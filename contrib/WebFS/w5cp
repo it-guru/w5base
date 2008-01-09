@@ -1,0 +1,194 @@
+#!/usr/bin/perl
+use strict;
+use LWP::UserAgent;
+use HTTP::Request::Common;
+use Getopt::Long;
+use File::Basename;
+use Fcntl qw(:DEFAULT);
+
+my ($help,$verbose,$loginuser,$loginpass,$quiet,$authstore);
+my $base="https://w5base.sf.net/w5base/auth/base/filemgmt/browser/";
+my $optresult = GetOptions ("help"       => \$help,
+                            "base=s"     => \$base,
+                            "webuser=s"  => \$loginuser,
+                            "webpass=s"  => \$loginpass,
+                            "authstore"  => \$authstore,
+                            "quiet"      => \$quiet,
+                            "verbose"    => \$verbose);
+#############################################################################
+#
+# show help, if this is requested by user
+#
+if ($help || !$optresult){
+   print(<<EOF);
+w5cp [options] source destination
+
+   --help    show this help
+   --verbose display more details of operation process
+   --quiet   only errors would be displayed
+   --base    base url of filemgmt (default: https://w5base.sf.net/w5base/auth/)
+
+   --webuser       username
+   --webpass       password
+   #--authstore    stores the authentification informations in home
+
+EOF
+   exit(1);
+}
+msg("INFO","W5Base w5cp: Operation system $^O");
+#######################################################################
+#
+# load "loginuser" from terminal if it is not set
+#
+if (!defined($loginuser)){
+   my $u;
+   while(1){
+      printf("login user: ");
+      $u=<STDIN>;
+      $u=~s/\s*$//;
+      last if ($u ne "");
+   }
+   $loginuser=$u;
+}
+
+#######################################################################
+#
+# load "loginpass" from terminal if it is not set
+#
+if (!defined($loginpass)){
+   my $p="";
+   system("stty -echo 2>/dev/null") if ($^O ne "MSWin32");
+   $SIG{INT}=sub{ system("stty echo 2>/dev/null") if ($^O ne "MSWin32");
+                  print("\n");
+                  exit(1)
+                };
+   while(1){
+      printf("password: ");
+      $p=<STDIN>;
+      $p=~s/\s*$//;
+      printf("\n");
+      last if ($p ne "");
+   }
+   system("stty echo 2>/dev/null") if ($^O ne "MSWin32");
+   $loginpass=$p;
+}
+
+#**********************************************************************
+#######################################################################
+#
+# prepare useragent
+#
+my $ua=LWP::UserAgent->new(env_proxy =>1,keep_alive=>1,timeout=>30);
+if ($ua->can("default_header")){
+   $ua->default_header('Accept-Language'=>"en");
+}
+
+#######################################################################
+#
+# prepare store url and opening source file
+#
+my @src;
+while(defined($ARGV[1])){
+   my $n=shift(@ARGV);
+   my @n=glob($n);
+   push(@src,@n);
+}
+my $dst=shift(@ARGV);
+if ($dst eq "" || $#src==-1){
+   msg("ERROR","parameter problem");
+   exit(2);
+}
+
+
+
+$dst=~s/^\///;
+$base=~s/\/$//;
+my $storeurl=$base."/base/filemgmt/browser/".$dst;
+msg("INFO","store to '$storeurl'");
+foreach my $src (@src){
+   printf("INFO:  start upload of '%s'\n",$src)  if (!defined($quiet));
+   my $srcSize;
+   if (open(F,"<$src")){
+      binmode(F);
+      (undef,undef,undef,undef,undef,undef,undef,$srcSize)=stat(F); 
+      seek(F,0,0);
+   }
+   else{
+      msg("ERROR",$!);
+      exit(2);
+   }
+   
+   #######################################################################
+   #
+   # prepare PUT request
+   #
+   my $basename=basename($src);
+   msg("INFO","Content-Name:'$basename'");
+   my $request=PUT($storeurl,'Content-Name'=>$basename);
+   $request->content_length($srcSize);
+   my $blknum=0;
+   my $block=65535;
+   my $blkcount=int($srcSize/$block);
+   $blkcount++ if ($blkcount*$block!=$srcSize);
+   $request->content(sub{
+                        my $d;
+                        msg("INFO","read file srcSize=$srcSize");
+                        return(undef) if ($srcSize<=0);
+                        $block=$srcSize if ($block>$srcSize);
+                        my $n=read(F,$d,$block);
+                        $blknum++;
+                        if (!defined($quiet)){
+                           printf("INFO:  send block %4d of %4d for %s\n",
+                                   $blknum,$blkcount,$src);
+                        }
+                        $srcSize-=$n;
+                        return($d);
+                     });
+   if ($loginuser ne "" || $loginpass ne ""){
+      my $xloginpass=$loginpass;
+      $xloginpass=~s/./*/g;
+      msg("INFO","authorization login=$loginuser password=$xloginpass");
+      $request->authorization_basic($loginuser,$loginpass);
+   }
+   
+   #######################################################################
+   #
+   # process the request and display the result
+   #
+   my $response=$ua->request($request);
+   if ($response->is_success) {
+      my $res=$response->content;
+      print $res if (!defined($quiet) || $res=~m/ERROR/);
+      exit(255) if ($res=~m/ERROR/);
+   }
+   else {
+      msg("ERROR",$response->status_line);
+      exit(200);
+   }
+   close(F);
+}
+exit(0);
+#**********************************************************************
+
+
+#######################################################################
+#
+# display messages formated
+#
+sub msg
+{
+   my $type=shift;
+   my $msg=shift;
+   my $format="\%-6s \%s\n";
+
+   if ($type eq "ERROR" || $type eq "WARN"){
+      printf STDERR ($format,$type.":",$msg);
+   }
+   else{
+      printf STDOUT ($format,$type.":",$msg) if ($verbose);
+   }
+}
+#######################################################################
+
+
+

@@ -1,0 +1,3 @@
+'AL_TCom::appl'=>{de=>'AL T-Com Anwendung',
+                  en=>'AL T-Com Application'},
+'allow to send for (Herbeiruf)'=>{de=>'Herbeiruf gestattet'},

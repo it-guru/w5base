@@ -1,0 +1,253 @@
+package itil::MyW5Base::efforts;
+#  W5Base Framework
+#  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+use strict;
+use vars qw(@ISA);
+use kernel;
+use kernel::MyW5Base;
+use kernel::date;
+@ISA=qw(kernel::MyW5Base);
+
+sub new
+{
+   my $type=shift;
+   my %param=@_;
+   my $self=bless($type->SUPER::new(%param),$type);
+   return($self);
+}
+
+sub isSelectable
+{
+   my $self=shift;
+
+#   my $acl=$self->getParent->getMenuAcl($ENV{REMOTE_USER},
+#                          "base::MyW5Base",
+#                          func=>'Main',
+#                          param=>'MyW5BaseSUBMOD=base::MyW5Base::wfmyjobs');
+#   if (defined($acl)){
+#      return(1) if (grep(/^read$/,@$acl));
+#   }
+   return(1);
+}
+
+
+
+sub Init
+{
+   my $self=shift;
+   $self->{DataObj}=getModuleObject($self->getParent->Config,"itil::appl");
+   return(0) if (!defined($self->{DataObj}));
+   $self->{DataObj}->AddFields(
+      new kernel::Field::Number(
+                name          =>'efforts_treal',
+                label         =>'Effort real',
+                searchable    =>0,
+                group         =>'efforts',
+                unit          =>'min',
+                depend        =>['id'],
+                onRawValue    =>sub {
+                   my $fieldself=shift;
+                   my $current=shift;
+                   my $id=$current->{id};
+
+                   return($self->Context->{treal}->{$id});
+                }),
+   #   new kernel::Field::Number(
+   #             name          =>'efforts_tprojection',
+   #             label         =>'Effort projection',
+   #             searchable    =>0,
+   #             depend        =>['id'],
+   #             onRawValue    =>sub {
+   #                my $fieldself=shift;
+   #                my $current=shift;
+   #                my $id=$current->{id};
+   #
+   #                   return($self->{treal}->{$id}+2);
+   #                }),
+
+      new kernel::Field::Number(
+                name          =>'efforts_employecount',
+                label         =>'Effort employecount',
+                searchable    =>0,
+                group         =>'efforts',
+                depend        =>['id'],
+                onRawValue    =>sub {
+                   my $fieldself=shift;
+                   my $current=shift;
+                   return($self->{usercount});
+                })
+   );
+   $self->{DataObj}->AddGroup("efforts",translation=>'itil::MyW5Base::efforts');
+
+
+   return(1);
+}
+
+
+
+
+
+sub getQueryTemplate
+{
+   my $self=shift;
+
+   my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
+                                            ["REmployee","RChief","RChief2"],
+                                            "down");
+
+   my $orgsel="<select name=search_grpid style=\"width:100%\">";
+   my $oldorg=Query->Param("search_grpid");
+   foreach my $rec (values(%grp)){
+      next if ($rec->{grpid}<=0);
+      $orgsel.="<option value=\"$rec->{grpid}\"";
+      $orgsel.=" selected" if ($oldorg eq $rec->{grpid});
+      $orgsel.=">$rec->{fullname}</option>";
+   }
+   $orgsel.="<option value=\"0\">only mine</option>";
+   $orgsel.="</select>";
+
+   my $msel=$self->getTimeRangeDrop("search_mon",$self->getParent,
+                                    "fixmonth",
+                                    "shorthist");
+
+
+   my $d=<<EOF;
+<div class=searchframe>
+<table class=searchframe>
+<tr>
+<td class=fname colspan=4 align=center><b>Dieses Modul ist noch im Test !!!</b></td>
+</tr>
+<tr>
+<td class=fname width=10%>Month:</td>
+<td class=finput width=40% >$msel</td>
+<td class=fname width=10%>Invoice Day:</td>
+<td class=finput width=40% ><select name=search_invoiceday><option value="1">1.</option></select></td>
+</tr>
+
+<tr>
+<td class=fname width=10%>Orgunit:</td>
+<td class=finput colspan=3>$orgsel</td>
+</tr>
+
+<tr>
+<td class=fname width=10%>Applicationname:</td>
+<td class=finput colspan=3 >\%name(search)\%</td>
+</tr>
+<tr>
+<td class=fname width=10%>\%customer(label)\%:</td>
+<td class=finput colspan=3 >\%customer(search)\%</td>
+</tr>
+</table>
+</div>
+%StdButtonBar(print,search)%
+EOF
+   return($d);
+}
+
+
+sub Result
+{
+   my $self=shift;
+   my %q=$self->{DataObj}->getSearchHash();
+   delete($q{mon});
+   delete($q{grpid});
+   delete($q{invoiceday});
+
+   my $invoiceday=Query->Param("search_invoiceday");
+   my $mon=Query->Param("search_mon");
+   my $grpid=Query->Param("search_grpid");
+   my ($mon,$year)=$mon=~m/^(\d+)\/(\d+)$/;
+   
+
+   #
+   # find user
+   #
+   my %user=();
+   if ($grpid!=0){
+      my $grp=getModuleObject($self->getParent->Config,"base::grp");
+      $grp->SetFilter({grpid=>\$grpid});
+      my @d=$grp->getHashList(qw(users));
+      foreach my $rec (@d){
+         next if (!defined($rec->{users}) || ref($rec->{users}) ne "ARRAY");
+         foreach my $urec (@{$rec->{users}}){
+            $user{$urec->{userid}}=1;
+         }
+      }
+      $self->{usercount}=keys(%user)+1;
+   }
+   else{
+      my $userid=$self->getParent->getCurrentUserId();
+      $user{$userid}=1;
+      $self->{usercount}=1;
+   }
+   msg(INFO,"user=%s\n",Dumper(\%user));
+ 
+   #
+   # find users actions
+   #
+   my ($Y1,$M1,$D1);
+   eval('($Y1,$M1,$D1)=Add_Delta_YM("GMT",$year,$mon,$invoiceday,0,1);');
+   if ($@ ne ""){
+      $self->getParent->LastMsg(ERROR,$@);
+      return(undef);
+   }
+   my $wfact=getModuleObject($self->getParent->Config,"base::workflowaction");
+   $wfact->SetFilter({creatorid=>[keys(%user)],
+                      cdate=>">$year-$mon-$invoiceday AND ".
+                             "<=$Y1-$M1-$invoiceday"
+                     }
+                    );
+   my %wfheadid=();
+   foreach my $rec ($wfact->getHashList(qw(wfheadid effort creator))){
+      if (defined($rec->{effort}) && $rec->{effort}!=0){
+         $wfheadid{$rec->{wfheadid}}+=$rec->{effort};
+      }
+   }
+   return(undef) if ($wfact->LastMsg());
+   #print STDERR Dumper(\%wfheadid);
+
+   #
+   # find affectedapplicationid
+   #
+   my $wfkey=getModuleObject($self->getParent->Config,"base::workflowkey");
+   $wfkey->SetFilter({wfheadid=>[keys(%wfheadid)],
+                      name=>\'affectedapplicationid'});
+   foreach my $rec ($wfkey->getHashList(qw(wfheadid value))){
+      my $applid=$rec->{value};
+      my $wfheadid=$rec->{wfheadid};
+      my $effort=$wfheadid{$wfheadid};
+      $self->Context->{treal}->{$applid}+=$effort;
+   }
+   $q{id}=[keys(%{$self->Context->{treal}})];
+
+   #print STDERR Dumper($self->Context->{treal});
+
+   $self->{DataObj}->ResetFilter();
+   $self->{DataObj}->SecureSetFilter([\%q]);
+   $self->{DataObj}->setDefaultView(qw(linenumber name customer conumber
+                                       efforts_treal
+                                       efforts_employecount
+                                       efforts_tprojection
+                                       ));
+   my %param=(ExternalFilter=>1);
+   return($self->{DataObj}->Result(%param));
+}
+
+
+
+1;

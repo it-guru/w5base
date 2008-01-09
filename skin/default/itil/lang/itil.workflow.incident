@@ -1,0 +1,6 @@
+'itil::workflow::incident'=>{de=>'ITIL Incident Prozess',
+                             en=>'ITIL Incident Process'},
+'fieldgroup.itilincident'=>{de=>'ITIL Incident Daten',
+                            en=>'ITIL Incident data'},
+'Description'=>{de=>'Incident Beschreibung'},
+

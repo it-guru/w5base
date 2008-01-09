@@ -1,0 +1,254 @@
+package base::usermask;
+#  W5Base Framework
+#  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+use strict;
+use vars qw(@ISA);
+use kernel;
+use kernel::App::Web;
+use CGI;
+@ISA=qw(kernel::App::Web);
+
+sub new
+{
+   my $type=shift;
+   my %param=@_;
+   my $self=bless($type->SUPER::new(%param),$type);
+   return($self);
+}
+
+sub getValidWebFunctions
+{
+   my ($self)=@_;
+   return(qw(Main));
+}
+
+sub isSubstValid
+{
+   my $self=shift;
+   my $realuser=shift;
+   my $substuser=shift;
+
+   my $isadmin=0;
+  # my $origREMOTE_USER=$ENV{REMOTE_USER};
+  # $ENV{REMOTE_USER}=$ENV{REAL_REMOTE_USER};
+   if ($ENV{REAL_REMOTE_USER} eq $substuser || $self->IsMemberOf("admin")){
+      $isadmin=1;
+   }
+  # $ENV{REMOTE_USER}=$origREMOTE_USER;
+   if ($isadmin){
+      return({usersubstid=>'admin',srcaccount=>$substuser});
+   }
+#   my $account=getModuleObject($self->Config,"base::useraccount");
+#   $account->SetFilter({account=>\$substuser});
+#   my ($substuserrec,$msg)=$account->getOnlyFirst(qw(userid));
+#   return(undef) if (!defined($substuserrec));
+
+
+   my $usersubst=getModuleObject($self->Config,"base::usersubst");
+   $usersubst->SetFilter({dstaccount=>\$realuser,
+                          srcaccount=>\$substuser,
+                          active=>\"1"});
+   
+   my ($substrec,$msg)=$usersubst->getOnlyFirst(qw(usersubstid srcaccount));
+   if (defined($substrec)){
+      return({srcaccount=>$substuser,usersubstid=>'admin'});
+   }
+   return();
+   
+#printf STDERR ("fifi 02 %s\n",Dumper(\@l));
+#   return(@l);
+}
+
+
+sub Main
+{
+   my ($self)=@_;
+   my $lastmsg="";
+   my $setaccount;
+   my $uainput="<input type=text name=setnewuser value=\"$ENV{REMOTE_USER}\" ".
+               "id=setnewuser style=\"width:100%\">";
+   if (Query->Param("setnewuser") ne ""){
+      my $setnewuser=trim(Query->Param("setnewuser"));
+      $uainput="<input type=text id=setnewuser name=setnewuser ".
+               "value=\"$setnewuser\" ".
+               "style=\"width:100%\">";
+      my $ua=getModuleObject($self->Config,"base::useraccount");
+      $ua->SetFilter({account=>\$setnewuser});
+      my @l=$ua->getHashList(qw(account));
+      if ($#l==-1){
+         my $altsetnewuser="\"*$setnewuser*\"";
+         $ua->SetFilter({account=>$altsetnewuser});
+         @l=$ua->getHashList(qw(account));
+         if ($#l==-1){
+            $lastmsg="ERROR "."account not found";
+         }
+      }
+      if ($#l==0){
+         # setzen
+         my @l=$self->isSubstValid($ENV{REAL_REMOTE_USER},$l[0]->{account});
+         if ($#l==0){
+            $setaccount=$l[0]->{srcaccount};
+            $lastmsg="OK ".
+                     sprintf(
+                        $self->T("account set by substitution id %s to '%s'"),
+                             $l[0]->{usersubstid},$setaccount);
+         }
+         else{ 
+            $lastmsg="ERROR "."account not allowed";
+         }
+      }
+      else{
+         $lastmsg="ERROR "."account not unique";
+         my $d="<select name=setnewuser style=\"width:100%\">";
+         $d.="<option value=\"$setnewuser\">$setnewuser</option>";
+         foreach my $rec (@l){
+            $d.="<option value=\"$rec->{account}\">$rec->{account}</option>";
+         }
+         $d.="<option value=\"\"></option>";
+         $d.="</select>";
+         $uainput=$d;
+      }
+   }
+ 
+   my $mycontactid;
+   my $UserCache=$self->Cache->{User}->{Cache};
+   if (defined($UserCache->{$ENV{REMOTE_USER}})){
+      $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
+   }
+   if (defined($UserCache->{userid})){
+      $mycontactid=$UserCache->{userid};
+   }
+   if (!defined($mycontactid)){
+      print $self->HttpHeader("text/plain");
+      print msg(ERROR,"unknown contact id for user $ENV{REMOTE_USER}");
+      return(undef); 
+   }
+   my $uau=getModuleObject($self->Config,"base::usersubstusage");
+   $uau->SetFilter({userid=>$mycontactid});
+   my @uaulist=$uau->getHashList(qw(usersubstusageid account));
+   my @lastused=map({$_->{account}} @uaulist);;
+   push(@lastused,$ENV{REAL_REMOTE_USER});
+   my $lastused="<select size=5 name=lastuse ".
+                "onchange=\"SetNewAcc(this);\" ".
+                "style=\"width:100%;height:100%\">";
+   foreach my $acc (reverse(@lastused)){
+      $lastused.="<option value=\"$acc\">$acc</option>";
+   }
+   $lastused.="</select>";
+   my %h=();
+   if (defined($setaccount)){
+      my $cookie;
+      if ($setaccount eq $ENV{REAL_REMOTE_USER}){
+         $cookie=Query->Cookie(
+                       -path=>'/',
+                       -name=>"remote_user",
+                       -value=>'',
+                       -expires=>'-1s');
+      }
+      else{
+         $cookie=Query->Cookie(
+                       -path=>'/',
+                       -name=>"remote_user",
+                       -value=>$setaccount);
+         my @cleanup;
+         for(my $c=0;$c<=$#uaulist;$c++){
+            if ($uaulist[$c]->{account} eq $setaccount){
+               push(@cleanup,$uaulist[$c]);
+            }
+            if ($c+($#cleanup+1)>10){
+               push(@cleanup,$uaulist[$c]);
+            }
+         }
+         foreach my $rec (@cleanup){
+            $uau->ValidatedDeleteRecord($rec);
+         }
+         $uau->ValidatedInsertRecord({userid=>$mycontactid,
+                                      account=>$setaccount});
+      }
+      $h{'-cookie'}=$cookie;
+   }
+   print(Query->Header(%h)); 
+   print $self->HtmlHeader(style=>'default.css',
+                           title=>$self->T($self->Self()));
+   print $self->HtmlBottom(body=>1,form=>1);
+   print <<EOF;
+<script language="JavaScript">
+function SetNewAcc(o)
+{
+   var dst=document.getElementById("setnewuser");
+   for(i=0;i<o.options.length;i++){
+      if (o.options[i].selected){
+         dst.value=o.options[i].value;
+      }
+      o.options[i].selected=false;
+   }
+}
+</script>
+EOF
+   if ($lastmsg=~m/^OK /){
+      print <<EOF;
+<script language="JavaScript">
+function fineclose()
+{
+   parent.hidePopWin(true);
+}
+window.setTimeout("fineclose();",1000);
+</script>
+EOF
+   }
+   if ($lastmsg=~m/^OK /){
+      $lastmsg="<font style=\"color:darkgreen\">$lastmsg</font>";
+   }
+   if ($lastmsg=~m/^ERROR /){
+      $lastmsg="<font style=\"color:red\">$lastmsg</font>";
+   }
+   my $currentuserlabel=$self->T("Current logged in useraccount");
+   my $effectuserlabel=$self->T("Effective useraccount");
+   my $lastlabel=$self->T("List of last used substitution accounts");
+   print <<EOF;
+<form method=post><center>
+<table border=0 cellspacing=2 cellpadding=1 width=98% height=180>
+<tr height=1%>
+<td width=1% nowrap>$currentuserlabel:</td>
+<td>
+<input style="width:100%;background:silver;" type=text value="$ENV{REAL_REMOTE_USER}" disabled>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr height=1%>
+<td width=1% nowrap>$effectuserlabel:</td>
+<td>$uainput</td>
+<td width=1%><input type=submit value="setzen"></td>
+</tr>
+<tr height=1%>
+<td colspan=3>$lastmsg&nbsp;</td>
+</tr>
+<tr height=1%>
+<td colspan=3>$lastlabel:</td>
+</tr>
+<tr>
+<td colspan=3>$lastused</td>
+</tr>
+</table>
+EOF
+      
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+
+1;

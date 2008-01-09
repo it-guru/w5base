@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <operation name="AL_TCom::workflow::diary::HEAD" reference="MyRef001">
+    <srcid>aaa</srcid>
+    <name>Dies ist ein Test Betriebstagebuch</name>
+    <detaildescription>b</detaildescription>
+    <affectedapplication>c</affectedapplication>
+    <state></state>
+    <eventstart></eventstart>
+    <eventend></eventend>
+    <tcomcodrelevant></tcomcodrelevant>
+    <tcomcodcause></tcomcodcause>
+    <tcomcodcomments></tcomcodcomments>
+    <tcomworktime></tcomworktime>
+  </operation>
+  <operation name="AL_TCom::workflow::diary::ADD">
+    <wfheadid>a</wfheadid>
+    <comments>a</comments>
+    <effort>a</effort>
+  </operation>
+</root>

@@ -1,0 +1,22 @@
+<!------------------------------------------------------------------------>
+<table id=tabelle width="710" border="0" cellspacing="0" cellpadding="0">
+  <tr> 
+    <td class=col1 nowrap valign=center>
+    <div class=timestamp>
+    %emailtstamp%
+    %emailprefix%
+    </div></td>
+    <td class="zelleWeiss">
+       <div style="width:530;overflow:hidden">
+          <p class=header><u><b>%emailhead%</u></b></p>
+       </div>
+       <pre class="text">%emailtext%</pre>
+    </td>
+  </tr>
+</table>
+<!------------------------------------------------------------------------>
+
+
+
+</body>
+</html>

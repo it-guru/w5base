@@ -1,0 +1,4 @@
+'itil::platform'=>{de=>'Hardware-Plattform',en=>'Hardware-platform'},
+'fieldgroup.default'=>{de=>'Hardware-Plattform-Daten',en=>'Hardware-platform-Informations'},
+'fieldgroup.source'=>{de=>'Datenquelle',en=>'Datasource'},
+'you are only authorized to add in \'order\' or \'reserved\' state'=>{de=>'Sie sind nur berechtig, im Status \'angefordert\' oder \'reserviert\' Datensätze zu erzeugen'},

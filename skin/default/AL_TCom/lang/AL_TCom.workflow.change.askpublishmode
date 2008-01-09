@@ -1,0 +1,14 @@
+'MSG001'=>{de=>'Sehr geehrte Damen und Herren,
+
+hiermit informieren wir Sie über den beigefügten Change. 
+Sie erhalten diese Information als Service-Manager der Anwendung, als TSM der Anwendung sowie als TSM/TSM-Vetreter einer Schnittstellenanwendung.
+Als TSM der Anwendung müssen Sie den Change im Servicecenter unter der Changenummer approven und evt. confirmen.
+Diese Information erhalten die TSM der Anwendungen bis 31.12.2007. 
+Ab dem 01.01.2008 sollen vom TSM der AG die Changes ohne Informationsmail approved werden.
+
+(Bitte beachten Sie, dass der beigefügte Direkt-Link die Information aus ServiceCenter mit 10-15min Verzögerung wiedergibt!)
+',
+en=>'Dear Sirs,
+
+we want to inform you about the attached change.'},
+'AL-TCom Change notification'=>{de=>'AL T-Com Benachrichtungsmodus'},

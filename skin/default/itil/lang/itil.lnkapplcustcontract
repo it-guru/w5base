@@ -1,0 +1,9 @@
+'itil::lnkapplcustcontract'=>{de=>'Anwendungs-Kundenvertragsverknüpfung',
+                              en=>'Application-CustomerContract Link'},
+'fieldgroup.default'=>{de=>'Verknüfpungsinformation',
+                       en=>'Linkinformations'},
+'Fraction'=>{de=>'Anteil'},
+'Application'=>{de=>'Anwendung'},
+'Customer Contract'=>{de=>'Kundenvertrag'},
+'Customer ContractId'=>{de=>'Kundenvertrags ID'},
+

@@ -1,0 +1,842 @@
+#!/usr/bin/env perl
+package W5Server;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/../mod";
+use strict;
+use vars qw(@ISA);
+use RPC::Smart::Server;
+use RPC::Smart::Client;
+use Data::Dumper;
+use Date::Calc qw(Today_and_Now);
+use kernel;
+use kernel::App;
+use kernel::cgi;
+use kernel::EventController;
+use IO::Select;
+use File::Temp qw(tempfile);
+use POSIX;
+
+@ISA=qw(RPC::Smart::Server kernel::App);
+
+
+sub rpcGetSSHkey
+{
+   my $self=shift;
+   if (! -d $ENV{HOME}){
+      return({exitcode=>1,msg=>"can't access home $ENV{HOME}"});
+   }
+   if (! -d $ENV{HOME}."/.ssh"){
+      return({exitcode=>1,msg=>"can't access home $ENV{HOME}/.ssh"});
+   }
+   if (! -r $ENV{HOME}."/.ssh/id_dsa.pub"){
+   }
+   if (!open(F,"<".$ENV{HOME}."/.ssh/id_dsa.pub")){
+      return({exitcode=>1,msg=>"can't access home $ENV{HOME}/.ssh/id_dsa.pub"});
+   }
+   my $key=join("",<F>);
+   $key=~s/\s*$//;
+   close(F);
+
+   return({exitcode=>0,key=>$key});
+}
+
+sub rpcReloadW5Server
+{
+   my $self=shift;
+   my $name=shift;
+
+   msg(DEBUG,"reload request for '$name' - active Servers:\n==>%s",
+             join("\n==>",keys(%{$self->{W5ServerProcess}})));
+   if (exists($self->{W5ServerProcess}->{$name})){
+      my $pid=$self->{W5ServerProcess}->{$name}->{AsyncID};
+      if (kill(1,$pid)){
+         return({exitcode=>0});
+      }
+      return({exitcode=>2,msg=>"fail to send reconfigure signal"});
+   }
+   return({exitcode=>1,msg=>"unknown or inactive server $name"});
+}
+
+sub rpcCallEvent
+{
+   my $self=shift;
+   return($self->rpcCallSerialEvent(@_));
+}
+
+
+sub rpcCallSerialEvent
+{
+   my $self=shift;
+   my $event=shift;
+   my @p=@_;
+
+   if ($self->{EventController}->isEvent($event)){
+      my $timeout=$self->{EventController}->getMaxEventTimeout($event);
+      return($self->async(sub {
+         $0="W5Server '$event'";
+         $self->initAsyncEnv($event);
+         $self->{EventController}->setParent($self);
+         my @methods=$self->{EventController}->getEventMethods($event);
+         msg(DEBUG,"rpcCallSerialEvent: name=$event timeout=$timeout ".
+                   "methods=%d",$#methods+1);
+         my @bk;
+         my $joblog=getModuleObject($self->Config,"base::joblog");
+         msg(DEBUG,"joblog=$joblog");
+         foreach my $method (@methods){
+            my %jobrec=(name=>$method,event=>$event,pid=>$$);
+            my $jobid=$joblog->ValidatedInsertRecord(\%jobrec);
+            msg(DEBUG,"jobid=$jobid");
+            my @subbk=$self->{EventController}->ProcessEvent($event,
+                                                             {param=>[@p]},
+                                                             $method);
+            for(my $c=0;$c<=$#subbk;$c++){
+               $subbk[$c]->{jobid}=$jobid if (ref($subbk[$c]) eq "HASH");
+            }
+            push(@bk,@subbk);
+         }
+         my $exitcode=0;
+         $exitcode=1 if ($#bk==-1);
+         return({exitcode=>$exitcode,handlerresult=>\@bk});
+      },timeout=>$timeout));
+   }
+   return({exitcode=>1,nohandler=>1});
+}
+
+sub rpcProcessState
+{
+   my $self=shift;
+   return($self->rpcAsyncState(@_));
+}
+
+sub rpcAsyncState
+{
+   my $self=shift;
+   my $id=shift;
+   my $tasks=$self->getTasksHash();
+
+   if (!defined($id) || !defined($tasks->{$id})){
+      return({exitcode=>1,invalidAsyncID=>1});
+   }
+   my %res=%{$tasks->{$id}};
+   my $ipcval=$tasks->{$id}->{ipc}->fetch();
+   delete($res{ipc}); 
+   my $VAR1=undef;
+   eval($ipcval);
+   if ($@ eq ""){
+      $res{ipc}=$VAR1;
+   }
+   return({exitcode=>0,process=>\%res});
+}
+
+#
+# a sample of the notification of the users on change of faq entry
+#
+# $w5server->Call("rpcCallSpooledEvent",            # sample
+#                 "faqnotify-123456789012345",      # unique tag
+#                 600,3600,12                       # timing
+#                 423423423423,                     # id of calling user or 0
+#                 "notifyFaqListener","123456789012345") # event call
+#
+
+sub rpcCallSpooledEvent
+{
+   my $self=shift;
+   my %param=@_;
+   msg(DEBUG,"rpcCallSpooledEvent\n%s",Dumper(\@_));
+   my $spooltag=$param{spooltag};  # tag label of the event (is unique)
+   my $firstcalldelay=$param{firstcalldelay}; 
+                                   # try to call the event in n seconds at first
+   my $interval=$param{interval};  # retry if the first call fails
+   my $retrycount=$param{retrycount};      # maximum retry count
+   my $userid=$param{userid};      # user witch calls the event
+   my $name=$param{eventname};     # eventname
+   my $redefine=$param{redefine};  # eventname
+   my @p;
+   if (defined($param{eventparam}) && ref($param{eventparam}) eq "ARRAY"){
+      @p=@{$param{eventparam}};
+   }
+   else{
+      @p=($param{eventparam});
+   }
+   if ($userid==0){
+      return({exitcode=>1,msg=>'ERROR: no userid given'});
+   }
+   $redefine=0          if (!defined($redefine));
+   $interval=10         if ($interval<10);
+   $retrycount=3        if (!defined($retrycount));
+   $firstcalldelay=5    if ($firstcalldelay<5);
+   $spooltag="t".time() if ($spooltag eq "");
+
+   # 1. Step: the minimum firstcallin time is 10 seconds
+   # 2. Step: put the entry in the processtimer control hash
+   # 3. Step: init async process
+   # 4. Step: write an entry in the eventspool table by base::eventspool
+   my $control={spooltag       =>$spooltag,
+                eventname      =>$name,
+                eventparam     =>join(" ",@p),
+                retryinterval  =>$interval,
+                maxretry       =>$retrycount,
+                failcount      =>0,
+                unixcalltime   =>time(),
+                lasttrytime    =>undef,
+                firstcalldelay =>$firstcalldelay,
+                createuser     =>$userid};
+   if (!defined($self->{EventSpool}->{$spooltag}) ||
+       ($redefine==1 && !defined($self->{EventSpool}->{$spooltag}->{run}))){
+      $self->{EventSpool}->{$spooltag}=$control;
+      return({exitcode=>0});
+   }
+   return({exitcode=>1,msg=>'event already running or not redefineable'});
+}
+
+sub DumpJobSpool
+{
+   my $self=shift;
+   my $spooltag=shift;
+ #  my $jobspool=getModuleObject($self->Config,"base::jobspool");
+ #  if (defined($spooltag)){
+ #     print STDERR Dumper($self->{EventSpool}->{$spooltag});
+ #  }
+ #  else{
+ #     print STDERR Dumper($self->{EventSpool});
+ #  }
+}
+
+sub rpcMultiCacheQuery
+{
+   my $self=shift;
+   my $account=shift;
+   my %res=();
+   my $r;
+
+   msg(DEBUG,"rpcMultiCacheQuery from $account");
+   return({exitcode=>1,msg=>'noaccount'}) if ($account eq "");
+   $r=$self->QueryCache("User",$account);
+   if (defined($r) && $r->{exitcode}==0){
+      $res{User}=$r->{state};
+   }
+   $r=$self->QueryCache("Menu");
+   if (defined($r) && $r->{exitcode}==0){
+      $res{Menu}=$r->{state};
+   }
+   $r=$self->QueryCache("Group");
+   if (defined($r) && $r->{exitcode}==0){
+      $res{Group}=$r->{state};
+   }
+   $r=$self->QueryCache("Mandator");
+   if (defined($r) && $r->{exitcode}==0){
+      $res{Mandator}=$r->{state};
+   }
+
+   return({exitcode=>0,%res});
+}
+
+
+sub rpcCacheQuery
+{
+   my $self=shift;
+   my $name=shift;
+   my $subkey=shift;
+
+   my $msg="rpcCacheQuery: name=$name";
+   $msg.="subkey=$subkey" if ($subkey ne "");
+   msg(DEBUG,$msg);
+   return($self->QueryCache($name,$subkey));
+}
+
+sub QueryCache
+{
+   my $self=shift;
+   my $name=shift;
+   my $subkey=shift;
+
+   if (!defined($self->{CacheState})){
+      my $id=$self->rpcGetUniqueId->{id};
+      $self->{CacheState}={state=>$id,subkey=>{}};
+   }
+   my $ca=$self->{CacheState};
+   if (!defined($name)){
+      return({exitcode=>0,state=>$ca->{state}})
+   }
+   if (!defined($ca->{subkey}->{$name})){
+      my $id=$self->rpcGetUniqueId->{id};
+      $ca->{subkey}->{$name}={subkey=>{},state=>$id};
+   }
+   if (!defined($subkey)){
+      return({exitcode=>0,state=>$ca->{subkey}->{$name}->{state}});
+   }
+   if (!defined($ca->{subkey}->{$name}->{subkey}->{$subkey})){
+      my $id=$self->rpcGetUniqueId->{id};
+      $ca->{subkey}->{$name}->{subkey}->{$subkey}={state=>$id};
+   }
+   return({exitcode=>0,
+           state=>$ca->{subkey}->{$name}->{subkey}->{$subkey}->{state}});
+}
+
+sub rpcCacheInvalidate
+{
+   my $self=shift;
+   my $name=shift;
+   my $subkey=shift;
+
+   msg(DEBUG,"rpcCacheInvalidate: name=$name subkey=$subkey");
+   my $id=$self->rpcGetUniqueId->{id};
+
+   if (!defined($subkey) && !defined($name)){
+      delete($self->{CacheState});
+   }
+   if (!defined($subkey) && defined($name)){
+      delete($self->{CacheState}->{subkey}->{$name});
+   }
+   if (defined($subkey) && defined($name)){
+      delete($self->{CacheState}->{subkey}->{$name}->{subkey}->{$subkey});
+   }
+   return($self->rpcCacheQuery($name,$subkey));
+}
+
+sub rpcGetUniqueId
+{
+   my $self=shift;
+
+   msg(DEBUG,"rpcGetUniqueId: UniqueId=%d/%d time=%d",
+             $self->{'UniqueId'}->{'counter'},
+             $self->{'UniqueId'}->{'timer'},
+             time());
+   if (time() > ($self->{'UniqueId'}->{'timer'})){
+      $self->{'UniqueId'}->{'counter'}=0;
+      $self->{'UniqueId'}->{'timer'}=time();
+   }
+   $self->{'UniqueId'}->{'counter'}++;
+   return({id=>sprintf("%011d%04d",time(),$self->{'UniqueId'}->{'counter'}),
+           exitcode=>0});
+}
+
+sub Config
+{
+   my ($self)=@_;
+
+   return($W5V2::Config);
+}
+
+sub W5ServerConnect
+{
+   my $self=shift;
+
+   if (!defined($W5V2::W5Server)){
+      my %ClientParam;
+      $ClientParam{'PeerAddr'}=$self->Config->Param("W5SERVERHOST");
+      $ClientParam{'PeerPort'}=$self->Config->Param("W5SERVERPORT");
+      $W5V2::W5Server=new RPC::Smart::Client(%ClientParam);
+      $W5V2::W5Server->Connect();
+   }
+   $self->Cache->{W5Server}=$W5V2::W5Server;
+   $W5V2::Query=new kernel::cgi({});
+
+}
+sub initAsyncEnv
+{
+   my $self=shift;
+   my $label=shift;
+
+   delete($self->{W5Server});
+   delete($self->{W5ServerProcess});
+   $self->W5ServerConnect();
+   #######################################################################
+   # STDERR Handling
+   #
+   $|=1;
+   pipe(REDIRSTDERR,NEWSTDERR);
+   my $pid=fork();
+   if ($pid==0){
+      $SIG{INT}='IGNORE';
+      $SIG{HUP}='DEFAULT';
+      $0.=" MONITOR";
+      my @e;
+      my @output;
+      my $ppid=POSIX::getppid();
+      my $evname="event $label ";
+      my %oldtaskenv=%{$self->{taskenv}};
+      while(1){
+         if (defined($self->{taskenv}) && defined($self->{taskenv}->{timeout})){
+            if ($self->{taskenv}->{start}+$self->{taskenv}->{timeout}<time()){
+               my $msg="ERROR: killed $evname at pid=$ppid by timeout ".
+                       "$self->{taskenv}->{timeout}sec by signal TERM\n";
+               kill(15,$ppid);
+               sleep(1);
+               sleep(3)      if (kill(0,$ppid));
+               if (kill(0,$ppid)){
+                  kill(9,$ppid);
+                  $msg="ERROR: force killed event at pid=$ppid by timeout ".
+                       "$self->{taskenv}->{timeout}sec by signal KILL\n";
+                  sleep(3);
+                  if (kill(0,$ppid)){
+                     $msg.="ERROR: shit - force kill haven't kill pid $ppid\n";
+                     $msg.="ERROR: ... this is not good !!!\n";
+                  }
+               }
+               push(@e,$msg);
+            }
+         }
+         my $s=new IO::Select();
+         $s->add(\*REDIRSTDERR);
+         my @ready=$s->can_read(1);
+         if ($#ready!=-1){
+            $_=<REDIRSTDERR>;
+            push(@output,$_);
+            print STDERR "STDERR($ppid):".$_;
+            if (!($_=~m/^INFO:/ ||
+                  $_=~m/^DEBUG:/)){
+               push(@e,$_);
+            }
+         }
+        # else{
+        #    sleep(1);
+        # }
+        last if (!kill(0,$ppid));
+      }
+      $SIG{INT}='DEFAULT';
+      $SIG{HUP}='DEFAULT';
+      $SIG{CHLD}='DEFAULT';
+      $SIG{ALRM}='DEFAULT';
+      $SIG{PIPE}='DEFAULT';
+      $SIG{WARN}='DEFAULT';
+      my %taskenv=%{$self->{taskenv}};
+      my $ipcval=$taskenv{ipc}->fetch();
+      delete($taskenv{ipc}); 
+      my $VAR1=undef;
+      eval($ipcval);
+      my $ipcresult;
+      if ($@ eq ""){
+         $ipcresult=$VAR1;
+      }
+      else{
+         my $res=$@;
+         push(@e,"ERROR: eval error on IPC Result");
+         push(@e,msg(ERROR,$res));
+         push(@e,"ipcval=$ipcval");
+      }
+      if (!defined($ipcresult)){
+         push(@e,msg(ERROR,"$evname maybe crashed? - no valid ipc results"));
+         push(@e,msg(ERROR,Dumper(\%taskenv)));
+         push(@e,msg(ERROR,"old=".Dumper(\%oldtaskenv)));
+         push(@e,"ipcval=$ipcval");
+      }
+      if ($#e!=-1){
+         if ($#output!=-1){
+            if ($#output>10){
+               splice(@output,0,$#output-10);
+            }
+            push(@e,"\n","last 10 lines output dump:\n",
+                         "==========================\n",@output);
+         }
+         my @sendmailpath=qw(/usr/local/sbin/sendmail 
+                             /sbin/sendmail 
+                             /usr/sbin/sendmail 
+                             /usr/lib/sendmail
+                             /usr/lib/sbin/sendmail);
+         my $sendmail=undef;
+         foreach my $s (@sendmailpath){
+            if (-x $s){
+               $sendmail=$s;
+               last;
+            }
+         }
+         if (!defined($sendmail)){
+            printf STDERR ("ERROR no sendmail found\n");
+            exit(1);
+         }
+
+         my $user=$self->Config->Param("W5SERVERUSER");
+         $user="root" if ($user eq "");
+         my ($fh,$filename)=tempfile();
+         if (defined($fh)){ 
+            printf $fh ("cat << EOF | $sendmail -t\n");
+            printf $fh ("To: %s\n",$user);
+            printf $fh ("From: %s\n","W5Server");
+            printf $fh ("Subject: %s\n","ERROR: ".
+                   "messages while processing $evname messages");
+            printf $fh ("Content-Type: text/plain; charset=\"iso-8859-1\"\n\n");
+            print $fh join("",@e);
+            print $fh "\nEOF\n";
+            close($fh);
+            system("sh $filename");
+            unlink($filename);
+         }
+      #   if (open(F,"|".$sendmail." -t")){
+      #      F->autoflush(1);
+      #      printf F ("To: %s\n",$user);
+      #      printf F ("From: %s\n","W5Server");
+      #      printf F ("Subject: %s\n","ERROR: ".
+      #             "messages while processing $evname messages");
+      #      printf F ("Content-Type: text/plain; charset=\"iso-8859-1\"\n\n");
+      #      print F join("",@e);
+      #      print F join("\n\n\n");
+      #      print F join("\n\n\n");
+      #      print F join("\n\n\n");
+      #      close(F);
+      #   }
+      }
+      my $joblog=getModuleObject($self->Config,"base::joblog");
+      if (defined($ipcresult->{handlerresult}) &&
+          ref($ipcresult->{handlerresult}) eq "ARRAY"){
+         foreach my $m (@{$ipcresult->{handlerresult}}){
+            if (defined($m->{jobid}) && $m->{jobid} ne ""){
+               my $exitcode;
+               my $exitstate="unknown";
+               if (defined($m->{exitcode})){
+                  $exitcode=$m->{exitcode};
+                  $exitstate="retry" if ($exitcode<0);
+                  $exitstate="fail" if ($exitcode>0);
+                  $exitstate="ok"   if (defined($exitcode) && $exitcode==0);
+               }
+               $joblog->ValidatedUpdateRecord({id=>$m->{jobid}},
+                                             {exitcode=>$exitcode,
+                                              exitstate=>$exitstate},
+                                             {id=>\$m->{jobid}});
+            }
+         }
+      }
+      $joblog->SetFilter({pid=>\$ppid});
+      $joblog->SetCurrentView(qw(ALL));
+      $joblog->ForeachFilteredRecord(sub{
+                            if (!defined($_->{exitstate}) ||
+                                $_->{exitstate} eq ""){
+                               $joblog->ValidatedUpdateRecord($_,
+                                    {exitstate=>'abort'},{id=>\$_->{id}});
+                            }
+                            });
+      msg(DEBUG,"controll process for pid=%d end",$ppid);
+      msg(DEBUG,"pid=%d ends width errors",$ppid) if ($#e!=-1);
+      POSIX::_exit(0);
+   }
+   open(STDERR, ">&NEWSTDERR");
+   #######################################################################
+   #$self->ValidateGroupCache(); # mal ein Test, ob es auch ohne geht
+}
+
+
+sub sig_hup
+{
+   my $self=shift;
+   my $bk=$self->SUPER::sig_hup();
+
+   delete($ENV{BOUND_SOCKETS});
+   return($bk);
+}
+
+sub ProcessSpoolEvent
+{
+   my $self = shift;
+   my $control = shift;
+   msg(DEBUG,"Run spooled event: %s",$control->{spooltag});
+   if (defined($control->{run})){
+      msg(DEBUG,"name=%s d=%s",$control->{eventname},Dumper($control->{run}));
+      return();
+   }
+   $control->{lasttrytime}=time();
+   $control->{run}=$self->rpcCallSerialEvent($control->{eventname},
+                                             $control->{eventparam});
+}
+
+sub run_dequeue
+{
+   my $self = shift;
+   my $bk=$self->{EventController}->ProcessTimer();
+   $self->CheckW5ServerProcess();
+   if (defined($self->{EventSpool}) && keys(%{$self->{EventSpool}})){
+      msg(DEBUG,"EventSpool: %s",join(",",keys(%{$self->{EventSpool}})));
+      foreach my $control (values(%{$self->{EventSpool}})){
+         if (defined($control->{run}) && $control->{run}->{nohandler}==1){
+            delete($self->{EventSpool}->{$control->{spooltag}}); 
+         }
+         if (defined($control->{run}) && defined($control->{run}->{AsyncID})){
+            my $st=$self->rpcAsyncState($control->{run}->{AsyncID});
+            if ($st->{exitcode}==0){
+               if (exists($st->{process}->{exitcode})){
+                  my $e=$st->{process}->{exitcode};
+                  if ($e==0){
+                     delete($self->{EventSpool}->{$control->{spooltag}});
+                  }
+                  elsif ($e<0){
+                     $control->{failcount}--;
+                     $control->{failcount}=0 if ($control->{failcount}<0);
+                  }
+                  else{
+                     delete($self->{EventSpool}->{$control->{spooltag}}->{run});
+                  }
+               }
+            }
+            #delete($self->{EventSpool}->{$control->{spooltag}}); 
+         }
+         else{
+            if (!defined($control->{lasttrytime})){
+               if ($control->{unixcalltime}+$control->{firstcalldelay}<time()){
+                  $self->ProcessSpoolEvent($control);
+               }
+            }
+            else{
+               if ($control->{lasttrytime}+$control->{retryinterval}<time()){
+                  if ($control->{failcount}>$control->{maxretry}){
+                     # event failed - notify admin 
+                     delete($self->{EventSpool}->{$control->{spooltag}});
+                  }
+                  else{
+                     $control->{failcount}++;
+                     $self->ProcessSpoolEvent($control);
+                  }
+               }
+            } 
+         } 
+      }
+   }
+   return($self->SUPER::run_dequeue(@_));
+}
+
+sub configure_hook
+{
+   my $self=shift;
+
+   $self->max_async(300);
+   $self->{'UniqueId'}={'counter'=>0,timer=>time()};
+   $self->{'CacheState'}={};
+   if ($W5V2::Debug==1){
+      $self->{'debug'}=1;
+   }
+   $self->{Config}=$W5V2::Config;
+
+   my $dummyapp=new kernel::App(Config=>$self->{Config});
+   if (!defined($W5V2::Translation{$dummyapp})){
+      $W5V2::Translation{$dummyapp}={self=>$dummyapp,tab=>{}};
+   }
+   $W5V2::Translation=$W5V2::Translation{$dummyapp};
+
+   msg(DEBUG,"debug=%s",$self->{'debug'});
+   @ARGV[0]="W5Server";
+   $self->{EventController}=new kernel::EventController(
+                                                        Config=>$self->{Config}
+                                                       );
+   $self->{EventController}->LoadEventHandler();
+   return(1);
+}
+
+sub post_configure_hook
+{
+   my $self=shift;
+
+   my $statefile=$self->getOfflineStateFile();
+   if (-f $statefile){
+      if (open(F,"<$statefile")){
+         my $d=join("",<F>);
+         eval($d);
+         msg(DEBUG,"loaded %d events from statefile",
+                    keys(%{$self->{EventSpool}}));
+         close(F);
+         unlink($statefile);
+      }
+   }
+}
+
+sub pre_loop_hook
+{
+   my $self=shift;
+
+   my @ent=getpwuid($>);
+   my $home=$ent[7];
+   $ENV{HOME}=$home if (-d $home);
+
+   $self->RunScheduler();
+   return(1);
+}
+
+sub RunScheduler
+{
+   my $self=shift;
+   $self->LoadSubObjs("W5Server","W5Server");
+   foreach my $server (keys(%{$self->{W5Server}})){
+      $self->StartW5ServerProcess($server);
+   }
+
+   #########################################################################
+}
+
+sub StartW5ServerProcess
+{
+   my $self=shift;
+   my $server=shift;
+
+   my $srv=$self->{W5Server}->{$server};
+   my $srvcode;
+   eval('$srvcode=sub {
+                               $0="W5Sserver-".$server;
+                               sub start{
+                                   $srv->start();
+                               }
+                               sub process{
+                                   $srv->process();
+                               }
+                               sub hup{
+                                   $srv->reload();
+                               }
+                               sub shutdown{
+                                   $srv->end();
+                                   exit(0);
+                               }
+                               $SIG{HUP}=\&hup;
+                               $SIG{INT}=\&shutdown;
+                               msg(DEBUG,"srvobj=$srv");
+                               $self->W5ServerConnect();
+                               start(); 
+                               process(); 
+                               return({exitcode=>0});
+                            }');
+   my $sched=$self->async($srvcode);
+   $self->{W5ServerProcess}->{$server}=$sched;
+}
+
+sub CheckW5ServerProcess
+{
+   my $self=shift;
+   foreach my $server (keys(%{$self->{W5Server}})){
+      my $pid=$self->{W5ServerProcess}->{$server}->{AsyncID};
+      if (!kill(0,$pid)){
+         $self->StartW5ServerProcess($server);
+      }
+   }
+}
+
+
+sub getOfflineStateFile
+{
+   my $self=shift;
+   my $statefile=$self->{server}->{pid_file};
+   $statefile=~s/\.pid$/\.state/;
+   return($statefile);
+}
+
+sub pre_server_close_hook
+{
+   my $self=shift;
+
+   #$self->DumpJobSpool();
+   my $statefile=$self->getOfflineStateFile();
+   msg(DEBUG,"server shutdown initiated");
+   foreach my $server (keys(%{$self->{W5Server}})){
+      my $pid=$self->{W5ServerProcess}->{$server}->{AsyncID};
+      kill(2,$pid);
+   }
+   if (defined($self->{EventSpool}) && keys(%{$self->{EventSpool}}) &&
+       $statefile ne ""){
+      msg(DEBUG,"try to dump eventspool to %s",$statefile);
+      if (open(F,">$statefile")){
+         print F Data::Dumper->Dump([$self->{EventSpool}], 
+                                    ['$self->{EventSpool}']);
+         msg(DEBUG,"dump eventspool ok");
+         close(F);
+      }
+   }
+}
+#######################################################################
+package main;
+use vars qw($opt_v $opt_h $opt_c $configname);
+use Getopt::Long;
+use Net::Server::Daemonize qw(daemonize);
+use kernel;
+use kernel::config;
+$ENV{PATH}="/usr/bin:/bin:/usr/contrib/bin:/usr/sbin:/sbin:".
+           "/usr/local/bin:/usr/local/sbin:/opt/openssh/bin:".
+           "/opt/ssh/bin/usr/local/ssh/bin";
+my @ARGV_bak=@ARGV;
+exit(1) if (!GetOptions('verbose'=>\$opt_v,
+                        'debug'=>\$opt_v,
+                        'help'=>\$opt_h,
+                        'config=s'=>\$opt_c));
+if ($opt_v){
+   $W5V2::Debug=1;
+}
+else{
+   $W5V2::Debug=0;
+}
+
+if (defined($opt_h)){
+   help();
+   exit(1);
+}
+if ($opt_c eq ""){
+   $opt_c="w5server";
+}
+$configname=$opt_c;
+my %ServerParam=();
+my $curconfig=new kernel::config();
+
+if (!$curconfig->readconfig("$FindBin::Bin/..",$configname)){
+   msg(ERROR,"can't read configfile '%s'",$configname);
+   exit(1);
+}
+
+if ($ENV{REMOTE_USER} eq ""){
+   if ($ENV{USER} ne ""){
+      $ENV{REMOTE_USER}="system/$ENV{USER}";
+   }
+   else{
+      $ENV{REMOTE_USER}="system/unknown";
+   }
+   $ENV{REAL_REMOTE_USER}="system/W5Server";
+}
+
+
+{
+   my $port=$curconfig->Param("W5SERVERPORT");
+   $port=4711 if ($port eq "");
+   msg(DEBUG,"W5ServerPort=%s",$port);
+   $ServerParam{'port'}=$port;
+   my $user=$curconfig->Param("W5SERVERUSER");
+   $user="nobody" if ($user eq "");
+   $ServerParam{'user'}=$user;
+   my $group=$curconfig->Param("W5SERVERGROUP");
+   $group="nobody" if ($group eq "");
+   $ServerParam{'group'}=$group;
+}
+
+my $statedir=$curconfig->Param("W5SERVERSTATE");
+if (! -d $statedir || $statedir eq ""){
+   msg(ERROR,"can't access statedir '%s'",$statedir);
+   exit(1);
+}
+$statedir.="/" if (!($statedir=~m/^\/$/));
+
+{
+   my $pidfile="${statedir}W5Server.${configname}.pid";
+   $ServerParam{'pid_file'}=$pidfile;
+   msg(DEBUG,"W5ServerPidFile=%s",$pidfile);
+   if (-f $pidfile){
+      msg(ERROR,"pidfile '%s' already exists",$pidfile);
+      exit(1);
+   }
+}
+
+
+if ($W5V2::Debug==0){
+   $ServerParam{'setsid'}=1;
+   {
+      my $logfile="${statedir}W5Server.${configname}.log";
+      $ServerParam{'log_file'}=$logfile;
+      msg(DEBUG,"W5ServerLogFile=%s",$logfile);
+   }
+}
+else{
+   $ServerParam{'debug'}=1;
+}
+$W5V2::Config=$curconfig;
+@ARGV=@ARGV_bak;
+$0="W5Server";
+W5Server->run(%ServerParam);
+
+
+sub help
+{
+   printf STDERR ("Usage: W5Server -c {config} [-v]\n");
+}
+
+
+

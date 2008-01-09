@@ -1,0 +1,6 @@
+'itil::producer'=>{de=>'Hersteller',en=>'Producer'},
+'fieldgroup.default'=>{de=>'Hersteller-Daten',en=>'Producer-Informations'},
+'fieldgroup.models'=>{de=>'Hardware-Modele',en=>'Hardware-Models'},
+'fieldgroup.source'=>{de=>'Datenquelle',en=>'Datasource'},
+'fieldgroup.software'=>{de=>'Software',en=>'Software'},
+'you are only authorized to add in \'order\' or \'reserved\' state'=>{de=>'Sie sind nur berechtig, im Status \'angefordert\' oder \'reserviert\' Datensätze zu erzeugen'},

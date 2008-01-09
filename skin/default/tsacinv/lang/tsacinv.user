@@ -1,0 +1,4 @@
+'tsacinv::user'=>{de=>'AssetCenter User/Kontakt',en=>'AssetCenter User/Contact'},
+'fieldgroup.default'=>{de=>'User/Kontaktdaten',en=>'User/Contact data'},
+'fieldgroup.sec'=>{de=>'Sicherheitsdaten',en=>'Security data'},
+'Fullname'=>{de=>'Vollständiger Name'},

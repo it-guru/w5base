@@ -1,0 +1,28 @@
+
+%menutab%
+
+<script language="JavaScript">
+function SwitchMenuVisible()
+{
+   var m=document.getElementById("MenuTree");
+   var mselframe=parent.document.getElementById("mselframe");
+   var topframe=parent.parent.document.getElementById("topframe");
+   if (m){
+      if (m.style.display=="none"){
+         m.style.visibility="visible";
+         m.style.display="block";
+         topframe.rows=m.oldtopframe;
+         mselframe.cols=m.oldmselframe;
+      }
+      else{
+         m.style.visibility="hidden";
+         m.style.display="none";
+         m.oldtopframe=topframe.rows;
+         m.oldmselframe=mselframe.cols;
+         topframe.rows="0,*";
+         mselframe.cols="25,*";
+      }
+   }
+}
+</script>
+

@@ -1,0 +1,3 @@
+'AL_TCom::qrule::ApplDesc'=>{de=>'Prüfung der Anwendungsdocumentation',
+                             en=>'check of Application documentation'},
+'there is no maintenence window defined'=>{de=>'es ist kein Wartungsfenster eingetragen'},

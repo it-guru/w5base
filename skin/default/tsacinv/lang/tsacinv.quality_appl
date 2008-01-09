@@ -1,0 +1,6 @@
+'tsacinv::quality_appl'=>{de=>'Befüllungsgrad und Qualität der Anwendungs CIs',
+                          en=>'Filllevel and qualtity of Application CIs'},
+'fieldgroup.default'=>{de=>'Qualitäts-Zusammenfassung',en=>'Quality'},
+'fieldgroup.base'=>{de=>'Qualitäts-Berechnungsbasis',en=>'Quality-Base'},
+'Appl count'=>{de=>'Anzahl Anwendungs CIs'},
+'averanged quality'=>{de=>'mittlere Qualität'},

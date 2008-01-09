@@ -1,0 +1,192 @@
+div.searchframe{
+   width:100%;
+   border-style:outset;
+   border-width:2px;
+   padding:0px;
+   padding-top:5px;
+   padding-bottom:5px;
+   margin-bottom:4px;
+   background:#dadada;
+}
+iframe.result{
+   height:100%;
+   width:100%;
+}
+div.extsearchframe{
+   height:100px;
+   border-style:outset;
+   border-width:2px;
+   padding:0px;
+   margin:0px;
+   padding-top:5px;
+   padding-bottom:5px;
+   margin-bottom:4px;
+   background:#dadada;
+   overflow:auto;
+   display:block;visibility:visible;
+}
+div.buttonframe{
+   width:100%;
+   border-style:outset;
+   border-width:2px;
+   padding:0px;
+   margin-bottom:4px;
+   background:#dadada;
+}
+table.searchframe{
+   width:100%;
+   border-style:none;
+   border-spacing:0px;
+   border-collapse:collapse;
+   margin:0px;
+   padding:0px;
+}
+table.buttonframe{
+   width:100%;
+   border-style:none;
+   border-spacing:5px;
+   padding:0px;
+   margin:0px;
+}
+
+tr.fline{
+   height:25px;
+}
+
+td.fname{
+   white-space:nowrap;
+   border-style:solid;
+   border-width:1px;
+   border-color:silver;
+   padding-left:4px;
+   padding-right:5px;
+   font-weight:bold;
+}
+td.finput{
+   border-style:solid;
+   border-width:1px;
+   border-color:silver;
+   padding-left:3px;
+   padding-right:5px;
+}
+span.buttontext{
+   line-height:11px;
+}
+td.button{
+   font-size:11px;
+   text-align:center;
+   white-space:normal;
+   line-height:11px;
+   font-weight:bolder;
+}
+input.button{
+   width:90px;
+   height:25px;
+   background:#dadada;
+   overflow:hidden;
+   border-style:outset;
+   border-width:3px;
+   padding:0px;
+   padding-left:2px;
+   padding-left:2px;
+   margin:2px;
+   float:right;
+}
+input.button_up{
+   width:40px;
+   height:100%;
+   background:#dadada;
+   background: url(arrow_up.gif) center no-repeat;
+   overflow:hidden;
+   border-style:outset;
+   border-width:3px;
+   padding:0px;
+   padding-left:2px;
+   padding-left:2px;
+   margin:2px;
+   float:right;
+}
+input.button_down{
+   width:40px;
+   height:100%;
+   background:#dadada;
+   background: url(arrow_down.gif) center no-repeat;
+   overflow:hidden;
+   border-style:outset;
+   border-width:3px;
+   padding:0px;
+   padding-left:2px;
+   padding-left:2px;
+   margin:2px;
+   float:right;
+}
+div.button{
+   width:80px;
+   height:25px;
+   background:#dadada;
+   overflow:hidden;
+   border-style:outset;
+   border-width:3px;
+   padding:0px;
+   padding-left:2px;
+   padding-left:2px;
+   margin:2px;
+   float:right;
+}
+div.viewselect{
+   font-size:11px;
+   text-align:center;
+   vertical-align:middle;
+   font-weight:bolder;
+   background:#dadada;
+   border-style:outset;
+   border-width:3px;
+   padding:0px;
+   padding-left:2px;
+   padding-left:2px;
+   width:160px;
+   margin:2px;
+   float:left;
+}
+table.viewselect{
+   width:160px;
+   border-style:none;
+   border-spacing:0px;
+   padding:0px;
+   margin:0px;
+}
+select.viewselect{
+   width:100%;
+}
+input.finput{
+   width:100%;
+}
+
+a.button:link    {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:#006666;
+          }
+a.button:visited {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:#006666;
+          }
+a.button:active  {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none; 
+            color:#006666;
+          }
+div.lastmsg{
+   margin:0px;
+   padding:0px;
+   height:15px;
+   width:99%;
+   border-style:none;
+   font-weight:normal;
+   border-style:none;
+   border-width:1px;
+   overflow:auto;
+   text-align:left;
+}
+

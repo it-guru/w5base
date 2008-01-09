@@ -1,0 +1,6 @@
+'base::reflexion_translation'=>{de=>'interne Übersetzungstabellen',en=>'internal Translations'},
+'german'=>{de=>'deutsch'},
+'english'=>{de=>'englisch'},
+'internal name'=>{de=>'interner Name'},
+'translation table must be specified'=>{de=>'Übersetzungstabelle muß angegeben werden'},
+'wildcard searches are not posible'=>{de=>'Wildcard Suche in Übersetzungstabelle nicht möglich'},

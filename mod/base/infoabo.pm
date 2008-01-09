@@ -1,0 +1,671 @@
+package base::infoabo;
+#  W5Base Framework
+#  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+use strict;
+use vars qw(@ISA);
+use Data::Dumper;
+use kernel;
+use kernel::App::Web;
+use kernel::DataObj::DB;
+use kernel::Field;
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
+
+sub new
+{
+   my $type=shift;
+   my %param=@_;
+   $param{MainSearchFieldLines}=3;
+   my $self=bless($type->SUPER::new(%param),$type);
+   
+
+   $self->AddFields(
+      new kernel::Field::Linenumber(
+                name          =>'linenumber',
+                label         =>'No.'),
+
+      new kernel::Field::Id(
+                name          =>'id',
+                label         =>'LinkID',
+                searchable    =>0,
+                dataobjattr   =>'infoabo.id'),
+
+      new kernel::Field::Select(
+                name          =>'parentobj',
+                label         =>'Info Source',
+                selectwidth   =>'100%',
+                readonly      =>1,
+                getPostibleValues=>\&getPostibleParentObjs,
+                jsonchanged   =>\&getOnChangedScript,
+                dataobjattr   =>'infoabo.parentobj'),
+
+      new kernel::Field::Link(
+                name          =>'parent',
+                searchable    =>0,
+                label         =>'parent',
+                dataobjattr   =>'infoabo.parentobj'),
+
+      new kernel::Field::Link(
+                name          =>'refid',
+                searchable    =>0,
+                depend        =>['parentobj'],
+                label         =>'refid',
+                dataobjattr   =>'infoabo.refid'),
+
+      new kernel::Field::MultiDst (
+                name          =>'targetname',
+                htmlwidth     =>'200',
+                selectwidth   =>'400',
+                label         =>'Target-Name',
+                dst           =>[],
+                readonly      =>1,
+                dsttypfield   =>'parentobj',
+                dstidfield    =>'refid'),
+
+      new kernel::Field::Select(
+                name          =>'mode',
+                searchable    =>0,
+                label         =>'Info Mode',
+                readonly      =>1,
+                selectwidth   =>'100%',
+                getPostibleValues=>\&getPostibleModes,
+                dataobjattr   =>'infoabo.mode'),
+
+      new kernel::Field::Text(
+                name          =>'rawmode',
+                label         =>'raw Info Mode',
+                group         =>'source',
+                readonly      =>1,
+                dataobjattr   =>'infoabo.mode'),
+
+      new kernel::Field::Link(
+                name          =>'rawmode',
+                label         =>'Raw Info Mode',
+                readonly      =>1,
+                dataobjattr   =>'infoabo.mode'),
+
+      new kernel::Field::TextDrop(
+                name          =>'user',
+                label         =>'User',
+                readonly      =>1,
+                vjointo       =>'base::user',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['userid'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'userid',
+                dataobjattr   =>'infoabo.userid'),
+
+      new kernel::Field::Email(
+                name          =>'email',
+                label         =>'E-Mail',
+                readonly      =>1,
+                dataobjattr   =>'user.email'),
+
+      new kernel::Field::Select(
+                name          =>'active',
+                label         =>'Active',
+                transprefix   =>'boolean.',
+                value         =>[1,0],
+                selectwidth   =>'80px',
+                dataobjattr   =>'infoabo.active'),
+
+      new kernel::Field::Creator(
+                name          =>'creator',
+                group         =>'source',
+                label         =>'Creator',
+                dataobjattr   =>'infoabo.createuser'),
+
+      new kernel::Field::Owner(
+                name          =>'owner',
+                group         =>'source',
+                label         =>'Owner',
+                dataobjattr   =>'infoabo.modifyuser'),
+
+      new kernel::Field::Text(
+                name          =>'srcsys',
+                group         =>'source',
+                label         =>'Source-System',
+                dataobjattr   =>'infoabo.srcsys'),
+                                                 
+      new kernel::Field::Text(
+                name          =>'srcid',
+                group         =>'source',
+                label         =>'Source-Id',
+                dataobjattr   =>'infoabo.srcid'),
+                                                 
+      new kernel::Field::Date(
+                name          =>'srcload',
+                group         =>'source',
+                label         =>'Source-Load',
+                dataobjattr   =>'infoabo.srcload'),
+                                                 
+      new kernel::Field::CDate(
+                name          =>'cdate',
+                group         =>'source',
+                label         =>'Creation-Date',
+                dataobjattr   =>'infoabo.createdate'),
+                                                 
+      new kernel::Field::MDate(
+                name          =>'mdate',
+                group         =>'source',
+                label         =>'Modification-Date',
+                dataobjattr   =>'infoabo.modifydate'),
+                                                 
+      new kernel::Field::Editor(
+                name          =>'editor',
+                group         =>'source',
+                label         =>'Editor',
+                dataobjattr   =>'infoabo.editor'),
+                                                 
+      new kernel::Field::RealEditor(
+                name          =>'realeditor',
+                group         =>'source',
+                label         =>'RealEditor',
+                dataobjattr   =>'infoabo.realeditor'),
+   );
+   $self->setDefaultView(qw(parentobj targetname mode user active));
+   $self->LoadSubObjs("ext/infoabo","infoabo");
+   $self->LoadSubObjs("ext/staticinfoabo","staticinfoabo");
+   $self->{admwrite}=[qw(admin w5base.base.infoabo.write)]; 
+   $self->{admread}=[@{$self->{admwrite}},"w5base.base.infoabo.read"];
+
+   #
+   # MultiDest Destination
+   #
+   my @dst=();   
+   foreach my $obj (values(%{$self->{infoabo}})){
+      my ($ctrl)=$obj->getControlData($self);
+      foreach my $obj (keys(%$ctrl)){
+         push(@dst,$obj,$ctrl->{$obj}->{target});
+      }
+   }
+   push(@dst,"base::staticinfoabo","fullname");
+   my $fo=$self->getField("targetname");
+   $fo->{dst}=\@dst;
+
+   return($self);
+}
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my ($worktable,$workdb)=$self->getWorktable();
+   return("$worktable left outer join user ".
+          "on $worktable.userid=user.userid ");
+}
+
+
+
+
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+   
+   if (!$self->IsMemberOf($self->{admread},"RMember")){
+      my $userid=$self->getCurrentUserId();
+      push(@flt,[
+                 {userid=>\$userid},
+                ]);
+   }
+   return($self->SetFilter(@flt));
+}
+
+
+sub initSearchQuery
+{
+   my $self=shift;
+
+   if ($self->IsMemberOf($self->{admread},"RMember")){
+      my $userid=$self->getCurrentUserId();
+      my $UserCache=$self->Cache->{User}->{Cache};
+      if (defined($UserCache->{$ENV{REMOTE_USER}})){
+         Query->Param("search_user"=>'"'.
+                      $UserCache->{$ENV{REMOTE_USER}}->{rec}->{fullname}.'"');
+      }
+   }
+}
+
+
+
+
+sub getOnChangedScript
+{
+   my $self=shift;
+   my $app=$self->getParent();
+
+   my $d=<<EOF;
+var e=document.forms[0].elements['Formated_parentobj'];
+var m=document.forms[0].elements['Formated_mode'];
+var found=false;
+   if (e && m ){
+EOF
+   foreach my $obj (values(%{$app->{infoabo}})){
+      my ($ctrl)=$obj->getControlData($self);
+      foreach my $objn (keys(%{$ctrl})){
+         my @modes=$app->getModesFor($objn);
+         $d.="if (e.value==\"$objn\"){";
+         my $c=0;
+         while(my $k=shift(@modes)){
+            my $v=shift(@modes);
+            $d.="m.options[$c]=new Option(\"$v\",\"$k\");";
+            $c++;
+         }
+         $d.="found=true;}";
+         $d.="m.options.length=$c;";
+      }
+   }
+   $d.="}if (!found){m.options.length=0;}";
+   return($d);
+}
+
+sub getModesFor
+{
+   my $self=shift;
+   my $parentobj=shift;
+
+
+   if ($parentobj eq "base::staticinfoabo"){
+      my $st=getModuleObject($self->Config,"base::staticinfoabo");
+      my @ll;
+      foreach my $rec ($st->getHashList(qw(id name fullname))){
+         push(@ll,$rec->{name});
+         push(@ll,$rec->{fullname});
+      }
+      return(@ll);
+   }
+   my @res=();
+   foreach my $obj (values(%{$self->{infoabo}})){
+      my ($ctrl)=$obj->getControlData($self);
+      foreach my $obj (keys(%$ctrl)){
+         if ($parentobj eq $obj){
+            my @l=@{$ctrl->{$obj}->{mode}};
+            while(my $m=shift(@l)){
+               my $t=shift(@l);
+               push(@res,$m,$self->T($m,$t));
+            }
+         }
+      }
+   }
+   return(@res);
+   return;
+}
+
+sub getPostibleModes
+{
+   my $self=shift;
+   my $current=shift;
+   my $parent=$current->{parentobj};
+   my $app=$self->getParent;
+
+   if ($parent eq "base::staticinfoabo"){
+      # find static targets and translations
+      my @opt;
+      foreach my $obj (values(%{$app->{staticinfoabo}})){
+         my ($ctrl)=$obj->getControlData($self);
+         while(my $trans=shift(@$ctrl)){
+            my $rec=shift(@$ctrl);
+            if ($current->{refid}==$rec->{id}){
+               push(@opt,$current->{mode},$app->T($current->{mode},$trans));
+            }
+         }
+      }
+      return(@opt);
+   }
+   if ($parent ne ""){
+      return($self->getParent->getModesFor($parent));
+   }
+   return();
+}
+
+sub getPostibleParentObjs
+{
+   my $self=shift;
+   my $current=shift;
+   my $app=$self->getParent();
+   my @opt;
+   push(@opt,"","");
+
+   foreach my $obj (values(%{$app->{infoabo}})){
+      my ($ctrl)=$obj->getControlData($self);
+      foreach my $obj (keys(%$ctrl)){
+         push(@opt,$obj,$app->T($obj,$obj));
+      }
+   }
+   push(@opt,"base::staticinfoabo",
+        $app->T("base::staticinfoabo","base::staticinfoabo"));
+   return(@opt);
+}
+
+sub Initialize
+{
+   my $self=shift;
+
+   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
+   return(@result) if (defined($result[0]) eq "InitERROR");
+   $self->setWorktable("infoabo");
+   return(1);
+}
+
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $origrec=shift;
+
+   my $mode=effVal($oldrec,$newrec,"mode");
+   if ($mode eq ""){
+      $self->LastMsg(ERROR,"invalid mode specified");
+      return(0);
+   }
+   my $parentobj=effVal($oldrec,$newrec,"parentobj");
+   my $parent=effVal($oldrec,$newrec,"parent");
+   if ($parentobj eq "" && $parent eq ""){
+      $self->LastMsg(ERROR,"invalid parentobj specified");
+      return(0);
+   }
+   
+   if (!$self->IsMemberOf($self->{admwrite},"RMember")){
+      my $curuserid=$self->getCurrentUserId();
+      my $userid=effVal($oldrec,$newrec,"userid");
+      if ($userid eq ""){
+         $self->LastMsg(ERROR,"invalid userid specified");
+         return(0);
+      }
+   }
+
+   return(1);
+}
+
+
+sub isViewValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return("header","default") if (!defined($rec));
+   return("ALL");
+}
+
+sub isWriteValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return("default") if (ref($rec) eq "HASH" &&
+                         $self->getCurrentUserId() eq $rec->{userid});
+   return("default") if ($self->IsMemberOf("admin"));
+   return(undef);
+}
+
+
+sub LoadTargets
+{
+   my $self=shift;
+   my $desthash=shift;
+   my $parent=shift;
+   my $mode=shift;
+   my $refid=shift;
+   my $userlist=shift;
+   my %param=@_;
+
+   my $c=0;
+   if (!defined($userlist)){
+      $self->ResetFilter();
+      $self->SetFilter({refid=>$refid,rawmode=>$mode,
+                         parent=>$parent,
+                         active=>\'1'});
+      foreach my $rec ($self->getHashList(qw(email))){
+         $desthash->{lc($rec->{email})}++;
+         $c++;
+      }
+   }
+   else{
+      $mode=\$mode if (!ref($mode));
+      $userlist=[$userlist] if (!ref($userlist) eq "ARRAY");
+      $param{default}=0 if (!exists($param{default}));
+      $self->ResetFilter();
+      $self->SetFilter({refid=>$refid,mode=>$mode,
+                        parent=>$parent,userid=>$userlist});
+      foreach my $rec ($self->getHashList(qw(userid email active))){
+         @{$userlist}=grep(!/^$rec->{userid}$/,@{$userlist}); 
+         if ($rec->{active}){
+            $desthash->{lc($rec->{email})}++;
+            $c++;
+         }
+      }
+      my %u=();
+      map({$u{$_}=1;} @$userlist);
+      @$userlist=keys(%u);
+      if ($#{$userlist}!=-1){
+         #if (!$parent=~m/^\*/){
+            foreach my $userid (@$userlist){
+               # insert operation
+               my $sparent=$parent;
+               my $srefid=$refid;
+               my $smode=$mode;
+               $sparent=$$parent if (ref($parent) eq "SCALAR");
+               $srefid=$$refid if (ref($refid) eq "SCALAR");
+               $smode=$$mode if (ref($mode) eq "SCALAR");
+               my $rec={userid=>$userid,active=>$param{default},
+                        parent=>$sparent,mode=>$smode,refid=>$srefid};
+               $self->ValidatedInsertRecord($rec);
+               printf STDERR ("fifi insert $userid\n");
+            }
+         #}
+         $self->ResetFilter();
+         $self->SetFilter({refid=>$refid,mode=>$mode,active=>\'1',
+                           parent=>$parent,userid=>$userlist});
+         foreach my $rec ($self->getHashList(qw(email))){
+            $desthash->{lc($rec->{email})}++;
+         }
+      }
+   }
+   return($c);
+}
+
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/base/load/infoabo.jpg?".$cgi->query_string());
+}
+
+sub isAboActiv
+{
+   my $cur=shift;
+   my $parentobj=shift;
+   my $mode=shift;
+   my $id=shift;
+   foreach my $rec (@$cur){
+      if ($rec->{parentobj} eq $parentobj &&
+          $rec->{mode} eq $mode && $rec->{refid} eq $id){
+         return($rec->{active});
+      }
+   }
+   return(undef);
+}
+
+
+sub WinHandleInfoAboSubscribe
+{
+   my $self=shift;
+   my $param=shift;
+   my @oplist=@_;
+   my $parentid=shift;
+   my $userid=$self->getCurrentUserId();
+   my $d=$self->HttpHeader("text/html");
+   $d.=$self->HtmlHeader(style=>'default.css',
+                         form=>1,body=>1,
+                         title=>$self->T("Subscribe managment"));
+   my $oldval=Query->Param("infoabo");
+   my ($curobj,$curmode,$curid)=split(/;/,$oldval);
+   if (defined($curobj) && defined($curmode) && defined($curid) &&
+       $curobj ne "" && $curmode ne "" && $curid ne ""){
+      $self->ResetFilter();
+      $self->SetFilter({refid=>\$curid,parentobj=>\$curobj,
+                        mode=>\$curmode,userid=>\$userid});
+      my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
+      if (Query->Param("ADD")){
+         if (defined($rec)){
+            $self->ValidatedUpdateRecord($rec,{active=>1},{id=>\$rec->{id}});
+         }
+         else{
+            $self->ValidatedInsertRecord({refid=>$curid,parentobj=>$curobj,
+                                          active=>1,
+                                          mode=>$curmode,userid=>$userid});
+         }
+      }
+      if (Query->Param("DEL")){
+         if (defined($rec)){
+            $self->ValidatedUpdateRecord($rec,{active=>0},{id=>\$rec->{id}});
+         }
+      }
+   }
+
+
+   my @flt;
+   my @fltoplist=@oplist;
+   while(defined(my $obj=shift(@fltoplist))){
+      my $id=shift(@fltoplist);
+      my $label=shift(@fltoplist);
+      my $localflt={parentobj=>\$obj,userid=>\$userid};
+      if (defined($id) && $id ne ""){
+         $localflt->{refid}=\$id;
+      }
+      push(@flt,$localflt);
+   }
+   printf STDERR ("fifi flt=%s\n",Dumper(\@flt));
+   $self->ResetFilter();
+   $self->SetFilter(\@flt);
+   my @cur=$self->getHashList(qw(parentobj refid active mode));
+   printf STDERR ("fifi cur=%s\n",Dumper(\@cur));
+
+   my $statusmsg="";
+   my $statusbtn;
+   if ($oldval ne ""){
+      $statusmsg="<b>".$self->T("Current State").":</b> ";
+      my $st=isAboActiv(\@cur,$curobj,$curmode,$curid);
+      if ((!defined($st)) && $curobj eq "base::staticinfoabo"){
+         $statusmsg.=$self->T("default handling");
+         $statusbtn="<input style=\"width:100px;margin-right:210px\" ".
+                    "type=submit name=ADD value=\" ".
+                    $self->T("subscribe")." \">";
+      }elsif ($st eq "1"){
+         $statusmsg.=$self->T("subscribed");
+         $statusbtn="<input style=\"width:100px;margin-right:210px\" ".
+                    "type=submit name=DEL value=\" ".
+                    $self->T("unsubscribe")." \">";
+      }
+      else{
+         $statusmsg.=$self->T("not subscribed");
+         $statusbtn="<input style=\"width:100px;margin-right:210px\" ".
+                    "type=submit name=ADD value=\" ".
+                    $self->T("subscribe")." \">";
+      }
+   }
+   my $optionlist="";
+   while(defined(my $obj=shift(@oplist))){
+      my $id=shift(@oplist);
+      my $label=shift(@oplist);
+      my @ml;
+      if ($obj eq "base::staticinfoabo"){
+         my $st=getModuleObject($self->Config,"base::staticinfoabo");
+         foreach my $rec ($st->getHashList(qw(id name fullname))){
+            push(@ml,$rec->{name}.";".$rec->{id});
+            push(@ml,$rec->{fullname});
+         }
+      }
+      else{
+         @ml=$self->getModesFor($obj);
+      }
+      my $objlabel=$self->T($obj,$obj);
+      $objlabel.=": ".$label if ($label ne "");
+      
+      $optionlist.="<optgroup label=\"$objlabel\">";
+      while(defined(my $mode=shift(@ml))){
+         my $modelabel=shift(@ml);
+         my $key="$obj;$mode";
+         $key.=";$id" if (defined($id) && $id ne "");
+         my ($akobj,$akmode,$akid)=split(/;/,$key);
+         my $st=isAboActiv(\@cur,$akobj,$akmode,$akid);
+         $st="?"      if ((!defined($st)) && $akobj eq "base::staticinfoabo");
+         $st="-"      if (!defined($st));
+         $st="*"      if ($st eq "1");
+         $st="-"      if ($st eq "0");
+         $optionlist.="<option value=\"$key\"";
+         $optionlist.=" selected" if ($oldval eq $key);
+         $optionlist.=">$st $modelabel</option>";
+      }
+      $optionlist.="</optgroup>";
+   }
+   my $handlermask=$self->getParsedTemplate("tmpl/base.infoabohandler",{});
+   my $CurrentIdToEdit=Query->Param("CurrentIdToEdit");
+   $d.=<<EOF;
+<style>body{overflow:hidden;padding:4px}optgroup{margin-bottom:5px}</style>
+<table width=100% height=98% border=0>
+<tr height=50><td>$handlermask</td></tr>
+<tr>
+<td>
+<div style="height:100%;margin:0">
+<select size=5 name=infoabo onchange="document.forms[0].submit();" 
+        style="width:100%;height:100%">
+$optionlist</select>
+</div>
+</td>
+<tr height=1%>
+<td>
+<table cellspacing=0 cellpadding=0 width=100%>
+<tr><td>$statusmsg</td><td align=right>$statusbtn</td></tr>
+</table>
+</td>
+
+</tr>
+<tr height=1%>
+<td align=right>
+<input onclick="parent.hidePopWin();" type=submit style="width:50px" value="OK">
+<input type=hidden name=CurrentIdToEdit value="$CurrentIdToEdit">
+</tr>
+</table>
+EOF
+
+   $d.=$self->HtmlBottom(body=>1,form=>1);
+   return($d);
+}
+
+
+sub Welcome
+{
+   my $self=shift;
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','work.css'],
+                           body=>1,form=>1);
+   print $self->getParsedTemplate("tmpl/welcome.infoabo",{});
+   print $self->HtmlBottom(body=>1,form=>1);
+   return(1);
+}  
+
+
+
+
+
+
+
+1;

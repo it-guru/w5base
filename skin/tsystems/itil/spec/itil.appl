@@ -1,0 +1,61 @@
+#######################################################################
+'itil::appl'=>{de=>'
+Keine Modul Beschreibung
+',en=>'
+No modul specification
+'},
+#######################################################################
+'customerprio'=>{de=>'
+Die Kundenprioriät definiert, mit welcher Priorität der Kunde die
+Anwendung einstuft, d.h. durch diesen Wert wird die Wichtigkeit der 
+Awendung für den Kunden beschrieben.
+',en=>'
+This is the customer priority. This meens, the priority of the
+application for the customer.
+'},
+#######################################################################
+'sem'=>{de=>'
+Keine Feldbeschreibung vorhanden
+',en=>'
+No field specivication
+'},
+#######################################################################
+'fieldgroup.finance'=>{de=>'
+In diesem Datenblock werden die finanziellen Verantwortlichkeiten für
+die Anwendung definiert.
+',en=>'
+In this Datablock the finance responsibility for the current application
+will be defined.
+'},
+#######################################################################
+'fieldgroup.technical'=>{de=>'
+In diesem Datenblock werden die technischen Verantwortlichkeiten für
+die Anwendung definiert.
+',en=>'
+In this Datablock the technical responsibility for the current application
+will be defined.
+'},
+#######################################################################
+
+'issoxappl'=>{de=>'
+Die Anwendung wird nach SOX Richtlinien
+betreut, wenn die nutzende Firma an US-Börsen
+notiert ist.
+Sarbanes Oxley Act (SOX) triff hauptsächlich
+Anwendung aus dem Finanz Bereich
+'},
+
+'kwords'=>{de=>'
+In diesem Feld können beliebige
+Worte eingetragen werden. Dies kann
+z.B. dazu verwendet werden um eine
+einfache Gruppierung von Systemen
+über die Suchfunktion zu erreichen.
+',en=>'
+In this field, you can enter any
+words. This can be used, to do a
+simple grouping of systems by
+search function.
+'},
+
+

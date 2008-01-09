@@ -1,0 +1,4 @@
+'WorkflowPrint'=>{de=>'drucken',     en=>'print'},
+'WorkflowClose'=>{de=>'schließen',   en=>'close'},
+'WorkflowDelete'=>{de=>'löschen',   en=>'delete'},
+

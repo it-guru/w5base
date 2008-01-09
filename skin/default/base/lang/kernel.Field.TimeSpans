@@ -1,0 +1,7 @@
+'sun'=>{de=>'So'},
+'sat'=>{de=>'Sa'},
+'mon'=>{de=>'Mo'},
+'tue'=>{de=>'Di'},
+'wed'=>{de=>'Mi'},
+'thu'=>{de=>'Do'},
+'fri'=>{de=>'Fr'},

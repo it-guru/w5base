@@ -1,0 +1,9 @@
+'base::usersubst'=>{de=>'Vertreterregelung',en=>'Substitiution'},
+'Fullname'=>{de=>'Kontakt',en=>'Contact'},
+'Account'=>{de=>'Benutzerkennung'},
+'Active'=>{de=>'Aktiv'},
+'Substitutable by'=>{de=>'vertretbar durch'},
+'1'=>{de=>'ja',en=>'yes'},
+'0'=>{de=>'nein',en=>'no'},
+'fieldgroup.default'=>{de=>'Vertreterregelung',en=>'Substitiution'},
+

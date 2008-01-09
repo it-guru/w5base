@@ -1,0 +1,7 @@
+'faq::acl'=>{de=>'Zugriffsrechte',en=>'Accesscontrol'},
+'AclID'=>{de=>'Rechte-ID'},
+'Target-Name'=>{de=>'Berechtigtenbezeichnung'},
+'Acl-Mode'=>{de=>'Zugriffsmodus'},
+'no \'%s\' specified'=>{de=>'keine \'%s\' eingegeben'},
+'fieldgroup.default'=>{de=>'Rechteinformationen',
+                       en=>'Accessinformations'},

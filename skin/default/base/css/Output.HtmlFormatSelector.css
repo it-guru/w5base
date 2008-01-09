@@ -1,0 +1,135 @@
+table.maintable{
+   border-collapse:collapse;
+   width:100%;
+   border-width:0px;
+   border-style:none;
+   padding:0px;
+   margin:0px;
+}
+td.mainblock{
+   border-collapse:collapse;
+   width:100%;
+   vertical-align:top;
+   border-width:0px;
+   border-style:none;
+   padding:0px;
+   margin:0px;
+   padding-left:2px;
+   padding-right:2px;
+}
+
+table.viewlist{
+   border-collapse:collapse;
+   width:100%;
+   border-width:0px;
+   border-style:none;
+   padding:0px;
+   margin:0px;
+}
+
+div.viewtab_active{
+   height:18px;
+   width:120px;
+   float:left;
+   text-align:center;
+   border-width:1px;
+   border-style:solid;
+   border-bottom-style:none;
+   background:#dadada;
+   padding:0px;
+   margin:0px;
+   margin-top:5px;
+   padding-left:5px;
+   padding-right:5px;
+   background:#CfCfCf;
+}
+div.viewtab_inactive{
+   height:18px;
+   width:120px;
+   float:left;
+   text-align:center;
+   border-width:1px;
+   border-style:solid;
+   border-bottom-style:none;
+   background:#dadada;
+   padding:0px;
+   margin:0px;
+   margin-top:5px;
+   padding-left:5px;
+   padding-right:5px;
+}
+td.viewtab_active{
+   border-width:0px;
+   border-style:none;
+   padding:0px;
+   margin:0px;
+   width:1%;
+   border-bottom-style:solid;border-bottom-width:1px;border-bottom-color:#CfCfCf;
+}
+td.viewtab_inactive{
+   border-width:0px;
+   border-style:none;
+   padding:0px;
+   margin:0px;
+   width:1%;
+   border-bottom-style:solid;border-width:1px;border-color:#000000;
+}
+td.viewtab_spacer{
+   border-width:0px;
+   border-style:none;
+   padding:0px;
+   margin:0px;
+   width:10px;
+   border-bottom-style:solid;border-width:1px;border-color:#000000;
+}
+td.viewtab_spacer_right{
+   border-width:0px;
+   border-style:none;
+   padding:0px;
+   margin:0px;
+   border-bottom-style:solid;border-width:1px;border-color:#000000;
+}
+body{
+   background:#ffffff;
+}
+
+table.datatable{
+   border-collapse:collapse;
+   border-width:1px;
+   border-style:solid;
+   border-color:#000000;
+   border-top-style:none;
+}
+span.viewselect{
+   cursor:pointer;
+}
+td.headline{
+}
+tr.line1{
+   background:#DDDDDD;
+   cursor:default;
+}
+tr.line2{
+   background:#CCCCCC;
+   cursor:default;
+}
+td.datafield{
+   padding-left:5px;
+   padding-right:5px;
+   width:15%;
+   vertical-align:top;
+}
+th.headfield{
+   padding-left:5px;
+   padding-right:5px;
+   background:#dadada;
+   background:#CfCfCf;
+   text-align:left;
+   border-bottom-width:1px;
+   border-bottom-style:solid;
+}
+tr.linehighlight{
+   background:#8888FF;
+   cursor:pointer;
+}
+

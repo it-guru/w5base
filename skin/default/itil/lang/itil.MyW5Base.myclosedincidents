@@ -1,0 +1,5 @@
+'itil::MyW5Base::myclosedincidents'=>{
+               de=>'IT-Workflow: meine ITIL Incidents geschlossenen',
+               en=>'IT-Inventar: my closed ITIL Incidents'},
+'Incident end time'=>{de=>'Incident Endezeitpunkt'},
+

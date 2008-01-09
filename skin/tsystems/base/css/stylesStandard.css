@@ -1,0 +1,2822 @@
+/* ------------------------------------------------------
+   allgemeine Angaben für HTML-Tags   ------------------------------------------------------ */
+
+body
+{
+  margin:0px;
+  padding:0px;
+  background-color:#f0f0f0;
+}
+
+body, td 
+{
+  font-family:Arial,Helvetica,Geneva,Sans-Serif;  
+  margin:0px;  
+  padding:0px;  
+  color:#000000;  
+}
+
+th
+{
+  vertical-align:top;
+}
+
+p
+{
+  padding:0px;
+  margin:0px;
+}
+
+form
+{
+  padding:0px;
+  margin:0px 0px 5px 0px;
+}
+
+a, 
+a:hover, 
+a:link
+{
+  color:#e20074;
+}
+
+a:visited
+{
+  color:#a4336d;
+}
+
+a.glossaryLink,
+a.glossaryLink:link,
+a.glossaryLink:visited,
+a.glossaryLink:hover
+{
+	color: expression((this.parentElement.currentStyle)?this.parentElement.currentStyle.color:"#000000");  
+	text-decoration: expression((this.parentElement.currentStyle.textDecoration)?this.parentElement.currentStyle.textDecoration:"none"); 
+	border-bottom: 1px dotted rgb(170,170,170);
+}
+
+a.glossaryLink:hover 
+{
+	cursor: help;
+}
+
+.error
+{
+  color:red;
+}
+
+.warning
+{
+  color:blue;
+}
+
+.lineClearer,
+.conFooter
+{
+  clear:both;
+  height:1px;
+  line-height:0px;
+  font-size:0px;
+}
+
+.empty,
+.empty select
+{
+  width:100%;
+}
+
+.subHeadline
+{
+  font-weight:bold;
+}
+
+.iconArea
+{
+  float:right;
+}
+
+.iconArea a
+{
+  text-decoration:none;
+  padding-left:10px;
+}
+
+.separator
+{
+  clear:both;
+  padding-top:5px;
+  line-height:0px;
+  font-size:0px;
+}
+
+.lastUpdate
+{
+  padding-right:2px;
+  height:24px;
+}
+
+.lastUpdate div
+{
+  padding-top:5px;
+  font-size:10px;
+  text-align:right;
+}
+
+
+/* ------------------------------------------------------
+   Styles aus Java-Editor
+   ------------------------------------------------------ */
+
+.float--left  
+{ 
+  float: left; 
+}
+
+.float--right 
+{ 
+  float: right;
+}
+
+.float--none  
+{ 
+  float: none; 
+}
+
+.float--inline  
+{ 
+  float: none;
+  display:inline; 
+}
+
+.font-name--arial, table.font-name--arial tr td
+{ 
+  font-family:Arial; 
+}
+
+.font-name--courier, table.font-name--courier tr td
+{ 
+  font-family:Courier; 
+}
+
+.align--left, table.align--left tr td
+{ 
+  text-align: left; 
+  clear:both;
+}
+
+.align--center, table.align--center tr td
+{ 
+  text-align: center; 
+  clear:both;
+}
+
+.align--right, table.align--right tr td 
+{ 
+  text-align: right; 
+  clear:both;
+}
+
+.align--justify, table.align--justify tr td
+{ 
+  text-align: justify; 
+  clear:both;
+}
+
+.font-size--200percent, table.font-size--200percent tr td
+{ 
+  font-size:200%; 
+}
+
+.font-size--150percent, table.font-size--150percent tr td
+{ 
+  font-size:150%; 
+}
+
+.font-size--125percent, table.font-size--125percent tr td
+{ 
+  font-size:125%; 
+}
+
+.font-size--100percent, table.font-size--100percent tr td
+{ 
+  font-size:100%; 
+}
+
+.font-size--75percent, table.font-size--75percent tr td
+{ 
+  font-size:75%; 
+}
+
+.color--magenta, table.color--magenta tr td
+{ 
+  color: #e20074; 
+}
+
+.color--black, table.color--black tr td
+{ 
+  color: black; 
+}
+
+.color--white, table.color--white tr td
+{ 
+  color: white; 
+}
+
+.color--lightGray, table.color--lightGray tr td
+{ 
+  color: #b5b5b5; 
+}
+
+.color--darkGray, table.color--darkGray tr td
+{ 
+  color: #7c7c7c; 
+}
+
+.background-color--magenta   { background-color: #e20074; }
+.background-color--black     { background-color: black; }
+.background-color--white     { background-color: white; }
+.background-color--lightGray { background-color: #e2e2e2; }
+.background-color--darkGray  { background-color: #8b8b8b; }
+
+table.tableformat--standard,
+table.tableformat--standardPadding,
+table.tableformat--complete,
+table.tableformat--completePadding
+{ 
+  border-collapse:collapse; 
+  border: 1px solid #7c7c7c;
+}
+
+table.tableformat--complete tr td,
+table.tableformat--completePadding tr td
+{
+  border: 1px solid #7c7c7c;
+}
+
+table.tableformat--standard tr td,
+table.tableformat--standardPadding tr td
+{
+  border-top: 1px solid #7c7c7c;
+  border-bottom: 1px solid #7c7c7c;
+}
+
+table.tableformat--invisible,
+table.tableformat--invisible tr td,
+table.tableformat--invisiblePadding,
+table.tableformat--invisiblePadding tr td
+{
+  border-collapse:collapse; 
+  border:0;
+}
+
+table.tableformat--standardPadding tr td,
+table.tableformat--completePadding tr td,
+table.tableformat--invisiblePadding tr td
+{
+  padding:3px;
+}
+
+
+/* ------------------------------------------------------
+   Schriftgrößen der Area   ------------------------------------------------------ */
+
+#logoArea, #topArea, #navigationArea, #leftArea
+{
+  font-size:12px;
+  line-height:14px;
+}
+
+#mainArea, #rightArea
+{
+  font-size:0.75em;
+  /* line-height:1.25em; */
+}
+
+
+/* ------------------------------------------------------
+   Positionierung der Areas
+   ------------------------------------------------------ */
+
+#logoArea
+{
+  position:absolute;
+  top:0px;
+  left:0px;
+  width:200px;
+  height:78px;
+}
+
+#topArea
+{
+  position:absolute;
+  top:0px;
+  left:200px;
+  width:823px;
+  width:100%;
+  height:78px;
+}
+
+#navigationArea
+{
+  position:absolute;
+  top:78px;
+  left:0px;
+  width:100%;
+  height:22px;
+  background-color:#7d9ba0;
+}
+
+#leftArea
+{
+  position:absolute;
+  top:100px;
+  left:0px;
+  width:200px;
+  max-width:163px;
+  padding-top:24px;
+  padding-right:10px;
+  background-color:#e2e2e2;
+}
+
+
+#rightArea
+{
+  position:absolute;
+  top:100px;
+  left:773px;
+  width:192px;
+}
+
+#bottomArea
+{
+  clear:both;
+  margin:0px;
+  padding:0px;
+  width:590px;
+  border-top:1px solid #7a7a7a;
+  border-bottom:1px solid #7a7a7a;
+}
+
+
+/* ------------------------------------------------------
+   Definition der Raster
+   ------------------------------------------------------ */
+
+#logoArea .grid-1cols
+{
+  width:200px;
+  height:78px;
+}
+
+#logoArea .grid-1cols .colLeft
+{
+}
+
+#topArea .grid-1cols
+{
+  width:823px;
+  height:78px;
+}
+
+#topArea .grid-1cols .colLeft
+{
+}
+
+#navigationArea .grid-1cols
+{
+  width:996px;
+  height:22px;
+}
+
+#navigationArea .grid-1cols .colLeft
+{
+}
+
+#leftArea .grid-1cols
+{
+  width:163px;
+}
+
+#leftArea .grid-1cols .colLeft
+{
+}
+
+#mainArea .grid-1cols
+{
+  clear:both;
+  width:600px;
+}
+
+#mainArea .grid-1cols .colLeft
+{
+}
+
+#mainArea .grid-2cols
+{
+  clear:both;
+  width:600px;
+}
+
+#mainArea .grid-2cols .colLeft
+{
+  width:400px;
+  overflow:hidden;
+  float:left;
+}
+
+#mainArea .grid-2cols .colCenter
+{
+  width:200px;
+  overflow:hidden;
+  float:left;
+}
+
+#mainArea .grid-2cols .colLeft .grid-2cols
+{
+  clear:both;
+  width:400px;
+}
+
+#mainArea .grid-2cols .colLeft .grid-2cols .colLeft
+{
+  width:200px;
+  overflow:hidden;
+  float:left;
+}
+
+#mainArea .grid-2cols .colLeft .grid-2cols .colCenter
+{
+  width:200px;
+  overflow:hidden;
+  float:left;
+}
+
+#mainArea .grid-3cols
+{
+  clear:both;
+  width:600px;
+}
+
+#mainArea .grid-3cols .colLeft
+{
+  width:200px;
+  overflow:hidden;
+  float:left;
+}
+
+#mainArea .grid-3cols .colCenter
+{
+  width:200px;
+  overflow:hidden;
+  float:left;
+}
+
+#mainArea .grid-3cols .colRight
+{
+  width:200px;
+  overflow:hidden;
+  float:left;
+}
+
+#rightArea .grid-1cols
+{
+  width:192px;
+  overflow:hidden;
+}
+
+#rightArea .grid-1cols .colLeft
+{
+}
+
+
+/* ------------------------------------------------------
+   allgemeingültige Container-Einstellungen    ------------------------------------------------------ */
+
+/* Contentelemente */
+
+.content
+{
+  overflow:hidden;
+}
+
+/* Containerbild */
+
+.contentImage
+{
+  padding-bottom:10px;
+  line-height:0px;
+  font-size:0px;
+}
+
+* html .contentImage
+{
+  height:1px;
+}
+
+.contentImage img
+{
+  vertical-align:top;
+}
+
+.noContentImage
+{
+  padding-bottom:5px;
+  line-height:0px;
+  font-size:0px;
+}
+
+* html .noContentImage
+{
+  height:1px;
+}
+
+/* Contentueberschriften */
+.headline
+{
+  padding-left:5px;
+  font-weight:bold;
+  color:#000000;
+}
+
+/* Info mit Datum und Publisher ueber einem CSS-Eintrag */
+.publishInfo
+{
+  padding-left:5px;
+  font-size:80%;
+  color:#000000;
+}
+
+
+/* Abstände nach unten */.conContentTopteaserMagWhiteVertSingle,
+.conContentTopteaserMagWhiteHorSingle,
+.conContentTopteaserMagWhiteVertMulti,
+.conContentTopteaserGreyWhiteVertSingle,
+.conContentTopteaserGreyWhiteHorSingle,
+.conContentTopteaserGreyWhiteVertMulti,
+.conContentTopteaserBlueGreyVertSingle,
+.conContentTopteaserBlueGreyHorSingle,
+.conContentTopteaserBlueGreyVertMulti,
+
+.conContentStandardteaserMagWhiteVertSingle,
+.conContentStandardteaserMagWhiteHorSingle,
+.conContentStandardteaserMagWhiteVertMulti,
+.conContentStandardteaserGreyWhiteVertSingle,
+.conContentStandardteaserGreyWhiteHorSingle,
+.conContentStandardteaserGreyWhiteVertMulti,
+.conContentStandardteaserBlueGreyVertSingle,
+.conContentStandardteaserBlueGreyHorSingle,
+.conContentStandardteaserBlueGreyVertMulti,
+
+.conContentEmptyMagWhiteVertSingle,
+.conContentEmptyMagWhiteHorSingle,
+.conContentEmptyMagWhiteVertMulti,
+.conContentEmptyGreyWhiteVertSingle,
+.conContentEmptyGreyWhiteHorSingle,
+.conContentEmptyGreyWhiteVertMulti,
+.conContentEmptyMagBlueGreyVertSingle,
+.conContentEmptyMagBlueGreyHorSingle,
+.conContentEmptyMagBlueGreyVertMulti,
+
+.conContentDetailsviewMagWhiteVertSingle,
+.conContentDetailsviewMagWhiteHorSingle,
+.conContentDetailsviewMagWhiteVertMulti,
+.conContentDetailsviewGreyWhiteVertSingle,
+.conContentDetailsviewGreyWhiteHorSingle,
+.conContentDetailsviewGreyWhiteVertMulti,
+.conContentDetailsviewBlueGreyVertSingle,
+.conContentDetailsviewBlueGreyHorSingle,
+.conContentDetailsviewBlueGreyVertMulti,
+
+.conContentLongteaserMagWhiteVertSingle,
+.conContentLongteaserMagWhiteHorSingle,
+.conContentLongteaserMagWhiteVertMulti,
+.conContentLongteaserGreyWhiteVertSingle,
+.conContentLongteaserGreyWhiteHorSingle,
+.conContentLongteaserGreyWhiteVertMulti,
+.conContentLongteaserBlueGreyVertSingle,
+.conContentLongteaserBlueGreyHorSingle,
+.conContentLongteaserBlueGreyVertMulti,
+
+.conContentShortteaserMagWhiteVertSingle,
+.conContentShortteaserMagWhiteHorSingle,
+.conContentShortteaserMagWhiteVertMulti,
+.conContentShortteaserGreyWhiteVertSingle,
+.conContentShortteaserGreyWhiteHorSingle,
+.conContentShortteaserGreyWhiteVertMulti,
+.conContentShortteaserBlueGreyVertSingle,
+.conContentShortteaserBlueGreyHorSingle,
+.conContentShortteaserBlueGreyVertMulti,
+
+.conNavigationVerticalSection,
+.conNavigationSitemap,
+
+.conFunctionA-Z-List,
+.conFunctionNewsArchive,
+.conFunctionEventCalendar,
+.conFunctionSimpleSearch,
+.conFunctionInfoSafe
+{
+  margin-bottom:20px;
+}
+
+/* evtl. Floating wieder abstellen */
+
+.conContentDetailsviewMagWhiteVertSingle,
+.conContentDetailsviewMagWhiteHorSingle,
+.conContentDetailsviewMagWhiteVertMulti,
+.conContentDetailsviewGreyWhiteVertSingle,
+.conContentDetailsviewGreyWhiteHorSingle,
+.conContentDetailsviewGreyWhiteVertMulti,
+.conContentDetailsviewBlueGreyVertSingle,
+.conContentDetailsviewBlueGreyHorSingle,
+.conContentDetailsviewBlueGreyVertMulti,
+
+.conContentEmptyMagWhiteVertSingle,
+.conContentEmptyMagWhiteHorSingle,
+.conContentEmptyMagWhiteVertMulti,
+.conContentEmptyGreyWhiteVertSingle,
+.conContentEmptyGreyWhiteHorSingle,
+.conContentEmptyGreyWhiteVertMulti,
+.conContentEmptyMagBlueGreyVertSingle,
+.conContentEmptyMagBlueGreyHorSingle,
+.conContentEmptyMagBlueGreyVertMulti,
+
+.conFunctionA-Z-List,
+.conNavigationDirectory
+{
+  clear:both;
+}
+
+
+/* ------------------------------------------------------
+   Farbschema: Magenta-Containertiel auf weissem Hintergrund
+   ------------------------------------------------------ */
+
+.conContentTopteaserMagWhiteVertSingle .conTitle,
+.conContentTopteaserMagWhiteHorSingle .conTitle,
+.conContentTopteaserMagWhiteVertMulti .conTitle,
+
+.conContentStandardteaserMagWhiteVertSingle .conTitle,
+.conContentStandardteaserMagWhiteHorSingle .conTitle,
+.conContentStandardteaserMagWhiteVertMulti .conTitle,
+
+.conContentShortteaserMagWhiteVertSingle .conTitle,
+.conContentShortteaserMagWhiteHorSingle .conTitle,
+.conContentShortteaserMagWhiteVertMulti .conTitle,
+
+.conContentLongteaserMagWhiteVertSingle .conTitle,
+.conContentLongteaserMagWhiteHorSingle .conTitle,
+.conContentLongteaserMagWhiteVertMulti .conTitle,
+
+.conContentDetailsviewMagWhiteVertSingle .conTitle,
+.conContentDetailsviewMagWhiteHorSingle .conTitle,
+.conContentDetailsviewMagWhiteVertMulti .conTitle,
+
+.conContentEmptyMagWhiteVertSingle .conTitle,
+.conContentEmptyMagWhiteHorSingle .conTitle,
+.conContentEmptyMagWhiteVertMulti .conTitle,
+
+.conFunctionA-Z-List .conTitle,
+.conFunctionNewsArchive .conTitle,
+.conFunctionEventCalendar .conTitle,
+.conFunctionSpecialView .conTitle,
+.selectInterface .conTitle
+{
+  border-top:2px solid #e20074;
+  border-bottom:1px solid #e20074;
+  padding:5px 0px 3px 5px;
+  font-weight:bold;
+  color:#e20074;
+}
+
+
+/* ------------------------------------------------------
+   Farbschema: Petrol-Containertiel auf grauem Hintergrund
+   ------------------------------------------------------ */
+
+.conContentTopteaserBlueGreyVertSingle .conTitle,
+.conContentTopteaserBlueGreyHorSingle .conTitle,
+.conContentTopteaserBlueGreyVertMulti .conTitle,
+
+.conContentStandardteaserBlueGreyVertSingle .conTitle,
+.conContentStandardteaserBlueGreyHorSingle .conTitle,
+.conContentStandardteaserBlueGreyVertMulti .conTitle,
+
+.conContentShortteaserBlueGreyVertSingle .conTitle,
+.conContentShortteaserBlueGreyHorSingle .conTitle,
+.conContentShortteaserBlueGreyVertMulti .conTitle,
+
+.conContentLongteaserBlueGreyVertSingle .conTitle,
+.conContentLongteaserBlueGreyHorSingle .conTitle,
+.conContentLongteaserBlueGreyVertMulti .conTitle,
+
+.conContentDetailsviewBlueGreyVertSingle .conTitle,
+.conContentDetailsviewBlueGreyHorSingle .conTitle,
+.conContentDetailsviewBlueGreyVertMulti .conTitle,
+
+.conContentEmptyBlueGreyVertSingle .conTitle,
+.conContentEmptyBlueGreyHorSingle .conTitle,
+.conContentEmptyBlueGreyVertMulti .conTitle
+{
+  border-top:2px solid #4b737d;
+  border-bottom:1px solid #4b737d;
+  padding:5px 0px 3px 5px;
+  font-weight:bold;
+  color:#4b737d;
+  background-color:#e2e2e2;
+}
+
+.conContentTopteaserBlueGreyVertSingle .content,
+.conContentTopteaserBlueGreyVertSingle .lineClearer,
+.conContentTopteaserBlueGreyVertSingle .separator,
+.conContentTopteaserBlueGreyHorSingle .content,
+.conContentTopteaserBlueGreyHorSingle .lineClearer,
+.conContentTopteaserBlueGreyHorSingle .separator,
+.conContentTopteaserBlueGreyVertMulti .content,
+.conContentTopteaserBlueGreyVertMulti .lineClearer,
+.conContentTopteaserBlueGreyVertMulti .separator,
+
+.conContentStandardteaserBlueGreyVertSingle .content,
+.conContentStandardteaserBlueGreyVertSingle .lineClearer,
+.conContentStandardteaserBlueGreyVertSingle .separator,
+.conContentStandardteaserBlueGreyHorSingle .content,
+.conContentStandardteaserBlueGreyHorSingle .lineClearer,
+.conContentStandardteaserBlueGreyHorSingle .separator,
+.conContentStandardteaserBlueGreyVertMulti .content,
+.conContentStandardteaserBlueGreyVertMulti .lineClearer,
+.conContentStandardteaserBlueGreyVertMulti .separator,
+
+.conContentShortteaserBlueGreyVertSingle .content,
+.conContentShortteaserBlueGreyVertSingle .lineClearer,
+.conContentShortteaserBlueGreyVertSingle .separator,
+.conContentShortteaserBlueGreyHorSingle .content,
+.conContentShortteaserBlueGreyHorSingle .lineClearer,
+.conContentShortteaserBlueGreyHorSingle .separator,
+.conContentShortteaserBlueGreyVertMulti .content,
+.conContentShortteaserBlueGreyVertMulti .lineClearer,
+.conContentShortteaserBlueGreyVertMulti .separator,
+
+.conContentLongteaserBlueGreyVertSingle .content,
+.conContentLongteaserBlueGreyVertSingle .lineClearer,
+.conContentLongteaserBlueGreyVertSingle .separator,
+.conContentLongteaserBlueGreyHorSingle .content,
+.conContentLongteaserBlueGreyHorSingle .lineClearer,
+.conContentLongteaserBlueGreyHorSingle .separator,
+.conContentLongteaserBlueGreyVertMulti .content,
+.conContentLongteaserBlueGreyVertMulti .lineClearer,
+.conContentLongteaserBlueGreyVertMulti .separator,
+
+.conContentDetailsviewBlueGreyVertSingle .content,
+.conContentDetailsviewBlueGreyVertSingle .lineClearer,
+.conContentDetailsviewBlueGreyVertSingle .separator,
+.conContentDetailsviewBlueGreyHorSingle .content,
+.conContentDetailsviewBlueGreyHorSingle .lineClearer,
+.conContentDetailsviewBlueGreyHorSingle .separator,
+.conContentDetailsviewBlueGreyVertMulti .content,
+.conContentDetailsviewBlueGreyVertMulti .lineClearer,
+.conContentDetailsviewBlueGreyVertMulti .separator,
+
+.conContentEmptyBlueGreyVertSingle .content,
+.conContentEmptyBlueGreyVertSingle .lineClearer,
+.conContentEmptyBlueGreyVertSingle .separator,
+.conContentEmptyBlueGreyHorSingle .content,
+.conContentEmptyBlueGreyHorSingle .lineClearer,
+.conContentEmptyBlueGreyHorSingle .separator,
+.conContentEmptyBlueGreyVertMulti .content,
+.conContentEmptyBlueGreyVertMulti .lineClearer,
+.conContentEmptyBlueGreyVertMulti .separator
+{
+  background-color:#e2e2e2;
+}
+
+.conContentTopteaserBlueGreyVertSingle .conFooter,
+.conContentTopteaserBlueGreyHorSingle .conFooter,
+.conContentTopteaserBlueGreyVertMulti .conFooter,
+
+.conContentStandardteaserBlueGreyVertSingle .conFooter,
+.conContentStandardteaserBlueGreyHorSingle .conFooter,
+.conContentStandardteaserBlueGreyVertMulti .conFooter,
+
+.conContentShortteaserBlueGreyVertSingle .conFooter,
+.conContentShortteaserBlueGreyHorSingle .conFooter,
+.conContentShortteaserBlueGreyVertMulti .conFooter,
+
+.conContentLongteaserBlueGreyVertSingle .conFooter,
+.conContentLongteaserBlueGreyHorSingle .conFooter,
+.conContentLongteaserBlueGreyVertMulti .conFooter,
+
+.conContentDetailsviewBlueGreyVertSingle .conFooter,
+.conContentDetailsviewBlueGreyHorSingle .conFooter,
+.conContentDetailsviewBlueGreyVertMulti .conFooter,
+
+.conContentEmptyBlueGreyVertSingle .conFooter,
+.conContentEmptyBlueGreyHorSingle .conFooter,
+.conContentEmptyBlueGreyVertMulti .conFooter
+{
+  background-color:#e2e2e2;
+  padding-bottom:5px;
+}
+
+.conContentTopteaserBlueGreyVertSingle a,
+.conContentTopteaserBlueGreyVertSingle a:hover, 
+.conContentTopteaserBlueGreyVertSingle a:visited, 
+.conContentTopteaserBlueGreyVertSingle a:link,
+.conContentTopteaserBlueGreyHorSingle a,
+.conContentTopteaserBlueGreyHorSingle a:hover, 
+.conContentTopteaserBlueGreyHorSingle a:visited, 
+.conContentTopteaserBlueGreyHorSingle a:link,
+.conContentTopteaserBlueGreyVertMulti a,
+.conContentTopteaserBlueGreyVertMulti a:hover, 
+.conContentTopteaserBlueGreyVertMulti a:visited, 
+.conContentTopteaserBlueGreyVertMulti a:link,
+
+.conContentStandardteaserBlueGreyVertSingle a,
+.conContentStandardteaserBlueGreyVertSingle a:hover, 
+.conContentStandardteaserBlueGreyVertSingle a:visited, 
+.conContentStandardteaserBlueGreyVertSingle a:link,
+.conContentStandardteaserBlueGreyHorSingle a,
+.conContentStandardteaserBlueGreyHorSingle a:hover, 
+.conContentStandardteaserBlueGreyHorSingle a:visited, 
+.conContentStandardteaserBlueGreyHorSingle a:link,
+.conContentStandardteaserBlueGreyVertMulti a,
+.conContentStandardteaserBlueGreyVertMulti a:hover, 
+.conContentStandardteaserBlueGreyVertMulti a:visited, 
+.conContentStandardteaserBlueGreyVertMulti a:link,
+
+.conContentShortteaserBlueGreyVertSingle a,
+.conContentShortteaserBlueGreyVertSingle a:hover, 
+.conContentShortteaserBlueGreyVertSingle a:visited, 
+.conContentShortteaserBlueGreyVertSingle a:link,
+.conContentShortteaserBlueGreyHorSingle a,
+.conContentShortteaserBlueGreyHorSingle a:hover, 
+.conContentShortteaserBlueGreyHorSingle a:visited, 
+.conContentShortteaserBlueGreyHorSingle a:link,
+.conContentShortteaserBlueGreyVertMulti a,
+.conContentShortteaserBlueGreyVertMulti a:hover, 
+.conContentShortteaserBlueGreyVertMulti a:visited, 
+.conContentShortteaserBlueGreyVertMulti a:link,
+
+.conContentLongteaserBlueGreyVertSingle a,
+.conContentLongteaserBlueGreyVertSingle a:hover, 
+.conContentLongteaserBlueGreyVertSingle a:visited, 
+.conContentLongteaserBlueGreyVertSingle a:link,
+.conContentLongteaserBlueGreyHorSingle a,
+.conContentLongteaserBlueGreyHorSingle a:hover, 
+.conContentLongteaserBlueGreyHorSingle a:visited, 
+.conContentLongteaserBlueGreyHorSingle a:link,
+.conContentLongteaserBlueGreyVertMulti a,
+.conContentLongteaserBlueGreyVertMulti a:hover, 
+.conContentLongteaserBlueGreyVertMulti a:visited, 
+.conContentLongteaserBlueGreyVertMulti a:link,
+
+.conContentDetailsviewBlueGreyVertSingle a,
+.conContentDetailsviewBlueGreyVertSingle a:hover, 
+.conContentDetailsviewBlueGreyVertSingle a:visited, 
+.conContentDetailsviewBlueGreyVertSingle a:link,
+.conContentDetailsviewBlueGreyHorSingle a,
+.conContentDetailsviewBlueGreyHorSingle a:hover, 
+.conContentDetailsviewBlueGreyHorSingle a:visited, 
+.conContentDetailsviewBlueGreyHorSingle a:link,
+.conContentDetailsviewBlueGreyVertMulti a,
+.conContentDetailsviewBlueGreyVertMulti a:hover, 
+.conContentDetailsviewBlueGreyVertMulti a:visited, 
+.conContentDetailsviewBlueGreyVertMulti a:link,
+
+.conContentEmptyBlueGreyVertSingle a,
+.conContentEmptyBlueGreyVertSingle a:hover, 
+.conContentEmptyBlueGreyVertSingle a:visited, 
+.conContentEmptyBlueGreyVertSingle a:link,
+.conContentEmptyBlueGreyHorSingle a,
+.conContentEmptyBlueGreyHorSingle a:hover, 
+.conContentEmptyBlueGreyHorSingle a:visited, 
+.conContentEmptyBlueGreyHorSingle a:link,
+.conContentEmptyBlueGreyVertMulti a,
+.conContentEmptyBlueGreyVertMulti a:hover, 
+.conContentEmptyBlueGreyVertMulti a:visited, 
+.conContentEmptyBlueGreyVertMulti a:link
+{
+  color:#000000;
+}
+
+
+/* ------------------------------------------------------
+   Farbschema: grauer Containertiel auf weissem Hintergrund
+   ------------------------------------------------------ */
+
+.conContentTopteaserGreyWhiteVertSingle .conTitle,
+.conContentTopteaserGreyWhiteHorSingle .conTitle,
+.conContentTopteaserGreyWhiteVertMulti .conTitle,
+
+.conContentStandardteaserGreyWhiteVertSingle .conTitle,
+.conContentStandardteaserGreyWhiteHorSingle .conTitle,
+.conContentStandardteaserGreyWhiteVertMulti .conTitle,
+
+.conContentShortteaserGreyWhiteVertSingle .conTitle,
+.conContentShortteaserGreyWhiteHorSingle .conTitle,
+.conContentShortteaserGreyWhiteVertMulti .conTitle,
+
+.conContentLongteaserGreyWhiteVertSingle .conTitle,
+.conContentLongteaserGreyWhiteHorSingle .conTitle,
+.conContentLongteaserGreyWhiteVertMulti .conTitle,
+
+.conContentDetailsviewGreyWhiteVertSingle .conTitle,
+.conContentDetailsviewGreyWhiteHorSingle .conTitle,
+.conContentDetailsviewGreyWhiteVertMulti .conTitle,
+
+.conContentEmptyGreyWhiteVertSingle .conTitle,
+.conContentEmptyGreyWhiteHorSingle .conTitle,
+.conContentEmptyGreyWhiteVertMulti .conTitle,
+
+.conFunctionSimpleSearch .conTitle,
+.conFunctionInfoSafe .conTitle
+{
+  border-top:2px solid #7a7a7a;
+  border-bottom:1px solid #7a7a7a;
+  padding:5px 0px 3px 5px;
+  font-weight:bold;
+  color:#7a7a7a;
+}
+
+
+/* ---------------------------------------------------------
+   allgemeingültige Einstellungen in der BottomArea   --------------------------------------------------------- */
+
+#bottomArea td.left
+{
+  text-align:left;
+  width:80px;
+}
+
+#bottomArea td.center
+{
+  text-align:center;
+  width:450px;
+}
+
+#bottomArea td.right
+{
+  text-align:right;
+  width:80px;
+}
+
+
+/* ---------------------------------------------------------
+   allgemeingültige Einstellungen in der LeftArea   --------------------------------------------------------- */
+
+#leftArea .text
+{
+  padding:0px 5px 0px 10px;
+  color:#000000;
+}
+
+#leftArea .conTitle
+{
+  padding-left:10px;
+}
+
+
+/* ---------------------------------------------------------
+   allgemeingültige Einstellungen in der RightArea   --------------------------------------------------------- */
+
+#rightArea .text
+{
+  padding:0px 5px 0px 5px;
+  color:#000000;
+}
+
+
+/* ------------------------------------------------------
+   allgemeingültige Einstellungen in der MainArea   ------------------------------------------------------ */
+
+/* Korrektur des rechten Abstands beim IE */
+
+#mainArea .conContentTopteaserMagWhiteVertSingle,
+#mainArea .conContentTopteaserMagWhiteHorSingle,
+#mainArea .conContentTopteaserMagWhiteVertMulti,
+#mainArea .conContentTopteaserGreyWhiteVertSingle,
+#mainArea .conContentTopteaserGreyWhiteHorSingle,
+#mainArea .conContentTopteaserGreyWhiteVertMulti,
+#mainArea .conContentTopteaserBlueGreyVertSingle,
+#mainArea .conContentTopteaserBlueGreyHorSingle,
+#mainArea .conContentTopteaserBlueGreyVertMulti,
+
+#mainArea .conContentStandardteaserMagWhiteVertSingle,
+#mainArea .conContentStandardteaserMagWhiteHorSingle,
+#mainArea .conContentStandardteaserMagWhiteVertMulti,
+#mainArea .conContentStandardteaserMagWhiteVertSingle,
+#mainArea .conContentStandardteaserMagWhiteVertSingle,
+#mainArea .conContentStandardteaserMagWhiteVertSingle,
+#mainArea .conContentStandardteaserMagWhiteVertSingle,
+#mainArea .conContentStandardteaserMagWhiteVertSingle,
+#mainArea .conContentStandardteaserMagWhiteVertSingle,
+
+#mainArea .conContentEmptyMagWhiteVertSingle,
+#mainArea .conContentEmptyMagWhiteHorSingle,
+#mainArea .conContentEmptyMagWhiteVertMulti,
+#mainArea .conContentEmptyGreyWhiteVertSingle,
+#mainArea .conContentEmptyGreyWhiteHorSingle,
+#mainArea .conContentEmptyGreyWhiteVertMulti,
+#mainArea .conContentEmptyMagBlueGreyVertSingle,
+#mainArea .conContentEmptyMagBlueGreyHorSingle,
+#mainArea .conContentEmptyMagBlueGreyVertMulti,
+
+#mainArea .conContentLongteaserMagWhiteVertSingle,
+#mainArea .conContentLongteaserMagWhiteHorSingle,
+#mainArea .conContentLongteaserMagWhiteVertMulti,
+#mainArea .conContentLongteaserGreyWhiteVertSingle,
+#mainArea .conContentLongteaserGreyWhiteHorSingle,
+#mainArea .conContentLongteaserGreyWhiteVertMulti,
+#mainArea .conContentLongteaserBlueGreyVertSingle,
+#mainArea .conContentLongteaserBlueGreyHorSingle,
+#mainArea .conContentLongteaserBlueGreyVertMulti,
+
+#mainArea .conContentShortteaserMagWhiteVertSingle,
+#mainArea .conContentShortteaserMagWhiteHorSingle,
+#mainArea .conContentShortteaserMagWhiteVertMulti,
+#mainArea .conContentShortteaserGreyWhiteVertSingle,
+#mainArea .conContentShortteaserGreyWhiteHorSingle,
+#mainArea .conContentShortteaserGreyWhiteVertMulti,
+#mainArea .conContentShortteaserBlueGreyVertSingle,
+#mainArea .conContentShortteaserBlueGreyHorSingle,
+#mainArea .conContentShortteaserBlueGreyVertMulti
+
+#mainArea .conContentDetailsviewMagWhiteVertSingle,
+#mainArea .conContentDetailsviewMagWhiteHorSingle,
+#mainArea .conContentDetailsviewMagWhiteVertMulti,
+#mainArea .conContentDetailsviewGreyWhiteVertSingle,
+#mainArea .conContentDetailsviewGreyWhiteHorSingle,
+#mainArea .conContentDetailsviewGreyWhiteVertMulti,
+#mainArea .conContentDetailsviewBlueGreyVertSingle,
+#mainArea .conContentDetailsviewBlueGreyHorSingle,
+#mainArea .conContentDetailsviewBlueGreyVertMulti,
+
+#mainArea .conNavigationDirectory,
+#mainArea .conFunctionA-Z-List
+{
+  margin-right:-10px;
+  width:100%;
+}
+
+
+/* Abstände nach rechts */
+#mainArea .conTitle,
+#mainArea .content,
+#mainArea .lineClearer,
+#mainArea .separator,
+#mainArea .conFooter
+{
+  margin-right:10px;
+}
+
+
+/* Textbereiche */
+
+#mainArea .text
+{
+  padding:0px 5px 0px 5px;
+}
+
+
+/* Textliste */
+
+#mainArea .text ul
+{
+  list-style-type:square;
+  color:#a7a7a7;
+}
+
+#mainArea .text ul span
+{
+  color:#000000;
+}
+
+
+/* Spaltenueberschriften in Tabellen */
+
+#mainArea table
+{
+  font-size:100%;
+}
+
+#mainArea th
+{
+  font-weight:bold;
+  text-align:left;
+}
+
+
+/* ----------------------------------------------------------
+   allgemeingültige Einstellungen in der BottomArea   ---------------------------------------------------------- */
+
+#bottomArea .conContentTopteaserMagWhiteVertSingle,
+#bottomArea .conContentTopteaserMagWhiteHorSingle,
+#bottomArea .conContentTopteaserMagWhiteVertMulti,
+#bottomArea .conContentTopteaserGreyWhiteVertSingle,
+#bottomArea .conContentTopteaserGreyWhiteHorSingle,
+#bottomArea .conContentTopteaserGreyWhiteVertMulti,
+#bottomArea .conContentTopteaserBlueGreyVertSingle,
+#bottomArea .conContentTopteaserBlueGreyHorSingle,
+#bottomArea .conContentTopteaserBlueGreyVertMulti,
+
+#bottomArea .conContentStandardteaserMagWhiteVertSingle,
+#bottomArea .conContentStandardteaserMagWhiteHorSingle,
+#bottomArea .conContentStandardteaserMagWhiteVertMulti,
+#bottomArea .conContentStandardteaserMagWhiteVertSingle,
+#bottomArea .conContentStandardteaserMagWhiteVertSingle,
+#bottomArea .conContentStandardteaserMagWhiteVertSingle,
+#bottomArea .conContentStandardteaserMagWhiteVertSingle,
+#bottomArea .conContentStandardteaserMagWhiteVertSingle,
+#bottomArea .conContentStandardteaserMagWhiteVertSingle,
+
+#bottomArea .conContentEmptyMagWhiteVertSingle,
+#bottomArea .conContentEmptyMagWhiteHorSingle,
+#bottomArea .conContentEmptyMagWhiteVertMulti,
+#bottomArea .conContentEmptyGreyWhiteVertSingle,
+#bottomArea .conContentEmptyGreyWhiteHorSingle,
+#bottomArea .conContentEmptyGreyWhiteVertMulti,
+#bottomArea .conContentEmptyMagBlueGreyVertSingle,
+#bottomArea .conContentEmptyMagBlueGreyHorSingle,
+#bottomArea .conContentEmptyMagBlueGreyVertMulti,
+
+#bottomArea .conContentLongteaserMagWhiteVertSingle,
+#bottomArea .conContentLongteaserMagWhiteHorSingle,
+#bottomArea .conContentLongteaserMagWhiteVertMulti,
+#bottomArea .conContentLongteaserGreyWhiteVertSingle,
+#bottomArea .conContentLongteaserGreyWhiteHorSingle,
+#bottomArea .conContentLongteaserGreyWhiteVertMulti,
+#bottomArea .conContentLongteaserBlueGreyVertSingle,
+#bottomArea .conContentLongteaserBlueGreyHorSingle,
+#bottomArea .conContentLongteaserBlueGreyVertMulti,
+
+#bottomArea .conContentShortteaserMagWhiteVertSingle,
+#bottomArea .conContentShortteaserMagWhiteHorSingle,
+#bottomArea .conContentShortteaserMagWhiteVertMulti,
+#bottomArea .conContentShortteaserGreyWhiteVertSingle,
+#bottomArea .conContentShortteaserGreyWhiteHorSingle,
+#bottomArea .conContentShortteaserGreyWhiteVertMulti,
+#bottomArea .conContentShortteaserBlueGreyVertSingle,
+#bottomArea .conContentShortteaserBlueGreyHorSingle,
+#bottomArea .conContentShortteaserBlueGreyVertMulti
+
+#bottomArea .conContentDetailsviewMagWhiteVertSingle,
+#bottomArea .conContentDetailsviewMagWhiteHorSingle,
+#bottomArea .conContentDetailsviewMagWhiteVertMulti,
+#bottomArea .conContentDetailsviewGreyWhiteVertSingle,
+#bottomArea .conContentDetailsviewGreyWhiteHorSingle,
+#bottomArea .conContentDetailsviewGreyWhiteVertMulti,
+#bottomArea .conContentDetailsviewBlueGreyVertSingle,
+#bottomArea .conContentDetailsviewBlueGreyHorSingle,
+#bottomArea .conContentDetailsviewBlueGreyVertMulti,
+
+#bottomArea *
+{
+  padding-top:0px;
+  padding-bottom:0px;
+  margin-bottom:0px;
+}
+
+
+/* ----------------------------------------------------------
+   allgemeingültige Einstellungen in der RightArea   ---------------------------------------------------------- */
+
+#rightArea .conContentTopteaserMagWhiteVertSingle,
+#rightArea .conContentTopteaserMagWhiteHorSingle,
+#rightArea .conContentTopteaserMagWhiteVertMulti,
+#rightArea .conContentTopteaserGreyWhiteVertSingle,
+#rightArea .conContentTopteaserGreyWhiteHorSingle,
+#rightArea .conContentTopteaserGreyWhiteVertMulti,
+#rightArea .conContentTopteaserBlueGreyVertSingle,
+#rightArea .conContentTopteaserBlueGreyHorSingle,
+#rightArea .conContentTopteaserBlueGreyVertMulti,
+
+#rightArea .conContentStandardteaserMagWhiteVertSingle,
+#rightArea .conContentStandardteaserMagWhiteHorSingle,
+#rightArea .conContentStandardteaserMagWhiteVertMulti,
+#rightArea .conContentStandardteaserMagWhiteVertSingle,
+#rightArea .conContentStandardteaserMagWhiteVertSingle,
+#rightArea .conContentStandardteaserMagWhiteVertSingle,
+#rightArea .conContentStandardteaserMagWhiteVertSingle,
+#rightArea .conContentStandardteaserMagWhiteVertSingle,
+#rightArea .conContentStandardteaserMagWhiteVertSingle,
+
+#rightArea .conContentEmptyMagWhiteVertSingle,
+#rightArea .conContentEmptyMagWhiteHorSingle,
+#rightArea .conContentEmptyMagWhiteVertMulti,
+#rightArea .conContentEmptyGreyWhiteVertSingle,
+#rightArea .conContentEmptyGreyWhiteHorSingle,
+#rightArea .conContentEmptyGreyWhiteVertMulti,
+#rightArea .conContentEmptyMagBlueGreyVertSingle,
+#rightArea .conContentEmptyMagBlueGreyHorSingle,
+#rightArea .conContentEmptyMagBlueGreyVertMulti,
+
+#rightArea .conContentLongteaserMagWhiteVertSingle,
+#rightArea .conContentLongteaserMagWhiteHorSingle,
+#rightArea .conContentLongteaserMagWhiteVertMulti,
+#rightArea .conContentLongteaserGreyWhiteVertSingle,
+#rightArea .conContentLongteaserGreyWhiteHorSingle,
+#rightArea .conContentLongteaserGreyWhiteVertMulti,
+#rightArea .conContentLongteaserBlueGreyVertSingle,
+#rightArea .conContentLongteaserBlueGreyHorSingle,
+#rightArea .conContentLongteaserBlueGreyVertMulti,
+
+#rightArea .conContentShortteaserMagWhiteVertSingle,
+#rightArea .conContentShortteaserMagWhiteHorSingle,
+#rightArea .conContentShortteaserMagWhiteVertMulti,
+#rightArea .conContentShortteaserGreyWhiteVertSingle,
+#rightArea .conContentShortteaserGreyWhiteHorSingle,
+#rightArea .conContentShortteaserGreyWhiteVertMulti,
+#rightArea .conContentShortteaserBlueGreyVertSingle,
+#rightArea .conContentShortteaserBlueGreyHorSingle,
+#rightArea .conContentShortteaserBlueGreyVertMulti
+
+#rightArea .conContentDetailsviewMagWhiteVertSingle,
+#rightArea .conContentDetailsviewMagWhiteHorSingle,
+#rightArea .conContentDetailsviewMagWhiteVertMulti,
+#rightArea .conContentDetailsviewGreyWhiteVertSingle,
+#rightArea .conContentDetailsviewGreyWhiteHorSingle,
+#rightArea .conContentDetailsviewGreyWhiteVertMulti,
+#rightArea .conContentDetailsviewBlueGreyVertSingle,
+#rightArea .conContentDetailsviewBlueGreyHorSingle,
+#rightArea .conContentDetailsviewBlueGreyVertMulti
+{
+  width:190px;
+}
+
+
+/* ------------------------------------------------------
+   Contentmodul 'Topteaser'
+   ------------------------------------------------------ */
+
+.conContentTopteaserMagWhiteVertSingle .content .relatedLinks,
+.conContentTopteaserMagWhiteHorSingle .content .relatedLinks,
+.conContentTopteaserMagWhiteVertMulti .content .relatedLinks,
+.conContentTopteaserGreyWhiteVertSingle .content .relatedLinks,
+.conContentTopteaserGreyWhiteHorSingle .content .relatedLinks,
+.conContentTopteaserGreyWhiteVertMulti .content .relatedLinks,
+.conContentTopteaserBlueGreyVertSingle .content .relatedLinks,
+.conContentTopteaserBlueGreyHorSingle .content .relatedLinks,
+.conContentTopteaserBlueGreyVertMulti .content .relatedLinks
+{
+  height:100%;
+}
+
+.conContentTopteaserMagWhiteVertSingle .content .relatedLinks .link,
+.conContentTopteaserMagWhiteHorSingle .content .relatedLinks .link,
+.conContentTopteaserMagWhiteVertMulti .content .relatedLinks .link,
+.conContentTopteaserGreyWhiteVertSingle .content .relatedLinks .link,
+.conContentTopteaserGreyWhiteHorSingle .content .relatedLinks .link,
+.conContentTopteaserGreyWhiteVertMulti .content .relatedLinks .link,
+.conContentTopteaserBlueGreyVertSingle .content .relatedLinks .link,
+.conContentTopteaserBlueGreyHorSingle .content .relatedLinks .link,
+.conContentTopteaserBlueGreyVertMulti .content .relatedLinks .link
+{
+  width:180px;
+  padding-top:5px;
+  padding-right:5px;
+  float:left;
+}
+
+
+/* ------------------------------------------------------
+   Contentmodul 'Longteaser'
+   ------------------------------------------------------ */
+
+.grid-1cols .colLeft .conContentLongteaserBlueGreyHorSingle,
+.grid-1cols .colLeft .conContentLongteaserBlueGreyVertMulti
+{
+  background-image:url(/static/pics/common/background_content_590.gif);
+  background-repeat:repeat-y;
+}
+
+.grid-2cols .colLeft .conContentLongteaserBlueGreyHorSingle,
+.grid-2cols .colLeft .conContentLongteaserBlueGreyVertMulti
+{
+  background-image:url(/static/pics/common/background_content_390.gif);
+  background-repeat:repeat-y;
+}
+
+.conContentLongteaserMagWhiteHorSingle .content .contentImage,
+.conContentLongteaserGreyWhiteHorSingle .content .contentImage,
+.conContentLongteaserBlueGreyHorSingle .content .contentImage
+{
+  float:left;
+  padding-right:5px;
+}
+
+.conContentLongteaserMagWhiteHorSingle .content .headline,
+.conContentLongteaserGreyWhiteHorSingle .content .headline,
+.conContentLongteaserBlueGreyHorSingle .content .headline
+{
+  padding-top:5px;
+}
+
+.conContentLongteaserMagWhiteVertMulti .content,
+.conContentLongteaserGreyWhiteVertMulti .content,
+.conContentLongteaserBlueGreyVertMulti .content
+{
+  width:190px !important;
+  float:left;
+}
+
+.conContentLongteaserMagWhiteVertMulti .lineClearer,
+.conContentLongteaserGreyWhiteVertMulti .lineClearer,
+.conContentLongteaserBlueGreyVertMulti .lineClearer
+{
+  padding-bottom:10px;
+}
+
+.conContentLongteaserMagWhiteVertMulti .separator,
+.conContentLongteaserGreyWhiteVertMulti .separator,
+.conContentLongteaserBlueGreyVertMulti .separator
+{
+  display:none;
+}
+
+
+/* ------------------------------------------------------
+   Contentmodul 'Shortteaser'
+   ------------------------------------------------------ */
+
+.grid-1cols .colLeft .conContentShortteaserBlueGreyVertMulti
+{
+  height:100%;
+  background-image:url(/static/pics/common/background_content_590.gif);
+  background-repeat:repeat-y;
+}
+
+.grid-2cols .colLeft .conContentShortteaserBlueGreyVertMulti
+{
+  height:100%;
+  background-image:url(/static/pics/common/background_content_390.gif);
+  background-repeat:repeat-y;
+}
+
+.conContentShortteaserMagWhiteVertSingle .content,
+.conContentShortteaserMagWhiteHorSingle .content,
+.conContentShortteaserMagWhiteVertMulti .content,
+.conContentShortteaserGreyWhiteVertSingle .content,
+.conContentShortteaserGreyWhiteHorSingle .content,
+.conContentShortteaserGreyWhiteVertMulti .content,
+.conContentShortteaserBlueGreyVertSingle .content,
+.conContentShortteaserBlueGreyHorSingle .content,
+.conContentShortteaserBlueGreyVertMulti .content
+{
+  padding-top:5px;
+}
+
+.grid-1cols .conContentShortteaserMagWhiteVertMulti .content,
+.grid-1cols .conContentShortteaserGreyWhiteVertMulti .content,
+.grid-1cols .conContentShortteaserBlueGreyVertMulti .content
+{
+  width:190px !important;
+  float:left;
+}
+
+.grid-2cols .conContentShortteaserMagWhiteVertMulti .content,
+.grid-2cols .conContentShortteaserGreyWhiteVertMulti .content,
+.grid-2cols .conContentShortteaserBlueGreyVertMulti .content
+{
+  width:190px !important;
+}
+
+.grid-2cols .colLeft .conContentShortteaserMagWhiteVertMulti .content,
+.grid-2cols .colLeft .conContentShortteaserGreyWhiteVertMulti .content,
+.grid-2cols .colLeft .conContentShortteaserBlueGreyVertMulti .content
+{
+  width:190px !important;
+  float:left;
+}
+
+.grid-3cols .conContentShortteaserMagWhiteVertMulti .content,
+.grid-3cols .conContentShortteaserGreyWhiteVertMulti .content,
+.grid-3cols .conContentShortteaserBlueGreyVertMulti .content
+{
+  width:190px !important;
+}
+
+.conContentShortteaserMagWhiteVertMulti .lineClearer,
+.conContentShortteaserGreyWhiteVertMulti .lineClearer,
+.conContentShortteaserBlueGreyVertMulti .lineClearer
+{
+  padding-bottom:10px;
+}
+
+.conContentShortteaserMagWhiteVertSingle .separator,
+.conContentShortteaserMagWhiteHorSingle .separator,
+.conContentShortteaserMagWhiteVertMulti .separator,
+.conContentShortteaserGreyWhiteVertSingle .separator,
+.conContentShortteaserGreyWhiteHorSingle .separator,
+.conContentShortteaserGreyWhiteVertMulti .separator,
+.conContentShortteaserBlueGreyVertSingle .separator,
+.conContentShortteaserBlueGreyHorSingle .separator,
+.conContentShortteaserBlueGreyVertMulti .separator
+{
+  display:none;
+}
+
+
+/* ------------------------------------------------------
+   Contentmodul 'Detailsview'
+   ------------------------------------------------------ */
+
+.conContentDetailsviewMagWhiteVertSingle .content .text,
+.conContentDetailsviewMagWhiteHorSingle .content .text,
+.conContentDetailsviewMagWhiteVertMulti .content .text,
+.conContentDetailsviewGreyWhiteVertSingle .content .text,
+.conContentDetailsviewGreyWhiteHorSingle .content .text,
+.conContentDetailsviewGreyWhiteVertMulti .content .text,
+.conContentDetailsviewBlueGreyVertSingle .content .text,
+.conContentDetailsviewBlueGreyHorSingle .content .text,
+.conContentDetailsviewBlueGreyVertMulti .content .text
+{
+  clear:both;
+  color:#000000;
+}
+
+.conContentDetailsviewMagWhiteVertSingle .content .headline,
+.conContentDetailsviewMagWhiteHorSingle .content .headline,
+.conContentDetailsviewMagWhiteVertMulti .content .headline,
+.conContentDetailsviewGreyWhiteVertSingle .content .headline,
+.conContentDetailsviewGreyWhiteHorSingle .content .headline,
+.conContentDetailsviewGreyWhiteVertMulti .content .headline,
+.conContentDetailsviewBlueGreyVertSingle .content .headline,
+.conContentDetailsviewBlueGreyHorSingle .content .headline,
+.conContentDetailsviewBlueGreyVertMulti .content .headline
+{
+  padding:0px 0px 5px 5px;
+  font-weight:bold;
+  font-size:1.4em;
+  line-height:1em;
+  color:#000000;
+  margin-bottom:10px;
+}
+
+.conContentDetailsviewMagWhiteVertSingle .content .subHeadline,
+.conContentDetailsviewMagWhiteHorSingle .content .subHeadline,
+.conContentDetailsviewMagWhiteVertMulti .content .subHeadline,
+.conContentDetailsviewGreyWhiteVertSingle .content .subHeadline,
+.conContentDetailsviewGreyWhiteHorSingle .content .subHeadline,
+.conContentDetailsviewGreyWhiteVertMulti .content .subHeadline,
+.conContentDetailsviewBlueGreyVertSingle .content .subHeadline,
+.conContentDetailsviewBlueGreyHorSingle .content .subHeadline,
+.conContentDetailsviewBlueGreyVertMulti .content .subHeadline
+{
+  margin-top:15px;
+  display:block;
+}
+
+.conContentDetailsviewMagWhiteVertSingle .content .text .thumbnails,
+.conContentDetailsviewMagWhiteHorSingle .content .text .thumbnails,
+.conContentDetailsviewMagWhiteVertMulti .content .text .thumbnails,
+.conContentDetailsviewGreyWhiteVertSingle .content .text .thumbnails,
+.conContentDetailsviewGreyWhiteHorSingle .content .text .thumbnails,
+.conContentDetailsviewGreyWhiteVertMulti .content .text .thumbnails,
+.conContentDetailsviewBlueGreyVertSingle .content .text .thumbnails,
+.conContentDetailsviewBlueGreyHorSingle .content .text .thumbnails,
+.conContentDetailsviewBlueGreyVertMulti .content .text .thumbnails
+{
+  margin-top:10px;
+  color:#000000;
+}
+
+.conContentDetailsviewMagWhiteVertSingle .content .text .thumbnails .thumbnail,
+.conContentDetailsviewMagWhiteHorSingle .content .text .thumbnails .thumbnail,
+.conContentDetailsviewMagWhiteVertMulti .content .text .thumbnails .thumbnail,
+.conContentDetailsviewGreyWhiteVertSingle .content .text .thumbnails .thumbnail,
+.conContentDetailsviewGreyWhiteHorSingle .content .text .thumbnails .thumbnail,
+.conContentDetailsviewGreyWhiteVertMulti .content .text .thumbnails .thumbnail,
+.conContentDetailsviewBlueGreyVertSingle .content .text .thumbnails .thumbnail,
+.conContentDetailsviewBlueGreyHorSingle .content .text .thumbnails .thumbnail,
+.conContentDetailsviewBlueGreyVertMulti .content .text .thumbnails .thumbnail
+{
+  padding-right:3px;
+  float:left;
+  color:#000000;
+}
+
+
+/* ------------------------------------------------------
+   Funktionsmodul 'Import Reader'
+   ------------------------------------------------------ */
+
+.conFunctionImportReader
+{
+  border:1px solid #e20074;
+}
+
+.conFunctionImportReader .content
+{
+  margin-bottom:10px;
+}
+
+.conFunctionImportReader img
+{
+  vertical-align:top;
+}
+
+.conFunctionImportReader .conTitle
+{
+  border:none;
+  color:#ffffff;
+  background-color:#e20074;
+  font-weight:bold;
+  padding-left:5px;
+}
+
+.conFunctionImportReader .conFooter
+{
+  border-top:1px solid #e20074;
+  line-height:2.5em;
+  vertical-align:middle;
+  text-align:center;
+  height:30px;
+  font-size:12px;
+  background-color:#e2e2e2;
+}
+
+
+/* ------------------------------------------------------
+   Funktionsmodul 'A-Z-Liste'
+   ------------------------------------------------------ */
+
+.conFunctionA-Z-List .conTitle
+{
+  margin-top:15px;
+}
+
+.conFunctionA-Z-List .subHeadline
+{
+  margin-top:10px;
+  display:block;
+}
+
+
+/* ------------------------------------------------------
+   Funktionsmodul 'SimpleSearch'
+   ------------------------------------------------------ */
+
+.conFunctionSimpleSearch table
+{
+  width:100%;
+}
+
+.conFunctionSimpleSearch td
+{
+  vertical-align:middle;
+}
+
+.conFunctionSimpleSearch .buttonVert100percent,
+.conFunctionSimpleSearch .inputVert100percent
+{
+  font-size:12px;
+}
+
+.conFunctionSimpleSearch .checkBoxVert100percent
+{
+  margin-top: -10px;
+}  
+
+.conFunctionSimpleSearch .htmlLinks 
+{
+  margin-top:-5px;
+}
+
+.conFunctionSimpleSearch .htmlLinks .link
+{
+  padding-right:10px;
+  display:inline;
+}
+
+
+/* ------------------------------------------------------
+   Funktionsmodul 'InfoSafe'
+   ------------------------------------------------------ */
+
+.conFunctionInfoSafe .htmlLinks
+{
+  padding-top:10px;
+}
+
+.conFunctionInfoSafe .htmlLinks .link
+{
+  padding-right:10px;
+  display:inline;
+}
+
+
+/* ------------------------------------------------------
+   Funktionsmodul 'Diashow'
+   ------------------------------------------------------ */
+
+.conFunctionSpecialView
+{
+  padding-right:10px;
+  margin-bottom:20px;
+}
+
+* html .conFunctionSpecialView
+{
+  width:100%;
+}
+
+.conFunctionSpecialView .conTitle
+{
+  margin-right:0px !important;
+}
+
+.conFunctionSpecialView .empty
+{
+  padding-top:5px;
+}
+
+
+/* ------------------------------------------------------
+   Topmodul 
+   ------------------------------------------------------ */
+
+.conTop
+{
+}
+
+.conTop .background
+{
+  height:60px;
+}
+
+.conTop .globalLinks
+{
+  height:18px;
+  text-align:right;
+  background-color:#7c7c7c;
+  padding-right:6px;
+}
+
+.conTop .globalLinks .link
+{
+  padding-left:5px;
+  display:inline;
+}
+
+.conTop .globalLinks .link, 
+.conTop .globalLinks .link a
+{
+  color:#ffffff;
+  font-size:10px;
+}
+
+
+/* ------------------------------------------------------
+   Navigationsmodul 'Horizontal'
+   ------------------------------------------------------ */
+
+.conNavigationHorizontal
+{
+  margin-left:200px;
+}
+
+.conNavigationHorizontal .navLevel1
+{
+}
+
+.conNavigationHorizontal .navLevel1 .navItem,
+.conNavigationHorizontal .navLevel1 .navItemSelected,
+.conNavigationHorizontal .navLevel1 .navItemHighlighted
+{
+  display:inline;
+  margin-right:1px;
+  padding-top:4px;
+  height:22px;
+  max-height:18px;
+  vertical-align:middle;
+  color:#ffffff;
+  background-color:#4b737d;
+  font-weight:bold;
+  float:left;
+}
+
+.conNavigationHorizontal .navLevel1 .navItem a,
+.conNavigationHorizontal .navLevel1 .navItemSelected a,
+.conNavigationHorizontal .navLevel1 .navItemHighlighted a
+{
+  margin-top:-4px;
+  padding:4px 8px 3px 8px;  
+  text-decoration:none;
+  color:#ffffff;
+  font-weight:bold;
+}
+
+.conNavigationHorizontal .navLevel1 .navItem span,
+.conNavigationHorizontal .navLevel1 .navItemSelected span,
+.conNavigationHorizontal .navLevel1 .navItemHighlighted span
+{
+  margin-top:-4px;
+  padding:4px 8px 3px 8px;  
+  text-decoration:none;
+  color:#ffffff;
+  font-weight:bold;
+}
+
+.conNavigationHorizontal .navLevel1 .navItem a
+{
+  background-color:#4b737d;
+}
+
+.conNavigationHorizontal .navLevel1 .navItem a:hover
+{
+  background-color:#e20074;
+}
+
+.conNavigationHorizontal .navLevel1 .navItemSelected a,
+.conNavigationHorizontal .navLevel1 .navItemHighlighted a
+{
+}
+
+.conNavigationHorizontal .navLevel1 .navItemSelected a:hover,
+.conNavigationHorizontal .navLevel1 .navItemHighlighted a:hover
+{
+  background-color:#7d9ba0;
+}
+
+
+/* ------------------------------------------------------
+   Navigationsmodul 'Vertical'
+   ------------------------------------------------------ */
+
+
+.conNavigationVerticalSection .navLevel1 .navItemSelected,
+.conNavigationVerticalSection .navLevel1 .navItemHighlighted
+{
+  padding-left:10px;
+  line-height:25px;
+  border-top:2px solid #7a7a7a; 
+  border-bottom:1px solid #7a7a7a; 
+  color:#7a7a7a;
+  font-weight:bold;
+}
+
+.conNavigationVerticalSection .navLevel1 .navItemSelected a,
+.conNavigationVerticalSection .navLevel1 .navItemHighlighted a
+{
+  margin-left:-10px;
+  padding:4px 0px 4px 10px;
+  line-height:15px;
+  width:100%;
+  display:block;
+  text-decoration:none;
+  overflow:hidden;
+  color:#7a7a7a;
+  font-weight:bold;
+}
+
+.conNavigationVerticalSection .navLevel1 .navItemSelected a
+{
+  font-weight:bold;
+}
+
+//.conNavigationVerticalSection .navLevel1 .navItemSelected a:hover,
+//.conNavigationVerticalSection .navLevel1 .navItemHighlighted a:hover
+//{
+//  background-color:#b5b5b5;
+//}
+
+.conNavigationVerticalSection .navLevel2 .navItem,
+.conNavigationVerticalSection .navLevel2 .navItemSelected
+{
+  margin-left:20px;
+  line-height:25px;
+  border-bottom:1px solid #7a7a7a;
+}
+
+.conNavigationVerticalSection .navLevel2 .navItem a,
+.conNavigationVerticalSection .navLevel2 .navItemSelected a
+{
+  padding:4px 0px 4px 0px;
+  line-height:15px;
+  width:100%;
+  display:block;
+  text-decoration:none;
+  overflow:hidden;
+}
+
+.conNavigationVerticalSection .navLevel2 .navItem a
+{
+  color:#000000;
+}
+
+.conNavigationVerticalSection .navLevel2 .navItemSelected a
+{
+  color:#000000;
+  font-weight:bold;
+}
+
+.conNavigationVerticalSection .navLevel2 .navItem a:hover,
+.conNavigationVerticalSection .navLevel2 .navItemSelected a:hover
+{
+  background-color:#b5b5b5;
+}
+
+.navItem {
+  padding:0px 0px 0px 0px;
+  line-height:15px;
+  display:block;
+  overflow:hidden;
+  color:#7a7a7a;
+  width:100px;text-align:center;
+}
+
+
+/* ------------------------------------------------------
+   Navigationsmodul 'Directory'
+   ------------------------------------------------------ */
+
+.conNavigationDirectory .navBlock
+{
+  width:190px;
+  margin-right:10px;
+  padding-bottom:20px;
+  overflow:hidden;
+  float:left;
+}
+
+.conNavigationDirectory .navBlock .navLevel1 .navItem
+{
+  border-top:2px solid #7a7a7a;
+  border-bottom:1px solid #7a7a7a;
+  padding:5px 0px 3px 5px;
+  font-weight:bold;
+  color:#7a7a7a;
+  overflow:hidden;
+  background-color:#dbdbdb;
+}
+
+.conNavigationDirectory .navBlock .navLevel1 .navItem a
+{
+  text-decoration:none;
+  color:#7a7a7a;
+}
+
+.conNavigationDirectory .navBlock .navLevel1 .navItem a:hover
+{
+  text-decoration:underline;
+}
+
+.conNavigationDirectory .navBlock .navLevel2
+{
+  padding-top:3px;
+  background-color:#cccccc;
+}
+
+.conNavigationDirectory .navBlock .navLevel2 .visibleNav
+{
+}
+
+.conNavigationDirectory .navBlock .navLevel2 .invisibleNav
+{
+}
+
+.conNavigationDirectory .navBlock .navLevel2 .visibleNav .navItem
+{
+  padding-top:3px;
+  padding-left:5px;
+  padding-bottom:3px;
+  color:#000000;
+  font-weight:bold;
+  background-color:#cccccc;
+}
+
+.conNavigationDirectory .navBlock .navLevel2 .invisibleNav .navItem
+{
+  padding-top:3px;
+  padding-left:5px;
+  color:#000000;
+  font-weight:bold;
+  background-color:#dbdbdb;
+}
+
+.conNavigationDirectory .navBlock .navLevel2 .visibleNav .navItem a,
+.conNavigationDirectory .navBlock .navLevel2 .invisibleNav .navItem a
+{
+  text-decoration:none;
+  color:#000000;
+}
+
+.conNavigationDirectory .navBlock .navLevel2 .visibleNav .navItem a:hover,
+.conNavigationDirectory .navBlock .navLevel2 .invisibleNav .navItem a:hover
+{
+  text-decoration:underline;
+}
+
+.conNavigationDirectory .navBlock .navLevel2 .visibleNav .navItem .text,
+.conNavigationDirectory .navBlock .navLevel2 .invisibleNav .navItem .text
+{
+  font-weight:normal;
+  padding-left:10px;
+  color:#000000;
+}
+
+.conNavigationDirectory .navBlock .moreLink
+{
+  padding-left:5px;
+  padding-top:5px;
+  padding-bottom:3px;
+  background-color:#dbdbdb;
+}
+
+.conNavigationDirectory .navBlock .moreLink a
+{
+  text-decoration:none;
+}
+
+
+/* ------------------------------------------------------
+   Navigationsmodul 'Sitemap'
+   ------------------------------------------------------ */
+
+.conNavigationSitemap
+{
+}
+
+.conNavigationSitemap .navBlock
+{
+  margin-bottom:10px;
+}
+
+.conNavigationSitemap .bullet
+{
+  vertical-align:middle;
+  font-size:7px;
+  line-height:7px;
+  width:17px;
+  padding-right:15px;
+  margin-right:4px;
+  text-decoration:none;
+}
+
+.conNavigationSitemap a,
+.conNavigationSitemap a:visited, 
+.conNavigationSitemap a:link
+{
+  color:#000000;
+  text-decoration:none;
+  line-height:15px;
+}
+
+.conNavigationSitemap a:hover
+{
+  color:#000000;
+  text-decoration:underline;
+  line-height:15px;
+}
+
+
+
+/* ------------------------------------------------------
+   Komplexbild innerhalb eines Richtextes
+   ------------------------------------------------------ */
+
+.complexImage,
+.complexImageLeft,
+.complexImageRight
+{
+  margin-bottom:5px;
+}
+
+.complexImageLeft
+{
+  margin-right:5px;
+  float:left;
+}
+
+.complexImageRight
+{
+  margin-left:5px;
+  float:right;
+}
+
+.complexImageInline
+{
+  display:inline;
+}
+
+.complexImage .magnifier,
+.complexImageLeft .magnifier,
+.complexImageRight .magnifier,
+.complexImageInline .magnifier
+{
+  float:left;
+}
+
+.complexImage .caption,
+.complexImageLeft .caption,
+.complexImageRight .caption,
+.complexImageInline .caption
+{
+  font-size:80%;
+}
+
+
+/* ------------------------------------------------------
+   Kalender-Datentabelle mit Tooltipps von Tagesereigenissen
+   ------------------------------------------------------ */
+
+.calendar
+{
+  border-collapse:collapse;
+  margin-top:5px;  
+  margin-left:auto;
+  margin-right:auto;
+  border-right:1px solid #8A9BB7;
+  border-bottom:1px solid #8A9BB7;
+}
+
+* html .calendar
+{
+  margin-right:5px;
+}
+
+.calendar th,
+.calendar td
+{
+  font-size:8pt;
+  padding:0px 4px 0px 4px;
+  border:1px solid #D2D8E6;
+  text-align:center;
+  background-color:#E8E8E8;
+}
+
+.calendar td.head
+{
+  text-align:center;
+  height:auto;
+  padding:5px;
+  background-color:#F6F6F6;
+  font-weight:bold;
+  font-size:9pt;
+}
+
+.calendar a,
+.calendar a:hover,
+.calendar a:visited,
+.calendar a:link
+{
+  font-weight:bold;
+  margin:0px -5px 0px -5px;
+  padding:0px 5px 0px 5px;
+  display:block;
+  width:100%;
+  text-decoration:none;
+}
+
+.calendar a:hover
+{
+  background-color:#F6F6F6;
+}
+
+.calendar .weekend
+{
+  color:#AF8608;
+}
+
+.calendar .kw
+{
+  color:#8B8A88;
+}
+
+.dayEvents
+{
+  position:absolute;
+  width:250;
+  border:1px solid black;
+  background-color:#EEEEEE;
+  z-index:2;
+  visibility:hidden;
+}
+
+.dayEvents .EventCalendar
+{
+  width:100%;
+}
+
+.dayEvents .EventCalendar td 
+{
+  vertical-align:top;
+  font-size:0.7em;
+}
+
+/* ------------------------------------------------------
+   CSV-Datentabelle
+   ------------------------------------------------------ */
+
+.csv1,
+.csv2
+{
+  border-collapse:collapse;
+}
+
+.csv1 .evenCol,
+.csv2 .evenCol,
+.csv1 .oddCol,
+.csv2 .oddCol
+{
+  padding:3px 5px 3px 5px;
+  color:#000000;
+  border:1px solid #7c7c7c;
+}
+
+.csv1 .evenCol,
+.csv2 .evenCol
+{
+  background-color:#ffffff;
+}
+
+
+/* ------------------------------------------------------
+   Personenlisten 
+   ------------------------------------------------------ */
+
+.personList1
+{
+  border-collapse:collapse;
+}
+
+.personList1 td, 
+.personList1 th
+{
+  padding:3px 5px 3px 5px;
+}
+
+.personList1 tr.highlightedTableRow
+{
+  background-color:#ffffff;
+}
+
+.personList2
+{
+  margin-top:5px;
+}
+
+.personList2 .card
+{
+  margin-right:5px;
+  margin-bottom:10px;
+  width:185px;
+  float:left;
+  overflow:hidden;
+}
+
+
+/* ------------------------------------------------------
+   DiaShow
+   ------------------------------------------------------ */
+
+.diaShow
+{
+  padding-top:5px;
+}
+
+.diaShow .dia .caption
+{
+  height:4.6em;
+  padding:5px 5px 0px 5px;
+  color:#000000;
+}
+
+.diaShowFooter
+{
+  width:100%;
+  background:#ffffff;
+  border-top:1px solid #7c7c7c;
+  border-bottom:1px solid #7c7c7c;
+}
+
+.diaShowFooter td
+{
+  padding:5px 5px 3px 5px;
+  font-weight:bold;
+  color:#7c7c7c;
+}
+
+.diaShowFooter .diaShowPrevButton,
+.diaShowFooter .diaShowNextButton
+{
+  font-weight:bold;
+  color:#e20074;  
+  text-decoration:none;
+}
+
+
+/* ------------------------------------------------------
+   News-Archiv / Veranstaltungskalender
+   ------------------------------------------------------ */
+
+.conFunctionNewsArchive,
+.conFunctionEventCalendar
+{
+  clear:both;
+}
+
+.NewsArchive,
+.EventCalendar
+{
+  width:590px;
+  border-collapse:collapse;
+}
+
+.NewsArchive td,
+.EventCalendar td,
+.NewsArchive th,
+.EventCalendar th
+{
+  padding:3px 5px 3px 5px;
+}
+
+.NewsArchive tr.highlightedTableRow,
+.EventCalendar tr.highlightedTableRow
+{
+  background-color:#ffffff;
+}
+
+
+/* ------------------------------------------------------
+   select-Interface für News-Archiv und A-Z-Liste   ------------------------------------------------------ */
+
+.selectInterface .selected
+{
+  font-weight:bold;
+}
+
+.selectInterface .yearLinks,
+.selectInterface .monthLinks
+{
+  margin-left:5px;
+  padding-bottom:0.5em;
+}
+
+.selectInterface .yearLinks .link,
+.selectInterface .monthLinks .link
+{
+  display:inline;
+  padding-right:0.5em;
+}
+
+.selectInterface .monthLinks
+{
+  padding-bottom:20px;
+}
+
+.selectInterface .calendar
+{
+  float:right;
+  margin-bottom:20px;  
+}
+
+/* ------------------------------------------------------
+   Linklisten
+   ------------------------------------------------------ */
+
+.pageFunctions .link
+{
+  float:left;
+  margin-right:15px;
+}
+
+.indexItemLinks
+{
+  margin-left:10px;
+}
+
+.htmlLinks .link,
+.relatedLinks .link,
+.indexItemLinks .link,
+.contacts .card
+{
+  padding-bottom:5px;
+}
+
+.letterLinks
+{
+  padding:0px 5px 0px 5px;
+}
+
+.letterLinks .link
+{
+  display:inline;
+  margin-right:10px;
+  font-weight:bold;
+}
+
+
+/* ------------------------------------------------------
+   Breadcrumbs
+   ------------------------------------------------------ */
+
+.breadCrumbs
+{
+  font-size:10px;
+  height:14px;
+  margin:5px 0px 5px 5px;
+}
+
+.hereText
+{
+  color:#000000;
+  display:inline;
+}
+
+.breadCrumbs .navItemSelected
+{
+  display:inline;
+  white-space:nowrap;
+}
+
+.breadCrumbs .navItemSelected a
+{
+  color:#000000;
+}
+
+.breadCrumbs .navItemHighlighted
+{
+  display:inline;
+  white-space:nowrap;
+}
+
+.breadCrumbs .navItemHighlighted a
+{
+  color:#000000;
+}
+
+.breadCrumbs .breadCrumbsSeparator
+{
+  color:#000000;
+  display:inline;
+  white-space:nowrap;
+}
+
+
+/* ------------------------------------------------------
+   Suchergebnisse
+   ------------------------------------------------------ */
+
+.searchResults .searchMessage,
+.searchResults .searchError,
+.searchResults .drillDown
+{
+  padding:10px 5px 0px 5px;
+}
+
+.searchResults .searchError,
+.searchResults .highlight
+{
+  font-weight:bold;
+}
+
+.searchResults .separator
+{
+  clear:both;
+  border-bottom:1px solid #7c7c7c;
+  padding-top:10px;
+  margin-bottom:10px;
+  line-height:0px;
+  font-size:0px;
+  width:590px;
+}
+
+.searchResults .selectInterface
+{
+  padding:3px 5px 0px 5px;
+}
+
+.searchResults .selectInterface a
+{
+  margin-left:3px;
+}
+
+.searchResults .resultItemArea .itemNumber
+{
+  padding-left:5px;
+  width:27px;
+  float:left;
+  font-weight:bold;
+}
+
+.searchResults .drillDown input
+{
+  border:1px solid #000000;
+  background-color:#b5b5b5;
+}
+
+.searchResults .resultItemArea .resultItem .headline
+{
+  margin-top:0px;
+  margin-left:24px;
+  font-weight:normal;
+  font-size:120%;
+}
+
+.searchResults .resultItemArea .resultItem .headline .date,
+.searchResults .resultItemArea .resultItem .headline .extension
+{
+	font-size:75%;
+	text-decoration: none;
+}
+
+.searchResults .resultItemArea .resultItem .text
+{
+  margin-top:5px;
+  margin-left:27px;
+  color:#000000;
+}
+
+.searchResults .resultItemArea .resultItem .path
+{
+  padding-top:3px;
+  padding-left:33px;
+  font-size:90%;
+  color:#7c7c7c;
+  font-weight:bold;
+}
+
+
+/* ------------------------------------------------------
+   Formularelemente
+   ------------------------------------------------------ */
+
+form .label
+{
+  color:#000000;
+}
+
+.formMessage
+{
+  padding:0px 5px 10px 5px;
+  color:#000000;
+  font-weight:bold;
+}
+
+input, textarea, select
+{
+  font-family:Arial,Helvetica,Geneva,Sans-Serif;  
+  font-size:12px;
+}
+
+
+/* Abstaende */
+
+form .buttonVert100percent,
+form .inputVert100percent, 
+form .textareaVert100percent,
+form .selectVert100percent,  
+form .multiSelectVert100percent,
+form .radioVert100percent,
+form .checkBoxVert100percent,
+
+form .buttonHor190pixel,
+form .inputHor190pixel,
+form .textareaHor190pixel,
+form .selectHor190pixel,
+form .multiSelectHor190pixel,
+form .radioHor190pixel,
+form .checkBoxHor190pixel,
+
+form .buttonHor390pixel, 
+form .inputHor390pixel,
+form .textareaHor390pixel,
+form .selectHor390pixel,
+form .multiSelectHor390pixel, 
+form .radioHor390pixel, 
+form .checkBoxHor390pixel,
+
+form .buttonHorAuto, 
+form .inputHorAuto,  
+form .textareaHorAuto,
+form .selectHorAuto, 
+form .multiSelectHorAuto,
+form .radioHorAuto, 
+form .checkBoxHorAuto
+{
+  margin-bottom:10px;
+  padding-left:5px;
+}
+
+/* Floating deaktivieren */
+
+form .inputVert100percent,
+form .textareaVert100percent,
+form .selectVert100percent, 
+form .multiSelectVert100percent,
+form .radioVert100percent, 
+form .checkBoxVert100percent,
+
+form .buttonHor190pixel, 
+form .inputHor190pixel, 
+form .textareaHor190pixel,
+form .selectHor190pixel, 
+form .multiSelectHor190pixel,
+form .radioHor190pixel, 
+form .checkBoxHor190pixel, 
+
+form .buttonHor390pixel,
+form .inputHor390pixel, 
+form .textareaHor390pixel,
+form .selectHor390pixel, 
+form .multiSelectHor390pixel,
+form .radioHor390pixel, 
+form .checkBoxHor390pixel,
+
+form .buttonHorAuto, 
+form .inputHorAuto, 
+form .textareaHorAuto,
+form .selectHorAuto, 
+form .multiSelectHorAuto,
+form .radioHorAuto, 
+form .checkBoxHorAuto 
+{
+  clear:both;
+}
+
+/* Aussehen der Buttons einstellen */
+
+form .buttonVert100percent input,
+form .buttonHor190pixel input, 
+form .buttonHor390pixel input, 
+form .buttonHorAuto input
+{
+  border:1px solid #000000;
+  background-color:#b5b5b5;
+}
+
+/* 
+  Layoutstyle 'Vert100percent' bedeutet: 
+   - Label und Formularelement untereinander 
+   - jeweils 98% breit 
+*/
+
+#mainarea form .buttonVert100percent
+{
+  float:left;
+  margin-right:10px;
+}
+
+#mainarea form .inputVert100percent
+{
+  display:block;
+  width:98%;
+}
+
+form .textareaVert100percent, 
+form .selectVert100percent, 
+form .multiSelectVert100percent,
+form .radioVert100percent, 
+form .checkBoxVert100percent
+{
+  display:block;
+  width:98%;
+}
+
+#mainarea form .buttonVert100percent .label,
+#mainarea form .buttonVert100percent input
+{
+  display:block;
+}
+
+form .inputVert100percent .label,   
+form .inputVert100percent input, 
+form .textareaVert100percent .label,
+form .textareaVert100percent textarea,
+form .selectVert100percent .label,
+form .selectVert100percent select,
+form .multiSelectVert100percent .label,
+form .multiSelectVert100percent select,
+form .radioVert100percent .label, 
+form .checkBoxVert100percent .label,
+form .radioVert100percent .radioButton,
+form .checkBoxVert100percent .checkBox
+{
+  display:block;
+  width:98%;
+}
+
+/* 
+  Layoutstyle 'Hor190pixel' bedeutet: 
+   - Label und Formularelement nebeneinander
+   - Label 190px breit
+   - Formularelement 190px breit
+*/
+
+form .radioHor190pixel
+{
+  width:190px;
+}
+
+form .textareaHor190pixel .label, 
+form .selectHor190pixel .label,
+form .multiSelectHor190pixel .label
+{
+  width:195px;
+  vertical-align:top;
+  float:left; 
+}
+
+form .buttonHor190pixel .label,
+form .inputHor190pixel .label,
+form .radioHor190pixel .label
+{
+  width:195px;
+  vertical-align:center;
+  float:left;
+}
+
+form .checkBoxHor190pixel .label
+{
+  width:195px;
+  vertical-align:top;
+}
+
+form .checkBoxHor190pixel .checkBoxArea
+{
+  width:190px;
+  display:inline;
+}
+
+form .buttonHor190pixel input,
+form .inputHor190pixel input, 
+form .textareaHor190pixel textarea,
+form .selectHor190pixel select, 
+form .multiSelectHor190pixel select
+{
+  width:190px;
+  vertical-align:center;
+}
+
+form .radioHor190pixel .radioButton,
+form .checkBoxHor190pixel .checkBox
+{
+  clear:right;
+  width:190px;
+  float:right;
+}
+
+
+/* 
+  Layoutstyle 'Hor390pixel' bedeutet:
+   - Label und Formularelement nebeneinander
+   - Label 190px breit
+   - Formularelement 390px breit
+*/
+
+form .radioHor390pixel
+{
+  width:390px;
+}
+
+form .textareaHor390pixel .label,
+form .selectHor390pixel .label,
+form .multiSelectHor390pixel .label
+{
+  width:195px;
+  vertical-align:top;
+  float:left; 
+}
+
+form .buttonHor390pixel .label,
+form .inputHor390pixel .label,
+form .radioHor390pixel .label
+{
+  width:195px;
+  vertical-align:center;
+  float:left;
+}
+
+form .checkBoxHor390pixel .label
+{
+  width:195px;
+  vertical-align:top;
+}
+
+form .checkBoxHor390pixel .checkBoxArea
+{
+  width:390px;
+  display:inline;
+}
+
+form .buttonHor390pixel input,
+form .inputHor390pixel input,
+form .textareaHor390pixel textarea,
+form .selectHor390pixel select,
+form .multiSelectHor390pixel select
+{
+  width:390px;
+  vertical-align:center;
+}
+
+form .radioHor390pixel .radioButton,
+form .checkBoxHor390pixel .checkBox
+{
+  clear:right;
+  width:390px;
+  float:right;
+}
+
+
+/* 
+  Layoutstyle 'HorAuto' bedeutet: 
+   - Label und Formularelement nebeneinander
+   - Label 190px breit
+   - Formularelement so breit, wie der browser es rendert
+*/
+
+form .textareaHorAuto .label,
+form .selectHorAuto .label,
+form .multiSelectHorAuto .label
+{
+  width:195px;
+  vertical-align:top;
+  float:left; 
+}
+
+form .buttonHorAuto .label,
+form .inputHorAuto .label,
+form .radioHorAuto .label
+{
+  width:195px;
+  vertical-align:center;
+  float:left;
+}
+
+form .checkBoxHorAuto .label
+{
+  width:195px;
+  vertical-align:top;
+}
+
+
+form .checkBoxHorAuto .checkBoxArea
+{
+  width:190px;
+  display:inline;
+}
+
+form .buttonHorAuto input,
+form .inputHorAuto input, 
+form .textareaHorAuto textarea,
+form .selectHorAuto select,
+form .multiSelectHorAuto select
+{
+  vertical-align:center;
+}
+
+
+/* ------------------------------------------------------
+   Control-Center
+   ------------------------------------------------------ */
+
+#controlCenter
+{
+  position:fixed;
+  right:50px;
+  bottom:50px; 
+  z-index:2;
+  width:120px;
+  border: 1px solid #000000;
+  background-color:#cccc33;
+  font-size:12px;
+}
+
+/* Korrektur der Position im IE */
+
+* html #controlCenter
+{
+  position:absolute;
+}
+
+#controlCenter .centerTitle
+{
+  padding:4px;
+  font-weight:bold;
+  border-bottom: 1px solid #000000;
+  height:100%;
+}
+ 
+#controlCenter .closeButton
+{
+  float:right;
+}
+
+#controlCenter .closeButton a,
+#controlCenter .closeButton a:link,
+#controlCenter .closeButton a:hover,
+#controlCenter .closeButton a:visited
+{
+  height:1px;
+  border:1px solid #808080;
+  color: #808080;
+  padding:0px 4px;
+  text-decoration:none;
+  background-color:#dddddd;
+}
+
+#controlCenter .centerContent
+{
+  padding:4px;
+}
+ 

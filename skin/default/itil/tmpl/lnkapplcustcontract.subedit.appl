@@ -1,0 +1,11 @@
+<div class=editframe>
+   <table class=editframe>
+      <tr>
+         <td class=fname width=10%>%custcontract(label)%:</td>
+         <td class=finput width=40%>%custcontract(sublistedit)%</td>
+         <td class=fname width=10%>%fraction(label)%:</td>
+         <td class=finput width=40%>%fraction(sublistedit)%</td>
+      </tr>
+   </table>
+</div>
+%StdButtonBar(subadd,subdelete,subsave,subcancel)%

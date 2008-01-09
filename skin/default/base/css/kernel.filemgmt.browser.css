@@ -1,0 +1,70 @@
+body,html{
+   overflow:hidden;
+}
+div#filelist{
+   xoverflow:visible;
+   overflow:auto;
+   height:300px;
+   padding:0px;
+}
+div#currentpath{
+   overflow:hidden;
+   font-weight:bold;   
+   padding:2px;
+   border-bottom-width:1px;
+   border-bottom-style:solid;
+}
+div.actionlist{
+   background:#eeeeee;
+   overflow:hidden;
+   font-weight:bold;   
+   padding:2px;
+   border-bottom-width:1px;
+   border-bottom-style:solid;
+   border-left-width:1px;
+   border-left-style:solid;
+   padding-bottom:8px;
+}
+ul.actionlist{
+   padding-top:8px;
+   padding-bottom:8px;
+   list-style-type:square;
+}
+div.fileimage{
+   float:left;
+   width:20px;
+   padding-top:3px;
+   padding-left:3px;
+}
+div.fileselect{
+   float:left;
+   width:15px;
+   height:15px;
+   padding-top:2px;
+}
+div.filename{
+   padding-top:4px;
+}
+div.fileline{
+   float:none;
+   border-style:none;
+   border-width:0px;
+   height:22px;
+}
+
+div.message{
+   border-width:1px;border-style:solid;padding:5px;margin:10px;
+   background:silver
+}
+
+a:link.action, a:visited.action, a:active.action {
+   font-family:Arial,Adobe Helvetica,Helvetica;
+   color:#16305e;
+   text-decoration:none;
+   font-weight:normal;
+}
+
+input.multiselect{
+   margin:0px;padding:0px;border-width:0px;width:16px;height:16px
+}
+

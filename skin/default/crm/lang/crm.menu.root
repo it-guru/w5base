@@ -1,0 +1,3 @@
+'customerportal'=>{de=>'Kundenportal',en=>'Customer portal'},
+'customerportal.bp'=>{de=>'Geschäftsprozess',en=>'Business process'},
+'customerportal.bp.new'=>{de=>'Neueingabe',en=>'New'},

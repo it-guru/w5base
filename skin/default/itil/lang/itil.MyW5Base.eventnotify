@@ -1,0 +1,3 @@
+'itil::MyW5Base::eventnotify'=>{de=>'IT-Workflow: Ereignismeldungs-Report',
+                                en=>'IT-Workflow: Event notifications report'},
+'Close time'=>{de=>'Ereignis Ende'},

@@ -1,0 +1,10 @@
+<hr>
+
+Ich bin Simple <br>
+Normales Input:
+<input type=text><br>
+Feld name(formdata): %name(formdata)%<br>
+Feld name:%name%<br>
+<hr>
+%name(formname)%: %name(formdata)%<br>
+

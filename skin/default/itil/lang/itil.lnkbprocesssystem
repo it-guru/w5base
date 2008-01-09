@@ -1,0 +1,11 @@
+'itil::lnkbprocesssystem'=>{de=>'Geschäftsprozess System-Verknüpfung',
+                            en=>'Business process system relation'},
+'invalid business process specified'=>{de=>'ungültiger Geschäftsprozess'},
+'invalid system specified'=>{de=>'ungültiges System'},
+'fieldgroup.systeminfo'=>{de=>'Systeminformationen',
+                            en=>'System informations'},
+'fieldgroup.bprocessinfo'=>{de=>'Geschaäftsprozessinformationen',
+                            en=>'Businessprocess informations'},
+'Business process'=>{de=>'Geschäftsprozess'},
+
+

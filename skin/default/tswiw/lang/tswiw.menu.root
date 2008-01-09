@@ -1,0 +1,3 @@
+'wiw'=>{de=>'WhoIsWho',en=>'WhoIsWho'},
+'wiw.user'=>{de=>'Mitarbeiterverzeichnis',en=>'Employeedirectory'},
+'wiw.orgarea'=>{de=>'Organisationsverzeichnis',en=>'Organisationdirectory'},

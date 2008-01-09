@@ -1,0 +1,19 @@
+<div class=editframe>
+   <table class=editframe>
+      <tr>
+         <td class=fname width=20%>%name(label)%:</td>
+         <td class=finput width=30% >%name(sublistedit)%</td>
+         <td class=fname width=20%>%network(label)%:</td>
+         <td class=finput >%network(sublistedit)%</td>
+      </tr>
+      <tr>
+         <td class=fname width=20%>%exportoptions(label)%:</td>
+         <td class=finput colspan=3 >%exportoptions(sublistedit)%</td>
+      </tr>
+      <tr>
+         <td class=fname width=20%>%comments(label)%:</td>
+         <td class=finput  colspan=3>%comments(sublistedit)%</td>
+      </tr>
+   </table>
+</div>
+%StdButtonBar(subadd,subdelete,subsave,subcancel)%

@@ -1,0 +1,35 @@
+<table width=100% height=100%>
+<tr><td valign=top align=center><br><br>
+  <div class=msg>
+  <table border=0 class=msg>
+  <tr><td class=t><b>W5Base Table Version Control System</td></tr>
+  <tr>
+  <td height=200 valign=top><div class=explain>
+      The table version control system has been detect a
+      missing control table. This the normal state after
+      a new install of W5Base.<br>
+      <br>
+      In the missing table 'tableversion' W5Base stores
+      all informations about the history of each table
+      under control of W5Base<br>
+      <br>
+      You can instruct W5Base to create the table, if you
+      think this is the consistent step. If this message
+      happens in normal work, there seems to be a database
+      or application problem. In this case please contact
+      the administrator.</div></td>
+  </tr>
+  <tr>
+     <td valign=top><b>%LOGHEAD%</b></td>
+  </tr>
+  <tr>
+     <td valign=top><div class=%LOGSTYLE%><xmp>%LOG%</xmp></div></td>
+  </tr>
+  <tr>
+     <td align=right>
+        <input type=submit name=do value=" try to create table ">
+     </td>
+  </tr> 
+  </table></div>
+
+</td></tr></table>

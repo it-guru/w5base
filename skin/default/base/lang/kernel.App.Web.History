@@ -1,0 +1,6 @@
+'Data changes'=>{de=>"Datenänderungen"},
+'last Week'=>{de=>'letzte Woche'},
+'last 4 Weeks'=>{de=>'letzten 4 Wochen'},
+'last 12 Weeks'=>{de=>'letzten 12 Wochen'},
+'last 365 days'=>{de=>'letzten 365 Tage'},
+'all'=>{de=>'alles'},

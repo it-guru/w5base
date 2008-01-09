@@ -1,0 +1,7 @@
+'itil::lnkaccountingno'=>{de=>'verknüpfte Account Nummer',en=>'linked account number'},
+'Application'=>{de=>'Anwendung'},
+'invalid account number specified'=>{de=>'ungültige Accountnummer'},
+'fieldgroup.applinfo'=>{de=>'Anwendungsinformationen',en=>'Application informations'},
+'Application CI-State'=>{de=>'Anwendungs CI-Status'},
+'Account Number'=>{de=>'Account Nummer'},
+'no access'=>{de=>'Zugriff verweigert'},

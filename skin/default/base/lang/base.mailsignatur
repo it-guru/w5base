@@ -1,0 +1,3 @@
+'base::mailsignatur'=>{de=>'E-Mail Signatur',en=>'E-Mail signature'},
+'fieldgroup.htmlsig'=>{de=>'HTML Sigantur',en=>'HTML Signatur'},
+'fieldgroup.textsig'=>{de=>'TEXT Sigantur',en=>'TEXT Signatur'},

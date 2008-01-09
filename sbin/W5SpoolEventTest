@@ -1,0 +1,72 @@
+#!/usr/bin/env perl
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use RPC::Smart::Client;
+use Data::Dumper;
+use strict;
+use kernel;
+use kernel::config;
+use Getopt::Long;
+use vars qw($opt_v $opt_h $opt_c $configname);
+
+exit(1) if (!GetOptions('verbose'=>\$opt_v,
+                        'debug'=>\$opt_v,
+                        'help'=>\$opt_h,
+                        'config=s'=>\$opt_c));
+
+if ($opt_v){
+   $W5V2::Debug=1;
+}
+else{
+   $W5V2::Debug=0;
+}
+
+if ($opt_c eq ""){
+   $opt_c="w5server";
+}
+$configname=$opt_c;
+
+my %ClientParam=();
+
+my $configcheck=new kernel::config();
+
+if (!$configcheck->readconfig("$FindBin::Bin/..",$configname)){
+   msg(ERROR,"can't read configfile '%s'",$configname);
+   exit(1);
+}
+{
+   my $port=$configcheck->Param("W5SERVERPORT");
+   $port=4711 if ($port eq "");
+   msg(DEBUG,"W5ServerPort=%s",$port);
+   $ClientParam{'PeerPort'}=$port;
+}
+
+my $MyClient=new RPC::Smart::Client(%ClientParam);
+
+if (! defined($MyClient->Connect())){
+   msg(ERROR,"can't connect to server");
+   exit(1);
+}
+my $method="rpcCallSpooledEvent";
+my %p=(eventname=>'sample1',
+       spooltag=>'tst123',
+       redefine=>'1',
+       firstcalldelay=>5,
+       userid=>11634953080001);
+
+my $res=$MyClient->Call($method,%p);
+printf("%s",Dumper($res)) if ($W5V2::Debug);
+if ($res->{exitcode}==0 && defined($res->{AsyncID})){
+   my $sec=0;
+   while(1){
+      if ($W5V2::Debug){
+         printf("   ----------- sec=%5d -------------\n",$sec);
+      }
+      my $st=$MyClient->Call("rpcProcessState",$res->{AsyncID});
+      printf("%s",Dumper($st)) if ($W5V2::Debug);
+      last if (defined($st->{process}) && defined($st->{process}->{exitcode}));
+      last if (defined($st->{exitcode}) && $st->{exitcode}!=0);
+      $sec++;
+      sleep(1);
+   }
+}

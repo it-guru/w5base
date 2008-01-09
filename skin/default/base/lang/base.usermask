@@ -1,0 +1,5 @@
+'base::usermask'=>{de=>'Benutzervertretung',en=>'Usermasquerading'},
+'Current logged in useraccount'=>{de=>'aktuell angemeldete Benutzerkennung'},
+'Effective useraccount'=>{de=>'effektive Benutzerkennung'},
+'List of last used substitution accounts'=>{de=>'Liste der zuletzt benutzen Benutzerkennungen'},
+'account set by substitution id %s to \'%s\''=>{de=>'Benutzer durch Vertretungs-ID %s gesetzt auf \'%s\''},

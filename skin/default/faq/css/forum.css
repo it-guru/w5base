@@ -1,0 +1,88 @@
+td.boardgroup{
+  background:#0074ba;
+  font-weight:bold;
+  color:white;
+  padding:2px;
+}
+th.boardgroup{
+  background:#0074ba;
+  color:white;
+  text-align:left;
+  padding:2px;
+}
+tr.boardspacer{
+  margin-top:5px;
+  height:5px;
+}
+tr.l1{
+  background:#eeeeee;
+}
+tr.l2{
+  background:#ffffff;
+}
+@media print {
+   tr.l1{
+     background:transparent;
+     border-style:solid;
+     border-width:1px;
+     border-color:gray;
+   }
+   tr.l2{
+     background:transparent;
+     border-style:solid;
+     border-width:1px;
+     border-color:gray;
+   }
+}
+
+td.topiclabel{
+  font-weight:bold;
+  color:black;
+  padding:2px;
+}
+div.boardcomments{
+  font-size:9px;
+  color:gray;
+}
+
+td.authorlabel{
+  font-size:10px;
+}
+
+a:link.ForumDirectLink, a:visited.ForumDirectLink, a:active.ForumDirectLink  {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            color:black;
+            font-size:10px;
+            text-decoration:none;
+          }
+
+a:link.toplink, a:visited.toplink, a:active.toplink  {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            color:white;
+          }
+
+a:link.topiclink, a:visited.topiclink, a:active.topiclink  {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            color:black;
+          }
+
+a:link.listlink, a:visited.listlink, a:active.listlink  {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            color:black;
+          }
+
+a.detailfunctions:link, a.detailfunctions:visited, a.detailfunctions:active {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:#353534;
+          }
+
+a:link.FunctionLink,a:visited.FunctionLink,a:active.FunctionLink    {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:#16305e;
+          }
+
+
+
+

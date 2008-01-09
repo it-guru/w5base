@@ -1,0 +1,16 @@
+=head1 NAME
+
+HISTORY - public release history for RPC::Smart
+
+=head1 DESCRIPTION
+
+=over 8
+
+=item 1.0 (2006/05/24)
+
+Build Perl package Vogler Hartmut <it@guru.de>.
+First stable version.
+
+=back
+
+=cut

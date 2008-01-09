@@ -1,0 +1,60 @@
+/* don't change this unless you want the layout stuff to show up 
+   in the outline view! */
+
+.layout div, #footer *, #controlForm * {display: none;}
+#footer, #controls, #controlForm, #navLinks, #toggle {
+  display: block; visibility: visible; margin: 0; padding: 0;}
+#toggle {float: right; padding: 0.5em;}
+html>body #toggle {position: fixed; top: 0; right: 0;}
+
+
+
+/* making the outline look pretty-ish */
+
+#slide0 h1, #slide0 h2, #slide0 h3, #slide0 h4 {border: none; margin: 0;}
+#slide0 h1 {padding-top: 1.5em;}
+.slide h1 {margin: 1.5em 0 0; padding-top: 0.25em;
+  border-top: 1px solid #888; border-bottom: 1px solid #AAA;}
+#toggle {border: 1px solid; border-width: 1px; background: #FFF;}
+
+div.slide{
+  height:auto;
+  overflow:visible;
+}
+p{
+   padding:0px;
+   margin:0px;
+   margin-top:2px;
+   margin-bottom:2px;
+}
+
+html{
+  padding:0px;
+  margin:0px;
+}
+body{
+  padding:0px;
+  margin:0px;
+  margin-left:5px;
+  margin-right:25px;
+}
+
+div.handout{
+  border-top: 5px solid green;
+  border-left: 5px solid green;
+  margin-left:15px;
+  padding-left:5px;
+  padding-right:50px;
+}
+
+.handout p{
+   font-size:100%;
+   font-weight:normal;
+   text-decoration:none;
+   font-family:Arial,Adobe Helvetica,Helvetica;
+   padding:0px;
+   margin:0px;
+   margin-top:10px;
+   margin-bottom:10px;
+}
+

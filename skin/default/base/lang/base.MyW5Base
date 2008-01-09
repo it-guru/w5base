@@ -1,0 +1,10 @@
+'base::MyW5Base'=>{de=>'MyW5Base',en=>'MyW5Base'},
+'please select a query'=>{de=>'bitte wählen Sie Ihre Anfrage'},
+'monitor my workflows'=>{de=>'von mir erstellte Workflows monitoren'},
+'my current jobs'=>{de=>'meine aktuell anstehenden Aufgaben'},
+'start a new workflow'=>{de=>'neuen Workflow starten'},
+"the requested query isn't supported or has internal errors procreated"=>{
+  de=>"Die angeforderte Abfrage ist derzeit nicht unterstützt oder hat interne Fehler"},
+'modify user properties'=>{de=>'Benutzereinstellungen verändern'},
+'bookmarks'=>{de=>'Lesezeichen'},
+'current topics from the Knwlege-Management Forum'=>{de=>'aktuelle Themen aus dem Wissensmanagement-Forum'},

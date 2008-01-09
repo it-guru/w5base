@@ -1,0 +1,12 @@
+'Tools.dev'=>{de=>'for Developers',en=>'for developers'},
+'Tools.dev.color'=>{de=>'ColorPicker',en=>'ColorPicker'},
+'Tools.dev.yui'=>{de=>'Yahoo User Interface',en=>'Yahoo User Interface'},
+'Tools.dev.tinymce'=>{de=>'Tiny MCE',en=>'Tiny MCE'},
+'Tools.dev.firebug'=>{de=>'FireBug',en=>'FireBug'},
+'Tools.dev.cssforyou'=>{de=>'css4you',en=>'css4you'},
+'Tools.dev.selfhtml'=>{de=>'SelfHTML',en=>'SelfHTML'},
+'Tools.dev.io'=>{de=>'W5Interface',en=>'W5Interface'},
+'Tools.dev.env'=>{de=>'Umgebunsvariablen',en=>'Enviroment'},
+'Tools.dev.texttranslation'=>{de=>'BubbleFish',en=>'BubbleFish'},
+'Tools.dev.tztest'=>{de=>'Timezone Test',en=>'Timezone Test'},
+

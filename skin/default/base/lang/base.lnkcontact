@@ -1,0 +1,8 @@
+'base::lnkcontact'=>{de=>'Kontaktverknüpfung',en=>'Contact link'},
+'fieldgroup.default'=>{de=>'Verknüpfungsdaten',en=>'Linkinformations'},
+'Parent-Object'=>{de=>'Elternobjekt'},
+'Target-Name'=>{de=>'Kontakt'},
+'RefID'=>{de=>'ReferenzID'},
+'Roles'=>{de=>'Rollen'},
+'Expiration-Date'=>{de=>'Verfallsdatum'},
+'no contact specified'=>{de=>'kein gültiger Kontakt angegeben'},

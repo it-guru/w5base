@@ -1,0 +1,5 @@
+'itil::liccontract'=>{de=>'Lizenzvertrag',en=>'License contract'},
+'fieldgroup.default'=>{de=>'Lizenzvertrag-Daten',en=>'License contract-Informations'},
+'fieldgroup.finance'=>{de=>'Finanzielle Verantwortung',en=>'finanze'},
+'fieldgroup.source'=>{de=>'Datenquelle',en=>'Datasource'},
+'you are only authorized to add in \'order\' or \'reserved\' state'=>{de=>'Sie sind nur berechtig, im Status \'angefordert\' oder \'reserviert\' Datensätze zu erzeugen'},

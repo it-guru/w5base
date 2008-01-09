@@ -1,0 +1,5 @@
+'tsacinv::group'=>{de=>'AssetCenter Gruppe',en=>'AssetCenter Group'},
+'fieldgroup.default'=>{de=>'Gruppendaten',en=>'Groupinformations'},
+'Supervisor'=>{de=>'Leiter'},
+'Parentgroup'=>{de=>'Elterngruppe'},
+'Phone'=>{de=>'Telefonnummer'},

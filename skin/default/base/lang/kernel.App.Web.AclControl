@@ -1,0 +1,4 @@
+'fieldgroup.default'=>{de=>'Zugriffsregel',en=>'AccessControl'},
+'Target-Name'=>{de=>'Bezugsziel'},
+'ACL-Mode'=>{de=>'Zugriffsmodus'},
+"no '\%s' specified"=>{de=>"kein '\%s' angegeben"},

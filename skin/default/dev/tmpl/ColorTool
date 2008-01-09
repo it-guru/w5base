@@ -1,0 +1,81 @@
+<link rel="stylesheet" type="text/css" href="../../../../static/yui/build/fonts/fonts-min.css" />
+<link rel="stylesheet" type="text/css" href="../../../../static/yui/build/colorpicker/assets/skins/sam/colorpicker.css" />
+<script type="text/javascript" src="../../../../static/yui/build/utilities/utilities.js"></script>
+<script type="text/javascript" src="../../../../static/yui/build/slider/slider.js"></script>
+<script type="text/javascript" src="../../../../static/yui/build/colorpicker/colorpicker-beta.js"></script>
+
+<table height=100% width=100%>
+<tr><td align=center valign=center>
+<style type="text/css">
+  #container { position: relative; padding: 6px; 
+               background-color: #eeeeee; 
+               border-style:solid;
+               width: 420px; height:220px; }
+</style>
+<div id="container">
+<!--Color Picker will appear here-->
+</div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+</td></tr></table>
+
+
+<script type="text/javascript">
+(function() {
+    var Event = YAHOO.util.Event,
+        picker;
+
+    Event.onDOMReady(function() {
+         YAHOO.log("Creating Color Picker.", "info", "example");
+            picker = new YAHOO.widget.ColorPicker("container", {
+                    showhsvcontrols: true,
+                    showhexcontrols: true,
+               images: {
+                  PICKER_THUMB: "../../../../static/yui/build/colorpicker/assets/picker_thumb.png",
+                  HUE_THUMB: "../../../../static/yui/build/colorpicker/assets/hue_thumb.png"
+                }
+                });
+         YAHOO.log("Finished creating Color Picker.", "info", "example");
+         
+         //a listener for logging RGB color changes;
+         //this will only be visible if logger is enabled:
+         var onRgbChange = function(o) {
+            /*o is an object
+               { newValue: (array of R, G, B values),
+                 prevValue: (array of R, G, B values),
+                 type: "rgbChange"
+                }
+            */
+            YAHOO.log("The new color value is " + o.newValue, "info", "example");
+         }
+         
+         //subscribe to the rgbChange event;
+         picker.on("rgbChange", onRgbChange);
+         
+         //use setValue to reset the value to white:
+         Event.on("reset", "click", function(e) {
+            picker.setValue([255, 255, 255], false); //false here means that rgbChange
+                                            //wil fire; true would silence it
+         });
+         
+         //use the "get" method to get the current value
+         //of one of the Color Picker's properties; in 
+         //this case, we'll get the hex value and write it
+         //to the log:
+         Event.on("gethex", "click", function(e) {
+            YAHOO.log("Current hex value: " + picker.get("hex"), "info", "example"); 
+         });
+        });
+})();
+</script>
+

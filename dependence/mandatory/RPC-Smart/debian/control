@@ -1,0 +1,22 @@
+Source: librpc-smart-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 4.0.2)
+Build-Depends-Indep: perl (>= 5.8.0-7)
+Maintainer: Vogler Hartmut <it@guru.de>
+Standards-Version: 3.6.1
+
+Package: librpc-smart-perl
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends}, 
+Description:  Server class
+ Given a list of scalars or reference variables, writes out their contents in
+ perl syntax. The references can also be objects.  The contents of each
+ variable is output in a single Perl statement.  Handles self-referential
+ structures correctly.
+ .
+ Several styles of output are possible, all controlled by setting
+ the Indent flag.  See Configuration Variables or Methods below 
+ for details.
+ .
+ This description was automagically extracted from the module by dh-make-perl.

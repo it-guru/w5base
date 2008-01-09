@@ -1,0 +1,38 @@
+div.winframe{
+   border-style:solid;
+   border-width:1px;
+   xheight:99%;
+   text-align:left;
+   font-size:12px;
+   font-family:Arial,Adobe Helvetica,Helvetica;
+}
+div.winframehead{
+   background-color: #30579f;
+   color: #ffffff;
+   font-family:Arial,Adobe Helvetica,Helvetica;
+   font-size:12px;
+   font-weight: bold;
+   height: 1.3em;
+   padding:2px;
+   border-bottom-width:1px;
+   border-bottom-style:solid;
+   border-bottom-color:black;
+   text-align:left;
+}
+div.winframebody{
+   padding-bottom:2px;
+   padding-top:5px;
+   padding-left:2px;
+   padding-right:2px;
+   font-size:12px;
+   text-align:left;
+   font-family:Arial,Adobe Helvetica,Helvetica;
+}
+
+a:link.winframehead,a:visited.winframehead,a:active.winframehead{
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:#ffffff;
+            font-weight:bold;
+}
+

@@ -1,0 +1,5 @@
+.fixed{
+  position:fixed;
+  position:expression("absolute");
+  top:expression((egal = document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop) +"px");
+}

@@ -1,0 +1,3 @@
+'itil::systemjob'=>{de=>'System Job',en=>'System Job'},
+'fieldgroup.default'=>{de=>'Job Beschreibung',en=>'Job Description'},
+'fieldgroup.systems'=>{de=>'Verknüpfte Systeme',en=>'linked systems'},

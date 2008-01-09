@@ -1,0 +1,240 @@
+#!/usr/bin/perl
+use strict;                     # mandatory
+use Getopt::Long;               # mandatory
+use FindBin qw($RealScript);    # mandatory
+
+use CGI qw(-oldstyle_urls);
+use LWP::UserAgent;
+use HTTP::Request::Common;
+use Data::Dumper;
+use Date::Calc qw(Today);
+
+my $DefaultBase="https://w5base.net/w5base/auth/";
+my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$out);
+my $green;
+my %P=("help"       => \$help,
+       "base=s"     => \$base,
+       "webuser=s"  => \$loginuser,
+       "webpass=s"  => \$loginpass,
+       "verbose+"    => \$verbose);
+
+my $optresult=XGetOptions(\%P,\&Help,undef,\&Defaults,".W5Base.Interface");
+
+sub Defaults
+{
+   my $p=shift;
+}
+
+
+#######################################################################
+sub Help
+{
+   my $myname=$RealScript;
+   print(<<EOF);
+$myname [options] 
+
+   --verbose display more details of operation process
+   --quiet   only errors would be displayed
+   --base    base url of filemgmt (default: $DefaultBase)
+   --out     output file to store the xml response (default: STDOUT)
+
+   --webuser username
+   --webpass password
+   --store   stores the parameters (not help,verbose and store)
+   --help    show this help
+
+EOF
+}
+
+#######################################################################
+# my special handler
+#
+# $optresult=XGetOptions(\%ARGPARAM,\&Help,\&preStore,".W5Base");
+# msg("INFO","xxx");
+#
+sub INFO{"INFO";} 
+sub WARN{"WARN";} 
+sub DEBUG{"DEBUG";} 
+sub ERROR{"ERROR";}
+sub XGetOptions
+{
+   my $param=shift;
+   my $help=shift;
+   my $prestore=shift;
+   my $defaults=shift;
+   my $storefile=shift;
+   my $optresult;
+   if (!($storefile=~m/^\//)){ # finding the home directory
+      if ($ENV{HOME} eq ""){
+         eval('
+            while(my @pline=getpwent()){
+               if ($pline[1]==$< && $pline[7] ne ""){
+                  $ENV{HOME}=$pline[7];
+                  last;
+               }
+            }
+            endpwent();
+         ');
+      }
+      if ($ENV{HOME} ne ""){
+         $storefile=$ENV{HOME}."/".$storefile;
+      }
+   }
+   my $store;
+   $param->{store}=\$store;
+   
+   if (!($optresult=GetOptions(%$param))){
+      if (defined($help)){
+         &$help();
+      }
+      exit(1);
+   }
+   if (defined(${$param->{help}})){
+      &$help();
+      exit(0);
+   }
+   if (open(F,"<".$storefile)){
+      if (defined($prestore)){
+         &$prestore($param);
+      }
+      while(my $l=<F>){
+         $l=~s/\s*$//;
+         if (my ($var,$val)=$l=~m/^(\S+)\t(.*)$/){
+            if (exists($param->{$var})){
+               if (!(${$param->{store}}) || $var eq "webuser=s" ||
+                   $var eq "webpass=s"){
+                  if (!defined(${$param->{$var}})){
+                     ${$param->{$var}}=unpack("u*",$val);
+                  }
+               }
+            }
+         }
+      }
+      close(F);
+   }
+   if (!defined(${$param->{'webuser=s'}})){
+      my $u;
+      while(1){
+         printf("login user: ");
+         $u=<STDIN>;
+         $u=~s/\s*$//;
+         last if ($u ne "");
+      }
+      ${$param->{'webuser=s'}}=$u;
+   }
+   if (!defined(${$param->{'webpass=s'}})){
+      my $p="";
+      system("stty -echo 2>/dev/null");
+      $SIG{INT}=sub{ system("stty echo 2>/dev/null");print("\n");exit(1)};
+      while(1){
+         printf("password: ");
+         $p=<STDIN>;
+         $p=~s/\s*$//;
+         printf("\n");
+         last if ($p ne "");
+      }
+      system("stty echo 2>/dev/null");
+      $SIG{INT}='default';
+      ${$param->{'webpass=s'}}=$p;
+   }
+   if (${$param->{store}}){
+      if (open(F,">".$storefile)){
+         foreach my $p (keys(%$param)){
+            next if ($p=~m/^verbose.*/);
+            next if ($p=~m/^help$/);
+            next if ($p=~m/^store$/);
+            if (defined(${$param->{$p}})){
+               my $pstring=pack("u*",${$param->{$p}});
+               $pstring=~s/\n//g;
+               printf F ("%s\t%s\n",$p,$pstring);
+            }
+         }
+         close(F);
+      }
+      else{
+         printf STDERR ("ERROR: $!\n");
+         exit(255);
+      }
+   }
+   if (defined($defaults)){
+      &$defaults($param);
+   }
+   if (defined($param->{'verbose+'}) && 
+       ref($param->{'verbose+'}) eq "SCALAR" &&
+       ${$param->{'verbose+'}}>0){
+      $Main::VERBOSE=1;
+      msg(INFO,"using parameters:");
+      foreach my $p (sort(keys(%$param))){
+         my $pname=$p;
+         $pname=~s/=.*$//;
+         $pname=~s/\+.*$//;
+         msg(INFO,sprintf("%8s = '%s'",$pname,${$param->{$p}}));
+      }
+      msg(INFO,"-----------------");
+   }
+   return($optresult);
+}
+
+sub msg
+{
+   my $type=shift;
+   my $msg=shift;
+   my $format="\%-6s \%s\n";
+
+   if ($type eq "ERROR" || $type eq "WARN"){
+      foreach my $submsg (split(/\n/,$msg)){
+         printf STDERR ($format,$type.":",$submsg);
+      }
+   }
+   else{
+      foreach my $submsg (split(/\n/,$msg)){
+         printf STDOUT ($format,$type.":",$submsg) if ($Main::VERBOSE);
+      }
+   }
+}
+#######################################################################
+#######################################################################
+
+#######################################################################
+#                                                                     #
+#                                 MAIN                                #
+#                                ======                               #
+#######################################################################
+$base.="/" if (!($base=~m/\/$/));
+my $url="${base}base/interface/io";
+
+my $ua=new LWP::UserAgent(env_proxy =>1,keep_alive=>1,timeout=>300);
+
+while(my $infile=shift(@ARGV)){
+   if (!open(IN,"<$infile")){
+      msg(ERROR,"fail to open $infile");
+      next;
+   }
+   close(IN);
+   my $queryparam=[MyW5BaseSUBMOD=>'AL_TCom::MyW5Base::myP800',
+                   EXVIEWCONTROL=>'TEAM',
+                   CurrentView=>'(ALL)',
+                   FormatAs=>'XMLV01'];
+   my $cgi=new CGI({@$queryparam});
+   msg(INFO,"url  =".$url);
+   msg(INFO,"query=".$cgi->query_string());
+
+   my %subsave;
+   $subsave{file}=[$infile];
+   my @content=%subsave;
+   my $request=HTTP::Request::Common::POST($url,Content=>\@content,
+                                       Content_Type=>'multipart/form-data');
+
+   $request->authorization_basic($loginuser,$loginpass);
+   my $response=$ua->request($request);
+   if ($response->is_success) {
+      my $res=$response->content;
+      my $size=length($res);
+      print $res."\n";
+   }
+   else {
+      msg("ERROR","http response=".$response->status_line);
+      exit(1);
+   }
+}
+exit(0);

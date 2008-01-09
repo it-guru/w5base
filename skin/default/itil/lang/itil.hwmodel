@@ -1,0 +1,3 @@
+'itil::hwmodel'=>{de=>'Hardware Model',en=>'Hardware Model'},
+'fieldgroup.default'=>{de=>'Hardware Model Daten',en=>'Hardware Model Data'},
+'Producer'=>{de=>'Hersteller'},

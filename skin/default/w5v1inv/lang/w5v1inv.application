@@ -1,0 +1,3 @@
+'w5v1inv::application' => {de=>'W5BaseV1 Anwendung'},
+'Applicationname'      => {de=>'Anwendungsname'},
+'fieldgroup.default'   => {de=>'Anwendungsdaten'},

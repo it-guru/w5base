@@ -1,0 +1,4 @@
+'faq::forumentry'=>{de=>'Forum Antwort Eintrag',en=>'Forum answer entry'},
+'Entry-No'=>{de=>'Antwort-ID'},
+'fieldgroup.topic'=>{de=>'Forum Thema',en=>'Forum topic'},
+

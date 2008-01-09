@@ -1,0 +1,5 @@
+'base::workflow::DataIssue'=>{
+   de=>'W5Base DataIssue - Datenproblem oder Datenabgleich Problembehandlung',
+   en=>'W5Base DataIssue - Dataproblem or Datasyncronisation problem handling'},
+'affected Dataobject'=>{de=>'betroffenes Datenobjekt'},
+'affected Dataelement'=>{de=>'betroffenes Datenelement'},

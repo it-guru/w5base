@@ -1,0 +1,11 @@
+#######################################################################
+'country'=>{de=>'
+2 stelliger Ländercode basierend auf <br>
+ISO 3166 ALPHA-2 <br>
+siehe: <a href="http://de.wikipedia.org/wiki/ISO-3166-1-Kodierliste" target=_blank>http://de.wikipedia.org/ wiki/ISO-3166-1-Kodierliste</a>
+',en=>'
+2 digit country code based on<br>
+ISO 3166 ALPHA-2 <br>
+look at <a href="http://de.wikipedia.org/wiki/ISO-3166-1-Kodierliste" target=_blank>http://de.wikipedia.org/ wiki/ISO-3166-1-Kodierliste</a>
+'},
+

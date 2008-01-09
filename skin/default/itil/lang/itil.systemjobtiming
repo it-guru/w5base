@@ -1,0 +1,6 @@
+'itil::systemjobtiming'=>{de=>'Job Scheduling',en=>'Job Scheduling'},
+'ti.0'=>{de=>'kein Scheduling',en=>'no scheduling'},
+'ti.1'=>{de=>'einmalig',en=>'once'},
+'ti.2'=>{de=>'täglich',en=>'dayly'},
+'ti.3'=>{de=>'wöchentlich',en=>'weekly'},
+'ti.4'=>{de=>'monatlich',en=>'monthly'},

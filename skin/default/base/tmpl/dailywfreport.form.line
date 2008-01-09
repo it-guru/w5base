@@ -1,0 +1,18 @@
+<!------------------------------------------------------------------------>
+<table id=tabelle border="0" cellspacing="0" cellpadding="0">
+  <tr> 
+    <td class=col1 nowrap>
+    <div class=timestamp>
+    %emailtstamp%
+    %emailprefix%
+    </div></td>
+    <td class="col2"><pre class="text">%emailtext%</pre></td>
+    <td class=col3><div class=postfix>%emailpostfix%</div></td>
+  </tr>
+</table>
+<!------------------------------------------------------------------------>
+
+
+
+</body>
+</html>

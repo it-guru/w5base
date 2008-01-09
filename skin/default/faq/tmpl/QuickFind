@@ -1,0 +1,38 @@
+<table height=100% width=100% cellspacing=0 cellpadding=0 border=0>
+<tr height=50%><td align=center valign=center>
+%TRANSLATE(Knowledge Base - Quickfind)%<br>
+<img src="../load/faqknowledgemain.jpg">
+<table border=0>
+<tr>
+<td>%TRANSLATE(Keywords)%:</td>
+<td><input type=text id=in name=search_kwords size=18></td>
+<td><input type=submit value="%TRANSLATE(Search)%"></td>
+</tr>
+</table>
+</td></tr>
+<tr height=30%>
+<td valign=top align=center>
+<div style="background:#F8F8FC;text-align:left;padding:5px;width:70%;border-style:solid;border-width:1px">
+%TRANSLATE(MSG001)%
+</div>
+</td>
+</tr>
+<tr><td valign=bottom align=right height=1%>
+<font size=-2>
+powered by W5Base
+</td></tr>
+</table>
+<input type=hidden name=AutoSearch value="1">
+<script language="JavaScript">
+
+function InitForm()
+{
+   document.forms[0].target="_parent";
+   document.forms[0].action="../../base/menu/msel/faq/article";
+   document.forms[0].search_kwords.focus();
+   return(true);
+}
+
+addEvent(window, "load", InitForm);
+
+</script>

@@ -1,0 +1,7 @@
+'expiration'=>{de=>'
+Das Verfallsdatum definiert, bis wann die Verknüpfung/Zuordnung bestehen
+bleiben soll. 
+',en=>'
+The Expiration-Date defines the date which the link should be exists.
+'},
+

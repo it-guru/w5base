@@ -1,0 +1,17 @@
+<div class=editframe>
+   <table class=editframe>
+      <tr>
+         <td class=fname width=10%>%software(label)%:</td>
+         <td class=finput width=40%>%software(sublistedit)%</td>
+         <td class=fname width=10%>%liccontract(label)%:</td>
+         <td class=finput width=40%>%liccontract(sublistedit)%</td>
+      </tr>
+      <tr>
+         <td class=fname>%version(label)%:</td>
+         <td class=finput>%version(sublistedit)%</td>
+         <td class=fname>%quantity(label)%:</td>
+         <td class=finput>%quantity(sublistedit)%</td>
+      </tr>
+   </table>
+</div>
+%StdButtonBar(subadd,subdelete,subsave,subcancel)%

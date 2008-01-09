@@ -1,0 +1,54 @@
+The search field '<b>%label%</b>' is a type of date-time. So you
+can use the following expressions to specify the desired date:<br>
+<br>
+<table width=100%>
+
+<tr>
+<td>12:30:00</td>
+<td>This will use the current date and add the specifed time</td>
+</tr>
+
+<tr>
+<td><a href=JavaScript:SendData("now")>now</a></td>
+<td>this will be use the current date and current time</td>
+</tr>
+
+<tr>
+<td><a href=JavaScript:SendData("lastmonth")>lastmonth</a></td>
+<td>this specifies the range of all days in the last month</td>
+</tr>
+
+<tr>
+<td><a href=JavaScript:SendData("nextmonth")>nextmonth</a></td>
+<td>this specifies the range of all days in the next month</td>
+</tr>
+
+<tr>
+<td><a href=JavaScript:SendData("currentmonth")>currentmonth</a></td>
+<td>this specifies the range of all days in the current month</td>
+</tr>
+
+<tr>
+<td><a href=JavaScript:SendData("now-5h")>now-5h</a></td>
+<td>this specifies timestamp 5 hours ago</td>
+</tr>
+
+<tr>
+<td>...</td>
+<td>there are more expression, but they are'nt documented at now</td>
+</tr>
+</table>
+<script language="JavaScript">
+function SendData(t)
+{
+   if (parent){
+      parent.document.forms[0].elements['%field%'].value=t;
+   }
+   parent.hidePopWin(false);
+}
+</script>
+<style>
+body,html{
+  padding:5px;
+}
+</style>

@@ -1,0 +1,2 @@
+'Output to CSV'=>{de=>'Ausgabe als CSV'},
+'Writes the data in clasical CSV Format. Even for use with Excel.'=>{de=>'Ausgabe im klassischen CSV Text Format. Auch geeignet zum Einlesen in Excel'},

@@ -1,0 +1,11 @@
+'write application'=>{de=>'schreiben'},
+'read application'=>{de=>'lesen'},
+'write system'=>{de=>'schreiben'},
+'read system'=>{de=>'lesen'},
+'write asset'=>{de=>'schreiben'},
+'read asset'=>{de=>'lesen'},
+'Business Employee'=>{de=>'Betriebsteam'},
+'Customer Contact'=>{de=>'Kundenkontakt'},
+'Developer'=>{de=>'Entwickler'},
+'Technical Contact'=>{de=>'technischer-Ansprechpartner'},
+

@@ -1,0 +1,16 @@
+<div class=editframe>
+   <table class=editframe>
+      <tr>
+         <td class=fname width=10%>%group(label)%:</td>
+         <td class=finput width=40%>%group(sublistedit)%</td>
+         <td class=fname width=10%>%roles(label)%:</td>
+         <td class=finput width=40% valign=top rowspan=2>%roles(sublistedit)%</td>
+      </tr>
+      <tr>
+         <td class=fname >&nbsp;</td>
+         <td class=finput ></td>
+         <td class=fname >&nbsp;</td>
+      </tr>
+   </table>
+</div>
+%StdButtonBar(subadd,subdelete,subsave,subcancel)%

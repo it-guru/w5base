@@ -1,0 +1,17 @@
+<script language=JavaScript src="../../../../public/base/load/TextTranslation.js"></script>
+<script language="JavaScript">
+function dotrans()
+{
+   document.forms[0].elements['dst'].value=doTranslate("de","en",document.forms[0].elements['src'].value);
+}
+</script>
+<input type=button onclick="dotrans();" value=" Trans de->en ">
+<br>
+Sample:<br>
+<form>
+Source:<br>
+<textarea name=src></textarea>
+<br>
+Destination:<br>
+<textarea name=dst></textarea>
+</form>

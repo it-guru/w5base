@@ -1,0 +1,6 @@
+'sc'=>{de=>'ServiceCenter',en=>'ServiceCenter'},
+'sc.change'=>{de=>'ChangeManagement',en=>'ChangeManagement'},
+'sc.change.software'=>{de=>'Software',en=>'Software'},
+'sc.change.device'=>{de=>'Device',en=>'Device'},
+'sc.incident'=>{de=>'IncidentManagement',en=>'IncidentManagement'},
+'sc.problem'=>{de=>'ProblemManagement',en=>'ProblemManagement'},

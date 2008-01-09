@@ -1,0 +1,469 @@
+package kernel::Output::HtmlViewEditor;
+#  W5Base Framework
+#  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+use strict;
+use vars qw(@ISA);
+use kernel;
+use Data::Dumper;
+use base::load;
+@ISA    = qw(kernel::Formater);
+
+
+sub new
+{
+   my $type=shift;
+   my $self=bless($type->SUPER::new(@_),$type);
+  # my $config=$self->getParent->getParent->Config();
+   #$self->{SkinLoad}=getModuleObject($config,"base::load");
+
+   return($self);
+}
+
+sub getHttpHeader
+{  
+   my $self=shift;
+   my $app=$self->getParent->getParent();
+   my $d=$app->HttpHeader();
+   $d.=$app->HtmlHeader();
+   $d.="\n<title>".$app->T("ViewEditor",$app->Self())."</title>\n";
+   $d.="<link rel=stylesheet ".
+       "href=\"../../base/load/default.css\"></link>\n";
+   $d.="<link rel=stylesheet ".
+       "href=\"../../base/load/work.css\"></link>\n";
+   $d.="<link rel=stylesheet ".
+       "href=\"../../base/load/Output.HtmlDetail.css\"></link>\n";
+   $d.="<link rel=stylesheet ".
+       "href=\"../../base/load/Output.HtmlViewEditor.css\"></link>\n";
+   $d.="<link rel=stylesheet ".
+       "href=\"../../base/load/MkTree.css\"></link>\n";
+   $d.="<script language=JavaScript ".
+       "src=\"../../../public/base/load/ViewEditor.js\"></script>\n";
+   $d.="<script language=JavaScript ".
+       "src=\"../../../public/base/load/MkTree.js\"></script>\n";
+   $d.="<script language=JavaScript ".
+       "src=\"../../../public/base/load/toolbox.js\"></script>\n";
+
+   $d.="<body>";
+   return($d);
+}
+
+sub getStyle
+{
+   my ($self,$fh)=@_;
+   my $app=$self->getParent->getParent();
+   my $d="";
+   $d.=$app->getTemplate("css/default.css","base");
+   $d.=$app->getTemplate("css/Output.HtmlFormatSelector.css","base");
+   return($d);
+}
+
+sub isRecordHandler
+{
+   return(0);
+}
+
+
+
+sub ProcessHead
+{
+   my ($self,$fh)=@_;
+   my $app=$self->getParent->getParent();
+   my $view=$app->getCurrentViewName();
+   my @view=$app->getCurrentView();
+   my $dest=$app->Self();
+   $dest=~s/::/\//g;
+   $dest="../../$dest/Result";
+
+   my $d="";
+   $d.="<form method=post><style>";
+   $d.=$self->getStyle($fh);
+   $d.="</style>\n\n";
+   $d.="<script language=JavaScript ".
+         "src=\"../../../public/base/load/toolbox.js\"></script>\n";
+   $d.="<script language=JavaScript ".
+         "src=\"../../../public/base/load/OutputHtml.js\"></script>\n";
+   $d.="<table id=viewline class=maintable>\n";
+   $d.=$self->getHtmlViewLine($fh,$dest);
+
+   $d.="<tr><td class=mainblock>";
+   $d.="<table  class=datatable width=100% border=0>\n".
+       "<tr class=headline>";
+   $d.="<th colspan=2 class=headfield height=1%>".
+       $self->getParent->getParent->T("Edit your view").
+       " ...</th></tr>\n";
+   $d.="</table>";
+   $d.="</table>";
+   return($d);
+}
+
+sub ProcessOp
+{
+   my $self=shift;
+   my $op=shift;
+   my $app=$self->getParent->getParent();
+   my $curruserid=$app->getCurrentUserId();
+
+   $app->{userview}->ResetFilter();
+   if ($op eq "save"){
+      my $name=Query->Param("CurrentView");
+      my $module=$app->ViewEditorModuleName();
+      my %flt=(name=>$name,module=>$module,userid=>$curruserid);
+      $app->{userview}->SetFilter(\%flt);
+      my ($oldrec,$msg)=$app->{userview}->getFirst();
+      my %rec=(viewrevision=>1,%flt,editor=>$ENV{REMOTE_USER});
+      $rec{data}=join(", ",Query->Param("ViewFieldList"));
+      $app->{userview}->ValidatedInsertOrUpdateRecord(\%rec,\%flt);
+   }
+   if ($op eq "del"){
+      my $name=Query->Param("CurrentView");
+      my $delcount=0;
+      my $module=$app->ViewEditorModuleName();
+      my %flt=(name=>$name,module=>$module);
+      $app->{userview}->SetFilter(\%flt);
+      $app->{userview}->ForeachFilteredRecord(sub{
+         if ($app->{userview}->ValidatedDeleteRecord($_)){
+            $delcount++;
+         }
+      });
+      if ($delcount){
+         $name=Query->Param("CurrentView"=>"default");
+      }
+   }
+   if ($op eq "add"){
+      my $name=Query->Param("AddView");
+      my $module=$app->ViewEditorModuleName();
+      my %rec=(viewrevision=>1,name=>$name,module=>$module,userid=>$curruserid,
+               editor=>$ENV{REMOTE_USER});
+      if ($name eq "all"){
+         $rec{data}="ALL";
+      }
+      if (my $id=$app->{userview}->ValidatedInsertRecord(\%rec)){
+         Query->Delete("AddView");
+         $app->{userview}->SetFilter(id=>\$id); # Datensatz neu lesen, damit
+         my ($rec,$msg)=$app->{userview}->getOnlyFirst(qw(name)); # der name
+         $app->{userview}->ResetFilter();       # correct neu gesetzt werdne k
+         $name=$rec->{name};
+         
+         $name=Query->Param("CurrentView"=>$name);
+      }
+   }
+   Query->Delete("OP");
+}
+
+sub ProcessLine
+{
+   my ($self,$fh,$viewgroups,$rec,$msg)=@_;
+   my $app=$self->getParent->getParent();
+   my $outputhandler=$self->getParent();
+   my $op=Query->Param("OP");
+   $self->ProcessOp($op) if ($op ne "");
+   my $d=<<EOF;
+<script language="JavaScript">
+function DoAdd()
+{
+   document.forms[0].elements['OP'].value="add";
+   document.forms[0].target="_self";
+   document.forms[0].submit();
+}
+function DoDel()
+{
+   document.forms[0].elements['OP'].value="del";
+   document.forms[0].target="_self";
+   document.forms[0].submit();
+}
+function DoSave()
+{
+   document.forms[0].elements['OP'].value="save";
+   document.forms[0].target="_self";
+   var view=document.forms[0].elements['ViewFieldList'];
+   for(c=view.length-1;c>=0;c--){
+      view.options[c].selected=1
+   }
+   document.forms[0].submit();
+}
+function DoUp()
+{
+   var view=document.forms[0].elements['ViewFieldList'];
+   for(c=0;c<view.length;c++){
+      if (view.options[c].selected && c != 0){
+         var oldText = view.options[c-1].text;
+         var oldVal = view.options[c-1].value;
+         view.options[c-1].text=view.options[c].text;
+         view.options[c-1].value=view.options[c].value;
+         view.options[c].text=oldText;
+         view.options[c].value=oldVal;
+         view.options[c-1].selected=1;
+         view.options[c].selected=0;
+      }else if (view.options[c].selected && c == 0){
+         c=view.length+1;
+      }else{
+         view.options[c].selected=0;
+      }
+   }
+}
+function DoDown()
+{
+   var view=document.forms[0].elements['ViewFieldList'];
+   for(var c=view.length-1;c>=0;c--){
+      if (view.options[c].selected && c != view.length-1){
+         var oldText = view.options[c+1].text;
+         var oldVal = view.options[c+1].value;
+         view.options[c+1].text=view.options[c].text;
+         view.options[c+1].value=view.options[c].value;
+         view.options[c].text=oldText;
+         view.options[c].value=oldVal;
+         view.options[c+1].selected=1;
+         view.options[c].selected=0;
+      }else if (view.options[c].selected && c == view.length-1){
+         c=-1;
+      }
+   }
+}
+
+function RowsDel(delary)
+{
+   var d=document.getElementById("NewCurrentView");
+   if (delary.constructor.toString().indexOf(Array) == -1) {
+      d.remove(delary);
+   }else{
+      for(var i=0;i<delary.length;++i){
+         d.remove(delary[i]);
+      }
+   }
+   inittree('tree_route');
+}
+
+
+function DropBoxKh(e)
+{
+   var d = document.getElementById("NewCurrentView");
+   var delary = new Array();
+   if (e.keyCode == 46 || e.keyCode == 44 || e.keyCode == 110){
+      for(var c=d.length-1;c>=0;c--){
+         if (d.options[c].selected ){
+            delary.push(c); 
+         }
+      }   
+   }
+   RowsDel(delary); 
+}
+
+function InitDropBox()
+{
+   var d=document.getElementById("NewCurrentView");
+   addEvent(d,"keydown",DropBoxKh);
+}
+
+addEvent(window,"load",InitDropBox);
+
+</script>
+EOF
+   $d.="<div id=ViewEditor class=ViewEditor><div class=ViewEditorMain>";
+   $d.="<table height=50% width=100% border=0 cellpadding=5>";
+   $d.="<tr><td valign=top>";
+   $d.="<table border=0 cellspacing=0 cellpadding=0 width=100% height=100%>".
+       "<tr height=1%>";
+   $d.="<td width=25% nowrap align=left>".
+       "<input type=text size=10 name=AddView>";
+   $d.="<input type=button OnClick=\"DoAdd();\" value=\"".
+       $app->T("Add View",$self->Self())."\"></td>";
+   $d.="<td align=center valign=top> <b><u>View Editor</u></b> </td>";
+   $d.="<td width=25% nowrap align=right>".
+       "<input type=button OnClick=\"DoDel();\" ".
+       "value=\"".
+       $app->T("Drop View",$self->Self())."\">";
+   $d.="</td></tr>";
+   $d.="<tr><td colspan=3><table width=100% border=1 height=100%>";
+   $d.="<tr height=1%>";
+   $d.="<td width=50%>".$app->T("MSG004",$self->Self())."</td>";
+   $d.="<td width=1%></td>";
+   $d.="<td width=50%>".$app->T("MSG005",$self->Self())."</td>";
+   $d.="</tr>";
+   $d.="<tr><td width=49% valign=top>".$self->getFullFieldTreeSelect($rec);
+   $d.="</td>";
+   $d.="<td width=1%>";
+   $d.="<table height=100%>".
+       "<tr><td valign=top><img OnClick=\"DoUp();\" ".
+       "src=\"../../base/load/DoUp.gif\" style=\"cursor:pointer\"".
+       "title=\"".$app->T("Field of current View order up",$self->Self()).
+       "\"></td></tr>".
+       "<tr><td valign=bottom><img OnClick=\"DoDown();\" ".
+       "style=\"cursor:pointer\" src=\"../../base/load/DoDown.gif\" ".
+       "title=\"".
+       $app->T("Field of current View order down",$self->Self()).
+       "\"></td></tr></table>";
+   $d.="</td>";
+   $d.="<td width=49% valign=top>".$self->getViewFieldSelect();
+   $d.="</td></tr></td></tr>";
+   $d.="<tr height=1%><td colspan=3 align=center>".
+       "<input type=button OnClick=\"DoSave();\" value=\"".
+       $app->T("Save View",$self->Self())."\"></td><tr>";
+   $d.="</table>";
+   $d.="</td></tr>";
+   my $lastmsg=$app->findtemplvar({},"LASTMSG");
+   $d.="<tr height=1%><td colspan=3 nowrap align=left>".
+       "$lastmsg</td><tr>";
+   $d.="</table>";
+   $d.="</td></tr>";
+   $d.="</table>";
+   $d.="</div></div>";
+
+   return($d);
+}
+
+sub getViewFieldSelect
+{
+   my $self=shift;
+   my $app=$self->getParent->getParent();
+   my $d="<select size=5 id=NewCurrentView class=ViewFieldSelect multiple ".
+         " onDblClick=\"RowsDel(this.options.selectedIndex); \" ".
+         " name=ViewFieldList style=\"width:100%;height:100%\">";
+   my @showfieldlist=();
+   my @oldval=Query->Param("ViewFieldList");
+   my $op=Query->Param("OP");
+   #printf STDERR ("on load op=$op\n");
+   if ($op ne ""){
+      @showfieldlist=Query->Param("ViewFieldList");
+   }
+   else{
+      my $currentview=Query->Param("CurrentView");
+      @showfieldlist=$app->getFieldListFromUserview($currentview);
+   }
+   foreach my $field (@showfieldlist){
+      if ($field eq "ALL" || $field=~m/^\S+\.\S+$/){
+         $d.="<option value=\"$field\">[$field]</option>";
+      }
+      else{
+         my $fobj=$app->getField($field);
+         if ($fobj){
+            $d.="<option value=\"$field\"";
+           # $d.=" selected" if (grep(/^$field$/,@oldval));
+            $d.=">".$fobj->Label()."</option>";
+         }
+      }
+   }
+   $d.="</select>";
+   return($d);
+
+
+
+}
+
+sub getFullFieldTreeSelect
+{
+   my $self=shift;
+   my $rec=shift;
+   my $app=$self->getParent->getParent();
+
+   my %sgrp=();
+   my %translation=();
+
+   foreach my $field ($app->getFieldList()){
+      my $fobj=$app->getField($field);
+      my $grp=$fobj->{group};
+      if (defined($fobj->{translation})){
+         $translation{$grp}=[] if (!defined($translation{$grp}));
+         if (!grep(/^$fobj->{translation}$/,@{$translation{$grp}})){
+            push(@{$translation{$grp}},$fobj->{translation});
+         }
+      }
+      $sgrp{$grp}=[] if (!defined($sgrp{$grp}));
+      push(@{$sgrp{$grp}},$fobj);
+   }
+   my $c=0;
+   my $d="<div class=FullFieldTreeSelect id=FullFieldTree>".
+         "<ul class=mktree id=tree_route>";
+   my @translationbase=($self->Self,
+                        $app->Self,
+                        sort(keys(%{$app->{SubDataObj}}),
+                        sort(keys(%{$app->{InactivSubDataObj}}))));
+   foreach my $grp ($app->sortDetailBlocks([keys(%sgrp)])){
+      my $trgrp;
+      my @checkedobjs;
+      foreach my $fobj (@{$sgrp{$grp}}){
+         next if (!$fobj->UiVisible("ViewEditor"));
+         push(@checkedobjs,$fobj);
+      }
+      next if ($#checkedobjs==-1);
+      if (defined($translation{$grp})){
+         $trgrp=$app->T("fieldgroup.".$grp,@{$translation{$grp}});
+      }
+      else{
+         $trgrp=$app->T("fieldgroup.".$grp,@translationbase);
+      }
+      if ($trgrp eq "fieldgroup.default"){
+         $trgrp=$app->T($app->Self(),$app->Self());
+      }
+      $d.="<li class=liClosed id=tree_$c ".
+          "onMouseDown=\"return(false)\" onSelectStart=\"return(false)\" ".
+          ">$trgrp";
+      $c++;
+      foreach my $fobj (@checkedobjs){
+         my $field=$fobj->Name();
+         $d.="<ul id=tree_$c>";
+         $c++;
+         $d.="<li value=\'$field\' downpoint=1 id=treediv_$c ".
+             "onClick=\"DoFieldonClick(this);\" ".
+             "onMouseDown=\"return(false)\" ".
+             "onSelectStart=\"return(false)\" ".
+             ">".$fobj->Label()."</li>";
+         $d.="</ul>";
+      }
+      $d.="</li>";
+   }
+   $d.="</ul></div>";
+
+   return($d);
+}
+
+
+
+
+
+
+sub getHttpFooter
+{  
+   my $self=shift;
+   my $d="";
+   $d.=$self->HtmlStoreQuery();
+   $d.=<<EOF;
+<script language="JavaScript">
+RefreshViewDropDown('tree_route');
+function ResizeViewEditor()
+{
+//   document.getElementById("ViewEditor").style.height="44px"; 
+}
+ResizeViewEditor();
+addEvent(window,"resize",ResizeViewEditor);
+
+</script>
+<input type=hidden name=OP value="">
+EOF
+   if (Query->Param("CurrentId")){
+      $d.="<input type=hidden name=CurrentId value=\"".
+          Query->Param("CurrentId")."\">";  # for history view editor
+   }
+   $d.="</form>";
+   $d.="</body>";
+   $d.="</html>";
+   return($d);
+}
+
+
+
+1;

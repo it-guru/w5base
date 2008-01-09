@@ -1,0 +1,26 @@
+table.uploadframe{
+   border-style:outset;
+   border-width:2px;
+   padding:0px;
+   padding-top:5px;
+   padding-bottom:5px;
+   margin-bottom:4px;
+   background:#dadada;
+}
+iframe.uploadresult{
+   height:100%;
+   width:100%;
+}
+input.uploadbutton{
+   width:90px;
+   height:25px;
+   background:#dadada;
+   overflow:hidden;
+   border-style:outset;
+   border-width:3px;
+   padding:0px;
+   padding-left:2px;
+   padding-left:2px;
+   margin:2px;
+   float:right;
+}

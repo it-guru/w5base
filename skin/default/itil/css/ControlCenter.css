@@ -1,0 +1,46 @@
+#ControlCenterSelectJob{
+   width:200px;
+   background-image:url(../../../public/itil/load/cc_select.gif);
+   background-color: silver;
+   background-repeat: no-repeat;
+   background-position: left center;
+   padding:1px;
+   margin:2px;
+}
+#RefreshJobList{
+   width:200px;
+   background-image:url(../../../public/itil/load/cc_refresh.gif);
+   background-color: silver;
+   background-repeat: no-repeat;
+   background-position: left center;
+   padding:1px;
+   margin:2px;
+}
+#ShowKey{
+   width:200px;
+   background-image:url(../../../public/itil/load/cc_help.gif);
+   background-color: silver;
+   background-repeat: no-repeat;
+   background-position: left center;
+   padding:1px;
+   margin:2px;
+}
+#Timing{
+   width:20px;
+   background-image:url(../../../public/itil/load/cc_clock.gif);
+   background-color: #9BCCCA;
+   background-repeat: no-repeat;
+   background-position: left center;
+   margin:1px;
+}
+.RunJob{
+   width:200px;
+   background-image:url(../../../public/itil/load/cc_runjob.gif);
+   background-color: #9BCCCA;
+   background-repeat: no-repeat;
+   background-position: left center;
+   margin:2px;
+}
+.Actions{
+   padding-left:5px;padding-right:5px;
+}

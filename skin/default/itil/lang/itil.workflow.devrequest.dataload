@@ -1,0 +1,4 @@
+'no application specified'=>{de=>'keine gültige Anwendung eingegeben'},
+'developer requests are disabled for the desired application'=>{de=>'Entwickleranforderungen sind für die ausgewählte Anwendung nicht zugelassen'},
+'no developer found'=>{de=>'für die ausgewählte Anwendung sind keine Entwickler registriert'},
+

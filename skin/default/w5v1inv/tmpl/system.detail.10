@@ -1,0 +1,11 @@
+<script language=JavaScript>
+DetailAddTitle("%name(formated)%");
+</script>
+<div class=detailtopline>
+   <table width=100% cellspacing=0 cellpadding=0><tr>
+      <td class=detailtopline align=left>System: %name(formated)%</td>
+      <td class=detailtopline align=right>%DETAILFUNCTIONS%</td>
+   </table>
+</div>
+
+

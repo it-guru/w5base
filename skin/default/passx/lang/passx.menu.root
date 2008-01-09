@@ -1,0 +1,8 @@
+'Tools.passx'=>{de=>'PassX',en=>'PassX'},
+'Tools.passx.log'=>{de=>'Logs',en=>'Logs'},
+'Tools.passx.entry'=>{de=>'Verteilung',en=>'Distribution'},
+'Tools.passx.entry.new'=>{de=>'Neueingabe',en=>'New'},
+'Tools.passx.new'=>{de=>'Neueingabe',en=>'New'},
+'Tools.passx.entry.acl'=>{de=>'Zugriffssteuerung',en=>'Access-Control'},
+'Tools.passx.mgrmain'=>{de=>'Passwortliste',en=>'Password list'},
+'Tools.passx.key'=>{de=>'Key Management',en=>'Key Management'},

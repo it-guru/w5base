@@ -1,0 +1,23 @@
+<div class=editframe>
+   <table class=editframe>
+      <tr>
+         <td class=fname width=10%>%toappl(label)%:</td>
+         <td class=finput colspan=3>%toappl(sublistedit)%</td>
+      </tr>
+      <tr>
+         <td class=fname width=10%>%contype(label)%:</td>
+         <td class=finput colspan=3>%contype(sublistedit)%</td>
+      </tr>
+      <tr>
+         <td class=fname width=10%>%conproto(label)%:</td>
+         <td class=finput width=40%>%conproto(sublistedit)%</td>
+         <td class=fname width=10%>%conmode(label)%:</td>
+         <td class=finput width=40%>%conmode(sublistedit)%</td>
+      </tr>
+      <tr>
+         <td class=fname width=10%>%comments(label)%:</td>
+         <td class=finput colspan=3>%comments(sublistedit)%</td>
+      </tr>
+   </table>
+</div>
+%StdButtonBar(subadd,subdelete,subsave,subcancel)%

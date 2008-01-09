@@ -1,0 +1,58 @@
+div.msg{
+   width:50%;
+   min-width:480px;
+   border-width:3px;
+   border-style:outset;
+}
+div.log{
+   height:100px;
+   xwidth:99%;
+   min-width:400px;
+   overflow:auto;
+   border-width:1px;
+   border-style:solid;
+   border-color:gray;
+   padding:2px;
+   margin:0px;
+}
+div.pmsg{
+   height:50px;
+   width:420px;
+   overflow:auto;
+   border-width:1px;
+   border-style:solid;
+   border-color:gray;
+   padding:2px;
+   margin:0px;
+}
+pre.pmsg {
+   margin: 0px;
+   padding: 0px;
+   font-family:monospace,Courier New,Adobe Courier,Courier;
+   font-size:10px;
+   font-weight:400;
+   color:black;
+   white-space: pre-wrap;       /* css-3 should we be so lucky... */
+   white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+   white-space: -pre-wrap;      /* Opera 4-6 ?? */
+   white-space: -o-pre-wrap;    /* Opera 7 ?? */
+   word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+div.nolog{
+   height:100px;
+   width:430px;
+   overflow:hidden;
+   padding:2px;
+   margin:0px;
+}
+table.msg{
+   background:#e7e7e7;
+   border-width:1px;
+   border-style:solid;
+   border-color:black;
+}
+td.t{
+   color:white;
+   background:#b02121;
+   padding:5px;
+}

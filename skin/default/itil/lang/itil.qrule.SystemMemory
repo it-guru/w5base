@@ -1,0 +1,2 @@
+'itil::qrule::SystemMemory'=>{de=>'Prüfung ob bei einem logischen System ein sinnvoller Arbeitsspeicher eingetragen ist',en=>'Check if there is memory registered at a logical system'},
+'no system memory defined'=>{de=>'kein sinnvoller Arbeitsspeicher eingetragen'},

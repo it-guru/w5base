@@ -1,0 +1,14 @@
+'MSG001'=>{de=><<EOF,
+Diese Wissensdatenbank steht allen Usern zur Verfügung. Jeder kann
+Artikel einstellen. Interessieren Sie bestimmte Themen, so können
+Sie einzelne <a class=alink href="../category/Main">Kategorien</a> abonnieren, d.h. Sie erhalten dann automatisch
+E-Mail, falls in Artikel diese Kathegorien aktualisiert oder neu
+eintestellt werden. Die Inhalte der Artikel werden nicht geprüft, d.h.
+es obliegt Ihnen die Vertrauenswürdigkeit der Informationen zu bewerten.
+EOF
+en=><<EOF},
+This Knowledge Base is avalilable for all users.
+EOF
+'Knowledge Base - Quickfind'=>{de=>'Wissensdatenbank - Quickfind'},
+'Keywords'=>{de=>'Schlüsselworte'},
+'Search'=>{de=>'Suchen'},

@@ -1,0 +1,4 @@
+'itil::MyW5Base::myclosedchanges'=>{
+               de=>'IT-Workflow: meine ITIL Changes geschlossenen',
+               en=>'IT-Inventar: my closed ITIL Changes'},
+'Change end time'=>{de=>'Change Ende Zeit'},

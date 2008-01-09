@@ -1,0 +1,13 @@
+<div class=editframe>
+   <table class=editframe>
+      <tr>
+         <td class=fname style="width:20%">%acltargetname(label)%:</td>
+         <td class=finput style="width:80%">%acltargetname(sublistedit)%</td>
+      </tr>
+      <tr>
+         <td class=fname style="width:20%">%aclmode(label)%:</td>
+         <td class=finput style="width:80%">%aclmode(sublistedit)%</td>
+      </tr>
+   </table>
+</div>
+%StdButtonBar(subadd,subdelete,subsave,subcancel)%

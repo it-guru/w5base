@@ -1,0 +1,16 @@
+<link rel=stylesheet type="text/css" 
+      href="../../../public/base/load/kernel.App.Web.css">
+<link rel=stylesheet type="text/css" 
+      href="../../../public/base/load/Output.HtmlSubListEdit.css">
+</link>
+<div class=editframe>
+   <table class=editframe>
+      <tr>
+         <td class=fname width=10%>%addr(label)%:</td>
+         <td class=finput width=40%>%addr(sublistedit)%</td>
+         <td class=fname width=10%>%name(label)%:</td>
+         <td class=finput width=40%>%name(sublistedit)%</td>
+      </tr>
+   </table>
+</div>
+%StdButtonBar(subadd,subdelete,subsave,subcancel)%

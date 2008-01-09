@@ -1,0 +1,38 @@
+<table width=100% height=100% border=0>
+<tr>
+<td colspan=2 height=1% valign=top>
+With this function it is able to add a bookmark
+for the current search parameters to your MyW5Base
+page or copy the URL to clipboard.<br>
+If you have create a bookmark, there is no warrenty
+that the bookmark will work in the hole future.
+Further development of W5Base can break the functionality
+of bookbarks!<br>
+</td>
+</tr>
+<tr>
+<td colspan=2 height=1% valign=top>
+<table width=100% cellspacing=0 cellpadding=0>
+<tr>
+<td width=1% nowrap>Bookmarkname:</td>
+<td>%BOOKM%</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td colspan=2 height=1% valign=top>Replace if bookmark already exists? %REPL%</td>
+</tr>
+<tr>
+<td colspan=2 height=1% valign=top>Do you wish "AutoSearch" option in bookmark? %AUTOS%</td>
+</tr>
+<tr>
+<td colspan=2 height=1% valign=top>%LASTMSG%</td>
+</tr>
+<tr>
+<td align=center valign=bottom>
+<input type=button onClick="showUrl();" style="width:200px" value=" prepare for clipboard ">
+</td>
+<td align=center valign=bottom>
+<input type=button name=SAVE onClick="document.forms[0].submit()" style="width:200px" value=" add bookmark to MyW5Base ">
+</table>

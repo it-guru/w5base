@@ -1,0 +1,7 @@
+'tsacinv::costcenter'=>{de=>'AssetCenter Kostenstellen/CO-Nummern',
+                        en=>'AssetCenter CostCenter'},
+'fieldgroup.default'=>{de=>'Kostenstellendaten',
+                       en=>'CostCenter data'},
+'CostCenter-No.'=>{de=>'Kostenstellennummer'},
+'Center-Code'=>{de=>'Kostenstellencode'},
+'Description'=>{de=>'Beschreibung'},

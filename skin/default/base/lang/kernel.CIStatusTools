@@ -1,0 +1,109 @@
+'you are not authorized to set this state, please wait for activation'=>{
+    de=>'Sie sind nicht berechtig, diesen Status zu setzen - bitte warten Sie auf die Aktivierung'},
+'you are not authorized to set this state, please set state to "requested"'=>{
+    de=>'Sie sind nicht berechtig, diesen Status zu setzen - bitte setzen Sie den Status "angefordert"'},
+"you are only authorized to add in 'order' or 'reserved' state"=>{
+    de=>"Sie sind nur berechtigt, Daten im Status 'angefordert' oder 'reserviert' hinzuzufügen"},
+'you are not authorized to set this state'=>{
+    de=>'Sie sind nicht berechtig, diesen Status zu setzen'},
+'you are not authorized to create items with this state'=>{
+    de=>'Sie sind nicht berechtig, Einträge in diesem Status zu erzeugen'},
+'current state of the requested CI'=>{
+    de=>'aktueller Status des angeforderten CI'},
+"Request to activate '\%s' in module '\%s'"=>{
+    de=>"Anforderung zur Aktivierung von '\%s' für das Modul '\%s'"},
+"Reservation confirmation for '\%s' in module '\%s'"=>{
+    de=>"Reservierungs-Bestätigung für '\%s' im Modul '\%s'"},
+"Activation notification for '\%s' in module '\%s'"=>{
+    de=>"Aktivierung durchgeführt für '\%s' im Modul '\%s'"},
+"Drop notification for '\%s' in module '\%s'"=>{
+    de=>"Löschungsbenachrichtigung für '\%s' im Modul '\%s'"},
+'MSG001'=>{en=>'From %s was requested to activate the config item "%s".
+
+ %s
+
+Please check the config item to "installed/activ" if
+it is ok.
+
+The complet list of config items of type "%s" can
+be viewed by 
+
+  %s
+
+The requestor is automaticly informed by email about
+your changes.
+',de=>'Von %s wurde hiermit angefordert, dass 
+Config-Item "%s" zu aktivieren.
+
+ %s
+
+Bitte prüfen Sie das Config-Item und setzen Sie den
+CI-Status bei erflogreicher Prüfung auf "installiert/aktiv".
+
+Die vollständige Liste der Config-Items vom Typ "%s" können Sie über folgenden Link ...
+
+ %s
+
+... abfragen.
+
+Der o.g. Anforderer wird dann automatisch per E-Mail
+über die Aktiverung informiert.
+'},
+
+'MSG002'=>{en=>'You (%s) have reserved the "%s". For a full usability of this Config-Item, there is need to set it in state "installed/active". You can initiate the activation by settting the CI-State to "requested".
+
+ %s
+
+The complet list of config items of type "%s" can
+be viewed by 
+
+  %s
+
+If you have set the CI-State to "requested" the admin will get a mail with your request. If the admin activates the Config-Item you will get an information by email.
+',de=>'Sie (%s) haben den Config-Eintrag "%s" reserviert. Um diesen Eintrag nutzen zu können, ist es notwendig den Status auf "installiert/aktiv" zu setzen. Sie können die Aktivierung dadurch in die Wege leiten, indem Sie den CI-Status auf "angefordert" ändern. 
+
+ %s
+
+Im Status "reserviert" ist es auch möglich, noch fehlende Informationen (z.B. Telefonnummern, Herstellerbeizeichnungen ...) in dem jeweiligen Config-Item nachzutragen.
+Wen Sie den CI-Status auf "angefordert" ändern, erhält der Admin eine E-Mail über diese Anforderung. Hat dann der Admin den Status auf "installiert/aktiv" geändert, so erhalten sie eine entsprechende Bestätigung.
+
+Die vollständige Liste der Config-Items vom Typ "%s" können Sie über folgenden Link ...
+
+ %s
+
+... abfragen.
+
+'},
+
+'MSG003'=>{en=>'The requested Config-Item "%s" is now installed/active and in this way useable.
+
+ %s
+
+The complet list of config items of type "%s" can
+be viewed by 
+
+  %s
+
+',de=>'Der angeforderte Config-Eintrag "%s" ist nun installiert/aktiv und somit verwendbar.
+
+ %s
+
+Die vollständige Liste der Config-Items vom Typ "%s" können Sie über folgenden Link ...
+
+ %s
+
+... abfragen.
+
+'},
+
+'MSG004'=>{en=>'The Config-Item "%s" has been droped by the admin. If you need detail informations about the reason of this acition, you can contact the admin by answering this mail.
+
+Normal resons are f.e. the naming want correct or the entry already exists by an other name.
+
+',de=>'Das angeforderte Config-Item "%s" wurde durch den Admin gelöscht. Wenn Sie weitere Information über den Grund der Löschung benötigen, so können Sie Ihre Fragen als Antwort auf diese Mail formulieren.
+
+Normale Gründe für eine solche Löschung sind z.B. dass die Namenskonvetionen nicht eingehalten wurden oder das Config-Item existiert bereits unter einem änlichen/anderen Namen.
+
+'},
+
+

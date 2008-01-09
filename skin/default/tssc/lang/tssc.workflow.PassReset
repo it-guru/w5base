@@ -1,0 +1,4 @@
+'tssc::workflow::PassReset'=>{de=>'Passwort Rücksetzung',
+                              en=>'Passwort Reset'},
+'fieldgroup.passresethead'=>{de=>'Passwort Rücksetzungsdaten',
+                             en=>'Password reset data'},

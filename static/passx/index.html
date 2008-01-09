@@ -1,0 +1,148 @@
+<html class=docu>
+<link rel=stylesheet type="text/css" href="../../public/base/load/default.css"></link>
+<link rel=stylesheet type="text/css" href="../../public/passx/load/passx.css"></link>
+<link rel=stylesheet type="text/css" href="style.css"></link>
+<body class=docu>
+
+
+<table border=0 cellpadding=5 width=100%><tr><td colspan=2>
+<p class=gross><u>Password Exchange System - PassX</u></p>
+</td></tr>
+<tr><td valign=top width=45%>
+Jeder Administrator kennt das Problem der zyklischen
+Passwort &Auml;nderung auf den verschiedensten Systemen. An der
+Tatsache das vor allem die Root-Kennung zyklische neue Passworte
+ben&ouml;tigen, kann PassX nichts &auml;ndern. PassX kann aber
+dabei unterst&uuml;tzen, diese Änderungen automatisiert 
+durchzuführen, und die neu gesetzten Passworte dann den 
+jeweiligen Administratorn und Nutzern gezielt auf einem
+sicheren Weg verf&uuml;gbar zu machen.
+
+</td>
+
+<td valign=top align=right rowspan=2>
+<!-- ********************* Block Start ********************************** -->
+<table cellspacing=0 cellpadding=0 border=0>
+<tr>
+<td width=1 height=1 align=center valing=center><img heigth=10 width=10 hspace=0 vspace=0 src="img/teck1.gif"></td>
+<td bgcolor="#b3cbcc" height=1 ><font size=1><img src="img/empty.gif" border=0></td>
+<td width=1 height=1 align=center valing=center><img heigth=10 width=10 hspace=0 vspace=0 src="img/teck2.gif"></td>
+</tr>
+
+<tr>
+<td bgcolor="#b3cbcc" width=1><img src="img/empty.gif" border=0></td>
+<td bgcolor="#b3cbcc" width=310>
+
+<!-- ******* Textblock Start ****** -->
+<table border=0 cellspacing=0 cellpadding=2 width=90%>
+
+<tr>
+<td bgcolor="#b3cbcc"><p><b>PassX Evolution II</b>
+<p>
+PassX ist ein Konzept zur automatischen &Auml;nderung und
+Verteilung von Passworten. Dies kann z.B. für root Kennungen
+oder andere Systemkennungen verwendet werden, bei denen
+ein Passwort zwingend notwendig ist.<br>
+<img src="../../public/passx/load/schloss.gif" align=right border=0>
+Alle Passwort Informationen werden verschl&uuml;sselt abgelegt,
+und einem genau definierten Benutzerkreis zug&auml;glich 
+gemacht. Dieser Schutz ist so effizient, das selbst der
+Administrator des Servers, auf dem die Passwortinformationen
+gespeichert sind, keinen Zugang zu diesen Daten hat.
+</td>
+</tr>
+
+</table>
+<!-- ******* Textblock Ende ******* -->
+
+</td>
+<td bgcolor="#b3cbcc" width=1><img src="img/empty.gif" border=0></td>
+</tr>
+
+<tr>
+<td width=1 height=1 align=center valing=center><img hspace=0 vspace=0 src="img/teck4.gif"></td>
+<td bgcolor="#b3cbcc" height=1 ><img src="img/empty.gif" border=0></td>
+<td width=1 height=1 align=center valing=center><img hspace=0 vspace=0 src="img/teck3.gif"></td>
+</tr>
+</table>
+<!-- ********************* Block Ende *********************************** -->
+
+
+
+</td></tr>
+
+</tr>
+
+<tr>
+<td>
+PassX erf&uuml;llt die h&ouml;chsten Sicherheitsanforderungen
+an den Passwortschutz. Es werden 8 stellige Passworte generiert,
+die Gro&szlig;-/ Kleinschreibung und numerische Werte kombinieren.
+Der Änderungszyklus kann beliebig gew&auml;hlt werden. So sind
+t&auml;glich, w&ouml;chentlich oder monatlich die am einfachsten
+zu konfigurierenden Zyklen - beliebige andere Zyklen aber jederzeit
+durch den Administrator des jeweigen Servers einstellbar.
+</td>
+</tr>
+
+<tr>
+<td colspan=2>
+Die &Uuml;bertragung der Passworte &uuml;ber das TCP/IP Netz
+an einen zentralen Punkt (PassX-Server) erfolgt RSA-Verschl&uuml;sselt.
+Ein "Mitlauschen" oder "Abh&ouml;ren" der IP-Verbindung ist somit
+zwecklos. Die Abfrage der Passworte vom zentralen PassX Server
+ist nur &uuml;ber einen JavaScript-WEB-Browser m&ouml;glich, auf dem
+im Browser die entschlüsselung der Passwort-Daten statfindet.
+Netztechnischen "Lauschangriffen" wird somit keine Angriffsfl&auml;che 
+geboten.
+
+</td>
+</tr>
+
+<tr>
+<td colspan=2>
+Der gesammte Prozess basiert auf OpenSource Software, und ist 
+somit einem Maximum an Transparenz unterworfen. Durch die Offenlegung
+der Source-Codes ist eine eingehende Pr&uuml;fung auf Sicherheitsprobleme
+durch jeden Programmiere/ Softwarespezialisten möglich. Dieses
+Level an Sicherheit kann durch keine rein kommerziell entwickelte
+Software gehalten werden. Das keinerlei Lizenskosten entstehen, ist dabei
+ein zus&auml;tzlicher angenehmer Nebeneffekt.
+</td>
+</tr>
+
+<tr>
+<td colspan=2>
+<b>Downloads:</b><br>
+<ul>
+<li><a href="../../public/passx/io/ChangePassword">PassX Commandline-Client</a>
+</ul>
+</td>
+</tr>
+
+<tr>
+<td colspan=2>
+<b>Tips:</b><br>
+
+
+<u>Warnmeldung des Mozilla/Firefox beim Schlüsselgenerieren</u><br>
+Als URL "about:config" eingeben, und dann die Variable <b>dom.max_script_run_time</b> auf 120 Sekunden setzen. Dann sollte der Browser keine Warnmeldung mehr
+erzeugen, dass das Script zu lange läuft.<br>
+<br>
+
+
+<u>Mit ChangePassword Passworte ändern, die als Privat gekennzeichnet sind</u><br>
+Beim Kommando ChangePassword die Option --entrytypeid 11 mitgeben!<br>
+<br>
+
+
+
+</td>
+</tr>
+
+
+
+</table>
+
+</body>
+</html>

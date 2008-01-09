@@ -1,0 +1,2 @@
+'base::userlogon'=>{de=>'Benutzeranmeldung',en=>'Userlogon'},
+'fieldgroup.default'=>{de=>'Logon Daten',en=>'Logon Data'},

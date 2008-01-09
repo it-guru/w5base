@@ -1,0 +1,15 @@
+table.HtmlDetail{
+   width:100%;
+   height:100%;
+   padding:0px;
+   margin:0px;
+   background:#eaeaea;
+}
+
+body{
+   margin:0px;
+   padding:0px;
+   border-width:0px;
+   overflow:hidden;
+   background:#eaeaea;
+}

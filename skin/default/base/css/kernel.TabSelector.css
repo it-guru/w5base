@@ -1,0 +1,94 @@
+div.ModeSelect{
+   border-width:0;
+   padding:0;
+   margin:0;
+   width:100%;
+}
+
+table.ModeSelect{
+   border-width:0;
+   padding:0;
+   margin:0;
+   margin-top:2px;
+   width:100%;
+}
+
+td.ModeSelectInactiv{
+   background:blue;
+   padding-left:5px;
+   background:#dadada;
+   border-color:gray;
+   border-style:solid;
+   border-width:1px;
+   border-bottom-color:black;
+   border-bottom-style:solid;
+   border-bottom-width:1px;
+}
+
+td.ModeSelectActiv{
+   background:blue;
+   padding-left:5px;
+   background:#eaeaea;
+   border-color:black;
+   border-style:solid;
+   border-width:1px;
+   border-bottom-color:#eaeaea;
+   border-bottom-style:solid;
+   border-bottom-width:1px;
+}
+
+td.ModeSelectSep{
+   width:6px;
+   border-color:black;
+   border-bottom-style:solid;
+   border-bottom-width:1px;
+}
+
+td.ModeSelectFillup{
+   border-color:black;
+   border-bottom-style:solid;
+   border-bottom-width:1px;
+}
+
+td.ModeSelectPageArea{
+   border-color:black;
+   border-style:none;
+   border-bottom-style:solid;
+   border-bottom-width:1px;
+   border-left-style:solid;
+   border-left-width:1px;
+   background:#eaeaea;
+}
+
+a:link.ModeSelectFunctionLink,a:visited.ModeSelectFunctionLink,a:active.ModeSelectFunctionLink    {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:#16305e;
+          }
+
+
+a:link.ModeSelectActiv    {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:#16305e;
+          }
+a:visited.ModeSelectActiv {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:#16305e;
+          }
+a:active.ModeSelectActiv  {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:#16305e;
+          }
+
+a:link.ModeSelectInactiv,
+a:visited.ModeSelectInactiv,
+a:active.ModeSelectInactiv    {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:#26507e;
+          }
+
+

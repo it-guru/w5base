@@ -1,0 +1,7 @@
+'tsacinv::service'=>{de=>'AssetCenter Service/Leistung',en=>'AssetCenter Service'},
+'fieldgroup.default'=>{de=>'Service/Leistung',en=>'Service'},
+'Ammount'=>{de=>'Menge/Anzahl'},
+'Service Name'=>{de=>'Leistungsbez.'},
+'Service Type'=>{de=>'Leistungsart'},
+'Service Description'=>{de=>'Leistungsbeschreibung'},
+'Unit'=>{de=>'Einheit'},

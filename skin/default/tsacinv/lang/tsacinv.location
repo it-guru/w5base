@@ -1,0 +1,8 @@
+'tsacinv::location'=>{de=>'AssetCenter Standort',en=>'AssetCenter Location'},
+'Fullname'=>{de=>'Standortname',en=>'Locationname'},
+'fieldgroup.default'=>{de=>'Standortdaten',en=>'Location data'},
+'fieldgroup.location'=>{de=>'Standort', en=>'Location'},
+'fieldgroup.map'=>{de=>'Karte', en=>'Map'},
+'Location'=>{de=>'Ort'},
+'Street'=>{de=>'Strasse'},
+'ZIP'=>{de=>'PLZ'},

@@ -1,0 +1,45 @@
+a:link.filelink , a:visited.filelink , a:active.filelink {
+   font-family:Arial,Adobe Helvetica,Helvetica;
+   text-decoration:none;
+   color:#16305e;
+}
+div.FileList{
+   width:100%;
+   margin-top:2px;
+   margin-left:2px;
+   border:solid;
+   border-color:black;
+   border-width:1px;
+   background:#DDDDDD;
+}
+div.FileListModeLine{
+   width:100%;
+   background:#95b5ef;
+   border-bottom:solid;
+   border-color:black;
+   border-width:1px;
+}
+div.FileListModeWork{
+   width:100%;
+}
+a:link.FileListMode {
+   font-family:Arial,Adobe Helvetica,Helvetica;
+   text-decoration:none;
+   color:#16305e;
+   margin-left:5px;
+   margin-right:5px;
+}
+a:visited.FileListMode {
+   font-family:Arial,Adobe Helvetica,Helvetica;
+   text-decoration:none;
+   color:#16305e;
+   margin-left:5px;
+   margin-right:5px;
+}
+a:active.FileListMode {
+   font-family:Arial,Adobe Helvetica,Helvetica;
+   text-decoration:none;
+   color:#16305e;
+   margin-left:5px;
+   margin-right:5px;
+}

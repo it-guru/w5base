@@ -1,0 +1,20 @@
+div.ViewEditor{
+   height:230px;
+   width:100%;
+   border-width:0;
+}
+div.ViewEditorMain{
+   height:100%;
+   margin:5px;
+   margin-top:1px;
+   border-width:1px;
+   border-style:solid;
+   background:#dadada;
+}
+select.ViewFieldSelect,div.FullFieldTreeSelect{
+   height:120;
+   overflow:auto;
+   border-width:1px;
+   border-style:solid;
+   background:white;
+}

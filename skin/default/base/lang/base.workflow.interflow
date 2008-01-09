@@ -1,0 +1,14 @@
+'base::workflow::interflow'=>{de=>'Interner Auftrag/Ablauf',
+                             en=>'Internal Order/Flow'},
+
+'base::workflow::interflow::tip'=>{ 
+             de=>'<iframe class=tip src=http://www.google.de></iframe>',
+             en=>'<iframe class=tip src=http://www.leo.org></iframe>',
+},
+
+'Description'=>{de=>'Detail Beschreibung',en=>'long description'},
+'note'=>{de=>'Notiz'},
+'takeover'=>{de=>'Übernahme'},
+'forwardto'=>{de=>'Weitergeleitet'},
+'wfclose'=>{de=>'Abgeschlossen'},
+'wffinish'=>{de=>'Beendet'},

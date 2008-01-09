@@ -1,0 +1,14 @@
+This is the debian package for the RPC::Smart module.
+It was created by Vogler Hartmut <it@guru.de> using dh-make-perl.
+
+This copyright info was automatically extracted from the perl module.
+It may not be accurate, so you better check the module sources
+if don't want to get into legal troubles.
+
+The upstream author is: 
+
+Vogler Hartmut          hartmut.vogler@t-systems.com
+
+Copyright (c) 2006 All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself..

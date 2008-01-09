@@ -1,0 +1,29 @@
+<table border=0 height=100% width=100%>
+<tr>
+<td valign=top align=center>
+<br>
+<br>
+<hr width=80%>
+<p>
+Sie sind derzeit nicht angemeldet! Diverse Funktionen in dieser WEB-Anwendung<br>
+sind nur möglich, wenn Sie sich Authentifiziert/Angemeldet haben.<br>
+Die Anmeldung ins W5Base Framework erfolgt mit Ihrem "normalen" WindowsNT <br>
+Domain Account oder der WhoIsWho Kennung. Wenn Sie z.B. Ihren Account <br>
+Mueller.Hans in der SUED3 Domain haben geben Sie sued3/mueller.hans (oder <br>
+z.B. wiw/hmueller für die WhoIsWho Anmeldung) als Anmeldename ein. <br>
+Achten Sie darauf, dass alles kleingeschrieben ist.<br>
+<br>
+<hr width=80%>
+Um fortzufahren klicken Sie bitte auf Login.<br>
+<p><b>
+<script language="JavaScript">
+function dologin()
+{
+   parent.parent.parent.document.location.href="../../../auth/base/menu/root";
+}
+</script>
+<input type=button style="width:200px" value=" Login " onclick="dologin();">
+<br>
+</td>
+</tr>
+</table>

@@ -1,0 +1,31 @@
+Source: libipc-smart-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 4.0.2)
+Build-Depends-Indep: perl (>= 5.8.0-7)
+Maintainer: Vogler Hartmut <it@guru.de>
+Standards-Version: 3.6.1
+
+Package: libipc-smart-perl
+Architecture: any
+Depends: ${perl:Depends}, ${shlibs:Depends}, ${misc:Depends}, 
+Description:  Shm interface to talk between parent and daughter processes
+ IPC::Smart provides a very smart interface to shared memory, allowing
+ data to be efficiently communicated between processes.  It is derived
+ from the module IPC::ShareLite.
+ .
+ System must support SysV IPC (shared memory and semaphores) in order to 
+ use this module.
+ .
+ IPC::Smart provides an abstraction of the shared memory and
+ semaphore facilities of SysV IPC, allowing the storage of arbitrarily
+ large data; the module automatically acquires and removes shared memory
+ segments as needed.  Storage and retrieval of data is atomic, and
+ locking functions are provided for higher-level synchronization.
+ .
+ In many respects, this module is similar to IPC::Shareable.  However,
+ IPC::Smart does not provide a tied interface, does not 
+ (automatically) allow the storage of variables, and is written in C
+ for additional speed.
+ .
+ This description was automagically extracted from the module by dh-make-perl.

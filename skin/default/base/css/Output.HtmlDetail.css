@@ -1,0 +1,280 @@
+div.detailframe{
+   width:99%;
+   border-style:solid;
+   border-width:1px;
+   margin:0px;
+   margin-bottom:1px;
+   background:#eeeeee;
+}
+div.sublist{
+   width:99%;
+   border-style:none;
+   font-weight:normal;
+}
+table.detailframe{
+   border-style:none;
+   border-spacing:0px;
+   border-collapse:collapse;
+   margin:0px;
+   padding:0px;
+   width:100%;
+}
+
+div.detailbottomline{
+   font-size:9px;
+   text-align:right;
+   margin-right:10px;
+   display:none;
+}
+
+div.detailtopline{
+   width:99%;
+   border-style:solid;
+   border-width:1px;
+   margin:0px;
+   padding:0px;
+   margin-bottom:1px;
+   background:#8faee7;
+   background:#30579f;
+   font-weight:bold;
+}
+td.detailtopline{
+   padding-right:4px;
+   padding-left:4px;
+}
+p.detailtoplineobj{
+   color:white;
+   font-weight:bold;
+}
+p.detailtoplinename{
+   color:white;
+}
+
+div.detailfieldspec{
+   padding:2px;
+   font-size:12px;
+   font-weight:normal;
+   text-decoration:none;
+   width:250px;
+   position:absolute;
+   border-style:outset;
+   border-wdith:2px;
+   overflow:visible;
+   white-space:normal;
+   word-wrap: normal;
+   background:#fffeeb;
+   visible:hidden;
+   display:none;
+   margin-top:18px;
+}
+
+
+div.detailgroupspec{
+   padding:2px;
+   font-size:11px;
+}
+div.detailheadline{
+   width:auto;
+   border-bottom-style:solid;
+   border-bottom-width:2px;
+   background:#a0bbed;
+}
+td.detailheadline{
+   font-weight:bold;
+   padding-right:4px;
+   padding-left:4px;
+}
+hr.detailseperator{
+   width:50%;
+   margin-top:20px;
+   margin-bottom:20px;
+   height:5px;
+   background-color:#000000;
+}
+
+#HtmlDetail{
+   width:100%;
+   height:100%;
+   overflow:visible;
+   padding:0px;
+   margin:0px;
+   background:#eaeaea;
+}
+
+body{
+   margin:0px;
+   xmargin-left:4px;
+   padding:0px;
+   border-width:0px;
+}
+
+div.detailfunctions{
+   margin:0px;
+   padding:0px;
+}
+div.multilinehtml{
+   height:204px;
+   overflow:auto;
+   padding:2px;
+   width:99%;
+   margin:0px;
+   margin-bottom:2px;
+   xfont-family:monospace,Courier New,Adobe Courier,Courier; // geht nicht!
+   font-size:11px;
+   color:black;
+   font-weight:400;
+   border-width:1px;
+   border-style:solid;
+   text-overflow:clip;
+}
+div.workflowmultilinetext{
+   height:auto;
+   overflow:hidden;
+   padding:0px;
+   width:100%;
+   margin:0px;
+   border-width:0px;
+   border-style:solid;
+   text-overflow:clip;
+}
+div.multilinetext{
+   height:104px;
+   overflow:auto;
+   padding:2px;
+   width:99%;
+   margin:0px;
+   margin-bottom:2px;
+   border-width:1px;
+   border-style:solid;
+   text-overflow:clip;
+}
+pre.multilinetext {
+   margin: 0px;
+   padding: 0px;
+   font-family:monospace,Courier New,Adobe Courier,Courier;
+   font-size:11px;
+   font-weight:400;
+   color:black;
+   white-space: pre-wrap;       /* css-3 should we be so lucky... */
+   white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+   white-space: -pre-wrap;      /* Opera 4-6 ?? */
+   white-space: -o-pre-wrap;    /* Opera 7 ?? */
+   word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+textarea.multilinehtml{
+   height:200px;
+   width:100%;
+   margin:0px;
+   padding:0px;
+   font-weight:300;
+   color:black;
+   background:#ffffff;
+}
+
+textarea.multilinetext{
+   height:96px;
+   width:100%;
+   margin:0px;
+   padding:0px;
+   font-weight:300;
+   font-family:monospace,Courier New,Adobe Courier,Courier;
+   font-size:11px;
+   color:black;
+   background:#ffffff;
+}
+
+img.toplineimage{
+   margin:5px;
+   border-style:outset;
+   border-width:2px
+}
+
+span.readonlyinput{
+   color:gray;
+}
+
+a.detailfunctions:link, a.detailfunctions:visited, a.detailfunctions:active {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:#353534;
+          }
+
+a.detailtopfunctions:link, a.detailtopfunctions:visited,a.detailtopfunctions:active    {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:white;
+            font-weight:bold;
+          }
+
+/*
+   fix für mozilla, da sonst das Laden hängen bleibt (normalerweise sollte
+   in diesplay none drin stehen
+*/
+#popupContainer {
+        display:block;
+}
+
+img.printspacer{
+   display:none;
+   visiblity:hidden;
+   border-width:0;maring:0;padding:0;
+} 
+
+
+
+@media print{
+   img.printspacer{
+      display:block;
+      visiblity:display;
+   } 
+   div.detailbottomline{
+      display:block;
+   }
+
+   textarea.multilinetext{
+      height:auto;
+      background:#ffffff;
+   }
+   textarea.multilinehtml{
+      height:auto;
+      background:#ffffff;
+   }
+   div.multilinetext{
+      height:auto;
+      overflow:visible;
+      border-style:none;
+      background:#ffffff;
+   }
+   div.multilinehtml{
+      height:auto;
+      overflow:visible;
+      background:#ffffff;
+   }
+   div.detailframe{
+      background:#ffffff;
+   }
+   pre.multilinetext{
+      height:auto;
+      overflow:visible;
+   }
+   body{
+      overflow:visible;
+      background:#ffffff;
+   }
+   div.detailfunctions{
+      display:none;
+      visibility:hidden;
+   }
+   td.detailheadline,td.detailtopline{
+      padding-top:3px;
+      padding-bottom:2px;
+   }
+   #HtmlDetail{
+      width:100%;
+      height:100%;
+      overflow:visible;
+   }
+}
+
+

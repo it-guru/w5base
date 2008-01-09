@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+README
+Configure
+config_h.SH
+Makefile.PL
+Smart.pm
+Smart.xs
+smart.h
+smart.c
+samples/test.pl
+samples/hash.pl
+typemap
+TODO
+META.yml                                 Module meta-data (added by MakeMaker)

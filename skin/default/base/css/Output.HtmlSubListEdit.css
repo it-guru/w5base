@@ -1,0 +1,77 @@
+div.editframe{
+   width:100%;
+   border-style:outset;
+   border-width:2px;
+   padding:0px;
+   padding-top:5px;
+   padding-bottom:5px;
+   margin-bottom:4px;
+   background:#dadada;
+}
+div.buttonframe{
+   width:100%;
+   border-style:outset;
+   border-width:2px;
+   padding:0px;
+   margin-bottom:4px;
+   background:#dadada;
+}
+table.editframe{
+   width:100%;
+   border-style:none;
+   border-spacing:0px;
+   border-collapse:collapse;
+   margin:0px;
+   padding:0px;
+}
+table.buttonframe{
+   width:100%;
+   border-style:none;
+   border-spacing:0px;
+   padding:0px;
+   margin:0px;
+}
+
+span.buttontext{
+   line-height:11px;
+}
+td.button{
+   font-size:11px;
+   text-align:center;
+   white-space:normal;
+   line-height:12px;
+   font-weight:bolder;
+}
+div.button{
+   width:80px;
+   height:18px;
+   background:#dadada;
+   overflow:hidden;
+   border-style:outset;
+   border-width:3px;
+   padding:0px;
+   padding-left:2px;
+   padding-left:2px;
+   margin:1px;
+   float:right;
+}
+
+a.button:link    {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:#006666;
+          }
+a.button:visited {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:#006666;
+          }
+a.button:active  {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none; 
+            color:#006666;
+          }
+
+body{
+   background:#eeeeee;
+}

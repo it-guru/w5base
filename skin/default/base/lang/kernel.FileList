@@ -1,0 +1,8 @@
+'File to upload'=>{de=>'Dateiname'},
+'Upload'=>{de=>'hochladen'},
+'FileListMode.DELENT'=>{de=>'Einträge löschen',
+                        en=>'Delete entrys'},
+'FileListMode.FILEADD'=>{de=>'Datei hinzufügen',
+                         en=>'Upload files'},
+'FileListMode.DIRADD'=>{de=>'Verzeichniss hinzufügen',
+                        en=>'Add directory'},

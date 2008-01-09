@@ -1,0 +1,7 @@
+'itil::MyW5Base::efforts'=>
+   {de=>'Tool: Arbeitszeitanalyse - anwendungsbezogen',
+    en=>'Tool: Worktimeanalyse - application related'},
+'fieldgroup.efforts'=>{de=>'Arbeitsaufwand',
+                       en=>'efforts'},
+'Effort real'=>{de=>'erfasster Arbeitsaufwand'},
+'Effort employecount'=>{de=>'Anzahl berücksichtigter Mitarbeiter'},

@@ -1,0 +1,9 @@
+#######################################################################
+'autoname'=>{de=>'
+In diesem Feld kann ein DNS Name oder
+eine IP-Adresse eingetragen werden.
+Von der W5Base wird dieser Name nicht
+verwendet. Er dient als Datenbasis
+für externe Automation.
+'},
+

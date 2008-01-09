@@ -1,0 +1,5 @@
+'question/ info'=>{de=>'Anfrage/ Information'},
+'answer'=>{de=>'Antwort'},
+'UnsubscribeInfo'=>{de=>'Falls Sie diese Benachrichtigung abschalten möchten, klicken Sie bitte auf den obigen Link, und nutzen den Button "InfoAbo"',
+                     en=>'If you want to unsubscribe this messages, click on the above link and use the Button "InfoAbo"'},
+'direct link'=>{de=>'direkt Link'},

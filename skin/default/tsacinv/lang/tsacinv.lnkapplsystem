@@ -1,0 +1,4 @@
+'tsacinv::lnkapplsystem'=>{de=>'System Zuordnung',en=>'System Relation'},
+'fieldgroup.default'=>{de=>'Zuordnungsdaten',en=>'Relationdata'},
+'Parent Application'=>{de=>'Anwendung'},
+'Child System'=>{de=>'System'},

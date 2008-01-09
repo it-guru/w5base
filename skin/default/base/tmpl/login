@@ -1,0 +1,27 @@
+<table border=0 height=80% width=100%>
+<tr>
+<td valign=top align=center>
+<br>
+<br>
+<hr width=80%>
+<p>
+You are not logged in at the moment! Many functions in these application are<br>
+only posible, if you are authenticated<br>
+The login at the W5Base Framework is possible takes place with your "normal" WindowsNT <br>
+Domain Account or the WhoIsWho Login. If you got f.e.  the Account <br>
+Mueller.Hans in the SUED3 Domain, you have to use sued3/mueller.hans (or <br>
+z.B. wiw/hmueller for WhoIsWho) as your loginname at this application. <br>
+<br>
+<hr width=80%>
+To continue please klick at login.<br>
+<script language="JavaScript">
+function dologin()
+{
+   parent.parent.parent.document.location.href="../../../auth/base/menu/root";
+}
+</script>
+<input type=button style="width:200px" value=" Login " onclick="dologin();">
+<br>
+</td>
+</tr>
+</table>

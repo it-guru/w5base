@@ -1,0 +1,63 @@
+body,html,form,table{
+   padding:0px;
+   margin:0px;
+   font-family:Arial,Adobe Helvetica,Helvetica;
+   font-size:12px;
+   text-decoration:none;
+   background-color:white;
+}
+
+#topbar{
+   background-image:url(images/sfx_bg2.png);
+   height:70px;
+}
+#sfxlogo{
+   float:right;
+   margin-top:10px;
+}
+#projectname{
+  padding-top:20px;
+  padding-left:10px;
+  font-weight:bold;
+  font-size:18px;
+}
+#authorname{
+  padding-left:10px;
+  font-size:10px;
+}
+#redbar{
+  background-image:url(images/sfx_tab_main2.png);
+  height:20px;
+}
+div.box{
+  border-style:solid;
+  border-color:gray;
+  border-width:1px;
+  margin:10px;
+}
+div.boxhead{
+  background-image:url(images/boxheadbg.png);
+  padding:2px;
+  padding-bottom:0px;
+  height:35px;
+  font-weight:bold;
+}
+div.boxtext{
+  padding:4px;
+  padding-top:0px;
+}
+ul{
+  padding:0px;
+  margin:0px;
+  margin-left:20px;
+}
+table{
+  padding:0px;
+  margin:0px;
+  border-collapse:collapse;
+}
+a:link.projectlink,a:visited.projectlink,a:active.projectlink{
+  text-decoration:none;
+  color:black;
+}
+

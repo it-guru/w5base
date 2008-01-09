@@ -1,0 +1,3 @@
+'tsacinv::model'=>{de=>'Modell',en=>'Model'},
+'Model'=>{de=>'Modell'},
+'fieldgroup.default'=>{de=>'Modelinformationen',en=>'Modelinformations'},

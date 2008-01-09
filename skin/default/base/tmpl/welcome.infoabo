@@ -1,0 +1,22 @@
+<table width=100% height=70%>
+<tr>
+<td align=center valign=center>
+
+
+<table border=0 cellspacing=5 cellpadding=5>
+<tr>
+<td>
+<img src="../../base/load/infoabo.jpg"
+      style="border-width:1px;border-style:solid;solid;border-color:black">
+</td>
+<td valign=center>
+<div style="border-width:1px;border-top-style:solid;border-bottom-style:solid;border-color:black;padding:3px;width:250px">
+Info-Abos are data sources, witch send information email if the specified events happens. You can deactivate them, if you tempoary don't want this infos.
+</div>
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+</table>

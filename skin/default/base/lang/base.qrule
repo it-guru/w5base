@@ -1,0 +1,3 @@
+'base::qrule'=>{de=>'Qualtiätsregel',en=>'Qualityrule'},
+'fail'=>{de=>'fehlgeschlagen'},
+'messy'=>{de=>'unschön'},

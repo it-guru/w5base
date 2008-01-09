@@ -1,0 +1,183 @@
+body{
+   padding:0px;
+   margin:0px;
+   overflow:hidden;
+}
+select.newworkflow{
+   width:99%;
+   height:99%;
+
+}
+div.newworkflowtip{
+   width:99%;
+   height:200px;
+   overflow:auto;
+   xborder-style:solid;
+   xborder-width:1px;
+}
+
+input.workflowbutton{
+   background:#dadada;
+   overflow:hidden;
+   border-style:outset;
+   border-width:3px;
+   padding:0px;
+   padding-left:2px;
+   padding-left:2px;
+   margin:1px;
+   margin-left:5px;
+   margin-right:5px;
+   width:190px;
+}
+
+div.multilinetext{
+   height:104px;
+   overflow:auto;
+   padding:2px;
+   width:99%;
+   margin:0px;
+   margin-bottom:2px;
+   font-family:monospace,Courier New,Adobe Courier,Courier;
+   font-size:11px;
+   color:black;
+   font-weight:400;
+   border-width:1px;
+   border-style:solid;
+   text-overflow:clip;
+}
+textarea.multilinetext{
+   height:96px;
+   xoverflow:auto;
+   width:100%;
+   margin:0px;
+   padding:0px;
+   font-weight:300;
+   font-family:monospace,Courier New,Adobe Courier,Courier;
+   font-size:11px;
+   color:black;
+   background:#ffffff;
+}
+
+div.Question{
+   border-width:1px;border-style:solid;padding:5px;margin:10px;
+   background:silver
+}
+div.LastMsg{
+   height:18px;
+   width:100%;
+   border-left-width:1px;
+   border-left-style:solid;
+   border-right-width:1px;
+   border-right-style:solid;
+   border-bottom-width:1px;
+   border-bottom-style:solid;
+   border-width:1px;
+   border-style:solid;
+   margin:0px;
+   padding:0px;
+   padding-left:5px;
+   background:white;
+   overflow:hidden;
+}
+
+div.ProcessHandler{
+  width:100%;
+  height:50;
+  border-style:none;
+  border-width:0px;
+  margin:0px;
+  padding:0px;
+}
+div.WorkArea{
+   border-style:solid;
+   border-width:1px;
+   border-width:0px;
+   width:100%;
+   overflow:auto;
+   margin:0px;
+   padding:0px;
+}
+
+div.WorkBorder{
+   xbackground:#8dafb5;
+   background:#b0bdcc;
+   width:100%;
+   overflow:hidden;
+   margin:0;
+   padding:0;
+   border-width:0
+   xborder-top-width:1px;
+   xborder-top-style:solid;
+   xborder-top-color:black;
+}
+
+iframe.ProcessWindow{
+   width:100%;
+   xborder-style:solid;
+   xborder-color:black;
+   border-width:0px;
+   xborder-style:inset;
+   overflow:hidden
+   height:5px;
+   margin:0px;
+}
+
+iframe.tip{
+   width:99%;
+   border-style:solid;
+   border-color:black;
+   border-style:inset;
+   overflow:hidden
+   height:40px;
+   margin:0px;
+   padding:0px;
+}
+
+
+div.emailpreview{
+   padding:4px;
+}
+table.emailpreview{
+   width:100%;
+   background:#ffffff;
+   border-width:1px;
+   border-style:solid;
+   border-color:gray;
+}
+table.emailpreviewset{
+   width:100%;
+   border-width:1px;
+   border-style:solid;
+   border-color:gray;
+   border-collapse:collapse;
+}
+td.emailpreviewemailprefix{
+   background:#f0f0f0;
+   width:121px;
+   vertical-align:top;
+   font-size: 10px;
+}
+td.emailpreviewemailtext{
+   background:#fbfbfb;
+   vertical-align:top;
+}
+td.emailpreviewemailsubheader{
+   border-style:none;
+   font-size: 5px;
+}
+
+pre.emailpreview {
+   margin: 0px;
+   padding: 4px;
+   padding-bottom: 6px;
+   font-family:Courier New,Courier;
+   font-size:10px;
+   white-space: pre-wrap;       /* css-3 should we be so lucky... */
+   white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+   white-space: -pre-wrap;      /* Opera 4-6 ?? */
+   white-space: -o-pre-wrap;    /* Opera 7 ?? */
+   word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+
+

@@ -1,0 +1,89 @@
+#!/usr/bin/env perl
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/../mod";
+use RPC::Smart::Client;
+use Data::Dumper;
+use strict;
+use kernel;
+use kernel::config;
+use kernel::EventController;
+use Getopt::Long;
+use kernel::cgi;
+use vars qw($opt_v $opt_h $opt_c $configname);
+
+exit(1) if (!GetOptions('verbose'=>\$opt_v,
+                        'debug'=>\$opt_v,
+                        'help'=>\$opt_h,
+                        'config=s'=>\$opt_c));
+
+if ($opt_v){
+   $W5V2::Debug=1;
+}
+else{
+   $W5V2::Debug=0;
+}
+if ($opt_c eq ""){
+   $opt_c="w5server";
+}
+$configname=$opt_c;
+
+my %ClientParam=();
+
+my $curconfig=new kernel::config();
+
+if (!$curconfig->readconfig("$FindBin::Bin/..",$configname)){
+   msg(ERROR,"can't read configfile '%s'",$configname);
+   exit(1);
+}
+
+my $user=$curconfig->Param('DATAOBJUSER');
+my $connect=$curconfig->Param('DATAOBJCONNECT');
+my $pass=$curconfig->Param('DATAOBJPASS');
+
+if (ref($user) ne "HASH" || ref($pass) ne "HASH" || ref($connect) ne "HASH"){
+   msg(ERROR,"config structure problem in DATAOBJUSER,DATAOBJPASS ".
+             "or DATAOBJCONNECT");
+   exit(1);
+}
+my $dbuser=$user->{w5base};
+my $dbpass=$pass->{w5base};
+my $dbconnect=$connect->{w5base};
+if (!defined($dbuser) || $dbuser eq "" ||
+    !defined($dbpass) || $dbpass eq "" ||
+    !defined($dbconnect) || $dbconnect eq ""){
+   msg(ERROR,"DATAOBJUSER,DATAOBJCONNECT or DATAOBJPASS for dataobj ".
+             "w5base problem");
+   exit(1);
+}
+my $dbname;
+my $dbhost="localhost";
+if (my ($db)=$dbconnect=~m/^dbi:mysql:[^:]+:(.*)$/i){
+   if (my ($dbh)=$db=~m/hostname=([^:]+)/){
+      $dbhost=$dbh;
+   }
+   else{
+      $dbhost=$db;
+   }
+}
+if (my ($db)=$dbconnect=~m/^dbi:mysql:([^:]+)$/i){
+   $dbname=$db;
+}
+msg(WARN,"using host '%s' and database '%s' for object w5base",$dbhost,$dbname);
+msg(WARN,"using user '%s' and password '%s' for object w5base",$dbuser,$dbpass);my $cmd=<<EOF;
+delete from user where user='$dbuser' and host='$dbhost';
+insert into user (user,host,password)
+            values('$dbuser','$dbhost',password('$dbpass'));
+delete from db where host='$dbhost' and db='$dbname' and user='$dbhost';
+insert into db (host,db,user,
+                Select_priv,Insert_priv,Update_priv,Delete_priv,
+                Create_priv,Drop_priv,Index_priv,Alter_priv,
+                Create_tmp_table_priv,Lock_tables_priv)
+            values('$dbhost','$dbname','$dbuser',
+                   'Y','Y','Y','Y','Y','Y','Y','Y','Y','Y');
+flush privileges;
+EOF
+print "\n".$cmd;
+
+
+   

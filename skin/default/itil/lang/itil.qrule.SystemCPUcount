@@ -1,0 +1,3 @@
+'itil::qrule::SystemCPUcount'=>{de=>'Anzahl CPUs eines logischen Systems',
+                                en=>'CPU count of a logical system'},
+'no cpu count defined'=>{de=>'keine CPU Anzahl definiert'},

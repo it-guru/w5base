@@ -1,0 +1,33 @@
+<table border=0 width=100% height=100%>
+<tr>
+<td align=center valign=top><br><br><br>
+<div style="border-width:2px;padding:5px;background:#bbe1b6;border-style:outset;width:500px">
+<table border=0>
+<tr>
+<td>
+%TRANSLATE(MSG001)%
+</td>
+</tr>
+<tr>
+<td align=center><br><br>
+<table border=0>
+<tr>
+<td>%TRANSLATE(MSG002)%:</td>
+<td><input type=text size=40 name=email value="%email%"></td>
+</td>
+</tr>
+<tr>
+<td colspan=2 align=right><br>
+<input type=submit name=save value=" %TRANSLATE(MSG003)% ">
+</td>
+</tr></table></td>
+<tr>
+<td align=left>%LASTMSG%&nbsp;</td>
+</td>
+</tr>
+</table>
+</div>
+</td>
+</tr>
+</table>
+

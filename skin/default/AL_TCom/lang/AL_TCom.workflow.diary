@@ -1,0 +1,12 @@
+'AL_TCom::workflow::diary'=>{de=>'AL T-Com: Betriebstagebuch',
+                             en=>'AL T-Com: Diary'},
+'AL_TCom::workflow::diary::tip'=>{
+              de=>'Das Betriebstagebuch dient zur Dokumentation von '.
+                  'Projektarbeiten oder allgemeinen Veränderungen '.
+                  'in bestimmten Anwendungen. Für die AL-T-Com müssen '.
+                  'im speziellen die P800 relevanten Aufwände '.
+                  'dokumentiert werden.',
+                  },
+
+'Application'=>{de=>'Anwendung'},
+'Worktime'=>{de=>'Arbeitszeit'},

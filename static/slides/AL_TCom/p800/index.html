@@ -1,0 +1,388 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<title>P800 HowTo</title>
+<!-- configuration parameters -->
+<meta name="defaultView" content="outline" content="slideshow" />
+<meta name="controlVis" content="visible" />
+<!-- style sheet links -->
+<link rel="stylesheet" href="../../base/ui/default/base.css" 
+      type="text/css" />
+<link rel="stylesheet" href="../../base/ui/default/slides.css" 
+      type="text/css" media="projection" id="slideProj" />
+<link rel="stylesheet" href="../../base/ui/default/outline.css" 
+      type="text/css" media="screen" id="outlineStyle" />
+<link rel="stylesheet" href="../../base/ui/default/print.css" 
+      type="text/css" media="print" id="slidePrint" />
+<link rel="stylesheet" href="../../base/ui/default/opera.css" 
+      type="text/css" media="projection" id="operaFix" />
+<!-- S5 JS -->
+<script src="../../../firebug/firebug.js"     type="text/javascript"></script>
+<script src="../../base/ui/default/slides.js" type="text/javascript"></script>
+</head>
+<body scroll=auto> <!-- verhinder "geister" scrollbars -->
+
+<div class="layout">
+<div id="controls"><!-- DO NOT EDIT --></div>
+<div id="currentSlide"><!-- DO NOT EDIT --></div>
+<div id="header"></div>
+<div id="footer">
+<h2>DTAG.TSI.ES.ITO.CSS.T-Com.QSM.QSO - W5Base/Darwin - HowTo P800 @ darwin.telekom.de</h2>
+<h1>02.01.2007 - Vogler Hartmut</h1>
+</div>
+<div id="screenshot"><!-- DO NOT EDIT --></div>
+</div>
+
+<div class="presentation">
+
+<div class="slide">
+<h1>W5Base/Darwin HowTo P800</h1>
+<h3>Nutzungshinweise zur Realisation von P800</h3>
+<h4>Stand: 12/2006</h4>
+</div>
+
+
+
+<div class="slide">
+<h1>Grundsätzliche Verfahrensweise</h1>
+<ul>
+<li><a href="#slide2">Changes</a>/<a href="#slide4">Incidents</a> werden über ServiceCenter eingegeben/bearbeitet</li>
+<li><a href="#slide6">Betriebstagebuch-Einträge (BTB)</a> werden über die Darwin-Oberfläche eingegeben/bearbeitet</li>
+<li>Für Changes und Incidents muß eine "Nachbehandlung" in <a href="http://darwin.telekom.de" target=_blank>http://darwin.telekom.de</a> durchgeführt werden</li>
+<li>Aus dem Config-Management der W5Base/Darwin (bzw. CMDB) werden die notwendigen Daten (z.B. Schnittstellen) ausgelesen</li>
+<li>Bis zum letzten Tag des folgenden Monats werden automatisch die P800-Reports (Workflows) erzeugt(und tgl. aktualisiert).</li>
+</ul>
+<div class="handout">
+<p>
+Aktuell ist es so, dass <b>1xtäglich</b> alle 
+<b>Config-Informationen</b> aus der W5Base/CMDB
+in die Datenbank von W5Base/Darwin <b>kopiert</b> werden, 
+d.h. alle Informationen die
+in der CMDB geändert werden, stehen im P800 Report erst mit 
+<b>24h Verzögerung</b>
+zur Verüfung.
+</p>
+<p>
+Derzeit ist noch <b>nicht geklärt</b> wie die 
+<b>P800 Reports an den Kunden ausgeliefert</b>
+werden sollen. Es wird angestrebt, dass diese direkt in der Darwin-Oberfläche
+eingesehen werden können (änlich wie dies bei CoD der Fall war/ist).
+</p>
+<p>
+Aktuell müssen die <b>P800 Reports</b> über den entsprechenden Menüpunkt unter 
+MyW5Base durch den SeM abgefragt werden, und dann <b>manuell</b> 
+(z.B. als Excel) 
+<b>an den Kunden ausgegeben</b> werden.
+</p>
+<p>
+Im Gegensatz zu CoD werden bei den P800 Report die Config-Daten <b>immer</b>
+aus dem <b>aktuellen Stand</b> verwendet, d.h. wird eine Anpassung in den 
+<b>Configdaten</b> vorgenommen (z.B. SeM geändert), so bezieht sich 
+diese Änderung der Rechte automatisch auf <b>alle</b> Reports - egal 
+welcher Monat.
+</div>
+</div>
+
+
+
+<div class="slide">
+<h1>Changes</h1>
+ <table cellspacing=10>
+  <tr>
+   <td class=numcol>1.</td>
+   <td colspan=2>Changes werden über die Seite
+       <a href="http://qso.telekom.de" target=_blank>http://qso.telekom.de</a>
+       beantragt (Stand&nbsp;12/2006).</td>
+  </tr>
+  <tr>
+   <td class=numcol>2.</td>
+   <td>P800 Daten des Changes werden automatisch mit Default-Werten 
+       (basierend auf den ServiceCenter Daten) in
+       Darwin vorbelegt. Alle Changes aus ServiceCenter
+       werden somit automatisch in Darwin sichtbar.</td>
+   <td class=screenshot>
+       <img class=screenshot 
+            onclick="ShowScreenshot(this,'p800-change-shot1.jpg');"
+            src="p800-change-shot1.thumpnail.jpg">
+   </td>
+  </tr>
+  <tr>
+   <td class=numcol>3.</td>
+   <td colspan=2>Nach Fertigmeldung des Changes kann die Nachbearbeitung 
+                 in Darwin durchgeführt werden. Die Aktualisierung der
+                 Vorbelegung ist in der Nachbearbeitung abgeschalten.
+   </td>
+  </tr>
+ </table>
+<div class="handout">
+<p>
+Es ist absolut wichtig, dass die Anwendungsnamen bei manueller Eingabe
+des Changes in ServiceCenter korrekt eingetragen werden. Es ist nicht
+vorgesehen, dass diese Zuordnung im Nachhinein geändert werden kann, wenn
+der Change erst einmal abgeschlossen ist.
+</p>
+</div>
+</div>
+
+
+
+<div class="slide">
+<h1>P800 Changeparameter</h1>
+<ol>
+<li><b>Relevant:</b><p>Alle Changes die nicht mit "Ja" gekennzeichnet wurden, werden bei der Zählung ignoriert.</p></li>
+<li><b>Anlass:</b><p>Zu statistischen Zwecken wird der Change nach verschiedenen Anlässen eingestuft.</p></li>
+<li><b>Bemerkungen:</b>
+<p>In diesem Feld werden Besonderheiten bei der Ausführung des Changes vermerkt (z.B. mangelhafte Softwarelieferung)</p></li>
+<li><b>Downtime Start/End:</b>
+<p>In diesem Zeitraum stand die Anwendung dem Kunden nicht zur
+Verfügung</p></li>
+<li><b>Arbeitszeit:</b>
+<p>In diesem Feld <b>muß</b> die Arbeitszeit für den Change incl. Vor- und
+Nacharbeiten festgehalten werden.</p></li>
+</ol>
+</div>
+
+
+
+<div class="slide">
+<h1>Incidents</h1>
+ <table cellspacing=10>
+  <tr>
+   <td class=numcol>1.</td>
+   <td colspan=2>Incidents werden im ServiceCenter eingegeben und bearbeitet
+   </td>
+  </tr>
+  <tr>
+   <td class=numcol>2.</td>
+   <td>P800 Daten des Incidents werden automatisch nach Abschluß des
+       Incidents mit Default-Werten 
+       (basierend auf den ServiceCenter Daten) in
+       Darwin vorbelegt. Alle Incidents aus ServiceCenter
+       werden somit automatisch in Darwin sichtbar. Voraussetzung
+       dafür ist, dass eine gültige Anwendung im Feld SoftwareID
+       eingetragen wurde.</td>
+   <td class=screenshot>
+       <img class=screenshot 
+            onclick="ShowScreenshot(this,'p800-incident-shot1.jpg');"
+            src="p800-incident-shot1.thumpnail.jpg">
+   </td>
+  </tr>
+ </table>
+<div class="handout">
+<p>
+Es ist absolut wichtig, dass die Anwendungsnamen bei manueller Eingabe
+des Incidents in ServiceCenter korrekt eingetragen werden. Es ist nicht
+vorgesehen, dass diese Zuordnung im Nachhinein geändert werden kann, wenn
+das Incident erst einmal abgeschlossen ist.
+</p>
+<p>
+Es wäre sinnvoll, wenn die Felder "Work Start" und "Work End" im ServiceCenter
+gefüllt werden würden. Derzeit ist das in allen meinen Stichproben nicht
+der Fall gewesen.
+</p>
+</div>
+</div>
+
+
+
+<div class="slide">
+<h1>P800 Incidentparameter</h1>
+<ol>
+<li><b>Relevant:</b><p>Alle Incidents die nicht mit "Ja" gekennzeichnet wurden, werden bei der Zählung ignoriert.</p></li>
+<li><b>Bemerkungen:</b>
+<p>In diesem Feld werden Besonderheiten bei der Bearbeitung des Incidents vermerkt (z.B. schlechte Zuarbeit des Kunden)</p></li>
+<li><b>Downtime Start/End:</b>
+<p>In diesem Zeitraum stand die Anwendung dem Kunden nicht zur
+Verfügung</p></li>
+<li><b>Arbeitszeit:</b>
+<p>In diesem Feld <b>muß</b> die Arbeitszeit für den Incident incl. Vor- und
+Nacharbeiten festgehalten werden.</p></li>
+</ol>
+<div class="handout">
+<p>
+Die Parameter Downtime Start/End und Arbeitszeit werden bei den Incidents
+rein zu statitischen Zwecken erfasst. Eine konkrete Auswertung für P800
+erfolgt derzeit noch nicht.
+</p>
+</div>
+</div>
+
+
+
+<div class="slide">
+<h1>Betriebstagebuch Workflow (I)</h1>
+ <table cellspacing=10>
+
+  <tr>
+   <td class=numcol>1.</td>
+   <td colspan=1>BTB Workflows können von jedem über "Workflow starten" unter
+                 MyW5Base initiert werden.</td>
+   <td class=screenshot>
+       <img class=screenshot 
+            onclick="ShowScreenshot(this,'btb-step1.jpg');"
+            src="btb-step1.thumpnail.jpg">
+   </td>
+  </tr>
+
+  <tr>
+   <td class=numcol>2.</td>
+   <td colspan=2>Die Kurzbeschreibung des BTW Workflows kann jederzeit
+                 geändert werden (solange der Workflow noch nicht
+                 geschlossen ist).</td>
+  </tr>
+
+  <tr>
+   <td class=numcol>3.</td>
+   <td colspan=2>Werden Notizen an den Workflow hinzugefügt, dann sind
+                 diese weder entfernbar noch korrigierbar.
+                 Die Notizen werden auch nicht in den P800 Reports an
+                 den Kunden herausgegeben.</td>
+  </tr>
+
+ </table>
+</div>
+
+
+
+<div class="slide">
+<h1>Betriebstagebuch Workflow (II)</h1>
+ <table cellspacing=10>
+
+  <tr>
+   <td class=numcol>4.</td>
+   <td colspan=2>Die laufende Bearbeitung des BTW Workflows kann nur
+                 durch den Ersteller durchgeführt werden. Es sei den, dieser
+                 hat "Unterstüzung" hinzugezogen. "Unterstützung" kann
+                 sowohl ein einzelner Mitarbeiter, als auch ein Team sein.</td>
+  </tr>
+
+  <tr>
+   <td class=numcol>5.</td>
+   <td colspan=1>Nach Abschluß des BTW Workflows wird dieser dem TSM
+                 der betroffenen Anwendung zugewiesen. Dieser hat dann
+                 die Möglichkeit die P800 relevanten Parameter zu 
+                 überarbeiten.</td>
+   <td class=screenshot>
+       <img class=screenshot 
+            onclick="ShowScreenshot(this,'btb-mywf.jpg');"
+            src="btb-mywf.thumpnail.jpg">
+   </td>
+  </tr>
+
+ </table>
+<div class="handout">
+ <table cellspacing=10>
+
+
+  <tr>
+   <td class=numcol nowrap><b>Schritt 1:</b></td>
+   <td colspan=1>Auswählen des Menuüunktes MyW5Base
+   </td>
+   <td class=screenshot>
+       <img class=screenshot 
+            onclick="ShowScreenshot(this,'btb-step1.jpg');"
+            src="btb-step1.thumpnail.jpg">
+   </td>
+  </tr>
+
+
+  <tr>
+   <td class=numcol nowrap><b>Schritt 2:</b></td>
+   <td colspan=1>Neuen Workflow starten - Auswahl von AL-T-Com Betriebstagebuch
+   </td>
+   <td class=screenshot>
+       <img class=screenshot 
+            onclick="ShowScreenshot(this,'btb-step2.jpg');"
+            src="btb-step2.thumpnail.jpg">
+   </td>
+  </tr>
+
+
+  <tr>
+   <td class=numcol nowrap><b>Schritt 3:</b></td>
+   <td colspan=1>Kurzbeschreibung und betreffende Anwendung eingeben
+   </td>
+   <td class=screenshot>
+       <img class=screenshot 
+            onclick="ShowScreenshot(this,'btb-step3.jpg');"
+            src="btb-step3.thumpnail.jpg">
+   </td>
+  </tr>
+
+
+  <tr>
+   <td class=numcol nowrap><b>Schritt 4:</b></td>
+   <td colspan=1>laufende Bearbeitung des Workflows:<br>
+                 - Notizen hinzufügen<br>
+                 - Support hinzuziehen oder entfernen<br>
+                 - BTB abschließen<br>
+   </td>
+   <td class=screenshot>
+       <img class=screenshot 
+            onclick="ShowScreenshot(this,'btb-close1.jpg');"
+            src="btb-close1.thumpnail.jpg">
+   </td>
+  </tr>
+
+  <tr>
+   <td class=numcol nowrap><b>Schritt 5:</b></td>
+   <td colspan=1>nach Abschluß des BTB Workflows können die P800 
+                 relevanten Parameter durch den TSM "überarbeitet" werden.
+                 Eine weitere Möglichkeit ist, dass der TSM den Workflow
+                 wieder einem Mitarbeiter zuweißt.
+   </td>
+   <td class=screenshot>
+       <img class=screenshot 
+            onclick="ShowScreenshot(this,'btb-close-tsm-finish1.jpg');"
+            src="btb-close-tsm-finish1.thumpnail.jpg">
+   </td>
+  </tr>
+
+  <tr>
+   <td class=numcol nowrap><b>Schritt 6:</b></td>
+   <td colspan=1>Die Bearbeitung der P800 Parameter kann durch klicken
+                 auf den "bearbeiten" link in der Kopfzeile des P800
+                 Datenblockes in die Wege geleitet werden. Die
+                 Änderungen werden nur gespeichert, wenn nach den Änderungen
+                 auch der "speichern" link angeklickt wird.
+   </td>
+   <td class=screenshot>
+       <img class=screenshot 
+            onclick="ShowScreenshot(this,'btb-close-tsm-finish2.jpg');"
+            src="btb-close-tsm-finish2.thumpnail.jpg">
+   </td>
+  </tr>
+
+  <tr>
+   <td class=numcol nowrap><b>Schritt 7:</b></td>
+   <td colspan=1>Wird der Button "beenden" geklickt, so wird der Workflow
+                 entgültig beendet, d.h. es sind unwiederruflich keinerlei
+                 Änderungen mehr möglich.
+   </td>
+   <td class=screenshot>
+       <img class=screenshot 
+            onclick="ShowScreenshot(this,'btb-close-tsm-finish3.jpg');"
+            src="btb-close-tsm-finish3.thumpnail.jpg">
+   </td>
+  </tr>
+
+
+ </table>
+</div>
+</div>
+
+
+
+<div id=end class="slide">
+<h1><center>- Ende -</center></h1>
+</div>
+
+
+
+</div>
+
+</body>
+</html>

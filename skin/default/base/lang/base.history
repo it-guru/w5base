@@ -1,0 +1,8 @@
+'base::history'=>{de=>'Verlauf',en=>'History'},
+'fieldgroup.default'=>{de=>'Veränderungsdaten',en=>'Modificationdata'},
+'Fieldname'=>{de=>'Feldname'},
+'Dataobject'=>{de=>'Datenobjekt'},
+'Operation'=>{de=>'Operation'},
+'Old State'=>{de=>'alter Zustand'},
+'New State'=>{de=>'neuer Zustand'},
+'Inscription-Date'=>{de=>'Eintragungszeit'},

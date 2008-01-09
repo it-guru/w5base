@@ -1,0 +1,10 @@
+'quantity'=>{de=><<EOF,
+Entsrechend dem jeweiligen Lizenzierungsverfahren (per CPU, per System, 
+per User, ...) der 
+Sofware können hier die Anzahl der verbrauchten Einheiten
+angegeben werden.
+EOF
+en=><<EOF},
+
+EOF
+

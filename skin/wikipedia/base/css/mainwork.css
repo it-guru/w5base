@@ -1,0 +1,29 @@
+   html{
+      border-top-style:solid;
+      border-top-width:1px;
+      border-top-color:gray;
+      border-left-style:solid;
+      border-left-width:1px;
+      border-left-color:gray;
+   }
+   body{
+      margin-right:5px;
+      margin-bottom:12px;
+   }
+   iframe{
+      border-style:inset;
+      border-width:2px;
+   }
+
+div.dialog{
+   border-style:outset;
+   border-width:2px;
+   padding:0px;
+   padding-top:5px;
+   padding-bottom:5px;
+   margin-bottom:4px;
+   background:#dadada;
+}
+
+  
+   

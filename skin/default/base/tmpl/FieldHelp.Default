@@ -1,0 +1,40 @@
+The search field '<b>%label%</b>' is a standard search field.
+In this case you can use the following expressions and wildcards:<br>
+<br>
+<table width=100%>
+
+<tr>
+<td>*</td>
+<td>stands for any kind and count of characters</td>
+</tr>
+
+<tr>
+<td>?</td>
+<td>stands for on arbitrary character</td>
+</tr>
+
+<tr>
+<td>!</td>
+<td>negates your expresssion. So if you write !Hans, you will get all
+    records with no "Hans" in '%label%'.
+</tr>
+
+<tr>
+<td>...</td>
+<td>there are more expression, but they are'nt documented at now</td>
+</tr>
+</table>
+<script language="JavaScript">
+function SendData(t)
+{
+   if (parent){
+      parent.document.forms[0].elements['%field%'].value=t;
+   }
+   parent.hidePopWin(false);
+}
+</script>
+<style>
+body,html{
+  padding:5px;
+}
+</style>

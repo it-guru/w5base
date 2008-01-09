@@ -1,0 +1,5 @@
+'base::mandator'=>{de=>'Mandant',en=>'Mandator'},
+'fieldgroup.default'=>{de=>'Mandanteninformationen',en=>'Mandatorinformations'},
+'fieldgroup.contacts'=>{de=>'Kontakte',en=>'Contacts'},
+'Groupname'=>{de=>'Gruppenname'},
+'Mandator'=>{de=>'Mandant'},

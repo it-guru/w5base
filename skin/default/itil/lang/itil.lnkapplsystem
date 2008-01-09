@@ -1,0 +1,30 @@
+'itil::lnkapplsystem'=>{de=>'Anwendungs-Systemverknüpfung',
+                              en=>'Application-System Link'},
+'fieldgroup.default'=>{de=>'Verknüfpungsinformation',
+                       en=>'Linkinformations'},
+'fieldgroup.applinfo'=>{de=>'Anwendungsinformationen',
+                        en=>'Applicationinformations'},
+'fieldgroup.systeminfo'=>{de=>'Systeminformationen',
+                          en=>'Systeminformations'},
+'Fraction'=>{de=>'Anteil'},
+'Application'=>{de=>'Anwendung'},
+'Application CI-State'=>{de=>'Anwendungs CI-Status'},
+'System CI-State'=>{de=>'System CI-Status'},
+'Short Description'=>{de=>'Kurzbeschreibung'},
+'Productionsystem'=>{de=>'Produktionssystem'},
+'Developmentsystem'=>{de=>'Entwicklungssystem'},
+'Educationsystem'=>{de=>'Schulungssystem'},
+'Approval Testsystem'=>{de=>'Abnahmesystem'},
+'Referencesystem'=>{de=>'Referenzsystem'},
+'WELCOME'=>{de=>'
+In diesem Modul können Sie nur die Anwendungs-System Verknüpfungen
+darstellen, bei denen Sie Zugriff auf den jeweiligen Mandanten haben.
+Sollten Sie Zugriff auf die Anwendungen z.B. über die Kontakte
+erhalten haben, so werden diese Anwendungen nicht aufgelistet.
+',en=>'
+In this module, you can only list the application-system links,
+to which your access is deriveded by the mandator. 
+If you have access to the applications as through the contacts, 
+then these applications-system links are not listed.
+'},
+

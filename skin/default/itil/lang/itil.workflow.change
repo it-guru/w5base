@@ -1,0 +1,12 @@
+'itil::workflow::change'=>{de=>'ITIL Change Prozess',
+                           en=>'ITIL Change Process'},
+
+'fieldgroup.itilchange'=>{de=>'ITIL Change Daten',
+                          en=>'ITIL Change data'},
+
+'Change Fallback'=>{de=>'Change Wiederherstellungsverfahren'},
+'Change Description'=>{de=>'Change Beschreibung'},
+'Change-Planed-Start'=>{de=>'geplanter Beginn'},
+'Change-Planed-End'=>{de=>'geplantes Ende'},
+'Changenumber'=>{de=>'Changenummer'},
+

@@ -1,0 +1,30 @@
+'Output format selection'=>{de=>'Ausgabeformat auswahl'},
+'MSG001'=>{de=>'Ansichten-Bearbeitung-Datenobjekt:',en=>'View-Edit-Dataobject:'},
+'MSG002'=>{de=>'View-Auswahl:',en=>'View-List:'},
+'MSG003'=>{de=><<EOF,
+Um einen neue 'Ansicht' hinzuzufügen, geben Sie
+bitte den neuen Namen der 'Ansicht' ein, und klicken
+dann auf 'Hinzufügen'.<br>
+<br>
+Um eine bestehende 'Ansicht' zu verändern, klicken
+Sie diese bitte in der Auflistung an, führen die
+Anpassungen durch, und klicken dann auf 'Speichern'.
+Über den Button 'Löschen' kann dann auch eine
+'Ansicht' gelöscht werden.'}
+
+EOF
+           en=><<EOF},
+To use a new 'View', enter the name<br> 
+for the new 'View' and click 'add'.<br>
+To edit a 'View', choose the 'View' <br>
+in the 'View-List', make your changes <br>
+and click 'Save'. Click 'Delete' to<br>
+erase a 'View'.
+EOF
+'MSG004'=>{de=>'Verfügbare Felder:',en=>'Available Fields:'},
+'MSG005'=>{de=>'Felder der aktuellen Ansicht:',en=>'Fields of current View:'},
+'History'=>{de=>'Verlauf'},
+'you are not autorized to delete the requested record'=>{de=>'Sie sind nicht berechtigt, den angeforderten Datensatz zu löschen'},
+'you are not autorized to insert the requested record'=>{de=>'Sie sind nicht berechtig den angeforderten Datensatz zu erzeugen'},
+'New'=>{de=>'Neueingabe'},
+

@@ -1,0 +1,5 @@
+'itil::systemnfsnas'=>{de=>'NFS/NAS Freigabe',en=>'NFS/NAS Export'},
+'fieldgroup.systems'=>{de=>'System Freigaben',en=>'System Shares'},
+'fieldgroup.ipshares'=>{de=>'IP Freigaben',en=>'IP Shares'},
+'Server'=>{de=>'NFS/NAS Server'},
+'related Systems'=>{de=>'verknüpfte Systeme'},

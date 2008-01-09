@@ -1,0 +1,3 @@
+'itil::businessprocess'=>{de=>'Geschäftsprozess',en=>'Business process'},
+'fieldgroup.applications'=>{de=>'Anwendungen',en=>'Applications'},
+'fieldgroup.systems'=>{de=>'Systems',en=>'Systems'},

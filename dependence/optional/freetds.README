@@ -1,0 +1,39 @@
+
+For Debian installation:
+========================
+aptitude install unixodbc
+aptitude install unixodbc-bin
+aptitude install unixodbc-dev
+
+in freetds:
+configure --prefix=/usr --libdir=/usr/lib/odbc
+make
+make install
+
+for mssql database /etc/odbc.ini looks like:
+
+[SAMPLE]
+Database                = SAMDB
+Server          = 11.22.33.44
+TDS_Version             = 4.2   
+Port            = 1433
+Driver          = FreeTDS
+
+[MSSQL2000]
+Database                = SAMDB
+Server          = 11.22.33.44
+TDS_Version             = 8.0   
+Port            = 1433
+Driver          = FreeTDS
+
+in odbinst.ini:
+
+[FreeTDS]
+Description             = TDS driver (Sybase/MS SQL)
+Driver          = /usr/lib/odbc/libtdsodbc.so
+Setup           = /usr/lib/odbc/libtdsS.so
+CPTimeout               =
+CPReuse         =
+FileUsage               = 1
+
+

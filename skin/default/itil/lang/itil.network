@@ -1,0 +1,9 @@
+'itil::network'=>{de=>'Netzwerk Bereich',en=>'Networkarea'},
+'fieldgroup.default'=>{de=>'Bereichsdaten',en=>'Networkarea-Informations'},
+'fieldgroup.source'=>{de=>'Datenquelle',en=>'Datasource'},
+'you are only authorized to add in \'order\' or \'reserved\' state'=>{de=>'Sie sind nur berechtig, im Status \'angefordert\' oder \'reserviert\' Datensätze zu erzeugen'},
+'WELCOME'=>{de=>'
+Innerhalb eines Netzbereiches müssen IP-Adressen eindeutig
+vergeben werden. Ein Netzbereich ist nicht gleichzusetzen
+mit einem IP-Netzwerk. Ein Netzbereich besteht aus mehreren
+IP-Netzwerken.',en=>'Welcome'},

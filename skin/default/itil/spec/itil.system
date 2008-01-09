@@ -1,0 +1,39 @@
+#######################################################################
+'asset'=>{de=>'
+auch als AssetID oder AGER bekannt
+'},
+'systemid'=>{de=>'
+auch als SGER bekannt
+'},
+'cpucount'=>{de=>'
+In diesem Feld ist die Anzahl der
+CPUs einzutragen, die das logische
+Betriebssystem "sieht".
+',en=>'
+In this field the count of cpus
+is to be inserted, which is "seen"
+from the operationsystem
+'},
+'kwords'=>{de=>'
+In diesem Feld können beliebige
+Worte eingetragen werden. Dies kann
+z.B. dazu verwendet werden um eine
+einfache Gruppierung von Systemen
+über die Suchfunktion zu erreichen.
+',en=>'
+In this field, you can enter any
+words. This can be used, to do a
+simple grouping of systems by
+search function.
+'},
+'shortdesc'=>{de=>'
+Die Beschreibung die hier eingetragen
+ist, wird bei den Auflistungen der
+Systeme in der Anwendungs-Seite
+angezeigt.
+',en=>'
+This description will be displayed
+in the detail view of the related
+applications.
+'},
+

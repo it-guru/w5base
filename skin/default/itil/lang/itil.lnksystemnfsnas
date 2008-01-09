@@ -1,0 +1,4 @@
+'itil::lnksystemnfsnas'=>{de=>'NFS/NAS Client',en=>'NFS/NAS Client'},
+'fieldgroup.systemdata'=>{de=>'Client Daten',en=>'Client Data'},
+'Server'=>{de=>'NFS/NAS Server'},
+'Application'=>{de=>'Anwendung'},

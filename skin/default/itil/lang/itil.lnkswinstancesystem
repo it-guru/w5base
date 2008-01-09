@@ -1,0 +1,29 @@
+'itil::lnkswinstancesystem'=>{de=>'Software-Instanz-Systemverknüpfung',
+                              en=>'Software-Instance-System Link'},
+'fieldgroup.default'=>{de=>'Verknüfpungsinformation',
+                       en=>'Linkinformations'},
+'fieldgroup.swinstanceinfo'=>{de=>'Instanz Informationen',
+                        en=>'Instance informations'},
+'fieldgroup.systeminfo'=>{de=>'Systeminformationen',
+                          en=>'Systeminformations'},
+'Instance name'=>{de=>'Instanz Name'},
+'Instance CI-State'=>{de=>'Instance CI-Status'},
+'System CI-State'=>{de=>'System CI-Status'},
+'Short Description'=>{de=>'Kurzbeschreibung'},
+'Productionsystem'=>{de=>'Produktionssystem'},
+'Developmentsystem'=>{de=>'Entwicklungssystem'},
+'Educationsystem'=>{de=>'Schulungssystem'},
+'Approval Testsystem'=>{de=>'Abnahmesystem'},
+'Referencesystem'=>{de=>'Referenzsystem'},
+'WELCOME'=>{de=>'
+In diesem Modul können Sie nur die Instanz-System Verknüpfungen
+darstellen, bei denen Sie Zugriff auf den jeweiligen Mandanten haben.
+Sollten Sie Zugriff auf die Instanz z.B. über die Kontakte
+erhalten haben, so werden diese Instanzen nicht aufgelistet.
+',en=>'
+In this module, you can only list the instance-system links,
+to which your access is deriveded by the mandator. 
+If you have access to the instances as through the contacts, 
+then these instances-system links are not listed.
+'},
+

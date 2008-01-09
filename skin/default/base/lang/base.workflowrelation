@@ -1,0 +1,5 @@
+'base::workflowrelation'=>{de=>'Workflow Verknüpfung',en=>'Workflow relation'},
+'fieldgroup.src'=>{de=>'von Workflow (source)',en=>'Source'},
+'fieldgroup.dst'=>{de=>'nach Workflow (destination)',en=>'Destination'},
+'fieldgroup.comments'=>{de=>'Bemerkungen',en=>'Comments'},
+"invalid relation '\%s' specified"=>{de=>"ungültiger Verweistyp '\%s' verwendet"},

@@ -1,0 +1,9 @@
+'Worktime'=>{de=>'Arbeitszeit'},
+'MSG'=>{de=><<EOF,
+Mit dem nächsten Schritt wird bei Bedarf ein entsprechendes Betriebstagebuch erzeugt, und die Eingegebenen Daten werden angefügt. Korrekturen sind dann nur noch in Zusammenarbeit mit dem TSM der Anwendung möglich.
+EOF
+en=><<EOF},
+
+EOF
+'no application specified'=>{de=>'keine gültige Anwendung eingegeben'},
+'invalid effort'=>{de=>'ungültiger Arbeitsaufwand'},

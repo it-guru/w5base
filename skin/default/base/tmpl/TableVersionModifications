@@ -1,0 +1,27 @@
+<table width=100% height=100%>
+<tr><td valign=top align=center><br><br>
+  <div class=msg>
+  <table border=0 class=msg>
+  <tr><td class=t><b>W5Base Table Version Control System</td></tr>
+  <tr>
+  <td valign=top><div class=explain>
+      The table version control system has been detect 
+      outstanding operations.
+      </div></td>
+  </tr>
+  <td valign=top><div class=explain>
+      %OPERATIONS%
+      </div></td>
+  </tr>
+  <tr>
+     <td valign=top><b>%LOGHEAD%</b></td>
+  </tr>
+  <tr>
+     <td valign=top><div class=%LOGSTYLE%><xmp>%LOG%</xmp></div></td>
+  </tr>
+  <tr>
+     <td align=center nowrap>%BUTTONS%</td>
+  </tr> 
+  </table></div>
+
+</td></tr></table>

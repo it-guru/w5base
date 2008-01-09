@@ -1,0 +1,13 @@
+#######################################################################
+'usertyp'=>{de=>'
+<table border=1>
+<tr><th>Usertyp</th><th>Bedeutung</th></tr>
+<tr><td>user</td><td>Standard Benutzer</td></tr>
+<tr><td>service</td><td>Service Nutzer zur Verbindung mit anderen Anwendungen</td></tr>
+<tr><td>extern</td><td>externer Kontakt</td></tr>
+<tr><td>function</td><td>Funktionsmailboxen</td></tr>
+</table>
+',en=>'
+
+'},
+

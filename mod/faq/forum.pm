@@ -1,0 +1,655 @@
+package faq::forum;
+#  W5Base Framework
+#  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+use strict;
+use vars qw(@ISA);
+use kernel;
+use kernel::App::Web;
+use CGI;
+@ISA=qw(kernel::App::Web);
+
+sub new
+{
+   my $type=shift;
+   my %param=@_;
+   my $self=bless($type->SUPER::new(%param),$type);
+   $self->{maintabparam}="class=boardgroup cellspacing=1 border=0 ".
+                         "cellpadding=0 width=95%";
+   return($self);
+}
+
+sub getValidWebFunctions
+{
+   my ($self)=@_;
+   return(qw(Main Topic NativNewTopic NewTopic HandleInfoAboSubscribe));
+}
+
+sub Main
+{
+   my ($self)=@_;
+
+   my ($func,$p)=$self->extractFunctionPath();
+   my $rootpath=Query->Param("RootPath");
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','public/faq/load/forum.css'],
+                           js=>['toolbox.js','subModal.js',
+                                'TextTranslation.js'],
+                           prefix=>$rootpath,
+                           title=>$self->T($self->Self()));
+   $rootpath.="/" if ($rootpath eq "..");
+   my @param=split(/\//,$p);
+   print $self->HtmlSubModalDiv(prefix=>$rootpath);
+  
+   $p=~s/\///g;
+   $self->ShowBoards($rootpath) if ($p eq ""); 
+   $self->ShowBoard($rootpath,$p) if ($p ne ""); 
+   print $self->HtmlBottom(body=>1);
+}
+
+
+sub Topic
+{
+   my $self=shift;
+   my ($func,$p)=$self->extractFunctionPath();
+   my $rootpath=Query->Param("RootPath");
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','public/faq/load/forum.css'],
+                           js=>['toolbox.js','subModal.js',
+                                'TextTranslation.js'],
+                           prefix=>$rootpath,
+                           form=>1,
+                           title=>$self->T($self->Self()));
+   $rootpath.="/" if ($rootpath eq "..");
+   print $self->HtmlSubModalDiv(prefix=>$rootpath);
+
+   $p=~s/\///g;
+   if ($p ne ""){
+      $self->ShowTopic($rootpath,$p);
+   }
+   else{
+      print("Exeption");
+   }
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+
+sub NewTopic
+{
+   my $self=shift;
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','public/faq/load/forum.css'],
+                           js=>['toolbox.js','subModal.js',
+                                'TextTranslation.js'],
+                           form=>1,
+                           title=>$self->T($self->Self()));
+   print $self->HtmlSubModalDiv();
+   my $board=Query->Param("board");
+   if ($board ne ""){
+      my $bo=$self->getPersistentModuleObject("faq::forumboard");
+      $bo->SetFilter({id=>\$board});
+      my ($borec,$msg)=$bo->getOnlyFirst(qw(name));
+      print $self->getAppTitleBar(title=>'Forum: '.
+                    "<a href=\"Main\" class=toplink>Boards</a> &bull; ".
+                    "<a href=\"Main/$board\" class=toplink>$borec->{name}</a>".
+                    ' &bull; neues Thema');
+      $self->ShowNewTopic();
+   }
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+
+
+sub ShowNewTopic
+{
+  my $self=shift;
+  print("<br><center>".
+        "<table $self->{maintabparam}>");
+  if (Query->Param("DO") ne ""){
+     my %rec=(name=>Query->Param("name"),
+              comments=>Query->Param("comments"),
+              forumboard=>Query->Param("board"));
+     my $to=$self->getPersistentModuleObject("faq::forumtopic");
+     $to->Context->{DataInputFromUserFrontend}=1;
+     if (my $id=$to->ValidatedInsertRecord(\%rec)){
+        print("<tr><td>Theam erfolgreich gespeichert.</td></tr></table>");
+        my $ref=Query->Param("HTTP_REFERER"); 
+        print("<script language=\"JavaScript\">".
+              "window.setTimeout('document.location.href=\"$ref\";', 500);".
+              "</script>");
+        return();
+     }
+  }
+  my $newtopic=$self->T("new topic");
+  print("<tr><th class=boardgroup colspan=3>$newtopic</th></tr>");
+  my $name=Query->Param("name");
+  my $comments=Query->Param("comments");
+  print("<tr><td width=1%>".$self->T("Topic","faq::forumtopic").":</td>".
+        "<td colspan=2>".
+        "<input name=name value=\"$name\" ".
+        "type=text style=\"width:100%\"></td></tr>");
+  print("<tr><td colspan=3>".
+        "<textarea onkeydown=\"textareaKeyHandler(this,event);\" ".
+        "name=comments id=comments ".
+        "rows=10 cols=20 style=\"width:100%\">".
+        "$comments</textarea></td></tr>"); 
+  my $lastmsg=$self->findtemplvar({},"LASTMSG");
+  my $send=$self->T("send");
+  print(<<EOF);
+<tr>
+<td colspan=3>
+<table border=0 cellspacing=0 cellpadding=0 width=100%>
+<tr>
+<td align=left>$lastmsg</td>
+<td width=1% align=right>
+<input type=button onClick="doSave();" value=" $send "></td></tr>
+<input type=hidden name=DO value="1">
+</table>
+</td></tr>
+</table></center>
+<script language="JavaScript">
+function doSave()
+{
+   document.forms[0].submit();
+}
+</script>
+EOF
+  print $self->HtmlPersistentVariables("board","HTTP_REFERER");
+}
+
+
+sub getShowTopicDetailFunctions
+{
+   my $self=shift;
+   my $rootpath=shift;
+   my $mode=shift;
+   my $id=shift;
+   my $d="";
+   $d.=<<EOF;
+<a href=\"javascript:DetailHandleInfoAboSubscribe()\" class=detailfunctions>InfoAbo</a>
+<script language="JavaScript">
+function DetailHandleInfoAboSubscribe()
+{
+   showPopWin('${rootpath}HandleInfoAboSubscribe?CurrentIdToEdit=$id,$mode',null,300,
+              FinishHandleInfoAboSubscribe);
+}
+function FinishHandleInfoAboSubscribe(returnVal,isbreak)
+{
+   if (!isbreak){
+      document.location.href=document.location.href;
+   }
+}
+</script>
+
+
+EOF
+
+
+   return($d);
+}
+
+sub ShowTopic
+{
+   my $self=shift;
+   my $rootpath=shift;
+   my $id=shift;
+
+   my $allowclose=Query->Param("AllowClose");
+   my $en=$self->getPersistentModuleObject("faq::forumentry");
+   my $to=$self->getPersistentModuleObject("faq::forumtopic");
+   $to->SecureSetFilter({id=>\$id});
+   my ($torec,$msg)=$to->getOnlyFirst(qw(ALL));
+   if (!defined($torec)){
+      print("no access or topic not found");
+      return();
+   }
+   $to->ValidatedUpdateRecord($torec,{viewcount=>$torec->{viewcount}+1,
+                                      mdate=>$torec->{mdate},
+                                      owner=>$torec->{owner},
+                                      editor=>$torec->{editor},
+                                      realeditor=>$torec->{realeditor}},
+                             {id=>\$torec->{id}});
+
+   my $bo=$self->getPersistentModuleObject("faq::forumboard");
+   $bo->SetFilter({id=>$torec->{forumboard}});
+   my ($borec,$msg)=$bo->getOnlyFirst(qw(ALL));
+   if (defined($borec) && defined($torec)){
+      my $comments=Query->Param("comments");
+      if ($comments ne ""){
+         $en->Context->{DataInputFromUserFrontend}=1;
+         $en->ValidatedInsertRecord({comments=>$comments,
+                                     forumtopic=>$torec->{id}});
+      }
+   }
+
+   $en->ResetFilter();
+   $en->SetFilter({forumtopic=>\$torec->{id}});
+
+   if (!$allowclose){
+      print $self->getAppTitleBar(prefix=>$rootpath,
+                                  title=>'Forum: '.
+                                         "<a class=toplink ".
+                                         "href=\"../Main\">Boards</a> &bull;".
+                                         "<a class=toplink ".
+                                         "href=\"../Main/$borec->{id}\">".
+                                         "$borec->{name}</a>");
+      print("<br>");
+   }
+   else{
+      print("<table width=100% cellspacing=0 cellpadding=0 border=0>");
+      print("<tr><td align=right><div class=OnlyInBrowser>");
+      print("<a class=FunctionLink href=JavaScript:DetailPrint()>".
+            $self->T("DetailPrint","kernel::App::Web::Listedit")."</a> &bull;");
+      print("<a class=FunctionLink href=JavaScript:DetailClose()>".
+            $self->T("DetailClose","kernel::App::Web::Listedit")."</a>");
+      print("&nbsp; </div></td><tr></table>");
+
+   }
+   my $grp="0"; 
+   print("<center><div id=mainarea style=\"overflow:auto\"> ".
+         "<table $self->{maintabparam}>");
+   my $Q="";
+   $Q="&AllowClose=1" if ($allowclose);
+   if ($allowclose){
+      printf("<tr><td colspan=3 class=topiclabel>".
+             "<table width=100%% cellspacing=0 cellpadding=0 border=0>".
+             "<tr><td><b>".
+             $self->T("Board","faq::forumboard").":</b> ".
+             "$borec->{name}".
+             "</td></tr></table></td></tr>");
+   }
+   printf("<tr><td colspan=3 class=topiclabel>".
+          "<table width=100%% cellspacing=0 cellpadding=0 border=0>".
+          "<tr><td><b>".
+          $self->T("Topic","faq::forumtopic").":</b> <a class=topiclink ".
+          "href=\"./$torec->{id}$Q\">$torec->{name}</a>".
+          "</td><td width=1%% valign=top>".
+          "<div class=OnlyInBrowser>%s</div></td></tr></table></td></tr>",
+          $self->getShowTopicDetailFunctions($rootpath,"topic",$id));
+   my $label=$self->T("topic answers")." ($torec->{entrycount})";
+   if ($torec->{entrycount}==0){
+      my $label=$self->T("topic entry");
+   }
+   print("<tr>".
+         "<th class=boardgroup width=200>".
+         $self->T("autor","faq::forum")."</th>".
+         "<th class=boardgroup>$label</th></tr>");
+   my @l=$en->getHashList(qw(cdate mdate comments creator id));
+   my $l=1;
+   my $line=0;
+   my $creatorfld=$en->getField("creator");
+   my $cdatefld=$en->getField("cdate");
+   foreach my $rec ($torec,@l){
+      my $linelabel="";
+      $linelabel="<a href=\"?go=$rec->{id}\" class=ForumDirectLink ".
+                 "name=\"E$rec->{id}\">#$line</a>" if ($line>0);
+      print("<tr class=l$l id=\"E$rec->{id}\">");
+      my $creator=$creatorfld->FormatedDetail($rec,"HtmlForum");
+      $creator=~s/\s\(/<br>(/;
+      my $cdate=$cdatefld->FormatedDetail($rec,"HtmlDetail");
+      $cdate=~s/\s\(/<br>(/;
+    #  print("<td valign=top width=200>$creator".
+    #        "<br>$cdate<br>Beiträge: 123<br>EMail, Home".
+    #        "</td>");
+     # print("<td width=1><img height=120 width=1 ".
+     #       "src=\"${rootpath}../../base/load/empty.gif\"></td>");
+      my $comments=$rec->{comments};
+      $comments=~s/</&lt;/g;
+      $comments=~s/>/&gt;/g;
+      $comments=FancyLinks($comments);
+
+      print <<EOF;
+<td valign=top width=200 class=authorlabel>$creator<br>$cdate<br>
+<table width=100%>
+<tr><td><!-- Beitragscount des users --></td><td align=right><!-- profile link -->
+</td></tr></table></td><td width=70% valign=top>
+<table style="table-layout:fixed" width=100% cellspacing=0 cellpadding=0>
+<tr><td><pre class=wraped style="overflow:hidden">$comments</pre></td>
+<td width=25 valign=top>$linelabel</td></tr></table>
+</td></tr>
+EOF
+      $l++;
+      $l=1 if ($l>2);
+      $line++; 
+   }
+   print(<<EOF);
+</table>
+<a name="end"></a>
+</div>
+<div class=OnlyInBrowser>
+<center>
+<table $self->{maintabparam}>
+EOF
+   my $answerok=0;
+   my @acl=$bo->getCurrentAclModes($ENV{REMOTE_USER},$borec->{acls});
+   if ($self->IsMemberOf("admin") ||
+       grep(/^write$/,@acl) ||
+       grep(/^moderate$/,@acl) ||
+       grep(/^answer$/,@acl)){
+      $answerok=1;
+   }
+   my $answer=$self->T("answer");
+   my $send=$self->T("send");
+   print(<<EOF) if ($answerok);
+<tr>
+<th class=boardgroup colspan=3>$answer:</th></tr>
+<tr>
+<td colspan=3>
+<input type="hidden" value="last" name="go">
+<textarea onkeydown=\"textareaKeyHandler(this,event);\" 
+          name=comments id=comments rows=5 cols=5 style="width:100%">
+</textarea></td></tr>
+<tr>
+<td colspan=3 align=right>
+<input type=submit value=" $send "></td></tr>
+EOF
+   my $go=Query->Param("go");
+   print(<<EOF);
+</table></center></div>
+<script language="JavaScript">
+function modMainTab()
+{
+   var d=document.getElementById("mainarea");
+   var comments=document.getElementById("comments");
+   d.style.height="1px";
+   var h=getViewportHeight();
+   if (comments){
+      h=h-180;
+   }
+   else{
+      h=h-40;
+   }
+   d.style.height=h+"px";
+   if ("$go"=="last"){
+      d.scrollTop=d.scrollHeight;
+   }
+   else{
+      if ("$go"!=""){
+         var y=document.getElementById("E$go");
+         if (y){
+            y=y.offsetTop;
+            d.scrollTop=y;
+         }
+      }
+   }
+   
+}
+function DetailClose()
+{
+   window.close();
+}
+function DetailPrint()
+{
+   var d=document.getElementById("mainarea");
+   d.style.height="auto";
+   window.print();
+   window.setTimeout("modMainTab();",2000);
+}
+addEvent(window,"load",modMainTab);
+addEvent(window,"resize",modMainTab);
+</script>
+<style>
+\@media print {
+   div.OnlyInBrowser{
+      display:none;
+      visibility:hidden;
+   }
+   #mainarea{
+      height:auto;
+      overflow:auto;
+   }
+}
+div.OnlyInBrowser{
+   margin:0;
+   padding:0;
+}
+</style>
+EOF
+  print $self->HtmlPersistentVariables("AllowClose");
+   
+}
+
+sub HandleInfoAboSubscribe
+{
+   my $self=shift;
+   my ($id,$mode)=split(/,/,Query->Param("CurrentIdToEdit"));
+   my $ia=$self->getPersistentModuleObject("base::infoabo");
+   if ($id ne ""){
+#      $self->ResetFilter();
+#      $self->SetFilter({id=>\$id});
+#      my ($rec,$msg)=$self->getOnlyFirst(qw(name));
+      $mode="board" if ($mode eq "");
+      my @modes;
+      if ($mode eq "board"){
+         my $bo=$self->getPersistentModuleObject("faq::forumboard");
+         $bo->SetFilter({id=>\$id});
+         my ($borec,$msg)=$bo->getOnlyFirst(qw(ALL));
+         if (defined($borec)){
+            unshift(@modes,"faq::forumboard",$id,$borec->{name});
+         }
+      }
+      if ($mode eq "topic"){
+         my $to=$self->getPersistentModuleObject("faq::forumtopic");
+         $to->SetFilter({id=>\$id});
+         my ($torec,$msg)=$to->getOnlyFirst(qw(ALL));
+         if (defined($torec)){
+            unshift(@modes,"faq::forumboard",
+                           $torec->{forumboard},$torec->{forumboardname});
+            unshift(@modes,"faq::forumtopic",$id,$torec->{name});
+         }
+      }
+      print($ia->WinHandleInfoAboSubscribe({},@modes,
+                      "base::staticinfoabo",undef,undef));
+   }
+   else{
+      print($self->noAccess());
+   }
+
+}
+
+sub getShowBoardDetailFunctions
+{
+   my $self=shift;
+   my $rootpath=shift;
+   my $mode=shift;
+   my $id=shift;
+   my $d="";
+   $d.=<<EOF;
+<a href=\"javascript:DetailHandleInfoAboSubscribe()\" class=detailfunctions>InfoAbo</a>
+<script language="JavaScript">
+function DetailHandleInfoAboSubscribe()
+{
+   showPopWin('${rootpath}HandleInfoAboSubscribe?CurrentIdToEdit=$id,$mode',null,300,
+              FinishHandleInfoAboSubscribe);
+}
+function FinishHandleInfoAboSubscribe(returnVal,isbreak)
+{
+   if (!isbreak){
+      document.location.href=document.location.href;
+   }
+}
+</script>
+
+
+EOF
+
+
+   return($d);
+}
+
+sub ShowBoard
+{
+   my $self=shift;
+   my $rootpath=shift;
+   my $id=shift;
+
+   my $bo=$self->getPersistentModuleObject("faq::forumboard");
+   $bo->SetFilter({id=>\$id});
+   my ($borec,$msg)=$bo->getOnlyFirst(qw(ALL));
+
+
+   print $self->getAppTitleBar(prefix=>$rootpath,
+                               title=>'Forum: '.
+                                      "<a class=toplink ".
+                                      "href=\"../Main\">Boards</a> &bull;".
+                                      "<a class=toplink ".
+                                      "href=\"./$id\">$borec->{name}</a>");
+   my $to=$self->getPersistentModuleObject("faq::forumtopic");
+   $to->SetFilter({forumboard=>\$id});
+   $to->SetCurrentOrder(qw(cdate));
+   my $class="class=boardgroup valign=top";
+   print("<br><center>".
+         "<div id=mainarea style=\"overflow:auto\">".
+         "<table $self->{maintabparam}>");
+   printf("<tr><td colspan=6 align=right valign=top>%s</td></tr>",
+          $self->getShowBoardDetailFunctions($rootpath,"board",$id));
+   print("<tr><th $class>&nbsp;</th><th $class>".
+         $self->T("Topic","faq::forumtopic")."</th><th $class>".
+         $self->T("Creator surname","faq::forumtopic")."</th>".
+         "<th $class style=\"width:1%;text-align=center\">".
+         $self->T("Answers","faq::forumtopic")."</th>".
+         "<th $class style=\"width:1%;text-align=center\">".
+         $self->T("Views","faq::forumtopic")."</th>".
+         "<th $class>".
+         $self->T("last answer")."</th></tr>");
+   print("<tr class=boardspacer><td colspan=6></td></tr>");
+   my $l=1;
+
+   foreach my $rec ($to->getHashList(qw(lastentrymdate cdate name creatorshort 
+                                        entrycount viewcount lastworkershort
+                                        forcetopicicon
+                                        topicicon))){
+      print("<tr class=l$l>");
+      my $iconobj=$to->getField("topicicon");
+      my $icon=$iconobj->FormatedDetail($rec,"HtmlDetail");
+      $icon=~s/..\/faq\/load/$rootpath\/..\/load/;
+      print("<td width=15 align=center>$icon</td>");
+      my $name=$rec->{name};
+      $name=~s/</&lt;/g;
+      $name=~s/>/&gt;/g;
+      $name="<b>$name</b>" if ($rec->{entrycount}==0);
+      $name="<font color=darkred>$name</font>" if ($rec->{forcetopicicon}==2);
+      print("<td width=200><a class=listlink href=\"../Topic/$rec->{id}\">".
+            "$name</a></td>");
+      print("<td width=1% style=\"padding-left:2px;padding-right:2px\">".
+            "$rec->{creatorshort}</td>");
+      print("<td align=center>$rec->{entrycount}</td>");
+      print("<td align=center>$rec->{viewcount}</td>");
+      print("<td width=120>$rec->{lastworkershort}</td>");
+      print("</tr>");
+      $l++;
+      $l=1 if ($l>2);
+   }
+   my $disnew="disabled";
+
+   my @acl=$bo->getCurrentAclModes($ENV{REMOTE_USER},$borec->{acls});
+   if ($self->IsMemberOf("admin") ||
+       grep(/^write$/,@acl) ||
+       grep(/^moderate$/,@acl)){
+      $disnew="";
+   }
+   my $HTTP_REFERER=$ENV{SCRIPT_URI};
+   my $q=kernel::cgi::Hash2QueryString({HTTP_REFERER=>$ENV{SCRIPT_URI},
+                                        board=>$id});
+   my $newtopic=$self->T("new topic");
+   print(<<EOF);
+</table></div>
+<table $self->{maintabparam}>
+<tr><td colspan=6 class=boardgroup>&nbsp;</td></tr>
+<tr><td colspan=6 align=right>
+<input type=button onClick="openNew();" $disnew value=" $newtopic "></td></tr>
+</table></center>
+
+<script language="JavaScript">
+function openNew()
+{
+   document.location.href="../NewTopic?$q";
+}
+function modMainTab()
+{
+   var d=document.getElementById("mainarea");
+   d.style.height="1px";
+   var h=getViewportHeight();
+   h=h-100;
+
+   d.style.height=h+"px";
+}
+addEvent(window,"load",modMainTab);
+</script>
+EOF
+   
+}
+
+sub ShowBoards
+{
+   my $self=shift;
+   my $rootpath=shift;
+
+   my $bo=$self->getPersistentModuleObject("faq::forumboardnativ");
+   print $self->getAppTitleBar(prefix=>$rootpath,
+                               title=>'Forum:'.
+                                    ' <a class=toplink href="Main">Boards</a>');
+   print "<br>";  
+   my $grp; 
+   my $class="class=boardgroup";
+   print("<center>".
+         "<table $self->{maintabparam}>");
+
+   print("<tr><td colspan=5 align=right>&nbsp;</td></tr>");
+   print("<tr><th $class>Board</th>".
+         "<th $class style=\"text-align:center\">".
+         $self->T("topics")."</th>".
+         "<th $class style=\"text-align:center\">".
+         $self->T("entrys")."</th>".
+         "<th $class>".
+         $self->T("last posting by")."</th>".
+         "<th $class>Moderator</th></tr>");
+   my $l=1;
+   $bo->SecureSetFilter();
+   foreach my $rec ($bo->getHashList(qw(boardgroup name id 
+                                        topiccount entrycount comments
+                                        lastworkershort))){
+      if ($grp ne $rec->{boardgroup}){
+         print("<tr class=boardspacer><td colspan=5></td></tr>");
+         if ($rec->{boardgroup} ne ""){
+            print("<tr><td colspan=5 class=boardgroup>".
+                  "&bull; ".$rec->{boardgroup}."</td></tr>");
+         }
+         $grp=$rec->{boardgroup};
+         $l=1;
+      }
+      my $comments=$rec->{comments};
+      if (!($comments=~m/^\s*$/)){
+         $comments="<br><div class=boardcomments>".$comments."</div>";
+      }
+      print("<tr class=l$l>".
+            "<td><a class=listlink href=\"Main/$rec->{id}\">".
+            "$rec->{name}</a>$comments</td>");
+      print("<td width=20 align=center valign=top>$rec->{topiccount}</td>");
+      print("<td width=20 align=center valign=top>$rec->{entrycount}</td>");
+      print("<td width=120 valign=top>$rec->{lastworkershort}</td>");
+      print("<td width=120 valign=top>admin</td>");
+      print("</tr>");
+      $l++;
+      $l=1 if ($l>2);
+   }
+   print("</table></center>");
+}
+
+
+
+1;

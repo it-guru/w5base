@@ -1,0 +1,24 @@
+'AL_TCom::workflow::fastdiary'=>{de=>'AL T-Com: Betriebstagebuch Kleinarbeiten',
+                                  en=>'AL T-Com: Diary short jobs'},
+'AL_TCom::workflow::fastdiary::tip'=>{
+              de=>'Das Betriebstagebuch dient zur Dokumentation von '.
+                  'Projektarbeiten oder allgemeinen Veränderungen '.
+                  'in bestimmten Anwendungen. Für die AL-T-Com müssen '.
+                  'im speziellen die P800 relevanten Aufwände '.
+                  'dokumentiert werden. Dieses spezielle Betriebstagebuch '.
+                  'ist zur schellen und effektiven Dokumentation von '.
+                  'Kleinarbeiten ausgerichtet. Es sind nur Einträge erlaubt '.
+                  'mit einem Aufwand von weniger als 60 Minuten. '.
+                  'Dieser Workflow erzeugt keine speziellen '.
+                  'Betriebstagebücher sondern stellt nur eine schnelle '.
+                  'Eingabemöglichkeit dar.',
+              en=>'A bussiness diary is to documentate all jobs and '.
+                  'projects at an specified application. '.
+                  'This diary is specaliy designed to documentate '.
+                  'short jobs. '.
+                  'It is only allowed for jobs with a duration less than '.
+                  '60 minutes ',
+                  },
+
+'Application'=>{de=>'Anwendung'},
+'Worktime'=>{de=>'Arbeitszeit'},

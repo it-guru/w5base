@@ -1,0 +1,10 @@
+ae1b7bdceefab5ef96700592a22f977d  usr/lib/perl5/auto/IPC/Smart/Smart.so
+d41d8cd98f00b204e9800998ecf8427e  usr/lib/perl5/auto/IPC/Smart/Smart.bs
+2d172098cac46424a2720606a1cbcb52  usr/lib/perl5/auto/IPC/Smart/autosplit.ix
+b1d7bf34a8dd18136f470b4cf95901f7  usr/lib/perl5/IPC/Smart.pm
+7922fb04fc1254a8a740351455e09185  usr/share/doc/libipc-smart-perl/README
+150496f99cdb22bfb5987181a60d52eb  usr/share/doc/libipc-smart-perl/TODO
+12540ada5e8ae26c8cad1b93a16d523b  usr/share/doc/libipc-smart-perl/copyright
+fe7695cf2e0b187f5161098202931ab7  usr/share/doc/libipc-smart-perl/changelog.gz
+58fc4c9fb8dedf03878a383d94a96cc7  usr/share/doc/libipc-smart-perl/changelog.Debian.gz
+c19a641254b5653d141b1ec0b366212b  usr/share/man/man3/IPC::Smart.3pm.gz

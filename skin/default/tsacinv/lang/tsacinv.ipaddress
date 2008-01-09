@@ -1,0 +1,8 @@
+'tsacinv::ipaddress'=>{de=>'AssetCenter IP-Adresse',
+                       de=>'AssetCenter IP-address'},
+'IP-Address'=>{de=>'IP-Adresse'},
+'Description'=>{de=>'Bemerkungen'},
+'fieldgroup.default'=>{de=>'IP-Daten',en=>'IP-Data'},
+'fieldgroup.finance'=>{de=>'Verrechnungsdaten',en=>'Accounting informations'},
+'Account Number'=>{de=>'Account Nummer'},
+

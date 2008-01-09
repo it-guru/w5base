@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+Todo
+lib/RPC/Smart/Client.pm
+lib/RPC/Smart/Server.pm
+samples/server.pl
+samples/client.pl

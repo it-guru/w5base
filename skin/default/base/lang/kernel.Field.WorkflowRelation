@@ -1,0 +1,6 @@
+'Add'=>{de=>'Hinzufügen'},
+'Delete'=>{de=>'Löschen'},
+'Update'=>{de=>'Aktualisieren'},
+'Cancel'=>{de=>'Abbrechen'},
+'Relation'=>{de=>'Verweistyp'},
+'Comments'=>{de=>'Bemerkungen'},

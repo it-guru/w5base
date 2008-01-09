@@ -1,0 +1,12 @@
+'TCOM::custappl'=>{de=>'T-Com Kundensicht Anwendung',
+               en=>'T-Com Customerview Application'},
+'Customer'=>{de=>'Kundenbezeichnung'},
+
+'fieldgroup.tscontact'=>{de=>'T-Systems Kontakte',
+                         en=>'T-Systems Contacts'},
+'fieldgroup.default'=>{de=>'allgemeine Anwendungsdaten',
+                       en=>'Application data'},
+'fieldgroup.tcomcontact'=>{de=>'T-Com Kontakte',
+                           en=>'T-Com Contacts'},
+'fieldgroup.custcontracts'=>{de=>'Vertragszuordnung',
+                             en=>'Contracts'},

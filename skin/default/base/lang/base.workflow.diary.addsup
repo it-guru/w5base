@@ -1,0 +1,5 @@
+'Support (Name or Group)'=>{de=>"Unterstützung (Name oder Gruppe)"},
+'Mail notification (without text there will be no notification generated)'=>
+{de=>"Mail-Benachrichtigung (ohne Text wird keine Beanchrichtung durchgeführt)"},
+'invalid forwarding target'=>
+{de=>"ungültiges Ziel"},

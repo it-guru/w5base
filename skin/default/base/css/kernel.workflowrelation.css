@@ -1,0 +1,36 @@
+div.EditFrame{
+   border-style:solid;
+   border-color:black;
+   border-width:1px;
+   padding:0px;
+   margin:0px;
+}
+div.RelationList{
+   border-style:solid;
+   border-color:black;
+   border-width:1px;
+   padding:0px;
+   margin:0px;
+}
+div.editSubList{
+   border-style:solid;
+   border-width:1px;
+   margin:0px;
+   padding:0px;
+   width:99%;
+   height:110px;
+   overflow:auto;
+}
+tr.subline1{
+   background:#DDDDDD;
+   cursor:default;
+}
+tr.subline2{
+   background:#CCCCCC;
+   cursor:default;
+}
+tr.linehighlight{
+   background:#b0c5ec;
+   cursor:pointer;
+}
+
