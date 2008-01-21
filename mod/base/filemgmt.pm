@@ -634,7 +634,7 @@ sub StoreFilehandle
       $dir.="/" if (!($dir=~m/\/$/));
       $dir.=$path[$sub];
       if (! -d $dir){
-         msg(INFO,"dir=$dir");
+         msg(INFO,"dir='$dir'");
          if (!mkdir($dir)){
             msg(ERROR,"can't mkdir dir='$dir' - $?, $!");
             return(undef);
