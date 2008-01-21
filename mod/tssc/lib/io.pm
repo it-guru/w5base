@@ -505,8 +505,8 @@ sub extractAffectedApplication
          last if (!($line=~m/^AG[: ]+/) && $#l2==-1);
          $line=~s/^AG[: ]+//;
          last if ($line=~m/^\s*$/);
-         push(@l2,split(/[,\s]+/,$line));
-         last if (!($line=~m/,\s*$/));
+         push(@l2,split(/[,\s;]+/,$line));
+         last if (!($line=~m/[,;]\s*$/));
       }
       if (my ($aglist)=$rec->{description}=~
              m/^.*\[AGLIST_START\](.*)\[AGLIST_END\].*$/sm){
@@ -514,7 +514,7 @@ sub extractAffectedApplication
          $aglist=~s/^\s*//g;
          $aglist=~s/\s*$//g;
          msg(DEBUG,"add AGLIST='%s' by Interface descrition",$aglist);
-         push(@l2,split(/[,\s]+/,$aglist));
+         push(@l2,split(/[,\s;]+/,$aglist));
       }
    }
 
