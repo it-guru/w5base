@@ -136,10 +136,10 @@ sub TimeGridMain
                                       label=>"Zeile 3 yyyyyyyyyyyyyyyyyyy",
                                      },
                                      {
-                                      label=>"Andreas, Wieschollek (andreas.wieschollek\@t-systems.com)",
+                                      label=>"Andreas, Wieschollek (andreas.wieschollek\@xxxxxxxxx.com)",
                                      },
                                      {
-                                      label=>"Vogler, Hartmut (hartmut.vogler\@t-systems.com)",
+                                      label=>"Vogler, Hartmut (hartmut.vogler\@xxxxxxxxx.com)",
                                      }
                                     ],
                               mode=>$mode));

@@ -114,7 +114,6 @@ sub dailywfreport
          my $subject=$self->getParent->T("daily Workflow activity report",
                                          $self->Self);
          my @emailto=($urec->{email});
-         #my @emailto=('hartmut.vogler@t-systems.com');
      
          ###################################################
          my $sitename=$self->Config->Param("SITENAME");

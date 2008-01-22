@@ -1,6 +1,6 @@
 package RPC::Smart::Client;
 #  W5Base Framework
-#  Copyright (C) 2006  Hartmut Vogler (hartmut.vogler@t-systems.com)
+#  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -412,7 +412,7 @@ be to use the C<Sortkeys> filter of Data::Dumper.
 
 =head1 AUTHOR
 
-Vogler Hartmut          hartmut.vogler@t-systems.com
+Vogler Hartmut          it@guru.de
 
 Copyright (c) 2006 All rights reserved.
 This program is free software; you can redistribute it and/or

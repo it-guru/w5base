@@ -100,7 +100,6 @@ sub LnkGrpUser
 #          class    =>'base::workflow::mailsend',
 #          step     =>'base::workflow::mailsend::dataload',
 #          name     =>'eine Mail vom Testevent1 mit äöüß',
-#          emailto  =>'hartmut.vogler@t-systems.com',
 #          emailtext=>'Hallo Welt'
 #         })){
 #      my $r=$wf->Store($id,step=>'base::workflow::mailsend::waitforspool');
