@@ -24,3 +24,5 @@
 'wfapprovok'=>{de=>'Ich genehmige diese Anforderung - die Anforderung kann realisiert werden',en=>'yes, i approve this request and it can be realized from now on'},
 
 "you don't have check the ensure checkbox"=>{de=>'Sie haben nicht die Sicherheitsabfrage bestätigt'},
+'you need to specified a descriptive note'=>{de=>'Sie müssen eine sprechende Bemerkung angeben'},
+'you need to specified a descriptive reason'=>{de=>'Sie müssen eine sprechende Begründung angeben'},

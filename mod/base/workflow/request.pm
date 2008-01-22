@@ -697,9 +697,10 @@ sub generateWorkspacePages
       $$selopt.="<option value=\"wfapprovok\" class=\"$class\">".
                 $self->getParent->T("wfapprovok",$tr).
                 "</option>\n";
+      my $note=Query->Param("note");
       my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
          "<td colspan=2><textarea name=note style=\"width:100%;height:70px\">".
-         "</textarea></td></tr>";
+         $note."</textarea></td></tr>";
       $d.="<tr><td colspan=2>Ja, ich bin sicher, dass ich diese Anforderung ".
           "genehmigen möchte <input name=VERIFY type=checkbox></td></tr>";
       $d.="</table>";
