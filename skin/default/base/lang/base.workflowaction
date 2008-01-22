@@ -5,11 +5,17 @@
 'fieldgroup.additional'=>{de=>'Weiterführende Information',en=>'Additional'},
 'Action'=>{de=>'Aktion'},
 'FW:'=>{de=>'WG:'},
-'Forwarding'=>{de=>'Weiterleitung'},
+'APRREQ:'=>{de=>'GENANF:'},
+'LABEL:FW:'=>{de=>'Weiterleitung',en=>'Forward'},
+'LABEL:APRREQ:'=>{de=>'Genehmigungsanforderung',en=>'Approve request'},
 'The Workflow %s has been forwared to you without comments'=>{
      de=>'Der Workflow %s wurde ohne Kommentare an Sie weitergeleitet'},
+'An approve for Workflow %s has been requested to you without comments'=>{
+     de=>'Eine Genehmigungsanforderung für den Workflow %s wurde ohne Kommentare an Sie gerichtet'},
 'The Workflow %s has been forwared to you'=>{
      de=>'Der Workflow %s wurde an Sie weitergeleitet'},
+'An approve for Workflow %s has been requested to you'=>{
+     de=>'Eine Genehmigungsanforderung für den Workflow %s wurde an Sie gerichtet'},
 'Edit'=>{de=>'Bearbeiten'},
 'Effort'=>{de=>'Zeitaufwand'},
 'Private State'=>{de=>'Sichtbarkeit'},

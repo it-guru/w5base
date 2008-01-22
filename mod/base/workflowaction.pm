@@ -306,6 +306,8 @@ sub NotifyForward
    my $comments=shift;
    my %param=@_;
 
+   $param{mode}="FW:" if (!defined($param{mode}));  # default ist forward
+
    my $wf=getModuleObject($self->Config,"base::workflow");
    my $from='no_reply@w5base.net';
    my @to=();
@@ -359,7 +361,7 @@ sub NotifyForward
    }
    my $subject=$self->Config->Param("SITENAME");
    $subject.=" " if ($subject ne "");
-   $subject.=$self->T("FW:");
+   $subject.=$self->T($param{mode});
    my ($wfrec,$msg)=$wf->getOnlyFirst({id=>\$wfheadid},qw(name));
    if (defined($wfrec)){
       $subject.=" " if ($subject ne "" && $wfrec->{name} ne "");
@@ -376,13 +378,27 @@ sub NotifyForward
       $workflowname="'".$param{workflowname}." ID:".$wfheadid."'";
    }
    if ($comments=~m/^\s*$/){
-      $comments=sprintf($self->T(
-        'The Workflow %s has been forwared to you without comments').".",
-        $workflowname);
+      if ($param{mode} eq "FW:"){
+         $comments=sprintf($self->T(
+           'The Workflow %s has been forwared to you without comments').".",
+           $workflowname);
+      }
+      elsif ($param{mode} eq "APRREQ:"){
+         $comments=sprintf($self->T(
+           'An approve for Workflow %s has been requested to you without comments').".",
+           $workflowname);
+      }
    }
    else{
-      $comments.="\n\n".sprintf($self->T(
-        'The Workflow %s has been forwared to you').".",$workflowname);
+      if ($param{mode} eq "FW:"){
+         $comments.="\n\n".sprintf($self->T(
+           'The Workflow %s has been forwared to you').".",$workflowname);
+      }
+      elsif ($param{mode} eq "APRREQ:"){
+         $comments.="\n\n".sprintf($self->T(
+           'An approve for Workflow %s has been requested to you').".",
+           $workflowname);
+      }
    }
    my $baseurl;
    if ($ENV{SCRIPT_URI} ne ""){
@@ -418,7 +434,7 @@ sub NotifyForward
            class    =>'base::workflow::mailsend',
            step     =>'base::workflow::mailsend::dataload',
            name     =>$subject,%adr,
-           emailhead=>$self->T("Forwarding").":",
+           emailhead=>$self->T("LABEL:".$param{mode}).":",
            emailpostfix=>$emailpostfix,
            emailtext=>$comments,
           })){

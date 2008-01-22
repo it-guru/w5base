@@ -1170,6 +1170,14 @@ sub Process
                                "base::user",$new1->{"${approverrequest}id"})){
                if ($self->StoreRecord($WfRec,{stateid=>6})){
                   Query->Delete("OP");
+                  #
+                  # Mail versenden - Genehmigungsanforderung
+                  #
+                  $self->PostProcess($action.".".$op,$WfRec,$actions,
+                                 note=>$note,
+                                 fwdtarget=>'base::user',
+                                 fwdtargetid=>$new1->{"${approverrequest}id"},
+                                 fwdtargetname=>$approverrequestname);
                   return(1);
                }
             }
@@ -1256,6 +1264,16 @@ sub PostProcess
    my $aobj=$self->getParent->getParent->Action();
    my $workflowname=$self->getParent->getWorkflowMailName();
 
+   if ($action eq "SaveStep.wfapprovalreq"){
+      $aobj->NotifyForward($WfRec->{id},
+                           $param{fwdtarget},
+                           $param{fwdtargetid},
+                           $param{fwdtargetname},
+                           $param{note},
+                           mode=>'APRREQ:',
+                           workflowname=>$workflowname,
+                           sendercc=>1);
+   }
    if ($action eq "SaveStep.wfforward" ||
        $action eq "SaveStep.wfreprocess"){
       $aobj->NotifyForward($WfRec->{id},
