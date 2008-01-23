@@ -87,7 +87,7 @@ sub isViewValid
    return(undef);
 }
 
-sub getDetailBlockPriority                # posibility to change the block order
+sub getDetailBlockPriority                # posibility to mod the block order
 {
    return("itilincident");
 }
