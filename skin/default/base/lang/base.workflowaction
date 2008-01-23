@@ -6,6 +6,10 @@
 'Action'=>{de=>'Aktion'},
 'FW:'=>{de=>'WG:'},
 'APRREQ:'=>{de=>'GENANF:'},
+'APROK:'=>{de=>'GENOK:'},
+'APRREJ:'=>{de=>'GENABG:'},
+'LABEL:APRREJ:'=>{de=>'Genehmigung abgelehnt',en=>'Approved rejected'},
+'LABEL:APROK:'=>{de=>'Genehmigt',en=>'Approved'},
 'LABEL:FW:'=>{de=>'Weiterleitung',en=>'Forward'},
 'LABEL:APRREQ:'=>{de=>'Genehmigungsanforderung',en=>'Approve request'},
 'The Workflow %s has been forwared to you without comments'=>{

@@ -298,7 +298,7 @@ sub getPosibleActions
        ($iscurrent && $userid==$creator)){
       push(@l,"wfaddnote");    # notiz hinzufügen        (jeder)
    }
-   if (($stateid==2 || $stateid==7) &&
+   if (($stateid==2 || $stateid==7 || $stateid==10) &&
        ((($lastworker!=$userid) && 
         (($userid!=$creator) || ($userid!=$initiatorid)) &&  $iscurrent) ||
         $iscurrent)){
@@ -308,7 +308,7 @@ sub getPosibleActions
       push(@l,"wfacceptn"); # workflow annehmen und notiz anf(durch Bearbeiter)
       push(@l,"wfreject");  # workflow bearbeitung abgelehnt (durch Bearbeiter)
    }
-   if (($stateid==2 || $stateid==4) && ($iscurrent || 
+   if (($stateid==2 || $stateid==4 || $stateid==10) && ($iscurrent || 
                                         ($isadmin && !$lastworker==$userid))){
       push(@l,"wfforward"); # workflow weiterleiten   (neuen Bearbeiter setzen)
    }
@@ -683,9 +683,10 @@ sub generateWorkspacePages
       $$selopt.="<option value=\"wfapprovalreq\" class=\"$class\">".
                 $self->getParent->T("wfapprovalreq",$tr).
                 "</option>\n";
+      my $note=Query->Param("note");
       my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
          "<td colspan=2><textarea name=note style=\"width:100%;height:70px\">".
-         "</textarea></td></tr>";
+         $note."</textarea></td></tr>";
       $d.="<tr><td width=1% nowrap>&nbsp;Genehmigungs ".
           "Anforderung bei:&nbsp;</td>".
           "<td>\%approverrequest(detail)\%".
@@ -710,9 +711,10 @@ sub generateWorkspacePages
       $$selopt.="<option value=\"wfapprovreject\" class=\"$class\">".
                 $self->getParent->T("wfapprovreject",$tr).
                 "</option>\n";
+      my $note=Query->Param("note");
       my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
          "<td colspan=2><textarea name=note style=\"width:100%;height:70px\">".
-         "</textarea></td></tr>";
+         $note."</textarea></td></tr>";
       $d.="</table>";
       $$divset.="<div id=OPwfapprovreject>$d</div>";
    }
@@ -1038,7 +1040,8 @@ sub Process
             #
             # MAIL versenden: Workflow wurde genehmigt
             #
-            $self->PostProcess($action.".".$op,$WfRec,$actions);
+            $self->PostProcess($action.".".$op,$WfRec,$actions,
+                               note=>$note);
             return(1);
          }
          return(0);
@@ -1051,12 +1054,13 @@ sub Process
              $WfRec->{id},"wfapprovereject",
              {translation=>'base::workflow::request'},$note,undef)){
             my $openuserid=$WfRec->{openuser};
-            $self->StoreRecord($WfRec,{stateid=>2});
+            $self->StoreRecord($WfRec,{stateid=>10});
             $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
             #
             # MAIL versenden: Workflow wurde abgelehnt
             #
-            $self->PostProcess($action.".".$op,$WfRec,$actions);
+            $self->PostProcess($action.".".$op,$WfRec,$actions,
+                               note=>$note);
             return(1);
          }
          return(0);
@@ -1272,6 +1276,26 @@ sub PostProcess
                            $param{fwdtargetname},
                            $param{note},
                            mode=>'APRREQ:',
+                           workflowname=>$workflowname,
+                           sendercc=>1);
+   }
+   if ($action eq "SaveStep.wfapprovok"){
+      $aobj->NotifyForward($WfRec->{id},
+                           $WfRec->{fwdtarget},
+                           $WfRec->{fwdtargetid},
+                           undef,
+                           $param{note},
+                           mode=>'APROK:',
+                           workflowname=>$workflowname,
+                           sendercc=>1);
+   }
+   if ($action eq "SaveStep.wfapprovreject"){
+      $aobj->NotifyForward($WfRec->{id},
+                           $WfRec->{fwdtarget},
+                           $WfRec->{fwdtargetid},
+                           undef,
+                           $param{note},
+                           mode=>'APRREJ:',
                            workflowname=>$workflowname,
                            sendercc=>1);
    }
