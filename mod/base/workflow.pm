@@ -87,6 +87,12 @@ sub new
                 default       =>5,
                 dataobjattr   =>'wfhead.prio'),
                                    
+      new kernel::Field::Link(
+                name          =>'prioid',
+                uivisible     =>0,
+                label         =>'PrioID',
+                dataobjattr   =>'wfhead.prio'),
+                                   
       new base::workflow::Field::state(
                 name          =>'state',
                 htmldetail    =>0,

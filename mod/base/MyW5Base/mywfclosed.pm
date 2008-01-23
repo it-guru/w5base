@@ -38,6 +38,36 @@ sub Init
    return(1);
 }
 
+sub getQueryTemplate
+{
+   my $self=shift;
+   my $timelabel=$self->getParent->T("Change end time");;
+   my $timedrop=$self->getTimeRangeDrop("search_eventend",
+                                        $self->getParent,
+                                        qw(month));
+   my $d=<<EOF;
+<div class=searchframe>
+<table class=searchframe>
+<tr>
+<td class=fname width=10%>\%name(label)\%:</td>
+<td class=finput width=40% >\%name(search)\%</td>
+<td class=fname>\%eventend(label)\%:</td>
+<td class=finput>$timedrop</td>
+</tr>
+<tr>
+<td class=fname width=10%>\%class(label)\%:</td>
+<td class=finput width=40% >\%class(search)\%</td>
+<td class=fname></td>
+<td class=finput></td>
+</tr>
+</table>
+</div>
+%StdButtonBar(_exviewcontrol,deputycontrol,teamviewcontrol,print,search)%
+EOF
+   return($d);
+}
+
+
 sub Result
 {
    my $self=shift;

@@ -80,6 +80,7 @@ sub new
 
       new kernel::Field::Duration(
                 name          =>'duration',
+                htmlwidth     =>'30px',
                 label         =>'Duration',
                 visual        =>'auto',
                 depend        =>['cdate','mdate']),

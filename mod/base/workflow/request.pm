@@ -1152,6 +1152,7 @@ sub Process
          else{
             return(0);
          }
+printf STDERR ("fifi 01\n");
          if ($self->getParent->getParent->getCurrentUserId()==
              $new1->{"${approverrequest}id"}){
             $self->LastMsg(ERROR,"you could'nt request approve by your self");
@@ -1174,8 +1175,6 @@ sub Process
                             approvereqtargetid=>$new1->{"${approverrequest}id"}
                           }},$info,undef)){
             my $openuserid=$WfRec->{openuser};
-            $self->PostProcess($action.".".$op,$WfRec,$actions,
-                               note=>$note);
             if ($self->getParent->getParent->AddToWorkspace($WfRec->{id},
                                "base::user",$new1->{"${approverrequest}id"})){
                if ($self->StoreRecord($WfRec,{stateid=>6})){

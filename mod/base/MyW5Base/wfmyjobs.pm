@@ -44,6 +44,33 @@ sub getDefaultStdButtonBar
    return('%StdButtonBar(deputycontrol,print,search)%');
 }
 
+sub getQueryTemplate
+{
+   my $self=shift;
+   my $bb=<<EOF;
+<div class=searchframe>
+<table class=searchframe>
+<tr>
+<td class=fname width=10%>\%name(label)\%:</td>
+<td class=finput width=50% >\%name(search)\%</td>
+<td class=fname width=10%>\%prio(label)\%:</td>
+<td class=finput width=30%>\%prioid(search)\%</td>
+</tr>
+<tr>
+<td class=fname width=10%>\%class(label)\%:</td>
+<td class=finput width=50% >\%class(search)\%</td>
+<td class=fname width=10%>\%state(label)\%:</td>
+<td class=finput width=30%>\%stateid(search)\%</td>
+</tr>
+</table>
+</div>
+EOF
+
+   $bb.=$self->getDefaultStdButtonBar();
+   return($bb);
+}
+
+
 sub isSelectable
 {
    my $self=shift;
@@ -69,10 +96,12 @@ sub Result
       my %q2=%q;
       $q1{fwddebtargetid}=\$userid;
       $q1{fwddebtarget}=\'base::user';
-      $q1{stateid}="<20";
+      $q1{stateid}.=" AND " if ($q1{stateid} ne "");
+      $q1{stateid}.="<20";
       $q2{fwddebtargetid}=\@grpids;
       $q2{fwddebtarget}=\'base::grp';
-      $q2{stateid}="<20";
+      $q2{stateid}.=" AND " if ($q2{stateid} ne "");
+      $q2{stateid}.="<20";
       push(@q,\%q1,\%q2);
    }
    if ($dc ne "DEPONLY"){
@@ -81,10 +110,12 @@ sub Result
       my %q3=%q;
       $q1{fwdtargetid}=\$userid;
       $q1{fwdtarget}=\'base::user';
-      $q1{stateid}="<20";
+      $q1{stateid}.=" AND " if ($q1{stateid} ne "");
+      $q1{stateid}.="<20";
       $q2{fwdtargetid}=\@grpids;
       $q2{fwdtarget}=\'base::grp';
-      $q2{stateid}="<20";
+      $q2{stateid}.=" AND " if ($q2{stateid} ne "");
+      $q2{stateid}.="<20";
 
       my %id=();  # this hack prevents searches over two keys (this is bad)
       $self->{DataObj}->SetFilter([\%q1,\%q2]);
@@ -92,7 +123,8 @@ sub Result
       map({$id{$_->{id}}=1} @l);
 
       $q3{owner}=\$userid;
-      $q3{stateid}="<=6";
+      $q3{stateid}.=" AND " if ($q3{stateid} ne "");
+      $q3{stateid}.="<=6";
 
       $self->{DataObj}->SetFilter([\%q3]);
       my @l=$self->{DataObj}->getHashList(qw(id));
