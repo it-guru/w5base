@@ -315,6 +315,7 @@ sub getPosibleActions
    if (($stateid==4 || $stateid==3) && 
        ($lastworker==$userid || $isadmin) && ($userid!=$creator)){
       push(@l,"wffineproc");# Bearbeiten und zurück an Anf.  (durch Bearbeiter)
+      push(@l,"wfapprovalreq"); # Genehmigung anfordern      (durch Bearbeiter)
    }
 
    #push(@l,"wfapprove");    # workflow genehmigen            (durch Aprover)
