@@ -278,6 +278,7 @@ sub Datafield2Hash
          my $key=$1;
          my $val=$2;
          $val=~s/<br>/\n/g;
+         $val=~s/\\&lt;br&gt;/<br>/g;
          if (defined($hash{$key})){
             push(@{$hash{$key}},$val);
          }
@@ -287,6 +288,28 @@ sub Datafield2Hash
       }
    }
    return(%hash);
+}
+
+sub Hash2Datafield
+{
+   my %hash=@_;
+   my $data="\n\n";
+   foreach my $k (sort(keys(%hash))){
+      my $d=$hash{$k};
+      my @dlist=($d);
+      if (ref($d) eq "ARRAY"){
+         @dlist=@{$d};
+      }
+      foreach my $d (@dlist){
+         $d=~s/\'/"/g;
+         $d=~s/<br>/\\&lt;br&gt;/g;
+         $d=~s/\n/<br>/g;
+         utf8::decode($d);
+         $data="$data$k='".$d."'=$k\r\n";
+      }
+   }
+   $data.="\n";
+   return($data);
 }
 
 sub CompressHash
@@ -305,27 +328,6 @@ sub CompressHash
       }
    }
    return($h);
-}
-
-sub Hash2Datafield
-{
-   my %hash=@_;
-   my $data="\n\n";
-   foreach my $k (sort(keys(%hash))){
-      my $d=$hash{$k};
-      my @dlist=($d);
-      if (ref($d) eq "ARRAY"){
-         @dlist=@{$d};
-      }
-      foreach my $d (@dlist){
-         $d=~s/\'/"/g;
-         $d=~s/\n/<br>/g;
-         utf8::decode($d);
-         $data="$data$k='".$d."'=$k\r\n";
-      }
-   }
-   $data.="\n";
-   return($data);
 }
 
 #
