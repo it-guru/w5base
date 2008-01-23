@@ -115,6 +115,7 @@ sub mkp800
       $wf->SetCurrentView(qw(id name affectedcontractid 
                                      affectedcontract
                                      affectedapplicationid
+                                     wffields.tcomcodrelevant
                                      affectedapplication
                              headref class step stateid
                              srcid));
@@ -126,8 +127,7 @@ sub mkp800
       if (defined($rec)){
          do{
             if (ref($rec->{affectedcontractid}) eq "ARRAY" &&
-                ref($rec->{headref}->{tcomcodrelevant}) eq "ARRAY" &&
-                $rec->{headref}->{tcomcodrelevant}->[0] eq "yes" &&
+                $rec->{tcomcodrelevant} eq "yes" &&
                 $rec->{stateid}>=17){
                $self->processRec($start,\%p800,$rec);
                $self->processRecSpecial($start,\%p800special,$rec,
