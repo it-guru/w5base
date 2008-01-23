@@ -1050,6 +1050,10 @@ sub Process
      
       if ($op eq "wfapprovreject"){
          my $note=Query->Param("note");
+         if ($note=~m/^\s*$/ || length($note)<10){
+            $self->LastMsg(ERROR,"you need to specified a descriptive note");
+            return(0);
+         }
          $note=trim($note);
          if ($self->getParent->getParent->Action->StoreRecord(
              $WfRec->{id},"wfapprovereject",
