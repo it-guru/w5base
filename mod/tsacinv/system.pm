@@ -161,6 +161,11 @@ sub new
                 label         =>'System OLA',
                 dataobjattr   =>'amcomputer.olaclasssystem'),
 
+      new kernel::Field::Text(
+                name          =>'priority',
+                label         =>'Priorität',
+                dataobjattr   =>'amportfolio.priority'),
+
       new kernel::Field::Import($self,
                 vjointo       =>'tsacinv::asset',
                 vjoinon       =>['lassetid'=>'lassetid'],
