@@ -163,7 +163,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'priority',
-                label         =>'Priorität',
+                label         =>'Priority of system',
                 dataobjattr   =>'amportfolio.priority'),
 
       new kernel::Field::Import($self,
