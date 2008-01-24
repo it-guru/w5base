@@ -324,6 +324,28 @@ sub new
                 vjoininhash   =>['system','systemsystemid','systemcistatus',
                                  'systemid']),
 
+      new kernel::Field::SubList(
+                name          =>'systemnames',
+                label         =>'active systemnames',
+                group         =>'systems',
+                htmldetail    =>0,
+                htmlwidth     =>'130px',
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{systemcistatusid=>"4"}],
+                vjoinon       =>['id'=>'applid'],
+                vjoindisp     =>['system']),
+
+      new kernel::Field::SubList(
+                name          =>'systemids',
+                label         =>'active systemids',
+                group         =>'systems',
+                htmldetail    =>0,
+                htmlwidth     =>'130px',
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{systemcistatusid=>"4"}],
+                vjoinon       =>['id'=>'applid'],
+                vjoindisp     =>['systemsystemid']),
+
       new kernel::Field::Textarea(
                 name          =>'description',
                 label         =>'Application Description',

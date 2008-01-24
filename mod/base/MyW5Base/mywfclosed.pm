@@ -81,7 +81,7 @@ sub Result
 
    $self->{DataObj}->ResetFilter();
    $self->{DataObj}->SecureSetFilter([\%q1]);
-   $self->{DataObj}->setDefaultView(qw(class eventstart eventend state name));
+   $self->{DataObj}->setDefaultView(qw(eventend eventstart class state name));
 
    return($self->{DataObj}->Result(ExternalFilter=>1));
 }

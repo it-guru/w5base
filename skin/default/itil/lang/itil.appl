@@ -3,6 +3,8 @@
 'fieldgroup.custcontracts'=>{de=>'Kundenverträge',en=>'Customer Contracts'},
 'fieldgroup.interfaces'=>{de=>'Schnittstellen',en=>'Interfaces'},
 'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
+'active systemnames'=>{de=>'aktive Systemnamen'},
+'active systemids'=>{de=>'aktive SystemIDs'},
 'you are only authorized to add in \'order\' or \'reserved\' state'=>{de=>'Sie sind nur berechtig, im Status \'angefordert\' oder \'reserviert\' Datensätze zu erzeugen'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'Deputy Service Manager'=>{de=>'Service Manager Vertreter'},
