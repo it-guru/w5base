@@ -1,5 +1,5 @@
 'question/ info'=>{de=>'Anfrage/ Information'},
 'answer'=>{de=>'Antwort'},
-'UnsubscribeInfo'=>{de=>'Falls Sie diese Benachrichtigung abschalten möchten, klicken Sie bitte auf den obigen Link, und nutzen den Button "InfoAbo"',
-                     en=>'If you want to unsubscribe this messages, click on the above link and use the Button "InfoAbo"'},
+'UnsubscribeInfo'=>{de=>'Zum Antworten auf diese Mail verwenden Sie bitte nicht die Antworten funktion in ihrem Mailprogramm, sondern den aufgeführten "direkt Link". Falls Sie diese Benachrichtigung abschalten möchten, klicken Sie bitte auf den obigen Link, und nutzen den Button "InfoAbo".',
+                     en=>'To answer this message, please dont use the answer function in your mail programm. Use the "direct link" above to do this!. If you want to unsubscribe this messages, click on the above link and use the Button "InfoAbo"'},
 'direct link'=>{de=>'direkt Link'},

@@ -150,7 +150,8 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'fullsystemlist',
-                label         =>'related Systems',
+                label         =>'all related Systems',
+                group         =>'relations',
                 readonly      =>1,
                 htmldetail    =>0,
                 onRawValue    =>sub{
@@ -164,7 +165,8 @@ sub new
                        $#{$current->{fullsystemidlist}}!=-1){
                       my $sys=getModuleObject($self->getParent->Config,
                                               "itil::system");
-                      $sys->SetFilter({id=>$current->{fullsystemidlist}});
+                      $sys->SetFilter({id=>$current->{fullsystemidlist},
+                                       cistatusid=>'<=4'});
                       my @l=$sys->getHashList("name");
                       foreach my $sysrec (@l){
                          push(@d,$sysrec->{name});
@@ -172,85 +174,121 @@ sub new
                    }
                    return(\@d);
                 }),
-      new kernel::Field::Link(
-                name          =>'fullsystemidlist',
+      new kernel::Field::Text(
+                name          =>'fulltsmlist',
+                label         =>'all related TSMs',
+                group         =>'relations',
                 readonly      =>1,
                 htmldetail    =>0,
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
-                   my %ids=();
-                   my $fo=$self->getParent->getField("systems");
-                   $current->{systems}=$fo->RawValue($current);
-                   my $fo=$self->getParent->getField("ipshares");
-                   $current->{ipshares}=$fo->RawValue($current);
-                   
-                   #
-                   # pass 1 : process system shares
-                   #
-                   if (defined($current) && defined($current->{systems}) &&
-                       ref($current->{systems}) eq "ARRAY"){
-                      foreach my $clirec (@{$current->{systems}}){
-                         printf STDERR ("d=%s\n",Dumper($clirec));
-                         my $sysid=$clirec->{systemid};
-                         if ($sysid ne ""){
-                            $ids{$sysid}++;
-                         }
+                   my %d;
+                   my %applid;
+                   my $fo=$self->getParent->getField("fullsystemidlist");
+                   $current->{fullsystemidlist}=$fo->RawValue($current);
+                   if (defined($current->{fullsystemidlist})&&
+                       ref($current->{fullsystemidlist}) eq "ARRAY" &&
+                       $#{$current->{fullsystemidlist}}!=-1){
+                      my $lnk=getModuleObject($self->getParent->Config,
+                                              "itil::lnkapplsystem");
+                      $lnk->SetFilter({systemid=>$current->{fullsystemidlist},
+                                       applcistatusid=>'<=4',
+                                       systemcistatusid=>'<=4'});
+                      my @l=$lnk->getHashList("applid");
+                      foreach my $lnkrec (@l){
+                         $applid{$lnkrec->{applid}}++;
                       }
                    }
-                   #
-                   # pass 2 : process ip shares
-                   #
-                   if (defined($current) && defined($current->{ipshares}) &&
-                       ref($current->{ipshares}) eq "ARRAY"){
-                      my @ipq=();
-                      my $ip=getModuleObject($self->getParent->Config,
-                                             "itil::ipaddress");
-                      foreach my $iprec (@{$current->{ipshares}}){
-                         my ($ipaddr,$bits)=split(/\//,$iprec->{name});
-                         my @ipaddr=split(/\./,$ipaddr);
-                         my $ipflt=$ipaddr;
-                         if ($bits<32){
-                            if ($bits>=24){
-                               $ipflt=$ipaddr[0].".".$ipaddr[1].".".
-                                      $ipaddr[2].".*";
-                            }
-                            elsif ($bits>=16){
-                               $ipflt=$ipaddr[0].".".$ipaddr[1].".*";
-                            }
-                            else{
-                               $ipflt=$ipaddr[0].".*";
-                            }
+                   if (keys(%applid)){
+                      my $appl=getModuleObject($self->getParent->Config,
+                                              "itil::appl");
+                      $appl->SetFilter({id=>[keys(%applid)]});
+                      my @l=$appl->getHashList("tsmemail");
+                      foreach my $applrec (@l){
+                         if ($applrec->{tsmemail} ne ""){
+                            $d{$applrec->{tsmemail}}++;
                          }
-                         my $network=$iprec->{networkid};
-                         printf STDERR ("ipfilter=%-15s netbits=%-3d ".
-                                        "netarea=%-12s ".
-                                        "flt=$ipflt\n",$ipaddr,$bits,$network);
-                         push(@ipq,{name=>$ipflt,
-                                    networkid=>\$network});
                       }
-                      if ($#ipq!=-1){
-                         $ip->SetFilter(\@ipq);
-                         foreach my $iprec ($ip->getHashList(qw(name 
-                                                                systemid))){
-                            my $match=0;
-                            foreach my $comprec (@{$current->{ipshares}}){
-                               if (ipCompare($comprec->{name},
-                                             $iprec->{name})){
-                                  $match=1;
-                                  last;
-                               }
-                            }
-                            if ($match){
-                            printf STDERR ("fifi process=%s\n",Dumper($iprec));
-                               $ids{$iprec->{systemid}}++;        
-                            }
-                         }
+                      return([sort(keys(%d))]);
+
+                   }
+                   return([]);
+                }),
+      new kernel::Field::Text(
+                name          =>'fulltsm2list',
+                label         =>'all related deputy TSMs',
+                group         =>'relations',
+                readonly      =>1,
+                htmldetail    =>0,
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my %d;
+                   my %applid;
+                   my $fo=$self->getParent->getField("fullsystemidlist");
+                   $current->{fullsystemidlist}=$fo->RawValue($current);
+                   if (defined($current->{fullsystemidlist})&&
+                       ref($current->{fullsystemidlist}) eq "ARRAY" &&
+                       $#{$current->{fullsystemidlist}}!=-1){
+                      my $lnk=getModuleObject($self->getParent->Config,
+                                              "itil::lnkapplsystem");
+                      $lnk->SetFilter({systemid=>$current->{fullsystemidlist},
+                                       applcistatusid=>'<=4',
+                                       systemcistatusid=>'<=4'});
+                      my @l=$lnk->getHashList("applid");
+                      foreach my $lnkrec (@l){
+                         $applid{$lnkrec->{applid}}++;
                       }
                    }
-                   ############################################################
-                   return([keys(%ids)]);
-                },
+                   if (keys(%applid)){
+                      my $appl=getModuleObject($self->getParent->Config,
+                                              "itil::appl");
+                      $appl->SetFilter({id=>[keys(%applid)]});
+                      my @l=$appl->getHashList("tsm2email");
+                      foreach my $applrec (@l){
+                         if ($applrec->{tsm2email} ne ""){
+                            $d{$applrec->{tsm2email}}++;
+                         }
+                      }
+                      return([sort(keys(%d))]);
+
+                   }
+                   return([]);
+                }),
+      new kernel::Field::Text(
+                name          =>'fullappllist',
+                label         =>'all related Applications',
+                readonly      =>1,
+                group         =>'relations',
+                htmldetail    =>0,
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my %d;
+                   my $fo=$self->getParent->getField("fullsystemidlist");
+                   $current->{fullsystemidlist}=$fo->RawValue($current);
+                   if (defined($current->{fullsystemidlist})&&
+                       ref($current->{fullsystemidlist}) eq "ARRAY" &&
+                       $#{$current->{fullsystemidlist}}!=-1){
+                      my $lnk=getModuleObject($self->getParent->Config,
+                                              "itil::lnkapplsystem");
+                      $lnk->SetFilter({systemid=>$current->{fullsystemidlist},
+                                       applcistatusid=>'<=4',
+                                       systemcistatusid=>'<=4'});
+                      my @l=$lnk->getHashList("appl");
+                      foreach my $lnkrec (@l){
+                         $d{$lnkrec->{appl}}++;
+                      }
+                   }
+                   return([sort(keys(%d))]);
+                }),
+      new kernel::Field::Link(
+                name          =>'fullsystemidlist',
+                readonly      =>1,
+                group         =>'relations',
+                htmldetail    =>0,
+                onRawValue    =>\&CalcSystemIdRelationList,
                 label         =>'full SystemID list'),
                                                    
       new kernel::Field::Text(
@@ -345,6 +383,83 @@ sub new
 
    $self->setDefaultView(qw(system name cistatus mdate comments));
    return($self);
+}
+
+sub CalcSystemIdRelationList
+{
+   my $self=shift;
+   my $current=shift;
+   my %ids=();
+   my $fo=$self->getParent->getField("systems");
+   $current->{systems}=$fo->RawValue($current);
+   my $fo=$self->getParent->getField("ipshares");
+   $current->{ipshares}=$fo->RawValue($current);
+   
+   #
+   # pass 1 : process system shares
+   #
+   if (defined($current) && defined($current->{systems}) &&
+       ref($current->{systems}) eq "ARRAY"){
+      foreach my $clirec (@{$current->{systems}}){
+         printf STDERR ("d=%s\n",Dumper($clirec));
+         my $sysid=$clirec->{systemid};
+         if ($sysid ne ""){
+            $ids{$sysid}++;
+         }
+      }
+   }
+   #
+   # pass 2 : process ip shares
+   #
+   if (defined($current) && defined($current->{ipshares}) &&
+       ref($current->{ipshares}) eq "ARRAY"){
+      my @ipq=();
+      my $ip=getModuleObject($self->getParent->Config,
+                             "itil::ipaddress");
+      foreach my $iprec (@{$current->{ipshares}}){
+         my ($ipaddr,$bits)=split(/\//,$iprec->{name});
+         my @ipaddr=split(/\./,$ipaddr);
+         my $ipflt=$ipaddr;
+         if ($bits<32){
+            if ($bits>=24){
+               $ipflt=$ipaddr[0].".".$ipaddr[1].".".
+                      $ipaddr[2].".*";
+            }
+            elsif ($bits>=16){
+               $ipflt=$ipaddr[0].".".$ipaddr[1].".*";
+            }
+            else{
+               $ipflt=$ipaddr[0].".*";
+            }
+         }
+         my $network=$iprec->{networkid};
+         printf STDERR ("ipfilter=%-15s netbits=%-3d ".
+                        "netarea=%-12s ".
+                        "flt=$ipflt\n",$ipaddr,$bits,$network);
+         push(@ipq,{name=>$ipflt,
+                    networkid=>\$network});
+      }
+      if ($#ipq!=-1){
+         $ip->SetFilter(\@ipq);
+         foreach my $iprec ($ip->getHashList(qw(name 
+                                                systemid))){
+            my $match=0;
+            foreach my $comprec (@{$current->{ipshares}}){
+               if (ipCompare($comprec->{name},
+                             $iprec->{name})){
+                  $match=1;
+                  last;
+               }
+            }
+            if ($match){
+            printf STDERR ("fifi process=%s\n",Dumper($iprec));
+               $ids{$iprec->{systemid}}++;        
+            }
+         }
+      }
+   }
+   ############################################################
+   return([keys(%ids)]);
 }
 
 sub ipCompare

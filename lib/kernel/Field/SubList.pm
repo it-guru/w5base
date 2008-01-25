@@ -152,11 +152,11 @@ sub getLineSubListData
       }
       my $d="";
       foreach my $rec ($self->vjoinobj->getHashList(@view)){
-         $d.="\n" if ($d ne "");
-         foreach my $field (@view){
-            $d.=", " if ($d ne "" && !($d=~m/\n$/));
+         $d.="\n" if ($d ne "" && $#view>0); # if there is only one field, it
+         foreach my $field (@view){          # isn't need to use linefeeds
+            $d.="; " if ($d ne "" && !($d=~m/\n$/));
             my $da=$rec->{$field};
-            $da=~s/[\n\r,]/ /g;
+            $da=~s/[\n\r;]/ /g;
             $d.=$da;
          }
       }
