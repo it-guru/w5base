@@ -1,61 +1,138 @@
+<style>
+.BlockHead{
+    margin:4px;
+    margin-left:0px;margin-right:0px;
+    padding:1px;
+    background-color: #30579f;
+    color:#ffffff;
+    font-size:12px;font-weight:bold;
+    cursor:pointer;
+}
+.DataBlock{
+    margin:2px;
+    font-size:16px;font-weight:bold
+}
+.DateLine{
+    text-align:right;float:right;width:40%;
+    font-size:10px;
+    margin:2px;margin-top:8px
+}
+.PrintButton{
+    float:right;
+    margin:2px;margin-top:3px;
+    cursor:pointer;
+}
+@media print {
+   .PrintButton{
+      display:none;
+      visibility:hidden;
+   }
+}
+.HeaderDesc{
+    width:50%;float:left;margin:2px;
+    font-size:16px;font-weight:bold;
+}
+table{
+   width:95%;
+}
+.col1{
+    width:180px;overflow:hidden;
+    vertical-align:top;
+    background-color:#ffffff;
+}
+.col2{
+    vertical-align:top;
+    background-color:#ffffff;
+}
+.signature{
+    font-size:10px;
+    text-align:right;
+    margin-top:-15px;
+    margin-right:15px;
+}
+</style>
+<script language="JavaScript">
+function BlockSwitch(blkname)
+{
+   var blk=document.getElementById(blkname);
+   var flag=document.getElementById(blkname+"flag");
+   if (blk){
+      if (blk.style.display=="block" || blk.style.display==""){
+         blk.style.display="none";
+         blk.style.visibility="hidden";
+         if (flag){
+            flag.innerHTML="&rarr;";
+         }
+      }
+      else{
+         blk.style.display="block";
+         blk.style.visibility="visible";
+         if (flag){
+            flag.innerHTML="&darr;";
+         }
+      }
+   }
+   else{
+      alert("div:"+blkname+" not found");
+   }
+}
+function doPrint()
+{
+   window.focus();
+   window.print();
+}
+</script>
 <div style="width:100%;">
  <div style="border-style:solid;
              border-width:1px;
-             border-color:gray;margin:5px">
+             border-color:gray;margin:15px">
+  <div class=HeaderDesc>Abhängikeits-/Ausfallsanalyse</div>
+  <div class=PrintButton onclick=doPrint()>
+       <img src="../../base/load/miniprint.gif" alt="">
+  </div>
+  <div class=DateLine>Stand: %NOW%</div>
+  <div style="clear:both">
 
-  <table width=100% border=1><tr>
-  <td align=left>Abhängikeits-/Ausfallsanalyse</td>
-  <td align=right>Stand: %NOW%</td>
-  </tr></table>
+    <div class=BlockHead onclick=BlockSwitch("INCOMP")>
+         <span id=INCOMPflag>&darr;</span> 
+         Gegenstand der Auswertung (Ausfall,Change oder Abschaltung)
+    </div>
+    <div id=INCOMP class=DataBlock>%INCOMP%</div>
 
-  <!-- ################################################################# -->
-  <!-- # auf was beziehen wir uns: -->
-  <table width=100% border=1>
-  <tr><td align=left>Gegenstand der Analyse ist der Ausfall oder Abschaltung von folgenden Komponenten:</td></tr><td>
-  %INCOMP%<hr>
+    <div class=BlockHead onclick=BlockSwitch("DIRECT")>
+         <span id=DIRECTflag>&darr;</span> 
+         %NDIRECT% direkt betroffene Komponenten
+    </div>
+    <div id=DIRECT class=DataBlock>%DIRECT%</div>
 
-  <!-- ################################################################# -->
+    <div class=BlockHead onclick=BlockSwitch("INDIRECT")>
+         <span id=INDIRECTflag>&darr;</span> 
+         %NINDIRECT% direkt betroffene bzw. beeinträchtiget 
+         Anwendung (Schnittstellen)
+    </div>
+    <div id=INDIRECT class=DataBlock>%INDIRECT%</div>
 
-  <!-- ################################################################# -->
-  <!-- # direct betroffene Komponenten: -->
-  <table width=100% border=1>
-  <tr><td align=left>%NDIRECT% direkt betroffene Komponenten:</td></tr><td>
-  %DIRECT%
+    <div class=BlockHead onclick=BlockSwitch("DETAIL")>
+         <span id=DETAILflag>&rarr;</span> 
+         detailierte Kontakte
+    </div>
+    <div id=DETAIL class=DataBlock style="display:none;visibility:hidden">
+         <table border=1>
+         <tr>
+         <td align=left valign=top>Komponente</td>
+         <td align=left valign=top>technischer Kontakt</td>
+         <td align=left valign=top>technischer Kontakt Vertr.</td>
+         <td align=left valign=top>Teamleiter</td>
+         </tr>
 
-  </td>
-  </table>
-  <!-- ################################################################# -->
+         </table>
 
-  <!-- ################################################################# -->
-  <!-- # indirect betroffene Komponenten: -->
-  <table width=100% border=1>
-  <tr><td align=left>%NINDIRECT% indirekt betroffene bzw. beeinträchtiget Anwendung (Schnittstellen):</td></tr><td>
-  %INDIRECT%
-  </td>
-  </table>
-  <!-- ################################################################# -->
+         %DETAIL%
+    </div>
 
-  <!-- ################################################################# -->
-  <!-- # detailiete Kontakt Liste: -->
-  <table width=100% border=1>
-  <tr><td align=left>detailierte Kontakte:</td></tr><td>
-
-  <table border=1>
-  <tr>
-  <td align=left valign=top>Komponente</td>
-  <td align=left valign=top>technischer Kontakt</td>
-  <td align=left valign=top>technischer Kontakt Vertr.</td>
-  <td align=left valign=top>Teamleiter</td>
-  </tr>
-
-  </table>
-
-  </td>
-  </table>
-  <!-- ################################################################# -->
-
+  </div>
  </div>
-<div align=right><font size=2>powerd by W5Base Analytics</font></div>
+ <div class=signature>powerd by W5Base Analytics</div>
 </div>
 
 

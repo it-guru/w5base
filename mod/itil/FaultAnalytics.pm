@@ -125,6 +125,8 @@ EOF
 <td valign=bottom>
 <select style="width:120px">
 <option>HTML Ausgabe</option>
+<option>native HTML</option>
+<option>Text only</option>
 </select>
 <input style="width:120px" onclick="doAnalyse();" type=button value=" analysieren ">
 </td></tr></table>
@@ -257,30 +259,33 @@ sub FormatIndirect
 {
    my ($self,$incomp,$outcomp,%param)=@_;
 
-   my $d="<table border=1>";
+   my $d="<table>";
    if (keys(%{$outcomp->{indirect}->{application}->{name}})){
-      $d.="<tr><td>Applications</td><td>".
+      $d.="<tr><td class=col1>Applications</td><td class=col2>".
           join(", ",sort(keys(%{$outcomp->{indirect}->{application}->{name}}))).
           "</td></tr>";
    }
    if (keys(%{$outcomp->{indirect}->{businessprocess}})){
       foreach my $customer (sort(keys(%{$outcomp->{indirect}->
                                                   {businessprocess}}))){
-         $d.="<tr><td>Geschäftsprozesse<br>$customer</td><td>".
+         $d.="<tr><td class=col1>Geschäftsprozesse<br>$customer</td>".
+             "<td class=col2>".
              join(", ",sort(keys(%{$outcomp->{indirect}->{businessprocess}->
                                              {$customer}->{name}}))).
              "</td></tr>";
       }
    }
    if (keys(%{$outcomp->{indirect}->{techcontact}})){
-      $d.="<tr><td>tech. Ansprechpartner</td><td>".
-          join(", ",sort(keys(%{$outcomp->{indirect}->{techcontact}->
+      $d.="<tr><td class=col1>tech. Ansprechpartner</td>".
+          "<td class=col2>".
+          join("; ",sort(keys(%{$outcomp->{indirect}->{techcontact}->
                                           {email}}))).
           "</td></tr>";
    }
    if (keys(%{$outcomp->{indirect}->{techcontact2}})){
-      $d.="<tr><td>tech. Ansprechpartner Vetreter</td><td>".
-          join(", ",sort(keys(%{$outcomp->{indirect}->{techcontact2}->
+      $d.="<tr><td class=col1>tech. Ansprechpartner Vetreter</td>".
+          "<td class=col2>".
+          join("; ",sort(keys(%{$outcomp->{indirect}->{techcontact2}->
                                           {email}}))).
           "</td></tr>";
    }
@@ -293,35 +298,38 @@ sub FormatDirect
 {
    my ($self,$incomp,$outcomp,%param)=@_;
 
-   my $d="<table border=1>";
+   my $d="<table>";
    if (keys(%{$outcomp->{direct}->{system}->{name}})){
-      $d.="<tr><td>Systems</td><td>".
+      $d.="<tr><td class=col1>Systems</td><td class=col2>".
           join(", ",sort(keys(%{$outcomp->{direct}->{system}->{name}}))).
           "</td></tr>";
    }
    if (keys(%{$outcomp->{direct}->{application}->{name}})){
-      $d.="<tr><td>Applications</td><td>".
+      $d.="<tr><td class=col1>Applications</td><td class=col2>".
           join(", ",sort(keys(%{$outcomp->{direct}->{application}->{name}}))).
           "</td></tr>";
    }
    if (keys(%{$outcomp->{direct}->{businessprocess}})){
       foreach my $customer (sort(keys(%{$outcomp->{direct}->
                                                   {businessprocess}}))){
-         $d.="<tr><td>Geschäftsprozesse<br>$customer</td><td>".
+         $d.="<tr><td class=col1>Geschäftsprozesse<br>$customer</td>".
+             "<td class=col2>".
              join(", ",sort(keys(%{$outcomp->{direct}->{businessprocess}->
                                              {$customer}->{name}}))).
              "</td></tr>";
       }
    }
    if (keys(%{$outcomp->{direct}->{techcontact}})){
-      $d.="<tr><td>tech. Ansprechpartner</td><td>".
-          join(", ",sort(keys(%{$outcomp->{direct}->{techcontact}->
+      $d.="<tr><td class=col1>tech. Ansprechpartner</td>".
+          "<td class=col2>".
+          join("; ",sort(keys(%{$outcomp->{direct}->{techcontact}->
                                           {email}}))).
           "</td></tr>";
    }
    if (keys(%{$outcomp->{direct}->{techcontact2}})){
-      $d.="<tr><td>tech. Ansprechpartner Vetreter</td><td>".
-          join(", ",sort(keys(%{$outcomp->{direct}->{techcontact2}->
+      $d.="<tr><td class=col1>tech. Ansprechpartner Vetreter</td>".
+          "<td class=col2>".
+          join("; ",sort(keys(%{$outcomp->{direct}->{techcontact2}->
                                           {email}}))).
           "</td></tr>";
    }
@@ -340,10 +348,11 @@ sub FormatIncomp
       my $objlabel=$self->T($rec->{objname},$rec->{objname});
       $l{$rec->{name}}={name=>$rec->{name},objlabel=>$objlabel};
    }
-   my $d="<table border=1>";
+   my $d="<table>";
    my $dtxt="";
    foreach my $k (sort(keys(%l))){
-      $d.="<tr><td>$l{$k}->{objlabel}</td><td>$l{$k}->{name}</td></tr>";
+      $d.="<tr><td class=col1>$l{$k}->{objlabel}</td>".
+          "<td class=col2>$l{$k}->{name}</td></tr>";
       $dtxt.="$l{$k}->{objlabel}:$l{$k}->{name}\n";
    }
    $d.="</table>";
