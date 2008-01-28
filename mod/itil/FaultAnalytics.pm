@@ -209,13 +209,20 @@ sub doAnalyse
    my ($directhtm,$directtxt)=$self->FormatDirect(\%incomp,\%outcomp,%param);
    my ($indirecthtm,$indirecttxt)=$self->FormatIndirect(\%incomp,\%outcomp,
                                                          %param);
+
+   my $ndirect=keys(%{$outcomp{direct}->{system}->{name}})+
+               keys(%{$outcomp{direct}->{application}->{name}});
+   my $nindirect=keys(%{$outcomp{indirect}->{system}->{name}})+
+                 keys(%{$outcomp{indirect}->{application}->{name}});
    
    print $self->getParsedTemplate("tmpl/FaultAnalytics",{
                                    static=>{
                                              NOW=>$nowstamp,
                                              INCOMP=>$incomphtm,
                                              DIRECT=>$directhtm,
+                                             NDIRECT=>$ndirect,
                                              INDIRECT=>$indirecthtm,
+                                             NINDIRECT=>$nindirect,
                                            }
                                   });
 
