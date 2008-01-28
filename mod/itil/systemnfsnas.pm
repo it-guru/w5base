@@ -149,6 +149,32 @@ sub new
                 dataobjattr   =>'systemnfsnas.additional'),
 
       new kernel::Field::Text(
+                name          =>'fullidlist',
+                label         =>'all related Systems IDs',
+                group         =>'relations',
+                readonly      =>1,
+                uivisible     =>0,
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my @d;
+                   my $fo=$self->getParent->getField("fullsystemidlist");
+                   $current->{fullsystemidlist}=$fo->RawValue($current);
+                   if (defined($current->{fullsystemidlist})&&
+                       ref($current->{fullsystemidlist}) eq "ARRAY" &&
+                       $#{$current->{fullsystemidlist}}!=-1){
+                      my $sys=getModuleObject($self->getParent->Config,
+                                              "itil::system");
+                      $sys->SetFilter({id=>$current->{fullsystemidlist},
+                                       cistatusid=>'<=4'});
+                      my @l=$sys->getHashList("id");
+                      foreach my $sysrec (@l){
+                         push(@d,$sysrec->{id});
+                      }
+                   }
+                   return(\@d);
+                }),
+      new kernel::Field::Text(
                 name          =>'fullsystemlist',
                 label         =>'all related Systems',
                 group         =>'relations',

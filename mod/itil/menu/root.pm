@@ -297,6 +297,11 @@ sub Init
                       func=>'New',
                       param=>'WorkflowClass=itil::workflow::eventnotify',
                       defaultacl=>['admin']);
+
+   $self->RegisterObj("Tools.analytics.itilfault",
+                      "itil::FaultAnalytics",
+                      defaultacl=>['admin']);
+
    return($self);
 }
 

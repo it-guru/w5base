@@ -1,4 +1,5 @@
 'Tools'=>{de=>'Werkzeuge'},
+'Tools.analytics'=>{de=>'Analytik',en=>'Analytics'},
 'Tools.XLSExpand'=>{de=>'XLSExpand',en=>'XLSExpand'},
 'Tools.workflow'=>{de=>'Workflow System',en=>'Workflow System'},
 'Tools.workflow.action'=>{de=>'Actionen',en=>'Actions'},

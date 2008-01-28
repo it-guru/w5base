@@ -186,6 +186,10 @@ sub Init
                       param=>'MSG=Hallo%20dies%20ist%20die%20Nachricht',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("Tools.analytics",
+                      "tmpl/welcome",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("Tools.workflow",
                       "base::workflow",
                       defaultacl=>['admin']);
