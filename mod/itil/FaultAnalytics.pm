@@ -123,6 +123,9 @@ EOF
 <td>
 </td>
 <td valign=bottom>
+<select style="width:120px">
+<option>HTML Ausgabe</option>
+</select>
 <input style="width:120px" onclick="doAnalyse();" type=button value=" analysieren ">
 </td></tr></table>
 </td>
