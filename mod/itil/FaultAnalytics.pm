@@ -70,6 +70,12 @@ sub Main
                            form=>1,
                            body=>1,
                            title=>$self->T($self->Self()));
+   if (Query->Param("DEL") ne ""){
+      my @comp=Query->Param("comp");
+      my $qd=quotemeta(Query->Param("DEL"));
+      @comp=grep(!/^$qd$/,@comp);
+      Query->Param("comp"=>\@comp);
+   }
    if (Query->Param("ADD")){
       $self->AddComponent();
    }
@@ -171,6 +177,7 @@ function doAnalyse()
    document.forms[0].action=oldaction;
 }
 </script>
+<input type=hidden name="DEL">
 EOF
    print $self->HtmlBottom(body=>1,form=>1);
 }
@@ -214,6 +221,8 @@ sub doAnalyse
    my ($directhtm,$directtxt)=$self->FormatDirect(\%incomp,\%outcomp,%param);
    my ($indirecthtm,$indirecttxt)=$self->FormatIndirect(\%incomp,\%outcomp,
                                                          %param);
+   my ($detailhtm,$detailtxt)=$self->FormatDetail(\%incomp,\%outcomp,
+                                                         %param);
 
    my $ndirect=keys(%{$outcomp{direct}->{system}->{name}})+
                keys(%{$outcomp{direct}->{application}->{name}});
@@ -224,6 +233,7 @@ sub doAnalyse
                                    static=>{
                                              NOW=>$nowstamp,
                                              INCOMP=>$incomphtm,
+                                             DETAIL=>$detailhtm,
                                              DIRECT=>$directhtm,
                                              NDIRECT=>$ndirect,
                                              INDIRECT=>$indirecthtm,
@@ -261,14 +271,17 @@ sub FormatIndirect
 
    my $d="<table>";
    if (keys(%{$outcomp->{indirect}->{application}->{name}})){
-      $d.="<tr><td class=col1>Applications</td><td class=col2>".
+      $d.="<tr><td class=col1>".$self->T("itil::appl","itil::appl").
+          "</td><td class=col2>".
           join(", ",sort(keys(%{$outcomp->{indirect}->{application}->{name}}))).
           "</td></tr>";
    }
    if (keys(%{$outcomp->{indirect}->{businessprocess}})){
       foreach my $customer (sort(keys(%{$outcomp->{indirect}->
                                                   {businessprocess}}))){
-         $d.="<tr><td class=col1>Geschäftsprozesse<br>$customer</td>".
+         $d.="<tr><td class=col1>".
+             $self->T("itil::businessprocess","itil::businessprocess").
+             "<br>$customer</td>".
              "<td class=col2>".
              join(", ",sort(keys(%{$outcomp->{indirect}->{businessprocess}->
                                              {$customer}->{name}}))).
@@ -294,25 +307,62 @@ sub FormatIndirect
    return($d);
 }
    
+sub FormatDetail
+{
+   my ($self,$incomp,$outcomp,%param)=@_;
+
+   my $d="<table>";
+   $d.="<tr>";
+   $d.="<td class=detailth>Komponente</td>";
+   $d.="<td class=detailth>tech. Contact<br>tech. Contact Vertr.</td>";
+   $d.="<td class=detailth>Teamleiter</td>";
+   $d.="<td class=detailth>reason</td>";
+   $d.="</tr>";
+   foreach my $k (sort(keys(%{$outcomp->{detail}}))){
+      $d.="<tr>";
+      $d.="<td class=detailname>".$outcomp->{detail}->{$k}->{name}."</td>";
+      $d.="<td class=techcontact>".$outcomp->{detail}->{$k}->{techcontact};
+      $d.="<br>" if ($outcomp->{detail}->{$k}->{techcontactphone} ne "");
+      $d.="<b><i>".$outcomp->{detail}->{$k}->{techcontactphone}."</i></b>";
+      $d.="<br>" if ($outcomp->{detail}->{$k}->{techcontact2} ne "");
+      $d.=$outcomp->{detail}->{$k}->{techcontact2};
+      $d.="</td>";
+      $d.="<td class=techtl>".$outcomp->{detail}->{$k}->{techtl};
+      $d.="<br>" if ($outcomp->{detail}->{$k}->{techtlphone} ne "");
+      $d.="<b><i>".$outcomp->{detail}->{$k}->{techtlphone}."</i></b>";
+      $d.="</td>";
+      $d.="<td class=detailreason>".
+          join(",<br>",sort(keys(%{$outcomp->{detail}->{$k}->{reason}}))).
+          "</td>";
+      $d.="</tr>";
+   }
+   $d.="</table>";
+   return($d);
+}
+   
 sub FormatDirect
 {
    my ($self,$incomp,$outcomp,%param)=@_;
 
    my $d="<table>";
    if (keys(%{$outcomp->{direct}->{system}->{name}})){
-      $d.="<tr><td class=col1>Systems</td><td class=col2>".
+      $d.="<tr><td class=col1>".$self->T("itil::system","itil::system").
+          "</td><td class=col2>".
           join(", ",sort(keys(%{$outcomp->{direct}->{system}->{name}}))).
           "</td></tr>";
    }
    if (keys(%{$outcomp->{direct}->{application}->{name}})){
-      $d.="<tr><td class=col1>Applications</td><td class=col2>".
+      $d.="<tr><td class=col1>".$self->T("itil::appl","itil::appl").
+          "</td><td class=col2>".
           join(", ",sort(keys(%{$outcomp->{direct}->{application}->{name}}))).
           "</td></tr>";
    }
    if (keys(%{$outcomp->{direct}->{businessprocess}})){
       foreach my $customer (sort(keys(%{$outcomp->{direct}->
                                                   {businessprocess}}))){
-         $d.="<tr><td class=col1>Geschäftsprozesse<br>$customer</td>".
+         $d.="<tr><td class=col1>".
+             $self->T("itil::businessprocess","itil::businessprocess").
+             "<br>$customer</td>".
              "<td class=col2>".
              join(", ",sort(keys(%{$outcomp->{direct}->{businessprocess}->
                                              {$customer}->{name}}))).
@@ -320,14 +370,14 @@ sub FormatDirect
       }
    }
    if (keys(%{$outcomp->{direct}->{techcontact}})){
-      $d.="<tr><td class=col1>tech. Ansprechpartner</td>".
+      $d.="<tr><td class=col1>".$self->T("technical contact")."</td>".
           "<td class=col2>".
           join("; ",sort(keys(%{$outcomp->{direct}->{techcontact}->
                                           {email}}))).
           "</td></tr>";
    }
    if (keys(%{$outcomp->{direct}->{techcontact2}})){
-      $d.="<tr><td class=col1>tech. Ansprechpartner Vetreter</td>".
+      $d.="<tr><td class=col1>".$self->T("deputy technical contact")."</td>".
           "<td class=col2>".
           join("; ",sort(keys(%{$outcomp->{direct}->{techcontact2}->
                                           {email}}))).
@@ -458,22 +508,83 @@ sub analyse
    }
 
 
+   #
+   # check tech. contacts
+   #
+   foreach my $direct (qw(direct indirect)){
+      $appl->ResetFilter();
+      $appl->SetFilter(
+                name=>[keys(%{$outcomp->{$direct}->{application}->{name}})],
+                cistatusid=>'<=4');
+      foreach my $rec ($appl->getHashList(qw(tsmemail tsm2email))){
+          if ($rec->{tsmemail} ne "" && 
+              !exists($outcomp->{$direct}->{techcontact}->
+                                {email}->{$rec->{tsmemail}})){
+             $outcomp->{$direct}->{techcontact}->{email}->{$rec->{tsmemail}}->
+                            {'appl contact'}++;
+          }
+          if ($rec->{tsm2email} ne "" && 
+              !exists($outcomp->{$direct}->{techcontact}->
+                                {email}->{$rec->{tsm2email}}) ){
+             $outcomp->{$direct}->{techcontact2}->{email}->{$rec->{tsm2email}}->
+                            {'appl contact'}++;
+          }
+      }
+   }
+
+   #
+   # remove double names
+   #
+   foreach my $direct (qw(direct indirect)){
+      foreach my $em (keys(%{$outcomp->{$direct}->{techcontact2}->{email}})){
+         if (exists($outcomp->{$direct}->{techcontact}->{email}->{$em})){
+            delete($outcomp->{$direct}->{techcontact2}->{email}->{$em});
+         }
+      }
+   }
 
 
-                              # direct->appl 
-                              # direct->system
-                              # direct->swinstance
-                              # direct->technical
-                              # direct->technical2
-                              # indirect->appl
-                              # indirect->system
-                              # indirect->swinstance
-                              # indirect->technical
-                              # indirect->technical2
-                              # critical->appl
-
-   
-
+   foreach my $direct (qw(direct indirect)){
+      foreach my $an (keys(%{$outcomp->{$direct}->{application}->{name}})){
+         my $k="itil::appl($an)";
+         my $detail={};
+         if (!exists($outcomp->{detail}->{$k})){
+            $appl->ResetFilter();
+            $appl->SetFilter(name=>\$an);
+            my ($rec,$msg)=$appl->getOnlyFirst(qw(name tsm tsm2 tsmphone
+                                           businessteamtlphone businessteamtl));
+            if (defined($rec)){
+               if ($rec->{name} ne ""){
+                  $detail->{name}=$rec->{name};
+               }
+               if ($rec->{tsm} ne ""){
+                  $detail->{techcontact}=$rec->{tsm};
+               }
+               if ($rec->{tsmphone} ne ""){
+                  $detail->{techcontactphone}=$rec->{tsmphone};
+               }
+               if ($rec->{tsm2} ne ""){
+                  $detail->{techcontact2}=$rec->{tsm2};
+               }
+               if ($rec->{businessteamtl} ne ""){
+                  $detail->{techtl}=$rec->{businessteamtl};
+               }
+               if ($rec->{businessteamtlphone} ne ""){
+                  $detail->{techtlphone}=$rec->{businessteamtlphone};
+               }
+               $outcomp->{detail}->{$k}=$detail;
+            }
+         }
+         if (exists($outcomp->{detail}->{$k})){
+            foreach my $reason (keys(%{$outcomp->{$direct}->{application}->
+                                      {name}->{$an}})){
+               $outcomp->{detail}->{$k}->{reason}->{$reason}++;
+            }
+         }
+      }
+      foreach my $sys (keys(%{$outcomp->{$direct}->{system}->{name}})){
+      }
+   }
 }
 
 1;

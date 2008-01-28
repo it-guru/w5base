@@ -165,6 +165,28 @@ sub new
                 vjoinon       =>['tsmid'=>'userid'],
                 vjoindisp     =>'fullname'),
 
+      new kernel::Field::Text(
+                name          =>'businessteamtl',
+                group         =>'technical',
+                label         =>'Business Team chef',
+                htmldetail    =>0,
+                readonly      =>1,
+                vjointo       =>'base::user',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['tsmid'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Text(
+                name          =>'businessteamtlphone',
+                group         =>'technical',
+                label         =>'Business Team chef phone',
+                htmldetail    =>0,
+                readonly      =>1,
+                vjointo       =>'base::user',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['tsmid'=>'userid'],
+                vjoindisp     =>'phone'),
+
       new kernel::Field::TextDrop(
                 name          =>'tsmemail',
                 group         =>'technical',

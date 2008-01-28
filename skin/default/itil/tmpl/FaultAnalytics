@@ -35,6 +35,33 @@
 table{
    width:95%;
 }
+.detailth{
+    vertical-align:top;
+    font-size:12px;
+    background-color:silver;
+}
+.detailname{
+    width:100px;overflow:hidden;
+    vertical-align:top;
+    font-size:10px;
+    background-color:#ffffff;
+}
+.detailreason{
+    width:80px;overflow:hidden;
+    vertical-align:top;
+    font-size:10px;
+    background-color:#ffffff;
+}
+.techcontact{
+    vertical-align:top;
+    font-size:10px;
+    background-color:#ffffff;
+}
+.techtl{
+    vertical-align:top;
+    font-size:10px;
+    background-color:#ffffff;
+}
 .col1{
     width:180px;overflow:hidden;
     vertical-align:top;
@@ -117,16 +144,6 @@ function doPrint()
          detailierte Kontakte
     </div>
     <div id=DETAIL class=DataBlock style="display:none;visibility:hidden">
-         <table border=1>
-         <tr>
-         <td align=left valign=top>Komponente</td>
-         <td align=left valign=top>technischer Kontakt</td>
-         <td align=left valign=top>technischer Kontakt Vertr.</td>
-         <td align=left valign=top>Teamleiter</td>
-         </tr>
-
-         </table>
-
          %DETAIL%
     </div>
 
