@@ -32,7 +32,7 @@ sub new
    $self->AddFields(
       new kernel::Field::Id(
                 name          =>'id',
-                label         =>'LinkID',
+                label         =>'InterfaceComponentID',
                 dataobjattr   =>'lnkapplapplcomp.id'),
 
       new kernel::Field::Link(
@@ -40,10 +40,19 @@ sub new
                 label         =>'Interface ID',
                 dataobjattr   =>'lnkapplapplcomp.lnkapplappl'),
 
+      new kernel::Field::Link(
+                name          =>'sortkey',
+                label         =>'SortKey',
+                dataobjattr   =>'lnkapplapplcomp.sortkey'),
+
       new kernel::Field::Select(
                 name          =>'objtype',
-                label         =>'Object type',
-                value         =>['itil::system'],
+                label         =>'Component type',
+                getPostibleValues=>sub{
+                   my $self=shift;
+                   return('itil::system'=>
+                           $self->getParent->T('itil::system','itil::system'));
+                },
                 dataobjattr   =>'lnkapplapplcomp.objtype'),
 
       new kernel::Field::MultiDst (
@@ -55,7 +64,7 @@ sub new
                                  'itil::appl'=>'name'],
                 vjoineditbase =>[{'cistatusid'=>"<5"},
                                  {'cistatusid'=>"<5"}],
-                label         =>'Komponente',
+                label         =>'Component',
                 dsttypfield   =>'objtype',
                 dstidfield    =>'obj1id'),
 

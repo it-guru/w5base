@@ -1,6 +1,7 @@
 'itil::lnkapplappl'=>{de=>'Anwendungsschnittstelle',
                       en=>'Application interface'},
-'fieldgroup.default'=>{de=>'Schnittstelleninformationen'},
+'fieldgroup.interfacescomp'=>{de=>'Schnittstellen Komponenten',
+                              en=>'Interface components'},
 'from Application'=>{de=>'von Anwendung'},
 'to Application'=>{de=>'nach Anwendung'},
 'Interfacetype'=>{de=>'Schnittstellentyp'},

@@ -612,7 +612,7 @@ create table lnknfsnasipnet (
 create table lnkapplapplcomp (
   id           bigint(20) NOT NULL,
   lnkapplappl  bigint(20) NOT NULL,
-  sortkey      bigint(20) NOT NULL,
+  sortkey      bigint(20)  default NULL,
   objtype      varchar(20) default NULL,
   obj1id       bigint(20)  default NULL,
   obj2id       bigint(20)  default NULL,

@@ -31,141 +31,146 @@ sub new
    
 
    $self->AddFields(
-      new kernel::Field::Id(       name       =>'id',
-                                   label      =>'LinkID',
-                                   dataobjattr=>'lnkapplappl.id'),
+      new kernel::Field::Id(
+                name          =>'id',
+                label         =>'LinkID',
+                dataobjattr   =>'lnkapplappl.id'),
 
-      new kernel::Field::TextDrop( name       =>'fromappl',
-                                   htmlwidth  =>'250px',
-                                   label      =>'from Application',
-                                   vjointo    =>'itil::appl',
-                                   vjoinon    =>['fromapplid'=>'id'],
-                                   vjoindisp  =>'name'),
+      new kernel::Field::TextDrop(
+                name          =>'fromappl',
+                htmlwidth     =>'250px',
+                label         =>'from Application',
+                vjointo       =>'itil::appl',
+                vjoinon       =>['fromapplid'=>'id'],
+                vjoindisp     =>'name'),
 
-      new kernel::Field::TextDrop( name       =>'toappl',
-                                   htmlwidth  =>'150px',
-                                   label      =>'to Application',
-                                   vjointo    =>'itil::appl',
-                                   vjoinon    =>['toapplid'=>'id'],
-                                   vjoindisp  =>'name'),
+      new kernel::Field::TextDrop(
+                name          =>'toappl',
+                htmlwidth     =>'150px',
+                label         =>'to Application',
+                vjointo       =>'itil::appl',
+                vjoinon       =>['toapplid'=>'id'],
+                vjoindisp     =>'name'),
 
-      new kernel::Field::Select(   name       =>'contype',
-                                   label      =>'Interfacetype',
-                                   htmlwidth  =>'250px',
-                                   transprefix   =>'contype.',
-                                   value      =>[qw(0 1 2 3 4 5)],
-                                   default    =>'0',
-                                   selectwidth=>'350px',
-                                   dataobjattr=>'lnkapplappl.contype'),
+      new kernel::Field::Select(
+                name          =>'contype',
+                label         =>'Interfacetype',
+                htmlwidth     =>'250px',
+                transprefix   =>'contype.',
+                value         =>[qw(0 1 2 3 4 5)],
+                default       =>'0',
+                selectwidth   =>'350px',
+                dataobjattr   =>'lnkapplappl.contype'),
 
-      new kernel::Field::Select(   name       =>'conmode',
-                                   label      =>'Interfacemode',
-                                   value      =>[qw(online batch manuell)],
-                                   default    =>'online',
-                                   selectwidth=>'150px',
-                                   dataobjattr=>'lnkapplappl.conmode'),
+      new kernel::Field::Select(
+                name          =>'conmode',
+                label         =>'Interfacemode',
+                value         =>[qw(online batch manuell)],
+                default       =>'online',
+                selectwidth   =>'150px',
+                dataobjattr   =>'lnkapplappl.conmode'),
 
-      new kernel::Field::Select(   name       =>'conproto',
-                                   label      =>'Interfaceprotocol',
-                                   value      =>[qw( unknown
-                                                     Corba
-                                                     dce
-                                                     DSO
-                                                     ftp
-                                                     html
-                                                     http
-                                                     jdbc
-                                                     ldap
-                                                     Netegrity
-                                                     NFS
-                                                     ODBC
-                                                     papier
-                                                     RMI
-                                                     rsh
-                                                     rcp
-                                                     rfc
-                                                     sldap
-                                                     ssh
-                                                     sftp
-                                                     smtp
-                                                     snmp
-                                                     tuxedo
-                                                     xml
-                                                     X.31
-                                                     openFT
-                                                     pkix-cmp
-                                                     utm
-                                                     DB-Link
-                                                     BCV )],
-                                   default    =>'online',
-                                   htmlwidth=>'50px',
-                                   selectwidth=>'150px',
-                                   dataobjattr=>'lnkapplappl.conprotocol'),
+      new kernel::Field::Select(
+                name          =>'conproto',
+                label         =>'Interfaceprotocol',
+                value         =>[qw( unknown Corba dce DSO ftp html http
+                                     jdbc ldap Netegrity NFS ODBC papier
+                                     RMI rsh rcp rfc sldap ssh sftp smtp
+                                     snmp tuxedo xml X.31 openFT pkix-cmp
+                                     utm DB-Link BCV )],
+                default       =>'online',
+                htmlwidth     =>'50px',
+                selectwidth   =>'150px',
+                dataobjattr   =>'lnkapplappl.conprotocol'),
 
-      new kernel::Field::Text(     name       =>'comments',
-                                   label      =>'Comments',
-                                   dataobjattr=>'lnkapplappl.comments'),
+      new kernel::Field::SubList(
+                name          =>'interfacescomp',
+                label         =>'Interface components',
+                group         =>'interfacescomp',
+                subeditmsk    =>'subedit.appl',
+                vjointo       =>'itil::lnkapplapplcomp',
+                allowcleanup  =>1,
+                vjoinon       =>['id'=>'lnkapplappl'],
+                vjoindisp     =>['name','namealt1','namealt2',"comments"]),
 
-      new kernel::Field::Creator(  name       =>'creator',
-                                   group      =>'source',
-                                   label      =>'Creator',
-                                   dataobjattr=>'lnkapplappl.createuser'),
+      new kernel::Field::Text(
+                name          =>'comments',
+                label         =>'Comments',
+                dataobjattr   =>'lnkapplappl.comments'),
 
-      new kernel::Field::Owner(    name       =>'owner',
-                                   group      =>'source',
-                                   label      =>'Owner',
-                                   dataobjattr=>'lnkapplappl.modifyuser'),
+      new kernel::Field::Creator(
+                name          =>'creator',
+                group         =>'source',
+                label         =>'Creator',
+                dataobjattr   =>'lnkapplappl.createuser'),
 
-      new kernel::Field::Text(     name       =>'srcsys',
-                                   group      =>'source',
-                                   label      =>'Source-System',
-                                   dataobjattr=>'lnkapplappl.srcsys'),
+      new kernel::Field::Owner(
+                name          =>'owner',
+                group         =>'source',
+                label         =>'Owner',
+                dataobjattr   =>'lnkapplappl.modifyuser'),
 
-      new kernel::Field::Text(     name       =>'srcid',
-                                   group      =>'source',
-                                   label      =>'Source-Id',
-                                   dataobjattr=>'lnkapplappl.srcid'),
+      new kernel::Field::Text(
+                name          =>'srcsys',
+                group         =>'source',
+                label         =>'Source-System',
+                dataobjattr   =>'lnkapplappl.srcsys'),
 
-      new kernel::Field::Date(     name       =>'srcload',
-                                   group      =>'source',
-                                   label      =>'Source-Load',
-                                   dataobjattr=>'lnkapplappl.srcload'),
+      new kernel::Field::Text(
+                name          =>'srcid',
+                group         =>'source',
+                label         =>'Source-Id',
+                dataobjattr   =>'lnkapplappl.srcid'),
 
-      new kernel::Field::CDate(    name       =>'cdate',
-                                   group      =>'source',
-                                   label      =>'Creation-Date',
-                                   dataobjattr=>'lnkapplappl.createdate'),
+      new kernel::Field::Date(
+                name          =>'srcload',
+                group         =>'source',
+                label         =>'Source-Load',
+                dataobjattr   =>'lnkapplappl.srcload'),
+
+      new kernel::Field::CDate(
+                name          =>'cdate',
+                group         =>'source',
+                label         =>'Creation-Date',
+                dataobjattr   =>'lnkapplappl.createdate'),
                                   
-      new kernel::Field::MDate(    name       =>'mdate',
-                                   group      =>'source',
-                                   label      =>'Modification-Date',
-                                   dataobjattr=>'lnkapplappl.modifydate'),
+      new kernel::Field::MDate(
+                name          =>'mdate',
+                group         =>'source',
+                label         =>'Modification-Date',
+                dataobjattr   =>'lnkapplappl.modifydate'),
 
-      new kernel::Field::Editor(   name       =>'editor',
-                                   group      =>'source',
-                                   label      =>'Editor',
-                                   dataobjattr=>'lnkapplappl.editor'),
+      new kernel::Field::Editor(
+                name          =>'editor',
+                group         =>'source',
+                label         =>'Editor',
+                dataobjattr   =>'lnkapplappl.editor'),
 
-      new kernel::Field::RealEditor(name      =>'realeditor',
-                                   group      =>'source',
-                                   label      =>'RealEditor',
-                                   dataobjattr=>'lnkapplappl.realeditor'),
+      new kernel::Field::RealEditor(
+                name          =>'realeditor',
+                group         =>'source',
+                label         =>'RealEditor',
+                dataobjattr   =>'lnkapplappl.realeditor'),
 
-      new kernel::Field::Link(     name       =>'fromapplid',
-                                   label      =>'from ApplID',
-                                   dataobjattr=>'lnkapplappl.fromappl'),
+      new kernel::Field::Link(
+                name          =>'fromapplid',
+                label         =>'from ApplID',
+                dataobjattr   =>'lnkapplappl.fromappl'),
 
-      new kernel::Field::Link(     name       =>'lnktoapplid',
-                                   label      =>'to ApplicationID',
-                                   dataobjattr=>'toappl.applid'),
+      new kernel::Field::Link(
+                name          =>'lnktoapplid',
+                label         =>'to ApplicationID',
+                dataobjattr   =>'toappl.applid'),
 
-      new kernel::Field::Link(     name       =>'toapplid',
-                                   label      =>'to ApplID',
-                                   dataobjattr=>'lnkapplappl.toappl'),
+      new kernel::Field::Link(
+                name          =>'toapplid',
+                label         =>'to ApplID',
+                dataobjattr   =>'lnkapplappl.toappl'),
 
-      new kernel::Field::Link(     name       =>'toapplcistatus',
-                                   label      =>'to Appl CI-Status',
-                                   dataobjattr=>'toappl.cistatus'),
+      new kernel::Field::Link(
+                name          =>'toapplcistatus',
+                label         =>'to Appl CI-Status',
+                dataobjattr   =>'toappl.cistatus'),
    );
    $self->setDefaultView(qw(id fromappl toappl cdate editor));
    return($self);
@@ -254,11 +259,12 @@ sub isWriteValid
    my $oldrec=shift;
    my $newrec=shift;
    my $applid=effVal($oldrec,$newrec,"fromapplid");
+   my @editgroup=("default","interfacescomp");
 
-   return("default") if (!defined($oldrec) && !defined($newrec));
-   return("default") if ($self->IsMemberOf("admin"));
-   return("default") if ($self->isWriteOnApplValid($applid,"interfaces"));
-   return("default") if (!$self->isDataInputFromUserFrontend());
+   return(@editgroup) if (!defined($oldrec) && !defined($newrec));
+   return(@editgroup) if ($self->IsMemberOf("admin"));
+   return(@editgroup) if ($self->isWriteOnApplValid($applid,"interfaces"));
+   return(@editgroup) if (!$self->isDataInputFromUserFrontend());
 
    return(undef);
 }
