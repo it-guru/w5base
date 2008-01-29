@@ -58,3 +58,5 @@
 "value of '\%s' is not allowed"=>{de=>"der Inhalt von '\%s' ist nicht erlaubt"},
 'Keywords'=>{de=>'Schlüsselworte'},
 "value of '\%s' is not correct numeric"=>{de=>"der Inhalt von '\%s' ist nicht passend numerisch"},
+'Business Team Boss'=>{de=>'Betriebsteamleiter'},
+'Business Team Boss ID'=>{de=>'Betriebsteamleiter ID'},

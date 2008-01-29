@@ -16,3 +16,4 @@
 'RTimeManager'=>{ de=>'Zeit-Manager', en=>'Time-Manager'},
 'base::lnkgrpuserrole'=>{ de=>'Rollenzuordnung',en=>'Rolerelation'},
 'fieldgroup.default'=>{ de=>'Rollenzuordnung',en=>'Rolerelation'},
+'native role'=>{de=>'interne Rollen Bez.'},

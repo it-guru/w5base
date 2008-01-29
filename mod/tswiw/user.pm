@@ -84,6 +84,11 @@ sub new
                                    label      =>'Phonenumber',
                                    dataobjattr=>'telephoneNumber'),
 
+      new kernel::Field::Text(     name       =>'office_mobile',
+                                   group      =>'office',
+                                   label      =>'Moible-Phonenumber',
+                                   dataobjattr=>'mobileNumber'),
+
       new kernel::Field::Text(     name       =>'office_facsimile',
                                    group      =>'office',
                                    label      =>'FAX-Number',

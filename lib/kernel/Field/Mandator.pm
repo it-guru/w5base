@@ -64,9 +64,16 @@ sub getPostibleValues
             push(@res,$mandator,$MandatorCache->{grpid}->{$mandator}->{name});
          }
       }
+      if ($self->{allowany}){
+         push(@res,0,"[any]");
+      }
       return(@res);
    }
-   return($self->SUPER::getPostibleValues($current,$mode));
+   my @res=$self->SUPER::getPostibleValues($current,$mode);
+   if ($self->{allowany}){
+      push(@res,0,"[any]");
+   }
+   return(@res);
 }
 
 sub Validate
@@ -85,7 +92,7 @@ sub Validate
          my @mandators=$app->getMandatorsOf($ENV{REMOTE_USER},"write");
          if (!defined($oldrec)){
             if (!defined($newrec->{$mandatoridname}) ||
-                $newrec->{$mandatoridname}==0){
+                ($newrec->{$mandatoridname}==0 && !$self->{allowany})){
                $app->LastMsg(ERROR,"no valid mandator defined");
                return(undef);
             }

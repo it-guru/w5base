@@ -42,7 +42,7 @@ sub new
                 label         =>'LinkID',
                 dataobjattr   =>'lnkqrulemandator.lnkqrulemandatorid'),
 
-      new kernel::Field::Mandator(),
+      new kernel::Field::Mandator(allowany=>1),
 
       new kernel::Field::Link(
                 name          =>'mandatorid',

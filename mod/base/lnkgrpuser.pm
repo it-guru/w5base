@@ -183,6 +183,16 @@ sub new
                 vjoindisp     =>['role'],
                 vjoininhash   =>['role']),
 
+      new kernel::Field::SubList(
+                name          =>'nativroles',
+                label         =>'native roles',
+                htmldetail    =>'0',
+                readonly      =>'1',
+                vjointo       =>'base::lnkgrpuserrole',
+                vjoinon       =>['lnkgrpuserid'=>'lnkgrpuserid'],
+                vjoindisp     =>['nativrole'],
+                vjoininhash   =>['nativrole']),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 searchable    =>0,
@@ -227,8 +237,9 @@ sub new
                 label         =>'RealEditor',
                 dataobjattr   =>'lnkgrpuser.realeditor'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Text(
                 name          =>'grpid',
+                readonly      =>1,
                 label         =>'GrpID',
                 dataobjattr   =>'lnkgrpuser.grpid'),
 

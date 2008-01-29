@@ -166,26 +166,22 @@ sub new
                 vjoindisp     =>'fullname'),
 
       new kernel::Field::Text(
-                name          =>'businessteamtl',
+                name          =>'businessteambossid',
                 group         =>'technical',
-                label         =>'Business Team chef',
-                htmldetail    =>0,
+                label         =>'Business Team Boss ID',
+                onRawValue    =>\&getTeamBossID,
                 readonly      =>1,
-                vjointo       =>'base::user',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['tsmid'=>'userid'],
-                vjoindisp     =>'fullname'),
+                uivisible     =>0,
+                depend        =>['businessteamid']),
 
       new kernel::Field::Text(
-                name          =>'businessteamtlphone',
+                name          =>'businessteamboss',
                 group         =>'technical',
-                label         =>'Business Team chef phone',
+                label         =>'Business Team Boss',
+                onRawValue    =>\&getTeamBoss,
                 htmldetail    =>0,
                 readonly      =>1,
-                vjointo       =>'base::user',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['tsmid'=>'userid'],
-                vjoindisp     =>'phone'),
+                depend        =>['businessteambossid']),
 
       new kernel::Field::TextDrop(
                 name          =>'tsmemail',
@@ -591,6 +587,48 @@ sub new
    $self->{PhoneLnkUsage}=\&PhoneUsage;
    $self->setDefaultView(qw(name mandator cistatus mdate));
    return($self);
+}
+
+sub getTeamBossID
+{
+   my $self=shift;
+   my $current=shift;
+   my $teamfieldname=$self->{depend}->[0];
+   my $teamfield=$self->getParent->getField($teamfieldname);
+   my $teamid=$teamfield->RawValue($current);
+   my @teambossid=();
+   if ($teamid ne ""){
+      my $lnk=getModuleObject($self->getParent->Config,
+                              "base::lnkgrpuser");
+      $lnk->SetFilter({grpid=>\$teamid,
+                       nativroles=>'RBoss'});
+      foreach my $rec ($lnk->getHashList("userid")){
+         if ($rec->{userid} ne ""){
+            push(@teambossid,$rec->{userid});
+         }
+      }
+   }
+   return(\@teambossid);
+}
+
+sub getTeamBoss
+{
+   my $self=shift;
+   my $current=shift;
+   my $teambossfieldname=$self->{depend}->[0];
+   my $teambossfield=$self->getParent->getField($teambossfieldname);
+   my $teambossid=$teambossfield->RawValue($current);
+   my @teamboss;
+   if ($teambossid ne "" && ref($teambossid) eq "ARRAY" && $#{$teambossid}>-1){
+      my $user=getModuleObject($self->getParent->Config,"base::user");
+      $user->SetFilter({userid=>$teambossid});
+      foreach my $rec ($user->getHashList("fullname")){
+         if ($rec->{fullname} ne ""){
+            push(@teamboss,$rec->{fullname});
+         }
+      }
+   }
+   return(\@teamboss);
 }
 
 sub PhoneUsage

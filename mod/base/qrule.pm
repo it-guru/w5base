@@ -136,10 +136,9 @@ sub WinHandleQualityCheck
    if (defined($mode) && $mode eq "process" && $CurrentIdToEdit ne ""){
       my $mandator=$rec->{mandatorid};
       $mandator=[$mandator] if (ref($mandator) ne "ARRAY");
+      push(@$mandator,0);  # for rules on any mandator
       my $lnkr=getModuleObject($self->Config,"base::lnkqrulemandator");
       $lnkr->SetFilter({mandatorid=>$mandator});
-
-
       print $self->HttpHeader("text/xml");
       my $res=hash2xml({},{header=>1});
       print $res."<document>";

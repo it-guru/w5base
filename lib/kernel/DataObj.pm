@@ -817,8 +817,13 @@ sub ValidatedUpdateRecord
          if ($self->Validate($oldrec,$validatednewrec,\%comprec)){
             $self->finishWriteRequestHash($oldrec,$validatednewrec);
             my $bak=$self->UpdateRecord($validatednewrec,@filter);
-            $self->FinishWrite($oldrec,$validatednewrec,\%comprec) if ($bak);
-            $self->StoreUpdateDelta($oldrec,\%comprec) if ($bak);
+            if ($bak){
+               $self->FinishWrite($oldrec,$validatednewrec,\%comprec);
+               $self->StoreUpdateDelta($oldrec,\%comprec) if ($bak);
+               foreach my $v (keys(%$newrec)){
+                  $oldrec->{$v}=$newrec->{$v};
+               }
+            }
             return($bak);
          }
          else{

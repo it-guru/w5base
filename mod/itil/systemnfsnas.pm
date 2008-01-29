@@ -201,114 +201,55 @@ sub new
                    return(\@d);
                 }),
       new kernel::Field::Text(
+                name          =>'fulltsmidlist',
+                label         =>'all related TSM IDs',
+                group         =>'relations',
+                readonly      =>1,
+                htmldetail    =>0,
+                loadapplfield =>'tsmid',
+                depend        =>['fulltsmidlist'],
+                onRawValue    =>\&LoadFromAppl),
+
+      new kernel::Field::Text(
                 name          =>'fulltsmlist',
                 label         =>'all related TSMs',
                 group         =>'relations',
                 readonly      =>1,
                 htmldetail    =>0,
-                onRawValue    =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my %d;
-                   my %applid;
-                   my $fo=$self->getParent->getField("fullsystemidlist");
-                   $current->{fullsystemidlist}=$fo->RawValue($current);
-                   if (defined($current->{fullsystemidlist})&&
-                       ref($current->{fullsystemidlist}) eq "ARRAY" &&
-                       $#{$current->{fullsystemidlist}}!=-1){
-                      my $lnk=getModuleObject($self->getParent->Config,
-                                              "itil::lnkapplsystem");
-                      $lnk->SetFilter({systemid=>$current->{fullsystemidlist},
-                                       applcistatusid=>'<=4',
-                                       systemcistatusid=>'<=4'});
-                      my @l=$lnk->getHashList("applid");
-                      foreach my $lnkrec (@l){
-                         $applid{$lnkrec->{applid}}++;
-                      }
-                   }
-                   if (keys(%applid)){
-                      my $appl=getModuleObject($self->getParent->Config,
-                                              "itil::appl");
-                      $appl->SetFilter({id=>[keys(%applid)]});
-                      my @l=$appl->getHashList("tsmemail");
-                      foreach my $applrec (@l){
-                         if ($applrec->{tsmemail} ne ""){
-                            $d{$applrec->{tsmemail}}++;
-                         }
-                      }
-                      return([sort(keys(%d))]);
+                loadapplfield =>'tsmemail',
+                depend        =>['fullsystemidlist'],
+                onRawValue    =>\&LoadFromAppl),
 
-                   }
-                   return([]);
-                }),
       new kernel::Field::Text(
                 name          =>'fulltsm2list',
                 label         =>'all related deputy TSMs',
                 group         =>'relations',
                 readonly      =>1,
                 htmldetail    =>0,
-                onRawValue    =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my %d;
-                   my %applid;
-                   my $fo=$self->getParent->getField("fullsystemidlist");
-                   $current->{fullsystemidlist}=$fo->RawValue($current);
-                   if (defined($current->{fullsystemidlist})&&
-                       ref($current->{fullsystemidlist}) eq "ARRAY" &&
-                       $#{$current->{fullsystemidlist}}!=-1){
-                      my $lnk=getModuleObject($self->getParent->Config,
-                                              "itil::lnkapplsystem");
-                      $lnk->SetFilter({systemid=>$current->{fullsystemidlist},
-                                       applcistatusid=>'<=4',
-                                       systemcistatusid=>'<=4'});
-                      my @l=$lnk->getHashList("applid");
-                      foreach my $lnkrec (@l){
-                         $applid{$lnkrec->{applid}}++;
-                      }
-                   }
-                   if (keys(%applid)){
-                      my $appl=getModuleObject($self->getParent->Config,
-                                              "itil::appl");
-                      $appl->SetFilter({id=>[keys(%applid)]});
-                      my @l=$appl->getHashList("tsm2email");
-                      foreach my $applrec (@l){
-                         if ($applrec->{tsm2email} ne ""){
-                            $d{$applrec->{tsm2email}}++;
-                         }
-                      }
-                      return([sort(keys(%d))]);
+                loadapplfield =>'tsm2email',
+                depend        =>['fullsystemidlist'],
+                onRawValue    =>\&LoadFromAppl),
 
-                   }
-                   return([]);
-                }),
+      new kernel::Field::Text(
+                name          =>'fulltsm2idlist',
+                label         =>'all related deputy TSM IDs',
+                group         =>'relations',
+                readonly      =>1,
+                htmldetail    =>0,
+                loadapplfield =>'tsm2id',
+                depend        =>['fullsystemidlist'],
+                onRawValue    =>\&LoadFromAppl),
+
       new kernel::Field::Text(
                 name          =>'fullappllist',
                 label         =>'all related Applications',
                 readonly      =>1,
                 group         =>'relations',
                 htmldetail    =>0,
-                onRawValue    =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my %d;
-                   my $fo=$self->getParent->getField("fullsystemidlist");
-                   $current->{fullsystemidlist}=$fo->RawValue($current);
-                   if (defined($current->{fullsystemidlist})&&
-                       ref($current->{fullsystemidlist}) eq "ARRAY" &&
-                       $#{$current->{fullsystemidlist}}!=-1){
-                      my $lnk=getModuleObject($self->getParent->Config,
-                                              "itil::lnkapplsystem");
-                      $lnk->SetFilter({systemid=>$current->{fullsystemidlist},
-                                       applcistatusid=>'<=4',
-                                       systemcistatusid=>'<=4'});
-                      my @l=$lnk->getHashList("appl");
-                      foreach my $lnkrec (@l){
-                         $d{$lnkrec->{appl}}++;
-                      }
-                   }
-                   return([sort(keys(%d))]);
-                }),
+                loadapplfield =>'name',
+                depend        =>['fullsystemidlist'],
+                onRawValue    =>\&LoadFromAppl),
+
       new kernel::Field::Link(
                 name          =>'fullsystemidlist',
                 readonly      =>1,
@@ -409,6 +350,43 @@ sub new
 
    $self->setDefaultView(qw(system name cistatus mdate comments));
    return($self);
+}
+
+sub LoadFromAppl
+{
+   my $self=shift;
+   my $current=shift;
+   my %d;
+   my %applid;
+   my $fo=$self->getParent->getField("fullsystemidlist");
+   $current->{fullsystemidlist}=$fo->RawValue($current);
+   if (defined($current->{fullsystemidlist})&&
+       ref($current->{fullsystemidlist}) eq "ARRAY" &&
+       $#{$current->{fullsystemidlist}}!=-1){
+      my $lnk=getModuleObject($self->getParent->Config,
+                              "itil::lnkapplsystem");
+      $lnk->SetFilter({systemid=>$current->{fullsystemidlist},
+                       applcistatusid=>'<=4',
+                       systemcistatusid=>'<=4'});
+      my @l=$lnk->getHashList("applid");
+      foreach my $lnkrec (@l){
+         $applid{$lnkrec->{applid}}++;
+      }
+   }
+   if (keys(%applid)){
+      my $appl=getModuleObject($self->getParent->Config,
+                              "itil::appl");
+      $appl->SetFilter({id=>[keys(%applid)]});
+      my @l=$appl->getHashList($self->{loadapplfield});
+      foreach my $applrec (@l){
+         if ($applrec->{$self->{loadapplfield}} ne ""){
+            $d{$applrec->{$self->{loadapplfield}}}++;
+         }
+      }
+      return([sort(keys(%d))]);
+
+   }
+   return([]);
 }
 
 sub CalcSystemIdRelationList

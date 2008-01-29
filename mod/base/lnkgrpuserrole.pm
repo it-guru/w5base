@@ -74,6 +74,12 @@ sub new
                                                  'RINManager','RCHManager',
                                                  'RCFManager','RTimeManager'],
                                    dataobjattr=>'lnkgrpuserrole.role'),
+
+      new kernel::Field::Text(     name       =>'nativrole',
+                                   label      =>'native role',
+                                   htmldetail =>0,
+                                   dataobjattr=>'lnkgrpuserrole.role'),
+
       new kernel::Field::CDate(    name       =>'cdate',
                                    label      =>'Creation-Date',
                                    dataobjattr=>'lnkgrpuserrole.createdate'),

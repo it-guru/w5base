@@ -9,5 +9,7 @@
 'invalid group specified'=>{de=>'ungültige oder unbekannte Gruppe'},
 'you are not authorized to admin this group'=>{de=>'Sie sind nicht berechtigt diese Gruppe zu administrieren'},
 'you are not authorized to modify your own account'=>{de=>'Sie sind nicht berechtig Ihre eigene Kennung zu verändern'},
-'LineRoles'=>{de=>'Rollen',en=>'Roles'},
+'LineRoles'=>{de=>'Rollen als Zeilen',en=>'Roles as lines'},
+'native roles'=>{de=>'interne Rollen Bez.'},
+'Roles'=>{de=>'Rollen',en=>'Roles'},
 'Office Phone'=>{de=>'Büro Telefonnummer'},

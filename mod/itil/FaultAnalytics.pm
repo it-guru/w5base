@@ -321,15 +321,14 @@ sub FormatDetail
    foreach my $k (sort(keys(%{$outcomp->{detail}}))){
       $d.="<tr>";
       $d.="<td class=detailname>".$outcomp->{detail}->{$k}->{name}."</td>";
-      $d.="<td class=techcontact>".$outcomp->{detail}->{$k}->{techcontact};
-      $d.="<br>" if ($outcomp->{detail}->{$k}->{techcontactphone} ne "");
-      $d.="<b><i>".$outcomp->{detail}->{$k}->{techcontactphone}."</i></b>";
-      $d.="<br>" if ($outcomp->{detail}->{$k}->{techcontact2} ne "");
-      $d.=$outcomp->{detail}->{$k}->{techcontact2};
+      $d.="<td class=techcontact>";
+      my $d1=$self->FormatUser($outcomp,$outcomp->{detail}->{$k}->{techcontact});
+      my $d2=$self->FormatUser($outcomp,$outcomp->{detail}->{$k}->{techcontact2});
+      $d.=$d1;
+      $d.="<br>".$d2 if ($d2 ne "" && $d2 ne $d1);
       $d.="</td>";
-      $d.="<td class=techtl>".$outcomp->{detail}->{$k}->{techtl};
-      $d.="<br>" if ($outcomp->{detail}->{$k}->{techtlphone} ne "");
-      $d.="<b><i>".$outcomp->{detail}->{$k}->{techtlphone}."</i></b>";
+      $d.="<td class=techboss>";
+      $d.=$self->FormatUser($outcomp,$outcomp->{detail}->{$k}->{techboss});
       $d.="</td>";
       $d.="<td class=detailreason>".
           join(",<br>",sort(keys(%{$outcomp->{detail}->{$k}->{reason}}))).
@@ -337,6 +336,32 @@ sub FormatDetail
       $d.="</tr>";
    }
    $d.="</table>";
+   return($d);
+}
+
+sub FormatUser
+{
+   my $self=shift;
+   my $outcomp=shift;
+   my $user=shift;
+   $user=[keys(%$user)] if (ref($user) eq "HASH");
+   $user=[$user] if (ref($user) ne "ARRAY");
+   my $d="";
+   foreach my $userid (@$user){
+      my $l;
+      $l.=$outcomp->{user}->{$userid}->{surname};
+      $l.=", " if ($l ne "" && $outcomp->{user}->{$userid}->{givenname} ne "");
+      $l.=$outcomp->{user}->{$userid}->{givenname};
+      $l=$outcomp->{user}->{$userid}->{fullname} if ($l eq "");
+      if ($outcomp->{user}->{$userid}->{phone} ne ""){
+         $l.="<br>$outcomp->{user}->{$userid}->{phone}";
+      }
+      if ($outcomp->{user}->{$userid}->{mobile} ne ""){
+         $l.="<br>$outcomp->{user}->{$userid}->{mobile}";
+      }
+      $d.="<br>" if ($d ne "");
+      $d.=$l;
+   }
    return($d);
 }
    
@@ -551,26 +576,25 @@ sub analyse
          if (!exists($outcomp->{detail}->{$k})){
             $appl->ResetFilter();
             $appl->SetFilter(name=>\$an);
-            my ($rec,$msg)=$appl->getOnlyFirst(qw(name tsm tsm2 tsmphone
-                                           businessteamtlphone businessteamtl));
+            my ($rec,$msg)=$appl->getOnlyFirst(qw(name tsm tsm2
+                                                  businessteambossid));
             if (defined($rec)){
                if ($rec->{name} ne ""){
                   $detail->{name}=$rec->{name};
                }
-               if ($rec->{tsm} ne ""){
-                  $detail->{techcontact}=$rec->{tsm};
+               if ($rec->{tsmid} ne ""){
+                  $detail->{techcontact}=$rec->{tsmid};
+                  $self->LoadUserInfo($outcomp,$detail->{techcontact});
                }
-               if ($rec->{tsmphone} ne ""){
-                  $detail->{techcontactphone}=$rec->{tsmphone};
+               if ($rec->{tsm2id} ne ""){
+                  $detail->{techcontact2}=$rec->{tsm2id};
+                  $self->LoadUserInfo($outcomp,$detail->{techcontact2});
                }
-               if ($rec->{tsm2} ne ""){
-                  $detail->{techcontact2}=$rec->{tsm2};
-               }
-               if ($rec->{businessteamtl} ne ""){
-                  $detail->{techtl}=$rec->{businessteamtl};
-               }
-               if ($rec->{businessteamtlphone} ne ""){
-                  $detail->{techtlphone}=$rec->{businessteamtlphone};
+               if (ref($rec->{businessteambossid}) eq "ARRAY"){
+                  foreach my $boss (@{$rec->{businessteambossid}}){
+                     $detail->{techboss}->{$boss}++;
+                     $self->LoadUserInfo($outcomp,$boss);
+                  }
                }
                $outcomp->{detail}->{$k}=$detail;
             }
@@ -583,6 +607,28 @@ sub analyse
          }
       }
       foreach my $sys (keys(%{$outcomp->{$direct}->{system}->{name}})){
+      }
+   }
+}
+
+
+sub LoadUserInfo
+{
+   my $self=shift;
+   my $outcomp=shift;
+   my $userid=shift;
+   if (!exists($outcomp->{user}->{$userid})){
+      my $user=$self->getPersistentModuleObject("base::user");
+      $user->SetFilter({userid=>\$userid});
+      my ($rec,$msg)=$user->getOnlyFirst(qw(fullname surname givenname email
+                                            office_phone office_mobile));
+      if (defined($rec)){
+         $outcomp->{user}->{$rec->{userid}}={fullname=>$rec->{fullname},
+                                             surname=>$rec->{surname},
+                                             givenname=>$rec->{givenname},
+                                             email=>$rec->{email},
+                                             phone=>$rec->{office_phone},
+                                             mobile=>$rec->{office_mobile}};
       }
    }
 }

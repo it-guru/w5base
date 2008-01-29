@@ -1226,6 +1226,7 @@ sub isQualityCheckValid
    my $rec=shift;
    my $mandator=$rec->{mandatorid};
    $mandator=[$mandator] if (ref($mandator) ne "ARRAY");
+   push(@$mandator,0);  # for rules on any mandator
    my $compatible=$self->getQualityCheckCompat($rec);
    my $qc=$self->getPersistentModuleObject("base::qrule");
    $qc->SetFilter({target=>$compatible});
@@ -1258,9 +1259,10 @@ sub HandleQualityCheck
 
    my $id=Query->Param("CurrentIdToEdit");
    my $qc=$self->getPersistentModuleObject("base::qrule");
-   if ($id ne ""){
+   my $idname=$self->IdField->Name();
+   if ($id ne "" && $idname ne ""){
       $self->ResetFilter();
-      $self->SetFilter({id=>\$id});
+      $self->SetFilter({$idname=>\$id});
       my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
       $qc->setParent($self);
       print($qc->WinHandleQualityCheck($self->getQualityCheckCompat($rec),$rec));

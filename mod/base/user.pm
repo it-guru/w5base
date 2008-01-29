@@ -724,6 +724,12 @@ sub getDetailBlockPriority
 }
 
 
+#sub isQualityCheckValid
+#{
+#   return(1);
+#}
+
+
 
 
 
