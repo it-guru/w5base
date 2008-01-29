@@ -30,6 +30,9 @@ sub new
    $self->{isinitialized}=0;
    $self->{depend}=[] if (!defined($self->{depend}));
    push(@{$self->{depend}},$self->{dsttypfield},$self->{dstidfield});
+   if (ref($self->{dst}) ne "ARRAY" && $self->{dst} ne ""){
+      push(@{$self->{depend}},$self->{dst}); # the type is loaded from a field
+   }
    return($self);
 }
 
@@ -39,24 +42,26 @@ sub initialize
    my $self=shift;
    my $app=$self->getParent();
 
-   my @dst=@{$self->{dst}};
-   my @vjoineditbase=();
-   @vjoineditbase=@{$self->{vjoineditbase}} if (defined($self->{vjoineditbase}));
-   $self->{dstobj}=[];
-   $self->{vjoineditbase}=[];
-   while(my $objname=shift(@dst)){
-      my $display=shift(@dst);
-      my $vjoineditbase=shift(@vjoineditbase);
-      my $o=getModuleObject($app->Config,$objname);
-      my $idname=$o->IdField->Name();
-      my $dstrec={obj   =>$o,
-                  idname =>$idname,
-                  name   =>$objname,
-                  disp   =>$display};
-      if (defined($vjoineditbase)){
-         $dstrec->{vjoineditbase}=$vjoineditbase;
+   if (ref($self->{dst}) eq "ARRAY"){
+      my @dst=@{$self->{dst}};
+      my @vjoineditbase=();
+      @vjoineditbase=@{$self->{vjoineditbase}} if (defined($self->{vjoineditbase}));
+      $self->{dstobj}=[];
+      $self->{vjoineditbase}=[];
+      while(my $objname=shift(@dst)){
+         my $display=shift(@dst);
+         my $vjoineditbase=shift(@vjoineditbase);
+         my $o=getModuleObject($app->Config,$objname);
+         my $idname=$o->IdField->Name();
+         my $dstrec={obj   =>$o,
+                     idname =>$idname,
+                     name   =>$objname,
+                     disp   =>$display};
+         if (defined($vjoineditbase)){
+            $dstrec->{vjoineditbase}=$vjoineditbase;
+         }
+         push(@{$self->{dstobj}},$dstrec);
       }
-      push(@{$self->{dstobj}},$dstrec);
    }
    $self->{isinitialized}=1;
 }
@@ -70,19 +75,21 @@ sub RawValue
    $self->initialize() if (!$self->{isinitialized});
    if (defined($current)){
       if ($current->{$self->{dsttypfield}}){
-         foreach my $dststruct (@{$self->{dstobj}}){
-            next if ($dststruct->{name} ne $current->{$self->{dsttypfield}});
-            my $idobj=$dststruct->{obj}->IdField();
-            my $targetid=$current->{$self->{dstidfield}};
-            $dststruct->{obj}->ResetFilter();
-            $dststruct->{obj}->SetFilter({$idobj->Name()=>\$targetid});
-            my ($rec,$msg)=$dststruct->{obj}->getOnlyFirst($dststruct->{disp});
-            if (defined($rec)){
-               return($rec->{$dststruct->{disp}});
+         my $targetid=$current->{$self->{dstidfield}};
+         if (defined($targetid)){
+            foreach my $dststruct (@{$self->{dstobj}}){
+               next if ($dststruct->{name} ne $current->{$self->{dsttypfield}});
+               my $idobj=$dststruct->{obj}->IdField();
+               $dststruct->{obj}->ResetFilter();
+               $dststruct->{obj}->SetFilter({$idobj->Name()=>\$targetid});
+               my ($rec,$msg)=$dststruct->{obj}->getOnlyFirst($dststruct->{disp});
+               if (defined($rec)){
+                  return($rec->{$dststruct->{disp}});
+               }
+               return("?-unknown dstid-?");
             }
-            return("?-unknown dstid-?");
          }
-         return("?-unknown dstobj-?");
+         return;
       }
    }
    return(undef);
@@ -129,6 +136,25 @@ sub preProcessFilter
 }
 
 
+sub getSelectiveTypeVal
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   if ($self->{selectivetyp}){
+      my $fieldobject=$self->getParent->getField($self->{dsttypfield});
+      my $fieldname=$fieldobject->Name();
+      my $formval=Query->Param("Formated_".$fieldname);
+      if (!defined($formval)){
+         $formval=effVal($oldrec,$newrec,$fieldname);
+      }
+      return($formval);
+   }
+   return;
+}
+
+
 
 sub Validate
 {
@@ -140,9 +166,12 @@ sub Validate
    my $newval=$newrec->{$name};
    $self->initialize() if (!$self->{isinitialized});
 
+   my $selectivetyp=$self->getSelectiveTypeVal($oldrec,$newrec);
    if ($newval ne ""){
       if (!($newval=~m/^\*/)){
          foreach my $dststruct (@{$self->{dstobj}}){
+            next if (defined($selectivetyp) && 
+                     $selectivetyp ne $dststruct->{name});
             $dststruct->{obj}->ResetFilter();
             $dststruct->{obj}->SetFilter({$dststruct->{disp}=>\$newval});
             if (defined($dststruct->{vjoineditbase})){
@@ -161,19 +190,23 @@ sub Validate
       my @select=();
       my $altnewval='"*'.$newval.'*"';
 
-      foreach my $dststruct (@{$self->{dstobj}}){
-         $dststruct->{obj}->ResetFilter();
-         $dststruct->{obj}->SetFilter({$dststruct->{disp}=>$altnewval});
-         if (defined($dststruct->{vjoineditbase})){
-            $dststruct->{obj}->SetNamedFilter("EDITBASE",
-                                              $dststruct->{vjoineditbase});
-         }
-         my $idname=$dststruct->{obj}->IdField->Name();
-         my @l=$dststruct->{obj}->getHashList($dststruct->{disp},$idname);
-         foreach my $rec (@l){
-            push(@select,{disp=>$rec->{$dststruct->{disp}},
-                          name=>$dststruct->{name},
-                          id=>$rec->{$idname}});
+      if (defined($self->{dst})){
+         foreach my $dststruct (@{$self->{dstobj}}){
+            next if (defined($selectivetyp) && 
+                     $selectivetyp ne $dststruct->{name});
+            $dststruct->{obj}->ResetFilter();
+            $dststruct->{obj}->SetFilter({$dststruct->{disp}=>$altnewval});
+            if (defined($dststruct->{vjoineditbase})){
+               $dststruct->{obj}->SetNamedFilter("EDITBASE",
+                                                 $dststruct->{vjoineditbase});
+            }
+            my $idname=$dststruct->{obj}->IdField->Name();
+            my @l=$dststruct->{obj}->getHashList($dststruct->{disp},$idname);
+            foreach my $rec (@l){
+               push(@select,{disp=>$rec->{$dststruct->{disp}},
+                             name=>$dststruct->{name},
+                             id=>$rec->{$idname}});
+            }
          }
       }
       if ($#select==0){
