@@ -828,6 +828,7 @@ else{
    $ServerParam{'debug'}=1;
 }
 $W5V2::Config=$curconfig;
+$W5V2::OperationContext="W5Server";
 @ARGV=@ARGV_bak;
 $0="W5Server";
 W5Server->run(%ServerParam);

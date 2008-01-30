@@ -47,7 +47,7 @@ sub qcheckRecord
       $wiw->SetFilter({email=>\$rec->{email}});
       my ($wiwrec,$msg)=$wiw->getOnlyFirst(qw(ALL));
       if (!defined($wiwrec)){
-         return(0,undef);
+         return(0,['user not found']);
       }
       my $upd={};
       my @failtext;
@@ -61,6 +61,10 @@ sub qcheckRecord
          if ($dataobj->ValidatedUpdateRecord($rec,$upd,
                                              {userid=>\$rec->{userid}})){
             push(@failtext,"some fields has been updated");
+         }
+         else{
+            push(@failtext,$self->getParent->LastMsg());
+            return(3,{failtext=>\@failtext});
          }
       }
       return(0,{failtext=>\@failtext});

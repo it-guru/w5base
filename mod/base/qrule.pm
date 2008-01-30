@@ -160,7 +160,10 @@ sub WinHandleQualityCheck
                }
             }
             if ($found){
+               my $oldcontext=$W5V2::OperationContext;
+               $W5V2::OperationContext="QualityCheck";
                my ($qresult,$control)=$qrule->qcheckRecord($parent,$rec);
+               $W5V2::OperationContext=$oldcontext;
                my $resulttext="OK";
                $resulttext="fail"      if ($qresult!=0);
                $resulttext="messy"     if ($qresult==1);

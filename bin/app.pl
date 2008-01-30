@@ -19,6 +19,7 @@
 use strict;
 use FindBin ;
 $W5V2::INSTDIR="/opt/w5base2";
+$W5V2::OperationContext="WebFrontend";
 if (defined(&{FindBin::again})){
    FindBin::again();
    $W5V2::INSTDIR="$FindBin::Bin/..";
