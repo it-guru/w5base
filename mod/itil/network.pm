@@ -139,7 +139,7 @@ sub new
    
 
    );
-   $self->setDefaultView(qw(id name cistatus mdate));
+   $self->setDefaultView(qw(name cistatus mdate));
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","admin.itil.network"],
                          uniquesize=>255};
