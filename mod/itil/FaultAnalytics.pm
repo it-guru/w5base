@@ -511,24 +511,27 @@ sub analyse
    # check direct businessprocess
    #
    my $o=getModuleObject($self->Config,"itil::businessprocess");
-   foreach my $inmode (qw(direct indirect)){
-      $o->ResetFilter();
-      $o->SetFilter(cistatusid=>\'4',
-                    applications=>[
-                     keys(%{$outcomp->{$inmode}->{application}->{name}})]);
-      my @l=$o->getHashList(qw(name customer));
-      foreach my $brec (@l){
-         $outcomp->{$inmode}->{businessprocess}->{$brec->{customer}}->
-                   {name}->{$brec->{name}}++
-      }
-      $o->ResetFilter();
-      $o->SetFilter(cistatusid=>\'4',
-                    systems=>[
-                     keys(%{$outcomp->{$inmode}->{system}->{name}})]);
-      my @l=$o->getHashList(qw(name customer));
-      foreach my $brec (@l){
-         $outcomp->{$inmode}->{businessprocess}->{$brec->{customer}}->
-                   {name}->{$brec->{name}}++
+   foreach my $direct (qw(direct indirect)){
+      if (exists($outcomp->{$direct}) && 
+          exists($outcomp->{$direct}->{application})){
+         $o->ResetFilter();
+         $o->SetFilter(cistatusid=>\'4',
+                       applications=>[
+                        keys(%{$outcomp->{$direct}->{application}->{name}})]);
+         my @l=$o->getHashList(qw(name customer));
+         foreach my $brec (@l){
+            $outcomp->{$direct}->{businessprocess}->{$brec->{customer}}->
+                      {name}->{$brec->{name}}++
+         }
+         $o->ResetFilter();
+         $o->SetFilter(cistatusid=>\'4',
+                       systems=>[
+                        keys(%{$outcomp->{$direct}->{system}->{name}})]);
+         my @l=$o->getHashList(qw(name customer));
+         foreach my $brec (@l){
+            $outcomp->{$direct}->{businessprocess}->{$brec->{customer}}->
+                      {name}->{$brec->{name}}++
+         }
       }
    }
 
@@ -537,23 +540,26 @@ sub analyse
    # check tech. contacts
    #
    foreach my $direct (qw(direct indirect)){
-      $appl->ResetFilter();
-      $appl->SetFilter(
-                name=>[keys(%{$outcomp->{$direct}->{application}->{name}})],
-                cistatusid=>'<=4');
-      foreach my $rec ($appl->getHashList(qw(tsmemail tsm2email))){
-          if ($rec->{tsmemail} ne "" && 
-              !exists($outcomp->{$direct}->{techcontact}->
-                                {email}->{$rec->{tsmemail}})){
-             $outcomp->{$direct}->{techcontact}->{email}->{$rec->{tsmemail}}->
-                            {'appl contact'}++;
-          }
-          if ($rec->{tsm2email} ne "" && 
-              !exists($outcomp->{$direct}->{techcontact}->
-                                {email}->{$rec->{tsm2email}}) ){
-             $outcomp->{$direct}->{techcontact2}->{email}->{$rec->{tsm2email}}->
-                            {'appl contact'}++;
-          }
+      if (exists($outcomp->{$direct}) && 
+          exists($outcomp->{$direct}->{application})){
+         $appl->ResetFilter();
+         $appl->SetFilter(
+                   name=>[keys(%{$outcomp->{$direct}->{application}->{name}})],
+                   cistatusid=>'<=4');
+         foreach my $rec ($appl->getHashList(qw(tsmemail tsm2email))){
+             if ($rec->{tsmemail} ne "" && 
+                 !exists($outcomp->{$direct}->{techcontact}->
+                                   {email}->{$rec->{tsmemail}})){
+                $outcomp->{$direct}->{techcontact}->{email}->
+                               {$rec->{tsmemail}}->{'appl contact'}++;
+             }
+             if ($rec->{tsm2email} ne "" && 
+                 !exists($outcomp->{$direct}->{techcontact}->
+                                   {email}->{$rec->{tsm2email}}) ){
+                $outcomp->{$direct}->{techcontact2}->{email}->
+                          {$rec->{tsm2email}}->{'appl contact'}++;
+             }
+         }
       }
    }
 
@@ -561,9 +567,12 @@ sub analyse
    # remove double names
    #
    foreach my $direct (qw(direct indirect)){
-      foreach my $em (keys(%{$outcomp->{$direct}->{techcontact2}->{email}})){
-         if (exists($outcomp->{$direct}->{techcontact}->{email}->{$em})){
-            delete($outcomp->{$direct}->{techcontact2}->{email}->{$em});
+      if (exists($outcomp->{$direct}) && 
+          exists($outcomp->{$direct}->{techcontact2})){
+         foreach my $em (keys(%{$outcomp->{$direct}->{techcontact2}->{email}})){
+            if (exists($outcomp->{$direct}->{techcontact}->{email}->{$em})){
+               delete($outcomp->{$direct}->{techcontact2}->{email}->{$em});
+            }
          }
       }
    }
