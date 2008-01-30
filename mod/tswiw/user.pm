@@ -87,7 +87,7 @@ sub new
       new kernel::Field::Text(     name       =>'office_mobile',
                                    group      =>'office',
                                    label      =>'Moible-Phonenumber',
-                                   dataobjattr=>'mobileNumber'),
+                                   dataobjattr=>'mobile'),
 
       new kernel::Field::Text(     name       =>'office_facsimile',
                                    group      =>'office',

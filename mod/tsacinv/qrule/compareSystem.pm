@@ -1,4 +1,4 @@
-package itil::qrule::SystemOpMode;
+package tsacinv::qrule::compareSystem;
 #  W5Base Framework
 #  Copyright (C) 2007  Hartmut Vogler (it@guru.de)
 #
@@ -33,27 +33,43 @@ sub new
 
 sub getPosibleTargets
 {
-   return(["itil::system"]);
+   return(["itil::system","OSY::system","AL_TCom::system"]);
 }
 
 sub qcheckRecord
-{  
+{
    my $self=shift;
    my $dataobj=shift;
    my $rec=shift;
 
-   return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
-   my $foundopmode=0;
-   my $foundsysclass=0;
-  # if (!$rec->{isnosysappl}){
-  #    if ($rec->{memory}<=0){
-  #       return(3,{failtext=>['no system memory defined']});
-  #    }
-  # }
+   if ($rec->{systemid} ne ""){
+      my $par=getModuleObject($self->getParent->Config(),"tsacinv::system");
+      $par->SetFilter({email=>\$rec->{email}});
+      my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
+      if (!defined($parrec)){
+         return(3,['systemid not found in AssetCenter']);
+      }
+      my $upd={};
+      my @failtext;
+    #  foreach my $fld (qw(office_phone office_street office_zipcode 
+    #                      office_facsimile)){
+    #     if ($rec->{$fld}=~m/^\s*$/ && $wiwrec->{$fld} ne ""){
+    #        $upd->{$fld}=$wiwrec->{$fld};
+    #     }
+    #  }
+      if (keys(%$upd)){
+         if ($dataobj->ValidatedUpdateRecord($rec,$upd,{id=>\$rec->{id}})){
+            push(@failtext,"some fields has been updated");
+         }
+         else{
+            push(@failtext,$self->getParent->LastMsg());
+            return(3,{failtext=>\@failtext});
+         }
+      }
+      return(0,{failtext=>\@failtext});
+   }
    return(0,undef);
-
 }
-
 
 
 

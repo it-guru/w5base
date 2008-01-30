@@ -1,1 +1,1 @@
-'itil::qrule::SystemOpMode'=>{de=>'Ist mindestens eine Betriebsart bei einem System eingetragen',en=>'Is there a operationmode defined at the system'},
+'itil::qrule::SystemOpMode'=>{de=>'Betriebsart/Systemklassifizierung bei einem System eingetragen',en=>'Is there a operationmode defined at the system'},
