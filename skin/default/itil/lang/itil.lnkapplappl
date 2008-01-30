@@ -2,6 +2,7 @@
                       en=>'Application interface'},
 'fieldgroup.interfacescomp'=>{de=>'Schnittstellen Komponenten',
                               en=>'Interface components'},
+'Interface components'=>{de=>'Schnittstellen Komponenten'},
 'from Application'=>{de=>'von Anwendung'},
 'to Application'=>{de=>'nach Anwendung'},
 'Interfacetype'=>{de=>'Schnittstellentyp'},

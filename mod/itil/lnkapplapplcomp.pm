@@ -181,6 +181,11 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
+   if (!$self->checkWriteValid($oldrec,$newrec)){
+      $self->LastMsg(ERROR,"no access");
+      return(0);
+   }
+
    return(1);
 }
 
@@ -189,6 +194,44 @@ sub SecureValidate
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
+
+   return(1);
+}
+
+sub isWriteValid
+{
+   my $self=shift;
+   my $rec=shift;
+
+   #return(undef);
+   return("default") if (!defined($rec));
+   return("default") if ($self->checkWriteValid($rec));
+   return(undef);
+}
+
+sub checkWriteValid
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   my $lnkapplappl=effVal($oldrec,$newrec,"lnkapplappl");
+
+   return(undef) if ($lnkapplappl eq "");
+
+   my $lnkobj=getModuleObject($self->Config,"itil::lnkapplappl");
+   if ($lnkobj){
+      $lnkobj->SetFilter(id=>\$lnkapplappl);
+      my ($aclrec,$msg)=$lnkobj->getOnlyFirst(qw(ALL)); 
+      if (defined($aclrec)){
+         my @grplist=$lnkobj->isWriteValid($aclrec);
+         if (grep(/^interfacescomp$/,@grplist) ||
+             grep(/^ALL$/,@grplist)){
+            return(1);
+         }
+      }
+      return(0);
+   }
 
    return(1);
 }
