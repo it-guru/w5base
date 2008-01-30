@@ -1,3 +1,9 @@
 'itil::FaultAnalytics'=>{de=>'ITIL Ausfallsanalyse',en=>'ITIL fault analytics'},
 'technical contact'=>{de=>'tech. Ansprechpartner'},
 'deputy technical contact'=>{de=>'tech. Ansprechpartner Vertr.'},
+'Component'=>{de=>'Komponente'},
+'boss'=>{de=>'Teamleiter'},
+'reason'=>{de=>'Grund'},
+'tech. Contact'=>{de=>'tech. Ansprechpartner'},
+'deputy tech. Contact'=>{de=>'tech. Ansprechpartner Vertr.'},
+

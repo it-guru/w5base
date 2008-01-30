@@ -91,7 +91,7 @@ sub Main
             $comp.="<tr><td align=left>".
                    "<input type=hidden name=comp ".
                    "value=\"$objname($id)\">$rec->{name}</td>".
-                   "<td width=1%>X</td>";
+                   "<td width=1%><img src=\"../../base/load/minidelete.gif\"></td>";
          }
       }
    }
@@ -289,14 +289,14 @@ sub FormatIndirect
       }
    }
    if (keys(%{$outcomp->{indirect}->{techcontact}})){
-      $d.="<tr><td class=col1>tech. Ansprechpartner</td>".
+      $d.="<tr><td class=col1>".$self->T("tech. Contact")."</td>".
           "<td class=col2>".
           join("; ",sort(keys(%{$outcomp->{indirect}->{techcontact}->
                                           {email}}))).
           "</td></tr>";
    }
    if (keys(%{$outcomp->{indirect}->{techcontact2}})){
-      $d.="<tr><td class=col1>tech. Ansprechpartner Vetreter</td>".
+      $d.="<tr><td class=col1>".$self->T("deputy tech. Contact")."</td>".
           "<td class=col2>".
           join("; ",sort(keys(%{$outcomp->{indirect}->{techcontact2}->
                                           {email}}))).
@@ -313,10 +313,11 @@ sub FormatDetail
 
    my $d="<table>";
    $d.="<tr>";
-   $d.="<td class=detailth>Komponente</td>";
-   $d.="<td class=detailth>tech. Contact<br>tech. Contact Vertr.</td>";
-   $d.="<td class=detailth>Teamleiter</td>";
-   $d.="<td class=detailth>reason</td>";
+   $d.="<td class=detailth>".$self->T("Component")."</td>";
+   $d.="<td class=detailth>".$self->T("tech. Contact")."<br>".
+                             $self->T("deputy tech. Contact")."</td>";
+   $d.="<td class=detailth>".$self->T("boss")."</td>";
+   $d.="<td class=detailth>".$self->T("reason")."</td>";
    $d.="</tr>";
    foreach my $k (sort(keys(%{$outcomp->{detail}}))){
       $d.="<tr>";
