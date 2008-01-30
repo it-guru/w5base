@@ -27,7 +27,12 @@ sub new
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
-   
+  
+   my $dst           =['itil::system' =>'name',
+                       'itil::network'=>'name'];
+
+   my $vjoineditbase =[{'cistatusid'=>"<5"},
+                       {'cistatusid'=>"<5"}];
 
    $self->AddFields(
       new kernel::Field::Id(
@@ -50,8 +55,13 @@ sub new
                 label         =>'Component type',
                 getPostibleValues=>sub{
                    my $self=shift;
-                   return('itil::system'=>
-                           $self->getParent->T('itil::system','itil::system'));
+                   my @l;
+                   my @dslist=@$dst;
+                   while(my $obj=shift(@dslist)){
+                       shift(@dslist);
+                       push(@l,$obj,$self->getParent->T($obj,$obj));
+                   }
+                   return(@l);
                 },
                 dataobjattr   =>'lnkapplapplcomp.objtype'),
 
@@ -60,10 +70,8 @@ sub new
                 htmlwidth     =>'200',
                 selectwidth   =>'400',
                 selectivetyp  =>1,
-                dst           =>['itil::system' =>'name',
-                                 'itil::appl'=>'name'],
-                vjoineditbase =>[{'cistatusid'=>"<5"},
-                                 {'cistatusid'=>"<5"}],
+                dst           =>$dst,
+                vjoineditbase =>$vjoineditbase,
                 label         =>'Component',
                 dsttypfield   =>'objtype',
                 dstidfield    =>'obj1id'),
@@ -78,10 +86,8 @@ sub new
                 htmlwidth     =>'200',
                 selectwidth   =>'400',
                 selectivetyp  =>1,
-                dst           =>['itil::system' =>'name',
-                                 'itil::appl'=>'name'],
-                vjoineditbase =>[{'cistatusid'=>"<5"},
-                                 {'cistatusid'=>"<5"}],
+                dst           =>$dst,
+                vjoineditbase =>$vjoineditbase,
                 label         =>'Redundance 1',
                 dsttypfield   =>'objtype',
                 dstidfield    =>'obj2id'),
@@ -96,10 +102,8 @@ sub new
                 htmlwidth     =>'200',
                 selectwidth   =>'400',
                 selectivetyp  =>1,
-                dst           =>['itil::system' =>'name',
-                                 'itil::appl'=>'name'],
-                vjoineditbase =>[{'cistatusid'=>"<5"},
-                                 {'cistatusid'=>"<5"}],
+                dst           =>$dst,
+                vjoineditbase =>$vjoineditbase,
                 label         =>'Redundance 2',
                 dsttypfield   =>'objtype',
                 dstidfield    =>'obj3id'),

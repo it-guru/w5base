@@ -67,6 +67,14 @@ sub getPosibleRoles
              "write"           =>$self->getParent->T("write instance",
                                                      $self->Self));
    }
+   if ($current->{parentobj}=~m/^.+::network/ ||
+       (defined($self->getParent) &&
+        defined($self->getParent->getParent) &&
+       $self->getParent->getParent->Self()=~m/^.+::network$/)){
+      return(
+             "techcontact"     =>$self->getParent->T("Technical Contact",
+                                                     $self->Self));
+   }
    if ($current->{parentobj}=~m/^.+::system/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&

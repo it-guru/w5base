@@ -81,6 +81,12 @@ sub new
                 },
                 dataobjattr   =>'network.additional'),
 
+      new kernel::Field::ContactLnk(
+                name          =>'contacts',
+                label         =>'Contacts',
+                vjoininhash   =>['mdate','targetid','target','roles'],
+                group         =>'contacts'),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
@@ -226,7 +232,7 @@ sub isWriteValid
    my $rec=shift;
 
    my $userid=$self->getCurrentUserId();
-   return("default") if (!defined($rec) ||
+   return("default","contacts") if (!defined($rec) ||
                          ($rec->{cistatusid}<3 && $rec->{creator}==$userid) ||
                          $self->IsMemberOf($self->{CI_Handling}->{activator}));
    return(undef);
