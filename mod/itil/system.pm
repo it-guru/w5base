@@ -121,6 +121,16 @@ sub new
                 dataobjattr   =>'system.adm'),
 
       new kernel::Field::TextDrop(
+                name          =>'admemail',
+                group         =>'admin',
+                label         =>'Administrator E-Mail',
+                vjointo       =>'base::user',
+                htmldetail    =>0,
+                readonly      =>1,
+                vjoinon       =>['admid'=>'userid'],
+                vjoindisp     =>'email'),
+
+      new kernel::Field::TextDrop(
                 name          =>'location',
                 depend        =>['assetid'],
                 readonly      =>1,
@@ -155,6 +165,16 @@ sub new
                 dataobjattr   =>'system.adm2'),
 
       new kernel::Field::TextDrop(
+                name          =>'adm2email',
+                group         =>'admin',
+                label         =>'Deputy Administrator E-Mail',
+                vjointo       =>'base::user',
+                htmldetail    =>0,
+                readonly      =>1,
+                vjoinon       =>['adm2id'=>'userid'],
+                vjoindisp     =>'email'),
+
+      new kernel::Field::TextDrop(
                 name          =>'adminteam',
                 htmlwidth     =>'300px',
                 group         =>'admin',
@@ -167,6 +187,24 @@ sub new
       new kernel::Field::Link(
                 name          =>'adminteamid',
                 dataobjattr   =>'system.admteam'),
+
+      new kernel::Field::Text(
+                name          =>'adminteambossid',
+                group         =>'admin',
+                label         =>'Admin Team Boss ID',
+                onRawValue    =>\&getTeamBossID,
+                readonly      =>1,
+                uivisible     =>0,
+                depend        =>['adminteamid']),
+
+      new kernel::Field::Text(
+                name          =>'adminteamboss',
+                group         =>'admin',
+                label         =>'Admin Team Boss',
+                onRawValue    =>\&getTeamBoss,
+                htmldetail    =>0,
+                readonly      =>1,
+                depend        =>['adminteambossid']),
 
 
       new kernel::Field::Select(
@@ -630,6 +668,49 @@ sub new
    $self->setDefaultView(qw(name location cistatus mdate));
    return($self);
 }
+
+sub getTeamBossID
+{
+   my $self=shift;
+   my $current=shift;
+   my $teamfieldname=$self->{depend}->[0];
+   my $teamfield=$self->getParent->getField($teamfieldname);
+   my $teamid=$teamfield->RawValue($current);
+   my @teambossid=();
+   if ($teamid ne ""){
+      my $lnk=getModuleObject($self->getParent->Config,
+                              "base::lnkgrpuser");
+      $lnk->SetFilter({grpid=>\$teamid,
+                       nativroles=>'RBoss'});
+      foreach my $rec ($lnk->getHashList("userid")){
+         if ($rec->{userid} ne ""){
+            push(@teambossid,$rec->{userid});
+         }
+      }
+   }
+   return(\@teambossid);
+}
+
+sub getTeamBoss
+{  
+   my $self=shift;
+   my $current=shift;
+   my $teambossfieldname=$self->{depend}->[0];
+   my $teambossfield=$self->getParent->getField($teambossfieldname);
+   my $teambossid=$teambossfield->RawValue($current);
+   my @teamboss;
+   if ($teambossid ne "" && ref($teambossid) eq "ARRAY" && $#{$teambossid}>-1){
+      my $user=getModuleObject($self->getParent->Config,"base::user");
+      $user->SetFilter({userid=>$teambossid});
+      foreach my $rec ($user->getHashList("fullname")){
+         if ($rec->{fullname} ne ""){
+            push(@teamboss,$rec->{fullname});
+         }
+      }
+   }
+   return(\@teamboss);
+}
+
 
 sub Initialize
 {

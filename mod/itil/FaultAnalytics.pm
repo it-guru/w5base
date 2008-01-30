@@ -54,7 +54,11 @@ sub AddComponent
          return();
       }
       my @comp=Query->Param("comp");
-      push(@comp,"itil::system($rec->{id})");
+      my $compname="itil::system($rec->{id})";
+      my $qcompname=quotemeta($compname);
+      if (!grep(/^$qcompname$/,@comp)){
+         push(@comp,"itil::system($rec->{id})");
+      }
       Query->Param("comp"=>\@comp);
    }
 }
@@ -88,10 +92,11 @@ sub Main
          $o->SetFilter(id=>\$id);
          my ($rec,$msg)=$o->getOnlyFirst(qw(name));
          if (defined($rec)){
-            $comp.="<tr><td align=left>".
+            $comp.="<tr><td class=complistname>".
                    "<input type=hidden name=comp ".
                    "value=\"$objname($id)\">$rec->{name}</td>".
-                   "<td width=1%><img src=\"../../base/load/minidelete.gif\"></td>";
+                   "<td width=1% class=complistdel>".
+                   "<img src=\"../../base/load/minidelete.gif\"></td>";
          }
       }
    }
@@ -101,6 +106,22 @@ sub Main
 body{
    overflow:hidden;
 }
+.complist{
+   border-top-style:solid;
+   border-top-width:1px;
+   border-top-color:black;
+}
+.complistdel{
+   border-bottom-style:solid;
+   border-bottom-width:1px;
+   border-bottom-color:black;
+}
+.complistname{
+   border-bottom-style:solid;
+   border-bottom-width:1px;
+   border-bottom-color:black;
+}
+
 </style>
 <table border=0 cellspacing=0 cellpadding=0 height=100% width=100%>
 EOF
@@ -144,10 +165,10 @@ EOF
 </td>
 <td valign=top>
 <div style="height:80px;overflow:auto">
-<u>Komponentenliste:</u><br>
+<b>Komponentenliste:</b><br>
 
 <div id=complist>
-<table width=95% border=1>$comp</table>
+<table width=95% class=complist border=0 cellspacing=0 cellpadding=0>$comp</table>
 </div>
 
 </div>
@@ -562,6 +583,27 @@ sub analyse
              }
          }
       }
+      if (exists($outcomp->{$direct}) && 
+          exists($outcomp->{$direct}->{system})){
+         $system->ResetFilter();
+         $system->SetFilter(
+                   name=>[keys(%{$outcomp->{$direct}->{system}->{name}})],
+                   cistatusid=>'<=4');
+         foreach my $rec ($system->getHashList(qw(admemail adm2email))){
+             if ($rec->{admemail} ne "" && 
+                 !exists($outcomp->{$direct}->{techcontact}->
+                                   {email}->{$rec->{admemail}})){
+                $outcomp->{$direct}->{techcontact}->{email}->
+                               {$rec->{admemail}}->{'appl contact'}++;
+             }
+             if ($rec->{adm2email} ne "" && 
+                 !exists($outcomp->{$direct}->{techcontact}->
+                                   {email}->{$rec->{adm2email}}) ){
+                $outcomp->{$direct}->{techcontact2}->{email}->
+                          {$rec->{adm2email}}->{'system contact'}++;
+             }
+         }
+      }
    }
 
    #
@@ -589,24 +631,28 @@ sub analyse
             my ($rec,$msg)=$appl->getOnlyFirst(qw(name tsm tsm2
                                                   businessteambossid));
             if (defined($rec)){
+               my $found=0;
                if ($rec->{name} ne ""){
                   $detail->{name}=$rec->{name};
                }
                if ($rec->{tsmid} ne ""){
                   $detail->{techcontact}=$rec->{tsmid};
                   $self->LoadUserInfo($outcomp,$detail->{techcontact});
+                  $found++;
                }
                if ($rec->{tsm2id} ne ""){
                   $detail->{techcontact2}=$rec->{tsm2id};
                   $self->LoadUserInfo($outcomp,$detail->{techcontact2});
+                  $found++;
                }
                if (ref($rec->{businessteambossid}) eq "ARRAY"){
                   foreach my $boss (@{$rec->{businessteambossid}}){
                      $detail->{techboss}->{$boss}++;
                      $self->LoadUserInfo($outcomp,$boss);
+                     $found++;
                   }
                }
-               $outcomp->{detail}->{$k}=$detail;
+               $outcomp->{detail}->{$k}=$detail if ($found);
             }
          }
          if (exists($outcomp->{detail}->{$k})){
@@ -617,6 +663,44 @@ sub analyse
          }
       }
       foreach my $sys (keys(%{$outcomp->{$direct}->{system}->{name}})){
+         my $k="itil::system($sys)";
+         my $detail={};
+         if (!exists($outcomp->{detail}->{$k})){
+            $system->ResetFilter();
+            $system->SetFilter(name=>\$sys);
+            my ($rec,$msg)=$system->getOnlyFirst(qw(name adm adm2
+                                                    adminteambossid));
+            if (defined($rec)){
+               my $found=0;
+               if ($rec->{name} ne ""){
+                  $detail->{name}=$rec->{name};
+               }
+               if ($rec->{admid} ne ""){
+                  $detail->{techcontact}=$rec->{admid};
+                  $self->LoadUserInfo($outcomp,$detail->{techcontact});
+                  $found++;
+               }
+               if ($rec->{adm2id} ne ""){
+                  $detail->{techcontact2}=$rec->{adm2id};
+                  $self->LoadUserInfo($outcomp,$detail->{techcontact2});
+                  $found++;
+               }
+               if (ref($rec->{adminteambossid}) eq "ARRAY"){
+                  foreach my $boss (@{$rec->{adminteambossid}}){
+                     $detail->{techboss}->{$boss}++;
+                     $self->LoadUserInfo($outcomp,$boss);
+                     $found++;
+                  }
+               }
+               $outcomp->{detail}->{$k}=$detail if ($found);
+            }
+         }
+         if (exists($outcomp->{detail}->{$k})){
+            foreach my $reason (keys(%{$outcomp->{$direct}->{system}->
+                                      {name}->{$sys}})){
+               $outcomp->{detail}->{$k}->{reason}->{$reason}++;
+            }
+         }
       }
    }
 }
