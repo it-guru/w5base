@@ -42,33 +42,54 @@ sub qcheckRecord
    my $dataobj=shift;
    my $rec=shift;
 
+   my $upd={};
+   my @failtext;
+   my $errorlevel=0;
+
    if ($rec->{systemid} ne ""){
       my $par=getModuleObject($self->getParent->Config(),"tsacinv::system");
-      $par->SetFilter({email=>\$rec->{email}});
+      $par->SetFilter({systemid=>\$rec->{systemid}});
       my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       if (!defined($parrec)){
-         return(3,['systemid not found in AssetCenter']);
+         push(@failtext,'given systemid not found as active in AssetCenter');
+         $errorlevel=3 if ($errorlevel<3);
       }
-      my $upd={};
-      my @failtext;
-    #  foreach my $fld (qw(office_phone office_street office_zipcode 
-    #                      office_facsimile)){
-    #     if ($rec->{$fld}=~m/^\s*$/ && $wiwrec->{$fld} ne ""){
-    #        $upd->{$fld}=$wiwrec->{$fld};
-    #     }
-    #  }
-      if (keys(%$upd)){
-         if ($dataobj->ValidatedUpdateRecord($rec,$upd,{id=>\$rec->{id}})){
-            push(@failtext,"some fields has been updated");
-         }
-         else{
-            push(@failtext,$self->getParent->LastMsg());
-            return(3,{failtext=>\@failtext});
-         }
-      }
-      return(0,{failtext=>\@failtext});
    }
-   return(0,undef);
+   else{
+      push(@failtext,'no systemid specified');
+      $errorlevel=3 if ($errorlevel<3);
+   }
+
+   if ($rec->{asset} ne ""){
+      my $par=getModuleObject($self->getParent->Config(),"tsacinv::asset");
+      $par->SetFilter({assetid=>\$rec->{asset}});
+      my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
+      if (!defined($parrec)){
+         push(@failtext,'given assetid not found as active in AssetCenter');
+         $errorlevel=3 if ($errorlevel<3);
+      }
+   }
+   else{
+      push(@failtext,'no assetid specified');
+      $errorlevel=3 if ($errorlevel<3);
+   }
+
+
+
+   if (keys(%$upd)){
+      if ($dataobj->ValidatedUpdateRecord($rec,$upd,{id=>\$rec->{id}})){
+         push(@failtext,"some fields has been updated");
+      }
+      else{
+         push(@failtext,$self->getParent->LastMsg());
+      }
+   }
+
+   if ($#failtext!=-1 || $errorlevel>0){
+      return($errorlevel,{failtext=>\@failtext});
+   }
+
+   return($errorlevel,undef);
 }
 
 

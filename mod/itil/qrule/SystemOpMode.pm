@@ -43,13 +43,24 @@ sub qcheckRecord
    my $rec=shift;
 
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
-   my $foundopmode=0;
-   my $foundsysclass=0;
-  # if (!$rec->{isnosysappl}){
-  #    if ($rec->{memory}<=0){
-  #       return(3,{failtext=>['no system memory defined']});
-  #    }
-  # }
+   
+   my $fndopmode=0;
+   my $fndsystemclass=0;
+   my @fl=$dataobj->getFieldObjsByView([qw(ALL)],current=>$rec);
+   foreach my $f (@fl){
+      $fndopmode++      if ($f->{group} eq "opmode" && $rec->{$f->{name}});
+      $fndsystemclass++ if ($f->{group} eq "systemclass" && $rec->{$f->{name}});
+   }
+   my @failtext;
+   if (!$fndopmode){
+      push(@failtext,"no operation mode defined");
+   }
+   if (!$fndsystemclass){
+      push(@failtext,"no system classification defined");
+   }
+   if ($#failtext!=-1){
+       return(3,{failtext=>\@failtext});
+   }
    return(0,undef);
 
 }

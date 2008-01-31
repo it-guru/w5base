@@ -1,1 +1,3 @@
 'itil::qrule::SystemOpMode'=>{de=>'Betriebsart/Systemklassifizierung bei einem System eingetragen',en=>'Is there a operationmode defined at the system'},
+'no operation mode defined'=>{de=>'keine Betriebsart definiert'},
+'no system classification defined'=>{de=>'keine Systemklassifizierung definiert'},

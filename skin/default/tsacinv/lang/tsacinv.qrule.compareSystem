@@ -1,2 +1,8 @@
 'tsacinv::qrule::compareSystem'=>{de=>'AssetCenter Abgleich log. System',
                                   en=>'AssetCenter compare of log. system'},
+
+'no systemid specified'=>{de=>'keine SystemID definiert'},
+'given systemid not found as active in AssetCenter'=>{de=>'angegebene SystemID im AssetCenter nich aktiv'},
+
+'no assetid specified'=>{de=>'keine AssetID definiert'},
+'given assetid not found as active in AssetCenter'=>{de=>'angegebene AssetID konnte im AssetCenter nicht aktiv'},
