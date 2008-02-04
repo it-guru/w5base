@@ -174,6 +174,22 @@ sub WorkflowLinkResult
    }
    if ($h->validateSearchQuery()){
       my %q=$h->getSearchHash();
+      my $tt=Query->Param("Search_ListTime");
+      if ($tt=~m/[\(\)]/){     # if a month or year is specified, the open
+         $q{eventend}=$tt;     # entrys will not be displayed
+      }
+      else{
+         $q{eventend}=[$tt,undef];
+      }
+      Query->Delete("Search_ListTime");
+      my $class=Query->Param("class");
+      if ($class ne "*" && $class ne ""){
+         $q{class}=$class;
+      }
+      if ($class eq "*" && defined($self->{workflowlink}->{workflowtyp})){
+         $q{class}=$self->{workflowlink}->{workflowtyp};
+      }
+      my %qorg=%q;
 
       my $dataobject=$self->Self;
       my $dataobjectid=Query->Param("CurrentId");
@@ -194,37 +210,46 @@ sub WorkflowLinkResult
       }
 
 
-      my $tt=Query->Param("Search_ListTime");
-      if ($tt=~m/[\(\)]/){     # if a month or year is specified, the open
-         $q{eventend}=$tt;     # entrys will not be displayed
-      }
-      else{
-         $q{eventend}=[$tt,undef];
-      }
-      Query->Delete("Search_ListTime");
-      my $class=Query->Param("class");
-      if ($class ne "*" && $class ne ""){
-         $q{class}=$class;
-      }
-      if ($class eq "*" && defined($self->{workflowlink}->{workflowtyp})){
-         $q{class}=$self->{workflowlink}->{workflowtyp};
-      }
       my $fulltext=Query->Param("fulltext");
-      if (!$fulltext=~m/^\s*$/){
-         my %qmax=%q;
+
+      my %qmax=%q;
+      $h->ResetFilter();
+      $h->SetFilter(\%qmax);
+      $h->Limit(1002);
+      $h->SetCurrentOrder("id");
+      my @l=$h->getHashList("id");
+      my %idl=();
+      map({$idl{$_->{id}}=1} @l);
+      if (keys(%idl)>1000){
+         print $self->noAccess(msg(ERROR,$self->T("selection to ".
+                               "unspecified for search",
+                               "kernel::App::Web::WorkflowLink")));
+         return();
+      }
+      if ($q{class} eq "" || $q{class}=~m/::DataIssue$/ ||
+          (ref($q{class}) eq "ARRAY" && grep(/::DataIssue$/,@{$q{class}}))){
+         my %qadd=%qorg; # now add the DataIssue Workflows to DataSelection idl
+         $qadd{directlnktype}=[$self->Self,$self->SelfAsParentObject()];
+         $qadd{directlnkid}=\$dataobjectid;
+         $qadd{directlnkmode}="DataIssue";
          $h->ResetFilter();
-         $h->SetFilter(\%qmax);
+         $h->SetFilter(\%qadd);
          $h->Limit(1002);
          $h->SetCurrentOrder("id");
+         printf STDERR ("fifi qadd=%s\n",Dumper(\%qadd));
          my @l=$h->getHashList("id");
-         if ($#l>1000){
-            print $self->noAccess(msg(ERROR,$self->T("selection to ".
-                                  "unspecified for fulltext search",
-                                  "kernel::App::Web::WorkflowLink")));
-            return();
-         }
-         my %idl=();
          map({$idl{$_->{id}}=1} @l);
+      }
+      if (keys(%idl)>1000){
+         print $self->noAccess(msg(ERROR,$self->T("selection to ".
+                               "unspecified for search",
+                               "kernel::App::Web::WorkflowLink")));
+         return();
+      }
+      %q=(id=>[keys(%idl)]);
+
+
+      if (!$fulltext=~m/^\s*$/){
          if (keys(%idl)!=0){
             my %ftname=%q;
             $ftname{name}="*$fulltext*";

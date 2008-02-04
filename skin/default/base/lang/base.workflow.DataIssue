@@ -3,3 +3,4 @@
    en=>'W5Base DataIssue - Dataproblem or Datasyncronisation problem handling'},
 'affected Dataobject'=>{de=>'betroffenes Datenobjekt'},
 'affected Dataelement'=>{de=>'betroffenes Datenelement'},
+'affected Dataobject Type'=>{de=>'Typ des betroffenen Datenobjektes'},

@@ -305,6 +305,9 @@ sub Process
       $h->{eventstart}=NowStamp("en");
       $h->{eventend}=undef;
       $h->{cistatusid}=2;
+      $h->{directlnktype}=$obj->{affectedobject};
+      $h->{directlnkid}=$obj->{affectedobjectid};
+      $h->{directlnkmode}="DataIssue";
      
       printf STDERR ("fifi getWriteRequestHash=%s\n",Dumper($h));
       if (my $id=$self->StoreRecord($WfRec,$h)){

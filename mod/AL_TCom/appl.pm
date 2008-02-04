@@ -41,6 +41,7 @@ sub new
    $self->{workflowlink}->{workflowtyp}=[qw(AL_TCom::workflow::diary
                                             OSY::workflow::diary
                                             itil::workflow::devrequest
+                                            base::workflow::DataIssue
                                             AL_TCom::workflow::change
                                             AL_TCom::workflow::problem
                                             AL_TCom::workflow::eventnotify
