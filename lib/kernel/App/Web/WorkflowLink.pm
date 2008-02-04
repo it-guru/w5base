@@ -231,7 +231,7 @@ sub WorkflowLinkResult
          my %qadd=%qorg; # now add the DataIssue Workflows to DataSelection idl
          $qadd{directlnktype}=[$self->Self,$self->SelfAsParentObject()];
          $qadd{directlnkid}=\$dataobjectid;
-         $qadd{directlnkmode}="DataIssue";
+         $qadd{directlnkmode}=\"DataIssue";
          $h->ResetFilter();
          $h->SetFilter(\%qadd);
          $h->Limit(1002);
