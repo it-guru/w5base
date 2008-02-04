@@ -375,6 +375,12 @@ sub new
                 dataobjattr   =>'appl.currentvers'),
 
       new kernel::Field::Boolean(
+                name          =>'allowifupdate',
+                group         =>'control',
+                label         =>'allow automatic updates by interfaces',
+                dataobjattr   =>'appl.allowifupdate'),
+
+      new kernel::Field::Boolean(
                 name          =>'isnosysappl',
                 group         =>'control',
                 selectwidth   =>'30%',

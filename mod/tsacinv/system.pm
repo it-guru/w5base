@@ -286,7 +286,7 @@ sub new
 
 
    );
-   $self->setDefaultView(qw(systemname systemid assetassetid));
+   $self->setDefaultView(qw(systemname bc tsacinv_locationfullname systemid assetassetid));
    return($self);
 }
 

@@ -139,3 +139,4 @@ CREATE TABLE wfworkspace (
   createdate  datetime NOT NULL default '0000-00-00 00:00:00',
   PRIMARY KEY (id),key fwd(fwdtarget,fwdtargetid)
 );
+alter table wfhead add directlnktype varchar(40) default NULL, add directlnkid bigint(20) default NULL,add directlnkmode varchar(20) default NULL,add key directlnk(directlnktype,directlnkid,wfstate,directlnkmode);

@@ -1,4 +1,11 @@
 package tsacinv::qrule::compareSystem;
+#  Functions:
+#  * at cistatus "installed/active":
+#    - check if systemid is valid in tsacinv::system
+#    - check if assetid is valid in tsacinv::asset 
+#
+#######################################################################
+#
 #  W5Base Framework
 #  Copyright (C) 2007  Hartmut Vogler (it@guru.de)
 #
@@ -42,10 +49,12 @@ sub qcheckRecord
    my $dataobj=shift;
    my $rec=shift;
 
-   my $upd={};
+   my $wfrequest={};
+   my $forcedupd={};
    my @failtext;
    my $errorlevel=0;
 
+   return(0,undef) if ($rec->{cistatusid}!=4);
    if ($rec->{systemid} ne ""){
       my $par=getModuleObject($self->getParent->Config(),"tsacinv::system");
       $par->SetFilter({systemid=>\$rec->{systemid}});
@@ -53,6 +62,13 @@ sub qcheckRecord
       if (!defined($parrec)){
          push(@failtext,'given systemid not found as active in AssetCenter');
          $errorlevel=3 if ($errorlevel<3);
+      }
+      else{
+         $self->IfaceCompare($dataobj,
+                             $rec,"memory",
+                             $parrec,"memory",
+                             $forcedupd,$wfrequest,\@failtext,\$errorlevel,
+                             tolerance=>10,mode=>'integer');
       }
    }
    else{
@@ -76,14 +92,21 @@ sub qcheckRecord
 
 
 
-   if (keys(%$upd)){
-      if ($dataobj->ValidatedUpdateRecord($rec,$upd,{id=>\$rec->{id}})){
-         push(@failtext,"some fields has been updated");
+   if (keys(%$forcedupd)){
+      if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,{id=>\$rec->{id}})){
+         push(@failtext,"all desired fields has been updated");
       }
       else{
          push(@failtext,$self->getParent->LastMsg());
+         $errorlevel=3 if ($errorlevel<3);
       }
    }
+
+   # now process workflow request for traditional W5Deltas
+
+   # todo
+
+   #######################################################################
 
    if ($#failtext!=-1 || $errorlevel>0){
       return($errorlevel,{failtext=>\@failtext});

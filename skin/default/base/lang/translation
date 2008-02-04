@@ -39,4 +39,5 @@
 'today'=>{de=>'heute'},
 'now'=>{de=>'jetzt'},
 'no access'=>{de=>'kein Zugriff'},
+'allow automatic updates by interfaces'=>{de=>'automatisierte Updates durch Schnittstellen zulassen'},
 

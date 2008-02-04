@@ -266,7 +266,6 @@ sub getSqlWhere
    my @filter=@_;
    my $where=$self->initSqlWhere($wheremode);
 
-
    foreach my $filter (@filter){
       if (ref($filter) eq "HASH"){
          my $bk=$self->processFilterHash($wheremode,\$where,$filter);

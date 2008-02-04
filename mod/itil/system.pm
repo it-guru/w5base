@@ -554,6 +554,12 @@ sub new
                 vjoininhash   =>['targetid','target','roles'],
                 group         =>'contacts'),
 
+      new kernel::Field::Boolean(
+                name          =>'allowifupdate',
+                group         =>'control',
+                label         =>'allow automatic updates by interfaces',
+                dataobjattr   =>'system.allowifupdate'),
+
       new kernel::Field::Text(
                 name          =>'ccproxy',
                 group         =>'control',

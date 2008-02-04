@@ -48,9 +48,9 @@ sub getDynamicFields
    my $class;
 
 
-   printf STDERR ("param in getDynamicFields=%s\n",Dumper(\%param));
-   printf STDERR ("Query in getDynamicFields=%s\n",
-                  Dumper(scalar(Query->MultiVars())));
+   #printf STDERR ("param in getDynamicFields=%s\n",Dumper(\%param));
+   #printf STDERR ("Query in getDynamicFields=%s\n",
+   #               Dumper(scalar(Query->MultiVars())));
    my $affectedobject;
    if (defined($param{current})){
       $affectedobject=$param{current}->{affectedobject};
@@ -59,20 +59,33 @@ sub getDynamicFields
       Query->Param("Formated_affectedobject");
    }
    my ($DataIssueName,$dataobjname)=split(/;/,$affectedobject);
-   printf STDERR ("fifi DataIssueName=$DataIssueName\n");
-   printf STDERR ("fifi dataobjname  =$dataobjname\n");
    my @dynfields=$self->InitFields(
                    new kernel::Field::Select(  
                              name               =>'affectedobject',
                              selectwidth        =>'350px',
                              translation        =>'base::workflow::DataIssue',
                              getPostibleValues  =>\&getObjectList,
-                             label              =>'affected Dataobject',
+                             label              =>'affected Dataobject Type',
                              container          =>'additional'),
-                   new kernel::Field::Text(  
-                             name               =>'targetname',
+                   new kernel::Field::MultiDst(  
+                             name               =>'dataissueobjectname',
                              translation        =>'base::workflow::DataIssue',
-                             label              =>'affected Dataelement',
+                             label              =>'affected Dataobject',
+                             dst                =>['itil::appl'=>'name',
+                                                   'itil::system'=>'name'],
+                             selectivetyp       =>1,
+                             altnamestore       =>'altaffectedobjectname',
+                             dsttypfield        =>'affectedobject',
+                             dstidfield         =>'affectedobjectid'),
+                   new kernel::Field::Link(  
+                             name               =>'affectedobjectid',
+                             translation        =>'base::workflow::DataIssue',
+                             label              =>'affected Dataelement ID',
+                             container          =>'additional'),
+                   new kernel::Field::Link(  
+                             name               =>'altaffectedobjectname',
+                             translation        =>'base::workflow::DataIssue',
+                             label              =>'affected Dataelement Name',
                              container          =>'additional'),
                  );
 #   if (defined($self->getParent->
@@ -89,7 +102,7 @@ sub getObjectList
    my @l;
    foreach my $k (sort({$app->T($a,$a) cmp $app->T($b,$b)} 
                        keys(%{$self->getParent->{da}}))){
-      push(@l,$self->getParent->{da}->{$k}->{DI}.";".$k,$app->T($k,$k));
+      push(@l,$k,$app->T($k,$k));
    }
    return(@l);
 
@@ -228,8 +241,8 @@ sub generateWorkspace
 <td class=finput>%affectedobject(detail)%</td>
 </tr>
 <tr>
-<td class=fname width=20%>%targetname(label)%:</td>
-<td class=finput>%targetname(detail)%</td>
+<td class=fname width=20%>%dataissueobjectname(label)%:</td>
+<td class=finput>%dataissueobjectname(detail)%</td>
 </tr>
 <tr>
 <td class=fname width=20%>%name(label)%:</td>
@@ -276,7 +289,24 @@ sub Process
    my $actions=shift;
 
    if ($action eq "NextStep"){
+      my $fo=$self->getField("dataissueobjectname");
+      my $foval=Query->Param("Formated_".$fo->Name());
+      if ($foval=~m/^\s*$/){
+         $self->LastMsg(ERROR,"no object specified");
+         return(0);
+      }
+      my $obj;
+      if (!($obj=$fo->Validate($WfRec,{$fo->Name=>$foval}))){
+         $self->LastMsg(ERROR,"unknown error") if (!$self->LastMsg());
+         return(0);
+      }
+
       my $h=$self->getWriteRequestHash("web");
+      $h->{eventstart}=NowStamp("en");
+      $h->{eventend}=undef;
+      $h->{cistatusid}=2;
+     
+      printf STDERR ("fifi getWriteRequestHash=%s\n",Dumper($h));
       if (my $id=$self->StoreRecord($WfRec,$h)){
          $h->{id}=$id;
       }

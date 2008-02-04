@@ -86,6 +86,12 @@ sub RawValue
                if (defined($rec)){
                   return($rec->{$dststruct->{disp}});
                }
+               if (defined($self->{altnamestore})){
+                  my $alt=$self->getParent->getField($self->{altnamestore});
+                  my $d=$alt->RawValue($current);
+                  $d.="[?]";
+                  return($d);
+               }
                return("?-unknown dstid-?");
             }
          }
@@ -182,8 +188,12 @@ sub Validate
             my @l=$dststruct->{obj}->getHashList($dststruct->{disp},$idname);
             if ($#l==0){
                Query->Param("Formated_$name"=>$l[0]->{$dststruct->{disp}});
-               return({$self->{dstidfield} =>$l[0]->{$idname},
-                       $self->{dsttypfield}=>$dststruct->{name}});
+               my $result={$self->{dstidfield} =>$l[0]->{$idname},
+                           $self->{dsttypfield}=>$dststruct->{name}};
+               if (defined($self->{altnamestore})){
+                  $result->{$self->{altnamestore}}=$l[0]->{$dststruct->{disp}};
+               }
+               return($result);
             }
          }
       }
@@ -211,8 +221,12 @@ sub Validate
       }
       if ($#select==0){
          Query->Param("Formated_$name"=>$select[0]->{disp});
-         return({$self->{dstidfield} =>$select[0]->{id},
-                 $self->{dsttypfield}=>$select[0]->{name}});
+         my $result={$self->{dstidfield} =>$select[0]->{id},
+                     $self->{dsttypfield}=>$select[0]->{name}};
+         if (defined($self->{altnamestore})){
+            $result->{$self->{altnamestore}}=$select[0]->{disp};
+         }
+         return($result);
       }
       if ($#select==-1){
          $self->getParent->LastMsg(ERROR,

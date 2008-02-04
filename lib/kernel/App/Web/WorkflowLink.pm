@@ -182,6 +182,7 @@ sub WorkflowLinkResult
       if (ref($self->{workflowlink}->{workflowkey}) eq "ARRAY" &&
           $self->{workflowlink}->{workflowkey}->[0] eq $idname){
          $q{$self->{workflowlink}->{workflowkey}->[1]}=\$dataobjectid;
+       #  $q{affectedapplication}="ASS_ADSL-NI(P)";
       }
       else{
          if (ref($self->{workflowlink}->{workflowkey}) eq "CODE"){

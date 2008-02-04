@@ -640,3 +640,8 @@ create table lnkapplapplcomp (
   UNIQUE KEY `sortkey` (sortkey),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 );
+alter table system       add allowifupdate int(2) default 0;
+alter table appl         add allowifupdate int(2) default 0;
+alter table custcontract add allowifupdate int(2) default 0;
+alter table swinstance   add allowifupdate int(2) default 0;
+alter table liccontract  add allowifupdate int(2) default 0;

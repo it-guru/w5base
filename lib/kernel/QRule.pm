@@ -98,5 +98,47 @@ sub T
    return($self->getParent->T($t,$tr,@_));
 }
 
+
+sub IfaceCompare
+{
+   my $self=shift;
+   my $obj=shift;
+   my $origrec=shift;
+   my $origfieldname=shift;
+   my $comprec=shift;
+   my $compfieldname=shift;
+   my $forcedupd=shift;
+   my $wfrequest=shift;
+   my $failtext=shift;
+   my $errorlevel=shift;
+   my %param=@_;
+
+   $param{mode}="native" if (!defined($param{mode}));
+
+   my $takeremote=0;
+   my $ask=1;
+   if ($param{mode} eq "native"){
+      if (exists($comprec->{$compfieldname}) &&
+          defined($comprec->{$compfieldname}) &&
+          (!defined($origrec->{$origfieldname}) ||
+           $comprec->{$compfieldname} ne $origrec->{$origfieldname})){
+         $takeremote++;
+      }
+   }
+   if ($takeremote){
+      if ((exists($origrec->{allowifupdate}) && $origrec->{allowifupdate}) ||
+          !defined($origrec->{$origfieldname}) ||
+          $origrec->{$origfieldname}=~m/^\s*$/ ||
+          ($param{mode} eq "integer" && $origrec->{$origfieldname}==0)){
+         $forcedupd->{$origfieldname}=$comprec->{$compfieldname};
+      }
+   }
+   else{
+      $wfrequest->{$origfieldname}=$comprec->{$compfieldname};
+   }
+   
+
+}
+
 1;
 
