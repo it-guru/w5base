@@ -195,6 +195,29 @@ sub new
                 vjoindisp     =>'fullname'),
 
       new kernel::Field::Text(
+                name          =>'businessteambossid',
+                group         =>'tscontact',
+                label         =>'Business Team Boss ID',
+                onRawValue    =>\&getTeamBossID,
+                readonly      =>1,
+                uivisible     =>0, 
+                depend        =>['businessteamid']),
+
+      new kernel::Field::Text( 
+                name          =>'businessteamboss',
+                group         =>'tscontact',
+                label         =>'Business Team Boss',
+                onRawValue    =>\&getTeamBoss, 
+                htmldetail    =>1,
+                readonly      =>1,             
+                depend        =>['businessteambossid']),
+
+      new kernel::Field::Link(
+                name          =>'businessteamid',
+                dataobjattr   =>'appl.businessteam'),
+
+
+      new kernel::Field::Text(
                 name          =>'custname',
                 htmlwidth     =>'200px',
                 label         =>'TCOM Applicationname',
@@ -219,6 +242,51 @@ sub new
    $self->setWorktable("TCOM_appl");
    return($self);
 }
+
+
+sub getTeamBossID
+{
+   my $self=shift;
+   my $current=shift;
+   my $teamfieldname=$self->{depend}->[0];
+   my $teamfield=$self->getParent->getField($teamfieldname);
+   my $teamid=$teamfield->RawValue($current);
+   my @teambossid=();
+   if ($teamid ne ""){
+      my $lnk=getModuleObject($self->getParent->Config,
+                              "base::lnkgrpuser");
+      $lnk->SetFilter({grpid=>\$teamid,
+                       nativroles=>'RBoss'});
+      foreach my $rec ($lnk->getHashList("userid")){
+         if ($rec->{userid} ne ""){
+            push(@teambossid,$rec->{userid});
+         }
+      }
+   }
+   return(\@teambossid);
+}
+
+sub getTeamBoss
+{
+   my $self=shift;
+   my $current=shift;
+   my $teambossfieldname=$self->{depend}->[0];
+   my $teambossfield=$self->getParent->getField($teambossfieldname);
+   my $teambossid=$teambossfield->RawValue($current);
+   my @teamboss;
+   if ($teambossid ne "" && ref($teambossid) eq "ARRAY" && $#{$teambossid}>-1){
+      my $user=getModuleObject($self->getParent->Config,"base::user");
+      $user->SetFilter({userid=>$teambossid});
+      foreach my $rec ($user->getHashList("fullname")){
+         if ($rec->{fullname} ne ""){
+            push(@teamboss,$rec->{fullname});
+         }
+      }
+   }
+   return(\@teamboss);
+}
+
+
 
 sub SecureSetFilter
 {

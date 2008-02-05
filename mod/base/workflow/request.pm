@@ -312,6 +312,9 @@ sub getPosibleActions
                                         ($isadmin && !$lastworker==$userid))){
       push(@l,"wfforward"); # workflow weiterleiten   (neuen Bearbeiter setzen)
    }
+   if ($isadmin){
+      push(@l,"wfforward"); # workflow weiterleiten   (neuen Bearbeiter setzen)
+   }
    if (($stateid==4 || $stateid==3) && 
        ($lastworker==$userid || $isadmin) && ($userid!=$creator)){
       push(@l,"wffineproc");# Bearbeiten und zurück an Anf.  (durch Bearbeiter)
