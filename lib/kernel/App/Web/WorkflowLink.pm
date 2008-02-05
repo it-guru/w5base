@@ -228,17 +228,21 @@ sub WorkflowLinkResult
       }
       if ($q{class} eq "" || $q{class}=~m/::DataIssue$/ ||
           (ref($q{class}) eq "ARRAY" && grep(/::DataIssue$/,@{$q{class}}))){
-         my %qadd=%qorg; # now add the DataIssue Workflows to DataSelection idl
-         $qadd{directlnktype}=[$self->Self,$self->SelfAsParentObject()];
-         $qadd{directlnkid}=\$dataobjectid;
-         $qadd{directlnkmode}=\"DataIssue";
-         $h->ResetFilter();
-         $h->SetFilter(\%qadd);
-         $h->Limit(1002);
-         $h->SetCurrentOrder("id");
-         printf STDERR ("fifi qadd=%s\n",Dumper(\%qadd));
-         my @l=$h->getHashList("id");
-         map({$idl{$_->{id}}=1} @l);
+         my $fo=$h->getField("directlnktype");
+         if (defined($fo)){
+            my %qadd=%qorg; # now add the DataIssue Workflows to 
+                            # DataSelection idl
+            $qadd{directlnktype}=[$self->Self,$self->SelfAsParentObject()];
+            $qadd{directlnkid}=\$dataobjectid;
+            $qadd{directlnkmode}=\"DataIssue";
+            $h->ResetFilter();
+            $h->SetFilter(\%qadd);
+            $h->Limit(1002);
+            $h->SetCurrentOrder("id");
+            printf STDERR ("fifi qadd=%s\n",Dumper(\%qadd));
+            my @l=$h->getHashList("id");
+            map({$idl{$_->{id}}=1} @l);
+         }
       }
       if (keys(%idl)>1000){
          print $self->noAccess(msg(ERROR,$self->T("selection to ".
