@@ -218,6 +218,12 @@ sub NotifyUsers
 
 }
 
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/base/load/issue.jpg?".$cgi->query_string());
+}
 
 
 #######################################################################
