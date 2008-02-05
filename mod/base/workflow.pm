@@ -449,26 +449,26 @@ sub new
                 label         =>'Workflow specific fields',
                 fields        =>\&getDynamicFields),
 
-      new kernel::Field::Text(
-                name          =>'directlnktype',
-                group         =>'state',
-                htmldetail    =>0,
-                label         =>'direct link type',
-                dataobjattr   =>'wfhead.directlnktype'),
-
-      new kernel::Field::Text(
-                name          =>'directlnkid',
-                group         =>'state',
-                htmldetail    =>0,
-                label         =>'direct link ID',
-                dataobjattr   =>'wfhead.directlnkid'),
-
-      new kernel::Field::Text(
-                name          =>'directlnkmode',
-                group         =>'state',
-                htmldetail    =>0,
-                label         =>'direct link mode',
-                dataobjattr   =>'wfhead.directlnkmode')
+#      new kernel::Field::Text(
+#                name          =>'directlnktype',
+#                group         =>'state',
+#                htmldetail    =>0,
+#                label         =>'direct link type',
+#                dataobjattr   =>'wfhead.directlnktype'),
+#
+#      new kernel::Field::Text(
+#                name          =>'directlnkid',
+#                group         =>'state',
+#                htmldetail    =>0,
+#                label         =>'direct link ID',
+#                dataobjattr   =>'wfhead.directlnkid'),
+#
+#      new kernel::Field::Text(
+#                name          =>'directlnkmode',
+#                group         =>'state',
+#                htmldetail    =>0,
+#                label         =>'direct link mode',
+#                dataobjattr   =>'wfhead.directlnkmode')
    );
    $self->LoadSubObjs("workflow");
    $self->setDefaultView(qw(id class state name editor));
