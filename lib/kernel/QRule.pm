@@ -117,11 +117,24 @@ sub IfaceCompare
 
    my $takeremote=0;
    my $ask=1;
-   if ($param{mode} eq "native"){
+   if ($param{mode} eq "native"){           # like nativ string compares
       if (exists($comprec->{$compfieldname}) &&
           defined($comprec->{$compfieldname}) &&
           (!defined($origrec->{$origfieldname}) ||
            $comprec->{$compfieldname} ne $origrec->{$origfieldname})){
+         $takeremote++;
+      }
+   }
+   elsif ($param{mode} eq "leftouterlinkcreate"){  # like servicesupprt links
+      if (exists($comprec->{$compfieldname}) &&
+          defined($comprec->{$compfieldname}) &&
+          (!defined($origrec->{$origfieldname}) ||
+           $comprec->{$compfieldname} ne $origrec->{$origfieldname})){
+         my $lnkfield=$obj->getField($origfieldname);
+         my $lnkobj=$lnkfield->{vjointo};
+         my $chkobj=getModuleObject($self->getParent->Config,$lnkobj);
+         
+printf STDERR ("fifi $chkobj val 1=$comprec->{$compfieldname} val2=$origrec->{$origfieldname}\n");
          $takeremote++;
       }
    }

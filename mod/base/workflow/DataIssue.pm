@@ -264,8 +264,19 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
+#  nativ needed
+#   - name
+#   - detaildescription
+#   - affectedobject
+#   - affectedobjectid
+#
+
    $newrec->{name}="Bla Bla";
    $newrec->{detaildescription}="xxo";
+   $newrec->{directlnktype}=$newrec->{affectedobject};
+   $newrec->{directlnkid}=$newrec->{affectedobjectid};
+   $newrec->{directlnkmode}="DataIssue";
+
    foreach my $v (qw(name detaildescription)){
       if ((!defined($oldrec) || exists($newrec->{$v})) && $newrec->{$v} eq ""){
          $self->LastMsg(ERROR,"field '%s' is empty",
@@ -273,9 +284,14 @@ sub Validate
          return(0);
       }
    }
-   $newrec->{stateid}=2; # zugewiesen
-  # $self->LastMsg(ERROR,"no op");
-  # return(0);
+   $newrec->{stateid}=2 if (!defined(effVal($oldrec,$newrec,"cistatusid"))); # zugewiesen
+
+      #
+      # now it's time to add fwdtarget,fwdtargetid,mandatorid,
+      # fwddebtarget,fwddebtargetid
+      # in an object specified method
+      #
+     
    $newrec->{step}=$self->getNextStep();
 
    return(1);
@@ -304,11 +320,6 @@ sub Process
       my $h=$self->getWriteRequestHash("web");
       $h->{eventstart}=NowStamp("en");
       $h->{eventend}=undef;
-      $h->{cistatusid}=2;
-      $h->{directlnktype}=$obj->{affectedobject};
-      $h->{directlnkid}=$obj->{affectedobjectid};
-      $h->{directlnkmode}="DataIssue";
-     
       printf STDERR ("fifi getWriteRequestHash=%s\n",Dumper($h));
       if (my $id=$self->StoreRecord($WfRec,$h)){
          $h->{id}=$id;

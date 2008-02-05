@@ -41,21 +41,23 @@ sub Validate
    my $newvallist=$newvalreq;
    $newvallist=[$newvallist] if (ref($newvallist) ne "ARRAY");
    my $newvallist=[map({
-         $_=trim($_);
-         if ($_ ne ""){
-            if (!($_=~m/^\S+\@\S+\.\S+$/) &&
-                !($_=~m/^".*" <\S+\@\S+\.\S+>$/)){
+         my $m=trim($_);
+         if ($m ne ""){
+            if (!($m=~m/^\S+\@\S+\.\S+$/) &&
+                !($m=~m/^".*" <\S+\@\S+\.\S+>$/)){
                $self->getParent->LastMsg(ERROR,
-                            "invalid E-Mail address format '%s'",$_);
+                            "invalid E-Mail address format '%s'",$m);
                return(undef);
             }
          }
-         if (my ($name,$mail)=$_=~m/^"(.*)" <(\S+\@\S+\.\S+)>$/){
-            $_='"'.$name.'" <'.lc($mail).'>';
+         if (my ($name,$mail)=$m=~m/^"(.*)" <(\S+\@\S+\.\S+)>$/){
+            $m='"'.$name.'" <'.lc($mail).'>';
          }
          else{
-            lc($_);
+            $m=lc($m);
          }
+         $m=~s/^(smtp:)//i;
+         $_=$m;
       } @{$newvallist})];
    if (ref($newvalreq) eq "ARRAY"){
       return({$self->Name()=>$newvallist});

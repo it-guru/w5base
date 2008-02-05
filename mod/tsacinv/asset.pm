@@ -72,6 +72,18 @@ sub new
                 timezone      =>'CET',
                 dataobjattr   =>'amasset.dinstall'),
 
+      new kernel::Field::TextDrop(
+                name          =>'assignmentgroup',
+                label         =>'Assignment Group',
+                vjointo       =>'tsacinv::group',
+                vjoinon       =>['lassignmentid'=>'lgroupid'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'lassignmentid',
+                label         =>'AC-AssignmentID',
+                dataobjattr   =>'assetportfolio.lassignmentid'),
+
       new kernel::Field::Text(
                 name          =>'conumber',
                 vjointo       =>'tsacinv::system',

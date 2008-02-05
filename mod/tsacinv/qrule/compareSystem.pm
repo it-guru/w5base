@@ -64,6 +64,15 @@ sub qcheckRecord
          $errorlevel=3 if ($errorlevel<3);
       }
       else{
+         # servicesupport
+         # itil::servicesupport
+         # tsacinv::system -> systemola
+
+         $self->IfaceCompare($dataobj,
+                             $rec,"servicesupport",
+                             $parrec,"systemola",
+                             $forcedupd,$wfrequest,\@failtext,\$errorlevel,
+                             mode=>'leftouterlinkcreate');
          $self->IfaceCompare($dataobj,
                              $rec,"memory",
                              $parrec,"memory",
