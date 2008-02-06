@@ -45,7 +45,8 @@ sub qcheckRecord
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
    if (!$rec->{isnosysappl}){
       if (ref($rec->{systems}) ne "ARRAY" || $#{$rec->{systems}}==-1){
-         return(3,{qmsg=>['no system relations']});
+         return(3,{qmsg=>['no system relations'],
+                   dataissue=>['no system relations']});
       }
    }
    return(0,undef);
