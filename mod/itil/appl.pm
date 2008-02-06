@@ -585,6 +585,9 @@ sub new
                 noselect      =>'1',
                 dataobjattr   =>'lnkcontact.croles'),
 
+      new kernel::Field::QualityText(),
+      new kernel::Field::QualityState(),
+      new kernel::Field::QualityOk(),
    );
    $self->{history}=[qw(insert modify delete)];
    $self->{workflowlink}={ workflowkey=>[id=>'affectedapplicationid']

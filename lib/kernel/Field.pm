@@ -62,6 +62,9 @@ use kernel::Field::KeyText;
 use kernel::Field::Mandator;
 use kernel::Field::Duration;
 use kernel::Field::Message;
+use kernel::Field::QualityText;
+use kernel::Field::QualityState;
+use kernel::Field::QualityOk;
 use kernel::Universal;
 @ISA    = qw(kernel::Universal);
 

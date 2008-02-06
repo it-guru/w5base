@@ -1,0 +1,2 @@
+'itil::qrule::ApplCO'=>{de=>'Prüfung der CO-Nummer',en=>'Check the CO-Number'},
+'no valid conumber'=>{de=>'keine gültige CO-Nummer'},
