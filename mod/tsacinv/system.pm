@@ -309,6 +309,7 @@ sub AddW5BaseData
          my %appl=();
          my %sem=();
          my %tsm=();
+printf STDERR ("fifi x=%s\n",Dumper($rec->{applications}));
          if (defined($rec->{applications}) && 
              ref($rec->{applications}) eq "ARRAY"){
             foreach my $app (@{$rec->{applications}}){
@@ -326,6 +327,7 @@ sub AddW5BaseData
          $l{w5base_sem}=[sort(values(%sem))];
          $l{w5base_tsm}=[sort(values(%tsm))];
       }
+printf STDERR ("fifi d=%s\n",Dumper(\%l));
       $c->{W5BaseSys}->{$systemid}=\%l;
    }
    return($c->{W5BaseSys}->{$systemid}->{$self->Name});

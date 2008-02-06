@@ -216,7 +216,6 @@ sub new
                 name          =>'businessteamid',
                 dataobjattr   =>'appl.businessteam'),
 
-
       new kernel::Field::Text(
                 name          =>'custname',
                 htmlwidth     =>'200px',

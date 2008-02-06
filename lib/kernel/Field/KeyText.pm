@@ -335,6 +335,25 @@ sub FormatedStoredWorkspace
    return($d);
 }
 
+sub FinishWrite
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $oldval=shift;
+   my $newval=shift;
+
+   my $keyname=$self->keyName();
+   if (defined($newval)){
+      my $khrec={}; 
+      if (defined($newrec->{$self->{keyhandler}})){
+         $khrec=$newrec->{$self->{keyhandler}};
+      }
+      $khrec->{$keyname}=$newval;
+      $newrec->{$self->{keyhandler}}=$khrec;
+   }
+}
+
 
 
 

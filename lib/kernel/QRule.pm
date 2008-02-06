@@ -66,18 +66,8 @@ sub qcheckRecord
                        #     2 = rule failed
                        #     3 = rule failed - k.o. criterium
    my $desc={
-               failtext=>'this is a rule with no defined qcheckRecord method',
-               solvetip=>'contact the developer to define the method',
-               datachanged=>0, # may be 1 if data has been changed by rule
-               emailtext=>'this may be a mail template',
-               emailtarget=>'this may be a target to help solve the problem',
-
-               # fwdtargetid fwdtarget are needed to produce a dataproblem wf
-               fwdtargetid=>'ID',
-               fwdtarget=>'base::user',
-               fwddebtargetid=>'ID',
-               fwddebtarget=>'base::user',
-               mandatorid=>[123],
+               qmsg=>'this is a rule with no defined qcheckRecord method',
+               dataissue=>'this could be an array of text to DataIssue Wf',
             };
 
 
@@ -109,7 +99,7 @@ sub IfaceCompare
    my $compfieldname=shift;
    my $forcedupd=shift;
    my $wfrequest=shift;
-   my $failtext=shift;
+   my $qmsg=shift;
    my $errorlevel=shift;
    my %param=@_;
 
@@ -133,21 +123,52 @@ sub IfaceCompare
          my $lnkfield=$obj->getField($origfieldname);
          my $lnkobj=$lnkfield->{vjointo};
          my $chkobj=getModuleObject($self->getParent->Config,$lnkobj);
-         
-printf STDERR ("fifi $chkobj val 1=$comprec->{$compfieldname} val2=$origrec->{$origfieldname}\n");
+         if (defined($chkobj)){
+            $chkobj->SetFilter($lnkfield->{vjoindisp}=>
+                               $comprec->{$compfieldname});
+            my ($chkrec,$msg)=$chkobj->getOnlyFirst($lnkfield->{vjoinon}->[1]);
+            if (!defined($chkrec)){
+               my $newrec={};
+               if (ref($param{onCreate}) eq "HASH"){
+                  foreach my $k (keys(%{$param{onCreate}})){
+                     $newrec->{$k}=$param{onCreate}->{$k};
+                  }
+               }
+               $chkobj->ValidatedInsertRecord($newrec);
+            }
+         }
          $takeremote++;
+      }
+   }
+   elsif ($param{mode} eq "integer"){  # like amounth of memory
+      if (exists($comprec->{$compfieldname}) &&
+          defined($comprec->{$compfieldname}) &&
+          $comprec->{$compfieldname}!=0 &&
+          (!defined($origrec->{$origfieldname}) ||
+           $origrec->{$origfieldname} ==0 ||
+           $comprec->{$compfieldname} != $origrec->{$origfieldname})){
+         if (defined($param{tolerance})){
+            if ( ($comprec->{$compfieldname}*((100+$param{tolerance})/100.0)<
+                  $origrec->{$origfieldname}) ||
+                 ($comprec->{$compfieldname}*((100-$param{tolerance})/100.0)>
+                  $origrec->{$origfieldname})){
+               $takeremote++;
+            }
+         }
+         else{
+            $takeremote++;
+         }
       }
    }
    if ($takeremote){
       if ((exists($origrec->{allowifupdate}) && $origrec->{allowifupdate}) ||
           !defined($origrec->{$origfieldname}) ||
-          $origrec->{$origfieldname}=~m/^\s*$/ ||
-          ($param{mode} eq "integer" && $origrec->{$origfieldname}==0)){
+          $origrec->{$origfieldname}=~m/^\s*$/){
          $forcedupd->{$origfieldname}=$comprec->{$compfieldname};
       }
-   }
-   else{
-      $wfrequest->{$origfieldname}=$comprec->{$compfieldname};
+      else{
+         $wfrequest->{$origfieldname}=$comprec->{$compfieldname};
+      }
    }
    
 

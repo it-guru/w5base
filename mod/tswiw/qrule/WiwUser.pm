@@ -50,7 +50,7 @@ sub qcheckRecord
          return(0,['user not found']);
       }
       my $upd={};
-      my @failtext;
+      my @qmsg;
       foreach my $fld (qw(office_phone office_street office_zipcode 
                           office_facsimile)){
          if ($rec->{$fld}=~m/^\s*$/ && $wiwrec->{$fld} ne ""){
@@ -60,14 +60,14 @@ sub qcheckRecord
       if (keys(%$upd)){
          if ($dataobj->ValidatedUpdateRecord($rec,$upd,
                                              {userid=>\$rec->{userid}})){
-            push(@failtext,"some fields has been updated");
+            push(@qmsg,"some fields has been updated");
          }
          else{
-            push(@failtext,$self->getParent->LastMsg());
-            return(3,{failtext=>\@failtext});
+            push(@qmsg,$self->getParent->LastMsg());
+            return(3,{qmsg=>\@qmsg});
          }
       }
-      return(0,{failtext=>\@failtext});
+      return(0,{qmsg=>\@qmsg});
    }
    return(0,undef);
 }

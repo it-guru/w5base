@@ -26,7 +26,7 @@ sub qcheckRecord
    my $rec=shift;
 
    my $exitcode=0;
-   my $desc={failtext=>[],solvtip=>[]};
+   my $desc={qmsg=>[],solvtip=>[]};
    return($exitcode,$desc) if (1);
 
    return($exitcode,$desc);

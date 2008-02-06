@@ -10,3 +10,4 @@
                            en=>'T-Com Contacts'},
 'fieldgroup.custcontracts'=>{de=>'Vertragszuordnung',
                              en=>'Contracts'},
+'Business Team Boss'=>{de=>'Betriebsteamleiter'},

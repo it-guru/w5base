@@ -51,7 +51,7 @@ sub qcheckRecord
 
    my $wfrequest={};
    my $forcedupd={};
-   my @failtext;
+   my @qmsg;
    my $errorlevel=0;
 
    return(0,undef) if ($rec->{cistatusid}!=4);
@@ -60,28 +60,29 @@ sub qcheckRecord
       $par->SetFilter({systemid=>\$rec->{systemid}});
       my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       if (!defined($parrec)){
-         push(@failtext,'given systemid not found as active in AssetCenter');
+         push(@qmsg,'given systemid not found as active in AssetCenter');
          $errorlevel=3 if ($errorlevel<3);
       }
       else{
-         # servicesupport
-         # itil::servicesupport
-         # tsacinv::system -> systemola
-
          $self->IfaceCompare($dataobj,
                              $rec,"servicesupport",
                              $parrec,"systemola",
-                             $forcedupd,$wfrequest,\@failtext,\$errorlevel,
-                             mode=>'leftouterlinkcreate');
+                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
+                             mode=>'leftouterlinkcreate',
+                             onCreate=>{
+                               comments=>"automaticly create by QualityCheck",
+                               cistatusid=>4,
+                               name=>$parrec->{systemola}}
+                             );
          $self->IfaceCompare($dataobj,
                              $rec,"memory",
-                             $parrec,"memory",
-                             $forcedupd,$wfrequest,\@failtext,\$errorlevel,
-                             tolerance=>10,mode=>'integer');
+                             $parrec,"systemmemory",
+                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
+                             tolerance=>5,mode=>'integer');
       }
    }
    else{
-      push(@failtext,'no systemid specified');
+      push(@qmsg,'no systemid specified');
       $errorlevel=3 if ($errorlevel<3);
    }
 
@@ -90,25 +91,29 @@ sub qcheckRecord
       $par->SetFilter({assetid=>\$rec->{asset}});
       my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       if (!defined($parrec)){
-         push(@failtext,'given assetid not found as active in AssetCenter');
+         push(@qmsg,'given assetid not found as active in AssetCenter');
          $errorlevel=3 if ($errorlevel<3);
       }
    }
    else{
-      push(@failtext,'no assetid specified');
+      push(@qmsg,'no assetid specified');
       $errorlevel=3 if ($errorlevel<3);
    }
 
 
 
    if (keys(%$forcedupd)){
+      printf STDERR ("fifi request a forceupd=%s\n",Dumper($forcedupd));
       if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,{id=>\$rec->{id}})){
-         push(@failtext,"all desired fields has been updated");
+         push(@qmsg,"all desired fields has been updated");
       }
       else{
-         push(@failtext,$self->getParent->LastMsg());
+         push(@qmsg,$self->getParent->LastMsg());
          $errorlevel=3 if ($errorlevel<3);
       }
+   }
+   if (keys(%$wfrequest)){
+      printf STDERR ("fifi request a DataIssue Workflow=%s\n",Dumper($wfrequest));
    }
 
    # now process workflow request for traditional W5Deltas
@@ -117,8 +122,8 @@ sub qcheckRecord
 
    #######################################################################
 
-   if ($#failtext!=-1 || $errorlevel>0){
-      return($errorlevel,{failtext=>\@failtext});
+   if ($#qmsg!=-1 || $errorlevel>0){
+      return($errorlevel,{qmsg=>\@qmsg});
    }
 
    return($errorlevel,undef);

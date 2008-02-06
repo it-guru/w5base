@@ -124,6 +124,115 @@ sub isWriteValid
    return(undef);
 }  
 
+sub nativQualityCheck
+{
+   my $self=shift;
+   my $objlist=shift;
+   my $rec=shift;
+   my @param=@_;
+   my $parent=$self->getParent;
+   my $result;
+   my @alldataissuemsg;
+   my $mandator=[];
+   $mandator=$rec->{mandatorid} if (exists($rec->{mandatorid}));
+   $mandator=[$mandator] if (ref($mandator) ne "ARRAY");
+   push(@$mandator,0);  # for rules on any mandator
+   $objlist=[$objlist] if (ref($objlist) ne "ARRAY");
+   my $lnkr=getModuleObject($self->Config,"base::lnkqrulemandator");
+   $lnkr->SetFilter({mandatorid=>$mandator});
+   foreach my $lnkrec ($lnkr->getHashList(qw(mdate qruleid))){
+      my $qrulename=$lnkrec->{qruleid};
+      if (defined($self->{qrule}->{$qrulename})){
+         my $qrule=$self->{qrule}->{$qrulename};
+         my $postargets=$qrule->getPosibleTargets();
+         my $found=0;
+         if (ref($postargets) eq "ARRAY"){
+            foreach my $target (@$postargets){
+               if (grep(/^$target$/,@$objlist)){
+                  $found=1;
+                  last;
+               }
+            }
+         }
+         if ($found){
+            my $oldcontext=$W5V2::OperationContext;
+            $W5V2::OperationContext="QualityCheck";
+            my ($qresult,$control)=$qrule->qcheckRecord($parent,$rec);
+            $W5V2::OperationContext=$oldcontext;
+            if (defined($control->{dataissue})){
+               my $dataissuemsg=$control->{dataissue};
+               $dataissuemsg=[$dataissuemsg] if (ref($dataissuemsg) ne "ARRAY");
+               push(@alldataissuemsg,$qrule->getName());
+               foreach my $m (@{$dataissuemsg}){
+                  push(@alldataissuemsg," - ".$m);
+               }
+            }
+            my $resulttext="OK";
+            $resulttext="fail"      if ($qresult!=0);
+            $resulttext="messy"     if ($qresult==1);
+            $resulttext="warn"      if ($qresult==2);
+            $resulttext="undefined" if (!defined($qresult));
+            my $qrulelongname=$qrule->getName();
+            my $res={ rulelabel=>"$qrulelongname",
+                      result=>$self->T($resulttext),
+                      exitcode=>$qresult};
+            if (defined($control->{qmsg})){
+               $res->{qmsg}=$control->{qmsg};
+               if (ref($res->{qmsg}) eq "ARRAY"){
+                  for(my $c=0;$c<=$#{$res->{qmsg}};$c++){
+                     $res->{qmsg}->[$c]=$self->T($res->{qmsg}->[$c],
+                                                  $qrulename);
+                  }
+               }
+               else{
+                  $res->{qmsg}=$self->T($res->{qmsg},$qrulename);
+               }
+            }
+            push(@{$result->{rule}},$res);
+         }
+      }
+   }
+   if ($#alldataissuemsg>-1){
+      my $wf=getModuleObject($parent->Config,"base::workflow");
+      my $dataobj=$self->getParent();
+      my $affectedobject=$dataobj->Self();
+      my $affectedobjectid=$rec->{id};
+      my $directlnkmode="DataIssueMsg";
+      my $detaildescription=join("\n",@alldataissuemsg);
+      my $name="DataIssue: ".$dataobj->T($affectedobject,$affectedobject).": ".
+               $rec->{name};
+      $wf->SetFilter({stateid=>"<20",class=>\"base::workflow::DataIssue",
+                      directlnktype=>\$affectedobject,
+                      directlnkid=>\$affectedobjectid});
+      my ($WfRec,$msg)=$wf->getOnlyFirst(qw(ALL));
+      if (!defined($WfRec)){
+         my $newrec={name=>$name,
+                     detaildescription=>$detaildescription,
+                     class=>"base::workflow::DataIssue",
+                     step=>"base::workflow::DataIssue::dataload",
+                     affectedobject=>$affectedobject,
+                     affectedobjectid=>$affectedobjectid,
+                     directlnkmode=>$directlnkmode,
+                     eventend=>undef,
+                     eventstart=>NowStamp("en"),
+                     DATAISSUEOPERATIONSRC=>$directlnkmode};
+         my $bk=$wf->Store(undef,$newrec);
+         printf STDERR ("store bk=%s\n",Dumper(\$bk));
+      }
+      else{
+         my $newrec={name=>$name,
+                     detaildescription=>$detaildescription};
+         my $bk=$wf->Store($WfRec,$newrec);
+         printf STDERR ("updstore bk=%s\n",Dumper(\$bk));
+      }
+
+                      
+
+   }
+   return($result);
+
+}
+
 
 sub WinHandleQualityCheck
 {
@@ -134,63 +243,15 @@ sub WinHandleQualityCheck
    my $CurrentIdToEdit=Query->Param("CurrentIdToEdit");
    my $mode=Query->Param("Mode");
    if (defined($mode) && $mode eq "process" && $CurrentIdToEdit ne ""){
-      my $mandator=$rec->{mandatorid};
-      $mandator=[$mandator] if (ref($mandator) ne "ARRAY");
-      push(@$mandator,0);  # for rules on any mandator
-      my $lnkr=getModuleObject($self->Config,"base::lnkqrulemandator");
-      $lnkr->SetFilter({mandatorid=>$mandator});
       print $self->HttpHeader("text/xml");
       my $res=hash2xml({},{header=>1});
       print $res."<document>";
-      #print STDERR Dumper($rec);
-      $objlist=[$objlist] if (ref($objlist) ne "ARRAY");
-      my $parent=$self->getParent;
-      foreach my $lnkrec ($lnkr->getHashList(qw(mdate qruleid))){
-         my $qrulename=$lnkrec->{qruleid};
-         if (defined($self->{qrule}->{$qrulename})){
-            my $qrule=$self->{qrule}->{$qrulename};
-            my $postargets=$qrule->getPosibleTargets();
-            my $found=0;
-            if (ref($postargets) eq "ARRAY"){
-               foreach my $target (@$postargets){
-                  if (grep(/^$target$/,@$objlist)){
-                     $found=1;
-                     last;
-                  }
-               }
-            }
-            if ($found){
-               my $oldcontext=$W5V2::OperationContext;
-               $W5V2::OperationContext="QualityCheck";
-               my ($qresult,$control)=$qrule->qcheckRecord($parent,$rec);
-               $W5V2::OperationContext=$oldcontext;
-               my $resulttext="OK";
-               $resulttext="fail"      if ($qresult!=0);
-               $resulttext="messy"     if ($qresult==1);
-               $resulttext="warn"      if ($qresult==2);
-               $resulttext="undefined" if (!defined($qresult));
-               my $qrulelongname=$qrule->getName();
-               my $res={ rulelabel=>"$qrulelongname",
-                         result=>$self->T($resulttext),
-                         exitcode=>$qresult};
-               if (defined($control->{failtext})){
-                  $res->{error}=$control->{failtext};
-                  if (ref($res->{error}) eq "ARRAY"){
-                     for(my $c=0;$c<=$#{$res->{error}};$c++){
-                        $res->{error}->[$c]=$self->T($res->{error}->[$c],
-                                                     $qrulename);
-                     }
-                  }
-                  else{
-                     $res->{error}=$self->T($res->{error},$qrulename);
-                  }
-               }
-               
-               my $res=hash2xml({rule=>$res},{});
-               print $res;
-               printf STDERR ($res."\n");
-            }
-         }
+      my $checkresult=$self->nativQualityCheck($objlist,$rec);
+      print STDERR Dumper($checkresult);
+      foreach my $ruleres (@{$checkresult->{rule}}){
+         my $res=hash2xml({rule=>$ruleres},{});
+         print $res;
+         printf STDERR ($res."\n");
       }
       print "</document>";
       return();
@@ -327,14 +388,14 @@ function addToResult(ruleid)
              }
              r.innerHTML+=labeltext+": "+color+resulttext+"</font><br>";
 
-             var error=ruleres.getElementsByTagName("error");
+             var qmsg=ruleres.getElementsByTagName("qmsg");
 
-             if (error.length>0){
+             if (qmsg.length>0){
                 r.innerHTML+="<ul>";
-                for(eid=0;eid<error.length;eid++){
-                   var errorChildNode=error[eid].childNodes[0];
-                   var errortext=errorChildNode.nodeValue;
-                   r.innerHTML+="<li>"+errortext+"</li>";
+                for(eid=0;eid<qmsg.length;eid++){
+                   var qmsgChildNode=qmsg[eid].childNodes[0];
+                   var qmsgtext=qmsgChildNode.nodeValue;
+                   r.innerHTML+="<li>"+qmsgtext+"</li>";
                   
                 }
                 r.innerHTML+="</ul>";

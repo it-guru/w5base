@@ -51,15 +51,15 @@ sub qcheckRecord
       $fndopmode++      if ($f->{group} eq "opmode" && $rec->{$f->{name}});
       $fndsystemclass++ if ($f->{group} eq "systemclass" && $rec->{$f->{name}});
    }
-   my @failtext;
+   my @qmsg;
    if (!$fndopmode){
-      push(@failtext,"no operation mode defined");
+      push(@qmsg,"no operation mode defined");
    }
    if (!$fndsystemclass){
-      push(@failtext,"no system classification defined");
+      push(@qmsg,"no system classification defined");
    }
-   if ($#failtext!=-1){
-       return(3,{failtext=>\@failtext});
+   if ($#qmsg!=-1){
+       return(3,{qmsg=>\@qmsg});
    }
    return(0,undef);
 

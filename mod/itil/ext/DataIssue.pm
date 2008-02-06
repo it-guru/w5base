@@ -35,19 +35,53 @@ sub getControlRecord
 {
    my $self=shift;
    my $d=[ 
-           { dataobj   =>'itil::appl',
+           {
+             dataobj   =>'itil::appl',
              target    =>'name',
-             targetid  =>'id',
-             issueowner=>['base::user'=>'databoss'],
-             workflowws=>['base::user'=>'semid'] },
-           { dataobj   =>'itil::system',
+             targetid  =>'id'
+           },
+           {
+             dataobj   =>'itil::system',
              target    =>'name',
-             targetid  =>'id',
-             issueowner=>['base::user'=>'databoss']}
+             targetid  =>'id'
+           },
          ];
 
 
    return($d);
+}
+
+
+sub completeWriteRequest
+{
+   my $self=shift;
+   my $newrec=shift;
+   if ($newrec->{affectedobject}=~m/::appl$/){
+      if ($newrec->{affectedobject}=~m/::appl$/){
+         # create link to config Management
+         $newrec->{directlnktype}=$newrec->{affectedobject};
+         $newrec->{directlnkid}=$newrec->{affectedobjectid};
+         $newrec->{directlnkmode}="DataIssue";
+      }
+      my $obj=getModuleObject($self->getParent->Config,
+                              $newrec->{directlnktype});
+      $obj->SetFilter(id=>\$newrec->{directlnkid});
+      my ($confrec,$msg)=$obj->getOnlyFirst(qw(databossid mandatorid mandator));
+      if (defined($confrec)){
+         if ($confrec->{databossid} ne ""){
+            $newrec->{fwdtarget}="base::user";
+            $newrec->{fwdtargetid}=$confrec->{databossid};
+         }
+         if ($confrec->{mandatorid} ne ""){
+            $newrec->{mandatorid}=$confrec->{mandatorid};
+         }
+         if ($confrec->{mandator} ne ""){
+            $newrec->{mandator}=$confrec->{mandator};
+         }
+      }
+   }
+   printf STDERR ("completeWriteRequest=%s\n",Dumper($newrec));
+   return(1);
 }
 
 

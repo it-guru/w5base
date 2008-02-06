@@ -76,7 +76,6 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'isoncallservice',
                 label         =>'oncall active',
-                default       =>'1',
                 container     =>'additional'),
 
       new kernel::Field::TimeSpans(
@@ -90,7 +89,6 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'issupport',
                 label         =>'support active',
-                default       =>'1',
                 container     =>'additional'),
 
       new kernel::Field::TimeSpans(
@@ -104,7 +102,6 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'isservice',
                 label         =>'service active',
-                default       =>'1',
                 container     =>'additional'),
 
       new kernel::Field::TimeSpans(
@@ -118,7 +115,6 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'iscallcenter',
                 label         =>'callcenter active',
-                default       =>'1',
                 container     =>'additional'),
 
       new kernel::Field::Container(
@@ -280,7 +276,7 @@ sub isWriteValid
    my $rec=shift;
 
    my $userid=$self->getCurrentUserId();
-   return("ALL") if ($self->IsMemberOf("admin"));
+   return("default") if ($self->IsMemberOf("admin"));
    return("default") if (!defined($rec) ||
                          ($rec->{cistatusid}<3 && $rec->{creator}==$userid) ||
                          $self->IsMemberOf($self->{CI_Handling}->{activator}));

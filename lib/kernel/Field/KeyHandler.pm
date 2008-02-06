@@ -82,7 +82,7 @@ sub FinishWrite
    my $newval=shift;
    my $keytab=$self->{tablename};
    my $nowstamp=NowStamp();
-   #printf STDERR ("fifi FinishWrite keyhandler %s\n",Dumper($newrec));
+   #printf STDERR ("fifi FinishWrite keyhandler %s my newval=%s\n",Dumper($newrec),Dumper($newval));
    $self->Initialize() if (!($self->{isinitialized}));
    my $idfield=$self->getParent->IdField()->Name();
    my $id;
@@ -142,6 +142,9 @@ sub FinishWrite
          foreach my $data (@{$newval->{$k}}){
             $data{$data}=1;
          }
+      }
+      else{
+         $data{$newval->{$k}}=1;
       }
       foreach my $data (keys(%data)){
          $insdata{fval}=$data;

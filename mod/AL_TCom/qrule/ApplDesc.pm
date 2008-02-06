@@ -26,12 +26,12 @@ sub qcheckRecord
    my $rec=shift;
 
    my $exitcode=0;
-   my $desc={failtext=>[],solvtip=>[]};
+   my $desc={qmsg=>[],solvtip=>[]};
    return($exitcode,$desc) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
 
    if ($rec->{description}=~m/^\s*$/){
       $exitcode=3 if ($exitcode<3);
-      push(@{$desc->{failtext}},
+      push(@{$desc->{qmsg}},
            $self->T('there is no description defined'));
       push(@{$desc->{solvtip}},
            $self->T('descripe the application'));
@@ -39,7 +39,7 @@ sub qcheckRecord
 
    if ($rec->{maintwindow}=~m/^\s*$/){
       $exitcode=1 if ($exitcode<1);
-      push(@{$desc->{failtext}},
+      push(@{$desc->{qmsg}},
            $self->T('there is no maintenence window defined'));
       push(@{$desc->{solvtip}},
            $self->T('define a maintenence window for the application'));
@@ -47,7 +47,7 @@ sub qcheckRecord
 
    if ($rec->{currentvers}=~m/^\s*$/){
       $exitcode=1 if ($exitcode<1);
-      push(@{$desc->{failtext}},
+      push(@{$desc->{qmsg}},
            $self->T('there is no application version entered'));
       push(@{$desc->{solvtip}},
            $self->T('documentated the application version'));

@@ -87,6 +87,26 @@ sub getDynamicFields
                              translation        =>'base::workflow::DataIssue',
                              label              =>'affected Dataelement Name',
                              container          =>'additional'),
+                   new kernel::Field::Link(  
+                             name               =>'DATAISSUEOPERATIONSRC',
+                             translation        =>'base::workflow::DataIssue',
+                             label              =>'DataIssue Source',
+                             container          =>'additional'),
+                   new kernel::Field::Link(  
+                             name               =>'DATAISSUEOPERATIONOBJ',
+                             translation        =>'base::workflow::DataIssue',
+                             label              =>'DataIssue Operation Obj',
+                             container          =>'additional'),
+                   new kernel::Field::Link(  
+                             name               =>'DATAISSUEOPERATIONMOD',
+                             translation        =>'base::workflow::DataIssue',
+                             label              =>'DataIssue Operation Mode',
+                             container          =>'additional'),
+                   new kernel::Field::Link(  
+                             name               =>'DATAISSUEOPERATIONFLD',
+                             translation        =>'base::workflow::DataIssue',
+                             label              =>'DataIssue Operation Fields',
+                             container          =>'additional'),
                  );
 #   if (defined($self->getParent->
 
@@ -107,6 +127,26 @@ sub getObjectList
    return(@l);
 
 }
+
+
+sub completeWriteRequest
+{
+   my $self=shift;
+   my $newrec=shift;
+
+   foreach my $objname (keys(%{$self->{DI}})){
+      my $obj=$self->{DI}->{$objname};
+      if ($obj->can("completeWriteRequest")){
+         if (!($obj->completeWriteRequest($newrec))){
+            return(undef);
+         }
+      }
+   }
+   return(1);
+}
+
+
+
 
 
 sub IsModuleSelectable
@@ -277,11 +317,23 @@ sub Validate
 #   - affectedobjectid
 #
 
-   $newrec->{name}="Bla Bla";
-   $newrec->{detaildescription}="xxo";
-   $newrec->{directlnktype}=$newrec->{affectedobject};
-   $newrec->{directlnkid}=$newrec->{affectedobjectid};
-   $newrec->{directlnkmode}="DataIssue";
+   my $issuesrc=effVal($oldrec,$newrec,"DATAISSUEOPERATIONSRC");
+   $newrec->{DATAISSUEOPERATIONSRC}="manual" if ($issuesrc eq "");
+                                             # if src is "qualitycheck" there
+                                             # is no need to inform the creator
+                                             # on finish
+
+   # requested from Quality Check
+   $newrec->{DATAISSUEOPERATIONOBJ}="itil::appl";
+   $newrec->{DATAISSUEOPERATIONMOD}="update";
+   $newrec->{DATAISSUEOPERATIONFLD}="name,xx";
+   $newrec->{headref}={name=>'hans',
+                       xx=>'wert von xx'};
+
+
+
+   #$newrec->{name}="Kundenpriorität ist nicht korrekt eingetragen";
+   #$newrec->{detaildescription}="xxo";
 
    foreach my $v (qw(name detaildescription)){
       if ((!defined($oldrec) || exists($newrec->{$v})) && $newrec->{$v} eq ""){
@@ -290,7 +342,14 @@ sub Validate
          return(0);
       }
    }
-   $newrec->{stateid}=2 if (!defined(effVal($oldrec,$newrec,"cistatusid"))); # zugewiesen
+   $newrec->{stateid}=2 if (!defined(effVal($oldrec,$newrec,"cistatusid")));
+
+   $newrec->{affectedobject}=effVal($oldrec,$newrec,"affectedobject");
+   $newrec->{affectedobjectid}=effVal($oldrec,$newrec,"affectedobjectid");
+   $newrec->{step}=$self->getNextStep();
+   if (!$self->getParent->completeWriteRequest($newrec)){
+      return(undef);
+   }
 
       #
       # now it's time to add fwdtarget,fwdtargetid,mandatorid,
@@ -298,10 +357,10 @@ sub Validate
       # in an object specified method
       #
      
-   $newrec->{step}=$self->getNextStep();
 
    return(1);
 }
+
 
 sub Process
 {
@@ -326,6 +385,7 @@ sub Process
       my $h=$self->getWriteRequestHash("web");
       $h->{eventstart}=NowStamp("en");
       $h->{eventend}=undef;
+      $h->{DATAISSUEOPERATIONSRC}="manual";
       printf STDERR ("fifi getWriteRequestHash=%s\n",Dumper($h));
       if (my $id=$self->StoreRecord($WfRec,$h)){
          $h->{id}=$id;
