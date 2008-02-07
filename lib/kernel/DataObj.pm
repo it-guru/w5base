@@ -231,6 +231,20 @@ sub getDefaultHtmlDetailPage
 }
 
 
+sub DBTransactionStart                  # hook to handle commits 
+{
+   my $self=shift;
+   msg(INFO,"=====> DBTransactionStart");
+   return(1);
+}
+
+sub DBTransactionEnd                    # hook to handle commits in 
+{                                       # transaction save database engines
+   my $self=shift;
+   my $docommit=shift;
+   msg(INFO,"=====> DBTransactionEnd docommit=$docommit");
+   return(1);
+}
 
 sub getHashIndexed
 {
@@ -742,6 +756,7 @@ sub ValidatedInsertRecord
    my $newrec=shift;
 
    $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+   $self->DBTransactionStart();
    if (!$self->preValidate(undef,$newrec)){
       if ($self->LastMsg()==0){
          $self->LastMsg(ERROR,"ValidatedInsertRecord: ".
@@ -754,6 +769,7 @@ sub ValidatedInsertRecord
             $self->finishWriteRequestHash(undef,$newrec);
             my $bak=$self->InsertRecord($newrec);
             $self->FinishWrite(undef,$newrec) if ($bak);
+            $self->DBTransactionEnd($bak);
             return($bak);
          }
          else{
@@ -770,6 +786,7 @@ sub ValidatedInsertRecord
          }
       }
    }
+   $self->DBTransactionEnd(undef);
    return(undef);
 }
 sub InsertRecord
@@ -806,6 +823,7 @@ sub ValidatedUpdateRecord
 
    $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
    my %comprec=%{$newrec};
+   $self->DBTransactionStart();
    if (!$self->preValidate($oldrec,$newrec,\%comprec)){
       if ($self->LastMsg()==0){
          $self->LastMsg(ERROR,"ValidatedUpdateRecord: ".
@@ -824,6 +842,7 @@ sub ValidatedUpdateRecord
                   $oldrec->{$v}=$newrec->{$v};
                }
             }
+            $self->DBTransactionEnd($bak);
             return($bak);
          }
          else{
@@ -840,6 +859,7 @@ sub ValidatedUpdateRecord
          }
       }
    }
+   $self->DBTransactionEnd(undef);
    return(undef);
 }
 sub UpdateRecord
