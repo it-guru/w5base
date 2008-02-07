@@ -157,7 +157,7 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("ALL");
+   return(undef);
 }
 
 sub FinishWrite

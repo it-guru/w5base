@@ -132,18 +132,7 @@ EOF
       }
       print $self->getParsedTemplate("tmpl/$app.$subeditmsk",{current=>$rec});
    }
-   my @msglist;
-   if ($self->LastMsg()){
-      @msglist=$self->LastMsg();
-   }
-   print "<div class=lastmsg>".
-          join("<br>\n",map({
-                              if ($_=~m/^ERROR/){
-                                 $_="<font style=\"color:red;\">".$_.
-                                    "</font>";
-                              }
-                              $_;
-                            } @msglist))."</div>";
+   print $self->findtemplvar({},"LASTMSG");
 }
 
 sub getForceParamForSubedit

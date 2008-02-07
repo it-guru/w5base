@@ -158,7 +158,7 @@ sub new
                 name          =>'users',
                 subeditmsk    =>'subedit.group',
                 label         =>'Users',
-                group         =>'userro',
+                group         =>'users',
                 vjointo       =>'base::lnkgrpuser',
                 vjoinon       =>['grpid'=>'grpid'],
                 vjoindisp     =>['user','roles'],
@@ -258,16 +258,16 @@ sub isWriteValid
 
    my $userid=$self->getCurrentUserId();
    return(qw(default)) if (!defined($rec));
-   return("default") if (($rec->{cistatusid}<3 && $rec->{creator}==$userid) ||
-                         $self->IsMemberOf($self->{CI_Handling}->{activator}));
+   return("default") if ($rec->{cistatusid}<3 && ($rec->{creator}==$userid ||
+                         $self->IsMemberOf($self->{CI_Handling}->{activator})));
 
    return(qw(default)) if (!defined($rec) && $self->IsMemberOf("admin"));
    return(undef) if ($rec->{grpid}<=0);
-   return(qw(default userro)) if ($self->IsMemberOf("admin"));
+   return(qw(default users)) if ($self->IsMemberOf("admin"));
    if (defined($rec)){
       my $grpid=$rec->{grpid};
       if ($self->IsMemberOf([$grpid],"RAdmin","down")){
-         return(qw(userro));
+         return(qw(users));
       }
    }
    return(undef);
@@ -313,7 +313,7 @@ sub FinishDelete
 sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
-   return(qw(header default userro subunits));
+   return(qw(header default users subunits));
 }
 
 

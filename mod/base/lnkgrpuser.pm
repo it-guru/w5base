@@ -83,6 +83,31 @@ sub new
             foreach my $old (@{$oldval}){
                push(@dellist,$old) if (!grep(/^$old$/,@{$newval}));
             }
+            my $grpid=effVal($oldrec,$newrec,"grpid");
+            if ($grpid eq ""){
+               $self->getParent->LastMsg(ERROR,"internal error");
+               return(undef);
+            }
+            if ($self->getParent->isDataInputFromUserFrontend()){
+               if (!$self->getParent->IsMemberOf("admin")){
+                  my @allowed=(qw(RMember REmployee RReportReceive 
+                                  RBoss RBoss2 RTimeManager));
+                  my $removed=0;
+                  foreach my $modlist ((\@addlist,\@dellist)){
+                     foreach my $rolechk (@$modlist){
+                        if (!grep(/^$rolechk$/,@allowed)){
+                           @$modlist=grep(!/^$rolechk$/,@$modlist);
+                           $removed++;
+                        }
+                     } 
+                  }
+                  if ($removed){
+                     $self->getParent->LastMsg(WARN,"some role changes are ".
+                                       "not done - you are only Org-Admin");
+                  }
+               }
+            }
+
             foreach my $add (@addlist){
                my $newrec={$idname=>\$relationrec->{$idname},
                            role=>$add};
@@ -98,10 +123,16 @@ sub new
                                });
             }
             #printf STDERR ("fifi onFinishWrite in %s\n",$self->Name());
+            printf STDERR ("fifi onFinishWrite d=%s\n",Dumper($newrec));
             #printf STDERR ("fifi oldval=%s\n",join(",",@{$oldval}));
             #printf STDERR ("fifi newval=%s\n",join(",",@{$newval}));
             #printf STDERR ("fifi addlist=%s\n",join(",",@addlist));
             #printf STDERR ("fifi dellist=%s\n",join(",",@dellist));
+            if ($self->getParent->isDataInputFromUserFrontend()){
+               if (!$self->getParent->IsMemberOf("admin")){
+                  
+               }
+            }
             return(undef);
          };
    }
@@ -352,6 +383,115 @@ sub getRecordImageUrl
    my $self=shift;
    return("../../../public/base/load/gnome-user-group.jpg");
 }
+
+
+
+
+sub NotifyOrgAdminActionToAdmin
+{
+   my $self=shift;
+   my $mode=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my %param=@_;
+
+   my $idname=$self->IdField->Name();
+   my $creator=effVal($oldrec,$newrec,"creator");
+   my $userid=$self->getCurrentUserId();
+   my $name=effVal($oldrec,$newrec,$param{uniquename});
+   my $id=effVal($oldrec,$newrec,$idname);
+   my $modulename=$self->T($self->Self,$self->Self);
+   my $wf=getModuleObject($self->Config,"base::workflow");
+
+   my $user=getModuleObject($self->Config,"base::user");
+   $user->Initialize();
+   #delete($user->{DB});
+   return() if ($creator==0);
+   $user->SetFilter({userid=>\$creator});
+   my ($creatorrec,$msg)=$user->getOnlyFirst(qw(email givenname surname));
+   return() if (!defined($creatorrec));
+   my $fromname=$creatorrec->{surname};
+   $fromname.=", " if ($creatorrec->{givenname} ne "" && $fromname ne "");
+   $fromname.=$creatorrec->{givenname} if ($creatorrec->{givenname});
+   $fromname=$creatorrec->{email} if ($fromname eq "");
+
+   my $url=$ENV{SCRIPT_URI};
+   $url=~s/[^\/]+$//;
+   my $publicurl=$url;
+   my $listurl=$url;
+   my $itemname=$self->T($self->Self,$self->Self);;
+   $url.="Detail?$idname=$id";
+   $listurl.="Main";
+   $publicurl=~s#/auth/#/public/#g;
+   my $cistatuspath=$self->Self;
+   $cistatuspath=~s/::/\//g;
+   $cistatuspath.="/$id";
+   $cistatuspath.="?HTTP_ACCEPT_LANGUAGE=".$self->Lang();
+
+   my $wfname;
+   my %notiy;
+   my $msg;
+   if ($mode eq "request"){
+      $user->SetFilter({groups=>$param{activator}});
+      my @admin=$user->getHashList(qw(email givenname surname));
+      $notiy{emailto}=[map({$_->{email}} @admin)];
+      $notiy{emailcc}=[$creatorrec->{email}];
+      $wfname=$self->T("Request to activate '%s' in module '%s'");
+      $wfname=sprintf($wfname,$name,$modulename);
+      $msg=$self->T("MSG001");
+      $msg=sprintf($msg,$fromname,$name,$url,$itemname,$listurl);
+   }
+   if ($mode eq "reservation"){
+      $notiy{emailto}=[$creatorrec->{email}];
+      $wfname=$self->T("Reservation confirmation for '%s' in module '%s'");
+      $wfname=sprintf($wfname,$name,$modulename);
+      $msg=$self->T("MSG002");
+      $msg=sprintf($msg,$fromname,$name,$url,$itemname,$listurl);
+   }
+   if ($mode eq "activate"){
+      $notiy{emailto}=[$creatorrec->{email}];
+      $wfname=$self->T("Activation notification for '%s' in module '%s'");
+      $wfname=sprintf($wfname,$name,$modulename);
+      $msg=$self->T("MSG003");
+      $msg=sprintf($msg,$name,$url,$itemname,$listurl);
+   }
+   if ($mode eq "drop"){
+      $notiy{emailto}=[$creatorrec->{email}];
+      $wfname=$self->T("Drop notification for '%s' in module '%s'");
+      $wfname=sprintf($wfname,$name,$modulename);
+      $msg=$self->T("MSG004");
+      $msg=sprintf($msg,$name);
+      return() if ($creator==$userid);
+   }
+   my $sitename=$self->Config->Param("SITENAME");
+   my $subject=$wfname;
+   if ($sitename ne ""){
+      $subject=$sitename.": ".$subject;
+   }
+
+   my $imgtitle=$self->T("current state of the requested CI");
+
+
+   $notiy{emailfrom}=$creatorrec->{email};
+   $notiy{name}=$subject;
+   if ($mode ne "drop"){
+      $notiy{emailpostfix}=<<EOF;
+<br>
+<br>
+<img title="$imgtitle" src="${publicurl}../../base/cistatus/show/$cistatuspath">
+EOF
+   }
+   $notiy{emailtext}=$msg;
+   $notiy{class}='base::workflow::mailsend';
+   $notiy{step}='base::workflow::mailsend::dataload';
+   if (my $id=$wf->Store(undef,\%notiy)){
+      my %d=(step=>'base::workflow::mailsend::waitforspool');
+      my $r=$wf->Store($id,%d);
+   }
+   return(0);
+}
+
+
 
    
 

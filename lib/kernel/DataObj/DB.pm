@@ -75,9 +75,15 @@ sub getSqlFields
       shift(@view);
    }
    if (!$distinct){
-      if (!($#view==0 && ($view[0] eq "srcload" || 
-                         $view[0] eq "mdate" || 
-                         $view[0] eq "cdate"))){
+      my $idfield=$self->IdField();
+      my $idfieldname;
+      $idfieldname=$idfield->Name() if (defined($idfield));
+      if (!($#view==0 && ($view[0] eq $idfieldname || 
+                          $view[0] eq "srcload" || 
+                          $view[0] eq "srcsys" || 
+                          $view[0] eq "srcid" || 
+                          $view[0] eq "mdate" || 
+                          $view[0] eq "cdate"))){
          my @selectfix=();
          foreach my $fname (@{$self->{'FieldOrder'}}){
             my $fobj=$self->{'Field'}->{$fname};
