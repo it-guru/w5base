@@ -578,7 +578,7 @@ sub generateWorkspacePages
    my $actions=shift;
    my $divset=shift;
    my $selopt=shift;
-   my $tr="base::workflow::request::main";
+   my $tr="base::workflow::actions";
    my $class="display:none;visibility:hidden";
 
    if (grep(/^nop$/,@$actions)){
@@ -587,7 +587,7 @@ sub generateWorkspacePages
                 "</option>\n";
       $$divset.="<div id=OPnop style=\"margin:15px\"><br>".
                 $self->getParent->T("The current workflow isn't forwared ".
-                "to you. At now there is no action nessasary.")."</div>";
+                "to you. At now there is no action nessasary.",$tr)."</div>";
    }
    if (grep(/^wfacceptp$/,@$actions)){
       $$selopt.="<option value=\"wfacceptp\" class=\"$class\">".
@@ -828,6 +828,7 @@ sub Process
              {translation=>'base::workflow::request'},$note,$effort)){
             $self->StoreRecord($WfRec,$oprec);
             $self->PostProcess($action.".".$op,$WfRec,$actions);
+            Query->Delete("note");
             return(1);
          }
          return(0);

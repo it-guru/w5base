@@ -1,2 +1,2 @@
-'base::MyW5Base::wfmyjobs'=>{de=>'- meine anstehenden Aufgaben -',
-                             en=>'- my open jobs -'},
+'base::MyW5Base::wfmyjobs'=>{de=>'- meine anstehenden Aufgaben/Workflows -',
+                             en=>'- my open jobs/workflows -'},

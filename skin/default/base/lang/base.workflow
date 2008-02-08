@@ -14,6 +14,7 @@
 'Description'=>{de=>'Beschreibung'},
 'Relations'=>{de=>'Verknüpfungen/ Verweise'},
 'Workflow specific fields'=>{de=>'Workflow spezifische Felder'},
+'postponed until'=>{de=>'Zurückgestellt bis'},
 'Event-Start'=>{de=>'Ereignis Beginn'},
 'Event-End'=>{de=>'Ereignis Ende'},
 'Event-Start day'=>{de=>'Ereignis Beginn Tag'},

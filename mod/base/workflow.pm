@@ -202,6 +202,22 @@ sub new
                 group         =>'state',
                 label         =>'Event-Start',
                 dataobjattr   =>'wfhead.eventstart'),
+
+      new kernel::Field::Date(
+                name          =>'postponeduntil',
+                searchable    =>0,
+                depend        =>['stateid'],
+                htmldetail    =>sub {
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(1) if ($current->{stateid}==5);
+                   return(0);
+                },
+                group         =>'state',
+                label         =>'postponed until',
+                container     =>'headref'),
                                   
       new kernel::Field::Text(
                 name          =>'eventstartday',
@@ -775,17 +791,23 @@ sub preValidate
    my $origrec=shift;
 
    if (!defined($oldrec)){
-      my $UserCache=$self->Cache->{User}->{Cache};
-      my $mycontactid=$self->getCurrentUserId();;
-      my $mycontactname;
-      if (defined($UserCache->{$ENV{REMOTE_USER}}->{rec}->{fullname})){
-         $mycontactname=$UserCache->{$ENV{REMOTE_USER}}->{rec}->{fullname};
+      if ($W5V2::OperationContext eq "QualityCheck"){
+         $newrec->{openuser}=undef;
+         $newrec->{openusername}="QualityCheck";
       }
-      if (defined($mycontactid)){
-         $newrec->{openuser}=$mycontactid;
-      }
-      if (defined($mycontactname)){
-         $newrec->{openusername}=$mycontactname;
+      else{
+         my $UserCache=$self->Cache->{User}->{Cache};
+         my $mycontactid=$self->getCurrentUserId();;
+         my $mycontactname;
+         if (defined($UserCache->{$ENV{REMOTE_USER}}->{rec}->{fullname})){
+            $mycontactname=$UserCache->{$ENV{REMOTE_USER}}->{rec}->{fullname};
+         }
+         if (defined($mycontactid)){
+            $newrec->{openuser}=$mycontactid;
+         }
+         if (defined($mycontactname)){
+            $newrec->{openusername}=$mycontactname;
+         }
       }
    }
    my $class=defined($oldrec) && defined($oldrec->{class}) ? 

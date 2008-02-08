@@ -45,7 +45,9 @@ sub initialize
    if (ref($self->{dst}) eq "ARRAY"){
       my @dst=@{$self->{dst}};
       my @vjoineditbase=();
-      @vjoineditbase=@{$self->{vjoineditbase}} if (defined($self->{vjoineditbase}));
+      if (defined($self->{vjoineditbase})){
+         @vjoineditbase=@{$self->{vjoineditbase}};
+      }
       $self->{dstobj}=[];
       $self->{vjoineditbase}=[];
       while(my $objname=shift(@dst)){
@@ -53,10 +55,10 @@ sub initialize
          my $vjoineditbase=shift(@vjoineditbase);
          my $o=getModuleObject($app->Config,$objname);
          my $idname=$o->IdField->Name();
-         my $dstrec={obj   =>$o,
-                     idname =>$idname,
+         my $dstrec={idname =>$idname,
                      name   =>$objname,
                      disp   =>$display};
+         $dstrec->{obj}=$o;
          if (defined($vjoineditbase)){
             $dstrec->{vjoineditbase}=$vjoineditbase;
          }
@@ -269,6 +271,7 @@ sub FormatedDetail
    my $name=$self->Name();
    my $app=$self->getParent();
    $self->initialize() if (!$self->{isinitialized});
+
 
    if (($mode eq "edit" || $mode eq "workflow") && !$self->{readonly}==1){
       my $fromquery=Query->Param("Formated_$name");
