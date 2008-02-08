@@ -78,8 +78,11 @@ sub FinishWrite
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   my $oldval=shift;
-   my $newval=shift;
+   my $myname=$self->Name();
+   my $oldval=$oldrec->{$myname} if (defined($oldrec) &&
+                                     exists($oldrec->{$myname}));
+   my $newval=$newrec->{$myname} if (defined($newrec) &&
+                                     exists($newrec->{$myname}));
    my $keytab=$self->{tablename};
    my $nowstamp=NowStamp();
    #printf STDERR ("fifi FinishWrite keyhandler %s my newval=%s\n",Dumper($newrec),Dumper($newval));

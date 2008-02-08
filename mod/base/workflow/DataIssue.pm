@@ -134,6 +134,7 @@ sub completeWriteRequest
    my $self=shift;
    my $newrec=shift;
 
+   $newrec->{srcload}=NowStamp("en");
    foreach my $objname (keys(%{$self->{DI}})){
       my $obj=$self->{DI}->{$objname};
       if ($obj->can("completeWriteRequest")){
@@ -141,6 +142,19 @@ sub completeWriteRequest
             return(undef);
          }
       }
+   }
+   if ($newrec->{fwdtargetid} eq "" ||
+       $newrec->{fwdtarget} eq ""){
+      my $grpobj=getModuleObject($self->getParent->Config(),"base::grp");
+      $grpobj->SetFilter({name=>\'admin'});
+      my ($grprec,$msg)=$grpobj->getOnlyFirst(qw(grpid));
+      if (defined($grprec)){
+         $newrec->{fwdtargetid}=$grprec->{grpid}; 
+         $newrec->{fwdtarget}="base::grp"; 
+         return(1);
+      }
+      return(undef);
+    
    }
    return(1);
 }
@@ -309,6 +323,7 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
    my $origrec=shift;
+   printf STDERR ("fifi Validate $self\n");
 
 #  nativ needed
 #   - name
@@ -348,6 +363,7 @@ sub Validate
    $newrec->{affectedobjectid}=effVal($oldrec,$newrec,"affectedobjectid");
    $newrec->{step}=$self->getNextStep();
    if (!$self->getParent->completeWriteRequest($newrec)){
+      $self->LastMsg(ERROR,"can't complete Write Request");
       return(undef);
    }
 
@@ -442,7 +458,20 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
-   return(0);
+   if (defined($newrec->{stateid}) &&
+       $newrec->{stateid}==21){
+      $newrec->{step}="base::workflow::DataIssue::finish";
+      $newrec->{eventend}=$self->getParent->ExpandTimeExpression("now",
+                                                                 "en","GMT");;
+      return(1);
+   }
+   else{
+      if (!$self->getParent->completeWriteRequest($newrec)){
+         $self->LastMsg(ERROR,"can't complete Write Request");
+         return(undef);
+      }
+   }
+
    return(1);
 }
 
@@ -475,6 +504,35 @@ sub getWorkHeight
    my $WfRec=shift;
 
    return("100");
+}
+
+
+#######################################################################
+package base::workflow::DataIssue::finish;
+use vars qw(@ISA);
+use kernel;
+use kernel::WfStep;
+use Data::Dumper;
+@ISA=qw(kernel::WfStep);
+
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $origrec=shift;
+
+   return(0);
+}
+
+
+sub getWorkHeight
+{
+   my $self=shift;
+   my $WfRec=shift;
+
+   return("0");
 }
 
 

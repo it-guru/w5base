@@ -375,7 +375,7 @@ sub Validate
 #   }
 
 
-
+   return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"name"));
    return(1);
 }
 

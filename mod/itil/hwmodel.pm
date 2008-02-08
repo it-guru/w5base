@@ -215,16 +215,6 @@ sub FinishWrite
 }
 
 
-sub FinishDelete
-{
-   my $self=shift;
-   my $oldrec=shift;
-   if (!$self->HandleCIStatus($oldrec,undef,%{$self->{CI_Handling}})){
-      return(0);
-   }
-   return(1);
-}
-
 
 sub isWriteValid
 {

@@ -640,14 +640,12 @@ sub FinishWrite
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   my $oldval=shift;
-   my $newval=shift;
 
    #printf STDERR ("fifi default FinishWrite handler for field %s\n",
    #               $self->{name});
    if (defined($self->{onFinishWrite}) && 
        ref($self->{onFinishWrite}) eq "CODE"){   
-      return(&{$self->{onFinishWrite}}($self,$oldrec,$newrec,$oldval,$newval));
+      return(&{$self->{onFinishWrite}}($self,$oldrec,$newrec));
    }
    return(undef);
 }

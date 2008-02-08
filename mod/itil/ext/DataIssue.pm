@@ -73,10 +73,10 @@ sub completeWriteRequest
             $newrec->{fwdtargetid}=$confrec->{databossid};
          }
          if ($confrec->{mandatorid} ne ""){
-            $newrec->{mandatorid}=$confrec->{mandatorid};
+            $newrec->{kh}->{mandatorid}=$confrec->{mandatorid};
          }
          if ($confrec->{mandator} ne ""){
-            $newrec->{mandator}=$confrec->{mandator};
+            $newrec->{kh}->{mandator}=$confrec->{mandator};
          }
       }
    }

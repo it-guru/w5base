@@ -68,8 +68,11 @@ sub new
             my $self=shift;
             my $oldrec=shift;
             my $newrec=shift;
-            my $oldval=shift;
-            my $newval=shift;
+            my $myname=$self->Name();
+            my $oldval=$oldrec->{$myname} if (defined($oldrec) && 
+                                              exists($oldrec->{$myname}));
+            my $newval=$newrec->{$myname} if (defined($newrec) && 
+                                              exists($newrec->{$myname}));
             my @addlist=();
             my @dellist=();
             my $idname=$self->getParent->IdField->Name();
@@ -123,7 +126,7 @@ sub new
                                });
             }
             #printf STDERR ("fifi onFinishWrite in %s\n",$self->Name());
-            printf STDERR ("fifi onFinishWrite d=%s\n",Dumper($newrec));
+            #printf STDERR ("fifi onFinishWrite d=%s\n",Dumper($newrec));
             #printf STDERR ("fifi oldval=%s\n",join(",",@{$oldval}));
             #printf STDERR ("fifi newval=%s\n",join(",",@{$newval}));
             #printf STDERR ("fifi addlist=%s\n",join(",",@addlist));

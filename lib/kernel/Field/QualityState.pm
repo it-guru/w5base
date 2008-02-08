@@ -31,6 +31,7 @@ sub new
    $self->{group}='qc'                      if (!defined($self->{qc}));
    $self->{name}='qcstate'                  if (!defined($self->{name}));
    $self->{label}='Quality Check State'     if (!defined($self->{label}));
+   $self->{history}=0;
    $self->{readonly}=1;
    $self->{htmldetail}=0;
    $self->{searchable}=0;

@@ -134,6 +134,8 @@ sub nativQualityCheck
    my $result;
    my @alldataissuemsg;
    my $mandator=[];
+   my $checkStart=NowStamp("en");
+
    $mandator=$rec->{mandatorid} if (exists($rec->{mandatorid}));
    $mandator=[$mandator] if (ref($mandator) ne "ARRAY");
    push(@$mandator,0);  # for rules on any mandator
@@ -192,11 +194,11 @@ sub nativQualityCheck
          }
       }
    }
+   my $wf=getModuleObject($parent->Config,"base::workflow");
+   my $dataobj=$self->getParent();
+   my $affectedobject=$dataobj->Self();
+   my $affectedobjectid=$rec->{id};
    if ($#alldataissuemsg>-1){
-      my $wf=getModuleObject($parent->Config,"base::workflow");
-      my $dataobj=$self->getParent();
-      my $affectedobject=$dataobj->Self();
-      my $affectedobjectid=$rec->{id};
       my $directlnkmode="DataIssueMsg";
       my $detaildescription=join("\n",@alldataissuemsg);
       my $name="DataIssue: ".$dataobj->T($affectedobject,$affectedobject).": ".
@@ -205,6 +207,8 @@ sub nativQualityCheck
                       directlnktype=>\$affectedobject,
                       directlnkid=>\$affectedobjectid});
       my ($WfRec,$msg)=$wf->getOnlyFirst(qw(ALL));
+      my $oldcontext=$W5V2::OperationContext;
+      $W5V2::OperationContext="QualityCheck";
       if (!defined($WfRec)){
          my $newrec={name=>$name,
                      detaildescription=>$detaildescription,
@@ -226,9 +230,26 @@ sub nativQualityCheck
          printf STDERR ("updstore bk=%s\n",Dumper(\$bk));
       }
 
-                      
-
+      $W5V2::OperationContext=$oldcontext;
    }
+   my $oldcontext=$W5V2::OperationContext;
+   $W5V2::OperationContext="QualityCheck";
+   #
+   # cleanup deprecated DataIssues for current object
+   #
+   $wf->ResetFilter();
+   $wf->SetFilter({stateid=>"<20",class=>\"base::workflow::DataIssue",
+                   srcload=>"<\"$checkStart GMT\"",
+                   directlnktype=>\$affectedobject,
+                   directlnkid=>\$affectedobjectid});
+   $wf->SetCurrentView(qw(ALL));
+   $wf->ForeachFilteredRecord(sub{
+                      $wf->Store($_,{stateid=>'21'});
+                   });
+
+   
+   $W5V2::OperationContext=$oldcontext;
+
    return($result);
 
 }

@@ -583,13 +583,9 @@ sub FinishWrite
       my $oldrec=shift;
       my $newrec=shift;
 
-      my $field=$fo->Name();
       if ($fo){
-         my $oldv;
-         my $newv;
-         $oldv=$oldrec->{$field} if (defined($oldrec));
-         $newv=$newrec->{$field} if (defined($newrec));
-         $fo->FinishWrite($oldrec,$newrec,$oldv,$newv);
+         my $field=$fo->Name();
+         $fo->FinishWrite($oldrec,$newrec);
       }
    }
    foreach my $fo ($self->getFieldObjsByView([qw(ALL)],
@@ -637,26 +633,31 @@ sub StoreUpdateDelta
    my $newrec=shift;
 
    if (defined($self->{history})){
+      $self->SetCurrentView(qw(ALL));
+      my @fieldlist=$self->getFieldObjsByView([$self->getCurrentView()],
+                                              oldrec=>$oldrec,
+                                              current=>$newrec,
+                                              opmode=>'StoreUpdateDelta');
       my %delta=();
-      foreach my $field (keys(%$newrec)){
-         next if (ref($oldrec->{$field}) eq "HASH" ||
-                  ref($newrec->{$field}) eq "HASH");
-         my $old=$oldrec->{$field};
-         my $new=$newrec->{$field};
-         $old=[$old] if (ref($old) ne "ARRAY");
-         $new=[$new] if (ref($new) ne "ARRAY");
-         $old=join(", ",sort(@{$old}));
-         $new=join(", ",sort(@{$new}));
-         if ($new ne $old){
-            $delta{$field}={'old'=>$old,'new'=>$new};
+      foreach my $fobj (@fieldlist){
+         if ($fobj->history){
+            my $field=$fobj->Name;
+            if (exists($newrec->{$field})){
+               next if (ref($oldrec->{$field}) eq "HASH" ||
+                        ref($newrec->{$field}) eq "HASH");
+               my $old=$oldrec->{$field};
+               my $new=$newrec->{$field};
+               $old=[$old] if (ref($old) ne "ARRAY");
+               $new=[$new] if (ref($new) ne "ARRAY");
+               $old=join(", ",sort(@{$old}));
+               $new=join(", ",sort(@{$new}));
+               if ($new ne $old){
+                  $delta{$field}={'old'=>$old,'new'=>$new};
+               }
+            }
          }
       }
       if (keys(%delta)){   # optimices the request of field object list
-         $self->SetCurrentView(qw(ALL));
-         my @fieldlist=$self->getFieldObjsByView([$self->getCurrentView()],
-                                                 oldrec=>$oldrec,
-                                                 current=>$newrec,
-                                                 opmode=>'StoreUpdateDelta');
          foreach my $field (keys(%delta)){
             my $old=$delta{$field}->{'old'};
             my $new=$delta{$field}->{'new'};
