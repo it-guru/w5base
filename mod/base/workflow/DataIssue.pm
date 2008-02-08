@@ -261,7 +261,8 @@ sub getPosibleActions
    my @l=();
    my $iscurrent=$self->isCurrentForward($WfRec);
 
-
+   push(@l,"nop");
+   push(@l,"wfaddnote");
    return(@l);
 }
 
@@ -440,14 +441,45 @@ sub generateWorkspace
    my $WfRec=shift;
    my $actions=shift;
 
-   my $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100%>
-<tr>
-<td class=fname width=20%>%affectedobject(label)%:</td>
-<td class=finput> Jo Main</td>
-</tr>
+   my $divset="";
+   my $selopt="";
+
+   $self->generateWorkspacePages($WfRec,$actions,\$divset,\$selopt);   
+   my $oldop=Query->Param("OP");
+   my $templ;
+   my $pa=$self->getParent->T("posible action");
+   $templ=<<EOF;
+<table width=100% height=148 border=0 cellspacing=0 cellpadding=0>
+<tr height=1%><td width=1% nowrap>$pa &nbsp;</td>
+<td><select id=OP name=OP style="width:100%">$selopt</select></td></tr>
+<tr><td colspan=3 valign=top>$divset</td></tr>
 </table>
+<script language="JavaScript">
+function fineSwitch(s)
+{
+   var sa=document.forms[0].elements['SaveStep'];
+   if (s.value=="nop"){
+      if (sa){
+         sa.disabled=true;
+      }
+   }
+   else{
+      if (sa){
+         sa.disabled=false;
+      }
+   }
+}
+function InitDivs()
+{
+   var s=document.getElementById("OP");
+   divSwitcher(s,"$oldop",fineSwitch);
+}
+addEvent(window,"load",InitDivs);
+//InitDivs();
+//window.setTimeout(InitDivs,1000);   // ensure to disable button (mozilla bug)
+</script>
 EOF
+
    return($templ);
 }
 
@@ -487,17 +519,35 @@ sub Process
    my $WfRec=shift;
    my $actions=shift;
 
-#   if ($action eq "NextStep"){
-#      my $h=$self->getWriteRequestHash("web");
-#      if (my $id=$self->StoreRecord($WfRec,$h)){
-#         $h->{id}=$id;
-#      }
-#      else{
-#         return(0);
-#      }
-#      return(1);
-#   }
-
+   if ($action eq "SaveStep"){
+      my $op=Query->Param("OP");
+      if ($action ne "" && !grep(/^$op$/,@{$actions})){
+         $self->LastMsg(ERROR,"invalid disalloed action requested");
+      }
+     
+     
+      if ($op eq "wfaddnote"){
+         my $note=Query->Param("note");
+         if ($note=~m/^\s*$/  || length($note)<10){
+            $self->LastMsg(ERROR,"empty or to short notes are not allowed");
+            return(0);
+         }
+         $note=trim($note);
+         my $oprec={};
+         if (grep(/^iscurrent$/,@{$actions})){ # state "in bearbeitung" darf
+            $oprec->{stateid}=4;               # nur gesetzt werden, wenn
+         }                                     # wf aktuell an mich zugewiesen
+         my $effort=Query->Param("Formated_effort");
+         if ($self->getParent->getParent->Action->StoreRecord(
+             $WfRec->{id},"wfaddnote",
+             {translation=>'base::workflow::request'},$note,$effort)){
+            $self->StoreRecord($WfRec,$oprec);
+            $self->PostProcess($action.".".$op,$WfRec,$actions);
+            return(1);
+         }
+         return(0);
+      }
+   }
    return($self->SUPER::Process($action,$WfRec));
 }
 
@@ -507,9 +557,214 @@ sub getWorkHeight
 {
    my $self=shift;
    my $WfRec=shift;
+   my $actions=shift;
 
-   return("100");
+   my @saveables=grep(!/^wfbreak$/,@$actions);
+   return(0)  if ($#{$actions}==-1);
+   return(20) if ($#saveables==-1);
+   return(180);
 }
+
+sub getPosibleButtons
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my @WorkflowStep=Query->Param("WorkflowStep");
+   my %b=();
+   my @saveables=grep(!/^wfbreak$/,@$actions);
+   if ($#saveables!=-1){
+      %b=(SaveStep=>$self->T('Save')) if ($#{$actions}!=-1);
+   }
+   if (defined($WfRec->{id})){
+      if (grep(/^wfbreak$/,@$actions)){
+         $b{BreakWorkflow}=$self->T('abbort request');
+      }
+   }
+   return(%b);
+}  
+
+
+sub generateWorkspacePages
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my $divset=shift;
+   my $selopt=shift;
+   my $tr="base::workflow::request::main";
+   my $class="display:none;visibility:hidden";
+
+   if (grep(/^nop$/,@$actions)){
+      $$selopt.="<option value=\"nop\" class=\"$class\">".
+                $self->getParent->T("nop",$tr).
+                "</option>\n";
+      $$divset.="<div id=OPnop style=\"margin:15px\"><br>".
+                $self->getParent->T("The current workflow isn't forwared ".
+                "to you. At now there is no action nessasary.")."</div>";
+   }
+   if (grep(/^wfacceptp$/,@$actions)){
+      $$selopt.="<option value=\"wfacceptp\" class=\"$class\">".
+                $self->getParent->T("wfacceptp",$tr).
+                "</option>\n";
+      $$divset.="<div id=OPwfacceptp>".$self->getDefaultNoteDiv($WfRec).
+                "</div>";
+   }
+   if (grep(/^wfacceptn$/,@$actions)){
+      $$selopt.="<option value=\"wfacceptn\" class=\"$class\">".
+                $self->getParent->T("wfacceptn",$tr).
+                "</option>\n";
+      $$divset.="<div id=OPwfacceptn>".$self->getDefaultNoteDiv($WfRec).
+                "</div>";
+   }
+   if (grep(/^wfapprove$/,@$actions)){
+      $$selopt.="<option value=\"wfapprove\" class=\"$class\">".
+                $self->getParent->T("wfapprove",$tr).
+                "</option>\n";
+      $$divset.="<div id=OPwfapprove><textarea name=note ".
+                "style=\"width:100%;height:110px\"></textarea></div>";
+   }
+   if (grep(/^wfaccept$/,@$actions)){
+      $$selopt.="<option value=\"wfaccept\" class=\"$class\">".
+                $self->getParent->T("wfaccept",$tr).
+                "</option>\n";
+      $$divset.="<div id=OPwfaccept></div>";
+   }
+   if (grep(/^wffine$/,@$actions)){
+      $$selopt.="<option value=\"wffine\" class=\"$class\">".
+                $self->getParent->T("wffine",$tr).
+                "</option>\n";
+      $$divset.="<div id=OPwffine style=\"margin:15px\"><br>".
+                $self->getParent->T("use this action,".
+                " to finish this request and mark it as according to ".
+                "desire processed")."</div>";
+   }
+   if (grep(/^wffineproc$/,@$actions)){
+      $$selopt.="<option value=\"wffineproc\" class=\"$class\">".
+                $self->getParent->T("wffineproc",$tr).
+                "</option>\n";
+      my $note=Query->Param("note");
+      $$divset.="<div id=OPwffineproc>".$self->getDefaultNoteDiv($WfRec).
+                "</div>";
+   }
+   if (grep(/^wfaddnote$/,@$actions)){
+      $$selopt.="<option value=\"wfaddnote\" class=\"$class\">".
+                $self->getParent->T("wfaddnote",$tr).
+                "</option>\n";
+      my $note=Query->Param("note");
+      $$divset.="<div id=OPwfaddnote>".$self->getDefaultNoteDiv($WfRec).
+                "</div>";
+   }
+   if (grep(/^wfreprocess$/,@$actions)){
+      $$selopt.="<option value=\"wfreprocess\" class=\"$class\">".
+                $self->getParent->T("wfreprocess",$tr).
+                "</option>\n";
+      my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
+         "<td colspan=2><textarea name=note style=\"width:100%;height:100px\">".
+         "</textarea></td></tr>";
+      $d.="<tr><td width=1% nowrap>Weiterleiten an:&nbsp;</td>".
+          "<td>\%fwdtargetname(detail)\%".
+          "</td>";
+      $d.="</tr></table>";
+      my $devpartner=$self->getParent->getDefaultContractor($WfRec,$actions);
+      $d.='<script language="JavaScript">'.
+          'function setDevReprocess(){'.
+          ' var d=document.getElementById("OPwfreprocess");'.
+          ' var f=d.getElementsByTagName("input");'.
+          ' for(var i=0;i<f.length;i++){'.
+          '    if (f[i].name=="Formated_fwdtargetname"){'.
+          '       f[i].value="'.$devpartner.'";'.
+          '    }'.
+          ' }'.
+          '}'.
+          'addEvent(window, "load", setDevReprocess);'.
+          '</script>';
+      $$divset.="<div id=OPwfreprocess>$d</div>";
+   }
+   if (grep(/^wfcallback$/,@$actions)){
+      $$selopt.="<option value=\"wfcallback\" class=\"$class\">".
+                $self->getParent->T("wfcallback",$tr).
+                "</option>\n";
+      $$divset.="<div id=OPwfcallback style=\"margin:15px\"><br>".
+                $self->getParent->T("use this action,".
+                " to call the request back. This can be usefull, if the ".
+                "request needs to be corrected.")."</div>";
+   }
+   if (grep(/^wfreject$/,@$actions)){
+      $$selopt.="<option value=\"wfreject\" class=\"$class\">".
+                $self->getParent->T("wfreject",$tr).
+                "</option>\n";
+      $$divset.="<div id=OPwfreject><textarea name=note ".
+                "style=\"width:100%;height:110px\"></textarea></div>";
+   }
+   if (grep(/^wfapprovalreq$/,@$actions)){
+      $$selopt.="<option value=\"wfapprovalreq\" class=\"$class\">".
+                $self->getParent->T("wfapprovalreq",$tr).
+                "</option>\n";
+      my $note=Query->Param("note");
+      my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
+         "<td colspan=2><textarea name=note style=\"width:100%;height:70px\">".
+         $note."</textarea></td></tr>";
+      $d.="<tr><td width=1% nowrap>&nbsp;Genehmigungs ".
+          "Anforderung bei:&nbsp;</td>".
+          "<td>\%approverrequest(detail)\%".
+          "</td></tr>";
+      $d.="</table>";
+      $$divset.="<div id=OPwfapprovalreq>$d</div>";
+   }
+   if (grep(/^wfapprovok$/,@$actions)){
+      $$selopt.="<option value=\"wfapprovok\" class=\"$class\">".
+                $self->getParent->T("wfapprovok",$tr).
+                "</option>\n";
+      my $note=Query->Param("note");
+      my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
+         "<td colspan=2><textarea name=note style=\"width:100%;height:70px\">".
+         $note."</textarea></td></tr>";
+      $d.="<tr><td colspan=2>Ja, ich bin sicher, dass ich diese Anforderung ".
+          "genehmigen möchte <input name=VERIFY type=checkbox></td></tr>";
+      $d.="</table>";
+      $$divset.="<div id=OPwfapprovok>$d</div>";
+   }
+   if (grep(/^wfapprovreject$/,@$actions)){
+      $$selopt.="<option value=\"wfapprovreject\" class=\"$class\">".
+                $self->getParent->T("wfapprovreject",$tr).
+                "</option>\n";
+      my $note=Query->Param("note");
+      my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
+         "<td colspan=2><textarea name=note style=\"width:100%;height:70px\">".
+         $note."</textarea></td></tr>";
+      $d.="</table>";
+      $$divset.="<div id=OPwfapprovreject>$d</div>";
+   }
+   if (grep(/^wfapprovalcan$/,@$actions)){
+      $$selopt.="<option value=\"wfapprovalcan\" class=\"$class\">".
+                $self->getParent->T("wfapprovalcan",$tr).
+                "</option>\n";
+      my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
+         "<td colspan=2><textarea name=note style=\"width:100%;height:70px\">".
+         "</textarea></td></tr>";
+      #$d.="<tr><td width=1% nowrap>&nbsp;Genehmigungs ".
+      #    "Anforderung bei:&nbsp;</td>".
+      #    "<td>\%approverrequest(detail)\%".
+      #    "</td></tr>";
+      $d.="</table>";
+      $$divset.="<div id=OPwfapprovalcan>$d</div>";
+   }
+   if (grep(/^wfforward$/,@$actions)){
+      $$selopt.="<option value=\"wfforward\" class=\"$class\">".
+                $self->getParent->T("wfforward",$tr).
+                "</option>\n";
+      my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
+         "<td colspan=2><textarea name=note style=\"width:100%;height:100px\">".
+         "</textarea></td></tr>";
+      $d.="<tr><td width=1% nowrap>Weiterleiten an:&nbsp;</td>".
+          "<td>\%fwdtargetname(detail)\%".
+          "</td>";
+      $d.="</tr></table>";
+      $$divset.="<div id=OPwfforward>$d</div>";
+   }
+}
+
 
 
 #######################################################################

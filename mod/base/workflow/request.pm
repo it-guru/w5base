@@ -751,55 +751,6 @@ sub generateWorkspacePages
    }
 }
 
-sub getDefaultNoteDiv
-{
-   my $self=shift;
-   my $WfRec=shift;
-
-   my $userid=$self->getParent->getParent->getCurrentUserId();
-   my $initiatorid=$WfRec->{initiatorid};
-   my $creator=$WfRec->{openuser};
-
-   my $note=Query->Param("note");
-   my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
-         "<td colspan=2><textarea name=note style=\"width:100%;height:100px\">".
-         $note."</textarea></td></tr>";
-   if ($creator!=$userid || $initiatorid!=$creator){
-      my @t=(''=>'',
-             '10'=>'10 min',
-             '20'=>'20 min',
-             '30'=>'30 min',
-             '40'=>'40 min',
-             '50'=>'50 min',
-             '60'=>'1 h',
-             '120'=>'2 h',
-             '240'=>'4 h',
-             '300'=>'5 h',
-             '360'=>'6 h',
-             '420'=>'7 h',
-             '480'=>'1 day',
-             '720'=>'1,5 days',
-             '960'=>'2 days');
-      $d.="<tr><td width=1% nowrap>".
-          $self->getParent->getParent->T("Effort","base::workflowaction").
-          ":&nbsp;</td>".
-          "<td><select name=Formated_effort style=\"width:80px\">";
-      my $oldval=Query->Param("Formated_effort");
-      while(defined(my $min=shift(@t))){
-         my $l=shift(@t);
-         $d.="<option value=\"$min\"";
-         $d.=" selected" if ($min==$oldval);
-         $d.=">$l</option>";
-      }
-      $d.="</select></td>";
-      $d.="</tr>";
-   }
-   $d.="</table>";
-   return($d);
-}
-
-
-
 sub Validate
 {
    my $self=shift;
@@ -1155,7 +1106,6 @@ sub Process
          else{
             return(0);
          }
-printf STDERR ("fifi 01\n");
          if ($self->getParent->getParent->getCurrentUserId()==
              $new1->{"${approverrequest}id"}){
             $self->LastMsg(ERROR,"you could'nt request approve by your self");
@@ -1345,15 +1295,9 @@ sub getWorkHeight
    my $WfRec=shift;
    my $actions=shift;
 
-printf STDERR ("fifi actions=%s\n",join(",",@$actions));
    my @saveables=grep(!/^wfbreak$/,@$actions);
-   if ($#{$actions}==-1){
-      return(0);
-   }
-   if ($#saveables==-1){
-      return(20);
-   }
-
+   return(0)  if ($#{$actions}==-1);
+   return(20) if ($#saveables==-1);
    return(180);
 }
 
