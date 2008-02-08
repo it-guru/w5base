@@ -63,6 +63,9 @@ sub getPostibleValues
    #          push(@l,$kval,$dispname);
    #       } @{$self->{value}});
       map({push(@l,$_,$_);} @{$self->{value}});
+      if ($self->{allowempty}==1){
+         unshift(@l,"","");
+      }
       return(@l);
    }
    if (defined($self->{vjointo})){
@@ -256,6 +259,9 @@ sub Unformat
       }
       else{
          $r->{$self->Name()}=$formated;
+      }
+      if ($self->{allowempty}==1){
+         $r->{$self->Name()}=undef if ($r->{$self->Name()} eq "");
       }
    }
    return($r);

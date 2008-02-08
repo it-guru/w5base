@@ -282,6 +282,7 @@ sub new
                 name          =>'avgusercount',
                 group         =>'customer',
                 label         =>'average user count',
+                allowempty    =>1,
                 value         =>['10','50','100','250',
                                  '500','800','1000','1500','2000','2500','3000',
                                  '4000','5000','7500','10000','12500','15000',
@@ -293,6 +294,7 @@ sub new
                 name          =>'namedusercount',
                 group         =>'customer',
                 label         =>'named user count',
+                allowempty    =>1,
                 value         =>['10','50','100','250',
                                  '500','800','1000','1500','2000','2500','3000',
                                  '4000','5000','7500','10000','12500','15000',
@@ -769,7 +771,9 @@ sub Validate
       }
       $newrec->{conumber}=$conumber;
    }
-
+   foreach my $v (qw(avgusercount namedusercount)){
+      $newrec->{$v}=undef if (exists($newrec->{$v}) && $newrec->{$v} eq "");
+   }
 
    ########################################################################
    # standard security handling
