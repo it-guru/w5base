@@ -4,7 +4,7 @@
 'wfaddnote'=>{de=>'Bearbeitungshinweis oder Notiz hinzufügen',en=>'add note'},
 'wfacceptp'=>{de=>'Anforderung annehmen, sofort bearbeiten und zurück an Anforderer',en=>'accept request process if needed'},
 'wfacceptn'=>{de=>'Anforderung annehmen und Notiz hinzufügen',en=>'accept request and add note'},
-'wffine'=>{de=>'Anforderung abschließen',en=>'finish the request'},
+'wffine'=>{de=>'Anforderung/Workflow abschließen',en=>'finish/workflow the request'},
 'wffineproc'=>{de=>'Anforderung bearbeiten und danach zurück zum Anforderer senden',en=>'process request and send back to requestor'},
 'wfreprocess'=>{de=>'Weiterleitung an eine Person oder Gruppe zur Nachbesserung',en=>'reprocess the request'},
 'wfaccept'=>{de=>'Anforderung annehmen',en=>'accept request'},

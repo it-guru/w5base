@@ -272,6 +272,7 @@ sub getPosibleActions
    push(@l,"wfdefer");
    push(@l,"wfdifine");
    push(@l,"wfdireproc");
+   push(@l,"wffine");
    return(@l);
 }
 
@@ -590,6 +591,8 @@ sub Process
          if ($WfRec->{openuser} eq ""){
             $oprec->{stateid}=21;
             $oprec->{step}='base::workflow::DataIssue::finish';
+            $oprec->{fwdtarget}=undef;
+            $oprec->{fwdtargetid}=undef;
          }
          else{
             $oprec->{stateid}=16;
@@ -598,6 +601,25 @@ sub Process
             $oprec->{eventend}=$self->getParent->ExpandTimeExpression("now",
                                                                  "en","GMT");;
          }
+         if ($app->Action->StoreRecord($WfRec->{id},"wffine",
+             {translation=>'base::workflow::DataIssue'},$note)){
+            $self->StoreRecord($WfRec,$oprec);
+            $self->PostProcess($action.".".$op,$WfRec,$actions);
+            Query->Delete("note");
+            return(1);
+         }
+         return(0);
+      }
+      if ($op eq "wffine"){
+         my $app=$self->getParent->getParent;
+         my $note=Query->Param("note");
+         $note=trim($note);
+         my $oprec={};
+         $oprec->{postponeduntil}=undef;
+         $oprec->{stateid}=21;
+         $oprec->{step}='base::workflow::DataIssue::finish';
+         $oprec->{fwdtarget}=undef;
+         $oprec->{fwdtargetid}=undef;
          if ($app->Action->StoreRecord($WfRec->{id},"wffine",
              {translation=>'base::workflow::DataIssue'},$note)){
             $self->StoreRecord($WfRec,$oprec);
@@ -686,6 +708,13 @@ sub generateWorkspacePages
       $$divset.="<div id=OPnop style=\"margin:15px\"><br>".
                 $self->getParent->T("The current workflow isn't forwared ".
                 "to you. At now there is no action nessasary.",$tr)."</div>";
+   }
+   if (grep(/^wffine$/,@$actions)){
+      $$selopt.="<option value=\"wffine\" class=\"$class\">".
+                $self->getParent->T("wffine",$tr).
+                "</option>\n";
+      $$divset.="<div id=OPwffine>".
+                "</div>";
    }
    if (grep(/^wfdifine$/,@$actions)){
       $$selopt.="<option value=\"wfdifine\" class=\"$class\">".
