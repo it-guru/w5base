@@ -428,10 +428,10 @@ sub Process
       my $h=$self->getWriteRequestHash("web");
       my ($target,$fwdtarget,$fwdtargetid,$fwddebtarget,$fwddebtargetid)=
              $self->getParent->getDefaultContractor($h,$actions);
-printf STDERR ("fifi fwdtarget=$fwdtarget\n");
-printf STDERR ("fifi fwdtargetid=$fwdtargetid\n");
-printf STDERR ("fifi fwddebtarget=$fwddebtarget\n");
-printf STDERR ("fifi fwddebtargetid=$fwddebtargetid\n");
+#printf STDERR ("fifi fwdtarget=$fwdtarget\n");
+#printf STDERR ("fifi fwdtargetid=$fwdtargetid\n");
+#printf STDERR ("fifi fwddebtarget=$fwddebtarget\n");
+#printf STDERR ("fifi fwddebtargetid=$fwddebtargetid\n");
       if ($self->LastMsg()){
          return(undef);
       }

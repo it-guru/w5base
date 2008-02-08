@@ -460,10 +460,15 @@ sub Validate
 
    if (defined($newrec->{stateid}) &&
        $newrec->{stateid}==21){
-      $newrec->{step}="base::workflow::DataIssue::finish";
-      $newrec->{eventend}=$self->getParent->ExpandTimeExpression("now",
-                                                                 "en","GMT");;
-      return(1);
+      if ($self->getParent->getParent->Action->StoreRecord(
+          $oldrec->{id},"wfobsolete",
+          {translation=>'base::workflow::DataIssue'},"",undef)){
+         $newrec->{step}="base::workflow::DataIssue::finish";
+         $newrec->{eventend}=$self->getParent->ExpandTimeExpression("now",
+                                                                  "en","GMT");;
+         return(1);
+      }
+      return(0);
    }
    else{
       if (!$self->getParent->completeWriteRequest($newrec)){

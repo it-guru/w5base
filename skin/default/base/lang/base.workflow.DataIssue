@@ -4,3 +4,4 @@
 'affected Dataobject'=>{de=>'betroffenes Datenobjekt'},
 'affected Dataelement'=>{de=>'betroffenes Datenelement'},
 'affected Dataobject Type'=>{de=>'Typ des betroffenen Datenobjektes'},
+'wfobsolete'=>{de=>'hinfällig',en=>'obsolete'},
