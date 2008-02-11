@@ -1,0 +1,50 @@
+Das Suchfeld '<b>%label%</b>' ist vom Typ Zeitstempel. In diesem
+Fall können Sie folgenden Ausdrücke verwenden:<br>
+<br>
+<table width=100%>
+
+<tr>
+<td nowrap valign=top><b>12:30:00</b></td>
+<td>...dies verwendet das aktuelle Datum und die angegebene Zeit zur Suche</td>
+</tr>
+
+<tr>
+<td nowrap valign=top><b><a href=JavaScript:SendData("jetzt")>jetzt</a></b></td>
+<td>... dies verwendet die aktuelle Zeit und das aktuelle Datum zur Suche</td>
+</tr>
+
+<tr>
+<td nowrap valign=top><b><a href=JavaScript:SendData("lastmonth")>lastmonth</a></b></td>
+<td>... es werden alle Datensätze aufgelistet, bei denen der geweilige Zeitstempel innerhalb des letzten (Kalendermonats) Monats lagen.</td>
+</tr>
+
+<tr>
+<td nowrap valign=top><b><a href=JavaScript:SendData("nextmonth")>nextmonth</a><b></td>
+<td>... es werden alle Datensätze aufgelistet, bei denen der geweilige Zeitstempel innerhalb des nächsten (Kalendermonats) Monats liegt.</td>
+</tr>
+
+<tr>
+<td nowrap valign=top><b><a href=JavaScript:SendData("currentmonth")>currentmonth</a></b></td>
+<td>... es werden alle Datensätze aufgelistet, bei denen der geweilige Zeitstempel innerhalb des aktuellen (Kalendermonats) Monats liegt.</td>
+</tr>
+
+<tr>
+<td nowrap valign=top><b><a href=JavaScript:SendData("now-5h")>now-5h</a></b></td>
+<td>... mit diesem Ausdruck können Sie alle Datensätze suchen, die in dem jeweiligen Feld den Zeitpunkt vor 5 Stunden eingetragen haben.</td>
+</tr>
+
+</table>
+<script language="JavaScript">
+function SendData(t)
+{
+   if (parent){
+      parent.document.forms[0].elements['%field%'].value=t;
+   }
+   parent.hidePopWin(false);
+}
+</script>
+<style>
+body,html{
+  padding:5px;
+}
+</style>

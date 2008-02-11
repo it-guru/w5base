@@ -1,0 +1,59 @@
+Das Suchfeld '<b>%label%</b>' ist ein "Standard-Suchfeld".
+In diesem Fall können Sie folgende Ausdrücke und Wildcards verwenden:<br>
+<br>
+<table width=100%>
+
+<tr>
+<td nowrap valign=top><b>*</b></td>
+<td>... steht für eine beliebige Anzahl von Zeichen</td>
+</tr>
+
+<tr>
+<td nowrap valign=top><b>?</b></td>
+<td>... steht für exakt ein beliebiges Zeichen</td>
+</tr>
+
+<tr>
+<td nowrap valign=top><b>!</b></td>
+<td>... negiert den Ausruck. Falls Sie also !Hans eingeben, so erhalten
+    Sie alle Datensätze, bei denen "Hans" nicht in '%label%' eingetragen ist.</td>
+</tr>
+
+<tr>
+<td nowrap valign=top><b>"Hallo Welt"</b></td>
+<td>... wenn Sie mehrere Ausdrücke Leerzeichen seperiert hintereinander
+    schreiben, so entspricht dies einer ODER Suche. Sollten Sie dies
+    verhindern wollen, so können Sie die Worte in Anführungszeichen 
+    einschliesen - dann wird im Beispiel exakt der Inhalt "Hallo Welt"
+    gesucht.</td>
+</tr>
+
+<tr>
+<td nowrap valign=top><b>a* AND *s</b></td>
+<td>... mit einem großgeschriebenen AND können Sie mehrere Ausdrücke
+    "und" verknüpfen. Im Beispiel werden z.B. die Datensätze aufgelistet,
+    ide mit a anfangen und gleichzeitig mit s aufhören.</td>
+</tr>
+
+<tr>
+<td nowrap valign=top><b>[LEER]</b></td>
+<td>... bei bestimmten Datenbank einträgen gibt es einen Unterschied
+    zwischen "" und leer. Mit der Eingabe von [LEER] können Sie alle
+    Datensätze suchen, die im jeweiligen Feld "" oder NULL (leer) enthalten.</td>
+</tr>
+
+</table>
+<script language="JavaScript">
+function SendData(t)
+{
+   if (parent){
+      parent.document.forms[0].elements['%field%'].value=t;
+   }
+   parent.hidePopWin(false);
+}
+</script>
+<style>
+body,html{
+  padding:5px;
+}
+</style>
