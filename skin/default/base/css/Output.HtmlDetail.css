@@ -6,6 +6,19 @@ div.detailframe{
    margin-bottom:1px;
    background:#eeeeee;
 }
+
+body.fullview{
+   background:#eaeaea;
+   margin:10px;
+}  
+
+div.fullview{
+   width:100%;
+   border-width:0px;
+   margin:0px;
+   margin-bottom:0px;
+}  
+
 div.sublist{
    width:99%;
    border-style:none;

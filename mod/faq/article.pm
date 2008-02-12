@@ -345,6 +345,82 @@ sub HandleInfoAboSubscribe
 }
 
 
+sub getDefaultHtmlDetailPage
+{
+   my $self=shift;
+   return("StandardDetail");
+}
+
+sub getHtmlDetailPages
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+
+   return($self->SUPER::getHtmlDetailPages($p,$rec),
+          "FView"=>$self->T("Full-View"));
+}
+
+sub getHtmlDetailPageContent
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+   return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "FView");
+   my $page;
+   my $idname=$self->IdField->Name();
+   my $idval=$rec->{$idname};
+
+   if ($p eq "FView"){
+      Query->Param("$idname"=>$idval);
+      $idval="NONE" if ($idval eq "");
+
+      my $q=new kernel::cgi({});
+      $q->Param("$idname"=>$idval);
+      my $urlparam=$q->QueryString();
+
+      $page="<iframe style=\"width:100%;height:100%;border-width:0;".
+            "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
+            "src=\"FullView?$urlparam\"></iframe>";
+   }
+   $page.=$self->HtmlPersistentVariables($idname);
+   return($page);
+}
+
+
+sub getValidWebFunctions
+{
+   my $self=shift;
+
+   return($self->SUPER::getValidWebFunctions(@_),"FullView");
+}
+
+
+sub FullView
+{
+   my $self=shift;
+
+   my %flt=$self->getSearchHash();
+   $self->ResetFilter();
+   $self->SecureSetFilter(\%flt);
+   my ($rec,$msg)=$self->getOnlyFirst(qw(name data));
+
+   print $self->HttpHeader();
+   print $self->HtmlHeader(
+                           style=>['default.css',
+                                'work.css',
+                                'Output.HtmlDetail.css',
+                                'kernel.App.Web.css']);
+#
+   print("<body class=fullview><form>");
+   print("<div class=fullview style=\"padding-bottom:10px\"><b>".$rec->{name}."</b></div>");
+   print("<div class=fullview>".$rec->{data}."</div>");
+   print("</form></body></html>");
+}
+
+
+
+
+
+
 
 
 
