@@ -278,7 +278,7 @@ sub TableVersionProceedFile
       }
    }
    return(1) if ($mode ne "procced" && $mode ne "auto");
-   return(2) if ( $rec->{linenumber} == $rec->{lines});
+   return(2) if ( $rec->{linenumber} >= $rec->{lines});
    my $curline=0;
    my $cmdok=0;
    my $command="";
