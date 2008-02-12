@@ -324,7 +324,7 @@ sub TableVersionIsInconsistent
 
    foreach my $rec (values(%c)){
       next if (!defined($rec->{dataobj}));
-      return(1) if ($rec->{linenumber} ne $rec->{lines});
+      return(1) if ($rec->{linenumber}<$rec->{lines});
    }
    return(0);
 }
@@ -422,7 +422,7 @@ sub TableVersionModifications
                            "size=5 value=\"$rec->{linenumber}\">";
       }
       next if ($bk==2);
-      if ($rec->{linenumber} ne $rec->{lines} &&
+      if ($rec->{linenumber}<$rec->{lines} &&
           defined($rec->{dataobj})){
          $style="background:#e3acac";
       }
