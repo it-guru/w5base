@@ -831,7 +831,13 @@ sub processSubs
    }
    $m->{tree}=\@subs;
    delete($m->{tree}) if ($#{$m->{tree}}==-1);
-   $m->{label}=$self->T($m->{fullname},$m->{translation});
+   if ($m->{translation} ne ""){
+      $m->{label}=$self->T($m->{fullname},$m->{translation});
+   }
+   else{
+      $m->{label}=$m->{fullname};
+      $m->{label}=~s/^.*\.//;
+   }
    my $desc=$self->T($m->{fullname}.":Desc",$m->{translation});
    if ($desc ne $m->{fullname}.":Desc"){
       $m->{description}=$desc;
