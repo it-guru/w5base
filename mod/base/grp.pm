@@ -232,6 +232,7 @@ sub isDeleteValid
    my $self=shift;
    my $rec=shift;
 
+   return(0) if (!grep(/^default$/,$self->isWriteValid($rec)));
    my $g=getModuleObject($self->Config,"base::grp");
    my $grpid=$rec->{grpid};
    $g->SetFilter({"parentid"=>\$grpid});
@@ -239,7 +240,7 @@ sub isDeleteValid
    if ($#l!=-1){
       return(undef);
    }
-   return($self->isWriteValid($rec));
+   return(1);
 }
 
 
