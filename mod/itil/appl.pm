@@ -244,6 +244,7 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'sem2',
+                AllowEmpty    =>1,
                 group         =>'finance',
                 label         =>'Deputy Service Manager',
                 vjointo       =>'base::user',
@@ -258,6 +259,7 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'tsm2',
+                AllowEmpty    =>1,
                 group         =>'technical',
                 label         =>'Deputy Technical Solution Manager',
                 vjointo       =>'base::user',
