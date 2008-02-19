@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=iso-8859-1">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 2.3  (Linux)">
+	<META NAME="CREATED" CONTENT="20080213;16111600">
+	<META NAME="CHANGED" CONTENT="20080219;9303200">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { size: 21cm 29.7cm; margin: 2cm }
+		P { margin-bottom: 0cm }
+		P.western { font-size: 11pt }
+		P.cjk { font-size: 10pt }
+		H1 { margin-bottom: 0.21cm }
+		H1.western { font-family: "Arial"; font-size: 16pt }
+		H1.cjk { font-family: "Andale Sans UI"; font-size: 16pt }
+		H1.ctl { font-family: "Andale Sans UI"; font-size: 16pt }
+		TD P { margin-bottom: 0cm }
+		TD P.western { font-size: 11pt }
+		TD P.cjk { font-size: 10pt }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="de-DE" DIR="LTR">
+<DIV ID="all" DIR="LTR">
+	<H1 CLASS="western" ALIGN=CENTER></H1>
+	<HR>
+	<P CLASS="western" ALIGN=CENTER><BR>
+	</P>
+	<P CLASS="western" ALIGN=CENTER><FONT SIZE=6><B>W5Base<BR>ITIL
+	Ausfalls-/<BR>Auswirkungsanalyse</B></FONT></P>
+	<CENTER>
+		<TABLE WIDTH=338 BORDER=0 CELLPADDING=0 CELLSPACING=0>
+			<COL WIDTH=338>
+			<TR>
+				<TD WIDTH=338 VALIGN=TOP>
+					<P CLASS="western" ALIGN=LEFT><IMG SRC="FaultAnalytics.de_html_m7fd5111f.png" NAME="Grafik2" ALIGN=LEFT WIDTH=338 HEIGHT=253 BORDER=0><BR CLEAR=LEFT>Version:
+					0.1</P>
+					<P CLASS="western" ALIGN=LEFT>Stand: <SDFIELD TYPE=DOCINFO SUBTYPE=CHANGE FORMAT=DATE SDNUM="1031;1031;TT.MM.JJJJ">19.02.2008</SDFIELD>
+					- <SDFIELD TYPE=DOCINFO SUBTYPE=CHANGE FORMAT=TIME SDNUM="1031;1031;HH:MM">09:30</SDFIELD></P>
+				</TD>
+			</TR>
+		</TABLE>
+	</CENTER>
+	<P CLASS="western"><BR>
+	</P>
+	<P CLASS="western"><BR>
+	</P>
+	<P CLASS="western"><BR>
+	</P>
+	<HR>
+	<P CLASS="western"><BR>
+	</P>
+	<OL>
+		<LI><H1 CLASS="western" STYLE="page-break-before: always">Zielsetzung</H1>
+	</OL>
+	<P CLASS="western">In einem IT Unternehmen ist es notwendig, beim
+	Ausfall oder der Planung einer Wartung eines Systems die genauen
+	Auswirkungen des Wegfalles dieser Komponente ermitteln zu k&ouml;nnen.</P>
+	<P CLASS="western">Gerade beim Einsatz von extrem gesharten
+	Kompontenten (NAS-Server, Backupserver ..) ist dies notwendig. In
+	diesem Fall ist es auch sehr hilfreich, wenn man die notwendigen
+	technischen Ansprechpartner sehr schnell ermitteln kann.<BR><BR><I><SPAN STYLE="font-weight: medium">W5Base
+	ITIL-FaultAnalytics</SPAN></I> kann dies in einem ersten Schritt f&uuml;r
+	das Wegfallen von NAS-Filern oder Server-Systemen analysieren.</P>
+	<P CLASS="western"><BR>
+	</P>
+	<OL START=2>
+		<LI><H1 CLASS="western"><A NAME="requirements"></A>Vorbedingungen</H1>
+	</OL>
+	<P CLASS="western">NAS Server zeichnen sich dadurch aus, dass
+	Resourcen (NAS-Freigaben) anderen Systemen zur Verf&uuml;gung
+	gestellt werden. Die Dokumentation dieser Freigaben ist somit
+	zwingend. Die Freigabe von Resourcen erfolgt entweder an Systeme,
+	IP-Adressen oder IP-Netze.</P>
+	<P CLASS="western" STYLE="font-weight: medium"><I>W5Base
+	ITIL-FaultAnalytics</I><SPAN STYLE="font-style: normal"> geht nun
+	davon aus, dass die IP-Adressen aller Systeme in der W5Base
+	dokumentiert sind. Wenn nun die Freigaben der NAS Filer ebenfalls
+	dokumentiert sind, so  k&ouml;nnen mit entsprechenden analyse
+	Programmen die geforderten Informationen sehr rasch ermittelt
+	werden.</SPAN></P>
+	<OL START=3>
+		<LI><H1 CLASS="western">Arbeitsweise der Analyse</H1>
+	</OL>
+	<P CLASS="western">Als Eingabe k&ouml;nnen ein oder mehrere Systeme
+	ausgew&auml;hlt werden. Das Analyse Programm geht dann in folgenden
+	Schritten vor:<BR><BR>
+	</P>
+	<OL TYPE=a>
+		<LI><P CLASS="western">Es werden alle Systeme ermittelt, die
+		NFS/NAS Exports eines der angegebenen Systeme nutzen. Diese Systeme
+		werden in die Liste der direkt betroffenen Systeme aufgenommen.<BR>Bei
+		der Ermittlung der NAS/NFS Clients sind IP Netz-Freigaben m&ouml;glich.
+		Diese werden entsprechend der TCP/IP Regeln mit den verf&uuml;gbaren
+		IP-Adressen abgeglichen, die bei Systemen in der W5Base zugeordnet
+		wurden.<BR><BR>
+		</P>
+		<LI><P CLASS="western">Aus der Liste der direkt betroffenen Systeme
+		wird dann die Liste der direkt betroffenen Anwendungen ermittelt.<BR><BR>
+		</P>
+		<LI><P CLASS="western">Aus den Direkt betroffenen Anwendungen wird
+		die Liste der Schnittstellen-Anwendungen und Kundenprozesse
+		ermittelt.<BR><BR>
+		</P>
+		<LI><P CLASS="western">Zu den Listen &bdquo;direkt betroffene
+		Systeme&ldquo;, &bdquo;direkt betroffene Anwendungen&ldquo; und
+		&bdquo;betroffene Schnittstellen Anwendungen&ldquo; werden die
+		technischen Kontakte und die Teamleiter der Teams ermittelt, die
+		f&uuml;r die jeweiligen Komponenten zust&auml;ndig sind.</P>
+	</OL>
+	<P CLASS="western"><BR>
+	</P>
+	<OL START=4>
+		<LI><H1 CLASS="western" STYLE="page-break-before: always">Beispiel
+		Ausgabe des Analyse Tools</H1>
+	</OL>
+	<P CLASS="western"><BR>
+	</P>
+	<P CLASS="western"><IMG SRC="FaultAnalytics.de_html_1cfc9791.jpg" NAME="Grafik3" ALIGN=LEFT WIDTH=607 HEIGHT=706 BORDER=0><BR>
+	</P>
+	<OL START=5>
+		<LI><H1 CLASS="western">Vergleich mit anderen Tools</H1>
+	</OL>
+	<P CLASS="western"><BR>
+	</P>
+	<P CLASS="western">Im &bdquo;T-Systems AssetCenter&ldquo; w&auml;re
+	eine vergleichbare Analyse nur m&ouml;glich, wenn die IP-Zuorndung
+	und die Definition von Freigaben und Mountpoints grundlegend
+	&uuml;berarbeitet werden w&uuml;rde.</P>
+	<P CLASS="western">Bei IP-Adressen fehlt z.B. der Netzbereich und
+	bei Mountpoints besteht nur die M&ouml;glichkeit, diese f&uuml;r
+	Systeme freizugeben, und nicht f&uuml;r IP-Netze.</P>
+	<P CLASS="western"><BR>
+	</P>
+	<P CLASS="western"><BR>
+	</P>
+	<OL START=6>
+		<LI><H1 CLASS="western" STYLE="page-break-before: always">Inhaltsverzeichnis</H1>
+	</OL>
+	<DIV ID="Inhaltsverzeichnis1" DIR="LTR">
+		<DIV ID="Inhaltsverzeichnis1_Head" DIR="LTR">
+			<P STYLE="margin-top: 0.42cm; margin-bottom: 0.21cm; page-break-after: avoid">
+			<FONT FACE="Arial"><FONT SIZE=4 STYLE="font-size: 16pt"><B>Inhaltsverzeichnis</B></FONT></FONT></P>
+		</DIV>
+		<P> <FONT FACE="Arial"><FONT SIZE=3>1 Format	2</FONT></FONT></P>
+		<P> <FONT FACE="Arial"><FONT SIZE=3>2 Variante Textblock	2</FONT></FONT></P>
+		<P> <FONT FACE="Arial"><FONT SIZE=3>3 Einbindung von Grafiken	2</FONT></FONT></P>
+		<P> <FONT FACE="Arial"><FONT SIZE=3>3.1 Variante Text mit Grafik
+		rechts	2</FONT></FONT></P>
+		<P> <FONT FACE="Arial"><FONT SIZE=3>3.2 Variante Tip Box	2</FONT></FONT></P>
+		<P> <FONT FACE="Arial"><FONT SIZE=3>3.3 Variante Grafik auf voller
+		Breite	3</FONT></FONT></P>
+		<P> <FONT FACE="Arial"><FONT SIZE=3>4 Beschriftungen in Grafiken	3</FONT></FONT></P>
+		<P> <FONT FACE="Arial"><FONT SIZE=3>5 Inhaltsverzeichnis	3</FONT></FONT></P>
+		<P> <FONT FACE="Arial"><FONT SIZE=3>6 Inhaltsverzeichnis	4</FONT></FONT></P>
+	</DIV>
+	<P CLASS="western"><SCRIPT LANGUAGE="JavaScript">
+function addEvent(obj, evType, fn){
+ if (obj.addEventListener){
+    obj.addEventListener(evType, fn, false);
+    return true;
+ } else if (obj.attachEvent){
+    var r = obj.attachEvent("on"+evType, fn);
+    return r;
+ } else {
+    return false;
+ }
+}
+function init()
+{
+   document.body.style.background="white";
+   document.getElementById("all").style.width="600px";
+}
+addEvent(window,"load",init);
+</SCRIPT><BR>
+	</P>
+</DIV>
+</BODY>
+</HTML>
