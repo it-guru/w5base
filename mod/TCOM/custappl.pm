@@ -265,11 +265,37 @@ sub getTeamBossID
                               "base::lnkgrpuser");
       $lnk->SetFilter({grpid=>\$teamid,
                        nativroles=>'RBoss'});
-      foreach my $rec ($lnk->getHashList("userid")){
+      my %bosslnk;
+                     # at 20.02.2008 by Mr. Berdelmann F. it was requested
+                     # that only one (the latest) boss should be displayed
+      foreach my $rec ($lnk->getHashList(qw(lnkgrpuserid userid mdate))){
          if ($rec->{userid} ne ""){
+            $bosslnk{$rec->{lnkgrpuserid}}=$rec;
+         }
+      }
+      if (keys(%bosslnk)==1){
+         foreach my $rec (values(%bosslnk)){
             push(@teambossid,$rec->{userid});
          }
       }
+      if (keys(%bosslnk)>1){
+         my $bossid;
+         my $cdate;
+         my $lnkr=getModuleObject($self->getParent->Config,
+                                 "base::lnkgrpuserrole");
+         $lnkr->SetFilter({lnkgrpuserid=>[keys(%bosslnk)],
+                           role=>\'RBoss'});
+         foreach my $rec ($lnkr->getHashList(qw(lnkgrpuserid cdate))){
+            $cdate=$rec->{cdate} if (!defined($cdate));
+            if ($cdate le $rec->{cdate}){
+               $cdate=$rec->{cdate};
+               $bossid=$bosslnk{$rec->{lnkgrpuserid}}->{userid};
+            }
+         }
+         push(@teambossid,$bossid) if (defined($bossid));
+      }
+
+
    }
    return(\@teambossid);
 }

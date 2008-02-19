@@ -47,6 +47,15 @@ sub qcheckRecord
       return(3,{qmsg=>['no valid conumber'],
                 dataissue=>['no valid conumber']});
    }
+   else{
+      my $coobj=getModuleObject($self->getParent->Config,"itil::costcenter");
+      $coobj->SetFilter({cistatusid=>4,name=>\$rec->{conumber}});
+      my ($rec,$msg)=$coobj->getOnlyFirst(qw(id));
+      if (!defined($rec)){
+         return(3,{qmsg=>['conumber is not installed/active'],
+                   dataissue=>['conumber is not installed/active']});
+      }
+   }
    return(0,undef);
 
 }
