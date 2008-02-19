@@ -267,12 +267,19 @@ sub getPosibleActions
    my @l=();
    my $iscurrent=$self->isCurrentForward($WfRec);
 
-   push(@l,"nop");
-   push(@l,"wfaddnote");
-   push(@l,"wfdefer");
-   push(@l,"wfdifine");
-   push(@l,"wfdireproc");
-   push(@l,"wffine");
+   if ($iscurrent && ($stateid==2 || $stateid==4)){
+      push(@l,"wfaddnote");
+      push(@l,"wfdefer");
+      push(@l,"wfdifine");
+   }
+   if ($iscurrent && $creator==$userid && ($stateid==16)){
+      push(@l,"wfdireproc");
+      push(@l,"wffine");
+   }
+   push(@l,"nop") if ($#l==-1 && $stateid<=20);
+   if ($creator==$userid && $stateid==2){
+      push(@l,"wfbreak");
+   }
    return(@l);
 }
 
@@ -514,6 +521,13 @@ sub Validate
       }
       return(0);
    }
+   elsif (defined($newrec->{stateid}) &&
+       $newrec->{stateid}==22){
+       $newrec->{eventend}=$self->getParent->ExpandTimeExpression("now",
+                                                                "en","GMT");;
+       $newrec->{closedate}=$self->getParent->ExpandTimeExpression("now",
+                                                                "en","GMT");;
+   }
    else{
       if (!$self->getParent->completeWriteRequest($newrec)){
          $self->LastMsg(ERROR,"can't complete Write Request");
@@ -531,10 +545,28 @@ sub Process
    my $WfRec=shift;
    my $actions=shift;
 
-   if ($action eq "SaveStep"){
+   
+   if ($action eq "BreakWorkflow"){
+      if ($action ne "" && !grep(/^wfbreak$/,@{$actions})){
+         $self->LastMsg(ERROR,"invalid disalloed action requested");
+         return(0);
+      }
+      my $oprec={};
+      $oprec->{stateid}=22;
+      if ($self->getParent->getParent->Action->StoreRecord(
+          $WfRec->{id},"wfbreak",
+          {translation=>'base::workflow::request'},undef,undef)){
+         $self->StoreRecord($WfRec,$oprec);
+         $self->PostProcess($action,$WfRec,$actions);
+         Query->Delete("note");
+         return(1);
+      }
+   }
+   elsif ($action eq "SaveStep"){
       my $op=Query->Param("OP");
       if ($action ne "" && !grep(/^$op$/,@{$actions})){
          $self->LastMsg(ERROR,"invalid disalloed action requested");
+         return(0);
       }
       if ($op eq "wfaddnote"){
          my $note=Query->Param("note");

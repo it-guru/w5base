@@ -1,3 +1,4 @@
 'write contract'=>{de=>'schreiben'},
+'write costcenter'=>{de=>'schreiben'},
 'read contract'=>{de=>'lesen'},
 'Customer Contact'=>{de=>'Kundenkontakt'},

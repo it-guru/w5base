@@ -253,7 +253,6 @@ sub new
                 group         =>'source',
                 label         =>'RealEditor',
                 dataobjattr   =>'custcontract.realeditor'),
-
    
       new kernel::Field::Link(
                 name          =>'sectarget',

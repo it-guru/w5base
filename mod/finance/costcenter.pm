@@ -19,8 +19,8 @@ package finance::costcenter;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use itil::lib::Listedit;
-@ISA=qw(itil::lib::Listedit);
+use finance::lib::Listedit;
+@ISA=qw(finance::lib::Listedit);
 
 sub new
 {
@@ -29,121 +29,148 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
-      new kernel::Field::Id(         name          =>'id',
-                                     sqlorder      =>'desc',
-                                     searchable    =>0,
-                                     label         =>'W5BaseID',
-                                     dataobjattr   =>'costcenter.id'),
+      new kernel::Field::Id(
+                name          =>'id',
+                sqlorder      =>'desc',
+                searchable    =>0,
+                label         =>'W5BaseID',
+                dataobjattr   =>'costcenter.id'),
                                                   
-      new kernel::Field::Text(       name          =>'name',
-                                     htmlwidth     =>'120px',
-                                     label         =>'CO-Number',
-                                     dataobjattr   =>'costcenter.name'),
+      new kernel::Field::Text(
+                name          =>'name',
+                htmlwidth     =>'120px',
+                label         =>'CO-Number',
+                dataobjattr   =>'costcenter.name'),
 
-      new kernel::Field::Select(     name          =>'cistatus',
-                                     selectwidth   =>'40%',
-                                     label         =>'CI-State',
-                                     vjoineditbase =>{id=>">0"},
-                                     vjointo       =>'base::cistatus',
-                                     vjoinon       =>['cistatusid'=>'id'],
-                                     vjoindisp     =>'name'),
+      new kernel::Field::Select(
+                name          =>'cistatus',
+                selectwidth   =>'40%',
+                label         =>'CI-State',
+                vjoineditbase =>{id=>">0"},
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['cistatusid'=>'id'],
+                vjoindisp     =>'name'),
 
-      new kernel::Field::Link(       name          =>'cistatusid',
-                                     label         =>'CI-StateID',
-                                     dataobjattr   =>'costcenter.cistatus'),
+      new kernel::Field::Link(
+                name          =>'cistatusid',
+                label         =>'CI-StateID',
+                dataobjattr   =>'costcenter.cistatus'),
 
-      new kernel::Field::Text(       name          =>'fullname',
-                                     htmlwidth     =>'120px',
-                                     label         =>'CO-Shortdescription',
-                                     dataobjattr   =>'costcenter.fullname'),
+      new kernel::Field::Text(
+                name          =>'fullname',
+                htmlwidth     =>'120px',
+                label         =>'CO-Shortdescription',
+                dataobjattr   =>'costcenter.fullname'),
 
-      new kernel::Field::TextDrop(   name          =>'delmgrteam',
-                                     group         =>'delmgmt',
-                                     htmlwidth     =>'300px',
-                                     label         =>'Delivery-Management Team',
-                                     vjointo       =>'base::grp',
-                                     vjoinon       =>['delmgrteamid'=>
-                                                      'grpid'],
-                                     vjoindisp     =>'fullname'),
+      new kernel::Field::TextDrop(
+                name          =>'delmgrteam',
+                group         =>'delmgmt',
+                htmlwidth     =>'300px',
+                label         =>'Delivery-Management Team',
+                vjointo       =>'base::grp',
+                vjoinon       =>['delmgrteamid'=>'grpid'],
+                vjoindisp     =>'fullname'),
 
-      new kernel::Field::TextDrop(   name          =>'delmgr',
-                                     group         =>'delmgmt',
-                                     label         =>'Delivery Manager',
-                                     vjointo       =>'base::user',
-                                     vjoinon       =>['delmgrid'=>'userid'],
-                                     vjoindisp     =>'fullname'),
+      new kernel::Field::TextDrop(
+                name          =>'delmgr',
+                group         =>'delmgmt',
+                label         =>'Delivery Manager',
+                vjointo       =>'base::user',
+                vjoinon       =>['delmgrid'=>'userid'],
+                vjoindisp     =>'fullname'),
 
-      new kernel::Field::Link(       name          =>'delmgrid',
-                                     group         =>'delmgmt',
-                                     dataobjattr   =>'costcenter.delmgr'),
+      new kernel::Field::Link(
+                name          =>'delmgrid',
+                group         =>'delmgmt',
+                dataobjattr   =>'costcenter.delmgr'),
 
-      new kernel::Field::TextDrop(   name          =>'delmgr2',
-                                     group         =>'delmgmt',
-                                     label         =>'Deputy Delivery Manager',
-                                     vjointo       =>'base::user',
-                                     vjoinon       =>['delmgr2id'=>'userid'],
-                                     vjoindisp     =>'fullname'),
+      new kernel::Field::TextDrop(
+                name          =>'delmgr2',
+                group         =>'delmgmt',
+                label         =>'Deputy Delivery Manager',
+                vjointo       =>'base::user',
+                vjoinon       =>['delmgr2id'=>'userid'],
+                vjoindisp     =>'fullname'),
 
-      new kernel::Field::Link(       name          =>'delmgr2id',
-                                     group         =>'delmgmt',
-                                     dataobjattr   =>'costcenter.delmgr2'),
-
-
-      new kernel::Field::Link(       name          =>'delmgrteamid',
-                                     group         =>'delmgmt',
-                                     dataobjattr   =>'costcenter.delmgrteam'),
+      new kernel::Field::Link(
+                name          =>'delmgr2id',
+                group         =>'delmgmt',
+                dataobjattr   =>'costcenter.delmgr2'),
 
 
-      new kernel::Field::Textarea(   name          =>'comments',
-                                     label         =>'Comments',
-                                     dataobjattr   =>'costcenter.comments'),
+      new kernel::Field::Link(
+                name          =>'delmgrteamid',
+                group         =>'delmgmt',
+                dataobjattr   =>'costcenter.delmgrteam'),
 
-      new kernel::Field::Text(       name          =>'srcsys',
-                                     group         =>'source',
-                                     label         =>'Source-System',
-                                     dataobjattr   =>'costcenter.srcsys'),
+      new kernel::Field::ContactLnk(
+                name          =>'contacts',
+                label         =>'Contacts',
+                class         =>'mandator',
+                vjoinbase     =>[{'parentobj'=>\'finance::costcenter'}],
+                vjoininhash   =>['targetid','target','roles'],
+                group         =>'contacts'),
+
+      new kernel::Field::Textarea(
+                name          =>'comments',
+                label         =>'Comments',
+                dataobjattr   =>'costcenter.comments'),
+
+      new kernel::Field::Text(
+                name          =>'srcsys',
+                group         =>'source',
+                label         =>'Source-System',
+                dataobjattr   =>'costcenter.srcsys'),
                                                    
-      new kernel::Field::Text(       name          =>'srcid',
-                                     group         =>'source',
-                                     label         =>'Source-Id',
-                                     dataobjattr   =>'costcenter.srcid'),
+      new kernel::Field::Text(
+                name          =>'srcid',
+                group         =>'source',
+                label         =>'Source-Id',
+                dataobjattr   =>'costcenter.srcid'),
                                                    
-      new kernel::Field::Date(       name          =>'srcload',
-                                     group         =>'source',
-                                     label         =>'Source-Load',
-                                     dataobjattr   =>'costcenter.srcload'),
+      new kernel::Field::Date(
+                name          =>'srcload',
+                group         =>'source',
+                label         =>'Source-Load',
+                dataobjattr   =>'costcenter.srcload'),
 
-      new kernel::Field::CDate(      name          =>'cdate',
-                                     group         =>'source',
-                                     sqlorder      =>'desc',
-                                     label         =>'Creation-Date',
-                                     dataobjattr   =>'costcenter.createdate'),
+      new kernel::Field::CDate(
+                name          =>'cdate',
+                group         =>'source',
+                sqlorder      =>'desc',
+                label         =>'Creation-Date',
+                dataobjattr   =>'costcenter.createdate'),
                                                   
-      new kernel::Field::MDate(      name          =>'mdate',
-                                     group         =>'source',
-                                     sqlorder      =>'desc',
-                                     label         =>'Modification-Date',
-                                     dataobjattr   =>'costcenter.modifydate'),
+      new kernel::Field::MDate(
+                name          =>'mdate',
+                group         =>'source',
+                sqlorder      =>'desc',
+                label         =>'Modification-Date',
+                dataobjattr   =>'costcenter.modifydate'),
 
-      new kernel::Field::Creator(    name          =>'creator',
-                                     group         =>'source',
-                                     label         =>'Creator',
-                                     dataobjattr   =>'costcenter.createuser'),
+      new kernel::Field::Creator(
+                name          =>'creator',
+                group         =>'source',
+                label         =>'Creator',
+                dataobjattr   =>'costcenter.createuser'),
 
-      new kernel::Field::Owner(      name          =>'owner',
-                                     group         =>'source',
-                                     label         =>'Owner',
-                                     dataobjattr   =>'costcenter.modifyuser'),
+      new kernel::Field::Owner(
+                name          =>'owner',
+                group         =>'source',
+                label         =>'Owner',
+                dataobjattr   =>'costcenter.modifyuser'),
 
-      new kernel::Field::Editor(     name          =>'editor',
-                                     group         =>'source',
-                                     label         =>'Editor',
-                                     dataobjattr   =>'costcenter.editor'),
+      new kernel::Field::Editor(
+                name          =>'editor',
+                group         =>'source',
+                label         =>'Editor',
+                dataobjattr   =>'costcenter.editor'),
 
-      new kernel::Field::RealEditor( name          =>'realeditor',
-                                     group         =>'source',
-                                     label         =>'RealEditor',
-                                     dataobjattr   =>'costcenter.realeditor'),
+      new kernel::Field::RealEditor(
+                name          =>'realeditor',
+                group         =>'source',
+                label         =>'RealEditor',
+                dataobjattr   =>'costcenter.realeditor'),
    
 
    );
@@ -166,6 +193,19 @@ sub getRecordImageUrl
    return("../../../public/itil/load/costcenter.jpg?".$cgi->query_string());
 }
 
+sub SecureValidate
+{  
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+#   return(0) if (!$self->ProtectObject($oldrec,$newrec,$self->{adminsgroups}));
+   return(1);
+}
+
+
+
+
 
 
 sub Validate
@@ -181,6 +221,25 @@ sub Validate
    }
    $conummer=~s/^0+//g;
    $newrec->{name}=$conummer;
+
+   if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
+      my $userid=$self->getCurrentUserId();
+      if (!defined($oldrec)){
+         if (!defined($newrec->{delmgrid}) ||
+             $newrec->{delmgrid}==0){
+            my $userid=$self->getCurrentUserId();
+            $newrec->{delmgrid}=$userid;
+         }
+      }
+      if (defined($newrec->{delmgrid}) &&
+          $newrec->{delmgrid}!=$userid &&
+          $newrec->{delmgrid}!=$oldrec->{delmgrid}){
+         $self->LastMsg(ERROR,"you are not authorized to set other persons ".
+                              "as delmgr");
+         return(0);
+      }
+   }
+
    
 #   if (defined($newrec->{cistatusid}) && $newrec->{cistatusid}>4){
 #      # validate if subdatastructures have a cistauts <=4 
@@ -194,8 +253,33 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
+   my $userid=$self->getCurrentUserId();
+
+
    return("default") if (!defined($rec) && $self->IsMemberOf("admin"));
-   return("default","delmgmt");
+
+   my @databossedit=("default","delmgmt","contacts");
+   return(@databossedit) if (defined($rec) && $self->IsMemberOf("admin"));
+
+   if (defined($rec->{contacts}) && ref($rec->{contacts}) eq "ARRAY"){
+      my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+                                  ["RMember"],"both");
+      my @grpids=keys(%grps);
+      foreach my $contact (@{$rec->{contacts}}){
+         if ($contact->{target} eq "base::user" &&
+             $contact->{targetid} ne $userid){
+            next;
+         }
+         if ($contact->{target} eq "base::grp"){
+            my $grpid=$contact->{targetid};
+            next if (!grep(/^$grpid$/,@grpids));
+         }
+         my @roles=($contact->{roles});
+         @roles=@{$contact->{roles}} if (ref($contact->{roles}) eq "ARRAY");
+         return(@databossedit) if (grep(/^write$/,@roles));
+      }
+   }
+   return(undef);
 }
 
 

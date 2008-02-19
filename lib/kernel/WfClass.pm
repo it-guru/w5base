@@ -280,7 +280,8 @@ sub Process
       }
       elsif ($b eq "BreakWorkflow"){
          $breakbutton.="<input type=submit class=workflowbutton ".
-                      "value=\"$button{$b}\" name=$b>";
+                      "value=\"$button{$b}\" ".
+                      "onclick=\"ValidateButtonClick('BreakWorkflow');\" name=$b>";
       }
       else{
          $addbuttons.="<input type=submit class=workflowbutton ".
@@ -391,6 +392,11 @@ function ProcessResize()
 function ProcessInit()
 {
    ProcessResize();
+}
+function ValidateButtonClick()
+{
+   alert("fifi");
+   return(0);
 }
 addEvent(window, "resize", ProcessResize);
 addEvent(window, "load",   ProcessInit);

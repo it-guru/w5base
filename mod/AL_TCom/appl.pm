@@ -36,7 +36,16 @@ sub new
                 selectwidth   =>'30%',
                 searchable    =>0,
                 label         =>'allow to send for (Herbeiruf)',
+                container     =>'additional')
+   );
+ 
+   $self->AddFields(
+      new kernel::Field::Number(
+                name          =>'applnumber',
+                searchable    =>0,
+                label         =>'Application number',
                 container     =>'additional'),
+      insertafter=>['applid'] 
    );
    $self->{workflowlink}->{workflowtyp}=[qw(AL_TCom::workflow::diary
                                             OSY::workflow::diary

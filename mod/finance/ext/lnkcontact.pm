@@ -50,6 +50,14 @@ sub getPosibleRoles
              "customer"        =>$self->getParent->T("Customer Contact",
                                                      $self->Self));
    }
+   if ($current->{parentobj}=~m/^.+::costcenter/ ||
+       (defined($self->getParent) &&
+        defined($self->getParent->getParent) &&
+       $self->getParent->getParent->Self()=~m/^.+::costcenter$/)){
+      return(
+             "write"           =>$self->getParent->T("write costcenter",
+                                                     $self->Self));
+   }
    return();
 }
 

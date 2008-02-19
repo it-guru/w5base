@@ -1098,8 +1098,9 @@ sub getOperator
 sub InitFields
 {
    my $self=shift;
-
+   my @finelist;
    foreach my $obj (@_){
+      next if (!defined($obj));
       my $name=$obj->Name;
       #msg(INFO,"fifi AddField:%s",$obj->name);
       $obj->{group}="default" if (!exists($obj->{group}));
@@ -1125,19 +1126,37 @@ sub InitFields
                                  $t eq "Container"  ||
                                  $t eq "Link"); 
       }
+      push(@finelist,$obj);
    }
-   return(@_);
+   return(@finelist);
 }
 
 sub AddFields
 {
    my $self=shift;
+   my @fobjlist=shift;
+   my %param;
+   if (ref($_[0])){
+      push(@fobjlist,@_);
+   }
+   else{
+      %param=@_;
+   }
 
-   foreach my $obj ($self->InitFields(@_)){
+   foreach my $obj ($self->InitFields(@fobjlist)){
       my $name=$obj->Name;
       next if (defined($self->{'Field'}->{$name}));
       $self->{'Field'}->{$name}=$obj;
-      push(@{$self->{'FieldOrder'}},$name);
+      my $inserted=0;
+      if (defined($param{insertafter})){
+         my @match=($param{insertafter});
+         @match=@{$param{insertafter}} if (ref($param{insertafter}) eq "ARRAY");
+         for(my $c=0;$c<=$#{$self->{'FieldOrder'}};$c++){
+         }
+      }
+      if (!$inserted){
+         push(@{$self->{'FieldOrder'}},$name);
+      }
       if (defined($obj->{group}) &&
           !defined($self->{Group}->{$obj->{group}})){
          $self->AddGroup($obj->{group},translation=>$obj->{translation});
