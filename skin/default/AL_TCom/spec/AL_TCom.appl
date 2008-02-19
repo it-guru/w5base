@@ -14,5 +14,13 @@ an already available Asset Center Application,
 ie it will be not a new application in Asset Center 
 Added.
 '},
+#######################################################################
+'applnumber'=>{de=>'
+Diese Nummer ist die Nummer, unter der die Anwendung in KOMPAS
+registriert ist.
+',en=>'
+This is the number under witch the current application is
+registered in KOMPAS.
+'},
 
 

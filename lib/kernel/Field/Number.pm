@@ -50,7 +50,7 @@ sub FormatedDetail
    my $d=$self->RawValue($current);
    my $name=$self->Name();
    if ($mode eq "HtmlSubList" || $mode eq "HtmlV01" || $mode eq "HtmlDetail"){
-      if (defined($d)){
+      if (defined($d) && $d ne ""){
          my $format=sprintf("%%.%df",$self->{precision});
          $d=sprintf($format,$d);
          $d=~s/\./,/g;
@@ -64,7 +64,7 @@ sub FormatedDetail
       if ($self->{readonly}==1){
          $readonly=1;
       }
-      if (defined($d)){
+      if (defined($d) && $d ne ""){
          my $format=sprintf("%%.%df",$self->{precision});
          $d=sprintf($format,$d);
          $d=~s/\./,/g;

@@ -748,6 +748,13 @@ sub PrepareApp
    $newrec{customerid}=$rec->{kndorgarea};
    $newrec{description}=$rec->{appdoku};
    $newrec{isnosysappl}=$rec->{is_licapp};
+   if ($rec->{agnummer}=~m/^\d+$/ && $rec->{agnummer} ne "" &&
+       $rec->{agnummer} ne "0"){
+      $newrec{applnumber}=$rec->{agnummer};
+   }
+   else{
+      $newrec{applnumber}="";
+   }
    $newrec{databossid}=$self->getUserIdByV1($rec->{databoss});;
    $newrec{semid}=$self->getUserIdByV1($rec->{sem});;
    $newrec{sem2id}=$self->getUserIdByV1($rec->{sem2});;

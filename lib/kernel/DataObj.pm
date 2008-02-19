@@ -1152,6 +1152,14 @@ sub AddFields
          my @match=($param{insertafter});
          @match=@{$param{insertafter}} if (ref($param{insertafter}) eq "ARRAY");
          for(my $c=0;$c<=$#{$self->{'FieldOrder'}};$c++){
+            if (grep(/^$self->{'FieldOrder'}->[$c]$/,@match)){
+               splice(@{$self->{'FieldOrder'}},$c+1,
+                      $#{$self->{'FieldOrder'}}-$c+1,
+                 ($name,
+                 @{$self->{'FieldOrder'}}[($c+1)..($#{$self->{'FieldOrder'}}+-1)]));
+               $inserted++;
+               last;
+            }
          }
       }
       if (!$inserted){
