@@ -774,6 +774,7 @@ sub Validate
    }
    my $conumber=trim(effVal($oldrec,$newrec,"conumber"));
    if ($conumber ne ""){
+      $conumber=~s/^0+//g;
       if (!($conumber=~m/^\d{5,13}$/)){
          my $fo=$self->getField("conumber");
          my $msg=sprintf($self->T("value of '%s' is not correct ".
