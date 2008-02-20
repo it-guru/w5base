@@ -395,7 +395,7 @@ function ProcessInit()
 }
 function ValidateButtonClick()
 {
-   alert("fifi");
+   //alert("fifi");
    return(0);
 }
 addEvent(window, "resize", ProcessResize);

@@ -37,6 +37,7 @@ sub new
    $self->{searchable}=0;
    $self->{onRawValue}=\&onRawValue;
    my $o=bless($type->SUPER::new(%$self),$type);
+   delete($o->{default});
    return($o);
 }
 
