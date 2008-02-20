@@ -65,6 +65,16 @@ sub new
                 label         =>'Usage',
                 dataobjattr   =>'amtsicustappl.usage'),
                                     
+      new kernel::Field::Text(
+                name          =>'criticality',
+                label         =>'Criticality',
+                dataobjattr   =>'amtsicustappl.businessimpact'),
+                                    
+      new kernel::Field::Text(
+                name          =>'customerprio',
+                label         =>'Priority',
+                dataobjattr   =>'amtsicustappl.priority'),
+                                    
       new kernel::Field::TextDrop(
                 name          =>'customer',
                 label         =>'Customer',
@@ -137,6 +147,11 @@ sub new
                 vjoinon       =>['id'=>'lapplicationid'],
                 vjoindisp     =>'name'),
                                     
+      new kernel::Field::Text(
+                name          =>'ref',
+                label         =>'Application Reference',
+                dataobjattr   =>'amtsicustappl.ref'),
+
       new kernel::Field::Link(
                 name          =>'lcostid',
                 label         =>'AC-CostcenterID',
@@ -147,6 +162,13 @@ sub new
                 label         =>'Version',
                 size          =>'16',
                 dataobjattr   =>'amtsicustappl.version'),
+
+      new kernel::Field::Text(
+                name          =>'issoxappl',
+                group         =>'control',
+                selectwidth   =>'30%',
+                label         =>'Application is mangaged by rules of SOX',
+                dataobjattr   =>'amtsicustappl.soxrelevant'),
                                     
       new kernel::Field::Textarea(
                 name          =>'description',

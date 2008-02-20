@@ -645,3 +645,4 @@ alter table appl         add allowifupdate int(2) default 0;
 alter table custcontract add allowifupdate int(2) default 0;
 alter table swinstance   add allowifupdate int(2) default 0;
 alter table liccontract  add allowifupdate int(2) default 0;
+alter table appl add criticality char(20) default NULL;

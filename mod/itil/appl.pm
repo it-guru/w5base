@@ -281,6 +281,16 @@ sub new
                 dataobjattr   =>'appl.customerprio'),
 
       new kernel::Field::Select(
+                name          =>'criticality',
+                group         =>'customer',
+                label         =>'Criticality',
+                allowempty    =>1,
+                value         =>['CRnone','CRlow','CRmedium','CRhigh',
+                                 'CRcritical'],
+                selectwidth   =>'100px',
+                dataobjattr   =>'appl.criticality'),
+
+      new kernel::Field::Select(
                 name          =>'avgusercount',
                 group         =>'customer',
                 label         =>'average user count',

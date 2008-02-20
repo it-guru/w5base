@@ -61,10 +61,21 @@ sub LoadBCBS
          last if (!defined($rec));
          msg(INFO,"load name=$rec->{name} id=$rec->{id}");
          my $databoss=$self->getUseridByPosix('hvogler');
+         my $criticality=$rec->{criticality};
+         $criticality="CR".$criticality;
+         my $issoxappl=$rec->{issoxappl};
+         $issoxappl=0 if (lc($issoxappl) eq "no");
+         $issoxappl=1 if ($issoxappl ne "0");
          my $newrec={name=>$rec->{name},
                      mandatorid=>$mandatorid,
                      conumber=>$rec->{conumber},
+                     applid=>$rec->{applid},
+                     description=>UTF8toLatin1($rec->{description}),
+                     applnumber=>$rec->{ref},
+                     criticality=>$criticality,
+                     customerprio=>$rec->{customerprio},
                      cistatusid=>4,
+                     issoxappl=>$issoxappl,
                      srcid=>$rec->{id},
                      srcsys=>'AC_BCBS',
                      databossid=>$databoss};

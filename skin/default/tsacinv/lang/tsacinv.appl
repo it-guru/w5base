@@ -10,3 +10,7 @@
 'Interfaces'=>{de=>'Schnittstellen'},
 'Application Description'=>{de=>'Anwendungsbeschreibung'},
 'Customer'=>{de=>'Kunde'},
+'Application Reference'=>{de=>'Anwendungs Referenz'},
+'Application is mangaged by rules of SOX'=>{de=>'Nach SOX Richtlinien zu betreuen'},
+'Criticality'=>{de=>'Kiritikalität'},
+'Priority'=>{de=>'Priorität'},
