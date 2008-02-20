@@ -43,8 +43,11 @@ sub Init
 sub LoadBCBS
 {
    my $self=shift;
+   my $loadstart=$self->getParent->ExpandTimeExpression("now","en","GMT");
+   my $srcsys="AC_BCBS";
 
    msg(INFO,"loading data for BCBS from AssetCenter to W5Base");
+   msg(INFO,"loadstart = $loadstart");
 
 
    my $man=getModuleObject($self->Config,"base::mandator");
@@ -52,6 +55,7 @@ sub LoadBCBS
    my ($manrec,$msg)=$man->getOnlyFirst("grpid");
    my $mandatorid=$manrec->{grpid};
 
+   my $lnkaccountno=getModuleObject($self->Config,"itil::lnkaccountingno");
    my $aappl=getModuleObject($self->Config,"tsacinv::appl");
    my $appl=getModuleObject($self->Config,"AL_TCom::appl");
    $aappl->SetFilter({assignmentgroup=>\'BPO.BCBS'});
@@ -77,12 +81,27 @@ sub LoadBCBS
                      cistatusid=>4,
                      issoxappl=>$issoxappl,
                      srcid=>$rec->{id},
-                     srcsys=>'AC_BCBS',
+                     srcsys=>$srcsys,
+                     srcload=>$loadstart,
                      databossid=>$databoss};
          $newrec->{name}=~s/\s+/_/g;
          $newrec->{conumber}=~s/^0+//g;
-         $appl->ValidatedInsertOrUpdateRecord($newrec,
-                 {srcid=>\$newrec->{srcid},srcsys=>\$newrec->{srcsys}});
+         my ($agid)=$appl->ValidatedInsertOrUpdateRecord($newrec,
+                        {srcid=>\$newrec->{srcid},srcsys=>\$newrec->{srcsys}});
+         if (defined($agid) && $agid ne ""){
+            msg(INFO,"now process realtions name=$rec->{name} id=$agid");
+            my $accountno=$rec->{accountno};
+            my @accountno=grep(!/^\s*$/,split(/\s*;\s*/,$accountno));
+            foreach my $accountno (@accountno){
+               my $newrec={name=>$accountno,
+                           applid=>$agid,
+                           srcsys=>$srcsys,
+                           srcid=>$accountno."-".$agid,
+                           srcload=>$loadstart};
+               $lnkaccountno->ValidatedInsertOrUpdateRecord($newrec,
+                       {srcid=>\$newrec->{srcid},srcsys=>\$newrec->{srcsys}});
+            }
+         }
      
          ($rec,$msg)=$aappl->getNext();
       } until(!defined($rec));

@@ -254,8 +254,8 @@ sub ApplicationModified
          { # Interfaces
             $applappl->SetFilter({fromapplid=>\$rec->{id},
                                   toapplcistatus=>\"4"});
-            my @l=$applappl->getHashList(qw(id toappl lnktoapplid 
-                                            toapplid comments));
+            my @l=$applappl->getHashList(qw(id toappl lnktoapplid conproto
+                                            toapplid conmode comments));
             foreach my $lnk (@l){
                $CurrentEventId="Add Interface '$lnk->{toappl}' to $CurrentAppl";
                my $acftprec={
@@ -266,6 +266,8 @@ sub ApplicationModified
                                    C_Appl_ExternalSystem=>'W5Base',
                                    C_Appl_ExternalID=>$lnk->{toapplid},
                                    UseAssignment=>'Parent',
+                                   Type=>$lnk->{conproto},
+                                   ReplMode=>$lnk->{conmode},
                                    Description=>$lnk->{comments},
                                    Qty=>'1',
                                    bDelete=>'0',
