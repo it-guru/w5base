@@ -118,11 +118,6 @@ sub new
    return($self);
 }
 
-sub SkinBase
-{
-   return("w5v1inv");
-}
-
 
 sub getSqlFrom
 {
@@ -147,7 +142,7 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
 #   msg(INFO,"isWriteValid in $self");
-   return("ALL");
+   return(undef);
 }
 
 

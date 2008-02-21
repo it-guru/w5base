@@ -55,6 +55,38 @@ sub new
       new kernel::Field::Text(      name       =>'bc',
                                     label      =>'Business Center',
                           dataobjattr=>'amcostcenter.alternatebusinesscenter'),
+
+      new kernel::Field::TextDrop(
+                name          =>'delmgr',
+                label         =>'Delivery Manager',
+                vjointo       =>'tsacinv::user',
+                vjoinon       =>['delmgrid'=>'lempldeptid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'delmgrid',
+                dataobjattr   =>'amcostcenter.arldeliverymanagementid'),
+                                    
+     new kernel::Field::TextDrop(
+                name          =>'sem',
+                label         =>'Service Manager',
+                vjointo       =>'tsacinv::user',
+                vjoinon       =>['semid'=>'lempldeptid'],
+                vjoindisp     =>'fullname'),
+
+     new kernel::Field::TextDrop(
+                name          =>'sememail',
+                htmldetail    =>0,
+                label         =>'Service Manager E-Mail',
+                vjointo       =>'tsacinv::user',
+                vjoinon       =>['semid'=>'lempldeptid'],
+                vjoindisp     =>'email'),
+
+      new kernel::Field::Link(
+                name          =>'semid',
+                dataobjattr   =>'amcostcenter.lservicemanagerid'),
+                                    
+
    );
    $self->setDefaultView(qw(linenumber id name code description));
    return($self);

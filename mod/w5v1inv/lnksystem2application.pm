@@ -42,6 +42,12 @@ sub new
                                   vjoinon      =>['w5systemid'=>'w5systemid'],
                                   vjoindisp    =>'name'),
                                               
+      new kernel::Field::Text(    name         =>'systemid',
+                                  label        =>'SystemID',
+                                  vjointo      =>'w5v1inv::system',
+                                  vjoinon      =>['w5systemid'=>'w5systemid'],
+                                  vjoindisp    =>'systemid'),
+                                              
       new kernel::Field::Text(    name         =>'application',
                                   label        =>'Application',
                                   vjointo      =>'w5v1inv::application',
