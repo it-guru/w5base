@@ -1,4 +1,5 @@
 'WorkflowPrint'=>{de=>'drucken',     en=>'print'},
 'WorkflowClose'=>{de=>'schließen',   en=>'close'},
 'WorkflowDelete'=>{de=>'löschen',   en=>'delete'},
+'Break the current workflow - are you sure?'=>{de=>'Workflow abbrechen - Sind Sie sicher?'},
 

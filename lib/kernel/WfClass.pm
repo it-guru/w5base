@@ -268,24 +268,28 @@ sub Process
    foreach my $b (sort(keys(%button))){
       if ($b eq "SaveStep"){
          $nextbutton.="<input type=submit class=workflowbutton ".
-                      "value=\"$button{$b}\" name=$b>";
+                      "value=\"$button{$b}\" onclick=\"btnWhich=this;\" ".
+                      "name=$b>";
       }
       elsif ($b eq "NextStep"){
          $nextbutton.="<input type=submit class=workflowbutton ".
-                      "value=\"$button{$b}\" name=$b>";
+                      "value=\"$button{$b}\" onclick=\"btnWhich=this;\" ".
+                      "name=$b>";
       }
       elsif ($b eq "PrevStep"){
          $prevbutton.="<input type=submit class=workflowbutton ".
-                      "value=\"$button{$b}\" name=$b>";
+                      "value=\"$button{$b}\" onclick=\"btnWhich=this;\" ".
+                      "name=$b>";
       }
       elsif ($b eq "BreakWorkflow"){
          $breakbutton.="<input type=submit class=workflowbutton ".
-                      "value=\"$button{$b}\" ".
-                      "onclick=\"ValidateButtonClick('BreakWorkflow');\" name=$b>";
+                      "value=\"$button{$b}\" onclick=\"btnWhich=this;\" ".
+                      "name=$b>";
       }
       else{
          $addbuttons.="<input type=submit class=workflowbutton ".
-                      "value=\"$button{$b}\" name=$b><br>";
+                      "value=\"$button{$b}\" onclick=\"btnWhich=this;\" ".
+                      "name=$b><br>";
       }
    }
 
@@ -295,8 +299,9 @@ sub Process
                                    'kernel.TabSelector.css'],
                           js=>['toolbox.js','subModal.js','Workflow.js',
                                'TextTranslation.js'],
-                           body=>1,form=>1,
+                           body=>1,
                            title=>"Workflow Process - $label");
+   print("<form method=POST onsubmit=\"return(ValidateSubmit(this));\">");
    my $appheader=$app->getAppTitleBar();
    print $app->HtmlSubModalDiv();
 
@@ -392,11 +397,6 @@ function ProcessResize()
 function ProcessInit()
 {
    ProcessResize();
-}
-function ValidateButtonClick()
-{
-   //alert("fifi");
-   return(0);
 }
 addEvent(window, "resize", ProcessResize);
 addEvent(window, "load",   ProcessInit);
@@ -540,22 +540,41 @@ EOF
    print(TabSelectorTool("ModeSelect",%param));
    print("<script language=\"JavaScript\">");
    print($self->getDetailFunctionsCode($WfRec));
-   print("function setEditMode(m)");
-   print("{");
-   print("   this.SubFrameEditMode=m;");
-   print("}");
-   print("function TabChangeCheck()");
-   print("{");
-   print("if (this.SubFrameEditMode==1){return(DataLoseWarn());}");
-   print("return(true);");
-   print("}");
-   print("function SubmitCheck()");
-   print("{");
-   print("if (this.SubFrameEditMode==1){return(DataLoseWarn());}");
-   print("return(true);");
-   print("}");
-  # print("addEvent(window, \"submit\", SubmitCheck);");
-   print("</script>");
+   my $breakmsg=$self->T("Break the current workflow - are you sure?");
+   print(<<EOF);
+function setEditMode(m)
+{
+   this.SubFrameEditMode=m;
+}
+function TabChangeCheck()
+{
+if (this.SubFrameEditMode==1){return(DataLoseWarn());}
+return(true);
+}
+function SubmitCheck()
+{
+if (this.SubFrameEditMode==1){return(DataLoseWarn());}
+return(true);
+}
+function ValidateSubmit(f)
+{
+   if (!btnWhich){
+      return(true);
+   }
+   if (document.doValidateSubmit){
+      return(doValidateSubmit(f,btnWhich));
+   }
+   return(defaultValidateSubmit(f,btnWhich));
+}
+function defaultValidateSubmit(f,b)
+{
+   if (b.name=="BreakWorkflow"){
+      return(confirm("$breakmsg"));
+   }
+   return(true);
+}
+</script>
+EOF
 
    print $app->HtmlBottom(body=>1,form=>1);
 
