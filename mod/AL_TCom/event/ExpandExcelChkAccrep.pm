@@ -77,7 +77,7 @@ sub ProcessLineData
    my $data=shift;
 
    my $msgcol=8; 
-   if ($data->[0]="AL T-COM"){
+   if ($data->[0] eq "AL T-COM"){
       my $systemid=$data->[1];
       my $conumber=$data->[3];
       my $w1sys=$self->{w1sys};
