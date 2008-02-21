@@ -461,6 +461,7 @@ sub generateWorkspace
    my $divset="";
    my $selopt="";
 
+   return("") if ($#{$actions}==-1);
    $self->generateWorkspacePages($WfRec,$actions,\$divset,\$selopt);   
    my $oldop=Query->Param("OP");
    my $templ;

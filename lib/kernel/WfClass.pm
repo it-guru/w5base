@@ -268,27 +268,27 @@ sub Process
    foreach my $b (sort(keys(%button))){
       if ($b eq "SaveStep"){
          $nextbutton.="<input type=submit class=workflowbutton ".
-                      "value=\"$button{$b}\" onclick=\"btnWhich=this;\" ".
+                      "value=\"$button{$b}\" onclick=\"document.btnWhich=this;\" ".
                       "name=$b>";
       }
       elsif ($b eq "NextStep"){
          $nextbutton.="<input type=submit class=workflowbutton ".
-                      "value=\"$button{$b}\" onclick=\"btnWhich=this;\" ".
+                      "value=\"$button{$b}\" onclick=\"document.btnWhich=this;\" ".
                       "name=$b>";
       }
       elsif ($b eq "PrevStep"){
          $prevbutton.="<input type=submit class=workflowbutton ".
-                      "value=\"$button{$b}\" onclick=\"btnWhich=this;\" ".
+                      "value=\"$button{$b}\" onclick=\"document.btnWhich=this;\" ".
                       "name=$b>";
       }
       elsif ($b eq "BreakWorkflow"){
          $breakbutton.="<input type=submit class=workflowbutton ".
-                      "value=\"$button{$b}\" onclick=\"btnWhich=this;\" ".
+                      "value=\"$button{$b}\" onclick=\"document.btnWhich=this;\" ".
                       "name=$b>";
       }
       else{
          $addbuttons.="<input type=submit class=workflowbutton ".
-                      "value=\"$button{$b}\" onclick=\"btnWhich=this;\" ".
+                      "value=\"$button{$b}\" onclick=\"document.btnWhich=this;\" ".
                       "name=$b><br>";
       }
    }
@@ -381,7 +381,6 @@ function ProcessResize()
    var ProcessWindow=document.getElementById("ProcessWindow");
    var Process=document.getElementById("Process");
    var LastMsg=document.getElementById("LastMsg");
-
    Process.style.height="${workheight}px";
    var h1=ModeSelect.offsetHeight;
    var h2=ProcessHandler.offsetHeight;
@@ -558,13 +557,13 @@ return(true);
 }
 function ValidateSubmit(f)
 {
-   if (!btnWhich){
+   if (!document.btnWhich){
       return(true);
    }
    if (document.doValidateSubmit){
-      return(doValidateSubmit(f,btnWhich));
+      return(doValidateSubmit(f,document.btnWhich));
    }
-   return(defaultValidateSubmit(f,btnWhich));
+   return(defaultValidateSubmit(f,document.btnWhich));
 }
 function defaultValidateSubmit(f,b)
 {

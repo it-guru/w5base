@@ -51,8 +51,8 @@ sub getQueryTemplate
 <tr>
 <td class=fname width=10%>\%name(label)\%:</td>
 <td class=finput width=40% >\%name(search)\%</td>
-<td class=fname>\%eventend(label)\%:</td>
-<td class=finput>$timedrop</td>
+<td class=fname width=10%>\%eventend(label)\%:</td>
+<td class=finput width=40%>$timedrop</td>
 </tr>
 <tr>
 <td class=fname width=10%>\%class(label)\%:</td>
