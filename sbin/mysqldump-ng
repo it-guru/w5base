@@ -1,0 +1,526 @@
+#!/usr/bin/perl
+#  W5Base Framework
+#  Copyright (C) 2008  Holm Basedow (holm@blauwaerme.de)
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+
+use strict;
+use warnings;
+use Data::Dumper;
+use Date::Calc qw(Today_and_Now Week_of_Year Delta_YMDHMS);
+use IPC::Open3;
+use Compress::Zlib;
+use Getopt::Long;
+use Cwd;
+use File::Path;
+
+my $st=[Today_and_Now()];
+$Data::Dumper::Terse = 1;          
+$Data::Dumper::Indent = 1;  
+my @prog=qw(mysql mysqldump gunzip);
+my($db,$prog,$err,$help,$exclude,$tasks,$convert,$file,$verbose,
+   $format,$mode,$targetdb,$dir,%inputinclude,%inputexclude);
+my $force=0;
+# find progamms
+foreach my $p (@prog){
+   my $found=0;
+   foreach my $path (split(/:/,$ENV{PATH})){
+      if ( -x "$path/$p"){
+         $found++;
+         $prog->{$p}="$path/$p";
+      }
+
+   }
+   die("programm $p not found") if (!$found);
+}
+
+
+# posible options
+my $optresult = GetOptions ("help"        => \$help,
+                            "exclude=s"   => \$exclude,
+                            "dir=s"       => \$dir,
+                            "file=s"      => \$file,
+                            "tasks=i"     => \$tasks,
+                            "mode=s"      => \$mode,
+                            "targetdb=s"  => \$targetdb,
+                            "force"       => \$force,
+                            "verbose"     => \$verbose,
+                            "format=s"    => \$format,
+                            "convert=s"   => \$convert);
+
+# print help message
+sub help
+{
+   if ($help || (!$db && !$targetdb)){
+      print <<EOF;
+   Usage: mysqldump-ng [options] database [tables]
+  
+        --help         show this help
+        --dir          directory to save dumps or import dumps (default current directory)
+        --file         file or files for import (seperat files by comma)
+        --mode         export, import or transfer
+                       (default is export and transfer need option --targetdb)
+        --targetdb     target database in transfer mode
+        --tasks        number of tasks are be able running simultaneous 
+        --exclude      tables excluded for dump (seperat tables by comma)
+        --convert      save dump in spezial database format (InnoDB|MyISAM)
+        --force        ignore warnings for example overwritting tables
+        --verbose      write more output
+        --format       defines the format of the dump folder (default: '\%db-\%Y-\%M-\%D-\%h:\%m')
+                       \%Y   Year
+                       \%M   Month
+                       \%D   Day
+                       \%h   hour
+                       \%m   minute
+                       \%s   second
+                       \%w   week
+                       \%db  database
+EOF
+      exit(1);                    
+   }                              
+}
+
+sub dirformat
+{
+   my $dirformat=$format;
+   my %format=(db=>$db);
+   ($format{Y},$format{M},$format{D},
+    $format{h},$format{m},$format{s})=Today_and_Now();
+   ($format{w})=Week_of_Year($format{Y},$format{M},$format{D});
+   foreach my $v (qw(h m s M D w)){
+      $format{$v}=sprintf("%02d",$format{$v});
+   }
+   if (!$format){
+      $dirformat="\%db-\%Y-\%M-\%D-\%h:\%m";
+   }
+   foreach my $key (keys(%format)){
+      $dirformat=~s/\%$key/$format{$key}/;
+   } 
+   return($dirformat);
+}
+
+sub msg
+{
+   my $type=shift;
+   my $msg=shift;
+   $msg=~s/%/%%/g if ($#_==-1);
+   $msg=sprintf($msg,@_);
+   return("") if (!$verbose);
+   my $d;
+   foreach my $linemsg (split(/\n/,$msg)){
+      $d.=sprintf("%-6s %s\n",$type.":",$linemsg);
+   }
+   print STDERR $d;
+   return($d);
+}
+
+sub check_db
+{
+   # db
+   $db=$ARGV[0];
+   shift(@ARGV);
+  
+   # check database is usable
+   if ($db){
+      local(*R, *E);
+      open3(undef,*R,*E,"$prog->{mysql} $db");
+      wait();
+      if ($? != 0){
+         printf STDERR ("ERROR: source database $db not useable or not found, rc=$?!\n");
+         exit(1);
+      }
+      close(R);
+    
+      # clear mysql cache
+      system("$prog->{mysql} -e 'flush logs' $db") == 0 
+              or die("system command -mysql flush logs- failed:$?");
+      system("$prog->{mysql} -e 'flush tables' $db") == 0 
+              or die("system command -mysql flush tables- failed:$?");
+   }
+}
+
+# check if database exists if not create the database
+sub check_targetdb
+{
+   local(*R, *E);
+   open3(undef,*R,*E,"$prog->{mysql} $targetdb");
+   wait();
+   close(R);
+   if ($? == 0){
+      if ($force != 1){
+         printf STDERR ("WARNING: the target database=$targetdb exists,
+maybe some tables will be overwritte!!
+You want continue? [y/N]: ");
+      chomp(my $decision=<STDIN>);
+         if (!(lc($decision) eq "yes" or lc($decision) eq "y")){
+            printf STDERR ("ERROR: abort by user\n");
+            exit(1);
+         }
+      }
+      return(0);
+   }else{
+      local(*ER);
+      open3(undef,undef,*ER,"$prog->{mysql} -e 'create database $targetdb'");
+      wait();
+      if ($? != 0){
+         printf STDERR ("ERROR: database $targetdb cannot create! rc=$?\n");
+         exit(1);
+      }
+      close(ER);
+      return(0);
+   }
+}
+
+
+# include tables
+sub include_tables
+{
+   foreach my $data (@ARGV){
+      my @tabary=split(/,/,$data);
+      foreach my $ty (@tabary){
+         $inputinclude{$ty}=0;
+      }
+   }
+}
+
+# exclude tables
+sub exclude_tables
+{
+   if ($exclude){
+      my @ex=split(/,/,$exclude);
+      foreach my $data (@ex){
+         $inputexclude{$data}=0;
+      }
+   }
+}
+
+# set directory
+if (!$dir){
+   $dir=cwd();
+}
+
+# set default simultaneous tasks
+if (!$tasks){
+   $tasks=4;
+}
+
+# set database type if convert set
+if ($convert){
+   if (lc($convert) eq "innodb"){
+      $convert="InnoDB";
+   }elsif(lc($convert) eq "myisam"){
+      $convert="MyISAM";
+   }else{
+      printf STDERR ("ERROR: unknow database format $convert only InnoDB or MyISAM\n");
+      exit(1);
+   }
+}
+
+# compare include and exclude tables are not the same
+foreach my $in (keys(%inputinclude)){
+   foreach my $ex (keys(%inputexclude)){
+      if ($in eq $ex){
+         printf STDERR ("ERROR: some include and exclude tables are the same!\n");
+         exit(1);
+      }      
+   }
+}
+
+sub load_tables{
+   # load available tables in a array
+   my $tabl=qx($prog->{mysql} -e 'show tables' $db) 
+         or die ("system command -mysql show tables- failed:$?");
+   my @tabl=split(/\n/,$tabl);
+   shift(@tabl);
+   return(@tabl);
+}
+
+# write tables to dump in a array
+sub create_array_to_dump
+{
+   my @tabl=load_tables();
+   my $found;
+   my @tables;
+   foreach my $tab (@tabl){
+      if (%inputinclude){
+         foreach my $data (keys(%inputinclude)){
+            if ($data eq $tab){
+               $inputinclude{$data}=1;
+            }
+         }
+      }
+      if (%inputexclude){
+         foreach my $data (keys(%inputexclude)){
+            if ($data eq $tab){
+               $inputexclude{$data}=1;
+            }
+         }
+      }
+      push(@tables,$tab);
+   }
+   if (%inputinclude){
+      @tables=();
+      foreach my $data (keys(%inputinclude)){ 
+         if ($inputinclude{"$data"} == 1){
+            push(@tables,$data);
+         }else{
+            printf("ERROR: table $data not found\n");   
+         }
+      }
+   }elsif(%inputexclude){
+      @tables=();
+      foreach my $tab (@tabl){
+         $found=0;
+         foreach my $data (keys(%inputexclude)){
+            if ($data eq $tab and $inputexclude{"$data"} == 1){
+               $found=1; 
+            }
+         }
+         if ($found==0){
+            push(@tables,$tab);
+         }else{
+            printf("INFO: table $tab excluded\n");
+   
+         }
+      }
+      foreach my $data (keys(%inputexclude)){
+         if ($inputexclude{"$data"} == 0){
+            printf("ERROR: table $data not found\n"); 
+         }
+      }
+   } 
+   return(@tables);
+}
+
+# plausibility-check for files in a dirctory 
+sub check_dir
+{
+   $dir=shift;
+   my $found=0;
+   my @path;
+   opendir(DIR,"$dir") or die("ERROR: directory $dir could not open!\n");
+   my @files = grep {/^\w.*\.sql\.gz/}readdir(DIR);
+   if (!@files){
+      printf STDERR ("ERROR: no *.sql.gz files in the $dir directory!\n");
+      exit(1);
+   }
+   foreach my $file (@files){
+      if ( -z "$dir/$file" ){
+         $err->{$file}->[1]="$dir/$file the lenght of this file is zero!";                  
+         $found=1;
+      }
+      push(@path,"$dir/$file");
+   }
+   closedir(DIR);
+   if ($found == 1){
+      printf STDERR ("ERROR: %s\n",Dumper($err));
+      exit(1);
+   }
+   return(@path);
+}
+
+# plausibility-check for files 
+sub check_file
+{
+   my $file=shift;
+   open(FH,"$file") or die("ERROR; file $file could not open!\n");
+   if ( -z $file){
+      printf STDERR ("ERROR: the length of the file=$file is zero!\n");      
+      exit(1);
+   }
+   close(FH);
+   return(0);
+}
+
+sub process_engine
+{ 
+   my $tables=shift;
+   my $dir=shift;
+   my %processes;
+   do 
+   {
+      foreach my $k (keys(%processes)){
+         delete($processes{$k})  if (!kill(0,$k));
+      }
+      if (keys(%processes) < $tasks and @$tables){
+         $SIG{CHLD}='IGNORE';  # parent don't wait on child exit state 
+         my $pid=fork();
+         if (not defined $pid) {
+            die ("pid is not defined\n\n");
+         } elsif ($pid == 0) {      # child process
+           my $first=$tables->[0];
+           $SIG{CHLD}='DEFAULT';
+           # export database
+           if ($mode eq "export"){
+              my $convert_flag=0;
+              local(*MYSQLDUMPRDR,*MYSQLDUMPERR);
+              my $mysqldump_pid=open3(undef,*MYSQLDUMPRDR,*MYSQLDUMPERR,"$prog->{mysqldump} -q -c $db $first");
+              my $gz = gzopen("$dir/$first.sql.gz", "w9")
+                       or die "Cannot open file $dir/$first.sql.gz: $gzerrno\n" ;
+              while(my $line=<MYSQLDUMPRDR>){
+                 if ($convert){
+                    $convert_flag=1 if($line=~m/^CREATE\s+TABLE.*\(/);
+                    if ($convert_flag==1 and $line=~m/ENGINE=\w+\s/){
+                       map({$_=~s/ENGINE=\w+\s/ENGINE=$convert /;} $line);
+                       $convert_flag=0;
+                    }
+                 }
+                 $gz->gzwrite("$line");
+              }
+              $gz->gzclose();
+              close(MYSQLDUMPRDR);
+              waitpid($mysqldump_pid,0);
+              printf("ERROR: system command mysqldump $db $first return a errorcode=$?\n") if ($? != 0);
+              exit(0);
+           #  import database
+           }elsif ($mode eq "import"){
+              my $convert_flag=0;
+              local(*GUNZIPRDR,*GUNZIPERR,*MYSQLWTR,*MYSQLERR);
+              my $gunzip_pid=open3(undef,*GUNZIPRDR,*GUNZIPERR,"$prog->{gunzip} -c $first");
+              my $mysql_pid=open3(*MYSQLWTR,undef,*MYSQLERR,"$prog->{mysql} $targetdb");
+              while(my $line=<GUNZIPRDR>){
+                 if ($convert){
+                    $convert_flag=1 if($line=~m/^CREATE\s+TABLE.*\(/);      
+                    if ($convert_flag==1 and $line=~m/ENGINE=\w+\s/){
+                       map({$_=~s/ENGINE=\w+\s/ENGINE=$convert /;} $line);
+                       print MYSQLWTR "$line";                
+                       $convert_flag=0;
+                    }else{
+                       print MYSQLWTR "$line";                
+                    }
+                 }else{
+                    print MYSQLWTR "$line";                
+                 }
+              }
+              close(GUNZIPRDR);
+              close(MYSQLWTR);
+              msg("INFO","import $first\n");
+              waitpid($gunzip_pid,0);
+              printf("ERROR: system command gunzip $first return a errorcode=$?\n") if ($? != 0);
+              waitpid($mysql_pid,0);
+              printf("ERROR: system command mysql $targetdb return a errorcode=$?\n") if ($? != 0);
+              exit(0);
+           # transfer database
+           }elsif($mode eq "transfer"){
+              local(*MYSQLDUMPRDR,*MYSQLDUMPERR,*MYSQLWTR,*MYSQLERR);
+              my $mysqldump_pid=open3(undef,*MYSQLDUMPRDR,*MYSQLDUMPERR,"$prog->{mysqldump} -q -c $db $first");
+              msg("INFO","transfer $first\n");
+              my $mysql_pid=open3(*MYSQLWTR,undef,*MYSQLERR,"$prog->{mysql} $targetdb");
+              while(my $line=<MYSQLDUMPRDR>){
+                 if ($convert){
+                    map({$_=~s/ENGINE=\w+\s/ENGINE=$convert /;} $line);
+                 }
+                 print MYSQLWTR ("$line"); 
+              }
+              close(MYSQLWTR);
+              waitpid($mysql_pid,0);
+              printf("ERROR: system command mysql $targetdb return a errorcode=$?\n") if ($? != 0);
+              close(MYSQLDUMPRDR);
+              waitpid($mysqldump_pid,0);
+              printf("ERROR: system command mysqldump $db $first return a errorcode=$?\n") if ($? != 0);
+              exit(0);
+           }
+         } else {       # parent process
+           $processes{$pid}=$tables->[0];
+           shift(@$tables);      
+         }
+      }
+      msg("INFO","count tables=$#{$tables}\nproccontent=".Dumper(\%processes));
+      select(undef,undef,undef,0.1);
+   }  
+   until (keys(%processes) == 0 );
+}
+
+# test the mode or set default mode and run the engines
+$mode="export" if (!$mode);
+if (lc($mode) eq "export"){
+   $mode="export";
+   check_db();
+   help();
+   my $dirformat=dirformat();
+   include_tables();
+   exclude_tables();
+   my @tab=create_array_to_dump();
+   # create dump folder
+   if (! -d "$dir/$dirformat"){
+      mkdir("$dir/$dirformat") or die("create folder $dir/$dirformat failed!\n");
+   }else{
+      if ($force != 1){
+         printf STDERR ("WARNING: the folder $dir/$dirformat exists,
+You really want to overite the folder? [y/N]: ");
+      chomp(my $decision=<STDIN>);
+         if (!(lc($decision) eq "yes" or lc($decision) eq "y")){
+            printf STDERR ("ERROR: abort by user\n");
+            exit(1);
+         }
+      }
+      rmtree("$dir/$dirformat");
+      mkdir("$dir/$dirformat") or die("create folder $dir/$dirformat failed!\n");
+   }
+   process_engine(\@tab,"$dir/$dirformat");
+   check_dir("$dir/$dirformat");
+}elsif(lc($mode) eq "import"){
+   $mode="import";
+   my @files;
+   if ($targetdb){
+      if (!$file && $dir){
+         @files=check_dir("$dir");
+      }elsif($file){
+         my @file=split(/,/,$file);
+         foreach my $f (@file){
+            check_file("$file");
+            push(@files,$f);
+         }
+      }else{
+         printf STDERR ("ERROR: no files or directory for import! \n");
+         exit(1);
+      }
+      check_targetdb();
+      help();
+      process_engine(\@files,$dir);
+   }else{
+      printf STDERR ("ERROR: if mode=import option --targetdb must be set\n");
+      exit(1);
+   }
+}elsif(lc($mode) eq "transfer"){
+   check_db();
+   help();
+   if ($targetdb){
+      $mode="transfer";
+      # check target db and source db not the same
+      if ($targetdb eq $db){
+         printf STDERR ("ERROR: target database $targetdb and source database $db the same!\n");
+         exit(1);
+      }
+   }else{
+      printf STDERR ("ERROR: if mode=transfer option --targetdb must be set\n");
+      exit(1);
+   }
+   include_tables();
+   exclude_tables();
+   my @tab=create_array_to_dump();
+   check_targetdb();
+   process_engine(\@tab);
+}else{
+   printf STDERR ("ERROR: unknow mode=$mode only this modes import, export or transfer\n");
+   exit(1);
+}
+
+my $et=[Today_and_Now()];
+push(@$st,@$et);
+my @take=Delta_YMDHMS(@$st);                         
+msg("INFO","the operation takes: $take[3]h $take[4]min $take[5]sec");                         
+                               
