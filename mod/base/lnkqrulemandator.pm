@@ -49,6 +49,11 @@ sub new
                 label         =>'Mandator-ID',
                 dataobjattr   =>'lnkqrulemandator.mandator'),
                                                  
+      new kernel::Field::Text(
+                name          =>'dataobj',
+                label         =>'confine to data object',
+                dataobjattr   =>'lnkqrulemandator.dataobj'),
+                                                 
       new kernel::Field::TextDrop(
                 name          =>'qrule',
                 label         =>'Quality Rule',
@@ -120,7 +125,7 @@ sub new
                 label         =>'RealEditor',
                 dataobjattr   =>'lnkqrulemandator.realeditor'),
    );
-   $self->setDefaultView(qw(mandator qrule cdate editor));
+   $self->setDefaultView(qw(mandator qrule cdate dataobj));
    return($self);
 }
 
@@ -141,6 +146,17 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
    my $origrec=shift;
+
+   my $dataobj=effVal($oldrec,$newrec,"dataobj");
+   if (defined($dataobj)){
+      $dataobj=trim($dataobj);
+      if ($dataobj eq "" ||
+          !($dataobj=~m/^[a-z,0-9,_]+::[a-z,0-9,_]+$/i)){
+         $self->LastMsg(ERROR,"invalid dataobject nameing");
+         return(undef);  
+      }
+      $newrec->{dataobj};
+   }
 
    return(1);
 }

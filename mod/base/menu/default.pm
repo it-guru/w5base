@@ -238,19 +238,19 @@ sub Init
                       "base::filemgmt",
                       func=>'browser');
    
-   $self->RegisterObj("Tools.qmgmt",
+   $self->RegisterObj("sysadm.qmgmt",
                       "tmpl/welcome.qmgmt",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("Tools.qmgmt.qrule",
+   $self->RegisterObj("sysadm.qmgmt.qrule",
                       "base::qrule",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("Tools.qmgmt.qrule.lnkmandator",
+   $self->RegisterObj("sysadm.qmgmt.qrule.lnkmandator",
                       "base::lnkqrulemandator",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("Tools.qmgmt.qrule.lnkmandator.new",
+   $self->RegisterObj("sysadm.qmgmt.qrule.lnkmandator.new",
                       "base::lnkqrulemandator",
                       func=>'New',
                       defaultacl=>['admin']);

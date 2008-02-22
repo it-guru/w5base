@@ -1,2 +1,6 @@
 'base::lnkqrulemandator'=>{de=>'Mandant-Qualitätsregel Verknüpfung',
                            en=>'Mandator-Quality-Rule link'},
+'confine to data object'=>{de=>'beschränkt auf Datenobjekt'},
+'Quality Rule'=>{de=>'Quality Regel'},
+'Expiration-Date'=>{de=>'Verfallsdatum'},
+'invalid dataobject nameing'=>{de=>'ungülige Datenobjektbezeichnung'},

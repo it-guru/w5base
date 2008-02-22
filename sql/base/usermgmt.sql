@@ -265,3 +265,5 @@ CREATE TABLE lnkqrulemandator (
   KEY qrule (qrule),key(expiration)
 );
 alter table lnkgrpuser add comments longtext default NULL;
+alter table lnkqrulemandator add dataobj varchar(40) default NULL,add key(dataobj);
+alter table lnkqrulemandator add additional blob;
