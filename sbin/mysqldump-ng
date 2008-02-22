@@ -292,7 +292,7 @@ sub create_array_to_dump
          if ($found==0){
             push(@tables,$tab);
          }else{
-            printf("INFO: table $tab excluded\n");
+            msg("INFO","table $tab excluded");
    
          }
       }
