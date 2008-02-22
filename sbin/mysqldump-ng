@@ -20,7 +20,10 @@
 use strict;
 use warnings;
 use Data::Dumper;
-use Date::Calc qw(Today_and_Now Week_of_Year Delta_YMDHMS);
+use Date::Calc qw( Today_and_Now
+                   Week_of_Year
+                   Day_of_Week_to_Text
+                   Day_of_Week );
 use IPC::Open3;
 use Compress::Zlib;
 use Getopt::Long;
@@ -69,7 +72,11 @@ sub help
    Usage: mysqldump-ng [options] database [tables]
   
         --help         show this help
-        --dir          directory to save dumps or import dumps (default current directory)
+        --dir          directory to save dumps or import dumps,
+                       (default current directory)
+                       if you want to save one dump in more than one
+                       directory you can seperate the directory names
+                       with comma
         --file         file or files for import (seperat files by comma)
         --mode         export, import or transfer
                        (default is export and transfer need option --targetdb)
@@ -80,9 +87,12 @@ sub help
         --force        ignore warnings for example overwritting tables
         --verbose      write more output
         --format       defines the format of the dump folder (default: '\%db-\%Y-\%M-\%D-\%h:\%m')
+                       if you save the dump in more than one folder, you can give various
+                       formats seperat by comma
                        \%Y   Year
                        \%M   Month
                        \%D   Day
+                       \%d   day of the week
                        \%h   hour
                        \%m   minute
                        \%s   second
@@ -95,21 +105,29 @@ EOF
 
 sub dirformat
 {
-   my $dirformat=$format;
+   my @dirformat; 
+   my @dir;
+   if ($format){
+      @dir=split(/,/,$format);
+   }
    my %format=(db=>$db);
    ($format{Y},$format{M},$format{D},
     $format{h},$format{m},$format{s})=Today_and_Now();
    ($format{w})=Week_of_Year($format{Y},$format{M},$format{D});
+   ($format{d})=Day_of_Week_to_Text(Day_of_Week($format{Y},$format{M},$format{D}));
    foreach my $v (qw(h m s M D w)){
       $format{$v}=sprintf("%02d",$format{$v});
    }
-   if (!$format){
-      $dirformat="\%db-\%Y-\%M-\%D-\%h:\%m";
+   if (!@dir){
+      push(@dir,"\%db-\%Y-\%M-\%D-\%h:\%m");
    }
-   foreach my $key (keys(%format)){
-      $dirformat=~s/\%$key/$format{$key}/;
-   } 
-   return($dirformat);
+   foreach my $d (@dir){
+      foreach my $key (keys(%format)){
+         $d=~s/\%$key/$format{$key}/;
+      } 
+      push(@dirformat,$d);
+   }
+   return(@dirformat);
 }
 
 sub msg
@@ -308,23 +326,25 @@ sub create_array_to_dump
 # plausibility-check for files in a dirctory 
 sub check_dir
 {
-   $dir=shift;
+   my $dir=shift;
    my $found=0;
    my @path;
-   opendir(DIR,"$dir") or die("ERROR: directory $dir could not open!\n");
-   my @files = grep {/^\w.*\.sql\.gz/}readdir(DIR);
-   if (!@files){
-      printf STDERR ("ERROR: no *.sql.gz files in the $dir directory!\n");
-      exit(1);
-   }
-   foreach my $file (@files){
-      if ( -z "$dir/$file" ){
-         $err->{$file}->[1]="$dir/$file the lenght of this file is zero!";                  
-         $found=1;
+   foreach my $dir (@$dir){
+      opendir(DIR,"$dir") or die("ERROR: directory $dir could not open!\n");
+      my @files = grep {/^\w.*\.sql\.gz/}readdir(DIR);
+      if (!@files){
+         printf STDERR ("ERROR: no *.sql.gz files in the $dir directory!\n");
+         exit(1);
       }
-      push(@path,"$dir/$file");
+      foreach my $file (@files){
+         if ( -z "$dir/$file" ){
+            $err->{$file}->[1]="$dir/$file the lenght of this file is zero!";                  
+            $found=1;
+         }
+         push(@path,"$dir/$file");
+      }
+      closedir(DIR);
    }
-   closedir(DIR);
    if ($found == 1){
       printf STDERR ("ERROR: %s\n",Dumper($err));
       exit(1);
@@ -368,8 +388,12 @@ sub process_engine
               my $convert_flag=0;
               local(*MYSQLDUMPRDR,*MYSQLDUMPERR);
               my $mysqldump_pid=open3(undef,*MYSQLDUMPRDR,*MYSQLDUMPERR,"$prog->{mysqldump} -q -c $db $first");
-              my $gz = gzopen("$dir/$first.sql.gz", "w9")
-                       or die "Cannot open file $dir/$first.sql.gz: $gzerrno\n" ;
+              my @gz;
+              foreach my $d (@$dir){
+                  my $gz=gzopen("$d/$first.sql.gz", "w9")
+                        or die "Cannot open file $d/$first.sql.gz: $gzerrno\n";
+                  push(@gz,$gz);
+              }
               while(my $line=<MYSQLDUMPRDR>){
                  if ($convert){
                     $convert_flag=1 if($line=~m/^CREATE\s+TABLE.*\(/);
@@ -378,9 +402,13 @@ sub process_engine
                        $convert_flag=0;
                     }
                  }
-                 $gz->gzwrite("$line");
+                 foreach my $gz (@gz){
+                    $gz->gzwrite("$line");
+                 }
               }
-              $gz->gzclose();
+              foreach my $gz (@gz){
+                 $gz->gzclose();
+              }
               close(MYSQLDUMPRDR);
               waitpid($mysqldump_pid,0);
               printf("ERROR: system command mysqldump $db $first return a errorcode=$?\n") if ($? != 0);
@@ -448,36 +476,73 @@ sub process_engine
 $mode="export" if (!$mode);
 if (lc($mode) eq "export"){
    $mode="export";
+   my $dircount=0;
    check_db();
    help();
-   my $dirformat=dirformat();
+   my @dirformat=dirformat();
+   my @dir=split(/,/,$dir);
+   my $dirformat;
+   my @dircomplete;
    include_tables();
    exclude_tables();
    my @tab=create_array_to_dump();
    # create dump folder
-   if (! -d "$dir/$dirformat"){
-      mkdir("$dir/$dirformat") or die("create folder $dir/$dirformat failed!\n");
-   }else{
-      if ($force != 1){
-         printf STDERR ("WARNING: the folder $dir/$dirformat exists,
+   if ($#dir >= $#dirformat){
+      foreach my $dir (@dir){
+         if ($dirformat[$dircount]){
+            $dirformat=$dirformat[$dircount];
+         } 
+         if (! -d "$dir/$dirformat"){
+            mkdir("$dir/$dirformat") or die("create folder $dir/$dirformat failed!\n");
+         }else{
+            if ($force != 1){
+               printf STDERR ("WARNING: the folder $dir/$dirformat exists,
 You really want to overite the folder? [y/N]: ");
-      chomp(my $decision=<STDIN>);
-         if (!(lc($decision) eq "yes" or lc($decision) eq "y")){
-            printf STDERR ("ERROR: abort by user\n");
-            exit(1);
+            chomp(my $decision=<STDIN>);
+               if (!(lc($decision) eq "yes" or lc($decision) eq "y")){
+                  printf STDERR ("ERROR: abort by user\n");
+                  exit(1);
+               }
+            }
+            rmtree("$dir/$dirformat");
+            mkdir("$dir/$dirformat") or die("create folder $dir/$dirformat failed!\n");
          }
+         push(@dircomplete,"$dir/$dirformat");
+         $dircount++;
       }
-      rmtree("$dir/$dirformat");
-      mkdir("$dir/$dirformat") or die("create folder $dir/$dirformat failed!\n");
+   }else{
+      foreach my $dirformat (@dirformat){
+         if ($dir[$dircount]){
+            $dir=$dir[$dircount]; 
+         } 
+         if (! -d "$dir/$dirformat"){
+            mkdir("$dir/$dirformat") or die("create folder $dir/$dirformat failed!\n");
+         }else{
+            if ($force != 1){
+               printf STDERR ("WARNING: the folder $dir/$dirformat exists,
+You really want to overite the folder? [y/N]: ");
+            chomp(my $decision=<STDIN>);
+               if (!(lc($decision) eq "yes" or lc($decision) eq "y")){
+                  printf STDERR ("ERROR: abort by user\n");
+                  exit(1);
+               }
+            }
+            rmtree("$dir/$dirformat");
+            mkdir("$dir/$dirformat") or die("create folder $dir/$dirformat failed!\n");
+         }
+         push(@dircomplete,"$dir/$dirformat");
+         $dircount++;
+      }
    }
-   process_engine(\@tab,"$dir/$dirformat");
-   check_dir("$dir/$dirformat");
+   process_engine(\@tab,\@dircomplete);
+   check_dir(\@dircomplete);
 }elsif(lc($mode) eq "import"){
    $mode="import";
    my @files;
    if ($targetdb){
       if (!$file && $dir){
-         @files=check_dir("$dir");
+         my @dir=split(/,/,$dir);
+         @files=check_dir(\@dir);
       }elsif($file){
          my @file=split(/,/,$file);
          foreach my $f (@file){
