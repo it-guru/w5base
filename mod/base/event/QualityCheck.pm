@@ -62,13 +62,21 @@ sub QualityCheck
    else{
       my $obj=getModuleObject($self->Config,$dataobj);
       if (defined($obj)){
-         return(doQualityCheck($obj));
+         return($self->doQualityCheck($obj));
       }
       else{
          return({exitcode=>1,msg=>"invalid dataobject '$dataobj' specified"});
       }
    }
-
+   foreach my $dataobj (sort(keys(%dataobjtocheck))){
+      if ($dataobj ne ""){
+         msg(INFO,"calling QualityCheck for '$dataobj'");
+         my $bk=$self->W5ServerCall("rpcCallEvent","QualityCheck",$dataobj);
+         if (!defined($bk->{AsyncID})){
+            msg(ERROR,"can't call QualityCheck for dataobj '$dataobj' Event");
+         }
+      }
+   }
    
    return({exitcode=>0,msg=>'ok'});
 }
@@ -77,6 +85,27 @@ sub doQualityCheck
 {
    my $self=shift;
    my $dataobj=shift;
+ 
+   msg(INFO,"doQualityCheck in Object $dataobj");
+   $dataobj->ResetFilter();
+   my @flt;
+   if ($dataobj->getField("cistatusid")){
+      push(@flt,{cistatusid=>[3,4]});
+   }
+   if ($dataobj->getField("mdate")){
+      push(@flt,{mdate=>">now-28d"});
+   }
+   $dataobj->SetFilter(\@flt);
+   $dataobj->SetCurrentView("qcok");
+
+   my ($rec,$msg)=$dataobj->getFirst();
+   if (defined($rec)){
+      do{
+         msg(DEBUG,"qcok=$rec->{qcok}");
+         ($rec,$msg)=$dataobj->getNext();
+      }until(!defined($rec));
+   }
+
 
    return({exitcode=>0,msg=>'ok'});
 }

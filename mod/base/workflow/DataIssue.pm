@@ -280,6 +280,9 @@ sub getPosibleActions
    if ($creator==$userid && $stateid==2){
       push(@l,"wfbreak");
    }
+   if ($isadmin){
+      push(@l,"wfbreak");
+   }
    return(@l);
 }
 
