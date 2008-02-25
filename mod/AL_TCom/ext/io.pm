@@ -178,7 +178,11 @@ sub AddDiary
       #delete($newrec->{affectedapplication});
 
       my $newid=$wf->Store($oldrec,$newrec);
-      if ($newid){
+
+      if ($newid && $newid ne ""){
+         $wf->ResetFilter();
+         $wf->SetFilter({id=>\$newid});
+         ($oldrec,$msg)=$wf->getOnlyFirst(qw(ALL));
          $out->{wfheadid}=$newid;
          $out->{operation}="INSERT";
          $out->{stateid}=effVal($oldrec,$newrec,"stateid");
