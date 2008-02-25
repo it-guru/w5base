@@ -143,73 +143,75 @@ sub io
       }
       else{
          my %op=();
+         my $p;
+         eval(<<EOF);
          sub XMLend {
-            my ($expat,$e,%attr)=@_; 
-            if ($e eq "operation"){
-               my $res={line=>$op{LINE},
-               #         DEBUG=>Dumper(\%op),
-                        name=>$op{NAME}};
-               my ($package)=$op{NAME}=~m/^([^:]+)::/;
-               $res->{package}=$package;
-               $res->{reference}=$op{REFERENCE} if (defined($op{REFERENCE}));
-               if (!defined($self->{io}->{$package."::ext::io"})){
-                  $res->{exitcode}=100;
-                  $res->{message}=msg(ERROR,"no io handler at ".
-                                            "package $package");
+            my (\$expat,\$e,\%attr)=\@_; 
+            if (\$e eq "operation"){
+               my \$res={line=>\$op{LINE},
+               #         DEBUG=>Dumper(\\%op),
+                        name=>\$op{NAME}};
+               my (\$package)=\$op{NAME}=~m/^([^:]+)::/;
+               \$res->{package}=\$package;
+               \$res->{reference}=\$op{REFERENCE} if (defined(\$op{REFERENCE}));
+               if (!defined(\$self->{io}->{\$package."::ext::io"})){
+                  \$res->{exitcode}=100;
+                  \$res->{message}=msg(ERROR,"no io handler at ".
+                                            "package \$package");
                }
                else{
-                  my $iohandler=$self->{io}->{$package."::ext::io"};
-                  msg(INFO,sprintf("W5IO-start: %s by %s",$op{NAME},
-                                   $ENV{REMOTE_USER}));
-                  $W5V2::Query=new kernel::cgi({});
-                  foreach my $k (keys(%op)){
-                     $op{$k}=UTF8toLatin1(trim($op{$k}));
+                  my \$iohandler=\$self->{io}->{\$package."::ext::io"};
+                  msg(INFO,sprintf("W5IO-start: \%s by \%s",\$op{NAME},
+                                   \$ENV{REMOTE_USER}));
+                  \$W5V2::Query=new kernel::cgi({});
+                  foreach my \$k (keys(\%op)){
+                     \$op{\$k}=UTF8toLatin1(trim(\$op{\$k}));
                   }
-                  $res->{exitcode}=$iohandler->Operation(\%op,$res);
-                  if ($res->{exitcode}!=0 || $res->{exitcode} eq ""){
-                     if ($res->{exitcode} eq ""){
-                        $res->{exitcode}=1024;
-                        $self->LastMsg(ERROR,"unknown operation request");
+                  \$res->{exitcode}=\$iohandler->Operation(\\%op,\$res);
+                  if (\$res->{exitcode}!=0 || \$res->{exitcode} eq ""){
+                     if (\$res->{exitcode} eq ""){
+                        \$res->{exitcode}=1024;
+                        \$self->LastMsg(ERROR,"unknown operation request");
                      }
-                     if (!($self->LastMsg())){
-                        $self->LastMsg(ERROR,"unexpected W5Interface error");
+                     if (!(\$self->LastMsg())){
+                        \$self->LastMsg(ERROR,"unexpected W5Interface error");
                      }
-                     $failcount++; 
+                     \$failcount++; 
                   }
                   else{
-                     $opokcount++; 
+                     \$opokcount++; 
                   }
-                  $exitcode+=$res->{exitcode};
-                  if ($self->LastMsg()){
-                     $res->{message}=[$self->LastMsg()];
+                  \$exitcode+=\$res->{exitcode};
+                  if (\$self->LastMsg()){
+                     \$res->{message}=[\$self->LastMsg()];
                   }
-                  msg(INFO,sprintf("W5IO-end  : %s by %s ($res->{exitcode})",
-                                   $op{NAME}, $ENV{REMOTE_USER}));
+                  msg(INFO,sprintf("W5IO-end  : \%s by \%s (\$res->{exitcode})",
+                                   \$op{NAME}, \$ENV{REMOTE_USER}));
                }
-               print hash2xml({result=>$res});
-               %op=();
-               $self->LastMsg("");
+               print hash2xml({result=>\$res});
+               \%op=();
+               \$self->LastMsg("");
             }
          }
          sub XMLstart {
-            my ($expat,$e,%attr)=@_; 
-            if ($e eq "operation"){
-               %op=(NAME=>$attr{name},LINE=>$expat->current_line);
-               if (defined($attr{reference})){
-                  $op{REFERENCE}=$attr{reference};
+            my (\$expat,\$e,\%attr)=\@_; 
+            if (\$e eq "operation"){
+               \%op=(NAME=>\$attr{name},LINE=>\$expat->current_line);
+               if (defined(\$attr{reference})){
+                  \$op{REFERENCE}=\$attr{reference};
                }
             }
          }
          sub XMLchar {
-            my ($expat,$string)=@_; 
-            my @context=$expat->context;
-            if ($#context==2 && $context[0] eq "root" &&
-                $context[1] eq "operation"){
-               $op{$context[2]}.=$string;
+            my (\$expat,\$string)=\@_; 
+            my \@context=\$expat->context;
+            if (\$#context==2 && \$context[0] eq "root" &&
+                \$context[1] eq "operation"){
+               \$op{\$context[2]}.=\$string;
             }
          }
-         my $p;
-         eval('use XML::Parser;$p = new XML::Parser();');
+use XML::Parser;\$p = new XML::Parser();
+EOF
          if (!defined($p)){
             print hash2xml({exitcode=>3,
                             message =>msg(ERROR,'XML::Parser not '.
