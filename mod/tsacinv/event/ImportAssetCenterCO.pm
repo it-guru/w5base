@@ -66,7 +66,7 @@ sub ImportAssetCenterCO
         $w5co->ValidatedUpdateRecord($w5rec,$newrec,{name=>\$rec->{name}});
      }
    }
-   return({}); 
+   return({exitcode=>0}); 
 }
 
 
