@@ -219,12 +219,18 @@ sub nativQualityCheck
                      directlnkmode=>$directlnkmode,
                      eventend=>undef,
                      eventstart=>NowStamp("en"),
+                     srcload=>NowStamp("en"),
                      DATAISSUEOPERATIONSRC=>$directlnkmode};
          my $bk=$wf->Store(undef,$newrec);
          printf STDERR ("store bk=%s\n",Dumper(\$bk));
       }
       else{
          my $newrec={name=>$name,
+                     mdate=>$WfRec->{mdate},
+                     owner=>$WfRec->{owner},
+                     editor=>$WfRec->{editor},
+                     realeditor=>$WfRec->{realeditor},
+                     srcload=>NowStamp("en"),
                      detaildescription=>$detaildescription};
          my $bk=$wf->Store($WfRec,$newrec);
          printf STDERR ("updstore bk=%s\n",Dumper(\$bk));

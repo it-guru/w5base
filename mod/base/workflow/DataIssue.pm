@@ -140,7 +140,6 @@ sub completeWriteRequest
    my $self=shift;
    my $newrec=shift;
 
-   $newrec->{srcload}=NowStamp("en");
    foreach my $objname (keys(%{$self->{DI}})){
       my $obj=$self->{DI}->{$objname};
       if ($obj->can("completeWriteRequest")){
@@ -189,8 +188,15 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default","state","flow","header","relations","init","history");
+   return("default","state","source","flow","header","relations","init","history");
 }
+
+sub getDetailBlockPriority            # posibility to change the block order
+{
+   return("header","default","flow","state","source");
+}
+
+
 
 sub isWriteValid
 {

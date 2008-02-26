@@ -69,7 +69,8 @@ sub Connect
    }
    if (!($self->{ldap}=Net::LDAP->new($self->{ldapserv},
                                       version=>'3',async=>0))){
-      return(undef,msg(ERROR,"ldapbind '%s'",$@));
+      return(undef,msg(ERROR,"ldapbind '%s' while connect '%s'",
+             $@,$self->{ldapserv}));
    }
    $self->{ldap}->bind($self->{ldapuser},password =>$self->{ldappass});
 
