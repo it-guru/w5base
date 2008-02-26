@@ -110,7 +110,7 @@ sub new
                 selectfix     =>1,
                 dataobjattr   =>'wfhead.wfstate'), # querys
                                    
-      new kernel::Field::Textarea(
+      new base::workflow::Textarea(
                 name          =>'detaildescription',     
                 label         =>'Description',
                 uivisible     =>\&isOptionalFieldVisible,
@@ -1595,6 +1595,52 @@ sub getSubListData
    return($self->SUPER::getSubListData($current,$mode,%param));
 }
 
+
+package base::workflow::Textarea;
+use strict;
+use vars qw(@ISA);
+@ISA    = qw(kernel::Field::Textarea);
+
+sub new
+{
+   my $type=shift;
+   my $self=bless($type->SUPER::new(@_),$type);
+   return($self);
+}
+
+sub RawValue
+{
+   my $self=shift;
+   my $current=shift;
+   my $d=$current->{$self->{name}};
+
+   if (defined($d) && $d=~m/^\[W5TRANSLATIONBASE=.*::.*\]$/m){
+      my $dd;
+      my $de;
+      my $tbase=$self->getParent->Self;
+      foreach my $line (split(/\n/,$d)){
+         if (my ($newtbase)=$line=~m/^\[W5TRANSLATIONBASE=(.*::.*)]$/){
+            $tbase=$newtbase;
+         }
+         else{
+           my $pref;
+           if (my ($newpref,$newline)=$line=~m/^(\s[-]\s)(.*)$/){
+              $line=$newline;
+              $pref=$newpref;
+           }
+           $dd.=$pref.$self->getParent->T($line,$tbase)."\n";
+           $ENV{HTTP_FORCE_LANGUAGE}="en";
+           $de.=$pref.$self->getParent->T($line,$tbase)."\n";
+           delete($ENV{HTTP_FORCE_LANGUAGE});
+         }
+      }
+      $d=$dd;
+      if ($self->getParent->Lang() ne "en"){
+         $d.="\n\n[en:]\n".$de;
+      }
+   }
+   return($d);
+}
 
 
 1;

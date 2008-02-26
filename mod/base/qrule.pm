@@ -132,7 +132,7 @@ sub nativQualityCheck
    my @param=@_;
    my $parent=$self->getParent;
    my $result;
-   my @alldataissuemsg;
+   my %alldataissuemsg;
    my $mandator=[];
    my $checkStart=NowStamp("en");
 
@@ -164,10 +164,11 @@ sub nativQualityCheck
             if (defined($control->{dataissue})){
                my $dataissuemsg=$control->{dataissue};
                $dataissuemsg=[$dataissuemsg] if (ref($dataissuemsg) ne "ARRAY");
-               push(@alldataissuemsg,$qrule->getName());
-               foreach my $m (@{$dataissuemsg}){
-                  push(@alldataissuemsg," - ".$m);
+               my $qrulename=$qrule->Self();
+               if (!defined($alldataissuemsg{$qrulename})){
+                  $alldataissuemsg{$qrulename}=[];
                }
+               push(@{$alldataissuemsg{$qrulename}},@{$dataissuemsg});
             }
             my $resulttext="OK";
             $resulttext="fail"      if ($qresult!=0);
@@ -198,9 +199,17 @@ sub nativQualityCheck
    my $dataobj=$self->getParent();
    my $affectedobject=$dataobj->Self();
    my $affectedobjectid=$rec->{id};
-   if ($#alldataissuemsg>-1){
+   if (keys(%alldataissuemsg)){
       my $directlnkmode="DataIssueMsg";
-      my $detaildescription=join("\n",@alldataissuemsg);
+      my $detaildescription;
+      foreach my $qrule (keys(%alldataissuemsg)){
+         $detaildescription.="\n" if ($detaildescription ne "");
+         $detaildescription.="[W5TRANSLATIONBASE=$qrule]\n";
+         $detaildescription.=$qrule."\n";
+         foreach my $msg (@{$alldataissuemsg{$qrule}}){
+            $detaildescription.=" - ".$msg."\n";
+         }
+      }
       my $name="DataIssue: ".$dataobj->T($affectedobject,$affectedobject).": ".
                $rec->{name};
       $wf->SetFilter({stateid=>"<20",class=>\"base::workflow::DataIssue",
