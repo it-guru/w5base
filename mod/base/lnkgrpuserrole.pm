@@ -32,65 +32,83 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->AddFields(
-      new kernel::Field::Id(       name   =>'roleid',
-                                   label  =>'RoleId',
-                                   size   =>'10',
-                                   dataobjattr=>
-                                         'lnkgrpuserrole.lnkgrpuserroleid'),
+      new kernel::Field::Id(
+                name          =>'roleid',
+                label         =>'RoleId',
+                size          =>'10',
+                dataobjattr   =>'lnkgrpuserrole.lnkgrpuserroleid'),
 
-      new kernel::Field::Text(     name       =>'userfullname',
-                                   label      =>'UserFullname',
-                                   readonly   =>1,
-                                   dataobjattr=>'user.fullname'),
+      new kernel::Field::Text(
+                name          =>'userfullname',
+                label         =>'UserFullname',
+                readonly      =>1,
+                dataobjattr   =>'user.fullname'),
 
-      new kernel::Field::Link(     name       =>'userid',
-                                   label      =>'UserID',
-                                   readonly   =>1,
-                                   dataobjattr=>'user.userid'),
+      new kernel::Field::Link(
+                name          =>'userid',
+                label         =>'UserID',
+                readonly      =>1,
+                dataobjattr   =>'user.userid'),
 
-      new kernel::Field::Text(     name       =>'grpfullname',
-                                   label      =>'GrpFullname',
-                                   weblinkto  =>'base::grp',
-                                   weblinkon  =>['grpid'=>'grpid'],
-                                   readonly   =>1,
-                                   dataobjattr=>'grp.fullname'),
+      new kernel::Field::Link(
+                name          =>'cistatusid',
+                label         =>'User CI-StatusID',
+                readonly      =>1,
+                dataobjattr   =>'user.cistatus'),
 
-      new kernel::Field::Link(     name       =>'grpid',
-                                   dataobjattr=>'grp.grpid'),
+      new kernel::Field::Text(
+                name          =>'grpfullname',
+                label         =>'GrpFullname',
+                weblinkto     =>'base::grp',
+                weblinkon     =>['grpid'=>'grpid'],
+                readonly      =>1,
+                dataobjattr   =>'grp.fullname'),
 
-      new kernel::Field::Text(     name       =>'lnkgrpuserid',
-                                   label      =>'LinkId',
-                                   weblinkto  =>'base::lnkgrpuser',
-                                   weblinkon  =>['lnkgrpuserid'=>
-                                                 'lnkgrpuserid'],
-                                   dataobjattr=>'lnkgrpuserrole.lnkgrpuserid'),
+      new kernel::Field::Link(
+                name          =>'grpid',
+                dataobjattr   =>'grp.grpid'),
 
-      new kernel::Field::Select(   name       =>'role',
-                                   label      =>'Role',
-                                   value      =>['RMember','REmployee',
-                                                 'RAdmin','RDataAdmin', 
-                                                 'RReportReceive','RBoss',
-                                                 'RBoss2','RQManager',
-                                                 'RINManager','RCHManager',
-                                                 'RCFManager','RTimeManager'],
-                                   dataobjattr=>'lnkgrpuserrole.role'),
+      new kernel::Field::Text(
+                name          =>'lnkgrpuserid',
+                label         =>'LinkId',
+                weblinkto     =>'base::lnkgrpuser',
+                weblinkon     =>['lnkgrpuserid'=>'lnkgrpuserid'],
+                dataobjattr   =>'lnkgrpuserrole.lnkgrpuserid'),
 
-      new kernel::Field::Text(     name       =>'nativrole',
-                                   label      =>'native role',
-                                   htmldetail =>0,
-                                   dataobjattr=>'lnkgrpuserrole.role'),
+      new kernel::Field::Select(
+                name          =>'role',
+                label         =>'Role',
+                value         =>['RMember','REmployee','RAdmin','RDataAdmin', 
+                                 'RReportReceive','RBoss','RBoss2','RQManager',
+                                 'RINManager','RCHManager',
+                                 'RCFManager','RTimeManager'],
+                dataobjattr   =>'lnkgrpuserrole.role'),
 
-      new kernel::Field::CDate(    name       =>'cdate',
-                                   label      =>'Creation-Date',
-                                   dataobjattr=>'lnkgrpuserrole.createdate'),
+      new kernel::Field::Text(
+                name          =>'nativrole',
+                label         =>'native role',
+                htmldetail    =>0,
+                dataobjattr   =>'lnkgrpuserrole.role'),
+
+      new kernel::Field::Date(
+                name          =>'expiration',
+                label         =>'Expiration-Date',
+                dataobjattr   =>'lnkgrpuser.expiration'),
+
+      new kernel::Field::CDate(
+                name          =>'cdate',
+                label         =>'Creation-Date',
+                dataobjattr   =>'lnkgrpuserrole.createdate'),
                                   
-      new kernel::Field::Editor(   name       =>'editor',
-                                   label      =>'Editor',
-                                   dataobjattr=>'lnkgrpuserrole.editor'),
+      new kernel::Field::Editor(
+                name          =>'editor',
+                label         =>'Editor',
+                dataobjattr   =>'lnkgrpuserrole.editor'),
 
-      new kernel::Field::RealEditor(name      =>'realeditor',
-                                   label      =>'RealEditor',
-                                   dataobjattr=>'lnkgrpuserrole.realeditor'),
+      new kernel::Field::RealEditor(
+                name          =>'realeditor',
+                label         =>'RealEditor',
+                dataobjattr   =>'lnkgrpuserrole.realeditor'),
 
    );
    $self->setDefaultView(qw(roleid userfullname grpfullname role editor cdate));

@@ -232,8 +232,10 @@ sub getMembersOf
    my $rolelink=$self->getPersistentModuleObject("getMembersOf",
                                                 "base::lnkgrpuserrole");
    my @grpids=keys(%allgrp);
-   $rolelink->SetFilter({grpid=>\@grpids,role=>$roles});
-   map({$userids{$_->{userid}}=1} $rolelink->getHashList(qw(userid)));
+   $rolelink->SetFilter({grpid=>\@grpids,role=>$roles,
+                         expiration=>">now OR [LEER]",    #to handle expiration
+                         cistatusid=>[3,4]});
+   map({$userids{$_->{userid}}++;} $rolelink->getHashList(qw(userid)));
 
    return(keys(%userids));
 }

@@ -14,3 +14,5 @@
 'Roles'=>{de=>'Rollen',en=>'Roles'},
 'Office Phone'=>{de=>'Büro Telefonnummer'},
 'some role changes are not done - you are only Org-Admin'=>{de=>'einige Rollenänderungen wurden nicht übernommen - Sie sind nur Org-Admin'},
+'GrpID'=>{de=>'W5Base Gruppen ID'},
+'Expiration-Date'=>{de=>'Verfallsdatum'},

@@ -17,3 +17,4 @@
 'base::lnkgrpuserrole'=>{ de=>'Rollenzuordnung',en=>'Rolerelation'},
 'fieldgroup.default'=>{ de=>'Rollenzuordnung',en=>'Rolerelation'},
 'native role'=>{de=>'interne Rollen Bez.'},
+'Expiration-Date'=>{de=>'Verfallsdatum'},

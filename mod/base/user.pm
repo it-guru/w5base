@@ -119,7 +119,6 @@ sub new
                 label         =>'W5BaseID',
                 size          =>'10',
                 group         =>'userro',
-                searchable    =>'0',
                 dataobjattr   =>'user.userid'),
                                   
       new kernel::Field::Text(

@@ -394,6 +394,48 @@ sub new
                 uivisible     =>0,
                 dataobjattr   =>'wfhead.headref'),
 
+      new kernel::Field::Text(
+                name          =>'directlnktype',
+                group         =>'source',
+                htmldetail    =>sub {
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(1) if ($current->{directlnktype} ne "");
+                   return(0);
+                },
+                label         =>'direct link type',
+                dataobjattr   =>'wfhead.directlnktype'),
+
+      new kernel::Field::Text(
+                name          =>'directlnkid',
+                group         =>'source',
+                htmldetail    =>sub {
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(1) if ($current->{directlnkid}!=0);
+                   return(0);
+                },
+                label         =>'direct link ID',
+                dataobjattr   =>'wfhead.directlnkid'),
+
+      new kernel::Field::Text(
+                name          =>'directlnkmode',
+                group         =>'source',
+                htmldetail    =>sub {
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(1) if ($current->{directlnkmode} ne "");
+                   return(0);
+                },
+                label         =>'direct link mode',
+                dataobjattr   =>'wfhead.directlnkmode'),
+
       new kernel::Field::Container(
                 name          =>'additional', #no search or key
                 selectfix     =>1,
@@ -463,28 +505,8 @@ sub new
                 name          =>'wffields',
                 searchable    =>0,
                 label         =>'Workflow specific fields',
-                fields        =>\&getDynamicFields),
+                fields        =>\&getDynamicFields)
 
-      new kernel::Field::Text(
-                name          =>'directlnktype',
-                group         =>'state',
-                htmldetail    =>0,
-                label         =>'direct link type',
-                dataobjattr   =>'wfhead.directlnktype'),
-
-      new kernel::Field::Text(
-                name          =>'directlnkid',
-                group         =>'state',
-                htmldetail    =>0,
-                label         =>'direct link ID',
-                dataobjattr   =>'wfhead.directlnkid'),
-
-      new kernel::Field::Text(
-                name          =>'directlnkmode',
-                group         =>'state',
-                htmldetail    =>0,
-                label         =>'direct link mode',
-                dataobjattr   =>'wfhead.directlnkmode')
    );
    $self->LoadSubObjs("workflow");
    $self->setDefaultView(qw(id class state name editor));
@@ -792,8 +814,12 @@ sub preValidate
 
    if (!defined($oldrec)){
       if ($W5V2::OperationContext eq "QualityCheck"){
-         $newrec->{openuser}=undef;
-         $newrec->{openusername}="QualityCheck";
+         if (!defined($newrec->{openuser})){
+            $newrec->{openuser}=undef;
+         }
+         if (!defined($newrec->{openusername})){
+            $newrec->{openusername}="QualityCheck";
+         }
       }
       else{
          my $UserCache=$self->Cache->{User}->{Cache};

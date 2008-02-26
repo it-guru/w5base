@@ -72,12 +72,29 @@ sub getDynamicFields
                              selectwidth        =>'350px',
                              translation        =>'base::workflow::DataIssue',
                              getPostibleValues  =>\&getObjectList,
+                             htmldetail    =>sub {
+                                my $self=shift;
+                                my $mode=shift;
+                                my %param=@_;
+                                my $current=$param{current};
+                                return(1) if ($current->{affectedobject} ne "");
+                                return(0);
+                             },
+
                              label              =>'affected Dataobject Type',
                              container          =>'additional'),
                    new kernel::Field::MultiDst(  
                              name               =>'dataissueobjectname',
                              translation        =>'base::workflow::DataIssue',
                              label              =>'affected Dataobject',
+                             htmldetail    =>sub {
+                                my $self=shift;
+                                my $mode=shift;
+                                my %param=@_;
+                                my $current=$param{current};
+                                return(1) if ($current->{affectedobject} ne "");
+                                return(0);
+                             },
                              dst                =>$dst,
                              selectivetyp       =>1,
                              altnamestore       =>'altaffectedobjectname',
@@ -138,12 +155,13 @@ sub getObjectList
 sub completeWriteRequest
 {
    my $self=shift;
+   my $oldrec=shift;
    my $newrec=shift;
 
    foreach my $objname (keys(%{$self->{DI}})){
       my $obj=$self->{DI}->{$objname};
       if ($obj->can("completeWriteRequest")){
-         if (!($obj->completeWriteRequest($newrec))){
+         if (!($obj->completeWriteRequest($oldrec,$newrec))){
             return(undef);
          }
       }
@@ -366,11 +384,11 @@ sub Validate
                                              # on finish
 
    # requested from Quality Check
-   $newrec->{DATAISSUEOPERATIONOBJ}="itil::appl";
-   $newrec->{DATAISSUEOPERATIONMOD}="update";
-   $newrec->{DATAISSUEOPERATIONFLD}="name,xx";
-   $newrec->{headref}={name=>'hans',
-                       xx=>'wert von xx'};
+#   $newrec->{DATAISSUEOPERATIONOBJ}="itil::appl";
+#   $newrec->{DATAISSUEOPERATIONMOD}="update";
+#   $newrec->{DATAISSUEOPERATIONFLD}="name,xx";
+#   $newrec->{headref}={name=>'hans',
+#                       xx=>'wert von xx'};
 
 
 
@@ -389,7 +407,7 @@ sub Validate
    $newrec->{affectedobject}=effVal($oldrec,$newrec,"affectedobject");
    $newrec->{affectedobjectid}=effVal($oldrec,$newrec,"affectedobjectid");
    $newrec->{step}=$self->getNextStep();
-   if (!$self->getParent->completeWriteRequest($newrec)){
+   if (!$self->getParent->completeWriteRequest($oldrec,$newrec)){
       $self->LastMsg(ERROR,"can't complete Write Request");
       return(undef);
    }
@@ -539,7 +557,7 @@ sub Validate
                                                                 "en","GMT");;
    }
    else{
-      if (!$self->getParent->completeWriteRequest($newrec)){
+      if (!$self->getParent->completeWriteRequest($oldrec,$newrec)){
          $self->LastMsg(ERROR,"can't complete Write Request");
          return(undef);
       }
@@ -682,7 +700,7 @@ sub Process
          $oprec->{step}='base::workflow::DataIssue::main';
          $oprec->{affectedobject}=effVal($WfRec,$oprec,"affectedobject");
          $oprec->{affectedobjectid}=effVal($WfRec,$oprec,"affectedobjectid");
-         if (!$self->getParent->completeWriteRequest($oprec)){
+         if (!$self->getParent->completeWriteRequest(undef,$oprec)){
             $self->LastMsg(ERROR,"can't complete Write Request");
             return(undef);
          }

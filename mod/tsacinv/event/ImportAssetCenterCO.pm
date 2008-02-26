@@ -46,8 +46,14 @@ sub ImportAssetCenterCO
 
    my $co=getModuleObject($self->Config,"tsacinv::costcenter");
    my $w5co=getModuleObject($self->Config,"itil::costcenter");
+
+   $self->{acsys}=getModuleObject($self->Config,"tsacinv::system");
+   $self->{wf}=getModuleObject($self->Config,"base::workflow");
+   $self->{user}=getModuleObject($self->Config,"base::user");
+   $self->{mandator}=getModuleObject($self->Config,"base::mandator");
+
    $co->SetFilter({bc=>\'AL T-COM'});
-   my @l=$co->getHashList(qw(name description));
+   my @l=$co->getHashList(qw(name bc description));
    foreach my $rec (@l){
      msg(INFO,"co=$rec->{name}");
      next if (!($rec->{name}=~m/^\d{5,20}$/));
@@ -65,8 +71,75 @@ sub ImportAssetCenterCO
      else{
         $w5co->ValidatedUpdateRecord($w5rec,$newrec,{name=>\$rec->{name}});
      }
+     $self->VerifyAssetCenterData($rec->{name},$rec->{bc}); 
    }
    return({exitcode=>0}); 
+}
+
+
+sub VerifyAssetCenterData
+{
+   my $self=shift;
+   my $conumber=shift;
+   my $altbc=shift;
+
+   if ($altbc eq "AL T-COM"){
+      my $acsys=$self->{acsys};
+      $acsys->ResetFilter();
+      $acsys->SetFilter({conumber=>\$conumber});
+      my @syslist=$acsys->getHashList(qw(systemid applications));
+      if ($#syslist!=-1){
+         foreach my $sysrec (@syslist){
+            if (!defined($sysrec->{applications}) ||
+                ref($sysrec->{applications}) ne "ARRAY" ||
+                $#{$sysrec->{applications}}==-1){
+               if (!defined($self->{configmgr}->{$altbc})){
+                  $self->{user}->SetFilter({posix=>\'hmerx'});
+                  my ($urec,$msg)=$self->{user}->getOnlyFirst(qw(userid));
+                  $self->{configmgr}->{$altbc}=$urec->{userid};
+               }
+               #############################################################
+               # Issue Create
+               #
+               my $wf=$self->{wf};
+               my $issue={name=>"DataIssue: AssetCenter: no applications ".
+                                "on systemid '$sysrec->{systemid}'",
+                          class=>'base::workflow::DataIssue',
+                          step=>'base::workflow::DataIssue::dataload',
+                          eventstart=>NowStamp("en"),
+                          srcload=>NowStamp("en"),
+                          directlnktype=>'tsacinv::event::ImportAssetCenterCO',
+                          directlnkid=>'0',
+                          mandatorid=>['200'],
+                          mandator=>['AL T-Com'],
+                          directlnkmode=>$sysrec->{systemid},
+                          detaildescription=>'This is the description'};
+               if (defined($self->{configmgr}->{$altbc})){
+                  $issue->{openusername}="Config Manager";
+                  $issue->{openuser}=$self->{configmgr}->{$altbc};
+                  $issue->{fwdtargetid}=$self->{configmgr}->{$altbc};
+                  $issue->{fwdtarget}="base::user";
+               }
+               $wf->ResetFilter();
+               $wf->SetFilter({stateid=>"<20",class=>\$issue->{class},
+                               directlnktype=>\$issue->{directlnktype},
+                               directlnkid=>\$issue->{directlnkid},
+                               directlnkmode=>\$issue->{directlnkmode}});
+               my ($WfRec,$msg)=$wf->getOnlyFirst(qw(ALL));
+               $W5V2::OperationContext="QualityCheck";
+               if (!defined($WfRec)){
+                  my $bk=$wf->Store(undef,$issue);
+               }
+               else{
+                  map({delete($issue->{$_})} qw(eventstart class step));
+                  my $bk=$wf->Store($WfRec,$issue);
+               }
+               #############################################################
+exit(1);
+            }
+         }
+      }
+   }
 }
 
 
