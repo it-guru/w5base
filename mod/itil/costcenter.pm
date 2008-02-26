@@ -41,7 +41,7 @@ sub new
                                      vjoindisp  =>['name'],
                                      vjoinbase  =>[{cistatusid=>'<=4'}]),
    );
-   $self->setDefaultView(qw(linenumber name cistatus mdate fullname));
+   $self->setDefaultView(qw(linenumber name cistatus fullname mdate));
    return($self);
 }
 

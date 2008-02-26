@@ -1,4 +1,4 @@
-package tsacinv::event::testprog;
+package tsacinv::event::ImportAssetCenterCO;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -36,41 +36,38 @@ sub Init
 {
    my $self=shift;
 
-
-   $self->RegisterEvent("testco","TestCoNumbers");
+   $self->RegisterEvent("ImportAssetCenterCO","ImportAssetCenterCO");
    return(1);
 }
 
-sub TestCoNumbers
+sub ImportAssetCenterCO
 {
    my $self=shift;
 
    my $co=getModuleObject($self->Config,"tsacinv::costcenter");
-   $co->SetFilter({});
-   my @l=$co->getHashList(qw(name));
-   my %u=();
-   my $colision=0;
+   my $w5co=getModuleObject($self->Config,"itil::costcenter");
+   $co->SetFilter({bc=>\'AL T-COM'});
+   my @l=$co->getHashList(qw(name description));
    foreach my $rec (@l){
-     my $striped=$rec->{name};
-     $striped=~s/^0+//g;
-     if (!defined($u{$striped})){
-        $u{$striped}=$rec->{name};
+     msg(INFO,"co=$rec->{name}");
+     next if (!($rec->{name}=~m/^\d{5,20}$/));
+     $w5co->ResetFilter();
+     $w5co->SetFilter({name=>\$rec->{name}});
+     my ($w5rec,$msg)=$w5co->getOnlyFirst(qw(name));
+     my $newrec={cistatusid=>4,
+                 fullname=>$rec->{description},
+                 comments=>"authority at AssetCenter",
+                 srcload=>NowStamp(),
+                 name=>$rec->{name}};
+     if (!defined($w5rec)){
+        $w5co->ValidatedInsertRecord($newrec);
      }
      else{
-        if ($striped ne $rec->{name}){
-           msg(ERROR,"CO collision bettween %15s and %15s",
-                  "'".$striped."'","'".$u{$striped}."'");
-           $colision++;
-        }
+        $w5co->ValidatedUpdateRecord($w5rec,$newrec,{name=>\$rec->{name}});
      }
    }
-   printf STDERR ("CO-Count:%s  collisions:%d\n",$#l+1,$colision);
-  # printf ("%s\n",join(",",map({$_->{name}} @l)));
-
    return({}); 
 }
-
-
 
 
 

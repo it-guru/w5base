@@ -6,3 +6,4 @@
 'Contacts'=>{de=>'Kontakte'},
 'CO-Shortdescription'=>{de=>'Kostenstellenbezeichnung'},
 "invalid CO-Numer '\%s' specified"=>{de=>"ungültige CO-Nummer '\%s' eingegeben"},
+'Deputy Delivery Manager'=>{de=>'Delivery Manager Vertreter'},
