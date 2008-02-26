@@ -32,29 +32,34 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->AddFields(
-      new kernel::Field::Linenumber(name       =>'linenumber',
-                                    label      =>'No.'),
+      new kernel::Field::Linenumber(
+                name       =>'linenumber',
+                label      =>'No.'),
 
+      new kernel::Field::Id(
+                name       =>'id',
+                label      =>'CostCenterID',
+                dataobjattr=>'amcostcenter.lcostid'),
 
-      new kernel::Field::Id(        name       =>'id',
-                                    label      =>'CostCenterID',
-                                    dataobjattr=>'amcostcenter.lcostid'),
+      new kernel::Field::Text(
+                name       =>'name',
+                label      =>'CostCenter-No.',
+                dataobjattr=>'amcostcenter.trimmedtitle'),
 
-      new kernel::Field::Text(      name       =>'name',
-                                    label      =>'CostCenter-No.',
-                                    dataobjattr=>'amcostcenter.trimmedtitle'),
+      new kernel::Field::Text(
+                name       =>'code',
+                label      =>'CostCenter-Code',
+                dataobjattr=>'amcostcenter.code'),
 
-      new kernel::Field::Text(      name       =>'code',
-                                    label      =>'CostCenter-Code',
-                                    dataobjattr=>'amcostcenter.code'),
+      new kernel::Field::Text(
+                name       =>'description',
+                label      =>'Description',
+                dataobjattr=>'amcostcenter.field1'),
 
-      new kernel::Field::Text(      name       =>'description',
-                                    label      =>'Description',
-                                    dataobjattr=>'amcostcenter.field1'),
-
-      new kernel::Field::Text(      name       =>'bc',
-                                    label      =>'Business Center',
-                          dataobjattr=>'amcostcenter.alternatebusinesscenter'),
+      new kernel::Field::Text(
+                name       =>'bc',
+                label      =>'Business Center',
+                dataobjattr=>'amcostcenter.alternatebusinesscenter'),
 
       new kernel::Field::TextDrop(
                 name          =>'delmgr',
