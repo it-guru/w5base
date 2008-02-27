@@ -64,6 +64,10 @@ sub getQueryTemplate
 </tr>
 </table>
 </div>
+<script language="JavaScript">
+setEnterSubmit(document.forms[0],DoSearch);
+</script>
+
 EOF
 
    $bb.=$self->getDefaultStdButtonBar();

@@ -38,6 +38,44 @@ sub Init
    return(1);
 }
 
+sub getDefaultStdButtonBar
+{
+   my $self=shift;
+   return('%StdButtonBar(print,search)%');
+}
+
+sub getQueryTemplate
+{
+   my $self=shift;
+   my $bb=<<EOF;
+<div class=searchframe>
+<table class=searchframe>
+<tr>
+<td class=fname width=10%>\%name(label)\%:</td>
+<td class=finput width=50% >\%name(search)\%</td>
+<td class=fname width=10%>\%prio(label)\%:</td>
+<td class=finput width=30%>\%prioid(search)\%</td>
+</tr>
+<tr>
+<td class=fname width=10%>\%class(label)\%:</td>
+<td class=finput width=50% >\%class(search)\%</td>
+<td class=fname width=10%>&nbsp;</td>
+<td class=finput width=50% >&nbsp;</td>
+</tr>
+</table>
+</div>
+<script language="JavaScript">
+setEnterSubmit(document.forms[0],DoSearch);
+</script>
+   
+EOF
+   
+   $bb.=$self->getDefaultStdButtonBar();
+   return($bb);
+}
+
+
+
 sub Result
 {
    my $self=shift;

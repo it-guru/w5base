@@ -397,7 +397,7 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
    my $origrec=shift;
-   printf STDERR ("fifi Validate $self\n");
+   #printf STDERR ("fifi Validate $self\n");
 
 #  nativ needed
 #   - name
