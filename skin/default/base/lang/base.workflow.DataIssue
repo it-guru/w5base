@@ -5,6 +5,7 @@
 'affected Dataelement'=>{de=>'betroffenes Datenelement'},
 'affected Dataobject Type'=>{de=>'Typ des betroffenen Datenobjektes'},
 'wfobsolete'=>{de=>'hinfällig',en=>'obsolete'},
-'wffine'=>{de=>'abgeschlossen',en=>'finished'},
+'wffine'=>{de=>'abgeschlossen',en=>'closed'},
+'wffinish'=>{de=>'beendet',en=>'finished'},
 'wfdireproc'=>{de=>'Nachbearbeitung angef.',en=>'reprocess request'},
 

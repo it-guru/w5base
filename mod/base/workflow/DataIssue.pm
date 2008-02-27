@@ -711,7 +711,7 @@ sub Process
          $oprec->{step}='base::workflow::DataIssue::finish';
          $oprec->{fwdtarget}=undef;
          $oprec->{fwdtargetid}=undef;
-         if ($app->Action->StoreRecord($WfRec->{id},"wffine",
+         if ($app->Action->StoreRecord($WfRec->{id},"wffinish",
              {translation=>'base::workflow::DataIssue'},$note)){
             $self->StoreRecord($WfRec,$oprec);
             $self->PostProcess($action.".".$op,$WfRec,$actions);

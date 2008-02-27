@@ -19,5 +19,5 @@
 "The current workflow isn't forwared to you. At now there is no action nessasary."=>{de=>'Der aktuelle Workflow ist derzeit nicht an Sie weitergeleitet. Es sind also nicht unbedingt Aktionen durch Sie notwendig. Möchten Sie dennoch Aktionen durchführen, so wählen Sie bitte die entsprechende Aktion aus, geben u.U. notwendige Parameter für die gewählte Aktion ein und klicken dann auf den Button "Aktion speichern/ausführen"'},
 'wfdifine'=>{de=>'DataIssue bearbeiten und abschließen',en=>'process DataIssue and close it'},
 'wfdireproc'=>{de=>'Nachbesserung anfordern',en=>'amendment request'},
-'wfmailsend'=>{de=>'E-Mail Nachricht versenden',en=>'send E-Mail message'},
+'wfmailsend'=>{de=>'E-Mail Nachricht versenden (auch an externe Kontakte)',en=>'send E-Mail message (to externel adresses too)'},
 
