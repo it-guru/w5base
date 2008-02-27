@@ -565,7 +565,8 @@ sub Validate
    my $origrec=shift;
 
    if (defined($newrec->{stateid}) &&
-       $newrec->{stateid}==21){
+       $newrec->{stateid}==21 ||
+       $newrec->{stateid}==25){
       if ($self->getParent->getParent->Action->StoreRecord(
           $oldrec->{id},"wfobsolete",
           {translation=>'base::workflow::DataIssue'},"",undef)){

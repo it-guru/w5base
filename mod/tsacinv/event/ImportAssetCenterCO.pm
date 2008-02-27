@@ -47,6 +47,7 @@ sub ImportAssetCenterCO
    my $co=getModuleObject($self->Config,"tsacinv::costcenter");
    my $w5co=getModuleObject($self->Config,"itil::costcenter");
 
+   $self->{loadstart}=NowStamp("en");
    $self->{acsys}=getModuleObject($self->Config,"tsacinv::system");
    $self->{w5sys}=getModuleObject($self->Config,"itil::system");
    $self->{w5v1s}=getModuleObject($self->Config,"w5v1inv::system");
@@ -56,7 +57,8 @@ sub ImportAssetCenterCO
    $self->{mandator}=getModuleObject($self->Config,"base::mandator");
 
    $co->SetFilter({bc=>\'AL T-COM'});
-   my @l=$co->getHashList(qw(name bc description));
+   my @l=$co->getHashList(qw(name bc description sememail));
+   my $cocount=0;
    foreach my $rec (@l){
      msg(INFO,"co=$rec->{name}");
      next if (!($rec->{name}=~m/^\d{5,20}$/));
@@ -74,8 +76,22 @@ sub ImportAssetCenterCO
      else{
         $w5co->ValidatedUpdateRecord($w5rec,$newrec,{name=>\$rec->{name}});
      }
-     $self->VerifyAssetCenterData($rec->{name},$rec->{bc}); 
+     $self->VerifyAssetCenterData($rec);
+     last if ($cocount++==80);
    }
+
+
+   my $wf=$self->{wf};
+   $wf->ResetFilter();
+   $wf->SetFilter({stateid=>"<20",class=>\'base::workflow::DataIssue',
+                   directlnktype=>[$self->Self],
+                   srcload=>"<\"$self->{loadstart}\""});
+   $wf->SetCurrentView(qw(ALL));
+   $wf->ForeachFilteredRecord(sub{
+       my $WfRec=$_;
+       my $bk=$wf->Store($WfRec,{stateid=>25});
+   });
+
    return({exitcode=>0}); 
 }
 
@@ -83,17 +99,19 @@ sub ImportAssetCenterCO
 sub VerifyAssetCenterData
 {
    my $self=shift;
-   my $conumber=shift;
-   my $altbc=shift;
+   my $corec=shift;
+   my $conumber=$corec->{name};
+   my $altbc=$corec->{bc};
 
    if ($altbc eq "AL T-COM"){
+      my $wf=$self->{wf};
       my $acsys=$self->{acsys};
       my $w5sys=$self->{w5sys};
       my $w5v1s=$self->{w5v1s};
       my $w1lnk=$self->{w1lnk};
       $acsys->ResetFilter();
       $acsys->SetFilter({conumber=>\$conumber});
-      my @syslist=$acsys->getHashList(qw(systemid applications));
+      my @syslist=$acsys->getHashList(qw(systemid systemname applications));
       if ($#syslist!=-1){
          foreach my $sysrec (@syslist){
             if (!defined($sysrec->{applications}) ||
@@ -112,6 +130,14 @@ sub VerifyAssetCenterData
                my ($w5v1srec,$msg)=$w5v1s->getOnlyFirst(qw(id cistatusid));
                if (!defined($w5v1srec)){
                   $desc.="- SystemID not found in W5Base/CMDB\n";
+                  if ($corec->{sememail} ne ""){
+                     my $colabel=$conumber;
+                     if ($corec->{description} ne ""){
+                        $colabel.=";".$corec->{description};
+                     }
+                     $desc.="- AssetCenter CO ($colabel)\n";
+                     $desc.="- Contact SeM: $corec->{sememail}\n";
+                  }
                }
                else{
                   if ($w5v1srec->{cistatusid}!=4){
@@ -125,20 +151,21 @@ sub VerifyAssetCenterData
                      return();
                   }
                }
-              
-               $w5sys->ResetFilter();
-               $w5sys->SetFilter({systemid=>\$sysrec->{systemid}});
-               my ($w5sysrec,$msg)=$w5sys->getOnlyFirst(qw(id applications
-                                                           cistatusid));
-               if (!defined($w5sysrec)){
-                  $desc.="- SystemID not found in W5Base/Darwin\n";
-               }
-               else{
-                  if (!defined($w5sysrec->{applications}) ||
-                      ref($w5sysrec->{applications}) ne "ARRAY" ||
-                      $#{$w5sysrec->{applications}}==-1){
-                     $desc.="- no application relations found in ".
-                            "W5Base/Darwin\n";
+               if (defined($w5v1srec)){ 
+                  $w5sys->ResetFilter();
+                  $w5sys->SetFilter({systemid=>\$sysrec->{systemid}});
+                  my ($w5sysrec,$msg)=$w5sys->getOnlyFirst(qw(id applications
+                                                              cistatusid));
+                  if (!defined($w5sysrec)){
+                     $desc.="- SystemID not found in W5Base/Darwin\n";
+                  }
+                  else{
+                     if (!defined($w5sysrec->{applications}) ||
+                         ref($w5sysrec->{applications}) ne "ARRAY" ||
+                         $#{$w5sysrec->{applications}}==-1){
+                        $desc.="- no application relations found in ".
+                               "W5Base/Darwin\n";
+                     }
                   }
                }
 
@@ -146,14 +173,14 @@ sub VerifyAssetCenterData
                #############################################################
                # Issue Create
                #
-               my $wf=$self->{wf};
                my $issue={name=>"DataIssue: AssetCenter: no applications ".
-                                "on systemid '$sysrec->{systemid}'",
+                                "on systemid '$sysrec->{systemid}' ".
+                                "($sysrec->{systemname})",
                           class=>'base::workflow::DataIssue',
                           step=>'base::workflow::DataIssue::dataload',
                           eventstart=>NowStamp("en"),
                           srcload=>NowStamp("en"),
-                          directlnktype=>'tsacinv::event::ImportAssetCenterCO',
+                          directlnktype=>$self->Self,
                           directlnkid=>'0',
                           altaffectedobjectname=>$sysrec->{systemid},
                           mandatorid=>['200'],
@@ -186,6 +213,7 @@ sub VerifyAssetCenterData
          }
       }
    }
+
 }
 
 
