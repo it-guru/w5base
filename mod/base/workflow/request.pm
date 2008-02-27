@@ -736,21 +736,8 @@ sub generateWorkspacePages
       $d.="</table>";
       $$divset.="<div id=OPwfapprovalcan>$d</div>";
    }
-   if (grep(/^wfforward$/,@$actions)){
-      $$selopt.="<option value=\"wfforward\" class=\"$class\">".
-                $self->getParent->T("wfforward",$tr).
-                "</option>\n";
-      my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
-         "<td colspan=2><textarea name=note style=\"width:100%;height:100px\">".
-         "</textarea></td></tr>";
-      $d.="<tr><td width=1% nowrap>".
-          $self->getParent->T("forward to","base::workflow::request").
-          ":&nbsp;</td>".
-          "<td>\%fwdtargetname(detail)\%".
-          "</td>";
-      $d.="</tr></table>";
-      $$divset.="<div id=OPwfforward>$d</div>";
-   }
+   return($self->SUPER::generateWorkspacePages($WfRec,$actions,
+                                               $divset,$selopt));
 }
 
 sub Validate
@@ -1172,49 +1159,6 @@ sub Process
          return(0);
       }
 
-      if ($op eq "wfforward"){
-         my $note=Query->Param("note");
-         $note=trim($note);
-     
-         my $fobj=$self->getParent->getField("fwdtargetname");
-         my $h=$self->getWriteRequestHash("web");
-         my $newrec;
-         if ($newrec=$fobj->Validate($WfRec,$h)){
-            if (!defined($newrec->{fwdtarget}) ||
-                !defined($newrec->{fwdtargetid} ||
-                $newrec->{fwdtargetid}==0)){
-               if ($self->LastMsg()==0){
-                  $self->LastMsg(ERROR,"invalid forwarding target");
-               }
-               return(0);
-            }
-         }
-         else{
-            return(0);
-         }
-         my $fwdtargetname=Query->Param("Formated_fwdtargetname");
-     
-         if ($self->StoreRecord($WfRec,{stateid=>2,
-                                       fwdtarget=>$newrec->{fwdtarget},
-                                       fwdtargetid=>$newrec->{fwdtargetid},
-                                       fwddebtarget=>undef,
-                                       fwddebtargetid=>undef })){
-            if ($self->getParent->getParent->Action->StoreRecord(
-                $WfRec->{id},"wfforward",
-                {translation=>'base::workflow::request'},$fwdtargetname."\n".
-                                                         $note,undef)){
-               my $openuserid=$WfRec->{openuser};
-               $self->PostProcess($action.".".$op,$WfRec,$actions,
-                                  note=>$note,
-                                  fwdtarget=>$newrec->{fwdtarget},
-                                  fwdtargetid=>$newrec->{fwdtargetid},
-                                  fwdtargetname=>$fwdtargetname);
-               Query->Delete("OP");
-               return(1);
-            }
-         }
-         return(0);
-      }
    }
    return($self->SUPER::Process($action,$WfRec));
 }

@@ -7,3 +7,4 @@
 'wfobsolete'=>{de=>'hinfällig',en=>'obsolete'},
 'wffine'=>{de=>'abgeschlossen',en=>'finished'},
 'wfdireproc'=>{de=>'Nachbearbeitung angef.',en=>'reprocess request'},
+

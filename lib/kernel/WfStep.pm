@@ -178,7 +178,7 @@ sub Process
       $self->PostProcess($action,$WfRec,$actions);
       return(0);
    }
-   if ($action eq "NextStep"){
+   elsif ($action eq "NextStep"){
       my $nextstep=$self->getParent->getNextStep($self->Self(),$WfRec); 
       if (!defined($nextstep)){
          $self->getParent->LastMsg(ERROR,"no next step defined in '%s'",
@@ -191,6 +191,56 @@ sub Process
       $self->PostProcess($action,$WfRec,$actions);
       return(0);
    }
+   elsif($action eq "SaveStep"){
+      my $op=Query->Param("OP");
+      if ($action ne "" && !grep(/^$op$/,@{$actions})){
+         $self->LastMsg(ERROR,"invalid disalloed action requested");
+         return(0);
+      }
+      if ($op eq "wfforward"){    # default forwarding Handler
+         my $note=Query->Param("note");
+         $note=trim($note);
+
+         my $fobj=$self->getParent->getField("fwdtargetname");
+         my $h=$self->getWriteRequestHash("web");
+         my $newrec;
+         if ($newrec=$fobj->Validate($WfRec,$h)){
+            if (!defined($newrec->{fwdtarget}) ||
+                !defined($newrec->{fwdtargetid} ||
+                $newrec->{fwdtargetid}==0)){
+               if ($self->LastMsg()==0){
+                  $self->LastMsg(ERROR,"invalid forwarding target");
+               }
+               return(0);
+            }
+         }
+         else{
+            return(0);
+         }
+         my $fwdtargetname=Query->Param("Formated_fwdtargetname");
+
+         if ($self->StoreRecord($WfRec,{stateid=>2,
+                                       fwdtarget=>$newrec->{fwdtarget},
+                                       fwdtargetid=>$newrec->{fwdtargetid},
+                                       fwddebtarget=>undef,
+                                       fwddebtargetid=>undef })){
+            if ($self->getParent->getParent->Action->StoreRecord(
+                $WfRec->{id},"wfforward",
+                {translation=>'base::workflow::request'},$fwdtargetname."\n".
+                                                         $note,undef)){
+               my $openuserid=$WfRec->{openuser};
+               $self->PostProcess($action.".".$op,$WfRec,$actions,
+                                  note=>$note,
+                                  fwdtarget=>$newrec->{fwdtarget},
+                                  fwdtargetid=>$newrec->{fwdtargetid},
+                                  fwdtargetname=>$fwdtargetname);
+               Query->Delete("OP");
+               return(1);
+            }
+         }
+         return(0);
+      }
+   }
    return(0);
 }
 
@@ -201,6 +251,49 @@ sub generateWorkspace
    my $actions=shift;
 
    return("no Workspace in ".$self->Self());
+}
+
+
+sub generateWorkspacePages
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my $divset=shift;
+   my $selopt=shift;
+   my $tr="base::workflow::actions";
+   my $class="display:none;visibility:hidden";
+
+   if (grep(/^wfforward$/,@$actions)){
+      $$selopt.="<option value=\"wfforward\" class=\"$class\">".
+                $self->getParent->T("wfforward",$tr).
+                "</option>\n";
+      my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
+         "<td colspan=2><textarea name=note style=\"width:100%;height:100px\">".
+         "</textarea></td></tr>";
+      $d.="<tr><td width=1% nowrap>".
+          $self->getParent->T("forward to","base::workflow::request").
+          ":&nbsp;</td>".
+          "<td>\%fwdtargetname(detail)\%".
+          "</td>";
+      $d.="</tr></table>";
+      $$divset.="<div id=OPwfforward>$d</div>";
+   }
+   if (grep(/^wfmailsend$/,@$actions)){
+      $$selopt.="<option value=\"wfmailsend\" class=\"$class\">".
+                $self->getParent->T("wfmailsend",$tr).
+                "</option>\n";
+      my $d="<table width=100% border=0 cellspacing=0 cellpadding=0>".
+         "<tr>".
+         "<td colspan=2>".
+         $self->getParent->T("to").": &nbsp;".
+         "<input type=text name=emailto style=\"width:90%\"></td></tr>".
+         "<tr>".
+         "<td colspan=2><textarea name=note style=\"width:100%;height:100px\">".
+         "</textarea></td></tr>";
+      $d.="</table>";
+      $$divset.="<div id=OPmailsend>$d</div>";
+   }
 }
 
 sub generateStoredWorkspace

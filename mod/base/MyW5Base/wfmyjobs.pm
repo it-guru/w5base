@@ -65,7 +65,7 @@ sub getQueryTemplate
 </table>
 </div>
 <script language="JavaScript">
-setEnterSubmit(document.forms[0],DoSearch);
+setEnterSubmit(document.forms[0],document.DoSearch);
 </script>
 
 EOF

@@ -174,7 +174,7 @@ sub VerifyAssetCenterData
                # Issue Create
                #
                my $issue={name=>"DataIssue: AssetCenter: no applications ".
-                                "on systemid '$sysrec->{systemid}' ".
+                                "on systemid \"$sysrec->{systemid}\" ".
                                 "($sysrec->{systemname})",
                           class=>'base::workflow::DataIssue',
                           step=>'base::workflow::DataIssue::dataload',
