@@ -48,6 +48,9 @@ sub ImportAssetCenterCO
    my $w5co=getModuleObject($self->Config,"itil::costcenter");
 
    $self->{acsys}=getModuleObject($self->Config,"tsacinv::system");
+   $self->{w5sys}=getModuleObject($self->Config,"itil::system");
+   $self->{w5v1s}=getModuleObject($self->Config,"w5v1inv::system");
+   $self->{w1lnk}=getModuleObject($self->Config,"w5v1inv::lnksystem2application");
    $self->{wf}=getModuleObject($self->Config,"base::workflow");
    $self->{user}=getModuleObject($self->Config,"base::user");
    $self->{mandator}=getModuleObject($self->Config,"base::mandator");
@@ -85,6 +88,9 @@ sub VerifyAssetCenterData
 
    if ($altbc eq "AL T-COM"){
       my $acsys=$self->{acsys};
+      my $w5sys=$self->{w5sys};
+      my $w5v1s=$self->{w5v1s};
+      my $w1lnk=$self->{w1lnk};
       $acsys->ResetFilter();
       $acsys->SetFilter({conumber=>\$conumber});
       my @syslist=$acsys->getHashList(qw(systemid applications));
@@ -98,6 +104,45 @@ sub VerifyAssetCenterData
                   my ($urec,$msg)=$self->{user}->getOnlyFirst(qw(userid));
                   $self->{configmgr}->{$altbc}=$urec->{userid};
                }
+               my $desc="[W5TRANSLATIONBASE=".$self->Self."]\n";
+               $desc.="There are no application relations in AssetCenter\n"; 
+
+               $w5v1s->ResetFilter();
+               $w5v1s->SetFilter({systemid=>\$sysrec->{systemid}});
+               my ($w5v1srec,$msg)=$w5v1s->getOnlyFirst(qw(id cistatusid));
+               if (!defined($w5v1srec)){
+                  $desc.="- SystemID not found in W5Base/CMDB\n";
+               }
+               else{
+                  if ($w5v1srec->{cistatusid}!=4){
+                     $desc.="- SystemID in W5Base/CMDB not installed/active\n";
+                  }
+                  $w1lnk->ResetFilter();
+                  $w1lnk->SetFilter({systemid=>\$sysrec->{systemid}});
+                  my ($rec,$msg)=$w1lnk->getOnlyFirst(qw(id));
+                  if (!defined($rec)){
+                     $desc.="- no applications assigned in W5Base/CMDB";
+                     return();
+                  }
+               }
+              
+               $w5sys->ResetFilter();
+               $w5sys->SetFilter({systemid=>\$sysrec->{systemid}});
+               my ($w5sysrec,$msg)=$w5sys->getOnlyFirst(qw(id applications
+                                                           cistatusid));
+               if (!defined($w5sysrec)){
+                  $desc.="- SystemID not found in W5Base/Darwin\n";
+               }
+               else{
+                  if (!defined($w5sysrec->{applications}) ||
+                      ref($w5sysrec->{applications}) ne "ARRAY" ||
+                      $#{$w5sysrec->{applications}}==-1){
+                     $desc.="- no application relations found in ".
+                            "W5Base/Darwin\n";
+                  }
+               }
+
+
                #############################################################
                # Issue Create
                #
@@ -110,10 +155,11 @@ sub VerifyAssetCenterData
                           srcload=>NowStamp("en"),
                           directlnktype=>'tsacinv::event::ImportAssetCenterCO',
                           directlnkid=>'0',
+                          altaffectedobjectname=>$sysrec->{systemid},
                           mandatorid=>['200'],
                           mandator=>['AL T-Com'],
                           directlnkmode=>$sysrec->{systemid},
-                          detaildescription=>'This is the description'};
+                          detaildescription=>$desc};
                if (defined($self->{configmgr}->{$altbc})){
                   $issue->{openusername}="Config Manager";
                   $issue->{openuser}=$self->{configmgr}->{$altbc};
@@ -135,7 +181,7 @@ sub VerifyAssetCenterData
                   my $bk=$wf->Store($WfRec,$issue);
                }
                #############################################################
-exit(1);
+#exit(1);
             }
          }
       }

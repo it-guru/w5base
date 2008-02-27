@@ -92,7 +92,16 @@ sub getDynamicFields
                                 my $mode=shift;
                                 my %param=@_;
                                 my $current=$param{current};
-                                return(1) if ($current->{affectedobject} ne "");
+                                my $f1=$self->getParent->
+                                        getField("affectedobjectid");
+                                my $f2=$self->getParent->
+                                        getField("altaffectedobjectname");
+                                my $fval1=$f1->RawValue($current);
+                                my $fval2=$f2->RawValue($current);
+                                my $current=$param{current};
+                                if ($fval1 ne "" || $fval2 ne ""){
+                                   return(1);
+                                }
                                 return(0);
                              },
                              dst                =>$dst,
@@ -165,6 +174,11 @@ sub completeWriteRequest
             return(undef);
          }
       }
+   }
+   if ($newrec->{fwdtargetid} eq "" ||
+       $newrec->{fwdtarget} eq ""){
+      $newrec->{fwdtargetid}=effVal($oldrec,$newrec,"fwdtargetid");
+      $newrec->{fwdtarget}=effVal($oldrec,$newrec,"fwdtarget");
    }
    if ($newrec->{fwdtargetid} eq "" ||
        $newrec->{fwdtarget} eq ""){

@@ -78,7 +78,7 @@ sub RawValue
    if (defined($current)){
       if ($current->{$self->{dsttypfield}}){
          my $targetid=$current->{$self->{dstidfield}};
-         if (defined($targetid)){
+         if (defined($targetid) && $targetid ne ""){
             foreach my $dststruct (@{$self->{dstobj}}){
                next if ($dststruct->{name} ne $current->{$self->{dsttypfield}});
                my $idobj=$dststruct->{obj}->IdField();
@@ -97,7 +97,12 @@ sub RawValue
                return("?-unknown dstid-?");
             }
          }
-         return;
+         return(undef);
+      }
+      if (defined($self->{altnamestore})){
+         my $alt=$self->getParent->getField($self->{altnamestore});
+         my $d=$alt->RawValue($current);
+         return($d) if ($d ne "");
       }
    }
    return(undef);

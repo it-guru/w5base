@@ -1650,13 +1650,16 @@ sub RawValue
          }
          else{
            my $pref;
-           if (my ($newpref,$newline)=$line=~m/^(\s[-]\s)(.*)$/){
+           my $post;
+           if (my ($newpref,$newline,$newpost)=
+                $line=~m/^([\s,\-,\!,\*]+)(.*)([\s,:]*)$/){
               $line=$newline;
               $pref=$newpref;
+              $post=$newpost;
            }
            $dd.=$pref.$self->getParent->T($line,$tbase)."\n";
            $ENV{HTTP_FORCE_LANGUAGE}="en";
-           $de.=$pref.$self->getParent->T($line,$tbase)."\n";
+           $de.=$pref.$self->getParent->T($line,$tbase).$post."\n";
            delete($ENV{HTTP_FORCE_LANGUAGE});
          }
       }
