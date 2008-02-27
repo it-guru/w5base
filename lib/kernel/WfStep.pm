@@ -240,7 +240,53 @@ sub Process
          }
          return(0);
       }
+      if ($op eq "wfmailsend"){    # default mailsending handling
+         my $emailto=Query->Param("emailto");
+         my $note=Query->Param("emailmsg");
+         $note=trim($note);
+         my $wf=$self->getParent->getParent();
+         my $subject=$WfRec->{name};
+         my $from='no_reply@w5base.net';
+         my @to=();
+         my $UserCache=$self->Cache->{User}->{Cache};
+         if ($emailto=~m/^\s*$/){
+            $self->LastMsg(ERROR,"no email address specified");
+            return(0);
+         }
+         my %adr=(emailto=>$emailto);
+         if (defined($UserCache->{$ENV{REMOTE_USER}})){
+            $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
+         }
+         if (defined($UserCache->{email}) &&
+             $UserCache->{email} ne ""){
+            $adr{emailcc}=$UserCache->{email};
+         }
+         if (my $id=$wf->Store(undef,{
+                 class    =>'base::workflow::mailsend',
+                 step     =>'base::workflow::mailsend::dataload',
+                 name     =>$subject,%adr,
+                 emailtext=>$note,
+                })){
+            my %d=(step=>'base::workflow::mailsend::waitforspool');
+            if ($wf->Store($id,%d)){
+               $self->getParent->getParent->Action->StoreRecord(
+                   $WfRec->{id},"wfmailsend",
+                   {translation=>'kernel::WfStep'},"\@:".$emailto."\n\n".$note);
+               $self->PostProcess($action.".".$op,$WfRec,$actions,
+                                  note=>$note);
+               Query->Delete("OP");
+               Query->Delete("emailto");
+               Query->Delete("emailmsg");
+            }
+            return(1);
+         }
+      }
    }
+
+
+
+
+
    return(0);
 }
 
@@ -286,13 +332,21 @@ sub generateWorkspacePages
       my $d="<table width=100% border=0 cellspacing=0 cellpadding=0>".
          "<tr>".
          "<td colspan=2>".
-         $self->getParent->T("to").": &nbsp;".
-         "<input type=text name=emailto style=\"width:90%\"></td></tr>".
+         $self->getParent->T("This action sends a E-Mail with automaticly ".
+                             "dokumentation in the workflow log").
+         "</td></tr><tr>".
+         "<td colspan=2>".
+         "<table width=100% cellspacing=0 cellpadding=0><tr>".
+         "<td nowrap width=1%>".
+         $self->getParent->T("to").": &nbsp;</td><td>".
+         "<input type=text name=emailto style=\"width:100%\">".
+         "</td></tr></table></td></tr>".
          "<tr>".
-         "<td colspan=2><textarea name=note style=\"width:100%;height:100px\">".
+         "<td colspan=2><textarea name=emailmsg ".
+         "style=\"width:100%;height:80px\">".
          "</textarea></td></tr>";
       $d.="</table>";
-      $$divset.="<div id=OPmailsend>$d</div>";
+      $$divset.="<div id=OPwfmailsend>$d</div>";
    }
 }
 

@@ -9,3 +9,6 @@
 'three months'=>{de=>'drei Monate'},
 'half a year'=>{de=>'ein halbes Jahr'},
 'postponed until'=>{de=>'zurückstellen bis'},
+'to'=>{de=>'An'},
+'This action sends a E-Mail with automaticly dokumentation in the workflow log'=>{de=>'Diese Aktion ermöglicht es eine E-Mail zu versenden mit automatischer Dokumentation im Workflow log'},
+'wfmailsend'=>{de=>'E-Mail gesandt',en=>'mail send'},
