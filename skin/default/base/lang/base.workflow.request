@@ -11,6 +11,7 @@
 'wfapprovecan'=>{de=>'Genehmigungsabbruch',en=>'canncel approve request'},
 'wfforward'=>{de=>'Weiterleitung',en=>'Forward'},
 'wfreactiv'=>{de=>'Reaktiviert',en=>'Reactivate'},
+'wfdefer'=>{de=>'Zurückgestellt',en=>'defered'},
 'wfcallback'=>{de=>'Zurückgerufen',en=>'Calledback'},
 'fieldgroup.init'=>{de=>'Anforderungszuordnung',en=>'Initiator infos'},
 'Initiated by'=>{de=>'Initiert/angefordert durch'},
@@ -19,3 +20,4 @@
 'Initiated by group'=>{de=>'Initiert durch Gruppe/Bereich'},
 'Approve requested by'=>{de=>'Genehmigung angefordert bei'},
 'Alternate approve requested by'=>{de=>'Genehmigung alternativ angefordert bei'},
+'forward to'=>{de=>'Weiterleitung an'},

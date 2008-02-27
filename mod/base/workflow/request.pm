@@ -743,7 +743,9 @@ sub generateWorkspacePages
       my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
          "<td colspan=2><textarea name=note style=\"width:100%;height:100px\">".
          "</textarea></td></tr>";
-      $d.="<tr><td width=1% nowrap>Weiterleiten an:&nbsp;</td>".
+      $d.="<tr><td width=1% nowrap>".
+          $self->getParent->T("forward to","base::workflow::request").
+          ":&nbsp;</td>".
           "<td>\%fwdtargetname(detail)\%".
           "</td>";
       $d.="</tr></table>";
