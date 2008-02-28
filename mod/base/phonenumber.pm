@@ -77,8 +77,8 @@ sub new
                    my $current=shift;
                    my $comments=$current->{comments};
                    $comments=~s/\n/ /g;
-                   if (length($comments)>30){
-                      $comments=substr($comments,0,29)."...";
+                   if (length($comments)>37){
+                      $comments=substr($comments,0,37)."...";
                    }
                    return($comments);
                 }),
