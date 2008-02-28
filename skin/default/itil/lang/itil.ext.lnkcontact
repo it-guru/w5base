@@ -7,5 +7,6 @@
 'Business Employee'=>{de=>'Betriebsteam'},
 'Customer Contact'=>{de=>'Kundenkontakt'},
 'Developer'=>{de=>'Entwickler'},
+'Chief Developer'=>{de=>'Entwicklungsleiter'},
 'Technical Contact'=>{de=>'technischer-Ansprechpartner'},
 

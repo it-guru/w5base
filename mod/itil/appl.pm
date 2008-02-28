@@ -410,6 +410,14 @@ sub new
                 container     =>'additional'),
 
       new kernel::Field::Boolean(
+                name          =>'allowbusinesreq',
+                group         =>'control',
+                searchable    =>0,
+                selectwidth   =>'30%',
+                label         =>'allow business request workflows',
+                container     =>'additional'),
+
+      new kernel::Field::Boolean(
                 name          =>'issoxappl',
                 group         =>'control',
                 selectwidth   =>'30%',
@@ -772,17 +780,19 @@ sub Validate
          return(0);
       }
    }
-   my $conumber=trim(effVal($oldrec,$newrec,"conumber"));
-   if ($conumber ne ""){
-      $conumber=~s/^0+//g;
-      if (!($conumber=~m/^\d{5,13}$/)){
-         my $fo=$self->getField("conumber");
-         my $msg=sprintf($self->T("value of '%s' is not correct ".
-                                  "numeric"),$fo->Label());
-         $self->LastMsg(ERROR,$msg);
-         return(0);
+   if (exists($newrec->{conumber})){
+      my $conumber=trim(effVal($oldrec,$newrec,"conumber"));
+      if ($conumber ne ""){
+         $conumber=~s/^0+//g;
+         if (!($conumber=~m/^\d{5,13}$/)){
+            my $fo=$self->getField("conumber");
+            my $msg=sprintf($self->T("value of '%s' is not correct ".
+                                     "numeric"),$fo->Label());
+            $self->LastMsg(ERROR,$msg);
+            return(0);
+         }
+         $newrec->{conumber}=$conumber;
       }
-      $newrec->{conumber}=$conumber;
    }
    foreach my $v (qw(avgusercount namedusercount)){
       $newrec->{$v}=undef if (exists($newrec->{$v}) && $newrec->{$v} eq "");

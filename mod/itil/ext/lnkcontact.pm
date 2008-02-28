@@ -38,12 +38,14 @@ sub getPosibleRoles
    my $field=shift;
    my $current=shift;
 
-   if ($current->{parentobj}=~m/^.+::appl/ ||
+   if ($current->{parentobj}=~m/^.+::appl$/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
        $self->getParent->getParent->Self()=~m/^.+::appl$/)){
       return("developer"       =>$self->getParent->T("Developer",
                                                      $self->Self),
+             "developerboss"   =>$self->getParent->T("Chief Developer",
+                                                 $self->Self),
              "businessemployee"=>$self->getParent->T("Business Employee",
                                                  $self->Self),
              "customer"        =>$self->getParent->T("Customer Contact",
@@ -57,7 +59,7 @@ sub getPosibleRoles
              "support"         =>$self->getParent->T("Support",
                                                      $self->Self));
    }
-   if ($current->{parentobj}=~m/^.+::dbinstance/ ||
+   if ($current->{parentobj}=~m/^.+::dbinstance$/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
        $self->getParent->getParent->Self()=~m/^.+::dbinstance$/)){
@@ -67,7 +69,7 @@ sub getPosibleRoles
              "write"           =>$self->getParent->T("write instance",
                                                      $self->Self));
    }
-   if ($current->{parentobj}=~m/^.+::network/ ||
+   if ($current->{parentobj}=~m/^.+::network$/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
        $self->getParent->getParent->Self()=~m/^.+::network$/)){
@@ -75,7 +77,7 @@ sub getPosibleRoles
              "techcontact"     =>$self->getParent->T("Technical Contact",
                                                      $self->Self));
    }
-   if ($current->{parentobj}=~m/^.+::system/ ||
+   if ($current->{parentobj}=~m/^.+::system$/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
        $self->getParent->getParent->Self()=~m/^.+::system$/)){
@@ -85,7 +87,7 @@ sub getPosibleRoles
                                                      $self->Self),
             );
    }
-   if ($current->{parentobj}=~m/^.+::asset/ ||
+   if ($current->{parentobj}=~m/^.+::asset$/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
        $self->getParent->getParent->Self()=~m/^.+::asset$/)){
@@ -96,6 +98,32 @@ sub getPosibleRoles
             );
    }
    return();
+}
+
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $origrec=shift;
+   my $parentobj=shift;
+   my $refid=shift;
+   my $app=$self->getParent();
+
+   if (defined($newrec->{roles}) && $parentobj=~m/::appl$/){
+      my $roles=$newrec->{roles};
+      $roles=[$roles] if (ref($roles) ne "ARRAY");
+      if (grep(/^developerboss$/,@$roles)){
+         if ($app->isRoleMultiUsed({developerboss=>
+                                     $self->getParent->T("Chief Developer"),
+                                   },$roles,$oldrec,$newrec,$parentobj,$refid)){
+            return(0);
+         }
+      }
+   }
+
+   return(1);
 }
 
 

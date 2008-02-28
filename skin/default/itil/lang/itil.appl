@@ -32,6 +32,7 @@
 'average user count'=>{de=>'mittlere Benutzeranzahl'},
 'named user count'=>{de=>'eingetragene Benutzeranzahl'},
 'allow developer request workflows'=>{de=>'Workflow "Anforderung an Anwendungsentwicklung" erlauben'},
+'allow business request workflows'=>{de=>'Workflow "Anforderung an den Anwendungsbetrieb" erlauben'},
 'Application has no system components'=>{de=>'Anwendung hat keine System Komponenten'},
 'Application is mangaged by rules of SOX'=>{de=>'Nach SOX Richtlinien zu betreuen'},
 'eventnotify'=>{de=>'Ereignismeldung',en=>'Eventnotification'},

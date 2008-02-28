@@ -210,6 +210,17 @@ sub Validate
       $self->LastMsg(ERROR,"empty refid");
       return(0);
    }
+   foreach my $obj (values(%{$self->{lnkcontact}})){
+      if ($obj->can("Validate")){
+         my $bak=$obj->Validate($oldrec,$newrec,$origrec,$parentobj,$refid);
+         if (!$bak){
+            if (!$self->LastMsg()){
+               $self->LastMsg(ERROR,"unknown error in Validate at $obj");
+            }
+            return(0);
+         }
+      }
+   }
    #
    # Security check
    #
@@ -227,6 +238,7 @@ sub Validate
       $self->LastMsg(ERROR,"invalid refid '$refid' in parent object '$parentobj'");
       return(0);
    }
+
    if ($self->isDataInputFromUserFrontend()){
       my @write=$p->isWriteValid($l[0]);
       if ($#write!=-1){
@@ -262,6 +274,39 @@ sub isWriteValid
    my $rec=shift;
 #   return("default") if ($self->IsMemberOf("admin"));
    return("default");
+}
+
+
+sub isRoleMultiUsed
+{
+   my $self=shift;
+   my $role=shift;
+   my $requestroles=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $parentobj=shift;
+   my $refid=shift;
+   my $id=effVal($oldrec,$newrec,"id");
+
+   $self->ResetFilter();
+   $self->SetFilter({parentobj=>\$parentobj,refid=>\$refid});
+   my @l=$self->getHashList(qw(id roles));
+   my $alreadyused=0;
+   foreach my $rec (@l){
+      next if (defined($id) && $id==$rec->{id});
+      my $r=$rec->{roles};
+      $r=[$r] if (ref($r) ne "ARRAY");
+      foreach my $chkrole (keys(%$role)){
+         if (grep(/^$chkrole$/,@$r) && grep(/^$chkrole$/,@$requestroles)){
+            $self->LastMsg(ERROR,
+                           sprintf($self->T("role \"%s\" already assigned at ".
+                             "current data record"),$role->{$chkrole}));
+            return(1);
+         }
+      }
+   }
+
+   return(0);
 }
 
 

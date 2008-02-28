@@ -54,6 +54,37 @@ sub getPosibleRoles
    return();
 }
 
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $origrec=shift;
+   my $parentobj=shift;
+   my $refid=shift;
+   my $app=$self->getParent();
+   
+   if (defined($newrec->{roles}) && $parentobj=~m/::appl$/){
+      my $roles=$newrec->{roles};
+      $roles=[$roles] if (ref($roles) ne "ARRAY");
+      if (grep(/^wbv$/,@$roles) ||
+          grep(/^eb$/,@$roles)){
+         if ($app->isRoleMultiUsed({
+                                    wbv=>
+                                     $self->getParent->T("T-Com:WBV"),
+                                    eb=>
+                                     $self->getParent->T("T-Com:EB"),
+                                   },$roles,$oldrec,$newrec,$parentobj,$refid)){
+            return(0);
+         }
+      }
+   }
+
+   return(1);
+}
+
+
+
 
 
 

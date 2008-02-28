@@ -6,3 +6,4 @@
 'Roles'=>{de=>'Rollen'},
 'Expiration-Date'=>{de=>'Verfallsdatum'},
 'no contact specified'=>{de=>'kein gültiger Kontakt angegeben'},
+'role "%s" already assigned at current data record'=>{de=>'die Rolle "%s" wurde im aktuellen Datensatz bereits zugewiesen'},
