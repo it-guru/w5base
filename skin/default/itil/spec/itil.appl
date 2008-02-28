@@ -17,5 +17,14 @@ words. This can be used, to do a
 simple grouping of systems by
 search function.
 '},
-
-
+'servicesupport'=>{de=>'
+In diesem Feld wird die Service
+Klasse definiert, mit der die 
+Anwendung dem Kunden zur Verfügung
+gestellt wird - es definiert
+also das Service-Verhältnis zwischen
+Betriebsteam und Endkunde der Anwendung.
+',en=>'
+This field defines the servicelevel
+between businessteam and customer.
+'},

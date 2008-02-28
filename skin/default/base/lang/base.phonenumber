@@ -2,4 +2,5 @@
 'fieldgroup.default'=>{de=>'Rufnummer',en=>'Phonenumber'},
 'Phonenumber'=>{de=>'Rufnummer',en=>'Phonenumber'},
 'Name'=>{de=>'Zweck',en=>'Usage'},
+'shorted Comments'=>{de=>'gekürzte Bemerkungen'},
 'invalid phone number'=>{de=>'ungültige Telefonnummer'},

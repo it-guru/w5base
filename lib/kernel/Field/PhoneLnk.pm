@@ -32,7 +32,7 @@ sub new
    $self{vjoinon}=['id'=>'refid']      if (!defined($self{vjoinon}));
    $self{allowcleanup}=1               if (!defined($self{allowcleanup}));
    if (!defined($self{vjoindisp})){
-      $self{vjoindisp}=['phonenumber','name'];
+      $self{vjoindisp}=['phonenumber','name','shortedcomments'];
    }
 
    my $self=bless($type->SUPER::new(%self),$type);

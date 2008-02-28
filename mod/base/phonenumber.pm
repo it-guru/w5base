@@ -44,12 +44,14 @@ sub new
                                                  
       new kernel::Field::Text(
                 name          =>'parentobj',
+                htmlwidth     =>'80',
                 label         =>'Parent-Object',
                 dataobjattr   =>'phonenumber.parentobj'),
 
       new kernel::Field::Text(
                 name          =>'refid',
                 label         =>'RefID',
+                htmlwidth     =>'50',
                 dataobjattr   =>'phonenumber.refid'),
 
       new kernel::Field::Text(
@@ -65,9 +67,25 @@ sub new
                 getPostibleValues=>\&getPostibleUsageValues,
                 dataobjattr   =>'phonenumber.name'),
                                                  
+      new kernel::Field::Text(
+                name          =>'shortedcomments',
+                htmlwidth     =>'180',
+                label         =>'shorted Comments',
+                depend        =>['comments'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $comments=$current->{comments};
+                   $comments=~s/\n/ /g;
+                   if (length($comments)>30){
+                      $comments=substr($comments,0,29)."...";
+                   }
+                   return($comments);
+                }),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
-                htmlwidth     =>'150',
+                htmlwidth     =>'180',
                 label         =>'Comments',
                 dataobjattr   =>'phonenumber.comments'),
 
@@ -125,7 +143,7 @@ sub new
                 label         =>'RealEditor',
                 dataobjattr   =>'phonenumber.realeditor'),
    );
-   $self->setDefaultView(qw(parentobj targetname cdate editor));
+   $self->setDefaultView(qw(parentobj refid phonenumber shortedcomments cdate editor));
    $self->LoadSubObjs("ext/phonenumber","phonenumber");
    return($self);
 }
