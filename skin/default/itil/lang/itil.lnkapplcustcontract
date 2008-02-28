@@ -2,7 +2,7 @@
                               en=>'Application-CustomerContract Link'},
 'fieldgroup.default'=>{de=>'Verknüfpungsinformation',
                        en=>'Linkinformations'},
-'Fraction'=>{de=>'Anteil'},
+'Fraction'=>{de=>'Anteil der Anwendung am Vertrag'},
 'Application'=>{de=>'Anwendung'},
 'Customer Contract'=>{de=>'Kundenvertrag'},
 'Customer ContractId'=>{de=>'Kundenvertrags ID'},
