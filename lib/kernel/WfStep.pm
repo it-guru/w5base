@@ -194,7 +194,8 @@ sub Process
    elsif($action eq "SaveStep"){
       my $op=Query->Param("OP");
       if ($action ne "" && !grep(/^$op$/,@{$actions})){
-         $self->LastMsg(ERROR,"invalid or disallowed action '$action' requested");
+         $self->LastMsg(ERROR,"invalid or disallowed action '$action.$op' ".
+                              "requested");
          return(0);
       }
       if ($op eq "wfforward"){    # default forwarding Handler
