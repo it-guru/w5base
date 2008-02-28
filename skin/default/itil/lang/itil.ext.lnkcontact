@@ -8,5 +8,7 @@
 'Customer Contact'=>{de=>'Kundenkontakt'},
 'Developer'=>{de=>'Entwickler'},
 'Chief Developer'=>{de=>'Entwicklungsleiter'},
+'Order acceptation'=>{de=>'Auftragsannahme'},
+'Order acceptation deputy'=>{de=>'Auftragsannahme Vertretung'},
 'Technical Contact'=>{de=>'technischer-Ansprechpartner'},
 

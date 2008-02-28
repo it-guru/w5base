@@ -48,6 +48,10 @@ sub getPosibleRoles
                                                  $self->Self),
              "businessemployee"=>$self->getParent->T("Business Employee",
                                                  $self->Self),
+             "orderin1"        =>$self->getParent->T("Order acceptation",
+                                                     $self->Self),
+             "orderin2"        =>$self->getParent->T("Order acceptation deputy",
+                                                     $self->Self),
              "customer"        =>$self->getParent->T("Customer Contact",
                                                      $self->Self),
              "techcontact"     =>$self->getParent->T("Technical Contact",
@@ -114,9 +118,12 @@ sub Validate
    if (defined($newrec->{roles}) && $parentobj=~m/::appl$/){
       my $roles=$newrec->{roles};
       $roles=[$roles] if (ref($roles) ne "ARRAY");
-      if (grep(/^developerboss$/,@$roles)){
+      if (grep(/^developerboss$/,@$roles) ||
+          grep(/^orderin1$/,@$roles)){
          if ($app->isRoleMultiUsed({developerboss=>
                                      $self->getParent->T("Chief Developer"),
+                                    orderin1=>
+                                     $self->getParent->T("Order acceptation")
                                    },$roles,$oldrec,$newrec,$parentobj,$refid)){
             return(0);
          }

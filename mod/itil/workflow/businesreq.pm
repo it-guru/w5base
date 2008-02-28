@@ -101,15 +101,18 @@ sub getDefaultContractor
             foreach my $con (@$c){
                my $roles=$con->{roles};
                $roles=[$roles] if (ref($roles) ne "ARRAY");
-               if (grep(/^developer$/,@$roles)){
+               if (grep(/^orderin1$/,@$roles)){
+                  unshift(@devcon,{target=>$con->{target},
+                                   targetid=>$con->{targetid}});
+               } 
+               if (grep(/^orderin2$/,@$roles)){
                   push(@devcon,{target=>$con->{target},
                                 targetid=>$con->{targetid}});
-                  last if ($#devcon==1);
                } 
             }
          }
          if (!$cur->{allowbusinesreq}){
-            $self->LastMsg(ERROR,"developer requests are disabled ".
+            $self->LastMsg(ERROR,"business requests are disabled ".
                                  "for the desired application");
             return(undef);
          }
