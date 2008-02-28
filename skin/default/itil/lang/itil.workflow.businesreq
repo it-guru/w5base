@@ -6,4 +6,4 @@
 'modification'=>{de=>'Veränderung der Anwendung'},
 'project'=>{de=>'Projektauftrag'},
 'other'=>{de=>'Sonstiges'},
-'developer requests are disabled for the desired application'=>{de=>'Entwickleranforderungen sind für die ausgewählte Anwendung (im CFM) nicht zugelassen'},
+'business requests are disabled for the desired application'=>{de=>'Anforderungen an den Anwendungsbetrieb sind für die ausgewählte Anwendung (im CFM) nicht zugelassen'},
