@@ -13,7 +13,7 @@ Awendung für den Kunden beschrieben.
 This is the customer priority. This meens, the priority of the
 application for the customer.
 '},
-'criticaliy'=>{de=>'
+'criticality'=>{de=>'
 Die Kiritkalität definiert, welche Auswirkung der Ausfall
 der Anwendung auf die Prozesse des Kunden hat.
 ',en=>'
