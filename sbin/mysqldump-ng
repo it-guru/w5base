@@ -158,7 +158,7 @@ sub check_db
       open3(undef,*R,*E,"$prog->{mysql} $db");
       wait();
       if ($? != 0){
-         printf STDERR ("ERROR: source database $db not useable or not found, rc=$?!\n");
+         printf STDERR ("ERROR: source database %s not useable or not found, rc=%s!\n",$db,$?>>8);
          exit(1);
       }
       close(R);
@@ -195,7 +195,7 @@ You want continue? [y/N]: ");
       open3(undef,undef,*ER,"$prog->{mysql} -e 'create database $targetdb'");
       wait();
       if ($? != 0){
-         printf STDERR ("ERROR: database $targetdb cannot create! rc=$?\n");
+         printf STDERR ("ERROR: database %s cannot create! rc=%s\n",$targetdb,$?>>8);
          exit(1);
       }
       close(ER);
@@ -388,7 +388,8 @@ sub process_engine
            if ($mode eq "export"){
               my $convert_flag=0;
               local(*MYSQLDUMPRDR,*MYSQLDUMPERR);
-              my $mysqldump_pid=open3(undef,*MYSQLDUMPRDR,*MYSQLDUMPERR,"$prog->{mysqldump} -q -c $db $first");
+              my $mysqldump_pid=open3(undef,*MYSQLDUMPRDR,*MYSQLDUMPERR,
+                                      "$prog->{mysqldump} -q -c $db $first");
               my @gz;
               foreach my $d (@$dir){
                   my $gz=gzopen("$d/$first.sql.gz", "w9")
@@ -412,7 +413,8 @@ sub process_engine
               }
               close(MYSQLDUMPRDR);
               waitpid($mysqldump_pid,0);
-              printf("ERROR: system command mysqldump $db $first return a errorcode=$?\n") if ($? != 0);
+              printf("ERROR: system command mysqldump %s %s return a errorcode=%s\n"
+                      ,$db,$first,($?>>8)) if ($? != 0);
               exit(0);
            #  import database
            }elsif ($mode eq "import"){
@@ -438,14 +440,17 @@ sub process_engine
               close(MYSQLWTR);
               msg("INFO","import $first\n");
               waitpid($gunzip_pid,0);
-              printf("ERROR: system command gunzip $first return a errorcode=$?\n") if ($? != 0);
+              printf("ERROR: system command gunzip %s return a errorcode=%s\n",
+                      $first,$?>>8) if ($? != 0);
               waitpid($mysql_pid,0);
-              printf("ERROR: system command mysql $targetdb return a errorcode=$?\n") if ($? != 0);
+              printf("ERROR: system command mysql %s return a errorcode=%s\n",
+                      $targetdb,$?>>8) if ($? != 0);
               exit(0);
            # transfer database
            }elsif($mode eq "transfer"){
               local(*MYSQLDUMPRDR,*MYSQLDUMPERR,*MYSQLWTR,*MYSQLERR);
-              my $mysqldump_pid=open3(undef,*MYSQLDUMPRDR,*MYSQLDUMPERR,"$prog->{mysqldump} -q -c $db $first");
+              my $mysqldump_pid=open3(undef,*MYSQLDUMPRDR,*MYSQLDUMPERR,
+                                      "$prog->{mysqldump} -q -c $db $first");
               msg("INFO","transfer $first\n");
               my $mysql_pid=open3(*MYSQLWTR,undef,*MYSQLERR,"$prog->{mysql} $targetdb");
               while(my $line=<MYSQLDUMPRDR>){
@@ -456,10 +461,12 @@ sub process_engine
               }
               close(MYSQLWTR);
               waitpid($mysql_pid,0);
-              printf("ERROR: system command mysql $targetdb return a errorcode=$?\n") if ($? != 0);
+              printf("ERROR: system command mysql %s return a errorcode=%s\n",
+                      $targetdb,$?>>8) if ($? != 0);
               close(MYSQLDUMPRDR);
               waitpid($mysqldump_pid,0);
-              printf("ERROR: system command mysqldump $db $first return a errorcode=$?\n") if ($? != 0);
+              printf("ERROR: system command mysqldump %s %s return a errorcode=%s\n",
+                      $db,$first,$?>>8) if ($? != 0);
               exit(0);
            }
          } else {       # parent process
