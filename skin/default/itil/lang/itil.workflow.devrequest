@@ -1,4 +1,4 @@
-'itil::workflow::devrequest'=>{de=>'Anfrage/Anforderung an die Anwendungsentwicklung',en=>'Question or request to the application developers'},
+'itil::workflow::devrequest'=>{de=>'ITIL Anfrage/Anforderung an die Anwendungsentwicklung',en=>'ITIL Question or request to the application developers'},
 'itil::workflow::devrequest::tip'=>{de=>'Mit diesem Workflow können Anforderungen an die Anwendungsentwicklung weitergegeben werden. Es werden damit automatisch die Entwickler einer Anwendung adressiert. Vor der Verwendung ist darauf zu achten, dass die Entwickler der jeweiligen Anwendung auch Anforderungen in dieser Form zugestimmt haben.<br>Sollte bei der ausgewählten Anwendung kein Entwickler registriert sein, so wird die Weiterleitung des Workflows nicht gestattet.',en=>'Question or request to the application developers'},
 'no developer found'=>{de=>'kein Entwickler für die gewählte Anwendung gefunden'},
 'Request nature'=>{de=>'Anforderungsart'},

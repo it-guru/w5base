@@ -1,4 +1,0 @@
-'AL_TCom::workflow::custorder'=>{de=>'Auftrag von Kunde T-Com an T-Systems',
-                                 en=>'order of customer T-Com to T-Systems'},
-'Order-Type'=>{de=>'Bestellungsart'},
-'contractbased'=>{de=>'Vetragsgebunden',en=>'contract related'},
