@@ -20,22 +20,6 @@ Keine Feldbeschreibung vorhanden
 No field specivication
 '},
 #######################################################################
-'fieldgroup.finance'=>{de=>'
-In diesem Datenblock werden die finanziellen Verantwortlichkeiten für
-die Anwendung definiert.
-',en=>'
-In this Datablock the finance responsibility for the current application
-will be defined.
-'},
-#######################################################################
-'fieldgroup.technical'=>{de=>'
-In diesem Datenblock werden die technischen Verantwortlichkeiten für
-die Anwendung definiert.
-',en=>'
-In this Datablock the technical responsibility for the current application
-will be defined.
-'},
-#######################################################################
 
 'issoxappl'=>{de=>'
 Die Anwendung wird nach SOX Richtlinien
