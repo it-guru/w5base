@@ -38,6 +38,13 @@ sub IsModuleSelectable
    return(1);
 }
 
+sub Init
+{
+   my $self=shift;
+   $self->AddGroup("customerdata",translation=>'itil::workflow::businesreq');
+   return($self->SUPER::Init(@_));
+}
+
 sub getDynamicFields
 {
    my $self=shift;
@@ -76,6 +83,7 @@ sub getDynamicFields
                                   container  =>'headref',
                                   label      =>'Affected Application ID'),
       new kernel::Field::Text(    name       =>'customerrefno',
+                                  htmleditwidth=>'100px',
                                   group      =>'customerdata',
                                   translation=>'itil::workflow::businesreq',
                                   searchable =>0,
@@ -145,6 +153,18 @@ sub getStepByShortname
    return($self->SUPER::getStepByShortname($shortname,$WfRec));
 }
 
+sub isViewValid
+{
+   my $self=shift;
+   return($self->SUPER::isViewValid(@_),"customerdata");
+}
+
+sub getDetailBlockPriority            # posibility to change the block order
+{
+   return("customerdata","init","flow");
+}
+
+
 
 
 
@@ -163,7 +183,7 @@ sub generateWorkspace
 
    my $oldval=Query->Param("Formated_prio");
    $oldval="5" if (!defined($oldval));
-   my $d="<select name=Formated_prio>";
+   my $d="<select name=Formated_prio style=\"width:100px\">";
    my @l=("high"=>3,"normal"=>5,"low"=>8);
    while(my $n=shift(@l)){
       my $i=shift(@l);

@@ -187,8 +187,10 @@ sub getSimpleTextInputField
    my $unit=$self->unit;
    $unit="<td width=40>$unit</td>" if ($unit ne "");
    if (!$readonly){
+      my $width="100%";
+      $width=$self->{htmleditwidth} if (defined($self->{htmleditwidth}));
       $d=<<EOF;
-<table style="table-layout:fixed;width:100%" cellspacing=0 cellpadding=0>
+<table style="table-layout:fixed;width:$width" cellspacing=0 cellpadding=0>
 <tr><td>
 <input type=text value="$value" name=Formated_$name class=finput>
 </td>$unit</tr></table>
