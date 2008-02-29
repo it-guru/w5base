@@ -39,7 +39,7 @@ sub new
                                      dataobjattr   =>'platform.name'),
 
       new kernel::Field::Select(     name          =>'cistatus',
-                                     selectwidth   =>'40%',
+                                     htmleditwidth =>'40%',
                                      label         =>'CI-State',
                                      vjoineditbase =>{id=>">0"},
                                      vjointo       =>'base::cistatus',
@@ -51,7 +51,7 @@ sub new
                                      dataobjattr   =>'platform.cistatus'),
 
       new kernel::Field::Select(     name          =>'hwbits',
-                                     selectwidth   =>'40%',
+                                     htmleditwidth =>'40%',
                                      label         =>'HardwareBits',
                                      value         =>['','32Bit','64Bit'],
                                      dataobjattr   =>'platform.hwbits'),

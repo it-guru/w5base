@@ -59,7 +59,7 @@ sub new
                 transprefix   =>'contype.',
                 value         =>[qw(0 1 2 3 4 5)],
                 default       =>'0',
-                selectwidth   =>'350px',
+                htmleditwidth =>'350px',
                 dataobjattr   =>'lnkapplappl.contype'),
 
       new kernel::Field::Select(
@@ -67,7 +67,7 @@ sub new
                 label         =>'Interfacemode',
                 value         =>[qw(online batch manuell)],
                 default       =>'online',
-                selectwidth   =>'150px',
+                htmleditwidth =>'150px',
                 dataobjattr   =>'lnkapplappl.conmode'),
 
       new kernel::Field::Select(
@@ -80,7 +80,7 @@ sub new
                                      utm DB-Link BCV )],
                 default       =>'online',
                 htmlwidth     =>'50px',
-                selectwidth   =>'150px',
+                htmleditwidth =>'150px',
                 dataobjattr   =>'lnkapplappl.conprotocol'),
 
       new kernel::Field::SubList(

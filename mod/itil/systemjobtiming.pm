@@ -67,7 +67,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'tinterval',
-                selectwidth   =>'100%',
+                htmleditwidth =>'100%',
                 transprefix   =>'ti.',
                 label         =>'timing interval',
                 value         =>[qw( 0 1 2 3 4)],
@@ -80,35 +80,35 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'plannedhour',
-                selectwidth   =>'40px',
+                htmleditwidth =>'40px',
                 label         =>'planned hour',
                 value         =>[(0..23)],
                 dataobjattr   =>'systemjobtiming.plannedhour'),
 
       new kernel::Field::Select(
                 name          =>'plannedmin',
-                selectwidth   =>'40px',
+                htmleditwidth =>'40px',
                 label         =>'planned min',
                 value         =>[(0..59)],
                 dataobjattr   =>'systemjobtiming.plannedmin'),
 
       new kernel::Field::Select(
                 name          =>'plannedday',
-                selectwidth   =>'40px',
+                htmleditwidth =>'40px',
                 label         =>'planned day',
                 value         =>[(1..31)],
                 dataobjattr   =>'systemjobtiming.plannedday'),
 
       new kernel::Field::Select(
                 name          =>'plannedmon',
-                selectwidth   =>'40px',
+                htmleditwidth =>'40px',
                 label         =>'planned month',
                 value         =>[(1..12)],
                 dataobjattr   =>'systemjobtiming.plannedmon'),
 
       new kernel::Field::Select(
                 name          =>'plannedyear',
-                selectwidth   =>'40px',
+                htmleditwidth =>'40px',
                 label         =>'planned year',
                 value         =>[(2007..2050)],
                 dataobjattr   =>'systemjobtiming.plannedyear'),

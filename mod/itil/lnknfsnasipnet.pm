@@ -63,7 +63,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'network',
-                selectwidth   =>'190px',
+                htmleditwidth =>'190px',
                 label         =>'Network',
                 vjointo       =>'itil::network',
                 vjoineditbase =>{'cistatusid'=>[3,4]},

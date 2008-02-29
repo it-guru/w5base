@@ -76,7 +76,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'active',
                 label         =>'Active',
-                selectwidth   =>'50%',
+                htmleditwidth =>'50%',
                 value         =>['1','0'],
                 dataobjattr   =>'usersubst.active'),
 

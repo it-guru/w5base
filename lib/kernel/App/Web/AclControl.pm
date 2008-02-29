@@ -63,7 +63,7 @@ sub new
       new kernel::Field::MultiDst (
                 name          =>'acltargetname',
                 htmlwidth     =>'450',
-                selectwidth   =>'400',
+                htmleditwidth =>'400',
                 label         =>'Target-Name',
                 dst           =>['base::grp' =>'fullname',
                                  'base::user'=>'fullname'],
@@ -73,7 +73,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'aclmode',
                 label         =>'Acl-Mode',
-                selectwidth   =>'100',
+                htmleditwidth =>'100',
                 value         =>$modes,
                 translation   =>$modestranslation,
                 default       =>'read',

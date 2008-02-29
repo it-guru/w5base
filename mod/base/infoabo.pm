@@ -47,7 +47,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'parentobj',
                 label         =>'Info Source',
-                selectwidth   =>'100%',
+                htmleditwidth =>'100%',
                 readonly      =>1,
                 getPostibleValues=>\&getPostibleParentObjs,
                 jsonchanged   =>\&getOnChangedScript,
@@ -69,7 +69,7 @@ sub new
       new kernel::Field::MultiDst (
                 name          =>'targetname',
                 htmlwidth     =>'200',
-                selectwidth   =>'400',
+                htmleditwidth =>'400',
                 label         =>'Target-Name',
                 dst           =>[],
                 readonly      =>1,
@@ -81,7 +81,7 @@ sub new
                 searchable    =>0,
                 label         =>'Info Mode',
                 readonly      =>1,
-                selectwidth   =>'100%',
+                htmleditwidth =>'100%',
                 getPostibleValues=>\&getPostibleModes,
                 dataobjattr   =>'infoabo.mode'),
 
@@ -122,7 +122,7 @@ sub new
                 label         =>'Active',
                 transprefix   =>'boolean.',
                 value         =>[1,0],
-                selectwidth   =>'80px',
+                htmleditwidth =>'80px',
                 dataobjattr   =>'infoabo.active'),
 
       new kernel::Field::Creator(

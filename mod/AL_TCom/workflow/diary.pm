@@ -220,7 +220,7 @@ sub getDynamicFields
           $self->InitFields(
            new kernel::Field::Select(    name       =>'tcomcodrelevant',
                                          label      =>'Relevant',
-                                         selectwidth=>'20%',
+                                         htmleditwidth=>'20%',
                                          value      =>['',qw(yes no)],
                                          default    =>'yes',
                                          group      =>'tcomcod',
@@ -228,7 +228,7 @@ sub getDynamicFields
 
            new kernel::Field::Select(    name       =>'tcomcodcause',
                                          label      =>'Activity',
-                                         selectwidth=>'80%',
+                                         htmleditwidth=>'80%',
                                          translation=>'AL_TCom::lib::workflow',
                                          value      =>
                              [AL_TCom::lib::workflow::tcomcodcause()],

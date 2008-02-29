@@ -65,7 +65,7 @@ sub new
       new kernel::Field::Select(  
                 name          =>'cistatus',
                 readonly      =>1,
-                selectwidth   =>'40%',
+                htmleditwidth =>'40%',
                 label         =>'CI-State',
                 vjointo       =>'base::cistatus',
                 vjoinon       =>['cistatusid'=>'id'],

@@ -50,7 +50,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'network',
-                selectwidth   =>'190px',
+                htmleditwidth =>'190px',
                 label         =>'Network',
                 vjointo       =>'itil::network',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
@@ -87,7 +87,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'cistatus',
-                selectwidth   =>'40%',
+                htmleditwidth =>'40%',
                 label         =>'CI-State',
                 vjointo       =>'base::cistatus',
                 vjoinon       =>['cistatusid'=>'id'],
@@ -95,7 +95,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'type',
-                selectwidth   =>'190px',
+                htmleditwidth =>'190px',
                 label         =>'Typ',
                 transprefix   =>'iptyp.',
                 value         =>[qw(0 1 2 3 4 5 8 9 6 7)],
@@ -131,7 +131,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'iscontrolpartner',
                 transprefix   =>'boolean.',
-                selectwidth   =>'30%',
+                htmleditwidth =>'30%',
                 label         =>'ControlCenter Partner',
                 value         =>[0,1],
                 dataobjattr   =>'ipaddress.is_controllpartner'),

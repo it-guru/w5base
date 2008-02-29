@@ -69,7 +69,7 @@ sub getDynamicFields
    my @dynfields=$self->InitFields(
                    new kernel::Field::Select(  
                              name               =>'affectedobject',
-                             selectwidth        =>'350px',
+                             htmleditwidth      =>'350px',
                              translation        =>'base::workflow::DataIssue',
                              getPostibleValues  =>\&getObjectList,
                              htmldetail    =>sub {

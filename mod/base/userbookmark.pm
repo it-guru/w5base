@@ -55,7 +55,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'target',
                 label         =>'Target',
-                selectwidth   =>'200px',
+                htmleditwidth =>'200px',
                 transprefix   =>'target', 
                 default       =>'_blank',
                 value         =>[qw(_blank _self _top msel)],

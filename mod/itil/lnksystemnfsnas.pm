@@ -83,7 +83,7 @@ sub new
                 name          =>'systemcistatus',
                 readonly      =>1,
                 group         =>'systemdata',
-                selectwidth   =>'40%',
+                htmleditwidth =>'40%',
                 label         =>'CI-State',
                 vjointo       =>'base::cistatus',
                 vjoinon       =>['systemcistatusid'=>'id'],

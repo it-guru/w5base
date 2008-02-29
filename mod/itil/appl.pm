@@ -58,7 +58,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'cistatus',
-                selectwidth   =>'40%',
+                htmleditwidth =>'40%',
                 label         =>'CI-State',
                 vjoineditbase =>{id=>">0"},
                 vjointo       =>'base::cistatus',
@@ -277,7 +277,7 @@ sub new
                 label         =>'Customers Application Prioritiy',
                 value         =>['1','2','3'],
                 default       =>'2',
-                selectwidth   =>'50px',
+                htmleditwidth =>'50px',
                 dataobjattr   =>'appl.customerprio'),
 
       new kernel::Field::Select(
@@ -287,7 +287,7 @@ sub new
                 allowempty    =>1,
                 value         =>['CRnone','CRlow','CRmedium','CRhigh',
                                  'CRcritical'],
-                selectwidth   =>'100px',
+                htmleditwidth =>'100px',
                 dataobjattr   =>'appl.criticality'),
 
       new kernel::Field::Select(
@@ -299,7 +299,7 @@ sub new
                                  '500','800','1000','1500','2000','2500','3000',
                                  '4000','5000','7500','10000','12500','15000',
                                  '20000','50000','100000','1000000','10000000'],
-                selectwidth   =>'100px',
+                htmleditwidth =>'100px',
                 dataobjattr   =>'appl.avgusercount'),
 
       new kernel::Field::Select(
@@ -311,7 +311,7 @@ sub new
                                  '500','800','1000','1500','2000','2500','3000',
                                  '4000','5000','7500','10000','12500','15000',
                                  '20000','50000','100000','1000000','10000000'],
-                selectwidth   =>'100px',
+                htmleditwidth =>'100px',
                 dataobjattr   =>'appl.namedusercount'),
 
       new kernel::Field::Link(
@@ -397,7 +397,7 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'isnosysappl',
                 group         =>'control',
-                selectwidth   =>'30%',
+                htmleditwidth =>'30%',
                 label         =>'Application has no system components',
                 dataobjattr   =>'appl.is_applwithnosys'),
 
@@ -405,7 +405,7 @@ sub new
                 name          =>'allowdevrequest',
                 group         =>'control',
                 searchable    =>0,
-                selectwidth   =>'30%',
+                htmleditwidth =>'30%',
                 label         =>'allow developer request workflows',
                 container     =>'additional'),
 
@@ -413,14 +413,14 @@ sub new
                 name          =>'allowbusinesreq',
                 group         =>'control',
                 searchable    =>0,
-                selectwidth   =>'30%',
+                htmleditwidth =>'30%',
                 label         =>'allow business request workflows',
                 container     =>'additional'),
 
       new kernel::Field::Boolean(
                 name          =>'issoxappl',
                 group         =>'control',
-                selectwidth   =>'30%',
+                htmleditwidth =>'30%',
                 label         =>'Application is mangaged by rules of SOX',
                 dataobjattr   =>'appl.is_soxcontroll'),
 
@@ -444,7 +444,7 @@ sub new
                                  'TV-CC',
                                  'SAP-Reporter',
                                  'no SLA control'],
-                selectwidth   =>'200px',
+                htmleditwidth =>'200px',
                 dataobjattr   =>'appl.slacontroltool'),
 
       new kernel::Field::Number(
@@ -466,7 +466,7 @@ sub new
                 value         =>['',
                                  'month',
                                  'year'],
-                selectwidth   =>'100px',
+                htmleditwidth =>'100px',
                 dataobjattr   =>'appl.slacontrbase'),
 
       new kernel::Field::Textarea(

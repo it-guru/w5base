@@ -54,7 +54,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'categorie',
-                selectwidth   =>'50%',
+                htmleditwidth =>'50%',
                 label         =>'Categorie',
                 vjointo       =>'faq::category',
                 vjoinon       =>['faqcat'=>'faqcatid'],

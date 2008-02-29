@@ -60,7 +60,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'cistatus',
-                selectwidth   =>'40%',
+                htmleditwidth =>'40%',
                 label         =>'CI-State',
                 vjoineditbase =>{id=>">0"},
                 vjointo       =>'base::cistatus',
@@ -69,7 +69,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'tmode',
-                selectwidth   =>'80%',
+                htmleditwidth =>'80%',
                 label         =>'Timeplan Mode',
                 getPostibleValues=>\&getTModes,
                 dataobjattr   =>'timeplan.tmode'),
@@ -124,7 +124,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'vbarheight',
                 group         =>'misc',
-                selectwidth   =>'50%',
+                htmleditwidth =>'50%',
                 label         =>'VBar Height',
                 default       =>'auto',
                 value         =>[qw(auto)],
@@ -133,7 +133,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'vbarcolor',
                 group         =>'misc',
-                selectwidth   =>'50%',
+                htmleditwidth =>'50%',
                 label         =>'VBar Color',
                 default       =>'blue',
                 value         =>[qw(blue red green)],
@@ -142,7 +142,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'defstarthour',
                 group         =>'misc',
-                selectwidth   =>'20%',
+                htmleditwidth =>'20%',
                 label         =>'Default Start hour',
                 default       =>'0',
                 value         =>[qw(0 1 2 3 4 5 6 7 8 9 10 11 12 

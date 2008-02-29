@@ -47,7 +47,7 @@ sub getDynamicFields
    return($self->InitFields(
       new kernel::Field::Select(  name       =>'reqnature',
                                   label      =>'Request nature',
-                                  selectwidth=>'60%',
+                                  htmleditwidth=>'60%',
                                   value      =>['operation',
                                                 'project',
                                                 'modification',
@@ -75,6 +75,12 @@ sub getDynamicFields
                                   keyhandler =>'kh',
                                   container  =>'headref',
                                   label      =>'Affected Application ID'),
+      new kernel::Field::Text(    name       =>'customerrefno',
+                                  group      =>'customerdata',
+                                  translation=>'itil::workflow::businesreq',
+                                  searchable =>0,
+                                  container  =>'headref',
+                                  label      =>'Reference'),
     ),$self->SUPER::getDynamicFields(%param));
 }
 
@@ -195,6 +201,10 @@ setEnterSubmit(document.forms[0],"NextStep");
 <td class=finput>$d</td>
 </tr>
 <tr>
+<td class=fname>%customerrefno(label)%:</td>
+<td class=finput>%customerrefno(detail)%</td>
+</tr>
+<tr>
 <td colspan=2 align=center><br>$nextstart</td>
 </tr>
 </table>
@@ -236,7 +246,7 @@ sub getWorkHeight
    my $self=shift;
    my $WfRec=shift;
 
-   return("270");
+   return("300");
 }
 
 1;

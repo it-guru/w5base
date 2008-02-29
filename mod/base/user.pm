@@ -59,13 +59,13 @@ sub new
       new kernel::Field::Select(
                 name          =>'usertyp',
                 label         =>'Usertyp',
-                selectwidth   =>'100px',
+                htmleditwidth =>'100px',
                 value         =>[qw(extern service user function)],
                 dataobjattr   =>'user.usertyp'),
 
       new kernel::Field::Select(
                 name          =>'cistatus',
-                selectwidth   =>'40%',
+                htmleditwidth =>'40%',
                 group         =>'name',
                 readonly      =>
                    sub{
@@ -84,7 +84,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'perscistatus',
-                selectwidth   =>'40%',
+                htmleditwidth =>'40%',
                 readonly      =>
                    sub{
                       my $self=shift;
@@ -250,7 +250,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'lang',
                 label         =>'Language',
-                selectwidth   =>'50%',
+                htmleditwidth =>'50%',
                 group         =>'userparam',
                 value         =>['',LangTable()],
                 dataobjattr   =>'user.lang'),
@@ -259,7 +259,7 @@ sub new
                 name          =>'pagelimit',
                 label         =>'Pagelimit',
                 unit          =>'Entrys',
-                selectwidth   =>'50px',
+                htmleditwidth =>'50px',
                 group         =>'userparam',
                 value         =>[qw(10 15 20 30 40 50 100)],
                 default       =>'20',
@@ -280,7 +280,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'winsize',
                 label         =>'Window-Size',
-                selectwidth   =>'50%',
+                htmleditwidth =>'50%',
                 group         =>'userparam',
                 value         =>['','normal','large'],
                 container     =>'options'),

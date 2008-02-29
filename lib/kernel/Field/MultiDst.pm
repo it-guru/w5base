@@ -243,7 +243,7 @@ sub Validate
       else{
          unshift(@select,{disp=>$newval},{disp=>""});
          my $width="100%";
-         $width=$self->{selectwidth} if (defined($self->{selectwidth})); 
+         $width=$self->{htmleditwidth} if (defined($self->{htmleditwidth})); 
          $self->FieldCache->{LastDrop}="<select name=Formated_$name ".
                                        "style=\"width:$width\">";
          foreach my $valrec (@select){

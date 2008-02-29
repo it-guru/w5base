@@ -203,7 +203,7 @@ sub getPosibleActions
 #          $self->InitFields(
 #           new kernel::Field::Select(    name       =>'tcomcodrelevant',
 #                                         label      =>'Relevant',
-#                                         selectwidth=>'20%',
+#                                         htmleditwidth=>'20%',
 #                                         value      =>['',qw(yes no)],
 #                                         default    =>'yes',
 #                                         group      =>'tcomcod',

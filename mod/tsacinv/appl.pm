@@ -166,7 +166,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'issoxappl',
                 group         =>'control',
-                selectwidth   =>'30%',
+                htmleditwidth =>'30%',
                 label         =>'Application is mangaged by rules of SOX',
                 dataobjattr   =>'amtsicustappl.soxrelevant'),
                                     

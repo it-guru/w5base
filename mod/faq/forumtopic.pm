@@ -59,7 +59,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'forcetopicicon',
                 default       =>'0',
-                selectwidth   =>'60%',
+                htmleditwidth =>'60%',
                 label         =>'force topic icon',
                 transprefix   =>'icon.',
                 value         =>['0',

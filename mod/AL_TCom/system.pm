@@ -33,7 +33,7 @@ sub new
 #      new kernel::Field::Select(
 #                name          =>'acsync',
 #                label         =>'AssetCenter syncronisation',
-#                selectwidth   =>'50%',
+#                htmleditwidth =>'50%',
 #                group         =>'control',
 #                default       =>'ac2w5base',
 #                transprefix   =>'acsync.',

@@ -110,7 +110,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'splattform',
                 label         =>'Service-Plattform',
-                selectwidth   =>'200px',
+                htmleditwidth =>'200px',
                 value         =>["",
                                  "SUN Solaris",
                                  "AIX",

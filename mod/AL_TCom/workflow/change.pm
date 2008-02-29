@@ -93,7 +93,7 @@ sub getDynamicFields
           $self->InitFields(
            new kernel::Field::Select(    name       =>'tcomcodrelevant',
                                          label      =>'Relevant',
-                                         selectwidth=>'20%',
+                                         htmleditwidth=>'20%',
                                          value      =>['',qw(yes no)],
                                          group      =>'tcomcod',
                                          container  =>'headref'),
@@ -118,7 +118,7 @@ sub getDynamicFields
            new kernel::Field::Select(    name       =>'tcomcodchmrisk',
                                          readonly   =>1,
                                          label      =>'Risk',
-                                         selectwidth=>'20%',
+                                         htmleditwidth=>'20%',
                                          value      =>["low","medium",
                                                        "high","very high"],
                                          group      =>'tcomcod',

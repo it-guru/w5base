@@ -49,7 +49,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'cistatus',
-                selectwidth   =>'40%',
+                htmleditwidth =>'40%',
                 label         =>'CI-State',
                 vjoineditbase =>{id=>">0"},
                 vjointo       =>'base::cistatus',

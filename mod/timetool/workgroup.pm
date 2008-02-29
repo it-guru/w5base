@@ -59,7 +59,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'cistatus',
-                selectwidth   =>'40%',
+                htmleditwidth =>'40%',
                 label         =>'CI-State',
                 vjoineditbase =>{id=>">0"},
                 vjointo       =>'base::cistatus',
@@ -99,7 +99,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'mincomposition',
-                selectwidth   =>'40%',
+                htmleditwidth =>'40%',
                 label         =>'Min. Composition',
                 default       =>'0',
                 value         =>[qw(0 1 2 3 4 5 6 7 8 9 10)],

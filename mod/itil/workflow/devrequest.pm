@@ -47,7 +47,7 @@ sub getDynamicFields
    return($self->InitFields(
       new kernel::Field::Select(  name       =>'reqnature',
                                   label      =>'Request nature',
-                                  selectwidth=>'60%',
+                                  htmleditwidth=>'60%',
                                   value      =>['feature request',
                                                 'bugfix',
                                                 'functional modification',

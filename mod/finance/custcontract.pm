@@ -60,7 +60,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'cistatus',
-                selectwidth   =>'40%',
+                htmleditwidth =>'40%',
                 label         =>'CI-State',
                 vjoineditbase =>{id=>">0"},
                 vjointo       =>'base::cistatus',
@@ -109,7 +109,7 @@ sub new
                 name          =>'autoexpansion',
                 label         =>'Auto Expansion',
                 transprefix   =>'autoexpansion.',
-                selectwidth   =>'150px',
+                htmleditwidth =>'150px',
                 value         =>[qw(0 1 2 3 6 12 18 24 36)],
                 dataobjattr   =>'custcontract.autoexpansion'),
 
@@ -117,7 +117,7 @@ sub new
                 name          =>'cancelperiod',
                 label         =>'Cancel Period',
                 transprefix   =>'cancelperiod.',
-                selectwidth   =>'150px',
+                htmleditwidth =>'150px',
                 value         =>[qw(0 1 2 3 6 12 18 24 36)],
                 dataobjattr   =>'custcontract.cancelperiod'),
 

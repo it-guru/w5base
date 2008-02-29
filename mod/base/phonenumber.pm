@@ -63,7 +63,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'name',
                 label         =>'Name',
-                selectwidth   =>'100%',
+                htmleditwidth =>'100%',
                 getPostibleValues=>\&getPostibleUsageValues,
                 dataobjattr   =>'phonenumber.name'),
                                                  

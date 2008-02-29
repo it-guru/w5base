@@ -75,7 +75,7 @@ sub new
 
       new kernel::Field::Select(   name       =>'useobjacl',
                                    label      =>'use Object ACL',
-                                   selectwidth=>'20%',
+                                   htmleditwidth=>'20%',
                                    transprefix   =>'useobjacl.',
                                    default    =>'0',
                                    uivisible  =>'0',

@@ -58,7 +58,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'cistatus',
-                selectwidth   =>'40%',
+                htmleditwidth =>'40%',
                 label         =>'CI-State',
                 vjoineditbase =>{id=>">0"},
                 vjointo       =>'base::cistatus',
@@ -79,7 +79,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'swnature',
-                selectwidth   =>'40%',
+                htmleditwidth =>'40%',
                 label         =>'Instance type',
                 value         =>['Oracle',
                                  'MySQL',
@@ -115,7 +115,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'swtype',
-                selectwidth   =>'40%',
+                htmleditwidth =>'40%',
                 label         =>'Instance operation type',
                 value         =>['primary',
                                  'secondary',

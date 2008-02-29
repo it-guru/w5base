@@ -55,7 +55,7 @@ sub new
       new kernel::Field::MultiDst (
                 name          =>'targetname',
                 htmlwidth     =>'200',
-                selectwidth   =>'400',
+                htmleditwidth =>'400',
                 label         =>'Target-Name',
                 dst           =>['base::grp' =>'fullname',
                                  'base::user'=>'fullname'],
@@ -80,7 +80,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'roles',
                 label         =>'Roles',
-                selectwidth   =>'100%',
+                htmleditwidth =>'100%',
                 multisize     =>5,
                 container     =>'croles',
                 getPostibleValues=>\&getPostibleRoleValues),

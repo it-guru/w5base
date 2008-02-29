@@ -30,7 +30,7 @@ sub new
    my $self={@_};
    $self->{name}='mandator'                 if (!defined($self->{name}));
    $self->{label}='Mandator'                if (!defined($self->{label}));
-   $self->{selectwidth}='250px'             if (!defined($self->{selectwidth}));
+   $self->{htmleditwidth}='250px'             if (!defined($self->{htmleditwidth}));
    $self->{htmlwidth}='80px'                if (!defined($self->{htmlwidth}));
    $self->{vjointo}='base::mandator'        if (!defined($self->{vjointo}));
    $self->{vjoinon}=['mandatorid'=>'grpid'] if (!defined($self->{vjoinon}));

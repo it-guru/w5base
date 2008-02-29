@@ -64,7 +64,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'cistatus',
-                selectwidth   =>'40%',
+                htmleditwidth =>'40%',
                 label         =>'CI-State',
                 vjoineditbase =>{'id'=>">0"},
                 vjointo       =>'base::cistatus',
@@ -73,7 +73,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'type',
-                selectwidth   =>'190px',
+                htmleditwidth =>'190px',
                 label         =>'Export Type',
                 value         =>[qw(nfs cifs)],
                 dataobjattr   =>'systemnfsnas.exporttype'),

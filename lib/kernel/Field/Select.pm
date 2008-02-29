@@ -114,7 +114,7 @@ sub FormatedDetail
          $d=[$self->default];
       }
       my $width="100%";
-      $width=$self->{selectwidth} if (defined($self->{selectwidth}));
+      $width=$self->{htmleditwidth} if (defined($self->{htmleditwidth}));
       my $s="<select name=Formated_$name";
       if ($self->{multisize}>0){
          $s.=" multiple";
@@ -138,7 +138,8 @@ sub FormatedDetail
       $s.="</select>";
       if (defined($self->{jsonchanged})){
          $s.="<script language=\"JavaScript\">".
-             "function jsonchanged_$name(mode){".$self->jsonchanged."}".
+             "function jsonchanged_$name(mode){".
+             $self->jsonchanged."}".  
              "</script>";
       }
       return($s);

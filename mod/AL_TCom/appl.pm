@@ -33,7 +33,7 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'allowoncall',
                 group         =>'control',
-                selectwidth   =>'30%',
+                htmleditwidth =>'30%',
                 searchable    =>0,
                 label         =>'allow to send for (Herbeiruf)',
                 container     =>'additional')

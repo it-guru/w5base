@@ -52,7 +52,7 @@ sub new
       new kernel::Field::MultiDst (
                 name          =>'fwdtargetname',
                 htmlwidth     =>'450',
-                selectwidth   =>'400',
+                htmleditwidth =>'400',
                 label         =>'mapped in Workspace of',
                 dst           =>['base::grp' =>'fullname',
                                  'base::user'=>'fullname'],

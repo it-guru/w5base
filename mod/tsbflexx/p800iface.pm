@@ -65,7 +65,7 @@ sub new
                   id                =>1,      
                   label             =>'Measurand',
                   htmlwidth         =>'200px',
-                  selectwidth       =>'200px',
+                  htmleditwidth     =>'200px',
                   value             =>[qw(1 2 3)],
                   transprefix =>'measurand.',
                   dataobjattr       =>'ta_application_data.messgroesse'),

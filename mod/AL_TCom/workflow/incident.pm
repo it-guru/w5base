@@ -82,7 +82,7 @@ EOF
           $self->InitFields(
            new kernel::Field::Select(    name       =>'tcomcodrelevant',
                                          label      =>'Relevant',
-                                         selectwidth=>'20%',
+                                         htmleditwidth=>'20%',
                                          value      =>['',qw(yes no)],
                                          group      =>'tcomcod',
                                          container  =>'headref'),
@@ -94,7 +94,7 @@ EOF
 
            new kernel::Field::Select(    name       =>'tcomcodrootcauseanalyse',
                                          label      =>'RootCause Analyses',
-                                         selectwidth=>'20%',
+                                         htmleditwidth=>'20%',
                                          default    =>'no',
                                          jsonchanged=>$rootcauseana,
                                          value      =>[qw(no yes)],
