@@ -171,8 +171,7 @@ sub ProcessLine
       }
    }
    $d.="</td>";
-   $d.="<td onClick=$lineonclick ".
-       "class=subdatafield valign=top style=\"width:auto\">";
+   $d.="<td class=subdatafield valign=top style=\"width:auto;cursor:auto\">";
    $d.="<div class=workflowmultilinetext>";
    $d.="<table width=100% cellspacing=0 cellpadding=0>".
        "<tr><td align=left valign=top>";
@@ -233,7 +232,7 @@ sub ProcessLine
             $data=~s/>/&gt;/g;
             $d.="<table cellspacing=0 cellpadding=0 border=0".
                 "width=99% style=\"table-layout:fixed\"><tr><td>";
-            $d.="<pre class=multilinetext>".$data."</pre>";
+            $d.="<pre class=multilinetext>".FancyLinks($data)."</pre>";
             $d.="</td></tr></table>";
          }
       }
