@@ -430,19 +430,22 @@ sub process_engine
               local(*GUNZIPRDR,*GUNZIPERR,*MYSQLWTR,*MYSQLERR);
               my $gunzip_pid=open3(undef,*GUNZIPRDR,*GUNZIPERR,"$prog->{gunzip} -c $first");
               my $mysql_pid=open3(*MYSQLWTR,undef,*MYSQLERR,
-                                  "$prog->{mysql} $targetdb -e 'set autocommit=0;commit;'");
+                            "$prog->{mysql} $targetdb ");
+              print MYSQLWTR ("set autocommit=0;");
+              print MYSQLWTR ("commit;");
+           #   my $mysql_pid=open3(*MYSQLWTR,undef,*MYSQLERR,"$prog->{mysql} $targetdb ");
               while(my $line=<GUNZIPRDR>){
                  if ($convert){
                     $convert_flag=1 if($line=~m/^CREATE\s+TABLE.*\(/);      
                     if ($convert_flag==1 and $line=~m/ENGINE=\w+\s/){
                        map({$_=~s/ENGINE=\w+\s/ENGINE=$convert /;} $line);
-                       print MYSQLWTR "$line";                
+                       print MYSQLWTR ("$line");                
                        $convert_flag=0;
                     }else{
-                       print MYSQLWTR "$line";                
+                       print MYSQLWTR ("$line");                
                     }
                  }else{
-                    print MYSQLWTR "$line";                
+                    print MYSQLWTR ("$line");                
                  }
               }
               close(GUNZIPRDR);
