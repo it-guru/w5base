@@ -46,7 +46,5 @@
 'AL_TCom.kern.costcenter'=>{de=>'Kostenstelle',en=>'CostCenter'},
 'AL_TCom.kern.bp'=>{de=>'Geschäftsprozess',en=>'Business process'},
 'AL_TCom.kern.bp.new'=>{de=>'Neueingabe',en=>'New'},
-'Tools.smatrix'=>{de=>'ServiceMatrix',en=>'ServiceMatrix'},
-'Tools.smatrix.new'=>{de=>'Neueingabe',en=>'New'},
 
 
