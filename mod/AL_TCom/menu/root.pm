@@ -270,15 +270,6 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
-   $self->RegisterObj("Tools.smatrix",
-                      "AL_TCom::smatrix",
-                      defaultacl=>['valid_user']);
-
-   $self->RegisterObj("Tools.smatrix.new",
-                      "AL_TCom::smatrix",
-                      func=>'New',
-                      defaultacl=>['admin']);
-
    $self->RegisterObj('AL_TCom::workflow::eventnotify$',
                       "base::workflow",
                       func=>'New',

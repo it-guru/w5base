@@ -1,8 +1,0 @@
-'AL_TCom::smatrix'=>{de=>'Service Matrix',en=>'Service matrix'},
-'fieldgroup.default'=>{de=>'TGU Kontakt',en=>'TGU Contact'},
-'fieldgroup.appl'=>{de=>'Anwendungsdaten',en=>'Application data'},
-'TGU Contact'=>{de=>'TGU Kontakt'},
-'Application'=>{de=>'Anwendung'},
-'CO-Number'=>{de=>'CO-Nummer'},
-'kernel::Output::HtmlGraphics'=>{de=>'Übersicht',en=>'Overview'},
-'Overview'=>{de=>'Übersicht'}
