@@ -133,7 +133,7 @@ sub getDefaultContractor
       }
    }
    if ($#devcon==-1){
-      $self->LastMsg(ERROR,"no developer found");
+      $self->LastMsg(ERROR,"no orderin found");
       return(undef);
    }
    return(undef,$devcon[0]->{target},$devcon[0]->{targetid},

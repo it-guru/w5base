@@ -551,13 +551,14 @@ sub _FancyLinks
       $res="<a href=\"$link\" title=\"$link\" target=_blank>$name</a>".$prefix;
    }
    else{
-      if (length($link)>35){
+      if (length($link)>55){
          my $start;
          my $ll=index($link,"//");
          $ll=index($link,"/",$ll+2);
-         $start=$ll+5;
-         $start=40 if ($start<10 || $start>40);
-         my $slink=substr($link,0,$start)."...".substr($link,length($link)-5,5);
+         $start=$ll+15;
+         $start=55 if ($start<10 || $start>55);
+         my $slink=substr($link,0,$start)."...".
+                   substr($link,length($link)-16,16);
          $res="<a href=\"$link\" target=_blank title=\"$link\">".
               "$slink</a>".$prefix;
       }
