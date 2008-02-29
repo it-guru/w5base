@@ -81,7 +81,7 @@ sub help
         --file         file or files for import (seperat files by comma)
         --mode         export, import or transfer
                        (default is export and transfer need option --targetdb)
-        --targetdb     target database in transfer mode
+        --targetdb     target database in transfer and import mode
         --tasks        number of tasks are be able running simultaneous 
         --exclude      tables excluded for dump (seperat tables by comma)
         --convert      save dump in spezial database format (InnoDB|MyISAM)
@@ -181,26 +181,34 @@ sub check_targetdb
    if ($? == 0){
       if ($force != 1){
          printf STDERR ("WARNING: the target database=$targetdb exists,
-maybe some tables will be overwritte!!
-You want continue? [y/N]: ");
-      chomp(my $decision=<STDIN>);
+the database will be drop!!
+Do you want continue? [y/N]: ");
+         chomp(my $decision=<STDIN>);
          if (!(lc($decision) eq "yes" or lc($decision) eq "y")){
             printf STDERR ("ERROR: abort by user\n");
             exit(1);
          }
+            
       }
-      return(0);
-   }else{
-      local(*ER);
-      open3(undef,undef,*ER,"$prog->{mysql} -e 'create database $targetdb'");
+      local(*DROPERR);
+      open3(undef,undef,*DROPERR,
+            "$prog->{mysql} -e 'drop database $targetdb;create database $targetdb'");
       wait();
       if ($? != 0){
-         printf STDERR ("ERROR: database %s cannot create! rc=%s\n",$targetdb,$?>>8);
+         printf STDERR ("ERROR: database %s cannot drop! rc=%s\n",$targetdb,$?>>8);
          exit(1);
       }
-      close(ER);
       return(0);
    }
+   local(*ER);
+   open3(undef,undef,*ER,"$prog->{mysql} -e 'create database $targetdb'");
+   wait();
+   if ($? != 0){
+      printf STDERR ("ERROR: database %s cannot create! rc=%s\n",$targetdb,$?>>8);
+      exit(1);
+   }
+   close(ER);
+   return(0);
 }
 
 
@@ -421,7 +429,8 @@ sub process_engine
               my $convert_flag=0;
               local(*GUNZIPRDR,*GUNZIPERR,*MYSQLWTR,*MYSQLERR);
               my $gunzip_pid=open3(undef,*GUNZIPRDR,*GUNZIPERR,"$prog->{gunzip} -c $first");
-              my $mysql_pid=open3(*MYSQLWTR,undef,*MYSQLERR,"$prog->{mysql} $targetdb");
+              my $mysql_pid=open3(*MYSQLWTR,undef,*MYSQLERR,
+                                  "$prog->{mysql} $targetdb -e 'set autocommit=0;commit;'");
               while(my $line=<GUNZIPRDR>){
                  if ($convert){
                     $convert_flag=1 if($line=~m/^CREATE\s+TABLE.*\(/);      
