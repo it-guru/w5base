@@ -100,7 +100,7 @@ sub completeWriteRequest
          }
       }
    }
-   printf STDERR ("itil:completeWriteRequest=%s\n",Dumper($newrec));
+   #printf STDERR ("itil:completeWriteRequest=%s\n",Dumper($newrec));
    return(1);
 }
 
