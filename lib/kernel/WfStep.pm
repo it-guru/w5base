@@ -241,6 +241,32 @@ sub Process
          }
          return(0);
       }
+      if ($op eq "wfdefer"){
+         my $app=$self->getParent->getParent;
+         my $note=Query->Param("note");
+         if ($note=~m/^\s*$/  || length($note)<10){
+            $self->LastMsg(ERROR,"empty or to short notes are not allowed");
+            return(0);
+         }
+         $note=trim($note);
+         my $oprec={};
+         $oprec->{stateid}=5;
+         my $postponeduntil=Query->Param("Formated_postponeduntil");
+         $oprec->{postponeduntil}=$app->ExpandTimeExpression($postponeduntil);
+         if ($oprec->{postponeduntil} ne ""){
+            if ($app->Action->StoreRecord($WfRec->{id},"wfdefer",
+                {translation=>'base::workflow::request'},$note)){
+               $self->StoreRecord($WfRec,$oprec);
+               $self->PostProcess($action.".".$op,$WfRec,$actions);
+               Query->Delete("note");
+               return(1);
+            }
+         }
+         else{
+            $app->LastMsg(ERROR,"invalid postponeduntil specifed");
+         }
+         return(0);
+      }
       if ($op eq "wfmailsend"){    # default mailsending handling
          my $emailto=Query->Param("emailto");
          my $note=Query->Param("emailmsg");
@@ -349,6 +375,15 @@ sub generateWorkspacePages
       $d.="</table>";
       $$divset.="<div id=OPwfmailsend>$d</div>";
    }
+   if (grep(/^wfdefer$/,@$actions)){
+      $$selopt.="<option value=\"wfdefer\" class=\"$class\">".
+                $self->getParent->T("wfdefer",$tr).
+                "</option>\n";
+      $$divset.="<div id=OPwfdefer>".$self->getDefaultNoteDiv($WfRec,
+                                                              mode=>"defer").
+                "</div>";
+   }
+
 }
 
 sub generateStoredWorkspace

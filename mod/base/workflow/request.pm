@@ -297,6 +297,7 @@ sub getPosibleActions
    if ((($stateid==4 || $stateid==3) && ($lastworker==$userid || $isadmin)) ||
        ($iscurrent && $userid==$creator)){
       push(@l,"wfaddnote");    # notiz hinzufügen        (jeder)
+      push(@l,"wfdefer");      # notiz hinzufügen        (jeder)
    }
    if (($stateid==2 || $stateid==7 || $stateid==10) &&
        ((($lastworker!=$userid) && 
