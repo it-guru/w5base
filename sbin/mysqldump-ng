@@ -441,12 +441,9 @@ sub process_engine
                        map({$_=~s/ENGINE=\w+\s/ENGINE=$convert /;} $line);
                        print MYSQLWTR ("$line");                
                        $convert_flag=0;
-                    }else{
-                       print MYSQLWTR ("$line");                
                     }
-                 }else{
-                    print MYSQLWTR ("$line");                
                  }
+                 print MYSQLWTR ("$line");                
               }
               close(GUNZIPRDR);
               close(MYSQLWTR);
@@ -460,14 +457,22 @@ sub process_engine
               exit(0);
            # transfer database
            }elsif($mode eq "transfer"){
+              my $convert_flag=0;
               local(*MYSQLDUMPRDR,*MYSQLDUMPERR,*MYSQLWTR,*MYSQLERR);
               my $mysqldump_pid=open3(undef,*MYSQLDUMPRDR,*MYSQLDUMPERR,
                                       "$prog->{mysqldump} -q -c $db $first");
               msg("INFO","transfer $first\n");
               my $mysql_pid=open3(*MYSQLWTR,undef,*MYSQLERR,"$prog->{mysql} $targetdb");
+              print MYSQLWTR ("set autocommit=0;");
+              print MYSQLWTR ("commit;");
               while(my $line=<MYSQLDUMPRDR>){
                  if ($convert){
-                    map({$_=~s/ENGINE=\w+\s/ENGINE=$convert /;} $line);
+                    $convert_flag=1 if($line=~m/^CREATE\s+TABLE.*\(/);      
+                    if ($convert_flag==1 and $line=~m/ENGINE=\w+\s/){
+                       map({$_=~s/ENGINE=\w+\s/ENGINE=$convert /;} $line);
+                       print MYSQLWTR ("$line"); 
+                       $convert_flag=0;
+                    }
                  }
                  print MYSQLWTR ("$line"); 
               }
