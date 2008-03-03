@@ -224,6 +224,33 @@ sub preProcessFilter
    return($subchanged+$changed,$err);
 }
 
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $name=$self->{name};
+   if (exists($newrec->{$name})){
+      my $val=$newrec->{$name};
+      if ($val eq "" && $self->{allowempty}==1){
+         return({$self->Name()=>$val});
+      }
+      else{
+         my @options=$self->getPostibleValues($oldrec,"edit");
+         while($#options!=-1){
+            my $key=shift(@options);
+            return({$self->Name()=>$val}) if ($val eq $key);
+            shift(@options);
+         }
+         $self->getParent->LastMsg(ERROR,"invalid native value ".
+                                         "'$val' in $name");
+         return(undef);
+      }
+   }
+   return({});
+}
+
 sub FormatedResult
 {
    my $self=shift;
