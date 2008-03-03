@@ -27,3 +27,4 @@
 'privatestate.1'=>{de=>'History ist nur für Admin und Ersteller sichtbar',en=>'>History ony for Admins and creator'},
 'Additional'=>{de=>'Zusatzinformationen'},
 'Action Ref'=>{de=>'Prozessinfos'},
+'wfautofinish'=>{de=>'automatisch beendet',en=>'auto finished'},
