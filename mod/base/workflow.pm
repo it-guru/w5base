@@ -101,7 +101,8 @@ sub new
                 label         =>'Workflow-State',
                 htmleditwidth =>'50%',
                 transprefix   =>'wfstate.',
-                value         =>[qw(1 2 3 4 5 6 7 8)],
+                value         =>[qw(0 1 2 3 4 5 6 7 8 9 10 16 
+                                    17 21 22 23 24 25)],
                 readonly      =>1,
                 dataobjattr   =>'wfhead.wfstate'),
                                    
