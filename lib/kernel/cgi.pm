@@ -25,8 +25,10 @@ sub new
 {
    my $type=shift;
    my $self={};
-   if ($ENV{REQUEST_METHOD} ne "GET" &&
-       $ENV{REQUEST_METHOD} ne "POST"){
+   if (($ENV{REQUEST_METHOD} ne "GET" &&
+       $ENV{REQUEST_METHOD} ne "POST") ||
+       $ENV{QUERY_STRING} eq "MOD=base::interface&FUNC=SOAP" ||
+       $ENV{QUERY_STRING} eq "FUNC=SOAP&MOD=base::interface"){
       $self->{'cgi'}=new CGI({});
    }
    else{

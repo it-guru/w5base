@@ -1,6 +1,6 @@
 package base::interface;
 #  W5Base Framework
-#  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2008  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -20,6 +20,9 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::App::Web;
+#use SOAP::Lite +trace => 'all', +debug=>'all';
+use SOAP::Lite;
+use SOAP::Transport::HTTP;
 use File::Temp(qw(tempfile));
 use CGI;
 @ISA=qw(kernel::App::Web);
@@ -36,7 +39,7 @@ sub new
 sub getValidWebFunctions
 {
    my ($self)=@_;
-   return(qw(io Empty));
+   return(qw(io Empty SOAP));
 }
 
 sub io
@@ -241,6 +244,8 @@ EOF
 sub XmlHead
 {
    my $self=shift;
+
+   
    my $d="Content-type: text/xml\n\n";
    $d.="<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n<root>\n";
    return($d);
@@ -252,5 +257,58 @@ sub XmlBottom
    return("</root>");
 }
 
+sub SOAP
+{
+   my $self=shift;
+
+   msg(INFO,"SOAP call from $ENV{REMOTE_USER}");
+   $W5Base::SOAP=$self;
+   SOAP::Transport::HTTP::CGI   
+    -> dispatch_to('interface::SOAP')
+    -> handle;
+}
+
+package interface::SOAP;
+use kernel;
+
+sub doSearch
+{
+   msg(INFO,"SOAP in search");
+   return([{id=>1,name=>'hans'},{id=>2,name=>'fritz'}]);
+}
+
+sub getHashList
+{
+   my $self=$W5Base::SOAP;
+   my $uri=shift;
+   my $objectname=shift;
+   my $view=shift;
+   my $filter=shift;
+
+   my $o=getModuleObject($self->Config,$objectname);
+
+   $o->SetFilter($filter); 
+   msg(INFO,"SOAPgetHashList in search objectname=$objectname");
+   my @l=$o->getHashList(@$view);
+   my $dummy=Dumper(\@l);
+   return({exitcode=>0,lastmsg=>[],records=>\@l});
+}
+
+sub validateObjectname
+{
+   my $self=$W5Base::SOAP;
+   my $uri=shift;
+   my $objectname=shift;
+   my $o=getModuleObject($self->Config,$objectname);
+
+   return(1) if (defined($o));
+   return(0);
+}
+
+sub Ping
+{
+   my $self=$W5Base::SOAP;
+   return(1);
+}
 
 1;

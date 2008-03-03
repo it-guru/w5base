@@ -31,6 +31,7 @@ sub process
    while(1){
       if (defined($nextrun) && $nextrun<=time()){
          $self->doCleanup();
+         $self->CleanupWorkflows();
          sleep(1);
       }
       my $current=time();
@@ -54,7 +55,7 @@ sub doCleanup
 
    my $CleanupJobLog=$self->getParent->Config->Param("CleanupJobLog");
 
-   $CleanupJobLog="<now-35d" if ($CleanupJobLog eq "");
+   $CleanupJobLog="<now-84d" if ($CleanupJobLog eq "");
 
    msg(DEBUG,"(%s) Processing doCleanup",$self->Self);
    my $j=$self->getParent->getPersistentModuleObject("base::joblog");
@@ -66,6 +67,50 @@ sub doCleanup
                                 });
    }
 }
+
+sub CleanupWorkflows
+{
+   my $self=shift;
+   my $wf=getModuleObject($self->getParent->Config,"base::workflow");
+   my $CleanupWorkflow=$self->getParent->Config->Param("CleanupWorkflow");
+   $CleanupWorkflow="<now-84d" if ($CleanupWorkflow eq "");
+
+
+
+   foreach my $stateid (qw(10 16 17)){
+      $wf->SetFilter({stateid=>\$stateid,
+                      mdate=>$CleanupWorkflow});
+      $wf->SetCurrentView(qw(id closedate stateid class));
+      $wf->SetCurrentOrder(qw(NONE));
+      $wf->Limit(100000);
+      my $c=0;
+
+      my ($rec,$msg)=$wf->getFirst();
+      if (defined($rec)){
+         do{
+            msg(INFO,"process $rec->{id} class=$rec->{class}");
+            if (1){
+               if ($wf->Action->StoreRecord($rec->{id},"wfautofinish",
+                   {translation=>'base::workflowaction'},"",undef)){
+                  my $closedate=$rec->{closedate};
+                  $closedate=NowStamp("en") if ($closedate eq "");
+
+                  $wf->UpdateRecord({stateid=>21,closedate=>$closedate},
+                                    {id=>\$rec->{id}});
+                  $wf->{DB}->do("update wfkey set wfstate='21',".
+                                "closedate='$closedate' where id='$rec->{id}'");
+                  $wf->StoreUpdateDelta({id=>$rec->{id},
+                                         stateid=>$rec->{stateid}},
+                                        {id=>$rec->{id},
+                                         stateid=>21});
+               }
+            }
+            ($rec,$msg)=$wf->getNext();
+         } until(!defined($rec));
+      }
+   }
+}
+
 
 
 

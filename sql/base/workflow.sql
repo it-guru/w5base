@@ -50,7 +50,7 @@ CREATE TABLE wfaction (
   editor varchar(100) NOT NULL default '',
   realeditor varchar(100) NOT NULL default '',
   PRIMARY KEY  (wfactionid),
-  KEY action (wfheadid,name),key(createuser),
+  KEY action (wfheadid,name),key(createuser,createdate),
   KEY modifydate (modifydate),
   KEY wfheadid (wfheadid)
 );
@@ -88,7 +88,7 @@ CREATE TABLE wfhead (
   PRIMARY KEY  (wfheadid),
   KEY openuser (openuser,wfstate),KEY modifyuser (modifyuser,wfstate),
   unique srcsys(srcsys,srcid),key srcid(srcid),
-  key srcload(srcsys,srcload),key modifydate(modifydate),
+  key srcload(srcsys,srcload),key modifydate(modifydate,wfstate),
   key fwd(fwdtarget,fwdtargetid,wfstate),
   key wfclass(wfclass,wfstep),
   key wfstep(wfstep)

@@ -320,7 +320,8 @@ sub getPosibleActions
       push(@l,"wfdireproc");
       push(@l,"wffine");
    }
-   push(@l,"nop") if ($#l==-1 && $stateid<=20);
+   push(@l,"nop") if (($#l==-1 && $stateid<=20) &&
+                      ($userid==$creator || $isadmin || $iscurrent));
    if ($creator==$userid && $stateid==2){
       push(@l,"wfbreak");
    }
