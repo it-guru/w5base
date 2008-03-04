@@ -99,6 +99,7 @@ sub HistoryResult
    my %param=@_;
 
    my $dataobjectid=Query->Param("CurrentId");
+   $dataobjectid=~s/^0*//;  # prevent leading zeros
    if ($dataobjectid ne ""){
       $self->ResetFilter();
       my $idobj=$self->IdField();
