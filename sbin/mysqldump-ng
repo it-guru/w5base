@@ -431,8 +431,9 @@ sub process_engine
               my $gunzip_pid=open3(undef,*GUNZIPRDR,*GUNZIPERR,"$prog->{gunzip} -c $first");
               my $mysql_pid=open3(*MYSQLWTR,undef,*MYSQLERR,
                             "$prog->{mysql} $targetdb ");
-              print MYSQLWTR ("set autocommit=0;");
-              print MYSQLWTR ("commit;");
+              print MYSQLWTR ("SET AUTOCOMMIT=0;\n");
+              print MYSQLWTR ("SET UNIQUE_CHECKS=0;\n");
+              print MYSQLWTR ("SET FOREIGN_KEY_CHECKS = 0;\n");
            #   my $mysql_pid=open3(*MYSQLWTR,undef,*MYSQLERR,"$prog->{mysql} $targetdb ");
               while(my $line=<GUNZIPRDR>){
                  if ($convert){
@@ -445,6 +446,7 @@ sub process_engine
                  print MYSQLWTR ("$line");                
               }
               close(GUNZIPRDR);
+              print MYSQLWTR ("COMMIT;\n");
               close(MYSQLWTR);
               msg("INFO","import $first\n");
               waitpid($gunzip_pid,0);
