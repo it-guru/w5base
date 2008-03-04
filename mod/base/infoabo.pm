@@ -237,7 +237,7 @@ sub initSearchQuery
       my $userid=$self->getCurrentUserId();
       my $UserCache=$self->Cache->{User}->{Cache};
       if (defined($UserCache->{$ENV{REMOTE_USER}}) &&
-          !defined(Query->Param("search_user")){
+          !defined(Query->Param("search_user"))){
          Query->Param("search_user"=>'"'.
                       $UserCache->{$ENV{REMOTE_USER}}->{rec}->{fullname}.'"');
       }
