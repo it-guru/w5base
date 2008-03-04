@@ -84,7 +84,6 @@ sub new
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
                 vjoinon       =>['id'=>'systemid'],
                 vjoindisp     =>['appl','applcistatus'],
-                vjoindispxls  =>['appl'],
                 vjoininhash   =>['appl','applcistatusid','mandatorid',
                                  'applid']),
 

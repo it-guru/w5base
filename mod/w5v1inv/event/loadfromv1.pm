@@ -1179,7 +1179,8 @@ sub LoadInterfaces
                   srcid=>$rec->{id},
                   srcsys=>"W5BaseV1",
                  );
-      print Dumper($rec);
+      delete($newrec{conmode}) if ($newrec{conmode} eq "");
+      #print Dumper($rec);
       $self->{lnkapplappl}->ValidatedInsertOrUpdateRecord(\%newrec,
                             {srcid=>$newrec{srcid},srcsys=>$newrec{srcsys}});
    }

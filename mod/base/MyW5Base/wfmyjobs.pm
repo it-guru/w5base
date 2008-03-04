@@ -41,12 +41,38 @@ sub Init
 sub getDefaultStdButtonBar
 {
    my $self=shift;
-   return('%StdButtonBar(deputycontrol,print,search)%');
+   return('%StdButtonBar(deputycontrol,wfstatecontrol,print,search)%');
 }
 
 sub getQueryTemplate
 {
    my $self=shift;
+   my $prio=Query->Param("search_prioid");
+   Query->Param("search_prioid"=>'<10') if (!defined($prio));
+   my $viewstate=Query->Param("VIEWSTATE");
+   $viewstate="HIDEUNNECESSARY" if (!defined($viewstate));
+   my $VS="<select name=VIEWSTATE style=\"width:100%\">";
+
+   $VS.="<option value=\"HIDEUNNECESSARY\"";
+   $VS.=" selected" if ($viewstate eq "HIDEUNNECESSARY");
+   $VS.=">";
+   $VS.=$self->getParent->T("hide defered, pending");
+   $VS.="</option>";
+
+   $VS.="<option value=\"ONLYDEFFERED\"";
+   $VS.=" selected" if ($viewstate eq "ONLYDEFFERED");
+   $VS.=">";
+   $VS.=$self->getParent->T("only defered workflows");
+   $VS.="</option>";
+
+   $VS.="<option value=\"\"";
+   $VS.=" selected" if ($viewstate eq "");
+   $VS.=">";
+   $VS.=$self->getParent->T("show all");
+   $VS.="</option>";
+   $VS.="</select>";
+   my $wffilter=$self->getParent->T("Workflow Filter");
+
    my $bb=<<EOF;
 <div class=searchframe>
 <table class=searchframe>
@@ -61,6 +87,12 @@ sub getQueryTemplate
 <td class=finput width=50% >\%class(search)\%</td>
 <td class=fname width=10%>\%state(label)\%:</td>
 <td class=finput width=30%>\%stateid(search)\%</td>
+</tr>
+<tr>
+<td class=fname width=10%>$wffilter:</td>
+<td class=finput width=50% >$VS</td>
+<td class=fname width=10%>&nbsp;</td>
+<td class=finput width=30%>&nbsp;</td>
 </tr>
 </table>
 </div>
@@ -94,6 +126,7 @@ sub Result
 
    $userid=-1 if (!defined($userid) || $userid==0);
    my $dc=Query->Param("EXVIEWCONTROL");
+   my $vs=Query->Param("VIEWSTATE");
    my @q=();
    if ($dc eq "ADDDEP" || $dc eq "DEPONLY"){
       my %q1=%q;
@@ -102,10 +135,26 @@ sub Result
       $q1{fwddebtarget}=\'base::user';
       $q1{stateid}.=" AND " if ($q1{stateid} ne "");
       $q1{stateid}.="<20";
+      if ($vs eq "HIDEUNNECESSARY"){
+         $q1{stateid}.=" AND " if ($q1{stateid} ne "");
+         $q1{stateid}.=" !6 AND !5";  # hide defered pending
+      }
+      if ($vs eq "ONLYDEFFERED"){
+         $q1{stateid}.=" AND " if ($q1{stateid} ne "");
+         $q1{stateid}.="5";
+      }
       $q2{fwddebtargetid}=\@grpids;
       $q2{fwddebtarget}=\'base::grp';
       $q2{stateid}.=" AND " if ($q2{stateid} ne "");
       $q2{stateid}.="<20";
+      if ($vs eq "HIDEUNNECESSARY"){
+         $q2{stateid}.=" AND " if ($q2{stateid} ne "");
+         $q2{stateid}.=" !6 AND !5";  # hide defered pending
+      }
+      if ($vs eq "ONLYDEFFERED"){
+         $q2{stateid}.=" AND " if ($q2{stateid} ne "");
+         $q2{stateid}.="5";
+      }
       push(@q,\%q1,\%q2);
    }
    if ($dc ne "DEPONLY"){
@@ -116,11 +165,26 @@ sub Result
       $q1{fwdtarget}=\'base::user';
       $q1{stateid}.=" AND " if ($q1{stateid} ne "");
       $q1{stateid}.="<20";
+      if ($vs eq "HIDEUNNECESSARY"){
+         $q1{stateid}.=" AND " if ($q1{stateid} ne "");
+         $q1{stateid}.=" !6 AND !5";  # hide defered pending
+      }
+      if ($vs eq "ONLYDEFFERED"){
+         $q1{stateid}.=" AND " if ($q1{stateid} ne "");
+         $q1{stateid}.="5";
+      }
       $q2{fwdtargetid}=\@grpids;
       $q2{fwdtarget}=\'base::grp';
       $q2{stateid}.=" AND " if ($q2{stateid} ne "");
       $q2{stateid}.="<20";
-
+      if ($vs eq "HIDEUNNECESSARY"){
+         $q2{stateid}.=" AND " if ($q2{stateid} ne "");
+         $q2{stateid}.=" !6 AND !5";  # hide defered pending
+      }
+      if ($vs eq "ONLYDEFFERED"){
+         $q2{stateid}.=" AND " if ($q2{stateid} ne "");
+         $q2{stateid}.="5";
+      }
       my %id=();  # this hack prevents searches over two keys (this is bad)
       $self->{DataObj}->SetFilter([\%q1,\%q2]);
       my @l=$self->{DataObj}->getHashList(qw(id));
@@ -128,7 +192,15 @@ sub Result
 
       $q3{owner}=\$userid;
       $q3{stateid}.=" AND " if ($q3{stateid} ne "");
-      $q3{stateid}.="<=6";
+      if ($vs eq "HIDEUNNECESSARY"){
+         $q3{stateid}.="<=4";
+      }
+      elsif ($vs eq "ONLYDEFFERED"){
+         $q3{stateid}.="5";
+      }
+      else{
+         $q3{stateid}.="<=6";
+      }
 
       $self->{DataObj}->SetFilter([\%q3]);
       my @l=$self->{DataObj}->getHashList(qw(id));

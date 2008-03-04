@@ -233,16 +233,27 @@ sub Validate
    my $name=$self->{name};
    if (exists($newrec->{$name})){
       my $val=$newrec->{$name};
-      if ($val eq "" && $self->{allowempty}==1){
+      if (($val eq "" || (ref($val) eq "ARRAY" && $#{$val}==-1)) 
+          && $self->{allowempty}==1){
          return({$self->Name()=>$val});
       }
       else{
          my @options=$self->getPostibleValues($oldrec,"edit");
+         my @nativ;
          while($#options!=-1){
             my $key=shift(@options);
-            return({$self->Name()=>$val}) if ($val eq $key);
-            shift(@options);
+            push(@nativ,$key);
          }
+         my $failfound=0;
+         my $chkval=$val;
+         my $chkval=[$chkval] if (ref($chkval) ne "ARRAY");
+         foreach my $v (@$chkval){
+            if (!grep(/^$v$/,@nativ)){
+               $failfound++;
+               last;
+            }
+         }
+         return({$self->Name()=>$val}) if (!$failfound);
          $self->getParent->LastMsg(ERROR,"invalid native value ".
                                          "'$val' in $name");
          return(undef);
