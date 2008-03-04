@@ -60,7 +60,7 @@ sub new
 
       new kernel::Field::Text(    name       =>'systemid',
                                   label      =>'SystemID',
-                                  dataobjattr     =>'bchw.sid',
+                                  dataobjattr     =>'bchw.sger',
                                   group      =>'30'),
 
       new kernel::Field::Text(    name       =>'acname',
