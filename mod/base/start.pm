@@ -86,7 +86,7 @@ function ForumCheck()
 }
 window.setTimeout("ForumCheck();", 2000);
 </script>
-<iframe frameborder=0 border=0 style="visibility:hidden" src="../msg/Empty" width=220 height=22 name=ForumCheck id=ForumCheck></iframe>
+<iframe style="visibility:hidden" frameborder=0 border=0 src="../msg/Empty" width=220 height=22 name=ForumCheck id=ForumCheck></iframe>
 EOF
                return($code);
             }
