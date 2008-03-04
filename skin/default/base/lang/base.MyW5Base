@@ -7,4 +7,4 @@
   de=>"Die angeforderte Abfrage ist derzeit nicht unterstützt oder hat interne Fehler"},
 'modify user properties'=>{de=>'Benutzereinstellungen verändern'},
 'bookmarks'=>{de=>'Lesezeichen'},
-'current topics from the Knwlege-Management Forum'=>{de=>'aktuelle Themen aus dem Wissensmanagement-Forum'},
+'current topics from the Knowledge-Management Forum'=>{de=>'aktuelle Themen aus dem Wissensmanagement-Forum'},

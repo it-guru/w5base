@@ -20,8 +20,6 @@ package W5Base::API;
 use strict;
 use vars qw(@EXPORT @ISA);
 use Exporter;
-#use SOAP::Lite +trace=>'all';
-use SOAP::Lite;
 use Getopt::Long;
 use FindBin qw($RealScript);
 
@@ -192,12 +190,26 @@ sub createConfig
    my $base=shift;
    my $user=shift;
    my $pass=shift;
+   my $lang=shift;
+   my $debug=shift;
 
    $W5Base::User=$user;
    $W5Base::Pass=$pass;
    $base.="/" if (!($base=~m/\/$/));
+   $lang="en" if ($lang eq "");
    my $proxy=$base.="base/interface/SOAP";
    my $uri="http://w5base.net/interface/SOAP";
+
+   if ($debug){
+      eval("use SOAP::Lite +trace=>'all';");
+   }
+   else{
+      eval("use SOAP::Lite;");
+   }
+   if ($@ ne ""){
+      msg(ERROR,$@);
+      exit(128);
+   }
    my $SOAP=SOAP::Lite->uri($uri)->proxy($proxy);
 
    my $result=eval("\$SOAP->Ping()->result;");
@@ -246,7 +258,8 @@ sub getHashList
 {
    my $self=shift;
    my @view=@_;
-   my $res=$self->SOAP->getHashList($self->Name,\@view,$self->{FILTER})->result;
+   my $res=$self->SOAP->getHashList({dataobject=>$self->Name,
+                      view=>\@view,filter=>$self->{FILTER}})->result;
    $self->{EXITCODE}=$res->{exitcode};
    if ($self->{EXITCODE}==0){
       delete($self->{LASTMSG});

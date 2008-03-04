@@ -281,9 +281,13 @@ sub getHashList
 {
    my $self=$W5Base::SOAP;
    my $uri=shift;
-   my $objectname=shift;
-   my $view=shift;
-   my $filter=shift;
+   my $param=shift;
+   my $objectname=$param->{dataobject};
+   my $view=$param->{view};
+   my $filter=$param->{filter};
+   if (!($objectname=~m/^.+::.+$/)){
+      return({exitcode=>128,lastmsg=>['invalid dataobject name']});
+   }
 
    my $o=getModuleObject($self->Config,$objectname);
 

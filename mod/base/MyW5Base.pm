@@ -296,7 +296,7 @@ sub addNewsFrame
            "<tr><td valign=center>".
            "<a target=msel class=winframehead ".
            "href=\"../../base/menu/msel/faq.forum\">".
-         $self->T("current topics from the Knwlege-Management Forum").
+         $self->T("current topics from the Knowledge-Management Forum").
            ":</a></td><td align=right valign=top>".
            "</td></tr></table>";
    $news.="</div><div class=winframebody id=news ".
