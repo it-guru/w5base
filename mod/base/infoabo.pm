@@ -236,7 +236,8 @@ sub initSearchQuery
    if ($self->IsMemberOf($self->{admread},"RMember")){
       my $userid=$self->getCurrentUserId();
       my $UserCache=$self->Cache->{User}->{Cache};
-      if (defined($UserCache->{$ENV{REMOTE_USER}})){
+      if (defined($UserCache->{$ENV{REMOTE_USER}}) &&
+          !defined(Query->Param("search_user")){
          Query->Param("search_user"=>'"'.
                       $UserCache->{$ENV{REMOTE_USER}}->{rec}->{fullname}.'"');
       }
