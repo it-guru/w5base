@@ -148,7 +148,6 @@ sub VerifyAssetCenterData
                   my ($rec,$msg)=$w1lnk->getOnlyFirst(qw(id));
                   if (!defined($rec)){
                      $desc.="- no applications assigned in W5Base/CMDB";
-                     return();
                   }
                }
                if (defined($w5v1srec)){ 
@@ -208,7 +207,8 @@ sub VerifyAssetCenterData
                   my $bk=$wf->Store($WfRec,$issue);
                }
                #############################################################
-#exit(1);
+#exit(1) if ($sysrec->{systemid} eq "S01312120");
+
             }
          }
       }
