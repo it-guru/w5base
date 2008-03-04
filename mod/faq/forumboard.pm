@@ -191,6 +191,14 @@ sub new
    return($self);
 }
 
+sub getValidWebFunctions
+{
+   my ($self)=@_;
+   return($self->SUPER::getValidWebFunctions(),"setSubscribe");
+}
+
+
+
 sub Validate
 {
    my $self=shift;
@@ -293,6 +301,28 @@ sub getRecordImageUrl
    my $self=shift;
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/faq/load/board.jpg?".$cgi->query_string());
+}
+
+
+sub setSubscribe
+{
+   my $self=shift;
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(title=>"",body=>1);
+   if ($ENV{REMOTE_USER} ne "anonymous"){
+      my ($op,$refid,$mode,$active)=split(/\//,Query->Param("FUNC"));
+      if ($refid=~m/^\d+$/ && $mode ne "" && 
+          ($active eq "1" || $active eq "0")){
+         my $userid=$self->getCurrentUserId();
+         my $ia=getModuleObject($self->Config,"base::infoabo");
+         $ia->ValidatedInsertOrUpdateRecord(
+                        {refid=>$refid,parentobj=>"faq::forumboard",
+                         userid=>$userid,mode=>$mode,active=>$active},
+                        {refid=>\$refid,parentobj=>\"faq::forumboard",
+                         userid=>$userid,mode=>\$mode});
+      }
+   }
+   print $self->HtmlBottom(body=>1);
 }
 
 

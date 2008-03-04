@@ -32,7 +32,7 @@ sub ParseTemplateVars
 
    $$mask=~s/\\\%/\@\@\@\%\@\@\@/g;
    $$mask=~s/\%INCLUDE\(([a-zA-Z\.0-9].+?)\)\%/&TemplInclude($self,$opt,$1)/ge;
-   $$mask=~s/\%([a-zA-Z0-9\.]+?)\%/&ProcessVar($self,$opt,$1)/ge;
+   $$mask=~s/\%([a-zA-Z0-9\.\/]+?)\%/&ProcessVar($self,$opt,$1)/ge;
    $$mask=~s/\%([a-zA-Z][^\%]+?)\%/&ProcessVar($self,$opt,$1)/ge;
    $$mask=~s/\@\@\@\%\@\@\@/\%/g;
 }

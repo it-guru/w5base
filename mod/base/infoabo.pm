@@ -282,20 +282,19 @@ sub getModesFor
    my $parentobj=shift;
 
 
-   if ($parentobj eq "base::staticinfoabo"){
-      my $st=getModuleObject($self->Config,"base::staticinfoabo");
-      my @ll;
-      foreach my $rec ($st->getHashList(qw(id name fullname))){
-         push(@ll,$rec->{name});
-         push(@ll,$rec->{fullname});
-      }
-      return(@ll);
-   }
    my @res=();
+   if ($parentobj eq "base::staticinfoabo" || $parentobj eq ""){
+      my $st=getModuleObject($self->Config,"base::staticinfoabo");
+      foreach my $rec ($st->getHashList(qw(id name fullname))){
+         push(@res,$rec->{name});
+         push(@res,$rec->{fullname});
+      }
+      return(@res) if ($parentobj eq "base::staticinfoabo");
+   }
    foreach my $obj (values(%{$self->{infoabo}})){
       my ($ctrl)=$obj->getControlData($self);
       foreach my $obj (keys(%$ctrl)){
-         if ($parentobj eq $obj){
+         if ($parentobj eq $obj || $parentobj eq ""){
             my @l=@{$ctrl->{$obj}->{mode}};
             while(my $m=shift(@l)){
                my $t=shift(@l);
@@ -305,7 +304,6 @@ sub getModesFor
       }
    }
    return(@res);
-   return;
 }
 
 sub getPostibleModes
@@ -329,10 +327,7 @@ sub getPostibleModes
       }
       return(@opt);
    }
-   if ($parent ne ""){
-      return($self->getParent->getModesFor($parent));
-   }
-   return();
+   return($self->getParent->getModesFor($parent));
 }
 
 sub getPostibleParentObjs
@@ -552,11 +547,11 @@ sub WinHandleInfoAboSubscribe
       }
       push(@flt,$localflt);
    }
-   printf STDERR ("fifi flt=%s\n",Dumper(\@flt));
+   #printf STDERR ("fifi flt=%s\n",Dumper(\@flt));
    $self->ResetFilter();
    $self->SetFilter(\@flt);
    my @cur=$self->getHashList(qw(parentobj refid active mode));
-   printf STDERR ("fifi cur=%s\n",Dumper(\@cur));
+   #printf STDERR ("fifi cur=%s\n",Dumper(\@cur));
 
    my $statusmsg="";
    my $statusbtn;

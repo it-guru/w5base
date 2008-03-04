@@ -41,6 +41,7 @@ sub Run
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','mainwork.css'],
                            title=>$title,
+                           js=>['toolbox.js'],
                            body=>1,form=>1);
    print "<script language=\"JavaScript\" ".
          "src=\"../../base/load/toolbox.js\"></script>";
@@ -48,6 +49,59 @@ sub Run
    print $self->HtmlBottom(body=>1,form=>1);
    return(0);
 }
+
+sub findtemplvar
+{
+   my $self=shift;
+   my $opt=$_[0];
+   my $var=$_[1];
+
+   my $chkobj=$self;
+   if ($var eq "FORUMCHECK" && defined($_[2]) && $ENV{REMOTE_USER} ne "anonymous"){
+      my $bo=getModuleObject($self->Config,"faq::forumboard");
+      if (defined($bo)){
+         $bo->SetFilter({name=>\$_[2]});
+         my ($borec,$msg)=$bo->getOnlyFirst(qw(id));
+         if (defined($borec)){
+            my $userid=$self->getCurrentUserId();
+            my $ia=getModuleObject($self->Config,"base::infoabo");
+            $ia->SetFilter({refid=>\$borec->{id},parentobj=>\"faq::forumboard",
+                            userid=>$userid,mode=>\"foaddtopic"});
+            my ($iarec,$msg)=$ia->getOnlyFirst(qw(id));
+            if (!defined($iarec)){
+               my $msg=sprintf($self->T("You currently haven't subscribe the '\%s' Forum. By subscribing this forum, you will get useful informations for you. Klick OK if you wan't to subscribe this forum."),$_[2]);
+               my $code=<<EOF;
+<script language="JavaScript">
+function ForumCheck()
+{
+  var r=confirm("$msg");
+  if (r){
+     window.document.getElementById("ForumCheck").src=
+               "../../faq/forumboard/setSubscribe/$borec->{id}/foaddtopic/1";
+  }
+  else{
+     window.document.getElementById("ForumCheck").src=
+               "../../faq/forumboard/setSubscribe/$borec->{id}/foaddtopic/0";
+  }
+}
+window.setTimeout("ForumCheck();", 2000);
+</script>
+<iframe frameborder=0 border=0 style="visibility:hidden" src="../msg/Empty" width=220 height=22 name=ForumCheck id=ForumCheck></iframe>
+EOF
+               return($code);
+            }
+            return(undef);
+         }
+         return("ERROR: can't find form $_[2]");
+      }
+      return(undef);
+   }
+
+   return($self->kernel::TemplateParsing(@_));
+}
+
+
+
 
 
 1;
