@@ -48,7 +48,8 @@ sub msg
    }
    else{
       foreach my $submsg (split(/\n/,$msg)){
-         printf STDOUT ($format,$type.":",$submsg) if ($Main::VERBOSE);
+         printf STDOUT ($format,$type.":",$submsg) if ($Main::VERBOSE ||
+                                                       $type eq "INFO");
       }
    }
 }
@@ -193,6 +194,8 @@ sub createConfig
    my $pass=shift;
    my $lang=shift;
    my $debug=shift;
+   my $backexitcode=shift;
+   my $backexitmsg=shift;
 
    $W5Base::User=$user;
    $W5Base::Pass=$pass;
@@ -213,9 +216,43 @@ sub createConfig
    }
    my $SOAP=SOAP::Lite->uri($uri)->proxy($proxy);
 
-   my $result=eval("\$SOAP->Ping()->result;");
+   my $SOAPresult=eval("\$SOAP->Ping();");
+   my $result;
+   if (!($SOAP->transport->status=~m/^(200|500)\s.*$/)){
+      if (defined($backexitmsg)){
+         $$backexitmsg=$SOAP->transport->status;
+      }
+      else{
+         msg(ERROR,"HTTP transport error");
+         msg(ERROR,$SOAP->transport->status);
+      }
+      if (defined($backexitcode)){
+         $$backexitcode=255;
+      }
+      else{
+         exit(255);
+      }
+   }
+   if (defined($SOAPresult)){
+      if ($SOAPresult->faultcode){
+         if (defined($backexitmsg)){
+            $backexitmsg=$SOAPresult->faultstring;
+         }
+         else{
+            msg(ERROR,"server error: ".$SOAPresult->faultstring);
+         }
+         if (defined($backexitcode)){
+            $$backexitcode=255;
+         }
+         else{
+            exit(255);
+         }
+      }
+      $result=$SOAPresult->result;
+   }
+   
 
-   return(undef) if (!defined($result));
+   return(undef) if (!defined($result) || $result==0);
 
    return({base=>$base,user=>$user,pass=>$pass,SOAP=>$SOAP,
            lang=>$lang,debug=>$debug});
@@ -226,9 +263,9 @@ sub getModuleObject
    my $config=shift;
    my $objectname=shift;
    my $SOAP=$config->{SOAP};
-   my $result=eval("\$SOAP->validateObjectname({dataobject=>\$objectname,
-                                                lang=>\$config->{lang}})
-                          ->result;");
+   my $SOAPresult=eval("\$SOAP->validateObjectname({dataobject=>\$objectname,
+                                                lang=>\$config->{lang}})");
+   my $result=$SOAPresult->result;
    return(undef) if (!defined($result) || $result->{exitcode}!=0);
    return(new W5Base::ModuleObject(CONFIG=>$config,SOAP=>$SOAP,
                                    NAME=>$objectname));
@@ -254,17 +291,19 @@ sub new
 sub showFields
 {
    my $self=shift;
-   my $res=$self->SOAP->showFields({dataobject=>$self->Name,
-                                    lang=>$self->Config->{lang}
-                                   })->result;
+   my $SOAPresult=$self->SOAP->showFields({dataobject=>$self->Name,
+                                           lang=>$self->Config->{lang}});
 
-   $self->{exitcode}=$res->{exitcode};
-   if ($self->{exitcode}==0){
-      delete($self->{lastmsg});
-      return(@{$res->{records}});
+   my $result=$self->_analyseSOAPresult($SOAPresult);
+   if (defined($result)){
+      $self->{exitcode}=$result->{exitcode};
+      if ($self->{exitcode}==0){
+         delete($self->{lastmsg});
+         return(@{$result->{records}});
+      }
+      $self->{lastmsg}=$result->{lastmsg};
    }
-   $self->{lastmsg}=$res->{lastmsg};
-   return(undef);
+   return;
 }
 
 sub LastMsg
@@ -273,11 +312,11 @@ sub LastMsg
    my $msg=shift;
 
    if (wantarray()){
-      return(undef) if (!defined($self->{LastMsg}));
-      return(@{$self->{LastMsg}});
+      return(undef) if (!defined($self->{lastmsg}));
+      return(@{$self->{lastmsg}});
    }
-   return(0) if (!defined($self->{LastMsg}));
-   return($#{$self->{LastMsg}}+1);
+   return(0) if (!defined($self->{lastmsg}));
+   return($#{$self->{lastmsg}}+1);
 }
 
 sub dieOnERROR
@@ -316,18 +355,20 @@ sub getHashList
 {
    my $self=shift;
    my @view=@_;
-   my $res=$self->SOAP->getHashList({dataobject=>$self->Name,
-                                     view=>\@view,
-                                     lang=>$self->Config->{lang},
-                                     filter=>$self->Filter
-                                    })->result;
-   $self->{exitcode}=$res->{exitcode};
-   if ($self->{exitcode}==0){
-      delete($self->{lastmsg});
-      return(@{$res->{records}});
+   my $SOAPresult=$self->SOAP->getHashList({dataobject=>$self->Name,
+                                            view=>\@view,
+                                            lang=>$self->Config->{lang},
+                                            filter=>$self->Filter});
+   my $result=$self->_analyseSOAPresult($SOAPresult);
+   if (defined($result)){
+      $self->{exitcode}=$result->{exitcode};
+      if ($self->{exitcode}==0){
+         delete($self->{lastmsg});
+         return(@{$result->{records}});
+      }
+      $self->{lastmsg}=$result->{lastmsg};
    }
-   $self->{lastmsg}=$res->{lastmsg};
-   return(undef);
+   return;
 }
 
 
@@ -346,19 +387,47 @@ sub storeRecord
       printf STDERR ("not supported\n");
       return(undef);
    }
-   my $res=$self->SOAP->storeRecord({dataobject=>$self->Name,
-                                     data=>$data,
-                                     lang=>$self->Config->{lang},
-                                     IdentifiedBy=>$flt})->result;
-   $self->{exitcode}=$res->{exitcode};
-printf STDERR ("fifi exitcode=$res->{lastmsg}\n");
-exit(1);
-   if ($self->{exitcode}==0){
-      delete($self->{lastmsg});
-      return($res->{IdentifiedBy});
+   my $SOAPresult=$self->SOAP->storeRecord({dataobject=>$self->Name,
+                                            data=>$data,
+                                            lang=>$self->Config->{lang},
+                                            IdentifiedBy=>$flt});
+   my $result=$self->_analyseSOAPresult($SOAPresult);
+   if (defined($result)){
+      $self->{exitcode}=$result->{exitcode};
+      if ($self->{exitcode}==0){
+         delete($self->{lastmsg});
+         return($result->{IdentifiedBy});
+      }
+      $self->{lastmsg}=$result->{lastmsg};
    }
-   $self->{lastmsg}=$res->{lastmsg};
    return(undef); 
+}
+
+sub _analyseSOAPresult
+{
+   my $self=shift; 
+   my $SOAPresult=shift;
+
+   if (!($self->SOAP->transport->status=~m/^(200|500)\s.*$/)){
+      $self->{lastmsg}=["ERROR:  transport(".$self->SOAP->transport->status.")"];
+      $self->{exitcode}=255;
+      return(undef);
+   }
+   if (defined($SOAPresult)){
+      if ($SOAPresult->faultcode){
+         my $faultstring=$SOAPresult->faultstring;
+         $faultstring=~s/\s*$//;
+         $self->{lastmsg}=["ERROR: method($faultstring)"];
+         $self->{exitcode}=254;
+         return(undef);
+      }
+   }
+   else{
+      $self->{lastmsg}=["ERROR: no valid SOAP result"];
+      $self->{exitcode}=253;
+      return(undef);
+   }
+   return($SOAPresult->result);
 }
 
 

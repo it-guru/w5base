@@ -77,10 +77,12 @@ else{
    if ($#l==0){
       my $rec=$l[0];
       printf("$rec->{fullname} ($rec->{userid})\n");
-      printf("$dstfield = '$rec->{$dstfield}'\n");
+      printf("\n");
+      msg(INFO,"befor update:");
+      msg(INFO,"$dstfield = '$rec->{$dstfield}'");
       if (defined($newval)){
          if (my $id=$user->storeRecord({$dstfield=>$newval},$rec->{userid})){
-            msg(INFO,"update done at id $id");
+            msg(DEBUG,"update done at id $id");
          }
          else{
             $user->dieOnERROR();
@@ -88,8 +90,9 @@ else{
          $user->SetFilter({accounts=>$loginuser});
          my @l=$user->getHashList(qw(fullname userid),$dstfield);
          my $rec=$l[0];
-         printf("\nafter update:\n");
-         printf("$dstfield = '$rec->{$dstfield}'\n");
+         printf("\n");
+         msg(INFO,"after update:");
+         msg(INFO,"$dstfield = '$rec->{$dstfield}'");
       }
    }
    elsif($#==-1){

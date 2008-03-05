@@ -45,32 +45,36 @@ if ($flt eq ""){
 #######################################################################
 # show fields
 #
-print("Fields in $objectname\n");
-my @fields=$user->showFields();
-foreach my $field (@fields){
-   printf("%-25s: %-20s: %s\n",
-          $field->{name},$field->{group},$field->{longtype});
+if (my @fields=$user->showFields()){
+   print("Fields in $objectname\n");
+   foreach my $field (@fields){
+      printf("%-25s: %-20s: %s\n",
+             $field->{name},$field->{group},$field->{longtype});
+   }
+   print("\n");
 }
-print("\n");
+$user->dieOnERROR();
 
 
 #######################################################################
 # do search
 #
 $user->SetFilter({fullname=>$flt});
-my @l=$user->getHashList(qw(fullname surname accounts));
-if ($#l==-1){
-   msg(INFO,"no data found in $objectname matching fullname=$flt");exit(2);
-}
-else{
-   foreach my $rec (@l){
-       printf("$rec->{fullname}\n");
-       foreach my $arec (@{$rec->{accounts}}){
-          printf(" - $arec->{account}\n");
-       }
+if (my @l=$user->getHashList(qw(fullname surname accounts))){
+   if ($#l==-1){
+      msg(INFO,"no data found in $objectname matching fullname=$flt");exit(2);
+   }
+   else{
+      foreach my $rec (@l){
+          printf("$rec->{fullname}\n");
+          foreach my $arec (@{$rec->{accounts}}){
+             printf(" - $arec->{account}\n");
+          }
+      }
    }
 }
-exit(1);
+$user->dieOnERROR();
+exit(0);
 
 #######################################################################
 sub Help

@@ -60,6 +60,7 @@ sub new
                 name          =>'usertyp',
                 label         =>'Usertyp',
                 htmleditwidth =>'100px',
+                default       =>'extern',
                 value         =>[qw(extern service user function)],
                 dataobjattr   =>'user.usertyp'),
 
@@ -489,6 +490,10 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
+   my $cistatusid=effVal($oldrec,$newrec,"cistatusid");
+   if (!defined($cistatusid)){
+      $newrec->{cistatusid}=1;
+   } 
    my $usertyp=effVal($oldrec,$newrec,"usertyp");
    $newrec->{surname}="FMB" if ($usertyp eq "function");
    if ($usertyp eq "service"){

@@ -355,6 +355,14 @@ sub storeRecord
              lastmsg=>[
                 msg(ERROR,'no unique idenitifier in dataobject found')]})); 
    }
+   else{
+      if (my $id=$o->SecureValidatedInsertRecord($newrec)){
+         return(interface::SOAP::kernel::Finish({exitcode=>0,
+                                                 IdentifiedBy=>$id})); 
+      }
+      return(interface::SOAP::kernel::Finish({exitcode=>10,
+             lastmsg=>[$o->LastMsg()]})); 
+   }
    return(interface::SOAP::kernel::Finish({exitcode=>-1}));
 }
 
