@@ -683,7 +683,7 @@ sub Lang
    }
    if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
       msg(INFO,"Warn: Lang(LANG)=%s not implemented! - ".
-                     "using en self=$self",$ENV{LANG});
+                     "using en caller=%s",join(",",caller(1)));
    }
    return("en");
 }

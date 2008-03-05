@@ -261,7 +261,6 @@ sub SOAP
 {
    my $self=shift;
 
-   msg(INFO,"SOAP call from $ENV{REMOTE_USER}");
    $W5Base::SOAP=$self;
    SOAP::Transport::HTTP::CGI   
     -> dispatch_to('interface::SOAP')
@@ -271,12 +270,6 @@ sub SOAP
 package interface::SOAP;
 use kernel;
 
-sub doSearch
-{
-   msg(INFO,"SOAP in search");
-   return([{id=>1,name=>'hans'},{id=>2,name=>'fritz'}]);
-}
-
 sub showFields
 {
    my $self=$W5Base::SOAP;
@@ -284,13 +277,17 @@ sub showFields
    my $param=shift;
    my $objectname=$param->{dataobject};
 
+   $ENV{HTTP_FORCE_LANGUAGE}=$param->{lang} if (defined($param->{lang}));
    if (!($objectname=~m/^.+::.+$/)){
-      return({exitcode=>128,lastmsg=>['invalid dataobject name']});
+      return(interface::SOAP::kernel::Finish({exitcode=>128,
+             lastmsg=>['invalid dataobject name']}));
    }
    my $o=getModuleObject($self->Config,$objectname);
    if (!defined($o)){
-      return({exitcode=>128,lastmsg=>['invalid dataobject specified']});
+      return(interface::SOAP::kernel::Finish({exitcode=>128,
+             lastmsg=>['invalid dataobject specified']}));
    }
+
    my @l;
    my @fieldlist=$o->getFieldList();
    foreach my $field (@fieldlist){
@@ -307,7 +304,8 @@ sub showFields
       }
       push(@l,$fielddesc);
    }
-   return({exitcode=>0,lastmsg=>[],records=>\@l});
+   return(interface::SOAP::kernel::Finish({exitcode=>0,
+          lastmsg=>[],records=>\@l}));
 }
 
 sub getHashList
@@ -319,12 +317,15 @@ sub getHashList
    my $view=$param->{view};
    my $filter=$param->{filter};
 
+   $ENV{HTTP_FORCE_LANGUAGE}=$param->{lang} if (defined($param->{lang}));
    if (!($objectname=~m/^.+::.+$/)){
-      return({exitcode=>128,lastmsg=>['invalid dataobject name']});
+      return(interface::SOAP::kernel::Finish({exitcode=>128,
+             lastmsg=>['invalid dataobject name']}));
    }
    my $o=getModuleObject($self->Config,$objectname);
    if (!defined($o)){
-      return({exitcode=>128,lastmsg=>['invalid dataobject specified']});
+      return(interface::SOAP::kernel::Finish({exitcode=>128,
+             lastmsg=>['invalid dataobject specified']}));
    }
 
    $o->SecureSetFilter($filter); 
@@ -335,25 +336,45 @@ sub getHashList
          defined($rec->{$field});
       }
    }
-   #my $dummy=Dumper(\@l);
-   return({exitcode=>0,lastmsg=>[],records=>\@l});
+   return(interface::SOAP::kernel::Finish({exitcode=>0,
+          lastmsg=>[],records=>\@l}));
 }
 
 sub validateObjectname
 {
    my $self=$W5Base::SOAP;
    my $uri=shift;
-   my $objectname=shift;
-   my $o=getModuleObject($self->Config,$objectname);
+   my $param=shift;
+   my $objectname=$param->{dataobject};
 
-   return(1) if (defined($o));
-   return(0);
+   $ENV{HTTP_FORCE_LANGUAGE}=$param->{lang} if (defined($param->{lang}));
+   if (!($objectname=~m/^.+::.+$/)){
+      return(interface::SOAP::kernel::Finish({exitcode=>128,
+             lastmsg=>['invalid dataobject name']}));
+   }
+   my $o=getModuleObject($self->Config,$objectname);
+   if (!defined($o)){
+      return(interface::SOAP::kernel::Finish({exitcode=>128,
+             lastmsg=>['invalid dataobject specified']}));
+   }
+
+   return(interface::SOAP::kernel::Finish({exitcode=>0}));
 }
 
 sub Ping
 {
    my $self=$W5Base::SOAP;
    return(1);
+}
+
+package interface::SOAP::kernel;
+use kernel;
+
+sub Finish
+{
+   my $result=shift;
+   delete($ENV{HTTP_FORCE_LANGUAGE});
+   return($result);
 }
 
 1;

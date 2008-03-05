@@ -216,7 +216,8 @@ sub createConfig
 
    return(undef) if (!defined($result));
 
-   return({base=>$base,user=>$user,pass=>$pass,SOAP=>$SOAP});
+   return({base=>$base,user=>$user,pass=>$pass,SOAP=>$SOAP,
+           lang=>$lang,debug=>$debug});
 }
 
 sub getModuleObject
@@ -224,8 +225,10 @@ sub getModuleObject
    my $config=shift;
    my $objectname=shift;
    my $SOAP=$config->{SOAP};
-   my $result=eval("\$SOAP->validateObjectname(\$objectname)->result;");
-   return(undef) if (!$result);
+   my $result=eval("\$SOAP->validateObjectname({dataobject=>\$objectname,
+                                                lang=>\$config->{lang}})
+                          ->result;");
+   return(undef) if (!defined($result) || $result->{exitcode}!=0);
    return(new W5Base::ModuleObject(CONFIG=>$config,SOAP=>$SOAP,
                                    NAME=>$objectname));
 }
@@ -257,7 +260,9 @@ sub SetFilter
 sub showFields
 {
    my $self=shift;
-   my $res=$self->SOAP->showFields({dataobject=>$self->Name})->result;
+   my $res=$self->SOAP->showFields({dataobject=>$self->Name,
+                                    lang=>$self->{CONFIG}->{lang}
+                                   })->result;
 
    $self->{EXITCODE}=$res->{exitcode};
    if ($self->{EXITCODE}==0){
@@ -273,7 +278,10 @@ sub getHashList
    my $self=shift;
    my @view=@_;
    my $res=$self->SOAP->getHashList({dataobject=>$self->Name,
-                      view=>\@view,filter=>$self->{FILTER}})->result;
+                                     view=>\@view,
+                                     lang=>$self->{CONFIG}->{lang},
+                                     filter=>$self->{FILTER}
+                                    })->result;
    $self->{EXITCODE}=$res->{exitcode};
    if ($self->{EXITCODE}==0){
       delete($self->{LASTMSG});

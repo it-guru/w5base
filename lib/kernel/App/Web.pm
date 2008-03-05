@@ -228,7 +228,10 @@ sub InitRequest
          else{
             $site=~s/\/public\/.*?$/\//;
          }
-         my $lang=$self->Lang();
+         my $lang="en";
+         if (Query->Param("MOD") ne "base::interface"){
+            $lang=$self->Lang();
+         }
 
 
 

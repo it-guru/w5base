@@ -16,7 +16,7 @@ my $optresult=XGetOptions(\%P,\&Help,undef,undef,".W5Base.Interface");
 my $apidebug=$verbose>=3 ? 1 : 0;
 my $Config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug);
 if (!defined($Config)){
-   msg(ERROR,"base or username/password is not valid");exit(1);
+   msg(ERROR,"base url or username/password is not valid");exit(1);
 }
 else{
    msg(DEBUG,"create of config ok");
@@ -36,38 +36,45 @@ else{
    msg(DEBUG,"create of ModuleObject $user ok");
 }
 
-my $flt=$ARGV[0];
-if ($flt eq ""){
-   msg(ERROR,"no filter specified");exit(3);
-}
+my $dstfield=shift(@ARGV);
+my $newval=join(" ",@ARGV);
 
 
 #######################################################################
 # show fields
 #
-print("Fields in $objectname\n");
+if ($verbose){
+   print("Fields in $objectname\n");
+}
+my $fieldfound=0;
 my @fields=$user->showFields();
 foreach my $field (@fields){
-   printf("%-25s: %-20s: %s\n",
-          $field->{name},$field->{group},$field->{longtype});
+   if ($verbose){
+      printf("%-25s: %-20s: %s\n",
+             $field->{name},$field->{group},$field->{longtype});
+   }
+   $fieldfound=1 if ($field->{name} eq $dstfield);
 }
-print("\n");
+if (!$fieldfound && $dstfield ne ""){
+   msg(ERROR,"field '$dstfield' not found in '$objectname'");exit(2);
+}
+if ($verbose){
+   print("\n");
+}
 
 
 #######################################################################
 # do search
 #
-$user->SetFilter({fullname=>$flt});
-my @l=$user->getHashList(qw(fullname surname accounts));
+$user->SetFilter({accounts=>$loginuser});
+my @l=$user->getHashList(qw(fullname userid),$dstfield);
 if ($#l==-1){
-   msg(INFO,"no data found in $objectname matching fullname=$flt");exit(2);
+   msg(INFO,"no data found in $objectname matching");exit(2);
 }
 else{
    foreach my $rec (@l){
-       printf("$rec->{fullname}\n");
-       foreach my $arec (@{$rec->{accounts}}){
-          printf(" - $arec->{account}\n");
-       }
+       printf("$rec->{fullname} ($rec->{userid})\n");
+       printf("$dstfield = '$rec->{$dstfield}'\n");
    }
 }
 exit(1);
