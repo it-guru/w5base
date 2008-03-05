@@ -1,0 +1,187 @@
+#!/usr/bin/perl
+use lib qw( /opt/w5base/lib);
+use strict;                   
+use W5Base::API;
+use Data::Dumper;
+use Fcntl qw(SEEK_SET);
+
+my $DefaultBase="https://w5base.net/w5base/auth/";
+my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang);
+my ($mode,$force,$hostname);
+my %o;
+my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
+       "webuser=s"=>\$loginuser,"webpass=s"=> \$loginpass,
+       "verbose+"=>\$verbose,
+       "force"=>\$force,"hostname"=>\$hostname,
+       "mode=s"=>\$mode);
+my @allowedmodes=qw(auto emc netapp);
+my $optresult=XGetOptions(\%P,\&Help,undef,undef,".W5Base.Interface");
+
+$mode="auto" if (!defined($mode));
+
+#######################################################################
+# create connection config
+#
+my $apidebug=$verbose>=3 ? 1 : 0;
+my $Config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug);
+if (!defined($Config)){
+   msg(ERROR,"base or username/password is not valid");exit(1);
+}
+else{
+   msg(DEBUG,"create of config ok");
+}
+msg(DEBUG,"verbose=$verbose");
+
+
+#
+# Datenobjecte laden
+#
+#
+#######################################################################
+# load ModuleObject
+#
+my %loadobj=('sys'=>'itil::system',
+             'lnknas'=>'itil::lnksystemnfsnas');
+foreach my $localid (keys(%loadobj)){
+   my $objectname=$loadobj{$localid};
+   my $obj=getModuleObject($Config,$objectname);
+   if (!defined($obj)){
+      msg(ERROR,"can't load object $objectname");exit(2);
+   }else{
+      msg(DEBUG,"create of ModuleObject $objectname ok");
+   }
+   $o{$localid}=$obj;
+}
+
+foreach my $file (@ARGV){
+   if (open(FILE,"<$file")){ 
+      my $curmode=$mode;
+      $curmode=detectMode(\*FILE) if ($mode eq "auto");
+      msg(DEBUG,"curmode=$curmode");
+      my %sharedata;
+      my $result=readFile(\*FILE,\%sharedata,$curmode);
+exit();
+      my @oplist;
+      my $result=calculateOperations(\%o,\%sharedata,\@oplist); 
+      if ($force){
+         my $result=processOperations(\%o,\@oplist);
+      }
+      close(FILE);
+   }
+}
+
+#######################################################################
+# detect import file
+#
+
+sub detectMode
+{
+   my $fh=shift;
+   my $mode;
+   while(<$fh>){
+      if ($_=~m/^export.*$/){
+         $mode="emc";
+      }elsif($_=~m/^.*sec=sys.*$/){
+         $mode="netapp";
+      }
+   }
+   return($mode);
+}
+
+#######################################################################
+# read file
+#
+
+sub readFile
+{
+   my $fh=shift;
+   my $sh=shift;
+   my $cm=shift;
+   seek($fh,SEEK_SET,0);
+   while(my $line=<$fh>){
+      $line=~s/\s*$//;
+      if ($cm eq "emc"){
+         next if ($line=~m/^\s*#.*$/);
+         next if ($line=~m/^\s*$/);
+         if (my ($path,$param)=$line=~m/^export\s+"([^"]+)"\s+(.*)\s*$/){
+            printf("fifi line='$line'\n");
+            my @param=split(/\s+/,$param); 
+            foreach my $param (@param){
+               if (my ($var,$ip)=$param=~m/^(\S+)=(.*)\s*$/){
+                  foreach my $ip (split(/:/,$ip)){
+                     printf("set %s = var=$var ip=$ip\n",$path);
+                  }
+               }
+               else{
+                  msg(WARN,"param problem $param");
+               }
+            }
+         }
+         else{
+            msg(WARN,$line);
+         }
+      }elsif($cm eq "netapp"){
+      }
+   }
+
+}
+
+#sub read_file
+#{
+#   my $emc=0;
+#   my $netapp=0;
+#   my $data;
+#   open(RDFILE,"<$file") or die("ERROR: open $file failed!");
+#   while(my $rec=<RDFILE>){
+#      if ($rec=~m/^export.*$/){
+#         $emc=1;
+#      }elsif($rec=~m/^.*sec=sys.*$/){
+#         $netapp=1;
+#      }
+#   }
+#   seek(RDFILE,SEEK_SET,0);
+#   if ($emc == 1){
+#      while(my $rec=<RDFILE>){
+#         if ($rec=~m/^export.*$/){
+#            my @dat=split(/\s+/,$rec); 
+#            foreach my $dat (@dat){
+#               $data->{$dat[1]}->{"rw"}->{$dat}="" if ($dat=~m/^rw=/); 
+#               $data->{$dat[1]}->{"root"}->{$dat}="" if ($dat=~m/^root=/);
+#               $data->{$dat[1]}->{"access"}->{$dat}="" if ($dat=~m/^access=/);
+#            } 
+#         }
+#      }
+#   }elsif($netapp == 1){
+#
+#   }else{
+#      printf STDERR ("ERROR: file format unknown!\n");
+#   }
+#}
+
+my $flt=$ARGV[0];
+if ($flt eq ""){
+   msg(ERROR,"no filter specified");exit(3);
+}
+
+
+#######################################################################
+sub Help
+{
+   print(<<EOF);
+$RealScript [options] File File ...
+
+   --verbose display more details of operation process
+   --quiet   only errors would be displayed
+   --base    base url of filemgmt (default: $DefaultBase)
+   --webuser username
+   --webpass password
+   --store   stores the parameters (not help,verbose and store)
+   --help    show this help
+
+   --mode    
+   --hostname
+   --force    
+EOF
+}
+#######################################################################
+exit(255);
