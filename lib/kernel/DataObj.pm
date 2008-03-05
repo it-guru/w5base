@@ -463,7 +463,7 @@ sub SecureValidate
           if ($fo->Type() eq "SubList" ||
               (!grep(/^ALL$/,@$wrgroups) &&
                !grep(/^$group$/,@$wrgroups))){
-             $self->LastMsg("write request to field '$wrfield' rejected");
+             $self->LastMsg(ERROR,"write request to field '$wrfield' rejected");
              return(0);
           }
        }

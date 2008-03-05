@@ -79,8 +79,11 @@ else{
       printf("$rec->{fullname} ($rec->{userid})\n");
       printf("$dstfield = '$rec->{$dstfield}'\n");
       if (defined($newval)){
-         if ($user->storeRecord({$dstfield=>$newval},$rec->{userid})){
-            msg(INFO,"update done");
+         if (my $id=$user->storeRecord({$dstfield=>$newval},$rec->{userid})){
+            msg(INFO,"update done at id $id");
+         }
+         else{
+            $user->dieOnERROR();
          }
          $user->SetFilter({accounts=>$loginuser});
          my @l=$user->getHashList(qw(fullname userid),$dstfield);

@@ -349,10 +349,11 @@ sub storeRecord
                    lastmsg=>[$o->LastMsg()]})); 
          }
          return(interface::SOAP::kernel::Finish({exitcode=>10,
-                lastmsg=>['can not find record for update']})); 
+                lastmsg=>[msg(ERROR,'can not find record for update')]})); 
       }
       return(interface::SOAP::kernel::Finish({exitcode=>20,
-             lastmsg=>['no unique idenitifier in dataobject found']})); 
+             lastmsg=>[
+                msg(ERROR,'no unique idenitifier in dataobject found')]})); 
    }
    return(interface::SOAP::kernel::Finish({exitcode=>-1}));
 }
@@ -369,12 +370,12 @@ sub getHashList
    $ENV{HTTP_FORCE_LANGUAGE}=$param->{lang} if (defined($param->{lang}));
    if (!($objectname=~m/^.+::.+$/)){
       return(interface::SOAP::kernel::Finish({exitcode=>128,
-             lastmsg=>['invalid dataobject name']}));
+             lastmsg=>[msg(ERROR,'invalid dataobject name')]}));
    }
    my $o=getModuleObject($self->Config,$objectname);
    if (!defined($o)){
       return(interface::SOAP::kernel::Finish({exitcode=>128,
-             lastmsg=>['invalid dataobject specified']}));
+             lastmsg=>[msg(ERROR,'invalid dataobject specified')]}));
    }
 
    $o->SecureSetFilter($filter); 
@@ -399,12 +400,12 @@ sub validateObjectname
    $ENV{HTTP_FORCE_LANGUAGE}=$param->{lang} if (defined($param->{lang}));
    if (!($objectname=~m/^.+::.+$/)){
       return(interface::SOAP::kernel::Finish({exitcode=>128,
-             lastmsg=>['invalid dataobject name']}));
+             lastmsg=>[msg(ERROR,'invalid dataobject name')]}));
    }
    my $o=getModuleObject($self->Config,$objectname);
    if (!defined($o)){
       return(interface::SOAP::kernel::Finish({exitcode=>128,
-             lastmsg=>['invalid dataobject specified']}));
+             lastmsg=>[msg(ERROR,'invalid dataobject specified')]}));
    }
 
    return(interface::SOAP::kernel::Finish({exitcode=>0}));
@@ -423,6 +424,11 @@ sub Finish
 {
    my $result=shift;
    delete($ENV{HTTP_FORCE_LANGUAGE});
+   if (defined($result->{lastmsg})){
+      for(my $c=0;$c<=$#{$result->{lastmsg}};$c++){
+         $result->{lastmsg}->[$c]=~s/\s*$//g;
+      }
+   }
    return($result);
 }
 

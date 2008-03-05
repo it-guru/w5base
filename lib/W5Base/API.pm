@@ -27,7 +27,8 @@ use FindBin qw($RealScript);
 @EXPORT = qw(&msg &ERROR &WARN &DEBUG &INFO $RealScript
              &XGetOptions
              &createConfig
-             &getModuleObject);
+             &getModuleObject
+             );
 
 sub ERROR() {return("ERROR")}
 sub WARN()  {return("WARN")}
@@ -244,6 +245,60 @@ sub new
    return($self);
 }
 
+
+
+#
+# Information and Status Methods
+#
+
+sub showFields
+{
+   my $self=shift;
+   my $res=$self->SOAP->showFields({dataobject=>$self->Name,
+                                    lang=>$self->Config->{lang}
+                                   })->result;
+
+   $self->{exitcode}=$res->{exitcode};
+   if ($self->{exitcode}==0){
+      delete($self->{lastmsg});
+      return(@{$res->{records}});
+   }
+   $self->{lastmsg}=$res->{lastmsg};
+   return(undef);
+}
+
+sub LastMsg
+{
+   my $self=shift;
+   my $msg=shift;
+
+   if (wantarray()){
+      return(undef) if (!defined($self->{LastMsg}));
+      return(@{$self->{LastMsg}});
+   }
+   return(0) if (!defined($self->{LastMsg}));
+   return($#{$self->{LastMsg}}+1);
+}
+
+sub dieOnERROR
+{
+   my $self=shift;
+   if ($self->LastMsg()){
+      foreach my $msg ($self->LastMsg()){
+         printf STDERR ("%s\n",$msg);
+      }
+      $self->{exitcode}=-1 if ($self->{exitcode}==0);
+      exit($self->{exitcode});
+   }
+}
+
+
+
+
+#
+# Read Methods
+#
+
 sub ResetFilter
 {
    my $self=shift;
@@ -257,6 +312,31 @@ sub SetFilter
    $self->{FILTER}=$filter;
 }
 
+sub getHashList
+{
+   my $self=shift;
+   my @view=@_;
+   my $res=$self->SOAP->getHashList({dataobject=>$self->Name,
+                                     view=>\@view,
+                                     lang=>$self->Config->{lang},
+                                     filter=>$self->Filter
+                                    })->result;
+   $self->{exitcode}=$res->{exitcode};
+   if ($self->{exitcode}==0){
+      delete($self->{lastmsg});
+      return(@{$res->{records}});
+   }
+   $self->{lastmsg}=$res->{lastmsg};
+   return(undef);
+}
+
+
+
+
+#
+# Write Methods
+#
+
 sub storeRecord
 {
    my $self=shift;
@@ -268,77 +348,24 @@ sub storeRecord
    }
    my $res=$self->SOAP->storeRecord({dataobject=>$self->Name,
                                      data=>$data,
-                                     lang=>$self->{CONFIG}->{lang},
+                                     lang=>$self->Config->{lang},
                                      IdentifiedBy=>$flt})->result;
    $self->{exitcode}=$res->{exitcode};
+printf STDERR ("fifi exitcode=$res->{lastmsg}\n");
+exit(1);
    if ($self->{exitcode}==0){
       delete($self->{lastmsg});
-      return();
+      return($res->{IdentifiedBy});
    }
    $self->{lastmsg}=$res->{lastmsg};
+   return(undef); 
 }
 
-sub showFields
-{
-   my $self=shift;
-   my $res=$self->SOAP->showFields({dataobject=>$self->Name,
-                                    lang=>$self->{CONFIG}->{lang}
-                                   })->result;
-
-   $self->{exitcode}=$res->{exitcode};
-   if ($self->{exitcode}==0){
-      delete($self->{lastmsg});
-      return(@{$res->{records}});
-   }
-   $self->{lastmsg}=$res->{lastmsg};
-   return(undef);
-}
-
-sub getHashList
-{
-   my $self=shift;
-   my @view=@_;
-   my $res=$self->SOAP->getHashList({dataobject=>$self->Name,
-                                     view=>\@view,
-                                     lang=>$self->{CONFIG}->{lang},
-                                     filter=>$self->{FILTER}
-                                    })->result;
-   $self->{exitcode}=$res->{exitcode};
-   if ($self->{exitcode}==0){
-      delete($self->{lastmsg});
-      return(@{$res->{records}});
-   }
-   $self->{lastmsg}=$res->{lastmsg};
-   return(undef);
-}
 
 sub SOAP   {$_[0]->{SOAP}}
 sub Name   {$_[0]->{NAME}}
 sub Filter {$_[0]->{FILTER}}
 sub Config {$_[0]->{CONFIG}}
 
-
-
-
-#my $SOAP=SOAP::Lite->uri('http://www.w5base.net/interface/SOAP')
-#                   ->proxy('http://localhost/w5base2/auth/base/interface/SOAP');
-#
-#
-#use Data::Dumper;
-#
-#
-#my $res=getHashList("xx");
-#
-#print "d=".Dumper($res)."\n";
-#
-#
-#sub getHashList
-#{
-#   my $result=$SOAP->SOAPgetHashList("base::user",
-#                                     [qw(fullname surname givenname)],
-#                                     undef,
-#                                     {surname=>"*vog*"})->result;
-#   return($result);
-#}
 1;
 

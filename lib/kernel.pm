@@ -98,7 +98,7 @@ sub Dumper
 
 
 sub ERROR() {return("ERROR")}
-sub OK() {return("OK")}
+sub OK()    {return("OK")}
 sub WARN()  {return("WARN")}
 sub DEBUG() {return("DEBUG")}
 sub INFO()  {return("INFO")}
