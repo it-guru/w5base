@@ -169,18 +169,6 @@ sub getRecordImageUrl
    return("../../../public/itil/load/ip_network.jpg?".$cgi->query_string());
 }
 
-sub SecureValidate
-{
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-   my $origrec=shift;
-
-   if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
-      return(0);
-   }
-   return(1);
-}
 
 sub Validate
 {

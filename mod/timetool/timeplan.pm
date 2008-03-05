@@ -334,12 +334,12 @@ sub SecureValidate
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   my $origrec=shift;
+   my $wrgroups=shift;
 
    if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
       return(0);
    }
-   return(1);
+   return($self->SUPER::SecureValidate($oldrec,$newrec,$wrgroups));
 }
 
 

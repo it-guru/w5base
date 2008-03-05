@@ -48,9 +48,10 @@ sub SecureValidate
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
+   my $wrgroups=shift;
 
    return(0) if (!$self->ProtectObject($oldrec,$newrec,$self->{adminsgroups}));
-   return(1);
+   return($self->SUPER::SecureValidate($oldrec,$newrec,$wrgroups));
 }
 
 

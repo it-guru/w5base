@@ -23,7 +23,6 @@ use kernel::App::Web;
 use kernel::App::Web::Listedit;
 use kernel::DataObj::DB;
 use kernel::Field;
-use Data::Dumper;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 
@@ -236,17 +235,6 @@ sub Initialize
    return($self->SUPER::Initialize());
 }
 
-
-sub SecureValidate
-{
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-   my $origrec=shift;
-
-
-   return(1);
-}
 
 
 sub FrontendSetFilter

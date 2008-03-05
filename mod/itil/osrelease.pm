@@ -143,19 +143,6 @@ sub getRecordImageUrl
 }
 
 
-sub SecureValidate
-{
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-   my $origrec=shift;
-
-   if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
-      return(0);
-   }
-   return(1);
-}
-
 
 sub Validate
 {

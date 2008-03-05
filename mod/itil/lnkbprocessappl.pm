@@ -272,14 +272,12 @@ sub isViewValid
    return("ALL");
 }
 
+
 sub SecureValidate
 {
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-
-   return(1);
+   return(kernel::DataObj::SecureValidate(@_));
 }
+
 
 
 sub isWriteValid

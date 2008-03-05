@@ -194,18 +194,9 @@ sub getRecordImageUrl
 }
 
 sub SecureValidate
-{  
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-
-#   return(0) if (!$self->ProtectObject($oldrec,$newrec,$self->{adminsgroups}));
-   return(1);
+{
+   return(kernel::DataObj::SecureValidate(@_));
 }
-
-
-
-
 
 
 sub Validate

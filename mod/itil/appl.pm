@@ -740,20 +740,11 @@ sub SelfAsParentObject    # this method is needed because existing derevations
 {
    return("itil::appl");
 }
-
-
          
 
 sub SecureValidate
 {
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-   my $origrec=shift;
-
-
-   $self->Context->{DataInputFromUserFrontend}=1;
-   return(1);
+   return(kernel::DataObj::SecureValidate(@_));
 }
 
 
