@@ -50,8 +50,10 @@ my $fieldfound=0;
 my @fields=$user->showFields();
 foreach my $field (@fields){
    if ($verbose){
+      my $name=$field->{name};
+      $name.="*" if ($field->{primarykey});
       printf("%-25s: %-20s: %s\n",
-             $field->{name},$field->{group},$field->{longtype});
+             $name,$field->{group},$field->{longtype});
    }
    $fieldfound=1 if ($field->{name} eq $dstfield);
 }
@@ -72,9 +74,26 @@ if ($#l==-1){
    msg(INFO,"no data found in $objectname matching");exit(2);
 }
 else{
-   foreach my $rec (@l){
-       printf("$rec->{fullname} ($rec->{userid})\n");
-       printf("$dstfield = '$rec->{$dstfield}'\n");
+   if ($#l==0){
+      my $rec=$l[0];
+      printf("$rec->{fullname} ($rec->{userid})\n");
+      printf("$dstfield = '$rec->{$dstfield}'\n");
+      if (defined($newval)){
+         if ($user->storeRecord({$dstfield=>$newval},$rec->{userid})){
+            msg(INFO,"update done");
+         }
+         $user->SetFilter({accounts=>$loginuser});
+         my @l=$user->getHashList(qw(fullname userid),$dstfield);
+         my $rec=$l[0];
+         printf("\nafter update:\n");
+         printf("$dstfield = '$rec->{$dstfield}'\n");
+      }
+   }
+   elsif($#==-1){
+      msg(ERROR,"result not found");exit(100);
+   }
+   else{
+      msg(ERROR,"result not unique");exit(200);
    }
 }
 exit(1);

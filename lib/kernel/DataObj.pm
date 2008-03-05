@@ -453,7 +453,22 @@ sub SecureValidate
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
+   my $wrgroups=shift;
    msg(INFO,"SecureValidate in $self");
+   foreach my $wrfield (keys(%{$newrec})){
+       my $fo=$self->getField($wrfield,$oldrec);
+       if (defined($fo)){
+          my $group=$fo->{group};
+          $group="default" if ($group eq "");
+          if ($fo->Type() eq "SubList" ||
+              (!grep(/^ALL$/,@$wrgroups) &&
+               !grep(/^$group$/,@$wrgroups))){
+             $self->LastMsg("write request to field '$wrfield' rejected");
+             return(0);
+          }
+       }
+   }
+
    return(1);
 }
 
@@ -736,8 +751,8 @@ sub SecureValidatedInsertRecord
    my $newrec=shift;
 
    $self->isDataInputFromUserFrontend(1);
-   if ($self->isWriteValid(undef)){
-      if ($self->SecureValidate(undef,$newrec)){
+   if (my @groups=$self->isWriteValid(undef)){
+      if ($self->SecureValidate(undef,$newrec,\@groups)){
          return($self->ValidatedInsertRecord($newrec));
       }
       if ($self->LastMsg()==0){
@@ -807,12 +822,18 @@ sub SecureValidatedUpdateRecord
    my @filter=@_;
 
    $self->isDataInputFromUserFrontend(1);
-   if ($self->SecureValidate($oldrec,$newrec)){
-      return($self->ValidatedUpdateRecord($oldrec,$newrec,@filter));
+   if (my @groups=$self->isWriteValid($oldrec)){
+      if ($self->SecureValidate($oldrec,$newrec,\@groups)){
+         return($self->ValidatedUpdateRecord($oldrec,$newrec,@filter));
+      }
+      if ($self->LastMsg()==0){
+         $self->LastMsg(ERROR,"SecureValidatedUpdateRecord: ".
+                              "unknown error in ${self}::Validate()");
+      }
    }
-   if ($self->LastMsg()==0){
-      $self->LastMsg(ERROR,"SecureValidatedUpdateRecord: ".
-                           "unknown error in ${self}::Validate()");
+   else{
+      $self->LastMsg(ERROR,"you are not autorized to update the ".
+                           "requested record");
    }
    return(undef);
 }

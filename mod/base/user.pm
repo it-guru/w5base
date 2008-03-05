@@ -458,7 +458,7 @@ sub SecureValidate
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   my $origrec=shift;
+   my $wrgroups=shift;
 
    my $usertyp=effVal($oldrec,$newrec,"usertyp");
    if (!$self->IsMemberOf("admin")){
@@ -479,7 +479,7 @@ sub SecureValidate
          return(0);
       }
    }
-   return(1);
+   return($self->SUPER::SecureValidate($oldrec,$newrec,$wrgroups));
 }
 
 sub Validate

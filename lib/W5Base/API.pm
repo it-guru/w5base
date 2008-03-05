@@ -257,6 +257,27 @@ sub SetFilter
    $self->{FILTER}=$filter;
 }
 
+sub storeRecord
+{
+   my $self=shift;
+   my $data=shift;
+   my $flt=shift;
+   if (ref($flt)){
+      printf STDERR ("not supported\n");
+      return(undef);
+   }
+   my $res=$self->SOAP->storeRecord({dataobject=>$self->Name,
+                                     data=>$data,
+                                     lang=>$self->{CONFIG}->{lang},
+                                     IdentifiedBy=>$flt})->result;
+   $self->{exitcode}=$res->{exitcode};
+   if ($self->{exitcode}==0){
+      delete($self->{lastmsg});
+      return();
+   }
+   $self->{lastmsg}=$res->{lastmsg};
+}
+
 sub showFields
 {
    my $self=shift;
@@ -264,12 +285,12 @@ sub showFields
                                     lang=>$self->{CONFIG}->{lang}
                                    })->result;
 
-   $self->{EXITCODE}=$res->{exitcode};
-   if ($self->{EXITCODE}==0){
-      delete($self->{LASTMSG});
+   $self->{exitcode}=$res->{exitcode};
+   if ($self->{exitcode}==0){
+      delete($self->{lastmsg});
       return(@{$res->{records}});
    }
-   $self->{LASTMSG}=$res->{LASTMSG};
+   $self->{lastmsg}=$res->{lastmsg};
    return(undef);
 }
 
@@ -282,12 +303,12 @@ sub getHashList
                                      lang=>$self->{CONFIG}->{lang},
                                      filter=>$self->{FILTER}
                                     })->result;
-   $self->{EXITCODE}=$res->{exitcode};
-   if ($self->{EXITCODE}==0){
-      delete($self->{LASTMSG});
+   $self->{exitcode}=$res->{exitcode};
+   if ($self->{exitcode}==0){
+      delete($self->{lastmsg});
       return(@{$res->{records}});
    }
-   $self->{LASTMSG}=$res->{LASTMSG};
+   $self->{lastmsg}=$res->{lastmsg};
    return(undef);
 }
 

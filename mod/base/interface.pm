@@ -289,6 +289,7 @@ sub showFields
    }
 
    my @l;
+   my $idfield=$o->IdField();
    my @fieldlist=$o->getFieldList();
    foreach my $field (@fieldlist){
       my $fielddesc={name=>$field};
@@ -299,6 +300,9 @@ sub showFields
                $fielddesc->{$prop}=$fo->{$prop};
             }
          }
+         if (defined($idfield) && $idfield->Name() eq $fo->Name()){
+            $fielddesc->{primarykey}=1;
+         }
          $fielddesc->{longtype}=$fo->Self();
          $fielddesc->{type}=$fo->Type();
       }
@@ -306,6 +310,51 @@ sub showFields
    }
    return(interface::SOAP::kernel::Finish({exitcode=>0,
           lastmsg=>[],records=>\@l}));
+}
+
+sub storeRecord
+{
+   my $self=$W5Base::SOAP;
+   my $uri=shift;
+   my $param=shift;
+   my $objectname=$param->{dataobject};
+   my $filter=$param->{filter};
+   my $newrec=$param->{data};
+   my $id=$param->{IdentifiedBy};
+
+   $ENV{HTTP_FORCE_LANGUAGE}=$param->{lang} if (defined($param->{lang}));
+   if (!($objectname=~m/^.+::.+$/)){
+      return(interface::SOAP::kernel::Finish({exitcode=>128,
+             lastmsg=>['invalid dataobject name']}));
+   }
+   my $o=getModuleObject($self->Config,$objectname);
+   if (!defined($o)){
+      return(interface::SOAP::kernel::Finish({exitcode=>128,
+             lastmsg=>['invalid dataobject specified']}));
+   }
+
+   if (defined($id)){
+      my $idfield=$o->IdField();
+      if (defined($idfield)){
+         my $idname=$idfield->Name();
+         my $filter={$idname=>\$id};
+         $o->SecureSetFilter($filter); 
+         my ($oldrec,$msg)=$o->getOnlyFirst(qw(ALL));
+         if (defined($oldrec)){
+            if ($o->SecureValidatedUpdateRecord($oldrec,$newrec,$filter)){
+               return(interface::SOAP::kernel::Finish({exitcode=>0,
+                                                       IdentifiedBy=>$id})); 
+            }
+            return(interface::SOAP::kernel::Finish({exitcode=>10,
+                   lastmsg=>[$o->LastMsg()]})); 
+         }
+         return(interface::SOAP::kernel::Finish({exitcode=>10,
+                lastmsg=>['can not find record for update']})); 
+      }
+      return(interface::SOAP::kernel::Finish({exitcode=>20,
+             lastmsg=>['no unique idenitifier in dataobject found']})); 
+   }
+   return(interface::SOAP::kernel::Finish({exitcode=>-1}));
 }
 
 sub getHashList
