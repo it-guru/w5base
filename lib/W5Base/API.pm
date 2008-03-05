@@ -274,6 +274,11 @@ sub getModuleObject
 package W5Base::ModuleObject;
 use Data::Dumper;
 
+sub ERROR() {return("ERROR")}
+sub WARN()  {return("WARN")}
+sub DEBUG() {return("DEBUG")}
+sub INFO()  {return("INFO")}
+
 sub new
 {
    my $type=shift;
@@ -285,7 +290,7 @@ sub new
 
 
 #
-# Information and Status Methods
+# Information and Status methods
 #
 
 sub showFields
@@ -335,7 +340,7 @@ sub dieOnERROR
 
 
 #
-# Read Methods
+# Read methods
 #
 
 sub ResetFilter
@@ -375,7 +380,7 @@ sub getHashList
 
 
 #
-# Write Methods
+# Write methods
 #
 
 sub storeRecord
@@ -384,8 +389,8 @@ sub storeRecord
    my $data=shift;
    my $flt=shift;
    if (ref($flt)){
-      printf STDERR ("not supported\n");
-      return(undef);
+      msg(ERROR,"storeRecord didn't supports hash filters");
+      exit(1);
    }
    my $SOAPresult=$self->SOAP->storeRecord({dataobject=>$self->Name,
                                             data=>$data,
@@ -402,6 +407,37 @@ sub storeRecord
    }
    return(undef); 
 }
+
+
+sub deleteRecord
+{
+   my $self=shift;
+   my $flt=shift;
+   if (ref($flt)){
+      msg(ERROR,"deleteRecord didn't supports hash filters");
+      exit(1);
+   }
+   my $SOAPresult=$self->SOAP->deleteRecord({dataobject=>$self->Name,
+                                             lang=>$self->Config->{lang},
+                                             IdentifiedBy=>$flt});
+   my $result=$self->_analyseSOAPresult($SOAPresult);
+   if (defined($result)){
+      $self->{exitcode}=$result->{exitcode};
+      if ($self->{exitcode}==0){
+         delete($self->{lastmsg});
+         return($result->{IdentifiedBy});
+      }
+      $self->{lastmsg}=$result->{lastmsg};
+   }
+   return(undef); 
+}
+
+
+
+
+#
+# internal methods
+#
 
 sub _analyseSOAPresult
 {

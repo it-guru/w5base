@@ -366,6 +366,55 @@ sub storeRecord
    return(interface::SOAP::kernel::Finish({exitcode=>-1}));
 }
 
+sub deleteRecord
+{
+   my $self=$W5Base::SOAP;
+   my $uri=shift;
+   my $param=shift;
+   my $objectname=$param->{dataobject};
+   my $filter=$param->{filter};
+   my $id=$param->{IdentifiedBy};
+
+   $ENV{HTTP_FORCE_LANGUAGE}=$param->{lang} if (defined($param->{lang}));
+   if (!($objectname=~m/^.+::.+$/)){
+      return(interface::SOAP::kernel::Finish({exitcode=>128,
+             lastmsg=>['invalid dataobject name']}));
+   }
+   my $o=getModuleObject($self->Config,$objectname);
+   if (!defined($o)){
+      return(interface::SOAP::kernel::Finish({exitcode=>128,
+             lastmsg=>['invalid dataobject specified']}));
+   }
+
+   if (defined($id)){
+      my $idfield=$o->IdField();
+      if (defined($idfield)){
+         my $idname=$idfield->Name();
+         my $filter={$idname=>\$id};
+         $o->SecureSetFilter($filter); 
+         my ($oldrec,$msg)=$o->getOnlyFirst(qw(ALL));
+         if (defined($oldrec)){
+            if ($o->SecureValidatedDeleteRecord($oldrec)){
+               return(interface::SOAP::kernel::Finish({exitcode=>0,
+                                                       IdentifiedBy=>$id})); 
+            }
+            return(interface::SOAP::kernel::Finish({exitcode=>10,
+                   lastmsg=>[$o->LastMsg()]})); 
+         }
+         return(interface::SOAP::kernel::Finish({exitcode=>11,
+                lastmsg=>[msg(ERROR,'can not find any record for delete')]})); 
+      }
+      return(interface::SOAP::kernel::Finish({exitcode=>20,
+             lastmsg=>[
+                msg(ERROR,'no unique idenitifier in dataobject found')]})); 
+   }
+   else{
+      return(interface::SOAP::kernel::Finish({exitcode=>12,
+             lastmsg=>["no delete IdentifiedBy specified"]})); 
+   }
+   return(interface::SOAP::kernel::Finish({exitcode=>-1}));
+}
+
 sub getHashList
 {
    my $self=$W5Base::SOAP;

@@ -645,10 +645,9 @@ sub isDeleteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-printf STDERR ("fifi creator=$rec->{creator}\n");
    return(1) if ($rec->{creator}==$userid && $rec->{cistatusid}<3);
 
-   return(1) if ($self->IsMemberOf("admin") && $rec->{usertyp} ne "user");
+   return(1) if ($self->IsMemberOf("admin"));
    return(0);
 }
 
