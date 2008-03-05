@@ -11,6 +11,8 @@ my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
 my $optresult=XGetOptions(\%P,\&Help,undef,undef,".W5Base.Interface");
 
 #######################################################################
+# create connection config
+#
 my $apidebug=$verbose>=3 ? 1 : 0;
 my $Config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug);
 if (!defined($Config)){
@@ -21,6 +23,10 @@ else{
 }
 msg(DEBUG,"verbose=$verbose");
 
+
+#######################################################################
+# load ModuleObject
+#
 my $objectname="base::user";
 my $user=getModuleObject($Config,$objectname);
 if (!defined($user)){
@@ -35,6 +41,22 @@ if ($flt eq ""){
    msg(ERROR,"no filter specified");exit(3);
 }
 
+
+#######################################################################
+# show fields
+#
+print("Fields in $objectname\n");
+my @fields=$user->showFields();
+foreach my $field (@fields){
+   printf("%-25s: %-20s: %s\n",
+          $field->{name},$field->{group},$field->{longtype});
+}
+print("\n");
+
+
+#######################################################################
+# do search
+#
 $user->SetFilter({fullname=>$flt});
 my @l=$user->getHashList(qw(fullname surname accounts));
 if ($#l==-1){

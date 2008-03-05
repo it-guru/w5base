@@ -277,6 +277,39 @@ sub doSearch
    return([{id=>1,name=>'hans'},{id=>2,name=>'fritz'}]);
 }
 
+sub showFields
+{
+   my $self=$W5Base::SOAP;
+   my $uri=shift;
+   my $param=shift;
+   my $objectname=$param->{dataobject};
+
+   if (!($objectname=~m/^.+::.+$/)){
+      return({exitcode=>128,lastmsg=>['invalid dataobject name']});
+   }
+   my $o=getModuleObject($self->Config,$objectname);
+   if (!defined($o)){
+      return({exitcode=>128,lastmsg=>['invalid dataobject specified']});
+   }
+   my @l;
+   my @fieldlist=$o->getFieldList();
+   foreach my $field (@fieldlist){
+      my $fielddesc={name=>$field};
+      my $fo=$o->getField($field);
+      if (defined($fo)){
+         foreach my $prop (qw(group)){
+            if (defined($fo->{$prop})){
+               $fielddesc->{$prop}=$fo->{$prop};
+            }
+         }
+         $fielddesc->{longtype}=$fo->Self();
+         $fielddesc->{type}=$fo->Type();
+      }
+      push(@l,$fielddesc);
+   }
+   return({exitcode=>0,lastmsg=>[],records=>\@l});
+}
+
 sub getHashList
 {
    my $self=$W5Base::SOAP;
@@ -285,16 +318,24 @@ sub getHashList
    my $objectname=$param->{dataobject};
    my $view=$param->{view};
    my $filter=$param->{filter};
+
    if (!($objectname=~m/^.+::.+$/)){
       return({exitcode=>128,lastmsg=>['invalid dataobject name']});
    }
-
    my $o=getModuleObject($self->Config,$objectname);
+   if (!defined($o)){
+      return({exitcode=>128,lastmsg=>['invalid dataobject specified']});
+   }
 
-   $o->SetFilter($filter); 
+   $o->SecureSetFilter($filter); 
    msg(INFO,"SOAPgetHashList in search objectname=$objectname");
    my @l=$o->getHashList(@$view);
-   my $dummy=Dumper(\@l);
+   foreach my $rec (@l){
+      foreach my $field (keys(%$rec)){
+         defined($rec->{$field});
+      }
+   }
+   #my $dummy=Dumper(\@l);
    return({exitcode=>0,lastmsg=>[],records=>\@l});
 }
 

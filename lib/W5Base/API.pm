@@ -254,6 +254,20 @@ sub SetFilter
    $self->{FILTER}=$filter;
 }
 
+sub showFields
+{
+   my $self=shift;
+   my $res=$self->SOAP->showFields({dataobject=>$self->Name})->result;
+
+   $self->{EXITCODE}=$res->{exitcode};
+   if ($self->{EXITCODE}==0){
+      delete($self->{LASTMSG});
+      return(@{$res->{records}});
+   }
+   $self->{LASTMSG}=$res->{LASTMSG};
+   return(undef);
+}
+
 sub getHashList
 {
    my $self=shift;
