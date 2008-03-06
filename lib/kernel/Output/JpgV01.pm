@@ -21,7 +21,6 @@ use vars qw(@ISA);
 use kernel;
 use kernel::Formater;
 use File::Path;
-use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
 use LWP::Simple qw(getstore);
 @ISA    = qw(kernel::Formater);
 
@@ -29,13 +28,19 @@ sub new
 {
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
-   $self->{zip}=Archive::Zip->new();
    return($self);
 }
 
 sub IsModuleSelectable
 {
+   my $self=shift;
+
+   printf STDERR ("fifi in jpg IsModuleSelectable $self\n");
    eval("use DTP;");
+   if ($@ ne ""){
+      return(0);
+   }
+   eval("use Archive::Zip qw( :ERROR_CODES :CONSTANTS );");
    if ($@ ne ""){
       return(0);
    }
@@ -83,7 +88,7 @@ sub Init
    my ($id,$res);
    binmode($$fh);
    my $dtp;
-   eval('use DTP::jpg;$dtp=new DTP::jpg();');
+   eval('use DTP::jpg;$dtp=new DTP::jpg();$self->{zip}=new Archive::Zip();');
    if ($@ eq ""){
       $self->{dtp}=$dtp;
    }
@@ -166,10 +171,12 @@ sub Finish
    my $dirhandler=$self->{dtp}->{_Layout}->{dir};
    $self->{dtp}->GetDocument($self->{dtp}->{_Layout}->{tempfile});
    my $dir_member = $self->{zip}->addTree($dirhandler);   
+   eval('
    unless ( $self->{zip}->writeToFileNamed("$dirhandler/pics.zip") == AZ_OK )
    {
       die("ERROR: write error zipfile error=$?");
    }
+   ');
    if (open(F,"<$dirhandler/pics.zip")){
       my $buf;
       while(sysread(F,$buf,8192)){

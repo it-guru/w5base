@@ -20,7 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Output::JpgV01;
-@ISA    = qw(kernel::Output::JpgV01);
+@ISA=qw(kernel::Output::JpgV01);
 
 
 sub new
@@ -54,6 +54,20 @@ sub getDownloadFilename
 
    return($self->SUPER::getDownloadFilename().".pdf");
 }
+
+sub IsModuleSelectable
+{  
+   my $self=shift;
+
+printf STDERR ("fifi $self 00 $@\n");
+   eval("use DTP::pdf;");
+   if ($@ ne ""){
+printf STDERR ("fifi $self 01 $@\n");
+      return(0);
+   }
+   return(1);
+}
+
 
 sub Init
 {
