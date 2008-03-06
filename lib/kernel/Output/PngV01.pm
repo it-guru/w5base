@@ -54,6 +54,17 @@ sub getDownloadFilename
    return($self->SUPER::getDownloadFilename().".zip");
 }
 
+sub IsModuleSelectable
+{
+   my $self=shift;
+
+   eval("use DTP::png;");
+   if ($@ ne ""){
+      return(0);
+   }
+   return(1);
+}
+
 sub Init
 {
    my $self=shift;
@@ -62,9 +73,11 @@ sub Init
    my ($id,$res);
    binmode($$fh);
    my $dtp;
-   eval('use DTP::png;$dtp=new DTP::png();');
+   eval('use DTP::png;$dtp=new DTP::png();$self->{zip}=new Archive::Zip();');
    if ($@ eq ""){
       $self->{dtp}=$dtp;
+   }else{
+      printf STDERR ("ERROR: $@\n");
    }
    if (defined($res=$self->getParent->getParent->W5ServerCall("rpcGetUniqueId")) &&
       $res->{exitcode}==0){
@@ -76,3 +89,4 @@ sub Init
 }
 
 1;
+

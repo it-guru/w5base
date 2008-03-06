@@ -59,10 +59,8 @@ sub IsModuleSelectable
 {  
    my $self=shift;
 
-printf STDERR ("fifi $self 00 $@\n");
    eval("use DTP::pdf;");
    if ($@ ne ""){
-printf STDERR ("fifi $self 01 $@\n");
       return(0);
    }
    return(1);

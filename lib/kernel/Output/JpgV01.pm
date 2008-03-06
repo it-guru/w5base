@@ -91,7 +91,7 @@ sub Init
    if ($@ eq ""){
       $self->{dtp}=$dtp;
    }else{
-      printf STDERR ("ERROR: can't use $@\n");
+      printf STDERR ("ERROR: $@\n");
    }
    if (defined($res=$self->getParent->getParent->W5ServerCall("rpcGetUniqueId")) &&
       $res->{exitcode}==0){
