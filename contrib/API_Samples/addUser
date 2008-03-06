@@ -1,0 +1,99 @@
+#!/usr/bin/perl
+use lib qw(/opt/w5base2/lib /opt/w5base/lib);
+use strict;                   
+use W5Base::API;
+
+my $DefaultBase="https://w5base.net/w5base/auth/";
+my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang);
+my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
+       "webuser=s"=>\$loginuser,"webpass=s"=> \$loginpass,
+       "verbose+"=>\$verbose);
+my $optresult=XGetOptions(\%P,\&Help,undef,undef,".W5Base.Interface");
+
+#######################################################################
+# create connection config
+#
+my $apidebug=$verbose>=3 ? 1 : 0;
+my $Config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug);
+if (!defined($Config)){
+   msg(ERROR,"base url or username/password is not valid");exit(1);
+}
+else{
+   msg(DEBUG,"create of config ok");
+}
+msg(DEBUG,"verbose=$verbose");
+
+
+#######################################################################
+# load ModuleObject
+#
+my $objectname="base::user";
+my $user=getModuleObject($Config,$objectname);
+if (!defined($user)){
+   msg(ERROR,"can't load object $objectname");exit(2);
+}
+else{
+   msg(DEBUG,"create of ModuleObject $user ok");
+}
+
+my $dstfield=shift(@ARGV);
+my $newval=join(" ",@ARGV);
+
+
+#######################################################################
+# show fields
+#
+if ($verbose){
+   print("Fields in $objectname\n");
+}
+my $fieldfound=0;
+my @fields=$user->showFields();
+foreach my $field (@fields){
+   if ($verbose){
+      my $name=$field->{name};
+      $name.="*" if ($field->{primarykey});
+      printf("%-25s: %-20s: %s\n",
+             $name,$field->{group},$field->{longtype});
+   }
+   $fieldfound=1 if ($field->{name} eq $dstfield);
+}
+if (!$fieldfound && $dstfield ne ""){
+   msg(ERROR,"field '$dstfield' not found in '$objectname'");exit(2);
+}
+if ($verbose){
+   print("\n");
+}
+
+
+#######################################################################
+#
+msg(INFO,"add user");
+if (my $id=$user->storeRecord({email=>'cxxxx@yyy.cc',
+                               cistatusid=>4})){
+   msg(INFO,"ok newid=$id");
+   exit(0);
+}
+else{
+   $user->dieOnERROR();
+}
+exit(1);
+
+#######################################################################
+sub Help
+{
+   print(<<EOF);
+$RealScript [options] FullnameFilter
+
+   --verbose display more details of operation process
+   --quiet   only errors would be displayed
+   --base    base url of filemgmt (default: $DefaultBase)
+
+   --webuser username
+   --webpass password
+   --store   stores the parameters (not help,verbose and store)
+   --help    show this help
+
+EOF
+}
+#######################################################################
+exit(255);
