@@ -18,7 +18,6 @@ package kernel::config;
 #
 
 use strict;
-use Data::Dumper;
 use kernel;
 use kernel::Universal;
 use vars(qw(@ISA));

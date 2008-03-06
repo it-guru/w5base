@@ -485,9 +485,11 @@ sub LoadSubObjs
       if (defined($o)){
          $o->setParent($self);
          $self->{$hashkey}->{$modname}=$o;
-         if (!$o->Init()){
-            delete($self->{$hashkey}->{$modname});
-            $self->{"Inactiv".$hashkey}->{$modname}=$modname;
+         if ($o->can("Init")){
+            if (!$o->Init()){
+               delete($self->{$hashkey}->{$modname});
+               $self->{"Inactiv".$hashkey}->{$modname}=$modname;
+            }
          }
       }
       else{

@@ -1,0 +1,230 @@
+#!/usr/bin/env perl
+package W5InstallCheckApp;
+use strict;
+use vars qw(@ISA);
+
+@ISA=("kernel::App");
+
+sub new
+{
+   my $type=shift;
+   my $self=bless($type->SUPER::new(@_),$type);
+   return($self);
+}
+
+package main;
+use strict;
+use vars qw($opt_v $opt_h $opt_c $configname);
+my $opt_v=0;
+if (grep(/^-v$/,@ARGV) || grep(/^--verbose$/,@ARGV)){
+   $opt_v=1;
+}
+my $count=0;
+my $failcount=0;
+print("\n");
+sub ysleep{Time::HiRes::usleep(80000);}
+
+#######################################################################
+printf("INFO:  W5InstallCheck Pass 1: low level check started ...\n");
+$|=1;
+foreach my $module (qw(Time::HiRes 
+                       FindBin UNIVERSAL Carp Getopt::Long
+                       Scalar::Util Unicode::String Encode Exporter POSIX
+                       Date::Calc 
+                       DateTime DateTime::Span DateTime::SpanSet 
+                       Data::Dumper)){
+   printf("INFO:  check module %-33s           ... ","'$module'");
+   eval("use $module;"); 
+   ysleep if ($module ne "Time::HiRes"); 
+   printResult($@,$module);
+}
+if ($failcount){
+   printf("ERROR: low level install check failed\n");
+   exit(1);
+}
+print("\n");
+
+
+
+#######################################################################
+printf("INFO:  W5InstallCheck Pass 2: ".
+       "extend module search paths ...\n");
+
+foreach my $moddir ("$FindBin::Bin/../lib","$FindBin::Bin/../mod"){
+   printf("INFO:  check lib dir at %-35s     ... ","'$moddir'");
+   ysleep;printResult(-d $moddir ? "" : $failcount++);
+   printf("INFO:  extend lib path for %-33s    ... ","'$moddir'");
+   eval("use lib \"$moddir\";");
+   ysleep;printResult($@,$moddir);
+}
+if ($failcount){
+   printf("ERROR: search path extend failed\n");
+   exit(1);
+}
+print("\n");
+
+
+
+#######################################################################
+if (!GetOptions('verbose'=>\$opt_v,
+                'debug'=>\$opt_v,
+                'help'=>\$opt_h,
+                'config=s'=>\$opt_c)){
+   help();
+   exit(1);
+}
+if (defined($opt_h)){
+   help();
+   exit(1);
+}
+if ($opt_v){
+   $W5V2::Debug=1;
+}
+else{
+   $W5V2::Debug=0;
+}
+
+if ($opt_c eq ""){
+   $opt_c="w5server";
+}
+printf("INFO:  W5InstallCheck Pass 3: ".
+       "check native W5Base enviroment ...\n");
+my $configdir="/etc/w5base";
+printf("INFO:  check config dir at %-32s     ... ","'$configdir'");
+ysleep;printResult(-d $configdir ? "" : $failcount++);
+
+my $configfile="/etc/w5base/$opt_c.conf";
+printf("INFO:  check config file at %-31s     ... ","'$configfile'");
+ysleep;printResult(-r $configfile ? "" : $failcount++);
+
+printf("INFO:  using W5Base kernel                                       ...");
+eval('
+   use kernel;
+   use kernel::App;
+   use kernel::config;
+');
+ysleep;printResult($@);
+
+printf("INFO:  create W5Base configuration object                        ...");
+my $curconfig;
+eval('
+$configname=$opt_c;
+my %ServerParam=();
+$curconfig=new kernel::config();
+
+if (!$curconfig->readconfig("$FindBin::Bin/..",$configname)){
+   die("ERROR: cant read configfile $configname");
+}
+');
+ysleep;printResult($@);
+
+if ($failcount){
+   printf("ERROR: fail to create W5Base config object\n");
+   exit(1);
+}
+print("\n");
+
+
+printf("INFO:  W5InstallCheck Pass 4: ".
+       "booting W5Base and run package tests ...\n");
+printf("INFO:  create W5Base testapp module                              ...");
+my $testapp;
+eval("
+\$testapp=new W5InstallCheckApp(Config=>\$curconfig);
+");
+ysleep;printResult($@);
+
+printf("INFO:  loading package specified InstallCheck modules            ...");
+eval('
+$testapp->LoadSubObjs("InstallCheck","InstallCheck");
+');
+ysleep;printResult($@);
+$testapp->LoadSubObjs("ext/InstallCheck","InstallCheck");
+
+foreach my $smod (keys(%{$testapp->{InstallCheck}})){
+   my $smodname=$smod;
+   $smodname=~s/::ext::InstallCheck$//;
+   if ($testapp->{InstallCheck}->{$smod}->can("getMandatoryModules")){
+      my $mod=$testapp->{InstallCheck}->{$smod};
+      foreach my $module ($mod->getMandatoryModules()){
+         printf("INFO:  mandatory mod %-43s ...","'$module' vor '$smodname'");
+         eval("use $module;");
+         ysleep;printResult($@);
+      }
+   }
+}
+if ($failcount){
+   printf("ERROR: mandatary modules are missing\n");
+   exit(1);
+}
+print("\n");
+
+printf("INFO:  W5InstallCheck Pass 5: ".
+       "running optional package tests ...\n");
+
+foreach my $smod (keys(%{$testapp->{InstallCheck}})){
+   my $smodname=$smod;
+   $smodname=~s/::ext::InstallCheck$//;
+   if ($testapp->{InstallCheck}->{$smod}->can("getOptionalModules")){
+      my $mod=$testapp->{InstallCheck}->{$smod};
+      foreach my $module ($mod->getOptionalModules()){
+         printf("INFO:  mandatory in %-43s ...","'$smodname' mod '$module'");
+         eval("use $module;");
+         ysleep;printResult($@);
+      }
+   }
+}
+
+
+
+
+printf("\n\n");
+$count=sprintf("%3d checks done",$count);
+print(<<EOF);
+   +--------------------------------------------------------------+
+   |    W5Base InstallCheck successfuly - $count         |
+   +--------------------------------------------------------------+
+EOF
+if ($failcount){
+   printf("       ++++  There are %d optional package tests failed  +++\n",
+          $failcount);
+   printf("       ++++  you will perhaps miss some functionalities! +++\n\n");
+}
+
+
+#######################################################################
+#
+# formats the check results and print them out
+#
+sub printResult
+{
+   my $res=shift;
+   my $module=shift;
+   if ($res eq ""){
+      printf("\b\b\b\b    ok\n");
+      $count++;
+   }
+   else{
+      printf("\b\b\b\b    fail\n");
+      $failcount++;
+      last if ($module eq "Time::HiRes");
+   }
+}
+
+
+#######################################################################
+#
+# displays the help
+#
+sub help
+{
+   printf STDERR ("Usage: W5InstallCheck -c {config} [-v]\n");
+}
+
+
+#######################################################################
+
+
+
+
+1;
