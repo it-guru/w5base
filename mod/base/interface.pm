@@ -471,7 +471,7 @@ sub validateObjectname
 sub Ping
 {
    my $self=$W5Base::SOAP;
-   return(1);
+   return({exitcode=>0,result=>1});
 }
 
 package interface::SOAP::kernel;

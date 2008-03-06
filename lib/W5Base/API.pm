@@ -17,6 +17,257 @@ package W5Base::API;
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
+=pod
+
+=head1 NAME
+
+W5Base::API - documentation of W5Base::API and native W5Base SOAP calls
+
+=head1 DESCRIPTION
+
+W5Base::ATI.pm is a perl interface to make the use of SOAP calls to W5Base
+server a little bit easir.
+
+=head1 FUNCTIONS
+
+=head2 XGetOptions()
+
+ $optresult=XGetOptions(\%P,\&Help,undef,undef,".W5Base.Interface");
+
+This function isn't needed to comunicate to W5Base, but it helps you to
+handle your work-script parameters in a comfortable kind.
+In %P you have to specify the posible parameters in Getopt::Long style.
+\&Help is a callback method, witch will be called on paramater problems.
+The last parameter is the filename, in witch the parameters are stored,
+if the --store option is specified by user.
+
+=head2 createConfig()
+
+ $config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug);
+
+The createConfig() function validates the configuration, checks the communication to the desiered W5Base-SOAP-Server and returns a config object on success.
+
+=head1 OBJECT CONSTRUCTOR
+
+=head2 getModuleObject()
+
+ $dataobject=getModuleObject($config,$dataobjectname);
+ $dataobject=getModuleObject($config,$dataobjectname,\$exitcode,\$msgs);
+
+There is no constructor in the classical kind. The function getModuleObject
+returns a dataobject or undef if it fails. If it fails, you can get a
+human readable error message if you specifed two references (\$exitcode,\$msgs) in witch the method can store these informations.
+
+=head1 OBJECT METHODS
+
+=head2 showFields()
+
+ $dataobject->showFields();
+
+If you need informations about the availabel fields in the current dataobject,
+you can read these by calling showFields. There are only these fields displayed, which are static and global in the dataobject. Record specified field informations couldn't be queried.
+The return value is an array of hash references with the field informations.
+
+=head2 SetFilter()
+
+ $dataobject->SetFilter()
+
+The filters are a simple hash reference. In the keys you have to use the
+interal fieldnames (see showFields() ) and in the values, you can use the
+same filter expressions like in the Web-Browser frontend.
+
+Wildcards like *,? oder negation like ! - for greater or less then use < or >. For further informations about filters check the help pages in the Web-Browser interface.
+
+Calling SetFilter is nesassary, if you wan't to use the method getHashList() . To clear all filters, ResetFilter() is to use.
+
+=head2 ResetFilter()
+
+ $dataobject->ResetFilter()
+
+With ResetFilter() all filters stored with SetFilter() will be deleted.
+
+=head2 getHashList()
+
+ @records=$dataobject->getHashList(qw(fieldname1 fieldname2 ...));
+
+To read the datarecords filterd with SetFilter() a call of getHashList() needs
+to be used. As parameters to getHashList() you specify an array with the
+list of fieldnames you want to read.
+The result is a array of hash references on success.
+
+=head2 storeRecord()
+
+ $id=$dataobject->storeRecord({field1=>'val',field2=>'val'}); 
+ $id=$dataobject->storeRecord({field1=>'val',field2=>'val'},$id); 
+
+If storeRecord() is called with $id, it will update the specified record. If
+$id is not specified or undef, storeRecord() will try to insert a new record.
+Any way, the unique identifier of the processed record will returned on success.
+
+=head2 deleteRecord()
+
+ $dataobject->deleteRecord($id); 
+
+A call to deleteRecord() deletes the record identified by $id.
+
+=head2 dieOnERROR()
+
+ $dataobject->dieOnERROR(); 
+
+A simple check, if in LastMsg is any error message the current programm die's.
+
+=head2 LastMsg()
+
+
+
+=head1 NATIVE SOAP-INTERFACE
+
+All SOAP calls to W5Base need the call structure:
+
+ <?xml version="1.0" encoding="UTF-8"?>
+ <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+       xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" 
+       xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" 
+       soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+  <!-- SOAP Body -->
+ </soap:Envelope>
+
+The SOAP body describes the call, you want to process on the W5Base 
+server. In the following documentation only the SOAP body is described.
+All method calls needs  B<xmlns="http://w5base.net/interface/SOAP"> in the method call. You can specifiy in all calls a B<lang>, but at now only 'en' will be used. The lang defines the language of the lastmsg values.
+
+The result of an method call always contains the field B<exitcode>. If this isn't 0, there will be also a field B<lastmsg> in the answer, witch contains the error in a human readable form.
+
+=head2 SOAP-Method: Ping
+
+With the ping method, you can do a native communication check. If this call returns an exitcode=0 your transport, authentication and SOAP call convention is correct. It is a good way to do a "Hello World!" in SOAP communication with the W5Base Server.
+
+ <soap:Body>
+   <Ping xmlns="http://w5base.net/interface/SOAP" xsi:nil="true"/>
+ </soap:Body>
+
+If all is fine, you will get a SOAP response like that:
+
+ <soap:Body>
+   <PingResponse xmlns="http://w5base.net/interface/SOAP">
+     <s-gensym15>
+       <exitcode xsi:type="xsd:int">0</exitcode>
+       <result   xsi:type="xsd:int">1</result>
+     </s-gensym15>
+   </PingResponse>
+ </soap:Body>
+
+B<Input:>
+
+  namespace     : http://w5base.net/interface/SOAP
+  encodingStyle : http://schemas.xmlsoap.org/soap/encoding/
+  message       : Ping
+  parts:
+    lang          : xsd:string
+
+B<Output:>
+
+  namespace     : http://w5base.net/interface/SOAP
+  encodingStyle : http://schemas.xmlsoap.org/soap/encoding/
+  message       : PingResponse
+  parts:
+    exitcode      : xsd:int
+    lastmsg       : soapenc:arrayType [ xsd:string ]
+    result        : xsd:int
+
+=head2 SOAP-Method: validateObjectname
+
+To verify the naming of an dataobject you can use this method. In W5Base::API this call is used in the API-Method getModuleOjbject to verify a valid objectname specification.
+
+B<Input:>
+
+  namespace     : http://w5base.net/interface/SOAP
+  encodingStyle : http://schemas.xmlsoap.org/soap/encoding/
+  message       : validateObjectname
+  parts:
+    dataobject    : xsd:string
+    lang          : xsd:string
+
+B<Output:>
+
+  namespace     : http://w5base.net/interface/SOAP
+  encodingStyle : http://schemas.xmlsoap.org/soap/encoding/
+  message       : validateObjectnameResponse
+  parts:
+    exitcode      : xsd:int
+    lastmsg       : soapenc:arrayType [ xsd:string ]
+
+=head2 SOAP-Method: showFields
+
+With the showFields message, you can get informations about the structure (available fields) of the specified dataobject in the output array 'records'.
+
+B<Input:>
+
+  namespace     : http://w5base.net/interface/SOAP
+  encodingStyle : http://schemas.xmlsoap.org/soap/encoding/
+  message       : showFields
+  parts:
+    dataobject    : xsd:string
+    lang          : xsd:string
+
+B<Output:>
+
+  namespace     : http://w5base.net/interface/SOAP
+  encodingStyle : http://schemas.xmlsoap.org/soap/encoding/
+  message       : showFieldsResponse
+  parts:
+    exitcode      : xsd:int
+    lastmsg       : soapenc:arrayType [ xsd:string ]
+    records       : soapenc:arrayType
+
+=head2 SOAP-Method: getHashList
+
+The getHashList message is the basic search function. By specifing 'filter' and 'view' you can search any informations in the W5Base witch are accessable by your useraccount.
+
+B<Input:>
+
+  namespace     : http://w5base.net/interface/SOAP
+  encodingStyle : http://schemas.xmlsoap.org/soap/encoding/
+  message       : getHashList
+  parts:
+    dataobject    : xsd:string
+    view          : soapenc:arrayType [ xsd:string ]
+    filter        : list of field filters
+    lang          : xsd:string
+
+B<Output:>
+
+  namespace     : http://w5base.net/interface/SOAP
+  encodingStyle : http://schemas.xmlsoap.org/soap/encoding/
+  message       : getHashListResponse
+  parts:
+    exitcode      : xsd:int
+    lastmsg       : soapenc:arrayType [ xsd:string ]
+    records       : soapenc:arrayType
+
+
+
+=head2 SOAP-Method: storeRecord
+
+documentation is ToDo.
+
+=head2 SOAP-Method: deleteRecord
+
+documentation is ToDo.
+
+=head2 SOAP-Method: getPosibleWorkflowActions
+
+not implemented at now (02/2008)
+
+=head2 SOAP-Method: processWorkflowAction
+
+not implemented at now (02/2008)
+
+=cut
+
+
+
 use strict;
 use vars qw(@EXPORT @ISA);
 use Exporter;
@@ -252,7 +503,8 @@ sub createConfig
    }
    
 
-   return(undef) if (!defined($result) || $result==0);
+   return(undef) if (!defined($result) || ref($result) ne "HASH" ||
+                     $result->{result}==0);
 
    return({base=>$base,user=>$user,pass=>$pass,SOAP=>$SOAP,
            lang=>$lang,debug=>$debug});
@@ -471,6 +723,19 @@ sub SOAP   {$_[0]->{SOAP}}
 sub Name   {$_[0]->{NAME}}
 sub Filter {$_[0]->{FILTER}}
 sub Config {$_[0]->{CONFIG}}
+
+=pod
+
+=head1 COPYRIGHT
+
+Copyright (C) 2008 Hartmut Vogler. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+
 
 1;
 
