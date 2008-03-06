@@ -1,0 +1,311 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>W5Base::API - documentation of W5Base::API and native W5Base SOAP calls</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#functions">FUNCTIONS</a></li>
+	<ul>
+
+		<li><a href="#xgetoptions__"><code>XGetOptions()</code></a></li>
+		<li><a href="#createconfig__"><code>createConfig()</code></a></li>
+	</ul>
+
+	<li><a href="#object_constructor">OBJECT CONSTRUCTOR</a></li>
+	<ul>
+
+		<li><a href="#getmoduleobject__"><code>getModuleObject()</code></a></li>
+	</ul>
+
+	<li><a href="#object_methods">OBJECT METHODS</a></li>
+	<ul>
+
+		<li><a href="#showfields__"><code>showFields()</code></a></li>
+		<li><a href="#setfilter__"><code>SetFilter()</code></a></li>
+		<li><a href="#resetfilter__"><code>ResetFilter()</code></a></li>
+		<li><a href="#gethashlist__"><code>getHashList()</code></a></li>
+		<li><a href="#storerecord__"><code>storeRecord()</code></a></li>
+		<li><a href="#deleterecord__"><code>deleteRecord()</code></a></li>
+		<li><a href="#dieonerror__"><code>dieOnERROR()</code></a></li>
+		<li><a href="#lastmsg__"><code>LastMsg()</code></a></li>
+	</ul>
+
+	<li><a href="#native_soapinterface">NATIVE SOAP-INTERFACE</a></li>
+	<ul>
+
+		<li><a href="#soapmethod__ping">SOAP-Method: Ping</a></li>
+		<li><a href="#soapmethod__validateobjectname">SOAP-Method: validateObjectname</a></li>
+		<li><a href="#soapmethod__showfields">SOAP-Method: showFields</a></li>
+		<li><a href="#soapmethod__gethashlist">SOAP-Method: getHashList</a></li>
+		<li><a href="#soapmethod__storerecord">SOAP-Method: storeRecord</a></li>
+		<li><a href="#soapmethod__deleterecord">SOAP-Method: deleteRecord</a></li>
+		<li><a href="#soapmethod__getposibleworkflowactions">SOAP-Method: getPosibleWorkflowActions</a></li>
+		<li><a href="#soapmethod__processworkflowaction">SOAP-Method: processWorkflowAction</a></li>
+	</ul>
+
+	<li><a href="#copyright">COPYRIGHT</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<hr />
+<h1><a name="name">NAME</a></h1>
+<p>W5Base::API - documentation of W5Base::API and native W5Base SOAP calls</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>W5Base::ATI.pm is a perl interface to make the use of SOAP calls to W5Base
+server a little bit easir.</p>
+<p>
+</p>
+<hr />
+<h1><a name="functions">FUNCTIONS</a></h1>
+<p>
+</p>
+<h2><a name="xgetoptions__"><code>XGetOptions()</code></a></h2>
+<pre>
+ $optresult=XGetOptions(\%P,\&amp;Help,undef,undef,&quot;.W5Base.Interface&quot;);</pre>
+<p>This function isn't needed to comunicate to W5Base, but it helps you to
+handle your work-script parameters in a comfortable kind.
+In %P you have to specify the posible parameters in Getopt::Long style.
+\&amp;Help is a callback method, witch will be called on paramater problems.
+The last parameter is the filename, in witch the parameters are stored,
+if the --store option is specified by user.</p>
+<p>
+</p>
+<h2><a name="createconfig__"><code>createConfig()</code></a></h2>
+<pre>
+ $config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug);</pre>
+<p>The <code>createConfig()</code> function validates the configuration, checks the communication to the desiered W5Base-SOAP-Server and returns a config object on success.</p>
+<p>
+</p>
+<hr />
+<h1><a name="object_constructor">OBJECT CONSTRUCTOR</a></h1>
+<p>
+</p>
+<h2><a name="getmoduleobject__"><code>getModuleObject()</code></a></h2>
+<pre>
+ $dataobject=getModuleObject($config,$dataobjectname);
+ $dataobject=getModuleObject($config,$dataobjectname,\$exitcode,\$msgs);</pre>
+<p>There is no constructor in the classical kind. The function getModuleObject
+returns a dataobject or undef if it fails. If it fails, you can get a
+human readable error message if you specifed two references (\$exitcode,\$msgs) in witch the method can store these informations.</p>
+<p>
+</p>
+<hr />
+<h1><a name="object_methods">OBJECT METHODS</a></h1>
+<p>
+</p>
+<h2><a name="showfields__"><code>showFields()</code></a></h2>
+<pre>
+ $dataobject-&gt;showFields();</pre>
+<p>If you need informations about the availabel fields in the current dataobject,
+you can read these by calling showFields. There are only these fields displayed, which are static and global in the dataobject. Record specified field informations couldn't be queried.
+The return value is an array of hash references with the field informations.</p>
+<p>
+</p>
+<h2><a name="setfilter__"><code>SetFilter()</code></a></h2>
+<pre>
+ $dataobject-&gt;SetFilter()</pre>
+<p>The filters are a simple hash reference. In the keys you have to use the
+interal fieldnames (see <code>showFields()</code> ) and in the values, you can use the
+same filter expressions like in the Web-Browser frontend.</p>
+<p>Wildcards like *,? oder negation like ! - for greater or less then use &lt; or &gt;. For further informations about filters check the help pages in the Web-Browser interface.</p>
+<p>Calling SetFilter is nesassary, if you wan't to use the method <code>getHashList()</code> . To clear all filters, <code>ResetFilter()</code> is to use.</p>
+<p>
+</p>
+<h2><a name="resetfilter__"><code>ResetFilter()</code></a></h2>
+<pre>
+ $dataobject-&gt;ResetFilter()</pre>
+<p>With <code>ResetFilter()</code> all filters stored with <code>SetFilter()</code> will be deleted.</p>
+<p>
+</p>
+<h2><a name="gethashlist__"><code>getHashList()</code></a></h2>
+<pre>
+ @records=$dataobject-&gt;getHashList(qw(fieldname1 fieldname2 ...));</pre>
+<p>To read the datarecords filterd with <code>SetFilter()</code> a call of <code>getHashList()</code> needs
+to be used. As parameters to <code>getHashList()</code> you specify an array with the
+list of fieldnames you want to read.
+The result is a array of hash references on success.</p>
+<p>
+</p>
+<h2><a name="storerecord__"><code>storeRecord()</code></a></h2>
+<pre>
+ $id=$dataobject-&gt;storeRecord({field1=&gt;'val',field2=&gt;'val'}); 
+ $id=$dataobject-&gt;storeRecord({field1=&gt;'val',field2=&gt;'val'},$id);</pre>
+<p>If <code>storeRecord()</code> is called with $id, it will update the specified record. If
+$id is not specified or undef, <code>storeRecord()</code> will try to insert a new record.
+Any way, the unique identifier of the processed record will returned on success.</p>
+<p>
+</p>
+<h2><a name="deleterecord__"><code>deleteRecord()</code></a></h2>
+<pre>
+ $dataobject-&gt;deleteRecord($id);</pre>
+<p>A call to <code>deleteRecord()</code> deletes the record identified by $id.</p>
+<p>
+</p>
+<h2><a name="dieonerror__"><code>dieOnERROR()</code></a></h2>
+<pre>
+ $dataobject-&gt;dieOnERROR();</pre>
+<p>A simple check, if in LastMsg is any error message the current programm die's.</p>
+<p>
+</p>
+<h2><a name="lastmsg__"><code>LastMsg()</code></a></h2>
+<p>
+</p>
+<hr />
+<h1><a name="native_soapinterface">NATIVE SOAP-INTERFACE</a></h1>
+<p>All SOAP calls to W5Base need the call structure:</p>
+<pre>
+ &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+ &lt;soap:Envelope xmlns:xsi=&quot;<a href="http://www.w3.org/2001/XMLSchema-instance&quot">http://www.w3.org/2001/XMLSchema-instance&quot</a>; 
+       xmlns:xsd=&quot;<a href="http://www.w3.org/2001/XMLSchema&quot">http://www.w3.org/2001/XMLSchema&quot</a>; 
+       xmlns:soap=&quot;<a href="http://schemas.xmlsoap.org/soap/envelope/&quot">http://schemas.xmlsoap.org/soap/envelope/&quot</a>; 
+       xmlns:soapenc=&quot;<a href="http://schemas.xmlsoap.org/soap/encoding/&quot">http://schemas.xmlsoap.org/soap/encoding/&quot</a>; 
+       soap:encodingStyle=&quot;<a href="http://schemas.xmlsoap.org/soap/encoding/">http://schemas.xmlsoap.org/soap/encoding/</a>&quot;&gt;
+  &lt;!-- SOAP Body --&gt;
+ &lt;/soap:Envelope&gt;</pre>
+<p>The SOAP body describes the call, you want to process on the W5Base 
+server. In the following documentation only the SOAP body is described.
+All method calls needs  <strong>xmlns=``http://w5base.net/interface/SOAP''</strong> in the method call. You can specifiy in all calls a <strong>lang</strong>, but at now only 'en' will be used. The lang defines the language of the lastmsg values.</p>
+<p>The result of an method call always contains the field <strong>exitcode</strong>. If this isn't 0, there will be also a field <strong>lastmsg</strong> in the answer, witch contains the error in a human readable form.</p>
+<p>
+</p>
+<h2><a name="soapmethod__ping">SOAP-Method: Ping</a></h2>
+<p>With the ping method, you can do a native communication check. If this call returns an exitcode=0 your transport, authentication and SOAP call convention is correct. It is a good way to do a ``Hello World!'' in SOAP communication with the W5Base Server.</p>
+<pre>
+ &lt;soap:Body&gt;
+   &lt;Ping xmlns=&quot;<a href="http://w5base.net/interface/SOAP&quot">http://w5base.net/interface/SOAP&quot</a>; xsi:nil=&quot;true&quot;/&gt;
+ &lt;/soap:Body&gt;</pre>
+<p>If all is fine, you will get a SOAP response like that:</p>
+<pre>
+ &lt;soap:Body&gt;
+   &lt;PingResponse xmlns=&quot;<a href="http://w5base.net/interface/SOAP">http://w5base.net/interface/SOAP</a>&quot;&gt;
+     &lt;s-gensym15&gt;
+       &lt;exitcode xsi:type=&quot;xsd:int&quot;&gt;0&lt;/exitcode&gt;
+       &lt;result   xsi:type=&quot;xsd:int&quot;&gt;1&lt;/result&gt;
+     &lt;/s-gensym15&gt;
+   &lt;/PingResponse&gt;
+ &lt;/soap:Body&gt;</pre>
+<p><strong>Input:</strong></p>
+<pre>
+  namespace     : <a href="http://w5base.net/interface/SOAP">http://w5base.net/interface/SOAP</a>
+  encodingStyle : <a href="http://schemas.xmlsoap.org/soap/encoding/">http://schemas.xmlsoap.org/soap/encoding/</a>
+  message       : Ping
+  parts:
+    lang          : xsd:string</pre>
+<p><strong>Output:</strong></p>
+<pre>
+  namespace     : <a href="http://w5base.net/interface/SOAP">http://w5base.net/interface/SOAP</a>
+  encodingStyle : <a href="http://schemas.xmlsoap.org/soap/encoding/">http://schemas.xmlsoap.org/soap/encoding/</a>
+  message       : PingResponse
+  parts:
+    exitcode      : xsd:int
+    lastmsg       : soapenc:arrayType [ xsd:string ]
+    result        : xsd:int</pre>
+<p>
+</p>
+<h2><a name="soapmethod__validateobjectname">SOAP-Method: validateObjectname</a></h2>
+<p>To verify the naming of an dataobject you can use this method. In W5Base::API this call is used in the API-Method getModuleOjbject to verify a valid objectname specification.</p>
+<p><strong>Input:</strong></p>
+<pre>
+  namespace     : <a href="http://w5base.net/interface/SOAP">http://w5base.net/interface/SOAP</a>
+  encodingStyle : <a href="http://schemas.xmlsoap.org/soap/encoding/">http://schemas.xmlsoap.org/soap/encoding/</a>
+  message       : validateObjectname
+  parts:
+    dataobject    : xsd:string
+    lang          : xsd:string</pre>
+<p><strong>Output:</strong></p>
+<pre>
+  namespace     : <a href="http://w5base.net/interface/SOAP">http://w5base.net/interface/SOAP</a>
+  encodingStyle : <a href="http://schemas.xmlsoap.org/soap/encoding/">http://schemas.xmlsoap.org/soap/encoding/</a>
+  message       : validateObjectnameResponse
+  parts:
+    exitcode      : xsd:int
+    lastmsg       : soapenc:arrayType [ xsd:string ]</pre>
+<p>
+</p>
+<h2><a name="soapmethod__showfields">SOAP-Method: showFields</a></h2>
+<p>With the showFields message, you can get informations about the structure (available fields) of the specified dataobject in the output array 'records'.</p>
+<p><strong>Input:</strong></p>
+<pre>
+  namespace     : <a href="http://w5base.net/interface/SOAP">http://w5base.net/interface/SOAP</a>
+  encodingStyle : <a href="http://schemas.xmlsoap.org/soap/encoding/">http://schemas.xmlsoap.org/soap/encoding/</a>
+  message       : showFields
+  parts:
+    dataobject    : xsd:string
+    lang          : xsd:string</pre>
+<p><strong>Output:</strong></p>
+<pre>
+  namespace     : <a href="http://w5base.net/interface/SOAP">http://w5base.net/interface/SOAP</a>
+  encodingStyle : <a href="http://schemas.xmlsoap.org/soap/encoding/">http://schemas.xmlsoap.org/soap/encoding/</a>
+  message       : showFieldsResponse
+  parts:
+    exitcode      : xsd:int
+    lastmsg       : soapenc:arrayType [ xsd:string ]
+    records       : soapenc:arrayType</pre>
+<p>
+</p>
+<h2><a name="soapmethod__gethashlist">SOAP-Method: getHashList</a></h2>
+<p>The getHashList message is the basic search function. By specifing 'filter' and 'view' you can search any informations in the W5Base witch are accessable by your useraccount.</p>
+<p><strong>Input:</strong></p>
+<pre>
+  namespace     : <a href="http://w5base.net/interface/SOAP">http://w5base.net/interface/SOAP</a>
+  encodingStyle : <a href="http://schemas.xmlsoap.org/soap/encoding/">http://schemas.xmlsoap.org/soap/encoding/</a>
+  message       : getHashList
+  parts:
+    dataobject    : xsd:string
+    view          : soapenc:arrayType [ xsd:string ]
+    filter        : list of field filters
+    lang          : xsd:string</pre>
+<p><strong>Output:</strong></p>
+<pre>
+  namespace     : <a href="http://w5base.net/interface/SOAP">http://w5base.net/interface/SOAP</a>
+  encodingStyle : <a href="http://schemas.xmlsoap.org/soap/encoding/">http://schemas.xmlsoap.org/soap/encoding/</a>
+  message       : getHashListResponse
+  parts:
+    exitcode      : xsd:int
+    lastmsg       : soapenc:arrayType [ xsd:string ]
+    records       : soapenc:arrayType</pre>
+<p>
+</p>
+<h2><a name="soapmethod__storerecord">SOAP-Method: storeRecord</a></h2>
+<p>documentation is ToDo.</p>
+<p>
+</p>
+<h2><a name="soapmethod__deleterecord">SOAP-Method: deleteRecord</a></h2>
+<p>documentation is ToDo.</p>
+<p>
+</p>
+<h2><a name="soapmethod__getposibleworkflowactions">SOAP-Method: getPosibleWorkflowActions</a></h2>
+<p>not implemented at now (02/2008)</p>
+<p>
+</p>
+<h2><a name="soapmethod__processworkflowaction">SOAP-Method: processWorkflowAction</a></h2>
+<p>not implemented at now (02/2008)</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright (C) 2008 Hartmut Vogler. All rights reserved.</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>
