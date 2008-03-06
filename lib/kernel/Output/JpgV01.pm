@@ -35,7 +35,6 @@ sub IsModuleSelectable
 {
    my $self=shift;
 
-   printf STDERR ("fifi in jpg IsModuleSelectable $self\n");
    eval("use DTP;");
    if ($@ ne ""){
       return(0);
@@ -91,6 +90,8 @@ sub Init
    eval('use DTP::jpg;$dtp=new DTP::jpg();$self->{zip}=new Archive::Zip();');
    if ($@ eq ""){
       $self->{dtp}=$dtp;
+   }else{
+      printf STDERR ("ERROR: can't use $@\n");
    }
    if (defined($res=$self->getParent->getParent->W5ServerCall("rpcGetUniqueId")) &&
       $res->{exitcode}==0){
