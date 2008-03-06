@@ -20,7 +20,9 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfClass;
+use Data::Dumper;
 use itil::workflow::eventnotify;
+use Text::Wrap qw($columns &wrap);
 
 @ISA=qw(itil::workflow::eventnotify);
 
@@ -97,10 +99,210 @@ sub getPosibleEventStatType
    return(@l);
 }
 
+sub getNotificationSubject 
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $subjectlabel=shift;
+   my $failclass=shift;
+   my $ag=shift;
+   my $subject;
+ 
+   $subject="$ag: Kundeninformation Anwendungsausfall/Störung";
+   if ($WfRec->{eventmode} eq "EVk.net"){ 
+      $subject="$ag: Kundeninformation Anwendungsausfall/Störung";
+   }
+   if ($WfRec->{eventmode} eq "EVk.infraloc"){ 
+      $subject="$ag: Kundeninformation Anwendungsausfall/Störung";
+   }
+   $subject.=" HeadID ".$WfRec->{id};
+   return($subject);
+}
 
+sub getSalutation
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $ag=shift;
+   my $salutation;
+   my $info;
+   my $st;
+ 
+   my $eventstat=$WfRec->{stateid};
+   my $eventstart=$WfRec->{eventstartofevent};
+   my $utz=$self->getParent->UserTimezone();
+   my $creationtime=$self->getParent->ExpandTimeExpression($eventstart,"de","UTC",$utz);
+   if ($WfRec->{eventmode} eq "EVk.infraloc" && $eventstat==17){
+      $salutation=<<EOF;
+Sehr geehrte Kundin, sehr geehrter Kunde,
 
+die Beeinträchtigung der Infrastruktur wurde beseitig.
+EOF
+   }elsif($WfRec->{eventmode} eq "EVk.infraloc"){
+      $salutation=<<EOF;
+Sehr geehrte Damen und Herren,
 
+folgende Informationen zum Ereignis im Bereich
+der Rechenzentrums-Infrastruktur liegen derzeit vor:
+$info
+EOF
+   }elsif ($WfRec->{eventmode} eq "EVk.appl" && $eventstat==17){
+      $salutation=<<EOF;
+Sehr geehrte Kundin, sehr geehrter Kunde,
 
+die Beeinträchtigung im Umfeld der AG "$ag" wurde beseitigt.
+EOF
+   }elsif($WfRec->{eventmode} eq "EVk.appl"){
+      $salutation=<<EOF;
+Sehr geehrte Damen und Herren,
 
+im Folgenden erhalten Sie den aktuellen Stand zum Ereignis
+der Anwendung '$ag' vom $creationtime.
+EOF
+   }elsif ($WfRec->{eventmode} eq "EVk.net" && $eventstat==17){
+      $salutation=<<EOF;
+Sehr geehrte Kundin, sehr geehrter Kunde,
+
+die Beeinträchtigung im Umfeld des TCP/IP-Netzes (HitNet) wurde beseitigt.
+EOF
+   }elsif($WfRec->{eventmode} eq "EVk.net"){   
+      $salutation=<<EOF;
+Sehr geehrte Damen und Herren,
+
+folgende Informationen zum Ereignis im Bereich des 
+TCP/IP-Netzes (HitNet) liegen derzeit vor:
+$info
+EOF
+   }
+   return($salutation);
+}
+ 
+sub getNotificationSkinbase
+{
+   my $self=shift;
+   return('AL_TCom');
+}
+
+sub generateMailSet
+{
+   my $self=shift;
+   my ($WfRec,$eventlang,$additional,$emailprefix,$emailpostfix,
+       $emailtext,$emailsep,$emailsubheader,$emailsubtitle)=@_;
+   my @emailprefix=();
+   my @emailpostfix=();
+   my @emailtext=();
+   my @emailsep=();
+   my @emailsubheader=();
+   my @emailsubtitle=();
+
+   my $baseurl;
+   if ($ENV{SCRIPT_URI} ne ""){
+      $baseurl=$ENV{SCRIPT_URI};
+      $baseurl=~s#/auth/.*$##;
+   }
+   my @baseset=qw(wffields.eventstatclass wffields.eventstartofevent);
+   my $fo=$self->getField("wffields.eventendofevent",$WfRec);
+   if (defined($fo)){
+      my $v=$fo->FormatedResult($WfRec,"HtmlMail");
+      if (defined($v)){
+         push(@baseset,"wffields.eventendofevent");
+      }else{
+         push(@baseset,"wffields.eventendexpected");
+      }
+   }
+   # wffields.eventstatnature deleted w5baseid: 12039307490008 
+   push(@baseset,qw(wffields.affectedregion));
+   if ($WfRec->{eventmode} eq "EVk.appl"){
+      push(@baseset,"affectedapplication");
+      push(@baseset,"wffields.affectedcustomer");
+   }
+   my @sets=([@baseset,qw(
+                          wffields.eventimpact
+                          wffields.eventreason 
+                          wffields.shorteventelimination
+                         )],
+             [@baseset,qw(
+                          wffields.eventaltimpact
+                          wffields.eventaltreason 
+                          wffields.altshorteventelimination
+                         )]);
+   my $lang="de";
+   my $line=0;
+   my $mailsep=0;
+   $mailsep="$lang:" if ($#emailsep!=-1); 
+   $ENV{HTTP_FORCE_LANGUAGE}=$lang;
+
+   my @fields=@{shift(@sets)};
+   foreach my $field (@fields){
+      my $fo=$self->getField($field,$WfRec);
+      my $sh=0;
+      $sh=" " if ($field eq "wffields.eventaltdesciption" ||
+                  $field eq "wffields.eventdesciption");
+      if (defined($fo)){
+         my $v=$fo->FormatedResult($WfRec,"HtmlMail");
+         if($field eq "wffields.eventendexpected" && $v eq ""){
+            $v=" ";
+         }
+         if ($v ne ""){
+            if ($baseurl ne "" && $line==0){
+               my $ilang="?HTTP_ACCEPT_LANGUAGE=$lang";
+               my $imgtitle=$self->getParent->T("current state of workflow",
+                                                "base::workflow");
+               push(@emailpostfix,
+                    "<img title=\"$imgtitle\" class=status border=0 ".
+                    "src=\"$baseurl/public/base/workflow/".
+                    "ShowState/$WfRec->{id}$ilang\">");
+            }
+            else{
+               push(@emailpostfix,"");
+            }
+            my $data=$v;
+            $data=~s/</&lt;/g;
+            $data=~s/>/&gt;/g;
+            $columns="50";
+            $data=wrap("","",$data);
+
+            push(@emailtext,$data);
+            push(@emailsubheader,$sh);
+            push(@emailsep,$mailsep);
+            if ($line==0){ 
+                push(@emailprefix,$fo->Label().":");
+                push(@emailsubtitle,"Problemdetails");
+            }elsif($field eq "wffields.affectedcustomer"){
+                push(@emailsubtitle,"");    
+                push(@emailprefix,"betroffener Kunde:");
+            }elsif($field eq "wffields.eventimpact"){
+                push(@emailsubtitle,"");    
+                push(@emailprefix,"Auswirkungen für den Kunden:");
+            }elsif($field eq "wffields.eventreason"){
+                push(@emailsubtitle,"");    
+                push(@emailprefix,"Beschreibung der Ursache:");
+            }elsif($field eq "wffields.shorteventelimination"){
+                push(@emailsubtitle,"");    
+                push(@emailprefix,"Kurzfristige Massnahme zur Servicewiederherstellung:");
+            }else{
+                push(@emailprefix,$fo->Label().":");
+                push(@emailsubtitle,"");
+            }
+            $line++;
+            $mailsep=0;
+         }
+     }
+   }
+   my $rel=$self->getField("relations",$WfRec);
+   my $reldata=$rel->ListRel($WfRec->{id},"mail",{name=>\'consequenceof'});
+   push(@emailprefix,$rel->Label().":");
+   push(@emailtext,$reldata);
+   push(@emailsubheader,0);
+   push(@emailsep,0);
+   push(@emailpostfix,"");
+   delete($ENV{HTTP_FORCE_LANGUAGE});
+   @$emailprefix=@emailprefix;
+   @$emailpostfix=@emailpostfix;
+   @$emailtext=@emailtext;
+   @$emailsep=@emailsep;
+   @$emailsubheader=@emailsubheader;
+   @$emailsubtitle=@emailsubtitle;
+}
 
 1;

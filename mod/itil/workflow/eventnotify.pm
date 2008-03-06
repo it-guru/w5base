@@ -94,6 +94,11 @@ sub getDynamicFields
                                   group      =>'eventnotifyshort',
                                   label      =>'Event Start',
                                   alias      =>'eventstart'),
+      new kernel::Field::Date(    name       =>'eventendexpected',
+                                  translation=>'itil::workflow::eventnotify',
+                                  group      =>'eventnotifyshort',
+                                  label      =>'expected event end',
+                                  container  =>'headref'),
       new kernel::Field::Date(    name       =>'eventendofevent',
                                   translation=>'itil::workflow::eventnotify',
                                   group      =>'eventnotifyshort',
@@ -178,6 +183,25 @@ sub getDynamicFields
                                   uivisible  =>\&calcVisibility,
                                   depend     =>['eventmode'],
                                   label      =>'Affected Region'),
+      new kernel::Field::KeyText( name       =>'affectedcustomer',
+                                  translation=>'itil::workflow::base',
+                                  vjointo    =>'base::grp',
+                                  vjoinon    =>['affectedcustomerid'=>'grpid'],
+                                  vjoindisp  =>'name',
+                                  keyhandler =>'kh',
+                                  container  =>'headref',
+                                  uivisible  =>\&calcVisibility,
+                                  group      =>'affected',
+                                  label      =>'Affected Customer'),
+      new kernel::Field::KeyText( name       =>'affectedcustomerid',
+                                  htmldetail =>0,
+                                  translation=>'itil::workflow::base',
+                                  searchable =>0,
+                                  keyhandler =>'kh',
+                                  container  =>'headref',
+                                  group      =>'affected',
+                                  uivisible  =>\&calcVisibility,
+                                  label      =>'Affected Customer ID'),
       new kernel::Field::Textarea(name       =>'eventdesciption',
                                   translation=>'itil::workflow::eventnotify',
                                   group      =>'eventnotify',
@@ -378,6 +402,8 @@ sub calcVisibility
    }
    if ($rec->{headref}->{eventmode}->[0] eq "EVk.appl"){
       return(1) if ($name eq "affectedapplication");
+      return(1) if ($name eq "affectedcustomer");
+      return(1) if ($name eq "affectedcustomerid");
    }
    if ($rec->{headref}->{eventmode}->[0] eq "EVk.net"){
       return(1) if ($name eq "affectednetwork");
@@ -393,7 +419,6 @@ sub activateMailSend
    my $wf=shift;
    my $id=shift;
    my $newmailrec=shift;
-
    my %d=(step=>'base::workflow::mailsend::waitforspool',
           emailsignatur=>'EventNotification');
    $self->linkMail($WfRec->{id},$id);
@@ -795,12 +820,50 @@ sub getNotifyDestinations
 }
 
 
+sub getNotificationSubject
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $subjectlabel=shift;
+   my $failclass=shift;
+   my $ag=shift;
+
+   my $subject="Event: $ag";
+   my $sitename=$self->Config->Param("SITENAME");
+   if ($sitename ne ""){
+      $subject=$sitename.": ".$subject;
+   }
+   if ($WfRec->{eventmode} eq "EVk.net"){ 
+      $subject.=" Network";
+   }
+   if ($WfRec->{eventmode} eq "EVk.infraloc"){ 
+      $subject.=" Infrastructure; ".$WfRec->{name};
+   }
+   $subject.="; ".$subjectlabel;
+   $subject.="; EKL: ".$failclass;
+   $subject.="; HeadID ".$WfRec->{id};
+   return($subject);
+}
+
+sub getNotificationSkinbase
+{
+   my $self=shift;
+   return('base');
+}
+
+sub getSalutation
+{
+   my $self=shift;
+   my $WfRec=shift;
+   return(0);
+}
+
+
 sub generateMailSet
 {
    my $self=shift;
    my ($WfRec,$eventlang,$additional,$emailprefix,$emailpostfix,
-       $emailtext,$emailsep,
-       $emailsubheader)=@_;
+       $emailtext,$emailsep,$emailsubheader)=@_;
    my @emailprefix=();
    my @emailpostfix=();
    my @emailtext=();
@@ -821,7 +884,7 @@ sub generateMailSet
    if ($WfRec->{eventmode} eq "EVk.appl"){
       push(@baseset,"affectedapplication");
    }
-   my @sets=([@baseset,qw(
+   my @sets=([@baseset,qw(  
                           wffields.eventimpact
                           wffields.eventreason 
                           wffields.shorteventelimination
@@ -1349,6 +1412,10 @@ $StoredWorkspace
 <td class=finput>%eventstartofevent(detail)%</td>
 </tr>
 <tr>
+<td class=fname valign=top width=20%>%eventendexpected(label)%:</td>
+<td class=finput>%eventendexpected(detail)%</td>
+</tr>
+<tr>
 <td class=fname valign=top width=20%>%eventdesciption(label)%:</td>
 <td class=finput>%eventdesciption(detail)%</td>
 <tr><td colspan=2>
@@ -1384,13 +1451,14 @@ sub Validate
       my $appl=getModuleObject($self->Config,"itil::appl");
       $appl->SetFilter({id=>$applid,cistatusid=>"<=4"});
       my (%mandator,%mandatorid,%responseteam,%businessteam,
-          %customer,%custcontract,%custcontractid);
+          %customer,%customerid,%custcontract,%custcontractid);
       foreach my $rec ($appl->getHashList(qw(mandator mandatorid 
-                               customer businessteam responseteam
+                               customer customerid businessteam responseteam
                                custcontracts))){
          $responseteam{$rec->{responseteam}}=1 if ($rec->{responseteam} ne "");
          $businessteam{$rec->{businessteam}}=1 if ($rec->{businessteam} ne "");
          $customer{$rec->{customer}}=1 if ($rec->{customer} ne "");
+         $customerid{$rec->{customerid}}=1 if ($rec->{customerid} ne "");
          $mandator{$rec->{mandator}}=1 if ($rec->{mandator} ne "");
          $mandatorid{$rec->{mandatorid}}=1 if ($rec->{mandatorid} ne "");
          if (ref($rec->{custcontracts}) eq "ARRAY"){
@@ -1412,6 +1480,10 @@ sub Validate
       $newrec->{kh}->{affectedcontractid}=[keys(%custcontractid)];
       $newrec->{affectedcontract}=[keys(%custcontract)];
       $newrec->{affectedcontractid}=[keys(%custcontractid)];
+      $newrec->{kh}->{affectedcustomer}=[keys(%customer)];
+      $newrec->{kh}->{affectedcustomerid}=[keys(%customerid)];
+      $newrec->{affectedcustomer}=[keys(%customer)];
+      $newrec->{affectedcustomerid}=[keys(%customerid)];
       $newrec->{involvedcustomer}=[keys(%customer)];
       $newrec->{involvedbusinessteam}=[keys(%businessteam)];
       $newrec->{involvedresponseteam}=[keys(%responseteam)];
@@ -1741,18 +1813,19 @@ sub generateWorkspace
    my @emailtext=();
    my @emailsep=();
    my @emailsubheader=();
+   my @emailsubtitle=();
    my %additional=();
    $self->getParent->generateMailSet($WfRec,\$emaillang,\%additional,
                     \@emailprefix,\@emailpostfix,\@emailtext,\@emailsep,
-                    \@emailsubheader);
+                    \@emailsubheader,\@emailsubtitle);
    return("&nbsp;Vorschau:<br>".
           $self->generateNotificationPreview(emailtext=>\@emailtext,
                                              emailprefix=>\@emailprefix,
                                              emailsep=>\@emailsep,
                                              emailsubheader=>\@emailsubheader,
+                                             emailsubtitle=>\@emailsubtitle,
                                              to=>\@email));
 }
-
 
 sub getPosibleButtons
 {  
@@ -1782,9 +1855,10 @@ sub Process
       #
       # check for needed values bevor sendcustinfo (REQ:11937530250003)
       # eventstatclass has been added by request (REQ:011946102560002)
+      # eventnature has been added by request (REQ:12009961770002)
       foreach my $chkvar (qw(eventimpact eventstatclass
                              shorteventelimination 
-                             eventreason)){
+                             eventreason eventstatnature)){
          if ($WfRec->{$chkvar}=~m/^\s*$/){
             my $fobj=$self->getField($chkvar);
             my $msg=sprintf($self->getParent->T("no value in field '\%s'"),
@@ -1806,31 +1880,13 @@ sub Process
          $sendcustinfocount++ if ($arec->{name} eq "sendcustinfo");
       }
       my $wf=getModuleObject($self->Config,"base::workflow");
-      my $subject="Event:";
-      my $sitename=$self->Config->Param("SITENAME");
-      if ($sitename ne ""){
-         $subject=$sitename.": ".$subject;
-      }
-      if ($WfRec->{eventmode} eq "EVk.appl"){ 
-         my $ag="";
-         foreach my $appl (@{$WfRec->{affectedapplication}}){
-            $ag.="; " if ($ag ne "");
-            $ag.=$appl;
-         }
-         $subject.=" ".$ag;
-      }
-      if ($WfRec->{eventmode} eq "EVk.net"){ 
-         $subject.=" Network";
-      }
-      if ($WfRec->{eventmode} eq "EVk.infraloc"){ 
-         $subject.=" Infrastructure; ".$WfRec->{name};
-      }
       my $eventlang;
       my @emailprefix=();
       my @emailpostfix=();
       my @emailtext=();
       my @emailsep=();
       my @emailsubheader=();
+      my @emailsubtitle=();
 
       my $eventlango=$self->getField("wffields.eventlang",$WfRec);
       $eventlang=$eventlango->RawValue($WfRec) if (defined($eventlango));
@@ -1840,7 +1896,7 @@ sub Process
       my $subjectlabel="first information";
       my $headtext=$self->T($subjectlabel,'itil::workflow::eventnotify');
       if ($sendcustinfocount>1){
-         $subjectlabel="followup info";
+         $subjectlabel="follow info";
          $headtext=$sendcustinfocount.". ".$self->T($subjectlabel,
                                           'itil::workflow::eventnotify');
       }
@@ -1849,13 +1905,17 @@ sub Process
          $headtext=$self->T($subjectlabel,'itil::workflow::eventnotify');
       }
       delete($ENV{HTTP_FORCE_LANGUAGE});
+      my $ag="";
+      if ($WfRec->{eventmode} eq "EVk.appl"){ 
+         foreach my $appl (@{$WfRec->{affectedapplication}}){
+            $ag.="; " if ($ag ne "");
+            $ag.=$appl;
+         }
+      }
 
       my $failclass=$WfRec->{eventstatclass};
-
-      $subject.="; ".$subjectlabel;
-      $subject.="; EKL: ".$failclass;
-      $subject.="; HeadID ".$WfRec->{id};
-
+      my $subject=$self->getParent->getNotificationSubject($WfRec,$subjectlabel,$failclass,$ag);
+      my $salutation=$self->getParent->getSalutation($WfRec,$ag);
 #   elsif ($variname eq "HEADCOLOR"){
 #      my $val=$self->findtemplvar("referenz_failend");
 #      my $failclass=$self->findtemplvar("referenz_failclass"); 
@@ -1872,18 +1932,22 @@ sub Process
 #   }
 
      my $eventstat=$WfRec->{stateid};
-     my $failcolor="#4f84ac";
+     my $failcolor="blue";
+     my $utz=$self->getParent->getParent->UserTimezone();
+     my $creationtime=$self->getParent->getParent->ExpandTimeExpression('now',"de",$utz,$utz);
      if ($eventstat==17){
-        $failcolor="#6BAF5D";
+        $failcolor="green";
      }elsif ($failclass==1 || $failclass==2){
-        $failcolor="#FC5E5E";
+        $failcolor="red";
      }elsif ($failclass==3 || $failclass==4 || $failclass==5){
-        $failcolor="#F6FAB5";
+        $failcolor="yellow";
      }
-      my %additional=(headcolor=>$failcolor,eventtype=>'Event',headtext=>$headtext);
+      my %additional=(headcolor=>$failcolor,eventtype=>'Event',    
+                      headtext=>$headtext,headid=>$id,salutation=>$salutation,
+                      creationtime=>$creationtime);
       $self->getParent->generateMailSet($WfRec,\$eventlang,\%additional,
                        \@emailprefix,\@emailpostfix,\@emailtext,\@emailsep,
-                       \@emailsubheader);
+                       \@emailsubheader,\@emailsubtitle);
       #
       # calc from address
       #
@@ -1916,13 +1980,12 @@ sub Process
             }
          }
       }
-
       my $newmailrec={
              class    =>'base::workflow::mailsend',
              step     =>'base::workflow::mailsend::dataload',
              name     =>$subject,
              emailtemplate  =>'eventnotification',
-             skinbase       =>'base',
+             skinbase       =>$self->getParent->getNotificationSkinbase(),
              emailfrom      =>$emailfrom,
              emailto        =>\@emailto,
              emailcc        =>\@emailcc,
@@ -1932,6 +1995,7 @@ sub Process
              emailtext      =>\@emailtext,
              emailsep       =>\@emailsep,
              emailsubheader =>\@emailsubheader,
+             emailsubtitle  =>\@emailsubtitle,
              additional     =>\%additional
             };
       if (my $id=$wf->Store(undef,$newmailrec)){

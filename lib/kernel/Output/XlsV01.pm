@@ -151,9 +151,7 @@ sub ProcessLine
          $self->{xlscollindex}->{$name}=$self->{maxcollindex};
          $self->{maxcollindex}++;
       }
-
       my $data="undef";
-
       if ($fo->UiVisible("XlsV01",current=>$rec)){ 
          if ($fo->can("getLineSubListData")){
             $data=$fo->getLineSubListData($rec,"xls");

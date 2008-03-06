@@ -19,7 +19,7 @@ package kernel::Output::AscV01;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use Data::Dumper;
+use kernel::Formater;
 @ISA    = qw(kernel::Formater);
 
 

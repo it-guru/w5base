@@ -99,7 +99,7 @@ sub Sendmail
          $ENV{LANG}=$rec->{initiallang};
          msg(DEBUG,"loading mail informations");
          foreach my $d (qw(emailtext emailtstamp emailprefix emailpostfix 
-                           emailhead emailsep emailsubheader)){
+                           emailhead emailsep emailsubheader emailsubtitle)){
             if (defined($rec->{$d})){
                if (ref($rec->{$d}) ne "ARRAY"){
                   $rec->{$d}=[$rec->{$d}];
@@ -187,7 +187,11 @@ sub Sendmail
          msg(DEBUG,"building mail header\nto=%s\ncc=%s\nbcc=%s\nallowed=%s",
              Dumper(\@emailto),Dumper(\@emailcc),Dumper(\@emailbcc),
              Dumper(\@mailallow));
-         $mail.="From: $from\n";
+         if (defined($emailsig) && $emailsig->{fromaddress} ne ""){
+            $mail.="From: $emailsig->{fromaddress}\n";
+         }else{
+            $mail.="From: $from\n";
+         }
          $mail.="To: $to\n" if ($to ne "");
          if (defined($emailsig) && $emailsig->{replyto} ne ""){
             $mail.="Reply-To: $emailsig->{replyto}\n";
@@ -204,11 +208,13 @@ sub Sendmail
          $mail.="Content-Type: text/plain; charset=\"iso-8859-1\"\n\n";
          {
             for(my $blk=0;$blk<=$blkcount;$blk++){
-               $mail.=$rec->{emailhead}->[$blk];
-               $mail.="\n-\n"; 
+               $mail.=$rec->{emailprefix}->[$blk];
+               $mail.="\n"; 
                my $emailtext=$rec->{emailtext}->[$blk];
                $emailtext=~s#<[a-z/].*?>##g;
+               $emailtext=~s#&nbsp;# #g;
                $mail.=$emailtext;
+               $mail.="\n-\n"; 
             }
          }
          $mail.="\n--$bound";
@@ -295,11 +301,13 @@ sub Sendmail
                                      emailbottom =>$emailbottom,
                                      emailtstamp =>$rec->{emailtstamp}->[$blk],
                                      emailprefix =>$rec->{emailprefix}->[$blk],
+                                     emailsubtitle =>$rec->{emailsubtitle}->[$blk],
                                      emailpostfix=>$prepemailpostfix,
                                      currentlang =>$currentlang,
                                      langcontrol =>$langcontrol,
                                                           }
                                    });
+printf STDERR ("fifi emailbuttom=%s\n",$emailbottom);
                if ($rec->{emailsep}->[$blk] ne "" &&
                    $rec->{emailsep}->[$blk] ne "0"){
                   $currentlang=shift(@emaillang);
@@ -372,7 +380,6 @@ sub Sendmail
                }
             }
          }
-         #printf STDERR ("fifi %s\n",Dumper($rec));       
          $mail.="--\n";
          $mail.="\n--$bound--\n";
          msg(DEBUG,"deliver maildata to $sendmail");

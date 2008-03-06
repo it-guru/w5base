@@ -2,6 +2,7 @@
                         en=>'Affected Component'},
 'Affected Application'=>{de=>'betroffene Anwendung'},
 'Affected Customer Contract'=>{de=>'betroffener Kundenvertrag'},
+'Affected Customer'=>{de=>'betroffener Kunde'},
 'Affected System'=>{de=>'betroffenes System'},
 'Affected Location'=>{de=>'betroffener Standort'},
 'Affected Room'=>{de=>'betroffener Raum'},

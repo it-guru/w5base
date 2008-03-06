@@ -56,6 +56,11 @@ sub new
                 label         =>'Replyto',
                 dataobjattr   =>'mailsignatur.replyto'),
 
+      new kernel::Field::Email(
+                name          =>'fromaddress',
+                label         =>'From',
+                dataobjattr   =>'mailsignatur.fromaddress'),
+ 
       new kernel::Field::Htmlarea(
                 name          =>'htmlsig',
                 searchable    =>0,
