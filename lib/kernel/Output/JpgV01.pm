@@ -170,12 +170,12 @@ sub Finish
    my $self=shift;
    my $dirhandler=$self->{dtp}->{_Layout}->{dir};
    $self->{dtp}->GetDocument($self->{dtp}->{_Layout}->{tempfile});
-   my $dir_member = $self->{zip}->addTree($dirhandler);   
    eval('
-   unless ( $self->{zip}->writeToFileNamed("$dirhandler/pics.zip") == AZ_OK )
-   {
-      die("ERROR: write error zipfile error=$?");
-   }
+      my $dir_member = $self->{zip}->addTree($dirhandler);   
+      unless ( $self->{zip}->writeToFileNamed("$dirhandler/pics.zip") == AZ_OK )
+      {
+         die("ERROR: write error zipfile error=$?");
+      }
    ');
    if (open(F,"<$dirhandler/pics.zip")){
       my $buf;
