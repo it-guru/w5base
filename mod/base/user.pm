@@ -286,6 +286,12 @@ sub new
                 value         =>['','normal','large'],
                 container     =>'options'),
 
+      new kernel::Field::Boolean(
+                name          =>'allowifupdate',
+                group         =>'userparam',
+                label         =>'allow automatic updates by interfaces',
+                dataobjattr   =>'user.allowifupdate'),
+
       new kernel::Field::Container(
                 name          =>'options',
                 dataobjattr   =>'user.options'),
@@ -532,6 +538,12 @@ sub Validate
    }
    if (defined($newrec->{posix})){
       $newrec->{posix}=undef if ($newrec->{posix} eq "");
+      if (my $posix=effVal($oldrec,$newrec,"posix")){
+         if (!($posix=~m/^[a-z,0-9,_,-]+$/)){
+            $self->LastMsg(ERROR,"invalid posix identifier specified");
+            return(0); 
+         }
+      }
    }
    if (defined($newrec->{email})){
       $newrec->{email}=undef if ($newrec->{email} eq "");
@@ -691,8 +703,7 @@ sub FinishDelete
                          $infoabo->ValidatedDeleteRecord($_);
                       });
    }
-
-   return(1);
+   return($self->SUPER::FinishDelete($oldrec));
 }
 
 sub getValidWebFunctions

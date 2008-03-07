@@ -46,6 +46,11 @@ sub Init
    $self->RegisterObj("wiw.orgarea",
                       "tswiw::orgarea",
                       defaultacl=>['admin']);
+
+   $self->RegisterObj("sysadm.user.wiwimport",
+                      "tswiw::user",
+                      func=>'ImportUser',
+                      defaultacl=>['valid_user']);
    
    return(1);
 }

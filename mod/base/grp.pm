@@ -427,7 +427,7 @@ sub TreeCreate
                               static=>{createname=>$createname},
                               body=>1,form=>1,
                               title=>"TreeCreate");
-      print $self->getParsedTemplate("tmpl/grp.treecreate",
+      print $self->getParsedTemplate("tmpl/minitool.grp.treecreate",
                            {
                              static=>{xxx=>'yyy'},
                            });

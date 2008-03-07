@@ -1,3 +1,4 @@
 'wiw'=>{de=>'WhoIsWho',en=>'WhoIsWho'},
 'wiw.user'=>{de=>'Mitarbeiterverzeichnis',en=>'Employeedirectory'},
 'wiw.orgarea'=>{de=>'Organisationsverzeichnis',en=>'Organisationdirectory'},
+'sysadm.user.wiwimport'=>{de=>'WhoIsWho Import',en=>'WhoIsWho Import'},

@@ -107,7 +107,8 @@ sub IfaceCompare
 
    my $takeremote=0;
    my $ask=1;
-   if ($param{mode} eq "native"){           # like nativ string compares
+   if ($param{mode} eq "native" ||
+       $param{mode} eq "string"){           # like nativ string compares
       if (exists($comprec->{$compfieldname}) &&
           defined($comprec->{$compfieldname}) &&
           (!defined($origrec->{$origfieldname}) ||

@@ -41,6 +41,7 @@ sub qcheckRecord
    my $self=shift;
    my $dataobj=shift;
    my $rec=shift;
+   my $errorlevel=0;
 
    if ($rec->{email} ne ""){
       my $wiw=getModuleObject($self->getParent->Config(),"tswiw::user");
@@ -49,16 +50,20 @@ sub qcheckRecord
       if (!defined($wiwrec)){
          return(0,['user not found']);
       }
-      my $upd={};
+      my $forcedupd={};
+      my $wfrequest={};
       my @qmsg;
       foreach my $fld (qw(office_phone office_street office_zipcode 
+                          office_location
                           office_facsimile)){
-         if ($rec->{$fld}=~m/^\s*$/ && $wiwrec->{$fld} ne ""){
-            $upd->{$fld}=$wiwrec->{$fld};
-         }
+          $self->IfaceCompare($dataobj,
+                     $rec,$fld,
+                     $wiwrec,$fld,
+                     $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
+                     mode=>'string');
       }
-      if (keys(%$upd)){
-         if ($dataobj->ValidatedUpdateRecord($rec,$upd,
+      if (keys(%$forcedupd)){
+         if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,
                                              {userid=>\$rec->{userid}})){
             push(@qmsg,"some fields has been updated");
          }
@@ -67,9 +72,9 @@ sub qcheckRecord
             return(3,{qmsg=>\@qmsg});
          }
       }
-      return(0,{qmsg=>\@qmsg});
+      return($errorlevel,{qmsg=>\@qmsg});
    }
-   return(0,undef);
+   return($errorlevel,undef);
 }
 
 

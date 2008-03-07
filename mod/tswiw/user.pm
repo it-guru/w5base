@@ -124,6 +124,13 @@ sub new
    return($self);
 }
 
+sub getValidWebFunctions
+{
+   my ($self)=@_;
+   return($self->SUPER::getValidWebFunctions(),qw(ImportUser));
+}
+
+
 sub getRecordImageUrl
 {
    my $self=shift;
@@ -144,6 +151,110 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
    return(undef);
+}
+
+
+sub ImportUser
+{
+   my $self=shift;
+
+   my $importname=Query->Param("importname");
+   if (Query->Param("DOIT")){
+      if (!($self->Import({importname=>$importname}))){
+         Query->Delete("importname");
+         $self->LastMsg(OK,"user has been successfuly imported");
+      }
+      Query->Delete("DOIT");
+   }
+
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','work.css',
+                                   'kernel.App.Web.css'],
+                           static=>{importname=>$importname},
+                           body=>1,form=>1,
+                           title=>"WhoIsWho Import");
+   print $self->getParsedTemplate("tmpl/minitool.user.import",{});
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+
+#######################################################################
+# this is a nativ call, witch can be used by any other module to
+# import WhoIsWho Users in W5Base by specifing WhoIsWhoID oder email.
+# It returns 0 on success or !=0 on error.
+#
+sub Import
+{
+   my $self=shift;
+   my $param=shift;
+
+   my $flt; 
+   if ($param->{importname} ne ""){
+      if ($param->{importname}=~m/\@/){
+         $param->{email}=$param->{importname};
+      }
+      else{
+         $param->{userid}=$param->{importname};
+      }
+   }
+   if ($param->{userid} ne ""){
+      my $id=$param->{userid};
+      $id=~s/[\s\*\?]//g;
+      $flt={uid=>\$id};
+   } 
+   if ($param->{email} ne ""){
+      my $email=$param->{email};
+      $email=~s/[\s\*\?]//g;
+      $flt=[{email=>\$email},{email2=>\$email}];
+   } 
+   if (!defined($flt)){
+      $self->LastMsg(ERROR,"no acceptable filter");
+      return(1);
+   }
+   $self->ResetFilter();
+   $self->SetFilter($flt);
+   my @l=$self->getHashList(qw(uid surname givenname email));
+   if ($#l==-1){
+      $self->LastMsg(ERROR,"contact not found in WhoIsWho");
+      return(2);
+   }
+   if ($#l>0){
+      $self->LastMsg(ERROR,"contact not unique in WhoIsWho");
+      return(3);
+   }
+   my $wiwrec=$l[0];
+   my $user=getModuleObject($self->Config,"base::user");
+   $user->SetFilter([{'email'=>$wiwrec->{email}},{posix=>$wiwrec->{uid}}]);
+   my ($userrec,$msg)=$user->getOnlyFirst(qw(ALL));
+   if (defined($userrec)){
+      if ($userrec->{cistatusid}==4){
+         $self->LastMsg(ERROR,"contact already exists in W5Base");
+         return(3);
+      }
+      if (!($user->ValidatedUpdateRecord($userrec,{cistatusid=>4},
+                                   {userid=>\$userrec->{userid}}))){
+         return(4);
+      }
+   }
+   else{
+      my $uidlist=$wiwrec->{uid};
+      $uidlist=[$uidlist] if (ref($uidlist) ne "ARRAY");
+      my @posix=grep(!/^[A-Z]{1,3}\d+$/,@{$uidlist});
+      my $posix=$posix[0];
+      if (!($user->ValidatedInsertRecord({cistatusid=>4,
+                                     usertyp=>'extern',
+                                     allowifupdate=>1,
+                                     surname=>$wiwrec->{surname},
+                                     givenname=>$wiwrec->{givenname},
+                                     posix=>$posix,
+                                     email=>$wiwrec->{email}}))){
+         return(5);
+      }
+   }
+
+
+   return(0);
 }
 
 
