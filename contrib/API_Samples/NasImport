@@ -7,17 +7,25 @@ use Fcntl qw(SEEK_SET);
 
 my $DefaultBase="https://w5base.net/w5base/auth/";
 my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang);
-my ($mode,$force,$hostname);
+my ($mode,$force,$hostname,$type);
 my %o;
+my $count=0;
 my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
        "webuser=s"=>\$loginuser,"webpass=s"=> \$loginpass,
        "verbose+"=>\$verbose,
-       "force"=>\$force,"hostname"=>\$hostname,
-       "mode=s"=>\$mode);
+       "force"=>\$force,"hostname=s"=>\$hostname,
+       "mode=s"=>\$mode,"type=s"=>\$type);
 my @allowedmodes=qw(auto emc netapp);
 my $optresult=XGetOptions(\%P,\&Help,undef,undef,".W5Base.Interface");
 
 $mode="auto" if (!defined($mode));
+$type="nfs" if (!defined($type));
+
+my @hostname=split(/,/,$hostname);
+if ($#ARGV != $#hostname){
+   msg(ERROR,"number of files and hostnames must be the same!");
+   exit(1);
+}
 
 #######################################################################
 # create connection config
@@ -41,7 +49,8 @@ msg(DEBUG,"verbose=$verbose");
 # load ModuleObject
 #
 my %loadobj=('sys'=>'itil::system',
-             'lnknas'=>'itil::lnksystemnfsnas');
+             'nas'=>'itil::systemnfsnas',
+             'ipnet'=>'itil::lnknfsnasipnet');
 foreach my $localid (keys(%loadobj)){
    my $objectname=$loadobj{$localid};
    my $obj=getModuleObject($Config,$objectname);
@@ -59,20 +68,23 @@ foreach my $file (@ARGV){
       $curmode=detectMode(\*FILE) if ($mode eq "auto");
       msg(DEBUG,"curmode=$curmode");
       my %sharedata;
-      my $result=readFile(\*FILE,\%sharedata,$curmode);
-exit();
+      my $result=readFile(\*FILE,\%sharedata,$curmode,$hostname[$count]);
+      exit(1) if ($result != 0);
       my @oplist;
-      my $result=calculateOperations(\%o,\%sharedata,\@oplist); 
+      my $result=calculateOperations(\%o,\%sharedata,\@oplist,$hostname[$count]); 
+      exit(1) if ($result != 0);
       if ($force){
          my $result=processOperations(\%o,\@oplist);
+         exit(1) if ($result != 0);
+      }else{
+         printf("fifi oplist=%s\n",Dumper(\@oplist)); 
       }
       close(FILE);
    }
+   $count++;
 }
 
-#######################################################################
-# detect import file
-#
+
 
 sub detectMode
 {
@@ -88,28 +100,34 @@ sub detectMode
    return($mode);
 }
 
-#######################################################################
-# read file
-#
+
 
 sub readFile
 {
    my $fh=shift;
-   my $sh=shift;
+   my $sharedata=shift;
    my $cm=shift;
+   my $hostname=shift;
    seek($fh,SEEK_SET,0);
    while(my $line=<$fh>){
       $line=~s/\s*$//;
+      $line=~s/#.*$//;
       if ($cm eq "emc"){
          next if ($line=~m/^\s*#.*$/);
          next if ($line=~m/^\s*$/);
          if (my ($path,$param)=$line=~m/^export\s+"([^"]+)"\s+(.*)\s*$/){
-            printf("fifi line='$line'\n");
             my @param=split(/\s+/,$param); 
             foreach my $param (@param){
                if (my ($var,$ip)=$param=~m/^(\S+)=(.*)\s*$/){
                   foreach my $ip (split(/:/,$ip)){
-                     printf("set %s = var=$var ip=$ip\n",$path);
+                     if ($ip!~m/^.*[\/].*$/ and $ip=~m/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/){
+                        $ip="$ip/32";
+                     }
+                     if (lc($var) eq "access" or lc($var) eq "rw" or lc($var) eq "root"){
+                        $sharedata->{$hostname}->{$path}->{'ip'}->{$ip}->{$var}=1;
+                     }else{
+                        $sharedata->{$hostname}->{$path}->{$var}=$ip;
+                     }
                   }
                }
                else{
@@ -121,10 +139,149 @@ sub readFile
             msg(WARN,$line);
          }
       }elsif($cm eq "netapp"){
+         next if ($line=~m/^\s*#.*$/);
+         next if ($line=~m/^\s*$/);
+         if (my ($path,$param)=$line=~m/^(\/.*)\s+(.*)\s*$/){
+            $param=~s/^-//;
+            my @param=split(/,/,$param); 
+            foreach my $param (@param){
+               if (my ($var,$ip)=$param=~m/^(\S+)=(.*)\s*$/){
+                  foreach my $ip (split(/:/,$ip)){
+                     if ($ip!~m/^.*[\/].*$/ and $ip=~m/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/){
+                        $ip="$ip/32";
+                     }
+                     if (lc($var) eq "access" or lc($var) eq "rw" or lc($var) eq "root"){
+                        $sharedata->{$hostname}->{$path}->{'ip'}->{$ip}->{$var}=1;
+                     }else{
+                        $sharedata->{$hostname}->{$path}->{$var}=$ip;
+                     }
+                  }
+               }
+               else{
+                  msg(WARN,"param problem $param");
+               }
+            }
+         }
+         else{
+            msg(WARN,$line);
+         }
       }
    }
-
+   return(0);
 }
+
+
+
+sub calculateOperations
+{
+   my $o=shift;    
+   my $sharedata=shift;    
+   my $oplist=shift;    
+   my $hostname=shift;    
+   my $found;
+printf STDERR ("fifi sharedata=%s\n",Dumper(\$sharedata));
+   $o->{'sys'}->SetFilter({name=>$hostname});
+   my @hl=$o->{'sys'}->getHashList(qw(id));
+   if ($#hl==-1){
+      msg(ERROR,"system $hostname not exists!");
+      return(1);      
+   }
+   if ($#hl>0){
+      msg(ERROR,"system $hostname not unique!");
+      return(1);      
+   }
+   my $destid=$hl[0]->{id};
+   $o->{'nas'}->SetFilter({systemid=>$destid});
+   my @ln=$o->{'nas'}->getHashList(qw(id systemnfsnasserver name cistatusid
+                                      type exportoptions systemnfsnas system ));
+   if ($#ln==-1){
+      foreach my $share (keys(%{$sharedata->{$hostname}})){ 
+         push(@$oplist,{id         => '',
+                        op         => 'insert',
+                        hostname   => $hostname,
+                        export     => $share,
+                        cistatusid => '4',
+                        type       => $type});
+      }
+   }
+   foreach my $ln (@ln){
+      $found=0;
+      foreach my $share (keys(%{$sharedata->{$hostname}})){
+         if ($ln->{name} eq $share){
+            if ($ln->{type} eq $type and $ln->{cistatus} == 4){
+               msg(INFO,"export ".$ln->{name}." exists. no changes!");
+            }elsif($ln->{type} ne $type){
+               msg(INFO,"export ".$ln->{name}.
+                   " exists. only change the type from ".
+                   $ln->{type}." to ".$type);
+            }elsif($ln->{cistatus} != 4){
+               msg(INFO,"export ".$ln->{name}.
+                   " exists. only change the cistatus from ".
+                   $ln->{cistatus}." to 4");
+            }elsif($ln->{cistatus} != 4 and $ln->{type} ne $type){ 
+               msg(INFO,"export ".$ln->{name}.
+                   " exists. only change the cistatus,type from ".
+                   $ln->{cistatus}." to 4 and ".$ln->{type}." to ".$type);
+            }
+            push(@$oplist,{id       => $ln->{id},
+                           op       => 'update',
+                           hostname => $hostname,
+                           export   => $share,
+                           cistatus => '4',
+                           type     => $type});
+            $found=1;
+         }
+      }
+      if ($found == 0){
+         msg(INFO,"add export ".$ln->{name});
+         push(@$oplist,{id       => '',
+                        op       => 'insert',
+                        hostname => $hostname,
+                        export   => $ln->{name},
+                        cistatus => '4',
+                        type     => $type});
+      }
+   }
+   return(0);
+}
+
+
+
+sub processOperations
+{
+   my $o=shift;    
+   my $oplist=shift;    
+   my $id;
+   foreach my $rec (@$oplist){
+      $id=undef;
+      if ($rec->{'op'} eq 'insert'){
+          $id=$o->{nas}->storeRecord({system   => $rec->{hostname},
+                                      name     => $rec->{export},
+                                      cistatus => $rec->{cistatus},
+                                      type     => $rec->{type}});
+      }elsif($rec->{'op'} eq 'update'){
+          $id=$o->{nas}->storeRecord({system   => $rec->{hostname},
+                                      name     => $rec->{export},
+                                      cistatus => $rec->{cistatus},
+                                      type     => $rec->{type}},$rec->{id});
+      }
+      if ($id){
+         msg(INFO,$rec->{op}." record ".$rec->{export}." id=$id");
+      }else{
+         msg(ERROR,"can't ".$rec->{op}." record ".$rec->{export}." id=$id");
+         return(1);
+      }
+   } 
+}
+
+
+
+
+
+
+
+
+
 
 #sub read_file
 #{
@@ -179,7 +336,8 @@ $RealScript [options] File File ...
    --help    show this help
 
    --mode    
-   --hostname
+   --hostname seperate by comma
+   --type    export type (nfs, cifs ...)
    --force    
 EOF
 }
