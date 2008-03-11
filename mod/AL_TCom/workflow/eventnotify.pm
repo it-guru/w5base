@@ -107,13 +107,14 @@ sub getNotificationSubject
    my $failclass=shift;
    my $ag=shift;
    my $subject;
- 
-   $subject="$ag: Kundeninformation Anwendungsausfall/Störung";
+   my $colon;
+   $colon=":" if ($ag ne "");              
+   $subject="$ag$colon Kundeninformation Anwendungsausfall/Störung";
    if ($WfRec->{eventmode} eq "EVk.net"){ 
-      $subject="$ag: Kundeninformation Anwendungsausfall/Störung";
+      $subject="$ag$colon Kundeninformation Anwendungsausfall/Störung";
    }
    if ($WfRec->{eventmode} eq "EVk.infraloc"){ 
-      $subject="$ag: Kundeninformation Anwendungsausfall/Störung";
+      $subject="$ag$colon Kundeninformation Anwendungsausfall/Störung";
    }
    $subject.=" HeadID ".$WfRec->{id};
    return($subject);
@@ -136,7 +137,7 @@ sub getSalutation
       $salutation=<<EOF;
 Sehr geehrte Kundin, sehr geehrter Kunde,
 
-die Beeinträchtigung der Infrastruktur wurde beseitig.
+die Beeinträchtigung der Infrastruktur wurde beseitigt.
 EOF
    }elsif($WfRec->{eventmode} eq "EVk.infraloc"){
       $salutation=<<EOF;

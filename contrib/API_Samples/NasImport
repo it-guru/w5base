@@ -3,6 +3,7 @@ use lib qw( /opt/w5base/lib);
 use strict;                   
 use W5Base::API;
 use Data::Dumper;
+use Net::DNS;
 use Fcntl qw(SEEK_SET);
 
 my $DefaultBase="https://w5base.net/w5base/auth/";
@@ -17,6 +18,7 @@ my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
        "mode=s"=>\$mode,"type=s"=>\$type);
 my @allowedmodes=qw(auto emc netapp);
 my $optresult=XGetOptions(\%P,\&Help,undef,undef,".W5Base.Interface");
+my $netdns=new Net::DNS::Resolver();
 
 $mode="auto" if (!defined($mode));
 $type="nfs" if (!defined($type));
@@ -50,6 +52,7 @@ msg(DEBUG,"verbose=$verbose");
 #
 my %loadobj=('sys'=>'itil::system',
              'nas'=>'itil::systemnfsnas',
+             'net'=>'itil::network',
              'ipnet'=>'itil::lnknfsnasipnet');
 foreach my $localid (keys(%loadobj)){
    my $objectname=$loadobj{$localid};
@@ -150,6 +153,15 @@ sub readFile
                      if ($ip!~m/^.*[\/].*$/ and $ip=~m/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/){
                         $ip="$ip/32";
                      }
+                     if ($ip!~m/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\/.[0-9]*$/){
+                   #          my $query->search("$ip") or die("fifi\n");
+                   #          foreach my $rr ($query->answer) {
+                   #   DNS       next unless $rr->type eq "A";
+                   #             print $rr->address, "\n";
+                   #          }
+                        msg(WARN,"no ip-address ($ip), entry will be ignored!");
+                        next;
+                     }
                      if (lc($var) eq "access" or lc($var) eq "rw" or lc($var) eq "root"){
                         $sharedata->{$hostname}->{$path}->{'ip'}->{$ip}->{$var}=1;
                      }else{
@@ -178,8 +190,7 @@ sub calculateOperations
    my $sharedata=shift;    
    my $oplist=shift;    
    my $hostname=shift;    
-   my $found;
-printf STDERR ("fifi sharedata=%s\n",Dumper(\$sharedata));
+   my $mode="insert";
    $o->{'sys'}->SetFilter({name=>$hostname});
    my @hl=$o->{'sys'}->getHashList(qw(id));
    if ($#hl==-1){
@@ -194,54 +205,59 @@ printf STDERR ("fifi sharedata=%s\n",Dumper(\$sharedata));
    $o->{'nas'}->SetFilter({systemid=>$destid});
    my @ln=$o->{'nas'}->getHashList(qw(id systemnfsnasserver name cistatusid
                                       type exportoptions systemnfsnas system ));
-   if ($#ln==-1){
-      foreach my $share (keys(%{$sharedata->{$hostname}})){ 
+   foreach my $ln (@ln){
+      my $found=0;
+      foreach my $share (keys(%{$sharedata->{$hostname}})){
+         if ($ln->{name} eq $share){
+            $found=1;
+         }
+      } 
+      if ($found == 0){
+         push(@$oplist,{id         => $ln->{id},
+                        cistatusid => 6,
+                        op         => 'delete'});
+         
+      }
+   }
+   foreach my $share (keys(%{$sharedata->{$hostname}})){
+      my $ref;
+      foreach my $ip (keys(%{$sharedata->{$hostname}->{$share}->{ip}})){
+         my @r;
+         foreach my $rights (keys(%{$sharedata->{$hostname}->{$share}->{ip}->{$ip}})){
+               if ($sharedata->{$hostname}->{$share}->{ip}->{$ip}->{$rights} == 1){
+                  push(@r,$rights);     
+               }
+         }
+         $ref={$ip=>join(",",@r)};
+      }
+      foreach my $ln (@ln){
+         if ($ln->{name} eq $share){
+             msg(INFO,"update record ".$ln->{name});
+             $mode=$ln->{id};
+         }
+      }
+      if ($mode eq "insert"){
+         msg(INFO,"add export ".$share);
          push(@$oplist,{id         => '',
                         op         => 'insert',
                         hostname   => $hostname,
                         export     => $share,
-                        cistatusid => '4',
+                        cistatusid => 4,
+                        ip         => $ref,
                         type       => $type});
+      }elsif(defined($mode)){
+         msg(INFO,"update export ".$share);
+          push(@$oplist,{id         => $mode,
+                         op         => 'update',
+                         hostname   => $hostname,
+                         export     => $share,
+                         cistatusid => 4,
+                         ip         => $ref,
+                         type       => $type});
+            
       }
    }
-   foreach my $ln (@ln){
-      $found=0;
-      foreach my $share (keys(%{$sharedata->{$hostname}})){
-         if ($ln->{name} eq $share){
-            if ($ln->{type} eq $type and $ln->{cistatus} == 4){
-               msg(INFO,"export ".$ln->{name}." exists. no changes!");
-            }elsif($ln->{type} ne $type){
-               msg(INFO,"export ".$ln->{name}.
-                   " exists. only change the type from ".
-                   $ln->{type}." to ".$type);
-            }elsif($ln->{cistatus} != 4){
-               msg(INFO,"export ".$ln->{name}.
-                   " exists. only change the cistatus from ".
-                   $ln->{cistatus}." to 4");
-            }elsif($ln->{cistatus} != 4 and $ln->{type} ne $type){ 
-               msg(INFO,"export ".$ln->{name}.
-                   " exists. only change the cistatus,type from ".
-                   $ln->{cistatus}." to 4 and ".$ln->{type}." to ".$type);
-            }
-            push(@$oplist,{id       => $ln->{id},
-                           op       => 'update',
-                           hostname => $hostname,
-                           export   => $share,
-                           cistatus => '4',
-                           type     => $type});
-            $found=1;
-         }
-      }
-      if ($found == 0){
-         msg(INFO,"add export ".$ln->{name});
-         push(@$oplist,{id       => '',
-                        op       => 'insert',
-                        hostname => $hostname,
-                        export   => $ln->{name},
-                        cistatus => '4',
-                        type     => $type});
-      }
-   }
+   
    return(0);
 }
 
@@ -251,19 +267,64 @@ sub processOperations
 {
    my $o=shift;    
    my $oplist=shift;    
-   my $id;
+   my ($networkid,$id);
+   $o->{'net'}->SetFilter({name=>'T-Systems\ Storage/NAS\ LAN'});
+   my @netid=$o->{'net'}->getHashList(qw(id));
+   if (!($networkid=shift(@netid))){
+      msg(ERROR,"no network id found");
+      return(1);
+   } 
    foreach my $rec (@$oplist){
       $id=undef;
       if ($rec->{'op'} eq 'insert'){
-          $id=$o->{nas}->storeRecord({system   => $rec->{hostname},
-                                      name     => $rec->{export},
-                                      cistatus => $rec->{cistatus},
-                                      type     => $rec->{type}});
+          $id=$o->{nas}->storeRecord({system     => $rec->{hostname},
+                                      name       => $rec->{export},
+                                      cistatusid => $rec->{cistatusid},
+                                      type       => $rec->{type}});
+          foreach my $ip (keys(%{$rec->{'ip'}})){
+             my $stat=$o->{ipnet}->storeRecord({systemnfsnasid => $id,
+                                                exportoptions  => $rec->{'ip'}->{$ip},
+                                                networkid      => $networkid->{id},
+                                                name           => $ip});
+             if ($stat){
+                msg(INFO,$rec->{op}." ip=".$ip);
+             }else{
+                msg(ERROR,"can't ".$rec->{op}." ip=".$ip);
+                return(1);
+             }
+          } 
       }elsif($rec->{'op'} eq 'update'){
-          $id=$o->{nas}->storeRecord({system   => $rec->{hostname},
-                                      name     => $rec->{export},
-                                      cistatus => $rec->{cistatus},
-                                      type     => $rec->{type}},$rec->{id});
+          $id=$o->{nas}->storeRecord({system     => $rec->{hostname},
+                                      name       => $rec->{export},
+                                      cistatusid => $rec->{cistatusid},
+                                      type       => $rec->{type}},$rec->{id});
+          $o->{'ipnet'}->SetFilter({systemnfsnasid=>$rec->{id}});
+          my @ips=$o->{'ipnet'}->getHashList(qw(id));
+printf STDERR ("fifi ips=%s\n",Dumper(\@ips));
+          foreach my $ip (@ips){
+             my $stat=$o->{ipnet}->deleteRecord($ip->{ip});
+             if ($stat){
+                msg(INFO,"delete ip=".$ip);
+             }else{
+                msg(ERROR,"can't delete ip=".$ip);
+                return(1);
+             }
+          }
+          foreach my $ip (keys(%{$rec->{'ip'}})){
+             my $stat=$o->{ipnet}->storeRecord({systemnfsnasid => $id,
+                                                exportoptions  => $rec->{'ip'}->{$ip},
+                                                networkid      => $networkid->{id},
+                                                name           => $ip});
+             if (!defined($stat)){
+                msg(ERROR,"can't ".$rec->{op}." ip=".$ip);
+                return(1);
+             }
+          } 
+      }elsif($rec->{'op'} eq 'delete'){
+          $id=$o->{nas}->storeRecord({cistatusid => $rec->{cistatusid}},$rec->{id});
+      }else{
+          msg(ERROR,"no operation mode");
+          return(1);
       }
       if ($id){
          msg(INFO,$rec->{op}." record ".$rec->{export}." id=$id");
@@ -274,46 +335,6 @@ sub processOperations
    } 
 }
 
-
-
-
-
-
-
-
-
-
-#sub read_file
-#{
-#   my $emc=0;
-#   my $netapp=0;
-#   my $data;
-#   open(RDFILE,"<$file") or die("ERROR: open $file failed!");
-#   while(my $rec=<RDFILE>){
-#      if ($rec=~m/^export.*$/){
-#         $emc=1;
-#      }elsif($rec=~m/^.*sec=sys.*$/){
-#         $netapp=1;
-#      }
-#   }
-#   seek(RDFILE,SEEK_SET,0);
-#   if ($emc == 1){
-#      while(my $rec=<RDFILE>){
-#         if ($rec=~m/^export.*$/){
-#            my @dat=split(/\s+/,$rec); 
-#            foreach my $dat (@dat){
-#               $data->{$dat[1]}->{"rw"}->{$dat}="" if ($dat=~m/^rw=/); 
-#               $data->{$dat[1]}->{"root"}->{$dat}="" if ($dat=~m/^root=/);
-#               $data->{$dat[1]}->{"access"}->{$dat}="" if ($dat=~m/^access=/);
-#            } 
-#         }
-#      }
-#   }elsif($netapp == 1){
-#
-#   }else{
-#      printf STDERR ("ERROR: file format unknown!\n");
-#   }
-#}
 
 my $flt=$ARGV[0];
 if ($flt eq ""){

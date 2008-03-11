@@ -1,5 +1,5 @@
 <!------------------------------------------------------------------------>
-<table id=tabelle width="98%" border="1" cellspacing="0" cellpadding="0">
+<table id=tabelle width="98%" border="0" cellspacing="0" cellpadding="0">
   <tr><td bgcolor=silver valign=top colspan=2><b>%emailsubtitle%</b></td></tr>
   <tr> 
     <td width=160 nowrap>
