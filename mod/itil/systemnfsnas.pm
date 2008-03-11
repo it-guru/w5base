@@ -23,8 +23,7 @@ use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
 use kernel::CIStatusTools;
-use NetAddr::IP qw( Compact Coalesce Zero Ones V4mask V4net :aton :old_storable
-                    :old_nth);
+use NetAddr::IP;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::CIStatusTools);
 
 sub new
