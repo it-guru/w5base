@@ -1179,6 +1179,7 @@ sub LoadInterfaces
                   srcid=>$rec->{id},
                   srcsys=>"W5BaseV1",
                  );
+      $newrec->{conproto}="DB-Link" if ($newrec->{conproto} eq "DB-Lin");
       delete($newrec{conmode}) if ($newrec{conmode} eq "");
       #print Dumper($rec);
       $self->{lnkapplappl}->ValidatedInsertOrUpdateRecord(\%newrec,
