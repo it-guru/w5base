@@ -159,3 +159,4 @@ create table postitnote (
 );
 alter table location add response bigint(20) default NULL;
 alter table location add response2 bigint(20) default NULL;
+alter table mailsignatur add fromaddress varchar(128) default NULL;
