@@ -342,6 +342,7 @@ sub storeRecord
          my ($oldrec,$msg)=$o->getOnlyFirst(qw(ALL));
          if (defined($oldrec)){
             if ($o->SecureValidatedUpdateRecord($oldrec,$newrec,$filter)){
+               $id=~s/^0*//g if (defined($id) && $id=~m/^\d+$/);
                return(interface::SOAP::kernel::Finish({exitcode=>0,
                                                        IdentifiedBy=>$id})); 
             }
@@ -357,6 +358,7 @@ sub storeRecord
    }
    else{
       if (my $id=$o->SecureValidatedInsertRecord($newrec)){
+         $id=~s/^0*//g if (defined($id) && $id=~m/^\d+$/);
          return(interface::SOAP::kernel::Finish({exitcode=>0,
                                                  IdentifiedBy=>$id})); 
       }
