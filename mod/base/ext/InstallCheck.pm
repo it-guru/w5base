@@ -49,7 +49,7 @@ sub getOptionalModules
 
    return qw(Spreadsheet::WriteExcel::Big 
              DTP 
-             pdflib_pl DTP::pdf 
+             pdflib_pl DTP::pdf Archive::Zip
              GD DTP::jpg DTP::png);
 }
 
