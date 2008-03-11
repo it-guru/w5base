@@ -307,7 +307,6 @@ sub Sendmail
                                      langcontrol =>$langcontrol,
                                                           }
                                    });
-printf STDERR ("fifi emailbuttom=%s\n",$emailbottom);
                if ($rec->{emailsep}->[$blk] ne "" &&
                    $rec->{emailsep}->[$blk] ne "0"){
                   $currentlang=shift(@emaillang);
