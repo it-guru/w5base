@@ -112,14 +112,14 @@ sub sendForumMail
                push(@$emailprefix,$self->getParent->T("answer").":");
                push(@$emailtext,$enrec->{comments});
             }
-         }
-         if ($enrec->{creator} ne ""){
-            $user->ResetFilter();
-            $user->SetFilter({userid=>\$enrec->{creator}});
-            my ($urec,$msg)=$user->getOnlyFirst(qw(fullname));
-            if (defined($urec)){
-               push(@$emailprefix,$self->getParent->T("Creator","faq::forumentry").":");
-               push(@$emailtext,$urec->{fullname});
+            if ($enrec->{creator} ne ""){
+               $user->ResetFilter();
+               $user->SetFilter({userid=>\$enrec->{creator}});
+               my ($urec,$msg)=$user->getOnlyFirst(qw(fullname));
+               if (defined($urec)){
+                  push(@$emailprefix,$self->getParent->T("Creator","faq::forumentry").":");
+                  push(@$emailtext,$urec->{fullname});
+               }
             }
          }
       }
