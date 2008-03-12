@@ -263,7 +263,8 @@ sub Sendmail
                my $emailtext=$rec->{emailtext}->[$blk];
                if (!(($emailtext=~m/<a/) ||
                      ($emailtext=~m/<b>/) ||
-                     ($emailtext=~m/<ul>/) ||
+                     ($emailtext=~m/<\/b>/) ||
+                     ($emailtext=~m/<\/ul>/) ||
                      ($emailtext=~m/<i>/) ||
                      ($emailtext=~m/<div/))){
                   $emailtext=~s/</&lt;/g;
