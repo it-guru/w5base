@@ -115,73 +115,57 @@ sub readFile
    while(my $line=<$fh>){
       $line=~s/\s*$//;
       $line=~s/#.*$//;
-      if ($cm eq "emc"){
-         next if ($line=~m/^\s*#.*$/);
-         next if ($line=~m/^\s*$/);
-         if (my ($path,$param)=$line=~m/^export\s+"([^"]+)"\s+(.*)\s*$/){
-            my @param=split(/\s+/,$param); 
-            foreach my $param (@param){
-               if (my ($var,$ip)=$param=~m/^(\S+)=(.*)\s*$/){
-                  foreach my $ip (split(/:/,$ip)){
-                     if ($ip!~m/^.*[\/].*$/ and $ip=~m/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/){
-                        $ip="$ip/32";
-                     }
-                     if (lc($var) eq "access" or lc($var) eq "rw" or lc($var) eq "root"){
-                        $sharedata->{$hostname}->{$path}->{'ip'}->{$ip}->{$var}=1;
-                     }else{
-                        $sharedata->{$hostname}->{$path}->{$var}=$ip;
-                     }
-                  }
-               }
-               else{
-                  msg(WARN,"param problem $param");
-               }
-            }
-         }
-         else{
-            msg(WARN,$line);
-         }
-      }elsif($cm eq "netapp"){
-         next if ($line=~m/^\s*#.*$/);
-         next if ($line=~m/^\s*$/);
-         if (my ($path,$param)=$line=~m/^(\/.*)\s+(.*)\s*$/){
+      next if ($line=~m/^\s*#.*$/);
+      next if ($line=~m/^\s*$/);
+      my ($path,$param,@param);
+      if ($cm eq "netapp"){
+         if (($path,$param)=$line=~m/^(\/.*)\s+(.*)\s*$/){
             $param=~s/^-//;
-            my @param=split(/,/,$param); 
-            foreach my $param (@param){
-               if (my ($var,$ip)=$param=~m/^(\S+)=(.*)\s*$/){
-                  foreach my $ip (split(/:/,$ip)){
-                     if ($ip!~m/^.*[\/].*$/ and $ip=~m/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/){
-                        $ip="$ip/32";
+            @param=split(/,/,$param); 
+         }else{
+            msg(WARN,$line);
+         }
+      }elsif($cm eq "emc"){
+         if (($path,$param)=$line=~m/^export\s+"([^"]+)"\s+(.*)\s*$/){
+             @param=split(/\s+/,$param); 
+         }else{
+            msg(WARN,$line);
+         }
+      }
+      foreach my $param (@param){
+         if (my ($var,$ip)=$param=~m/^(\S+)=(.*)\s*$/){
+            if (lc($var) ne "access" and lc($var) ne "rw" and lc($var) ne "root"){
+               $sharedata->{$hostname}->{$path}->{'exportoptions'}="$ip=$var ";
+               next;
+            }
+            foreach my $ip (split(/:/,$ip)){
+               if ($ip!~m/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+.*$/){
+                  my $query;
+                  if ($query=$netdns->search($ip)){
+                     foreach my $rr ($query->answer) {
+                        next unless $rr->type eq "A";
+                        $ip=$rr->address;
                      }
-                     if ($ip!~m/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\/.[0-9]*$/){
-                   #          my $query->search("$ip") or die("fifi\n");
-                   #          foreach my $rr ($query->answer) {
-                   #   DNS       next unless $rr->type eq "A";
-                   #             print $rr->address, "\n";
-                   #          }
-                        msg(WARN,"no ip-address ($ip), entry will be ignored!");
-                        next;
-                     }
-                     if (lc($var) eq "access" or lc($var) eq "rw" or lc($var) eq "root"){
-                        $sharedata->{$hostname}->{$path}->{'ip'}->{$ip}->{$var}=1;
-                     }else{
-                        $sharedata->{$hostname}->{$path}->{$var}=$ip;
-                     }
+                  }else{
+                     $sharedata->{$hostname}->{$path}->{'exportoptions'}=
+                     $sharedata->{$hostname}->{$path}->{'exportoptions'}."$var=$ip ";
+                     msg(WARN,"unknown $ip, entry will be a export option!");
+                     next;
                   }
                }
-               else{
-                  msg(WARN,"param problem $param");
+               if ($ip!~m/^.*[\/].*$/ and $ip=~m/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/){
+                  $ip="$ip/32";
                }
+               $sharedata->{$hostname}->{$path}->{'ip'}->{$ip}->{$var}=1;
             }
          }
          else{
-            msg(WARN,$line);
+            msg(WARN,"param problem $param");
          }
       }
    }
    return(0);
 }
-
 
 
 sub calculateOperations
@@ -216,7 +200,6 @@ sub calculateOperations
          push(@$oplist,{id         => $ln->{id},
                         cistatusid => 6,
                         op         => 'delete'});
-         
       }
    }
    foreach my $share (keys(%{$sharedata->{$hostname}})){
@@ -228,7 +211,7 @@ sub calculateOperations
                   push(@r,$rights);     
                }
          }
-         $ref={$ip=>join(",",@r)};
+         $ref->{$ip}=join(",",@r);
       }
       foreach my $ln (@ln){
          if ($ln->{name} eq $share){
@@ -238,29 +221,28 @@ sub calculateOperations
       }
       if ($mode eq "insert"){
          msg(INFO,"add export ".$share);
-         push(@$oplist,{id         => '',
-                        op         => 'insert',
-                        hostname   => $hostname,
-                        export     => $share,
-                        cistatusid => 4,
-                        ip         => $ref,
-                        type       => $type});
+         push(@$oplist,{id            => '',
+                        op            => 'insert',
+                        hostname      => $hostname,
+                        export        => $share,
+                        exportoptions => $sharedata->{$hostname}->{$share}->{'exportoptions'},
+                        cistatusid    => 4,
+                        ip            => $ref,
+                        type          => $type});
       }elsif(defined($mode)){
          msg(INFO,"update export ".$share);
-          push(@$oplist,{id         => $mode,
-                         op         => 'update',
-                         hostname   => $hostname,
-                         export     => $share,
-                         cistatusid => 4,
-                         ip         => $ref,
-                         type       => $type});
-            
+          push(@$oplist,{id            => $mode,
+                         op            => 'update',
+                         hostname      => $hostname,
+                         export        => $share,
+                         exportoptions => $sharedata->{$hostname}->{$share}->{'exportoptions'},
+                         cistatusid    => 4,
+                         ip            => $ref,
+                         type          => $type});
       }
    }
-   
    return(0);
 }
-
 
 
 sub processOperations
@@ -277,10 +259,11 @@ sub processOperations
    foreach my $rec (@$oplist){
       $id=undef;
       if ($rec->{'op'} eq 'insert'){
-          $id=$o->{nas}->storeRecord({system     => $rec->{hostname},
-                                      name       => $rec->{export},
-                                      cistatusid => $rec->{cistatusid},
-                                      type       => $rec->{type}});
+          $id=$o->{nas}->storeRecord({system        => $rec->{hostname},
+                                      name          => $rec->{export},
+                                      cistatusid    => $rec->{cistatusid},
+                                      exportoptions => $rec->{exportoptions},
+                                      type          => $rec->{type}});
           foreach my $ip (keys(%{$rec->{'ip'}})){
              my $stat=$o->{ipnet}->storeRecord({systemnfsnasid => $id,
                                                 exportoptions  => $rec->{'ip'}->{$ip},
@@ -294,19 +277,19 @@ sub processOperations
              }
           } 
       }elsif($rec->{'op'} eq 'update'){
-          $id=$o->{nas}->storeRecord({system     => $rec->{hostname},
-                                      name       => $rec->{export},
-                                      cistatusid => $rec->{cistatusid},
-                                      type       => $rec->{type}},$rec->{id});
+          $id=$o->{nas}->storeRecord({system        => $rec->{hostname},
+                                      name          => $rec->{export},
+                                      cistatusid    => $rec->{cistatusid},
+                                      exportoptions => $rec->{exportoptions},
+                                      type          => $rec->{type}},$rec->{id});
           $o->{'ipnet'}->SetFilter({systemnfsnasid=>$rec->{id}});
           my @ips=$o->{'ipnet'}->getHashList(qw(id));
-printf STDERR ("fifi ips=%s\n",Dumper(\@ips));
           foreach my $ip (@ips){
-             my $stat=$o->{ipnet}->deleteRecord($ip->{ip});
+             my $stat=$o->{ipnet}->deleteRecord($ip->{id});
              if ($stat){
-                msg(INFO,"delete ip=".$ip);
+                msg(INFO,"delete ip=".$ip->{id});
              }else{
-                msg(ERROR,"can't delete ip=".$ip);
+                msg(ERROR,"can't delete ip=".$ip->{id});
                 return(1);
              }
           }
@@ -356,7 +339,7 @@ $RealScript [options] File File ...
    --store   stores the parameters (not help,verbose and store)
    --help    show this help
 
-   --mode    
+   --mode    emc, netapp, auto if no --mode
    --hostname seperate by comma
    --type    export type (nfs, cifs ...)
    --force    
