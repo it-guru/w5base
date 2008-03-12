@@ -80,7 +80,9 @@ foreach my $file (@ARGV){
          my $result=processOperations(\%o,\@oplist);
          exit(1) if ($result != 0);
       }else{
-         printf("fifi oplist=%s\n",Dumper(\@oplist)); 
+         foreach my $preview (@oplist){
+            msg(INFO,$preview->{'op'}." ".$preview->{'export'});
+         }
       }
       close(FILE);
    }
@@ -123,13 +125,13 @@ sub readFile
             $param=~s/^-//;
             @param=split(/,/,$param); 
          }else{
-            msg(WARN,$line);
+            msg(WARN,"line ignored: ".$line);
          }
       }elsif($cm eq "emc"){
          if (($path,$param)=$line=~m/^export\s+"([^"]+)"\s+(.*)\s*$/){
              @param=split(/\s+/,$param); 
          }else{
-            msg(WARN,$line);
+            msg(WARN,"line ignored: ".$line);
          }
       }
       foreach my $param (@param){
@@ -149,7 +151,7 @@ sub readFile
                   }else{
                      $sharedata->{$hostname}->{$path}->{'exportoptions'}=
                      $sharedata->{$hostname}->{$path}->{'exportoptions'}."$var=$ip ";
-                     msg(WARN,"unknown $ip, entry will be a export option!");
+                     msg(WARN,"unknown IP/HOST=$ip, entry will be a export option!");
                      next;
                   }
                }
@@ -160,7 +162,7 @@ sub readFile
             }
          }
          else{
-            msg(WARN,"param problem $param");
+            msg(WARN,"param problem $param line=$line");
          }
       }
    }
@@ -199,6 +201,7 @@ sub calculateOperations
       if ($found == 0){
          push(@$oplist,{id         => $ln->{id},
                         cistatusid => 6,
+                        export     => $ln->{name},
                         op         => 'delete'});
       }
    }
@@ -215,12 +218,10 @@ sub calculateOperations
       }
       foreach my $ln (@ln){
          if ($ln->{name} eq $share){
-             msg(INFO,"update record ".$ln->{name});
              $mode=$ln->{id};
          }
       }
       if ($mode eq "insert"){
-         msg(INFO,"add export ".$share);
          push(@$oplist,{id            => '',
                         op            => 'insert',
                         hostname      => $hostname,
@@ -230,7 +231,6 @@ sub calculateOperations
                         ip            => $ref,
                         type          => $type});
       }elsif(defined($mode)){
-         msg(INFO,"update export ".$share);
           push(@$oplist,{id            => $mode,
                          op            => 'update',
                          hostname      => $hostname,
@@ -269,13 +269,12 @@ sub processOperations
                                                 exportoptions  => $rec->{'ip'}->{$ip},
                                                 networkid      => $networkid->{id},
                                                 name           => $ip});
-             if ($stat){
-                msg(INFO,$rec->{op}." ip=".$ip);
-             }else{
+             if (!defined($stat)){
                 msg(ERROR,"can't ".$rec->{op}." ip=".$ip);
                 return(1);
              }
           } 
+          msg(INFO,$rec->{op}." ".$rec->{export});
       }elsif($rec->{'op'} eq 'update'){
           $id=$o->{nas}->storeRecord({system        => $rec->{hostname},
                                       name          => $rec->{export},
@@ -286,9 +285,7 @@ sub processOperations
           my @ips=$o->{'ipnet'}->getHashList(qw(id));
           foreach my $ip (@ips){
              my $stat=$o->{ipnet}->deleteRecord($ip->{id});
-             if ($stat){
-                msg(INFO,"delete ip=".$ip->{id});
-             }else{
+             if (!defined($stat)){
                 msg(ERROR,"can't delete ip=".$ip->{id});
                 return(1);
              }
@@ -303,15 +300,14 @@ sub processOperations
                 return(1);
              }
           } 
+          msg(INFO,$rec->{op}." ".$rec->{export});
       }elsif($rec->{'op'} eq 'delete'){
           $id=$o->{nas}->storeRecord({cistatusid => $rec->{cistatusid}},$rec->{id});
       }else{
           msg(ERROR,"no operation mode");
           return(1);
       }
-      if ($id){
-         msg(INFO,$rec->{op}." record ".$rec->{export}." id=$id");
-      }else{
+      if (!defined($id)){
          msg(ERROR,"can't ".$rec->{op}." record ".$rec->{export}." id=$id");
          return(1);
       }
