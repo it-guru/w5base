@@ -177,6 +177,7 @@ sub calculateOperations
    my $oplist=shift;    
    my $hostname=shift;    
    my $mode="insert";
+   my $networkid;
    $o->{'sys'}->SetFilter({name=>$hostname});
    my @hl=$o->{'sys'}->getHashList(qw(id));
    if ($#hl==-1){
@@ -185,6 +186,16 @@ sub calculateOperations
    }
    if ($#hl>0){
       msg(ERROR,"system $hostname not unique!");
+      return(1);      
+   }
+   $o->{'net'}->SetFilter({name=>['T-Systems Storage/NAS LAN']);
+   my @netid=$o->{'net'}->getHashList(qw(id));
+   if ($#netid==-1){
+      msg(ERROR,"network T-Systems Storage/NAS LAN not exists!");
+      return(1);      
+   }
+   if ($#netid>0){
+      msg(ERROR,"network T-Systems Storage/NAS LAN not unique!");
       return(1);      
    }
    my $destid=$hl[0]->{id};
@@ -199,10 +210,14 @@ sub calculateOperations
          }
       } 
       if ($found == 0){
-         push(@$oplist,{id         => $ln->{id},
-                        cistatusid => 6,
-                        export     => $ln->{name},
-                        op         => 'delete'});
+ #        push(@$oplist,{id         => $ln->{id},
+ #                       cistatusid => 6,
+ #                       export     => $ln->{name},
+ #                       op         => 'delete'});
+          push(@$oplist,{OP           => 'update',
+                         DATAOBJALIAS => 'nas',
+                         IDENTIFYBY   => $ln->{id},
+                         DATA         => {cistatusid => 6});
       }
    }
    foreach my $share (keys(%{$sharedata->{$hostname}})){
@@ -222,23 +237,47 @@ sub calculateOperations
          }
       }
       if ($mode eq "insert"){
-         push(@$oplist,{id            => '',
-                        op            => 'insert',
-                        hostname      => $hostname,
-                        export        => $share,
-                        exportoptions => $sharedata->{$hostname}->{$share}->{'exportoptions'},
-                        cistatusid    => 4,
-                        ip            => $ref,
-                        type          => $type});
+#         push(@$oplist,{id            => '',
+#                        op            => 'insert',
+#                        hostname      => $hostname,
+#                        export        => $share,
+#                        exportoptions => $sharedata->{$hostname}->{$share}->{'exportoptions'},
+#                        cistatusid    => 4,
+#                        ip            => $ref,
+#                        type          => $type});
+          push(@$oplist,{OP           => 'insert',
+                         DATAOBJALIAS => 'nas',
+                         IDENTIFYBY   => undef,
+                         DATA         => {
+                           type          => $type,
+                           cistatusid    => 4,
+                           hostname      => $hostname,
+                           export        => $share,
+                           exportoptions => $sharedata->{$hostname}->{$share}->
+                                            {'exportoptions'},
+                           msg           => "insert $share on $hostname",
+                           network       => $netid[0]->{id};});
+                           
       }elsif(defined($mode)){
-          push(@$oplist,{id            => $mode,
-                         op            => 'update',
-                         hostname      => $hostname,
-                         export        => $share,
-                         exportoptions => $sharedata->{$hostname}->{$share}->{'exportoptions'},
-                         cistatusid    => 4,
-                         ip            => $ref,
-                         type          => $type});
+#          push(@$oplist,{id            => $mode,
+#                         op            => 'update',
+#                         hostname      => $hostname,
+#                         export        => $share,
+#                         exportoptions => $sharedata->{$hostname}->{$share}->{'exportoptions'},
+#                         cistatusid    => 4,
+#                         ip            => $ref,
+#                         type          => $type});
+          push(@$oplist,{OP           => 'update',
+                         DATAOBJALIAS => 'nas',
+                         IDENTIFYBY   => $mode,
+                         DATA         => {
+                           type          => $type,
+                           cistatusid    => 4,
+                           hostname      => $hostname,
+                           export        => $share,
+                           exportoptions => $sharedata->{$hostname}->{$share}->
+                                            {'exportoptions'},
+                           msg           => "update $share on $hostname"});
       }
    }
    return(0);
@@ -249,13 +288,7 @@ sub processOperations
 {
    my $o=shift;    
    my $oplist=shift;    
-   my ($networkid,$id);
-   $o->{'net'}->SetFilter({name=>'T-Systems\ Storage/NAS\ LAN'});
-   my @netid=$o->{'net'}->getHashList(qw(id));
-   if (!($networkid=shift(@netid))){
-      msg(ERROR,"no network id found");
-      return(1);
-   } 
+   my $id;
    foreach my $rec (@$oplist){
       $id=undef;
       if ($rec->{'op'} eq 'insert'){
