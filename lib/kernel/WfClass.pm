@@ -22,7 +22,6 @@ use strict;
 use kernel;
 use kernel::Operator;
 use kernel::Wf;
-use Data::Dumper;
 use kernel::SubDataObj;
 use kernel::TabSelector;
 
@@ -529,7 +528,7 @@ EOF
                               viewgroups       =>['ALL'],
                               });
    my @WfFunctions=$self->getDetailFunctions($WfRec);
-   
+  
    my %param=(functions   =>\@WfFunctions,
               pages       =>[$self->getHtmlDetailPages($p,$WfRec)],
               activpage   =>$p,

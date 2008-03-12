@@ -591,8 +591,8 @@ EOF
       $templ.="<td class=emailpreviewemailtext>".
               "<table style=\"table-layout:fixed;width:100%\" ".
               "cellspacing=0 cellpadding=0><tr><td>".
-              "<pre class=emailpreview>".
-              FancyLinks($param{emailtext}->[$blk])."</pre>".
+              "<div style=\"overflow:hidden\"><pre class=emailpreview>".
+              FancyLinks($param{emailtext}->[$blk])."</pre></div>".
               "</td></tr></table></td>";
       $templ.="</tr>";
    }

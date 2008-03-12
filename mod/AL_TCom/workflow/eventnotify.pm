@@ -260,8 +260,8 @@ sub generateMailSet
             my $data=$v;
             $data=~s/</&lt;/g;
             $data=~s/>/&gt;/g;
-            $columns="50";
-            $data=wrap("","",$data);
+            #$columns="50";
+            #$data=wrap("","",$data);
 
             push(@emailtext,$data);
             push(@emailsubheader,$sh);

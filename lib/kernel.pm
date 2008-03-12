@@ -559,7 +559,9 @@ sub _FancyLinks
          $start=55 if ($start<10 || $start>55);
          my $slink=substr($link,0,$start)."...".
                    substr($link,length($link)-16,16);
-         $res="<a href=\"$link\" target=_blank title=\"$link\">".
+         my $title=$link;
+         $title=~s/^.*?://g;
+         $res="<a href=\"$link\" target=_blank title=\"$title\">".
               "$slink</a>".$prefix;
       }
    }
@@ -571,7 +573,6 @@ sub FancyLinks
    my $data=shift;
    $data=~s#(http|https|telnet|news)(://\S+?)(\?\S+){0,1}(["']{0,1}\s)#_FancyLinks("$1$2$3",$4)#ge;
    $data=~s#(http|https|telnet|news)(://\S+?)(\?\S+){0,1}$#_FancyLinks("$1$2$3",$4)#ge;
-#   $data=~s#\[(http|https|telnet|news)(://\S+?)(\?\S+){0,1}\]\[([^\]]*)\]#_FancyLinks("$1$2$3",$4,$5)#ge;
 
 #   foreach my $color (qw(RED GREEN BLUE)){
 #      $data=~s/&lt;w5${color}&gt;/<font color=$color>/ig;

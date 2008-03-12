@@ -148,9 +148,9 @@ sub ListRel
             }
             if ($mode eq "mail"){
                $d.="---\n" if ($d ne "");
-               $d.="<b>".$trlabel."</b>\n";
+               $d.="<li class=workflowrelations><b>".$trlabel."</b>\n";
                $d.="$partner\n";
-               $d.="$baseurl/auth/base/workflow/ById/$lnkid\n";
+               $d.="$baseurl/auth/base/workflow/ById/$lnkid </li>\n";
             }
             else{
                $d.="<td $onclick style=\"border-top:solid;border-width:1px;".
@@ -172,6 +172,9 @@ sub ListRel
    if ($mode ne "mail"){
       $d.="</table>" if ($headadd);
       $d.="</div>" if ($headadd);
+   }
+   else{
+      $d="<ul class=workflowrelations>".$d."</ul>";
    }
    return($d);
 }

@@ -229,6 +229,23 @@ sub getNextStep
 }
 
 
+sub getHtmlDetailPageContent
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+
+   return($self->SUPER::getHtmlDetailPageContent($p,$rec));
+}
+
+sub getHtmlDetailPages
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+
+   return($self->SUPER::getHtmlDetailPages($p,$rec),"FView"=>$self->T("FView"));
+}
+
+
 
 
 
