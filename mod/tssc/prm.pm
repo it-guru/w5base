@@ -28,6 +28,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->AddFields(
@@ -262,6 +263,19 @@ sub Initialize
    $self->{use_distinct}=0;
    return($bk);
 }
+
+sub initSearchQuery
+{
+   my $self=shift;
+
+   if (!defined(Query->Param("search_sysmodtime"))){
+      Query->Param("search_sysmodtime"=>'>now-7d');
+   }
+}
+
+
+
+
 
 sub getRecordImageUrl
 {

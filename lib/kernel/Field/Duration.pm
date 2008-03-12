@@ -53,6 +53,9 @@ sub FormatedDetail
    foreach my $fo ($p->getFieldObjsByView($self->{depend},current=>$current)){
       if ($fo->Name() eq $self->{depend}->[0]){
          $d1=$fo->RawValue($current);
+         if (defined($d1)){
+            $d1=$self->getParent->ExpandTimeExpression($d1,"en",$fo->timezone,"GMT");
+         }
       }
       if ($fo->Name() eq $self->{depend}->[1]){
          $d2=$fo->RawValue($current);
