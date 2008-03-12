@@ -209,11 +209,18 @@ sub new
                 dataobjattr   =>'rootcausem1.close_type'),
 
       new kernel::Field::Textarea(
+                name          =>'cause',
+                label         =>'Cause',
+                group         =>'close',
+                searchable    =>0,
+                dataobjattr   =>'rootcausea1.root_cause'),
+
+      new kernel::Field::Textarea(
                 name          =>'solution',
                 label         =>'Solution',
                 group         =>'close',
                 searchable    =>0,
-                dataobjattr   =>'rootcausea1.root_cause'),
+                dataobjattr   =>'rootcausea3.resolution'),
 
 
       new kernel::Field::Text(
@@ -296,7 +303,7 @@ sub getDetailBlockPriority                # posibility to change the block order
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="rootcausem1,rootcausea1,rootcausea4";
+   my $from="rootcausem1,rootcausea1,rootcausea3,rootcausea4";
    return($from);
 }
 
@@ -304,6 +311,7 @@ sub initSqlWhere
 {
    my $self=shift;
    my $where="rootcausem1.id=rootcausea4.id and ".
+             "rootcausem1.id=rootcausea3.id and ".
              "rootcausem1.id=rootcausea1.id";
    return($where);
 }

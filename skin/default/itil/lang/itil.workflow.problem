@@ -1,3 +1,6 @@
 'itil::workflow::problem'=>{de=>'ITIL Problem Prozess',
                             en=>'ITIL Problem Process'},
 
+'fieldgroup.itilproblem'=>{de=>'Problem Informationen',
+                           en=>'problem informations'},
+'Solution'=>{de=>'Lösung'},

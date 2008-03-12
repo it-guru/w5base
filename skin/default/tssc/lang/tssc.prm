@@ -10,6 +10,7 @@
 'Pritority'=>{de=>'Priorität'},
 'Creator'=>{de=>'Ersteller'},
 'Solution Type'=>{de=>'Lösungstyp'},
+'Cause'=>{de=>'Grund'},
 'Close Type'=>{de=>'Abschlusstyp'},
 'Workaround'=>{de=>'Übergangslösung'},
 'Solution'=>{de=>'Lösung'},

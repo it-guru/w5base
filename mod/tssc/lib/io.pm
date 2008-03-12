@@ -93,6 +93,7 @@ sub mkProblemStoreRec
    $wfrec{srcid}=$rec->{problemnumber};
    $wfrec{name}=$rec->{name};
    $wfrec{detaildescription}=$rec->{description};
+   $wfrec{problemsolution}=$rec->{solution};
    $wfrec{stateid}=1;
    $wfrec{stateid}=21 if (lc($rec->{status}) eq "closed");
    $wfrec{additional}={

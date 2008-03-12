@@ -1,8 +1,6 @@
 'Send a customert notification'=>{de=>'Kundeninformation versenden'},
 'Send a management notification'=>{de=>'Managementinformation versenden'},
-'Start a WARUM analaysis'=>{de=>'WARUM Analyse durchführen'},
 'Close Workflow'=>{de=>'Ereignisinformation beenden'},
-'Check completeness of Event-Info'=>{de=>'Ereignisinfo auf Vollständigkeit prüfen'},
 'Add Note to flow'=>{de=>'Notiz dem Verlauf hinzufügen'},
 'Modify event timespan'=>{de=>'Ereigniszeitraum anpassen'}
 

@@ -31,6 +31,32 @@ sub new
    return($self);
 }
 
+sub getDynamicFields
+{
+   my $self=shift;
+   my %param=@_;
+   my $class;
+
+   return($self->InitFields(
+      new kernel::Field::Textarea(name       =>'problemsolution',
+                                  group      =>'itilproblem',
+                                  label      =>'Solution',
+                                  container  =>'headref'),
+
+   ));
+}
+
+sub Init
+{
+   my $self=shift;
+
+   $self->AddGroup("itilproblem",translation=>'itil::workflow::problem');
+}
+
+
+
+
+
 sub IsModuleSelectable
 {
    my $self=shift;

@@ -20,7 +20,6 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfClass;
-use Data::Dumper;
 use itil::workflow::eventnotify;
 use Text::Wrap qw($columns &wrap);
 
@@ -305,5 +304,64 @@ sub generateMailSet
    @$emailsubheader=@emailsubheader;
    @$emailsubtitle=@emailsubtitle;
 }
+
+sub getPosibleRelations
+{
+   my $self=shift;
+   my $WfRec=shift;
+   return("AL_TCom::workflow::eventnotify"=>'relprobtick',
+          $self->SUPER::getPosibleRelations($WfRec));
+}
+
+sub getAdditionalMainButtons
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my $d="";
+
+   my @buttons=('rootcausei'=>$self->T("Send Root-Cause Info"),
+                'startwarum'=>$self->T("Start a WARUM analaysis"));
+
+   while(my $name=shift(@buttons)){
+      my $label=shift(@buttons);
+      my $dis="";
+      $dis="disabled" if (!$self->ValidActionCheck(0,$actions,$name));
+      $d.="<input type=submit $dis ".
+          "class=workflowbutton name=$name value=\"$label\">";
+   }
+   return($d);
+}
+
+sub getPosibleActions
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $app=$self->getParent;
+   my $userid=$self->getParent->getCurrentUserId();
+   my @l;
+   push(@l,"rootcausei");
+   return(@l,$self->SUPER::getPosibleActions($WfRec));
+}
+
+sub AdditionalMainProcess
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   if (!defined($action) && Query->Param("rootcausei")){
+      return(-1) if (!$self->ValidActionCheck(1,$actions,"rootcausei"));
+      my @WorkflowStep=Query->Param("WorkflowStep");
+      push(@WorkflowStep,"AL_TCom::workflow::eventnotify::sendrootcausei");
+      Query->Param("WorkflowStep"=>\@WorkflowStep);
+      return(0);
+   }
+   return(undef);
+}
+
+
+
 
 1;

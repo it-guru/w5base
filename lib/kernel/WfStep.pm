@@ -436,18 +436,7 @@ sub getNextStep
 sub ValidActionCheck
 {
    my $self=shift;
-   my $lastmsg=shift;
-   my $actions=shift;
-   my @reqaction=@_;
-   foreach my $a (@reqaction){
-      return(1) if ($a ne "" && grep(/^$a$/,@{$actions}));
-   }
-   if ($lastmsg){
-      my $app=$self->getParent->getParent();
-      $app->LastMsg(ERROR,$app->T("ileagal action '%s' requested"),
-                    join(",",@reqaction));
-   }
-   return(0);
+   return($self->getParent->ValidActionCheck(@_));
 }
 
 

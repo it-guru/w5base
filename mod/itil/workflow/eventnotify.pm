@@ -364,6 +364,23 @@ sub getPosibleEventStatType
    return(@l);
 }
 
+sub getAdditionalMainButtons
+{
+   my $self=shift;
+   my $WfRec=shift;
+
+}
+
+sub AdditionalMainProcess
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   return(-1);
+}
+
 sub FgetPosibleEventStatType
 {
    my $self=shift;
@@ -943,18 +960,11 @@ sub generateMailSet
    }
    delete($ENV{HTTP_FORCE_LANGUAGE});
 
-
-
    @$emailprefix=@emailprefix;
    @$emailpostfix=@emailpostfix;
    @$emailtext=@emailtext;
    @$emailsep=@emailsep;
    @$emailsubheader=@emailsubheader;
-
-
-
-
-
 }
 
 
@@ -1138,7 +1148,6 @@ package itil::workflow::eventnotify::askappl;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfStep;
-use Data::Dumper;
 @ISA=qw(kernel::WfStep);
 
 sub generateStoredWorkspace
@@ -1639,12 +1648,10 @@ sub generateWorkspace
    my $WfRec=shift;
    my $actions=shift;
 
-   my ($Dscust,$Dsmgmt,$Dwfclose,$Dcheckevi,$Dswarum,$Dnote,$Daddnote,
+   my ($Dscust,$Dsmgmt,$Dwfclose,$Dnote,$Daddnote,
        $Dtimemod);
    $Dscust="disabled" if (!$self->ValidActionCheck(0,$actions,"sendcustinfo"));
    $Dsmgmt="disabled" if (!$self->ValidActionCheck(0,$actions,"sendmgmtinfo"));
-   $Dcheckevi="disabled" if (!$self->ValidActionCheck(0,$actions,"checkevi"));
-   $Dswarum="disabled"   if (!$self->ValidActionCheck(0,$actions,"startwarum"));
    $Daddnote="disabled"  if (!$self->ValidActionCheck(0,$actions,"addnote"));
    $Dwfclose="disabled"  if (!$self->ValidActionCheck(0,$actions,"wfclose"));
    $Dtimemod="disabled"  if (!$self->ValidActionCheck(0,$actions,"timemod"));
@@ -1652,8 +1659,9 @@ sub generateWorkspace
    my $t1=$self->T("Add Note to flow");
    my $t2=$self->T("Send a customert notification");
    my $t3=$self->T("Send a management notification");
-   my $t4=$self->T("Start a WARUM analaysis");
-   my $t5=$self->T("Check completeness of Event-Info");
+
+   my $addButtons=$self->getParent->getAdditionalMainButtons($WfRec,$actions);
+
    my $t6=$self->T("Close Workflow");
    my $t7=$self->T("Modify event timespan");
    my $templ=<<EOF;
@@ -1672,12 +1680,9 @@ sub generateWorkspace
 </table>
 </td>
 <td width=1% valign=top>
-<input type=submit $Dcheckevi
-       class=workflowbutton name=checkevi value="$t5">
-<input type=submit $Dswarum
-       class=workflowbutton name=startwarum value="$t4">
 <input type=submit $Dtimemod
        class=workflowbutton name=timemod value="$t7">
+$addButtons
 </td>
 </tr>
 <tr>
@@ -1728,6 +1733,9 @@ sub Process
    my $action=shift;
    my $WfRec=shift;
    my $actions=shift;
+
+   my $mainprocess=$self->getParent->AdditionalMainProcess($action,$WfRec,$actions);
+   return($mainprocess) if ($mainprocess!=-1);
 
    if (!defined($action) && Query->Param("addnote")){
       my $note=Query->Param("note");
