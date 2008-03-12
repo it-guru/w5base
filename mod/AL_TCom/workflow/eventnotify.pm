@@ -102,6 +102,7 @@ sub getNotificationSubject
 {
    my $self=shift;
    my $WfRec=shift;
+   my $action=shift;
    my $subjectlabel=shift;
    my $failclass=shift;
    my $ag=shift;
@@ -115,6 +116,9 @@ sub getNotificationSubject
    if ($WfRec->{eventmode} eq "EVk.infraloc"){ 
       $subject="$ag$colon Kundeninformation Anwendungsausfall/Störung";
    }
+   if ($action eq "rootcausei"){
+      $subject="$ag$colon Ursachenanalyse";
+   }
    $subject.=" HeadID ".$WfRec->{id};
    return($subject);
 }
@@ -123,6 +127,7 @@ sub getSalutation
 {
    my $self=shift;
    my $WfRec=shift;
+   my $action=shift;
    my $ag=shift;
    my $salutation;
    my $info;
@@ -174,6 +179,14 @@ TCP/IP-Netzes (HitNet) liegen derzeit vor:
 $info
 EOF
    }
+   if ($action eq "rootcausei"){
+      $salutation=<<EOF;
+Sehr geehrte Damen und Herren,
+
+wir informieren Sie über das Ergebnis der Ursachenanalyse und über die
+eingeleiteten Maßnahmen.
+EOF
+   }
    return($salutation);
 }
  
@@ -186,7 +199,7 @@ sub getNotificationSkinbase
 sub generateMailSet
 {
    my $self=shift;
-   my ($WfRec,$eventlang,$additional,$emailprefix,$emailpostfix,
+   my ($WfRec,$action,$eventlang,$additional,$emailprefix,$emailpostfix,
        $emailtext,$emailsep,$emailsubheader,$emailsubtitle)=@_;
    my @emailprefix=();
    my @emailpostfix=();
@@ -210,6 +223,10 @@ sub generateMailSet
          push(@baseset,"wffields.eventendexpected");
       }
    }
+   if ($action eq "rootcausei"){
+      @baseset=qw(wffields.eventstatclass wffields.eventstartofevent
+                  wffields.eventendofevent);
+   }
    # wffields.eventstatnature deleted w5baseid: 12039307490008 
    push(@baseset,qw(wffields.affectedregion));
    if ($WfRec->{eventmode} eq "EVk.appl"){
@@ -226,6 +243,10 @@ sub generateMailSet
                           wffields.eventaltreason 
                           wffields.altshorteventelimination
                          )]);
+   if ($action eq "rootcausei"){
+      @sets=([@baseset,qw(wffields.eventimpact wffields.eventreason)],
+             [@baseset,qw(wffields.eventimpact wffields.eventreason)]);
+   }
    my $lang="de";
    my $line=0;
    my $mailsep=0;
@@ -289,13 +310,15 @@ sub generateMailSet
          }
      }
    }
-   my $rel=$self->getField("relations",$WfRec);
-   my $reldata=$rel->ListRel($WfRec->{id},"mail",{name=>\'consequenceof'});
-   push(@emailprefix,$rel->Label().":");
-   push(@emailtext,$reldata);
-   push(@emailsubheader,0);
-   push(@emailsep,0);
-   push(@emailpostfix,"");
+   if ($action ne "rootcausei"){
+      my $rel=$self->getField("relations",$WfRec);
+      my $reldata=$rel->ListRel($WfRec->{id},"mail",{name=>\'consequenceof'});
+      push(@emailprefix,$rel->Label().":");
+      push(@emailtext,$reldata);
+      push(@emailsubheader,0);
+      push(@emailsep,0);
+      push(@emailpostfix,"");
+   }
    delete($ENV{HTTP_FORCE_LANGUAGE});
    @$emailprefix=@emailprefix;
    @$emailpostfix=@emailpostfix;
@@ -340,7 +363,7 @@ sub getPosibleActions
    my $app=$self->getParent;
    my $userid=$self->getParent->getCurrentUserId();
    my @l;
-   push(@l,"rootcausei");
+   push(@l,"rootcausei") if ($WfRec->{stateid}==17);
    return(@l,$self->SUPER::getPosibleActions($WfRec));
 }
 
@@ -358,9 +381,187 @@ sub AdditionalMainProcess
       Query->Param("WorkflowStep"=>\@WorkflowStep);
       return(0);
    }
-   return(undef);
+   return(-1);
 }
 
+
+#######################################################################
+package AL_TCom::workflow::eventnotify::sendrootcausei;
+use vars qw(@ISA);
+use kernel;
+use kernel::WfStep;
+@ISA=qw(kernel::WfStep);
+
+sub generateWorkspace
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my @email=@{$self->Context->{CurrentTarget}};
+   my $emaillang=();
+   my @emailprefix=();
+   my @emailpostfix=();
+   my @emailtext=();
+   my @emailsep=();
+   my @emailsubheader=();
+   my @emailsubtitle=();
+   my %additional=();
+   $self->getParent->generateMailSet($WfRec,"rootcausei",
+                    \$emaillang,\%additional,
+                    \@emailprefix,\@emailpostfix,\@emailtext,\@emailsep,
+                    \@emailsubheader,\@emailsubtitle);
+   return($self->generateNotificationPreview(emailtext=>\@emailtext,
+                                             emailprefix=>\@emailprefix,
+                                             emailsep=>\@emailsep,
+                                             emailsubheader=>\@emailsubheader,
+                                             emailsubtitle=>\@emailsubtitle,
+                                             to=>\@email));
+}
+
+sub getPosibleButtons
+{  
+   my $self=shift;
+   my $WfRec=shift;
+   my %b=$self->SUPER::getPosibleButtons($WfRec);
+   my %em=();
+   $self->getParent->getNotifyDestinations("custinfo",$WfRec,\%em);
+   my @email=sort(keys(%em));
+   $self->Context->{CurrentTarget}=\@email;
+   delete($b{NextStep}) if ($#email==-1);
+   delete($b{BreakWorkflow});
+
+   return(%b);
+}
+
+sub Process
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   if ($action eq "NextStep"){
+      return(undef) if (!$self->ValidActionCheck(1,$actions,"rootcausei"));
+      my %em=();
+      $self->getParent->getNotifyDestinations("sendcustinfo",$WfRec,\%em);
+      my @emailto=sort(keys(%em));
+      my $id=$WfRec->{id};
+      $self->getParent->getParent->Action->ResetFilter();
+      $self->getParent->getParent->Action->SetFilter({wfheadid=>\$id});
+      my @l=$self->getParent->getParent->Action->getHashList(qw(cdate name));
+      my $sendcustinfocount=1;
+      foreach my $arec (@l){
+         $sendcustinfocount++ if ($arec->{name} eq "sendcustinfo");
+      }
+      my $wf=getModuleObject($self->Config,"base::workflow");
+      my $eventlang;
+      my @emailprefix=();
+      my @emailpostfix=();
+      my @emailtext=();
+      my @emailsep=();
+      my @emailsubheader=();
+      my @emailsubtitle=();
+
+      my $eventlango=$self->getField("wffields.eventlang",$WfRec);
+      $eventlang=$eventlango->RawValue($WfRec) if (defined($eventlango));
+      $ENV{HTTP_FORCE_LANGUAGE}=$eventlang;
+      $ENV{HTTP_FORCE_LANGUAGE}=~s/-.*$//;
+
+      my $subjectlabel="Ergebnis der Ursachenanalyse";
+      my $headtext="Ergebnis der Ursachenanalyse";
+      delete($ENV{HTTP_FORCE_LANGUAGE});
+      my $ag="";
+      if ($WfRec->{eventmode} eq "EVk.appl"){ 
+         foreach my $appl (@{$WfRec->{affectedapplication}}){
+            $ag.="; " if ($ag ne "");
+            $ag.=$appl;
+         }
+      }
+
+      my $failclass=$WfRec->{eventstatclass};
+      my $subject=$self->getParent->getNotificationSubject($WfRec,"rootcausei",
+                                                $subjectlabel,$failclass,$ag);
+      my $salutation=$self->getParent->getSalutation($WfRec,"rootcausei",$ag);
+
+      my $eventstat=$WfRec->{stateid};
+      my $failcolor="#6699FF";
+      my $utz=$self->getParent->getParent->UserTimezone();
+      my $creationtime=$self->getParent->getParent->ExpandTimeExpression('now',
+                                                                "de",$utz,$utz);
+      my %additional=(headcolor=>$failcolor,eventtype=>'Event',    
+                      headtext=>$headtext,headid=>$id,salutation=>$salutation,
+                      creationtime=>$creationtime);
+      $self->getParent->generateMailSet($WfRec,"rootcausei",
+                       \$eventlang,\%additional,
+                       \@emailprefix,\@emailpostfix,\@emailtext,\@emailsep,
+                       \@emailsubheader,\@emailsubtitle);
+      #
+      # calc from address
+      #
+      my $emailfrom="unknown\@w5base.net";
+      my @emailcc=();
+      my $uobj=$self->getParent->getPersistentModuleObject("base::user");
+      my $userid=$self->getParent->getParent->getCurrentUserId(); 
+      $uobj->SetFilter({userid=>\$userid});
+      my ($userrec,$msg)=$uobj->getOnlyFirst(qw(email));
+      if (defined($userrec) && $userrec->{email} ne ""){
+         $emailfrom=$userrec->{email};
+         my $qemailfrom=quotemeta($emailfrom);
+         if (!grep(/^$qemailfrom$/,@emailto)){
+            push(@emailcc,$emailfrom);
+         }
+      }
+      
+      #
+      # load crator in cc
+      #
+      if ($WfRec->{openuser} ne ""){
+         $uobj->SetFilter({userid=>\$WfRec->{openuser}});
+         my ($userrec,$msg)=$uobj->getOnlyFirst(qw(email));
+         if (defined($userrec) && $userrec->{email} ne ""){
+            my $e=$userrec->{email};
+            my $qemailfrom=quotemeta($e);
+            if (!grep(/^$qemailfrom$/,@emailto) &&
+                !grep(/^$qemailfrom$/,@emailcc)){
+               push(@emailcc,$e);
+            }
+         }
+      }
+      my $newmailrec={
+             class    =>'base::workflow::mailsend',
+             step     =>'base::workflow::mailsend::dataload',
+             name     =>$subject,
+             emailtemplate  =>'eventnotification',
+             skinbase       =>$self->getParent->getNotificationSkinbase(),
+             emailfrom      =>$emailfrom,
+             emailto        =>\@emailto,
+             emailcc        =>\@emailcc,
+             emaillang      =>$eventlang,
+             emailprefix    =>\@emailprefix,
+             emailpostfix   =>\@emailpostfix,
+             emailtext      =>\@emailtext,
+             emailsep       =>\@emailsep,
+             emailsubheader =>\@emailsubheader,
+             emailsubtitle  =>\@emailsubtitle,
+             additional     =>\%additional
+            };
+      if (my $id=$wf->Store(undef,$newmailrec)){
+         if ($self->getParent->activateMailSend($WfRec,$wf,$id,$newmailrec)){
+            if ($wf->Action->StoreRecord(
+                $WfRec->{id},"rootcausi",
+                {translation=>'AL_TCom::workflow::eventnotify'},
+                undef,undef)){
+               Query->Delete("WorkflowStep");
+               return(1);
+            }
+         }
+      }
+      else{
+         return(0);
+      }
+      return(1);
+   }
+   return($self->SUPER::Process($action,$WfRec));
+}
 
 
 

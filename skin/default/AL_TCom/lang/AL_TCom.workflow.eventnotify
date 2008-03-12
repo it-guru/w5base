@@ -19,4 +19,5 @@
 'REV.relprobtick'=>{de=>'der aktuelle Workflow ist das Problem-Ticket für den Workflow "%s" ',en=>'the current workflow is the Problem-Ticket for "%s"'},
 'Start a WARUM analaysis'=>{de=>'WARUM Analyse durchführen'},
 'Send Root-Cause Info'=>{de=>'Ursachenanalyse versenden'},
+'rootcausi'=>{de=>'Ursachenanalyse versandt',en=>'root cause analyse send'},
 

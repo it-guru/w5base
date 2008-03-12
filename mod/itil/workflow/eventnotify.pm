@@ -368,7 +368,7 @@ sub getAdditionalMainButtons
 {
    my $self=shift;
    my $WfRec=shift;
-
+   return("");
 }
 
 sub AdditionalMainProcess
@@ -879,7 +879,7 @@ sub getSalutation
 sub generateMailSet
 {
    my $self=shift;
-   my ($WfRec,$eventlang,$additional,$emailprefix,$emailpostfix,
+   my ($WfRec,$action,$eventlang,$additional,$emailprefix,$emailpostfix,
        $emailtext,$emailsep,$emailsubheader)=@_;
    my @emailprefix=();
    my @emailpostfix=();
@@ -1823,11 +1823,11 @@ sub generateWorkspace
    my @emailsubheader=();
    my @emailsubtitle=();
    my %additional=();
-   $self->getParent->generateMailSet($WfRec,\$emaillang,\%additional,
+   $self->getParent->generateMailSet($WfRec,"sendcustinfo",
+                    \$emaillang,\%additional,
                     \@emailprefix,\@emailpostfix,\@emailtext,\@emailsep,
                     \@emailsubheader,\@emailsubtitle);
-   return("&nbsp;Vorschau:<br>".
-          $self->generateNotificationPreview(emailtext=>\@emailtext,
+   return($self->generateNotificationPreview(emailtext=>\@emailtext,
                                              emailprefix=>\@emailprefix,
                                              emailsep=>\@emailsep,
                                              emailsubheader=>\@emailsubheader,
@@ -1922,8 +1922,9 @@ sub Process
       }
 
       my $failclass=$WfRec->{eventstatclass};
-      my $subject=$self->getParent->getNotificationSubject($WfRec,$subjectlabel,$failclass,$ag);
-      my $salutation=$self->getParent->getSalutation($WfRec,$ag);
+      my $subject=$self->getParent->getNotificationSubject($WfRec,
+                               "sendcustinfo",$subjectlabel,$failclass,$ag);
+      my $salutation=$self->getParent->getSalutation($WfRec,$action,$ag);
 #   elsif ($variname eq "HEADCOLOR"){
 #      my $val=$self->findtemplvar("referenz_failend");
 #      my $failclass=$self->findtemplvar("referenz_failclass"); 
@@ -1953,7 +1954,7 @@ sub Process
       my %additional=(headcolor=>$failcolor,eventtype=>'Event',    
                       headtext=>$headtext,headid=>$id,salutation=>$salutation,
                       creationtime=>$creationtime);
-      $self->getParent->generateMailSet($WfRec,\$eventlang,\%additional,
+      $self->getParent->generateMailSet($WfRec,$action,\$eventlang,\%additional,
                        \@emailprefix,\@emailpostfix,\@emailtext,\@emailsep,
                        \@emailsubheader,\@emailsubtitle);
       #
