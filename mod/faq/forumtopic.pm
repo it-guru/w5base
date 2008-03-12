@@ -276,10 +276,12 @@ sub Validate
    }
 
    my $comments=effVal($oldrec,$newrec,"comments");
-   $newrec->{comments}=trim($comments);
-   if ($newrec->{comments} eq ""){
+   if ($comments eq ""){
       $self->LastMsg(ERROR,"no valid comments");
       return(0);
+   }
+   else{
+      $newrec->{comments}=trim($comments);
    }
 
    return(1);
@@ -368,8 +370,9 @@ sub FinishWrite
    my $id=effVal($oldrec,$newrec,"id");
    my $idobj=$self->IdField();
    my $idname=$idobj->Name();
+   my $userid=$self->getCurrentUserId();
 
-   if (!defined($oldrec)){   # call only if new rec
+   if (!defined($oldrec) && $id ne "" && $userid ne ""){   # call only if new rec
       my $url=$ENV{SCRIPT_URI};
       $url=~s#/auth/.*$##g;
       $url=~s#/public/.*$##g;
@@ -379,7 +382,14 @@ sub FinishWrite
       $url.="?OpenURL=$openurl";
       #$url.="ById/$id";
       my $lang=$self->Lang();
-    
+      {  # add infoabo for creator
+         my $ia=getModuleObject($self->Config,"base::infoabo");
+         $ia->ValidatedInsertRecord({parentobj=>'faq::forumtopic',
+                                     active=>'1',
+                                     mode=>'foaddentry',
+                                     refid=>$id,
+                                     userid=>$userid});
+      }
       my %p=(eventname=>'forumnewtopicmail',
              spooltag=>'forummail-'.$id,
              redefine=>'1',

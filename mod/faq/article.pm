@@ -307,8 +307,7 @@ sub FinishWrite
           spooltag=>'faqchanged-'.$id,
           redefine=>'1',
           retryinterval=>600,
-          xfirstcalldelay=>300,
-          firstcalldelay=>3,
+          firstcalldelay=>300,
           eventparam=>$id.";".$url.";".$lang,
           userid=>11634953080001);
    my $res;

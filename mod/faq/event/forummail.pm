@@ -70,6 +70,7 @@ sub sendForumMail
    }
 
    return({exitcode=>1,msg=>'ERROR: no id'}) if (!($id=~m/^\d+$/));
+   my $user=getModuleObject($self->Config,"base::user");
    my $faq=getModuleObject($self->Config,"faq::forumtopic");
    $faq->SetFilter({id=>\$id});
    my ($torec,$msg)=$faq->getOnlyFirst(qw(ALL));
@@ -89,9 +90,18 @@ sub sendForumMail
          push(@$emailprefix,$self->getParent->T("direct link").":");
          push(@$emailtext,$link." ");
       }
-      if ($torec->{comments} ne ""){
+      if ($torec->{comments} ne "" && $mode ne "add"){
          push(@$emailprefix,$self->getParent->T("question/ info").":");
          push(@$emailtext,$torec->{comments});
+      }
+      if ($torec->{creator} ne "" && $mode ne "add"){
+         $user->ResetFilter();
+         $user->SetFilter({userid=>\$torec->{creator}});
+         my ($urec,$msg)=$user->getOnlyFirst(qw(fullname));
+         if (defined($urec)){
+            push(@$emailprefix,$self->getParent->T("Creator","faq::forumtopic").":");
+            push(@$emailtext,$urec->{fullname});
+         }
       }
       if ($mode eq "add"){
          if ($entryid ne ""){
@@ -101,6 +111,15 @@ sub sendForumMail
             if (defined($enrec)){
                push(@$emailprefix,$self->getParent->T("answer").":");
                push(@$emailtext,$enrec->{comments});
+            }
+         }
+         if ($enrec->{creator} ne ""){
+            $user->ResetFilter();
+            $user->SetFilter({userid=>\$enrec->{creator}});
+            my ($urec,$msg)=$user->getOnlyFirst(qw(fullname));
+            if (defined($urec)){
+               push(@$emailprefix,$self->getParent->T("Creator","faq::forumentry").":");
+               push(@$emailtext,$urec->{fullname});
             }
          }
       }
@@ -114,7 +133,13 @@ sub sendForumMail
       delete($ENV{HTTP_FORCE_LANGUAGE});
       return({exitcode=>'0'}) if ($#emailto==-1);
       #push(@$emailtext,join(", ",@emailto));
-      my $fromemail='"'.$sitename.': Forum" <noreply@w5base.net>';
+      my $fromemail='"'.$sitename.': Forum';
+      if ($torec->{forumboardname} ne ""){
+         my $boardname=$torec->{forumboardname};
+         $boardname=~s/[^a-z0-9]/ /gi; 
+         $fromemail.=": ".$boardname;
+      }
+      $fromemail.='" <noreply@w5base.net>';
 
 
      # if ($torec->{ownerid}>0){

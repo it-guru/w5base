@@ -46,7 +46,7 @@ sub getControlData
                                },
            'faq::forumboard'=> {target=>'name',
                                 mode  =>['foaddtopic'=>'faq::forumboard',
-                                         'foboardansw'=>'faq::forumboard']
+                                         'foboardansw'=>'faq::forumtopic']
                                }
           });
 

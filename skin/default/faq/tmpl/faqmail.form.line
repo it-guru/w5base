@@ -1,7 +1,7 @@
 <!------------------------------------------------------------------------>
 <table id=tabelle width="710" border="0" cellspacing="0" cellpadding="0">
   <tr> 
-    <td class=col1 nowrap valign=center>
+    <td class=col1 width=95 nowrap valign=center>
     <div class=timestamp>
     %emailtstamp%
     %emailprefix%

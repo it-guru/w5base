@@ -24,6 +24,7 @@ li{
    margin: 2px;
    padding: 0px;
    border: 0px;
+   table-layout:fixed;
 }
 #tabelle .zelleWeiss {
    background-color: #FFFFFF;
@@ -32,7 +33,6 @@ li{
    width: 640px;
 }
 #tabelle td {
-   height: 20px;
    vertical-align: top;
    padding: 0px;
 }
@@ -88,7 +88,7 @@ div.box{
 
 <table style="margin-bottom:5px;width:710px" cellspacing=0 cellpadding=0>
   <tr>
-    <td class=col1><img src="cid:faqmail.bild1.jpg" /></td>
+    <td class=col1 width=95><img src="cid:faqmail.bild1.jpg" /></td>
     <td width=10>&nbsp;</td>
     <td><b>%label%</b></td>
   </tr>   
