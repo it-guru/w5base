@@ -42,7 +42,7 @@ sub Init
 sub getQueryTemplate
 {
    my $self=shift;
-   my $timelabel=$self->getParent->T("Change end time");;
+   my $timelabel=$self->getParent->T("Event end time");;
    my $timedrop=$self->getTimeRangeDrop("Search_TimeRange",
                                         $self->getParent,
                                         qw(month));
@@ -83,8 +83,10 @@ sub Result
    my @q=();
    if ($dc eq "TEAM"){
       my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
-                                            ["REmployee","RChief"],"down");
+                                            ["REmployee","RChief",
+                                             "RINManager"],"down");
       my @grpids=keys(%grp);
+printf STDERR ("fifi grpids=%s\n",join(",",@grpids));
       @grpids=(qw(-1)) if ($#grpids==-1);
       my (%q1,%q2);
       $q1{cistatusid}='<=4';

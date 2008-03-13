@@ -2062,11 +2062,11 @@ EOF
 <table border=0 cellspacing=0 cellpadding=0 width=100%>
 <tr>
 <td class=fname valign=top width=20%>%eventstartofevent(label)%:</td>
-<td class=finput>%eventstartofevent(detail)%</td>
+<td class=finput>%eventstart(detail)%</td>
 </tr>
 <tr>
 <td class=fname valign=top width=20%>%eventendofevent(label)%:</td>
-<td class=finput>%eventendofevent(detail)%</td>
+<td class=finput>%eventend(detail)%</td>
 </tr>
 <tr><td colspan=2>
 <div class=Question>
@@ -2091,13 +2091,13 @@ sub Process
    if ($action eq "NextStep"){
       return(undef) if (!$self->ValidActionCheck(1,$actions,"timemod"));
       my $h=$self->getWriteRequestHash("web",{class=>$self->getParent->Self});
-      if ($h->{eventstartofevent} eq ""){
+      if ($h->{eventstart} eq ""){
          $self->LastMsg(ERROR,"invalid event start"); 
          return(0);
       }
-      if ($h->{eventendofevent} ne ""){
-         my $dur=CalcDateDuration($h->{eventstartofevent},
-                                  $h->{eventendofevent});
+      if ($h->{eventend} ne ""){
+         my $dur=CalcDateDuration($h->{eventstart},
+                                  $h->{eventend});
          if ($dur->{totalseconds}<=0){
             $self->LastMsg(ERROR,"invalid event end"); 
             return(0);
