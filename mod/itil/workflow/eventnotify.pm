@@ -503,8 +503,8 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    my $userid=$self->getParent->getCurrentUserId();
-   my @grps=qw(state flow header eventnotifystat eventnotify 
-               eventnotifyshort relations);
+   my @grps=qw(state header eventnotifystat eventnotify 
+               eventnotifyshort);
    my $fo=$self->getField("wffields.eventlang",$rec);
    if (defined($fo)){
       my $lang=$fo->RawValue($rec);
@@ -522,9 +522,11 @@ sub isViewValid
          $mandatorok=1;
       }
    }
-   if ($mandatorok){
+   if ($mandatorok || $rec->{owner}==$userid){
       push(@grps,"eventnotifyinternal","affected");
       push(@grps,"history"); # maybe
+      push(@grps,"relations"); # maybe
+      push(@grps,"flow"); # maybe
    }
 
 #printf STDERR ("fifi mandators=%s\n",Dumper($rec->{mandatorid}));

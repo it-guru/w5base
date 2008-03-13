@@ -497,7 +497,7 @@ sub Validate
    my $origrec=shift;
 
    my $cistatusid=effVal($oldrec,$newrec,"cistatusid");
-   if (!defined($cistatusid)){
+   if (!defined($cistatusid) && !defined($oldrec)){
       $newrec->{cistatusid}=1;
    } 
    my $usertyp=effVal($oldrec,$newrec,"usertyp");
