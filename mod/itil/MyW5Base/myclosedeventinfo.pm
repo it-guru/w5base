@@ -86,14 +86,15 @@ sub Result
                                             ["REmployee","RChief",
                                              "RINManager"],"down");
       my @grpids=keys(%grp);
-printf STDERR ("fifi grpids=%s\n",join(",",@grpids));
       @grpids=(qw(-1)) if ($#grpids==-1);
-      my (%q1,%q2);
+      my (%q1,%q2,%q3);
       $q1{cistatusid}='<=4';
       $q1{businessteamid}=\@grpids;
       $q2{cistatusid}='<=4';
       $q2{responseteamid}=\@grpids;
-      push(@q,\%q1,\%q2);
+      $q3{cistatusid}='<=4';
+      $q3{mandatorid}=\@grpids;
+      push(@q,\%q1,\%q2,\%q3);
    }
    if ($dc eq "ADDDEP" || $dc eq "DEPONLY"){
       my (%q1,%q2,%q3,%q4);
