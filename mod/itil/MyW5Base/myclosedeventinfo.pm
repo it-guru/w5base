@@ -81,11 +81,12 @@ sub Result
 
    my $dc=Query->Param("EXVIEWCONTROL");
    my @q=();
+   my @grpids;
    if ($dc eq "TEAM"){
       my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
                                             ["REmployee","RChief",
                                              "RINManager"],"down");
-      my @grpids=keys(%grp);
+      @grpids=keys(%grp);
       @grpids=(qw(-1)) if ($#grpids==-1);
       my (%q1,%q2,%q3);
       $q1{cistatusid}='<=4';
@@ -125,11 +126,24 @@ sub Result
    }
    my %q1=%q;
    $q1{stateid}='>15';
-   $q1{affectedapplicationid}=\@appl;
    $q1{eventend}=Query->Param("Search_TimeRange");
    $q1{eventend}="<now AND >now-24h" if (!defined($q1{eventend}));
    $q1{class}=[grep(/^.*::eventnotify$/,
                     keys(%{$self->{DataObj}->{SubDataObj}}))];
+   $q1{affectedapplicationid}=\@appl;
+   if ($#grpids!=-1){   # hack to find delete applications over mandatorid
+      $self->{DataObj}->ResetFilter();    # (most only needed for incidenmanager
+      $self->{DataObj}->SecureSetFilter([\%q1]);
+      my @l1=$self->{DataObj}->getHashList("id");
+      delete($q1{affectedapplicationid});
+      $q1{mandatorid}=\@grpids;
+      $self->{DataObj}->ResetFilter();
+      $self->{DataObj}->SecureSetFilter([\%q1]);
+      my @l2=$self->{DataObj}->getHashList("id");
+      delete($q1{mandatorid});
+      $q1{id}=[map({$_->{id}} @l1),map({$_->{id}} @l2)];
+   }
+
 
    $self->{DataObj}->ResetFilter();
    $self->{DataObj}->SecureSetFilter([\%q1]);
