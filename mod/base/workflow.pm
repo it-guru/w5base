@@ -934,7 +934,6 @@ sub FinishWrite
       $self->CleanupWorkspace($oldrec->{id});
    }
    ######################################################################
-printf STDERR ("fifi FinishWrite=================\n");
 
    return($self->SUPER::FinishWrite($oldrec,$newrec));
 }
