@@ -351,7 +351,7 @@ sub getAdditionalMainButtons
       my $dis="";
       $dis="disabled" if (!$self->ValidActionCheck(0,$actions,$name));
       $d.="<input type=submit $dis ".
-          "class=workflowbutton name=$name value=\"$label\">";
+          "class=workflowbutton name=$name value=\"$label\"><br>";
    }
    return($d);
 }
