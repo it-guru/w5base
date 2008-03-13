@@ -163,7 +163,7 @@ sub isViewValid
 {
    my $self=shift;
    my $oldrec=shift;
-
+   return(qw(default header)) if (!defined($oldrec));
    return(qw(ALL));
 }
 
