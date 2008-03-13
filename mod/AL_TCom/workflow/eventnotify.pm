@@ -363,7 +363,13 @@ sub getPosibleActions
    my $app=$self->getParent;
    my $userid=$self->getParent->getCurrentUserId();
    my @l;
-   push(@l,"rootcausei") if ($WfRec->{stateid}==17);
+
+   if ($WfRec->{stateid}==17){
+      if ($self->IsIncidentManager($WfRec) || 
+          $self->getParent->IsMemberOf(["admin","admin.workflow"])){
+         push(@l,"rootcausei");
+      }
+   }
    return(@l,$self->SUPER::getPosibleActions($WfRec));
 }
 
