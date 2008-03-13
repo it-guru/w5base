@@ -51,18 +51,15 @@ sub getQueryTemplate
 <table class=searchframe><tr>
 <td class=fname width=10%>\%name(label)\%:</td>
 <td class=finput width=40% >\%name(search)\%</td>
-<td class=fname width=10%>\%srcid(label)\%:</td>
-<td class=finput width=40%>\%srcid(search)\%</td>
+<td class=fname width=10%>&nbsp;</td>
+<td class=finput width=40% >&nbsp;</td>
 </tr><tr>
 <td class=fname>$timelabel:</td>
 <td class=finput>$timedrop</td>
 <td class=fname>\%affectedapplication(label)\%:</td>
 <td class=finput>\%affectedapplication(search)\%</td>
-</tr><tr>
-<td colspan=2></td>
-<td class=fname>\%affectedcontract(label)\%:</td>
-<td class=finput>\%affectedcontract(search)\%</td>
-</tr></table>
+</tr>
+</table>
 </div>
 %StdButtonBar(_exviewcontrol,deputycontrol,teamviewcontrol,print,search)%
 EOF
