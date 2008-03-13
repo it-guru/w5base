@@ -50,9 +50,10 @@ sub getQueryTemplate
 <td class=finput width=40%>\%affectedapplication(search)\%</td>
 <td class=fname width=10%>\%affectedcontract(label)\%:</td>
 <td class=finput width=40%>\%affectedcontract(search)\%</td>
-</tr></table>
+</tr>
+</table>
 </div>
-%StdButtonBar(exviewcontrol,deputycontrol,teamviewcontrol,search)%
+%StdButtonBar(bookmark,search)%
 EOF
    return($d);
 }
@@ -68,12 +69,16 @@ sub Result
 
    my %q1=%q;
    $q1{stateid}='<20';
-   #$q1{mdate}='>now-4h';
+   $q1{eventend}="[EMPTY]";
    $q1{class}=[grep(/^.*::eventnotify$/,keys(%{$self->{DataObj}->{SubDataObj}}))];
+   my %q2=%q;
+   $q2{stateid}='<20';
+   $q2{eventend}=">now";
+   $q2{class}=[grep(/^.*::eventnotify$/,keys(%{$self->{DataObj}->{SubDataObj}}))];
 
 
    $self->{DataObj}->ResetFilter();
-   $self->{DataObj}->SecureSetFilter([\%q1]);
+   $self->{DataObj}->SecureSetFilter([\%q1,\%q2]);
    $self->{DataObj}->setDefaultView(qw(linenumber eventstart name  
                                        eventduration state));
    my %param=(ExternalFilter=>1,

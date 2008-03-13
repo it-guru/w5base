@@ -1016,7 +1016,7 @@ sub Detail
    print "<script language=\"JavaScript\">".$self->getDetailFunctionsCode($rec).
           "</script>";
 
-   if (0){
+   if (0){   # maybe later implementation of PostIt's
       print("<div id=PostIT>");
       print("<iframe border=0 frameborder=0 src=\"../../base/note/Actor\" style=\"position:absolute;left:0px;top:0px;border-style:none;border-width:0px\" width=120 height=15></iframe>");
       print("</div>");

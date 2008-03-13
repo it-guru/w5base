@@ -524,8 +524,8 @@ sub isViewValid
    }
    if ($mandatorok){
       push(@grps,"eventnotifyinternal","affected");
+      push(@grps,"history"); # maybe
    }
-   push(@grps,"history"); # maybe
 
 #printf STDERR ("fifi mandators=%s\n",Dumper($rec->{mandatorid}));
 #printf STDERR ("fifi mymandators=%s\n",Dumper(\@mymandators));

@@ -66,7 +66,9 @@ sub getQueryTemplate
                 'multi'=>
                 $self->getParent->T("only multi application changes"),
                 'divmulti'=>
-                $self->getParent->T("only multi TSM responsibility")
+                $self->getParent->T("only multi TSM responsibility"),
+                'prio1ag'=>
+                $self->getParent->T("only applications with customer prio 1")
                );
                 
    my $oldval=Query->Param("search_SP");
@@ -104,14 +106,27 @@ sub Result
    my $search_es=Query->Param("search_ES");
    my $search_sp=Query->Param("search_SP");
 
+   my $flt={ eventstart=>$search_es,
+             mandator=>"\"AL T-Com\"",
+             class=>[grep(/^AL_TCom::.*::change$/,
+                          keys(%{$self->{DataObj}->{SubDataObj}}))]};
+   if ($search_sp eq "prio1ag"){
+      $self->{appl}->ResetFilter();
+      $self->{appl}->SetFilter({customerprio=>1,
+                                mandator=>"\"AL T-Com\""});
+      my @l=$self->{appl}->getHashList(qw(id));
+      if ($#l==-1){
+         $flt->{affectedapplicationid}=-1;
+      }
+      else{
+         $flt->{affectedapplicationid}=[map({$_->{id}} @l)];
+      }
+   }
+
    $self->{DataObj}->ResetFilter();
-   $self->{DataObj}->SecureSetFilter({
-                  eventstart=>$search_es,
-                  mandator=>"\"AL T-Com\"",
-                  class=>[grep(/^AL_TCom::.*::change$/,
-                               keys(%{$self->{DataObj}->{SubDataObj}}))],
-                                     });
+   $self->{DataObj}->SecureSetFilter($flt);
    my @l=$self->{DataObj}->getHashList(qw(id affectedapplicationid));
+
   
    my @idl;
    foreach my $rec (@l){
