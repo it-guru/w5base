@@ -211,7 +211,8 @@ sub getValidWebFunctions
 {
    my ($self)=@_;
    return($self->SUPER::getValidWebFunctions(),
-          "root","menutop","menuframe","msel","TableVersionChecker");
+          "root","menutop","menuframe","msel","TableVersionChecker",
+          "LoginFail");
 }
 
 #####################################################################
@@ -613,6 +614,15 @@ sub root
       print $d;
       print $self->HtmlBottom();
    }
+}
+
+sub LoginFail
+{
+   my $self=shift;
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','menu.css']);
+   print $self->getParsedTemplate("tmpl/LoginFail");
+   print ("</html>");
 }
 
 sub menuframe
