@@ -352,7 +352,7 @@ sub storeRecord
             }
             else{
                return(interface::SOAP::kernel::Finish({exitcode=>12,
-                      lastmsg=>["no access"]})); 
+                      lastmsg=>["no write access to specified record"]})); 
             }
          }
          return(interface::SOAP::kernel::Finish({exitcode=>10,
@@ -374,7 +374,7 @@ sub storeRecord
       }
       else{
          return(interface::SOAP::kernel::Finish({exitcode=>12,
-                lastmsg=>["no access"]})); 
+                lastmsg=>["no write (insert) access to specified data"]})); 
       }
    }
    return(interface::SOAP::kernel::Finish({exitcode=>-1}));
