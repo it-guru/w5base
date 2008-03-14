@@ -341,13 +341,19 @@ sub storeRecord
          $o->SecureSetFilter($filter); 
          my ($oldrec,$msg)=$o->getOnlyFirst(qw(ALL));
          if (defined($oldrec)){
-            if ($o->SecureValidatedUpdateRecord($oldrec,$newrec,$filter)){
-               $id=~s/^0*//g if (defined($id) && $id=~m/^\d+$/);
-               return(interface::SOAP::kernel::Finish({exitcode=>0,
-                                                       IdentifiedBy=>$id})); 
+            if ($o->isWriteValid($oldrec,$newrec)){
+               if ($o->SecureValidatedUpdateRecord($oldrec,$newrec,$filter)){
+                  $id=~s/^0*//g if (defined($id) && $id=~m/^\d+$/);
+                  return(interface::SOAP::kernel::Finish({exitcode=>0,
+                                                          IdentifiedBy=>$id})); 
+               }
+               return(interface::SOAP::kernel::Finish({exitcode=>10,
+                      lastmsg=>[$o->LastMsg()]})); 
             }
-            return(interface::SOAP::kernel::Finish({exitcode=>10,
-                   lastmsg=>[$o->LastMsg()]})); 
+            else{
+               return(interface::SOAP::kernel::Finish({exitcode=>12,
+                      lastmsg=>["no access"]})); 
+            }
          }
          return(interface::SOAP::kernel::Finish({exitcode=>10,
                 lastmsg=>[msg(ERROR,'can not find record for update')]})); 
@@ -357,13 +363,19 @@ sub storeRecord
                 msg(ERROR,'no unique idenitifier in dataobject found')]})); 
    }
    else{
-      if (my $id=$o->SecureValidatedInsertRecord($newrec)){
-         $id=~s/^0*//g if (defined($id) && $id=~m/^\d+$/);
-         return(interface::SOAP::kernel::Finish({exitcode=>0,
-                                                 IdentifiedBy=>$id})); 
+      if ($o->isWriteValid(undef,$newrec)){
+         if (my $id=$o->SecureValidatedInsertRecord($newrec)){
+            $id=~s/^0*//g if (defined($id) && $id=~m/^\d+$/);
+            return(interface::SOAP::kernel::Finish({exitcode=>0,
+                                                    IdentifiedBy=>$id})); 
+         }
+         return(interface::SOAP::kernel::Finish({exitcode=>10,
+                lastmsg=>[$o->LastMsg()]})); 
       }
-      return(interface::SOAP::kernel::Finish({exitcode=>10,
-             lastmsg=>[$o->LastMsg()]})); 
+      else{
+         return(interface::SOAP::kernel::Finish({exitcode=>12,
+                lastmsg=>["no access"]})); 
+      }
    }
    return(interface::SOAP::kernel::Finish({exitcode=>-1}));
 }
