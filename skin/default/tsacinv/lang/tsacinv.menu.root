@@ -19,3 +19,4 @@
 'ac.krn.accountno'=>{de=>'Account-Nummer',en=>'Account-Number'},
 'ac.quality'=>{de=>'Qualitätsanalysen',en=>'Quality-Analysys'},
 'ac.quality.appl'=>{de=>'Anwendung',en=>'Application'},
+'AL_TCom.system.acimport'=>{de=>'AssetCenter Import',en=>'AssetCenter Import'},

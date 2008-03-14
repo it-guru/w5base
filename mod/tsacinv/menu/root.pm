@@ -119,6 +119,11 @@ sub Init
                       "tsacinv::quality_appl",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("AL_TCom.system.acimport",
+                      "tsacinv::system",
+                      func=>'ImportSystem',
+                      defaultacl=>['valid_user']);
+   
    return(1);
 }
 

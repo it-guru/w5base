@@ -3,3 +3,4 @@
 'Supervisor'=>{de=>'Leiter'},
 'Parentgroup'=>{de=>'Elterngruppe'},
 'Phone'=>{de=>'Telefonnummer'},
+'Supervisor LDAPID'=>{de=>'Leiter LDAPID'},

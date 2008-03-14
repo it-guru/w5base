@@ -70,6 +70,14 @@ sub new
                 vjoinon       =>['supervid'=>'lempldeptid'],
                 vjoindisp     =>'fullname'),
 
+      new kernel::Field::TextDrop(
+                name          =>'supervisorldapid',
+                label         =>'Supervisor LDAPID',
+                searchable    =>0,
+                vjointo       =>'tsacinv::user',
+                vjoinon       =>['supervid'=>'lempldeptid'],
+                vjoindisp     =>'ldapid'),
+
       new kernel::Field::SubList(
                 name          =>'users',
                 label         =>'Users',

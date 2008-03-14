@@ -160,7 +160,7 @@ sub ImportUser
 
    my $importname=Query->Param("importname");
    if (Query->Param("DOIT")){
-      if (!($self->Import({importname=>$importname}))){
+      if ($self->Import({importname=>$importname})){
          Query->Delete("importname");
          $self->LastMsg(OK,"user has been successfuly imported");
       }
@@ -182,8 +182,31 @@ sub ImportUser
 #######################################################################
 # this is a nativ call, witch can be used by any other module to
 # import WhoIsWho Users in W5Base by specifing WhoIsWhoID oder email.
-# It returns 0 on success or !=0 on error.
+# It returns undef on fail and the id of the new user on success
 #
+sub GetW5BaseUserID
+{
+   my $self=shift;
+   my $importname=shift;
+
+   return(undef) if ($importname eq "");
+   my $flt={posix=>\$importname};
+   if ($importname=~m/\@/){
+      $flt={email=>\$importname};
+   }
+   my $user=getModuleObject($self->Config,"base::user");
+   $user->SetFilter($flt);
+   my ($userrec,$msg)=$user->getOnlyFirst(qw(userid));
+   if (defined($userrec)){
+      return($userrec->{userid});
+   }
+   else{
+      return($self->Import({importname=>$importname}));
+   }
+   return(undef);
+}
+
+
 sub Import
 {
    my $self=shift;
@@ -210,18 +233,18 @@ sub Import
    } 
    if (!defined($flt)){
       $self->LastMsg(ERROR,"no acceptable filter");
-      return(1);
+      return(undef);
    }
    $self->ResetFilter();
    $self->SetFilter($flt);
    my @l=$self->getHashList(qw(uid surname givenname email));
    if ($#l==-1){
       $self->LastMsg(ERROR,"contact not found in WhoIsWho");
-      return(2);
+      return(undef);
    }
    if ($#l>0){
       $self->LastMsg(ERROR,"contact not unique in WhoIsWho");
-      return(3);
+      return(undef);
    }
    my $wiwrec=$l[0];
    my $user=getModuleObject($self->Config,"base::user");
@@ -230,11 +253,11 @@ sub Import
    if (defined($userrec)){
       if ($userrec->{cistatusid}==4){
          $self->LastMsg(ERROR,"contact already exists in W5Base");
-         return(3);
+         return(undef);
       }
-      if (!($user->ValidatedUpdateRecord($userrec,{cistatusid=>4},
-                                   {userid=>\$userrec->{userid}}))){
-         return(4);
+      if (my $id=$user->ValidatedUpdateRecord($userrec,{cistatusid=>4},
+                                   {userid=>\$userrec->{userid}})){
+         return($id);
       }
    }
    else{
@@ -242,19 +265,17 @@ sub Import
       $uidlist=[$uidlist] if (ref($uidlist) ne "ARRAY");
       my @posix=grep(!/^[A-Z]{1,3}\d+$/,@{$uidlist});
       my $posix=$posix[0];
-      if (!($user->ValidatedInsertRecord({cistatusid=>4,
+      if (my $id=$user->ValidatedInsertRecord({cistatusid=>4,
                                      usertyp=>'extern',
                                      allowifupdate=>1,
                                      surname=>$wiwrec->{surname},
                                      givenname=>$wiwrec->{givenname},
                                      posix=>$posix,
-                                     email=>$wiwrec->{email}}))){
-         return(5);
+                                     email=>$wiwrec->{email}})){
+         return($id);
       }
    }
-
-
-   return(0);
+   return(undef);
 }
 
 

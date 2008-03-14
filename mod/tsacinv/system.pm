@@ -286,7 +286,8 @@ sub new
 
 
    );
-   $self->setDefaultView(qw(systemname bc tsacinv_locationfullname systemid assetassetid));
+   $self->setDefaultView(qw(systemname bc tsacinv_locationfullname 
+                            systemid assetassetid));
    return($self);
 }
 
@@ -309,7 +310,6 @@ sub AddW5BaseData
          my %appl=();
          my %sem=();
          my %tsm=();
-printf STDERR ("fifi x=%s\n",Dumper($rec->{applications}));
          if (defined($rec->{applications}) && 
              ref($rec->{applications}) eq "ARRAY"){
             foreach my $app (@{$rec->{applications}}){
@@ -327,7 +327,6 @@ printf STDERR ("fifi x=%s\n",Dumper($rec->{applications}));
          $l{w5base_sem}=[sort(values(%sem))];
          $l{w5base_tsm}=[sort(values(%tsm))];
       }
-printf STDERR ("fifi d=%s\n",Dumper(\%l));
       $c->{W5BaseSys}->{$systemid}=\%l;
    }
    return($c->{W5BaseSys}->{$systemid}->{$self->Name});
@@ -358,8 +357,8 @@ sub AddServices
                                           group      =>'services',
                                           htmldetail =>0,
                                           onRawValue =>sub {
-                                                       return($sumrec{$ola});
-                                                           },
+                                                          return($sumrec{$ola});
+                                                       },
                                           dataobjattr=>'amcomputer.name'
                                       )
              ));
@@ -521,6 +520,128 @@ sub getDetailBlockPriority
    return($self->SUPER::getDetailBlockPriority(@_),
           qw(default form location));
 }  
+
+
+sub getValidWebFunctions
+{
+   my ($self)=@_;
+   return($self->SUPER::getValidWebFunctions(),qw(ImportSystem));
+}  
+
+sub ImportSystem
+{
+   my $self=shift;
+
+   my $importname=Query->Param("importname");
+   if (Query->Param("DOIT")){
+      if ($self->Import({importname=>$importname})){
+         Query->Delete("importname");
+         $self->LastMsg(OK,"system has been successfuly imported");
+      }
+      Query->Delete("DOIT");
+   }
+
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','work.css',
+                                   'kernel.App.Web.css'],
+                           static=>{importname=>$importname},
+                           body=>1,form=>1,
+                           title=>"AssetCenter System Import");
+   print $self->getParsedTemplate("tmpl/minitool.system.import",{});
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+
+   
+
+sub Import
+{
+   my $self=shift;
+   my $param=shift;
+
+   my $flt;
+   if ($param->{importname} ne ""){
+      $flt={systemid=>[$param->{importname}]};
+   }
+   else{
+      return(undef);
+   }
+   $self->ResetFilter();
+   $self->SetFilter($flt);
+   my @l=$self->getHashList(qw(systemid systemname lassignmentid assetid));
+   if ($#l==-1){
+      $self->LastMsg(ERROR,"SystemID not found in AssetCenter");
+      return(undef);
+   }
+   if ($#l>0){
+      $self->LastMsg(ERROR,"SystemID not unique in AssetCenter");
+      return(undef);
+   }
+
+   my $sysrec=$l[0];
+   my $sys=getModuleObject($self->Config,"itil::system");
+   $sys->SetFilter($flt);
+   my ($w5sysrec,$msg)=$sys->getOnlyFirst(qw(ALL));
+   if (defined($w5sysrec)){
+      if ($w5sysrec->{cistatusid}==4){
+         $self->LastMsg(ERROR,"SystemID already exists in W5Base");
+         return(undef);
+      }
+      if (my $id=$sys->ValidatedUpdateRecord($w5sysrec,{cistatusid=>4},
+                                   {id=>\$w5sysrec->{id}})){
+         return($id);
+      }
+   }
+   else{
+      # check 1: Assigmenen Group registered
+      if ($sysrec->{lassignmentid} eq ""){
+         $self->LastMsg(ERROR,"SystemID has no Assignment Group");
+         return(undef);
+      }
+      printf STDERR Dumper($sysrec);
+      # check 2: Assingment Group active
+      my $acgroup=getModuleObject($self->Config,"tsacinv::group");
+      $acgroup->SetFilter({lgroupid=>\$sysrec->{lassignmentid}});
+      my ($acgrouprec,$msg)=$acgroup->getOnlyFirst(qw(supervisorldapid));
+      if (!defined($acgrouprec)){
+         $self->LastMsg(ERROR,"Can't find Assignment Group of system");
+         return(undef);
+      }
+      # check 3: Supervisor registered
+      if ($acgrouprec->{supervisorldapid} eq ""){
+         $self->LastMsg(ERROR,"No correct Supervisor at Assignment Group");
+         return(undef);
+      }
+      # check 4: load Supervisor ID in W5Base
+      my $tswiw=getModuleObject($self->Config,"tswiw::user");
+      my $databossid=$tswiw->GetW5BaseUserID($acgrouprec->{supervisorldapid});
+      if (!defined($databossid)){
+         $self->LastMsg(ERROR,"Can't import Supervisor as Databoss");
+         return(undef);
+      }
+      # check 5: find id of mandator "extern"
+      my $mand=getModuleObject($self->Config,"base::mandator");
+      $mand->SetFilter({name=>"extern"});
+      my ($mandrec,$msg)=$mand->getOnlyFirst(qw(grpid));
+      if (!defined($mandrec)){
+         $self->LastMsg(ERROR,"Can't find mandator extern");
+         return(undef);
+      }
+      my $mandatorid=$mandrec->{grpid};
+      # final: do the insert operation
+      my $newrec={name=>$sysrec->{systemname},
+                  systemid=>$sysrec->{systemid},
+                  admid=>$databossid,
+                  mandatorid=>$mandatorid,
+                  cistatusid=>4};
+      if (my $id=$sys->ValidatedInsertRecord($newrec)){
+         return($id);
+      }
+   }
+   return(undef);
+}
+
 
 
 
