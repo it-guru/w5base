@@ -250,32 +250,40 @@ sub Import
    my $user=getModuleObject($self->Config,"base::user");
    $user->SetFilter([{'email'=>$wiwrec->{email}},{posix=>$wiwrec->{uid}}]);
    my ($userrec,$msg)=$user->getOnlyFirst(qw(ALL));
+   my $identifyby=undef;
    if (defined($userrec)){
       if ($userrec->{cistatusid}==4){
          $self->LastMsg(ERROR,"contact already exists in W5Base");
          return(undef);
       }
-      if (my $id=$user->ValidatedUpdateRecord($userrec,{cistatusid=>4},
-                                   {userid=>\$userrec->{userid}})){
-         return($id);
-      }
+      $identifyby=$user->ValidatedUpdateRecord($userrec,{cistatusid=>4},
+                                               {userid=>\$userrec->{userid}});
    }
    else{
       my $uidlist=$wiwrec->{uid};
       $uidlist=[$uidlist] if (ref($uidlist) ne "ARRAY");
       my @posix=grep(!/^[A-Z]{1,3}\d+$/,@{$uidlist});
       my $posix=$posix[0];
-      if (my $id=$user->ValidatedInsertRecord({cistatusid=>4,
+      $identifyby=$user->ValidatedInsertRecord({
+                                     cistatusid=>4,
                                      usertyp=>'extern',
                                      allowifupdate=>1,
                                      surname=>$wiwrec->{surname},
                                      givenname=>$wiwrec->{givenname},
                                      posix=>$posix,
-                                     email=>$wiwrec->{email}})){
-         return($id);
+                                     email=>$wiwrec->{email}});
+   }
+   if (defined($identifyby) && $identifyby!=0){
+      $user->ResetFilter();
+      $user->SetFilter({'userid'=>\$identifyby});
+      my ($rec,$msg)=$user->getOnlyFirst(qw(ALL));
+      if (defined($rec)){
+         my $qc=getModuleObject($self->Config,"base::qrule");
+         $qc->setParent($user);
+         $qc->nativQualityCheck($user->getQualityCheckCompat($rec),$rec);
       }
    }
-   return(undef);
+   return($identifyby);
 }
 
 

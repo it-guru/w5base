@@ -583,15 +583,14 @@ sub Import
    my $sys=getModuleObject($self->Config,"itil::system");
    $sys->SetFilter($flt);
    my ($w5sysrec,$msg)=$sys->getOnlyFirst(qw(ALL));
+   my $identifyby;
    if (defined($w5sysrec)){
       if ($w5sysrec->{cistatusid}==4){
          $self->LastMsg(ERROR,"SystemID already exists in W5Base");
          return(undef);
       }
-      if (my $id=$sys->ValidatedUpdateRecord($w5sysrec,{cistatusid=>4},
-                                   {id=>\$w5sysrec->{id}})){
-         return($id);
-      }
+      $identifyby=$sys->ValidatedUpdateRecord($w5sysrec,{cistatusid=>4},
+                                              {id=>\$w5sysrec->{id}});
    }
    else{
       # check 1: Assigmenen Group registered
@@ -635,11 +634,19 @@ sub Import
                   admid=>$databossid,
                   mandatorid=>$mandatorid,
                   cistatusid=>4};
-      if (my $id=$sys->ValidatedInsertRecord($newrec)){
-         return($id);
+      $identifyby=$sys->ValidatedInsertRecord($newrec);
+   }
+   if (defined($identifyby) && $identifyby!=0){
+      $sys->ResetFilter();
+      $sys->SetFilter({'id'=>\$identifyby});
+      my ($rec,$msg)=$sys->getOnlyFirst(qw(ALL));
+      if (defined($rec)){
+         my $qc=getModuleObject($self->Config,"base::qrule");
+         $qc->setParent($sys);
+         $qc->nativQualityCheck($sys->getQualityCheckCompat($rec),$rec);
       }
    }
-   return(undef);
+   return($identifyby);
 }
 
 
