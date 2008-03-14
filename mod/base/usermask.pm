@@ -43,20 +43,19 @@ sub isSubstValid
    my $realuser=shift;
    my $substuser=shift;
 
+   my $user=getModuleObject($self->Config,"base::user");
+   $user->SetFilter({accounts=>\$substuser});
+   my ($userrec,$msg)=$user->getOnlyFirst(qw(userid));
+   return() if (!defined($userrec));
+
+
    my $isadmin=0;
-  # my $origREMOTE_USER=$ENV{REMOTE_USER};
-  # $ENV{REMOTE_USER}=$ENV{REAL_REMOTE_USER};
    if ($ENV{REAL_REMOTE_USER} eq $substuser || $self->IsMemberOf("admin")){
       $isadmin=1;
    }
-  # $ENV{REMOTE_USER}=$origREMOTE_USER;
    if ($isadmin){
       return({usersubstid=>'admin',srcaccount=>$substuser});
    }
-#   my $account=getModuleObject($self->Config,"base::useraccount");
-#   $account->SetFilter({account=>\$substuser});
-#   my ($substuserrec,$msg)=$account->getOnlyFirst(qw(userid));
-#   return(undef) if (!defined($substuserrec));
 
 
    my $usersubst=getModuleObject($self->Config,"base::usersubst");
@@ -112,7 +111,7 @@ sub Main
             $lastmsg="ERROR "."account not allowed";
          }
       }
-      else{
+      if ($#l>0){
          $lastmsg="ERROR "."account not unique";
          my $d="<select name=setnewuser style=\"width:100%\">";
          $d.="<option value=\"$setnewuser\">$setnewuser</option>";
