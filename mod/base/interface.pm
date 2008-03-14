@@ -341,7 +341,7 @@ sub storeRecord
          $o->SecureSetFilter($filter); 
          my ($oldrec,$msg)=$o->getOnlyFirst(qw(ALL));
          if (defined($oldrec)){
-            if ($o->isWriteValid($oldrec,$newrec)){
+            if (my @grps=$o->isWriteValid($oldrec,$newrec)){
                if ($o->SecureValidatedUpdateRecord($oldrec,$newrec,$filter)){
                   $id=~s/^0*//g if (defined($id) && $id=~m/^\d+$/);
                   return(interface::SOAP::kernel::Finish({exitcode=>0,
@@ -363,7 +363,7 @@ sub storeRecord
                 msg(ERROR,'no unique idenitifier in dataobject found')]})); 
    }
    else{
-      if ($o->isWriteValid(undef,$newrec)){
+      if (my @grps=$o->isWriteValid(undef,$newrec)){
          if (my $id=$o->SecureValidatedInsertRecord($newrec)){
             $id=~s/^0*//g if (defined($id) && $id=~m/^\d+$/);
             return(interface::SOAP::kernel::Finish({exitcode=>0,
