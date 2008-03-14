@@ -255,13 +255,13 @@ sub calculateOperations
                foreach my $ip (keys(%{$sharedata->{$hostname}->
                                       {$share}->{ip}})){
                   if ($ni->{name} eq $ip){ 
-                     $found=$ni->{id};
+                     $found=1;
                   } 
                }
                if ($found == 0){
                   push(@$oplist,{OP           => 'delete',
                                  DATAOBJALIAS => 'ipnet',
-                                 IDENTIFYBY   => $found,
+                                 IDENTIFYBY   => $ni->{id},
                                  MSG          => "delete ip with id=$found",
                                  DATA         => {}});
                }
@@ -272,17 +272,17 @@ sub calculateOperations
                my $options;
                foreach my $ni (@ni){
                   if ($ni->{name} eq $ip){ 
-                     my @r;
-                     foreach my $rights (keys(%{$sharedata->{$hostname}->
-                                                 {$share}->{ip}->{$ip}})){
-                           if ($sharedata->{$hostname}->{$share}->
-                                            {ip}->{$ip}->{$rights} == 1){
-                              push(@r,$rights);     
-                           }
-                     }
-                     $options=join(",",@r);
                      $found=$ni->{id};
                   }
+                  my @r;
+                  foreach my $rights (keys(%{$sharedata->{$hostname}->
+                                              {$share}->{ip}->{$ip}})){
+                        if ($sharedata->{$hostname}->{$share}->
+                                         {ip}->{$ip}->{$rights} == 1){
+                           push(@r,$rights);     
+                        }
+                  }
+                  $options=join(",",@r);
                }
                if ($found == 0){
                   push(@$oplist,{OP           => 'insert',
@@ -383,6 +383,7 @@ sub processOperations
                                                           $record->{'IDENTIFYBY'});
       }elsif($record->{OP} eq "delete"){
          $id=$o->{$record->{'DATAOBJALIAS'}}->deleteRecord($record->{'IDENTIFYBY'});
+printf ("fifi delete=%s\n",$record->{'IDENTIFYBY'});
       }else{
          msg(ERROR,"unvalid mode ".$record->{OP});
          return(1);
