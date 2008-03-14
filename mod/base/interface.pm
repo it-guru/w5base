@@ -436,7 +436,10 @@ sub getHashList
       return(interface::SOAP::kernel::Finish({exitcode=>128,
              lastmsg=>[msg(ERROR,'invalid dataobject specified')]}));
    }
-
+   if (!$o->isViewValid()){
+      return(interface::SOAP::kernel::Finish({exitcode=>128,
+             lastmsg=>[msg(ERROR,'no access to dataobject')]}));
+   }
    $o->SecureSetFilter($filter); 
    msg(INFO,"SOAPgetHashList in search objectname=$objectname");
    my @l=$o->getHashList(@$view);
