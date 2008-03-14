@@ -29,9 +29,7 @@ if ($#ARGV != $#hostname){
    exit(1);
 }
 
-#######################################################################
 # create connection config
-#
 my $apidebug=$verbose>=3 ? 1 : 0;
 my $Config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug);
 if (!defined($Config)){
@@ -43,13 +41,7 @@ else{
 msg(DEBUG,"verbose=$verbose");
 
 
-#
-# Datenobjecte laden
-#
-#
-#######################################################################
 # load ModuleObject
-#
 my %loadobj=('sys'=>'itil::system',
              'nas'=>'itil::systemnfsnas',
              'net'=>'itil::network',
@@ -74,21 +66,23 @@ foreach my $file (@ARGV){
       my $result=readFile(\*FILE,\%sharedata,$curmode,$hostname[$count]);
       exit(1) if ($result != 0);
       my @oplist;
-      my $result=calculateOperations(\%o,\%sharedata,\@oplist,$hostname[$count]); 
+      my $result=calculateOperations(\%o,\%sharedata,\@oplist,$hostname[$count]);
       exit(1) if ($result != 0);
       if ($force){
          my $result=processOperations(\%o,\@oplist);
          exit(1) if ($result != 0);
       }else{
-         foreach my $preview (@oplist){
-            msg(INFO,$preview->{'op'}." ".$preview->{'export'});
+         foreach my $record (@oplist){
+            msg(INFO,$record->{MSG});
          }
       }
       close(FILE);
+   }else{
+      msg(ERROR,"file not exists!");
+      exit(1);
    }
    $count++;
 }
-
 
 
 sub detectMode
@@ -98,11 +92,14 @@ sub detectMode
    while(<$fh>){
       if ($_=~m/^export.*$/){
          $mode="emc";
+         return($mode);
       }elsif($_=~m/^.*sec=sys.*$/){
          $mode="netapp";
+         return($mode);
       }
    }
-   return($mode);
+   msg(ERROR,"mode not exists");
+   return(1);
 }
 
 
@@ -136,7 +133,8 @@ sub readFile
       }
       foreach my $param (@param){
          if (my ($var,$ip)=$param=~m/^(\S+)=(.*)\s*$/){
-            if (lc($var) ne "access" and lc($var) ne "rw" and lc($var) ne "root"){
+            if (lc($var) ne "access" and lc($var) ne 
+                         "rw" and lc($var) ne "root"){
                $sharedata->{$hostname}->{$path}->{'exportoptions'}="$ip=$var ";
                next;
             }
@@ -150,12 +148,15 @@ sub readFile
                      }
                   }else{
                      $sharedata->{$hostname}->{$path}->{'exportoptions'}=
-                     $sharedata->{$hostname}->{$path}->{'exportoptions'}."$var=$ip ";
-                     msg(WARN,"unknown IP/HOST=$ip, entry will be a export option!");
+                     $sharedata->{$hostname}->{$path}->{'exportoptions'}.
+                     "$var=$ip ";
+                     msg(WARN,"unknown IP/HOST=$ip, 
+                               entry will be a export option!");
                      next;
                   }
                }
-               if ($ip!~m/^.*[\/].*$/ and $ip=~m/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/){
+               if ($ip!~m/^.*[\/].*$/ and 
+                   $ip=~m/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/){
                   $ip="$ip/32";
                }
                $sharedata->{$hostname}->{$path}->{'ip'}->{$ip}->{$var}=1;
@@ -176,32 +177,43 @@ sub calculateOperations
    my $sharedata=shift;    
    my $oplist=shift;    
    my $hostname=shift;    
-   my $mode="insert";
-   my $networkid;
+   my ($networkid,$found);
+
+   # get hostname
    $o->{'sys'}->SetFilter({name=>$hostname});
    my @hl=$o->{'sys'}->getHashList(qw(id));
    if ($#hl==-1){
-      msg(ERROR,"system $hostname not exists!");
+      $o->{'sys'}->LastMsg();
+#      msg(ERROR,"system $hostname not exists!");
       return(1);      
    }
    if ($#hl>0){
-      msg(ERROR,"system $hostname not unique!");
+      $o->{'sys'}->LastMsg();
+#      msg(ERROR,"system $hostname not unique!");
       return(1);      
    }
-   $o->{'net'}->SetFilter({name=>['T-Systems Storage/NAS LAN']);
+  
+   # get network 
+   $o->{'net'}->SetFilter({name=>['T-Systems Storage/NAS LAN']});
    my @netid=$o->{'net'}->getHashList(qw(id));
    if ($#netid==-1){
-      msg(ERROR,"network T-Systems Storage/NAS LAN not exists!");
+      $o->{'sys'}->LastMsg();
+  #    msg(ERROR,"network T-Systems Storage/NAS LAN not exists!");
       return(1);      
    }
    if ($#netid>0){
-      msg(ERROR,"network T-Systems Storage/NAS LAN not unique!");
+      $o->{'sys'}->LastMsg();
+  #    msg(ERROR,"network T-Systems Storage/NAS LAN not unique!");
       return(1);      
    }
+
+   # get available shares
    my $destid=$hl[0]->{id};
    $o->{'nas'}->SetFilter({systemid=>$destid});
    my @ln=$o->{'nas'}->getHashList(qw(id systemnfsnasserver name cistatusid
-                                      type exportoptions systemnfsnas system ));
+                                      type exportoptions systemnfsnas system));
+   $o->{'nas'}->dieOnERROR();
+   # set needless shares on delete state
    foreach my $ln (@ln){
       my $found=0;
       foreach my $share (keys(%{$sharedata->{$hostname}})){
@@ -210,74 +222,130 @@ sub calculateOperations
          }
       } 
       if ($found == 0){
- #        push(@$oplist,{id         => $ln->{id},
- #                       cistatusid => 6,
- #                       export     => $ln->{name},
- #                       op         => 'delete'});
           push(@$oplist,{OP           => 'update',
                          DATAOBJALIAS => 'nas',
                          IDENTIFYBY   => $ln->{id},
-                         DATA         => {cistatusid => 6});
+                         MSG          => "delete share ".$ln->{name},
+                         DATA         => {cistatusid => 6}});
       }
    }
+
    foreach my $share (keys(%{$sharedata->{$hostname}})){
       my $ref;
-      foreach my $ip (keys(%{$sharedata->{$hostname}->{$share}->{ip}})){
-         my @r;
-         foreach my $rights (keys(%{$sharedata->{$hostname}->{$share}->{ip}->{$ip}})){
-               if ($sharedata->{$hostname}->{$share}->{ip}->{$ip}->{$rights} == 1){
-                  push(@r,$rights);     
-               }
-         }
-         $ref->{$ip}=join(",",@r);
-      }
+      my $mode="insert";
       foreach my $ln (@ln){
          if ($ln->{name} eq $share){
-             $mode=$ln->{id};
+            $mode="update";
+            push(@$oplist,{OP           => 'update',
+                           DATAOBJALIAS => 'nas',
+                           IDENTIFYBY   => $ln->{id},
+                           MSG          => "update $share on $hostname",
+                           DATA         => {
+                             type          => $type,
+                             cistatusid    => 4,
+                             hostname      => $hostname,
+                             name          => $share}});
+            # get available ip's
+            $o->{'ipnet'}->SetFilter({systemnfsnasid=>$ln->{id}});
+            my @ni=$o->{'ipnet'}->getHashList(qw(id systemnfsnasid name));
+            $o->{'ipnet'}->dieOnERROR();
+            # delete ip's on a existing share
+            foreach my $ni (@ni){
+               $found=0;
+               foreach my $ip (keys(%{$sharedata->{$hostname}->
+                                      {$share}->{ip}})){
+                  if ($ni->{name} eq $ip){ 
+                     $found=$ni->{id};
+                  } 
+               }
+               if ($found == 0){
+                  push(@$oplist,{OP           => 'delete',
+                                 DATAOBJALIAS => 'ipnet',
+                                 IDENTIFYBY   => $found,
+                                 MSG          => "delete ip with id=$found",
+                                 DATA         => {}});
+               }
+            }
+            # update or insert ip's on a existing share
+            foreach my $ip (keys(%{$sharedata->{$hostname}->{$share}->{ip}})){
+               $found=0;
+               my $options;
+               foreach my $ni (@ni){
+                  if ($ni->{name} eq $ip){ 
+                     my @r;
+                     foreach my $rights (keys(%{$sharedata->{$hostname}->
+                                                 {$share}->{ip}->{$ip}})){
+                           if ($sharedata->{$hostname}->{$share}->
+                                            {ip}->{$ip}->{$rights} == 1){
+                              push(@r,$rights);     
+                           }
+                     }
+                     $options=join(",",@r);
+                     $found=$ni->{id};
+                  }
+               }
+               if ($found == 0){
+                  push(@$oplist,{OP           => 'insert',
+                                 DATAOBJALIAS => 'ipnet',
+                                 IDENTIFYBY   => undef,
+                                 MSG          => "insert ip $ip",
+                                 DATA         => {
+                                   systemnfsnasid  => $ln->{id},
+                                   exportoptions   => $options,
+                                   name            => $ip,
+                                   networkid       => $netid[0]->{id}}});
+               }else{
+                  push(@$oplist,{OP           => 'update',
+                                 DATAOBJALIAS => 'ipnet',
+                                 IDENTIFYBY   => $found,
+                                 MSG          => "update ip $ip",
+                                 DATA         => {
+                                   systemnfsnasid  => $ln->{id},
+                                   exportoptions   => $options,
+                                   name            => $ip,
+                                   networkid       => $netid[0]->{id}}});
+               }
+            }
          }
       }
+      # insert a new share
       if ($mode eq "insert"){
-#         push(@$oplist,{id            => '',
-#                        op            => 'insert',
-#                        hostname      => $hostname,
-#                        export        => $share,
-#                        exportoptions => $sharedata->{$hostname}->{$share}->{'exportoptions'},
-#                        cistatusid    => 4,
-#                        ip            => $ref,
-#                        type          => $type});
-          push(@$oplist,{OP           => 'insert',
-                         DATAOBJALIAS => 'nas',
-                         IDENTIFYBY   => undef,
-                         DATA         => {
-                           type          => $type,
-                           cistatusid    => 4,
-                           hostname      => $hostname,
-                           export        => $share,
-                           exportoptions => $sharedata->{$hostname}->{$share}->
-                                            {'exportoptions'},
-                           msg           => "insert $share on $hostname",
-                           network       => $netid[0]->{id};});
-                           
-      }elsif(defined($mode)){
-#          push(@$oplist,{id            => $mode,
-#                         op            => 'update',
-#                         hostname      => $hostname,
-#                         export        => $share,
-#                         exportoptions => $sharedata->{$hostname}->{$share}->{'exportoptions'},
-#                         cistatusid    => 4,
-#                         ip            => $ref,
-#                         type          => $type});
-          push(@$oplist,{OP           => 'update',
-                         DATAOBJALIAS => 'nas',
-                         IDENTIFYBY   => $mode,
-                         DATA         => {
-                           type          => $type,
-                           cistatusid    => 4,
-                           hostname      => $hostname,
-                           export        => $share,
-                           exportoptions => $sharedata->{$hostname}->{$share}->
-                                            {'exportoptions'},
-                           msg           => "update $share on $hostname"});
+         my $newshare={OP           => 'insert',
+                       DATAOBJALIAS => 'nas',
+                       IDENTIFYBY   => undef,
+                       MSG          => "insert $share on $hostname", 
+                       DATA         => {
+                         type          => $type,
+                         cistatusid    => 4,
+                         system        => $hostname,
+                         name          => $share,
+                         exportoptions => $sharedata->{$hostname}->{$share}->
+                                          {'exportoptions'}}};
+ 
+         push(@$oplist,$newshare);
+
+         # insert a new ip on a new share
+         my $options;
+         foreach my $ip (keys(%{$sharedata->{$hostname}->{$share}->{ip}})){
+            my @r;
+            foreach my $rights (keys(%{$sharedata->{$hostname}->
+                                       {$share}->{ip}->{$ip}})){
+               if ($sharedata->{$hostname}->{$share}->{ip}->
+                   {$ip}->{$rights} == 1){
+                  push(@r,$rights);     
+               }
+            }
+            $options=join(",",@r);
+            push(@$oplist,{OP           => 'insert',
+                           DATAOBJALIAS => 'ipnet',
+                           IDENTIFYBY   => undef,
+                           MSG          => "insert ip $ip on $hostname", 
+                           DATA         => {
+                             name            => $ip,
+                             networt         => $netid[0]->{id},
+                             exportoptions   => $options,
+                             systemnfsnasid  => \$newshare->{IDENTIFYBY}}});
+         }
       }
    }
    return(0);
@@ -288,63 +356,40 @@ sub processOperations
 {
    my $o=shift;    
    my $oplist=shift;    
-   my $id;
-   foreach my $rec (@$oplist){
-      $id=undef;
-      if ($rec->{'op'} eq 'insert'){
-          $id=$o->{nas}->storeRecord({system        => $rec->{hostname},
-                                      name          => $rec->{export},
-                                      cistatusid    => $rec->{cistatusid},
-                                      exportoptions => $rec->{exportoptions},
-                                      type          => $rec->{type}});
-          foreach my $ip (keys(%{$rec->{'ip'}})){
-             my $stat=$o->{ipnet}->storeRecord({systemnfsnasid => $id,
-                                                exportoptions  => $rec->{'ip'}->{$ip},
-                                                networkid      => $networkid->{id},
-                                                name           => $ip});
-             if (!defined($stat)){
-                msg(ERROR,"can't ".$rec->{op}." ip=".$ip);
-                return(1);
-             }
-          } 
-          msg(INFO,$rec->{op}." ".$rec->{export});
-      }elsif($rec->{'op'} eq 'update'){
-          $id=$o->{nas}->storeRecord({system        => $rec->{hostname},
-                                      name          => $rec->{export},
-                                      cistatusid    => $rec->{cistatusid},
-                                      exportoptions => $rec->{exportoptions},
-                                      type          => $rec->{type}},$rec->{id});
-          $o->{'ipnet'}->SetFilter({systemnfsnasid=>$rec->{id}});
-          my @ips=$o->{'ipnet'}->getHashList(qw(id));
-          foreach my $ip (@ips){
-             my $stat=$o->{ipnet}->deleteRecord($ip->{id});
-             if (!defined($stat)){
-                msg(ERROR,"can't delete ip=".$ip->{id});
-                return(1);
-             }
-          }
-          foreach my $ip (keys(%{$rec->{'ip'}})){
-             my $stat=$o->{ipnet}->storeRecord({systemnfsnasid => $id,
-                                                exportoptions  => $rec->{'ip'}->{$ip},
-                                                networkid      => $networkid->{id},
-                                                name           => $ip});
-             if (!defined($stat)){
-                msg(ERROR,"can't ".$rec->{op}." ip=".$ip);
-                return(1);
-             }
-          } 
-          msg(INFO,$rec->{op}." ".$rec->{export});
-      }elsif($rec->{'op'} eq 'delete'){
-          $id=$o->{nas}->storeRecord({cistatusid => $rec->{cistatusid}},$rec->{id});
-      }else{
-          msg(ERROR,"no operation mode");
-          return(1);
+   my ($id,$found);
+
+   foreach my $record (@$oplist){
+      # check for valid objects only
+      foreach my $objname (keys(%{$record})){
+         $found=0;
+         foreach my $orgobjname (qw(DATAOBJALIAS OP MSG DATA IDENTIFYBY)){
+            $found=1 if ($objname eq $orgobjname);
+         }
+         if ($found == 0){
+            msg(ERROR,"Objectname=$objname not allowed");
+            return(1);
+         }
       }
-      if (!defined($id)){
-         msg(ERROR,"can't ".$rec->{op}." record ".$rec->{export}." id=$id");
+      foreach my $data (keys(%{$record->{'DATA'}})){
+         if (ref($record->{'DATA'}->{$data}) eq "SCALAR"){ 
+            $record->{'DATA'}->{$data}=${$record->{'DATA'}->{$data}};
+         }
+      }
+      if ($record->{OP} eq "insert"){
+         $id=$o->{$record->{'DATAOBJALIAS'}}->storeRecord($record->{'DATA'});
+         $record->{'IDENTIFYBY'}=$id;
+      }elsif($record->{OP} eq "update"){
+         $id=$o->{$record->{'DATAOBJALIAS'}}->storeRecord($record->{'DATA'},
+                                                          $record->{'IDENTIFYBY'});
+      }elsif($record->{OP} eq "delete"){
+         $id=$o->{$record->{'DATAOBJALIAS'}}->deleteRecord($record->{'IDENTIFYBY'});
+      }else{
+         msg(ERROR,"unvalid mode ".$record->{OP});
          return(1);
       }
-   } 
+      $o->{$record->{'DATAOBJALIAS'}}->dieOnERROR();
+      msg(INFO,$record->{MSG});
+   }
 }
 
 
@@ -354,25 +399,25 @@ if ($flt eq ""){
 }
 
 
-#######################################################################
+# help menu
 sub Help
 {
    print(<<EOF);
 $RealScript [options] File File ...
 
-   --verbose display more details of operation process
-   --quiet   only errors would be displayed
-   --base    base url of filemgmt (default: $DefaultBase)
-   --webuser username
-   --webpass password
-   --store   stores the parameters (not help,verbose and store)
-   --help    show this help
-
-   --mode    emc, netapp, auto if no --mode
-   --hostname seperate by comma
-   --type    export type (nfs, cifs ...)
+   --verbose  display more details of operation process
+   --quiet    only errors would be displayed
+   --base     base url of filemgmt (default: $DefaultBase)
+   --webuser  username
+   --webpass  password
+   --store    stores the parameters (not help,verbose and store)
+   --help     show this help
+              
+   --mode     emc, netapp, auto if no --mode
+   --hostname more than one seperate by comma
+   --type     export type (nfs, cifs ...)
    --force    
 EOF
 }
-#######################################################################
+
 exit(255);
