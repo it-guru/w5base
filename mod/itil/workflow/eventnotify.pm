@@ -2075,6 +2075,10 @@ EOF
 <td class=finput>%eventstart(detail)%</td>
 </tr>
 <tr>
+<td class=fname valign=top width=20%>%eventendexpected(label)%:</td>
+<td class=finput>%eventendexpected(detail)%</td>
+</tr>
+<tr>
 <td class=fname valign=top width=20%>%eventendofevent(label)%:</td>
 <td class=finput>%eventend(detail)%</td>
 </tr>
@@ -2104,6 +2108,14 @@ sub Process
       if ($h->{eventstart} eq ""){
          $self->LastMsg(ERROR,"invalid event start"); 
          return(0);
+      }
+      if ($h->{eventendexpected} ne ""){
+         my $dur=CalcDateDuration($h->{eventstart},
+                                  $h->{eventendexpected});
+         if ($dur->{totalseconds}<=0){
+            $self->LastMsg(ERROR,"invalid expected event end"); 
+            return(0);
+         }
       }
       if ($h->{eventend} ne ""){
          my $dur=CalcDateDuration($h->{eventstart},
