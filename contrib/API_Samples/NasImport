@@ -182,13 +182,11 @@ sub calculateOperations
    $o->{'sys'}->SetFilter({name=>$hostname});
    my @hl=$o->{'sys'}->getHashList(qw(id));
    if ($#hl==-1){
-      $o->{'sys'}->LastMsg();
-#      msg(ERROR,"system $hostname not exists!");
+      msg(ERROR,"system $hostname not exists!");
       return(1);      
    }
    if ($#hl>0){
-      $o->{'sys'}->LastMsg();
-#      msg(ERROR,"system $hostname not unique!");
+      msg(ERROR,"system $hostname not unique!");
       return(1);      
    }
   
@@ -389,7 +387,6 @@ sub processOperations
                                                           $record->{'IDENTIFYBY'});
       }elsif($record->{OP} eq "delete"){
          $id=$o->{$record->{'DATAOBJALIAS'}}->deleteRecord($record->{'IDENTIFYBY'});
-printf ("fifi delete=%s\n",$record->{'IDENTIFYBY'});
       }else{
          msg(ERROR,"unvalid mode ".$record->{OP});
          return(1);
