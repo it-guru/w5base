@@ -236,18 +236,21 @@ sub calculateOperations
       foreach my $ln (@ln){
          if ($ln->{name} eq $share){
             $mode="update";
-            push(@$oplist,{OP           => 'update',
-                           DATAOBJALIAS => 'nas',
-                           IDENTIFYBY   => $ln->{id},
-                           MSG          => "update $share on $hostname",
-                           DATA         => {
-                             type          => $type,
-                             cistatusid    => 4,
-                             hostname      => $hostname,
-                             name          => $share}});
+            if ($ln->{cistatusid} != 4 or $ln->{type} ne $type){
+               push(@$oplist,{OP           => 'update',
+                              DATAOBJALIAS => 'nas',
+                              IDENTIFYBY   => $ln->{id},
+                              MSG          => "update $share on $hostname",
+                              DATA         => {
+                                type          => $type,
+                                cistatusid    => 4,
+                                hostname      => $hostname,
+                                name          => $share}});
+            }
             # get available ip's
             $o->{'ipnet'}->SetFilter({systemnfsnasid=>$ln->{id}});
-            my @ni=$o->{'ipnet'}->getHashList(qw(id systemnfsnasid name));
+            my @ni=$o->{'ipnet'}->getHashList(qw(id exportoptions 
+                                              networkid systemnfsnasid name));
             $o->{'ipnet'}->dieOnERROR();
             # delete ip's on a existing share
             foreach my $ni (@ni){
@@ -271,9 +274,6 @@ sub calculateOperations
                $found=0;
                my $options;
                foreach my $ni (@ni){
-                  if ($ni->{name} eq $ip){ 
-                     $found=$ni->{id};
-                  }
                   my @r;
                   foreach my $rights (keys(%{$sharedata->{$hostname}->
                                               {$share}->{ip}->{$ip}})){
@@ -283,6 +283,13 @@ sub calculateOperations
                         }
                   }
                   $options=join(",",@r);
+                  if ($ni->{name} eq $ip and ($ni->{networkid} ne $netid[0]->{id} or
+                     $ni->{exportoptions} ne $options or 
+                     $ni->{systemnfsnasid} ne $ln->{id})){
+                      $found=$ni->{id};
+                  }elsif($ni->{name} eq $ip){
+                      $found=2;
+                  }
                }
                if ($found == 0){
                   push(@$oplist,{OP           => 'insert',
@@ -294,7 +301,7 @@ sub calculateOperations
                                    exportoptions   => $options,
                                    name            => $ip,
                                    networkid       => $netid[0]->{id}}});
-               }else{
+               }elsif($found != 2){
                   push(@$oplist,{OP           => 'update',
                                  DATAOBJALIAS => 'ipnet',
                                  IDENTIFYBY   => $found,
@@ -342,7 +349,7 @@ sub calculateOperations
                            MSG          => "insert ip $ip on $hostname", 
                            DATA         => {
                              name            => $ip,
-                             networt         => $netid[0]->{id},
+                             networkid       => $netid[0]->{id},
                              exportoptions   => $options,
                              systemnfsnasid  => \$newshare->{IDENTIFYBY}}});
          }
