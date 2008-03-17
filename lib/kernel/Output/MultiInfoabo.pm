@@ -132,13 +132,6 @@ sub Init
    return(undef);
 }
 
-sub isInfoAboAdmin
-{
-   my $self=shift;
-
-   return($self->getParent->getParent->IsMemberOf([qw(admin w5base.base.infoabo.write)]));
-
-}
 
 sub MultiOperationHeader
 {
@@ -163,7 +156,7 @@ sub MultiOperationHeader
    }
    $d.=sprintf("</select>");
    $d.=sprintf("</td>");
-   if ($self->isInfoAboAdmin()){
+   if ($self->{opobj}->isInfoAboAdmin()){
       $d.=sprintf("<td width=5%% nowrap>%s:</td>",
                   $self->getParent->getParent->T("Contact"));
       my $in=$self->Context->{LastDrop};
@@ -189,7 +182,7 @@ sub MultiOperationActionOn
    $self->LoadOpObj();
 
    if (defined($self->Context->{LastID})){
-      if ($self->isInfoAboAdmin()){
+      if ($self->{opobj}->isInfoAboAdmin()){
          $curruserid=$self->Context->{LastID};
       }
       else{

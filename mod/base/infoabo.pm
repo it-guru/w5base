@@ -184,6 +184,8 @@ sub new
    $self->LoadSubObjs("ext/staticinfoabo","staticinfoabo");
    $self->{admwrite}=[qw(admin w5base.base.infoabo.write)]; 
    $self->{admread}=[@{$self->{admwrite}},"w5base.base.infoabo.read"];
+   $self->{history}=[qw(insert modify delete)];
+
 
    #
    # MultiDest Destination
@@ -407,7 +409,17 @@ sub isWriteValid
    my $rec=shift;
    return("default") if (ref($rec) eq "HASH" &&
                          $self->getCurrentUserId() eq $rec->{userid});
-   return("default") if ($self->IsMemberOf("admin"));
+   return("default") if ($self->isInfoAboAdmin());
+   return(undef);
+}
+
+sub isDeleteValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(1) if (ref($rec) eq "HASH" &&
+                 $self->getCurrentUserId() eq $rec->{userid});
+   return(1) if ($self->IsMemberOf("admin"));
    return(undef);
 }
 
@@ -657,6 +669,17 @@ sub Welcome
    print $self->HtmlBottom(body=>1,form=>1);
    return(1);
 }  
+
+
+sub isInfoAboAdmin
+{
+   my $self=shift;
+
+   return($self->IsMemberOf($self->{admwrite}));
+
+}
+
+
 
 
 
