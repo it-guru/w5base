@@ -20,3 +20,4 @@
 'ac.quality'=>{de=>'Qualitätsanalysen',en=>'Quality-Analysys'},
 'ac.quality.appl'=>{de=>'Anwendung',en=>'Application'},
 'AL_TCom.system.acimport'=>{de=>'AssetCenter Import',en=>'AssetCenter Import'},
+'AL_TCom.appl.acimport'=>{de=>'AssetCenter Import',en=>'AssetCenter Import'},

@@ -124,6 +124,11 @@ sub Init
                       func=>'ImportSystem',
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("AL_TCom.appl.acimport",
+                      "tsacinv::appl",
+                      func=>'ImportAppl',
+                      defaultacl=>['valid_user']);
+   
    return(1);
 }
 
