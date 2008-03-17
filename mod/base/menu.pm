@@ -847,7 +847,7 @@ sub processSubs
    else{
       $m->{label}=$m->{fullname};
       $m->{label}=~s/^.*\.//;
-      $m->{label}=~s/_/ /;
+      $m->{label}=~s/_/ /g;
    }
    my $desc=$self->T($m->{fullname}.":Desc",$m->{translation});
    if ($desc ne $m->{fullname}.":Desc"){
