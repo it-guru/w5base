@@ -79,10 +79,9 @@ sub help
                        directory you can seperate the directory names
                        with comma
         --file         file or files for import (seperat files by comma)
-        --mode         export, import or transfer
-                       (default is export and transfer need option --targetdb)
-        --targetdb     target database in transfer and import mode
-        --tasks        number of tasks are be able running simultaneous 
+        --mode         export, import or transfer [default:export]
+        --targetdb     is needed in transfermode transfer
+        --tasks        number of tasks are be able running simultaneous [default:4]
         --exclude      tables excluded for dump (seperat tables by comma)
         --convert      save dump in spezial database format (InnoDB|MyISAM)
         --force        ignore warnings for example overwritting tables
@@ -173,14 +172,15 @@ sub check_db
 
 # check if database exists if not create the database
 sub check_targetdb
-{
+{  
+   my $tdb=shift;
    local(*R, *E);
-   open3(undef,*R,*E,"$prog->{mysql} $targetdb");
+   open3(undef,*R,*E,"$prog->{mysql} $tdb");
    wait();
    close(R);
    if ($? == 0){
       if ($force != 1){
-         printf STDERR ("WARNING: the target database=$targetdb exists,
+         printf STDERR ("WARNING: the target database=$tdb exists,
 the database will be drop!!
 Do you want continue? [y/N]: ");
          chomp(my $decision=<STDIN>);
@@ -192,19 +192,19 @@ Do you want continue? [y/N]: ");
       }
       local(*DROPERR);
       open3(undef,undef,*DROPERR,
-            "$prog->{mysql} -e 'drop database $targetdb;create database $targetdb'");
+            "$prog->{mysql} -e 'drop database $tdb;create database $tdb'");
       wait();
       if ($? != 0){
-         printf STDERR ("ERROR: database %s cannot drop! rc=%s\n",$targetdb,$?>>8);
+         printf STDERR ("ERROR: database %s cannot drop! rc=%s\n",$tdb,$?>>8);
          exit(1);
       }
       return(0);
    }
    local(*ER);
-   open3(undef,undef,*ER,"$prog->{mysql} -e 'create database $targetdb'");
+   open3(undef,undef,*ER,"$prog->{mysql} -e 'create database $tdb'");
    wait();
    if ($? != 0){
-      printf STDERR ("ERROR: database %s cannot create! rc=%s\n",$targetdb,$?>>8);
+      printf STDERR ("ERROR: database %s cannot create! rc=%s\n",$tdb,$?>>8);
       exit(1);
    }
    close(ER);
@@ -430,11 +430,10 @@ sub process_engine
               local(*GUNZIPRDR,*GUNZIPERR,*MYSQLWTR,*MYSQLERR);
               my $gunzip_pid=open3(undef,*GUNZIPRDR,*GUNZIPERR,"$prog->{gunzip} -c $first");
               my $mysql_pid=open3(*MYSQLWTR,undef,*MYSQLERR,
-                            "$prog->{mysql} $targetdb ");
+                            "$prog->{mysql} $db ");
               print MYSQLWTR ("SET AUTOCOMMIT=0;\n");
               print MYSQLWTR ("SET UNIQUE_CHECKS=0;\n");
               print MYSQLWTR ("SET FOREIGN_KEY_CHECKS = 0;\n");
-           #   my $mysql_pid=open3(*MYSQLWTR,undef,*MYSQLERR,"$prog->{mysql} $targetdb ");
               while(my $line=<GUNZIPRDR>){
                  if ($convert){
                     $convert_flag=1 if($line=~m/^CREATE\s+TABLE.*\(/);      
@@ -454,7 +453,7 @@ sub process_engine
                       $first,$?>>8) if ($? != 0);
               waitpid($mysql_pid,0);
               printf("ERROR: system command mysql %s return a errorcode=%s\n",
-                      $targetdb,$?>>8) if ($? != 0);
+                      $db,$?>>8) if ($? != 0);
               exit(0);
            # transfer database
            }elsif($mode eq "transfer"){
@@ -564,7 +563,8 @@ You really want to overite the folder? [y/N]: ");
 }elsif(lc($mode) eq "import"){
    $mode="import";
    my @files;
-   if ($targetdb){
+   check_db();
+   if ($db){
       if (!$file && $dir){
          my @dir=split(/,/,$dir);
          @files=check_dir(\@dir);
@@ -578,11 +578,11 @@ You really want to overite the folder? [y/N]: ");
          printf STDERR ("ERROR: no files or directory for import! \n");
          exit(1);
       }
-      check_targetdb();
+      check_targetdb($db);
       help();
       process_engine(\@files,$dir);
    }else{
-      printf STDERR ("ERROR: if mode=import option --targetdb must be set\n");
+      printf STDERR ("ERROR: if mode=import option database must be set\n");
       exit(1);
    }
 }elsif(lc($mode) eq "transfer"){
@@ -602,7 +602,7 @@ You really want to overite the folder? [y/N]: ");
    include_tables();
    exclude_tables();
    my @tab=create_array_to_dump();
-   check_targetdb();
+   check_targetdb($targetdb);
    process_engine(\@tab);
 }else{
    printf STDERR ("ERROR: unknow mode=$mode only this modes import, export or transfer\n");
