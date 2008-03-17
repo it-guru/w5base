@@ -173,7 +173,6 @@ sub ProcessLine
             if ($self->Context->{VALID}){
                if ($self->MultiOperationActionOn($app,$id)){
                   $fail=0;
-                  msg(ERROR,"MultiOperationActionOn $app,$id failed\n");
                }
             }
          }
