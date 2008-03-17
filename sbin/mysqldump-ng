@@ -460,7 +460,7 @@ sub process_engine
               my $convert_flag=0;
               local(*MYSQLDUMPRDR,*MYSQLDUMPERR,*MYSQLWTR,*MYSQLERR);
               my $mysqldump_pid=open3(undef,*MYSQLDUMPRDR,*MYSQLDUMPERR,
-                                      "$prog->{mysqldump} -q -c $db $first");
+                                      "$prog->{mysqldump} --compact -q -c $db $first");
               msg("INFO","transfer $first\n");
               my $mysql_pid=open3(*MYSQLWTR,undef,*MYSQLERR,"$prog->{mysql} $targetdb");
               print MYSQLWTR ("set autocommit=0;");
@@ -612,5 +612,5 @@ You really want to overite the folder? [y/N]: ");
 my $et=[Today_and_Now()];
 push(@$st,@$et);
 my @take=Delta_YMDHMS(@$st);                         
-msg("INFO","the operation takes: $take[3]h $take[4]min $take[5]sec");                         
+printf ("INFO","the operation takes: $take[3]h $take[4]min $take[5]sec");                         
                                
