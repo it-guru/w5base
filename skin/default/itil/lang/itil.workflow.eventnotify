@@ -76,3 +76,5 @@
 'REV.info'=>{de=>'der Workflow "%s" verweist auf den aktuellen Workflow',en=>'the workflow "%s" has a link to the current workflow'},
 "can't clear eventstatnature from defined state"=>{de=>"Ereignisart kann nicht auf 'leer' gesetzt werden"},
 'expected event end'=>{de=>'voraussichtliches Ende'},
+'related problem ticket'=>{de=>'relevantes ServiceCenter Problem-Ticket'},
+'related incident ticket'=>{de=>'relevantes ServiceCenter Incident-Ticket'},
