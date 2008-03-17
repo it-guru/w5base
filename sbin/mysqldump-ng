@@ -152,7 +152,7 @@ sub check_db
    shift(@ARGV);
   
    # check database is usable
-   if ($db){
+   if ($db and $mode ne "import"){
       local(*R, *E);
       open3(undef,*R,*E,"$prog->{mysql} $db");
       wait();
@@ -564,6 +564,7 @@ You really want to overite the folder? [y/N]: ");
    $mode="import";
    my @files;
    check_db();
+   check_targetdb($db);
    if ($db){
       if (!$file && $dir){
          my @dir=split(/,/,$dir);
@@ -578,11 +579,10 @@ You really want to overite the folder? [y/N]: ");
          printf STDERR ("ERROR: no files or directory for import! \n");
          exit(1);
       }
-      check_targetdb($db);
       help();
       process_engine(\@files,$dir);
    }else{
-      printf STDERR ("ERROR: if mode=import option database must be set\n");
+      printf STDERR ("ERROR: $db not exists\n");
       exit(1);
    }
 }elsif(lc($mode) eq "transfer"){
@@ -612,5 +612,5 @@ You really want to overite the folder? [y/N]: ");
 my $et=[Today_and_Now()];
 push(@$st,@$et);
 my @take=Delta_YMDHMS(@$st);                         
-printf ("INFO","the operation takes: $take[3]h $take[4]min $take[5]sec");                         
+printf ("INFO: the operation takes: $take[3]h $take[4]min $take[5]sec\n");                         
                                

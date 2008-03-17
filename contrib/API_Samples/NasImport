@@ -161,8 +161,7 @@ sub readFile
                }
                $sharedata->{$hostname}->{$path}->{'ip'}->{$ip}->{$var}=1;
             }
-         }
-         else{
+         }else{
             msg(WARN,"param problem $param line=$line");
          }
       }
@@ -415,16 +414,16 @@ $RealScript [options] File File ...
 
    --verbose  display more details of operation process
    --quiet    only errors would be displayed
-   --base     base url of filemgmt (default: $DefaultBase)
+   --base     base url of filemgmt [default:$DefaultBase]
    --webuser  username
    --webpass  password
    --store    stores the parameters (not help,verbose and store)
    --help     show this help
               
-   --mode     emc, netapp, auto if no --mode
+   --mode     emc, netapp, auto if no --mode [default:auto]
    --hostname more than one seperate by comma
-   --type     export type (nfs, cifs ...)
-   --force    
+   --type     export type (nfs, cifs ...) [default:nfs]
+   --force    write data  
 EOF
 }
 
