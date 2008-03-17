@@ -1181,7 +1181,10 @@ sub LoadInterfaces
                   srcid=>$rec->{id},
                   srcsys=>"W5BaseV1",
                  );
-      $newrec{conproto}="DB-Link" if ($newrec{conproto} eq "DB-Lin");
+      $newrec{conproto}="DB-Link"   if ($newrec{conproto} eq "DB-Lin");
+      $newrec{conproto}="MQSeries"  if ($newrec{conproto} eq "xml(MQ");
+      $newrec{conproto}="Netegrity" if ($newrec{conproto} eq "Netegr");
+      $newrec{conproto}="pkix-cmp"  if ($newrec{conproto} eq "pkix-c");
       delete($newrec{conmode}) if ($newrec{conmode} eq "");
       #print Dumper($rec);
       $self->{lnkapplappl}->ValidatedInsertOrUpdateRecord(\%newrec,
