@@ -56,7 +56,7 @@ sub Init
    $self->RegisterEvent("loadproducer","LoadProducer");
    $self->RegisterEvent("loadplatform","LoadPlatform");
    $self->RegisterEvent("loadosrelease","LoadOsrelease");
-   $self->RegisterEvent("loadinterfaces","LoadInterfaces");
+   $self->RegisterEvent("loadinterfaces","LoadInterfaces",timeout=>900);
    $self->RegisterEvent("loadmodel","LoadModel");
    $self->RegisterEvent("loadcostcenter","LoadCostCenter");
    $self->RegisterEvent("loadcontact","LoadContact");
@@ -1174,8 +1174,10 @@ sub LoadInterfaces
                   srcload=>$loadstart,
                   owner=>$ownerid,
                   creator=>$ownerid,
-                  mdate=>scalar($app->ExpandTimeExpression($rec->{mdate},"en","GMT")),
-                  cdate=>scalar($app->ExpandTimeExpression($rec->{mdate},"en","GMT")),
+                  mdate=>scalar($app->ExpandTimeExpression($rec->{mdate},
+                                "en","GMT")),
+                  cdate=>scalar($app->ExpandTimeExpression($rec->{mdate},
+                                "en","GMT")),
                   srcid=>$rec->{id},
                   srcsys=>"W5BaseV1",
                  );

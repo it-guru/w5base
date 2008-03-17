@@ -1,4 +1,4 @@
 'itil::MyW5Base::myclosedeventinfo'=>{
-               de=>'IT-Workflow: meine ITIL Ereignismeldungen geschlossenen',
-               en=>'IT-Inventar: my closed ITIL eventnotifications'},
+               de=>'IT-Workflow: ITIL Ereignismeldungen geschlossen',
+               en=>'IT-Inventar: closed ITIL eventnotifications'},
 'Event end time'=>{de=>'Ereignis Ende Zeit'},

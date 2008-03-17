@@ -1,1 +1,2 @@
-'itil::MyW5Base::openeventinfo'=>{de=>'IT-Workflow: aktuelle Ereignismeldungen',en=>'latest event notifications'}
+'itil::MyW5Base::openeventinfo'=>{de=>'IT-Workflow: ITIL Ereignismeldungen aktuell',en=>'latest event notifications'},
+'enclose all not finshed eventnotifications'=>{de=>'alle nicht beendeten Ereignismeldungen einschließen'},

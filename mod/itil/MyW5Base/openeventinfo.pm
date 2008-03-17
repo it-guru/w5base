@@ -42,6 +42,7 @@ sub Init
 sub getQueryTemplate
 {
    my $self=shift;
+   my $m1=$self->getParent->T("enclose all not finshed eventnotifications");
    my $d=<<EOF;
 <div class=searchframe>
 <table class=searchframe>
@@ -50,6 +51,11 @@ sub getQueryTemplate
 <td class=finput width=40%>\%affectedapplication(search)\%</td>
 <td class=fname width=10%>\%affectedcontract(label)\%:</td>
 <td class=finput width=40%>\%affectedcontract(search)\%</td>
+</tr>
+<tr>
+<td class=fname width=10%>&nbsp;</td>
+<td class=finput width=40%>&nbsp;</td>
+<td class=fname colspan=2><input type=checkbox name=SHOWALL>$m1</td>
 </tr>
 </table>
 </div>
@@ -68,13 +74,22 @@ sub Result
    $userid=-1 if (!defined($userid) || $userid==0);
 
    my %q1=%q;
-   $q1{stateid}='<20';
-   $q1{eventend}="[EMPTY]";
-   $q1{class}=[grep(/^.*::eventnotify$/,keys(%{$self->{DataObj}->{SubDataObj}}))];
    my %q2=%q;
-   $q2{stateid}='<20';
-   $q2{eventend}=">now";
-   $q2{class}=[grep(/^.*::eventnotify$/,keys(%{$self->{DataObj}->{SubDataObj}}))];
+   if (Query->Param("SHOWALL")){
+      $q1{stateid}='<20';
+      $q1{class}=[grep(/^.*::eventnotify$/,
+                  keys(%{$self->{DataObj}->{SubDataObj}}))];
+   }
+   else{
+      $q1{stateid}='<20';
+      $q1{eventend}="[EMPTY]";
+      $q1{class}=[grep(/^.*::eventnotify$/,
+                       keys(%{$self->{DataObj}->{SubDataObj}}))];
+      $q2{stateid}='<20';
+      $q2{eventend}=">now";
+      $q2{class}=[grep(/^.*::eventnotify$/,
+                       keys(%{$self->{DataObj}->{SubDataObj}}))];
+   }
 
 
    $self->{DataObj}->ResetFilter();
