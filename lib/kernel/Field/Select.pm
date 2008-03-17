@@ -248,7 +248,8 @@ sub Validate
          my $chkval=$val;
          my $chkval=[$chkval] if (ref($chkval) ne "ARRAY");
          foreach my $v (@$chkval){
-            if (!grep(/^$v$/,@nativ)){
+            my $qv=quotemeta($v);
+            if (!grep(/^$qv$/,@nativ)){
                $failfound++;
                last;
             }

@@ -226,7 +226,7 @@ sub new
                 vjoininhash   =>['name','type','ammount']),
 
       new kernel::Field::SubList(
-                name          =>'ipadresses',
+                name          =>'ipaddresses',
                 label         =>'IP-Adresses',
                 group         =>'ipaddresses',
                 vjointo       =>'tsacinv::ipaddress',
@@ -608,13 +608,16 @@ sub Import
          return(undef);
       }
       # check 3: Supervisor registered
-      if ($acgrouprec->{supervisorldapid} eq ""){
-         $self->LastMsg(ERROR,"No correct Supervisor at Assignment Group");
+      if ($acgrouprec->{supervisorldapid} eq "" &&
+          $acgrouprec->{supervisoremail} eq ""){
+         $self->LastMsg(ERROR,"incomplet Supervisor at Assignment Group");
          return(undef);
       }
+      my $importname=$acgrouprec->{supervisorldapid};
+      $importname=$acgrouprec->{supervisoremail} if ($importname eq "");
       # check 4: load Supervisor ID in W5Base
       my $tswiw=getModuleObject($self->Config,"tswiw::user");
-      my $databossid=$tswiw->GetW5BaseUserID($acgrouprec->{supervisorldapid});
+      my $databossid=$tswiw->GetW5BaseUserID($importname);
       if (!defined($databossid)){
          $self->LastMsg(ERROR,"Can't import Supervisor as Databoss");
          return(undef);

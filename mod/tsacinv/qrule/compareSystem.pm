@@ -79,6 +79,61 @@ sub qcheckRecord
                              $parrec,"systemmemory",
                              $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
                              tolerance=>5,mode=>'integer');
+         $self->IfaceCompare($dataobj,
+                             $rec,"cpucount",
+                             $parrec,"systemcpucount",
+                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
+                             mode=>'integer');
+      }
+      if ($rec->{allowifupdate}){
+printf STDERR ("ac=%s\n",Dumper($parrec->{ipaddresses}));
+printf STDERR ("w5=%s\n",Dumper($rec->{ipaddresses}));
+      }
+
+      if ($rec->{mandator} eq "Extern" && $rec->{allowifupdate}){
+         # forced updates on External Data
+         my $admid;
+         my $acgroup=getModuleObject($self->getParent->Config,"tsacinv::group");
+         $acgroup->SetFilter({lgroupid=>\$parrec->{lassignmentid}});
+         my ($acgrouprec,$msg)=$acgroup->getOnlyFirst(qw(supervisorldapid));
+         if (defined($acgrouprec)){
+            if ($acgrouprec->{supervisorldapid} ne "" ||
+                $acgrouprec->{supervisoremail} ne ""){
+               my $importname=$acgrouprec->{supervisorldapid};
+               if ($importname eq ""){
+                  $importname=$acgrouprec->{supervisoremail};
+               }
+               my $tswiw=getModuleObject($self->getParent->Config,
+                                         "tswiw::user");
+               my $databossid=$tswiw->GetW5BaseUserID($importname);
+               if (defined($databossid)){
+                  $admid=$databossid;
+               }
+            }
+         }
+         if ($admid ne ""){
+            $self->IfaceCompare($dataobj,
+                                $rec,"admid",
+                                {admid=>$admid},"admid",
+                                $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
+                                mode=>'integer');
+         }
+         my $comments="";
+         if ($parrec->{assignmentgroup} ne ""){
+            $comments.="\n" if ($comments ne "");
+            $comments.="AssetCenter AssignmentGroup: ".
+                       $parrec->{assignmentgroup};
+         }
+         if ($parrec->{conumber} ne ""){
+            $comments.="\n" if ($comments ne "");
+            $comments.="AssetCenter CO-Number: ".
+                       $parrec->{conumber};
+         }
+         $self->IfaceCompare($dataobj,
+                             $rec,"comments",
+                             {comments=>$comments},"comments",
+                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
+                             mode=>'string');
       }
    }
    else{
