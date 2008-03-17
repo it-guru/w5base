@@ -1197,7 +1197,7 @@ sub LoadInterfaces
        $self->{lnkapplappl}->ValidatedDeleteRecord($_);
    });
 
-   return({exicode=>0});
+   return({exitcode=>0});
 }
 
 
