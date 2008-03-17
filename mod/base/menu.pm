@@ -212,7 +212,7 @@ sub getValidWebFunctions
    my ($self)=@_;
    return($self->SUPER::getValidWebFunctions(),
           "root","menutop","menuframe","msel","TableVersionChecker",
-          "LoginFail");
+          "LoginFail","IllegalTokenAccess");
 }
 
 #####################################################################
@@ -625,6 +625,15 @@ sub LoginFail
    print ("</html>");
 }
 
+sub IllegalTokenAccess
+{
+   my $self=shift;
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','menu.css']);
+   print $self->getParsedTemplate("tmpl/IllegalTokenAccess");
+   print ("</html>");
+}
+
 sub menuframe
 {
    my $self=shift;
@@ -723,12 +732,27 @@ EOF
       else{
          if (defined($mt->{fullname}->{$fp})){
             my $m=$mt->{fullname}->{$fp};
-            my $target=$self->targetUrl($m);
-            if ($target=~m/^http[s]{0,1}:\/\//){
-               $currenturl=$self->targetUrl($m);
+            my $target;
+            if (defined($m->{acls}) && ref($m->{acls}) eq "ARRAY" &&
+                ($#{$m->{acls}}==-1 ||
+                 grep(/^read$/,$self->getCurrentAclModes($ENV{REMOTE_USER},
+                                                     $m->{acls})))){
+               $target=$self->targetUrl($m);
+               printf STDERR ("fifi read of $fp ok\n");
+            }
+            if (!defined($target)){
+               printf STDERR ("fifi read of $fp NOT ok\n");
+            }
+            if (defined($target)){
+               if ($target=~m/^http[s]{0,1}:\/\//){
+                  $currenturl=$self->targetUrl($m);
+               }
+               else{
+                  $currenturl=${rootpath}.$self->targetUrl($m);
+               }
             }
             else{
-               $currenturl=${rootpath}.$self->targetUrl($m);
+               $currenturl=${rootpath}."IllegalTokenAccess";
             }
             my %forwardquery;
             foreach my $q (Query->Param()){
