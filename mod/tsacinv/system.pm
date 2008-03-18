@@ -635,6 +635,7 @@ sub Import
       my $newrec={name=>$sysrec->{systemname},
                   systemid=>$sysrec->{systemid},
                   admid=>$databossid,
+                  allowifupdate=>1,
                   mandatorid=>$mandatorid,
                   cistatusid=>4};
       $identifyby=$sys->ValidatedInsertRecord($newrec);

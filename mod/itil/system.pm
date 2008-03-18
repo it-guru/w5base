@@ -532,7 +532,7 @@ sub new
                                  'dnsname','shortcomments'],
                 vjoininhash   =>['id','name','addresstyp',
                                  'cistatusid',
-                                 'dnsname']),
+                                 'dnsname','comments']),
 
       new kernel::Field::Container(
                 name          =>'additional',

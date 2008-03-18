@@ -303,6 +303,10 @@ sub Validate
       $self->LastMsg(ERROR,"invalid system specified");
       return(0);
    } 
+   if (!defined($oldrec) && !exists($newrec->{type}) &&
+                            !exists($newrec->{addresstyp})){
+      $newrec->{addresstyp}=1;
+   }
    return(0) if (!($self->isParentWriteable($systemid)));
    #return(1) if ($self->IsMemberOf("admin"));
 

@@ -126,7 +126,7 @@ sub IfaceCompare
          my $chkobj=getModuleObject($self->getParent->Config,$lnkobj);
          if (defined($chkobj)){
             $chkobj->SetFilter($lnkfield->{vjoindisp}=>
-                               $comprec->{$compfieldname});
+                               "\"".$comprec->{$compfieldname}."\"");
             my ($chkrec,$msg)=$chkobj->getOnlyFirst($lnkfield->{vjoinon}->[1]);
             if (!defined($chkrec)){
                my $newrec={};
