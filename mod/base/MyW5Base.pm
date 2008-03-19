@@ -42,22 +42,28 @@ sub getValidWebFunctions
 sub Main
 {
    my $self=shift;
+   my $oldval=Query->Param("MyW5BaseSUBMOD");
+   my $title=$self->T($self->Self);
+
+   my %l=();
+   my $DefaultFormat="HtmlV01";
+   my $doAutoSearch=0;
+   foreach my $m (values(%{$self->{SubDataObj}})){
+      $l{$m->getLabel()}=$m;
+      $title.=" - ".$m->getLabel() if ($oldval eq $m->Self()); 
+   }
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','mainwork.css',
                                    'kernel.App.Web.css','myw5base.css',
                                    'frames.css'],
+                           title=>$title,
                            js=>['toolbox.js','subModal.js'],
                            body=>1,form=>1);
-   my %l=();
-   my $DefaultFormat="xHtmlV01";
-   my $doAutoSearch=0;
-   foreach my $m (values(%{$self->{SubDataObj}})){
-      $l{$m->getLabel()}=$m;
-   }
    print $self->HtmlSubModalDiv();
 
    print("<table width=100% height=100% border=0 cellspacing=0 cellpadding=0>");
-   printf("<tr><td height=1%% valign=top>%s</td></tr>",$self->getAppTitleBar());
+   printf("<tr><td height=1%% valign=top>%s</td></tr>",
+          $self->getAppTitleBar(title=>$title));
    print("<tr><td height=1% valign=top>");
 print <<EOF;
 <div class=searchframe>
@@ -68,7 +74,6 @@ EOF
          "OnChange=\"SelectionChanged();\">";
    $s.="<option value=\"\">&lt;".$self->T("please select a query").
        "&gt;</option>";
-   my $oldval=Query->Param("MyW5BaseSUBMOD");
    foreach my $label (sort(keys(%l))){
       if (defined($l{$label}) &&
           $l{$label}->can("isSelectable") && 

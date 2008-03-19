@@ -308,7 +308,7 @@ sub getAppTitleBar
                  "overflow:hidden\">".
                  "%s&nbsp;</div></td>".
                  "<td align=right nowrap><div $onclick ".
-                 "style=\"margin:0;padding:0;padding-right:5px;\">%s</div>".
+                 "style=\"margin:0;padding:0;padding-right:5px;margin-left:10px;\">%s</div>".
                  "</td></tr>",$param{title},
                                     $self->T("Logged in as")." ".$user);
    $d=<<EOF;
