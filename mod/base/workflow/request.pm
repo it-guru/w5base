@@ -902,13 +902,17 @@ sub Process
              $WfRec->{id},"wffine",
              {translation=>'base::workflow::request'},"",undef)){
             my $nextstep=$self->getParent->getStepByShortname("finish");
-            $self->StoreRecord($WfRec,{stateid=>21,
-                                       step=>$nextstep,
-                                       fwdtargetid=>undef,
-                                       fwdtarget=>undef,
-                                       closedate=>NowStamp("en"),
-                                       fwddebtarget=>undef,
-                                       fwddebtargetid=>undef});
+            my $store={stateid=>21,
+                       step=>$nextstep,
+                       fwdtargetid=>undef,
+                       fwdtarget=>undef,
+                       closedate=>NowStamp("en"),
+                       fwddebtarget=>undef,
+                       fwddebtargetid=>undef};
+            if ($WfRec->{eventend} eq ""){
+               $store->{eventend}=NowStamp("en");
+            }
+            $self->StoreRecord($WfRec,$store);
             $self->PostProcess($action.".".$op,$WfRec,$actions);
             return(1);
          }

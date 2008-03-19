@@ -308,7 +308,7 @@ sub rpcGetUniqueId
       $self->{'UniqueId'}->{'timer'}=time();
    }
    $self->{'UniqueId'}->{'counter'}++;
-   return({id=>sprintf("%011d%04d",time(),$self->{'UniqueId'}->{'counter'}),
+   return({id=>sprintf("%11d%04d",time(),$self->{'UniqueId'}->{'counter'}),
            exitcode=>0});
 }
 
