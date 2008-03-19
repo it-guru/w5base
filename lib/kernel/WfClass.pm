@@ -925,6 +925,7 @@ EOF
 <tr>
 <td colspan=2>$sepstart
 EOF
+   $param{emailtext}=[$param{emailtext}] if (ref($param{emailtext}) ne "ARRAY");
    for(my $blk=0;$blk<=$#{$param{emailtext}};$blk++){
 
       if ($param{emailsubheader}->[$blk] ne "" &&
