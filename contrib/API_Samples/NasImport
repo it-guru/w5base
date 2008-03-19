@@ -1,21 +1,190 @@
-#!/usr/bin/perl
-use lib qw( /opt/w5base/lib);
+#!/usr/bin/env perl
+package MyWin;
+use strict;
+use vars qw(@ISA);
+use Data::Dumper;
+@ISA=qw(Win32::GUI::Window);
+
+sub new
+{
+   my $type=shift;
+   my %param=@_;
+   my $hostname=$param{-hostname};
+   my $file=$param{ARGV}->[0];
+   my $o=$param{o};
+   my $force=$param{-force};
+   $param{-left}=100;
+   $param{-height}=500;
+   $param{-width}=700;
+   $param{-dialogui}=1;
+   $param{-title}="test" if (!$param{-title});
+   $param{-name}="Main";
+   $param{-onResize}=\&doResize;
+   $param{-onTerminate}=\&doTerminate;
+   $param{-onMinimize}=\&doMinimize;
+   eval("\$param{-menu}=Win32::GUI::MakeMenu(
+                                     '&Datei' => 'Datei',
+                                     ' > Öffnen'  => { -name=>'Open',-onClick=>\\&OpenFile},
+                                     ' > B&eenden'  => { -name=>'Exit',-onClick=>\\&doTerminate},
+                                     '&Test' =>{ -name=>'MyTest',-onClick=>\\&MyTest} ,
+   );");
+   my $self=$type->SUPER::new(%param);
+   $self=bless($self,$type);
+   $self->{file}=$file;
+   $self->{o}=$o;
+   $self->{force}=$force;
+   $self->{GRID}=eval("apply Win32::GUI::GridLayout(\$self,[qw(10 * * * * 10)],
+                                         [qw(10 20 20 20 10 40 10 20 10 * 10)],0,0);");
+   $self->AddRadioButton(
+           -name     => "auto",
+           -text     => "Auto",
+           -checked  => 1,
+   );
+   $self->{GRID}->add($self->auto,2,2,"justify justify");
+   $self->AddRadioButton(
+           -name     => "emc",
+           -text     => "Emc"
+   );
+   $self->{GRID}->add($self->emc,2,3,"justify justify");
+   $self->AddRadioButton(
+           -name     => "netapp",
+           -text     => "NetApp"
+   );
+   $self->{GRID}->add($self->netapp,2,4,"justify justify");
+   $self->AddButton(
+           -name   => "run",
+           -text   => "Start",
+           -onClick  => \&doStart, 
+   );
+   $self->{GRID}->add($self->run,[2..5],6,"justify justify");
+   $self->AddLabel(
+          -name   => "filename",
+          -text   => $self->{file},
+   );
+   $self->{GRID}->add($self->filename,2,8,"justify justify");
+   $self->AddLabel(
+          -name   => "fileformat",
+   );
+   $self->{GRID}->add($self->fileformat,3,8,"justify justify");
+   $self->AddLabel(
+          -name   => "host",
+   );
+   $self->{GRID}->add($self->host,4,8,"justify justify");
+   $self->AddLabel(
+          -name   => "hostname",
+          -text   => "Hostname",
+   );
+   $self->{GRID}->add($self->hostname,3,2,"justify justify");
+   $self->AddTextfield(
+           -name      => "hostname",
+           -text      => $hostname,
+   );
+   $self->{GRID}->add($self->hostname, 3, 3, "justify justify");
+   $self->AddTextfield(
+           -name      => "output",
+           -text      => "host",
+           -multiline => 1,
+   );
+   $self->{GRID}->add($self->output, [2..5], 10, "justify justify");
+   $self->checkMode();
+   $self->{GRID}->recalc();
+   return($self); 
+}
+
+sub OpenFile
+{
+   my $self=shift;
+   my $file;
+   eval('$file = Win32::GUI::GetOpenFileName();');
+   $self->{file}=$file;
+   $self->checkMode();
+}
+
+sub doStart
+{
+   my $self=shift;
+   $self->{sharedata}={}; 
+   my $mainwin=$self->GetParent;
+   my $result=main::readFile($mainwin->{FH},
+                             $self->{sharedata},
+                             $mainwin->{curmode},
+                             $mainwin->hostname->GetLine(0));
+   exit(1) if ($result != 0);
+   my @oplist; 
+   my $result=main::calculateOperations($mainwin->{o},$self->{sharedata},
+                                        \@oplist,$mainwin->hostname->GetLine(0));
+   exit(1) if ($result != 0);
+   if ($mainwin->{force}){
+      $result=processOperations($mainwin->{o},\@oplist);
+      exit(1) if ($result != 0);
+   }
+   my $text;
+   foreach my $rec (@oplist){
+      foreach my $key (keys(%{$rec})){
+         $text=$text.$key."\t\t".$rec->{$key}."\r\n";
+      }
+   }
+   $mainwin->output->Change(-text=>$text);
+
+}
+
+sub checkMode
+{
+   my $self=shift;
+   my $file=$self->{file};
+   if (open(FILE,"<$file")){
+      $self->{curmode}=main::detectMode(\*FILE) if ($self->auto->GetCheck() == 1);
+      $self->{curmode}="emc" if ($self->emc->GetCheck() == 1);
+      $self->{curmode}="netapp" if ($self->netapp->GetCheck() == 1);
+      $self->{FH}=\*FILE;
+   }
+   $self->{curmode}="unknown" if ($self->{curmode} == 1);
+   $self->filename->Change(-text=>"DATEI: ".$file);
+   $self->fileformat->Change(-text=>"FILEFORMAT: ".$self->{curmode});
+   $self->host->Change(-text=>"HOSTNAME: ".$self->hostname->GetLine(0));
+}
+
+sub MyTest
+{
+   exit(0);
+}
+
+sub doTerminate
+{
+   return(-1);
+}
+
+sub doResize
+{
+   my $self=shift;
+   $self->{GRID}->recalc();
+}
+
+sub doMinimize {
+    return(0);
+}
+
+
+package main;
+use lib qw(/opt/w5base/lib);
 use strict;                   
 use W5Base::API;
 use Data::Dumper;
 use Net::DNS;
 use Fcntl qw(SEEK_SET);
+use vars qw($GUI $Window);
+
 
 my $DefaultBase="https://w5base.net/w5base/auth/";
 my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang);
-my ($mode,$force,$hostname,$type);
+my ($mode,$force,$hostname,$type,$gui);
 my %o;
 my $count=0;
 my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
        "webuser=s"=>\$loginuser,"webpass=s"=> \$loginpass,
        "verbose+"=>\$verbose,
        "force"=>\$force,"hostname=s"=>\$hostname,
-       "mode=s"=>\$mode,"type=s"=>\$type);
+       "mode=s"=>\$mode,"type=s"=>\$type,"gui"=>\$gui);
 my @allowedmodes=qw(auto emc netapp);
 my $optresult=XGetOptions(\%P,\&Help,undef,undef,".W5Base.Interface");
 my $netdns=new Net::DNS::Resolver();
@@ -25,21 +194,12 @@ $type="nfs" if (!defined($type));
 
 my @hostname=split(/,/,$hostname);
 if ($#ARGV != $#hostname){
-   msg(ERROR,"number of files and hostnames must be the same!");
    exit(1);
 }
 
 # create connection config
 my $apidebug=$verbose>=3 ? 1 : 0;
 my $Config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug);
-if (!defined($Config)){
-   msg(ERROR,"base or username/password is not valid");exit(1);
-}
-else{
-   msg(DEBUG,"create of config ok");
-}
-msg(DEBUG,"verbose=$verbose");
-
 
 # load ModuleObject
 my %loadobj=('sys'=>'itil::system',
@@ -50,40 +210,52 @@ foreach my $localid (keys(%loadobj)){
    my $objectname=$loadobj{$localid};
    my $obj=getModuleObject($Config,$objectname);
    if (!defined($obj)){
-      msg(ERROR,"can't load object $objectname");exit(2);
    }else{
-      msg(DEBUG,"create of ModuleObject $objectname ok");
    }
    $o{$localid}=$obj;
 }
 
+gui();
+exit;
+sub gui
+{
+   if ($gui){
+      $|=1;
+      eval('use Win32::GUI;
+            use Win32::GUI::GridLayout;
+            $GUI=new MyWin(-title=>"NasImporter", 
+                           -hostname=>$hostname,
+                           ARGV=>\@ARGV,
+                           o=>\%o,
+                           -force=>$force);
+            $GUI->Show();
+            Win32::GUI::Dialog();');
+      msg(ERROR,"--gui only in windows systems \n $@") if ($@);
+   }
+}
 foreach my $file (@ARGV){
    if (open(FILE,"<$file")){ 
       my $curmode=$mode;
       $curmode=detectMode(\*FILE) if ($mode eq "auto");
-      msg(DEBUG,"curmode=$curmode");
       my %sharedata;
       my $result=readFile(\*FILE,\%sharedata,$curmode,$hostname[$count]);
       exit(1) if ($result != 0);
       my @oplist;
-      my $result=calculateOperations(\%o,\%sharedata,\@oplist,$hostname[$count]);
+      $result=calculateOperations(\%o,\%sharedata,\@oplist,$hostname[$count]);
       exit(1) if ($result != 0);
       if ($force){
-         my $result=processOperations(\%o,\@oplist);
+         $result=processOperations(\%o,\@oplist);
          exit(1) if ($result != 0);
       }else{
          foreach my $record (@oplist){
-            msg(INFO,$record->{MSG});
          }
       }
       close(FILE);
    }else{
-      msg(ERROR,"file not exists!");
       exit(1);
    }
    $count++;
 }
-
 
 sub detectMode
 {
@@ -421,6 +593,7 @@ $RealScript [options] File File ...
    --hostname more than one seperate by comma
    --type     export type (nfs, cifs ...) [default:nfs]
    --force    write data  
+   --gui      grafical user interface
 EOF
 }
 
