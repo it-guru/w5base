@@ -232,6 +232,7 @@ sub generateMailSet
    if ($WfRec->{eventmode} eq "EVk.appl"){
       push(@baseset,"affectedapplication");
       push(@baseset,"wffields.affectedcustomer");
+      push(@baseset,"wffields.eventstatreason");
    }
    my @sets=([@baseset,qw(
                           wffields.eventimpact
@@ -319,6 +320,24 @@ sub generateMailSet
       push(@emailsep,0);
       push(@emailpostfix,"");
    }
+   if ($action eq "rootcausei"){
+      my $wf=$self->getParent();
+      my $prmfld=$wf->getField("wffields.eventprmticket",$WfRec);
+      my $prmticket=$prmfld->RawValue($WfRec);
+      if ($prmticket ne ""){
+         $wf->ResetFilter();
+         $wf->SetFilter({srcid=>\$prmticket});
+         my ($prmrec,$msg)=$wf->getOnlyFirst(qw(problemsolution));
+         my $solfield=$wf->getField("wffields.problemsolution",$prmrec);
+         if (defined($solfield)){
+            push(@emailprefix,"Umgesetzte Maßnahmen:");
+            push(@emailtext,$solfield->FormatedResult($prmrec,"HtmlMail"));
+            push(@emailsubheader,0);
+            push(@emailsep,0);
+            push(@emailpostfix,"");
+         }
+      }
+   }
    delete($ENV{HTTP_FORCE_LANGUAGE});
    @$emailprefix=@emailprefix;
    @$emailpostfix=@emailpostfix;
@@ -367,7 +386,11 @@ sub getPosibleActions
    if ($WfRec->{stateid}==17){
       if ($self->IsIncidentManager($WfRec) || 
           $self->getParent->IsMemberOf(["admin","admin.workflow"])){
-         push(@l,"rootcausei");
+         my $prmfld=$self->getField("wffields.eventprmticket",$WfRec);
+         my $prmticket=$prmfld->RawValue($WfRec);
+         if ($prmticket ne ""){
+            push(@l,"rootcausei");
+         }
       }
    }
    return(@l,$self->SUPER::getPosibleActions($WfRec));
