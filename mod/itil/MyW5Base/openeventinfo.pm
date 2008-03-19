@@ -49,8 +49,8 @@ sub getQueryTemplate
 <tr>
 <td class=fname width=10%>\%affectedapplication(label)\%:</td>
 <td class=finput width=40%>\%affectedapplication(search)\%</td>
-<td class=fname width=10%>&nbsp;</td>
-<td class=finput width=40%>&nbsp;</td>
+<td class=fname width=10%>\%affectedcontract(label)\%:</td>
+<td class=finput width=40%>\%affectedcontract(search)\%</td>
 </tr>
 <tr>
 <td class=fname width=10%>&nbsp;</td>
