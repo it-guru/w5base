@@ -138,6 +138,7 @@ sub Result
       $self->{DataObj}->SecureSetFilter([\%q1]);
       my @l2=$self->{DataObj}->getHashList("id");
       delete($q1{mandatorid});
+      %q1=%q;
       $q1{id}=[map({$_->{id}} @l1),map({$_->{id}} @l2)];
    }
 
