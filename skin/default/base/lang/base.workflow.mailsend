@@ -12,5 +12,5 @@
 'Mail CC Address'=>{de=>'E-Mail Kopie An',en=>'E-Mail Copy To'},
 '1'=>{en=>'yes',de=>'ja'},
 '0'=>{en=>'no',de=>'nein'},
-'FView'=>{en=>'true Mail',de=>'echt Mail'},
+'FView'=>{en=>'true mail view',de=>'Echt Mail-Darstellung'},
 

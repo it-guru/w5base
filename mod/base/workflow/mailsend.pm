@@ -233,8 +233,25 @@ sub getHtmlDetailPageContent
 {
    my $self=shift;
    my ($p,$rec)=@_;
+   return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "FView");
+   my $page;
+   my $idname=$self->IdField->Name();
+   my $idval=$rec->{$idname};
 
-   return($self->SUPER::getHtmlDetailPageContent($p,$rec));
+   if ($p eq "FView"){
+      Query->Param("$idname"=>$idval);
+      $idval="NONE" if ($idval eq "");
+
+      my $q=new kernel::cgi({});
+      $q->Param("$idname"=>$idval);
+      my $urlparam=$q->QueryString();
+
+      $page="<iframe style=\"width:100%;height:100%;border-width:0;".
+            "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
+            "src=\"WorkflowSpecView?$urlparam\"></iframe>";
+   }
+   $page.=$self->HtmlPersistentVariables($idname);
+   return($page);
 }
 
 sub getHtmlDetailPages
@@ -242,7 +259,65 @@ sub getHtmlDetailPages
    my $self=shift;
    my ($p,$rec)=@_;
 
-   return($self->SUPER::getHtmlDetailPages($p,$rec),"FView"=>$self->T("FView"));
+   return($self->SUPER::getHtmlDetailPages($p,$rec),
+          "WorkflowSpecView"=>$self->T("FView"));
+}
+
+sub WorkflowSpecView
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $d="<div id=ViewDiv style=\"overflow:auto\">";
+   $d.="<div style=\"".
+         "border-style:none;text-align:left;".
+         "margin:10px;padding:5px\">";
+   my %param;
+   my %tr=('emailto'=>'to',
+           'name'=>'subject',
+           'wffields.emailprefix'=>'emailprefix',
+           'wffields.emailtext'=>'emailtext',
+           'wffields.emailsubheader'=>'emailsubheader',
+           'wffields.emailsep'=>'emailsep',
+           'emailfrom'=>'from',
+           'emailcc'=>'cc');
+   foreach my $fldname (keys(%tr)){
+      my $fo=$self->getField($fldname,$WfRec);
+      if ($fo){
+         my $v=$fo->RawValue($WfRec);
+         $param{$tr{$fldname}}=$v;
+      }
+   }
+
+   $d.=$self->generateNotificationPreview(%param,nolabel=>1);
+   $d.="</div>";
+   $d.="</div>";
+   $d.=<<EOF;
+<script language="JavaScript">
+function resize()
+{
+   var h=getViewportHeight();
+   var w=getViewportWidth();
+   var d=document.getElementById("ViewDiv");
+   var ModeSelect=document.getElementById("ModeSelect");
+   d.style.width=w-8+"px";
+   d.style.height=h-ModeSelect.offsetHeight+"px";
+}
+addEvent(window, "load",   resize);
+addEvent(window, "resize",   resize);
+</script>
+<style>
+\@media print {
+   body{
+      background: #FFFFFF;
+   }
+   #ViewDiv{
+      height:auto;
+   }
+}
+
+</style>
+EOF
+   return($d);
 }
 
 

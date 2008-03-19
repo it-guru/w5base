@@ -342,7 +342,10 @@ EOF
       my $workheight=$StepObj->getWorkHeight($WfRec,\@actions);
       my $workareah=$workheight-30;
       my $dst="HtmlDetail?id=$id";
-      if ($p eq "HtmlHistory"){
+      if ($p eq "WorkflowSpecView"){
+         $template=$self->WorkflowSpecView($WfRec);
+      }
+      elsif ($p eq "HtmlHistory"){
          $dst="HtmlHistory?id=$id" if ($id ne "");
          $template=(<<EOF);
 <iframe style="height:99%" src="$dst" name=ProcessWindow
@@ -578,6 +581,12 @@ EOF
 
 }
 
+sub WorkflowSpecView
+{
+   my $self=shift;
+   return("no special View for Workflow $self");
+}
+
 sub getDetailFunctions
 {
    my $self=shift;
@@ -608,8 +617,13 @@ sub getDetailFunctionsCode
 
    my $d=<<EOF;
 function WorkflowPrint(){
-   window.frames['ProcessWindow'].focus();
-   window.frames['ProcessWindow'].print();
+   if (window.frames['ProcessWindow']){
+      window.frames['ProcessWindow'].focus();
+      window.frames['ProcessWindow'].print();
+   }
+   else{
+      window.print();
+   }
 }
 function WorkflowClose(){
    if (window.name=="work"){
@@ -873,6 +887,97 @@ sub ValidActionCheck
    return(0);
 }
 
+
+sub generateNotificationPreview
+{
+   my $self=shift;
+   my %param=@_;
+   my $email=$param{to};
+   $email=join("; ",@{$param{to}})   if (ref($param{to}) eq "ARRAY");;
+   my $emailcc="";
+   $emailcc=join("; ",@{$param{cc}}) if (ref($param{cc}) eq "ARRAY");
+
+   my $preview=$self->getParent->T("Preview");
+   $preview.=":";
+   if (defined($param{subject})){
+      $preview=$param{subject};
+   }
+   my $tomsg=$self->getParent->T("To");
+   my $ccmsg=$self->getParent->T("CC");
+   my $sepstart="<table class=emailpreviewset border=1>";
+   my $sepend="</table>";
+   my $templ=<<EOF;
+<div class=emailpreview>
+&nbsp;<b>$preview</b>
+<table class=emailpreview>
+<tr>
+<td valign=top>$tomsg:</td>
+<td>$email</td>
+</tr>
+EOF
+   $templ.=<<EOF if ($emailcc ne "");
+<tr>
+<td valign=top>$ccmsg:</td>
+<td>$emailcc</td>
+</tr>
+EOF
+   $templ.=<<EOF;
+<tr>
+<td colspan=2>$sepstart
+EOF
+   for(my $blk=0;$blk<=$#{$param{emailtext}};$blk++){
+
+      if ($param{emailsubheader}->[$blk] ne "" &&
+          $param{emailsubheader}->[$blk] ne "0"){
+         my $sh=$param{emailsubheader}->[$blk];
+         if ($sh eq "1"){
+            $sh="";
+         }
+         if ($sh eq " "){
+            $sh="&nbsp;";
+         }
+         $templ.="<tr><td colspan=2 class=emailpreviewemailsubheader>".
+                 $sh."</td></tr>";
+      }
+
+      if ($param{emailsep}->[$blk] ne "" &&
+          $param{emailsep}->[$blk] ne "0"){
+         my $septext=$param{emailsep}->[$blk];
+         if ($septext eq "1"){
+            $septext="";
+         }
+         $templ.=$sepend.$septext.$sepstart;
+      }
+      $templ.="<tr>";
+      $templ.="<td class=emailpreviewemailprefix>".
+              $param{emailprefix}->[$blk]."</td>";
+      $templ.="<td class=emailpreviewemailtext>".
+              "<table style=\"table-layout:fixed;width:100%\" ".
+              "cellspacing=0 cellpadding=0><tr><td>".
+              "<div style=\"overflow:hidden\"><pre class=emailpreview>".
+              FancyLinks($param{emailtext}->[$blk])."</pre></div>".
+              "</td></tr></table></td>";
+      $templ.="</tr>";
+   }
+   $templ.=$sepend."</td></tr></table></div>";
+
+#   sub processlink
+#   {
+#      my $link=shift;
+#      my $prefix=shift;
+#      my $res="<a href=\"$link\">$link</a>".$prefix;
+#      if (length($link)>20){
+#         $res="<a href=\"$link\">".
+#              "&lt;direct link&gt;</a>".$prefix;
+#      }
+#      return($res);
+#   }
+#   $templ=~s#(http|https|telnet|news)(://\S+?)(\?\S+){0,1}(["']{0,1}\s)#processlink("$1$2$3",$4)#ge;
+
+   return($templ);
+
+
+}
 
 
 

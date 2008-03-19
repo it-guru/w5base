@@ -135,10 +135,9 @@ iframe.tip{
 
 
 div.emailpreview{
-   padding:4px;
 }
 table.emailpreview{
-   width:100%;
+   width:585px;
    background:#ffffff;
    border-width:1px;
    border-style:solid;
