@@ -984,7 +984,7 @@ sub ExpandTimeExpression
                                          $orgval);
          return(undef);
       }
-      ($Y,$M,$D,$h,$m,$s)=Localtime($dsttimezone,$time);
+      ($Y,$M,$D,$h,$m)=Localtime($dsttimezone,$time);
       $found=1;
       $fail=0;
    }
