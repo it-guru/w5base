@@ -114,7 +114,11 @@ sub getTimeRangeDrop
       $lmonth=12;
    }
    my $oldval=Query->Param($name);
-   $oldval=undef if (grep(/^fixmonth$/,@modes) && !($oldval=~m/^\d+-\d+$/));
+   $oldval=undef if (grep(/^fixmonth$/,@modes) && 
+                     (!($oldval=~m/^\d+-\d+$/) && 
+                      !($oldval=~m/^nextmonth$/) &&
+                      !($oldval=~m/^currentmonth$/) &&
+                      !($oldval=~m/^lastmonth$/)));
    $oldval=undef if (grep(/^month$/,@modes) && !($oldval=~m/AND/));
    foreach my $blk (@modes){
       if ($blk eq "nearfuture"){
@@ -225,8 +229,23 @@ sub getTimeRangeDrop
          }
       }
    }
-   if (grep(/^lastmonth$/,@modes)){
-      $d.="<option value=\"lastmonth\">lastmonth</option>";
+   if (grep(/^relativemonth$/,@modes)){
+      $d.="<option value=\"nextmonth\"";
+      $d.=" selected" if ($oldval eq "nextmonth");
+      $d.=">".$self->getParent->T("nextmonth")."</option>";
+      $k{nextmonth}="nextmonth";
+   }
+   if (grep(/^relativemonth$/,@modes)){
+      $d.="<option value=\"currentmonth\"";
+      $d.=" selected" if ($oldval eq "currentmonth");
+      $d.=">".$self->getParent->T("currentmonth")."</option>";
+      $k{currentmonth}="currentmonth";
+   }
+   if (grep(/^lastmonth$/,@modes) ||
+       grep(/^relativemonth$/,@modes)){
+      $d.="<option value=\"lastmonth\"";
+      $d.=" selected" if ($oldval eq "lastmonth");
+      $d.=">".$self->getParent->T("lastmonth")."</option>";
       $k{lastmonth}="lastmonth";
    }
    $d.="</select>\n"; 

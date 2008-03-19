@@ -19,6 +19,7 @@ package AL_TCom::MyW5Base::myP800;
 use strict;
 use vars qw(@ISA);
 use kernel;
+use kernel::date;
 use kernel::MyW5Base;
 use Data::Dumper;
 @ISA=qw(kernel::MyW5Base);
@@ -58,7 +59,8 @@ sub getQueryTemplate
    my $timelabel=$self->getParent->T("P800 reporting month");;
    my $timedrop=$self->getTimeRangeDrop("P800_TimeRange",
                                         $self->getParent,
-                                        qw(fixmonth selectlastmonth));
+                                        qw(fixmonth selectlastmonth 
+                                           relativemonth));
    my $d=<<EOF;
 <div class=searchframe>
 <table class=searchframe>
@@ -76,7 +78,7 @@ sub getQueryTemplate
 </tr>
 </table>
 </div>
-%StdButtonBar(teamviewcontrol,deputycontrol,print,search)%
+%StdButtonBar(teamviewcontrol,bookmark,deputycontrol,print,search)%
 EOF
    return($d);
 }
@@ -155,10 +157,22 @@ sub Result
       @appl=map({$_->{id}} @l);
    }
    $mainq1{affectedapplicationid}=\@appl;
-   my $m=Query->Param("P800_TimeRange");
-   $m="now" if (!defined($m) || $m eq ""); 
-   $mainq1{srcid}="$m-*";
-   $mainq1{eventstart}=">$m-1000h AND <$m+1000h";
+   my $p800m=Query->Param("P800_TimeRange");
+   if ($p800m eq "currentmonth" || $p800m eq "lastmonth" || 
+       $p800m eq "nextmonth"){
+      my $tz=$self->getParent->UserTimezone();
+      my ($Y,$M,$D,$h,$m,$s)=Today_and_Now($tz);
+      if ($p800m eq "nextmonth"){
+         ($Y,$M,$D)=Add_Delta_YM($tz,$Y,$M,$D,0,1);
+      }
+      elsif ($p800m eq "lastmonth"){
+         ($Y,$M,$D)=Add_Delta_YM($tz,$Y,$M,$D,0,-1);
+      }
+      $p800m=sprintf("%02d/%04d",$M,$Y);
+   }
+   $p800m="now" if (!defined($p800m) || $p800m eq ""); 
+   $mainq1{srcid}="$p800m-*";
+   $mainq1{eventstart}=">$p800m-1000h AND <$p800m+1000h";
    my @valids=grep(/^.*::P800.*$/,keys(%{$self->{DataObj}->{SubDataObj}}));
    if ($mainq1{class} ne ""){
       my $q=quotemeta($mainq1{class});

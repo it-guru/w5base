@@ -13,3 +13,6 @@
 'future and last 28 days'=>{de=>'zukünftig und die letzten 28 Tage'},
 'future and last 12 weeks'=>{de=>'zukünftig und die letzten 12 Wochen'},
 'future and last 365 days'=>{de=>'zukünftig und die letzten 365 Tage'},
+'currentmonth'=>{de=>'aktueller Monat',en=>'current month'},
+'nextmonth'=>{de=>'nächster Monat',en=>'next month'},
+'lastmonth'=>{de=>'letzter Monat',en=>'last month'},
