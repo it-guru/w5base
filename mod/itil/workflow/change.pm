@@ -27,6 +27,8 @@ sub new
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
+   $self->{history}=[qw(insert modify delete)];
+
 
    return($self);
 }
