@@ -13,6 +13,8 @@ sub new
    my $file=$param{ARGV}->[0];
    my $o=$param{o};
    my $force=$param{-force};
+   my $icon=eval("new Win32::GUI::Icon('icon_w5base.ico')");
+   $param{-icon}=$icon;
    $param{-left}=100;
    $param{-height}=500;
    $param{-width}=700;
@@ -22,18 +24,24 @@ sub new
    $param{-onResize}=\&doResize;
    $param{-onTerminate}=\&doTerminate;
    $param{-onMinimize}=\&doMinimize;
+   $param{-minsize}=[600,400];
    eval("\$param{-menu}=Win32::GUI::MakeMenu(
-                                     '&Datei' => 'Datei',
-                                     ' > Öffnen'  => { -name=>'Open',-onClick=>\\&OpenFile},
-                                     ' > B&eenden'  => { -name=>'Exit',-onClick=>\\&doTerminate},
+                                     '&File' => 'File',
+                                     ' > &Open'  => { -name=>'Open',-onClick=>\\&OpenFile},
+                                     ' > &End'  => { -name=>'Exit',-onClick=>\\&doTerminate},
                                      '&Test' =>{ -name=>'MyTest',-onClick=>\\&MyTest} ,
    );");
    my $self=$type->SUPER::new(%param);
    $self=bless($self,$type);
    $self->{file}=$file;
    $self->{o}=$o;
-   $self->{force}=$force;
-   $self->{GRID}=eval("apply Win32::GUI::GridLayout(\$self,[qw(10 * * * * 10)],
+   $self->{ICON}=$icon;
+   $self->AddNotifyIcon(-name => "systray",
+                        -icon => $self->{ICON},
+                        -tip  => "W5Base Importer",
+   );
+   $self->Center();
+   $self->{GRID}=eval("apply Win32::GUI::GridLayout(\$self,[qw(10 * * * * * 10)],
                                          [qw(10 20 20 20 10 40 10 20 10 * 10)],0,0);");
    $self->AddRadioButton(
            -name     => "auto",
@@ -51,43 +59,55 @@ sub new
            -text     => "NetApp"
    );
    $self->{GRID}->add($self->netapp,2,4,"justify justify");
+   $self->AddCheckbox(
+           -name     => "writedata",
+           -text     => "write Data",
+   );
+   $self->{GRID}->add($self->writedata,3,4,"justify justify");
    $self->AddButton(
            -name   => "run",
            -text   => "Start",
            -onClick  => \&doStart, 
    );
-   $self->{GRID}->add($self->run,[2..5],6,"justify justify");
+   $self->{GRID}->add($self->run,[2..6],6,"justify justify");
    $self->AddLabel(
           -name   => "filename",
           -text   => $self->{file},
    );
-   $self->{GRID}->add($self->filename,2,8,"justify justify");
+   $self->{GRID}->add($self->filename,[2..4],8,"justify justify");
    $self->AddLabel(
           -name   => "fileformat",
    );
-   $self->{GRID}->add($self->fileformat,3,8,"justify justify");
+   $self->{GRID}->add($self->fileformat,5,8,"justify justify");
    $self->AddLabel(
           -name   => "host",
    );
-   $self->{GRID}->add($self->host,4,8,"justify justify");
+   $self->{GRID}->add($self->host,6,8,"justify justify");
    $self->AddLabel(
           -name   => "hostname",
           -text   => "Hostname",
    );
-   $self->{GRID}->add($self->hostname,3,2,"justify justify");
+   $self->{GRID}->add($self->hostname,4,2,"justify justify");
    $self->AddTextfield(
            -name      => "hostname",
            -text      => $hostname,
+           -width     => 100,
+           -height    => 20,
    );
-   $self->{GRID}->add($self->hostname, 3, 3, "justify justify");
+   $self->{GRID}->add($self->hostname, 3, 2, "left");
    $self->AddTextfield(
-           -name      => "output",
-           -text      => "host",
-           -multiline => 1,
+           -name        => "output",
+           -text        => "",
+           -multiline   => 1,
+           -readonly    => 1,
+           -autohscroll => 1,
+           -hscroll     => 1,
+           -autovscroll => 1,
+           -vscroll     => 1,
    );
-   $self->{GRID}->add($self->output, [2..5], 10, "justify justify");
-   $self->checkMode();
+   $self->{GRID}->add($self->output, [2..6], 10, "justify justify");
    $self->{GRID}->recalc();
+   $self->writedata->SetCheck(1) if ($force);
    return($self); 
 }
 
@@ -103,45 +123,65 @@ sub OpenFile
 sub doStart
 {
    my $self=shift;
-   $self->{sharedata}={}; 
-   my $mainwin=$self->GetParent;
-   my $result=main::readFile($mainwin->{FH},
-                             $self->{sharedata},
-                             $mainwin->{curmode},
-                             $mainwin->hostname->GetLine(0));
-   exit(1) if ($result != 0);
    my @oplist; 
-   my $result=main::calculateOperations($mainwin->{o},$self->{sharedata},
-                                        \@oplist,$mainwin->hostname->GetLine(0));
-   exit(1) if ($result != 0);
-   if ($mainwin->{force}){
-      $result=processOperations($mainwin->{o},\@oplist);
-      exit(1) if ($result != 0);
+   $self->{sharedata}={}; 
+   my $mainwin=$self->GetParent();
+   my @result=$mainwin->checkMode();
+   if ($result[0] != 0){
+      eval("Win32::MsgBox(\"\$result[1]\",Win32::MB_ICONQUESTION|0, 'Error!')"); 
+      return(1,$result[1]);
+   }
+   @result=main::readFile($mainwin->{FH},
+                          $self->{sharedata},
+                          $mainwin->{curmode},
+                          $mainwin->hostname->GetLine(0));
+   if ($result[0] != 0){
+      eval("Win32::MsgBox(\"\$result[1]\",Win32::MB_ICONQUESTION|0, 'Error!')");   
+      return(1,$result[1]);
+   }
+   @result=main::calculateOperations($mainwin->{o},$self->{sharedata},
+                                     \@oplist,$mainwin->hostname->GetLine(0));
+   if ($result[0] != 0){
+      eval("Win32::MsgBox(\"\$result[1]\",Win32::MB_ICONQUESTION|0, 'Error!')");   
+      return(1,$result[1]);
+   }
+   if ($mainwin->writedata->GetCheck() == 1){
+      @result=main::processOperations($mainwin->{o},\@oplist);
+      if ($result[0] != 0){
+         eval("Win32::MsgBox(\"\$result[1]\",Win32::MB_ICONQUESTION|0, 'Error!')");   
+         return(1,$result[1]);
+      }
    }
    my $text;
    foreach my $rec (@oplist){
-      foreach my $key (keys(%{$rec})){
-         $text=$text.$key."\t\t".$rec->{$key}."\r\n";
-      }
+      $text=$text.$rec->{MSG}."\r\n";
    }
    $mainwin->output->Change(-text=>$text);
-
 }
 
 sub checkMode
 {
    my $self=shift;
    my $file=$self->{file};
+   my @mode;
+   $self->{curmode}="emc" if ($self->emc->GetCheck() == 1);
+   $self->{curmode}="netapp" if ($self->netapp->GetCheck() == 1);
    if (open(FILE,"<$file")){
-      $self->{curmode}=main::detectMode(\*FILE) if ($self->auto->GetCheck() == 1);
-      $self->{curmode}="emc" if ($self->emc->GetCheck() == 1);
-      $self->{curmode}="netapp" if ($self->netapp->GetCheck() == 1);
+      if ($self->auto->GetCheck() == 1){
+         @mode=main::detectMode(\*FILE) if ($self->auto->GetCheck() == 1);
+      }
       $self->{FH}=\*FILE;
    }
-   $self->{curmode}="unknown" if ($self->{curmode} == 1);
-   $self->filename->Change(-text=>"DATEI: ".$file);
+   $self->filename->Change(-text=>"FILE: ".$file);
    $self->fileformat->Change(-text=>"FILEFORMAT: ".$self->{curmode});
    $self->host->Change(-text=>"HOSTNAME: ".$self->hostname->GetLine(0));
+   if ($mode[0] != 0){
+      $self->{curmode}="unknown";
+      return(1,$mode[1]);
+   }else{
+      $self->{curmode}=$mode[1];
+   }
+   return(0);
 }
 
 sub MyTest
@@ -154,6 +194,11 @@ sub doTerminate
    return(-1);
 }
 
+sub doOk
+{
+   return(-1);
+}
+
 sub doResize
 {
    my $self=shift;
@@ -161,7 +206,7 @@ sub doResize
 }
 
 sub doMinimize {
-    return(0);
+    return(1);
 }
 
 
@@ -192,11 +237,6 @@ my $netdns=new Net::DNS::Resolver();
 $mode="auto" if (!defined($mode));
 $type="nfs" if (!defined($type));
 
-my @hostname=split(/,/,$hostname);
-if ($#ARGV != $#hostname){
-   exit(1);
-}
-
 # create connection config
 my $apidebug=$verbose>=3 ? 1 : 0;
 my $Config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug);
@@ -215,46 +255,50 @@ foreach my $localid (keys(%loadobj)){
    $o{$localid}=$obj;
 }
 
-gui();
-exit;
-sub gui
-{
-   if ($gui){
-      $|=1;
-      eval('use Win32::GUI;
-            use Win32::GUI::GridLayout;
-            $GUI=new MyWin(-title=>"NasImporter", 
-                           -hostname=>$hostname,
-                           ARGV=>\@ARGV,
-                           o=>\%o,
-                           -force=>$force);
-            $GUI->Show();
-            Win32::GUI::Dialog();');
-      msg(ERROR,"--gui only in windows systems \n $@") if ($@);
-   }
-}
-foreach my $file (@ARGV){
-   if (open(FILE,"<$file")){ 
-      my $curmode=$mode;
-      $curmode=detectMode(\*FILE) if ($mode eq "auto");
-      my %sharedata;
-      my $result=readFile(\*FILE,\%sharedata,$curmode,$hostname[$count]);
-      exit(1) if ($result != 0);
-      my @oplist;
-      $result=calculateOperations(\%o,\%sharedata,\@oplist,$hostname[$count]);
-      exit(1) if ($result != 0);
-      if ($force){
-         $result=processOperations(\%o,\@oplist);
-         exit(1) if ($result != 0);
-      }else{
-         foreach my $record (@oplist){
-         }
-      }
-      close(FILE);
-   }else{
+if ($gui){
+   $|=1;
+   eval('
+         use Win32::GUI;
+         use Win32::GUI::GridLayout;
+         $GUI=new MyWin(-title=>"W5Base Importer", 
+                        -hostname=>$hostname,
+                        ARGV=>\@ARGV,
+                        o=>\%o,
+                        -force=>$force);
+         $GUI->Show();
+         Win32::GUI::Dialog();');
+   msg(ERROR,"--gui only in windows systems \n $@") if ($@);
+}else{
+   my @hostname=split(/,/,$hostname);
+   if ($#ARGV != $#hostname){
       exit(1);
    }
-   $count++;
+
+   foreach my $file (@ARGV){
+      if (open(FILE,"<$file")){ 
+         my @curmode=($mode);
+         @curmode=detectMode(\*FILE) if ($mode eq "auto");
+         msg(ERROR,$curmode[1]); exit(1) if ($curmode[0] != 0);
+         my %sharedata;
+         my @result=readFile(\*FILE,\%sharedata,$curmode[0],$hostname[$count]);
+         msg(ERROR,$result[1]); exit(1) if ($result[0] != 0);
+         my @oplist;
+         @result=calculateOperations(\%o,\%sharedata,\@oplist,$hostname[$count]);
+         msg(ERROR,$result[1]); exit(1) if ($result[0] != 0);
+         if ($force){
+            @result=processOperations(\%o,\@oplist);
+            msg(ERROR,$result[1]); exit(1) if ($result[0] != 0);
+         }else{
+            foreach my $rec (@oplist){
+               msg(INFO,$rec->{MSG});
+            }
+         }
+         close(FILE);
+      }else{
+         exit(1);
+      }
+      $count++;
+   }
 }
 
 sub detectMode
@@ -264,14 +308,13 @@ sub detectMode
    while(<$fh>){
       if ($_=~m/^export.*$/){
          $mode="emc";
-         return($mode);
+         return(0,$mode);
       }elsif($_=~m/^.*sec=sys.*$/){
          $mode="netapp";
-         return($mode);
+         return(0,$mode);
       }
    }
-   msg(ERROR,"mode not exists");
-   return(1);
+   return(1,"mode not exists");
 }
 
 
@@ -283,6 +326,7 @@ sub readFile
    my $cm=shift;
    my $hostname=shift;
    seek($fh,SEEK_SET,0);
+   $sharedata->{$hostname}->{'ignore'}=[];
    while(my $line=<$fh>){
       $line=~s/\s*$//;
       $line=~s/#.*$//;
@@ -294,13 +338,13 @@ sub readFile
             $param=~s/^-//;
             @param=split(/,/,$param); 
          }else{
-            msg(WARN,"line ignored: ".$line);
+            push(@{$sharedata->{$hostname}->{'ignore'}},"WARN: line ignored: $line");
          }
       }elsif($cm eq "emc"){
          if (($path,$param)=$line=~m/^export\s+"([^"]+)"\s+(.*)\s*$/){
              @param=split(/\s+/,$param); 
          }else{
-            msg(WARN,"line ignored: ".$line);
+            push(@{$sharedata->{$hostname}->{'ignore'}},"WARN: line ignored: $line");
          }
       }
       foreach my $param (@param){
@@ -322,8 +366,8 @@ sub readFile
                      $sharedata->{$hostname}->{$path}->{'exportoptions'}=
                      $sharedata->{$hostname}->{$path}->{'exportoptions'}.
                      "$var=$ip ";
-                     msg(WARN,"unknown IP/HOST=$ip, 
-                               entry will be a export option!");
+                     push(@{$sharedata->{$hostname}->{'ignore'}},
+                     "WARN: unknown IP/HOST=$ip, entry will be a export option!");
                      next;
                   }
                }
@@ -334,7 +378,8 @@ sub readFile
                $sharedata->{$hostname}->{$path}->{'ip'}->{$ip}->{$var}=1;
             }
          }else{
-            msg(WARN,"param problem $param line=$line");
+            push(@{$sharedata->{$hostname}->{'ignore'}},
+            "WARN: param problem $param line=$line");
          }
       }
    }
@@ -354,12 +399,10 @@ sub calculateOperations
    $o->{'sys'}->SetFilter({name=>$hostname});
    my @hl=$o->{'sys'}->getHashList(qw(id));
    if ($#hl==-1){
-      msg(ERROR,"system $hostname not exists!");
-      return(1);      
+      return(1,"system $hostname not exists!");      
    }
    if ($#hl>0){
-      msg(ERROR,"system $hostname not unique!");
-      return(1);      
+      return(1,"system $hostname not unique!");      
    }
   
    # get network 
@@ -367,13 +410,11 @@ sub calculateOperations
    my @netid=$o->{'net'}->getHashList(qw(id));
    if ($#netid==-1){
       $o->{'sys'}->LastMsg();
-  #    msg(ERROR,"network T-Systems Storage/NAS LAN not exists!");
-      return(1);      
+      return(1,"network T-Systems Storage/NAS LAN not exists!");      
    }
    if ($#netid>0){
       $o->{'sys'}->LastMsg();
-  #    msg(ERROR,"network T-Systems Storage/NAS LAN not unique!");
-      return(1);      
+      return(1,"network T-Systems Storage/NAS LAN not unique!");      
    }
 
    # get available shares
@@ -400,8 +441,15 @@ sub calculateOperations
    }
 
    foreach my $share (keys(%{$sharedata->{$hostname}})){
-      my $ref;
       my $mode="insert";
+      if ($share eq "ignore"){
+         foreach my $ig (@{$sharedata->{$hostname}->{'ignore'}}){
+            push(@$oplist,{OP  => 'ignore',
+                           MSG => $ig});
+         }
+         $mode="ignore";
+      }
+      my $ref;
       foreach my $ln (@ln){
          if ($ln->{name} eq $share){
             $mode="update";
@@ -533,7 +581,6 @@ sub processOperations
    my $o=shift;    
    my $oplist=shift;    
    my ($id,$found);
-
    foreach my $record (@$oplist){
       # check for valid objects only
       foreach my $objname (keys(%{$record})){
@@ -542,8 +589,7 @@ sub processOperations
             $found=1 if ($objname eq $orgobjname);
          }
          if ($found == 0){
-            msg(ERROR,"Objectname=$objname not allowed");
-            return(1);
+            return(1,"Objectname=$objname not allowed");
          }
       }
       foreach my $data (keys(%{$record->{'DATA'}})){
@@ -560,11 +606,10 @@ sub processOperations
       }elsif($record->{OP} eq "delete"){
          $id=$o->{$record->{'DATAOBJALIAS'}}->deleteRecord($record->{'IDENTIFYBY'});
       }else{
-         msg(ERROR,"unvalid mode ".$record->{OP});
-         return(1);
+         if ($record->{OP} ne "ignore"){
+            return(1,"unvalid mode ".$record->{OP});
+         }
       }
-      $o->{$record->{'DATAOBJALIAS'}}->dieOnERROR();
-      msg(INFO,$record->{MSG});
    }
 }
 
