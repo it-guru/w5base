@@ -30,7 +30,7 @@ $|=1;
 foreach my $module (qw(Time::HiRes 
                        FindBin UNIVERSAL Carp Getopt::Long
                        Scalar::Util Unicode::String Encode Exporter POSIX
-                       Date::Calc 
+                       Date::Calc Text::ParseWords
                        DateTime DateTime::Span DateTime::SpanSet 
                        Data::Dumper)){
    printf("INFO:  check module %-33s           ... ","'$module'");

@@ -20,7 +20,6 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::App;
-use Data::Dumper;
 use Text::ParseWords;
 
 @ISA    = qw(kernel::App);
@@ -1925,7 +1924,9 @@ sub Data2SQLwhere
          if ($sqlparam{datatype} eq "DATE"){
             $f=$self->PreParseTimeExpression($f,$sqlparam{timezone});
          }
+         $f=~s/\\\*/[|*|]/g;
          my @words=parse_line('[,;]{0,1}\s+',0,$f);
+         #my @words=parse_line('[,;]{0,1}\s+',"delimiters",$f);
          if (!($f=~m/^\s*$/) && $#words==-1){  # maybe an invalid " struct
             push(@newfilter,undef);
          }
@@ -1978,6 +1979,7 @@ sub dbQuote
       $str=~s/_/\\_/g;
       $str=~s/\*/%/g;
       $str=~s/\?/_/g;
+      $str=~s/\[\|%\|\]/*/g;  # to allow \* searchs (see parse_line above)
    }
    return($sqlparam{sqldbh}->quote($str)) if defined($sqlparam{sqldbh});
    return("'".$str."'");
