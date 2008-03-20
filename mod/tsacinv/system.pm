@@ -174,7 +174,7 @@ sub new
                 prefix        =>"asset",
                 group         =>"assetdata",
                 fields        =>[qw(assetid serialno inventoryno modelname 
-                                    powerinput cpucount cpuspeed
+                                    powerinput cpucount cpuspeed corecount
                                     systemsonasset)]),
 
       new kernel::Field::Import($self,

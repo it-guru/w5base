@@ -129,6 +129,13 @@ sub new
                 dataobjattr   =>'decode(amasset.lcpuspeedmhz,0,NULL,'.
                                 'amasset.lcpuspeedmhz)'),
 
+      new kernel::Field::Float(
+                name          =>'corecount',
+                label         =>'Asset Core count',
+                precision     =>'0',
+                dataobjattr   =>'decode(amasset.itotalnumberofcores,0,NULL,'.
+                                'amasset.itotalnumberofcores)'),
+
       new kernel::Field::Text(
                 name          =>'serialno',
                 ignorecase    =>1,
