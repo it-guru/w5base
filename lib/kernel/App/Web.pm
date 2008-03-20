@@ -716,8 +716,9 @@ sub HandleNewUser
                # update user record because the user is inactive or
                # it already exists as an external user
                #
-               $user->ValidatedUpdateRecord($urec,{usertyp=>'user',
-                                                   creator=>$urec->{userid}},
+               my $updrec={usertyp=>'user',creator=>$urec->{userid}};
+               $updrec->{cistatusid}=4 if ($urec->{cistatusid}<4);
+               $user->ValidatedUpdateRecord($urec,$updrec,
                                    {userid=>\$urec->{userid}});
             }
             else{
