@@ -58,7 +58,7 @@ sub RunWebApp
        =~m/^maintenance/){
       return($W5V2::ObjCache{$objectkey}->DisplayMaintenanceWindow());
    }
-   return() if (!$W5V2::ObjCache{$objectkey}->InitRequest(cgi=>$cgi));
+   return if (!$W5V2::ObjCache{$objectkey}->InitRequest(cgi=>$cgi));
 
    return($W5V2::ObjCache{$objectkey}->Run());
 }
@@ -360,6 +360,32 @@ sub ValidateCaches
    return(0) if (!$self->ValidateUserCache($res->{User}));
    return(0) if (!$self->ValidateGroupCache($res->{Group}));
    return(0) if (!$self->ValidateMandatorCache($res->{Mandator}));
+
+   my $UserCache=$self->Cache->{User}->{Cache};
+   if ($ENV{REMOTE_USER} ne "anonymous" && #locked account check
+       defined($UserCache->{$ENV{REMOTE_USER}}) &&
+       defined($UserCache->{$ENV{REMOTE_USER}}->{rec}->{cistatusid})){ 
+      if ($UserCache->{$ENV{REMOTE_USER}}->{rec}->{cistatusid}>4){
+         if (Query->Param("MOD") eq "base::interface"){
+            printf("Status: 403 Forbitten - ".
+                   "account needs to be activate with web browser\n");
+            printf("Content-type: text/xml\n\n".
+                   "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+            return(0);
+         }
+         else{
+            print("Content-type:text/plain\n\n");
+            printf(msg(ERROR,$self->T("access for user '\%s' to W5Base ".
+                             "Framework rejected")),$ENV{REMOTE_USER});
+            printf(msg(INFO,$self->T("posible resons are a locked account ".
+                            "or an incorect contact definition")));
+            printf(msg(INFO,$self->T("please contact the admins if you think,".
+                            " this isn't purposed")));
+            return(0);
+         }
+      }
+   }
+
    return(1);
 }
 
@@ -624,6 +650,7 @@ sub ValidateUserCache
       my $o=$self->Cache->{User}->{DataObj};
       if ($o){
          $o->SetCurrentView(qw(surname userid givenname posix groups tz lang
+                               cistatusid
                                email usersubst usertyp fullname));
         # $o->SetCurrentView(qw(ALL));
          $o->SetFilter({'accounts'=>[$ENV{REMOTE_USER}]});
@@ -690,7 +717,6 @@ sub HandleNewUser
                # it already exists as an external user
                #
                $user->ValidatedUpdateRecord($urec,{usertyp=>'user',
-                                                   cistatusid=>4,
                                                    creator=>$urec->{userid}},
                                    {userid=>\$urec->{userid}});
             }
