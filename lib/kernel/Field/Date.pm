@@ -205,7 +205,7 @@ sub FormatedDetail
       if ($mode=~m/^XlsV\d+$/){
          my $usertimezone=$self->getParent->UserTimezone();
          $d=$self->getParent->ExpandTimeExpression($d,"ISO8601",
-                                                      $self->{timezone},
+                                                      $usertimezone,
                                                       $usertimezone);
       }
       return($d);
