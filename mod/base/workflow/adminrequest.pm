@@ -46,6 +46,20 @@ sub getDefaultContractor
    return('admin');
 }
 
+sub getPosibleActions
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $app=$self->getParent;
+   my $userid=$self->getParent->getCurrentUserId();
+   my $isadmin=$self->getParent->IsMemberOf("admin");
+   my $stateid=$WfRec->{stateid};
+
+
+   return("transform",$self->SUPER::getPosibleActions($WfRec));
+}
+
+
 
 
 
@@ -114,7 +128,7 @@ sub getWorkHeight
    my $self=shift;
    my $WfRec=shift;
 
-   return("100%");
+   return("200");
 }
 
 1;

@@ -425,30 +425,40 @@ EOF
               $self->getParent->T($self->Self,$self->Self).
               "</b></div>";
       }
+      my $imgurl=$self->getRecordImageUrl();
       #if ($self->getParent->IsMemberOf("admin")){
-         $tip.="<hr>";
-         my $url=$ENV{SCRIPT_URI};
-         $url=~s/\/auth\/.*$//;
-         $url.="/auth/base/menu/msel/MyW5Base";
-         my $qhash=Query->MultiVars();
-         delete($qhash->{NextStep});
-         delete($qhash->{SaveStep});
-         my $qhash=new kernel::cgi($qhash);
-         my $openquery={OpenURL=>"$ENV{SCRIPT_URI}?".$qhash->QueryString()};
-         my $queryobj=new kernel::cgi($openquery);
-         $url.="?".$queryobj->QueryString();
-         $url=~s/\%/\\\%/g;
-         my $a="<a href=\"$url\" ".
-               "target=_blank title=\"Workflow link included current query\">".
-               "<img src=\"../../base/load/anker.gif\" ".
-               "height=10 border=0></a>";
-         $tip.=sprintf($self->T("You can add a shortcut of this anker %s to ".
-                       "your bookmarks, to access faster to this workflow.",
-                       'base::workflow'),$a);
-         $tip.="<hr>";
-      #}
+      my $subtip="<hr>";
+      my $url=$ENV{SCRIPT_URI};
+      $url=~s/\/auth\/.*$//;
+      $url.="/auth/base/menu/msel/MyW5Base";
+      my $qhash=Query->MultiVars();
+      delete($qhash->{NextStep});
+      delete($qhash->{SaveStep});
+      my $qhash=new kernel::cgi($qhash);
+      my $openquery={OpenURL=>"$ENV{SCRIPT_URI}?".$qhash->QueryString()};
+      my $queryobj=new kernel::cgi($openquery);
+      $url.="?".$queryobj->QueryString();
+      $url=~s/\%/\\\%/g;
+      my $a="<a href=\"$url\" ".
+            "target=_blank title=\"Workflow link included current query\">".
+            "<img src=\"../../base/load/anker.gif\" ".
+            "height=10 border=0></a>";
+      $subtip.=sprintf($self->T("You can add a shortcut of this anker %s to ".
+                    "your bookmarks, to access faster to this workflow.",
+                    'base::workflow'),$a);
+      $subtip.="<hr>";
       $template.=<<EOF;
-<div align=left class=newworkflowtip id=tip><div style="margin:5px;margin-top:10px">$tip</div></div>
+<div align=left class=newworkflowtip id=tip>
+<div>
+<div style="height:100px;margin:5px;margin-top:10px">
+<img style="border-color:black;border-style:solid;border-width:1px;margin:5px;margin-top:2px;margin-right:8px;float:left" src="$imgurl">
+$tip
+</div>
+</div>
+<div style="float:none">
+$subtip
+</div>
+</div>
 <div id=ProcessHandler style="border-top-style:outset;border-width:4px;visibility:hidden">
 <div class=WorkBorder>
 $LastMsg
