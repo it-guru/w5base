@@ -43,6 +43,8 @@ sub getQueryTemplate
 {
    my $self=shift;
    my $m1=$self->getParent->T("enclose all not finshed eventnotifications");
+   my $showallsel;
+   $showallsel="checked" if (Query->Param("SHOWALL"));
    my $d=<<EOF;
 <div class=searchframe>
 <table class=searchframe>
@@ -55,7 +57,7 @@ sub getQueryTemplate
 <tr>
 <td class=fname width=10%>&nbsp;</td>
 <td class=finput width=40%>&nbsp;</td>
-<td class=fname colspan=2><input type=checkbox name=SHOWALL>$m1</td>
+<td class=fname colspan=2><input type=checkbox $showallsel name=SHOWALL>$m1</td>
 </tr>
 </table>
 </div>
