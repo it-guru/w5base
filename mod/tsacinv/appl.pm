@@ -405,98 +405,97 @@ sub Import
    my $self=shift;
    my $param=shift;
 
-#   my $flt;
-#   if ($param->{importname} ne ""){
-#      $flt={systemid=>[$param->{importname}]};
-#   }
-#   else{
-#      return(undef);
-#   }
-#   $self->ResetFilter();
-#   $self->SetFilter($flt);
-#   my @l=$self->getHashList(qw(systemid systemname lassignmentid assetid));
-#   if ($#l==-1){
-#      $self->LastMsg(ERROR,"SystemID not found in AssetCenter");
-#      return(undef);
-#   }
-#   if ($#l>0){
-#      $self->LastMsg(ERROR,"SystemID not unique in AssetCenter");
-#      return(undef);
-#   }
-#
-#   my $sysrec=$l[0];
-#   my $sys=getModuleObject($self->Config,"itil::system");
-#   $sys->SetFilter($flt);
-#   my ($w5sysrec,$msg)=$sys->getOnlyFirst(qw(ALL));
-#   my $identifyby;
-#   if (defined($w5sysrec)){
-#      if ($w5sysrec->{cistatusid}==4){
-#         $self->LastMsg(ERROR,"SystemID already exists in W5Base");
-#         return(undef);
-#      }
-#      $identifyby=$sys->ValidatedUpdateRecord($w5sysrec,{cistatusid=>4},
-#                                              {id=>\$w5sysrec->{id}});
-#   }
-#   else{
-#      # check 1: Assigmenen Group registered
-#      if ($sysrec->{lassignmentid} eq ""){
-#         $self->LastMsg(ERROR,"SystemID has no Assignment Group");
-#         return(undef);
-#      }
-#      printf STDERR Dumper($sysrec);
-#      # check 2: Assingment Group active
-#      my $acgroup=getModuleObject($self->Config,"tsacinv::group");
-#      $acgroup->SetFilter({lgroupid=>\$sysrec->{lassignmentid}});
-#      my ($acgrouprec,$msg)=$acgroup->getOnlyFirst(qw(supervisorldapid));
-#      if (!defined($acgrouprec)){
-#         $self->LastMsg(ERROR,"Can't find Assignment Group of system");
-#         return(undef);
-#      }
-#      # check 3: Supervisor registered
-#      if ($acgrouprec->{supervisorldapid} eq "" &&
-#          $acgrouprec->{supervisoremail} eq ""){
-#         $self->LastMsg(ERROR,"incomplet Supervisor at Assignment Group");
-#         return(undef);
-#      }
-#      my $importname=$acgrouprec->{supervisorldapid};
-#      $importname=$acgrouprec->{supervisoremail} if ($importname eq "");
-#      # check 4: load Supervisor ID in W5Base
-#      my $tswiw=getModuleObject($self->Config,"tswiw::user");
-#      my $databossid=$tswiw->GetW5BaseUserID($importname);
-#      if (!defined($databossid)){
-#         $self->LastMsg(ERROR,"Can't import Supervisor as Databoss");
-#         return(undef);
-#      }
-#      # check 5: find id of mandator "extern"
-#      my $mand=getModuleObject($self->Config,"base::mandator");
-#      $mand->SetFilter({name=>"extern"});
-#      my ($mandrec,$msg)=$mand->getOnlyFirst(qw(grpid));
-#      if (!defined($mandrec)){
-#         $self->LastMsg(ERROR,"Can't find mandator extern");
-#         return(undef);
-#      }
-#      my $mandatorid=$mandrec->{grpid};
-#      # final: do the insert operation
-#      my $newrec={name=>$sysrec->{systemname},
-#                  systemid=>$sysrec->{systemid},
-#                  admid=>$databossid,
-#                  mandatorid=>$mandatorid,
-#                  cistatusid=>4};
-#      $identifyby=$sys->ValidatedInsertRecord($newrec);
-#   }
-#   if (defined($identifyby) && $identifyby!=0){
-#      $sys->ResetFilter();
-#      $sys->SetFilter({'id'=>\$identifyby});
-#      my ($rec,$msg)=$sys->getOnlyFirst(qw(ALL));
-#      if (defined($rec)){
-#         my $qc=getModuleObject($self->Config,"base::qrule");
-#         $qc->setParent($sys);
-#         $qc->nativQualityCheck($sys->getQualityCheckCompat($rec),$rec);
-#      }
-#   }
-#   return($identifyby);
-   $self->LastMsg(ERROR,"not full implemented at now");
-   return(undef);
+   my $flt;
+   if ($param->{importname} ne ""){
+      $flt={applid=>[$param->{importname}]};
+   }
+   else{
+      return(undef);
+   }
+   $self->ResetFilter();
+   $self->SetFilter($flt);
+   my @l=$self->getHashList(qw(applid name lassignmentid));
+   if ($#l==-1){
+      $self->LastMsg(ERROR,"ApplicationID not found in AssetCenter");
+      return(undef);
+   }
+   if ($#l>0){
+      $self->LastMsg(ERROR,"ApplicationID not unique in AssetCenter");
+      return(undef);
+   }
+
+   my $applrec=$l[0];
+   my $appl=getModuleObject($self->Config,"itil::appl");
+   $appl->SetFilter($flt);
+   my ($w5applrec,$msg)=$appl->getOnlyFirst(qw(ALL));
+   my $identifyby;
+   if (defined($w5applrec)){
+      if ($w5applrec->{cistatusid}==4){
+         $self->LastMsg(ERROR,"ApplicationID already exists in W5Base");
+         return(undef);
+      }
+      $identifyby=$appl->ValidatedUpdateRecord($w5applrec,{cistatusid=>4},
+                                              {id=>\$w5applrec->{id}});
+   }
+   else{
+      # check 1: Assigmenen Group registered
+      if ($applrec->{lassignmentid} eq ""){
+         $self->LastMsg(ERROR,"ApplicationID has no Assignment Group");
+         return(undef);
+      }
+      printf STDERR Dumper($applrec);
+      # check 2: Assingment Group active
+      my $acgroup=getModuleObject($self->Config,"tsacinv::group");
+      $acgroup->SetFilter({lgroupid=>\$applrec->{lassignmentid}});
+      my ($acgrouprec,$msg)=$acgroup->getOnlyFirst(qw(supervisorldapid));
+      if (!defined($acgrouprec)){
+         $self->LastMsg(ERROR,"Can't find Assignment Group of system");
+         return(undef);
+      }
+      # check 3: Supervisor registered
+      if ($acgrouprec->{supervisorldapid} eq "" &&
+          $acgrouprec->{supervisoremail} eq ""){
+         $self->LastMsg(ERROR,"incomplet Supervisor at Assignment Group");
+         return(undef);
+      }
+      my $importname=$acgrouprec->{supervisorldapid};
+      $importname=$acgrouprec->{supervisoremail} if ($importname eq "");
+      # check 4: load Supervisor ID in W5Base
+      my $tswiw=getModuleObject($self->Config,"tswiw::user");
+      my $databossid=$tswiw->GetW5BaseUserID($importname);
+      if (!defined($databossid)){
+         $self->LastMsg(ERROR,"Can't import Supervisor as Databoss");
+         return(undef);
+      }
+      # check 5: find id of mandator "extern"
+      my $mand=getModuleObject($self->Config,"base::mandator");
+      $mand->SetFilter({name=>"extern"});
+      my ($mandrec,$msg)=$mand->getOnlyFirst(qw(grpid));
+      if (!defined($mandrec)){
+         $self->LastMsg(ERROR,"Can't find mandator extern");
+         return(undef);
+      }
+      my $mandatorid=$mandrec->{grpid};
+      # final: do the insert operation
+      my $newrec={name=>$applrec->{name},
+                  applid=>$applrec->{applid},
+                  databossid=>$databossid,
+                  allowifupdate=>1,
+                  mandatorid=>$mandatorid,
+                  cistatusid=>4};
+      $identifyby=$appl->ValidatedInsertRecord($newrec);
+   }
+   if (defined($identifyby) && $identifyby!=0){
+      $appl->ResetFilter();
+      $appl->SetFilter({'id'=>\$identifyby});
+      my ($rec,$msg)=$appl->getOnlyFirst(qw(ALL));
+      if (defined($rec)){
+         my $qc=getModuleObject($self->Config,"base::qrule");
+         $qc->setParent($appl);
+         $qc->nativQualityCheck($appl->getQualityCheckCompat($rec),$rec);
+      }
+   }
+   return($identifyby);
 }
 
 
