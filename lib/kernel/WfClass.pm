@@ -489,7 +489,7 @@ function ProcessResize()
       if (LastMsg){
          h4=LastMsg.offsetHeight;
       }
-      ProcessWindow.style.height=h-h1-h4-90;
+      ProcessWindow.style.height=h-h1-h4-180;
       var h2=ProcessHandler.offsetHeight;
       Tip.style.height=h-h2-h1-5;
       var WorkArea=document.getElementById("WorkArea");
