@@ -35,6 +35,10 @@ sub Init
 {
    my $self=shift;
 
+   $self->RegisterObj("businessportal",
+                      "tmpl/welcome",
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("customerportal",
                       "tmpl/welcome",
                       defaultacl=>['valid_user']);
