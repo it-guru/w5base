@@ -29,7 +29,7 @@ sub new
    my $self={@_};
 
    $self->{group}='qc'                      if (!defined($self->{qc}));
-   $self->{name}='qclast'                   if (!defined($self->{name}));
+   $self->{name}='lastqcheck'               if (!defined($self->{name}));
    $self->{label}='Quality Check last date' if (!defined($self->{label}));
    $self->{history}=0;
    $self->{readonly}=1;
@@ -37,6 +37,7 @@ sub new
    $self->{searchable}=0;
 
    my $self=bless($type->SUPER::new(%$self),$type);
+
    return($self);
 }
 

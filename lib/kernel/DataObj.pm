@@ -35,6 +35,14 @@ sub new
 }
 
 
+sub Clone
+{
+   my $self=shift;
+   my $name=$self->Self;
+   my $config=$self->Config;
+   return(getModuleObject($config,$name));
+}
+
 sub getFilterSet
 {
    my $self=shift;

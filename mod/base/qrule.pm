@@ -130,7 +130,7 @@ sub nativQualityCheck
    my $objlist=shift;
    my $rec=shift;
    my @param=@_;
-   my $parent=$self->getParent;
+   my $parent=$self->getParent->Clone;
    my $result;
    my %alldataissuemsg;
    my $mandator=[];
@@ -261,8 +261,16 @@ sub nativQualityCheck
    $wf->ForeachFilteredRecord(sub{
                       $wf->Store($_,{stateid=>'21'});
                    });
-
-   
+   if (my $qclast=$parent->getField("lastqcheck")){
+      my $idfield=$parent->IdField();
+      if (defined($idfield)){
+         my $id=$idfield->RawValue($rec);
+         if ($id ne ""){
+            $parent->ValidatedUpdateRecord($rec,{lastqcheck=>NowStamp("en")},
+                                           {$idfield->Name()=>\$id});
+         }
+      }
+   }
    $W5V2::OperationContext=$oldcontext;
 
    return($result);
