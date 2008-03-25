@@ -75,6 +75,13 @@ sub getStepByShortname
    return("base::workflow::request::".$shortname);
 }
 
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/base/load/workflow_admin.jpg?".$cgi->query_string());
+}
+
 
 #######################################################################
 package base::workflow::adminrequest::dataload;

@@ -139,7 +139,12 @@ sub getStepByShortname
    return($self->SUPER::getStepByShortname($shortname,$WfRec));
 }
 
-
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/itil/load/workflow_dev.jpg?".$cgi->query_string());
+}
 
 
 
