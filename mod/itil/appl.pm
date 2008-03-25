@@ -610,6 +610,7 @@ sub new
       new kernel::Field::QualityText(),
       new kernel::Field::QualityState(),
       new kernel::Field::QualityOk(),
+      new kernel::Field::QualityLast(),
    );
    $self->{history}=[qw(insert modify delete)];
    $self->{workflowlink}={ workflowkey=>[id=>'affectedapplicationid']

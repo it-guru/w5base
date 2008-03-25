@@ -646,3 +646,6 @@ alter table custcontract add allowifupdate int(2) default 0;
 alter table swinstance   add allowifupdate int(2) default 0;
 alter table liccontract  add allowifupdate int(2) default 0;
 alter table appl add criticality char(20) default NULL;
+alter table appl   add lastqcheck datetime default NULL,add key(lastqcheck);
+alter table system add lastqcheck datetime default NULL,add key(lastqcheck);
+alter table asset  add lastqcheck datetime default NULL,add key(lastqcheck);

@@ -268,3 +268,4 @@ alter table lnkgrpuser add comments longtext default NULL;
 alter table lnkqrulemandator add dataobj varchar(40) default NULL,add key(dataobj);
 alter table lnkqrulemandator add additional blob;
 alter table user add allowifupdate int(2) default 0;
+alter table user add lastqcheck datetime default NULL,add key(lastqcheck);

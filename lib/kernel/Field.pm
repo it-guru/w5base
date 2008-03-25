@@ -65,6 +65,7 @@ use kernel::Field::Message;
 use kernel::Field::QualityText;
 use kernel::Field::QualityState;
 use kernel::Field::QualityOk;
+use kernel::Field::QualityLast;
 use kernel::Universal;
 @ISA    = qw(kernel::Universal);
 
