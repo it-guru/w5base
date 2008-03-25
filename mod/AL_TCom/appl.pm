@@ -40,7 +40,7 @@ sub new
    );
  
    $self->AddFields(
-      new kernel::Field::Number(
+      new kernel::Field::Text(
                 name          =>'applnumber',
                 searchable    =>0,
                 label         =>'Application number',

@@ -90,7 +90,7 @@ sub doQualityCheck
    $dataobj->ResetFilter();
    my @flt;
    if ($dataobj->getField("cistatusid")){
-      push(@flt,{cistatusid=>[3,4]});
+      push(@flt,{cistatusid=>[3,4,5]});
    }
    if ($dataobj->getField("mdate")){
       push(@flt,{mdate=>">now-28d"});

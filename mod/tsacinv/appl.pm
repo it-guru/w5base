@@ -100,6 +100,14 @@ sub new
                 vjoinon       =>['semid'=>'lempldeptid'],
                 vjoindisp     =>'fullname'),
 
+      new kernel::Field::TextDrop(
+                name          =>'sememail',
+                htmldetail    =>0,
+                label         =>'Service Manager E-Mail',
+                vjointo       =>'tsacinv::user',
+                vjoinon       =>['semid'=>'lempldeptid'],
+                vjoindisp     =>'email'),
+
       new kernel::Field::Link(
                 name          =>'semid',
                 dataobjattr   =>'amtsicustappl.lservicecontactid'),
@@ -110,6 +118,14 @@ sub new
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['tsmid'=>'lempldeptid'],
                 vjoindisp     =>'fullname'),
+
+      new kernel::Field::TextDrop(
+                name          =>'tsmemail',
+                htmldetail    =>0,
+                label         =>'Technical Contact E-Mail',
+                vjointo       =>'tsacinv::user',
+                vjoinon       =>['tsmid'=>'lempldeptid'],
+                vjoindisp     =>'email'),
 
       new kernel::Field::Link(
                 name          =>'tsmid',
@@ -137,7 +153,7 @@ sub new
                 size          =>'15',
                 weblinkto     =>'tsacinv::costcenter',
                 weblinkon     =>['lcostid'=>'id'],
-                dataobjattr   =>'amcostcenter.title'),
+                dataobjattr   =>'amcostcenter.trimmedtitle'),
                                     
       new kernel::Field::TextDrop(
                 name          =>'accountno',
@@ -477,7 +493,9 @@ sub Import
       }
       my $mandatorid=$mandrec->{grpid};
       # final: do the insert operation
-      my $newrec={name=>$applrec->{name},
+      my $appname=$applrec->{name};
+      $appname=~s/ /_/g;
+      my $newrec={name=>$appname,
                   applid=>$applrec->{applid},
                   databossid=>$databossid,
                   allowifupdate=>1,
