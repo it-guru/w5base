@@ -37,7 +37,7 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("QualityCheck","QualityCheck");
+   $self->RegisterEvent("QualityCheck","QualityCheck",timeout=>10800); #3h
    return(1);
 }
 
@@ -89,20 +89,23 @@ sub doQualityCheck
    msg(INFO,"doQualityCheck in Object $dataobj");
    $dataobj->ResetFilter();
    my @flt;
-   if ($dataobj->getField("cistatusid")){
-      push(@flt,{cistatusid=>[3,4,5]});
+   my @view=("qcok");
+   if (my $cistatusid=$dataobj->getField("cistatusid")){
+      $flt[0]->{cistatusid}=[3,4,5];
    }
-   if ($dataobj->getField("mdate")){
-      push(@flt,{mdate=>">now-28d"});
+   if (my $lastqcheck=$dataobj->getField("lastqcheck")){
+      unshift(@view,"lastqcheck");
    }
    $dataobj->SetFilter(\@flt);
-   $dataobj->SetCurrentView("qcok");
+   $dataobj->SetCurrentView(@view);
 
    my ($rec,$msg)=$dataobj->getFirst();
+   my $time=time();
    if (defined($rec)){
       do{
          msg(DEBUG,"qcok=$rec->{qcok}");
          ($rec,$msg)=$dataobj->getNext();
+         last if (time()-$time>10000);
       }until(!defined($rec));
    }
 

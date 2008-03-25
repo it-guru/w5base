@@ -2028,7 +2028,7 @@ sub FilterPart2SQLexp
             next;
          }
          if (($val eq "[LEER]" || $val eq "[EMPTY]") && 
-              $sqlparam{wildcards}){
+              ($sqlparam{wildcards} || $sqlparam{datatype} eq "DATE")){
             $exp.=" ".$conjunction." " if ($exp ne "");
             $exp.="($sqlfieldname is NULL or $sqlfieldname='')";
             next;
