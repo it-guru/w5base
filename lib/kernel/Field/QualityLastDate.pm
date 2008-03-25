@@ -1,4 +1,4 @@
-package kernel::Field::QualityLast;
+package kernel::Field::QualityLastDate;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -19,7 +19,6 @@ package kernel::Field::QualityLast;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use Data::Dumper;
 @ISA    = qw(kernel::Field::Date);
 
 
@@ -34,7 +33,6 @@ sub new
    $self->{history}=0;
    $self->{readonly}=1;
    $self->{htmldetail}=0;
-   $self->{searchable}=0;
 
    my $self=bless($type->SUPER::new(%$self),$type);
 
