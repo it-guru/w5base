@@ -32,7 +32,7 @@ sub ParseTemplateVars
 
    $$mask=~s/\\\%/\@\@\@\%\@\@\@/g;
    $$mask=~s/\%INCLUDE\(([a-zA-Z\.0-9].+?)\)\%/&TemplInclude($self,$opt,$1)/ge;
-   $$mask=~s/\%([a-zA-Z0-9\.\/]+?)\%/&ProcessVar($self,$opt,$1)/ge;
+   $$mask=~s/\%([a-zA-Z0-9\.\/\[\]]+?)\%/&ProcessVar($self,$opt,$1)/ge;
    $$mask=~s/\%([a-zA-Z][^\%]+?)\%/&ProcessVar($self,$opt,$1)/ge;
    $$mask=~s/\@\@\@\%\@\@\@/\%/g;
 }
@@ -84,6 +84,17 @@ sub findtemplvar
       my $t=$self->T($_[2],$tr);
       $self->ParseTemplateVars(\$t,$opt);
       return($t);
+   }
+   elsif ($var eq "CONFIG" && defined($_[2])){
+      my $v=$_[2];
+      return(undef) if ($v=~m/^DATAOBJPASS/);
+      if (my ($var,$k)=$v=~m/^(.+)\[(.+)\]$/){
+         my $h=$self->Config->Param($var);
+         return($h->{$k}) if (ref($h) eq "HASH");
+         return(undef);
+      }
+      my $val=$self->Config->Param($v);
+      return($val);
    }
    elsif ($var eq "LASTMSG"){
       my $d="<div class=lastmsg>";

@@ -18,7 +18,6 @@ package crm::menu::root;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::MenuRegistry;
 @ISA=qw(kernel::MenuRegistry);
@@ -35,10 +34,6 @@ sub Init
 {
    my $self=shift;
 
-   $self->RegisterObj("businessportal",
-                      "tmpl/welcome",
-                      defaultacl=>['valid_user']);
-   
    $self->RegisterObj("customerportal",
                       "tmpl/welcome",
                       defaultacl=>['valid_user']);
