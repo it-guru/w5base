@@ -20,6 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use AL_TCom::workflow::diary;
+use AL_TCom::lib::workflow;
 @ISA=qw(AL_TCom::workflow::diary);
 
 sub new
@@ -51,6 +52,36 @@ sub new
 
    return($self);
 }
+
+sub getDynamicFields
+{
+   my $self=shift;
+   my %param=@_;
+   my @l=();
+   
+   return($self->SUPER::getDynamicFields(%param),
+          $self->InitFields(
+           new kernel::Field::Select(    name       =>'tcomcodrelevant',
+                                         label      =>'P800 Relevant',
+                                         htmleditwidth=>'20%',
+                                         value      =>[qw(yes no)],
+                                         default    =>'yes',
+                                         group      =>'tcomcod',
+                                         container  =>'headref'),
+
+           new kernel::Field::Select(    name       =>'tcomcodcause',
+                                         label      =>'Activity',
+                                         htmleditwidth=>'80%',
+                                         translation=>'AL_TCom::lib::workflow',
+                                         value      =>
+                             [AL_TCom::lib::workflow::tcomcodcause()],
+                                         default    =>'undef',
+                                         group      =>'tcomcod',
+                                         container  =>'headref'),
+   ));
+}
+
+
 
 
 sub IsModuleSelectable
@@ -113,6 +144,7 @@ sub generateWorkspace
    my $self=shift;
    my $WfRec=shift;
    my $actions=shift;
+   my $l2=$self->T("Worktime");
    my $l1=$self->T("Worktime");
    my $m1=$self->T("MSG");
    $m1="" if ($m1 eq "MSG");
@@ -130,8 +162,20 @@ sub generateWorkspace
 <table border=0 cellspacing=0 cellpadding=0 width=100%>
 <tr>
 <td class=fname colspan=2>
+%name(label)%:<br>
+%name(detail)%</td>
+</tr>
+<td class=fname colspan=2>
 %detaildescription(label)%:<br>
 %detaildescription(detail)%</td>
+</tr>
+<tr>
+<td class=fname width=20%>%tcomcodrelevant(label)%:</td>
+<td class=finput>%tcomcodrelevant(detail)%</td>
+</tr>
+<tr>
+<td class=fname width=20%>%tcomcodcause(label)%:</td>
+<td class=finput>%tcomcodcause(detail)%</td>
 </tr>
 <tr>
 <td class=fname width=20%>$l1:</td>
@@ -209,8 +253,8 @@ sub ProcessNext
    # check description
    #
    my $description=Query->Param("Formated_detaildescription");
-   if ($description=~m/^\s*$/){
-      $self->LastMsg(ERROR,"invalid description");
+   if ($description=~m/^\s*$/ || length($description)<10){
+      $self->LastMsg(ERROR,"invalid or to short description");
       return(0);
    }
 
@@ -219,7 +263,6 @@ sub ProcessNext
    #
    my $wf=$self->getParent->getParent();
    my $h=$self->getWriteRequestHash("web");
-printf STDERR ("fifi h=%s\n",Dumper($h));
    if (ref($h->{affectedapplication}) eq "ARRAY" && 
        $#{$h->{affectedapplication}}==0){
       $h->{affectedapplication}=$h->{affectedapplication}->[0];
@@ -239,34 +282,15 @@ printf STDERR ("fifi h=%s\n",Dumper($h));
          $applobj->SetFilter({cistatusid=>"<=4",
                               name=>\$h->{affectedapplication}});
          my ($applrec,$msg)=$applobj->getOnlyFirst(qw(id));
-         if (defined($applrec)){
-            $h->{srcid}=$applrec->{id};
-         }
       }
       my ($oldrec,$msg);
-      if ($h->{srcid} ne ""){
-         $h->{srcload}=$entrytime;
-         $h->{srcsys}="AL_TCom::workflow::fastdiary::$mstr";
-         $h->{name}="$mstr ".
-                    $self->T("mini jobs for ").$h->{affectedapplication};
-        
-         printf STDERR ("entrytime=$entrytime hash=%s\n",Dumper($h));
-         # find current
-         $wf->ResetFilter();
-         $wf->SetFilter({srcid=>\$h->{srcid},
-                         srcsys=>\$h->{srcsys}});
+
+      my $id=$wf->Store(undef,$h);
+      if (defined($id) && $id ne ""){
+         $wf->SetFilter({id=>\$id});
          ($oldrec,$msg)=$wf->getOnlyFirst(qw(ALL));
-         if (!defined($oldrec)){
-         #   Query->Param("Formated_affectedapplication"=>
-         #                $h->{affectedapplication});
-            my $id=$wf->Store(undef,$h);
-         #   Query->Delete("Formated_appl");
-            $wf->SetFilter({srcid=>\$h->{srcid},
-                            srcsys=>\$h->{srcsys}});
-            ($oldrec,$msg)=$wf->getOnlyFirst(qw(ALL));
-        
-         }
       }
+
       if (defined($oldrec)){
          my $tcomworktime=$oldrec->{tcomworktime};
          $tcomworktime+=$effort;
@@ -311,7 +335,7 @@ sub getWorkHeight
    my $self=shift;
    my $WfRec=shift;
 
-   return(240);
+   return(330);
 }
 
 
@@ -370,6 +394,12 @@ sub getWorkHeight
    my $WfRec=shift;
 
    return(70);
+}
+
+sub CreateSubTip
+{
+   my $self=shift;
+   return("");
 }
 
 

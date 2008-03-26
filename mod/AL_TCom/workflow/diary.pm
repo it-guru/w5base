@@ -158,6 +158,10 @@ sub getFinishUseridList
          push(@l,$WfRec->{openuser});
          msg(INFO,"warn: no TSM found - using openuser");
       }
+      if ($self->getParent->IsMemberOf("admin")){
+         my $userid=$self->getParent->getCurrentUserId();
+         push(@l,$userid);
+      }
    }
    return(@l);
 }

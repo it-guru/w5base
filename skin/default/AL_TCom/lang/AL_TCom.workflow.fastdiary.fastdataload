@@ -7,3 +7,5 @@ en=><<EOF},
 EOF
 'no application specified'=>{de=>'keine gültige Anwendung eingegeben'},
 'invalid effort'=>{de=>'ungültiger Arbeitsaufwand'},
+'invalid or to short description'=>{de=>'ungültige oder zu kurze Beschreibung'},
+
