@@ -41,7 +41,7 @@ sub loadQualityCheckResult
          $qc->setParent($parent);
          my $compat=$parent->getQualityCheckCompat($chkrec);
          $result=$qc->nativQualityCheck($compat,$chkrec);
-         printf STDERR ("nativQualityCheck=%s\n",Dumper($result));
+         #printf STDERR ("nativQualityCheck=%s\n",Dumper($result));
       }
       $context->{QualityResult}->{$id}=$result;
    }

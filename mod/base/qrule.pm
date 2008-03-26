@@ -242,7 +242,7 @@ sub nativQualityCheck
                      srcload=>NowStamp("en"),
                      detaildescription=>$detaildescription};
          my $bk=$wf->Store($WfRec,$newrec);
-         printf STDERR ("updstore bk=%s\n",Dumper(\$bk));
+         #printf STDERR ("updstore bk=%s\n",Dumper(\$bk));
       }
 
       $W5V2::OperationContext=$oldcontext;
