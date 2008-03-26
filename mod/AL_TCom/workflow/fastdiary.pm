@@ -270,13 +270,13 @@ sub ProcessNext
       $h->{class}="AL_TCom::workflow::diary";
       $h->{step}="AL_TCom::workflow::diary::dataload";
       my $entrytime=$self->getParent->getParent->ExpandTimeExpression("now");
-      my ($year,$month)=$entrytime=~m/^(\d+)-(\d+)-/;
-      my $mstr="$month/$year";
-      my $evstart=$self->getParent->getParent->ExpandTimeExpression($mstr);
-      my $evend=$self->getParent->getParent->ExpandTimeExpression($mstr.
-                                                                  "+1M-1s");
-      $h->{eventstart}=$evstart;
-      $h->{eventend}=$evend;
+      #my ($year,$month)=$entrytime=~m/^(\d+)-(\d+)-/;
+      #my $mstr="$month/$year";
+      #my $evstart=$self->getParent->getParent->ExpandTimeExpression($mstr);
+      #my $evend=$self->getParent->getParent->ExpandTimeExpression($mstr.
+      #                                                            "+1M-1s");
+      $h->{eventstart}=$entrytime;
+      $h->{eventend}=$entrytime;
       {
          my $applobj=getModuleObject($self->Config,"itil::appl");
          $applobj->SetFilter({cistatusid=>"<=4",
