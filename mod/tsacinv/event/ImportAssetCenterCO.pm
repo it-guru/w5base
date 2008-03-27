@@ -77,7 +77,7 @@ sub ImportAssetCenterCO
         $w5co->ValidatedUpdateRecord($w5rec,$newrec,{name=>\$rec->{name}});
      }
      $self->VerifyAssetCenterData($rec);
-     last if ($cocount++==80);
+     #last if ($cocount++==80);
    }
 
 
