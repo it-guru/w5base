@@ -1207,7 +1207,11 @@ sub LoadSystem
    my $app=$self->getParent;
 
    my $db=new kernel::database($self->getParent,"w5v1");
+   my $dbalt=new kernel::database($self->getParent,"w5v1");
    my $osydb=new kernel::database($self->getParent,"w5v1");
+   if (!$dbalt->Connect()){
+      return({exitcode=>1,msg=>msg(ERROR,"failed to connect database")});
+   }
    if (!$db->Connect()){
       return({exitcode=>1,msg=>msg(ERROR,"failed to connect database")});
    }
@@ -1261,10 +1265,10 @@ sub LoadSystem
               "where lnkbcappbchw.bcapp=bcapp.id and bcapp.cistatus<=4 and ".
               "lnkbcappbchw.bchw='$rec->{id}' order by bcapp.name";
       msg(INFO,"cmd=$cmd");
-      if (!$db->execute($cmd)){
+      if (!$dbalt->execute($cmd)){
          return({exitcode=>2,msg=>msg(ERROR,"can't execute '%s'",$cmd)});
       }
-      while(my ($rrec,$msg)=$db->fetchrow()){
+      while(my ($rrec,$msg)=$dbalt->fetchrow()){
          last if (!defined($rrec));
          if ($admid eq ""){
             my $uid=$self->getUserIdByV1($rrec->{tsm});
@@ -1372,7 +1376,7 @@ sub LoadSystem
             if (!defined($self->{con}->ValidatedInsertOrUpdateRecord($con,
                                   {target=>\'base::grp',
                                    refid=>\$assetid,
-                                   parentobj=>\'itil::system',
+                                   parentobj=>\'itil::asset',
                                    targetid=>\$newrec{guardianteamid}}))){
                msg(ERROR,"failed to insert guardianteam=%s",Dumper($con));
             }
