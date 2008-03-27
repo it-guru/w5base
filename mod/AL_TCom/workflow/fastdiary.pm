@@ -179,7 +179,7 @@ sub generateWorkspace
 </tr>
 <tr>
 <td class=fname width=20%>$l1:</td>
-<td class=finput>${e}min</td>
+<td class=finput>${e} min</td>
 </tr>
 <tr>
 <td class=fname width=20%>%affectedapplication(label)%:</td>

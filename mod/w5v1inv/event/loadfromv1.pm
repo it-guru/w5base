@@ -1215,7 +1215,7 @@ sub LoadSystem
       return({exitcode=>1,msg=>msg(ERROR,"failed to connect database")});
    }
    my $cmd="select * from bchw where srcsys='w5base' and cistatus=4";
-   #my $cmd="select * from bchw where srcsys='w5base' and cistatus=4 and name like 'g8nzbwb%'";
+   #my $cmd="select * from bchw where srcsys='w5base' and cistatus=4 and name like 'e8ncb%'";
    if (!$db->execute($cmd)){
       return({exitcode=>2,msg=>msg(ERROR,"can't execute '%s'",$cmd)});
    }
@@ -1244,6 +1244,58 @@ sub LoadSystem
       my %sys_mandatorenv=(mandatorid=>200);
       my %ass_mandatorenv=(mandatorid=>200);
 
+
+      #######################################################################
+      # create rights set from bchw
+      my $admid;
+      my $adm2id;
+      my $admteamid;
+      my $guardianid;
+      my $guardian2id;
+      my $guardianteamid;
+      my %writeuserid;
+      my %writegroupid;
+      my $cmd="select bcapp.tsm,bcapp.tsm2,bcbereiche.name as teamorgarea ".
+              "from lnkbcappbchw,bcapp ".
+              "left outer join bcbereiche on bcapp.teamorgarea=bcbereiche.id ".
+              "where lnkbcappbchw.bcapp=bcapp.id and bcapp.cistatus<=4 and ".
+              "lnkbcappbchw.bchw='$rec->{id}' order by bcapp.name";
+      msg(INFO,"cmd=$cmd");
+      if (!$db->execute($cmd)){
+         return({exitcode=>2,msg=>msg(ERROR,"can't execute '%s'",$cmd)});
+      }
+      while(my ($rrec,$msg)=$db->fetchrow()){
+         last if (!defined($rrec));
+         if ($admid eq ""){
+            my $uid=$self->getUserIdByV1($rrec->{tsm});
+            $admid=$uid if ($uid ne "");
+         }
+         if ($adm2id eq ""){
+            my $uid=$self->getUserIdByV1($rrec->{tsm2});
+            $adm2id=$uid if ($uid ne "");
+         }
+         if ($guardianteamid eq ""){
+            my $g=$self->ImportGroup($rrec->{teamorgarea});
+            $guardianteamid=$g->{grpid} if (defined($g));
+         }
+         if ($admteamid eq ""){
+            my $g=$self->ImportGroup($rrec->{teamorgarea});
+            $admteamid=$g->{grpid}      if (defined($g));
+         }
+      }
+      if ($admteamid ne ""){
+         $sys_mandatorenv{adminteamid}=$admteamid;
+      }
+      if ($guardianteamid ne ""){
+         $ass_mandatorenv{guardianteamid}=$guardianteamid;
+      }
+      #######################################################################
+
+
+
+      #######################################################################
+      #  modifiy rights set from hw (OSY)
+      #
       my $osycmd="select hw.*,grp.name as editgroupname from hw ".
                  "left outer join grp on hw.editgroup=grp.id ".
                  "where hw.name like '$rec->{name}'";
@@ -1262,6 +1314,14 @@ sub LoadSystem
             $ass_mandatorenv{guardianteamid}=$g->{grpid};
          }
       }
+      $sys_mandatorenv{admid}=$admid        if ($admid ne "");
+      $ass_mandatorenv{guardianid}=$admid   if ($admid ne "");
+      $sys_mandatorenv{adm2id}=$adm2id      if ($adm2id ne "");
+      $ass_mandatorenv{guardian2id}=$adm2id if ($adm2id ne "");
+
+
+
+
       my $assetid;
       if (defined($rec->{ager}) && $rec->{ager} ne ""){
          my $oldloc=$rec->{loc};
@@ -1285,8 +1345,10 @@ sub LoadSystem
                 srcload=>$loadstart,
                 owner=>$ownerid,
                 creator=>$ownerid,
-                mdate=>scalar($app->ExpandTimeExpression($rec->{mdate},"en","GMT")),
-                cdate=>scalar($app->ExpandTimeExpression($rec->{mdate},"en","GMT")),
+                mdate=>scalar($app->ExpandTimeExpression($rec->{mdate},
+                                                         "en","GMT")),
+                cdate=>scalar($app->ExpandTimeExpression($rec->{mdate},
+                                                         "en","GMT")),
                 srcid=>$rec->{id},
                 srcsys=>"W5BaseV1",
                );
@@ -1304,7 +1366,7 @@ sub LoadSystem
          msg(INFO,"W5BaseID of asset=%d",$assetid);
          if ($newrec{guardianteamid}!=0){
             my $con={target=>'base::grp',refid=>$assetid,
-                     parentobj=>'itil::system',
+                     parentobj=>'itil::asset',
                      targetid=>$newrec{guardianteamid},
                      srcsys=>'W5BaseV1'};
             if (!defined($self->{con}->ValidatedInsertOrUpdateRecord($con,

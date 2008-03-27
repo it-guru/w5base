@@ -231,7 +231,6 @@ sub nativQualityCheck
                      srcload=>NowStamp("en"),
                      DATAISSUEOPERATIONSRC=>$directlnkmode};
          my $bk=$wf->Store(undef,$newrec);
-         printf STDERR ("store bk=%s\n",Dumper(\$bk));
       }
       else{
          my $newrec={name=>$name,

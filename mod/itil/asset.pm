@@ -587,7 +587,8 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default guardian location physasset systems appl misc attachments));
+          qw(default guardian location physasset contacts misc systems 
+             appl attachments));
 }
 
 
