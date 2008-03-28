@@ -386,11 +386,7 @@ sub getPosibleActions
    if ($WfRec->{stateid}==17){
       if ($self->IsIncidentManager($WfRec) || 
           $self->getParent->IsMemberOf(["admin","admin.workflow"])){
-         my $prmfld=$self->getField("wffields.eventprmticket",$WfRec);
-         my $prmticket=$prmfld->RawValue($WfRec);
-         if ($prmticket ne ""){
-            push(@l,"rootcausei");
-         }
+         push(@l,"rootcausei");
       }
    }
    return(@l,$self->SUPER::getPosibleActions($WfRec));
@@ -405,6 +401,12 @@ sub AdditionalMainProcess
 
    if (!defined($action) && Query->Param("rootcausei")){
       return(-1) if (!$self->ValidActionCheck(1,$actions,"rootcausei"));
+      my $prmfld=$self->getField("wffields.eventprmticket",$WfRec);
+      my $prmticket=$prmfld->RawValue($WfRec);
+      if (!($prmticket=~m/^PRM\d+$/)){
+         $self->LastMsg(ERROR,"invalid problemticket registered");
+         return(0);
+      }
       my @WorkflowStep=Query->Param("WorkflowStep");
       push(@WorkflowStep,"AL_TCom::workflow::eventnotify::sendrootcausei");
       Query->Param("WorkflowStep"=>\@WorkflowStep);

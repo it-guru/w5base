@@ -20,4 +20,5 @@
 'Start a WARUM analaysis'=>{de=>'WARUM Analyse durchführen'},
 'Send Root-Cause Info'=>{de=>'Ursachenanalyse versenden'},
 'rootcausi'=>{de=>'Ursachenanalyse versandt',en=>'root cause analyse send'},
+'invalid problemticket registered'=>{de=>'ungültiges Problem Ticket eingetragen'},
 
