@@ -26,9 +26,17 @@ sub new
 {
    my $type=shift;
    my $self={@_};
-   $self->{htmldetail}=0  if (!defined($self->{htmldetail}));
-   $self->{searchable}=1  if (!defined($self->{searchable}));
-   $self->{uivisible}=0   if (!defined($self->{uivisible}));
+   $self->{htmldetail}=0      if (!defined($self->{htmldetail}));
+   $self->{searchable}=1      if (!defined($self->{searchable}));
+   $self->{uivisible}=0       if (!defined($self->{uivisible}));
+   $self->{name}="ftext"      if (!defined($self->{name}));
+   $self->{label}="Fulltext"  if (!defined($self->{label}));
+   $self->{uivisible}=sub{
+                         my $self=shift;
+                         my $mode=shift;
+                         return(1) if ($mode eq "SearchMask");
+                         return(0);
+                      };
    my $self=bless($type->SUPER::new(%$self),$type);
    return($self);
 }

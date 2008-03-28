@@ -227,15 +227,6 @@ sub new
                 dataobjattr   =>'forumtopic.modifydate'),
                                    
       new kernel::Field::Fulltext(
-                name          =>'ftext',
-                label         =>'Fulltext',
-                uivisible     =>sub{
-                                   my $self=shift;
-                                   my $mode=shift;
-                                   return(1) if ($mode eq "SearchMask");
-                                   return(0);
-                                },
-                depend        =>['comments','name'],
                 dataobjattr   =>'forumtopic.comments,forumtopic.name'),
 
    );

@@ -125,7 +125,9 @@ sub new
                 sqlorder      =>'desc',
                 group         =>'source',
                 dataobjattr   =>'forumentry.modifydate'),
-                                   
+
+      new kernel::Field::Fulltext(
+                dataobjattr   =>'forumentry.comments'),
    );
    $self->setDefaultView(qw(mdate editor comments));
    $self->{DetailY}=520;
