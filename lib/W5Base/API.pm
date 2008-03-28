@@ -44,8 +44,14 @@ if the --store option is specified by user.
 =head2 createConfig()
 
  $config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug);
+ $config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug,
+                      \$exitcode,\$msgs);
 
 The createConfig() function validates the configuration, checks the communication to the desiered W5Base-SOAP-Server and returns a config object on success.
+If it fails, you can get a human readable error message if you specifed 
+two references (\$exitcode,\$msgs) in witch the method can store these 
+informations.
+
 
 =head1 OBJECT CONSTRUCTOR
 

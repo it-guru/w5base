@@ -236,6 +236,12 @@ sub processFilterHash
       my %sqlparam=();
       my $preparedFilter=$fo->prepareToSearch($filter->{$fieldname});
       if (defined($preparedFilter)){
+         if ($fotype eq "Fulltext"){
+            $sqlparam{datatype}="FULLTEXT";
+            $sqlparam{listmode}=0;
+            $sqlparam{wildcards}=0;
+            $sqlparam{logicalop}=0;
+         }
          if ($fotype=~m/Date$/){
             $sqlparam{datatype}="DATE";
             $sqlparam{timezone}=$fo->timezone();

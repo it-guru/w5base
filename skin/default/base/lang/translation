@@ -1,6 +1,7 @@
 'Linenumber'             =>{de=>'Zeile',en=>'Line'                          },
 'Modification-Date'      =>{de=>'Bearbeitungszeitpunkt'                     },
 'Creation-Date'          =>{de=>'Erstellungszeitpunkt'                      },
+'Fulltext'               =>{de=>'Volltext suche',en=>'Fulltext search'      },
 'Attachments'            =>{de=>'Dateianlagen'                              },
 'Further Functions'      =>{de=>'weiterführende Funktionen'                 },
 'Comments'               =>{de=>'Bemerkungen'                               },

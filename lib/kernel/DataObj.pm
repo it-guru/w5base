@@ -2058,6 +2058,12 @@ sub FilterPart2SQLexp
                $compop=">";
             }
          }
+         if ($sqlparam{datatype} eq "FULLTEXT"){
+            $sqlfieldname="match($sqlfieldname)";
+            $compop=" ";
+            $val=dbQuote($val,%sqlparam);
+            $val="against($val)";
+         }
          if ($sqlparam{datatype} eq "STRING"){
             if (($val eq '' || $val=~m/^\d+$/) && $compop eq " like "){
                $compop="=";
