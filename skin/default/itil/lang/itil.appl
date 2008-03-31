@@ -16,6 +16,7 @@
 'fieldgroup.customer'=>{de=>'Kunde',en=>'Customer'},
 'fieldgroup.phonenumbers'=>{de=>'Rufnummernverzeichnis',en=>'Phonenumbers'},
 'fieldgroup.accountnumbers'=>{de=>'Account Nummern',en=>'Account numbers'},
+'Account numbers'=>{de=>'Account Nummern'},
 'Phonenumbers'=>{de=>'Rufnummernverzeichnis'},
 'Interfaces'=>{de=>'Schnittstellen'},
 'Customer Contracts'=>{de=>'Kundenverträge'},
