@@ -38,32 +38,65 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("loadfromv1","LoadUser",timeout=>4000);  # seems OK
-   $self->RegisterEvent("loaduser","LoadUser",timeout=>4000);  # seems OK
-
-   $self->RegisterEvent("loadcust","LoadCustomer"); 
-   $self->RegisterEvent("loadproto","LoadProto");
-   $self->RegisterEvent("loadfaq","LoadFaq");
-   $self->RegisterEvent("loadcustcontract","LoadCustContract");
-   $self->RegisterEvent("loadapp","LoadApp");
-   $self->RegisterEvent("loadsystem","LoadSystem",timeout=>12000);
-   $self->RegisterEvent("loadosysystem","LoadOsySystems");
-   $self->RegisterEvent("loadlocation","LoadLocation");
-   $self->RegisterEvent("loadv1location","LoadLocation");
-   $self->RegisterEvent("loadappcontract","LoadAppContract");
-   $self->RegisterEvent("loadliccontract","LoadLicContract");
-   $self->RegisterEvent("loadsoftware","LoadSoftware");
-   $self->RegisterEvent("loadproducer","LoadProducer");
-   $self->RegisterEvent("loadplatform","LoadPlatform");
-   $self->RegisterEvent("loadosrelease","LoadOsrelease");
-   $self->RegisterEvent("loadinterfaces","LoadInterfaces",timeout=>900);
-   $self->RegisterEvent("loadmodel","LoadModel");
-   $self->RegisterEvent("loadcostcenter","LoadCostCenter");
-   $self->RegisterEvent("loadcontact","LoadContact");
-   $self->RegisterEvent("loadbtb","LoadBTB",timeout=>12000);
-   $self->RegisterEvent("loadip","LoadIP");
-   $self->RegisterEvent("loadaccno","LoadAccNo");
+#   $self->RegisterEvent("loadfromv1","LoadUser",timeout=>4000);  # seems OK
+#   $self->RegisterEvent("loaduser","LoadUser",timeout=>4000);  # seems OK
+#
+#   $self->RegisterEvent("loadcust","LoadCustomer"); 
+#   $self->RegisterEvent("loadproto","LoadProto");
+#   $self->RegisterEvent("loadfaq","LoadFaq");
+#   $self->RegisterEvent("loadcustcontract","LoadCustContract");
+#   $self->RegisterEvent("loadapp","LoadApp");
+#   $self->RegisterEvent("loadsystem","LoadSystem",timeout=>12000);
+#   $self->RegisterEvent("loadosysystem","LoadOsySystems");
+#   $self->RegisterEvent("loadlocation","LoadLocation");
+#   $self->RegisterEvent("loadv1location","LoadLocation");
+#   $self->RegisterEvent("loadappcontract","LoadAppContract");
+#   $self->RegisterEvent("loadliccontract","LoadLicContract");
+#   $self->RegisterEvent("loadsoftware","LoadSoftware");
+#   $self->RegisterEvent("loadproducer","LoadProducer");
+#   $self->RegisterEvent("loadplatform","LoadPlatform");
+#   $self->RegisterEvent("loadosrelease","LoadOsrelease");
+#   $self->RegisterEvent("loadinterfaces","LoadInterfaces",timeout=>900);
+#   $self->RegisterEvent("loadmodel","LoadModel");
+#   $self->RegisterEvent("loadcostcenter","LoadCostCenter");
+#   $self->RegisterEvent("loadcontact","LoadContact");
+#   $self->RegisterEvent("loadbtb","LoadBTB",timeout=>12000);
+#   $self->RegisterEvent("loadip","LoadIP");
+#   $self->RegisterEvent("loadaccno","LoadAccNo");
+   $self->RegisterEvent("loadconsoleip","LoadConsoleIP");
    return(1);
+}
+
+
+sub LoadConsoleIP
+{
+   my $self=shift;
+
+   my $sys=getModuleObject($self->Config,"itil::system");
+   my $db=new kernel::database($self->getParent,"w5v1");
+   if (!$db->Connect()){
+      msg(ERROR,"cant connect to db");
+      return(undef);
+   }
+   my $cmd="select hw.name,hw.console_ip,hw.console_port from hw where aktiv=1";
+   if (!$db->execute($cmd)){
+      msg(ERROR,"cant execute statement");
+      return(undef);
+   }
+   while(my ($rec,$msg)=$db->fetchrow()){
+      last if (!defined($rec));
+      if ($rec->{name} ne "" && $rec->{'console_ip'} ne ""){
+         my $console=$rec->{'console_ip'};
+         $console.=":".$rec->{'console_port'} if ($rec->{'console_port'} ne "");
+         $sys->ResetFilter();
+         $sys->SetFilter(name=>[$rec->{name}]);
+         my ($sysrec,$msg)=$sys->getOnlyFirst(qw(ALL));
+         msg(INFO,"name=$rec->{name} console=$console id=$sysrec->{id}");
+         $sys->ValidatedUpdateRecord($sysrec,{consoleip=>$console},
+                                     {id=>\$sysrec->{id}});
+      }
+   }
+
 }
 
 sub LoadCustomer

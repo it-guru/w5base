@@ -132,6 +132,16 @@ sub new
                 vjoindisp     =>'email'),
 
       new kernel::Field::TextDrop(
+                name          =>'asset',
+                group         =>'physys',
+                label         =>'Asset-Name',
+                AllowEmpty    =>1,
+                vjointo       =>'itil::asset',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['assetid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::TextDrop(
                 name          =>'location',
                 depend        =>['assetid'],
                 readonly      =>1,
@@ -254,6 +264,12 @@ sub new
                 unit          =>'MB',
                 dataobjattr   =>'system.memory'),
 
+      new kernel::Field::Text(
+                name          =>'consoleip',
+                group         =>'logsys',
+                label         =>'Console-IP[:Port]',
+                dataobjattr   =>'system.consoleip'),
+
       new kernel::Field::TextDrop(
                 name          =>'servicesupport',
                 group         =>'misc',
@@ -286,16 +302,6 @@ sub new
                 label         =>'Attachments',
                 parentobj     =>'itil::system',
                 group         =>'attachments'),
-
-      new kernel::Field::TextDrop(
-                name          =>'asset',
-                group         =>'physys',
-                label         =>'Asset-Name',
-                AllowEmpty    =>1,
-                vjointo       =>'itil::asset',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['assetid'=>'id'],
-                vjoindisp     =>'name'),
 
       new kernel::Field::Link(
                 name          =>'assetid',
