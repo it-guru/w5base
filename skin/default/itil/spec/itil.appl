@@ -28,3 +28,13 @@ Betriebsteam und Endkunde der Anwendung.
 This field defines the servicelevel
 between businessteam and customer.
 '},
+'applgroup'=>{de=>'
+Die Anwendungsgruppe dient rein
+als Filterkriterium bei Suchen
+oder Auswertungen. Es steht den
+Datenverantwortlichen frei, dieses
+Feld nach eigenem Ermessen zu
+verweden.
+',en=>'
+This is only a filter criterium. 
+'},

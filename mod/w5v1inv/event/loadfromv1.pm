@@ -63,6 +63,7 @@ sub Init
 #   $self->RegisterEvent("loadbtb","LoadBTB",timeout=>12000);
    $self->RegisterEvent("loadsystb","loadsystb",timeout=>12000);
    $self->RegisterEvent("patchgroup","patchgroup");
+   $self->RegisterEvent("loadaggroup","loadaggroup");
 #   $self->RegisterEvent("loadaccno","LoadAccNo");
 #   $self->RegisterEvent("loadconsoleip","LoadConsoleIP");
    return(1);
@@ -99,6 +100,36 @@ sub LoadConsoleIP
    }
 
 }
+
+sub loadaggroup
+{
+   my $self=shift;
+
+   my $appl=getModuleObject($self->Config,"itil::appl");
+   my $db=new kernel::database($self->getParent,"w5v1");
+   if (!$db->Connect()){
+      msg(ERROR,"cant connect to db");
+      return(undef);
+   }
+   my $cmd="select bcapp.id,bcapp.aggroup from bcapp";
+   if (!$db->execute($cmd)){
+      msg(ERROR,"cant execute statement");
+      return(undef);
+   }
+   while(my ($rec,$msg)=$db->fetchrow()){
+      last if (!defined($rec));
+      print Dumper($rec);
+      $appl->ResetFilter();
+      $appl->SetFilter({srcsys=>\'W5BaseV1',srcid=>\$rec->{id}});
+      my ($applrec,$msg)=$appl->getOnlyFirst(qw(ALL));
+      if (defined($applrec) && $rec->{aggroup} ne ""){
+         $appl->ValidatedUpdateRecord($applrec,{applgroup=>$rec->{aggroup}},
+                                               {id=>\$applrec->{id}});
+      }
+   }
+   return(undef);
+}
+
 
 sub patchgroup
 {
