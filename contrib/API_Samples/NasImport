@@ -13,6 +13,10 @@ sub new
    my $file=$param{ARGV}->[0];
    my $o=$param{o};
    my $force=$param{-force};
+   my $mode=$param{-mode};
+   my $base=$param{-base};
+   my $webuser=$param{-webuser};
+   my $webpass=$param{-webpass};
    my $icon=eval("new Win32::GUI::Icon('icon_w5base.ico')");
    $param{-icon}=$icon;
    $param{-left}=100;
@@ -24,77 +28,145 @@ sub new
    $param{-onResize}=\&doResize;
    $param{-onTerminate}=\&doTerminate;
    $param{-onMinimize}=\&doMinimize;
-   $param{-minsize}=[600,400];
+   $param{-minsize}=[800,400];
    eval("\$param{-menu}=Win32::GUI::MakeMenu(
                                      '&File' => 'File',
                                      ' > &Open'  => { -name=>'Open',-onClick=>\\&OpenFile},
                                      ' > &End'  => { -name=>'Exit',-onClick=>\\&doTerminate},
-                                     '&Test' =>{ -name=>'MyTest',-onClick=>\\&MyTest} ,
    );");
    my $self=$type->SUPER::new(%param);
+   $self->SetIcon($icon);
+   #$self->MessageBox('error','header');
    $self=bless($self,$type);
    $self->{file}=$file;
    $self->{o}=$o;
    $self->{ICON}=$icon;
+   $self->{mainwebuser}=$webuser;
+   $self->{mainwebpass}=$webpass;
+   $self->{webbase}=$base;
    $self->AddNotifyIcon(-name => "systray",
                         -icon => $self->{ICON},
                         -tip  => "W5Base Importer",
    );
    $self->Center();
-   $self->{GRID}=eval("apply Win32::GUI::GridLayout(\$self,[qw(10 * * * * * 10)],
-                                         [qw(10 20 20 20 10 40 10 20 10 * 10)],0,0);");
+   $self->{GRID}=eval("apply Win32::GUI::GridLayout(\$self,[qw(10 10 90 * 10 30 10 * * * 10 10)],
+                                         [qw(20 10 20 20 20 10 10 20 10 * 10 40 10 20 10)],0,0);");
+   # select fileformat 
    $self->AddRadioButton(
            -name     => "auto",
            -text     => "Auto",
-           -checked  => 1,
+           -tabstop     => 1,
    );
-   $self->{GRID}->add($self->auto,2,2,"justify justify");
+   $self->{GRID}->add($self->auto,3,3,"justify justify");
    $self->AddRadioButton(
            -name     => "emc",
-           -text     => "Emc"
+           -text     => "Emc",
+           -tabstop     => 1,
    );
-   $self->{GRID}->add($self->emc,2,3,"justify justify");
+   $self->{GRID}->add($self->emc,3,4,"justify justify");
    $self->AddRadioButton(
            -name     => "netapp",
-           -text     => "NetApp"
+           -text     => "NetApp",
+           -tabstop  => 1,
    );
-   $self->{GRID}->add($self->netapp,2,4,"justify justify");
-   $self->AddCheckbox(
-           -name     => "writedata",
-           -text     => "write Data",
-   );
-   $self->{GRID}->add($self->writedata,3,4,"justify justify");
-   $self->AddButton(
-           -name   => "run",
-           -text   => "Start",
-           -onClick  => \&doStart, 
-   );
-   $self->{GRID}->add($self->run,[2..6],6,"justify justify");
+   $self->{GRID}->add($self->netapp,3,5,"justify justify");
+   # hostname & write data
    $self->AddLabel(
-          -name   => "filename",
-          -text   => $self->{file},
-   );
-   $self->{GRID}->add($self->filename,[2..4],8,"justify justify");
-   $self->AddLabel(
-          -name   => "fileformat",
-   );
-   $self->{GRID}->add($self->fileformat,5,8,"justify justify");
-   $self->AddLabel(
-          -name   => "host",
-   );
-   $self->{GRID}->add($self->host,6,8,"justify justify");
-   $self->AddLabel(
-          -name   => "hostname",
+          -name   => "hostlabel",
           -text   => "Hostname",
    );
-   $self->{GRID}->add($self->hostname,4,2,"justify justify");
+   $self->{GRID}->add($self->hostlabel,4,2,"justify buttom");
    $self->AddTextfield(
            -name      => "hostname",
            -text      => $hostname,
-           -width     => 100,
+           -width     => 130,
            -height    => 20,
+           -tabstop     => 1,
    );
-   $self->{GRID}->add($self->hostname, 3, 2, "left");
+   $self->{GRID}->add($self->hostname, 4, 3, "justify top");
+   $self->AddCheckbox(
+           -name     => "writedata",
+           -text     => "write Data",
+           -tabstop     => 1,
+   );
+   $self->{GRID}->add($self->writedata,4,4,"justify justify");
+   $self->AddCheckbox(
+           -name     => "warnings",
+           -text     => "Warnings on",
+           -checked  => 1,
+           -tabstop     => 1,
+   );
+   $self->{GRID}->add($self->warnings,4,5,"justify justify");
+   $self->AddGroupbox( 
+           -name => "inputdata", 
+           -text => "input",
+           -size => [100,100],
+   );
+   $self->{GRID}->add($self->inputdata, [2..5], [1..7], "justify top");
+   # login data
+   $self->AddLabel(
+          -name   => "webuserl",
+          -text   => "Webuser",
+   );
+   $self->{GRID}->add($self->webuserl,8,2,"justify buttom");
+   $self->AddTextfield(
+          -name      => "webuser",
+          -text      => $self->{mainwebuser},
+          -width     => 130,
+          -height    => 20,
+          -tabstop=> 1,
+   );
+   $self->{GRID}->add($self->webuser, 8, 3, "justify top");
+   $self->AddLabel(
+          -name   => "webpassl",
+          -text   => "Webpassword",
+   );
+   $self->{GRID}->add($self->webpassl,9,2,"justify buttom");
+   $self->AddTextfield(
+          -name      => "webpass",
+          -text      => $self->{mainwebpass},
+          -width     => 130,
+          -height    => 20,
+          -password  => 1,
+          -tabstop=> 1,
+   );
+   $self->{GRID}->add($self->webpass, 9, 3, "justify top");
+   $self->AddLabel(
+          -name   => "baseurl",
+          -text   => "BaseURL",
+   );
+   $self->{GRID}->add($self->baseurl,8,4,"justify buttom");
+   $self->AddTextfield(
+          -name      => "base",
+          -text      => $self->{webbase},
+          -width     => 130,
+          -height    => 20,
+          -tabstop=> 1,
+   );
+   $self->{GRID}->add($self->base, [8..10], 5, "justify top");
+   $self->AddGroupbox( 
+          -name => "connectdata", 
+          -text => "connect datas",
+          -size => [100,100],
+   );
+   $self->{GRID}->add($self->connectdata, [7..11], [1..7], "justify top");
+   # info row
+   $self->AddLabel(
+          -name   => "filename",
+          -text   => "FILE: ".$self->{file},
+   );
+   $self->{GRID}->add($self->filename,[9..12],8,"justify justify");
+   $self->AddLabel(
+          -name   => "fileformat",
+          -text   => "FILEFORMAT:",
+   );
+   $self->{GRID}->add($self->fileformat,[5..8],8,"justify justify");
+   $self->AddLabel(
+          -name   => "host",
+          -text   => "HOSTNAME:",
+   );
+   $self->{GRID}->add($self->host,[2..3],8,"justify justify");
+   # output textfield
    $self->AddTextfield(
            -name        => "output",
            -text        => "",
@@ -104,9 +176,28 @@ sub new
            -hscroll     => 1,
            -autovscroll => 1,
            -vscroll     => 1,
+           -foreground  => 0x000000,
+           -background  => 0xD4CACA,
    );
-   $self->{GRID}->add($self->output, [2..6], 10, "justify justify");
+   $self->{GRID}->add($self->output, [2..11], 10, "justify justify");
+   # start button
+   $self->AddButton(
+           -name     => "run",
+           -text     => "Start",
+           -disabled  => 1,
+           -onClick  => \&doStart, 
+   );
+   $self->{GRID}->add($self->run,[2..11],12,"justify justify");
+   $self->AddProgressBar(
+           -name     => "pgbar",
+           -smooth   => 1,
+   );
+   $self->{GRID}->add($self->pgbar,[2..11],14,"justify justify");
    $self->{GRID}->recalc();
+   $self->checkMode();
+   $self->emc->SetCheck(1) if ($mode eq "emc");
+   $self->netapp->SetCheck(1) if ($mode eq "netapp");
+   $self->auto->SetCheck(1) if ($mode eq "auto");
    $self->writedata->SetCheck(1) if ($force);
    return($self); 
 }
@@ -116,8 +207,10 @@ sub OpenFile
    my $self=shift;
    my $file;
    eval('$file = Win32::GUI::GetOpenFileName();');
-   $self->{file}=$file;
-   $self->checkMode();
+   if ($file){
+      $self->{file}=$file;
+      $self->checkMode();
+   }
 }
 
 sub doStart
@@ -126,37 +219,81 @@ sub doStart
    my @oplist; 
    $self->{sharedata}={}; 
    my $mainwin=$self->GetParent();
+   $mainwin->output->Change(-text => "");
+   $mainwin->output->DoEvents();
+   $mainwin->output->LimitText(1000000);
+   my ($exitcode, $msgs);
    my @result=$mainwin->checkMode();
    if ($result[0] != 0){
-      eval("Win32::MsgBox(\"\$result[1]\",Win32::MB_ICONQUESTION|0, 'Error!')"); 
       return(1,$result[1]);
    }
+   # connect API
+   $mainwin->pgbar->StepIt();
+   $mainwin->pgbar->SetRange(0,1500);
+   $mainwin->pgbar->SetStep(1);
+   $mainwin->pgbar->SetPos(50);
+   $mainwin->output->SetFocus();
+   $mainwin->output->Append("login ... ");
+   my $Config=main::createConfig($mainwin->{webbase},
+                                 $mainwin->{mainwebuser},
+                                 $mainwin->{mainwebpass},0,0,\$exitcode,\$msgs);
+   if (!$Config){
+      eval("Win32::MsgBox(\"login error: \$msgs\",Win32::MB_ICONQUESTION|0, 'Error!')");   
+      return(1,$msgs);
+   }
+   $mainwin->output->Append("done\r\nget objects ... ");
+   @result=main::moduleObj($Config);
+   if ($result[0] != 0){
+      eval("Win32::MsgBox(\"\$result[1]\",Win32::MB_ICONQUESTION|0, 'Error!')");   
+      return(1,$result[1]);
+   }
+
+   # read File
+   $mainwin->output->Append("done\r\nreading file ... ");
    @result=main::readFile($mainwin->{FH},
                           $self->{sharedata},
                           $mainwin->{curmode},
-                          $mainwin->hostname->GetLine(0));
+                          $mainwin->hostname->GetLine(0),\&StepIt,$mainwin);
    if ($result[0] != 0){
       eval("Win32::MsgBox(\"\$result[1]\",Win32::MB_ICONQUESTION|0, 'Error!')");   
       return(1,$result[1]);
    }
+
+   # compute operation
+   $mainwin->output->Append("done\r\ncompute operations ... and preview operations...\r\n");
    @result=main::calculateOperations($mainwin->{o},$self->{sharedata},
-                                     \@oplist,$mainwin->hostname->GetLine(0));
+                                     \@oplist,$mainwin->hostname->GetLine(0),\&StepIt,$mainwin);
    if ($result[0] != 0){
       eval("Win32::MsgBox(\"\$result[1]\",Win32::MB_ICONQUESTION|0, 'Error!')");   
       return(1,$result[1]);
    }
+ 
+   # write data to API
    if ($mainwin->writedata->GetCheck() == 1){
-      @result=main::processOperations($mainwin->{o},\@oplist);
+      $mainwin->output->Append("write data ... ");
+      @result=main::processOperations($mainwin->{o},\@oplist,\&StepIt,$mainwin);
       if ($result[0] != 0){
          eval("Win32::MsgBox(\"\$result[1]\",Win32::MB_ICONQUESTION|0, 'Error!')");   
          return(1,$result[1]);
       }
+      $mainwin->output->Append("done\r\n");
    }
-   my $text;
-   foreach my $rec (@oplist){
-      $text=$text.$rec->{MSG}."\r\n";
-   }
-   $mainwin->output->Change(-text=>$text);
+   $mainwin->output->Append("\r\nready!");
+   $mainwin->pgbar->SetPos(1500);
+}
+
+sub StepIt
+{
+   my $self=shift;
+   my $text=shift;
+   $self->pgbar->StepIt();;
+   if ($self->warnings->GetCheck() == 0 and substr($text,0,4) eq "WARN"){
+      return(0); 
+   } 
+   $text="      ".$text if (substr($text,0,9) eq "insert ip");
+#   $self->output->Append($text."\r\n") if ($text);
+   $self->output->Text($self->output->Text().$text."\r\n") if ($text);
+   $self->DoEvents();
 }
 
 sub checkMode
@@ -164,22 +301,38 @@ sub checkMode
    my $self=shift;
    my $file=$self->{file};
    my @mode;
+   # check filemode
    $self->{curmode}="emc" if ($self->emc->GetCheck() == 1);
    $self->{curmode}="netapp" if ($self->netapp->GetCheck() == 1);
    if (open(FILE,"<$file")){
+      $self->run->Enable(1);
       if ($self->auto->GetCheck() == 1){
          @mode=main::detectMode(\*FILE) if ($self->auto->GetCheck() == 1);
+         if ($mode[0] == 0){
+            $self->{curmode}=$mode[1];
+         }else{
+            $self->{curmode}="unknown";
+         }
       }
       $self->{FH}=\*FILE;
+   }else{
+      @mode=(1,"ERROR: $file not found!");
    }
+   # limit filename length
+   if (length($file) > 45){
+      $file=substr($file,0,5)."...".substr($file,length($file)-36,length($file));
+   }
+   # save login datas
+   $self->{webbase}=$self->base->GetLine(0);
+   $self->{mainwebuser}=$self->webuser->GetLine(0);
+   $self->{mainwebpass}=$self->webpass->GetLine(0);
+   # output file datas
    $self->filename->Change(-text=>"FILE: ".$file);
    $self->fileformat->Change(-text=>"FILEFORMAT: ".$self->{curmode});
    $self->host->Change(-text=>"HOSTNAME: ".$self->hostname->GetLine(0));
    if ($mode[0] != 0){
-      $self->{curmode}="unknown";
+      eval("Win32::MsgBox(\"\$mode[1]\",Win32::MB_ICONEXCLAMATION|0, 'Error!')"); 
       return(1,$mode[1]);
-   }else{
-      $self->{curmode}=$mode[1];
    }
    return(0);
 }
@@ -209,7 +362,7 @@ sub doMinimize {
     return(1);
 }
 
-
+################################################################################
 package main;
 use lib qw(/opt/w5base/lib);
 use strict;                   
@@ -237,22 +390,23 @@ my $netdns=new Net::DNS::Resolver();
 $mode="auto" if (!defined($mode));
 $type="nfs" if (!defined($type));
 
-# create connection config
-my $apidebug=$verbose>=3 ? 1 : 0;
-my $Config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug);
-
-# load ModuleObject
-my %loadobj=('sys'=>'itil::system',
-             'nas'=>'itil::systemnfsnas',
-             'net'=>'itil::network',
-             'ipnet'=>'itil::lnknfsnasipnet');
-foreach my $localid (keys(%loadobj)){
-   my $objectname=$loadobj{$localid};
-   my $obj=getModuleObject($Config,$objectname);
-   if (!defined($obj)){
-   }else{
+sub moduleObj
+{
+   my $Config=shift;
+   # load ModuleObject
+   my %loadobj=('sys'=>'itil::system',
+                'nas'=>'itil::systemnfsnas',
+                'ipnet'=>'itil::lnknfsnasipnet',
+                'net'=>'itil::network');
+   foreach my $localid (keys(%loadobj)){
+      my $objectname=$loadobj{$localid};
+      my $obj=getModuleObject($Config,$objectname);
+      if (!defined($obj)){
+         msg(ERROR,"$obj not defined");
+      }
+      $o{$localid}=$obj;
    }
-   $o{$localid}=$obj;
+   return(0);
 }
 
 if ($gui){
@@ -264,37 +418,58 @@ if ($gui){
                         -hostname=>$hostname,
                         ARGV=>\@ARGV,
                         o=>\%o,
+                        -mode=>$mode,
+                        -base=>$base,
+                        -webpass=>$loginpass,
+                        -webuser=>$loginuser,
                         -force=>$force);
          $GUI->Show();
          Win32::GUI::Dialog();');
    msg(ERROR,"--gui only in windows systems \n $@") if ($@);
 }else{
+   # create connection config
+   my $apidebug=$verbose>=3 ? 1 : 0;
+   my $Config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug);
+   
+   my @result=moduleObj($Config);
+   msg(ERROR,$result[1]);exit(1) if ($result[0] != 0);  
+   
    my @hostname=split(/,/,$hostname);
    if ($#ARGV != $#hostname){
       exit(1);
    }
-
    foreach my $file (@ARGV){
       if (open(FILE,"<$file")){ 
          my @curmode=($mode);
-         @curmode=detectMode(\*FILE) if ($mode eq "auto");
-         msg(ERROR,$curmode[1]); exit(1) if ($curmode[0] != 0);
+         if ($mode eq "auto"){
+            @curmode=detectMode(\*FILE);
+            if ($curmode[0] != 0){
+               msg(ERROR,$curmode[1]);
+               exit(1);
+            }
+         }
          my %sharedata;
-         my @result=readFile(\*FILE,\%sharedata,$curmode[0],$hostname[$count]);
-         msg(ERROR,$result[1]); exit(1) if ($result[0] != 0);
+         my @result=readFile(\*FILE,\%sharedata,$curmode[1],$hostname[$count]);
+         if ($result[0] != 0){
+            msg(ERROR,$result[1]);
+            exit(1);
+         }
          my @oplist;
          @result=calculateOperations(\%o,\%sharedata,\@oplist,$hostname[$count]);
-         msg(ERROR,$result[1]); exit(1) if ($result[0] != 0);
+         if ($result[0] != 0){
+            msg(ERROR,$result[1]);
+            exit(1);
+         }
          if ($force){
             @result=processOperations(\%o,\@oplist);
-            msg(ERROR,$result[1]); exit(1) if ($result[0] != 0);
-         }else{
-            foreach my $rec (@oplist){
-               msg(INFO,$rec->{MSG});
+            if ($result[0] != 0){
+               msg(ERROR,$result[1]);
+               exit(1);
             }
          }
          close(FILE);
       }else{
+         msg(ERROR,"File: $file doesn't exists");
          exit(1);
       }
       $count++;
@@ -318,16 +493,20 @@ sub detectMode
 }
 
 
-
 sub readFile
 {
    my $fh=shift;
    my $sharedata=shift;
    my $cm=shift;
    my $hostname=shift;
+   my $stepit=shift;
+   my $mywin=shift;
    seek($fh,SEEK_SET,0);
    $sharedata->{$hostname}->{'ignore'}=[];
+   $|=1;
+   msg(INFO,"read input file...") if (!$stepit);
    while(my $line=<$fh>){
+      &{$stepit}($mywin) if ($stepit);
       $line=~s/\s*$//;
       $line=~s/#.*$//;
       next if ($line=~m/^\s*#.*$/);
@@ -338,13 +517,13 @@ sub readFile
             $param=~s/^-//;
             @param=split(/,/,$param); 
          }else{
-            push(@{$sharedata->{$hostname}->{'ignore'}},"WARN: line ignored: $line");
+            push(@{$sharedata->{$hostname}->{'ignore'}},"line ignored: $line");
          }
       }elsif($cm eq "emc"){
          if (($path,$param)=$line=~m/^export\s+"([^"]+)"\s+(.*)\s*$/){
              @param=split(/\s+/,$param); 
          }else{
-            push(@{$sharedata->{$hostname}->{'ignore'}},"WARN: line ignored: $line");
+            push(@{$sharedata->{$hostname}->{'ignore'}},"line ignored: $line");
          }
       }
       foreach my $param (@param){
@@ -357,6 +536,7 @@ sub readFile
             foreach my $ip (split(/:/,$ip)){
                if ($ip!~m/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+.*$/){
                   my $query;
+                    
                   if ($query=$netdns->search($ip)){
                      foreach my $rr ($query->answer) {
                         next unless $rr->type eq "A";
@@ -367,7 +547,7 @@ sub readFile
                      $sharedata->{$hostname}->{$path}->{'exportoptions'}.
                      "$var=$ip ";
                      push(@{$sharedata->{$hostname}->{'ignore'}},
-                     "WARN: unknown IP/HOST=$ip, entry will be a export option!");
+                     "unknown IP/HOST=$ip, entry will be a export option!");
                      next;
                   }
                }
@@ -379,10 +559,11 @@ sub readFile
             }
          }else{
             push(@{$sharedata->{$hostname}->{'ignore'}},
-            "WARN: param problem $param line=$line");
+            "param problem $param line=$line");
          }
       }
    }
+   msg(INFO,"ready read input file!") if (!$stepit);
    return(0);
 }
 
@@ -393,10 +574,12 @@ sub calculateOperations
    my $sharedata=shift;    
    my $oplist=shift;    
    my $hostname=shift;    
+   my $stepit=shift;
+   my $mywin=shift;
    my ($networkid,$found);
 
    # get hostname
-   $o->{'sys'}->SetFilter({name=>$hostname});
+   $o->{'sys'}->SetFilter({name=>[$hostname]});
    my @hl=$o->{'sys'}->getHashList(qw(id));
    if ($#hl==-1){
       return(1,"system $hostname not exists!");      
@@ -431,21 +614,32 @@ sub calculateOperations
             $found=1;
          }
       } 
-      if ($found == 0){
-          push(@$oplist,{OP           => 'update',
+      if ($found == 0 and $ln->{cistatusid} ne 6){
+         push(@$oplist,{OP           => 'update',
                          DATAOBJALIAS => 'nas',
                          IDENTIFYBY   => $ln->{id},
                          MSG          => "delete share ".$ln->{name},
                          DATA         => {cistatusid => 6}});
+         if ($stepit){
+            &{$stepit}($mywin,"delete share ".$ln->{name});
+         }else{
+            msg(INFO,"delete share ".$ln->{name});
+         }
       }
    }
 
    foreach my $share (keys(%{$sharedata->{$hostname}})){
       my $mode="insert";
+
       if ($share eq "ignore"){
          foreach my $ig (@{$sharedata->{$hostname}->{'ignore'}}){
             push(@$oplist,{OP  => 'ignore',
                            MSG => $ig});
+            if ($stepit){
+               &{$stepit}($mywin,"WARN: $ig");
+            }else{
+               msg(INFO,"$ig");
+            }
          }
          $mode="ignore";
       }
@@ -463,6 +657,11 @@ sub calculateOperations
                                 cistatusid    => 4,
                                 hostname      => $hostname,
                                 name          => $share}});
+                  if ($stepit){
+                     &{$stepit}($mywin,"update $share on $hostname");
+                  }else{
+                     msg(INFO,"update $share on $hostname");
+                  }
             }
             # get available ip's
             $o->{'ipnet'}->SetFilter({systemnfsnasid=>$ln->{id}});
@@ -484,6 +683,11 @@ sub calculateOperations
                                  IDENTIFYBY   => $ni->{id},
                                  MSG          => "delete ip with id=$found",
                                  DATA         => {}});
+                  if ($stepit){
+                     &{$stepit}($mywin,"delete ip with id=$found");
+                  }else{
+                     msg(INFO,"delete ip with id=$found");
+                  }
                }
             }
             # update or insert ip's on a existing share
@@ -518,6 +722,11 @@ sub calculateOperations
                                    exportoptions   => $options,
                                    name            => $ip,
                                    networkid       => $netid[0]->{id}}});
+                  if ($stepit){
+                     &{$stepit}($mywin,"insert ip $ip");
+                  }else{
+                     msg(INFO,"insert ip $ip");
+                  }
                }elsif($found != 2){
                   push(@$oplist,{OP           => 'update',
                                  DATAOBJALIAS => 'ipnet',
@@ -528,6 +737,11 @@ sub calculateOperations
                                    exportoptions   => $options,
                                    name            => $ip,
                                    networkid       => $netid[0]->{id}}});
+                  if ($stepit){
+                     &{$stepit}($mywin,"update ip $ip");
+                  }else{
+                     msg(INFO,"update ip $ip");
+                  }
                }
             }
          }
@@ -545,7 +759,11 @@ sub calculateOperations
                          name          => $share,
                          exportoptions => $sharedata->{$hostname}->{$share}->
                                           {'exportoptions'}}};
- 
+            if ($stepit){
+               &{$stepit}($mywin,"insert $share on $hostname");
+            }else{
+               msg(INFO,"insert $share on $hostname");
+            }
          push(@$oplist,$newshare);
 
          # insert a new ip on a new share
@@ -569,6 +787,11 @@ sub calculateOperations
                              networkid       => $netid[0]->{id},
                              exportoptions   => $options,
                              systemnfsnasid  => \$newshare->{IDENTIFYBY}}});
+            if ($stepit){
+               &{$stepit}($mywin,"insert ip $ip on $hostname");
+            }else{
+               msg(INFO,"insert ip $ip on $hostname");
+            }
          }
       }
    }
@@ -580,8 +803,11 @@ sub processOperations
 {
    my $o=shift;    
    my $oplist=shift;    
+   my $stepit=shift;
+   my $mywin=shift;
    my ($id,$found);
    foreach my $record (@$oplist){
+      &{$stepit}($mywin) if ($stepit);
       # check for valid objects only
       foreach my $objname (keys(%{$record})){
          $found=0;
