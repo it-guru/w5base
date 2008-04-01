@@ -384,6 +384,11 @@ sub new
                 vjoinon       =>['id'=>'applid'],
                 vjoindisp     =>['systemsystemid']),
 
+      new kernel::Field::Text(
+                name          =>'applgroup',
+                label         =>'Application Group',
+                dataobjattr   =>'appl.applgroup'),
+
       new kernel::Field::Textarea(
                 name          =>'description',
                 label         =>'Application Description',

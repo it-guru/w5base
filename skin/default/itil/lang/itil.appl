@@ -9,6 +9,7 @@
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'Deputy Service Manager'=>{de=>'Service Manager Vertreter'},
 'Deputy Technical Solution Manager'=>{de=>'TSM Vertreter'},
+'Application Group'=>{de=>'Anwendungsgruppe'},
 'Application Description'=>{de=>'Anwendungsbeschreibung'},
 'fieldgroup.finance'=>{de=>'Finanzielle Verantwortung',en=>'finanze'},
 'fieldgroup.opmode'=>{de=>'Betriebsparameter',en=>'Operationalparameters'},
