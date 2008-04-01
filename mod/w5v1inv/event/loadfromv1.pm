@@ -61,9 +61,10 @@ sub Init
 #   $self->RegisterEvent("loadcostcenter","LoadCostCenter");
 #   $self->RegisterEvent("loadcontact","LoadContact");
 #   $self->RegisterEvent("loadbtb","LoadBTB",timeout=>12000);
-#   $self->RegisterEvent("loadip","LoadIP");
+   $self->RegisterEvent("loadsystb","loadsystb",timeout=>12000);
+   $self->RegisterEvent("patchgroup","patchgroup");
 #   $self->RegisterEvent("loadaccno","LoadAccNo");
-   $self->RegisterEvent("loadconsoleip","LoadConsoleIP");
+#   $self->RegisterEvent("loadconsoleip","LoadConsoleIP");
    return(1);
 }
 
@@ -97,6 +98,26 @@ sub LoadConsoleIP
       }
    }
 
+}
+
+sub patchgroup
+{
+   my $self=shift;
+   my @grps=qw(usergroup.os.ux3-4-iron usergroup.ironman
+               usergroup.webadm.ironman usergroup.ag.ironman.betrieb
+               usergroup.os.ux2-3-ba-e usergroup.os.nt1-3-ba
+               usergroup.os.ux3-4-dks usergroup.os.sm1
+               usergroup.os.ux3-3 usergroup.os.ux2-3-gp-s
+               usergroup.os.ux2-1 usergroup.os.ux2-3-gp-h
+               usergroup.os.ux2-3-gp-p usergroup.os.ux2-3-ba-s
+               usergroup.os.ux1-4-bi usergroup.os.ux1-4-mu
+               usergroup.ghs-tsi usergroup.st_win
+               usergroup.stdb-oks usergroup.ag.an-tk);
+   foreach my $grp (@grps){
+      $self->ImportGroup($grp);
+      $self->VerifyMembers($grp);
+   }
+   return(undef);
 }
 
 sub LoadCustomer
@@ -1977,6 +1998,121 @@ sub LoadContact
 
    return({exicode=>0});
 }
+
+sub loadsystb
+{
+   my $self=shift;
+   my $app=$self->getParent;
+
+   my $db=new kernel::database($self->getParent,"w5v1");
+   if (!$db->Connect()){
+      return({exitcode=>1,msg=>msg(ERROR,"failed to connect database")});
+   }
+   my $dbact=new kernel::database($self->getParent,"w5v1");
+   if (!$dbact->Connect()){
+      return({exitcode=>1,msg=>msg(ERROR,"failed to connect database")});
+   }
+   my $wf=getModuleObject($self->Config,"base::workflow");
+   my $wfact=getModuleObject($self->Config,"base::workflowaction");
+   my $loadstart=$self->getParent->ExpandTimeExpression("now","en","GMT");
+   my $cmd="select * from protokoll_header where prott='proto_hw'";
+   $cmd.=" and id in ('5007','5239')";
+   if (!$db->execute($cmd)){
+      return({exitcode=>2,msg=>msg(ERROR,"can't execute '%s'",$cmd)});
+   }
+   my $c=0;
+   while(my ($rec,$msg)=$db->fetchrow()){
+      last if (!defined($rec));
+      my %ref=Datafield2Hash($rec->{referenz});
+      $rec->{referenz}=\%ref;
+      msg(DEBUG,Dumper($rec));
+      my @act;
+      my $cmd="select * from protokoll_data where protid='$rec->{id}'";
+      if ($dbact->execute($cmd)){
+         while(my ($act,$msg)=$dbact->fetchrow()){
+            last if (!defined($act));
+            my %add=Datafield2Hash($rec->{addional});
+            $act->{addional}=\%add;
+            push(@act,$act);
+         }
+      }
+      msg(DEBUG,Dumper(\@act));
+      my %p=(class=>'OSY::workflow::diary',
+             step=>'base::workflow::diary::main');
+      $p{name}=$rec->{filename}; 
+      $p{stateid}=1; 
+      $p{mdate}=$app->ExpandTimeExpression($rec->{mdate},"en","CET","GMT"),
+      $p{eventstart}=$app->ExpandTimeExpression($rec->{odate},"en","CET","GMT"),
+      $p{createdate}=$app->ExpandTimeExpression($rec->{odate},"en","CET","GMT"),
+      $p{eventend}=undef;
+      $p{closedate}=undef;
+      $p{srcsys}='W5BaseV1-SYS';
+      $p{srcid}=$rec->{id};
+      $p{id}=$rec->{id};
+      $p{openusername}=$rec->{owner};
+      $p{openuser}=$self->getUserIdByV1($rec->{owner});
+      $p{owner}=$self->getUserIdByV1($rec->{owner});
+      $p{creator}=$self->getUserIdByV1($rec->{owner});
+      $p{editor}=$rec->{owner};
+      $p{realeditor}=$rec->{owner};
+      $p{srcload}=$loadstart;
+      $p{mandatorid}=[1168];
+      $p{mandator}=['OSY'];
+#      if ($rec->{referenz}->{bcappw5baseid}->[0] ne ""){
+#         $p{affectedapplicationid}=$rec->{referenz}->{bcappw5baseid}->[0];
+#      }
+      if ($rec->{referenz}->{systemname}->[0] ne ""){
+         $p{affectedsystem}=$rec->{referenz}->{systemname}->[0];
+      }
+#      if ($rec->{statuslevel} ne ""){
+#         if ($rec->{statuslevel}==0){
+#            $p{stateid}=4;
+#         }
+#         if ($rec->{statuslevel}==1){
+#            $p{stateid}=21;
+#            $p{step}='base::workflow::diary::wffinish';
+#         }
+#      }
+#      if ($p{stateid}!=21){    # autoclose operation
+#         foreach my $act (@act){
+#            my $d=$app->ExpandTimeExpression($act->{mdate},"en","CET","GMT");
+#            if (!defined($p{closedate}) || $d gt $p{closedate}){
+#               $p{closedate}=$d;
+#            }
+#         }
+#         $p{step}='base::workflow::diary::wffinish';
+#         $p{eventend}=$p{closedate};
+#         $p{stateid}=21;
+#      }
+      printf STDERR ("fifi new=%s\n",Dumper(\%p));
+      my @l=$wf->ValidatedInsertOrUpdateRecord(\%p,{srcsys=>\$p{srcsys},
+                                                    srcid=>\$p{srcid}});
+#      foreach my $act (@act){
+#         msg(DEBUG,Dumper($act));
+#         my $cdate=$act->{mdate};
+#         $cdate=$app->ExpandTimeExpression($cdate,"en","CET","GMT");
+#         my %act=(wfheadid=>$rec->{id},comments=>$act->{data},
+#                  cdate=>$cdate,
+#                  name=>'note',translation=>'base::workflow::diary',
+#                  srcid=>$act->{id},srcsys=>'W5BaseV1-BTB');
+#         if ($act->{mdate} ne ""){
+#            $act{mdate}=$app->ExpandTimeExpression($act->{mdate},"en",
+#                                                   "CET","GMT"),
+#         }
+#         $act{owner}=$self->getUserIdByV1($act->{owner});
+#         $act{creator}=$act{owner};
+# 
+#         my @l=$wfact->ValidatedInsertOrUpdateRecord(\%act,
+#                                                   {srcsys=>\$act{srcsys},
+#                                                    srcid=>\$act{srcid}});
+#
+#      }
+#      $c++;
+   }
+   msg(ERROR,"Import=$c");
+   return({exicode=>0});
+}
+
 
 
 

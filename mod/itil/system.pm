@@ -141,6 +141,16 @@ sub new
                 vjoinon       =>['assetid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::Text(
+                name          =>'assetserialno',
+                readonly      =>1,
+                translation   =>'itil::asset',
+                label         =>'Serialnumber',
+                group         =>'physys',
+                vjointo       =>'itil::asset',
+                vjoinon       =>['assetid'=>'id'],
+                vjoindisp     =>'serialno'),
+
       new kernel::Field::TextDrop(
                 name          =>'location',
                 depend        =>['assetid'],
