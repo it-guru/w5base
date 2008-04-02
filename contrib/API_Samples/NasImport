@@ -13,6 +13,7 @@ sub new
    my $file=$param{ARGV}->[0];
    my $o=$param{o};
    my $force=$param{-force};
+   my $nowarn=$param{-nowarn};
    my $mode=$param{-mode};
    my $base=$param{-base};
    my $webuser=$param{-webuser};
@@ -116,12 +117,12 @@ sub new
           -height    => 20,
           -tabstop=> 1,
    );
-   $self->{GRID}->add($self->webuser, 8, 3, "justify top");
+   $self->{GRID}->add($self->webuser, [8..9], 3, "justify top");
    $self->AddLabel(
           -name   => "webpassl",
           -text   => "Webpassword",
    );
-   $self->{GRID}->add($self->webpassl,9,2,"justify buttom");
+   $self->{GRID}->add($self->webpassl,10,2,"justify buttom");
    $self->AddTextfield(
           -name      => "webpass",
           -text      => $self->{mainwebpass},
@@ -130,7 +131,7 @@ sub new
           -password  => 1,
           -tabstop=> 1,
    );
-   $self->{GRID}->add($self->webpass, 9, 3, "justify top");
+   $self->{GRID}->add($self->webpass, 10, 3, "justify top");
    $self->AddLabel(
           -name   => "baseurl",
           -text   => "BaseURL",
@@ -177,7 +178,7 @@ sub new
            -autovscroll => 1,
            -vscroll     => 1,
            -foreground  => 0x000000,
-           -background  => 0xD4CACA,
+           -background  => 0xE6E6E6,
    );
    $self->{GRID}->add($self->output, [2..11], 10, "justify justify");
    # start button
@@ -197,6 +198,7 @@ sub new
    $self->checkMode();
    $self->emc->SetCheck(1) if ($mode eq "emc");
    $self->netapp->SetCheck(1) if ($mode eq "netapp");
+   $self->warnings->SetCheck(0) if ($nowarn);
    $self->auto->SetCheck(1) if ($mode eq "auto");
    $self->writedata->SetCheck(1) if ($force);
    return($self); 
@@ -222,8 +224,11 @@ sub doStart
    $mainwin->output->Change(-text => "");
    $mainwin->output->DoEvents();
    $mainwin->output->LimitText(1000000);
+   $mainwin->output->SetFocus();
+   $mainwin->output->Append("login ... ");
    my ($exitcode, $msgs);
    my @result=$mainwin->checkMode();
+   $mainwin->run->Enable(0);
    if ($result[0] != 0){
       return(1,$result[1]);
    }
@@ -232,19 +237,19 @@ sub doStart
    $mainwin->pgbar->SetRange(0,1500);
    $mainwin->pgbar->SetStep(1);
    $mainwin->pgbar->SetPos(50);
-   $mainwin->output->SetFocus();
-   $mainwin->output->Append("login ... ");
    my $Config=main::createConfig($mainwin->{webbase},
                                  $mainwin->{mainwebuser},
                                  $mainwin->{mainwebpass},0,0,\$exitcode,\$msgs);
    if (!$Config){
       eval("Win32::MsgBox(\"login error: \$msgs\",Win32::MB_ICONQUESTION|0, 'Error!')");   
+      $mainwin->run->Enable(1);
       return(1,$msgs);
    }
    $mainwin->output->Append("done\r\nget objects ... ");
    @result=main::moduleObj($Config);
    if ($result[0] != 0){
       eval("Win32::MsgBox(\"\$result[1]\",Win32::MB_ICONQUESTION|0, 'Error!')");   
+      $mainwin->run->Enable(1);
       return(1,$result[1]);
    }
 
@@ -256,6 +261,7 @@ sub doStart
                           $mainwin->hostname->GetLine(0),\&StepIt,$mainwin);
    if ($result[0] != 0){
       eval("Win32::MsgBox(\"\$result[1]\",Win32::MB_ICONQUESTION|0, 'Error!')");   
+      $mainwin->run->Enable(1);
       return(1,$result[1]);
    }
 
@@ -265,6 +271,7 @@ sub doStart
                                      \@oplist,$mainwin->hostname->GetLine(0),\&StepIt,$mainwin);
    if ($result[0] != 0){
       eval("Win32::MsgBox(\"\$result[1]\",Win32::MB_ICONQUESTION|0, 'Error!')");   
+      $mainwin->run->Enable(1);
       return(1,$result[1]);
    }
  
@@ -274,11 +281,13 @@ sub doStart
       @result=main::processOperations($mainwin->{o},\@oplist,\&StepIt,$mainwin);
       if ($result[0] != 0){
          eval("Win32::MsgBox(\"\$result[1]\",Win32::MB_ICONQUESTION|0, 'Error!')");   
+         $mainwin->run->Enable(1);
          return(1,$result[1]);
       }
       $mainwin->output->Append("done\r\n");
    }
    $mainwin->output->Append("\r\nready!");
+   $mainwin->run->Enable(1);
    $mainwin->pgbar->SetPos(1500);
 }
 
@@ -291,8 +300,7 @@ sub StepIt
       return(0); 
    } 
    $text="      ".$text if (substr($text,0,9) eq "insert ip");
-#   $self->output->Append($text."\r\n") if ($text);
-   $self->output->Text($self->output->Text().$text."\r\n") if ($text);
+   $self->output->Append($text."\r\n") if ($text);
    $self->DoEvents();
 }
 
@@ -315,8 +323,6 @@ sub checkMode
          }
       }
       $self->{FH}=\*FILE;
-   }else{
-      @mode=(1,"ERROR: $file not found!");
    }
    # limit filename length
    if (length($file) > 45){
@@ -375,12 +381,11 @@ use vars qw($GUI $Window);
 
 my $DefaultBase="https://w5base.net/w5base/auth/";
 my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang);
-my ($mode,$force,$hostname,$type,$gui);
-my %o;
+my ($mode,$force,$hostname,$type,$gui,$nowarn,%o);
 my $count=0;
 my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
        "webuser=s"=>\$loginuser,"webpass=s"=> \$loginpass,
-       "verbose+"=>\$verbose,
+       "verbose+"=>\$verbose,"nowarn"=>\$nowarn,
        "force"=>\$force,"hostname=s"=>\$hostname,
        "mode=s"=>\$mode,"type=s"=>\$type,"gui"=>\$gui);
 my @allowedmodes=qw(auto emc netapp);
@@ -389,25 +394,6 @@ my $netdns=new Net::DNS::Resolver();
 
 $mode="auto" if (!defined($mode));
 $type="nfs" if (!defined($type));
-
-sub moduleObj
-{
-   my $Config=shift;
-   # load ModuleObject
-   my %loadobj=('sys'=>'itil::system',
-                'nas'=>'itil::systemnfsnas',
-                'ipnet'=>'itil::lnknfsnasipnet',
-                'net'=>'itil::network');
-   foreach my $localid (keys(%loadobj)){
-      my $objectname=$loadobj{$localid};
-      my $obj=getModuleObject($Config,$objectname);
-      if (!defined($obj)){
-         msg(ERROR,"$obj not defined");
-      }
-      $o{$localid}=$obj;
-   }
-   return(0);
-}
 
 if ($gui){
    $|=1;
@@ -422,6 +408,7 @@ if ($gui){
                         -base=>$base,
                         -webpass=>$loginpass,
                         -webuser=>$loginuser,
+                        -nowarn=>$nowarn,
                         -force=>$force);
          $GUI->Show();
          Win32::GUI::Dialog();');
@@ -435,16 +422,27 @@ if ($gui){
    msg(ERROR,$result[1]);exit(1) if ($result[0] != 0);  
    
    my @hostname=split(/,/,$hostname);
+   if ($#hostname == -1){
+      msg(ERROR,"no hostname specified!");
+      exit(1);
+   }
+   
+   if ($#ARGV == -1){
+      msg(ERROR,"no share specified!");
+      exit(1);
+   }
+    
    if ($#ARGV != $#hostname){
+      msg(ERROR,"number of hostnames and shares must be the same!");
       exit(1);
    }
    foreach my $file (@ARGV){
       if (open(FILE,"<$file")){ 
-         my @curmode=($mode);
+         my @curmode=(0,$mode);
          if ($mode eq "auto"){
             @curmode=detectMode(\*FILE);
             if ($curmode[0] != 0){
-               msg(ERROR,$curmode[1]);
+               msg(ERROR,"mode=".$curmode[1]);
                exit(1);
             }
          }
@@ -474,6 +472,25 @@ if ($gui){
       }
       $count++;
    }
+}
+
+sub moduleObj
+{
+   my $Config=shift;
+   # load ModuleObject
+   my %loadobj=('sys'=>'itil::system',
+                'nas'=>'itil::systemnfsnas',
+                'ipnet'=>'itil::lnknfsnasipnet',
+                'net'=>'itil::network');
+   foreach my $localid (keys(%loadobj)){
+      my $objectname=$loadobj{$localid};
+      my $obj=getModuleObject($Config,$objectname);
+      if (!defined($obj)){
+         msg(ERROR,"$obj not defined");
+      }
+      $o{$localid}=$obj;
+   }
+   return(0);
 }
 
 sub detectMode
@@ -524,6 +541,11 @@ sub readFile
              @param=split(/\s+/,$param); 
          }else{
             push(@{$sharedata->{$hostname}->{'ignore'}},"line ignored: $line");
+         }
+      }else{
+         if (!$stepit){
+            msg(ERROR,"unknown mode");
+            exit;
          }
       }
       foreach my $param (@param){
@@ -582,10 +604,10 @@ sub calculateOperations
    $o->{'sys'}->SetFilter({name=>[$hostname]});
    my @hl=$o->{'sys'}->getHashList(qw(id));
    if ($#hl==-1){
-      return(1,"system $hostname not exists!");      
+      return(1,"hostname $hostname not exists!");      
    }
    if ($#hl>0){
-      return(1,"system $hostname not unique!");      
+      return(1,"hostname $hostname not unique!");      
    }
   
    # get network 
@@ -638,7 +660,7 @@ sub calculateOperations
             if ($stepit){
                &{$stepit}($mywin,"WARN: $ig");
             }else{
-               msg(INFO,"$ig");
+               msg(WARN,"$ig") if (!$nowarn);
             }
          }
          $mode="ignore";
@@ -839,13 +861,6 @@ sub processOperations
    }
 }
 
-
-my $flt=$ARGV[0];
-if ($flt eq ""){
-   msg(ERROR,"no filter specified");exit(3);
-}
-
-
 # help menu
 sub Help
 {
@@ -860,11 +875,12 @@ $RealScript [options] File File ...
    --store    stores the parameters (not help,verbose and store)
    --help     show this help
               
-   --mode     emc, netapp, auto if no --mode [default:auto]
+   --mode     emc, netapp, auto [default:auto]
    --hostname more than one seperate by comma
    --type     export type (nfs, cifs ...) [default:nfs]
    --force    write data  
    --gui      grafical user interface
+   --nowarn   prevent warnings
 EOF
 }
 
