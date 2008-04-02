@@ -392,7 +392,8 @@ my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
        "mode=s"=>\$mode,"type=s"=>\$type,"gui"=>\$gui);
 
 $|=1;
-my $optresult=XGetOptions(\%P,\&Help,undef,undef,".W5Base.Interface");
+my $noautologin=1;
+my $optresult=XGetOptions(\%P,\&Help,undef,undef,".W5Base.Interface",(noautologin=>0));
 $mode="auto" if (!defined($mode));
 $type="nfs" if (!defined($type));
 

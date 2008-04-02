@@ -32,7 +32,7 @@ server a little bit easir.
 
 =head2 XGetOptions()
 
- $optresult=XGetOptions(\%P,\&Help,undef,undef,".W5Base.Interface");
+ $optresult=XGetOptions(\%P,\&Help,undef,undef,".W5Base.Interface",[noautologin=>1|0]);
 
 This function isn't needed to comunicate to W5Base, but it helps you to
 handle your work-script parameters in a comfortable kind.
@@ -314,7 +314,7 @@ sub msg
 #######################################################################
 # my special handler
 #
-# $optresult=XGetOptions(\%ARGPARAM,\&Help,\&preStore,".W5Base");
+# $optresult=XGetOptions(\%ARGPARAM,\&Help,\&preStore,".W5Base",[noautologin=>1|0]);
 # msg("INFO","xxx");
 #  
 sub XGetOptions
@@ -324,6 +324,7 @@ sub XGetOptions
    my $prestore=shift;
    my $defaults=shift;
    my $storefile=shift;
+   my %param=@_;
    my $optresult;
    if (!($storefile=~m/^\//)){ # finding the home directory
       if ($ENV{HOME} eq ""){
@@ -373,7 +374,7 @@ sub XGetOptions
       }
       close(F);
    }
-   if (!defined(${$param->{'webuser=s'}})){
+   if (!defined(${$param->{'webuser=s'}}) && !$param{noautologin}){
       my $u;
       while(1){
          printf("login user: ");
@@ -383,7 +384,7 @@ sub XGetOptions
       }
       ${$param->{'webuser=s'}}=$u;
    }
-   if (!defined(${$param->{'webpass=s'}})){
+   if (!defined(${$param->{'webpass=s'}}) && !$param{noautologin}){
       my $p="";
       system("stty -echo 2>/dev/null");
       $SIG{INT}=sub{ system("stty echo 2>/dev/null");print("\n");exit(1)};
