@@ -209,7 +209,7 @@ printf STDERR ("netarea=%s\n",Dumper($netarea));
 
 
    if (keys(%$forcedupd)){
-      printf STDERR ("fifi request a forceupd=%s\n",Dumper($forcedupd));
+      #printf STDERR ("fifi request a forceupd=%s\n",Dumper($forcedupd));
       if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,{id=>\$rec->{id}})){
          push(@qmsg,"all desired fields has been updated");
       }
@@ -219,7 +219,7 @@ printf STDERR ("netarea=%s\n",Dumper($netarea));
       }
    }
    if (keys(%$wfrequest)){
-      printf STDERR ("fifi request a DataIssue Workflow=%s\n",Dumper($wfrequest));
+      #printf STDERR ("fifi request a DataIssue Workflow=%s\n",Dumper($wfrequest));
    }
 
    # now process workflow request for traditional W5Deltas

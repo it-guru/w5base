@@ -261,13 +261,19 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
+   my @blklist;
 
    my $userid=$self->getCurrentUserId();
-   return("default") if ($self->IsMemberOf("admin"));
-   return("default") if (!defined($rec) ||
+   push(@blklist,"default") if ($self->IsMemberOf("admin"));
+   push(@blklist,"default") if (!defined($rec) ||
                          ($rec->{cistatusid}<3 && $rec->{creator}==$userid) ||
                          $self->IsMemberOf($self->{CI_Handling}->{activator}));
-   return(undef);
+   if (grep(/^default$/,@blklist) && defined($rec)){
+      foreach my $grp (qw(service oncallservice support callcenter)){
+         push(@blklist,$grp) if ($rec->{"is".$grp});
+      }
+   }
+   return(@blklist);
 }
 
 

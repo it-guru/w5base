@@ -1,0 +1,34 @@
+#######################################################################
+'isoncallservice'=>{de=>'
+... gibt an, ob Definitionen zur Rufbereitschaft
+vorliegen.
+Sind Zeiten definiert, so ist es innerhalb dieser
+Zeiten gestattet, die Rufbereitschaft zu kontaktiern.
+'},
+'issupport'=>{de=>'
+... gibt an, ob Definitionen zur Supportzeit
+vorliegen. Als Supportzeit ist die Zeit definiert,
+in der "bedienter Betrieb" der jeweiligen Komponente
+vorliegt.
+Sind Zeiten definiert, so ist davon auszugehen,
+dass in diesen Zeiten die Betreuung der jeweiligen
+Komponenten im Büro anwesend sind.
+'},
+'isservice'=>{de=>'
+... gibt an, ob Definitionen zur Servicezeit
+vorliegen. Als Servicezeit ist die Zeit definiert,
+in der eine Sörungsbehebung der jeweiligen Komponente
+durchgeführt wird. Geht diese Zeit über die Supportzeit
+hinaus, so sollten diese Zeiten durch Rufbereitschaft
+abgedeckt sein.
+Sind Sericezeiten definiert, so hat man innerhalb
+dieser Zeiten Anspruch auf eine Störungsbehebung.
+'},
+'iscallcenter'=>{de=>'
+... gibt an, ob Definitionen vorliegen, innerhalb
+wecher Zeitfenster ein entsprechendes Callcenter
+kontaktiert werden darf, bzw. innerhalb welcher
+Zeiten das jeweilige Callcenter Anfragen/Meldungen
+entgegen nimmt.
+'},
+
