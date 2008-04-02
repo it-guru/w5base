@@ -6,7 +6,8 @@ Sind Zeiten definiert, so ist es innerhalb dieser
 Zeiten gestattet, die Rufbereitschaft zu kontaktiern.
 '},
 'issupport'=>{de=>'
-... gibt an, ob Definitionen zur Supportzeit
+... gibt an, ob Definitionen zur Supportzeit 
+(Anwesenheitszeit oder Öffnungszeit)
 vorliegen. Als Supportzeit ist die Zeit definiert,
 in der "bedienter Betrieb" der jeweiligen Komponente
 vorliegt.
@@ -15,7 +16,8 @@ dass in diesen Zeiten die Betreuung der jeweiligen
 Komponenten im Büro anwesend sind.
 '},
 'isservice'=>{de=>'
-... gibt an, ob Definitionen zur Servicezeit
+... gibt an, ob Definitionen zur Servicezeit 
+(Fehlerbehebungszeit)
 vorliegen. Als Servicezeit ist die Zeit definiert,
 in der eine Sörungsbehebung der jeweiligen Komponente
 durchgeführt wird. Geht diese Zeit über die Supportzeit
