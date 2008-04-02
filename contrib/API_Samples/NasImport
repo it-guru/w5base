@@ -237,6 +237,7 @@ sub doStart
    $mainwin->pgbar->SetRange(0,1500);
    $mainwin->pgbar->SetStep(1);
    $mainwin->pgbar->SetPos(50);
+   my %login=(base=>$mainwin->{webbase},webuser=>$mainwin->{mainwebuser},webpass=>$mainwin->{mainwebpass});
    my $Config=main::createConfig($mainwin->{webbase},
                                  $mainwin->{mainwebuser},
                                  $mainwin->{mainwebpass},0,0,\$exitcode,\$msgs);
@@ -379,6 +380,7 @@ use Fcntl qw(SEEK_SET);
 use vars qw($GUI $Window);
 
 
+my $netdns=new Net::DNS::Resolver();
 my $DefaultBase="https://w5base.net/w5base/auth/";
 my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang);
 my ($mode,$force,$hostname,$type,$gui,$nowarn,%o);
@@ -388,10 +390,9 @@ my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
        "verbose+"=>\$verbose,"nowarn"=>\$nowarn,
        "force"=>\$force,"hostname=s"=>\$hostname,
        "mode=s"=>\$mode,"type=s"=>\$type,"gui"=>\$gui);
-my @allowedmodes=qw(auto emc netapp);
-my $optresult=XGetOptions(\%P,\&Help,undef,undef,".W5Base.Interface");
-my $netdns=new Net::DNS::Resolver();
 
+$|=1;
+my $optresult=XGetOptions(\%P,\&Help,undef,undef,".W5Base.Interface");
 $mode="auto" if (!defined($mode));
 $type="nfs" if (!defined($type));
 
