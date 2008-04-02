@@ -412,7 +412,7 @@ if ($gui){
                         -force=>$force);
          $GUI->Show();
          Win32::GUI::Dialog();');
-   msg(ERROR,"--gui only in windows systems \n $@") if ($@);
+   msg(ERROR,"--gui only on windows systems \n $@") if ($@);
 }else{
    # create connection config
    my $apidebug=$verbose>=3 ? 1 : 0;
