@@ -1,5 +1,6 @@
 'base::userbookmark'=>{de=>'Lesezeichen',en=>'Bookmark'},
 'fieldgroup.default'=>{de=>'Lesezeichen',en=>'Bookmark'},
+'fieldgroup.link'=>{de=>'Verknüpfung',en=>'Link'},
 "invalid web link '\%s' specified"=>{de=>"ungültiger web link '\%s'"},
 'attached user'=>{de=>'verknüpfter Kontakt'},
 'Target'=>{de=>'Fenster'},

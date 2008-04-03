@@ -95,7 +95,7 @@ create table userdefault (
 );
 create table userbookmark (
   id         bigint(20)   NOT NULL,
-  userid     bigint(20)   NOT NULL,
+  userid     bigint(20)   default NULL,
   name       varchar(128) NOT NULL,
   src        blob,
   booktype   varchar(20),
@@ -160,3 +160,4 @@ create table postitnote (
 alter table location add response bigint(20) default NULL;
 alter table location add response2 bigint(20) default NULL;
 alter table mailsignatur add fromaddress varchar(128) default NULL;
+alter table userbookmark add comments blob;

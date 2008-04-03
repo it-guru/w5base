@@ -61,6 +61,11 @@ sub new
                 value         =>[qw(_blank _self _top msel)],
                 dataobjattr   =>'userbookmark.target'),
 
+      new kernel::Field::Textarea(
+                name          =>'comments',
+                label         =>'Comments',
+                dataobjattr   =>'userbookmark.comments'),
+
       new kernel::Field::Link(
                 name          =>'userid',
                 selectfix     =>1,
@@ -107,10 +112,16 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'user',
-                group         =>'source',
+                group         =>'link',
                 label         =>'attached user',
                 vjointo       =>'base::user',
-                readonly      =>1,
+                AllowEmpty    =>1,
+                readonly      =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(0) if ($app->IsMemberOf("admin"));
+                   return(1);
+                },
                 vjoinon       =>['userid'=>'userid'],
                 vjoindisp     =>'fullname'),
    );
@@ -149,23 +160,37 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
+   if (!defined($oldrec)){
+      $newrec->{userid}=$self->getCurrentUserId();
+   }
    my $name=trim(effVal($oldrec,$newrec,"name"));
-   if ($name=~m/^\s*$/){
+   my $userid=effVal($oldrec,$newrec,"userid");
+   if ($userid!=0 || $userid ne ""){
+      $name=~s/^\*//g;
+   }
+   if ($name=~m/^\s*$/ || ($userid!=0 && $name=~m/\*/)){
       $self->LastMsg(ERROR,"invalid name '%s' specified",$name); 
       return(undef);
    }
    $newrec->{'name'}=$name;
    my $srclink=trim(effVal($oldrec,$newrec,"srclink"));
-   if ($srclink=~m/\s$/ || !($srclink=~m/^(javascript:|http:|https:|news:|telnet:|..\/)/)){
+   if ($srclink=~m/\s$/ || 
+       !($srclink=~m/^(javascript:|http:|https:|news:|telnet:|..\/)/)){
       $self->LastMsg(ERROR,"invalid web link '%s' specified",$srclink); 
       return(undef);
    }
-   if (!defined($oldrec)){
-      $newrec->{userid}=$self->getCurrentUserId();
-   }
-   if (effVal($oldrec,$newrec,"userid") eq ""){
-      $self->LastMsg(ERROR,"unable to create bookmark - missing userid"); 
-      return(undef);
+   my $userid=effVal($oldrec,$newrec,"userid");
+   if (!defined($userid) || $userid==0){
+      if ($self->IsMemberOf("admin")){
+         if (!($newrec->{'name'}=~m/^\*/)){
+            $newrec->{'name'}="*".$newrec->{'name'};
+         }
+         $newrec->{'userid'}=0;
+      }
+      else{
+         $self->LastMsg(ERROR,"unable to create bookmark - missing userid"); 
+         return(undef);
+      }
    }
    
    return(1);
@@ -189,7 +214,7 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
 
    return("default") if (!defined($rec));
-   return("default") if ($self->IsMemberOf("admin"));
+   return("default","link") if ($self->IsMemberOf("admin"));
    return("default") if (defined($rec) && $rec->{userid} eq $userid);
    return(undef);
 }
@@ -240,6 +265,70 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/base/load/userbookmark.jpg?".$cgi->query_string());
 }
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my $grp=shift;
+   my %param=@_;
+   return("header","default","link","soure");
+}
+
+
+sub ById
+{
+   my ($self)=@_;
+   my $idfield=$self->IdField();
+   my $idname=$idfield->Name();
+   my $val="undefined";
+   if (defined(Query->Param("FunctionPath"))){
+      $val=Query->Param("FunctionPath");
+   }
+   $val=~s/^\///;
+   my ($rec,$msg);
+   if ($val ne ""){
+      $self->ResetFilter();
+      $self->SetFilter({id=>\$val});
+      ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
+   }
+   if (defined($rec) && $rec->{srclink} ne ""){
+     # printf("Location: %s\n",$rec->{srclink});
+     # printf("Status: 301 Moved Permanently\n");
+     # printf("Connection: close\n");
+      printf("Content-type: text/html\n\n");
+      my $name=$rec->{name};
+      $name=~s/^\*//;
+      printf("<html>");
+      printf("<head>");
+      printf("<meta http-equiv=\"refresh\" content=\"1;url=%s\">",
+             $rec->{srclink});
+      printf("</head>");
+      printf("<body>");
+      printf("Please wait while connecting to '$name'<br>");
+      printf("Redirecting to bookmark $val ...<br>\n");
+      printf("\n<script language=\"JavaScript\">\n");
+      my $l=length($rec->{srclink});
+      print(<<EOF);
+function info()
+{
+   alert("URL lenght is $l characters. This isn't accessable in some bad browsers");
+}
+   window.setTimeout("info();",2000);
+EOF
+      printf("</script>\n");
+      printf("</body>\n");
+      printf("</html>");
+   }
+   else{
+      print $self->HttpHeader("text/html");
+      printf("ERROR: bookmark id '$val' doesn't exists<br>");
+   }
+   return();
+}
+
+
+
+
 
 
 
