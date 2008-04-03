@@ -59,7 +59,7 @@ sub Init
 #   $self->RegisterEvent("loadinterfaces","LoadInterfaces",timeout=>900);
 #   $self->RegisterEvent("loadmodel","LoadModel");
 #   $self->RegisterEvent("loadcostcenter","LoadCostCenter");
-#   $self->RegisterEvent("loadcontact","LoadContact");
+   $self->RegisterEvent("loadcontact","LoadContact");
 #   $self->RegisterEvent("loadbtb","LoadBTB",timeout=>12000);
    $self->RegisterEvent("loadsystb","loadsystb",timeout=>12000);
    $self->RegisterEvent("patchgroup","patchgroup");
@@ -705,17 +705,44 @@ sub getUserIdByV1
       $self->{userv2}=getModuleObject($self->Config,"base::user");
    }
    my $account;
+   my ($rec,$msg);
    if ($dest=~m/^\d+$/ && $dest!=0){
       $self->{userv1}->SetFilter(id=>\$dest);
-      my ($rec,$msg)=$self->{userv1}->getOnlyFirst(qw(account));
+      ($rec,$msg)=$self->{userv1}->getOnlyFirst(qw(ALL));
       $dest=$rec->{account};
       return(undef) if ($dest eq "");
    }
    
    $self->{userv2}->SetFilter(accounts=>\$dest);
-   my ($rec,$msg)=$self->{userv2}->getOnlyFirst(qw(userid));
-   if (defined($rec)){
-      return($rec->{userid});
+   my ($rec2,$msg)=$self->{userv2}->getOnlyFirst(qw(userid));
+   if (defined($rec2)){
+      return($rec2->{userid});
+   }
+   else{
+      if (defined($rec)){
+         # create extern contact entry
+         if ($rec->{email} ne ""){
+            $self->{userv2}->ResetFilter();
+            $self->{userv2}->SetFilter(email=>$rec->{email});
+            ($rec2,$msg)=$self->{userv2}->getOnlyFirst(qw(ALL));
+            if (defined($rec2)){
+               return($rec2->{userid});
+            }
+            printf STDERR ("create external contact %s\n",Dumper($rec));
+            my $newrec={email=>$rec->{email},
+                        surname=>$rec->{surname},
+                        cistatusid=>4,
+                        usertyp=>'extern',
+                        givenname=>$rec->{givenname},
+                        office_street=>$rec->{office_street},
+                        office_location=>$rec->{office_location},
+                        office_zipcode=>$rec->{office_zipcode},
+                        office_phone=>$rec->{office_phone}};
+            my $id=$self->{userv2}->ValidatedInsertRecord($newrec);
+            return($id);
+         }
+      }
+      msg(ERROR,"user $dest not found in W5BaseV1");
    }
    return(undef);
 }
@@ -1947,7 +1974,7 @@ sub LoadContact
    $self->{con}=getModuleObject($self->Config,"base::lnkcontact");
    my $appl=getModuleObject($self->Config,"itil::appl");
    $appl->ResetFilter();
-  # $appl->SetFilter(id=>\'1');
+   $appl->SetFilter(id=>\'5331');
    foreach my $rec ($appl->getHashList(qw(id))){
       my %con=();
       my $cmd="select * from lnkcontact where app='bcapp' and ref='$rec->{id}'";
@@ -1957,58 +1984,64 @@ sub LoadContact
       while(my ($rec,$msg)=$db->fetchrow()){
          last if (!defined($rec));
          my $user=$self->getUserIdByV1($rec->{user});
-         $con{"base::user::$user"}={} if (!defined($con{"base::user::$user"}));
-         my $con=$con{"base::user::$user"};
-         $con->{target}='base::user';
-         $con->{targetid}=$user;
-         my $ownerid=$self->getUserIdByV1($rec->{owner});
-         $ownerid=0 if (!defined($ownerid));
-         $con->{creator}=$ownerid;
-         $con->{refid}=$rec->{ref};
-         $con->{parentobj}='itil::appl';
-         $con->{srcid}=$rec->{id};
-         $con->{srcsys}="W5BaseV1";
-         $con->{srcload}=$loadstart;
-         $con->{comments}=$rec->{typ};
-         $con->{mdate}=scalar($app->ExpandTimeExpression($rec->{mdate},"en","GMT")),
-         $con->{roles}=[] if (!defined($con->{roles}));
-         my %ro=();
-         foreach my $r (@{$con->{roles}}){
-            $ro{$r}=1;
+         if (defined($user)){
+            $con{"base::user::$user"}={} if (!defined($con{"base::user::$user"}));
+            my $con=$con{"base::user::$user"};
+            $con->{target}='base::user';
+            $con->{targetid}=$user;
+            my $ownerid=$self->getUserIdByV1($rec->{owner});
+            $ownerid=0 if (!defined($ownerid));
+            $con->{creator}=$ownerid;
+            $con->{refid}=$rec->{ref};
+            $con->{parentobj}='itil::appl';
+            $con->{srcid}=$rec->{id};
+            $con->{srcsys}="W5BaseV1";
+            $con->{srcload}=$loadstart;
+            $con->{comments}=$rec->{typ};
+            $con->{mdate}=scalar($app->ExpandTimeExpression($rec->{mdate},"en","GMT")),
+            $con->{roles}=[] if (!defined($con->{roles}));
+            my %ro=();
+            foreach my $r (@{$con->{roles}}){
+               $ro{$r}=1;
+            }
+            $ro{"businessemployee"}=1 if ($rec->{typ} eq "Betriebsteam");
+            $ro{"developer"}=1        if ($rec->{typ} eq "Entwickler");
+            $ro{"wbv"}=1 if ($rec->{typ} eq "WBV (Wirkbetriebsverantwortlicher)");
+            $con->{roles}=[keys(%ro)];
          }
-         $ro{"businessemployee"}=1 if ($rec->{typ} eq "Betriebsteam");
-         $ro{"developer"}=1        if ($rec->{typ} eq "Entwickler");
-         $ro{"wbv"}=1 if ($rec->{typ} eq "WBV (Wirkbetriebsverantwortlicher)");
-         $con->{roles}=[keys(%ro)];
-      }
-      my $cmd="select * from lnkaccess where app='bcapp' and ref='$rec->{id}'";
-      if (!$db->execute($cmd)){
-         return({exitcode=>2,msg=>msg(ERROR,"can't execute '%s'",$cmd)});
-      }
-      while(my ($rec,$msg)=$db->fetchrow()){
-         last if (!defined($rec));
-         my $user=$self->getUserIdByV1($rec->{user});
-         next if ($user==0);
-         $con{"base::user::$user"}={} if (!defined($con{"base::user::$user"}));
-         my $con=$con{"base::user::$user"};
-         $con->{target}='base::user';
-         $con->{targetid}=$user;
-         my $ownerid=$self->getUserIdByV1($rec->{owner});
-         $ownerid=0 if (!defined($ownerid));
-         $con->{creator}=$ownerid;
-         $con->{refid}=$rec->{ref};
-         $con->{parentobj}='itil::appl';
-         $con->{srcsys}="W5BaseV1";
-         $con->{srcload}=$loadstart;
-         $con->{comments}="W5BaseV1 ACL";
-         $con->{roles}=[] if (!defined($con->{roles}));
-         my %ro=();
-         foreach my $r (@{$con->{roles}}){
-            $ro{$r}=1;
+         else{
+            msg(ERROR,"can't create $rec->{user}");
          }
-         $ro{write}=1;
-         $con->{roles}=[keys(%ro)];
       }
+    #  print STDERR Dumper(\%con);
+    #  my $cmd="select * from lnkaccess where app='bcapp' and ref='$rec->{id}'";
+    #  if (!$db->execute($cmd)){
+    #     return({exitcode=>2,msg=>msg(ERROR,"can't execute '%s'",$cmd)});
+    #  }
+    #  while(my ($rec,$msg)=$db->fetchrow()){
+    #     last if (!defined($rec));
+    #     my $user=$self->getUserIdByV1($rec->{user});
+    #     next if ($user==0);
+    #     $con{"base::user::$user"}={} if (!defined($con{"base::user::$user"}));
+    #     my $con=$con{"base::user::$user"};
+    #     $con->{target}='base::user';
+    #     $con->{targetid}=$user;
+    #     my $ownerid=$self->getUserIdByV1($rec->{owner});
+    #     $ownerid=0 if (!defined($ownerid));
+    #     $con->{creator}=$ownerid;
+    #     $con->{refid}=$rec->{ref};
+    #     $con->{parentobj}='itil::appl';
+    #     $con->{srcsys}="W5BaseV1";
+    #     $con->{srcload}=$loadstart;
+    #     $con->{comments}="W5BaseV1 ACL";
+    #     $con->{roles}=[] if (!defined($con->{roles}));
+    #     my %ro=();
+    #     foreach my $r (@{$con->{roles}}){
+    #        $ro{$r}=1;
+    #     }
+    #     $ro{write}=1;
+    #     $con->{roles}=[keys(%ro)];
+    #  }
       foreach my $con (values(%con)){
          next if ($con->{targetid} eq "");
          if (!defined($self->{con}->ValidatedInsertOrUpdateRecord($con,
@@ -2021,10 +2054,10 @@ sub LoadContact
       }
    }
    # cleanup
-   $self->{con}->SetFilter(srcload=>"\"<$loadstart\"",srcsys=>\"W5BaseV1");
-   $self->{con}->ForeachFilteredRecord(sub{
-       $self->{con}->ValidatedDeleteRecord($_);
-   });
+#   $self->{con}->SetFilter(srcload=>"\"<$loadstart\"",srcsys=>\"W5BaseV1");
+#   $self->{con}->ForeachFilteredRecord(sub{
+#       $self->{con}->ValidatedDeleteRecord($_);
+#   });
 
 
    return({exicode=>0});
