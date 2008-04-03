@@ -250,7 +250,7 @@ sub FrontendSetFilter
                                          {aclmode=>['write','read'],
                                           acltarget=>\'base::grp',
                                           acltargetid=>[keys(%groups)],
-                                          entrytypeid=>'<10'},
+                                          entrytypeid=>'<=10'},
                                          ],@_));
    return($self->SUPER::SecureSetFilter(@_));
 }
@@ -261,7 +261,7 @@ sub SecureSetFilter
    my $userid=$self->getCurrentUserId();
 
    return($self->SUPER::SecureSetFilter([{modifyuser=>\$userid},
-                                         {entrytypeid=>'<10'},
+                                         {entrytypeid=>'<=10'},
                                          ],@_));
 
 }
