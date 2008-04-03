@@ -646,7 +646,7 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
    if ($userid eq $rec->{userid} ||
        ($rec->{creator}==$userid && $rec->{cistatusid}<3)){
-      return("name","userparam","office","private","usersubst");
+      return("default","name","userparam","office","private","usersubst");
    }
    return(undef);
 }

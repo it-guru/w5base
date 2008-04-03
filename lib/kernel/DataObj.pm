@@ -461,7 +461,7 @@ sub SecureValidate
    my $oldrec=shift;
    my $newrec=shift;
    my $wrgroups=shift;
-   msg(INFO,"SecureValidate in $self");
+   msg(INFO,"SecureValidate in $self x");
    foreach my $wrfield (keys(%{$newrec})){
        my $fo=$self->getField($wrfield,$oldrec);
        if (defined($fo)){
@@ -470,7 +470,9 @@ sub SecureValidate
           if ($fo->Type() eq "SubList" ||
               (!grep(/^ALL$/,@$wrgroups) &&
                !grep(/^$group$/,@$wrgroups))){
-             $self->LastMsg(ERROR,"write request to field '$wrfield' rejected");
+             my $msg=sprintf($self->T("write request to field '\%s' rejected"),
+                             $wrfield);
+             $self->LastMsg(ERROR,$msg);
              return(0);
           }
        }
