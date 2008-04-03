@@ -246,7 +246,7 @@ sub FrontendSetFilter
                                          {aclmode=>['write','read'],
                                           acltarget=>\'base::user',
                                           acltargetid=>[$userid],
-                                          entrytypeid=>'<10'},
+                                          entrytypeid=>'<=10'},
                                          {aclmode=>['write','read'],
                                           acltarget=>\'base::grp',
                                           acltargetid=>[keys(%groups)],
