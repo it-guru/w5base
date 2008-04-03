@@ -542,6 +542,7 @@ sub new
                 group         =>'ipaddresses',
                 allowcleanup  =>1,
                 subeditmsk    =>'subedit.system',
+                vjoinbase     =>[{cistatusid=>"<=5"}],
                 vjointo       =>'itil::ipaddress',
                 vjoinon       =>['id'=>'systemid'],
                 vjoindisp     =>['webaddresstyp','name','cistatus',
