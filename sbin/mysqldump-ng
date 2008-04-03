@@ -51,7 +51,6 @@ foreach my $p (@prog){
    die("programm $p not found") if (!$found);
 }
 
-
 # posible options
 my $optresult = GetOptions ("help"        => \$help,
                             "exclude=s"   => \$exclude,
