@@ -102,6 +102,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'cistatusid',
+                group         =>'name',
                 label         =>'CI-StateID',
                 dataobjattr   =>'user.cistatus'),
 
@@ -637,7 +638,7 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default") if (!defined($rec));
+   return("default","name") if (!defined($rec));
    return(undef) if (!defined($rec));
    if ($self->IsMemberOf("admin")){
       return(qw(default name office private userparam groups usersubst 
@@ -646,7 +647,7 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
    if ($userid eq $rec->{userid} ||
        ($rec->{creator}==$userid && $rec->{cistatusid}<3)){
-      return("default","name","userparam","office","private","usersubst");
+      return("name","userparam","office","private","usersubst");
    }
    return(undef);
 }
