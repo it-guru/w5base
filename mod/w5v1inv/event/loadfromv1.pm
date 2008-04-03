@@ -45,7 +45,7 @@ sub Init
 #   $self->RegisterEvent("loadproto","LoadProto");
 #   $self->RegisterEvent("loadfaq","LoadFaq");
 #   $self->RegisterEvent("loadcustcontract","LoadCustContract");
-#   $self->RegisterEvent("loadapp","LoadApp");
+   $self->RegisterEvent("loadapp","LoadApp");
 #   $self->RegisterEvent("loadsystem","LoadSystem",timeout=>12000);
 #   $self->RegisterEvent("loadosysystem","LoadOsySystems");
 #   $self->RegisterEvent("loadlocation","LoadLocation");
@@ -736,7 +736,7 @@ sub LoadApp
    my $cmd="select bcapp.*,bcbereiche.name as orgarea ".
            "from bcapp left outer join bcbereiche ".
            "on bcapp.vieworgarea=bcbereiche.id";
-   #$cmd.=" where bcapp.id=279";
+   $cmd.=" where bcapp.tsm=63 and cistatus<4";
    if (!$db->execute($cmd)){
       return({exitcode=>2,msg=>msg(ERROR,"can't execute '%s'",$cmd)});
    }
@@ -747,7 +747,7 @@ sub LoadApp
    my $loadstart=$self->getParent->ExpandTimeExpression("now","en","GMT");
    while(my ($rec,$msg)=$db->fetchrow()){
       last if (!defined($rec));
-      next if ($rec->{cistatus}!=4);
+      #next if ($rec->{cistatus}!=4);
       if (my %newrec=$self->PrepareApp($rec)){
          $app->ValidatedInsertOrUpdateRecord(\%newrec,
                              {srcid=>$newrec{srcid},srcsys=>$newrec{srcsys}});
@@ -782,10 +782,10 @@ sub LoadApp
       #exit(0);
    }
    # cleanup
-   $app->SetFilter(srcload=>"\"<$loadstart\"");
-   $app->ForeachFilteredRecord(sub{
-       $app->ValidatedDeleteRecord($_);
-   });
+#   $app->SetFilter(srcload=>"\"<$loadstart\"");
+#   $app->ForeachFilteredRecord(sub{
+#       $app->ValidatedDeleteRecord($_);
+#   });
 
    return({exicode=>0});
 }
