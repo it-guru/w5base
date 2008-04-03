@@ -1974,7 +1974,7 @@ sub LoadContact
    $self->{con}=getModuleObject($self->Config,"base::lnkcontact");
    my $appl=getModuleObject($self->Config,"itil::appl");
    $appl->ResetFilter();
-   $appl->SetFilter(id=>\'5331');
+   #$appl->SetFilter(id=>\'5166');
    foreach my $rec ($appl->getHashList(qw(id))){
       my %con=();
       my $cmd="select * from lnkcontact where app='bcapp' and ref='$rec->{id}'";
@@ -1998,6 +1998,8 @@ sub LoadContact
             $con->{srcsys}="W5BaseV1";
             $con->{srcload}=$loadstart;
             $con->{comments}=$rec->{typ};
+            $con->{comments}.="; " if ($con->{comments} ne "" && $rec->{info} ne "");
+            $con->{comments}.=$rec->{info};
             $con->{mdate}=scalar($app->ExpandTimeExpression($rec->{mdate},"en","GMT")),
             $con->{roles}=[] if (!defined($con->{roles}));
             my %ro=();
@@ -2013,35 +2015,34 @@ sub LoadContact
             msg(ERROR,"can't create $rec->{user}");
          }
       }
-    #  print STDERR Dumper(\%con);
-    #  my $cmd="select * from lnkaccess where app='bcapp' and ref='$rec->{id}'";
-    #  if (!$db->execute($cmd)){
-    #     return({exitcode=>2,msg=>msg(ERROR,"can't execute '%s'",$cmd)});
-    #  }
-    #  while(my ($rec,$msg)=$db->fetchrow()){
-    #     last if (!defined($rec));
-    #     my $user=$self->getUserIdByV1($rec->{user});
-    #     next if ($user==0);
-    #     $con{"base::user::$user"}={} if (!defined($con{"base::user::$user"}));
-    #     my $con=$con{"base::user::$user"};
-    #     $con->{target}='base::user';
-    #     $con->{targetid}=$user;
-    #     my $ownerid=$self->getUserIdByV1($rec->{owner});
-    #     $ownerid=0 if (!defined($ownerid));
-    #     $con->{creator}=$ownerid;
-    #     $con->{refid}=$rec->{ref};
-    #     $con->{parentobj}='itil::appl';
-    #     $con->{srcsys}="W5BaseV1";
-    #     $con->{srcload}=$loadstart;
-    #     $con->{comments}="W5BaseV1 ACL";
-    #     $con->{roles}=[] if (!defined($con->{roles}));
-    #     my %ro=();
-    #     foreach my $r (@{$con->{roles}}){
-    #        $ro{$r}=1;
-    #     }
-    #     $ro{write}=1;
-    #     $con->{roles}=[keys(%ro)];
-    #  }
+      my $cmd="select * from lnkaccess where app='bcapp' and ref='$rec->{id}'";
+      if (!$db->execute($cmd)){
+         return({exitcode=>2,msg=>msg(ERROR,"can't execute '%s'",$cmd)});
+      }
+      while(my ($rec,$msg)=$db->fetchrow()){
+         last if (!defined($rec));
+         my $user=$self->getUserIdByV1($rec->{user});
+         next if ($user==0);
+         $con{"base::user::$user"}={} if (!defined($con{"base::user::$user"}));
+         my $con=$con{"base::user::$user"};
+         $con->{target}='base::user';
+         $con->{targetid}=$user;
+         my $ownerid=$self->getUserIdByV1($rec->{owner});
+         $ownerid=0 if (!defined($ownerid));
+         $con->{creator}=$ownerid;
+         $con->{refid}=$rec->{ref};
+         $con->{parentobj}='itil::appl';
+         $con->{srcsys}="W5BaseV1";
+         $con->{srcload}=$loadstart;
+         $con->{comments}="W5BaseV1 ACL";
+         $con->{roles}=[] if (!defined($con->{roles}));
+         my %ro=();
+         foreach my $r (@{$con->{roles}}){
+            $ro{$r}=1;
+         }
+         $ro{write}=1;
+         $con->{roles}=[keys(%ro)];
+      }
       foreach my $con (values(%con)){
          next if ($con->{targetid} eq "");
          if (!defined($self->{con}->ValidatedInsertOrUpdateRecord($con,

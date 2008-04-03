@@ -76,10 +76,10 @@ sub ProcessLineData
    my $row=shift;
    my $data=shift;
 
-   my $msgcol=8; 
+   my $msgcol=35; 
    if ($data->[0] eq "AL T-COM"){
       my $systemid=$data->[1];
-      my $conumber=$data->[8];
+      my $conumber=$data->[7];
       my $w1sys=$self->{w1sys};
       my $w1lnk=$self->{w1lnk};
       my $w5sys=$self->{w5sys};
