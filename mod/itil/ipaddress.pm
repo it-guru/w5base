@@ -353,12 +353,10 @@ sub isParentWriteable
       $self->LastMsg(ERROR,"invalid system reference");
       return(0);
    }
-   if ($self->isDataInputFromUserFrontend()){
-      my @write=$p->isWriteValid($l[0]);
-      if (!grep(/^ALL$/,@write) && !grep(/^ipaddresses$/,@write)){
-         $self->LastMsg(ERROR,"no access");
-         return(0);
-      }
+   my @write=$p->isWriteValid($l[0]);
+   if (!grep(/^ALL$/,@write) && !grep(/^ipaddresses$/,@write)){
+      $self->LastMsg(ERROR,"no access");
+      return(0);
    }
    return(1);
 }
