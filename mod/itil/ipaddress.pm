@@ -101,6 +101,12 @@ sub new
                 value         =>[qw(0 1 2 3 4 5 8 9 6 7)],
                 dataobjattr   =>'ipaddress.addresstyp'),
 
+      new kernel::Field::Text(
+                name          =>'accountno',
+                htmlwidth     =>'130px',
+                label         =>'Account Number',
+                dataobjattr   =>'ipaddress.accountno'),
+
       new kernel::Field::Link(
                 name          =>'addresstyp',
                 htmlwidth     =>'5px',
@@ -300,6 +306,14 @@ sub Validate
    $dnsname=~s/[^a-z0-9]*$//;
    $dnsname=~s/^[^a-z0-9]*//;
    $newrec->{dnsname}=$dnsname;
+
+   my $accountno=trim(effVal($oldrec,$newrec,"accountno"));
+   if ($accountno=~m/\s/){
+      $self->LastMsg(ERROR,"invalid account number specified");
+      return(0);
+   }
+
+
 
    printf STDERR ("iprec=%s\n",Dumper($newrec));
 

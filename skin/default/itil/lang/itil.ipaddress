@@ -5,6 +5,7 @@
 'assigned to System'=>{de=>'zugeordnetes System'},
 'DNS-Name of IP-Address'=>{de=>'DNS-Name der IP-Adresse'},
 'IP-Address'=>{de=>'IP-Adresse'},
+'Account Number'=>{de=>'Account Nummer'},
 'Short Comments'=>{de=>'Kurzbemerkungen'},
 'iptyp.0'=>{de=>'primär',en=>'primary'},
 'iptyp.1'=>{de=>'sekundär',en=>'secondary'},
@@ -16,3 +17,4 @@
 'iptyp.7'=>{de=>'Storage/NAS-LAN',en=>'Storage/NAS-LAN'},
 'iptyp.8'=>{de=>'RemoteControl-Board (HTTP)',en=>'RemoteControl-Board (HTTP)'},
 'iptyp.9'=>{de=>'RemoteControl-Board (HTTPS)',en=>'RemoteControl-Board (HTTPS)'},
+'invalid account number specified'=>{de=>'ungültige Account Nummer angegeben'},
