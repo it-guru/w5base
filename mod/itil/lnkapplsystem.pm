@@ -62,6 +62,7 @@ sub new
                                                    
       new kernel::Field::Select(
                 name          =>'systemcistatus',
+                readonly      =>1,
                 group         =>'systeminfo',
                 label         =>'System CI-State',
                 vjointo       =>'base::cistatus',
@@ -71,18 +72,21 @@ sub new
       new kernel::Field::Text(
                 name          =>'systemsystemid',
                 label         =>'SystemID',
+                readonly      =>1,
                 group         =>'systeminfo',
                 dataobjattr   =>'system.systemid'),
 
       new kernel::Field::Text(
                 name          =>'shortdesc',
                 label         =>'Short Description',
+                readonly      =>1,
                 group         =>'systeminfo',
                 dataobjattr   =>'system.shortdesc'),
 
       new kernel::Field::Select(
                 name          =>'osrelease',
                 group         =>'systeminfo',
+                readonly      =>1,
                 translation   =>'itil::system',
                 htmleditwidth =>'40%',
                 readonly      =>1,
@@ -99,6 +103,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'isprod',
+                readonly      =>1,
                 group         =>'systeminfo',
                 transprefix   =>'boolean.',
                 htmleditwidth =>'30%',
@@ -108,6 +113,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'istest',
+                readonly      =>1,
                 group         =>'systeminfo',
                 transprefix   =>'boolean.',
                 htmleditwidth =>'30%',
@@ -193,6 +199,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'applcistatus',
+                readonly      =>1,
                 group         =>'applinfo',
                 label         =>'Application CI-State',
                 vjointo       =>'base::cistatus',
@@ -202,12 +209,14 @@ sub new
       new kernel::Field::Text(
                 name          =>'applapplid',
                 label         =>'ApplicationID',
+                readonly      =>1,
                 group         =>'applinfo',
                 dataobjattr   =>'appl.applid'),
 
       new kernel::Field::TextDrop(
                 name          =>'customer',
                 label         =>'Customer',
+                readonly      =>1,
                 group         =>'applinfo',
                 translation   =>'itil::appl',
                 vjointo       =>'base::grp',
@@ -219,6 +228,7 @@ sub new
                 name          =>'applcustomerprio',
                 label         =>'Customers Application Prioritiy',
                 translation   =>'itil::appl',
+                readonly      =>1,
                 group         =>'applinfo',
                 dataobjattr   =>'appl.customerprio'),
 
@@ -239,6 +249,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'isdevel',
+                readonly      =>1,
                 group         =>'systeminfo',
                 transprefix   =>'boolean.',
                 htmleditwidth =>'30%',
@@ -248,6 +259,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'iseducation',
+                readonly      =>1,
                 group         =>'systeminfo',
                 transprefix   =>'boolean.',
                 htmleditwidth =>'30%',
@@ -257,6 +269,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'isapprovtest',
+                readonly      =>1,
                 group         =>'systeminfo',
                 transprefix   =>'boolean.',
                 htmleditwidth =>'30%',
@@ -266,6 +279,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'isreference',
+                readonly      =>1,
                 group         =>'systeminfo',
                 transprefix   =>'boolean.',
                 htmleditwidth =>'30%',
