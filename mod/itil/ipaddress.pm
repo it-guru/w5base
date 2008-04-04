@@ -260,8 +260,16 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
+   my $cistatusid=trim(effVal($oldrec,$newrec,"cistatusid"));
+   if (!defined($cistatusid) || $cistatusid==0){
+      $newrec->{cistatusid}=4;
+   }
+
    my $name=trim(effVal($oldrec,$newrec,"name"));
    $name=~s/\s//g;
+   if ($cistatusid<=5){
+      $name=~s/\[\d*\]$//;
+   }
    if ($name=~m/^\s*$/){
       $self->LastMsg(ERROR,"invalid ip-address specified");
       return(0);
@@ -286,10 +294,6 @@ sub Validate
          return(0);
       }
    }
-   my $cistatusid=trim(effVal($oldrec,$newrec,"cistatusid"));
-   if (!defined($cistatusid) || $cistatusid==0){
-      $newrec->{cistatusid}=4;
-   }
    $newrec->{name}=$name;
    my $dnsname=lc(trim(effVal($oldrec,$newrec,"dnsname")));
    $dnsname=~s/[^a-z0-9]*$//;
@@ -309,6 +313,7 @@ sub Validate
    }
    return(0) if (!($self->isParentWriteable($systemid)));
    #return(1) if ($self->IsMemberOf("admin"));
+   return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"name"));
 
    return(1);
 }
