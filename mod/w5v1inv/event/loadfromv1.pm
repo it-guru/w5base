@@ -43,7 +43,7 @@ sub Init
 #
 #   $self->RegisterEvent("loadcust","LoadCustomer"); 
 #   $self->RegisterEvent("loadproto","LoadProto");
-#   $self->RegisterEvent("loadfaq","LoadFaq");
+   $self->RegisterEvent("loadfaq","LoadFaq");
 #   $self->RegisterEvent("loadcustcontract","LoadCustContract");
    $self->RegisterEvent("loadapp","LoadApp");
 #   $self->RegisterEvent("loadsystem","LoadSystem",timeout=>12000);
