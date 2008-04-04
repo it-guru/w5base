@@ -108,6 +108,7 @@ sub new
 
       new kernel::Field::DynWebIcon(
                 name          =>'webaddresstyp',
+                searchable    =>0,
                 depend        =>['type'],
                 htmlwidth     =>'5px',
                 htmldetail    =>0,
