@@ -107,8 +107,8 @@ sub qcheckRecord
                              mode=>'native');
       }
       if ($rec->{allowifupdate}){
-printf STDERR ("ac=%s\n",Dumper($parrec->{systems}));
-printf STDERR ("w5=%s\n",Dumper($rec->{systems}));
+#printf STDERR ("ac=%s\n",Dumper($parrec->{systems}));
+#printf STDERR ("w5=%s\n",Dumper($rec->{systems}));
 #         my $net=getModuleObject($self->getParent->Config(),"itil::network");
 #         $net->SetCurrentView(qw(id name));
 #         my $netarea=$net->getHashIndexed("name");
@@ -226,7 +226,7 @@ printf STDERR ("w5=%s\n",Dumper($rec->{systems}));
       }
    }
    if (keys(%$wfrequest)){
-      printf STDERR ("fifi request a DataIssue Workflow=%s\n",Dumper($wfrequest));
+#      printf STDERR ("fifi request a DataIssue Workflow=%s\n",Dumper($wfrequest));
    }
 
    # now process workflow request for traditional W5Deltas
