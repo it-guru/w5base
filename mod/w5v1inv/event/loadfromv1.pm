@@ -66,6 +66,7 @@ sub Init
    $self->RegisterEvent("loadaggroup","loadaggroup");
 #   $self->RegisterEvent("loadaccno","LoadAccNo");
 #   $self->RegisterEvent("loadconsoleip","LoadConsoleIP");
+   $self->RegisterEvent("loadip","LoadIP");
    return(1);
 }
 
@@ -1631,14 +1632,13 @@ sub LoadIP
 
 
    my @apps=qw(bchw hw);
-   #my @apps=qw(bchw);
 
    foreach my $app (@apps){
       my $cmd;
       if ($app eq "bchw"){
          $cmd="select *,bchw.name as systemname ".
               "from ip,bchw where ip.app='$app' ".
-              "and ip.hardware=bchw.id and bchw.name like '%'";
+              "and ip.hardware=bchw.id";
       }
       if ($app eq "hw"){
          $cmd="select *,hw.name as systemname ".
@@ -1658,6 +1658,10 @@ sub LoadIP
          $name=~s/\s//g;
          $name=~s/^[0]+([1-9])/$1/g;
          $name=~s/\.[0]+([1-9])/.$1/g;
+         my $comments;
+         if (!($iprec->{kabelbez}=~m/^\s*$/)){
+            $comments.="Kabelbezeichnung: ".$iprec->{kabelbez}."\n";
+         }
          my $newip={name=>$name,cistatusid=>4,
                     addresstyp=>$iprec->{typ}, 
                     iscontrolpartner=>0,
@@ -1665,7 +1669,10 @@ sub LoadIP
                     realeditor=>$iprec->{owner},
                     srcsys=>"W5BaseV1",
                     srcload=>$srcload,
+                    comments=>$comments,
                     dnsname=>$iprec->{dnsname},
+                    ifname=>$iprec->{ifname},
+                    accountno=>$iprec->{accountno},
                     system=>$iprec->{systemname}};
          $iprec->{netname}="0,HitNet" if ($iprec->{netname} eq "");
          if ($iprec->{netname} eq "0,HitNet"){
@@ -1682,13 +1689,13 @@ sub LoadIP
          }
          $newip->{'iscontrolpartner'}=1 if ($iprec->{typ}==0);
          my ($w5id)=$ip->ValidatedInsertOrUpdateRecord($newip,
-                    {name=>\$newip->{name},cistatusid=>\'4'});
+                    {name=>\$newip->{name}});
       }
    }
-   $ip->SetFilter(srcload=>"\"<$srcload\"",srcsys=>\"W5BaseV1");
-   $ip->ForeachFilteredRecord(sub{
-       $ip->ValidatedDeleteRecord($_);
-   });
+#   $ip->SetFilter(srcload=>"\"<$srcload\"",srcsys=>\"W5BaseV1");
+#   $ip->ForeachFilteredRecord(sub{
+#       $ip->ValidatedDeleteRecord($_);
+#   });
 }
 
 sub LoadOsySystems

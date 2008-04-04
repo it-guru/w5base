@@ -49,6 +49,22 @@ sub new
                 dataobjattr   =>'ipaddress.name'),
 
       new kernel::Field::Select(
+                name          =>'cistatus',
+                htmleditwidth =>'40%',
+                label         =>'CI-State',
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['cistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::TextDrop(
+                name          =>'system',
+                htmlwidth     =>'100px',
+                label         =>'assigned to System',
+                vjointo       =>'itil::system',
+                vjoinon       =>['systemid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Select(
                 name          =>'network',
                 htmleditwidth =>'190px',
                 label         =>'Network',
@@ -61,14 +77,6 @@ sub new
                 name          =>'networkid',
                 label         =>'NetworkID',
                 dataobjattr   =>'ipaddress.network'),
-
-      new kernel::Field::TextDrop(
-                name          =>'system',
-                htmlwidth     =>'100px',
-                label         =>'assigned to System',
-                vjointo       =>'itil::system',
-                vjoinon       =>['systemid'=>'id'],
-                vjoindisp     =>'name'),
 
       new kernel::Field::Link(
                 name          =>'systemid',
@@ -86,20 +94,18 @@ sub new
                 dataobjattr   =>'ipaddress.dnsname'),
 
       new kernel::Field::Select(
-                name          =>'cistatus',
-                htmleditwidth =>'40%',
-                label         =>'CI-State',
-                vjointo       =>'base::cistatus',
-                vjoinon       =>['cistatusid'=>'id'],
-                vjoindisp     =>'name'),
-
-      new kernel::Field::Select(
                 name          =>'type',
                 htmleditwidth =>'190px',
                 label         =>'Typ',
                 transprefix   =>'iptyp.',
                 value         =>[qw(0 1 2 3 4 5 8 9 6 7)],
                 dataobjattr   =>'ipaddress.addresstyp'),
+
+      new kernel::Field::Text(
+                name          =>'ifname',
+                htmlwidth     =>'130px',
+                label         =>'Interface name',
+                dataobjattr   =>'ipaddress.ifname'),
 
       new kernel::Field::Text(
                 name          =>'accountno',

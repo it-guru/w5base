@@ -6,6 +6,7 @@
 'DNS-Name of IP-Address'=>{de=>'DNS-Name der IP-Adresse'},
 'IP-Address'=>{de=>'IP-Adresse'},
 'Account Number'=>{de=>'Account Nummer'},
+'Interface name'=>{de=>'Interface-Bezeichnung'},
 'Short Comments'=>{de=>'Kurzbemerkungen'},
 'iptyp.0'=>{de=>'primär',en=>'primary'},
 'iptyp.1'=>{de=>'sekundär',en=>'secondary'},
