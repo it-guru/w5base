@@ -51,26 +51,67 @@ sub LoadBCBS
 
 
    my $man=getModuleObject($self->Config,"base::mandator");
+   my $wiw=getModuleObject($self->Config,"tswiw::user");
    $man->SetFilter({name=>\'AL T-Com'});
    my ($manrec,$msg)=$man->getOnlyFirst("grpid");
    my $mandatorid=$manrec->{grpid};
 
+   my $grp=getModuleObject($self->Config,"base::grp");
+   my $customerid=$grp->TreeCreate("DTAG.TSI.ACTIVEBILLING");
+   my $businessteam=$grp->TreeCreate("DTAG.TSI.ES.ITO.CSS.T-Com.BILLING");
+
+
+
    my $lnkaccountno=getModuleObject($self->Config,"itil::lnkaccountingno");
    my $aappl=getModuleObject($self->Config,"tsacinv::appl");
    my $appl=getModuleObject($self->Config,"AL_TCom::appl");
-   $aappl->SetFilter({assignmentgroup=>\'BPO.BCBS'});
+   $aappl->SetFilter({assignmentgroup=>\'BPO.BCBS',
+                      status=>['IN OPERATION']});
    $aappl->SetCurrentView(qw(ALL));
    if (my ($rec,$msg)=$aappl->getFirst()){
       do{
          last if (!defined($rec));
+         my $semw5baseid=$wiw->GetW5BaseUserID($rec->{sememail});
+         my $tsmw5baseid=$wiw->GetW5BaseUserID($rec->{tsmemail});
+         my $databossid=$semw5baseid;
+         if ($databossid eq ""){
+            my $acgroup=getModuleObject($self->getParent->Config,
+                                        "tsacinv::group");
+            $acgroup->SetFilter({lgroupid=>\$rec->{lassignmentid}});
+            my ($acgrouprec,$msg)=$acgroup->getOnlyFirst(qw(supervisorldapid));
+            if (defined($acgrouprec)){
+               if ($acgrouprec->{supervisorldapid} ne "" ||
+                   $acgrouprec->{supervisoremail} ne ""){
+                  my $importname=$acgrouprec->{supervisorldapid};
+                  if ($importname eq ""){
+                     $importname=$acgrouprec->{supervisoremail};
+                  }
+                  my $bossid=$wiw->GetW5BaseUserID($importname);
+                  if (defined($bossid)){
+                     $databossid=$bossid;
+                  }
+               }
+            }
+         }
+         my $name=$rec->{name};
+         $name=~s/[^a-z0-9_-]/_/gi;
+ 
+
          msg(INFO,"load name=$rec->{name} id=$rec->{id}");
-         my $databoss=$self->getUseridByPosix('hvogler');
+         msg(INFO,"load name        = '$name'");
+         msg(INFO,"load sememail    = $rec->{sememail} ($semw5baseid)");
+         msg(INFO,"load tsmemail    = $rec->{tsmemail} ($tsmw5baseid)");
+         msg(INFO,"load databossid  = ($databossid)");
+         if ($databossid eq ""){
+            exit(1);
+         }
+
          my $criticality=$rec->{criticality};
          $criticality="CR".$criticality;
          my $issoxappl=$rec->{issoxappl};
          $issoxappl=0 if (lc($issoxappl) eq "no");
          $issoxappl=1 if ($issoxappl ne "0");
-         my $newrec={name=>$rec->{name},
+         my $newrec={name=>$name,
                      mandatorid=>$mandatorid,
                      conumber=>$rec->{conumber},
                      applid=>$rec->{applid},
@@ -83,16 +124,22 @@ sub LoadBCBS
                      srcid=>$rec->{id},
                      srcsys=>$srcsys,
                      srcload=>$loadstart,
-                     databossid=>$databoss};
-         $newrec->{name}=~s/\s+/_/g;
+                     semid=>$semw5baseid,
+                     tsmid=>$tsmw5baseid,
+                     businessteamid=>$businessteam,
+                     responseteamid=>$businessteam,
+                     databossid=>$databossid};
          $newrec->{conumber}=~s/^0+//g;
+         if ($rec->{customer}=~m/ACTIVEBILLING/){
+            $newrec->{customerid}=$customerid;
+         }
          my ($agid)=$appl->ValidatedInsertOrUpdateRecord($newrec,
                         {srcid=>\$newrec->{srcid},srcsys=>\$newrec->{srcsys}});
          if (defined($agid) && $agid ne ""){
             msg(INFO,"now process realtions name=$rec->{name} id=$agid");
             my $accountno=$rec->{accountno};
             my @accountno=grep(!/^\s*$/,split(/\s*;\s*/,$accountno));
-            foreach my $accountno (@accountno){
+           foreach my $accountno (@accountno){
                my $newrec={name=>$accountno,
                            applid=>$agid,
                            srcsys=>$srcsys,
