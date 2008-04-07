@@ -907,7 +907,7 @@ sub isWriteValid
                        physys ipaddresses
                        attachments control systemclass);
    if (!defined($rec)){
-      return("default");
+      return("default","admin","misc","opmode","control","systemclass");
    }
    else{
       if ($rec->{admid}==$userid){

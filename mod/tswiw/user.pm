@@ -253,8 +253,7 @@ sub Import
    my $identifyby=undef;
    if (defined($userrec)){
       if ($userrec->{cistatusid}==4){
-         $self->LastMsg(ERROR,"contact already exists in W5Base");
-         return(undef);
+         return($userrec->{userid});
       }
       $identifyby=$user->ValidatedUpdateRecord($userrec,{cistatusid=>4},
                                                {userid=>\$userrec->{userid}});
