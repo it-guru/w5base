@@ -999,10 +999,6 @@ sub generateStoredWorkspace
 <td class=fname width=30%>%eventmode(label)%:</td>
 <td class=finput>%eventmode(storedworkspace)%</td>
 </tr>
-<script language="JavaScript">
-setFocus("Formated_eventmode");
-setEnterSubmit(document.forms[0],"NextStep");
-</script>
 EOF
 
    return($self->SUPER::generateStoredWorkspace($WfRec,@steplist).$d);
