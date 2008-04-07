@@ -65,34 +65,7 @@ sub LoadDoc
       msg(DEBUG,"process=%s",$dir);
      
       my @files=glob($dir.'/*');
-      if ($mod eq "bcapp"){
-         msg(DEBUG,"module=$mod id=$id");
-         my $p=$self->getPersistentModuleObject("W5BaseAppl","itil::appl");
-         $p->ResetFilter();
-         $p->SetFilter({id=>\$id});
-         my ($rec,$msg)=$p->getOnlyFirst(qw(id));
-         if (defined($rec)){
-            $filemgmt->SetFilter(parentobj=>\"itil::appl",
-                                 parentrefid=>\$id);
-            $filemgmt->SetCurrentView(qw(ALL));
-            $filemgmt->ForeachFilteredRecord(sub{
-                $filemgmt->ValidatedDeleteRecord($_);
-            });
-            foreach my $file (@files){
-               if (open(F,"<".$file)){
-                  msg(DEBUG,"open %s",$file);
-                  $filemgmt->ValidatedInsertRecord({name=>$file,
-                                                    file=>\*F,
-                                                    parentobj=>'itil::appl',
-                                                    parentrefid=>$id});
-
-
-                  close(F);
-               }
-            }
-         }
-      }
-      if ($mod eq "bchw"){
+      if ($mod eq "hw"){
          msg(DEBUG,"module=$mod id=$id");
          my $p=$self->getPersistentModuleObject("W5BaseAppl","itil::system");
          $p->ResetFilter();
@@ -112,11 +85,38 @@ sub LoadDoc
                                                     file=>\*F,
                                                     parentobj=>'itil::system',
                                                     parentrefid=>$id});
+
+
                   close(F);
                }
             }
          }
       }
+      #if ($mod eq "bchw"){
+      #   msg(DEBUG,"module=$mod id=$id");
+      #   my $p=$self->getPersistentModuleObject("W5BaseAppl","itil::system");
+      #   $p->ResetFilter();
+      #   $p->SetFilter({id=>\$id});
+      #   my ($rec,$msg)=$p->getOnlyFirst(qw(id));
+      #   if (defined($rec)){
+      #      $filemgmt->SetFilter(parentobj=>\"itil::system",
+      #                           parentrefid=>\$id);
+      #      $filemgmt->SetCurrentView(qw(ALL));
+      #      $filemgmt->ForeachFilteredRecord(sub{
+      #          $filemgmt->ValidatedDeleteRecord($_);
+      #      });
+      #      foreach my $file (@files){
+      #         if (open(F,"<".$file)){
+      #            msg(DEBUG,"open %s",$file);
+      #            $filemgmt->ValidatedInsertRecord({name=>$file,
+      #                                              file=>\*F,
+      #                                              parentobj=>'itil::system',
+      #                                              parentrefid=>$id});
+      #            close(F);
+      #         }
+      #      }
+      #   }
+      #}
       
    }
 }
