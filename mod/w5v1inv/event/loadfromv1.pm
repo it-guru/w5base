@@ -2084,11 +2084,12 @@ sub loadsystb
    if (!$dbact->Connect()){
       return({exitcode=>1,msg=>msg(ERROR,"failed to connect database")});
    }
+   my $sys=getModuleObject($self->Config,"itil::system");
    my $wf=getModuleObject($self->Config,"base::workflow");
    my $wfact=getModuleObject($self->Config,"base::workflowaction");
    my $loadstart=$self->getParent->ExpandTimeExpression("now","en","GMT");
    my $cmd="select * from protokoll_header where prott='proto_hw'";
-   $cmd.=" and id in ('5007','5239')";
+#   $cmd.=" and id in ('5007','5239')";
    if (!$db->execute($cmd)){
       return({exitcode=>2,msg=>msg(ERROR,"can't execute '%s'",$cmd)});
    }
@@ -2134,52 +2135,67 @@ sub loadsystb
 #         $p{affectedapplicationid}=$rec->{referenz}->{bcappw5baseid}->[0];
 #      }
       if ($rec->{referenz}->{systemname}->[0] ne ""){
-         $p{affectedsystem}=$rec->{referenz}->{systemname}->[0];
+         $p{affectedsystem}=$rec->{referenz}->{systemname};
+         $sys->ResetFilter();
+         $sys->SetFilter({name=>$p{affectedsystem}});
+         my @rec=$sys->getHashList(qw(id name));
+         if ($#rec>0){
+            printf STDERR ("fifi id=$rec->{id}\n");
+            exit(1);
+         }
+         if ($#rec==-1 || $#rec>10){
+            delete($p{affectedsystem}); 
+         }
+         else{
+            $p{affectedsystemid}=[map({$_->{id}} @rec)];
+         }
       }
-#      if ($rec->{statuslevel} ne ""){
-#         if ($rec->{statuslevel}==0){
-#            $p{stateid}=4;
-#         }
-#         if ($rec->{statuslevel}==1){
-#            $p{stateid}=21;
-#            $p{step}='base::workflow::diary::wffinish';
-#         }
-#      }
-#      if ($p{stateid}!=21){    # autoclose operation
-#         foreach my $act (@act){
-#            my $d=$app->ExpandTimeExpression($act->{mdate},"en","CET","GMT");
-#            if (!defined($p{closedate}) || $d gt $p{closedate}){
-#               $p{closedate}=$d;
-#            }
-#         }
-#         $p{step}='base::workflow::diary::wffinish';
-#         $p{eventend}=$p{closedate};
-#         $p{stateid}=21;
-#      }
+      
+      
+      if ($rec->{statuslevel} ne ""){
+         if ($rec->{statuslevel}==0){
+            $p{stateid}=4;
+         }
+         if ($rec->{statuslevel}==1){
+            $p{stateid}=21;
+            $p{step}='base::workflow::diary::wffinish';
+         }
+      }
+      if ($p{stateid}!=21){    # autoclose operation
+         foreach my $act (@act){
+            my $d=$app->ExpandTimeExpression($act->{mdate},"en","CET","GMT");
+            if (!defined($p{closedate}) || $d gt $p{closedate}){
+               $p{closedate}=$d;
+            }
+         }
+         $p{step}='base::workflow::diary::wffinish';
+         $p{eventend}=$p{closedate};
+         $p{stateid}=21;
+      }
       printf STDERR ("fifi new=%s\n",Dumper(\%p));
       my @l=$wf->ValidatedInsertOrUpdateRecord(\%p,{srcsys=>\$p{srcsys},
                                                     srcid=>\$p{srcid}});
-#      foreach my $act (@act){
-#         msg(DEBUG,Dumper($act));
-#         my $cdate=$act->{mdate};
-#         $cdate=$app->ExpandTimeExpression($cdate,"en","CET","GMT");
-#         my %act=(wfheadid=>$rec->{id},comments=>$act->{data},
-#                  cdate=>$cdate,
-#                  name=>'note',translation=>'base::workflow::diary',
-#                  srcid=>$act->{id},srcsys=>'W5BaseV1-BTB');
-#         if ($act->{mdate} ne ""){
-#            $act{mdate}=$app->ExpandTimeExpression($act->{mdate},"en",
-#                                                   "CET","GMT"),
-#         }
-#         $act{owner}=$self->getUserIdByV1($act->{owner});
-#         $act{creator}=$act{owner};
-# 
-#         my @l=$wfact->ValidatedInsertOrUpdateRecord(\%act,
-#                                                   {srcsys=>\$act{srcsys},
-#                                                    srcid=>\$act{srcid}});
-#
-#      }
-#      $c++;
+      foreach my $act (@act){
+         msg(DEBUG,Dumper($act));
+         my $cdate=$act->{mdate};
+         $cdate=$app->ExpandTimeExpression($cdate,"en","CET","GMT");
+         my %act=(wfheadid=>$rec->{id},comments=>$act->{data},
+                  cdate=>$cdate,
+                  name=>'note',translation=>'base::workflow::diary',
+                  srcid=>$act->{id},srcsys=>'W5BaseV1-BTB');
+         if ($act->{mdate} ne ""){
+            $act{mdate}=$app->ExpandTimeExpression($act->{mdate},"en",
+                                                   "CET","GMT"),
+         }
+         $act{owner}=$self->getUserIdByV1($act->{owner});
+         $act{creator}=$act{owner};
+ 
+         my @l=$wfact->ValidatedInsertOrUpdateRecord(\%act,
+                                                   {srcsys=>\$act{srcsys},
+                                                    srcid=>\$act{srcid}});
+
+      }
+      $c++;
    }
    msg(ERROR,"Import=$c");
    return({exicode=>0});

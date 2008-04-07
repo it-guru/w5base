@@ -51,7 +51,7 @@ CREATE TABLE wfaction (
   realeditor varchar(100) NOT NULL default '',
   PRIMARY KEY  (wfactionid),
   KEY action (wfheadid,name),key(createuser,createdate),
-  KEY modifydate (modifydate),
+  KEY modifydate (modifydate),key srcsys(srcid,srcsys),
   KEY wfheadid (wfheadid)
 );
 CREATE TABLE wfhead (
