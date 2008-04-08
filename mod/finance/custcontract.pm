@@ -193,6 +193,7 @@ sub new
                    if (!defined($rec->{$self->Name()})){
                       return(0);
                    }
+                   return(0);
                    return(1);
                 },
                 dataobjattr   =>'custcontract.additional'),
@@ -282,7 +283,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default sem contacts misc attachments));
+          qw(default sem contacts control misc attachments));
 }
 
 
@@ -414,7 +415,7 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default contacts sem misc attachments);
+   my @databossedit=qw(default contacts sem misc control attachments);
    if (!defined($rec)){
       return("default");
    }

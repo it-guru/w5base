@@ -1186,7 +1186,7 @@ sub AddFields
                splice(@{$self->{'FieldOrder'}},$c+1,
                       $#{$self->{'FieldOrder'}}-$c+1,
                  ($name,
-                 @{$self->{'FieldOrder'}}[($c+1)..($#{$self->{'FieldOrder'}}+-1)]));
+                 @{$self->{'FieldOrder'}}[($c+1)..($#{$self->{'FieldOrder'}})]));
                $inserted++;
                last;
             }

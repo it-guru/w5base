@@ -1,3 +1,4 @@
 'itil::custcontract'=>{de=>'Kundenvertrag',en=>'Customer Contract'},
 'fieldgroup.default'=>{de=>'Kundenvertrag-Daten',en=>'Customer Contract-Informations'},
 'fieldgroup.applications'=>{de=>'Anwendungen',en=>'Applications'},
+'Applications'=>{de=>'Anwendungen',en=>'Applications'},
