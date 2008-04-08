@@ -1,4 +1,4 @@
-package itil::ext::DataIssue;
+package finance::ext::DataIssue;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -36,17 +36,7 @@ sub getControlRecord
    my $self=shift;
    my $d=[ 
            {
-             dataobj   =>'itil::appl',
-             target    =>'name',
-             targetid  =>'id'
-           },
-           {
-             dataobj   =>'itil::system',
-             target    =>'name',
-             targetid  =>'id'
-           },
-           {
-             dataobj   =>'itil::custcontract',
+             dataobj   =>'finance::custcontract',
              target    =>'name',
              targetid  =>'id'
            },
@@ -65,8 +55,8 @@ sub completeWriteRequest
 
    my $affectedobject=effVal($oldrec,$newrec,"affectedobject");
 
-   if ($affectedobject=~m/::appl$/){
-      if ($newrec->{affectedobject}=~m/::appl$/){
+   if ($affectedobject=~m/::custcontract$/){
+      if ($newrec->{affectedobject}=~m/::custcontract$/){
          # create link to config Management
          $newrec->{directlnktype}=$newrec->{affectedobject};
          $newrec->{directlnkid}=$newrec->{affectedobjectid};

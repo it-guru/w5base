@@ -44,7 +44,6 @@ sub new
                                      vjoininhash=>['applid','applcistatusid',
                                                    'appl']),
    );
-   $self->setDefaultView(qw(linenumber name cistatus mdate fullname));
    return($self);
 }
 

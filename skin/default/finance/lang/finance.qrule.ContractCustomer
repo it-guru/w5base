@@ -1,0 +1,2 @@
+'finance::qrule::ContractCustomer'=>{de=>'Prüfung ob Kunde im Vertrag eingetragen ist',en=>'Check if Customer is defined'},
+'no customer defined'=>{de=>'kein Kunde eingetragen'},

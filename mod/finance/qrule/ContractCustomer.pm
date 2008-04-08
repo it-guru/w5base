@@ -1,6 +1,6 @@
-package AL_TCom::ext::DataIssue;
+package finance::qrule::ContractCustomer;
 #  W5Base Framework
-#  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2007  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,39 +19,36 @@ package AL_TCom::ext::DataIssue;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use kernel::Universal;
-@ISA=qw(kernel::Universal);
-
+use kernel::QRule;
+@ISA=qw(kernel::QRule);
 
 sub new
 {
    my $type=shift;
    my %param=@_;
-   my $self=bless({%param},$type);
+   my $self=bless($type->SUPER::new(%param),$type);
+
    return($self);
 }
 
-sub getControlRecord
+sub getPosibleTargets
+{
+   return(["finance::custcontract"]);
+}
+
+sub qcheckRecord
 {
    my $self=shift;
-   my $d=[ 
-           {
-             dataobj   =>'AL_TCom::appl',
-             target    =>'name',
-             targetid  =>'id'
-           },
-           {
-             dataobj   =>'AL_TCom::custcontract',
-             target    =>'name',
-             targetid  =>'id'
-           },
-           {
-             dataobj   =>'AL_TCom::system',
-             target    =>'name',
-             targetid  =>'id'
-           },
-         ];
-   return($d);
+   my $dataobj=shift;
+   my $rec=shift;
+
+   return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
+   if (!defined($rec->{customerid}) || $rec->{customerid} eq ""){
+      return(3,{qmsg=>['no customer defined'],
+                dataissue=>['no customer defined']});
+   }
+   return(0,undef);
+
 }
 
 

@@ -272,7 +272,9 @@ sub new
    );
    $self->{use_distinct}=1;
    $self->{history}=[qw(modify delete)];
-   $self->setDefaultView(qw(linenumber name cistatus mdate fullname));
+   $self->{workflowlink}={ workflowkey=>[id=>'affectedcontractid']
+                         };
+   $self->setDefaultView(qw(linenumber name cistatus mandator mdate fullname));
    return($self);
 }
 
@@ -444,6 +446,14 @@ sub isWriteValid
    }
    return(undef);
 }
+
+sub SelfAsParentObject    # this method is needed because existing derevations
+{
+   return("finance::custcontract");
+}
+
+
+
 
 
 
