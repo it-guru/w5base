@@ -161,7 +161,7 @@ sub nativQualityCheck
             $W5V2::OperationContext="QualityCheck";
             my ($qresult,$control)=$qrule->qcheckRecord($parent,$rec);
             $W5V2::OperationContext=$oldcontext;
-            if (defined($control->{dataissue})){
+            if (defined($control) && defined($control->{dataissue})){
                my $dataissuemsg=$control->{dataissue};
                $dataissuemsg=[$dataissuemsg] if (ref($dataissuemsg) ne "ARRAY");
                my $qrulename=$qrule->Self();

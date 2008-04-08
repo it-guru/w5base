@@ -48,7 +48,7 @@ sub qcheckRecord
       $wiw->SetFilter({email=>\$rec->{email}});
       my ($wiwrec,$msg)=$wiw->getOnlyFirst(qw(ALL));
       if (!defined($wiwrec)){
-         return(0,['user not found']);
+         return(0,{qmsg=>['user not found']});
       }
       my $forcedupd={};
       my $wfrequest={};
