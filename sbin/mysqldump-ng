@@ -69,6 +69,7 @@ my $optresult = GetOptions ("help"        => \$help,
                             "convert=s"   => \$convert);
 
 # print help message
+help() if ($help); 
 sub help
 {
    if ($help || (!$db && !$targetdb)){
@@ -864,6 +865,6 @@ You really want to overite the folder? [y/N]: ");
 my $et=[Today_and_Now()];
 push(@$st,@$et);
 my @take=Delta_YMDHMS(@$st);                         
-printf ("INFO: the mysqldump-ng operation takes: %sh %smin %ssec\n"
-        ,$take[3],$take[4],$take[5]);                         
+printf("INFO: the mysqldump-ng operation takes: %sh %smin %ssec\n"
+       ,$take[3],$take[4],$take[5]);                         
                                
