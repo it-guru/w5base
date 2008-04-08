@@ -26,10 +26,13 @@ use Date::Calc qw( Today_and_Now
                    Delta_YMDHMS
                    Day_of_Week );
 use IPC::Open3;
+use IO::Handle;
+use IO::Select;
 use Compress::Zlib;
 use Getopt::Long;
 use Cwd;
 use File::Path;
+use POSIX;
 
 my $st=[Today_and_Now()];
 $Data::Dumper::Terse = 1;          
@@ -136,7 +139,7 @@ sub msg
    my $msg=shift;
    $msg=~s/%/%%/g if ($#_==-1);
    $msg=sprintf($msg,@_);
-   return("") if (!$verbose);
+   return("") if (!$verbose and $type ne "ERROR");
    my $d;
    foreach my $linemsg (split(/\n/,$msg)){
       $d.=sprintf("%-6s %s\n",$type.":",$linemsg);
@@ -150,14 +153,18 @@ sub check_db
    # db
    $db=$ARGV[0];
    shift(@ARGV);
-  
+ 
+   if (!$db){
+      msg("ERROR","database not found!");
+      exit(1);
+   }
    # check database is usable
    if ($db and $mode ne "import"){
       local(*R, *E);
       open3(undef,*R,*E,"$prog->{mysql} $db");
       wait();
       if ($? != 0){
-         printf STDERR ("ERROR: source database %s not useable or not found, rc=%s!\n",$db,$?>>8);
+         msg("ERROR","source database $db not useable or not found, rc=".$?>>8);
          exit(1);
       }
       close(R);
@@ -180,12 +187,12 @@ sub check_targetdb
    close(R);
    if ($? == 0){
       if ($force != 1){
-         printf STDERR ("WARNING: the target database=$tdb exists,
+         msg("ERROR","the target database=$tdb exists,
 the database will be drop!!
 Do you want continue? [y/N]: ");
          chomp(my $decision=<STDIN>);
          if (!(lc($decision) eq "yes" or lc($decision) eq "y")){
-            printf STDERR ("ERROR: abort by user\n");
+            msg("ERROR","abort by user");
             exit(1);
          }
             
@@ -195,7 +202,7 @@ Do you want continue? [y/N]: ");
             "$prog->{mysql} -e 'drop database $tdb;create database $tdb'");
       wait();
       if ($? != 0){
-         printf STDERR ("ERROR: database %s cannot drop! rc=%s\n",$tdb,$?>>8);
+         msg("ERROR","database $tdb cannot drop! rc=".$?>>8);
          exit(1);
       }
       return(0);
@@ -204,7 +211,7 @@ Do you want continue? [y/N]: ");
    open3(undef,undef,*ER,"$prog->{mysql} -e 'create database $tdb'");
    wait();
    if ($? != 0){
-      printf STDERR ("ERROR: database %s cannot create! rc=%s\n",$tdb,$?>>8);
+      msg("ERROR","database $tdb cannot create! rc=".$?>>8);
       exit(1);
    }
    close(ER);
@@ -251,7 +258,7 @@ if ($convert){
    }elsif(lc($convert) eq "myisam"){
       $convert="MyISAM";
    }else{
-      printf STDERR ("ERROR: unknow database format $convert only InnoDB or MyISAM\n");
+      msg("ERROR","unknow database format $convert only InnoDB or MyISAM");
       exit(1);
    }
 }
@@ -260,7 +267,7 @@ if ($convert){
 foreach my $in (keys(%inputinclude)){
    foreach my $ex (keys(%inputexclude)){
       if ($in eq $ex){
-         printf STDERR ("ERROR: some include and exclude tables are the same!\n");
+         msg("ERROR","some include and exclude tables are the same!");
          exit(1);
       }      
    }
@@ -342,7 +349,7 @@ sub check_dir
       opendir(DIR,"$dir") or die("ERROR: directory $dir could not open!\n");
       my @files = grep {/^\w.*\.sql\.gz/}readdir(DIR);
       if (!@files){
-         printf STDERR ("ERROR: no *.sql.gz files in the $dir directory!\n");
+         msg("ERROR","no *.sql.gz files in the $dir directory!");
          exit(1);
       }
       foreach my $file (@files){
@@ -355,7 +362,7 @@ sub check_dir
       closedir(DIR);
    }
    if ($found == 1){
-      printf STDERR ("ERROR: %s\n",Dumper($err));
+      msg("ERROR",Dumper($err));
       exit(1);
    }
    return(@path);
@@ -367,7 +374,7 @@ sub check_file
    my $file=shift;
    open(FH,"$file") or die("ERROR; file $file could not open!\n");
    if ( -z $file){
-      printf STDERR ("ERROR: the length of the file=$file is zero!\n");      
+      msg("ERROR","the length of the file=$file is zero!");      
       exit(1);
    }
    close(FH);
@@ -394,24 +401,39 @@ sub process_engine
            $SIG{CHLD}='DEFAULT';
            # export database
            if ($mode eq "export"){
+              my $mydsel=new IO::Select();
+              my $mydrdr=new IO::Handle();
+              my $myderr=new IO::Handle();
               my $convert_flag=0;
-              local(*MYSQLDUMPRDR,*MYSQLDUMPERR);
-              my $mysqldump_pid=open3(undef,*MYSQLDUMPRDR,*MYSQLDUMPERR,
-                                      "$prog->{mysqldump} -q -c $db $first");
-              my @gz;
+              my (@gz,@ready,@myderr,$wp,$save);
+              my $mysqldump_pid=open3(undef,$mydrdr,$myderr,"$prog->{mysqldump} -q -c $db $first");
+              $mydsel->add($myderr);
+
+              # check for mysqldump errors
+              @ready = $mydsel->can_read(0.5);
+              foreach my $fh (@ready){
+                 while (my $data=<$fh>){
+                    push(@myderr,$data);
+                 }
+              }
+              # print mysqldump errors
+              if ($#myderr != -1){
+                 foreach my $fi (@myderr){
+                    if ($fi){
+                       msg("ERROR","$fi");
+                    }
+                 }
+                 @ready=[];
+              }else{
+                 msg("ERROR","convert engine is not supported for export") if ($convert);
+              }
+
               foreach my $d (@$dir){
                   my $gz=gzopen("$d/$first.sql.gz", "w9")
                         or die "Cannot open file $d/$first.sql.gz: $gzerrno\n";
                   push(@gz,$gz);
               }
-              while(my $line=<MYSQLDUMPRDR>){
-                 if ($convert){
-                    $convert_flag=1 if($line=~m/^CREATE\s+TABLE.*\(/);
-                    if ($convert_flag==1 and $line=~m/ENGINE=\w+\s/){
-                       map({$_=~s/ENGINE=\w+\s/ENGINE=$convert /;} $line);
-                       $convert_flag=0;
-                    }
-                 }
+              while(my $line=<$mydrdr>){
                  foreach my $gz (@gz){
                     $gz->gzwrite("$line");
                  }
@@ -419,79 +441,292 @@ sub process_engine
               foreach my $gz (@gz){
                  $gz->gzclose();
               }
-              close(MYSQLDUMPRDR);
-              waitpid($mysqldump_pid,0);
-              printf("ERROR: system command mysqldump %s %s return a errorcode=%s\n"
-                      ,$db,$first,($?>>8)) if ($? != 0);
+              close($mydrdr);
+              $wp=waitpid($mysqldump_pid,0);
+              $save=$?;
+              if ($save != 0){
+                 # print rc codes
+                 msg("ERROR","system commmand mysqldump db=$db table=$first return a errorcode=$save");
+                 msg("ERROR","mysqlprocess=$$ mysql_waitpid_return=$wp");
+              }
               exit(0);
            #  import database
            }elsif ($mode eq "import"){
+              my @ready;
+              my @myerr;
+              my @gunziperr;
               my $convert_flag=0;
-              local(*GUNZIPRDR,*GUNZIPERR,*MYSQLWTR,*MYSQLERR);
-              my $gunzip_pid=open3(undef,*GUNZIPRDR,*GUNZIPERR,"$prog->{gunzip} -c $first");
-              my $mysql_pid=open3(*MYSQLWTR,undef,*MYSQLERR,
-                            "$prog->{mysql} $db ");
-              print MYSQLWTR ("SET AUTOCOMMIT=0;\n");
-              print MYSQLWTR ("SET UNIQUE_CHECKS=0;\n");
-              print MYSQLWTR ("SET FOREIGN_KEY_CHECKS = 0;\n");
-              while(my $line=<GUNZIPRDR>){
-                 if ($convert){
-                    $convert_flag=1 if($line=~m/^CREATE\s+TABLE.*\(/);      
-                    if ($convert_flag==1 and $line=~m/ENGINE=\w+\s/){
-                       map({$_=~s/ENGINE=\w+\s/ENGINE=$convert /;} $line);
-                       $convert_flag=0;
+              my ($wp,$save,$table);
+              my $mysel=new IO::Select();
+              my $gunzipsel=new IO::Select();
+              my $mywtr=new IO::Handle();
+              my $myerr=new IO::Handle();
+              my $gunziprdr=new IO::Handle();
+              my $gunziperr=new IO::Handle();
+              my $gunzip_pid=open3(undef,$gunziprdr,$gunziperr,"$prog->{gunzip} -c $first");
+              $gunzipsel->add($gunziperr);
+
+              # check for gunzip errors
+              @ready = $gunzipsel->can_read(0.1);
+              foreach my $fh (@ready){
+                 while (my $data=<$fh>){
+                    push(@gunziperr,$data);
+                 }
+              }
+              # print gunzip errors
+              if ($#gunziperr != -1){
+                 foreach my $fi (@gunziperr){
+                    if ($fi){
+                       msg("ERROR","$fi");
                     }
                  }
-                 print MYSQLWTR ("$line");                
+                 @ready=[];
               }
-              close(GUNZIPRDR);
-              print MYSQLWTR ("COMMIT;\n");
-              close(MYSQLWTR);
-              msg("INFO","import $first\n");
-              waitpid($gunzip_pid,0);
-              printf("ERROR: system command gunzip %s return a errorcode=%s\n",
-                      $first,$?>>8) if ($? != 0);
-              waitpid($mysql_pid,0);
-              printf("ERROR: system command mysql %s return a errorcode=%s\n",
-                      $db,$?>>8) if ($? != 0);
+
+              my $mysql_pid=open3($mywtr,undef,$myerr,"$prog->{mysql} $db ");
+              $mysel->add($myerr);
+
+              # check for mysql errors
+              @ready = $mysel->can_read(0.5);
+              foreach my $fh (@ready){
+                 while (my $data=<$fh>){
+                    push(@myerr,$data);
+                 }
+              }
+              # print mysql errors
+              if ($#myerr != -1){
+                 foreach my $fi (@myerr){
+                    if ($fi){
+                       msg("ERROR","$fi");
+                    }
+                 }
+                 @ready=[];
+              }
+
+              msg("INFO","import $first");
+
+              # database statments
+              print $mywtr ("SET AUTOCOMMIT=0;\n");
+              print $mywtr ("SET UNIQUE_CHECKS=0;\n");
+              print $mywtr ("SET FOREIGN_KEY_CHECKS = 0;\n");
+              while(my $line=<$gunziprdr>){
+                 print $mywtr ("$line\n");                
+                 if (!$table and $line=~m/^CREATE\s+TABLE.*\(/){
+                    my @table=split('[ `]',$line);
+                    $table=$table[3];
+                 }
+              }
+              print $mywtr (";\n");                
+              print $mywtr ("COMMIT;\n");
+              # check for mysql errors
+              @ready = $mysel->can_read(0.5);
+              foreach my $fh (@ready){
+                 while (my $data=<$fh>){
+                    push(@myerr,$data);
+                 }
+              }
+              # check for gunzip errors
+              @ready = $gunzipsel->can_read(0.1);
+              foreach my $fh (@ready){
+                 while (my $data=<$fh>){
+                    push(@gunziperr,$data);
+                 }
+              }
+              # print mysql errors
+              if ($#myerr != -1){
+                 foreach my $fi (@myerr){
+                    if ($fi){
+                       msg("ERROR","$fi");
+                    }
+                 }
+                 @ready=[];
+              }
+              # print gunzip errors
+              if ($#gunziperr != -1){
+                 foreach my $fi (@gunziperr){
+                    if ($fi){
+                       msg("ERROR","$fi");
+                    }
+                 }
+                 @ready=[];
+              }else{
+                 if ($convert){
+                    $|=1;
+                    print $mywtr ("alter table $table engine=$convert;\n");
+                    # check for alter table errors
+                    @ready = $mysel->can_read(0.5);
+                    foreach my $fh (@ready){
+                       while (my $data=<$fh>){
+                          push(@myerr,$data);
+                       }
+                    }
+                    # print errors
+                    if ($#myerr != -1){
+                       foreach my $fi (@myerr){
+                          if ($fi){
+                             msg("ERROR","$fi");
+                          }
+                       }
+                    }
+                 }
+              }
+              close($gunziprdr);
+              $wp=waitpid($gunzip_pid,0);
+              $save=$?;
+              if ($save != 0){
+                 # print rc codes
+                 msg("ERROR","system commmand gunzip file=$first return a errorcode=$save");
+                 msg("ERROR","mysqlprocess=$$ mysql_waitpid_return=$wp");
+              }
+              close($mywtr);
+              $wp=waitpid($mysql_pid,0);
+              $save=$?;
+              if ($save != 0){
+                 # print rc codes
+                 msg("ERROR","system commmand mysql db=$db file=$first return a errorcode=$save");
+                 msg("ERROR","mysqlprocess=$$ mysql_waitpid_return=$wp");
+              }
               exit(0);
            # transfer database
            }elsif($mode eq "transfer"){
               my $convert_flag=0;
-              local(*MYSQLDUMPRDR,*MYSQLDUMPERR,*MYSQLWTR,*MYSQLERR);
-              my $mysqldump_pid=open3(undef,*MYSQLDUMPRDR,*MYSQLDUMPERR,
-                                      "$prog->{mysqldump} --compact -q -c $db $first");
-              msg("INFO","transfer $first\n");
-              my $mysql_pid=open3(*MYSQLWTR,undef,*MYSQLERR,"$prog->{mysql} $targetdb");
-              print MYSQLWTR ("set autocommit=0;");
-              print MYSQLWTR ("commit;");
-              while(my $line=<MYSQLDUMPRDR>){
-                 if ($convert){
-                    $convert_flag=1 if($line=~m/^CREATE\s+TABLE.*\(/);      
-                    if ($convert_flag==1 and $line=~m/ENGINE=\w+\s/){
-                       map({$_=~s/ENGINE=\w+\s/ENGINE=$convert /;} $line);
-                       $convert_flag=0;
+              my @myerr;
+              my @myderr;
+              my @ready;
+              my ($mysqldump_pid,$wp,$save);
+              my $mysel=new IO::Select();
+              my $mydumpsel=new IO::Select();
+              my $myerr=new IO::Handle();
+              my $mywtr=new IO::Handle();
+              my $myderr=new IO::Handle();
+              my $mydrdr=new IO::Handle();
+
+              # open mysqldump handle
+              $mysqldump_pid=open3(undef,$mydrdr,$myderr,"$prog->{mysqldump} $db $first");
+              $mydumpsel->add($myderr);
+             
+              # check for mysqldump errors
+              @ready = $mydumpsel->can_read(0.1);
+              foreach my $fh (@ready){
+                 while (my $data=<$fh>){
+                    push(@myderr,$data);
+                 }
+              }
+              # print mysqldump errors
+              if ($#myderr != -1){
+                 foreach my $fi (@myderr){
+                    if ($fi){
+                       msg("ERROR","$fi");
                     }
                  }
-                 print MYSQLWTR ("$line"); 
+                 @ready=[];
               }
-              close(MYSQLWTR);
-              waitpid($mysql_pid,0);
-              printf("ERROR: system command mysql %s return a errorcode=%s\n",
-                      $targetdb,$?>>8) if ($? != 0);
-              close(MYSQLDUMPRDR);
-              waitpid($mysqldump_pid,0);
-              printf("ERROR: system command mysqldump %s %s return a errorcode=%s\n",
-                      $db,$first,$?>>8) if ($? != 0);
+               
+
+              # open mysql handle
+              my $mysql_pid=open3($mywtr,undef,$myerr,"$prog->{mysql} $targetdb");
+              $mysel->add($myerr);
+              # check for mysql errors
+              @ready = $mydumpsel->can_read(0.5);
+              foreach my $fh (@ready){
+                 while (my $data=<$fh>){
+                    push(@myerr,$data);
+                 }
+              }
+              # print mysql errors
+              if ($#myerr != -1){
+                 foreach my $fi (@myerr){
+                    if ($fi){
+                       msg("ERROR","$fi");
+                    }
+                 }
+                 @ready=[];
+              }
+               
+              msg("INFO","transfer $first");
+       
+              # write data to mysql handle
+              print $mywtr ("SET AUTOCOMMIT=0;\n");
+              print $mywtr ("SET UNIQUE_CHECKS=0;\n");
+              print $mywtr ("SET FOREIGN_KEY_CHECKS = 0;\n");
+              print $mywtr ("COMMIT;\n");
+
+              while(my $line=<$mydrdr>){
+                 print $mywtr ("$line\n"); 
+              }
+              print $mywtr (";\n");
+              
+              # check for mysqldump errors
+              @ready = $mydumpsel->can_read(0.5);
+              foreach my $fh (@ready){
+                 while (my $data=<$fh>){
+                    push(@myerr,$data);
+                 }
+              }
+
+              # check for mysql errors
+              @ready = $mysel->can_read(0.5);
+              foreach my $fh (@ready){
+                 while (my $data=<$fh>){
+                    push(@myerr,$data);
+                 }
+              }
+
+              # print errors
+              if ($#myerr != -1){
+                 foreach my $fi (@myerr){
+                    if ($fi){
+                       msg("ERROR","$fi");
+                    }
+                 }
+              }
+
+              close($mydrdr);
+              $wp=waitpid($mysqldump_pid,0);
+              $save=$?;
+              if ($save != 0){
+                 # print rc codes
+                 msg("ERROR","system command mysqldump db=$db table=$first return a errorcode=".$save>>8);
+                 msg("ERROR","mysqlprocess=$$ mysql_waitpid_return=$wp");
+
+              }else{
+                 if ($convert){
+                    $|=1;
+                    print $mywtr ("alter table $first engine=$convert;\n");
+                    # check for alter table errors
+                    @ready = $mysel->can_read(0.5);
+                    foreach my $fh (@ready){
+                       while (my $data=<$fh>){
+                          push(@myerr,$data);
+                       }
+                    }
+                    # print errors
+                    if ($#myerr != -1){
+                       foreach my $fi (@myerr){
+                          if ($fi){
+                             msg("ERROR","$fi");
+                          }
+                       }
+                    }
+                 }
+              }
+              close($mywtr);
+              $wp=waitpid($mysql_pid,0);
+              $save=$?;
+              if ($save != 0){
+                 # print rc codes
+                 msg("ERROR","system commmand mysql db=$targetdb table=$first return a errorcode=".$save>>8);
+                 msg("ERROR","mysqlprocess=$$ mysql_waitpid_return=$wp");
+              }
               exit(0);
-           }
+            }
          } else {       # parent process
            $processes{$pid}=$tables->[0];
            shift(@$tables);      
          }
       }
-      msg("INFO","count tables=$#{$tables}\nproccontent=".Dumper(\%processes));
-      select(undef,undef,undef,0.1);
+      msg("INFO","count tables=$#{$tables} proccontent=".Dumper(\%processes));
+      select(undef,undef,undef,0.5);
    }  
    until (keys(%processes) == 0 );
 }
@@ -520,11 +755,11 @@ if (lc($mode) eq "export"){
             mkdir("$dir/$dirformat") or die("create folder $dir/$dirformat failed!\n");
          }else{
             if ($force != 1){
-               printf STDERR ("WARNING: the folder $dir/$dirformat exists,
+               msg("ERROR","the folder $dir/$dirformat exists,
 You really want to overite the folder? [y/N]: ");
             chomp(my $decision=<STDIN>);
                if (!(lc($decision) eq "yes" or lc($decision) eq "y")){
-                  printf STDERR ("ERROR: abort by user\n");
+                  msg("ERROR","abort by user");
                   exit(1);
                }
             }
@@ -543,11 +778,11 @@ You really want to overite the folder? [y/N]: ");
             mkdir("$dir/$dirformat") or die("create folder $dir/$dirformat failed!\n");
          }else{
             if ($force != 1){
-               printf STDERR ("WARNING: the folder $dir/$dirformat exists,
+               msg("ERROR","the folder $dir/$dirformat exists,
 You really want to overite the folder? [y/N]: ");
             chomp(my $decision=<STDIN>);
                if (!(lc($decision) eq "yes" or lc($decision) eq "y")){
-                  printf STDERR ("ERROR: abort by user\n");
+                  msg("ERROR","abort by user");
                   exit(1);
                }
             }
@@ -564,6 +799,7 @@ You really want to overite the folder? [y/N]: ");
    $mode="import";
    my @files;
    check_db();
+   help();
    check_targetdb($db);
    if ($db){
       if (!$file && $dir){
@@ -576,13 +812,12 @@ You really want to overite the folder? [y/N]: ");
             push(@files,$f);
          }
       }else{
-         printf STDERR ("ERROR: no files or directory for import! \n");
+         msg("ERROR","no files or directory for import!");
          exit(1);
       }
-      help();
       process_engine(\@files,$dir);
    }else{
-      printf STDERR ("ERROR: $db not exists\n");
+      msg("ERROR","$db not exists!");
       exit(1);
    }
 }elsif(lc($mode) eq "transfer"){
@@ -592,11 +827,11 @@ You really want to overite the folder? [y/N]: ");
       $mode="transfer";
       # check target db and source db not the same
       if ($targetdb eq $db){
-         printf STDERR ("ERROR: target database $targetdb and source database $db the same!\n");
+         msg("ERROR","target database $targetdb and source database $db the same!");
          exit(1);
       }
    }else{
-      printf STDERR ("ERROR: if mode=transfer option --targetdb must be set\n");
+      msg("ERROR","if mode=transfer option --targetdb must be set");
       exit(1);
    }
    include_tables();
@@ -605,12 +840,12 @@ You really want to overite the folder? [y/N]: ");
    check_targetdb($targetdb);
    process_engine(\@tab);
 }else{
-   printf STDERR ("ERROR: unknow mode=$mode only this modes import, export or transfer\n");
+   msg("ERROR","unknow mode=$mode only this modes import, export or transfer\n");
    exit(1);
 }
 
 my $et=[Today_and_Now()];
 push(@$st,@$et);
 my @take=Delta_YMDHMS(@$st);                         
-printf ("INFO: the operation takes: $take[3]h $take[4]min $take[5]sec\n");                         
+msg("INFO","the operation takes: $take[3]h $take[4]min $take[5]sec");                         
                                
