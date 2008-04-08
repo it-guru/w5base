@@ -58,16 +58,7 @@ body{
 EOF
    print("<table width=100% height=100% border=0 cellspacing=10 cellpadding=0>");
    printf("<tr><td height=1%% valign=top>%s</td></tr>",$self->getAppTitleBar());
-   print("<tr><td height=1% valign=top>");
-   print(<<EOF);
-Dieses Werkzeug ermöglicht es, Exceldateien um bestimmte verknüpfte
-Information zu erweitern. Zu diesem Zweck definieren Sie Spalten in der
-Eingabedatei, die die Schlüsselinformationen enthalten. Die Eingangsspalten sind
-ODER verknüpft und es werden nur CI-Status installed/activ gefiltert. Bei der Verarbeitung<br>
-werden dann die gewünschten "Auffüll Information" als zusätzliche Spalten
-in die Exceldatei angefügt.
-EOF
-   print("<tr><td valign=top id=ref>");
+   print $self->getParsedTemplate("tmpl/XLSExpand",{});
    my @collabel=('A'..'Z');
    my $o="<option value=\"\">--</option>";
    for(my $c=0;$c<=$#collabel;$c++){
