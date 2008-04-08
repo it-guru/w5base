@@ -60,7 +60,7 @@ EOF
    printf("<tr><td height=1%% valign=top>%s</td></tr>",$self->getAppTitleBar());
    print("<tr><td height=1% valign=top>");
    print(<<EOF);
-Dieses Werkezug ermöglicht es, Exceldateien um bestimmte verknüpfte
+Dieses Werkzeug ermöglicht es, Exceldateien um bestimmte verknüpfte
 Information zu erweitern. Zu diesem Zweck definieren Sie Spalten in der
 Eingabedatei, die die Schlüsselinformationen enthalten. Die Eingangsspalten sind
 ODER verknüpft und es werden nur CI-Status installed/activ gefiltert. Bei der Verarbeitung<br>
