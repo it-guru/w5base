@@ -1353,6 +1353,18 @@ sub ById
    return();
 }
 
+sub getRecordHtmlIndex
+{
+   my $self=shift;
+   my $rec=shift;
+   my $id=shift;
+   my $grouplist=shift;
+   my $grouplabel=shift;
+   my @indexlist;
+   return();
+}
+
+
 sub getWriteRequestHash
 {
    my $self=shift;

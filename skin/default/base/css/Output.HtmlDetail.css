@@ -213,6 +213,12 @@ a.detailfunctions:link, a.detailfunctions:visited, a.detailfunctions:active {
             color:#353534;
           }
 
+a.HtmlDetailIndex:link, a.HtmlDetailIndex:visited, a.HtmlDetailIndex:active {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:#353534;
+          }
+
 a.detailtopfunctions:link, a.detailtopfunctions:visited,a.detailtopfunctions:active    {
             font-family:Arial,Adobe Helvetica,Helvetica;
             text-decoration:none;
@@ -237,6 +243,10 @@ img.printspacer{
 
 
 @media print{
+   div.HtmlDetailIndex{
+      display:none;
+      visiblity:hidden;
+   } 
    img.printspacer{
       display:block;
       visiblity:display;
