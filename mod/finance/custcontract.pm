@@ -444,6 +444,14 @@ sub isWriteValid
             return(@databossedit) if (grep(/^write$/,@roles));
          }
       }
+      my @chkgroups;
+      push(@chkgroups,$rec->{mandatorid}) if ($rec->{mandatorid} ne "");
+      push(@chkgroups,$rec->{responseteamid}) if ($rec->{responseteamid} ne "");
+      if ($#chkgroups!=-1){
+         if ($self->IsMemberOf(\@chkgroups,"RControlling","down")){
+            return(@databossedit);
+         }
+      }
    }
    return(undef);
 }

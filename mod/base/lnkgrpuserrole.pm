@@ -79,9 +79,15 @@ sub new
                 name          =>'role',
                 label         =>'Role',
                 value         =>['RMember','REmployee','RAdmin','RDataAdmin', 
-                                 'RReportReceive','RBoss','RBoss2','RQManager',
-                                 'RINManager','RCHManager',
-                                 'RCFManager','RTimeManager'],
+                                 'RReportReceive',
+                                 'RBoss','RBoss2',
+                                 'RINManager',
+                                 'RCHManager',
+                                 'RCFManager',
+                                 'RQManager',
+                                 'RControlling',
+                                 'RAuditor',
+                                 'RTimeManager'],
                 dataobjattr   =>'lnkgrpuserrole.role'),
 
       new kernel::Field::Text(

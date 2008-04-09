@@ -13,6 +13,8 @@
 'RINManager'=>{ de=>'Incident-Manager', en=>'Incident-Manager'},
 'RCHManager'=>{ de=>'Change-Manager', en=>'Change-Manager'},
 'RCFManager'=>{ de=>'Config-Manager', en=>'Config-Manager'},
+'RControlling'=>{ de=>'Controlling', en=>'Controlling'},
+'RAuditor'=>{ de=>'Auditor', en=>'Auditor'},
 'RTimeManager'=>{ de=>'Zeit-Manager', en=>'Time-Manager'},
 'base::lnkgrpuserrole'=>{ de=>'Rollenzuordnung',en=>'Rolerelation'},
 'fieldgroup.default'=>{ de=>'Rollenzuordnung',en=>'Rolerelation'},
