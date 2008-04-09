@@ -270,6 +270,7 @@ function InitDropBox()
 }
 
 addEvent(window,"load",InitDropBox);
+addEvent(window,"load",convertTrees);
 
 </script>
 EOF
@@ -331,7 +332,7 @@ sub getViewFieldSelect
    my $self=shift;
    my $app=$self->getParent->getParent();
    my $d="<select size=5 id=NewCurrentView class=ViewFieldSelect multiple ".
-         " onDblClick=\"RowsDel(this.options.selectedIndex); \" ".
+         " onDblClick=\" RowsDel(this.options.selectedIndex);  \" ".
          " name=ViewFieldList style=\"width:100%;height:100%\">";
    my @showfieldlist=();
    my @oldval=Query->Param("ViewFieldList");
@@ -417,7 +418,7 @@ sub getFullFieldTreeSelect
          my $field=$fobj->Name();
          $d.="<ul id=tree_$c>";
          $c++;
-         $d.="<li value=\'$field\' downpoint=1 id=treediv_$c ".
+         $d.="<li xvalue=\'$field\' downpoint=1 id=treediv_$c ".
              "onClick=\"DoFieldonClick(this);\" ".
              "onMouseDown=\"return(false)\" ".
              "onSelectStart=\"return(false)\" ".
