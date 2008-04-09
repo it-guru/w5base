@@ -43,9 +43,9 @@ sub Init
 #
 #   $self->RegisterEvent("loadcust","LoadCustomer"); 
 #   $self->RegisterEvent("loadproto","LoadProto");
-   $self->RegisterEvent("loadfaq","LoadFaq");
+#   $self->RegisterEvent("loadfaq","LoadFaq");
 #   $self->RegisterEvent("loadcustcontract","LoadCustContract");
-   $self->RegisterEvent("loadapp","LoadApp");
+#   $self->RegisterEvent("loadapp","LoadApp");
 #   $self->RegisterEvent("loadsystem","LoadSystem",timeout=>12000);
 #   $self->RegisterEvent("loadosysystem","LoadOsySystems");
 #   $self->RegisterEvent("loadlocation","LoadLocation");
@@ -59,15 +59,59 @@ sub Init
 #   $self->RegisterEvent("loadinterfaces","LoadInterfaces",timeout=>900);
 #   $self->RegisterEvent("loadmodel","LoadModel");
 #   $self->RegisterEvent("loadcostcenter","LoadCostCenter");
-   $self->RegisterEvent("loadcontact","LoadContact");
+#   $self->RegisterEvent("loadcontact","LoadContact");
 #   $self->RegisterEvent("loadbtb","LoadBTB",timeout=>12000);
-   $self->RegisterEvent("loadsystb","loadsystb",timeout=>12000);
-   $self->RegisterEvent("patchgroup","patchgroup");
-   $self->RegisterEvent("loadaggroup","loadaggroup");
+#   $self->RegisterEvent("loadsystb","loadsystb",timeout=>12000);
+#   $self->RegisterEvent("patchgroup","patchgroup");
+#   $self->RegisterEvent("loadaggroup","loadaggroup");
 #   $self->RegisterEvent("loadaccno","LoadAccNo");
 #   $self->RegisterEvent("loadconsoleip","LoadConsoleIP");
-   $self->RegisterEvent("loadip","LoadIP");
+#   $self->RegisterEvent("loadip","LoadIP");
+   $self->RegisterEvent("loadcontractco","LoadCustContractCO");
    return(1);
+}
+
+sub LoadCustContractCO
+{
+   my $self=shift;
+
+   my $db=new kernel::database($self->getParent,"w5v1");
+   if (!$db->Connect()){
+      return({exitcode=>1,msg=>msg(ERROR,"failed to connect database")});
+   }
+   my $cmd="select bccontract.*,bcbereiche.name as orgareaname ".
+           "from bccontract left outer join bcbereiche on ".
+           "bccontract.orgarea=bcbereiche.id";
+   if (!$db->execute($cmd)){
+      return({exitcode=>2,msg=>msg(ERROR,"can't execute '%s'",$cmd)});
+   }
+   my $custcontract=getModuleObject($self->Config,"AL_TCom::custcontract");
+   my $loadstart=$self->getParent->ExpandTimeExpression("now","en","GMT");
+   while(my ($rec,$msg)=$db->fetchrow()){
+      last if (!defined($rec));
+      next if (defined($rec->{valid_to}) && $rec->{valid_to} ne "");
+      next if ($rec->{cistatus}!=4);
+      msg(INFO,"======= process contract $rec->{id} =======================");
+      next if ($rec->{name}=~m/^BC-Admin.*/);
+      next if ($rec->{name}=~m/^Text CON.*/);
+      next if ($rec->{name}=~m/^Test010101/);
+      next if ($rec->{name}=~m/^Test020202/);
+      next if ($rec->{name}=~m/^Test030303/);
+      printf STDERR ("co=$rec->{conummer}\n");
+      my %newrec=(conumber=>$rec->{conummer},name=>$rec->{vertnr});
+      $custcontract->ResetFilter();
+      $custcontract->SetFilter({name=>\$rec->{vertnr}});
+      my ($oldrec,$msg)=$custcontract->getOnlyFirst(qw(ALL));
+      if (defined($oldrec)){
+         $newrec{p800opmode}="prod";
+         $custcontract->ValidatedUpdateRecord($oldrec,\%newrec,
+                                              {id=>\$oldrec->{id}});
+      }
+   }
+
+   return({exicode=>0});
+
+
 }
 
 

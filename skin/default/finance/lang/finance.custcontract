@@ -38,3 +38,4 @@
 'autoexpansion.36'=>{de=>'3 Jahre',en=>'3 Years'},
 'Cancel Period'=>{de=>'Kündigungsfrist'},
 'Auto Expansion'=>{de=>'automatische Verlängerung'},
+'CO-Number'=>{de=>'CO-Nummer'},

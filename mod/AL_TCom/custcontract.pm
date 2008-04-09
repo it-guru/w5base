@@ -32,7 +32,6 @@ sub new
    $self->AddFields(
       new kernel::Field::Select(
                 name          =>'p800opmode',
-                group         =>'control',
                 transprefix   =>'KS.',
                 htmleditwidth =>'250px',
                 searchable    =>0,
