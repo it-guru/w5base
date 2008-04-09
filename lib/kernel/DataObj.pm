@@ -1598,6 +1598,37 @@ sub DetailX
 
 }
 
+sub getRecordHtmlIndex
+{
+   my $self=shift;
+   my $rec=shift;
+   my $id=shift;
+   my $grouplist=shift;
+   my $grouplabel=shift;
+   my @indexlist;
+   return() if (!defined($rec));
+
+   foreach my $group (@$grouplist){
+      if ($group ne "header"){
+        push(@indexlist,
+             $self->makeHtmlIndexRecord($id,$group,$grouplabel->{$group}));
+      }
+   }
+   return(@indexlist);
+}
+
+sub makeHtmlIndexRecord
+{
+   my $self=shift;
+   my $id=shift;
+   my $group=shift;
+   my $label=shift;
+   return({label=>$label,
+           href=>"#$id.$group",
+           group=>"$group",
+          });
+}
+
 sub getRecordImageUrl
 {
    my $self=shift;

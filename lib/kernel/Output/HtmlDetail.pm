@@ -184,6 +184,7 @@ sub ProcessLine
       @detaillist=$app->getSkinFile("$module/tmpl/$appname.detail")
    }
    my %template=();
+   my %grouplabel;
    if ($#detaillist!=-1){
       for(my $c=0;$c<=$#detaillist;$c++){
          my $template=$detaillist[$c];
@@ -235,6 +236,7 @@ sub ProcessLine
       #           "setEnterSubmit(document.forms[0],DetailEditSave);";
       }
       $template{"header"}=<<EOF;
+<a name="index"></a>
 <div style="height:4px;border-width:0;overflow:hidden">&nbsp;</div>
 <div class=detailtopline>
    <table width=100% cellspacing=0 cellpadding=0>
@@ -264,7 +266,6 @@ $sfocus
 </script>
 EOF
       my @grouplist;
-      my %grouplabel;
       my @fieldlist=@$recordview;
       my @uivisibleof=();
 
@@ -281,6 +282,7 @@ EOF
          my $grouplabel=$fieldlist[$c]->grouplabel($rec);
          $grouplabel{$fieldlist[$c]->{group}}=1 if ($grouplabel);
       }
+ 
       foreach my $group (@grouplist){
          my $subfunctions="topedit,editend";
          my $subblock="";
@@ -293,7 +295,8 @@ EOF
                my $valign=$fieldlist[$c]->valign();
                $valign=" valign=$valign";
                $valign=" valign=top" if ($fieldlist[$c]->can("EditProcessor"));
-               if (!($fieldlist[$c]->can("EditProcessor"))){ $subfunctions="edit,cancel,save";
+               if (!($fieldlist[$c]->can("EditProcessor"))){ 
+                  $subfunctions="edit,cancel,save";
                }
                my $fieldspec="";
                my $fieldspecfunc="";
@@ -409,6 +412,7 @@ EOF
  </div>
  $groupspec
 EOF
+            $grouplabel{$group}=$grouplabel;
          }
          $template{$group}.=<<EOF;
  <table class=detailframe border=1>$subblock
@@ -417,10 +421,51 @@ EOF
 EOF
       }
    }
+
+
    my $c=0;
    my @blocks=$self->getParent->getParent->sortDetailBlocks([keys(%template)],
                                                             current=>$rec,
                                                             mode=>'HtmlDetail');
+   my @indexdata=$app->getRecordHtmlIndex($rec,$id,\@blocks,\%grouplabel);
+   if ($#indexdata!=-1){
+      my @set;
+      my $setno=0;
+      for(my $c=0;$c<=$#indexdata;$c++){
+         $setno++ if ($setno==0 && $c>($#indexdata/2));
+         if (defined($indexdata[$c])){
+            $set[$setno].="<li><a class=HtmlDetailIndex ".
+                          "href=\"$indexdata[$c]->{href}\">".
+                          "$indexdata[$c]->{label}</a></li>";
+         }
+      }
+      $template{"header"}.=<<EOF;
+<center><div class=HtmlDetailIndex style="text-align:center;width:95%">
+<hr>
+<table style="table-layout:fixed;width:98%" border=0 cellspacing=0 cellpadding=0>
+<tr>
+<td width=50% valign=top>
+<table style="table-layout:fixed;width:100%" 
+       cellspacing=0 cellpadding=0 border=0><tr><td>
+<ul>$set[0]</ul>
+</td></tr></table>
+</td>
+<td width=50% valign=top>
+<table style="table-layout:fixed;width:100%" 
+       cellspacing=0 cellpadding=0 border=0><tr><td>
+<ul>$set[1]</ul>
+</td></tr></table>
+</td>
+</tr>
+</table>
+
+<hr>
+</div></center>
+EOF
+   }
+     
+
+
    $self->{WindowMode}="HtmlDetailEdit" if ($currentfieldgroup ne "");
    foreach my $template (@blocks){
       my $dtemp=$template{$template};
@@ -548,11 +593,16 @@ sub MkFunc
 
 sub DetailFunctions
 {
+   my $back="&nbsp;";
    if ($#_!=-1){
-      return("<div class=detailfunctions>&bull; ".join(" &bull; ",@_).
-             " &bull;</div>");
+      $back="&bull; ".join(" &bull; ",@_)." &bull;";
    }
-   return("&nbsp;");
+   $back="<div class=detailfunctions>".
+         "<span style=\"\">".
+         "<a class=HtmlDetailIndex style=\"cursor:n-resize\" href=\"#index\">".
+         "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</a></span>".
+         $back."</div>";
+   return($back);
 }
 
 

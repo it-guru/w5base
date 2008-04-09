@@ -627,7 +627,8 @@ EOF
    }
    my $BookmarkName=Query->Param("BookmarkName");
    print(<<EOF);
-<tr><td><iframe class=result name="Result" src="$welcomeurl"></iframe></td></tr>
+<tr><td><iframe class=result id=result 
+                name="Result" src="$welcomeurl"></iframe></td></tr>
 </table>
 <input type=hidden name=UseLimit value="10">
 <input type=hidden name=UseLimitStart value="0">
