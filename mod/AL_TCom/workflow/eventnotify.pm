@@ -234,9 +234,9 @@ sub generateMailSet
       push(@baseset,"wffields.affectedcustomer");
       push(@baseset,"wffields.eventstatreason");
    }
+   # wffields.eventreason entfernt request ID:12077277280002
    my @sets=([@baseset,qw(
                           wffields.eventimpact
-                          wffields.eventreason 
                           wffields.shorteventelimination
                          )],
              [@baseset,qw(
