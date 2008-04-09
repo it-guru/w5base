@@ -232,11 +232,13 @@ sub generateMailSet
    if ($WfRec->{eventmode} eq "EVk.appl"){
       push(@baseset,"affectedapplication");
       push(@baseset,"wffields.affectedcustomer");
-      push(@baseset,"wffields.eventstatreason");
+      # wffields.eventstatreason entfernt lt. Request ID:12077277280002  
+      #push(@baseset,"wffields.eventstatreason");
    }
-   # wffields.eventreason entfernt request ID:12077277280002
+
    my @sets=([@baseset,qw(
                           wffields.eventimpact
+                          wffields.eventreason
                           wffields.shorteventelimination
                          )],
              [@baseset,qw(
@@ -253,6 +255,7 @@ sub generateMailSet
    my $mailsep=0;
    $mailsep="$lang:" if ($#emailsep!=-1); 
    $ENV{HTTP_FORCE_LANGUAGE}=$lang;
+printf STDERR ("fifi %s \n\n\n\n",Dumper(\@baseset));
 
    my @fields=@{shift(@sets)};
    foreach my $field (@fields){
