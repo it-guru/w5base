@@ -362,8 +362,6 @@ sub isParentWriteable
 }
 
 
-
-
 sub isViewValid
 {
    my $self=shift;
@@ -384,6 +382,11 @@ sub isWriteValid
 
    return("default");
 }
+
+sub getRecordHtmlIndex
+{ return(); }
+
+
 
 
 1;

@@ -66,6 +66,34 @@ sub new
                 dsttypfield   =>'target',
                 dstidfield    =>'targetid'),
 
+      new kernel::Field::DynWebIcon(
+                name          =>'targetweblink',
+                searchable    =>0,
+                depend        =>['target','targetid'],
+                htmlwidth     =>'5px',
+                htmldetail    =>0,
+                weblink       =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+
+                   my $targeto=$self->getParent->getField("target");
+                   my $target=$targeto->RawValue($current);
+
+                   my $targetido=$self->getParent->getField("targetid");
+                   my $targetid=$targetido->RawValue($current);
+                   my $img="<img ";
+                   $img.="src=\"../../base/load/directlink.gif\" ";
+                   $img.="title=\"\">";
+                   
+
+                   if ($mode=~m/html/i){
+                      return($img);
+                   }
+                   return("-only a web useable link-");
+                }),
+
+
       new kernel::Field::Date(
                 name          =>'expiration',
                 label         =>'Expiration-Date',
@@ -175,6 +203,11 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/base/load/lnkcontact.jpg?".$cgi->query_string());
 }
+
+sub getRecordHtmlIndex
+{ return(); }
+
+
 
 sub Initialize
 {

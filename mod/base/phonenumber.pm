@@ -262,15 +262,7 @@ sub getRecordImageUrl
 }
 
 sub getRecordHtmlIndex
-{
-   my $self=shift;
-   my $rec=shift;
-   my $id=shift;
-   my $grouplist=shift;
-   my $grouplabel=shift;
-   my @indexlist;
-   return();
-}
+{ return(); }
 
 
 

@@ -344,16 +344,16 @@ sub isWriteValid
 }
 
 
-sub schain
-{
-   my $self=shift;
-   my $page="schain";
-
-   my $idname=$self->IdField->Name();
-   $page.=$self->HtmlPersistentVariables($idname);
-
-   return($page);
-}
+#sub schain
+#{
+#   my $self=shift;
+#   my $page="schain";
+#
+#   my $idname=$self->IdField->Name();
+#   $page.=$self->HtmlPersistentVariables($idname);
+#
+#   return($page);
+#}
 
 sub getValidWebFunctions
 {
@@ -361,12 +361,12 @@ sub getValidWebFunctions
    return(qw(schain ImportAppl),$self->SUPER::getValidWebFunctions());
 }
 
-sub getHtmlDetailPages
-{
-   my $self=shift;
-   my ($p,$rec)=@_;
-   return($self->SUPER::getHtmlDetailPages($p,$rec),"schain"=>"Servicekette");
-}
+#sub getHtmlDetailPages
+#{
+#   my $self=shift;
+#   my ($p,$rec)=@_;
+#   return($self->SUPER::getHtmlDetailPages($p,$rec),"schain"=>"Servicekette");
+#}
 
 #sub getDefaultHtmlDetailPage
 #{
@@ -380,13 +380,13 @@ sub getHtmlDetailPages
 #   return("schain");
 #}
 
-sub getHtmlDetailPageContent
-{
-   my $self=shift;
-   my ($p,$rec)=@_;
-   return($self->schain($p,$rec)) if ($p eq "schain");
-   return($self->SUPER::getHtmlDetailPageContent($p,$rec));
-}
+#sub getHtmlDetailPageContent
+#{
+#   my $self=shift;
+#   my ($p,$rec)=@_;
+#   return($self->schain($p,$rec)) if ($p eq "schain");
+#   return($self->SUPER::getHtmlDetailPageContent($p,$rec));
+#}
 
 
 sub ImportAppl
