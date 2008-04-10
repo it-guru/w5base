@@ -22,4 +22,4 @@
               en=>'(<-<) uncritical informations are received'},
 'invalid from application'=>{de=>'unkgültige Anwendung bei "von"'},
 'invalid to application'=>{de=>'unkgültige Anwendung bei "nach"'},
-
+'selected application is currently unuseable'=>{de=>'die ausgewählte Anwendung kann aktuell nicht verwendet werden'},

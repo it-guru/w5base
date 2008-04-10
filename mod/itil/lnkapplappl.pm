@@ -221,6 +221,17 @@ sub Validate
       $self->LastMsg(ERROR,"invalid to application");
       return(0);
    }
+   if (exists($newrec->{toapplid}) && 
+       (!defined($oldrec) || $oldrec->{toapplid}!=$toapplid)){
+      my $applobj=getModuleObject($self->Config,"itil::appl");
+      $applobj->SetFilter({id=>\$newrec->{toapplid}});
+      my ($applrec,$msg)=$applobj->getOnlyFirst(qw(cistatusid));
+      if (!defined($applrec) || 
+          $applrec->{cistatusid}>4 || $applrec->{cistatusid}==0){
+         $self->LastMsg(ERROR,"selected application is currently unuseable");
+         return(0);
+      }
+   }
 
    my $applid=effVal($oldrec,$newrec,"fromapplid");
 
