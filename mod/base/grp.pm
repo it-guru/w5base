@@ -85,6 +85,15 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'grp.comments'),
 
+      new kernel::Field::PhoneLnk(
+                name          =>'phonenumbers',
+                searchable    =>0,
+                label         =>'Phonenumbers',
+                group         =>'phonenumbers',
+                vjoinon       =>['grpid'=>'refid'],
+                vjoinbase     =>[{'parentobj'=>\'base::grp'}],
+                subeditmsk    =>'subedit'),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
@@ -164,6 +173,7 @@ sub new
                 vjoindisp     =>['user','roles'],
                 vjoininhash   =>['userid','email','user','roles']),
    );
+   $self->{PhoneLnkUsage}=\&PhoneUsage;
    $self->{CI_Handling}={uniquename=>"fullname",
                          activator=>["admin","admin.base.grp"],
                          uniquesize=>255};
@@ -174,6 +184,20 @@ sub new
                        "wfkey write, wfaction write";
    return($self);
 }
+
+sub PhoneUsage
+{
+   my $self=shift;
+   my $current=shift;
+   my @codes=qw(phoneMISC);
+   my @l;
+   foreach my $code (@codes){
+      push(@l,$code,$self->T($code));
+   }
+   return(@l);
+
+}
+
 
 sub getValidWebFunctions
 {
@@ -264,11 +288,11 @@ sub isWriteValid
 
    return(qw(default)) if (!defined($rec) && $self->IsMemberOf("admin"));
    return(undef) if ($rec->{grpid}<=0);
-   return(qw(default users)) if ($self->IsMemberOf("admin"));
+   return(qw(default users phonenumbers)) if ($self->IsMemberOf("admin"));
    if (defined($rec)){
       my $grpid=$rec->{grpid};
       if ($self->IsMemberOf([$grpid],"RAdmin","down")){
-         return(qw(users));
+         return(qw(users phonenumbers));
       }
    }
    return(undef);
@@ -314,7 +338,7 @@ sub FinishDelete
 sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
-   return(qw(header default users subunits));
+   return(qw(header default users subunits phonenumbers));
 }
 
 

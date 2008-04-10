@@ -261,6 +261,18 @@ sub getRecordImageUrl
    return("../../../public/base/load/phonenumber.jpg?".$cgi->query_string());
 }
 
+sub getRecordHtmlIndex
+{
+   my $self=shift;
+   my $rec=shift;
+   my $id=shift;
+   my $grouplist=shift;
+   my $grouplabel=shift;
+   my @indexlist;
+   return();
+}
+
+
 
 
 
