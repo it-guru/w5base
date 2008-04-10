@@ -226,7 +226,7 @@ sub isViewValid
    return("ALL") if ($rec->{creator}==$userid);
    return(undef) if ($param{resultname} eq "HistoryResult" &&
                      $rec->{privatestate}>=1);
-   return("default","actiondata","source");
+   return("header","default","actiondata","source");
    # eine Analyse der Action wäre zu aufwendig
 #   if (defined($rec) && $rec->{wfheadid}>0){
 #      my $wf=$self->getPersistentModuleObject("wf","base::workflow");
