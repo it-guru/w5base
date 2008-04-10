@@ -84,7 +84,7 @@ sub new
                 vjointo       =>'itil::lnkapplsystem',
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
                 vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>['appl','applcistatus'],
+                vjoindisp     =>['appl','applweblink','applcistatus'],
                 vjoininhash   =>['appl','applcistatusid','mandatorid',
                                  'applid']),
 

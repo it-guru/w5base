@@ -312,6 +312,69 @@ sub new
                 name          =>'mandatorid',
                 label         =>'MandatorID',
                 dataobjattr   =>'appl.mandator'),
+
+      new kernel::Field::DynWebIcon(
+                name          =>'applweblink',
+                searchable    =>0,
+                depend        =>['applid'],
+                htmlwidth     =>'5px',
+                htmldetail    =>0,
+                weblink       =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+                   my $app=$self->getParent;
+
+                   my $applido=$self->getParent->getField("applid");
+                   my $applid=$applido->RawValue($current);
+
+                   my $img="<img ";
+                   $img.="src=\"../../base/load/directlink.gif\" ";
+                   $img.="title=\"\" border=0>";
+                   my $dest="../../itil/appl/Detail?id=$applid";
+                   my $detailx=$app->DetailX();
+                   my $detaily=$app->DetailY();
+                   my $onclick="openwin(\"$dest\",\"_blank\",".
+                       "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
+                       "resizable=yes,scrollbars=no\")";
+
+                   if ($mode=~m/html/i){
+                      return("<a href=javascript:$onclick>$img</a>");
+                   }
+                   return("-only a web useable link-");
+                }),
+
+      new kernel::Field::DynWebIcon(
+                name          =>'systemweblink',
+                searchable    =>0,
+                depend        =>['systemid'],
+                htmlwidth     =>'5px',
+                htmldetail    =>0,
+                weblink       =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+                   my $app=$self->getParent;
+
+                   my $systemido=$self->getParent->getField("systemid");
+                   my $systemid=$systemido->RawValue($current);
+
+                   my $img="<img ";
+                   $img.="src=\"../../base/load/directlink.gif\" ";
+                   $img.="title=\"\" border=0>";
+                   my $dest="../../itil/system/Detail?id=$systemid";
+                   my $detailx=$app->DetailX();
+                   my $detaily=$app->DetailY();
+                   my $onclick="openwin(\"$dest\",\"_blank\",".
+                       "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
+                       "resizable=yes,scrollbars=no\")";
+
+                   if ($mode=~m/html/i){
+                      return("<a href=javascript:$onclick>$img</a>");
+                   }
+                   return("-only a web useable link-");
+                }),
+
    );
    $self->setDefaultView(qw(appl system systemsystemid fraction cdate));
    $self->setWorktable("lnkapplsystem");
