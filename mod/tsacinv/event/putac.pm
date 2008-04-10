@@ -197,7 +197,7 @@ sub ApplicationModified
                   }
                }
                my %posix=();
-               foreach my $userent (qw(tsm tsm2 sem)){
+               foreach my $userent (qw(tsm tsm2 sem databoss)){
                   if ($rec->{$userent} ne ""){
                      $user->SetFilter({fullname=>\$rec->{$userent}});
                      $user->SetCurrentView("posix");
@@ -225,6 +225,7 @@ sub ApplicationModified
                else{
                   $assignment="CSS.TCOM";
                }
+               my $issoxappl=$rec->{issoxappl};
                $CurrentAppl="$rec->{name}($rec->{id})";
                $CurrentEventId="Add Application $CurrentAppl";
                $ApplU=10 if ($rec->{isnosysappl} && $SysCount==0);
@@ -243,7 +244,9 @@ sub ApplicationModified
                                    Remarks=>$rec->{comments},
                                    MaintWindow=>$rec->{maintwindow},
                                    Version=>$rec->{currentvers},
+                                   SoxRelevant=>$issoxappl,
                                    Technical_Contact=>$posix{tsm},
+                                   DataSupervisor=>$posix{databoss},
                                    Service_Manager=>$posix{sem},
                                    Deputy_Technical_Contact=>$posix{tsm2},
                                    bDelete=>'0',
