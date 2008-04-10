@@ -332,7 +332,7 @@ sub new
                 vjointo       =>'itil::lnkapplcustcontract',
                 vjoinon       =>['id'=>'applid'],
                 vjoindisp     =>['custcontract','fraction'],
-                vjoinbase     =>[{custcontractcistatusid=>'<=4'}],
+                vjoinbase     =>[{custcontractcistatusid=>'<=5'}],
                 vjoininhash   =>['custcontractid','custcontractcistatusid',
                                  'custcontract','custcontractname']),
 
@@ -342,7 +342,7 @@ sub new
                 group         =>'interfaces',
                 subeditmsk    =>'subedit.appl',
                 vjointo       =>'itil::lnkapplappl',
-                vjoinbase     =>[{toapplcistatus=>"<=4"}],
+                vjoinbase     =>[{toapplcistatus=>"<=5"}],
                 vjoinon       =>['id'=>'fromapplid'],
                 vjoindisp     =>['toappl','contype','conproto','conmode'],
                 vjoininhash   =>['toappl','contype','conproto','conmode',
