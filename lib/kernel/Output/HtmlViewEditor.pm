@@ -58,7 +58,7 @@ sub getHttpHeader
    $d.="<script language=JavaScript ".
        "src=\"../../../public/base/load/toolbox.js\"></script>\n";
 
-   $d.="<body>";
+   $d.="<body onload=\"ResizeObj()\" onresize=\"ResizeObj()\">";
    return($d);
 }
 
@@ -174,6 +174,18 @@ sub ProcessLine
    $self->ProcessOp($op) if ($op ne "");
    my $d=<<EOF;
 <script language="JavaScript">
+
+function ResizeObj(obj)
+{
+   h=getViewportHeight();
+   w=getViewportWidth();
+   document.getElementById('ViewEditor').style.height=h-60;
+   document.getElementById('ViewEditorMain').style.height=h-60;
+   document.getElementById('FullFieldTree').style.height=h-170;
+   document.getElementById('NewCurrentView').style.height=h-170;
+   document.getElementById('NewCurrentView').style.width=w-(w/2)-30;
+}
+
 function DoAdd()
 {
    document.forms[0].elements['OP'].value="add";
@@ -274,8 +286,8 @@ addEvent(window,"load",convertTrees);
 
 </script>
 EOF
-   $d.="<div id=ViewEditor class=ViewEditor><div class=ViewEditorMain>";
-   $d.="<table height=50% width=100% border=0 cellpadding=5>";
+   $d.="<div id=ViewEditor class=ViewEditor ><div id=ViewEditorMain class=ViewEditorMain>";
+   $d.="<table height=100% width=100% border=0 cellpadding=5>";
    $d.="<tr><td valign=top>";
    $d.="<table border=0 cellspacing=0 cellpadding=0 width=100% height=100%>".
        "<tr height=1%>";
@@ -333,7 +345,7 @@ sub getViewFieldSelect
    my $app=$self->getParent->getParent();
    my $d="<select size=5 id=NewCurrentView class=ViewFieldSelect multiple ".
          " onDblClick=\" RowsDel(this.options.selectedIndex);  \" ".
-         " name=ViewFieldList style=\"width:100%;height:100%\">";
+         " name=ViewFieldList >";
    my @showfieldlist=();
    my @oldval=Query->Param("ViewFieldList");
    my $op=Query->Param("OP");
@@ -445,11 +457,6 @@ sub getHttpFooter
    $d.=<<EOF;
 <script language="JavaScript">
 RefreshViewDropDown('tree_route');
-function ResizeViewEditor()
-{
-//   document.getElementById("ViewEditor").style.height="44px"; 
-}
-ResizeViewEditor();
 addEvent(window,"resize",ResizeViewEditor);
 
 </script>
