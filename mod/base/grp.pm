@@ -170,7 +170,7 @@ sub new
                 group         =>'users',
                 vjointo       =>'base::lnkgrpuser',
                 vjoinon       =>['grpid'=>'grpid'],
-                vjoindisp     =>['user','roles'],
+                vjoindisp     =>['user','userweblink','roles'],
                 vjoininhash   =>['userid','email','user','roles']),
    );
    $self->{PhoneLnkUsage}=\&PhoneUsage;

@@ -281,6 +281,38 @@ sub new
                 name          =>'userid',
                 label         =>'UserId',
                 dataobjattr   =>'lnkgrpuser.userid'),
+
+      new kernel::Field::DynWebIcon(
+                name          =>'userweblink',
+                searchable    =>0,
+                depend        =>['userid'],
+                htmlwidth     =>'5px',
+                htmldetail    =>0,
+                weblink       =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+                   my $app=$self->getParent;
+
+                   my $userido=$self->getParent->getField("userid");
+                   my $userid=$userido->RawValue($current);
+
+                   my $img="<img ";
+                   $img.="src=\"../../base/load/directlink.gif\" ";
+                   $img.="title=\"\" border=0>";
+                   my $dest="../../base/user/Detail?id=$userid";
+                   my $detailx=$app->DetailX();
+                   my $detaily=$app->DetailY();
+                   my $onclick="openwin(\"$dest\",\"_blank\",".
+                       "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
+                       "resizable=yes,scrollbars=no\")";
+
+                   if ($mode=~m/html/i){
+                      return("<a href=javascript:$onclick>$img</a>");
+                   }
+                   return("-only a web useable link-");
+                }),
+
    );
    $self->setDefaultView(qw(lnkgrpuserid user group editor));
    return($self);
@@ -493,6 +525,10 @@ EOF
    }
    return(0);
 }
+
+sub getRecordHtmlIndex
+{ return(); }
+
 
 
 
