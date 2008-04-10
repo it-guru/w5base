@@ -76,6 +76,7 @@ sub new
                    my $self=shift;
                    my $current=shift;
                    my $mode=shift;
+                   my $app=$self->getParent;
 
                    my $targeto=$self->getParent->getField("target");
                    my $target=$targeto->RawValue($current);
@@ -84,11 +85,22 @@ sub new
                    my $targetid=$targetido->RawValue($current);
                    my $img="<img ";
                    $img.="src=\"../../base/load/directlink.gif\" ";
-                   $img.="title=\"\">";
-                   
+                   $img.="title=\"\" border=0>";
+                   my $dest;
+                   if ($target eq "base::user"){
+                      $dest="../../base/user/Detail?userid=$targetid";
+                   }
+                   if ($target eq "base::grp"){
+                      $dest="../../base/grp/Detail?grpid=$targetid";
+                   }
+                   my $detailx=$app->DetailX();
+                   my $detaily=$app->DetailY();
+                   my $onclick="openwin(\"$dest\",\"_blank\",".
+                       "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
+                       "resizable=yes,scrollbars=no\")";
 
                    if ($mode=~m/html/i){
-                      return($img);
+                      return("<a href=javascript:$onclick>$img</a>");
                    }
                    return("-only a web useable link-");
                 }),
