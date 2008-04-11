@@ -278,6 +278,11 @@ sub new
                 noselect      =>'1',
                 dataobjattr   =>'lnkcontact.croles'),
 
+      new kernel::Field::QualityText(),
+      new kernel::Field::QualityState(),
+      new kernel::Field::QualityOk(),
+      new kernel::Field::QualityLastDate(
+                dataobjattr   =>'custcontract.lastqcheck'),
    );
    $self->{use_distinct}=1;
    $self->{history}=[qw(modify delete)];
@@ -354,7 +359,9 @@ sub Validate
       $self->LastMsg(ERROR,"invalid contract number '%s' specified",$name);
       return(0);
    }
-   $newrec->{name}=$name;
+   if (exists($newrec->{name}) && $newrec->{name} ne $name){
+      $newrec->{name}=$name;
+   }
    ########################################################################
    # standard security handling
    #

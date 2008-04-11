@@ -393,6 +393,12 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'user.comments'),
 
+      new kernel::Field::QualityText(),
+      new kernel::Field::QualityState(),
+      new kernel::Field::QualityOk(),
+      new kernel::Field::QualityLastDate(
+                dataobjattr   =>'user.lastqcheck'),
+
    );
    $self->{CI_Handling}={uniquename=>"fullname",
                          uniquesize=>255};

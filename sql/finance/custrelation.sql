@@ -35,3 +35,4 @@ create table custcontract (
   UNIQUE KEY `srcsys` (srcsys,srcid)
 );
 alter table custcontract add conumber varchar(20) default NULL;
+alter table custcontract add lastqcheck datetime default NULL,add key(lastqcheck);
