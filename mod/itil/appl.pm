@@ -789,7 +789,9 @@ sub Validate
            sprintf($self->T("invalid application name '%s' specified"),$name));
       return(0);
    }
-   $newrec->{name}=$name;
+   if (exists($newrec->{name}) && $newrec->{name} ne $name){
+      $newrec->{name}=$name;
+   }
 
    if (defined($newrec->{slacontravail})){
       if ($newrec->{slacontravail}>100 || $newrec->{slacontravail}<0){
