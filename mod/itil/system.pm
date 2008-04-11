@@ -684,6 +684,12 @@ sub new
                 noselect      =>'1',
                 dataobjattr   =>'lnkcontact.croles'),
 
+      new kernel::Field::QualityText(),
+      new kernel::Field::QualityState(),
+      new kernel::Field::QualityOk(),
+      new kernel::Field::QualityLastDate(
+                dataobjattr   =>'system.lastqcheck'),
+
    );
    $self->{workflowlink}={ workflowkey=>[id=>'affectedsystemid']
                          };
@@ -795,9 +801,14 @@ sub Validate
       $self->LastMsg(ERROR,"invalid system name '%s' specified",$name);
       return(0);
    }
-   $newrec->{name}=lc($name);
-   $newrec->{systemid}=trim(effVal($oldrec,$newrec,"systemid"));
-   $newrec->{systemid}=undef if ($newrec->{systemid} eq "");
+   $newrec->{name}=lc($name) if (exists($newrec->{name}) &&
+                                 $newrec->{name} ne lc($name));
+   my $systemid=trim(effVal($oldrec,$newrec,"systemid"));
+   if (exists($newrec->{systemid}) && $newrec->{systemid} ne $systemid){
+      $newrec->{systemid}=$systemid;
+   }
+   $newrec->{systemid}=undef if (exists($newrec->{systemid}) &&
+                                 $newrec->{systemid} eq "");
    if (defined($newrec->{asset}) && $newrec->{asset} eq ""){
       $newrec->{asset}=undef;
    }

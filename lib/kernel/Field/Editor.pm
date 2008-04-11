@@ -59,7 +59,7 @@ sub Validate
    my $editor=$newrec->{$self->Name()};
    if ($editor eq ""){
       if ($W5V2::OperationContext eq "QualityCheck"){
-         $editor="service/QualityCheck";
+         return({});
       }
    }
    $editor=$ENV{REMOTE_USER}    if ($editor eq "");

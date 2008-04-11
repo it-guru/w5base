@@ -89,13 +89,19 @@ sub doQualityCheck
    msg(INFO,"doQualityCheck in Object $dataobj");
    $dataobj->ResetFilter();
    my @flt;
-   my @view=("qcok");
+   my @view=("id","qcok");
    if (my $cistatusid=$dataobj->getField("cistatusid")){
       $flt[0]->{cistatusid}=[3,4,5];
    }
    if (my $lastqcheck=$dataobj->getField("lastqcheck")){
       unshift(@view,"lastqcheck");
    }
+   my $idfieldobj=$dataobj->IdField();
+   if (defined($idfieldobj)){
+      unshift(@view,$idfieldobj->Name());
+   }
+   #@view=("ALL");
+
    $dataobj->SetFilter(\@flt);
    $dataobj->SetCurrentView(@view);
 
@@ -103,7 +109,14 @@ sub doQualityCheck
    my $time=time();
    if (defined($rec)){
       do{
-         msg(DEBUG,"qcok=$rec->{qcok}");
+         my $qcokobj=$dataobj->getField("qcok");
+         if (defined($qcokobj)){
+            my $qcok=$qcokobj->RawValue($rec); 
+            msg(DEBUG,"qcok=$rec->{qcok}");
+         }
+         else{
+            msg(DEBUG,"no qcok field");
+         }
          ($rec,$msg)=$dataobj->getNext();
          last if (time()-$time>10000);
       }until(!defined($rec));
