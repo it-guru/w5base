@@ -338,7 +338,7 @@ sub FinishDelete
 sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
-   return(qw(header default users subunits phonenumbers));
+   return(qw(header default users phonenumbers subunits));
 }
 
 

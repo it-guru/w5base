@@ -45,6 +45,7 @@ sub LoadBCBS
    my $self=shift;
    my $loadstart=$self->getParent->ExpandTimeExpression("now","en","GMT");
    my $srcsys="AC_BCBS";
+   my $app=$self->getParent();
 
    msg(INFO,"loading data for BCBS from AssetCenter to W5Base");
    msg(INFO,"loadstart = $loadstart");
@@ -57,23 +58,36 @@ sub LoadBCBS
    my $mandatorid=$manrec->{grpid};
 
    my $grp=getModuleObject($self->Config,"base::grp");
-   my $customerid=$grp->TreeCreate("DTAG.TSI.ACTIVEBILLING");
+   my $customerid=$grp->TreeCreate("DTAG.ACTIVEBILLING");
    my $businessteam=$grp->TreeCreate("DTAG.TSI.ES.ITO.CSS.T-Com.BILLING");
 
 
 
    my $lnkaccountno=getModuleObject($self->Config,"itil::lnkaccountingno");
+   my $lnkappl=getModuleObject($self->Config,"itil::lnkapplsystem");
+   my $location=getModuleObject($self->Config,"base::location");
    my $aappl=getModuleObject($self->Config,"tsacinv::appl");
+   my $asystem=getModuleObject($self->Config,"tsacinv::system");
+   my $aasset=getModuleObject($self->Config,"tsacinv::asset");
+   my $alocation=getModuleObject($self->Config,"tsacinv::location");
    my $appl=getModuleObject($self->Config,"AL_TCom::appl");
+   my $sys=getModuleObject($self->Config,"AL_TCom::system");
+   my $asset=getModuleObject($self->Config,"AL_TCom::asset");
    $aappl->SetFilter({assignmentgroup=>\'BPO.BCBS',
                       status=>['IN OPERATION']});
    $aappl->SetCurrentView(qw(ALL));
+   my $agcount=0;
    if (my ($rec,$msg)=$aappl->getFirst()){
-      do{
+       agloop: while(defined($rec)){
+         my %systemid;
+         my %assetid;
          last if (!defined($rec));
          my $semw5baseid=$wiw->GetW5BaseUserID($rec->{sememail});
          my $tsmw5baseid=$wiw->GetW5BaseUserID($rec->{tsmemail});
          my $databossid=$semw5baseid;
+         if ($databossid eq ""){
+            $databossid=$semw5baseid;
+         }
          if ($databossid eq ""){
             my $acgroup=getModuleObject($self->getParent->Config,
                                         "tsacinv::group");
@@ -139,7 +153,7 @@ sub LoadBCBS
             msg(INFO,"now process realtions name=$rec->{name} id=$agid");
             my $accountno=$rec->{accountno};
             my @accountno=grep(!/^\s*$/,split(/\s*;\s*/,$accountno));
-           foreach my $accountno (@accountno){
+            foreach my $accountno (@accountno){
                my $newrec={name=>$accountno,
                            applid=>$agid,
                            srcsys=>$srcsys,
@@ -148,11 +162,135 @@ sub LoadBCBS
                $lnkaccountno->ValidatedInsertOrUpdateRecord($newrec,
                        {srcid=>\$newrec->{srcid},srcsys=>\$newrec->{srcsys}});
             }
+            foreach my $sysrec (@{$rec->{systems}}){
+               $systemid{$sysrec->{systemid}}->{$agid}->{$rec->{usage}}++;
+            }
          }
-     
+         #if ($agcount++>5){
+         #   last agloop;
+         #}
+         my $asys=getModuleObject($self->Config,"tsacinv::system");
+         $asys->SetFilter({systemid=>[keys(%systemid)]});
+         $asys->SetCurrentView(qw(systemid assetassetid));
+         if (my ($rec,$msg)=$asys->getFirst()){
+            assetloop: while(defined($rec)){
+               $assetid{$rec->{assetassetid}}->{$rec->{systemid}}++;
+               ($rec,$msg)=$asys->getNext();
+               last if (!defined($rec));
+            }
+         }
+       
+         foreach my $assetid (keys(%assetid)){
+            $aasset->SetFilter({assetid=>[$assetid]});
+            my ($aassetrec,$msg)=$aasset->getOnlyFirst("ALL");
+
+            my $assetrec={name=>$assetid,cistatusid=>4,
+                          mandatorid=>$mandatorid,
+                          cpucount=>$aassetrec->{cpucount},
+                          memory=>$aassetrec->{memory},
+                          allowifupdate=>1,
+                          room=>$aassetrec->{room},
+                          serialno=>$aassetrec->{serialno},
+                          guardianid=>$databossid,
+                          comments=>'Initial load for BCBS '.
+                                    'while merge to AL T-Com',
+                          srcsys=>$srcsys,srcid=>$assetid};
+
+            if ($aassetrec->{locationid} ne ""){  # find a w5base location
+               $alocation->ResetFilter();
+               $alocation->SetFilter({locationid=>\$aassetrec->{locationid}});
+               my ($lrec,$msg)=$alocation->getOnlyFirst("ALL");
+               if ($lrec->{address1} ne ""){
+                  my $label="";
+                  my %newrec=(address1=>$lrec->{address1},
+                              label=>$label,
+                              zipcode=>$lrec->{zip},
+                              country=>$lrec->{country},
+                              location=>$lrec->{location},
+                              refcode2=>"AC-".$lrec->{locationid},
+                              cistatusid=>4,
+                              srcload=>$loadstart,
+                              owner=>0,
+                              creator=>0,
+                              mdate=>scalar($app->ExpandTimeExpression(
+                                            $lrec->{mdate},"en","GMT")),
+                              cdate=>scalar($app->ExpandTimeExpression(
+                                            $lrec->{mdate},"en","GMT")),
+                              srcsys=>"AC",
+                            );
+                           #  srcid=>$rec->{locationid},
+                  $newrec{country}="DE" if ($newrec{country} eq "");
+                  delete($newrec{zipcode}) if ($newrec{zipcode} eq "");
+                  delete($newrec{roomexpr}) if ($newrec{roomexpr} eq "");
+                  my $locid=$location->getLocationByHash(%newrec);
+                  print Dumper(\%newrec);
+                  printf STDERR ("fifi locationid=$locid\n");
+                  #exit(0);
+                  $assetrec->{locationid}=$locid;
+               }
+            }
+
+            $asset->ResetFilter();
+            $asset->SetFilter({name=>\$assetrec->{name},
+                               srcsys=>"!$srcsys"});
+            my ($oldassetrec,$msg)=$asset->getOnlyFirst("id");
+            if (!defined($oldassetrec)){
+               $asset->ValidatedInsertOrUpdateRecord($assetrec,
+                                                     {name=>\$assetrec->{name}});
+            }
+         }
+         foreach my $systemid (keys(%systemid)){
+            $asystem->SetFilter({systemid=>[$systemid]});
+            my ($asystemrec,$msg)=$asystem->getOnlyFirst("ALL");
+            my $systemname=$asystemrec->{systemname};
+            $systemname=$systemid if ($systemname eq "");
+            $systemname=lc($systemname); 
+            printf STDERR ("==> systemname=$systemname systemid=$systemid\n");
+            my $systemrec={name=>$systemname,cistatusid=>4,
+                          mandatorid=>$mandatorid,
+                          systemid=>$systemid,
+                          allowifupdate=>1,
+                          cpucount=>$asystemrec->{cpucount},
+                          memory=>$asystemrec->{memory},
+                          comments=>'Initial load for BCBS '.
+                                    'while merge to AL T-Com',
+                          srcsys=>$srcsys,srcid=>$systemid};
+            if ($asystemrec->{assetassetid} ne ""){
+               $systemrec->{asset}=$asystemrec->{assetassetid};
+            }
+
+            $sys->ResetFilter();
+            $sys->SetFilter({systemid=>\$systemid,
+                             srcsys=>"!$srcsys"});
+            my ($oldsystemrec,$msg)=$sys->getOnlyFirst("id");
+            my $w5systemid;
+            if (!defined($oldsystemrec)){
+               ($w5systemid)=$sys->ValidatedInsertOrUpdateRecord($systemrec,
+                                         {systemid=>\$systemid});
+            }
+            else{
+               $w5systemid=$oldsystemrec->{id};
+            }
+            my $lnkrec={applid=>$agid,
+                        systemid=>$w5systemid
+                       };
+            $lnkappl->ValidatedInsertOrUpdateRecord($lnkrec,
+               {applid=>\$lnkrec->{applid},systemid=>\$lnkrec->{systemid}});
+            
+            
+         }
+         printf STDERR ("result=%s\n",Dumper(\%systemid));
+         printf STDERR ("result=%s\n",Dumper(\%assetid));
+         printf STDERR ("=============================================\n");
+         #sleep(1);
+
+
          ($rec,$msg)=$aappl->getNext();
-      } until(!defined($rec));
+         last if (!defined($rec));
+      }
+      
    }
+   
 
 
    return({exitcode=>0});

@@ -483,7 +483,10 @@ sub Validate
    }
    my $systemhandle=trim(effVal($oldrec,$newrec,"systemhandle"));
    $systemhandle=undef if ($systemhandle eq "");
-   $newrec->{systemhandle}=$systemhandle;
+   if (exists($newrec->{systemhandle}) && 
+       $newrec->{systemhandle} ne $systemhandle){
+      $newrec->{systemhandle}=$systemhandle;
+   }
 
    ########################################################################
    # standard security handling
