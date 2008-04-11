@@ -4,6 +4,7 @@
 'Fulltext'               =>{de=>'Volltext suche',en=>'Fulltext search'      },
 'Attachments'            =>{de=>'Dateianlagen'                              },
 'Further Functions'      =>{de=>'weiterführende Funktionen'                 },
+'Quality Check last date'=>{de=>'Zeitpunkt der letzten Qualitätsprüfung'    },
 'Comments'               =>{de=>'Bemerkungen'                               },
 'User-Account'           =>{de=>'Benutzerkennung'                           },
 'cancel'                 =>{de=>'abbrechen'                                 },
