@@ -19,6 +19,7 @@
 'fieldgroup.accountnumbers'=>{de=>'Account Nummern',en=>'Account numbers'},
 'Account numbers'=>{de=>'Account Nummern'},
 'Phonenumbers'=>{de=>'Rufnummernverzeichnis'},
+'oncall Phonenumbers'=>{de=>'Rufbereitschaftsnummern'},
 'Interfaces'=>{de=>'Schnittstellen'},
 'Customer Contracts'=>{de=>'Kundenverträge'},
 'Contacts'=>{de=>'Kontakte'},

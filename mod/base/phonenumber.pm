@@ -62,9 +62,15 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'name',
+                depend        =>['parentobj'],
                 label         =>'Name',
                 htmleditwidth =>'100%',
                 getPostibleValues=>\&getPostibleUsageValues,
+                dataobjattr   =>'phonenumber.name'),
+                                                 
+      new kernel::Field::Link(
+                name          =>'rawname',
+                label         =>'rawName',
                 dataobjattr   =>'phonenumber.name'),
                                                  
       new kernel::Field::Text(

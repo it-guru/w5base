@@ -169,9 +169,9 @@ sub getTimeRangeDrop
       }
       if ($blk eq "longhistory"){
          my @l=(
-                '<now AND >now-84d'=>
+                '>now-84d'=>
                 $app->T("future and last 12 weeks"), 
-                '<now AND >now-365'=>
+                '>now-365d'=>
                 $app->T("future and last 365 days"));
          while(defined(my $exp=shift(@l))){
             my $nam=shift(@l);

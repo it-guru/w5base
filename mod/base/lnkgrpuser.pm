@@ -300,7 +300,38 @@ sub new
                    my $img="<img ";
                    $img.="src=\"../../base/load/directlink.gif\" ";
                    $img.="title=\"\" border=0>";
-                   my $dest="../../base/user/Detail?id=$userid";
+                   my $dest="../../base/user/Detail?userid=$userid";
+                   my $detailx=$app->DetailX();
+                   my $detaily=$app->DetailY();
+                   my $onclick="openwin(\"$dest\",\"_blank\",".
+                       "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
+                       "resizable=yes,scrollbars=no\")";
+
+                   if ($mode=~m/html/i){
+                      return("<a href=javascript:$onclick>$img</a>");
+                   }
+                   return("-only a web useable link-");
+                }),
+
+      new kernel::Field::DynWebIcon(
+                name          =>'grpweblink',
+                searchable    =>0,
+                depend        =>['grpid'],
+                htmlwidth     =>'5px',
+                htmldetail    =>0,
+                weblink       =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+                   my $app=$self->getParent;
+
+                   my $grpido=$self->getParent->getField("grpid");
+                   my $grpid=$grpido->RawValue($current);
+
+                   my $img="<img ";
+                   $img.="src=\"../../base/load/directlink.gif\" ";
+                   $img.="title=\"\" border=0>";
+                   my $dest="../../base/grp/Detail?grpid=$grpid";
                    my $detailx=$app->DetailX();
                    my $detaily=$app->DetailY();
                    my $onclick="openwin(\"$dest\",\"_blank\",".

@@ -56,6 +56,19 @@ div.button{
    float:right;
 }
 
+textarea.multilinetext{
+   height:50px;
+   width:100%;
+   margin:0px;
+   padding:0px;
+   font-weight:300;
+   font-family:monospace,Courier New,Adobe Courier,Courier;
+   font-size:11px;
+   color:black;
+   background:#ffffff;
+}
+
+
 a.button:link    {
             font-family:Arial,Adobe Helvetica,Helvetica;
             text-decoration:none;

@@ -537,6 +537,20 @@ sub new
                 vjoinbase     =>[{'parentobj'=>\'itil::appl'}],
                 subeditmsk    =>'subedit'),
 
+      new kernel::Field::SubList(
+                name          =>'oncallphones',
+                searchable    =>0,
+                htmldetail    =>0,
+                uivisible     =>1,
+                readonly      =>1,
+                label         =>'oncall Phonenumbers',
+                group         =>'phonenumbers',
+                vjoinbase     =>[{'parentobj'=>\'itil::appl'}],
+                vjointo       =>'base::phonenumber',
+                vjoinon       =>['id'=>'refid'],
+                vjoinbase     =>{'rawname'=>'phoneRB'},
+                vjoindisp     =>['phonenumber','shortedcomments']),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',

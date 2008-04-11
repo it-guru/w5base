@@ -363,7 +363,7 @@ sub new
                 allowcleanup  =>1,
                 vjointo       =>'base::lnkgrpuser',
                 vjoinon       =>['userid'=>'userid'],
-                vjoindisp     =>['group','roles'],
+                vjoindisp     =>['group','grpweblink','roles'],
                 vjoininhash   =>['group','grpid','roles']),
 
       new kernel::Field::SubList(
