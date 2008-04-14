@@ -49,7 +49,9 @@ sub Validate
    my $newrec=shift;
    my $val=$newrec->{$self->Name()};
    $val=NowStamp("en") if (!defined($val));
-   return({}) if ($W5V2::OperationContext eq "QualityCheck");
+   if (defined($oldrec)){
+      return({}) if ($W5V2::OperationContext eq "QualityCheck");
+   }
    return({$self->Name()=>$val});
 }
 

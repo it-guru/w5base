@@ -57,9 +57,12 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
    my $editor=$newrec->{$self->Name()};
-   if ($editor eq ""){
-      if ($W5V2::OperationContext eq "QualityCheck"){
+   if ($W5V2::OperationContext eq "QualityCheck"){
+      if (defined($oldrec)){
          return({});
+      }
+      else{
+         return({$self->Name()=>"service/QualityCheck"});
       }
    }
    $editor=$ENV{REMOTE_USER}    if ($editor eq "");

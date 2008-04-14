@@ -211,7 +211,7 @@ sub qcheckRecord
    if (keys(%$forcedupd)){
       #printf STDERR ("fifi request a forceupd=%s\n",Dumper($forcedupd));
       if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,{id=>\$rec->{id}})){
-         push(@qmsg,"all desired fields has been updated");
+         push(@qmsg,"all desired fields has been updated:");
       }
       else{
          push(@qmsg,$self->getParent->LastMsg());

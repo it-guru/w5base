@@ -44,6 +44,7 @@ sub Validate
 
    if (!defined($oldrec)){
       if (!defined($newrec->{$name})){
+         return({}) if ($W5V2::OperationContext eq "QualityCheck");
          my $userid=$self->getDefaultValue();
          return({}) if (!defined($userid));
          return({$name=>$userid});
@@ -52,6 +53,8 @@ sub Validate
    }
    return({});
 }
+
+
 
 sub getDefaultValue
 {  

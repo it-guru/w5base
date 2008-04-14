@@ -374,7 +374,8 @@ sub Debug
 
 sub isDataInputFromUserFrontend
 {
-   if ($ENV{SCRIPT_URI} ne "" || $ENV{REMOTE_ADDR} ne ""){
+   if (($ENV{SCRIPT_URI} ne "" || $ENV{REMOTE_ADDR} ne "" ) &&
+       $W5V2::OperationContext ne "QualityCheck"){
       return(1);
    }
    return(0);
