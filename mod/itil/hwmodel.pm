@@ -41,7 +41,7 @@ sub new
                                                   
       new kernel::Field::Text(
                 name          =>'name',
-                htmlwidth     =>'120px',
+                htmlwidth     =>'180px',
                 label         =>'Name',
                 dataobjattr   =>'hwmodel.name'),
 

@@ -91,6 +91,10 @@ sub Init
                       "tsacinv::model",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("ac.krn.osrelease",
+                      "tsacinv::osrelease",
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("ac.krn.service",
                       "tsacinv::service",
                       defaultacl=>['valid_user']);

@@ -12,6 +12,7 @@
 'ac.krn.location'=>{de=>'Standort',en=>'Location'},
 'ac.krn.costcenter'=>{de=>'Kostenstelle',en=>'CostCenter'},
 'ac.krn.customer'=>{de=>'Kunden',en=>'Customer'},
+'ac.krn.osrelease'=>{de=>'Betriebssystem',en=>'Operationsystem'},
 'ac.group'=>{de=>'Gruppe',en=>'Group'},
 'ac.user'=>{de=>'Benutzer',en=>'User'},
 'ac.user.groups'=>{de=>'Gruppenzuorndung',en=>'Grouprelation'},
