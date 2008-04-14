@@ -58,7 +58,7 @@ sub new
                 htmleditwidth =>'200px',
                 transprefix   =>'target', 
                 default       =>'_blank',
-                value         =>[qw(_blank _self _top msel)],
+                value         =>[qw(_blank _self _top msel smallwin)],
                 dataobjattr   =>'userbookmark.target'),
 
       new kernel::Field::Textarea(

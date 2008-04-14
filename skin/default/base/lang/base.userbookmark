@@ -6,5 +6,6 @@
 'Target'=>{de=>'Fenster'},
 'target_self'=>{de=>'Arbeitsfenster',en=>'Work window'},
 'target_top'=>{de=>'Hauptfenster',en=>'Main window'},
+'targetsmallwin'=>{de=>'Minimal-Fenster',en=>'minimal window'},
 'target_blank'=>{de=>'neues Fenster',en=>'New window'},
 'targetmsel'=>{de=>'W5Base intern',en=>'W5Base internal'},
