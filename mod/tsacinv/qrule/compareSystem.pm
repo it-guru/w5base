@@ -86,12 +86,12 @@ sub qcheckRecord
                              mode=>'integer');
       }
       if ($rec->{allowifupdate}){
-printf STDERR ("ac=%s\n",Dumper($parrec->{ipaddresses}));
-printf STDERR ("w5=%s\n",Dumper($rec->{ipaddresses}));
+#printf STDERR ("ac=%s\n",Dumper($parrec->{ipaddresses}));
+#printf STDERR ("w5=%s\n",Dumper($rec->{ipaddresses}));
          my $net=getModuleObject($self->getParent->Config(),"itil::network");
          $net->SetCurrentView(qw(id name));
          my $netarea=$net->getHashIndexed("name");
-printf STDERR ("netarea=%s\n",Dumper($netarea));
+#printf STDERR ("netarea=%s\n",Dumper($netarea));
          my @opList;
          my $res=OpAnalyse(sub{  # comperator 
                               my $eq;

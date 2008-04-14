@@ -81,6 +81,7 @@ use Unicode::String qw(utf8 latin1 utf16);
              &Datafield2Hash &Hash2Datafield &CompressHash
              &unHtml &quoteHtml &quoteQueryString &Dumper &FancyLinks
              &getModuleObject &getConfigObject &generateToken
+             &isDataInputFromUserFrontend
              &msg &ERROR &WARN &DEBUG &INFO &OK &utf8 &latin1 &utf16);
 
 sub utf8{return(&Unicode::String::utf8);}
@@ -369,6 +370,14 @@ sub msg
 sub Debug
 {
    return($W5V2::Debug);
+}
+
+sub isDataInputFromUserFrontend
+{
+   if ($ENV{SCRIPT_URI} ne "" || $ENV{REMOTE_ADDR} ne ""){
+      return(1);
+   }
+   return(0);
 }
 
 

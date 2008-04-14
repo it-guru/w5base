@@ -45,10 +45,11 @@ sub getMandatoryModules
 sub getOptionalModules
 {
    my $self=shift;
-
+   # Digest/SHA1 for mysql server interface
 
    return qw(Spreadsheet::WriteExcel::Big 
              DTP 
+             Digest::SHA1
              pdflib_pl DTP::pdf Archive::Zip
              GD DTP::jpg DTP::png);
 }

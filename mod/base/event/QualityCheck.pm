@@ -98,7 +98,7 @@ sub doQualityCheck
    }
    my $idfieldobj=$dataobj->IdField();
    if (defined($idfieldobj)){
-      unshift(@view,$idfieldobj->Name());
+      push(@view,$idfieldobj->Name());
    }
    #@view=("ALL");
 
@@ -118,7 +118,7 @@ sub doQualityCheck
             msg(DEBUG,"no qcok field");
          }
          ($rec,$msg)=$dataobj->getNext();
-         last if (time()-$time>10000);
+         last if (time()-$time>5400); # 2 hours quality check
       }until(!defined($rec));
    }
 

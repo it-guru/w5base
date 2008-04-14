@@ -232,7 +232,7 @@ sub getFinalLdapFilter
 
    foreach my $filter (@filter){
       #msg(INFO,"getSqlWhere: interpret $filter in object $self");
-      msg(INFO,"getSqlWhere: interpret %s",Dumper($filter));
+      #msg(INFO,"getSqlWhere: interpret %s",Dumper($filter));
       my @subflt=$filter;
       @subflt=@$filter if (ref($filter) eq "ARRAY");
       foreach my $filter (@subflt){
