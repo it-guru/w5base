@@ -418,7 +418,7 @@ my ($mode,$force,$hostname,$type,$gui,$nowarn,%o);
 my $count=0;
 my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
        "webuser=s"=>\$loginuser,"webpass=s"=> \$loginpass,
-       "verbose+"=>\$verbose,"nowarn"=>\$nowarn,
+       "verbose+"=>\$verbose,"nowarn"=>\$nowarn,"quiet"=>\$quiet,
        "force"=>\$force,"hostname=s"=>\$hostname,
        "mode=s"=>\$mode,"type=s"=>\$type,"gui"=>\$gui);
 
