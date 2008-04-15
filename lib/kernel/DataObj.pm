@@ -1614,6 +1614,9 @@ sub getRecordHtmlIndex
              $self->makeHtmlIndexRecord($id,$group,$grouplabel->{$group}));
       }
    }
+   if ($#indexlist<=1){
+      return;
+   }
    return(@indexlist);
 }
 

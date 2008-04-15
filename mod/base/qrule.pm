@@ -177,6 +177,7 @@ sub nativQualityCheck
             $resulttext="undefined" if (!defined($qresult));
             my $qrulelongname=$qrule->getName();
             my $res={ rulelabel=>"$qrulelongname",
+                      ruleid=>$qrule->Self,
                       result=>$self->T($resulttext),
                       exitcode=>$qresult};
             if (defined($control->{qmsg})){
@@ -303,7 +304,7 @@ sub WinHandleQualityCheck
    my $winlabel;
    $winlabel=$rec->{name}     if (defined($rec->{name}));
    $winlabel=$rec->{fullname} if (defined($rec->{fullname}));
-   $d.=$self->HtmlHeader(style=>'default.css',
+   $d.=$self->HtmlHeader(style=>['default.css','qrule.css'],
                          form=>1,body=>1,
                          js=>['toolbox.js'],
                          title=>$self->T("QC:").$winlabel);
@@ -313,36 +314,6 @@ sub WinHandleQualityCheck
    my $DetailClose=$self->T("DetailClose","kernel::App::Web::Listedit");
    my $DetailPrint=$self->T("DetailPrint","kernel::App::Web::Listedit");
    $d.=<<EOF;
-<style>body{overflow:hidden;padding:4px}optgroup{margin-bottom:5px}
-div.buttonline{
-   margin:0;
-   padding:0;
-}
-div#reslist{
-   height:80px;
-   overflow:auto;
-   background:#FFFFFF;
-   margin:0;
-   padding:2px;
-   border-color:black;
-   border-width:1px;
-   border-style:solid;
-}
-\@media print {
-   div#reslist{
-      height:auto;
-      overflow:show;
-   }
-   div.buttonline{
-      display:none;
-      visibility:hidden;
-   }
-   body{
-     padding:10px;
-   }
-}
-
-</style>
 <table width=100% height=98% border=0>
 <tr height=50><td>$handlermask</td></tr>
 <tr>
@@ -408,6 +379,10 @@ function addToResult(ruleid)
              var labelChildNode=label.childNodes[0];
              var labeltext=labelChildNode.nodeValue;
 
+             var ruleid=ruleres.getElementsByTagName("ruleid")[0];
+             var ruleidChildNode=ruleid.childNodes[0];
+             var ruleidtext=ruleidChildNode.nodeValue;
+
              var result=ruleres.getElementsByTagName("result")[0];
              var resultChildNode=result.childNodes[0];
              var resulttext=resultChildNode.nodeValue;
@@ -429,7 +404,7 @@ function addToResult(ruleid)
              if (exitcodetext==2){
                 warn++;
              }
-             r.innerHTML+=labeltext+": "+color+resulttext+"</font><br>";
+             r.innerHTML+="<a class=rulelink href=javascript:openwin('../../base/qrule/Detail?id="+ruleidtext+"','_blank','height=480,width=640,toolbar=no,status=no,resizeable=yes,scrollbars=no')>"+labeltext+"</a>"+": "+color+resulttext+"</font><br>";
 
              var qmsg=ruleres.getElementsByTagName("qmsg");
 
