@@ -52,8 +52,16 @@ sub getName
 sub getDescription
 {
    my $self=shift;
+   my $instdir=$self->getParent->Config->Param("INSTDIR");
+   my $selfname=$self->Self();
+   $selfname=~s/::/\//g;
+   my $filename=$instdir."/mod/${selfname}.pm";
+   my $html=`cd /tmp && pod2html --title none --noheader --noindex --infile=$filename`;
+   ($html)=$html=~m/<body[^>]*>(.*)<\/body>/smi;
+   $html=~s/<p>\s*<\/p>//smi;
+   $html=~s/<p><a name="__index__"><\/a><\/p>//smi;
 
-   return("This is long");
+   return($html);
 }
 
 sub qcheckRecord

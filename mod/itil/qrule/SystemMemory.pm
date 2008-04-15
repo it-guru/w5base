@@ -1,4 +1,19 @@
 package itil::qrule::SystemMemory;
+#######################################################################
+=pod
+
+=head3 PURPOSE
+
+Every system needs memory to work. If there is no or 0 memory size
+defined on a logical system in CI-Status "installed/active" or "available",
+this will produce an error.
+
+=head3 IMPORTS
+
+NONE
+
+=cut
+#######################################################################
 #  W5Base Framework
 #  Copyright (C) 2007  Hartmut Vogler (it@guru.de)
 #

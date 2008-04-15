@@ -1,9 +1,21 @@
 package tsacinv::qrule::compareAppl;
-#  Functions:
-#  * at cistatus "installed/active":
-#    - check if systemid is valid in tsacinv::system
-#    - check if assetid is valid in tsacinv::asset 
-#
+#######################################################################
+=pod
+
+=head3 PURPOSE
+
+This qulaity rule compares a W5Base application to an AssetCenter application
+and updates on demand nessasary fields.
+Unattended Imports are only done, if the field "Allow automatic interface
+updates" is set to "yes".
+
+=head3 IMPORTS
+
+From AssetCenter the fields CO-Number, ApplicationID, Application Number,
+CurrentVersion and Description are imported. SeM and TSM are imported, if
+it was successfuly to import the relatied contacts.
+
+=cut
 #######################################################################
 #
 #  W5Base Framework

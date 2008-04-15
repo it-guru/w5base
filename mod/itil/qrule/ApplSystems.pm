@@ -1,4 +1,22 @@
 package itil::qrule::ApplSystems;
+#######################################################################
+=pod
+
+=head3 PURPOSE
+
+Every Application in in CI-Status "installed/active" or "available", needs
+at least 1 logical system linked. If there are no logical systems assigned,
+this will produce an error.
+In some cases (applications witch ships licenses f.e.) you can set the
+flag "application has no systems". In this case, this rule produces an
+error, if logical systems are assinged.
+
+=head3 IMPORTS
+
+NONE
+
+=cut
+#######################################################################
 #  W5Base Framework
 #  Copyright (C) 2007  Hartmut Vogler (it@guru.de)
 #

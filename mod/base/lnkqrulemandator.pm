@@ -61,6 +61,26 @@ sub new
                 vjoinon       =>['qruleid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::Htmlarea(
+                name          =>'qruledesc',
+                label         =>'Quality Rule Description',
+                htmldetail    =>0,
+                htmlwidth     =>'500',
+                searchable    =>0,
+                vjointo       =>'base::qrule',
+                vjoinon       =>['qruleid'=>'id'],
+                vjoindisp     =>'longdescription'),
+
+      new kernel::Field::Textarea(
+                name          =>'qrulecode',
+                label         =>'Quality Rule Code',
+                htmlwidth     =>'500',
+                htmldetail    =>0,
+                searchable    =>0,
+                vjointo       =>'base::qrule',
+                vjoinon       =>['qruleid'=>'id'],
+                vjoindisp     =>'code'),
+
       new kernel::Field::Link(
                 name          =>'qruleid',
                 label         =>'QRule-ID',

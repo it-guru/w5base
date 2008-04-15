@@ -1,4 +1,18 @@
 package finance::qrule::ContractSeM;
+#######################################################################
+=pod
+
+=head3 PURPOSE
+
+Checks if a SeM is definend in every contract with a CI-Status 
+"installed/active". If there is no SeM defined, an error will be procceded.
+
+=head3 IMPORTS
+
+NONE
+
+=cut
+#######################################################################
 #  W5Base Framework
 #  Copyright (C) 2007  Hartmut Vogler (it@guru.de)
 #

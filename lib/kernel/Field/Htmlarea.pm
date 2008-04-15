@@ -87,13 +87,13 @@ sub FormatedResult
    my $current=shift;
    my $FormatAs=shift;
    my $d=$self->RawValue($current);
-   if ($FormatAs eq "HtmlV01"){
-      if (!$self->{AllowHtmlInput}){
-         $d=~s/</&lt;/g;
-         $d=~s/>/&gt;/g;
-      }
-      $d=~s/\n/<br>\n/g;
-   }
+ #  if ($FormatAs eq "HtmlV01"){
+ #     if (!$self->{AllowHtmlInput}){
+ #        $d=~s/</&lt;/g;
+ #        $d=~s/>/&gt;/g;
+ #     }
+ #     $d=~s/\n/<br>\n/g;
+ #  }
    #printf STDERR ("fifi FormatAs=$FormatAs\n");
    return($d);
 }

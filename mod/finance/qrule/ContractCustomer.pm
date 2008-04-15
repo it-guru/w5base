@@ -1,4 +1,18 @@
 package finance::qrule::ContractCustomer;
+#######################################################################
+=pod
+
+=head3 PURPOSE
+
+Checks if a Customer is definend in every contract with a CI-Status 
+"installed/active". If there is no Customer defined, an error will be procceded.
+
+=head3 IMPORTS
+
+NONE
+
+=cut
+#######################################################################
 #  W5Base Framework
 #  Copyright (C) 2007  Hartmut Vogler (it@guru.de)
 #

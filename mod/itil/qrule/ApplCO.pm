@@ -1,4 +1,19 @@
 package itil::qrule::ApplCO;
+#######################################################################
+=pod
+
+=head3 PURPOSE
+
+Checks if there is an "installed/active" CO-Nummer is selected in
+every application with an CI-Status "installed/active" or "available".
+If there is no valid CO-Number defined, an error will be procceded.
+
+=head3 IMPORTS
+
+NONE
+
+=cut
+#######################################################################
 #  W5Base Framework
 #  Copyright (C) 2007  Hartmut Vogler (it@guru.de)
 #
