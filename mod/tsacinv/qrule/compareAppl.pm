@@ -14,6 +14,9 @@ updates" is set to "yes".
 From AssetCenter the fields CO-Number, ApplicationID, Application Number,
 CurrentVersion and Description are imported. SeM and TSM are imported, if
 it was successfuly to import the relatied contacts.
+#If Mandator is "Extern" and "Allow automatic interface updates" is set to "yes",
+#there will be also the Name of the application, the databoss and the cistatus 
+#imported from AssetCenter.
 
 =cut
 #######################################################################
@@ -174,54 +177,70 @@ sub qcheckRecord
 #         }
       }
 
-#      if ($rec->{mandator} eq "Extern" && $rec->{allowifupdate}){
-#         # forced updates on External Data
-#         my $admid;
-#         my $acgroup=getModuleObject($self->getParent->Config,"tsacinv::group");
-#         $acgroup->SetFilter({lgroupid=>\$parrec->{lassignmentid}});
-#         my ($acgrouprec,$msg)=$acgroup->getOnlyFirst(qw(supervisorldapid));
-#         if (defined($acgrouprec)){
-#            if ($acgrouprec->{supervisorldapid} ne "" ||
-#                $acgrouprec->{supervisoremail} ne ""){
-#               my $importname=$acgrouprec->{supervisorldapid};
-#               if ($importname eq ""){
-#                  $importname=$acgrouprec->{supervisoremail};
-#               }
-#               my $tswiw=getModuleObject($self->getParent->Config,
-#                                         "tswiw::user");
-#               my $databossid=$tswiw->GetW5BaseUserID($importname);
-#               if (defined($databossid)){
-#                  $admid=$databossid;
-#               }
+      if ($rec->{mandator} eq "Extern" && $rec->{allowifupdate}){
+         # forced updates on External Data
+         if (!defined($parrec)){
+            $forcedupd->{cistatusid}=5;
+         }
+         else{
+            my $databossid;
+            my $acgroup=getModuleObject($self->getParent->Config,
+                                        "tsacinv::group");
+            $acgroup->SetFilter({lgroupid=>\$parrec->{lassignmentid}});
+            my ($acgrouprec,$msg)=$acgroup->getOnlyFirst(qw(supervisorldapid));
+            if (defined($acgrouprec)){
+               if ($acgrouprec->{supervisorldapid} ne "" ||
+                   $acgrouprec->{supervisoremail} ne ""){
+                  my $importname=$acgrouprec->{supervisorldapid};
+                  if ($importname eq ""){
+                     $importname=$acgrouprec->{supervisoremail};
+                  }
+                  my $tswiw=getModuleObject($self->getParent->Config,
+                                            "tswiw::user");
+    #              my $newdatabossid=$tswiw->GetW5BaseUserID($importname);
+    # noch nicht   if (defined($newdatabossid)){
+    #                 $databossid=$newdatabossid;
+    #              }
+               }
+            }
+            if ($databossid ne ""){
+    #           $self->IfaceCompare($dataobj,
+    #                               $rec,"databossid",
+    # noch nicht                    {databossid=>$databossid},"databossid",
+    #                               $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
+    #                               mode=>'integer');
+            }
+    #        my $newname=$parrec->{name};
+    #        $newname=~s/[^a-z0-9_-]/_/gi;
+    #        $self->IfaceCompare($dataobj,
+    #                            $rec,"name",
+    #                            {name=>$newname},"name",
+    # noch nicht                 $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
+    #                            mode=>'string');
+           
+           
+           
+#            my $comments="";
+#            if ($parrec->{assignmentgroup} ne ""){
+#               $comments.="\n" if ($comments ne "");
+#               $comments.="AssetCenter AssignmentGroup: ".
+#                          $parrec->{assignmentgroup};
 #            }
-#         }
-#         if ($admid ne ""){
+#            if ($parrec->{conumber} ne ""){
+#               $comments.="\n" if ($comments ne "");
+#               $comments.="AssetCenter CO-Number: ".
+#                          $parrec->{conumber};
+#            }
 #            $self->IfaceCompare($dataobj,
-#                                $rec,"admid",
-#                                {admid=>$admid},"admid",
+#                                $rec,"comments",
+#                                {comments=>$comments},"comments",
 #                                $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
-#                                mode=>'integer');
-#         }
-#         my $comments="";
-#         if ($parrec->{assignmentgroup} ne ""){
-#            $comments.="\n" if ($comments ne "");
-#            $comments.="AssetCenter AssignmentGroup: ".
-#                       $parrec->{assignmentgroup};
-#         }
-#         if ($parrec->{conumber} ne ""){
-#            $comments.="\n" if ($comments ne "");
-#            $comments.="AssetCenter CO-Number: ".
-#                       $parrec->{conumber};
-#         }
-#         $self->IfaceCompare($dataobj,
-#                             $rec,"comments",
-#                             {comments=>$comments},"comments",
-#                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
-#                             mode=>'string');
-#      }
+#                                mode=>'string');
+         }
+      }
    }
    else{
-      push(@qmsg,'no systemid specified');
+      push(@qmsg,'no applicationid specified');
       $errorlevel=3 if ($errorlevel<3);
    }
 

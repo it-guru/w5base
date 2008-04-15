@@ -184,12 +184,23 @@ sub nativQualityCheck
                $res->{qmsg}=$control->{qmsg};
                if (ref($res->{qmsg}) eq "ARRAY"){
                   for(my $c=0;$c<=$#{$res->{qmsg}};$c++){
-                     $res->{qmsg}->[$c]=$self->T($res->{qmsg}->[$c],
-                                                  $qrulename);
+                     if (my ($pr,$po)=$res->{qmsg}->[$c]=~m/^(.*)\s*:\s*(.*)$/){
+                        $res->{qmsg}->[$c]=$self->T($pr,
+                                                     $qrulename)." : ".$po;
+                     }
+                     else{
+                        $res->{qmsg}->[$c]=$self->T($res->{qmsg}->[$c],
+                                                     $qrulename);
+                     }
                   }
                }
                else{
-                  $res->{qmsg}=$self->T($res->{qmsg},$qrulename);
+                  if (my ($pr,$po)=$res->{qmsg}=~m/^(.*)\s*:\s*(.*)$/){
+                     $res->{qmsg}=$self->T($pr,$qrulename)." : ".$po;
+                  }
+                  else{
+                     $res->{qmsg}=$self->T($res->{qmsg},$qrulename);
+                  }
                }
             }
             push(@{$result->{rule}},$res);

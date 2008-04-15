@@ -1,4 +1,33 @@
 package tsacinv::qrule::compareSystem;
+#######################################################################
+=pod
+
+=head3 PURPOSE
+
+This qulaity rule compares a W5Base logical system to an AssetCenter logical
+system and updates on demand nessasary fields.
+Unattended Imports are only done, if the field "Allow automatic interface
+updates" is set to "yes".
+
+=head3 IMPORTS
+
+From AssetCenter the fields Memory, CPU-Count, Application Number,
+CurrentVersion and Description are imported. SeM and TSM are imported, if
+it was successfuly to import the relatied contacts.
+IP-Addresses can only be synced, if the field "Allow automatic interface
+updates" is set to "yes".
+If Mandator is set to "Extern" and "Allow automatic interface updates"
+is set to "yes", some aditional Imports are posible:
+
+- "W5Base Administrator" field is set to the supervisor of Assignmentgroup in AC
+
+- "AC CO-Number" is imported to comments field in W5Base
+
+- "AC Assignmentgroup" is imported to comments field in W5Base
+
+=cut
+#######################################################################
+
 #  Functions:
 #  * at cistatus "installed/active":
 #    - check if systemid is valid in tsacinv::system
@@ -211,7 +240,8 @@ sub qcheckRecord
    if (keys(%$forcedupd)){
       #printf STDERR ("fifi request a forceupd=%s\n",Dumper($forcedupd));
       if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,{id=>\$rec->{id}})){
-         push(@qmsg,"all desired fields has been updated:");
+         push(@qmsg,"all desired fields has been updated: ".
+                    join(", ",keys(%$forcedupd)));
       }
       else{
          push(@qmsg,$self->getParent->LastMsg());
