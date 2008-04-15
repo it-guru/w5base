@@ -13,7 +13,7 @@ div#reslist{
    border-width:1px;
    border-style:solid;
 }  
-\@media print {
+@media print {
    div#reslist{
       height:auto;
       overflow:show;
