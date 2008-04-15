@@ -376,7 +376,7 @@ create table lnkapplsystem (
   srcid        varchar(20) default NULL,
   srcload      datetime    default NULL,
   PRIMARY KEY  (id),
-  KEY appl (appl),
+  KEY appl (appl),UNIQUE applsys(appl,system),
   KEY system (system),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 );

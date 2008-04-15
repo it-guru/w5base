@@ -298,14 +298,18 @@ sub new
                 label         =>'AssetId',
                 dataobjattr   =>'system.asset'),
                                                    
-      new kernel::Field::Link(
+      new kernel::Field::Text(
                 name          =>'applid',
-                label         =>'ApplID',
+                readonly      =>1,
+                htmldetail    =>0,
+                label         =>'W5Base Application ID',
                 dataobjattr   =>'lnkapplsystem.appl'),
                                                    
-      new kernel::Field::Link(
+      new kernel::Field::Text(
                 name          =>'systemid',
-                label         =>'SystemId',
+                readonly      =>1,
+                htmldetail    =>0,
+                label         =>'W5Base System ID',
                 dataobjattr   =>'lnkapplsystem.system'),
 
       new kernel::Field::Link(

@@ -266,6 +266,9 @@ sub isWriteValid
    my $rec=shift;
    my $userid;
    my $UserCache=$self->Cache->{User}->{Cache};
+
+printf STDERR ("fifi member=$ENV{REMOTE_USER} val=%s\n",$self->IsMemberOf("valid_user"));
+   return if (!defined($rec) && !$self->IsMemberOf("valid_user"));
    return("default") if (!defined($rec) && $self->IsMemberOf("valid_user"));
    if (defined($UserCache->{$ENV{REMOTE_USER}})){
       $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
