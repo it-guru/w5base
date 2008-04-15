@@ -300,14 +300,12 @@ sub new
                                                    
       new kernel::Field::Text(
                 name          =>'applid',
-                readonly      =>1,
                 htmldetail    =>0,
                 label         =>'W5Base Application ID',
                 dataobjattr   =>'lnkapplsystem.appl'),
                                                    
       new kernel::Field::Text(
                 name          =>'systemid',
-                readonly      =>1,
                 htmldetail    =>0,
                 label         =>'W5Base System ID',
                 dataobjattr   =>'lnkapplsystem.system'),
