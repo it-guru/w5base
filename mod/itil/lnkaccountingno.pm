@@ -249,7 +249,7 @@ sub Validate
 
 
    my $name=uc(trim(effVal($oldrec,$newrec,"name")));
-   if ($name=~m/\s/){
+   if (($name=~m/\s/) || ($name=~m/^\s*$/)){
       $self->LastMsg(ERROR,"invalid account number specified");
       return(undef);
    }

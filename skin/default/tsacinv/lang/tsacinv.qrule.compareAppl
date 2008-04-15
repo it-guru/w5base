@@ -3,4 +3,5 @@
 
 'no applicationid specified'=>{de=>'keine AnwendungsID definiert'},
 'given applicationid not found as active in AssetCenter'=>{de=>'angegebene AnwendungsID im AssetCenter nich aktiv'},
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
 

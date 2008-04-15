@@ -40,7 +40,7 @@ sub new
 
 sub getPosibleTargets
 {
-   return(["itil::appl","AL_TCom::appl"]);
+   return(["AL_TCom::appl"]);
 }
 
 sub qcheckRecord
@@ -215,10 +215,11 @@ sub qcheckRecord
 
 
 
-   if (keys(%$forcedupd)){
-      #printf STDERR ("fifi request a forceupd=%s\n",Dumper($forcedupd));
+   if (keys(%$forcedupd)>0){
+      msg(INFO,sprintf("forceupd=%s\n",Dumper($forcedupd)));
       if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,{id=>\$rec->{id}})){
-         push(@qmsg,"all desired fields has been updated");
+         push(@qmsg,"all desired fields has been updated: ".
+                    join(", ",keys(%$forcedupd)));
       }
       else{
          push(@qmsg,$self->getParent->LastMsg());
