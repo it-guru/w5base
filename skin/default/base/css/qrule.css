@@ -1,0 +1,37 @@
+body{overflow:hidden;padding:4px}optgroup{margin-bottom:5px}
+div.buttonline{
+   margin:0;
+   padding:0;
+}
+div#reslist{
+   height:80px;
+   overflow:auto;
+   background:#FFFFFF;
+   margin:0;
+   padding:2px;
+   border-color:black;
+   border-width:1px;
+   border-style:solid;
+}  
+\@media print {
+   div#reslist{
+      height:auto;
+      overflow:show;
+   }
+   div.buttonline{
+      display:none;
+      visibility:hidden;
+   }
+   body{
+     padding:10px;
+   }
+}
+
+a:link.rulelink, a:visited.rulelink, a:active.rulelink  {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:#16305e;
+          }
+
+
+
