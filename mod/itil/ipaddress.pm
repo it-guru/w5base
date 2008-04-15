@@ -319,9 +319,7 @@ sub Validate
       return(0);
    }
 
-
-
-   printf STDERR ("iprec=%s\n",Dumper($newrec));
+   msg(INFO,sprintf("iprec=%s\n",Dumper($newrec)));
 
    my $systemid=effVal($oldrec,$newrec,"systemid");
    if ($systemid<=0){

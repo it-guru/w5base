@@ -362,7 +362,7 @@ sub ProcessOpList
       my $dataobj=$objCache->{$op->{DATAOBJ}};
       if (defined($dataobj)){
          $dataobj->ResetFilter();
-         printf STDERR ("OP:%s\n",Dumper($op));
+         msg(INFO,sprintf("OP:%s\n",Dumper($op)));
          if ($op->{OP} eq "insert"){
             my $id=$dataobj->ValidatedInsertRecord($op->{DATA});
             $op->{IDENTIFYBY}=$id;

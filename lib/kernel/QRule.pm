@@ -105,6 +105,7 @@ sub IfaceCompare
 
    $param{mode}="native" if (!defined($param{mode}));
 
+   return if (!defined($obj->getField($origfieldname)));
    my $takeremote=0;
    my $ask=1;
    if ($param{mode} eq "native" ||

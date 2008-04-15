@@ -40,7 +40,7 @@ sub new
 
 sub getPosibleTargets
 {
-   return(["AL_TCom::appl"]);
+   return(["itil::appl","AL_TCom::appl"]);
 }
 
 sub qcheckRecord
