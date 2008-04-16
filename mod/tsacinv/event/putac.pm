@@ -226,6 +226,8 @@ sub ApplicationModified
                   $assignment="CSS.TCOM";
                }
                my $issoxappl=$rec->{issoxappl};
+               $issoxappl="YES" if ($rec->{issoxappl});
+               $issoxappl="NO" if (!($rec->{issoxappl}));
                $CurrentAppl="$rec->{name}($rec->{id})";
                $CurrentEventId="Add Application $CurrentAppl";
                $ApplU=10 if ($rec->{isnosysappl} && $SysCount==0);
