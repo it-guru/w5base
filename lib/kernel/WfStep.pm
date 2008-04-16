@@ -230,6 +230,7 @@ sub Process
                 {translation=>'base::workflow::request'},$fwdtargetname."\n".
                                                          $note,undef)){
                my $openuserid=$WfRec->{openuser};
+               $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
                $self->PostProcess($action.".".$op,$WfRec,$actions,
                                   note=>$note,
                                   fwdtarget=>$newrec->{fwdtarget},
@@ -257,6 +258,7 @@ sub Process
             if ($app->Action->StoreRecord($WfRec->{id},"wfdefer",
                 {translation=>'base::workflow::request'},$note)){
                $self->StoreRecord($WfRec,$oprec);
+               $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
                $self->PostProcess($action.".".$op,$WfRec,$actions);
                Query->Delete("note");
                return(1);

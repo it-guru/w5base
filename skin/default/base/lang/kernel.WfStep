@@ -12,3 +12,5 @@
 'wfmailsend'=>{de=>'E-Mail gesandt',en=>'mail send'},
 'invalid postponeduntil specifed'=>{de=>'ungültiger Zeitpunkt für die Zurückstellung angegeben'},
 'empty or to short notes are not allowed'=>{de=>'leere oder zu kurze Notizen sind nicht erlaubt'},
+'to'=>{de=>'An'},
+'no email address specified'=>{de=>'keine Mailaddresse angegeben'},

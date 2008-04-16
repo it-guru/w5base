@@ -119,7 +119,8 @@ sub getDefaultContractor
                   unshift(@devcon,{target=>$con->{target},
                                    targetid=>$con->{targetid}});
                } 
-               if (grep(/^orderin2$/,@$roles)){
+               if (grep(/^orderin2$/,@$roles) ||
+                   grep(/^businessemployee$/,@$roles)){
                   push(@devcon,{target=>$con->{target},
                                 targetid=>$con->{targetid}});
                } 
@@ -136,8 +137,7 @@ sub getDefaultContractor
       $self->LastMsg(ERROR,"no orderin found");
       return(undef);
    }
-   return(undef,$devcon[0]->{target},$devcon[0]->{targetid},
-                $devcon[1]->{target},$devcon[1]->{targetid});
+   return(undef,map({$_->{target},$_->{targetid}} @devcon));
 }
 
 

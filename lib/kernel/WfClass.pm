@@ -851,14 +851,33 @@ sub isCurrentForward
          return(1);
       }
    }
-   elsif ($WfRec->{fwddeptarget} eq 'base::user'){
-      if ($userid==$WfRec->{fwddeptargetid}){
+   elsif ($WfRec->{fwddebtarget} eq 'base::user'){
+      if ($userid==$WfRec->{fwddebtargetid}){
          return(1);
       }
    }
    return(0);
 }
 
+sub isCurrentWorkspace
+{
+   my $self=shift;
+   my $WfRec=shift;
+
+   my $userid=$self->getParent->getCurrentUserId();
+   my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},"RMember","both");
+   my @grpids=keys(%grp);
+   @grpids=(qw(NONE)) if ($#grpids==-1);
+
+   my $ws=$self->getParent->getPersistentModuleObject("base::workflowws");
+   $ws->SetFilter([{fwdtargetid=>\$userid,fwdtarget=>\'base::user',
+                    wfheadid=>$WfRec->{wfheadid}},
+                   {fwdtargetid=>\@grpids,fwdtarget=>\'base::grp',
+                    wfheadid=>$WfRec->{wfheadid}}]);
+   my ($wsrec,$msg)=$ws->getOnlyFirst(qw(wfheadid));
+   return(1) if (defined($wsrec));
+   return(0);
+}
 
 sub ValidActionCheck
 {

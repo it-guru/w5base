@@ -248,6 +248,13 @@ sub getPosibleActions
    my $initiatorid=$WfRec->{initiatorid};
    my @l=();
    my $iscurrent=$self->isCurrentForward($WfRec);
+   my $isworkspace=0;
+printf STDERR ("fifi userid=$userid\n");
+printf STDERR ("fifi iscurrent=$iscurrent\n");
+   if (!$iscurrent){  # check Workspace only if not current
+      $isworkspace=$self->isCurrentWorkspace($WfRec); 
+   }
+printf STDERR ("fifi isworkspace=$isworkspace\n");
    my $iscurrentapprover=0;
 
    if ($stateid==6){
@@ -296,13 +303,14 @@ sub getPosibleActions
    }
    if ((($stateid==4 || $stateid==3) && ($lastworker==$userid || $isadmin)) ||
        ($iscurrent && $userid==$creator)){
+      push(@l,"wfmailsend");   # notiz hinzufügen        (jeder)
       push(@l,"wfaddnote");    # notiz hinzufügen        (jeder)
       push(@l,"wfdefer");      # notiz hinzufügen        (jeder)
    }
    if (($stateid==2 || $stateid==7 || $stateid==10) &&
        ((($lastworker!=$userid) && 
         (($userid!=$creator) || ($userid!=$initiatorid)) &&  $iscurrent) ||
-        $iscurrent)){
+        $iscurrent || $isworkspace)){
       push(@l,"wfapprovalreq"); # Genehmigung anfordern      (durch Bearbeiter)
       push(@l,"wfaccept");  # workflow annehmen              (durch Bearbeiter)
       push(@l,"wfacceptp"); # workflow annehmen und bearbeit.(durch Bearbeiter)
@@ -427,7 +435,7 @@ sub Process
 
    if ($action eq "NextStep"){
       my $h=$self->getWriteRequestHash("web");
-      my ($target,$fwdtarget,$fwdtargetid,$fwddebtarget,$fwddebtargetid)=
+      my ($target,$fwdtarget,$fwdtargetid,$fwddebtarget,$fwddebtargetid,@wsref)=
              $self->getParent->getDefaultContractor($h,$actions);
 #printf STDERR ("fifi fwdtarget=$fwdtarget\n");
 #printf STDERR ("fifi fwdtargetid=$fwdtargetid\n");
@@ -470,6 +478,14 @@ sub Process
 
       if (my $id=$self->StoreRecord($WfRec,$h)){
          $h->{id}=$id;
+         if ($#wsref!=-1){
+            while(my $target=shift(@wsref)){
+               my $targetid=shift(@wsref);
+               last if ($targetid eq "" || $target eq "");
+               $self->getParent->getParent->AddToWorkspace($id,
+                                                           $target,$targetid);
+            }
+         }
          $self->PostProcess($action,$h,$actions);
       }
       else{
@@ -817,6 +833,7 @@ sub Process
              $WfRec->{id},"wfaddnote",
              {translation=>'base::workflow::request'},$note,$effort)){
             $self->StoreRecord($WfRec,$oprec);
+            $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
             $self->PostProcess($action.".".$op,$WfRec,$actions);
             Query->Delete("note");
             return(1);
@@ -834,6 +851,7 @@ sub Process
             if ($self->getParent->getParent->Action->StoreRecord(
                 $WfRec->{id},"wfaccept",
                 {translation=>'base::workflow::request'},"",undef)){
+               $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
                $self->PostProcess($action.".".$op,$WfRec,$actions);
                return(1);
             }
@@ -857,6 +875,7 @@ sub Process
                 $WfRec->{id},"wfaddnote",
                 {translation=>'base::workflow::request'},$note,$effort)){
                if ($self->StoreRecord($WfRec,{stateid=>4})){
+                  $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
                   $self->PostProcess($action.".".$op,$WfRec,$actions);
                }
                return(1);
@@ -886,6 +905,7 @@ sub Process
                                                       eventend=>NowStamp("en"),
                                                       fwddebtarget=>undef,
                                                       fwddebtargetid=>undef});
+               $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
                $self->PostProcess($action.".".$op,$WfRec,$actions,
                                   note=>$note,
                                   fwdtarget=>'base::user',
@@ -913,6 +933,7 @@ sub Process
                $store->{eventend}=NowStamp("en");
             }
             $self->StoreRecord($WfRec,$store);
+            $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
             $self->PostProcess($action.".".$op,$WfRec,$actions);
             return(1);
          }
@@ -937,6 +958,7 @@ sub Process
                                        eventend=>NowStamp("en"),
                                        fwddebtarget=>undef,
                                        fwddebtargetid=>undef});
+            $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
             $self->PostProcess($action.".".$op,$WfRec,$actions,
                                note=>$note,
                                fwdtarget=>'base::user',
@@ -964,6 +986,7 @@ sub Process
                                                    fwddebtarget=>undef,
                                                    fwddebtargetid=>undef});
 
+            $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
             $self->PostProcess($action.".".$op,$WfRec,$actions,
                                note=>$note,
                                fwdtarget=>'base::user',
