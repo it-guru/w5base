@@ -21,18 +21,30 @@ package W5Base::API;
 
 =head1 NAME
 
-W5Base::API - documentation of W5Base::API and native W5Base SOAP calls
+W5Base::API - documentation and native W5Base SOAP calls
+
+=begin __INTERNALS
+
+=head1 PORTABILITY
+
+This module is designed to be portable across operating systems
+and it currently supports Unix, VMS, DOS, OS/2 and Windows. When
+porting to a new OS there are generally three main issues
+that have to be solved:
+
+=end __INTERNALS
+
 
 =head1 DESCRIPTION
 
-W5Base::ATI.pm is a perl interface to make the use of SOAP calls to W5Base
-server a little bit easir.
+W5Base::ATI.pm is a perl interface to make the use of SOAP calls to W5Base server a little bit easir.
 
 =head1 FUNCTIONS
 
 =head2 XGetOptions()
 
- $optresult=XGetOptions(\%P,\&Help,undef,undef,".W5Base.Interface",[noautologin=>1|0]);
+ $optresult=XGetOptions(\%P,\&Help,$prestore,undef,".W5Base.Interface",
+                        [noautologin=>1|0]);
 
 This function isn't needed to comunicate to W5Base, but it helps you to
 handle your work-script parameters in a comfortable kind.
@@ -40,6 +52,33 @@ In %P you have to specify the posible parameters in Getopt::Long style.
 \&Help is a callback method, witch will be called on paramater problems.
 The last parameter is the filename, in witch the parameters are stored,
 if the --store option is specified by user.
+If you specify a callback $prestore, you can modify parameters before they
+will be written to storefile.
+
+
+=head2 XGetFQStoreFilename()
+
+ $fqstorefilename=XGetFQStoreFilename([$storefile]);
+
+Is only needed, if you need direct access to the store methods called from
+XGetOptions(). XGetFQStoreFilename() calculates an full qualified storefile
+name from by passing an storfilename whitch can be a relative name.
+
+=head2 XLoadStoreFile()
+
+ $sresult=XLoadStoreFile($storefile,$param);
+
+Is only needed, if you need direct access to the store methods called from
+XGetOptions(). XLoadStoreFile() reads all stored variables from $storefile
+and write them in the hash pointer $param.
+
+=head2 XSaveStoreFile()
+
+ $sresult=XSaveStoreFile($storefile,$param);
+
+Is only needed, if you need direct access to the store methods called from
+XGetOptions(). XSaveStoreFile() saves all keys in hash pointer $param in
+the specified $storefile.
 
 =head2 createConfig()
 
@@ -273,13 +312,14 @@ not implemented at now (02/2008)
 =cut
 
 
-
+use 5.005;
 use strict;
-use vars qw(@EXPORT @ISA);
+use vars qw(@EXPORT @ISA $VERSION);
 use Exporter;
 use Getopt::Long;
 use FindBin qw($RealScript);
 
+$VERSION = "0.2";
 @ISA = qw(Exporter);
 @EXPORT = qw(&msg &ERROR &WARN &DEBUG &INFO $RealScript
              &XGetOptions
@@ -326,22 +366,8 @@ sub XGetOptions
    my $storefile=shift;
    my %param=@_;
    my $optresult;
-   if (!($storefile=~m/^\//)){ # finding the home directory
-      if ($ENV{HOME} eq ""){
-         eval('
-            while(my @pline=getpwent()){
-               if ($pline[1]==$< && $pline[7] ne ""){
-                  $ENV{HOME}=$pline[7];
-                  last;
-               }
-            }
-            endpwent();
-         ');
-      }
-      if ($ENV{HOME} ne ""){
-         $storefile=$ENV{HOME}."/".$storefile;
-      }
-   }
+
+   my $storefile=XGetFQStoreFilename($storefile);
    my $store;
    $param->{store}=\$store;
 
@@ -355,24 +381,13 @@ sub XGetOptions
       &$help();
       exit(0);
    }
-   if (open(F,"<".$storefile)){
-      if (defined($prestore)){
-         &$prestore($param);
-      }
-      while(my $l=<F>){
-         $l=~s/\s*$//;
-         if (my ($var,$val)=$l=~m/^(\S+)\t(.*)$/){
-            if (exists($param->{$var})){
-               if (!(${$param->{store}}) || $var eq "webuser=s" ||
-                   $var eq "webpass=s"){
-                  if (!defined(${$param->{$var}})){
-                     ${$param->{$var}}=unpack("u*",$val);
-                  }
-               }
-            }
-         }
-      }
-      close(F);
+   if (defined($prestore)){
+      &$prestore($param);
+   }
+   my $sresult=XLoadStoreFile($storefile,$param);
+   if ($sresult){
+      printf STDERR ("ERROR: $!\n");
+      exit(255);
    }
    if (!defined(${$param->{'webuser=s'}}) && !$param{noautologin}){
       my $u;
@@ -400,20 +415,8 @@ sub XGetOptions
       ${$param->{'webpass=s'}}=$p;
    }
    if (${$param->{store}}){
-      if (open(F,">".$storefile)){
-         foreach my $p (keys(%$param)){
-            next if ($p=~m/^verbose.*/);
-            next if ($p=~m/^help$/);
-            next if ($p=~m/^store$/);
-            if (defined(${$param->{$p}})){
-               my $pstring=pack("u*",${$param->{$p}});
-               $pstring=~s/\n//g;
-               printf F ("%s\t%s\n",$p,$pstring);
-            }
-         }
-         close(F);
-      }
-      else{
+      my $sresult=XSaveStoreFile($storefile,$param);
+      if ($sresult){
          printf STDERR ("ERROR: $!\n");
          exit(255);
       }
@@ -435,6 +438,81 @@ sub XGetOptions
       msg(INFO,"-----------------");
    }
    return($optresult);
+}
+
+sub XGetFQStoreFilename
+{
+   my $storefile=shift;
+
+   $storefile=".W5API" if ($storefile eq "");
+
+   if (!($storefile=~m/^\//) &&
+       !($storefile=~m/\\/)){ # finding the home directory
+      if ($ENV{HOME} eq ""){
+         eval('
+            while(my @pline=getpwent()){
+               if ($pline[1]==$< && $pline[7] ne ""){
+                  $ENV{HOME}=$pline[7];
+                  last;
+               }
+            }
+            endpwent();
+         ');
+      }
+      if ($ENV{HOME} ne ""){
+         $storefile=$ENV{HOME}."/".$storefile;
+      }
+   }
+   return($storefile);
+}
+
+sub XLoadStoreFile
+{
+   my $storefile=shift;
+   my $param=shift;
+
+   if (open(F,"<".$storefile)){
+      
+      while(my $l=<F>){
+         $l=~s/\s*$//;
+         if (my ($var,$val)=$l=~m/^(\S+)\t(.*)$/){
+            if (exists($param->{$var})){
+               if (!(${$param->{store}}) || $var eq "webuser=s" ||
+                   $var eq "webpass=s"){
+                  if (!defined(${$param->{$var}})){
+                     ${$param->{$var}}=unpack("u*",$val);
+                  }
+               }
+            }
+         }
+      }
+      close(F);
+   }
+   return(0);
+}
+
+sub XSaveStoreFile
+{
+   my $storefile=shift;
+   my $param=shift;
+
+   if (open(F,">".$storefile)){
+      foreach my $p (keys(%$param)){
+         next if ($p=~m/^verbose.*/);
+         next if ($p=~m/^help$/);
+         next if ($p=~m/^store$/);
+         if (defined(${$param->{$p}})){
+            my $pstring=pack("u*",${$param->{$p}});
+            $pstring=~s/\n//g;
+            printf F ("%s\t%s\n",$p,$pstring);
+         }
+      }
+      close(F);
+   }
+   else{
+      return($?);
+   }
+   return(0);
 }
 
 

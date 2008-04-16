@@ -61,7 +61,7 @@ sub new
                                  'base::user'=>'fullname'],
                 vjoineditbase =>[{'cistatusid'=>[3,4]},
                                  {'cistatusid'=>4,
-                                  'usertyp'=>['user','extern']},
+                                  'usertyp'=>['user','extern','function']},
                                 ],
                 dsttypfield   =>'target',
                 dstidfield    =>'targetid'),
