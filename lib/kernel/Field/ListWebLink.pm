@@ -26,7 +26,9 @@ use Data::Dumper;
 sub new
 {
    my $type=shift;
-   my $self=bless($type->SUPER::new(@_),$type);
+   my %self=@_;
+   $self{readonly}=1 if (!exists($self{readonly}));
+   my $self=bless($type->SUPER::new(%self),$type);
    $self->{webparams}=[qw(weblink webtarget webtitle webjs)];
    foreach my $v (@{$self->{webparams}}){
       $self->{_permitted}->{$v}=1;

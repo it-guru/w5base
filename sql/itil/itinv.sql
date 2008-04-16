@@ -270,7 +270,7 @@ create table ipaddress (
   srcid      varchar(20) default NULL,
   srcload    datetime    default NULL,
   PRIMARY KEY  (id),
-  UNIQUE KEY name (name),
+  key name(network,name),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 );
 create table liccontract (
