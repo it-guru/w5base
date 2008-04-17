@@ -7,6 +7,8 @@
 'Applicationname'=>{de=>'Anwendungsname'},
 'Deputy Technical Contact'=>{de=>'Technischer Ansprechpartner Vertr.'},
 'Technical Contact'=>{de=>'Technischer Ansprechpartner'},
+'Technical Contact E-Mail'=>{de=>'Technischer Ansprechpartner E-Mail'},
+'Technical Contact LDAPID'=>{de=>'Technischer Ansprechpartner LDAPID'},
 'Interfaces'=>{de=>'Schnittstellen'},
 'Application Description'=>{de=>'Anwendungsbeschreibung'},
 'Customer'=>{de=>'Kunde'},

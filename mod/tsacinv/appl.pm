@@ -108,6 +108,14 @@ sub new
                 vjoinon       =>['semid'=>'lempldeptid'],
                 vjoindisp     =>'email'),
 
+      new kernel::Field::TextDrop(
+                name          =>'semldapid',
+                htmldetail    =>0,
+                label         =>'Service Manager LDAPID',
+                vjointo       =>'tsacinv::user',
+                vjoinon       =>['semid'=>'lempldeptid'],
+                vjoindisp     =>'ldapid'),
+
       new kernel::Field::Link(
                 name          =>'semid',
                 dataobjattr   =>'amtsicustappl.lservicecontactid'),
@@ -126,6 +134,14 @@ sub new
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['tsmid'=>'lempldeptid'],
                 vjoindisp     =>'email'),
+
+      new kernel::Field::TextDrop(
+                name          =>'tsmldapid',
+                htmldetail    =>0,
+                label         =>'Technical Contact LDAPID',
+                vjointo       =>'tsacinv::user',
+                vjoinon       =>['tsmid'=>'lempldeptid'],
+                vjoindisp     =>'ldapid'),
 
       new kernel::Field::Link(
                 name          =>'tsmid',

@@ -74,6 +74,7 @@ sub LoadBCBS
    my $sys=getModuleObject($self->Config,"AL_TCom::system");
    my $asset=getModuleObject($self->Config,"AL_TCom::asset");
    $aappl->SetFilter({assignmentgroup=>\'BPO.BCBS',
+                      name=>'BISYS*',
                       status=>['IN OPERATION']});
    $aappl->SetCurrentView(qw(ALL));
    my $agcount=0;
@@ -83,7 +84,13 @@ sub LoadBCBS
          my %assetid;
          last if (!defined($rec));
          my $semw5baseid=$wiw->GetW5BaseUserID($rec->{sememail});
+         if (!defined($semw5baseid) && $rec->{semldapid} ne ""){
+            $semw5baseid=$wiw->GetW5BaseUserID($rec->{semldapid});
+         }
          my $tsmw5baseid=$wiw->GetW5BaseUserID($rec->{tsmemail});
+         if (!defined($tsmw5baseid) && $rec->{tsmldapid} ne ""){
+            $tsmw5baseid=$wiw->GetW5BaseUserID($rec->{tsmldapid});
+         }
          my $databossid=$semw5baseid;
          if ($databossid eq ""){
             $databossid=$semw5baseid;
@@ -131,6 +138,7 @@ sub LoadBCBS
                      applid=>$rec->{applid},
                      description=>UTF8toLatin1($rec->{description}),
                      applnumber=>$rec->{ref},
+                     applgroup=>"BCBS",
                      criticality=>$criticality,
                      customerprio=>$rec->{customerprio},
                      cistatusid=>4,

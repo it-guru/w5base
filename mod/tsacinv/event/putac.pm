@@ -134,7 +134,8 @@ sub ApplicationModified
          #msg(DEBUG,"dump=%s",Dumper($rec));
          my $jobname="W5Base.$self->{jobstart}.".NowStamp().'.Appl_'.
                      sprintf("%d",$rec->{id});
-         if ($rec->{mandatorid} ne $exclmand){
+         if ($rec->{mandatorid} ne $exclmand &&
+             !($rec->{businessteam}=~m/\.BILLING/i)){
             my $CurrentEventId;
             my $CurrentAppl;
             my $ApplU=0;
