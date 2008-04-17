@@ -2,7 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>W5Base::API - documentation of W5Base::API and native W5Base SOAP calls</title>
+<title>W5Base::API - documentation and native W5Base SOAP calls</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <link rev="made" href="mailto:root@localhost" />
 </head>
@@ -15,11 +15,15 @@
 <ul>
 
 	<li><a href="#name">NAME</a></li>
+	<li><a href="#portability">PORTABILITY</a></li>
 	<li><a href="#description">DESCRIPTION</a></li>
 	<li><a href="#functions">FUNCTIONS</a></li>
 	<ul>
 
 		<li><a href="#xgetoptions__"><code>XGetOptions()</code></a></li>
+		<li><a href="#xgetfqstorefilename__"><code>XGetFQStoreFilename()</code></a></li>
+		<li><a href="#xloadstorefile__"><code>XLoadStoreFile()</code></a></li>
+		<li><a href="#xsavestorefile__"><code>XSaveStoreFile()</code></a></li>
 		<li><a href="#createconfig__"><code>createConfig()</code></a></li>
 	</ul>
 
@@ -64,13 +68,12 @@
 </p>
 <hr />
 <h1><a name="name">NAME</a></h1>
-<p>W5Base::API - documentation of W5Base::API and native W5Base SOAP calls</p>
+<p>W5Base::API - documentation and native W5Base SOAP calls</p>
 <p>
 </p>
 <hr />
 <h1><a name="description">DESCRIPTION</a></h1>
-<p>W5Base::ATI.pm is a perl interface to make the use of SOAP calls to W5Base
-server a little bit easir.</p>
+<p>W5Base::ATI.pm is a perl interface to make the use of SOAP calls to W5Base server a little bit easir.</p>
 <p>
 </p>
 <hr />
@@ -79,19 +82,51 @@ server a little bit easir.</p>
 </p>
 <h2><a name="xgetoptions__"><code>XGetOptions()</code></a></h2>
 <pre>
- $optresult=XGetOptions(\%P,\&amp;Help,undef,undef,&quot;.W5Base.Interface&quot;);</pre>
+ $optresult=XGetOptions(\%P,\&amp;Help,$prestore,undef,&quot;.W5Base.Interface&quot;,
+                        [noautologin=&gt;1|0]);</pre>
 <p>This function isn't needed to comunicate to W5Base, but it helps you to
 handle your work-script parameters in a comfortable kind.
 In %P you have to specify the posible parameters in Getopt::Long style.
 \&amp;Help is a callback method, witch will be called on paramater problems.
 The last parameter is the filename, in witch the parameters are stored,
-if the --store option is specified by user.</p>
+if the --store option is specified by user.
+If you specify a callback $prestore, you can modify parameters before they
+will be written to storefile.</p>
+<p>
+</p>
+<h2><a name="xgetfqstorefilename__"><code>XGetFQStoreFilename()</code></a></h2>
+<pre>
+ $fqstorefilename=XGetFQStoreFilename([$storefile]);</pre>
+<p>Is only needed, if you need direct access to the store methods called from
+XGetOptions(). <code>XGetFQStoreFilename()</code> calculates an full qualified storefile
+name from by passing an storfilename whitch can be a relative name.</p>
+<p>
+</p>
+<h2><a name="xloadstorefile__"><code>XLoadStoreFile()</code></a></h2>
+<pre>
+ $sresult=XLoadStoreFile($storefile,$param);</pre>
+<p>Is only needed, if you need direct access to the store methods called from
+XGetOptions(). <code>XLoadStoreFile()</code> reads all stored variables from $storefile
+and write them in the hash pointer $param.</p>
+<p>
+</p>
+<h2><a name="xsavestorefile__"><code>XSaveStoreFile()</code></a></h2>
+<pre>
+ $sresult=XSaveStoreFile($storefile,$param);</pre>
+<p>Is only needed, if you need direct access to the store methods called from
+XGetOptions(). <code>XSaveStoreFile()</code> saves all keys in hash pointer $param in
+the specified $storefile.</p>
 <p>
 </p>
 <h2><a name="createconfig__"><code>createConfig()</code></a></h2>
 <pre>
- $config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug);</pre>
-<p>The <code>createConfig()</code> function validates the configuration, checks the communication to the desiered W5Base-SOAP-Server and returns a config object on success.</p>
+ $config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug);
+ $config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug,
+                      \$exitcode,\$msgs);</pre>
+<p>The <code>createConfig()</code> function validates the configuration, checks the communication to the desiered W5Base-SOAP-Server and returns a config object on success.
+If it fails, you can get a human readable error message if you specifed 
+two references (\$exitcode,\$msgs) in witch the method can store these 
+informations.</p>
 <p>
 </p>
 <hr />
