@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
 package MyWin;
-#  $Revision$
 #  W5Base Framework
 #  Copyright (C) 2008  Holm Basedow (info@blauwarme.de)
 #
@@ -17,7 +16,8 @@ package MyWin;
 #  You should have received a copy of the GNU General Public License
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-#
+
+#  $Revision$  Subversion Revision Number
 use strict;
 use vars qw(@ISA);
 use Data::Dumper;
@@ -34,6 +34,7 @@ sub new
    my $nowarn=$param{-nowarn};
    my $mode=$param{-mode};
    my $params=$param{-params};
+   my $version=$param{-version};
    my $fullstoredfilename=$param{-fullstoredfilename};
    my $icon = eval("newIcon Win32::GUI::BitmapInline(main::WindowIcon());");
    $param{-icon}=$icon;
@@ -61,6 +62,7 @@ sub new
    $self->{file}=$file;
    $self->{fullstoredfilename}=$fullstoredfilename;
    $self->{PARAM}=$params;
+   $self->{VERSION}=$version;
    $self->{o}=$o;
    $self->{ICON}=$icon;
    $self->AddNotifyIcon(-name => "systray",
@@ -85,7 +87,7 @@ sub new
    $self->{GRID}->add($self->headname,[3..12],2,"left justify");
    $self->AddLabel(
           -name        => "headname",
-          -text        => "Version 0.1",
+          -text        => $self->{VERSION},
           -font        => $self->{FONT},
           -foreground  => 0x000000,
    );
@@ -398,7 +400,10 @@ sub checkMode
 sub Info
 {
    my $self=shift; 
+   my $version=$self->{VERSION};
    my $text=(<<EOF);
+Version $version
+
 W5Base Importer is a tiny software to import data
 in a W5Base Environment of your own choice
 
@@ -454,6 +459,7 @@ my $DefaultBase="https://w5base.net/w5base/auth/";
 my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang);
 my ($mode,$force,$hostname,$type,$gui,$nowarn,%o);
 my $count=0;
+my $version="0.1 Build: \$Revision\$";
 my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
        "webuser=s"=>\$loginuser,"webpass=s"=> \$loginpass,
        "verbose+"=>\$verbose,"nowarn"=>\$nowarn,
@@ -481,6 +487,7 @@ if ($gui){
                         ARGV=>\@ARGV,
                         o=>\%o,
                         -mode=>$mode,
+                        -version=>$version,
                         -nowarn=>$nowarn,
                         -fullstoredfilename=>$fullstoredfilename,
                         -params=>\%P,
