@@ -82,10 +82,14 @@ sub new
                 htmleditwidth =>'40%',
                 label         =>'Instance type',
                 value         =>['Oracle',
-                                 'MySQL',
                                  'Informix',
+                                 'MySQL',
+                                 'DB2',
                                  'MSSQL',
-                                 'SAP/R3'],
+                                 'SAP/R3',
+                                 'SAP/R2',
+                                 'MQSeries',
+                                 'Apache'],
                 dataobjattr   =>'swinstance.swnature'),
 
       new kernel::Field::TextDrop(

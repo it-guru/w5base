@@ -125,20 +125,20 @@ sub new
                 htmlwidth     =>'5px',
                 htmldetail    =>0,
                 weblink       =>sub{
-                                   my $self=shift;
-                                   my $current=shift;
-                                   my $mode=shift;
-                                   my $typeo=$self->getParent->getField("type");
-                                   my $d=$typeo->FormatedDetail($current,"AscV01");
-                                   my $e=$self->RawValue($current);
-                                   my $name=$self->Name();
-                                   my $app=$self->getParent();
-                                   if ($mode=~m/html/i){
-                                      return("<img ".
-                                             "src=\"../../itil/load/iptyp${e}.gif\" title=\"$d\">");
-                                   }
-                                   return($d);
-                                },
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+                   my $typeo=$self->getParent->getField("type");
+                   my $d=$typeo->FormatedDetail($current,"AscV01");
+                   my $e=$self->RawValue($current);
+                   my $name=$self->Name();
+                   my $app=$self->getParent();
+                   if ($mode=~m/html/i){
+                      return("<img ".
+                         "src=\"../../itil/load/iptyp${e}.gif\" title=\"$d\">");
+                   }
+                   return($d);
+                },
                 dataobjattr   =>'ipaddress.addresstyp'),
 
       new kernel::Field::Select(
@@ -284,7 +284,7 @@ sub Validate
       $name=~s/\[\d*\]$//;
    }
    if ($name=~m/^\s*$/){
-      $self->LastMsg(ERROR,"invalid ip-address specified");
+      $self->LastMsg(ERROR,"invalid ip-address or empty specified");
       return(0);
    }
    else{
@@ -298,7 +298,8 @@ sub Validate
               $o4<0 || $o4 >255)||
              ($o1==0 && $o2==0 && $o3==0 && $o4==0) ||
              ($o1==255 && $o2==255 && $o3==255 && $o4==255)){
-            $self->LastMsg(ERROR,"invalid IPV4 address");
+            $self->LastMsg(ERROR,
+                   sprintf($self->T("invalid IPV4 address '\%s'"),$name));
             return(0);
          }
       }

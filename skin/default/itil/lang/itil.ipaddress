@@ -19,3 +19,6 @@
 'iptyp.8'=>{de=>'RemoteControl-Board (HTTP)',en=>'RemoteControl-Board (HTTP)'},
 'iptyp.9'=>{de=>'RemoteControl-Board (HTTPS)',en=>'RemoteControl-Board (HTTPS)'},
 'invalid account number specified'=>{de=>'ungültige Account Nummer angegeben'},
+'invalid ip-address or empty specified'=>{de=>'ungültige oder leere IP-Adresse'},
+"invalid IPV4 address '\%s'"=>{de=>"ungültige IPV4 IP-Adresse '\%s'"},
+'unknown ip-address format'=>{de=>'unbekanntes IP-Adressformat'},
