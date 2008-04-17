@@ -457,9 +457,9 @@ use vars qw($GUI $Window);
 my $netdns=new Net::DNS::Resolver();
 my $DefaultBase="https://w5base.net/w5base/auth/";
 my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang);
-my ($mode,$force,$hostname,$type,$gui,$nowarn,%o);
+my ($mode,$force,$hostname,$type,$gui,$nowarn,%o,$Revision);
 my $count=0;
-my $version="0.1 Build: \$Revision\$";
+my $version="0.1 Build: '$Revision$'";
 my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
        "webuser=s"=>\$loginuser,"webpass=s"=> \$loginpass,
        "verbose+"=>\$verbose,"nowarn"=>\$nowarn,
