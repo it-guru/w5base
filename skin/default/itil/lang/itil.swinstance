@@ -16,3 +16,5 @@
 'Application'=>{de=>'Anwendung'},
 'Instance operation type'=>{de=>'Instanz Betriebsmodus'},
 'Automationsname/IP-Address'=>{de=>'Automationsname/IP-Adresse'},
+'Instance ID'=>{de=>'Instanz ID'},
+'Customer cost allocation'=>{de=>'Instanz wird dem Endkunden verrechnet'},

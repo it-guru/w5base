@@ -117,6 +117,14 @@ sub new
                 label         =>'callcenter active',
                 container     =>'additional'),
 
+      new kernel::Field::Number(
+                name          =>'flathourscost',
+                precision     =>2,
+                unit          =>'h',
+                group         =>'finance',
+                label         =>'Flat hours per month',
+                dataobjattr   =>'servicesupport.flathourscost'),
+
       new kernel::Field::Container(
                 name          =>'additional',
                 label         =>'Additionalinformations',
@@ -199,7 +207,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default oncallservice support service callcenter source));
+          qw(default finance oncallservice support service callcenter source));
 }
 
 
@@ -272,6 +280,7 @@ sub isWriteValid
       foreach my $grp (qw(service oncallservice support callcenter)){
          push(@blklist,$grp) if ($rec->{"is".$grp});
       }
+      push(@blklist,"finance");
    }
    return(@blklist);
 }
@@ -288,7 +297,7 @@ sub isViewValid
       push(@adds,$grp) if ($rec->{"is".$grp});
    }
 
-   return("header","default","source",@adds);
+   return("header","default","finance","source",@adds);
 }
 
 sub getRecordImageUrl

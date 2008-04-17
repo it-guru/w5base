@@ -65,6 +65,7 @@ sub ApplicationModified
    my $acappl=getModuleObject($self->Config,"tsacinv::appl");
    my $applappl=getModuleObject($self->Config,"itil::lnkapplappl");
    my $applsys=getModuleObject($self->Config,"itil::lnkapplsystem");
+   my $swinstance=getModuleObject($self->Config,"itil::swinstance");
    my $acgrp=getModuleObject($self->Config,"tsacinv::group");
    my $app=getModuleObject($self->Config,"itil::appl");
    my $user=getModuleObject($self->Config,"base::user");
@@ -83,7 +84,7 @@ sub ApplicationModified
               50=>'ACCEPTANCE',
               60=>'DEVELOPMENT',
               70=>'PRODUCTION');
-   #$filter{name}="Rebell*PropMan*";
+   $filter{name}="*darwin* *routing*";
    $app->SetFilter(\%filter);
    $app->SetCurrentView(qw(ALL));
   # $app->SetCurrentView(qw(id name sem tsm tsm2 conumber currentvers
@@ -105,6 +106,7 @@ sub ApplicationModified
    ($fh{appl_appl_rel},$filename{appl_appl_rel}      )=$self->InitTransfer();
    ($fh{ci_appl_rel},  $filename{ci_appl_rel}        )=$self->InitTransfer();
    ($fh{appl_contact_rel},$filename{appl_contact_rel})=$self->InitTransfer();
+   ($fh{instance},     $filename{instance}           )=$self->InitTransfer();
    return($ftp) if (ref($ftp) eq "HASH" || !defined($ftp)); # on errors
 
 
@@ -141,14 +143,16 @@ sub ApplicationModified
             my $ApplU=0;
             my $SysCount=0;
             {  # systems
-               $applsys->SetFilter({applid=>\$rec->{id},systemcistatusid=>\"4"});
+               $applsys->SetFilter({applid=>\$rec->{id},
+                                    systemcistatusid=>\"4"});
                my @l=$applsys->getHashList(qw(id systemsystemid system
                                               istest iseducation isref 
                                               isapprovtest isdevel isprod
                                               shortdesc systemid));
                foreach my $lnk (@l){
                   my $SysU=0;
-                  #$SysU=10 if ($SysU<10 && $lnk->{isnosysappl}); # noch nicht drin
+                  #$SysU=10 if ($SysU<10 && $lnk->{isnosysappl}); 
+                                                          # noch nicht drin
                   $SysU=20 if ($SysU<20 && $lnk->{istest}); 
                   $SysU=30 if ($SysU<30 && $lnk->{iseducation}); 
                   $SysU=40 if ($SysU<40 && $lnk->{isref}); 
@@ -310,7 +314,7 @@ sub ApplicationModified
                    }
                }
             }
-            {
+            {  # prepare contacts
                if (ref($rec->{contacts}) eq "ARRAY"){
                   foreach my $contact (@{$rec->{contacts}}){
                      next if ($contact->{target} ne "base::user");
@@ -380,6 +384,58 @@ sub ApplicationModified
                   }
                }
             }
+            { # prepare instances
+               $swinstance->ResetFilter();
+               $swinstance->SetFilter({applid=>\$rec->{id},
+                                       cistatusid=>\"4"});
+               foreach my $irec ($swinstance->getHashList(qw(ALL))){
+                  $CurrentEventId="Instance '$irec->{name}' ";
+
+                  my $assignment=$rec->{swteam};
+                  $assignment=~s/^.*\.CSS\.T-Com/CSS.TCOM/i;
+                  if ($assignment ne ""){
+                     $acgrp->ResetFilter(); 
+                     $acgrp->SetFilter({name=>$assignment}); 
+                     my ($acgrprec,$msg)=$acgrp->getOnlyFirst(qw(name));
+                     if (defined($acgrprec)){
+                        $assignment=$acgrprec->{name};
+                     }
+                     else{
+                        $grpnotfound{$assignment}=1;
+                        $assignment="CSS.TCOM";
+                     }
+                  }
+                  else{
+                     $assignment="CSS.TCOM";
+                  }
+                  my $model="APPL-INSTANCE";
+                  $model="SAP-INSTANCE" if ($irec->{swnature}=~m/^SAP.*$/i); 
+                  $model="DB-INSTANCE"  if ($irec->{swnature}=~m/mysql/i); 
+                  $model="DB-INSTANCE"  if ($irec->{swnature}=~m/oracle/i); 
+                  $model="DB-INSTANCE"  if ($irec->{swnature}=~m/informix/i); 
+                  $model="DB-INSTANCE"  if ($irec->{swnature}=~m/mssql/i); 
+                  $model="DB-INSTANCE"  if ($irec->{swnature}=~m/db2/i); 
+                  my $swi={Instance=>{
+                             EventID=>$CurrentEventId,
+                             ExternalSystem=>'W5Base',
+                             ExternalID=>$irec->{id},
+                             Name=>$irec->{fullname},
+                             Status=>"in operation",
+                             Model=>$model,
+                             Remarks=>$irec->{comments},
+                             Assignment=>$assignment,
+                             CostCenter=>$rec->{conumber},
+                             Security_Unit=>"TS.DE",
+                             CustomerLink=>"TS.DE",
+                             bDelete=>'0'
+                           }
+                          };
+                  my $fh=$fh{instance};
+                  print $fh hash2xml($swi,{header=>0});
+                  print $onlinefh hash2xml($swi,{header=>0});
+                  $elements++;
+               }
+            }
             #print Dumper($rec->{contacts});
          }
 
@@ -397,6 +453,8 @@ sub ApplicationModified
    print $onlinefh ("</XMLInterface>\n");
    close($onlinefh);
 
+   $self->TransferFile($fh{instance},$filename{instance},
+                       $ftp,"instance");
    $self->TransferFile($fh{appl_contact_rel},$filename{appl_contact_rel},
                        $ftp,"appl_contact_rel");
    $self->TransferFile($fh{ci_appl_rel},$filename{ci_appl_rel},

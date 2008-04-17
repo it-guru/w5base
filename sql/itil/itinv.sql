@@ -652,3 +652,7 @@ alter table asset  add lastqcheck datetime default NULL,add key(lastqcheck);
 alter table system add consoleip  varchar(40) default NULL;
 alter table ipaddress add accountno varchar(20), add key(accountno);
 alter table ipaddress add ifname varchar(20);
+alter table swinstance add swinstanceid varchar(20) default NULL;
+alter table swinstance add UNIQUE key swinstanceid (swinstanceid);
+alter table swinstance add custcostalloc int(2) default 0;
+alter table servicesupport add flathourscost float(5,2) default NULL;

@@ -140,6 +140,12 @@ sub new
                 vjoinon       =>['swteamid'=>'grpid'],
                 vjoindisp     =>'fullname'),
 
+      new kernel::Field::Text(
+                name          =>'swinstanceid',
+                htmlwidth     =>'100px',
+                label         =>'Instance ID',
+                dataobjattr   =>'swinstance.swinstanceid'),
+
       new kernel::Field::Link(
                 name          =>'swteamid',
                 dataobjattr   =>'swinstance.swteam'),
@@ -202,6 +208,12 @@ sub new
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['servicesupportid'=>'id'],
                 vjoindisp     =>'name'),
+
+      new kernel::Field::Boolean(
+                name          =>'custcostalloc',
+                label         =>'Customer cost allocation',
+                group         =>'misc',
+                dataobjattr   =>'swinstance.custcostalloc'),
 
       new kernel::Field::Text(
                 name          =>'autoname',
@@ -422,6 +434,7 @@ sub Validate
    my $addname=trim(effVal($oldrec,$newrec,"addname"));
    my $swtype=trim(effVal($oldrec,$newrec,"swtype"));
    my $swport=trim(effVal($oldrec,$newrec,"swport"));
+   my $swinstanceid=trim(effVal($oldrec,$newrec,"swinstanceid"));
    if ($swnature=~m/^\s*$/){
       $self->LastMsg(ERROR,"invalid swnature");
       return(0);
@@ -473,6 +486,9 @@ sub Validate
                               "as databoss");
          return(0);
       }
+   }
+   if ($swinstanceid eq ""){
+      $newrec->{swinstanceid}=undef;
    }
    ########################################################################
    if (effVal($oldrec,$newrec,"swport")=~m/^\s*$/){
