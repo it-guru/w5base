@@ -323,6 +323,9 @@ $VERSION = "0.2";
 @ISA = qw(Exporter);
 @EXPORT = qw(&msg &ERROR &WARN &DEBUG &INFO $RealScript
              &XGetOptions
+             &XGetFQStoreFilename
+             &XLoadStoreFile
+             &XSaveStoreFile
              &createConfig
              &getModuleObject
              );
