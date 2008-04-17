@@ -11,7 +11,10 @@ updates" is set to "yes".
 
 =head3 IMPORTS
 
-From AssetCenter the fields Location.
+none
+=cut
+# ToDo:
+#From AssetCenter the fields Location.
 #CurrentVersion and Description are imported. SeM and TSM are imported, if
 #it was successfuly to import the relatied contacts.
 #IP-Addresses can only be synced, if the field "Allow automatic interface
@@ -25,7 +28,6 @@ From AssetCenter the fields Location.
 #
 #- "AC Assignmentgroup" is imported to comments field in W5Base
 
-=cut
 #######################################################################
 
 #  Functions:
