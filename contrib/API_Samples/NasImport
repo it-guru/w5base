@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 package MyWin;
-#  $rev$
+#  $Revision$
 #  W5Base Framework
 #  Copyright (C) 2008  Holm Basedow (info@blauwarme.de)
 #
