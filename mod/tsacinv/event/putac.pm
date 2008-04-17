@@ -84,7 +84,7 @@ sub ApplicationModified
               50=>'ACCEPTANCE',
               60=>'DEVELOPMENT',
               70=>'PRODUCTION');
-   $filter{name}="*darwin* *routing*";
+   #$filter{name}="*darwin* *routing*";
    $app->SetFilter(\%filter);
    $app->SetCurrentView(qw(ALL));
   # $app->SetCurrentView(qw(id name sem tsm tsm2 conumber currentvers
