@@ -139,6 +139,9 @@ sub qcheckRecord
                                  if ($mode eq "update"){
                                     $identifyby=$oldrec->{id};
                                  }
+                                 if ($newrec->{ipaddress}=~m/^\s*$/){
+                                    $mode="nop";
+                                 }
                                  return({OP=>$mode,
                                          MSG=>"$mode ip $newrec->{ipaddress} ".
                                               "in W5Base",
@@ -393,7 +396,10 @@ sub ProcessOpList
       if (defined($dataobj)){
          $dataobj->ResetFilter();
          msg(INFO,sprintf("OP:%s\n",Dumper($op)));
-         if ($op->{OP} eq "insert"){
+         if ($op->{OP} eq "nop"){
+            msg(INFO,"skipped operation");
+         }
+         elsif ($op->{OP} eq "insert"){
             my $id=$dataobj->ValidatedInsertRecord($op->{DATA});
             $op->{IDENTIFYBY}=$id;
             msg(INFO,"insert id ok = $id");
