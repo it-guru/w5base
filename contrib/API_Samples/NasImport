@@ -1,5 +1,23 @@
 #!/usr/bin/env perl
 package MyWin;
+#  W5Base Framework
+#  Copyright (C) 2008  Holm Basedow (info@blauwarme.de)
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+
 use strict;
 use vars qw(@ISA);
 use Data::Dumper;
@@ -15,9 +33,8 @@ sub new
    my $force=$param{-force};
    my $nowarn=$param{-nowarn};
    my $mode=$param{-mode};
-   my $base=$param{-base};
-   my $webuser=$param{-webuser};
-   my $webpass=$param{-webpass};
+   my $params=$param{-params};
+   my $fullstoredfilename=$param{-fullstoredfilename};
    my $icon = eval("newIcon Win32::GUI::BitmapInline(main::WindowIcon());");
    $param{-icon}=$icon;
    $param{-left}=100;
@@ -34,16 +51,17 @@ sub new
                                      '&File' => 'File',
                                      ' > &Open'  => { -name=>'Open',-onClick=>\\&OpenFile},
                                      ' > &End'  => { -name=>'Exit',-onClick=>\\&doTerminate},
+                                     '&?' => 'Info',
+                                     ' > &Info'   => { -name=>'Info',-onClick=>\\&Info},
    );");
    my $self=$type->SUPER::new(%param);
    $self->SetIcon($icon);
    #$self->MessageBox('error','header');
    $self=bless($self,$type);
    $self->{file}=$file;
+   $self->{fullstoredfilename}=$fullstoredfilename;
+   $self->{PARAM}=$params;
    $self->{o}=$o;
-   $self->{mainwebuser}=$webuser;
-   $self->{mainwebpass}=$webpass;
-   $self->{webbase}=$base;
    $self->{ICON}=$icon;
    $self->AddNotifyIcon(-name => "systray",
                         -icon => $self->{ICON},
@@ -143,7 +161,7 @@ sub new
    $self->{GRID}->add($self->webuserl,8,5,"justify buttom");
    $self->AddTextfield(
           -name      => "webuser",
-          -text      => $self->{mainwebuser},
+          -text      => ${$self->{PARAM}->{'webuser=s'}},
           -width     => 130,
           -height    => 20,
           -tabstop=> 1,
@@ -156,7 +174,7 @@ sub new
    $self->{GRID}->add($self->webpassl,9,5,"justify buttom");
    $self->AddTextfield(
           -name      => "webpass",
-          -text      => $self->{mainwebpass},
+          -text      => ${$self->{PARAM}->{'webpass=s'}},
           -width     => 130,
           -height    => 20,
           -password  => 1,
@@ -170,7 +188,7 @@ sub new
    $self->{GRID}->add($self->baseurl,8,7,"justify buttom");
    $self->AddTextfield(
           -name      => "base",
-          -text      => $self->{webbase},
+          -text      => ${$self->{PARAM}->{'base=s'}},
           -width     => 130,
           -height    => 20,
           -tabstop=> 1,
@@ -267,15 +285,17 @@ sub doStart
    $mainwin->pgbar->SetRange(0,1500);
    $mainwin->pgbar->SetStep(1);
    $mainwin->pgbar->SetPos(50);
-   my %login=(base=>$mainwin->{webbase},webuser=>$mainwin->{mainwebuser},webpass=>$mainwin->{mainwebpass});
-   my $Config=main::createConfig($mainwin->{webbase},
-                                 $mainwin->{mainwebuser},
-                                 $mainwin->{mainwebpass},0,0,\$exitcode,\$msgs);
+   my $Config=main::createConfig(${$mainwin->{PARAM}->{'base=s'}},
+                                 ${$mainwin->{PARAM}->{'webuser=s'}},
+                                 ${$mainwin->{PARAM}->{'webpass=s'}},
+                                 0,0,\$exitcode,\$msgs);
    $mainwin->run->Enable(0);
    if (!$Config){
       eval("Win32::MsgBox(\"login error: \$msgs\",Win32::MB_ICONQUESTION|0, 'Error!')");   
       $mainwin->run->Enable(1);
       return(1,$msgs);
+   }else{
+      main::XSaveStoreFile($mainwin->{fullstoredfilename},$mainwin->{PARAM});
    }
    $mainwin->output->Append("done\r\nget objects ... ");
    @result=main::moduleObj($Config);
@@ -361,9 +381,9 @@ sub checkMode
       $file=substr($file,0,5)."...".substr($file,length($file)-36,length($file));
    }
    # save login datas
-   $self->{webbase}=$self->base->GetLine(0);
-   $self->{mainwebuser}=$self->webuser->GetLine(0);
-   $self->{mainwebpass}=$self->webpass->GetLine(0);
+   ${$self->{PARAM}->{'base=s'}}=$self->base->GetLine(0);
+   ${$self->{PARAM}->{'webuser=s'}}=$self->webuser->GetLine(0);
+   ${$self->{PARAM}->{'webpass=s'}}=$self->webpass->GetLine(0);
    # output file datas
    $self->filename->Change(-text=>"FILE: ".$file);
    $self->fileformat->Change(-text=>"FILEFORMAT: ".$self->{curmode});
@@ -375,17 +395,35 @@ sub checkMode
    return(0);
 }
 
-sub MyTest
+sub Info
 {
-   exit(0);
+   my $self=shift; 
+   my $text=(<<EOF);
+W5Base Importer is a tiny software to import data
+in a W5Base Environment of your own choice
+
+W5Base Framework
+Copyright (C) 2008  Holm Basedow (info\@blauwaerme.de)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+EOF
+
+   $self->MessageBox("$text",'Infomation',0x0020);
 }
 
 sub doTerminate
-{
-   return(-1);
-}
-
-sub doOk
 {
    return(-1);
 }
@@ -402,8 +440,8 @@ sub doMinimize {
 
 ################################################################################
 package main;
-use lib qw(/opt/w5base/lib);
 use strict;                   
+use lib qw(/opt/w5base/lib);
 use W5Base::API;
 use Data::Dumper;
 use Net::DNS;
@@ -418,18 +456,21 @@ my ($mode,$force,$hostname,$type,$gui,$nowarn,%o);
 my $count=0;
 my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
        "webuser=s"=>\$loginuser,"webpass=s"=> \$loginpass,
-       "verbose+"=>\$verbose,"nowarn"=>\$nowarn,"quiet"=>\$quiet,
+       "verbose+"=>\$verbose,"nowarn"=>\$nowarn,
        "force"=>\$force,"hostname=s"=>\$hostname,
        "mode=s"=>\$mode,"type=s"=>\$type,"gui"=>\$gui);
 
+# set options
 $|=1;
-my $noautologin=1;
-my $optresult=XGetOptions(\%P,\&Help,undef,undef,".W5Base.Interface",(noautologin=>1));
+XGetOptions(\%P,\&Help,undef,undef,".w5api",noautologin=>1);
+
+# set defaults
 $mode="auto" if (!defined($mode));
 $type="nfs" if (!defined($type));
-
 if ($gui){
    $|=1;
+   my $fullstoredfilename=$ENV{HOMEPATH}."\\.w5api";
+   XLoadStoreFile($fullstoredfilename,\%P);
    eval('
          use Win32::GUI;
          use Win32::GUI::GridLayout;
@@ -440,10 +481,9 @@ if ($gui){
                         ARGV=>\@ARGV,
                         o=>\%o,
                         -mode=>$mode,
-                        -base=>$base,
-                        -webpass=>$loginpass,
-                        -webuser=>$loginuser,
                         -nowarn=>$nowarn,
+                        -fullstoredfilename=>$fullstoredfilename,
+                        -params=>\%P,
                         -force=>$force);
          $GUI->Show();
          Win32::GUI::Dialog();');
