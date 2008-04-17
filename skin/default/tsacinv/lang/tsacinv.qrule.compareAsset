@@ -1,0 +1,5 @@
+'tsacinv::qrule::compareAsset'=>{de=>'AssetCenter Abgleich Asset',
+                                  en=>'AssetCenter compare of Asset'},
+
+'no assetid specified'=>{de=>'keine AssetID definiert'},
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},

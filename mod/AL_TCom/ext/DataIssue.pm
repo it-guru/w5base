@@ -50,6 +50,11 @@ sub getControlRecord
              target    =>'name',
              targetid  =>'id'
            },
+           {
+             dataobj   =>'AL_TCom::asset',
+             target    =>'name',
+             targetid  =>'id'
+           },
          ];
    return($d);
 }

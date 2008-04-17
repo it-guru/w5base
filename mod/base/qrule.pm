@@ -211,7 +211,9 @@ sub nativQualityCheck
    my $dataobj=$self->getParent();
    my $affectedobject=$dataobj->Self();
    my $affectedobjectid=$rec->{id};
+   msg(INFO,"QualityRule Level1");
    if (keys(%alldataissuemsg)){
+      msg(INFO,"QualityRule Level2");
       my $directlnkmode="DataIssueMsg";
       my $detaildescription;
       foreach my $qrule (keys(%alldataissuemsg)){
@@ -222,14 +224,22 @@ sub nativQualityCheck
             $detaildescription.=" - ".$msg."\n";
          }
       }
+      msg(INFO,"QualityRule Level3");
+      my $oldforce=$ENV{HTTP_FORCE_LANGUAGE};
+      $ENV{HTTP_FORCE_LANGUAGE}="en";
       my $name="DataIssue: ".$dataobj->T($affectedobject,$affectedobject).": ".
                $rec->{name};
+      $ENV{HTTP_FORCE_LANGUAGE}=$oldforce;
+      delete($ENV{HTTP_FORCE_LANGUAGE}) if ($ENV{HTTP_FORCE_LANGUAGE} eq "");
       $wf->SetFilter({stateid=>"<20",class=>\"base::workflow::DataIssue",
                       directlnktype=>\$affectedobject,
                       directlnkid=>\$affectedobjectid});
+      msg(INFO,"QualityRule Level4");
       my ($WfRec,$msg)=$wf->getOnlyFirst(qw(ALL));
       my $oldcontext=$W5V2::OperationContext;
       $W5V2::OperationContext="QualityCheck";
+      msg(INFO,"QualityRule Level5");
+      msg(INFO,sprintf("check old wfrec=%s",Dumper($WfRec)));
       if (!defined($WfRec)){
          my $newrec={name=>$name,
                      detaildescription=>$detaildescription,
@@ -270,7 +280,11 @@ sub nativQualityCheck
                    directlnkid=>\$affectedobjectid});
    $wf->SetCurrentView(qw(ALL));
    $wf->ForeachFilteredRecord(sub{
-                      $wf->Store($_,{stateid=>'21'});
+                      $wf->Store($_,{stateid=>'21',
+                                     fwddebtarget=>undef,
+                                     fwddebtargetid=>undef,
+                                     fwdtarget=>undef,
+                                     fwdtarget=>undef});
                    });
    if (my $qclast=$parent->getField("lastqcheck")){
       my $idfield=$parent->IdField();
