@@ -76,6 +76,9 @@ sub new
    $self->{FONT}=eval("new Win32::GUI::Font(-bold   => 1,
                                             -size   => 12,
    )");
+   $self->{FONT2}=eval("new Win32::GUI::Font(-bold   => 0,
+                                             -size   => 12,
+   )");
    $self->{BITMAP}=eval("new Win32::GUI::BitmapInline(main::WindowImg());");
    # header
    $self->AddLabel(
@@ -88,7 +91,7 @@ sub new
    $self->AddLabel(
           -name        => "headname",
           -text        => $self->{VERSION},
-          -font        => $self->{FONT},
+          -font        => $self->{FONT2},
           -foreground  => 0x000000,
    );
    $self->{GRID}->add($self->headname,[1..10],2,"right justify");
@@ -402,7 +405,7 @@ sub Info
    my $self=shift; 
    my $version=$self->{VERSION};
    my $text=(<<EOF);
-Version $version
+$version
 
 W5Base Importer is a tiny software to import data
 in a W5Base Environment of your own choice
@@ -459,7 +462,7 @@ my $DefaultBase="https://w5base.net/w5base/auth/";
 my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang);
 my ($mode,$force,$hostname,$type,$gui,$nowarn,%o,$Revision,$empty);
 my $count=0;
-my $version="0.1 Build: $Revision$empty ";
+my $version="Version 0.1 Build$Revision$empty ";
 my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
        "webuser=s"=>\$loginuser,"webpass=s"=> \$loginpass,
        "verbose+"=>\$verbose,"nowarn"=>\$nowarn,
