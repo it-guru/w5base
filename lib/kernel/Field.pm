@@ -22,6 +22,7 @@ use kernel;
 use kernel::Field::Id;
 use kernel::Field::Text;
 use kernel::Field::Password;
+use kernel::Field::Phonenumber;
 use kernel::Field::File;
 use kernel::Field::Float;
 use kernel::Field::Currency;

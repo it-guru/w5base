@@ -54,7 +54,7 @@ sub new
                 htmlwidth     =>'50',
                 dataobjattr   =>'phonenumber.refid'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Phonenumber(
                 name          =>'phonenumber',
                 htmlwidth     =>'150',
                 label         =>'Phonenumber',

@@ -152,13 +152,13 @@ sub new
                 label         =>'Surname',
                 dataobjattr   =>'user.surname'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Phonenumber(
                 name          =>'office_mobile',
                 group         =>'office',
                 label         =>'Mobile-Phonenumber',
                 dataobjattr   =>'user.office_mobile'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Phonenumber(
                 name          =>'office_phone',
                 group         =>'office',
                 label         =>'Phonenumber',
@@ -218,25 +218,25 @@ sub new
                 label         =>'Location',
                 dataobjattr   =>'user.private_location'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Phonenumber(
                 name          =>'private_facsimile',
                 group         =>'private',
                 label         =>'FAX-Number',
                 dataobjattr   =>'user.private_facsimile'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Phonenumber(
                 name          =>'private_elecfacsimile',
                 group         =>'private',
                 label         =>'electronical FAX-Number',
                 dataobjattr   =>'user.private_elecfacsimile'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Phonenumber(
                 name          =>'private_mobile',
                 group         =>'private',
                 label         =>'Mobile-Phonenumber',
                 dataobjattr   =>'user.private_mobile'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Phonenumber(
                 name          =>'private_phone',
                 group         =>'private',
                 label         =>'Phonenumber',
