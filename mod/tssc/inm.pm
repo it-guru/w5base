@@ -224,6 +224,7 @@ sub new
                 name          =>'page',
                 dataobjattr   =>'problemm1.page'),
    );
+   $self->{use_distinct}=0;
 
    $self->setDefaultView(qw(linenumber incidentnumber 
                             downtimestart downtimeend status name));
@@ -270,7 +271,6 @@ sub Initialize
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"tssc"));
    return(@result) if (defined($result[0]) eq "InitERROR");
 
-   $self->{use_distinct}=0;
    return(1) if (defined($self->{DB}));
    return(0);
 }

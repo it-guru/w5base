@@ -245,7 +245,7 @@ sub new
                 dataobjattr   =>'rootcausem1.assignment'),
 
    );
-
+   $self->{use_distinct}=0;
    $self->setDefaultView(qw(linenumber cdate problemnumber status name));
    return($self);
 }
@@ -266,7 +266,6 @@ sub Initialize
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"tssc"));
    return(@result) if (defined($result[0]) eq "InitERROR");
 
-   $self->{use_distinct}=0;
    return(1) if (defined($self->{DB}));
    return(0);
 }
