@@ -146,21 +146,13 @@ sub new
 
    );
    $self->setDefaultView(qw(name cistatus mdate));
+   $self->setWorktable("network");
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","admin.itil.network"],
                          uniquesize=>255};
    return($self);
 }
 
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("network");
-   return(1);
-}
 
 sub getRecordImageUrl
 {

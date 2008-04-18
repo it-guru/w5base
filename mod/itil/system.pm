@@ -697,6 +697,7 @@ sub new
    $self->{use_distinct}=1;
    $self->AddGroup("control",translation=>'itil::system');
    $self->setDefaultView(qw(name location cistatus mdate));
+   $self->setWorktable("system");
    return($self);
 }
 
@@ -742,16 +743,6 @@ sub getTeamBoss
    return(\@teamboss);
 }
 
-
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("system");
-   return(1);
-}
 
 sub getRecordImageUrl
 {

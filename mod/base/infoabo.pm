@@ -180,6 +180,7 @@ sub new
                 dataobjattr   =>'infoabo.realeditor'),
    );
    $self->setDefaultView(qw(parentobj targetname mode user active));
+   $self->setWorktable("infoabo");
    $self->LoadSubObjs("ext/infoabo","infoabo");
    $self->LoadSubObjs("ext/staticinfoabo","staticinfoabo");
    $self->{admwrite}=[qw(admin w5base.base.infoabo.write)]; 
@@ -350,16 +351,6 @@ sub getPostibleParentObjs
    push(@opt,"base::staticinfoabo",
         $app->T("base::staticinfoabo","base::staticinfoabo"));
    return(@opt);
-}
-
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("infoabo");
-   return(1);
 }
 
 

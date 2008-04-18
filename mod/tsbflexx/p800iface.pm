@@ -97,7 +97,8 @@ sub Initialize
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"tsbflexx"));
    return(@result) if (defined($result[0]) eq "InitERROR");
    $self->setWorktable("ta_application_data");
-   return(1);
+   return(1) if (defined($self->{DB}));
+   return(0);
 }
 
 sub isViewValid

@@ -370,7 +370,7 @@ sub XGetOptions
    my %param=@_;
    my $optresult;
 
-   my $storefile=XGetFQStoreFilename($storefile);
+   $storefile=XGetFQStoreFilename($storefile);
    my $store;
    $param->{store}=\$store;
 

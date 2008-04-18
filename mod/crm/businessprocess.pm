@@ -208,6 +208,7 @@ sub new
 
    );
    $self->setDefaultView(qw(linenumber name cistatus importance cdate));
+   $self->setWorktable("businessprocess");
    $self->{use_distinct}=1;
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","w5base.crm.businessprocess"],
@@ -215,13 +216,6 @@ sub new
    return($self);
 }
 
-sub Initialize
-{
-   my $self=shift;
-
-   $self->setWorktable("businessprocess");
-   return($self->SUPER::Initialize());
-}
 
 sub SecureValidate
 {

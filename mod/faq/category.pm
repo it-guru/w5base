@@ -127,19 +127,9 @@ sub new
    );
    $self->{locktables}="faqcat write, faqcatacl write";
    $self->setDefaultView(qw(fullname faqcatid editor comments));
+   $self->setWorktable("faqcat");
    return($self);
 }
-
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("faqcat");
-   return(1);
-}
-
 
 
 sub Validate
@@ -153,7 +143,8 @@ sub Validate
       trim(\$newrec->{name});
       if ($newrec->{name} eq "" ||
            !($newrec->{name}=~m/^[a-zA-Z0-9_-]+$/)){
-         $self->LastMsg(ERROR,"invalid groupname '%s' specified",$newrec->{name});
+         $self->LastMsg(ERROR,"invalid groupname '%s' specified",
+                        $newrec->{name});
          return(undef);
       }
    }

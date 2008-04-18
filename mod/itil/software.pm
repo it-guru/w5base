@@ -156,17 +156,10 @@ sub new
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","admin.itil.software"],
                          uniquesize=>255};
-
+   $self->setWorktable("software");
    return($self);
 }
 
-sub Initialize
-{
-   my $self=shift;
-
-   $self->setWorktable("software");
-   return($self->SUPER::Initialize());
-}
 
 sub getRecordImageUrl
 {
@@ -174,9 +167,6 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/itil/load/software.jpg?".$cgi->query_string());
 }
-
-
-
 
 
 sub Validate

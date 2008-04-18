@@ -346,19 +346,9 @@ sub new
 
    );
    $self->setDefaultView(qw(lnkgrpuserid user group editor));
+   $self->setWorktable("lnkgrpuser");
    return($self);
 }
-
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("lnkgrpuser");
-   return(1);
-}
-
 
 
 sub Validate
@@ -470,8 +460,6 @@ sub NotifyOrgAdminActionToAdmin
    my $wf=getModuleObject($self->Config,"base::workflow");
 
    my $user=getModuleObject($self->Config,"base::user");
-   $user->Initialize();
-   #delete($user->{DB});
    return() if ($creator==0);
    $user->SetFilter({userid=>\$creator});
    my ($creatorrec,$msg)=$user->getOnlyFirst(qw(email givenname surname));

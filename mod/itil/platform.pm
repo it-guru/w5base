@@ -107,17 +107,10 @@ sub new
 
    );
    $self->setDefaultView(qw(id name cistatus mdate cdate));
+   $self->setWorktable("platform");
    $self->{history}=[qw(insert modify delete)];
    $self->{adminsgroups}=["admin","admin.platform"];
    return($self);
-}
-
-sub Initialize
-{
-   my $self=shift;
-
-   $self->setWorktable("platform");
-   return($self->SUPER::Initialize());
 }
 
 

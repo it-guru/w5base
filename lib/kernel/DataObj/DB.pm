@@ -648,7 +648,10 @@ sub getFirst
    my $self=shift;
 
    if (!defined($self->{DB})){
-      return(undef,msg(ERROR,"no database connection"));
+      $self->{isInitalized}=0;
+      return(undef,
+             msg(ERROR,
+             $self->T("no database connection or invalid database handle")));
    }
    $self->{DB}->finish();
    my @sqlcmd=($self->getSqlSelect());

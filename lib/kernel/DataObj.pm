@@ -30,6 +30,7 @@ sub new
    my $self={@_};
    $self=bless($self,$type);
    $self->{isInitalized}=0;
+   $self->{use_distinct}=1 if (!exists($self->{use_distinct}));
    
    return($self);
 }
@@ -89,6 +90,7 @@ sub SetFilter
    my $self=shift;
    #$self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
    $self->Limit(0);
+   $self->{use_distinct}=1 if (!exists($self->{use_distinct}));
    return($self->_SetFilter("FILTER",@_));
 }
 
@@ -148,12 +150,12 @@ sub _SetFilter
 sub Initialize
 {
    my $self=shift;
-   $self->{use_distinct}=1 if (!exists($self->{use_distinct}));
-   if ($self->can("AddDatabase") && !exists($self->{DB})){
+   if ($self->can("AddDatabase")){
       my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
       return(@result) if (defined($result[0]) eq "InitERROR");
+      return(1) if (defined($self->{DB}));
    }
-   return(1);
+   return(0);
 }
 
 sub getFirst

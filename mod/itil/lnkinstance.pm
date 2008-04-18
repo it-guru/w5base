@@ -227,18 +227,10 @@ sub new
 
    );
    $self->setDefaultView(qw(software version quantity system cdate));
+   $self->setWorktable("lnkinstance");
    return($self);
 }
 
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("lnkinstance");
-   return(1);
-}
 
 sub getSqlFrom
 {
@@ -252,6 +244,7 @@ sub getSqlFrom
    return($from);
 }
 
+
 sub initSqlWhere
 {
    my $self=shift;
@@ -262,10 +255,6 @@ sub initSqlWhere
    my $where="lnkinstance.lnksoftwaresystem=lnksoftwaresystem.id";
    return($where);
 }
-
-
-
-
 
 
 sub Validate

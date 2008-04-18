@@ -381,14 +381,17 @@ sub new
 
    $self->{PhoneLnkUsage}=\&getPhoneUsage;
    $self->setDefaultView(qw(name mandator cistatus mdate));
+   $self->setWorktable("asset");
    return($self);
 }
+
 
 sub getPhoneUsage
 {
    my $self=shift;
    return('phoneRB',$self->T("phoneRB","itil::appl"));
 }
+
 
 sub createWorkflowQuery
 {
@@ -408,15 +411,6 @@ sub createWorkflowQuery
    $q->{affectedsystemid}=[keys(%sid)];   
 }
 
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("asset");
-   return(1);
-}
 
 sub getRecordImageUrl
 {

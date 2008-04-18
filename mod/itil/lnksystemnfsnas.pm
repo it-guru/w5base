@@ -224,6 +224,7 @@ sub new
    $self->{use_distinct}=1;
    $self->setDefaultView(qw(linenumber systemnfsnasserver system 
                             syssystemid systemnfsnas cdate));
+   $self->setWorktable("lnksystemnfsnas");
    return($self);
 }
 
@@ -258,16 +259,6 @@ sub getApplData
    return([sort(keys(%name))]) if ($name eq "appl");
    return([sort(keys(%tsm))])  if ($name eq "tsmemail");
    return([sort(keys(%sem))])  if ($name eq "sememail");
-}
-
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("lnksystemnfsnas");
-   return(1);
 }
 
 

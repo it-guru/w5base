@@ -289,25 +289,16 @@ sub new
    $self->{workflowlink}={ workflowkey=>[id=>'affectedcontractid']
                          };
    $self->setDefaultView(qw(linenumber name cistatus mandator mdate fullname));
+   $self->setWorktable("custcontract");
    return($self);
 }
+
 
 sub getDetailBlockPriority
 {
    my $self=shift;
    return($self->SUPER::getDetailBlockPriority(@_),
           qw(default sem contacts control misc attachments));
-}
-
-
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("custcontract");
-   return(1);
 }
 
 

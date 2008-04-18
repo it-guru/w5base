@@ -69,41 +69,27 @@ sub new
 
    );
    $self->setDefaultView(qw(logondate account logonip logonbrowser));
-   return($self);
-}
-
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
    $self->setWorktable("userlogon");
-   return(1);
+   return($self);
 }
 
 
 sub Validate
 {
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-
+   my ($self,$oldrec,$newrec)=@_;
    return(1);
 }
 
 
 sub isViewValid
 {
-   my $self=shift;
-   my $rec=shift;
+   my ($self,$rec)=@_;
    return("ALL");
 }
 
 sub isWriteValid
 {
-   my $self=shift;
-   my $rec=shift;
+   my ($self,$rec)=@_;
    return(undef);
 }
 

@@ -118,20 +118,9 @@ sub new
 
    );
    $self->setDefaultView(qw(roleid userfullname grpfullname role editor cdate));
+   $self->setWorktable("lnkgrpuserrole");
    return($self);
 }
-
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("lnkgrpuserrole");
-   return(1);
-}
-
-
 
 
 sub getSqlFrom

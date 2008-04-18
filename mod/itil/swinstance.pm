@@ -338,19 +338,10 @@ sub new
    $self->{history}=[qw(insert modify delete)];
    $self->{use_distinct}=1;
    $self->setDefaultView(qw(fullname mandator cistatus mdate));
+   $self->setWorktable("swinstance");
    return($self);
 }
 
-
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("swinstance");
-   return(1);
-}
 
 sub getRecordImageUrl
 {

@@ -645,8 +645,10 @@ sub new
    $self->{use_distinct}=1;
    $self->{PhoneLnkUsage}=\&PhoneUsage;
    $self->setDefaultView(qw(name mandator cistatus mdate));
+   $self->setWorktable("appl");
    return($self);
 }
+
 
 sub getTeamBossID
 {
@@ -670,6 +672,7 @@ sub getTeamBossID
    return(\@teambossid);
 }
 
+
 sub getTeamBoss
 {
    my $self=shift;
@@ -690,6 +693,7 @@ sub getTeamBoss
    return(\@teamboss);
 }
 
+
 sub PhoneUsage
 {
    my $self=shift;
@@ -703,15 +707,6 @@ sub PhoneUsage
 
 }
 
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("appl");
-   return(1);
-}
 
 sub getRecordImageUrl
 {
@@ -719,6 +714,7 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/itil/load/appl.jpg?".$cgi->query_string());
 }
+
 
 sub getSqlFrom
 {

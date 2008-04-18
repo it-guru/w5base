@@ -168,7 +168,8 @@ sub Initialize
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"tsac"));
    return(@result) if (defined($result[0]) eq "InitERROR");
    $self->setWorktable("amlocation");
-   return(1);
+   return(1) if (defined($self->{DB}));
+   return(0);
 }
 
 sub isViewValid

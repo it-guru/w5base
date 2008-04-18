@@ -279,8 +279,10 @@ sub new
 
    );
    $self->setDefaultView(qw(location address1 name cistatus));
+   $self->setWorktable("location");
    return($self);
 }
+
 
 sub getDetailBlockPriority
 {
@@ -290,16 +292,6 @@ sub getDetailBlockPriority
    return("header","default","contacts","map","gps");
 }
 
-
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("location");
-   return(1);
-}
 
 sub getRecordImageUrl
 {

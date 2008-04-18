@@ -83,8 +83,10 @@ sub new
                 dataobjattr   =>'wfkey.realeditor'),
    );
    $self->setDefaultView(qw(wfheadid name value cdate));
+   $self->setWorktable("wfkey");
    return($self);
 }
+
 
 sub initSearchQuery
 {
@@ -93,16 +95,6 @@ sub initSearchQuery
    Query->Param("search_cdate"=>'>now-60m');
 }
 
-
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("wfkey");
-   return(1);
-}
 
 sub isViewValid
 {

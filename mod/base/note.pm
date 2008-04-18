@@ -92,18 +92,10 @@ sub new
 
    );
    $self->setDefaultView(qw(linenumber name groupname cistatus cdate mdate));
+   $self->setWorktable("note");
    return($self);
 }
 
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("note");
-   return(1);
-}
 
 sub Validate
 {
@@ -129,6 +121,7 @@ sub isViewValid
    return("ALL");
 }
 
+
 sub isWriteValid
 {
    my $self=shift;
@@ -143,6 +136,7 @@ sub getValidWebFunctions
    my ($self)=@_;
    return(qw(Actor Display),$self->SUPER::getValidWebFunctions());
 }
+
 
 sub Display
 {

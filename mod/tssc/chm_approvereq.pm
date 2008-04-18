@@ -55,8 +55,8 @@ sub Initialize
 
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"tssc"));
    return(@result) if (defined($result[0]) eq "InitERROR");
-
-   return(1);
+   return(1) if (defined($self->{DB}));
+   return(0);
 }
 
 

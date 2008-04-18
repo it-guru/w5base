@@ -26,7 +26,6 @@ use kernel::Field;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 
-
 sub new
 {
    my $type=shift;
@@ -173,6 +172,7 @@ sub new
 
    );
    $self->setDefaultView(qw(mdate categorie name editor));
+   $self->setWorktable("faq");
    $self->{DetailY}=520;
    return($self);
 }
@@ -213,15 +213,6 @@ sub getSqlFrom
    return($from);
 }
 
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("faq");
-   return($self->SUPER::Initialize(@_));
-}
 
 sub Validate
 {
@@ -248,9 +239,6 @@ sub Validate
 }
 
 
-
-
-
 sub isViewValid
 {
    my $self=shift;
@@ -259,6 +247,7 @@ sub isViewValid
 
    return("ALL");
 }
+
 
 sub isWriteValid
 {
@@ -279,9 +268,9 @@ sub isWriteValid
    return("default","acl","attachments") if ($rec->{owner}==$userid ||
                                              $self->IsMemberOf("admin") ||
                                              grep(/^write$/,@acl));
-
    return(undef);
 }
+
 
 sub getRecordImageUrl
 {
@@ -289,6 +278,7 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/faq/load/faqknowledge.jpg?".$cgi->query_string());
 }
+
 
 sub FinishWrite
 {

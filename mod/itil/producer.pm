@@ -156,19 +156,13 @@ sub new
 
    );
    $self->setDefaultView(qw(name id cistatus cdate mdate));
+   $self->setWorktable("producer");
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","admin.itil.producer"],
                          uniquesize=>255};
    return($self);
 }
 
-sub Initialize
-{
-   my $self=shift;
-
-   $self->setWorktable("producer");
-   return($self->SUPER::Initialize());
-}
 
 sub getRecordImageUrl
 {
@@ -176,8 +170,6 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/itil/load/producer.jpg?".$cgi->query_string());
 }
-
-
 
 
 sub Validate

@@ -175,16 +175,10 @@ sub new
 
    );
    $self->setDefaultView(qw(name cistatus fullname mdate));
+   $self->setWorktable("costcenter");
    return($self);
 }
 
-sub Initialize
-{
-   my $self=shift;
-
-   $self->setWorktable("costcenter");
-   return($self->SUPER::Initialize());
-}
 
 sub getRecordImageUrl
 {
@@ -192,6 +186,7 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/itil/load/costcenter.jpg?".$cgi->query_string());
 }
+
 
 sub SecureValidate
 {

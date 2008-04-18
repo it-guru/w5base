@@ -126,18 +126,10 @@ sub new
 
    );
    $self->setDefaultView(qw(linenumber name groupname cistatus cdate mdate));
+   $self->setWorktable("mandator");
    return($self);
 }
 
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("mandator");
-   return(1);
-}
 
 sub getRecordImageUrl
 {
@@ -176,6 +168,7 @@ sub isViewValid
    return("ALL");
 }
 
+
 sub isWriteValid
 {
    my $self=shift;
@@ -183,6 +176,7 @@ sub isWriteValid
    return("default","contacts") if ($self->IsMemberOf("admin"));
    return(undef);
 }
+
 
 sub FinishWrite
 {
@@ -193,6 +187,7 @@ sub FinishWrite
    $self->InvalidateMandatorCache();
    return($bak);
 }
+
 
 sub FinishDelete
 {

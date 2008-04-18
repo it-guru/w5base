@@ -119,18 +119,10 @@ sub new
    $self->LoadSubObjs("ext/w5stat","w5stat");
    $self->LoadSubObjs("ext/w5workflowstat","w5workflowstat");
    $self->setDefaultView(qw(linenumber month sgroup fullname mdate));
+   $self->setWorktable("w5stat");
    return($self);
 }
 
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("w5stat");
-   return(1);
-}
 
 sub Validate
 {

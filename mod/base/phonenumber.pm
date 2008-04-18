@@ -149,7 +149,9 @@ sub new
                 label         =>'RealEditor',
                 dataobjattr   =>'phonenumber.realeditor'),
    );
-   $self->setDefaultView(qw(parentobj refid phonenumber shortedcomments cdate editor));
+   $self->setDefaultView(qw(parentobj refid phonenumber 
+                            shortedcomments cdate editor));
+   $self->setWorktable("phonenumber");
    $self->LoadSubObjs("ext/phonenumber","phonenumber");
    return($self);
 }
@@ -174,16 +176,6 @@ sub getPostibleUsageValues
       }
    }
    return();
-}
-
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("phonenumber");
-   return(1);
 }
 
 

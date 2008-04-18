@@ -146,6 +146,7 @@ sub new
    );
    $self->{use_distinct}=1;
    $self->setDefaultView(qw(linenumber name cistatus cdate mdate));
+   $self->setWorktable("systemjob");
    return($self);
 }
 
@@ -177,16 +178,6 @@ sub getSqlFrom
    return($from);
 }
 
-
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("systemjob");
-   return(1);
-}
 
 sub Validate
 {

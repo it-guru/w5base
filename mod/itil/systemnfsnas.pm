@@ -348,6 +348,7 @@ sub new
    $self->{use_distinct}=1;
 
    $self->setDefaultView(qw(system name cistatus mdate comments));
+   $self->setWorktable("systemnfsnas");
    return($self);
 }
 
@@ -480,16 +481,6 @@ sub ipCompare
    }
    #printf STDERR ("fail\n");
    return(0);
-}
-
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("systemnfsnas");
-   return(1);
 }
 
 sub SecureSetFilter

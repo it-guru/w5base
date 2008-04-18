@@ -79,17 +79,8 @@ sub new
 
    );
    $self->setDefaultView(qw(cdate editor name newstate));
-   return($self);
-}
-
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
    $self->setWorktable("history");
-   return(1);
+   return($self);
 }
 
 

@@ -146,17 +146,8 @@ sub new
                 dataobjattr   =>'lnkqrulemandator.realeditor'),
    );
    $self->setDefaultView(qw(mandator qrule cdate dataobj));
-   return($self);
-}
-
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
    $self->setWorktable("lnkqrulemandator");
-   return(1);
+   return($self);
 }
 
 
@@ -177,7 +168,6 @@ sub Validate
       }
       $newrec->{dataobj};
    }
-
    return(1);
 }
 

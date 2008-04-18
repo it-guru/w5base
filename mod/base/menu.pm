@@ -99,17 +99,8 @@ sub new
    );
    $self->{defaultlimit}=999999;
    $self->setDefaultView(qw(linenumber fullname target func config useobjacl));
-   return($self);
-}
-
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
    $self->setWorktable("menu");
-   return($self->SUPER::Initialize(@_));
+   return($self);
 }
 
 sub DatabaseLowInit

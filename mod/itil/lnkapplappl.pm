@@ -173,18 +173,10 @@ sub new
                 dataobjattr   =>'toappl.cistatus'),
    );
    $self->setDefaultView(qw(id fromappl toappl cdate editor));
+   $self->setWorktable("lnkapplappl");
    return($self);
 }
 
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("lnkapplappl");
-   return(1);
-}
 
 sub getSqlFrom
 {
@@ -195,6 +187,7 @@ sub getSqlFrom
    return($from);
 }
 
+
 sub getRecordImageUrl
 {
    my $self=shift;
@@ -202,7 +195,6 @@ sub getRecordImageUrl
    return("../../../public/itil/load/lnkapplappl.jpg?".$cgi->query_string());
 }
          
-
 
 sub Validate
 {

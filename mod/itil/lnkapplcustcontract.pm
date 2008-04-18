@@ -125,18 +125,10 @@ sub new
                                            'lnkapplcustcontract.custcontract'),
    );
    $self->setDefaultView(qw(id appl custcontract cdate editor));
+   $self->setWorktable("lnkapplcustcontract");
    return($self);
 }
 
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("lnkapplcustcontract");
-   return(1);
-}
 
 sub getSqlFrom
 {
@@ -153,7 +145,8 @@ sub getRecordImageUrl
 {
    my $self=shift;
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-   return("../../../public/itil/load/lnkapplcustcontract.jpg?".$cgi->query_string());
+   return("../../../public/itil/load/lnkapplcustcontract.jpg?".
+          $cgi->query_string());
 }
          
 

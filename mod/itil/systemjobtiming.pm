@@ -221,17 +221,8 @@ sub new
    );
    $self->{use_distinct}=1;
    $self->setDefaultView(qw(linenumber system job tinterval cdate mdate));
-   return($self);
-}
-
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
    $self->setWorktable("systemjobtiming");
-   return(1);
+   return($self);
 }
 
 sub Validate

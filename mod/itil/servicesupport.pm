@@ -195,6 +195,7 @@ sub new
 
    );
    $self->setDefaultView(qw(name cistatus mdate cdate));
+   $self->setWorktable("servicesupport");
    $self->{history}=[qw(insert modify delete)];
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","admin.itil.servicesupport"],
@@ -209,19 +210,6 @@ sub getDetailBlockPriority
    return($self->SUPER::getDetailBlockPriority(@_),
           qw(default finance oncallservice support service callcenter source));
 }
-
-
-
-
-
-sub Initialize
-{
-   my $self=shift;
-
-   $self->setWorktable("servicesupport");
-   return($self->SUPER::Initialize());
-}
-
 
 
 sub Validate

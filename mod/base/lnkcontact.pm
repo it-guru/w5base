@@ -194,8 +194,10 @@ sub new
    );
    $self->setDefaultView(qw(parentobj targetname cdate editor));
    $self->LoadSubObjs("ext/lnkcontact","lnkcontact");
+   $self->setWorktable("lnkcontact");
    return($self);
 }
+
 
 sub getPostibleRoleValues
 {
@@ -209,6 +211,7 @@ sub getPostibleRoleValues
    return(@opt);
 }
 
+
 sub getRecordImageUrl
 {
    my $self=shift;
@@ -216,20 +219,9 @@ sub getRecordImageUrl
    return("../../../public/base/load/lnkcontact.jpg?".$cgi->query_string());
 }
 
+
 sub getRecordHtmlIndex
 { return(); }
-
-
-
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("lnkcontact");
-   return(1);
-}
 
 
 sub Validate

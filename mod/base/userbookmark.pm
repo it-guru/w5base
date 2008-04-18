@@ -126,18 +126,10 @@ sub new
                 vjoindisp     =>'fullname'),
    );
    $self->setDefaultView(qw(linenumber name user mdate));
+   $self->setWorktable("userbookmark");
    return($self);
 }
 
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("userbookmark");
-   return(1);
-}
 
 sub SecureSetFilter
 {  

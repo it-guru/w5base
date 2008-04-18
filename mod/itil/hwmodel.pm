@@ -149,19 +149,13 @@ sub new
 
    );
    $self->setDefaultView(qw(name producer cistatus cdate mdate));
+   $self->setWorktable("hwmodel");
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","admin.itil.hwmodel"],
                          uniquesize=>255};
    return($self);
 }
 
-sub Initialize
-{
-   my $self=shift;
-
-   $self->setWorktable("hwmodel");
-   return($self->SUPER::Initialize());
-}
 
 sub getRecordImageUrl
 {
@@ -169,7 +163,6 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/itil/load/hwmodel.jpg?".$cgi->query_string());
 }
-
 
 
 sub Validate

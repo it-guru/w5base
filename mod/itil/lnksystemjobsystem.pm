@@ -132,17 +132,8 @@ sub new
 
    );
    $self->setDefaultView(qw(linenumber system job cdate));
-   return($self);
-}
-
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
    $self->setWorktable("lnksystemjobsystem");
-   return(1);
+   return($self);
 }
 
 
@@ -155,8 +146,6 @@ sub getSqlFrom
             "on lnksystemjobsystem.systemjob=systemjob.id";
    return($from);
 }
-
-
 
 
 sub Validate

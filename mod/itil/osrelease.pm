@@ -118,20 +118,12 @@ sub new
 
    );
    $self->setDefaultView(qw(name id cistatus mdate cdate));
+   $self->setWorktable("osrelease");
    $self->{history}=[qw(insert modify delete)];
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","admin.itil.osrelease"],
                          uniquesize=>255};
    return($self);
-}
-
-
-sub Initialize
-{
-   my $self=shift;
-
-   $self->setWorktable("osrelease");
-   return($self->SUPER::Initialize());
 }
 
 
@@ -141,7 +133,6 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/itil/load/osrelease.jpg?".$cgi->query_string());
 }
-
 
 
 sub Validate

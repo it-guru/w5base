@@ -221,18 +221,10 @@ sub new
 
    );
    $self->setDefaultView(qw(software version quantity system cdate));
+   $self->setWorktable("lnksoftwaresystem");
    return($self);
 }
 
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("lnksoftwaresystem");
-   return(1);
-}
 
 sub getSqlFrom
 {
@@ -245,8 +237,6 @@ sub getSqlFrom
             "on lnksoftwaresystem.liccontract=liccontract.id";
    return($from);
 }
-
-
 
 
 sub Validate

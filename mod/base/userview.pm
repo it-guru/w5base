@@ -120,8 +120,10 @@ sub new
                 dataobjattr   =>'userview.realeditor'),
    );
    $self->setDefaultView(qw(modulelong module name data));
+   $self->setWorktable("userview");
    return($self);
 }
+
 
 sub isNotAdmin
 {
@@ -131,12 +133,14 @@ sub isNotAdmin
    return(0);
 }
 
+
 sub isCopyValid
 {
    my $self=shift;
 
    return(1);
 }
+
 
 sub getLongName
 {
@@ -151,16 +155,6 @@ sub getLongName
       $mlong=$self->getParent->T($module,$module);
    }
    return($mlong);
-}
-
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("userview");
-   return(1);
 }
 
 
@@ -215,6 +209,7 @@ sub Validate
    return(1);
 }
 
+
 sub initSearchQuery
 {
    my $self=shift;
@@ -226,6 +221,7 @@ sub initSearchQuery
                    $UserCache->{$ENV{REMOTE_USER}}->{rec}->{fullname}.'"');
    }
 }  
+
 
 sub InitCopy
 {
@@ -239,12 +235,7 @@ sub InitCopy
       $copyinit->{Formated_user}=$UserCache->{$ENV{REMOTE_USER}}->
                                  {rec}->{fullname};
    }
-
 }
-
-
-   
-
 
 
 sub isViewValid
@@ -254,6 +245,7 @@ sub isViewValid
    return("default","header") if (!defined($rec));
    return("ALL");
 }
+
 
 sub isWriteValid
 {
@@ -265,6 +257,7 @@ sub isWriteValid
                          $self->IsMemberOf("admin"));
    return(undef);
 }
+
 
 sub getRecordImageUrl
 {

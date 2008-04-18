@@ -79,19 +79,10 @@ sub new
                 dataobjattr   =>'wfworkspace.createdate'),
    );
    $self->setDefaultView(qw(wfheadid fwdtargetname cdate));
+   $self->setWorktable("wfworkspace");
    return($self);
 }
 
-
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("wfworkspace");
-   return(1);
-}
 
 sub isViewValid
 {
@@ -103,6 +94,7 @@ sub isViewValid
                                         "workflow.admin"]));
    return(undef);
 }
+
 
 sub isWriteValid
 {

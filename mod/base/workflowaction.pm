@@ -179,17 +179,8 @@ sub new
    $self->{history}=[qw(insert modify delete)];
 
    $self->setDefaultView(qw(id name editor comments mdate));
-   return($self);
-}
-
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
    $self->setWorktable("wfaction");
-   return(1);
+   return($self);
 }
 
 
