@@ -246,6 +246,7 @@ sub new
                 label         =>'Source-Id',
                 dataobjattr   =>'amtsicustappl.externalid'),
    );
+   $self->{use_distinct}=0;
    $self->setDefaultView(qw(name applid usage conumber assignmentgroup));
    return($self);
 }

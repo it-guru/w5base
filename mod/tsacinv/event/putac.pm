@@ -384,7 +384,7 @@ sub ApplicationModified
                   }
                }
             }
-            { # prepare instances
+            if ($rec->{applid} ne ""){ # prepare instances
                $swinstance->ResetFilter();
                $swinstance->SetFilter({applid=>\$rec->{id},
                                        cistatusid=>\"4"});
@@ -415,10 +415,11 @@ sub ApplicationModified
                   $model="DB-INSTANCE"  if ($irec->{swnature}=~m/informix/i); 
                   $model="DB-INSTANCE"  if ($irec->{swnature}=~m/mssql/i); 
                   $model="DB-INSTANCE"  if ($irec->{swnature}=~m/db2/i); 
-                  my $swi={Instance=>{
+                  my $swi={Instances=>{
                              EventID=>$CurrentEventId,
                              ExternalSystem=>'W5Base',
                              ExternalID=>$irec->{id},
+                             Parent=>$rec->{applid},
                              Name=>$irec->{fullname},
                              Status=>"in operation",
                              Model=>$model,
