@@ -109,7 +109,7 @@ sub new
 
    );
    $self->setWorktable("useraccount");
-   $self->setDefaultView(qw(account userid surname givenname));
+   $self->setDefaultView(qw(account contactfullname surname givenname));
    return($self);
 }
 
