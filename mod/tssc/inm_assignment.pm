@@ -60,6 +60,8 @@ sub new
                                     label      =>'SysModTime',
                                     dataobjattr=>'problemm1.sysmodtime'),
    );
+   $self->{use_distinct}=0;
+
 
    $self->setDefaultView(qw(linenumber page incidentnumber assignment status sysmodtime));
    return($self);
