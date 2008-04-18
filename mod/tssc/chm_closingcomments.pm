@@ -45,6 +45,7 @@ sub new
    );
 
    $self->setDefaultView(qw(linenumber changenumber closingcomments));
+   $self->{use_distinct}=0;
    return($self);
 }
 

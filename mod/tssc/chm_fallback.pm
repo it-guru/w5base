@@ -45,6 +45,8 @@ sub new
    );
 
    $self->setDefaultView(qw(linenumber changenumber name));
+   $self->{use_distinct}=0;
+
    return($self);
 }
 
