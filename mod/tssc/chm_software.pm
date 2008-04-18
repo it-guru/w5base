@@ -44,6 +44,8 @@ sub new
                                     label      =>'Software/Application',
                                     dataobjattr=>'cm3ra26.affected_software'),
    );
+   $self->{use_distinct}=0;
+
 
    $self->setDefaultView(qw(linenumber changenumber name));
    return($self);

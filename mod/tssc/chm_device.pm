@@ -43,6 +43,8 @@ sub new
                                     label      =>'Device/System',
                                     dataobjattr=>'cm3ra25.affected_device'),
    );
+   $self->{use_distinct}=0;
+
 
    $self->setDefaultView(qw(linenumber changenumber name));
    return($self);
