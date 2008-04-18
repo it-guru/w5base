@@ -471,14 +471,14 @@ my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
 
 # set options
 $|=1;
-XGetOptions(\%P,\&Help,undef,undef,".w5api",noautologin=>1);
+XGetOptions(\%P,\&Help,undef,undef,".nasimport",noautologin=>1);
 
 # set defaults
 $mode="auto" if (!defined($mode));
 $type="nfs" if (!defined($type));
 if ($gui){
    $|=1;
-   my $fullstoredfilename=$ENV{HOMEPATH}."\\.w5api";
+   my $fullstoredfilename=$ENV{HOMEPATH}."\\.nasimport";
    XLoadStoreFile($fullstoredfilename,\%P);
    eval('
          use Win32::GUI;
