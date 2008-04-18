@@ -510,7 +510,7 @@ if ($gui){
       exit(1);
    }
    my @oplist;
-   @result=calculateOperations();
+   @result=calculateOperations(\%o,$rdir);
    if ($result[0] != 0){
       msg(ERROR,$result[1]);
       exit(1);
@@ -537,7 +537,6 @@ sub moduleObj
          msg(ERROR,"$obj not defined");
       }
       $o{$localid}=$obj;
-printf STDERR ("fifi %s\n",Dumper(\%o));
    }
    return(0);
 }
@@ -564,6 +563,10 @@ sub readLocalDescList
 sub calculateOperations
 {
    my $o=shift;    
+   my $rdir=shift;
+   $o->{'filemgmt'}->SetFilter({fullname=>"$rdir*",parentobj=>undef});
+   my @all=$o->{'filemgmt'}->getHashList(qw(ALL));
+printf STDERR ("fifi %s\n",Dumper(\@all));
    return(0);
 }
 
