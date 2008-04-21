@@ -295,7 +295,7 @@ sub createGrp
    my $wiworg=shift;
    my $wiwrec=shift;
 
-   my $v1=getModuleObject($self->Config,"w5v1inv::orgarea");
+#   my $v1=getModuleObject($self->Config,"w5v1inv::orgarea");
    msg(DEBUG,"try to create touid=$wiwrec->{touid} in base::grp");
    my $parentid;
    if (defined($wiwrec->{parentid})){
@@ -322,12 +322,12 @@ sub createGrp
          my $parentoftsi;
          if (!defined($rec)){
             my %newgrp=(name=>"DTAG",cistatusid=>4);
-            $v1->SetFilter({fullname=>\"DTAG"});
-            $v1->SetCurrentView(@view);
-            my ($rec,$msg)=$v1->getFirst();
-            if (defined($rec)){
-               $newgrp{grpid}=$rec->{id};
-            }
+      #      $v1->SetFilter({fullname=>\"DTAG"});
+      #      $v1->SetCurrentView(@view);
+      #      my ($rec,$msg)=$v1->getFirst();
+      #      if (defined($rec)){
+      #         $newgrp{grpid}=$rec->{id};
+      #      }
             my $back=$grp->ValidatedInsertRecord(\%newgrp);
             $parentoftsi=$back; 
          }
@@ -335,12 +335,12 @@ sub createGrp
             $parentoftsi=$rec->{grpid};
          }
          my %newgrp=(name=>"TSI",parent=>'DTAG',cistatusid=>4);
-         $v1->SetFilter({fullname=>\"DTAG.TSI"});
-         $v1->SetCurrentView(@view);
-         my ($rec,$msg)=$v1->getFirst();
-         if (defined($rec)){
-            $newgrp{grpid}=$rec->{id};
-         }
+      #   $v1->SetFilter({fullname=>\"DTAG.TSI"});
+      #   $v1->SetCurrentView(@view);
+      #   my ($rec,$msg)=$v1->getFirst();
+      #   if (defined($rec)){
+      #      $newgrp{grpid}=$rec->{id};
+      #   }
          $parentid=$grp->ValidatedInsertRecord(\%newgrp);
       }
       else{
@@ -352,24 +352,24 @@ sub createGrp
       msg(ERROR,"no shortname for id '$wiwrec->{touid}' found");
       return(undef);
    }
-   my $w5v1id;
-   ################################################################
-   #
-   # W5V1 Interface
-   #
-   {
-      if (defined($v1)){
-         $v1->SetFilter({ldapid=>$wiwrec->{touid}});
-         $v1->SetCurrentView(qw(id name));
-         my ($rec,$msg)=$v1->getFirst();
-         if (defined($rec)){
-            $w5v1id=$rec->{id};
-            if ($rec->{name} ne ""){
-               $newname=$rec->{name};
-            }
-         }
-      }
-   }
+#   my $w5v1id;
+#   ################################################################
+#   #
+#   # W5V1 Interface
+#   #
+#   {
+#      if (defined($v1)){
+#         $v1->SetFilter({ldapid=>$wiwrec->{touid}});
+#         $v1->SetCurrentView(qw(id name));
+#         my ($rec,$msg)=$v1->getFirst();
+#         if (defined($rec)){
+#            $w5v1id=$rec->{id};
+#            if ($rec->{name} ne ""){
+#               $newname=$rec->{name};
+#            }
+#         }
+#      }
+#   }
    ################################################################
    $newname=~s/\s/_/g;    # rewriting for some shit names
    my %newgrp=(name=>$newname,
@@ -379,7 +379,7 @@ sub createGrp
                srcload=>NowStamp(),
                comments=>"Description from WhoIsWho: ".$wiwrec->{name});
    $newgrp{name}=~s/&/_u_/g;
-   $newgrp{grpid}=$w5v1id if (defined($w5v1id));
+#   $newgrp{grpid}=$w5v1id if (defined($w5v1id));
    $newgrp{parentid}=$parentid if (defined($parentid));
    msg(DEBUG,"Write=%s",Dumper(\%newgrp));
    my $back=$grp->ValidatedInsertRecord(\%newgrp);
