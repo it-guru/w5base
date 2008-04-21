@@ -7,3 +7,5 @@
 'CO-Shortdescription'=>{de=>'Kostenstellenbezeichnung'},
 "invalid CO-Numer '\%s' specified"=>{de=>"ungültige CO-Nummer '\%s' eingegeben"},
 'Deputy Delivery Manager'=>{de=>'Delivery Manager Vertreter'},
+'Databoss'=>{de=>'Datenverantwortlicher'},
+'costcenter is direct useable by workflows'=>{de=>'Konstenstelle darf direkt von Workflows verwendet werden'},

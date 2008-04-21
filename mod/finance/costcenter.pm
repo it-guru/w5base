@@ -63,6 +63,18 @@ sub new
                 dataobjattr   =>'costcenter.fullname'),
 
       new kernel::Field::TextDrop(
+                name          =>'databoss',
+                label         =>'Databoss',
+                vjointo       =>'base::user',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['databossid'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'databossid',
+                dataobjattr   =>'costcenter.databoss'),
+
+      new kernel::Field::TextDrop(
                 name          =>'delmgrteam',
                 group         =>'delmgmt',
                 htmlwidth     =>'300px',
@@ -115,6 +127,13 @@ sub new
                 name          =>'comments',
                 label         =>'Comments',
                 dataobjattr   =>'costcenter.comments'),
+
+      new kernel::Field::Boolean(
+                name          =>'isdirectwfuse',
+                group         =>'control',
+                htmleditwidth =>'30%',
+                label         =>'costcenter is direct useable by workflows',
+                dataobjattr   =>'costcenter.is_directwfuse'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
@@ -211,15 +230,15 @@ sub Validate
    if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
       my $userid=$self->getCurrentUserId();
       if (!defined($oldrec)){
-         if (!defined($newrec->{delmgrid}) ||
-             $newrec->{delmgrid}==0){
+         if (!defined($newrec->{databoss}) ||
+             $newrec->{databoss}==0){
             my $userid=$self->getCurrentUserId();
-            $newrec->{delmgrid}=$userid;
+            $newrec->{databoss}=$userid;
          }
       }
-      if (defined($newrec->{delmgrid}) &&
-          $newrec->{delmgrid}!=$userid &&
-          $newrec->{delmgrid}!=$oldrec->{delmgrid}){
+      if (defined($newrec->{databoss}) &&
+          $newrec->{databoss}!=$userid &&
+          $newrec->{databoss}!=$oldrec->{databoss}){
          $self->LastMsg(ERROR,"you are not authorized to set other persons ".
                               "as delmgr");
          return(0);
@@ -244,8 +263,9 @@ sub isWriteValid
 
    return("default") if (!defined($rec) && $self->IsMemberOf("admin"));
 
-   my @databossedit=("default","delmgmt","contacts");
+   my @databossedit=("default","delmgmt","contacts","control");
    return(@databossedit) if (defined($rec) && $self->IsMemberOf("admin"));
+   return(@databossedit) if (defined($rec) && $rec->{databossid}==$userid);
 
    if (defined($rec->{contacts}) && ref($rec->{contacts}) eq "ARRAY"){
       my %grps=$self->getGroupsOf($ENV{REMOTE_USER},

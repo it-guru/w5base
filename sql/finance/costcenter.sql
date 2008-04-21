@@ -24,3 +24,5 @@ create table costcenter (
   UNIQUE KEY name (name),KEY(fullname),KEY(mandator),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 );
+alter table costcenter add databoss bigint(20) default NULL,add key(databoss);
+alter table costcenter add is_directwfuse int(2) default '0';

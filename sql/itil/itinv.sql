@@ -657,3 +657,5 @@ alter table swinstance add UNIQUE key swinstanceid (swinstanceid);
 alter table swinstance add custcostalloc int(2) default 0;
 alter table servicesupport add flathourscost float(5,2) default NULL;
 alter table appl add is_applwithnoiface bool default '0';
+alter table asset  add databoss bigint(20) default NULL,add key(databoss);
+alter table system add databoss bigint(20) default NULL,add key(databoss);
