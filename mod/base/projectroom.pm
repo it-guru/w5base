@@ -302,7 +302,7 @@ sub getRecordImageUrl
 {
    my $self=shift;
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-   return("../../../public/itil/load/contract.jpg?".$cgi->query_string());
+   return("../../../public/base/load/project.jpg?".$cgi->query_string());
 }
 
 
