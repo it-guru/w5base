@@ -294,6 +294,14 @@ sub getSelectField
          };
       }
    }
+   if ($mode eq "order"){
+      $_=$db->DriverName();
+      case: {
+         /^oracle$/i and do {
+            return("to_char($self->{dataobjattr},'YYYY-MM-DD HH24:MI:SS')");
+         };
+      }
+   }
    return($self->SUPER::getSelectField($mode,$db));
 }  
 

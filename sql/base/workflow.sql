@@ -80,7 +80,7 @@ CREATE TABLE wfhead (
   initialconfig varchar(20) NOT NULL,
   initialclient varchar(20) NOT NULL,
   srcsys varchar(100) default NULL,
-  srcid varchar(20) default NULL,
+  srcid varchar(40) default NULL,
   srcload datetime default NULL,
   additional longtext default NULL,
   editor varchar(100) NOT NULL default '',

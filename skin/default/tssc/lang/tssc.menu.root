@@ -3,4 +3,5 @@
 'sc.change.software'=>{de=>'Software',en=>'Software'},
 'sc.change.device'=>{de=>'Device',en=>'Device'},
 'sc.incident'=>{de=>'IncidentManagement',en=>'IncidentManagement'},
+'sc.incident.assignment'=>{de=>'Assignment',en=>'Assignment'},
 'sc.problem'=>{de=>'ProblemManagement',en=>'ProblemManagement'},
