@@ -125,6 +125,7 @@ sub new
       new kernel::Field::Float(
                 name          =>'cpuspeed',
                 label         =>'Asset CPU speed',
+                unit          =>'Hz',
                 precision     =>'0',
                 dataobjattr   =>'decode(amasset.lcpuspeedmhz,0,NULL,'.
                                 'amasset.lcpuspeedmhz)'),
