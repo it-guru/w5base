@@ -1,3 +1,4 @@
 'itil::qrule::ApplSystems'=>{de=>'Prüfung ob Systemzuordnungen vorhanden sind',
                              en=>'check if System relations are valid'},
 'no system relations'=>{de=>'keine Systemzuordnungen vorhanden'},
+'superfluous system relations'=>{de=>'überzählige Systemzuordnungen vorhanden'},

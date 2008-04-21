@@ -414,6 +414,13 @@ sub new
                 dataobjattr   =>'appl.is_applwithnosys'),
 
       new kernel::Field::Boolean(
+                name          =>'isnoifaceappl',
+                group         =>'control',
+                htmleditwidth =>'30%',
+                label         =>'Application has no interfaces',
+                dataobjattr   =>'appl.is_applwithnoiface'),
+
+      new kernel::Field::Boolean(
                 name          =>'allowdevrequest',
                 group         =>'control',
                 searchable    =>0,

@@ -1,15 +1,12 @@
-package itil::qrule::ApplSystems;
+package itil::qrule::ApplIface;
 #######################################################################
 =pod
 
 =head3 PURPOSE
 
 Every Application in in CI-Status "installed/active" or "available", needs
-at least 1 logical system linked. If there are no logical systems assigned,
-this will produce an error.
-In some cases (applications witch ships licenses f.e.) you can set the
-flag "application has no systems". In this case, this rule produces an
-error, if logical systems are assinged.
+at least 1 interface, if the flag "application has no intefaces" is not 
+true.
 
 =head3 IMPORTS
 
@@ -61,16 +58,16 @@ sub qcheckRecord
    my $rec=shift;
 
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
-   if (!$rec->{isnosysappl}){
+   if (!$rec->{isnoifaceappl}){
       if (ref($rec->{systems}) ne "ARRAY" || $#{$rec->{systems}}==-1){
-         return(3,{qmsg=>['no system relations'],
-                   dataissue=>['no system relations']});
+         return(3,{qmsg=>['no interfaces defined'],
+                   dataissue=>['no interfaces defined']});
       }
    }
    else{
       if (ref($rec->{systems}) eq "ARRAY" && $#{$rec->{systems}}!=-1){
-         return(3,{qmsg=>['superfluous system relations'],
-                   dataissue=>['superfluous system relations']});
+         return(3,{qmsg=>['superfluous interfaces'],
+                   dataissue=>['superfluous interfaces']});
       }
    }
    return(0,undef);

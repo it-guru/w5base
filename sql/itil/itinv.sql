@@ -656,3 +656,4 @@ alter table swinstance add swinstanceid varchar(20) default NULL;
 alter table swinstance add UNIQUE key swinstanceid (swinstanceid);
 alter table swinstance add custcostalloc int(2) default 0;
 alter table servicesupport add flathourscost float(5,2) default NULL;
+alter table appl add is_applwithnoiface bool default '0';
