@@ -171,6 +171,15 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("osy.kern.projectroom",
+                      "OSY::projectroom",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("osy.kern.projectroom.new",
+                      "OSY::projectroom",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("osy.appl",
                       "itil::appl",
                       defaultacl=>['valid_user']);

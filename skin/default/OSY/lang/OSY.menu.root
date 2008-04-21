@@ -35,4 +35,5 @@
 'osy.kern.location.new'=>{de=>'Neueingabe',en=>'New'},
 'osy.kern.hwmodel'=>{de=>'Model',en=>'Model'},
 'osy.kern.hwmodel.new'=>{de=>'Neueingabe',en=>'New'},
-
+'osy.kern.projectroom'=>{de=>'Projektraum',en=>'Projectroom'},
+'osy.kern.projectroom.new'=>{de=>'Neueingabe',en=>'New'},
