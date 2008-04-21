@@ -225,6 +225,15 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("Tools.projectroom",
+                      "base::projectroom",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("Tools.projectroom.new",
+                      "base::projectroom",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("Tools.filemgmt",
                       "base::filemgmt",
                       defaultacl=>['admin']);

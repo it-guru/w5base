@@ -1,0 +1,9 @@
+'base::projectroom'=>{de=>'Projektraum',en=>'Projectroom'},
+'Projectroom name'=>{de=>'Projektraum Name'},
+'WELCOME'=>{de=>'
+Ein Projektraum dient zur Dokumentation von Projekten und
+der im deren Zusammenhang entstehenden Daten.
+In bestimmten Fällen kann ein Projektraum als eine Art
+Klammer über mehrere Config-Items angesehen werden.
+',en=>'Welcome'},
+

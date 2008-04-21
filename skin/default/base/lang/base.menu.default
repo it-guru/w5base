@@ -1,6 +1,8 @@
 'Tools'=>{de=>'Werkzeuge'},
 'Tools.analytics'=>{de=>'Analytik',en=>'Analytics'},
 'Tools.XLSExpand'=>{de=>'XLSExpand',en=>'XLSExpand'},
+'Tools.projectroom'=>{de=>'Projektraum',en=>'Projectroom'},
+'Tools.projectroom.new'=>{de=>'Neueingabe',en=>'New'},
 'Tools.workflow'=>{de=>'Workflow System',en=>'Workflow System'},
 'Tools.workflow.action'=>{de=>'Actionen',en=>'Actions'},
 'Tools.workflow.relation'=>{de=>'Verknüpfungen',en=>'Relations'},
