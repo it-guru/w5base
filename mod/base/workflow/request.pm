@@ -103,6 +103,14 @@ sub getDynamicFields
                 group         =>'init',
                 container     =>'headref'),
 
+      new kernel::Field::Text(
+                name          =>'conumber',
+                label         =>'CO-Number',
+                htmldetail    =>0,
+                readonly      =>1,
+                container     =>'headref'),
+
+
     ));
 }
 
@@ -249,12 +257,9 @@ sub getPosibleActions
    my @l=();
    my $iscurrent=$self->isCurrentForward($WfRec);
    my $isworkspace=0;
-printf STDERR ("fifi userid=$userid\n");
-printf STDERR ("fifi iscurrent=$iscurrent\n");
    if (!$iscurrent){  # check Workspace only if not current
       $isworkspace=$self->isCurrentWorkspace($WfRec); 
    }
-printf STDERR ("fifi isworkspace=$isworkspace\n");
    my $iscurrentapprover=0;
 
    if ($stateid==6){
@@ -426,6 +431,13 @@ sub Validate
    return(1);
 }
 
+sub addInitialParameters
+{
+   my $self=shift;
+   my $newrec=shift;
+   return(1);
+}
+
 sub Process
 {
    my $self=shift;
@@ -475,7 +487,13 @@ sub Process
          $h->{initiatorgroupid}=$k[0];
          $h->{initiatorgroup}=$groups{$k[0]}->{fullname};
       }
-
+      if (!$self->addInitialParameters($h)){
+         if (!$self->getParent->LastMsg()){
+            $self->getParent->LastMsg(ERROR,
+                   "unknown error while addInitialParameters");
+         }
+         return(0);
+      }
       if (my $id=$self->StoreRecord($WfRec,$h)){
          $h->{id}=$id;
          if ($#wsref!=-1){

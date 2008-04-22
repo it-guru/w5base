@@ -189,7 +189,7 @@ sub getTimeRangeDrop
             $sY++;
          }
          my $histl=60;
-         $histl=7 if (grep(/^shorthist$/,@modes));
+         $histl=9 if (grep(/^shorthist$/,@modes));
          for(my $c=0;$c<=$histl;$c++){
             my $eM=$sM-1;
             my $eY=$sY;

@@ -99,7 +99,21 @@ sub Init
 }
 
 
-
+sub addSpecialSearchMask
+{
+   my $self=shift;
+   my $Applicationname=$self->getParent->T("Applicationname");
+   my $d=<<EOF;
+<tr>
+<td class=fname width=10%>$Applicationname:</td>
+<td class=finput colspan=3 >\%name(search)\%</td>
+</tr>
+<tr>
+<td class=fname width=10%>\%customer(label)\%:</td>
+<td class=finput colspan=3 >\%customer(search)\%</td>
+</tr>
+EOF
+}
 
 
 sub getQueryTemplate
@@ -123,42 +137,42 @@ sub getQueryTemplate
 
    my $msel=$self->getTimeRangeDrop("search_mon",$self->getParent,
                                     "fixmonth",
-                                    "shorthist");
-
+                                    "shorthist","lastmonth");
+   my $ivday=$self->getParent->T("Invoice Day");
+   my $Month=$self->getParent->T("Timerange");
+   my $Orgunit=$self->getParent->T("Orgunit");
+   my $InvoiceInfo=$self->getParent->T("all calculations based on GMT");
+   my $invoiceday="<select name=search_invoiceday>";
+   my $oldivday=Query->Param("search_invoiceday");
+   for(my $c=1;$c<=25;$c++){
+      $invoiceday.="<option value=\"$c\"";
+      $invoiceday.=" selected" if ($oldivday==$c);
+      $invoiceday.=">$c.</option>";
+   }
+   $invoiceday.="</select>";
 
    my $d=<<EOF;
 <div class=searchframe>
 <table class=searchframe>
 <tr>
-<td class=fname colspan=4 align=center><b>Dieses Modul ist noch im Test !!!</b></td>
-</tr>
-<tr>
-<td class=fname width=10%>Month:</td>
+<td class=fname width=10%>$Month:</td>
 <td class=finput width=40% >$msel</td>
-<td class=fname width=10%>Invoice Day:</td>
-<td class=finput width=40% ><select name=search_invoiceday><option value="1">1.</option></select></td>
+<td class=fname width=10%>$ivday:</td>
+<td class=finput width=40% >$invoiceday ($InvoiceInfo)</td>
 </tr>
-
 <tr>
-<td class=fname width=10%>Orgunit:</td>
+<td class=fname width=10%>$Orgunit:</td>
 <td class=finput colspan=3>$orgsel</td>
 </tr>
-
-<tr>
-<td class=fname width=10%>Applicationname:</td>
-<td class=finput colspan=3 >\%name(search)\%</td>
-</tr>
-<tr>
-<td class=fname width=10%>\%customer(label)\%:</td>
-<td class=finput colspan=3 >\%customer(search)\%</td>
-</tr>
+EOF
+   $d.=$self->addSpecialSearchMask();
+   $d.=<<EOF;
 </table>
 </div>
-%StdButtonBar(print,search)%
+%StdButtonBar(bookmark,print,search)%
 EOF
    return($d);
 }
-
 
 sub Result
 {
@@ -169,8 +183,15 @@ sub Result
    delete($q{invoiceday});
 
    my $invoiceday=Query->Param("search_invoiceday");
+   $invoiceday=1 if ($invoiceday eq "");
    my $mon=Query->Param("search_mon");
    my $grpid=Query->Param("search_grpid");
+   if ($mon eq "lastmonth" || $mon eq ""){
+      my ($year,$month,$day)=Today_and_Now($self->getParent->UserTimezone());
+      ($year,$month)=Add_Delta_YM($self->getParent->UserTimezone(),
+                                  $year,$month,$day,0,-1);
+      $mon="$month/$year";
+   }
    my ($mon,$year)=$mon=~m/^(\d+)\/(\d+)$/;
    
 
@@ -206,10 +227,33 @@ sub Result
       $self->getParent->LastMsg(ERROR,$@);
       return(undef);
    }
+   my %fineQuery;
+   $self->{DataObj}->ResetFilter();
+   my $result=$self->calculateEfforts($year,$mon,$invoiceday,
+                                      $Y1,$M1,$invoiceday,\%user,\%fineQuery);
+
+   #print STDERR Dumper($self->Context->{treal});
+
+   $self->{DataObj}->SecureSetFilter([\%fineQuery]);
+   my %param=(ExternalFilter=>1);
+   return($self->{DataObj}->Result(%param));
+}
+
+sub calculateEfforts
+{
+   my $self=shift;
+   my ($year,$mon,$invoiceday,$Y1,$M1,$invoiceday1,$user,$fineQuery)=@_;
+
+   $self->{DataObj}->setDefaultView(qw(linenumber name customer conumber
+                                       efforts_treal
+                                       efforts_employecount
+                                       efforts_tprojection
+                                       ));
+
    my $wfact=getModuleObject($self->getParent->Config,"base::workflowaction");
-   $wfact->SetFilter({creatorid=>[keys(%user)],
-                      cdate=>">$year-$mon-$invoiceday AND ".
-                             "<=$Y1-$M1-$invoiceday"
+   $wfact->SetFilter({creatorid=>[keys(%{$user})],
+                      cdate=>">$year-$mon-${invoiceday} AND ".
+                             "<=$Y1-$M1-${invoiceday1}"
                      }
                     );
    my %wfheadid=();
@@ -224,28 +268,22 @@ sub Result
    #
    # find affectedapplicationid
    #
-   my $wfkey=getModuleObject($self->getParent->Config,"base::workflowkey");
-   $wfkey->SetFilter({wfheadid=>[keys(%wfheadid)],
-                      name=>\'affectedapplicationid'});
-   foreach my $rec ($wfkey->getHashList(qw(wfheadid value))){
-      my $applid=$rec->{value};
-      my $wfheadid=$rec->{wfheadid};
-      my $effort=$wfheadid{$wfheadid};
-      $self->Context->{treal}->{$applid}+=$effort;
+   if (keys(%wfheadid)){
+      my $wfkey=getModuleObject($self->getParent->Config,"base::workflowkey");
+      $wfkey->SetFilter({wfheadid=>[keys(%wfheadid)],
+                         name=>\'affectedapplicationid'});
+      foreach my $rec ($wfkey->getHashList(qw(wfheadid value))){
+         my $applid=$rec->{value};
+         my $wfheadid=$rec->{wfheadid};
+         my $effort=$wfheadid{$wfheadid};
+         $self->Context->{treal}->{$applid}+=$effort;
+      }
+      $fineQuery->{id}=[keys(%{$self->Context->{treal}})];
    }
-   $q{id}=[keys(%{$self->Context->{treal}})];
-
-   #print STDERR Dumper($self->Context->{treal});
-
-   $self->{DataObj}->ResetFilter();
-   $self->{DataObj}->SecureSetFilter([\%q]);
-   $self->{DataObj}->setDefaultView(qw(linenumber name customer conumber
-                                       efforts_treal
-                                       efforts_employecount
-                                       efforts_tprojection
-                                       ));
-   my %param=(ExternalFilter=>1);
-   return($self->{DataObj}->Result(%param));
+   else{
+      $fineQuery->{id}=["NONE"];
+   }
+   return(1);
 }
 
 

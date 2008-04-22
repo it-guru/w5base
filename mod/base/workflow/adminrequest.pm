@@ -127,6 +127,27 @@ EOF
    return($templ);
 }
 
+sub addInitialParameters
+{
+   my $self=shift;
+   my $newrec=shift;
+   my $conumber=$self->getParent->Config->Param("W5BASEADMINCONUMBER");
+   if ($conumber ne ""){
+      my $co=getModuleObject($self->getParent->Config,"finance::costcenter");
+      if (defined($co)){
+         $co->SetFilter({name=>\$conumber,cistatusid=>\'4'});
+         my ($corec)=$co->getOnlyFirst(qw(id));
+         if (!defined($corec)){
+            $self->getParent->LastMsg(ERROR,
+             "invalid CO-Number for admin requests - please contact the admin");
+            return(0);
+         }
+         $newrec->{conumber}=$conumber;
+      }
+   }
+   return(1);
+}
+
 
 
 

@@ -245,6 +245,12 @@ sub getDynamicFields
                                          group       =>'tcomcod',
                                          container   =>'headref'),
 
+           new kernel::Field::Text(      name        =>'conumber',
+                                         label       =>'CO-Number',
+                                         htmldetail  =>0,
+                                         readonly    =>1,
+                                         container   =>'headref'),
+
            new kernel::Field::Number(    name       =>'tcomworktime',
                                          unit       =>'min',
                                          label      =>'Worktime',
@@ -567,17 +573,22 @@ sub preValidate                 # das muß in preValidate behandelt werden,
          my $applid=$newrec->{affectedapplicationid};
          my $app=getModuleObject($self->getParent->Config,"itil::appl");
          $app->SetFilter({id=>\$applid});
-         my @l=$app->getHashList(qw(custcontracts mandator mandatorid));
+         my @l=$app->getHashList(qw(custcontracts mandator 
+                                    conumber mandatorid));
          my %custcontract;
          my %custcontractid;
          my %mandator;
          my %mandatorid;
+         my %conumber;
          foreach my $apprec (@l){
             if (defined($apprec->{mandator})){
                $mandator{$apprec->{mandator}}=1;
             }
             if (defined($apprec->{mandatorid})){
                $mandatorid{$apprec->{mandatorid}}=1;
+            }
+            if (defined($apprec->{conumber}) && $apprec->{conumber} ne ""){
+               $conumber{$apprec->{conumber}}=1;
             }
             next if (!defined($apprec->{custcontracts}));
             foreach my $rec (@{$apprec->{custcontracts}}){
@@ -600,6 +611,9 @@ sub preValidate                 # das muß in preValidate behandelt werden,
          }
          if (keys(%mandatorid)){
             $newrec->{mandatorid}=[keys(%mandatorid)];
+         }
+         if (keys(%conumber)){
+            $newrec->{conumber}=[keys(%conumber)];
          }
       }
       else{
