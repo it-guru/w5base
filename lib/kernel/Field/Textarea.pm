@@ -52,7 +52,8 @@ sub FormatedDetail
          "<tr><td><img class=printspacer style=\"float:left\" ".
          "src=\"../../../public/base/load/empty.gif\" width=1 height=100>".
          "<div class=multilinetext>".
-         "<pre class=multilinetext>$d</pre></div></td></tr></table>";
+         "<pre class=multilinetext>".FancyLinks($d).
+         "</pre></div></td></tr></table>";
    }
    if ($mode eq "edit" || $mode eq "workflow"){
       my $fromquery=Query->Param("Formated_$name");
