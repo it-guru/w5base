@@ -127,19 +127,19 @@ sub getFinishUseridList
    my @l=();
 
    if (ref($WfRec->{affectedsystemid}) eq "ARRAY"){
-      my @app=@{$WfRec->{affectedsystemid}};
-      my $app=getModuleObject($self->getParent->Config,"itil::appl");
-      $app->SetFilter(id=>\@app);
-      my @rec=$app->getHashList(qw(tsmid tsm2id));
+      my @sys=@{$WfRec->{affectedsystemid}};
+      my $sys=getModuleObject($self->getParent->Config,"itil::system");
+      $sys->SetFilter(id=>\@sys);
+      my @rec=$sys->getHashList(qw(admid adm2id));
       foreach my $rec (@rec){
-         push(@l,$rec->{tsmid})  if (defined($rec->{tsmid}));
+         push(@l,$rec->{admid})  if (defined($rec->{admid}));
       }
       foreach my $rec (@rec){
-         push(@l,$rec->{tsm2id}) if (defined($rec->{tsm2id}));
+         push(@l,$rec->{adm2id}) if (defined($rec->{adm2id}));
       }
       if ($#l==-1){
          push(@l,$WfRec->{openuser});
-         msg(INFO,"warn: no TSM found - using openuser");
+         msg(INFO,"warn: no ADM found - using openuser");
       }
    }
    return(@l);
