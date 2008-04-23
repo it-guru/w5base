@@ -454,8 +454,6 @@ use W5Base::API;
 use Data::Dumper;
 use Fcntl qw(SEEK_SET);
 use POSIX;
-use LWP::UserAgent;
-use HTTP::Request::Common;
 use vars qw($GUI $Window);
 
 
@@ -508,6 +506,11 @@ if ($gui){
    my @result=moduleObj($Config);
    msg(ERROR,$result[1]);exit(1) if ($result[0] != 0);  
    
+   dirLoop(); 
+}
+
+sub dirLoop
+{
    my @result=readLocalDescList($ldir,\@ldir);
    if ($result[0] != 0){
       msg(ERROR,$result[1]);
@@ -524,7 +527,7 @@ if ($gui){
       exit(1);
    }
    if ($force){
-      @result=processOperations(\%o,\@oplist);
+      @result=processOperations(\%o,\@oplist,$Config,$ldir);
       if ($result[0] != 0){
          msg(ERROR,$result[1]);
          exit(1);
@@ -620,50 +623,39 @@ sub calculateOperations
                        IDENTIFYBY   => $rfile->{'entrytyp'}, 
                        MSG          => "insert ".$rfile->{'entrytyp'}." ".
                                        $rfile->{'fullname'},
-                       DATA         => {fullname => $rfile->{'fullname'}}});
+                       DATA         => {fullname => $rfile->{'fullname'},
+                                        name => $rfile->{'name'},
+                                        file     => $rfile->{'file'}}});
       }
    }
 #printf STDERR ("fifi 02%s\n",Dumper($oplist));
-printf STDERR ("fifi 03%s\n",Dumper($refrdir));
+#printf STDERR ("fifi 03%s\n",Dumper($refrdir));
    return(0);
 }
 
 
 sub processOperations
 {
-   my $ua=new LWP::UserAgent(env_proxy=>0);
-   my %form;
-   $ua->timeout(60);
-   my $loginurl="http://w8n00226.bmbg01.telekom.de/darwin/auth"; 
-
-   my $response=$ua->request(GET($loginurl));
-   if ($response->code ne "200"){
-      printf STDERR ("ERROR: fail to get loginurl\n");
-      exit(1);
-   }
-   eval('$html->parse($response->content);');
-   if ($@ ne ""){
-      printf STDERR ("%s\n",$@);
-      printf STDERR ("ERROR: parsing loginurl=$loginurl\n");
-      exit(1);
-   }
-   $form{myUsername}="dummy/admin";
-   $form{myPassword}="acache";
-   
-   #print Dumper(\%form);
-   
-   my $req=POST($loginurl,Content_Type=>'form-data',Content=>[%form]);
-   
-   my $response=$ua->request($req);
-   if ($response->code ne "200"){
-      printf STDERR ("ERROR: fail to login as '%s'\n",$loginurl);
-      print STDERR $response->code;
-      print STDERR $response->content;
-      exit(1);
-   }
 
    my $o=shift;    
    my $oplist=shift;    
+   my $Config=shift;    
+   my $ldir=shift;    
+   my $ua=getUserAgent($Config);
+   foreach my $rec (@$oplist){
+      if ($rec->{IDENTIFYBY} eq "file"){
+         my $req=$ua->get($rec->{DATA}->{file},
+                          ':content_file' => "$ldir/".$rec->{DATA}->{name}.".tmp"
+                         );
+         if (!$req->is_success){
+            printf STDERR ("ERROR: %s \n",$req->status_line);
+            exit(1);
+         }
+
+      printf STDERR ("fifi %s\n",$rec->{DATA}->{file});
+
+      }
+   }
    
 }
 
