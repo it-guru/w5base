@@ -96,7 +96,8 @@ sub qcheckRecord
          $self->IfaceCompare($dataobj,
                              $rec,"servicesupport",
                              $parrec,"systemola",
-                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
+                             $forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'leftouterlinkcreate',
                              onCreate=>{
                                comments=>"automaticly create by QualityCheck",
@@ -106,12 +107,14 @@ sub qcheckRecord
          $self->IfaceCompare($dataobj,
                              $rec,"memory",
                              $parrec,"systemmemory",
-                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
+                             $forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
                              tolerance=>5,mode=>'integer');
          $self->IfaceCompare($dataobj,
                              $rec,"cpucount",
                              $parrec,"systemcpucount",
-                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
+                             $forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'integer');
       }
       if ($rec->{allowifupdate}){

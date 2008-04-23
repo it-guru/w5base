@@ -101,24 +101,28 @@ sub qcheckRecord
                $self->IfaceCompare($dataobj,
                                    $rec,"tsmid",
                                    {tsmid=>$tsmid},"tsmid",
-                                   $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
+                                   $forcedupd,$wfrequest,
+                                   \@qmsg,\@dataissue,\$errorlevel,
                                    mode=>'native');
             }
          }
          $self->IfaceCompare($dataobj,
                              $rec,"applnumber",
                              $parrec,"ref",
-                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
+                             $forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'native');
          $self->IfaceCompare($dataobj,
                              $rec,"description",
                              $parrec,"description",
-                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
+                             $forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'native');
          $self->IfaceCompare($dataobj,
                              $rec,"currentvers",
                              $parrec,"version",
-                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
+                             $forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'native');
       }
       if ($rec->{allowifupdate}){

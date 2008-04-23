@@ -1,5 +1,5 @@
 'itil::MyW5Base::coefforts'=>
-   {de=>'Tool: Arbeitszeitanalyse - (AER - Kostenstellebezogen)',
+   {de=>'Tool: Arbeitszeitanalyse - (AER - Kostenstellen-/CO-Nummern bezogen)',
     en=>'Tool: Worktimeanalyse - costcenter related'},
 'fieldgroup.efforts'=>{de=>'Arbeitsaufwand',
                        en=>'efforts'},

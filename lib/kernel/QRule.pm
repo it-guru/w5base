@@ -108,6 +108,7 @@ sub IfaceCompare
    my $forcedupd=shift;
    my $wfrequest=shift;
    my $qmsg=shift;
+   my $dataissue=shift;
    my $errorlevel=shift;
    my %param=@_;
 

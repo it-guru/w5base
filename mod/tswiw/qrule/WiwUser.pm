@@ -59,7 +59,8 @@ sub qcheckRecord
           $self->IfaceCompare($dataobj,
                      $rec,$fld,
                      $wiwrec,$fld,
-                     $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
+                     $forcedupd,$wfrequest,
+                     \@qmsg,\@dataissue,\$errorlevel,
                      mode=>'string');
       }
       if (keys(%$forcedupd)){

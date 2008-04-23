@@ -97,33 +97,28 @@ sub qcheckRecord
          $errorlevel=3 if ($errorlevel<3);
       }
       else{
-#         $self->IfaceCompare($dataobj,
-#                             $rec,"servicesupport",
-#                             $parrec,"systemola",
-#                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
-#                             mode=>'leftouterlinkcreate',
-#                             onCreate=>{
-#                               comments=>"automaticly create by QualityCheck",
-#                               cistatusid=>4,
-#                               name=>$parrec->{systemola}}
-#                             );
-#         $self->IfaceCompare($dataobj,
-#                             $rec,"memory",
-#                             $parrec,"systemmemory",
-#                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
-#                             tolerance=>5,mode=>'integer');
+          my $acroom=$parrec->{room};
+          my $acloc=$parrec->{tsacinv_locationfullname};
+          if ($acroom=~m/^\d{1,2}\.\d{3}$/){
+             if (my ($geb)=$acloc=~m#^/[^/]+/([A-Z]{1})/#){
+                $acroom=$geb.$acroom;
+             }
+          }
+          $acroom="C1.300" if ($acroom eq "1.300"); 
+printf STDERR ("acroom=$acroom asset=%s\n",Dumper($parrec));
+          $self->IfaceCompare($dataobj,
+                              $rec,"room",
+                              {room=>$acroom},"room",
+                              $forcedupd,$wfrequest,
+                              \@qmsg,\@dataissue,\$errorlevel,
+                              mode=>'string');
 #         $self->IfaceCompare($dataobj,
 #                             $rec,"cpucount",
 #                             $parrec,"systemcpucount",
 #                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
 #                             mode=>'integer');
       }
-#      if ($rec->{allowifupdate}){
-#         if (!$res){
-#            my $opres=ProcessOpList($self->getParent,\@opList);
-#         }
-#      }
-#
+
 #      if ($rec->{mandator} eq "Extern" && $rec->{allowifupdate}){
 #         # forced updates on External Data
 #         my $admid;
@@ -189,7 +184,7 @@ sub qcheckRecord
       }
    }
    if (keys(%$wfrequest)){
-      #printf STDERR ("fifi request a DataIssue Workflow=%s\n",Dumper($wfrequest));
+      printf STDERR ("fifi request a DataIssue Workflow=%s\n",Dumper($wfrequest));
    }
 
    # now process workflow request for traditional W5Deltas
