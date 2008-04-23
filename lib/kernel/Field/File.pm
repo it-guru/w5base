@@ -35,7 +35,14 @@ sub RawValue
 {
    my $self=shift;
    my $current=shift;
-
+   if (defined($self->{onDownloadUrl}) &&
+          ref($self->{onDownloadUrl}) eq "CODE"){
+      my $path=$ENV{SCRIPT_URI};
+      $path=~s/\/[^\/]*$/\//;
+      my $url=$path.&{$self->{onDownloadUrl}}($self,$current);
+      return($url);
+   }
+  
    return("< FileEntry >");
 
 }

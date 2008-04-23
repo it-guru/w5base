@@ -455,10 +455,12 @@ sub getHashList
    $o->SecureSetFilter($filter); 
    msg(INFO,"SOAPgetHashList in search objectname=$objectname");
    my @l=$o->getHashList(@$view);
-   foreach my $rec (@l){
-      foreach my $field (keys(%$rec)){
-         defined($rec->{$field});
+   for(my $c=0;$c<=$#l;$c++){
+      my %cprec;
+      foreach my $k (keys(%{$l[$c]})){
+         $cprec{$k}=$l[$c]->{$k};
       }
+      $l[$c]=\%cprec;
    }
    return(interface::SOAP::kernel::Finish({exitcode=>0,
           lastmsg=>[],records=>\@l}));
