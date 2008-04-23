@@ -53,6 +53,7 @@ sub qcheckRecord
       my $forcedupd={};
       my $wfrequest={};
       my @qmsg;
+      my @dataissue;
       foreach my $fld (qw(office_phone office_street office_zipcode 
                           office_location
                           office_facsimile)){

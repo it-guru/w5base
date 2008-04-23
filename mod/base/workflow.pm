@@ -1667,9 +1667,9 @@ sub RawValue
            my $post;
            if (my ($newpref,$newline)=
                 $line=~m/^([\s,\-,\!,\*]{1,3})(.*)$/){
-              if (my ($t,$p)=$newline=~m/^(.*?)\s*:\s*(.*)$/){
+              if (my ($t,$p)=$newline=~m/^(.*?)\s*:\s+(.*)$/){
                  $newline=$t;
-                 $post=" : ".$p;
+                 $post=": ".$p;
               }
               $line=$newline;
               $pref=$newpref;

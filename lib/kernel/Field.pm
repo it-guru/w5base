@@ -329,6 +329,15 @@ sub Label
    return($self->getParent->T($d,$self->{translation}));
 }
 
+sub rawLabel
+{
+   my $self=shift;
+   my $label=$self->{label};
+   my $d="-NoLabelSet-";
+   $d=$label if ($label ne "");
+   return($d);
+}
+
 sub Validate
 {
    my $self=shift;

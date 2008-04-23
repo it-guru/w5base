@@ -133,6 +133,7 @@ sub nativQualityCheck
    my $parent=$self->getParent->Clone;
    my $result;
    my %alldataissuemsg;
+   my %dataupdate;
    my $mandator=[];
    my $checkStart=NowStamp("en");
 
@@ -170,6 +171,8 @@ sub nativQualityCheck
                }
                push(@{$alldataissuemsg{$qrulename}},@{$dataissuemsg});
             }
+            if (defined($control) && defined($control->{dataupdate})){
+            }
             my $resulttext="OK";
             $resulttext="fail"      if ($qresult!=0);
             $resulttext="messy"     if ($qresult==1);
@@ -184,9 +187,9 @@ sub nativQualityCheck
                $res->{qmsg}=$control->{qmsg};
                if (ref($res->{qmsg}) eq "ARRAY"){
                   for(my $c=0;$c<=$#{$res->{qmsg}};$c++){
-                     if (my ($pr,$po)=$res->{qmsg}->[$c]=~m/^(.*)\s*:\s*(.*)$/){
+                     if (my ($pr,$po)=$res->{qmsg}->[$c]=~m/^(.*)\s*:\s+(.*)$/){
                         $res->{qmsg}->[$c]=$self->T($pr,
-                                                     $qrulename)." : ".$po;
+                                                     $qrulename).": ".$po;
                      }
                      else{
                         $res->{qmsg}->[$c]=$self->T($res->{qmsg}->[$c],
@@ -195,8 +198,8 @@ sub nativQualityCheck
                   }
                }
                else{
-                  if (my ($pr,$po)=$res->{qmsg}=~m/^(.*)\s*:\s*(.*)$/){
-                     $res->{qmsg}=$self->T($pr,$qrulename)." : ".$po;
+                  if (my ($pr,$po)=$res->{qmsg}=~m/^(.*)\s*:\s+(.*)$/){
+                     $res->{qmsg}=$self->T($pr,$qrulename).": ".$po;
                   }
                   else{
                      $res->{qmsg}=$self->T($res->{qmsg},$qrulename);
@@ -221,7 +224,12 @@ sub nativQualityCheck
          $detaildescription.="[W5TRANSLATIONBASE=$qrule]\n";
          $detaildescription.=$qrule."\n";
          foreach my $msg (@{$alldataissuemsg{$qrule}}){
-            $detaildescription.=" - ".$msg."\n";
+            if ($msg=~m/^\[\S+::\S+\]$/){
+               $detaildescription.=$msg."\n";
+            }
+            else{
+               $detaildescription.=" - ".$msg."\n";
+            }
          }
       }
       msg(INFO,"QualityRule Level3");

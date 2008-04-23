@@ -181,9 +181,41 @@ sub IfaceCompare
          $wfrequest->{$origfieldname}=$comprec->{$compfieldname};
       }
    }
-   
-
 }
+
+sub HandleWfRequest
+{
+   my $self=shift;
+   my $dataobj=shift;
+   my $rec=shift;
+   my $qmsg=shift;
+   my $dataissue=shift;
+   my $errorlevel=shift;
+   my $wfrequest=shift;
+
+   foreach my $name (sort(keys(%$wfrequest))){
+      my $fo=$dataobj->getField($name);
+      if (defined($fo)){
+         my $label=$fo->rawLabel();
+         push(@$dataissue,"[W5TRANSLATIONBASE=$fo->{translation}]");
+         my $msg="$label: '$wfrequest->{$name}'";
+         push(@$dataissue,$msg);
+
+         my $label=$fo->Label();
+         my $msg="$label: '$wfrequest->{$name}'";
+         push(@$qmsg,$msg);
+      }
+   }
+   printf STDERR ("fifi request a DataIssue Workflow=%s\n",Dumper($wfrequest));
+   if ($#{$qmsg}!=-1 || $$errorlevel>0){
+      my $r={qmsg=>$qmsg,dataissue=>$dataissue};
+      $r->{dataupdate}=$wfrequest;
+      return($$errorlevel,$r);
+   }
+   return($$errorlevel,undef);
+}
+
+
 
 1;
 

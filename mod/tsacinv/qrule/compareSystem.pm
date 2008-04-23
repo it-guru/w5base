@@ -81,6 +81,7 @@ sub qcheckRecord
    my $wfrequest={};
    my $forcedupd={};
    my @qmsg;
+   my @dataissue;
    my $errorlevel=0;
 
    return(0,undef) if ($rec->{cistatusid}!=4);
@@ -255,20 +256,13 @@ sub qcheckRecord
       }
    }
    if (keys(%$wfrequest)){
-      #printf STDERR ("fifi request a DataIssue Workflow=%s\n",Dumper($wfrequest));
+      my $msg="different values stored in AssetCenter: ";
+      push(@qmsg,$msg);
+      push(@dataissue,$msg);
+      $errorlevel=3 if ($errorlevel<3);
    }
-
-   # now process workflow request for traditional W5Deltas
-
-   # todo
-
-   #######################################################################
-
-   if ($#qmsg!=-1 || $errorlevel>0){
-      return($errorlevel,{qmsg=>\@qmsg});
-   }
-
-   return($errorlevel,undef);
+   return($self->HandleWfRequest($dataobj,$rec,
+                                 \@qmsg,\@dataissue,\$errorlevel,$wfrequest));
 }
 
 

@@ -7,3 +7,4 @@
 'no assetid specified'=>{de=>'keine AssetID definiert'},
 'given assetid not found as active in AssetCenter'=>{de=>'angegebene AssetID konnte im AssetCenter nicht aktiv'},
 'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
+'different values stored in AssetCenter'=>{de=>'in AssetCenter sind andere Inhalte gespeichert'},
