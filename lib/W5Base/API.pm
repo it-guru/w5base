@@ -103,6 +103,13 @@ There is no constructor in the classical kind. The function getModuleObject
 returns a dataobject or undef if it fails. If it fails, you can get a
 human readable error message if you specifed two references (\$exitcode,\$msgs) in witch the method can store these informations.
 
+=head2 getUserAgent()
+
+ $ua=getUserAgent($config);
+
+Returns a LWP::UserAgent Object, as base of SOAP communication to the
+W5Base server.
+
 =head1 OBJECT METHODS
 
 =head2 showFields()
@@ -319,7 +326,7 @@ use Exporter;
 use Getopt::Long;
 use FindBin qw($RealScript);
 
-$VERSION = "0.2";
+$VERSION = "0.3";
 @ISA = qw(Exporter);
 @EXPORT = qw(&msg &ERROR &WARN &DEBUG &INFO $RealScript
              &XGetOptions
@@ -328,6 +335,7 @@ $VERSION = "0.2";
              &XSaveStoreFile
              &createConfig
              &getModuleObject
+             &getUserAgent
              );
 
 sub ERROR() {return("ERROR")}
@@ -609,6 +617,14 @@ sub getModuleObject
    return(undef) if (!defined($result) || $result->{exitcode}!=0);
    return(new W5Base::ModuleObject(CONFIG=>$config,SOAP=>$SOAP,
                                    NAME=>$objectname));
+}
+
+sub getUserAgent
+{
+   my $config=shift;
+   my $objectname=shift;
+   my $SOAP=$config->{SOAP};
+   return($SOAP->transport);
 }
 
 package W5Base::ModuleObject;
