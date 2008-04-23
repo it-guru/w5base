@@ -116,6 +116,7 @@ sub mkp800
                                      affectedcontract
                                      affectedapplicationid
                                      wffields.tcomcodrelevant
+                                     wffields.tcomcodcause
                                      affectedapplication
                              headref class step stateid
                              srcid));
@@ -126,9 +127,10 @@ sub mkp800
       my ($rec,$msg)=$wf->getFirst();
       if (defined($rec)){
          do{
+printf STDERR ("==== $rec->{tcomcodcause} ====\n");
             if (ref($rec->{affectedcontractid}) eq "ARRAY" &&
                 $rec->{tcomcodrelevant} eq "yes" &&
-                $rec->{stateid}>=17){
+                $rec->{stateid}>=17 ){
                $self->processRec($start,\%p800,$rec);
                $self->processRecSpecial($start,\%p800special,$rec,
                                         $xlsexp,$monthlist[1]);

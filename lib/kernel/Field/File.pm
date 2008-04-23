@@ -38,8 +38,10 @@ sub RawValue
    if (defined($self->{onDownloadUrl}) &&
           ref($self->{onDownloadUrl}) eq "CODE"){
       my $path=$ENV{SCRIPT_URI};
-      $path=~s/\/[^\/]*$/\//;
-      my $url=$path.&{$self->{onDownloadUrl}}($self,$current);
+      $path=~s/\/(auth|public)\/.*/\/$1\//;
+      my $parent=$self->getParent->Self;
+      $parent=~s/::/\//g;
+      my $url=$path.$parent."/".&{$self->{onDownloadUrl}}($self,$current);
       return($url);
    }
   
