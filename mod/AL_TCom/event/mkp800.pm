@@ -358,7 +358,7 @@ sub processRec
             }
          }
       }
-      if ($rec->{class}=~m/::diary$/){
+      if ($rec->{class}=~m/::diary$/ || $rec->{class}=~m/::businesreq$/){
          if ($rec->{tcomcodcause} ne "std"){
             $p800->{$cid}->{p800_app_specialcount}++;
             $p800->{$cid}->{p800_app_speicalwt}+=
@@ -404,7 +404,7 @@ sub processRecSpecial
          if ($rec->{class}=~m/::incident$/){
             $rec->{headref}->{specialt}=$rec->{headref}->{tcomworktimespecial};
          }
-         if ($rec->{class}=~m/::diary$/){
+         if ($rec->{class}=~m/::diary$/ || $rec->{class}=~m/::businesreq$/){
             $rec->{headref}->{specialt}=$rec->{headref}->{tcomworktime};
          }
          if ($rec->{class}=~m/::change$/){
