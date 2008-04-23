@@ -3,4 +3,5 @@
 
 'no assetid specified'=>{de=>'keine AssetID definiert'},
 'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
+'inconsistend field values for'=>{de=>'Inhaltliche Unterschiede in Datenfeldern'},
 'given assetid not found as active in AssetCenter'=>{de=>'angegebene AssetID ist im AssetCenter nicht aktiv'},

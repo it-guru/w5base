@@ -184,6 +184,10 @@ printf STDERR ("acroom=$acroom asset=%s\n",Dumper($parrec));
       }
    }
    if (keys(%$wfrequest)){
+      my $msg="inconsistend field values for: ".join(", ",keys(%$wfrequest));
+      push(@qmsg,$msg);
+      push(@dataissue,$msg);
+      $errorlevel=3 if ($errorlevel<3);
       printf STDERR ("fifi request a DataIssue Workflow=%s\n",Dumper($wfrequest));
    }
 

@@ -67,6 +67,7 @@ sub qcheckRecord
    my $wfrequest={};
    my $forcedupd={};
    my @qmsg;
+   my @dataissue;
    my $errorlevel=0;
 
    return(0,undef) if ($rec->{cistatusid}!=4);

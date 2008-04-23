@@ -1665,13 +1665,17 @@ sub RawValue
          else{
            my $pref;
            my $post;
-           if (my ($newpref,$newline,$newpost)=
-                $line=~m/^([\s,\-,\!,\*]+)(.*)([\s,:]*)$/){
+           if (my ($newpref,$newline)=
+                $line=~m/^([\s,\-,\!,\*]{1,3})(.*)$/){
+              if (my ($t,$p)=$newline=~m/^(.*?)\s*:\s*(.*)$/){
+                 $newline=$t;
+                 $post=" : ".$p;
+              }
               $line=$newline;
               $pref=$newpref;
-              $post=$newpost;
+              
            }
-           $dd.=$pref.$self->getParent->T($line,$tbase)."\n";
+           $dd.=$pref.$self->getParent->T($line,$tbase).$post."\n";
            $ENV{HTTP_FORCE_LANGUAGE}="en";
            $de.=$pref.$self->getParent->T($line,$tbase).$post."\n";
            delete($ENV{HTTP_FORCE_LANGUAGE});
