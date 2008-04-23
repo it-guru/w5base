@@ -453,6 +453,9 @@ use lib qw(/opt/w5base/lib);
 use W5Base::API;
 use Data::Dumper;
 use Fcntl qw(SEEK_SET);
+use POSIX;
+use LWP::UserAgent;
+use HTTP::Request::Common;
 use vars qw($GUI $Window);
 
 
@@ -497,6 +500,7 @@ if ($gui){
          Win32::GUI::Dialog();');
    msg(ERROR,"--gui only on windows systems \n $@") if ($@);
 }else{
+   my (@ldir,@rdir,@oplist);
    # create connection config
    my $apidebug=$verbose>=3 ? 1 : 0;
    my $Config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug);
@@ -504,19 +508,23 @@ if ($gui){
    my @result=moduleObj($Config);
    msg(ERROR,$result[1]);exit(1) if ($result[0] != 0);  
    
-   my @result=readLocalDescList($ldir);
+   my @result=readLocalDescList($ldir,\@ldir);
    if ($result[0] != 0){
       msg(ERROR,$result[1]);
       exit(1);
    }
-   my @oplist;
-   @result=calculateOperations(\%o,$rdir);
+   my @result=readRemoteDescList(\%o,$rdir,\@rdir);
+   if ($result[0] != 0){
+      msg(ERROR,$result[1]);
+      exit(1);
+   }
+   @result=calculateOperations(\@rdir,\@ldir,\@oplist);
    if ($result[0] != 0){
       msg(ERROR,$result[1]);
       exit(1);
    }
    if ($force){
-      @result=processOperations();
+      @result=processOperations(\%o,\@oplist);
       if ($result[0] != 0){
          msg(ERROR,$result[1]);
          exit(1);
@@ -540,18 +548,32 @@ sub moduleObj
    }
    return(0);
 }
-
 sub readLocalDescList
 {
    my $ldir=shift;
+   my $refldir=shift;
    local *FH;
    if (opendir(FH,"$ldir")){
       while (defined(my $file=readdir(FH)))
       {
-         if (-d "$ldir/$file" && $file ne "." && $file ne "..") {
+         my $mtime=(stat("$ldir/$file"))[9];
+         if (-d "$ldir/$file" && !(-l "$ldir/$file") 
+             && $file ne "." && $file ne "..") {
+            push(@$refldir,{entrytyp   => 'dir',
+                            fullname   => "$ldir/$file",
+                            name       => "$file",
+                            mdatestamp => "$mtime",
+                           });
             readLocalDescList("$ldir/$file");
-         }
-      }
+         }elsif(!(-l "$ldir/$file") && $file ne "." && $file ne ".."){
+            push(@$refldir,{entrytyp    => 'file',
+                            fullname    => "$ldir/$file",
+                            name        => "$file",
+                            mdatestamp  => "$mtime",
+                           });
+
+         }      
+      }         
       closedir(FH);
    }else{
       msg(ERROR,"can't open directory $ldir");
@@ -559,21 +581,90 @@ sub readLocalDescList
    return(0);
 }
 
-
-sub calculateOperations
+sub readRemoteDescList
 {
    my $o=shift;    
    my $rdir=shift;
+   my $refrdir=shift;
    $o->{'filemgmt'}->SetFilter({fullname=>"$rdir*",parentobj=>undef});
-   my @all=$o->{'filemgmt'}->getHashList(qw(ALL));
-printf STDERR ("fifi %s\n",Dumper(\@all));
+   @$refrdir=$o->{'filemgmt'}->getHashList(qw(ALL));
+   # change timestamp from mdate in a unixtimestamp
+   foreach my $rec (@$refrdir){
+      foreach my $key (keys(%$rec)){
+         if ($key eq "mdate"){
+            my @time=split(/[- :]/,$$rec{$key});
+            $$rec{mdatestamp}=mktime($time[5],$time[4],$time[3],
+                               $time[2],$time[1],$time[0]-1900,0,0,-1);
+         }
+      }
+   }
+   return(0);
+}
+
+sub calculateOperations
+{
+   my $refrdir=shift;
+   my $refldir=shift;
+   my $oplist=shift;
+   foreach my $rfile (@$refrdir){
+      my $found=0;
+      foreach my $lfile (@$refldir){
+         if ($lfile->{'fullname'} eq $rfile->{'fullname'} &&
+             $lfile->{'mdatestamp'} eq $rfile->{'mdatestamp'} ){
+            $found=1; 
+         }
+      }
+      if ($found == 0){
+         push(@$oplist,{OP           => 'download',
+                       DATAOBJALIAS => 'filemgmt',
+                       IDENTIFYBY   => $rfile->{'entrytyp'}, 
+                       MSG          => "insert ".$rfile->{'entrytyp'}." ".
+                                       $rfile->{'fullname'},
+                       DATA         => {fullname => $rfile->{'fullname'}}});
+      }
+   }
+#printf STDERR ("fifi 02%s\n",Dumper($oplist));
+printf STDERR ("fifi 03%s\n",Dumper($refrdir));
    return(0);
 }
 
 
 sub processOperations
 {
+   my $ua=new LWP::UserAgent(env_proxy=>0);
+   my %form;
+   $ua->timeout(60);
+   my $loginurl="http://w8n00226.bmbg01.telekom.de/darwin/auth"; 
+
+   my $response=$ua->request(GET($loginurl));
+   if ($response->code ne "200"){
+      printf STDERR ("ERROR: fail to get loginurl\n");
+      exit(1);
+   }
+   eval('$html->parse($response->content);');
+   if ($@ ne ""){
+      printf STDERR ("%s\n",$@);
+      printf STDERR ("ERROR: parsing loginurl=$loginurl\n");
+      exit(1);
+   }
+   $form{myUsername}="dummy/admin";
+   $form{myPassword}="acache";
+   
+   #print Dumper(\%form);
+   
+   my $req=POST($loginurl,Content_Type=>'form-data',Content=>[%form]);
+   
+   my $response=$ua->request($req);
+   if ($response->code ne "200"){
+      printf STDERR ("ERROR: fail to login as '%s'\n",$loginurl);
+      print STDERR $response->code;
+      print STDERR $response->content;
+      exit(1);
+   }
+
    my $o=shift;    
+   my $oplist=shift;    
+   
 }
 
 # help menu
