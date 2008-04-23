@@ -261,6 +261,27 @@ sub Process
    return($self->SUPER::Process($action,$WfRec));
 }
 
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=$_[0];
+   my $newrec=$_[1];
+
+   my $aid=effVal($oldrec,$newrec,"affectedapplicationid");
+   $aid=[$aid] if (ref($aid) ne "ARRAY");
+   my $appl=getModuleObject($self->Config,"itil::appl");
+   $appl->SetFilter({id=>$aid});
+   my %conumber;
+   foreach my $arec ($appl->getHashList(qw(conumber))){
+      $conumber{$arec->{conumber}}++ if ($arec->{conumber} ne "");
+   }
+   if (keys(%conumber)){
+      $newrec->{conumber}=[keys(%conumber)];
+   }
+   return($self->SUPER::Validate(@_));
+
+}
+
 
 
 
