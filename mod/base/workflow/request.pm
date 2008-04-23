@@ -156,7 +156,7 @@ sub isWriteValid
    my $rec=shift;
    return(1) if (!defined($rec));
    my @l;
-   push(@l,"default") if ($rec->{state}<=20 &&
+   push(@l,"default") if ($rec->{state}<10 &&
                          ($self->isCurrentForward() ||
                           $self->getParent->IsMemberOf("admin")));
    if (grep(/^default$/,@l) &&

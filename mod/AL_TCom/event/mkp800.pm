@@ -127,7 +127,6 @@ sub mkp800
       my ($rec,$msg)=$wf->getFirst();
       if (defined($rec)){
          do{
-printf STDERR ("==== $rec->{tcomcodcause} ====\n");
             if (ref($rec->{affectedcontractid}) eq "ARRAY" &&
                 $rec->{tcomcodrelevant} eq "yes" &&
                 $rec->{stateid}>=17 ){
@@ -350,17 +349,23 @@ sub processRec
             $rec->{headref}->{tcomcodchangetype}=[];
          }
          if ($rec->{headref}->{tcomcodchangetype}->[0] eq "customer"){
-            $p800->{$cid}->{p800_app_changecount_customer}+=1;
-            $p800->{$cid}->{p800_app_customerwt}+=
-                            $rec->{headref}->{tcomworktime};
-            $p800->{$cid}->{p800_app_change_customerwt}+=
-                            $rec->{headref}->{tcomworktime};
+            if ($rec->{tcomcodcause} ne "std"){
+               $p800->{$cid}->{p800_app_changecount_customer}+=1;
+               $p800->{$cid}->{p800_app_customerwt}+=
+                               $rec->{headref}->{tcomworktime};
+               $p800->{$cid}->{p800_app_change_customerwt}+=
+                               $rec->{headref}->{tcomworktime};
+            }
          }
       }
       if ($rec->{class}=~m/::diary$/){
-         $p800->{$cid}->{p800_app_specialcount}++;
-         $p800->{$cid}->{p800_app_speicalwt}+=$rec->{headref}->{tcomworktime};
-         $p800->{$cid}->{p800_app_customerwt}+=$rec->{headref}->{tcomworktime};
+         if ($rec->{tcomcodcause} ne "std"){
+            $p800->{$cid}->{p800_app_specialcount}++;
+            $p800->{$cid}->{p800_app_speicalwt}+=
+                           $rec->{headref}->{tcomworktime};
+            $p800->{$cid}->{p800_app_customerwt}+=
+                           $rec->{headref}->{tcomworktime};
+         }
          if (ref($rec->{headref}->{tcomcodchangetype}) ne "ARRAY"){
             $rec->{headref}->{tcomcodchangetype}=[];
          }
@@ -368,8 +373,10 @@ sub processRec
       if ($rec->{class}=~m/::incident$/){
          $p800->{$cid}->{p800_app_incidentcount}++;
          $p800->{$cid}->{p800_app_incidentwt}+=$rec->{headref}->{tcomworktime};
-         $p800->{$cid}->{p800_app_speicalwt}+=
-                                $rec->{headref}->{tcomworktimespecial};
+         if ($rec->{tcomcodcause} ne "std"){
+            $p800->{$cid}->{p800_app_speicalwt}+=
+                                   $rec->{headref}->{tcomworktimespecial};
+         }
       }
    }
 }
@@ -405,23 +412,25 @@ sub processRecSpecial
                $rec->{headref}->{specialt}=$rec->{headref}->{tcomworktime};
             }
          }
-         $self->xlsExport($xlsexp,$rec,$mon,$eY,$eM,$eD);
-         for(my $c=0;$c<=$#{$rec->{affectedcontractid}};$c++){
-            my $cid=$rec->{affectedcontractid}->[$c];
-            my $wt=$rec->{headref}->{specialt};
-            if ($wt>0){
-               $p800->{$mon}={} if (!defined($p800->{$mon}));
-               $p800->{$mon}->{$cid}={} if (!defined($p800->{$mon}->{$cid}));
-               msg(DEBUG,"report special process $cid");
-               $p800->{$mon}->{$cid}->{p800_app_speicalwt}+=$wt;
-               if (!defined($p800->{$mon}->{$cid}->{additional})){
-                  $p800->{$mon}->{$cid}->{additional}={wfheadid=>[],
-                                                       srcid=>[]};
+         if ($rec->{tcomcodcause} ne "std"){
+            $self->xlsExport($xlsexp,$rec,$mon,$eY,$eM,$eD);
+            for(my $c=0;$c<=$#{$rec->{affectedcontractid}};$c++){
+               my $cid=$rec->{affectedcontractid}->[$c];
+               my $wt=$rec->{headref}->{specialt};
+               if ($wt>0){
+                  $p800->{$mon}={} if (!defined($p800->{$mon}));
+                  $p800->{$mon}->{$cid}={} if (!defined($p800->{$mon}->{$cid}));
+                  msg(DEBUG,"report special process $cid");
+                  $p800->{$mon}->{$cid}->{p800_app_speicalwt}+=$wt;
+                  if (!defined($p800->{$mon}->{$cid}->{additional})){
+                     $p800->{$mon}->{$cid}->{additional}={wfheadid=>[],
+                                                          srcid=>[]};
+                  }
+                  push(@{$p800->{$mon}->{$cid}->{additional}->{wfheadid}},
+                       $rec->{id});
+                  push(@{$p800->{$mon}->{$cid}->{additional}->{srcid}},
+                       $rec->{srcid}) if ($rec->{srcid} ne "");
                }
-               push(@{$p800->{$mon}->{$cid}->{additional}->{wfheadid}},
-                    $rec->{id});
-               push(@{$p800->{$mon}->{$cid}->{additional}->{srcid}},
-                    $rec->{srcid}) if ($rec->{srcid} ne "");
             }
          }
       }

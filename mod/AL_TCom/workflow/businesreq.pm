@@ -33,6 +33,80 @@ sub new
    return($self);
 }
 
+sub getDynamicFields
+{
+   my $self=shift;
+   my %param=@_;
+   my @l=();
+
+   return($self->SUPER::getDynamicFields(%param),
+          $self->InitFields(
+           new kernel::Field::Select(    name       =>'tcomcodcause',
+                                         label      =>'Activity',
+                                         htmleditwidth=>'80%',
+                                         translation=>'AL_TCom::lib::workflow',
+                                         value      =>
+                             [AL_TCom::lib::workflow::tcomcodcause()],
+                                         default    =>'undef',
+                                         group      =>'tcomcod',
+                                         container  =>'headref'),
+   
+           new kernel::Field::Textarea(  name        =>'tcomcodcomments',
+                                         label       =>'Comments',
+                                         group       =>'tcomcod',
+                                         container   =>'headref'),
+
+           new kernel::Field::Number(    name       =>'tcomworktime',
+                                         unit       =>'min',
+                                         label      =>'Worktime',
+                                         group      =>'tcomcod',
+                                         container  =>'headref'),
+
+   ));
+}
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my $grp=shift;
+   my %param=@_;
+   return("customerdata","tcomcod","init","flow");
+}
+
+sub getRequestNatureOptions
+{
+   my $self=shift;
+   my $vv=[AL_TCom::lib::workflow::tcomcodcause()];
+   my @l;
+   foreach my $v (@$vv){
+      push(@l,$v,$self->getParent->T($v,"AL_TCom::lib::workflow"));
+   }
+   return(@l);
+}
+
+
+
+
+
+sub isViewValid
+{
+   my $self=shift;
+   return($self->SUPER::isViewValid(@_),"tcomcod");
+}
+
+sub isWriteValid
+{
+   my $self=shift;
+   my $rec=shift;
+   my @grps=$self->SUPER::isWriteValid($rec);
+   if (grep(/^init$/,@grps)){
+      push(@grps,"tcomcod");
+   }
+   return(@grps);
+}
+
+
+
 
 
 

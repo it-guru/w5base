@@ -54,11 +54,9 @@ sub getDynamicFields
    return($self->InitFields(
       new kernel::Field::Select(  name       =>'reqnature',
                                   label      =>'Request nature',
+                                  group      =>'customerdata',
                                   htmleditwidth=>'60%',
-                                  value      =>['operation',
-                                                'project',
-                                                'modification',
-                                                'other'],
+                                  getPostibleValues=>\&XgetRequestNatureOptions,
                                   container  =>'headref'),
 
       new kernel::Field::KeyText( name       =>'affectedapplication',
@@ -90,6 +88,22 @@ sub getDynamicFields
                                   container  =>'headref',
                                   label      =>'Reference'),
     ),$self->SUPER::getDynamicFields(%param));
+}
+
+sub XgetRequestNatureOptions
+{
+   my $self=shift;
+   return($self->getParent->getRequestNatureOptions());
+}
+sub getRequestNatureOptions
+{
+   my $self=shift;
+   my $vv=['operation','project','modification','other'];
+   my @l;
+   foreach my $v (@$vv){
+      push(@l,$v,$v);
+   }
+   return(@l);
 }
 
 
