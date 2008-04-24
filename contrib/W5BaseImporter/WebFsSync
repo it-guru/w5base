@@ -475,6 +475,24 @@ XGetOptions(\%P,\&Help,undef,undef,".websync",noautologin=>1);
 # set defaults
 $mode="download" if (!defined($mode));
 
+sub msg
+{
+   my $type=shift;
+   my $msg=shift;
+   my $format="\%-6s \%s\n";
+   if ($type eq "ERROR" || $type eq "WARN"){
+      foreach my $submsg (split(/\n/,$msg)){
+         printf STDERR ($format,$type.":",$submsg);
+      }
+   }
+   else{
+      foreach my $submsg (split(/\n/,$msg)){
+         printf STDOUT ($format,$type.":",$submsg) if ($Main::VERBOSE ||
+                                                       $type eq "INFO");
+      }
+   }
+}
+
 if ($gui){
    $|=1;
    my $fullstoredfilename=$ENV{HOMEPATH}."\\.websync";
@@ -507,22 +525,32 @@ if ($gui){
       msg(ERROR,$result[1]);  
       exit(1);
    }
-    
+   
    $o{'filemgmt'}->SetFilter({fullname=>"$rdir",parentobj=>undef}); 
    my @rdirid=$o{'filemgmt'}->getHashList(qw(fid fullname));
-   if ($#rdirid == 0){
-      if(!(-w "$ldir/".$rdir) && -e "$ldir/".$rdir){
-         msg(ERROR,"no write access on '$ldir/$rdir'");
+   if ($mode eq "download"){ 
+      if ($#rdirid == 0){
+         if(!(-w "$ldir/".$rdir) && -e "$ldir/".$rdir){
+            msg(ERROR,"no write access on '$ldir/$rdir'");
+            exit(1);
+         }
+         @result=directoryLoop($rdirid[0]->{fid},$rdirid[0]->{fullname},$Config,$directorycount); 
+         if ($result[0] != 0){  
+            msg(ERROR,$result[1]);  
+            exit(1);
+         }
+      }else{
+         msg(ERROR,"remote directory '$rdir' not exists or not unique!");
          exit(1);
       }
-      @result=directoryLoop($rdirid[0]->{fid},$rdirid[0]->{fullname},$Config,$directorycount); 
-      if ($result[0] != 0){  
-         msg(ERROR,$result[1]);  
-         exit(1);
+   }elsif($mode eq "upload"){
+      if ($#rdirid == 0){
+         @result=directoryLoop($rdirid[0]->{fid},$rdirid[0]->{fullname},$Config,$directorycount);
+         if ($result[0] != 0){
+            msg(ERROR,$result[1]);
+            exit(1);
+         }
       }
-   }else{
-      msg(ERROR,"remote directory '$rdir' not exists or not unique!");
-      exit(1);
    }
 }
 
@@ -571,7 +599,7 @@ sub directoryLoop
             return(1,$result[1]);
          }
       }
-      if ($operations->{OP} eq "delete"){
+      if ($operations->{OP} eq "delete" && $mode eq "download"){
          if ($force && -d "$ldir/".$operations->{DATA}->{fullname} &&
              !(-l "$ldir/".$operations->{DATA}->{fullname})){
             rmtree("$ldir/".$operations->{DATA}->{fullname}) ||
@@ -584,6 +612,8 @@ sub directoryLoop
                                    $operations->{DATA}->{fullname}.
                                    " failed -> $!");
          }
+         msg(INFO,$operations->{MSG});
+      }elsif($operations->{OP} eq "delete" && $mode eq "upload"){
          msg(INFO,$operations->{MSG});
       }
    }
@@ -685,28 +715,32 @@ sub calculateOperations
             $found=2;
          }
       }
-      if ($found == 0){
-         push(@$oplist,{OP          => 'insert',
-                       DATAOBJALIAS => 'filemgmt',
-                       IDENTIFYBY   => $rfile->{'entrytyp'}, 
-                       MSG          => "insert ".$rfile->{'entrytyp'}." ".
-                                       $rfile->{'fullname'},
-                       DATA         => {fullname   => $rfile->{'fullname'},
-                                        name       => $rfile->{'name'},
-                                        fid        => $rfile->{'fid'},
-                                        mdatestamp => $rfile->{'mdatestamp'},
-                                        file       => $rfile->{'file'}}});
-      }elsif($found == 2){
-         push(@$oplist,{OP          => 'update',
-                       DATAOBJALIAS => 'filemgmt',
-                       IDENTIFYBY   => $rfile->{'entrytyp'}, 
-                       MSG          => "update ".$rfile->{'entrytyp'}." ".
-                                       $rfile->{'fullname'},
-                       DATA         => {fullname    => $rfile->{'fullname'},
-                                        mdatestamp  => $rfile->{'mdatestamp'},
-                                        fid         => $rfile->{'fid'},
-                                        name        => $rfile->{'name'},
-                                        file        => $rfile->{'file'}}});
+      if ($mode eq "download"){
+         if ($found == 0){
+            push(@$oplist,{OP          => 'insert',
+                          DATAOBJALIAS => 'filemgmt',
+                          IDENTIFYBY   => $rfile->{'entrytyp'}, 
+                          MSG          => "insert ".$rfile->{'entrytyp'}." ".
+                                          $rfile->{'fullname'},
+                          DATA         => {fullname   => $rfile->{'fullname'},
+                                           name       => $rfile->{'name'},
+                                           fid        => $rfile->{'fid'},
+                                           mdatestamp => $rfile->{'mdatestamp'},
+                                           file       => $rfile->{'file'}}});
+         }elsif($found == 2){
+            push(@$oplist,{OP          => 'update',
+                          DATAOBJALIAS => 'filemgmt',
+                          IDENTIFYBY   => $rfile->{'entrytyp'}, 
+                          MSG          => "update ".$rfile->{'entrytyp'}." ".
+                                          $rfile->{'fullname'},
+                          DATA         => {fullname    => $rfile->{'fullname'},
+                                           mdatestamp  => $rfile->{'mdatestamp'},
+                                           fid         => $rfile->{'fid'},
+                                           name        => $rfile->{'name'},
+                                           file        => $rfile->{'file'}}});
+         }
+      }elsif($mode eq "upload"){
+          # operation list für den upload zusammensetzen
       }
    }
    # delete local files
@@ -717,14 +751,18 @@ sub calculateOperations
             $found=1;  
          }
       } 
-      if($found == 0){
-         push(@$oplist,{OP          => 'delete',
-                       DATAOBJALIAS => 'filemgmt',
-                       IDENTIFYBY   => $lfile->{'entrytyp'}, 
-                       MSG          => "delete ".$lfile->{'entrytyp'}." ".
-                                       $lfile->{'fullname'},
-                       DATA         => {fullname  => $lfile->{'fullname'},
-                                        name      => $lfile->{'name'}}});
+      if ($mode eq "download"){
+         if($found == 0){
+            push(@$oplist,{OP          => 'delete',
+                          DATAOBJALIAS => 'filemgmt',
+                          IDENTIFYBY   => $lfile->{'entrytyp'}, 
+                          MSG          => "delete ".$lfile->{'entrytyp'}." ".
+                                          $lfile->{'fullname'},
+                          DATA         => {fullname  => $lfile->{'fullname'},
+                                           name      => $lfile->{'name'}}});
+         }
+      }elsif($mode eq "upload"){
+         # operation list für den upload zusammensetzen
       }
    }
    return(0);
@@ -733,7 +771,6 @@ sub calculateOperations
 
 sub processOperations
 {
-
    my $o=shift;    
    my $oplist=shift;    
    my $Config=shift;    
@@ -742,7 +779,7 @@ sub processOperations
    foreach my $rec (@$oplist){
       if ($rec->{IDENTIFYBY} eq "file" && ($rec->{OP} eq "update" || 
           $rec->{OP} eq "insert")){
-         if ($force){
+         if ($force && $mode eq "download"){
             my $req=$ua->get($rec->{DATA}->{file},
                     ':content_file' => "$ldir/".$rec->{DATA}->{fullname}.".tmp");
             if (!$req->is_success){
@@ -757,6 +794,8 @@ sub processOperations
                       return(1,"utime $ldir/".
                              $rec->{DATA}->{fullname}." failed -> $!");
             }
+         }elsif($force && $mode eq "upload"){
+            # run update processlist 
          }
          msg(INFO,$rec->{MSG});
       }
