@@ -504,7 +504,10 @@ if ($gui){
    my $Config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug);
    
    my @result=moduleObj($Config);
-   msg(ERROR,$result[1]);exit(1) if ($result[0] != 0);  
+   if ($result[0] != 0){
+      msg(ERROR,$result[1]);
+      exit(1);  
+   }
    
    my @hostname=split(/,/,$hostname);
    if ($#hostname == -1){

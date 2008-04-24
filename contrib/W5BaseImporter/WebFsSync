@@ -498,30 +498,65 @@ if ($gui){
          Win32::GUI::Dialog();');
    msg(ERROR,"--gui only on windows systems \n $@") if ($@);
 }else{
-   my (@ldir,@rdir,@oplist);
    # create connection config
    my $apidebug=$verbose>=3 ? 1 : 0;
    my $Config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug);
-   
+   my $directorycount=0;
    my @result=moduleObj($Config);
-   msg(ERROR,$result[1]);exit(1) if ($result[0] != 0);  
-   
-   dirLoop(); 
+   if ($result[0] != 0){  
+      msg(ERROR,$result[1]);  
+      exit(1);
+   }
+    
+   $o{'filemgmt'}->SetFilter({fullname=>"$rdir",parentobj=>undef}); 
+   my @rdirid=$o{'filemgmt'}->getHashList(qw(fid fullname));
+   if ($#rdirid == 0){
+      if(!(-w "$ldir/".$rdir) && -e "$ldir/".$rdir){
+         msg(ERROR,"no write access on '$ldir/$rdir'");
+         exit(1);
+      }
+      directoryLoop($rdirid[0]->{fid},$rdirid[0]->{fullname},$Config,$directorycount); 
+      if ($result[0] != 0){  
+         msg(ERROR,$result[1]);  
+         exit(1);
+      }
+   }else{
+      msg(ERROR,"remote directory '$rdir' not exists or not unique!");
+      exit(1);
+   }
 }
 
-sub dirLoop
+sub directoryLoop
 {
-   my @result=readLocalDescList($ldir,\@ldir);
+   my $parentid=shift; 
+   my $fullname=shift; 
+   my $Config=shift; 
+   my $directorycount=shift;
+   my (@lobj,@robj,@oplist);
+   if ($directorycount > 100){
+      return(1,"directory depth to high, greater than 100");
+   }
+   if (!(-d "$ldir/$fullname")){
+      my $stat=mkdir("$ldir/$fullname");
+      if ($stat != 1){
+         msg(ERROR,"$!"); 
+         exit(1);
+      }
+   }elsif(!(-w "$ldir/$fullname") && -e "$ldir/$fullname"){
+      msg(ERROR,"no write access on '$ldir/$fullname'");
+      exit(1);
+   }
+   my @result=readRemoteDescList(\%o,$parentid,\@robj);
    if ($result[0] != 0){
       msg(ERROR,$result[1]);
       exit(1);
    }
-   my @result=readRemoteDescList(\%o,$rdir,\@rdir);
+   my @result=readLocalDescList($fullname,\@lobj);
    if ($result[0] != 0){
       msg(ERROR,$result[1]);
       exit(1);
    }
-   @result=calculateOperations(\@rdir,\@ldir,\@oplist);
+   @result=calculateOperations(\@robj,\@lobj,\@oplist);
    if ($result[0] != 0){
       msg(ERROR,$result[1]);
       exit(1);
@@ -533,6 +568,34 @@ sub dirLoop
          exit(1);
       }
    }
+   foreach my $operations (@oplist){
+      if ($operations->{'IDENTIFYBY'} eq "dir"){
+         directoryLoop($operations->{'DATA'}->{'fid'},
+                       $operations->{'DATA'}->{'fullname'},
+                       $Config,$directorycount+1);    
+      }
+   }
+}
+
+sub readRemoteDescList
+{
+   my $o=shift;    
+   my $parentid=shift;
+   my $robj=shift;
+   $o->{'filemgmt'}->SetFilter({parentid=>"$parentid"});
+   @$robj=$o->{'filemgmt'}->getHashList(qw(ALL));
+
+   # change timestamp from mdate in a unixtimestamp
+   foreach my $rec (@$robj){
+      foreach my $key (keys(%$rec)){
+         if ($key eq "mdate"){
+            my @time=split(/[- :]/,$$rec{$key});
+            $$rec{mdatestamp}=mktime($time[5],$time[4],$time[3],
+                               $time[2],$time[1],$time[0]-1900,0,0,-1);
+         }
+      }
+   }
+   return(0);
 }
 
 sub moduleObj
@@ -551,55 +614,42 @@ sub moduleObj
    }
    return(0);
 }
+
 sub readLocalDescList
 {
-   my $ldir=shift;
-   my $refldir=shift;
+   my $fullname=shift;
+   my $lobj=shift;
+   my $dir="$ldir/$fullname";
    local *FH;
-   if (opendir(FH,"$ldir")){
+   if (opendir(FH,"$dir")){
       while (defined(my $file=readdir(FH)))
       {
-         my $mtime=(stat("$ldir/$file"))[9];
-         if (-d "$ldir/$file" && !(-l "$ldir/$file") 
+         my $mtime=(stat("$dir/$file"))[9];
+         if (-d "$dir/$file" && !(-l "$dir/$file") 
              && $file ne "." && $file ne "..") {
-            push(@$refldir,{entrytyp   => 'dir',
-                            fullname   => "$ldir/$file",
+            push(@$lobj,{entrytyp   => 'dir',
+                            fullname   => "$fullname/$file",
                             name       => "$file",
                             mdatestamp => "$mtime",
                            });
-            readLocalDescList("$ldir/$file");
-         }elsif(!(-l "$ldir/$file") && $file ne "." && $file ne ".."){
-            push(@$refldir,{entrytyp    => 'file',
-                            fullname    => "$ldir/$file",
+         }elsif(!(-l "$dir/$file") && $file ne "."
+                && $file ne ".." ){
+            push(@$lobj,{entrytyp    => 'file',
+                            fullname    => "$fullname/$file",
                             name        => "$file",
                             mdatestamp  => "$mtime",
                            });
-
+         }elsif(-l "$dir/$file"){
+            push(@$lobj,{entrytyp    => 'link',
+                            fullname    => "$fullname/$file",
+                            name        => "$file",
+                            mdatestamp  => "$mtime",
+                           });
          }      
       }         
       closedir(FH);
    }else{
-      msg(ERROR,"can't open directory $ldir");
-   }
-   return(0);
-}
-
-sub readRemoteDescList
-{
-   my $o=shift;    
-   my $rdir=shift;
-   my $refrdir=shift;
-   $o->{'filemgmt'}->SetFilter({fullname=>"$rdir*",parentobj=>undef});
-   @$refrdir=$o->{'filemgmt'}->getHashList(qw(ALL));
-   # change timestamp from mdate in a unixtimestamp
-   foreach my $rec (@$refrdir){
-      foreach my $key (keys(%$rec)){
-         if ($key eq "mdate"){
-            my @time=split(/[- :]/,$$rec{$key});
-            $$rec{mdatestamp}=mktime($time[5],$time[4],$time[3],
-                               $time[2],$time[1],$time[0]-1900,0,0,-1);
-         }
-      }
+      return(1,"can't open directory $dir");
    }
    return(0);
 }
@@ -613,23 +663,49 @@ sub calculateOperations
       my $found=0;
       foreach my $lfile (@$refldir){
          if ($lfile->{'fullname'} eq $rfile->{'fullname'} &&
-             $lfile->{'mdatestamp'} eq $rfile->{'mdatestamp'} ){
+             $lfile->{'mdatestamp'} eq $rfile->{'mdatestamp'} &&
+             $lfile->{'entrytyp'} eq $rfile->{'entrytyp'} ){
             $found=1; 
+         }elsif($lfile->{'fullname'} eq $rfile->{'fullname'} &&
+             $lfile->{'mdatestamp'} ne $rfile->{'mdatestamp'} &&
+             $lfile->{'entrytyp'} eq $rfile->{'entrytyp'} ){
+            $found=2;
+         }elsif($lfile->{'fullname'} eq $rfile->{'fullname'}){
+            $found=3;
          }
       }
       if ($found == 0){
-         push(@$oplist,{OP           => 'download',
+         push(@$oplist,{OP          => 'insert',
                        DATAOBJALIAS => 'filemgmt',
                        IDENTIFYBY   => $rfile->{'entrytyp'}, 
                        MSG          => "insert ".$rfile->{'entrytyp'}." ".
                                        $rfile->{'fullname'},
-                       DATA         => {fullname => $rfile->{'fullname'},
-                                        name => $rfile->{'name'},
-                                        file     => $rfile->{'file'}}});
+                       DATA         => {fullname   => $rfile->{'fullname'},
+                                        name       => $rfile->{'name'},
+                                        fid        => $rfile->{'fid'},
+                                        mdatestamp => $rfile->{'mdatestamp'},
+                                        file       => $rfile->{'file'}}});
+      }elsif($found == 2){
+         push(@$oplist,{OP          => 'update',
+                       DATAOBJALIAS => 'filemgmt',
+                       IDENTIFYBY   => $rfile->{'entrytyp'}, 
+                       MSG          => "insert ".$rfile->{'entrytyp'}." ".
+                                       $rfile->{'fullname'},
+                       DATA         => {fullname    => $rfile->{'fullname'},
+                                        mdatestamp  => $rfile->{'mdatestamp'},
+                                        fid         => $rfile->{'fid'},
+                                        name        => $rfile->{'name'},
+                                        file        => $rfile->{'file'}}});
+      }elsif($found == 0){
+         push(@$oplist,{OP          => 'delete',
+                       DATAOBJALIAS => 'filemgmt',
+                       IDENTIFYBY   => $rfile->{'entrytyp'}, 
+                       MSG          => "insert ".$rfile->{'entrytyp'}." ".
+                                       $rfile->{'fullname'},
+                       DATA         => {fullname  => $rfile->{'fullname'},
+                                        name      => $rfile->{'name'}}});
       }
    }
-#printf STDERR ("fifi 02%s\n",Dumper($oplist));
-#printf STDERR ("fifi 03%s\n",Dumper($refrdir));
    return(0);
 }
 
@@ -645,18 +721,22 @@ sub processOperations
    foreach my $rec (@$oplist){
       if ($rec->{IDENTIFYBY} eq "file"){
          my $req=$ua->get($rec->{DATA}->{file},
-                          ':content_file' => "$ldir/".$rec->{DATA}->{name}.".tmp"
+                          ':content_file' => "$ldir/".$rec->{DATA}->{fullname}.".tmp"
                          );
          if (!$req->is_success){
-            printf STDERR ("ERROR: %s \n",$req->status_line);
-            exit(1);
+            return(1,$req->status_line);
+         }else{
+            rename("$ldir/".$rec->{DATA}->{fullname}.".tmp",
+                   "$ldir/".$rec->{DATA}->{fullname}) || 
+                   return(1,"rename $ldir/".$rec->{DATA}->{fullname}." failed -> $!");
+            utime($rec->{DATA}->{mdatestamp},$rec->{DATA}->{mdatestamp},
+                  "$ldir/".$rec->{DATA}->{fullname}) ||
+                   return(1,"utime $ldir/".$rec->{DATA}->{fullname}." failed -> $!");
          }
 
-      printf STDERR ("fifi %s\n",$rec->{DATA}->{file});
 
       }
    }
-   
 }
 
 # help menu
