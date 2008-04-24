@@ -479,16 +479,26 @@ sub msg
 {
    my $type=shift;
    my $msg=shift;
+   my $output=shift;
    my $format="\%-6s \%s\n";
+   $output="textfield" if ($gui && !defined($output));
    if ($type eq "ERROR" || $type eq "WARN"){
       foreach my $submsg (split(/\n/,$msg)){
-         printf STDERR ($format,$type.":",$submsg);
+         if (!defined($output)){
+            printf STDERR ($format,$type.":",$submsg);
+         }else{
+
+         }
       }
    }
    else{
       foreach my $submsg (split(/\n/,$msg)){
-         printf STDOUT ($format,$type.":",$submsg) if ($Main::VERBOSE ||
-                                                       $type eq "INFO");
+         if (!defined($output)){
+            printf STDOUT ($format,$type.":",$submsg) if ($Main::VERBOSE ||
+                                                          $type eq "INFO");
+         }else{
+
+         }
       }
    }
 }
@@ -650,7 +660,7 @@ sub moduleObj
       my $objectname=$loadobj{$localid};
       my $obj=getModuleObject($Config,$objectname);
       if (!defined($obj)){
-         msg(ERROR,"$obj not defined");
+         return(1,"$obj not defined");
       }
       $o{$localid}=$obj;
    }
