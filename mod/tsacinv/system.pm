@@ -175,7 +175,7 @@ sub new
                 group         =>"assetdata",
                 fields        =>[qw(assetid serialno inventoryno modelname 
                                     powerinput cpucount cpuspeed corecount
-                                    systemsonasset)]),
+                                    systemsonasset maitcond)]),
 
       new kernel::Field::Import($self,
                 vjointo       =>'tsacinv::asset',
