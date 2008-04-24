@@ -154,7 +154,8 @@ function onLoadViewProcessor_$self->{name}(timedout)
       ResContainer.innerHTML="ERROR: XML request timed out";
       return;
    }
-   window.setTimeout("onLoadViewProcessor_$self->{name}(1);",10000);
+   // window.setTimeout("onLoadViewProcessor_$self->{name}(1);",10000);
+   // timeout handling ist noch bugy!
    var xmlhttp=getXMLHttpRequest();
    xmlhttp.open("POST","$XMLUrl",true);
    xmlhttp.onreadystatechange=function() {
