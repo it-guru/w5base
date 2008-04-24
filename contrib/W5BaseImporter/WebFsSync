@@ -452,7 +452,7 @@ use strict;
 use lib qw(/opt/w5base/lib);
 use W5Base::API;
 use Data::Dumper;
-use Fcntl qw(SEEK_SET);
+use File::Path;
 use POSIX;
 use vars qw($GUI $Window);
 
@@ -515,7 +515,7 @@ if ($gui){
          msg(ERROR,"no write access on '$ldir/$rdir'");
          exit(1);
       }
-      directoryLoop($rdirid[0]->{fid},$rdirid[0]->{fullname},$Config,$directorycount); 
+      @result=directoryLoop($rdirid[0]->{fid},$rdirid[0]->{fullname},$Config,$directorycount); 
       if ($result[0] != 0){  
          msg(ERROR,$result[1]);  
          exit(1);
@@ -539,40 +539,52 @@ sub directoryLoop
    if (!(-d "$ldir/$fullname")){
       my $stat=mkdir("$ldir/$fullname");
       if ($stat != 1){
-         msg(ERROR,"$!"); 
-         exit(1);
+         return(1,"$!"); 
       }
+      msg(INFO,"create directory $ldir/$fullname");
    }elsif(!(-w "$ldir/$fullname") && -e "$ldir/$fullname"){
-      msg(ERROR,"no write access on '$ldir/$fullname'");
-      exit(1);
+      return(1,"no write access on '$ldir/$fullname'");
    }
    my @result=readRemoteDescList(\%o,$parentid,\@robj);
    if ($result[0] != 0){
-      msg(ERROR,$result[1]);
-      exit(1);
+      return(1,$result[1]);
    }
    my @result=readLocalDescList($fullname,\@lobj);
    if ($result[0] != 0){
-      msg(ERROR,$result[1]);
-      exit(1);
+      return(1,$result[1]);
    }
    @result=calculateOperations(\@robj,\@lobj,\@oplist);
    if ($result[0] != 0){
-      msg(ERROR,$result[1]);
-      exit(1);
+      return(1,$result[1]);
    }
-   if ($force){
-      @result=processOperations(\%o,\@oplist,$Config,$ldir);
-      if ($result[0] != 0){
-         msg(ERROR,$result[1]);
-         exit(1);
-      }
+   @result=processOperations(\%o,\@oplist,$Config,$ldir);
+   if ($result[0] != 0){
+      return(1,$result[1]);
    }
    foreach my $operations (@oplist){
-      if ($operations->{'IDENTIFYBY'} eq "dir"){
-         directoryLoop($operations->{'DATA'}->{'fid'},
-                       $operations->{'DATA'}->{'fullname'},
-                       $Config,$directorycount+1);    
+      if ($operations->{'IDENTIFYBY'} eq "dir" && 
+          $operations->{'OP'} ne "delete"){
+         @result=directoryLoop($operations->{'DATA'}->{'fid'},
+                               $operations->{'DATA'}->{'fullname'},
+                               $Config,$directorycount+1);    
+         if ($result[0] != 0){
+            return(1,$result[1]);
+         }
+      }
+      if ($operations->{OP} eq "delete"){
+         if ($force && -d "$ldir/".$operations->{DATA}->{fullname} &&
+             !(-l "$ldir/".$operations->{DATA}->{fullname})){
+            rmtree("$ldir/".$operations->{DATA}->{fullname}) ||
+                            return(1,"delete $ldir/".
+                                   $operations->{DATA}->{fullname}.
+                                   " failed -> $!");
+         }elsif($force){
+            unlink("$ldir/".$operations->{DATA}->{fullname}) ||
+                            return(1,"delete $ldir/".
+                                   $operations->{DATA}->{fullname}.
+                                   " failed -> $!");
+         }
+         msg(INFO,$operations->{MSG});
       }
    }
 }
@@ -659,6 +671,7 @@ sub calculateOperations
    my $refrdir=shift;
    my $refldir=shift;
    my $oplist=shift;
+   # insert and update local files
    foreach my $rfile (@$refrdir){
       my $found=0;
       foreach my $lfile (@$refldir){
@@ -670,8 +683,6 @@ sub calculateOperations
              $lfile->{'mdatestamp'} ne $rfile->{'mdatestamp'} &&
              $lfile->{'entrytyp'} eq $rfile->{'entrytyp'} ){
             $found=2;
-         }elsif($lfile->{'fullname'} eq $rfile->{'fullname'}){
-            $found=3;
          }
       }
       if ($found == 0){
@@ -689,21 +700,31 @@ sub calculateOperations
          push(@$oplist,{OP          => 'update',
                        DATAOBJALIAS => 'filemgmt',
                        IDENTIFYBY   => $rfile->{'entrytyp'}, 
-                       MSG          => "insert ".$rfile->{'entrytyp'}." ".
+                       MSG          => "update ".$rfile->{'entrytyp'}." ".
                                        $rfile->{'fullname'},
                        DATA         => {fullname    => $rfile->{'fullname'},
                                         mdatestamp  => $rfile->{'mdatestamp'},
                                         fid         => $rfile->{'fid'},
                                         name        => $rfile->{'name'},
                                         file        => $rfile->{'file'}}});
-      }elsif($found == 0){
+      }
+   }
+   # delete local files
+   foreach my $lfile (@$refldir){
+      my $found=0;
+      foreach my $rfile (@$refrdir){
+         if ($lfile->{'fullname'} eq $rfile->{'fullname'}){
+            $found=1;  
+         }
+      } 
+      if($found == 0){
          push(@$oplist,{OP          => 'delete',
                        DATAOBJALIAS => 'filemgmt',
-                       IDENTIFYBY   => $rfile->{'entrytyp'}, 
-                       MSG          => "insert ".$rfile->{'entrytyp'}." ".
-                                       $rfile->{'fullname'},
-                       DATA         => {fullname  => $rfile->{'fullname'},
-                                        name      => $rfile->{'name'}}});
+                       IDENTIFYBY   => $lfile->{'entrytyp'}, 
+                       MSG          => "delete ".$lfile->{'entrytyp'}." ".
+                                       $lfile->{'fullname'},
+                       DATA         => {fullname  => $lfile->{'fullname'},
+                                        name      => $lfile->{'name'}}});
       }
    }
    return(0);
@@ -719,22 +740,25 @@ sub processOperations
    my $ldir=shift;    
    my $ua=getUserAgent($Config);
    foreach my $rec (@$oplist){
-      if ($rec->{IDENTIFYBY} eq "file"){
-         my $req=$ua->get($rec->{DATA}->{file},
-                          ':content_file' => "$ldir/".$rec->{DATA}->{fullname}.".tmp"
-                         );
-         if (!$req->is_success){
-            return(1,$req->status_line);
-         }else{
-            rename("$ldir/".$rec->{DATA}->{fullname}.".tmp",
-                   "$ldir/".$rec->{DATA}->{fullname}) || 
-                   return(1,"rename $ldir/".$rec->{DATA}->{fullname}." failed -> $!");
-            utime($rec->{DATA}->{mdatestamp},$rec->{DATA}->{mdatestamp},
-                  "$ldir/".$rec->{DATA}->{fullname}) ||
-                   return(1,"utime $ldir/".$rec->{DATA}->{fullname}." failed -> $!");
+      if ($rec->{IDENTIFYBY} eq "file" && ($rec->{OP} eq "update" || 
+          $rec->{OP} eq "insert")){
+         if ($force){
+            my $req=$ua->get($rec->{DATA}->{file},
+                    ':content_file' => "$ldir/".$rec->{DATA}->{fullname}.".tmp");
+            if (!$req->is_success){
+               return(1,$req->status_line);
+            }else{
+               rename("$ldir/".$rec->{DATA}->{fullname}.".tmp",
+                      "$ldir/".$rec->{DATA}->{fullname}) || 
+                      return(1,"rename $ldir/".
+                             $rec->{DATA}->{fullname}." failed -> $!");
+               utime($rec->{DATA}->{mdatestamp},$rec->{DATA}->{mdatestamp},
+                     "$ldir/".$rec->{DATA}->{fullname}) ||
+                      return(1,"utime $ldir/".
+                             $rec->{DATA}->{fullname}." failed -> $!");
+            }
          }
-
-
+         msg(INFO,$rec->{MSG});
       }
    }
 }
