@@ -100,12 +100,108 @@ sub Validate
    return($result);
 }
 
+sub ViewProcessor
+{
+   my $self=shift;
+   my $mode=shift;
+   my $refid=shift;
+   if ($mode eq "XML" && $refid ne ""){
+      my $response={document=>{}};
+
+      my $obj=$self->getParent();
+      my $idfield=$obj->IdField();
+      if (defined($idfield)){
+         $obj->ResetFilter();
+         $obj->SetFilter({$idfield->Name()=>\$refid});
+         my ($rec,$msg)=$obj->getOnlyFirst($self->Name());
+         if (defined($rec)){
+            $response->{document}->{value}=[$rec->{$self->Name()}];
+         }
+         else{
+            $response->{document}->{value}="";
+         }
+      }
+      print $self->getParent->HttpHeader("text/xml");
+      print hash2xml($response,{header=>1});
+      msg(INFO,hash2xml($response,{header=>1}));
+      return;
+   }
+   return;
+}
+
 
 sub FormatedDetail
 {
    my $self=shift;
    my $current=shift;
    my $mode=shift;
+   if ($self->{async} && $mode eq "HtmlDetail"){
+      my $idfield=$self->getParent->IdField();
+      if (defined($idfield)){
+         my $id=$idfield->RawValue($current);
+         my $divid="ViewProcessor_$self->{name}";
+         my $XMLUrl="$ENV{SCRIPT_URI}";
+         $XMLUrl.="/../ViewProcessor/XML/$self->{name}/$id";
+         my $d="<div id=\"$divid\"><font color=silver>init ...</font></div>";
+         $d=$self->addWebLinkToFacility($d,$current);
+         return(<<EOF);
+$d
+<script language="JavaScript">
+function onLoadViewProcessor_$self->{name}(timedout)
+{
+   var ResContainer=document.getElementById("$divid");
+   if (ResContainer && timedout==1){
+      ResContainer.innerHTML="ERROR: XML request timed out";
+      return;
+   }
+   window.setTimeout("onLoadViewProcessor_$self->{name}(1);",10000);
+   var xmlhttp=getXMLHttpRequest();
+   xmlhttp.open("POST","$XMLUrl",true);
+   xmlhttp.onreadystatechange=function() {
+      var r=document.getElementById("$divid");
+      if (r){
+         if (xmlhttp.readyState<4){
+            var t="<font color=silver>Loading ...</font>";
+            if (r.innerHTML!=t){
+               r.innerHTML=t;
+            }
+         }
+         if (xmlhttp.readyState==4 && 
+             (xmlhttp.status==200||xmlhttp.status==304)){
+            var xmlobject = xmlhttp.responseXML;
+            var result=xmlobject.getElementsByTagName("value");
+            if (result){
+               r.innerHTML="";
+               for(rid=0;rid<result.length;rid++){
+                  if (r.innerHTML!=""){
+                     r.innerHTML+=", ";
+                  }
+                  if (result[rid].childNodes[0]){
+                     r.innerHTML+=result[rid].childNodes[0].nodeValue;
+                  }
+               }
+            }
+            else{
+               r.innerHTML="ERROR: XML error";
+            }
+         }
+      }
+   };
+   xmlhttp.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+   var r=xmlhttp.send('Mode=XML');
+
+
+
+//   ResContainer.innerHTML="<font color=silver>"+
+//                          "- Informations isn't avalilable at now -"+
+//                          "</font>";
+}
+addEvent(window,"load",onLoadViewProcessor_$self->{name});
+</script>
+EOF
+      }
+      return("- ERROR - no idfield - ");
+   }
    my $d=$self->RawValue($current);
    my $name=$self->Name();
    my $app=$self->getParent();

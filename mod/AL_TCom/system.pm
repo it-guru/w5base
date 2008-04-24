@@ -29,17 +29,37 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
 
-#   $self->AddFields(
-#      new kernel::Field::Select(
-#                name          =>'acsync',
-#                label         =>'AssetCenter syncronisation',
-#                htmleditwidth =>'50%',
-#                group         =>'control',
-#                default       =>'ac2w5base',
-#                transprefix   =>'acsync.',
-#                value         =>['w5base2ac','ac2w5base',''],
-#                container     =>'additional'),
-#   );
+   $self->AddFields(
+      new kernel::Field::TextDrop(
+                name          =>'acassingmentgroup',
+                label         =>'AssetCenter Assignmentgroup',
+                group         =>'admin',
+                weblinkto     =>'none',
+                readonly      =>1,
+                async         =>'1',
+                vjointo       =>'tsacinv::system',
+                vjoinon       =>['systemid'=>'systemid'],
+                vjoindisp     =>'assignmentgroup'),
+      new kernel::Field::TextDrop(
+                name          =>'accontrolcenter',
+                label         =>'AssetCenter ControlCenter',
+                group         =>'admin',
+                weblinkto     =>'none',
+                async         =>'1',
+                readonly      =>1,
+                vjointo       =>'tsacinv::system',
+                vjoinon       =>['systemid'=>'systemid'],
+                vjoindisp     =>'controlcenter'),
+      new kernel::Field::TextDrop(
+                name          =>'acsystemname',
+                label         =>'AssetCenter Systemname',
+                group         =>'logsys',
+                async         =>'1',
+                readonly      =>1,
+                vjointo       =>'tsacinv::system',
+                vjoinon       =>['systemid'=>'systemid'],
+                vjoindisp     =>'systemname'),
+   );
 
    return($self);
 }
