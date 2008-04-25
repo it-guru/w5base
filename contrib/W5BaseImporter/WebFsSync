@@ -27,7 +27,8 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   my $hostname=$param{-hostname};
+   my $rdir=$param{-rdir};
+   my $ldir=$param{-ldir};
    my $file=$param{ARGV}->[0];
    my $o=$param{o};
    my $force=$param{-force};
@@ -50,7 +51,6 @@ sub new
    $param{-minsize}=[700,400];
    eval("\$param{-menu}=Win32::GUI::MakeMenu(
                                      '&File' => 'File',
-                                     ' > &Open'  => { -name=>'Open',-onClick=>\\&OpenFile},
                                      ' > &End'  => { -name=>'Exit',-onClick=>\\&doTerminate},
                                      '&?' => 'Info',
                                      ' > &Info'   => { -name=>'Info',-onClick=>\\&Info},
@@ -60,6 +60,9 @@ sub new
    #$self->MessageBox('error','header');
    $self=bless($self,$type);
    $self->{file}=$file;
+   $self->{mode}=$mode;
+   $self->{rdir}=$rdir;
+   $self->{ldir}=$ldir;
    $self->{fullstoredfilename}=$fullstoredfilename;
    $self->{PARAM}=$params;
    $self->{VERSION}=$version;
@@ -67,11 +70,11 @@ sub new
    $self->{ICON}=$icon;
    $self->AddNotifyIcon(-name => "systray",
                         -icon => $self->{ICON},
-                        -tip  => "W5Base Importer",
+                        -tip  => "W5Base Synchronizer",
    );
    $self->Center();
    $self->{GRID}=eval("apply Win32::GUI::GridLayout(\$self,
-                       [qw(10 10 90 * 10 30 10 * * * 10 10)],
+                       [qw(10 10 * 30 10 15 10 150 80 100 10 10)],
                        [qw(10 25 10 20 10 20 20 20 10 10 20 10 * 10 40 10 20 10)],0,0);");
    $self->{FONT}=eval("new Win32::GUI::Font(-bold   => 1,
                                             -size   => 12,
@@ -83,7 +86,7 @@ sub new
    # header
    $self->AddLabel(
           -name        => "headname",
-          -text        => "W5Base NAS IMPORTER",
+          -text        => "W5Base SYNCHRONIZER",
           -font        => $self->{FONT},
           -foreground  => 0x000000,
    );
@@ -106,56 +109,57 @@ sub new
            -size => [100,100],
    );
    $self->{GRID}->add($self->header, [2..11], [1..2], "justify justify");
-   # select fileformat 
-   $self->AddRadioButton(
-           -name     => "auto",
-           -text     => "Auto",
-           -tabstop     => 1,
-   );
-   $self->{GRID}->add($self->auto,3,6,"justify justify");
-   $self->AddRadioButton(
-           -name     => "emc",
-           -text     => "Emc",
-           -tabstop     => 1,
-   );
-   $self->{GRID}->add($self->emc,3,7,"justify justify");
-   $self->AddRadioButton(
-           -name     => "netapp",
-           -text     => "NetApp",
-           -tabstop  => 1,
-   );
-   $self->{GRID}->add($self->netapp,3,8,"justify justify");
    # input data 
    $self->AddLabel(
-          -name   => "hostlabel",
-          -text   => "Hostname",
+          -name   => "remotepathlabel",
+          -text   => "Remote Path",
    );
-   $self->{GRID}->add($self->hostlabel,4,5,"justify buttom");
+   $self->{GRID}->add($self->remotepathlabel,[3..4],5,"justify buttom");
    $self->AddTextfield(
-           -name      => "hostname",
-           -text      => $hostname,
+           -name      => "remotepath",
+           -text      => $rdir,
            -width     => 130,
            -height    => 20,
            -tabstop     => 1,
    );
-   $self->{GRID}->add($self->hostname, 4, 6, "justify top");
+   $self->{GRID}->add($self->remotepath, [3..4],6,"justify top");
+   $self->AddLabel(
+          -name   => "localpathlabel",
+          -text   => "Local Path",
+   );
+   $self->{GRID}->add($self->localpathlabel,[3..4],7,"justify buttom");
+   $self->AddTextfield(
+           -name      => "localpath",
+           -text      => $ldir,
+           -width     => 130,
+           -height    => 20,
+           -tabstop     => 1,
+   );
+   $self->{GRID}->add($self->localpath, 3,8,"justify top");
+   $self->AddButton(
+           -name     => "loadpath",
+           -text     => "...",
+           -disabled  => 0,
+           -onClick  => \&OpenFile, 
+   );
+   $self->{GRID}->add($self->loadpath,4,8,"justify top");
    $self->AddCheckbox(
            -name     => "writedata",
            -text     => "write Data",
            -tabstop     => 1,
    );
-   $self->{GRID}->add($self->writedata,4,7,"justify justify");
+   $self->{GRID}->add($self->writedata,3,[10..11],"justify top");
    $self->AddCheckbox(
            -name     => "warnings",
            -text     => "Warnings on",
            -checked  => 1,
            -tabstop     => 1,
    );
-   $self->{GRID}->add($self->warnings,4,8,"justify justify");
+   $self->{GRID}->add($self->warnings,3,[10..11],"right top");
    $self->AddGroupbox( 
            -name => "inputdata", 
            -text => "input",
-           -size => [100,100],
+           -size => [100,130],
    );
    $self->{GRID}->add($self->inputdata, [2..5], [4..10], "justify top");
    # login data
@@ -202,25 +206,9 @@ sub new
    $self->AddGroupbox( 
           -name => "connectdata", 
           -text => "connect data",
-          -size => [100,100],
+          -size => [100,130],
    );
-   $self->{GRID}->add($self->connectdata, [7..11], [4..10], "justify top");
-   # info row
-   $self->AddLabel(
-          -name   => "filename",
-          -text   => "FILE: ".$self->{file},
-   );
-   $self->{GRID}->add($self->filename,[9..12],11,"justify justify");
-   $self->AddLabel(
-          -name   => "fileformat",
-          -text   => "FILEFORMAT:",
-   );
-   $self->{GRID}->add($self->fileformat,[5..8],11,"justify justify");
-   $self->AddLabel(
-          -name   => "host",
-          -text   => "HOSTNAME:",
-   );
-   $self->{GRID}->add($self->host,[2..3],11,"justify justify");
+   $self->{GRID}->add($self->connectdata, [7..11], [4..12], "justify top");
    # output textfield
    $self->AddTextfield(
            -name        => "output",
@@ -250,10 +238,7 @@ sub new
    $self->{GRID}->add($self->pgbar,[2..11],17,"justify justify");
    $self->{GRID}->recalc();
    $self->checkMode();
-   $self->emc->SetCheck(1) if ($mode eq "emc");
-   $self->netapp->SetCheck(1) if ($mode eq "netapp");
    $self->warnings->SetCheck(0) if ($nowarn);
-   $self->auto->SetCheck(1) if ($mode eq "auto");
    $self->writedata->SetCheck(1) if ($force);
    return($self); 
 }
@@ -261,11 +246,12 @@ sub new
 sub OpenFile
 {
    my $self=shift;
-   my $file;
-   eval('$file = Win32::GUI::GetOpenFileName();');
-   if ($file){
-      $self->{file}=$file;
-      $self->checkMode();
+   my $mainwin=$self->GetParent();
+   my $folder;
+   eval('$folder = Win32::GUI::BrowseForFolder();');
+   if ($folder){
+      $mainwin->{ldir}=$folder;
+      $mainwin->checkMode();
    }
 }
 
@@ -273,7 +259,6 @@ sub doStart
 {
    my $self=shift;
    my @oplist; 
-   $self->{sharedata}={}; 
    my $mainwin=$self->GetParent();
    $mainwin->output->Change(-text => "");
    $mainwin->output->DoEvents();
@@ -311,38 +296,63 @@ sub doStart
    }
 
    # read File
+
+
    $mainwin->output->Append("done\r\nreading file ... ");
-   @result=main::readFile($mainwin->{FH},
-                          $self->{sharedata},
-                          $mainwin->{curmode},
-                          $mainwin->hostname->GetLine(0),\&StepIt,$mainwin);
-   if ($result[0] != 0){
-      eval("Win32::MsgBox(\"\$result[1]\",Win32::MB_ICONQUESTION|0, 'Error!')");   
-      $mainwin->run->Enable(1);
-      return(1,$result[1]);
+
+
+   $mainwin->{o}{'filemgmt'}->SetFilter({fullname=>$mainwin->{rdir},parentobj=>undef}); 
+   my @rdirid=$mainwin->{o}{'filemgmt'}->getHashList(qw(fid fullname));
+   if ($self->{mode} eq "download"){ 
+      if ($#rdirid == 0){
+         if(!(-w $mainwin->{ldir}."/".$mainwin->{rdir}) && -e $mainwin->{ldir}."/".$mainwin->{rdir}){
+         #   main::msg(ERROR,"no write access on ".$mainwin->{ldir}."/".$mainwin->{rdir});
+            exit(1);
+         }
+         @result=main::directoryLoop($rdirid[0]->{fid},$rdirid[0]->{fullname},$Config,0); 
+         if ($result[0] != 0){  
+      #      msg(ERROR,$result[1]);  
+            exit(1);
+         }
+      }else{
+      #   msg(ERROR,"remote directory '".$mainwin->{rdir}."' not exists or not unique!");
+         exit(1);
+      }
+   }elsif($self->{mode} eq "upload"){
    }
+
+
+#   @result=main::readFile($mainwin->{FH},
+#                          $self->{sharedata},
+#                          $mainwin->{curmode},
+#                          $mainwin->hostname->GetLine(0),\&StepIt,$mainwin);
+#   if ($result[0] != 0){
+#      eval("Win32::MsgBox(\"\$result[1]\",Win32::MB_ICONQUESTION|0, 'Error!')");   
+#      $mainwin->run->Enable(1);
+#      return(1,$result[1]);
+#   }
 
    # compute operation
    $mainwin->output->Append("done\r\ncompute operations ... and preview operations...\r\n");
-   @result=main::calculateOperations($mainwin->{o},$self->{sharedata},
-                                     \@oplist,$mainwin->hostname->GetLine(0),\&StepIt,$mainwin);
-   if ($result[0] != 0){
-      eval("Win32::MsgBox(\"\$result[1]\",Win32::MB_ICONQUESTION|0, 'Error!')");   
-      $mainwin->run->Enable(1);
-      return(1,$result[1]);
-   }
+#   @result=main::calculateOperations($mainwin->{o},$self->{sharedata},
+#                                     \@oplist,$mainwin->hostname->GetLine(0),\&StepIt,$mainwin);
+#   if ($result[0] != 0){
+#      eval("Win32::MsgBox(\"\$result[1]\",Win32::MB_ICONQUESTION|0, 'Error!')");   
+ #     $mainwin->run->Enable(1);
+ ##     return(1,$result[1]);
+ #  }
  
    # write data to API
-   if ($mainwin->writedata->GetCheck() == 1){
-      $mainwin->output->Append("write data ... ");
-      @result=main::processOperations($mainwin->{o},\@oplist,\&StepIt,$mainwin);
-      if ($result[0] != 0){
-         eval("Win32::MsgBox(\"\$result[1]\",Win32::MB_ICONQUESTION|0, 'Error!')");   
-         $mainwin->run->Enable(1);
-         return(1,$result[1]);
-      }
-      $mainwin->output->Append("done\r\n");
-   }
+#   if ($mainwin->writedata->GetCheck() == 1){
+#      $mainwin->output->Append("write data ... ");
+#      @result=main::processOperations($mainwin->{o},\@oplist,\&StepIt,$mainwin);
+#      if ($result[0] != 0){
+#         eval("Win32::MsgBox(\"\$result[1]\",Win32::MB_ICONQUESTION|0, 'Error!')");   
+#         $mainwin->run->Enable(1);
+#         return(1,$result[1]);
+#      }
+#      $mainwin->output->Append("done\r\n");
+#   }
    $mainwin->output->Append("\r\nready!");
    $mainwin->run->Enable(1);
    $mainwin->pgbar->SetPos(1500);
@@ -364,39 +374,18 @@ sub StepIt
 sub checkMode
 {
    my $self=shift;
-   my $file=$self->{file};
-   my @mode;
+   my $folder=$self->{ldir};
    # check filemode
-   $self->{curmode}="emc" if ($self->emc->GetCheck() == 1);
-   $self->{curmode}="netapp" if ($self->netapp->GetCheck() == 1);
-   if (open(FILE,"<$file")){
+   if (-d $folder){
       $self->run->Enable(1);
-      if ($self->auto->GetCheck() == 1){
-         @mode=main::detectMode(\*FILE) if ($self->auto->GetCheck() == 1);
-         if ($mode[0] == 0){
-            $self->{curmode}=$mode[1];
-         }else{
-            $self->{curmode}="unknown";
-         }
-      }
       $self->{FH}=\*FILE;
-   }
-   # limit filename length
-   if (length($file) > 45){
-      $file=substr($file,0,5)."...".substr($file,length($file)-36,length($file));
+      $self->localpath->Change(-text=>"$folder");
    }
    # save login datas
    ${$self->{PARAM}->{'base=s'}}=$self->base->GetLine(0);
    ${$self->{PARAM}->{'webuser=s'}}=$self->webuser->GetLine(0);
    ${$self->{PARAM}->{'webpass=s'}}=$self->webpass->GetLine(0);
-   # output file datas
-   $self->filename->Change(-text=>"FILE: ".$file);
-   $self->fileformat->Change(-text=>"FILEFORMAT: ".$self->{curmode});
-   $self->host->Change(-text=>"HOSTNAME: ".$self->hostname->GetLine(0));
-   if ($mode[0] != 0){
-      eval("Win32::MsgBox(\"\$mode[1]\",Win32::MB_ICONEXCLAMATION|0, 'Error!')"); 
-      return(1,$mode[1]);
-   }
+   $self->{mode}="download" if (!$self->{mode});
    return(0);
 }
 
@@ -407,8 +396,9 @@ sub Info
    my $text=(<<EOF);
 $version
 
-W5Base Importer is a tiny software to import data
-in a W5Base Environment of your own choice
+W5Base Syncronizer compare two filesystems and 
+syncronize files and folder. It's matter who is the
+master it will be upload or download objects. 
 
 W5Base Framework
 Copyright (C) 2008  Holm Basedow (info\@blauwaerme.de)
@@ -513,11 +503,12 @@ if ($gui){
          use Win32::GUI::BitmapInline;
          use Win32::GUI::DIBitmap;
          $GUI=new MyWin(-title=>"W5Base Importer", 
-                        -hostname=>$hostname,
                         ARGV=>\@ARGV,
                         o=>\%o,
                         -mode=>$mode,
                         -version=>$version,
+                        -rdir=>$rdir,
+                        -ldir=>$ldir,
                         -nowarn=>$nowarn,
                         -fullstoredfilename=>$fullstoredfilename,
                         -params=>\%P,
