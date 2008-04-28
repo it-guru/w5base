@@ -63,6 +63,7 @@ sub new
    $self->{mode}=$mode;
    $self->{rdir}=$rdir;
    $self->{ldir}=$ldir;
+   $self->{force}=$force;
    $self->{fullstoredfilename}=$fullstoredfilename;
    $self->{PARAM}=$params;
    $self->{VERSION}=$version;
@@ -265,6 +266,7 @@ sub doStart
    $mainwin->output->LimitText(1000000);
    $mainwin->output->SetFocus();
    $mainwin->output->Append("login ... ");
+   my $directorycount=0;
    my ($exitcode, $msgs);
    my @result=$mainwin->checkMode();
    if ($result[0] != 0){
@@ -275,6 +277,7 @@ sub doStart
    $mainwin->pgbar->SetRange(0,1500);
    $mainwin->pgbar->SetStep(1);
    $mainwin->pgbar->SetPos(50);
+   my $force=1 if ($mainwin->writedata->GetCheck() == 1);
    my $Config=main::createConfig(${$mainwin->{PARAM}->{'base=s'}},
                                  ${$mainwin->{PARAM}->{'webuser=s'}},
                                  ${$mainwin->{PARAM}->{'webpass=s'}},
@@ -297,28 +300,33 @@ sub doStart
 
    # read File
 
+   $mainwin->output->Append("done\r\nreading file ...\r\n");
+   
 
-   $mainwin->output->Append("done\r\nreading file ... ");
-
-
-   $mainwin->{o}{'filemgmt'}->SetFilter({fullname=>$mainwin->{rdir},parentobj=>undef}); 
+   $mainwin->{o}{'filemgmt'}->SetFilter({fullname=>$mainwin->{rdir},
+                                        parentobj=>undef}); 
    my @rdirid=$mainwin->{o}{'filemgmt'}->getHashList(qw(fid fullname));
-   if ($self->{mode} eq "download"){ 
+   if ($mainwin->{mode} eq "download"){ 
       if ($#rdirid == 0){
-         if(!(-w $mainwin->{ldir}."/".$mainwin->{rdir}) && -e $mainwin->{ldir}."/".$mainwin->{rdir}){
-         #   main::msg(ERROR,"no write access on ".$mainwin->{ldir}."/".$mainwin->{rdir});
+         if (!(-w $mainwin->{ldir}."/".$mainwin->{rdir}) && -e $mainwin->{ldir}.
+                  "/".$mainwin->{rdir}){
+            $mainwin->MessageBox("no write access on".
+                       $mainwin->{ldir}."/".$mainwin->{rdir},'ERROR',0x0020);
             exit(1);
          }
-         @result=main::directoryLoop($rdirid[0]->{fid},$rdirid[0]->{fullname},$Config,0); 
+         @result=main::directoryLoop($rdirid[0]->{fid},$rdirid[0]->{fullname},
+                                     $Config,$directorycount,$mainwin->{mode},$force,
+                                     \&StepIt,$mainwin);
          if ($result[0] != 0){  
-      #      msg(ERROR,$result[1]);  
+            $mainwin->MessageBox($result[1],'ERROR',0x0020);
             exit(1);
          }
       }else{
-      #   msg(ERROR,"remote directory '".$mainwin->{rdir}."' not exists or not unique!");
+          $mainwin->MessageBox("remote directory '".$mainwin->{rdir}.
+                     "' not exists or not unique!",'ERROR',0x0020);
          exit(1);
       }
-   }elsif($self->{mode} eq "upload"){
+   }elsif($mainwin->{mode} eq "upload"){
    }
 
 
@@ -366,7 +374,6 @@ sub StepIt
    if ($self->warnings->GetCheck() == 0 and substr($text,0,4) eq "WARN"){
       return(0); 
    } 
-   $text="      ".$text if (substr($text,0,9) eq "insert ip");
    $self->output->Append($text."\r\n") if ($text);
    $self->DoEvents();
 }
@@ -381,6 +388,9 @@ sub checkMode
       $self->{FH}=\*FILE;
       $self->localpath->Change(-text=>"$folder");
    }
+   # load path
+   $self->{rdir}=$self->remotepath->GetLine(0);
+   $self->{ldir}=$self->localpath->GetLine(0);
    # save login datas
    ${$self->{PARAM}->{'base=s'}}=$self->base->GetLine(0);
    ${$self->{PARAM}->{'webuser=s'}}=$self->webuser->GetLine(0);
@@ -465,34 +475,6 @@ XGetOptions(\%P,\&Help,undef,undef,".websync",noautologin=>1);
 # set defaults
 $mode="download" if (!defined($mode));
 
-sub msg
-{
-   my $type=shift;
-   my $msg=shift;
-   my $output=shift;
-   my $format="\%-6s \%s\n";
-   $output="textfield" if ($gui && !defined($output));
-   if ($type eq "ERROR" || $type eq "WARN"){
-      foreach my $submsg (split(/\n/,$msg)){
-         if (!defined($output)){
-            printf STDERR ($format,$type.":",$submsg);
-         }else{
-
-         }
-      }
-   }
-   else{
-      foreach my $submsg (split(/\n/,$msg)){
-         if (!defined($output)){
-            printf STDOUT ($format,$type.":",$submsg) if ($Main::VERBOSE ||
-                                                          $type eq "INFO");
-         }else{
-
-         }
-      }
-   }
-}
-
 if ($gui){
    $|=1;
    my $fullstoredfilename=$ENV{HOMEPATH}."\\.websync";
@@ -535,7 +517,8 @@ if ($gui){
             msg(ERROR,"no write access on '$ldir/$rdir'");
             exit(1);
          }
-         @result=directoryLoop($rdirid[0]->{fid},$rdirid[0]->{fullname},$Config,$directorycount); 
+         @result=directoryLoop(\%o,$rdirid[0]->{fid},$rdirid[0]->{fullname},
+                               $Config,$directorycount,$mode,$force); 
          if ($result[0] != 0){  
             msg(ERROR,$result[1]);  
             exit(1);
@@ -546,7 +529,8 @@ if ($gui){
       }
    }elsif($mode eq "upload"){
       if ($#rdirid == 0){
-         @result=directoryLoop($rdirid[0]->{fid},$rdirid[0]->{fullname},$Config,$directorycount);
+         @result=directoryLoop($rdirid[0]->{fid},$rdirid[0]->{fullname},
+                               $Config,$directorycount,$mode,$force); 
          if ($result[0] != 0){
             msg(ERROR,$result[1]);
             exit(1);
@@ -561,6 +545,10 @@ sub directoryLoop
    my $fullname=shift; 
    my $Config=shift; 
    my $directorycount=shift;
+   my $mode=shift;
+   my $force=shift;
+   my $stepit=shift;
+   my $mywin=shift;
    my (@lobj,@robj,@oplist);
    if ($directorycount > 100){
       return(1,"directory depth to high, greater than 100");
@@ -570,7 +558,11 @@ sub directoryLoop
       if ($stat != 1){
          return(1,"$!"); 
       }
-      msg(INFO,"create directory $ldir/$fullname");
+      if ($stepit){
+         &{$stepit}($mywin,"INFO: create directory $ldir\\$fullname");
+      }else{
+         msg(INFO,"create directory $ldir/$fullname");
+      }
    }elsif(!(-w "$ldir/$fullname") && -e "$ldir/$fullname"){
       return(1,"no write access on '$ldir/$fullname'");
    }
@@ -582,11 +574,12 @@ sub directoryLoop
    if ($result[0] != 0){
       return(1,$result[1]);
    }
-   @result=calculateOperations(\@robj,\@lobj,\@oplist);
+   @result=calculateOperations(\@robj,\@lobj,\@oplist,$mode);
    if ($result[0] != 0){
       return(1,$result[1]);
    }
-   @result=processOperations(\%o,\@oplist,$Config,$ldir);
+   @result=processOperations(\%o,\@oplist,$Config,$ldir,
+                             $mode,$force,$stepit,$mywin);
    if ($result[0] != 0){
       return(1,$result[1]);
    }
@@ -595,7 +588,8 @@ sub directoryLoop
           $operations->{'OP'} ne "delete"){
          @result=directoryLoop($operations->{'DATA'}->{'fid'},
                                $operations->{'DATA'}->{'fullname'},
-                               $Config,$directorycount+1);    
+                               $Config,$directorycount+1,
+                               $mode,$force,$stepit,$mywin);    
          if ($result[0] != 0){
             return(1,$result[1]);
          }
@@ -613,19 +607,27 @@ sub directoryLoop
                                    $operations->{DATA}->{fullname}.
                                    " failed -> $!");
          }
-         msg(INFO,$operations->{MSG});
+         if ($stepit){
+            &{$stepit}($mywin,"INFO: ".$operations->{MSG});
+         }else{
+            msg(INFO,$operations->{MSG});
+         }
       }elsif($operations->{OP} eq "delete" && $mode eq "upload"){
-         msg(INFO,$operations->{MSG});
+         if ($stepit){
+            &{$stepit}($mywin,"INFO: ".$operations->{MSG});
+         }else{
+            msg(INFO,$operations->{MSG});
+         }
       }
    }
 }
 
 sub readRemoteDescList
 {
-   my $o=shift;    
+   my $o=shift;
    my $parentid=shift;
    my $robj=shift;
-   $o->{'filemgmt'}->SetFilter({parentid=>"$parentid"});
+   $o->{'filemgmt'}->SetFilter({parentid=>[$parentid]});
    @$robj=$o->{'filemgmt'}->getHashList(qw(ALL));
 
    # change timestamp from mdate in a unixtimestamp
@@ -702,6 +704,7 @@ sub calculateOperations
    my $refrdir=shift;
    my $refldir=shift;
    my $oplist=shift;
+   my $mode=shift;
    # insert and update local files
    foreach my $rfile (@$refrdir){
       my $found=0;
@@ -776,6 +779,10 @@ sub processOperations
    my $oplist=shift;    
    my $Config=shift;    
    my $ldir=shift;    
+   my $mode=shift;    
+   my $force=shift;    
+   my $stepit=shift;    
+   my $mywin=shift;    
    my $ua=getUserAgent($Config);
    foreach my $rec (@$oplist){
       if ($rec->{IDENTIFYBY} eq "file" && ($rec->{OP} eq "update" || 
@@ -798,7 +805,11 @@ sub processOperations
          }elsif($force && $mode eq "upload"){
             # run update processlist 
          }
-         msg(INFO,$rec->{MSG});
+         if ($stepit){
+            &{$stepit}($mywin,"INFO: ".$rec->{MSG});
+         }else{
+            msg(INFO,$rec->{MSG});
+         }
       }
    }
 }
