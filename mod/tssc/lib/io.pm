@@ -449,7 +449,7 @@ sub mkChangeStoreRec
        #$wfrec{tcomcodcontract}=join(", ",@{$wfrec{affectedcontract}});
        $wfrec{tcomcodcause}="undef";
        $wfrec{tcomcodchmrisk}=$rec->{risk};
-       if ($wfrec{tcomcodchmrisk} eq "" || $wfrec{tcomcodchmrisk}==0){
+       if ($wfrec{tcomcodchmrisk} eq "" || $wfrec{tcomcodchmrisk} eq "0"){
           msg(ERROR,"no tcomcodchmrisk in Changenumber '$rec->{changenumber}'");
        }
        $wfrec{tcomcoddownstart}=$ws;
