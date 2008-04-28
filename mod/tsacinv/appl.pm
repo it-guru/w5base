@@ -231,7 +231,7 @@ sub new
                 label         =>'Systems',
                 vjointo       =>'tsacinv::lnkapplsystem',
                 vjoinon       =>['id'=>'lparentid'],
-                vjoindisp     =>['child','systemid']),
+                vjoindisp     =>['child','systemweblink','systemid','comments']),
 
       new kernel::Field::Text(
                 name          =>'srcsys',

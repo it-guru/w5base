@@ -62,6 +62,43 @@ sub new
                 weblinkon     =>['lsystemid'=>'systemid'],
                 dataobjattr   =>'amportfolio.assettag'),
 
+      new kernel::Field::Textarea(
+                name          =>'comments',
+                searchable    =>0,
+                label         =>'Comments',
+                dataobjattr   =>'amtsirelportfappl.description'),
+
+      new kernel::Field::DynWebIcon(
+                name          =>'systemweblink',
+                searchable    =>0,
+                depend        =>['systemid'],
+                htmlwidth     =>'5px',
+                htmldetail    =>0,
+                weblink       =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+                   my $app=$self->getParent;
+
+                   my $systemido=$self->getParent->getField("systemid");
+                   my $systemid=$systemido->RawValue($current);
+
+                   my $img="<img ";
+                   $img.="src=\"../../base/load/directlink.gif\" ";
+                   $img.="title=\"\" border=0>";
+                   my $dest="../../tsacinv/system/Detail?systemid=$systemid";
+                   my $detailx=$app->DetailX();
+                   my $detaily=$app->DetailY();
+                   my $onclick="openwin(\"$dest\",\"_blank\",".
+                       "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
+                       "resizable=yes,scrollbars=no\")";
+
+                   if ($mode=~m/html/i){
+                      return("<a href=javascript:$onclick>$img</a>");
+                   }
+                   return("-only a web useable link-");
+                }),
+
       new kernel::Field::Link(
                 name          =>'lsystemid',
                 label         =>'lsystemid',
@@ -116,15 +153,17 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="amtsirelportfappl,amportfolio";
+   my $from="amtsirelportfappl,amportfolio,amcomputer";
    return($from);
 }
 
 sub initSqlWhere
 {
    my $self=shift;
-   return("amtsirelportfappl.bdelete=0 and ".
-          "amtsirelportfappl.lportfolioid=amportfolio.lportfolioitemid");
+   return("amtsirelportfappl.bdelete=0 and amportfolio.bdelete=0 and ".
+          "amtsirelportfappl.lportfolioid=amportfolio.lportfolioitemid and ".
+          "amportfolio.lportfolioitemid=amcomputer.litemid and ".
+          "amcomputer.status<>'out of operation'");
 }
 
 sub isViewValid

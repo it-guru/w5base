@@ -74,13 +74,14 @@ sub LoadBCBS
    my $sys=getModuleObject($self->Config,"AL_TCom::system");
    my $asset=getModuleObject($self->Config,"AL_TCom::asset");
    $aappl->SetFilter({assignmentgroup=>\'BPO.BCBS',
-   #                   name=>'BISYS*',
+                      name=>'ABBV*',
                       status=>['IN OPERATION']});
    $aappl->SetCurrentView(qw(ALL));
    my $agcount=0;
    if (my ($rec,$msg)=$aappl->getFirst()){
        agloop: while(defined($rec)){
          my %systemid;
+         my %systemidcomments;
          my %assetid;
          last if (!defined($rec));
          my $semw5baseid=$wiw->GetW5BaseUserID($rec->{sememail});
@@ -172,6 +173,7 @@ sub LoadBCBS
             }
             foreach my $sysrec (@{$rec->{systems}}){
                $systemid{$sysrec->{systemid}}->{$agid}->{$rec->{usage}}++;
+               $systemidcomments{$sysrec->{systemid}}=$sysrec->{comments};
             }
          }
          #if ($agcount++>5){
@@ -280,7 +282,8 @@ sub LoadBCBS
                $w5systemid=$oldsystemrec->{id};
             }
             my $lnkrec={applid=>$agid,
-                        systemid=>$w5systemid
+                        systemid=>$w5systemid,
+                        comments=>$systemidcomments{$systemid}
                        };
             $lnkappl->ValidatedInsertOrUpdateRecord($lnkrec,
                {applid=>\$lnkrec->{applid},systemid=>\$lnkrec->{systemid}});
