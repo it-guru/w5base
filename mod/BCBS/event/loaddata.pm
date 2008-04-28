@@ -74,7 +74,7 @@ sub LoadBCBS
    my $sys=getModuleObject($self->Config,"AL_TCom::system");
    my $asset=getModuleObject($self->Config,"AL_TCom::asset");
    $aappl->SetFilter({assignmentgroup=>\'BPO.BCBS',
-                      name=>'ABBV*',
+   #                   name=>'ABBV*',
                       status=>['IN OPERATION']});
    $aappl->SetCurrentView(qw(ALL));
    my $agcount=0;
