@@ -3,8 +3,6 @@
 
 'undef'=>              {de=>'nicht detailerte Leistung',
                         en=>'undefined Service'},
-'std'=>                {de=>'Basisleistung',
-                        en=>'Standard'},
 'devsupport'=>         {de=>'Entwicklungsunterstützung',
                         en=>'Developer support'},
 'pilot'=>              {de=>'Pilotierung',

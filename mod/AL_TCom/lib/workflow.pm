@@ -136,8 +136,7 @@ sub tcomcodcause
              ETAtestSIT2
              ETAtestSIT3
              ETAtestSIT4 
-             misc
-             std));
+             misc));
 }
 
 
