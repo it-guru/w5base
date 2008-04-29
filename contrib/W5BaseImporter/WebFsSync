@@ -310,10 +310,11 @@ sub doStart
       $mainwin->run->Enable(1);
       return(1,$msgs);
    }else{
-      foreach my $del (qw(gui force nowarn admin)){
-         delete($mainwin->{PARAM}->{$del});
+      my %save;
+      foreach my $save (qw(ldir=s webpass=s rdir=s base=s webuser=s)){
+         $save{$save}=$mainwin->{PARAM}->{$save};
       }
-      main::XSaveStoreFile($mainwin->{fullstoredfilename},$mainwin->{PARAM});
+      main::XSaveStoreFile($mainwin->{fullstoredfilename},\%save);
    }
    $mainwin->output->Append("done\r\nget objects ... ");
    @result=main::moduleObj($Config);
@@ -341,6 +342,7 @@ sub doStart
                                      $Config,$directorycount,$mainwin->{mode},$force,
                                      \&StepIt,$mainwin);
          if ($result[0] != 0){  
+            $result[1]=~s/\//\\/g; 
             $mainwin->MessageBox($result[1],'ERROR',0x0020);
             exit(1);
          }
@@ -373,6 +375,9 @@ sub StepIt
 sub checkMode
 {
    my $self=shift;
+   # load path
+   $self->{rdir}=$self->remotepath->GetLine(0);
+   $self->{ldir}=$self->localpath->GetLine(0);
    my $folder=$self->{ldir};
    # check filemode
    if (-d $folder){
@@ -380,22 +385,25 @@ sub checkMode
       $self->{FH}=\*FILE;
       $self->localpath->Change(-text=>"$folder");
    }
-   # load path
-   $self->{rdir}=$self->remotepath->GetLine(0);
-   $self->{ldir}=$self->localpath->GetLine(0);
-   # save login datas
+   # save datas
    ${$self->{PARAM}->{'base=s'}}=$self->base->GetLine(0);
    ${$self->{PARAM}->{'webuser=s'}}=$self->webuser->GetLine(0);
    ${$self->{PARAM}->{'webpass=s'}}=$self->webpass->GetLine(0);
+   ${$self->{PARAM}->{'rdir=s'}}=$self->{rdir};
+   ${$self->{PARAM}->{'ldir=s'}}=$self->{ldir};
+   # set checkboxes
+   $self->warnings->SetCheck(0) if ($self->{nowarn});
+   $self->writedata->SetCheck(1) if ($self->{force});
+   if ($self->{mode} eq "upload"){
+      $self->upload->SetCheck(1);
+      $self->download->SetCheck(0);
+   }
    # define mode
    if ($self->upload->GetCheck() == 1){
       $self->{mode}="upload";
    }else{
       $self->{mode}="download";
    }
-   # set checkboxes
-   $self->warnings->SetCheck(0) if ($self->{nowarn});
-   $self->writedata->SetCheck(1) if ($self->{force});
    # set admin options
    if (${$self->{PARAM}->{'admin'}} == 1){
       $self->download->Change(-disabled=>0);      
@@ -559,9 +567,11 @@ sub directoryLoop
       return(1,"directory depth to high, greater than 100");
    }
    if (!(-d "$ldir/$fullname")){
-      my $stat=mkdir("$ldir/$fullname");
-      if ($stat != 1){
-         return(1,"$!"); 
+      if ($force){
+         my $stat=mkdir("$ldir/$fullname");
+         if ($stat != 1){
+            return(1,"$!"); 
+         }
       }
       if ($stepit){
          $fullname=~s/\//\\/g;
@@ -576,7 +586,7 @@ sub directoryLoop
    if ($result[0] != 0){
       return(1,$result[1]);
    }
-   my @result=readLocalDescList($fullname,\@lobj);
+   my @result=readLocalDescList($fullname,\@lobj,$force);
    if ($result[0] != 0){
       return(1,$result[1]);
    }
@@ -672,6 +682,7 @@ sub readLocalDescList
 {
    my $fullname=shift;
    my $lobj=shift;
+   my $force=shift;
    my $dir="$ldir/$fullname";
    local *FH;
    if (opendir(FH,"$dir")){
@@ -702,7 +713,7 @@ sub readLocalDescList
       }         
       closedir(FH);
    }else{
-      return(1,"can't open directory $dir");
+      return(1,"can't open directory $dir") if ($force);
    }
    return(0);
 }
