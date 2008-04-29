@@ -213,6 +213,7 @@ sub Sendmail
                my $emailtext=$rec->{emailtext}->[$blk];
                $emailtext=~s#<[a-z/].*?>##g;
                $emailtext=~s#&nbsp;# #g;
+               $emailtext=~s#^\.\s*$# .\n#mg;  # prevent . finish of mail
                $mail.=$emailtext;
                $mail.="\n-\n"; 
             }
@@ -309,6 +310,7 @@ sub Sendmail
                                      langcontrol =>$langcontrol,
                                                           }
                                    });
+               $maildata=~s#^\.\s*$# .\n#mg;  # prevent . finish of mail
                if ($rec->{emailsep}->[$blk] ne "" &&
                    $rec->{emailsep}->[$blk] ne "0"){
                   $currentlang=shift(@emaillang);
