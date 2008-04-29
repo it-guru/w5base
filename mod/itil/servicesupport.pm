@@ -117,6 +117,12 @@ sub new
                 label         =>'callcenter active',
                 container     =>'additional'),
 
+      new kernel::Field::Textarea(
+                name          =>'servicedescription',
+                group         =>'finance',
+                label         =>'Service description',
+                container     =>'additional'),
+
       new kernel::Field::Number(
                 name          =>'flathourscost',
                 precision     =>2,
