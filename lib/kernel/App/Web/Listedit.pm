@@ -1326,11 +1326,6 @@ sub Welcome
 </tr>
 </table>
 EOF
-      print("<table width=100% height=100%>");
-      printf("<tr><td align=center valign=center>".
-             "<div class=dialog style=\"width:50%%;text-align:left\">%s</div>".
-             "</td><tr>",$self->T("WELCOME"));
-      print("</table>");
    }
    else{
       my $module=$self->Module();
