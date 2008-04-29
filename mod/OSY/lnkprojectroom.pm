@@ -89,6 +89,19 @@ sub new
    return($self);
 }
 
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $origrec=shift;
+
+   if (!defined($oldrec)){
+      $newrec->{parentobj}="itil::system";
+   }
+   return($self->SUPER::Validate($oldrec,$newrec,$origrec));
+}
+
 
 
 1;

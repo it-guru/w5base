@@ -496,7 +496,6 @@ sub isDeleteValid
 {
    my $self=shift;
    my $rec=shift;
-
                    # (1/ALL=Ok) or undef if record could/should be not deleted
    return($self->isWriteValid($rec));
 }

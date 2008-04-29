@@ -48,6 +48,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'parentobj',
+                htmldetail    =>0,
                 label         =>'Parent-Object',
                 dataobjattr   =>'lnkprojectroom.objtype'),
 
@@ -66,48 +67,9 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'refid',
+                htmldetail    =>0,
                 label         =>'RefID',
                 dataobjattr   =>'lnkprojectroom.objid'),
-
-
-#      new kernel::Field::DynWebIcon(
-#                name          =>'targetweblink',
-#                searchable    =>0,
-#                depend        =>['target','targetid'],
-#                htmlwidth     =>'5px',
-#                htmldetail    =>0,
-#                weblink       =>sub{
-#                   my $self=shift;
-#                   my $current=shift;
-#                   my $mode=shift;
-#                   my $app=$self->getParent;
-#
-#                   my $targeto=$self->getParent->getField("target");
-#                   my $target=$targeto->RawValue($current);
-#
-#                   my $targetido=$self->getParent->getField("targetid");
-#                   my $targetid=$targetido->RawValue($current);
-#                   my $img="<img ";
-#                   $img.="src=\"../../base/load/directlink.gif\" ";
-#                   $img.="title=\"\" border=0>";
-#                   my $dest;
-#                   if ($target eq "base::user"){
-#                      $dest="../../base/user/Detail?userid=$targetid";
-#                   }
-#                   if ($target eq "base::grp"){
-#                      $dest="../../base/grp/Detail?grpid=$targetid";
-#                   }
-#                   my $detailx=$app->DetailX();
-#                   my $detaily=$app->DetailY();
-#                   my $onclick="openwin(\"$dest\",\"_blank\",".
-#                       "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
-#                       "resizable=yes,scrollbars=no\")";
-#
-#                   if ($mode=~m/html/i){
-#                      return("<a href=javascript:$onclick>$img</a>");
-#                   }
-#                   return("-only a web useable link-");
-#                }),
 
 
       new kernel::Field::Text(
@@ -203,33 +165,43 @@ sub Validate
       $self->LastMsg(ERROR,"invalid parentobj '$parentobj'");
       return(0);
    }
+   my $projectroomid=effVal($oldrec,$newrec,"projectroomid");
+   if ($self->isWriteOnProjectroomValid($projectroomid)){
+      return(1);
+   }
+   return(0);
+}
+
+sub isWriteOnProjectroomValid
+{
+   my $self=shift;
+   my $projectroomid=shift;
+
+   if ($projectroomid eq ""){
+      $self->LastMsg(ERROR,"invalid projectroomid '$projectroomid'");
+   }
+   my $p=getModuleObject($self->Config,"base::projectroom");
    my $idname=$p->IdField->Name();
-   my %flt=($idname=>\$refid);
+   my %flt=($idname=>\$projectroomid);
    $p->SetFilter(\%flt);
    my @l=$p->getHashList(qw(ALL));
    if ($#l!=0){
-      $self->LastMsg(ERROR,"invalid refid '$refid' in parent object '$parentobj'");
+      $self->LastMsg(ERROR,"projectroomid '$projectroomid' not found");
       return(0);
    }
    return(1) if ($self->IsMemberOf("admin"));
 
-#   if ($self->isDataInputFromUserFrontend()){
-#      my @write=$p->isWriteValid($l[0]);
-#      if ($#write!=-1){
-#         return(1) if (grep(/^ALL$/,@write));
-#         foreach my $fo ($p->getFieldObjsByView(["ALL"],current=>$l[0])){
-#            if ($fo->Type() eq "ContactLnk"){
-#               my $grp=quotemeta($fo->{group});
-#               $grp="default" if ($grp eq "");
-#               return(1) if (grep(/^$grp$/,@write));
-#            }
-#         }
-#      }
-#   }
-#   else{
-#      return(1);
-#   }
-#   $self->LastMsg(ERROR,"no write access");
+   if ($self->isDataInputFromUserFrontend()){
+      my @write=$p->isWriteValid($l[0]);
+      if ($#write!=-1){
+         return(1) if (grep(/^ALL$/,@write));
+         return(1) if (grep(/^default$/,@write));
+      }
+   }
+   else{
+      return(1);
+   }
+   $self->LastMsg(ERROR,"no write access");
    return(0);
 }
 
@@ -246,8 +218,13 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-#   return("default") if ($self->IsMemberOf("admin"));
-   return("default");
+   return("ALL") if (!defined($rec));
+
+   my $projectroomid=effVal($rec,undef,"projectroomid");
+   if ($self->isWriteOnProjectroomValid($projectroomid)){
+      return("default");
+   }
+   return(undef);
 }
 
 

@@ -115,6 +115,18 @@ sub new
                 },
                 dataobjattr   =>'projectroom.additional'),
 
+      new kernel::Field::SubList(
+                name          =>'relations',
+                label         =>'Relations',
+                group         =>'relations',
+                htmldetail    =>0,
+                allowcleanup  =>1,
+                readonly      =>1,
+                vjointo       =>'base::lnkprojectroom',
+                vjoinon       =>['id'=>'projectroomid'],
+                vjoindisp     =>['parentobj','refid',
+                                 'parentobjname','comments']),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
@@ -282,28 +294,11 @@ sub Validate
    }
    ########################################################################
 
-#   if ($self->isDataInputFromUserFrontend()){
-#      if (!$self->isWriteOnApplValid($applid,"systems")){
-#         $self->LastMsg(ERROR,"no access");
-#         return(undef);
-#      }
-#   }
-
 
    return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"name"));
    return(1);
 }
 
-
-sub FinishWrite
-{
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-   my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
-   $self->NotifyOnCIStatusChange($oldrec,$newrec);
-   return($bak);
-}
 
 sub getRecordImageUrl
 {
@@ -358,7 +353,7 @@ sub isWriteValid
          }
       }
    }
-   return(undef);
+   return;
 }
 
 sub SelfAsParentObject    # this method is needed because existing derevations

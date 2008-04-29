@@ -46,6 +46,16 @@ sub getPosibleRoles
              "write"=>$self->getParent->T("write",$self->Self)
              );
    }
+   if ($current->{parentobj}=~m/^.+::projectroom$/ ||
+       (defined($self->getParent) &&
+        defined($self->getParent->getParent) &&
+       $self->getParent->getParent->Self()=~m/^.+::projectroom$/)){
+      return(
+             "read"            =>$self->getParent->T("read",
+                                                     $self->Self),
+             "write"           =>$self->getParent->T("write",
+                                                     $self->Self));
+   }
    if ($current->{parentobj} eq "base::location" ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
