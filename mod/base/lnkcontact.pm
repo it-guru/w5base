@@ -266,7 +266,6 @@ sub Validate
       $self->LastMsg(ERROR,"invalid parentobj '$parentobj'");
       return(0);
    }
-   return(1) if ($self->IsMemberOf("admin"));
    my $idname=$p->IdField->Name();
    my %flt=($idname=>\$refid);
    $p->SetFilter(\%flt);
@@ -275,6 +274,7 @@ sub Validate
       $self->LastMsg(ERROR,"invalid refid '$refid' in parent object '$parentobj'");
       return(0);
    }
+   return(1) if ($self->IsMemberOf("admin"));
 
    if ($self->isDataInputFromUserFrontend()){
       my @write=$p->isWriteValid($l[0]);
