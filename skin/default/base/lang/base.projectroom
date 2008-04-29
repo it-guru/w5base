@@ -1,9 +1,11 @@
 'base::projectroom'=>{de=>'Projektraum',en=>'Projectroom'},
 'Projectroom name'=>{de=>'Projektraum Name'},
+'Databoss'=>{de=>'Datenverantwortlicher'},
+'Contacts'=>{de=>'Kontakte'},
 'WELCOME'=>{de=>'
 Ein Projektraum dient zur Dokumentation von Projekten und
 der im deren Zusammenhang entstehenden Daten.
 In bestimmten Fällen kann ein Projektraum als eine Art
 Klammer über mehrere Config-Items angesehen werden.
 ',en=>'Welcome'},
-
+'no valid databoss defined'=>{de=>'kein gültiger Datenverantwortlicher definiert'},

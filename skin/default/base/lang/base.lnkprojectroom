@@ -1,1 +1,4 @@
 'base::lnkprojectroom'=>{de=>'Projektraumverknüpfung',en=>'Projectroom relation'},
+'Parent-Object Name'=>{de=>'Elementtyp'},
+'empty parent object'=>{de=>'ungültige Eltern-Objekt Definition'},
+

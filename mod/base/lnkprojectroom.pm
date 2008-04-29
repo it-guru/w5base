@@ -41,10 +41,28 @@ sub new
                 label         =>'LinkID',
                 dataobjattr   =>'lnkprojectroom.id'),
                                                  
+      new kernel::Field::Link(
+                name          =>'projectroomid',
+                label         =>'ProjectroomID',
+                dataobjattr   =>'lnkprojectroom.projectroom'),
+
       new kernel::Field::Text(
                 name          =>'parentobj',
                 label         =>'Parent-Object',
                 dataobjattr   =>'lnkprojectroom.objtype'),
+
+      new kernel::Field::Text(
+                name          =>'parentobjname',
+                label         =>'Parent-Object Name',
+                htmlwidth     =>'50px',
+                readonly      =>1,
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $parentobj=$current->{parentobj};
+                   return($self->getParent->T($parentobj,$parentobj));
+                },
+                depend        =>['parentobj']),
 
       new kernel::Field::Text(
                 name          =>'refid',

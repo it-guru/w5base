@@ -80,6 +80,7 @@ sub new
 
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
+                label         =>'Contacts',
                 class         =>'mandator',
                 vjoinbase     =>[{'parentobj'=>\'base::projectroom'}],
                 vjoininhash   =>['targetid','target','roles'],
@@ -203,7 +204,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default contacts control misc attachments));
+          qw(default misc control attachments contacts));
 }
 
 
@@ -261,8 +262,14 @@ sub Validate
       if (!defined($oldrec)){
          if (!defined($newrec->{databossid}) ||
              $newrec->{databossid}==0){
-            $self->LastMsg(ERROR,"no valid databoss defined");
-            return(0);
+            if ($self->IsMemberOf("admin")){
+               $self->LastMsg(ERROR,"no valid databoss defined");
+               return(0);
+            }
+            else{
+               my $userid=$self->getCurrentUserId();
+               $newrec->{databossid}=$userid;
+            }
          }
       }
       if (defined($newrec->{databossid}) &&
@@ -321,7 +328,7 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default contacts sem misc control attachments);
+   my @databossedit=qw(default contacts misc control attachments);
    if (!defined($rec)){
       return("default");
    }

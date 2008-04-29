@@ -27,10 +27,46 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=3;
    my $self=bless($type->SUPER::new(%param),$type);
+
+   $self->AddFields(
+      new kernel::Field::SubList(
+                name          =>'systems',
+                label         =>'Systems',
+                group         =>'systems',
+                subeditmsk    =>'subedit.system',
+                vjointo       =>'OSY::lnkprojectroom',
+                vjoinbase     =>{parentobj=>"itil::system"},
+                vjoinon       =>['id'=>'projectroomid'],
+                vjoindisp     =>['system','systemweblink',
+                                 'parentobjname','systemshortdesc']),
+      insertafter=>'name'
+   );
+
+
 
    return($self);
 }
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   return(qw(header default systems),$self->SUPER::getDetailBlockPriority(@_));
+}
+
+sub isWriteValid
+{
+   my $self=shift;
+   my $rec=shift;
+   my @grps=$self->SUPER::isWriteValid($rec);
+   if (grep(/^default$/,@grps)){
+      push(@grps,"systems");
+   }
+   return(@grps);
+}
+
+
 
 
 

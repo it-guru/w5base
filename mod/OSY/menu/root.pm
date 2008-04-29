@@ -207,6 +207,15 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("osy.projectroom",
+                      "OSY::projectroom",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("osy.projectroom.new",
+                      "OSY::projectroom",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj('OSY::workflow::diary$',
                       "base::workflow",
                       func=>'New',

@@ -7,6 +7,8 @@
 'osy.appl.new'=>{de=>'Neueingabe',en=>'New'},
 'osy.appl.lnksystem'=>{de=>'Verkn. System',en=>'Link System'},
 'osy.appl.lnksystem.new'=>{de=>'Neueingabe',en=>'New'},
+'osy.projectroom'=>{de=>'Projektraum',en=>'Projectroom'},
+'osy.projectroom.new'=>{de=>'Neueingabe',en=>'New'},
 'osy.system'=>{de=>'System',en=>'System'},
 'osy.system.new'=>{de=>'Neueingabe',en=>'New'},
 'osy.system.ipaddress'=>{de=>'IP-Adresse',en=>'IP-Address'},
