@@ -212,7 +212,7 @@ sub nativQualityCheck
    }
    my $wf=getModuleObject($parent->Config,"base::workflow");
    my $dataobj=$self->getParent();
-   my $affectedobject=$dataobj->Self();
+   my $affectedobject=$dataobj->SelfAsParentObject();
    my $affectedobjectid=$rec->{id};
    msg(INFO,"QualityRule Level1");
    if (keys(%alldataissuemsg)){
