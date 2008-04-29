@@ -113,6 +113,10 @@ sub _preProcessFilter
          } 
          else{
             my ($subchanged,$err)=$fobj->preProcessFilter($hflt);
+            if ($err ne ""){
+               $self->LastMsg(ERROR,$err);
+               return(undef);
+            }
             $changed=$changed+$subchanged;
          }
       }
