@@ -198,7 +198,15 @@ sub ProcessLine
    for(my $cc;$cc<=$#view;$cc++){
       my $fo=$view[$cc];
       my $fulldata=$fo->RawValue($rec);
+      $fulldata=join("\n",map({
+                                my $bk=$_;
+                                if (ref($_) eq "HASH"){
+                                   $bk=join("; ",values(%{$_}));
+                                }
+                                $bk;
+                              }@$fulldata)) if (ref($fulldata) eq "ARRAY");
       $fulldata="&nbsp;" if ($fulldata eq "");
+      $fulldata=~s/\n/<br>/g;
       $d.="<td>$fulldata</td>";
    }
    $d.="</tr>";
