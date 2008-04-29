@@ -64,6 +64,7 @@ sub new
    $self->{rdir}=$rdir;
    $self->{ldir}=$ldir;
    $self->{force}=$force;
+   $self->{nowarn}=$nowarn;
    $self->{fullstoredfilename}=$fullstoredfilename;
    $self->{PARAM}=$params;
    $self->{VERSION}=$version;
@@ -149,7 +150,7 @@ sub new
            -text     => "write Data",
            -tabstop     => 1,
    );
-   $self->{GRID}->add($self->writedata,3,[10..11],"justify top");
+   $self->{GRID}->add($self->writedata,3,[10..11],"left top");
    $self->AddCheckbox(
            -name     => "warnings",
            -text     => "Warnings on",
@@ -160,7 +161,7 @@ sub new
    $self->AddGroupbox( 
            -name => "inputdata", 
            -text => "input",
-           -size => [100,130],
+           -size => [100,133],
    );
    $self->{GRID}->add($self->inputdata, [2..5], [4..10], "justify top");
    # login data
@@ -207,9 +208,32 @@ sub new
    $self->AddGroupbox( 
           -name => "connectdata", 
           -text => "connect data",
-          -size => [100,130],
+          -size => [100,100],
    );
-   $self->{GRID}->add($self->connectdata, [7..11], [4..12], "justify top");
+   $self->{GRID}->add($self->connectdata, [7..11], [4..8], "justify top");
+   # admin options
+   $self->AddRadioButton(
+           -name     => "download",
+           -text     => "Download",
+           -checked  => 1,
+           -tabstop  => 1,
+           -disabled => 1,
+   );
+   $self->{GRID}->add($self->download,8,11,"right top");
+   $self->AddRadioButton(
+           -name     => "upload",
+           -text     => "Upload",
+           -checked  => 0,
+           -tabstop  => 1,
+           -disabled => 1,
+   );
+   $self->{GRID}->add($self->upload,9,11,"left top");
+   $self->AddGroupbox( 
+          -name => "admin", 
+          -text => "admin",
+          -size => [100,33],
+   );
+   $self->{GRID}->add($self->admin, [7..11], [10..12], "justify top");
    # output textfield
    $self->AddTextfield(
            -name        => "output",
@@ -239,8 +263,6 @@ sub new
    $self->{GRID}->add($self->pgbar,[2..11],17,"justify justify");
    $self->{GRID}->recalc();
    $self->checkMode();
-   $self->warnings->SetCheck(0) if ($nowarn);
-   $self->writedata->SetCheck(1) if ($force);
    return($self); 
 }
 
@@ -288,6 +310,9 @@ sub doStart
       $mainwin->run->Enable(1);
       return(1,$msgs);
    }else{
+      foreach my $del (qw(gui force nowarn admin)){
+         delete($mainwin->{PARAM}->{$del});
+      }
       main::XSaveStoreFile($mainwin->{fullstoredfilename},$mainwin->{PARAM});
    }
    $mainwin->output->Append("done\r\nget objects ... ");
@@ -298,9 +323,7 @@ sub doStart
       return(1,$result[1]);
    }
 
-   # read File
-
-   $mainwin->output->Append("done\r\nreading file ...\r\n");
+   $mainwin->output->Append("done\r\ncompute operations...\r\n");
    
 
    $mainwin->{o}{'filemgmt'}->SetFilter({fullname=>$mainwin->{rdir},
@@ -329,38 +352,7 @@ sub doStart
    }elsif($mainwin->{mode} eq "upload"){
    }
 
-
-#   @result=main::readFile($mainwin->{FH},
-#                          $self->{sharedata},
-#                          $mainwin->{curmode},
-#                          $mainwin->hostname->GetLine(0),\&StepIt,$mainwin);
-#   if ($result[0] != 0){
-#      eval("Win32::MsgBox(\"\$result[1]\",Win32::MB_ICONQUESTION|0, 'Error!')");   
-#      $mainwin->run->Enable(1);
-#      return(1,$result[1]);
-#   }
-
    # compute operation
-   $mainwin->output->Append("done\r\ncompute operations ... and preview operations...\r\n");
-#   @result=main::calculateOperations($mainwin->{o},$self->{sharedata},
-#                                     \@oplist,$mainwin->hostname->GetLine(0),\&StepIt,$mainwin);
-#   if ($result[0] != 0){
-#      eval("Win32::MsgBox(\"\$result[1]\",Win32::MB_ICONQUESTION|0, 'Error!')");   
- #     $mainwin->run->Enable(1);
- ##     return(1,$result[1]);
- #  }
- 
-   # write data to API
-#   if ($mainwin->writedata->GetCheck() == 1){
-#      $mainwin->output->Append("write data ... ");
-#      @result=main::processOperations($mainwin->{o},\@oplist,\&StepIt,$mainwin);
-#      if ($result[0] != 0){
-#         eval("Win32::MsgBox(\"\$result[1]\",Win32::MB_ICONQUESTION|0, 'Error!')");   
-#         $mainwin->run->Enable(1);
-#         return(1,$result[1]);
-#      }
-#      $mainwin->output->Append("done\r\n");
-#   }
    $mainwin->output->Append("\r\nready!");
    $mainwin->run->Enable(1);
    $mainwin->pgbar->SetPos(1500);
@@ -395,7 +387,20 @@ sub checkMode
    ${$self->{PARAM}->{'base=s'}}=$self->base->GetLine(0);
    ${$self->{PARAM}->{'webuser=s'}}=$self->webuser->GetLine(0);
    ${$self->{PARAM}->{'webpass=s'}}=$self->webpass->GetLine(0);
-   $self->{mode}="download" if (!$self->{mode});
+   # define mode
+   if ($self->upload->GetCheck() == 1){
+      $self->{mode}="upload";
+   }else{
+      $self->{mode}="download";
+   }
+   # set checkboxes
+   $self->warnings->SetCheck(0) if ($self->{nowarn});
+   $self->writedata->SetCheck(1) if ($self->{force});
+   # set admin options
+   if (${$self->{PARAM}->{'admin'}} == 1){
+      $self->download->Change(-disabled=>0);      
+      $self->upload->Change(-disabled=>0);      
+   }
    return(0);
 }
 
@@ -458,13 +463,13 @@ use vars qw($GUI $Window);
 
 
 my $DefaultBase="https://w5base.net/w5base/auth/";
-my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang);
+my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang,$admin);
 my ($mode,$force,$rdir,$ldir,$type,$gui,$nowarn,%o,$Revision,$empty);
 my $count=0;
 my $version="Version 0.1 build$Revision$empty ";
 my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
        "webuser=s"=>\$loginuser,"webpass=s"=> \$loginpass,
-       "verbose+"=>\$verbose,"nowarn"=>\$nowarn,
+       "verbose+"=>\$verbose,"nowarn"=>\$nowarn,"admin"=>\$admin,
        "force"=>\$force,"rdir=s"=>\$rdir,"ldir=s"=>\$ldir,
        "mode=s"=>\$mode,"type=s"=>\$type,"gui"=>\$gui);
 
@@ -559,6 +564,7 @@ sub directoryLoop
          return(1,"$!"); 
       }
       if ($stepit){
+         $fullname=~s/\//\\/g;
          &{$stepit}($mywin,"INFO: create directory $ldir\\$fullname");
       }else{
          msg(INFO,"create directory $ldir/$fullname");
@@ -608,12 +614,14 @@ sub directoryLoop
                                    " failed -> $!");
          }
          if ($stepit){
+            $operations->{MSG}=~s/\//\\/g;
             &{$stepit}($mywin,"INFO: ".$operations->{MSG});
          }else{
             msg(INFO,$operations->{MSG});
          }
       }elsif($operations->{OP} eq "delete" && $mode eq "upload"){
          if ($stepit){
+            $operations->{MSG}=~s/\//\\/g;
             &{$stepit}($mywin,"INFO: ".$operations->{MSG});
          }else{
             msg(INFO,$operations->{MSG});
@@ -772,7 +780,6 @@ sub calculateOperations
    return(0);
 }
 
-
 sub processOperations
 {
    my $o=shift;    
@@ -806,6 +813,7 @@ sub processOperations
             # run update processlist 
          }
          if ($stepit){
+            $rec->{MSG}=~s/\//\\/g;
             &{$stepit}($mywin,"INFO: ".$rec->{MSG});
          }else{
             msg(INFO,$rec->{MSG});
@@ -835,6 +843,7 @@ $RealScript [options] File File ...
    --force    write data  
    --gui      grafical user interface
    --nowarn   prevent warnings
+   --admin    enable admin options
 EOF
 }
 exit(255);
