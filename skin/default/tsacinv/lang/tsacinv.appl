@@ -2,7 +2,7 @@
                   en=>'AssetCenter Application'},
 'fieldgroup.default'=>{de=>'Anwendungsdaten',en=>'Applicationdata'},
 'Assignment Group'=>{de=>'zugeordnete Gruppe'},
-'CO-Number'=>{de=>'Kostenstelle'},
+'CO-Number'=>{de=>'CO-Nummer/Kostenstelle'},
 'Usage'=>{de=>'Betriebsart'},
 'Applicationname'=>{de=>'Anwendungsname'},
 'Deputy Technical Contact'=>{de=>'Technischer Ansprechpartner Vertr.'},
