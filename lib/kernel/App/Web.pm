@@ -1060,9 +1060,11 @@ EOF
       my @js=$param{'js'};
       @js=@{$param{'js'}} if (ref($param{'js'}) eq "ARRAY");
       foreach my $js (@js){
-         $d.="<script language=JavaScript ".
-             "src=\"$param{prefix}$param{base}../../../public/base/load/$js\">".
-             "</script>\n";
+         my $jsname="$js";
+         if (!($jsname=~m/^(http|https):/)){
+            $jsname="$param{prefix}$param{base}../../../public/base/load/$js";
+         }
+         $d.="<script language=JavaScript src=\"$jsname\"></script>\n";
       }
    }
    $d.="<head>\n";
