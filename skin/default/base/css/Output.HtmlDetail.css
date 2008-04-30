@@ -55,6 +55,28 @@ td.detailtopline{
    padding-right:4px;
    padding-left:4px;
 }
+h1{
+   font-weight:bold;
+   font-size:18px;
+   margin-bottom:4px;
+   margin-top:4px;
+}
+h2{
+   font-weight:bold;
+   font-size:16px;
+   padding:0px;
+   margin:0px;
+   margin-bottom:2px;
+   margin-top:2px;
+}
+h3{
+   font-weight:bold;
+   font-size:14px;
+   padding:0px;
+   margin:0px;
+   margin-bottom:2px;
+   margin-top:2px;
+}
 p.detailtoplineobj{
    color:white;
    font-weight:bold;

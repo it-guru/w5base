@@ -91,6 +91,7 @@ sub qcheckRecord
       my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       if (!defined($parrec)){
          push(@qmsg,'given systemid not found as active in AssetCenter');
+         push(@dataissue,'given systemid not found as active in AssetCenter');
          $errorlevel=3 if ($errorlevel<3);
       }
       else{
