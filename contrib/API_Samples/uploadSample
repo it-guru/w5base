@@ -1,0 +1,90 @@
+#!/usr/bin/perl
+use lib qw(/opt/w5base2/lib /opt/w5base/lib);
+use strict;                   
+use W5Base::API;
+use Data::Dumper;
+use MIME::Entity;
+
+my $DefaultBase="https://w5base.net/w5base/auth/";
+my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang);
+my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
+       "webuser=s"=>\$loginuser,"webpass=s"=> \$loginpass,
+       "verbose+"=>\$verbose);
+my $optresult=XGetOptions(\%P,\&Help,undef,undef,".W5Base.Interface");
+
+#######################################################################
+# create connection config
+#
+my $apidebug=$verbose>=3 ? 1 : 0;
+my $Config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug);
+if (!defined($Config)){
+   msg(ERROR,"base or username/password is not valid");exit(1);
+}
+else{
+   msg(DEBUG,"create of config ok");
+}
+msg(DEBUG,"verbose=$verbose");
+
+my $objectname=$ARGV[0];
+if ($objectname eq "" || !($objectname=~m/^\S+::\S+$/)){
+   msg(ERROR,"no dataobject specified");exit(3);
+}
+
+#######################################################################
+# load ModuleObject
+#
+my $obj=getModuleObject($Config,$objectname);
+if (!defined($obj)){
+   msg(ERROR,"can't load object $objectname");exit(2);
+}
+else{
+   msg(DEBUG,"create of ModuleObject $objectname ok");
+}
+
+
+
+#######################################################################
+# show fields
+#
+if (my @fields=$obj->showFields()){
+   foreach my $field (@fields){
+      printf("%-25s: %-20s: %s\n",
+             $field->{name},$field->{group},$field->{longtype});
+   }
+   print("\n");
+}
+$obj->dieOnERROR();
+
+my $sendfile = build MIME::Entity
+#           Type        => "text/plain",
+           Encoding    => "base64",
+           Path        => "/tmp/linux.bin",
+           Filename    => "linux.bin",
+           Disposition => "attachment";
+
+
+$obj->storeRecord({file=>$sendfile,parentid=>undef,parentobj=>undef});
+
+$obj->dieOnERROR();
+
+exit(0);
+
+#######################################################################
+sub Help
+{
+   print(<<EOF);
+$RealScript [options] DataObjectName
+
+   --verbose display more details of operation process
+   --quiet   only errors would be displayed
+   --base    base url of filemgmt (default: $DefaultBase)
+
+   --webuser username
+   --webpass password
+   --store   stores the parameters (not help,verbose and store)
+   --help    show this help
+
+EOF
+}
+#######################################################################
+exit(255);

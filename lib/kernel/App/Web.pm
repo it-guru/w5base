@@ -229,10 +229,10 @@ sub InitRequest
             $site=~s/\/public\/.*?$/\//;
          }
          my $lang="en";
-         if (Query->Param("MOD") ne "base::interface"){
-            $lang=$self->Lang();
+         if ($self->LowLevelLang() eq ""){
+            $ENV{HTTP_ACCEPT_LANGUAGE}="en";
          }
-
+         $lang=$self->Lang();
 
 
          $user="anonymous" if ($user eq "");

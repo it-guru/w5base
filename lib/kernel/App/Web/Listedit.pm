@@ -1134,7 +1134,12 @@ function DetailClose(){
             return;
          }
       }
+      window.opener=self;
+      window.open('','_parent','');
       window.close();
+      if (!window.closed){
+         document.location.href="Welcome";
+      }
    }
 }
 function DetailDelete(id)
@@ -1195,10 +1200,12 @@ sub getDetailFunctions
      # my $id=$rec->{$idname};
       unshift(@f,$self->T("DetailCopy")=>"DetailCopy");
    }
-   if (defined($rec) && $self->can("HandleInfoAboSubscribe")){
+   if (defined($rec) && $self->can("HandleInfoAboSubscribe") && 
+       $ENV{REMOTE_USER} ne "anonymous"){
       unshift(@f,$self->T("InfoAbo")=>"DetailHandleInfoAboSubscribe");
    }
    if (defined($rec) && $self->can("HandleQualityCheck") &&
+       $ENV{REMOTE_USER} ne "anonymous" &&
        $self->isQualityCheckValid($rec)){
       unshift(@f,$self->T("QualityCheck")=>"DetailHandleQualityCheck");
    }

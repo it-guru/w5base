@@ -78,10 +78,9 @@ sub new
                                    dataobjattr=>'filemgmt.inheritrights'),
 
       new kernel::Field::Text(     name       =>'parentobj',
-                                   group      =>'state',
+                                   htmldetail =>0,
                                    label      =>'parent Object',
                                    htmlwidth  =>'90',
-                                   readonly   =>1,
                                    dataobjattr=>'filemgmt.parentobj'),
 
       new kernel::Field::Text(     name       =>'parentrefid',
@@ -323,6 +322,11 @@ sub Validate
       {
          no strict;
          my $f=$newrec->{file};
+         msg(INFO,"got filetransfer request ref=$f");
+         if (ref($f) eq "MIME::Entity"){
+            $f=$newrec->{file}->open("r");
+         }
+         msg(INFO,"cleared filetransfer request ref=$f");
          my $bk=seek($f,0,SEEK_SET);
          seek($f,0,SEEK_SET);
          if (!$self->StoreFilehandle($f,$realfile,"preview")){
@@ -331,14 +335,27 @@ sub Validate
          }
          $context->{CurrentFileHandle}=$f;
       }
+      my ($size,$atime,$mtime,$ctime,$blksize,$blocks);
       my $f=$newrec->{file};
-      my (undef,undef,undef,undef,undef,undef,undef,
+      if (ref($newrec->{file}) eq "MIME::Entity"){
+         $f=$newrec->{file}->open("r");
+         while(<$f>){};
+         $size=$f->tell();
+         $f->seek(0,0);
+      }
+      else{
+         (undef,undef,undef,undef,undef,undef,undef,
           $size,$atime,$mtime,$ctime,$blksize,$blocks)=stat($f);
+      }
       if (!defined($f) || $size<=0){
-         $self->LastMsg(ERROR,sprintf($self->T("invalid file upload '%s'"),$f));
+         $self->LastMsg(ERROR,sprintf($self->T("invalid file upload '%s($size)'"),$f));
          return(undef);
       }
       my $filename=$f;
+      if (ref($newrec->{file}) eq "MIME::Entity"){
+         $filename=$newrec->{file}->head()->get("Content-Disposition");
+         ($filename)=$filename=~m/filename=\"(.+)\"/;
+      }
       $filename=~s/^.*[\/\\]//;
       if (!defined($newrec->{name}) || $newrec->{name} eq ""){
          $newrec->{name}=$filename;

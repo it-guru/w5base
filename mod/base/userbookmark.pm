@@ -303,9 +303,11 @@ sub ById
       print(<<EOF);
 function info()
 {
-   alert("URL lenght is $l characters. This isn't accessable in some bad browsers");
+   if ($l>1024){
+      alert("URL lenght is $l characters. This isn't accessable in some bad browsers");
+   }
 }
-   window.setTimeout("info();",2000);
+   window.setTimeout("info();",4000);
 EOF
       printf("</script>\n");
       printf("</body>\n");

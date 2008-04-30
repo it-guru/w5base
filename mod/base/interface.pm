@@ -269,6 +269,9 @@ sub SOAP
 
 package interface::SOAP;
 use kernel;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SOAP::Server::Parameters);
 
 sub showFields
 {
@@ -317,6 +320,7 @@ sub storeRecord
    my $self=$W5Base::SOAP;
    my $uri=shift;
    my $param=shift;
+   my $envelope=pop;
    my $objectname=$param->{dataobject};
    my $filter=$param->{filter};
    my $newrec=$param->{data};
@@ -331,6 +335,12 @@ sub storeRecord
    if (!defined($o)){
       return(interface::SOAP::kernel::Finish({exitcode=>128,
              lastmsg=>['invalid dataobject specified']}));
+   }
+   foreach my $k (keys(%$newrec)){
+      if (ref($newrec->{$k}) eq "ARRAY" &&
+          $newrec->{$k}->[0] eq "MIME::Entity"){
+         $newrec->{$k}=$envelope->parts()->[$newrec->{$k}->[1]];
+      }
    }
 
    if (defined($id)){

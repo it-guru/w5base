@@ -563,7 +563,7 @@ sub createConfig
    }
    my $SOAP=SOAP::Lite->uri($uri)->proxy($proxy);
 
-   my $SOAPresult=eval("\$SOAP->Ping();");
+   my $SOAPresult=eval("\$SOAP->Ping({lang=>\$lang});");
    my $result;
    if (!($SOAP->transport->status=~m/^(200|500)\s.*$/)){
       if (defined($backexitmsg)){
@@ -748,7 +748,14 @@ sub storeRecord
       msg(ERROR,"storeRecord didn't supports hash filters");
       exit(1);
    }
-   my $SOAPresult=$self->SOAP->storeRecord({dataobject=>$self->Name,
+   my @ent;
+   foreach my $k (keys(%$data)){
+      if (ref($data->{$k}) eq "MIME::Entity"){
+         push(@ent,$data->{$k});
+         $data->{$k}=["MIME::Entity"=>$#ent];
+      }
+   } 
+   my $SOAPresult=$self->SOAP->parts(\@ent)->storeRecord({dataobject=>$self->Name,
                                             data=>$data,
                                             lang=>$self->Config->{lang},
                                             IdentifiedBy=>$flt});
