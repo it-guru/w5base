@@ -695,7 +695,7 @@ sub TransferFile
       return({msg=>$self->msg(ERROR,'can\'t connect to ftp srv'),exitcode=>1});
    }
 
-   return({msg=>'OK'});
+   return({exitcode=>0,msg=>'OK'});
 }
 
 
