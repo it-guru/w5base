@@ -29,7 +29,6 @@ sub new
    my %param=@_;
    my $rdir=$param{-rdir};
    my $ldir=$param{-ldir};
-   my $file=$param{ARGV}->[0];
    my $o=$param{o};
    my $force=$param{-force};
    my $nowarn=$param{-nowarn};
@@ -53,13 +52,13 @@ sub new
                                      '&File' => 'File',
                                      ' > &End'  => { -name=>'Exit',-onClick=>\\&doTerminate},
                                      '&?' => 'Info',
+                                     ' > &Help'   => { -name=>'Help',-onClick=>\\&Help},
                                      ' > &Info'   => { -name=>'Info',-onClick=>\\&Info},
    );");
    my $self=$type->SUPER::new(%param);
    $self->SetIcon($icon);
    #$self->MessageBox('error','header');
    $self=bless($self,$type);
-   $self->{file}=$file;
    $self->{mode}=$mode;
    $self->{rdir}=$rdir;
    $self->{ldir}=$ldir;
@@ -251,8 +250,8 @@ sub new
    # start button
    $self->AddButton(
            -name     => "run",
-           -text     => "Start",
-           -disabled  => 1,
+           -text     => "Sync",
+           -disabled  => 0,
            -onClick  => \&doStart, 
    );
    $self->{GRID}->add($self->run,[2..11],15,"justify justify");
@@ -262,6 +261,12 @@ sub new
    );
    $self->{GRID}->add($self->pgbar,[2..11],17,"justify justify");
    $self->{GRID}->recalc();
+   $self->warnings->SetCheck(0) if ($self->{nowarn});
+   $self->writedata->SetCheck(1) if ($self->{force});
+   if ($self->{mode} eq "upload"){
+      $self->upload->SetCheck(1);
+      $self->download->SetCheck(0);
+   }
    $self->checkMode();
    return($self); 
 }
@@ -274,7 +279,7 @@ sub OpenFile
    eval('$folder = Win32::GUI::BrowseForFolder();');
    if ($folder){
       $mainwin->{ldir}=$folder;
-      $mainwin->checkMode();
+      $mainwin->localpath->Change(-text=>"$folder");
    }
 }
 
@@ -283,40 +288,40 @@ sub doStart
    my $self=shift;
    my @oplist; 
    my $mainwin=$self->GetParent();
-   $mainwin->output->Change(-text => "");
-   $mainwin->output->DoEvents();
    $mainwin->output->LimitText(1000000);
    $mainwin->output->SetFocus();
-   $mainwin->output->Append("login ... ");
    my $directorycount=0;
    my ($exitcode, $msgs);
    my @result=$mainwin->checkMode();
    if ($result[0] != 0){
       return(1,$result[1]);
    }
-   # connect API
+   $mainwin->output->Append("login ... ");
+   # define progressbar values
    $mainwin->pgbar->StepIt();
    $mainwin->pgbar->SetRange(0,1500);
    $mainwin->pgbar->SetStep(1);
    $mainwin->pgbar->SetPos(50);
-   my $force=1 if ($mainwin->writedata->GetCheck() == 1);
+   # connect API
    my $Config=main::createConfig(${$mainwin->{PARAM}->{'base=s'}},
                                  ${$mainwin->{PARAM}->{'webuser=s'}},
                                  ${$mainwin->{PARAM}->{'webpass=s'}},
                                  0,0,\$exitcode,\$msgs);
-   $mainwin->run->Enable(0);
    if (!$Config){
       eval("Win32::MsgBox(\"login error: \$msgs\",Win32::MB_ICONQUESTION|0, 'Error!')");   
       $mainwin->run->Enable(1);
       return(1,$msgs);
    }else{
       my %save;
+      $mainwin->run->Enable(0);
       foreach my $save (qw(ldir=s webpass=s rdir=s base=s webuser=s)){
          $save{$save}=$mainwin->{PARAM}->{$save};
       }
       main::XSaveStoreFile($mainwin->{fullstoredfilename},\%save);
    }
+   $mainwin->pgbar->SetPos(100);
    $mainwin->output->Append("done\r\nget objects ... ");
+   # get module object
    @result=main::moduleObj($Config);
    if ($result[0] != 0){
       eval("Win32::MsgBox(\"\$result[1]\",Win32::MB_ICONQUESTION|0, 'Error!')");   
@@ -324,37 +329,41 @@ sub doStart
       return(1,$result[1]);
    }
 
-   $mainwin->output->Append("done\r\ncompute operations...\r\n");
-   
-
+   # looking for remote directory
    $mainwin->{o}{'filemgmt'}->SetFilter({fullname=>$mainwin->{rdir},
                                         parentobj=>undef}); 
    my @rdirid=$mainwin->{o}{'filemgmt'}->getHashList(qw(fid fullname));
-   if ($mainwin->{mode} eq "download"){ 
-      if ($#rdirid == 0){
-         if (!(-w $mainwin->{ldir}."/".$mainwin->{rdir}) && -e $mainwin->{ldir}.
-                  "/".$mainwin->{rdir}){
-            $mainwin->MessageBox("no write access on".
-                       $mainwin->{ldir}."/".$mainwin->{rdir},'ERROR',0x0020);
-            exit(1);
-         }
-         @result=main::directoryLoop($rdirid[0]->{fid},$rdirid[0]->{fullname},
-                                     $Config,$directorycount,$mainwin->{mode},$force,
-                                     \&StepIt,$mainwin);
-         if ($result[0] != 0){  
-            $result[1]=~s/\//\\/g; 
-            $mainwin->MessageBox($result[1],'ERROR',0x0020);
-            exit(1);
-         }
-      }else{
-          $mainwin->MessageBox("remote directory '".$mainwin->{rdir}.
-                     "' not exists or not unique!",'ERROR',0x0020);
-         exit(1);
+   # mode download
+   $mainwin->pgbar->SetPos(150);
+   if ($#rdirid == 0){
+      $mainwin->output->Append("done\r\nmode -> ".$mainwin->{mode}.
+                               "\r\ncompute operations...\r\n");
+      if (!(-w $mainwin->{ldir}."/".$mainwin->{rdir}) && -e $mainwin->{ldir}.
+               "/".$mainwin->{rdir}){
+         $mainwin->{rdir}=~s/\//\\/g; 
+         $mainwin->MessageBox("no access on".
+                    $mainwin->{ldir}."\\".$mainwin->{rdir},'ERROR',0x0020);
+         return(0);
       }
-   }elsif($mainwin->{mode} eq "upload"){
+      @result=main::directoryLoop($rdirid[0]->{fid},$rdirid[0]->{fullname},
+                                  $Config,$directorycount,$mainwin->{mode},$mainwin->{force},
+                                  \&StepIt,$mainwin);
+      if ($result[0] != 0){  
+         $mainwin->run->Enable(1);
+         $result[1]=~s/\//\\/g; 
+         $mainwin->MessageBox($result[1],'ERROR',0x0020);
+         return(0);
+      }
+   }else{
+       $mainwin->MessageBox("remote directory '".$mainwin->{rdir}.
+                  "' not exists or not unique!",'ERROR',0x0020);
+       $mainwin->checkMode();
+       return(0);
    }
-
-   # compute operation
+   if (main::action() == 0){
+      $mainwin->output->Append("\r\nnothing to do, everything is synchro\r\n");
+   }
+   # set window formality 
    $mainwin->output->Append("\r\nready!");
    $mainwin->run->Enable(1);
    $mainwin->pgbar->SetPos(1500);
@@ -375,6 +384,11 @@ sub StepIt
 sub checkMode
 {
    my $self=shift;
+   # clear output textfield
+   $self->output->Change(-text => "");
+   $self->output->DoEvents();
+   # reset progressbar
+   $self->pgbar->SetPos(0);
    # load path
    $self->{rdir}=$self->remotepath->GetLine(0);
    $self->{ldir}=$self->localpath->GetLine(0);
@@ -391,14 +405,17 @@ sub checkMode
    ${$self->{PARAM}->{'webpass=s'}}=$self->webpass->GetLine(0);
    ${$self->{PARAM}->{'rdir=s'}}=$self->{rdir};
    ${$self->{PARAM}->{'ldir=s'}}=$self->{ldir};
-   # set checkboxes
-   $self->warnings->SetCheck(0) if ($self->{nowarn});
-   $self->writedata->SetCheck(1) if ($self->{force});
-   if ($self->{mode} eq "upload"){
-      $self->upload->SetCheck(1);
-      $self->download->SetCheck(0);
+   # define modes
+   if ($self->warnings->GetCheck() == 1){
+      $self->{nowarn}=1;
+   }else{
+      $self->{nowarn}=undef;
    }
-   # define mode
+   if ($self->writedata->GetCheck() == 1){
+      $self->{force}=1;
+   }else{
+      $self->{force}=undef;
+   }
    if ($self->upload->GetCheck() == 1){
       $self->{mode}="upload";
    }else{
@@ -410,6 +427,38 @@ sub checkMode
       $self->upload->Change(-disabled=>0);      
    }
    return(0);
+}
+
+sub Help
+{
+   my $self=shift; 
+   my $text=(<<EOF);
+input
+--------------------------
+Remote Path   -> is the WebFS Path on the Server f.e. 'ITCSM'
+Local Path    -> is the Local Path on your pc f.e. c:\\temp 
+write Data    -> isn't this options activated, operations only
+                 will be simulated, no files will be uploaded or
+                 downloaded 
+Warnings On   -> show warning messages 
+
+connect data
+--------------------------
+Webuser       -> your web account, same like on the webinterface,
+                 f.e. sued/basedow.holm or wiw/hbasedow
+Webpassword   -> your web password, same like on the web interface
+BaseURL       -> url or your webinterface f.e. https://w5base-testenv.telekom.de/darwin/auth
+
+admin
+--------------------------
+Download      -> synchronize your local filesystem from the remote filesystem
+Upload        -> synchronize your remote filesystem from the local filesystem
+
+options only for admins available
+
+EOF
+
+   $self->MessageBox("$text",'Infomation',0x200000);
 }
 
 sub Info
@@ -472,14 +521,15 @@ use vars qw($GUI $Window);
 
 my $DefaultBase="https://w5base.net/w5base/auth/";
 my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang,$admin);
-my ($mode,$force,$rdir,$ldir,$type,$gui,$nowarn,%o,$Revision,$empty);
+my ($mode,$force,$rdir,$ldir,$gui,$nowarn,%o,$Revision,$empty);
+my $action=0;
 my $count=0;
 my $version="Version 0.1 build$Revision$empty ";
 my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
        "webuser=s"=>\$loginuser,"webpass=s"=> \$loginpass,
        "verbose+"=>\$verbose,"nowarn"=>\$nowarn,"admin"=>\$admin,
        "force"=>\$force,"rdir=s"=>\$rdir,"ldir=s"=>\$ldir,
-       "mode=s"=>\$mode,"type=s"=>\$type,"gui"=>\$gui);
+       "mode=s"=>\$mode,"gui"=>\$gui);
 
 # set options
 $|=1;
@@ -498,7 +548,6 @@ if ($gui){
          use Win32::GUI::BitmapInline;
          use Win32::GUI::DIBitmap;
          $GUI=new MyWin(-title=>"W5Base Importer", 
-                        ARGV=>\@ARGV,
                         o=>\%o,
                         -mode=>$mode,
                         -version=>$version,
@@ -525,12 +574,13 @@ if ($gui){
    $o{'filemgmt'}->SetFilter({fullname=>"$rdir",parentobj=>undef}); 
    my @rdirid=$o{'filemgmt'}->getHashList(qw(fid fullname));
    if ($mode eq "download"){ 
+      msg(INFO,"mode -> download");
       if ($#rdirid == 0){
          if(!(-w "$ldir/".$rdir) && -e "$ldir/".$rdir){
             msg(ERROR,"no write access on '$ldir/$rdir'");
             exit(1);
          }
-         @result=directoryLoop(\%o,$rdirid[0]->{fid},$rdirid[0]->{fullname},
+         @result=directoryLoop($rdirid[0]->{fid},$rdirid[0]->{fullname},
                                $Config,$directorycount,$mode,$force); 
          if ($result[0] != 0){  
             msg(ERROR,$result[1]);  
@@ -541,6 +591,7 @@ if ($gui){
          exit(1);
       }
    }elsif($mode eq "upload"){
+      msg(INFO,"mode=upload");
       if ($#rdirid == 0){
          @result=directoryLoop($rdirid[0]->{fid},$rdirid[0]->{fullname},
                                $Config,$directorycount,$mode,$force); 
@@ -550,6 +601,7 @@ if ($gui){
          }
       }
    }
+   msg(INFO,"nothing to do, everything is synchro") if (action() == 0);
 }
 
 sub directoryLoop
@@ -566,11 +618,13 @@ sub directoryLoop
    if ($directorycount > 100){
       return(1,"directory depth to high, greater than 100");
    }
-   if (!(-d "$ldir/$fullname")){
+   if (!(-d "$ldir/$fullname") && $mode eq "download"){
+      $action=1;
       if ($force){
          my $stat=mkdir("$ldir/$fullname");
          if ($stat != 1){
-            return(1,"$!"); 
+            $action=0;
+            return(1,"$ldir $!"); 
          }
       }
       if ($stepit){
@@ -582,15 +636,16 @@ sub directoryLoop
    }elsif(!(-w "$ldir/$fullname") && -e "$ldir/$fullname"){
       return(1,"no write access on '$ldir/$fullname'");
    }
-   my @result=readRemoteDescList(\%o,$parentid,\@robj);
+   my @result=readRemoteDescList(\%o,$parentid,\@robj,$stepit,$mywin);
    if ($result[0] != 0){
       return(1,$result[1]);
    }
-   my @result=readLocalDescList($fullname,\@lobj,$force);
+   my @result=readLocalDescList($fullname,\@lobj,$force,$stepit,$mywin);
    if ($result[0] != 0){
       return(1,$result[1]);
    }
-   @result=calculateOperations(\@robj,\@lobj,\@oplist,$mode);
+   @result=calculateOperations(\@robj,\@lobj,\@oplist,
+                               $mode,$parentid,$stepit,$mywin);
    if ($result[0] != 0){
       return(1,$result[1]);
    }
@@ -624,12 +679,14 @@ sub directoryLoop
                                    " failed -> $!");
          }
          if ($stepit){
+            $action=1;
             $operations->{MSG}=~s/\//\\/g;
             &{$stepit}($mywin,"INFO: ".$operations->{MSG});
          }else{
             msg(INFO,$operations->{MSG});
          }
       }elsif($operations->{OP} eq "delete" && $mode eq "upload"){
+         $action=1;
          if ($stepit){
             $operations->{MSG}=~s/\//\\/g;
             &{$stepit}($mywin,"INFO: ".$operations->{MSG});
@@ -645,11 +702,16 @@ sub readRemoteDescList
    my $o=shift;
    my $parentid=shift;
    my $robj=shift;
-   $o->{'filemgmt'}->SetFilter({parentid=>[$parentid]});
-   @$robj=$o->{'filemgmt'}->getHashList(qw(ALL));
+   my $stepit=shift;
+   my $mywin=shift;
+   if ($parentid){
+      $o->{'filemgmt'}->SetFilter({parentid=>[$parentid]});
+      @$robj=$o->{'filemgmt'}->getHashList(qw(ALL));
+   }
 
    # change timestamp from mdate in a unixtimestamp
    foreach my $rec (@$robj){
+      &{$stepit}($mywin) if ($stepit);
       foreach my $key (keys(%$rec)){
          if ($key eq "mdate"){
             my @time=split(/[- :]/,$$rec{$key});
@@ -683,11 +745,14 @@ sub readLocalDescList
    my $fullname=shift;
    my $lobj=shift;
    my $force=shift;
+   my $stepit=shift;
+   my $mywin=shift;
    my $dir="$ldir/$fullname";
    local *FH;
    if (opendir(FH,"$dir")){
       while (defined(my $file=readdir(FH)))
       {
+         &{$stepit}($mywin) if ($stepit);
          my $mtime=(stat("$dir/$file"))[9];
          if (-d "$dir/$file" && !(-l "$dir/$file") 
              && $file ne "." && $file ne "..") {
@@ -720,72 +785,124 @@ sub readLocalDescList
 
 sub calculateOperations
 {
-   my $refrdir=shift;
-   my $refldir=shift;
+   my $refrobj=shift;
+   my $reflobj=shift;
    my $oplist=shift;
    my $mode=shift;
-   # insert and update local files
-   foreach my $rfile (@$refrdir){
+   my $pid=shift;
+   my $stepit=shift;
+   my $mywin=shift;
+   # delete remote files or update,insert,delete local files
+   foreach my $rfile (@$refrobj){
+      &{$stepit}($mywin) if ($stepit);
       my $found=0;
-      foreach my $lfile (@$refldir){
-         if ($lfile->{'fullname'} eq $rfile->{'fullname'} &&
-             $lfile->{'mdatestamp'} eq $rfile->{'mdatestamp'} &&
-             $lfile->{'entrytyp'} eq $rfile->{'entrytyp'} ){
-            $found=1; 
-         }elsif($lfile->{'fullname'} eq $rfile->{'fullname'} &&
-             $lfile->{'mdatestamp'} ne $rfile->{'mdatestamp'} &&
-             $lfile->{'entrytyp'} eq $rfile->{'entrytyp'} ){
-            $found=2;
+      foreach my $lfile (@$reflobj){
+         if ($mode eq "upload"){
+            if ($lfile->{'fullname'} eq $rfile->{'fullname'}){
+               $found=1;
+            }
+         }elsif($mode eq "download"){
+            if ($lfile->{'fullname'} eq $rfile->{'fullname'} &&
+                $lfile->{'mdatestamp'} eq $rfile->{'mdatestamp'} &&
+                $lfile->{'entrytyp'} eq $rfile->{'entrytyp'} ){
+               $found=1; 
+            }elsif($lfile->{'fullname'} eq $rfile->{'fullname'} &&
+                $lfile->{'mdatestamp'} ne $rfile->{'mdatestamp'} &&
+                $lfile->{'entrytyp'} eq $rfile->{'entrytyp'}){
+               $found=2;
+            }
          }
       }
-      if ($mode eq "download"){
-         if ($found == 0){
-            push(@$oplist,{OP          => 'insert',
-                          DATAOBJALIAS => 'filemgmt',
+      if ($found == 0 && $mode eq "download"){
+         push(@$oplist,{OP          => 'insert',
+                       DATAOBJALIAS => 'filemgmt',
                           IDENTIFYBY   => $rfile->{'entrytyp'}, 
-                          MSG          => "insert ".$rfile->{'entrytyp'}." ".
-                                          $rfile->{'fullname'},
-                          DATA         => {fullname   => $rfile->{'fullname'},
-                                           name       => $rfile->{'name'},
-                                           fid        => $rfile->{'fid'},
-                                           mdatestamp => $rfile->{'mdatestamp'},
-                                           file       => $rfile->{'file'}}});
-         }elsif($found == 2){
-            push(@$oplist,{OP          => 'update',
-                          DATAOBJALIAS => 'filemgmt',
-                          IDENTIFYBY   => $rfile->{'entrytyp'}, 
-                          MSG          => "update ".$rfile->{'entrytyp'}." ".
-                                          $rfile->{'fullname'},
-                          DATA         => {fullname    => $rfile->{'fullname'},
-                                           mdatestamp  => $rfile->{'mdatestamp'},
-                                           fid         => $rfile->{'fid'},
-                                           name        => $rfile->{'name'},
-                                           file        => $rfile->{'file'}}});
-         }
-      }elsif($mode eq "upload"){
-          # operation list für den upload zusammensetzen
+                       MSG          => "insert ".$rfile->{'entrytyp'}." ".
+                                       $rfile->{'fullname'},
+                       DATA         => {fullname   => $rfile->{'fullname'},
+                                        name       => $rfile->{'name'},
+                                        fid        => $rfile->{'fid'},
+                                        mdatestamp => $rfile->{'mdatestamp'},
+                                        file       => $rfile->{'file'}}});
+      }elsif($found == 2 && $mode eq "download"){
+         push(@$oplist,{OP          => 'update',
+                       DATAOBJALIAS => 'filemgmt',
+                       IDENTIFYBY   => $rfile->{'entrytyp'}, 
+                       MSG          => "update ".$rfile->{'entrytyp'}." ".
+                                       $rfile->{'fullname'},
+                       DATA         => {fullname    => $rfile->{'fullname'},
+                                        mdatestamp  => $rfile->{'mdatestamp'},
+                                        fid         => $rfile->{'fid'},
+                                        name        => $rfile->{'name'},
+                                        file        => $rfile->{'file'}}});
+      }elsif($found == 0 && $mode eq "upload"){
+         push(@$oplist,{OP          => 'delete',
+                        DATAOBJALIAS => 'filemgmt',
+                        IDENTIFYBY   => $rfile->{'entrytyp'},
+                        MSG          => "delete ".$rfile->{'entrytyp'}." ".
+                                         $rfile->{'fullname'},
+                        DATA         => {fullname  => $rfile->{'fullname'},
+                                         name      => $rfile->{'name'}}});
       }
    }
-   # delete local files
-   foreach my $lfile (@$refldir){
+   # delete local files or update,insert,delete remote files
+   foreach my $lfile (@$reflobj){
+      &{$stepit}($mywin) if ($stepit);
       my $found=0;
-      foreach my $rfile (@$refrdir){
-         if ($lfile->{'fullname'} eq $rfile->{'fullname'}){
-            $found=1;  
+      my ($fid,$file,$parentid);
+      foreach my $rfile (@$refrobj){
+         $parentid=$rfile->{parentid};
+         if ($mode eq "download"){
+            if ($lfile->{'fullname'} eq $rfile->{'fullname'}){
+               $found=1;  
+            }
+         }elsif($mode eq "upload"){
+            foreach my $rfile (@$refrobj){
+               if ($lfile->{'fullname'} eq $rfile->{'fullname'} &&
+                   $lfile->{'mdatestamp'} eq $rfile->{'mdatestamp'} &&
+                   $lfile->{'entrytyp'} eq $rfile->{'entrytyp'} ){
+                  $found=1;
+               }elsif($lfile->{'fullname'} eq $rfile->{'fullname'} &&
+                   $lfile->{'mdatestamp'} ne $rfile->{'mdatestamp'} &&
+                   $lfile->{'entrytyp'} eq $rfile->{'entrytyp'}){
+                  $found=2;
+                  $fid=$rfile->{'fid'};
+                  $file=$rfile->{'file'};
+               }
+            }
          }
       } 
-      if ($mode eq "download"){
-         if($found == 0){
-            push(@$oplist,{OP          => 'delete',
-                          DATAOBJALIAS => 'filemgmt',
-                          IDENTIFYBY   => $lfile->{'entrytyp'}, 
-                          MSG          => "delete ".$lfile->{'entrytyp'}." ".
-                                          $lfile->{'fullname'},
-                          DATA         => {fullname  => $lfile->{'fullname'},
-                                           name      => $lfile->{'name'}}});
-         }
-      }elsif($mode eq "upload"){
-         # operation list für den upload zusammensetzen
+      if ($found == 0 && $mode eq "download"){
+         push(@$oplist,{OP          => 'delete',
+                        DATAOBJALIAS => 'filemgmt',
+                        IDENTIFYBY   => $lfile->{'entrytyp'}, 
+                        MSG          => "delete ".$lfile->{'entrytyp'}." ".
+                                         $lfile->{'fullname'},
+                        DATA         => {fullname  => $lfile->{'fullname'},
+                                         name      => $lfile->{'name'}}});
+      }elsif($found == 0 && $mode eq "upload"){
+         $parentid=$pid if ($parentid eq "");
+         push(@$oplist,{OP          => 'insert',
+                       DATAOBJALIAS => 'filemgmt',
+                       IDENTIFYBY   => $lfile->{'entrytyp'}, 
+                       MSG          => "insert ".$lfile->{'entrytyp'}." ".
+                                       $lfile->{'fullname'},
+                       DATA         => {fullname   => $lfile->{'fullname'},
+                                        name       => $lfile->{'name'},
+                                        fid        => $parentid,
+                                        mdatestamp => $lfile->{'mdatestamp'},
+                                        file       => ''}});
+      }elsif($found == 2 && $mode eq "upload"){
+         push(@$oplist,{OP          => 'update',
+                       DATAOBJALIAS => 'filemgmt',
+                       IDENTIFYBY   => $lfile->{'entrytyp'}, 
+                       MSG          => "update ".$lfile->{'entrytyp'}." ".
+                                       $lfile->{'fullname'},
+                       DATA         => {fullname    => $lfile->{'fullname'},
+                                        mdatestamp  => $lfile->{'mdatestamp'},
+                                        fid         => $fid,
+                                        name        => $lfile->{'name'},
+                                        file        => $file}});
       }
    }
    return(0);
@@ -821,8 +938,17 @@ sub processOperations
                              $rec->{DATA}->{fullname}." failed -> $!");
             }
          }elsif($force && $mode eq "upload"){
-            # run update processlist 
+#            my %form=(enctype   => "multipart/form-data",
+#                      file      => $rec->{DATA}->{fullname},
+#                      do        => "Upload",
+#                     );
+#printf STDERR ("fifi form=%s\n",Dumper(\%form));
+
+
+#            my $req=$ua->post(\%form);
+   
          }
+         $action=1;
          if ($stepit){
             $rec->{MSG}=~s/\//\\/g;
             &{$stepit}($mywin,"INFO: ".$rec->{MSG});
@@ -833,11 +959,21 @@ sub processOperations
    }
 }
 
+sub action
+{
+   if ($action == 0){
+      return(0);
+   }else{
+      $action=0;
+      return(1);
+   }
+}
+
 # help menu
 sub Help
 {
    print(<<EOF);
-$RealScript [options] File File ...
+$RealScript [options] 
 
    --verbose  display more details of operation process
    --quiet    only errors would be displayed
@@ -847,10 +983,9 @@ $RealScript [options] File File ...
    --store    stores the parameters (not help,verbose and store)
    --help     show this help
               
-   --mode     emc, netapp, auto [default:auto]
+   --mode     download or upload [default:download]
    --rdir     remote directory
    --ldir     local directory
-   --type     export type (nfs, cifs ...) [default:nfs]
    --force    write data  
    --gui      grafical user interface
    --nowarn   prevent warnings
