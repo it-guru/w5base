@@ -351,7 +351,8 @@ sub ApplicationModified
                         next if ($posix eq "");
                         my $acftprec;
                         if (defined($idno)){
-                           $CurrentEventId="Add Contact '$posix' to $CurrentAppl";
+                           $CurrentEventId="Add Contact '$posix' ".
+                                           "to $CurrentAppl";
            
                            $acftprec={
                                    APPL_CONTACT_REL=>{
@@ -396,52 +397,62 @@ sub ApplicationModified
                $swinstance->SetFilter({applid=>\$rec->{id},
                                        cistatusid=>\"4"});
                foreach my $irec ($swinstance->getHashList(qw(ALL))){
-                  $CurrentEventId="Instance '$irec->{name}' ";
-
-                  my $assignment=$rec->{swteam};
-                  $assignment=~s/^.*\.CSS\.T-Com/CSS.TCOM/i;
-                  if ($assignment ne ""){
-                     $acgrp->ResetFilter(); 
-                     $acgrp->SetFilter({name=>$assignment}); 
-                     my ($acgrprec,$msg)=$acgrp->getOnlyFirst(qw(name));
-                     if (defined($acgrprec)){
-                        $assignment=$acgrprec->{name};
+                  $CurrentEventId="Instance '$irec->{fullname}'";
+                  my $systemid;
+                  foreach my $system (sort({$a->{systemsystemid} cmp 
+                                            $b->{systemsystemid}} 
+                                             @{$irec->{systems}})){
+                     if ($system->{systemsystemid} ne ""){
+                        $systemid=$system->{systemsystemid};
+                        last;
+                     }
+                  }
+                  if ($systemid ne ""){
+                     my $assignment=$rec->{swteam};
+                     $assignment=~s/^.*\.CSS\.T-Com/CSS.TCOM/i;
+                     if ($assignment ne ""){
+                        $acgrp->ResetFilter(); 
+                        $acgrp->SetFilter({name=>$assignment}); 
+                        my ($acgrprec,$msg)=$acgrp->getOnlyFirst(qw(name));
+                        if (defined($acgrprec)){
+                           $assignment=$acgrprec->{name};
+                        }
+                        else{
+                           $grpnotfound{$assignment}=1;
+                           $assignment="CSS.TCOM";
+                        }
                      }
                      else{
-                        $grpnotfound{$assignment}=1;
                         $assignment="CSS.TCOM";
                      }
+                     my $model="APPL-INSTANCE";
+                     $model="SAP-INSTANCE" if ($irec->{swnature}=~m/^SAP.*$/i); 
+                     $model="DB-INSTANCE" if ($irec->{swnature}=~m/mysql/i); 
+                     $model="DB-INSTANCE" if ($irec->{swnature}=~m/oracle/i); 
+                     $model="DB-INSTANCE" if ($irec->{swnature}=~m/informix/i); 
+                     $model="DB-INSTANCE" if ($irec->{swnature}=~m/mssql/i); 
+                     $model="DB-INSTANCE" if ($irec->{swnature}=~m/db2/i); 
+                     my $swi={Instances=>{
+                                EventID=>$CurrentEventId,
+                                ExternalSystem=>'W5Base',
+                                ExternalID=>$irec->{id},
+                                Parent=>$systemid,
+                                Name=>$irec->{fullname},
+                                Status=>"in operation",
+                                Model=>$model,
+                                Remarks=>$irec->{comments},
+                                Assignment=>$assignment,
+                                CostCenter=>$rec->{conumber},
+                                Security_Unit=>"TS.DE",
+                                CustomerLink=>"TS.DE",
+                                bDelete=>'0'
+                              }
+                             };
+                     my $fh=$fh{instance};
+                     print $fh hash2xml($swi,{header=>0});
+                     print $onlinefh hash2xml($swi,{header=>0});
+                     $elements++;
                   }
-                  else{
-                     $assignment="CSS.TCOM";
-                  }
-                  my $model="APPL-INSTANCE";
-                  $model="SAP-INSTANCE" if ($irec->{swnature}=~m/^SAP.*$/i); 
-                  $model="DB-INSTANCE"  if ($irec->{swnature}=~m/mysql/i); 
-                  $model="DB-INSTANCE"  if ($irec->{swnature}=~m/oracle/i); 
-                  $model="DB-INSTANCE"  if ($irec->{swnature}=~m/informix/i); 
-                  $model="DB-INSTANCE"  if ($irec->{swnature}=~m/mssql/i); 
-                  $model="DB-INSTANCE"  if ($irec->{swnature}=~m/db2/i); 
-                  my $swi={Instances=>{
-                             EventID=>$CurrentEventId,
-                             ExternalSystem=>'W5Base',
-                             ExternalID=>$irec->{id},
-                             Parent=>$rec->{applid},
-                             Name=>$irec->{fullname},
-                             Status=>"in operation",
-                             Model=>$model,
-                             Remarks=>$irec->{comments},
-                             Assignment=>$assignment,
-                             CostCenter=>$rec->{conumber},
-                             Security_Unit=>"TS.DE",
-                             CustomerLink=>"TS.DE",
-                             bDelete=>'0'
-                           }
-                          };
-                  my $fh=$fh{instance};
-                  print $fh hash2xml($swi,{header=>0});
-                  print $onlinefh hash2xml($swi,{header=>0});
-                  $elements++;
                }
             }
             #print Dumper($rec->{contacts});
