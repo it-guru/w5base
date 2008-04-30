@@ -43,6 +43,10 @@ sub Init
                       "tmpl/GeoUTM",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("Tools.outdoor.GCopti",
+                      "outdoor::GCopti",
+                      defaultacl=>['valid_user']);
+   
    return($self);
 }
 
