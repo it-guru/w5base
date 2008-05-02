@@ -306,7 +306,7 @@ sub doStart
    my $Config=main::createConfig(${$mainwin->{PARAM}->{'base=s'}},
                                  ${$mainwin->{PARAM}->{'webuser=s'}},
                                  ${$mainwin->{PARAM}->{'webpass=s'}},
-                                 0,1,\$exitcode,\$msgs);
+                                 0,0,\$exitcode,\$msgs);
    if (!$Config){
       eval("Win32::MsgBox(\"login error: \$msgs\",Win32::MB_ICONQUESTION|0, 'Error!')");   
       $mainwin->run->Enable(1);
@@ -941,11 +941,11 @@ sub processOperations
          }elsif($force && $mode eq "upload"){
             my $sendfile = MIME::Entity->build(
                     Encoding    => "base64",
-                    Path        => "c:\\XWin.log",
-                    Filename    => "XWin.log",
+                    Path        => $ldir."\\".$rec->{DATA}->{fullname},
+                    Filename    => $rec->{DATA}->{name},
                     Disposition => "attachment");
-            $o{'filemgmt'}->storeRecord({file=>$sendfile,parentid=>undef,parentobj=>undef});
-#printf STDERR ("fifi rec=%s\n",Dumper($rec));
+printf STDERR ("fifi %s\n",Dumper($rec));
+            $o{'filemgmt'}->storeRecord({file=>$sendfile,parentid=>$rec->{DATA}->{fid},parentobj=>undef});
          }
          $action=1;
          if ($stepit){
