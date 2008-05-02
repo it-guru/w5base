@@ -306,7 +306,7 @@ sub doStart
    my $Config=main::createConfig(${$mainwin->{PARAM}->{'base=s'}},
                                  ${$mainwin->{PARAM}->{'webuser=s'}},
                                  ${$mainwin->{PARAM}->{'webpass=s'}},
-                                 0,0,\$exitcode,\$msgs);
+                                 0,1,\$exitcode,\$msgs);
    if (!$Config){
       eval("Win32::MsgBox(\"login error: \$msgs\",Win32::MB_ICONQUESTION|0, 'Error!')");   
       $mainwin->run->Enable(1);
@@ -511,12 +511,15 @@ sub doMinimize {
 ################################################################################
 package main;
 use strict;                   
-use lib qw(/opt/w5base/lib);
+use lib qw(c:\\Programme\\opt\\w5base\\lib /opt/w5base/lib);
 use W5Base::API;
 use Data::Dumper;
 use File::Path;
 use POSIX;
+use MIME::Entity;
 use vars qw($GUI $Window);
+
+
 
 
 my $DefaultBase="https://w5base.net/w5base/auth/";
@@ -537,6 +540,23 @@ XGetOptions(\%P,\&Help,undef,undef,".websync",noautologin=>1);
 
 # set defaults
 $mode="download" if (!defined($mode));
+
+sub moduleObj
+{
+   my $Config=shift;
+   # load ModuleObject
+   my %loadobj=('filemgmt'=>'base::filemgmt',
+                );
+   foreach my $localid (keys(%loadobj)){
+      my $objectname=$loadobj{$localid};
+      my $obj=getModuleObject($Config,$objectname);
+      if (!defined($obj)){
+         return(1,"$obj not defined");
+      }
+      $o{$localid}=$obj;
+   }
+   return(0);
+}
 
 if ($gui){
    $|=1;
@@ -636,7 +656,7 @@ sub directoryLoop
    }elsif(!(-w "$ldir/$fullname") && -e "$ldir/$fullname"){
       return(1,"no write access on '$ldir/$fullname'");
    }
-   my @result=readRemoteDescList(\%o,$parentid,\@robj,$stepit,$mywin);
+   my @result=readRemoteDescList($parentid,\@robj,$stepit,$mywin);
    if ($result[0] != 0){
       return(1,$result[1]);
    }
@@ -649,7 +669,7 @@ sub directoryLoop
    if ($result[0] != 0){
       return(1,$result[1]);
    }
-   @result=processOperations(\%o,\@oplist,$Config,$ldir,
+   @result=processOperations(\@oplist,$Config,$ldir,
                              $mode,$force,$stepit,$mywin);
    if ($result[0] != 0){
       return(1,$result[1]);
@@ -699,14 +719,13 @@ sub directoryLoop
 
 sub readRemoteDescList
 {
-   my $o=shift;
    my $parentid=shift;
    my $robj=shift;
    my $stepit=shift;
    my $mywin=shift;
    if ($parentid){
-      $o->{'filemgmt'}->SetFilter({parentid=>[$parentid]});
-      @$robj=$o->{'filemgmt'}->getHashList(qw(ALL));
+      $o{'filemgmt'}->SetFilter({parentid=>[$parentid]});
+      @$robj=$o{'filemgmt'}->getHashList(qw(ALL));
    }
 
    # change timestamp from mdate in a unixtimestamp
@@ -719,23 +738,6 @@ sub readRemoteDescList
                                $time[2],$time[1],$time[0]-1900,0,0,-1);
          }
       }
-   }
-   return(0);
-}
-
-sub moduleObj
-{
-   my $Config=shift;
-   # load ModuleObject
-   my %loadobj=('filemgmt'=>'base::filemgmt',
-                );
-   foreach my $localid (keys(%loadobj)){
-      my $objectname=$loadobj{$localid};
-      my $obj=getModuleObject($Config,$objectname);
-      if (!defined($obj)){
-         return(1,"$obj not defined");
-      }
-      $o{$localid}=$obj;
    }
    return(0);
 }
@@ -910,7 +912,6 @@ sub calculateOperations
 
 sub processOperations
 {
-   my $o=shift;    
    my $oplist=shift;    
    my $Config=shift;    
    my $ldir=shift;    
@@ -938,15 +939,13 @@ sub processOperations
                              $rec->{DATA}->{fullname}." failed -> $!");
             }
          }elsif($force && $mode eq "upload"){
-#            my %form=(enctype   => "multipart/form-data",
-#                      file      => $rec->{DATA}->{fullname},
-#                      do        => "Upload",
-#                     );
-#printf STDERR ("fifi form=%s\n",Dumper(\%form));
-
-
-#            my $req=$ua->post(\%form);
-   
+            my $sendfile = MIME::Entity->build(
+                    Encoding    => "base64",
+                    Path        => "c:\\XWin.log",
+                    Filename    => "XWin.log",
+                    Disposition => "attachment");
+            $o{'filemgmt'}->storeRecord({file=>$sendfile,parentid=>undef,parentobj=>undef});
+#printf STDERR ("fifi rec=%s\n",Dumper($rec));
          }
          $action=1;
          if ($stepit){
