@@ -73,7 +73,7 @@ sub LoadBCBS
    my $appl=getModuleObject($self->Config,"AL_TCom::appl");
    my $sys=getModuleObject($self->Config,"AL_TCom::system");
    my $asset=getModuleObject($self->Config,"AL_TCom::asset");
-   $aappl->SetFilter({assignmentgroup=>\'BPO.BCBS',
+   $aappl->SetFilter({assignmentgroup=>['BPO.BCBS','CSS.TCOM.BILLING'],
    #                   name=>'ABBV*',
                       status=>['IN OPERATION']});
    $aappl->SetCurrentView(qw(ALL));

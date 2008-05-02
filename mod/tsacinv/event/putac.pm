@@ -136,12 +136,13 @@ sub ApplicationModified
          #msg(DEBUG,"dump=%s",Dumper($rec));
          my $jobname="W5Base.$self->{jobstart}.".NowStamp().'.Appl_'.
                      sprintf("%d",$rec->{id});
-         my @okaglist=qw(
-            VGNV_WIRK BPO4CONGSTER_WIRK IPS4CONGSTER_BPO_WIRK 
-            SAP4CONGSTER_FK_WIRK WS4CONGSTER_WIRK WC4CONGSTER_WIRK 
-            SV4CONGSTER_WIRK DKK_NEU_WIRK REO_WIRK DWH_AW_WIRK 
-            BACKUP_SERVER DMZ_SERVER
-         );
+         my @okaglist=qw( VGNV_WIRK BACKUP_SERVER DMZ_SERVER );
+        # my @okaglist=qw(
+        #    VGNV_WIRK BPO4CONGSTER_WIRK IPS4CONGSTER_BPO_WIRK 
+        #    SAP4CONGSTER_FK_WIRK WS4CONGSTER_WIRK WC4CONGSTER_WIRK 
+        #    SV4CONGSTER_WIRK DKK_NEU_WIRK REO_WIRK DWH_AW_WIRK 
+        #    BACKUP_SERVER DMZ_SERVER
+        # );
          if ($rec->{mandatorid} ne $exclmand &&
              (!($rec->{businessteam}=~m/\.BILLING/i) || 
                grep(/^$rec->{name}$/,@okaglist))){
