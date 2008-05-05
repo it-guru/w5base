@@ -223,24 +223,25 @@ sub qcheckRecord
                              $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
                              mode=>'string');
       }
-   }
-   else{
-      push(@qmsg,'no systemid specified');
-      $errorlevel=3 if ($errorlevel<3);
-   }
-
-   if ($rec->{asset} ne ""){
-      my $par=getModuleObject($self->getParent->Config(),"tsacinv::asset");
-      $par->SetFilter({assetid=>\$rec->{asset}});
-      my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
-      if (!defined($parrec)){
-         push(@qmsg,'given assetid not found as active in AssetCenter');
-         $errorlevel=3 if ($errorlevel<3);
+      if ($rec->{asset} ne ""){
+         my $par=getModuleObject($self->getParent->Config(),"tsacinv::asset");
+         $par->SetFilter({assetid=>\$rec->{asset}});
+         my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
+         if (!defined($parrec)){
+            push(@qmsg,'given assetid not found as active in AssetCenter');
+            $errorlevel=3 if ($errorlevel<3);
+         }
+      }
+      else{
+         push(@qmsg,'no assetid specified');
+         push(@dataissue,'no assetid specified');
+         $errorlevel=1 if ($errorlevel<1);
       }
    }
    else{
-      push(@qmsg,'no assetid specified');
-      $errorlevel=1 if ($errorlevel<1);
+      push(@qmsg,'no systemid specified');
+      push(@dataissue,'no systemid specified');
+      $errorlevel=3 if ($errorlevel<3);
    }
 
 

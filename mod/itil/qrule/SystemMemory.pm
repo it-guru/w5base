@@ -59,7 +59,8 @@ sub qcheckRecord
 
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
    if ($rec->{memory}<=0){
-      return(3,{qmsg=>['no system memory defined']});
+      my $msg='no system memory defined';
+      return(3,{qmsg=>[$msg],dataissue=>[$msg]});
    }
    return(0,undef);
 
