@@ -38,7 +38,7 @@
 'allow business request workflows'=>{de=>'Workflow "Anforderung an den Anwendungsbetrieb" erlauben'},
 'Application has no system components'=>{de=>'Anwendung hat keine System Komponenten'},
 'Application has no interfaces'=>{de=>'Anwendung hat keine Schnittstellen'},
-'Application is mangaged by rules of SOX'=>{de=>'Nach SOX Richtlinien zu betreuen'},
+'Application is mangaged by rules of SOX'=>{de=>'Nach SOX Richtlinien (USA) zu betreuen'},
 'eventnotify'=>{de=>'Ereignismeldung',en=>'Eventnotification'},
 'changenotify'=>{de=>'Change-Benachrichtigung',en=>'Changenotification'},
 'STEVchangeinfobyfunction'=>{de=>'Change-Benachrichtigung über Funktion (SeM oder TSM)',en=>'automatic change notification by function'},

@@ -84,7 +84,7 @@ sub ApplicationModified
               50=>'ACCEPTANCE',
               60=>'DEVELOPMENT',
               70=>'PRODUCTION');
-   #$filter{name}="*darwin* *routing*";
+  # $filter{name}="*darwin* *routing*";
    $app->SetFilter(\%filter);
    $app->SetCurrentView(qw(ALL));
   # $app->SetCurrentView(qw(id name sem tsm tsm2 conumber currentvers
@@ -136,6 +136,7 @@ sub ApplicationModified
          #msg(DEBUG,"dump=%s",Dumper($rec));
          my $jobname="W5Base.$self->{jobstart}.".NowStamp().'.Appl_'.
                      sprintf("%d",$rec->{id});
+         #msg(INFO,Dumper($rec));
          my @okaglist=qw( VGNV_WIRK BACKUP_SERVER DMZ_SERVER );
         # my @okaglist=qw(
         #    VGNV_WIRK BPO4CONGSTER_WIRK IPS4CONGSTER_BPO_WIRK 
@@ -238,6 +239,19 @@ sub ApplicationModified
                else{
                   $assignment="CSS.TCOM";
                }
+               my $criticality=$rec->{criticality};
+               $criticality=~s/^CR//;
+               if ($criticality eq ""){
+                  if ($rec->{customerprio}==1){
+                     $criticality="critical";
+                  }
+                  elsif ($rec->{customerprio}==2){
+                     $criticality="medium";
+                  }
+                  else{ 
+                     $criticality="none";
+                  }
+               }
                my $issoxappl=$rec->{issoxappl};
                $issoxappl="YES" if ($rec->{issoxappl});
                $issoxappl="NO" if (!($rec->{issoxappl}));
@@ -260,6 +274,7 @@ sub ApplicationModified
                                    MaintWindow=>$rec->{maintwindow},
                                    Version=>$rec->{currentvers},
                                    SoxRelevant=>$issoxappl,
+                                   Criticality=>$criticality,
                                    Technical_Contact=>$posix{tsm},
                                    DataSupervisor=>$posix{databoss},
                                    Service_Manager=>$posix{sem},
