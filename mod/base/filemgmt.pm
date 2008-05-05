@@ -296,6 +296,16 @@ sub Validate
       delete($newrec->{parentobj});
       delete($newrec->{parentrefid});
    }
+   if (defined($newrec->{parentid})){
+      my $chkfm=getModuleObject($self->Config,"base::filemgmt");
+      $chkfm->SetFilter({fid=>[$newrec->{parentid}],entrytyp=>\'dir'});
+      my ($prec)=$chkfm->getOnlyFirst("fid");
+      if (!defined($prec)){
+         $self->LastMsg(ERROR,"invalid parentid specified");
+         return(undef);
+      }
+   }
+   
 
    if (defined($newrec->{file}) && $newrec->{file} ne ""){
       if (!defined($oldrec) || $newrec->{realfile} eq "" ||
