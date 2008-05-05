@@ -51,7 +51,7 @@
 'itil.kern.hwmodel.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.kern.servicesupport'=>{de=>'Service&amp;Support',en=>'Service&amp;Support'},
 'itil.kern.servicesupport.new'=>{de=>'Neueingabe',en=>'New'},
-'itil.kern.costcenter'=>{de=>'Kostenstelle',en=>'Costcenter'},
+'itil.kern.costcenter'=>{de=>'Kostenstelle/CO',en=>'Costcenter/CO'},
 'itil.kern.costcenter.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.kern.bp'=>{de=>'Geschäftsprozess',en=>'Business process'},
 'itil.kern.bp.new'=>{de=>'Neueingabe',en=>'New'},

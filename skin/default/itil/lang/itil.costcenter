@@ -1,3 +1,3 @@
-'itil::costcenter'=>{de=>'Kostenstelle',en=>'CostCenter'},
+'itil::costcenter'=>{de=>'Kostenstelle/CO-Nummer',en=>'CostCenter/CO-Number'},
 'fieldgroup.applications'=>{de=>'Anwendungen',en=>'Applications'},
 'Applications'=>{de=>'Anwendungen'},

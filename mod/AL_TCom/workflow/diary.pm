@@ -571,6 +571,7 @@ sub preValidate                 # das muß in preValidate behandelt werden,
          $newrec->{affectedapplicationid}=$appl->{affectedapplicationid};
          $newrec->{affectedapplication}=$f;
          my $applid=$newrec->{affectedapplicationid};
+         my $co=getModuleObject($self->getParent->Config,"itil::costcenter");
          my $app=getModuleObject($self->getParent->Config,"itil::appl");
          $app->SetFilter({id=>\$applid});
          my @l=$app->getHashList(qw(custcontracts mandator 
@@ -588,6 +589,14 @@ sub preValidate                 # das muß in preValidate behandelt werden,
                $mandatorid{$apprec->{mandatorid}}=1;
             }
             if (defined($apprec->{conumber}) && $apprec->{conumber} ne ""){
+               $co->ResetFilter();
+               $co->SetFilter({name=>\$apprec->{conumber},cistatusid=>"<=4"});
+               my ($corec)=$co->getOnlyFirst("id");
+               if (!defined($corec)){
+                  $self->LastMsg(ERROR,"invalid or inactive costcenter ".
+                                       "used in application configuration");
+                  return(0);
+               }
                $conumber{$apprec->{conumber}}=1;
             }
             next if (!defined($apprec->{custcontracts}));

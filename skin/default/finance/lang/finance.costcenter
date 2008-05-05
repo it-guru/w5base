@@ -2,7 +2,7 @@
                         en=>'Costcenter'},
 'fieldgroup.default'=>{de=>'Kostenstellendaten'},
 'fieldgroup.delmgmt'=>{de=>'Delivery-Management'},
-'CO-Number'=>{de=>'Kostenstellenummer'},
+'CO-Number'=>{de=>'CO-/Kostenstellen-Nummer'},
 'Contacts'=>{de=>'Kontakte'},
 'CO-Shortdescription'=>{de=>'Kostenstellenbezeichnung'},
 "invalid CO-Numer '\%s' specified"=>{de=>"ungültige CO-Nummer '\%s' eingegeben"},
