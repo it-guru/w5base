@@ -46,35 +46,28 @@ sub QualityCheck
    my $self=shift;
    my $dataobj=shift;
    msg(DEBUG,"starting QualityCheck");
-   my $lnkq=getModuleObject($self->Config,"base::lnkqrulemandator");
-   my %dataobjtocheck;
+   my %dataobjtocheck=$self->LoadQualitCheckActivationLinks();
+   print Dumper(\%dataobjtocheck);
    if ($dataobj eq ""){
-      $lnkq->ResetFilter();
-      $lnkq->SetCurrentView("dataobj");
-      my ($rec,$msg)=$lnkq->getFirst();
-      if (defined($rec)){
-         do{
-            $dataobjtocheck{$rec->{dataobj}}++;
-            ($rec,$msg)=$lnkq->getNext();
-         }until(!defined($rec));
+      foreach my $dataobj (sort(keys(%dataobjtocheck))){
+            msg(INFO,"calling QualityCheck for '$dataobj'");
+            my $bk=$self->W5ServerCall("rpcCallEvent","QualityCheck",$dataobj);
+            if (!defined($bk->{AsyncID})){
+               msg(ERROR,"can't call QualityCheck for ".
+                         "dataobj '$dataobj' Event");
+            }
       }
    }
    else{
       my $obj=getModuleObject($self->Config,$dataobj);
       if (defined($obj)){
+         if (!grep(/^0$/,keys(%{$dataobjtocheck{$dataobj}}))){
+            $obj->SetFilter({mandatorid=>[keys(%{$dataobjtocheck{$dataobj}})]});
+         }
          return($self->doQualityCheck($obj));
       }
       else{
          return({exitcode=>1,msg=>"invalid dataobject '$dataobj' specified"});
-      }
-   }
-   foreach my $dataobj (sort(keys(%dataobjtocheck))){
-      if ($dataobj ne ""){
-         msg(INFO,"calling QualityCheck for '$dataobj'");
-         my $bk=$self->W5ServerCall("rpcCallEvent","QualityCheck",$dataobj);
-         if (!defined($bk->{AsyncID})){
-            msg(ERROR,"can't call QualityCheck for dataobj '$dataobj' Event");
-         }
       }
    }
    
@@ -126,4 +119,30 @@ sub doQualityCheck
 
    return({exitcode=>0,msg=>'ok'});
 }
+
+
+sub LoadQualitCheckActivationLinks
+{
+   my $self=shift;
+
+   my $lnkq=getModuleObject($self->Config,"base::lnkqrulemandator");
+   my %dataobjtocheck;
+   $lnkq->ResetFilter();
+   $lnkq->SetCurrentView("dataobj","mandatorid");
+   my ($rec,$msg)=$lnkq->getFirst();
+   if (defined($rec)){
+      do{
+         msg(INFO,"dataobject=$rec->{dataobj} ".
+                  "mandatorid=$rec->{mandatorid}");
+         if ($rec->{dataobj} ne ""){
+            my $mandatorid=$rec->{mandatorid};
+            $mandatorid=0 if (!defined($mandatorid));
+            $dataobjtocheck{$rec->{dataobj}}->{$mandatorid}++;
+         }
+         ($rec,$msg)=$lnkq->getNext();
+      }until(!defined($rec));
+   }
+   return(%dataobjtocheck);
+}
+
 1;

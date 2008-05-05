@@ -26,6 +26,7 @@
 'Approval Testsystem'=>{de=>'Abnahmesystem'},
 'Referencesystem'=>{de=>'Referenzsystem'},
 'Databaseserver'=>{de=>'Datenbankserver'},
+'Workstation'=>{de=>'Workstation/DesktopPC',en=>'Workstation/DesktopPC'},
 'you are not authorized to set other persons as admin'=>{de=>'sie sind nicht berechtig andere Personen als Admin einzutragen'},
 'Room'=>{de=>'Raum'},
 'Customer'=>{de=>'Kunde'},
