@@ -75,7 +75,7 @@ sub rpcCallSerialEvent
       my $timeout=$self->{EventController}->getMaxEventTimeout($event);
       return($self->async(sub {
          $0="W5Server '$event'";
-         $self->initAsyncEnv($event);
+         $self->initAsyncEnv($event,{param=>[@p]},'any');
          $self->{EventController}->setParent($self);
          my @methods=$self->{EventController}->getEventMethods($event);
          msg(DEBUG,"rpcCallSerialEvent: name=$event timeout=$timeout ".
@@ -338,6 +338,8 @@ sub initAsyncEnv
 {
    my $self=shift;
    my $label=shift;
+   my $param=shift;
+   my $method=shift;
 
    delete($self->{W5Server});
    delete($self->{W5ServerProcess});
@@ -423,12 +425,14 @@ sub initAsyncEnv
          push(@e,"ipcval=$ipcval");
       }
       if ($#e!=-1){
+         push(@e,"\n\n","call of '$label' with method '$method'\n",
+                      Dumper($param)."\n");
          if ($#output!=-1){
             if ($#output>10){
                splice(@output,0,$#output-10);
             }
-            push(@e,"\n","last 10 lines output dump:\n",
-                         "==========================\n",@output);
+            push(@e,"\n\n","last 10 lines output dump:\n",
+                           "==========================\n",@output);
          }
          my @sendmailpath=qw(/usr/local/sbin/sendmail 
                              /sbin/sendmail 

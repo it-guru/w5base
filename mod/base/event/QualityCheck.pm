@@ -92,6 +92,7 @@ sub doQualityCheck
    my @view=("id","qcok");
    if (my $cistatusid=$dataobj->getField("cistatusid")){
       $flt[0]->{cistatusid}=[3,4,5];
+      #$flt[0]->{id}=[221488];
    }
    if (my $lastqcheck=$dataobj->getField("lastqcheck")){
       unshift(@view,"lastqcheck");
