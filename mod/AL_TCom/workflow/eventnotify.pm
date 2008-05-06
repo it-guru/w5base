@@ -213,7 +213,7 @@ sub generateMailSet
       $baseurl=$ENV{SCRIPT_URI};
       $baseurl=~s#/auth/.*$##;
    }
-   my @baseset=qw(wffields.eventstatclass wffields.eventstartofevent);
+   my @baseset=qw(wffields.eventstartofevent wffields.eventstatclass );
    my $fo=$self->getField("wffields.eventendofevent",$WfRec);
    if (defined($fo)){
       my $v=$fo->FormatedResult($WfRec,"HtmlMail");
@@ -224,8 +224,8 @@ sub generateMailSet
       }
    }
    if ($action eq "rootcausei"){
-      @baseset=qw(wffields.eventstatclass wffields.eventstartofevent
-                  wffields.eventendofevent);
+      @baseset=qw(wffields.eventstartofevent
+                  wffields.eventendofevent wffields.eventstatclass);
    }
    # wffields.eventstatnature deleted w5baseid: 12039307490008 
    push(@baseset,qw(wffields.affectedregion));
