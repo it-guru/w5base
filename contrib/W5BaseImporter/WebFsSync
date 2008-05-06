@@ -520,10 +520,10 @@ use Data::Dumper;
 use File::Path;
 use POSIX;
 use MIME::Entity;
+use Config;
 use vars qw($GUI $Window);
 
-
-
+printf STDERR ("fifi %s\n",$Config{'osname'});
 
 my $DefaultBase="https://w5base.net/w5base/auth/";
 my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang,$admin);
@@ -738,6 +738,7 @@ printf STDERR ("fifi oplist=%s\n",Dumper(\@oplist));
          }
       }elsif($operations->{OP} eq "delete" && $mode eq "upload"){
          if ($force){
+printf STDERR ("fifi upload %s\n",$operations->{DATA}->{fid});
             $o{'filemgmt'}->deleteRecord($operations->{DATA}->{fid});
             my @res=$o{'filemgmt'}->LastMsg();
             return(1,$res[0]) if (defined($res[0]));
@@ -990,9 +991,11 @@ printf STDERR ("fifi delete for update fid=-%s-\n",$rec->{DATA}->{fid});
                return(1,$res[0]) if (defined($res[0]));
             }
 printf STDERR ("fifi path=%s\n",$ldir."\\".$rec->{DATA}->{fullname});
+            my $sep="/";
+            $sep="\\" if ($os eq "win32");
             my $sendfile = MIME::Entity->build(
                     Encoding    => "base64",
-                    Path        => $ldir."\\".$rec->{DATA}->{fullname},
+                    Path        => $ldir.$sep.$rec->{DATA}->{fullname},
                     Filename    => $rec->{DATA}->{name},
                     Disposition => "attachment");
 printf STDERR ("fifi parentid=%s fid=%s\n",$rec->{DATA}->{parentid},$rec->{DATA}->{fid});
