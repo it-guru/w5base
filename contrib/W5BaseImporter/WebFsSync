@@ -306,7 +306,7 @@ sub doStart
    my $Config=main::createConfig(${$mainwin->{PARAM}->{'base=s'}},
                                  ${$mainwin->{PARAM}->{'webuser=s'}},
                                  ${$mainwin->{PARAM}->{'webpass=s'}},
-                                 0,0,\$exitcode,\$msgs);
+                                 0,1,\$exitcode,\$msgs);
    if (!$Config){
       eval("Win32::MsgBox(\"login error: \$msgs\",Win32::MB_ICONQUESTION|0, 'Error!')");   
       $mainwin->run->Enable(1);
@@ -332,7 +332,9 @@ sub doStart
    # looking for remote directory
    $mainwin->{o}{'filemgmt'}->SetFilter({fullname=>$mainwin->{rdir},
                                         parentobj=>undef}); 
-   my @rdirid=$mainwin->{o}{'filemgmt'}->getHashList(qw(fid fullname));
+   my @res=$mainwin->{o}{'filemgmt'}->LastMsg();
+   return(1,$res[0]) if (defined($res[0]));
+   my @rdirid=$mainwin->{o}{'filemgmt'}->getHashList(qw(fid fullname name));
    # mode download
    $mainwin->pgbar->SetPos(150);
    if ($#rdirid == 0){
@@ -346,7 +348,8 @@ sub doStart
          return(0);
       }
       @result=main::directoryLoop($rdirid[0]->{fid},$rdirid[0]->{fullname},
-                                  $Config,$directorycount,$mainwin->{mode},$mainwin->{force},
+                                  $rdirid[0]->{name},undef,$Config,$directorycount,
+                                  $mainwin->{mode},$mainwin->{force},
                                   \&StepIt,$mainwin);
       if ($result[0] != 0){  
          $mainwin->run->Enable(1);
@@ -592,7 +595,12 @@ if ($gui){
    }
    
    $o{'filemgmt'}->SetFilter({fullname=>"$rdir",parentobj=>undef}); 
-   my @rdirid=$o{'filemgmt'}->getHashList(qw(fid fullname));
+   my @res=$o{'filemgmt'}->LastMsg();
+   if (defined($res[0])){  
+      msg(ERROR,$res[0]);  
+      exit(1);
+   }
+   my @rdirid=$o{'filemgmt'}->getHashList(qw(fid fullname name));
    if ($mode eq "download"){ 
       msg(INFO,"mode -> download");
       if ($#rdirid == 0){
@@ -601,7 +609,7 @@ if ($gui){
             exit(1);
          }
          @result=directoryLoop($rdirid[0]->{fid},$rdirid[0]->{fullname},
-                               $Config,$directorycount,$mode,$force); 
+                 $rdirid[0]->{name},undef,$Config,$directorycount,$mode,$force); 
          if ($result[0] != 0){  
             msg(ERROR,$result[1]);  
             exit(1);
@@ -614,7 +622,7 @@ if ($gui){
       msg(INFO,"mode=upload");
       if ($#rdirid == 0){
          @result=directoryLoop($rdirid[0]->{fid},$rdirid[0]->{fullname},
-                               $Config,$directorycount,$mode,$force); 
+                 $rdirid[0]->{name},undef,$Config,$directorycount,$mode,$force); 
          if ($result[0] != 0){
             msg(ERROR,$result[1]);
             exit(1);
@@ -628,6 +636,9 @@ sub directoryLoop
 {
    my $parentid=shift; 
    my $fullname=shift; 
+printf STDERR ("fifi fullname=$fullname parentid=$parentid\n");
+   my $name=shift; 
+   my $ppid=shift; 
    my $Config=shift; 
    my $directorycount=shift;
    my $mode=shift;
@@ -638,6 +649,7 @@ sub directoryLoop
    if ($directorycount > 100){
       return(1,"directory depth to high, greater than 100");
    }
+   # create local directory
    if (!(-d "$ldir/$fullname") && $mode eq "download"){
       $action=1;
       if ($force){
@@ -656,6 +668,22 @@ sub directoryLoop
    }elsif(!(-w "$ldir/$fullname") && -e "$ldir/$fullname"){
       return(1,"no write access on '$ldir/$fullname'");
    }
+   # create remote directory
+   if ($mode eq "upload"){
+      $o{'filemgmt'}->SetFilter({fid=>[$parentid]});
+      my @res=$o{'filemgmt'}->LastMsg();
+      return(1,$res[0]) if (defined($res[0]));
+      my @sum=$o{'filemgmt'}->getHashList(qw(ALL));
+      if ($#sum == -1 ){
+         $action=1;
+         $o{'filemgmt'}->storeRecord({name      => $name,
+                                      parentid  => $ppid,
+                                      parentobj => undef});
+         my @res=$o{'filemgmt'}->LastMsg();
+         return(1,$res[0]) if (defined($res[0]));
+      }
+   }
+
    my @result=readRemoteDescList($parentid,\@robj,$stepit,$mywin);
    if ($result[0] != 0){
       return(1,$result[1]);
@@ -674,13 +702,16 @@ sub directoryLoop
    if ($result[0] != 0){
       return(1,$result[1]);
    }
+printf STDERR ("fifi oplist=%s\n",Dumper(\@oplist));
    foreach my $operations (@oplist){
       if ($operations->{'IDENTIFYBY'} eq "dir" && 
           $operations->{'OP'} ne "delete"){
          @result=directoryLoop($operations->{'DATA'}->{'fid'},
                                $operations->{'DATA'}->{'fullname'},
+                               $operations->{'DATA'}->{'name'},
+                               $operations->{'DATA'}->{'parentid'},
                                $Config,$directorycount+1,
-                               $mode,$force,$stepit,$mywin);    
+                               $mode,$force,$stepit,$mywin);
          if ($result[0] != 0){
             return(1,$result[1]);
          }
@@ -706,6 +737,11 @@ sub directoryLoop
             msg(INFO,$operations->{MSG});
          }
       }elsif($operations->{OP} eq "delete" && $mode eq "upload"){
+         if ($force){
+            $o{'filemgmt'}->deleteRecord($operations->{DATA}->{fid});
+            my @res=$o{'filemgmt'}->LastMsg();
+            return(1,$res[0]) if (defined($res[0]));
+         }
          $action=1;
          if ($stepit){
             $operations->{MSG}=~s/\//\\/g;
@@ -725,9 +761,10 @@ sub readRemoteDescList
    my $mywin=shift;
    if ($parentid){
       $o{'filemgmt'}->SetFilter({parentid=>[$parentid]});
+      my @res=$o{'filemgmt'}->LastMsg();
+      return(1,$res[0]) if (defined($res[0]));
       @$robj=$o{'filemgmt'}->getHashList(qw(ALL));
    }
-
    # change timestamp from mdate in a unixtimestamp
    foreach my $rec (@$robj){
       &{$stepit}($mywin) if ($stepit);
@@ -794,7 +831,7 @@ sub calculateOperations
    my $pid=shift;
    my $stepit=shift;
    my $mywin=shift;
-   # delete remote files or update,insert,delete local files
+   # delete remote files, update,insert local files
    foreach my $rfile (@$refrobj){
       &{$stepit}($mywin) if ($stepit);
       my $found=0;
@@ -844,10 +881,11 @@ sub calculateOperations
                         MSG          => "delete ".$rfile->{'entrytyp'}." ".
                                          $rfile->{'fullname'},
                         DATA         => {fullname  => $rfile->{'fullname'},
+                                         fid       => $rfile->{'fid'},
                                          name      => $rfile->{'name'}}});
       }
    }
-   # delete local files or update,insert,delete remote files
+   # delete local files, update,insert remote files
    foreach my $lfile (@$reflobj){
       &{$stepit}($mywin) if ($stepit);
       my $found=0;
@@ -891,7 +929,8 @@ sub calculateOperations
                                        $lfile->{'fullname'},
                        DATA         => {fullname   => $lfile->{'fullname'},
                                         name       => $lfile->{'name'},
-                                        fid        => $parentid,
+                                        fid        => undef,
+                                        parentid   => $parentid,
                                         mdatestamp => $lfile->{'mdatestamp'},
                                         file       => ''}});
       }elsif($found == 2 && $mode eq "upload"){
@@ -903,6 +942,7 @@ sub calculateOperations
                        DATA         => {fullname    => $lfile->{'fullname'},
                                         mdatestamp  => $lfile->{'mdatestamp'},
                                         fid         => $fid,
+                                        parentid    => $parentid,
                                         name        => $lfile->{'name'},
                                         file        => $file}});
       }
@@ -938,14 +978,28 @@ sub processOperations
                       return(1,"utime $ldir/".
                              $rec->{DATA}->{fullname}." failed -> $!");
             }
-         }elsif($force && $mode eq "upload"){
+         }elsif($force && $mode eq "upload" && ($rec->{OP} eq "update" ||
+                $rec->{OP} eq "insert")){
+printf STDERR ("fifi mode=%s\n%s\n",$rec->{OP},Dumper($rec));
+            if ($rec->{OP} eq "update"){
+printf STDERR ("fifi delete for update fid=-%s-\n",$rec->{DATA}->{fid});
+
+             #  $o{'filemgmt'}->deleteRecord($rec->{DATA}->{fid});               
+
+               my @res=$o{'filemgmt'}->LastMsg();
+               return(1,$res[0]) if (defined($res[0]));
+            }
+printf STDERR ("fifi path=%s\n",$ldir."\\".$rec->{DATA}->{fullname});
             my $sendfile = MIME::Entity->build(
                     Encoding    => "base64",
                     Path        => $ldir."\\".$rec->{DATA}->{fullname},
                     Filename    => $rec->{DATA}->{name},
                     Disposition => "attachment");
-printf STDERR ("fifi %s\n",Dumper($rec));
-            $o{'filemgmt'}->storeRecord({file=>$sendfile,parentid=>$rec->{DATA}->{fid},parentobj=>undef});
+printf STDERR ("fifi parentid=%s fid=%s\n",$rec->{DATA}->{parentid},$rec->{DATA}->{fid});
+            $o{'filemgmt'}->storeRecord({file=>$sendfile,
+                                parentid=>$rec->{DATA}->{parentid}},$rec->{DATA}->{fid});
+            my @res=$o{'filemgmt'}->LastMsg();
+            return(1,$res[0]) if (defined($res[0]));
          }
          $action=1;
          if ($stepit){
