@@ -523,11 +523,9 @@ use MIME::Entity;
 use Config;
 use vars qw($GUI $Window);
 
-printf STDERR ("fifi %s\n",$Config{'osname'});
-
 my $DefaultBase="https://w5base.net/w5base/auth/";
 my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang,$admin);
-my ($mode,$force,$rdir,$ldir,$gui,$nowarn,%o,$Revision,$empty);
+my ($mode,$force,$rdir,$ldir,$nogui,$nowarn,%o,$Revision,$empty);
 my $os=$Config{'osname'};
 my $action=0;
 my $count=0;
@@ -536,7 +534,7 @@ my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
        "webuser=s"=>\$loginuser,"webpass=s"=> \$loginpass,
        "verbose+"=>\$verbose,"nowarn"=>\$nowarn,"admin"=>\$admin,
        "force"=>\$force,"rdir=s"=>\$rdir,"ldir=s"=>\$ldir,
-       "mode=s"=>\$mode,"gui"=>\$gui);
+       "mode=s"=>\$mode,"nogui"=>\$nogui);
 
 # set options
 $|=1;
@@ -562,7 +560,7 @@ sub moduleObj
    return(0);
 }
 
-if ($gui){
+if ($os eq "MSWin32" && !$nogui){
    $|=1;
    my $fullstoredfilename=$ENV{HOMEPATH}."\\.websync";
    XLoadStoreFile($fullstoredfilename,\%P);
@@ -628,6 +626,9 @@ if ($gui){
             msg(ERROR,$result[1]);
             exit(1);
          }
+      }else{
+         msg(ERROR,"remote directory '".$rdir."' not exists or not unique!");
+         exit(1);
       }
    }
    msg(INFO,"nothing to do, everything is synchro") if (action() == 0);
@@ -677,11 +678,13 @@ printf STDERR ("fifi fullname=$fullname parentid=$parentid\n");
       my @sum=$o{'filemgmt'}->getHashList(qw(ALL));
       if ($#sum == -1 ){
          $action=1;
-         $o{'filemgmt'}->storeRecord({name      => $name,
-                                      parentid  => $ppid,
-                                      parentobj => undef});
-         my @res=$o{'filemgmt'}->LastMsg();
-         return(1,$res[0]) if (defined($res[0]));
+         if ($force){
+            $o{'filemgmt'}->storeRecord({name      => $name,
+                                         parentid  => $ppid,
+                                         parentobj => undef});
+            my @res=$o{'filemgmt'}->LastMsg();
+            return(1,$res[0]) if (defined($res[0]));
+         }
       }
    }
 
@@ -739,7 +742,7 @@ printf STDERR ("fifi oplist=%s\n",Dumper(\@oplist));
          }
       }elsif($operations->{OP} eq "delete" && $mode eq "upload"){
          if ($force){
-printf STDERR ("fifi upload %s\n",$operations->{DATA}->{fid});
+printf STDERR ("fifi delete %s\n",$operations->{DATA}->{fid});
             $o{'filemgmt'}->deleteRecord($operations->{DATA}->{fid});
             my @res=$o{'filemgmt'}->LastMsg();
             return(1,$res[0]) if (defined($res[0]));
@@ -983,17 +986,11 @@ sub processOperations
          }elsif($force && $mode eq "upload" && ($rec->{OP} eq "update" ||
                 $rec->{OP} eq "insert")){
 printf STDERR ("fifi mode=%s\n%s\n",$rec->{OP},Dumper($rec));
-            if ($rec->{OP} eq "update"){
-printf STDERR ("fifi delete for update fid=-%s-\n",$rec->{DATA}->{fid});
 
-             #  $o{'filemgmt'}->deleteRecord($rec->{DATA}->{fid});               
-
-               my @res=$o{'filemgmt'}->LastMsg();
-               return(1,$res[0]) if (defined($res[0]));
-            }
-printf STDERR ("fifi path=%s\n",$ldir."\\".$rec->{DATA}->{fullname});
             my $sep="/";
             $sep="\\" if ($os eq "MSWin32");
+
+printf STDERR ("fifi path=%s\n",$ldir.$sep.$rec->{DATA}->{fullname});
             my $sendfile = MIME::Entity->build(
                     Encoding    => "base64",
                     Path        => $ldir.$sep.$rec->{DATA}->{fullname},
@@ -1044,7 +1041,8 @@ $RealScript [options]
    --rdir     remote directory
    --ldir     local directory
    --force    write data  
-   --gui      grafical user interface
+   --nogui    for commandline usage in win32 systems only,
+              default is gui on
    --nowarn   prevent warnings
    --admin    enable admin options
 EOF
