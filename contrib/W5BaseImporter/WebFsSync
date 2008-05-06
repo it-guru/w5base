@@ -562,7 +562,7 @@ sub moduleObj
 
 if ($os eq "MSWin32" && !$nogui){
    $|=1;
-   my $fullstoredfilename=$ENV{HOMEPATH}."\\.websync";
+   my $fullstoredfilename=$ENV{HOMEDRIVE}.$ENV{HOMEPATH}."\\.websync";
    XLoadStoreFile($fullstoredfilename,\%P);
    eval('
          use Win32::GUI;

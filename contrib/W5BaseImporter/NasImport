@@ -478,7 +478,7 @@ $mode="auto" if (!defined($mode));
 $type="nfs" if (!defined($type));
 if ($gui){
    $|=1;
-   my $fullstoredfilename=$ENV{HOMEPATH}."\\.nasimport";
+   my $fullstoredfilename=$ENV{HOMEDRIVE}.$ENV{HOMEPATH}."\\.nasimport";
    XLoadStoreFile($fullstoredfilename,\%P);
    eval('
          use Win32::GUI;
