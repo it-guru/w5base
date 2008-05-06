@@ -133,10 +133,9 @@ sub ApplicationModified
    my %grpnotfound;
    if (defined($rec)){
       do{
-         #msg(DEBUG,"dump=%s",Dumper($rec));
-         my $jobname="W5Base.$self->{jobstart}.".NowStamp().'.Appl_'.
-                     sprintf("%d",$rec->{id});
-         #msg(INFO,Dumper($rec));
+        # msg(INFO,"dump=%s",Dumper($rec));
+        # msg(INFO,"id=$rec->{id}");
+         my $jobname="W5Base.$self->{jobstart}.".NowStamp().'.Appl_'.$rec->{id};
          my @okaglist=qw( VGNV_WIRK BACKUP_SERVER DMZ_SERVER );
         # my @okaglist=qw(
         #    VGNV_WIRK BPO4CONGSTER_WIRK IPS4CONGSTER_BPO_WIRK 
@@ -147,6 +146,7 @@ sub ApplicationModified
          if ($rec->{mandatorid} ne $exclmand &&
              (!($rec->{businessteam}=~m/\.BILLING/i) || 
                grep(/^$rec->{name}$/,@okaglist))){
+            msg(INFO,"process application=$rec->{name} jobname=$jobname");
             my $CurrentEventId;
             my $CurrentAppl;
             my $ApplU=0;
@@ -473,6 +473,9 @@ sub ApplicationModified
             }
             #print Dumper($rec->{contacts});
          }
+         else{
+            msg(INFO,"skipped application=$rec->{name} jobname=$jobname");
+         }
 
          ($rec,$msg)=$app->getNext();
       } until(!defined($rec));
@@ -688,12 +691,10 @@ sub TransferFile
    print $fh ("</XMLInterface>\n");
    close($fh);
 
-   if (Debug()){
-      if (open(FI,"<$filename") && open(FO,">/tmp/last.putac.$object.xml")){
-         printf FO ("%s",join("",<FI>));
-         close(FO);
-         close(FI);
-      }
+   if (open(FI,"<$filename") && open(FO,">/tmp/last.putac.$object.xml")){
+      printf FO ("%s",join("",<FI>));
+      close(FO);
+      close(FI);
    }
    if ($ftp->Connect()){
       msg(INFO,"Connect to FTP Server OK");
@@ -701,9 +702,9 @@ sub TransferFile
       my $jobfile="$object/$jobname";
       msg(INFO,"Processing  job : '%s'",$jobfile);
       msg(INFO,"Processing  file: '%s'",$filename);
-#      if (!$ftp->Put($filename,$jobfile)){
-#         msg(ERROR,"File $filename to $jobfile could not be transfered");
-#      }
+      if (!$ftp->Put($filename,$jobfile)){
+         msg(ERROR,"File $filename to $jobfile could not be transfered");
+      }
       unlink($filename);
       $ftp->Disconnect();
    }
