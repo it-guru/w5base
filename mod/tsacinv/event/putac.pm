@@ -84,7 +84,7 @@ sub ApplicationModified
               50=>'ACCEPTANCE',
               60=>'DEVELOPMENT',
               70=>'PRODUCTION');
-  # $filter{name}="*darwin* *routing*";
+   $filter{name}="*i-network*";
    $app->SetFilter(\%filter);
    $app->SetCurrentView(qw(ALL));
   # $app->SetCurrentView(qw(id name sem tsm tsm2 conumber currentvers
@@ -701,9 +701,9 @@ sub TransferFile
       my $jobfile="$object/$jobname";
       msg(INFO,"Processing  job : '%s'",$jobfile);
       msg(INFO,"Processing  file: '%s'",$filename);
-      if (!$ftp->Put($filename,$jobfile)){
-         msg(ERROR,"File $filename to $jobfile could not be transfered");
-      }
+#      if (!$ftp->Put($filename,$jobfile)){
+#         msg(ERROR,"File $filename to $jobfile could not be transfered");
+#      }
       unlink($filename);
       $ftp->Disconnect();
    }
