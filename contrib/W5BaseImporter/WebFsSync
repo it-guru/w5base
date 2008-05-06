@@ -528,6 +528,7 @@ printf STDERR ("fifi %s\n",$Config{'osname'});
 my $DefaultBase="https://w5base.net/w5base/auth/";
 my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang,$admin);
 my ($mode,$force,$rdir,$ldir,$gui,$nowarn,%o,$Revision,$empty);
+my $os=$Config{'osname'};
 my $action=0;
 my $count=0;
 my $version="Version 0.1 build$Revision$empty ";
@@ -992,7 +993,7 @@ printf STDERR ("fifi delete for update fid=-%s-\n",$rec->{DATA}->{fid});
             }
 printf STDERR ("fifi path=%s\n",$ldir."\\".$rec->{DATA}->{fullname});
             my $sep="/";
-            $sep="\\" if ($os eq "win32");
+            $sep="\\" if ($os eq "MSWin32");
             my $sendfile = MIME::Entity->build(
                     Encoding    => "base64",
                     Path        => $ldir.$sep.$rec->{DATA}->{fullname},
