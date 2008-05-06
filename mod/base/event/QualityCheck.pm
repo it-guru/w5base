@@ -47,7 +47,7 @@ sub QualityCheck
    my $dataobj=shift;
    msg(DEBUG,"starting QualityCheck");
    my %dataobjtocheck=$self->LoadQualitCheckActivationLinks();
-   print Dumper(\%dataobjtocheck);
+   msg(INFO,Dumper(\%dataobjtocheck));
    if ($dataobj eq ""){
       foreach my $dataobj (sort(keys(%dataobjtocheck))){
             msg(INFO,"calling QualityCheck for '$dataobj'");
@@ -62,7 +62,8 @@ sub QualityCheck
       my $obj=getModuleObject($self->Config,$dataobj);
       if (defined($obj)){
          if (!grep(/^0$/,keys(%{$dataobjtocheck{$dataobj}}))){
-            $obj->SetFilter({mandatorid=>[keys(%{$dataobjtocheck{$dataobj}})]});
+            $obj->SetNamedFilter("MANDATORID",
+                            {mandatorid=>[keys(%{$dataobjtocheck{$dataobj}})]});
          }
          return($self->doQualityCheck($obj));
       }
@@ -80,7 +81,6 @@ sub doQualityCheck
    my $dataobj=shift;
  
    msg(INFO,"doQualityCheck in Object $dataobj");
-   $dataobj->ResetFilter();
    my @flt;
    my @view=("id","qcok");
    if (my $cistatusid=$dataobj->getField("cistatusid")){
