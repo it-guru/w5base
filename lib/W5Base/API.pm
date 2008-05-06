@@ -325,6 +325,7 @@ use vars qw(@EXPORT @ISA $VERSION);
 use Exporter;
 use Getopt::Long;
 use FindBin qw($RealScript);
+use Config;
 
 $VERSION = "0.3";
 @ISA = qw(Exporter);
@@ -454,26 +455,31 @@ sub XGetOptions
 sub XGetFQStoreFilename
 {
    my $storefile=shift;
-
+   my $home;
    $storefile=".W5API" if ($storefile eq "");
-
+   if ($Config{'osname'} eq "MSWin32"){
+      $home=$ENV{'HOMEPATH'};
+   }else{
+      $home=$ENV{'HOME'};
+   }
    if (!($storefile=~m/^\//) &&
        !($storefile=~m/\\/)){ # finding the home directory
-      if ($ENV{HOME} eq ""){
+      if ($home eq ""){
          eval('
             while(my @pline=getpwent()){
                if ($pline[1]==$< && $pline[7] ne ""){
-                  $ENV{HOME}=$pline[7];
+                  $home=$pline[7];
                   last;
                }
             }
             endpwent();
          ');
       }
-      if ($ENV{HOME} ne ""){
-         $storefile=$ENV{HOME}."/".$storefile;
+      if ($home ne ""){
+         $storefile=$home."/".$storefile;
       }
    }
+   $storefile=$ENV{'HOMEDRIVE'}.$storefile if ($Config{'osname'} eq "MSWin32");
    return($storefile);
 }
 
