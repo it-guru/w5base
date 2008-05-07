@@ -438,30 +438,32 @@ sub Help
    my $text=(<<EOF);
 input
 --------------------------
-Remote Path   -> is the WebFS Path on the Server f.e. 'ITCSM'
-Local Path    -> is the Local Path on your pc f.e. c:\\temp 
-write Data    -> isn't this options activated, operations only
-                 will be simulated, no files will be uploaded or
-                 downloaded 
-Warnings On   -> show warning messages 
+Remote Path\t->\tis the WebFS Path on the Server f.e. 'ITSCM'
+Local Path\t->\tis the Local Path on your pc f.e. c:\\temp 
+write Data\t->\tisn't this options activated, operations only
+\t\t\twill be simulated, no files will be uploaded or
+\t\t\tdownloaded 
+Warnings On\t->\tshow warning messages 
 
 connect data
 --------------------------
-Webuser       -> your web account, same like on the webinterface,
-                 f.e. sued/basedow.holm or wiw/hbasedow
-Webpassword   -> your web password, same like on the web interface
-BaseURL       -> url or your webinterface f.e. https://w5base-testenv.telekom.de/darwin/auth
+Webuser\t\t->\tyour web account, same like on the webinterface,
+\t\t\tf.e. sued/basedow.holm or wiw/hbasedow
+Webpassword\t->\tyour web password, same like on the web interface
+BaseURL\t\t->\turl or your webinterface
+\t\t\tf.e. https://w5base-testenv.telekom.de/darwin/auth
 
 admin
 --------------------------
-Download      -> synchronize your local filesystem from the remote filesystem
-Upload        -> synchronize your remote filesystem from the local filesystem
+Download\t\t->\tsynchronize your local filesystem
+\t\t\tfrom the remote filesystem
+Upload\t\t->\tsynchronize your remote filesystem
+\t\t\tfrom the local filesystem
 
 options only for admins available
 
 EOF
-
-   $self->MessageBox("$text",'Infomation',0x200000);
+   $self->MessageBox("$text",'Infomation',0x0020);
 }
 
 sub Info
