@@ -176,7 +176,6 @@ sub ApplicationModified
                                       EventID=>$CurrentEventId,
                                       ExternalSystem=>'W5Base',
                                       ExternalID=>$lnk->{id},
-                                      Usage=>$w52ac{$SysU},
                                       Appl_ExternalSystem=>'W5Base',
                                       Appl_ExternalID=>$rec->{id},
                                       Port_ExternalSystem=>'W5Base',
@@ -188,6 +187,12 @@ sub ApplicationModified
                                       Portfolio=>$lnk->{systemsystemid},
                                    }
                                };
+                   #
+                   # Workaround für AktiveBilling (Fachbereich Billing)
+                   #
+                   if (!($rec->{businessteam}=~m/\.BILLING./i)){
+                      $acftprec->{CI_APPL_REL}->{Usage}=$w52ac{$SysU};
+                   }
                    my $fh=$fh{ci_appl_rel};
                    print $fh hash2xml($acftprec,{header=>0});
                    print $onlinefh hash2xml($acftprec,{header=>0});
@@ -265,7 +270,6 @@ sub ApplicationModified
                                    Security_Unit=>"TS.DE",
                                    Status=>"IN OPERATION",
                                    Priority=>$rec->{customerprio},
-                                   Usage=>$w52ac{$ApplU},
                                    EventID=>$CurrentEventId,
                                    AssignmentGroup=>$assignment,
                                    CO_CC=>$rec->{conumber},
@@ -283,6 +287,13 @@ sub ApplicationModified
                                    Name=>$rec->{name}
                                 }
                             };
+               #
+               # Workaround für AktiveBilling (Fachbereich Billing)
+               #
+               if (!($rec->{businessteam}=~m/\.BILLING./i)){
+                  $acftprec->{Appl}->{Usage}=$w52ac{$ApplU};
+                  $acftprec->{Appl}->{Customer}='TS.DE';
+               }
                if (defined($acapplrec) && $acapplrec->{applid} ne ""){
                   $acftprec->{Appl}->{Code}=$acapplrec->{applid};
                }
