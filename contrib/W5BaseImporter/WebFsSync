@@ -17,7 +17,7 @@ package MyWin;
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#  $Revision: 3155 $  Subversion Revision Number
+#  $Revision$  Subversion Revision Number
 use strict;
 use vars qw(@ISA);
 use Data::Dumper;
@@ -638,7 +638,6 @@ sub directoryLoop
 {
    my $parentid=shift; 
    my $fullname=shift; 
-printf STDERR ("fifi fullname=$fullname parentid=$parentid\n");
    my $name=shift; 
    my $ppid=shift; 
    my $Config=shift; 
@@ -706,7 +705,6 @@ printf STDERR ("fifi fullname=$fullname parentid=$parentid\n");
    if ($result[0] != 0){
       return(1,$result[1]);
    }
-printf STDERR ("fifi oplist=%s\n",Dumper(\@oplist));
    foreach my $operations (@oplist){
       if ($operations->{'IDENTIFYBY'} eq "dir" && 
           $operations->{'OP'} ne "delete"){
@@ -742,7 +740,6 @@ printf STDERR ("fifi oplist=%s\n",Dumper(\@oplist));
          }
       }elsif($operations->{OP} eq "delete" && $mode eq "upload"){
          if ($force){
-printf STDERR ("fifi delete %s\n",$operations->{DATA}->{fid});
             $o{'filemgmt'}->deleteRecord($operations->{DATA}->{fid});
             my @res=$o{'filemgmt'}->LastMsg();
             return(1,$res[0]) if (defined($res[0]));
@@ -985,18 +982,15 @@ sub processOperations
             }
          }elsif($force && $mode eq "upload" && ($rec->{OP} eq "update" ||
                 $rec->{OP} eq "insert")){
-printf STDERR ("fifi mode=%s\n%s\n",$rec->{OP},Dumper($rec));
 
             my $sep="/";
             $sep="\\" if ($os eq "MSWin32");
 
-printf STDERR ("fifi path=%s\n",$ldir.$sep.$rec->{DATA}->{fullname});
             my $sendfile = MIME::Entity->build(
                     Encoding    => "base64",
                     Path        => $ldir.$sep.$rec->{DATA}->{fullname},
                     Filename    => $rec->{DATA}->{name},
                     Disposition => "attachment");
-printf STDERR ("fifi parentid=%s fid=%s\n",$rec->{DATA}->{parentid},$rec->{DATA}->{fid});
             $o{'filemgmt'}->storeRecord({file=>$sendfile,
                                 parentid=>$rec->{DATA}->{parentid}},$rec->{DATA}->{fid});
             my @res=$o{'filemgmt'}->LastMsg();
