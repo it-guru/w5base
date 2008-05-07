@@ -1,0 +1,4 @@
+'itil::qrule::SystemAppls'=>{de=>'Prüfung ob Anwendungszuordnungen vorhanden sind',
+                             en=>'check if Application relations are valid'},
+'no application relations'=>{de=>'keine Anwendungszuordnungen vorhanden'},
+

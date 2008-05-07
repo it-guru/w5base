@@ -31,6 +31,7 @@ sub new
 
 
    $self->{workflowlink}->{workflowtyp}=[qw(OSY::workflow::diary
+                                            base::workflow::DataIssue 
                                             AL_TCom::workflow::incident 
                                             AL_TCom::workflow::change)];
    $self->{workflowlink}->{workflowstart}=\&calcWorkflowStart;
