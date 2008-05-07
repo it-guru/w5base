@@ -287,19 +287,20 @@ sub ById
      # printf("Location: %s\n",$rec->{srclink});
      # printf("Status: 301 Moved Permanently\n");
      # printf("Connection: close\n");
+      my $srclink=$rec->{srclink}; 
+      $srclink="../$srclink" if ($srclink=~m/^..\//);
       printf("Content-type: text/html\n\n");
       my $name=$rec->{name};
       $name=~s/^\*//;
       printf("<html>");
       printf("<head>");
-      printf("<meta http-equiv=\"refresh\" content=\"1;url=%s\">",
-             $rec->{srclink});
+      printf("<meta http-equiv=\"refresh\" content=\"1;url=%s\">",$srclink);
       printf("</head>");
       printf("<body>");
       printf("Please wait while connecting to '$name'<br>");
       printf("Redirecting to bookmark $val ...<br>\n");
       printf("\n<script language=\"JavaScript\">\n");
-      my $l=length($rec->{srclink});
+      my $l=length($srclink);
       print(<<EOF);
 function info()
 {
