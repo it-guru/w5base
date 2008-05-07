@@ -190,7 +190,7 @@ sub ApplicationModified
                    #
                    # Workaround für AktiveBilling (Fachbereich Billing)
                    #
-                   if (!($rec->{businessteam}=~m/\.BILLING./i)){
+                   if (!($rec->{businessteam}=~m/\.BILLING/i)){
                       $acftprec->{CI_APPL_REL}->{Usage}=$w52ac{$SysU};
                    }
                    my $fh=$fh{ci_appl_rel};
@@ -290,7 +290,7 @@ sub ApplicationModified
                #
                # Workaround für AktiveBilling (Fachbereich Billing)
                #
-               if (!($rec->{businessteam}=~m/\.BILLING./i)){
+               if (!($rec->{businessteam}=~m/\.BILLING/i)){
                   $acftprec->{Appl}->{Usage}=$w52ac{$ApplU};
                   $acftprec->{Appl}->{Customer}='TS.DE';
                }
