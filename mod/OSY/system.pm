@@ -29,7 +29,28 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
 
-
+   $self->AddFields(
+      new kernel::Field::TextDrop(
+                name          =>'acassingmentgroup',
+                label         =>'AssetCenter Assignmentgroup',
+                group         =>'admin',
+                weblinkto     =>'none',
+                readonly      =>1,
+                async         =>'1',
+                vjointo       =>'tsacinv::system',
+                vjoinon       =>['systemid'=>'systemid'],
+                vjoindisp     =>'assignmentgroup'),
+      new kernel::Field::TextDrop(
+                name          =>'aciassingmentgroup',
+                label         =>'AssetCenter Incident Assignmentgroup',
+                group         =>'admin',
+                weblinkto     =>'none',
+                readonly      =>1,
+                async         =>'1',
+                vjointo       =>'tsacinv::system',
+                vjoinon       =>['systemid'=>'systemid'],
+                vjoindisp     =>'iassignmentgroup'),
+   );
    $self->{workflowlink}->{workflowtyp}=[qw(OSY::workflow::diary
                                             base::workflow::DataIssue 
                                             AL_TCom::workflow::incident 

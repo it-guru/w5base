@@ -87,10 +87,22 @@ sub new
                 vjoinon       =>['lassignmentid'=>'lgroupid'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::TextDrop(
+                name          =>'iassignmentgroup',
+                label         =>'Incident Assignment Group',
+                vjointo       =>'tsacinv::group',
+                vjoinon       =>['lincidentagid'=>'lgroupid'],
+                vjoindisp     =>'name'),
+
       new kernel::Field::Link(
                 name          =>'lassignmentid',
                 label         =>'AC-AssignmentID',
                 dataobjattr   =>'amportfolio.lassignmentid'),
+
+      new kernel::Field::Link(
+                name          =>'lincidentagid',
+                label         =>'AC-Incident-AssignmentID',
+                dataobjattr   =>'amportfolio.lincidentagid'),
 
       new kernel::Field::Text(
                 name          =>'controlcenter',
