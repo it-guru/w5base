@@ -136,7 +136,7 @@ sub ApplicationModified
         # msg(INFO,"dump=%s",Dumper($rec));
         # msg(INFO,"id=$rec->{id}");
          my $jobname="W5Base.$self->{jobstart}.".NowStamp().'.Appl_'.$rec->{id};
-         my @okaglist=qw( VGNV_WIRK BACKUP_SERVER DMZ_SERVER );
+         my @okaglist=qw( DMZ_SERVER );
         # my @okaglist=qw(
         #    VGNV_WIRK BPO4CONGSTER_WIRK IPS4CONGSTER_BPO_WIRK 
         #    SAP4CONGSTER_FK_WIRK WS4CONGSTER_WIRK WC4CONGSTER_WIRK 
