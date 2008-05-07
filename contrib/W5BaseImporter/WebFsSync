@@ -540,7 +540,8 @@ my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
 
 # set options
 $|=1;
-XGetOptions(\%P,\&Help,undef,undef,".websync",noautologin=>1);
+my $storefile=".websync";
+XGetOptions(\%P,\&Help,undef,undef,"$storefile",noautologin=>1);
 
 # set defaults
 $mode="download" if (!defined($mode));
@@ -564,7 +565,7 @@ sub moduleObj
 
 if ($os eq "MSWin32" && !$nogui){
    $|=1;
-   my $fullstoredfilename=$ENV{HOMEDRIVE}.$ENV{HOMEPATH}."\\.websync";
+   my $fullstoredfilename=$ENV{HOMEDRIVE}.$ENV{HOMEPATH}."\\$storefile";
    XLoadStoreFile($fullstoredfilename,\%P);
    eval('
          use Win32::GUI;
@@ -796,27 +797,30 @@ sub readLocalDescList
       while (defined(my $file=readdir(FH)))
       {
          &{$stepit}($mywin) if ($stepit);
-         my $mtime=(stat("$dir/$file"))[9];
+         my $mdatestamp=(stat("$dir/$file"))[9];
+         my $mdate=strftime("%Y-%m-%d %H:%M:%S",localtime($mdatestamp));
          if (-d "$dir/$file" && !(-l "$dir/$file") 
              && $file ne "." && $file ne "..") {
             push(@$lobj,{entrytyp   => 'dir',
-                            fullname   => "$fullname/$file",
-                            name       => "$file",
-                            mdatestamp => "$mtime",
-                           });
+                         fullname   => "$fullname/$file",
+                         name       => "$file",
+                         mdatestamp => "$mdatestamp",
+                        });
          }elsif(!(-l "$dir/$file") && $file ne "."
                 && $file ne ".." ){
             push(@$lobj,{entrytyp    => 'file',
-                            fullname    => "$fullname/$file",
-                            name        => "$file",
-                            mdatestamp  => "$mtime",
-                           });
+                         fullname    => "$fullname/$file",
+                         name        => "$file",
+                         mdatestamp  => "$mdatestamp",
+                         mdate       => "$mdate",
+                        });
          }elsif(-l "$dir/$file"){
             push(@$lobj,{entrytyp    => 'link',
-                            fullname    => "$fullname/$file",
-                            name        => "$file",
-                            mdatestamp  => "$mtime",
-                           });
+                         fullname    => "$fullname/$file",
+                         name        => "$file",
+                         mdatestamp  => "$mdatestamp",
+                         mdate       => "$mdate",
+                        });
          }      
       }         
       closedir(FH);
@@ -936,6 +940,7 @@ sub calculateOperations
                                         fid        => undef,
                                         parentid   => $parentid,
                                         mdatestamp => $lfile->{'mdatestamp'},
+                                        mdate      => $lfile->{'mdate'},
                                         file       => ''}});
       }elsif($found == 2 && $mode eq "upload"){
          push(@$oplist,{OP          => 'update',
@@ -945,6 +950,7 @@ sub calculateOperations
                                        $lfile->{'fullname'},
                        DATA         => {fullname    => $lfile->{'fullname'},
                                         mdatestamp  => $lfile->{'mdatestamp'},
+                                        mdate      => $lfile->{'mdate'},
                                         fid         => $fid,
                                         parentid    => $parentid,
                                         name        => $lfile->{'name'},
@@ -984,19 +990,36 @@ sub processOperations
             }
          }elsif($force && $mode eq "upload" && ($rec->{OP} eq "update" ||
                 $rec->{OP} eq "insert")){
-
             my $sep="/";
             $sep="\\" if ($os eq "MSWin32");
-
             my $sendfile = MIME::Entity->build(
                     Encoding    => "base64",
                     Path        => $ldir.$sep.$rec->{DATA}->{fullname},
                     Filename    => $rec->{DATA}->{name},
                     Disposition => "attachment");
-            $o{'filemgmt'}->storeRecord({file=>$sendfile,
-                                parentid=>$rec->{DATA}->{parentid}},$rec->{DATA}->{fid});
+            my $fid=$o{'filemgmt'}->storeRecord({file       =>  $sendfile,
+                                                parentid   =>  $rec->{DATA}->{parentid}
+                                                },
+                                               $rec->{DATA}->{fid});
+            # read modifydate from the stored record
+            $o{'filemgmt'}->SetFilter({fid=>[$fid]});
             my @res=$o{'filemgmt'}->LastMsg();
             return(1,$res[0]) if (defined($res[0]));
+            my @mdate=$o{'filemgmt'}->getHashList(qw(mdate));
+            return(1,"record fid=$fid not found!") if ($#mdate != 0);
+
+            # change the datestamp to a unixtimestamp
+            my @time=split(/[- :]/,$mdate[0]->{mdate});
+            my $mdate=mktime($time[5],$time[4],$time[3],
+                             $time[2],$time[1],$time[0]-1900,0,0,-1);
+
+            my @res=$o{'filemgmt'}->LastMsg();
+            if (defined($res[0])){
+               return(1,$res[0]);
+            }else{
+               utime($mdate,$mdate,"$ldir/".$rec->{DATA}->{fullname}) ||
+                  return(1,"utime $ldir/".$rec->{DATA}->{fullname}." failed -> $!");
+            }
          }
          $action=1;
          if ($stepit){
