@@ -84,6 +84,7 @@ sub new
                                  'RINManager',
                                  'RCHManager',
                                  'RCFManager',
+                                 'RPRManager',
                                  'RQManager',
                                  'RControlling',
                                  'RAuditor',

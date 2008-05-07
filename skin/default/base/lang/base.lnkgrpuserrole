@@ -12,6 +12,7 @@
 'RQManager'=>{ de=>'Qualitäts-Manager', en=>'Quality-Manager'},
 'RINManager'=>{ de=>'Incident-Manager', en=>'Incident-Manager'},
 'RCHManager'=>{ de=>'Change-Manager', en=>'Change-Manager'},
+'RPRManager'=>{ de=>'Problem-Manager',en=>'Problem-Manager'},
 'RCFManager'=>{ de=>'Config-Manager', en=>'Config-Manager'},
 'RControlling'=>{ de=>'Controlling', en=>'Controlling'},
 'RAuditor'=>{ de=>'Auditor', en=>'Auditor'},
