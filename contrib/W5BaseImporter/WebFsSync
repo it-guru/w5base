@@ -306,7 +306,7 @@ sub doStart
    my $Config=main::createConfig(${$mainwin->{PARAM}->{'base=s'}},
                                  ${$mainwin->{PARAM}->{'webuser=s'}},
                                  ${$mainwin->{PARAM}->{'webpass=s'}},
-                                 0,1,\$exitcode,\$msgs);
+                                 0,0,\$exitcode,\$msgs);
    if (!$Config){
       eval("Win32::MsgBox(\"login error: \$msgs\",Win32::MB_ICONQUESTION|0, 'Error!')");   
       $mainwin->run->Enable(1);
@@ -681,9 +681,9 @@ sub directoryLoop
       if ($#sum == -1 ){
          $action=1;
          if ($force){
-            $o{'filemgmt'}->storeRecord({name      => $name,
-                                         parentid  => $ppid,
-                                         parentobj => undef});
+            $parentid=$o{'filemgmt'}->storeRecord({name      => $name,
+                                                   parentid  => $ppid,
+                                                   parentobj => undef});
             my @res=$o{'filemgmt'}->LastMsg();
             return(1,$res[0]) if (defined($res[0]));
          }
@@ -863,7 +863,7 @@ sub calculateOperations
       if ($found == 0 && $mode eq "download"){
          push(@$oplist,{OP          => 'insert',
                        DATAOBJALIAS => 'filemgmt',
-                          IDENTIFYBY   => $rfile->{'entrytyp'}, 
+                       IDENTIFYBY   => $rfile->{'entrytyp'}, 
                        MSG          => "insert ".$rfile->{'entrytyp'}." ".
                                        $rfile->{'fullname'},
                        DATA         => {fullname   => $rfile->{'fullname'},
@@ -876,7 +876,7 @@ sub calculateOperations
                        DATAOBJALIAS => 'filemgmt',
                        IDENTIFYBY   => $rfile->{'entrytyp'}, 
                        MSG          => "update ".$rfile->{'entrytyp'}." ".
-                                       $rfile->{'fullname'},
+                                        $rfile->{'fullname'},
                        DATA         => {fullname    => $rfile->{'fullname'},
                                         mdatestamp  => $rfile->{'mdatestamp'},
                                         fid         => $rfile->{'fid'},
@@ -997,8 +997,8 @@ sub processOperations
                     Path        => $ldir.$sep.$rec->{DATA}->{fullname},
                     Filename    => $rec->{DATA}->{name},
                     Disposition => "attachment");
-            my $fid=$o{'filemgmt'}->storeRecord({file       =>  $sendfile,
-                                                parentid   =>  $rec->{DATA}->{parentid}
+            my $fid=$o{'filemgmt'}->storeRecord({file      =>  $sendfile,
+                                                parentid   =>  $rec->{DATA}->{parentid},
                                                 },
                                                $rec->{DATA}->{fid});
             # read modifydate from the stored record
@@ -1022,6 +1022,8 @@ sub processOperations
             }
          }
          $action=1;
+
+printf STDERR ("fifi process=%s\n",Dumper($rec));
          if ($stepit){
             $rec->{MSG}=~s/\//\\/g;
             &{$stepit}($mywin,"INFO: ".$rec->{MSG});
