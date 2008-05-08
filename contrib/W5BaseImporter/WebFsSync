@@ -523,6 +523,9 @@ use File::Path;
 use POSIX;
 use MIME::Entity;
 use Config;
+use utf8;
+use Encode;
+use Unicode::String qw(utf8 latin1 utf16);
 use vars qw($GUI $Window);
 
 my $DefaultBase="https://w5base.net/w5base/auth/";
@@ -796,6 +799,10 @@ sub readLocalDescList
    if (opendir(FH,"$dir")){
       while (defined(my $file=readdir(FH)))
       {
+printf STDERR ("fifi file=%s\n",Dumper($file));
+if (-e "$dir/$file"){
+printf STDERR ("fifi filein=%s\n",$file);
+}
          &{$stepit}($mywin) if ($stepit);
          my $mdatestamp=(stat("$dir/$file"))[9];
          my $mdate=strftime("%Y-%m-%d %H:%M:%S",localtime($mdatestamp));
@@ -842,6 +849,7 @@ sub calculateOperations
 {
    my $refrobj=shift;
    my $reflobj=shift;
+#printf STDERR ("fifi oplist=%s\n",Dumper($reflobj));
    my $oplist=shift;
    my $mode=shift;
    my $pid=shift;
@@ -1060,6 +1068,22 @@ sub action
       return(1);
    }
 }
+
+sub UTF8toLatin1
+{
+   my $dd=shift;
+   if ($dd=~m/\xC3/){
+      utf8::decode($dd);
+   }
+   if (utf8::is_utf8($dd)){
+      utf8::downgrade($dd,1);
+      $dd=~s/\x{201e}/"/g;
+      decode_utf8($dd,0);
+      $dd=encode("iso-8859-1", $dd);
+   }
+   return($dd);
+}
+
 
 # help menu
 sub Help
