@@ -245,6 +245,29 @@ sub new
                 group         =>'source',
                 label         =>'Source-Id',
                 dataobjattr   =>'amtsicustappl.externalid'),
+
+      new kernel::Field::Date(
+                name          =>'srcload',
+                timezone      =>'CET',
+                group         =>'source',
+                label         =>'Source-Load',
+                dataobjattr   =>'amtsicustappl.dtimport'),
+
+    #  new kernel::Field::Link(
+    #            name          =>'ownerid',
+    #            group         =>'source',
+    #            label         =>'AC OwnerID',
+    #            dataobjattr   =>'amportfolio.luserid'),
+    #
+    #  new kernel::Field::TextDrop(
+    #            name          =>'owner',
+    #            readonly      =>1,
+    #            group         =>'source',
+    #            label         =>'Owner',
+    #            vjointo       =>'tsacinv::user',
+    #            vjointo       =>'tsacinv::user',
+    #            vjoinon       =>['ownerid'=>'lempldeptid'],
+    #            vjoindisp     =>'fullname')
    );
    $self->{use_distinct}=0;
    $self->setDefaultView(qw(name applid usage conumber assignmentgroup));

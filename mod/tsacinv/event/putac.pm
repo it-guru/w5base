@@ -731,8 +731,10 @@ sub TransferFile
       my $jobfile="$object/$jobname";
       msg(INFO,"Processing  job : '%s'",$jobfile);
       msg(INFO,"Processing  file: '%s'",$filename);
-      if (!$ftp->Put($filename,$jobfile)){
-         msg(ERROR,"File $filename to $jobfile could not be transfered");
+      if (1){
+         if (!$ftp->Put($filename,$jobfile)){
+            msg(ERROR,"File $filename to $jobfile could not be transfered");
+         }
       }
       unlink($filename);
       $ftp->Disconnect();
