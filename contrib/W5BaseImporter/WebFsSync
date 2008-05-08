@@ -807,7 +807,7 @@ sub readLocalDescList
                          mdatestamp => "$mdatestamp",
                         });
          }elsif(!(-l "$dir/$file") && $file ne "."
-                && $file ne ".." ){
+                && $file ne ".." && -s "$dir/$file"){
             push(@$lobj,{entrytyp    => 'file',
                          fullname    => "$fullname/$file",
                          name        => "$file",
@@ -816,6 +816,14 @@ sub readLocalDescList
                         });
          }elsif(-l "$dir/$file"){
             push(@$lobj,{entrytyp    => 'link',
+                         fullname    => "$fullname/$file",
+                         name        => "$file",
+                         mdatestamp  => "$mdatestamp",
+                         mdate       => "$mdate",
+                        });
+         }elsif(-z "$dir/$file" && !(-l "$dir/$file")
+                && $file ne "." && $file ne ".."){
+            push(@$lobj,{entrytyp    => 'zerofile',
                          fullname    => "$fullname/$file",
                          name        => "$file",
                          mdatestamp  => "$mdatestamp",
@@ -845,7 +853,8 @@ sub calculateOperations
       my $found=0;
       foreach my $lfile (@$reflobj){
          if ($mode eq "upload"){
-            if ($lfile->{'fullname'} eq $rfile->{'fullname'}){
+            if ($lfile->{'fullname'} eq $rfile->{'fullname'} &&
+               $lfile->{'entrytyp'} ne "zerofile"){
                $found=1;
             }
          }elsif($mode eq "download"){
@@ -901,7 +910,8 @@ sub calculateOperations
       foreach my $rfile (@$refrobj){
          $parentid=$rfile->{parentid};
          if ($mode eq "download"){
-            if ($lfile->{'fullname'} eq $rfile->{'fullname'}){
+            if ($lfile->{'fullname'} eq $rfile->{'fullname'} &&
+                $rfile->{'contentsize'} != 0){
                $found=1;  
             }
          }elsif($mode eq "upload"){
@@ -928,7 +938,7 @@ sub calculateOperations
                                          $lfile->{'fullname'},
                         DATA         => {fullname  => $lfile->{'fullname'},
                                          name      => $lfile->{'name'}}});
-      }elsif($found == 0 && $mode eq "upload"){
+      }elsif($found == 0 && $mode eq "upload" && $lfile->{'entrytyp'} ne "zerofile"){
          $parentid=$pid if ($parentid eq "");
          push(@$oplist,{OP          => 'insert',
                        DATAOBJALIAS => 'filemgmt',
@@ -942,7 +952,7 @@ sub calculateOperations
                                         mdatestamp => $lfile->{'mdatestamp'},
                                         mdate      => $lfile->{'mdate'},
                                         file       => ''}});
-      }elsif($found == 2 && $mode eq "upload"){
+      }elsif($found == 2 && $mode eq "upload" && $lfile->{'entrytyp'} ne "zerofile"){
          push(@$oplist,{OP          => 'update',
                        DATAOBJALIAS => 'filemgmt',
                        IDENTIFYBY   => $lfile->{'entrytyp'}, 
@@ -955,6 +965,13 @@ sub calculateOperations
                                         parentid    => $parentid,
                                         name        => $lfile->{'name'},
                                         file        => $file}});
+      }elsif(($found == 2 || $found == 0) && $mode eq "upload"
+             && $lfile->{'entrytyp'} eq "zerofile"){
+         push(@$oplist,{OP          => 'info',
+                       DATAOBJALIAS => 'filemgmt',
+                       IDENTIFYBY   => 'file',
+                       MSG          => "file ".$lfile->{'fullname'}.
+                                       " has zero size, will be ignored!"});
       }
    }
    return(0);
@@ -972,7 +989,7 @@ sub processOperations
    my $ua=getUserAgent($Config);
    foreach my $rec (@$oplist){
       if ($rec->{IDENTIFYBY} eq "file" && ($rec->{OP} eq "update" || 
-          $rec->{OP} eq "insert")){
+          $rec->{OP} eq "insert" || $rec->{OP} eq "info")){
          if ($force && $mode eq "download"){
             my $req=$ua->get($rec->{DATA}->{file},
                     ':content_file' => "$ldir/".$rec->{DATA}->{fullname}.".tmp");
@@ -1001,6 +1018,8 @@ sub processOperations
                                                 parentid   =>  $rec->{DATA}->{parentid},
                                                 },
                                                $rec->{DATA}->{fid});
+            my @res=$o{'filemgmt'}->LastMsg();
+            return(1,$res[0]) if (defined($res[0]));
             # read modifydate from the stored record
             $o{'filemgmt'}->SetFilter({fid=>[$fid]});
             my @res=$o{'filemgmt'}->LastMsg();
@@ -1022,8 +1041,6 @@ sub processOperations
             }
          }
          $action=1;
-
-printf STDERR ("fifi process=%s\n",Dumper($rec));
          if ($stepit){
             $rec->{MSG}=~s/\//\\/g;
             &{$stepit}($mywin,"INFO: ".$rec->{MSG});
