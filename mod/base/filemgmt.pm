@@ -306,22 +306,6 @@ sub Validate
       }
    }
    
-   if (defined($newrec->{name}) || !defined($oldrec)){
-      trim(\$newrec->{name});
-      $newrec->{name}=~s/^.*[\\\/]//;
-      $newrec->{name}=UTF8toLatin1($newrec->{name});
-      if ($newrec->{name} eq "" ||
-          $newrec->{name} eq "W5Base" ||
-          $newrec->{name} eq "auth" ||
-          $newrec->{name} eq "public" ||
-          $newrec->{name}=~m/["'`]/ ||
-          !($newrec->{name}=~m/^[[:graph:]äöüÄÖÜß ]+$/i)){
-         $self->LastMsg(ERROR,"invalid filename '%s' specified",
-                        $newrec->{name});
-         return(undef);
-      }
-   }
-
    if (defined($newrec->{file}) && $newrec->{file} ne ""){
       if (!defined($oldrec) || $newrec->{realfile} eq "" ||
           $oldrec->{realfile} eq ""){
@@ -373,7 +357,8 @@ sub Validate
           $size,$atime,$mtime,$ctime,$blksize,$blocks)=stat($f);
       }
       if (!defined($f) || $size<=0){
-         $self->LastMsg(ERROR,sprintf($self->T("invalid file upload '%s($size)'"),$f));
+         $self->LastMsg(ERROR,
+                 sprintf($self->T("invalid file upload '%s($size)'"),$f));
          return(undef);
       }
       my $filename=$f;
@@ -410,6 +395,23 @@ sub Validate
    }
    if ($newrec->{file} eq "" && !defined($oldrec)){
       $newrec->{entrytyp}='dir' if (!defined($newrec->{entrytyp}));
+   }
+
+   if (defined($newrec->{name}) || !defined($oldrec)){
+      my $newname=$newrec->{name};
+      $newname=~s/^.*[\\\/]//;
+      $newname=trim(UTF8toLatin1($newrec->{name}));
+      $newrec->{name}=$newname;
+      if ($newrec->{name} eq "" ||
+          $newrec->{name} eq "W5Base" ||
+          $newrec->{name} eq "auth" ||
+          $newrec->{name} eq "public" ||
+          $newrec->{name}=~m/["'`]/ ||
+          !($newrec->{name}=~m/^[[:graph:]äöüÄÖÜß ]+$/i)){
+         $self->LastMsg(ERROR,"invalid filename '%s' specified",
+                        $newrec->{name});
+         return(undef);
+      }
    }
 
    return($self->SUPER::Validate($oldrec,$newrec,$origrec));
