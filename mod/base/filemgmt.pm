@@ -407,7 +407,7 @@ sub Validate
           $newrec->{name}=~m/^\.\./ ||
           $newrec->{name} eq "auth" ||
           $newrec->{name} eq "public" ||
-          $newrec->{name}=~m/["'`\/\\]/ ||
+          ($newrec->{name}=~m/["'`\/\\]/) ||
           !($newrec->{name}=~m/^[[:graph:]äöüÄÖÜß ]+$/i)){
          $self->LastMsg(ERROR,"invalid filename '%s' specified",
                         $newrec->{name});

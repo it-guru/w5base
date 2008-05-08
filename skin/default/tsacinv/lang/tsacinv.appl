@@ -16,3 +16,5 @@
 'Application is mangaged by rules of SOX'=>{de=>'Nach SOX Richtlinien zu betreuen'},
 'Criticality'=>{de=>'Kiritikalität'},
 'Priority'=>{de=>'Priorität'},
+'Application Maintenence Window'=>{de=>'Wartungsfenster'},
+'Account-Number'=>{de=>'Account-Nummer'},
