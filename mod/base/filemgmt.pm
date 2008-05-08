@@ -404,9 +404,10 @@ sub Validate
       $newrec->{name}=$newname;
       if ($newrec->{name} eq "" ||
           $newrec->{name} eq "W5Base" ||
+          $newrec->{name}=~m/^\.\./ ||
           $newrec->{name} eq "auth" ||
           $newrec->{name} eq "public" ||
-          $newrec->{name}=~m/["'`]/ ||
+          $newrec->{name}=~m/["'`\/\\]/ ||
           !($newrec->{name}=~m/^[[:graph:]äöüÄÖÜß ]+$/i)){
          $self->LastMsg(ERROR,"invalid filename '%s' specified",
                         $newrec->{name});
