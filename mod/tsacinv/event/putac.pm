@@ -305,6 +305,7 @@ sub ApplicationModified
                if (defined($acapplrec) && $acapplrec->{applid} ne ""){
                   $acftprec->{Appl}->{Code}=$acapplrec->{applid};
                   $acftprec->{Appl}->{ExternalID}=$rec->{id};
+                  $acftprec->{Appl}->{ExternalSystem}="W5Base";
                }
                else{
                   $acftprec->{Appl}->{ExternalSystem}="W5Base";
