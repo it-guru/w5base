@@ -179,25 +179,31 @@ sub ApplicationModified
                                       Appl_ExternalSystem=>'W5Base',
                                       Appl_ExternalID=>$rec->{id},
                                       Port_ExternalSystem=>'W5Base',
-                                      Port_ExternalID=>$rec->{systemid},
+                                      Port_ExternalID=>$lnk->{systemid},
                                       Security_Unit=>"TS.DE",
                                       Description=>$lnk->{shortdesc},
                                       bDelete=>'0',
                                       bActive=>'1',
-                                      Portfolio=>$lnk->{systemsystemid},
                                    }
                                };
-                   #
-                   # Workaround für AktiveBilling (Fachbereich Billing)
-                   #
-                   if (!($rec->{businessteam}=~m/\.BILLING/i)){
-                      $acftprec->{CI_APPL_REL}->{Usage}=$w52ac{$SysU};
-                   }
-                   my $fh=$fh{ci_appl_rel};
-                   print $fh hash2xml($acftprec,{header=>0});
-                   print $onlinefh hash2xml($acftprec,{header=>0});
-                   $SysCount++;
-                   $elements++;
+                  if ($lnk->{systemsystemid} ne ""){
+                     $acftprec->{Portfolio}=$lnk->{systemsystemid};
+                  }
+                  if ($rec->{applid} ne ""){
+                     $acftprec->{CI_APPL_REL}->{Application}=$rec->{applid};
+                  }    
+
+                  #
+                  # Workaround für AktiveBilling (Fachbereich Billing)
+                  #
+                  if (!($rec->{businessteam}=~m/\.BILLING/i)){
+                     $acftprec->{CI_APPL_REL}->{Usage}=$w52ac{$SysU};
+                  }
+                  my $fh=$fh{ci_appl_rel};
+                  print $fh hash2xml($acftprec,{header=>0});
+                  print $onlinefh hash2xml($acftprec,{header=>0});
+                  $SysCount++;
+                  $elements++;
                }
             }
             my $acapplrec;
@@ -266,7 +272,6 @@ sub ApplicationModified
                $ApplU=5  if (lc($rec->{mandator}) eq "extern");
                my $acftprec={
                                 Appl=>{
-                                   Customer=>"TS.DE",
                                    Security_Unit=>"TS.DE",
                                    Status=>"IN OPERATION",
                                    Priority=>$rec->{customerprio},
@@ -293,14 +298,25 @@ sub ApplicationModified
                if (!($rec->{businessteam}=~m/\.BILLING/i)){
                   $acftprec->{Appl}->{Usage}=$w52ac{$ApplU};
                   $acftprec->{Appl}->{Customer}='TS.DE';
+                  if ($rec->{customer}=~m/^DTAG.T-Com/i){
+                     $acftprec->{Appl}->{Customer}="DTAG, T-COM";
+                  }
                }
                if (defined($acapplrec) && $acapplrec->{applid} ne ""){
                   $acftprec->{Appl}->{Code}=$acapplrec->{applid};
+                  $acftprec->{Appl}->{ExternalSystem}="W5Base";
+                  $acftprec->{Appl}->{ExternalID}=$rec->{id};
                }
                else{
                   $acftprec->{Appl}->{ExternalSystem}="W5Base";
                   $acftprec->{Appl}->{ExternalID}=$rec->{id};
                }
+               if ((!exists($acftprec->{Appl}->{Code}) || 
+                     $acftprec->{Appl}->{Code} eq "") &&
+                   $rec->{applid} ne ""){
+                  $acftprec->{Appl}->{Code}=$rec->{applid};
+               }
+                    
                $acftprec->{Appl}->{Description}=~s/[\n\r]/ /g;
                $acftprec->{Appl}->{Version}=~s/[\n\r]/ /g;
                my $fh=$fh{appl};
@@ -333,6 +349,8 @@ sub ApplicationModified
                    if (defined($acapplrec) && $acapplrec->{applid} ne ""){
                       $acftprec->{APPL_APPL_REL}->{Parent_Appl}=
                                                  $acapplrec->{applid};
+                      $acftprec->{APPL_APPL_REL}->{P_Appl_ExternalSystem}='W5Base';
+                      $acftprec->{APPL_APPL_REL}->{P_Appl_ExternalID}=$rec->{id};
                    }
                    else{
                       $acftprec->{APPL_APPL_REL}->{P_Appl_ExternalSystem}='W5Base';
