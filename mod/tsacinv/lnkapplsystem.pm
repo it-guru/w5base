@@ -127,6 +127,13 @@ sub new
                 label         =>'Source-Id',
                 dataobjattr   =>'amtsirelportfappl.externalid'),
 
+      new kernel::Field::Date(
+                name          =>'srcload',
+                timezone      =>'CET',
+                group         =>'source',
+                label         =>'Source-Load',
+                dataobjattr   =>'amtsirelportfappl.dtimport'),
+
    );
    $self->setDefaultView(qw(id parent child));
    return($self);
@@ -160,7 +167,8 @@ sub getSqlFrom
 sub initSqlWhere
 {
    my $self=shift;
-   return("amtsirelportfappl.bdelete=0 and amportfolio.bdelete=0 and ".
+   return("amtsirelportfappl.bdelete=0 and ".
+          "amtsirelportfappl.bactive=1 and amportfolio.bdelete=0 and ".
           "amtsirelportfappl.lportfolioid=amportfolio.lportfolioitemid and ".
           "amportfolio.lportfolioitemid=amcomputer.litemid and ".
           "amcomputer.status<>'out of operation'");
