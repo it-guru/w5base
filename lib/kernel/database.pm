@@ -104,9 +104,6 @@ sub Connect
          msg(INFO,"schema on $dbname set: $schemacmd; for $parent");
       }
    }
-   if ($self->{dbconnect}=~m/^dbi:mysql:/i){
-      $self->do("set names latin1");
-   }
    #
    #  setting the DBI parameters for the created
    #  child session
