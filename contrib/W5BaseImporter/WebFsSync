@@ -335,9 +335,9 @@ sub doStart
    $mainwin->{rdir}=~s/^[\/\\]//g;
    $mainwin->{o}{'filemgmt'}->SetFilter({fullname=>$mainwin->{rdir},
                                         parentobj=>undef}); 
+   my @rdirid=$mainwin->{o}{'filemgmt'}->getHashList(qw(fid fullname name));
    my @res=$mainwin->{o}{'filemgmt'}->LastMsg();
    return(1,$res[0]) if (defined($res[0]));
-   my @rdirid=$mainwin->{o}{'filemgmt'}->getHashList(qw(fid fullname name));
 
    $mainwin->pgbar->SetPos(150);
    if ($#rdirid == 0){
@@ -608,12 +608,12 @@ if ($os eq "MSWin32" && !$nogui){
    }
    $rdir=~s/^[\/\\]//g;
    $o{'filemgmt'}->SetFilter({fullname=>"$rdir",parentobj=>undef}); 
+   my @rdirid=$o{'filemgmt'}->getHashList(qw(fid fullname name));
    my @res=$o{'filemgmt'}->LastMsg();
    if (defined($res[0])){  
       msg(ERROR,$res[0]);  
       exit(1);
    }
-   my @rdirid=$o{'filemgmt'}->getHashList(qw(fid fullname name));
    if ($mode eq "download"){ 
       msg(INFO,"mode -> download");
       if ($#rdirid == 0){
@@ -686,9 +686,9 @@ sub directoryLoop
    # create remote directory
    if ($mode eq "upload"){
       $o{'filemgmt'}->SetFilter({fid=>[$parentid]});
+      my @sum=$o{'filemgmt'}->getHashList(qw(ALL));
       my @res=$o{'filemgmt'}->LastMsg();
       return(1,$res[0]) if (defined($res[0]));
-      my @sum=$o{'filemgmt'}->getHashList(qw(ALL));
       if ($#sum == -1 ){
          $action=1;
          if ($force){
@@ -705,7 +705,7 @@ sub directoryLoop
    if ($result[0] != 0){
       return(1,$result[1]);
    }
-   my @result=readLocalDescList($fullname,\@lobj,$force,$stepit,$mywin);
+   @result=readLocalDescList($fullname,\@lobj,$force,$stepit,$mywin);
    if ($result[0] != 0){
       return(1,$result[1]);
    }
@@ -756,9 +756,19 @@ sub directoryLoop
       # delete remote files/folder
       }elsif($operations->{OP} eq "delete" && $mode eq "upload"){
          if ($force){
-            $o{'filemgmt'}->deleteRecord($operations->{DATA}->{fid});
+            $o{'filemgmt'}->SetFilter({fid=>[$operations->{DATA}->{fid}]});
+            my @entrytyp=$o{'filemgmt'}->getHashList(qw(name entrytyp));
             my @res=$o{'filemgmt'}->LastMsg();
             return(1,$res[0]) if (defined($res[0]));
+            # delete directory
+            if ($entrytyp[0]->{entrytyp} eq "dir"){
+               reverseDelete($operations->{DATA}->{fid});
+            # delete file
+            }else{
+               $o{'filemgmt'}->deleteRecord($operations->{DATA}->{fid});
+               my @res=$o{'filemgmt'}->LastMsg();
+               return(1,$res[0]) if (defined($res[0]));
+            }
          }
          $action=1;
          if ($stepit){
@@ -769,6 +779,24 @@ sub directoryLoop
          }
       }
    }
+   return(0);
+}
+
+sub reverseDelete
+{
+   my $parentid=shift;
+   $o{'filemgmt'}->SetFilter({parentid=>[$parentid]});
+   my @files=$o{'filemgmt'}->getHashList(qw(fid entrytyp));
+   foreach my $file (@files){
+      if ($file->{entrytyp} eq "dir"){
+         reverseDelete($file->{fid});
+      } 
+      $o{'filemgmt'}->deleteRecord($file->{fid});
+   }
+   $o{'filemgmt'}->deleteRecord($parentid);
+   my @res=$o{'filemgmt'}->LastMsg();
+   return(1,$res[0]) if (defined($res[0]));
+   return(0);
 }
 
 sub readRemoteDescList
@@ -779,9 +807,9 @@ sub readRemoteDescList
    my $mywin=shift;
    if ($parentid){
       $o{'filemgmt'}->SetFilter({parentid=>[$parentid]});
+      @$robj=$o{'filemgmt'}->getHashList(qw(ALL));
       my @res=$o{'filemgmt'}->LastMsg();
       return(1,$res[0]) if (defined($res[0]));
-      @$robj=$o{'filemgmt'}->getHashList(qw(ALL));
    }
    # change timestamp from mdate in a unixtimestamp
    foreach my $rec (@$robj){
@@ -1070,6 +1098,7 @@ sub processOperations
          }
       }
    }
+   return(0);
 }
 
 sub action
