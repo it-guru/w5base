@@ -32,6 +32,7 @@ sub new
    my $o=$param{o};
    my $force=$param{-force};
    my $nowarn=$param{-nowarn};
+   my $apidebug=$param{-apidebug};
    my $mode=$param{-mode};
    my $params=$param{-params};
    my $version=$param{-version};
@@ -64,6 +65,7 @@ sub new
    $self->{ldir}=$ldir;
    $self->{force}=$force;
    $self->{nowarn}=$nowarn;
+   $self->{apidebug}=$apidebug;
    $self->{fullstoredfilename}=$fullstoredfilename;
    $self->{PARAM}=$params;
    $self->{VERSION}=$version;
@@ -104,7 +106,7 @@ sub new
           -bitmap       => $self->{BITMAP},
           -size   => [200,200],
    );
-   $self->{GRID}->add($self->pic,10,6,"right top");
+   $self->{GRID}->add($self->pic,10,6,"right center");
    $self->AddGroupbox( 
            -name => "header", 
            -size => [100,100],
@@ -203,7 +205,7 @@ sub new
           -height    => 20,
           -tabstop=> 1,
    );
-   $self->{GRID}->add($self->base, [8..9], 8, "justify top");
+   $self->{GRID}->add($self->base, [8..10], 8, "justify top");
    $self->AddGroupbox( 
           -name => "connectdata", 
           -text => "connect data",
@@ -306,7 +308,7 @@ sub doStart
    my $Config=main::createConfig(${$mainwin->{PARAM}->{'base=s'}},
                                  ${$mainwin->{PARAM}->{'webuser=s'}},
                                  ${$mainwin->{PARAM}->{'webpass=s'}},
-                                 0,0,\$exitcode,\$msgs);
+                                 0,$mainwin->{apidebug},\$exitcode,\$msgs);
    if (!$Config){
       eval("Win32::MsgBox(\"login error: \$msgs\",Win32::MB_ICONQUESTION|0, 'Error!')");   
       $mainwin->run->Enable(1);
@@ -330,12 +332,13 @@ sub doStart
    }
 
    # looking for remote directory
+   $mainwin->{rdir}=~s/^[\/\\]//g;
    $mainwin->{o}{'filemgmt'}->SetFilter({fullname=>$mainwin->{rdir},
                                         parentobj=>undef}); 
    my @res=$mainwin->{o}{'filemgmt'}->LastMsg();
    return(1,$res[0]) if (defined($res[0]));
    my @rdirid=$mainwin->{o}{'filemgmt'}->getHashList(qw(fid fullname name));
-   # mode download
+
    $mainwin->pgbar->SetPos(150);
    if ($#rdirid == 0){
       $mainwin->output->Append("done\r\nmode -> ".$mainwin->{mode}.
@@ -380,6 +383,7 @@ sub StepIt
    if ($self->warnings->GetCheck() == 0 and substr($text,0,4) eq "WARN"){
       return(0); 
    } 
+   $text=main::encode("iso-8859-1",$text);
    $self->output->Append($text."\r\n") if ($text);
    $self->DoEvents();
 }
@@ -526,7 +530,10 @@ use Config;
 use utf8;
 use Encode;
 use Unicode::String qw(utf8 latin1 utf16);
+use Data::HexDump;
+
 use vars qw($GUI $Window);
+
 
 my $DefaultBase="https://w5base.net/w5base/auth/";
 my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang,$admin);
@@ -545,6 +552,7 @@ my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
 $|=1;
 my $storefile=".websync";
 XGetOptions(\%P,\&Help,undef,undef,"$storefile",noautologin=>1);
+my $apidebug=$verbose>=3 ? 1 : 0;
 
 # set defaults
 $mode="download" if (!defined($mode));
@@ -582,6 +590,7 @@ if ($os eq "MSWin32" && !$nogui){
                         -rdir=>$rdir,
                         -ldir=>$ldir,
                         -nowarn=>$nowarn,
+                        -apidebug=>$apidebug,
                         -fullstoredfilename=>$fullstoredfilename,
                         -params=>\%P,
                         -force=>$force);
@@ -590,7 +599,6 @@ if ($os eq "MSWin32" && !$nogui){
    msg(ERROR,"--gui only on windows systems \n $@") if ($@);
 }else{
    # create connection config
-   my $apidebug=$verbose>=3 ? 1 : 0;
    my $Config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug);
    my $directorycount=0;
    my @result=moduleObj($Config);
@@ -598,7 +606,7 @@ if ($os eq "MSWin32" && !$nogui){
       msg(ERROR,$result[1]);  
       exit(1);
    }
-   
+   $rdir=~s/^[\/\\]//g;
    $o{'filemgmt'}->SetFilter({fullname=>"$rdir",parentobj=>undef}); 
    my @res=$o{'filemgmt'}->LastMsg();
    if (defined($res[0])){  
@@ -724,6 +732,7 @@ sub directoryLoop
             return(1,$result[1]);
          }
       }
+      # delete local files/folder
       if ($operations->{OP} eq "delete" && $mode eq "download"){
          if ($force && -d "$ldir/".$operations->{DATA}->{fullname} &&
              !(-l "$ldir/".$operations->{DATA}->{fullname})){
@@ -744,6 +753,7 @@ sub directoryLoop
          }else{
             msg(INFO,$operations->{MSG});
          }
+      # delete remote files/folder
       }elsif($operations->{OP} eq "delete" && $mode eq "upload"){
          if ($force){
             $o{'filemgmt'}->deleteRecord($operations->{DATA}->{fid});
@@ -782,6 +792,8 @@ sub readRemoteDescList
             $$rec{mdatestamp}=mktime($time[5],$time[4],$time[3],
                                $time[2],$time[1],$time[0]-1900,0,0,-1);
          }
+         $$rec{fullname}=encode("iso-8859-1",$$rec{fullname});
+         $$rec{name}=encode("iso-8859-1",$$rec{name});
       }
    }
    return(0);
@@ -794,15 +806,16 @@ sub readLocalDescList
    my $force=shift;
    my $stepit=shift;
    my $mywin=shift;
+   $ldir=~s/$fullname*[\\\/]?$//g;
    my $dir="$ldir/$fullname";
+   
    local *FH;
    if (opendir(FH,"$dir")){
       while (defined(my $file=readdir(FH)))
       {
-printf STDERR ("fifi file=%s\n",Dumper($file));
-if (-e "$dir/$file"){
-printf STDERR ("fifi filein=%s\n",$file);
-}
+         $dir=encode("iso-8859-1",$dir);
+         $fullname=encode("iso-8859-1",$fullname);
+         $file=encode("iso-8859-1",$file);
          &{$stepit}($mywin) if ($stepit);
          my $mdatestamp=(stat("$dir/$file"))[9];
          my $mdate=strftime("%Y-%m-%d %H:%M:%S",localtime($mdatestamp));
@@ -849,7 +862,6 @@ sub calculateOperations
 {
    my $refrobj=shift;
    my $reflobj=shift;
-#printf STDERR ("fifi oplist=%s\n",Dumper($reflobj));
    my $oplist=shift;
    my $mode=shift;
    my $pid=shift;
@@ -1026,12 +1038,13 @@ sub processOperations
                                                 parentid   =>  $rec->{DATA}->{parentid},
                                                 },
                                                $rec->{DATA}->{fid});
-            my @res=$o{'filemgmt'}->LastMsg();
-            return(1,$res[0]) if (defined($res[0]));
             # read modifydate from the stored record
             $o{'filemgmt'}->SetFilter({fid=>[$fid]});
             my @res=$o{'filemgmt'}->LastMsg();
-            return(1,$res[0]) if (defined($res[0]));
+            if (defined($res[0]) && $stepit){
+               &{$stepit}($mywin,$res[0]);
+               next;
+            }
             my @mdate=$o{'filemgmt'}->getHashList(qw(mdate));
             return(1,"record fid=$fid not found!") if ($#mdate != 0);
 
@@ -1068,22 +1081,6 @@ sub action
       return(1);
    }
 }
-
-sub UTF8toLatin1
-{
-   my $dd=shift;
-   if ($dd=~m/\xC3/){
-      utf8::decode($dd);
-   }
-   if (utf8::is_utf8($dd)){
-      utf8::downgrade($dd,1);
-      $dd=~s/\x{201e}/"/g;
-      decode_utf8($dd,0);
-      $dd=encode("iso-8859-1", $dd);
-   }
-   return($dd);
-}
-
 
 # help menu
 sub Help
