@@ -82,6 +82,15 @@ sub new
                 name          =>'databossid',
                 dataobjattr   =>'appl.databoss'),
 
+      new kernel::Field::TextDrop(
+                name          =>'sememail',
+                label         =>'Databoss E-Mail',
+                searchable    =>0,
+                htmldetail    =>0,
+                vjointo       =>'base::user',
+                vjoinon       =>['databossid'=>'userid'],
+                vjoindisp     =>'email'),
+
       new kernel::Field::Link(
                 name          =>'servicesupportid',
                 dataobjattr   =>'appl.servicesupport'),

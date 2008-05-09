@@ -7,6 +7,7 @@
 'active systemids'=>{de=>'aktive SystemIDs'},
 'you are only authorized to add in \'order\' or \'reserved\' state'=>{de=>'Sie sind nur berechtig, im Status \'angefordert\' oder \'reserviert\' Datensätze zu erzeugen'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
+'Databoss E-Mail'=>{de=>'Datenverantwortlicher E-Mail'},
 'Deputy Service Manager'=>{de=>'Service Manager Vertreter'},
 'Deputy Technical Solution Manager'=>{de=>'TSM Vertreter'},
 'Application Group'=>{de=>'Anwendungsgruppe'},
