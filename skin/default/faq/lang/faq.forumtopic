@@ -15,4 +15,4 @@
 'icon.2'=>{de=>'sehr wichtige Information',en=>'very important information'},
 'Views'=>{de=>'Gelesen'},
 'no valid comments'=>{de=>'kein gültiger Text eingegeben'},
-
+'foboardansw'=>{de=>'information bei Antworten auf dem Board',en=>'info on answer to any topic in this board'},
