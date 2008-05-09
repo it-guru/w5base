@@ -100,7 +100,7 @@ sub help
                        \%h   hour
                        \%m   minute
                        \%s   second
-                       \%w   week
+                       \%w   week  (is like shell command 'date +%V')
                        \%db  database
 EOF
       exit(1);                    
