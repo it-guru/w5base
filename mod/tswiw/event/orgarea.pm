@@ -45,6 +45,7 @@ sub Init
 sub UpdateOrgareaStructure
 {
    my $self=shift;
+   my $app=$self->getParent();
    $self->{SRCSYS}="WhoIsWho";
    my $account=shift;
    msg(DEBUG,"Verify orgarea structure of account '%s'",$account);
@@ -192,6 +193,30 @@ sub UpdateOrgareaStructure
 
    if (!defined($account) || $account eq ""){
       $grpuser->SetFilter(srcsys=>\$self->{SRCSYS},       # (8 Wochen)
+                          srcload=>"<now-7d");           # übergang = 7 Tage
+      $grpuser->SetCurrentView(qw(ALL));
+      my ($rec,$msg)=$grpuser->getFirst();
+      if (defined($rec)){
+         do{
+            if ($rec->{expiration} eq ""){
+               my $exp="now+21d";
+               $exp=$app->ExpandTimeExpression($exp,"en","GMT","GMT");
+               $grpuser->ValidatedUpdateRecord($rec,{expiration=>$exp,
+                                               roles=>$rec->{roles}},
+                                               {userid=>\$rec->{userid}});
+            }
+            ($rec,$msg)=$grpuser->getNext();
+         }until(!defined($rec));
+      }
+      else{
+         if (defined($msg)){
+            msg(ERROR,"LDAP cleanup problem:%s",$msg);
+         }
+      }
+
+
+
+      $grpuser->SetFilter(srcsys=>\$self->{SRCSYS},       # (8 Wochen)
                           srcload=>"<now-56d");           # übergang = 56 Tage
       $grpuser->SetCurrentView(qw(ALL));
       my ($rec,$msg)=$grpuser->getFirst();
@@ -243,6 +268,7 @@ sub addGrpLinkToUser
             }
          }
          my %newlnk=(roles=>[@newroles,@{$lnkrec->{roles}}],
+                     expiration=>undef,
                      srcsys=>$self->{SRCSYS},
                      srcid=>"none",
                      srcload=>$nowstamp);
@@ -255,6 +281,7 @@ sub addGrpLinkToUser
                      roles=>$roles,
                      srcsys=>$self->{SRCSYS},
                      srcload=>$nowstamp,
+                     expiration=>undef,
                      grpid=>$grpid2add);
          #printf STDERR ("fifi try to create lnk %s\n",Dumper(\%newlnk));
          my $back=$grpuser->ValidatedInsertRecord(\%newlnk);

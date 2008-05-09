@@ -852,7 +852,7 @@ sub browser
             $fm->SetFilter({'parentid'=>[$target->{fid}],fid=>\@oldval});
             $fm->SetCurrentView(qw(ALL));
             $fm->ForeachFilteredRecord(sub{
-                                          $fm->ValidatedDeleteRecord($_);
+                                          $fm->SecureValidatedDeleteRecord($_);
                                        });
          }
          $fm->ResetFilter();
