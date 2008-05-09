@@ -104,7 +104,7 @@ sub new
    $self->AddLabel(
           -name         => "pic",
           -bitmap       => $self->{BITMAP},
-          -size   => [200,200],
+          -size         => [200,200],
    );
    $self->{GRID}->add($self->pic,10,6,"right center");
    $self->AddGroupbox( 
@@ -136,27 +136,28 @@ sub new
            -text      => $ldir,
            -width     => 130,
            -height    => 20,
-           -tabstop     => 1,
+           -tabstop   => 1,
    );
    $self->{GRID}->add($self->localpath, 3,8,"justify top");
    $self->AddButton(
            -name     => "loadpath",
            -text     => "...",
-           -disabled  => 0,
+           -disabled => 0,
            -onClick  => \&OpenFile, 
    );
    $self->{GRID}->add($self->loadpath,4,8,"justify top");
    $self->AddCheckbox(
            -name     => "writedata",
            -text     => "write Data",
-           -tabstop     => 1,
+           -checked  => 1,
+           -tabstop  => 1,
    );
    $self->{GRID}->add($self->writedata,3,[10..11],"left top");
    $self->AddCheckbox(
            -name     => "warnings",
            -text     => "Warnings on",
            -checked  => 1,
-           -tabstop     => 1,
+           -tabstop  => 1,
    );
    $self->{GRID}->add($self->warnings,3,[10..11],"right top");
    $self->AddGroupbox( 
