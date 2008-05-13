@@ -67,6 +67,7 @@ use kernel::Field::QualityText;
 use kernel::Field::QualityState;
 use kernel::Field::QualityOk;
 use kernel::Field::QualityLastDate;
+use kernel::Field::QualityResponseArea;
 use kernel::Field::Fulltext;
 use kernel::Universal;
 @ISA    = qw(kernel::Universal);

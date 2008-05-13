@@ -26,6 +26,7 @@
 'Source-System'          =>{de=>'Quellsystem' },
 'Source-Id'              =>{de=>'ID im Quellsystem' },
 'Quality Check State'    =>{de=>'Quality Check Status' },
+'Quality Response Area'  =>{de=>'Quality verantwortlicher Bereich' },
 'Source-Load'            =>{de=>'letzter Quellsystem load' },
 'fieldgroup.source'      =>{de=>'Quellinformationen',en=>'Sourceinformations' },
 'fieldgroup.attachments' =>{de=>'Datei-Anlagen',     en=>'File-Attachments'},

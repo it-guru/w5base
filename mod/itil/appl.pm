@@ -654,6 +654,7 @@ sub new
       new kernel::Field::QualityOk(),
       new kernel::Field::QualityLastDate(
                 dataobjattr   =>'appl.lastqcheck'),
+      new kernel::Field::QualityResponseArea()
    );
    $self->{history}=[qw(insert modify delete)];
    $self->{workflowlink}={ workflowkey=>[id=>'affectedapplicationid']
