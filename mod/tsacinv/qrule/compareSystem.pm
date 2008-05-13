@@ -240,8 +240,10 @@ sub qcheckRecord
    }
    else{
       push(@qmsg,'no systemid specified');
-      push(@dataissue,'no systemid specified');
-      $errorlevel=3 if ($errorlevel<3);
+      if (!($rec->{isworkstation})){
+         push(@dataissue,'no systemid specified');
+         $errorlevel=3 if ($errorlevel<3);
+      }
    }
 
 
