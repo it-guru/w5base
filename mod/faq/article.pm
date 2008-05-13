@@ -407,6 +407,22 @@ sub FullView
    print("</form></body></html>");
 }
 
+sub ById
+{
+   my ($self)=@_;
+   my $idfield=$self->IdField();
+   my $idname=$idfield->Name();
+   my $val="undefined";
+   if (defined(Query->Param("FunctionPath"))){
+      $val=Query->Param("FunctionPath");
+   }
+   $val=~s/^\///;
+   $val="UNDEF" if ($val eq "");
+   $self->HtmlGoto("../Detail",post=>{$idname=>$val,
+                                      ModeSelectCurrentMode=>'FullView'});
+   return();
+}
+
 
 
 
