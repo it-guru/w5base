@@ -8,6 +8,8 @@ This qulaity rule compares a W5Base logical system to an AssetCenter logical
 system and updates on demand nessasary fields.
 Unattended Imports are only done, if the field "Allow automatic interface
 updates" is set to "yes".
+If a logical system is a workstation, no DataIssue Workflow is started on
+a missing systemid.
 
 =head3 IMPORTS
 
