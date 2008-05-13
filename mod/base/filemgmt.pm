@@ -400,7 +400,7 @@ sub Validate
    if (defined($newrec->{name}) || !defined($oldrec)){
       my $newname=$newrec->{name};
       $newname=~s/^.*[\\\/]//;
-      $newname=trim(UTF8toLatin1($newrec->{name}));
+      $newname=trim(UTF8toLatin1($newname));
       $newrec->{name}=$newname;
       if ($newrec->{name} eq "" ||
           $newrec->{name} eq "W5Base" ||
@@ -408,7 +408,7 @@ sub Validate
           $newrec->{name} eq "auth" ||
           $newrec->{name} eq "public" ||
           ($newrec->{name}=~m/["'`\/\\]/) ||
-          !($newrec->{name}=~m/^[[:graph:]äöüÄÖÜß ]+$/i)){
+          !($newrec->{name}=~m/^[[:graph:]äöüÄÖÜß \.]+$/i)){
          $self->LastMsg(ERROR,"invalid filename '%s' specified",
                         $newrec->{name});
          return(undef);
