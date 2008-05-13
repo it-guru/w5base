@@ -132,7 +132,10 @@ sub getSalutation
    my $salutation;
    my $info;
    my $st;
- 
+   $ag="\"$ag\"";
+   if (length($ag) > 16){
+       $ag="<br>$ag";
+   }
    my $eventstat=$WfRec->{stateid};
    my $eventstart=$WfRec->{eventstartofevent};
    my $utz=$self->getParent->UserTimezone();
@@ -155,14 +158,14 @@ EOF
       $salutation=<<EOF;
 Sehr geehrte Kundin, sehr geehrter Kunde,
 
-die Beeinträchtigung im Umfeld der AG "$ag" wurde beseitigt.
+die Beeinträchtigung im Umfeld der AG $ag wurde beseitigt.
 EOF
    }elsif($WfRec->{eventmode} eq "EVk.appl"){
       $salutation=<<EOF;
 Sehr geehrte Damen und Herren,
 
 im Folgenden erhalten Sie den aktuellen Stand zum Ereignis
-der Anwendung '$ag' vom $creationtime.
+der Anwendung $ag vom $creationtime.
 EOF
    }elsif ($WfRec->{eventmode} eq "EVk.net" && $eventstat==17){
       $salutation=<<EOF;
@@ -255,7 +258,6 @@ sub generateMailSet
    my $mailsep=0;
    $mailsep="$lang:" if ($#emailsep!=-1); 
    $ENV{HTTP_FORCE_LANGUAGE}=$lang;
-printf STDERR ("fifi %s \n\n\n\n",Dumper(\@baseset));
 
    my @fields=@{shift(@sets)};
    foreach my $field (@fields){
