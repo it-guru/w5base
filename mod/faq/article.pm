@@ -419,7 +419,7 @@ sub ById
    $val=~s/^\///;
    $val="UNDEF" if ($val eq "");
    $self->HtmlGoto("../Detail",post=>{$idname=>$val,
-                                      ModeSelectCurrentMode=>'FullView'});
+                                      ModeSelectCurrentMode=>'FView'});
    return();
 }
 
