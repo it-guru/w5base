@@ -190,6 +190,7 @@ sub FinishWrite
    my $newrec=shift;
    my $id=effVal($oldrec,$newrec,"id");
    my $toid=effVal($oldrec,$newrec,"forumtopic");
+   my $userid=$self->getCurrentUserId();
 
    if (!defined($oldrec)){   # call only if new rec
       my $url=$ENV{SCRIPT_URI};
@@ -200,6 +201,21 @@ sub FinishWrite
       $openurl.="/auth/faq/forum/Topic/$toid";
       $url.="?OpenURL=$openurl";
       my $lang=$self->Lang();
+
+      {  # add infoabo for creator
+         my $ia=getModuleObject($self->Config,"base::infoabo");
+         $ia->ValidatedInsertOrUpdateRecord(
+                                {parentobj=>'faq::forumtopic',
+                                 active=>'1',
+                                 mode=>'foaddentry',
+                                 refid=>$toid,
+                                 userid=>$userid},
+                                {parentobj=>\'faq::forumtopic',
+                                 mode=>\'foaddentry',
+                                 refid=>\$toid,
+                                 userid=>\$userid});
+      }
+
     
       my %p=(eventname=>'forumaddentrymail',
              spooltag=>'forumaddmail-'.$id,
