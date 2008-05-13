@@ -165,11 +165,13 @@ sub nativQualityCheck
             if (defined($control) && defined($control->{dataissue})){
                my $dataissuemsg=$control->{dataissue};
                $dataissuemsg=[$dataissuemsg] if (ref($dataissuemsg) ne "ARRAY");
-               my $qrulename=$qrule->Self();
-               if (!defined($alldataissuemsg{$qrulename})){
-                  $alldataissuemsg{$qrulename}=[];
+               if ($#{$dataissuemsg}!=-1){
+                  my $qrulename=$qrule->Self();
+                  if (!defined($alldataissuemsg{$qrulename})){
+                     $alldataissuemsg{$qrulename}=[];
+                  }
+                  push(@{$alldataissuemsg{$qrulename}},@{$dataissuemsg});
                }
-               push(@{$alldataissuemsg{$qrulename}},@{$dataissuemsg});
             }
             if (defined($control) && defined($control->{dataupdate})){
             }
