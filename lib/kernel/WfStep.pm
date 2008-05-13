@@ -271,8 +271,18 @@ sub Process
       }
       if ($op eq "wfmailsend"){    # default mailsending handling
          my $emailto=Query->Param("emailto");
-         my $note=Query->Param("emailmsg");
-         $note=trim($note);
+         my $shortnote=Query->Param("emailmsg");
+         $shortnote=trim($shortnote);
+         my $note=$shortnote;
+         if ($ENV{SCRIPT_URI} ne ""){
+            my $baseurl=$ENV{SCRIPT_URI};
+            $baseurl=~s#/(auth|public)/.*$##;
+            my $url=$baseurl;
+            $url.="/auth/base/workflow/ById/".$WfRec->{id};
+            $note.="\n\n\n".$self->T("Workflow Link").":\n";
+            $note.=$url;
+            $note.="\n\n";
+         }
          my $wf=$self->getParent->getParent();
          my $subject=$WfRec->{name};
          my $from='no_reply@w5base.net';
@@ -300,9 +310,10 @@ sub Process
             if ($wf->Store($id,%d)){
                $self->getParent->getParent->Action->StoreRecord(
                    $WfRec->{id},"wfmailsend",
-                   {translation=>'kernel::WfStep'},"\@:".$emailto."\n\n".$note);
+                   {translation=>'kernel::WfStep'},"\@:".
+                                 $emailto."\n\n".$shortnote);
                $self->PostProcess($action.".".$op,$WfRec,$actions,
-                                  note=>$note);
+                                  note=>$shortnote);
                Query->Delete("OP");
                Query->Delete("emailto");
                Query->Delete("emailmsg");

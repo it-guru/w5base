@@ -718,7 +718,7 @@ sub HandleHistory
    }
    my $h=$self->getPersistentModuleObject("History","base::history");
    if (defined($h)){
-      my $dataobject=$self->Self;
+      my $dataobject=$self->SelfAsParentObject();
       my $idname=$self->IdField->Name();
       my $id=effVal($oldrec,$newrec,$idname);
       $h->ValidatedInsertRecord({name=>$field,

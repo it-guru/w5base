@@ -126,8 +126,8 @@ sub HistoryResult
             if ($h->validateSearchQuery()){
                $h->ResetFilter();
                my %q=$h->getSearchHash();
-               my $dataobject=$self->Self;
-               $q{dataobject}=\$dataobject;
+               my $dataobject=[$self->Self,$self->SelfAsParentObject()];
+               $q{dataobject}=$dataobject;
                $q{dataobjectid}=\$dataobjectid;
                $q{name}=\@fields;
                my $listdate=Query->Param("ListTime");
