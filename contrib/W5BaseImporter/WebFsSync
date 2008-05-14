@@ -1081,7 +1081,6 @@ sub processOperations
                     Path        => $ldir.$sep.$rec->{DATA}->{fullname},
                     Filename    => $rec->{DATA}->{name},
                     Disposition => "attachment");
-           printf STDERR ($sendfile->stringify);
             my $fid=$o{'filemgmt'}->storeRecord({file      =>  $sendfile,
                                                 parentid   =>  $rec->{DATA}->{parentid},
                                                 },
