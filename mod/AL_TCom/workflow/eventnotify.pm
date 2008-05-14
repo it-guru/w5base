@@ -478,7 +478,7 @@ sub Process
    if ($action eq "NextStep"){
       return(undef) if (!$self->ValidActionCheck(1,$actions,"rootcausei"));
       my %em=();
-      $self->getParent->getNotifyDestinations("sendcustinfo",$WfRec,\%em);
+      $self->getParent->getNotifyDestinations("custinfo",$WfRec,\%em);
       my @emailto=sort(keys(%em));
       my $id=$WfRec->{id};
       $self->getParent->getParent->Action->ResetFilter();
