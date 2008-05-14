@@ -43,7 +43,6 @@ sub processData
 
    my $grp=getModuleObject($self->getParent->Config,"base::grp");
    $grp->SetFilter({cistatusid=>\"4"});
-   $grp->SetFilter({cistatusid=>\"4",fullname=>"*.st.* *.st"});
    $grp->SetCurrentView(qw(ALL));
    my ($rec,$msg)=$grp->getFirst();
    if (defined($rec)){
@@ -58,8 +57,6 @@ sub processData
    $wf->SetFilter([{eventend=>">=$month/$year AND <$month/$year+1M"},
                    {eventstart=>">=$month/$year AND <$month/$year+1M"},
                    {eventstart=>"<$month/$year",eventend=>">$month/$year+1M"}]);
-#   $wf->SetFilter([{eventend=>">=$month/$year AND <$month/$year+14d"},
-#                   {eventstart=>">=$month/$year AND <$month/$year+14d"}]);
    $wf->SetCurrentView(qw(ALL));
    $wf->SetCurrentOrder("eventstart");
    my $c=0;
@@ -67,11 +64,29 @@ sub processData
    my ($rec,$msg)=$wf->getFirst();
    if (defined($rec)){
       do{
-         $self->getParent->processRecord('base::workflow',$monthstamp,$rec);
+         $self->getParent->processRecord('base::workflow::active',
+                                         $monthstamp,$rec);
          $c++;
          ($rec,$msg)=$wf->getNext();
       } until(!defined($rec));
    }
+
+   $wf->ResetFilter();
+   $wf->SetFilter([{stateid=>"<20",fwdtarget=>'![EMPTY]'}]);
+   $wf->SetCurrentView(qw(ALL));
+   $wf->SetCurrentOrder("eventstart");
+   my $c=0;
+
+   my ($rec,$msg)=$wf->getFirst();
+   if (defined($rec)){
+      do{
+         $self->getParent->processRecord('base::workflow::notfinished',
+                                         $monthstamp,$rec);
+         $c++;
+         ($rec,$msg)=$wf->getNext();
+      } until(!defined($rec));
+   }
+
 
 }
 
@@ -101,6 +116,19 @@ sub processRecord
       $self->getParent->storeStatVar("Group",$name,{},"User",$userscount);
       $self->getParent->storeStatVar("Group",$name,{maxlevel=>0},
                                      "User.Direct",$userscount);
+   }
+   if ($module eq "base::workflow::notfinished"){
+      if ($rec->{class} eq "base::workflow::DataIssue"){
+         if (ref($rec->{responsibilityby}) eq "ARRAY"){
+            foreach my $resp (@{$rec->{responsibilityby}}){
+               if (my ($statgroup,$name)=$resp=~m/^(\S+)\s*:\s*(.+)$/){
+                  $self->getParent->storeStatVar($statgroup,$name,{},
+                                                 "base.DataIssue.open",1);
+               }
+            }
+         }
+         msg(DEBUG,"response %s\n",Dumper($rec->{responsibilityby}));
+      }
    }
 }
 

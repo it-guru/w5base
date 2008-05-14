@@ -539,7 +539,7 @@ sub Validate
    }
    my $fullname=effVal($oldrec,$newrec,"fullname");
    msg(INFO,"fullname=$fullname");
-   if ($fullname eq ""){
+   if ($fullname eq "" || ($fullname=~m/;/)){
       $self->LastMsg(ERROR,"invalid given or resulted fullname");
       return(0);
    }

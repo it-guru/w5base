@@ -68,7 +68,7 @@ sub processRecord
                                               $rec->{responseteam}],{},
                                      "ITIL.Application.Count",1);
    }
-   if ($module eq "base::workflow"){
+   if ($module eq "base::workflow::active"){
       my $countvar;
       $countvar="ITIL.Change.Finish.Count" if ($rec->{class}=~m/::change$/);
       $countvar="ITIL.Incident.Finish.Count" if ($rec->{class}=~m/::incident$/);

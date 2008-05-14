@@ -462,6 +462,13 @@ sub new
                 label         =>'Creator Name',
                 dataobjattr   =>'wfhead.openusername'),
 
+      new kernel::Field::Text(
+                name          =>'responsibilityby',
+                group         =>'state',
+                label         =>'W5Stat Responsibility by',
+                onRawValue    =>\&calcResponsibilityBy,
+                depend        =>['fwdtargetid','fwdtarget']),
+
       new kernel::Field::Link(
                 name          =>'openuser',
                 group         =>'state',
@@ -516,6 +523,44 @@ sub new
 
    return($self);
 }
+
+sub calcResponsibilityBy
+{
+   my $self=shift;
+   my $current=shift;
+   my $target=$current->{fwdtarget};
+   my $targetid=$current->{fwdtargetid};
+   return(undef) if ($target eq "" || $targetid eq "");
+   my @resp=();
+   my $u=$self->getParent->getPersistentModuleObject("UcalcResponsibilityBy",
+                                                        "base::user");
+   my $g=$self->getParent->getPersistentModuleObject("GcalcResponsibilityBy",
+                                                        "base::grp");
+   if ($target eq "base::user"){
+      $u->SetFilter({userid=>\$targetid,cistatusid=>[3,4]});
+      my ($rec,$msg)=$u->getOnlyFirst(qw(fullname groups));
+      if (defined($rec)){
+         push(@resp,"User: ".$rec->{fullname});
+         foreach my $grprec (sort({$a->{group} cmp $b->{group}}
+                                  @{$rec->{groups}})){
+            if (grep(/^(RBoss|REmployee|RBoss2)$/,@{$grprec->{roles}})){
+               push(@resp,"Group: ".$grprec->{group});
+            }
+         }
+      }
+   }
+   if ($target eq "base::grp"){
+      $g->SetFilter({grpid=>\$targetid,cistatusid=>[3,4]});
+      my ($rec,$msg)=$u->getOnlyFirst(qw(fullname));
+      if (defined($rec)){
+         push(@resp,"GROUP: ".$rec->{fullname});
+      }
+   }
+   push(@resp,"INVALID") if ($#resp==-1);
+
+   return(\@resp);
+}
+
 
 sub initSearchQuery
 {
