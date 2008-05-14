@@ -626,6 +626,7 @@ EOF
       }
    }
    my $BookmarkName=Query->Param("BookmarkName");
+   my $PostOrder=Query->Param("PostOrder");
    print(<<EOF);
 <tr><td><iframe class=result id=result 
                 name="Result" src="$welcomeurl"></iframe></td></tr>
@@ -635,6 +636,7 @@ EOF
 <input type=hidden name=FormatAs value="HtmlV01">
 <input type=hidden name=BookmarkName value="$BookmarkName">
 <input type=hidden name=CurrentView value="$CurrentView">
+<input type=hidden name=PostOrder value="$PostOrder">
 EOF
    print $self->HtmlBottom(body=>1,form=>1);
 }

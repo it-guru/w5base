@@ -22,7 +22,6 @@ use strict;
 use kernel;
 use kernel::Formater;
 use kernel::Universal;
-use Data::Dumper;
 use Fcntl 'SEEK_SET';
 
 @ISA=qw(kernel::Universal);
@@ -95,6 +94,28 @@ sub getLinenumber
    return($self->getParent->Context->{Linenumber});
 }
 
+sub getFirst
+{
+   my $self=shift;
+   if (Query->Param("PostOrder") ne ""){
+      return(undef); # PostOrder technologie isn't implemented at now
+   }
+
+   my ($rec,$msg)=$self->getParent->getFirst();
+
+   return($rec,$msg);
+}
+
+sub getNext
+{
+   my $self=shift;
+
+   my ($rec,$msg)=$self->getParent->getNext();
+
+   return($rec,$msg);
+}
+
+
 sub WriteToStdout
 {
    my $self=shift;
@@ -108,7 +129,7 @@ sub WriteToStdout
    my $fh=\*TMP;
    my ($rec,$msg);
    if (!$self->{NewRecord} && $self->Format->isRecordHandler()){
-      ($rec,$msg)=$self->getParent->getFirst();
+      ($rec,$msg)=$self->getFirst();
    }
    else{
       $rec=undef;
@@ -156,7 +177,7 @@ sub WriteToStdout
             $rec=undef;
          }
          else{
-            ($rec,$msg)=$self->getParent->getNext();
+            ($rec,$msg)=$self->getNext();
          }
       }until(!defined($rec));
       my $d=$self->Format->ProcessBottom(\$fh,undef,$msg,\%param);
@@ -206,7 +227,7 @@ sub WriteToScalar    # ToDo: viewgroups implementation
 
    my ($rec,$msg);
    if (!$self->{NewRecord} && $self->Format->isRecordHandler()){
-      ($rec,$msg)=$self->getParent->getFirst();
+      ($rec,$msg)=$self->getFirst();
    }
    else{
       $rec=undef;
@@ -257,7 +278,7 @@ sub WriteToScalar    # ToDo: viewgroups implementation
             $rec=undef;
          }
          else{
-            ($rec,$msg)=$self->getParent->getNext();
+            ($rec,$msg)=$self->getNext();
          }
       }until(!defined($rec));
       my $d=$self->Format->ProcessBottom(\$fh,undef,$msg);

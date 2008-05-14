@@ -46,8 +46,18 @@ sub onRawValue
    my $self=shift;
    my $current=shift;
    my $parent=$self->getParent();
-
+   my $c=$parent->Cache();
    my $d=undef;
+   if (!defined($c->{QualityResonseAreaObject})){
+      my $wf=getModuleObject($parent->Config,"base::workflow");
+      $c->{QualityResonseAreaObject}=$wf;
+   }
+   my $wf=$c->{QualityResonseAreaObject};
+   if (defined($wf)){
+      $wf->ResetFilter();
+     # $wf->SetFilter(
+
+   }
 
    return($d);
 }
