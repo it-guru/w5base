@@ -532,7 +532,6 @@ use utf8;
 use Encode;
 use Unicode::String qw(utf8 latin1 utf16);
 use Data::HexDump;
-
 use vars qw($GUI $Window);
 
 
@@ -662,6 +661,8 @@ sub directoryLoop
    my $stepit=shift;
    my $mywin=shift;
    my (@lobj,@robj,@oplist);
+   # if remote and local dir given change it to one dir
+   $ldir=~s/$fullname*[\\\/]?$//g;
    if ($directorycount > 100){
       return(1,"directory depth to high, greater than 100");
    }
@@ -835,7 +836,6 @@ sub readLocalDescList
    my $force=shift;
    my $stepit=shift;
    my $mywin=shift;
-   $ldir=~s/$fullname*[\\\/]?$//g;
    my $dir="$ldir/$fullname";
    
    local *FH;
@@ -848,37 +848,47 @@ sub readLocalDescList
          &{$stepit}($mywin) if ($stepit);
          my $mdatestamp=(stat("$dir/$file"))[9];
          my $mdate=strftime("%Y-%m-%d %H:%M:%S",localtime($mdatestamp));
-         if (-d "$dir/$file" && !(-l "$dir/$file") 
-             && $file ne "." && $file ne "..") {
-            push(@$lobj,{entrytyp   => 'dir',
-                         fullname   => "$fullname/$file",
-                         name       => "$file",
-                         mdatestamp => "$mdatestamp",
-                        });
-         }elsif(!(-l "$dir/$file") && $file ne "."
-                && $file ne ".." && -s "$dir/$file"){
-            push(@$lobj,{entrytyp    => 'file',
-                         fullname    => "$fullname/$file",
-                         name        => "$file",
-                         mdatestamp  => "$mdatestamp",
-                         mdate       => "$mdate",
-                        });
-         }elsif(-l "$dir/$file"){
-            push(@$lobj,{entrytyp    => 'link',
-                         fullname    => "$fullname/$file",
-                         name        => "$file",
-                         mdatestamp  => "$mdatestamp",
-                         mdate       => "$mdate",
-                        });
-         }elsif(-z "$dir/$file" && !(-l "$dir/$file")
-                && $file ne "." && $file ne ".."){
-            push(@$lobj,{entrytyp    => 'zerofile',
-                         fullname    => "$fullname/$file",
-                         name        => "$file",
-                         mdatestamp  => "$mdatestamp",
-                         mdate       => "$mdate",
-                        });
-         }      
+         if ($file ne "." && $file ne ".."){
+            if (-d "$dir/$file" && !(-l "$dir/$file")){
+               push(@$lobj,{entrytyp   => 'dir',
+                            fullname   => "$fullname/$file",
+                            name       => "$file",
+                            mdatestamp => "$mdatestamp",
+                           });
+            }elsif(open(IN,'>>'.$dir."/".$file)){
+               if((-f "$dir/$file") && (-s "$dir/$file") && (-r "$dir/$file")){
+                  push(@$lobj,{entrytyp    => 'file',
+                               fullname    => "$fullname/$file",
+                               name        => "$file",
+                               mdatestamp  => "$mdatestamp",
+                               mdate       => "$mdate",
+                              });
+               }elsif(-l "$dir/$file"){
+                  push(@$lobj,{entrytyp    => 'link',
+                               fullname    => "$fullname/$file",
+                               name        => "$file",
+                               mdatestamp  => "$mdatestamp",
+                               mdate       => "$mdate",
+                              });
+               }elsif(-z "$dir/$file" && (-f "$dir/$file")){
+                  push(@$lobj,{entrytyp    => 'zerofile',
+                               fullname    => "$fullname/$file",
+                               name        => "$file",
+                               mdatestamp  => "$mdatestamp",
+                               mdate       => "$mdate",
+                              });
+               }      
+            }else{
+                  push(@$lobj,{entrytyp    => 'permission',
+                               fullname    => "$fullname/$file",
+                               error       => "$!",
+                               name        => "$file",
+                               mdatestamp  => "$mdatestamp",
+                               mdate       => "$mdate",
+                              });
+            }
+            close(IN);
+         }
       }         
       closedir(FH);
    }else{
@@ -903,7 +913,8 @@ sub calculateOperations
       foreach my $lfile (@$reflobj){
          if ($mode eq "upload"){
             if ($lfile->{'fullname'} eq $rfile->{'fullname'} &&
-               $lfile->{'entrytyp'} ne "zerofile"){
+               $lfile->{'entrytyp'} ne "zerofile"
+               && $lfile->{'entrytyp'} ne "permission"){
                $found=1;
             }
          }elsif($mode eq "download"){
@@ -987,7 +998,8 @@ sub calculateOperations
                                          $lfile->{'fullname'},
                         DATA         => {fullname  => $lfile->{'fullname'},
                                          name      => $lfile->{'name'}}});
-      }elsif($found == 0 && $mode eq "upload" && $lfile->{'entrytyp'} ne "zerofile"){
+      }elsif($found == 0 && $mode eq "upload" && $lfile->{'entrytyp'} ne "zerofile" &&
+            $lfile->{'entrytyp'} ne "permission"){
          $parentid=$pid if ($parentid eq "");
          push(@$oplist,{OP          => 'insert',
                        DATAOBJALIAS => 'filemgmt',
@@ -1001,7 +1013,8 @@ sub calculateOperations
                                         mdatestamp => $lfile->{'mdatestamp'},
                                         mdate      => $lfile->{'mdate'},
                                         file       => ''}});
-      }elsif($found == 2 && $mode eq "upload" && $lfile->{'entrytyp'} ne "zerofile"){
+      }elsif($found == 2 && $mode eq "upload" && $lfile->{'entrytyp'} ne "zerofile" &&
+            $lfile->{'entrytyp'} ne "permission"){
          push(@$oplist,{OP          => 'update',
                        DATAOBJALIAS => 'filemgmt',
                        IDENTIFYBY   => $lfile->{'entrytyp'}, 
@@ -1021,6 +1034,11 @@ sub calculateOperations
                        IDENTIFYBY   => 'file',
                        MSG          => "file ".$lfile->{'fullname'}.
                                        " has zero size, will be ignored!"});
+      }elsif($lfile->{'entrytyp'} eq "permission"){
+         push(@$oplist,{OP          => 'info',
+                       DATAOBJALIAS => 'filemgmt',
+                       IDENTIFYBY   => 'file',
+                       MSG          => $lfile->{'fullname'}." ".$lfile->{'error'}});
       }
    }
    return(0);
@@ -1038,7 +1056,7 @@ sub processOperations
    my $ua=getUserAgent($Config);
    foreach my $rec (@$oplist){
       if ($rec->{IDENTIFYBY} eq "file" && ($rec->{OP} eq "update" || 
-          $rec->{OP} eq "insert" || $rec->{OP} eq "info")){
+          $rec->{OP} eq "insert")){
          if ($force && $mode eq "download"){
             my $req=$ua->get($rec->{DATA}->{file},
                     ':content_file' => "$ldir/".$rec->{DATA}->{fullname}.".tmp");
@@ -1062,6 +1080,7 @@ sub processOperations
                     Encoding    => "base64",
                     Path        => $ldir.$sep.$rec->{DATA}->{fullname},
                     Filename    => $rec->{DATA}->{name},
+                    Filename    => "l.xls",
                     Disposition => "attachment");
             my $fid=$o{'filemgmt'}->storeRecord({file      =>  $sendfile,
                                                 parentid   =>  $rec->{DATA}->{parentid},
@@ -1097,6 +1116,14 @@ sub processOperations
          }else{
             msg(INFO,$rec->{MSG});
          }
+      }elsif($rec->{OP} eq "info"){
+         if ($stepit){
+            $rec->{MSG}=~s/\//\\/g;
+            &{$stepit}($mywin,"WARN: ".$rec->{MSG});
+         }else{
+            msg(WARN,$rec->{MSG});
+         }
+
       }
    }
    return(0);
