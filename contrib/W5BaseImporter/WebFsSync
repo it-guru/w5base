@@ -645,7 +645,7 @@ if ($os eq "MSWin32" && !$nogui){
          exit(1);
       }
    }
-   msg(INFO,"nothing to do, everything is synchro") if (action() == 0);
+   msg(INFO,"nothing to do!") if (action() == 0);
 }
 
 sub directoryLoop
@@ -837,7 +837,7 @@ sub readRemoteDescList
          if ($key eq "mdate"){
             my @time=split(/[- :]/,$$rec{$key});
             $$rec{mdatestamp}=mktime($time[5],$time[4],$time[3],
-                               $time[2],$time[1],$time[0]-1900,0,0,-1);
+                               $time[2],$time[1]-1,$time[0]-1900,0,0,-1);
          }
          $$rec{fullname}=encode("iso-8859-1",$$rec{fullname});
          $$rec{name}=encode("iso-8859-1",$$rec{name});
@@ -1098,12 +1098,10 @@ sub processOperations
                     Path        => $ldir.$sep.$rec->{DATA}->{fullname},
                     Filename    => $rec->{DATA}->{name},
                     Disposition => "attachment");
-printf STDERR ("fifi after mime::entity\n");
             my $fid=$o{'filemgmt'}->storeRecord({file      =>  $sendfile,
                                                 parentid   =>  $rec->{DATA}->{parentid},
                                                 },
                                                $rec->{DATA}->{fid});
-printf STDERR ("fifi after storerecord\n");
             # read modifydate from the stored record
             $o{'filemgmt'}->SetFilter({fid=>[$fid]});
             my @res=$o{'filemgmt'}->LastMsg();
@@ -1117,8 +1115,7 @@ printf STDERR ("fifi after storerecord\n");
             # change the datestamp to a unixtimestamp
             my @time=split(/[- :]/,$mdate[0]->{mdate});
             my $mdate=mktime($time[5],$time[4],$time[3],
-                             $time[2],$time[1],$time[0]-1900,0,0,-1);
-
+                             $time[2],$time[1]-1,$time[0]-1900,0,0,-1);
             my @res=$o{'filemgmt'}->LastMsg();
             if (defined($res[0])){
                return(1,$res[0]);
