@@ -147,6 +147,7 @@ sub ProcessLine
       my $field=$app->getField($fieldname);
       my $data="undefined";
       my $fclick=$lineonclick;
+      my $weblinkname=$app->Self();
       if (defined($field)){
          $data=$app->findtemplvar({viewgroups=>$viewgroups,
                                    mode=>'HtmlSubList',
@@ -167,6 +168,7 @@ sub ProcessLine
 
             if (defined($weblinkto) && 
                 defined($weblinkon) && $weblinkto ne "none"){
+               $weblinkname=$weblinkto;
                my $target=$weblinkto;
                $target=~s/::/\//g;
                $target="../../$target/Detail";
@@ -201,6 +203,14 @@ sub ProcessLine
          $fclick=undef if ($field->Type() eq "SubList");
          $fclick=undef if ($field->Type() eq "DynWebIcon");
          $fclick=undef if ($self->{nodetaillink});
+         if (defined($fclick)){
+            my $p=$self->getParent->getParent;
+            $weblinkname=sprintf($p->T('klick to view &lt;%s&gt;'),
+                         $p->T($weblinkname,$weblinkname));
+         }
+         else{
+            $weblinkname="";
+         }
       
          if ($self->{SubListEdit}==1){
             $fclick="SubListEdit('$id')";
@@ -224,6 +234,7 @@ sub ProcessLine
       $d.="<td class=subdatafield valign=top $align";
       $d.=" onClick=$fclick" if ($fclick ne "");
       $d.=" style=\"$style\"";
+      $d.=" title=\"$weblinkname\"";
       $d.="$nowrap>".$data."</td>\n";
    }
    $d.="</tr>\n";
