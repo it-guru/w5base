@@ -553,7 +553,7 @@ sub calcResponsibilityBy
       $g->SetFilter({grpid=>\$targetid,cistatusid=>[3,4]});
       my ($rec,$msg)=$u->getOnlyFirst(qw(fullname));
       if (defined($rec)){
-         push(@resp,"GROUP: ".$rec->{fullname});
+         push(@resp,"Group: ".$rec->{fullname});
       }
    }
    push(@resp,"INVALID") if ($#resp==-1);
