@@ -380,12 +380,17 @@ sub StepIt
 {
    my $self=shift;
    my $text=shift;
+   my $wrap=shift;
    $self->pgbar->StepIt();;
    if ($self->warnings->GetCheck() == 0 and substr($text,0,4) eq "WARN"){
       return(0); 
    } 
    $text=main::encode("iso-8859-1",$text);
-   $self->output->Append($text."\r\n") if ($text);
+   if ($text && $wrap == 1){
+      $self->output->Append($text);
+   }elsif($text){
+      $self->output->Append($text."\r\n");
+   }
    $self->DoEvents();
 }
 
@@ -614,6 +619,7 @@ if ($os eq "MSWin32" && !$nogui){
       msg(ERROR,$res[0]);  
       exit(1);
    }
+   # if remote and local dir given change it to one dir
    if ($mode eq "download"){ 
       msg(INFO,"mode -> download");
       if ($#rdirid == 0){
@@ -661,8 +667,8 @@ sub directoryLoop
    my $stepit=shift;
    my $mywin=shift;
    my (@lobj,@robj,@oplist);
-   # if remote and local dir given change it to one dir
-   $ldir=~s/$fullname*[\\\/]?$//g;
+   $fullname=~s/\\/\//g;
+   $ldir=~s/$fullname+[\\\/]*$//g;
    if ($directorycount > 100){
       return(1,"directory depth to high, greater than 100");
    }
@@ -678,9 +684,9 @@ sub directoryLoop
       }
       if ($stepit){
          $fullname=~s/\//\\/g;
-         &{$stepit}($mywin,"INFO: create directory $ldir\\$fullname");
+         &{$stepit}($mywin,"INFO: create directory $ldir\\$fullname ...done");
       }else{
-         msg(INFO,"create directory $ldir/$fullname");
+         msg(INFO,"create directory $ldir/$fullname ...done");
       }
    }elsif(!(-w "$ldir/$fullname") && -e "$ldir/$fullname"){
       return(1,"no write access on '$ldir/$fullname'");
@@ -713,9 +719,9 @@ sub directoryLoop
          }
          if ($stepit){
             $fullname=~s/\//\\/g;
-            &{$stepit}($mywin,"INFO: create directory $ldir\\$fullname");
+            &{$stepit}($mywin,"INFO: create directory $ldir\\$fullname ...done");
          }else{
-            msg(INFO,"create directory '$ldir/$fullname'");
+            msg(INFO,"create directory '$ldir/$fullname' ...done");
          }
       }
    }
@@ -791,9 +797,9 @@ sub directoryLoop
          $action=1;
          if ($stepit){
             $operations->{MSG}=~s/\//\\/g;
-            &{$stepit}($mywin,"INFO: ".$operations->{MSG});
+            &{$stepit}($mywin,"INFO: ".$operations->{MSG}." ...done");
          }else{
-            msg(INFO,$operations->{MSG});
+            msg(INFO,$operations->{MSG}." ...done");
          }
       }
    }
@@ -1077,7 +1083,7 @@ sub processOperations
           $rec->{OP} eq "insert")){
          if ($stepit){
             $rec->{MSG}=~s/\//\\/g;
-            &{$stepit}($mywin,"INFO: ".$rec->{MSG});
+            &{$stepit}($mywin,"INFO: ".$rec->{MSG},1);
          }else{
             msg(INFO,$rec->{MSG});
          }
