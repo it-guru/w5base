@@ -719,7 +719,6 @@ sub directoryLoop
          }
       }
    }
-
    my @result=readRemoteDescList($parentid,\@robj,$stepit,$mywin);
    if ($result[0] != 0){
       return(1,$result[1]);
@@ -843,6 +842,7 @@ sub readRemoteDescList
          $$rec{name}=encode("iso-8859-1",$$rec{name});
       }
    }
+
    return(0);
 }
 
@@ -937,11 +937,12 @@ sub calculateOperations
          }elsif($mode eq "download"){
             if ($lfile->{'fullname'} eq $rfile->{'fullname'} &&
                 $lfile->{'mdatestamp'} eq $rfile->{'mdatestamp'} &&
-                $lfile->{'entrytyp'} eq $rfile->{'entrytyp'} ){
+                $lfile->{'entrytyp'} eq $rfile->{'entrytyp'}){
                $found=1; 
             }elsif($lfile->{'fullname'} eq $rfile->{'fullname'} &&
                 $lfile->{'mdatestamp'} ne $rfile->{'mdatestamp'} &&
-                $lfile->{'entrytyp'} eq $rfile->{'entrytyp'}){
+                $lfile->{'entrytyp'} eq $rfile->{'entrytyp'} &&
+                $rfile->{'entrytyp'} ne "dir"){
                $found=2;
             }
          }
@@ -987,8 +988,8 @@ sub calculateOperations
       foreach my $rfile (@$refrobj){
          $parentid=$rfile->{parentid};
          if ($mode eq "download"){
-            if ($lfile->{'fullname'} eq $rfile->{'fullname'} &&
-                $rfile->{'contentsize'} != 0){
+            if (($lfile->{'fullname'} eq $rfile->{'fullname'}) &&
+                ($rfile->{'contentsize'} != 0 || $rfile->{'entrytyp'} eq "dir")){
                $found=1;  
             }
          }elsif($mode eq "upload"){
