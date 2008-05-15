@@ -72,7 +72,7 @@ use Data::Dumper;
 use kernel::date;
 use Scalar::Util qw(weaken);
 use Exporter;
-use utf8;
+#use utf8; # scheint nicht notwendig zu sein 15.08.2008 hb
 use Encode;
 use Unicode::String qw(utf8 latin1 utf16);
 @ISA = qw(Exporter);
