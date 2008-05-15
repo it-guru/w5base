@@ -56,6 +56,7 @@ sub new
                 group         =>'applications',
                 subeditmsk    =>'subedit.appl',
                 allowcleanup  =>1,
+                htmldetail    =>0,
                 vjointo       =>'itil::lnkapplsystem',
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
                 vjoinon       =>['id'=>'systemid'],

@@ -101,7 +101,7 @@ sub getDefaultContractor
             foreach my $con (@$c){
                my $roles=$con->{roles};
                $roles=[$roles] if (ref($roles) ne "ARRAY");
-               if (grep(/^bossdeveloper$/,@$roles)){
+               if (grep(/^developerboss$/,@$roles)){
                   unshift(@devcon,{target=>$con->{target},
                                    targetid=>$con->{targetid}});
                }
