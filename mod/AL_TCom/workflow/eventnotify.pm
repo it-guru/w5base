@@ -87,7 +87,8 @@ sub getPosibleEventStatType
    my @l;
    
    foreach my $int ('',
-                    qw(EVt.iswtsi EVt.iswext EVt.wrkerr EVt.wrkerrito
+                    qw(EVt.iswtsi EVt.iswext EVt.wrkerr 
+                       EVt.wrkerrito EVt.wrkerr3ito EVt.wrkerr3thome
                        EVt.dqual EVt.stdswbug EVt.stdswold 
                        EVt.hwfail EVt.busoverflow EVt.tecoverflow
                        EVt.parammod EVt.rzinfra EVt.hitnet EVt.inanalyse

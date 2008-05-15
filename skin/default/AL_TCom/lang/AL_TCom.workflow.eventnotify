@@ -5,6 +5,8 @@
 'EVt.wrkerr'=>{de=>'Arbeitsfehler',en=>'Work mistake'},
 'EVt.wrkerrito'=>{de=>'Arbeitsfehler ITO',en=>'Work mistake ITO'},
 'EVt.dqual'=>{de=>'Datenqualität',en=>'Data quality'},
+'EVt.wrkerr3ito'=>{de=>'Arbeitsfehler Dritte (ITO)',en=>'Work mistake thered (ITO)'},
+'EVt.wrkerr3thome'=>{de=>'Arbeitsfehler Dritte (T-Home)',en=>'Work mistake thered (T-Home)'},
 'EVt.stdswbug'=>{de=>'Standard-SW Bugs',en=>'Standard-SW Bugs'},
 'EVt.stdswold'=>{de=>'Standard-SW veraltet',en=>'Standard-SW outdated'},
 'EVt.hwfail'=>{de=>'Hardwareausfall',en=>'Hardware fail'},
