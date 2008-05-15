@@ -234,7 +234,6 @@ sub LoadBCBS
                   delete($newrec{roomexpr}) if ($newrec{roomexpr} eq "");
                   my $locid=$location->getLocationByHash(%newrec);
                   print Dumper(\%newrec);
-                  printf STDERR ("fifi locationid=$locid\n");
                   #exit(0);
                   $assetrec->{locationid}=$locid;
                }

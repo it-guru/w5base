@@ -27,6 +27,7 @@ sub new
 {
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
+   $self->{nowrap}=1;
    return($self);
 }
 

@@ -85,6 +85,7 @@ sub new
    $self->{_permitted}->{fields}=1;     # Feld erzeugt dynamisch zusätzl. Felder
    $self->{_permitted}->{align}=1;      # Ausrichtung
    $self->{_permitted}->{valign}=1;
+   $self->{_permitted}->{nowrap}=1;     # kein automatischer Zeilenumbruch
    $self->{_permitted}->{htmlwidth}=1;  # Breite in der HTML Ausgabe (Spalten)
    $self->{_permitted}->{xlswidth}=1;   # Breite in der XLS Ausgabe (Spalten)
    $self->{_permitted}->{uivisible}=1;  # Anzeige in der Detailsicht bzw. Listen

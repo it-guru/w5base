@@ -171,6 +171,7 @@ sub ProcessLine
        "onMouseOut=\"this.className='$lineclass'\">\n";
    my @l=();
    for(my $c=0;$c<=$#view;$c++){
+      my $nowrap="";
       my $fieldname=$view[$c]->Name();
       my $field=$view[$c];
       my $data="undefined";
@@ -220,9 +221,14 @@ sub ProcessLine
       else{
          $style.="width:auto;";
       }
+      if (defined($field->{nowrap}) && $field->{nowrap}==1){
+         $style.="white-space:nowrap;";
+         $nowrap=" nowrap";
+      }
       $l[$self->{fieldkeys}->{$fieldname}]={data=>$data,
                                             fclick=>$fclick,
                                             align=>$align,
+                                            nowrap=>$nowrap,
                                             style=>$style};
    }
    foreach my $rec (@l){
@@ -232,7 +238,7 @@ sub ProcessLine
       else{
          $d.="<td class=datafield$rec->{align}";
          $d.=" onClick=$rec->{fclick}" if ($rec->{fclick} ne "");
-         $d.=" style=\"$rec->{style}\">".$rec->{data}."</td>\n";
+         $d.=" style=\"$rec->{style}\"$rec->{nowrap}>".$rec->{data}."</td>\n";
       }
    }
    $d.="</tr>\n";

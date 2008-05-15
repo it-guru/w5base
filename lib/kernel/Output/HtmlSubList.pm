@@ -86,12 +86,15 @@ sub getStyle
 
 sub ProcessHead
 {
-   my ($self,$fh)=@_;
+   my ($self,$fh,$param)=@_;
    my $app=$self->getParent->getParent();
    my $view=$app->getCurrentViewName();
    my @view=$app->getCurrentView();
    my $d="";
-   $d.="<table width=100% style=\"table-layout:fixed\"><tr><td><div style=\"overflow:hidden\">\n";
+   if ($param->{ParentMode} ne "HtmlV01"){
+      $d.="<table width=100% style=\"table-layout:fixed\">".
+          "<tr><td><div style=\"overflow:hidden\">\n";
+   }
    $d.="<table class=maintable>\n";
    $d.=$self->getViewLine($fh);
 
@@ -142,6 +145,7 @@ sub ProcessLine
    for(my $c=0;$c<=$#view;$c++){
       my $fieldname=$view[$c];
       my $field=$app->getField($fieldname);
+printf STDERR ("fifi field=$fieldname nowrap=$field->{nowrap}\n");
       my $data="undefined";
       my $fclick=$lineonclick;
       if (defined($field)){
@@ -171,11 +175,17 @@ sub ProcessLine
       if (defined($field->{htmlwidth})){
          $style.="width:$field->{htmlwidth};";
       }
+      my $nowrap="";
+      if (defined($field->{nowrap}) && $field->{nowrap}==1){
+         $style.="white-space:nowrap;";
+         $nowrap=" nowrap";
+      }
+
       $style.="width:auto;" if ($c==$#view);
       $d.="<td class=subdatafield valign=top $align";
       $d.=" onClick=$fclick" if ($fclick ne "");
       $d.=" style=\"$style\"";
-      $d.=">".$data."</td>\n";
+      $d.="$nowrap>".$data."</td>\n";
    }
    $d.="</tr>\n";
    $self->{lineclass}++;
@@ -184,7 +194,7 @@ sub ProcessLine
 }
 sub ProcessBottom
 {
-   my ($self,$fh,$rec,$msg)=@_;
+   my ($self,$fh,$rec,$msg,$param)=@_;
    my $app=$self->getParent->getParent();
    my $view=$app->getCurrentViewName();
    my @view=$app->getCurrentView();
@@ -212,7 +222,9 @@ EOF
       }
    }
    $d.=$self->StoreQuery();
-   $d.="</div></td></tr></table>";
+   if ($param->{ParentMode} ne "HtmlV01"){
+      $d.="</div></td></tr></table>";
+   }
 
    return($d);
 }

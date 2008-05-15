@@ -207,26 +207,30 @@ sub new
                 vjoindisp     =>'email'),
 
       new kernel::Field::TextDrop(
-                name          =>'tsm2email',
-                group         =>'technical',
-                label         =>'Deputy Technical Solution Manager E-Mail',
-                vjointo       =>'base::user',
-                searchable    =>0,
-                htmldetail    =>0,
-                readonly      =>1,
-                vjoinon       =>['tsm2id'=>'userid'],
-                vjoindisp     =>'email'),
-
-      new kernel::Field::TextDrop(
                 name          =>'tsmphone',
                 group         =>'technical',
                 label         =>'Technical Solution Manager Office-Phone',
                 vjointo       =>'base::user',
+                htmlwidth     =>'200px',
+                nowrap        =>1,
                 htmldetail    =>0,
                 readonly      =>1,
                 searchable    =>0,
                 vjoinon       =>['tsmid'=>'userid'],
                 vjoindisp     =>'office_phone'),
+
+      new kernel::Field::TextDrop(
+                name          =>'tsmmobile',
+                group         =>'technical',
+                label         =>'Technical Solution Manager Mobile-Phone',
+                vjointo       =>'base::user',
+                htmlwidth     =>'200px',
+                htmldetail    =>0,
+                nowrap        =>1,
+                readonly      =>1,
+                searchable    =>0,
+                vjoinon       =>['tsmid'=>'userid'],
+                vjoindisp     =>'office_mobile'),
 
       new kernel::Field::TextDrop(
                 name          =>'tsmposix',
@@ -280,6 +284,17 @@ sub new
                 vjointo       =>'base::user',
                 vjoinon       =>['tsm2id'=>'userid'],
                 vjoindisp     =>'fullname'),
+
+      new kernel::Field::TextDrop(
+                name          =>'tsm2email',
+                group         =>'technical',
+                label         =>'Deputy Technical Solution Manager E-Mail',
+                vjointo       =>'base::user',
+                searchable    =>0,
+                htmldetail    =>0,
+                readonly      =>1,
+                vjoinon       =>['tsm2id'=>'userid'],
+                vjoindisp     =>'email'),
 
       new kernel::Field::Link(
                 name          =>'tsm2id',

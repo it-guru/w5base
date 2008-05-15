@@ -1446,6 +1446,7 @@ sub getSubList
    my %param=@_;
    my %opt=();
 
+   my $pmode=$mode;
    $opt{SubListEdit}=1 if ($mode eq "HtmlSubListEdit");
    $mode="HtmlSubList" if ($mode=~m/^.{0,1}Html.*$/);
    $mode="SubXMLV01"   if ($mode=~m/XML/);
@@ -1459,7 +1460,7 @@ sub getSubList
       msg(ERROR,"can't set output format '$mode'");
       return("ERROR: Data-Source '$mode' not available - Format problem");
    }
-   return($output->WriteToScalar(HttpHeader=>0));
+   return($output->WriteToScalar(HttpHeader=>0,ParentMode=>$pmode));
 }
 
 
