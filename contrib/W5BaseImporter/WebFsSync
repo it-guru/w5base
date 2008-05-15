@@ -368,7 +368,7 @@ sub doStart
        return(0);
    }
    if (main::action() == 0){
-      $mainwin->output->Append("\r\nnothing to do, everything is synchro\r\n");
+      $mainwin->output->Append("\r\nnothing to do!\r\n");
    }
    # set window formality 
    $mainwin->output->Append("\r\nready!");
@@ -691,7 +691,18 @@ sub directoryLoop
       my @sum=$o{'filemgmt'}->getHashList(qw(ALL));
       my @res=$o{'filemgmt'}->LastMsg();
       return(1,$res[0]) if (defined($res[0]));
-      if ($#sum == -1 ){
+      if ($#sum == -1){
+         # check open directory
+         if (!opendir(D,"$ldir/$fullname")){
+            if ($stepit){
+               $fullname=~s/\//\\/g;
+               &{$stepit}($mywin,"WARN: can't open directory '$ldir\\$fullname'");
+            }else{
+               msg(WARN,"can't open directory '$ldir/$fullname'");
+            }
+            return(0);
+         }
+         close(D);
          $action=1;
          if ($force){
             $parentid=$o{'filemgmt'}->storeRecord({name      => $name,
@@ -699,6 +710,12 @@ sub directoryLoop
                                                    parentobj => undef});
             my @res=$o{'filemgmt'}->LastMsg();
             return(1,$res[0]) if (defined($res[0]));
+         }
+         if ($stepit){
+            $fullname=~s/\//\\/g;
+            &{$stepit}($mywin,"INFO: create directory $ldir\\$fullname");
+         }else{
+            msg(INFO,"create directory '$ldir/$fullname'");
          }
       }
    }
@@ -892,7 +909,7 @@ sub readLocalDescList
       }         
       closedir(FH);
    }else{
-      return(1,"can't open directory $dir") if ($force);
+      return(1,"can't open directory $dir ") if ($force);
    }
    return(0);
 }
@@ -1081,10 +1098,12 @@ sub processOperations
                     Path        => $ldir.$sep.$rec->{DATA}->{fullname},
                     Filename    => $rec->{DATA}->{name},
                     Disposition => "attachment");
+printf STDERR ("fifi after mime::entity\n");
             my $fid=$o{'filemgmt'}->storeRecord({file      =>  $sendfile,
                                                 parentid   =>  $rec->{DATA}->{parentid},
                                                 },
                                                $rec->{DATA}->{fid});
+printf STDERR ("fifi after storerecord\n");
             # read modifydate from the stored record
             $o{'filemgmt'}->SetFilter({fid=>[$fid]});
             my @res=$o{'filemgmt'}->LastMsg();
