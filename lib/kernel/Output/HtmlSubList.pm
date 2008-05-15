@@ -162,7 +162,7 @@ sub ProcessLine
             my $weblinkon=$field->{weblinkon};
             my $weblinkto=$field->{weblinkto};
             if (ref($weblinkto) eq "CODE"){
-               ($weblinkto,$weblinkon)=&{$weblinkto}($self,$data,$rec);
+               ($weblinkto,$weblinkon)=&{$weblinkto}($field,$data,$rec);
             }
 
             if (defined($weblinkto) && 
@@ -177,7 +177,8 @@ sub ProcessLine
                   $targetval=$d;
                }
                else{
-                  my $linkfield=$self->getParent->getParent->getField($weblinkon->[0]);
+                  my $linkfield=$self->getParent->getParent->
+                                       getField($weblinkon->[0]);
                   if (!defined($linkfield)){
                      msg(ERROR,"can't find field '%s' in '%s'",$weblinkon->[0],
                          $self->getParent);

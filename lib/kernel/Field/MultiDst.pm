@@ -28,12 +28,36 @@ sub new
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
    $self->{isinitialized}=0;
+   $self->{weblinkto}=\&calcWebLink;
    $self->{depend}=[] if (!defined($self->{depend}));
    push(@{$self->{depend}},$self->{dsttypfield},$self->{dstidfield});
    if (ref($self->{dst}) ne "ARRAY" && $self->{dst} ne ""){
       push(@{$self->{depend}},$self->{dst}); # the type is loaded from a field
    }
    return($self);
+}
+
+sub calcWebLink
+{
+   my $self=shift;
+   my $d=shift;
+   my $current=shift;
+   my $weblinkto;
+   my $weblinkon;
+
+   my $target=$current->{$self->{dsttypfield}};
+   if ($target ne "" && $target ne "none"){
+      my $targetid;
+      foreach my $dststruct (@{$self->{dstobj}}){
+         if ($dststruct->{name} eq $target){
+            $targetid=$dststruct->{idname};
+            last;
+         }
+      }
+      return($target,[$self->{dstidfield}=>$targetid]);
+   }
+
+   return($weblinkto,$weblinkon);
 }
 
 
@@ -288,33 +312,8 @@ sub FormatedDetail
       }
       return("<input class=finput type=text name=Formated_$name value=\"$d\">");
    }
-   if (defined($current->{$self->{dstidfield}}) &&
-       defined($current->{$self->{dsttypfield}})){
-      my $target=$current->{$self->{dsttypfield}};
-      my $targetid;
-      foreach my $dststruct (@{$self->{dstobj}}){
-         if ($dststruct->{name} eq $target){
-            $targetid=$dststruct->{idname};
-            last;
-         }
-      }
-      if (defined($targetid)){
-         $target=~s/::/\//g;
-         $target="../../$target/Detail";
-         my $app=$self->getParent();
-         my $targetval=$current->{$self->{dstidfield}};
-         my $detailx=$app->DetailX();
-         my $detaily=$app->DetailY();
-         $targetval=$targetval->[0] if (ref($targetval) eq "ARRAY");
-         if ($mode eq "HtmlDetail"){
-            my $onclick="openwin(\"".
-                        "$target?AllowClose=1&$targetid=$targetval\",".
-                        "\"_blank\",".
-                        "\"height=$detaily,width=$detailx,toolbar=no,".
-                        "status=no,resizable=yes,scrollbars=no\")";
-            $d="<a class=sublink href=JavaScript:$onclick>".$d."</a>";
-         }
-      }
+   if (!($d=~m/\[\?\]$/)){
+      $d=$self->addWebLinkToFacility($d,$current) if ($mode eq "HtmlDetail");
    }
    return($d);
 }
