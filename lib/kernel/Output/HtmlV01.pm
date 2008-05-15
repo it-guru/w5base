@@ -204,7 +204,7 @@ sub ProcessLine
          if (exists($field->{weblink})){
             $fclick=undef;
          }
-         $fclick=undef if ($field->Type() eq "SubList");
+         $fclick=undef if ($field->can("getSubListData"));
       
          if ($self->{SubListEdit}==1){
             $fclick="SubListEdit('$id')";
