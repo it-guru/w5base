@@ -145,7 +145,6 @@ sub ProcessLine
    for(my $c=0;$c<=$#view;$c++){
       my $fieldname=$view[$c];
       my $field=$app->getField($fieldname);
-printf STDERR ("fifi field=$fieldname nowrap=$field->{nowrap}\n");
       my $data="undefined";
       my $fclick=$lineonclick;
       if (defined($field)){
@@ -158,6 +157,45 @@ printf STDERR ("fifi field=$fieldname nowrap=$field->{nowrap}\n");
          if (ref($field->{onClick}) eq "CODE"){
             my $fc=&{$field->{onClick}}($self,$app);
             $fclick=$fc if ($fc ne "");
+         }
+         elsif (defined($field->{weblinkto}) && $field->{weblinkto} ne "none"){
+            my $weblinkon=$field->{weblinkon};
+            my $weblinkto=$field->{weblinkto};
+            if (ref($weblinkto) eq "CODE"){
+               ($weblinkto,$weblinkon)=&{$weblinkto}($self,$data,$rec);
+            }
+
+            if (defined($weblinkto) && 
+                defined($weblinkon) && $weblinkto ne "none"){
+               my $target=$weblinkto;
+               $target=~s/::/\//g;
+               $target="../../$target/Detail";
+               my $targetid=$weblinkon->[1];
+               my $targetval;
+               if (!defined($targetid)){
+                  $targetid=$weblinkon->[0];
+                  $targetval=$d;
+               }
+               else{
+                  my $linkfield=$self->getParent->getParent->getField($weblinkon->[0]);
+                  if (!defined($linkfield)){
+                     msg(ERROR,"can't find field '%s' in '%s'",$weblinkon->[0],
+                         $self->getParent);
+                     return($d);
+                  }
+                  $targetval=$linkfield->RawValue($rec);
+               }
+               if (defined($targetval) && $targetval ne ""){
+                  my $detailx=$self->getParent->getParent->DetailX();
+                  my $detaily=$self->getParent->getParent->DetailY();
+                  $targetval=$targetval->[0] if (ref($targetval) eq "ARRAY");
+                  $fclick="openwin(\"$target?".
+                      "AllowClose=1&search_$targetid=$targetval\",".
+                      "\"_blank\",".
+                      "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
+                      "resizable=yes,scrollbars=no\")";
+               }
+            }
          }
          $fclick=undef if ($field->Type() eq "SubList");
          $fclick=undef if ($field->Type() eq "DynWebIcon");
@@ -181,7 +219,7 @@ printf STDERR ("fifi field=$fieldname nowrap=$field->{nowrap}\n");
          $nowrap=" nowrap";
       }
 
-      $style.="width:auto;" if ($c==$#view);
+      $style.="width:auto;" if ($c==$#view && !defined($field->{htmlwidth}));
       $d.="<td class=subdatafield valign=top $align";
       $d.=" onClick=$fclick" if ($fclick ne "");
       $d.=" style=\"$style\"";

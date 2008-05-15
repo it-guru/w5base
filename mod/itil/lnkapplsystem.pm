@@ -221,9 +221,9 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'tsm',
-                group         =>'technical',
+                group         =>'applinfo',
                 label         =>'Technical Solution Manager',
-                htmldetail    =>0,
+                htmlwidth     =>'280px',
                 readonly      =>1,
                 vjointo       =>'base::user',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
@@ -239,9 +239,9 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'businessteam',
                 htmlwidth     =>'300px',
-                htmldetail    =>0,
                 readonly      =>1,
-                group         =>'technical',
+                htmlwidth     =>'280px',
+                group         =>'applinfo',
                 label         =>'Business Team',
                 vjointo       =>'base::grp',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
@@ -255,6 +255,22 @@ sub new
                 readonly      =>1,
                 group         =>'applinfo',
                 dataobjattr   =>'appl.customerprio'),
+
+      new kernel::Field::Text(
+                name          =>'oncallphones',
+                searchable    =>0,
+                readonly      =>1,
+                label         =>'oncall Phonenumbers',
+                htmlwidth     =>'150px',
+                group         =>'applinfo',
+                translation   =>'itil::appl',
+                weblinkto     =>'none',
+                vjoinbase     =>[{'parentobj'=>\'itil::appl'}],
+                vjointo       =>'base::phonenumber',
+                vjoinon       =>['applid'=>'refid'], 
+                vjoinbase     =>{'rawname'=>'phoneRB'},
+                vjoindisp     =>'phonenumber'),
+
 
       new kernel::Field::Link(
                 name          =>'applcistatusid',

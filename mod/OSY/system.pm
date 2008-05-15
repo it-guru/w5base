@@ -60,7 +60,7 @@ sub new
                 vjointo       =>'itil::lnkapplsystem',
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
                 vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>['appl','tsm','businessteam']),
+                vjoindisp     =>['appl','tsm','businessteam','oncallphones']),
 
    );
    $self->{workflowlink}->{workflowtyp}=[qw(OSY::workflow::diary

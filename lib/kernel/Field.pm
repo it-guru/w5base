@@ -592,7 +592,11 @@ sub RawValue
          if ($joinval){ 
             if (!exists($c->{$joinkey})){
                if (defined($self->{vjoinbase})){
-                  $self->vjoinobj->SetNamedFilter("BASE",@{$self->{vjoinbase}});
+                  my $base=$self->{vjoinbase};
+                  if (ref($base) eq "HASH"){
+                     $base=[$base];
+                  }
+                  $self->vjoinobj->SetNamedFilter("BASE",@{$base});
                }
                $self->vjoinobj->SetFilter(\%flt);
                $c->{$joinkey}=$self->vjoinobj->getHashList(@view);
