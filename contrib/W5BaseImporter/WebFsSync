@@ -343,7 +343,7 @@ sub doStart
    $mainwin->pgbar->SetPos(150);
    if ($#rdirid == 0){
       $mainwin->output->Append("done\r\nmode -> ".$mainwin->{mode}.
-                               "\r\ncompute operations...\r\n");
+                               "\r\ncomputing operations...\r\n");
       if (!(-w $mainwin->{ldir}."/".$mainwin->{rdir}) && -e $mainwin->{ldir}.
                "/".$mainwin->{rdir}){
          $mainwin->{rdir}=~s/\//\\/g; 
@@ -1075,6 +1075,12 @@ sub processOperations
    foreach my $rec (@$oplist){
       if ($rec->{IDENTIFYBY} eq "file" && ($rec->{OP} eq "update" || 
           $rec->{OP} eq "insert")){
+         if ($stepit){
+            $rec->{MSG}=~s/\//\\/g;
+            &{$stepit}($mywin,"INFO: ".$rec->{MSG});
+         }else{
+            msg(INFO,$rec->{MSG});
+         }
          if ($force && $mode eq "download"){
             my $req=$ua->get($rec->{DATA}->{file},
                     ':content_file' => "$ldir/".$rec->{DATA}->{fullname}.".tmp");
@@ -1094,11 +1100,13 @@ sub processOperations
                 $rec->{OP} eq "insert")){
             my $sep="/";
             $sep="\\" if ($os eq "MSWin32");
+            msg(DEBUG,"prepare upload '$rec->{DATA}->{name}'");
             my $sendfile = MIME::Entity->build(
-                    Encoding    => "base64",
+                    Encoding    => "binary",
                     Path        => $ldir.$sep.$rec->{DATA}->{fullname},
                     Filename    => $rec->{DATA}->{name},
                     Disposition => "attachment");
+            msg(DEBUG,"start upload '$rec->{DATA}->{name}'");
             my $fid=$o{'filemgmt'}->storeRecord({file      =>  $sendfile,
                                                 parentid   =>  $rec->{DATA}->{parentid},
                                                 },
@@ -1127,10 +1135,9 @@ sub processOperations
          }
          $action=1;
          if ($stepit){
-            $rec->{MSG}=~s/\//\\/g;
-            &{$stepit}($mywin,"INFO: ".$rec->{MSG});
+            &{$stepit}($mywin,"  ...done");
          }else{
-            msg(INFO,$rec->{MSG});
+            msg(INFO,"done");
          }
       }elsif($rec->{OP} eq "info"){
          if ($stepit){
