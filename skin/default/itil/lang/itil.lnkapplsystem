@@ -13,6 +13,7 @@
 'Short Description'=>{de=>'Kurzbeschreibung'},
 'Productionsystem'=>{de=>'Produktionssystem'},
 'Developmentsystem'=>{de=>'Entwicklungssystem'},
+'Business Team'=>{de=>'Betriebsteam'},
 'Educationsystem'=>{de=>'Schulungssystem'},
 'Approval Testsystem'=>{de=>'Abnahmesystem'},
 'Referencesystem'=>{de=>'Referenzsystem'},

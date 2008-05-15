@@ -50,6 +50,17 @@ sub new
                 vjointo       =>'tsacinv::system',
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>'iassignmentgroup'),
+      new kernel::Field::SubList(
+                name          =>'techapplications',
+                label         =>'Applications technical contact',
+                group         =>'applications',
+                subeditmsk    =>'subedit.appl',
+                allowcleanup  =>1,
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{applcistatusid=>"<=4"}],
+                vjoinon       =>['id'=>'systemid'],
+                vjoindisp     =>['appl','tsm','businessteam']),
+
    );
    $self->{workflowlink}->{workflowtyp}=[qw(OSY::workflow::diary
                                             base::workflow::DataIssue 

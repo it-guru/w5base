@@ -213,17 +213,41 @@ sub new
                 group         =>'applinfo',
                 dataobjattr   =>'appl.applid'),
 
-      new kernel::Field::TextDrop(
-                name          =>'customer',
-                label         =>'Customer',
+      new kernel::Field::Link(
+                name          =>'tsmid',
+                label         =>'TSM ID',
                 readonly      =>1,
-                group         =>'applinfo',
-                translation   =>'itil::appl',
+                dataobjattr   =>'appl.tsm'),
+
+      new kernel::Field::TextDrop(
+                name          =>'tsm',
+                group         =>'technical',
+                label         =>'Technical Solution Manager',
+                htmldetail    =>0,
+                readonly      =>1,
+                vjointo       =>'base::user',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['tsmid'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'businessteamid',
+                label         =>'Businessteam ID',
+                readonly      =>1,
+                dataobjattr   =>'appl.businessteam'),
+
+      new kernel::Field::TextDrop(
+                name          =>'businessteam',
+                htmlwidth     =>'300px',
+                htmldetail    =>0,
+                readonly      =>1,
+                group         =>'technical',
+                label         =>'Business Team',
                 vjointo       =>'base::grp',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['customerid'=>'grpid'],
+                vjoinon       =>['businessteamid'=>'grpid'],
                 vjoindisp     =>'fullname'),
-                                                   
+
       new kernel::Field::Text(
                 name          =>'applcustomerprio',
                 label         =>'Customers Application Prioritiy',
