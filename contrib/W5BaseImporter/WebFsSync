@@ -1089,12 +1089,12 @@ sub processOperations
    foreach my $rec (@$oplist){
       if ($rec->{IDENTIFYBY} eq "file" && ($rec->{OP} eq "update" || 
           $rec->{OP} eq "insert")){
+         my $t="byte";
          if ($mode eq "download"){
             $size=$rec->{DATA}->{contentsize}; 
          }else{
             $size= -s "$ldir/$rec->{DATA}->{fullname}";        
          }
-         my $t="byte";
          $volume=$volume+$size;
          if ($size > 1024){
             $size=sprintf("%.2f",$size/1024);
@@ -1132,7 +1132,7 @@ sub processOperations
             $sep="\\" if ($os eq "MSWin32");
             msg(DEBUG,"prepare upload '$rec->{DATA}->{name}'");
             my $sendfile = MIME::Entity->build(
-                    Encoding    => "binary",
+                    Encoding    => "base64",
                     Path        => $ldir.$sep.$rec->{DATA}->{fullname},
                     Filename    => $rec->{DATA}->{name},
                     Disposition => "attachment");
