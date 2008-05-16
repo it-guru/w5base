@@ -367,6 +367,8 @@ sub doStart
        $mainwin->checkMode();
        return(0);
    }
+   my @vol=main::volume();
+   $mainwin->output->Append("\r\ntransfervolume $vol[0] $vol[1]\r\n"); 
    if (main::action() == 0){
       $mainwin->output->Append("\r\nnothing to do!\r\n");
    }
@@ -533,9 +535,9 @@ use File::Path;
 use POSIX;
 use MIME::Entity;
 use Config;
-use utf8;
+#use utf8;
 use Encode;
-use Unicode::String qw(utf8 latin1 utf16);
+#use Unicode::String qw(utf8 latin1 utf16);
 use Data::HexDump;
 use vars qw($GUI $Window);
 
@@ -545,6 +547,7 @@ my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang,$admin);
 my ($mode,$force,$rdir,$ldir,$nogui,$nowarn,%o,$Revision,$empty);
 my $os=$Config{'osname'};
 my $action=0;
+my $volume=0;
 my $count=0;
 my $version="Version 0.1 build$Revision$empty ";
 my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
@@ -651,6 +654,8 @@ if ($os eq "MSWin32" && !$nogui){
          exit(1);
       }
    }
+   my @vol=volume();
+   msg(INFO,"transfervolume $vol[0] $vol[1]");
    msg(INFO,"nothing to do!") if (action() == 0);
 }
 
@@ -773,9 +778,9 @@ sub directoryLoop
          if ($stepit){
             $action=1;
             $operations->{MSG}=~s/\//\\/g;
-            &{$stepit}($mywin,"INFO: ".$operations->{MSG});
+            &{$stepit}($mywin,"INFO: ".$operations->{MSG}." ...done");
          }else{
-            msg(INFO,$operations->{MSG});
+            msg(INFO,$operations->{MSG}." ...done");
          }
       # delete remote files/folder
       }elsif($operations->{OP} eq "delete" && $mode eq "upload"){
@@ -962,6 +967,7 @@ sub calculateOperations
                        DATA         => {fullname   => $rfile->{'fullname'},
                                         name       => $rfile->{'name'},
                                         fid        => $rfile->{'fid'},
+                                        contentsize=> $rfile->{'contentsize'},
                                         mdatestamp => $rfile->{'mdatestamp'},
                                         file       => $rfile->{'file'}}});
       }elsif($found == 2 && $mode eq "download"){
@@ -974,6 +980,7 @@ sub calculateOperations
                                         mdatestamp  => $rfile->{'mdatestamp'},
                                         fid         => $rfile->{'fid'},
                                         name        => $rfile->{'name'},
+                                        contentsize => $rfile->{'contentsize'},
                                         file        => $rfile->{'file'}}});
       }elsif($found == 0 && $mode eq "upload"){
          push(@$oplist,{OP          => 'delete',
@@ -1077,16 +1084,33 @@ sub processOperations
    my $force=shift;    
    my $stepit=shift;    
    my $mywin=shift;    
+   my $size;
    my $ua=getUserAgent($Config);
    foreach my $rec (@$oplist){
       if ($rec->{IDENTIFYBY} eq "file" && ($rec->{OP} eq "update" || 
           $rec->{OP} eq "insert")){
+         if ($mode eq "download"){
+            $size=$rec->{DATA}->{contentsize}; 
+         }else{
+            $size= -s "$ldir/$rec->{DATA}->{fullname}";        
+         }
+         my $t="byte";
+         $volume=$volume+$size;
+         if ($size > 1024){
+            $size=sprintf("%.2f",$size/1024);
+            $t="kbyte";
+         }
+         if ($size > 1024){
+            $size=sprintf("%.2f",$size/1024);
+            $t="mbyte";
+         }
          if ($stepit){
             $rec->{MSG}=~s/\//\\/g;
-            &{$stepit}($mywin,"INFO: ".$rec->{MSG},1);
+            &{$stepit}($mywin,"INFO: ".$rec->{MSG}." ".$size." $t",1);
          }else{
             msg(INFO,$rec->{MSG});
          }
+
          if ($force && $mode eq "download"){
             my $req=$ua->get($rec->{DATA}->{file},
                     ':content_file' => "$ldir/".$rec->{DATA}->{fullname}.".tmp");
@@ -1166,6 +1190,22 @@ sub action
       $action=0;
       return(1);
    }
+}
+
+sub volume
+{
+   my $v=$volume;
+   $volume=0;
+   my $t="byte";
+   if ($v > 1024){
+      $v=sprintf("%.2f",$v/1024);
+      $t="kbyte";
+   }
+   if ($v > 1024){
+      $v=sprintf("%.2f",$v/1024);
+      $t="mbyte";
+   }
+   return($v,$t);
 }
 
 # help menu
