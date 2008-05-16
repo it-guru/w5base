@@ -171,6 +171,7 @@ sub ProcessLine
       else{
          $data="-";
       }
+      $data=~s/\r\n/\n/g;
       $cell[$self->{xlscollindex}->{$name}]=$data;
       $cellobj[$self->{xlscollindex}->{$name}]=$fo;
       foreach my $subline (split(/\n/,$data)){
