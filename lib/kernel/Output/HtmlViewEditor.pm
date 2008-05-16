@@ -85,7 +85,9 @@ sub ProcessHead
    my $app=$self->getParent->getParent();
    my $view=$app->getCurrentViewName();
    my @view=$app->getCurrentView();
+   my $userid=$app->getCurrentUserId();
    my $dest=$app->Self();
+   my $module=$app->ViewEditorModuleName();
    $dest=~s/::/\//g;
    $dest="../../$dest/Result";
 
@@ -103,9 +105,24 @@ sub ProcessHead
    $d.="<tr><td class=mainblock>";
    $d.="<table  class=datatable width=100% border=0>\n".
        "<tr class=headline>";
-   $d.="<th colspan=2 class=headfield height=1%>".
-       $self->getParent->getParent->T("Edit your view").
-       " ...</th></tr>\n";
+   $app->{userview}->ResetFilter();
+   $app->{userview}->SetFilter({module=>\$module,
+                                userid=>\$userid,
+                                name=>\$view});
+   my ($vrec,$msg)=$app->{userview}->getOnlyFirst(qw(id));
+   my $link=$self->getParent->getParent->T("Edit your view")." ...";
+   if (defined($vrec)){
+      my $dest="../../base/userview/Detail?id=$vrec->{id}&AllowClose=1";
+      my $detailx=$app->DetailX();
+      my $detaily=$app->DetailY();
+      my $label=$self->getParent->getParent->T("direct edit view");
+      my $lineonclick="openwin(\"$dest\",\"_blank\",".
+             "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
+             "resizable=yes,scrollbars=auto\")";
+      $link="<a title=\"$label\" class=viewdirectedit ".
+            "href=JavaScript:$lineonclick>$link</a>";
+   }
+   $d.="<th colspan=2 class=headfield height=1%>".$link."</th></tr>\n";
    $d.="</table>";
    $d.="</table>";
    return($d);

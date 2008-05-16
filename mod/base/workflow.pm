@@ -199,6 +199,7 @@ sub new
       new kernel::Field::Date(
                 name          =>'eventstart',
                 selectfix     =>1,
+                xlswidth      =>'25',
                 htmlwidth     =>'80px',
                 group         =>'state',
                 label         =>'Event-Start',

@@ -14,3 +14,11 @@ select.ViewFieldSelect,div.FullFieldTreeSelect{
    border-style:solid;
    background:white;
 }
+
+a:link.viewdirectedit, a:visited.viewdirectedit, a:active.viewdirectedit  {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:#000000;
+          }
+
+
