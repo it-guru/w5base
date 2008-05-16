@@ -172,7 +172,8 @@ EOF
       $salutation=<<EOF;
 Sehr geehrte Kundin, sehr geehrter Kunde,
 
-die Beeinträchtigung im Umfeld des TCP/IP-Netzes (HitNet) wurde beseitigt.
+die Beeinträchtigung im Umfeld des
+TCP/IP-Netzes (HitNet) wurde beseitigt.
 EOF
    }elsif($WfRec->{eventmode} eq "EVk.net"){   
       $salutation=<<EOF;
@@ -187,8 +188,8 @@ EOF
       $salutation=<<EOF;
 Sehr geehrte Damen und Herren,
 
-wir informieren Sie über das Ergebnis der Ursachenanalyse und über die
-eingeleiteten Maßnahmen.
+wir informieren Sie über das Ergebnis der
+Ursachenanalyse und über die eingeleiteten Maßnahmen.
 EOF
    }
    return($salutation);
