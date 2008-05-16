@@ -141,7 +141,7 @@ sub Result
       %q1=%q;
       $q1{id}=[map({$_->{id}} @l1),map({$_->{id}} @l2)];
    }
-   if ($self->IsMemberOf("admin") && $dc eq "TEAM"){
+   if ($self->getParent->IsMemberOf("admin") && $dc eq "TEAM"){
       delete(%q1{affectedapplicationid});
       delete(%q1{id});
    }
