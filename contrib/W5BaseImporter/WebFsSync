@@ -780,7 +780,7 @@ sub directoryLoop
             $operations->{MSG}=~s/\//\\/g;
             &{$stepit}($mywin,"INFO: ".$operations->{MSG}." ...done");
          }else{
-            msg(INFO,$operations->{MSG}." ...done");
+            msg(INFO,$operations->{MSG});
          }
       # delete remote files/folder
       }elsif($operations->{OP} eq "delete" && $mode eq "upload"){
@@ -804,7 +804,7 @@ sub directoryLoop
             $operations->{MSG}=~s/\//\\/g;
             &{$stepit}($mywin,"INFO: ".$operations->{MSG}." ...done");
          }else{
-            msg(INFO,$operations->{MSG}." ...done");
+            msg(INFO,$operations->{MSG});
          }
       }
    }
@@ -1108,7 +1108,7 @@ sub processOperations
             $rec->{MSG}=~s/\//\\/g;
             &{$stepit}($mywin,"INFO: ".$rec->{MSG}." ".$size." $t",1);
          }else{
-            msg(INFO,$rec->{MSG});
+            msg(INFO,$rec->{MSG}." ".$size." $t");
          }
 
          if ($force && $mode eq "download"){
@@ -1166,8 +1166,6 @@ sub processOperations
          $action=1;
          if ($stepit){
             &{$stepit}($mywin,"  ...done");
-         }else{
-            msg(INFO,"done");
          }
       }elsif($rec->{OP} eq "info"){
          if ($stepit){
