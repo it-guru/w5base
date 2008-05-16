@@ -199,7 +199,7 @@ sub new
       new kernel::Field::Date(
                 name          =>'eventstart',
                 selectfix     =>1,
-                xlswidth      =>'25',
+                xlswidth      =>'18',
                 htmlwidth     =>'80px',
                 group         =>'state',
                 label         =>'Event-Start',
@@ -239,6 +239,7 @@ sub new
       new kernel::Field::Date(
                 name          =>'eventend',
                 htmlwidth     =>'80px',
+                xlswidth      =>'18',
                 sqlorder      =>'desc',
                 selectfix     =>1,
                 group         =>'state',

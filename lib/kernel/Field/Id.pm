@@ -31,6 +31,7 @@ sub new
    $self{autogen}=1   if (!defined($self{autogen}));
    $self{readonly}=1  if (!defined($self{readonly}));
    $self{htmlwidth}="1%"  if (!exists($self{htmlwidth}));
+   $self{xlswidth}="16"   if (!exists($self{xlswidth}));
    $self{align}="right"   if (!defined($self{align}));
    my $self=bless($type->SUPER::new(%self),$type);
    $self->{_permitted}->{thoupoint}=1;
@@ -100,6 +101,14 @@ sub Uploadable
 
    return(1);
 }
+
+sub getXLSformatname
+{
+   my $self=shift;
+   my $data=shift;
+   return("longint");
+}
+
 
 
 

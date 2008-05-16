@@ -112,6 +112,9 @@ sub Format
       $format=$self->{'workbook'}->addformat(align=>'top',
                                           num_format => 'yyyy-mm-dd HH:MM:SS');
    }
+   elsif ($name eq "longint"){
+      $format=$self->{'workbook'}->addformat(align=>'top',num_format => '#');
+   }
    elsif ($name eq "header"){
       $format=$self->{'workbook'}->addformat();
       $format->copy($self->Format("default"));

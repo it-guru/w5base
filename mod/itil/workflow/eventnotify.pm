@@ -251,6 +251,7 @@ sub getDynamicFields
 
       new kernel::Field::Textarea(
                 name          =>'shorteventelimination',
+                xlswidth      =>'45',
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'eventnotify',
                 label         =>'Action for short event elimination',
@@ -258,6 +259,7 @@ sub getDynamicFields
 
       new kernel::Field::Textarea(
                 name          =>'longeventelimination',
+                xlswidth      =>'45',
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'eventnotify',
                 label         =>'Action for long event elimination',
@@ -326,6 +328,7 @@ sub getDynamicFields
 
       new kernel::Field::Text(
                 name          =>'eventprmticket',
+                xlswidth      =>'15',
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'eventnotifyinternal',
                 label         =>'related problem ticket',
@@ -333,6 +336,7 @@ sub getDynamicFields
 
       new kernel::Field::Text(
                 name          =>'eventinmticket',
+                xlswidth      =>'15',
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'eventnotifyinternal',
                 label         =>'related incident ticket',
