@@ -142,8 +142,12 @@ sub Result
       $q1{id}=[map({$_->{id}} @l1),map({$_->{id}} @l2)];
    }
    if ($self->getParent->IsMemberOf("admin") && $dc eq "TEAM"){
-      delete($q1{affectedapplicationid});
-      delete($q1{id});
+      %q1=%q;
+      $q1{stateid}='>15';
+      $q1{eventend}=Query->Param("Search_TimeRange");
+      $q1{eventend}="<now AND >now-24h" if (!defined($q1{eventend}));
+      $q1{class}=[grep(/^.*::eventnotify$/,
+                       keys(%{$self->{DataObj}->{SubDataObj}}))];
    }
 
 
