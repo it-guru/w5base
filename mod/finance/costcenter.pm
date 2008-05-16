@@ -26,7 +26,10 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=5;
    my $self=bless($type->SUPER::new(%param),$type);
+
+
 
    $self->AddFields(
       new kernel::Field::Id(
@@ -73,6 +76,33 @@ sub new
       new kernel::Field::Link(
                 name          =>'databossid',
                 dataobjattr   =>'costcenter.databoss'),
+
+      new kernel::Field::TextDrop(
+                name          =>'ldelmgr',
+                group         =>'delmgmt',
+                label         =>'lead Delivery Manager',
+                vjointo       =>'base::user',
+                vjoinon       =>['ldelmgrid'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'ldelmgrid',
+                group         =>'delmgmt',
+                dataobjattr   =>'costcenter.ldelmgr'),
+
+      new kernel::Field::TextDrop(
+                name          =>'ldelmgr2',
+                group         =>'delmgmt',
+                label         =>'lead Deputy Delivery Manager',
+                vjointo       =>'base::user',
+                vjoinon       =>['ldelmgr2id'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'ldelmgr2id',
+                group         =>'delmgmt',
+                dataobjattr   =>'costcenter.ldelmgr2'),
+
 
       new kernel::Field::TextDrop(
                 name          =>'delmgrteam',
@@ -209,7 +239,14 @@ sub getRecordImageUrl
 
 sub SecureValidate
 {
-   return(kernel::DataObj::SecureValidate(@_));
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $wrgroups=shift;
+   my $userid=$self->getCurrentUserId();
+
+
+   return(kernel::DataObj::SecureValidate($self,$oldrec,$newrec,$wrgroups));
 }
 
 
@@ -219,6 +256,14 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
+   if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
+      my $databossid=effVal($oldrec,$newrec,"databossid");
+      if (!defined($databossid) || $databossid eq ""){
+         $self->LastMsg(ERROR,"no write access - ".
+                              "you have to define databoss at first");
+         return(undef);
+      }
+   }
    my $conummer=effVal($oldrec,$newrec,"name");
    if ($conummer=~m/^\s*$/ || !($conummer=~m/^[0-9]+$/)){
       $self->LastMsg(ERROR,"invalid CO-Numer '\%s' specified",$conummer);
@@ -230,15 +275,15 @@ sub Validate
    if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
       my $userid=$self->getCurrentUserId();
       if (!defined($oldrec)){
-         if (!defined($newrec->{databoss}) ||
-             $newrec->{databoss}==0){
+         if (!defined($newrec->{databossid}) ||
+             $newrec->{databossid}==0){
             my $userid=$self->getCurrentUserId();
-            $newrec->{databoss}=$userid;
+            $newrec->{databossid}=$userid;
          }
       }
-      if (defined($newrec->{databoss}) &&
-          $newrec->{databoss}!=$userid &&
-          $newrec->{databoss}!=$oldrec->{databoss}){
+      if (defined($newrec->{databossid}) &&
+          $newrec->{databossid}!=$userid &&
+          $newrec->{databossid}!=$oldrec->{databossid}){
          $self->LastMsg(ERROR,"you are not authorized to set other persons ".
                               "as delmgr");
          return(0);
@@ -262,6 +307,9 @@ sub isWriteValid
 
 
    return("default") if (!defined($rec) && $self->IsMemberOf("admin"));
+   if (defined($rec) && !defined($rec->{databossid})){
+      return("default");
+   }
 
    my @databossedit=("default","delmgmt","contacts","control");
    return(@databossedit) if (defined($rec) && $self->IsMemberOf("admin"));

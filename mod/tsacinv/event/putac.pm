@@ -148,7 +148,7 @@ sub ApplicationModified
                grep(/^$rec->{name}$/,@okaglist))){
             msg(INFO,"process application=$rec->{name} jobname=$jobname");
             my $CurrentEventId;
-            my $CurrentAppl;
+            my $CurrentAppl=$rec->{name};
             my $ApplU=0;
             my $SysCount=0;
             {  # systems
@@ -187,7 +187,8 @@ sub ApplicationModified
                                    }
                                };
                   if ($lnk->{systemsystemid} ne ""){
-                     $acftprec->{Portfolio}=$lnk->{systemsystemid};
+                     $acftprec->{CI_APPL_REL}->{Portfolio}=
+                            $lnk->{systemsystemid};
                   }
                   if ($rec->{applid} ne ""){
                      $acftprec->{CI_APPL_REL}->{Application}=$rec->{applid};

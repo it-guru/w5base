@@ -28,6 +28,9 @@ sub new
    my $type=shift;
    my $parent=shift;
    my %param=@_;
+   if (!exists($param{manglednames})){
+      $param{manglednames}=1;
+   }
    if (!defined($param{vjointo})){
       msg(ERROR,"can't Import field without vjointo");
       return()

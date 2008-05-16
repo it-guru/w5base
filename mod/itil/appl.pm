@@ -248,6 +248,14 @@ sub new
                 group         =>'technical',
                 dataobjattr   =>'appl.tsm'),
 
+      new kernel::Field::Import( $self,
+                vjointo       =>'itil::costcenter',
+                vjoinon       =>['conumber'=>'name'],
+                dontrename    =>1,
+                group         =>'delmgmt',
+                fields        =>[qw(ldelmgr   ldelmgr2   delmgr   delmgr2
+                                    ldelmgrid ldelmgr2id delmgrid delmgr2id)]),
+
       new kernel::Field::TextDrop(
                 name          =>'customer',
                 group         =>'customer',
@@ -989,7 +997,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default finance technical customer custcontracts 
+          qw(default finance technical delmgmt customer custcontracts 
              contacts phonenumbers 
              interfaces systems misc attachments control 
              accountnumbers source));
