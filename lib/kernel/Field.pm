@@ -397,13 +397,21 @@ sub preProcessFilter
       return(&{$self->{onPreProcessFilter}}($self,$hflt));
    }
    if (defined($fobj->{vjointo})){
+      $fobj->vjoinobj->ResetFilter();
       my $loadfield=$fobj->{vjoinon}->[1];
       my $searchfield=$fobj->{vjoindisp};
       if (ref($fobj->{vjoindisp}) eq "ARRAY"){
-         $searchfield=$fobj->{vjoindisp}->[0];
+         for(my $findex=0;$findex<=$#{$fobj->{vjoindisp}};$findex++){
+            my $sfobj=$fobj->vjoinobj->getField($fobj->{vjoindisp}->[$findex]);
+            if (defined($sfobj)){
+               if ($sfobj->Self ne "kernel::Field::DynWebIcon"){
+                  $searchfield=$fobj->{vjoindisp}->[$findex];
+                  last;
+               }
+            }
+         }
       }
       my %flt=($searchfield=>$hflt->{$field});
-      $fobj->vjoinobj->ResetFilter();
       $fobj->vjoinobj->SetFilter(\%flt);
       if (defined($hflt->{$fobj->{vjoinon}->[0]})){
          $fobj->vjoinobj->SetNamedFilter("vjoinadd".$field,
