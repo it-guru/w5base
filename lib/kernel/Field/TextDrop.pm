@@ -113,9 +113,13 @@ sub ViewProcessor
       if (defined($idfield)){
          $obj->ResetFilter();
          $obj->SetFilter({$idfield->Name()=>\$refid});
-         my ($rec,$msg)=$obj->getOnlyFirst($self->Name());
-         if (defined($rec)){
-            $response->{document}->{value}=[$rec->{$self->Name()}];
+         my ($rec,$msg)=$obj->getOnlyFirst(qw(ALL));
+         my $fo=$obj->getField($self->Name(),$rec);
+         if (defined($fo) && defined($rec)){
+printf STDERR ("fifi found fo=$fo rec=$rec\n");
+            my $d=$fo->RawValue($rec);
+            $d=[$d] if (ref($d) ne "ARRAY");
+            $response->{document}->{value}=$d;
          }
          else{
             $response->{document}->{value}="";

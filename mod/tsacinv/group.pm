@@ -36,9 +36,15 @@ sub new
                 name          =>'linenumber',
                 label         =>'No.'),
 
+      new kernel::Field::Text(
+                name          =>'code',
+                label         =>'Code',
+                ignorecase    =>1,
+                dataobjattr   =>'amemplgroup.barcode'),
+
       new kernel::Field::Id(
                 name          =>'lgroupid',
-                label         =>'GroupID',
+                label         =>'LGroup ID',
                 dataobjattr   =>'amemplgroup.lgroupid'),
 
       new kernel::Field::Text(

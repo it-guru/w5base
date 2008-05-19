@@ -36,7 +36,22 @@ sub new
                 htmleditwidth =>'30%',
                 searchable    =>0,
                 label         =>'allow to send for (Herbeiruf)',
-                container     =>'additional')
+                container     =>'additional'),
+
+      new kernel::Field::Link(
+                name          =>'acinmassignmentgroupid',
+                group         =>'control',
+                label         =>'AssetCenter Incient Assignmentgroup ID',
+                container     =>'additional'),
+
+      new kernel::Field::TextDrop(
+                name          =>'acinmassingmentgroup',
+                label         =>'AssetCenter Incident Assignmentgroup',
+                group         =>'technical',
+                async         =>'1',
+                vjointo       =>'tsacinv::group',
+                vjoinon       =>['acinmassignmentgroupid'=>'lgroupid'],
+                vjoindisp     =>'name'),
    );
  
    $self->AddFields(
