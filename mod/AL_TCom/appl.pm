@@ -47,7 +47,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'acinmassingmentgroup',
                 label         =>'AssetCenter Incident Assignmentgroup',
-                group         =>'technical',
+                group         =>'inm',
                 async         =>'1',
                 vjointo       =>'tsacinv::group',
                 vjoinon       =>['acinmassignmentgroupid'=>'lgroupid'],
@@ -99,6 +99,30 @@ sub calcWorkflowStart
    }
    return($r);
 }
+
+sub isWriteValid
+{
+   my $self=shift;
+   my @l=$self->SUPER::isWriteValid(@_);
+   if (grep(/^(technical|ALL)$/,@l)){
+      push(@l,"inm");
+   }
+   return(@l);
+}
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my @l=$self->SUPER::getDetailBlockPriority(@_);
+   my $inserti=$#l;
+   for(my $c=0;$c<=$#l;$c++){
+      $inserti=$c+1 if ($l[$c] eq "technical");
+   }
+   splice(@l,$inserti,$#l-$inserti,("inm",@l[$inserti..($#l+-1)]));
+   return(@l);
+
+}  
+
 
 
 
