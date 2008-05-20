@@ -68,7 +68,7 @@ sub FormatedDetail
    }
    if (my $duration=CalcDateDuration($d1,$d2,"GMT")){
       if ($mode eq "HtmlDetail" || $mode eq "HtmlV01" ||
-          ($mode=~m/^XLS/)){
+          ($mode=~m/^XLS/i)){
          if ($self->{visual} eq "auto"){
             return($prefix.$duration->{string});
          }
