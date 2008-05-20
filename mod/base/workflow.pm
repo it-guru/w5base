@@ -108,6 +108,7 @@ sub new
                                    
       new kernel::Field::Link(
                 name          =>'stateid',         # for fast
+                label         =>'Worflow state ID',
                 selectfix     =>1,
                 dataobjattr   =>'wfhead.wfstate'), # querys
                                    

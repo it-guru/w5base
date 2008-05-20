@@ -30,6 +30,20 @@ sub new
    return($self);
 }
 
+sub getDefaultStdButtonBar
+{
+   my $self=shift;
+   my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
+                                         ["REmployee","RChief"],
+                                         "down");
+   my @grpids=keys(%grp);
+   if ($#grpids<5){
+      return('%StdButtonBar(teamviewcontrol,print,search)%');
+   }
+   return($self->SUPER::getDefaultStdButtonBar());
+}
+
+
 sub Init
 {
    my $self=shift;
@@ -45,6 +59,7 @@ sub getQueryTemplate
    my $timedrop=$self->getTimeRangeDrop("search_eventend",
                                         $self->getParent,
                                         qw(month));
+   my $dd=$self->getDefaultStdButtonBar();
    my $d=<<EOF;
 <div class=searchframe>
 <table class=searchframe>
@@ -57,12 +72,12 @@ sub getQueryTemplate
 <tr>
 <td class=fname width=10%>\%class(label)\%:</td>
 <td class=finput width=40% >\%class(search)\%</td>
-<td class=fname></td>
-<td class=finput></td>
+<td class=fname>\%state(label)\%</td>
+<td class=finput>\%stateid(search)\%</td>
 </tr>
 </table>
 </div>
-%StdButtonBar(print,search)%
+$dd
 EOF
    return($d);
 }
@@ -72,12 +87,38 @@ sub Result
 {
    my $self=shift;
    my %q=$self->{DataObj}->getSearchHash();
+   my $dc=Query->Param("EXVIEWCONTROL");
+
 
    my $userid=$self->getParent->getCurrentUserId();
    $userid=-1 if (!defined($userid) || $userid==0);
    my %q1=%q;
-   $q1{openuser}=\$userid;
-   $q1{stateid}=">16";
+
+   my $searchuser=[$userid];
+   if ($dc eq "TEAM"){
+      my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
+                                            ["REmployee","RChief"],
+                                            "down");
+      my @grpids=keys(%grp);
+      if ($#grpids<5){
+         @grpids=(qw(-1)) if ($#grpids==-1);
+         my $lnk=getModuleObject($self->getParent->Config,"base::lnkgrpuser");
+         $lnk->SetFilter({grpid=>\@grpids});
+         my @l=$lnk->getHashList(qw(userid));
+         if ($#l!=-1){
+            $searchuser=[map({$_->{userid}} @l)];
+         }
+      }
+   }
+   $q1{openuser}=$searchuser;
+
+   if ($q1{stateid} eq ""){
+      $q1{stateid}=">16";
+   }
+   else{
+      $q1{stateid}=$q1{stateid}." AND >16"
+   }
+
 
    $self->{DataObj}->ResetFilter();
    $self->{DataObj}->SecureSetFilter([\%q1]);

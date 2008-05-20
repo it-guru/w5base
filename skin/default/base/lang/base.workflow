@@ -30,6 +30,7 @@
 'Additionalinformations'=>{de=>'weiterführende Information'},
 'start workflow'=>{de=>'Workflow starten'},
 'State'=>{de=>'Status'},
+'Workflow state ID'=>{de=>'Workflow Status ID'},
 'Workflow-State'=>{de=>'Workflow Status'},
 'wfstate.0'=>{de=>'0-undefiniert',      en=>'0-undefined'},
 'wfstate.1'=>{de=>'1-erzeugt',          en=>'1-created'},

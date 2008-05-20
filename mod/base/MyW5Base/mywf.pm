@@ -38,11 +38,20 @@ sub Init
    return(1);
 }
 
+
 sub getDefaultStdButtonBar
 {
    my $self=shift;
-   return('%StdButtonBar(print,search)%');
+   my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
+                                         ["REmployee","RChief"],
+                                         "down");
+   my @grpids=keys(%grp);
+   if ($#grpids<5){
+      return('%StdButtonBar(teamviewcontrol,print,search)%');
+   }
+   return($self->SUPER::getDefaultStdButtonBar());
 }
+
 
 sub getQueryTemplate
 {
@@ -59,8 +68,8 @@ sub getQueryTemplate
 <tr>
 <td class=fname width=10%>\%class(label)\%:</td>
 <td class=finput width=50% >\%class(search)\%</td>
-<td class=fname width=10%>&nbsp;</td>
-<td class=finput width=50% >&nbsp;</td>
+<td class=fname width=10%>\%state(label)\%:</td>
+<td class=finput width=50% >\%stateid(search)\%</td>
 </tr>
 </table>
 </div>
@@ -80,12 +89,38 @@ sub Result
 {
    my $self=shift;
    my %q=$self->{DataObj}->getSearchHash();
+   my $dc=Query->Param("EXVIEWCONTROL");
+
 
    my $userid=$self->getParent->getCurrentUserId();
    $userid=-1 if (!defined($userid) || $userid==0);
    my %q1=%q;
-   $q1{openuser}=\$userid;
-   $q1{stateid}="<20";
+
+   my $searchuser=[$userid];
+   if ($dc eq "TEAM"){
+      my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
+                                            ["REmployee","RChief"],
+                                            "down");
+      my @grpids=keys(%grp);
+      if ($#grpids<5){
+         @grpids=(qw(-1)) if ($#grpids==-1);
+         my $lnk=getModuleObject($self->getParent->Config,"base::lnkgrpuser");
+         $lnk->SetFilter({grpid=>\@grpids});
+         my @l=$lnk->getHashList(qw(userid));
+         if ($#l!=-1){
+            $searchuser=[map({$_->{userid}} @l)];
+         }
+      }
+   }
+   $q1{openuser}=$searchuser;
+
+
+   if ($q1{stateid} eq ""){
+      $q1{stateid}="<20";
+   }
+   else{
+      $q1{stateid}=$q1{stateid}." AND <20"
+   }
 
    $self->{DataObj}->ResetFilter();
    $self->{DataObj}->SecureSetFilter([\%q1]);
