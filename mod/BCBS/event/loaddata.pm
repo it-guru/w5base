@@ -142,6 +142,7 @@ sub LoadBCBS
                      applgroup=>"BCBS",
                      criticality=>$criticality,
                      customerprio=>$rec->{customerprio},
+                     acinmassingmentgroup=>$rec->{iassignmentgroup},
                      cistatusid=>4,
                      issoxappl=>$issoxappl,
                      srcid=>$rec->{id},

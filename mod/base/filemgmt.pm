@@ -1010,6 +1010,7 @@ EOF
       }
    }
    else{
+      print("Status: 404 Not Found\n");
       print($header);
       print("<div class=message>"); 
       printf($self->T("ERROR: the requested path '%s' does not exists"),$p);

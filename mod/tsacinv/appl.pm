@@ -88,10 +88,24 @@ sub new
                                     
       new kernel::Field::TextDrop(
                 name          =>'assignmentgroup',
-                label         =>'Assignment Group',
+                label         =>'CFM Assignment Group',
                 vjointo       =>'tsacinv::group',
                 vjoinon       =>['lassignmentid'=>'lgroupid'],
                 vjoindisp     =>'name'),
+
+      new kernel::Field::TextDrop(
+                name          =>'iassignmentgroup',
+                label         =>'INM Assignment Group',
+                vjointo       =>'tsacinv::group',
+                vjoinon       =>['lincidentagid'=>'lgroupid'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'lincidentagid',
+                label         =>'AC-Incident-AssignmentID',
+                dataobjattr   =>'amtsicustappl.lincidentagid'),
+
+
                                     
       new kernel::Field::TextDrop(
                 name          =>'sem',
