@@ -105,12 +105,20 @@ sub Result
    my %q3;
    my %q4;
    my %q5;
+   my %q6;
+   my %q7;
+   my %q8;
+   my %q9;
    $q1{semid}=\$userid;
    $q2{tsmid}=\$userid;
    $q3{databossid}=\$userid;
    $q4{sem2id}=\$userid;
    $q5{tsm2id}=\$userid;
-   push(@q,\%q1,\%q2,\%q3,\%q4,\%q5);
+   $q6{delmgrid}=\$userid;
+   $q7{delmgr2id}=\$userid;
+   $q8{ldelmgrid}=\$userid;
+   $q9{ldelmgr2id}=\$userid;
+   push(@q,\%q1,\%q2,\%q3,\%q4,\%q5,\%q6,\%q7,\%q8,\%q9);
 
 
    $self->{appl}->ResetFilter();

@@ -87,6 +87,8 @@ sub Result
       my %q2=();
       my %q3=();
       my %q4=();
+      my %q5=();
+      my %q6=();
       $q1{sem2id}=\$userid;
       $q2{tsm2id}=\$userid;
 
@@ -99,17 +101,25 @@ sub Result
       $q3{businessteamid}=\@grpids;
       my %q4;
       $q4{responseteamid}=\@grpids;
+      $q5{delmgr2id}=\$userid;
+      $q6{ldelmgr2id}=\$userid;
 
-      push(@q,\%q1,\%q2,\%q3,\%q4);
+
+      push(@q,\%q1,\%q2,\%q3,\%q4,\%q5,\%q6);
    }
    if ($dc ne "DEPONLY" && $dc ne "TEAM"){
       my %q1=();
       my %q2=();
       my %q3=();
+      my %q4=();
+      my %q5=();
       $q1{semid}=\$userid;
       $q2{tsmid}=\$userid;
       $q3{databossid}=\$userid;
-      push(@q,\%q1,\%q2,\%q3);
+      $q4{delmgrid}=\$userid;
+      $q5{ldelmgrid}=\$userid;
+
+      push(@q,\%q1,\%q2,\%q3,\%q4,\%q5);
    }
    if ($dc eq "TEAM"){
       my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
@@ -126,7 +136,11 @@ sub Result
       $q2{cistatusid}='<=4';
       $q2{responseteamid}=\@grpids;
 
-      push(@q,\%q1,\%q2);
+      my %q3;
+      $q3{cistatusid}='<=4';
+      $q3{delmgrteamid}=\@grpids;
+
+      push(@q,\%q1,\%q2,\%q3);
    }
 
 

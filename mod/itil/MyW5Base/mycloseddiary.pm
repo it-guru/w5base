@@ -94,13 +94,19 @@ sub Result
       $q2{cistatusid}='<=4';
       $q2{responseteamid}=\@grpids;
 
-      push(@q,\%q1,\%q2);
+      my %q3;
+      $q3{cistatusid}='<=4';
+      $q3{delmgrteamid}=\@grpids;
+
+      push(@q,\%q1,\%q2,\%q3);
    }
    if ($dc eq "ADDDEP" || $dc eq "DEPONLY"){
-      my %q1;
-      my %q2;
-      my %q3;
-      my %q4;
+      my %q1=%q;
+      my %q2=%q;
+      my %q3=%q;
+      my %q4=%q;
+      my %q5=%q;
+      my %q6=%q;
       $q1{sem2id}=\$userid;
       $q2{tsm2id}=\$userid;
 
@@ -113,16 +119,22 @@ sub Result
       $q3{businessteamid}=\@grpids;
       my %q4;
       $q4{responseteamid}=\@grpids;
-      push(@q,\%q1,\%q2,\%q3,\%q4);
+      $q5{delmgr2id}=\$userid;
+      $q6{ldelmgr2id}=\$userid;
+      push(@q,\%q1,\%q2,\%q3,\%q4,\%q5,\%q6);
    }
    if ($dc ne "DEPONLY" && $dc ne "TEAM"){
       my %q1=%q;
       my %q2=%q;
       my %q3=%q;
+      my %q4=%q;
+      my %q5=%q;
       $q1{semid}=\$userid;
       $q2{tsmid}=\$userid;
       $q3{databossid}=\$userid;
-      push(@q,\%q1,\%q2,\%q3);
+      $q4{delmgrid}=\$userid;
+      $q5{ldelmgrid}=\$userid;
+      push(@q,\%q1,\%q2,\%q3,\%q4,\%q5);
    }
 
 

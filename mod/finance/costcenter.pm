@@ -94,6 +94,7 @@ sub new
                 name          =>'ldelmgr2',
                 group         =>'delmgmt',
                 label         =>'lead Deputy Delivery Manager',
+                AllowEmpty    =>1,
                 vjointo       =>'base::user',
                 vjoinon       =>['ldelmgr2id'=>'userid'],
                 vjoindisp     =>'fullname'),
@@ -129,6 +130,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'delmgr2',
                 group         =>'delmgmt',
+                AllowEmpty    =>1,
                 label         =>'Deputy Delivery Manager',
                 vjointo       =>'base::user',
                 vjoinon       =>['delmgr2id'=>'userid'],
@@ -307,7 +309,8 @@ sub isWriteValid
 
 
    return("default") if (!defined($rec) && $self->IsMemberOf("admin"));
-   if (defined($rec) && !defined($rec->{databossid})){
+   if (defined($rec) && !defined($rec->{databossid}) &&
+       !($self->IsMemberOf("admin"))){
       return("default");
    }
 
