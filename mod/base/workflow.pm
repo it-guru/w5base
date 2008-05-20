@@ -465,12 +465,12 @@ sub new
                 label         =>'Creator Name',
                 dataobjattr   =>'wfhead.openusername'),
 
-      new kernel::Field::Text(
-                name          =>'responsibilityby',
-                group         =>'state',
-                label         =>'W5Stat Responsibility by',
-                onRawValue    =>\&calcResponsibilityBy,
-                depend        =>['fwdtargetid','fwdtarget']),
+#      new kernel::Field::Text(  # so wird das nichts
+#                name          =>'responsibilityby',
+#                group         =>'state',
+#                label         =>'W5Stat Responsibility by',
+#                onRawValue    =>\&calcResponsibilityBy,
+#                depend        =>['fwdtargetid','fwdtarget']),
 
       new kernel::Field::Link(
                 name          =>'openuser',
