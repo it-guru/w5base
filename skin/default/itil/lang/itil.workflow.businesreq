@@ -1,6 +1,5 @@
 'itil::workflow::businesreq'=>{de=>'ITIL Anfrage/Auftrag an den Anwendungsbetrieb oder an die Anwendungsbetreuung',en=>'ITIL Question or request to applications businessteam'},
 'itil::workflow::businesreq::tip'=>{de=>'Dieser Workflow nimmt Aufträge des Kunden an die Anwendungsbetreuung entgegen. Der Workflow wird automatisch an den Auftragseingang der jeweiligen Anwendung weitergeleitet.<br>Sollte bei der ausgewählten Anwendung kein Kundenauftragseingang registriert sein, so wird die Weiterleitung des Workflows nicht gestattet.',en=>'Question or request to the application developers'},
-'no developer found'=>{de=>'kein Entwickler für die gewählte Anwendung gefunden'},
 'Request nature'=>{de=>'Auftragsart'},
 'operation'=>{de=>'normale Betriebsaufgaben'},
 'modification'=>{de=>'Veränderung der Anwendung'},
@@ -10,3 +9,5 @@
 'Reference'=>{de=>'Referenz'},
 'fieldgroup.customerdata'=>{de=>'Zusatzinformationen des Auftraggebers',
                             en=>'Additional informations from the orderer'},
+'no orderin found'=>{de=>'für die ausgewählte Anwendung ist kein Auftragseingang registriert'},
+

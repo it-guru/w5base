@@ -1,4 +1,3 @@
 'no application specified'=>{de=>'keine gültige Anwendung eingegeben'},
 'business requests are disabled for the desired application'=>{de=>'Anforderungen an den Anwendugnsbetrieb sind für die ausgewählte Anwendung nicht zugelassen'},
-'no orderin found'=>{de=>'für die ausgewählte Anwendung ist kein Auftragseingang registriert'},
 
