@@ -1,0 +1,2 @@
+'itil::qrule::ApplCriticality'=>{de=>'Eintragung der Kritikalität',en=>'definition of criticality'},
+'no criticality defined'=>{de=>'keine Kritikalität eingetragen'},
