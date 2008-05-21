@@ -485,18 +485,18 @@ sub new
                 dataobjattr   =>'wfhead.modifyuser'),
 
       new kernel::Field::KeyText(
-                name          =>'responsablegrp',
+                name          =>'responsiblegrp',
                 htmldetail    =>0,
                 keyhandler    =>'kh',
                 group         =>'state',
-                label         =>'Responsable Group'),
+                label         =>'Responsible Group'),
 
       new kernel::Field::KeyText(
-                name          =>'responsablegrpid',
+                name          =>'responsiblegrpid',
                 htmldetail    =>0,
                 keyhandler    =>'kh',
                 group         =>'state',
-                label         =>'Responsable Group ID'),
+                label         =>'Responsible Group ID'),
 
       new kernel::Field::KeyHandler(
                 name          =>'kh',
@@ -947,6 +947,44 @@ sub Validate
    if ($name=~m/^\s*$/){
       $self->LastMsg(ERROR,"invalid workflow short description spezified");
       return(0);
+   }
+   if ((defined($newrec->{fwdtarget}) && 
+        effVal($oldrec,$newrec,"fwdtarget") ne $oldrec->{fwdtarget}) ||
+       (defined($newrec->{fwdtargetid}) && 
+        effVal($oldrec,$newrec,"fwdtargetid") ne $oldrec->{fwdtargetid})){
+      # no the last responsegroup has to be posible changed
+      my $fwdtargetid=effVal($oldrec,$newrec,"fwdtargetid");
+      my $fwdtarget=effVal($oldrec,$newrec,"fwdtarget");
+      if ($fwdtarget eq "base::grp"){
+         my $grp=getModuleObject($self->Config,"base::grp");
+         $grp->SetFilter({grpid=>\$fwdtargetid});
+         my ($grprec)=$grp->getOnlyFirst(qw(fullname));
+         if (defined($grprec)){
+            $newrec->{responsiblegrp}=[$grprec->{fullname}];
+            $newrec->{responsiblegrpid}=[$fwdtargetid];
+         }
+      }
+      if ($fwdtarget eq "base::user"){
+         my $user=getModuleObject($self->Config,"base::user");
+         $user->SetFilter({userid=>\$fwdtargetid});
+         my ($usrrec)=$user->getOnlyFirst(qw(groups));
+         if (defined($usrrec) && ref($usrrec->{groups}) eq "ARRAY"){
+            my %grp;
+            my %grpid;
+            foreach my $grec (@{$usrrec->{groups}}){
+               if (ref($grec->{roles}) eq "ARRAY"){
+                  if (grep(/^(REmployee|RBoss|RBoss2)$/,@{$grec->{roles}})){
+                     $grp{$grec->{group}}++;
+                     $grpid{$grec->{grpid}}++;
+                  }
+               }
+            }
+            if (keys(%grp)){
+               $newrec->{responsiblegrp}=[keys(%grp)];
+               $newrec->{responsiblegrpid}=[keys(%grpid)];
+            }
+         }
+      }
    }
    return($bk);
 }
