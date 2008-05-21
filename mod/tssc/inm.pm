@@ -215,10 +215,32 @@ sub new
                 dataobjattr   =>'problemm1.work_end'),
 
       new kernel::Field::Text(
+                name          =>'reportedby',
+                uppersearch   =>1,
+                group         =>'contact',
+                label         =>'Reported by',
+                dataobjattr   =>'problemm1.reported_by'),
+
+      new kernel::Field::Text(
                 name          =>'editor',
+                uppersearch   =>1,
                 group         =>'contact',
                 label         =>'Editor',
                 dataobjattr   =>'problemm1.sysmoduser'),
+
+      new kernel::Field::Text(
+                name          =>'contactlastname',
+                ignorecase    =>1,
+                group         =>'contact',
+                label         =>'Contact Lastname',
+                dataobjattr   =>'problemm1.contact_lastname'),
+
+      new kernel::Field::Text(
+                name          =>'contactname',
+                ignorecase    =>1,
+                group         =>'contact',
+                label         =>'Contact Name',
+                dataobjattr   =>'problemm1.contact_name'),
 
       new kernel::Field::Link(
                 name          =>'page',
