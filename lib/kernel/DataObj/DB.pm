@@ -407,7 +407,7 @@ sub QuoteHashData
       }
       else{
          if (!defined($fobj->{container}) && !defined($fobj->{onFinishWrite})
-             && $fobj->Type() ne "KeyText" &&
+             && $fobj->Type() ne "KeyText" 
              && $fobj->Type() ne "KeyHandler" &&
                 $fobj->Type() ne "File"){
             msg(ERROR,"can't QuoteHashData field '$field' in $self - ".
