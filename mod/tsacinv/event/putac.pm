@@ -147,7 +147,8 @@ sub ApplicationModified
         # );
          if ($rec->{mandatorid} ne $exclmand &&
              (!($rec->{businessteam}=~m/\.BILLING/i) || 
-               grep(/^$rec->{name}$/,@okaglist))){
+               grep(/^$rec->{name}$/,@okaglist) ||
+               ($rec->{name}=~m/^.*(_ABN|_ENTW|_GIT)$/))){
             msg(INFO,"process application=$rec->{name} jobname=$jobname");
             my $CurrentEventId;
             my $CurrentAppl=$rec->{name};
