@@ -67,7 +67,7 @@ sub ApplicationModified
    my $applsys=getModuleObject($self->Config,"itil::lnkapplsystem");
    my $swinstance=getModuleObject($self->Config,"itil::swinstance");
    my $acgrp=getModuleObject($self->Config,"tsacinv::group");
-   my $app=getModuleObject($self->Config,"itil::appl");
+   my $app=getModuleObject($self->Config,"AL_TCom::appl");
    my $user=getModuleObject($self->Config,"base::user");
    my $mand=getModuleObject($self->Config,"base::mandator");
    my $acuser=getModuleObject($self->Config,"tsacinv::user");
@@ -84,7 +84,7 @@ sub ApplicationModified
               50=>'ACCEPTANCE',
               60=>'DEVELOPMENT',
               70=>'PRODUCTION');
-   #$filter{name}="*i-network*";
+  # $filter{name}="*w5base*";
    $app->SetFilter(\%filter);
    $app->SetCurrentView(qw(ALL));
   # $app->SetCurrentView(qw(id name sem tsm tsm2 conumber currentvers
@@ -285,6 +285,7 @@ sub ApplicationModified
                                    Description=>$rec->{description},
                                    Remarks=>$rec->{comments},
                                    MaintWindow=>$rec->{maintwindow},
+                                   IncidentAG=>$rec->{acinmassingmentgroup},
                                    Version=>$rec->{currentvers},
                                    SoxRelevant=>$issoxappl,
                                    Criticality=>$criticality,
