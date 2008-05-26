@@ -145,10 +145,7 @@ sub ApplicationModified
         #    SV4CONGSTER_WIRK DKK_NEU_WIRK REO_WIRK DWH_AW_WIRK 
         #    BACKUP_SERVER DMZ_SERVER
         # );
-         if ($rec->{mandatorid} ne $exclmand &&
-             (!($rec->{businessteam}=~m/\.BILLING/i) || 
-               grep(/^$rec->{name}$/,@okaglist) ||
-               ($rec->{name}=~m/^.*(_ABN|_ENTW|_GIT)$/))){
+         if ($rec->{mandatorid} ne $exclmand ){
             msg(INFO,"process application=$rec->{name} jobname=$jobname");
             my $CurrentEventId;
             my $CurrentAppl=$rec->{name};
