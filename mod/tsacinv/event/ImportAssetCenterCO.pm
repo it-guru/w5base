@@ -54,7 +54,7 @@ sub ImportAssetCenterCO
    $self->{user}=getModuleObject($self->Config,"base::user");
    $self->{mandator}=getModuleObject($self->Config,"base::mandator");
 
-   $co->SetFilter({bc=>\'AL T-COM'});
+   $co->SetFilter({bc=>['AL T-COM','OSY']});
    my @l=$co->getHashList(qw(name bc description sememail));
    my $cocount=0;
    foreach my $rec (@l){
