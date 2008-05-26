@@ -207,6 +207,7 @@ sub HandleCIStatus
 
 sub NotifyAdmin
 {
+printf STDERR ("fifi 01 in NotifyAdmin\n");
    my $self=shift;
    my $mode=shift;
    my $oldrec=shift;
