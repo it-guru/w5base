@@ -308,7 +308,7 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
 
 
-   return("default") if (!defined($rec) && $self->IsMemberOf("admin"));
+   return("default") if (!defined($rec));
    if (defined($rec) && !defined($rec->{databossid}) &&
        !($self->IsMemberOf("admin"))){
       return("default");
