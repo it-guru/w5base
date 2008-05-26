@@ -791,7 +791,7 @@ sub directoryLoop
             return(1,$res[0]) if (defined($res[0]));
             # delete directory
             if ($entrytyp[0]->{entrytyp} eq "dir"){
-               reverseDelete($operations->{DATA}->{fid});
+               reverseDelete($operations->{DATA}->{fid},$stepit,$mywin);
             # delete file
             }else{
                $o{'filemgmt'}->deleteRecord($operations->{DATA}->{fid});
@@ -814,9 +814,12 @@ sub directoryLoop
 sub reverseDelete
 {
    my $parentid=shift;
+   my $stepit=shift;
+   my $mywin=shift;
    $o{'filemgmt'}->SetFilter({parentid=>[$parentid]});
    my @files=$o{'filemgmt'}->getHashList(qw(fid entrytyp));
    foreach my $file (@files){
+       &{$stepit}($mywin,"INFO: delete ".$file->{name}) if ($stepit);
       if ($file->{entrytyp} eq "dir"){
          reverseDelete($file->{fid});
       } 
