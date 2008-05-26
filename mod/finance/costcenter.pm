@@ -258,7 +258,12 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
+
    if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
+      if (!defined($oldrec) && !defined($newrec->{databossid})){
+         my $userid=$self->getCurrentUserId();
+         $newrec->{databossid}=$userid;
+      }
       my $databossid=effVal($oldrec,$newrec,"databossid");
       if (!defined($databossid) || $databossid eq ""){
          $self->LastMsg(ERROR,"no write access - ".
