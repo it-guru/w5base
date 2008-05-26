@@ -239,17 +239,17 @@ sub getRecordImageUrl
 }
 
 
-sub SecureValidate
-{
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-   my $wrgroups=shift;
-   my $userid=$self->getCurrentUserId();
-
-
-   return(kernel::DataObj::SecureValidate($self,$oldrec,$newrec,$wrgroups));
-}
+#sub SecureValidate
+#{
+#   my $self=shift;
+#   my $oldrec=shift;
+#   my $newrec=shift;
+#   my $wrgroups=shift;
+#   my $userid=$self->getCurrentUserId();
+#
+#
+#   return(kernel::DataObj::SecureValidate($self,$oldrec,$newrec,$wrgroups));
+#}
 
 
 sub Validate
