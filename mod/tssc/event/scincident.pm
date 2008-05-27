@@ -54,7 +54,7 @@ sub scincident
                            hassignment iassignment priority causecode reason
                            downtimestart downtimeend opentime 
                            workstart workend resolution
-                           softwareid deviceid
+                           softwareid deviceid reportedby
                            action sysmodtime involvedassignment));
    my $focus="now";
    my %flt=(closetime=>"\">$focus-10m\"");

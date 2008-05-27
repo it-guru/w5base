@@ -131,10 +131,13 @@ sub mkProblemStoreRec
    $wfrec{closedate}=$app->ExpandTimeExpression($rec->{closetime},
                                                 "en","CET");
    $wfrec{openuser}=undef;
-   $wfrec{openusername}="wiw/".lc($rec->{creator});
-   $self->{user}->SetFilter({posix=>\$rec->{creator}});
-   my $userid=$self->{user}->getVal("userid");
-   $wfrec{openuser}=$userid if (defined($userid));
+   $wfrec{openusername}=undef;
+   if ($rec->{creator} ne ""){
+      $wfrec{openusername}="wiw/".lc($rec->{creator});
+      $self->{user}->SetFilter({posix=>\$rec->{creator}});
+      my $userid=$self->{user}->getVal("userid");
+      $wfrec{openuser}=$userid if (defined($userid));
+   }
 #   if (!($rec->{closecode}=~m/^\s*$/)){
 #      $wfrec{additional}->{ServiceCenterCloseCode}=$rec->{closecode};
 #   }
@@ -413,7 +416,7 @@ sub mkChangeStoreRec
    if (!defined($updateto)){
       $wfrec{openuser}=undef;
       my $posix=lc($rec->{requestedby});
-      $wfrec{openusername}=$rec->{requestedby};
+      $wfrec{openusername}="wiw/$posix";
       $self->{user}->ResetFilter();
       $self->{user}->SetFilter({posix=>\$posix});
       my $userid=$self->{user}->getVal("userid");
@@ -733,6 +736,16 @@ sub mkIncidentStoreRec
    $wfrec{createdate}=$app->ExpandTimeExpression($rec->{opentime},"en","CET");
    $wfrec{closedate}=$app->ExpandTimeExpression($rec->{closetime},"en","CET");
    #$rec->{softwareid}="CMDB" if ($rec->{incidentnumber} eq "GER03733409");
+
+   $wfrec{openuser}=undef;
+   $wfrec{openusername}=undef;
+   if ($rec->{reportedby} ne ""){
+      $wfrec{openusername}="wiw/".lc($rec->{reportedby});
+      $self->{user}->SetFilter({posix=>\$rec->{reportedby}});
+      my $userid=$self->{user}->getVal("userid");
+      $wfrec{openuser}=$userid if (defined($userid));
+   }
+
    my ($system,$systemid,
        $anames,$aids,$contrnames,$contrids,$mandator,$mandatorid,
        $costcenter,$customername,$responseteam,$businessteam)=
