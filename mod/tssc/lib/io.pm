@@ -776,7 +776,10 @@ sub mkIncidentStoreRec
       }
       else{
          $wfrec{class}='itil::workflow::incident';
-         $wfrec{stateid}=21;           # non AL-T-Com is automaticly finished
+         #$wfrec{stateid}=21;           # non AL-T-Com is automaticly finished
+         # automatisches schliesen ist doch nicht so gut, da die Incidents
+         # nun auch bei den eigenen Workflows erscheinen und ansonsten nicht
+         # korrekt dargestellt würden
       }
       $wfrec{step}='itil::workflow::incident::extauthority';
    }

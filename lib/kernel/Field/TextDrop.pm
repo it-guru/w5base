@@ -28,6 +28,9 @@ sub new
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
    $self->{AllowEmpty}=0 if (!defined($self->{AllowEmpty}));
+   if (!defined($self->{depend}) && defined($self->{vjoinon})){
+      $self->{depend}=[$self->{vjoinon}->[0]]; # if there is a vjoin, we must
+   }                         # be sure, to select the local criteria
    return($self);
 }
 
@@ -116,7 +119,6 @@ sub ViewProcessor
          my ($rec,$msg)=$obj->getOnlyFirst(qw(ALL));
          my $fo=$obj->getField($self->Name(),$rec);
          if (defined($fo) && defined($rec)){
-printf STDERR ("fifi found fo=$fo rec=$rec\n");
             my $d=$fo->RawValue($rec);
             $d=[$d] if (ref($d) ne "ARRAY");
             $response->{document}->{value}=$d;

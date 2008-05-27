@@ -892,7 +892,11 @@ sub Process
             if ($self->getParent->getParent->Action->StoreRecord(
                 $WfRec->{id},"wfaddnote",
                 {translation=>'base::workflow::request'},$note,$effort)){
-               if ($self->StoreRecord($WfRec,{stateid=>4})){
+               if ($self->StoreRecord($WfRec,{fwdtarget=>'base::user',
+                                              fwdtargetid=>$userid,
+                                              fwddebtarget=>undef,
+                                              fwddebtargetid=>undef,
+                                              stateid=>4})){
                   $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
                   $self->PostProcess($action.".".$op,$WfRec,$actions);
                }
