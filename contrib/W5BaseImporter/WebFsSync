@@ -291,7 +291,7 @@ sub doStart
    my $self=shift;
    my @oplist; 
    my $mainwin=$self;
-   if (!$mainwin){
+   if (!($mainwin=~m/^MyWin*/)){
       $mainwin=$self->GetParent();
    }
    $mainwin->output->LimitText(1000000);
@@ -319,6 +319,7 @@ sub doStart
       return(1,$msgs);
    }else{
       my %save;
+     # $mainwin->run->Change(-text => "Abort");
       $mainwin->run->Enable(0);
       foreach my $save (qw(ldir=s webpass=s rdir=s base=s webuser=s)){
          $save{$save}=$mainwin->{PARAM}->{$save};
