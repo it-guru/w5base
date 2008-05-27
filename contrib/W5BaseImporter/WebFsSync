@@ -294,6 +294,9 @@ sub doStart
    if (!($mainwin=~m/^MyWin*/)){
       $mainwin=$self->GetParent();
    }
+   #if ($mainwin->run->Text() eq "Abort"){
+   #  exit;
+   #}
    $mainwin->output->LimitText(1000000);
    $mainwin->output->SetFocus();
    my $directorycount=0;
@@ -826,9 +829,9 @@ sub reverseDelete
    my $stepit=shift;
    my $mywin=shift;
    $o{'filemgmt'}->SetFilter({parentid=>[$parentid]});
-   my @files=$o{'filemgmt'}->getHashList(qw(fid entrytyp));
+   my @files=$o{'filemgmt'}->getHashList(qw(fid entrytyp name));
    foreach my $file (@files){
-       &{$stepit}($mywin,"INFO: delete ".$file->{name}) if ($stepit);
+       &{$stepit}($mywin,"INFO: delete ".$file->{name}." ...done") if ($stepit);
       if ($file->{entrytyp} eq "dir"){
          reverseDelete($file->{fid});
       } 
