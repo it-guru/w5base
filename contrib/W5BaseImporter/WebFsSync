@@ -290,7 +290,10 @@ sub doStart
 {
    my $self=shift;
    my @oplist; 
-   my $mainwin=$self->GetParent();
+   my $mainwin=$self;
+   if (!$mainwin){
+      $mainwin=$self->GetParent();
+   }
    $mainwin->output->LimitText(1000000);
    $mainwin->output->SetFocus();
    my $directorycount=0;
@@ -544,7 +547,7 @@ use vars qw($GUI $Window);
 
 my $DefaultBase="https://w5base.net/w5base/auth/";
 my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang,$admin);
-my ($mode,$force,$rdir,$ldir,$nogui,$nowarn,%o,$Revision,$empty);
+my ($mode,$force,$rdir,$ldir,$nogui,$nowarn,%o,$Revision,$empty,$autostart);
 my $os=$Config{'osname'};
 my $action=0;
 my $volume=0;
@@ -554,7 +557,7 @@ my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
        "webuser=s"=>\$loginuser,"webpass=s"=> \$loginpass,
        "verbose+"=>\$verbose,"nowarn"=>\$nowarn,"admin"=>\$admin,
        "force"=>\$force,"rdir=s"=>\$rdir,"ldir=s"=>\$ldir,
-       "mode=s"=>\$mode,"nogui"=>\$nogui);
+       "mode=s"=>\$mode,"nogui"=>\$nogui,"autostart"=>\$autostart);
 
 # set options
 $|=1;
@@ -603,6 +606,11 @@ if ($os eq "MSWin32" && !$nogui){
                         -params=>\%P,
                         -force=>$force);
          $GUI->Show();
+         if ($autostart){
+            $GUI->doStart();
+            sleep(2);
+            return(-1);
+         }
          Win32::GUI::Dialog();');
    msg(ERROR,"--gui only on windows systems \n $@") if ($@);
 }else{
@@ -1144,6 +1152,7 @@ sub processOperations
                                                 parentid   =>  $rec->{DATA}->{parentid},
                                                 },
                                                $rec->{DATA}->{fid});
+            msg(DEBUG,"upload done'$rec->{DATA}->{name}'");
             # read modifydate from the stored record
             $o{'filemgmt'}->SetFilter({fid=>[$fid]});
             my @res=$o{'filemgmt'}->LastMsg();
@@ -1215,22 +1224,23 @@ sub Help
    print(<<EOF);
 $RealScript [options] 
 
-   --verbose  display more details of operation process
-   --quiet    only errors would be displayed
-   --base     base url of filemgmt [default:$DefaultBase]
-   --webuser  username
-   --webpass  password
-   --store    stores the parameters (not help,verbose and store)
-   --help     show this help
-              
-   --mode     download or upload [default:download]
-   --rdir     remote directory
-   --ldir     local directory
-   --force    write data  
-   --nogui    for commandline usage in win32 systems only,
-              default is gui on
-   --nowarn   prevent warnings
-   --admin    enable admin options
+   --verbose    display more details of operation process
+   --quiet      only errors would be displayed
+   --base       base url of filemgmt [default:$DefaultBase]
+   --webuser    username
+   --webpass    password
+   --store      stores the parameters (not help,verbose and store)
+   --help       show this help
+                
+   --mode       download or upload [default:download]
+   --rdir       remote directory
+   --ldir       local directory
+   --force      write data  
+   --nogui      for commandline usage in win32 systems only,
+                default is gui on
+   --nowarn     prevent warnings
+   --admin      enable admin options
+   --autostart  sync automatically, in win32 mode only
 EOF
 }
 exit(255);
