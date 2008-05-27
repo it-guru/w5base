@@ -689,6 +689,16 @@ sub new
    return($self);
 }
 
+#sub initSearchQuery
+#{
+#   my $self=shift;
+#   if (!defined(Query->Param("search_cistatus"))){
+#     Query->Param("search_cistatus"=>
+#                  "!".$self->T("CI-Status(6)","base::cistatus"));
+#   }
+#}
+
+
 
 sub getTeamBossID
 {

@@ -568,8 +568,9 @@ sub calcResponsibilityBy
 sub initSearchQuery
 {
    my $self=shift;
-
-   Query->Param("search_mdate"=>'>now-60m');
+   if (!defined(Query->Param("search_mdate"))){
+      Query->Param("search_mdate"=>'>now-60m');
+   }
 }
 
 sub getEventDay

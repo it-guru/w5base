@@ -33,6 +33,8 @@ sub qcheckRecord
       $exitcode=3 if ($exitcode<3);
       push(@{$desc->{qmsg}},
            $self->T('there is no description defined'));
+      push(@{$desc->{dataissue}},
+           $self->T('there is no description defined'));
       push(@{$desc->{solvtip}},
            $self->T('descripe the application'));
    }
