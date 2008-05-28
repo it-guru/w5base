@@ -29,6 +29,8 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=4;
+
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
