@@ -1369,6 +1369,7 @@ sub prepUploadRecord                       # pre processing interface
 {
    my $self=shift;
    my $newrec=shift;
+
    return(1);
 }
 
@@ -1447,7 +1448,6 @@ sub ProcessUploadRecord
    my $idobj=$self->IdField();
    if (defined($idobj)){
       my $idname=$idobj->Name();
-printf STDERR ("fifi idname=$idname\n");
       if (defined($rec->{$idname}) && !($rec->{$idname}=~m/^\s*$/)){
          $self->ResetFilter();
          $id=$rec->{$idname};
@@ -1467,6 +1467,7 @@ printf STDERR ("fifi idname=$idname\n");
       }
    }
    my $newrec=$self->getWriteRequestHash("upload",$oldrec,$rec);
+printf STDERR ("fifi newrec=%s\n",Dumper($newrec));
    if (!defined($newrec)){
       if ($self->LastMsg()){
          print join("\n",$self->LastMsg());
@@ -1568,6 +1569,11 @@ sub Upload
                                                     debug=>$debug,
                                                     countok=>\$countok,
                                                     countfail=>\$countfail);
+                                      }
+                                      else{
+                                         $countfail++;
+                                         print join("",$self->LastMsg());
+                                         $self->LastMsg("");
                                       }
                                    }
                                    else{

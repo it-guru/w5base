@@ -347,6 +347,21 @@ sub getXLSformatname
 }
 
 
+sub prepUploadRecord   # prepair one record on upload
+{
+   my $self=shift;
+   my $newrec=shift;
+   my $oldrec=shift;
+   my $name=$self->Name();
+   if (defined($newrec->{$name})){
+      my $dn=$self->Unformat([$newrec->{$name}],$newrec);
+      return(undef) if (!defined($dn));
+      $newrec->{$name}=$dn->{$name};
+   }
+   return(1);
+}
+
+
 
 
 

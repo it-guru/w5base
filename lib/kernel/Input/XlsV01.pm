@@ -28,7 +28,8 @@ sub SetInput
    my $file=shift;
 
    my $buffer;
-   eval("use Spreadsheet::ParseExcel;");
+   eval("use Spreadsheet::ParseExcel;".
+        "use Spreadsheet::ParseExcel::Utility qw(ExcelFmt);");
    return(undef) if ($@ ne "");
    if (sysread($file,$buffer,8)){
       if (uc(unpack("H*",$buffer)) ne "D0CF11E0A1B11AE1"){
@@ -135,6 +136,9 @@ sub Process
          my $cell=$self->{'oWkS'}->{Cells}[$row][$col];
          if (defined($cell)){
             my $v=$cell->{Val};
+            if ($cell->{Type} eq "Date" && $v ne ""){
+               $v=ExcelFmt("dd.mm.yyyy hh:mm:ss",$cell->{Val});
+            }
             print msg(INFO,"cell (c=$col/r=$row)=%s",$v) if ($self->{debug});
             $isempty=0 if (!($v=~m/^\s*$/));
             $rec{$self->{Fields}->[$col]}=$v;
