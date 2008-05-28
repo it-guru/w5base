@@ -46,6 +46,11 @@ sub getControlData
                                      'daily_modified_appldiary'=>'itil::appl'
                                  ],
                                 },
+           'base::grp'=>       {target=>'fullname',
+                                mode  =>[
+                                     'eventnotify'=>'itil::appl::alternate',
+                                ],
+                               },
            'base::location'=>   {target=>'name',
                                  mode  =>['eventnotify'=>'itil::appl'],
                                 },

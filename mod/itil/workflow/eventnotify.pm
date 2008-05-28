@@ -842,8 +842,8 @@ sub getNotifyDestinations
    my $WfRec=shift;
    my $emailto=shift;
 
-   my $ia=getModuleObject($self->Config,"base::infoabo");
    if ($mode eq "custinfo"){
+      my $ia=getModuleObject($self->Config,"base::infoabo");
       if ($WfRec->{eventmode} eq "EVk.appl"){ 
          my $applid=$WfRec->{affectedapplicationid};
          $applid=[$applid] if (ref($applid) ne "ARRAY");
@@ -852,9 +852,11 @@ sub getNotifyDestinations
          my @byfunc;
          my @byorg;
          my @team;
+         my %allcustgrp;
          foreach my $rec ($appl->getHashList(qw(semid sem2id 
                                                 tsmid tsm2id
                                                 responseteamid
+                                                customerid
                                                 businessteamid))){
             foreach my $v (qw(semid sem2id tsmid tsm2id)){
                my $userid=$rec->{$v};
@@ -864,6 +866,15 @@ sub getNotifyDestinations
                my $grpid=$rec->{$v};
                push(@team,$grpid) if ($grpid>0);
             }
+            if ($rec->{customerid}!=0){
+               $self->getParent->LoadGroups(\%allcustgrp,"up",
+                                            $rec->{customerid});
+               
+            }
+         }
+         if (keys(%allcustgrp)){
+            $ia->LoadTargets($emailto,'base::grp',\'eventnotify',
+                                      [keys(%allcustgrp)]);
          }
          $ia->LoadTargets($emailto,'*::appl *::custappl',\'eventnotify',
                                    $applid);

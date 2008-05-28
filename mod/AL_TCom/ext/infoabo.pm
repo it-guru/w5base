@@ -45,7 +45,7 @@ sub getControlData
                                      'eventnotify'=>'itil::appl',
                                      'daily_modified_appldiary'=>'itil::appl'
                                 ],
-                               }
+                               },
           });
 
 }
