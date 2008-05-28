@@ -150,6 +150,13 @@ sub Hash2QueryString
    return($str);
 }
 
+sub Cookie
+{
+   my $self=shift;
+   return(CGI::cookie(@_));
+
+}
+
 
 
 

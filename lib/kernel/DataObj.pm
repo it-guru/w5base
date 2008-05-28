@@ -240,7 +240,11 @@ sub getHtmlDetailPages
 sub getDefaultHtmlDetailPage
 {
    my $self=shift;
-   return("StandardDetail");
+   my $cookievar=shift;
+
+   my $d=Query->Cookie($cookievar);
+   $d="StandardDetail" if ($d eq "");
+   return($d);
 }
 
 

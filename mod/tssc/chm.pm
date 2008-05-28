@@ -369,5 +369,112 @@ sub isWriteValid
    return(undef);
 }
 
+sub getHtmlDetailPages
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+
+   return($self->SUPER::getHtmlDetailPages($p,$rec),
+          "VisualView"=>$self->T("Visual-View"));
+}
+
+sub getHtmlDetailPageContent
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+   return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "VisualView");
+   my $page;
+   my $idname=$self->IdField->Name();
+   my $idval=$rec->{$idname};
+   
+   if ($p eq "VisualView"){
+      Query->Param("$idname"=>$idval);
+      $idval="NONE" if ($idval eq "");
+
+      my $q=new kernel::cgi({});
+      $q->Param("$idname"=>$idval);
+      my $urlparam=$q->QueryString();
+
+      $page="<iframe style=\"width:100%;height:100%;border-width:0;".
+            "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
+            "src=\"VisualView?$urlparam\"></iframe>";
+   }
+   $page.=$self->HtmlPersistentVariables($idname);
+   return($page);
+}
+
+
+sub getValidWebFunctions
+{
+   my $self=shift;
+
+   return($self->SUPER::getValidWebFunctions(@_),"VisualView");
+}
+
+
+sub VisualView
+{
+   my $self=shift;
+
+   my %flt=$self->getSearchHash();
+   $self->ResetFilter();
+   $self->SecureSetFilter(\%flt);
+   my ($rec,$msg)=$self->getOnlyFirst(qw(name data));
+
+   print $self->HttpHeader();
+   print $self->HtmlHeader(
+                           style=>['default.css',
+                                   'work.css',
+                                   '../../../public/tssc/load/visual-view.css']);
+#
+   print("<body class=fullview><form>");
+   print $self->BuildVisualView($rec);
+   print("</form></body></html>");
+}
+
+sub BuildVisualView
+{
+   my $self=shift;
+   my $rec=shift;
+   my $d;
+
+   $d=<<EOF;
+CR# $rec->{changenumber}
+<table width=100% border=1>
+<td width=80>Auftraggeber:</td>
+<td>CR-Status:</td>
+<td>Approval:</td>
+<td>Owner:</td>
+<td>Assigned Group:</td>
+</table>
+<table width=100% border=1>
+<td width=80>Change-Mgr:</td>
+<td>Group:</td>
+<td>Released by:</td>
+<td>Completion Code:</td>
+</table>
+<table width=100% border=1>
+<tr>
+<td>Start:</td>
+<td>$rec->{plannedstart}</td>
+</tr>
+<tr>
+<td>End:</td>
+<td>$rec->{plannedend}</td>
+</tr>
+</table>
+<table width=100% border=1>
+<td>Brief-Description:<br>
+<b>$rec->{name}</b></td>
+</table>
+<table width=100% border=1>
+<td><b><u>Description:</b></u><br>
+$rec->{description}</td>
+</table>
+EOF
+   return($d);
+}
+
+
 
 1;

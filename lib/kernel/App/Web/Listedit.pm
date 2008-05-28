@@ -977,7 +977,16 @@ sub Detail
    $self->ResetFilter();
    $self->SecureSetFilter(\%flt);
    my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
-   print $self->HttpHeader("text/html");
+
+   my $cookievar="HtmlDetailPage_".$self->Self;
+   $cookievar=~s/[:]+/_/g;
+
+   my $p=Query->Param("ModeSelectCurrentMode");
+   $p=$self->getDefaultHtmlDetailPage($cookievar) if ($p eq "");
+
+   print $self->HttpHeader("text/html",cookies=>Query->Cookie(-name=>$cookievar,
+                                                             -path=>"/",
+                                                             -value=>$p));
    print $self->HtmlHeader(style=>['default.css','mainwork.css',
                                    'kernel.TabSelector.css'],
                            body=>1,form=>1);
@@ -1004,8 +1013,6 @@ sub Detail
    print("}");
    print("</script>");
 
-   my $p=Query->Param("ModeSelectCurrentMode");
-   $p=$self->getDefaultHtmlDetailPage() if ($p eq "");
    my $page=$self->getHtmlDetailPageContent($p,$rec);
 
    my @WfFunctions=$self->getDetailFunctions($rec);

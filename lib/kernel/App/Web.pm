@@ -955,6 +955,13 @@ sub HttpHeader
    if (defined($param{'inline'}) && $param{'inline'}==1){
       $disp="inline";
    }
+   if (defined($param{'cookies'})){
+      my $c=$param{'cookies'};
+      $c=[$c] if (ref($c) ne "ARRAY");
+      foreach my $cc (@$c){
+         $d.="Set-Cookie: ".$cc."\n";
+      }
+   }
    if (defined($param{'filename'})){
       my $f=$param{'filename'};
       $f=~s/^.*\\//g;
