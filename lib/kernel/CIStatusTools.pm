@@ -354,7 +354,18 @@ sub NotifyAddOrRemoveObject
    my $newrec=shift;
    my $labelname=shift;
    my $infoaboname=shift;
+   my $infoaboid=shift;
    my $modulelabel=$self->T($self->Self,$self->Self);
+   my $mandator=effVal($oldrec,$newrec,"mandator");
+   my $name=effVal($oldrec,$newrec,$labelname);
+   my $fullname="???";
+
+   my $UserCache=$self->Cache->{User}->{Cache};
+   if (defined($UserCache->{$ENV{REMOTE_USER}})){
+      if ($UserCache->{$ENV{REMOTE_USER}}->{rec}->{fullname} ne ""){
+         $fullname=$UserCache->{$ENV{REMOTE_USER}}->{rec}->{fullname};
+      }
+   }
 
    my $op;
    if (defined($oldrec) && !defined($newrec)){
@@ -377,39 +388,50 @@ sub NotifyAddOrRemoveObject
       my $msg;
       if ($op eq "insert"){
          $msg=$self->T("MSG005");
-        # $msg=sprintf($msg,$name);
+         $msg=sprintf($msg,$name,$mandator,$fullname);
       }
       if ($op eq "delete"){
          $msg=$self->T("MSG006");
-        # $msg=sprintf($msg,$name);
+         $msg=sprintf($msg,$name,$mandator,$fullname);
       }
       if ($op eq "activate"){
          $msg=$self->T("MSG007");
-        # $msg=sprintf($msg,$name);
+         $msg=sprintf($msg,$name,$mandator,$fullname);
       }
       if ($op eq "deactivate"){
          $msg=$self->T("MSG008");
-        # $msg=sprintf($msg,$name);
+         $msg=sprintf($msg,$name,$mandator,$fullname);
       }
-      my @emailto=qw(hartmut.vogler@t-systems.com);
-      my %notiy;
-      $notiy{name}="Meldung";
-#      if ($mode ne "drop"){
-#         $notiy{emailpostfix}=<<EOF;
-#<br>
-#<br>
-#<img title="$imgtitle" src="${publicurl}../../base/cistatus/show/$cistatuspath">
-#EOF
-#      }
-      $notiy{emailtext}=$msg;
-      $notiy{class}='base::workflow::mailsend';
-      $notiy{step}='base::workflow::mailsend::dataload';
-      my $wf=getModuleObject($self->Config,"base::workflow");
-      if (my $id=$wf->Store(undef,\%notiy)){
-         my %d=(step=>'base::workflow::mailsend::waitforspool');
-         my $r=$wf->Store($id,%d);
+      my $sitename=$self->Config->Param("SITENAME");
+      my $subject="Config-Change: ";
+      if ($mandator ne ""){
+         $subject.=" $mandator: ";
       }
 
+      $subject.=effVal($oldrec,$newrec,$labelname);
+      if ($sitename ne ""){
+         $subject=$sitename.": ".$subject;
+      }
+      my $ia=getModuleObject($self->Config,"base::infoabo");
+      my @emailto;
+      my $emailto={};
+      $ia->LoadTargets($emailto,'base::staticinfoabo',\$infoaboname,
+                                 $infoaboid,undef);
+      @emailto=keys(%$emailto);
+
+      if ($#emailto!=-1){
+         my %notiy;
+         $notiy{name}=$subject;
+         $notiy{emailtext}=$msg;
+         $notiy{emailto}=\@emailto;
+         $notiy{class}='base::workflow::mailsend';
+         $notiy{step}='base::workflow::mailsend::dataload';
+         my $wf=getModuleObject($self->Config,"base::workflow");
+         if (my $id=$wf->Store(undef,\%notiy)){
+            my %d=(step=>'base::workflow::mailsend::waitforspool');
+            my $r=$wf->Store($id,%d);
+         }
+      }
    }
 }
 

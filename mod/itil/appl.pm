@@ -906,7 +906,8 @@ sub FinishWrite
    my $newrec=shift;
    my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
    $self->NotifyOnCIStatusChange($oldrec,$newrec);
-   $self->NotifyAddOrRemoveObject($oldrec,$newrec,"name","STEVapplchanged");
+   $self->NotifyAddOrRemoveObject($oldrec,$newrec,"name",
+                                  "STEVapplchanged",100000003);
    return($bak);
 }
 
