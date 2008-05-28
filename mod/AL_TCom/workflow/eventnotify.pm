@@ -33,6 +33,98 @@ sub new
    return($self);
 }
 
+sub getDynamicFields
+{
+   my $self=shift;
+   my %param=@_;
+   my $class;
+
+   return($self->InitFields(
+      $self->SUPER::getDynamicFields(@_),
+      new kernel::Field::Textarea(
+                name          =>'eventscproblemsolution',
+                translation   =>'AL_TCom::workflow::eventnotify',
+                group         =>'eventnotifyinternal',
+                depend        =>['eventprmticket'],
+                readonly      =>1,
+                htmldetail    =>1,
+                onRawValue    =>\&loadDataFromSC,
+                label         =>'SC Problem soultion'),
+      new kernel::Field::Textarea(
+                name          =>'eventscproblemcause',
+                translation   =>'AL_TCom::workflow::eventnotify',
+                onRawValue    =>\&loadDataFromSC,
+                group         =>'eventnotifyinternal',
+                readonly      =>1,
+                htmldetail    =>1,
+                depend        =>['eventprmticket'],
+                label         =>'SC Problem cause'),
+      ));
+}
+
+sub loadDataFromSC
+{
+   my $self=shift;
+   my $current=shift;
+
+   my $reffld=$self->getParent->getField("eventprmticket",$current);
+   return(undef) if (!defined($reffld));
+   my $prmid=$reffld->RawValue($current);
+   return(undef) if (!defined($prmid) || $prmid eq "");
+   my $scprm=getModuleObject($self->getParent->Config,"tssc::prm");
+   if (defined($scprm)){
+      $scprm->SetFilter({problemnumber=>\$prmid});
+      my ($prmrec,$msg)=$scprm->getOnlyFirst(qw(cause solution));
+      if (defined($prmrec)){ 
+         if ($self->Name eq "eventscproblemcause"){
+            return($prmrec->{cause});
+         }
+         if ($self->Name eq "eventscproblemsolution"){
+            return($prmrec->{solution});
+         }
+      }
+   }
+   
+   return(undef);
+
+}
+
+
+sub getNotifyDestinations
+{
+   my $self=shift;
+   my $mode=shift;    # "custinfo" | "mgmtinfo"
+   my $WfRec=shift;
+   my $emailto=shift;
+
+   if ($mode eq "rootcausei"){
+      my $ia=getModuleObject($self->Config,"base::infoabo");
+      if ($WfRec->{eventmode} eq "EVk.appl"){
+         my $applid=$WfRec->{affectedapplicationid};
+         $applid=[$applid] if (ref($applid) ne "ARRAY");
+         my $appl=getModuleObject($self->Config,"itil::appl");
+         $appl->SetFilter({id=>$applid});
+         my %allcustgrp;
+         foreach my $rec ($appl->getHashList(qw( customerid))){
+            if ($rec->{customerid}!=0){
+               $self->getParent->LoadGroups(\%allcustgrp,"up",
+                                            $rec->{customerid});
+            }
+         }
+         if (keys(%allcustgrp)){
+            $ia->LoadTargets($emailto,'base::grp',\'rootcauseinfo',
+                                      [keys(%allcustgrp)]);
+         }
+         $ia->LoadTargets($emailto,'*::appl *::custappl',\'rootcauseinfo',
+                                   $applid);
+      }
+   }
+   return($self->SUPER::getNotifyDestinations($mode,$WfRec,$emailto));
+}
+
+
+
+
 sub IsModuleSelectable
 {
    my $self=shift;
@@ -252,8 +344,8 @@ sub generateMailSet
                           wffields.altshorteventelimination
                          )]);
    if ($action eq "rootcausei"){
-      @sets=([@baseset,qw(wffields.eventimpact wffields.eventreason)],
-             [@baseset,qw(wffields.eventimpact wffields.eventreason)]);
+      @sets=([@baseset,qw(wffields.eventimpact wffields.eventscproblemcause)],
+             [@baseset,qw(wffields.eventimpact wffields.eventscproblemcause)]);
    }
    my $lang="de";
    my $line=0;
@@ -303,12 +395,14 @@ sub generateMailSet
             }elsif($field eq "wffields.eventimpact"){
                 push(@emailsubtitle,"");    
                 push(@emailprefix,"Auswirkungen für den Kunden:");
-            }elsif($field eq "wffields.eventreason"){
+            }elsif($field eq "wffields.eventreason"||
+                   $field eq "wffields.eventscproblemcause"){
                 push(@emailsubtitle,"");    
                 push(@emailprefix,"Beschreibung der Ursache:");
             }elsif($field eq "wffields.shorteventelimination"){
                 push(@emailsubtitle,"");    
-                push(@emailprefix,"Kurzfristige Massnahme zur Servicewiederherstellung:");
+                push(@emailprefix,"Kurzfristige Massnahme zur ".
+                                  "Servicewiederherstellung:");
             }else{
                 push(@emailprefix,$fo->Label().":");
                 push(@emailsubtitle,"");
@@ -329,20 +423,14 @@ sub generateMailSet
    }
    if ($action eq "rootcausei"){
       my $wf=$self->getParent();
-      my $prmfld=$wf->getField("wffields.eventprmticket",$WfRec);
+      my $prmfld=$wf->getField("wffields.eventscproblemsolution",$WfRec);
       my $prmticket=$prmfld->RawValue($WfRec);
       if ($prmticket ne ""){
-         $wf->ResetFilter();
-         $wf->SetFilter({srcid=>\$prmticket});
-         my ($prmrec,$msg)=$wf->getOnlyFirst(qw(problemsolution));
-         my $solfield=$wf->getField("wffields.problemsolution",$prmrec);
-         if (defined($solfield)){
-            push(@emailprefix,"Umgesetzte Maßnahmen:");
-            push(@emailtext,$solfield->FormatedResult($prmrec,"HtmlMail"));
-            push(@emailsubheader,0);
-            push(@emailsep,0);
-            push(@emailpostfix,"");
-         }
+         push(@emailprefix,"Umgesetzte Maßnahmen:");
+         push(@emailtext,$prmfld->FormatedResult($WfRec,"HtmlMail"));
+         push(@emailsubheader,0);
+         push(@emailsep,0);
+         push(@emailpostfix,"");
       }
    }
    delete($ENV{HTTP_FORCE_LANGUAGE});
@@ -461,7 +549,7 @@ sub getPosibleButtons
    my $WfRec=shift;
    my %b=$self->SUPER::getPosibleButtons($WfRec);
    my %em=();
-   $self->getParent->getNotifyDestinations("custinfo",$WfRec,\%em);
+   $self->getParent->getNotifyDestinations("rootcausei",$WfRec,\%em);
    my @email=sort(keys(%em));
    $self->Context->{CurrentTarget}=\@email;
    delete($b{NextStep}) if ($#email==-1);
@@ -480,7 +568,7 @@ sub Process
    if ($action eq "NextStep"){
       return(undef) if (!$self->ValidActionCheck(1,$actions,"rootcausei"));
       my %em=();
-      $self->getParent->getNotifyDestinations("custinfo",$WfRec,\%em);
+      $self->getParent->getNotifyDestinations("rootcausei",$WfRec,\%em);
       my @emailto=sort(keys(%em));
       my $id=$WfRec->{id};
       $self->getParent->getParent->Action->ResetFilter();
