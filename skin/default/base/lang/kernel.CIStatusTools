@@ -105,5 +105,32 @@ Normal resons are f.e. the naming want correct or the entry already exists by an
 Normale Gründe für eine solche Löschung sind z.B. dass die Namenskonvetionen nicht eingehalten wurden oder das Config-Item existiert bereits unter einem änlichen/anderen Namen.
 
 '},
+'MSG005'=>{en=>'The Config-Item "%s" at mandator "%s" has been new inserted by "%s".
+
+Depending on your user rights, it is posible that the new record is not accessable by you.
+
+',de=>'Das Config-Item "%s" im Mandaten "%s" wurde durch den User "%s" neu erzeugt.
+
+Abhängig von Ihren Rechten ist es möglich, dass der neue Datensatz von Ihnen nicht abgefragt werden darf.
+'},
+'MSG006'=>{en=>'The Config-Item "%s" at mandator "%s" has been new deleted by "%s".
+',de=>'Das Config-Item "%s" im Mandaten "%s" wurde durch den User "%s" gelöscht.
+'},
+'MSG007'=>{en=>'The Config-Item "%s" at mandator "%s" has been acivated by "%s".
+
+Depending on your user rights, it is posible that the new record is not accessable by you.
+
+',de=>'Das Config-Item "%s" im Mandaten "%s" wurde durch den User "%s" aktiviert.
+
+Abhängig von Ihren Rechten ist es möglich, dass der neue Datensatz von Ihnen nicht abgefragt werden darf.
+'},
+'MSG008'=>{en=>'The Config-Item "%s" at mandator "%s" has been deacivated by "%s".
+
+Depending on your user rights, it is posible that the new record is not accessable by you.
+
+',de=>'Das Config-Item "%s" im Mandaten "%s" wurde durch den User "%s" deaktiviert.
+
+Abhängig von Ihren Rechten ist es möglich, dass der neue Datensatz von Ihnen nicht abgefragt werden darf.
+'},
 
 

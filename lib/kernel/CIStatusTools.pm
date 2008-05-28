@@ -347,6 +347,72 @@ sub NotifyOnCIStatusChange
    return();
 }
 
+sub NotifyAddOrRemoveObject
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $labelname=shift;
+   my $infoaboname=shift;
+   my $modulelabel=$self->T($self->Self,$self->Self);
+
+   my $op;
+   if (defined($oldrec) && !defined($newrec)){
+      $op="delete";
+   }
+   if (!defined($oldrec) && defined($newrec)){
+      $op="insert";
+   }
+   if (defined($oldrec) && defined($newrec)){
+      if (exists($newrec->{cistatusid})){
+         if ($newrec->{cistatusid}==4 && $oldrec->{cistatusid}!=4){
+            $op="activate";
+         }
+         if ($newrec->{cistatusid}!=4 && $oldrec->{cistatusid}==4){
+            $op="deactivate";
+         }
+      }
+   }
+   if (defined($op)){
+      my $msg;
+      if ($op eq "insert"){
+         $msg=$self->T("MSG005");
+        # $msg=sprintf($msg,$name);
+      }
+      if ($op eq "delete"){
+         $msg=$self->T("MSG006");
+        # $msg=sprintf($msg,$name);
+      }
+      if ($op eq "activate"){
+         $msg=$self->T("MSG007");
+        # $msg=sprintf($msg,$name);
+      }
+      if ($op eq "deactivate"){
+         $msg=$self->T("MSG008");
+        # $msg=sprintf($msg,$name);
+      }
+      my @emailto=qw(hartmut.vogler@t-systems.com);
+      my %notiy;
+      $notiy{name}="Meldung";
+#      if ($mode ne "drop"){
+#         $notiy{emailpostfix}=<<EOF;
+#<br>
+#<br>
+#<img title="$imgtitle" src="${publicurl}../../base/cistatus/show/$cistatuspath">
+#EOF
+#      }
+      $notiy{emailtext}=$msg;
+      $notiy{class}='base::workflow::mailsend';
+      $notiy{step}='base::workflow::mailsend::dataload';
+      my $wf=getModuleObject($self->Config,"base::workflow");
+      if (my $id=$wf->Store(undef,\%notiy)){
+         my %d=(step=>'base::workflow::mailsend::waitforspool');
+         my $r=$wf->Store($id,%d);
+      }
+
+   }
+}
+
 
 1;
 

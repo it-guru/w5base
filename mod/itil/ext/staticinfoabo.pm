@@ -43,12 +43,12 @@ sub getControlData
                                               name=>'STEVeventinfobyorg'},
            'itil::appl' =>   {id  =>'100000002',
                                               name=>'STEVeventinfobyfunction'},
+           'itil::appl' =>   {id  =>'100000003',
+                                              name=>'STEVapplchanged'},
            'itil::appl' =>   {id  =>'100000004',
                                               name=>'STEVchangeinfobyfunction'},
            'itil::appl' =>   {id  =>'100000005',
                                               name=>'STEVchangeinfobydepfunc'},
-#           'itil::appl' =>                    {id  =>'100000003',
-#                                               name=>'STEVnewappl'},
           ]);
 
 }

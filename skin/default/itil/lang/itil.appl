@@ -45,6 +45,7 @@
 'Application is mangaged by rules of SOX'=>{de=>'Nach SOX Richtlinien (USA) zu betreuen'},
 'eventnotify'=>{de=>'Ereignismeldung',en=>'Eventnotification'},
 'changenotify'=>{de=>'Change-Benachrichtigung',en=>'Changenotification'},
+'STEVapplchanged'=>{de=>'Benachrichtigung bei hinzufügen/entfernen einer Anwendung',en=>'notification on add/remove of application'},
 'STEVchangeinfobyfunction'=>{de=>'Change-Benachrichtigung über Funktion (SeM oder TSM)',en=>'automatic change notification by function'},
 'STEVchangeinfobydepfunc'=>{de=>'Change-Benachrichtigung über Funktion (SeM oder TSM Vertreter)',en=>'automatic change notification by function (SeM or TSM deputy)'},
 'STEVeventinfobyorg'=>{de=>'automatische Ereignismeldung über die Organisationsstruktur',en=>'automatic eventnotification by orgstructure'},

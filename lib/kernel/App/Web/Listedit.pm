@@ -1447,7 +1447,8 @@ sub ProcessUploadRecord
    my $idobj=$self->IdField();
    if (defined($idobj)){
       my $idname=$idobj->Name();
-      if (defined($rec->{$idname}) && $rec->{$idname} ne ""){
+printf STDERR ("fifi idname=$idname\n");
+      if (defined($rec->{$idname}) && !($rec->{$idname}=~m/^\s*$/)){
          $self->ResetFilter();
          $id=$rec->{$idname};
          $self->SetFilter({$idname=>\$id});
@@ -1460,6 +1461,9 @@ sub ProcessUploadRecord
                               "and use this as oldrec");
             }
          }
+      }
+      else{
+         delete($rec->{$idname});
       }
    }
    my $newrec=$self->getWriteRequestHash("upload",$oldrec,$rec);

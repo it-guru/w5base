@@ -361,16 +361,18 @@ sub Validate
       if (!defined($oldrec)){
          if (!defined($newrec->{databossid}) ||
              $newrec->{databossid}==0){
-            $self->LastMsg(ERROR,"no valid databoss defined");
+            $newrec->{databossid}=$userid;
             return(0);
          }
       }
-      if (defined($newrec->{databossid}) &&
-          $newrec->{databossid}!=$userid &&
-          $newrec->{databossid}!=$oldrec->{databossid}){
-         $self->LastMsg(ERROR,"you are not authorized to set other persons ".
-                              "as databoss");
-         return(0);
+      if (!$self->IsMemberOf("admin")){
+         if (defined($newrec->{databossid}) &&
+             $newrec->{databossid}!=$userid &&
+             $newrec->{databossid}!=$oldrec->{databossid}){
+            $self->LastMsg(ERROR,"you are not authorized to set other persons ".
+                                 "as databoss");
+            return(0);
+         }
       }
    }
    ########################################################################
@@ -423,7 +425,7 @@ sub isWriteValid
 
    my @databossedit=qw(default contacts sem misc control attachments);
    if (!defined($rec)){
-      return("default");
+      return(@databossedit);
    }
    else{
       if ($rec->{databossid}==$userid){
