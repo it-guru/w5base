@@ -196,6 +196,24 @@ sub new
                 label         =>'Type',
                 dataobjattr   =>'cm3rm1.class_field'),
 
+      new kernel::Field::Text(
+                name          =>'approvalstatus',
+                group         =>'status',
+                label         =>'Approval Status',
+                dataobjattr   =>'cm3rm1.approval_status'),
+
+      new kernel::Field::Text(
+                name          =>'currentstatus',
+                group         =>'status',
+                label         =>'Current Status',
+                dataobjattr   =>'cm3rm1.status'),
+
+      new kernel::Field::Text(
+                name          =>'approvalstatus',
+                group         =>'status',
+                label         =>'Approval Status',
+                dataobjattr   =>'cm3rm1.approval_status'),
+
       new kernel::Field::Date(
                 name          =>'sysmodtime',
                 group         =>'status',
@@ -266,6 +284,12 @@ sub new
                 group         =>'contact',
                 label         =>'Assign Area',
                 dataobjattr   =>'cm3rm1.assigned_area'),
+
+      new kernel::Field::Text(
+                name          =>'customer',
+                group         =>'contact',
+                label         =>'Customer',
+                dataobjattr   =>'cm3rm1.misc4'),
 
       new kernel::Field::Text(
                 name          =>'requestedby',
@@ -419,13 +443,13 @@ sub VisualView
    my %flt=$self->getSearchHash();
    $self->ResetFilter();
    $self->SecureSetFilter(\%flt);
-   my ($rec,$msg)=$self->getOnlyFirst(qw(name data));
+   my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
 
    print $self->HttpHeader();
    print $self->HtmlHeader(
                            style=>['default.css',
-                                   'work.css',
-                                   '../../../public/tssc/load/visual-view.css']);
+                             'work.css',
+                             '../../../public/tssc/load/visual-view.css']);
 #
    print("<body class=fullview><form>");
    print $self->BuildVisualView($rec);
@@ -438,38 +462,127 @@ sub BuildVisualView
    my $rec=shift;
    my $d;
 
+   my $label="CR# ";
+   if ($rec->{changenumber} ne ""){
+      $label.=$rec->{changenumber};
+      $label.=" - ";
+   }
+
+
+   if ($rec->{risk} ne ""){
+      $label.=$rec->{risk};
+   }
+   else{
+      $label.="<font color=red>MISSING RISK</font>";
+   }
+   $label.=" - ";
+
+
+   if ($rec->{impact} ne ""){
+      $label.=$rec->{impact};
+   }
+   else{
+      $label.="<font color=red>MISSING IMPACT</font>";
+   }
+   $label.=" - ";
+
+
+   if ($rec->{type} ne ""){
+      $label.=$rec->{type};
+   }
+   else{
+      $label.="<font color=red>MISSING TYPE</font>";
+   }
+   $label.=" - ";
+
+   if ($rec->{reason} ne ""){
+      $label.=$rec->{reason};
+   }
+   else{
+      $label.="<font color=red>MISSING REASON</font>";
+   }
+   $label.=" - ";
+   my $templparam={WindowMode=>"HtmlDetail",current=>$rec};
+
+   my $starttime=$self->findtemplvar($templparam,"plannedstart","detail");
+   my $endtime=$self->findtemplvar($templparam,"plannedend","detail");
+   my $requestedby=$self->findtemplvar($templparam,"requestedby","detail");
+
+
    $d=<<EOF;
-CR# $rec->{changenumber}
-<table width=100% border=1>
-<td width=80>Auftraggeber:</td>
-<td>CR-Status:</td>
-<td>Approval:</td>
-<td>Owner:</td>
-<td>Assigned Group:</td>
+<div class=label>$label</div>
+<table style="border-bottom-style:none">
+<tr>
+<td width=80>Start:</td>
+<td>$starttime</td>
+</tr>
+<tr>
+<td width=80>End:</td>
+<td>$endtime</td>
+</tr>
 </table>
-<table width=100% border=1>
-<td width=80>Change-Mgr:</td>
-<td>Group:</td>
-<td>Released by:</td>
+
+<table style="border-bottom-style:none">
+<tr>
+<td width=80><u>Auftraggeber:</u><br>&nbsp;</td>
+<td width=107>CR-Status:<br>
+<b>$rec->{currentstatus}</b></td>
+<td width=100>Approval:<br>
+<b>$rec->{approvalstatus}</b></td>
+<td>Owner:<br>
+<b>$requestedby</b></td>
+<td width=200>Assigned Group:<br>
+<b>$rec->{assignedto}</b></td>
+</tr>
+</table>
+
+<table><tr>
+<td width=80><u>Change-Mgr:</u><br>&nbsp;</td>
+<td>Group:<br>
+<b>$rec->{coordinator}</b></td>
+<td>Released by:<br>
+<b>??</b></td>
 <td>Completion Code:</td>
-</table>
-<table width=100% border=1>
-<tr>
-<td>Start:</td>
-<td>$rec->{plannedstart}</td>
-</tr>
-<tr>
-<td>End:</td>
-<td>$rec->{plannedend}</td>
 </tr>
 </table>
-<table width=100% border=1>
+
+<table style="margin-top:10px">
+<tr>
+<td>
+  <table class=noborder>
+    <tr>
+     <td class=noborder align=right width=20%><b>Customer:</b></td>
+     <td class=noborder>$rec->{customer}</td>
+     <td class=noborder align=right width=20%><b>Ext. Change ID:</b></td>
+     <td class=noborder>$rec->{srcid}</td>
+    </tr>
+    <tr>
+     <td class=noborder align=right width=20%><b>Reason:</b></td>
+     <td class=noborder>$rec->{reason}</td>
+     <td class=noborder align=right width=20%><b>Project:</b></td>
+     <td class=noborder>??</td>
+    </tr>
+    <tr>
+     <td class=noborder align=right width=20%><b>Risk:</b></td>
+     <td class=noborder>$rec->{risk}</td>
+     <td class=noborder align=right width=20%><b>Int. Order:</b></td>
+     <td class=noborder>??</td>
+    </tr>
+    <tr>
+     <td class=noborder align=right width=20%><b>Req. Customer:</b></td>
+     <td class=noborder>??</td>
+     <td class=noborder align=right width=20%><b>&nbsp;</b></td>
+     <td class=noborder>&nbsp;</td>
+    </tr>
+  </table>
+</td>
+</tr><tr>
+<tr>
 <td>Brief-Description:<br>
 <b>$rec->{name}</b></td>
-</table>
-<table width=100% border=1>
+</tr><tr>
 <td><b><u>Description:</b></u><br>
-$rec->{description}</td>
+<pre class=multilinetext>$rec->{description}</pre></td>
 </table>
 EOF
    return($d);

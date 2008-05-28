@@ -7,15 +7,58 @@ td{
   border-style:solid;
   border-color:black;
   border-width:1px;
+  padding:2px;
+  vertical-align:top;
+  border-bottom-style:none;
+}
+td.noborder{
+  border-style:none;
+  border-color:black;
+  border-width:1px;
+  padding:2px;
+  vertical-align:top;
+}
+table.noborder{
+  border-style:none;
+  border-spacing:0px;
+  border-collapse:collapse;
+  margin:0px;
+  padding:0px;
+  width:100%;
 }
 table{
-   border-style:none;
-   border-spacing:0px;
-   border-collapse:collapse;
-   margin:0px;
-   padding:0px;
-   width:100%;
+  border-style:none;
+  border-spacing:0px;
+  border-collapse:collapse;
+  margin:0px;
+  padding:0px;
+  width:100%;
+  border-bottom-style:solid;
+  border-width:1px;
 }
+
+div.label{
+   margin:0px;
+   margin-bootom:3px;
+   padding:0px;
+   font-weight:bold;
+}
+
+pre.multilinetext {
+   margin: 0px;
+   padding: 0px;
+   font-family:monospace,Courier New,Adobe Courier,Courier;
+   font-size:11px;
+   font-weight:400;
+   color:black;
+   white-space: pre-wrap;       /* css-3 should we be so lucky... */
+   white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+   white-space: -pre-wrap;      /* Opera 4-6 ?? */
+   white-space: -o-pre-wrap;    /* Opera 7 ?? */
+   word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+
 
 
 
