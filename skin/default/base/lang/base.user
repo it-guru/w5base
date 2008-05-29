@@ -37,7 +37,7 @@
 'you are not autorized to create these usertyp'=>{de=>'Sie sind nicht berechtigt, Kontakte diesen Typs zu erzeugen'},
 'picture to large'=>{de=>'Bild ist zu groß'},
 'Roles'=>{de=>'Rollen'},
-'SMS Notification'=>{de=>'SMS Benachrichtigung'},
+'SMS Notification'=>{de=>'SMS Benachrichtigung (Testbetrieb)'},
 'SMS.'=>{de=>'nicht zugelassen',en=>'no allowed'},
 'SMS.officealways'=>{de=>'Büro-Kontakt Handynummer immer',
                      en=>'Office-Contact Mobile always'},

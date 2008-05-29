@@ -661,6 +661,7 @@ sub Process
              emailfrom      =>$emailfrom,
              emailto        =>\@emailto,
              emailcc        =>\@emailcc,
+             allowsms       =>1,
              emaillang      =>$eventlang,
              emailprefix    =>\@emailprefix,
              emailpostfix   =>\@emailpostfix,

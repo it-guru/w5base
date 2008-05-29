@@ -292,10 +292,20 @@ sub new
                 name          =>'sms',
                 label         =>'SMS Notification',
                 transprefix   =>'SMS.',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   if ($self->getParent->Config->Param("SMSInterfaceScript") 
+                       eq ""){
+                      return(0);
+                   }
+                   return(1);
+                },
                 default       =>'',
                 group         =>'userparam',
-                value         =>['',qw( officealways officenight officeday
-                                        homealways   homenight   homeday)],
+#                value         =>['',qw( officealways officenight officeday
+#                                        homealways   homenight   homeday)],
+                value         =>['',qw( officealways
+                                        homealways)],
                 container     =>'options'),
 
       new kernel::Field::Boolean(

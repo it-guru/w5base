@@ -52,7 +52,6 @@ sub new
                                   uivisible   =>0,
                                   group       =>'mailsend',
                                   container   =>'headref'),
-
    );
    return($self);
 }
@@ -141,6 +140,18 @@ sub getDynamicFields
 
       new kernel::Field::Textarea(name        =>'emailsubheader',
                                   label       =>'Mail SubHeader',
+                                  uivisible   =>0,
+                                  group       =>'mailsend',
+                                  container   =>'headref'),
+
+      new kernel::Field::Boolean( name        =>'allowsms',
+                                  label       =>'allow SMS send',
+                                  uivisible   =>0,
+                                  group       =>'mailsend',
+                                  container   =>'headref'),
+
+      new kernel::Field::Textarea(name        =>'smstext',
+                                  label       =>'alternate SMS Text',
                                   uivisible   =>0,
                                   group       =>'mailsend',
                                   container   =>'headref'),

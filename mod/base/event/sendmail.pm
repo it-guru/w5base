@@ -85,6 +85,7 @@ sub Sendmail
    my ($rec,$msg)=$wf->getFirst();
    if (defined($rec)){
       msg(DEBUG,"found record");
+      my $smstext;
       $wf->Store($rec,{state=>4,step=>'base::workflow::mailsend::finish'});
       msg(DEBUG,"state of record id '%s' is set to 4",$rec->{id});
       do{
@@ -207,15 +208,20 @@ sub Sendmail
          $mail.="\n";
          $mail.="Content-Type: text/plain; charset=\"iso-8859-1\"\n\n";
          {
+            my $plaintext;
             for(my $blk=0;$blk<=$blkcount;$blk++){
-               $mail.=$rec->{emailprefix}->[$blk];
-               $mail.="\n"; 
+               $plaintext.=$rec->{emailprefix}->[$blk];
+               $plaintext.="\n"; 
                my $emailtext=$rec->{emailtext}->[$blk];
                $emailtext=~s#<[a-z/].*?>##g;
                $emailtext=~s#&nbsp;# #g;
                $emailtext=~s#^\.\s*$# .\n#mg;  # prevent . finish of mail
-               $mail.=$emailtext;
-               $mail.="\n-\n"; 
+               $plaintext.=$emailtext;
+               $plaintext.="\n-\n"; 
+            }
+            if ($plaintext ne ""){
+               $mail.=$plaintext;
+               $smstext=$plaintext;
             }
          }
          $mail.="\n--$bound";
@@ -385,6 +391,36 @@ sub Sendmail
          }
          $mail.="--\n";
          $mail.="\n--$bound--\n";
+         ####################################################################
+         # SMS Handling
+         if ($rec->{allowsms}==1 &&
+             $self->Config->Param("SMSInterfaceScript") ne ""){
+            my $smsscript=$self->Config->Param("SMSInterfaceScript");
+            msg(DEBUG,"prepare to call $smsscript");
+            my $user=getModuleObject($self->Config,"base::user");
+            $user->SetFilter({email=>\@emailto});
+            my @smsrec=$user->getHashList(qw(fullname sms 
+                                             office_mobile home_mobile));
+            $smstext=$rec->{smstext} if ($rec->{smstext} ne "");
+            foreach my $smsrec (@smsrec){
+               my $number;
+               if ($smsrec->{sms} eq "officealways"){
+                  $number=$smsrec->{office_mobile};
+               }
+               if ($smsrec->{sms} eq "homealways"){
+                  $number=$smsrec->{home_mobile};
+               }
+               if (defined($number)){
+                  $number=~s/\s//g;
+                  msg(DEBUG,"sending sms to $smsrec->{fullname}");
+                  if (open(F,"|".$smsscript." \"$number\"")){
+                     print F $smstext;
+                     close(F);
+                  }
+               }
+            }
+         }
+         ####################################################################
          msg(DEBUG,"deliver maildata to $sendmail");
          if (open(F,"|".$sendmail." -t")){
             print F $mail;

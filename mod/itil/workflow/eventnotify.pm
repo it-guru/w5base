@@ -2103,6 +2103,7 @@ sub Process
              emailprefix    =>\@emailprefix,
              emailpostfix   =>\@emailpostfix,
              emailtext      =>\@emailtext,
+             allowsms       =>1,
              emailsep       =>\@emailsep,
              emailsubheader =>\@emailsubheader,
              emailsubtitle  =>\@emailsubtitle,
