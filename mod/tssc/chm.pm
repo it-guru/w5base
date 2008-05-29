@@ -588,6 +588,19 @@ EOF
    return($d);
 }
 
+sub getDefaultHtmlDetailPage
+{
+   my $self=shift;
+   my $cookievar=shift;
+
+   my $d=Query->Cookie($cookievar);
+   $d="StandardDetail" if ($d eq "");
+   return($d);
+}
+
+
+
+
 
 
 1;
