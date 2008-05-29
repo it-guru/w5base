@@ -395,10 +395,12 @@ sub generateMailSet
             }elsif($field eq "wffields.eventimpact"){
                 push(@emailsubtitle,"");    
                 push(@emailprefix,"Auswirkungen für den Kunden:");
-            }elsif($field eq "wffields.eventreason"||
-                   $field eq "wffields.eventscproblemcause"){
+            }elsif($field eq "wffields.eventreason"){
                 push(@emailsubtitle,"");    
                 push(@emailprefix,"Beschreibung der Ursache:");
+            }elsif($field eq "wffields.eventscproblemcause"){
+                push(@emailsubtitle,"");    
+                push(@emailprefix,"Ursachen-Cluster/Beschreibung der Ursache:");
             }elsif($field eq "wffields.shorteventelimination"){
                 push(@emailsubtitle,"");    
                 push(@emailprefix,"Kurzfristige Massnahme zur ".
@@ -426,7 +428,7 @@ sub generateMailSet
       my $prmfld=$wf->getField("wffields.eventscproblemsolution",$WfRec);
       my $prmticket=$prmfld->RawValue($WfRec);
       if ($prmticket ne ""){
-         push(@emailprefix,"Umgesetzte Maßnahmen:");
+         push(@emailprefix,"Umzusetzende Maßnahmen:");
          push(@emailtext,$prmfld->FormatedResult($WfRec,"HtmlMail"));
          push(@emailsubheader,0);
          push(@emailsep,0);
