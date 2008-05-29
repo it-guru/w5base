@@ -283,8 +283,19 @@ sub new
                 name          =>'winsize',
                 label         =>'Window-Size',
                 htmleditwidth =>'50%',
+                htmldetail    =>0,           # die Sache ist noch nicht opti
                 group         =>'userparam',
                 value         =>['','normal','large'],
+                container     =>'options'),
+
+      new kernel::Field::Select(
+                name          =>'sms',
+                label         =>'SMS Notification',
+                transprefix   =>'SMS.',
+                default       =>'',
+                group         =>'userparam',
+                value         =>['',qw( officealways officenight officeday
+                                        homealways   homenight   homeday)],
                 container     =>'options'),
 
       new kernel::Field::Boolean(

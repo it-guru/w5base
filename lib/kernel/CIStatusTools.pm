@@ -355,6 +355,8 @@ sub NotifyAddOrRemoveObject
    my $labelname=shift;
    my $infoaboname=shift;
    my $infoaboid=shift;
+   my $idname=$self->IdField->Name();
+   my $id=effVal($oldrec,$newrec,$idname);
    my $modulelabel=$self->T($self->Self,$self->Self);
    my $mandatorid=effVal($oldrec,$newrec,"mandatorid");
    my $name=effVal($oldrec,$newrec,$labelname);
@@ -366,6 +368,19 @@ sub NotifyAddOrRemoveObject
          $fullname=$UserCache->{$ENV{REMOTE_USER}}->{rec}->{fullname};
       }
    }
+
+   my $url=$ENV{SCRIPT_URI};
+   $url=~s/[^\/]+$//;
+   my $publicurl=$url;
+   my $listurl=$url;
+   my $itemname=$self->T($self->Self,$self->Self);;
+   $url.="Detail?$idname=$id";
+   $listurl.="Main";
+   $publicurl=~s#/auth/#/public/#g;
+   my $cistatuspath=$self->Self;
+   $cistatuspath=~s/::/\//g;
+   $cistatuspath.="/$id";
+   $cistatuspath.="?HTTP_ACCEPT_LANGUAGE=".$self->Lang();
 
    my $op;
    if (defined($oldrec) && !defined($newrec)){
@@ -398,6 +413,7 @@ sub NotifyAddOrRemoveObject
       if ($op eq "insert"){
          $msg=$self->T("MSG005");
          $msg=sprintf($msg,$modulelabel,$name,$mandator,$fullname);
+         $msg.="\n\nDirectLink:\n$url";
       }
       if ($op eq "delete"){
          $msg=$self->T("MSG006");
@@ -406,10 +422,12 @@ sub NotifyAddOrRemoveObject
       if ($op eq "activate"){
          $msg=$self->T("MSG007");
          $msg=sprintf($msg,$modulelabel,$name,$mandator,$fullname);
+         $msg.="\n\nDirectLink:\n$url";
       }
       if ($op eq "deactivate"){
          $msg=$self->T("MSG008");
          $msg=sprintf($msg,$modulelabel,$name,$mandator,$fullname);
+         $msg.="\n\nDirectLink:\n$url";
       }
       my $sitename=$self->Config->Param("SITENAME");
       my $subject="Config-Change: ";
