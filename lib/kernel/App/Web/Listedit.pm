@@ -986,9 +986,9 @@ sub Detail
    $p=$self->getDefaultHtmlDetailPage($cookievar) if ($p eq "");
 
    print $self->HttpHeader("text/html",
-                           cookies=>Query->httpCookie(-name=>$cookievar,
-                                                      -path=>"/",
-                                                      -value=>$p));
+                           cookies=>Query->Cookie(-name=>$cookievar,
+                                                  -path=>"/",
+                                                  -value=>$p));
    print $self->HtmlHeader(style=>['default.css','mainwork.css',
                                    'kernel.TabSelector.css'],
                            body=>1,form=>1);
