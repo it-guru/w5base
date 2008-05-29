@@ -150,7 +150,7 @@ sub Hash2QueryString
    return($str);
 }
 
-sub Cookie
+sub httpCookie
 {
    my $self=shift;
    return(CGI::cookie(@_));
