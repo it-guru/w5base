@@ -356,7 +356,7 @@ sub NotifyAddOrRemoveObject
    my $infoaboname=shift;
    my $infoaboid=shift;
    my $modulelabel=$self->T($self->Self,$self->Self);
-   my $mandator=effVal($oldrec,$newrec,"mandator");
+   my $mandatorid=effVal($oldrec,$newrec,"mandatorid");
    my $name=effVal($oldrec,$newrec,$labelname);
    my $fullname="???";
 
@@ -385,22 +385,31 @@ sub NotifyAddOrRemoveObject
       }
    }
    if (defined($op)){
+      my $mandator;
+      if ($mandatorid ne ""){
+         my $ma=getModuleObject($self->Config,"base::mandator");
+         $ma->SetFilter({id=>\$mandatorid});
+         my ($marec,$msg)=$ma->getOnlyFirst(qw(name));
+         if (defined($marec)){ 
+            $mandator=$marec->{name};
+         }
+      }
       my $msg;
       if ($op eq "insert"){
          $msg=$self->T("MSG005");
-         $msg=sprintf($msg,$name,$mandator,$fullname);
+         $msg=sprintf($msg,$modulelabel,$name,$mandator,$fullname);
       }
       if ($op eq "delete"){
          $msg=$self->T("MSG006");
-         $msg=sprintf($msg,$name,$mandator,$fullname);
+         $msg=sprintf($msg,$modulelabel,$name,$mandator,$fullname);
       }
       if ($op eq "activate"){
          $msg=$self->T("MSG007");
-         $msg=sprintf($msg,$name,$mandator,$fullname);
+         $msg=sprintf($msg,$modulelabel,$name,$mandator,$fullname);
       }
       if ($op eq "deactivate"){
          $msg=$self->T("MSG008");
-         $msg=sprintf($msg,$name,$mandator,$fullname);
+         $msg=sprintf($msg,$modulelabel,$name,$mandator,$fullname);
       }
       my $sitename=$self->Config->Param("SITENAME");
       my $subject="Config-Change: ";

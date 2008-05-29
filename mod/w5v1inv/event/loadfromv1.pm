@@ -67,8 +67,60 @@ sub Init
 #   $self->RegisterEvent("loadaccno","LoadAccNo");
 #   $self->RegisterEvent("loadconsoleip","LoadConsoleIP");
 #   $self->RegisterEvent("loadip","LoadIP");
-   $self->RegisterEvent("loadcontractco","LoadCustContractCO");
+#   $self->RegisterEvent("loadcontractco","LoadCustContractCO");
+   $self->RegisterEvent("loadITSCM","loadITSCM");
    return(1);
+}
+
+sub loadITSCM
+{
+   my $self=shift;
+   my $filename=shift;
+
+   my $user=getModuleObject($self->Config,"base::user");
+   my $filemgmt=getModuleObject($self->Config,"base::filemgmt");
+   my $facl=getModuleObject($self->Config,"base::fileacl");
+   msg(INFO,"starting loadITSCM userobject=$user");
+
+   $filemgmt->SetFilter({fullname=>\'ITSCM'});
+   my ($frec,$msg)=$filemgmt->getOnlyFirst(qw(ALL));
+   if (!defined($frec)){
+      msg(ERROR,"can not find filemgmt record for ITSCM");
+      return({exitcode=>1});
+   }
+
+   if (open(F,"<$filename")){
+      msg(DEBUG,"open $filename OK");
+      while(my $line=<F>){
+          $line=~s/\s*//g;
+          msg(DEBUG,"process $line");
+          $user->ResetFilter();
+          $user->SetFilter({accounts=>\$line});
+          my ($urec,$msg)=$user->getOnlyFirst(qw(ALL));
+          if (defined($urec)){
+             msg(DEBUG,"user $line found");
+             my $newrec={refid=>$frec->{fid},
+                         acltarget=>'base::user',
+                         acltargetid=>$urec->{userid},
+                         aclparentobj=>'base::filemgmt',
+                         aclmode=>'read'};
+             $facl->ValidatedInsertOrUpdateRecord($newrec,
+                       {refid=>\$newrec->{refid},
+                        acltarget=>\$newrec->{acltarget},
+                        acltargetid=>\$newrec->{acltargetid},
+                        aclparentobj=>\$newrec->{aclparentobj}});
+          }
+          else{
+             msg(DEBUG,"user $line NOT FOUND");
+          }
+      }
+   }
+   else{
+      return({exitcode=>1,msg=>'ERROR: can not open file'});
+   }
+   msg(INFO,"finish loadITSCM");
+
+   return({exitcode=>0});
 }
 
 sub LoadCustContractCO
