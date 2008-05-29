@@ -1006,6 +1006,23 @@ sub FinishDelete
    return($bak);
 }
 
+sub ValidateDelete
+{
+   my $self=shift;
+   my $rec=shift;
+
+   if ($#{$rec->{systems}}!=-1 ||
+       $#{$rec->{custcontracts}}!=-1){
+      $self->LastMsg(ERROR,
+          "delete only posible, if there are no system and contract relations");
+      return(0);
+   }
+
+   return(1);
+}
+
+
+
 sub getDetailBlockPriority
 {
    my $self=shift;

@@ -76,3 +76,4 @@
 'CRmedium'=>{de=>'medium',en=>'medium'},
 'CRhigh'=>{de=>'high',en=>'high'},
 'CRcritical'=>{de=>'critical',en=>'critical'},
+'delete only posible, if there are no system and contract relations'=>{de=>'löschen ist nur möglich, wenn keine System und Vertragsbeziehungen existieren'},

@@ -523,7 +523,8 @@ EOF
       printf("<tr height=1%>");
       printf("<td align=center>".
              "<div style=\"text-align:left;border-style:solid;".
-             "border-width:1px;overflow:auto;height:50px;width:500px\">");
+             "border-width:1px;padding:3px;".
+             "overflow:auto;height:50px;width:500px\">");
       print join("<br>",map({
                              if ($_=~m/^ERROR/){
                                 $_="<font style=\"color:red;\">".$_.
