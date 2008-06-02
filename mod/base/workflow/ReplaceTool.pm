@@ -27,6 +27,66 @@ sub new
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
+
+   $self->AddFrontendFields(
+      new kernel::Field::TextDrop(
+                name          =>'wfreplaceusersrc',
+                label         =>'Search User',
+                htmldetail    =>0,
+                group         =>'init',
+                vjointo       =>'base::user',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['wfreplaceusersrcid'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link (
+                name          =>'wfreplaceusersrcid',
+                container     =>'headref'),
+
+      new kernel::Field::TextDrop(
+                name          =>'wfreplaceuserdst',
+                label         =>'Replace by',
+                htmldetail    =>0,
+                group         =>'init',
+                vjointo       =>'base::user',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['wfreplaceuserdstid'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link (
+                name          =>'wfreplaceuserdstid',
+                container     =>'headref'),
+
+      new kernel::Field::TextDrop(
+                name          =>'wfreplacegrpsrc',
+                label         =>'Search User',
+                htmldetail    =>0,
+                group         =>'init',
+                vjointo       =>'base::grp',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['wfreplacegrpsrcid'=>'grpid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link (
+                name          =>'wfreplacegrpsrcid',
+                container     =>'headref'),
+
+      new kernel::Field::TextDrop(
+                name          =>'wfreplacegrpdst',
+                label         =>'Replace by',
+                htmldetail    =>0,
+                group         =>'init',
+                vjointo       =>'base::grp',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['wfreplacegrpdstid'=>'grpid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link (
+                name          =>'wfreplacegrpdstid',
+                container     =>'headref'),
+
+    );
+
    return($self);
 }
 
@@ -34,7 +94,8 @@ sub getRecordImageUrl
 {
    my $self=shift;
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-   return("../../../public/base/load/workflow-ReplaceTool.jpg?".$cgi->query_string());
+   return("../../../public/base/load/workflow-ReplaceTool.jpg?".
+          $cgi->query_string());
 }
 
 
@@ -44,7 +105,7 @@ sub IsModuleSelectable
    my $self=shift;
    my $acl;
 
-   return(1) if ($self->IsMemberOf("admin"));
+   return(1) if ($self->getParent->IsMemberOf("admin"));
    return(0);
 }
 
@@ -91,11 +152,11 @@ sub getNextStep
    if($currentstep eq "base::workflow::ReplaceTool::finish"){
       return($self->getStepByShortname("finish",$WfRec)); 
    }
-   elsif($currentstep=~m/^.*::workflow::ReplaceTool::dataload$/){
-      return($self->getStepByShortname("main",$WfRec)); 
+   elsif($currentstep=~m/^.*::workflow::ReplaceTool::asktype$/){
+      return($self->getStepByShortname("askreplace",$WfRec)); 
    }
    elsif($currentstep eq ""){
-      return($self->getStepByShortname("dataload",$WfRec)); 
+      return($self->getStepByShortname("asktype",$WfRec)); 
    }
    return(undef);
 }
@@ -131,64 +192,97 @@ sub getPosibleActions
    my $app=$self->getParent;
    my $userid=$self->getParent->getCurrentUserId();
    my @l=();
-   if ($WfRec->{state}==17 && $WfRec->{openuser}==$userid){
-      push(@l,"addsup");
-      push(@l,"wffinish");
-   }
-
-   if ($WfRec->{state}>=21 && 
-       ($WfRec->{openuser}==$userid || 
-        $self->getParent->IsMemberOf(["admin","admin.workflow"]))){
-      push(@l,"reactivate");
-   }
-
-   if ($WfRec->{fwdtarget} eq 'base::grp'){
-      if ($app->IsMemberOf($WfRec->{fwdtargetid},undef,"both")){
-         push(@l,"addnote");
-      }
-   }
-   elsif ($WfRec->{fwdtarget} eq 'base::user' && 
-       $userid==$WfRec->{fwdtargetid}){
-         push(@l,"addnote");
-   }
-   elsif ($WfRec->{fwddebtarget} eq 'base::grp'){
-      if ($app->IsMemberOf($WfRec->{fwddebtargetid},undef,"both")){
-         push(@l,"addnote");
-      }
-      else{
-         if ($app->IsMemberOf(["admin","admin.workflow"])){
-            push(@l,"addnote");
-         }
-      }
-   }
-   elsif ($WfRec->{fwddeptarget} eq 'base::user'){
-      if ($userid==$WfRec->{fwddeptargetid}){
-         push(@l,"addnote");
-      }
-   }
-   if ($WfRec->{owner}==$userid || $WfRec->{openuser}==$userid){
-      push(@l,"addnote");
-      if ($WfRec->{fwdtarget} ne ""){
-         push(@l,"remsup");
-      }
-      else{
-         push(@l,"addsup");
-      }
-      push(@l,"wfclose");
-   }
+#   if ($WfRec->{state}==17 && $WfRec->{openuser}==$userid){
+#      push(@l,"addsup");
+#      push(@l,"wffinish");
+#   }
+#
+#   if ($WfRec->{state}>=21 && 
+#       ($WfRec->{openuser}==$userid || 
+#        $self->getParent->IsMemberOf(["admin","admin.workflow"]))){
+#      push(@l,"reactivate");
+#   }
+#
+#   if ($WfRec->{fwdtarget} eq 'base::grp'){
+#      if ($app->IsMemberOf($WfRec->{fwdtargetid},undef,"both")){
+#         push(@l,"addnote");
+#      }
+#   }
+#   elsif ($WfRec->{fwdtarget} eq 'base::user' && 
+#       $userid==$WfRec->{fwdtargetid}){
+#         push(@l,"addnote");
+#   }
+#   elsif ($WfRec->{fwddebtarget} eq 'base::grp'){
+#      if ($app->IsMemberOf($WfRec->{fwddebtargetid},undef,"both")){
+#         push(@l,"addnote");
+#      }
+#      else{
+#         if ($app->IsMemberOf(["admin","admin.workflow"])){
+#            push(@l,"addnote");
+#         }
+#      }
+#   }
+#   elsif ($WfRec->{fwddeptarget} eq 'base::user'){
+#      if ($userid==$WfRec->{fwddeptargetid}){
+#         push(@l,"addnote");
+#      }
+#   }
+#   if ($WfRec->{owner}==$userid || $WfRec->{openuser}==$userid){
+#      push(@l,"addnote");
+#      if ($WfRec->{fwdtarget} ne ""){
+#         push(@l,"remsup");
+#      }
+#      else{
+#         push(@l,"addsup");
+#      }
+#      push(@l,"wfclose");
+#   }
    #msg(INFO,"valid operations=%s",join(",",@l));
 
    return(@l);
 }
 
 
+sub getDynamicFields
+{
+   my $self=shift;
+   my %param=@_;
+   my $class;
+
+   return($self->InitFields(
+                   new kernel::Field::Select(
+                             name               =>'replaceoptype',
+                             htmleditwidth      =>'350px',
+                             value              =>['user','grp'],
+                             translation        =>'base::workflow::ReplaceTool',
+                             label              =>'Replace operation type',
+                             container          =>'additional'),
+   ));
+}
+
+
 #######################################################################
-package base::workflow::ReplaceTool::dataload;
+package base::workflow::ReplaceTool::asktype;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfStep;
 use Data::Dumper;
 @ISA=qw(kernel::WfStep);
+
+sub generateStoredWorkspace
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my @steplist=@_;
+   my $d=<<EOF;
+<tr>
+<td class=fname width=30%>%replaceoptype(label)%:</td>
+<td class=finput>%replaceoptype(storedworkspace)%</td>
+</tr>
+EOF
+
+   return($self->SUPER::generateStoredWorkspace($WfRec,@steplist).$d);
+}
 
 sub generateWorkspace
 {
@@ -196,11 +290,16 @@ sub generateWorkspace
    my $WfRec=shift;
    my $actions=shift;
 
+   my @steplist=Query->Param("WorkflowStep");
+   pop(@steplist);
+   my $StoredWorkspace=$self->SUPER::generateStoredWorkspace($WfRec,@steplist);
+
    my $templ=<<EOF;
 <table border=0 cellspacing=0 cellpadding=0 width=100%>
+$StoredWorkspace
 <tr>
-<td class=fname width=20%>%name(label)%:</td>
-<td class=finput>%name(detail)%</td>
+<td class=fname width=20%>%replaceoptype(label)%:</td>
+<td class=finput>%replaceoptype(detail)%</td>
 </tr>
 </table>
 EOF
@@ -214,36 +313,8 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
-   foreach my $v (qw(name)){
-      if ((!defined($oldrec) || exists($newrec->{$v})) && $newrec->{$v} eq ""){
-         $self->LastMsg(ERROR,"field '%s' is empty",
-                        $self->getField($v)->Label());
-         return(0);
-      }
-   }
-   $newrec->{step}=$self->getNextStep();
 
    return(1);
-}
-
-sub Process
-{
-   my $self=shift;
-   my $action=shift;
-   my $WfRec=shift;
-   my $actions=shift;
-
-   if ($action eq "NextStep"){
-      my $h=$self->getWriteRequestHash("web");
-      $h->{stateid}=1;
-      $h->{eventstart}=NowStamp("en");
-      $h->{eventend}=undef;
-      $h->{closedate}=undef;
-      if (!$self->StoreRecord($WfRec,$h)){
-         return(0);
-      }
-   }
-   return($self->SUPER::Process($action,$WfRec));
 }
 
 
@@ -252,8 +323,95 @@ sub getWorkHeight
    my $self=shift;
    my $WfRec=shift;
 
-   return(100);
+   return(300);
 }
+
+
+
+#######################################################################
+package base::workflow::ReplaceTool::askreplace;
+use vars qw(@ISA);
+use kernel;
+use kernel::WfStep;
+use Data::Dumper;
+@ISA=qw(kernel::WfStep);
+
+sub generateStoredWorkspace
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my @steplist=@_;
+   my $d=<<EOF;
+<tr>
+<td class=fname width=30%>%replaceoptype(label)%:</td>
+<td class=finput>%replaceoptype(storedworkspace)%</td>
+</tr>
+EOF
+
+   return($self->SUPER::generateStoredWorkspace($WfRec,@steplist).$d);
+}
+
+sub generateWorkspace
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   my @steplist=Query->Param("WorkflowStep");
+   pop(@steplist);
+   my $StoredWorkspace=$self->SUPER::generateStoredWorkspace($WfRec,@steplist);
+
+
+   my $templ=<<EOF;
+<table border=0 cellspacing=0 cellpadding=0 width=100%>
+$StoredWorkspace
+<tr>
+<td class=fname width=20%>%replaceoptype(label)%:</td>
+<td class=finput>%replaceoptype(detail)%</td>
+</tr>
+</table>
+EOF
+   return($templ);
+}
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $origrec=shift;
+
+
+   return(1);
+}
+
+
+sub getWorkHeight
+{
+   my $self=shift;
+   my $WfRec=shift;
+
+   return(300);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #######################################################################
 package base::workflow::ReplaceTool::main;
