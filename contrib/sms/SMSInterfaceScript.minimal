@@ -1,0 +1,8 @@
+#!/bin/bash
+SMSNUM=$1
+SMSTEXT=`cat` 
+echo "=========================================================================" >> /tmp/smslog
+echo "date: `date`" >> /tmp/smslog
+echo "to:   $SMSNUM" >> /tmp/smslog
+echo "$SMSTEXT" >> /tmp/smslog
+echo "=========================================================================" >> /tmp/smslog
