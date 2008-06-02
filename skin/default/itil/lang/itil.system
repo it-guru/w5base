@@ -27,7 +27,7 @@
 'Referencesystem'=>{de=>'Referenzsystem'},
 'Databaseserver'=>{de=>'Datenbankserver'},
 'Workstation'=>{de=>'Workstation/DesktopPC',en=>'Workstation/DesktopPC'},
-'you are not authorized to set other persons as admin'=>{de=>'sie sind nicht berechtig andere Personen als Admin einzutragen'},
+'you are not authorized to set other persons as databoss'=>{de=>'sie sind nicht berechtig andere Personen als Datanverantwortlicher einzutragen'},
 'Room'=>{de=>'Raum'},
 'Customer'=>{de=>'Kunde'},
 'Contacts'=>{de=>'Kontakte'},
@@ -35,4 +35,5 @@
 'Producer Service&Support Class'=>{de=>'Hersteller Service&Support Class'},
 'Keywords'=>{de=>'Schlüsselworte'},
 'IP-Adresses'=>{de=>'IP-Adressen'},
-
+'Databoss'=>{de=>'Datenverantwortlicher'},
+'Asset-Name'=>{de=>'Asset-Name/AssetID',en=>'Asset-Name/AssetID'},

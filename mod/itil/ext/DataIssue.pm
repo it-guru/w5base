@@ -120,11 +120,11 @@ sub completeWriteRequest
       my $obj=getModuleObject($self->getParent->Config,$affectedobject);
       my $affectedobjectid=effVal($oldrec,$newrec,"directlnkid");
       $obj->SetFilter(id=>\$affectedobjectid);
-      my ($confrec,$msg)=$obj->getOnlyFirst(qw(admid mandatorid mandator));
+      my ($confrec,$msg)=$obj->getOnlyFirst(qw(databossid mandatorid mandator));
       if (defined($confrec)){
-         if ($confrec->{admid} ne ""){
+         if ($confrec->{databossid} ne ""){
             $newrec->{fwdtarget}="base::user";
-            $newrec->{fwdtargetid}=$confrec->{admid};
+            $newrec->{fwdtargetid}=$confrec->{databossid};
          }
          if ($confrec->{mandatorid} ne ""){
             $newrec->{kh}->{mandatorid}=$confrec->{mandatorid};
@@ -160,11 +160,11 @@ sub completeWriteRequest
       my $obj=getModuleObject($self->getParent->Config,$affectedobject);
       my $affectedobjectid=effVal($oldrec,$newrec,"directlnkid");
       $obj->SetFilter(id=>\$affectedobjectid);
-      my ($confrec,$msg)=$obj->getOnlyFirst(qw(guardianid mandatorid mandator));
+      my ($confrec,$msg)=$obj->getOnlyFirst(qw(databossid mandatorid mandator));
       if (defined($confrec)){
-         if ($confrec->{guardianid} ne ""){
+         if ($confrec->{databossid} ne ""){
             $newrec->{fwdtarget}="base::user";
-            $newrec->{fwdtargetid}=$confrec->{guardianid};
+            $newrec->{fwdtargetid}=$confrec->{databossid};
          }
          if ($confrec->{mandatorid} ne ""){
             $newrec->{kh}->{mandatorid}=$confrec->{mandatorid};

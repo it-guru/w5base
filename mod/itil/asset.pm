@@ -71,6 +71,18 @@ sub new
 
 
       new kernel::Field::TextDrop(
+                name          =>'databoss',
+                label         =>'Databoss',
+                vjointo       =>'base::user',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['databossid'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'databossid',
+                dataobjattr   =>'asset.databoss'),
+
+      new kernel::Field::TextDrop(
                 name          =>'hwmodel',
                 htmlwidth     =>'130px',
                 group         =>'physasset',
@@ -488,15 +500,15 @@ sub Validate
    if ($self->isDataInputFromUserFrontend()){
       my $userid=$self->getCurrentUserId();
       if (!defined($oldrec)){
-         if (!defined($newrec->{guardianid}) ||
-             $newrec->{guardianid}==0){
-            $newrec->{guardianid}=$userid;
+         if (!defined($newrec->{databossid}) ||
+             $newrec->{databossid}==0){
+            $newrec->{databossid}=$userid;
          }
       }
       if (!$self->IsMemberOf("admin") && 
-          (defined($newrec->{guardianid}) &&
-           $newrec->{guardianid}!=$userid &&
-           $newrec->{guardianid}!=$oldrec->{guardianid})){
+          (defined($newrec->{databossid}) &&
+           $newrec->{databossid}!=$userid &&
+           $newrec->{databossid}!=$oldrec->{databossid})){
          $self->LastMsg(ERROR,"you are not authorized to set other persons ".
                               "as guardian");
          return(0);
@@ -543,7 +555,7 @@ sub isWriteValid
       return("default");
    }
    else{
-      if ($rec->{guardianid}==$userid){
+      if ($rec->{databossid}==$userid){
          return(@databossedit);
       }
       if ($self->IsMemberOf("admin")){

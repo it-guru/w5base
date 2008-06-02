@@ -75,6 +75,18 @@ sub new
                 label         =>'SystemID',
                 dataobjattr   =>'system.systemid'),
 
+      new kernel::Field::TextDrop(
+                name          =>'databoss',
+                label         =>'Databoss',
+                vjointo       =>'base::user',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['databossid'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'databossid',
+                dataobjattr   =>'system.databoss'),
+
       new kernel::Field::SubList(
                 name          =>'applications',
                 label         =>'Applications',
@@ -810,17 +822,17 @@ sub Validate
    if ($self->isDataInputFromUserFrontend()){
       my $userid=$self->getCurrentUserId();
       if (!defined($oldrec)){
-         if (!defined($newrec->{admid}) ||
-             $newrec->{admid}==0){
-            $newrec->{admid}=$userid;
+         if (!defined($newrec->{databossid}) ||
+             $newrec->{databossid}==0){
+            $newrec->{databossid}=$userid;
          }
       }
-      if (defined($newrec->{admid}) &&
-          $newrec->{admid}!=$userid &&
-          !($self->IsMemberOf("admin")) &&
-          $newrec->{admid}!=$oldrec->{admid}){
+      if (defined($newrec->{databossid}) &&
+          $newrec->{databossid}!=$userid &&
+          !($self->IsMemberOf("databossin")) &&
+          $newrec->{databossid}!=$oldrec->{databossid}){
          $self->LastMsg(ERROR,"you are not authorized to set other persons ".
-                              "as admin");
+                              "as databoss");
          return(0);
       }
    }
@@ -912,7 +924,7 @@ sub isWriteValid
       return("default","admin","misc","opmode","control","systemclass");
    }
    else{
-      if ($rec->{admid}==$userid){
+      if ($rec->{databossid}==$userid){
          return(@databossedit);
       }
       if ($self->IsMemberOf("admin")){
