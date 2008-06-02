@@ -163,9 +163,12 @@ sub ValidateCreate
    my $self=shift;
    my $newrec=shift;
 
-   if (!defined($newrec->{kh}->{mandator}) || 
+  #
+  # laut Tino soll nun auch Extern zugelassen werden
+  #
+   if (!defined($newrec->{kh}->{mandator}) ||    
        ref($newrec->{kh}->{mandator}) ne "ARRAY" ||
-       !grep(/^AL T-Com$/,@{$newrec->{kh}->{mandator}})){
+       !grep(/^(Extern|AL T-Com)$/,@{$newrec->{kh}->{mandator}})){
       $self->LastMsg(ERROR,"no AL T-Com mandator included");
       return(0);
    }
@@ -400,7 +403,8 @@ sub generateMailSet
                 push(@emailprefix,"Beschreibung der Ursache:");
             }elsif($field eq "wffields.eventscproblemcause"){
                 push(@emailsubtitle,"");    
-                push(@emailprefix,"Ursachen-Cluster/Beschreibung der Ursache:");
+                push(@emailprefix,"Ursachen-Cluster/ ".
+                                  "Beschreibung der Ursache:");
             }elsif($field eq "wffields.shorteventelimination"){
                 push(@emailsubtitle,"");    
                 push(@emailprefix,"Kurzfristige Massnahme zur ".

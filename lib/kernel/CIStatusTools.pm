@@ -403,7 +403,7 @@ sub NotifyAddOrRemoveObject
       my $mandator;
       if ($mandatorid ne ""){
          my $ma=getModuleObject($self->Config,"base::mandator");
-         $ma->SetFilter({id=>\$mandatorid});
+         $ma->SetFilter({grpid=>\$mandatorid});
          my ($marec,$msg)=$ma->getOnlyFirst(qw(name));
          if (defined($marec)){ 
             $mandator=$marec->{name};
