@@ -520,7 +520,7 @@ sub isWriteValid
 
    my @databossedit=qw(default adm systems contacts misc);
    if (!defined($rec)){
-      return("default");
+      return(@databossedit);
    }
    else{
       if ($rec->{databossid}==$userid){
