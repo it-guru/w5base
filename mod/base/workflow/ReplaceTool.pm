@@ -94,7 +94,7 @@ sub getRecordImageUrl
 {
    my $self=shift;
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-   return("../../../public/base/load/workflow-ReplaceTool.jpg?".
+   return("../../../public/base/load/workflow_replacetool.jpg?".
           $cgi->query_string());
 }
 
