@@ -10,3 +10,4 @@
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'costcenter is direct useable by workflows'=>{de=>'Konstenstelle darf direkt von Workflows verwendet werden'},
 'no write access - you have to define databoss at first'=>{de=>'kein Schreibzugriff - es muß erst ein Datenverantwortlicher definiert werden'},
+'you are not authorized to set other persons as databoss'=>{de=>'Sie sind nicht berechtig, andere Personen als Datenverantwortlichen zu bennen'},

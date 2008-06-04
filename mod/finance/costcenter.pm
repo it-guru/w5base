@@ -242,17 +242,17 @@ sub getRecordImageUrl
 }
 
 
-#sub SecureValidate
-#{
-#   my $self=shift;
-#   my $oldrec=shift;
-#   my $newrec=shift;
-#   my $wrgroups=shift;
-#   my $userid=$self->getCurrentUserId();
-#
-#
-#   return(kernel::DataObj::SecureValidate($self,$oldrec,$newrec,$wrgroups));
-#}
+
+sub SecureValidate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   return(1);
+}
+
+
 
 
 sub Validate
@@ -295,7 +295,7 @@ sub Validate
           $newrec->{databossid}!=$userid &&
           $newrec->{databossid}!=$oldrec->{databossid}){
          $self->LastMsg(ERROR,"you are not authorized to set other persons ".
-                              "as delmgr");
+                              "as databoss");
          return(0);
       }
    }

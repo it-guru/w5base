@@ -1,4 +1,4 @@
-package tsacinv::lnksystemlicense;
+package tsacinv::lnksystemsoftware;
 
 #
 # Diese Module ist noch nicht fertig - ich begreife da einfach nicht
@@ -49,8 +49,8 @@ sub new
                 dataobjattr   =>"amportfolio.assettag"),
 
       new kernel::Field::Text(
-                name          =>'model',
-                label         =>'Model',
+                name          =>'name',
+                label         =>'Software',
                 uppersearch   =>1,
                 size          =>'16',
                 dataobjattr   =>'ammodel.name'),
@@ -60,15 +60,28 @@ sub new
                 label         =>'System',
                 uppersearch   =>1,
                 vjointo       =>'tsacinv::system',
-                vjoinon       =>['lparentid'=>'lcomputerid'],
+                vjoinon       =>['lparentid'=>'lportfolioitemid'],
+                vjoindisp     =>'systemname'),
+
+      new kernel::Field::TextDrop(
+                name          =>'license',
+                label         =>'License',
+                uppersearch   =>1,
+                vjointo       =>'tsacinv::license',
+                vjoinon       =>['llicense'=>'lportfolioitemid'],
                 vjoindisp     =>'name'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Link(
                 name          =>'lparentid',
                 label         =>'ParentID',
                 dataobjattr   =>'amportfolio.lparentid'),
+
+      new kernel::Field::Link(
+                name          =>'llicense',
+                label         =>'LicenseID',
+                dataobjattr   =>'amsoftinstall.llicenseid'),
    );
-   $self->setDefaultView(qw(id model child));
+   $self->setDefaultView(qw(id model system license));
    return($self);
 }
 
@@ -92,7 +105,7 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="amportfolio,ammodel";
+   my $from="amportfolio,ammodel,amsoftinstall";
    return($from);
 }  
 
@@ -100,7 +113,8 @@ sub initSqlWhere
 {  
    my $self=shift;
    my $where=
-      "amportfolio.lmodelid=ammodel.lmodelid ".
+      "amportfolio.lportfolioitemid=amsoftinstall.litemid ".
+      "and amportfolio.lmodelid=ammodel.lmodelid ".
       "and amportfolio.bdelete=0 ";
    return($where);
 }

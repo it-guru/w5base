@@ -49,7 +49,7 @@ sub new
                 dataobjattr   =>'amasset.status'),
 
       new kernel::Field::Text(
-                name          =>'model',
+                name          =>'name',
                 label         =>'Model',
                 uppersearch   =>1,
                 size          =>'16',
@@ -228,10 +228,10 @@ sub new
 #                label         =>'AC-AssetID',
 #                dataobjattr   =>'amportfolio.lparentid'),
 #
-#      new kernel::Field::Link(
-#                name          =>'lportfolioitemid',
-#                label         =>'PortfolioID',
-#                dataobjattr   =>'amportfolio.lportfolioitemid'),
+      new kernel::Field::Link(
+                name          =>'lportfolioitemid',
+                label         =>'PortfolioID',
+                dataobjattr   =>'amportfolio.lportfolioitemid'),
 #
 #      new kernel::Field::Link(
 #                name          =>'locationid',

@@ -253,6 +253,14 @@ sub new
                 vjoinon       =>['lportfolioitemid'=>'lchildid'],
                 vjoindisp     =>[qw(parent)]),
 
+      new kernel::Field::SubList(
+                name          =>'software',
+                label         =>'Software',
+                group         =>'software',
+                vjointo       =>'tsacinv::lnksystemsoftware',
+                vjoinon       =>['lportfolioitemid'=>'lparentid'],
+                vjoindisp     =>[qw(id name)]),
+
       new kernel::Field::Dynamic(
                 name          =>'dynservices',
                 depend        =>[qw(systemid)],

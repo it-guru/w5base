@@ -207,10 +207,10 @@ sub getNotificationSubject
    $colon=":" if ($ag ne "");              
    $subject="$ag$colon Kundeninformation Anwendungsausfall/Störung";
    if ($WfRec->{eventmode} eq "EVk.net"){ 
-      $subject="$ag$colon Kundeninformation Anwendungsausfall/Störung";
+      $subject="Kundeninformation Netzausfall/Störung";
    }
    if ($WfRec->{eventmode} eq "EVk.infraloc"){ 
-      $subject="$ag$colon Kundeninformation Anwendungsausfall/Störung";
+      $subject="Kundeninformation Infrastruktur-Störung";
    }
    if ($action eq "rootcausei"){
       $subject="$ag$colon Ursachenanalyse";

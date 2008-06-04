@@ -22,7 +22,6 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
-use kernel::CIStatusTools;
 use finance::costcenter;
 @ISA=qw(finance::costcenter);
 

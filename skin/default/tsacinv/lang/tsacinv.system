@@ -3,6 +3,7 @@
 'fieldgroup.default'=>{de=>'allgemeine Systemdaten', en=>'common system data'},
 'fieldgroup.services'=>{de=>'Leistungsarten', en=>'Services'},
 'fieldgroup.ipaddresses'=>{de=>'IP-Adressen', en=>'IP-Addresses'},
+'fieldgroup.software'=>{de=>'Software', en=>'Software'},
 'fieldgroup.applications'=>{de=>'Anwendungen', en=>'Applications'},
 'fieldgroup.form'=>{de=>'Ausprägung', en=>'Characteristic'},
 'Cost allocation active'=>{de=>'interne Leistungsverrechung aktiv'},
