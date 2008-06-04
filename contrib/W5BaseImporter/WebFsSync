@@ -317,7 +317,8 @@ sub doStart
                                  ${$mainwin->{PARAM}->{'webpass=s'}},
                                  0,$mainwin->{apidebug},\$exitcode,\$msgs);
    if (!$Config){
-      eval("Win32::MsgBox(\"login error: \$msgs\",Win32::MB_ICONQUESTION|0, 'Error!')");   
+      eval("Win32::MsgBox(\"login error: \$msgs \$exitcode\",
+            Win32::MB_ICONQUESTION|0, 'Error!')");   
       $mainwin->run->Enable(1);
       return(1,$msgs);
    }else{
@@ -469,17 +470,34 @@ connect data
 Webuser\t\t->\tyour web account, same like on the webinterface,
 \t\t\tf.e. sued/basedow.holm or wiw/hbasedow
 Webpassword\t->\tyour web password, same like on the web interface
-BaseURL\t\t->\turl or your webinterface
-\t\t\tf.e. https://w5base-testenv.telekom.de/darwin/auth
+BaseURL\t\t->\turl or your filemgmt
+\t\t\tf.e. https://darwin.telekom.de/darwin/auth
 
-admin
+admin 
 --------------------------
 Download\t\t->\tsynchronize your local filesystem
 \t\t\tfrom the remote filesystem
 Upload\t\t->\tsynchronize your remote filesystem
 \t\t\tfrom the local filesystem
 
-options only for admins available
+options
+--------------------------
+ --verbose\tdisplay more details of operation process
+ --quiet\t\tonly errors would be displayed
+ --base\t\tbase url of filemgmt 
+ --webuser\tusername
+ --webpass\tpassword
+ --store\t\tstores the parameters (not help,verbose and store)
+ --help\t\tshow this help
+ --mode\t\tdownload or upload [default:download]
+ --rdir\t\tremote directory
+ --ldir\t\tlocal directory
+ --force\t\twrite data  
+ --nogui\t\tfor commandline usage in win32 systems only, default is gui on
+ --nowarn\t\tprevent warnings
+ --admin\t\tenable admin options
+ --autostart\tsync automatically, in win32 mode only
+
 
 EOF
    $self->MessageBox("$text",'Infomation',0x0020);
@@ -542,9 +560,7 @@ use File::Path;
 use POSIX;
 use MIME::Entity;
 use Config;
-#use utf8;
 use Encode;
-#use Unicode::String qw(utf8 latin1 utf16);
 use Data::HexDump;
 use vars qw($GUI $Window);
 
