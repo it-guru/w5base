@@ -121,8 +121,11 @@ sub getImputTemplate
             }
             if (defined($dataobj)){
                $d.="<tr>";
+               my $optname="SR:$data->{dataobj}:$k";
+               my $checked;
+               $checked=" checked" if (Query->Param($optname) ne "");
                $d.="<td width=20><input type=checkbox class=ACT ".
-                   " name=\"ReplaceTool:$data->{dataobj}:$k\"></td>";
+                   " name=\"$optname\"$checked></td>";
                $d.="<td>".
                    $self->getParent->T($data->{dataobj},$data->{dataobj});
                $d.=" - Field: ".$label if ($label ne "");
