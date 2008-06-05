@@ -1,1 +1,11 @@
-'base::workflow::ReplaceTool'=>{de=>'Nachfolger-Behandlung: globales Kontakte oder Gruppen Austauschen',en=>'global replace user or groups'},
+'base::workflow::ReplaceTool'=>{de=>'Suchen/Ersetzen: Referenzen auf Objekte global suchen und ersetzen (Nachfolger Behandlung)',en=>'global replace user or groups'},
+'base::workflow::ReplaceTool::tip'=>{de=>'Dieser Workflow dient dazu, Referenzen auf bestimmte Objekte (z.B. Konakte, Gruppen, Standorte ...) in Config-Objekten auszutauschen. Es kann damit z.B. die Datenverantwortung für bestimmte Objekte (z.B. Anwendungen) an eine andere Person übergeben werden. Die Operation ist immer Global, d.h. sie bezieht sich auf alle Objekte eines bestimmten Typs.
+',en=>'With this workflow you can replace all references to an specified object by an other object.'},
+'Replace operation type'=>{de=>'Suchen/Ersetzen Datenobjekt'},
+'Search User'=>{de=>'Suchen nach Kontakt'},
+'Replace by'=>{de=>'Referenzen ersetzen durch'},
+'Replace operation in the following fields'=>{de=>'Suchen/Ersetzen Operation auf folgende Felder anwenden'},
+'all posible elements'=>{de=>'alle Zielelemente, die möglich sind'},
+'Yes, i am sure to want to start the workflow replacing the matching references.'=>{de=>'Ja, ich bin sicher, dass ich den Workflow zum ersetzen der Referenzen starten will.'},
+'SR::base::user'=>{de=>'Kontakt',en=>'Contact'},
+'SR::base::grp'=>{de=>'Gruppe',en=>'Group'},

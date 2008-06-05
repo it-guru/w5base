@@ -1,3 +1,4 @@
 'itil::costcenter'=>{de=>'Kostenstelle/CO-Nummer',en=>'CostCenter/CO-Number'},
 'fieldgroup.applications'=>{de=>'Anwendungen',en=>'Applications'},
 'Applications'=>{de=>'Anwendungen'},
+'delete only posible, if there are no application relations'=>{de=>'löschen ist nur mögliche, wenn keine Anwendungsverknüpfungen vorhanden sind'},

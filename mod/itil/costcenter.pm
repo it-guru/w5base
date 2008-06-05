@@ -73,6 +73,23 @@ sub FinishWrite
 }
 
 
+sub ValidateDelete
+{
+   my $self=shift;
+   my $rec=shift;
+
+   if ($#{$rec->{applications}}!=-1){
+      $self->LastMsg(ERROR,
+          "delete only posible, if there are no application relations");
+      return(0);
+   }
+
+   return(1);
+}
+
+
+
+
 
 
 

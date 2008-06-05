@@ -59,7 +59,7 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'wfreplacegrpsrc',
-                label         =>'Search User',
+                label         =>'Search Group',
                 htmldetail    =>0,
                 group         =>'init',
                 vjointo       =>'base::grp',
@@ -86,8 +86,78 @@ sub new
                 container     =>'headref'),
 
     );
+   $self->LoadSubObjs("ext/ReplaceTool","ReplaceTool");
+
 
    return($self);
+}
+
+sub getImputTemplate
+{
+   my $self=shift;
+   my $replaceoptype=shift;
+
+   my $d="<table border=0 bgcolor=silver width=100%>";
+   $d.="<tr><td width=20></td><td>".
+       "<b>".
+       $self->T("Replace operation in the following fields").":</b></td></tr>";
+
+   foreach my $module (sort(keys(%{$self->{ReplaceTool}}))){
+      my $crec=$self->{ReplaceTool}->{$module}->getControlRecord();
+      while(my $k=shift(@$crec)){
+         my $data=shift(@$crec);
+         if ($data->{replaceoptype} eq $replaceoptype){
+            my $dataobj=getModuleObject($self->getParent->Config,
+                                        $data->{dataobj});
+            my $label;
+            if ($data->{label} ne ""){
+               $label=$self->getParent->T($data->{label},$data->{dataobj});
+            }
+            if (!defined($label) && defined($dataobj)){
+               my $fldobj=$dataobj->getField($data->{target});
+               if (defined($fldobj)){
+                  $label=$fldobj->Label();
+               }
+            }
+            if (defined($dataobj)){
+               $d.="<tr>";
+               $d.="<td width=20><input type=checkbox class=ACT ".
+                   " name=\"ReplaceTool:$data->{dataobj}:$k\"></td>";
+               $d.="<td>".
+                   $self->getParent->T($data->{dataobj},$data->{dataobj});
+               $d.=" - Field: ".$label if ($label ne "");
+               $d.="</td>";
+               $d.="</tr>";
+            }
+         }
+      }
+   }
+   $d.="<tr><td width=20><input type=button style=\"width:20px;height:20px\" ".
+       "onClick=checkAll()></td>".
+       "<td><b>".
+       $self->T("all posible elements")."</b></td></tr>";
+   $d.="</table>";
+   $d.=<<EOF;
+<script language=JavaScript>
+var allon=false;
+
+function checkAll()
+{
+   for(var i = 0; i < document.forms.length; i++) {
+      for(var e = 0; e < document.forms[i].length; e++){
+         if(document.forms[i].elements[e].className == "ACT") {
+            document.forms[i].elements[e].checked=!allon;
+         }
+      }
+   }
+   allon=!allon;
+}
+</script>
+
+EOF
+
+   return($d);
+
 }
 
 sub getRecordImageUrl
@@ -155,6 +225,9 @@ sub getNextStep
    elsif($currentstep=~m/^.*::workflow::ReplaceTool::asktype$/){
       return($self->getStepByShortname("askreplace",$WfRec)); 
    }
+   elsif($currentstep=~m/^.*::workflow::ReplaceTool::askreplace$/){
+      return($self->getStepByShortname("askarg",$WfRec)); 
+   }
    elsif($currentstep eq ""){
       return($self->getStepByShortname("asktype",$WfRec)); 
    }
@@ -168,8 +241,6 @@ sub isOptionalFieldVisible
    my %param=@_;
    my $name=$param{field}->Name();
 
-   return(1) if ($name eq "relations");
-   return(1) if ($name eq "prio");
    return(1) if ($name eq "name");
    return(1) if ($name eq "shortactionlog");
    return(1) if ($name eq "detaildescription");
@@ -253,7 +324,9 @@ sub getDynamicFields
                    new kernel::Field::Select(
                              name               =>'replaceoptype',
                              htmleditwidth      =>'350px',
-                             value              =>['user','grp'],
+                             transprefix        =>'SR::',
+                             translation        =>'base::workflow::ReplaceTool',
+                             value              =>['base::user','base::grp'],
                              translation        =>'base::workflow::ReplaceTool',
                              label              =>'Replace operation type',
                              container          =>'additional'),
@@ -266,7 +339,6 @@ package base::workflow::ReplaceTool::asktype;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfStep;
-use Data::Dumper;
 @ISA=qw(kernel::WfStep);
 
 sub generateStoredWorkspace
@@ -276,7 +348,7 @@ sub generateStoredWorkspace
    my @steplist=@_;
    my $d=<<EOF;
 <tr>
-<td class=fname width=30%>%replaceoptype(label)%:</td>
+<td class=fname style="width:200px">%replaceoptype(label)%:</td>
 <td class=finput>%replaceoptype(storedworkspace)%</td>
 </tr>
 EOF
@@ -298,7 +370,7 @@ sub generateWorkspace
 <table border=0 cellspacing=0 cellpadding=0 width=100%>
 $StoredWorkspace
 <tr>
-<td class=fname width=20%>%replaceoptype(label)%:</td>
+<td class=fname style="width:150px">%replaceoptype(label)%:</td>
 <td class=finput>%replaceoptype(detail)%</td>
 </tr>
 </table>
@@ -323,7 +395,7 @@ sub getWorkHeight
    my $self=shift;
    my $WfRec=shift;
 
-   return(300);
+   return(340);
 }
 
 
@@ -333,7 +405,185 @@ package base::workflow::ReplaceTool::askreplace;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfStep;
-use Data::Dumper;
+@ISA=qw(kernel::WfStep);
+
+sub generateStoredWorkspace
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $replaceoptype=Query->Param("Formated_replaceoptype");
+
+   my @steplist=@_;
+   my $d;
+   if ($replaceoptype eq "base::user"){
+      $d=<<EOF;
+<tr>
+<td class=fname>%wfreplaceusersrc(label)%:</td>
+<td class=finput>%wfreplaceusersrc(storedworkspace)%</td>
+</tr>
+<tr>
+<td class=fname>%wfreplaceuserdst(label)%:</td>
+<td class=finput>%wfreplaceuserdst(storedworkspace)%</td>
+</tr>
+EOF
+   }
+   if ($replaceoptype eq "base::grp"){
+      $d=<<EOF;
+<tr>
+<td class=fname>%wfreplacegrpsrc(label)%:</td>
+<td class=finput>%wfreplacegrpsrc(storedworkspace)%</td>
+</tr>
+<tr>
+<td class=fname>%wfreplacegrpdst(label)%:</td>
+<td class=finput>%wfreplacegrpdst(storedworkspace)%</td>
+</tr>
+EOF
+   }
+
+   return($self->SUPER::generateStoredWorkspace($WfRec,@steplist).$d);
+}
+
+sub generateWorkspace
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my $replaceoptype=Query->Param("Formated_replaceoptype");
+printf STDERR ("fifi replaceoptype=$replaceoptype\n");
+
+   my @steplist=Query->Param("WorkflowStep");
+   pop(@steplist);
+   my $StoredWorkspace=$self->SUPER::generateStoredWorkspace($WfRec,@steplist);
+
+
+   my $templ;
+   if ($replaceoptype eq "base::user"){
+      $templ=<<EOF;
+<table border=0 cellspacing=0 cellpadding=0 width=100%>
+$StoredWorkspace
+<tr>
+<td class=fname>%wfreplaceusersrc(label)%:</td>
+<td class=finput>%wfreplaceusersrc(detail)%</td>
+</tr>
+<tr>
+<td class=fname>%wfreplaceuserdst(label)%:</td>
+<td class=finput>%wfreplaceuserdst(detail)%</td>
+</tr>
+</table>
+EOF
+   }
+   if ($replaceoptype eq "base::grp"){
+      $templ=<<EOF;
+<table border=0 cellspacing=0 cellpadding=0 width=100%>
+$StoredWorkspace
+<tr>
+<td class=fname>%wfreplacegrpsrc(label)%:</td>
+<td class=finput>%wfreplacegrpsrc(detail)%</td>
+</tr>
+<tr>
+<td class=fname>%wfreplacegrpdst(label)%:</td>
+<td class=finput>%wfreplacegrpdst(detail)%</td>
+</tr>
+</table>
+EOF
+   }
+printf STDERR ("fifi templ=$templ\n");
+   return($templ);
+}
+
+sub ProcessNext                
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   my $replaceoptype=Query->Param("Formated_replaceoptype");
+
+   my $srcfieldname;
+   my $dstfieldname;
+   if ($replaceoptype eq "base::user"){
+      $srcfieldname="wfreplaceusersrc";
+      $dstfieldname="wfreplaceuserdst";
+   }
+   if ($replaceoptype eq "base::grp"){
+      $srcfieldname="wfreplacegrpsrc";
+      $dstfieldname="wfreplacegrpdst";
+   }
+   if (defined($srcfieldname) && defined($dstfieldname)){
+      my $srcfield=$self->getField($srcfieldname);
+      my $f=Query->Param("Formated_".$srcfield->Name());
+      if ($f=~m/^\s*$/){
+         $self->LastMsg(ERROR,"no src specified");
+         return(0);
+      }
+     
+      if (my $appl=$srcfield->Validate($WfRec,{$srcfield->Name()=>$f})){
+
+         my $dstfield=$self->getField($dstfieldname);
+         my $f=Query->Param("Formated_".$dstfield->Name());
+         if ($f=~m/^\s*$/){
+            $self->LastMsg(ERROR,"no dst specified");
+            return(0);
+         }
+        
+         if (my $appl=$dstfield->Validate($WfRec,{$dstfield->Name()=>$f})){
+            my $nextstep=$self->getParent->getNextStep($self->Self(),$WfRec);
+            if (defined($nextstep)){
+               my @WorkflowStep=Query->Param("WorkflowStep");
+               push(@WorkflowStep,$nextstep);
+               Query->Param("WorkflowStep"=>\@WorkflowStep);
+               return(0);
+            }
+            return(0);
+         }
+         else{
+            if ($self->LastMsg()==0){
+               $self->LastMsg(ERROR,"unexpected error while dstfield check");
+            }
+            return(0);
+         }
+
+
+      }
+      else{
+         if ($self->LastMsg()==0){
+            $self->LastMsg(ERROR,"unexpected error while srcfield check");
+         }
+         return(0);
+      }
+   }
+   return(0);
+}
+
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $origrec=shift;
+
+
+   return(1);
+}
+
+
+sub getWorkHeight
+{
+   my $self=shift;
+   my $WfRec=shift;
+
+   return(340);
+}
+
+
+
+#######################################################################
+package base::workflow::ReplaceTool::askarg;
+use vars qw(@ISA);
+use kernel;
+use kernel::WfStep;
 @ISA=qw(kernel::WfStep);
 
 sub generateStoredWorkspace
@@ -343,8 +593,8 @@ sub generateStoredWorkspace
    my @steplist=@_;
    my $d=<<EOF;
 <tr>
-<td class=fname width=30%>%replaceoptype(label)%:</td>
-<td class=finput>%replaceoptype(storedworkspace)%</td>
+<td class=fname colspan=2>Begründung:<br>
+%detaildescription(storedworkspace)%</td>
 </tr>
 EOF
 
@@ -357,18 +607,27 @@ sub generateWorkspace
    my $WfRec=shift;
    my $actions=shift;
 
+   my $replaceoptype=Query->Param("Formated_replaceoptype");
    my @steplist=Query->Param("WorkflowStep");
    pop(@steplist);
    my $StoredWorkspace=$self->SUPER::generateStoredWorkspace($WfRec,@steplist);
 
-
+   my $inputTempl=$self->getParent()->getImputTemplate($replaceoptype);
+   my $q=$self->getParent->T("Yes, i am sure to want to start the workflow replacing the matching references.","base::workflow::ReplaceTool");
    my $templ=<<EOF;
 <table border=0 cellspacing=0 cellpadding=0 width=100%>
 $StoredWorkspace
+</table>
+<div style="overflow:auto;width:100%;height:80px">
+$inputTempl
+</div>
+<table border=0 cellspacing=0 cellpadding=0 width=100%>
 <tr>
-<td class=fname width=20%>%replaceoptype(label)%:</td>
-<td class=finput>%replaceoptype(detail)%</td>
+<td class=fname colspan=2>Begründung:<br>
+%detaildescription(detail)%</td>
 </tr>
+<tr>
+<td class=fname colspan=2><input name=FORCE type=checkbox>$q</td></tr>
 </table>
 EOF
    return($templ);
@@ -391,8 +650,10 @@ sub getWorkHeight
    my $self=shift;
    my $WfRec=shift;
 
-   return(300);
+   return(340);
 }
+
+
 
 
 
@@ -418,7 +679,6 @@ package base::workflow::ReplaceTool::main;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfStep;
-use Data::Dumper;
 @ISA=qw(kernel::WfStep);
 
 sub generateWorkspace

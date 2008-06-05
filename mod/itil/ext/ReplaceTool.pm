@@ -35,39 +35,42 @@ sub getControlRecord
 {
    my $self=shift;
    my $d=[ 
-           {
-             dataobj   =>'itil::appl',
-             target    =>'databoss',
-             idfield   =>'databossid'
+           databoss=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'itil::appl',
+             target       =>'databoss',
+             idfield      =>'databossid'
            },
-           {
-             dataobj   =>'itil::appl',
-             target    =>'tsm',
-             idfield   =>'tsmid'
+           tsm=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'itil::appl',
+             target       =>'tsm',
+             idfield      =>'tsmid'
            },
-           {
-             dataobj   =>'itil::appl',
-             target    =>'tsm2',
-             idfield   =>'tsm2id'
+           tsm2=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'itil::appl',
+             target       =>'tsm2',
+             idfield      =>'tsm2id'
            },
-           {
-             dataobj   =>'itil::appl',
-             target    =>'sem',
-             idfield   =>'semid'
+           sem=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'itil::appl',
+             target       =>'sem',
+             idfield      =>'semid'
            },
-           {
-             dataobj   =>'itil::appl',
-             target    =>'sem2',
-             idfield   =>'sem2id'
+           sem2=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'itil::appl',
+             target       =>'sem2',
+             idfield      =>'sem2id'
            },
-           {
-             dataobj   =>'itil::appl',
-             target    =>'contacts',
-             idfield   =>'sem2id'
+           contacts=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'itil::appl',
+             target       =>'contacts',
            },
          ];
-
-
    return($d);
 }
 
