@@ -1,2 +1,3 @@
 'you are not authorized to write in the requested mandator'=>{
        de=>'sie sind nicht berechtig in den gewählten Mandanten zu schreiben'},
+'no valid mandator defined'=>{de=>'kein gültiger Mandant definiert'},
