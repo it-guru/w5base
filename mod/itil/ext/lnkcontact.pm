@@ -63,10 +63,10 @@ sub getPosibleRoles
              "support"         =>$self->getParent->T("Support",
                                                      $self->Self));
    }
-   if ($current->{parentobj}=~m/^.+::dbinstance$/ ||
+   if ($current->{parentobj}=~m/^.+::swinstance$/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
-       $self->getParent->getParent->Self()=~m/^.+::dbinstance$/)){
+       $self->getParent->getParent->Self()=~m/^.+::swinstance$/)){
       return(
              "read"            =>$self->getParent->T("read instance",
                                                      $self->Self),
