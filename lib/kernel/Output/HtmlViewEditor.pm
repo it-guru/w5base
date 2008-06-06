@@ -474,7 +474,6 @@ sub getHttpFooter
    $d.=<<EOF;
 <script language="JavaScript">
 RefreshViewDropDown('tree_route');
-addEvent(window,"resize",ResizeViewEditor);
 
 </script>
 <input type=hidden name=OP value="">
