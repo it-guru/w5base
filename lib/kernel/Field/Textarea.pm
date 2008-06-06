@@ -70,6 +70,19 @@ sub FormatedDetail
    return($d);
 }
 
+sub HtmlEditArea    # for module defined edit areas (f.e. javascript areas)
+{
+   my $self=shift;
+
+}
+
+sub HtmlViewArea    # for module defined view areas (f.e. javascript areas)
+{
+   my $self=shift;
+
+
+}
+
 sub FormatedResult
 {
    my $self=shift;
