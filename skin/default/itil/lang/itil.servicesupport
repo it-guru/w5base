@@ -2,6 +2,7 @@
 'fieldgroup.default'=>{de=>'Service und Support',en=>'Service and Support'},
 'service'=>{de=>'Service-Zeiten'},
 'support'=>{de=>'Support-Zeiten'},
+'Timezone'=>{de=>'Zeitzone'},
 'callcenter'=>{de=>'CallCenter-Zeiten'},
 'on-call service'=>{de=>'Rufbereitschaftszeiten'},
 'fieldgroup.oncallservice'=>{de=>'Rufbereitschaftszeiten',en=>'on-call service'},
