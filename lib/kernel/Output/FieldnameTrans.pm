@@ -90,6 +90,7 @@ sub ProcessLine
       next if ($fo->Type() eq "Interface");
       next if (!$fo->UiVisible());
       my $name=$fo->Name();
+      $name=$fo->{namepref}.$name if (defined($fo->{namepref}));
       foreach my $lang (LangTable()){
          $ENV{HTTP_FORCE_LANGUAGE}=$lang;
          my $label=$fo->Label();

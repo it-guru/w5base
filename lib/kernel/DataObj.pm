@@ -1319,7 +1319,11 @@ sub getFieldObjsByView
          } 
          if (defined($fobj)){
             if ($fobj->Type() eq "Dynamic"){
-               push(@subl,$fobj->fields(%param));
+               my @dlist=$fobj->fields(%param);
+               foreach my $f (@dlist){
+                  $f->{namepref}=$fobj->Name().".";
+               }
+               push(@subl,@dlist);
             }
             else{
                push(@fobjs,$fobj);
@@ -1333,7 +1337,11 @@ sub getFieldObjsByView
          my @sublreq;
          if (defined($fobj)){
             if ($fobj->Type() eq "Dynamic"){
-               push(@sublreq,$fobj->fields(%param));
+               my @dlist=$fobj->fields(%param);
+               foreach my $f (@dlist){
+                  $f->{namepref}=$fobj->Name().".";
+               }
+               push(@sublreq,@dlist);
             }
             if ($fobj->Type() eq "Container"){
                push(@sublreq,$fobj->fields(%param));

@@ -738,7 +738,7 @@ sub getDynamicFields
                                                                  %param);
       return(@subl);
    }
-   return();
+   return;
 }
 
 sub Main
