@@ -1,5 +1,4 @@
 'Save'=>{de=>'Aktion speichern/ausf¸hren',en=>'action save/run'},
-'posible action'=>{de=>'mˆgliche Aktion'},
 'abbort request'=>{de=>'Anforderung abbrechen'},
 'empty or to short notes are not allowed'=>{de=>'leere oder zu kurze Notizen sind nicht erlaubt'},
 'use this action, to finish this request and mark it as according to desire processed'=>{de=>'Verwenden Sie diese Aktion, um die Anforderung als "wunschgem‰ﬂ erledigt" abzuschlieﬂen'},

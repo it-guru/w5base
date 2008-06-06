@@ -84,6 +84,7 @@ sub mkchmreport
             foreach my $co (@$colist){
                #
                # HPOS CO-Number need to be maped to costcenter 70110954 
+               # Info from Fr. Helbrecht, Birgit
                #
                my @hposmap=qw(6013002013 6013002014 6013002015 6013002016
                               6013002017 6013002018 6013002019 6013002020

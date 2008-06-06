@@ -41,7 +41,9 @@ sub FormatedDetail
    my $name=$self->Name();
    my $d=$self->RawValue($current);
    $d=join("\n--\n",@{$d}) if (ref($d) eq "ARRAY");
-   if ($mode eq "HtmlDetail"){
+   my $readonly=$self->readonly($current);
+   if ($mode eq "HtmlDetail" || 
+       (($mode eq "edit" || $mode eq "workflow") && $readonly)){
       #$d="<div class=multilinetext><pre class=multilinetext>$d</pre></div>";
       if (!$self->{AllowHtmlInput}){
          $d=~s/&/&amp;/g;
@@ -55,7 +57,7 @@ sub FormatedDetail
          "<pre class=multilinetext>".FancyLinks($d).
          "</pre></div></td></tr></table>";
    }
-   if ($mode eq "edit" || $mode eq "workflow"){
+   if (($mode eq "edit" || $mode eq "workflow") && !$readonly){
       my $fromquery=Query->Param("Formated_$name");
       if (defined($fromquery)){
          $d=$fromquery;

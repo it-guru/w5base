@@ -557,55 +557,6 @@ use Data::Dumper;
 @ISA=qw(kernel::WfStep);
 
 
-sub generateWorkspace
-{
-   my $self=shift;
-   my $WfRec=shift;
-   my $actions=shift;
-
-   my $divset="";
-   my $selopt="";
-
-   $self->generateWorkspacePages($WfRec,$actions,\$divset,\$selopt);   
-   my $oldop=Query->Param("OP");
-   my $templ;
-   my $pa=$self->getParent->T("posible action");
-   $templ=<<EOF;
-<table width=100% height=148 border=0 cellspacing=0 cellpadding=0>
-<tr height=1%><td width=1% nowrap>$pa &nbsp;</td>
-<td><select id=OP name=OP style="width:100%">$selopt</select></td></tr>
-<tr><td colspan=3 valign=top>$divset</td></tr>
-</table>
-<script language="JavaScript">
-function fineSwitch(s)
-{
-   var sa=document.forms[0].elements['SaveStep'];
-   if (s.value=="nop"){
-      if (sa){
-         sa.disabled=true;
-      }
-   }
-   else{
-      if (sa){
-         sa.disabled=false;
-      }
-   }
-}
-function InitDivs()
-{
-   var s=document.getElementById("OP");
-   divSwitcher(s,"$oldop",fineSwitch);
-}
-addEvent(window,"load",InitDivs);
-//InitDivs();
-//window.setTimeout(InitDivs,1000);   // ensure to disable button (mozilla bug)
-</script>
-EOF
-
-   return($templ);
-}
-
-
 sub generateWorkspacePages
 {
    my $self=shift;

@@ -92,6 +92,59 @@ sub new
    return($self);
 }
 
+
+sub getDynamicFields
+{
+   my $self=shift;
+   my %param=@_;
+   my $class;
+
+   return($self->InitFields(
+                   new kernel::Field::Select(
+                             name               =>'replaceoptype',
+                             htmleditwidth      =>'350px',
+                             readonly           =>sub{
+                                my $self=shift;
+                                my $current=shift;
+                                return(0) if (!defined($current));
+                                return(1);
+                             },
+                             transprefix        =>'SR::',
+                             translation        =>'base::workflow::ReplaceTool',
+                             value              =>['base::user','base::grp'],
+                             translation        =>'base::workflow::ReplaceTool',
+                             label              =>'Replace operation type',
+                             container          =>'headref'),
+                   new kernel::Field::Text(
+                             name               =>'replacesearch',
+                             readonly           =>1,
+                             translation        =>'base::workflow::ReplaceTool',
+                             label              =>'search for',
+                             container          =>'headref'),
+                   new kernel::Field::Link(
+                             name               =>'replacesearchid',
+                             readonly           =>1,
+                             container          =>'headref'),
+                   new kernel::Field::Text(
+                             name               =>'replacereplacewith',
+                             readonly           =>1,
+                             translation        =>'base::workflow::ReplaceTool',
+                             label              =>'replace with',
+                             container          =>'headref'),
+                   new kernel::Field::Link(
+                             name               =>'replacereplacewithid',
+                             readonly           =>1,
+                             container          =>'headref'),
+                   new kernel::Field::Textarea(
+                             name               =>'replaceat',
+                             readonly           =>1,
+                             translation        =>'base::workflow::ReplaceTool',
+                             label              =>'replace at fields',
+                             container          =>'headref'),
+   ));
+}
+
+
 sub getImputTemplate
 {
    my $self=shift;
@@ -121,7 +174,7 @@ sub getImputTemplate
             }
             if (defined($dataobj)){
                $d.="<tr>";
-               my $optname="SR:$data->{dataobj}:$k";
+               my $optname="SR:".$module."::".$k;
                my $checked;
                $checked=" checked" if (Query->Param($optname) ne "");
                $d.="<td width=20><input type=checkbox class=ACT ".
@@ -192,7 +245,7 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default","state","flow","header","relations");
+   return("default","state","flow","header");
 }
 
 sub isWriteValid
@@ -201,8 +254,7 @@ sub isWriteValid
    my $rec=shift;
    return(1) if (!defined($rec));
    return("default") if ($rec->{state}<=20 &&
-                         ($self->getParent->getCurrentUserId()==$rec->{owner} ||
-                          $self->getParent->IsMemberOf("admin")));
+                         $self->getParent->IsMemberOf("admin"));
    return(undef);
 }
 
@@ -231,6 +283,9 @@ sub getNextStep
    elsif($currentstep=~m/^.*::workflow::ReplaceTool::askreplace$/){
       return($self->getStepByShortname("askarg",$WfRec)); 
    }
+   elsif($currentstep=~m/^.*::workflow::ReplaceTool::askarg$/){
+      return($self->getStepByShortname("approval",$WfRec)); 
+   }
    elsif($currentstep eq ""){
       return($self->getStepByShortname("asktype",$WfRec)); 
    }
@@ -250,93 +305,29 @@ sub isOptionalFieldVisible
    return(0);
 }
 
-sub getPosibleRelations
-{
-   my $self=shift;
-   my $WfRec=shift;
-   return("base::workflow::ReplaceTool"=>'relinfo');
-}
-
-
-
 sub getPosibleActions
 {
    my $self=shift;
    my $WfRec=shift;
+   my @l;
    my $app=$self->getParent;
    my $userid=$self->getParent->getCurrentUserId();
-   my @l=();
-#   if ($WfRec->{state}==17 && $WfRec->{openuser}==$userid){
-#      push(@l,"addsup");
-#      push(@l,"wffinish");
-#   }
-#
-#   if ($WfRec->{state}>=21 && 
-#       ($WfRec->{openuser}==$userid || 
-#        $self->getParent->IsMemberOf(["admin","admin.workflow"]))){
-#      push(@l,"reactivate");
-#   }
-#
-#   if ($WfRec->{fwdtarget} eq 'base::grp'){
-#      if ($app->IsMemberOf($WfRec->{fwdtargetid},undef,"both")){
-#         push(@l,"addnote");
-#      }
-#   }
-#   elsif ($WfRec->{fwdtarget} eq 'base::user' && 
-#       $userid==$WfRec->{fwdtargetid}){
-#         push(@l,"addnote");
-#   }
-#   elsif ($WfRec->{fwddebtarget} eq 'base::grp'){
-#      if ($app->IsMemberOf($WfRec->{fwddebtargetid},undef,"both")){
-#         push(@l,"addnote");
-#      }
-#      else{
-#         if ($app->IsMemberOf(["admin","admin.workflow"])){
-#            push(@l,"addnote");
-#         }
-#      }
-#   }
-#   elsif ($WfRec->{fwddeptarget} eq 'base::user'){
-#      if ($userid==$WfRec->{fwddeptargetid}){
-#         push(@l,"addnote");
-#      }
-#   }
-#   if ($WfRec->{owner}==$userid || $WfRec->{openuser}==$userid){
-#      push(@l,"addnote");
-#      if ($WfRec->{fwdtarget} ne ""){
-#         push(@l,"remsup");
-#      }
-#      else{
-#         push(@l,"addsup");
-#      }
-#      push(@l,"wfclose");
-#   }
-   #msg(INFO,"valid operations=%s",join(",",@l));
+   my $creator=$WfRec->{openuser};
+   my $iscurrent=$self->isCurrentForward($WfRec);
+
+   if ($WfRec->{step} eq "base::workflow::ReplaceTool::approval"){
+      if ($iscurrent){
+         push(@l,"approve");
+         push(@l,"break");
+      }
+      if ($userid==$creator){
+         push(@l,"break");
+      }
+   }
+         push(@l,"nop");
 
    return(@l);
 }
-
-
-sub getDynamicFields
-{
-   my $self=shift;
-   my %param=@_;
-   my $class;
-
-   return($self->InitFields(
-                   new kernel::Field::Select(
-                             name               =>'replaceoptype',
-                             htmleditwidth      =>'350px',
-                             transprefix        =>'SR::',
-                             translation        =>'base::workflow::ReplaceTool',
-                             value              =>['base::user','base::grp'],
-                             translation        =>'base::workflow::ReplaceTool',
-                             label              =>'Replace operation type',
-                             container          =>'additional'),
-   ));
-}
-
-
 #######################################################################
 package base::workflow::ReplaceTool::asktype;
 use vars qw(@ISA);
@@ -657,337 +648,109 @@ sub getWorkHeight
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#######################################################################
-package base::workflow::ReplaceTool::main;
-use vars qw(@ISA);
-use kernel;
-use kernel::WfStep;
-@ISA=qw(kernel::WfStep);
-
-sub generateWorkspace
-{
-   my $self=shift;
-   my $WfRec=shift;
-   my $actions=shift;
-
-   my ($Dremsup,$Dwfclose,$Daddnote,$Daddsup,$Dnote);
-   $Dwfclose="disabled"   if (!$self->ValidActionCheck(0,$actions,"wfclose"));
-   $Daddsup="disabled"    if (!$self->ValidActionCheck(0,$actions,"addsup"));
-   $Dremsup="disabled"    if (!$self->ValidActionCheck(0,$actions,"remsup"));
-   my $t0=$self->T("Effort");
-   my $t1=$self->T("Add Note");
-   my $t2=$self->T("Add Support");
-   my $t3=$self->T("Remove Support");
-   my $t4=$self->T("Close Workflow");
-   if (!$self->ValidActionCheck(0,$actions,"addnote")){
-      $Daddnote="disabled";
-      $Dnote="readonly";
-   }
-   my $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100% height=110>
-<tr><td align=center valign=top>
-<textarea name=note $Dnote style=\"width:100%;height:80\"></textarea>
-<table border=0 width=100% cellspacing=0 cellpadding=0>
-<tr>
-<td width=25% nowrap>&nbsp;$t0:</td>
-<td width=25%><select name=Formated_effort>
-<option value=""></option>
-<option value="10">10 min</option>
-<option value="15">15 min</option>
-<option value="20">20 min</option>
-<option value="25">25 min</option>
-<option value="30">30 min</option>
-<option value="45">45 min</option>
-<option value="60">1,0 h</option>
-<option value="90">1,5 h</option>
-<option value="120">2,0 h</option>
-<option value="180">3,0 h</option>
-<option value="240">4,0 h</option>
-<option value="300">5,0 h</option>
-<option value="360">6,0 h</option>
-<option value="420">7,0 h</option>
-<option value="480">8,0 h</option>
-</select></td>
-<td>
-<input type=submit name=addnote $Daddnote value="$t1" 
-       class=workflowbutton>
-</td>
-<td width=25%>&nbsp;</td>
-<td width=25%>&nbsp;</td>
-</tr>
-</table>
-</td>
-<td width=1% valign=top>
-<input type=submit $Daddsup 
-       class=workflowbutton name=addsup value="$t2">
-<input type=submit $Dremsup 
-       class=workflowbutton name=remsup value="$t3">
-<input type=submit $Dwfclose
-       class=workflowbutton name=wfclose value="$t4">
-<input type=submit disabled 
-       class=workflowbutton name=forwardtox value="Workflow Einstellungen">
-</td>
-</tr>
-</table>
-EOF
-   return($templ);
-}
-
-sub Validate
-{
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-   my $origrec=shift;
-
-   foreach my $v (qw(name)){
-      if ((!defined($oldrec) || exists($newrec->{$v})) && $newrec->{$v} eq ""){
-         $self->LastMsg(ERROR,"field '%s' is empty",
-                        $self->getField($v)->Label());
-         return(0);
-      }
-   }
-   $newrec->{stateid}=4 if (!defined($newrec->{stateid}));
-
-   return(1);
-}
-
-sub Process
+sub ProcessNext                
 {
    my $self=shift;
    my $action=shift;
    my $WfRec=shift;
    my $actions=shift;
 
-   if (!defined($action) && Query->Param("addnote")){
-      my $note=Query->Param("note");
-      if ($note=~m/^\s*$/){
-         $self->LastMsg(ERROR,"nix drin");
-         return(0);
+   my $forcechk=Query->Param("FORCE");
+   if ($forcechk eq ""){
+      $self->LastMsg(ERROR,"verfication question noch checked");
+      return(0);
+   }
+   print STDERR Dumper(scalar(Query->MultiVars()));
+   my $h=$self->getWriteRequestHash("web");
+   my $q=Query->MultiVars();
+   my @replaceat;
+   foreach my $k (keys(%$q)){
+      if (($k=~m/^SR:/) && $q->{$k} ne ""){
+         push(@replaceat,$k);
       }
-      $note=trim($note);
-      my $effort=Query->Param("Formated_effort");
-      if ($self->getParent->getParent->Action->StoreRecord(
-          $WfRec->{id},"note",
-          {translation=>'base::workflow::ReplaceTool'},$note,$effort)){
-         $self->StoreRecord($WfRec,{stateid=>4});
-         Query->Delete("WorkflowStep");
-         return(1);
+   }
+   
+  
+   my $newrec={step =>'base::workflow::ReplaceTool::approval',
+               name =>'Reference replace: ',
+               eventstart=>NowStamp("en"),
+               eventend=>undef,
+               replaceat=>join("\n",sort(@replaceat)),
+               detaildescription=>'Ja',
+               stateid=>4};
+   if ($h->{replaceoptype} eq "base::user"){
+      $newrec->{replacesearch}=$q->{Formated_wfreplaceusersrc};
+      $newrec->{replacereplacewith}=$q->{Formated_wfreplaceuserdst};
+      my $user=getModuleObject($self->Config,"base::user");
+      $user->ResetFilter();
+      $user->SetFilter({fullname=>[$newrec->{replacesearch}]});
+      my ($rec,$msg)=$user->getOnlyFirst(qw(userid));
+      if (defined($rec)){
+         $newrec->{replacesearchid}=$rec->{userid};
       }
-      return(0);
-   }
-   if (!defined($action) && Query->Param("addsup")){
-      return(undef) if (!$self->ValidActionCheck(1,$actions,"addsup"));
-      my @WorkflowStep=Query->Param("WorkflowStep");
-      push(@WorkflowStep,"base::workflow::ReplaceTool::addsup");
-      Query->Param("WorkflowStep"=>\@WorkflowStep);
-      return(0);
-   }
-   if (!defined($action) && Query->Param("remsup")){
-      return(0) if (!$self->ValidActionCheck(1,$actions,"remsup"));
-      my $maindisp=$self->getParent->getStepByShortname("main",$WfRec);
-      if ($self->StoreRecord($WfRec,{step=>$maindisp,
-                                     fwdtarget=>undef,
-                                     fwdtargetid=>undef,
-                                     stateid=>4})){
-         if ($self->getParent->getParent->Action->StoreRecord(
-             $WfRec->{id},"remsup", 
-             {translation=>'base::workflow::ReplaceTool'},undef)){
-            Query->Delete("WorkflowStep");
-            return(1);
-         }
-         return(0);
+      $user->ResetFilter();
+      $user->SetFilter({fullname=>[$newrec->{replacereplacewith}]});
+      my ($rec,$msg)=$user->getOnlyFirst(qw(userid));
+      if (defined($rec)){
+         $newrec->{replacereplacewithid}=$rec->{userid};
       }
-      return(0);
    }
-   if (!defined($action) && Query->Param("wfclose")){
-      return(undef) if (!$self->ValidActionCheck(1,$actions,"wfclose"));
-      my @WorkflowStep=Query->Param("WorkflowStep");
-      push(@WorkflowStep,$self->getParent->getStepByShortname('prewfclose',
-                                                              $WfRec));
-      Query->Param("WorkflowStep"=>\@WorkflowStep);
-      return(0);
+   if ($h->{replaceoptype} eq "base::grp"){
+      $newrec->{replacesearch}=$q->{Formated_wfreplacegrpsrc};
+      $newrec->{replacereplacewith}=$q->{Formated_wfreplacegrpdst};
+      my $grp=getModuleObject($self->Config,"base::grp");
+      $grp->ResetFilter();
+      $grp->SetFilter({fullname=>[$newrec->{replacesearch}]});
+      my ($rec,$msg)=$grp->getOnlyFirst(qw(grpid));
+      if (defined($rec)){
+         $newrec->{replacesearchid}=$rec->{grpid};
+      }
+      $grp->ResetFilter();
+      $grp->SetFilter({fullname=>[$newrec->{replacereplacewith}]});
+      my ($rec,$msg)=$grp->getOnlyFirst(qw(grpid));
+      if (defined($rec)){
+         $newrec->{replacereplacewithid}=$rec->{grpid};
+      }
    }
-   return($self->SUPER::Process($action,$WfRec));
-}
+   $newrec->{name}.=$newrec->{replacesearch};
+   $newrec->{replaceoptype}=$h->{replaceoptype};
+   $newrec->{detaildescription}=$h->{detaildescription};
+               
 
-
-sub getWorkHeight
-{
-   my $self=shift;
-   my $WfRec=shift;
-
-   return(140);
-}
-
-sub getPosibleButtons
-{
-   my $self=shift;
-   my $WfRec=shift;
-   my $actions=shift;
-   my %p=$self->SUPER::getPosibleButtons($WfRec);
-   delete($p{PrevStep});
-   delete($p{NextStep});
-   return()   if (!$self->ValidActionCheck(0,$actions,"BreakWorkflow"));
-   return(%p);
-}
-
-#######################################################################
-package base::workflow::ReplaceTool::addsup;
-use vars qw(@ISA);
-use kernel;
-use kernel::WfStep;
-use Data::Dumper;
-@ISA=qw(kernel::WfStep);
-
-sub generateWorkspace
-{
-   my $self=shift;
-   my $WfRec=shift;
-   my $note=Query->Param("note");
-   my $l1=$self->T("Support (Name or Group)");
-   my $l2=$self->T("Mail notification (without text there will be no notification generated)");
-   my $templ=<<EOF;
-<table border=1 cellspacing=0 cellpadding=0 width=100% height=50>
-<tr height=1%>
-<td class=fname width=20%>$l1:</td>
-<td class=finput>%fwdtargetname(detail)%</td>
-</tr>
-<!--
-<tr height=1%>
-<td class=fname colspan=2>$l2:</td>
-</tr>
-<tr><td align=center colspan=2>
-<textarea class=multilinetext name=note style="height:100%">$note</textarea>
-</td></tr>
--->
-</table>
-<script language="JavaScript">
-setFocus("Formated_fwdtargetname");
-setEnterSubmit(document.forms[0],"NextStep");
-</script>
-
-EOF
-   return($templ);
-}
-
-sub Validate
-{
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-   my $origrec=shift;
-
-   $self->LastMsg(ERROR,"%s is no storeable step",$self->Self());
-   return(0);
-}
-
-sub Process
-{
-   my $self=shift;
-   my $action=shift;
-   my $WfRec=shift;
-   my $actions=shift;
-   my $note=Query->Param("note");
-
-   if ($action eq "NextStep"){
-      return(undef) if (!$self->ValidActionCheck(1,$actions,"addsup"));
-      my $fobj=$self->getParent->getField("fwdtargetname");
-      my $h=$self->getWriteRequestHash("web");
-      my $maindisp=$self->getParent->getStepByShortname("main",$WfRec);
-      if (my $newrec=$fobj->Validate($WfRec,$h)){
-         if (!defined($newrec->{fwdtarget}) ||
-             !defined($newrec->{fwdtargetid} ||
-             $newrec->{fwdtargetid}==0)){
+   my $fobj=$self->getParent->getField("fwdtargetname");
+   if (my $admrec=$fobj->Validate(undef,{fwdtargetname=>'admin'})){
+      if (!defined($admrec->{fwdtarget}) ||
+          !defined($admrec->{fwdtargetid} ||
+          $admrec->{fwdtargetid}==0)){
+         if ($self->LastMsg()==0){
             $self->LastMsg(ERROR,"invalid forwarding target");
-            return(0);
          }
-         $newrec->{stateid}=2;
-         $newrec->{step}=$maindisp;
-         if ($self->StoreRecord($WfRec,$newrec)){
-            my $additional={};
-            $additional->{ForwardToName}=Query->Param("Formated_fwdtargetname");
-            $additional->{ForwardTarget}=$newrec->{fwdtarget};
-            $additional->{ForwardTargetId}=$newrec->{fwdtargetid};
-            if ($self->getParent->getParent->Action->StoreRecord(
-                $WfRec->{id},"addsup",
-                {translation=>'base::workflow::ReplaceTool',
-                 additional=>$additional},$note)){
-               Query->Delete("WorkflowStep");
-               return(1);
-            }
-            return(0);
-         }
+         return(0);
       }
-      return(0);
+      $newrec->{fwdtarget}=$admrec->{fwdtarget};
+      $newrec->{fwdtargetid}=$admrec->{fwdtargetid};
    }
-   return($self->SUPER::Process($action,$WfRec));
+               
+   if (my $id=$self->StoreRecord($WfRec,$newrec)){
+      return(1);
+   }
+
+   return(0);
 }
 
 
-sub getWorkHeight
-{
-   my $self=shift;
-   my $WfRec=shift;
 
-   return(100);
-}
 
-sub getPosibleButtons
-{
-   my $self=shift;
-   my $WfRec=shift;
-   my %p=$self->SUPER::getPosibleButtons($WfRec);
-   delete($p{BreakWorkflow});
-   return(%p);
-}
+
+
 
 #######################################################################
-package base::workflow::ReplaceTool::prewfclose;
+package base::workflow::ReplaceTool::approval;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfStep;
 @ISA=qw(kernel::WfStep);
 
-
-sub generateWorkspace
-{
-   my $self=shift;
-   my $WfRec=shift;
-   my $note=Query->Param("note");
-   my $l1=$self->T("closing comments");
-   my $templ=<<EOF;
-<table border=1 cellspacing=0 cellpadding=0 width=100% height=180>
-<tr height=1%>
-<td class=fname>$l1:</td>
-</tr>
-<tr><td align=center colspan=2>
-<textarea class=multilinetext name=note style="height:100%">$note</textarea>
-</td></tr>
-</table>
-EOF
-   return($templ);
-}
 
 sub Validate
 {
@@ -996,41 +759,8 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
-   return(0);
-}
-sub Process
-{
-   my $self=shift;
-   my $action=shift;
-   my $WfRec=shift;
-   my $actions=shift;
-   my $note=Query->Param("note");
 
-   if ($action eq "NextStep"){
-      return(undef) if (!$self->ValidActionCheck(1,$actions,"wfclose"));
-      my %fwd;
-      %fwd=(fwdtarget=>"base::user",fwdtargetid=>$WfRec->{openuser});
-      my $note=Query->Param("note");
-      if (!($note=~m/^\s*$/) && $WfRec->{detaildescription}=~m/^\s*$/){
-         $fwd{detaildescription}=$note;
-      }
-      my $newstep=$self->getParent->getStepByShortname('wfclose',$WfRec);
-      msg(INFO,"newstep=$newstep");
-      if ($self->getParent->StoreRecord($WfRec,$newstep,{
-                                %fwd,
-                                step=>$newstep,
-                                eventend=>NowStamp("en"),
-                                stateid=>17})){
-         if ($self->getParent->getParent->Action->StoreRecord(
-             $WfRec->{id},"wfclose",
-             {translation=>'base::workflow::ReplaceTool'},$note)){
-            Query->Delete("WorkflowStep");
-            return(1);
-         }
-         return(0);
-      }
-   }
-   return($self->SUPER::Process($action,$WfRec));
+   return(1);
 }
 
 
@@ -1039,182 +769,45 @@ sub getWorkHeight
    my $self=shift;
    my $WfRec=shift;
 
-   return(220);
+   return(150);
 }
 
 sub getPosibleButtons
 {
    my $self=shift;
    my $WfRec=shift;
+   my $actions=shift;
+
    my %p=$self->SUPER::getPosibleButtons($WfRec);
-   delete($p{BreakWorkflow});
+   delete($p{NextStep});
+   delete($p{BreakWorkflow})      if (!grep(/^break$/,@$actions));
+   $p{SaveStep}=$self->T('SaveStep')  if (grep(/^approve$/,@$actions));
    return(%p);
 }
 
-
-#######################################################################
-package base::workflow::ReplaceTool::wfclose;
-use vars qw(@ISA);
-use kernel;
-use kernel::WfStep;
-@ISA=qw(kernel::WfStep);
-
-sub generateWorkspace
+sub generateWorkspacePages
 {
    my $self=shift;
    my $WfRec=shift;
    my $actions=shift;
+   my $divset=shift;
+   my $selopt=shift;
+   my $tr="base::workflow::actions";
+   my $class="display:none;visibility:hidden";
 
-   my ($Dwffinish,$Daddsup);
-   $Dwffinish="disabled"  if (!$self->ValidActionCheck(0,$actions,"wffinish"));
-   $Daddsup="disabled"    if (!$self->ValidActionCheck(0,$actions,"addsup"));
-   my $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100% height=50>
-<tr><td width=50% align=center>
-<input type=submit $Daddsup 
-       class=workflowbutton name=addsup value="Unterstützung hinzuziehen">
-</td>
-<td width=50% align=center>
-<input type=submit $Dwffinish
-       class=workflowbutton name=wffinish value="beenden">
-</td></tr> 
-</table>
-EOF
-   return($templ);
-}
-
-sub getPosibleButtons
-{
-   return();
-}
-
-sub getWorkHeight
-{
-   return(80);
-}
-
-sub Process
-{
-   my $self=shift;
-   my $action=shift;
-   my $WfRec=shift;
-   my $actions=shift;
-
-   if (!defined($action) && Query->Param("addsup")){
-      return(undef) if (!$self->ValidActionCheck(1,$actions,"addsup"));
-      my @WorkflowStep=Query->Param("WorkflowStep");
-      push(@WorkflowStep,"base::workflow::ReplaceTool::addsup");
-      Query->Param("WorkflowStep"=>\@WorkflowStep);
-      return(0);
-   }
-   if (!defined($action) && Query->Param("wffinish")){
-      return(undef) if (!$self->ValidActionCheck(1,$actions,"wffinish"));
-      if ($self->StoreRecord($WfRec,{
-                                step=>'base::workflow::ReplaceTool::wffinish',
-                                fwdtarget=>undef,
-                                fwdtargetid=>undef,
-                                closedate=>NowStamp("en"),
-                                stateid=>21})){
-         if ($self->getParent->getParent->Action->StoreRecord(
-             $WfRec->{id},"wffinish", 
-             {translation=>'base::workflow::ReplaceTool'},undef)){
-            Query->Delete("WorkflowStep");
-            return(1);
-         }
-         return(0);
-      }
-      return(0);
-   }
-   return(0);
-}
-
-sub Validate
-{
-   my $self=shift;
-   return(1);
+#   if (grep(/^nop$/,@$actions)){
+#      $$selopt.="<option value=\"nop\" class=\"$class\">".
+#                $self->getParent->T("nop",$tr).
+#                "</option>\n";
+#      $$divset.="<div id=OPnop style=\"margin:15px\"><br>".
+#                $self->getParent->T("The current workflow isn't forwared ".
+#                "to you. At now there is no action nessasary.",$tr)."</div>";
+#   }
+   return($self->SUPER::generateWorkspacePages($WfRec,$actions,$divset,$selopt));
 }
 
 
 
 
-#######################################################################
-package base::workflow::ReplaceTool::wffinish;
-use vars qw(@ISA);
-use kernel;
-use kernel::WfStep;
-@ISA=qw(kernel::WfStep);
-
-sub generateWorkspace
-{
-   my $self=shift;
-   my $WfRec=shift;
-   my $actions=shift;
-
-
-   my ($Dwfreact);
-   $Dwfreact="disabled"  if (!$self->ValidActionCheck(0,$actions,"reactivate"));
-   my $label=$self->T("reactivate");
-
-   my $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100% height=50>
-<tr><td align=center>
-<input type=submit $Dwfreact 
-       class=workflowbutton name=reactivate value="$label">
-</td></tr> 
-</table>
-EOF
-   return($templ);
-}
-
-sub getPosibleButtons
-{
-   return();
-}
-
-sub getWorkHeight
-{
-   my $self=shift;
-   my $WfRec=shift;
-   my $actions=shift;
-   return(0) if ($#{$actions}==-1);
-   return(80);
-}
-
-
-sub Process
-{
-   my $self=shift;
-   my $action=shift;
-   my $WfRec=shift;
-   my $actions=shift;
-
-   if (!defined($action) && Query->Param("reactivate")){
-      return(undef) if (!$self->ValidActionCheck(1,$actions,"reactivate"));
-      if ($self->StoreRecord($WfRec,{
-                                step=>'base::workflow::ReplaceTool::main',
-                                fwdtarget=>undef,
-                                fwdtargetid=>undef,
-                                closedate=>undef,
-                                eventend=>undef,
-                                stateid=>4})){
-         if ($self->getParent->getParent->Action->StoreRecord(
-             $WfRec->{id},"reactivate", 
-             {translation=>'base::workflow::ReplaceTool'},undef)){
-            Query->Delete("WorkflowStep");
-            return(1);
-         }
-         return(0);
-      }
-      return(0);
-   }
-   return(0);
-}
-
-
-sub Validate
-{
-   my $self=shift;
-   return(1);
-}
 
 1;
