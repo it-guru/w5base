@@ -85,7 +85,7 @@ sub getHttpHeader
 {  
    my $self=shift;
    my $d="";
-   $d.="Content-type:".$self->MimeType()."\n\n";
+   $d.="Content-type:".$self->MimeType().";charset=iso-8859-1\n\n";
    return($d);
 }
 
@@ -110,8 +110,12 @@ sub ProcessHead
          $l{$self->{recordlist}->[$recno]->[$fieldno]}++;
       }
    }
-   my @l=sort(keys(%l));
-   if (grep(!/\s/,@l)){
+   my @l=grep(!/^\s*$/,sort(keys(%l)));
+   
+   if (grep(!/^\S+\@\S+$/,@l)){
+      $d.=join("; ",@l);
+   }
+   elsif (grep(!/\s/,@l)){
       $d.=join(" ",@l);
    }
    elsif (grep(!/,/,@l)){

@@ -62,7 +62,7 @@ sub getHttpHeader
    my $self=shift;
    my $app=$self->getParent->getParent();
    my $d="";
-   $d.="Content-type:".$self->MimeType()."\n\n";
+   $d.="Content-type:".$self->MimeType().";charset=iso-8859-1\n\n";
    return($d);
 }
 
@@ -110,11 +110,11 @@ sub ProcessBottom
    my ($self,$fh,$rec,$msg)=@_;
    my @view=@{$self->{fieldobjects}};
    my $d="";
-   my $colmax=30;
+   my $colmax=35;
    $self->{langmax}->{de}=$colmax if ($self->{langmax}->{de}>$colmax);
    $self->{langmax}->{en}=$colmax if ($self->{langmax}->{en}>$colmax);
    $self->{namemax}=8 if ($self->{namemax}<8);
-   my $f=sprintf("| %%-%ds | %%-%ds | %%-%ds |\n",
+   my $f=sprintf("| %%-%ds | %%-%ds | %%-%ds |\r\n",
              $self->{namemax},$self->{langmax}->{de},$self->{langmax}->{en});
    $d.=sprintf($f,"internal","de","en");
    my $l=sprintf($f,"","","");
