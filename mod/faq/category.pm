@@ -230,6 +230,74 @@ sub HandleInfoAboSubscribe
    }
 }
 
+sub HandleShowSubscribers
+{
+   my $self=shift;
+   my $id=Query->Param("CurrentIdToEdit");
+   my $ia=$self->getPersistentModuleObject("base::infoabo");
+   if ($id ne ""){
+      print $self->HttpHeader("text/html");
+      print $self->HtmlHeader(style=>['default.css'],
+                              title=>$self->T("ShowSubscribers"));
+      $ia->SetFilter({refid=>\$id,
+                      mode=>\'faqchanged',
+                      active=>\'1',
+                      parentobj=>\'faq::category'});
+      my @l=$ia->getHashList(qw(user));
+      my $d="<div style=\"padding:5px;\">".
+            "<div style=\"margin-bottom:2px\">".
+            "<b><u>".$self->T("current active subscribers").":</u></b></div>";
+      foreach my $rec (sort({$a->{user} cmp $b->{user}} @l)){
+         $d.=$rec->{user}."<br>";
+      }
+      $d.="</div>";
+      print $d;
+
+   }
+   else{
+      print($self->noAccess());
+   }
+}
+
+sub getDetailFunctionsCode
+{
+   my $self=shift;
+   my $rec=shift;
+   my $d=$self->SUPER::getDetailFunctionsCode($rec);
+   $d.=<<EOF;
+function ShowSubscribers()
+{
+   showPopWin('HandleShowSubscribers?CurrentIdToEdit=$rec->{faqcatid}',450,250,
+              null);
+}
+
+
+
+EOF
+
+   return($d);
+}
+
+sub getDetailFunctions
+{
+   my $self=shift;
+   my $rec=shift;
+   my @f=$self->SUPER::getDetailFunctions($rec);
+   unshift(@f,$self->T("ShowSubscribers")=>"ShowSubscribers");
+
+   return(@f);
+}
+
+sub getValidWebFunctions
+{
+   my ($self)=@_;
+   return(qw(HandleShowSubscribers),$self->SUPER::getValidWebFunctions());
+}  
+
+
+
+
+
 
 
 
