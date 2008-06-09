@@ -1,0 +1,118 @@
+#!/usr/bin/env perl
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/../mod";
+use RPC::Smart::Client;
+use strict;
+use kernel;
+use kernel::config;
+use kernel::EventController;
+use Getopt::Long;
+use kernel::cgi;
+use Digest::SHA1;
+use Data::HexDump;
+
+use vars qw($opt_v $opt_h $opt_c $configname);
+exit(1) if (!GetOptions('verbose'=>\$opt_v,
+                        'debug'=>\$opt_v,
+                        'help'=>\$opt_h,
+                        'config=s'=>\$opt_c));
+
+if ($opt_v){
+   $W5V2::Debug=1;
+}
+else{
+   $W5V2::Debug=0;
+}
+
+if ($ENV{REMOTE_USER} eq ""){
+   if ($ENV{USER} ne ""){
+      $ENV{REMOTE_USER}="system/$ENV{USER}";
+   }
+   else{
+      $ENV{REMOTE_USER}="system/unknown";
+   }
+   $ENV{REAL_REMOTE_USER}="system/W5PassChk";
+}
+
+###########################################################
+# init like W5Event
+###########################################################
+
+
+
+if ($opt_c eq ""){
+   $opt_c="w5server";
+}
+$configname=$opt_c;
+
+my %ClientParam=();
+
+my $curconfig=new kernel::config();
+
+if (!$curconfig->readconfig("$FindBin::Bin/..",$configname)){
+   msg(ERROR,"can't read configfile '%s'",$configname);
+   exit(1);
+}
+{
+   my $port=$curconfig->Param("W5SERVERPORT");
+   $port=4711 if ($port eq "");
+   msg(DEBUG,"W5ServerPort=%s",$port);
+   $ClientParam{'PeerPort'}=$port;
+}
+
+my $MyClient=new RPC::Smart::Client(%ClientParam);
+my $self=new kernel::App(Config=>$curconfig);
+if (!defined($W5V2::Translation{$self})){
+   $W5V2::Translation{$self}={self=>$self,tab=>{}};
+}
+$W5V2::Translation=$W5V2::Translation{$self};
+
+
+if (! defined($MyClient->Connect())){
+   msg(ERROR,"can't connect to server");
+   exit(1);
+}
+if (!defined($W5V2::W5Server)){
+   my %ClientParam;
+   $ClientParam{'PeerAddr'}=$self->Config->Param("W5SERVERHOST");
+   $ClientParam{'PeerPort'}=$self->Config->Param("W5SERVERPORT");
+   $W5V2::W5Server=new RPC::Smart::Client(%ClientParam);
+   $W5V2::W5Server->Connect();
+}
+$W5V2::Query=new kernel::cgi({});
+
+
+###########################################################
+# end of init like W5Event
+###########################################################
+
+# read stdin
+my $pwd=<STDIN>;
+$pwd=~s/\s*$//g;
+
+# stdin in sha1 hash
+my $ctx = Digest::SHA1->new;
+$ctx->reset;
+$ctx->add($pwd);
+my $stage1 = $ctx->digest;
+
+$ctx->reset;
+$ctx->add($stage1);
+my $stage2 = $ctx->hexdigest;
+
+msg(INFO,"pwd hash = %s",uc($stage2));
+
+
+my $o=getModuleObject($curconfig,"base::useraccount");
+   $o->SetFilter({'account'=>'service/smsid'});
+my ($rec,$msg)=$o->getHashList(qw(account password));
+   if ($rec->{'password'}=~m/^\*/){
+      msg(INFO,"mysql 5");
+   }else{
+      msg(INFO,"mysql 4 not supported");
+      exit(1);
+   }
+msg(INFO,"password=%s",$rec->{'password'});
+
+
