@@ -195,6 +195,10 @@ sub Validate
       $self->LastMsg(ERROR,"invalid action '%s' specified",$name);
       return(0);
    }
+   my $translation=trim(effVal($oldrec,$newrec,"translation"));
+   if ($translation eq ""){
+      $newrec->{translation}=$self->Self;
+   }
    my $owner=trim(effVal($oldrec,$newrec,"owner"));
    if ($owner!=0){
       $newrec->{owner}=$owner;

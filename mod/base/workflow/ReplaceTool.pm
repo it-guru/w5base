@@ -140,8 +140,53 @@ sub getDynamicFields
                              readonly           =>1,
                              translation        =>'base::workflow::ReplaceTool',
                              label              =>'replace at fields',
+                             viewarea           =>\&viewReplaceFields,
                              container          =>'headref'),
    ));
+}
+
+sub viewReplaceFields
+{
+   my $self=shift;
+   my $current=shift;
+   my $mode=shift;
+   my $d=shift;
+   my @sets=split(/\s+/,$d);
+   my $app=$self->getParent;
+   $d="";
+   foreach my $s (@sets){
+      if (my ($mod,$tag)=$s=~m/^SR:(.*)::([^:]+)$/){
+         if (defined($app->{ReplaceTool}->{$mod})){
+            my $crec=$app->{ReplaceTool}->{$mod}->getControlRecord();
+            my %crec=@{$crec};
+            my $data=$crec{$tag};
+            my $dataobj=getModuleObject($app->Config,
+                                        $data->{dataobj});
+            if (defined($dataobj)){
+               my $label;
+               if ($data->{label} ne ""){
+                  $label=$app->T($data->{label},$data->{dataobj});
+               }
+               if (!defined($label) && defined($dataobj)){
+                  my $fldobj=$dataobj->getField($data->{target});
+                  if (defined($fldobj)){
+                     $label=$fldobj->Label();
+                  }
+               }
+               my $name=$app->T($data->{dataobj},$data->{dataobj});
+               $d.=" - $name: $label\n";
+            }
+         }
+      }
+   }
+   $d="<table style=\"width:100%;table-layout:fixed;padding:0;margin:0\">".
+      "<tr><td><img class=printspacer style=\"float:left\" ".
+      "src=\"../../../public/base/load/empty.gif\" width=1 height=100>".
+      "<div class=multilinetext>".
+      "<pre class=multilinetext>".$d.
+      "</pre></div></td></tr></table>";
+
+   return($d);
 }
 
 
@@ -677,7 +722,7 @@ sub ProcessNext
                eventend=>undef,
                replaceat=>join("\n",sort(@replaceat)),
                detaildescription=>'Ja',
-               stateid=>4};
+               stateid=>2};
    if ($h->{replaceoptype} eq "base::user"){
       $newrec->{replacesearch}=$q->{Formated_wfreplaceusersrc};
       $newrec->{replacereplacewith}=$q->{Formated_wfreplaceuserdst};
@@ -732,6 +777,13 @@ sub ProcessNext
    }
                
    if (my $id=$self->StoreRecord($WfRec,$newrec)){
+      if ($self->getParent->getParent->Action->StoreRecord(
+                $id,"forwardto",
+                {additional=>{ForwardTarget=>$newrec->{fwdtarget},
+                              ForwardTargetId=>$newrec->{fwdtargetid},
+                              ForwardToName=>'admin'}})){
+         return(1);
+      }
       return(1);
    }
 

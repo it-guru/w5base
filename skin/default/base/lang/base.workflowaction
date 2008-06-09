@@ -28,3 +28,5 @@
 'Additional'=>{de=>'Zusatzinformationen'},
 'Action Ref'=>{de=>'Prozessinfos'},
 'wfautofinish'=>{de=>'automatisch beendet',en=>'auto finished'},
+'forwardto'=>{de=>'Weitergeleitet'},
+

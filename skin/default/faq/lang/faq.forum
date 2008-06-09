@@ -9,3 +9,5 @@
 'last answer'=>{de=>'letzter Beitrag von'},
 'last posting by'=>{de=>'letzter Beitrag von'},
 'autor'=>{de=>'Author'},
+'subscribers'=>{de=>'Abonentenliste'},
+'current active subscribers'=>{de=>'aktuell eingetragene Abonenten'},

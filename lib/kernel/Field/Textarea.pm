@@ -28,6 +28,8 @@ sub new
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
    $self->{_permitted}->{htmlheight}=1;
+   $self->{_permitted}->{viewarea}=1;
+   $self->{_permitted}->{editarea}=1;
    $self->{htmlheight}="300" if (!defined($self->{htmlheight}));
    $self->{valign}="top"     if (!defined($self->{valign}));
    return($self);
@@ -44,43 +46,73 @@ sub FormatedDetail
    my $readonly=$self->readonly($current);
    if ($mode eq "HtmlDetail" || 
        (($mode eq "edit" || $mode eq "workflow") && $readonly)){
-      #$d="<div class=multilinetext><pre class=multilinetext>$d</pre></div>";
-      if (!$self->{AllowHtmlInput}){
-         $d=~s/&/&amp;/g;
-         $d=~s/</&lt;/g;
-         $d=~s/>/&gt;/g;
-      }
-      $d="<table style=\"width:100%;table-layout:fixed;padding:0;margin:0\">".
-         "<tr><td><img class=printspacer style=\"float:left\" ".
-         "src=\"../../../public/base/load/empty.gif\" width=1 height=100>".
-         "<div class=multilinetext>".
-         "<pre class=multilinetext>".FancyLinks($d).
-         "</pre></div></td></tr></table>";
+      $d=$self->callViewArea($current,$mode,$d);
    }
    if (($mode eq "edit" || $mode eq "workflow") && !$readonly){
       my $fromquery=Query->Param("Formated_$name");
       if (defined($fromquery)){
          $d=$fromquery;
       }
-      $d="<div class=multilinetext>".
-         "<textarea onkeydown=\"textareaKeyHandler(this,event);\" ".
-         "cols=80 name=Formated_$name ".
-         "class=multilinetext>".quoteHtml($d)."</textarea></div>";
+      $d=$self->callEditArea($current,$mode,$d);
    }
    return($d);
 }
 
-sub HtmlEditArea    # for module defined edit areas (f.e. javascript areas)
+sub callEditArea
 {
    my $self=shift;
-
+   my $current=shift;
+   my $mode=shift;
+   my $d=shift;
+   $self->{editarea}=\&EditArea if (!defined($self->{editarea}));
+   return(&{$self->{editarea}}($self,$current,$mode,$d));
 }
 
-sub HtmlViewArea    # for module defined view areas (f.e. javascript areas)
+sub EditArea    # for module defined edit areas (f.e. javascript areas)
 {
    my $self=shift;
+   my $current=shift;
+   my $mode=shift;
+   my $d=shift;
+   my $name=$self->Name();
+   $d="<div class=multilinetext>".
+      "<textarea onkeydown=\"textareaKeyHandler(this,event);\" ".
+      "cols=80 name=Formated_$name ".
+      "class=multilinetext>".quoteHtml($d)."</textarea></div>";
+
+   return($d);
+}
+
+sub callViewArea
+{
+   my $self=shift;
+   my $current=shift;
+   my $mode=shift;
+   my $d=shift;
+   $self->{viewarea}=\&ViewArea if (!defined($self->{viewarea}));
+   return(&{$self->{viewarea}}($self,$current,$mode,$d));
+}
+
+sub ViewArea    # for module defined view areas (f.e. javascript areas)
+{
+   my $self=shift;
+   my $current=shift;
+   my $mode=shift;
+   my $d=shift;
 
 
+   if (!$self->{AllowHtmlInput}){
+      $d=~s/&/&amp;/g;
+      $d=~s/</&lt;/g;
+      $d=~s/>/&gt;/g;
+   }
+   $d="<table style=\"width:100%;table-layout:fixed;padding:0;margin:0\">".
+      "<tr><td><img class=printspacer style=\"float:left\" ".
+      "src=\"../../../public/base/load/empty.gif\" width=1 height=100>".
+      "<div class=multilinetext>".
+      "<pre class=multilinetext>".FancyLinks($d).
+      "</pre></div></td></tr></table>";
+   return($d);
 }
 
 sub FormatedResult

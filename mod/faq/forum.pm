@@ -36,7 +36,8 @@ sub new
 sub getValidWebFunctions
 {
    my ($self)=@_;
-   return(qw(Main Topic NativNewTopic NewTopic HandleInfoAboSubscribe));
+   return(qw(Main Topic NativNewTopic NewTopic HandleInfoAboSubscribe
+             HandleShowSubscribers));
 }
 
 sub Main
@@ -461,6 +462,35 @@ sub HandleInfoAboSubscribe
 
 }
 
+sub HandleShowSubscribers
+{
+   my $self=shift;
+   my ($id,$mode)=split(/,/,Query->Param("CurrentIdToEdit"));
+   my $ia=$self->getPersistentModuleObject("base::infoabo");
+   if ($id ne ""){
+      print $self->HttpHeader("text/html");
+      print $self->HtmlHeader(style=>['default.css'],
+                              title=>$self->T("subscribers"));
+      $ia->SetFilter({refid=>\$id,
+                      mode=>\'foaddtopic',
+                      active=>\'1',
+                      parentobj=>\'faq::forumboard'});
+      my @l=$ia->getHashList(qw(user));
+      my $d="<div style=\"padding:5px;\">".
+            "<div style=\"margin-bottom:2px\">".
+            "<b><u>".$self->T("current active subscribers").":</u></b></div>";
+      foreach my $rec (sort({$a->{user} cmp $b->{user}} @l)){
+         $d.=$rec->{user}."<br>";
+      }
+      $d.="</div>";
+      print $d;
+
+   }
+   else{
+      print($self->noAccess());
+   }
+}
+
 sub getShowBoardDetailFunctions
 {
    my $self=shift;
@@ -468,6 +498,18 @@ sub getShowBoardDetailFunctions
    my $mode=shift;
    my $id=shift;
    my $d="";
+   my $label=$self->T("subscribers");
+   $d.=<<EOF;
+<a href=\"javascript:DetailHandleShowSubscribers()\" class=detailfunctions>$label</a> &bull; 
+<script language="JavaScript">
+function DetailHandleShowSubscribers()
+{
+   showPopWin('${rootpath}HandleShowSubscribers?CurrentIdToEdit=$id,$mode',450,250,
+              null);
+}
+</script>
+EOF
+
    $d.=<<EOF;
 <a href=\"javascript:DetailHandleInfoAboSubscribe()\" class=detailfunctions>InfoAbo</a>
 <script language="JavaScript">
@@ -483,8 +525,6 @@ function FinishHandleInfoAboSubscribe(returnVal,isbreak)
    }
 }
 </script>
-
-
 EOF
 
 
