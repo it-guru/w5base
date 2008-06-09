@@ -117,17 +117,15 @@ sub processRecord
       $self->getParent->storeStatVar("Group",$name,{maxlevel=>0},
                                      "User.Direct",$userscount);
    }
-   if ($module eq "base::workflow::notfinished"){
+   elsif ($module eq "base::workflow::notfinished"){
       if ($rec->{class} eq "base::workflow::DataIssue"){
-         if (ref($rec->{responsibilityby}) eq "ARRAY"){
-            foreach my $resp (@{$rec->{responsibilityby}}){
-               if (my ($statgroup,$name)=$resp=~m/^(\S+)\s*:\s*(.+)$/){
-                  $self->getParent->storeStatVar($statgroup,$name,{},
-                                                 "base.DataIssue.open",1);
-               }
+         if (ref($rec->{responsiblegrp}) eq "ARRAY"){
+            foreach my $resp (@{$rec->{responsiblegrp}}){
+               $self->getParent->storeStatVar("Group",$resp,{},
+                                              "base.DataIssue.open",1);
             }
          }
-         msg(DEBUG,"response %s\n",Dumper($rec->{responsibilityby}));
+         msg(DEBUG,"response %s\n",Dumper($rec->{responsiblegrp}));
       }
    }
 }
