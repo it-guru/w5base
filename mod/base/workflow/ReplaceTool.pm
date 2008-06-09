@@ -276,6 +276,7 @@ sub IsModuleSelectable
    my $self=shift;
    my $acl;
 
+   return(1);
    return(1) if ($self->getParent->IsMemberOf("admin"));
    return(0);
 }
@@ -298,8 +299,9 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
    return(1) if (!defined($rec));
-   return("default") if ($rec->{state}<=20 &&
-                         $self->getParent->IsMemberOf("admin"));
+   my @l=$self->getPosibleActions($rec);
+
+   return("default") if (grep(/^wfapproveop$/,@l));
    return(undef);
 }
 
@@ -362,14 +364,19 @@ sub getPosibleActions
 
    if ($WfRec->{step} eq "base::workflow::ReplaceTool::approval"){
       if ($iscurrent){
-         push(@l,"approve");
+         push(@l,"wfaddnote");
+         push(@l,"wfapproveop");
+         push(@l,"wfrejectop");
+         push(@l,"iscurrent");
+      }
+      elsif ($userid==$creator){
+         push(@l,"nop");
          push(@l,"break");
       }
-      if ($userid==$creator){
-         push(@l,"break");
+      else{
+         push(@l,"nop");
       }
    }
-         push(@l,"nop");
 
    return(@l);
 }
@@ -526,7 +533,6 @@ $StoredWorkspace
 </table>
 EOF
    }
-printf STDERR ("fifi templ=$templ\n");
    return($templ);
 }
 
@@ -832,8 +838,8 @@ sub getPosibleButtons
 
    my %p=$self->SUPER::getPosibleButtons($WfRec);
    delete($p{NextStep});
-   delete($p{BreakWorkflow})      if (!grep(/^break$/,@$actions));
-   $p{SaveStep}=$self->T('SaveStep')  if (grep(/^approve$/,@$actions));
+   delete($p{BreakWorkflow})          if (!grep(/^break$/,@$actions));
+   $p{SaveStep}=$self->T('SaveStep')  if (grep(/^wfapproveop$/,@$actions));
    return(%p);
 }
 
@@ -844,22 +850,91 @@ sub generateWorkspacePages
    my $actions=shift;
    my $divset=shift;
    my $selopt=shift;
-   my $tr="base::workflow::actions";
+   my $tr="base::workflow::ReplaceTool";
    my $class="display:none;visibility:hidden";
 
-#   if (grep(/^nop$/,@$actions)){
-#      $$selopt.="<option value=\"nop\" class=\"$class\">".
-#                $self->getParent->T("nop",$tr).
-#                "</option>\n";
-#      $$divset.="<div id=OPnop style=\"margin:15px\"><br>".
-#                $self->getParent->T("The current workflow isn't forwared ".
-#                "to you. At now there is no action nessasary.",$tr)."</div>";
-#   }
+   if (grep(/^wfapproveop$/,@$actions)){
+      $$selopt.="<option value=\"wfapproveop\" class=\"$class\">".
+                $self->getParent->T("wfapproveop",$tr).
+                "</option>\n";
+      $$divset.="<div id=OPwfapproveop style=\"margin:15px\"></div>";
+   }
+   if (grep(/^wfrejectop$/,@$actions)){
+      $$selopt.="<option value=\"wfrejectop\" class=\"$class\">".
+                $self->getParent->T("wfrejectop",$tr).
+                "</option>\n";
+      my $note=Query->Param("note");
+      $$divset.="<div id=OPwfrejectop>".$self->getDefaultNoteDiv($WfRec,
+                                        mode=>'reject').
+                "</div>";
+   }
+
    return($self->SUPER::generateWorkspacePages($WfRec,$actions,$divset,$selopt));
+}
+
+sub Process
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my $userid=$self->getParent->getParent->getCurrentUserId();
+
+   if ($action eq "BreakWorkflow"){
+      if ($self->getParent->getParent->Action->StoreRecord(
+          $WfRec->{id},"wfbreak",
+          {translation=>'base::workflow::ReplaceTool'},"",undef)){
+         my $openuserid=$WfRec->{openuser};
+         my $step=$self->getParent->getStepByShortname("break");
+         $self->StoreRecord($WfRec,{stateid=>22,
+                                    step=>$step,
+                                    eventend=>NowStamp("en"),
+                                    closedate=>NowStamp("en"),
+                                    fwddebtargetid=>undef,
+                                    fwddebtarget=>undef,
+                                    fwdtargetid=>undef,
+                                    fwdtarget=>undef,
+                                   });
+         if ($openuserid!=$userid){
+            $self->PostProcess($action,$WfRec,$actions,
+                               "breaked by $ENV{REMOTE_USER}",
+                               fwdtarget=>'base::user',
+                               fwdtargetid=>$openuserid,
+                               fwdtargetname=>"Requestor");
+         }
+         return(1);
+      }
+      return(0);
+   }
+   elsif($action eq "SaveStep"){
+      my $op=Query->Param("OP");
+      if ($action ne "" && !grep(/^$op$/,@{$actions})){
+         $self->LastMsg(ERROR,"invalid or disallowed action '$action.$op' ".
+                              "requested");
+         return(0);
+      }
+      if ($op eq "wfaddnote"){
+         # check if any further approves are required. If not, do
+         # the operation
+         #$self->getParent->doReplaceOperation($WfRec); 
+
+
+
+ 
+      }
+   }
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 
 
+
+
+#######################################################################
+package base::workflow::ReplaceTool::break;
+use vars qw(@ISA);
+use kernel;
+@ISA=qw(base::workflow::request::finish);
 
 
 1;

@@ -198,6 +198,29 @@ sub Process
                               "requested");
          return(0);
       }
+      if ($op eq "wfaddnote"){
+         my $note=Query->Param("note");
+         if ($note=~m/^\s*$/  || length($note)<10){
+            $self->LastMsg(ERROR,"empty or to short notes are not allowed");
+            return(0);
+         }
+         $note=trim($note);
+         my $oprec={};
+         if (grep(/^iscurrent$/,@{$actions})){ # state "in bearbeitung" darf
+            $oprec->{stateid}=4;               # nur gesetzt werden, wenn
+         }                                     # wf aktuell an mich zugewiesen
+         my $effort=Query->Param("Formated_effort");
+         if ($self->getParent->getParent->Action->StoreRecord(
+             $WfRec->{id},"wfaddnote",
+             {translation=>'base::workflow::request'},$note,$effort)){
+            $self->StoreRecord($WfRec,$oprec);
+            $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
+            $self->PostProcess($action.".".$op,$WfRec,$actions);
+            Query->Delete("note");
+            return(1);
+         }
+         return(0);
+      }
       if ($op eq "wfforward"){    # default forwarding Handler
          my $note=Query->Param("note");
          $note=trim($note);
@@ -442,6 +465,14 @@ sub generateWorkspacePages
       $d.="</table>";
       $$divset.="<div id=OPwfmailsend>$d</div>";
    }
+   if (grep(/^wfaddnote$/,@$actions)){
+      $$selopt.="<option value=\"wfaddnote\" class=\"$class\">".
+                $self->getParent->T("wfaddnote",$tr).
+                "</option>\n";
+      my $note=Query->Param("note");
+      $$divset.="<div id=OPwfaddnote>".$self->getDefaultNoteDiv($WfRec).
+                "</div>";
+   }
    if (grep(/^wfdefer$/,@$actions)){
       $$selopt.="<option value=\"wfdefer\" class=\"$class\">".
                 $self->getParent->T("wfdefer",$tr).
@@ -519,9 +550,16 @@ sub getDefaultNoteDiv
    my $initiatorid=$WfRec->{initiatorid};
    my $creator=$WfRec->{openuser};
 
+   my $wsheight=$self->getWorkHeight($WfRec);
+   $wsheight="200" if ($wsheight=~m/%/);
+   $wsheight=~s/px//g;
+
+   my $noteheight=$wsheight-90;
+
    my $note=Query->Param("note");
    my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
-         "<td colspan=2><textarea name=note style=\"width:100%;height:100px\">".
+         "<td colspan=2><textarea name=note ".
+         "style=\"width:100%;height:${noteheight}px\">".
          $note."</textarea></td></tr>";
    if ($mode eq "addnote"){
       my @t=(''=>'',

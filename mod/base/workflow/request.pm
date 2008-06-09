@@ -619,14 +619,6 @@ sub generateWorkspacePages
       $$divset.="<div id=OPwffineproc>".$self->getDefaultNoteDiv($WfRec).
                 "</div>";
    }
-   if (grep(/^wfaddnote$/,@$actions)){
-      $$selopt.="<option value=\"wfaddnote\" class=\"$class\">".
-                $self->getParent->T("wfaddnote",$tr).
-                "</option>\n";
-      my $note=Query->Param("note");
-      $$divset.="<div id=OPwfaddnote>".$self->getDefaultNoteDiv($WfRec).
-                "</div>";
-   }
    if (grep(/^wfreprocess$/,@$actions)){
       $$selopt.="<option value=\"wfreprocess\" class=\"$class\">".
                 $self->getParent->T("wfreprocess",$tr).
@@ -783,31 +775,6 @@ sub Process
       my $op=Query->Param("OP");
       if ($action ne "" && !grep(/^$op$/,@{$actions})){
          $self->LastMsg(ERROR,"invalid disalloed action requested");
-      }
-     
-     
-      if ($op eq "wfaddnote"){
-         my $note=Query->Param("note");
-         if ($note=~m/^\s*$/  || length($note)<10){
-            $self->LastMsg(ERROR,"empty or to short notes are not allowed");
-            return(0);
-         }
-         $note=trim($note);
-         my $oprec={};
-         if (grep(/^iscurrent$/,@{$actions})){ # state "in bearbeitung" darf
-            $oprec->{stateid}=4;               # nur gesetzt werden, wenn
-         }                                     # wf aktuell an mich zugewiesen
-         my $effort=Query->Param("Formated_effort");
-         if ($self->getParent->getParent->Action->StoreRecord(
-             $WfRec->{id},"wfaddnote",
-             {translation=>'base::workflow::request'},$note,$effort)){
-            $self->StoreRecord($WfRec,$oprec);
-            $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
-            $self->PostProcess($action.".".$op,$WfRec,$actions);
-            Query->Delete("note");
-            return(1);
-         }
-         return(0);
       }
      
       if ($op eq "wfaccept"){

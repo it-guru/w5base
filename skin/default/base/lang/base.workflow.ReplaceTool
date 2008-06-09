@@ -12,3 +12,8 @@
 'search for'=>{de=>'Suchen nach'},
 'replace with'=>{de=>'Ersetzen durch'},
 'replace at fields'=>{de=>'Ersetzen in Feldern'},
+'wfbreak'=>{de=>'Abgebrochen',en=>'breaked'},
+'wfapproveop'=>{de=>'Änderung genehmigen und wenn möglich sofort durchführen',
+              en=>'Approve modification and do it now, if it is posible'},
+'wfrejectop'=>{de=>'Änderung ablehnen',
+              en=>'reject modification'},
