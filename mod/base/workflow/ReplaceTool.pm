@@ -261,6 +261,49 @@ EOF
 
 }
 
+sub doReplaceOperation
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $log;
+
+   my @sets=split(/\s+/,$WfRec->{replaceat});
+   my $app=$self;
+   my $oldOperationContext=$W5V2::OperationContext;
+
+   if ($ENV{SCRIPT_URI} ne ""){
+      my $baseurl=$ENV{SCRIPT_URI};
+      $baseurl=~s#/(auth|public)/.*$##;
+      my $url=$baseurl;
+      $url.="/auth/base/workflow/ById/".$WfRec->{id};
+      $W5V2::OperationContext=$url;
+   }
+
+   
+   foreach my $s (@sets){
+      if (my ($mod,$tag)=$s=~m/^SR:(.*)::([^:]+)$/){
+         if (defined($app->{ReplaceTool}->{$mod})){
+            my $workmod=$app->{ReplaceTool}->{$mod};
+            my $crec=$workmod->getControlRecord();
+            my %crec=@{$crec};
+            my $data=$crec{$tag};
+            if (defined($data) && $workmod->can("doReplaceOperation")){
+               my $replacemode=$WfRec->{replaceoptype};
+               my $search=$WfRec->{replacesearch};
+               my $searchid=$WfRec->{replacesearchid};
+               my $replace=$WfRec->{replacereplacewith};
+               my $replaceid=$WfRec->{replacereplacewithid};
+               $log.=$workmod->doReplaceOperation($tag,$data,
+                          $replacemode,$search,$searchid,$replace,$replaceid);
+            }
+         }
+      }
+   }
+   $W5V2::OperationContext=$oldOperationContext;
+
+   return($log);
+}
+
 sub getRecordImageUrl
 {
    my $self=shift;
@@ -880,6 +923,7 @@ sub Process
    my $actions=shift;
    my $userid=$self->getParent->getParent->getCurrentUserId();
 
+printf STDERR ("fifi process $action\n");
    if ($action eq "BreakWorkflow"){
       if ($self->getParent->getParent->Action->StoreRecord(
           $WfRec->{id},"wfbreak",
@@ -913,14 +957,11 @@ sub Process
                               "requested");
          return(0);
       }
-      if ($op eq "wfaddnote"){
+      if ($op eq "wfapproveop"){
          # check if any further approves are required. If not, do
          # the operation
-         #$self->getParent->doReplaceOperation($WfRec); 
-
-
-
- 
+         my $resultlog=$self->getParent->doReplaceOperation($WfRec); 
+         printf STDERR ("fifi resultlog=%s\n",$resultlog); 
       }
    }
    return($self->SUPER::Process($action,$WfRec,$actions));

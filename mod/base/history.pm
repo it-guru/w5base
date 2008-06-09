@@ -60,6 +60,10 @@ sub new
                                     label       =>'New State',
                                     dataobjattr =>'history.newstate'),
 
+      new kernel::Field::Textarea(  name        =>'comments',
+                                    label       =>'Comments',
+                                    dataobjattr =>'history.comments'),
+
       new kernel::Field::Creator(   name        =>'creator',
                                     label       =>'Creator',
                                     dataobjattr =>'history.createuser'),

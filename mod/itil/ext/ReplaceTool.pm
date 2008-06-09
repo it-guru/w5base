@@ -74,4 +74,32 @@ sub getControlRecord
    return($d);
 }
 
+sub doReplaceOperation
+{
+   my $self=shift;
+   my $tag=shift;
+   my $data=shift;
+   my ($replacemode,$search,$searchid,$replace,$replaceid)=@_;
+
+   if ($tag ne "contacts"){
+      my $dataobj=getModuleObject($self->getParent->Config,$data->{dataobj});
+      if (defined($dataobj)){
+         my $idname=$dataobj->IdField->Name();
+         $dataobj->SetFilter({cistatusid=>'<=5',
+                              $data->{idfield}=>\$searchid});
+         $dataobj->SetCurrentView(qw(ALL));
+         $dataobj->ForeachFilteredRecord(sub{
+               my $rec=$_;
+               $dataobj->ValidatedUpdateRecord($rec,
+                                     {$data->{target}=>$replace},
+                                     {$idname=>\$rec->{$idname}});
+         });
+
+         
+      }
+   }
+
+   return("$tag:ok\n");
+}
+
 1;

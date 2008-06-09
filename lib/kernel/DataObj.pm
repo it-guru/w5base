@@ -723,12 +723,24 @@ sub HandleHistory
       my $dataobject=$self->SelfAsParentObject();
       my $idname=$self->IdField->Name();
       my $id=effVal($oldrec,$newrec,$idname);
-      $h->ValidatedInsertRecord({name=>$field,
-                                 dataobject=>$dataobject,
-                                 dataobjectid=>$id,
-                                 oldstate=>$oldval,
-                                 newstate=>$newval,
-                                 operation=>"modify"});
+      my $histrec={name=>$field,
+                   dataobject=>$dataobject,
+                   dataobjectid=>$id,
+                   oldstate=>$oldval,
+                   newstate=>$newval,
+                   operation=>"modify"};
+      my $comments;
+      if ($ENV{REMOTE_ADDR} ne ""){
+         $comments.="REMOTE_ADDR = $ENV{REMOTE_ADDR} \n";
+      }
+      if ($W5V2::OperationContext ne "WebFrontend"){
+         $comments.="CONTEXT = $W5V2::OperationContext \n";
+      }
+      if (defined($comments)){
+         $histrec->{comments}=$comments;
+      }
+
+      $h->ValidatedInsertRecord($histrec);
    }
    #msg(INFO,"DELTAWRITE: %-10s : old=%s new=%s",$field,$oldval,$newval);
 }
