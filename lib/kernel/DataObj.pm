@@ -1536,7 +1536,9 @@ sub SetCurrentOrder
 sub GetCurrentOrder
 {
    my $self=shift;
-   return(@{$self->Context->{'CurrentOrder'}}) if (defined($self->Context->{'CurrentOrder'}));
+   if (defined($self->Context->{'CurrentOrder'})){
+      return(@{$self->Context->{'CurrentOrder'}});
+   }
    return(undef);
 }
 
@@ -1557,6 +1559,7 @@ sub SetCurrentView
    else{
       $self->Context->{'CurrentView'}=[@_];
    }
+   delete($self->Context->{'CurrentOrder'});
    return(@{$self->Context->{'CurrentView'}});
 }
 
