@@ -33,6 +33,7 @@ table{
   margin:0px;
   padding:0px;
   width:100%;
+  border-bottom-color:black;
   border-bottom-style:solid;
   border-width:1px;
 }

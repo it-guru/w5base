@@ -522,7 +522,7 @@ sub BuildVisualView
 
    $d=<<EOF;
 <div class=label>$label</div>
-<table style="border-bottom-style:none">
+<table style="border-bottom-style:none;min-width:500px;width:auto;width:100%">
 <tr>
 <td width=80>Start:</td>
 <td>$starttime</td>
@@ -533,9 +533,9 @@ sub BuildVisualView
 </tr>
 </table>
 
-<table style="border-bottom-style:none">
+<table style="border-bottom-style:none;min-width:500px;width:auto;width:100%">
 <tr>
-<td width=80><u>Auftraggeber:</u><br>&nbsp;</td>
+<td width=80><u>Originator:</u><br>&nbsp;</td>
 <td width=107 $crscol>CR-Status:<br>
 <b>$rec->{currentstatus}</b></td>
 <td width=100 $aprcol>Approval:<br>
@@ -547,7 +547,7 @@ sub BuildVisualView
 </tr>
 </table>
 
-<table><tr>
+<table style="min-width:500px;width:auto;width:100%"><tr>
 <td width=80><u>Change-Mgr:</u><br>&nbsp;</td>
 <td>Group:<br>
 <b>$rec->{coordinator}</b></td>
@@ -557,7 +557,7 @@ sub BuildVisualView
 </tr>
 </table>
 
-<table style="margin-top:10px">
+<table style="margin-top:10px;min-width:500px;width:auto;width:100%">
 <tr>
 <td>
   <table class=noborder>
@@ -591,8 +591,6 @@ sub BuildVisualView
 <tr>
 <td>Brief-Description:<br>
 <b>$rec->{name}</b>
-<img class=printspacer style="float:left" border=0
-     src="../../../public/base/load/empty.gif" width=500 height=1>
 </td>
 </tr>
 <tr>
