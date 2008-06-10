@@ -189,6 +189,9 @@ sub ProcessLine
    my $outputhandler=$self->getParent();
    my $op=Query->Param("OP");
    $self->ProcessOp($op) if ($op ne "");
+   my $delconfirm=$app->T("are you sure, that you want to delete '\%s'");
+   my $currentview=Query->Param("CurrentView");
+   $delconfirm=sprintf($delconfirm,$currentview);
    my $d=<<EOF;
 <script language="JavaScript">
 
@@ -211,9 +214,11 @@ function DoAdd()
 }
 function DoDel()
 {
-   document.forms[0].elements['OP'].value="del";
-   document.forms[0].target="_self";
-   document.forms[0].submit();
+   if (confirm("$delconfirm")){
+      document.forms[0].elements['OP'].value="del";
+      document.forms[0].target="_self";
+      document.forms[0].submit();
+   }
 }
 function DoSave()
 {
