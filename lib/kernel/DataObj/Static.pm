@@ -119,6 +119,7 @@ sub CheckFilter
    return(1) if (!defined($rec));
    return(1) if (!defined($#flt==-1));
    my $failcount=0;
+   my $okcount=0;
    CHK: foreach my $filter (@flt){
       foreach my $k (keys(%{$filter})){
          if (exists($filter->{$k}) && !defined($filter->{$k})){ # compare on 
@@ -168,14 +169,14 @@ sub CheckFilter
                   if ($chk=~m/^>/){
                      $chk=~s/^>//;
                      if (!($rec->{$k}>$chk)){
-                        $failcount=1;
+                        $failcount++;
                         last CHK;
                      }
                   }
                   elsif ($chk=~m/^</){
                      $chk=~s/^<//;
                      if (!($rec->{$k}<$chk)){
-                        $failcount=1;
+                        $failcount++;
                         last CHK;
                      }
                   }
@@ -184,7 +185,7 @@ sub CheckFilter
                      $chk=~s/\?/\./g;
                      $chk=~s/\*/\.*/g;
                      if (($rec->{$k}=~m/^$chk$/i)){
-                        $failcount=1;
+                        $failcount++;
                         last CHK;
                      }
                   }
@@ -192,8 +193,10 @@ sub CheckFilter
                      $chk=~s/\?/\./g;
                      $chk=~s/\*/\.*/g;
                      if (!($rec->{$k}=~m/^$chk$/i)){
-                        $failcount=1;
-                        last CHK;
+                        $failcount++;
+                     }
+                     else{
+                        $okcount++;   # to allow OR search  - AND not supported
                      }
                   }
                }
@@ -201,6 +204,7 @@ sub CheckFilter
          } 
       }
    }
+   return(1) if ($okcount); 
    return(0) if ($failcount); 
    return(1);
 }
