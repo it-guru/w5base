@@ -179,6 +179,15 @@ sub CheckFilter
                         last CHK;
                      }
                   }
+                  elsif ($chk=~m/^!/){
+                     $chk=~s/^!//;
+                     $chk=~s/\?/\./g;
+                     $chk=~s/\*/\.*/g;
+                     if (($rec->{$k}=~m/^$chk$/i)){
+                        $failcount=1;
+                        last CHK;
+                     }
+                  }
                   else{
                      $chk=~s/\?/\./g;
                      $chk=~s/\*/\.*/g;

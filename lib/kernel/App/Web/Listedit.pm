@@ -714,10 +714,10 @@ sub Bookmark
 
    Query->Delete("AutoSearch");
    my %qu=Query->MultiVars();
-   foreach my $sv (keys(%qu)){
-      next if ($qu{$sv} ne "");
-      delete($qu{$sv});
-   }
+  # foreach my $sv (keys(%qu)){    # just do no cleaning - i think it's better
+  #    next if ($qu{$sv} ne "" || $sv eq "search_cistatus");
+  #    delete($qu{$sv});
+  # }
    my $querystring=kernel::cgi::Hash2QueryString(%qu);
    $querystring="?".$querystring;
    my $srclink=$self->Self();

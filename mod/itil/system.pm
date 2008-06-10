@@ -763,6 +763,17 @@ sub getRecordImageUrl
    return("../../../public/itil/load/system.jpg?".$cgi->query_string());
 }
 
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_cistatus"))){
+     Query->Param("search_cistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
+
+
 sub SecureSetFilter
 {
    my $self=shift;
