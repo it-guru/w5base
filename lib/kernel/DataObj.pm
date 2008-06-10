@@ -1559,7 +1559,8 @@ sub SetCurrentView
    else{
       $self->Context->{'CurrentView'}=[@_];
    }
-   delete($self->Context->{'CurrentOrder'});
+   delete($self->Context->{'CurrentOrder'}); # if there is a new view set,
+                                             # the last order must be deleted
    return(@{$self->Context->{'CurrentView'}});
 }
 
