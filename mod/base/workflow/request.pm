@@ -1193,14 +1193,7 @@ sub PostProcess
                            workflowname=>$workflowname);
    }
 
-   if ($action=~m/^SaveStep\..*$/){
-      Query->Delete("WorkflowStep");
-      Query->Delete("note");
-      Query->Delete("Formated_note");
-      Query->Delete("Formated_effort");
-   }
-
-   return(undef);
+   return($self->SUPER::PostProcess($action,$WfRec,$actions));
 }
 
 

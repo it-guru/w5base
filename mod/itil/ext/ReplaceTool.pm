@@ -80,6 +80,7 @@ sub doReplaceOperation
    my $tag=shift;
    my $data=shift;
    my ($replacemode,$search,$searchid,$replace,$replaceid)=@_;
+   my $count=0;
 
    if ($tag ne "contacts"){
       my $dataobj=getModuleObject($self->getParent->Config,$data->{dataobj});
@@ -93,13 +94,14 @@ sub doReplaceOperation
                $dataobj->ValidatedUpdateRecord($rec,
                                      {$data->{target}=>$replace},
                                      {$idname=>\$rec->{$idname}});
+               $count++;
          });
 
          
       }
    }
 
-   return("$tag:ok\n");
+   return($count);
 }
 
 1;

@@ -291,6 +291,10 @@ sub Process
                       "name=$b><br>";
       }
    }
+   if (keys(%button)==1 && $addbuttons ne ""){ # only one button can be placed
+      $nextbutton=$addbuttons;                # at the nextbutton position.
+      $addbuttons="";                         # this looks better.
+   }
 
    print $app->HttpHeader("text/html");
    print $app->HtmlHeader(style=>['default.css','work.css',

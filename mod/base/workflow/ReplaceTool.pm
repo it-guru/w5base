@@ -279,6 +279,7 @@ sub doReplaceOperation
       $W5V2::OperationContext=$url;
    }
 
+   my $count=0;
    
    foreach my $s (@sets){
       if (my ($mod,$tag)=$s=~m/^SR:(.*)::([^:]+)$/){
@@ -293,15 +294,14 @@ sub doReplaceOperation
                my $searchid=$WfRec->{replacesearchid};
                my $replace=$WfRec->{replacereplacewith};
                my $replaceid=$WfRec->{replacereplacewithid};
-               $log.=$workmod->doReplaceOperation($tag,$data,
+               $count+=$workmod->doReplaceOperation($tag,$data,
                           $replacemode,$search,$searchid,$replace,$replaceid);
             }
          }
       }
    }
    $W5V2::OperationContext=$oldOperationContext;
-
-   return($log);
+   return("$count entrys replaced");
 }
 
 sub getRecordImageUrl
@@ -420,7 +420,14 @@ sub getPosibleActions
          push(@l,"nop");
       }
    }
-
+   if ($WfRec->{stateid}==16){
+      if ($userid==$creator){
+         push(@l,"wffinish");
+      }
+      else{
+         push(@l,"nop");
+      }
+   }
    return(@l);
 }
 #######################################################################
@@ -923,7 +930,6 @@ sub Process
    my $actions=shift;
    my $userid=$self->getParent->getParent->getCurrentUserId();
 
-printf STDERR ("fifi process $action\n");
    if ($action eq "BreakWorkflow"){
       if ($self->getParent->getParent->Action->StoreRecord(
           $WfRec->{id},"wfbreak",
@@ -961,11 +967,57 @@ printf STDERR ("fifi process $action\n");
          # check if any further approves are required. If not, do
          # the operation
          my $resultlog=$self->getParent->doReplaceOperation($WfRec); 
-         printf STDERR ("fifi resultlog=%s\n",$resultlog); 
+         if ($self->getParent->getParent->Action->StoreRecord(
+             $WfRec->{id},"note",
+             {translation=>'base::workflowaction'},$resultlog,undef)){
+            my $openuserid=$WfRec->{openuser};
+            my $openusername=$WfRec->{openusername};
+            my $step=$self->getParent->getStepByShortname("opdone");
+            $self->StoreRecord($WfRec,{stateid=>16,
+                                       step=>$step,
+                                       eventend=>NowStamp("en"),
+                                       closedate=>NowStamp("en"),
+                                       fwddebtargetid=>undef,
+                                       fwddebtarget=>undef,
+                                       fwdtarget=>'base::user',
+                                       fwdtargetid=>$openuserid,
+                                      });
+            if ($openuserid!=$userid){
+               $self->PostProcess($action.".".$op,$WfRec,$actions,
+                                  "done by $ENV{REMOTE_USER}",
+                                  fwdtarget=>'base::user',
+                                  fwdtargetid=>$openuserid,
+                                  fwdtargetname=>$openusername);
+            }
+            return(1);
+         }
+
       }
    }
    return($self->SUPER::Process($action,$WfRec,$actions));
 }
+
+sub PostProcess
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my %param=@_;
+   my $aobj=$self->getParent->getParent->Action();
+
+   if ($action eq "SaveStep.wfapproveop"){
+      $aobj->NotifyForward($WfRec->{id},
+                           $param{fwdtarget},
+                           $param{fwdtargetid},
+                           $param{fwdtargetname},
+                           "replace operation done");
+   }
+
+   return($self->SUPER::PostProcess($action,$WfRec,$actions));
+}
+
+
 
 
 
@@ -975,7 +1027,104 @@ printf STDERR ("fifi process $action\n");
 package base::workflow::ReplaceTool::break;
 use vars qw(@ISA);
 use kernel;
-@ISA=qw(base::workflow::request::finish);
+use kernel::WfStep;
+@ISA=qw(kernel::WfStep);
+
+sub getWorkHeight
+{
+   my $self=shift;
+   my $WfRec=shift;
+
+   return(0);
+}
+
+
+#######################################################################
+package base::workflow::ReplaceTool::opdone;
+use vars qw(@ISA);
+use kernel;
+use kernel::WfStep;
+@ISA=qw(kernel::WfStep);
+
+sub getWorkHeight
+{
+   my $self=shift;
+   my $WfRec=shift;
+
+   return(30);
+}
+
+sub getPosibleButtons
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   return() if (!grep(/^wffinish$/,@$actions));
+   return(FinishWorkflow=>$self->T('FinishWorkflow'));
+}
+
+
+sub Process
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my $userid=$self->getParent->getParent->getCurrentUserId();
+
+   if ($action eq "FinishWorkflow"){
+      if ($self->getParent->getParent->Action->StoreRecord(
+          $WfRec->{id},"wffinish",
+          {translation=>'base::workflow::ReplaceTool'},"",undef)){
+         my $openuserid=$WfRec->{openuser};
+         my $step=$self->getParent->getStepByShortname("finish");
+         $self->StoreRecord($WfRec,{stateid=>21,
+                                    step=>$step,
+                                    eventend=>NowStamp("en"),
+                                    closedate=>NowStamp("en"),
+                                    fwddebtargetid=>undef,
+                                    fwddebtarget=>undef,
+                                    fwdtargetid=>undef,
+                                    fwdtarget=>undef,
+                                   });
+         $self->PostProcess($action,$WfRec,$actions,
+                            "finish by $ENV{REMOTE_USER}",
+                            fwdtarget=>'base::user',
+                            fwdtargetid=>$openuserid,
+                            fwdtargetname=>"Requestor");
+         return(1);
+      }
+      return(0);
+   }
+   return(0); 
+}
+
+sub Validate
+{
+   return(1);
+}
+
+
+#######################################################################
+package base::workflow::ReplaceTool::finish;
+use vars qw(@ISA);
+use kernel;
+use kernel::WfStep;
+@ISA=qw(kernel::WfStep);
+
+sub getWorkHeight
+{
+   my $self=shift;
+   my $WfRec=shift;
+
+   return(0);
+}
+
+sub Validate
+{
+   return(1);
+}
 
 
 1;

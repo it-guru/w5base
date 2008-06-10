@@ -161,6 +161,14 @@ sub PostProcess
    my $WfRec=shift;
    my $actions=shift;
 
+   if ($action=~m/^SaveStep\..*$/){
+      Query->Delete("WorkflowStep");
+      Query->Delete("note");
+      Query->Delete("Formated_note");
+      Query->Delete("Formated_effort");
+   }
+
+
    return(undef);           # return isn't matter
 }
 
@@ -370,6 +378,9 @@ sub generateWorkspace
    $self->generateWorkspacePages($WfRec,$actions,\$divset,\$selopt);   
    my $oldop=Query->Param("OP");
    my $templ;
+   if ($divset eq ""){
+      return("<table width=100%><tr><td>&nbsp;</td></tr></table>");
+   }
    my $pa=$self->getParent->T("posible action");
    my $tabheight=$wsheight-30;
    $templ=<<EOF;

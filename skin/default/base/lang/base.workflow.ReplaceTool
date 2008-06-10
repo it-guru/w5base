@@ -17,3 +17,4 @@
               en=>'Approve modification and do it now, if it is posible'},
 'wfrejectop'=>{de=>'Änderung ablehnen',
               en=>'reject modification'},
+'wffinish'=>{de=>'beendet',en=>'finished'},
