@@ -598,7 +598,7 @@ sub BuildVisualView
 <tr>
 <td><b><u>Description:</b></u><br>
 <table style=\"width:100%;table-layout:fixed;padding:0;margin:0\">
-<tr><td style="min-height:50px">
+<tr><td style="min-height:80px;height:auto;height:80px">
 <pre class=multilinetext>$rec->{description}</pre>
 </td></tr></table>
 </td>
@@ -606,7 +606,7 @@ sub BuildVisualView
 <tr>
 <td><b><u>Backout Method:</b></u><br>
 <table style=\"width:100%;table-layout:fixed;padding:0;margin:0\">
-<tr><td style="min-height:50px">
+<tr><td style="min-height:80px;height:auto;height:80px">
 <pre class=multilinetext>$rec->{fallback}</pre>
 </td></tr></table>
 </td>
