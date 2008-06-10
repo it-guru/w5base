@@ -50,7 +50,7 @@ sub Main
    my $doAutoSearch=0;
    foreach my $m (values(%{$self->{SubDataObj}})){
       $l{$m->getLabel()}=$m;
-      $title.=" - ".$m->getLabel() if ($oldval eq $m->Self()); 
+      $title.=" &rArr; ".$m->getLabel() if ($oldval eq $m->Self()); 
    }
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','mainwork.css',
@@ -74,7 +74,8 @@ EOF
          "OnChange=\"SelectionChanged();\">";
    $s.="<option value=\"\">&lt;".$self->T("please select a query").
        "&gt;</option>";
-   foreach my $label (sort(keys(%l))){
+   foreach my $label (sort(grep(/^\[/,keys(%l))),
+                      sort(grep(!/^\[/,keys(%l)))){
       if (defined($l{$label}) &&
           $l{$label}->can("isSelectable") && 
           $l{$label}->isSelectable()){

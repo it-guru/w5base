@@ -1,5 +1,5 @@
-'base::MyW5Base::wfmyjobs'=>{de=>'- meine anstehenden Aufgaben/Workflows -',
-                             en=>'- my open jobs/workflows -'},
+'base::MyW5Base::wfmyjobs'=>{de=>'[meine anstehenden Aufgaben/Workflows]',
+                             en=>'[my open jobs/workflows]'},
 'Workflow Filter'=>{de=>'Aufgaben Filter'},
 'only defered workflows'=>{de=>'nur zurückgestellte Workflows'},
 'hide defered, pending'=>{de=>'zurückgest. und anhängige verstecken'},
