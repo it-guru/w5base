@@ -64,9 +64,9 @@ sub qcheckRecord
    if ($rec->{acinmassingmentgroup}=~m/^\s*$/){
       $exitcode=3 if ($exitcode<3);
       push(@{$desc->{qmsg}},
-           $self->T('there is no incident assignmentgroup defined'));
+           'there is no incident assignmentgroup defined');
       push(@{$desc->{dataissue}},
-           $self->T('there is no incident assignmentgroup defined'));
+           'there is no incident assignmentgroup defined');
    }
    return($exitcode,$desc);
 }
