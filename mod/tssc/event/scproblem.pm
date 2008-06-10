@@ -59,10 +59,10 @@ sub scproblem
 
    msg(DEBUG,"view is set");
    my $focus="now";
-   my %flt=(sysmodtime=>">$focus-60m");
+   my %flt=(sysmodtime=>">$focus-24h");
    if (!defined($param{problemnumber}) && !defined($param{sysmodtime}) &&
        !defined($param{closetime})){
-      $self->{wf}->SetFilter(srcsys=>\$selfname,srcload=>">now-7d");
+      $self->{wf}->SetFilter(srcsys=>\$selfname,srcload=>">now-3d");
       msg(DEBUG,"finding last srcload");
       my ($wfrec,$msg)=$self->{wf}->getOnlyFirst(qw(srcload));
       if (defined($wfrec)){

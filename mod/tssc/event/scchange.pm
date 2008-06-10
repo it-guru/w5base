@@ -62,14 +62,24 @@ sub scchange
 
    msg(DEBUG,"view is set");
    my $focus="now";
-   my %flt=(sysmodtime=>">$focus-10m");
+   my %flt=(sysmodtime=>">$focus-24h");
    if (!defined($param{changenumber}) && !defined($param{sysmodtime}) &&
        !defined($param{plannedend})){
-      $self->{wf}->SetFilter(srcsys=>\$selfname,srcload=>">now-7d");
+      $self->{wf}->SetFilter(srcsys=>\$selfname,srcload=>">now-3d");
       msg(DEBUG,"finding last srcload");
       my ($wfrec,$msg)=$self->{wf}->getOnlyFirst(qw(srcload));
       if (defined($wfrec)){
          $focus=$wfrec->{srcload};
+     #    my $nowstamp=NowStamp("en");
+     #    my $dur=CalcDateDuration($focus,$nowstamp);
+     #    if (abs($dur->{totalminutes}>120)
+     #    printf STDERR ("fifi dur=%s\n",Dumper($dur));
+     #    printf STDERR ("focus=$focus nowstamp=$nowstamp\n");
+     #    exit(1);
+
+
+
+
          %flt=(sysmodtime=>"\">$focus-10m\"");
       }
    }

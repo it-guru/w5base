@@ -57,10 +57,10 @@ sub scincident
                            softwareid deviceid reportedby
                            action sysmodtime involvedassignment));
    my $focus="now";
-   my %flt=(closetime=>"\">$focus-10m\"");
+   my %flt=(closetime=>"\">$focus-24h\"");
    if (!defined($param{incidentnumber}) && !defined($param{closetime}) &&
        !defined($param{downtimeend})){
-      $self->{wf}->SetFilter(srcsys=>\$selfname,srcload=>">now-7d");
+      $self->{wf}->SetFilter(srcsys=>\$selfname,srcload=>">now-3d");
       $self->{wf}->SetCurrentView(qw(srcload));
       msg(DEBUG,"finding last srcload");
       my ($wfrec,$msg)=$self->{wf}->getOnlyFirst(qw(srcload));

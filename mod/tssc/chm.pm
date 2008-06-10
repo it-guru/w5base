@@ -508,6 +508,17 @@ sub BuildVisualView
    my $endtime=$self->findtemplvar($templparam,"plannedend","detail");
    my $requestedby=$self->findtemplvar($templparam,"requestedby","detail");
 
+   my $gr="#75D194";
+   my $rd="#F28C8C";
+   my $bl="#B9C5F5";
+
+   my $aprcol="";
+   my $crscol="";
+   my $bg="bgcolor";
+   $aprcol="$bg=\"$gr\"" if (lc($rec->{approvalstatus}) eq "approved");
+   $crscol="$bg=\"$bl\"" if (lc($rec->{currentstatus}) eq "work in progress");
+   
+
 
    $d=<<EOF;
 <div class=label>$label</div>
@@ -525,9 +536,9 @@ sub BuildVisualView
 <table style="border-bottom-style:none">
 <tr>
 <td width=80><u>Auftraggeber:</u><br>&nbsp;</td>
-<td width=107>CR-Status:<br>
+<td width=107 $crscol>CR-Status:<br>
 <b>$rec->{currentstatus}</b></td>
-<td width=100>Approval:<br>
+<td width=100 $aprcol>Approval:<br>
 <b>$rec->{approvalstatus}</b></td>
 <td>Owner:<br>
 <b>$requestedby</b></td>
@@ -579,11 +590,29 @@ sub BuildVisualView
 </tr><tr>
 <tr>
 <td>Brief-Description:<br>
-<b>$rec->{name}</b></td>
-</tr><tr>
+<b>$rec->{name}</b>
+<img class=printspacer style="float:left" border=0
+     src="../../../public/base/load/empty.gif" width=500 height=1>
+</td>
+</tr>
+<tr>
 <td><b><u>Description:</b></u><br>
-<pre class=multilinetext>$rec->{description}</pre></td>
+<table style=\"width:100%;table-layout:fixed;padding:0;margin:0\">
+<tr><td style="min-height:50px">
+<pre class=multilinetext>$rec->{description}</pre>
+</td></tr></table>
+</td>
+</tr>
+<tr>
+<td><b><u>Backout Method:</b></u><br>
+<table style=\"width:100%;table-layout:fixed;padding:0;margin:0\">
+<tr><td style="min-height:50px">
+<pre class=multilinetext>$rec->{fallback}</pre>
+</td></tr></table>
+</td>
+</tr>
 </table>
+
 EOF
    return($d);
 }
