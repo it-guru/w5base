@@ -59,6 +59,7 @@ sub Result
 {
    my $self=shift;
    my %q=$self->{DataObj}->getSearchHash();
+   $q{cistatusid}="<=5";
 
    my $userid=$self->getParent->getCurrentUserId();
    $userid=-1 if (!defined($userid) || $userid==0);
@@ -69,9 +70,7 @@ sub Result
       my %q1=%q;
       my %q2=%q;
       $q1{sem2id}=\$userid;
-      $q1{cistatusid}=\'4';
       $q2{tsm2id}=\$userid;
-      $q2{cistatusid}=\'4';
 
       my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
                                             ["RChief2"],
@@ -83,19 +82,24 @@ sub Result
       my %q4=%q;
     #  $q4{responseteamid}=\@grpids;
 
-      push(@q,\%q1,\%q2,\%q3,\%q4);
+      my %q5=%q;
+      my %q6=%q;
+      $q5{delmgr2id}=\$userid;
+      $q6{ldelmgr2id}=\$userid;
+      push(@q,\%q1,\%q2,\%q3,\%q4,\%q5,\%q6);
    }
    if ($dc ne "DEPONLY" && $dc ne "TEAM"){
       my %q1=%q;
       my %q2=%q;
       my %q3=%q;
+      my %q4=%q;
+      my %q5=%q;
       $q1{semid}=\$userid;
-      $q1{cistatusid}='<=4';
       $q2{tsmid}=\$userid;
-      $q2{cistatusid}='<=4';
       $q3{databossid}=\$userid;
-      $q3{cistatusid}='<=4';
-      push(@q,\%q1,\%q2,\%q3);
+      $q4{delmgrid}=\$userid;
+      $q5{ldelmgrid}=\$userid;
+      push(@q,\%q1,\%q2,\%q3,\%q4,\%q5);
    }
    if ($dc eq "TEAM"){
       my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
