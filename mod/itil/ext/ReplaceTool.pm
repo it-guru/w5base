@@ -65,7 +65,7 @@ sub getControlRecord
              target       =>'sem2',
              idfield      =>'sem2id'
            },
-           contacts=>{
+           usercontacts=>{
              replaceoptype=>'base::user',
              dataobj      =>'itil::appl',
              target       =>'contacts',
@@ -82,7 +82,7 @@ sub doReplaceOperation
    my ($replacemode,$search,$searchid,$replace,$replaceid)=@_;
    my $count=0;
 
-   if ($tag ne "contacts"){
+   if ($tag ne "usercontacts"){
       my $dataobj=getModuleObject($self->getParent->Config,$data->{dataobj});
       if (defined($dataobj)){
          my $idname=$dataobj->IdField->Name();
@@ -96,8 +96,36 @@ sub doReplaceOperation
                                      {$idname=>\$rec->{$idname}});
                $count++;
          });
-
-         
+      }
+   }
+   if ($tag eq "usercontacts"){
+      my $dataobj=getModuleObject($self->getParent->Config,$data->{dataobj});
+      my $cobj=getModuleObject($self->getParent->Config,"base::lnkcontact");
+      if (defined($dataobj)){
+         my $idname=$dataobj->IdField->Name();
+         $dataobj->SetFilter({cistatusid=>'<=5'});
+         $dataobj->SetCurrentView($data->{target});
+         my ($rec,$msg)=$dataobj->getFirst();
+         if (defined($rec)){
+            do{
+               foreach my $contact (@{$rec->{$data->{target}}}){
+                  if ($contact->{target} eq $data->{replaceoptype} &&
+                      $contact->{targetid}==$searchid){
+                     $cobj->ResetFilter();
+                     $cobj->SetFilter(id=>\$contact->{id});
+                     $cobj->SetCurrentView(qw(ALL));
+                     $cobj->ForeachFilteredRecord(sub{
+                           my $rec=$_;
+                           $cobj->ValidatedUpdateRecord($rec,
+                                                 {targetname=>$replace},
+                                                 {id=>\$rec->{id}});
+                           $count++;
+                     });
+                  }
+               }
+               ($rec,$msg)=$dataobj->getNext();
+           }until(!defined($rec));
+        }
       }
    }
 

@@ -1,1 +1,2 @@
 'SaveStep'=>{de=>'Aktion speichern/ausführen',en=>'Save Step'},
+'MSG000'=>{de=>'Bitte prüfen Sie vor einer Genehmigung, ob die Begründung ausreichend ist und ob die Replace-Operation an sich Sinn macht.',en=>'Please check bevor an approve, if the argumantation ist sufficient.'},

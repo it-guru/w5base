@@ -28,67 +28,7 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
 
-   $self->AddFrontendFields(
-      new kernel::Field::TextDrop(
-                name          =>'wfreplaceusersrc',
-                label         =>'Search User',
-                htmldetail    =>0,
-                group         =>'init',
-                vjointo       =>'base::user',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['wfreplaceusersrcid'=>'userid'],
-                vjoindisp     =>'fullname'),
-
-      new kernel::Field::Link (
-                name          =>'wfreplaceusersrcid',
-                container     =>'headref'),
-
-      new kernel::Field::TextDrop(
-                name          =>'wfreplaceuserdst',
-                label         =>'Replace by',
-                htmldetail    =>0,
-                group         =>'init',
-                vjointo       =>'base::user',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['wfreplaceuserdstid'=>'userid'],
-                vjoindisp     =>'fullname'),
-
-      new kernel::Field::Link (
-                name          =>'wfreplaceuserdstid',
-                container     =>'headref'),
-
-      new kernel::Field::TextDrop(
-                name          =>'wfreplacegrpsrc',
-                label         =>'Search Group',
-                htmldetail    =>0,
-                group         =>'init',
-                vjointo       =>'base::grp',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['wfreplacegrpsrcid'=>'grpid'],
-                vjoindisp     =>'fullname'),
-
-      new kernel::Field::Link (
-                name          =>'wfreplacegrpsrcid',
-                container     =>'headref'),
-
-      new kernel::Field::TextDrop(
-                name          =>'wfreplacegrpdst',
-                label         =>'Replace by',
-                htmldetail    =>0,
-                group         =>'init',
-                vjointo       =>'base::grp',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['wfreplacegrpdstid'=>'grpid'],
-                vjoindisp     =>'fullname'),
-
-      new kernel::Field::Link (
-                name          =>'wfreplacegrpdstid',
-                container     =>'headref'),
-
-    );
    $self->LoadSubObjs("ext/ReplaceTool","ReplaceTool");
-
-
    return($self);
 }
 
@@ -106,7 +46,7 @@ sub getDynamicFields
          my $crec=$self->{ReplaceTool}->{$module}->getControlRecord();
          while(my $k=shift(@$crec)){
             my $data=shift(@$crec);
-            my $do=$data->{dataobj};
+            my $do=$data->{replaceoptype};
             my $dataobj=getModuleObject($self->getParent->Config,$do);
             if (defined($dataobj)){
                my $idname=$dataobj->IdField->Name();
@@ -123,7 +63,6 @@ sub getDynamicFields
       }
       @{$self->{dstobjects}}=%target;
    }
-   printf STDERR ("tagets=%s\n",Dumper($self->{dstobjects}));
 
    return($self->InitFields(
                    new kernel::Field::Select(
@@ -146,19 +85,28 @@ sub getDynamicFields
                              selectivetyp       =>'1',
                              dsttypfield        =>'replaceoptype',
                              dstidfield         =>'replacesearchid',
+                             altnamestore       =>'altreplacesearch',
                              dst                =>$self->{dstobjects},
                              translation        =>'base::workflow::ReplaceTool',
-                             label              =>'search for',
+                             label              =>'search for'),
+                   new kernel::Field::Link(
+                             name               =>'altreplacesearch',
                              container          =>'headref'),
                    new kernel::Field::Link(
                              name               =>'replacesearchid',
                              readonly           =>1,
                              container          =>'headref'),
-                   new kernel::Field::Text(
+                   new kernel::Field::MultiDst(
                              name               =>'replacereplacewith',
-                             readonly           =>1,
+                             selectivetyp       =>'1',
+                             dsttypfield        =>'replaceoptype',
+                             dstidfield         =>'replacereplacewithid',
+                             altnamestore       =>'altreplacereplacewith',
+                             dst                =>$self->{dstobjects},
                              translation        =>'base::workflow::ReplaceTool',
-                             label              =>'replace with',
+                             label              =>'replace with'),
+                   new kernel::Field::Link(
+                             name               =>'altreplacereplacewith',
                              container          =>'headref'),
                    new kernel::Field::Link(
                              name               =>'replacereplacewithid',
@@ -540,30 +488,16 @@ sub generateStoredWorkspace
 
    my @steplist=@_;
    my $d;
-   if ($replaceoptype eq "base::user"){
-      $d=<<EOF;
+   $d=<<EOF;
 <tr>
-<td class=fname>%wfreplaceusersrc(label)%:</td>
-<td class=finput>%wfreplaceusersrc(storedworkspace)%</td>
+<td class=fname>%replacesearch(label)%:</td>
+<td class=finput>%replacesearch(storedworkspace)%</td>
 </tr>
 <tr>
-<td class=fname>%wfreplaceuserdst(label)%:</td>
-<td class=finput>%wfreplaceuserdst(storedworkspace)%</td>
-</tr>
-EOF
-   }
-   if ($replaceoptype eq "base::grp"){
-      $d=<<EOF;
-<tr>
-<td class=fname>%wfreplacegrpsrc(label)%:</td>
-<td class=finput>%wfreplacegrpsrc(storedworkspace)%</td>
-</tr>
-<tr>
-<td class=fname>%wfreplacegrpdst(label)%:</td>
-<td class=finput>%wfreplacegrpdst(storedworkspace)%</td>
+<td class=fname>%replacereplacewith(label)%:</td>
+<td class=finput>%replacereplacewith(storedworkspace)%</td>
 </tr>
 EOF
-   }
 
    return($self->SUPER::generateStoredWorkspace($WfRec,@steplist).$d);
 }
@@ -574,7 +508,6 @@ sub generateWorkspace
    my $WfRec=shift;
    my $actions=shift;
    my $replaceoptype=Query->Param("Formated_replaceoptype");
-printf STDERR ("fifi replaceoptype=$replaceoptype\n");
 
    my @steplist=Query->Param("WorkflowStep");
    pop(@steplist);
@@ -582,36 +515,19 @@ printf STDERR ("fifi replaceoptype=$replaceoptype\n");
 
 
    my $templ;
-   if ($replaceoptype eq "base::user"){
-      $templ=<<EOF;
+   $templ=<<EOF;
 <table border=0 cellspacing=0 cellpadding=0 width=100%>
 $StoredWorkspace
 <tr>
-<td class=fname>%wfreplaceusersrc(label)%:</td>
-<td class=finput>%wfreplaceusersrc(detail)%</td>
+<td class=fname>%replacesearch(label)%:</td>
+<td class=finput>%replacesearch(detail)%</td>
 </tr>
 <tr>
-<td class=fname>%wfreplaceuserdst(label)%:</td>
-<td class=finput>%wfreplaceuserdst(detail)%</td>
+<td class=fname>%replacereplacewith(label)%:</td>
+<td class=finput>%replacereplacewith(detail)%</td>
 </tr>
 </table>
 EOF
-   }
-   if ($replaceoptype eq "base::grp"){
-      $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100%>
-$StoredWorkspace
-<tr>
-<td class=fname>%wfreplacegrpsrc(label)%:</td>
-<td class=finput>%wfreplacegrpsrc(detail)%</td>
-</tr>
-<tr>
-<td class=fname>%wfreplacegrpdst(label)%:</td>
-<td class=finput>%wfreplacegrpdst(detail)%</td>
-</tr>
-</table>
-EOF
-   }
    return($templ);
 }
 
@@ -624,16 +540,8 @@ sub ProcessNext
 
    my $replaceoptype=Query->Param("Formated_replaceoptype");
 
-   my $srcfieldname;
-   my $dstfieldname;
-   if ($replaceoptype eq "base::user"){
-      $srcfieldname="wfreplaceusersrc";
-      $dstfieldname="wfreplaceuserdst";
-   }
-   if ($replaceoptype eq "base::grp"){
-      $srcfieldname="wfreplacegrpsrc";
-      $dstfieldname="wfreplacegrpdst";
-   }
+   my $srcfieldname="replacesearch";
+   my $dstfieldname="replacereplacewith";
    if (defined($srcfieldname) && defined($dstfieldname)){
       my $srcfield=$self->getField($srcfieldname);
       my $f=Query->Param("Formated_".$srcfield->Name());
@@ -787,7 +695,7 @@ sub ProcessNext
 
    my $forcechk=Query->Param("FORCE");
    if ($forcechk eq ""){
-      $self->LastMsg(ERROR,"verfication question noch checked");
+      $self->LastMsg(ERROR,"verfication question not checked");
       return(0);
    }
    print STDERR Dumper(scalar(Query->MultiVars()));
@@ -799,6 +707,14 @@ sub ProcessNext
          push(@replaceat,$k);
       }
    }
+   if ($#replaceat==-1){
+      $self->LastMsg(ERROR,"no replace fields selected");
+      return(0);
+   }
+   if (length(trim($h->{detaildescription}))<20){
+      $self->LastMsg(ERROR,"description not detailed enough");
+      return(0);
+   }
    
   
    my $newrec={step =>'base::workflow::ReplaceTool::approval',
@@ -806,43 +722,55 @@ sub ProcessNext
                eventstart=>NowStamp("en"),
                eventend=>undef,
                replaceat=>join("\n",sort(@replaceat)),
-               detaildescription=>'Ja',
+               detaildescription=>trim($h->{detaildescription}),
                stateid=>2};
-   if ($h->{replaceoptype} eq "base::user"){
-      $newrec->{replacesearch}=$q->{Formated_wfreplaceusersrc};
-      $newrec->{replacereplacewith}=$q->{Formated_wfreplaceuserdst};
-      my $user=getModuleObject($self->Config,"base::user");
-      $user->ResetFilter();
-      $user->SetFilter({fullname=>[$newrec->{replacesearch}]});
-      my ($rec,$msg)=$user->getOnlyFirst(qw(userid));
-      if (defined($rec)){
-         $newrec->{replacesearchid}=$rec->{userid};
+
+   my $fobj=$self->getParent->getField("fwdtargetname");
+   if (my $admrec=$fobj->Validate(undef,{fwdtargetname=>'admin'})){
+      if (!defined($admrec->{fwdtarget}) ||
+          !defined($admrec->{fwdtargetid} ||
+          $admrec->{fwdtargetid}==0)){
+         if ($self->LastMsg()==0){
+            $self->LastMsg(ERROR,"invalid forwarding target");
+         }
+         return(0);
       }
-      $user->ResetFilter();
-      $user->SetFilter({fullname=>[$newrec->{replacereplacewith}]});
-      my ($rec,$msg)=$user->getOnlyFirst(qw(userid));
-      if (defined($rec)){
-         $newrec->{replacereplacewithid}=$rec->{userid};
+      foreach my $k (keys(%$admrec)){
+         $newrec->{$k}=$admrec->{$k};
       }
    }
-   if ($h->{replaceoptype} eq "base::grp"){
-      $newrec->{replacesearch}=$q->{Formated_wfreplacegrpsrc};
-      $newrec->{replacereplacewith}=$q->{Formated_wfreplacegrpdst};
-      my $grp=getModuleObject($self->Config,"base::grp");
-      $grp->ResetFilter();
-      $grp->SetFilter({fullname=>[$newrec->{replacesearch}]});
-      my ($rec,$msg)=$grp->getOnlyFirst(qw(grpid));
-      if (defined($rec)){
-         $newrec->{replacesearchid}=$rec->{grpid};
+
+
+   my $fobj=$self->getParent->getField("replacesearch");
+   if (my $admrec=$fobj->Validate(undef,$h)){
+
+      if (!defined($admrec->{replacesearchid} ||
+          $admrec->{replacesearchid}==0)){
+         if ($self->LastMsg()==0){
+            $self->LastMsg(ERROR,"invalid replacesearch target");
+         }
+         return(0);
       }
-      $grp->ResetFilter();
-      $grp->SetFilter({fullname=>[$newrec->{replacereplacewith}]});
-      my ($rec,$msg)=$grp->getOnlyFirst(qw(grpid));
-      if (defined($rec)){
-         $newrec->{replacereplacewithid}=$rec->{grpid};
+      foreach my $k (keys(%$admrec)){
+         $newrec->{$k}=$admrec->{$k};
       }
    }
-   $newrec->{name}.=$newrec->{replacesearch};
+
+   my $fobj=$self->getParent->getField("replacereplacewith");
+   if (my $admrec=$fobj->Validate(undef,$h)){
+      if (!defined($admrec->{replacereplacewithid} ||
+          $admrec->{replacereplacewithid}==0)){
+         if ($self->LastMsg()==0){
+            $self->LastMsg(ERROR,"invalid replacereplacewith target");
+         }
+         return(0);
+      }
+      foreach my $k (keys(%$admrec)){
+         $newrec->{$k}=$admrec->{$k};
+      }
+   }
+
+   $newrec->{name}.=$newrec->{altreplacesearch};
    $newrec->{replaceoptype}=$h->{replaceoptype};
    $newrec->{detaildescription}=$h->{detaildescription};
                
@@ -936,7 +864,8 @@ sub generateWorkspacePages
       $$selopt.="<option value=\"wfapproveop\" class=\"$class\">".
                 $self->getParent->T("wfapproveop",$tr).
                 "</option>\n";
-      $$divset.="<div id=OPwfapproveop style=\"margin:15px\"></div>";
+      $$divset.="<div id=OPwfapproveop style=\"margin:15px\">".
+                $self->getParent->T("MSG000")."</div>";
    }
    if (grep(/^wfrejectop$/,@$actions)){
       $$selopt.="<option value=\"wfrejectop\" class=\"$class\">".
@@ -1011,13 +940,11 @@ sub Process
                                        fwdtarget=>'base::user',
                                        fwdtargetid=>$openuserid,
                                       });
-            if ($openuserid!=$userid){
-               $self->PostProcess($action.".".$op,$WfRec,$actions,
-                                  "done by $ENV{REMOTE_USER}",
-                                  fwdtarget=>'base::user',
-                                  fwdtargetid=>$openuserid,
-                                  fwdtargetname=>$openusername);
-            }
+            $self->PostProcess($action.".".$op,$WfRec,$actions,
+                               "done by $ENV{REMOTE_USER}",
+                               fwdtarget=>'base::user',
+                               fwdtargetid=>$openuserid,
+                               fwdtargetname=>$openusername);
             return(1);
          }
 

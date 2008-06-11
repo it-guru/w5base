@@ -195,6 +195,8 @@ sub new
    $self->setDefaultView(qw(parentobj targetname cdate editor));
    $self->LoadSubObjs("ext/lnkcontact","lnkcontact");
    $self->setWorktable("lnkcontact");
+   $self->{history}=[qw(insert modify delete)];
+
    return($self);
 }
 

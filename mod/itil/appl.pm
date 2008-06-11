@@ -565,7 +565,7 @@ sub new
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
                 label         =>'Contacts',
-                vjoininhash   =>['mdate','targetid','target','roles'],
+                vjoininhash   =>['mdate','targetid','target', 'roles','id'],
                 group         =>'contacts'),
 
       new kernel::Field::PhoneLnk(

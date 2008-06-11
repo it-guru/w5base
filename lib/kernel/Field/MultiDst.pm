@@ -18,7 +18,6 @@ package kernel::Field::MultiDst;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 @ISA    = qw(kernel::Field);
 
@@ -100,11 +99,20 @@ sub RawValue
 
    $self->initialize() if (!$self->{isinitialized});
    if (defined($current)){
-      if ($current->{$self->{dsttypfield}}){
-         my $targetid=$current->{$self->{dstidfield}};
+      my $dsttyp;
+      my $dsttypobj=$self->getParent->getField($self->{dsttypfield});
+      if (defined($dsttypobj)){
+         $dsttyp=$dsttypobj->RawValue($current);
+      }
+      if (defined($dsttyp) && $dsttyp ne ""){
+         my $targetidobj=$self->getParent->getField($self->{dstidfield});
+         my $targetid;
+         if (defined($targetidobj)){
+            $targetid=$targetidobj->RawValue($current);
+         }
          if (defined($targetid) && $targetid ne ""){
             foreach my $dststruct (@{$self->{dstobj}}){
-               next if ($dststruct->{name} ne $current->{$self->{dsttypfield}});
+               next if ($dststruct->{name} ne $dsttyp);
                my $idobj=$dststruct->{obj}->IdField();
                $dststruct->{obj}->ResetFilter();
                $dststruct->{obj}->SetFilter({$idobj->Name()=>\$targetid});
@@ -296,11 +304,17 @@ sub FormatedDetail
    my $self=shift;
    my $current=shift;
    my $mode=shift;
-   my $d=$self->RawValue($current);
+   my $d;
+   my $fromquery=Query->Param("Formated_".$self->Name());
+   if ($fromquery ne ""){
+      $d=$fromquery;
+   }
+   else{
+      $d=$self->RawValue($current);
+   }
    my $name=$self->Name();
    my $app=$self->getParent();
    $self->initialize() if (!$self->{isinitialized});
-
 
    if (($mode eq "edit" || $mode eq "workflow") && !$self->{readonly}==1){
       my $fromquery=Query->Param("Formated_$name");
