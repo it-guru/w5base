@@ -932,7 +932,6 @@ sub Process
          if ($self->getParent->getParent->Action->StoreRecord(
              $WfRec->{id},"note",
              {translation=>'base::workflowaction'},$resultlog,undef)){
-            return(0);
             my $openuserid=$WfRec->{openuser};
             my $openusername=$WfRec->{openusername};
             my $step=$self->getParent->getStepByShortname("opdone");
