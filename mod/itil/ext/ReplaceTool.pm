@@ -96,13 +96,16 @@ sub doReplaceOperation
          $dataobj->SetFilter({cistatusid=>'<=5',
                               $data->{idfield}=>\$searchid});
          $dataobj->SetCurrentView(qw(ALL));
-         $dataobj->ForeachFilteredRecord(sub{
-               my $rec=$_;
-               $opdataobj->ValidatedUpdateRecord($rec,
+         my ($rec,$msg)=$dataobj->getFirst();
+         if (defined($rec)){
+            do{
+               $dataobj->ValidatedUpdateRecord($rec,
                                      {$data->{target}=>$replace},
                                      {$idname=>\$rec->{$idname}});
                $count++;
-         });
+               ($rec,$msg)=$dataobj->getNext();
+            }until(!defined($rec));
+         }
       }
    }
    if ($tag eq "usercontacts"){
@@ -121,13 +124,16 @@ sub doReplaceOperation
                      $cobj->ResetFilter();
                      $cobj->SetFilter(id=>\$contact->{id});
                      $cobj->SetCurrentView(qw(ALL));
-                     $cobj->ForeachFilteredRecord(sub{
-                           my $rec=$_;
+                     my ($rec,$msg)=$cobj->getFirst();
+                     if (defined($rec)){
+                        do{
                            $cobj->ValidatedUpdateRecord($rec,
                                                  {targetname=>$replace},
                                                  {id=>\$rec->{id}});
                            $count++;
-                     });
+                           ($rec,$msg)=$cobj->getNext();
+                        }until(!defined($rec));
+                     }
                   }
                }
                ($rec,$msg)=$dataobj->getNext();
