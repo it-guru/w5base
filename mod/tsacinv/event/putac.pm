@@ -472,13 +472,21 @@ sub ApplicationModified
                      else{
                         $assignment="CSS.TCOM";
                      }
-                     my $model="APPL-INSTANCE";
-                     $model="SAP-INSTANCE" if ($irec->{swnature}=~m/^SAP.*$/i); 
-                     $model="DB-INSTANCE" if ($irec->{swnature}=~m/mysql/i); 
-                     $model="DB-INSTANCE" if ($irec->{swnature}=~m/oracle/i); 
-                     $model="DB-INSTANCE" if ($irec->{swnature}=~m/informix/i); 
-                     $model="DB-INSTANCE" if ($irec->{swnature}=~m/mssql/i); 
-                     $model="DB-INSTANCE" if ($irec->{swnature}=~m/db2/i); 
+                     #
+                     # Info von Florian Sahlmann vom 11.06.2008:
+                     # SAP-Instance:    M079345
+                     # APPL_Instance:   M079346
+                     # DB-Instance:     M079347
+                     # SELECT BarCode from AmModel where Name = 'DB-INSTANCE';
+                     #
+                     #
+                     my $model="M079346";
+                     $model="M079345" if ($irec->{swnature}=~m/^SAP.*$/i); 
+                     $model="M079347" if ($irec->{swnature}=~m/mysql/i); 
+                     $model="M079347" if ($irec->{swnature}=~m/oracle/i); 
+                     $model="M079347" if ($irec->{swnature}=~m/informix/i); 
+                     $model="M079347" if ($irec->{swnature}=~m/mssql/i); 
+                     $model="M079347" if ($irec->{swnature}=~m/db2/i); 
                      my $swi={Instances=>{
                                 EventID=>$CurrentEventId,
                                 ExternalSystem=>'W5Base',

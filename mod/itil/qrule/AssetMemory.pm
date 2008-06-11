@@ -1,11 +1,11 @@
-package itil::qrule::SystemCPUcount;
+package itil::qrule::AssetMemory;
 #######################################################################
 =pod
 
 =head3 PURPOSE
 
-Every system needs one CPU at minimum to work. If there is no or 0 cpu-count
-defined on a logical system in CI-Status "installed/active" or "available",
+Every system needs memory to work. If there is no or 0 memory size
+defined on a physical system in CI-Status "installed/active" or "available",
 this will produce an error.
 
 =head3 IMPORTS
@@ -48,18 +48,18 @@ sub new
 
 sub getPosibleTargets
 {
-   return(["itil::system"]);
+   return(["itil::asset"]);
 }
 
 sub qcheckRecord
-{
+{  
    my $self=shift;
    my $dataobj=shift;
    my $rec=shift;
 
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
-   if ($rec->{cpucount}<=0){
-      my $msg='no cpu count defined';
+   if ($rec->{memory}<=0){
+      my $msg='no asset memory defined';
       return(3,{qmsg=>[$msg],dataissue=>[$msg]});
    }
    return(0,undef);

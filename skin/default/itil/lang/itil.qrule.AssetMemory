@@ -1,0 +1,2 @@
+'itil::qrule::AssetMemory'=>{de=>'Prüfung ob bei einem physischen System/Hardware ein sinnvoller Arbeitsspeicher eingetragen ist',en=>'Check if there is memory registered at a logical system'},
+'no asset memory defined'=>{de=>'kein sinnvoller Arbeitsspeicher eingetragen'},

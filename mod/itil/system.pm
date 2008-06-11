@@ -360,6 +360,31 @@ sub new
                 vjoinon       =>['assetid'=>'id'],
                 vjoindisp     =>'hwproducer'),
 
+      new kernel::Field::Number(
+                name          =>'hwcpucount',
+                readonly      =>1,
+                group         =>'physys',
+                label         =>'CPU-Count',
+                translation   =>'itil::asset',
+                dataobjattr   =>'asset.cpucount'),
+
+      new kernel::Field::Number(
+                name          =>'hwcorecount',
+                readonly      =>1,
+                group         =>'physys',
+                label         =>'Core-Count',
+                translation   =>'itil::asset',
+                dataobjattr   =>'asset.corecount'),
+
+      new kernel::Field::Number(
+                name          =>'hwmemory',
+                readonly      =>1,
+                group         =>'physys',
+                label         =>'Memory',
+                translation   =>'itil::asset',
+                unit          =>'MB',
+                dataobjattr   =>'asset.memory'),
+
       new kernel::Field::Text(
                 name          =>'systemhandle',
                 readonly      =>1,

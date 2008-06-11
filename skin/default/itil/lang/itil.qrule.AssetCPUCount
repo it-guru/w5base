@@ -1,0 +1,4 @@
+'itil::qrule::AssetCPUCount'=>{de=>'Prüfung der CPU-Anzahl eines physikalischen Systems',
+                                en=>'check CPU count of a phyisical system'},
+'no cpu count defined'=>{de=>'keine CPU Anzahl definiert'},
+'core count is less then cpu count'=>{de=>'Core-Anzahl ist geringer als die CPU-Anzahl'},

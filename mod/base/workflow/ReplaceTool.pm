@@ -99,6 +99,32 @@ sub getDynamicFields
    my %param=@_;
    my $class;
 
+   if (!defined($self->{dstobjects})){
+      $self->{dstobjects}=[];
+      my %target;
+      foreach my $module (sort(keys(%{$self->{ReplaceTool}}))){
+         my $crec=$self->{ReplaceTool}->{$module}->getControlRecord();
+         while(my $k=shift(@$crec)){
+            my $data=shift(@$crec);
+            my $do=$data->{dataobj};
+            my $dataobj=getModuleObject($self->getParent->Config,$do);
+            if (defined($dataobj)){
+               my $idname=$dataobj->IdField->Name();
+               my $nameobj=$dataobj->getField("fullname");
+               if (!defined($nameobj)){
+                  $nameobj=$dataobj->getField("name");
+               }
+               if (defined($nameobj)){
+                  my $name=$nameobj->Name();
+                  $target{$do}=$name;
+               }
+            }
+         }
+      }
+      @{$self->{dstobjects}}=%target;
+   }
+   printf STDERR ("tagets=%s\n",Dumper($self->{dstobjects}));
+
    return($self->InitFields(
                    new kernel::Field::Select(
                              name               =>'replaceoptype',
@@ -115,9 +141,12 @@ sub getDynamicFields
                              translation        =>'base::workflow::ReplaceTool',
                              label              =>'Replace operation type',
                              container          =>'headref'),
-                   new kernel::Field::Text(
+                   new kernel::Field::MultiDst(
                              name               =>'replacesearch',
-                             readonly           =>1,
+                             selectivetyp       =>'1',
+                             dsttypfield        =>'replaceoptype',
+                             dstidfield         =>'replacesearchid',
+                             dst                =>$self->{dstobjects},
                              translation        =>'base::workflow::ReplaceTool',
                              label              =>'search for',
                              container          =>'headref'),
