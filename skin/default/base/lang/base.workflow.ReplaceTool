@@ -7,8 +7,6 @@
 'Replace operation in the following fields'=>{de=>'Suchen/Ersetzen Operation auf folgende Felder anwenden'},
 'all posible elements'=>{de=>'alle Zielelemente, die möglich sind'},
 'Yes, i am sure to want to start the workflow replacing the matching references.'=>{de=>'Ja, ich bin sicher, dass ich den Workflow zum ersetzen der Referenzen starten will.'},
-'SR::base::user'=>{de=>'Kontakt',en=>'Contact'},
-'SR::base::grp'=>{de=>'Gruppe',en=>'Group'},
 'search for'=>{de=>'Suchen nach'},
 'replace with'=>{de=>'Ersetzen durch'},
 'replace at fields'=>{de=>'Ersetzen in Feldern'},

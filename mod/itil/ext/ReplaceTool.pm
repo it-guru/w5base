@@ -59,6 +59,12 @@ sub getControlRecord
              target       =>'sem',
              idfield      =>'semid'
            },
+           businessteam=>{
+             replaceoptype=>'base::grp',
+             dataobj      =>'itil::appl',
+             target       =>'businessteam',
+             idfield      =>'businessteamid'
+           },
            sem2=>{
              replaceoptype=>'base::user',
              dataobj      =>'itil::appl',
@@ -84,6 +90,7 @@ sub doReplaceOperation
 
    if ($tag ne "usercontacts"){
       my $dataobj=getModuleObject($self->getParent->Config,$data->{dataobj});
+      my $opdataobj=getModuleObject($self->getParent->Config,$data->{dataobj});
       if (defined($dataobj)){
          my $idname=$dataobj->IdField->Name();
          $dataobj->SetFilter({cistatusid=>'<=5',
@@ -91,7 +98,7 @@ sub doReplaceOperation
          $dataobj->SetCurrentView(qw(ALL));
          $dataobj->ForeachFilteredRecord(sub{
                my $rec=$_;
-               $dataobj->ValidatedUpdateRecord($rec,
+               $opdataobj->ValidatedUpdateRecord($rec,
                                      {$data->{target}=>$replace},
                                      {$idname=>\$rec->{$idname}});
                $count++;

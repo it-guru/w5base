@@ -41,12 +41,14 @@ sub getDynamicFields
 
    if (!defined($self->{dstobjects})){
       $self->{dstobjects}=[];
+      $self->{dstnames}={};
       my %target;
       foreach my $module (sort(keys(%{$self->{ReplaceTool}}))){
          my $crec=$self->{ReplaceTool}->{$module}->getControlRecord();
          while(my $k=shift(@$crec)){
             my $data=shift(@$crec);
             my $do=$data->{replaceoptype};
+            $self->{dstnames}->{$do}=$self->getParent->T($do,$do);
             my $dataobj=getModuleObject($self->getParent->Config,$do);
             if (defined($dataobj)){
                my $idname=$dataobj->IdField->Name();
@@ -74,9 +76,11 @@ sub getDynamicFields
                                 return(0) if (!defined($current));
                                 return(1);
                              },
-                             transprefix        =>'SR::',
-                             translation        =>'base::workflow::ReplaceTool',
-                             value              =>['base::user','base::grp'],
+                             getPostibleValues=>sub{
+                                my $self=shift;
+                                my @l=%{$self->getParent->{dstnames}};
+                                return(@l);
+                             },
                              translation        =>'base::workflow::ReplaceTool',
                              label              =>'Replace operation type',
                              container          =>'headref'),
