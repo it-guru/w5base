@@ -481,14 +481,14 @@ sub generateWorkspacePages
                 $self->getParent->T("wfaddnote",$tr).
                 "</option>\n";
       my $note=Query->Param("note");
-      $$divset.="<div id=OPwfaddnote>".$self->getDefaultNoteDiv($WfRec).
+      $$divset.="<div id=OPwfaddnote>".$self->getDefaultNoteDiv($WfRec,$actions).
                 "</div>";
    }
    if (grep(/^wfdefer$/,@$actions)){
       $$selopt.="<option value=\"wfdefer\" class=\"$class\">".
                 $self->getParent->T("wfdefer",$tr).
                 "</option>\n";
-      $$divset.="<div id=OPwfdefer>".$self->getDefaultNoteDiv($WfRec,
+      $$divset.="<div id=OPwfdefer>".$self->getDefaultNoteDiv($WfRec,$actions,
                                                               mode=>"defer").
                 "</div>";
    }
@@ -553,6 +553,7 @@ sub getDefaultNoteDiv
 {
    my $self=shift;
    my $WfRec=shift;
+   my $actions=shift;
    my %param=@_;
    my $mode=$param{mode};
    $mode="addnote" if ($mode eq "");
@@ -561,7 +562,7 @@ sub getDefaultNoteDiv
    my $initiatorid=$WfRec->{initiatorid};
    my $creator=$WfRec->{openuser};
 
-   my $wsheight=$self->getWorkHeight($WfRec);
+   my $wsheight=$self->getWorkHeight($WfRec,$actions);
    $wsheight="200" if ($wsheight=~m/%/);
    $wsheight=~s/px//g;
 

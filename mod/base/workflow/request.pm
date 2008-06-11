@@ -579,14 +579,14 @@ sub generateWorkspacePages
       $$selopt.="<option value=\"wfacceptp\" class=\"$class\">".
                 $self->getParent->T("wfacceptp",$tr).
                 "</option>\n";
-      $$divset.="<div id=OPwfacceptp>".$self->getDefaultNoteDiv($WfRec).
+      $$divset.="<div id=OPwfacceptp>".$self->getDefaultNoteDiv($WfRec,$actions).
                 "</div>";
    }
    if (grep(/^wfacceptn$/,@$actions)){
       $$selopt.="<option value=\"wfacceptn\" class=\"$class\">".
                 $self->getParent->T("wfacceptn",$tr).
                 "</option>\n";
-      $$divset.="<div id=OPwfacceptn>".$self->getDefaultNoteDiv($WfRec).
+      $$divset.="<div id=OPwfacceptn>".$self->getDefaultNoteDiv($WfRec,$actions).
                 "</div>";
    }
    if (grep(/^wfapprove$/,@$actions)){
@@ -616,7 +616,7 @@ sub generateWorkspacePages
                 $self->getParent->T("wffineproc",$tr).
                 "</option>\n";
       my $note=Query->Param("note");
-      $$divset.="<div id=OPwffineproc>".$self->getDefaultNoteDiv($WfRec).
+      $$divset.="<div id=OPwffineproc>".$self->getDefaultNoteDiv($WfRec,$actions).
                 "</div>";
    }
    if (grep(/^wfreprocess$/,@$actions)){

@@ -803,13 +803,6 @@ sub generateWorkspacePages
                 $self->getParent->T("The current workflow isn't forwared ".
                 "to you. At now there is no action nessasary.",$tr)."</div>";
    }
-   if (grep(/^wfaddnote$/,@$actions)){
-      $$selopt.="<option value=\"wfaddnote\" class=\"$class\">".
-                $self->getParent->T("wfaddnote",$tr).
-                "</option>\n";
-      $$divset.="<div id=OPwfaddnote>".$self->getDefaultNoteDiv($WfRec).
-                "</div>";
-   }
    if (grep(/^wffine$/,@$actions)){
       $$selopt.="<option value=\"wffine\" class=\"$class\">".
                 $self->getParent->T("wffine",$tr).
@@ -821,14 +814,14 @@ sub generateWorkspacePages
       $$selopt.="<option value=\"wfdifine\" class=\"$class\">".
                 $self->getParent->T("wfdifine",$tr).
                 "</option>\n";
-      $$divset.="<div id=OPwfdifine>".$self->getDefaultNoteDiv($WfRec).
+      $$divset.="<div id=OPwfdifine>".$self->getDefaultNoteDiv($WfRec,$actions).
                 "</div>";
    }
    if (grep(/^wfdireproc$/,@$actions)){
       $$selopt.="<option value=\"wfdireproc\" class=\"$class\">".
                 $self->getParent->T("wfdireproc",$tr).
                 "</option>\n";
-      $$divset.="<div id=OPwfdireproc>".$self->getDefaultNoteDiv($WfRec).
+      $$divset.="<div id=OPwfdireproc>".$self->getDefaultNoteDiv($WfRec,$actions).
                 "</div>";
    }
    return($self->SUPER::generateWorkspacePages($WfRec,$actions,

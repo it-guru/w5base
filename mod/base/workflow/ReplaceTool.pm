@@ -943,7 +943,7 @@ sub generateWorkspacePages
                 $self->getParent->T("wfrejectop",$tr).
                 "</option>\n";
       my $note=Query->Param("note");
-      $$divset.="<div id=OPwfrejectop>".$self->getDefaultNoteDiv($WfRec,
+      $$divset.="<div id=OPwfrejectop>".$self->getDefaultNoteDiv($WfRec,$actions,
                                         mode=>'reject').
                 "</div>";
    }
