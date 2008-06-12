@@ -116,7 +116,7 @@ sub processRecord
       my $name=$rec->{name};
       if ($rec->{cistatusid}==4){
          $self->getParent->storeStatVar("Group",[$rec->{guardianteam}],{},
-                                        "ITIL.System.Count",1);
+                                        "ITIL.Asset.Count",1);
       }
    }
    if ($module eq "base::workflow::active"){
