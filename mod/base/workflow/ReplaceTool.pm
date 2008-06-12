@@ -300,8 +300,8 @@ sub IsModuleSelectable
    my $self=shift;
    my $acl;
 
-   return(1);
-   return(1) if ($self->getParent->IsMemberOf("admin"));
+   return(1) if ($self->getParent->IsMemberOf("DTAG.TSI.ES.ITO.CSS.T-Com.PMAQ",
+                                              "RMember","up"));
    return(0);
 }
 
