@@ -112,7 +112,7 @@ sub ProcessHead
    }
    my @l=grep(!/^\s*$/,sort(keys(%l)));
    
-   if (grep(!/^\S+\@\S+$/,@l)){
+   if (grep(/^\S+\@\S+\.\S+$/,@l)){   # output seems to be an email list
       $d.=join("; ",@l);
    }
    elsif (grep(!/\s/,@l)){

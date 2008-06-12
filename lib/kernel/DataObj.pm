@@ -77,6 +77,8 @@ sub ResetFilter
    $self->Limit(0);
    $self->{FilterSet}={};
    $self->{FilterSet}->{BASE}=$base if (defined($base)); # restore BASE filter
+   delete($self->Context->{'CurrentOrder'}); # if there is a new view set,
+                                             # the last order must be deleted
 }
 
 sub SecureSetFilter
@@ -1559,8 +1561,6 @@ sub SetCurrentView
    else{
       $self->Context->{'CurrentView'}=[@_];
    }
-   delete($self->Context->{'CurrentOrder'}); # if there is a new view set,
-                                             # the last order must be deleted
    return(@{$self->Context->{'CurrentView'}});
 }
 

@@ -324,11 +324,12 @@ sub getNews
    my $to=$self->getPersistentModuleObject("faq::forumtopic");
    if (defined($to)){
       $to->SecureSetFilter();
-      $to->SetCurrentOrder(qw(cdate));
       $to->Limit(50);
       $d.="<table width=100% border=0 cellspacing=0>";
       my $newsline=1;
       my $newscount=0;
+      $to->SetCurrentOrder(qw(cdate));
+printf STDERR ("filter set\n");
       foreach my $rec ($to->getHashList(qw(name cdate entrycount mdate
                                            topicicon))){
          my $name=$rec->{name};
