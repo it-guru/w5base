@@ -72,6 +72,7 @@ sub new
       new kernel::Field::Container(
                 name          =>'stats',
                 group         =>'stats',
+                desccolwidth  =>'200',
                 uivisible     =>1,
                 selectfix     =>1,
                 label         =>'Statistic Data',

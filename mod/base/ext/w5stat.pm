@@ -58,7 +58,7 @@ sub processData
                    {eventstart=>">=$month/$year AND <$month/$year+1M"},
                    {eventstart=>"<$month/$year",eventend=>">$month/$year+1M"}]);
    $wf->SetCurrentView(qw(ALL));
-   $wf->SetCurrentOrder("eventstart");
+   $wf->SetCurrentOrder("NONE");
    my $c=0;
 
    my ($rec,$msg)=$wf->getFirst();
@@ -74,7 +74,7 @@ sub processData
    $wf->ResetFilter();
    $wf->SetFilter([{stateid=>"<20",fwdtarget=>'![EMPTY]'}]);
    $wf->SetCurrentView(qw(ALL));
-   $wf->SetCurrentOrder("eventstart");
+   $wf->SetCurrentOrder("NONE");
    my $c=0;
 
    my ($rec,$msg)=$wf->getFirst();

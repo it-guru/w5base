@@ -45,7 +45,11 @@ sub FormatedDetail
          my $r="<table border=1 width=100%>"; 
          foreach my $k (sort(keys(%{$d}))){
             $r.="<tr>"; 
-            $r.="<td width=1% valign=top>$k</td>"; 
+            my $descwidth="width=1%";
+            if (defined($self->{desccolwidth})){
+               $descwidth="width=$self->{desccolwidth}"; 
+            }
+            $r.="<td $descwidth valign=top>$k</td>"; 
             my $dd=join(", ",@{$d->{$k}});
             $dd="&nbsp;" if ($dd=~m/^\s*$/);
             #$dd=~s/\n/<br>\n/g;

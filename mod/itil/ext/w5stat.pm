@@ -43,11 +43,31 @@ sub processData
 
    my $appl=getModuleObject($self->getParent->Config,"itil::appl");
    $appl->SetCurrentView(qw(ALL));
-   $appl->SetFilter({cistatusid=>\'4'});
+   $appl->SetFilter({cistatusid=>'<=4'});
    my ($rec,$msg)=$appl->getFirst();
    if (defined($rec)){
       do{
          $self->getParent->processRecord('itil::appl',$monthstamp,$rec);
+         ($rec,$msg)=$appl->getNext();
+      } until(!defined($rec));
+   }
+   my $appl=getModuleObject($self->getParent->Config,"itil::system");
+   $appl->SetCurrentView(qw(ALL));
+   $appl->SetFilter({cistatusid=>'<=4'});
+   my ($rec,$msg)=$appl->getFirst();
+   if (defined($rec)){
+      do{
+         $self->getParent->processRecord('itil::system',$monthstamp,$rec);
+         ($rec,$msg)=$appl->getNext();
+      } until(!defined($rec));
+   }
+   my $appl=getModuleObject($self->getParent->Config,"itil::asset");
+   $appl->SetCurrentView(qw(ALL));
+   $appl->SetFilter({cistatusid=>'<=4'});
+   my ($rec,$msg)=$appl->getFirst();
+   if (defined($rec)){
+      do{
+         $self->getParent->processRecord('itil::asset',$monthstamp,$rec);
          ($rec,$msg)=$appl->getNext();
       } until(!defined($rec));
    }
@@ -64,9 +84,25 @@ sub processRecord
 
    if ($module eq "itil::appl"){
       my $name=$rec->{name};
-      $self->getParent->storeStatVar("Group",[$rec->{businessteam},
-                                              $rec->{responseteam}],{},
-                                     "ITIL.Application.Count",1);
+      if ($rec->{cistatusid}==4){
+         $self->getParent->storeStatVar("Group",[$rec->{businessteam},
+                                                 $rec->{responseteam}],{},
+                                        "ITIL.Application.Count",1);
+      }
+   }
+   if ($module eq "itil::system"){
+      my $name=$rec->{name};
+      if ($rec->{cistatusid}==4){
+         $self->getParent->storeStatVar("Group",[$rec->{admteam}],{},
+                                        "ITIL.System.Count",1);
+      }
+   }
+   if ($module eq "itil::asset"){
+      my $name=$rec->{name};
+      if ($rec->{cistatusid}==4){
+         $self->getParent->storeStatVar("Group",[$rec->{guardianteam}],{},
+                                        "ITIL.System.Count",1);
+      }
    }
    if ($module eq "base::workflow::active"){
       my $countvar;
