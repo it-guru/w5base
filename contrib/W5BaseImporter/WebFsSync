@@ -737,7 +737,7 @@ sub directoryLoop
                $fullname=~s/\//\\/g;
                &{$stepit}($mywin,"WARN: can't open directory '$ldir\\$fullname'");
             }else{
-               msg(WARN,"can't open directory '$ldir/$fullname'");
+               msg(WARN,"can't open directory '$ldir/$fullname'") if (!$nowarn);
             }
             return(0);
          }
@@ -812,6 +812,7 @@ sub directoryLoop
          }
       # delete remote files/folder
       }elsif($operations->{OP} eq "delete" && $mode eq "upload"){
+         my $state="INFO";
          if ($force){
             $o{'filemgmt'}->SetFilter({fid=>[$operations->{DATA}->{fid}]});
             my @entrytyp=$o{'filemgmt'}->getHashList(qw(name entrytyp));
@@ -819,7 +820,11 @@ sub directoryLoop
             return(1,$res[0]) if (defined($res[0]));
             # delete directory
             if ($entrytyp[0]->{entrytyp} eq "dir"){
-               reverseDelete($operations->{DATA}->{fid},$stepit,$mywin);
+               @result=reverseDelete($operations->{DATA}->{fid},$stepit,$mywin);
+               if ($result[0] != 0){
+                  $operations->{MSG}="$result[1] ".$operations->{DATA}->{fullname};
+                  $state="WARN";
+               }
             # delete file
             }else{
                $o{'filemgmt'}->deleteRecord($operations->{DATA}->{fid});
@@ -830,9 +835,12 @@ sub directoryLoop
          $action=1;
          if ($stepit){
             $operations->{MSG}=~s/\//\\/g;
-            &{$stepit}($mywin,"INFO: ".$operations->{MSG}." ...done");
+            &{$stepit}($mywin,"$state\: ".$operations->{MSG}." ...done");
          }else{
-            msg(INFO,$operations->{MSG});
+            if ($state eq "WARN" && $nowarn){
+            }else{
+               msg($state,$operations->{MSG});
+            }
          }
       }
    }
@@ -1204,7 +1212,7 @@ sub processOperations
             $rec->{MSG}=~s/\//\\/g;
             &{$stepit}($mywin,"WARN: ".$rec->{MSG});
          }else{
-            msg(WARN,$rec->{MSG});
+            msg(WARN,$rec->{MSG}) if (!$nowarn);
          }
 
       }
