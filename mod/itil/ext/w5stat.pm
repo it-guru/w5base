@@ -39,38 +39,53 @@ sub processData
    my $monthstamp=shift;
    my $currentmonth=shift;
    my ($year,$month)=$monthstamp=~m/^(\d{4})(\d{2})$/;
+   my $count;
 
 
    my $appl=getModuleObject($self->getParent->Config,"itil::appl");
    $appl->SetCurrentView(qw(ALL));
    $appl->SetFilter({cistatusid=>'<=4'});
+   $appl->SetCurrentOrder("NONE");
+   msg(INFO,"starting collect of itil::appl");$count=0;
    my ($rec,$msg)=$appl->getFirst();
    if (defined($rec)){
       do{
          $self->getParent->processRecord('itil::appl',$monthstamp,$rec);
          ($rec,$msg)=$appl->getNext();
+         $count++;
       } until(!defined($rec));
    }
-   my $appl=getModuleObject($self->getParent->Config,"itil::system");
-   $appl->SetCurrentView(qw(ALL));
-   $appl->SetFilter({cistatusid=>'<=4'});
-   my ($rec,$msg)=$appl->getFirst();
+   msg(INFO,"FINE of itil::appl  $count records");
+
+   my $system=getModuleObject($self->getParent->Config,"itil::system");
+   $system->SetCurrentView(qw(ALL));
+   $system->SetFilter({cistatusid=>'<=4'});
+   $system->SetCurrentOrder("NONE");
+   msg(INFO,"starting collect of itil::system");$count=0;
+   my ($rec,$msg)=$system->getFirst();
    if (defined($rec)){
       do{
          $self->getParent->processRecord('itil::system',$monthstamp,$rec);
-         ($rec,$msg)=$appl->getNext();
+         $count++;
+         ($rec,$msg)=$system->getNext();
       } until(!defined($rec));
    }
-   my $appl=getModuleObject($self->getParent->Config,"itil::asset");
-   $appl->SetCurrentView(qw(ALL));
-   $appl->SetFilter({cistatusid=>'<=4'});
-   my ($rec,$msg)=$appl->getFirst();
+   msg(INFO,"FINE of itil::system  $count records");
+
+   my $asset=getModuleObject($self->getParent->Config,"itil::asset");
+   $asset->SetCurrentView(qw(ALL));
+   $asset->SetFilter({cistatusid=>'<=4'});
+   $asset->SetCurrentOrder("NONE");
+   msg(INFO,"starting collect of itil::asset");$count=0;
+   my ($rec,$msg)=$asset->getFirst();
    if (defined($rec)){
       do{
          $self->getParent->processRecord('itil::asset',$monthstamp,$rec);
-         ($rec,$msg)=$appl->getNext();
+         $count++;
+         ($rec,$msg)=$asset->getNext();
       } until(!defined($rec));
    }
+   msg(INFO,"FINE of itil::asset  $count records");
 }
 
 

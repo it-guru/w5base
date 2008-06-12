@@ -170,6 +170,20 @@ sub recreateStats
 
 
    $self->{stats}={};
+   msg(INFO,"processData handler Status:");
+   msg(INFO,"===========================");
+   foreach my $obj (values(%{$self->{$mode}})){
+      if ($obj->can("processData")){
+         msg(INFO,"found processData handler in %s",$obj->Self);
+      }
+   }
+   msg(INFO,"processRecord handler Status:");
+   msg(INFO,"=============================");
+   foreach my $obj (values(%{$self->{$mode}})){
+      if ($obj->can("processRecord")){
+         msg(INFO,"found processRecord handler in %s",$obj->Self);
+      }
+   }
    foreach my $obj (values(%{$self->{$mode}})){
       if ($obj->can("processData")){
          $obj->processData($monthstamp,$currentmonth);
