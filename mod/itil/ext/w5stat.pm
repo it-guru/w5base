@@ -58,8 +58,8 @@ sub processData
    msg(INFO,"FINE of itil::appl  $count records");
 
    my $system=getModuleObject($self->getParent->Config,"itil::system");
-   $system->SetCurrentView(qw(ALL));
    $system->SetFilter({cistatusid=>'<=4'});
+   $system->SetCurrentView(qw(ALL));
    $system->SetCurrentOrder("NONE");
    msg(INFO,"starting collect of itil::system");$count=0;
    my ($rec,$msg)=$system->getFirst();
@@ -73,8 +73,8 @@ sub processData
    msg(INFO,"FINE of itil::system  $count records");
 
    my $asset=getModuleObject($self->getParent->Config,"itil::asset");
-   $asset->SetCurrentView(qw(ALL));
    $asset->SetFilter({cistatusid=>'<=4'});
+   $asset->SetCurrentView(qw(ALL));
    $asset->SetCurrentOrder("NONE");
    msg(INFO,"starting collect of itil::asset");$count=0;
    my ($rec,$msg)=$asset->getFirst();
@@ -106,14 +106,12 @@ sub processRecord
       }
    }
    if ($module eq "itil::system"){
-      my $name=$rec->{name};
       if ($rec->{cistatusid}==4){
-         $self->getParent->storeStatVar("Group",[$rec->{admteam}],{},
+         $self->getParent->storeStatVar("Group",[$rec->{adminteam}],{},
                                         "ITIL.System.Count",1);
       }
    }
    if ($module eq "itil::asset"){
-      my $name=$rec->{name};
       if ($rec->{cistatusid}==4){
          $self->getParent->storeStatVar("Group",[$rec->{guardianteam}],{},
                                         "ITIL.Asset.Count",1);
