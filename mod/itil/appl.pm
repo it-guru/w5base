@@ -1002,7 +1002,8 @@ sub FinishDelete
                          $refobj->ValidatedDeleteRecord($_);
                       });
    }
-   $self->NotifyAddOrRemoveObject($oldrec,undef,"STEVapplchanged");
+   $self->NotifyAddOrRemoveObject($oldrec,undef,"name",
+                                  "STEVapplchanged",100000003);
    return($bak);
 }
 

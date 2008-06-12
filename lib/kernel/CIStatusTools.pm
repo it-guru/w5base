@@ -444,8 +444,27 @@ sub NotifyAddOrRemoveObject
       my $emailto={};
       $ia->LoadTargets($emailto,'base::staticinfoabo',\$infoaboname,
                                  $infoaboid,undef);
-      @emailto=keys(%$emailto);
 
+      if ($op eq "delete" || $op eq "deactivate"){
+         my $databossobj=$self->getField("databossid");
+         if (defined($databossobj)){
+            my $databossid=effVal($oldrec,$newrec,"databossid");
+            my $userid=$self->getCurrentUserId();
+            if ($databossid!=$userid && $databossid ne ""){
+               my $user=getModuleObject($self->Config,"base::user");
+               $user->SetFilter({userid=>\$databossid});
+               my ($urec,$msg)=$user->getOnlyFirst(qw(email));
+               if (defined($urec) && $urec->{email} ne ""){
+                  $emailto->{$urec->{email}}=1;         
+               }
+            }
+         }
+      }
+
+
+
+
+      @emailto=keys(%$emailto);
       if ($#emailto!=-1){
          my %notiy;
          $notiy{name}=$subject;
