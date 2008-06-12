@@ -76,6 +76,12 @@ sub getControlRecord
              dataobj      =>'itil::appl',
              target       =>'contacts',
            },
+           lnkapplappl=>{
+             replaceoptype=>'itil::appl',
+             dataobj      =>'itil::lnkapplappl',
+             target       =>'toappl',
+             idfield      =>'toapplid'
+           },
          ];
    return($d);
 }
@@ -93,13 +99,17 @@ sub doReplaceOperation
       my $opdataobj=getModuleObject($self->getParent->Config,$data->{dataobj});
       if (defined($dataobj)){
          my $idname=$dataobj->IdField->Name();
-         $dataobj->SetFilter({cistatusid=>'<=5',
-                              $data->{idfield}=>\$searchid});
+         my %flt=($data->{idfield}=>\$searchid);
+         my $cistatusobj=$dataobj->getField("cistatusid");
+         if (defined($cistatusobj)){
+            $flt{cistatusid}='<=5';
+         }
+         $dataobj->SetFilter(\%flt);
          $dataobj->SetCurrentView(qw(ALL));
          my ($rec,$msg)=$dataobj->getFirst();
          if (defined($rec)){
             do{
-               $dataobj->ValidatedUpdateRecord($rec,
+               $opdataobj->ValidatedUpdateRecord($rec,
                                      {$data->{target}=>$replace},
                                      {$idname=>\$rec->{$idname}});
                $count++;

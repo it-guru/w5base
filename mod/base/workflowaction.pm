@@ -368,6 +368,10 @@ sub NotifyForward
    msg(INFO,"forward    from: %s",$from);
    msg(INFO,"forward      to: %s",join(", ",@to));
    msg(INFO,"forward comment: %s",$comments);
+   if ($#to==-1){
+      msg(ERROR,"no mail send, because there is no target found");
+      return;
+   }
    my $workflowname="$wfheadid";
    if (defined($param{workflowname})){
       $workflowname="'".$param{workflowname}." ID:".$wfheadid."'";

@@ -945,7 +945,6 @@ sub Process
                                        fwdtargetid=>$openuserid,
                                       });
             $self->PostProcess($action.".".$op,$WfRec,$actions,
-                               "done by $ENV{REMOTE_USER}",
                                fwdtarget=>'base::user',
                                fwdtargetid=>$openuserid,
                                fwdtargetname=>$openusername);
