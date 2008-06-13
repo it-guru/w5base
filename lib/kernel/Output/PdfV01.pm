@@ -194,12 +194,14 @@ sub Init
 sub Finish
 {
    my $self=shift;
+   my $fh=shift;
+
    $self->{filename}="/tmp/tmp.$$.pdf";
    $self->{dtp}->GetDocument($self->{filename});
    if (open(F,"<$self->{filename}")){
       my $buf;
       while(sysread(F,$buf,8192)){
-         print STDOUT $buf;
+         syswrite($$fh,$buf);
       }
       close(F);
   }
