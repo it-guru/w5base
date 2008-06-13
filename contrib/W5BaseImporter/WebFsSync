@@ -381,7 +381,7 @@ sub doStart
    }
    my @vol=main::volume();
    $mainwin->output->Append("\r\ntransfervolume\t$vol[0] $vol[1]\r"); 
-   $mainwin->output->Append("\r\naltered files\t".${$mainwin->{files}}."\r"); 
+   $mainwin->output->Append("\r\nfiles\t\t".${$mainwin->{files}}."\r"); 
    $mainwin->output->Append("\r\nwarnings\t\t".${$mainwin->{warncount}}."\r\n"); 
    # reset counts
    ${$mainwin->{files}}=0;
@@ -697,7 +697,7 @@ if ($os eq "MSWin32" && !$nogui){
    }
    my @vol=volume();
    msg(INFO,"transfervolume $vol[0] $vol[1]");
-   msg(INFO,"altered files  $files");
+   msg(INFO,"files          $files");
    msg(INFO,"warnings       $warnings");
    msg(INFO,"nothing to do!") if (action() == 0);
 }
