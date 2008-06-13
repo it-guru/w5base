@@ -35,6 +35,8 @@ sub new
    my $apidebug=$param{-apidebug};
    my $mode=$param{-mode};
    my $params=$param{-params};
+   my $warncount=$param{-warnings};
+   my $files=$param{-files};
    my $version=$param{-version};
    my $fullstoredfilename=$param{-fullstoredfilename};
    my $icon = eval("newIcon Win32::GUI::BitmapInline(main::WindowIcon());");
@@ -71,6 +73,8 @@ sub new
    $self->{VERSION}=$version;
    $self->{o}=$o;
    $self->{ICON}=$icon;
+   $self->{warncount}=$warncount;
+   $self->{files}=$files;
    $self->AddNotifyIcon(-name => "systray",
                         -icon => $self->{ICON},
                         -tip  => "W5Base Synchronizer",
@@ -376,7 +380,12 @@ sub doStart
        return(0);
    }
    my @vol=main::volume();
-   $mainwin->output->Append("\r\ntransfervolume $vol[0] $vol[1]\r\n"); 
+   $mainwin->output->Append("\r\ntransfervolume\t$vol[0] $vol[1]\r"); 
+   $mainwin->output->Append("\r\naltered files\t".${$mainwin->{files}}."\r"); 
+   $mainwin->output->Append("\r\nwarnings\t\t".${$mainwin->{warncount}}."\r\n"); 
+   # reset counts
+   ${$mainwin->{files}}=0;
+   ${$mainwin->{warncount}}=0;
    if (main::action() == 0){
       $mainwin->output->Append("\r\nnothing to do!\r\n");
    }
@@ -572,6 +581,8 @@ my $os=$Config{'osname'};
 my $action=0;
 my $volume=0;
 my $count=0;
+my $warnings=0;
+my $files=0;
 my $version="Version 0.1 build$Revision$empty ";
 my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
        "webuser=s"=>\$loginuser,"webpass=s"=> \$loginpass,
@@ -617,6 +628,8 @@ if ($os eq "MSWin32" && !$nogui){
          $GUI=new MyWin(-title=>"W5Base Importer", 
                         o=>\%o,
                         -mode=>$mode,
+                        -files=>\$files,
+                        -warnings=>\$warnings,
                         -version=>$version,
                         -rdir=>$rdir,
                         -ldir=>$ldir,
@@ -684,6 +697,8 @@ if ($os eq "MSWin32" && !$nogui){
    }
    my @vol=volume();
    msg(INFO,"transfervolume $vol[0] $vol[1]");
+   msg(INFO,"altered files  $files");
+   msg(INFO,"warnings       $warnings");
    msg(INFO,"nothing to do!") if (action() == 0);
 }
 
@@ -739,6 +754,7 @@ sub directoryLoop
             }else{
                msg(WARN,"can't open directory '$ldir/$fullname'") if (!$nowarn);
             }
+            $warnings++;
             return(0);
          }
          close(D);
@@ -824,6 +840,7 @@ sub directoryLoop
                if ($result[0] != 0){
                   $operations->{MSG}="$result[1] ".$operations->{DATA}->{fullname};
                   $state="WARN";
+                  $warnings++;
                }
             # delete file
             }else{
@@ -1135,6 +1152,7 @@ sub processOperations
             $size= -s "$ldir/$rec->{DATA}->{fullname}";        
          }
          $volume=$volume+$size;
+         $files++;
          if ($size > 1024){
             $size=sprintf("%.2f",$size/1024);
             $t="kbyte";
@@ -1208,13 +1226,13 @@ sub processOperations
             &{$stepit}($mywin,"  ...done");
          }
       }elsif($rec->{OP} eq "info"){
+         $warnings++;
          if ($stepit){
             $rec->{MSG}=~s/\//\\/g;
             &{$stepit}($mywin,"WARN: ".$rec->{MSG});
          }else{
             msg(WARN,$rec->{MSG}) if (!$nowarn);
          }
-
       }
    }
    return(0);
