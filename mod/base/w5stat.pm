@@ -266,16 +266,19 @@ sub storeStatVar
    my @key=($key);
    @key=@$key if (ref($key) eq "ARRAY");
    my %key=();
-   foreach my $k (@key){
-     $key{$k}=1;
+   foreach my $k (@key){  # make all keys unique
+     if ($k ne ""){
+        $key{$k}=1;
+     }
    }
    @key=keys(%key);
 
+   %isAlreadyCounted=(); 
    foreach my $key (@key){
       my $level=0;
       if ($var ne ""){
          while(1){
-            if ($key ne ""){
+            if ($key ne "" && !defined($isAlreadyCounted{$key})){
                if (defined($keyid)){
                   $self->{stats}->{$group}->{$key}->{keyid}=$keyid;
                }
@@ -316,6 +319,7 @@ sub storeStatVar
                      }
                   }
                }
+               $isAlreadyCounted{$key}++;
             }
             if ((!$param->{nosplit}) && $key=~m/\.[^\.]+$/){
                $key=~s/\.[^\.]+$//;
