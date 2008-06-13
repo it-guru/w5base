@@ -1,0 +1,8 @@
+﻿&title=Danish chars,{color: #736AFF; font-size: 25;}&
+&x_legend=æ ø å Æ Ø Å,20,0x736AFF&
+&y_legend=æ ø å Æ Ø Å,15,0x736AFF&
+&y_ticks=5,10,5&
+&line=3,#87421F&
+&values=197.5,200,200.5,201.5,207.5&
+&y_min=197&
+&y_max=208&

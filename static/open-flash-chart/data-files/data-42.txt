@@ -1,0 +1,14 @@
+&y_legend=Time of day,#736AFF,12&
+&y_ticks=5,10,6&
+&line_dot=3,0x736AFF,Test real numbers,10,3&
+
+&values=2.84,2.973,2.979,2.859,2.861,2.782,2.755,2.735,2.788,2.864,3.037,3.127,3.07&
+&x_labels=2.84,2.973,2.979,2.859,2.861,2.782,2.755,2.735,2.788,2.864,3.037,3.127,3.07&
+
+&y_min=2&
+&y_max=4&
+
+&bg_colour=0xDFFFDF&
+&x_label_style=13,0x9933CC,0,6&
+
+&y_label_style=none&

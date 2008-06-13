@@ -1,0 +1,14 @@
+&title=Pie chart - some values are 0,{font-size:30px; color:#000000}&
+
+
+&pie=60,#9933CC,{display: n-one; font-size:16px; color: #ff0000;},false,3&
+&values=0,2,0,2,6&
+
+&X colours=#d01f3c,#356aa0,#C79810,#73880A,#D15600,#6BBA70&
+&colours=#d01f3c,#356aa0,#C79810&
+
+&links=javascript:alert('9'),javascript:alert('6'),javascript:alert('7'),javascript:alert('9'),javascript:alert('5'),javascript:alert('7'),javascript:alert('6'),javascript:alert('9'),javascript:alert('9')&
+
+&pie_labels=zero,two,zero,two (2),six&
+
+&tool_tip=Value: #val#%25&

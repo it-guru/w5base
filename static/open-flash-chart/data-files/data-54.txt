@@ -1,0 +1,21 @@
+&title=Many data lines,{font-size: 30px;}&
+&y_legend=Open Flash Chart,12,0x736AFF&
+&y_ticks=5,10,4&
+
+&line=2,0x9933CC,Page views,10&
+&line_dot_2=3,0xCC3399,Downloads,10,5&
+&line_hollow_3=2,0x80a033,Bounces,10,6&
+
+&values=15,18,19,14,17,18,15,18,17&
+&values_2=12,8,11,13,10,12,9,10,8&
+&values_3=5,5,5,4,1,6,1,5,1&
+
+&tool_tips_set=1,2,3,4,5,6,7,8,9&
+&tool_tips_set_2=a,b,c,d,e,f,g,h,i&
+&tool_tips_set_3=j,k,l,m,n,o,p,q,r#comma#ppp&
+
+&x_labels=aa,bb,cc,dd,ee,ff,gg,ii&
+&y_min=0&
+&y_max=20&
+
+&tool_tip=#x_label#<br>#key#: £#val#.00<br>#val:time#<br>Set :#tip#&

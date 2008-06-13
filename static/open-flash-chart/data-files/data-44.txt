@@ -1,0 +1,15 @@
+&title=Test y_min = 1.5,{font-size:12px; color: #800000}&
+&y_legend=Ebit!,12,#736AFF&
+&y_ticks=10,2,5&
+
+&area_hollow=1,5,50,#ADFF2F,0.75,12,#ADFF2F&
+&area_hollow_2=1,5,50,#FF0000,0.5,12,#FF0000&
+
+
+&values=2,4.09,3.89,3.89,3.80,3.99,4.09,4.18,4.18,4.18,4.18,4.18&
+&values_2=1.5,3.87,3.69,3.69,3.6,3.78,3.87,3.96,3.96,3.96,3.96,3.96&
+
+
+&x_labels=Jan,Feb,Mar,Apr,Mai,Jun,Jul,Aug,Sep,Out,Nov,Dez&
+&y_min=1.5&
+&y_max=6.5&

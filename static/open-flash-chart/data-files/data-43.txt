@@ -1,0 +1,21 @@
+
+&scatter=3,#736AFF,Avg. wave height (cm),10,3&
+
+&_values=[1120773600000,0,10],[1152309600000,0,10]&
+&values=[31,0,10],[35,0,10]&
+
+&x_labels=1,2,3,4,5&
+
+&y_min=-5&
+&y_max=5&
+
+&_x_min=1120773600000&
+&_x_max=1152309600000&
+
+&x_min=30&
+&x_max=35&
+
+
+&tool_tip=x:#x_label#<br>y:#val#&
+
+&x_offset=false&

@@ -41,7 +41,6 @@ sub new
 
       new kernel::Field::Id(
                 name          =>'id',
-                uivisible     =>0,
                 sqlorder      =>'desc',
                 label         =>'W5BaseID',
                 dataobjattr   =>'w5stat.id'),
@@ -285,6 +284,12 @@ sub storeStatVar
                if (lc($method) eq "count"){
                   $self->{stats}->{$group}->{$key}->{$var}+=$val[0];
                }
+               if (lc($method) eq "concat"){
+                  if ($self->{stats}->{$group}->{$key}->{$var} ne ""){
+                     $self->{stats}->{$group}->{$key}->{$var}.=", ";
+                  }
+                  $self->{stats}->{$group}->{$key}->{$var}.=$val[0];
+               }
                elsif (lc($method) eq "tspan.union"){
 
                   if ((my ($Y1,$M1,$D1,$h1,$m1,$s1)=$val[0]=~
@@ -333,6 +338,156 @@ sub storeStatVar
       }
    }
 }
+
+sub getValidWebFunctions
+{
+   my $self=shift;
+   return("Presenter","ShowEntry",
+          $self->SUPER::getValidWebFunctions());
+}
+
+
+sub ShowEntry
+{
+   my $self=shift;
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css'],
+                           js=>['toolbox.js','subModal.js'],
+                           body=>1,form=>1,
+                           title=>"W5Base Statistik Presenter");
+   print(<<EOF);
+<div style="margin:10px;padding:15px;width:600px;background:#ffffff;
+            border-color:black;border-style:solid;border-width:1px;">
+<div>
+Quality Report 06/2008
+</div>
+<script type="text/javascript" src="../../../static/open-flash-chart/js/swfobject.js"></script>
+
+<center>
+<div id="my_chart" style="padding: 0px; margin:10px; border: 1px solid #30579f; width: 540px; height: 300px;""></div>
+</center>
+<div>
+Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
+fehlen darf, da sonst wieder niemand durchblickt.
+Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
+fehlen darf, da sonst wieder niemand durchblickt.
+Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
+fehlen darf, da sonst wieder niemand durchblickt.
+</div>
+
+<script type="text/javascript">
+var so = new SWFObject("../../../static/open-flash-chart/actionscript/open-flash-chart.swf", 
+                       "ofc", "540", "300", "9", "#FFFFFF");
+
+so.addVariable("variables","true");
+so.addVariable("title","offene DataIssue Workflows,{font-size: 18;}");
+so.addVariable("bg_colour","#f4f4f4");
+so.addVariable("y_label_size","15");
+so.addVariable("y_ticks","5,10,4");
+so.addVariable("line","3,0xff0000");
+so.addVariable("values","9,6,7,9,5,7,6,9,9");
+so.addVariable("x_labels","Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Okt,Nov,Dez");
+so.addVariable("x_axis_steps","2");
+
+
+so.addParam("allowScriptAccess", "always" );//"sameDomain");
+//so.addParam("onmouseout", "onrollout2();" );
+so.write("my_chart");
+</script>
+</div>
+
+EOF
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+
+sub LoadStatSet
+{
+   my $self=shift;
+   my $id=shift;
+
+   $self->ResetFilter();
+   $self->SecureSetFilter({id=>\$id});
+   my ($primrec,$msg)=$self->getOnlyFirst(qw(ALL));
+   if (defined($primrec)){
+      $self->ResetFilter();
+      $self->SecureSetFilter({fullname=>\$primrec->{fullname},
+                              sgroup=>\$primrec->{sgroup}});
+      my $hist=[$self->getHashList(qw(ALL))];
+      return($primrec,$hist);
+
+   }
+   return($primrec,[]);
+}
+
+
+sub Presenter
+{
+   my $self=shift;
+   my ($func,$p)=$self->extractFunctionPath();
+   my $rootpath=Query->Param("RootPath");
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css'],
+                           js=>['toolbox.js','subModal.js'],
+                           body=>1,form=>1,
+                           prefix=>$rootpath,
+                           title=>"W5Base Statistik Presenter");
+   print("<style>body{overflow:hidden}</style>");
+   print("<table width=100% height=100% border=0>");
+
+   printf("<tr height=1%><td>");
+   print $self->getAppTitleBar(prefix=>$rootpath,
+                               title=>'W5Base Statistik Presenter');
+   printf("</td></tr>");
+
+
+   my $requestid=$p;
+   $p=~s/[^\d]//g;
+
+   my ($primrec,$hist)=$self->LoadStatSet($p);
+
+
+   if (!defined($primrec)){
+      print "Requested Record not found";
+      print $self->HtmlBottom(body=>1,form=>1);
+      return();
+   }
+
+
+
+   printf("<tr height=1%><td>");
+   print("<table width=100%><tr>\n");
+   printf("<td width=1%><select><option>DTAG.TSI.ES.ITO.CSS.T-Com.PMAQ.QSO</option></select></td>");
+   for(my $c=0;$c<=14;$c++){
+      printf("<td align=center>%02d<br>%4d</td>",$c,2008);
+   }
+   print("</tr></table>\n");
+   printf("</td></tr>");
+
+
+   printf("<tr><td valign=top>");
+
+   print("<table width=100% height=100% border=0 cellspacing=0 cellpadding=0>");
+   printf("<tr>");
+   printf("<td width=150 valign=top>");
+   printf("<div align=right>drucken &nbsp;</div><br>");
+   printf("<br>");
+   printf("Overview<br>");
+   printf("DataIssues<br>");
+   printf("Anwendungen<br>");
+   printf("Systeme<br>");
+   printf("Assets<br>");
+   printf("<br>");
+   printf("All<br>");
+   printf("</td>");
+   print("<td valign=top style=\"padding-right:5px\"><iframe width=100% height=100% src=\"../ShowEntry\"></iframe></td>");
+   print ("</tr></table>");
+   print ("</td></tr>");
+   print ("</table>");
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+
 
 
 

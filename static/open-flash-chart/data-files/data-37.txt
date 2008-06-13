@@ -1,0 +1,38 @@
+&title=Boo#comma# woo,{font-size:20px; color: #FFFFFF; margin: 5px; background-color: #505050; padding:5px; padding-left: 20px; padding-right: 20px;}&
+&y_legend=Boo#comma# woo,12,#7E97A6&
+&y_label_size=15&
+&y_ticks=5,10,4&
+
+&bar=40,#D54C78,Boo#comma# hoo,10&
+&values=6,6,7,2,5,7,6,null,6&
+
+&bar_2=40,#78D54C,Boo#comma# hoo(2),10&
+&values_2=7,2,5,7,6,null,6,5,4&
+&links_2=javascript('hello'),x,y,z&
+
+&line_dot_3=3,#CC3399,Boo#comma# woo,10,5&
+&values_3=9,9,9,9,9,9,9,9,9&
+
+&x_labels=Boo#comma# woo,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep&
+&x_label_style=10,#9933CC,2&
+
+&bg_colour=#E2E6E0&
+&x_axis_colour=#818D9D&
+&x_grid_colour=#ADB5C7&
+&y_axis_colour=#818D9D&
+&y_grid_colour=#ADB5C7&
+
+&x_ticks=20&
+&_x_axis_3d=5&
+&y_max=12&
+
+&show_y2=true&
+&y2_axis_colour=#164166&
+&y2_label_style=10,0x164166&
+&y2_lines=99&
+
+&y2_min=0&
+&y2_max=1700&
+
+&y2_legend=Boo#comma# woo,12,0x164166&
+&x_offset=false&

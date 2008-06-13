@@ -161,6 +161,9 @@ sub processRecord
             foreach my $resp (@{$rec->{responsiblegrp}}){
                $self->getParent->storeStatVar("Group",$resp,{},
                                               "base.DataIssue.open",1);
+               $self->getParent->storeStatVar("Group",$resp,
+                                 {maxlevel=>1,method=>'concat'},
+                                 "base.DataIssue.IdList.open",$rec->{id});
             }
          }
          msg(DEBUG,"response %s\n",Dumper($rec->{responsiblegrp}));

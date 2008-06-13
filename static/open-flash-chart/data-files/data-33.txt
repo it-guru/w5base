@@ -1,0 +1,8 @@
+&pie=60,#9933CC,{font-size: 7px; color: #FF0000;}&
+
+&values=10,20,0,10&
+&colours=#ff0000,#00ff00,#0000ff,#ff00ff&
+
+&pie_labels=10,20,0,1&
+
+&tool_tip=#x_label#<br>Value: #val#%25&

@@ -1,0 +1,15 @@
+&x_legend=Average: 121%2C342,12,#000000&
+&title=Sales Pipeline,{font-size: 14px;}&
+&bg_colour=#cacaca&
+&x_label_style=0,#cacaca,0,1&y_ticks=5,10,5&
+&bar=50,#0868A3,,0&
+&values=274.0,925.0,343.0,242.0,617.0,719.0,384.0,436.0,425.0,493.0,992.0,509.0&
+&x_labels=Dec 2006,Jan 2007,Feb 2007,Mar 2007,Apr 2007,May 2007,Jun 2007,Jul 2007,Aug 2007,Sep 2007,Oct 2007,Nov 2007&
+&y_min=0&
+&y_max=995.0&
+&x_axis_colour=#666666&
+&x_grid_colour=#AAAAAA&
+&y_axis_colour=#666666&
+&y_grid_colour=#AAAAAA&
+&y2_axis_colour=& 
+&x_legend=%E4%B8%AD%E6%96%87%23comma%23%E4%B8%AD%E6%96%87%26-%25-%22-%C2%A3-%2B-%3D,20,#000000&

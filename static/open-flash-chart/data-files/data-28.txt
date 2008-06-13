@@ -1,0 +1,17 @@
+&title=Mixed Line and Bar Charts,{font-size:35px; color: #800000}&
+&y_legend=Your legend here!,12,#736AFF&
+&y_ticks=5,10,7&
+
+&bars_width=0.95&
+
+&candle=50,2,#F50505,One,10&
+&values=[48,40,30,22],[38,30,25,20],[20,15,10,5],[50,45,30,25],[58,30,50,25],[62,33,45,28],[30,20,10,5]&
+
+&candle_2=70,5,#050505,Purple Bar,10&
+&values_2=[48,40,30,22],[38,30,25,20],[20,15,10,5],[50,45,30,25],[58,30,50,25],[62,33,45,28],[30,20,10,5]&
+&links_2=javascript:alert('1'),javascript:alert('2'),javascript:alert('3'),javascript:alert('4'),javascript:alert('5'),javascript:alert('6'),javascript:alert('7')&
+
+&x_labels=Mon,Tue,Wed,Thur,Fri,Sat,Sun&
+&y_min=0&
+&y_max=70&
+&tool_tip=#x_legend#<br>High: #high#<br>Open: #open#<br>Close: #close#<br>Low: #low#&

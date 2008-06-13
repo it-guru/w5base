@@ -1,0 +1,73 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7CDEB378-B1E3-49D0-A0D6-EBC53BD53ADC}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OpenFlashChart</RootNamespace>
+    <AssemblyName>OpenFlashChart</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\OpenFlashChart.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BackgroundImage.cs" />
+    <Compile Include="Chart.cs" />
+    <Compile Include="Charts\AreaHollow.cs" />
+    <Compile Include="Charts\Bar3D.cs" />
+    <Compile Include="Charts\BarFilled.cs" />
+    <Compile Include="Charts\ChartData.cs" />
+    <Compile Include="Charts\Bar.cs" />
+    <Compile Include="Charts\BarGlass.cs" />
+    <Compile Include="Charts\BarFade.cs" />
+    <Compile Include="Charts\Line.cs" />
+    <Compile Include="Charts\LineDot.cs" />
+    <Compile Include="Charts\LineHollow.cs" />
+    <Compile Include="Charts\Pie.cs" />
+    <Compile Include="Graph.cs" />
+    <Compile Include="InnerBackground.cs" />
+    <Compile Include="LabelStyle.cs" />
+    <Compile Include="LabelStyleX.cs" />
+    <Compile Include="LabelStyleY.cs" />
+    <Compile Include="LabelStyleYRight.cs" />
+    <Compile Include="Legend.cs" />
+    <Compile Include="LegendX.cs" />
+    <Compile Include="LegendY.cs" />
+    <Compile Include="LegendYRight.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Title.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

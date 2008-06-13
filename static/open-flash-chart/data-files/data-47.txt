@@ -1,0 +1,22 @@
+&title=Bar+Chart,{font-size: 26px;}&
+&x_label_style=10,#9933CC,0,2&
+&x_axis_steps=2&
+&y_legend=Open Flash Chart,12,0x736AFF&
+&y_ticks=5,10,2&
+
+&bar=50,0x0066CC,Kittens,10&
+&bar_2=50,0x9933CC,Puppies,10&
+
+&values=4,5,3,3,4,4,3,4,2&
+&values_2=9,5,6,5,8,6,9,7,8&
+
+&links=javascript:alert('Kitte#comma#ns: Bar 0'),javascript:alert('Kittens: Bar 1'),javascript:alert('Kittens: Bar 2'),javascript:alert('Kittens: Bar 3'),javascript:alert('Kittens: Bar 4'),javascript:alert('Kittens: Bar 5'),javascript:alert('Kittens: Bar 6'),javascript:alert('Kittens: Bar 7'),javascript:alert('Kittens: Bar 8')&
+&links_2=javascript:alert('Puppies: Bar 0'),javascript:alert('Puppies: Bar 1'),javascript:alert('Puppies: Bar 2'),javascript:alert('Puppies: Bar 3'),javascript:alert('Puppies: Bar 4'),javascript:alert('Puppies: Bar 5'),javascript:alert('Puppies: Bar 6'),javascript:alert('Puppies: Bar 7'),javascript:alert('Puppies: Bar 8')&
+
+&tool_tips_set_2=E1,E2,E3&
+
+&tool_tip=Value: #val#%25<br>Set :#tip#&
+
+&x_labels=January,February,March,April,May,June,July,August,September&
+&y_min=0&
+&y_max=10&

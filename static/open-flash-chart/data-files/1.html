@@ -1,0 +1,59 @@
+<html>
+<head>
+
+<script type="text/javascript">
+
+function onrollout()
+{
+  tmp = findSWF("ofc");
+  x = tmp.rollout();
+}
+
+function onrollout2()
+{
+  tmp = findSWF("ofc");
+  x = tmp.rollout();
+}
+
+function findSWF(movieName) {
+  if (navigator.appName.indexOf("Microsoft")!= -1) {
+    return window[movieName];
+  } else {
+    return document[movieName];
+  }
+}
+
+</script>
+
+</head>
+<body>
+    
+<script type="text/javascript" src="../js/swfobject.js"></script>
+
+<div id="my_chart" style="padding: 0px; margin:10px; border: 1px solid lightblue; width: 250px; height: 200px;" onmouseout="__onrollout();"></div>
+ 	
+<script type="text/javascript">
+var so = new SWFObject("../actionscript/open-flash-chart.swf", "ofc", "250", "200", "9", "#FFFFFF");
+//so.addVariable("data", "../data-files/data-20.txt");
+
+so.addVariable("variables","true");
+so.addVariable("title","Test,{font-size: 20;}");
+so.addVariable("y_legendx","Open Flash Chart,12,0x736AFF");
+so.addVariable("y_label_size","15");
+so.addVariable("y_ticks","5,10,4");
+so.addVariable("bar","50,0x9933CC,Page views,10");
+so.addVariable("values","9,6,7,9,5,7,6,9,9");
+so.addVariable("x_labels","January,,March,,May,,June,,August");
+so.addVariable("x_axis_steps","2");
+so.addVariable("y_max","20");
+
+
+so.addParam("allowScriptAccess", "always" );//"sameDomain");
+so.addParam("onmouseout", "onrollout2();" );
+so.write("my_chart");
+</script>
+
+<div>boo</div>
+
+</body>
+</html>

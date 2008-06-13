@@ -1,0 +1,34 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+</head>
+<body>
+    
+<script type="text/javascript" src="../js/swfobject.js"></script>
+
+<div id="my_chart"></div>
+ 	
+<script type="text/javascript">
+var so = new SWFObject("../actionscript/open-flash-chart.swf", "ofc", "250", "200", "9", "#FFFFFF");
+//so.addVariable("data", "../data-files/data-20.txt");
+
+so.addVariable("variables","true");
+so.addVariable("title","中文,{font-size: 20;}");
+so.addVariable("y_legend","中文,12,#736AFF");
+so.addVariable("x_legend","中文,12,#736AFF");
+so.addVariable("y_label_size","15");
+so.addVariable("y_ticks","5,10,4");
+so.addVariable("area_hollow","2,3,25,#CC3399,中文,10");
+so.addVariable("values","9,6,7,9,5,7,6,9,9");
+so.addVariable("x_labels","中文,中文,中文,中文,中文,中文,中文,中文,µß!");
+so.addVariable("x_axis_steps","2");
+so.addVariable("y_max","20");
+
+so.addParam("allowScriptAccess", "always" );//"sameDomain");
+so.write("my_chart");
+</script>
+
+<div>boo</div>
+
+</body>
+</html>

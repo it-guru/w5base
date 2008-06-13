@@ -1,0 +1,21 @@
+&y_legend=Time of day,12,#736AFF&
+&y_ticks=5,10,10&
+
+&scatter=3,#736AFF,Avg. wave height (cm),10,3&
+&values=[-5,-5,10],[0,0,5],[0,1,15],[0,-1,15],[1,1,15],[2,2,4][5,5,12][5,-5,9][-5,5,5],[0.5,1,15]&
+
+&x_labels_=mon,tue,wed,thur,fri,sat,sun&
+
+
+&y_min=-5&
+&y_max=5&
+
+&x_min=-5&
+&x_max=5&
+
+&bg_colour=#DFFFDF&
+
+&x_label_style=12,#9933CC&
+&y_label_style=12,#9933CC&
+
+&tool_tip=x:#x_label#<br>y:#val#&

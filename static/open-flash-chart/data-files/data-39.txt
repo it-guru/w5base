@@ -1,0 +1,10 @@
+&title=Sketch,{font-size:35px; color: #800000}&
+&y_legend=Your legend here!,12,#736AFF&
+&y_ticks=5,10,2&
+
+&bar_sketch=50,7,#99FF00,#7030A0,Purple Bar,10&
+&values=3,8,-5,5,4,5,-2,2,7.5&
+
+&x_labels=Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep&
+&y_min=-10&
+&y_max=10&
