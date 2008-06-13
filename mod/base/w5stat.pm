@@ -273,7 +273,7 @@ sub storeStatVar
    }
    @key=keys(%key);
 
-   %isAlreadyCounted=(); 
+   my %isAlreadyCounted=(); 
    foreach my $key (@key){
       my $level=0;
       if ($var ne ""){
