@@ -3,3 +3,7 @@
 'Statistic Name'=>{de=>'Statistik Name'},
 'fieldgroup.default'=>{de=>'Statistik Kopf',en=>'Statistic Header'},
 'fieldgroup.stats'=>{de=>'Statistik Daten',en=>'Statistic Data'},
+'condition'=>{de=>'Stand'},
+'employees'=>{de=>'Mitarbeiter'},
+'count of employees'=>{de=>'Mitarbeiteranzahl'},
+'averange'=>{de=>'Bereichs Mittelwert'},

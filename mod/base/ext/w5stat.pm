@@ -43,6 +43,7 @@ sub getPresenter
                          prio=>1,
                       },
           'dataissue'=>{
+                         overview=>\&overviewDataIssue,
                          opcode=>\&displayDataIssue,
                          prio=>2,
                       }
@@ -60,12 +61,40 @@ sub displayOverview
 }
 
 
+sub overviewDataIssue
+{
+   my $self=shift;
+
+
+}
+
 sub displayDataIssue
 {
    my $self=shift;
-   my $d="DataIssue";
+   my ($primrec,$hist)=@_;
+   my $app=$self->getParent();
+   #my $data=$app->extractYear($primrec,$hist,"base.DataIssue.IdList.open");
+   my $data=$app->extractYear($primrec,$hist,"base.DataIssue.open",
+                              setUndefZero=>1);
+   my $user=$app->extractYear($primrec,$hist,"User",
+                              setUndefZero=>1);
+   return(undef) if (!defined($data));
+   my $chart=$app->buildChart("ofcDataIssue",$data,
+                   employees=>$user, 
+                   label=>'automatisch erkannte Datenprobleme',
+                   legend=>'Anzahl DataIssue Workflows');
 
-
+   my $d=<<EOF;
+<center>$chart</center>
+<div>
+Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
+fehlen darf, da sonst wieder niemand durchblickt.
+Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
+fehlen darf, da sonst wieder niemand durchblickt.
+Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
+fehlen darf, da sonst wieder niemand durchblickt.
+</div>
+EOF
    return($d);
 }
 

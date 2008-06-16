@@ -361,13 +361,15 @@ sub ShowEntry
    my ($primrec,$hist)=$self->LoadStatSet($requestid);
 
    if (defined($primrec)){
+      my $load=$self->findtemplvar({current=>$primrec,mode=>"HtmlV01"},"mdate","formated");
       my $month=$primrec->{month};
+      my $condition=$self->T("condition");
       my ($Y,$M)=$month=~m/^(\d{4})(\d{2})$/;
       print(<<EOF);
 <div style="margin:10px;padding:15px;width:600px;background:#ffffff;
             border-color:black;border-style:solid;border-width:1px;">
 <div class=chartlabel>
-Quality Report $M/$Y
+Quality Report $M/$Y - $primrec->{fullname}
 </div>
 <script type="text/javascript" src="../../../static/open-flash-chart/js/swfobject.js"></script>
 EOF
@@ -387,6 +389,7 @@ EOF
       }
      
       print(<<EOF);
+<div class=condition>$condition: $load</div>
 </div>
 
 EOF
@@ -399,15 +402,24 @@ sub LoadStatSet
 {
    my $self=shift;
    my $id=shift;
+   my $dep=shift;
 
    $self->ResetFilter();
    $self->SecureSetFilter({id=>\$id});
    my ($primrec,$msg)=$self->getOnlyFirst(qw(ALL));
    if (defined($primrec)){
+      if (ref($primrec->{stats}) ne "HASH"){
+         $primrec->{stats}={Datafield2Hash($primrec->{stats})};
+      }
       $self->ResetFilter();
       $self->SecureSetFilter({fullname=>\$primrec->{fullname},
                               sgroup=>\$primrec->{sgroup}});
-      my $hist=[$self->getHashList(qw(ALL))];
+      my $hist={area=>[map({
+                             if (ref($_->{stats}) ne "HASH"){
+                                $_->{stats}={Datafield2Hash($_->{stats})};
+                             }
+                             $_;
+                           } $self->getHashList(qw(ALL)))]};
       return($primrec,$hist);
 
    }
@@ -450,10 +462,9 @@ sub Presenter
 
 
    my %histid;
-   foreach my $h (@$hist){
+   foreach my $h (@{$hist->{area}}){
       $histid{$h->{month}}=$h->{id};
    }
-   printf STDERR ("fifi d=%s\n",Dumper(\%histid));
 
 
 
@@ -559,9 +570,10 @@ sub buildChart
    my $data=shift;
    my %param=@_;
    my $d="";
-   $param{width}=540       if (!defined($param{width}));
-   $param{height}=300      if (!defined($param{height}));
-   $param{mode}="line_dot" if (!defined($param{mode}));
+   $param{width}=540            if (!defined($param{width}));
+   $param{height}=300           if (!defined($param{height}));
+   $param{mode}="line_dot"      if (!defined($param{mode}));
+   $param{legend}=$param{label} if (!defined($param{legend}));
    my $w=$param{width};
    my $h=$param{height};
    my $swfobjcode="static/open-flash-chart/actionscript/open-flash-chart.swf";
@@ -569,15 +581,20 @@ sub buildChart
 
 
    my $vstring="";
+   my $ymax=9;
    foreach my $d (@$data){
       $vstring.="," if ($vstring ne "");
       if (defined($d)){
          $vstring.=$d;
+         $ymax=$d if ($ymax<$d);
       }
       else{
          $vstring.="null";
       }
    }
+   $ymax=int($ymax*1.15);
+  
+   
    my $datacode;
   
    my $maxdataset; 
@@ -590,27 +607,52 @@ sub buildChart
       $datacode="$so.addVariable(\"values\",\"$grline\");\n".
                 "$so.addVariable(\"line\",\"1,0x00ff00\");\n".
                 "$so.addVariable(\"values_2\",\"$vstring\");\n".
-                "$so.addVariable(\"$param{mode}_2\",\"3,0xff0000,Anzahl Systeme,10,4\");\n";
+                "$so.addVariable(\"$param{mode}_2\",\"3,0xff0000,".
+                $param{legend}.",10,4\");\n";
       $maxdataset=2;
    }
    else{
       $datacode="$so.addVariable(\"values\",\"$vstring\");\n".
-                "$so.addVariable(\"$param{mode}\",\"3,0xff0000\");\n";
+                "$so.addVariable(\"$param{mode}\",\"3,0xff0000,".
+                $param{legend}.",10,4\");\n";
       $maxdataset=1;
    }
    if (defined($param{avg})){
       $maxdataset++;
-      $datacode.="$so.addVariable(\"values_$maxdataset\",\"".join(",",@{$param{avg}})."\");\n".
-                 "$so.addVariable(\"line_$maxdataset\",\"1,0x86B34B,averange,10,4\");\n";
+      $datacode.="$so.addVariable(\"values_$maxdataset\",\"".
+                 join(",",@{$param{avg}})."\");\n".
+                 "$so.addVariable(\"line_$maxdataset\",\"1,0x86B34B,".
+                 $self->T("averange").",10,4\");\n";
    }
    if (defined($param{employees})){
       $maxdataset++;
-      $datacode.="$so.addVariable(\"values_$maxdataset\",\"".join(",",@{$param{employees}})."\");\n".
-                 "$so.addVariable(\"line_$maxdataset\",\"1,0x0000ff,count of Employees,10,4\");\n".
+      my $y2max=19;
+      my $vstring;
+      foreach my $d (@{$param{employees}}){
+         $vstring.="," if ($vstring ne "");
+         if (defined($d)){
+            $vstring.=$d;
+            $y2max=$d if ($y2max<$d);
+         }
+         else{
+            $vstring.="null";
+         }
+      }
+      $y2max=int($y2max*1.15);
+      $datacode.="$so.addVariable(\"values_$maxdataset\",\"$vstring\");\n".
+                 "$so.addVariable(\"line_$maxdataset\",\"1,0x0000ff,".
+                 $self->T("count of employees").",10,4\");\n".
                  "$so.addVariable(\"y2_lines\",\"$maxdataset\");\n".
-                 "$so.addVariable(\"y2_max\",\"20\");\n".
-                 "$so.addVariable(\"y2_legend\",\"Employees,10,4\");\n".
+                 "$so.addVariable(\"y2_max\",\"$y2max\");\n".
+                 "$so.addVariable(\"y2_legend\",\"".
+                 $self->T("employees").",10,4\");\n".
                  "$so.addVariable(\"show_y2\",\"true\");\n";
+   }
+   if (defined($param{ymax})){
+     $datacode.="$so.addVariable(\"y_max\",\"$param{ymax}\");\n";
+   }
+   else{
+     $datacode.="$so.addVariable(\"y_max\",\"$ymax\");\n";
    }
 
 
@@ -642,6 +684,49 @@ EOF
 
 
    return($d);
+}
+
+
+sub extractYear
+{
+   my $self=shift;
+   my $primrec=shift;
+   my $hist=shift;
+   my $name=shift;
+   my %param=@_;
+
+   my ($Y,$M)=$primrec->{month}=~m/^(\d{4})(\d{2})$/;
+
+   my %p;
+   foreach my $hrec (@{$hist->{area}}){
+      if ($hrec->{month}=~m/^$Y/){
+         $p{$hrec->{month}}=$hrec;
+      }
+   }
+   my @d;
+   for(my $m=1;$m<=12;$m++){
+      my $k=sprintf("%04d%02d",$Y,$m);
+      if ($m<=$M){
+         if (defined($p{$k}) && ref($p{$k}->{stats}->{$name}) eq "ARRAY" &&
+             $p{$k}->{stats}->{$name}->[0] ne ""){
+            push(@d,$p{$k}->{stats}->{$name}->[0]);
+         }
+         else{
+            if ($param{setUndefZero}){
+               push(@d,0);
+               
+            }
+            else{
+               push(@d,undef);
+            }
+         }
+      }
+      else{
+         push(@d,undef);
+      }
+   }
+printf STDERR ("YearData($name)=%s\n",Dumper(\@d));
+   return(\@d);
 }
 
 

@@ -113,7 +113,7 @@ sub doQualityCheck
          }
          ($rec,$msg)=$dataobj->getNext();
          last if (time()-$time>3600); # 1 hours quality check
-         last if (time()-$time>60); # 1 hours quality check
+   #      last if (time()-$time>60); # 1 hours quality check
       }until(!defined($rec));
    }
 

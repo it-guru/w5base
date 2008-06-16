@@ -39,6 +39,7 @@ sub getPresenter
    my @l=(
           'appl'=>{
                          opcode=>\&displayAppl,
+                         overview=>\&overviewAppl,
                          prio=>1000,
                       },
           'system'=>{
@@ -53,12 +54,27 @@ sub getPresenter
 
 }
 
-sub displayAppl
+sub overviewAppl
 {  
    my $self=shift;
    my $app=$self->getParent();
-   my $chart=$app->buildChart("ofcAppl",[9,6,7,9,5,7,6,9,9],
-                                        label=>'offene DataIssue Workflows');
+
+   return(['Anzahl dem Bereich zugeordneter Anwendungen',10,'black','+10%']);
+}
+
+sub displayAppl
+{  
+   my $self=shift;
+   my ($primrec,$hist)=@_;
+   my $app=$self->getParent();
+   my $data=$app->extractYear($primrec,$hist,"ITIL.Application.Count");
+   my $user=$app->extractYear($primrec,$hist,"User",
+                              setUndefZero=>1);
+   return(undef) if (!defined($data));
+   my $chart=$app->buildChart("ofcAppl",$data,
+                   employees=>$user,
+                   label=>'Anwendungen',
+                   legend=>'Anzahl Anwendungen');
 
    my $d=<<EOF;
 <center>$chart</center>
@@ -78,12 +94,16 @@ EOF
 sub displaySystem
 {  
    my $self=shift;
+   my ($primrec,$hist)=@_;
    my $app=$self->getParent();
-   my $chart=$app->buildChart("ofcSystem",[4,4,4,4,4,undef,6,9,9],
-                                        greenline=>4,
-                                        avg=>[3,3,4,4,5,5,6,6,7,7],
-                                        employees=>[1,2,3,4,5,6,7,8,9,10,11,12],
-                                        label=>'logische Systeme');
+   my $data=$app->extractYear($primrec,$hist,"ITIL.System.Count");
+   return(undef) if (!defined($data));
+   my $chart=$app->buildChart("ofcSystem",$data,
+                   greenline=>4,
+                   avg=>[3,3,4,4,5,5,6,6,7,7],
+                   employees=>[1,2,3,4,5,6,7,8,9,10,11,12],
+                   label=>'logische Systeme',
+                   legend=>'Anzahl logische Systeme');
 
    my $d=<<EOF;
 <center>$chart</center>

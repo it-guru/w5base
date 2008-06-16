@@ -436,7 +436,8 @@ sub mkChangeStoreRec
            (my ($weY,$weM,$weD,$weh,$wem,$wes)=$we=~
               m/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/)){
           my ($dd,$dh,$dm,$ds);
-          eval('($dd,$dh,$dm,$ds)=Delta_DHMS("CET",$wsY,$wsM,$wsD,$wsh,$wsm,$wss,
+          eval('($dd,$dh,$dm,$ds)=Delta_DHMS("CET",
+                                             $wsY,$wsM,$wsD,$wsh,$wsm,$wss,
                                              $weY,$weM,$weD,$weh,$wem,$wes);
                ');
           if (defined($dd) && defined($dh) && defined($dm)){
