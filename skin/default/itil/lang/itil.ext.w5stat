@@ -1,0 +1,3 @@
+'itil::ext::w5stat::appl'=>{de=>'Anwendungen',en=>'Applications'},
+'itil::ext::w5stat::system'=>{de=>'Systeme',en=>'Systems'},
+'itil::ext::w5stat::asset'=>{de=>'Hardware',en=>'Assets'},
