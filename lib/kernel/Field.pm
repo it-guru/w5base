@@ -413,7 +413,8 @@ sub preProcessFilter
       }
       my %flt=($searchfield=>$hflt->{$field});
       $fobj->vjoinobj->SetFilter(\%flt);
-      if (defined($hflt->{$fobj->{vjoinon}->[0]})){
+      if (defined($hflt->{$fobj->{vjoinon}->[0]}) &&
+          !defined($self->{dataobjattr})){
          $fobj->vjoinobj->SetNamedFilter("vjoinadd".$field,
                       {$fobj->{vjoinon}->[1]=>$hflt->{$fobj->{vjoinon}->[0]}});
       }
