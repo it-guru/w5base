@@ -529,7 +529,7 @@ sub Presenter
    }
    my %P=@Presenter;
    print("<ul>");
-   foreach my $p (sort({$P{$a}->{prio} <=> $P{$a}->{prio}} keys(%P))){
+   foreach my $p (sort({$P{$a}->{prio} <=> $P{$b}->{prio}} keys(%P))){
       my $prec=$P{$p};
       my $tag=$prec->{module}."::".$p;
       my $label=$self->T($tag,$prec->{module});
@@ -541,7 +541,7 @@ sub Presenter
    printf("</td>");
    print("<td valign=top style=\"padding-right:5px\">".
         "<iframe name=entry width=100% height=100% ".
-        "src=\"../ShowEntry?id=$requestid\">".
+        "src=\"../ShowEntry?id=$requestid&tag=base::ext::w5stat::overview\">".
         "</iframe></td>");
    print ("</tr></table>");
    print ("</td></tr>");
