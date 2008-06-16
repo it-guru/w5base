@@ -55,8 +55,6 @@ sub upddataboss
       my $count=1;
       while(defined($rec)){
          msg(INFO,"$count sys=$rec->{name}   $rec->{asset}");
-         ($rec,$msg)=$sys->getNext();
-         $count++;
          my $databoss;
          findboss: foreach my $applrec (@{$rec->{applications}}){
             $appl->ResetFilter();
@@ -84,10 +82,8 @@ sub upddataboss
                                              {id=>\$arec->{id}});
             }
          }
-
-
-
-
+         ($rec,$msg)=$sys->getNext();
+         $count++;
          last if (!defined($rec));
       }
    }
