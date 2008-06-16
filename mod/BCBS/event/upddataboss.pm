@@ -85,6 +85,7 @@ sub upddataboss
          ($rec,$msg)=$sys->getNext();
          $count++;
          last if (!defined($rec));
+         last;
       }
    }
 
