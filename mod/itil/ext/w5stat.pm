@@ -97,11 +97,12 @@ sub displaySystem
    my ($primrec,$hist)=@_;
    my $app=$self->getParent();
    my $data=$app->extractYear($primrec,$hist,"ITIL.System.Count");
+   my $user=$app->extractYear($primrec,$hist,"User",
+                              setUndefZero=>1);
    return(undef) if (!defined($data));
    my $chart=$app->buildChart("ofcSystem",$data,
                    greenline=>4,
-                   avg=>[3,3,4,4,5,5,6,6,7,7],
-                   employees=>[1,2,3,4,5,6,7,8,9,10,11,12],
+                   employees=>$user,
                    label=>'logische Systeme',
                    legend=>'Anzahl logische Systeme');
 
@@ -123,9 +124,17 @@ EOF
 sub displayAsset
 {  
    my $self=shift;
+   my ($primrec,$hist)=@_;
    my $app=$self->getParent();
-   my $chart=$app->buildChart("ofcAsset",[undef,undef,undef,4,4,undef,6,9,9],
-                                        label=>'Anzahl Assets');
+   my $data=$app->extractYear($primrec,$hist,"ITIL.Asset.Count");
+   my $user=$app->extractYear($primrec,$hist,"User",
+                              setUndefZero=>1);
+   return(undef) if (!defined($data));
+   my $chart=$app->buildChart("ofcAsset",$data,
+                   greenline=>4,
+                   employees=>$user,
+                   label=>'Assets',
+                   legend=>'Anzahl physicalische Systeme');
 
    my $d=<<EOF;
 <center>$chart</center>
