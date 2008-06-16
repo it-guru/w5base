@@ -33,6 +33,43 @@ sub new
 }
 
 
+sub getPresenter
+{
+   my $self=shift;
+
+   my @l=(
+          'overview'=>{
+                         opcode=>\&displayOverview,
+                         prio=>1,
+                      },
+          'dataissue'=>{
+                         opcode=>\&displayDataIssue,
+                         prio=>2,
+                      }
+         );
+
+}
+
+sub displayOverview
+{
+   my $self=shift;
+   my $d="Overview";
+
+
+   return($d);
+}
+
+
+sub displayDataIssue
+{
+   my $self=shift;
+   my $d="DataIssue";
+
+
+   return($d);
+}
+
+
 sub processData
 {
    my $self=shift;

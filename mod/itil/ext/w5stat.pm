@@ -32,6 +32,99 @@ sub new
    return($self);
 }
 
+sub getPresenter
+{
+   my $self=shift;
+
+   my @l=(
+          'appl'=>{
+                         opcode=>\&displayAppl,
+                         prio=>1000,
+                      },
+          'system'=>{
+                         opcode=>\&displaySystem,
+                         prio=>1001,
+                      },
+          'asset'=>{
+                         opcode=>\&displayAsset,
+                         prio=>1002,
+                      }
+         );
+
+}
+
+sub displayAppl
+{  
+   my $self=shift;
+   my $app=$self->getParent();
+   my $chart=$app->buildChart("ofcAppl",[9,6,7,9,5,7,6,9,9],
+                                        label=>'offene DataIssue Workflows');
+
+   my $d=<<EOF;
+<center>$chart</center>
+<div>
+Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
+fehlen darf, da sonst wieder niemand durchblickt.
+Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
+fehlen darf, da sonst wieder niemand durchblickt.
+Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
+fehlen darf, da sonst wieder niemand durchblickt.
+</div>
+EOF
+   return($d);
+}
+
+
+sub displaySystem
+{  
+   my $self=shift;
+   my $app=$self->getParent();
+   my $chart=$app->buildChart("ofcSystem",[4,4,4,4,4,undef,6,9,9],
+                                        greenline=>4,
+                                        avg=>[3,3,4,4,5,5,6,6,7,7],
+                                        employees=>[1,2,3,4,5,6,7,8,9,10,11,12],
+                                        label=>'logische Systeme');
+
+   my $d=<<EOF;
+<center>$chart</center>
+<div>
+Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
+fehlen darf, da sonst wieder niemand durchblickt.
+Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
+fehlen darf, da sonst wieder niemand durchblickt.
+Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
+fehlen darf, da sonst wieder niemand durchblickt.
+</div>
+EOF
+   return($d);
+}
+
+
+sub displayAsset
+{  
+   my $self=shift;
+   my $app=$self->getParent();
+   my $chart=$app->buildChart("ofcAsset",[undef,undef,undef,4,4,undef,6,9,9],
+                                        label=>'Anzahl Assets');
+
+   my $d=<<EOF;
+<center>$chart</center>
+<div>
+Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
+fehlen darf, da sonst wieder niemand durchblickt.
+Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
+fehlen darf, da sonst wieder niemand durchblickt.
+Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
+fehlen darf, da sonst wieder niemand durchblickt.
+</div>
+EOF
+
+
+   return($d);
+}
+
+
+
 
 sub processData
 {

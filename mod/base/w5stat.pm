@@ -351,52 +351,46 @@ sub ShowEntry
 {
    my $self=shift;
    print $self->HttpHeader("text/html");
-   print $self->HtmlHeader(style=>['default.css'],
+   print $self->HtmlHeader(style=>['default.css','w5stat.css'],
                            js=>['toolbox.js','subModal.js'],
                            body=>1,form=>1,
                            title=>"W5Base Statistik Presenter");
-   print(<<EOF);
+   my $requestid=Query->Param("id");
+   my $requesttag=Query->Param("tag");
+
+   my ($primrec,$hist)=$self->LoadStatSet($requestid);
+
+   if (defined($primrec)){
+      my $month=$primrec->{month};
+      my ($Y,$M)=$month=~m/^(\d{4})(\d{2})$/;
+      print(<<EOF);
 <div style="margin:10px;padding:15px;width:600px;background:#ffffff;
             border-color:black;border-style:solid;border-width:1px;">
-<div>
-Quality Report 06/2008
+<div class=chartlabel>
+Quality Report $M/$Y
 </div>
 <script type="text/javascript" src="../../../static/open-flash-chart/js/swfobject.js"></script>
-
-<center>
-<div id="my_chart" style="padding: 0px; margin:10px; border: 1px solid #30579f; width: 540px; height: 300px;""></div>
-</center>
-<div>
-Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
-fehlen darf, da sonst wieder niemand durchblickt.
-Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
-fehlen darf, da sonst wieder niemand durchblickt.
-Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
-fehlen darf, da sonst wieder niemand durchblickt.
-</div>
-
-<script type="text/javascript">
-var so = new SWFObject("../../../static/open-flash-chart/actionscript/open-flash-chart.swf", 
-                       "ofc", "540", "300", "9", "#FFFFFF");
-
-so.addVariable("variables","true");
-so.addVariable("title","offene DataIssue Workflows,{font-size: 18;}");
-so.addVariable("bg_colour","#f4f4f4");
-so.addVariable("y_label_size","15");
-so.addVariable("y_ticks","5,10,4");
-so.addVariable("line","3,0xff0000");
-so.addVariable("values","9,6,7,9,5,7,6,9,9");
-so.addVariable("x_labels","Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Okt,Nov,Dez");
-so.addVariable("x_axis_steps","2");
-
-
-so.addParam("allowScriptAccess", "always" );//"sameDomain");
-//so.addParam("onmouseout", "onrollout2();" );
-so.write("my_chart");
-</script>
+EOF
+      if ($requesttag ne ""){
+         my ($rmod,$rtag)=$requesttag=~m/^(.*)::([^:]+)$/;
+     
+         foreach my $obj (values(%{$self->{w5stat}})){
+            if ($obj->Self() eq $rmod){
+               if ($obj->can("getPresenter")){
+                  my %P=$obj->getPresenter();
+                  if (defined($P{$rtag})){
+                     print &{$P{$rtag}->{opcode}}($obj,$primrec,$hist);
+                  }
+               }
+            }
+         }
+      }
+     
+      print(<<EOF);
 </div>
 
 EOF
+   }
    print $self->HtmlBottom(body=>1,form=>1);
 }
 
@@ -429,10 +423,24 @@ sub Presenter
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css'],
                            js=>['toolbox.js','subModal.js'],
-                           body=>1,form=>1,
+                           body=>1,form=>1,action=>'../ShowEntry',
                            prefix=>$rootpath,
                            title=>"W5Base Statistik Presenter");
    print("<style>body{overflow:hidden}</style>");
+
+
+   my $requestid=$p;
+   $requestid=~s/[^\d]//g;
+
+   my ($primrec,$hist)=$self->LoadStatSet($requestid);
+
+
+   if (!defined($primrec)){
+      print "Requested Record '$requestid' not found";
+      print $self->HtmlBottom(body=>1,form=>1);
+      return();
+   }
+
    print("<table width=100% height=100% border=0>");
 
    printf("<tr height=1%><td>");
@@ -441,27 +449,54 @@ sub Presenter
    printf("</td></tr>");
 
 
-   my $requestid=$p;
-   $p=~s/[^\d]//g;
-
-   my ($primrec,$hist)=$self->LoadStatSet($p);
-
-
-   if (!defined($primrec)){
-      print "Requested Record not found";
-      print $self->HtmlBottom(body=>1,form=>1);
-      return();
+   my %histid;
+   foreach my $h (@$hist){
+      $histid{$h->{month}}=$h->{id};
    }
+   printf STDERR ("fifi d=%s\n",Dumper(\%histid));
 
 
 
    printf("<tr height=1%><td>");
    print("<table width=100%><tr>\n");
-   printf("<td width=1%><select><option>DTAG.TSI.ES.ITO.CSS.T-Com.PMAQ.QSO</option></select></td>");
-   for(my $c=0;$c<=14;$c++){
-      printf("<td align=center>%02d<br>%4d</td>",$c,2008);
+   printf("<td width=1%><select>".
+          "<option>DTAG.TSI.ES.ITO.CSS.T-Com.PMAQ.QSO</option></select></td>");
+   my $month=$primrec->{month};
+   my ($Y,$M)=$month=~m/^(\d{4})(\d{2})$/;
+   my $mstr="";
+   my ($Y1,$M1)=($Y,$M);
+   sub getLabelString
+   {
+      my $histid=shift;
+      my $M1=shift;
+      my $Y1=shift;
+      my $k=sprintf("%04d%02d",$Y1,$M1);
+      if (defined($histid->{$k})){
+         return(sprintf("<td align=center><a href=\"$histid->{$k}\">".
+                        "%02d<br>%4d</a></td>",$M1,$Y1));
+      }
+      return(sprintf("<td align=center>%02d<br>%4d</td>",$M1,$Y1));
+      
    }
-   print("</tr></table>\n");
+   for(my $c=0;$c<=7;$c++){
+      $mstr.=getLabelString(\%histid,$M1,$Y1);
+      $M1++;
+      if ($M1>12){
+         $Y1++;
+         $M1=1;
+      }
+   }
+   my ($Y1,$M1)=($Y,$M);
+   for(my $c=0;$c<7;$c++){
+      $M1--;
+      if ($M1<1){
+         $Y1--;
+         $M1=12;
+      }
+      $mstr=getLabelString(\%histid,$M1,$Y1).$mstr;
+   }
+
+   print($mstr."</tr></table>\n");
    printf("</td></tr>");
 
 
@@ -470,21 +505,143 @@ sub Presenter
    print("<table width=100% height=100% border=0 cellspacing=0 cellpadding=0>");
    printf("<tr>");
    printf("<td width=150 valign=top>");
-   printf("<div align=right>drucken &nbsp;</div><br>");
-   printf("<br>");
-   printf("Overview<br>");
-   printf("DataIssues<br>");
-   printf("Anwendungen<br>");
-   printf("Systeme<br>");
-   printf("Assets<br>");
-   printf("<br>");
-   printf("All<br>");
+
+   my @Presenter;
+   foreach my $obj (values(%{$self->{w5stat}})){
+      if ($obj->can("getPresenter")){
+         my %P=$obj->getPresenter();
+         foreach my $p (values(%P)){
+            $p->{module}=$obj->Self();
+         }
+         push(@Presenter,%P);
+      }
+   }
+   my %P=@Presenter;
+   print("<ul>");
+   foreach my $p (sort({$P{$a}->{prio} <=> $P{$a}->{prio}} keys(%P))){
+      my $prec=$P{$p};
+      my $tag=$prec->{module}."::".$p;
+      my $label=$self->T($tag,$prec->{module});
+      my $link="javascript:setTag($requestid,\"$tag\")";
+      print "<li><a href=$link>".$label."</a></li>";
+   }
+   printf("</ul>");
+
    printf("</td>");
-   print("<td valign=top style=\"padding-right:5px\"><iframe width=100% height=100% src=\"../ShowEntry\"></iframe></td>");
+   print("<td valign=top style=\"padding-right:5px\">".
+        "<iframe name=entry width=100% height=100% ".
+        "src=\"../ShowEntry?id=$requestid\">".
+        "</iframe></td>");
    print ("</tr></table>");
    print ("</td></tr>");
    print ("</table>");
+   print(<<EOF);
+<input type=hidden name=id value="$requestid">
+<input type=hidden name=tag value="">
+<script language="JavaScript">
+function setTag(id,tag)
+{
+   document.forms[0].elements['id'].value=id;
+   document.forms[0].elements['tag'].value=tag;
+   document.forms[0].target="entry";
+   document.forms[0].submit();
+}
+</script>
+EOF
    print $self->HtmlBottom(body=>1,form=>1);
+}
+
+
+sub buildChart
+{
+   my $self=shift;
+   my $name=shift;
+   my $data=shift;
+   my %param=@_;
+   my $d="";
+   $param{width}=540       if (!defined($param{width}));
+   $param{height}=300      if (!defined($param{height}));
+   $param{mode}="line_dot" if (!defined($param{mode}));
+   my $w=$param{width};
+   my $h=$param{height};
+   my $swfobjcode="static/open-flash-chart/actionscript/open-flash-chart.swf";
+   my $so="SO_$name";
+
+
+   my $vstring="";
+   foreach my $d (@$data){
+      $vstring.="," if ($vstring ne "");
+      if (defined($d)){
+         $vstring.=$d;
+      }
+      else{
+         $vstring.="null";
+      }
+   }
+   my $datacode;
+  
+   my $maxdataset; 
+   if (defined($param{greenline})){
+      my @grline;
+      for(my $c=0;$c<12;$c++){
+         push(@grline,$param{greenline});
+      }
+      my $grline=join(",",@grline);
+      $datacode="$so.addVariable(\"values\",\"$grline\");\n".
+                "$so.addVariable(\"line\",\"1,0x00ff00\");\n".
+                "$so.addVariable(\"values_2\",\"$vstring\");\n".
+                "$so.addVariable(\"$param{mode}_2\",\"3,0xff0000,Anzahl Systeme,10,4\");\n";
+      $maxdataset=2;
+   }
+   else{
+      $datacode="$so.addVariable(\"values\",\"$vstring\");\n".
+                "$so.addVariable(\"$param{mode}\",\"3,0xff0000\");\n";
+      $maxdataset=1;
+   }
+   if (defined($param{avg})){
+      $maxdataset++;
+      $datacode.="$so.addVariable(\"values_$maxdataset\",\"".join(",",@{$param{avg}})."\");\n".
+                 "$so.addVariable(\"line_$maxdataset\",\"1,0x86B34B,averange,10,4\");\n";
+   }
+   if (defined($param{employees})){
+      $maxdataset++;
+      $datacode.="$so.addVariable(\"values_$maxdataset\",\"".join(",",@{$param{employees}})."\");\n".
+                 "$so.addVariable(\"line_$maxdataset\",\"1,0x0000ff,count of Employees,10,4\");\n".
+                 "$so.addVariable(\"y2_lines\",\"$maxdataset\");\n".
+                 "$so.addVariable(\"y2_max\",\"20\");\n".
+                 "$so.addVariable(\"y2_legend\",\"Employees,10,4\");\n".
+                 "$so.addVariable(\"show_y2\",\"true\");\n";
+   }
+
+
+   $d=<<EOF;
+<div id="$name" style="padding:0px;margin:10px;border:1px solid #30579f;
+                       width:${w}px;height:${h}px;"></div>
+<script language="JavaScript">
+function buildChart$name()
+{
+   var $so=new SWFObject("../../../$swfobjcode","$name",
+                         "$w","$h","9","#FFFFFF");
+   $so.addVariable("variables","true");
+   $so.addVariable("title","$param{label},{font-size: 15;}");
+   $so.addVariable("bg_colour","#f4f4f4");
+   $so.addVariable("y_label_size","15");
+   $so.addVariable("y_ticks","5,10,4");
+   $datacode
+   $so.addVariable("x_labels","Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Okt,Nov,Dez");
+   //$so.addVariable("x_axis_steps","2");
+   $so.addParam("allowScriptAccess", "always" );//"sameDomain");
+   //$so.addParam("onmouseout", "onrollout2();" );
+   $so.write("$name");
+}
+addEvent(window,"load",buildChart$name);
+</script>
+EOF
+
+
+
+
+   return($d);
 }
 
 
