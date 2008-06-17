@@ -85,20 +85,14 @@ sub displayDataIssue
    return(undef) if (!defined($data));
    my $chart=$app->buildChart("ofcDataIssue",$data,
                    employees=>$user, 
-                   label=>'automatisch erkannte Datenprobleme',
-                   legend=>'Anzahl DataIssue Workflows');
-
-   my $d=<<EOF;
-<center>$chart</center>
-<div>
-Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
-fehlen darf, da sonst wieder niemand durchblickt.
-Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
-fehlen darf, da sonst wieder niemand durchblickt.
-Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
-fehlen darf, da sonst wieder niemand durchblickt.
-</div>
-EOF
+                   label=>'automaticly detected Data-Problems',
+                   legend=>'count of DataIssue Workflows');
+   my $d=$app->getParsedTemplate("tmpl/ext.w5stat.DataIssue",
+                                 {current=>$primrec,
+                                  static=>{
+                                       chart1=>$chart
+                                          }
+                                 },"base");
    return($d);
 }
 
@@ -126,19 +120,14 @@ sub displayOrg
                    label=>'SubGroups');
    return(undef) if (!defined($data));
 
-   my $d=<<EOF;
-<center>$chart1</center>
-<center>$chart2</center>
-<center>$chart3</center>
-<div>
-Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
-fehlen darf, da sonst wieder niemand durchblickt.
-Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
-fehlen darf, da sonst wieder niemand durchblickt.
-Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
-fehlen darf, da sonst wieder niemand durchblickt.
-</div>
-EOF
+   my $d=$app->getParsedTemplate("tmpl/ext.w5stat.org",
+                                 {current=>$primrec,
+                                  static=>{
+                                       chart1=>$chart1,
+                                       chart2=>$chart2,
+                                       chart3=>$chart3,
+                                          }
+                                 },"base");
    return($d);
 }
 

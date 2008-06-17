@@ -1,0 +1,44 @@
+<table width=100%>
+<tr>
+
+<td valign=top><br>
+The "total Users" KPI defines the count of employees
+in the current organisational unit incl. all sub units.
+</td>
+
+<td>
+%chart1%
+</td>
+</tr>
+</table>
+
+<table width=100%>
+<tr>
+
+<td>
+%chart2%
+</td>
+
+<td valign=top><br>
+The "total Users" KPI defines the count of employees
+in the current organisational unit incl. all sub units.
+</td>
+
+</tr>
+</table>
+
+
+<table width=100%>
+<tr>
+
+<td valign=top><br>
+The "direct Users" KPI is the count of users, witch
+are directly assigned to the current group.
+</td>
+
+<td>
+%chart3%
+</td>
+</tr>
+</table>
+

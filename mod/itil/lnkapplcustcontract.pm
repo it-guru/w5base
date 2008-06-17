@@ -31,98 +31,121 @@ sub new
    
 
    $self->AddFields(
-      new kernel::Field::Id(       name       =>'id',
-                                   label      =>'LinkID',
-                                   dataobjattr=>'lnkapplcustcontract.id'),
+      new kernel::Field::Id(
+                name          =>'id',
+                label         =>'LinkID',
+                dataobjattr   =>'lnkapplcustcontract.id'),
 
-      new kernel::Field::TextDrop( name       =>'appl',
-                                   htmlwidth  =>'300px',
-                                   label      =>'Application',
-                                   vjointo    =>'itil::appl',
-                                   vjoinon    =>['applid'=>'id'],
-                                   vjoindisp  =>'name'),
+      new kernel::Field::TextDrop(
+                name          =>'appl',
+                htmlwidth     =>'300px',
+                label         =>'Application',
+                vjointo       =>'itil::appl',
+                vjoinon       =>['applid'=>'id'],
+                vjoindisp     =>'name'),
 
-      new kernel::Field::TextDrop( name       =>'custcontract',
-                                   htmlwidth  =>'300px',
-                                   label      =>'Customer Contract',
-                                   vjointo    =>'itil::custcontract',
-                                   vjoinon    =>['custcontractid'=>'id'],
-                                   vjoindisp  =>'name'),
+      new kernel::Field::TextDrop(
+                name          =>'custcontract',
+                htmlwidth     =>'300px',
+                label         =>'Customer Contract',
+                vjointo       =>'itil::custcontract',
+                vjoinon       =>['custcontractid'=>'id'],
+                vjoindisp     =>'name'),
 
-      new kernel::Field::Percent(  name       =>'fraction',
-                                   label      =>'Fraction',
-                                   dataobjattr=>'lnkapplcustcontract.fraction'),
+      new kernel::Field::Select(
+                name          =>'custcontractcistatus',
+                htmleditwidth =>'40%',
+                label         =>'CI-State',
+                vjoineditbase =>{id=>">0"},
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['custcontractcistatusid'=>'id'],
+                vjoindisp     =>'name'),
 
-      new kernel::Field::Creator(  name          =>'creator',
-                                   group         =>'source',
-                                   label         =>'Creator',
-                                   dataobjattr   =>
-                                           'lnkapplcustcontract.createuser'),
 
-      new kernel::Field::Owner(    name          =>'owner',
-                                   group         =>'source',
-                                   label         =>'Owner',
-                                   dataobjattr   =>
-                                           'lnkapplcustcontract.modifyuser'),
+      new kernel::Field::Percent(
+                name          =>'fraction',
+                label         =>'Fraction',
+                dataobjattr   =>'lnkapplcustcontract.fraction'),
 
-      new kernel::Field::Text(     name       =>'srcsys',
-                                   group      =>'source',
-                                   label      =>'Source-System',
-                                   dataobjattr=>'lnkapplcustcontract.srcsys'),
+      new kernel::Field::Creator(
+                name          =>'creator',
+                group         =>'source',
+                label         =>'Creator',
+                dataobjattr   =>'lnkapplcustcontract.createuser'),
 
-      new kernel::Field::Text(     name       =>'srcid',
-                                   group      =>'source',
-                                   label      =>'Source-Id',
-                                   dataobjattr=>'lnkapplcustcontract.srcid'),
+      new kernel::Field::Owner(
+                name          =>'owner',
+                group         =>'source',
+                label         =>'Owner',
+                dataobjattr   =>'lnkapplcustcontract.modifyuser'),
 
-      new kernel::Field::Date(     name       =>'srcload',
-                                   group      =>'source',
-                                   label      =>'Last-Load',
-                                   dataobjattr=>'lnkapplcustcontract.srcload'),
+      new kernel::Field::Text(
+                name          =>'srcsys',
+                group         =>'source',
+                label         =>'Source-System',
+                dataobjattr   =>'lnkapplcustcontract.srcsys'),
 
-      new kernel::Field::CDate(    name       =>'cdate',
-                                   group      =>'source',
-                                   label      =>'Creation-Date',
-                                   dataobjattr=>
-                                           'lnkapplcustcontract.createdate'),
+      new kernel::Field::Text(
+                name          =>'srcid',
+                group         =>'source',
+                label         =>'Source-Id',
+                dataobjattr   =>'lnkapplcustcontract.srcid'),
+
+      new kernel::Field::Date(
+                name          =>'srcload',
+                group         =>'source',
+                label         =>'Last-Load',
+                dataobjattr   =>'lnkapplcustcontract.srcload'),
+
+      new kernel::Field::CDate(
+                name          =>'cdate',
+                group         =>'source',
+                label         =>'Creation-Date',
+                dataobjattr   =>'lnkapplcustcontract.createdate'),
                                   
-      new kernel::Field::MDate(    name       =>'mdate',
-                                   group      =>'source',
-                                   label      =>'Modification-Date',
-                                   dataobjattr=>
-                                           'lnkapplcustcontract.modifydate'),
+      new kernel::Field::MDate(
+                name          =>'mdate',
+                group         =>'source',
+                label         =>'Modification-Date',
+                dataobjattr   =>'lnkapplcustcontract.modifydate'),
 
-      new kernel::Field::Editor(   name       =>'editor',
-                                   group      =>'source',
-                                   label      =>'Editor',
-                                   dataobjattr=>'lnkapplcustcontract.editor'),
+      new kernel::Field::Editor(
+                name          =>'editor',
+                group         =>'source',
+                label         =>'Editor',
+                dataobjattr   =>'lnkapplcustcontract.editor'),
 
-      new kernel::Field::RealEditor(name      =>'realeditor',
-                                   group      =>'source',
-                                   label      =>'RealEditor',
-                                   dataobjattr=>
-                                           'lnkapplcustcontract.realeditor'),
+      new kernel::Field::RealEditor(
+                name          =>'realeditor',
+                group         =>'source',
+                label         =>'RealEditor',
+                dataobjattr   =>'lnkapplcustcontract.realeditor'),
 
-      new kernel::Field::Link(     name       =>'applcistatusid',
-                                   label      =>'ApplCiStatusID',
-                                   dataobjattr=>'appl.cistatus'),
+      new kernel::Field::Link(
+                name          =>'applcistatusid',
+                label         =>'ApplCiStatusID',
+                dataobjattr   =>'appl.cistatus'),
 
-      new kernel::Field::Link(     name       =>'custcontractcistatusid',
-                                   label      =>'CustContractCiStatusID',
-                                   dataobjattr=>'custcontract.cistatus'),
+      new kernel::Field::Link(
+                name          =>'custcontractcistatusid',
+                label         =>'CustContractCiStatusID',
+                dataobjattr   =>'custcontract.cistatus'),
 
-      new kernel::Field::Link(     name       =>'custcontractname',
-                                   label      =>'CustContractName',
-                                   dataobjattr=>'custcontract.fullname'),
+      new kernel::Field::Link(
+                name          =>'custcontractname',
+                label         =>'CustContractName',
+                dataobjattr   =>'custcontract.fullname'),
 
-      new kernel::Field::Link(     name       =>'applid',
-                                   label      =>'ApplID',
-                                   dataobjattr=>'lnkapplcustcontract.appl'),
+      new kernel::Field::Link(
+                name          =>'applid',
+                label         =>'ApplID',
+                dataobjattr   =>'lnkapplcustcontract.appl'),
 
-      new kernel::Field::Interface(name       =>'custcontractid',
-                                   label      =>'Customer ContractId',
-                                   dataobjattr=>
-                                           'lnkapplcustcontract.custcontract'),
+      new kernel::Field::Interface(
+                name          =>'custcontractid',
+                htmlwidth     =>'150px',
+                label         =>'Customer ContractId',
+                dataobjattr   =>'lnkapplcustcontract.custcontract'),
    );
    $self->setDefaultView(qw(id appl custcontract cdate editor));
    $self->setWorktable("lnkapplcustcontract");

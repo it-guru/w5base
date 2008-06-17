@@ -1,0 +1,4 @@
+
+ %chart1%
+
+The count of DataIssue is a measurement for the quality of the config items. Many data problems can be automaticly detect. If one or more problems are found related to a config-item, the W5Base QualityCheck-System creates a DataIssue-Workflow.
