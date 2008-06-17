@@ -77,6 +77,13 @@ sub mkP800swi
             printf STDERR ("fifi ssrec=%s\n",Dumper($ssrec));
             my $detaildescription=$ssrec->{servicedescription};
             $detaildescription="" if ($detaildescription eq "");
+            my $tcomcodcomments="Software-Instance: $rec->{fullname}\n".
+                                "Response-Team: $rec->{swteam}\n";
+            if ($rec->{databoss} ne ""){
+               $tcomcodcomments.="Instance databoss: $rec->{databoss}\n";
+            }
+            $tcomcodcomments.="Entry automaticly created - ".
+                              "Contact: Vogler Hartmut\n";
             my $rec={name=>'T-Systems Database support: '.$rec->{appl},
                      srcid=>$srcid,
                      srcsys=>$srcsys,
@@ -92,8 +99,7 @@ sub mkP800swi
                      openuser=>$rec->{databoassid},
                      tcomworktime=>$tcomworktime,
                      detaildescription=>$detaildescription,
-                     tcomcodcomments=>"Software-Instance: $rec->{fullname}\n".
-                                      "Response-Team: $rec->{swteam}",
+                     tcomcodcomments=>$tcomcodcomments,
                     };
 
             $wf->ResetFilter();
