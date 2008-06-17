@@ -159,7 +159,7 @@ sub ProcessLine
                               %font,
                               fontsize      =>8,
                               bold          =>[1,0],
-                              width         =>[120,undef],
+                              width         =>[130,undef],
                               border        =>0.5,
                               color         =>'black',
                               background    =>'snow2');
