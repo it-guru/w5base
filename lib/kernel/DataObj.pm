@@ -735,7 +735,8 @@ sub HandleHistory
       if ($ENV{REMOTE_ADDR} ne ""){
          $comments.="REMOTE_ADDR = $ENV{REMOTE_ADDR} \n";
       }
-      if ($W5V2::OperationContext ne "WebFrontend"){
+      if ($W5V2::OperationContext ne "WebFrontend" &&
+          $W5V2::OperationContext ne ""){
          $comments.="CONTEXT = $W5V2::OperationContext \n";
       }
       if (defined($comments)){

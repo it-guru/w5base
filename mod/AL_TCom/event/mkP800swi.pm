@@ -89,9 +89,6 @@ sub mkP800swi
                      srcsys=>$srcsys,
                      srcload=>$entrytime,
                      affectedapplication=>$rec->{appl},
-                     stateid=>17,
-                     class=>"AL_TCom::workflow::diary",
-                     step=>"AL_TCom::workflow::diary::dataload",
                      eventstart=>$eventstart,
                      eventend=>$eventend,
                      tcomcodrelevant=>'yes',
@@ -118,15 +115,18 @@ sub mkP800swi
                   }
             });
             if (!$found){
+               $rec->{class}="AL_TCom::workflow::diary";
+               $rec->{step}="AL_TCom::workflow::diary::dataload";
+               $rec->{stateid}=4;
                $id=$wf->ValidatedInsertRecord($rec);
             }
             if (defined($id)){
                $wf->ResetFilter();
                $wf->SetFilter({id=>\$id});
                my ($WfRec)=$wf->getOnlyFirst(qw(ALL));
-               if (defined($WfRec)){
+               if (defined($WfRec) && $WfRec->{stateid}!=17){
                   $wf->ValidatedUpdateRecord($WfRec,{
-                                         cistatusid=>17,
+                                         stateid=>17,
                                          step=>'AL_TCom::workflow::diary::wfclose',
                                          },
                                          {id=>\$id});
