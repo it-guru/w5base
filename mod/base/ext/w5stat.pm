@@ -58,9 +58,44 @@ sub getPresenter
 sub displayOverview
 {
    my $self=shift;
-   my $d="Overview";
+   my ($primrec,$hist)=@_;
+   my $app=$self->getParent();
+   my $d="";
 
+   my @ovdata;
 
+   my @Presenter;
+   foreach my $obj (values(%{$app->{w5stat}})){
+      if ($obj->can("getPresenter")){
+         my %P=$obj->getPresenter();
+         foreach my $p (values(%P)){
+            $p->{module}=$obj->Self();
+            $p->{obj}=$obj;
+         }
+         push(@Presenter,%P);
+      }
+   }
+   my %P=@Presenter;
+   foreach my $p (sort({$P{$a}->{prio} <=> $P{$b}->{prio}} keys(%P))){
+      my $prec=$P{$p};
+      if (defined($prec) && defined($prec->{overview})){
+         if (my @ov=&{$prec->{overview}}($prec->{obj},$primrec,$hist)){
+            push(@ovdata,@ov);
+         }
+      }
+   }
+   $d.="<div class=overview>";
+   $d.="<table width=100%>";
+   foreach my $rec (@ovdata){
+      $d.="<tr>";
+      $d.="<td>".$rec->[0]."</td>";
+      $d.="<td>".$rec->[1]."</td>";
+      $d.="<td>".$rec->[2]."</td>";
+      $d.="<td>".$rec->[3]."</td>";
+      $d.="</tr>";
+   }
+   $d.="</table>";
+   $d.="</div>";
    return($d);
 }
 
@@ -69,7 +104,7 @@ sub overviewDataIssue
 {
    my $self=shift;
 
-
+   return(['Anzahl DataIssues',20,'red','-10%']);
 }
 
 sub displayDataIssue

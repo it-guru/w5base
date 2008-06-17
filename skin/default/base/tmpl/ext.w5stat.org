@@ -3,7 +3,9 @@
 
 <td valign=top><br>
 The "total Users" KPI defines the count of employees
-in the current organisational unit incl. all sub units.
+in the current organisational unit incl. all sub units.<br>
+<br>
+Only these users can be counted, witch have already done a login at W5Base.
 </td>
 
 <td>
@@ -22,6 +24,9 @@ in the current organisational unit incl. all sub units.
 <td valign=top><br>
 The "total Users" KPI defines the count of employees
 in the current organisational unit incl. all sub units.
+<br>
+<br>
+Only these users can be counted, witch have already done a login at W5Base.
 </td>
 
 </tr>
@@ -32,8 +37,10 @@ in the current organisational unit incl. all sub units.
 <tr>
 
 <td valign=top><br>
-The "direct Users" KPI is the count of users, witch
-are directly assigned to the current group.
+The SubGroups are the count of organisational units
+"under" the current group.<br>
+<br>
+The Users in these SubGroups are counted in "total Users".
 </td>
 
 <td>

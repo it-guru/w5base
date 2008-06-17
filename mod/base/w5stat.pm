@@ -350,13 +350,17 @@ sub getValidWebFunctions
 sub ShowEntry
 {
    my $self=shift;
+   my $requestid=Query->Param("id");
+   my $requesttag=Query->Param("tag");
+   my ($rmod,$rtag)=$requesttag=~m/^(.*)::([^:]+)$/;
+   my $title=$self->T("W5Base Statistic Presenter");
+   my $subtitle=$self->T($requesttag,$rmod);
+   $title.=" - ".$subtitle;
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','w5stat.css'],
                            js=>['toolbox.js','subModal.js'],
                            body=>1,form=>1,
-                           title=>"W5Base Statistik Presenter");
-   my $requestid=Query->Param("id");
-   my $requesttag=Query->Param("tag");
+                           title=>$title);
 
    my ($primrec,$hist)=$self->LoadStatSet($requestid);
 
@@ -371,10 +375,12 @@ sub ShowEntry
 <div class=chartlabel>
 Quality Report $M/$Y - $primrec->{fullname}
 </div>
+<div class=chartsublabel>
+$subtitle
+</div>
 <script type="text/javascript" src="../../../static/open-flash-chart/js/swfobject.js"></script>
 EOF
       if ($requesttag ne ""){
-         my ($rmod,$rtag)=$requesttag=~m/^(.*)::([^:]+)$/;
      
          foreach my $obj (values(%{$self->{w5stat}})){
             if ($obj->Self() eq $rmod){
