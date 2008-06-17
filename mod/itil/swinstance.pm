@@ -106,6 +106,14 @@ sub new
                 dataobjattr   =>'swinstance.appl'),
 
       new kernel::Field::Text(
+                name          =>'applconumber',
+                htmlwidth     =>'100px',
+                label         =>'Application CO-Number',
+                weblinkto     =>'itil::costcenter',
+                weblinkon     =>['conumber'=>'name'],
+                dataobjattr   =>'appl.conumber'),
+
+      new kernel::Field::Text(
                 name          =>'name',
                 htmlwidth     =>'250px',
                 label         =>'Instance-Name',
@@ -360,7 +368,8 @@ sub getSqlFrom
 
    $from.=" left outer join lnkcontact ".
           "on lnkcontact.parentobj='itil::swinstance' ".
-          "and $worktable.id=lnkcontact.refid";
+          "and $worktable.id=lnkcontact.refid ".
+          "left outer join appl on $worktable.appl=appl.id";
 
    return($from);
 }

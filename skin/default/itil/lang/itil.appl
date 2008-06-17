@@ -33,7 +33,7 @@
 'you are not authorized to set other persons as databoss'=>{
           de=>'sie sind nicht berechtigt, andere Personen als Datenverantwortlicher zu definieren'},
 'Application ID'=>{de=>'Anwendungs-ID'},
-'CO-Number'=>{de=>'CO-Nummer'},
+'CO-Number'=>{de=>'Kostenstelle/CO-Nummer',en=>'CostCenter/CO-Number'},
 'Application Version'=>{de=>'Anwendungsversion'},
 'Maintenance Window'=>{de=>'Wartungsfenster'},
 'average user count'=>{de=>'mittlere Benutzeranzahl'},
