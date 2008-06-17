@@ -453,7 +453,7 @@ sub Presenter
    my ($primrec,$hist)=$self->LoadStatSet($requestid);
 
 
-   if (!defined($primrec)){
+   if (!defined($primrec) && $requestid ne ""){
       print "Requested Record '$requestid' not found";
       print $self->HtmlBottom(body=>1,form=>1);
       return();
@@ -468,18 +468,35 @@ sub Presenter
 
 
    my %histid;
-   foreach my $h (@{$hist->{area}}){
-      $histid{$h->{month}}=$h->{id};
+   my @ol;
+   if (defined($primrec)){
+      push(@ol,$primrec->{id},$primrec->{fullname});
+      foreach my $h (@{$hist->{area}}){
+         $histid{$h->{month}}=$h->{id};
+      }
    }
 
 
 
-   printf("<tr height=1%><td>");
+   print("<tr height=1%><td>");
    print("<table width=100%><tr>\n");
-   printf("<td width=1%><select>".
-          "<option>DTAG.TSI.ES.ITO.CSS.T-Com.PMAQ.QSO</option></select></td>");
-   my $month=$primrec->{month};
-   my ($Y,$M)=$month=~m/^(\d{4})(\d{2})$/;
+   print("<td width=1%><select name=selid style=\"width:300px\">");
+   while(my $k=shift(@ol)){
+      my $label=shift(@ol);
+      printf("<option value=\"%s\">%s</option>",$k,$label);
+   }
+   print("</select></td>");
+   my ($Y,$M);
+   if (defined($primrec)){
+      my $month=$primrec->{month};
+      ($Y,$M)=$month=~m/^(\d{4})(\d{2})$/;
+   }
+   else{
+      my ($year,$mon,$day, $hour,$min,$sec) = Today_and_Now("GMT");
+      $Y=$year;
+      $M=$mon;
+   }
+   
    my $mstr="";
    my ($Y1,$M1)=($Y,$M);
    sub getLabelString
@@ -525,27 +542,29 @@ sub Presenter
    printf("<td width=150 valign=top>");
 
    my @Presenter;
-   foreach my $obj (values(%{$self->{w5stat}})){
-      if ($obj->can("getPresenter")){
-         my %P=$obj->getPresenter();
-         foreach my $p (values(%P)){
-            $p->{module}=$obj->Self();
-         }
-         push(@Presenter,%P);
-      }
-   }
    my $oldtag=Query->Param("tag");
-   $oldtag="base::ext::w5stat::overview" if ($oldtag eq "");
-   my %P=@Presenter;
-   print("<ul>");
-   foreach my $p (sort({$P{$a}->{prio} <=> $P{$b}->{prio}} keys(%P))){
-      my $prec=$P{$p};
-      my $tag=$prec->{module}."::".$p;
-      my $label=$self->T($tag,$prec->{module});
-      my $link="javascript:setTag($requestid,\"$tag\")";
-      print "<li><a href=$link>".$label."</a></li>";
+   if (defined($primrec)){
+      foreach my $obj (values(%{$self->{w5stat}})){
+         if ($obj->can("getPresenter")){
+            my %P=$obj->getPresenter();
+            foreach my $p (values(%P)){
+               $p->{module}=$obj->Self();
+            }
+            push(@Presenter,%P);
+         }
+      }
+      $oldtag="base::ext::w5stat::overview" if ($oldtag eq "");
+      my %P=@Presenter;
+      print("<ul>");
+      foreach my $p (sort({$P{$a}->{prio} <=> $P{$b}->{prio}} keys(%P))){
+         my $prec=$P{$p};
+         my $tag=$prec->{module}."::".$p;
+         my $label=$self->T($tag,$prec->{module});
+         my $link="javascript:setTag($requestid,\"$tag\")";
+         print "<li><a href=$link>".$label."</a></li>";
+      }
+      printf("</ul>");
    }
-   printf("</ul>");
 
    printf("</td>");
    print("<td valign=top style=\"padding-right:5px\">".

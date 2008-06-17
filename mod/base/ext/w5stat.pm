@@ -150,17 +150,17 @@ sub displayOrg
    my $data=$app->extractYear($primrec,$hist,"User",
                               setUndefZero=>1);
    my $chart1=$app->buildChart("ofcUser",$data,
-                   width=>300,height=>200,
+                   width=>400,height=>200,
                    label=>'total Users');
    my $data=$app->extractYear($primrec,$hist,"User.Direct",
                               setUndefZero=>1);
    my $chart2=$app->buildChart("ofcUserDirect",$data,
-                   width=>300,height=>200,
+                   width=>400,height=>200,
                    label=>'direct Users');
    my $data=$app->extractYear($primrec,$hist,"SubGroups",
                               setUndefZero=>1);
    my $chart3=$app->buildChart("ofcSubGroups",$data,
-                   width=>300,height=>200,
+                   width=>400,height=>200,
                    label=>'SubGroups');
    return(undef) if (!defined($data));
 
