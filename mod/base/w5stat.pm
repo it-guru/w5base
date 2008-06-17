@@ -469,33 +469,50 @@ sub Presenter
 
    my %histid;
    my @ol;
+   my ($Y,$M,$month);
    if (defined($primrec)){
       push(@ol,$primrec->{id},$primrec->{fullname});
       foreach my $h (@{$hist->{area}}){
          $histid{$h->{month}}=$h->{id};
       }
+      $month=$primrec->{month};
+      ($Y,$M)=$month=~m/^(\d{4})(\d{2})$/;
+   }
+   else{
+      my ($year,$mon,$day, $hour,$min,$sec) = Today_and_Now("GMT");
+      push(@ol,"-","- select a statistic -");
+      $Y=$year;
+      $M=$mon;
+      $month=sprintf("%04d%02d",$year,$mon);
+   }
+   my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+                    ['REmployee','RBoss','RReportReceive'],"both");
+   my @grpnames;
+   foreach my $g (values(%grps)){
+      push(@grpnames,$g->{fullname});
+   }
+
+   printf STDERR ("grp=%s\n",Dumper(\@grpnames));
+   $self->ResetFilter();
+   $self->SecureSetFilter({month=>\$month,sgroup=>\'Group',
+                           fullname=>\@grpnames});
+
+   foreach my $r (sort({$a->{fullname} cmp $b->{fullname}}
+                            $self->getHashList(qw(fullname id)))){
+      push(@ol,$r->{id},$r->{fullname});
    }
 
 
 
    print("<tr height=1%><td>");
    print("<table width=100%><tr>\n");
-   print("<td width=1%><select name=selid style=\"width:300px\">");
+   print("<td width=1%><select name=selid onchange=\"changeid(this);\" ".
+         "style=\"width:300px\">");
    while(my $k=shift(@ol)){
       my $label=shift(@ol);
       printf("<option value=\"%s\">%s</option>",$k,$label);
    }
    print("</select></td>");
-   my ($Y,$M);
-   if (defined($primrec)){
-      my $month=$primrec->{month};
-      ($Y,$M)=$month=~m/^(\d{4})(\d{2})$/;
-   }
-   else{
-      my ($year,$mon,$day, $hour,$min,$sec) = Today_and_Now("GMT");
-      $Y=$year;
-      $M=$mon;
-   }
    
    my $mstr="";
    my ($Y1,$M1)=($Y,$M);
@@ -593,6 +610,10 @@ function refreshTag(id)
    document.forms[0].action=id;
    document.forms[0].target="_self";
    document.forms[0].submit();
+}
+function changeid(bo)
+{
+   refreshTag(bo.value);
 }
 </script>
 EOF

@@ -265,7 +265,8 @@ sub Init
                       defaultacl=>['admin']);
    
    $self->RegisterObj("Tools.reflexion",
-                      "tmpl/welcome.reflexion",
+                      "base::w5stat",
+                      func=>'Presenter/Main',
                       defaultacl=>['valid_user']);
    
    $self->RegisterObj("Tools.reflexion.w5stat",
