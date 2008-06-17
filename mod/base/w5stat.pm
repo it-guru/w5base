@@ -489,7 +489,8 @@ sub Presenter
       my $Y1=shift;
       my $k=sprintf("%04d%02d",$Y1,$M1);
       if (defined($histid->{$k})){
-         return(sprintf("<td align=center><a href=\"$histid->{$k}\">".
+         return(sprintf("<td align=center>".
+                        "<a href=javascript:refreshTag($histid->{$k})>".
                         "%02d<br>%4d</a></td>",$M1,$Y1));
       }
       return(sprintf("<td align=center>%02d<br>%4d</td>",$M1,$Y1));
@@ -533,6 +534,8 @@ sub Presenter
          push(@Presenter,%P);
       }
    }
+   my $oldtag=Query->Param("tag");
+   $oldtag="base::ext::w5stat::overview" if ($oldtag eq "");
    my %P=@Presenter;
    print("<ul>");
    foreach my $p (sort({$P{$a}->{prio} <=> $P{$b}->{prio}} keys(%P))){
@@ -547,20 +550,29 @@ sub Presenter
    printf("</td>");
    print("<td valign=top style=\"padding-right:5px\">".
         "<iframe name=entry width=100% height=100% ".
-        "src=\"../ShowEntry?id=$requestid&tag=base::ext::w5stat::overview\">".
+        "src=\"../ShowEntry?id=$requestid&tag=$oldtag\">".
         "</iframe></td>");
    print ("</tr></table>");
    print ("</td></tr>");
    print ("</table>");
    print(<<EOF);
 <input type=hidden name=id value="$requestid">
-<input type=hidden name=tag value="">
+<input type=hidden name=tag value="$oldtag">
 <script language="JavaScript">
 function setTag(id,tag)
 {
    document.forms[0].elements['id'].value=id;
-   document.forms[0].elements['tag'].value=tag;
+   if (tag){
+      document.forms[0].elements['tag'].value=tag;
+   }
    document.forms[0].target="entry";
+   document.forms[0].submit();
+}
+function refreshTag(id)
+{
+   document.forms[0].elements['id'].value=id;
+   document.forms[0].action=id;
+   document.forms[0].target="_self";
    document.forms[0].submit();
 }
 </script>

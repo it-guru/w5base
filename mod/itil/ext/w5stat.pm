@@ -44,10 +44,12 @@ sub getPresenter
                       },
           'system'=>{
                          opcode=>\&displaySystem,
+                         overview=>\&overviewSystem,
                          prio=>1001,
                       },
           'asset'=>{
                          opcode=>\&displayAsset,
+                         overview=>\&overviewAsset,
                          prio=>1002,
                       }
          );
@@ -57,9 +59,15 @@ sub getPresenter
 sub overviewAppl
 {  
    my $self=shift;
-   my $app=$self->getParent();
-
-   return(['Anzahl dem Bereich zugeordneter Anwendungen',10,'black','+10%']);
+   my ($primrec,$hist)=@_;
+   my @l;
+   if (defined($primrec->{stats}->{'ITIL.Application.Count'})){
+      my $color="black";
+      push(@l,['Anzahl dem Bereich zugeordneter Anwendungen',
+               $primrec->{stats}->{'ITIL.Application.Count'}->[0],
+               $color,'-10%']);
+   }
+   return(@l);
 }
 
 sub displayAppl
@@ -91,6 +99,20 @@ EOF
 }
 
 
+sub overviewSystem
+{  
+   my $self=shift;
+   my ($primrec,$hist)=@_;
+   my @l;
+   if (defined($primrec->{stats}->{'ITIL.System.Count'})){
+      my $color="black";
+      push(@l,['Anzahl dem Bereich zugeordneter Systeme',
+               $primrec->{stats}->{'ITIL.System.Count'}->[0],
+               $color,'-10%']);
+   }
+   return(@l);
+}
+
 sub displaySystem
 {  
    my $self=shift;
@@ -120,6 +142,20 @@ EOF
    return($d);
 }
 
+
+sub overviewAsset
+{  
+   my $self=shift;
+   my ($primrec,$hist)=@_;
+   my @l;
+   if (defined($primrec->{stats}->{'ITIL.Asset.Count'})){
+      my $color="black";
+      push(@l,['Anzahl dem Bereich zugeordneter Assets',
+               $primrec->{stats}->{'ITIL.Asset.Count'}->[0],
+               $color,'-10%']);
+   }
+   return(@l);
+}
 
 sub displayAsset
 {  

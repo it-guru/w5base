@@ -103,8 +103,17 @@ sub displayOverview
 sub overviewDataIssue
 {
    my $self=shift;
-
-   return(['Anzahl DataIssues',20,'red','-10%']);
+   my ($primrec,$hist)=@_;
+   my @l;
+   if (defined($primrec->{stats}->{'base.DataIssue.open'})){
+      my $color="red";
+      if ($primrec->{stats}->{'base.DataIssue.open'}->[0]<3){
+         $color="yellow";
+      }
+      push(@l,['Anzahl unbearbeiteter DataIssues',
+               $primrec->{stats}->{'base.DataIssue.open'}->[0],$color,'-10%']);
+   }
+   return(@l);
 }
 
 sub displayDataIssue

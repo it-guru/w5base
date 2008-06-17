@@ -73,8 +73,6 @@ sub mkP800swi
             my $srcid=sprintf("%s-%s",$start,$rec->{id});
             my $srcsys=$self->Self();
             my $tcomworktime=int($ssrec->{flathourscost}*60);
-            printf STDERR ("fifi srcid=$srcid srcsys=$srcsys d=%s\n",Dumper($rec));
-            printf STDERR ("fifi ssrec=%s\n",Dumper($ssrec));
             my $detaildescription=$ssrec->{servicedescription};
             $detaildescription="" if ($detaildescription eq "");
             my $tcomcodcomments="Software-Instance: $rec->{fullname}\n".
