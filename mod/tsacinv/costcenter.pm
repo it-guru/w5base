@@ -59,6 +59,7 @@ sub new
       new kernel::Field::Text(
                 name       =>'bc',
                 label      =>'Business Center',
+                ignorecase    =>1,
                 dataobjattr=>'amcostcenter.alternatebusinesscenter'),
 
       new kernel::Field::TextDrop(
