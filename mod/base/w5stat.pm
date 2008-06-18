@@ -26,6 +26,7 @@ use kernel::Field;
 use DateTime;
 use DateTime::Span;
 use DateTime::SpanSet;
+use POSIX qw(floor);
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -420,12 +421,24 @@ sub LoadStatSet
       $self->ResetFilter();
       $self->SecureSetFilter({fullname=>\$primrec->{fullname},
                               sgroup=>\$primrec->{sgroup}});
-      my $hist={area=>[map({
-                             if (ref($_->{stats}) ne "HASH"){
-                                $_->{stats}={Datafield2Hash($_->{stats})};
-                             }
-                             $_;
-                           } $self->getHashList(qw(ALL)))]};
+      my $month=$primrec->{month};
+      my ($Y,$M)=$month=~m/^(\d{4})(\d{2})$/;
+      $M--;
+      if ($M<=0){
+         $M=12;
+         $Y--;
+      }
+      my $lastmonth=sprintf("%04d%02d",$Y,$M);
+      my $hist={area=>[]};
+      foreach my $srec ($self->getHashList(qw(ALL))){
+         if (ref($srec->{stats}) ne "HASH"){
+            $srec->{stats}={Datafield2Hash($srec->{stats})};
+         }
+         push(@{$hist->{area}},$srec);
+         if ($lastmonth eq $srec->{month}){
+            $hist->{lastmonth}=$srec;
+         }
+      }
       return($primrec,$hist);
 
    }
@@ -497,7 +510,7 @@ sub Presenter
    $self->SecureSetFilter({month=>\$month,sgroup=>\'Group',
                            fullname=>\@grpnames});
 
-   foreach my $r (sort({$a->{fullname} cmp $b->{fullname}}
+   foreach my $r (sort({$b->{fullname} cmp $a->{fullname}}
                             $self->getHashList(qw(fullname id)))){
       push(@ol,$r->{id},$r->{fullname});
    }
@@ -783,8 +796,35 @@ sub extractYear
          push(@d,undef);
       }
    }
-printf STDERR ("YearData($name)=%s\n",Dumper(\@d));
    return(\@d);
+}
+
+sub calcPOffset
+{
+   my $self=shift;
+   my ($primrec,$hist,$name)=@_;
+   my $delta;
+
+printf STDERR ("fifi name=$name\n");
+   if (defined($hist->{lastmonth}) && 
+       $hist->{lastmonth}->{stats}->{$name}->[0]>0){
+      my $cur=$primrec->{stats}->{$name}->[0];
+      my $lst=$hist->{lastmonth}->{stats}->{$name}->[0];
+printf STDERR ("fifi cur=$cur lst=$lst\n");
+      $delta=floor(($cur-$lst)*100.0/$lst);
+      if ($delta!=0){
+         if ($delta<0){
+            $delta="$delta".'%'; 
+         }
+         else{
+            $delta="+$delta".'%';
+         }
+      }
+      else{
+         $delta=undef;
+      }
+   }
+   return($delta);
 }
 
 

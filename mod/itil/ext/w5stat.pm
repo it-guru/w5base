@@ -60,13 +60,17 @@ sub overviewAppl
 {  
    my $self=shift;
    my ($primrec,$hist)=@_;
+   my $app=$self->getParent();
    my @l;
-   if (defined($primrec->{stats}->{'ITIL.Application.Count'})){
+
+   my $keyname='ITIL.Application.Count';
+   if (defined($primrec->{stats}->{$keyname})){
       my $color="black";
-      push(@l,['Anzahl dem Bereich zugeordneter Anwendungen',
-               $primrec->{stats}->{'ITIL.Application.Count'}->[0],
-               $color,'-10%']);
+      my $delta=$app->calcPOffset($primrec,$hist,$keyname);
+      push(@l,[$app->T('Count of Application Config-Items'),
+               $primrec->{stats}->{$keyname}->[0],$color,$delta]);
    }
+
    return(@l);
 }
 
@@ -103,12 +107,15 @@ sub overviewSystem
 {  
    my $self=shift;
    my ($primrec,$hist)=@_;
+   my $app=$self->getParent();
    my @l;
-   if (defined($primrec->{stats}->{'ITIL.System.Count'})){
+
+   my $keyname='ITIL.System.Count';
+   if (defined($primrec->{stats}->{$keyname})){
       my $color="black";
-      push(@l,['Anzahl dem Bereich zugeordneter Systeme',
-               $primrec->{stats}->{'ITIL.System.Count'}->[0],
-               $color,'-10%']);
+      my $delta=$app->calcPOffset($primrec,$hist,$keyname);
+      push(@l,[$app->T('Count of System Config-Items'),
+               $primrec->{stats}->{$keyname}->[0],$color,$delta]);
    }
    return(@l);
 }
@@ -147,12 +154,15 @@ sub overviewAsset
 {  
    my $self=shift;
    my ($primrec,$hist)=@_;
+   my $app=$self->getParent();
    my @l;
-   if (defined($primrec->{stats}->{'ITIL.Asset.Count'})){
+
+   my $keyname='ITIL.Asset.Count';
+   if (defined($primrec->{stats}->{$keyname})){
       my $color="black";
-      push(@l,['Anzahl dem Bereich zugeordneter Assets',
-               $primrec->{stats}->{'ITIL.Asset.Count'}->[0],
-               $color,'-10%']);
+      my $delta=$app->calcPOffset($primrec,$hist,$keyname);
+      push(@l,[$app->T('Count of Asset Config-Items'),
+               $primrec->{stats}->{$keyname}->[0],$color,$delta]);
    }
    return(@l);
 }

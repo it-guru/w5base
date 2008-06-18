@@ -1,3 +1,4 @@
 'base::ext::w5stat::overview'=>{de=>'Übersicht',en=>'Overview'},
 'base::ext::w5stat::dataissue'=>{de=>'Datenqualität',en=>'Datquality'},
 'base::ext::w5stat::org'=>{de=>'Organisation',en=>'Organisational'},
+'Unprocessed DataIssue Workflows'=>{de=>'Unbearbeitete DataIssue Workflows'},

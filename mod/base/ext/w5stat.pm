@@ -87,11 +87,15 @@ sub displayOverview
    $d.="<div class=overview>";
    $d.="<table width=100%>";
    foreach my $rec (@ovdata){
+      my $color="black";
+      if (defined($rec->[2])){
+         $color=$rec->[2];
+      }
       $d.="<tr>";
       $d.="<td>".$rec->[0]."</td>";
-      $d.="<td>".$rec->[1]."</td>";
-      $d.="<td>".$rec->[2]."</td>";
-      $d.="<td>".$rec->[3]."</td>";
+      $d.="<td align=right width=50><font color=\"$color\"><b>".
+          $rec->[1]."</b></font></td>";
+      $d.="<td align=right width=50>".$rec->[3]."</td>";
       $d.="</tr>";
    }
    $d.="</table>";
@@ -104,14 +108,17 @@ sub overviewDataIssue
 {
    my $self=shift;
    my ($primrec,$hist)=@_;
+   my $app=$self->getParent();
    my @l;
-   if (defined($primrec->{stats}->{'base.DataIssue.open'})){
+   my $keyname='base.DataIssue.open';
+   if (defined($primrec->{stats}->{$keyname})){
       my $color="red";
-      if ($primrec->{stats}->{'base.DataIssue.open'}->[0]<3){
+      my $delta=$app->calcPOffset($primrec,$hist,$keyname);
+      if ($primrec->{stats}->{$keyname}->[0]<3){
          $color="yellow";
       }
-      push(@l,['Anzahl unbearbeiteter DataIssues',
-               $primrec->{stats}->{'base.DataIssue.open'}->[0],$color,'-10%']);
+      push(@l,[$app->T('Unprocessed DataIssue Workflows'),
+               $primrec->{stats}->{$keyname}->[0],$color,$delta]);
    }
    return(@l);
 }
