@@ -55,6 +55,25 @@ sub getPresenter
 
 }
 
+
+sub processOverviewRecords
+{
+   my $self=shift;
+   my $ovdata=shift;
+   my $P=shift;
+   my $primrec=shift;
+   my $hist=shift;
+
+   foreach my $p (sort({$P->{$a}->{prio} <=> $P->{$b}->{prio}} keys(%{$P}))){
+      my $prec=$P->{$p};
+      if (defined($prec) && defined($prec->{overview})){
+         if (my @ov=&{$prec->{overview}}($prec->{obj},$primrec,$hist)){
+            push(@{$ovdata},@ov);
+         }
+      }
+   }
+}
+
 sub displayOverview
 {
    my $self=shift;
@@ -63,6 +82,7 @@ sub displayOverview
    my $d="";
 
    my @ovdata;
+
 
    my @Presenter;
    foreach my $obj (values(%{$app->{w5stat}})){
@@ -75,28 +95,47 @@ sub displayOverview
          push(@Presenter,%P);
       }
    }
-   my %P=@Presenter;
-   foreach my $p (sort({$P{$a}->{prio} <=> $P{$b}->{prio}} keys(%P))){
-      my $prec=$P{$p};
-      if (defined($prec) && defined($prec->{overview})){
-         if (my @ov=&{$prec->{overview}}($prec->{obj},$primrec,$hist)){
-            push(@ovdata,@ov);
+   my $P={@Presenter};
+   $self->processOverviewRecords(\@ovdata,$P,$primrec,$hist);
+   if (defined($primrec->{nameid}) && $primrec->{nameid} ne "" 
+       && $primrec->{sgroup} eq "Group"){
+      my $month=$primrec->{month};
+      my $grp=getModuleObject($app->Config,"base::grp");
+      $grp->SetFilter({parentid=>\$primrec->{nameid}});
+      my @l=$grp->getHashList(qw(fullname grpid));
+      if ($#l!=-1){
+         foreach my $grprec (@l){
+            my ($primrec,$hist)=$app->LoadStatSet(grpid=>$grprec->{grpid},
+                                                   $month);
+            if (defined($primrec)){
+               push(@ovdata,[$primrec->{fullname}]);
+               $self->processOverviewRecords(\@ovdata,$P,$primrec,$hist);
+
+            }
          }
       }
    }
    $d.="<div class=overview>";
    $d.="<table width=100%>";
    foreach my $rec (@ovdata){
-      my $color="black";
-      if (defined($rec->[2])){
-         $color=$rec->[2];
+      if ($#{$rec}!=0){
+         my $color="black";
+         if (defined($rec->[2])){
+            $color=$rec->[2];
+         }
+         $d.="<tr>";
+         $d.="<td>".$rec->[0]."</td>";
+         $d.="<td align=right width=50><font color=\"$color\"><b>".
+             $rec->[1]."</b></font></td>";
+         $d.="<td align=right width=50>".$rec->[3]."</td>";
+         $d.="</tr>";
       }
-      $d.="<tr>";
-      $d.="<td>".$rec->[0]."</td>";
-      $d.="<td align=right width=50><font color=\"$color\"><b>".
-          $rec->[1]."</b></font></td>";
-      $d.="<td align=right width=50>".$rec->[3]."</td>";
-      $d.="</tr>";
+      else{
+         $d.="<tr>";
+         $d.="<td colspan=3><div class=subunit>".$app->T("Subunit").":".
+              $rec->[0]."</div></td>";
+         $d.="</tr>";
+      }
    }
    $d.="</table>";
    $d.="</div>";

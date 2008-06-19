@@ -291,7 +291,7 @@ sub storeStatVar
       if ($var ne ""){
          while(1){
             if ($key ne "" && !defined($isAlreadyCounted{$key})){
-               if (defined($nameid)){
+               if (defined($nameid) && $level==0){
                   $self->{stats}->{$group}->{$key}->{nameid}=$nameid;
                }
                if (lc($method) eq "count"){
@@ -375,7 +375,7 @@ sub ShowEntry
                            body=>1,form=>1,
                            title=>$title);
 
-   my ($primrec,$hist)=$self->LoadStatSet($requestid);
+   my ($primrec,$hist)=$self->LoadStatSet(id=>$requestid);
 
    if (defined($primrec)){
       my $load=$self->findtemplvar({current=>$primrec,mode=>"HtmlV01"},"mdate","formated");
@@ -420,11 +420,17 @@ EOF
 sub LoadStatSet
 {
    my $self=shift;
+   my $type=shift;
    my $id=shift;
-   my $dep=shift;
+   my $month=shift;
 
    $self->ResetFilter();
-   $self->SecureSetFilter({id=>\$id});
+   if ($type eq "id"){
+      $self->SecureSetFilter({id=>\$id});
+   }
+   if ($type eq "grpid"){
+      $self->SecureSetFilter({sgroup=>\'Group',nameid=>\$id,month=>\$month});
+   }
    my ($primrec,$msg)=$self->getOnlyFirst(qw(ALL));
    if (defined($primrec)){
       if (ref($primrec->{stats}) ne "HASH"){
@@ -475,7 +481,7 @@ sub Presenter
    my $requestid=$p;
    $requestid=~s/[^\d]//g;
 
-   my ($primrec,$hist)=$self->LoadStatSet($requestid);
+   my ($primrec,$hist)=$self->LoadStatSet(id=>$requestid);
 
 
    if (!defined($primrec) && $requestid ne ""){
