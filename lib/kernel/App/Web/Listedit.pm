@@ -1471,13 +1471,9 @@ sub ProcessUploadRecord
             }
          }
       }
-      else{
-         delete($rec->{$idname});
-      }
-      delete($rec->{$idname});
+      delete($rec->{$idname}); # id field isn't valid in Write-Request!
    }
    my $newrec=$self->getWriteRequestHash("upload",$oldrec,$rec);
-printf STDERR ("fifi newrec=%s\n",Dumper($newrec));
    if (!defined($newrec)){
       if ($self->LastMsg()){
          print join("\n",$self->LastMsg());
