@@ -402,6 +402,7 @@ sub Sendmail
             my @smsrec=$user->getHashList(qw(fullname sms 
                                              office_mobile home_mobile));
             $smstext=$rec->{smstext} if ($rec->{smstext} ne "");
+            my @numlist;
             foreach my $smsrec (@smsrec){
                my $number;
                if ($smsrec->{sms} eq "officealways"){
@@ -411,12 +412,23 @@ sub Sendmail
                   $number=$smsrec->{home_mobile};
                }
                if (defined($number)){
-                  $number=~s/\s//g;
+                  $number=~s/[\s-\/]//g;
                   msg(DEBUG,"sending sms to $smsrec->{fullname}");
-                  if (open(F,"|".$smsscript." \"$number\"")){
+                  push(@numlist,$number);
+                  if (open(F,"|".$smsscript." \"-s\" \"$number\"")){
                      print F $smstext;
                      close(F);
                   }
+                  else{
+                     msg(ERROR,"cant initiate sms to $smsrec->{fullname}");
+                  }
+               }
+            }
+            if ($#numlist!=-1){
+               if (open(F,"|".$smsscript." \"-m\" ".
+                          join(" ",map({'"'.$_.'"'} @numlist)))){
+                  print F $smstext;
+                  close(F);
                }
             }
          }

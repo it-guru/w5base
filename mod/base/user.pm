@@ -616,6 +616,9 @@ sub FinishWrite
    if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
       return(0);
    }
+   $self->NotifyAddOrRemoveObject($oldrec,$newrec,"fullname",
+                                  "STEVuserchanged",110000001);
+
    return(1);
 }
 
@@ -731,6 +734,8 @@ sub FinishDelete
                          $infoabo->ValidatedDeleteRecord($_);
                       });
    }
+   $self->NotifyAddOrRemoveObject($oldrec,undef,"fullname",
+                                  "STEVuserchanged",110000001);
    return($self->SUPER::FinishDelete($oldrec));
 }
 

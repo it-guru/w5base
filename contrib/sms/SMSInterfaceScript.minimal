@@ -1,8 +1,13 @@
 #!/bin/bash
-SMSNUM=$1
+SMSMODE=$1
+SMSNUM=$2
 SMSTEXT=`cat` 
-echo "=========================================================================" >> /tmp/smslog
-echo "date: `date`" >> /tmp/smslog
-echo "to:   $SMSNUM" >> /tmp/smslog
-echo "$SMSTEXT" >> /tmp/smslog
-echo "=========================================================================" >> /tmp/smslog
+if [ "$SMSMODE" = "-s" ]; then
+   SMSNUM=`echo "$SMSNUM" | sed -e 's/^\+49/0/g'`
+   echo "=========================================================================" >> /tmp/smslog
+   echo "date: `date`" >> /tmp/smslog
+   echo "to:   $SMSNUM" >> /tmp/smslog
+   echo "$SMSTEXT" >> /tmp/smslog
+   echo "=========================================================================" >> /tmp/smslog
+   echo "$SMSTEXT" | mailx $SMSNUM@t-mobile-sms.de
+fi

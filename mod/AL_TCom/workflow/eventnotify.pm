@@ -300,13 +300,18 @@ sub generateMailSet
 {
    my $self=shift;
    my ($WfRec,$action,$eventlang,$additional,$emailprefix,$emailpostfix,
-       $emailtext,$emailsep,$emailsubheader,$emailsubtitle)=@_;
+       $emailtext,$emailsep,$emailsubheader,$emailsubtitle,$allowsms,$smstext)=@_;
    my @emailprefix=();
    my @emailpostfix=();
    my @emailtext=();
    my @emailsep=();
    my @emailsubheader=();
    my @emailsubtitle=();
+
+   $$allowsms=0;
+   $$smstext="";
+
+
 
    my $baseurl;
    if ($ENV{SCRIPT_URI} ne ""){
@@ -335,6 +340,13 @@ sub generateMailSet
       # wffields.eventstatreason entfernt lt. Request ID:12077277280002  
       #push(@baseset,"wffields.eventstatreason");
    }
+   my $fo=$self->getField("wffields.eventmode",$WfRec);
+   if (defined($fo)){
+      my $v=$fo->FormatedResult($WfRec,"HtmlMail");
+      if ($v ne ""){
+         $$smstext.=$v."\n";
+      }
+   }
 
    my @sets=([@baseset,qw(
                           wffields.eventimpact
@@ -357,6 +369,7 @@ sub generateMailSet
    $ENV{HTTP_FORCE_LANGUAGE}=$lang;
 
    my @fields=@{shift(@sets)};
+ 
    foreach my $field (@fields){
       my $fo=$self->getField($field,$WfRec);
       my $sh=0;
@@ -368,6 +381,19 @@ sub generateMailSet
             $v=" ";
          }
          if ($v ne ""){
+            if ($field eq "wffields.eventstatclass" &&
+                $v eq "1" || $v eq "2"){
+               $$allowsms=1
+            }
+            if (grep(/^$field$/,qw(wffields.eventstartofevent 
+                                   wffields.eventendofevent
+                                   wffields.eventstatclass 
+                                   affectedapplication))){
+                my $vv=$v;
+                $vv=~s/&nbsp;/ /g;;
+                $$smstext.=$fo->Label().":".$vv."\n";
+            }
+                           
             if ($baseurl ne "" && $line==0){
                my $ilang="?HTTP_ACCEPT_LANGUAGE=$lang";
                my $imgtitle=$self->getParent->T("current state of workflow",
@@ -537,10 +563,12 @@ sub generateWorkspace
    my @emailsubheader=();
    my @emailsubtitle=();
    my %additional=();
+   my $smsallow;
+   my $smstext;
    $self->getParent->generateMailSet($WfRec,"rootcausei",
                     \$emaillang,\%additional,
                     \@emailprefix,\@emailpostfix,\@emailtext,\@emailsep,
-                    \@emailsubheader,\@emailsubtitle);
+                    \@emailsubheader,\@emailsubtitle,\$smsallow,\$smstext);
    return($self->generateNotificationPreview(emailtext=>\@emailtext,
                                              emailprefix=>\@emailprefix,
                                              emailsep=>\@emailsep,
@@ -592,6 +620,8 @@ sub Process
       my @emailsep=();
       my @emailsubheader=();
       my @emailsubtitle=();
+      my $smsallow;
+      my $smstext;
 
       my $eventlango=$self->getField("wffields.eventlang",$WfRec);
       $eventlang=$eventlango->RawValue($WfRec) if (defined($eventlango));
@@ -625,7 +655,7 @@ sub Process
       $self->getParent->generateMailSet($WfRec,"rootcausei",
                        \$eventlang,\%additional,
                        \@emailprefix,\@emailpostfix,\@emailtext,\@emailsep,
-                       \@emailsubheader,\@emailsubtitle);
+                       \@emailsubheader,\@emailsubtitle,\$smsallow,\$smstext);
       #
       # calc from address
       #

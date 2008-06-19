@@ -977,12 +977,15 @@ sub generateMailSet
 {
    my $self=shift;
    my ($WfRec,$action,$eventlang,$additional,$emailprefix,$emailpostfix,
-       $emailtext,$emailsep,$emailsubheader)=@_;
+       $emailtext,$emailsep,$emailsubheader,$allowsms,$smstext)=@_;
    my @emailprefix=();
    my @emailpostfix=();
    my @emailtext=();
    my @emailsep=();
    my @emailsubheader=();
+
+   $$allowsms=0;
+   $$smstext="";
 
    my $eventlango=$self->getField("wffields.eventlang",$WfRec);
    $$eventlang=$eventlango->RawValue($WfRec) if (defined($eventlango));
@@ -998,6 +1001,14 @@ sub generateMailSet
    if ($WfRec->{eventmode} eq "EVk.appl"){
       push(@baseset,"affectedapplication");
    }
+   my $fo=$self->getField("wffields.eventmode",$WfRec);
+   if (defined($fo)){
+      my $v=$fo->FormatedResult($WfRec,"HtmlMail");
+      if ($v ne ""){
+         $$smstext.=$v."\n";
+      }
+   }
+
    my @sets=([@baseset,qw(  
                           wffields.eventimpact
                           wffields.eventreason 
@@ -1022,7 +1033,18 @@ sub generateMailSet
          if (defined($fo)){
             my $v=$fo->FormatedResult($WfRec,"HtmlMail");
             if ($v ne ""){
-
+               if ($field eq "wffields.eventstatclass" &&
+                   $v eq "1" || $v eq "2"){
+                  $$allowsms=1
+               }
+               if (grep(/^$field$/,qw(wffields.eventstartofevent 
+                                      wffields.eventendofevent
+                                      wffields.eventstatclass 
+                                      affectedapplication))){
+                   my $vv=$v;
+                   $vv=~s/&nbsp;/ /g;;
+                   $$smstext.=$fo->Label().":".$vv."\n";
+               }
                if ($baseurl ne "" && $line==0){
                   my $ilang="?HTTP_ACCEPT_LANGUAGE=$lang";
                   my $imgtitle=$self->getParent->T("current state of workflow",
@@ -1923,11 +1945,13 @@ sub generateWorkspace
    my @emailsep=();
    my @emailsubheader=();
    my @emailsubtitle=();
+   my $smsallow=();
+   my $smstext=();
    my %additional=();
    $self->getParent->generateMailSet($WfRec,"sendcustinfo",
                     \$emaillang,\%additional,
                     \@emailprefix,\@emailpostfix,\@emailtext,\@emailsep,
-                    \@emailsubheader,\@emailsubtitle);
+                    \@emailsubheader,\@emailsubtitle,\$smsallow,\$smstext);
    return($self->generateNotificationPreview(emailtext=>\@emailtext,
                                              emailprefix=>\@emailprefix,
                                              emailsep=>\@emailsep,
@@ -1996,6 +2020,8 @@ sub Process
       my @emailsep=();
       my @emailsubheader=();
       my @emailsubtitle=();
+      my $smsallow=();
+      my $smstext=();
 
       my $eventlango=$self->getField("wffields.eventlang",$WfRec);
       $eventlang=$eventlango->RawValue($WfRec) if (defined($eventlango));
@@ -2057,7 +2083,7 @@ sub Process
                       creationtime=>$creationtime);
       $self->getParent->generateMailSet($WfRec,$action,\$eventlang,\%additional,
                        \@emailprefix,\@emailpostfix,\@emailtext,\@emailsep,
-                       \@emailsubheader,\@emailsubtitle);
+                       \@emailsubheader,\@emailsubtitle,\$smsallow,\$smstext);
       #
       # calc from address
       #
@@ -2103,7 +2129,8 @@ sub Process
              emailprefix    =>\@emailprefix,
              emailpostfix   =>\@emailpostfix,
              emailtext      =>\@emailtext,
-             allowsms       =>1,
+             allowsms       =>$smsallow,
+             smstext        =>$smstext,
              emailsep       =>\@emailsep,
              emailsubheader =>\@emailsubheader,
              emailsubtitle  =>\@emailsubtitle,

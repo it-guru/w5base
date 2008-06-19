@@ -513,14 +513,21 @@ sub Presenter
    my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
                     ['REmployee','RBoss','RReportReceive'],"both");
    my @grpnames;
+   my @grpids;
+   foreach my $id (keys(%grps)){
+      push(@grpids,$id);
+   }
    foreach my $g (values(%grps)){
       push(@grpnames,$g->{fullname});
    }
 
-   printf STDERR ("grp=%s\n",Dumper(\@grpnames));
    $self->ResetFilter();
-   $self->SecureSetFilter({month=>\$month,sgroup=>\'Group',
-                           fullname=>\@grpnames});
+   $self->SecureSetFilter([
+                           {month=>\$month,sgroup=>\'Group',
+                            fullname=>\@grpnames},
+                           {month=>\$month,sgroup=>\'Group',
+                            nameid=>\@grpids},
+                          ]);
 
    foreach my $r (sort({$b->{fullname} cmp $a->{fullname}}
                             $self->getHashList(qw(fullname id)))){
