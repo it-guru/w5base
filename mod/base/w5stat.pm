@@ -101,6 +101,12 @@ sub new
                 label         =>'Source-Load',
                 dataobjattr   =>'w5stat.srcload'),
 
+      new kernel::Field::Link(
+                name          =>'nameid',
+                group         =>'source',
+                label         =>'NameID',
+                dataobjattr   =>'w5stat.nameid'),
+
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
@@ -223,9 +229,15 @@ sub recreateStats
                delete($self->{stats}->{$group}->{$name}->{$v});
             }
          }
+         my $nameid;
+         if (defined($self->{stats}->{$group}->{$name}->{nameid})){
+            $nameid=$self->{stats}->{$group}->{$name}->{nameid};
+            delete($self->{stats}->{$group}->{$name}->{nameid});
+         }
          my $statrec={stats=>$self->{stats}->{$group}->{$name},
                       sgroup=>$group,
                       month=>$monthstamp,
+                      nameid=>$nameid,
                       fullname=>$name};
          $self->ValidatedInsertOrUpdateRecord($statrec,
                                             {sgroup=>\$statrec->{sgroup},
@@ -260,7 +272,7 @@ sub storeStatVar
    my @val=@_;
    my $method=$param->{method};
    my $maxlevel=$param->{maxlevel};
-   my $keyid=$param->{key};
+   my $nameid=$param->{nameid};
    $method="count" if (!defined($method));
 
    my @key=($key);
@@ -279,8 +291,8 @@ sub storeStatVar
       if ($var ne ""){
          while(1){
             if ($key ne "" && !defined($isAlreadyCounted{$key})){
-               if (defined($keyid)){
-                  $self->{stats}->{$group}->{$key}->{keyid}=$keyid;
+               if (defined($nameid)){
+                  $self->{stats}->{$group}->{$key}->{nameid}=$nameid;
                }
                if (lc($method) eq "count"){
                   $self->{stats}->{$group}->{$key}->{$var}+=$val[0];
@@ -805,12 +817,10 @@ sub calcPOffset
    my ($primrec,$hist,$name)=@_;
    my $delta;
 
-printf STDERR ("fifi name=$name\n");
    if (defined($hist->{lastmonth}) && 
        $hist->{lastmonth}->{stats}->{$name}->[0]>0){
       my $cur=$primrec->{stats}->{$name}->[0];
       my $lst=$hist->{lastmonth}->{stats}->{$name}->[0];
-printf STDERR ("fifi cur=$cur lst=$lst\n");
       $delta=floor(($cur-$lst)*100.0/$lst);
       if ($delta!=0){
          if ($delta<0){

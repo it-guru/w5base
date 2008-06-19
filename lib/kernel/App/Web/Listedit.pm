@@ -1474,6 +1474,7 @@ sub ProcessUploadRecord
       else{
          delete($rec->{$idname});
       }
+      delete($rec->{$idname});
    }
    my $newrec=$self->getWriteRequestHash("upload",$oldrec,$rec);
 printf STDERR ("fifi newrec=%s\n",Dumper($newrec));

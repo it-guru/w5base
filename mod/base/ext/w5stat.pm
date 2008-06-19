@@ -296,7 +296,7 @@ sub processRecord
       my $userscount=$#{$users}+1;
 
 
-      $self->getParent->storeStatVar("Group",$name,{key=>$rec->{grpid}},
+      $self->getParent->storeStatVar("Group",$name,{nameid=>$rec->{grpid}},
                                      "Groups",1);
       $self->getParent->storeStatVar("Group",$name,{maxlevel=>0},
                                      "SubGroups",$subunitcount);
