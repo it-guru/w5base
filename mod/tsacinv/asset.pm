@@ -116,6 +116,14 @@ sub new
                 fields        =>['name']),
 
       new kernel::Field::Float(
+                name          =>'memory',
+                label         =>'Asset Memory',
+                unit          =>'MB',
+                precision     =>'0',
+                dataobjattr   =>'decode(amasset.lmemorysizemb,0,NULL,'.
+                                'amasset.lmemorysizemb)'),
+
+      new kernel::Field::Float(
                 name          =>'cpucount',
                 label         =>'Asset CPU count',
                 precision     =>'0',

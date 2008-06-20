@@ -660,3 +660,4 @@ alter table appl add is_applwithnoiface bool default '0';
 alter table asset  add databoss bigint(20) default NULL,add key(databoss);
 alter table system add databoss bigint(20) default NULL,add key(databoss);
 alter table lnkapplcustcontract add unique applcontr(appl,custcontract);
+alter table asset  add allowifupdate int(2) default 0;

@@ -294,6 +294,12 @@ sub new
                 name          =>'guardianteamid',
                 dataobjattr   =>'asset.guardianteam'),
 
+      new kernel::Field::Boolean(
+                name          =>'allowifupdate',
+                group         =>'control',
+                label         =>'allow automatic updates by interfaces',
+                dataobjattr   =>'asset.allowifupdate'),
+
       new kernel::Field::Container(
                 name          =>'additional',
                 label         =>'Additionalinformations',

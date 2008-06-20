@@ -112,11 +112,23 @@ sub qcheckRecord
                               $forcedupd,$wfrequest,
                               \@qmsg,\@dataissue,\$errorlevel,
                               mode=>'string');
-#         $self->IfaceCompare($dataobj,
-#                             $rec,"cpucount",
-#                             $parrec,"systemcpucount",
-#                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
-#                             mode=>'integer');
+         $self->IfaceCompare($dataobj,
+                             $rec,"memory",
+                             $parrec,"memory",
+                             $forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             tolerance=>5,mode=>'integer');
+
+         $self->IfaceCompare($dataobj,
+                             $rec,"cpucount",
+                             $parrec,"cpucount",
+                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
+                             mode=>'integer');
+         $self->IfaceCompare($dataobj,
+                             $rec,"corecount",
+                             $parrec,"corecount",
+                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
+                             mode=>'integer');
       }
 
 #      if ($rec->{mandator} eq "Extern" && $rec->{allowifupdate}){
