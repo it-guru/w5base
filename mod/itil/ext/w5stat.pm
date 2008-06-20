@@ -177,7 +177,7 @@ sub displayAsset
                               setUndefZero=>1);
    return(undef) if (!defined($data));
    my $chart=$app->buildChart("ofcAsset",$data,
-                   greenline=>4,
+#                   greenline=>4,
                    employees=>$user,
                    label=>'Assets',
                    legend=>'Anzahl physicalische Systeme');

@@ -512,7 +512,6 @@ sub Presenter
    }
    else{
       my ($year,$mon,$day, $hour,$min,$sec) = Today_and_Now("GMT");
-      push(@ol,"-","- select a statistic -");
       $Y=$year;
       $M=$mon;
       $month=sprintf("%04d%02d",$year,$mon);
@@ -539,6 +538,10 @@ sub Presenter
    foreach my $r (sort({$b->{fullname} cmp $a->{fullname}}
                             $self->getHashList(qw(fullname id)))){
       push(@ol,$r->{id},$r->{fullname});
+   }
+   if (!defined($primrec) && $#ol!=-1){
+      $requestid=$ol[0];
+      ($primrec,$hist)=$self->LoadStatSet(id=>$requestid);
    }
 
 
