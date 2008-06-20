@@ -269,6 +269,7 @@ sub InitRequest
                    $substuser,$self->Self);
       }
    }
+   msg(INFO,"W5Query(%s:$ENV{REMOTE_USER}):%s",NowStamp(),Query->QueryString());
    ######################
    return($self->ValidateCaches());
 }

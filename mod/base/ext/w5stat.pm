@@ -116,27 +116,33 @@ sub displayOverview
       }
    }
    $d.="<div class=overview>";
-   $d.="<table width=100%>";
+   $d.="<table width=100% height=70%>";
+   my $class="unitdata";
    foreach my $rec (@ovdata){
       if ($#{$rec}!=0){
          my $color="black";
          if (defined($rec->[2])){
             $color=$rec->[2];
          }
-         $d.="<tr>";
-         $d.="<td>".$rec->[0]."</td>";
+         $d.="<tr height=1%>";
+         $d.="<td><div class=\"$class\">".$rec->[0]."</div></td>";
          $d.="<td align=right width=50><font color=\"$color\"><b>".
              $rec->[1]."</b></font></td>";
          $d.="<td align=right width=50>".$rec->[3]."</td>";
          $d.="</tr>";
       }
       else{
-         $d.="<tr>";
-         $d.="<td colspan=3><div class=subunit>".$app->T("Subunit").":".
+         if ($class eq "unitdata"){
+            $d.="<tr height=1%><td colspan=3>&nbsp;</td></tr>";
+            $class="subunitdata";
+         }
+         $d.="<tr height=1%>";
+         $d.="<td colspan=3><div class=subunit>".$app->T("Subunit").": ".
               $rec->[0]."</div></td>";
          $d.="</tr>";
       }
    }
+   $d.="<tr><td colspan=3></td></tr>";
    $d.="</table>";
    $d.="</div>";
    return($d);
@@ -154,7 +160,7 @@ sub overviewDataIssue
       my $color="red";
       my $delta=$app->calcPOffset($primrec,$hist,$keyname);
       if ($primrec->{stats}->{$keyname}->[0]<3){
-         $color="yellow";
+         $color="goldenrod";
       }
       push(@l,[$app->T('Unprocessed DataIssue Workflows'),
                $primrec->{stats}->{$keyname}->[0],$color,$delta]);

@@ -137,7 +137,6 @@ sub WriteToStdout
          $self->getParent->SetCurrentView(qw(ALL));
       }
    }
-   msg(INFO,"query=%s",Query->QueryString());
    #my @baseview=$app->getFieldObjsByView([$app->getCurrentView()]);
    #for(my $c=0;$c<=$#baseview;$c++){
    #   my $field=$baseview[$c];

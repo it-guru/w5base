@@ -475,6 +475,7 @@ sub Presenter
                            body=>1,form=>1,action=>'../ShowEntry',
                            prefix=>$rootpath,
                            title=>"W5Base Statistik Presenter");
+   print $self->HtmlSubModalDiv();
    print("<style>body{overflow:hidden}</style>");
 
 

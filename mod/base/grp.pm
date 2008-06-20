@@ -256,6 +256,9 @@ sub isDeleteValid
    my $self=shift;
    my $rec=shift;
 
+   return(0) if ($rec->{grpid}==1);
+   return(0) if ($rec->{grpid}==-1);
+   return(0) if ($rec->{grpid}==-2);
    return(0) if (!grep(/^default$/,$self->isWriteValid($rec)));
    my $g=getModuleObject($self->Config,"base::grp");
    my $grpid=$rec->{grpid};

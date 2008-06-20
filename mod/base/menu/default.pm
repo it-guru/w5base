@@ -271,7 +271,7 @@ sub Init
    
    $self->RegisterObj("Tools.reflexion.w5stat",
                       "base::w5stat",
-                      defaultacl=>['valid_user']);
+                      defaultacl=>['admin']);
    
    $self->RegisterObj("Tools.reflexion.fields",
                       "base::reflexion_fields",

@@ -665,7 +665,7 @@ sub getFirst
    if ($self->{DB}->execute($sqlcmd[0])){
       my $t=tv_interval($t0,[gettimeofday()]);
       my $p=$self->Self();
-      my $msg=sprintf("time=%0.4fsec;mod=$p",$t);
+      my $msg=sprintf("%s:time=%0.4fsec;mod=$p",NowStamp(),$t);
       $msg.=";user=$ENV{REMOTE_USER}" if ($ENV{REMOTE_USER} ne "");
       msg(INFO,"sqlcmd=%s (%s)",$sqlcmd[0],$msg);
       if ($self->{_LimitStart}>0){

@@ -729,10 +729,10 @@ EOF
                  grep(/^read$/,$self->getCurrentAclModes($ENV{REMOTE_USER},
                                                      $m->{acls})))){
                $target=$self->targetUrl($m);
-               printf STDERR ("fifi read of $fp ok\n");
+               #printf STDERR ("fifi read of $fp ok\n");
             }
             if (!defined($target)){
-               printf STDERR ("fifi read of $fp NOT ok\n");
+               #printf STDERR ("fifi read of $fp NOT ok\n");
             }
             if (defined($target)){
                if ($target=~m/^http[s]{0,1}:\/\//){
