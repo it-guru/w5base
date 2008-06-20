@@ -104,7 +104,7 @@ sub qcheckRecord
                 $acroom=$geb.$acroom;
              }
           }
-          $acroom="C1.300" if ($acroom eq "1.300"); 
+         # $acroom="C1.300" if ($acroom eq "1.300"); 
 #printf STDERR ("acroom=$acroom asset=%s\n",Dumper($parrec));
           $self->IfaceCompare($dataobj,
                               $rec,"room",

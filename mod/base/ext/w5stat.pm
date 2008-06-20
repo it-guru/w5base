@@ -183,10 +183,56 @@ sub displayDataIssue
                    employees=>$user, 
                    label=>'automaticly detected Data-Problems',
                    legend=>'count of DataIssue Workflows');
+
+   my $wfid=$primrec->{stats}->{'base.DataIssue.IdList.open'}->[0];
+   my @wfid=sort({$a<=>$b} grep(!/^\s*$/,split(/\s*,\s*/,$wfid)));
+   my $wfidtmpl;
+   if ($#wfid!=-1){
+      my @usewfid=@wfid[0..20];
+      my $wf=getModuleObject($app->Config,"base::workflow");
+      if (defined($wf)){
+         $wf->SetFilter({id=>\@usewfid});
+         my @wfl=$wf->getHashList(qw(name id state stateid));
+         if ($#wfl!=-1){
+            $wfidtmpl.="<table border=0 cellspacing=0 cellpadding=0>";
+            $wfidtmpl.="<tr>"; 
+            $wfidtmpl.="<td colspan=2><b>".
+                        $app->T("The related Worflow list").":</td>"; 
+            $wfidtmpl.="</tr>"; 
+            foreach my $WfRec (@wfl){
+               my $statename=$wf->findtemplvar({current=>$WfRec},
+                                               "state","formated");
+
+               my $dest="../../base/workflow/Detail?id=$WfRec->{id}";
+               my $detailx=$wf->DetailX();
+               my $detaily=$wf->DetailY();
+               my $onclick="openwin(\"$dest\",\"_blank\",".
+                   "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
+                   "resizable=yes,scrollbars=no\")";
+
+               $wfidtmpl.="<tr>"; 
+               $wfidtmpl.="<td><a href=JavaScript:$onclick>".
+                          $WfRec->{name}."</a></td>"; 
+               $wfidtmpl.="<td width=10%>".$statename."</td>"; 
+               $wfidtmpl.="</tr>"; 
+            }
+            if ($#wfid>$#wfl){
+               my $num=$#wfid-$#usewfid;
+               $wfidtmpl.="<tr>"; 
+               $wfidtmpl.="<td colspan=2>... ($num)</td>"; 
+               $wfidtmpl.="</tr>"; 
+            }
+            $wfidtmpl.="</table>";
+         }
+      }
+      printf STDERR ("fifi d=%s\n",Dumper(\@usewfid));
+   }
+
    my $d=$app->getParsedTemplate("tmpl/ext.w5stat.DataIssue",
                                  {current=>$primrec,
                                   static=>{
-                                       chart1=>$chart
+                                       chart1=>$chart,
+                                       detaillist=>$wfidtmpl
                                           }
                                  },"base");
    return($d);

@@ -618,6 +618,9 @@ sub Presenter
          my $label=$self->T($tag,$prec->{module});
          my $link="javascript:setTag($requestid,\"$tag\")";
          print "<li><a href=$link>".$label."</a></li>";
+         if ($p eq "overview"){
+            print "</ul><br><u>".$self->T("Details").":</u><ul>";
+         }
       }
       printf("</ul>");
    }

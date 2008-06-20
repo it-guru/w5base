@@ -3,4 +3,5 @@
 'base::ext::w5stat::org'=>{de=>'Organisation',en=>'Organisational'},
 'Unprocessed DataIssue Workflows'=>{de=>'Unbearbeitete DataIssue Workflows'},
 'Subunit'=>{de=>'Unterbereich'},
+'The related Worflow list'=>{de=>'Detailierte Problem Liste'},
 
