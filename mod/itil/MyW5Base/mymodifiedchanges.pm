@@ -68,12 +68,20 @@ sub getQueryTemplate
 <td class=finput width=40% >\%name(search)\%</td>
 <td class=fname widths10%>\%affectedapplication(label)\%:</td>
 <td class=finput width=40%>\%affectedapplication(search)\%</td>
-</tr><tr>
+</tr>
+<tr>
 <td class=fname>$t1:</td>
 <td class=finput>$tdrop</td>
 <td class=fname>\%affectedcontract(label)\%:</td>
 <td class=finput>\%affectedcontract(search)\%</td>
-</tr></table>
+</tr>
+<tr>
+<td class=fname>&nbsp;</td>
+<td class=finput>&nbsp;</td>
+<td class=fname>\%srcid(label)\%:</td>
+<td class=finput>\%srcid(search)\%</td>
+</tr>
+</table>
 </div>
 %StdButtonBar(exviewcontrol,deputycontrol,teamviewcontrol,search)%
 EOF
