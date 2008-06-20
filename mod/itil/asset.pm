@@ -415,6 +415,14 @@ sub getPhoneUsage
    return('phoneRB',$self->T("phoneRB","itil::appl"));
 }
 
+sub SelfAsParentObject    # this method is needed because existing derevations
+{
+   return("itil::asset");
+}
+
+
+
+
 
 sub createWorkflowQuery
 {
