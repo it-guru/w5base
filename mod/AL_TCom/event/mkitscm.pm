@@ -44,44 +44,36 @@ sub mkitscm
 {
    my $self=shift;
    my %param=@_;
+   my $tmpfile="/tmp/appl-handbook.$$.pdf";
+   my $filename="handbook.pdf";
    my $wf=getModuleObject($self->Config,"itil::appl");
+   my $file=getModuleObject($self->Config,"base::filemgmt");
    $wf->ResetFilter();
-   $wf->SetFilter(id=>'12121501640002');
-   $wf->SetCurrentView(qw(name conumber cistatus sem tsmphone tsmmobile ldelmgr delmgr customer customerprio criticality oncallphones interfaces systems systemnames systemids));
+   $wf->SetFilter(businessteam=>'DTAG.TSI.ES.ITO.CSS.T-Com*');
+   $wf->SetCurrentView(qw(name conumber cistatus sem tsmphone 
+                          tsmmobile ldelmgr delmgr customer 
+                          customerprio criticality oncallphones 
+                          interfaces systems systemnames systemids));
    $wf->SetCurrentOrder("NONE");
    my $output=new kernel::Output($wf);
    $output->setFormat("PdfV01");
    my $page=$output->WriteToScalar(HttpHeader=>0);
-   if (open(F,">/tmp/x.pdf")){
+   if (open(F,">$tmpfile")){
       print F $page;
       close(F);
+      open(F,"<$tmpfile");
+      my $dir="ITSCM/auto-create";
+      $file->ValidatedInsertOrUpdateRecord({name=>$filename,
+                                            parent=>$dir,
+                                            file=>\*F},
+                                           {name=>\$filename,
+                                            parent=>\$dir});
+      close(F);
+   }else{
+      msg(ERROR,"can't open $tmpfile");
    }
+   unlink("$tmpfile");
+   msg(DEBUG,"remove $tmpfile");
 }
-
-sub xlsFinish
-{
-   my $self=shift;
-   my $xlsexp=shift;
-   my $repmon=shift;
-
-#   if (defined($xlsexp->{xls}) && $xlsexp->{xls}->{state} eq "ok"){
-#      $xlsexp->{xls}->{workbook}->close(); 
-#      my $file=getModuleObject($self->Config,"base::filemgmt");
-#      $repmon=~s/\//./g;
-#      my $filename=$repmon.".xls";
-#      if (open(F,"<".$xlsexp->{xls}->{filename})){
-#         my $dir="TSI-Connect/Konzernstandard-Sonderleistungen";
-#         $file->ValidatedInsertOrUpdateRecord({name=>$filename,
-#                                               parent=>$dir,
-#                                               file=>\*F},
-#                                              {name=>\$filename,
-#                                               parent=>\$dir});
-#      }
-#      else{
-#         msg(ERROR,"can't open $xlsexp->{xls}->{filename}");
-#      }
-#   }
-}
-
 
 1;
