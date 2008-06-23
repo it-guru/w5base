@@ -504,9 +504,6 @@ sub Presenter
    my ($Y,$M,$month);
    if (defined($primrec)){
       push(@ol,$primrec->{id},$primrec->{fullname});
-      foreach my $h (@{$hist->{area}}){
-         $histid{$h->{month}}=$h->{id};
-      }
       $month=$primrec->{month};
       ($Y,$M)=$month=~m/^(\d{4})(\d{2})$/;
    }
@@ -571,6 +568,11 @@ sub Presenter
       }
       return(sprintf("<td align=center>%02d<br>%4d</td>",$M1,$Y1));
       
+   }
+   if (defined($primrec)){
+      foreach my $h (@{$hist->{area}}){
+         $histid{$h->{month}}=$h->{id};
+      }
    }
    for(my $c=0;$c<=7;$c++){
       $mstr.=getLabelString(\%histid,$M1,$Y1);

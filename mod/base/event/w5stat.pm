@@ -39,6 +39,7 @@ sub Init
 
 
    $self->RegisterEvent("w5stat","w5stat",timeout=>21600);
+   $self->RegisterEvent("w5statsend","w5statsend");
    return(1);
 }
 
@@ -59,5 +60,12 @@ sub w5stat
    return({exitcode=>0});
 }
 
+sub w5statsend
+{
+   my $self=shift;
+   my $grp=getModuleObject($self->Config,"base::grp");
+
+   return({exitcode=>0});
+}
 
 1;

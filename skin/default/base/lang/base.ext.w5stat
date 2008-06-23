@@ -7,6 +7,6 @@
 'count of DataIssue Workflows'=>{de=>'Anzahl unbearbeiteter DataIssue Workflows'},
 'automaticly detected Data-Problems'=>{de=>'automatisch erkannte Datenprobleme'},
 'SubGroups'=>{de=>'Untergruppen'},
-'total Users'=>{de=>'Gesammtanzahl Mitarbeiter'},
+'total Users'=>{de=>'Gesamtanzahl Mitarbeiter'},
 'direct Users'=>{de=>'Mitarbeiter'},
 
