@@ -7,3 +7,4 @@
 'employees'=>{de=>'Mitarbeiter'},
 'count of employees'=>{de=>'Mitarbeiteranzahl'},
 'averange'=>{de=>'Bereichs Mittelwert'},
+'complete list'=>{de=>'vollständige Liste'},

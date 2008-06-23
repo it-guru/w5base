@@ -368,6 +368,7 @@ sub ShowEntry
    my ($rmod,$rtag)=$requesttag=~m/^(.*)::([^:]+)$/;
    my $title=$self->T("W5Base Statistic Presenter");
    my $subtitle=$self->T($requesttag,$rmod);
+   $subtitle="" if ($requesttag eq "ALL");
    $title.=" - ".$subtitle;
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','w5stat.css'],
@@ -394,15 +395,23 @@ $subtitle
 <script type="text/javascript" src="../../../static/open-flash-chart/js/swfobject.js"></script>
 EOF
       if ($requesttag ne ""){
-     
+         my @Presenter;
          foreach my $obj (values(%{$self->{w5stat}})){
-            if ($obj->Self() eq $rmod){
-               if ($obj->can("getPresenter")){
-                  my %P=$obj->getPresenter();
-                  if (defined($P{$rtag})){
-                     print &{$P{$rtag}->{opcode}}($obj,$primrec,$hist);
-                  }
+            if ($obj->can("getPresenter")){
+               my %P=$obj->getPresenter();
+               foreach my $p (values(%P)){
+                  $p->{module}=$obj->Self();
+                  $p->{obj}=$obj;
                }
+               push(@Presenter,%P);
+            }
+         }
+         my %P=@Presenter;
+     
+         foreach my $p (sort({$P{$a}->{prio} <=> $P{$b}->{prio}} keys(%P))){
+            if (defined($P{$p}->{opcode}) && 
+                ($rtag eq $p || $requesttag eq "ALL")){
+               print &{$P{$p}->{opcode}}($P{$p}->{obj},$primrec,$hist);
             }
          }
       }
@@ -563,8 +572,8 @@ sub Presenter
       my $k=sprintf("%04d%02d",$Y1,$M1);
       if (defined($histid->{$k})){
          return(sprintf("<td align=center>".
-                        "<a href=javascript:refreshTag($histid->{$k})>".
-                        "%02d<br>%4d</a></td>",$M1,$Y1));
+                 "<a class=monlink href=javascript:refreshTag($histid->{$k})>".
+                 "%02d<br>%4d</a></td>",$M1,$Y1));
       }
       return(sprintf("<td align=center>%02d<br>%4d</td>",$M1,$Y1));
       
@@ -622,10 +631,16 @@ sub Presenter
          my $tag=$prec->{module}."::".$p;
          my $label=$self->T($tag,$prec->{module});
          my $link="javascript:setTag($requestid,\"$tag\")";
-         print "<li><a href=$link>".$label."</a></li>";
+         print "<li><a class=sublink href=$link>".$label."</a></li>";
          if ($p eq "overview"){
             print "</ul><br><u>".$self->T("Details").":</u><ul>";
          }
+      }
+      if (keys(%P)>1){
+         my $link="javascript:setTag($requestid,\"ALL\")";
+         print "<br><br><li>".
+               "<a class=sublink href=$link>".
+               $self->T("complete list")."</a></li>";
       }
       printf("</ul>");
    }
