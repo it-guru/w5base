@@ -101,24 +101,20 @@ sub new
                 label         =>'OSReleaseID',
                 dataobjattr   =>'system.osrelease'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'isprod',
                 readonly      =>1,
                 group         =>'systeminfo',
-                transprefix   =>'boolean.',
                 htmleditwidth =>'30%',
                 label         =>'Productionsystem',
-                value         =>[0,1],
                 dataobjattr   =>'system.is_prod'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'istest',
                 readonly      =>1,
                 group         =>'systeminfo',
-                transprefix   =>'boolean.',
                 htmleditwidth =>'30%',
                 label         =>'Testsystem',
-                value         =>[0,1],
                 dataobjattr   =>'system.is_test'),
 
       new kernel::Field::Percent(
@@ -287,48 +283,40 @@ sub new
                 label         =>'CustomerID',
                 dataobjattr   =>'appl.customer'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'isdevel',
                 readonly      =>1,
                 group         =>'systeminfo',
-                transprefix   =>'boolean.',
                 htmleditwidth =>'30%',
                 label         =>'Developmentsystem',
-                value         =>[0,1],
                 dataobjattr   =>'system.is_devel'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'iseducation',
                 readonly      =>1,
                 group         =>'systeminfo',
-                transprefix   =>'boolean.',
                 htmleditwidth =>'30%',
                 label         =>'Educationsystem',
-                value         =>[0,1],
                 dataobjattr   =>'system.is_education'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'isapprovtest',
                 readonly      =>1,
                 group         =>'systeminfo',
-                transprefix   =>'boolean.',
                 htmleditwidth =>'30%',
                 label         =>'Approval Testsystem',
-                value         =>[0,1],
                 dataobjattr   =>'system.is_approvtest'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'isreference',
                 readonly      =>1,
                 group         =>'systeminfo',
-                transprefix   =>'boolean.',
                 htmleditwidth =>'30%',
                 label         =>'Referencesystem',
-                value         =>[0,1],
                 dataobjattr   =>'system.is_reference'),
 
                                                    
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'systemcistatusid',
                 label         =>'SystemCiStatusID',
                 dataobjattr   =>'system.cistatus'),

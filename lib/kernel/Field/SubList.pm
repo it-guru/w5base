@@ -184,7 +184,16 @@ sub getSubListData
       my $loadfield=$self->{vjoinon}->[1];
       $self->vjoinobjInit();
       $self->vjoinobj->SetFilter({$self->{vjoinon}->[1]=>$srcval});
-      $self->vjoinobj->SetCurrentView(@{$self->{vjoindisp}});
+
+      my @view=@{$self->{vjoindisp}};
+      if (defined($self->{'vjoindisp'.$mode})){
+         if (!ref($self->{'vjoindisp'.$mode}) eq "ARRAY"){
+            $self->{'vjoindisp'.$mode}=[$self->{'vjoindisp'.$mode}];
+         }
+         @view=@{$self->{'vjoindisp'.$mode}};
+      }
+
+      $self->vjoinobj->SetCurrentView(@view);
       return($self->vjoinobj->getSubList($current,$mode,%param));
    }
    return("ERROR: Data-Source not available");

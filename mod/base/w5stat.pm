@@ -572,7 +572,7 @@ sub Presenter
       my $k=sprintf("%04d%02d",$Y1,$M1);
       if (defined($histid->{$k})){
          return(sprintf("<td align=center>".
-                 "<a class=monlink href=javascript:refreshTag($histid->{$k})>".
+                 "<a class=sublink href=javascript:refreshTag($histid->{$k})>".
                  "%02d<br>%4d</a></td>",$M1,$Y1));
       }
       return(sprintf("<td align=center>%02d<br>%4d</td>",$M1,$Y1));

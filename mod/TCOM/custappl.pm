@@ -71,7 +71,7 @@ sub new
                 vjoinon       =>['cistatusid'=>'id'],
                 vjoindisp     =>'name'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'cistatusid',   # function is needed to 
                 label         =>'CI-StatusID',  # show undefined state
                 dataobjattr   =>'if (appl.cistatus is null,0,appl.cistatus)'),
@@ -163,6 +163,20 @@ sub new
                 vjoinon       =>['semid'=>'userid'],
                 vjoindisp     =>'email'),
 
+      new kernel::Field::Interface(
+                name          =>'semofficephone',
+                group         =>'tscontact',
+                vjointo       =>'base::user',
+                vjoinon       =>['semid'=>'userid'],
+                vjoindisp     =>'office_phone'),
+
+      new kernel::Field::Interface(
+                name          =>'semofficemobile',
+                group         =>'tscontact',
+                vjointo       =>'base::user',
+                vjoinon       =>['semid'=>'userid'],
+                vjoindisp     =>'office_mobile'),
+
       new kernel::Field::TextDrop(
                 name          =>'sem',
                 group         =>'tscontact',
@@ -184,6 +198,20 @@ sub new
                 vjointo       =>'base::user',
                 vjoinon       =>['tsmid'=>'userid'],
                 vjoindisp     =>'email'),
+
+      new kernel::Field::Interface(
+                name          =>'tsmofficephone',
+                group         =>'tscontact',
+                vjointo       =>'base::user',
+                vjoinon       =>['tsmid'=>'userid'],
+                vjoindisp     =>'office_phone'),
+
+      new kernel::Field::Interface(
+                name          =>'tsmofficemobile',
+                group         =>'tscontact',
+                vjointo       =>'base::user',
+                vjoinon       =>['tsmid'=>'userid'],
+                vjoindisp     =>'office_mobile'),
 
       new kernel::Field::TextDrop(
                 name          =>'tsm',
@@ -236,15 +264,30 @@ sub new
                 label         =>'Customer Contracts',
                 group         =>'custcontracts',
                 nodetaillink  =>1,
-                subeditmsk    =>'subedit.appl',
                 vjointo       =>'itil::lnkapplcustcontract',
                 vjoinon       =>['id'=>'applid'],
                 vjoindisp     =>['custcontract','custcontractid',
                                  'custcontractcistatus'],
-                vjoinbase     =>[{custcontractcistatusid=>'<=4'}],
-                vjoininhash   =>['custcontractid','custcontractcistatusid',
-                                 'custcontract','custcontractname']),
+                vjoinbase     =>[{custcontractcistatusid=>'<=4'}]),
 
+      new kernel::Field::SubList(
+                name          =>'systems',
+                label         =>'Systems',
+                group         =>'systems',
+                nodetaillink  =>1,
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{systemcistatusid=>"<=5"}],
+                vjoinon       =>['id'=>'applid'],
+                vjoindisp     =>['system','systemsystemid',
+                                 'systemcistatus',
+                                 'shortdesc'],
+                vjoindispXMLV01=>['system','systemsystemid',
+                                 'systemcistatus',
+                                 'systemcistatusid',
+                                 'isprod', 'isdevel', 'iseducation',
+                                 'isapprovtest', 'isreference',
+                                 'osrelease',
+                                 'shortdesc']),
    );
 
    $self->setDefaultView(qw(name custname cistatus));

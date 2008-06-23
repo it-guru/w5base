@@ -35,5 +35,15 @@ sub new
    return($self);
 }
 
+sub FormatedResult
+{
+   my $self=shift;
+   my $current=shift;
+   my $mode=shift;
+   my $d=$self->RawValue($current);
+   return($d) if ($mode eq "XMLV01");
+   return($self->SUPER::FormatedDetail($current,$mode));
+}
+
 
 1;

@@ -390,7 +390,7 @@ sub new
                 vjoinbase     =>[{systemcistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'applid'],
                 vjoindisp     =>['system','systemsystemid',
-                                 'systemweblink','systemcistatus',
+                                 'systemcistatus',
                                  'shortdesc'],
                 vjoininhash   =>['system','systemsystemid','systemcistatus',
                                  'systemid']),

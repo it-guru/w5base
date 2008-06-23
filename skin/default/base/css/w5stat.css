@@ -28,13 +28,14 @@
    margin-left:10px;  
 }
 
-a:link.sublink, a:visited.sublink, a:active.sublink  {
+
+a:link.monlink, a:visited.monlink, a:active.monlink  {
             font-family:Arial,Adobe Helvetica,Helvetica;
             text-decoration:none;
             color:#16305e;
           }
 
-a:link.monlink, a:visited.monlink, a:active.monlink  {
+a:link.sublink, a:visited.sublink, a:active.sublink  {
             font-family:Arial,Adobe Helvetica,Helvetica;
             text-decoration:none;
             color:#16305e;
