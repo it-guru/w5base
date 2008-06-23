@@ -9,3 +9,6 @@
 'fieldgroup.phonenumbers'      =>{ de=>'Rufnummernverzeichnis',en=>'Phonenumbers'},
 'base::grp'                    =>{ de=>'Gruppe',en=>'Group'},
 'phoneMISC'                    =>{ de=>'Sonstiges',en=>'Misc'},
+'STEVqreportbyorg'=>{
+          de=>'Quality-Report Empfang über organisatorische Role (Leiter)',
+          en=>'Quality-Report by organisaional role (boss)'},

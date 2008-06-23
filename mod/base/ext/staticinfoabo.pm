@@ -40,6 +40,8 @@ sub getControlData
    return([
            'base::user' =>   {id  =>'110000001',
                                               name=>'STEVuserchanged'},
+           'base::grp' =>    {id  =>'110000002',
+                                              name=>'STEVqreportbyorg'},
           ]);
 
 }

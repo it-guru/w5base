@@ -63,7 +63,53 @@ sub w5stat
 sub w5statsend
 {
    my $self=shift;
+   my $user=getModuleObject($self->Config,"base::user");
    my $grp=getModuleObject($self->Config,"base::grp");
+   my $ia=getModuleObject($self->Config,"base::infoabo");
+   my $lnkgrp=getModuleObject($self->Config,"base::lnkgrpuser");
+   my $lnkrole=getModuleObject($self->Config,"base::lnkgrpuserrole");
+
+   $grp->SetFilter({cistatusid=>[3,4]});
+   $grp->SetCurrentView(qw(grpid fullname));
+   my ($rec,$msg)=$grp->getFirst();
+   if (defined($rec)){
+      do{
+         my $emailto={};
+         $lnkgrp->ResetFilter();
+         $lnkgrp->SetFilter({grpid=>\$rec->{grpid}});
+         my @RBoss;
+         my @RReportReceive;
+         foreach my $lnkrec ($lnkgrp->getHashList(qw(userid lnkgrpuserid))){
+            $lnkrole->ResetFilter();
+            $lnkrole->SetFilter({lnkgrpuserid=>\$lnkrec->{lnkgrpuserid}});
+            foreach my $lnkrolerec ($lnkrole->getHashList("role")){
+               if ($lnkrolerec->{role} eq "RBoss"){
+                  push(@RBoss,$lnkrec->{userid});
+               }
+               if ($lnkrolerec->{role} eq "RReportReceive"){
+                  push(@RReportReceive,$lnkrec->{userid});
+               }
+            }
+         }
+         $ia->LoadTargets($emailto,'base::staticinfoabo',\'STEVqreportbyorg',
+                                   '110000002',\@RBoss,default=>1);
+         $user->ResetFilter();
+         $user->SetFilter({userid=>\@RReportReceive,cistatusid=>'<=4'});
+         foreach my $urec ($user->getHashList("email")){
+            if ($urec->{email} ne ""){
+               $emailto->{$urec->{email}}++;
+            }
+         }
+         if (keys(%$emailto)){
+msg(INFO,"email=".Dumper($emailto));
+
+            msg(INFO,"process group $rec->{fullname}($rec->{grpid})");
+         }
+         ($rec,$msg)=$grp->getNext();
+      }until(!defined($rec));
+   }
+
+   
 
    return({exitcode=>0});
 }
