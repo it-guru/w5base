@@ -1,7 +1,7 @@
 'base::ext::w5stat::overview'=>{de=>'Übersicht',en=>'Overview'},
 'base::ext::w5stat::dataissue'=>{de=>'Datenqualität',en=>'Datquality'},
 'base::ext::w5stat::org'=>{de=>'Organisation',en=>'Organisational'},
-'Unprocessed DataIssue Workflows'=>{de=>'Unbearbeitete DataIssue Workflows'},
+'unprocessed DataIssue Workflows'=>{de=>'unbearbeitete DataIssue Workflows'},
 'Subunit'=>{de=>'Unterbereich'},
 'The related Worflow list'=>{de=>'Detailierte Problem Liste'},
 'count of DataIssue Workflows'=>{de=>'Anzahl unbearbeiteter DataIssue Workflows'},

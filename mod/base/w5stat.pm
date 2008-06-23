@@ -695,7 +695,7 @@ sub buildChart
          $vstring.="null";
       }
    }
-   $ymax=int($ymax*1.15);
+   $ymax=calcScaleMax($ymax*1.01);
   
    
    my $datacode;
@@ -741,7 +741,7 @@ sub buildChart
             $vstring.="null";
          }
       }
-      $y2max=int($y2max*1.15);
+      $y2max=calcScaleMax($y2max*1.01);
       $datacode.="$so.addVariable(\"values_$maxdataset\",\"$vstring\");\n".
                  "$so.addVariable(\"line_$maxdataset\",\"1,0x0000ff,".
                  $self->T("count of employees").",10,4\");\n".
@@ -771,7 +771,7 @@ function buildChart$name()
    $so.addVariable("title","$param{label},{font-size: 15;}");
    $so.addVariable("bg_colour","#f4f4f4");
    $so.addVariable("y_label_size","15");
-   $so.addVariable("y_ticks","5,10,4");
+   $so.addVariable("y_ticks","5,10,5");
    $datacode
    $so.addVariable("x_labels","Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Okt,Nov,Dez");
    //$so.addVariable("x_axis_steps","2");
@@ -782,11 +782,29 @@ function buildChart$name()
 addEvent(window,"load",buildChart$name);
 </script>
 EOF
-
-
-
-
    return($d);
+}
+
+sub calcScaleMax
+{
+   my $max=shift;
+
+   my $scalemax=0.001;
+   my $chk1=10;
+   my $chk2=5;
+   while(1){
+      if ($max<$scalemax*$chk2){
+         $scalemax=$scalemax*$chk2;
+         last;
+      }
+      $chk2=$chk2*10;
+      if ($max<$scalemax*$chk1){
+         $scalemax=$scalemax*$chk1;
+         last;
+      }
+      $chk1=$chk1*10;
+   }
+   return($scalemax);
 }
 
 

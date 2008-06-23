@@ -156,15 +156,24 @@ sub overviewDataIssue
    my $app=$self->getParent();
    my @l;
    my $keyname='base.DataIssue.open';
-   if (defined($primrec->{stats}->{$keyname})){
-      my $color="red";
-      my $delta=$app->calcPOffset($primrec,$hist,$keyname);
-      if ($primrec->{stats}->{$keyname}->[0]<3){
-         $color="goldenrod";
-      }
-      push(@l,[$app->T('Unprocessed DataIssue Workflows'),
-               $primrec->{stats}->{$keyname}->[0],$color,$delta]);
+   my $users=0;
+   if (defined($primrec->{stats}->{User})){
+      $users=$primrec->{stats}->{User}->[0];
    }
+   my $dataissues=0;
+   if (defined($primrec->{stats}->{$keyname})){
+      $dataissues=$primrec->{stats}->{$keyname}->[0];
+   }
+   my $color="goldenrod";
+   if ($dataissues==0){
+      $color="black";
+   }
+   my $delta=$app->calcPOffset($primrec,$hist,$keyname);
+   if ($dataissues>($users*0.4) && $dataissues>5){
+      $color="red";
+   }
+   push(@l,[$app->T('unprocessed DataIssue Workflows'),
+            $dataissues,$color,$delta]);
    return(@l);
 }
 
