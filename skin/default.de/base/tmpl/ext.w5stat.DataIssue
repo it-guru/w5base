@@ -1,0 +1,8 @@
+
+ %chart1%
+
+Die Anzahl der DataIssues ist eine Kennzahl für die Qualität der Config-Items. Die Anzahl dieser "unbearbeiteten Datenprobleme" sollte so gering wie möglich sein. DataIssue-Workflows werden erzeugt, wenn Datenfehler oder Abgleichfehler programmtechnisch erkannt werden konnten.
+<br>
+<br>
+%detaillist%
+

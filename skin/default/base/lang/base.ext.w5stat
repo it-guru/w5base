@@ -4,4 +4,9 @@
 'Unprocessed DataIssue Workflows'=>{de=>'Unbearbeitete DataIssue Workflows'},
 'Subunit'=>{de=>'Unterbereich'},
 'The related Worflow list'=>{de=>'Detailierte Problem Liste'},
+'count of DataIssue Workflows'=>{de=>'Anzahl unbearbeiteter DataIssue Workflows'},
+'automaticly detected Data-Problems'=>{de=>'automatisch erkannte Datenprobleme'},
+'SubGroups'=>{de=>'Untergruppen'},
+'total Users'=>{de=>'Gesammtanzahl Mitarbeiter'},
+'direct Users'=>{de=>'Mitarbeiter'},
 

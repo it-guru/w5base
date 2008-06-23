@@ -85,20 +85,16 @@ sub displayAppl
    return(undef) if (!defined($data));
    my $chart=$app->buildChart("ofcAppl",$data,
                    employees=>$user,
-                   label=>'Anwendungen',
-                   legend=>'Anzahl Anwendungen');
-
-   my $d=<<EOF;
-<center>$chart</center>
-<div>
-Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
-fehlen darf, da sonst wieder niemand durchblickt.
-Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
-fehlen darf, da sonst wieder niemand durchblickt.
-Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
-fehlen darf, da sonst wieder niemand durchblickt.
-</div>
-EOF
+                   label=>$app->T('Applications'),
+                   legend=>$app->T('count of applications'));
+   my $d=$app->getParsedTemplate("tmpl/ext.w5stat.appl",
+                              {current=>$primrec,
+                               static=>{
+                                    statname=>$primrec->{fullname},
+                                    chart1=>$chart
+                                       },
+                               skinbase=>'itil'
+                              });
    return($d);
 }
 
@@ -130,22 +126,19 @@ sub displaySystem
                               setUndefZero=>1);
    return(undef) if (!defined($data));
    my $chart=$app->buildChart("ofcSystem",$data,
-                   greenline=>4,
+   #                greenline=>4,
                    employees=>$user,
-                   label=>'logische Systeme',
-                   legend=>'Anzahl logische Systeme');
+                   label=>$app->T('logical systems'),
+                   legend=>$app->T('count of logical systems'));
 
-   my $d=<<EOF;
-<center>$chart</center>
-<div>
-Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
-fehlen darf, da sonst wieder niemand durchblickt.
-Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
-fehlen darf, da sonst wieder niemand durchblickt.
-Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
-fehlen darf, da sonst wieder niemand durchblickt.
-</div>
-EOF
+   my $d=$app->getParsedTemplate("tmpl/ext.w5stat.system",
+                              {current=>$primrec,
+                               static=>{
+                                    statname=>$primrec->{fullname},
+                                    chart1=>$chart
+                                       },
+                               skinbase=>'itil'
+                              });
    return($d);
 }
 
@@ -179,22 +172,17 @@ sub displayAsset
    my $chart=$app->buildChart("ofcAsset",$data,
 #                   greenline=>4,
                    employees=>$user,
-                   label=>'Assets',
-                   legend=>'Anzahl physicalische Systeme');
+                   label=>$app->T('assets'),
+                   legend=>$app->T('count of physical systems'));
 
-   my $d=<<EOF;
-<center>$chart</center>
-<div>
-Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
-fehlen darf, da sonst wieder niemand durchblickt.
-Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
-fehlen darf, da sonst wieder niemand durchblickt.
-Dies ist das allgemeine Bla Bla zur Erklärung des Diagramms, dass auf keinen Fall
-fehlen darf, da sonst wieder niemand durchblickt.
-</div>
-EOF
-
-
+   my $d=$app->getParsedTemplate("tmpl/ext.w5stat.asset",
+                              {current=>$primrec,
+                               static=>{
+                                    statname=>$primrec->{fullname},
+                                    chart1=>$chart
+                                       },
+                               skinbase=>'itil'
+                              });
    return($d);
 }
 

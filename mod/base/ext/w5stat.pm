@@ -181,8 +181,8 @@ sub displayDataIssue
    return(undef) if (!defined($data));
    my $chart=$app->buildChart("ofcDataIssue",$data,
                    employees=>$user, 
-                   label=>'automaticly detected Data-Problems',
-                   legend=>'count of DataIssue Workflows');
+                   label=>$app->T('automaticly detected Data-Problems'),
+                   legend=>$app->T('count of DataIssue Workflows'));
 
    my $wfid=$primrec->{stats}->{'base.DataIssue.IdList.open'}->[0];
    my @wfid=sort({$a<=>$b} grep(!/^\s*$/,split(/\s*,\s*/,$wfid)));
@@ -225,16 +225,16 @@ sub displayDataIssue
             $wfidtmpl.="</table>";
          }
       }
-      printf STDERR ("fifi d=%s\n",Dumper(\@usewfid));
    }
 
    my $d=$app->getParsedTemplate("tmpl/ext.w5stat.DataIssue",
                                  {current=>$primrec,
                                   static=>{
+                                       statname=>$primrec->{fullname},
                                        chart1=>$chart,
                                        detaillist=>$wfidtmpl
-                                          }
-                                 },"base");
+                                          },
+                                  skinbase=>"base"});
    return($d);
 }
 
@@ -249,27 +249,28 @@ sub displayOrg
                               setUndefZero=>1);
    my $chart1=$app->buildChart("ofcUser",$data,
                    width=>400,height=>200,
-                   label=>'total Users');
+                   label=>$app->T('total Users'));
    my $data=$app->extractYear($primrec,$hist,"User.Direct",
                               setUndefZero=>1);
    my $chart2=$app->buildChart("ofcUserDirect",$data,
                    width=>400,height=>200,
-                   label=>'direct Users');
+                   label=>$app->T('direct Users'));
    my $data=$app->extractYear($primrec,$hist,"SubGroups",
                               setUndefZero=>1);
    my $chart3=$app->buildChart("ofcSubGroups",$data,
                    width=>400,height=>200,
-                   label=>'SubGroups');
+                   label=>$app->T('SubGroups'));
    return(undef) if (!defined($data));
 
    my $d=$app->getParsedTemplate("tmpl/ext.w5stat.org",
                                  {current=>$primrec,
                                   static=>{
+                                       statname=>$primrec->{fullname},
                                        chart1=>$chart1,
                                        chart2=>$chart2,
                                        chart3=>$chart3,
-                                          }
-                                 },"base");
+                                          },
+                                  skinbase=>"base"});
    return($d);
 }
 
