@@ -42,7 +42,7 @@ sub FormatedResult
    my $mode=shift;
    my $d=$self->RawValue($current);
    return($d) if ($mode eq "XMLV01");
-   return($self->SUPER::FormatedDetail($current,$mode));
+   return($self->SUPER::FormatedResult($current,$mode));
 }
 
 
