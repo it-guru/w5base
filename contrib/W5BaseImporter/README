@@ -1,5 +1,0 @@
-file upload
-===========
-
-Problem:   uploads with large attachments are corrupt 
-Solution:  don't use MIME-tools Version 5.426

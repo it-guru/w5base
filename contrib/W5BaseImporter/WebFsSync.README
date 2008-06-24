@@ -1,0 +1,17 @@
+file upload
+===========
+
+Problem:   uploads with large attachments are corrupt 
+Solution:  don't use MIME-tools Version 5.426
+
+Problem:   error failed module deserializer.pm
+Solution:  user SOAP-Lite Version 0.69
+
+Problem:   on upload with attachments appear a error like this "as_string"
+Solution:  insert in the SOAP file Transport/HTTP.pm on line 123
+           this code
+           ---------------------------------------------------------------
+           }else{
+              $self->http_request->headers->header("Content-Type" => "text/xml");
+           ---------------------------------------------------------------
+
