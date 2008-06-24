@@ -1,0 +1,9 @@
+.attachments{
+   margin-top:15px;
+}
+a:link.attlink, a:visited.attlink, a:active.attlink  {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            color:black;
+            text-decoration:none;
+          }
+
