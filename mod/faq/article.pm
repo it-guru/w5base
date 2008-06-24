@@ -406,7 +406,7 @@ sub FullView
 #
    print("<body class=fullview><form>");
    print("<div class=fullview style=\"padding-bottom:10px\">".
-         "<b>".$rec->{name}."</b></div>");
+         "<b><div id=WindowTitle>".$rec->{name}."</div></b></div>");
    print("<div class=fullview>".$rec->{data}."</div>");
    if (defined($rec->{attachments}) && ref($rec->{attachments}) eq "ARRAY" &&
        $#{$rec->{attachments}}!=-1){
