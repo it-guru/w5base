@@ -63,13 +63,20 @@ sub w5stat
 sub w5statsend
 {
    my $self=shift;
+
+   my ($year,$mon,$day, $hour,$min,$sec) = Today_and_Now("GMT");
+   my $month=sprintf("%04d%02d",$year,$mon);
+   my $forcesend=0;
+
+   my $w5stat=getModuleObject($self->Config,"base::w5stat");
    my $user=getModuleObject($self->Config,"base::user");
    my $grp=getModuleObject($self->Config,"base::grp");
    my $ia=getModuleObject($self->Config,"base::infoabo");
    my $lnkgrp=getModuleObject($self->Config,"base::lnkgrpuser");
    my $lnkrole=getModuleObject($self->Config,"base::lnkgrpuserrole");
 
-   $grp->SetFilter({cistatusid=>[3,4]});
+   $grp->SetFilter({cistatusid=>[3,4],
+                    fullname=>'*.PMAQ'});
    $grp->SetCurrentView(qw(grpid fullname));
    my ($rec,$msg)=$grp->getFirst();
    if (defined($rec)){
@@ -91,8 +98,10 @@ sub w5statsend
                }
             }
          }
-         $ia->LoadTargets($emailto,'base::staticinfoabo',\'STEVqreportbyorg',
-                                   '110000002',\@RBoss,default=>1);
+         if ($#RReportReceive==-1){
+            $ia->LoadTargets($emailto,'base::staticinfoabo',\'STEVqreportbyorg',
+                                      '110000002',\@RBoss,default=>1);
+         }
          $user->ResetFilter();
          $user->SetFilter({userid=>\@RReportReceive,cistatusid=>'<=4'});
          foreach my $urec ($user->getHashList("email")){
@@ -101,17 +110,108 @@ sub w5statsend
             }
          }
          if (keys(%$emailto)){
-msg(INFO,"email=".Dumper($emailto));
-
+            my @emailto=keys(%$emailto);
+            my @emailto=qw(hartmut.vogler@t-systems.com);
+            msg(INFO,"email=".join(", ",@emailto));
             msg(INFO,"process group $rec->{fullname}($rec->{grpid})");
+
+            $w5stat->ResetFilter();
+            $w5stat->SetFilter([{month=>\$month,
+                                 nameid=>\$rec->{grpid},
+                                 sgroup=>\'Group'},
+                                {month=>\$month,
+                                 fullname=>\$rec->{fullname},
+                                 sgroup=>\'Group'}]);
+            my ($chkrec,$msg)=$w5stat->getOnlyFirst(qw(id));
+            if (defined($chkrec)){
+               my ($primrec,$hist)=$w5stat->LoadStatSet(id=>$chkrec->{id});
+               if (defined($primrec) &&
+                   defined($w5stat->{w5stat}->{'base::ext::w5stat'})){
+                  msg(INFO,"primrec ok and stat processor found");
+                  my $obj=$w5stat->{w5stat}->{'base::ext::w5stat'};
+                  my %P=$obj->getPresenter();
+                  if (defined($P{'overview'}) &&
+                      defined($P{'overview'}->{opcode})){
+                     msg(INFO,"overview tag handler found");
+                     foreach my $emailto (@emailto){
+                        my $lang="en";
+                        $user->ResetFilter();
+                        $user->SetFilter({email=>\$emailto});
+                        my ($urec,$msg)=$user->getOnlyFirst(qw(lastlang));
+                        if (defined($urec)){
+                           if ($urec->{lastlang} ne ""){
+                              $lang=$urec->{lastlang};
+                           }
+                           $ENV{HTTP_FORCE_LANGUAGE}=$lang;
+                           my ($d,$ovdata)=&{$P{'overview'}->{opcode}}($obj,
+                                                                $primrec,$hist);
+                           my $needsend=$forcesend;
+                           foreach my $ovrec (@$ovdata){
+                              if (defined($ovrec->[2]) && $ovrec->[2] eq "red"){
+                                 $needsend=1;last;
+                              }
+                           }
+                           msg(INFO,"target=$emailto lang=$lang needsend=$needsend");
+                           if ($needsend){
+                              $self->sendOverviewData($emailto,$lang,
+                                                      $primrec,$hist,$d,$ovdata);
+                           }
+                           delete($ENV{HTTP_FORCE_LANGUAGE});
+                        }
+                     }
+                  }
+               }
+            }
+            
          }
          ($rec,$msg)=$grp->getNext();
       }until(!defined($rec));
    }
-
-   
-
    return({exitcode=>0});
+}
+
+sub sendOverviewData
+{
+   my $self=shift;
+   my $emailto=shift;
+   my $lang=shift;
+   my $primrec=shift;
+   my $hist=shift;
+   my $d=shift;
+   my $ovdata=shift;
+
+   my $wf=getModuleObject($self->Config,"base::workflow");
+   my $sitename=$wf->Config->Param("SITENAME");
+   my $joburl=$wf->Config->Param("EventJobBaseUrl");
+   my @emailtext;
+   foreach my $ovrec (@$ovdata){
+      if ($#{$ovrec}==0){
+         push(@emailtext,"---\n".$ovrec->[0]);
+      }
+      else{
+         push(@emailtext,$ovrec->[0].": ".$ovrec->[1]);
+      }
+   }
+   my $month=$primrec->{month};
+   my ($Y,$M)=$month=~m/^(\d{4})(\d{2})$/;
+   my $month=sprintf("%02d/%04d",$M,$Y);
+ 
+   if (my $id=$wf->Store(undef,{
+          class    =>'base::workflow::mailsend',
+          step     =>'base::workflow::mailsend::dataload',
+          name     =>$sitename.": ".'QualityReport '.$month." ".$primrec->{fullname},
+          emailtemplate =>'w5stat',
+          emaillang     =>$lang,
+          emailfrom     =>$emailto,
+          emailtext     =>\@emailtext,
+          emailto       =>$emailto,
+          additional    =>{htmldata=>$d,month=>$month,
+                           directlink=>$joburl."/auth/base/menu/msel/Tools/reflexion?search_id=".$primrec->{id},
+                           fullname=>$primrec->{fullname}},
+         })){
+      my $r=$wf->Store($id,step=>'base::workflow::mailsend::waitforspool');
+      return({msg=>'versandt'});
+   }
 }
 
 1;

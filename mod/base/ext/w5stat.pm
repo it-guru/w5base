@@ -145,7 +145,7 @@ sub displayOverview
    $d.="<tr><td colspan=3></td></tr>";
    $d.="</table>";
    $d.="</div>";
-   return($d);
+   return($d,\@ovdata);
 }
 
 

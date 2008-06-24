@@ -411,7 +411,8 @@ EOF
          foreach my $p (sort({$P{$a}->{prio} <=> $P{$b}->{prio}} keys(%P))){
             if (defined($P{$p}->{opcode}) && 
                 ($rtag eq $p || $requesttag eq "ALL")){
-               print &{$P{$p}->{opcode}}($P{$p}->{obj},$primrec,$hist);
+               my ($d,$ovdata)=&{$P{$p}->{opcode}}($P{$p}->{obj},$primrec,$hist);
+               print($d);
             }
          }
       }
@@ -490,6 +491,9 @@ sub Presenter
 
    my $requestid=$p;
    $requestid=~s/[^\d]//g;
+   if (Query->Param("search_id") ne ""){
+      $requestid=Query->Param("search_id");
+   }
 
    my ($primrec,$hist)=$self->LoadStatSet(id=>$requestid);
 
