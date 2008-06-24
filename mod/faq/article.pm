@@ -396,6 +396,8 @@ sub FullView
 
    print $self->HttpHeader();
    print $self->HtmlHeader(
+                           title=>$rec->{name},
+                           js=>['toolbox.js'],
                            style=>['default.css',
                                 'work.css',
                                 'Output.HtmlDetail.css',
@@ -403,9 +405,9 @@ sub FullView
                                 'public/faq/load/faq.css']);
 #
    print("<body class=fullview><form>");
-   print("<div class=fullview style=\"padding-bottom:10px\"><b>".$rec->{name}."</b></div>");
+   print("<div class=fullview style=\"padding-bottom:10px\">".
+         "<b>".$rec->{name}."</b></div>");
    print("<div class=fullview>".$rec->{data}."</div>");
-   printf STDERR ("fifi attachments=%s\n",Dumper($rec->{attachments}));
    if (defined($rec->{attachments}) && ref($rec->{attachments}) eq "ARRAY" &&
        $#{$rec->{attachments}}!=-1){
       my $att;
@@ -413,7 +415,8 @@ sub FullView
          if ($frec->{label}=~m/\.pdf$/i){
             $att.="\n<tr><td width=1%><a class=attlink href=\"$frec->{href}\">".
                   "<img src=\"../load/pdf_icon.gif\"></a></td>".
-                  "<td><a class=attlink href=\"$frec->{href}\">$frec->{label}</a></td></tr>";
+                  "<td><a class=attlink href=\"$frec->{href}\">".
+                  "$frec->{label}</a></td></tr>";
          }
       }
       if ($att ne ""){
@@ -421,6 +424,17 @@ sub FullView
                "<table width=100%>".$att."</table></div>");
       }
    }
+   print(<<EOF);
+<script language="JavaScript">
+function setTitle()
+{
+   var t=window.document.getElementById("WindowTitle");
+   parent.document.title=t.innerHTML;
+   return(true);
+}
+addEvent(window, "load", setTitle);
+</script>
+EOF
    print("</form></body></html>");
 
 

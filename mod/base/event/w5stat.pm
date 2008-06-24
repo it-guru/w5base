@@ -203,7 +203,7 @@ sub sendOverviewData
           emailtemplate =>'w5stat',
           emaillang     =>$lang,
           emailcc       =>['hartmut.vogler@t-systems.com',
-                           'holm.basedow@t-system.com'],
+                           'holm.basedow@t-systems.com'],
           emailfrom     =>$emailto,
           emailtext     =>\@emailtext,
           emailto       =>$emailto,
