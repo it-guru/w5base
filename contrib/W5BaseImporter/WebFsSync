@@ -1201,12 +1201,12 @@ sub processOperations
             msg(DEBUG,"upload done'$rec->{DATA}->{name}'");
             # read modifydate from the stored record
             $o{'filemgmt'}->SetFilter({fid=>[$fid]});
+            my @mdate=$o{'filemgmt'}->getHashList(qw(mdate));
             my @res=$o{'filemgmt'}->LastMsg();
             if (defined($res[0]) && $stepit){
                &{$stepit}($mywin,$res[0]);
                next;
             }
-            my @mdate=$o{'filemgmt'}->getHashList(qw(mdate));
             return(1,"record fid=$fid not found!") if ($#mdate != 0);
 
             # change the datestamp to a unixtimestamp
