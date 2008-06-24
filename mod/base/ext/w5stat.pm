@@ -115,7 +115,7 @@ sub displayOverview
          }
       }
    }
-   $d.="<div class=overview>";
+   $d.="\n<div class=overview>";
    $d.="<table width=100% height=70%>";
    my $class="unitdata";
    foreach my $rec (@ovdata){
@@ -124,7 +124,7 @@ sub displayOverview
          if (defined($rec->[2])){
             $color=$rec->[2];
          }
-         $d.="<tr height=1%>";
+         $d.="\n<tr height=1%>";
          $d.="<td><div class=\"$class\">".$rec->[0]."</div></td>";
          $d.="<td align=right width=50><font color=\"$color\"><b>".
              $rec->[1]."</b></font></td>";
@@ -133,18 +133,18 @@ sub displayOverview
       }
       else{
          if ($class eq "unitdata"){
-            $d.="<tr height=1%><td colspan=3>&nbsp;</td></tr>";
+            $d.="\n<tr height=1%><td colspan=3>&nbsp;</td></tr>";
             $class="subunitdata";
          }
-         $d.="<tr height=1%>";
+         $d.="\n<tr height=1%>";
          $d.="<td colspan=3><div class=subunit>".$app->T("Subunit").": ".
               $rec->[0]."</div></td>";
          $d.="</tr>";
       }
    }
-   $d.="<tr><td colspan=3></td></tr>";
+   $d.="\n<tr><td colspan=3></td></tr>";
    $d.="</table>";
-   $d.="</div>";
+   $d.="</div>\n";
    return($d,\@ovdata);
 }
 
