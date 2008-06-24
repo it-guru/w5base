@@ -18,7 +18,6 @@ package base::event::w5stat;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::date;
 use kernel::Event;
@@ -75,8 +74,7 @@ sub w5statsend
    my $lnkgrp=getModuleObject($self->Config,"base::lnkgrpuser");
    my $lnkrole=getModuleObject($self->Config,"base::lnkgrpuserrole");
 
-   $grp->SetFilter({cistatusid=>[3,4],
-                    fullname=>'*.PMAQ'});
+   $grp->SetFilter({cistatusid=>[3,4]});
    $grp->SetCurrentView(qw(grpid fullname));
    my ($rec,$msg)=$grp->getFirst();
    if (defined($rec)){
@@ -111,7 +109,7 @@ sub w5statsend
          }
          if (keys(%$emailto)){
             my @emailto=keys(%$emailto);
-            my @emailto=qw(hartmut.vogler@t-systems.com);
+            #my @emailto=qw(hartmut.vogler@t-systems.com);
             msg(INFO,"email=".join(", ",@emailto));
             msg(INFO,"process group $rec->{fullname}($rec->{grpid})");
 
@@ -151,8 +149,9 @@ sub w5statsend
                                  $needsend=1;last;
                               }
                            }
-                           msg(INFO,"target=$emailto lang=$lang needsend=$needsend");
-                           if ($needsend){
+                           msg(INFO,"target=$emailto lang=$lang ".
+                                    "needsend=$needsend");
+                           if ($needsend && 1){
                               $self->sendOverviewData($emailto,$lang,
                                                       $primrec,$hist,$d,$ovdata);
                            }
@@ -199,9 +198,12 @@ sub sendOverviewData
    if (my $id=$wf->Store(undef,{
           class    =>'base::workflow::mailsend',
           step     =>'base::workflow::mailsend::dataload',
-          name     =>$sitename.": ".'QualityReport '.$month." ".$primrec->{fullname},
+          name     =>$sitename.": ".'QualityReport '.
+                     $month." ".$primrec->{fullname},
           emailtemplate =>'w5stat',
           emaillang     =>$lang,
+          emailcc       =>['hartmut.vogler@t-systems.com',
+                           'holm.basedow@t-system.com'],
           emailfrom     =>$emailto,
           emailtext     =>\@emailtext,
           emailto       =>$emailto,

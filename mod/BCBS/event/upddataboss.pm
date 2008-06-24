@@ -48,18 +48,19 @@ sub upddataboss
    my $sys=getModuleObject($self->Config,"itil::system");
    my $osys=getModuleObject($self->Config,"itil::system");
    my $appl=getModuleObject($self->Config,"itil::appl");
+   my $ass=getModuleObject($self->Config,"itil::asset");
    my $asset=getModuleObject($self->Config,"itil::asset");
-   $sys->SetFilter({databoss=>'[EMPTY]'});
-   $sys->SetCurrentView(qw(name applications asset));
-   if (my ($rec,$msg)=$sys->getFirst()){
+   $ass->SetFilter({databoss=>'[EMPTY]'});
+   $ass->SetCurrentView(qw(id name systems));
+   if (my ($rec,$msg)=$ass->getFirst()){
       my $count=1;
       while(defined($rec)){
-         msg(INFO,"$count sys=$rec->{name}   $rec->{asset}");
+         msg(INFO,"$count ass=$rec->{name}");
          my $databoss;
-         findboss: foreach my $applrec (@{$rec->{applications}}){
-            $appl->ResetFilter();
-            $appl->SetFilter({id=>\$applrec->{applid}});
-            my ($rec,$msg)=$appl->getOnlyFirst("id","databoss");
+         findboss: foreach my $sysrec (@{$rec->{systems}}){
+            $sys->ResetFilter();
+            $sys->SetFilter({id=>\$sysrec->{id}});
+            my ($rec,$msg)=$sys->getOnlyFirst("id","databoss");
             if (defined($rec) && $rec->{databoss} ne ""){
                $databoss=$rec->{databoss};
                last findboss;
@@ -68,24 +69,23 @@ sub upddataboss
          msg(INFO,"===> using $databoss");
          if (defined($databoss)){
             $asset->ResetFilter();
-            $asset->SetFilter({name=>\$rec->{asset}});
+            $asset->SetFilter({id=>\$rec->{id}});
             my ($arec,$msg)=$asset->getOnlyFirst(qw(ALL));
             if ($arec->{databoss} eq ""){
                $asset->ValidatedUpdateRecord($arec,{databoss=>$databoss},
                                              {id=>\$arec->{id}});
             }
-            $osys->ResetFilter();
-            $osys->SetFilter({id=>\$rec->{id}});
-            my ($arec,$msg)=$osys->getOnlyFirst(qw(ALL));
-            if ($arec->{databoss} eq ""){
-               $osys->ValidatedUpdateRecord($arec,{databoss=>$databoss},
-                                             {id=>\$arec->{id}});
-            }
+#            $osys->ResetFilter();
+#            $osys->SetFilter({id=>\$rec->{id}});
+#            my ($arec,$msg)=$osys->getOnlyFirst(qw(ALL));
+#            if ($arec->{databoss} eq ""){
+#               $osys->ValidatedUpdateRecord($arec,{databoss=>$databoss},
+#                                             {id=>\$arec->{id}});
+#            }
          }
-         ($rec,$msg)=$sys->getNext();
+         ($rec,$msg)=$ass->getNext();
          $count++;
          last if (!defined($rec));
-         last;
       }
    }
 
