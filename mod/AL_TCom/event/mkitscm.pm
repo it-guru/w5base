@@ -49,7 +49,8 @@ sub mkitscm
    my $wf=getModuleObject($self->Config,"itil::appl");
    my $file=getModuleObject($self->Config,"base::filemgmt");
    $wf->ResetFilter();
-   $wf->SetFilter(businessteam=>'DTAG.TSI.ES.ITO.CSS.T-Com*');
+   $wf->SetFilter(businessteam=>'DTAG.TSI.ES.ITO.CSS.T-Com*',
+                  cistatusid=>'4',customerprio=>'1');
    $wf->SetCurrentView(qw(name conumber cistatus sem tsmphone 
                           tsmmobile ldelmgr delmgr customer 
                           customerprio criticality oncallphones 
