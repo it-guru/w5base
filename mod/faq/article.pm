@@ -392,19 +392,39 @@ sub FullView
    my %flt=$self->getSearchHash();
    $self->ResetFilter();
    $self->SecureSetFilter(\%flt);
-   my ($rec,$msg)=$self->getOnlyFirst(qw(name data));
+   my ($rec,$msg)=$self->getOnlyFirst(qw(name data attachments));
 
    print $self->HttpHeader();
    print $self->HtmlHeader(
                            style=>['default.css',
                                 'work.css',
                                 'Output.HtmlDetail.css',
-                                'kernel.App.Web.css']);
+                                'kernel.App.Web.css',
+                                'public/faq/load/faq.css']);
 #
    print("<body class=fullview><form>");
    print("<div class=fullview style=\"padding-bottom:10px\"><b>".$rec->{name}."</b></div>");
    print("<div class=fullview>".$rec->{data}."</div>");
+   printf STDERR ("fifi attachments=%s\n",Dumper($rec->{attachments}));
+   if (defined($rec->{attachments}) && ref($rec->{attachments}) eq "ARRAY" &&
+       $#{$rec->{attachments}}!=-1){
+      my $att;
+      foreach my $frec (@{$rec->{attachments}}){
+         if ($frec->{label}=~m/\.pdf$/i){
+            $att.="\n<tr><td width=1%><a class=attlink href=\"$frec->{href}\">".
+                  "<img src=\"../load/pdf_icon.gif\"></a></td>".
+                  "<td><a class=attlink href=\"$frec->{href}\">$frec->{label}</a></td></tr>";
+         }
+      }
+      if ($att ne ""){
+         print("<div class=attachments>".
+               "<table width=100%>".$att."</table></div>");
+      }
+   }
    print("</form></body></html>");
+
+
+
 }
 
 sub ById

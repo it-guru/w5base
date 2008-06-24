@@ -9,6 +9,7 @@
 'fieldgroup.attachments'=>{de=>'Dateianlagen',
                            en=>'Attachments'},
 'Accesscontrol'=>{de=>'Zugriffssteuerung'},
+'attachments'=>{de=>'Anlagen'},
 'Keywords'=>{de=>'Schlüsselworte'},
 'Categorie'=>{de=>'Kathegorie'},
 'Category'=>{de=>'Kategorie'},

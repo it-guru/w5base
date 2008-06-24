@@ -345,7 +345,27 @@ sub RawValue
 {
    my $self=shift;
    my $current=shift;
-   return("no RawValue");
+   my $app=$self->getParent();
+   my $idfield=$app->IdField();
+   my $refid=$idfield->RawValue($current);
+   my $fo=$self->getFileManagementObj();
+   my @filelist=();
+   my $parentobj=$self->{parentobj};
+   if (!defined($parentobj)){
+      $parentobj=$self->getParent->Self();
+   }
+   $fo->SetFilter({parentobj=>$parentobj,
+                   parentrefid=>$refid});
+   foreach my $rec ($fo->getHashList(qw(ALL))){
+      if (defined($rec)){
+         my %clone=(%{$rec});
+         $clone{label}=$clone{name};
+         $clone{href}="ViewProcessor/load/$self->{name}/".
+                      "$refid/$clone{fid}/$clone{name}";
+         push(@filelist,\%clone);
+      }
+   }
+   return(\@filelist);
 }
 
 
