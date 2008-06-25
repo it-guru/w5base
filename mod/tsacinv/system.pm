@@ -251,7 +251,7 @@ sub new
                 group         =>'applications',
                 vjointo       =>'tsacinv::lnkapplsystem',
                 vjoinon       =>['lportfolioitemid'=>'lchildid'],
-                vjoindisp     =>[qw(parent)]),
+                vjoindisp     =>[qw(parent applid)]),
 
       new kernel::Field::SubList(
                 name          =>'software',

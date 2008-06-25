@@ -46,7 +46,7 @@ sub new
                                     
       new kernel::Field::Link(
                 name          =>'id',
-                label         =>'ApplID',
+                label         =>'ApplicationID',
                 dataobjattr   =>'amtsicustappl.ltsicustapplid'),
 
       new kernel::Field::Text(

@@ -48,6 +48,14 @@ sub new
                 vjoinon       =>['lparentid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::Text(
+                name          =>'applid',
+                readonly      =>1,
+                uppersearch   =>1,
+                htmlwidth     =>'100',
+                label         =>'ApplicationID',
+                dataobjattr   =>'amtsicustappl.code'),
+
       new kernel::Field::TextDrop(
                 name          =>'child',
                 label         =>'Child System',
@@ -61,6 +69,11 @@ sub new
                 weblinkto     =>'tsacinv::system',
                 weblinkon     =>['lsystemid'=>'systemid'],
                 dataobjattr   =>'amportfolio.assettag'),
+
+      new kernel::Field::Text(
+                name          =>'systemola',
+                label         =>'System OLA',
+                dataobjattr   =>'amcomputer.olaclasssystem'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
@@ -135,7 +148,7 @@ sub new
                 dataobjattr   =>'amtsirelportfappl.dtimport'),
 
    );
-   $self->setDefaultView(qw(id parent child));
+   $self->setDefaultView(qw(id parent applid child systemid systemola));
    return($self);
 }
 
@@ -160,7 +173,7 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="amtsirelportfappl,amportfolio,amcomputer";
+   my $from="amtsirelportfappl,amportfolio,amcomputer,amtsicustappl";
    return($from);
 }
 
@@ -168,6 +181,7 @@ sub initSqlWhere
 {
    my $self=shift;
    return("amtsirelportfappl.bdelete=0 and ".
+          "amtsirelportfappl.lapplicationid=amtsicustappl.ltsicustapplid and ".
           "amtsirelportfappl.bactive=1 and amportfolio.bdelete=0 and ".
           "amtsirelportfappl.lportfolioid=amportfolio.lportfolioitemid and ".
           "amportfolio.lportfolioitemid=amcomputer.litemid and ".
