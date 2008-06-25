@@ -298,6 +298,7 @@ sub WriteToScalar    # ToDo: viewgroups implementation
    }
    my $bk="";
    my $d=$self->Format->ProcessHead(\$fh,\%param);
+   $self->Format->Finish(\$fh,%param);
    $bk.=$d if (defined($d));
    sysseek($fh,0,SEEK_SET);
    my $buffer;
