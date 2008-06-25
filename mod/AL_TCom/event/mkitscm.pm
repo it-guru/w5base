@@ -63,7 +63,7 @@ sub mkitscm
       print F $page;
       close(F);
       open(F,"<$tmpfile");
-      my $dir="ITSCM/auto_create";
+      my $dir="ITSCM/Daten/auto_create";
       $file->ValidatedInsertOrUpdateRecord({name=>$filename,
                                             parent=>$dir,
                                             file=>\*F},
