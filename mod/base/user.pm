@@ -442,7 +442,8 @@ sub getLastLogon
       return(undef) if ($#accounts==-1);
       my $ul=$self->getParent->getPersistentModuleObject("ul",
                                                          "base::userlogon");
-      $ul->SetFilter({account=>\@accounts});
+      $ul->SetFilter({account=>\@accounts,
+                      logonbrowser=>'!SOAP::*'}); # exclude SOAP logons
       $ul->Limit(1);
       my ($ulrec,$msg)=$ul->getOnlyFirst(qw(logondate lang));
       if (defined($ulrec)){
