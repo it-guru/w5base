@@ -302,8 +302,8 @@ sub Process
                                    'kernel.TabSelector.css'],
                           js=>['toolbox.js','subModal.js','Workflow.js',
                                'TextTranslation.js'],
-                           body=>1,
-                           title=>"Workflow Process - $label");
+                          body=>1,
+                          title=>"Workflow Process - $label");
    print("<form method=POST onsubmit=\"return(ValidateSubmit(this));\">");
    my $appheader=$app->getAppTitleBar();
    print $app->HtmlSubModalDiv();
@@ -553,6 +553,11 @@ return(true);
 }
 function ValidateSubmit(f)
 {
+   if (this.SubFrameEditMode==1){
+      if (!DataLoseWarn()){
+         return(false);
+      }
+   }
    if (!document.btnWhich){
       return(true);
    }

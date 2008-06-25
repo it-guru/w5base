@@ -1091,12 +1091,22 @@ EOF
       $d.=$param{'title'};
       $d.="</title>\n";
    }
+   $d.="\n<script language=\"JavaScript\">\n";
+   $d.="function DataLoseWarn(){\n";
+   $d.="return(confirm(\"".
+        $self->T("With this action, it is posible to lose data!").
+       "\"));\n";
+   $d.="}\n";
+   $d.="</script>\n\n";
    if (defined($param{'refresh'})){
       $d.="<meta http-equiv=\"refresh\" content=\"$param{'refresh'}\">";
    }
    $d.="</head>\n";
-   if ($param{body}){
+   if ($param{body} || defined($param{onunload})){
       $d.="<body";
+      if (defined($param{onunload})){
+         $d.=" onUnload=\"$param{onunload}\"";
+      }
       $d.=">";
    }
    if (defined($param{target}) || defined($param{base}) ||
@@ -1114,13 +1124,6 @@ EOF
    if ($param{form}){
       my $enctype="";
       $enctype="enctype=\"multipart/form-data\"" if ($param{multipart});
-      $d.="<script language=\"JavaScript\">";
-      $d.="function DataLoseWarn(){";
-      $d.="return(confirm(\"".
-           $self->T("With this action, it is posible to lose data!").
-          "\"));";
-      $d.="}";
-      $d.="</script>";
       $d.="<form method=post $enctype";
       $d.=" onSubmit=\"if (this.SubmitCheck){return(this.SubmitCheck());}else{return(true);}\"";
      # $d.=" onSubmit=\"if (SubmitCheck){return(SubmitCheck())}".

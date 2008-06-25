@@ -48,23 +48,8 @@ sub getHttpHeader
                                 'Output.HtmlDetail.css',
                                 'kernel.App.Web.css',
                                 'Output.HtmlSubList.css',
-                           #     'kernel.workflowrelation.css',
                                 'kernel.filemgmt.css'],
                         onload=>'DetailInit()');
-#   $d.="<html>";
-#   $d.="<link rel=stylesheet ".
-#       "href=\"../../base/load/default.css\"></link>";
-#   $d.="<link rel=stylesheet ".
-#       "href=\"../../base/load/work.css\"></link>";
-#   $d.="<link rel=stylesheet ".
-#       "href=\"../../base/load/Output.HtmlDetail.css\"></link>";
-#   $d.="<link rel=stylesheet ".
-#       "href=\"../../base/load/kernel.App.Web.css\"></link>";
-#   $d.="<link rel=stylesheet ".
-#       "href=\"../../base/load/Output.HtmlSubList.css\"></link>";
-#   $d.="<link rel=stylesheet ".
-#       "href=\"../../base/load/kernel.filemgmt.css\"></link>";
-#   $d.="<body OnLoad=DetailInit()>";
    return($d);
 }
 
