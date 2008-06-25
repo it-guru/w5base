@@ -570,7 +570,7 @@ sub extractAffectedApplication
    my $novalidappl=0;
    $novalidappl=1 if ($#applid==-1);
    my $dev=$rec->{deviceid};
-   if (my ($applid)=$dev=~m/^.*\((APPL\d+)\)$/){ # im change steht ag (id) drin
+   if (my ($applid)=$dev=~m/^.*\(((APPL|GER)\d+)\)$/){ # im change steht ag (id) drin
       msg(DEBUG,"ApplicationID=%s",$applid);
       $appl->ResetFilter();
       $appl->SetFilter({applid=>\$applid});
