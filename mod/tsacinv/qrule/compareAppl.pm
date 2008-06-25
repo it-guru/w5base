@@ -126,61 +126,8 @@ sub qcheckRecord
                              \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'native');
       }
-      if ($rec->{allowifupdate}){
-#printf STDERR ("ac=%s\n",Dumper($parrec->{systems}));
-#printf STDERR ("w5=%s\n",Dumper($rec->{systems}));
-#         my $net=getModuleObject($self->getParent->Config(),"itil::network");
-#         $net->SetCurrentView(qw(id name));
-#         my $netarea=$net->getHashIndexed("name");
-#printf STDERR ("netarea=%s\n",Dumper($netarea));
-#         my @opList;
-#         my $res=OpAnalyse(sub{  # comperator 
-#                              my $eq;
-#                              if ($a->{name} eq $b->{ipaddress}){
-#                                 $eq=0;
-#                                 $eq=1 if ($a->{comments} eq $b->{description});
-#                              }
-#                              return($eq);
-#                           },
-#                           sub{  # oprec generator
-#                              my ($mode,$oldrec,$newrec,%p)=@_;
-#                              if ($mode eq "insert" || $mode eq "update"){
-#                                 my $networkid=$p{netarea}->{name}->
-#                                               {'Insel-Netz/Kunden-LAN'}->{id};
-#                                 my $identifyby=undef;
-#                                 if ($mode eq "update"){
-#                                    $identifyby=$oldrec->{id};
-#                                 }
-#                                 return({OP=>$mode,
-#                                         MSG=>"$mode ip $newrec->{ipaddress} ".
-#                                              "in W5Base",
-#                                         IDENTIFYBY=>$identifyby,
-#                                         DATAOBJ=>'itil::ipaddress',
-#                                         DATA=>{
-#                                            name      =>$newrec->{ipaddress},
-#                                            cistatusid=>4,
-#                                            networkid =>$networkid,
-#                                            comments  =>$newrec->{description},
-#                                            systemid  =>$p{refid}
-#                                            }
-#                                         });
-#                              }
-#                              elsif ($mode eq "delete"){
-#                                 return({OP=>$mode,
-#                                         MSG=>"delete ip $oldrec->{name} ".
-#                                              "from W5Base",
-#                                         DATAOBJ=>'itil::ipaddress',
-#                                         IDENTIFYBY=>$oldrec->{id},
-#                                         });
-#                              }
-#                              return(undef);
-#                           },
-#                           $rec->{ipaddresses},$parrec->{ipaddresses},\@opList,
-#                           refid=>$rec->{id},netarea=>$netarea);
-#         if (!$res){
-#            my $opres=ProcessOpList($self->getParent,\@opList);
-#         }
-      }
+      #if ($rec->{allowifupdate}){
+      #}
 
       if ($rec->{mandator} eq "Extern" && $rec->{allowifupdate}){
          # forced updates on External Data
@@ -208,39 +155,6 @@ sub qcheckRecord
     #              }
                }
             }
-            if ($databossid ne ""){
-    #           $self->IfaceCompare($dataobj,
-    #                               $rec,"databossid",
-    # noch nicht                    {databossid=>$databossid},"databossid",
-    #                               $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
-    #                               mode=>'integer');
-            }
-    #        my $newname=$parrec->{name};
-    #        $newname=~s/[^a-z0-9_-]/_/gi;
-    #        $self->IfaceCompare($dataobj,
-    #                            $rec,"name",
-    #                            {name=>$newname},"name",
-    # noch nicht                 $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
-    #                            mode=>'string');
-           
-           
-           
-#            my $comments="";
-#            if ($parrec->{assignmentgroup} ne ""){
-#               $comments.="\n" if ($comments ne "");
-#               $comments.="AssetCenter AssignmentGroup: ".
-#                          $parrec->{assignmentgroup};
-#            }
-#            if ($parrec->{conumber} ne ""){
-#               $comments.="\n" if ($comments ne "");
-#               $comments.="AssetCenter CO-Number: ".
-#                          $parrec->{conumber};
-#            }
-#            $self->IfaceCompare($dataobj,
-#                                $rec,"comments",
-#                                {comments=>$comments},"comments",
-#                                $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
-#                                mode=>'string');
          }
       }
    }

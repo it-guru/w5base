@@ -62,10 +62,26 @@ sub w5stat
 sub w5statsend
 {
    my $self=shift;
+   my $force=shift;
 
-   my ($year,$mon,$day, $hour,$min,$sec) = Today_and_Now("GMT");
+   my ($year,$mon,$day, $hour,$min,$sec)=Today_and_Now("GMT");
+   
+
+
+
    my $month=sprintf("%04d%02d",$year,$mon);
    my $forcesend=0;
+   {
+      my ($year1,$mon1,$day1, $hour1,$min1,$sec1)=
+              Add_Delta_YMD("GMT",$year,$mon,$day, $hour,$min,$sec,0,0,7);
+      if ($mon!=$mon1){
+         $forcesend=1;
+      }
+   }
+   if (lc($force) eq "force" ||
+       lc($force) eq "-force"){
+      $forcesend=1;
+   }
 
    my $w5stat=getModuleObject($self->Config,"base::w5stat");
    my $user=getModuleObject($self->Config,"base::user");
@@ -208,7 +224,9 @@ sub sendOverviewData
           emailtext     =>\@emailtext,
           emailto       =>$emailto,
           additional    =>{htmldata=>$d,month=>$month,
-                           directlink=>$joburl."/auth/base/menu/msel/Tools/reflexion?search_id=".$primrec->{id},
+                           directlink=>$joburl.
+                           "/auth/base/menu/msel/Tools/reflexion?search_id=".
+                           $primrec->{id},
                            fullname=>$primrec->{fullname}},
          })){
       my $r=$wf->Store($id,step=>'base::workflow::mailsend::waitforspool');
