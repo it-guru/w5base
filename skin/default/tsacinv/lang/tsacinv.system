@@ -20,3 +20,4 @@
 'fieldgroup.w5basedata'=>{de=>'W5Base/Darwin Daten',
                           en=>'W5Base/Darwin Data'},
 'Priority of system'=>{de=>'Priorität des Systems'},
+'Services Columns'=>{de=>'Leistungsarten in Spalten'},

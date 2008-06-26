@@ -272,6 +272,7 @@ sub new
 
       new kernel::Field::Dynamic(
                 name          =>'dynservices',
+                searchable    =>0,
                 depend        =>[qw(systemid)],
                 group         =>'services',
                 label         =>'Services Columns',
