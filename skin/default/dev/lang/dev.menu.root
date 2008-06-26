@@ -9,4 +9,5 @@
 'Tools.dev.env'=>{de=>'Umgebunsvariablen',en=>'Enviroment'},
 'Tools.dev.texttranslation'=>{de=>'BubbleFish',en=>'BubbleFish'},
 'Tools.dev.tztest'=>{de=>'Timezone Test',en=>'Timezone Test'},
+'Tools.dev.sqlparser'=>{de=>'SQL Parser',en=>'SQL Parser'},
 

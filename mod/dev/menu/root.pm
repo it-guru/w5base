@@ -39,6 +39,10 @@ sub Init
                       "tmpl/welcome",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("Tools.dev.sqlparser",
+                      "http://www.orafaq.com/cgi-bin/sqlformat/pp/utilities/sqlformatter.tpl",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("Tools.dev.io",
                       "base::interface",
                       func=>'io',
