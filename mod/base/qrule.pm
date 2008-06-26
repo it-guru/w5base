@@ -453,6 +453,7 @@ function addToResult(ruleid)
                 }
                 r.innerHTML+="</ul>";
              }
+             r.innerHTML+="<div style=\\"height:4px\\"></div>";
           }
           var r=document.getElementById("summary");
           if (r){
