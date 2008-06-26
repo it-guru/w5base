@@ -25,6 +25,7 @@
 'fieldgroup.default'=>{ de=>'Personalien',en=>'Person-Informations'},
 'fieldgroup.name'=>{ de=>'Name',en=>'Name'},
 'fieldgroup.office'=>{ de=>'Büro-Kontakt',en=>'Office-ContactProfile'},
+'fieldgroup.nativcontact'=>{ de=>'minimale Kontaktdaten',en=>'minimal Contactdata'},
 'fieldgroup.private'=>{ de=>'Privat-Kontakt',en=>'Private-ContactProfile'},
 'fieldgroup.userparam'=>{ de=>'Umgebungseinstellungen',en=>'Profile'},
 'fieldgroup.userro'=>{ de=>'Kontakt-Identifikation',en=>'Contact-Identification'},

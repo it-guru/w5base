@@ -475,11 +475,22 @@ sub SecureValidate
    foreach my $wrfield (keys(%{$newrec})){
        my $fo=$self->getField($wrfield,$oldrec);
        if (defined($fo)){
-          my $group=$fo->{group};
-          $group="default" if ($group eq "");
+          my @fieldgrouplist=($fo->{group});
+          if (ref($fo->{group}) eq "ARRAY"){
+             @fieldgrouplist=@{$fo->{group}};
+          }
+          if ($#fieldgrouplist==-1 || 
+              ($#fieldgrouplist==0 && !defined($fieldgrouplist[0]))){
+             @fieldgrouplist=("default");
+          }
+          my $writeok=0;
+          foreach my $group (@fieldgrouplist){
+             if (grep(/^$group$/,@$wrgroups)){
+                $writeok=1;last;
+             }
+          }
           if ($fo->Type() eq "SubList" ||
-              (!grep(/^ALL$/,@$wrgroups) &&
-               !grep(/^$group$/,@$wrgroups))){
+              (!grep(/^ALL$/,@$wrgroups) && !$writeok)){
              my $msg=sprintf($self->T("write request to field '\%s' rejected"),
                              $wrfield);
              $self->LastMsg(ERROR,$msg);
@@ -1746,9 +1757,17 @@ sub DataObj_findtemplvar
       if ($param[0] eq "formated" || $param[0] eq "detail" || 
           $param[0] eq "sublistedit"){
          if (exists($opt->{viewgroups})){
-            if (!grep(/^$fieldbase->{$var}->{group}$/,
-                       @{$opt->{viewgroups}})
-                && !grep(/^ALL$/,@{$opt->{viewgroups}})){
+            my @fieldgrouplist=($fieldbase->{$var}->{group});
+            if (ref($fieldbase->{$var}->{group}) eq "ARRAY"){
+               @fieldgrouplist=@{$fieldbase->{$var}->{group}};
+            }
+            my $viewok=0;
+            foreach my $fieldgroup (@fieldgrouplist){
+               if (grep(/^$fieldgroup$/,@{$opt->{viewgroups}})){
+                  $viewok=1;last;
+               }
+            }
+            if (!$viewok && !grep(/^ALL$/,@{$opt->{viewgroups}})){
                return("-");
             }
          }
@@ -1764,8 +1783,17 @@ sub DataObj_findtemplvar
                }
             }
             if (exists($opt->{editgroups})){
-               if (!grep(/^$fieldbase->{$var}->{group}$/,
-                          @{$opt->{editgroups}}) && 
+               my @fieldgrouplist=($fieldbase->{$var}->{group});
+               if (ref($fieldbase->{$var}->{group}) eq "ARRAY"){
+                  @fieldgrouplist=@{$fieldbase->{$var}->{group}};
+               }
+               my $editok=0;
+               foreach my $fieldgroup (@fieldgrouplist){
+                  if (grep(/^$fieldgroup$/,@{$opt->{editgroups}})){
+                     $editok=1;last;
+                  }
+               }
+               if (!$editok && 
                    !grep(/^ALL$/,@{$opt->{editgroups}}) &&
                    !grep(/^1$/,@{$opt->{editgroups}})){
                   $mode=$defmode;

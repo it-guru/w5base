@@ -262,12 +262,18 @@ EOF
          $uivisibleof[$c]=$fieldlist[$c]->UiVisible("HtmlDetail",current=>$rec);
          next if (!($uivisibleof[$c]));
          next if (!($fieldlist[$c]->htmldetail("HtmlDetail",current=>$rec)));
-         if (!grep(/^$fieldlist[$c]->{group}$/,@grouplist)){
-            push(@grouplist,$fieldlist[$c]->{group});
-            $grouplabel{$fieldlist[$c]->{group}}=0;
+         my @fieldgrouplist=($fieldlist[$c]->{group});
+         if (ref($fieldlist[$c]->{group}) eq "ARRAY"){
+            @fieldgrouplist=@{$fieldlist[$c]->{group}};
          }
          my $grouplabel=$fieldlist[$c]->grouplabel($rec);
-         $grouplabel{$fieldlist[$c]->{group}}=1 if ($grouplabel);
+         foreach my $fieldgroup (@fieldgrouplist){
+            if (!grep(/^$fieldgroup$/,@grouplist)){
+               push(@grouplist,$fieldgroup);
+               $grouplabel{$fieldgroup}=0;
+            }
+            $grouplabel{$fieldgroup}=1 if ($grouplabel);
+         }
       }
  
       foreach my $group (@grouplist){
@@ -278,7 +284,11 @@ EOF
             my $name=$fieldlist[$c]->Name();
             next if (!($uivisibleof[$c]));
             next if (!($fieldlist[$c]->htmldetail("HtmlDetail",current=>$rec)));
-            if ($fieldlist[$c]->{group} eq $group){
+            my @fieldgrouplist=($fieldlist[$c]->{group});
+            if (ref($fieldlist[$c]->{group}) eq "ARRAY"){
+               @fieldgrouplist=@{$fieldlist[$c]->{group}};
+            }
+            if (grep(/^$group$/,@fieldgrouplist)){
                my $valign=$fieldlist[$c]->valign();
                $valign=" valign=$valign";
                $valign=" valign=top" if ($fieldlist[$c]->can("EditProcessor"));
@@ -408,6 +418,7 @@ EOF
 EOF
       }
    }
+printf STDERR ("grouplabel=%s\n",Dumper(\%grouplabel));
 
 
    my $c=0;

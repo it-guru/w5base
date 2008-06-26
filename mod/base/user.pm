@@ -67,30 +67,14 @@ sub new
       new kernel::Field::Select(
                 name          =>'cistatus',
                 htmleditwidth =>'40%',
-                group         =>'name',
+                group         =>['name','default'],
                 readonly      =>
                    sub{
                       my $self=shift;
                       my $rec=shift;
+                      return(0) if ($self->getParent->IsMemberOf("admin"));
                       return(1) if (defined($rec) && 
                                     $rec->{cistatusid}>2 &&
-                                    !$self->getParent->IsMemberOf("admin"));
-                      return(0);
-                   },
-                label         =>'CI-State',
-                vjointo       =>'base::cistatus',
-                vjoineditbase =>{id=>">0"},
-                vjoinon       =>['cistatusid'=>'id'],
-                vjoindisp     =>'name'),
-
-      new kernel::Field::Select(
-                name          =>'perscistatus',
-                htmleditwidth =>'40%',
-                readonly      =>
-                   sub{
-                      my $self=shift;
-                      my $rec=shift;
-                      return(1) if (defined($rec) && 
                                     !$self->getParent->IsMemberOf("admin"));
                       return(0);
                    },
@@ -160,7 +144,7 @@ sub new
 
       new kernel::Field::Phonenumber(
                 name          =>'office_phone',
-                group         =>'office',
+                group         =>['office','nativcontact'],
                 label         =>'Phonenumber',
                 dataobjattr   =>'user.office_phone'),
 
@@ -184,7 +168,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'office_facsimile',
-                group         =>'office',
+                group         =>['office','nativcontact'],
                 label         =>'FAX-Number',
                 dataobjattr   =>'user.office_facsimile'),
 
@@ -653,9 +637,9 @@ sub isViewValid
    }  
    if ($rec->{usertyp} eq "function"){
       if ($self->IsMemberOf("admin")){
-         return(qw(header name default comments userro));
+         return(qw(header name default nativcontact comments userro));
       }
-     return(qw(header name default comments));
+     return(qw(header name default nativcontact comments));
    }  
    if ($rec->{usertyp} eq "service"){
       return(qw(header name default comments groups usersubst userro userparam));
@@ -673,12 +657,12 @@ sub isWriteValid
    return(undef) if (!defined($rec));
    if ($self->IsMemberOf("admin")){
       return(qw(default name office private userparam groups usersubst 
-                comments header picture));
+                comments header picture nativcontact));
    }
    my $userid=$self->getCurrentUserId();
    if ($userid eq $rec->{userid} ||
        ($rec->{creator}==$userid && $rec->{cistatusid}<3)){
-      return("name","userparam","office","private","usersubst");
+      return("name","userparam","office","private","nativcontact","usersubst");
    }
    return(undef);
 }
@@ -767,7 +751,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","name","picture","default","office","private",
+   return("header","name","picture","default","nativcontact","office","private",
           "userparam","groups");
 }
 
