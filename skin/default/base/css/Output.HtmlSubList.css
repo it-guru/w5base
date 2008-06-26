@@ -105,8 +105,10 @@ th.subheadfield{
    padding-right:5px;
    background:#8faee7;
    text-align:left;
+   vertical-align:bottom;
    border-bottom-width:1px;
    border-bottom-style:solid;
+   cursor:pointer;
 }
 tr.linehighlight{
    background:#b0c5ec;
