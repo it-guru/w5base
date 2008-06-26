@@ -254,6 +254,15 @@ sub new
                 vjoindisp     =>[qw(parent applid)]),
 
       new kernel::Field::SubList(
+                name          =>'applicationids',
+                htmldetail    =>0,
+                label         =>'ApplicationIDs',
+                group         =>'applications',
+                vjointo       =>'tsacinv::lnkapplsystem',
+                vjoinon       =>['lportfolioitemid'=>'lchildid'],
+                vjoindisp     =>[qw(applid)]),
+
+      new kernel::Field::SubList(
                 name          =>'software',
                 label         =>'Software',
                 group         =>'software',
