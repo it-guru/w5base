@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html>
+<head>
+<title>Sortable Table Demo (WebFX)</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="js/sortabletable.js"></script>
+<link type="text/css" rel="StyleSheet" href="css/sortabletable.css" />
+<style type="text/css">
+
+body {
+	font-family:	Verdana, Helvetica, Arial, Sans-Serif;
+	font:			Message-Box;
+}
+
+code {
+	font-size:	1em;
+}
+
+</style>
+
+</head>
+<body>
+
+<h2>Table with Inputs</h2>
+
+<p>Below is a static table where one column contains checkbox inputs.
+To handle these the method <code>getRowValue</code> is overriddden to
+support a new type called <code>CheckBox</code>.</p>
+
+<p>Since there is a bug in IE that makes the inputs lose their value
+after the DOM node is moved in the tree we backup the input value before
+the sort (using <code>onbeforesort</code> and restore it afterwards.</p>
+
+<p>
+<a href="inputdemo.html" onclick="document.location = 'view-source:' + document.location; return false;">View Source</a>
+</p>
+
+<table class="sort-table" id="table-1" cellspacing="0">
+	<col />
+	<col />
+	<col />
+	<col style="text-align: right" />
+	<col />
+	<col />
+	<thead>
+		<tr>
+			<td>&nbsp;</td>
+			<td>String</td>
+			<td title="CaseInsensitiveString">String</td>
+			<td>Number</td>
+			<td>Date</td>
+			<td>No Sort</td>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><input type="checkbox" /></td>
+			<td>apple</td>
+			<td>Strawberry</td>
+			<td>45</td>
+			<td>2001-03-13</td>
+			<td>Item 0</td>
+		</tr>
+		<tr>
+			<td><input type="checkbox" /></td>
+			<td>Banana</td>
+			<td>orange</td>
+			<td>7698</td>
+			<td>1789-07-14</td>
+			<td>Item 1</td>
+		</tr>
+		<tr>
+			<td><input type="checkbox" /></td>
+			<td>orange</td>
+			<td>Banana</td>
+			<td>4546</td>
+			<td>1949-07-04</td>
+			<td>Item 2</td>
+		</tr>
+		<tr>
+			<td><input type="checkbox" /></td>
+			<td>Strawberry</td>
+			<td>apple</td>
+			<td>987</td>
+			<td>1975-08-19</td>
+			<td>Item 3</td>
+		</tr>
+		<tr>
+			<td><input type="checkbox" /></td>
+			<td>Pear</td>
+			<td>blueberry</td>
+			<td>98743</td>
+			<td>2001-01-01</td>
+			<td>Item 4</td>
+		</tr>
+		<tr>
+			<td><input type="checkbox" /></td>
+			<td>blueberry</td>
+			<td>Pear</td>
+			<td>4</td>
+			<td>2001-04-18</td>
+			<td>Item 5</td>
+		</tr>
+	</tbody>
+</table>
+
+<script type="text/javascript">
+//<![CDATA[
+
+/*
+// override getRowValue to support CheckBox
+SortableTable.prototype._getRowValue = SortableTable.prototype.getRowValue;
+SortableTable.prototype.getRowValue = function (oRow, sType, nColumn) {
+	if (sType == "CheckBox") {
+		return oRow.cells[nColumn].firstChild.checked ? 1 : 0;
+	}
+	return this._getRowValue(oRow, sType, nColumn);
+};
+*/
+
+
+var st = new SortableTable(document.getElementById("table-1"),
+	["CheckBox", "String", "CaseInsensitiveString", "Number", "Date", "None"]);
+
+function getCheckBoxValue (oRow, nColumn) {
+	return oRow.cells[nColumn].firstChild.checked ? 1 : 0;
+};
+
+// add new sort type and use the default compare
+// also use custom getRowValue since the text content is not enough
+st.addSortType("CheckBox", null, null, getCheckBoxValue);
+
+// IE does not remember input values when moving DOM elements
+if (/MSIE/.test(navigator.userAgent)) {
+
+	// backup check box values
+	st.onbeforesort = function () {
+		var table = st.element;
+		var inputs = table.getElementsByTagName("INPUT");
+		var l = inputs.length;
+		for (var i = 0; i < l; i++) {
+			inputs[i].parentNode.parentNode._checked = inputs[i].checked;
+		}
+	};
+
+	// restore check box values
+	st.onsort = function () {
+		var table = st.element;
+		var inputs = table.getElementsByTagName("INPUT");
+		var l = inputs.length;
+		for (var i = 0; i < l; i++) {
+			inputs[i].checked = inputs[i].parentNode.parentNode._checked;
+		}
+	};
+}
+
+//]]>
+</script>
+
+
+
+</body>
+</html>

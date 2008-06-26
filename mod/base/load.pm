@@ -93,6 +93,7 @@ sub Run
             $content="text/javascript";
             $filename=$instdir."/lib/javascript/".$func; 
             $param{cache}=3600;
+            $param{cache}=3;
          }
       }
       delete($param{cache});

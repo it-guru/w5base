@@ -97,6 +97,10 @@ sub Init
                       "itil::lnkaccountingno",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itil.appl.lnkapplcontact",
+                      "itil::lnkapplcontact",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itil.system",
                       "itil::system",
                       defaultacl=>['valid_user']);

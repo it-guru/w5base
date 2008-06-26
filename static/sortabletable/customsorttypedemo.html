@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html>
+<head>
+<title>Sortable Table Demo (WebFX)</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="js/sortabletable.js"></script>
+<!-- add sort type for sorting NumberK types -->
+<script type="text/javascript" src="js/numberksorttype.js"></script>
+<script type="text/javascript" src="js/uscurrencysorttype.js"></script>
+
+<link type="text/css" rel="StyleSheet" href="css/sortabletable.css" />
+<style type="text/css">
+
+body {
+	font-family:	Verdana, Helvetica, Arial, Sans-Serif;
+	font:			Message-Box;
+}
+
+code {
+	font-size:	1em;
+}
+
+
+</style>
+
+</head>
+<body>
+
+<h2>Table with Custom Sort Types</h2>
+
+<p>This sortable table uses two custom sort types that are defined in two
+external Javascript files called <a href="js/numberksorttype.js">numberksorttype.js</a>
+and <a href="js/uscurrencysorttype.js">uscurrencysorttype.js</a>. These define
+the sort types <code>NumberK</code> and <code>UsCurrency</code>. The <code>NumberK</code>
+sort type uses the scientific modifiers K, M, G and T (the
+computer science ones, not the general science ones) when comparing the value by
+number. The <code>UsCurrency</code> takes a string representing a US currency formatted
+with optional commas ($4,000,123.99)</p>
+
+
+<p>
+<a href="customsorttypedemo.html" onclick="document.location = 'view-source:' + document.location; return false;">View Source</a>
+</p>
+
+
+<table class="sort-table" id="table-1" cellspacing="0">
+<thead>
+	<tr>
+		<td>Size</td>
+		<td>Name</td>
+		<td>Date</td>
+		<td>Currency</td>
+	</tr>
+</thead>
+<tbody>
+	<tr>
+		<td>824.8K</td>
+		<td>File B</td>
+		<td>2003-08-13</td>
+		<td>$4,000,123.99</td>
+	</tr>
+	<tr>
+		<td>907980</td>
+		<td>File A</td>
+		<td>2003-12-01</td>
+		<td>$5000.50</td>
+	</tr>
+	<tr>
+		<td>20.69M</td>
+		<td>File D</td>
+		<td>2001-02-27</td>
+		<td>$8</td>
+	</tr>
+	<tr>
+		<td>1.6G</td>
+		<td>File C</td>
+		<td>2004-01-12</td>
+		<td>$0</td>
+	</tr>
+</tbody>
+</table>
+
+<script type="text/javascript">
+//<![CDATA[
+
+var st = new SortableTable( document.getElementById("table-1"),
+	["NumberK", "String", "Date", "UsCurrency"] );
+st.sort( 1 );
+
+//]]>
+</script>
+
+
+
+</body>
+</html>

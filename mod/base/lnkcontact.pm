@@ -42,16 +42,6 @@ sub new
                 label         =>'LinkID',
                 dataobjattr   =>'lnkcontact.id'),
                                                  
-      new kernel::Field::Text(
-                name          =>'parentobj',
-                label         =>'Parent-Object',
-                dataobjattr   =>'lnkcontact.parentobj'),
-
-      new kernel::Field::Text(
-                name          =>'refid',
-                label         =>'RefID',
-                dataobjattr   =>'lnkcontact.refid'),
-
       new kernel::Field::MultiDst (
                 name          =>'targetname',
                 htmlwidth     =>'200',
@@ -70,6 +60,7 @@ sub new
                 name          =>'targetweblink',
                 searchable    =>0,
                 depend        =>['target','targetid'],
+                uploadable    =>0,
                 htmlwidth     =>'5px',
                 htmldetail    =>0,
                 weblink       =>sub{
@@ -125,6 +116,20 @@ sub new
                 container     =>'croles',
                 getPostibleValues=>\&getPostibleRoleValues),
                                                  
+      new kernel::Field::Text(
+                name          =>'parentobj',
+                frontreadonly =>1,
+                uploadable    =>0,
+                label         =>'Parent-Object',
+                dataobjattr   =>'lnkcontact.parentobj'),
+
+      new kernel::Field::Text(
+                name          =>'refid',
+                label         =>'RefID',
+                frontreadonly =>1,
+                uploadable    =>0,
+                dataobjattr   =>'lnkcontact.refid'),
+
       new kernel::Field::Container(
                 name          =>'croles',
                 dataobjattr   =>'lnkcontact.croles'),
@@ -191,6 +196,12 @@ sub new
                 group         =>'source',
                 label         =>'RealEditor',
                 dataobjattr   =>'lnkcontact.realeditor'),
+
+      new kernel::Field::Link(
+                name          =>'secparentobj',
+                label         =>'Security Parent-Object',
+                dataobjattr   =>'lnkcontact.parentobj'),
+
    );
    $self->setDefaultView(qw(parentobj targetname cdate editor));
    $self->LoadSubObjs("ext/lnkcontact","lnkcontact");
@@ -199,6 +210,19 @@ sub new
 
    return($self);
 }
+
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if (defined($self->{secparentobj})){
+      push(@flt,[{secparentobj=>\$self->{secparentobj}}]);
+   }
+   return($self->SetFilter(@flt));
+}
+
+
 
 
 sub getPostibleRoleValues
@@ -243,6 +267,10 @@ sub Validate
    my $refid=effVal($oldrec,$newrec,"refid");
    if (!defined($parentobj) || $parentobj eq ""){
       $self->LastMsg(ERROR,"empty parent object");
+      return(0);
+   }
+   if (defined($self->{secparentobj}) && $parentobj ne $self->{secparentobj}){
+      $self->LastMsg(ERROR,"invalid write request to requested parentobj");
       return(0);
    }
    if (!defined($refid) || $refid eq ""){

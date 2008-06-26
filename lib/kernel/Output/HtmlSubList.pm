@@ -91,15 +91,75 @@ sub ProcessHead
    my $view=$app->getCurrentViewName();
    my @view=$app->getCurrentView();
    my $d="";
+
+   my $tableid;
+   my $tableidstr;
+   if (defined($self->{parentfield})){
+      $tableid=$self->{parentfield};
+   }
+   else{
+      $tableid=$self->Self;
+      $tableid=~s/[^a-z]/_/gi;
+   }
+   $tableidstr="id=\"$tableid\""; 
+   my @sortnames;
+   foreach my $fname (@view){
+      push(@sortnames,"String");
+   }
+   my $sortline=join(",",map({'"'.$_.'"'} @sortnames));
+   
    if ($param->{ParentMode} ne "HtmlV01"){
       $d.="<table width=100% style=\"table-layout:fixed\">".
           "<tr><td><div style=\"overflow:hidden\">\n";
    }
+   $d.=<<EOF;
+<script language="JavaScript">
+var SortTable$tableid;
+function addClassName$tableid(el, sClassName) {
+	var s = el.className;
+	var p = s.split(" ");
+	var l = p.length;
+	for (var i = 0; i < l; i++) {
+		if (p[i] == sClassName)
+			return;
+	}
+	p[p.length] = sClassName;
+	el.className = p.join(" ").replace( /(^\s+)|(\s+\$)/g, "" );
+}
+
+function removeClassName$tableid(el) {
+	var s = el.className;
+	var p = s.split(" ");
+	var np = [];
+	var l = p.length;
+	var j = 0;
+	el.className = "";
+}
+
+
+function InitTab$tableid()
+{
+  SortTable$tableid = new SortableTable(document.getElementById("$tableid"),
+                                        [$sortline]);
+  SortTable$tableid.onsort=function () {
+        var rows = SortTable$tableid.tBody.rows;
+        var l = rows.length;
+        for (var i = 0; i < l; i++) {
+                removeClassName$tableid(rows[i]);
+                addClassName$tableid(rows[i], i % 2 ? "subline2":"subline1");
+        }
+  };
+  SortTable$tableid.sort(0,false);
+}
+addEvent(window,"load",InitTab$tableid);
+</script>
+EOF
    $d.="<table class=maintable>\n";
    $d.=$self->getViewLine($fh);
 
    $d.="<tr><td class=mainblock>";
-   $d.="<table class=subdatatable width=100%>\n<tr class=subheadline>";
+   $d.="<table $tableidstr class=subdatatable width=100%>\n".
+       "<thead><tr class=subheadline>";
    foreach my $fieldname (@view){
       my $field=$app->getField($fieldname);
       my $displayname=$fieldname;
@@ -108,7 +168,7 @@ sub ProcessHead
       }
       $d.="<th class=subheadfield>".$displayname."</th>";
    }
-   $d.="</tr>\n";
+   $d.="</tr></thead>\n<tbody>\n";
    return($d);
 }
 sub ProcessLine
@@ -139,8 +199,8 @@ sub ProcessLine
    }
    $d.="<tr class=$lineclass ";
    if (!($self->{nodetaillink})){
-      $d.="onMouseOver=\"this.className='linehighlight'\" ".
-          "onMouseOut=\"this.className='$lineclass'\">\n";
+      $d.="onMouseOver=\"this.oldclassName=this.className;this.className='linehighlight';\" ".
+          "onMouseOut=\"this.className=this.oldclassName\">\n";
    }
    for(my $c=0;$c<=$#view;$c++){
       my $fieldname=$view[$c];
@@ -248,7 +308,7 @@ sub ProcessBottom
    my $app=$self->getParent->getParent();
    my $view=$app->getCurrentViewName();
    my @view=$app->getCurrentView();
-   my $d="</table></td></tr>\n\n\n";
+   my $d="</tbody></table></td></tr>\n\n\n";
    $d.="</table>\n";
    if ($self->{SubListEdit}==1){
       $d.=<<EOF;

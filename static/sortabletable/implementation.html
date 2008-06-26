@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html>
+<head>
+<title>Sortable Table Implementation (WebFX)</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="local/webfxlayout.js"></script>
+
+</head>
+<body>
+<!-- WebFX Layout Include -->
+<script type="text/javascript">
+
+var articleMenu= new WebFXMenu;
+articleMenu.left  = 384;
+articleMenu.top   = 86;
+articleMenu.width = 140;
+articleMenu.add(new WebFXMenuItem("Sortable Table", "sortabletable.html"));
+articleMenu.add(new WebFXMenuItem("Implementation", "implementation.html"));
+articleMenu.add(new WebFXMenuItem("API", "api.html"));
+articleMenu.add(new WebFXMenuItem("Demo", "demo.html"));
+articleMenu.add(new WebFXMenuSeparator);
+articleMenu.add(new WebFXMenuItem("Download", "http://webfx.eae.net/download/sortabletable112.zip"));
+webfxMenuBar.add(new WebFXMenuButton("Article Menu", null, null, articleMenu));
+
+webfxLayout.writeTitle("Sortable Table");
+webfxLayout.writeMenu();
+webfxLayout.writeDesignedByEdger();
+
+</script>
+<div class="webfx-main-body">
+<!-- end WebFX Layout Includes -->
+
+
+<h2>Implementation</h2>
+
+<p>Since a lot of the implementaion follows the old version I'm going to try
+to concentrate on the more important parts. Espescially how the sorting is
+done and how this was done to maximize performance.</p>
+
+<h3>Sorting</h3>
+
+<p>Just like in the old version the <code>Array</code> <code>sort</code> is
+used, but unlike the old version most of the work that was done in the compare
+function has been moved out of this function and is done once before the
+sorting starts.</p>
+
+<h4>Caching the Data</h4>
+
+<p>Before the sorting is started an array is made that contains JavaScript
+objects which contains the needed information to do the actual sorting of the
+table. This information consists of the value used to sort the rows as well
+as a reference to the actual row element so that we can reorder the rows once
+the sorting is done.</p>
+
+<pre>
+SortableTable.prototype.getCache = function (sType, nColumn) {
+   var rows = this.tBody.rows;
+   var l = rows.length;
+   var a = new Array(l);
+   var r;
+   for (var i = 0; i &lt; l; i++) {
+      r = rows[i];
+      a[i] = {
+         value:   this.getRowValue(r, sType, nColumn),
+         element: r
+      };
+   };
+   return a;
+};
+</pre>
+
+<p>One thing to note here is that the <code>length</code> is calculated once
+before the loop. The reason for this is that getting <code>rows.length</code>
+is an expensive operation in IE and we do not want to do it once for every
+row.</p>
+
+<p>Once we have this array we do not need to interact with the DOM during the
+actual sorting of the array.</p>
+
+<h3>The sort method</h3>
+
+<p>The function <code>getCache</code> prepares the data and once that is done
+the actual code to sort the table is more or less book keeping. The compare
+function to use when sorting is returned by the method
+<code>getSortFunction</code>. In its current state this function just returns
+a funtion that compares the <code>value</code> properties of the object inside
+the cache array. One might want to modify this for more esoteric data types
+where the operator <code>&lt;</code> is not defined.</p>
+
+<p>Once the cache array has been sorted the table rows are reinserted in the
+same order as the cache array. The property <code>element</code> of the JS
+object in the array is used to find the correct row element.</p>
+
+<pre>
+SortableTable.prototype.sort = function (nColumn, bDescending, sSortType) {
+   if (sSortType == null)
+      sSortType = this.getSortType(nColumn);
+
+   // exit if None
+   if (sSortType == "None")
+      return;
+
+   if (bDescending == null) {
+      if (this.sortColumn != nColumn)
+         this.descending = true;
+      else
+         this.descending = !this.descending;
+   }
+
+   this.sortColumn = nColumn;
+
+   if (typeof this.onbeforesort == "function")
+      this.onbeforesort();
+
+   var f = this.getSortFunction(sSortType, nColumn);
+   var a = this.getCache(sSortType, nColumn);
+   var tBody = this.tBody;
+
+   a.sort(f);
+
+   if (this.descending)
+      a.reverse();
+
+   if (SortableTable.removeBeforeSort) {
+      // remove from doc
+      var nextSibling = tBody.nextSibling;
+      var p = tBody.parentNode;
+      p.removeChild(tBody);
+   }
+
+   // insert in the new order
+   var l = a.length;
+   for (var i = 0; i < l; i++)
+      tBody.appendChild(a[i].element);
+
+   if (SortableTable.removeBeforeSort) {
+      // insert into doc
+      p.insertBefore(tBody, nextSibling);
+   }
+
+   this.updateHeaderArrows();
+
+   this.destroyCache(a);
+
+   if (typeof this.onsort == "function")
+      this.onsort();
+};
+</pre>
+
+<p>In some browser (namely Mozilla) the DOM manipulations are faster when
+done on a disconnected DOM tree. Therefore when
+<code>SortableTable.removeBeforeSort</code> is true we first disconnect the
+tree before reorganizing the rows and once the reorganization is done we
+reinsert the table.</p>
+
+<h2>Setting up the Header</h2>
+
+<h3>Sort Arrows</h3>
+
+<p>When the <code>SortableTable</code> is constructed images are added to
+the table header cells. These images then changes their background image
+to indicate that the column is sorted.</p>
+
+<h3>Hooking up the events</h3>
+
+<p>Also at creation, event listeners are added to the table header cells. In
+this case we use <code>addEventListener</code> if available and if not we
+try to use <code>attachEvent</code>. These are set to call
+<code>this._headerOnclick</code>, which is just an encapsulation of
+<code>this.headerOnclick()</code>. There are 2 reasons why it is done in this
+way. The first is so that <code>this</code> will point to the JS object inside
+the function <code>headerOnclick</code> and not on the table cell element. The
+other reason is that we need to be able to detach the event listener when
+destroying the JS object. If we used an anonymous function this would not
+have been possible.</p>
+
+<pre>
+function SortableTable(oTable, oSortTypes) {
+   ...
+   var oThis = this;
+   this._headerOnclick = function (e) {
+      oThis.headerOnclick(e);
+   };
+   ...
+}
+
+SortableTable.prototype.initHeader = function (oSortTypes) {
+   var cells = this.tHead.rows[0].cells;
+   var l = cells.length;
+   var img, c;
+   for (var i = 0; i &lt; l; i++) {
+      c = cells[i];
+      img = this.document.createElement("IMG");
+      img.src = "images/blank.png";
+      c.appendChild(img);
+      if (oSortTypes[i] != null) {
+         c._sortType = oSortTypes[i];
+      }
+      if ("addEventListener" in c)
+         c.addEventListener("click", this._headerOnclick, false);
+      else if ("attachEvent" in c)
+         c.attachEvent("onclick", this._headerOnclick);
+   }
+   this.updateHeaderArrows();
+};
+</pre>
+
+
+
+<p>
+<a href="sortabletable.html">Sortable Table</a><br />
+<a href="implementation.html">Implementation</a><br />
+<a href="api.html">API</a><br />
+<a href="demo.html">Demo</a><br />
+<a href="http://webfx.eae.net/download/sortabletable112.zip">Download</a>
+</p>
+
+<p class="author">Author: Erik Arvidsson</p>
+
+<!-- end webfx-main-body -->
+</div>
+
+</body>
+</html>

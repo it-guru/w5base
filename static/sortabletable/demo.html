@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html>
+<head>
+<title>Sortable Table Demo (WebFX)</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="js/sortabletable.js"></script>
+<link type="text/css" rel="StyleSheet" href="css/sortabletable.css" />
+
+<style type="text/css">
+
+body {
+	font-family:	Verdana, Helvetica, Arial, Sans-Serif;
+	font:			Message-Box;
+}
+
+code {
+	font-size:	1em;
+}
+
+</style>
+</head>
+<body>
+
+<h2>Small Static Table</h2>
+
+<p>Below is a static table with 6 rows. The sort type has been set using
+the <code>oSortType</code> argument in the constructor.</p>
+
+<table class="sort-table" id="table-1" cellspacing="0">
+	<col />
+	<col />
+	<col style="text-align: right" />
+	<col />
+	<col />
+	<thead>
+		<tr>
+			<td>String</td>
+			<td title="CaseInsensitiveString">String</td>
+			<td>Number</td>
+			<td>Date</td>
+			<td>No Sort</td>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>apple</td>
+			<td>Strawberry</td>
+			<td>45</td>
+			<td>2001-03-13</td>
+			<td>Item 0</td>
+		</tr>
+		<tr>
+			<td>Banana</td>
+			<td>orange</td>
+			<td>7698</td>
+			<td>1789-07-14</td>
+			<td>Item 1</td>
+		</tr>
+		<tr>
+			<td>orange</td>
+			<td>Banana</td>
+			<td>4546</td>
+			<td>1949-07-04</td>
+			<td>Item 2</td>
+		</tr>
+		<tr>
+			<td>Strawberry</td>
+			<td>apple</td>
+			<td>987</td>
+			<td>1975-08-19</td>
+			<td>Item 3</td>
+		</tr>
+		<tr>
+			<td>Pear</td>
+			<td>blueberry</td>
+			<td>98743</td>
+			<td>2001-01-01</td>
+			<td>Item 4</td>
+		</tr>
+		<tr>
+			<td>blueberry</td>
+			<td>Pear</td>
+			<td>4</td>
+			<td>2001-04-18</td>
+			<td>Item 5</td>
+		</tr>
+	</tbody>
+</table>
+
+<script type="text/javascript">
+
+var st1 = new SortableTable(document.getElementById("table-1"),
+	["String", "CaseInsensitiveString", "Number", "Date", "None"]);
+
+</script>
+
+
+<h2>Small Static Table</h2>
+
+<p>This is an identical table as the one above. The only difference is that the
+headers have been hidden using CSS.</p>
+
+<table class="sort-table" id="table-2" cellspacing="0">
+	<col />
+	<col />
+	<col style="text-align: right" />
+	<col />
+	<col />
+	<tbody>
+		<tr>
+			<td>apple</td>
+			<td>Strawberry</td>
+			<td>45</td>
+			<td>2001-03-13</td>
+			<td>Item 0</td>
+		</tr>
+		<tr>
+			<td>Banana</td>
+			<td>orange</td>
+			<td>7698</td>
+			<td>1789-07-14</td>
+			<td>Item 1</td>
+		</tr>
+		<tr>
+			<td>orange</td>
+			<td>Banana</td>
+			<td>4546</td>
+			<td>1949-07-04</td>
+			<td>Item 2</td>
+		</tr>
+		<tr>
+			<td>Strawberry</td>
+			<td>apple</td>
+			<td>987</td>
+			<td>1975-08-19</td>
+			<td>Item 3</td>
+		</tr>
+		<tr>
+			<td>Pear</td>
+			<td>blueberry</td>
+			<td>98743</td>
+			<td>2001-01-01</td>
+			<td>Item 4</td>
+		</tr>
+		<tr>
+			<td>blueberry</td>
+			<td>Pear</td>
+			<td>4</td>
+			<td>2001-04-18</td>
+			<td>Item 5</td>
+		</tr>
+	</tbody>
+</table>
+
+<script type="text/javascript">
+
+var st2 = new SortableTable(document.getElementById("table-2"),
+	["String", "CaseInsensitiveString", "Number", "Date", "None"]);
+
+</script>
+
+<p>Since the headers have been removed we call sort manually.</p>
+
+<p>
+<button onclick="st2.sort(0)">Sort Column 0</button>
+<button onclick="st2.sort(1)">Sort Column 1</button>
+<button onclick="st2.sort(2)">Sort Column 2</button>
+<button onclick="st2.sort(3)">Sort Column 3</button>
+<button onclick="st2.sort(4)">Sort Column 4</button>
+</p>
+
+
+</body>
+</html>

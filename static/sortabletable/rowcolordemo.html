@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html>
+<head>
+<title>Sortable Table Demo (WebFX)</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="js/sortabletable.js"></script>
+<link type="text/css" rel="StyleSheet" href="css/sortabletable.css" />
+<style type="text/css">
+
+body {
+	font-family:	Verdana, Helvetica, Arial, Sans-Serif;
+	font:			Message-Box;
+}
+
+code {
+	font-size:	1em;
+}
+
+/* extra rules for even and odd rows */
+.even {
+	background:	#eee;
+}
+
+.odd {
+
+}
+
+</style>
+
+</head>
+<body>
+
+<h2>Table with Alternating Row Colors</h2>
+
+<p>Below is another table. This time the rows have the class names
+<code>even</code> and <code>odd</code>. Since the order of the rows
+change when the table is sorted we reset the class names after the
+sort.</p>
+
+<p>
+<a href="rowcolordemo.html" onclick="document.location = 'view-source:' + document.location; return false;">View Source</a>
+</p>
+
+<table class="sort-table" id="table-1" cellspacing="0">
+	<col />
+	<col />
+	<col style="text-align: right" />
+	<col />
+	<col />
+	<thead>
+		<tr>
+			<td>String</td>
+			<td title="CaseInsensitiveString">String</td>
+			<td>Number</td>
+			<td>Date</td>
+			<td>No Sort</td>
+		</tr>
+	</thead>
+	<tbody>
+		<tr class="odd">
+			<td>apple</td>
+			<td>Strawberry</td>
+			<td>45</td>
+			<td>2001-03-13</td>
+			<td>Item 0</td>
+		</tr>
+		<tr class="even">
+			<td>Banana</td>
+			<td>orange</td>
+			<td>7698</td>
+			<td>1789-07-14</td>
+			<td>Item 1</td>
+		</tr>
+		<tr class="odd">
+			<td>orange</td>
+			<td>Banana</td>
+			<td>4546</td>
+			<td>1949-07-04</td>
+			<td>Item 2</td>
+		</tr>
+		<tr class="even">
+			<td>Strawberry</td>
+			<td>apple</td>
+			<td>987</td>
+			<td>1975-08-19</td>
+			<td>Item 3</td>
+		</tr>
+		<tr class="odd">
+			<td>Pear</td>
+			<td>blueberry</td>
+			<td>98743</td>
+			<td>2001-01-01</td>
+			<td>Item 4</td>
+		</tr>
+		<tr class="even">
+			<td>blueberry</td>
+			<td>Pear</td>
+			<td>4</td>
+			<td>2001-04-18</td>
+			<td>Item 5</td>
+		</tr>
+	</tbody>
+</table>
+
+<script type="text/javascript">
+//<![CDATA[
+
+function addClassName(el, sClassName) {
+	var s = el.className;
+	var p = s.split(" ");
+	var l = p.length;
+	for (var i = 0; i < l; i++) {
+		if (p[i] == sClassName)
+			return;
+	}
+	p[p.length] = sClassName;
+	el.className = p.join(" ").replace( /(^\s+)|(\s+$)/g, "" );
+}
+
+function removeClassName(el, sClassName) {
+	var s = el.className;
+	var p = s.split(" ");
+	var np = [];
+	var l = p.length;
+	var j = 0;
+	for (var i = 0; i < l; i++) {
+		if (p[i] != sClassName)
+			np[j++] = p[i];
+	}
+	el.className = np.join(" ").replace( /(^\s+)|(\s+$)/g, "" );
+}
+
+var st = new SortableTable(document.getElementById("table-1"),
+	["String", "CaseInsensitiveString", "Number", "Date", "None"]);
+
+// restore the class names
+st.onsort = function () {
+	var rows = st.tBody.rows;
+	var l = rows.length;
+	for (var i = 0; i < l; i++) {
+		removeClassName(rows[i], i % 2 ? "odd" : "even");
+		addClassName(rows[i], i % 2 ? "even" : "odd");
+	}
+};
+
+
+//]]>
+</script>
+
+
+
+</body>
+</html>

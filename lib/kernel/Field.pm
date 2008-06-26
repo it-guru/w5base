@@ -250,8 +250,13 @@ sub Uploadable
 {
    my $self=shift;
    my %param=@_;
-   if (ref($self->{uploadable}) eq "CODE"){
-      return(&{$self->{uploadable}}($self,%param));
+   if (defined($self->{uploadable})){
+      if (ref($self->{uploadable}) eq "CODE"){
+         return(&{$self->{uploadable}}($self,%param));
+      }
+      else{
+         return($self->{uploadable});
+      }
    }
    return(0) if (!$self->UiVisible("ViewEditor"));
    return(0) if ($self->readonly);

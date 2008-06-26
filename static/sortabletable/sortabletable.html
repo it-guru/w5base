@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html>
+<head>
+<title>Sortable Table (WebFX)</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="local/webfxlayout.js"></script>
+
+</head>
+<body>
+<!-- WebFX Layout Include -->
+<script type="text/javascript">
+
+var articleMenu= new WebFXMenu;
+articleMenu.left  = 384;
+articleMenu.top   = 86;
+articleMenu.width = 140;
+articleMenu.add(new WebFXMenuItem("Sortable Table", "sortabletable.html"));
+articleMenu.add(new WebFXMenuItem("Implementation", "implementation.html"));
+articleMenu.add(new WebFXMenuItem("API", "api.html"));
+articleMenu.add(new WebFXMenuItem("Demos", "demos.html"));
+articleMenu.add(new WebFXMenuSeparator);
+articleMenu.add(new WebFXMenuItem("Download", "http://webfx.eae.net/download/sortabletable112.zip"));
+webfxMenuBar.add(new WebFXMenuButton("Article Menu", null, null, articleMenu));
+
+webfxLayout.writeTitle("Sortable Table");
+webfxLayout.writeMenu();
+webfxLayout.writeDesignedByEdger();
+
+</script>
+<div class="webfx-main-body">
+<!-- end WebFX Layout Includes -->
+
+<p>
+	<span class="date">2003-01-10</span>: First public version released<br/>
+	<span class="date">2004-01-27</span>: Version 1.1 - Simplified adding custom sort types<br/>
+	<span class="date">2006-05-26</span>: Changed license to Apache Software License 2.0.<br />
+</p>
+
+<h2>Introduction</h2>
+
+<p>In 1998 we released a <a href="/dhtml/tablesort/tablesort.html">script</a>
+that allowed any HTML table element to be sorted using
+<a href="http://www.w3.org/DOM/DOMTR#dom1">DOM level 1</a>. Now that this script
+has played its part it is time to realize that there were a few things that could
+greatly improve this script.</p>
+
+<p>There were mainly two goals that I wanted to achieve with the new version. The
+first one was to make a more consistent API. The old script wasn't were modular
+and the only way to sort the table was to actually click on the header cell. The
+new version should allow sort to be called from any script anywhere. The second
+most important part was performance. The new version is about 10 times faster.
+This was acheived by doing as little DOM interaction as possible in the actual
+sorting.</p>
+
+<h2>Usage</h2>
+
+<p>The usage has changed a little since the first version. Now a JavaScript
+object is constructed. The constructor takes the table element that it should
+make sortable and an array of the sort types. This array is optional and if
+left out all columns are sorted using case sensitive string comparison.</p>
+
+<p>The format of the table is the same as in the previous version. The table
+must consist of a <code>thead</code> and a <code>tbody</code> element. Note
+alse that cells with <code>rowspan</code> and <code>colspan</code> will break
+the sort behavior since then the correct cells cannot be found. If you really
+do not want a visible header you can hide the <code>thead</code> by setting the
+<code>display</code> style to <code>"none"</code>.</p>
+
+<pre>
+&lt;table class="sort-table" id="table-1" cellspacing="0"&gt;
+   &lt;thead&gt;
+      &lt;tr&gt;
+         &lt;td&gt;String&lt;/td&gt;
+         &lt;td&gt;Number&lt;/td&gt;
+         ...
+      &lt;/tr&gt;
+   &lt;/thead&gt;
+   &lt;tbody&gt;
+      &lt;tr&gt;
+         &lt;td&gt;apple&lt;/td&gt;
+         &lt;td&gt;45&lt;/td&gt;
+         ...
+      &lt;/tr&gt;
+      ...
+   &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;script type="text/javascript"&gt;
+var st1 = new SortableTable(document.getElementById("table-1"));
+&lt;/script&gt;
+</pre>
+
+<p>And to use different types for the columns.</p>
+
+<pre>
+var st2 = new SortableTable(document.getElementById("table-2"),
+   ["String", "CaseInsensitiveString", "Number", "Date", "None"]);
+</pre>
+
+<h3>Sorting the table</h3>
+
+<p>To sort the table the user can click on the table header cells. Sometimes
+it is also desired to allow the table to be sorted without the user interaction.
+For example, one might want to sort the table when the page has loaded.</p>
+
+<p>The table can be sorted by calling the method sort on the <code>SortableTable</code>
+object. This method takes 3 argument but only the first one is required. The
+first argument is the column number to sort by. The second argument is used to
+tell whether to sort descending or ascending. If left out then this is toggled
+so that the column will be sorted descending and ascending every other time
+respectively. The last argument can be used to set the sort type. If this is
+left out the sort type set in the constructor is used.</p>
+
+<pre>
+st1.sort(0);
+st1.sort(0, true);
+st1.sort(1, true, "Number");
+</pre>
+
+<h3>Sort Types</h3>
+
+<p>There are 4 built in supported sort types. These are:</p>
+
+<table cellspacing="0">
+<thead>
+<tr>
+	<td>Type</td>
+	<td>Description</td>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td><code>String</code></td>
+	<td>The default sort type. Sorts the text of the cells using a case
+		sensitive string comparison.</td>
+</tr>
+<tr>
+	<td><code>CaseInsensitiveString</code></td>
+	<td>Sorts the text of the cells using a case insensitive string comparison.</td>
+</tr>
+<tr>
+	<td><code>Number</code></td>
+	<td>Converts the text of the cells to numbers and then the sort compares
+		the numbers.</td>
+</tr>
+<tr>
+	<td><code>Date</code></td>
+	<td>Uses the ISO date format to sort the column. Converts the text of the
+		cells to <code>Date</code> objects and then the sort compares these
+		dates.</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>
+<a href="sortabletable.html">Sortable Table</a><br />
+<a href="implementation.html">Implementation</a><br />
+<a href="api.html">API</a><br />
+<a href="demos.html">Demos</a><br />
+<a href="http://webfx.eae.net/download/sortabletable112.zip">Download</a>
+</p>
+
+<p class="author">Author: Erik Arvidsson</p>
+
+<!-- end webfx-main-body -->
+</div>
+
+</body>
+</html>

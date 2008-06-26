@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html>
+<head>
+<title>Sortable Table Demos (WebFX)</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="local/webfxlayout.js"></script>
+
+</head>
+<body>
+<!-- WebFX Layout Include -->
+<script type="text/javascript">
+
+var articleMenu= new WebFXMenu;
+articleMenu.left  = 384;
+articleMenu.top   = 86;
+articleMenu.width = 140;
+articleMenu.add(new WebFXMenuItem("Sortable Table", "sortabletable.html"));
+articleMenu.add(new WebFXMenuItem("Implementation", "implementation.html"));
+articleMenu.add(new WebFXMenuItem("API", "api.html"));
+articleMenu.add(new WebFXMenuItem("Demos", "demos.html"));
+articleMenu.add(new WebFXMenuSeparator);
+articleMenu.add(new WebFXMenuItem("Download", "http://webfx.eae.net/download/sortabletable112.zip"));
+webfxMenuBar.add(new WebFXMenuButton("Article Menu", null, null, articleMenu));
+
+webfxLayout.writeTitle("Sortable Table");
+webfxLayout.writeMenu();
+webfxLayout.writeDesignedByEdger();
+
+</script>
+<div class="webfx-main-body">
+<!-- end WebFX Layout Includes -->
+
+
+<h2>Simple Static Demo</h2>
+
+<p>This contains two simple tables with SortableTable objects attached to
+them. For the second table the <code>thead</code> has been hidden using CSS.</p>
+
+<p><a href="demo.html">demo.html</a></p>
+
+
+<h2>Large Table Demo</h2>
+
+<p>This demo generates a large table during load. A string is generated using
+a <code>StringBuilder</code> and then written to the page using
+<code>document.write</code>. When generating such long strings as this the gain
+of using a string builder is huge. The demo also uses the <code>asyncSort</code>
+method to be able to write out a status messsage while the sorting is being done.</p>
+
+<p><a href="largetabledemo.html">largetabledemo.html</a></p>
+
+
+<h2>Row Color Demo</h2>
+
+<p>In this demo the rows have alternating colors. Since the sorting reorders the
+rows we'll have to change the colors after the actual sorting. This is done in
+the <code>onsort</code> handler.</p>
+
+<p><a href="rowcolordemo.html">rowcolordemo.html</a></p>
+
+
+<h2>Input Demo</h2>
+
+<p>This demo table has a column containing inputs. In this case we define our own
+custom <code>getRowValue</code> to find the value of the input.</p>
+
+<p>This demo would have been much simpler if IE did not have a bug when it comes
+to DOM and input elements. In IE the value of the input is lost when doing DOM
+manipulations and therefore we store the input value before the sort and restore
+it afterwards.</p>
+
+<p><a href="inputdemo.html">inputdemo.html</a></p>
+
+<h2>External Sort Type Demo</h2>
+
+<p>This demo shows how to add a custom sort type using a external JavaScript
+files. There is no need to create a sub class or override any methods to achieve
+this any more. Just one line of code to add the new sort type.</p>
+
+<p><a href="customsorttypedemo.html">customsorttypedemo.html</a></p>
+
+<p>
+<a href="sortabletable.html">Sortable Table</a><br />
+<a href="implementation.html">Implementation</a><br />
+<a href="api.html">API</a><br />
+<a href="demos.html">Demos</a><br />
+<a href="http://webfx.eae.net/download/sortabletable112.zip">Download</a>
+</p>
+
+<p class="author">Author: Erik Arvidsson</p>
+
+<!-- end webfx-main-body -->
+</div>
+
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html>
+<head>
+<title>Sortable Table Demo (WebFX)</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="js/sortabletable.js"></script>
+<link type="text/css" rel="StyleSheet" href="css/sortabletable.css" />
+
+<!-- StringBuilder is only needed for the demo page -->
+<script type="text/javascript" src="js/stringbuilder.js"></script>
+
+<style type="text/css">
+
+body {
+	font-family:	Verdana, Helvetica, Arial, Sans-Serif;
+	font:			Message-Box;
+}
+
+code {
+	font-size:	1em;
+}
+
+</style>
+<script type="text/javascript">
+//<![CDATA[
+
+// This function is just part of the demo page
+// it is used for the large table to measure the time
+// the sorting took
+function timedSort(nColumn) {
+	var out = document.getElementById("out");
+
+	if (st.getSortType(nColumn) == "None") {
+		out.firstChild.data = "Sort type is None for column " + nColumn;
+		return;
+	}
+
+	st.onsort = function () {
+		out.firstChild.data = "Sorting took " + (new Date - d0) + "ms";
+		st.onsort = null;
+	};
+	var d0 = new Date;
+	st.asyncSort(nColumn);
+	out.firstChild.data = "Sorting column " + nColumn + "...";
+}
+
+//]]>
+</script>
+</head>
+<body>
+
+
+<h2>Large Table</h2>
+
+<p>Below is a large table with <span id="nr-of-rows">?</span> rows and
+<span id="nr-of-cols">?</span> columns that is dynamically generated during
+load of the page</p>
+
+<p>
+<button onclick="timedSort(0)">Sort Column 0</button>
+<button onclick="timedSort(1)">Sort Column 1</button>
+<button onclick="timedSort(2)">Sort Column 2</button>
+<button onclick="timedSort(3)">Sort Column 3</button>
+</p>
+
+<p id="out">Status...</p>
+
+<script type="text/javascript">
+
+function getRandomDate() {
+	var d = new Date(Math.random() * Math.pow(10, 12));
+	return d.getFullYear() + "-" +
+		(d.getMonth() < 10 ? "0" : "") +
+		d.getMonth() + "-" +
+		(d.getDate() < 10 ? "0" : "") +
+		d.getDate();
+}
+
+ROWS = 500;
+COLS = 4;
+
+document.getElementById("nr-of-rows").firstChild.data = ROWS;
+document.getElementById("nr-of-cols").firstChild.data = COLS;
+
+var sb = new StringBuilder();
+sb.append("<table id=\"table-3\" class=\"sort-table\" cellspacing=\"0\"><thead><tr>");
+for (var x = 0; x < COLS; x++) {
+	if (x == 1)
+		sb.append("<td>Number</td>");
+	else if (x == 2)
+		sb.append("<td>Date</td>");
+	else if (x == 3)
+		sb.append("<td>No sort</td>");
+	else
+		sb.append("<td>Head " + x + "</td>");
+}
+
+sb.append("</tr></thead><tbody>");
+for (var y = 0; y < ROWS; y++) {
+	sb.append("<tr>");
+	for (var x = 0; x < COLS; x++) {
+		if (x == 1)
+			sb.append("<td>" + Math.round(Math.random() * Math.pow(10,5)) + "</td>");
+		else if (x == 2)
+			sb.append("<td>" + getRandomDate() + "</td>");
+		else
+			sb.append("<td>Item " + y + "." + x + "</td>");
+	}
+	sb.append("</tr>");
+}
+sb.append("</tbody><table>");
+
+document.write(sb.toString());
+
+var st = new SortableTable(document.getElementById("table-3"),
+	["String", "Number", "Date", "None"]);
+
+</script>
+
+
+
+
+</body>
+</html>

@@ -97,6 +97,8 @@ sub ProcessHead
    $d.="<script language=\"JavaScript\" ".
        "src=\"../../base/load/toolbox.js\"></script>\n";
    $d.="<script language=\"JavaScript\" ".
+       "src=\"../../base/load/sortabletable.js\"></script>\n";
+   $d.="<script language=\"JavaScript\" ".
        "src=\"../../base/load/TextTranslation.js\"></script>\n";
    $d.="<script language=\"JavaScript\">\n";
    if ($scrolly!=0){

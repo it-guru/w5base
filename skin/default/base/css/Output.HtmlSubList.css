@@ -113,3 +113,21 @@ tr.linehighlight{
    cursor:pointer;
 }
 
+.sort-arrow {
+	width:					11px;
+	height:					11px;
+	background-position:	center center;
+	background-repeat:		no-repeat;
+	margin:					0 2px;
+}
+
+
+.sort-arrow.descending {
+	background-image:		url("../../../public/base/load/downsimple.png");
+
+}
+
+.sort-arrow.ascending {
+	background-image:		url("../../../public/base/load/upsimple.png");
+}
+

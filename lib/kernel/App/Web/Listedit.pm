@@ -102,6 +102,8 @@ sub HandleSubListEdit
          "src=\"../../../public/base/load/OutputHtml.js\"></script>\n");
    print("<script language=JavaScript ".
          "src=\"../../../public/base/load/toolbox.js\"></script>\n");
+   print("<script language=JavaScript ".
+         "src=\"../../../public/base/load/sortabletable.js\"></script>\n");
    $self->ProcessDataModificationOP();
    {
       # SubList Edit-Mask anzeigen

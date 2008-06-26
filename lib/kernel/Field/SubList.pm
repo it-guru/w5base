@@ -194,6 +194,7 @@ sub getSubListData
       }
 
       $self->vjoinobj->SetCurrentView(@view);
+      $param{parentfield}=$self->Name();
       return($self->vjoinobj->getSubList($current,$mode,%param));
    }
    return("ERROR: Data-Source not available");

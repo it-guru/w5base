@@ -1,6 +1,6 @@
 'faq::category'=>{de=>'Wissenskategorie',
                   en=>'Knowleged category'},
-'fieldgroup.default'=>{de=>'Kathegoriedaten',
+'fieldgroup.default'=>{de=>'Kategoriedaten',
                        en=>'Category data'},
 'fieldgroup.id'=>{de=>'Identifikation',
                   en=>'Identification'},
