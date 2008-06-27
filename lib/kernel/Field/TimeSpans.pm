@@ -46,6 +46,7 @@ sub Validate
    my $newstring="";
    for(my $day=0;$day<=$#{$newval};$day++){
       $newval->[$day]=~s/[\(\)\s\+]//g;
+      my @times;
       foreach my $t (split(/[,;]/,$newval->[$day])){
          if ($t ne ""){
             my ($h1,$m1,$h2,$m2)=$t=~m/^(\d+):(\d+)-(\d+):(\d+)$/;
@@ -55,8 +56,10 @@ sub Validate
                $self->getParent->LastMsg(ERROR,$msg);
                return(undef);
             }
+            push(@times,sprintf("%02d:%02d-%02d:%02d",$h1,$m1,$h2,$m2));
          }
       }
+      $newval->[$day]=join(", ",@times);
       $newstring.="+" if ($newstring ne "");
       $newstring.="$day($newval->[$day])";
    }
