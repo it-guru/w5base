@@ -1160,9 +1160,7 @@ sub HtmlSubModalDiv
    my $docallback="false";
    $docallback="true" if ($param{docallback});
    my $d=<<EOF;
-<div id="popupMask">
-Dies ist ein Test
-</div>
+<div id="popupMask">&nbsp;</div>
 <div id="popupContainer">
    <div id="popupInner" >
       <div id="TitleBar" class="TitleBar">

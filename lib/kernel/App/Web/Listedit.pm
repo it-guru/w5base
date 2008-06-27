@@ -1157,7 +1157,7 @@ function DetailClose(){
 }
 function DetailDelete(id)
 {
-   showPopWin('DeleteRec?CurrentIdToEdit=$id',null,200,FinishDelete);
+   showPopWin('DeleteRec?CurrentIdToEdit=$id',500,180,FinishDelete);
 }
 function DetailCopy(id)
 {

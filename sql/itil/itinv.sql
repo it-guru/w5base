@@ -435,7 +435,7 @@ alter table appl add key(customer);
 alter table system add ccproxy varchar(128) default '';
 create table servicesupport (
   id         bigint(20) NOT NULL,
-  name       varchar(40) NOT NULL,
+  name       varchar(60) NOT NULL,
   cistatus   int(2)      NOT NULL,
     mandator       bigint(20)  default NULL,
   comments    longtext     default NULL,

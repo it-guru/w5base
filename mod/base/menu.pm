@@ -664,7 +664,10 @@ sub menutop
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css',
                                    'kernel.App.Web.css'],
+                           js=>['toolbox.js','subModal.js'],
                            body=>1,form=>1);
+   print $self->HtmlSubModalDiv();
+
    print $self->getParsedTemplate("tmpl/menuheader",{});
    print $self->HtmlBottom(body=>1,form=>1);
 }

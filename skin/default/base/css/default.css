@@ -64,8 +64,8 @@
 	visibility:hidden;
         display:none;
 	padding: 0px;
-	margin: 0px;
-        border-width:0;
+	margin: 10px;
+        border-style:solid;border-width:2px;border-color:black
 width:85%;
 overflow:hidden;
 }
@@ -95,7 +95,8 @@ iframe.popupFrame {
 	padding: 0px;
 	margin: 0px;
 	xmargin-bottom: 2px;
-	border-bottom: 2px solid #000000;
+	padding-left: 3px;
+	border-bottom: 1px solid #000000;
 	border-top: 1px solid #78A3F2;
 	border-left: 1px solid #78A3F2;
 	border-right: 1px solid #204095;

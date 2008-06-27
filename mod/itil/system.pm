@@ -855,7 +855,7 @@ sub Validate
    ########################################################################
    # standard security handling
    #
-   if ($self->isDataInputFromUserFrontend()){
+   if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
       my $userid=$self->getCurrentUserId();
       if (!defined($oldrec)){
          if (!defined($newrec->{databossid}) ||
