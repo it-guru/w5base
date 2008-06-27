@@ -38,6 +38,7 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
    my $name=$self->Name();
+   my $app=$self->getParent();
    return({}) if (!exists($newrec->{$name}));
 
    my $newval=$newrec->{$name};
@@ -45,11 +46,13 @@ sub Validate
    my $newstring="";
    for(my $day=0;$day<=$#{$newval};$day++){
       $newval->[$day]=~s/[\(\)\s\+]//g;
-      foreach my $t (split(/,/,$newval->[$day])){
+      foreach my $t (split(/[,;]/,$newval->[$day])){
          if ($t ne ""){
             my ($h1,$m1,$h2,$m2)=$t=~m/^(\d+):(\d+)-(\d+):(\d+)$/;
             if (!defined($h1) || !defined($m2)){
-               $self->getParent->LastMsg(ERROR,"invalid timespan format='$t'");
+               my $msg=sprintf($app->T("invalid timespan format '%s' - ".
+                          "use f.e. 10:00-11:00, 15:00-18:30"),$t);
+               $self->getParent->LastMsg(ERROR,$msg);
                return(undef);
             }
          }
@@ -176,12 +179,16 @@ sub FormatedDetail
          }
          my $dis="";
          $dis=" disabled " if ($mode ne "edit");
+         my $val=$fval[$dayno];
+         my @fromquery=Query->Param($name);
+         if ($mode eq "edit" && defined($fromquery[$dayno])){
+            $val=$fromquery[$dayno];
+         }
          $tab.="</td>".
-               "<td><input name=$name $dis type=text value=\"$fval[$dayno]\" ".
+               "<td><input name=$name $dis type=text value=\"$val\" ".
                "style=\"width:100%\"></td></tr>";
       }
-      $tab.="</table><br>xx";
-      #$d="<div style=\"margin:0px;padding:0px;border-width:1px;border-style:solid;border-color:black\">$tab</div>";
+      $tab.="</table><br>";
       $d=$tab;
    }
    return($d);

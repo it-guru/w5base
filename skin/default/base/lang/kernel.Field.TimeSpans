@@ -5,3 +5,4 @@
 'wed'=>{de=>'Mi'},
 'thu'=>{de=>'Do'},
 'fri'=>{de=>'Fr'},
+"invalid timespan format '\%s' - use f.e. 10:00-11:00, 15:00-18:30"=>{de=>"ungültiges Zeitspannen Format '\%s' - nutzen Sie z.B. 10:00-11:00, 15:00-18:30"},
