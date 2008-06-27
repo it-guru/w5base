@@ -59,7 +59,7 @@ sub Validate
             push(@times,sprintf("%02d:%02d-%02d:%02d",$h1,$m1,$h2,$m2));
          }
       }
-      $newval->[$day]=join(", ",@times);
+      $newval->[$day]=join(", ",sort(@times));
       $newstring.="+" if ($newstring ne "");
       $newstring.="$day($newval->[$day])";
    }
