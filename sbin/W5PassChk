@@ -11,6 +11,7 @@ use Getopt::Long;
 use kernel::cgi;
 use Digest::SHA1;
 use Data::HexDump;
+use Sys::Syslog;
 
 use vars qw($opt_v $opt_h $opt_c $configname);
 exit(1) if (!GetOptions('verbose'=>\$opt_v,
@@ -101,18 +102,26 @@ $ctx->reset;
 $ctx->add($stage1);
 my $stage2 = $ctx->hexdigest;
 
-msg(INFO,"pwd hash = %s",uc($stage2));
-
-
+# read stored password
 my $o=getModuleObject($curconfig,"base::useraccount");
-   $o->SetFilter({'account'=>'service/smsid'});
+   $o->SetFilter({'account'=>"$ARGV[0]"});
 my ($rec,$msg)=$o->getHashList(qw(account password));
-   if ($rec->{'password'}=~m/^\*/){
-      msg(INFO,"mysql 5");
+
+# check if password mysql5 conform 
+if ($rec->{'password'}=~m/^\*/){
+   syslog("info","password is mysql5 conform");
+   $rec->{'password'}=~s/^\*//;
+   if (uc($stage2) eq uc($rec->{'password'})){
+      # password accepted
+      syslog("info","password accepted");
+      exit(0);
    }else{
-      msg(INFO,"mysql 4 not supported");
+      # access denied
+      syslog("info","password wrong");
       exit(1);
    }
-msg(INFO,"password=%s",$rec->{'password'});
-
+}else{
+   syslog("info","password is'nt mysql5 conform");
+   exit(1);
+}
 
