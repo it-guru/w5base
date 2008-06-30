@@ -53,7 +53,7 @@ sub globalHelp
 
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','mainwork.css'],
-                           title=>"W5Base global help system",
+                           title=>"W5Base global search and help system",
                            target=>'Result',
                            action=>'Result',
                            js=>['toolbox.js'],
@@ -71,7 +71,7 @@ sub Welcome
    my $label=shift;
    my $searchtext=shift;
 
-   print treeViewHeader($label);
+   print treeViewHeader($label,1);
    my $faq=getModuleObject($self->Config,"faq::article");
 
    $faq->SecureSetFilter({categorie=>'W5Base*'});
@@ -105,7 +105,8 @@ sub doSearch
                    "$rec->{faqid}");
    }
    if (!$found){
-      print treeViewHeader("<font color=red>".$self->T("nothing found")."</font>");
+      print treeViewHeader("<font color=red>".$self->T("nothing found")."</font>",
+                           1);
    }
    return(0);
 }
@@ -131,6 +132,8 @@ sub insDoc
 sub treeViewHeader
 {
    my $label=shift;
+   my $allopen=shift;
+   $allopen=0 if (!defined($allopen));
 
    my $d=<<EOF;
 
@@ -143,7 +146,7 @@ sub treeViewHeader
 
 <script langauge="JavaScript">
 USETEXTLINKS=1;
-STARTALLOPEN=0;
+STARTALLOPEN=$allopen;
 ICONPATH = '../../../static/treeview/';
 
 foldersTree=gFld("<i>$label</i>");
