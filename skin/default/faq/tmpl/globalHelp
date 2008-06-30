@@ -13,7 +13,7 @@
 </tr>
 <tr>
 <td><input type=text id=in name=searchtext size=28></td>
-<td><input type=submit value="%TRANSLATE(Search)%"></td>
+<td><input type=submit name=dosearch value="%TRANSLATE(Search)%"></td>
 </tr>
 </table>
 
@@ -26,3 +26,7 @@
 </td>
 </tr>
 </table>
+<script language="JavaScript">
+setFocus("searchtext");
+setEnterSubmit(document.forms[0],"dosearch");
+</script>
