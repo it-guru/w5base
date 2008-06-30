@@ -12,3 +12,6 @@ EOF
 'Knowledge Base - Quickfind'=>{de=>'Wissensdatenbank - Quickfind'},
 'Keywords'=>{de=>'Schlüsselworte'},
 'Search'=>{de=>'Suchen'},
+'Search Result'=>{de=>'Suchergebnis'},
+'W5Base Documentation'=>{de=>'W5Base Dokumentation'},
+'nothing found'=>{de=>'nichts gefunden'},

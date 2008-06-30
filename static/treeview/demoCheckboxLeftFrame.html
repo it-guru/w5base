@@ -1,0 +1,101 @@
+<HTML>
+
+<!--------------------------------------------------------------->
+<!-- Copyright (c) 2006 by Conor O'Mahony.                     -->
+<!-- For enquiries, please email GubuSoft@GubuSoft.com.        -->
+<!-- Please keep all copyright notices below.                  -->
+<!-- Original author of TreeView script is Marcelino Martins.  -->
+<!--------------------------------------------------------------->
+<!-- This document includes the TreeView script.  The TreeView -->
+<!-- script can be found at http://www.TreeView.net.  The      -->
+<!-- script is Copyright (c) 2006 by Conor O'Mahony.           -->
+<!--------------------------------------------------------------->
+
+ <HEAD>
+
+  <STYLE>
+    BODY {
+      background-color: white;}
+    TD {
+      font-size: 10pt; 
+      font-family: verdana,helvetica; 
+      text-decoration: none;
+      white-space:nowrap;}
+    A {
+      text-decoration: none;
+      color: black;}
+  </STYLE>
+
+  <!-- Code for browser detection. DO NOT REMOVE.             -->
+  <SCRIPT src="ua.js"></SCRIPT>
+
+  <!-- Infrastructure code for the TreeView. DO NOT REMOVE.   -->
+  <SCRIPT src="ftiens4.js"></SCRIPT>
+
+  <!-- Scripts that define the tree. DO NOT REMOVE.           -->
+  <SCRIPT SRC="demoCheckboxNodes.js"></SCRIPT>
+
+
+  <SCRIPT>
+
+    // NOTE: This function depends on the actual prependHTML strings used in the
+    // configuration file (dmeoCheckboxNodes.js). If you change these strings, 
+    // you will need to change this function.
+    function generateQueryString() {
+      var retStr
+      // The getElById function is defined in ftiens4.js and helps with cross-
+      // browser compatibility
+      retStr = "BOX1=" + getElById('BOX1').checked
+      retStr = retStr + "&BOX2=" + getElById('BOX2').checked
+      retStr = retStr + "&BOX3=" + getElById('BOX3').checked
+      retStr = retStr + "&RD1=" + getElById('RD1').checked
+      retStr = retStr + "&RD2=" + getElById('RD2').checked
+      retStr = retStr + "&RD3=" + getElById('RD3').checked
+      return retStr;
+    }
+
+    // NOTE: If you are using a frameless layout, you need to change this function
+    // so it reloads "self" rather than reloading the right frame.
+    function submitTreeForm() {
+      window.open("demoCheckboxRightFrame.html?" + generateQueryString(), "basefrm")
+    }
+  </SCRIPT>
+
+
+  <TITLE>TreeView Demo: Checkboxes and Radio Buttons for a Form</TITLE>
+
+ </HEAD>
+
+ <BODY topmargin="16" marginheight="16">
+
+  <!------------------------------------------------------------->
+  <!-- IMPORTANT NOTICE:                                       -->
+  <!-- Removing the following link will prevent this script    -->
+  <!-- from working.  Unless you purchase the registered       -->
+  <!-- version of TreeView, you must include this link.        -->
+  <!-- If you make any unauthorized changes to the following   -->
+  <!-- code, you will violate the user agreement.  If you want -->
+  <!-- to remove the link, see the online FAQ for instructions -->
+  <!-- on how to obtain a version without the link.            -->
+  <!------------------------------------------------------------->
+  <DIV style="position:absolute; top:0; left:0;"><TABLE border=0><TR><TD><FONT size=-2><A style="font-size:7pt;text-decoration:none;color:silver" href="http://www.treemenu.net/" target=_blank>Javascript Tree Menu</A></FONT></TD></TR></TABLE></DIV>
+
+  <!-- The form-related tags in this file are needed only to  -->
+  <!-- demonstrate the checkbox functionality.                -->
+  <FORM name="ft" method="">
+
+   <!-- Build the browser's objects and display default view  -->
+   <!-- of the tree.                                          -->
+   <SCRIPT>initializeDocument()</SCRIPT>
+   <NOSCRIPT>
+     A tree for site navigation will open here if you enable JavaScript in your browser.
+   </NOSCRIPT>
+
+   <BR>
+   <BR>
+   <CENTER><INPUT type="button" onClick="submitTreeForm()" value="Get Values"></CENTER>
+  </FORM>
+
+ </BODY>
+
+</HTML>

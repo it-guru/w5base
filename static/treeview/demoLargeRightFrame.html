@@ -1,0 +1,55 @@
+<HTML>
+
+<!--------------------------------------------------------------->
+<!-- Copyright (c) 2006 by Conor O'Mahony.                     -->
+<!-- For enquiries, please email GubuSoft@GubuSoft.com.        -->
+<!-- Please keep all copyright notices below.                  -->
+<!-- Original author of TreeView script is Marcelino Martins.  -->
+<!--------------------------------------------------------------->
+<!-- This document includes the TreeView script.  The TreeView -->
+<!-- script can be found at http://www.TreeView.net.  The      -->
+<!-- script is Copyright (c) 2006 by Conor O'Mahony.           -->
+<!--------------------------------------------------------------->
+
+ <HEAD>
+
+  <style>
+   BODY {
+     background-color: white;
+     font-size: 10pt;
+     font-family: verdana,helvetica;}
+  </style>
+
+ </HEAD>
+
+ <BODY BGCOLOR="#FFFFFF">
+
+  <H3>TreeView Demo: Thousands of Nodes</H3>
+  <p><B>See how fast it is to build a large tree</B></p>
+  <p>Transfering the files to the browser on a slow connection may still take 
+  some unavoidable seconds because the definition of this large tree requires 
+  a configuration file of 11KB. However, after the internet transfer, creating 
+  the actual tree on the browser, setting it up, and displaying it doesn't 
+  take much longer than with the smallest of the trees.</p>
+  <p>Folders for years and folders for months do not load pages themselves 
+  and, thus, cannot be highlighted. All days can be highlighted with the 
+  exception of Feb 1, 2000. The exclusion of highlight for one node shows the 
+  flexibility of the highlight settings in Treeview.</p>
+  <p>A tree with years, months, and days is a rather ficticious example; 
+  there are obviously better ways to pick a date. Real world examples of 
+  very large trees include presenting data from a database or displaying the 
+  structure of a file system.</p>
+
+  <script>
+   // This code is only needed for the demo, not for your site
+   var d=""
+   var queryStr = window.location.search.substr(1)
+   queryStr=unescape(queryStr)
+   queryStr=queryStr.replace("+"," ").replace("+"," ")
+   if (queryStr.length != 0)
+    document.write("Date clicked: " + queryStr + "<br><br>");
+  </script>
+
+ </body>
+
+</html>

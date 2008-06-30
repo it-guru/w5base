@@ -1,0 +1,87 @@
+<HTML>
+
+<!--------------------------------------------------------------->
+<!-- Copyright (c) 2006 by Conor O'Mahony.                     -->
+<!-- For enquiries, please email GubuSoft@GubuSoft.com.        -->
+<!-- Please keep all copyright notices below.                  -->
+<!-- Original author of TreeView script is Marcelino Martins.  -->
+<!--------------------------------------------------------------->
+<!-- This document includes the TreeView script.  The TreeView -->
+<!-- script can be found at http://www.TreeView.net.  The      -->
+<!-- script is Copyright (c) 2006 by Conor O'Mahony.           -->
+<!--------------------------------------------------------------->
+
+ <HEAD>
+  <STYLE>
+   BODY {
+     background-color: white;
+     font-size: 10pt;
+     font-family: verdana,helvetica}
+  </STYLE>
+ </HEAD>
+
+ <BODY bgcolor="white">
+
+  <h4>TreeView Demo: Checkboxes and Radio Buttons for a Form</h4>
+  <P>The layout used for this demo is just one of the many possible combinations of Treeview settings. 
+  Among te types of things you can change are:</P>
+  <UL>
+   <LI>Use a frameless layout</LI>
+   <LI>Have the nodes in the tree link to Web pages</LI>
+   <LI>Display folder and document icons</LI>
+   <LI>Activate highlighting for the current selection</LI>
+  </UL>
+  <P>See the other TreeView demos for more ideas.</P>
+  <P>Make your check box and radio button selections in the left frame and then click the "Get Values" 
+  button.  The options you select are shown in this frame. Notice that the Hour group in the tree 
+  contains radio buttons; only one can be pressed at a time.</P>
+
+  <SCRIPT>
+    //This code is used to read the querystring sent by the left frame.
+    var d="";
+    var queryStr = window.location.search.substr(1);
+    var i, splitArray;
+    var BOX1, BOX2, BOX3, RD1, RD2, RD3
+
+    queryStr=unescape(queryStr)
+    queryStr=queryStr.replace("+"," ").replace("+"," ")
+    if (queryStr.length != 0) {
+      splitArray = queryStr.split("&")
+      for (i=0; i<splitArray.length; i++) {
+        eval(splitArray[i])
+      }
+    }
+  </SCRIPT>
+
+  <P>Days selected:<B> 
+  <SCRIPT>
+    if (BOX1)
+      document.write ("Monday ")
+    if (BOX2)
+      document.write ("Wednesday ")
+    if (BOX3)
+      document.write ("Friday ")
+  </SCRIPT>
+  </B>	
+  <BR>Time selected:<B>
+  <SCRIPT>
+    if (RD1)
+      document.write ("10AM ")
+    if (RD2)
+      document.write ("2PM ")
+    if (RD3)
+      document.write ("6PM ")
+  </SCRIPT>
+  </B></P>
+
+  <P>Instructions for configuring the TreeView script to show checkboxes are provided in the 
+  <tt>demoCheckbox*.*</tt> source files that are in the free download.</P>
+  <P><SPAN style="font-size:8pt">Note: This demo runs on IE4+, Mozilla 0.9+, and NS6+. 
+  NS4.* handles all the other Treeview demos, but does not support the dynamic creation of 
+  form elements used by this checkbox tree.  Opera 7 also runs correctly all configurations 
+  of the regular Treeview but has one problem with the checkbox demo: it cannot query form 
+  elements that are not visible (closed branches).</SPAN></P>
+
+ </BODY>
+
+</html>
