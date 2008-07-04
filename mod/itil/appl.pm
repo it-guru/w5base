@@ -830,7 +830,7 @@ sub Validate
 
    my $name=trim(effVal($oldrec,$newrec,"name"));
    
-   if ($name eq "" || $name=~m/[;,\s\&\\]/){
+   if ($name eq "" || $name=~m/[;,\s\&\\\*]/){
       $self->LastMsg(ERROR,
            sprintf($self->T("invalid application name '%s' specified"),$name));
       return(0);

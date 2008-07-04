@@ -27,8 +27,8 @@ sub ysleep{Time::HiRes::usleep(80000);}
 #######################################################################
 printf("INFO:  W5InstallCheck Pass 1: low level check started ...\n");
 $|=1;
-foreach my $module (qw(Time::HiRes 
-                       FindBin UNIVERSAL Carp Getopt::Long
+foreach my $module (qw(Time::HiRes Digest::SHA1 Data::HexDump
+                       FindBin UNIVERSAL Carp Getopt::Long Sys::Syslog
                        Scalar::Util Unicode::String Encode Exporter POSIX
                        Date::Calc Text::ParseWords
                        DateTime DateTime::Span DateTime::SpanSet 
