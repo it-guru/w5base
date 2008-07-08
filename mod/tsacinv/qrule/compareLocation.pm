@@ -102,21 +102,22 @@ sub qcheckRecord
           $acloc->SetFilter({locationid=>\$parrec->{'locationid'}});
           my ($locrec,$msg)=$acloc->getOnlyFirst(qw(ALL));
 
-          my @loc=split("[-/]",$locrec->{'fullname'});
+          my @loc=split("[/]",$locrec->{'fullname'});
+          @loc=split("[-.]",$loc[1]);
           # first check
-          my $location=$loc[1].".".$loc[2].".".$loc[3]."*".$loc[4]."*";
+          my $location=$loc[0].".".$loc[1].".".$loc[2]."*".$loc[3]."*".$loc[4]."*";
           $baseloc->SetFilter({name=>$location});
           my ($baselocrec,$msg)=$baseloc->getOnlyFirst(qw(ALL));
           if (!defined($baselocrec)){
              # secound check
-             $location=$loc[1]."*".$loc[2]."*".substr($loc[3],0,3)."*".
-                       substr($loc[3],length($loc[3])-1,1)."*".$loc[4]."*";
+             $location=$loc[0]."*".$loc[1]."*".substr($loc[2],0,3)."*".
+                       substr($loc[2],length($loc[2])-1,1)."*".$loc[3]."*".$loc[4]."*";
              $baseloc->ResetFilter();
              $baseloc->SetFilter({name=>$location});
              ($baselocrec,$msg)=$baseloc->getOnlyFirst(qw(ALL));
           }
-      #    push(@qmsg,'w5baselocation='.$baselocrec->{name}.' aclocation='.$location.' acorg='.
-      #         $locrec->{fullname});
+          push(@qmsg,'w5baselocation='.$baselocrec->{name}.' aclocation='.$location.' acorg='.
+               $locrec->{fullname});
           $self->IfaceCompare($dataobj,
                               $rec,"location",
                               $baselocrec,"name",
