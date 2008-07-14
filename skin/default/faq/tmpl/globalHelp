@@ -27,6 +27,7 @@
 </tr>
 </table>
 <script language="JavaScript">
+window.focus();
 setFocus("searchtext");
 setEnterSubmit(document.forms[0],"dosearch");
 </script>

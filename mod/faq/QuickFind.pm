@@ -105,8 +105,8 @@ sub doSearch
                    "$rec->{faqid}");
    }
    if (!$found){
-      print treeViewHeader("<font color=red>".$self->T("nothing found")."</font>",
-                           1);
+      print treeViewHeader("<font color=red>".$self->T("nothing found").
+                           "</font>",1);
    }
    return(0);
 }
