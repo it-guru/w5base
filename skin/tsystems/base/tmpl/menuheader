@@ -55,7 +55,7 @@
 <div class="navItem"><a target=work href="http://youandme.telekom.de" title="YOU and ME - auch wenns eigentlich keiner braucht">YOU and ME</a>
 </div>
 %rootpath%
-<div align=right>%rootpath%<a target=_self href=javascript:openwin('../../faq/QuickFind/globalHelp','_help','height=400,width=620,toolbar=no,status=no,resizable=yes,scrollbars=auto') title="Help"><img border=0 src="../load/help.gif"></a>
+<div align=right>%rootpath%<a target=_self href=javascript:openwin('../../faq/QuickFind/globalHelp','_help','height=570,width=620,toolbar=no,status=no,resizable=yes,scrollbars=auto') title="Help"><img border=0 src="../load/help.gif"></a>
 </div>
 
 </div>
