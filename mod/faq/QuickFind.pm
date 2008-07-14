@@ -160,7 +160,7 @@ sub doSearch
             $loop++;
          }
          print insDoc($tree,$rec->{name},
-                      "../../faq/forumtopic/ById/".
+                      "../../faq/forum/Topic/".
                       "$rec->{id}");
       }
 
