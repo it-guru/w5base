@@ -665,8 +665,7 @@ sub menutop
    print $self->HtmlHeader(style=>['default.css',
                                    'kernel.App.Web.css'],
                            body=>1,form=>1);
-
-   print $self->getParsedTemplate("tmpl/menuheader",{});
+   print $self->getParsedTemplate("tmpl/menuheader",{static=>{rootpath=>$rootpath}});
    print $self->HtmlBottom(body=>1,form=>1);
 }
 
