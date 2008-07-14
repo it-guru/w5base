@@ -20,8 +20,8 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Field;
-use itil::appl;
-@ISA=qw(itil::appl);
+use TS::appl;
+@ISA=qw(TS::appl);
 
 sub new
 {
@@ -37,21 +37,6 @@ sub new
                 searchable    =>0,
                 label         =>'allow to send for (Herbeiruf)',
                 container     =>'additional'),
-
-      new kernel::Field::Link(
-                name          =>'acinmassignmentgroupid',
-                group         =>'control',
-                label         =>'AssetCenter Incient Assignmentgroup ID',
-                container     =>'additional'),
-
-      new kernel::Field::TextDrop(
-                name          =>'acinmassingmentgroup',
-                label         =>'AssetCenter Incident Assignmentgroup',
-                group         =>'inm',
-                async         =>'1',
-                vjointo       =>'tsacinv::group',
-                vjoinon       =>['acinmassignmentgroupid'=>'lgroupid'],
-                vjoindisp     =>'name'),
    );
  
    $self->AddFields(
@@ -62,70 +47,8 @@ sub new
                 container     =>'additional'),
       insertafter=>['applid'] 
    );
-   $self->{workflowlink}->{workflowtyp}=[qw(AL_TCom::workflow::diary
-                                            OSY::workflow::diary
-                                            itil::workflow::devrequest
-                                            AL_TCom::workflow::businesreq
-                                            base::workflow::DataIssue
-                                            AL_TCom::workflow::change
-                                            AL_TCom::workflow::problem
-                                            AL_TCom::workflow::eventnotify
-                                            AL_TCom::workflow::P800
-                                            AL_TCom::workflow::P800special
-                                            AL_TCom::workflow::incident)];
-   $self->{workflowlink}->{workflowstart}=\&calcWorkflowStart;
-
    return($self);
 }
-
-sub calcWorkflowStart
-{
-   my $self=shift;
-   my $r={};
-
-   my %env=('frontendnew'=>'1');
-   my $wf=getModuleObject($self->Config,"base::workflow");
-   my @l=$wf->getSelectableModules(%env);
-
-   if (grep(/^AL_TCom::workflow::diary$/,@l)){
-      $r->{'AL_TCom::workflow::diary'}={
-                                          name=>'Formated_appl'
-                                       };
-   }
-   if (grep(/^AL_TCom::workflow::eventnotify$/,@l)){
-      $r->{'AL_TCom::workflow::eventnotify'}={
-                                          name=>'Formated_affectedapplication'
-                                       };
-   }
-   return($r);
-}
-
-sub isWriteValid
-{
-   my $self=shift;
-   my @l=$self->SUPER::isWriteValid(@_);
-   if (grep(/^(technical|ALL)$/,@l)){
-      push(@l,"inm");
-   }
-   return(@l);
-}
-
-sub getDetailBlockPriority
-{
-   my $self=shift;
-   my @l=$self->SUPER::getDetailBlockPriority(@_);
-   my $inserti=$#l;
-   for(my $c=0;$c<=$#l;$c++){
-      $inserti=$c+1 if ($l[$c] eq "technical");
-   }
-   splice(@l,$inserti,$#l-$inserti,("inm",@l[$inserti..($#l+-1)]));
-   return(@l);
-
-}  
-
-
-
-
 
 
 
