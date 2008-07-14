@@ -90,19 +90,82 @@ sub doSearch
    my $label=shift;
    my $searchtext=shift;
 
-   print treeViewHeader($label);
-   my $faq=getModuleObject($self->Config,"faq::article");
+   my @stags=();
+   if (Query->Param("forum") ne ""){
+      push(@stags,"forum");
+   }
+   if (Query->Param("article") ne ""){
+      push(@stags,"article");
+   }
+   if (Query->Param("ci") ne ""){
+      push(@stags,"ci");
+   }
 
-   $faq->SecureSetFilter({kwords=>$searchtext});
+
+
+
+#   print treeViewHeader($label,1,\@stags);
    my $found=0;
-   foreach my $rec ($faq->getHashList(qw(name faqid))){
-      if (!$found){
-         print treeViewHeader($label);
-         $found++;
+   if (grep(/^article$/,@stags)){
+      my $tree="foldersTree";
+      my $faq=getModuleObject($self->Config,"faq::article");
+    
+      $faq->SecureSetFilter({kwords=>$searchtext});
+      my @l=$faq->getHashList(qw(name faqid));
+      my $loop=0;
+      foreach my $rec (@l){
+         if (!$found){
+            print treeViewHeader($label,1);
+            $found++;
+         }
+         if ($loop==0 && $#stags>0){
+            print insFld($tree,"article","FAQ-Artikel");
+            $tree="article";
+            $loop++;
+         }
+         print insDoc($tree,$rec->{name},
+                      "../../faq/article/ById/".
+                      "$rec->{faqid}");
       }
-      print insDoc("foldersTree",$rec->{name},
-                   "../../faq/article/ById/".
-                   "$rec->{faqid}");
+   }
+   if (grep(/^forum$/,@stags)){
+      my $tree="foldersTree";
+      my %id;
+
+      my $fo=getModuleObject($self->Config,"faq::forumentry");
+      $fo->SecureSetFilter({ftext=>$searchtext});
+      my @l=$fo->getHashList(qw(forumtopic));
+      foreach my $rec (@l){
+         $id{$rec->{forumtopic}}++;
+      }
+      my $fo=getModuleObject($self->Config,"faq::forumtopic");
+      $fo->SecureSetFilter({ftext=>$searchtext});
+      my @l=$fo->getHashList(qw(id));
+      foreach my $rec (@l){
+         $id{$rec->{id}}++;
+      }
+      $fo->ResetFilter();
+      $fo->SecureSetFilter({id=>[keys(%id)]});
+      my @l=$fo->getHashList(qw(id name));
+
+      my $loop=0;
+      foreach my $rec (@l){
+         if (!$found){
+            print treeViewHeader($label,1);
+            $found++;
+         }
+         if ($loop==0 && $#stags>0){
+            print insFld($tree,"forum","Forum");
+            $tree="forum";
+            $loop++;
+         }
+         print insDoc($tree,$rec->{name},
+                      "../../faq/forumtopic/ById/".
+                      "$rec->{id}");
+      }
+
+
+
    }
    if (!$found){
       print treeViewHeader("<font color=red>".$self->T("nothing found").
@@ -117,7 +180,7 @@ sub insDoc
    my $label=shift;
    my $link=shift;
 
-
+   $label=~s/"//g;
    $link=sprintf("javascript:openwin('%s','_blank',".
                  "'height=400,width=550,toolbar=no,".
                  "status=no,resizable=yes,scrollbars=auto')",$link); 
@@ -129,10 +192,21 @@ sub insDoc
    return($d);
 }
 
+sub insFld
+{
+   my $tree=shift;
+   my $name=shift;
+   my $label=shift;
+
+   my $d=sprintf("%s=insFld(%s,gFld(\"%s\", \"\"));\n",$name,$tree,$label);
+   return($d);
+}
+
 sub treeViewHeader
 {
    my $label=shift;
    my $allopen=shift;
+   my $stags=shift;
    $allopen=0 if (!defined($allopen));
 
    my $d=<<EOF;

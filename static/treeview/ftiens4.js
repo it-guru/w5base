@@ -446,8 +446,10 @@ function drawItem(insertAtObj)
 { 
   var leftSide = leftSideHTML(this.leftSideCoded)
   var docW = ""
+  var l=this.link;
+  
 
-  var fullLink = "href=\""+this.link+"\" target=\""+this.target+"\" onClick=\"clickOnLink('"+this.getID()+"\', '"+this.link+"','"+this.target+"');return false;\"";
+  var fullLink = "href=\""+this.link+"\" target=\""+this.target+"\" onClick=\"clickOnLink('"+this.getID()+"\','"+l+"','"+this.target+"');return false;\"";
   this.isRendered = 1
 
   if (this.level>0) 

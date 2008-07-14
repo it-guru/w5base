@@ -6,9 +6,9 @@
 
 <table>
 <tr><td colspan=2>
-<input type=checkbox name=configitem disabled>Config-Item Suche<br>
-<input type=checkbox name=aricle checked disabled>FAQ-Wissensdatenbank Schlagwortsuche<br>
-<input type=checkbox name=forum disabled>Forum Volltextsuche<br>
+<input type=checkbox name=ci disabled>Config-Item Suche<br>
+<input type=checkbox name=article checked>FAQ-Wissensdatenbank Schlagwortsuche<br>
+<input type=checkbox name=forum>Forum Volltextsuche<br>
 </td>
 </tr>
 <tr>
