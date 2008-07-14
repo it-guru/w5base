@@ -384,6 +384,8 @@ sub ShowEntry
       my $condition=$self->T("condition");
       my ($Y,$M)=$month=~m/^(\d{4})(\d{2})$/;
       print(<<EOF);
+<input type=hidden name=id value="$requestid">
+<input type=hidden name=tag value="$requesttag">
 <div style="margin:10px;padding:15px;width:600px;background:#ffffff;
             border-color:black;border-style:solid;border-width:1px;">
 <div class=chartlabel>

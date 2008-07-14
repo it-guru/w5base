@@ -40,4 +40,9 @@ a:link.sublink, a:visited.sublink, a:active.sublink  {
             text-decoration:none;
             color:#16305e;
           }
+a:link.exlink, a:visited.exlink, a:active.exlink  {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:#16305e;
+          }
 

@@ -182,6 +182,7 @@ sub displayDataIssue
    my $self=shift;
    my ($primrec,$hist)=@_;
    my $app=$self->getParent();
+   my $showall=Query->Param("FullDataIssueList");
    #my $data=$app->extractYear($primrec,$hist,"base.DataIssue.IdList.open");
    my $data=$app->extractYear($primrec,$hist,"base.DataIssue.open",
                               setUndefZero=>1);
@@ -198,12 +199,15 @@ sub displayDataIssue
    my $wfidtmpl;
    if ($#wfid!=-1){
       my @usewfid=@wfid[0..20];
+      if ($showall eq "1"){
+         @usewfid=@wfid;
+      }
       my $wf=getModuleObject($app->Config,"base::workflow");
       if (defined($wf)){
          $wf->SetFilter({id=>\@usewfid});
-         my @wfl=$wf->getHashList(qw(name id state stateid));
+         my @wfl=$wf->getHashList(qw(name id state stateid fwdtargetname));
          if ($#wfl!=-1){
-            $wfidtmpl.="<table border=0 cellspacing=0 cellpadding=0>";
+            $wfidtmpl.="<table border=0 cellspacing=2 cellpadding=0>";
             $wfidtmpl.="<tr>"; 
             $wfidtmpl.="<td colspan=2><b>".
                         $app->T("The related Worflow list").":</td>"; 
@@ -220,15 +224,28 @@ sub displayDataIssue
                    "resizable=yes,scrollbars=no\")";
 
                $wfidtmpl.="<tr>"; 
-               $wfidtmpl.="<td><a href=JavaScript:$onclick>".
-                          $WfRec->{name}."</a></td>"; 
-               $wfidtmpl.="<td width=10%>".$statename."</td>"; 
+               $wfidtmpl.="<td valign=top><a class=exlink ".
+                          "href=JavaScript:$onclick>".
+                          $WfRec->{name}."</a>";
+               if ($showall eq "1"){
+                  $wfidtmpl.="<br>".$WfRec->{fwdtargetname};
+               }
+               $wfidtmpl.="</td>"; 
+               $wfidtmpl.="<td width=10% valign=top nowrap>".
+                          $statename."</td>"; 
                $wfidtmpl.="</tr>"; 
             }
             if ($#wfid>$#wfl){
                my $num=$#wfid-$#usewfid;
                $wfidtmpl.="<tr>"; 
-               $wfidtmpl.="<td colspan=2>... ($num)</td>"; 
+               $wfidtmpl.="<td colspan=2><br><br>".
+                          "<a class=exlink ".
+                          "href=javascript:showFullDataIssue(this) ".
+                          "title=\"".
+                  $self->getParent->T("click to see full list","base::w5stat").
+                          "\">... ($num ".
+                          $self->getParent->T("more","base::w5stat").
+                          ")</a></td>"; 
                $wfidtmpl.="</tr>"; 
             }
             $wfidtmpl.="</table>";
@@ -244,6 +261,16 @@ sub displayDataIssue
                                        detaillist=>$wfidtmpl
                                           },
                                   skinbase=>"base"});
+   $d.=<<EOF;
+<input type=hidden name=FullDataIssueList value="$showall">
+<script language="JavaScript">
+function showFullDataIssue()
+{
+   document.forms[0].elements['FullDataIssueList'].value='1'; 
+   document.forms[0].submit();
+}
+</script>
+EOF
    return($d);
 }
 

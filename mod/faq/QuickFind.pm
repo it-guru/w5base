@@ -119,7 +119,7 @@ sub insDoc
 
 
    $link=sprintf("javascript:openwin('%s','_blank',".
-                 "'height=400,width=500,toolbar=no,".
+                 "'height=400,width=550,toolbar=no,".
                  "status=no,resizable=yes,scrollbars=auto')",$link); 
 
 

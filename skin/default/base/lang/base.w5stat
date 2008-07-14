@@ -8,3 +8,5 @@
 'count of employees'=>{de=>'Mitarbeiteranzahl'},
 'averange'=>{de=>'Bereichs Mittelwert'},
 'complete list'=>{de=>'vollständige Liste'},
+'more'=>{de=>'weitere'},
+'click to see full list'=>{de=>'klicken Sie hier, um die vollständige Liste zu erhalten'},
