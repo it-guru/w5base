@@ -57,6 +57,24 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("itts.appl",
+                      "TS::appl",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itts.appl.new",
+                      "TS::appl",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itts.appl.lnksystem",
+                      "itil::lnkapplsystem",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itts.appl.lnksystem.new",
+                      "itil::lnkapplsystem",
+                      func=>'New',
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("itts.system",
                       "OSY::system",
                       defaultacl=>['valid_user']);
@@ -74,15 +92,6 @@ sub Init
                       "itil::ipaddress",
                       func=>'New',
                       defaultacl=>['admin']);
-
-   $self->RegisterObj("itts.system.jobs",
-                      "itil::systemjob",
-                      defaultacl=>['valid_user']);
-
-   $self->RegisterObj("itts.system.jobs.new",
-                      "itil::systemjob",
-                      func=>'New',
-                      defaultacl=>['valid_user']);
 
    $self->RegisterObj("itts.system.systemnfsnas",
                       "itil::systemnfsnas",
@@ -180,24 +189,6 @@ sub Init
                       "OSY::projectroom",
                       func=>'New',
                       defaultacl=>['valid_user']);
-
-   $self->RegisterObj("itts.appl",
-                      "TS::appl",
-                      defaultacl=>['valid_user']);
-   
-   $self->RegisterObj("itts.appl.new",
-                      "TS::appl",
-                      func=>'New',
-                      defaultacl=>['valid_user']);
-
-   $self->RegisterObj("itts.appl.lnksystem",
-                      "itil::lnkapplsystem",
-                      defaultacl=>['admin']);
-
-   $self->RegisterObj("itts.appl.lnksystem.new",
-                      "itil::lnkapplsystem",
-                      func=>'New',
-                      defaultacl=>['admin']);
 
    $self->RegisterObj("itts.liccontract",
                       "itil::liccontract",
