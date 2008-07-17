@@ -55,7 +55,7 @@ sub qcheckRecord
       my @qmsg;
       my @dataissue;
       foreach my $fld (qw(office_phone office_street office_zipcode 
-                          office_location
+                          office_location office_mobile
                           office_facsimile)){
           $self->IfaceCompare($dataobj,
                      $rec,$fld,
