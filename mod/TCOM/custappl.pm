@@ -195,6 +195,7 @@ sub new
       new kernel::Field::Interface(
                 name          =>'tsmemail',
                 group         =>'tscontact',
+                label         =>'TSM E-Mail',
                 vjointo       =>'base::user',
                 vjoinon       =>['tsmid'=>'userid'],
                 vjoindisp     =>'email'),
@@ -202,6 +203,7 @@ sub new
       new kernel::Field::Interface(
                 name          =>'tsmofficephone',
                 group         =>'tscontact',
+                label         =>'TSM Office Phone',
                 vjointo       =>'base::user',
                 vjoinon       =>['tsmid'=>'userid'],
                 vjoindisp     =>'office_phone'),
@@ -209,6 +211,7 @@ sub new
       new kernel::Field::Interface(
                 name          =>'tsmofficemobile',
                 group         =>'tscontact',
+                label         =>'TSM Mobile Phone',
                 vjointo       =>'base::user',
                 vjoinon       =>['tsmid'=>'userid'],
                 vjoindisp     =>'office_mobile'),
@@ -220,6 +223,44 @@ sub new
                 label         =>'Technical Solution Manager',
                 vjointo       =>'base::user',
                 vjoinon       =>['tsmid'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Interface(
+                name          =>'tsm2id',
+                group         =>'tscontact',
+                dataobjattr   =>'appl.tsm2'),
+
+      new kernel::Field::Interface(
+                name          =>'tsm2email',
+                group         =>'tscontact',
+                label         =>'Deputy TSM E-Mail',
+                vjointo       =>'base::user',
+                vjoinon       =>['tsm2id'=>'userid'],
+                vjoindisp     =>'email'),
+
+      new kernel::Field::Interface(
+                name          =>'tsm2officephone',
+                group         =>'tscontact',
+                label         =>'Deputy TSM Office Phone',
+                vjointo       =>'base::user',
+                vjoinon       =>['tsm2id'=>'userid'],
+                vjoindisp     =>'office_phone'),
+
+      new kernel::Field::Interface(
+                name          =>'tsm2officemobile',
+                group         =>'tscontact',
+                label         =>'Deputy TSM Mobile Phone',
+                vjointo       =>'base::user',
+                vjoinon       =>['tsm2id'=>'userid'],
+                vjoindisp     =>'office_mobile'),
+
+      new kernel::Field::TextDrop(
+                name          =>'tsm2',
+                group         =>'tscontact',
+                translation   =>'itil::appl',
+                label         =>'Deputy Technical Solution Manager',
+                vjointo       =>'base::user',
+                vjoinon       =>['tsm2id'=>'userid'],
                 vjoindisp     =>'fullname'),
 
       new kernel::Field::Text(
