@@ -107,10 +107,6 @@ sub new
                 vjoinon       =>['userid'=>'userid'],
                 vjoindisp     =>'fullname'),
 
-      new kernel::Field::Link(
-                name          =>'userid',
-                dataobjattr   =>'infoabo.userid'),
-
       new kernel::Field::Email(
                 name          =>'email',
                 label         =>'E-Mail',
@@ -124,6 +120,13 @@ sub new
                 value         =>[1,0],
                 htmleditwidth =>'80px',
                 dataobjattr   =>'infoabo.active'),
+
+      new kernel::Field::Text(
+                name          =>'userid',
+                label         =>'W5Base UserID',
+                htmldetail    =>0,
+                readonly      =>1,
+                dataobjattr   =>'infoabo.userid'),
 
       new kernel::Field::Creator(
                 name          =>'creator',
