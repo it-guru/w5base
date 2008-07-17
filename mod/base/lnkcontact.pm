@@ -230,10 +230,11 @@ sub getPostibleRoleValues
 {
    my $self=shift;
    my $current=shift;
+   my $newrec=shift;
    my $app=$self->getParent();
    my @opt;
    foreach my $obj (values(%{$app->{lnkcontact}})){
-      push(@opt,$obj->getPosibleRoles($self,$current));
+      push(@opt,$obj->getPosibleRoles($self,$current,$newrec));
    }
    return(@opt);
 }
@@ -249,6 +250,20 @@ sub getRecordImageUrl
 
 sub getRecordHtmlIndex
 { return(); }
+
+
+
+sub prepUploadRecord                              # pre processing interface
+{
+   my $self=shift;
+   my $inp=shift;
+   if (defined($self->{secparentobj})){
+      $inp->{parentobj}=$self->{secparentobj};
+   }
+   return(1);
+}
+
+
 
 
 sub Validate

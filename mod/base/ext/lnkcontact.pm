@@ -37,8 +37,10 @@ sub getPosibleRoles
    my $self=shift;
    my $field=shift;
    my $current=shift;
+   my $newrec=shift;
 
-   if ($current->{parentobj} eq "base::mandator" ||
+   my $parentobj=effVal($current,$newrec,"parentobj");
+   if ($parentobj eq "base::mandator" ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
        $self->getParent->getParent->Self() eq "base::mandator")){
@@ -46,7 +48,7 @@ sub getPosibleRoles
              "write"=>$self->getParent->T("write",$self->Self)
              );
    }
-   if ($current->{parentobj}=~m/^.+::projectroom$/ ||
+   if ($parentobj=~m/^.+::projectroom$/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
        $self->getParent->getParent->Self()=~m/^.+::projectroom$/)){
@@ -56,7 +58,7 @@ sub getPosibleRoles
              "write"           =>$self->getParent->T("write",
                                                      $self->Self));
    }
-   if ($current->{parentobj} eq "base::location" ||
+   if ($parentobj eq "base::location" ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
        $self->getParent->getParent->Self() eq "base::location")){

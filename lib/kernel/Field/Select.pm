@@ -37,13 +37,14 @@ sub getPostibleValues
 {
    my $self=shift;
    my $current=shift;
+   my $newrec=shift;
    my $mode=shift;
  
    if (defined($self->{getPostibleValues}) &&
        ref($self->{getPostibleValues}) eq "CODE"){
       my $f=$self->{getPostibleValues};
-      my @l=&$f($self,$current);
-      return(&$f($self,$current));
+      my @l=&$f($self,$current,$newrec);
+      return(&$f($self,$current,$newrec));
    }
 
    if (defined($self->{value}) && ref($self->{value}) eq "ARRAY"){
@@ -124,7 +125,7 @@ sub FormatedDetail
          $s.=" onchange=\"jsonchanged_$name('onchange');\"";
       }
       $s.=" style=\"width:$width\">";
-      my @options=$self->getPostibleValues($current,"edit");
+      my @options=$self->getPostibleValues($current,undef,"edit");
       while($#options!=-1){
          my $key=shift(@options);
          my $val=shift(@options);
@@ -165,7 +166,7 @@ sub preProcessFilter
 
    if (!defined($self->{vjointo})){
       my $oldval=$hflt->{$field};
-      my @options=$fobj->getPostibleValues();
+      my @options=$fobj->getPostibleValues(undef,undef);
       my %tr=();
       my %raw=();
       my @to=@options;
@@ -238,7 +239,7 @@ sub Validate
          return({$self->Name()=>$val});
       }
       else{
-         my @options=$self->getPostibleValues($oldrec,"edit");
+         my @options=$self->getPostibleValues($oldrec,$newrec,"edit");
          my @nativ;
          while($#options!=-1){
             my $key=shift(@options);
@@ -274,7 +275,7 @@ sub FormatedResult
   
    if (defined($self->{getPostibleValues}) &&
        ref($self->{getPostibleValues}) eq "CODE"){
-      my %opt=&{$self->{getPostibleValues}}($self,$current);
+      my %opt=&{$self->{getPostibleValues}}($self,$current,undef);
       return(join(", ",map({ defined($opt{$_}) ? $opt{$_} : '?'; } @{$d})));
    }
    return(join(", ",map({
@@ -316,7 +317,7 @@ sub prepUploadRecord   # prepair one record on upload
    if (defined($newrec->{$name})){
       my $reqval=$newrec->{$name};
       my $newkey;
-      my @options=$self->getPostibleValues($oldrec,"edit");
+      my @options=$self->getPostibleValues($oldrec,$newrec,"edit");
       my @o=@options;
       if ($self->{multisize}>0){  # multivalue selects
          $reqval=[split(/[,;]\s+/,$reqval)] if (ref($reqval) ne "ARRAY");

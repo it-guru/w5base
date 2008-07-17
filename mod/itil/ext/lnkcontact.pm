@@ -37,8 +37,12 @@ sub getPosibleRoles
    my $self=shift;
    my $field=shift;
    my $current=shift;
+   my $newrec=shift;
 
-   if ($current->{parentobj}=~m/^.+::appl$/ ||
+   my $parentobj=effVal($current,$newrec,"parentobj");
+
+
+   if ($parentobj=~m/^.+::appl$/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
        $self->getParent->getParent->Self()=~m/^.+::appl$/)){
@@ -63,7 +67,7 @@ sub getPosibleRoles
              "support"         =>$self->getParent->T("Support",
                                                      $self->Self));
    }
-   if ($current->{parentobj}=~m/^.+::swinstance$/ ||
+   if ($parentobj=~m/^.+::swinstance$/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
        $self->getParent->getParent->Self()=~m/^.+::swinstance$/)){
@@ -73,7 +77,7 @@ sub getPosibleRoles
              "write"           =>$self->getParent->T("write instance",
                                                      $self->Self));
    }
-   if ($current->{parentobj}=~m/^.+::network$/ ||
+   if ($parentobj=~m/^.+::network$/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
        $self->getParent->getParent->Self()=~m/^.+::network$/)){
@@ -81,7 +85,7 @@ sub getPosibleRoles
              "techcontact"     =>$self->getParent->T("Technical Contact",
                                                      $self->Self));
    }
-   if ($current->{parentobj}=~m/^.+::system$/ ||
+   if ($parentobj=~m/^.+::system$/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
        $self->getParent->getParent->Self()=~m/^.+::system$/)){
@@ -91,7 +95,7 @@ sub getPosibleRoles
                                                      $self->Self),
             );
    }
-   if ($current->{parentobj}=~m/^.+::asset$/ ||
+   if ($parentobj=~m/^.+::asset$/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
        $self->getParent->getParent->Self()=~m/^.+::asset$/)){
