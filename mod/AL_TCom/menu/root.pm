@@ -116,6 +116,10 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("AL_TCom.appl.lnkapplcontact",
+                      "itil::lnkapplcontact",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.system",
                       "AL_TCom::system",
                       defaultacl=>['valid_user']);
@@ -151,6 +155,10 @@ sub Init
                       "itil::lnknfsnasipnet",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.system.lnksystemcontact",
+                      "itil::lnksystemcontact",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.asset",
                       "AL_TCom::asset",
                       defaultacl=>['valid_user']);
@@ -158,6 +166,10 @@ sub Init
    $self->RegisterObj("AL_TCom.asset.new",
                       "AL_TCom::asset",
                       func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.asset.lnkassetcontact",
+                      "itil::lnkassetcontact",
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("AL_TCom.liccontract",
