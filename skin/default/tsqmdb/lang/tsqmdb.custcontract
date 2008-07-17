@@ -1,0 +1,7 @@
+'tsqmdb::custcontract'=>{de=>'QMDB Kundenvertrag',en=>'QMDB customer contract'},
+'Contract Number'=>{de=>'Vertragsnummer'},
+'Contract Name'=>{de=>'Vertragsbezeichnung'},
+'CO-Number'=>{de=>'CO-/Kostenstellennummer'},
+'Account-Number'=>{de=>'Account-Nummer'},
+'Duration Start'=>{de=>'Laufzeitbegin'},
+'Duration End'=>{de=>'Laufzeitende'},

@@ -305,12 +305,14 @@ sub getPosibleActions
    my @l=();
    my $iscurrent=$self->isCurrentForward($WfRec);
 
+   if ($stateid==2 || $stateid==4){
+      push(@l,"wfaddnote");
+   }
    if ($iscurrent && ($stateid==5)){
       push(@l,"nop");
       push(@l,"wfaddnote");
    }
    if ($iscurrent && ($stateid==2 || $stateid==4)){
-      push(@l,"wfaddnote");
       push(@l,"wfdefer");
       push(@l,"wfdifine");
       push(@l,"wfforward");
