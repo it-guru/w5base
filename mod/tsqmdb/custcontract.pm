@@ -43,7 +43,7 @@ sub new
                 align         =>'left',
                 label         =>'ID',
                 uivisible     =>'0',
-                dataobjattr   =>'ROWID'),
+                dataobjattr   =>'vertrag.ROWID'),
                                                   
       new kernel::Field::Id(
                 name          =>'name',
@@ -53,6 +53,7 @@ sub new
                                                   
       new kernel::Field::Text(
                 name          =>'fullname',
+                ignorecase    =>1,
                 label         =>'Contract Name',
                 dataobjattr   =>'vertrag.bezeichnung'),
 
@@ -78,6 +79,50 @@ sub new
                 htmlwidth     =>'100px',
                 label         =>'CO-Number',
                 dataobjattr   =>'vertrag.co_nummer'),
+
+      new kernel::Field::Text(
+                name          =>'orgunit',
+                htmlwidth     =>'100px',
+                ignorecase    =>1,
+                label         =>'Org-Unit',
+                dataobjattr   =>'ou.description'),
+
+      new kernel::Field::Text(
+                name          =>'orgunit1',
+                htmlwidth     =>'100px',
+                ignorecase    =>1,
+                label         =>'Org1-Unit',
+                dataobjattr   =>'ou1.description'),
+
+      new kernel::Field::Text(
+                name          =>'orgunit2',
+                htmlwidth     =>'100px',
+                ignorecase    =>1,
+                label         =>'Org2-Unit',
+                dataobjattr   =>'ou2.description'),
+
+      new kernel::Field::Link(
+                name          =>'contractco',
+                label         =>'Contract-CO',
+                dataobjattr   =>'concat(vertrag.vertrags_nr,'.
+                                "concat(';',vertrag.co_nummer))"),
+
+      new kernel::Field::SubList(
+                name          =>'ordertickets',
+                label         =>'Order Tickets',
+                group         =>'ordertickets',
+                vjointo       =>'tsqmdb::orderticket',
+                vjoinon       =>['contractco'=>'contractco'],
+                vjoindisp     =>['orderticketnumber','typ','fullname']),
+
+      new kernel::Field::SubList(
+                name          =>'orderticketstyp',
+                label         =>'Order Ticket Typ',
+                group         =>'ordertickets',
+                htmldetail    =>0,
+                vjointo       =>'tsqmdb::orderticket',
+                vjoinon       =>['contractco'=>'contractco'],
+                vjoindisp     =>['typ']),
 
       new kernel::Field::CDate(
                 name          =>'cdate',
@@ -106,10 +151,11 @@ sub Initialize
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"tsqmdb"));
    return(@result) if (defined($result[0]) eq "InitERROR");
 
-   $self->{use_distinct}=0;
+   $self->{use_distinct}=1;
    return(1) if (defined($self->{DB}));
    return(0);
 }
+
 
 
 
@@ -120,6 +166,26 @@ sub isViewValid
 
    return("ALL");
 }
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $wt=$self->{Worktable};
+   my $from="$wt,organisationunit ou,organisationunit ou1,organisationunit ou2";
+   return($from);
+}
+
+sub initSqlWhere
+{
+   my $self=shift;
+   my $wt=$self->{Worktable};
+   my $where="$wt.ou_id=ou.ou_id(+) ".
+             "and $wt.ou1_id=ou1.ou_id(+) ".
+             "and $wt.ou2_id=ou2.ou_id(+) ";
+   return($where);
+}
+
+
 
 
 

@@ -40,7 +40,11 @@ sub Init
    
    $self->RegisterObj("qmdb.custcontract",
                       "tsqmdb::custcontract",
-                      defaultacl=>['admin']);
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("qmdb.custcontract.orderticket",
+                      "tsqmdb::orderticket",
+                      defaultacl=>['valid_user']);
    
    return($self);
 }

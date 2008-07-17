@@ -1,2 +1,3 @@
 'qmdb'=>{de=>'QMDB SSM',en=>'QMDB SSM'},
 'qmdb.custcontract'=>{de=>'Kundenvertrag',en=>'CustomerContract'},
+'qmdb.custcontract.orderticket'=>{de=>'Bestellschein',en=>'Order Ticket'},
