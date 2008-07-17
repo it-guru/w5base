@@ -1,4 +1,4 @@
-package kernel::Field::DynWebIcon;
+package itil::lnkassetcontact;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -18,41 +18,28 @@ package kernel::Field::DynWebIcon;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
-@ISA    = qw(kernel::Field);
-
+use kernel;
+use base::lnkcontact;
+@ISA=qw(base::lnkcontact);
 
 sub new
 {
    my $type=shift;
-   my $self={@_};
-   if (!defined($self->{uivisible})){
-      $self->{uivisible}=sub{
-         my $self=shift;
-         my $mode=shift;
-         return(0) if ($mode eq "ViewEditor");
-         return(0) if ($mode eq "SearchMask");
-         return(1);
-      };
-   }
-   $self=bless($type->SUPER::new(%$self),$type);
+   my %param=@_;
+   my $self=bless($type->SUPER::new(%param),$type);
+
+   $self->AddFields(
+      new kernel::Field::TextDrop(
+                name          =>'asset',
+                htmlwidth     =>'100px',
+                label         =>'Asset',
+                vjointo       =>'itil::asset',
+                vjoinon       =>['refid'=>'id'],
+                vjoindisp     =>'name'),
+      insertafter=>'id'
+   );
+   $self->{secparentobj}='itil::asset';
+   $self->setDefaultView(qw(asset targetname cdate editor));
    return($self);
 }
-
-sub Label
-{
-   my $self=shift;
-   my $mode=shift;
-   return(" ") if ($mode ne "HtmlDetail");
-   return($self->SUPER::Label(@_));
-}
-
-sub FormatedDetail
-{
-   my $self=shift;
-
-   return(&{$self->{weblink}}($self,@_));
-}
-
-
 1;

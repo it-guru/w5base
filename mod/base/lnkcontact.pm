@@ -112,6 +112,7 @@ sub new
                 name          =>'roles',
                 label         =>'Roles',
                 htmleditwidth =>'100%',
+                depend        =>['parentobj'],
                 multisize     =>5,
                 container     =>'croles',
                 getPostibleValues=>\&getPostibleRoleValues),
@@ -264,6 +265,10 @@ sub Validate
       return(0);
    }
    my $parentobj=effVal($oldrec,$newrec,"parentobj");
+   if (!defined($parentobj) && defined($self->{secparentobj})){
+      $parentobj=$self->{secparentobj};
+      $newrec->{parentobj}=$parentobj;
+   }
    my $refid=effVal($oldrec,$newrec,"refid");
    if (!defined($parentobj) || $parentobj eq ""){
       $self->LastMsg(ERROR,"empty parent object");
@@ -322,7 +327,7 @@ sub Validate
    else{
       return(1);
    }
-   $self->LastMsg(ERROR,"no write access");
+   $self->LastMsg(ERROR,"no write access to requested contact");
    return(0);
 }
 

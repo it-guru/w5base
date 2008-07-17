@@ -168,6 +168,9 @@ sub Init
                       func=>'MainWithNew',
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("itil.system.lnksystemcontact",
+                      "itil::lnksystemcontact",
+                      defaultacl=>['valid_user']);
    
    $self->RegisterObj("itil.asset",
                       "itil::asset",
@@ -178,6 +181,10 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itil.asset.lnkassetcontact",
+                      "itil::lnkassetcontact",
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("itil.liccontract",
                       "itil::liccontract",
                       defaultacl=>['valid_user']);

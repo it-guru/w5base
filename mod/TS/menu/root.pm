@@ -75,6 +75,10 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("itts.appl.lnkapplcontact",
+                      "itil::lnkapplcontact",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itts.system",
                       "OSY::system",
                       defaultacl=>['valid_user']);
@@ -106,6 +110,10 @@ sub Init
                       "itil::lnksystemnfsnas",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itts.system.lnksystemcontact",
+                      "itil::lnksystemcontact",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itts.asset",
                       "itil::asset",
                       defaultacl=>['valid_user']);
@@ -113,6 +121,10 @@ sub Init
    $self->RegisterObj("itts.asset.new",
                       "itil::asset",
                       func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itts.asset.lnkassetcontact",
+                      "itil::lnkassetcontact",
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("itts.kern",

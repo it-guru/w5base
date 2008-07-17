@@ -318,39 +318,70 @@ sub prepUploadRecord   # prepair one record on upload
       my $newkey;
       my @options=$self->getPostibleValues($oldrec,"edit");
       my @o=@options;
-      while($#o!=-1){   # pass 1 check if value  matches
-         my $key=shift(@o);
-         my $val=shift(@o);
-         if ($val eq $reqval){
-            $newkey=$key;
-            last;
+      if ($self->{multisize}>0){  # multivalue selects
+         $reqval=[split(/[,;]\s+/,$reqval)] if (ref($reqval) ne "ARRAY");
+         $newkey=[];
+         if ($#{$reqval}!=-1){
+            foreach my $strval (@$reqval){
+               my @o=@options;
+               my $kval;
+               while($#o!=-1){   # pass 1 check if value  matches
+                  my $key=shift(@o);
+                  my $val=shift(@o);
+                  if ($val eq $strval){
+                     $kval=$key;
+                     last;
+                  }
+               }
+               if (!defined($kval)){
+                  print msg(ERROR,
+                          $self->getParent->T("no matching value '\%s' ".
+                                              "in field '\%s'"),
+                        $strval,$name);
+                  return(0);
+               }
+               push(@$newkey,$kval);
+            }
          }
       }
-      if (!defined($newkey)){
-         my @o=@options;
-         while($#o!=-1){  # pass 1 check if value (translated) matches
+      else{
+         while($#o!=-1){   # pass 1 check if value  matches
             my $key=shift(@o);
             my $val=shift(@o);
-            if ($self->getParent->T($self->{transprefix}.$val,
-                  $self->{translation}) eq $reqval){
+            if ($val eq $reqval){
                $newkey=$key;
                last;
             }
          }
          if (!defined($newkey)){
             my @o=@options;
-            while($#o!=-1){  # pass 1 check if key direct matches
+            while($#o!=-1){  # pass 1 check if value (translated) matches
                my $key=shift(@o);
                my $val=shift(@o);
-               if ($key eq $reqval){
+               if ($self->getParent->T($self->{transprefix}.$val,
+                     $self->{translation}) eq $reqval){
                   $newkey=$key;
                   last;
+               }
+            }
+            if (!defined($newkey)){
+               my @o=@options;
+               while($#o!=-1){  # pass 1 check if key direct matches
+                  my $key=shift(@o);
+                  my $val=shift(@o);
+                  if ($key eq $reqval){
+                     $newkey=$key;
+                     last;
+                  }
                }
             }
          }
       }
       if (!defined($newkey)){
-         print msg(ERROR,"no matching value '%s' in field $name",$reqval);
+ 
+         print msg(ERROR,
+                 $self->getParent->T("no matching value '\%s' in field '\%s'"),
+               $reqval,$name);
          return(0);
       }
       else{
