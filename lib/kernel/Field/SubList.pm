@@ -184,6 +184,13 @@ sub getSubListData
       my $loadfield=$self->{vjoinon}->[1];
       $self->vjoinobjInit();
       $self->vjoinobj->ResetFilter();
+      if (defined($self->{vjoinbase})){
+         my $base=$self->{vjoinbase};
+         if (ref($base) eq "HASH"){
+            $base=[$base];
+         }
+         $self->vjoinobj->SetNamedFilter("BASE",@{$base});
+      }
       $self->vjoinobj->SetFilter({$self->{vjoinon}->[1]=>$srcval});
 
       my @view=@{$self->{vjoindisp}};
@@ -215,6 +222,13 @@ sub RawValue
       my $srcval=$srcfield->RawValue($current);
       my $loadfield=$self->{vjoinon}->[1];
       $self->vjoinobjInit();
+      if (defined($self->{vjoinbase})){
+         my $base=$self->{vjoinbase};
+         if (ref($base) eq "HASH"){
+            $base=[$base];
+         }
+         $self->vjoinobj->SetNamedFilter("BASE",@{$base});
+      }
       $self->vjoinobj->SetFilter({$self->{vjoinon}->[1]=>$srcval});
       my @view=($self->{vjoindisp});
       @view=@{$self->{vjoindisp}} if (ref($self->{vjoindisp}) eq "ARRAY");
@@ -244,6 +258,13 @@ sub FinishDelete
       my $srcval=$oldrec->{$self->{vjoinon}->[0]};
       my $loadfield=$self->{vjoinon}->[1];
       $self->vjoinobjInit();
+      if (defined($self->{vjoinbase})){
+         my $base=$self->{vjoinbase};
+         if (ref($base) eq "HASH"){
+            $base=[$base];
+         }
+         $self->vjoinobj->SetNamedFilter("BASE",@{$base});
+      }
       $self->vjoinobj->SetFilter({$self->{vjoinon}->[1]=>$srcval});
       $self->vjoinobj->SetCurrentView(qw(ALL));
       $self->vjoinobj->ForeachFilteredRecord(sub{
