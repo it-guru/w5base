@@ -118,7 +118,6 @@ sub RawValue
                $dststruct->{obj}->SetFilter({$idobj->Name()=>\$targetid});
                my ($rec,$msg)=$dststruct->{obj}->getOnlyFirst($dststruct->{disp});
                if (defined($rec)){
-printf STDERR ("fifi $rec->{$dststruct->{disp}}\n");
                   return($rec->{$dststruct->{disp}});
                }
                if (defined($self->{altnamestore})){
