@@ -75,6 +75,29 @@ sub new
                 dataobjattr   =>'bestellschein.lz_ende'),
 
       new kernel::Field::Text(
+                name          =>'typ',
+                htmlwidth     =>'30px',
+                label         =>'Typ',
+                dataobjattr   =>'bestellschein.typ'),
+
+      new kernel::Field::Text(
+                name          =>'state',
+                label         =>'WF-State',
+                dataobjattr   =>'bestellschein.wf_state_id'),
+
+      new kernel::Field::Text(
+                name          =>'conumber',
+                htmlwidth     =>'100px',
+                label         =>'CO-Number',
+                dataobjattr   =>'bestellschein.co_nummer'),
+
+      new kernel::Field::Link(
+                name          =>'contractco',
+                label         =>'Contract-CO',
+                dataobjattr   =>'concat(bestellschein.vertrag_nr,'.
+                                "concat(';',bestellschein.co_nummer))"),
+
+      new kernel::Field::Text(
                 name          =>'orgunit',
                 ignorecase    =>1,
                 htmlwidth     =>'100px',
@@ -95,24 +118,6 @@ sub new
                 label         =>'Org2-Unit',
                 dataobjattr   =>'ou2.description'),
 
-      new kernel::Field::Text(
-                name          =>'conumber',
-                htmlwidth     =>'100px',
-                label         =>'CO-Number',
-                dataobjattr   =>'bestellschein.co_nummer'),
-
-      new kernel::Field::Text(
-                name          =>'typ',
-                htmlwidth     =>'30px',
-                label         =>'Typ',
-                dataobjattr   =>'bestellschein.typ'),
-
-      new kernel::Field::Link(
-                name          =>'contractco',
-                label         =>'Contract-CO',
-                dataobjattr   =>'concat(bestellschein.vertrag_nr,'.
-                                "concat(';',bestellschein.co_nummer))"),
-
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
@@ -128,7 +133,7 @@ sub new
                 dataobjattr   =>'bestellschein.update_timestamp'),
 
    );
-   $self->setDefaultView(qw(linenumber name conumber fullname));
+   $self->setDefaultView(qw(linenumber orderticketnumber conumber fullname));
    $self->setWorktable("bestellschein");
    return($self);
 }

@@ -22,3 +22,5 @@
 'Priority of system'=>{de=>'Priorität des Systems'},
 'Services Columns'=>{de=>'Leistungsarten in Spalten'},
 'Services'=>{de=>'Leistungsarten'},
+'Assignment Group Supervisor'=>{de=>'Assignment Group Leiter'},
+'Assignment Group Supervisor E-Mail'=>{de=>'Assignment Group Leiter E-Mail'},

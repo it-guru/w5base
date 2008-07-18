@@ -28,7 +28,9 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
+
    
    $self->AddFields(
       new kernel::Field::Linenumber(
@@ -86,6 +88,22 @@ sub new
                 vjointo       =>'tsacinv::group',
                 vjoinon       =>['lassignmentid'=>'lgroupid'],
                 vjoindisp     =>'name'),
+
+      new kernel::Field::TextDrop(
+                name          =>'assignmentgroupsupervisor',
+                label         =>'Assignment Group Supervisor',
+                htmldetail    =>0,
+                vjointo       =>'tsacinv::group',
+                vjoinon       =>['lassignmentid'=>'lgroupid'],
+                vjoindisp     =>'supervisor'),
+
+      new kernel::Field::TextDrop(
+                name          =>'assignmentgroupsupervisoremail',
+                label         =>'Assignment Group Supervisor E-Mail',
+                htmldetail    =>0,
+                vjointo       =>'tsacinv::group',
+                vjoinon       =>['lassignmentid'=>'lgroupid'],
+                vjoindisp     =>'supervisoremail'),
 
       new kernel::Field::TextDrop(
                 name          =>'iassignmentgroup',

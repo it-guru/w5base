@@ -469,7 +469,6 @@ sub LoadTargets
                my $rec={userid=>$userid,active=>$param{default},
                         parent=>$sparent,mode=>$smode,refid=>$srefid};
                $self->ValidatedInsertRecord($rec);
-               printf STDERR ("fifi insert $userid\n");
             }
          #}
          $self->ResetFilter();
