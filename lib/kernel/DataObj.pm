@@ -1683,6 +1683,27 @@ sub getRecordImageUrl
    return("../../../public/base/load/world.jpg?".$cgi->query_string());
 }
 
+sub getRecordHeader
+{
+   my $self=shift;
+   my $rec=shift;
+   my $headerval;
+
+   if (my $f=$self->getField("fullname")){
+      $headerval=quoteHtml($f->RawValue($rec));
+   }
+   elsif (my $f=$self->getField("name")){
+      $headerval=quoteHtml($f->RawValue($rec));
+   }
+   elsif (my $f=$self->getField("id")){
+      $headerval=quoteHtml($f->RawValue($rec));
+   }
+   else{
+      $headerval="not labeld";
+   }
+   return($headerval);
+}
+
 
 sub DetailY
 {

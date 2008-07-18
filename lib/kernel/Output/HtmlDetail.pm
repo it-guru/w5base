@@ -184,17 +184,12 @@ sub ProcessLine
       }
    }
    else{
-      my $headerval="";
+      my $headerval;
+      if ($self->getParent->getParent->can("getRecordHeader")){
+         $headerval=$self->getParent->getParent->getRecordHeader($rec);
+      }
       my $H="";
-      if (my $f=$self->getParent->getParent->getField("fullname")){
-         $headerval=quoteHtml($f->RawValue($rec));
-      }
-      elsif (my $f=$self->getParent->getParent->getField("name")){
-         $headerval=quoteHtml($f->RawValue($rec));
-      }
-      else{
-         $headerval='%objecttitle%';
-      }
+      $headerval='%objecttitle%' if ($headerval eq "");
       my $s=$self->getParent->getParent->T($self->getParent->getParent->Self,
                                            $self->getParent->getParent->Self);
       my $recordimg=$self->getParent->getParent->getRecordImageUrl($rec);

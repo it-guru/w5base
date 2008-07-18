@@ -215,7 +215,8 @@ sub nativQualityCheck
    my $wf=getModuleObject($parent->Config,"base::workflow");
    my $dataobj=$self->getParent();
    my $affectedobject=$dataobj->SelfAsParentObject();
-   my $affectedobjectid=$rec->{id};
+   my $idfield=$dataobj->IdField();
+   my $affectedobjectid=$idfield->RawValue($rec);
    msg(INFO,"QualityRule Level1");
    if (keys(%alldataissuemsg)){
       msg(INFO,"QualityRule Level2");
@@ -237,8 +238,9 @@ sub nativQualityCheck
       msg(INFO,"QualityRule Level3");
       my $oldforce=$ENV{HTTP_FORCE_LANGUAGE};
       $ENV{HTTP_FORCE_LANGUAGE}="en";
+      my $objectname=$dataobj->getRecordHeader($rec);
       my $name="DataIssue: ".$dataobj->T($affectedobject,$affectedobject).": ".
-               $rec->{name};
+               $objectname;
       $ENV{HTTP_FORCE_LANGUAGE}=$oldforce;
       delete($ENV{HTTP_FORCE_LANGUAGE}) if ($ENV{HTTP_FORCE_LANGUAGE} eq "");
       $wf->SetFilter({stateid=>"<20",class=>\"base::workflow::DataIssue",
