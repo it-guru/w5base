@@ -58,6 +58,11 @@ sub new
                 size          =>'20',
                 dataobjattr   =>'grp.name'),
 
+      new kernel::Field::Text(
+                name          =>'description',
+                label         =>'Description',
+                dataobjattr   =>'grp.description'),
+
       new kernel::Field::TextDrop(
                 name          =>'parent',
                 label         =>'Parentgroup',
@@ -172,6 +177,13 @@ sub new
                 vjoinon       =>['grpid'=>'grpid'],
                 vjoindisp     =>['user','userweblink','roles'],
                 vjoininhash   =>['userid','email','user','roles']),
+
+      new kernel::Field::QualityText(),
+      new kernel::Field::QualityState(),
+      new kernel::Field::QualityOk(),
+      new kernel::Field::QualityLastDate(
+                dataobjattr   =>'grp.lastqcheck'),
+
    );
    $self->{PhoneLnkUsage}=\&PhoneUsage;
    $self->{CI_Handling}={uniquename=>"fullname",

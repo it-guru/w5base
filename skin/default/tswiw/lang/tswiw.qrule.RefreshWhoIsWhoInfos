@@ -1,0 +1,4 @@
+'tswiw::qrule::RefreshWhoIsWhoInfos'=>{de=>'Abgleich von Gruppendaten mit WhoIsWho',
+                                  en=>'sync of group informations from WhoIsWho'},
+
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
