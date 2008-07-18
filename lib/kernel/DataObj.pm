@@ -616,7 +616,8 @@ sub FinishDelete
                          directlnkid=>\$id});
          my ($WfRec,$msg)=$wf->getOnlyFirst(qw(ALL));
          if (defined($WfRec)){
-            $wf->Store($WfRec,{stateid=>'21',
+            $wf->Store($WfRec,{stateid=>'25',
+                               note=>'related data record deleted',
                                fwddebtarget=>undef,
                                fwddebtargetid=>undef,
                                fwdtarget=>undef,

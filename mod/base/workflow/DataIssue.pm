@@ -571,9 +571,14 @@ sub Validate
    if (defined($newrec->{stateid}) &&
        $newrec->{stateid}==21 ||
        $newrec->{stateid}==25){
+      my $note="";
+      if (defined($newrec->{note})){
+         $note=$newrec->{note};
+         delete($newrec->{note});
+      }
       if ($self->getParent->getParent->Action->StoreRecord(
           $oldrec->{id},"wfobsolete",
-          {translation=>'base::workflow::DataIssue'},"",undef)){
+          {translation=>'base::workflow::DataIssue'},$note,undef)){
          $newrec->{step}="base::workflow::DataIssue::finish";
          $newrec->{eventend}=$self->getParent->ExpandTimeExpression("now",
                                                                   "en","GMT");;
