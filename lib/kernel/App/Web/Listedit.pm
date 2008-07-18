@@ -104,7 +104,7 @@ sub HandleSubListEdit
          "src=\"../../../public/base/load/toolbox.js\"></script>\n");
    print("<script language=JavaScript ".
          "src=\"../../../public/base/load/sortabletable.js\"></script>\n");
-   $self->ProcessDataModificationOP();
+   my $op=$self->ProcessDataModificationOP();
    {
       # SubList Edit-Mask anzeigen
       my $id=Query->Param("CurrentIdToEdit");
@@ -135,6 +135,9 @@ EOF
       print $self->getParsedTemplate("tmpl/$app.$subeditmsk",{current=>$rec});
    }
    print $self->findtemplvar({},"LASTMSG");
+   if ($op eq "delete" || $op eq "save"){
+      $self->ClearSaveQuery();
+   }
 }
 
 sub getForceParamForSubedit
@@ -949,6 +952,7 @@ sub ProcessDataModificationOP
       Query->Delete("OP");
       $self->HandleDelete();
    }
+   return($op);
 }
 
 sub HtmlDetail

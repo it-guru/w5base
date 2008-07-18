@@ -183,6 +183,7 @@ sub getSubListData
       my $srcval=$srcfield->RawValue($current);
       my $loadfield=$self->{vjoinon}->[1];
       $self->vjoinobjInit();
+      $self->vjoinobj->ResetFilter();
       $self->vjoinobj->SetFilter({$self->{vjoinon}->[1]=>$srcval});
 
       my @view=@{$self->{vjoindisp}};
