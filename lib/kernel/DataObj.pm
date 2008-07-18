@@ -605,6 +605,25 @@ sub FinishDelete
    if (defined($p) && defined($pid) && $p->can("FinishSubDelete")){
       $p->FinishSubDelete($pid);
    }
+   my $wf=getModuleObject($self->Config,"base::workflow");
+   my $selfname=$self->SelfAsParentObject();
+   my $idfield=$self->IdField();
+   if (defined($idfield)){
+      my $id=$idfield->RawValue($oldrec);
+      if ($id ne ""){
+         $wf->SetFilter({stateid=>"<20",class=>\"base::workflow::DataIssue",
+                         directlnktype=>\$selfname,
+                         directlnkid=>\$id});
+         my ($WfRec,$msg)=$wf->getOnlyFirst(qw(ALL));
+         if (defined($WfRec)){
+            $wf->Store($WfRec,{stateid=>'21',
+                               fwddebtarget=>undef,
+                               fwddebtargetid=>undef,
+                               fwdtarget=>undef,
+                               fwdtarget=>undef});
+         }
+      }
+   }
 }
 
 sub FinishSubDelete                  # called, if a record in 
