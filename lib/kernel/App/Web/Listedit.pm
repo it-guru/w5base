@@ -515,8 +515,8 @@ EOF
          return();
       }
    }
-   printf("<form method=post>");
-   printf("<table border=0 width=100% height=100%>");
+   printf("<form method=post><center>");
+   printf("<table border=0 height=80%>");
    printf("<tr height=1%>");
    printf("<td align=center><br><br>");
    if (!grep(/^ERROR/,$self->LastMsg())){
@@ -529,7 +529,7 @@ EOF
       printf("<td align=center>".
              "<div style=\"text-align:left;border-style:solid;".
              "border-width:1px;padding:3px;".
-             "overflow:auto;height:50px;width:500px\">");
+             "overflow:auto;height:50px;width:400px\">");
       print join("<br>",map({
                              if ($_=~m/^ERROR/){
                                 $_="<font style=\"color:red;\">".$_.
@@ -902,7 +902,6 @@ sub HandleSave
 sub HandleDelete
 {
    my $self=shift;
-   printf STDERR ("fifi now we do delete\n");
 
    my $id=Query->Param("CurrentIdToEdit");
    my $flt=undef;

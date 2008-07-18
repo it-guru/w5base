@@ -350,6 +350,37 @@ sub FinishDelete
    return($bak);
 }
 
+sub ValidateDelete
+{
+   my $self=shift;
+   my $rec=shift;
+
+   if (ref($rec->{users}) eq "ARRAY" &&
+       $#{$rec->{users}}!=-1){
+      $self->LastMsg(WARN,"group has members!");
+   }
+   my $grpid=$rec->{grpid};
+   if ($grpid ne ""){
+      my $chk=getModuleObject($self->Config,"base::menuacl");
+      $chk->SetFilter({acltarget=>\'base::grp',
+                       acltargetid=>\$grpid});
+      my ($chkrec,$msg)=$chk->getOnlyFirst(qw(refid));
+      if (defined($chkrec)){
+         $self->LastMsg(WARN,"group has references in menu acl!");
+      }
+      my $chk=getModuleObject($self->Config,"base::lnkcontact");
+      $chk->SetFilter({target=>\'base::grp',
+                       targetid=>\$grpid});
+      my ($chkrec,$msg)=$chk->getOnlyFirst(qw(refid));
+      if (defined($chkrec)){
+         $self->LastMsg(WARN,"group has references in contact links!");
+      }
+   }
+
+   return(1);
+}
+
+
 sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;

@@ -55,29 +55,31 @@ sub qcheckRecord
    my $rec=shift;
    my $errorlevel=undef;
 
-   if ($rec->{srcsys} eq "WhoIsWho"){
-      my @qmsg;
-      if ($rec->{srcid} eq ""){
-         push(@qmsg,"srcid is not defined");
-         return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
-      }
-      $errorlevel=0;
-      my $wiw=getModuleObject($self->getParent->Config(),"tswiw::orgarea");
-      $wiw->SetFilter({touid=>\$rec->{srcid}});
-      my ($wiwrec,$msg)=$wiw->getOnlyFirst(qw(ALL));
-      if (!defined($wiwrec)){
-         push(@qmsg,"orgunit id not found in WhoIsWho");
-         return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
-      }
-      if ($wiwrec->{parentid} ne ""){
-         my $grp=getModuleObject($self->getParent->Config(),"base::grp");
-         $grp->SetFilter({srcid=>\$wiwrec->{parentid},
-                          srcsys=>\'WhoIsWho',
-                          grpid=>\$rec->{parentid}});
-         my ($prec,$msg)=$grp->getOnlyFirst(qw(ALL));
-         if (!defined($prec)){
-            push(@qmsg,"parent unit in WhoIsWho doesn't matches");
+   if ($rec->{cistatusid}==4){
+      if ($rec->{srcsys} eq "WhoIsWho"){
+         my @qmsg;
+         if ($rec->{srcid} eq ""){
+            push(@qmsg,"srcid is not defined");
             return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
+         }
+         $errorlevel=0;
+         my $wiw=getModuleObject($self->getParent->Config(),"tswiw::orgarea");
+         $wiw->SetFilter({touid=>\$rec->{srcid}});
+         my ($wiwrec,$msg)=$wiw->getOnlyFirst(qw(ALL));
+         if (!defined($wiwrec)){
+            push(@qmsg,"orgunit id not found in WhoIsWho");
+            return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
+         }
+         if ($wiwrec->{parentid} ne ""){
+            my $grp=getModuleObject($self->getParent->Config(),"base::grp");
+            $grp->SetFilter({srcid=>\$wiwrec->{parentid},
+                             srcsys=>\'WhoIsWho',
+                             grpid=>\$rec->{parentid}});
+            my ($prec,$msg)=$grp->getOnlyFirst(qw(ALL));
+            if (!defined($prec)){
+               push(@qmsg,"parent unit in WhoIsWho doesn't matches");
+               return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
+            }
          }
       }
    }
