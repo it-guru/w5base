@@ -465,6 +465,26 @@ sub TreeCreate
    return($createid);
 }
 
+sub HandleInfoAboSubscribe
+{
+   my $self=shift;
+   my $id=Query->Param("CurrentIdToEdit");
+   my $ia=$self->getPersistentModuleObject("base::infoabo");
+   if ($id ne ""){
+      $self->ResetFilter();
+      $self->SetFilter({grpid=>\$id});
+      my ($rec,$msg)=$self->getOnlyFirst(qw(fullname));
+      print($ia->WinHandleInfoAboSubscribe({},
+                      $self->SelfAsParentObject(),$id,$rec->{fullname},
+                      "base::staticinfoabo",undef,undef));
+   }
+   else{
+      print($self->noAccess());
+   }
+}
+
+
+
 
 
 
