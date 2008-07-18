@@ -259,6 +259,7 @@ sub nativQualityCheck
                      step=>"base::workflow::DataIssue::dataload",
                      affectedobject=>$affectedobject,
                      affectedobjectid=>$affectedobjectid,
+                     altaffectedobjectname=>$objectname,
                      directlnkmode=>$directlnkmode,
                      eventend=>undef,
                      eventstart=>NowStamp("en"),
