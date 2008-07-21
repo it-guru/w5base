@@ -129,53 +129,13 @@ sub qcheckRecord
                              $parrec,"corecount",
                              $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
                              mode=>'integer');
+         my $w5aclocation=$self->getW5ACLocationname($parrec->{locationid});
+         $self->IfaceCompare($dataobj,
+                             $rec,"location",
+                             {location=>$w5aclocation},"location",
+                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
+                             mode=>'string');
       }
-
-#      if ($rec->{mandator} eq "Extern" && $rec->{allowifupdate}){
-#         # forced updates on External Data
-#         my $admid;
-#         my $acgroup=getModuleObject($self->getParent->Config,"tsacinv::group");
-#         $acgroup->SetFilter({lgroupid=>\$parrec->{lassignmentid}});
-#         my ($acgrouprec,$msg)=$acgroup->getOnlyFirst(qw(supervisorldapid));
-#         if (defined($acgrouprec)){
-#            if ($acgrouprec->{supervisorldapid} ne "" ||
-#                $acgrouprec->{supervisoremail} ne ""){
-#               my $importname=$acgrouprec->{supervisorldapid};
-#               if ($importname eq ""){
-#                  $importname=$acgrouprec->{supervisoremail};
-#               }
-#               my $tswiw=getModuleObject($self->getParent->Config,
-#                                         "tswiw::user");
-#               my $databossid=$tswiw->GetW5BaseUserID($importname);
-#               if (defined($databossid)){
-#                  $admid=$databossid;
-#               }
-#            }
-#         }
-#         if ($admid ne ""){
-#            $self->IfaceCompare($dataobj,
-#                                $rec,"admid",
-#                                {admid=>$admid},"admid",
-#                                $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
-#                                mode=>'integer');
-#         }
-#         my $comments="";
-#         if ($parrec->{assignmentgroup} ne ""){
-#            $comments.="\n" if ($comments ne "");
-#            $comments.="AssetCenter AssignmentGroup: ".
-#                       $parrec->{assignmentgroup};
-#         }
-#         if ($parrec->{conumber} ne ""){
-#            $comments.="\n" if ($comments ne "");
-#            $comments.="AssetCenter CO-Number: ".
-#                       $parrec->{conumber};
-#         }
-#         $self->IfaceCompare($dataobj,
-#                             $rec,"comments",
-#                             {comments=>$comments},"comments",
-#                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
-#                             mode=>'string');
-#      }
    }
    else{
       push(@qmsg,'no assetid specified');
@@ -202,6 +162,50 @@ sub qcheckRecord
    }
    return($self->HandleWfRequest($dataobj,$rec,
                                  \@qmsg,\@dataissue,\$errorlevel,$wfrequest));
+}
+
+
+sub getW5ACLocationname
+{
+   my $self=shift;
+   my $aclocationid=shift;
+
+   return(undef) if ($aclocationid eq "" || $aclocationid==0);
+   my $acloc=$self->getPersistentModuleObject('tsacinv::location');
+   my $w5loc=$self->getPersistentModuleObject('base::location');
+   $acloc->SetFilter({locationid=>\$aclocationid}); 
+   my ($aclocrec,$msg)=$acloc->getOnlyFirst(qw(ALL));
+   my %lrec;
+
+   $lrec{label}=$aclocrec->{label};
+   $lrec{address1}=$aclocrec->{address1};
+   $lrec{location}=$aclocrec->{location};
+   $lrec{zipcode}=$aclocrec->{zipcode};
+   $lrec{country}=$aclocrec->{country};
+
+   #
+   # pre process aclocation 
+   #
+   delete($lrec{country}) if ($lrec{country} eq ""); 
+   delete($lrec{zipcode}) if ($lrec{zipcode} eq ""); 
+   delete($lrec{label})   if ($lrec{label} eq ""); 
+
+   if (!defined($lrec{country})){
+      if ($aclocrec->{fullname}=~m/^\/DE[_-]/){
+         $lrec{country}="DE";
+      }
+   }
+   printf STDERR ("requestrec=%s\n",Dumper(\%lrec));
+   
+
+   my $w5locid=$w5loc->getLocationByHash(%lrec);
+   return(undef) if (!defined($w5locid));
+   $w5loc->SetFilter({id=>\$w5locid}); 
+   my ($w5locrec,$msg)=$w5loc->getOnlyFirst(qw(name));
+   return(undef) if (!defined($w5locrec));
+   printf STDERR ("fifi x w5fullname=$w5locrec->{name}\n");
+   return($w5locrec->{fullname});
+
 }
 
 

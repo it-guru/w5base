@@ -215,6 +215,23 @@ sub HandleWfRequest
    return($$errorlevel,undef);
 }
 
+sub getPersistentModuleObject
+{
+   my $self=shift;
+   my $label=shift;
+   my $module=shift;
+
+   $module=$label if (!defined($module) || $module eq "");
+   if (!defined($self->{$label})){
+      my $config=$self->getParent->Config();
+      my $m=getModuleObject($config,$module);
+      $self->{$label}=$m
+   }
+   $self->{$label}->ResetFilter();
+   return($self->{$label});
+}
+
+
 
 
 1;

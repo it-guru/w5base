@@ -793,8 +793,17 @@ sub ValidatedInsertOrUpdateRecord
    my @idlist=();
    $self->ForeachFilteredRecord(sub{
          my $rec=$_;
-         $self->ValidatedUpdateRecord($rec,$newrec,
-                                      {$idfname=>$rec->{$idfname}});
+         my $changed=0;
+         foreach my $k (keys(%$newrec)){
+            if ($newrec->{$k} ne $rec->{$k}){
+               $changed=1;
+               last;
+            }
+         }
+         if ($changed){
+            $self->ValidatedUpdateRecord($rec,$newrec,
+                                         {$idfname=>$rec->{$idfname}});
+         }
          push(@idlist,$rec->{$idfname});
          $found++;
    });
