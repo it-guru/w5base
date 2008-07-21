@@ -405,6 +405,7 @@ sub getLocationByHash
 
    return(undef) if ($req{country}=~m/^\s*$/);
    return(undef) if ($req{location}=~m/^\s*$/);
+   msg(INFO,"getLocationByHash=%s",Dumper(\%req));
 #   if (defined($req{srcid}) && defined($req{srcsys})){
 #      $self->ResetFilter();
 #      $self->SetFilter({'srcsys'=>\$req{srcsys},srcid=>\$req{srcid}});

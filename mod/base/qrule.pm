@@ -356,9 +356,10 @@ sub WinHandleQualityCheck
 <tr height=50><td>$handlermask</td></tr>
 <tr>
 <td valign=top>
-<div id=reslist>
+<div height=100% id=reslist >
 </div>
 </td>
+</tr>
 <tr height=20>
 <td>
 <table cellspacing=0 cellpadding=0 width=100%>
