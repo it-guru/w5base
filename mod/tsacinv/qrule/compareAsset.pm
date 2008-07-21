@@ -130,6 +130,8 @@ sub qcheckRecord
                              $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
                              mode=>'integer');
          my $w5aclocation=$self->getW5ACLocationname($parrec->{locationid});
+         msg(INFO,"rec location=$rec->{location}");
+         msg(INFO,"ac  location=$w5aclocation");
          $self->IfaceCompare($dataobj,
                              $rec,"location",
                              {location=>$w5aclocation},"location",
@@ -170,6 +172,7 @@ sub getW5ACLocationname
    my $self=shift;
    my $aclocationid=shift;
 
+   msg(INFO,"start getW5ACLocationname");
    return(undef) if ($aclocationid eq "" || $aclocationid==0);
    my $acloc=$self->getPersistentModuleObject('tsacinv::location');
    my $w5loc=$self->getPersistentModuleObject('base::location');
@@ -177,6 +180,7 @@ sub getW5ACLocationname
    my ($aclocrec,$msg)=$acloc->getOnlyFirst(qw(ALL));
    my %lrec;
 
+   msg(INFO,"req  ac location=$aclocrec->{fullname}");
    $lrec{label}=$aclocrec->{label};
    $lrec{address1}=$aclocrec->{address1};
    $lrec{location}=$aclocrec->{location};
@@ -195,7 +199,7 @@ sub getW5ACLocationname
          $lrec{country}="DE";
       }
    }
-   printf STDERR ("requestrec=%s\n",Dumper(\%lrec));
+   msg(INFO,"requestrec=%s",Dumper(\%lrec));
    
 
    my $w5locid=$w5loc->getLocationByHash(%lrec);
@@ -203,8 +207,8 @@ sub getW5ACLocationname
    $w5loc->SetFilter({id=>\$w5locid}); 
    my ($w5locrec,$msg)=$w5loc->getOnlyFirst(qw(name));
    return(undef) if (!defined($w5locrec));
-   printf STDERR ("fifi x w5fullname=$w5locrec->{name}\n");
-   return($w5locrec->{fullname});
+   msg(INFO,"used w5 location=$w5locrec->{name}");
+   return($w5locrec->{name});
 
 }
 
