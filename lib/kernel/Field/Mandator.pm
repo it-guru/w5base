@@ -42,6 +42,7 @@ sub new
 sub getPostibleValues
 {
    my $self=shift;
+   my $oldrec=shift;
    my $current=shift;
    my $mode=shift;
 
