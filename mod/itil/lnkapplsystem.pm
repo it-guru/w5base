@@ -245,6 +245,15 @@ sub new
                 vjoindisp     =>'fullname'),
 
       new kernel::Field::Text(
+                name          =>'applcustomer',
+                label         =>'Application Customer',
+                readonly      =>1,
+                group         =>'applinfo',
+                vjointo       =>'base::grp',
+                vjoinon       =>['customerid'=>'grpid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Text(
                 name          =>'applcustomerprio',
                 label         =>'Customers Application Prioritiy',
                 translation   =>'itil::appl',

@@ -29,6 +29,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
    $self->{UseSqlReplace}=1;
 
@@ -518,6 +519,18 @@ sub SelfAsParentObject    # this method is needed because existing derevations
 {
    return("itil::appl");
 }
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_cistatus"))){
+     Query->Param("search_cistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
+
+
 
 
 

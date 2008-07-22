@@ -8,6 +8,7 @@
                           en=>'Systeminformations'},
 'Fraction'=>{de=>'Anteil des Systems an der Anwendung'},
 'Application'=>{de=>'Anwendung'},
+'Application Customer'=>{de=>'Anwendungs Kunde'},
 'Application CI-State'=>{de=>'Anwendungs CI-Status'},
 'System CI-State'=>{de=>'System CI-Status'},
 'Short Description'=>{de=>'Kurzbeschreibung'},

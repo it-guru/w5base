@@ -40,6 +40,10 @@ sub Init
                       "TCOM::custappl",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("customerportal.system",
+                      "TCOM::custsystem",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("customerportal.tcomconnect",
                       "base::filemgmt",
                       func=>'browser/TSI-Connect/index.html');

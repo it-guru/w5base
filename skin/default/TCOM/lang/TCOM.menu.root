@@ -1,3 +1,4 @@
 'customerportal.appl'=>{de=>'Anwendung',en=>'Application'},
+'customerportal.system'=>{de=>'System',en=>'System'},
 'customerportal.tcomconnect'=>{de=>'TSI-Connect',en=>'TSI-Connect'},
 
