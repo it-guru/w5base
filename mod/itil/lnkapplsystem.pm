@@ -315,6 +315,38 @@ sub new
                 label         =>'Referencesystem',
                 dataobjattr   =>'system.is_reference'),
 
+      new kernel::Field::Boolean(
+                name          =>'isapplserver',
+                readonly      =>1,
+                group         =>'systeminfo',
+                htmleditwidth =>'30%',
+                label         =>'Applicationserver',
+                dataobjattr   =>'system.is_applserver'),
+
+      new kernel::Field::Boolean(
+                name          =>'isbackupsrv',
+                readonly      =>1,
+                group         =>'systeminfo',
+                htmleditwidth =>'30%',
+                label         =>'Backupserver',
+                dataobjattr   =>'system.is_backupsrv'),
+
+      new kernel::Field::Boolean(
+                name          =>'isdatabasesrv',
+                readonly      =>1,
+                group         =>'systeminfo',
+                htmleditwidth =>'30%',
+                label         =>'Databaseserver',
+                dataobjattr   =>'system.is_databasesrv'),
+
+      new kernel::Field::Boolean(
+                name          =>'iswebserver',
+                readonly      =>1,
+                group         =>'systeminfo',
+                htmleditwidth =>'30%',
+                label         =>'WEB-Server',
+                dataobjattr   =>'system.is_webserver'),
+
                                                    
       new kernel::Field::Interface(
                 name          =>'systemcistatusid',

@@ -300,9 +300,15 @@ sub new
                 label         =>'TCOM Applicationname',
                 dataobjattr   =>'TCOM_appl.name'),
 
+     # new kernel::Field::Interface(  # kommt hinzu, sobald iwr die IDs von
+     #           name          =>'custnameid',  # IT-BaseCMDB
+     #           htmlwidth     =>'200px',
+     #           label         =>'TCOM Applicationname ID',
+     #           dataobjattr   =>'TCOM_appl.name'),
+
       new kernel::Field::SubList(
                 name          =>'custcontracts',
-                label         =>'Customer Contracts',
+                ysabel         =>'Customer Contracts',
                 group         =>'custcontracts',
                 nodetaillink  =>1,
                 vjointo       =>'itil::lnkapplcustcontract',
@@ -327,6 +333,8 @@ sub new
                                  'systemcistatusid',
                                  'isprod', 'isdevel', 'iseducation',
                                  'isapprovtest', 'isreference',
+                                 'isapplserver','isbackupsrv',
+                                 'isdatabasesrv','iswebserver',
                                  'osrelease',
                                  'shortdesc']),
    );
