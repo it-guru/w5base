@@ -36,65 +36,73 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->AddFields(
-      new kernel::Field::Linenumber(name     =>'linenumber',
-                                    label      =>'No.'),
+      new kernel::Field::Linenumber(
+                name          =>'linenumber',
+                label         =>'No.'),
 
-      new kernel::Field::Id(       name       =>'menuid',
-                                   label      =>'W5BaseID',
-                                   size       =>'10',
-                                   dataobjattr=>'menu.menuid'),
+      new kernel::Field::Id(
+                name          =>'menuid',
+                label         =>'W5BaseID',
+                size          =>'10',
+                dataobjattr   =>'menu.menuid'),
                                   
-      new kernel::Field::Text(     name       =>'fullname',
-                                   htmlwidth  =>'180',
-                                   label      =>'Fullname',
-                                   dataobjattr=>'menu.fullname'),
+      new kernel::Field::Text(
+                name          =>'fullname',
+                htmlwidth     =>'180',
+                label         =>'Fullname',
+                dataobjattr   =>'menu.fullname'),
 
-      new kernel::Field::Text(     name       =>'target',
-                                   label      =>'Target',
-                                   dataobjattr=>'menu.target'),
+      new kernel::Field::Text(
+                name          =>'target',
+                label         =>'Target',
+                dataobjattr   =>'menu.target'),
 
-      new kernel::Field::Text(     name       =>'prio',
-                                   label      =>'Prio',
-                                   dataobjattr=>'menu.prio'),
+      new kernel::Field::Text(
+                name          =>'prio',
+                label         =>'Prio',
+                dataobjattr   =>'menu.prio'),
 
-      new kernel::Field::Text(     name       =>'translation',
-                                   label      =>'Translation',
-                                   dataobjattr=>'menu.translation'),
+      new kernel::Field::Text(
+                name          =>'translation',
+                label         =>'Translation',
+                dataobjattr   =>'menu.translation'),
 
-      new kernel::Field::Text(     name       =>'func',
-                                   label      =>'Function',
-                                   dataobjattr=>'menu.func'),
+      new kernel::Field::Text(
+                name          =>'func',
+                label         =>'Function',
+                dataobjattr   =>'menu.func'),
 
-      new kernel::Field::Textarea( name       =>'param',
-                                   label      =>'Parameters',
-                                   dataobjattr=>'menu.param'),
+      new kernel::Field::Textarea(
+                name          =>'param',
+                label         =>'Parameters',
+                dataobjattr   =>'menu.param'),
 
-      new kernel::Field::Text(     name       =>'config',
-                                   label      =>'Config',
-                                   dataobjattr=>'menu.config'),
+      new kernel::Field::Text(
+                name          =>'config',
+                label         =>'Config',
+                dataobjattr   =>'menu.config'),
 
-      new kernel::Field::Select(   name       =>'useobjacl',
-                                   label      =>'use Object ACL',
-                                   htmleditwidth=>'20%',
-                                   transprefix   =>'useobjacl.',
-                                   default    =>'0',
-                                   uivisible  =>'0',
-                                   value      =>['0','1'],
-                                   dataobjattr=>'menu.useobjacl'),
+      new kernel::Field::Select(
+                name          =>'useobjacl',
+                label         =>'use Object ACL',
+                htmleditwidth =>'20%',
+                transprefix   =>'useobjacl.',
+                default       =>'0',
+                uivisible     =>'0',
+                value         =>['0','1'],
+                dataobjattr   =>'menu.useobjacl'),
 
-      new kernel::Field::SubList(   name       =>'acls',
-                                    xsearchable =>0,
-                                    label      =>'Accesscontrol',
-                                    subeditmsk =>'subedit.menu',
-                                    allowcleanup=>1,
-                                    group      =>'acl',
-                                    vjoininhash=>[qw(acltarget 
-                                                     acltargetid 
-                                                     aclmode)],
-                                    vjointo    =>'base::menuacl',
-                                    vjoinbase=>{'aclparentobj'=>$self->Self()},
-                                    vjoinon    =>['menuid'=>'refid'],
-                                    vjoindisp  =>['acltargetname','aclmode']),
+      new kernel::Field::SubList(
+                name          =>'acls',
+                label         =>'Accesscontrol',
+                subeditmsk    =>'subedit.menu',
+                allowcleanup  =>1,
+                group         =>'acl',
+                vjoininhash   =>[qw(acltarget acltargetid aclmode)],
+                vjointo       =>'base::menuacl',
+                vjoinbase     =>{'aclparentobj'=>$self->Self()},
+                vjoinon       =>['menuid'=>'refid'],
+                vjoindisp     =>['acltargetname','aclmode']),
 
    );
    $self->{defaultlimit}=999999;
@@ -164,7 +172,7 @@ sub isWriteValid
    my $oldrec=shift;
 
    return(qw(default)) if (!defined($oldrec));
-   return(qw(ALL));
+   return(qw(ALL)) if ($self->IsMemberOf("admin"));
    return(undef);
 }
 
@@ -173,7 +181,7 @@ sub isDeleteValid
    my $self=shift;
    my $oldrec=shift;
 
-   return(qw(ALL));
+   return(qw(ALL)) if ($self->IsMemberOf("admin"));
    return(undef);
 }
 
@@ -681,6 +689,28 @@ sub msel
    my $rootpath=Query->Param("RootPath");
    $fp=~s/\//./g;
    $fp=~s/"/./g;
+
+   my $wintitle="";
+   if (defined($mt->{fullname}->{$fp})){
+      my $m=$mt->{fullname}->{$fp};
+      my @msub;
+      my @mname;
+      foreach my $subm (split(/\./,$fp)){
+         push(@msub,$subm);
+         my $tag=join(".",@msub);
+         if (defined($mt->{fullname}->{$tag})){
+            my $trtext=$self->T($tag,$mt->{fullname}->{$tag}->{translation});
+            if ($trtext ne $tag){
+               push(@mname,$trtext);
+            }
+            else{
+               push(@mname,"?");
+            }
+         }
+      }
+      $wintitle=join(".",@mname);
+   }
+
    my $fpfine=$fp;
    $fpfine=~s/\./\//g;
    $fpfine="/".$fpfine if (!($fpfine=~m/^\//));
@@ -708,6 +738,11 @@ if (!(top.frames[0])){
    document.writeln("</form>");
    document.writeln("</base>");
    document.writeln("</html>");
+}
+else{
+   if ("$wintitle"!=""){
+      top.document.title="$wintitle";
+   }
 }
 </script>
 EOF
