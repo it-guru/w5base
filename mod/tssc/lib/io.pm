@@ -207,7 +207,7 @@ sub mkProblemStoreRec
    $wfrec{mandatorid}=$mandatorid;
    $wfrec{class}=$oldclass;
    if (defined($updateto) && $#{$aids}!=-1 && 
-       $oldclass eq "itil::workflow::change"){
+       $oldclass eq "itil::workflow::problem"){
       $wf->UpdateRecord({class=>'AL_TCom::workflow::problem'},
                         {id=>$updateto});
       #printf STDERR ("WARN: class changed on id $updateto\n");

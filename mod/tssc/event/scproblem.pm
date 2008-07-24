@@ -52,7 +52,7 @@ sub scproblem
    msg(DEBUG,"ServiceCenter prm is connected");
    $prm->SetCurrentView(qw(sysmodtime closetime problemnumber name description 
                            status assignedto priority impact urgency
-                           solution
+                           solution deviceid
                            createtime closetime srcid triggeredby
                            creator editor softwareid assignedto homeassignment
                            createtime type resources closecode));
