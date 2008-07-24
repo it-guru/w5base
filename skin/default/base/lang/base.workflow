@@ -50,6 +50,7 @@
 'wfstate.23'=>{de=>'23-fehlgeschlagen', en=>'23-failed'},
 'wfstate.24'=>{de=>'24-abgelehnt',      en=>'24-rejected'},
 'wfstate.25'=>{de=>'25-hinfällig',      en=>'25-obsolete'},
+'wfstate.26'=>{de=>'26-gelöscht',       en=>'26-deleted'},
 'requested action is not allowed'=>{de=>'die angeforderte operation ist nicht zulässig'},
 'You can add a shortcut of this anker %s to your bookmarks, to access faster to this workflow.'=>{de=>'Sie können sich eine Bookmark auf diesen Anker %s in Ihrem Browser speichern, um auf den Workflow schneller zugreifen zu können.'},
 'Fulltext'=>{de=>'Volltext Suche'},
