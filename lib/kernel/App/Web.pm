@@ -37,8 +37,8 @@ sub RunWebApp
 {
    my ($instdir,$configname)=@_;
 
-   binmode(STDOUT,':latin1');
-   binmode(STDERR,':latin1');
+   binmode(STDOUT,':raw');
+   binmode(STDERR,':raw');
 
    #printf STDERR ("WebDav=%s\n",Dumper(\%ENV));
    my $cgi=new kernel::cgi();
