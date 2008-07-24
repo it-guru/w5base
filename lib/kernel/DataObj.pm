@@ -1512,6 +1512,9 @@ sub getSubList
    my %opt=();
 
    my $pmode=$mode;
+   if (defined($param{ParentMode})){
+      $pmode=$param{ParentMode};
+   }
    $opt{SubListEdit}=1 if ($mode eq "HtmlSubListEdit");
    $mode="HtmlSubList" if ($mode=~m/^.{0,1}Html.*$/);
    $mode="SubXMLV01"   if ($mode=~m/XML/);

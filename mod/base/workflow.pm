@@ -1716,6 +1716,7 @@ sub getSubListData
    my $mode=shift;
    my %param=@_;
 
+   $param{ParentMode}=$mode;
    if ($mode=~m/^.{0,1}Html.*$/){
       $mode="WfShortActionlog";
    }

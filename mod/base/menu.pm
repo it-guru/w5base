@@ -700,12 +700,7 @@ sub msel
          my $tag=join(".",@msub);
          if (defined($mt->{fullname}->{$tag})){
             my $trtext=$self->T($tag,$mt->{fullname}->{$tag}->{translation});
-            if ($trtext ne $tag){
-               push(@mname,$trtext);
-            }
-            else{
-               push(@mname,"?");
-            }
+            push(@mname,$trtext);
          }
       }
       $wintitle=join(".",@mname);

@@ -86,7 +86,7 @@ sub getStyle
 
 sub ProcessHead
 {
-   my ($self,$fh)=@_;
+   my ($self,$fh,$param)=@_;
    my $app=$self->getParent->getParent();
    my $view=$app->getCurrentViewName();
    my @view=$app->getCurrentView();
@@ -97,10 +97,11 @@ sub ProcessHead
    #$d.="<script language=\"JavaScript\">";
    #$d.=$app->getTemplate("toolbox.js");
    #$d.="</script>\n\n";
-   $d.="<table width=100% style=\"table-layout:fixed\"><tr><td>".
-       "<div style=\"overflow:hidden\">\n";
-#   $d.="<table class=maintable>\n";
-   $d.="<tr><td class=mainblock>";
+   if ($param->{ParentMode} ne "HtmlV01"){
+      $d.="<table width=100% style=\"table-layout:fixed\"><tr><td>".
+          "<div style=\"overflow:hidden\">\n";
+      $d.="<tr><td class=mainblock>";
+   }
    $d.="<table class=subdatatable width=100%>\n<tr class=subheadline>";
    my $col=0;
    foreach my $f (qw(cdate name)){
@@ -300,7 +301,9 @@ EOF
       }
    }
    $d.=$self->StoreQuery();
-   $d.="</div></td></tr></table>";
+   if ($param->{ParentMode} ne "HtmlV01"){
+      $d.="</div></td></tr></table>";
+   }
    $d.="<a id=\"EndOfActionList\"></a>";
 
    return($d);

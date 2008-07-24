@@ -107,7 +107,7 @@ sub ProcessHead
       push(@sortnames,"String");
    }
    my $sortline=join(",",map({'"'.$_.'"'} @sortnames));
-   
+
    if ($param->{ParentMode} ne "HtmlV01"){
       $d.="<table width=100% style=\"table-layout:fixed\">".
           "<tr><td><div style=\"overflow:hidden\">\n";
