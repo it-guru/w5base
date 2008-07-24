@@ -5,3 +5,5 @@
 'sc.incident'=>{de=>'IncidentManagement',en=>'IncidentManagement'},
 'sc.incident.assignment'=>{de=>'Assignment',en=>'Assignment'},
 'sc.problem'=>{de=>'ProblemManagement',en=>'ProblemManagement'},
+'sc.krn'=>{de=>'Stammdaten',en=>'Kerneldata'},
+'sc.krn.mandator'=>{de=>'Mandanten',en=>'Mandator'},

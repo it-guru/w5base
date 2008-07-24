@@ -124,7 +124,7 @@ sub WriteToStdout
    my $app=$self->getParent();
    local *TMP;
 
-   binmode(STDOUT);
+   #binmode(STDOUT);   # test 24.07.2008 by hv
    open(TMP, "+>", undef);
    my $fh=\*TMP;
    my ($rec,$msg);

@@ -62,7 +62,15 @@ sub Init
    $self->RegisterObj("sc.problem",
                       "tssc::prm",
                       defaultacl=>['valid_user']);
-   
+
+   $self->RegisterObj("sc.krn",
+                      "tmpl/welcome",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("sc.krn.mandator",
+                      "tssc::mandator",
+                      defaultacl=>['valid_user']);
+
    return($self);
 }
 
