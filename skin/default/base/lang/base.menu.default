@@ -1,4 +1,4 @@
-'Tools'=>{de=>'Werkzeuge'},
+'Tools'=>{de=>'Werkzeuge',en=>'Tools'},
 'Tools.analytics'=>{de=>'Analytik',en=>'Analytics'},
 'Tools.XLSExpand'=>{de=>'XLSExpand',en=>'XLSExpand'},
 'Tools.projectroom'=>{de=>'Projektraum',en=>'Projectroom'},
