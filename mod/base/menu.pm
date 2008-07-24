@@ -700,6 +700,9 @@ sub msel
          my $tag=join(".",@msub);
          if (defined($mt->{fullname}->{$tag})){
             my $trtext=$self->T($tag,$mt->{fullname}->{$tag}->{translation});
+            if ($trtext eq $tag && $trtext=~m/\./){
+               $trtext=~s/^.*\.//;
+            }
             push(@mname,$trtext);
          }
       }
