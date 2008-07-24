@@ -192,7 +192,7 @@ sub getW5ACLocationname
    #
    delete($lrec{country}) if ($lrec{country} eq ""); 
    delete($lrec{zipcode}) if ($lrec{zipcode} eq ""); 
-   delete($lrec{label})   if ($lrec{label} eq ""); 
+   $lrec{label}=""        if (!defined($lrec{label}));
 
    if (!defined($lrec{country})){
       if ($aclocrec->{fullname}=~m/^\/DE[_-]/){
