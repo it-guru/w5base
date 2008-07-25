@@ -330,24 +330,11 @@ sub FinishDelete
    my $oldrec=shift;
    my $bak=$self->SUPER::FinishDelete($oldrec);
 
-   my $lnkgrpuser=getModuleObject($self->Config,"base::lnkgrpuser");
-   if (defined($lnkgrpuser)){
-      my $idname=$self->IdField->Name();
-      my $id=$oldrec->{$idname};
-      $lnkgrpuser->SetFilter({'grpid'=>$id});
-      $lnkgrpuser->SetCurrentView(qw(ALL));
-      $lnkgrpuser->ForeachFilteredRecord(sub{
-                         $lnkgrpuser->ValidatedDeleteRecord($_);
-                      });
-   }
-
-
-
    $self->InvalidateGroupCache();
    if (!$self->HandleCIStatus($oldrec,undef,%{$self->{CI_Handling}})){
       return(0);
    }
-   return($bak);
+   return($self->SUPER::FinishDelete($oldrec));
 }
 
 sub ValidateDelete
