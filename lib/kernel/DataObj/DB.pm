@@ -498,6 +498,10 @@ sub DeleteRecord
    msg(INFO,"delcmd=%s",$cmd);
    if ($workdb->do($cmd)){
       msg(INFO,"delete seems to be ok");
+      my $ehh=$self->LoadSubObjs("ObjectEventHandler","ObjectEventHandler");
+      foreach my $eh (values(%{$self->{ObjectEventHandler}})){
+         $eh->HandleEvent("DeleteRecord",$self->Self,$oldrec,undef,$dropid);
+      }
       return(1);
    }
    $self->LastMsg(ERROR,$self->preProcessDBmsg($workdb->getErrorMsg()));

@@ -453,61 +453,63 @@ sub LoadSubObjs
    my $extender=shift;
    my $hashkey=shift;
    $hashkey="SubDataObj" if (!defined($hashkey));
-   my $instdir=$self->Config->Param("INSTDIR");
-   my $pat="$instdir/mod/*/$extender/*.pm";
-   if ($extender=~m/\//){
-      $pat="$instdir/mod/*/$extender.pm";
-   }
-   my @sublist=glob($pat); 
-   @sublist=map({my $qi=quotemeta($instdir);
-                 $_=~s/^$instdir//;
-                 $_=~s/\/mod\///; 
-                 $_;
-                } @sublist);
-
-   my @disabled=glob("$instdir/mod/*.DISABLED"); 
-   @disabled=map({my $qi=quotemeta($instdir);
-                 $_=~s/^$instdir//;
-                 $_=~s/\/mod\///; 
-                 $_=~s/\.DISABLED//; 
-                 $_."/" if (!($_=~m/\.pm$/));
-                } @disabled);
-   foreach my $dis (@disabled){
-      @sublist=grep(!/^$dis/,@sublist);
-   }
-
-   @sublist=map({$_=~s/\.pm$//;
-                 $_=~s/\//::/g;
-                 $_;
-                } @sublist);
-   foreach my $modname (@sublist){
-      my $o=getModuleObject($self->Config,$modname);
-      if (defined($o)){
-         $o->setParent($self);
-         $self->{$hashkey}->{$modname}=$o;
-         if ($o->can("Init")){
-            if (!$o->Init()){
-               delete($self->{$hashkey}->{$modname});
-               $self->{"Inactiv".$hashkey}->{$modname}=$modname;
+   if (!defined($self->{$hashkey})){
+      my $instdir=$self->Config->Param("INSTDIR");
+      my $pat="$instdir/mod/*/$extender/*.pm";
+      if ($extender=~m/\//){
+         $pat="$instdir/mod/*/$extender.pm";
+      }
+      my @sublist=glob($pat); 
+      @sublist=map({my $qi=quotemeta($instdir);
+                    $_=~s/^$instdir//;
+                    $_=~s/\/mod\///; 
+                    $_;
+                   } @sublist);
+    
+      my @disabled=glob("$instdir/mod/*.DISABLED"); 
+      @disabled=map({my $qi=quotemeta($instdir);
+                    $_=~s/^$instdir//;
+                    $_=~s/\/mod\///; 
+                    $_=~s/\.DISABLED//; 
+                    $_."/" if (!($_=~m/\.pm$/));
+                   } @disabled);
+      foreach my $dis (@disabled){
+         @sublist=grep(!/^$dis/,@sublist);
+      }
+    
+      @sublist=map({$_=~s/\.pm$//;
+                    $_=~s/\//::/g;
+                    $_;
+                   } @sublist);
+      foreach my $modname (@sublist){
+         my $o=getModuleObject($self->Config,$modname);
+         if (defined($o)){
+            $o->setParent($self);
+            $self->{$hashkey}->{$modname}=$o;
+            if ($o->can("Init")){
+               if (!$o->Init()){
+                  delete($self->{$hashkey}->{$modname});
+                  $self->{"Inactiv".$hashkey}->{$modname}=$modname;
+               }
             }
          }
+         else{
+            msg(ERROR,"can't load $hashkey '%s' in '%s'",$modname,$self);
+            printf STDERR ("%s\n",$@);
+         }
       }
-      else{
-         msg(ERROR,"can't load $hashkey '%s' in '%s'",$modname,$self);
-         printf STDERR ("%s\n",$@);
+      my $inactiv="";
+      my $activ="";
+      if (keys(%{$self->{$hashkey}})){
+         $activ=sprintf(" activ=%s",join(", ",keys(%{$self->{$hashkey}}))); 
       }
-   }
-   my $inactiv="";
-   my $activ="";
-   if (keys(%{$self->{$hashkey}})){
-      $activ=sprintf(" activ=%s",join(", ",keys(%{$self->{$hashkey}}))); 
-   }
-   if (keys(%{$self->{"Inactiv".$hashkey}})){
-      $activ=sprintf(" inactiv=%s",
-                     join(", ",keys(%{$self->{"Inactiv".$hashkey}}))); 
-   }
-   if ($activ ne "" || $inactiv ne ""){
-      #msg(INFO,"LoadSubObjs($self - $hashkey): $activ$inactiv");
+      if (keys(%{$self->{"Inactiv".$hashkey}})){
+         $activ=sprintf(" inactiv=%s",
+                        join(", ",keys(%{$self->{"Inactiv".$hashkey}}))); 
+      }
+      if ($activ ne "" || $inactiv ne ""){
+         #msg(INFO,"LoadSubObjs($self - $hashkey): $activ$inactiv");
+      }
    }
    return(keys(%{$self->{$hashkey}}));
 }

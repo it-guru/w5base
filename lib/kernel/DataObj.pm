@@ -990,6 +990,35 @@ sub ForeachFilteredRecord
    return(1);
 }
 
+sub DeleteAllFilteredRecords
+{
+   my $self=shift;
+   my $method=shift;
+   my $idobj=$self->IdField();
+   my $ncount;
+   if (defined($idobj)){
+      my $idname=$idobj->Name();
+      $self->SetCurrentView(qw(ALL));
+      $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+      my ($rec,$msg)=$self->getFirst();
+      if (defined($rec)){
+         do{
+            if ($method eq "SecureValidatedDeleteRecord"){
+               $self->SecureValidatedDeleteRecord($rec);
+               $ncount++;
+            }
+            if ($method eq "ValidatedDeleteRecord"){
+               $self->ValidatedDeleteRecord($rec);
+               $ncount++;
+            }
+            ($rec,$msg)=$self->getNext();
+            return($ncount) if (!defined($rec));
+         }until(!defined($rec));
+      }
+   }
+   return($ncount);
+}
+
 sub SecureValidatedDeleteRecord
 {
    my $self=shift;
