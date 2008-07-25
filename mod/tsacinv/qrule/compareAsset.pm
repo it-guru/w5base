@@ -186,6 +186,7 @@ sub getW5ACLocationname
    $lrec{location}=$aclocrec->{location};
    $lrec{zipcode}=$aclocrec->{zipcode};
    $lrec{country}=$aclocrec->{country};
+   $lrec{cistatusid}=4;
 
    #
    # pre process aclocation 

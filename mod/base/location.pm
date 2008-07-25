@@ -338,7 +338,7 @@ sub Validate
    $name=~s/\xD6/Oe/g;
    $name=~s/\xC4/Ae/g;
    $name=~s/\xDF/ss/g;
-   $name=~s/[\s\/]/_/g;
+   $name=~s/[\s\/,]+/_/g;
    $newrec->{'name'}=$name;
 
    return(1);
@@ -356,8 +356,10 @@ sub Normalize
       $rec->{address1}="Karl-Marx-Stra\xDFe 109-113";
    }
    if (defined($rec->{address1})){
+      $rec->{address1}=~s/([a-z])(\d)/$1 $2/gi;
       $rec->{address1}=~s/Memmelsdorferstr.*e/Memmelsdorfer Stra\xDFe/g;
       $rec->{address1}=~s/Luebecker\s+/L\xFCbecker /g;
+      $rec->{address1}=~s/Willy Brandt Platz/Willy.Brandt.Platz/g;
       $rec->{address1}=~s/([S|s])tr\./$1tra\xDFe/g;
       $rec->{address1}=~s/([S|s])trasse/$1tra\xDFe/g;
       $rec->{address1}=~s/([S|s])ttrasse/$1tra\xDFe/g;
