@@ -22,6 +22,7 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use Data::HexDump;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -331,13 +332,13 @@ sub Validate
    $name.=($name ne "" && $location ne "" ? "." : "").$location;
    $name.=($name ne "" && $address1 ne "" ? "." : "").$address1;
    $name.=($name ne "" && $label    ne "" ? "." : "").$label;
-   $name=~s/ü/ue/g;
-   $name=~s/ö/oe/g;
-   $name=~s/ä/ae/g;
-   $name=~s/Ü/Ue/g;
-   $name=~s/Ö/Oe/g;
-   $name=~s/Ä/Ae/g;
-   $name=~s/ß/ss/g;
+   $name=~s/\xFC/ue/g;
+   $name=~s/\xF6/oe/g;
+   $name=~s/\xE4/ae/g;
+   $name=~s/\xDC/Ue/g;
+   $name=~s/\xD6/Oe/g;
+   $name=~s/\xC4/Ae/g;
+   $name=~s/\xDF/ss/g;
    $name=~s/[\s\/]/_/g;
    $newrec->{'name'}=$name;
 
@@ -350,17 +351,17 @@ sub Normalize
    my $rec=shift;
 
    if ($rec->{address1}=~m/ALTE POTSDAMER.*7/){
-      $rec->{address1}="Alte Potsdamer Straße 7";
+      $rec->{address1}="Alte Potsdamer Stra\xDFe 7";
    }
-   if ($rec->{address1}=~m/Karl-Marx-Straße109-113/i){
-      $rec->{address1}="Karl-Marx-Straße 109-113";
+   if ($rec->{address1}=~m/Karl-Marx-Stra\xDFe109-113/i){
+      $rec->{address1}="Karl-Marx-Stra\xDFe 109-113";
    }
    if (defined($rec->{address1})){
-      $rec->{address1}=~s/Memmelsdorferstr.*e/Memmelsdorfer Straße/g;
-      $rec->{address1}=~s/([S|s])tr\./$1traße/g;
-      $rec->{address1}=~s/([S|s])trasse/$1traße/g;
-      $rec->{address1}=~s/([S|s])ttrasse/$1traße/g;
-      $rec->{address1}=~s/([S|s])ttraße/$1traße/g;
+      $rec->{address1}=~s/Memmelsdorferstr.*e/Memmelsdorfer Stra\xDFe/g;
+      $rec->{address1}=~s/([S|s])tr\./$1tra\xDFe/g;
+      $rec->{address1}=~s/([S|s])trasse/$1tra\xDFe/g;
+      $rec->{address1}=~s/([S|s])ttrasse/$1tra\xDFe/g;
+      $rec->{address1}=~s/([S|s])ttra\xDFe/$1tra\xDFe/g;
       $rec->{address1}=~s/(\d)\s([a-z])$/$1$2/i;
       $rec->{address1}=trim($rec->{address1});
    }
@@ -371,10 +372,10 @@ sub Normalize
       $rec->{label}="T-Systems SCZ Mitte"   if ($rec->{label}=~m/SCZ Mitte/);
       $rec->{label}="T-Systems SCZ Ost"    if ($rec->{label}=~m/Magdeburg SCZ/);
       $rec->{label}="T-Systems SCZ Nord"    if ($rec->{label}=~m/SCZ Nord/);
-      $rec->{label}="T-Systems SCZ Südwest" if ($rec->{label}=~m/SCZ Südwest/);
-      $rec->{label}="T-Systems SCZ Südwest" if ($rec->{label}=~m/SCZ Suedwest/);
-      $rec->{label}="T-Systems SCZ Süd"     if ($rec->{label}=~m/SCZ Süd/);
-      $rec->{label}="T-Systems SCZ Süd"     if ($rec->{label}=~m/SCZ Sued/);
+      $rec->{label}="T-Systems SCZ S\xFCdwest" if ($rec->{label}=~m/SCZ S\xFCdwest/);
+      $rec->{label}="T-Systems SCZ S\xFCdwest" if ($rec->{label}=~m/SCZ Suedwest/);
+      $rec->{label}="T-Systems SCZ S\xFCd"     if ($rec->{label}=~m/SCZ S\xFCd/);
+      $rec->{label}="T-Systems SCZ S\xFCd"     if ($rec->{label}=~m/SCZ Sued/);
       $rec->{label}="T-Systems SCZ West"    if ($rec->{label}=~m/SCZ West/);
       $rec->{label}="T-Punkt"               if ($rec->{label}=~m/T-Punkt/);
       $rec->{label}=""     if ($rec->{label}=~m/Bamberg Memmelsdorfer/);
@@ -383,13 +384,13 @@ sub Normalize
       $rec->{location}="Berlin";
    }
    if ($rec->{address1}=~m/Gutenberg.*$/ && $rec->{location} eq "Bamberg"){
-      $rec->{label}="T-Systems SCZ Süd";
+      $rec->{label}="T-Systems SCZ S\xFCd";
    }
    if ($rec->{address1}=~m/Hauptwach.*$/ && $rec->{location} eq "Bamberg"){
       $rec->{label}="T-Punkt";
    }
-   if ($rec->{address1}=~m/Salamander.*$/ && $rec->{location} eq "Göppingen"){
-      $rec->{label}="T-Systems SCZ Südwest";
+   if ($rec->{address1}=~m/Salamander.*$/ && $rec->{location} eq "G\xF6ppingen"){
+      $rec->{label}="T-Systems SCZ S\xFCdwest";
    }
    if ($rec->{address1}=~m/Fichtenhain.*10.*/ && $rec->{location} eq "Krefeld"){
       $rec->{address1}="Europapark Fichtenhain B 10";
@@ -416,6 +417,7 @@ sub getLocationByHash
    return(undef) if ($req{country}=~m/^\s*$/);
    return(undef) if ($req{location}=~m/^\s*$/);
    msg(INFO,"getLocationByHash=%s",Dumper(\%req));
+
 #   if (defined($req{srcid}) && defined($req{srcsys})){
 #      $self->ResetFilter();
 #      $self->SetFilter({'srcsys'=>\$req{srcsys},srcid=>\$req{srcid}});

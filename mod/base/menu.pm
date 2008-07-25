@@ -859,7 +859,7 @@ sub MenuTab
       }
    }
 #printf STDERR ("l=%s\n",Dumper($mt));
-   $d.=BuildHtmlTree(tree     => \@modmlist,
+   $d.=kernel::MenuTree::BuildHtmlTree(tree     => \@modmlist,
                      hrefclass=>'menulink',
                      rootlink =>$rootlink,
                      rootpath => $rootpath);
