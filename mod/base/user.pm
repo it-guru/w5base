@@ -709,13 +709,6 @@ sub FinishDelete
    if (!$self->HandleCIStatus($oldrec,undef,%{$self->{CI_Handling}})){
       return(0);
    }
-#   my $infoabo=getModuleObject($self->Config,"base::infoabo");
-#   if (defined($infoabo)){
-#      my $idname=$self->IdField->Name();
-#      my $id=$oldrec->{$idname};
-#      $infoabo->SetFilter({'userid'=>\$id});
-#      my $nresult=$infoabo->DeleteAllFilteredRecords("ValidatedDeleteRecord");
-#   }
    $self->NotifyAddOrRemoveObject($oldrec,undef,"fullname",
                                   "STEVuserchanged",110000001);
    return($self->SUPER::FinishDelete($oldrec));
