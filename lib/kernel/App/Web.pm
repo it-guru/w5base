@@ -1083,7 +1083,10 @@ EOF
       my $shorticon=$param{'shorticon'};
       $d.="<link rel=\"shortcut icon\" ".
           "href=\"$param{prefix}$param{base}../../../public/base/".
-          "load/$shorticon\"></link>\n";
+          "load/$shorticon\" type=\"image/x-icon\"></link>\n";
+      $d.="<link rel=\"icon\" ".
+          "href=\"$param{prefix}$param{base}../../../public/base/".
+          "load/$shorticon\" type=\"image/x-icon\"></link>\n";
    }
    my $charset="ISO-8859-1";
    $charset=$param{charset} if (defined($param{charset}));
