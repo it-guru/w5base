@@ -105,7 +105,7 @@ function load() {
      if (GBrowserIsCompatible()) {
        map$id = new GMap2(document.getElementById("googlemap$id"));
        geocoder$id = new GClientGeocoder();
-       window.setTimeout("showAddress$id(\\"$address\\");",100);
+       window.setTimeout("showAddress$id(\\"$address\\");",200);
        addEvent(window, "unload",GUnload);
      }
   }

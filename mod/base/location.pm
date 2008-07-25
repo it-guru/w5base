@@ -35,10 +35,10 @@ sub new
       my $self=shift;
       my $current=shift;
       my $a="";
-      $a.=" ".$current->{country};
-      $a.=" ".$current->{zipcode};
-      $a.=" ".$current->{location};
-      $a.=" ".$current->{address1};
+      $a.=($a eq "" ? "" : " ").$current->{country};
+      $a.=($a eq "" ? "" : " ").$current->{zipcode};
+      $a.=($a eq "" ? "" : " ").$current->{location};
+      $a.=($a eq "" ? "" : " ").$current->{address1};
       return($a);
    }
 
@@ -323,6 +323,10 @@ sub Validate
    }
 
    my $name="";
+   $country=~s/\.//g;
+   $location=~s/\.//g;
+   $address1=~s/\.//g;
+   $label=~s/\.//g;
    $name.=($name ne "" && $country  ne "" ? "." : "").$country;
    $name.=($name ne "" && $location ne "" ? "." : "").$location;
    $name.=($name ne "" && $address1 ne "" ? "." : "").$address1;
@@ -334,7 +338,7 @@ sub Validate
    $name=~s/Ö/Oe/g;
    $name=~s/Ä/Ae/g;
    $name=~s/ß/ss/g;
-   $name=~s/\s/_/g;
+   $name=~s/[\s\/]/_/g;
    $newrec->{'name'}=$name;
 
    return(1);
@@ -390,6 +394,12 @@ sub Normalize
    if ($rec->{address1}=~m/Fichtenhain.*10.*/ && $rec->{location} eq "Krefeld"){
       $rec->{address1}="Europapark Fichtenhain B 10";
       $rec->{label}="T-Systems SCZ West";
+   }
+   if (($rec->{location}=~m/^frankfurt am main$/i) ||
+       ($rec->{location}=~m/^frankfurt\/m$/i) ||
+       ($rec->{location}=~m/^frankfurt$/i) ||
+       ($rec->{location}=~m/^frankfurt a\.m\.$/i)){
+      $rec->{location}="Frankfurt/Main";
    }
    $rec->{country}=trim($rec->{country});
    $rec->{label}=trim($rec->{label});

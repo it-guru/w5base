@@ -382,7 +382,7 @@ sub generateMailSet
          }
          if ($v ne ""){
             if ($field eq "wffields.eventstatclass" &&
-                $v eq "1" || $v eq "2"){
+               ( $v eq "1" || $v eq "2") && $action ne "rootcausei"){
                $$allowsms=1
             }
             if (grep(/^$field$/,qw(wffields.eventstartofevent 

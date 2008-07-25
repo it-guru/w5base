@@ -123,6 +123,11 @@ sub new
                 dataobjattr   =>'decode(amasset.lmemorysizemb,0,NULL,'.
                                 'amasset.lmemorysizemb)'),
 
+      new kernel::Field::Text(
+                name          =>'cputype',
+                label         =>'Asset CPU type',
+                dataobjattr   =>'amasset.cputype'),
+
       new kernel::Field::Float(
                 name          =>'cpucount',
                 label         =>'Asset CPU count',
