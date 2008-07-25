@@ -22,7 +22,6 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
-use Data::HexDump;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new

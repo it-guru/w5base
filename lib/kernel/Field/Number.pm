@@ -83,7 +83,6 @@ sub Unformat
    my $self=shift;
    my $formated=shift;
    my $rec=shift;
-   printf STDERR ("fifi unformat of %s = %s\n",$self->Name(),Dumper($formated));
    if (defined($formated)){
       return(undef) if (!defined($formated->[0]));
       $formated=trim($formated->[0]) if (ref($formated) eq "ARRAY");
@@ -100,7 +99,6 @@ sub Unformat
          return(undef);
       }
       $d=~s/\.$//;
-      printf STDERR ("fifi formated=%s d=$d\n",Dumper($formated));
      # if ($formated ne "" && $d eq ""){
      #    return(undef);
      # }
