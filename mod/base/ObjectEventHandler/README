@@ -1,0 +1,7 @@
+ObjectEventHandler Description
+
+The Method "HandleEvent" is called by DataObj.pm Objects.
+
+Functional Events:  DeleteRecord
+
+Planned: GetReferenceCount, GetReferences, UpdateRecord, InsertRecord
