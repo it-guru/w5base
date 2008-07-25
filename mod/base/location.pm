@@ -358,6 +358,7 @@ sub Normalize
    }
    if (defined($rec->{address1})){
       $rec->{address1}=~s/Memmelsdorferstr.*e/Memmelsdorfer Stra\xDFe/g;
+      $rec->{address1}=~s/Luebecker\s+/L\xFCbecker /g;
       $rec->{address1}=~s/([S|s])tr\./$1tra\xDFe/g;
       $rec->{address1}=~s/([S|s])trasse/$1tra\xDFe/g;
       $rec->{address1}=~s/([S|s])ttrasse/$1tra\xDFe/g;
@@ -365,19 +366,24 @@ sub Normalize
       $rec->{address1}=~s/(\d)\s([a-z])$/$1$2/i;
       $rec->{address1}=trim($rec->{address1});
    }
-   #if (!defined($rec->{country}) || $rec->{country} eq ""){
-   #   $rec->{country}="DE";
-   #}
    if (defined($rec->{label})){
       $rec->{label}="T-Systems SCZ Mitte"   if ($rec->{label}=~m/SCZ Mitte/);
-      $rec->{label}="T-Systems SCZ Ost"    if ($rec->{label}=~m/Magdeburg SCZ/);
       $rec->{label}="T-Systems SCZ Nord"    if ($rec->{label}=~m/SCZ Nord/);
-      $rec->{label}="T-Systems SCZ S\xFCdwest" if ($rec->{label}=~m/SCZ S\xFCdwest/);
-      $rec->{label}="T-Systems SCZ S\xFCdwest" if ($rec->{label}=~m/SCZ Suedwest/);
-      $rec->{label}="T-Systems SCZ S\xFCd"     if ($rec->{label}=~m/SCZ S\xFCd/);
-      $rec->{label}="T-Systems SCZ S\xFCd"     if ($rec->{label}=~m/SCZ Sued/);
       $rec->{label}="T-Systems SCZ West"    if ($rec->{label}=~m/SCZ West/);
       $rec->{label}="T-Punkt"               if ($rec->{label}=~m/T-Punkt/);
+      if ($rec->{label}=~m/Magdeburg SCZ/){
+         $rec->{label}="T-Systems SCZ Ost";
+      }
+      if ($rec->{label}=~m/SCZ S\xFCdwest/){
+         $rec->{label}="T-Systems SCZ S\xFCdwest";
+      }
+      if ($rec->{label}=~m/SCZ Suedwest/){
+         $rec->{label}="T-Systems SCZ S\xFCdwest";
+      }
+      if ($rec->{label}=~m/SCZ S\xFCd$/ ||
+          $rec->{label}=~m/SCZ Sued$/){
+         $rec->{label}="T-Systems SCZ S\xFCd";
+      }
       $rec->{label}=""     if ($rec->{label}=~m/Bamberg Memmelsdorfer/);
    }
    if ($rec->{location}=~m/^berlin$/i){
@@ -389,10 +395,12 @@ sub Normalize
    if ($rec->{address1}=~m/Hauptwach.*$/ && $rec->{location} eq "Bamberg"){
       $rec->{label}="T-Punkt";
    }
-   if ($rec->{address1}=~m/Salamander.*$/ && $rec->{location} eq "G\xF6ppingen"){
+   if ($rec->{address1}=~m/Salamander.*$/ && 
+       $rec->{location} eq "G\xF6ppingen"){
       $rec->{label}="T-Systems SCZ S\xFCdwest";
    }
-   if ($rec->{address1}=~m/Fichtenhain.*10.*/ && $rec->{location} eq "Krefeld"){
+   if ($rec->{address1}=~m/Fichtenhain.*10.*/ && 
+       $rec->{location} eq "Krefeld"){
       $rec->{address1}="Europapark Fichtenhain B 10";
       $rec->{label}="T-Systems SCZ West";
    }
