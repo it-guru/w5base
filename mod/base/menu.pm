@@ -707,6 +707,14 @@ sub msel
          }
       }
       $wintitle=join(".",@mname);
+      my $sitename=$self->Config->Param("SITENAME");
+      if ($sitename eq ""){
+         $sitename=$self->Config->getCurrentConfigName();
+      }
+      my $siteopmode;
+      if ($wintitle ne "" && (($siteopmode)=$sitename=~m/\((.+)\)$/)){
+         $wintitle=$siteopmode.":".$wintitle;
+      }
    }
 
    my $fpfine=$fp;
