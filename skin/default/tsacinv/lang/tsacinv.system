@@ -14,7 +14,7 @@
 'Usage'=>{de=>'Verwendung'},
 'Type'=>{de=>'Systemart'},
 'System Part of Asset'=>{de=>'Sytemanteil an der Hardware'},
-'CO-Number'=>{de=>'Kostenstelle'},
+'CO-Number'=>{de=>'Kostenstelle/CO-Nummer'},
 'Applications'=>{de=>'Anwendungen'},
 'ApplicationIDs'=>{de=>'Anwendungs IDs'},
 'fieldgroup.w5basedata'=>{de=>'W5Base/Darwin Daten',

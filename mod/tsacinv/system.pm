@@ -73,7 +73,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'cocustomeroffice',
-                label         =>'CO-Number/Customer Office',
+                label         =>'Customer Office',
                 size          =>'20',
                 dataobjattr   =>'amcostcenter.customeroffice'),
 
