@@ -14,3 +14,4 @@
 'longitude'=>{de=>'Längengrad'},
 'Location responsible'=>{de=>'Standortverantwortlicher'},
 'Deputy location responsible'=>{de=>'Standortverantwortlicher Vetreter'},
+"invalid zipcode '\%s'"=>{de=>"ungültige Postleitzahl '\%s'"},

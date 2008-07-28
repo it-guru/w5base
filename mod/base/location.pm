@@ -314,7 +314,7 @@ sub Validate
    my $address1=trim(effVal($oldrec,$newrec,"address1"));
    my $zipcode=trim(effVal($oldrec,$newrec,"zipcode"));
    if ($zipcode ne "" && !($zipcode=~m/^\d{4,6}$/)){
-      $self->LastMsg(ERROR,"invalid zipcode");
+      $self->LastMsg(ERROR,"invalid zipcode '\%s'",$zipcode);
       return(0);
    }
    if ($location eq ""){
@@ -425,6 +425,7 @@ sub getLocationByHash
 
    return(undef) if ($req{country}=~m/^\s*$/);
    return(undef) if ($req{location}=~m/^\s*$/);
+   return(undef) if ($req{address1}=~m/^\s*$/);
    msg(INFO,"getLocationByHash=%s",Dumper(\%req));
 
 #   if (defined($req{srcid}) && defined($req{srcsys})){
