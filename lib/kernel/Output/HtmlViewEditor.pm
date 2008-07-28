@@ -212,6 +212,7 @@ function DoAdd()
    document.forms[0].target="_self";
    document.forms[0].submit();
 }
+
 function DoDel()
 {
    if (confirm("$delconfirm")){
@@ -274,6 +275,7 @@ function RowsDel(delary)
    var d=document.getElementById("NewCurrentView");
    if (delary.constructor.toString().indexOf(Array) == -1) {
       d.remove(delary);
+      inittree('tree_route');
    }else{
       for(var i=0;i<delary.length;++i){
          d.remove(delary[i]);
@@ -468,11 +470,6 @@ sub getFullFieldTreeSelect
 
    return($d);
 }
-
-
-
-
-
 
 sub getHttpFooter
 {  

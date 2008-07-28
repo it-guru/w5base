@@ -18,11 +18,10 @@ package kernel::MenuTree;
 #
 use strict;
 use vars qw(@ISA @EXPORT);
-use Exporter;
-use kernel;
-use Data::Dumper;
-use XML::Smart;
 use UNIVERSAL;
+use kernel;
+use Exporter;
+use XML::Smart;
 @EXPORT=qw(&BuildHtmlTree);
 
 
