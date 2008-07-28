@@ -2168,7 +2168,10 @@ sub dbQuote
       $str=~s/\?/_/g;
       $str=~s/\[\|%\|\]/*/g;  # to allow \* searchs (see parse_line above)
    }
-   return($sqlparam{sqldbh}->quote($str)) if defined($sqlparam{sqldbh});
+   if (defined($sqlparam{sqldbh})){
+      my $str=$sqlparam{sqldbh}->quote($str);
+      return($str);
+   }
    return("'".$str."'");
 
 }
