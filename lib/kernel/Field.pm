@@ -114,6 +114,7 @@ sub new
    }
    if (!defined($self->{valign})){
       $self->{valign}="center";
+      $self->{valign}="top";
    }
    if (!defined($self->{grouplabel})){
       $self->{grouplabel}=1;

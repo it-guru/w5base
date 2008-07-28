@@ -38,9 +38,24 @@ sub HandleEvent
    my $object=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   my $id=shift;
 
+   if ($object eq "base::user" && $event eq "UpdateRecord"){
+      my $oldcistatusid=$oldrec->{cistatusid};
+      my $newcistatusid=$newrec->{cistatusid};
+      if (defined($newcistatusid) && $newcistatusid==6 &&
+          $oldcistatusid!=6){ # delete infoabos if user is set disposed of wast
+         my $idobj=$self->getParent->IdField();
+         my $id=$idobj->RawValue($oldrec);
+         my $infoabo=getModuleObject($self->getParent->Config,"base::infoabo");
+         if (defined($infoabo)){
+            $infoabo->SetFilter({'userid'=>\$id});
+            my $nr=$infoabo->DeleteAllFilteredRecords("ValidatedDeleteRecord");
+         }
+      }
+   }
    if ($object eq "base::user" && $event eq "DeleteRecord"){
+      my $idobj=$self->getParent->IdField();
+      my $id=$idobj->RawValue($oldrec);
       my $infoabo=getModuleObject($self->getParent->Config,"base::infoabo");
       if (defined($infoabo)){
          $infoabo->SetFilter({'userid'=>\$id});

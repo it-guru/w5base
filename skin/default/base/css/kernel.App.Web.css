@@ -51,7 +51,7 @@ table.buttonframe{
 }
 
 tr.fline{
-   height:25px;
+   height:24px;
 }
 
 td.fname{
@@ -59,6 +59,7 @@ td.fname{
    border-style:solid;
    border-width:1px;
    border-color:silver;
+   padding-top:4px;
    padding-left:4px;
    padding-right:5px;
    font-weight:bold;

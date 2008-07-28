@@ -51,6 +51,12 @@ sub new
                 dataobjattr   =>'cm3rm1.brief_description'),
 
       new kernel::Field::Text(
+                name          =>'location',
+                label         =>'Location',
+                ignorecase    =>1,
+                dataobjattr   =>'cm3rm1.location_code'),
+
+      new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
                 htmlwidth     =>20,

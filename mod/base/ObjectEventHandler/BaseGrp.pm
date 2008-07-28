@@ -38,9 +38,10 @@ sub HandleEvent
    my $object=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   my $id=shift;
 
    if ($object eq "base::grp" && $event eq "DeleteRecord"){
+      my $idobj=$self->getParent->IdField();
+      my $id=$idobj->RawValue($oldrec);
       my $ldataobj=getModuleObject($self->getParent->Config,"base::lnkgrpuser");
       if (defined($ldataobj)){
          $ldataobj->SetFilter({'grpid'=>\$id});

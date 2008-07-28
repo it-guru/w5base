@@ -856,6 +856,10 @@ sub ValidatedInsertRecord
          if ($self->Validate(undef,$newrec)){
             $self->finishWriteRequestHash(undef,$newrec);
             my $bak=$self->InsertRecord($newrec);
+            $self->LoadSubObjs("ObjectEventHandler","ObjectEventHandler");
+            foreach my $eh (values(%{$self->{ObjectEventHandler}})){
+               $eh->HandleEvent("InsertRecord",$self->Self,undef,$newrec);
+            }
             $self->FinishWrite(undef,$newrec) if ($bak);
             $self->DBTransactionEnd($bak);
             return($bak);
@@ -930,6 +934,10 @@ sub ValidatedUpdateRecord
             $self->finishWriteRequestHash($oldrec,$validatednewrec);
             my $bak=$self->UpdateRecord($validatednewrec,@filter);
             if ($bak){
+               $self->LoadSubObjs("ObjectEventHandler","ObjectEventHandler");
+               foreach my $eh (values(%{$self->{ObjectEventHandler}})){
+                  $eh->HandleEvent("UpdateRecord",$self->Self,$oldrec,$newrec);
+               }
                $self->FinishWrite($oldrec,$validatednewrec,\%comprec);
                $self->StoreUpdateDelta($oldrec,\%comprec) if ($bak);
                foreach my $v (keys(%$newrec)){
@@ -1042,7 +1050,12 @@ sub ValidatedDeleteRecord
 
    $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
    my $bak=$self->DeleteRecord($oldrec);
+   $self->LoadSubObjs("ObjectEventHandler","ObjectEventHandler");
+   foreach my $eh (values(%{$self->{ObjectEventHandler}})){
+      $eh->HandleEvent("DeleteRecord",$self->Self,$oldrec,undef);
+   }
    $self->FinishDelete($oldrec) if ($bak); 
+
    return($bak);
 }
 sub DeleteRecord
