@@ -73,6 +73,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'cocustomeroffice',
+                searchable    =>0,
                 label         =>'Customer Office',
                 size          =>'20',
                 dataobjattr   =>'amcostcenter.customeroffice'),
@@ -160,6 +161,12 @@ sub new
                 unit          =>'MHz',
                 precision     =>0,
                 dataobjattr   =>'amcomputer.lcpuspeedmhz'),
+
+      new kernel::Field::Text(
+                name          =>'systemcputype',
+                label         =>'System CPU type',
+                unit          =>'MHz',
+                dataobjattr   =>'amcomputer.cputype'),
 
       new kernel::Field::Float(
                 name          =>'systemmemory',

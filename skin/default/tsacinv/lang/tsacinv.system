@@ -9,6 +9,7 @@
 'Cost allocation active'=>{de=>'interne Leistungsverrechung aktiv'},
 'System CPU count'=>{de=>'CPU Anzahl'},
 'System CPU speed'=>{de=>'CPU Taktfrequenz'},
+'System CPU type'=>{de=>'CPU Typ'},
 'System Memory'=>{de=>'Arbeitsspeicher'},
 'System OS'=>{de=>'Betriebssystem'},
 'Usage'=>{de=>'Verwendung'},
