@@ -28,6 +28,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->AddFields(
@@ -50,6 +51,35 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'cm3rm1.brief_description'),
 
+      new kernel::Field::Date(
+                name          =>'cdate',
+                timezone      =>'CET',
+                label         =>'Created',
+                dataobjattr   =>'cm3rm1.orig_date_entered'),
+
+      new kernel::Field::Date(
+                name          =>'plannedstart',
+                timezone      =>'CET',
+                label         =>'Planed Start',
+                dataobjattr   =>'cm3rm1.planned_start'),
+
+      new kernel::Field::Date(
+                name          =>'plannedend',
+                timezone      =>'CET',
+                label         =>'Planed End',
+                dataobjattr   =>'cm3rm1.planned_end'),
+
+      new kernel::Field::Duration(
+                name          =>'plannedduration',
+                label         =>'Planed Duration',
+                depend        =>[qw(plannedstart plannedend)]),
+
+      new kernel::Field::Text(
+                name          =>'status',
+                label         =>'Status',
+                htmlwidth     =>20,
+                dataobjattr   =>'cm3rm1.status'),
+
       new kernel::Field::Text(
                 name          =>'location',
                 label         =>'Location',
@@ -60,12 +90,6 @@ sub new
                 name          =>'rawlocation',
                 label         =>'raw Location',
                 dataobjattr   =>'cm3rm1.location_code'),
-
-      new kernel::Field::Text(
-                name          =>'status',
-                label         =>'Status',
-                htmlwidth     =>20,
-                dataobjattr   =>'cm3rm1.status'),
 
       new kernel::Field::Text(
                 name          =>'softwareid',
@@ -99,6 +123,11 @@ sub new
                 vjoinon       =>['changenumber'=>'changenumber'],
                 vjoindisp     =>[qw(name)]),
 
+      new kernel::Field::Text(
+                name          =>'srcid',
+                label         =>'Extern Change ID',
+                dataobjattr   =>'cm3rm1.ex_number'),
+
       new kernel::Field::SubList(
                 name          =>'approvalsreq',
                 label         =>'Approvals Required',
@@ -116,29 +145,6 @@ sub new
                 vjointo       =>'tssc::chm_approvedgrp',
                 vjoinon       =>['changenumber'=>'changenumber'],
                 vjoindisp     =>[qw(name)]),
-
-      new kernel::Field::Date(
-                name          =>'cdate',
-                timezone      =>'CET',
-                label         =>'Created',
-                dataobjattr   =>'cm3rm1.orig_date_entered'),
-
-      new kernel::Field::Date(
-                name          =>'plannedstart',
-                timezone      =>'CET',
-                label         =>'Planed Start',
-                dataobjattr   =>'cm3rm1.planned_start'),
-
-      new kernel::Field::Date(
-                name          =>'plannedend',
-                timezone      =>'CET',
-                label         =>'Planed End',
-                dataobjattr   =>'cm3rm1.planned_end'),
-
-      new kernel::Field::Duration(
-                name          =>'plannedduration',
-                label         =>'Planed Duration',
-                depend        =>[qw(plannedstart plannedend)]),
 
       new kernel::Field::Textarea(
                 name          =>'description',
@@ -254,11 +260,6 @@ sub new
                 label         =>'Close Code',
                 dataobjattr   =>'cm3rm1.close_code_accept'),
 
-      new kernel::Field::Text(
-                name          =>'srcid',
-                label         =>'Extern Change ID',
-                dataobjattr   =>'cm3rm1.ex_number'),
-
       new kernel::Field::Date(
                 name          =>'workstart',
                 depend        =>['status'],
@@ -348,6 +349,18 @@ sub new
                             status name));
    return($self);
 }
+
+sub initSearchQuery
+{
+   my $self=shift;
+   my $nowlabel=$self->T("now","kernel::App");
+
+   if (!defined(Query->Param("search_plannedend"))){
+     Query->Param("search_plannedend"=>">$nowlabel AND <$nowlabel+2M");
+   }
+}
+
+
 
 sub Initialize
 {
