@@ -1002,6 +1002,24 @@ sub noAccess
    return($d);
 }
 
+sub queryError
+{
+   my $self=shift;
+   my $extinfo=shift;
+   my %param=@_;
+   my $d;
+
+   $d.=$self->HttpHeader("text/html");
+   $d.=$self->HtmlHeader(style=>['default.css','work.css'],
+                         body=>1,form=>1,
+                         title=>"No Access to ".$self->Self);
+   $d.=$self->getParsedTemplate("tmpl/kernel.queryerror",
+                                  { skinbase=>'base',
+                                    static=>{extinfo=>$extinfo}});
+   $d.=$self->HtmlBottom(body=>1,form=>1);
+   return($d);
+}
+
 sub HtmlGoto
 {
    my $self=shift;

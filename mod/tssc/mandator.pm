@@ -30,12 +30,12 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
-      new kernel::Field::Textarea( name       =>'tsscfilter',
+      new kernel::Field::Textarea( name       =>'tsscchmfilter',
                                    label      =>'SC change base filter',
                                    group      =>'screlation',
                                    container  =>'additional'),
    );
-   $self->setDefaultView(qw(id name tsscfilter));
+   $self->setDefaultView(qw(id name tsscchmfilter));
    return($self);
 
 

@@ -207,6 +207,7 @@ sub initSqlWhere
 {
    my $self=shift;
    my $mode=shift;
+   my $filter=shift;
 
    return("");
 }
@@ -276,7 +277,7 @@ sub getSqlWhere
    my $self=shift;
    my $wheremode=shift;
    my @filter=@_;
-   my $where=$self->initSqlWhere($wheremode);
+   my $where=$self->initSqlWhere($wheremode,\@filter);
 
    foreach my $filter (@filter){
       if (ref($filter) eq "HASH"){

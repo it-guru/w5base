@@ -153,6 +153,124 @@ sub _SetFilter
    return(1);
 }
 
+sub StringToFilter
+{
+   my $self=shift;
+   my $str=shift;
+   my @flt;
+
+   my @words=parse_line('[,;]{0,1}\s+',0,$str);
+
+   my $curhash;
+   my $andclose=0;
+   my $andopen=0;
+   my $inrawmode=0;
+   my $closerawmode=0;
+   my $lastrawmodefield;
+   msg(INFO,"StringToFilter words=%s\n",Dumper(\@words));
+   for(my $c=0;$c<=$#words;$c++){
+      if ($words[$c]=~m/^([a-z,0-9]+)=\[/){
+         $words[$c]=~s/^([a-z,0-9]+)=\[/$1=/;
+         $inrawmode++;
+      }
+      if ($words[$c]=~m/^\[/){
+         $words[$c]=~s/^\[//;
+         if ($inrawmode){
+            $self->LastMsg(ERROR,"structure error in []");
+            return;
+         }
+         $inrawmode++;
+      }
+      if ($words[$c]=~m/^\(/){
+         $words[$c]=~s/^\(//;
+         $andopen++;
+      }
+      if ($words[$c]=~m/\]$/){
+         $words[$c]=~s/\]$//;
+         if (!$inrawmode){
+            $self->LastMsg(ERROR,"structure error while closeing []");
+            return;
+         }
+         $closerawmode++;
+      }
+      if ($words[$c]=~m/\)$/){
+         $words[$c]=~s/\)$//;
+         $andclose++;
+      }
+      if (lc($words[$c]) eq "and"){
+         return if ($andopen!=1);
+      }
+      elsif (lc($words[$c]) eq "or"){
+         if ($andopen!=0){
+            $self->LastMsg(ERROR,"or not allowed in ()");
+            return;
+         }
+         if (!defined($curhash)){
+            $self->LastMsg(ERROR,"or not allowed at begin of expression");
+            return;
+         }
+         push(@flt,$curhash);
+         $curhash=undef;
+      }
+      elsif (my ($vari,$vali)=$words[$c]=~m/^([a-z,0-9]+)=(.*)$/){
+         my $fobj=$self->getField($vari);
+         if (!defined($fobj)){
+            $self->LastMsg(ERROR,"invalid attribute '%s' used",$vari);
+            return;
+         }
+         if (!defined($curhash)){
+            if ($inrawmode){
+               $curhash={$vari=>[$vali]};
+               $lastrawmodefield=$vari;
+            }
+            else{
+               $curhash={$vari=>$vali};
+            }
+         }
+         else{
+            if (exists($curhash->{$vari}) && !$inrawmode){
+               $self->LastMsg(ERROR,"multiple definition of same attribute");
+               return;
+            }
+            if ($inrawmode){
+               push(@{$curhash->{$vari}},$vali);
+               $lastrawmodefield=$vari;
+            }
+            else{
+               $curhash->{$vari}=$vali;
+            }
+         }
+      }
+      elsif($inrawmode && defined($lastrawmodefield)){
+         push(@{$curhash->{$lastrawmodefield}},$words[$c]);
+      }
+      if ($andclose==1){
+         push(@flt,$curhash);
+         $curhash=undef;
+         $andclose--;
+      }
+      if ($closerawmode==1){
+         $inrawmode=0;
+         $lastrawmodefield=undef;
+      }
+   }
+   if (defined($curhash)){   # save the last or statement
+      push(@flt,$curhash);
+      $curhash=undef;
+   }
+   if ($inrawmode){
+      $self->LastMsg(ERROR,"unclosed expression []");
+      return;
+   }
+   if ($andopen){
+      $self->LastMsg(ERROR,"unclosed expression ()");
+      return;
+   }
+
+
+   return(@flt);
+}
+
 sub Initialize
 {
    my $self=shift;

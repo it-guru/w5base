@@ -56,6 +56,11 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'cm3rm1.location_code'),
 
+      new kernel::Field::Link(
+                name          =>'rawlocation',
+                label         =>'raw Location',
+                dataobjattr   =>'cm3rm1.location_code'),
+
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
@@ -288,7 +293,13 @@ sub new
       new kernel::Field::Text(
                 name          =>'assignarea',
                 group         =>'contact',
+                ignorecase    =>1,
                 label         =>'Assign Area',
+                dataobjattr   =>'cm3rm1.assigned_area'),
+
+      new kernel::Field::Link(
+                name          =>'rawassignarea',
+                label         =>'raw Assign Area',
                 dataobjattr   =>'cm3rm1.assigned_area'),
 
       new kernel::Field::Text(
@@ -349,6 +360,83 @@ sub Initialize
    return(1) if (defined($self->{DB}));
    return(0);
 }
+
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+
+  
+   my @chmfilter; 
+   if (!$self->IsMemberOf("admin")){
+      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"direct");
+      my $MandatorCache=$self->Cache->{Mandator}->{Cache};
+      foreach my $grpid (@mandators){
+         if (defined($MandatorCache->{grpid}->{$grpid})){
+            my $mc=$MandatorCache->{grpid}->{$grpid};
+            if (defined($mc->{additional}) &&
+                ref($mc->{additional}->{tsscchmfilter}) eq "ARRAY"){
+               push(@chmfilter,@{$mc->{additional}->{tsscchmfilter}});
+            }
+         }
+      }
+      @chmfilter=grep(!/^\s*$/,@chmfilter);
+      my $chmfilter=join(" or ",@chmfilter);
+      @chmfilter=();
+      if (!(@chmfilter=$self->StringToFilter($chmfilter))){
+         $self->LastMsg(ERROR,"invalid base filter '%s'",$chmfilter);
+         return(undef);
+      }
+      @chmfilter=("rawlocation"=>\'InvalidMandator') if ($#chmfilter==-1);
+      msg(INFO,"chm mandator filter=%s\n",Dumper(\@chmfilter));
+      $self->SetNamedFilter("MandatorFilter",\@chmfilter);
+   }
+
+#   my %altbc=();
+#   foreach my $grpid (@mandators){
+#      if (defined($MandatorCache->{grpid}->{$grpid})){
+#         my $mc=$MandatorCache->{grpid}->{$grpid};
+#         if (defined($mc->{additional}) &&
+#             ref($mc->{additional}->{acaltbc}) eq "ARRAY"){
+#            map({if ($_ ne ""){$altbc{$_}=1;}} @{$mc->{additional}->{acaltbc}});
+#         }
+#      }
+#   }
+#   my @altbc=keys(%altbc);
+#
+#   if (!$self->IsMemberOf("admin")){
+#      my @wild;
+#      my @fix;
+#      if ($#altbc!=-1){
+#         @wild=("\"\"");
+#         @fix=(undef);
+#         foreach my $altbc (@altbc){
+#            if ($altbc=~m/\*/ || $altbc=~m/"/){
+#               push(@wild,$altbc);
+#            }
+#            else{
+#               push(@fix,$altbc);
+#            }
+#         }
+#      }
+#      if ($#wild==-1 && $#fix==-1){
+#         @fix=("NONE");
+#      }
+#      my @addflt=();
+#      if ($#fix!=-1){
+#         push(@addflt,{altbc=>\@fix});
+#      }
+#      if ($#wild!=-1){
+#         foreach my $wild (@wild){
+#            push(@addflt,{altbc=>$wild});
+#         }
+#      }
+#      push(@flt,\@addflt);
+#   }
+   return($self->SUPER::SecureSetFilter(@flt));
+}
+
 
 sub getDetailBlockPriority                # posibility to change the block order
 {

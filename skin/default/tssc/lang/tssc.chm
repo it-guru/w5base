@@ -15,6 +15,7 @@
 'SysModTime'=>{de=>'letzte Bearbeitung'},
 'Risk'=>{de=>'Risiko (Risk)'},
 'Priority'=>{de=>'Priorität (Priority)'},
+'Location'=>{de=>'Standort (Location)'},
 'Category'=>{de=>'Kathegorie (Category)'},
 'Fallback'=>{de=>'Anulierungsverfahren (Fallback)'},
 'Urgency'=>{de=>'Dringlichkeit (Urgency)'},

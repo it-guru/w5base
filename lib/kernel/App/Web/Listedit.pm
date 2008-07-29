@@ -963,6 +963,10 @@ sub HtmlDetail
    my %flt=$self->getSearchHash();
    $self->ResetFilter();
    $self->SecureSetFilter(\%flt);
+   if ($self->LastMsg()>0){
+      print $self->queryError();
+      return();
+   }
    my $output=new kernel::Output($self);
    $self->SetCurrentView(qw(ALL));
    $param{WindowMode}="Detail";
@@ -1768,6 +1772,10 @@ sub Result
          $self->ResetFilter();
          my %q=$self->getSearchHash();
          $self->SecureSetFilter(\%q);
+         if ($self->LastMsg()>0){
+            print $self->queryError();
+            return();
+         }
       }
 
       my $view=Query->Param("CurrentView");
