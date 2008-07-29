@@ -365,8 +365,6 @@ sub SecureSetFilter
 {
    my $self=shift;
    my @flt=@_;
-
-
   
    my @chmfilter; 
    if (!$self->IsMemberOf("admin")){
@@ -388,52 +386,11 @@ sub SecureSetFilter
          $self->LastMsg(ERROR,"invalid base filter '%s'",$chmfilter);
          return(undef);
       }
+      # ensure, that undefined mandators results to empty result
       @chmfilter=("rawlocation"=>\'InvalidMandator') if ($#chmfilter==-1);
       msg(INFO,"chm mandator filter=%s\n",Dumper(\@chmfilter));
       $self->SetNamedFilter("MandatorFilter",\@chmfilter);
    }
-
-#   my %altbc=();
-#   foreach my $grpid (@mandators){
-#      if (defined($MandatorCache->{grpid}->{$grpid})){
-#         my $mc=$MandatorCache->{grpid}->{$grpid};
-#         if (defined($mc->{additional}) &&
-#             ref($mc->{additional}->{acaltbc}) eq "ARRAY"){
-#            map({if ($_ ne ""){$altbc{$_}=1;}} @{$mc->{additional}->{acaltbc}});
-#         }
-#      }
-#   }
-#   my @altbc=keys(%altbc);
-#
-#   if (!$self->IsMemberOf("admin")){
-#      my @wild;
-#      my @fix;
-#      if ($#altbc!=-1){
-#         @wild=("\"\"");
-#         @fix=(undef);
-#         foreach my $altbc (@altbc){
-#            if ($altbc=~m/\*/ || $altbc=~m/"/){
-#               push(@wild,$altbc);
-#            }
-#            else{
-#               push(@fix,$altbc);
-#            }
-#         }
-#      }
-#      if ($#wild==-1 && $#fix==-1){
-#         @fix=("NONE");
-#      }
-#      my @addflt=();
-#      if ($#fix!=-1){
-#         push(@addflt,{altbc=>\@fix});
-#      }
-#      if ($#wild!=-1){
-#         foreach my $wild (@wild){
-#            push(@addflt,{altbc=>$wild});
-#         }
-#      }
-#      push(@flt,\@addflt);
-#   }
    return($self->SUPER::SecureSetFilter(@flt));
 }
 
