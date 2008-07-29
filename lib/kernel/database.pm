@@ -75,12 +75,12 @@ sub Connect
    if (defined($Apache::DBI::VERSION)){
       $self->{'db'}=DBI->connect($self->{dbconnect},
                                  $self->{dbuser},
-                                 $self->{dbpass},{mysql_enable_utf8 => 1});
+                                 $self->{dbpass},{mysql_enable_utf8 => 0});
    }
    else{
       $self->{'db'}=DBI->connect_cached($self->{dbconnect},
                                         $self->{dbuser},
-                                        $self->{dbpass},{mysql_enable_utf8 => 1});
+                                        $self->{dbpass},{mysql_enable_utf8 => 0});
    }
 
    if (!$self->{'db'}){
