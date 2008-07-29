@@ -250,6 +250,13 @@ sub new
    return($self);
 }
 
+sub SetFilterForQualityCheck
+{
+   my $self=shift;
+   my @view=@_;
+   return(undef);
+}
+
 sub onlyIfFilled
 {
    my $self=shift;

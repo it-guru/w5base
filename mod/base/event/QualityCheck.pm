@@ -81,12 +81,7 @@ sub doQualityCheck
    my $dataobj=shift;
  
    msg(INFO,"doQualityCheck in Object $dataobj");
-   my @flt;
    my @view=("id","qcok");
-   if (my $cistatusid=$dataobj->getField("cistatusid")){
-      $flt[0]->{cistatusid}=[3,4,5];
-      #$flt[0]->{id}=[221488];
-   }
    if (my $lastqcheck=$dataobj->getField("lastqcheck")){
       unshift(@view,"lastqcheck");
    }
@@ -94,10 +89,9 @@ sub doQualityCheck
    if (defined($idfieldobj)){
       push(@view,$idfieldobj->Name());
    }
-   #@view=("ALL");
-
-   $dataobj->SetFilter(\@flt);
-   $dataobj->SetCurrentView(@view);
+   if (!($dataobj->SetFilterForQualityCheck(@view))){
+      return({exitcode=>0,msg=>'ok'});
+   }
 
    my ($rec,$msg)=$dataobj->getFirst();
    my $time=time();

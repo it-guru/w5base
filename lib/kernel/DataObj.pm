@@ -81,6 +81,20 @@ sub ResetFilter
                                              # the last order must be deleted
 }
 
+sub SetFilterForQualityCheck    # prepaire dataobject for automatic 
+{                               # quality check (nightly)
+   my $self=shift;
+   my @view=@_;                 # predefinition for request view
+   my @flt;
+   if (my $cistatusid=$self->getField("cistatusid")){
+      $flt[0]->{cistatusid}=[3,4,5];
+      #$flt[0]->{id}=[221488];
+   }
+   $self->SetFilter(\@flt);
+   $self->SetCurrentView(@view);
+   return(1);
+}
+
 sub SecureSetFilter
 {
    my $self=shift;

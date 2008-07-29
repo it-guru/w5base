@@ -361,6 +361,15 @@ sub Initialize
    return(0);
 }
 
+sub SetFilterForQualityCheck
+{
+   my $self=shift;
+   my @view=@_;
+   return(undef);
+}
+
+
+
 sub SecureSetFilter
 {
    my $self=shift;
@@ -383,7 +392,8 @@ sub SecureSetFilter
       my $chmfilter=join(" or ",@chmfilter);
       @chmfilter=();
       if (!(@chmfilter=$self->StringToFilter($chmfilter))){
-         $self->LastMsg(ERROR,"invalid base filter '%s'",$chmfilter);
+         $self->LastMsg(ERROR,"none or invalid mandator base filter '\%s'",
+                        $chmfilter);
          return(undef);
       }
       # ensure, that undefined mandators results to empty result

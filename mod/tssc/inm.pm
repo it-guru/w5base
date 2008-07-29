@@ -266,6 +266,15 @@ sub getResolvAssignment
    return($a); 
 }
 
+sub SetFilterForQualityCheck
+{
+   my $self=shift;
+   my @view=@_;
+   return(undef);
+}
+
+
+
 sub getRecordImageUrl
 {
    my $self=shift;
