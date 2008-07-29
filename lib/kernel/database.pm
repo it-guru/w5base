@@ -212,11 +212,19 @@ sub getArrayList
    return(\@l);
 }
 
+sub DriverName
+{
+   my $self=shift;
+   return($self->{db}->{Driver}->{Name});
+}
+
 
 sub quotemeta
 {
    my $self=shift;
-   return($self->{db}->quote(@_));
+   my $str=shift;
+   utf8::downgrade($str,1);
+   return($self->{db}->quote($str));
 }
 
 sub DriverName

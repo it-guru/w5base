@@ -258,7 +258,7 @@ sub processFilterHash
          if (defined($fo->{ignorecase})){
             $sqlparam{ignorecase}=1;
          }
-         $sqlparam{sqldbh}=$self->{DB}->{db};
+         $sqlparam{sqldbh}=$self->{DB};
          my $sqlfieldname=$fo->getSelectField("where.$wheremode",$self->{DB});
          next if (!defined($sqlfieldname));
          my $bk=$self->Data2SQLwhere($where,$sqlfieldname,$preparedFilter,

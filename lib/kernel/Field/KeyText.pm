@@ -54,11 +54,11 @@ sub preProcessFilter
       my @words=parse_line('[,;]{0,1}\s+',0,$str);
       if (lc($self->{conjunction}) eq "or"){
          my $where="";
-         my %sqlparam=(sqldbh=>$db->{db});
+         my %sqlparam=(sqldbh=>$db);
          my $bk=$self->getParent->Data2SQLwhere(\$where,"fval",
                                      $hflt->{$self->{name}},%sqlparam);
          return(undef) if (!$bk);
-         my %sqlparam=(sqldbh=>$db->{db},listmode=>0,wildcards=>0);
+         my %sqlparam=(sqldbh=>$db,listmode=>0,wildcards=>0);
          my $bk=$self->getParent->Data2SQLwhere(\$where,"name",
                                      $name,%sqlparam);
          return(undef) if (!$bk);
@@ -69,7 +69,7 @@ sub preProcessFilter
                my $sqltype="STRING";
                $sqltype="DATE" if ($type=~m/Date$/); 
                if (exists($hflt->{$sfld})){
-                  my %sqlparam=(sqldbh=>$db->{db},datatype=>$sqltype);
+                  my %sqlparam=(sqldbh=>$db,datatype=>$sqltype);
                   my $searchfield;
                   if ($sfld eq $idfield){
                      $searchfield="id";

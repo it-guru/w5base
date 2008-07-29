@@ -2182,7 +2182,7 @@ sub dbQuote
       $str=~s/\[\|%\|\]/*/g;  # to allow \* searchs (see parse_line above)
    }
    if (defined($sqlparam{sqldbh})){
-      my $str=$sqlparam{sqldbh}->quote($str);
+      my $str=$sqlparam{sqldbh}->quotemeta($str);
       return($str);
    }
    return("'".$str."'");
@@ -2273,7 +2273,7 @@ sub FilterPart2SQLexp
          }
          my $setescape="";
          if (defined($sqlparam{sqldbh}) &&
-             lc($sqlparam{sqldbh}->{Driver}->{Name}) eq "oracle" &&
+             lc($sqlparam{sqldbh}->DriverName()) eq "oracle" &&
              $compop eq " like "){
             $setescape=" ESCAPE '\\' ";
          }
@@ -2294,7 +2294,7 @@ sub FilterPart2SQLexp
                   return(undef);
                }
                if (defined($sqlparam{sqldbh}) &&
-                   lc($sqlparam{sqldbh}->{Driver}->{Name}) eq "oracle"){
+                   lc($sqlparam{sqldbh}->DriverName()) eq "oracle"){
                   $val="to_date(".dbQuote($qval,%sqlparam).
                        ",'YYYY-MM-DD HH24:MI:SS')";
                }
@@ -2310,7 +2310,7 @@ sub FilterPart2SQLexp
             return(undef);
             $sqlfieldname=$sqlparam{containermode};
          }
-         if (lc($sqlparam{sqldbh}->{Driver}->{Name}) eq "oracle" &&
+         if (lc($sqlparam{sqldbh}->DriverName()) eq "oracle" &&
              $sqlparam{ignorecase}==1){
             $sqlfieldname="lower($sqlfieldname)";
             $val="lower($val)";

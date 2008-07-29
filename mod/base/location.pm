@@ -412,6 +412,9 @@ sub Normalize
       $rec->{location}="Frankfurt/Main";
    }
    $rec->{country}=trim($rec->{country});
+   if (lc($rec->{country}) eq "de"){
+      $rec->{zipcode}=~s/^D-//i;
+   }
    $rec->{label}=trim($rec->{label});
 }
 
