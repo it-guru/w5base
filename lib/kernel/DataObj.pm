@@ -185,11 +185,15 @@ sub StringToFilter
    msg(INFO,"StringToFilter words=%s\n",Dumper(\@words));
    for(my $c=0;$c<=$#words;$c++){
       msg(INFO,"parse word '\%s'",$words[$c]);
-      if ($words[$c]=~m/^([a-z,0-9]+)=\[/){
+      while ($words[$c]=~m/^([a-z,0-9]+)=\[/){
+         if ($inrawmode){
+            $self->LastMsg(ERROR,"structure error in []");
+            return;
+         }
          $words[$c]=~s/^([a-z,0-9]+)=\[/$1=/;
          $inrawmode++;
       }
-      if ($words[$c]=~m/^\[/){
+      while($words[$c]=~m/^\[/){
          $words[$c]=~s/^\[//;
          if ($inrawmode){
             $self->LastMsg(ERROR,"structure error in []");
@@ -197,11 +201,15 @@ sub StringToFilter
          }
          $inrawmode++;
       }
-      if ($words[$c]=~m/^\(/){
+      while($words[$c]=~m/^\(/){
          $words[$c]=~s/^\(//;
+         if ($andopen){
+            $self->LastMsg(ERROR,"structure error in ()");
+            return;
+         }
          $andopen++;
       }
-      if ($words[$c]=~m/\]$/){
+      while ($words[$c]=~m/\]$/){
          $words[$c]=~s/\]$//;
          if (!$inrawmode){
             $self->LastMsg(ERROR,"structure error while closeing []");
@@ -233,7 +241,7 @@ sub StringToFilter
          if (!$param{nofieldcheck}){
             my $fobj=$self->getField($vari);
             if (!defined($fobj)){
-               $self->LastMsg(ERROR,"invalid attribute '%s' used",$vari);
+               $self->LastMsg(ERROR,"invalid attribute '\%s' used",$vari);
                return;
             }
          }
