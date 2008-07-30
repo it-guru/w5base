@@ -183,6 +183,7 @@ sub StringToFilter
    my $lastrawmodefield;
    msg(INFO,"StringToFilter words=%s\n",Dumper(\@words));
    for(my $c=0;$c<=$#words;$c++){
+      msg(INFO,"parse word '\%s'",$words[$c]);
       if ($words[$c]=~m/^([a-z,0-9]+)=\[/){
          $words[$c]=~s/^([a-z,0-9]+)=\[/$1=/;
          $inrawmode++;
@@ -211,6 +212,7 @@ sub StringToFilter
          $words[$c]=~s/\)$//;
          $andclose++;
       }
+      #msg(INFO,"parse inrawmode=$inrawmode closerawmode=$closerawmode");
       if (lc($words[$c]) eq "and"){
          return if ($andopen!=1);
       }
@@ -265,6 +267,7 @@ sub StringToFilter
       }
       if ($closerawmode==1){
          $inrawmode=0;
+         $closerawmode--;
          $lastrawmodefield=undef;
       }
    }
