@@ -16,3 +16,4 @@
 'STEVqreportbyorg'=>{
           de=>'Quality-Report Empfang über organisatorische Role (Leiter)',
           en=>'Quality-Report by organisaional role (boss)'},
+"invalid groupname '\%s' specified"=>{de=>"ungültiger Gruppenname '\%s'"},

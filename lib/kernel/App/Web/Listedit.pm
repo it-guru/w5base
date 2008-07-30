@@ -963,10 +963,6 @@ sub HtmlDetail
    my %flt=$self->getSearchHash();
    $self->ResetFilter();
    $self->SecureSetFilter(\%flt);
-   if ($self->LastMsg()>0){
-      print $self->queryError();
-      return();
-   }
    my $output=new kernel::Output($self);
    $self->SetCurrentView(qw(ALL));
    $param{WindowMode}="Detail";

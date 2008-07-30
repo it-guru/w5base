@@ -171,6 +171,7 @@ sub StringToFilter
 {
    my $self=shift;
    my $str=shift;
+   my %param=@_;
    my @flt;
 
    my @words=parse_line('[,;]{0,1}\s+',0,$str);
@@ -229,10 +230,12 @@ sub StringToFilter
          $curhash=undef;
       }
       elsif (my ($vari,$vali)=$words[$c]=~m/^([a-z,0-9]+)=(.*)$/){
-         my $fobj=$self->getField($vari);
-         if (!defined($fobj)){
-            $self->LastMsg(ERROR,"invalid attribute '%s' used",$vari);
-            return;
+         if (!$param{nofieldcheck}){
+            my $fobj=$self->getField($vari);
+            if (!defined($fobj)){
+               $self->LastMsg(ERROR,"invalid attribute '%s' used",$vari);
+               return;
+            }
          }
          if (!defined($curhash)){
             if ($inrawmode){
@@ -264,6 +267,10 @@ sub StringToFilter
          push(@flt,$curhash);
          $curhash=undef;
          $andclose--;
+      }
+      if ($closerawmode==1 && !$inrawmode){
+         $self->LastMsg(ERROR,"invalid close ] of raw mode");
+         return;
       }
       if ($closerawmode==1){
          $inrawmode=0;

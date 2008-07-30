@@ -44,6 +44,25 @@ sub new
    return($self);
 }
 
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   my $tsscchmfilter=trim(effVal($oldrec,$newrec,"tsscchmfilter"));
+   if ($tsscchmfilter ne ""){
+      $self->StringToFilter($tsscchmfilter,nofieldcheck=>1);
+      if ($self->LastMsg()>0){
+         return(0);
+      }
+   }
+   return($self->SUPER::Validate($oldrec,$newrec));
+}
+
+
+
+
 sub isWriteValid
 {
    my $self=shift;
