@@ -413,7 +413,6 @@ EOF
 EOF
       }
    }
-printf STDERR ("grouplabel=%s\n",Dumper(\%grouplabel));
 
 
    my $c=0;

@@ -423,6 +423,7 @@ sub UpdateRecord
 {
    my $self=shift;
    my $newdata=shift;  # hash ref
+printf STDERR ("fifi d=%s\n",Dumper($newdata));
    $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
    my @updfilter=@_;   # update filter
    my $where=$self->getSqlWhere("update",@updfilter);
@@ -447,6 +448,7 @@ sub UpdateRecord
       $cmd="replace into $worktable (".
            join(",",@flist).") ".
            "values(".join(",",map({$raw{$_}} @flist)).")";
+      $logcmd=$cmd;
    }
    else{
       $cmd="update $worktable set ".

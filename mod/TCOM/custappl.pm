@@ -453,6 +453,7 @@ sub getTeamBossEMail
 
 
 
+
 sub SecureSetFilter
 {
    my $self=shift;
@@ -478,6 +479,7 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
+   $newrec->{id}=$oldrec->{id};
    $newrec->{origname}=effVal($oldrec,$newrec,"name");
    $newrec->{customerid}=effVal($oldrec,$newrec,"customerid");
    if (exists($newrec->{custname})){
