@@ -28,10 +28,8 @@ sub start
    }
    if (opendir(D,$statedir)){
       foreach my $job (grep { !/^\./ } readdir(D)){
-         printf STDERR ("fifi run job $job\n");
          my $b=$self->getParent->W5ServerCall("rpcCallSerialEvent",
                                               "systemjob",$job);
-         printf STDERR ("fifi d=%s\n",Dumper($b));
       }
    }
    $self->{Reload}=1;
