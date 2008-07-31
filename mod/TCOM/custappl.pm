@@ -480,6 +480,10 @@ sub Validate
    my $newrec=shift;
 
    $newrec->{id}=$oldrec->{id};
+   if (!defined($newrec->{id}) || $newrec->{id} eq ""){
+      $self->LastMsg(ERROR,"invalid write request to empty id");
+      return(undef);
+   }
    $newrec->{origname}=effVal($oldrec,$newrec,"name");
    $newrec->{customerid}=effVal($oldrec,$newrec,"customerid");
    if (exists($newrec->{custname})){
