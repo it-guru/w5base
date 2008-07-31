@@ -458,11 +458,13 @@ sub SecureSetFilter
    my $self=shift;
    my @flt=@_;
 
-   my $userid=$self->getCurrentUserId();
-   my %grp=$self->getGroupsOf($ENV{REMOTE_USER},"RMember","both");
-   my @grpids=keys(%grp);
-   @grpids=(qw(NONE)) if ($#grpids==-1);
-   $self->SetNamedFilter("Customer",{customerid=>\@grpids});
+   if (!$self->IsMemberOf("admin")){
+      my $userid=$self->getCurrentUserId();
+      my %grp=$self->getGroupsOf($ENV{REMOTE_USER},"RMember","both");
+      my @grpids=keys(%grp);
+      @grpids=(qw(NONE)) if ($#grpids==-1);
+      $self->SetNamedFilter("Customer",{customerid=>\@grpids});
+   }
 
    return($self->SetFilter(@flt));
 }
