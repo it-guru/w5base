@@ -640,7 +640,8 @@ sub SecureValidate
              }
           }
           if ($fo->Type() eq "SubList" ||
-              (!grep(/^ALL$/,@$wrgroups) && !$writeok)){
+              (!grep(/^ALL$/,@$wrgroups) && !$writeok &&
+               !($fo->Type() eq "Id"))){
              my $msg=sprintf($self->T("write request to field '\%s' rejected"),
                              $wrfield);
              $self->LastMsg(ERROR,$msg);

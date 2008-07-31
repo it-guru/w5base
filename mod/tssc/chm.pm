@@ -305,8 +305,15 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'customer',
+                ignorecase    =>1,
                 group         =>'contact',
                 label         =>'Customer',
+                dataobjattr   =>'cm3rm1.misc4'),
+
+      new kernel::Field::Link(
+                name          =>'rawcustomer',
+                group         =>'contact',
+                label         =>'raw Customer',
                 dataobjattr   =>'cm3rm1.misc4'),
 
       new kernel::Field::Text(

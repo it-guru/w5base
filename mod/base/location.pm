@@ -349,6 +349,9 @@ sub Normalize
    my $self=shift;
    my $rec=shift;
 
+   $rec->{address1}=~s/^"//;
+   $rec->{address1}=~s/"$//;
+   $rec->{address1}=~s/; / /;
    if ($rec->{address1}=~m/ALTE POTSDAMER.*7/){
       $rec->{address1}="Alte Potsdamer Stra\xDFe 7";
    }
@@ -416,6 +419,8 @@ sub Normalize
       $rec->{zipcode}=~s/^D-//i;
    }
    $rec->{label}=trim($rec->{label});
+   $rec->{address1}=trim($rec->{address1});
+   $rec->{location}=trim($rec->{location});
 }
 
 sub getLocationByHash

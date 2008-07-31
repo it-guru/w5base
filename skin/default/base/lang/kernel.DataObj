@@ -33,3 +33,4 @@ EOF
 "or not allowed at begin of expression"=>{de=>"OR darf nicht am Anfang des Ausdruckes stehen"},
 "invalid attribute '\%s' used"=>{de=>"ungültiges Feld '\%s' verwendet"},
 "multiple definition of same attribute"=>{de=>"Mehrfachdefinition des gleichen Feldes"},
+"write request to field '\%s' rejected"=>{de=>"Schreibzugriff auf das Feld '\%s' ist nicht zulässig"},

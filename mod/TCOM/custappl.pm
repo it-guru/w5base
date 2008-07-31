@@ -54,6 +54,13 @@ sub new
                 altdataobjattr=>'appl.name',
                 dataobjattr   =>'TCOM_appl.origname'),
 
+      new kernel::Field::Link(
+                name          =>'origname',
+                readonly      =>1,
+                htmlwidth     =>'200px',
+                label         =>'Orig TS Applicationname',
+                dataobjattr   =>'TCOM_appl.origname'),
+
       new kernel::Field::TextDrop(
                 name          =>'customer',
                 label         =>'Customer',
@@ -298,8 +305,16 @@ sub new
       new kernel::Field::Text(
                 name          =>'custname',
                 htmlwidth     =>'200px',
-                label         =>'TCOM Applicationname',
+                group         =>'custapplnameing',
+                label         =>'Customer Applicationname',
                 dataobjattr   =>'TCOM_appl.name'),
+
+      new kernel::Field::Text(
+                name          =>'custnameid',
+                htmlwidth     =>'200px',
+                group         =>'custapplnameing',
+                label         =>'Customer Application ID',
+                dataobjattr   =>'TCOM_appl.custapplid'),
 
      # new kernel::Field::Interface(  # kommt hinzu, sobald iwr die IDs von
      #           name          =>'custnameid',  # IT-BaseCMDB
@@ -339,6 +354,7 @@ sub new
                                  'osrelease',
                                  'shortdesc']),
    );
+   $self->{history}=[qw(insert modify delete)];
 
    $self->setDefaultView(qw(name custname cistatus));
    $self->setWorktable("TCOM_appl");
@@ -460,8 +476,14 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
-   $newrec->{tsiname}=effVal($oldrec,$newrec,"tsiname");
+   $newrec->{origname}=effVal($oldrec,$newrec,"name");
    $newrec->{customerid}=effVal($oldrec,$newrec,"customerid");
+   if (exists($newrec->{custname})){
+      $newrec->{custname}=trim(effVal($oldrec,$newrec,"custname"));
+   }
+   if (exists($newrec->{custnameid})){
+      $newrec->{custnameid}=trim(effVal($oldrec,$newrec,"custnameid"));
+   }
 
    return(1);
 }
@@ -487,14 +509,14 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("tcomcontact");
+   return("tcomcontact","custapplnameing");
 }  
 
 sub getDetailBlockPriority
 {
    my $self=shift;
    return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default tcomcontact tscontact custcontracts));
+          qw(default custapplnameing tcomcontact tscontact custcontracts));
 }
 
 sub HandleInfoAboSubscribe
