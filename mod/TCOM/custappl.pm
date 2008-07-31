@@ -61,6 +61,13 @@ sub new
                 label         =>'Orig TS Applicationname',
                 dataobjattr   =>'TCOM_appl.origname'),
 
+      new kernel::Field::Text(
+                name          =>'custname',
+                htmlwidth     =>'200px',
+                group         =>'custapplnameing',
+                label         =>'Customer Applicationname',
+                dataobjattr   =>'TCOM_appl.name'),
+
       new kernel::Field::TextDrop(
                 name          =>'customer',
                 label         =>'Customer',
@@ -303,13 +310,6 @@ sub new
                 dataobjattr   =>'appl.businessteam'),
 
       new kernel::Field::Text(
-                name          =>'custname',
-                htmlwidth     =>'200px',
-                group         =>'custapplnameing',
-                label         =>'Customer Applicationname',
-                dataobjattr   =>'TCOM_appl.name'),
-
-      new kernel::Field::Text(
                 name          =>'custnameid',
                 htmlwidth     =>'200px',
                 group         =>'custapplnameing',
@@ -324,7 +324,7 @@ sub new
 
       new kernel::Field::SubList(
                 name          =>'custcontracts',
-                ysabel         =>'Customer Contracts',
+                label         =>'Customer Contracts',
                 group         =>'custcontracts',
                 nodetaillink  =>1,
                 vjointo       =>'itil::lnkapplcustcontract',
