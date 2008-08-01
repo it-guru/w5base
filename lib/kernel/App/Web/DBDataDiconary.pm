@@ -92,7 +92,6 @@ sub getSqlFrom
         data_type,data_length,t.owner owner
  from all_TABLES t, all_TAB_COLUMNS c
  where t.TABLE_NAME = c.TABLE_NAME
-       and lower(t.owner)  like 'scadm1'
        and   t.owner = c.OWNER) f,
 (select concat(concat(concat(table_owner,'.'),concat(table_name,'.')),column_name) fieldname from all_ind_columns) i
 EOF

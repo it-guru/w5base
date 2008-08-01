@@ -118,7 +118,11 @@ sub Init
    $self->RegisterObj("ac.krn.accountno",
                       "tsacinv::accountno",
                       defaultacl=>['valid_user']);
-   
+
+   $self->RegisterObj("ac.krn.dictonary",
+                      "tsacinv::DBDataDiconary",
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("ac.quality",
                       "tsacinv::quality_appl",
                       defaultacl=>['valid_user']);
