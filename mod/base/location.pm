@@ -323,10 +323,6 @@ sub Validate
    }
 
    my $name="";
-   $country=~s/\.//g;
-   $location=~s/\.//g;
-   $address1=~s/\.//g;
-   $label=~s/\.//g;
    $name.=($name ne "" && $country  ne "" ? "." : "").$country;
    $name.=($name ne "" && $location ne "" ? "." : "").$location;
    $name.=($name ne "" && $address1 ne "" ? "." : "").$address1;
@@ -421,6 +417,10 @@ sub Normalize
    $rec->{label}=trim($rec->{label});
    $rec->{address1}=trim($rec->{address1});
    $rec->{location}=trim($rec->{location});
+   $rec->{country}=~s/\.//;
+   $rec->{label}=~s/\.//;
+   $rec->{address1}=~s/\.//;
+   $rec->{location}=~s/\.//;
 }
 
 sub getLocationByHash
