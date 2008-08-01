@@ -412,6 +412,12 @@ sub FinishWrite
    my $newrec=shift;
    my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
    $self->InvalidateUserCache();
+   if (exists($newrec->{roles})){
+      if (grep(/^(RBoss|RBoss2)$/,@{$newrec->{roles}},@{$newrec->{roles}})){
+         # boss operation
+
+      }
+   }
    return($bak);
 }
 

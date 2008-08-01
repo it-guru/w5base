@@ -71,6 +71,10 @@ sub Init
                       "tssc::mandator",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("sc.krn.dictonary",
+                      "tssc::DBDataDiconary",
+                      defaultacl=>['admin']);
+
    return($self);
 }
 

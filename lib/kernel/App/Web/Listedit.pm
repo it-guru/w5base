@@ -25,7 +25,6 @@ use kernel::App::Web::History;
 use kernel::App::Web::WorkflowLink;
 use kernel::Output;
 use kernel::Input;
-use Data::Dumper;
 use kernel::TabSelector;
 @ISA    = qw(kernel::App::Web kernel::App::Web::History 
              kernel::App::Web::WorkflowLink);

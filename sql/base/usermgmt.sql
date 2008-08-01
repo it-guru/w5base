@@ -271,3 +271,4 @@ alter table user add allowifupdate int(2) default 0;
 alter table user add lastqcheck datetime default NULL,add key(lastqcheck);
 alter table grp  add lastqcheck datetime default NULL,add key(lastqcheck);
 alter table grp  add description varchar(128);
+alter table grp  add lastknownbossemail blob;

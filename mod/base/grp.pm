@@ -158,6 +158,11 @@ sub new
                 label         =>'ParentID',
                 dataobjattr   =>'grp.parentid'),
 
+      new kernel::Field::Link(
+                name          =>'lastknownbossemail',
+                label         =>'last Known Boss E-Mailaddesses',
+                dataobjattr   =>'grp.lastknownbossemail'),
+
       new kernel::Field::SubList(
                 name          =>'subunits',
                 subeditmsk    =>'subedit.group',

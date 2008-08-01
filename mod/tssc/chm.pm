@@ -588,6 +588,8 @@ sub BuildVisualView
    my $starttime=$self->findtemplvar($templparam,"plannedstart","detail");
    my $endtime=$self->findtemplvar($templparam,"plannedend","detail");
    my $requestedby=$self->findtemplvar($templparam,"requestedby","detail");
+   my $description=$self->findtemplvar($templparam,"description","detail");
+   $description=~s/(\S{40,60})([,:;])/$1$2 /g; # break long lines
 
    my $gr="#75D194";
    my $rd="#F28C8C";
@@ -678,7 +680,7 @@ sub BuildVisualView
 <td><b><u>Description:</b></u><br>
 <table style=\"width:100%;table-layout:fixed;padding:0;margin:0\">
 <tr><td style="min-height:80px;height:auto;height:80px">
-<pre class=multilinetext>$rec->{description}</pre>
+<pre class=multilinetext>$description</pre>
 </td></tr></table>
 </td>
 </tr>
