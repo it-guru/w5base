@@ -348,6 +348,9 @@ sub Normalize
    $rec->{address1}=~s/^"//;
    $rec->{address1}=~s/"$//;
    $rec->{address1}=~s/; / /;
+   $rec->{label}=trim($rec->{label});
+   $rec->{address1}=trim($rec->{address1});
+   $rec->{location}=trim($rec->{location});
    if ($rec->{address1}=~m/ALTE POTSDAMER.*7/){
       $rec->{address1}="Alte Potsdamer Stra\xDFe 7";
    }
@@ -355,7 +358,6 @@ sub Normalize
       $rec->{address1}="Karl-Marx-Stra\xDFe 109-113";
    }
    if (defined($rec->{address1})){
-      $rec->{address1}=~s/([a-z])(\d)/$1 $2/gi;
       $rec->{address1}=~s/Memmelsdorferstr.*e/Memmelsdorfer Stra\xDFe/g;
       $rec->{address1}=~s/Luebecker\s+/L\xFCbecker /g;
       $rec->{address1}=~s/Willy Brandt Platz/Willy.Brandt.Platz/g;
@@ -364,7 +366,7 @@ sub Normalize
       $rec->{address1}=~s/([S|s])ttrasse/$1tra\xDFe/g;
       $rec->{address1}=~s/([S|s])ttra\xDFe/$1tra\xDFe/g;
       $rec->{address1}=~s/(\d)\s([a-z])$/$1$2/i;
-      $rec->{address1}=trim($rec->{address1});
+      $rec->{address1}=~s/([a-z])(\d)/$1 $2/gi;
    }
    if (defined($rec->{label})){
       $rec->{label}="T-Systems SCZ Mitte"   if ($rec->{label}=~m/SCZ Mitte/);
@@ -414,9 +416,6 @@ sub Normalize
    if (lc($rec->{country}) eq "de"){
       $rec->{zipcode}=~s/^D-//i;
    }
-   $rec->{label}=trim($rec->{label});
-   $rec->{address1}=trim($rec->{address1});
-   $rec->{location}=trim($rec->{location});
    $rec->{country}=~s/\.//;
    $rec->{label}=~s/\.//;
    $rec->{address1}=~s/\.//;
