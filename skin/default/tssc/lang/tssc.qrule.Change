@@ -1,0 +1,3 @@
+'tssc::qrule::Change'=>{de=>'T-Systems Change Basis-Check',
+                        en=>'T-Systems Change basic check'},
+"no customer defined in change"=>{de=>"kein Kunde im Change eingetragen"},

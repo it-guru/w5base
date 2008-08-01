@@ -486,7 +486,7 @@ function addToResult(ruleid)
     }
    }
    xmlhttp.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
-   var r=xmlhttp.send('Mode=process&CurrentIdToEdit='+$CurrentIdToEdit);
+   var r=xmlhttp.send('Mode=process&CurrentIdToEdit='+'$CurrentIdToEdit');
 }
 function processCheck()
 {
