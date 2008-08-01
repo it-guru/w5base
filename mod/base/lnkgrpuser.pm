@@ -412,13 +412,37 @@ sub FinishWrite
    my $newrec=shift;
    my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
    $self->InvalidateUserCache();
-   if (exists($newrec->{roles})){
-      if (grep(/^(RBoss|RBoss2)$/,@{$newrec->{roles}},@{$newrec->{roles}})){
-         # boss operation
-
-      }
+   my $grpid=effVal($oldrec,$newrec,"grpid");
+   if ((exists($newrec->{roles}) || exists($oldrec->{roles})) && $grpid ne ""){
+      $self->StoreLastKnownBoss($oldrec,$newrec,$grpid);
    }
    return($bak);
+}
+
+sub StoreLastKnownBoss  # the storeing of last known Boss-Email is needed,
+{                       # to informate the boss, if any time the group
+   my $self=shift;      # is set to disposed of wast. In this cast the last
+   my $oldrec=shift;    # boss has to bee ensure, that all old references
+   my $newrec=shift;    # would be corrected to the posible new group
+   my $grpid=shift;
+
+   if (!defined($newrec) ||
+       grep(/^(RBoss|RBoss2)$/,@{$oldrec->{roles}},@{$newrec->{roles}})){
+      $self->ResetFilter();
+      $self->SetFilter({grpid=>\$grpid,nativroles=>["RBoss","RBoss2"]});
+      my @l=$self->getHashList("email");
+      if ($#l!=-1){
+         my @email=grep(!/^\s*$/,map({$_->{email}} @l));
+         if ($#email!=-1){
+            my $grp=getModuleObject($self->Config,"base::grp");
+            $grp->UpdateRecord({lastknownbossemail=>join("\n",@email)},
+                               grpid=>\$grpid);
+         }
+      }
+
+      # boss operation
+
+   }
 }
 
 sub FinishDelete
@@ -436,6 +460,10 @@ sub FinishDelete
       $self->{lnkgrpuserrole}->ForeachFilteredRecord(sub{
                          $self->{lnkgrpuserrole}->ValidatedDeleteRecord($_);
                       });
+   }
+   my $grpid=$oldrec->{grpid};
+   if ($grpid ne ""){
+      $self->StoreLastKnownBoss($oldrec,undef,$grpid);
    }
    return($bak);
 }
