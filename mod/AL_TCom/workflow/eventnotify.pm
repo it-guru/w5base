@@ -697,7 +697,7 @@ sub Process
              emailfrom      =>$emailfrom,
              emailto        =>\@emailto,
              emailcc        =>\@emailcc,
-             allowsms       =>$allowsms,
+             allowsms       =>$smsallow,
              emaillang      =>$eventlang,
              emailprefix    =>\@emailprefix,
              emailpostfix   =>\@emailpostfix,
