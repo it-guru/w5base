@@ -30,9 +30,10 @@ $|=1;
 foreach my $module (qw(Time::HiRes Digest::SHA1 Data::HexDump
                        FindBin UNIVERSAL Carp Getopt::Long Sys::Syslog
                        Scalar::Util Unicode::String Encode Exporter POSIX
-                       Date::Calc Text::ParseWords
-                       DateTime DateTime::Span DateTime::SpanSet 
-                       Data::Dumper)){
+                       Date::Calc Text::ParseWords Set::Infinite IO::Multiplex
+                       DateTime DateTime::Span DateTime::SpanSet Object::MultiType
+                       XML::Parser IO::Stringy MIME::Tools 
+                       Net::Server XML::Smart IPC::Smart Data::Dumper RPC::Smart)){
    printf("INFO:  check module %-33s           ... ","'$module'");
    eval("use $module;"); 
    ysleep if ($module ne "Time::HiRes"); 
