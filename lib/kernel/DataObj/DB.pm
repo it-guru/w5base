@@ -699,7 +699,12 @@ sub getOnlyFirst
    $self->SetCurrentView(@view);
    $self->Limit(1,1);
    my @res=$self->getFirst();
-   $self->{DB}->finish();
+   if (defined($self->{DB})){
+      $self->{DB}->finish();
+   }
+   else{
+      return(undef,"DB Error");
+   }
    return(@res);
 }
 
