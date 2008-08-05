@@ -171,12 +171,14 @@ sub getFinalLdapFilter
          my $sqlfield=shift;
          my $fo=shift;
          my $sub="";
-         my @vallist=$fo->prepareToSearch(@_);
-         foreach my $val (@vallist){
-            $sub.="($sqlfield=$val)";
-         }
-         if ($#vallist>0){
-           $sub="(|$sub)";
+         foreach my $subval (@_){
+            my @vallist=$fo->prepareToSearch($subval);
+            foreach my $val (@vallist){
+               $sub.="($sqlfield=$val)";
+            }
+            if ($#vallist>0){
+              $sub="(|$sub)";
+            }
          }
          return($sub);
       }
@@ -201,7 +203,7 @@ sub getFinalLdapFilter
          my $orlist=MakeLikeList($sqlfield,$fieldobject,@orlist);
          my $norlist=MakeLikeList($sqlfield,$fieldobject,@norlist);
          #msg(INFO,"orlist =$orlist");
-         msg(INFO,"norlist=$norlist");
+         #msg(INFO,"norlist=$norlist");
          if ($orlist ne "" || $norlist ne ""){ 
             my $notempty=0;
             $notempty=1 if ($$where ne "");

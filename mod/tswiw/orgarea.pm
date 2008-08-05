@@ -78,10 +78,22 @@ sub new
       new kernel::Field::Link(     name       =>'mgrwiwid',
                                    dataobjattr=>'tOuMgr'),
 
+      new kernel::Field::QualityText(),
+      new kernel::Field::QualityState(),
+      new kernel::Field::QualityOk(),
    );
    $self->setDefaultView(qw(touid name users));
    return($self);
 }
+
+sub SetFilterForQualityCheck
+{  
+   my $self=shift;
+   my @view=@_;
+   return(undef);
+}
+   
+
 
 sub getRecordImageUrl
 {

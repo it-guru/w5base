@@ -2180,6 +2180,8 @@ sub sortDetailBlocks
    my %param=@_;
    my @grp=@{$grp};
    my @prio=$self->getDetailBlockPriority($grp,%param);
+   push(@prio,"source") if (!grep(/^source$/,@prio));
+   push(@prio,"qc") if (!grep(/^qc$/,@prio));
 
    my @newlist=();
    map({
