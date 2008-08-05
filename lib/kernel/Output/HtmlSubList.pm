@@ -108,7 +108,8 @@ sub ProcessHead
    }
    my $sortline=join(",",map({'"'.$_.'"'} @sortnames));
 
-   if ($param->{ParentMode} ne "HtmlV01"){
+   if ($param->{ParentMode} ne "HtmlV01" &&
+       $param->{ParentMode} ne "HtmlNative"){
       $d.="<table width=100% style=\"table-layout:fixed\">".
           "<tr><td><div style=\"overflow:hidden\">\n";
    }
@@ -332,7 +333,8 @@ EOF
       }
    }
    $d.=$self->StoreQuery();
-   if ($param->{ParentMode} ne "HtmlV01"){
+   if ($param->{ParentMode} ne "HtmlV01" && 
+       $param->{ParentMode} ne "HtmlNative"){
       $d.="</div></td></tr></table>";
    }
 

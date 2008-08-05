@@ -401,6 +401,10 @@ sub Normalize
        $rec->{location} eq "G\xF6ppingen"){
       $rec->{label}="T-Systems SCZ S\xFCdwest";
    }
+   if ($rec->{address1}=~m/Willy.*Brandt.*Platz.*1\s*$/ && 
+       $rec->{location} eq "Augsburg"){
+      $rec->{address1}="Willy-Brandt-Platz 1";
+   }
    if ($rec->{address1}=~m/Fichtenhain.*10.*/ && 
        $rec->{location} eq "Krefeld"){
       $rec->{address1}="Europapark Fichtenhain B 10";
