@@ -104,9 +104,16 @@ sub ValidatedUpdateRecord
    if ($workdb->do("lock tables $locktables")){
       msg(DEBUG,"lock $locktables");
       my @dep=(\%{$oldrec});
-      $self->SetFilter({parentid=>[$oldrec->{$idfield}]});
-      my @d=$self->getHashList(qw(fullname parentid name));
-      push(@dep,@d); 
+      my @loadlist=($oldrec->{$idfield});
+      while($#loadlist!=-1){
+         $self->SetFilter({parentid=>\@loadlist});
+         my @d=$self->getHashList(qw(fullname parentid name));
+         @loadlist=();
+         foreach my $rec (@d){  # load recursive the full dependency
+            push(@loadlist,$rec->{$idfield});
+            push(@dep,$rec); 
+         }
+      }
       my $bak=1;
       my $writefailon=undef;
       for(my $c=0;$c<=$#dep;$c++){

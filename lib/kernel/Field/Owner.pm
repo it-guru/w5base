@@ -42,7 +42,7 @@ sub Validate
    my $name=$self->Name();
    my $userid;
 
-   if (!defined($newrec->{$name})){
+   if (!defined($newrec->{$name}) || !($newrec->{$name}=~m/^\d+$/)){
       return({}) if ($W5V2::OperationContext eq "QualityCheck");
       my $userid=$self->getDefaultValue();
       return({}) if (!defined($userid));

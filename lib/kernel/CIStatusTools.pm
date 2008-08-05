@@ -105,9 +105,9 @@ sub HandleCIStatusModification
    if ($cistatusid!=6){
       foreach my $primarykey (@primarykey){
          my $primkeyval=effVal($oldrec,$newrec,$primarykey);
-         if ($primkeyval=~m/[\[\]]/){
+         if ($primkeyval=~m/\[.*\]\s*$/){
             $self->LastMsg(ERROR,
-                           "invalid character in key field '$primarykey'");
+                           "invalid character in key field '\%s'",$primarykey);
             return(0);
          }
       }

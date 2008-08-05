@@ -254,10 +254,13 @@ sub Validate
    }
    my $cistatus=effVal($oldrec,$newrec,"cistatusid");
    $newrec->{cistatusid}=4 if ($cistatus==0);
+   if (!$self->SUPER::Validate($oldrec,$newrec,$origrec)){
+      return(0);
+   }
    if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
       return(0);
    }
-   return($self->SUPER::Validate($oldrec,$newrec,$origrec));
+   return(1);
 }
 
 sub getRecordImageUrl
@@ -323,7 +326,9 @@ sub FinishWrite
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   $self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}});
+
+  # $self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}});
+   $self->NotifyOnCIStatusChange($oldrec,$newrec);
    my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
    $self->InvalidateGroupCache();
    return($bak);
@@ -496,7 +501,6 @@ sub TreeCreate
       print $self->HtmlBottom(body=>1,form=>1);
 
    }
-   #printf STDERR ("fifi tree=$tree\n");
    return($createid);
 }
 
