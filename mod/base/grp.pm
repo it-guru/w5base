@@ -58,18 +58,6 @@ sub new
                 size          =>'20',
                 dataobjattr   =>'grp.name'),
 
-      new kernel::Field::Text(
-                name          =>'description',
-                label         =>'Description',
-                dataobjattr   =>'grp.description'),
-
-      new kernel::Field::TextDrop(
-                name          =>'parent',
-                label         =>'Parentgroup',
-                vjointo       =>'base::grp',
-                vjoinon       =>['parentid'=>'grpid'],
-                vjoindisp     =>'fullname'),
-
       new kernel::Field::Select(
                 name          =>'cistatus',
                 htmleditwidth =>'40%',
@@ -84,6 +72,18 @@ sub new
                 label         =>'CI-StateID',
                 dataobjattr   =>'grp.cistatus'),
 
+
+      new kernel::Field::Text(
+                name          =>'description',
+                label         =>'Description',
+                dataobjattr   =>'grp.description'),
+
+      new kernel::Field::TextDrop(
+                name          =>'parent',
+                label         =>'Parentgroup',
+                vjointo       =>'base::grp',
+                vjoinon       =>['parentid'=>'grpid'],
+                vjoindisp     =>'fullname'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
