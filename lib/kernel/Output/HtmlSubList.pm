@@ -155,12 +155,24 @@ function InitTab$tableid()
 addEvent(window,"load",InitTab$tableid);
 </script>
 EOF
-   $d.="<table class=maintable>\n";
+   if ($param->{ParentMode} eq "HtmlNative"){
+      $d.="<table width=100%>\n";
+   }
+   else{
+      $d.="<table class=maintable>\n";
+   }
    $d.=$self->getViewLine($fh);
 
    $d.="<tr><td class=mainblock>";
-   $d.="<table $tableidstr class=subdatatable width=100%>\n".
-       "<thead><tr class=subheadline>";
+
+   if ($param->{ParentMode} eq "HtmlNative"){
+      $d.="<table $tableidstr border=1 width=100%>\n";
+   }
+   else{
+      $d.="<table $tableidstr class=subdatatable width=100%>\n";
+   }
+
+   $d.="<thead><tr class=subheadline>";
    foreach my $fieldname (@view){
       my $field=$app->getField($fieldname);
       my $displayname=$fieldname;
@@ -294,6 +306,7 @@ sub ProcessLine
       $style.="width:auto;" if ($c==$#view && !defined($field->{htmlwidth}));
       $d.="<td class=subdatafield valign=top $align";
       $d.=" onClick=$fclick" if ($fclick ne "");
+      $data="&nbsp;" if ($data=~m/^\s*$/);
       $d.=" style=\"$style\"";
       $d.=" title=\"$weblinkname\"";
       $d.="$nowrap>".$data."</td>\n";

@@ -64,6 +64,10 @@ sub getHttpHeader
    $d.=$app->HtmlHeader();
    $d.=<<EOF;
 <style>
+body,th,td,li,p{
+   font-family:Arial,Adobe Helvetica,Helvetica;
+   font-size:12px;
+}
 th{
    text-align:left;
 }
