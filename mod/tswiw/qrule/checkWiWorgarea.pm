@@ -49,7 +49,7 @@ sub qcheckRecord
       $errorlevel=3;
    }
    else{
-      my $c="[A-Z,a-z,_,0-9 ]";
+      my $c="[\(\)a-zA-Z0-9_-\@ ]";
       if (!($rec->{shortname}=~m/^$c+$/)){
          push(@qmsg,"tOuSD includes invalid characters. valids are: $c");
       }
