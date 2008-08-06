@@ -351,6 +351,9 @@ sub Normalize
    $rec->{label}=trim($rec->{label});
    $rec->{address1}=trim($rec->{address1});
    $rec->{location}=trim($rec->{location});
+   if ($rec->{address1}=~m/Schlo(\xDF|ss)str/){
+      $rec->{address1}=~s/Schlo(\xDF|ss)str/Schlo\xDFstr/i;
+   }
    if ($rec->{address1}=~m/ALTE POTSDAMER.*7/){
       $rec->{address1}="Alte Potsdamer Stra\xDFe 7";
    }
@@ -410,11 +413,21 @@ sub Normalize
       $rec->{address1}="Europapark Fichtenhain B 10";
       $rec->{label}="T-Systems SCZ West";
    }
-   if (($rec->{location}=~m/^frankfurt am main$/i) ||
-       ($rec->{location}=~m/^frankfurt\/m$/i) ||
-       ($rec->{location}=~m/^frankfurt$/i) ||
-       ($rec->{location}=~m/^frankfurt a\.m\.$/i)){
-      $rec->{location}="Frankfurt/Main";
+   if ($rec->{address1}=~m/He.*brhlstr.*7$/ && 
+       $rec->{location} eq "Stuttgart"){
+      $rec->{address1}="He\xDFbr\xFChlstra\xDFe 7";
+   }
+   if (($rec->{location}=~m/^M\xFC[h]{0,1}lheim$/i)){
+      $rec->{location}="M\xFChlheim an der Donau";
+   }
+   if (($rec->{location}=~m/^M\xFC[h]{0,1}lheim .*Ruhr$/i) ){
+      $rec->{location}="M\xFChlheim an der Ruhr";
+   }
+   if (($rec->{location}=~m/^M\xFC[h]{0,1}lheim .*Donau$/i) ){
+      $rec->{location}="M\xFChlheim an der Donau";
+   }
+   if (($rec->{location}=~m/^M\xFC[h]{0,1}lheim .*Main$/i) ){
+      $rec->{location}="M\xFChlheim am Main";
    }
    $rec->{country}=trim($rec->{country});
    if (lc($rec->{country}) eq "de"){
