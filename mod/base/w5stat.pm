@@ -528,15 +528,35 @@ sub Presenter
       $M=$mon;
       $month=sprintf("%04d%02d",$year,$mon);
    }
-   my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
-                    ['REmployee','RBoss','RReportReceive'],"both");
+   my $lnkrole=getModuleObject($self->Config,"base::lnkgrpuserrole");
+   my $userid=$self->getCurrentUserId();
+
+   $lnkrole->SetFilter({userid=>\$userid,
+                        nativrole=>['REmployee','RBoss','RBoss2',
+                                    'RReportReceive','RQManager']});
+   my %grpids;
+   map({$grpids{$_->{grpid}}++} $lnkrole->getHashList("grpid"));
+   my $grp=getModuleObject($self->Config,"base::grp");
+   $grp->SetFilter([{grpid=>[keys(%grpids)]},
+                    {parentid=>[keys(%grpids)]}]);
+   map({$grpids{$_->{grpid}}++;
+        $grpids{$_->{parentid}}++;} $grp->getHashList("grpid","parentid"));
+   my @grpids=grep(!/^\s*$/,keys(%grpids));
+   printf STDERR ("fifi d=%s\n",Dumper(\@grpids));
+   $grp->ResetFilter();
+   $grp->SetFilter({grpid=>\@grpids});
+   my @grps=$grp->getHashList("grpid","fullname");
+                    
+
+
+
+
+
    my @grpnames;
    my @grpids;
-   foreach my $id (keys(%grps)){
-      push(@grpids,$id);
-   }
-   foreach my $g (values(%grps)){
-      push(@grpnames,$g->{fullname});
+   foreach my $r (@grps){
+      push(@grpids,$r->{grpid});
+      push(@grpnames,$r->{fullname});
    }
 
    $self->ResetFilter();
