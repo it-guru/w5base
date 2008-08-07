@@ -413,7 +413,7 @@ sub Normalize
       $rec->{address1}="Europapark Fichtenhain B 10";
       $rec->{label}="T-Systems SCZ West";
    }
-   if ($rec->{address1}=~m/He.*brhlstr.*7$/ && 
+   if ($rec->{address1}=~m/He.*br(\xFC|ue)hlstr.*7$/ && 
        $rec->{location} eq "Stuttgart"){
       $rec->{address1}="He\xDFbr\xFChlstra\xDFe 7";
    }
