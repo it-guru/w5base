@@ -545,7 +545,7 @@ sub Presenter
    printf STDERR ("fifi d=%s\n",Dumper(\@grpids));
    $grp->ResetFilter();
    $grp->SetFilter({grpid=>\@grpids});
-   my @grps=$grp->getHashList("grpid","fullname");
+   my @grps=$grp->getHashList("fullname","grpid");
                     
 
 
