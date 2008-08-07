@@ -31,6 +31,10 @@ sub qcheckRecord
       push(@qmsg,"no customer defined in change");
       $exitcode=3;
    }
+   if ($rec->{impact} =~m/^\s*$/){
+      push(@qmsg,"no impact defined in change");
+      $exitcode=3;
+   }
    my $desc={qmsg=>\@qmsg};
    return($exitcode,$desc);
 }

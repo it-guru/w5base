@@ -349,6 +349,9 @@ sub new
                 label         =>'Additional Groups',
                 dataobjattr   =>'cm3rm1.additional_groups'),
 
+      new kernel::Field::QualityText(),
+      new kernel::Field::QualityState(),
+      new kernel::Field::QualityOk()
    );
 
    $self->setDefaultView(qw(linenumber changenumber 
@@ -544,6 +547,9 @@ sub BuildVisualView
    my $d;
 
    my $label="CR# ";
+
+
+
    if ($rec->{changenumber} ne ""){
       $label.=$rec->{changenumber};
       $label.=" - ";
@@ -585,6 +591,7 @@ sub BuildVisualView
    $label.=" - ";
    my $templparam={WindowMode=>"HtmlDetail",current=>$rec};
 
+   my $qcok=$self->findtemplvar($templparam,"qcok");
    my $starttime=$self->findtemplvar($templparam,"plannedstart","detail");
    my $endtime=$self->findtemplvar($templparam,"plannedend","detail");
    my $requestedby=$self->findtemplvar($templparam,"requestedby","detail");
@@ -600,6 +607,12 @@ sub BuildVisualView
    my $bg="bgcolor";
    $aprcol="$bg=\"$gr\"" if (lc($rec->{approvalstatus}) eq "approved");
    $crscol="$bg=\"$bl\"" if (lc($rec->{currentstatus}) eq "work in progress");
+   my $qcflag="";
+   if (!$qcok){
+      $qcflag="<td rowspan=2 align=center>".
+              "<img src=\"../../base/load/alarm.gif\">".
+              "</td>";
+   }
    
 
 
@@ -608,8 +621,7 @@ sub BuildVisualView
 <table style="border-bottom-style:none;min-width:500px;width:auto;width:100%">
 <tr>
 <td width=80>Start:</td>
-<td>$starttime</td>
-</tr>
+<td>$starttime</td>$qcflag</tr>
 <tr>
 <td width=80>End:</td>
 <td>$endtime</td>
@@ -678,7 +690,7 @@ sub BuildVisualView
 </tr>
 <tr>
 <td><b><u>Description:</b></u><br>
-<table style=\"width:100%;table-layout:fixed;padding:0;margin:0\">
+<table style=\"width:100%;overflow:hidden;table-layout:fixed;padding:0;margin:0\">
 <tr><td style="min-height:80px;height:auto;height:80px">
 <pre class=multilinetext>$description</pre>
 </td></tr></table>
@@ -686,7 +698,7 @@ sub BuildVisualView
 </tr>
 <tr>
 <td><b><u>Backout Method:</b></u><br>
-<table style=\"width:100%;table-layout:fixed;padding:0;margin:0\">
+<table style=\"width:100%;overflow:hidden;table-layout:fixed;padding:0;margin:0\">
 <tr><td style="min-height:80px;height:auto;height:80px">
 <pre class=multilinetext>$rec->{fallback}</pre>
 </td></tr></table>
