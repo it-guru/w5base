@@ -159,7 +159,8 @@ sub isViewValid
    my $rec=shift;  # if $rec is not defined, insert is validated
    if (!$self->isRecordMandatorReadable($rec) &&
        !$self->isPostReflector($rec)){
-      return("header","default","itilchange","affected","relations","source","state");
+      return("header","default","itilchange","affected","relations",
+             "source","state");
    }
    return($self->SUPER::isViewValid($rec));
 }

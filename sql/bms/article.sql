@@ -3,6 +3,8 @@ create table articlegroup (
   id          bigint(20)  NOT NULL,
   name        varchar(128) NOT NULL,
   cistatus    int(2)      NOT NULL,
+    mandator     bigint(20)  default NULL,
+    databoss     bigint(20)  default NULL,
     duty         float(5,2)  default NULL,
     surcharge    float(5,2)  default NULL,
   description longtext     default NULL,
@@ -23,14 +25,35 @@ create table articlegroup (
   UNIQUE KEY name (name),
   KEY qcheck (lastqcheck)
 );
+create table articletag (
+  id          bigint(20)  NOT NULL,
+  name        varchar(128) NOT NULL,
+  article     bigint(20)  NOT NULL,
+  createdate  datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate  datetime NOT NULL default '0000-00-00 00:00:00',
+  lastqcheck  datetime default NULL,
+  createuser  bigint(20) NOT NULL default '0',
+  modifyuser  bigint(20) NOT NULL default '0',
+  editor      varchar(100) NOT NULL default '',
+  realeditor  varchar(100) NOT NULL default '',
+  srcsys      varchar(10) default 'w5base',
+  srcid       varchar(20) default NULL,
+  srcload     datetime    default NULL,
+  PRIMARY KEY  (id),
+  UNIQUE KEY srcsys (srcsys,srcid),
+  KEY name (name)
+);
 create table article (
   id          bigint(20)  NOT NULL,
   name        varchar(128) NOT NULL,
+  shortname   varchar(128) NOT NULL,
   cistatus    int(2)      NOT NULL,
-    mandator     bigint(20)  default NULL,
-    articlegroup bigint(20)  default NULL,
-    purcaseprice float(17,2) default NULL,
-    sellingprice float(17,2) default NULL,
+    unitname      char(20)    default NULL,
+    articlegroup  bigint(20)  default NULL,
+    scurrency     char(20)    default NULL,
+    purcaseprice  float(17,2) default NULL,
+    internalprice float(17,2) default NULL,
+    sellingprice  float(17,2) default NULL,
   description longtext     default NULL,
   comments    longtext     default NULL,
   additional  longtext     default NULL,
@@ -46,7 +69,8 @@ create table article (
   srcload     datetime    default NULL,
   PRIMARY KEY  (id),
   UNIQUE KEY srcsys (srcsys,srcid),
-  KEY mandator (mandator),
   KEY name (name),
+  UNIQUE KEY shortname (shortname),
+  UNIQUE KEY namegroup (articlegroup,name),
   KEY qcheck (lastqcheck)
 );
