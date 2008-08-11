@@ -136,6 +136,8 @@ sub tcomcodcause
              ETAtestSIT2
              ETAtestSIT3
              ETAtestSIT4 
+             SOXreq
+             TECreq
              misc));
 }
 
