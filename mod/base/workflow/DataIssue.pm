@@ -220,7 +220,8 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default","state","source","flow","header","relations","init","history");
+   return("default","state","source","flow","header",
+          "relations","init","history");
 }
 
 sub getDetailBlockPriority            # posibility to change the block order
@@ -480,7 +481,6 @@ sub Process
       $h->{eventstart}=NowStamp("en");
       $h->{eventend}=undef;
       $h->{DATAISSUEOPERATIONSRC}="manual";
-      printf STDERR ("fifi getWriteRequestHash=%s\n",Dumper($h));
       if (my $id=$self->StoreRecord($WfRec,$h)){
          $h->{id}=$id;
       }
@@ -509,7 +509,6 @@ package base::workflow::DataIssue::main;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfStep;
-use Data::Dumper;
 @ISA=qw(kernel::WfStep);
 
 sub generateWorkspace

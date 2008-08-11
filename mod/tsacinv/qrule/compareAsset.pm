@@ -11,22 +11,9 @@ updates" is set to "yes".
 
 =head3 IMPORTS
 
-none
+Location, Room, Memory, CPU-Count, Core-Count, SerialNo
+
 =cut
-# ToDo:
-#From AssetCenter the fields Location.
-#CurrentVersion and Description are imported. SeM and TSM are imported, if
-#it was successfuly to import the relatied contacts.
-#IP-Addresses can only be synced, if the field "Allow automatic interface
-#updates" is set to "yes".
-#If Mandator is set to "Extern" and "Allow automatic interface updates"
-#is set to "yes", some aditional Imports are posible:
-#
-#- "W5Base Administrator" field is set to the supervisor of Assignmentgroup in AC
-#
-#- "AC CO-Number" is imported to comments field in W5Base
-#
-#- "AC Assignmentgroup" is imported to comments field in W5Base
 
 #######################################################################
 
@@ -109,6 +96,12 @@ sub qcheckRecord
           $self->IfaceCompare($dataobj,
                               $rec,"room",
                               {room=>$acroom},"room",
+                              $forcedupd,$wfrequest,
+                              \@qmsg,\@dataissue,\$errorlevel,
+                              mode=>'string');
+          $self->IfaceCompare($dataobj,
+                              $rec,"serialno",
+                              $parrec,"serialno",
                               $forcedupd,$wfrequest,
                               \@qmsg,\@dataissue,\$errorlevel,
                               mode=>'string');

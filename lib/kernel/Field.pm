@@ -430,14 +430,14 @@ sub preProcessFilter
       delete($hflt->{$field});
       my $d=$fobj->vjoinobj->getHashIndexed($fobj->{vjoinon}->[1]);
       my @keylist=keys(%{$d->{$fobj->{vjoinon}->[1]}});
-      if ($#keylist==-1){
-         if ($flt{$searchfield} eq "[LEER]" || $flt{$searchfield} eq "[EMPTY]"){
-            @keylist=(undef,"") if ($#keylist==-1);
-         }
-         else{
-            @keylist=(-99) if ($#keylist==-1);
-         }
+      if (($flt{$searchfield}=~m/\[LEER\]/) || 
+          ($flt{$searchfield}=~m/\[EMPTY\]/)){
+         push(@keylist,undef,"");
       }
+      if ($#keylist==-1){
+         @keylist=(-99);
+      }
+
       $hflt->{$fobj->{vjoinon}->[0]}=\@keylist;
       if ($fobj->{vjoinon}->[0] ne $self->Name()){
          $changed=1;

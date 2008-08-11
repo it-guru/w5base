@@ -567,7 +567,7 @@ sub Presenter
                             nameid=>\@grpids},
                           ]);
 
-   foreach my $r (sort({$b->{fullname} cmp $a->{fullname}}
+   foreach my $r (sort({$a->{fullname} cmp $b->{fullname}}
                             $self->getHashList(qw(fullname id)))){
       push(@ol,$r->{id},$r->{fullname});
    }
