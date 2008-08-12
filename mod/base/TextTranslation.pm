@@ -207,5 +207,24 @@ EOF
    print $self->HtmlBottom(body=>1,form=>1);
 }
 
+sub getValidWebFunctions
+{
+   my ($self)=@_;
+   return(qw(Text2Acronym),$self->SUPER::getValidWebFunctions());
+}
+
+
+sub Text2Acronym
+{
+   my $self=shift;
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>'default.css',
+                           title=>$self->T($self->Self()));
+
+printf("fifi Text2Acronym");
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
 
 1;

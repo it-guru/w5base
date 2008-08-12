@@ -49,6 +49,8 @@
 'Tools.reflexion.w5stat'=>{de=>'Statistiken',en=>'Statistics'},
 'Tools.reflexion.fields'=>{de=>'Feldliste',en=>'Fields'},
 'Tools.reflexion.translation'=>{de=>'Translation Tabelle',en=>'Translation table'},
+'Tools.translation'=>{de=>'Übersetzung',en=>'Translation'},
+'Tools.translation.acronym'=>{de=>'Acronym Generator',en=>'Acronym generator'},
 'sysadm.joblog'=>{de=>'Event Log',en=>'Event Log'},
 'sysadm.useraccount'=>{de=>'Accountverwaltung',en=>'Account-Administration'},
 'sysadm.useraccount.new'=>{de=>'Neueingabe',en=>'New'},

@@ -285,6 +285,19 @@ sub Init
                       "base::XLSExpand",
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("Tools.translation",
+                      "base::reflexion_translation",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("Tools.translation",
+                      "base::TextTranslation",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("Tools.translation.acronym",
+                      "base::TextTranslation",
+                      func=>'Text2Acronym',
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("sysadm.joblog",
                       "base::joblog",
                       defaultacl=>['admin']);
