@@ -114,6 +114,7 @@ sub new
                 label         =>'Application CO-Number',
                 weblinkto     =>'itil::costcenter',
                 weblinkon     =>['conumber'=>'name'],
+                readonly      =>'1',
                 dataobjattr   =>'appl.conumber'),
 
       new kernel::Field::Text(
