@@ -41,7 +41,7 @@ sub moveStart
          for (my $y=0;$y<$length;$y++){ 
             $lastword=$lastword.$letters->[$a+$y]->{'char'};
          }
-         $acros{$lastword}=1;
+         $acros{lc($lastword)}=1;
          next;
       }
       my ($rstr,$rpos)=chglastchar($letters,$length,\%acros,"",$a);
@@ -105,7 +105,7 @@ sub chglastchar
    for (my $c=$pos;$c<=$#{$letters};$c++){
       $str=$str.$letters->[$c]->{'char'};
       if($length == length($str)){
-         $acros->{$str}=1;
+         $acros->{lc($str)}=1;
          if ($#{$letters} != $letters->[$c]->{'pos'}){
             chglastchar($letters,$length,$acros,substr($str,0,$length-1),$letters->[$c]->{'pos'}+1);
             return($str,$letters->[$c]->{'pos'}+1);
@@ -127,13 +127,21 @@ sub initDBs
           printf STDERR ("ERROR: can't open dictionary $d\n");
       my $fh=\*FH;
       $db{'tblname'}="$d";
-      $db{'dbfp'}=$fh;
       while (my $w=<$fh>){
-         if ($fnd ne substr($w,0,1)){
-            $fnd=substr($w,0,1); 
+         if ($fnd ne lc(substr($w,0,1))){
+            $fnd=lc(substr($w,0,1)); 
             $db{'keypos'}->{$fnd}=tell($fh);
          }
       }
+      seek($fh,0,0);
+      while (my $w=<$fh>){
+         if ($fnd ne lc(substr($w,0,2))){
+            $fnd=lc(substr($w,0,2)); 
+            $db{'keypos'}->{$fnd}=tell($fh);
+         }
+      }
+      seek($fh,0,0);
+      $db{'dbfp'}=$fh;
       push(@rdb,\%db);
    }
    return(\@rdb); 
@@ -151,16 +159,31 @@ sub seekWord
    my $acros=shift;
    my $dbs=shift;
    foreach my $key (keys(%$acros)){
-      my $k=$key;
       foreach my $db (@$dbs){
          my $f=$db->{'dbfp'};
-         seek($f,$db->{'keypos'}->{substr($key,0,1)},0);
+         my ($ch,$l);
+         if (exists($db->{'keypos'}->{substr($key,0,2)})){
+            $ch=substr($key,0,2);
+            $l=2;
+            seek($f,$db->{'keypos'}->{$ch},0);
+         }elsif(exists($db->{'keypos'}->{substr($key,0,1)})){
+            $ch=substr($key,0,1);
+            $l=1;
+            seek($f,$db->{'keypos'}->{$ch},0);
+         }else{
+            $ch="";
+            $l=0;
+            seek($f,0,0);
+         }
          while(my $dict=<$f>){
-            my $dict=chop($dict);
-print "$dict\n";
-            if (chomp($dict) eq $k){
+            chop($dict);
+            if (lc($dict) eq $key){
                $acros->{$key}=3;
+               last;
             } 
+            if (lc(substr($dict,0,$l)) ne $ch){
+               last;
+            }
          }
       }
    }
@@ -168,15 +191,20 @@ print "$dict\n";
 }
 
 
-my $length=4;
+my $length=5;
 my $name="operational framework";
 
 my $letters=scanWord($name);
 my $acros=moveStart($letters,$length);
 printf ("fifi count=%s\n",my $a=keys(%$acros));
 my $dbs=initDBs(['en']);
+#printf ("fifi dbs=%s\n",Dumper($dbs));
 seekWord($acros,$dbs);
-printf ("fifi founds=%s\n",$acros->{'oper'});
+foreach my $key (keys(%$acros)){
+   if ($acros->{$key} == 3){
+      printf ("fifi found=%s\n",$key);
+   }
+}
 closeDBs($dbs);
 
 
