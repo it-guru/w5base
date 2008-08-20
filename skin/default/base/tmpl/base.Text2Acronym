@@ -1,6 +1,12 @@
 <script language=JavaScript src="../../../../public/base/load/TextTranslation.js"></script>
-<script language="JavaScript">
+<script language=JavaScript>
+   function loading (string) 
+   {
+      var obj=document.getElementById('loading');
+      obj.appendChild(document.createTextNode('loading...'))
+   }
 </script>
+
 <table width=100%>
 <tr><td height=30></td></tr>
 <tr><td align=center><b>Acronym Creator</b></td></tr>
@@ -8,9 +14,11 @@
 <tr><td align=center>
 <form>
 Enter Keywords: <input name=src size=30 maxlength=30></input>
-<input type=submit value=" create ">
+<input type=submit value=" create " onclick="loading('loading...')">
 </form>
+<tr><td align=center height=30><div id="loading"></div></td></tr>
 </td></tr></table>
-<br><br><table border=0 width=100%>
+<br>
+<table border=0 width=100%>
 <tr><td></td><td align=center width=120><b>Acronym</b>
 </td><td width=190 align=center><b>Keyword</b></td><td></td></tr>

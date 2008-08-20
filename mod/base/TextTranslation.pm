@@ -289,15 +289,11 @@ sub Text2Acronym
    if ($cursrc ne ""){
       my $letters=scanWord($cursrc);
       my %acros;
-printf STDERR ("fifi nach scan word\n");
       for (my $l=4;$l<7;$l++){
           moveStart($letters,$l,\%acros);
       }
-printf STDERR ("fifi nach reverse\n");
       my $dbs=initDBs(['en']);
-printf STDERR ("fifi nach initDB\n");
       seekWord(\%acros,$dbs);
-printf STDERR ("fifi nach seek\n");
       closeDBs($dbs);
       foreach my $key (keys(%acros)){
          if ($acros{$key} == 5 and 
