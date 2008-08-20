@@ -83,6 +83,7 @@ sub new
                 label         =>'Instance type',
                 value         =>['Apache',
                                  'Apache Tomcat',
+                                 'BEA WebLogic',
                                  'DB2',
                                  'IIS',
                                  'Informix',
