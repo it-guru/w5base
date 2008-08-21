@@ -335,7 +335,7 @@ EOF
                  keys(%acros)."</b><td></td></tr></table>";
    }else{
       $acywords.="<script language=JavaScript>".
-                 "loading('please insert your keyword...')</script>";
+                 "loading('please insert your Keywords ...')</script>";
    }
    my $aout=$self->getParsedTemplate("tmpl/base.Text2Acronym",
                                              {static=>{acywords=>$acywords}});
