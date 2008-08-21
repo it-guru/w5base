@@ -59,13 +59,13 @@ sub qcheckRecord
 
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
    if (!$rec->{isnoifaceappl}){
-      if (ref($rec->{systems}) ne "ARRAY" || $#{$rec->{systems}}==-1){
+      if (ref($rec->{interfaces}) ne "ARRAY" || $#{$rec->{interfaces}}==-1){
          return(3,{qmsg=>['no interfaces defined'],
                    dataissue=>['no interfaces defined']});
       }
    }
    else{
-      if (ref($rec->{systems}) eq "ARRAY" && $#{$rec->{systems}}!=-1){
+      if (ref($rec->{interfaces}) eq "ARRAY" && $#{$rec->{interfaces}}!=-1){
          return(3,{qmsg=>['superfluous interfaces'],
                    dataissue=>['superfluous interfaces']});
       }
