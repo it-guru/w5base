@@ -217,7 +217,7 @@ sub getValidWebFunctions
 sub Text2Acronym
 {
    my $self=shift;
-
+   my $acywords;
    my $cursrc=Query->Param("src");
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>'default.css',
@@ -283,12 +283,17 @@ sub Text2Acronym
 #                                   'F_FeedBack'=>'0']));
 #printf ("rccode=%s <br>",$response->status_line());
 #   }
-
-   my $handlermask=$self->getParsedTemplate("tmpl/base.Text2Acronym",{});
-   print $handlermask;
    if ($cursrc ne ""){
+      $acywords=<<EOF;
+<tr>
+    <td></td>
+    <td align=center width=190><b>Acronym</b></td>
+    <td align=center width=190><b>Keyword</b></td>
+    <td></td>
+</tr>
+EOF
       my $letters=scanWord($cursrc);
-      my %acros;
+      my (%acros);
       for (my $l=4;$l<7;$l++){
           moveStart($letters,$l,\%acros);
       }
@@ -322,16 +327,19 @@ sub Text2Acronym
                $nword=$nword.$keychr;
             }
          }
-         print ("<tr><td></td><td align=center width=120>$key
-                 </td><td width=190 align=center>$nword</td><td></td></tr>");
+         $acywords.="<tr><td></td><td align=center width=190>$key
+                 </td><td width=190 align=center>$nword</td><td></td></tr>";
       }
-      printf ("<tr><td colspan=4>&nbsp;</td></tr><tr><td></td><td align=center".
-              " colspan=2><b>possibilities=%s</b><td></td></td></tr></table>",
-              my $co=keys(%acros));
+      $acywords.="<tr><td colspan=4>&nbsp;</td></tr><tr><td></td><td ".
+                 "align=center colspan=2><b>possibilities=".
+                 keys(%acros)."</b><td></td></tr></table>";
    }else{
-         print ("<tr><td></td><td colspan=2 align=center width=120>".
-                "please insert your keyword...</td><td></td></tr>");
+      $acywords.="<script language=JavaScript>".
+                 "loading('please insert your keyword...')</script>";
    }
+   my $aout=$self->getParsedTemplate("tmpl/base.Text2Acronym",
+                                             {static=>{acywords=>$acywords}});
+   print $aout;
    print $self->HtmlBottom(body=>1,form=>1);
 }
 
@@ -454,7 +462,7 @@ sub initDBs
    foreach my $d (@$db){
       my %db;
       my $tell=0;
-      open(my $fh,'<'."/opt/w5base/lib/dict/$d") ||
+      open(my $fh,'<'." $W5V2::INSTDIR/lib/dict/$d") ||
           printf STDERR ("ERROR: can't open dictionary $d\n");
       $db{'tblname'}="$d";
       while (my $w=<$fh>){
