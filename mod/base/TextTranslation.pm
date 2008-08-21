@@ -292,7 +292,7 @@ sub Text2Acronym
       for (my $l=4;$l<7;$l++){
           moveStart($letters,$l,\%acros);
       }
-      my $dbs=initDBs(['en']);
+      my $dbs=initDBs(['en','de']);
       seekWord(\%acros,$dbs);
       closeDBs($dbs);
       foreach my $key (keys(%acros)){
@@ -449,8 +449,6 @@ sub initDBs
 {
    my $db=shift;
    my @rdb;
-   my $fnd="";
-   my $fnd2="";
    my $fnd3="";
    my $fnd4="";
    foreach my $d (@$db){
@@ -460,20 +458,12 @@ sub initDBs
           printf STDERR ("ERROR: can't open dictionary $d\n");
       $db{'tblname'}="$d";
       while (my $w=<$fh>){
-         if ($fnd ne lc(substr($w,0,1))){
-            $fnd=lc(substr($w,0,1)); 
-            $db{'keypos'}->{$fnd}=$tell;
-         }
-         if ($fnd2 ne lc(substr($w,0,2))){
-            $fnd2=lc(substr($w,0,2)); 
-            $db{'keypos'}->{$fnd2}=$tell;
-         }
          if ($fnd3 ne lc(substr($w,0,3))){
             $fnd3=lc(substr($w,0,3)); 
             $db{'keypos'}->{$fnd3}=$tell;
          }
-         if ($fnd4 ne lc(substr($w,0,3))){
-            $fnd4=lc(substr($w,0,3)); 
+         if ($fnd4 ne lc(substr($w,0,4))){
+            $fnd4=lc(substr($w,0,4)); 
             $db{'keypos'}->{$fnd4}=$tell;
          }
          $tell=tell($fh);
@@ -509,14 +499,6 @@ sub seekWord
          }elsif(exists($db->{'keypos'}->{substr($key,0,3)})){
             $ch=substr($key,0,3);
             $l=3;
-            seek($f,$db->{'keypos'}->{$ch},0);
-         }elsif(exists($db->{'keypos'}->{substr($key,0,2)})){
-            $ch=substr($key,0,2);
-            $l=2;
-            seek($f,$db->{'keypos'}->{$ch},0);
-         }elsif(exists($db->{'keypos'}->{substr($key,0,1)})){
-            $ch=substr($key,0,1);
-            $l=1;
             seek($f,$db->{'keypos'}->{$ch},0);
          }else{
             last;
