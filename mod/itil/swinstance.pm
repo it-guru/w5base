@@ -84,6 +84,7 @@ sub new
                 value         =>['Apache',
                                  'Apache Tomcat',
                                  'BEA WebLogic',
+                                 'BEA Tuxedo',
                                  'DB2',
                                  'IIS',
                                  'Informix',
