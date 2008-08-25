@@ -82,7 +82,6 @@ sub new
                 htmleditwidth =>'40%',
                 label         =>'Instance type',
                 value         =>['Apache',
-                                 'Apache Tomcat',
                                  'BEA WebLogic',
                                  'BEA Tuxedo',
                                  'DB2',
@@ -94,7 +93,8 @@ sub new
                                  'Oracle',
                                  'SAP/R2',
                                  'SAP/R3',
-                                 'SunONE'],
+                                 'SunONE',
+                                 'Tomcat'],
                 dataobjattr   =>'swinstance.swnature'),
 
       new kernel::Field::TextDrop(
