@@ -203,6 +203,7 @@ sub Sendmail
          $mail.="Message-ID: <".$rec->{id}.'@'.$rec->{initialconfig}.'@'.
                 $rec->{initialsite}.'@'."W5Base>\n";
          $mail.="Mime-Version: 1.0\n";
+         $mail.="X-Vacation-Reply-To: hartmut.vogler\@t-systems.com\n";
          $mail.="Content-Type: multipart/alternative; boundary=\"$bound\"\n";
          $mail.="--$bound";
          $mail.="\n";
