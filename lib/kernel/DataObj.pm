@@ -1558,7 +1558,7 @@ sub getFieldObjsByView
       $fullfieldname=trim($fullfieldname);
       my ($container,$fieldname)=(undef,$fullfieldname);
       if ($fullfieldname=~m/\./){
-         ($container,$fieldname)=$fullfieldname=~m/^(\S+)\.(\S+)/;
+         ($container,$fieldname)=$fullfieldname=~m/^(\S+?)\.(\S+)/;
       }
       my $fobj;
       if (!defined($container)){
