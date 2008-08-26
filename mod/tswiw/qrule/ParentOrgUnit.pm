@@ -53,7 +53,7 @@ sub qcheckRecord
    my $self=shift;
    my $dataobj=shift;
    my $rec=shift;
-   my $errorlevel=undef;
+   my $errorlevel=0;
 
    if ($rec->{cistatusid}==4){
       if ($rec->{srcsys} eq "WhoIsWho"){
