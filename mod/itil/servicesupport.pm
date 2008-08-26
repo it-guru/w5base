@@ -117,6 +117,23 @@ sub new
                 label         =>'callcenter active',
                 container     =>'additional'),
 
+      new kernel::Field::Boolean(
+                name          =>'issaprelation',
+                label         =>'SAP relation posible',
+                container     =>'additional'),
+
+      new kernel::Field::Text(
+                name          =>'sapcompanycode',
+                label         =>'SAP Company Code',
+                group         =>'saprelation',
+                dataobjattr   =>'servicesupport.sapcompanycode'),
+
+      new kernel::Field::Text(
+                name          =>'sapservicename',
+                label         =>'SAP Service name',
+                group         =>'saprelation',
+                dataobjattr   =>'servicesupport.sapservicename'),
+
       new kernel::Field::Textarea(
                 name          =>'servicedescription',
                 group         =>'finance',
@@ -214,7 +231,8 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default finance oncallservice support service callcenter source));
+          qw(default finance oncallservice support service 
+             callcenter saprelation source));
 }
 
 
@@ -271,7 +289,8 @@ sub isWriteValid
                          ($rec->{cistatusid}<3 && $rec->{creator}==$userid) ||
                          $self->IsMemberOf($self->{CI_Handling}->{activator}));
    if (grep(/^default$/,@blklist) && defined($rec)){
-      foreach my $grp (qw(service oncallservice support callcenter)){
+      foreach my $grp (qw(service oncallservice support callcenter 
+                          saprelation)){
          push(@blklist,$grp) if ($rec->{"is".$grp});
       }
       push(@blklist,"finance");
@@ -287,7 +306,7 @@ sub isViewValid
    my @param=@_;
    my @adds=();
    return("header","default") if (!defined($rec));
-   foreach my $grp (qw(service oncallservice support callcenter)){
+   foreach my $grp (qw(service oncallservice support callcenter saprelation)){
       push(@adds,$grp) if ($rec->{"is".$grp});
    }
 

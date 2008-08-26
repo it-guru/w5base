@@ -1,4 +1,4 @@
-'itil::servicesupport'=>{de=>'Service und Support',en=>'Service and Support'},
+'itil::servicesupport'=>{de=>'Service und Support Klasse',en=>'Service and Support Class'},
 'fieldgroup.default'=>{de=>'Service und Support',en=>'Service and Support'},
 'service'=>{de=>'Service-Zeiten'},
 'support'=>{de=>'Support-Zeiten'},
@@ -10,9 +10,17 @@
 'fieldgroup.service'=>{de=>'Service-Zeiten',en=>'service'},
 'fieldgroup.support'=>{de=>'Support-Zeiten',en=>'support'},
 'fieldgroup.finance'=>{de=>'Finanzdaten',en=>'Finance'},
+'fieldgroup.saprelation'=>{de=>'SAP Zuorndung',en=>'SAP relation'},
 'service active'=>{de=>'Service-Zeiten definiert'},
 'oncall active'=>{de=>'Rufbereitschaftszeiten definiert'},
 'Service description'=>{de=>'Leistungsbeschreibung'},
 'support active'=>{de=>'Support-Zeiten definiert'},
 'callcenter active'=>{de=>'CallCenter-Zeiten definiert'},
+'SAP relation posible'=>{de=>'SAP Zuordnung möglich'},
 'Flat hours per month'=>{de=>'Pauschaler monatlicher Stundenansatz'},
+'WELCOME'=>{de=>'
+Eine Service & Support Klasse ist die Definition einer
+Leistung oder eines Services.',en=>'
+'},
+'SAP Company Code'=>{de=>'SAP Buchungskreis'},
+'SAP Service Name'=>{de=>'SAP Leistungsart'},

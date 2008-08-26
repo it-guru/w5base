@@ -661,3 +661,5 @@ alter table asset  add databoss bigint(20) default NULL,add key(databoss);
 alter table system add databoss bigint(20) default NULL,add key(databoss);
 alter table lnkapplcustcontract add unique applcontr(appl,custcontract);
 alter table asset  add allowifupdate int(2) default 0;
+alter table servicesupport add sapservicename varchar(20) default NULL;
+alter table servicesupport add sapcompanycode varchar(20) default NULL;

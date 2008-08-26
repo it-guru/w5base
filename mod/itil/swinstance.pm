@@ -223,6 +223,17 @@ sub new
                 vjoinon       =>['servicesupportid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::TextDrop(
+                name          =>'servicesupportsapservicename',
+                label         =>'Service&Support Class - SAP Service name',
+                group         =>'misc',
+                htmldetail    =>0,
+                readonly      =>1,
+                vjointo       =>'itil::servicesupport',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['servicesupportid'=>'id'],
+                vjoindisp     =>'sapservicename'),
+
       new kernel::Field::Boolean(
                 name          =>'custcostalloc',
                 label         =>'Customer cost allocation',
@@ -456,7 +467,11 @@ sub Validate
       $self->LastMsg(ERROR,"invalid swnature");
       return(0);
    }
-   if ($name eq ""){
+   if (exists($newrec->{name})){
+      $newrec->{name}=$name;
+   }
+   $name=~s/\./_/g;
+   if ($name eq "" || ($name=~m/[^-a-z0-1\._]/i)){
       $self->LastMsg(ERROR,"invalid instance name");
       return(0);
    }
