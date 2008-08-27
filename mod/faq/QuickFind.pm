@@ -163,10 +163,29 @@ sub doSearch
                       "../../faq/forum/Topic/".
                       "$rec->{id}");
       }
-
-
+   }
+   if (grep(/^ci$/,@stags)){
+      my $tree="foldersTree";
+      if (!$found){
+         print treeViewHeader($label,1);
+         $found++;
+      }
+      print <<EOF;
+function switchTag(id)
+{
+   var e=document.getElementById(id);
+   e.style.visibility="visible";
+   e.style.display="block";
+}
+EOF
+      print insFld($tree,"itil__appl","Application");
+      $tree="itil__appl";
+      print insDoc($tree,"AG XY \@ DTAG.T-Com<div id=\"xx\" style=\"visibility:hidden;display:none;text-decoration:none;color:black\">SeM:xxx<br><a href=http://www.google.com target=_blank>TSM:xxx</a><br></div>","javascript:switchTag('xx')");
+      print insDoc($tree,"AG XY<br>","../../faq/forum/Topic/123");
 
    }
+
+
    if (!$found){
       print treeViewHeader("<font color=red>".$self->T("nothing found").
                            "</font>",1);
@@ -180,15 +199,23 @@ sub insDoc
    my $label=shift;
    my $link=shift;
 
-   $label=~s/"//g;
-   $link=sprintf("javascript:openwin('%s','_blank',".
-                 "'height=400,width=550,toolbar=no,".
-                 "status=no,resizable=yes,scrollbars=auto')",$link); 
+   $label=~s/"/\\"/g;
+   if (!($link=~m/^javascript:/)){
+      $link=sprintf("javascript:openwin('%s','_blank',".
+                    "'height=400,width=550,toolbar=no,".
+                    "status=no,resizable=yes,scrollbars=auto')",$link); 
+   }
+   my $mode="S";
+   if ($link=~m/^javascript:/i){
+      $link=~s/^javascript://i;
+      $mode.="j";
+   }
+   $link=~s/'/\\\\\\'/g;
 
 
    my $d=sprintf("e=insDoc(%s,".
-             "gLnk(\"R\",\"<div class=specialClass>%s</div>\",".
-             "\"%s\"));e.target='_self';\n",$tree,$label,$link);
+             "gLnk(\"%s\",\"<div class=specialClass>%s</div>\",".
+             "\"%s\"));\n",$tree,$mode,$label,$link);
    return($d);
 }
 
@@ -208,7 +235,6 @@ sub treeViewHeader
    my $allopen=shift;
    my $stags=shift;
    $allopen=0 if (!defined($allopen));
-
    my $d=<<EOF;
 
 <DIV style="position:absolute; top:0; left:0;display:none"><TABLE border=0><TR><TD><FONT size=-2><A style="font-size:7pt;text-decoration:none;color:silver" href="http://www.treemenu.net/" target=_blank>Javascript Tree Menu</A></FONT></TD></TR></TABLE></DIV>
@@ -220,23 +246,14 @@ sub treeViewHeader
 
 <script langauge="JavaScript">
 USETEXTLINKS=1;
+USEFRAMES=0;
+USEICONS=1;
+PRESERVESTATE=0;
 STARTALLOPEN=$allopen;
 ICONPATH = '../../../static/treeview/';
-
-foldersTree=gFld("<i>$label</i>");
-
-foldersTree.treeID="Frameset";
+foldersTree=gFld("<i>$label</i>","");
+foldersTree.treeID = "Frameless";
 foldersTree.iconSrc="../../base/load/help.gif";
-
-//aux1=insFld(foldersTree,gFld("Photos example", "demoFramesetRightFrame.html"));
-//aux1=insFld(foldersTree,gFld("xxx", "demoFramesetRightFrame.html"));
-
-//docAux=insDoc(aux1, 
-//              gLnk("R", "<div class=specialClass>CSS Class</div>", 
-//            "http://www.treeview.net/treemenu/demopics/beenthere_newyork.jpg"));
-//insDoc(foldersTree, 
-//              gLnk("R", "<div class=specialClass>CSS Class</div>", 
-//            "http://www.treeview.net/treemenu/demopics/beenthere_newyork.jpg"));
 EOF
    return($d);
 }
@@ -264,7 +281,9 @@ sub Result
 </script>
 
 <div style="margin:5px">
-<SCRIPT>initializeDocument()</SCRIPT>
+<script language="JavaScript">
+initializeDocument();
+</script>
 </div>
 EOF
    print $self->HtmlBottom(body=>1,form=>1);

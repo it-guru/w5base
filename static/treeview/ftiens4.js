@@ -62,29 +62,29 @@ function Folder(folderDescription, hreference) //constructor
   this.prependHTML = ""
  
   //dynamic data 
-  this.isOpen = false
-  this.isLastOpenedFolder = false
-  this.isRendered = 0
+  this.isOpen = false;
+  this.isLastOpenedFolder = false;
+  this.isRendered = 0;
  
   //methods 
-  this.initialize = initializeFolder 
-  this.setState = setStateFolder 
-  this.addChild = addChild 
-  this.addChildren = addChildren
-  this.createIndex = createEntryIndex 
-  this.escondeBlock = escondeBlock
-  this.esconde = escondeFolder 
-  this.folderMstr = folderMstr 
-  this.renderOb = drawFolder 
-  this.totalHeight = totalHeight 
-  this.subEntries = folderSubEntries 
-  this.linkHTML = linkFolderHTML
-  this.blockStartHTML = blockStartHTML
-  this.blockEndHTML = blockEndHTML
-  this.nodeImageSrc = nodeImageSrc
-  this.iconImageSrc = iconImageSrc
-  this.getID = getID
-  this.forceOpeningOfAncestorFolders = forceOpeningOfAncestorFolders
+  this.initialize = initializeFolder ;
+  this.setState = setStateFolder ;
+  this.addChild = addChild ;
+  this.addChildren = addChildren;
+  this.createIndex = createEntryIndex ;
+  this.escondeBlock = escondeBlock;
+  this.esconde = escondeFolder ;
+  this.folderMstr = folderMstr ;
+  this.renderOb = drawFolder ;
+  this.totalHeight = totalHeight ;
+  this.subEntries = folderSubEntries ;
+  this.linkHTML = linkFolderHTML;
+  this.blockStartHTML = blockStartHTML;
+  this.blockEndHTML = blockEndHTML;
+  this.nodeImageSrc = nodeImageSrc;
+  this.iconImageSrc = iconImageSrc;
+  this.getID = getID;
+  this.forceOpeningOfAncestorFolders = forceOpeningOfAncestorFolders;
 } 
  
 function initializeFolder(level, lastNode, leftSide) 
@@ -487,11 +487,11 @@ function drawItem(insertAtObj)
  
   if (insertAtObj == null)
   {
-	  doc.write(docW)
+     doc.write(docW)
   }
   else
   {
-      insertAtObj.insertAdjacentHTML("afterEnd", docW)
+     insertAtObj.insertAdjacentHTML("afterEnd", docW)
   }
 
   if (browserVersion == 2) { 
@@ -836,6 +836,8 @@ function setItemLink(item, optionFlags, linkData) {
       protocol = "ftp://"
     if (protocolFlag=="m")
       protocol = "mailto:"
+    if (protocolFlag=="j")
+      protocol = "javascript:"
   }
 
   item.link = protocol+linkData;    
@@ -882,12 +884,15 @@ function setInitialLayout() {
 function renderAllTree(nodeObj, parent) {
   var i=0;
   nodeObj.renderOb(parent)
-  if (supportsDeferral)
-    for (i=nodeObj.nChildren-1; i>=0; i--) 
-      renderAllTree(nodeObj.children[i], nodeObj.navObj)
-  else
+  if (supportsDeferral){
+    for (i=nodeObj.nChildren-1; i>=0; i--){
+       renderAllTree(nodeObj.children[i], nodeObj.navObj)
+    }
+  }
+  else{
     for (i=0 ; i < nodeObj.nChildren; i++) 
       renderAllTree(nodeObj.children[i], null)
+  }
 }
 
 function hideWholeTree(nodeObj, hideThisOne, nodeObjMove) {
