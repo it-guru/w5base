@@ -134,7 +134,7 @@ sub viewReplaceFields
    my $d=shift;
    my @sets=split(/\s+/,$d);
    my $app=$self->getParent;
-   @d;
+   my @d;
    foreach my $s (@sets){
       if (my ($mod,$tag)=$s=~m/^SR:(.*)::([^:]+)$/){
          if (defined($app->{ReplaceTool}->{$mod})){
