@@ -134,7 +134,7 @@ sub viewReplaceFields
    my $d=shift;
    my @sets=split(/\s+/,$d);
    my $app=$self->getParent;
-   $d="";
+   @d;
    foreach my $s (@sets){
       if (my ($mod,$tag)=$s=~m/^SR:(.*)::([^:]+)$/){
          if (defined($app->{ReplaceTool}->{$mod})){
@@ -155,11 +155,12 @@ sub viewReplaceFields
                   }
                }
                my $name=$app->T($data->{dataobj},$data->{dataobj});
-               $d.=" - $name: $label\n";
+               push(@d," - $name: $label");
             }
          }
       }
    }
+   my $d=join("\n",@d);
    $d="<table style=\"width:100%;table-layout:fixed;padding:0;margin:0\">".
       "<tr><td><img class=printspacer style=\"float:left\" ".
       "src=\"../../../public/base/load/empty.gif\" width=1 height=100>".
