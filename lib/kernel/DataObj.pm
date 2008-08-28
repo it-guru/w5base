@@ -88,7 +88,10 @@ sub SetFilterForQualityCheck    # prepaire dataobject for automatic
    my @flt;
    if (my $cistatusid=$self->getField("cistatusid")){
       $flt[0]->{cistatusid}=[3,4,5];
-      #$flt[0]->{id}=[221488];
+      if (my $mdate=$self->getField("mdate")){
+         $flt[1]->{cistatusid}=[1,2,6];
+         $flt[1]->{mdate}=">now-14d";
+      }
    }
    $self->SetFilter(\@flt);
    $self->SetCurrentView(@view);

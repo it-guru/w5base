@@ -62,8 +62,10 @@ sub QualityCheck
       my $obj=getModuleObject($self->Config,$dataobj);
       if (defined($obj)){
          if (!grep(/^0$/,keys(%{$dataobjtocheck{$dataobj}}))){
+            msg(INFO,"set mandatorid filter='%s'",
+                     join(",",keys(%{$dataobjtocheck{$dataobj}})));
             $obj->SetNamedFilter("MANDATORID",
-                            {mandatorid=>[keys(%{$dataobjtocheck{$dataobj}})]});
+                        {mandatorid=>[keys(%{$dataobjtocheck{$dataobj}})]});
          }
          return($self->doQualityCheck($obj));
       }
@@ -81,7 +83,7 @@ sub doQualityCheck
    my $dataobj=shift;
  
    msg(INFO,"doQualityCheck in Object $dataobj");
-   my @view=("id","qcok");
+   my @view=("qcok");
    if (my $lastqcheck=$dataobj->getField("lastqcheck")){
       unshift(@view,"lastqcheck");
    }
