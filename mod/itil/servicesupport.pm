@@ -310,7 +310,7 @@ sub isViewValid
       push(@adds,$grp) if ($rec->{"is".$grp});
    }
 
-   return("header","default","finance","source",@adds);
+   return("header","default","finance","source","history",@adds);
 }
 
 sub getRecordImageUrl
