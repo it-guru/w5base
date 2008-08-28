@@ -51,4 +51,40 @@ sub getControlRecord
    return($d);
 }
 
+sub doReplaceOperation
+{
+   my $self=shift;
+   my $tag=shift;
+   my $data=shift;
+   my ($replacemode,$search,$searchid,$replace,$replaceid)=@_;
+   my $count=0;
+
+   my $dataobj=getModuleObject($self->getParent->Config,$data->{dataobj});
+   my $opdataobj=getModuleObject($self->getParent->Config,$data->{dataobj});
+   if (defined($dataobj)){
+      my $idname=$dataobj->IdField->Name();
+      my %flt=($data->{idfield}=>\$searchid);
+      my $cistatusobj=$dataobj->getField("cistatusid");
+      if (defined($cistatusobj)){
+         $flt{cistatusid}='<=5';
+      }
+      $dataobj->SetFilter(\%flt);
+      $dataobj->SetCurrentView(qw(ALL));
+      my ($rec,$msg)=$dataobj->getFirst();
+      if (defined($rec)){
+         do{
+            $opdataobj->ValidatedUpdateRecord($rec,
+                                  {$data->{target}=>$replace},
+                                  {$idname=>\$rec->{$idname}});
+            $count++;
+            ($rec,$msg)=$dataobj->getNext();
+         }until(!defined($rec));
+      }
+   }
+
+   return($count);
+}
+
+
+
 1;

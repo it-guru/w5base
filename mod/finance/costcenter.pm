@@ -225,6 +225,7 @@ sub new
    
 
    );
+   $self->{history}=[qw(modify delete)];
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","admin.finance.costcenter"],
                          uniquesize=>20};

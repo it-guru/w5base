@@ -89,6 +89,12 @@ sub getControlRecord
              target       =>'databoss',
              idfield      =>'databossid'
            },
+           swinstancedataboss=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'itil::swinstance',
+             target       =>'databoss',
+             idfield      =>'databossid'
+           },
            lnkapplappl=>{
              replaceoptype=>'itil::appl',
              dataobj      =>'itil::lnkapplappl',

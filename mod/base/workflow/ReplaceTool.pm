@@ -160,7 +160,7 @@ sub viewReplaceFields
          }
       }
    }
-   my $d=join("\n",@d);
+   my $d=join("\n",sort(@d));
    $d="<table style=\"width:100%;table-layout:fixed;padding:0;margin:0\">".
       "<tr><td><img class=printspacer style=\"float:left\" ".
       "src=\"../../../public/base/load/empty.gif\" width=1 height=100>".
