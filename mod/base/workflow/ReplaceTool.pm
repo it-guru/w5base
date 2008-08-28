@@ -282,7 +282,12 @@ sub doReplaceOperation
       }
    }
    $W5V2::OperationContext=$oldOperationContext;
-   return("$count entrys replaced");
+   my $msg="$count entrys replaced";
+   if ($self->LastMsg()>0){
+      $msg.="\n\n".join("",$self->LastMsg());
+      $self->LastMsg("");
+   }
+   return($msg);
 }
 
 sub getRecordImageUrl

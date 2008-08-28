@@ -69,10 +69,11 @@ sub doReplaceOperation
       my ($rec,$msg)=$dataobj->getFirst();
       if (defined($rec)){
          do{
-      #      $opdataobj->ValidatedUpdateRecord($rec,
-      #                            {$data->{target}=>$replace},
-      #                            {$idname=>\$rec->{$idname}});
-            $count++;
+            if ($opdataobj->ValidatedUpdateRecord($rec,
+                                  {$data->{target}=>$replace},
+                                  {$idname=>\$rec->{$idname}})){
+               $count++;
+            }
             ($rec,$msg)=$dataobj->getNext();
          }until(!defined($rec));
       }
