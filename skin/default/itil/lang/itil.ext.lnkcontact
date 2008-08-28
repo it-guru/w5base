@@ -4,7 +4,7 @@
 'read system'=>{de=>'lesen'},
 'write asset'=>{de=>'schreiben'},
 'read asset'=>{de=>'lesen'},
-'Business Employee'=>{de=>'Betriebsteam'},
+'Business Employee'=>{de=>'Betriebsmitarbeiter'},
 'Customer Contact'=>{de=>'Kundenkontakt'},
 'Developer'=>{de=>'Entwickler'},
 'Chief Developer'=>{de=>'Entwicklungsleiter'},
