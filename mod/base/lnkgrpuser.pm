@@ -428,9 +428,10 @@ sub StoreLastKnownBoss  # the storeing of last known Boss-Email is needed,
 
    if (!defined($newrec) ||
        grep(/^(RBoss|RBoss2)$/,@{$oldrec->{roles}},@{$newrec->{roles}})){
-      $self->ResetFilter();
-      $self->SetFilter({grpid=>\$grpid,nativroles=>["RBoss","RBoss2"]});
-      my @l=$self->getHashList("email");
+      my $lnk=getModuleObject($self->Config,$self->Self);
+      $lnk->ResetFilter();
+      $lnk->SetFilter({grpid=>\$grpid,nativroles=>["RBoss","RBoss2"]});
+      my @l=$lnk->getHashList("email");
       if ($#l!=-1){
          my @email=grep(!/^\s*$/,map({$_->{email}} @l));
          if ($#email!=-1){
