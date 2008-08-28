@@ -35,7 +35,7 @@ sub getControlRecord
 {
    my $self=shift;
    my $d=[ 
-           databoss=>{
+           appldataboss=>{
              replaceoptype=>'base::user',
              dataobj      =>'itil::appl',
              target       =>'databoss',
@@ -76,6 +76,18 @@ sub getControlRecord
              dataobj      =>'itil::appl',
              target       =>'sem2',
              idfield      =>'sem2id'
+           },
+           systemdataboss=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'itil::system',
+             target       =>'databoss',
+             idfield      =>'databossid'
+           },
+           assetdataboss=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'itil::asset',
+             target       =>'databoss',
+             idfield      =>'databossid'
            },
            lnkapplappl=>{
              replaceoptype=>'itil::appl',
