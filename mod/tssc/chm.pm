@@ -246,6 +246,12 @@ sub new
                 label         =>'Create time',
                 dataobjattr   =>'cm3rm1.orig_date_entered'),
 
+      new kernel::Field::Text(
+                name          =>'closedby',
+                group         =>'close',
+                label         =>'Closed by',
+                dataobjattr   =>'cm3rm1.closed_by'),
+
       new kernel::Field::Date(
                 name          =>'closetime',
                 depend        =>['status'],
@@ -259,6 +265,20 @@ sub new
                 group         =>'close',
                 label         =>'Close Code',
                 dataobjattr   =>'cm3rm1.close_code_accept'),
+
+      new kernel::Field::Text(
+                name          =>'resolvedby',
+                group         =>'close',
+                label         =>'Resolved by',
+                dataobjattr   =>'cm3rm1.resolved_by'),
+
+      new kernel::Field::Date(
+                name          =>'resolvetime',
+                depend        =>['status'],
+                group         =>'close',
+                timezone      =>'CET',
+                label         =>'Resolve time',
+                dataobjattr   =>'cm3rm1.resolve_time'),
 
       new kernel::Field::Date(
                 name          =>'workstart',
