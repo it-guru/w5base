@@ -58,6 +58,12 @@ sub new
                 label         =>'Description',
                 dataobjattr   =>'tbl_p800sleist.description'),
 
+      new kernel::Field::Date(
+                name          =>'eventend',
+                sqlorder      =>'desc',
+                label         =>'Event End',
+                dataobjattr   =>'tbl_p800sleist.eventend'),
+
       new kernel::Field::Text(    
                 name          =>'appl',
                 label         =>'Application',
@@ -83,6 +89,20 @@ sub new
                 unit          =>'min',
                 label         =>'Worktime',
                 dataobjattr   =>'tbl_p800sleist.tcomworktime'),
+
+      new kernel::Field::Text(
+                name          =>'month',
+                group         =>'source',
+                sqlorder      =>'desc',
+                label         =>'P800 Month',
+                dataobjattr   =>'tbl_p800sleist.month'),
+
+      new kernel::Field::MDate(
+                name          =>'mdate',
+                group         =>'source',
+                sqlorder      =>'desc',
+                label         =>'Modification-Date',
+                dataobjattr   =>'tbl_p800sleist.mdate'),
 
       new kernel::Field::CDate(
                 name          =>'cdate',
@@ -110,7 +130,7 @@ sub new
                 label         =>'Source-Load',
                 dataobjattr   =>'tbl_p800sleist.srcload'),
    );
-   $self->setDefaultView(qw(linenumber shortdescription 
+   $self->setDefaultView(qw(linenumber name 
                             eventend appl custcontract));
    return($self);
 }

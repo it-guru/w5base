@@ -955,7 +955,8 @@ sub ValidatedInsertOrUpdateRecord
             }
          }
          if ($changed){
-            $self->ValidatedUpdateRecord($rec,$newrec,
+            my $opobj=$self->Clone();
+            $opobj->ValidatedUpdateRecord($rec,$newrec,
                                          {$idfname=>$rec->{$idfname}});
          }
          push(@idlist,$rec->{$idfname});

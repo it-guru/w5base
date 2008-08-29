@@ -5,5 +5,7 @@
 'Application'=>{de=>'Anwendung'},
 'Customer Contract'=>{de=>'Kundenvertrag'},
 'P800 Cause'=>{de=>'P800 Tätigkeit'},
+'Event End'=>{de=>'Ereignisende'},
 'P800 Comments'=>{de=>'P800 Bemerkungen'},
+'P800 Month'=>{de=>'P800 Abrechnungsmonat'},
 'Worktime'=>{de=>'Arbeitszeit'},

@@ -210,7 +210,6 @@ sub getArrayList
 
    my ($sth,$errstr)=$self->execute($cmd);
    if (defined($sth)){
-printf STDERR ("1state=%s\n",Dumper(\$sth));
       while(my $h=$self->{'sth'}->fetchrow_arrayref()){
          push(@l,$h);
       }

@@ -90,6 +90,7 @@ sub mkp800
       @monthlist=(sprintf("%02d/%04d",$sM,$sY),
                   sprintf("%02d/%04d",$month,$year));
    }
+   my $bflexxp800=getModuleObject($self->Config,"tsbflexx::p800sonder");
 
    my %p800special=();
    foreach my $month (@monthlist){
@@ -117,11 +118,13 @@ sub mkp800
                                      affectedapplicationid
                                      wffields.tcomcodrelevant
                                      wffields.tcomcodcause
+                                     wffields.tcomcodcomments
                                      affectedapplication
-                             headref class step stateid
-                             srcid));
+                             headref class step stateid eventend
+                             srcid srcsys));
       $wf->SetFilter(eventend=>"\">=$starttime\" AND \"<=$endtime\"",
                      class=>[grep(/^AL_TCom::.*$/,keys(%{$wf->{SubDataObj}}))]);
+      #$wf->SetFilter({srcid=>"CHM00283030"});
       my %nocontract=();
       my %p800=();
       my ($rec,$msg)=$wf->getFirst();
@@ -132,7 +135,7 @@ sub mkp800
                 $rec->{stateid}>=17 ){
                $self->processRec($start,\%p800,$rec);
                $self->processRecSpecial($start,\%p800special,$rec,
-                                        $xlsexp,$monthlist[1]);
+                                        $xlsexp,$bflexxp800,$monthlist[1]);
             }
             else{
                if (defined($rec->{srcid})){
@@ -312,6 +315,7 @@ sub mkp800
              $wf->ValidatedDeleteRecord($_);
          });
          $self->xlsFinish($xlsexp,$month);  # stores the xls export in webfs
+         $self->bflexxFinish($bflexxp800,$now,$month); 
       }
    }
    return({exitcode=>0});
@@ -389,6 +393,7 @@ sub processRecSpecial
    my $p800=shift;
    my $rec=shift;
    my $xlsexp=shift;
+   my $bflexxp800=shift;
    my $specialmon=shift;
 
    msg(DEBUG,"special process %s:%s end=%s",
@@ -414,6 +419,7 @@ sub processRecSpecial
          }
          if ($rec->{tcomcodcause} ne "std"){
             $self->xlsExport($xlsexp,$rec,$mon,$eY,$eM,$eD);
+            $self->bflexxExport($bflexxp800,$rec,$mon,$eY,$eM,$eD);
             for(my $c=0;$c<=$#{$rec->{affectedcontractid}};$c++){
                my $cid=$rec->{affectedcontractid}->[$c];
                my $wt=$rec->{headref}->{specialt};
@@ -434,6 +440,67 @@ sub processRecSpecial
             }
          }
       }
+   }
+}
+
+
+sub bflexxFinish
+{
+   my $self=shift;
+   my $bflexxp800=shift;
+   my $now=shift;
+   my $repmon=shift;
+
+   my $opobj=$bflexxp800->Clone();
+   if (my ($m,$y)=$repmon=~m/^(\d+)\/(\d{4})/){
+      $repmon=sprintf("%04d%02d",$y,$m);
+   }
+   $bflexxp800->ResetFilter(); 
+   $bflexxp800->SetFilter(srcload=>"\"<$now\"",month=>\$repmon);
+   $bflexxp800->ForeachFilteredRecord(sub{
+       $opobj->ValidatedDeleteRecord($_);
+   });
+
+}
+
+sub bflexxExport
+{
+   my $self=shift;
+   my $bflexxp800=shift;
+   my $rec=shift;
+   my $repmon=shift;
+   my ($wY,$wM,$wD)=@_;
+
+
+   if (defined($bflexxp800)){
+      my $ag=$rec->{affectedapplication};
+      $ag=[$ag] if (!ref($ag) eq "ARRAY");
+      my $vert=$rec->{affectedcontract};
+      $vert=[$vert] if (!ref($vert) eq "ARRAY");
+      my $cause=$rec->{tcomcodcause};
+      $cause=join("",@$cause) if (ref($cause) eq "ARRAY");
+      my $comments=$rec->{tcomcodcomments};
+      $comments=join("",@$comments) if (ref($comments) eq "ARRAY");
+      my $specialt=$rec->{headref}->{specialt};
+      $specialt=join("",@$specialt) if (ref($specialt) eq "ARRAY");
+      if (my ($m,$y)=$repmon=~m/^(\d+)\/(\d{4})/){
+         $repmon=sprintf("%04d%02d",$y,$m);
+      }
+
+      my $newrec={name=>$rec->{name},
+                  eventend=>$rec->{eventend},
+                  w5baseid=>$rec->{id},
+                  tcomworktime=>$specialt,
+                  tcomcodcause=>$cause,
+                  tcomcodcomments=>$comments,
+                  appl=>join(", ",@$ag),
+                  custcontract=>join(", ",@$vert),
+                  srcload=>NowStamp("en"),
+                  srcid=>$rec->{srcid},
+                  month=>$repmon,
+                  srcsys=>$rec->{srcsys}};
+      $bflexxp800->ValidatedInsertOrUpdateRecord($newrec,
+                                              {w5baseid=>\$newrec->{w5baseid}});
    }
 }
 

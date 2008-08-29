@@ -69,12 +69,15 @@ sub MultiOperationActionOn
    $opobj->ResetFilter();
    $opobj->SetFilter({$idfield->Name()=>\$id});
    $opobj->SetCurrentView(qw(ALL));
+   my @dellist;
    $opobj->ForeachFilteredRecord(sub{
-                      my $rec=$_;
-                      if (!($opobj->SecureValidatedDeleteRecord($rec))){
-                         $fail=1;
-                      }
+                      push(@dellist,$_);
                      });
+   foreach my $rec (@dellist){
+      if (!($opobj->SecureValidatedDeleteRecord($rec))){
+         $fail=1;
+      }
+   }
    return(1) if (!$fail);
    return(0);
 }
