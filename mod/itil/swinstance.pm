@@ -115,7 +115,7 @@ sub new
                 htmlwidth     =>'100px',
                 label         =>'Application CO-Number',
                 weblinkto     =>'itil::costcenter',
-                weblinkon     =>['conumber'=>'name'],
+                weblinkon     =>['applconumber'=>'name'],
                 readonly      =>'1',
                 dataobjattr   =>'appl.conumber'),
 

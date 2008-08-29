@@ -121,9 +121,7 @@ sub SampleEvent2
 {
    my $self=shift;
 
-   msg(DEBUG,"Start(Event2): ... sleep 4");sleep(4);
-   msg(ERROR,"test error  (Event2):");
-   msg(DEBUG,"End  msg=%s (Event2):",$self->getParent->T("undef","AL_TCom::lib::workflow"));
+   msg(DEBUG,"Start(Event2):");
    return({exitcode=>-1});
 }
 

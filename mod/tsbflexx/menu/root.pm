@@ -64,6 +64,15 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("bflexx.p800sonder",
+                      "tsbflexx::p800sonder",
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("bflexx.p800sonder.new",
+                      "tsbflexx::p800sonder",
+                      func=>'New',
+                      defaultacl=>['admin']);
+   
    return($self);
 }
 

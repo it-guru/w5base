@@ -90,6 +90,11 @@ sub Connect
    else{
       $self->{isConnected}=1;
    }
+
+   # to prevent "no select statement currently executing" errors in mod_perl
+   # enviroment, set exec_direct on ODBC connections
+   $self->{db}->{odbc_exec_direct}=1;
+
    if (exists($self->{dbschema})){
       $self->do("alter session set sort_area_size=524288000");
       my $schemacmd="alter session set current_schema=$self->{dbschema}";
@@ -203,10 +208,15 @@ sub getArrayList
    my $cmd=shift;
    my @l;
 
-   if ($self->execute($cmd)){
+   my ($sth,$errstr)=$self->execute($cmd);
+   if (defined($sth)){
+printf STDERR ("1state=%s\n",Dumper(\$sth));
       while(my $h=$self->{'sth'}->fetchrow_arrayref()){
          push(@l,$h);
       }
+   }
+   else{
+      msg(ERROR,$errstr." while execute $cmd");
    }
    return(@l) if (wantarray());
    return(\@l);

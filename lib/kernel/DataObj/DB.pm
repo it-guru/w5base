@@ -565,6 +565,7 @@ sub InsertRecord
    #msg(INFO,"fifi InsertRecord data=%s into '$worktable'\n",Dumper($newdata));
    msg(INFO,"insert=%s",$cmd);
    if ($workdb->do($cmd)){
+      $workdb->finish();
       if (!defined($id)){
          # id was not created by w5base, soo we need to read it from the
          # table
