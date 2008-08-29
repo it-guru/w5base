@@ -18,6 +18,8 @@
 'Asset Depr./Month'=>{de=>'Abschreibung/Monat'},
 'Asset Maint./Month'=>{de=>'Wartung/Monat'},
 'Install Date'=>{de=>'Installationsdatum'},
+'Room'=>{de=>'Raum'},
+'Place'=>{de=>'Platz'},
 'Maintenance Codition'=>{de=>'Wartungsvertrag'},
 'Deprecation Start'=>{de=>'Abschreibungsbegin'},
 'Deprecation End'=>{de=>'Abschreibungsende'},

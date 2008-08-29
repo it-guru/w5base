@@ -156,6 +156,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'assetserialno',
                 readonly      =>1,
+                weblinkto     =>'none',
                 translation   =>'itil::asset',
                 label         =>'Serialnumber',
                 group         =>'physys',
@@ -167,7 +168,7 @@ sub new
                 name          =>'location',
                 depend        =>['assetid'],
                 readonly      =>1,
-                group         =>'physys',
+                group         =>'location',
                 label         =>'Location',
                 vjointo       =>'base::location',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
@@ -177,11 +178,32 @@ sub new
       new kernel::Field::Text(
                 name          =>'assetroom',
                 readonly      =>1,
+                weblinkto     =>'none',
                 label         =>'Room',
-                group         =>'physys',
+                group         =>'location',
                 vjointo       =>'itil::asset',
                 vjoinon       =>['assetid'=>'id'],
                 vjoindisp     =>'room'),
+
+      new kernel::Field::Text(
+                name          =>'assetplace',
+                readonly      =>1,
+                weblinkto     =>'none',
+                label         =>'Place',
+                group         =>'location',
+                vjointo       =>'itil::asset',
+                vjoinon       =>['assetid'=>'id'],
+                vjoindisp     =>'place'),
+
+      new kernel::Field::Text(
+                name          =>'assetrack',
+                readonly      =>1,
+                weblinkto     =>'none',
+                label         =>'Rack',
+                group         =>'location',
+                vjointo       =>'itil::asset',
+                vjoinon       =>['assetid'=>'id'],
+                vjoindisp     =>'rack'),
 
       new kernel::Field::TextDrop(
                 name          =>'adm2',
@@ -338,6 +360,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'hwmodel',
                 readonly      =>1,
+                weblinkto     =>'none',
                 group         =>'physys',
                 label         =>'Hardwaremodel',
                 vjointo       =>'itil::hwmodel',
@@ -354,6 +377,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'hwproducer',
                 readonly      =>1,
+                weblinkto     =>'none',
                 group         =>'physys',
                 label         =>'Producer',
                 vjointo       =>'itil::asset',
@@ -1002,7 +1026,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default admin logsys physys systemclass 
+          qw(default admin logsys location physys systemclass 
              opmode applications software ipaddresses
              contacts misc attachments control source));
 }

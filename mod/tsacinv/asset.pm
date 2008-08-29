@@ -106,6 +106,12 @@ sub new
                 group         =>"location",
                 dataobjattr   =>'assetportfolio.room'),
 
+      new kernel::Field::Text(
+                name          =>'place',
+                label         =>'Place',
+                group         =>"location",
+                dataobjattr   =>'assetportfolio.place'),
+
       new kernel::Field::Import( $self,
                 weblinkto     =>'tsacinv::model',
                 vjointo       =>'tsacinv::model',

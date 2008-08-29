@@ -66,6 +66,15 @@ sub new
                 group         =>"location",
                 fields        =>[qw(fullname location)]),
 
+      new kernel::Field::Import($self,
+                vjointo       =>'tsacinv::asset',
+                vjoinon       =>['lassetid'=>'lassetid'],
+                weblinkto     =>'none',
+              #  weblinkon     =>['lassetid'=>'lassetid'],
+                prefix        =>"asset",
+                group         =>"location",
+                fields        =>[qw(room place)]),
+
       new kernel::Field::Link(
                 name          =>'lcostcenterid',
                 label         =>'CostCenterID',
@@ -574,7 +583,9 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default form location));
+          qw(default form applications location ipaddresses software 
+             assetdata assetfinanz 
+             services w5basedata source));
 }  
 
 
