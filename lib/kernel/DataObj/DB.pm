@@ -570,6 +570,7 @@ sub InsertRecord
          # id was not created by w5base, soo we need to read it from the
          # table
          # getHashList
+         my $cmd;
          my %q=();
          my @fieldlist=$self->getFieldList();
          foreach my $field (@fieldlist){
@@ -584,17 +585,24 @@ sub InsertRecord
                }
             }
          }
-         my $cmd;
          if (defined($idobj->{dataobjattr}) &&          # id is automatic gen
              ref($idobj->{dataobjattr}) ne "ARRAY"){    # by the database 
-            $cmd="select $idobj->{dataobjattr} from $worktable ".
-                 "where ".join(" and ",map({$_.="=".$q{$_}} keys(%q)));
-            msg(INFO,"reading id by=%s",$cmd);
-
-            my @l=$workdb->getArrayList($cmd);
-            my $rec=pop(@l);
-            if (defined($rec)){
-               $id=$rec->[0];
+            if (keys(%q)==0){     # SCOPE_IDENTIY should work on ODBC databases
+               my @l=$workdb->getArrayList("select SCOPE_IDENTITY()");
+               my $rec=pop(@l);
+               if (defined($rec)){
+                  $id=$rec->[0];
+               }
+            }
+            else{
+               $cmd="select $idobj->{dataobjattr} from $worktable ".
+                    "where ".join(" and ",map({$_.="=".$q{$_}} keys(%q)));
+               msg(INFO,"reading id by=%s",$cmd);
+               my @l=$workdb->getArrayList($cmd);
+               my $rec=pop(@l);
+               if (defined($rec)){
+                  $id=$rec->[0];
+               }
             }
          }
          if (defined($idobj->{dataobjattr}) &&          # no one simple unique
