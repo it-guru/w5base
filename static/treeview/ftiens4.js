@@ -422,6 +422,7 @@ function finalizeCreationOfItem(itemArray)
   itemArray.isRendered = 0
   itemArray.nChildren = 0
   itemArray.prependHTML = ""
+  itemArray.appendHTML = ""
  
   // methods 
   itemArray.escondeBlock = escondeBlock
@@ -481,6 +482,7 @@ function drawItem(insertAtObj)
   else 
     docW = docW + this.desc
 
+  docW = docW + this.appendHTML;
   docW = docW + "</td>"
 
   docW = docW + this.blockEndHTML()

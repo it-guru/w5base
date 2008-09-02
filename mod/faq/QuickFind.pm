@@ -100,12 +100,67 @@ sub doSearch
    if (Query->Param("ci") ne ""){
       push(@stags,"ci");
    }
+   if ($searchtext ne "" && length($searchtext)<3){
+      print treeViewHeader("<font color=red>".$self->T("search text to short").
+                           "</font>",1);
+      return();
+   }
 
 
 
 
-#   print treeViewHeader($label,1,\@stags);
    my $found=0;
+   if (grep(/^ci$/,@stags)){
+      my $tree="foldersTree";
+      if (!$found){
+         print treeViewHeader($label,1);
+         $found++;
+      }
+      print <<EOF;
+function switchTag(id)
+{
+   var e=document.getElementById(id);
+   if (e.style.visibility!="visible"){
+      e.style.visibility="visible";
+      e.style.display="block";
+   }
+   else{
+      e.style.visibility="hidden";
+      e.style.display="none";
+   }
+}
+EOF
+      $self->LoadSubObjs("QuickFind","QuickFind");
+      my @s;
+      foreach my $sobj (values(%{$self->{QuickFind}})){
+         if ($sobj->can("CISearchResult")){
+            push(@s,$sobj->CISearchResult($searchtext));
+         }
+      }
+      my $group=undef;
+      foreach my $res (sort({$a->{group}.";".$a->{name} cmp 
+                             $b->{group}.";".$b->{name}} @s)){
+          if ($group ne $res->{group}){
+             my $gtag=$res->{group};
+             $gtag=~s/[^a-z0-9]/_/gi;
+             print insFld($tree,$gtag,$res->{group});
+             $tree=$gtag;
+             $group=$res->{group};
+          }
+          print insDoc($tree,$res->{name}); 
+      }
+#
+#printf STDERR ("fifi keys of QuickFind=%s\n",keys(%{$self->{QuickFind}}));
+#      $tree="itil__appl";
+#      print insDoc($tree,"AG XY \@ DTAG.T-Com",
+#                   "javascript:switchTag('yy::xx')",
+#                   appendHTML=>"<div id=\"yy::xx\" ".
+#                               "style=\"visibility:hidden;display:none\">".
+#                               "SeM:xxx<br><a href=http://www.google.com target=_blank>TSM:xxx</a><br></div>");
+#      print insDoc($tree,"AG XY<br>","../../faq/forum/Topic/123");
+#
+   }
+
    if (grep(/^article$/,@stags)){
       my $tree="foldersTree";
       my $faq=getModuleObject($self->Config,"faq::article");
@@ -164,28 +219,6 @@ sub doSearch
                       "$rec->{id}");
       }
    }
-   if (grep(/^ci$/,@stags)){
-      my $tree="foldersTree";
-      if (!$found){
-         print treeViewHeader($label,1);
-         $found++;
-      }
-      print <<EOF;
-function switchTag(id)
-{
-   var e=document.getElementById(id);
-   e.style.visibility="visible";
-   e.style.display="block";
-}
-EOF
-      print insFld($tree,"itil__appl","Application");
-      $tree="itil__appl";
-      print insDoc($tree,"AG XY \@ DTAG.T-Com<div id=\"xx\" style=\"visibility:hidden;display:none;text-decoration:none;color:black\">SeM:xxx<br><a href=http://www.google.com target=_blank>TSM:xxx</a><br></div>","javascript:switchTag('xx')");
-      print insDoc($tree,"AG XY<br>","../../faq/forum/Topic/123");
-
-   }
-
-
    if (!$found){
       print treeViewHeader("<font color=red>".$self->T("nothing found").
                            "</font>",1);
@@ -198,6 +231,7 @@ sub insDoc
    my $tree=shift;
    my $label=shift;
    my $link=shift;
+   my %param=@_;
 
    $label=~s/"/\\"/g;
    if (!($link=~m/^javascript:/)){
@@ -216,6 +250,9 @@ sub insDoc
    my $d=sprintf("e=insDoc(%s,".
              "gLnk(\"%s\",\"<div class=specialClass>%s</div>\",".
              "\"%s\"));\n",$tree,$mode,$label,$link);
+   if (exists($param{appendHTML})){
+      $d.=sprintf("e.appendHTML='%s';\n",$param{appendHTML});
+   }
    return($d);
 }
 

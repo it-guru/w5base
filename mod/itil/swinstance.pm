@@ -94,7 +94,8 @@ sub new
                                  'SAP/R2',
                                  'SAP/R3',
                                  'SunONE',
-                                 'Tomcat'],
+                                 'Tomcat',
+                                 'Visibroker'],
                 dataobjattr   =>'swinstance.swnature'),
 
       new kernel::Field::TextDrop(
