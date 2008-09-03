@@ -261,7 +261,7 @@ sub insDoc
    $label=~s/"/\\"/g;
    if (!($link=~m/^javascript:/)){
       $link=sprintf("javascript:openwin('%s','_blank',".
-                    "'height=400,width=550,toolbar=no,".
+                    "'height=400,width=640,toolbar=no,".
                     "status=no,resizable=yes,scrollbars=auto')",$link); 
    }
    my $mode="S";
