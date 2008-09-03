@@ -1,4 +1,4 @@
-package itil::QuickFind::appl;
+package itil::QuickFind::system;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -37,15 +37,13 @@ sub CISearchResult
    my $searchtext=shift;
    my %param=@_;
 
-   my $appl=getModuleObject($self->getParent->Config,"itil::appl");
-   $appl->SetFilter([{name=>"*$searchtext*"},{systems=>"$searchtext"}]);
+   my $appl=getModuleObject($self->getParent->Config,"itil::system");
+   $appl->SetFilter([{name=>"$searchtext"},{applications=>"$searchtext"},
+                     {systemid=>"$searchtext"}]);
    my @l;
-   foreach my $rec ($appl->getHashList(qw(name customer))){
+   foreach my $rec ($appl->getHashList(qw(name))){
       my $dispname=$rec->{name};
-      if ($rec->{customer} ne ""){
-         $dispname.=' @ '.$rec->{customer};
-      }
-      push(@l,{group=>$self->getParent->T("itil::appl","itil::appl"),
+      push(@l,{group=>$self->getParent->T("itil::system","itil::system"),
                id=>$rec->{id},
                parent=>$self->Self,
                name=>$dispname});
@@ -59,13 +57,12 @@ sub QuickFindDetail
    my $id=shift;
    my $htmlresult="?";
 
-   my $appl=getModuleObject($self->getParent->Config,"itil::appl");
+   my $appl=getModuleObject($self->getParent->Config,"itil::system");
    $appl->SetFilter({id=>\$id});
-   my ($rec,$msg)=$appl->getOnlyFirst(qw(delmgr delmgr2 conumber cistatus 
-                                         sem sem2 tsm tsm2 description));
+   my ($rec,$msg)=$appl->getOnlyFirst(qw(systemid adm adm2 applications));
    if (defined($rec)){
       $htmlresult="<table>";
-      my @l=qw(sem sem2 delmgr delmgr2 tsm tsm2);
+      my @l=qw(systemid adm adm2 admteam);
       foreach my $v (@l){
          if ($rec->{$v} ne ""){
             my $name=$appl->getField($v)->Label();
@@ -75,9 +72,6 @@ sub QuickFindDetail
                          "<td valign=top>$data</td></tr>";
          }
       }
-      $htmlresult.="<tr><td colspan=2>".
-                   "<div style=\"height:60px;overflow:auto;color:gray\">".
-                   "$rec->{description}</div></td></tr>";
       $htmlresult.="</table>";
    }
    return($htmlresult);

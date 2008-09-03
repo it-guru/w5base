@@ -36,7 +36,8 @@ sub Main
    my $self=shift;
 
    print $self->HttpHeader("text/html");
-   print $self->HtmlHeader(style=>['default.css','mainwork.css'],
+   print $self->HtmlHeader(style=>['default.css','mainwork.css',
+                                   'public/faq/load/QuickFind.css'],
                            title=>"FAQ QuickFind",
                            js=>['toolbox.js'],
                            body=>1,form=>1);
@@ -114,15 +115,30 @@ sub doSearch
       my $tree="foldersTree";
       if (!$found){
          print treeViewHeader($label,1);
-         $found++;
       }
       print <<EOF;
 function switchTag(id)
 {
    var e=document.getElementById(id);
    if (e.style.visibility!="visible"){
+      e.innerHTML='<center><img src="../../base/load/loading.gif"></center>';
       e.style.visibility="visible";
       e.style.display="block";
+      var xmlhttp=getXMLHttpRequest();
+      var path='QuickFindDetail';
+      xmlhttp.open("GET",path+"?id="+id);
+      xmlhttp.onreadystatechange=function() {
+       if (xmlhttp.readyState==4 && 
+           (xmlhttp.status==200 || xmlhttp.status==304)){
+          var xmlobject = xmlhttp.responseXML;
+          var result=xmlobject.getElementsByTagName("htmlresult")[0];
+          var childNode=result.childNodes[0];
+          e.innerHTML=childNode.nodeValue;
+         // setFunc(fromlang,tolang,resulttext);
+         // alert("ifif");
+       }
+      }
+      var r=xmlhttp.send('');
    }
    else{
       e.style.visibility="hidden";
@@ -137,17 +153,26 @@ EOF
             push(@s,$sobj->CISearchResult($searchtext));
          }
       }
+      if ($#s!=-1){
+         $found++;
+      }
       my $group=undef;
       foreach my $res (sort({$a->{group}.";".$a->{name} cmp 
                              $b->{group}.";".$b->{name}} @s)){
           if ($group ne $res->{group}){
+             $tree="foldersTree";
              my $gtag=$res->{group};
              $gtag=~s/[^a-z0-9]/_/gi;
              print insFld($tree,$gtag,$res->{group});
              $tree=$gtag;
              $group=$res->{group};
           }
-          print insDoc($tree,$res->{name}); 
+          my $divid="$res->{parent}::$res->{id}";
+          my $html="<div class=QuickFindDetail id=\"$divid\" ".
+                   "style=\"visibility:hidden;display:none\">XXX</div>";
+
+          print insDoc($tree,$res->{name},"javascript:switchTag('$divid')",
+                        appendHTML=>$html); 
       }
 #
 #printf STDERR ("fifi keys of QuickFind=%s\n",keys(%{$self->{QuickFind}}));
@@ -303,7 +328,8 @@ sub Result
    my $searchtext=Query->Param("searchtext");
 
    print $self->HttpHeader("text/html");
-   print $self->HtmlHeader(style=>['default.css','mainwork.css'],
+   print $self->HtmlHeader(style=>['default.css','mainwork.css',
+                                   'public/faq/load/QuickFind.css'],
                            title=>"Welcome",
                            js=>['toolbox.js'],
                            body=>1,form=>1);
@@ -329,7 +355,36 @@ EOF
 sub getValidWebFunctions
 {
    my ($self)=@_;
-   return(qw(Main globalHelp Welcome Result));
+   return(qw(Main globalHelp Welcome Result QuickFindDetail));
+}
+
+sub QuickFindDetail
+{
+   my $self=shift;
+
+   my $id=Query->Param("id");
+   my $htmlresult;
+
+   $self->LoadSubObjs("QuickFind","QuickFind");
+   if (my ($mod,$id)=$id=~m/^(.*)::(.*)$/){
+      msg(INFO,"load $id from mod=$mod");
+      if (defined($self->{QuickFind}->{$mod})){
+         $htmlresult=$self->{QuickFind}->{$mod}->QuickFindDetail($id);
+      }
+      else{
+         msg(ERROR,"can't find module $mod"); 
+      }
+   }
+   else{
+      msg(ERROR,"can't interpret $id");
+   }
+
+   print $self->HttpHeader("text/xml");
+   my $res=hash2xml({document=>{htmlresult=>$htmlresult}},{header=>1});
+#printf STDERR ("fifi res=$res\n");
+   print $res;
+
+
 }
 
 
