@@ -18,7 +18,6 @@ package base::event::sample;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::Event;
 @ISA=qw(kernel::Event);

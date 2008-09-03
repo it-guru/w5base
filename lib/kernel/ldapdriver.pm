@@ -23,7 +23,6 @@ use kernel;
 use kernel::Universal;
 use Net::LDAP;
 use Unicode::Map8;
-use Data::Dumper;
 use Unicode::String qw(utf8 latin1);
 
 @ISA=qw(kernel::Universal);
@@ -38,9 +37,17 @@ sub new
    $self->setParent($parent);
    $self->{ldapname}=$name;
    $self->{isConnected}=0;
-   
 
    return($self);
+}
+
+sub DESTROY
+{
+   my $self=shift;
+   if (defined($self->{ldap}) && $self->{ldap}->can("unbind")){
+      msg(DEBUG,"unbind");
+      $self->{ldap}->unbind();
+   }
 }
 
 
