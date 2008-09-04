@@ -1,4 +1,4 @@
-package itil::QuickFind::system;
+package itil::QuickFind::costcenter;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -37,21 +37,22 @@ sub CISearchResult
    my $searchtext=shift;
    my %param=@_;
 
-   my $flt=[{name=>"$searchtext"},
-            {applications=>"$searchtext"},
-            {systemid=>"$searchtext"}];
-   if ($searchtext=~m/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/){
-      push(@$flt,{ipaddresses=>"$searchtext"});
-   }
-   my $dataobj=getModuleObject($self->getParent->Config,"itil::system");
-   $dataobj->SetFilter($flt);
    my @l;
-   foreach my $rec ($dataobj->getHashList(qw(name))){
-      my $dispname=$rec->{name};
-      push(@l,{group=>$self->getParent->T("itil::system","itil::system"),
-               id=>$rec->{id},
-               parent=>$self->Self,
-               name=>$dispname});
+   if ($searchtext=~m/^\d{3,20}$/){
+      my $flt=[{name=>\"$searchtext"}];
+      my $dataobj=getModuleObject($self->getParent->Config,"itil::costcenter");
+      $dataobj->SetFilter($flt);
+      foreach my $rec ($dataobj->getHashList(qw(name fullname))){
+         my $dispname=$rec->{name};
+         if ($rec->{fullname} ne ""){
+            $dispname.=' ; '.$rec->{fullname};
+         }
+         push(@l,{group=>$self->getParent->T("itil::costcenter",
+                                             "itil::costcenter"),
+                  id=>$rec->{id},
+                  parent=>$self->Self,
+                  name=>$dispname});
+      }
    }
    return(@l);
 }
@@ -62,10 +63,9 @@ sub QuickFindDetail
    my $id=shift;
    my $htmlresult="?";
 
-   my $dataobj=getModuleObject($self->getParent->Config,"itil::system");
+   my $dataobj=getModuleObject($self->getParent->Config,"itil::costcenter");
    $dataobj->SetFilter({id=>\$id});
-   my ($rec,$msg)=$dataobj->getOnlyFirst(qw(systemid adm adm2 applications));
-
+   my ($rec,$msg)=$dataobj->getOnlyFirst(qw(fullname delmgr delmgr2));
    $dataobj->ResetFilter();
    $dataobj->SecureSetFilter([{id=>\$id}]);
    my ($secrec,$msg)=$dataobj->getOnlyFirst(qw(id));
@@ -76,7 +76,7 @@ sub QuickFindDetail
          $htmlresult.=$self->addDirectLink($dataobj,search_id=>$id);
       }
       $htmlresult.="<table>";
-      my @l=qw(systemid adm adm2 admteam);
+      my @l=qw(fullname delmgr delmgr2);
       foreach my $v (@l){
          if ($rec->{$v} ne ""){
             my $name=$dataobj->getField($v)->Label();
@@ -86,7 +86,6 @@ sub QuickFindDetail
                          "<td valign=top>$data</td></tr>";
          }
       }
-      $htmlresult.="</table>";
    }
    return($htmlresult);
 }

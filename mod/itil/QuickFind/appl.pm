@@ -19,8 +19,8 @@ package itil::QuickFind::appl;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use kernel::Universal;
-@ISA=qw(kernel::Universal);
+use kernel::QuickFind;
+@ISA=qw(kernel::QuickFind);
 
 
 sub new
@@ -37,8 +37,12 @@ sub CISearchResult
    my $searchtext=shift;
    my %param=@_;
 
+   my $flt=[{name=>"*$searchtext*"},{systems=>"$searchtext"}];
+   if ($searchtext=~m/^\d{3,20}$/){
+      push(@$flt,{conumber=>\"$searchtext"});
+   }
    my $appl=getModuleObject($self->getParent->Config,"itil::appl");
-   $appl->SetFilter([{name=>"*$searchtext*"},{systems=>"$searchtext"}]);
+   $appl->SetFilter($flt);
    my @l;
    foreach my $rec ($appl->getHashList(qw(name customer))){
       my $dispname=$rec->{name};
@@ -63,8 +67,16 @@ sub QuickFindDetail
    $appl->SetFilter({id=>\$id});
    my ($rec,$msg)=$appl->getOnlyFirst(qw(delmgr delmgr2 conumber cistatus 
                                          sem sem2 tsm tsm2 description));
+   $appl->ResetFilter();
+   $appl->SecureSetFilter([{id=>\$id}]);
+   my ($secrec,$msg)=$appl->getOnlyFirst(qw(id));
+
    if (defined($rec)){
-      $htmlresult="<table>";
+      $htmlresult="";
+      if (defined($secrec)){
+         $htmlresult.=$self->addDirectLink($appl,search_id=>$id);
+      }
+      $htmlresult.="<table>";
       my @l=qw(sem sem2 delmgr delmgr2 tsm tsm2);
       foreach my $v (@l){
          if ($rec->{$v} ne ""){
@@ -75,10 +87,14 @@ sub QuickFindDetail
                          "<td valign=top>$data</td></tr>";
          }
       }
-      $htmlresult.="<tr><td colspan=2>".
-                   "<div style=\"height:60px;overflow:auto;color:gray\">".
-                   "$rec->{description}</div></td></tr>";
+      my $desclabel=$appl->getField("description")->Label();
+      my $desc=$rec->{description};
+      $desc=~s/\n/<br>\n/g;
+    
       $htmlresult.="</table>";
+      $htmlresult.="<table><tr><td><div style=\"height:60px;overflow:auto;color:gray\">".
+                   "<font color=black>$desclabel:</font><div>$desc".
+                   "</div></div></td></tr></table>";
    }
    return($htmlresult);
 }

@@ -1,18 +1,53 @@
+<a href="../../../auth/faq/QuickFind/globalHelp" target=_blank>
+<img align=right style="margin:2px" 
+     border=0 src="../../../public/base/load/listweblink.gif"></a>
 <table height=100% width=100% cellspacing=0 cellpadding=0 border=0>
-<tr height=1%><td align=left>
-<img style="margin:4px" src="../load/faqglobalHelp.jpg">
+<tr height=1%><td align=left width=1%>
+<a href="../../../auth/base/menu/msel/faq" target=_blank>
+<img style="margin:4px" border=0 src="../load/faqglobalHelp.jpg"></a>
 </td>
 <td>
 
 <table>
-<tr><td colspan=2>
-<input type=checkbox name=ci xdisabled>Config-Item Suche<br>
+<tr><td colspan=2 align=left>
+<div style="overflow:hidden;height:70px">
+
+<div style="float:left;width:280px;height:70px;border-style:none">
+<input type=checkbox name=ci>Config-Item Suche<br>
 <input type=checkbox name=article checked>FAQ-Wissensdatenbank Schlagwortsuche<br>
 <input type=checkbox name=forum checked>Forum Volltextsuche<br>
+</div>
+
+<div style="float:left;width:280px;height:70px;border-style:none">
+<table>
+
+<tr><td nowrap valign=center> MyW5Base
+<a href="../../../auth/base/menu/msel/MyW5Base" target="MyW5Base">
+<img  style="margin:2px"
+     border=0 src="../../../public/base/load/listweblink.gif"></a>
+</td></tr>
+
+<tr><td nowrap valign=center> %newwf%
+<a href="../../../auth/base/menu/root?OpenURL=../../base/workflow/New" target="startWorkflow">
+<img style="margin:2px"
+     border=0 src="../../../public/base/load/listweblink.gif"></a>
+</td></tr>
+
+<tr><td nowrap valign=center> %myjobs%
+<a href="../../../auth/base/menu/msel/MyW5Base?MyW5BaseSUBMOD=base::MyW5Base::wfmyjobs" target="myJobs">
+<img style="margin:2px"
+     border=0 src="../../../public/base/load/listweblink.gif"></a>
+</td></tr>
+</table>
+
+</div>
+
+
+</div>
 </td>
 </tr>
 <tr>
-<td><input type=text id=in name=searchtext size=28></td>
+<td width=1%><input type=text id=in name=searchtext size=28></td>
 <td><input type=submit name=dosearch value="%TRANSLATE(Search)%"></td>
 </tr>
 </table>
@@ -30,4 +65,34 @@
 window.focus();
 setFocus("searchtext");
 setEnterSubmit(document.forms[0]);
+var checklist=new Array("article","forum","ci");
+function InitCheckboxes()
+{
+   for(c=0;c<checklist.length;c++){
+      var v=checklist[c];
+      var s=rdCookie("QuickFind_"+v);
+      if (s!=null){
+         if (s=="1"){
+            document.forms[0].elements[v].checked=true;
+         }
+         else{
+            document.forms[0].elements[v].checked=false;
+         }
+      }
+   }
+}
+function onSubmit()
+{
+   for(c=0;c<checklist.length;c++){
+      var v=checklist[c];
+      if (document.forms[0].elements[v].checked==true){
+         wrCookie("QuickFind_"+v,"1","/",2400);
+      }
+      else{
+         wrCookie("QuickFind_"+v,"0","/",2400);
+      }
+   }
+}
+addEvent(window,"load",InitCheckboxes);
+addEvent(window,"submit",onSubmit);
 </script>

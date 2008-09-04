@@ -42,8 +42,9 @@ sub Main
                            js=>['toolbox.js'],
                            body=>1,form=>1);
    print $self->getParsedTemplate("tmpl/QuickFind",{
-                                         translation=>'faq::QuickFind',
-                                         static=>{}});
+            translation=>'faq::QuickFind',
+            static=>{
+            }});
    print $self->HtmlBottom(body=>1,form=>1);
    return(0);
 }
@@ -57,11 +58,15 @@ sub globalHelp
                            title=>"W5Base global search and help system",
                            target=>'Result',
                            action=>'Result',
-                           js=>['toolbox.js'],
+                           js=>['toolbox.js','cookie.js'],
                            body=>1,form=>1);
    print $self->getParsedTemplate("tmpl/globalHelp",{
-                                         translation=>'faq::QuickFind',
-                                         static=>{}});
+               translation=>'faq::QuickFind',
+               static=>{
+                 remote_user=>$ENV{REMOTE_USER},
+                 newwf=>$self->T("start a new workflow","base::MyW5Base"),
+                 myjobs=>$self->T("my current jobs","base::MyW5Base")
+               }});
    print $self->HtmlBottom(body=>1,form=>1);
    return(0);
 }
@@ -149,6 +154,12 @@ EOF
       $self->LoadSubObjs("QuickFind","QuickFind");
       my @s;
       foreach my $sobj (values(%{$self->{QuickFind}})){
+         my $acl=$self->getMenuAcl($ENV{REMOTE_USER},
+                                   $sobj->Self());
+         if (defined($acl)){
+            next if (!grep(/^read$/,@$acl));
+         }
+         msg(INFO,"mod=%s acl=%s",$sobj->Self(),Dumper($acl));
          if ($sobj->can("CISearchResult")){
             push(@s,$sobj->CISearchResult($searchtext));
          }

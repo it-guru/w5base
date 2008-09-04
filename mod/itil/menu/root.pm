@@ -309,6 +309,22 @@ sub Init
                       param=>'WorkflowClass=itil::workflow::eventnotify',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj('itil::QuickFind::appl$',
+                      "itil::QuickFind::appl",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj('itil::QuickFind::system$',
+                      "itil::QuickFind::system",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj('itil::QuickFind::asset$',
+                      "itil::QuickFind::asset",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj('itil::QuickFind::costcenter$',
+                      "itil::QuickFind::costcenter",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("Tools.analytics.itilfault",
                       "itil::FaultAnalytics",
                       defaultacl=>['admin']);

@@ -3,3 +3,10 @@ div.QuickFindDetail{
    border-color:silver;
    border-width:1px;
 }
+
+a:link, a:visited, a:active  {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:#16305e;
+          }
+

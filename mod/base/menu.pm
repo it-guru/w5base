@@ -581,12 +581,14 @@ sub root
       foreach my $v (Query->Param()){ 
          next if ($v=~m/^search_/);
          next if ($v=~m/^AutoSearch$/);
+         next if ($v=~m/^MyW5BaseSUBMOD$/);
          next if ($v=~m/^OpenURL$/);
          Query->Delete($v);
       }
       print $self->HtmlPersistentVariables(qw(ALL));
       print("</form>");
       print("</body>");
+      print("<script language=\"JavaScript\">window.focus();</script>");
       print("</html>");
    }
    else{
@@ -611,6 +613,7 @@ sub root
                                                    mselurl=>$mselurl,
                                                 }});
       print $d;
+      print("<script language=\"JavaScript\">window.focus();</script>");
       print $self->HtmlBottom();
    }
 }
@@ -651,9 +654,11 @@ sub menuframe
                             prefix=>$rootpath,
                            style=>['default.css','menu.css']);
    my $m=$self->MenuTab($rootpath,$mt,$fp,'JavaScript:SwitchMenuVisible() target=_self');
-   print $self->getParsedTemplate("tmpl/menutmpl",{
+   my $menuframe=$self->getParsedTemplate("tmpl/menutmpl",{
                                        static=>{menutab=>$m,
                                                 rootpath=>$rootpath}});
+   print $menuframe;
+
    print ("</html>");
 }
 
@@ -725,6 +730,7 @@ sub msel
    foreach my $sv (keys(%qu)){
       next if ($sv=~m/^search_/);
       next if ($sv=~m/^AutoSearch$/);
+      next if ($sv=~m/^MyW5BaseSUBMOD$/);
       next if ($sv=~m/^OpenURL$/);
       delete($qu{$sv});
    }
@@ -789,7 +795,7 @@ EOF
             }
             my %forwardquery;
             foreach my $q (Query->Param()){
-               next if (!($q=~m/^(search_|Auto)/));
+               next if (!($q=~m/^(search_|Auto|MyW5Base)/));
                $forwardquery{$q}=[Query->Param($q)];
             }
             if (keys(%forwardquery)){

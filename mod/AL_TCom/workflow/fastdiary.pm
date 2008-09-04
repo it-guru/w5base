@@ -150,7 +150,7 @@ sub generateWorkspace
    $m1="" if ($m1 eq "MSG");
    my $oldval=Query->Param("Formated_effort");
    my $e="<select name=Formated_effort>";
-   for(my $ef=5;$ef<=60;$ef+=5){
+   for(my $ef=5;$ef<=480;$ef+=5){
       $e.="<option value=\"$ef\"";
       $e.=" selected" if ($ef==$oldval);
       $e.=">$ef</option>";

@@ -1,4 +1,4 @@
-package itil::QuickFind::system;
+package itil::QuickFind::asset;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -38,17 +38,14 @@ sub CISearchResult
    my %param=@_;
 
    my $flt=[{name=>"$searchtext"},
-            {applications=>"$searchtext"},
-            {systemid=>"$searchtext"}];
-   if ($searchtext=~m/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/){
-      push(@$flt,{ipaddresses=>"$searchtext"});
-   }
-   my $dataobj=getModuleObject($self->getParent->Config,"itil::system");
+            {systems=>"$searchtext"},
+            {assetid=>"$searchtext"}];
+   my $dataobj=getModuleObject($self->getParent->Config,"itil::asset");
    $dataobj->SetFilter($flt);
    my @l;
    foreach my $rec ($dataobj->getHashList(qw(name))){
       my $dispname=$rec->{name};
-      push(@l,{group=>$self->getParent->T("itil::system","itil::system"),
+      push(@l,{group=>$self->getParent->T("itil::asset","itil::asset"),
                id=>$rec->{id},
                parent=>$self->Self,
                name=>$dispname});
@@ -62,9 +59,10 @@ sub QuickFindDetail
    my $id=shift;
    my $htmlresult="?";
 
-   my $dataobj=getModuleObject($self->getParent->Config,"itil::system");
+   my $dataobj=getModuleObject($self->getParent->Config,"itil::asset");
    $dataobj->SetFilter({id=>\$id});
-   my ($rec,$msg)=$dataobj->getOnlyFirst(qw(systemid adm adm2 applications));
+   my ($rec,$msg)=$dataobj->getOnlyFirst(qw(guardian guardian2 
+                                         location room place));
 
    $dataobj->ResetFilter();
    $dataobj->SecureSetFilter([{id=>\$id}]);
@@ -76,7 +74,7 @@ sub QuickFindDetail
          $htmlresult.=$self->addDirectLink($dataobj,search_id=>$id);
       }
       $htmlresult.="<table>";
-      my @l=qw(systemid adm adm2 admteam);
+      my @l=qw(guardian guardian2 location room place);
       foreach my $v (@l){
          if ($rec->{$v} ne ""){
             my $name=$dataobj->getField($v)->Label();
