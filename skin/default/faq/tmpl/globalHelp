@@ -1,6 +1,6 @@
-<a href="../../../auth/faq/QuickFind/globalHelp" target=_blank>
-<img align=right style="margin:2px" 
-     border=0 src="../../../public/base/load/listweblink.gif"></a>
+<div style="position:absolute;right:0px">
+<a href="../../../auth/faq/QuickFind/globalHelp" target="_blank"><img  style="margin:2px" border=0 src="../../../public/base/load/listweblink.gif"></a>
+</div>
 <table height=100% width=100% cellspacing=0 cellpadding=0 border=0>
 <tr height=1%><td align=left width=1%>
 <a href="../../../auth/base/menu/msel/faq" target=_blank>
@@ -13,9 +13,9 @@
 <div style="overflow:hidden;height:70px">
 
 <div style="float:left;width:280px;height:70px;border-style:none">
-<input type=checkbox name=ci>Config-Item Suche<br>
-<input type=checkbox name=article checked>FAQ-Wissensdatenbank Schlagwortsuche<br>
-<input type=checkbox name=forum checked>Forum Volltextsuche<br>
+<input type=checkbox onChange="onSubmit();" name=ci>Config-Item Suche<br>
+<input type=checkbox onChange="onSubmit();" name=article checked>FAQ-Wissensdatenbank Schlagwortsuche<br>
+<input type=checkbox onChange="onSubmit();" name=forum checked>Forum Volltextsuche<br>
 </div>
 
 <div style="float:left;width:280px;height:70px;border-style:none">
@@ -37,7 +37,10 @@
 <a href="../../../auth/base/menu/msel/MyW5Base?MyW5BaseSUBMOD=base::MyW5Base::wfmyjobs" target="myJobs">
 <img style="margin:2px"
      border=0 src="../../../public/base/load/listweblink.gif"></a>
-</td></tr>
+</td>
+
+
+</tr>
 </table>
 
 </div>
