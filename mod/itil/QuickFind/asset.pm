@@ -37,7 +37,7 @@ sub CISearchResult
    my $searchtext=shift;
    my %param=@_;
 
-   my $flt=[{name=>"$searchtext"},
+   my $flt=[{name=>"$searchtext",cistatusid=>"<=5"},
             {systems=>"$searchtext"},
             {assetid=>"$searchtext"}];
    my $dataobj=getModuleObject($self->getParent->Config,"itil::asset");
@@ -61,7 +61,8 @@ sub QuickFindDetail
 
    my $dataobj=getModuleObject($self->getParent->Config,"itil::asset");
    $dataobj->SetFilter({id=>\$id});
-   my ($rec,$msg)=$dataobj->getOnlyFirst(qw(guardian guardian2 
+   my ($rec,$msg)=$dataobj->getOnlyFirst(qw(guardian guardian2  databoss
+                                         phonenumbers
                                          location room place));
 
    $dataobj->ResetFilter();
@@ -74,7 +75,7 @@ sub QuickFindDetail
          $htmlresult.=$self->addDirectLink($dataobj,search_id=>$id);
       }
       $htmlresult.="<table>";
-      my @l=qw(guardian guardian2 location room place);
+      my @l=qw(guardian guardian2 databoss location room place);
       foreach my $v (@l){
          if ($rec->{$v} ne ""){
             my $name=$dataobj->getField($v)->Label();
@@ -84,6 +85,8 @@ sub QuickFindDetail
                          "<td valign=top>$data</td></tr>";
          }
       }
+      $htmlresult.=$self->addPhoneNumbers($dataobj,$rec,"phonenumbers",
+                                          ["phoneRB"]);
       $htmlresult.="</table>";
    }
    return($htmlresult);

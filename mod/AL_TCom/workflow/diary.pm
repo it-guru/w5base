@@ -245,6 +245,11 @@ sub getDynamicFields
                                          group       =>'tcomcod',
                                          container   =>'headref'),
 
+           new kernel::Field::Text(      name        =>'tcomexternalid',
+                                         label       =>'ExternalID (I-Network)',
+                                         group       =>'tcomcod',
+                                         container   =>'headref'),
+
            new kernel::Field::Text(      name        =>'conumber',
                                          label       =>'CO-Number',
                                          htmldetail  =>0,

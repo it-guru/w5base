@@ -37,8 +37,8 @@ sub CISearchResult
    my $searchtext=shift;
    my %param=@_;
 
-   my $flt=[{name=>"$searchtext"},
-            {applications=>"$searchtext"},
+   my $flt=[{name=>"$searchtext",cistatusid=>"<=5"},
+            {applications=>"$searchtext",cistatusid=>"<=5"},
             {systemid=>"$searchtext"}];
    if ($searchtext=~m/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/){
       push(@$flt,{ipaddresses=>"$searchtext"});
@@ -64,7 +64,9 @@ sub QuickFindDetail
 
    my $dataobj=getModuleObject($self->getParent->Config,"itil::system");
    $dataobj->SetFilter({id=>\$id});
-   my ($rec,$msg)=$dataobj->getOnlyFirst(qw(systemid adm adm2 applications));
+   my ($rec,$msg)=$dataobj->getOnlyFirst(qw(systemid adm adm2 databoss
+                                            phonenumbers
+                                            applications));
 
    $dataobj->ResetFilter();
    $dataobj->SecureSetFilter([{id=>\$id}]);
@@ -76,7 +78,7 @@ sub QuickFindDetail
          $htmlresult.=$self->addDirectLink($dataobj,search_id=>$id);
       }
       $htmlresult.="<table>";
-      my @l=qw(systemid adm adm2 admteam);
+      my @l=qw(systemid adm adm2 databoss admteam);
       foreach my $v (@l){
          if ($rec->{$v} ne ""){
             my $name=$dataobj->getField($v)->Label();
@@ -86,6 +88,8 @@ sub QuickFindDetail
                          "<td valign=top>$data</td></tr>";
          }
       }
+      $htmlresult.=$self->addPhoneNumbers($dataobj,$rec,"phonenumbers",
+                                          ["phoneRB"]);
       $htmlresult.="</table>";
    }
    return($htmlresult);

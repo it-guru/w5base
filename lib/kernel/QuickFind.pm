@@ -32,6 +32,41 @@ sub new
    return($self);
 }
 
+sub addPhoneNumbers
+{
+   my $self=shift;
+   my $dataobj=shift;
+   my $rec=shift;
+   my $k=shift;
+   my $ntypes=shift;
+   my $d="";
+
+   if (exists($rec->{$k}) && ref($rec->{$k}) eq "ARRAY"){
+      foreach my $prec (@{$rec->{$k}}){
+         if (grep(/^$prec->{name}$/,@$ntypes)){
+            my $phonelabel=$prec->{shortedcomments};
+            if ($phonelabel=~m/^\s*$/){
+               $phonelabel=$dataobj->T($prec->{name},
+                              $dataobj->Self,"base::phonelnk");
+            }
+            if (ref($dataobj->{PhoneLnkUsage}) eq "CODE"){
+               my %tr=&{$dataobj->{PhoneLnkUsage}}($dataobj);
+               if (exists($tr{$phonelabel})){
+                  $phonelabel=$tr{$phonelabel};
+               }
+            }
+            $d.="<tr><td valign=top>$phonelabel</td>";
+            $d.="<td valign=top>$prec->{phonenumber}</td></tr>";
+         }
+      }
+   }
+   if ($d ne ""){
+      $d="<tr height=1><td height=1><img src=\"../../base/load/empty.gif\" ".
+          "width=180 height=1></td><td height=1></td></tr>".$d;
+   }
+   return($d);
+
+}
 sub addDirectLink
 {
    my $self=shift;

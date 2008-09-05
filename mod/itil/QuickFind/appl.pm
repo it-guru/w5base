@@ -37,9 +37,11 @@ sub CISearchResult
    my $searchtext=shift;
    my %param=@_;
 
-   my $flt=[{name=>"*$searchtext*"},{systems=>"$searchtext"}];
+   my $flt=[{name=>"*$searchtext*", cistatusid=>"<=5"},
+            {systems=>"$searchtext",cistatusid=>"<=5"}];
    if ($searchtext=~m/^\d{3,20}$/){
-      push(@$flt,{conumber=>\"$searchtext"});
+      push(@$flt,{conumber=>\"$searchtext",
+                  cistatusid=>"<=5"});
    }
    my $appl=getModuleObject($self->getParent->Config,"itil::appl");
    $appl->SetFilter($flt);
@@ -66,7 +68,9 @@ sub QuickFindDetail
    my $appl=getModuleObject($self->getParent->Config,"itil::appl");
    $appl->SetFilter({id=>\$id});
    my ($rec,$msg)=$appl->getOnlyFirst(qw(delmgr delmgr2 conumber cistatus 
-                                         sem sem2 tsm tsm2 description));
+                                         sem sem2 tsm tsm2 databoss 
+                                         customerprio phonenumbers
+                                         description));
    $appl->ResetFilter();
    $appl->SecureSetFilter([{id=>\$id}]);
    my ($secrec,$msg)=$appl->getOnlyFirst(qw(id));
@@ -77,7 +81,7 @@ sub QuickFindDetail
          $htmlresult.=$self->addDirectLink($appl,search_id=>$id);
       }
       $htmlresult.="<table>";
-      my @l=qw(sem sem2 delmgr delmgr2 tsm tsm2);
+      my @l=qw(sem sem2 delmgr delmgr2 tsm tsm2 databoss);
       foreach my $v (@l){
          if ($rec->{$v} ne ""){
             my $name=$appl->getField($v)->Label();
@@ -87,12 +91,15 @@ sub QuickFindDetail
                          "<td valign=top>$data</td></tr>";
          }
       }
+      $htmlresult.=$self->addPhoneNumbers($appl,$rec,"phonenumbers",
+                                          ["phoneRB"]);
       my $desclabel=$appl->getField("description")->Label();
       my $desc=$rec->{description};
       $desc=~s/\n/<br>\n/g;
     
       $htmlresult.="</table>";
-      $htmlresult.="<table><tr><td><div style=\"height:60px;overflow:auto;color:gray\">".
+      $htmlresult.="<table><tr><td>".
+                   "<div style=\"height:60px;overflow:auto;color:gray\">".
                    "<font color=black>$desclabel:</font><div>$desc".
                    "</div></div></td></tr></table>";
    }

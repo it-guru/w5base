@@ -8,6 +8,7 @@
 'fieldgroup.applications'=>{de=>'Anwendungen',en=>'Applications'},
 'fieldgroup.software'=>{de=>'Software',en=>'Software'},
 'fieldgroup.ipaddresses'=>{de=>'IP-Adressen',en=>'IP-Addresses'},
+'fieldgroup.phonenumbers'=>{de=>'Rufnummernverzeichnis',en=>'Phonenumbers'},
 'CPU-Count'=>{de=>'CPU-Anzahl'},
 'Name'=>{de=>'Systemname'},
 'OS-Release'=>{de=>'Betriebssystemversion'},

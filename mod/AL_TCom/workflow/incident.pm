@@ -101,6 +101,11 @@ EOF
                                          group      =>'tcomcod',
                                          container  =>'headref'),
 
+           new kernel::Field::Text(      name        =>'tcomexternalid',
+                                         label       =>'ExternalID (I-Network)',
+                                         group       =>'tcomcod',
+                                         container   =>'headref'),
+
            new kernel::Field::Number(    name       =>'tcomworktime',
                                          unit       =>'min',
                                          label      =>'Worktime Problem-Mgmt',

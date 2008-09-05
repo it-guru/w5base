@@ -634,6 +634,13 @@ sub new
                 vjoininhash   =>['targetid','target','roles'],
                 group         =>'contacts'),
 
+      new kernel::Field::PhoneLnk(
+                name          =>'phonenumbers',
+                label         =>'Phonenumbers',
+                group         =>'phonenumbers',
+                vjoinbase     =>[{'parentobj'=>\'itil::system'}],
+                subeditmsk    =>'subedit'),
+
       new kernel::Field::Boolean(
                 name          =>'allowifupdate',
                 group         =>'control',
@@ -756,6 +763,7 @@ sub new
                          };
    $self->{history}=[qw(insert modify delete)];
    $self->{use_distinct}=1;
+   $self->{PhoneLnkUsage}=\&PhoneUsage;
    $self->AddGroup("control",translation=>'itil::system');
    $self->setDefaultView(qw(name location cistatus mdate));
    $self->setWorktable("system");
@@ -783,6 +791,14 @@ sub getTeamBossID
    }
    return(\@teambossid);
 }
+
+sub PhoneUsage
+{
+   my $self=shift;
+   return('phoneRB',$self->T("phoneRB","itil::appl"));
+}
+
+
 
 sub getTeamBoss
 {  
@@ -978,7 +994,7 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
 
    my @databossedit=qw(default software admin logsys contacts misc opmode 
-                       physys ipaddresses
+                       physys ipaddresses phonenumbers
                        attachments control systemclass);
    if (!defined($rec)){
       return("default","admin","misc","opmode","control","systemclass");
@@ -1026,7 +1042,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default admin logsys location physys systemclass 
+          qw(default admin phonenumbers logsys location physys systemclass 
              opmode applications software ipaddresses
              contacts misc attachments control source));
 }

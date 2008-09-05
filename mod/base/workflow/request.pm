@@ -567,14 +567,6 @@ sub generateWorkspacePages
    my $tr="base::workflow::actions";
    my $class="display:none;visibility:hidden";
 
-   if (grep(/^nop$/,@$actions)){
-      $$selopt.="<option value=\"nop\" class=\"$class\">".
-                $self->getParent->T("nop",$tr).
-                "</option>\n";
-      $$divset.="<div id=OPnop style=\"margin:15px\"><br>".
-                $self->getParent->T("The current workflow isn't forwared ".
-                "to you. At now there is no action nessasary.",$tr)."</div>";
-   }
    if (grep(/^wfacceptp$/,@$actions)){
       $$selopt.="<option value=\"wfacceptp\" class=\"$class\">".
                 $self->getParent->T("wfacceptp",$tr).

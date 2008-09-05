@@ -245,7 +245,7 @@ sub ProcessNext
    # check effort
    #
    my $effort=Query->Param("Formated_effort");
-   if ($effort<=0 || $effort>60){
+   if ($effort<=0 || $effort>480){
       $self->LastMsg(ERROR,"invalid effort");
       return(0);
    }

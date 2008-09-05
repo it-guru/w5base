@@ -129,15 +129,10 @@ sub getDynamicFields
                                          group       =>'tcomcod',
                                          container   =>'headref'),
 
-#           new kernel::Field::Date(      name        =>'tcomcoddownstart',
-#                                         group       =>'tcomcod',
-#                                         label       =>'Down start',
-#                                         container   =>'headref'),
-#
-#           new kernel::Field::Date(      name        =>'tcomcoddownend',
-#                                         group       =>'tcomcod',
-#                                         label       =>'Down end',
-#                                         container   =>'headref'),
+           new kernel::Field::Text(      name        =>'tcomexternalid',
+                                         label       =>'ExternalID (I-Network)',
+                                         group       =>'tcomcod',
+                                         container   =>'headref'),
 
            new kernel::Field::Number(    name       =>'tcomworktime',
                                          unit       =>'min',

@@ -126,7 +126,7 @@ function switchTag(id)
 {
    var e=document.getElementById(id);
    if (e.style.visibility!="visible"){
-      e.innerHTML='<center><img src="../../base/load/loading.gif"></center>';
+      e.innerHTML='<center><img src="../../base/load/ajaxloader.gif"></center>';
       e.style.visibility="visible";
       e.style.display="block";
       var xmlhttp=getXMLHttpRequest();

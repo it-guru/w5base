@@ -224,13 +224,6 @@ sub new
                 label         =>'Rack identifier',
                 dataobjattr   =>'asset.rack'),
 
-      new kernel::Field::PhoneLnk(
-                name          =>'phonenumbers',
-                label         =>'Phonenumbers',
-                group         =>'phonenumbers',
-                vjoinbase     =>[{'parentobj'=>\'itil::asset'}],
-                subeditmsk    =>'subedit'),
-
       new kernel::Field::Textarea(
                 name          =>'comments',
                 group         =>'misc',
@@ -250,6 +243,13 @@ sub new
                 vjoinbase     =>[{'parentobj'=>\'itil::asset'}],
                 vjoininhash   =>['targetid','target','roles'],
                 group         =>'contacts'),
+
+      new kernel::Field::PhoneLnk(
+                name          =>'phonenumbers',
+                label         =>'Phonenumbers',
+                group         =>'phonenumbers',
+                vjoinbase     =>[{'parentobj'=>\'itil::asset'}],
+                subeditmsk    =>'subedit'),
 
       new kernel::Field::FileList(
                 name          =>'attachments',
@@ -402,14 +402,15 @@ sub new
                             cistatus mandator mdate));
 
 
-   $self->{PhoneLnkUsage}=\&getPhoneUsage;
+   $self->{PhoneLnkUsage}=\&PhoneUsage;
+
    $self->setDefaultView(qw(name mandator cistatus mdate));
    $self->setWorktable("asset");
    return($self);
 }
 
 
-sub getPhoneUsage
+sub PhoneUsage
 {
    my $self=shift;
    return('phoneRB',$self->T("phoneRB","itil::appl"));
@@ -626,8 +627,9 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default guardian location physasset contacts misc systems 
-             appl attachments));
+          qw(default guardian phonenumbers location 
+             physasset contacts misc systems 
+             appl attachments control source));
 }
 
 
