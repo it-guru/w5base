@@ -292,9 +292,12 @@ sub mkChangeStoreRec
       ServiceCenterSoftwareID=>$rec->{softwareid},
       ServiceCenterWorkStart=>$rec->{workstart},
       ServiceCenterWorkEnd=>$rec->{workend},
-      ServiceCenterWorkDuration=>$rec->{workduration},
-      ServiceCenterExternChangeID=>$rec->{srcid}
+      ServiceCenterWorkDuration=>$rec->{workduration}
    };
+   if ($rec->{srcid} ne ""){
+      $wfrec{additional}->{ServiceCenterExternChangeID}=$rec->{srcid};
+   }
+
    if (!($rec->{coordinator}=~m/^\s*$/)){
       $wfrec{additional}->{ServiceCenterCoordinator}=$rec->{coordinator};
    }
@@ -430,6 +433,9 @@ sub mkChangeStoreRec
    }
    if (!($oldrec[0]->{step}=~m/::postreflection$/) &&
        $wfrec{class}=~m/^AL_TCom::/){
+       if ($rec->{srcid} ne ""){
+          $wfrec{tcomexternalid}=$rec->{srcid};
+       }
        my $ws=$app->ExpandTimeExpression($rec->{workstart},"en","CET");
        my $we=$app->ExpandTimeExpression($rec->{workend},"en","CET");
        my $wt=0;

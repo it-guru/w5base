@@ -115,14 +115,14 @@ sub getDynamicFields
                                          group      =>'tcomcod',
                                          container  =>'headref'),
 
-           new kernel::Field::Select(    name       =>'tcomcodchmrisk',
-                                         readonly   =>1,
-                                         label      =>'Risk',
+           new kernel::Field::Select(    name        =>'tcomcodchmrisk',
+                                         readonly    =>1,
+                                         label       =>'Risk',
                                          htmleditwidth=>'20%',
-                                         value      =>["low","medium",
-                                                       "high","very high"],
-                                         group      =>'tcomcod',
-                                         container  =>'headref'),
+                                         value       =>["low","medium",
+                                                        "high","very high"],
+                                         group       =>'tcomcod',
+                                         container   =>'headref'),
 
            new kernel::Field::Textarea(  name        =>'tcomcodcomments',
                                          label       =>'Comments',
@@ -134,16 +134,16 @@ sub getDynamicFields
                                          group       =>'tcomcod',
                                          container   =>'headref'),
 
-           new kernel::Field::Number(    name       =>'tcomworktime',
-                                         unit       =>'min',
-                                         label      =>'Worktime',
-                                         group      =>'tcomcod',
-                                         container  =>'headref'),
-
-           new kernel::Field::Number(    name       =>'truecustomerprio',
-                                         label      =>'true customer prio',
-                                         group      =>'affected',
-                                         container  =>'headref'),
+           new kernel::Field::Number(    name        =>'tcomworktime',
+                                         unit        =>'min',
+                                         label       =>'Worktime',
+                                         group       =>'tcomcod',
+                                         container   =>'headref'),
+                                                   
+           new kernel::Field::Number(    name        =>'truecustomerprio',
+                                         label       =>'true customer prio',
+                                         group       =>'affected',
+                                         container   =>'headref'),
 
    ));
 }
