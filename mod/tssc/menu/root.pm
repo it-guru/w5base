@@ -51,6 +51,10 @@ sub Init
                       "tssc::chm_device",
                       defaultacl=>['admin',"support"]);
    
+   $self->RegisterObj("sc.change.timing",
+                      "tssc::chm_timingcheck",
+                      defaultacl=>['admin']);
+   
    $self->RegisterObj("sc.incident",
                       "tssc::inm",
                       defaultacl=>['valid_user']);
