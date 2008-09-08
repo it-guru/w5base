@@ -47,7 +47,6 @@ sub mkitscm
    my $tmpfile="/tmp/appl-handbook.$$.pdf";
    my $filename="handbook.pdf";
    my $wf=getModuleObject($self->Config,"itil::appl");
-   my $file=getModuleObject($self->Config,"base::filemgmt");
    $wf->ResetFilter();
    $wf->SetFilter(businessteam=>'DTAG.TSI.ES.ITO.CSS.T-Com*',
                   cistatusid=>'4',customerprio=>'1');
@@ -59,17 +58,24 @@ sub mkitscm
    my $output=new kernel::Output($wf);
    $output->setFormat("PdfV01");
    my $page=$output->WriteToScalar(HttpHeader=>0);
+   msg(INFO,"page ready");
    if (open(F,">$tmpfile")){
       print F $page;
       close(F);
-      open(F,"<$tmpfile");
-      my $dir="ITSCM/Daten/auto_create";
-      $file->ValidatedInsertOrUpdateRecord({name=>$filename,
-                                            parent=>$dir,
-                                            file=>\*F},
-                                           {name=>\$filename,
-                                            parent=>\$dir});
-      close(F);
+      if (open(F,"<$tmpfile")){
+         msg(INFO,"tempfile is open for read");
+         my $dir="ITSCM/Daten/auto_create";
+         my $file=getModuleObject($self->Config,"base::filemgmt");
+         $file->ValidatedInsertOrUpdateRecord({name=>$filename,
+                                               parent=>$dir,
+                                               file=>\*F},
+                                              {name=>\$filename,
+                                               parent=>\$dir});
+         close(F);
+      }
+      else{
+         msg(ERROR,"unexpected problem while opening tempfile");
+      }
    }else{
       msg(ERROR,"can't open $tmpfile");
    }

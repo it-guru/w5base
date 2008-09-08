@@ -90,6 +90,7 @@ sub ValidatedUpdateRecord
    return(undef) if (!defined($oldrec) || $#filter!=0 ||
                      keys(%{$filter[0]})!=1 ||
                      !defined($filter[0]->{$idfield}));
+   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
    my @updfields=keys(%{$newrec});
    if (!grep(/^fullname$/,@updfields) &&
        !grep(/^name$/,@updfields) &&
