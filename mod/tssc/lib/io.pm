@@ -433,8 +433,10 @@ sub mkChangeStoreRec
    }
    if (!($oldrec[0]->{step}=~m/::postreflection$/) &&
        $wfrec{class}=~m/^AL_TCom::/){
-       if ($rec->{srcid} ne ""){
-          $wfrec{tcomexternalid}=$rec->{srcid};
+       if ($rec->{srcid} ne "" && ($rec->{srcid}=~m/^IN:/)){
+          my $srcid=$rec->{srcid};
+          $src=~s/^IN://i;
+          $wfrec{tcomexternalid}=$srcid;
        }
        my $ws=$app->ExpandTimeExpression($rec->{workstart},"en","CET");
        my $we=$app->ExpandTimeExpression($rec->{workend},"en","CET");
