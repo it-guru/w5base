@@ -153,6 +153,11 @@ function switchTag(id)
 EOF
       $self->LoadSubObjs("QuickFind","QuickFind");
       my @s;
+      my $tag=undef;
+      if (my ($stag,$stxt)=$searchtext=~m/^\s*(\S+)\s*:\s*(\S+.*)\S*$/){
+         $tag=lc($stag);
+         $searchtext=trim($stxt);
+      }
       foreach my $sobj (values(%{$self->{QuickFind}})){
          my $acl=$self->getMenuAcl($ENV{REMOTE_USER},
                                    $sobj->Self());
@@ -161,15 +166,15 @@ EOF
          }
          msg(INFO,"mod=%s acl=%s",$sobj->Self(),Dumper($acl));
          if ($sobj->can("CISearchResult")){
-            push(@s,$sobj->CISearchResult($searchtext));
+            push(@s,$sobj->CISearchResult($tag,$searchtext));
          }
       }
       if ($#s!=-1){
          $found++;
       }
       my $group=undef;
-      foreach my $res (sort({$a->{group}.";".$a->{name} cmp 
-                             $b->{group}.";".$b->{name}} @s)){
+      foreach my $res (sort({$a->{group} cmp 
+                             $b->{group}} @s)){
           if ($group ne $res->{group}){
              $tree="foldersTree";
              my $gtag=$res->{group};
@@ -181,9 +186,10 @@ EOF
           my $divid="$res->{parent}::$res->{id}";
           my $html="<div class=QuickFindDetail id=\"$divid\" ".
                    "style=\"visibility:hidden;display:none\">XXX</div>";
+          my $link="javascript:switchTag('$divid')";
+          $link=undef if (!defined($res->{id}) || !defined($res->{parent}));
 
-          print insDoc($tree,$res->{name},"javascript:switchTag('$divid')",
-                        appendHTML=>$html); 
+          print insDoc($tree,$res->{name},$link,appendHTML=>$html); 
       }
 #
 #printf STDERR ("fifi keys of QuickFind=%s\n",keys(%{$self->{QuickFind}}));
@@ -270,7 +276,8 @@ sub insDoc
    my %param=@_;
 
    $label=~s/"/\\"/g;
-   if (!($link=~m/^javascript:/)){
+   $label=~s/[\r\n]/ /g;
+   if (defined($link) && !($link=~m/^javascript:/)){
       $link=sprintf("javascript:openwin('%s','_blank',".
                     "'height=400,width=640,toolbar=no,".
                     "status=no,resizable=yes,scrollbars=auto')",$link); 
@@ -281,6 +288,7 @@ sub insDoc
       $mode.="j";
    }
    $link=~s/'/\\\\\\'/g;
+
 
 
    my $d=sprintf("e=insDoc(%s,".

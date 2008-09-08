@@ -34,6 +34,7 @@ sub new
 sub CISearchResult
 {
    my $self=shift;
+   my $tag=shift;
    my $searchtext=shift;
    my %param=@_;
 

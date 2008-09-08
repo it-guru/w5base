@@ -942,6 +942,7 @@ sub ValidatedInsertOrUpdateRecord
 
    $self->SetCurrentView(qw(ALL));
    $self->SetFilter(@filter);
+   $self->SetCurrentOrder("NONE");  # needed because MSSQL cant order text flds
    my $idfname=$self->IdField()->Name();
    my $found=0;
    my @idlist=();

@@ -34,21 +34,24 @@ sub new
 sub CISearchResult
 {
    my $self=shift;
+   my $tag=shift;
    my $searchtext=shift;
    my %param=@_;
 
-   my $flt=[{name=>"$searchtext",cistatusid=>"<=5"},
-            {systems=>"$searchtext"},
-            {assetid=>"$searchtext"}];
-   my $dataobj=getModuleObject($self->getParent->Config,"itil::asset");
-   $dataobj->SetFilter($flt);
    my @l;
-   foreach my $rec ($dataobj->getHashList(qw(name))){
-      my $dispname=$rec->{name};
-      push(@l,{group=>$self->getParent->T("itil::asset","itil::asset"),
-               id=>$rec->{id},
-               parent=>$self->Self,
-               name=>$dispname});
+   if (!defined($tag) || grep(/^$tag$/,qw(asset))){
+      my $flt=[{name=>"$searchtext",cistatusid=>"<=5"},
+               {systems=>"$searchtext"},
+               {assetid=>"$searchtext"}];
+      my $dataobj=getModuleObject($self->getParent->Config,"itil::asset");
+      $dataobj->SetFilter($flt);
+      foreach my $rec ($dataobj->getHashList(qw(name))){
+         my $dispname=$rec->{name};
+         push(@l,{group=>$self->getParent->T("itil::asset","itil::asset"),
+                  id=>$rec->{id},
+                  parent=>$self->Self,
+                  name=>$dispname});
+      }
    }
    return(@l);
 }

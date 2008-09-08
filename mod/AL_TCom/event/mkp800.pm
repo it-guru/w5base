@@ -118,6 +118,7 @@ sub mkp800
                                      affectedapplicationid
                                      wffields.tcomcodrelevant
                                      wffields.tcomcodcause
+                                     wffields.tcomexternalid
                                      wffields.tcomcodcomments
                                      affectedapplication
                              headref class step stateid eventend
@@ -570,6 +571,11 @@ sub xlsExport
                           $xlsexp->{xls}->{format}->{header});
                $ws->set_column(6,6,140);
 
+               $ws->write($xlsexp->{xls}->{line},7,
+                          "ExternalID",
+                          $xlsexp->{xls}->{format}->{header});
+               $ws->set_column(7,7,18);
+
                $xlsexp->{xls}->{line}++;
             }
          }
@@ -611,6 +617,13 @@ sub xlsExport
       }
       $ws->write($xlsexp->{xls}->{line},6,$name,
            $xlsexp->{xls}->{format}->{default});
+
+      my $extid=$rec->{headref}->{tcomexternalid};
+      $extid=join("",@$extid) if (ref($extid) eq "ARRAY");
+      $ws->write($xlsexp->{xls}->{line},7,
+           $extid,
+           $xlsexp->{xls}->{format}->{default});
+
       $xlsexp->{xls}->{line}++;
    }
 }

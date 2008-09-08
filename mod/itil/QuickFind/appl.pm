@@ -34,27 +34,30 @@ sub new
 sub CISearchResult
 {
    my $self=shift;
+   my $tag=shift;
    my $searchtext=shift;
    my %param=@_;
 
-   my $flt=[{name=>"*$searchtext*", cistatusid=>"<=5"},
-            {systems=>"$searchtext",cistatusid=>"<=5"}];
-   if ($searchtext=~m/^\d{3,20}$/){
-      push(@$flt,{conumber=>\"$searchtext",
-                  cistatusid=>"<=5"});
-   }
-   my $appl=getModuleObject($self->getParent->Config,"itil::appl");
-   $appl->SetFilter($flt);
    my @l;
-   foreach my $rec ($appl->getHashList(qw(name customer))){
-      my $dispname=$rec->{name};
-      if ($rec->{customer} ne ""){
-         $dispname.=' @ '.$rec->{customer};
+   if (!defined($tag) || grep(/^$tag$/,qw(ag appl anwendung))){
+      my $flt=[{name=>"*$searchtext*", cistatusid=>"<=5"},
+               {systems=>"$searchtext",cistatusid=>"<=5"}];
+      if ($searchtext=~m/^\d{3,20}$/){
+         push(@$flt,{conumber=>\"$searchtext",
+                     cistatusid=>"<=5"});
       }
-      push(@l,{group=>$self->getParent->T("itil::appl","itil::appl"),
-               id=>$rec->{id},
-               parent=>$self->Self,
-               name=>$dispname});
+      my $appl=getModuleObject($self->getParent->Config,"itil::appl");
+      $appl->SetFilter($flt);
+      foreach my $rec ($appl->getHashList(qw(name customer))){
+         my $dispname=$rec->{name};
+         if ($rec->{customer} ne ""){
+            $dispname.=' @ '.$rec->{customer};
+         }
+         push(@l,{group=>$self->getParent->T("itil::appl","itil::appl"),
+                  id=>$rec->{id},
+                  parent=>$self->Self,
+                  name=>$dispname});
+      }
    }
    return(@l);
 }
@@ -93,15 +96,17 @@ sub QuickFindDetail
       }
       $htmlresult.=$self->addPhoneNumbers($appl,$rec,"phonenumbers",
                                           ["phoneRB"]);
-      my $desclabel=$appl->getField("description")->Label();
-      my $desc=$rec->{description};
-      $desc=~s/\n/<br>\n/g;
-    
       $htmlresult.="</table>";
-      $htmlresult.="<table><tr><td>".
-                   "<div style=\"height:60px;overflow:auto;color:gray\">".
-                   "<font color=black>$desclabel:</font><div>$desc".
-                   "</div></div></td></tr></table>";
+      if ($rec->{description} ne ""){
+         my $desclabel=$appl->getField("description")->Label();
+         my $desc=$rec->{description};
+         $desc=~s/\n/<br>\n/g;
+        
+         $htmlresult.="<table><tr><td>".
+                      "<div style=\"height:60px;overflow:auto;color:gray\">".
+                      "<font color=black>$desclabel:</font><div>$desc".
+                      "</div></div></td></tr></table>";
+      }
    }
    return($htmlresult);
 }

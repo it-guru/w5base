@@ -1,4 +1,4 @@
-package itil::QuickFind::system;
+package base::QuickFind::grp;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -39,19 +39,14 @@ sub CISearchResult
    my %param=@_;
 
    my @l;
-   if (!defined($tag) || grep(/^$tag$/,qw(system sys server))){
-      my $flt=[{name=>"$searchtext",cistatusid=>"<=5"},
-               {applications=>"$searchtext",cistatusid=>"<=5"},
-               {systemid=>"$searchtext"}];
-      if ($searchtext=~m/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/){
-         push(@$flt,{ipaddresses=>"$searchtext"});
-      }
-      my $dataobj=getModuleObject($self->getParent->Config,"itil::system");
+   if (grep(/^$tag$/,qw(group team gruppe bereich grp))){
+      my $flt=[{name=>"$searchtext",cistatusid=>"<=5"}];
+      my $dataobj=getModuleObject($self->getParent->Config,"base::grp");
       $dataobj->SetFilter($flt);
-      foreach my $rec ($dataobj->getHashList(qw(name))){
-         my $dispname=$rec->{name};
-         push(@l,{group=>$self->getParent->T("itil::system","itil::system"),
-                  id=>$rec->{id},
+      foreach my $rec ($dataobj->getHashList(qw(fullname))){
+         my $dispname=$rec->{fullname};
+         push(@l,{group=>$self->getParent->T("base::grp","base::grp"),
+                  id=>$rec->{grpid},
                   parent=>$self->Self,
                   name=>$dispname});
       }
@@ -65,23 +60,22 @@ sub QuickFindDetail
    my $id=shift;
    my $htmlresult="?";
 
-   my $dataobj=getModuleObject($self->getParent->Config,"itil::system");
-   $dataobj->SetFilter({id=>\$id});
-   my ($rec,$msg)=$dataobj->getOnlyFirst(qw(systemid adm adm2 databoss
-                                            phonenumbers
-                                            applications));
+   my $dataobj=getModuleObject($self->getParent->Config,"base::grp");
+   $dataobj->SetFilter({grpid=>\$id});
+   my @fl=qw(description);
+   my ($rec,$msg)=$dataobj->getOnlyFirst(@fl);
 
    $dataobj->ResetFilter();
-   $dataobj->SecureSetFilter([{id=>\$id}]);
-   my ($secrec,$msg)=$dataobj->getOnlyFirst(qw(id));
+   $dataobj->SecureSetFilter([{grpid=>\$id}]);
+   my ($secrec,$msg)=$dataobj->getOnlyFirst(qw(grpid));
 
    if (defined($rec)){
       $htmlresult="";
       if (defined($secrec)){
-         $htmlresult.=$self->addDirectLink($dataobj,search_id=>$id);
+         $htmlresult.=$self->addDirectLink($dataobj,search_grpid=>$id);
       }
       $htmlresult.="<table>";
-      my @l=qw(systemid adm adm2 databoss admteam);
+      my @l=@fl;
       foreach my $v (@l){
          if ($rec->{$v} ne ""){
             my $name=$dataobj->getField($v)->Label();
@@ -91,8 +85,6 @@ sub QuickFindDetail
                          "<td valign=top>$data</td></tr>";
          }
       }
-      $htmlresult.=$self->addPhoneNumbers($dataobj,$rec,"phonenumbers",
-                                          ["phoneRB"]);
       $htmlresult.="</table>";
    }
    return($htmlresult);
