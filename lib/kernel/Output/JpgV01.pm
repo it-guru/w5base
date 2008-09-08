@@ -93,8 +93,9 @@ sub Init
    }else{
       printf STDERR ("ERROR: $@\n");
    }
-   if (defined($res=$self->getParent->getParent->W5ServerCall("rpcGetUniqueId")) &&
-      $res->{exitcode}==0){
+   if (defined($res=
+               $self->getParent->getParent->W5ServerCall("rpcGetUniqueId")) &&
+       $res->{exitcode}==0){
       $id=$res->{id};
    }
    $self->{dtp}->{_Layout}->{dir}="/tmp/tmp.$id.jpg";
@@ -104,7 +105,7 @@ sub Init
 
 sub Format
 {
-   printf STDERR ("fifi format \n\n\n");
+   return(undef);
 }
 
 sub ProcessLine

@@ -98,6 +98,7 @@ sub ValidatedUpdateRecord
        !grep(/^parentid$/,@updfields) ){ # just make it simple
       return($self->SUPER::ValidatedUpdateRecord($oldrec,$newrec,@filter));
    }
+   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
    my ($worktable,$workdb)=$self->getWorktable();
    $workdb=$self->{DB} if (!defined($workdb));
    my $locktables=$self->{locktables};

@@ -78,6 +78,7 @@ sub Init
    if ($@ eq ""){
       $self->{dtp}=$dtp;
    }
+   return(undef);
 }
 
 sub Finish
