@@ -28,6 +28,9 @@ sub new
 {
    my $type=shift;
    my $self={@_};
+   if (exists($self->{vjoinon}) && ref($self->{vjoinon}) ne "ARRAY"){
+      $self->{vjoinon}=[$self->{vjoinon}=>'grpid'];
+   }
    $self->{name}='mandator'                 if (!defined($self->{name}));
    $self->{label}='Mandator'                if (!defined($self->{label}));
    $self->{htmleditwidth}='250px'             if (!defined($self->{htmleditwidth}));

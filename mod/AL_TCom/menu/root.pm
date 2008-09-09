@@ -159,6 +159,10 @@ sub Init
                       "itil::lnksystemcontact",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.system.software",
+                      "itil::lnksoftwaresystem",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.asset",
                       "AL_TCom::asset",
                       defaultacl=>['valid_user']);

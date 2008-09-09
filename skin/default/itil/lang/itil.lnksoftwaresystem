@@ -11,3 +11,5 @@
 'invalid software version specified'=>{
                de=>'ungültiger Software-Versionsausdruck'},
 'invalid software specified'=>{de=>'keine oder ungültige Software'},
+'System Mandator'=>{de=>'System Mandant'},
+'License Mandator'=>{de=>'Lizenz Mandant'},

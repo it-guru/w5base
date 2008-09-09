@@ -87,16 +87,110 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'lnksoftwaresystem.comments'),
 
-      new kernel::Field::SubList(
-                name          =>'instances',
-                label         =>'Instances',
-                group         =>'instances',
-                subeditmsk    =>'subedit.lnksoftwaresystem',
-                allowcleanup  =>1,
-                vjointo       =>'itil::lnkinstance',
-                vjoinon       =>['id'=>'installationid'],
-                vjoindisp     =>['name','comments'],
-                vjoininhash   =>['name']),
+#     # alt bestand - muß entfernt werden
+#      new kernel::Field::SubList(
+#                name          =>'instances',
+#                label         =>'Instances',
+#                group         =>'instances',
+#                subeditmsk    =>'subedit.lnksoftwaresystem',
+#                allowcleanup  =>1,
+#                vjointo       =>'itil::lnkinstance',
+#                vjoinon       =>['id'=>'installationid'],
+#                vjoindisp     =>['name','comments'],
+#                vjoininhash   =>['name']),
+
+      new kernel::Field::Select(
+                name          =>'softwarecistatus',
+                group         =>'link',
+                readonly      =>1,
+                label         =>'Software CI-State',
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['softwarecistatusid'=>'id'],
+                vjoindisp     =>'name'),
+                                                  
+      new kernel::Field::Mandator(
+                label         =>'System Mandator',
+                name          =>'systemmandator',
+                vjoinon       =>'systemmandatorid',
+                group         =>'link',
+                readonly      =>1),
+
+      new kernel::Field::Link(
+                name          =>'systemmandatorid',
+                label         =>'SystemMandatorID',
+                group         =>'link',
+                dataobjattr   =>'system.mandator'),
+
+      new kernel::Field::Link(
+                name          =>'softwarecistatusid',
+                label         =>'SoftwareCiStatusID',
+                dataobjattr   =>'software.cistatus'),
+
+      new kernel::Field::Select(
+                name          =>'systemcistatus',
+                readonly      =>1,
+                group         =>'link',
+                label         =>'System CI-State',
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['systemcistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'systemsystemid',
+                label         =>'SystemID',
+                dataobjattr   =>'system.systemid'),
+                                                   
+      new kernel::Field::Link(
+                name          =>'systemcistatusid',
+                label         =>'SystemCiStatusID',
+                dataobjattr   =>'system.cistatus'),
+                                                   
+      new kernel::Field::Mandator(
+                label         =>'License Mandator',
+                name          =>'liccontractmandator',
+                vjoinon       =>'liccontractmandatorid',
+                group         =>'link',
+                readonly      =>1),
+
+      new kernel::Field::Link(
+                name          =>'liccontractmandatorid',
+                label         =>'LicenseMandatorID',
+                group         =>'link',
+                dataobjattr   =>'liccontract.mandator'),
+
+      new kernel::Field::Select(
+                name          =>'liccontractcistatus',
+                readonly      =>1,
+                group         =>'link',
+                label         =>'License CI-State',
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['liccontractcistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'liccontractcistatusid',
+                label         =>'LiccontractCiStatusID',
+                dataobjattr   =>'liccontract.cistatus'),
+                                                   
+      new kernel::Field::Link(
+                name          =>'assetid',
+                label         =>'AssetId',
+                dataobjattr   =>'system.asset'),
+                                                   
+      new kernel::Field::Link(
+                name          =>'softwareid',
+                label         =>'SoftwareID',
+                dataobjattr   =>'lnksoftwaresystem.software'),
+                                                   
+      new kernel::Field::Link(
+                name          =>'liccontractid',
+                label         =>'LicencenseID',
+                dataobjattr   =>'lnksoftwaresystem.liccontract'),
+                                                   
+      new kernel::Field::Link(
+                name          =>'systemid',
+                label         =>'SystemId',
+                dataobjattr   =>'lnksoftwaresystem.system'),
 
       new kernel::Field::Creator(
                 name          =>'creator',
@@ -152,73 +246,6 @@ sub new
                 label         =>'RealEditor',
                 dataobjattr   =>'lnksoftwaresystem.realeditor'),
                                                    
-      new kernel::Field::Select(
-                name          =>'softwarecistatus',
-                group         =>'link',
-                readonly      =>1,
-                label         =>'Software CI-State',
-                vjointo       =>'base::cistatus',
-                vjoinon       =>['softwarecistatusid'=>'id'],
-                vjoindisp     =>'name'),
-                                                  
-      new kernel::Field::Link(
-                name          =>'softwarecistatusid',
-                label         =>'SoftwareCiStatusID',
-                dataobjattr   =>'software.cistatus'),
-
-      new kernel::Field::Select(
-                name          =>'systemcistatus',
-                readonly      =>1,
-                group         =>'link',
-                label         =>'System CI-State',
-                vjointo       =>'base::cistatus',
-                vjoinon       =>['systemcistatusid'=>'id'],
-                vjoindisp     =>'name'),
-
-      new kernel::Field::Link(
-                name          =>'systemsystemid',
-                label         =>'SystemID',
-                dataobjattr   =>'system.systemid'),
-                                                   
-      new kernel::Field::Link(
-                name          =>'systemcistatusid',
-                label         =>'SystemCiStatusID',
-                dataobjattr   =>'system.cistatus'),
-                                                   
-      new kernel::Field::Select(
-                name          =>'liccontractcistatus',
-                readonly      =>1,
-                group         =>'link',
-                label         =>'License CI-State',
-                vjointo       =>'base::cistatus',
-                vjoinon       =>['liccontractcistatusid'=>'id'],
-                vjoindisp     =>'name'),
-
-      new kernel::Field::Link(
-                name          =>'liccontractcistatusid',
-                label         =>'LiccontractCiStatusID',
-                dataobjattr   =>'liccontract.cistatus'),
-                                                   
-      new kernel::Field::Link(
-                name          =>'assetid',
-                label         =>'AssetId',
-                dataobjattr   =>'system.asset'),
-                                                   
-      new kernel::Field::Link(
-                name          =>'softwareid',
-                label         =>'SoftwareID',
-                dataobjattr   =>'lnksoftwaresystem.software'),
-                                                   
-      new kernel::Field::Link(
-                name          =>'liccontractid',
-                label         =>'LicencenseID',
-                dataobjattr   =>'lnksoftwaresystem.liccontract'),
-                                                   
-      new kernel::Field::Link(
-                name          =>'systemid',
-                label         =>'SystemId',
-                dataobjattr   =>'lnksoftwaresystem.system'),
-
    );
    $self->setDefaultView(qw(software version quantity system cdate));
    $self->setWorktable("lnksoftwaresystem");
@@ -302,7 +329,7 @@ sub isWriteValid
    $rw=1 if (!defined($rec));
    $rw=1 if (defined($rec) && $self->isParentWriteable($rec->{systemid}));
    $rw=1 if ((!$rw) && ($self->IsMemberOf("admin")));
-   return("default","misc","instances") if ($rw);
+   return("default","misc") if ($rw);
    return(undef);
 }
 
@@ -325,7 +352,7 @@ sub isParentWriteable  # Eltern Object Schreibzugriff prüfen
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default misc instances link source));
+   return(qw(header default misc link source));
 }
 
 
