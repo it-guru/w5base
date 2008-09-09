@@ -70,10 +70,7 @@ sub new
                 label         =>'CI-StateID',
                 dataobjattr   =>'appl.cistatus'),
 
-      new kernel::Field::Databoss(
-                name          =>'databoss',
-                label         =>'Databoss',
-                vjoinon       =>'databossid'),
+      new kernel::Field::Databoss(),
 
       new kernel::Field::Link(
                 name          =>'databossid',

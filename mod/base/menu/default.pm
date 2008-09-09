@@ -286,10 +286,6 @@ sub Init
                       defaultacl=>['admin']);
    
    $self->RegisterObj("Tools.translation",
-                      "base::reflexion_translation",
-                      defaultacl=>['valid_user']);
-   
-   $self->RegisterObj("Tools.translation",
                       "base::TextTranslation",
                       defaultacl=>['valid_user']);
    
