@@ -50,11 +50,13 @@ sub new
 
       new kernel::Field::Text(    
                 name          =>'name',
+                sqlorder      =>'NONE',
                 label         =>'Short-Description',
                 dataobjattr   =>'tbl_p800sleist.shortdescription'),
 
       new kernel::Field::Textarea(    
                 name          =>'description',
+                sqlorder      =>'NONE',
                 label         =>'Description',
                 dataobjattr   =>'tbl_p800sleist.description'),
 
@@ -66,11 +68,13 @@ sub new
 
       new kernel::Field::Text(    
                 name          =>'appl',
+                sqlorder      =>'NONE',
                 label         =>'Application',
                 dataobjattr   =>'tbl_p800sleist.application'),
 
       new kernel::Field::Text(    
                 name          =>'custcontract',
+                sqlorder      =>'NONE',
                 label         =>'Customer Contract',
                 dataobjattr   =>'tbl_p800sleist.custcontract'),
 
@@ -81,8 +85,14 @@ sub new
 
       new kernel::Field::Text(    
                 name          =>'tcomcodcomments',
+                sqlorder      =>'NONE',
                 label         =>'P800 Comments',
                 dataobjattr   =>'tbl_p800sleist.tcomcodcomments'),
+
+      new kernel::Field::Text(    
+                name          =>'tcomexternalid',
+                label         =>'P800 ExternalID',
+                dataobjattr   =>'tbl_p800sleist.externalid'),
 
       new kernel::Field::Number(
                 name          =>'tcomworktime',
@@ -158,7 +168,7 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("ALL") if ($self->IsMemberOf("admin"));
+   return("default") if ($self->IsMemberOf("admin"));
    return(undef);
 }
 

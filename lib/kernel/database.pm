@@ -72,6 +72,7 @@ sub Connect
       }
    }
    #msg(DEBUG,"fifi %s",Dumper($self));
+   $ENV{NLS_LANG}="German_Germany.WE8ISO8859P15"; # for oracle connections
    if (defined($Apache::DBI::VERSION)){
       $self->{'db'}=DBI->connect($self->{dbconnect},
                                  $self->{dbuser},

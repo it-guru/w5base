@@ -478,12 +478,19 @@ sub bflexxExport
       $ag=[$ag] if (!ref($ag) eq "ARRAY");
       my $vert=$rec->{affectedcontract};
       $vert=[$vert] if (!ref($vert) eq "ARRAY");
+
       my $cause=$rec->{tcomcodcause};
-      $cause=join("",@$cause) if (ref($cause) eq "ARRAY");
+      $cause=join(", ",@$cause) if (ref($cause) eq "ARRAY");
+
       my $comments=$rec->{tcomcodcomments};
-      $comments=join("",@$comments) if (ref($comments) eq "ARRAY");
+      $comments=join("\n",@$comments) if (ref($comments) eq "ARRAY");
+
+      my $extid=$rec->{tcomexternalid};
+      $extid=join("\n",@$extid) if (ref($extid) eq "ARRAY");
+
       my $specialt=$rec->{headref}->{specialt};
-      $specialt=join("",@$specialt) if (ref($specialt) eq "ARRAY");
+      $specialt=join(", ",@$specialt) if (ref($specialt) eq "ARRAY");
+
       if (my ($m,$y)=$repmon=~m/^(\d+)\/(\d{4})/){
          $repmon=sprintf("%04d%02d",$y,$m);
       }
@@ -494,6 +501,7 @@ sub bflexxExport
                   tcomworktime=>$specialt,
                   tcomcodcause=>$cause,
                   tcomcodcomments=>$comments,
+                  tcomexternalid=>$extid,
                   appl=>join(", ",@$ag),
                   custcontract=>join(", ",@$vert),
                   srcload=>NowStamp("en"),

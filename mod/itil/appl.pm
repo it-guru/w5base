@@ -70,13 +70,10 @@ sub new
                 label         =>'CI-StateID',
                 dataobjattr   =>'appl.cistatus'),
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Databoss(
                 name          =>'databoss',
                 label         =>'Databoss',
-                vjointo       =>'base::user',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['databossid'=>'userid'],
-                vjoindisp     =>'fullname'),
+                vjoinon       =>'databossid'),
 
       new kernel::Field::Link(
                 name          =>'databossid',

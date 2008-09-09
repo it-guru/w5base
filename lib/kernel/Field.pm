@@ -21,6 +21,7 @@ use vars qw(@ISA);
 use kernel;
 use kernel::Field::Id;
 use kernel::Field::Text;
+use kernel::Field::Databoss;
 use kernel::Field::Password;
 use kernel::Field::Phonenumber;
 use kernel::Field::File;
@@ -43,6 +44,7 @@ use kernel::Field::ListWebLink;
 use kernel::Field::Select;
 use kernel::Field::Boolean;
 use kernel::Field::SubList;
+use kernel::Field::Contact;
 use kernel::Field::ContactLnk;
 use kernel::Field::PhoneLnk;
 use kernel::Field::FileList;
@@ -147,7 +149,7 @@ sub addWebLinkToFacility
       ($weblinkto,$weblinkon)=&{$weblinkto}($self,$d,$current);
    }
 
-   if (defined($weblinkto) && defined($weblinkon) && $weblinkto ne "none"){
+   if (defined($weblinkto) && defined($weblinkon) && lc($weblinkto) ne "none"){
       my $target=$weblinkto;
       $target=~s/::/\//g;
       $target="../../$target/Detail";
@@ -533,7 +535,7 @@ sub getSelectField     # returns the name/function to place in select
          my $orderstring=$self->{dataobjattr};
          $orderstring=$self->{name} if ($self->{dataobjattr}=~m/^max\(.*\)$/);
          $orderstring.=" ".$self->{sqlorder} if (defined($self->{sqlorder}));
-         return(undef) if ($self->{sqlorder} eq "none");
+         return(undef) if (lc($self->{sqlorder}) eq "none");
          return($orderstring);
       }
    }

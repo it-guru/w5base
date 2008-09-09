@@ -179,7 +179,7 @@ sub getSqlOrder
 
 
    my @o=$self->GetCurrentOrder();
-   if (!($#o==0 && $o[0] eq "NONE")){
+   if (!($#o==0 && uc($o[0]) eq "NONE")){
       if ($#o==-1 || ($#o==0 && $o[0] eq "")){
          foreach my $field (@view){
             my $orderstring=$field->getSelectField("order",$self->{DB});
