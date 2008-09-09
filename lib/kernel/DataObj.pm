@@ -950,9 +950,16 @@ sub ValidatedInsertOrUpdateRecord
          my $rec=$_;
          my $changed=0;
          foreach my $k (keys(%$newrec)){
-            if ($newrec->{$k} ne $rec->{$k}){
-               $changed=1;
-               last;
+            if ($k ne $idfname){
+               if ($newrec->{$k} ne $rec->{$k}){
+                  $changed=1;
+                  last;
+               }
+            }
+            else{
+               if (exists($newrec->{$k})){
+                  delete($newrec->{$k});
+               }
             }
          }
          if ($changed){

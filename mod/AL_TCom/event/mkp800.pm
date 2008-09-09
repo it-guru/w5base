@@ -452,15 +452,15 @@ sub bflexxFinish
    my $now=shift;
    my $repmon=shift;
 
-   my $opobj=$bflexxp800->Clone();
-   if (my ($m,$y)=$repmon=~m/^(\d+)\/(\d{4})/){
-      $repmon=sprintf("%04d%02d",$y,$m);
-   }
-   $bflexxp800->ResetFilter(); 
-   $bflexxp800->SetFilter(srcload=>"\"<$now\"",month=>\$repmon);
-   $bflexxp800->ForeachFilteredRecord(sub{
-       $opobj->ValidatedDeleteRecord($_);
-   });
+#   my $opobj=$bflexxp800->Clone();
+#   if (my ($m,$y)=$repmon=~m/^(\d+)\/(\d{4})/){
+#      $repmon=sprintf("%04d%02d",$y,$m);
+#   }
+#   $bflexxp800->ResetFilter(); 
+#   $bflexxp800->SetFilter(srcload=>"\"<$now\"",month=>\$repmon);
+#   $bflexxp800->ForeachFilteredRecord(sub{
+#       $opobj->ValidatedDeleteRecord($_);
+#   });
 
 }
 
