@@ -38,6 +38,48 @@ sub new
    return($self);
 }
 
+sub FormatedDetail
+{
+   my $self=shift;
+   my $current=shift;
+   my $mode=shift;
+
+   my $d=$self->SUPER::FormatedDetail($current,$mode);
+   return($d);
+}
+
+sub addWebLinkToFacility
+{
+   my $self=shift;
+   my $d=shift;
+   my $current=shift;
+   my %param=@_;
+
+   $param{contextMenu}="contextMenu_".$self->Name;
+   return($self->SUPER::addWebLinkToFacility($d,$current,%param));
+}
+
+sub contextMenu
+{
+   my $self=shift;
+   my %param=@_;
+
+   my $detailx=$self->getParent->DetailX();
+   my $detaily=$self->getParent->DetailY();
+   my $target="../../base/user/Detail";
+   my $targetval=$param{current}->{$self->{vjoinon}->[0]};
+   my $onclick="openwin('$target?".
+               "AllowClose=1&search_userid=$targetval',".
+               "'_blank',".
+               "'height=$detaily,width=$detailx,toolbar=no,status=no,".
+               "resizable=yes,scrollbars=no')";
+
+
+   return($self->getParent->T("Contact Detail")=>$onclick,
+          "alarm"=>"alert('alarm');");
+}
+
+
 
 
 

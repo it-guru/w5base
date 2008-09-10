@@ -41,6 +41,29 @@
       padding: 0px;
    }
 
+div.context_menu {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	border: 2px outset ThreeDFace;
+	background-color: ThreeDFace;
+	display: none;
+}
+
+div.context_menu td.std {
+	background-color: transparent;
+	color: MenuText;
+	cursor: default;
+}
+
+div.context_menu td.active {
+	background-color: Highlight;
+	color: HighlightText;
+	cursor: default;
+}
+
+
+
 #popupMask {
 	position: absolute;
 	xz-index: 200;
@@ -118,10 +141,13 @@ iframe.popupFrame {
 	cursor: hand;
 }
 
-a:link.sublink, a:visited.sublink, a:active.sublink  {
+a:link.sublink, a:visited.sublink, a:active.sublink,
+div.sublink,span.sublink  {
             font-family:Arial,Adobe Helvetica,Helvetica;
             text-decoration:none;
             color:#16305e;
+            cursor: pointer;
+            cursor: hand;
           }
 
 a:link.emaillink    {

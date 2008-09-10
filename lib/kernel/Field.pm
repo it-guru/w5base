@@ -142,6 +142,7 @@ sub addWebLinkToFacility
    my $self=shift;
    my $d=shift;
    my $current=shift;
+   my %param=@_;
 
    my $weblinkon=$self->{weblinkon};
    my $weblinkto=$self->{weblinkto};
@@ -172,12 +173,18 @@ sub addWebLinkToFacility
          my $detailx=$self->getParent->DetailX();
          my $detaily=$self->getParent->DetailY();
          $targetval=$targetval->[0] if (ref($targetval) eq "ARRAY");
-         my $onclick="openwin(\"$target?".
-                     "AllowClose=1&search_$targetid=$targetval\",".
-                     "\"_blank\",".
-                     "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
-                     "resizable=yes,scrollbars=no\")";
-         $d="<a class=sublink href=JavaScript:$onclick>".$d."</a>";
+         my $onclick="openwin('$target?".
+                     "AllowClose=1&search_$targetid=$targetval',".
+                     "'_blank',".
+                     "'height=$detaily,width=$detailx,toolbar=no,status=no,".
+                     "resizable=yes,scrollbars=no')";
+         #$d="<a class=sublink href=JavaScript:$onclick>".$d."</a>";
+         my $context;
+         if (defined($param{contextMenu})){
+            $context=" cont=\"$param{contextMenu}\" ";
+         }
+         #$d="<div class=\"sublink\" $context onclick=$onclick>".$d."</div>";
+         $d="<span class=\"sublink\" $context onclick=$onclick>".$d."</span>";
       }
    }
    return($d);
@@ -328,6 +335,14 @@ sub Size     # returns the size in chars if any defined
 {
    my $self=shift;
    return($self->{size});
+}
+
+sub contextMenu
+{
+   my $self=shift;
+   my %param=@_;
+
+   return;
 }
 
 sub Label

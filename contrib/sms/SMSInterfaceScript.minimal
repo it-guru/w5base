@@ -1,4 +1,5 @@
 #!/bin/bash
+PATH=/sbin:/usr/sbin:/usr/lib/:/usr/lib/sbin:$PATH
 SMSMODE=$1
 SMSNUM=$2
 SMSTEXT=`cat` 
@@ -9,5 +10,11 @@ if [ "$SMSMODE" = "-s" ]; then
    echo "to:   $SMSNUM" >> /tmp/smslog
    echo "$SMSTEXT" >> /tmp/smslog
    echo "=========================================================================" >> /tmp/smslog
-   echo "$SMSTEXT" | mailx $SMSNUM@t-mobile-sms.de
+   cat <<EOF | sendmail -t
+From: SMS@null.com
+To: $SMSNUM@t-mobile-sms.de
+
+$SMSTEXT
+.
+EOF
 fi
