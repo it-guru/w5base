@@ -83,6 +83,12 @@ sub GetKeyCriterion
                                                        itil::asset::name
                                                        itil::system::ipaddress::name
                                                        itil::system::name)]},
+                'itil::appl::customer'      =>{label=>'IT-Inventar: Application: Kunde',
+                                               in=>[qw(itil::appl::name
+                                                       itil::system::systemid
+                                                       itil::asset::name
+                                                       itil::system::ipaddress::name
+                                                       itil::system::name)]},
                 'itil::appl::customerprio'  =>{label=>'IT-Inventar: Application: Kundenprio',
                                                in=>[qw(itil::appl::name
                                                        itil::system::systemid
@@ -182,7 +188,8 @@ sub ProcessLine
 
  
    # output
-   foreach my $appsekvar (qw(sem tsm sememail tsmemail businessteam customerprio)){
+   foreach my $appsekvar (qw(sem tsm sememail tsmemail businessteam 
+                             customerprio customer)){
       if (defined($in->{'itil::appl::id'}) && 
           exists($out->{'itil::appl::'.$appsekvar})){
          my $appl=$self->getParent->getPersistentModuleObject('itil::appl');
