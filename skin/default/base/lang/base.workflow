@@ -22,6 +22,7 @@
 'Event-Duration Minutes'=>{de=>'Ereignis Dauer in Minuten'},
 'Event-Duration'=>{de=>'Ereignis Dauer'},
 'sum documented efforts'=>{de=>'Summe dokumentierter Aufwände'},
+'sum efforts in hours'=>{de=>'Summe Aufwände in Stunden'},
 'Forward to'=>{de=>'Weiterleitung an/ Vorlage bei'},
 'Close-Date'=>{de=>'Abschlusszeitpunkt'},
 'Creator Name'=>{de=>'Erstellername'},

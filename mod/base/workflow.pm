@@ -289,6 +289,34 @@ sub new
                 label         =>'sum documented efforts',
                 depend        =>['shortactionlog']),
                                    
+      new kernel::Field::Number(
+                name          =>'documentedefforth',
+                group         =>'state',
+                htmldetail    =>0,
+                searchable    =>0,
+                precision     =>2,
+                unit          =>'h',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $fobj=$self->getParent->getField("shortactionlog");
+                   my $d=$fobj->RawValue($current);
+                   my $dsum;
+                   if (defined($d) && ref($d) eq "ARRAY"){
+                      foreach my $arec (@{$d}){
+                         if (defined($arec->{effort}) &&
+                             $arec->{effort}!=0){
+                            $dsum+=$arec->{effort};
+                         }
+                      }
+                   }
+                   return(undef) if ($dsum==0);
+                   $dsum=$dsum/60.0;
+                   return($dsum);
+                },
+                label         =>'sum efforts in hours',
+                depend        =>['shortactionlog']),
+                                   
       new kernel::Field::Duration(
                 name          =>'eventdurationmin',
                 htmlwidth     =>'100px',
