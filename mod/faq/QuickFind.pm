@@ -111,9 +111,12 @@ sub doSearch
                            "</font>",1);
       return();
    }
-
-
-
+   my $tag=undef;
+   if (my ($stag,$stxt)=$searchtext=~m/^\s*(\S+)\s*:\s*(\S+.*)\S*$/){
+      $tag=lc($stag);
+      $searchtext=$stxt;
+   }
+   $searchtext=trim($searchtext);
 
    my $found=0;
    if (grep(/^ci$/,@stags)){
@@ -153,11 +156,6 @@ function switchTag(id)
 EOF
       $self->LoadSubObjs("QuickFind","QuickFind");
       my @s;
-      my $tag=undef;
-      if (my ($stag,$stxt)=$searchtext=~m/^\s*(\S+)\s*:\s*(\S+.*)\S*$/){
-         $tag=lc($stag);
-         $searchtext=trim($stxt);
-      }
       foreach my $sobj (values(%{$self->{QuickFind}})){
          my $acl=$self->getMenuAcl($ENV{REMOTE_USER},
                                    $sobj->Self());
@@ -191,19 +189,9 @@ EOF
 
           print insDoc($tree,$res->{name},$link,appendHTML=>$html); 
       }
-#
-#printf STDERR ("fifi keys of QuickFind=%s\n",keys(%{$self->{QuickFind}}));
-#      $tree="itil__appl";
-#      print insDoc($tree,"AG XY \@ DTAG.T-Com",
-#                   "javascript:switchTag('yy::xx')",
-#                   appendHTML=>"<div id=\"yy::xx\" ".
-#                               "style=\"visibility:hidden;display:none\">".
-#                               "SeM:xxx<br><a href=http://www.google.com target=_blank>TSM:xxx</a><br></div>");
-#      print insDoc($tree,"AG XY<br>","../../faq/forum/Topic/123");
-#
    }
 
-   if (grep(/^article$/,@stags)){
+   if (grep(/^article$/,@stags) && (!defined($tag) || grep(/^$tag$/,qw(faq)))){
       my $tree="foldersTree";
       my $faq=getModuleObject($self->Config,"faq::article");
     
@@ -225,7 +213,7 @@ EOF
                       "$rec->{faqid}");
       }
    }
-   if (grep(/^forum$/,@stags)){
+   if (grep(/^forum$/,@stags) && (!defined($tag) || grep(/^$tag$/,qw(forum)))){
       my $tree="foldersTree";
       my %id;
 

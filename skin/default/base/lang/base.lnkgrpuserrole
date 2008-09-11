@@ -15,6 +15,7 @@
 'RPRManager'=>{ de=>'Problem-Manager',en=>'Problem-Manager'},
 'RCFManager'=>{ de=>'Config-Manager', en=>'Config-Manager'},
 'RControlling'=>{ de=>'Controlling', en=>'Controlling'},
+'RBackoffice'=>{ de=>'Backoffice', en=>'Backoffice'},
 'RAuditor'=>{ de=>'Auditor', en=>'Auditor'},
 'RTimeManager'=>{ de=>'Zeit-Manager', en=>'Time-Manager'},
 'base::lnkgrpuserrole'=>{ de=>'Rollenzuordnung',en=>'Rolerelation'},

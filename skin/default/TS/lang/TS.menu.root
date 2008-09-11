@@ -50,5 +50,8 @@
 'itts.kern.costcenter.new'=>{de=>'Neueingabe',en=>'New'},
 'itts.kern.bp'=>{de=>'Geschäftsprozess',en=>'Business process'},
 'itts.kern.bp.new'=>{de=>'Neueingabe',en=>'New'},
+'itts.kern.projectroom'=>{de=>'Projektraum',en=>'Projectroom'},
+'itts.kern.projectroom.new'=>{de=>'Neueingabe',en=>'New'},
+
 
 

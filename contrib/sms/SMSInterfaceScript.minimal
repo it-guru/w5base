@@ -11,7 +11,7 @@ if [ "$SMSMODE" = "-s" ]; then
    echo "$SMSTEXT" >> /tmp/smslog
    echo "=========================================================================" >> /tmp/smslog
    cat <<EOF | sendmail -t
-From: SMS@null.com
+From: EventInfo@IT.org
 To: $SMSNUM@t-mobile-sms.de
 
 $SMSTEXT

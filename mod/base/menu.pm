@@ -292,7 +292,7 @@ sub TableVersionProceedFile
       if ($command=~/^.*;\s*$/){
          $command=~s/;\s*$//;
          printf STDERR ("[notice] W5Base dbtool '%s'\n",$command);
-         if ($command=~m/^use \S+$/ || $workdb->do($command)){
+         if ($command=~m/^use \S+$/ || defined($workdb->do($command))){
             $cmdok++;
             $workdb->finish();
             $db->do("update  tableversion ".
@@ -550,6 +550,7 @@ sub TableVersionChecker
    }
    if ($self->TableVersionIsInconsistent()){
       if ($self->Config->Param("W5BaseOperationMode") eq "normal"||
+          $self->Config->Param("W5BaseOperationMode") eq "dev" ||
           $self->Config->Param("W5BaseOperationMode") eq "online"){
          if (!$self->IsMemberOf("admin")){
             return($self->TableVersionNeedAdmin());

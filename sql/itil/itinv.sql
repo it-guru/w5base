@@ -663,3 +663,7 @@ alter table lnkapplcustcontract add unique applcontr(appl,custcontract);
 alter table asset  add allowifupdate int(2) default 0;
 alter table servicesupport add sapservicename varchar(20) default NULL;
 alter table servicesupport add sapcompanycode varchar(20) default NULL;
+alter table appl       add databoss2 bigint(20)  default NULL;
+alter table asset      add databoss2 bigint(20)  default NULL;
+alter table system     add databoss2 bigint(20)  default NULL;
+alter table swinstance add databoss2 bigint(20)  default NULL;

@@ -87,6 +87,7 @@ sub new
                                  'RPRManager',
                                  'RQManager',
                                  'RControlling',
+                                 'RBackoffice',
                                  'RAuditor',
                                  'RTimeManager'],
                 dataobjattr   =>'lnkgrpuserrole.role'),

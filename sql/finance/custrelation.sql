@@ -36,3 +36,4 @@ create table custcontract (
 );
 alter table custcontract add conumber varchar(20) default NULL;
 alter table custcontract add lastqcheck datetime default NULL,add key(lastqcheck);
+alter table custcontract add databoss2 bigint(20)  default NULL;
