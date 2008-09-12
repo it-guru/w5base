@@ -576,7 +576,13 @@ sub RawValue
       $c->{JoinData}={} if (!exists($c->{JoinData}));
       $c=$c->{JoinData};
       my $joincontext=$self->vjoinContext();
-      my @view=($self->{vjoindisp},$self->{vjoinon}->[1]);
+      my @view;
+      if (ref($self->{vjoindisp}) eq "ARRAY"){
+         @view=(@{$self->{vjoindisp}},$self->{vjoinon}->[1]);
+      }
+      else{
+         @view=($self->{vjoindisp},$self->{vjoinon}->[1]);
+      }
       foreach my $fieldname ($self->getParent->getCurrentView()){
          my $fobj=$self->getParent->getField($fieldname);
          next if (!defined($fobj));

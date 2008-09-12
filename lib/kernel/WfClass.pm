@@ -458,6 +458,7 @@ $LastMsg
 </div>
 </div>
 <script language="JavaScript">
+var submitCount=0;
 function ProcessResize()
 {
    var h=getViewportHeight();
@@ -551,8 +552,18 @@ function SubmitCheck()
 if (this.SubFrameEditMode==1){return(DataLoseWarn());}
 return(true);
 }
+function disableButtons()
+{
+   document.btnWhich.disabled=true;
+   document.btnWhich.value="Working ...";
+}
+
 function ValidateSubmit(f)
 {
+   if (submitCount>0){   // prevent doubleclick idiots
+      return(false);
+   }
+   submitCount++;
    if (this.SubFrameEditMode==1){
       if (!DataLoseWarn()){
          return(false);
@@ -564,6 +575,7 @@ function ValidateSubmit(f)
    if (document.doValidateSubmit){
       return(doValidateSubmit(f,document.btnWhich));
    }
+   window.setTimeout("disableButtons();",1);
    return(defaultValidateSubmit(f,document.btnWhich));
 }
 function defaultValidateSubmit(f,b)

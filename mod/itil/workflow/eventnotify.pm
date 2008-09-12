@@ -1613,7 +1613,7 @@ sub Validate
       $newrec->{involvedresponseteam}=[keys(%responseteam)];
       my %groups=$self->getGroupsOf($ENV{REMOTE_USER},
                                     ['REmployee','RBoss','RBoss2'],'direct');
-      #printf STDERR ("fifi groups=%s\n",Dumper(\%groups));
+      printf STDERR ("fifi groups=%s\n",Dumper(\%groups));
       my @grpids=keys(%groups);
       if ($#grpids!=-1){
          $newrec->{initiatorgroupid}=\@grpids;
@@ -1639,8 +1639,12 @@ sub Process
    if ($action eq "NextStep"){
       my $h=$self->getWriteRequestHash("web");
       $h->{stateid}=1;
+      sleep(1);
       $h->{eventstart}=Query->Param("Formated_eventstartofevent");
       $h->{eventend}=undef;
+      if (Query->Param("Formated_eventmode") ne ""){
+         $h->{eventmode}=Query->Param("Formated_eventmode");
+      }
       if (Query->Param("Formated_eventendofevent") ne ""){
          $h->{eventend}=Query->Param("Formated_eventendofevent");
       }

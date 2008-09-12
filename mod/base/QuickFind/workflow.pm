@@ -39,7 +39,7 @@ sub CISearchResult
    my %param=@_;
 
    my @l;
-   if (($searchtext=~m/^\d{10,20}$/) || grep(/^$tag$/,qw(workflow wf))){
+   if (!defined($tag) || grep(/^$tag$/,qw(workflow wf))){
       my $flt=[{srcid=>\"$searchtext"}];
       if ($searchtext=~m/^\d{10,20}$/){
          push(@$flt,{id=>\"$searchtext"});
