@@ -309,7 +309,7 @@ sub generateMailSet
    my @emailsubtitle=();
 
    $$allowsms=0;
-   $$smstext="";
+   $$smstext="\n";
 
 
 
@@ -340,13 +340,13 @@ sub generateMailSet
       # wffields.eventstatreason entfernt lt. Request ID:12077277280002  
       #push(@baseset,"wffields.eventstatreason");
    }
-   my $fo=$self->getField("wffields.eventmode",$WfRec);
-   if (defined($fo)){
-      my $v=$fo->FormatedResult($WfRec,"HtmlMail");
-      if ($v ne ""){
-         $$smstext.=$v."\n";
-      }
-   }
+   # my $fo=$self->getField("wffields.eventmode",$WfRec);
+   # if (defined($fo)){
+   #    my $v=$fo->FormatedResult($WfRec,"HtmlMail");
+   #    if ($v ne ""){
+   #       $$smstext.=$v."\n";
+   #    }
+   # }
 
    my @sets=([@baseset,qw(
                           wffields.eventimpact
@@ -370,6 +370,39 @@ sub generateMailSet
 
    my @fields=@{shift(@sets)};
  
+   foreach my $field (qw(wffields.affectedcustomer
+                         affectedapplication
+                         wffields.eventstatclass
+                         wffields.eventstartofevent 
+                         wffields.eventendofevent id)){
+      my $fo=$self->getField($field,$WfRec);
+
+      my $vv=$fo->FormatedResult($WfRec,"ShortMsg");
+      if ($vv ne ""){
+         if ($field=~m/(eventstartofevent)/){
+            $$smstext.="Start:".$vv."\n";
+         }
+         elsif ($field=~m/(eventendofevent)/){
+            $$smstext.="Ende:".$vv."\n";
+         }
+         elsif ($field=~m/(affectedapplication)/){
+            $$smstext.="AG:".$vv."\n";
+         }
+         elsif ($field=~m/(eventstatnature)/){
+            $$smstext.=$vv."\n";
+         }
+         elsif ($field=~m/(affectedcustomer)/){
+            $vv=~s/^([^\.]+\.[^\.]+).*$/$1/;
+            $$smstext.=$vv."\n";
+         }
+         elsif ($field=~m/^id$/){
+            $$smstext.="HeadID:".$vv."\n";
+         }
+         else{
+            $$smstext.=$fo->Label().":".$vv."\n";
+         }
+      }
+   }
    foreach my $field (@fields){
       my $fo=$self->getField($field,$WfRec);
       my $sh=0;
@@ -384,14 +417,6 @@ sub generateMailSet
             if ($field eq "wffields.eventstatclass" &&
                ( $v eq "1" || $v eq "2") && $action ne "rootcausei"){
                $$allowsms=1
-            }
-            if (grep(/^$field$/,qw(wffields.eventstartofevent 
-                                   wffields.eventendofevent
-                                   wffields.eventstatclass 
-                                   affectedapplication))){
-                my $vv=$v;
-                $vv=~s/&nbsp;/ /g;;
-                $$smstext.=$fo->Label().":".$vv."\n";
             }
                            
             if ($baseurl ne "" && $line==0){

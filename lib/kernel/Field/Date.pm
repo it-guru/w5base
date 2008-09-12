@@ -65,6 +65,9 @@ sub FormatedDetail
             $d=~s/ 00:00:00//;
          }
       }
+      if ($mode eq "ShortMsg"){         # SMS Modus
+         $d=~s/^(.*\d+:\d+):\d+\s*$/$1/;   # cut seconds
+      }
       if ($mode eq "HtmlDetail"){
          if (defined($delta) && $delta!=0){
             my $lang=$self->getParent->Lang();
