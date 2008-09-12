@@ -30,7 +30,10 @@ sub new
       $param{vjoinon}=[$param{vjoinon}=>'userid'];
    }
    $param{vjointo}='base::user'  if (!defined($param{vjointo}));
-   $param{vjoindisp}='fullname'  if (!defined($param{vjoindisp}));
+  # $param{vjoindisp}='fullname'  if (!defined($param{vjoindisp}));
+   if (!defined($param{vjoindisp})){
+      $param{vjoindisp}=['fullname','email','office_phone','office_mobile'];
+   }
    if (!defined($param{vjoineditbase})){
       $param{vjoineditbase}={'cistatusid'=>[3,4]};
    }
@@ -73,10 +76,24 @@ sub contextMenu
                "'_blank',".
                "'height=$detaily,width=$detailx,toolbar=no,status=no,".
                "resizable=yes,scrollbars=no')";
-
-
-   return($self->getParent->T("Contact Detail")=>$onclick,
-          "alarm"=>"alert('alarm');");
+   my $rec=$self->getLastVjoinRec();
+   my @ml=($self->getParent->T("Contact Detail")=>$onclick);
+   if (defined($rec) && ref($rec) eq "ARRAY"){
+      my $email=$rec->[0]->{email};
+      if ($email ne ""){
+         push(@ml,$self->getParent->T("send a mail"),
+                  "window.location.href = 'mailto:$email';");
+      }
+      my $office_phone=$rec->[0]->{office_phone};
+      if ($office_phone ne ""){
+         push(@ml,$office_phone,"void;");
+      }
+      my $office_mobile=$rec->[0]->{office_mobile};
+      if ($office_mobile ne ""){
+         push(@ml,$office_mobile,"void;");
+      }
+   }
+   return(@ml);
 }
 
 

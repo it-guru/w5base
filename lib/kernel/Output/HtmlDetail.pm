@@ -314,26 +314,26 @@ EOF
                                   \"displaySpec(this,'fieldspec_$name');\"";
                }
                my $prefix=$fieldlist[$c]->dlabelpref(current=>$rec);
-               my @contextMenu=$fieldlist[$c]->contextMenu(current=>$rec);
-               my $contextMenu="";
-               if ($#contextMenu!=-1){
-                  $contextMenu="<div id=\"contextMenu_$name\" "
-                               ."class=\"context_menu\">";
-                  $contextMenu.="<table cellspacing=\"1\" cellpadding=\"2\" ".
-                                "border=\"0\">";
-                  while(my $label=shift(@contextMenu)){
-                     my $link=shift(@contextMenu);
-                     $contextMenu.="<tr>";
-                     $contextMenu.="<td class=\"std\" ".
-                                   "onMouseOver=\"this.className='active'\" ".
-                                   "onMouseOut=\"this.className='std'\">";
-                     $contextMenu.="<div onMouseUp=\"$link\">$label</div>";
-                     $contextMenu.="</td></tr>";
-                  }
+           #    my @contextMenu=$fieldlist[$c]->contextMenu(current=>$rec);
+           #    my $contextMenu="";
+           #    if ($#contextMenu!=-1){
+           #       $contextMenu="<div id=\"contextMenu_$name\" "
+           #                    ."class=\"context_menu\">";
+           #       $contextMenu.="<table cellspacing=\"1\" cellpadding=\"2\" ".
+           #                     "border=\"0\">";
+           #       while(my $label=shift(@contextMenu)){
+           #          my $link=shift(@contextMenu);
+           #          $contextMenu.="<tr>";
+           #          $contextMenu.="<td class=\"std\" ".
+           #                        "onMouseOver=\"this.className='active'\" ".
+           #                        "onMouseOut=\"this.className='std'\">";
+           #          $contextMenu.="<div onMouseUp=\"$link\">$label</div>";
+           #          $contextMenu.="</td></tr>";
+           #       }
 
-                  $contextMenu.="</table>";
-                  $contextMenu.="</div>";
-               }
+           #       $contextMenu.="</table>";
+           #       $contextMenu.="</div>";
+           #    }
                if (defined($fieldlist[$c]->{jsonchanged})){
                   my $n="jsonchanged_".$name;
                   if (!grep(/^$n$/,@{$self->Context->{jsonchanged}})){
@@ -346,7 +346,7 @@ EOF
                   $subblock.=<<EOF;
       <tr class=fline>
          <td class=fname$valign colspan=2>
-<span $fieldspecfunc>$prefix\%$name(label)%:</span><br>$fieldspec$contextMenu
+<span $fieldspecfunc>$prefix\%$name(label)%:</span><br>$fieldspec
 \%$name(detail)\%
 </td>
       </tr>
@@ -366,7 +366,7 @@ EOF
                elsif ($fieldlist[$c]->can("EditProcessor")){
                   $subblock.=<<EOF;
       <tr class=fline>
-         <td class=fname$valign colspan=2 $fieldspecfunc>$fieldspec$contextMenu
+         <td class=fname$valign colspan=2 $fieldspecfunc>$fieldspec
 \%$name(detail)\%
 </td>
       </tr>
@@ -387,7 +387,7 @@ EOF
                else{
                   $subblock.=<<EOF;
       <tr class=fline>
-         <td class=fname$valign style="width:20%;">$fieldspec$contextMenu<span $fieldspecfunc>$prefix\%$name(label)%:</span></td>
+         <td class=fname$valign style="width:20%;">$fieldspec<span $fieldspecfunc>$prefix\%$name(label)%:</span></td>
          <td class=finput>
 <table border=0 cellspacing=0 cellpadding=0 width=100% style="table-layout:fixed;overflow:hidden"><tr>
 <td>

@@ -240,6 +240,7 @@ EOF
    }
    if (!($d=~m/\[\?\]$/)){
       $d=$self->addWebLinkToFacility($d,$current) if ($mode eq "HtmlDetail");
+      $d.=$self->getHtmlContextMenu($current);
    }
    return($d);
 }

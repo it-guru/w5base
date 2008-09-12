@@ -345,6 +345,34 @@ sub contextMenu
    return;
 }
 
+sub getHtmlContextMenu
+{
+   my $self=shift;
+   my $rec=shift;
+   my $name=$self->Name();
+
+   my @contextMenu=$self->contextMenu(current=>$rec);
+   my $contextMenu;
+   if ($#contextMenu!=-1){
+      $contextMenu="<div id=\"contextMenu_$name\" "
+                   ."class=\"context_menu\">";
+      $contextMenu.="<table cellspacing=\"1\" cellpadding=\"2\" ".
+                    "border=\"0\">";
+      while(my $label=shift(@contextMenu)){
+         my $link=shift(@contextMenu);
+         $contextMenu.="<tr>";
+         $contextMenu.="<td class=\"std\" ".
+                       "onMouseOver=\"this.className='active'\" ".
+                       "onMouseOut=\"this.className='std'\">";
+         $contextMenu.="<div onMouseUp=\"$link\">$label</div>";
+         $contextMenu.="</td></tr>";
+      }
+      $contextMenu.="</table>";
+      $contextMenu.="</div>";
+   }
+   return($contextMenu);
+}
+
 sub Label
 {
    my $self=shift;
@@ -626,6 +654,8 @@ sub RawValue
                                  $_."=".$k;
                                } sort(keys(%flt))));
       delete($self->{VJOINSTATE});
+      delete($self->{VJOINKEY});
+      delete($self->{VJOINCONTEXT});
       if (keys(%flt)>0){
          if ($joinval){ 
             if (!exists($c->{$joinkey})){
@@ -640,13 +670,17 @@ sub RawValue
                $c->{$joinkey}=$self->vjoinobj->getHashList(@view);
             }
             my %u=();
+            my $disp=$self->{vjoindisp};
+            $disp=$disp->[0] if (ref($disp) eq "ARRAY");
             map({
-                   my $bk=$_->{$self->{vjoindisp}};
+                   my $bk=$_->{$disp};
                    $bk=join(", ",@$bk) if (ref($bk) eq "ARRAY");
                    $u{$bk}=1;
                 } @{$c->{$joinkey}});
             if (keys(%u)>0){
                $self->{VJOINSTATE}="ok";
+               $self->{VJOINKEY}=$joinkey;
+               $self->{VJOINCONTEXT}=$joincontext;
             }
             else{
                $self->{VJOINSTATE}="not found";
@@ -696,6 +730,23 @@ sub RawValue
    $d=$self->{default} if (exists($self->{default}) && (!defined($d) ||
                            $d eq ""));
    return($d);
+}
+
+sub getLastVjoinRec          # to use the last joined record
+{
+   my $self=shift;
+   my $joinkey=$self->{VJOINKEY};
+   my $joincontext=$self->{VJOINCONTEXT};
+   my $c=$self->getParent->Context();
+
+   if (defined($joinkey) && defined($joincontext) &&
+       defined($c->{JoinData}->{$joincontext}) && 
+       defined($c->{JoinData}->{$joincontext}->{$joinkey})){
+      return($c->{JoinData}->{$joincontext}->{$joinkey});
+   }
+
+   return(undef);
+
 }
 
 sub FinishWrite
