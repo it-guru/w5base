@@ -27,12 +27,13 @@ sub ysleep{Time::HiRes::usleep(80000);}
 #######################################################################
 printf("INFO:  W5InstallCheck Pass 1: low level check started ...\n");
 $|=1;
-foreach my $module (qw(Time::HiRes Digest::SHA1 Data::HexDump
+foreach my $module (qw(Time::HiRes Digest::SHA1 Data::HexDump Archive::Zip GD
                        FindBin UNIVERSAL Carp Getopt::Long Sys::Syslog
                        Scalar::Util Unicode::String Encode Exporter POSIX
                        Date::Calc Text::ParseWords Set::Infinite IO::Multiplex
                        DateTime DateTime::Span DateTime::SpanSet Object::MultiType
-                       XML::Parser IO::Stringy MIME::Tools Crypt::DES
+                       XML::Parser IO::Stringy MIME::Tools Crypt::DES 
+                       Spreadsheet::WriteExcel::Big
                        Net::Server XML::Smart IPC::Smart Data::Dumper RPC::Smart)){
    printf("INFO:  check module %-33s           ... ","'$module'");
    eval("use $module;"); 
