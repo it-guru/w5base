@@ -30,6 +30,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
@@ -65,11 +66,6 @@ sub new
                 label         =>'Article',
                 dataobjattr   =>'faq.data'),
                                     
-      new kernel::Field::FileList(
-                name          =>'attachments',
-                label         =>'Attachments',
-                group         =>'attachments'),
-                                   
       new kernel::Field::Link(
                 name          =>'faqcat',
                 dataobjattr   =>'faq.faqcat'),
@@ -110,6 +106,18 @@ sub new
                 label         =>'OwnerID',
                 dataobjattr   =>'faq.owner'),
                                    
+      new kernel::Field::SubList(
+                name          =>'acls',
+                label         =>'Accesscontrol',
+                subeditmsk    =>'subedit.article',
+                group         =>'acl',
+                allowcleanup  =>1,
+                vjoininhash   =>[qw(acltarget acltargetid aclmode)],
+                vjointo       =>'faq::acl',
+                vjoinbase     =>[{'aclparentobj'=>\'faq::article'}],
+                vjoinon       =>['faqid'=>'refid'],
+                vjoindisp     =>['acltargetname','aclmode']),
+                                    
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'sig',
@@ -153,18 +161,11 @@ sub new
                 group         =>'sig',
                 dataobjattr   =>'faq.modifydate'),
                                    
-      new kernel::Field::SubList(
-                name          =>'acls',
-                label         =>'Accesscontrol',
-                subeditmsk    =>'subedit.article',
-                group         =>'acl',
-                allowcleanup  =>1,
-                vjoininhash   =>[qw(acltarget acltargetid aclmode)],
-                vjointo       =>'faq::acl',
-                vjoinbase     =>[{'aclparentobj'=>\'faq::article'}],
-                vjoinon       =>['faqid'=>'refid'],
-                vjoindisp     =>['acltargetname','aclmode']),
-                                    
+      new kernel::Field::FileList(
+                name          =>'attachments',
+                label         =>'Attachments',
+                group         =>'attachments'),
+                                   
       new kernel::Field::KeyHandler(
                 name          =>'kh',
                 dataobjname   =>'w5base',
@@ -327,6 +328,7 @@ sub HandleInfoAboSubscribe
       $self->SetFilter({faqid=>\$id});
       my ($rec,$msg)=$self->getOnlyFirst(qw(name categorie faqcat));
       print($ia->WinHandleInfoAboSubscribe({},
+                      "faq::article",$id,$rec->{name},
                       "faq::category",$rec->{faqcat},$rec->{categorie},
                       "base::staticinfoabo",undef,undef)); 
    }

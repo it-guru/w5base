@@ -621,19 +621,19 @@ sub WinHandleInfoAboSubscribe
    my $CurrentIdToEdit=Query->Param("CurrentIdToEdit");
    $d.=<<EOF;
 <style>body{overflow:hidden;padding:4px}optgroup{margin-bottom:5px}</style>
-<table width=100% height=98% border=0>
+<table width=580 height=98% border=0>
 <tr height=50><td>$handlermask</td></tr>
 <tr>
 <td>
 <div style="height:100%;margin:0">
 <select size=5 name=infoabo onchange="document.forms[0].submit();" 
-        style="width:100%;height:100%">
+        style="width:570px;height:100%;overflow:hidden">
 $optionlist</select>
 </div>
 </td>
 <tr height=1%>
 <td>
-<table cellspacing=0 cellpadding=0 width=100%>
+<table cellspacing=0 cellpadding=0 width=580>
 <tr><td>$statusmsg</td><td align=right>$statusbtn</td></tr>
 </table>
 </td>
@@ -641,7 +641,8 @@ $optionlist</select>
 </tr>
 <tr height=1%>
 <td align=right>
-<input onclick="parent.hidePopWin();" type=submit style="width:50px" value="OK">
+<input onclick="parent.hidePopWin();" type=submit 
+       style="width:50px;margin-right:10px" value="OK">
 <input type=hidden name=CurrentIdToEdit value="$CurrentIdToEdit">
 </tr>
 </table>

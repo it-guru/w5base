@@ -67,10 +67,12 @@ sub FaqNotify
       $subject=$sitename.": ".$subject;
    }
    $ENV{HTTP_FORCE_LANGUAGE}=$lang if ($lang ne "");
-   my $emailprefix=[$self->getParent->T("changed").":",$self->getParent->T("cathegorie").":"];
+   my $emailprefix=[$self->getParent->T("changed").":",
+                    $self->getParent->T("cathegorie").":"];
    my $emailtext=[$faqrec->{name},$faqrec->{categorie}];
    my %email;
    $self->getNotifyDestinations($faqrec,"faqchanged",\%email);
+   $self->getNotifyDestinations($faqrec,"faqartchanged",\%email);
    my @emailto=keys(%email);
 
    if (defined($link)){

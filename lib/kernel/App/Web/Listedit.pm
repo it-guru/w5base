@@ -1178,7 +1178,7 @@ function FinishDelete(returnVal,isbreak)
 }
 function DetailHandleInfoAboSubscribe()
 {
-   showPopWin('HandleInfoAboSubscribe?CurrentIdToEdit=$id',null,300,
+   showPopWin('HandleInfoAboSubscribe?CurrentIdToEdit=$id',590,300,
               FinishHandleInfoAboSubscribe);
 }
 function DetailHandleQualityCheck()

@@ -38,6 +38,9 @@ sub getControlData
    my $app=$self->getParent();
 
    return({
+           'faq::article'=>   {target=>'name',
+                                mode  =>['faqartchanged'=>'faq::article'],
+                               },
            'faq::category'=>   {target=>'fullname',
                                 mode  =>['faqchanged'=>'faq::category'],
                                },

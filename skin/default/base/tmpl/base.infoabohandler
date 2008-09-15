@@ -1,4 +1,4 @@
-<table width=100% cellspacing=0 cellpadding=0>
+<table width=580 cellspacing=0 cellpadding=0>
 <tr height=50>
 <td>
 <img width=45 src="../../base/load/infoabo.jpg">
@@ -6,5 +6,6 @@
 <td style="padding-left:5px" valign=top>
 With these function "InfoAbo" you can abo different informations. If
 one of the described events happens, you will get a information mail
-from the system.
+from the system.<br>
+Click on the event to check the current state or change it.
 </td></tr></table>
