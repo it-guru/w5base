@@ -129,7 +129,7 @@ sub ProcessLine
    else{
       $headerval='%objecttitle%';
    }
-   $self->{dtp}->NewPage(format=>'A4');
+   $self->{dtp}->NewPage(format=>'A4',headerval=>"$headerval");
    $self->{dtp}->WriteLine($s.": ".$headerval,
                            border        =>1,
                            color         =>'white',
