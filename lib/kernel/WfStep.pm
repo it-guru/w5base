@@ -445,13 +445,14 @@ sub generateWorkspacePages
       $d.="</tr></table>";
       $$divset.="<div id=OPwfforward>$d</div>";
    }
-   if (grep(/^nop$/,@$actions)){
-      $$selopt.="<option value=\"nop\" class=\"$class\">".
+   if (grep(/^nop$/,@$actions)){  # put nop NO-Operation at the begin of list
+      $$selopt="<option value=\"nop\" class=\"$class\">".
                 $self->getParent->T("nop",$tr).
-                "</option>\n";
-      $$divset.="<div id=OPnop style=\"margin:15px\"><br>".
+                "</option>\n".$$selopt;
+      $$divset="<div id=OPnop style=\"margin:15px\"><br>".
                 $self->getParent->T("The current workflow isn't forwared ".
-                "to you. At now there is no action nessasary.",$tr)."</div>";
+                "to you. At now there is no action nessasary.",$tr)."</div>".
+                $$divset;
    }
    if (grep(/^wfmailsend$/,@$actions)){
       $$selopt.="<option value=\"wfmailsend\" class=\"$class\">".
