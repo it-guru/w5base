@@ -17,3 +17,5 @@ CREATE TABLE faq (
   PRIMARY KEY  (faqid),
   KEY name (name)
 );
+alter table faq add createuser bigint(20) default NULL,add key (createuser);
+update faq set createuser=owner where createuser is null;

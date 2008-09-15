@@ -136,6 +136,12 @@ sub new
                 label         =>'Source-Load',
                 dataobjattr   =>'faq.srcload'),
 
+      new kernel::Field::Creator(
+                name          =>'creator',
+                group         =>'sig',
+                label         =>'Creator',
+                dataobjattr   =>'faq.createuser'),
+
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'sig',
@@ -417,6 +423,12 @@ sub FullView
          if ($frec->{label}=~m/\.pdf$/i){
             $att.="\n<tr><td width=1%><a class=attlink href=\"$frec->{href}\">".
                   "<img src=\"../load/pdf_icon.gif\"></a></td>".
+                  "<td><a class=attlink href=\"$frec->{href}\">".
+                  "$frec->{label}</a></td></tr>";
+         }
+         if ($frec->{label}=~m/\.xls$/i){
+            $att.="\n<tr><td width=1%><a class=attlink href=\"$frec->{href}\">".
+                  "<img src=\"../load/xls_icon.gif\"></a></td>".
                   "<td><a class=attlink href=\"$frec->{href}\">".
                   "$frec->{label}</a></td></tr>";
          }
