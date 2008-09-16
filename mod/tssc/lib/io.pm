@@ -297,6 +297,14 @@ sub mkChangeStoreRec
    if ($rec->{srcid} ne ""){
       $wfrec{additional}->{ServiceCenterExternChangeID}=$rec->{srcid};
    }
+   if ($wfrec{additional}->{ServiceCenterClosedBy} ne
+       $rec->{closedby}){
+      $wfrec{additional}->{ServiceCenterClosedBy}=$rec->{closedby};
+   }
+   if ($wfrec{additional}->{ServiceCenterResolvedBy} ne
+       $rec->{resolvedby}){
+      $wfrec{additional}->{ServiceCenterResolvedBy}=$rec->{resolvedby};
+   }
 
    if (!($rec->{coordinator}=~m/^\s*$/)){
       $wfrec{additional}->{ServiceCenterCoordinator}=$rec->{coordinator};

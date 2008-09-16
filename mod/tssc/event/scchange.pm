@@ -54,12 +54,12 @@ sub scchange
                            fallback status assignedto
                            plannedstart plannedend srcid
                            tssc_chm_closingcommentsclosingcomments assignarea
-                           workstart workend workduration
+                           workstart workend workduration resolvedby closedby
                            requestedby editor softwareid software deviceid
                            createtime type resources closecode approved addgrp
                            impact priority reason urgency category risk
                            coordinator));
-
+   $chm->SetCurrentOrder("sysmodtime");
    msg(DEBUG,"view is set");
    my $focus="now";
    my %flt=(sysmodtime=>">$focus-24h");
