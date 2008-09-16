@@ -33,7 +33,7 @@ foreach my $module (qw(Time::HiRes Digest::SHA1 Data::HexDump
                        Date::Calc Text::ParseWords Set::Infinite IO::Multiplex
                        DateTime DateTime::Span DateTime::SpanSet Object::MultiType
                        XML::Parser IO::Stringy MIME::Tools Crypt::DES 
-                       Spreadsheet::WriteExcel::Big pdflib_pl
+                       Spreadsheet::WriteExcel::Big
                        Net::Server XML::Smart IPC::Smart Data::Dumper RPC::Smart)){
    printf("INFO:  check module %-33s           ... ","'$module'");
    eval("use $module;"); 
