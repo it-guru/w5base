@@ -17,4 +17,5 @@
 'no valid article shortdescription'=>{de=>'keine gültige Kurzbezeichnung'},
 'no article or article to short'=>{de=>'kein Artikel oder Artikel zu kurz'},
 'Full-View'=>{de=>'Vollbild'},
+'View count'=>{de=>'Seitenaufrufe'},
 'faqartchanged'=>{de=>'Artikel geändert',en=>'Aricle changed'},

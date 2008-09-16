@@ -406,7 +406,18 @@ sub FullView
    my %flt=$self->getSearchHash();
    $self->ResetFilter();
    $self->SecureSetFilter(\%flt);
-   my ($rec,$msg)=$self->getOnlyFirst(qw(name data attachments));
+   my ($rec,$msg)=$self->getOnlyFirst(qw(name data attachments viewcount faqid
+                                         mdate editor realeditor));
+
+   if (defined($rec)){
+      $self->ValidatedUpdateRecord($rec,{mdate=>$rec->{mdate},
+                                         editor=>$rec->{editor},
+                                         realeditor=>$rec->{realeditor},
+                                         viewcount=>$rec->{viewcount}+1},
+                                   {faqid=>\$rec->{faqid}});
+                        
+      
+   }
 
    print $self->HttpHeader();
    print $self->HtmlHeader(
