@@ -65,6 +65,18 @@ sub new
                 searchable    =>0,
                 label         =>'Article',
                 dataobjattr   =>'faq.data'),
+
+      new kernel::Field::Text(
+                name          =>'furtherkeys',
+                label         =>'Further keywords',
+                htmldetail    =>sub{
+                                    my $self=shift;
+                                    my $mode=shift;
+                                    my %param=@_;
+                                    return(0) if (!defined($param{current}));
+                                    return(1);
+                                },
+                dataobjattr   =>'faq.furtherkeys'),
                                     
       new kernel::Field::Link(
                 name          =>'faqcat',
@@ -96,6 +108,7 @@ sub new
                                     
       new kernel::Field::Number(
                 name          =>'viewcount',
+                readonly      =>1,
                 group         =>'sig',
                 label         =>'View count',
                 dataobjattr   =>'faq.viewcount'),
@@ -316,7 +329,7 @@ sub FinishWrite
           eventparam=>$id.";".$url.";".$lang,
           userid=>11634953080001);
    my $res;
-   if ($self->isDataInputFromUserFrontend()){
+   if ($self->isDataInputFromUserFrontend() && !defined($newrec->{viewcount})){
       if (defined($res=$self->W5ServerCall("rpcCallSpooledEvent",%p)) &&
           $res->{exitcode}==0){
          msg(INFO,"FaqModifed Event sent OK");
@@ -407,6 +420,7 @@ sub FullView
    $self->ResetFilter();
    $self->SecureSetFilter(\%flt);
    my ($rec,$msg)=$self->getOnlyFirst(qw(name data attachments viewcount faqid
+                                         furtherkeys kwords
                                          mdate editor realeditor));
 
    if (defined($rec)){
@@ -418,6 +432,65 @@ sub FullView
                         
       
    }
+   my $further;
+   my @fl;
+   if ($rec->{furtherkeys} ne ""){
+      $self->ResetFilter();
+      $self->SecureSetFilter({kwords=>$rec->{furtherkeys}});
+      $self->Limit(11);
+      @fl=$self->getHashList(qw(mdate faqid name));
+   }
+   else{
+      my @kw=grep(/^\S{3,100}$/,split(/[\s\/,]/,$rec->{name}));
+      if ($#kw>0){
+      #   my @kw=@{$rec->{kwords}};
+         my @ll;
+         my @not=qw(mit einer einen eines der die das ich du er sie es wir
+                    auf in dem dessen ab meinen im gehe gehen vom wie was
+                    und nicht für voll nach bringen bringt oder bei
+                    finden finde greift gegeben 
+                    ihr euer werden wird kann man muß eingegeben);
+         foreach my $keyword (@kw){
+            my $qkeyword=quotemeta($keyword);
+            next if (grep(/^$qkeyword$/i,@not));
+            $self->ResetFilter();
+            $self->SecureSetFilter({kwords=>$keyword});
+            $self->Limit(11);
+            my @kl=$self->getHashList(qw(mdate faqid name));
+            if ($#kl!=-1){
+               push(@ll,\@kl);
+            }
+         }
+         my %kl;
+         foreach my $kl (sort({$#{$a}<=>$#{$b}} @ll)){
+            last if (keys(%kl)>10);
+            foreach my $klrec (@$kl){
+               $kl{$klrec->{faqid}}=$klrec;
+               last if (keys(%kl)>10);
+            }
+         }
+         if (keys(%kl)){
+            @fl=values(%kl);
+         }
+      }
+
+      printf STDERR ("fifi kworks=%s\n",Dumper($rec->{kwords}));
+   }
+   foreach my $frec (@fl){
+      next if ($frec->{faqid}==$rec->{faqid});
+      my $dest="Detail?faqid=$frec->{faqid}";
+      my $detailx=$self->DetailX();
+      my $detaily=$self->DetailY();
+      my $onclick="openwin(\"$dest\",\"_blank\",".
+          "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
+          "resizable=yes,scrollbars=no\")";
+      my $label=$frec->{name};
+      $label=~s/</&lt;/g;
+      $label=~s/>/&gt;/g;
+      $further.="<tr><td><ul><li><span class=sublink onclick=$onclick>".
+                $label."</span></li></ul></td></tr>";
+   }
+  
 
    print $self->HttpHeader();
    print $self->HtmlHeader(
@@ -454,6 +527,10 @@ sub FullView
          print("<div class=attachments>".
                "<table width=100%>".$att."</table></div>");
       }
+   }
+   if ($further ne ""){
+      print("<div class=further>".$self->T("further articles").":".
+            "<table width=100%>".$further."</table></div>");
    }
    print(<<EOF);
 <script language="JavaScript">

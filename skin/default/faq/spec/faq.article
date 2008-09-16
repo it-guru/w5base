@@ -1,0 +1,17 @@
+'viewcount'=>{de=>'
+Zeit die Anzahl an, wie oft die 
+Vollbild darstellung aufgerufen wurde.
+',en=>'
+Displays the count of fullview 
+requests to this article.
+'},
+'furtherkeys'=>{de=>'
+Mit weiterführenden Schlüsselworten
+kann man auf der "Vollbild" Seite
+automatisch FAQ-Artikel zu änlichen
+Themen einblenden lassen.
+',en=>'
+With "further keywords" you can
+automaticly display further articles
+in the fullview page.
+'},
