@@ -51,7 +51,7 @@ sub CleanupWorkflows
 
    foreach my $stateid (qw(16 17 10)){
       $wf->SetFilter({stateid=>\$stateid,
-                      class=>"*diary*",
+                      class=>"*::diary",
                       mdate=>'<now-56d'});
       $wf->SetCurrentView(qw(id closedate stateid class));
       $wf->SetCurrentOrder(qw(NONE));
@@ -62,7 +62,7 @@ sub CleanupWorkflows
       if (defined($rec)){
          do{
             msg(INFO,"process $rec->{id} class=$rec->{class}");
-            if (0){
+            if (1){
                if ($wf->Action->StoreRecord($rec->{id},"wfautofinish",
                    {translation=>'base::workflowaction'},"",undef)){
                   my $closedate=$rec->{closedate};
@@ -91,6 +91,9 @@ sub LnkGrpUser
    my $lnk=getModuleObject($self->Config,"base::lnkgrpuser");
    my $nowstamp=NowStamp("en");
    $lnk->SetFilter({expiration=>"<\"$nowstamp\""});
+   my $oldcontext=$W5V2::OperationContext;
+   $W5V2::OperationContext="Kernel";
+
    foreach my $lrec ($lnk->getHashList(qw(ALL))){
       my $dur=CalcDateDuration($lrec->{expiration},$nowstamp);
       my $days=$dur->{totalseconds}/86400;
@@ -137,6 +140,7 @@ sub LnkGrpUser
       msg(INFO,Dumper($lrec));
       msg(INFO,Dumper($dur));
    }
+   $W5V2::OperationContext=$oldcontext;
 
 #   my $wf=getModuleObject($self->Config,"base::workflow");
 #   if (my $id=$wf->Store(undef,{
