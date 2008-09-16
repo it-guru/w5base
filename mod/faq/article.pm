@@ -424,13 +424,12 @@ sub FullView
                                          mdate editor realeditor));
 
    if (defined($rec)){
+      my $oldcontext=$W5V2::OperationContext;
+      $W5V2::OperationContext="Kernel";
       $self->ValidatedUpdateRecord($rec,{mdate=>$rec->{mdate},
-                                         editor=>$rec->{editor},
-                                         realeditor=>$rec->{realeditor},
                                          viewcount=>$rec->{viewcount}+1},
                                    {faqid=>\$rec->{faqid}});
-                        
-      
+      $W5V2::OperationContext=$oldcontext;
    }
    my $further;
    my @fl;

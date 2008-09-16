@@ -56,6 +56,7 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
    my $editor=$newrec->{$self->Name()};
+   return({}) if ($W5V2::OperationContext eq "Kernel");
    if ($W5V2::OperationContext eq "QualityCheck"){
       if (defined($oldrec)){
          return({});

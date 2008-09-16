@@ -18,7 +18,6 @@ package kernel::Field::Owner;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 @ISA    = qw(kernel::Field);
 
@@ -44,6 +43,7 @@ sub Validate
 
    if (!defined($newrec->{$name}) || !($newrec->{$name}=~m/^\d+$/)){
       return({}) if ($W5V2::OperationContext eq "QualityCheck");
+      return({}) if ($W5V2::OperationContext eq "Kernel");
       my $userid=$self->getDefaultValue();
       return({}) if (!defined($userid));
       return({$name=>$userid});
