@@ -94,6 +94,12 @@ sub new
                 group         =>'sig',
                 dataobjattr   =>'faq.faqid'),
                                     
+      new kernel::Field::Number(
+                name          =>'viewcount',
+                group         =>'sig',
+                label         =>'View count',
+                dataobjattr   =>'faq.viewcount'),
+
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'sig',

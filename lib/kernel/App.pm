@@ -465,6 +465,7 @@ sub LoadSubObjs
                     $_=~s/\/mod\///; 
                     $_;
                    } @sublist);
+
     
       my @disabled=glob("$instdir/mod/*.DISABLED"); 
       @disabled=map({my $qi=quotemeta($instdir);

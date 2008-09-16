@@ -27,7 +27,7 @@ sub ysleep{Time::HiRes::usleep(80000);}
 #######################################################################
 printf("INFO:  W5InstallCheck Pass 1: low level check started ...\n");
 $|=1;
-foreach my $module (qw(Time::HiRes Digest::SHA1 Data::HexDump Archive::Zip GD
+foreach my $module (qw(Time::HiRes Digest::SHA1 Data::HexDump
                        FindBin UNIVERSAL Carp Getopt::Long Sys::Syslog
                        Scalar::Util Unicode::String Encode Exporter POSIX
                        Date::Calc Text::ParseWords Set::Infinite IO::Multiplex
@@ -137,11 +137,9 @@ eval("
 ysleep;printResult($@);
 
 printf("INFO:  loading package specified InstallCheck modules            ...");
-eval('
-$testapp->LoadSubObjs("InstallCheck","InstallCheck");
-');
+eval('$testapp->LoadSubObjs("ext/InstallCheck","InstallCheck");');
 ysleep;printResult($@);
-$testapp->LoadSubObjs("ext/InstallCheck","InstallCheck");
+exit(1) if ($@ ne "");
 
 foreach my $smod (keys(%{$testapp->{InstallCheck}})){
    my $smodname=$smod;
