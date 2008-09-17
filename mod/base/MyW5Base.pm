@@ -85,7 +85,7 @@ sub Main
          $s.="value=\"".$l{$label}->Self()."\">$label</option>";
       }
    }
-   $s.="</select></form>";
+   $s.="</select>";
    printf("<tr><td valign=top height=1%%>%s</td></tr>",$s);
    print("</table></div>");
    if (defined($oldval) && exists($self->{SubDataObj}->{$oldval})){
@@ -341,9 +341,6 @@ function doQuickFind()
 {
    var t=document.forms['QuickFind'].elements['searchtext'].value;
    if (t!="" && t.length>2){
-      document.forms['QuickFind'].elements['searchtext'].value="";
-
-
       openwin("../../faq/QuickFind/Result?"+
               "forum=on&ci=on&article=on&searchtext="+t,
               "_quickfind",
@@ -354,6 +351,7 @@ function doQuickFind()
 }
 </script>
 <div class=winframe style=\"margin-top:4px\" id=quickfind>
+</form>
 <form name=QuickFind>
 <div class=winframehead>QuickFind:</div>
 <table width=100% border=1>
@@ -366,7 +364,6 @@ function doQuickFind()
 </td>
 </tr>
 </table>
-</form>
 </div>
 <script language="JavaScript">
 setEnterSubmit(document.forms['QuickFind'],doQuickFind);
