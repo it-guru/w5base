@@ -43,11 +43,10 @@ sub isSubstValid
    my $realuser=shift;
    my $substuser=shift;
 
-   my $user=getModuleObject($self->Config,"base::user");
-   $user->SetFilter({accounts=>\$substuser});
-   my ($userrec,$msg)=$user->getOnlyFirst(qw(userid));
-   return() if (!defined($userrec));
-
+   my $user=getModuleObject($self->Config,"base::user");  # this operation
+   $user->SetFilter({accounts=>\$substuser});             # is only done, if
+   my ($userrec,$msg)=$user->getOnlyFirst(qw(userid));    # the current user
+   return() if (!defined($userrec));                      # is in mask mode
 
    my $isadmin=0;
    if ($ENV{REAL_REMOTE_USER} eq $substuser || $self->IsMemberOf("admin")){

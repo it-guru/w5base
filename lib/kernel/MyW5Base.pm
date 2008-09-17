@@ -71,9 +71,10 @@ sub doAutoSearch
 sub getDataObj
 {
    my $self=shift;
-   my $app=$self->getParent();
    return($self->{DataObj});
 }
+
+
 
 sub getDefaultStdButtonBar
 {
@@ -256,8 +257,51 @@ sub getTimeRangeDrop
 }
 
 
+#######################################################################
+#
+# DataObj compatibility Interface
+#
+sub getHashList
+{
+   my $self=shift;
+   my $dataobj=$self->getDataObj();
+   return($dataobj->getHashList(@_));
+   return;
+}
 
+sub SetFilter
+{
+   my $self=shift;
+   my $dataobj=$self->getDataObj();
+   return($dataobj->SetFilter(@_));
+   return;
+}
 
+sub SecureSetFilter
+{
+   my $self=shift;
+   my $dataobj=$self->getDataObj();
+   return($dataobj->SecureSetFilter(@_));
+   return;
+}
+
+sub SetCurrentView
+{
+   my $self=shift;
+   my $dataobj=$self->getDataObj();
+   return($dataobj->SetCurrentView(@_));
+   return;
+}
+
+sub getOnlyFirst
+{
+   my $self=shift;
+   my $dataobj=$self->getDataObj();
+   return($dataobj->getOnlyFirst(@_));
+   return;
+}
+
+#######################################################################
 
 
 

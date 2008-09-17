@@ -653,16 +653,7 @@ sub ValidateUserCache
       my $res=$self->W5ServerCall("rpcCacheQuery","User",$ENV{REMOTE_USER});
       my $o=$self->Cache->{User}->{DataObj};
       if ($o){
-         $o->SetCurrentView(qw(surname userid givenname posix groups tz lang
-                               cistatusid
-                               email usersubst usertyp fullname));
-        # $o->SetCurrentView(qw(ALL));
-         $o->SetFilter({'accounts'=>[$ENV{REMOTE_USER}]});
-         my ($rec,$msg)=$o->getFirst();
-         if (defined($rec)){
-            $UserCache->{$ENV{REMOTE_USER}}->{rec}=$rec;
-            $UserCache->{$ENV{REMOTE_USER}}->{state}=$res->{state};
-            $UserCache->{$ENV{REMOTE_USER}}->{atime}=time();
+         if ($self->_LoadUserInUserCache($ENV{REMOTE_USER},$res)){
             return(1);
          }
          else{

@@ -28,6 +28,6 @@ foreach my $path ("$W5V2::INSTDIR/mod","$W5V2::INSTDIR/lib"){
    unshift(@INC,$path) if (!grep(/^$path$/,@INC));
 }
 do "$W5V2::INSTDIR/lib/kernel/App/Web.pm";
-printf STDERR ("ERROR: $@\n") if ($@ ne "");
+print STDERR ("ERROR: $@\n") if ($@ ne "");
 my ($configname)=$ENV{'SCRIPT_NAME'}=~m#/(.+)/(bin|auth|public|cookie)#;
 kernel::App::Web::RunWebApp($W5V2::INSTDIR,$configname);

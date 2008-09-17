@@ -162,18 +162,19 @@ sub ReadMimeTypes
 sub getMandatorsOf
 {
    my $self=shift;
-   my $account=shift;
+   my $AccountOrUserID=shift;
    my @roles=@_;
    @roles=@{$roles[0]} if (ref($roles[0]) eq "ARRAY");
    my $userid;
    my $UserCache=$self->Cache->{User}->{Cache};
-   if (defined($UserCache->{$account})){
-      $UserCache=$UserCache->{$account}->{rec};
+   if (defined($UserCache->{$AccountOrUserID})){
+      $UserCache=$UserCache->{$AccountOrUserID}->{rec};
    }
    if (defined($UserCache->{userid})){
       $userid=$UserCache->{userid};
    }
-   my %groups=$self->getGroupsOf($account,[qw(REmployee RBoss RBoss2 RMember)],
+   my %groups=$self->getGroupsOf($AccountOrUserID,
+                                 [qw(REmployee RBoss RBoss2 RMember)],
                                  'both');
    my @grps=keys(%groups);
    my %m=();
@@ -268,11 +269,50 @@ sub LoadGroups
    }
 }
 
+sub _LoadUserInUserCache
+{
+   my $self=shift;
+   my $AccountOrUserID=shift;
+   my $res=shift;              # result of rpcCacheQuery in Web Context
+
+   return(0) if ($AccountOrUserID eq "");
+   my $o=$self->Cache->{User}->{DataObj};
+   if (!defined($o)){     # DataObj also filled in App/Web.pm !
+      $o=getModuleObject($self->Config,"base::user");
+      $self->Cache->{User}={DataObj=>$o,Cache=>{}};
+   }
+   my $UserCache=$self->Cache->{User}->{Cache};
+   if ($o){
+         $o->SetCurrentView(qw(surname userid givenname posix groups tz lang
+                               cistatusid
+                               email usersubst usertyp fullname));
+         if ($AccountOrUserID=~m/^\d+$/){
+            $o->SetFilter({userid=>\$AccountOrUserID});
+         }
+         else{
+            $o->SetFilter({'accounts'=>[$AccountOrUserID]});
+         }
+         my ($rec,$msg)=$o->getFirst();
+         if (defined($rec)){
+            $UserCache->{$AccountOrUserID}->{rec}=$rec;
+            if (defined($res)){   # only in Web-Context the state is stored
+               $UserCache->{$AccountOrUserID}->{state}=$res->{state};
+            }
+            $UserCache->{$AccountOrUserID}->{atime}=time();
+            if ($AccountOrUserID ne $rec->{userid}){
+               $UserCache->{$rec->{userid}}=$UserCache->{$ENV{REMOTE_USER}};
+            }
+            return(1);
+         }
+   }
+   return(0);
+}
+
 
 sub getGroupsOf
 {
    my $self=shift;
-   my $user=shift;
+   my $AccountOrUserID=shift;
    my $roles=shift;      # internel names of roles         (undef=RMember)
    my $direction=shift;  # up | down | both | direct       (undef=direct)
 
@@ -284,11 +324,12 @@ sub getGroupsOf
    my %allgrp=();
 
    my $UserCache=$self->Cache->{User}->{Cache};
-   if (defined($UserCache->{$user})){
-      # user not cached! - there are a todo!
+
+   if (!defined($UserCache->{$AccountOrUserID})){
+      $self->_LoadUserInUserCache($AccountOrUserID);
    }
-   if (defined($UserCache->{$user})){
-      $UserCache=$UserCache->{$user}->{rec};
+   if (defined($UserCache->{$AccountOrUserID})){
+      $UserCache=$UserCache->{$AccountOrUserID}->{rec};
       if (defined($UserCache->{groups}) && 
           ref($UserCache->{groups}) eq "ARRAY"){
          foreach my $role (@{$roles}){
