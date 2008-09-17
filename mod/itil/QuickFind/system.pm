@@ -46,6 +46,14 @@ sub CISearchResult
       if ($searchtext=~m/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/){
          push(@$flt,{ipaddresses=>"$searchtext"});
       }
+      else{
+         if ($searchtext=~m/\./){
+            push(@$flt,{dnsnamelist=>\"$searchtext"});
+         }
+         else{
+            push(@$flt,{dnsnamelist=>"$searchtext.*"});
+         }
+      }
       my $dataobj=getModuleObject($self->getParent->Config,"itil::system");
       $dataobj->SetFilter($flt);
       foreach my $rec ($dataobj->getHashList(qw(name))){

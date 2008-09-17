@@ -38,5 +38,7 @@
 'Producer Service&Support Class'=>{de=>'Hersteller Service&Support Class'},
 'Keywords'=>{de=>'Schlüsselworte'},
 'IP-Adresses'=>{de=>'IP-Adressen'},
+'IP-Adresses list'=>{de=>'IP-Adressen Liste'},
+'DNS-Name list'=>{de=>'DNS-Names Liste'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'Asset-Name'=>{de=>'Asset-Name/AssetID',en=>'Asset-Name/AssetID'},

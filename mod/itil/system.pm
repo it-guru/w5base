@@ -612,6 +612,28 @@ sub new
                                  'cistatusid',
                                  'dnsname','comments']),
 
+      new kernel::Field::SubList(
+                name          =>'ipaddresseslist',
+                label         =>'IP-Adresses list',
+                group         =>'ipaddresses',
+                htmldetail    =>0,
+                subeditmsk    =>'subedit.system',
+                vjoinbase     =>[{cistatusid=>\"4"}],
+                vjointo       =>'itil::ipaddress',
+                vjoinon       =>['id'=>'systemid'],
+                vjoindisp     =>['name']),
+
+      new kernel::Field::SubList(
+                name          =>'dnsnamelist',
+                label         =>'DNS-Name list',
+                group         =>'ipaddresses',
+                htmldetail    =>0,
+                subeditmsk    =>'subedit.system',
+                vjoinbase     =>[{cistatusid=>\"4"}],
+                vjointo       =>'itil::ipaddress',
+                vjoinon       =>['id'=>'systemid'],
+                vjoindisp     =>['dnsname']),
+
       new kernel::Field::Container(
                 name          =>'additional',
                 label         =>'Additionalinformations',
