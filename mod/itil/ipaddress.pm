@@ -310,9 +310,11 @@ sub Validate
       $dnsname=~s/[^a-z0-9\[\]]*$//;
       $dnsname=~s/^[^a-z0-9]*//;
       $newrec->{dnsname}=$dnsname;
-      if (($dnsname=~m/\s/) || !($dnsname=~m/.+\..+/)){
-         $self->LastMsg(ERROR,"invalid dns name");
-         return(0);
+      if ($dnsname ne ""){
+         if (($dnsname=~m/\s/) || !($dnsname=~m/.+\..+/)){
+            $self->LastMsg(ERROR,"invalid dns name");
+            return(0);
+         }
       }
       $newrec->{dnsname}=undef if ($newrec->{dnsname} eq "");
    }
