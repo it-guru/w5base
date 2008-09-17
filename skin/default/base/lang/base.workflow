@@ -2,7 +2,7 @@
 'current state of workflow'=>{de=>'aktueller Status des Workflows'},
 'Please select the workflow to start:'=>{de=>'Bitte wählen Sie den Workflow, der gestartet werden soll:'},
 'Workflow nature'=>{de=>'Workflow Art'},
-'Workflow-Class'=>{de=>'Workflow Typ'},
+'Workflow-Class'=>{de=>'Workflow Klasse'},
 'Workflow-Step'=>{de=>'aktueller Workflow Schritt'},
 'fieldgroup.default'=>{de=>'allgemeine Workflow Informationen',en=>'common workflow informations'},
 'fieldgroup.state'=>{de=>'Workflow Status',en=>'Workflow state'},

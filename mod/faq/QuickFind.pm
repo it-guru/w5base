@@ -256,6 +256,26 @@ EOF
    return(0);
 }
 
+sub DetailX
+{
+   my $self=shift;
+
+   $self->{DetailX}=$_[0] if (defined($_[0]));
+   $self->{DetailX}=640 if (!defined($self->{DetailX}));
+   return($self->{DetailX});
+
+}
+
+sub DetailY
+{
+   my $self=shift;
+
+   $self->{DetailY}=$_[0] if (defined($_[0]));
+   $self->{DetailY}=480 if (!defined($self->{DetailY}));
+   return($self->{DetailY});
+}
+
+
 sub insDoc
 {
    my $tree=shift;
@@ -337,7 +357,7 @@ sub Result
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','mainwork.css',
                                    'public/faq/load/QuickFind.css'],
-                           title=>"Welcome",
+                           title=>"QuickFind Result",
                            js=>['toolbox.js'],
                            body=>1,form=>1);
    if ($searchtext eq ""){

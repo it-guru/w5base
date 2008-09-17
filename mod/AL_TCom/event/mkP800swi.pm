@@ -52,7 +52,7 @@ sub mkP800swi
    $sw->ResetFilter();
    $sw->SetFilter({custcostalloc=>1,cistatusid=>4});
    $sw->SetCurrentView("fullname","appl","applid","id","servicesupportid",
-                       "swteam","databoss","databossid");
+                       "swteam","databoss","databossid","swnature");
 
    my ($rec,$msg)=$sw->getFirst();
    if (defined($rec)){
@@ -81,8 +81,9 @@ sub mkP800swi
                $tcomcodcomments.="Instance databoss: $rec->{databoss}\n";
             }
             $tcomcodcomments.="Entry automaticly created - ".
-                              "Contact: Vogler Hartmut\n";
-            my $rec={name=>'T-Systems Database support: '.$rec->{appl},
+                              "Technical contact: Vogler Hartmut\n";
+            my $rec={name=>'T-Systems '.$rec->{swnature}.' support: '.
+                           $rec->{appl},
                      srcid=>$srcid,
                      srcsys=>$srcsys,
                      srcload=>$entrytime,

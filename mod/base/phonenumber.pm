@@ -56,7 +56,7 @@ sub new
 
       new kernel::Field::Phonenumber(
                 name          =>'phonenumber',
-                htmlwidth     =>'150',
+                htmlwidth     =>'120',
                 label         =>'Phonenumber',
                 dataobjattr   =>'phonenumber.number'),
 
@@ -75,7 +75,7 @@ sub new
                                                  
       new kernel::Field::Text(
                 name          =>'shortedcomments',
-                htmlwidth     =>'180',
+                htmlwidth     =>'320',
                 label         =>'shorted Comments',
                 depend        =>['comments'],
                 onRawValue    =>sub{
@@ -83,8 +83,8 @@ sub new
                    my $current=shift;
                    my $comments=$current->{comments};
                    $comments=~s/\n/ /g;
-                   if (length($comments)>37){
-                      $comments=substr($comments,0,37)."...";
+                   if (length($comments)>47){
+                      $comments=substr($comments,0,45)."...";
                    }
                    return($comments);
                 }),

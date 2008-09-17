@@ -1871,12 +1871,20 @@ sub ViewEditorModuleName
 sub DetailX
 {
    my $self=shift;
-   if (defined($_[0])){
-      $self->{DetailX}=$_[0];
-   }
+
+   $self->{DetailX}=$_[0] if (defined($_[0]));
    $self->{DetailX}=640 if (!defined($self->{DetailX}));
    return($self->{DetailX});
 
+}
+
+sub DetailY
+{
+   my $self=shift;
+
+   $self->{DetailY}=$_[0] if (defined($_[0]));
+   $self->{DetailY}=480 if (!defined($self->{DetailY}));
+   return($self->{DetailY});
 }
 
 sub getRecordHtmlIndex
@@ -1941,17 +1949,6 @@ sub getRecordHeader
    return($headerval);
 }
 
-
-sub DetailY
-{
-   my $self=shift;
-
-   if (defined($_[0])){
-      $self->{DetailY}=$_[0];
-   }
-   $self->{DetailY}=480 if (!defined($self->{DetailY}));
-   return($self->{DetailY});
-}
 
 #
 # setting the limit on selects -

@@ -65,26 +65,30 @@ sub Main
    printf("<tr><td height=1%% valign=top>%s</td></tr>",
           $self->getAppTitleBar(title=>$title));
    print("<tr><td height=1% valign=top>");
-print <<EOF;
-<div class=searchframe>
-<table class=searchframe>
-EOF
+   print("<div class=searchframe><table class=searchframe>");
 
    my $s="<select name=MyW5BaseSUBMOD style=\"width:100%\" ".
          "OnChange=\"SelectionChanged();\">";
    $s.="<option value=\"\">&lt;".$self->T("please select a query").
        "&gt;</option>";
+   my $user=getModuleObject($self->Config,"base::user");
+   my $userid=$self->getCurrentUserId();
+   $user->SetFilter({userid=>\$userid});
+   $user->SetCurrentView(qw(groups));
+   my ($userrec)=$user->getOnlyFirst(qw(fullname userid groups));
+
+
    foreach my $label (sort(grep(/^\[/,keys(%l))),
                       sort(grep(!/^\[/,keys(%l)))){
       if (defined($l{$label}) &&
           $l{$label}->can("isSelectable") && 
-          $l{$label}->isSelectable()){
+          $l{$label}->isSelectable(user=>$userrec)){
          $s.="<option ";
          $s.="selected " if ($l{$label}->Self() eq $oldval);
          $s.="value=\"".$l{$label}->Self()."\">$label</option>";
       }
    }
-   $s.="</select>";
+   $s.="</select></form>";
    printf("<tr><td valign=top height=1%%>%s</td></tr>",$s);
    print("</table></div>");
    if (defined($oldval) && exists($self->{SubDataObj}->{$oldval})){
@@ -176,6 +180,11 @@ EOF
          $bmdiv.="</ul>";
 
          $bmdiv.="</div></div>";
+         my $qf=getModuleObject($self->Config,"faq::QuickFind");
+         my $quickfind;
+         if (defined($qf)){
+            $quickfind=$self->addQuickFind($qf);
+         }
          print <<EOF;
 <tr><td valign=top align=center>
 <table width=100% border=0>
@@ -183,7 +192,8 @@ EOF
 $newstext
 </td>
 <td width=40% valign=top>
-<div class=winframe>
+<div class=winframe id=workflowlinks>
+
 <div class=winframehead>Workflow Links:</div>
 <table width=99%>
 <tr>
@@ -198,7 +208,9 @@ $newstext
 <tr><td align=center colspan=2>$myjobs</tr>
 <tr><td align=center colspan=2 style="padding:10px">$l2</tr>
 </table>
+
 </div>
+$quickfind
 </td>
 </tr>
 </table>
@@ -217,14 +229,20 @@ EOF
 function keyhandler(ev)
 {
    if (ev && ev.keyCode==13){
-      DoSearch();
+      if (document.forms[0].elements['MyW5BaseSUBMOD'].value!=""){
+         DoSearch();
+      }
+      return false;
    }
 }
 document.onkeypress=keyhandler;
 function inputkeyhandler()
 {
    if (window.event && window.event.keyCode==13){
-      DoSearch();
+      if (document.forms[0].elements['MyW5BaseSUBMOD'].value!=""){
+         DoSearch();
+      }
+      return false;
    }
    return(true);
 }
@@ -239,7 +257,10 @@ document.onsubmit=OnSubmit;
 
 function OnSubmit()
 {
-   DoSearch();
+   if (document.forms[0].elements['MyW5BaseSUBMOD'].value!=""){
+      DoSearch();
+   }
+   return(0);
 }
 
 function DoSearch()
@@ -280,6 +301,19 @@ function RecalcNews()
          news.style.height=h+"px";
       }
    }
+   var quickfind=document.getElementById("quickfind");
+   var workflowlinks=document.getElementById("workflowlinks");
+   if (quickfind && workflowlinks){
+      var h=getViewportHeight();
+      if (h-workflowlinks.offsetHeight<140){
+         quickfind.style.display="none";
+         quickfind.visibility="hidden";
+      }
+      else{
+         quickfind.style.display="block";
+         quickfind.visibility="visible";
+      }
+   }
 }
 addEvent(window, "load", RecalcNews);
 addEvent(window, "resize", RecalcNews);
@@ -294,6 +328,54 @@ addEvent(window, "load", DoSearch);
 EOF
    }
    print $self->HtmlBottom(body=>1,form=>1);
+}
+
+sub addQuickFind
+{
+   my $self=shift;
+   my $qf=shift;
+   my $detailx=$qf->DetailX();
+   my $detaily=$qf->DetailY();
+   my $search=$self->T("search");
+
+   my $d=<<EOF;
+<script language="JavaScript">
+function doQuickFind()
+{
+   var t=document.forms['QuickFind'].elements['searchtext'].value;
+   if (t!="" && t.length>2){
+      document.forms['QuickFind'].elements['searchtext'].value="";
+
+
+      openwin("../../faq/QuickFind/Result?"+
+              "forum=on&ci=on&article=on&searchtext="+t,
+              "_quickfind",
+              "height=$detaily,width=$detailx,toolbar=no,status=no,"+
+                       "resizable=yes,scrollbars=no");
+   }
+   return(false);
+}
+</script>
+<div class=winframe style=\"margin-top:4px\" id=quickfind>
+<form name=QuickFind>
+<div class=winframehead>QuickFind:</div>
+<table width=100% border=1>
+<tr>
+<td>
+<input style="width:100%" type=text value="" name=searchtext>
+</td>
+<td width=1%>
+<input onclick="doQuickFind();" type=button value="$search">
+</td>
+</tr>
+</table>
+</form>
+</div>
+<script language="JavaScript">
+setEnterSubmit(document.forms['QuickFind'],doQuickFind);
+</script>
+EOF
+   return($d);
 }
 
 sub addNewsFrame
@@ -329,7 +411,6 @@ sub getNews
       my $newsline=1;
       my $newscount=0;
       $to->SetCurrentOrder(qw(cdate));
-printf STDERR ("filter set\n");
       foreach my $rec ($to->getHashList(qw(name cdate entrycount mdate
                                            topicicon))){
          my $name=$rec->{name};
