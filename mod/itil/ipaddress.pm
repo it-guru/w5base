@@ -164,13 +164,13 @@ sub new
                 label         =>'Short Comments',
                 readonly      =>1,
                 htmldetail    =>0,
-                htmlwidth     =>'50px',
+                htmlwidth     =>'190px',
                 onRawValue    =>sub{
                                    my $self=shift;
                                    my $current=shift;
                                    my $d=$current->{comments};
                                    $d=~s/\n/ /g;
-                                   $d=substr($d,0,20);
+                                   $d=substr($d,0,24);
                                    if (length($current->{comments})>
                                        length($d)){
                                       $d.="...";

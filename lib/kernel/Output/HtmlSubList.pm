@@ -179,7 +179,12 @@ EOF
       if (defined($field)){
          $displayname=$field->Label();
       }
-      $d.="<th class=subheadfield>".$displayname."</th>";
+      my $style;
+      if (defined($field->{htmlwidth})){
+         $style.="width:$field->{htmlwidth};";
+      }
+      $displayname="&nbsp;" if ($displayname eq "");
+      $d.="<th class=subheadfield style=\"$style\">".$displayname."</th>";
    }
    $d.="</tr></thead>\n<tbody>\n";
    return($d);
