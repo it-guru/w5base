@@ -71,18 +71,15 @@ sub Main
          "OnChange=\"SelectionChanged();\">";
    $s.="<option value=\"\">&lt;".$self->T("please select a query").
        "&gt;</option>";
-   my $user=getModuleObject($self->Config,"base::user");
-   my $userid=$self->getCurrentUserId();
-   $user->SetFilter({userid=>\$userid});
-   $user->SetCurrentView(qw(groups));
-   my ($userrec)=$user->getOnlyFirst(qw(fullname userid groups));
 
-
+   my $UserCache=$self->Cache->{User}->{Cache};
+   $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
+   my %selectCache;
    foreach my $label (sort(grep(/^\[/,keys(%l))),
                       sort(grep(!/^\[/,keys(%l)))){
       if (defined($l{$label}) &&
           $l{$label}->can("isSelectable") && 
-          $l{$label}->isSelectable(user=>$userrec)){
+          $l{$label}->isSelectable(user=>$UserCache,cache=>\%selectCache)){
          $s.="<option ";
          $s.="selected " if ($l{$label}->Self() eq $oldval);
          $s.="value=\"".$l{$label}->Self()."\">$label</option>";

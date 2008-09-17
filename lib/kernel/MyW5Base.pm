@@ -43,6 +43,7 @@ sub Init
 sub isSelectable
 {
    my $self=shift;
+   my %param=@_;
 
    return(1);
 }
