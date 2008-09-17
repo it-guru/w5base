@@ -282,7 +282,11 @@ sub Validate
       $name=~s/\s//g;
       $name=~s/^[0]+([1-9])/$1/g;
       $name=~s/\.[0]+([1-9])/.$1/g;
-      if (my ($o1,$o2,$o3,$o4)=$name=~m/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/){
+      my $chkname=$name;
+      if ($cistatusid>5){
+         $chkname=~s/\[\d+\]$//;
+      }
+      if (my ($o1,$o2,$o3,$o4)=$chkname=~m/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/){
          if (($o1<0 || $o1 >255 || 
               $o2<0 || $o2 >255 ||
               $o3<0 || $o3 >255 ||
@@ -300,10 +304,17 @@ sub Validate
       }
    }
    $newrec->{name}=$name;
-   my $dnsname=lc(trim(effVal($oldrec,$newrec,"dnsname")));
-   $dnsname=~s/[^a-z0-9]*$//;
-   $dnsname=~s/^[^a-z0-9]*//;
-   $newrec->{dnsname}=$dnsname;
+   if (exists($newrec->{dnsname})){
+      my $dnsname=lc(trim(effVal($oldrec,$newrec,"dnsname")));
+      $dnsname=~s/[^a-z0-9\[\]]*$//;
+      $dnsname=~s/^[^a-z0-9]*//;
+      $newrec->{dnsname}=$dnsname;
+      if (($dnsname=~m/\s/) || !($dnsname=~m/.+\..+/)){
+         $self->LastMsg(ERROR,"invalid dns name");
+         return(0);
+      }
+      $newrec->{dnsname}=undef if ($newrec->{dnsname} eq "");
+   }
 
    my $accountno=trim(effVal($oldrec,$newrec,"accountno"));
    if ($accountno=~m/\s/){
@@ -324,7 +335,7 @@ sub Validate
    }
    return(0) if (!($self->isParentWriteable($systemid)));
    #return(1) if ($self->IsMemberOf("admin"));
-   return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"name"));
+   return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"name","dnsname"));
 
    return(1);
 }

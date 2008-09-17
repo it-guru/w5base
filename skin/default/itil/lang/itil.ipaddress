@@ -22,3 +22,4 @@
 'invalid ip-address or empty specified'=>{de=>'ungültige oder leere IP-Adresse'},
 "invalid IPV4 address '\%s'"=>{de=>"ungültige IPV4 IP-Adresse '\%s'"},
 'unknown ip-address format'=>{de=>'unbekanntes IP-Adressformat'},
+'invalid dns name'=>{de=>'ungüliger DNS Name'},

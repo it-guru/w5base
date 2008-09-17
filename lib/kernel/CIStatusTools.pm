@@ -84,18 +84,25 @@ sub HandleCIStatusModification
    }
    if ($adduniq){
       foreach my $primarykey (@primarykey){
-         for(my $c=0;$c<=100;$c++){
-            my $chkname=$newrec->{$primarykey}."[$c]";
-            $self->SetFilter($primarykey=>\$chkname);
-            my $chkid=$self->getVal($idfield);
-            if (!defined($chkid)){
-               $newrec->{$primarykey}=$chkname;
-               return(1);
+         if (defined($newrec->{$primarykey})){
+            my $found=0;
+            for(my $c=0;$c<=100;$c++){
+               my $chkname=$newrec->{$primarykey}."[$c]";
+               $self->SetFilter($primarykey=>\$chkname);
+               my $chkid=$self->getVal($idfield);
+               if (!defined($chkid)){
+                  $newrec->{$primarykey}=$chkname;
+                  $found++;
+                  last;
+               }
+            }
+            if (!$found){
+               $self->LastMsg(ERROR,"can't find a unique name for '%s'",$primarykey);
+               return(0);
             }
          }
-         $self->LastMsg(ERROR,"can't find a unique name for '%s'",$primarykey);
-         return(0);
       }
+      return(1);
    }
    if ($deluniq){
       foreach my $primarykey (@primarykey){
