@@ -27,6 +27,7 @@ sub new
 {
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
+   $self->{_permitted}->{forwardSearch}=1;
    $self->{Sequence}=0;
    return($self);
 }
@@ -101,7 +102,41 @@ sub FormatedDetail
         style="display:none">
 </iframe>
 EOF
-      return($self->getSubListData($current,"HtmlDetail",%param));
+      my $d=$self->getSubListData($current,"HtmlDetail",%param);
+      if ($d ne ""){
+         if ($self->forwardSearch){
+            my $target=$self->{vjointo};
+            my $dstflt=$self->{vjoinon}->[1];
+            my $src=$app->getField($self->{vjoinon}->[0])->RawValue($current);
+            my $dstflt=$self->{vjoinon}->[1];
+            $target=~s/::/\//g;
+            $target="../../$target/NativResult?".
+                    "AutoSearch=1&search_$dstflt=".quoteQueryString($src);
+            my $vjoinbaseok=1;
+            if (defined($self->{vjoinbase})){
+               $vjoinbaseok=0;
+               if (ref($self->{vjoinbase}) eq "ARRAY" &&
+                   $#{$self->{vjoinbase}}==0){
+                  if (ref($self->{vjoinbase}->[0]) eq "HASH"){
+                     foreach my $k (keys(%{$self->{vjoinbase}->[0]})){
+                         my $v=$self->{vjoinbase}->[0]->{$k};
+                         $target.="&search_$k=".quoteQueryString($v);
+                     }
+                     $vjoinbaseok=1;
+                  } 
+               }
+            }
+            if ($vjoinbaseok){ 
+               my $cmd="parent.showPopWin('$target',null,null);";
+               #my $cmd="alert('$target');";
+               $d.="<div class=directsublist>".
+                   "<img border=0 onclick=\"$cmd\" ".
+                   "src=\"../../../public/base/load/directlink.gif\">".
+                   "</div>";
+            }
+         }
+      }
+      return($d);
    }
    if ($mode eq "edit"){
       my $h=$self->getParent->DetailY()-80;

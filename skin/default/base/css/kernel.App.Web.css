@@ -13,6 +13,8 @@ div.searchframe{
 iframe.result{
    height:100%;
    width:100%;
+   margin:0px;
+   padding:0px;
 }
 div.extsearchframe{
    height:100px;

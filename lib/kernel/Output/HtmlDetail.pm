@@ -344,32 +344,19 @@ EOF
                    $fieldlist[$c]->Type() eq "Container" ||
                    $fieldlist[$c]->Type() eq "Htmlarea"){
                   $subblock.=<<EOF;
-      <tr class=fline>
-         <td class=fname$valign colspan=2>
-<span $fieldspecfunc>$prefix\%$name(label)%:</span><br>$fieldspec
-\%$name(detail)\%
-</td>
-      </tr>
+<tr class=fline><td class=fname$valign colspan=2><span $fieldspecfunc>$prefix\%$name(label)%:</span><br>$fieldspec \%$name(detail)\%</td></tr>
 EOF
                }
                elsif (
                    $fieldlist[$c]->Type() eq "TimeSpans" 
                    ){
                   $subblock.=<<EOF;
-      <tr class=fline>
-         <td class=fname$valign colspan=2>
-\%$name(detail)\%
-</td>
-      </tr>
+<tr class=fline><td class=fname$valign colspan=2>\%$name(detail)\%</td></tr>
 EOF
                }
                elsif ($fieldlist[$c]->can("EditProcessor")){
                   $subblock.=<<EOF;
-      <tr class=fline>
-         <td class=fname$valign colspan=2 $fieldspecfunc>$fieldspec
-\%$name(detail)\%
-</td>
-      </tr>
+<tr class=fline><td class=fname$valign colspan=2 $fieldspecfunc>$fieldspec\%$name(detail)\%</td></tr>
 EOF
 
                }

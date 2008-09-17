@@ -378,6 +378,7 @@ sub new
                 name          =>'systems',
                 label         =>'Systems',
                 group         =>'systems',
+                forwardSearch =>1,
                 allowcleanup  =>1,
                 subeditmsk    =>'subedit.appl',
                 vjointo       =>'itil::lnkapplsystem',

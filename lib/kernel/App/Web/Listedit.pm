@@ -44,7 +44,8 @@ sub getValidWebFunctions
    if (!$self->{IsFrontendInitialized}){
       $self->{IsFrontendInitialized}=$self->FrontendInitialize();
    }
-   my @l=qw(NativMain Main MainWithNew Result Upload UploadWelcome UploadFrame
+   my @l=qw(NativMain Main MainWithNew 
+            NativResult Result Upload UploadWelcome UploadFrame
             Welcome Empty Detail HtmlDetail HandleInfoAboSubscribe
             New Copy FormatSelect Bookmark startWorkflow
             DeleteRec InitWorkflow AsyncSubListView 
@@ -295,6 +296,13 @@ $AutoSearch
 </script>
 EOF
    my $defaultsearch="";
+   if ($param{nosearch}){
+      my %search=$self->getSearchHash();
+      foreach my $k (keys(%search)){
+         $d.="<input type=hidden value=\"$search{$k}\" name=search_$k>";
+      }
+      return($d);
+   }
    if ($self->getSkinFile($self->SkinBase()."/".$name)){
       $d.=$self->getParsedTemplate($name);
    }
@@ -581,6 +589,12 @@ sub NativMain
    return($self->Main(nohead=>1,allowNewButton=>1));
 }
 
+sub NativResult
+{
+   my ($self)=@_;
+   return($self->Main(nohead=>1,nosearch=>1));
+}
+
 sub MainWithNew
 {
    my ($self)=@_;
@@ -601,7 +615,7 @@ sub Main
                                    'kernel.App.Web.css'],
                            submodal=>1,
                            body=>1,form=>1,
-                           title=>'W5BaseV1-System');
+                           title=>$self->T($self->Self,$self->Self));
    print ("<style>body{overflow:hidden}</style>");
    if ($param{nohead}){
       print <<EOF;

@@ -69,6 +69,14 @@ xbody{
    background:#ffffff;
 }
 
+div.directsublist
+{
+   text-align:right;
+   padding-right:5px;
+   cursor: pointer;
+   cursor: hand;
+}
+
 div.SubList{
    border-collapse:collapse;
    border-width:1px;
@@ -82,7 +90,7 @@ table.subdatatable{
    border-style:solid;
    border-color:#000000;
    border-top-style:none;
-   margin-bottom:5px;
+   margin-bottom:1px;
 }
 td.subheadline{
 }
