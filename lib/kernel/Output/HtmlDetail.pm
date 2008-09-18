@@ -224,8 +224,8 @@ sub ProcessLine
  <table cellspacing="1" cellpadding="2" border="0">
 
   <tr>
-   <td class="std" onMouseOver="this.className='active'" 
-       onMouseOut="this.className='std'">ContextMenu Test</td>
+   <td class="std" onMouseOver="this.className='active';" 
+       onMouseOut="this.className='std';">ContextMenu Test</td>
   </tr>
 
  </table>

@@ -177,13 +177,13 @@ sub addWebLinkToFacility
                      "AllowClose=1&search_$targetid=$targetval',".
                      "'_blank',".
                      "'height=$detaily,width=$detailx,toolbar=no,status=no,".
-                     "resizable=yes,scrollbars=no')";
+                     "resizable=yes,scrollbars=no');";
          #$d="<a class=sublink href=JavaScript:$onclick>".$d."</a>";
          my $context;
          if (defined($param{contextMenu})){
             $context=" cont=\"$param{contextMenu}\" ";
          }
-         #$d="<div class=\"sublink\" $context onclick=$onclick>".$d."</div>";
+         $d="<div class=\"sublink\" $context onclick=$onclick>".$d."</div>";
          $d="<span class=\"sublink\" $context onclick=\"$onclick\">".
             $d."</span>";
       }
@@ -361,14 +361,14 @@ sub getHtmlContextMenu
                     "border=\"0\">";
       while(my $label=shift(@contextMenu)){
          my $link=shift(@contextMenu);
-         $contextMenu.="<tr>";
+         $contextMenu.="\n<tr>";
          $contextMenu.="<td class=\"std\" ".
-                       "onMouseOver=\"this.className='active'\" ".
-                       "onMouseOut=\"this.className='std'\">";
+                       "onMouseOver=\"this.className='active';\" ".
+                       "onMouseOut=\"this.className='std';\">";
          $contextMenu.="<div onMouseUp=\"$link\">$label</div>";
          $contextMenu.="</td></tr>";
       }
-      $contextMenu.="</table>";
+      $contextMenu.="\n</table>";
       $contextMenu.="</div>";
    }
    return($contextMenu);

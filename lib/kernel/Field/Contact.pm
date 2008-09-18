@@ -86,11 +86,11 @@ sub contextMenu
       }
       my $office_phone=$rec->[0]->{office_phone};
       if ($office_phone ne ""){
-         push(@ml,$office_phone,"void;");
+         push(@ml,$office_phone,"alert('call $office_phone');");
       }
       my $office_mobile=$rec->[0]->{office_mobile};
       if ($office_mobile ne ""){
-         push(@ml,$office_mobile,"void;");
+         push(@ml,$office_mobile,"alert('call $office_mobile');");
       }
    }
    return(@ml);
