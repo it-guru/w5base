@@ -224,7 +224,7 @@ sub SetFilter
                        keys(%{$dataobj->{SubDataObj}}))];
    delete($flt->{wfclass});
 
-   $flt->{$flt->{refto}}=">\"$flt->{from}\" AND <\"$flt->{to}\"";
+   $flt->{$flt->{refto}}=">\"$flt->{from} GMT\" AND <\"$flt->{to} GMT\"";
    delete ($flt->{refto});
    
    delete ($flt->{duration});
