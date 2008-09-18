@@ -380,7 +380,9 @@ sub Label
    my $label=$self->{label};
    my $d="-NoLabelSet-";
    $d=$label if ($label ne "");
-   return($self->getParent->T($d,$self->{translation}));
+   my $tr=$self->{translation};
+   $tr=$self->getParent->Self if (!defined($tr));
+   return($self->getParent->T($d,$tr));
 }
 
 sub rawLabel

@@ -41,11 +41,13 @@ sub Init
                 Parent        =>$self,
                 name          =>'from',
                 label         =>'From');
+   $self->{Field}->{from}->setParent($self);
 
    $self->{Field}->{to}=new kernel::Field::Date(
                 Parent        =>$self, 
                 name          =>'to',
                 label         =>'To');
+   $self->{Field}->{to}->setParent($self);
 
    $self->{Val}->{wfclass}=["",qw(problem change incident eventnotify)];
 
@@ -86,6 +88,7 @@ sub isSelectable
 sub getQueryTemplate
 {
    my $self=shift;
+   my $dataobj=$self->getDataObj();
 
    #######################################################################
    my @wfclass=@{$self->{Val}->{wfclass}};
@@ -98,6 +101,7 @@ sub getQueryTemplate
       $reptyp.=">".$self->T($wfclass)."</option>";
    }
    $reptyp.="</select>";
+   my $reptypl=$self->T("workflow class");
    #######################################################################
    my @refto=@{$self->{Val}->{refto}};
 
@@ -109,6 +113,7 @@ sub getQueryTemplate
       $refsel.=">".$self->T($refto)."</option>";
    }
    $refsel.="</select>";
+   my $refsell=$self->T("reference to");
    #######################################################################
 
    my $m1=$self->getParent->T("enclose all not finshed eventnotifications");
@@ -116,10 +121,10 @@ sub getQueryTemplate
    $showallsel="checked" if (Query->Param("SHOWALL"));
 
    
-   my $froml=$self->{Field}->{from}->label;
+   my $froml=$self->{Field}->{from}->Label;
    my $froms=$self->{Field}->{from}->FormatedSearch();
 
-   my $tol=$self->{Field}->{to}->label;
+   my $tol=$self->{Field}->{to}->Label;
    my $tos=$self->{Field}->{to}->FormatedSearch();
 
 
@@ -127,9 +132,9 @@ sub getQueryTemplate
 <div class=searchframe>
 <table class=searchframe>
 <tr>
-<td class=fname width=10%>Workflow Klasse:</td>
+<td class=fname width=10%>$reptypl:</td>
 <td class=finput width=40%>$reptyp</td>
-<td class=fname width=10%>Bezugsfeld:</td>
+<td class=fname width=10%>$refsell:</td>
 <td class=finput width=40%>$refsel</td>
 </tr>
 <tr>
@@ -141,14 +146,20 @@ sub getQueryTemplate
 <tr>
 <td class=fname width=10%>\%affectedapplication(label)\%:</td>
 <td class=finput width=40%>\%affectedapplication(search)\%</td>
-<td class=fname width=10%>&nbsp;</td>
-<td class=finput width=40%>&nbsp;</td>
+<td class=fname width=10%>\%involvedbusinessteam(label)\%(Test):</td>
+<td class=finput width=40%>\%involvedbusinessteam(search)\%</td>
 </tr>
 <tr>
 <td class=fname width=10%>\%state(label)\%:</td>
 <td class=finput width=40%>\%state(search)\%</td>
 <td class=fname width=10%>\%prio(label)\%:</td>
 <td class=finput width=40%>\%prio(search)\%</td>
+</tr>
+<tr>
+<td class=fname width=10%>\%name(label)\%:</td>
+<td class=finput width=40%>\%name(search)\%</td>
+<td class=fname width=10%>\%srcid(label)\%:</td>
+<td class=finput width=40%>\%srcid(search)\%</td>
 </tr>
 </table>
 </div>
@@ -167,6 +178,67 @@ sub SetFilter
 
 }
 
+sub SetFilter
+{
+   my $self=shift;
+   my $flt=shift;
+
+   #######################################################################
+   #
+   # verify allowed data for current MyW5Base module
+   #
+   $flt->{duration}=CalcDateDuration($flt->{from},$flt->{to},"GMT");
+   if ($flt->{duration}->{totalseconds}<0){
+      $self->LastMsg(ERROR,"from is later then to");
+      return(undef);
+   }
+   if ($flt->{duration}->{totalseconds}>8640000){
+      $self->LastMsg(ERROR,"range is larger then the allowed limit of 100d");
+      return(undef);
+   }
+   if (defined($flt->{affectedapplication}) &&
+       $flt->{affectedapplication} eq "*"){
+      $self->LastMsg(ERROR,"invalid application filter");
+      return(undef);
+   }
+   if (defined($flt->{srcid}) &&
+       $flt->{srcid}=~m/^\*/){
+      $self->LastMsg(ERROR,"invalid srcid filter");
+      return(undef);
+   }
+   if (!grep(/^$flt->{refto}$/,@{$self->{Val}->{refto}}) ||
+       !grep(/^$flt->{wfclass}$/,@{$self->{Val}->{wfclass}})){
+      $self->LastMsg(ERROR,"invalid request for this module");
+      return(undef);
+   }
+   if ($flt->{wfclass} eq "" || $flt->{to} eq "" || $flt->{from} eq ""){
+      $self->LastMsg(ERROR,"missing query param to prozess this request");
+      return(undef);
+   }
+   #######################################################################
+   #
+   # make filter related to dataobj
+   #
+   my $dataobj=$self->getDataObj();
+   $flt->{class}=[grep(/^.*::$flt->{wfclass}$/,
+                       keys(%{$dataobj->{SubDataObj}}))];
+   delete($flt->{wfclass});
+
+   $flt->{$flt->{refto}}=">\"$flt->{from}\" AND <\"$flt->{to}\"";
+   delete ($flt->{refto});
+   
+   delete ($flt->{duration});
+   delete ($flt->{to});
+   delete ($flt->{from});
+
+   $dataobj->SetFilter($flt);
+   #######################################################################
+
+
+   printf STDERR ("fifi SetFilter=%s\n",Dumper($flt));
+   return(1);
+}
+
 
 
 
@@ -181,18 +253,10 @@ sub Result
    return(undef) if (!(my $f=$self->{Field}->{to}->Unformat($q{to})));
    $q{to}=$f->{to};
 
-   $q{duration}=CalcDateDuration($q{from},$q{to},"GMT");
-   if ($q{duration}->{totalseconds}<0){
-      $self->LastMsg(ERROR,"from is later then to");
-      return(undef);
-   }
-   if (!grep(/^$q{refto}$/,@{$self->{Val}->{refto}}) ||
-       !grep(/^$q{wfclass}$/,@{$self->{Val}->{wfclass}})){
-      $self->LastMsg(ERROR,"invalid request for this module");
-      return(undef);
-   }
-   if ($q{wfclass} eq "" || $q{to} eq "" || $q{from} eq ""){
-      $self->LastMsg(ERROR,"missing query param to prozess this request");
+   if (!$self->SetFilter(\%q)){
+      if ($self->LastMsg()==0){
+         $self->LastMsg(ERROR,"can not SetFilter on DataObj - unknown problem");
+      }
       return(undef);
    }
 
@@ -201,7 +265,6 @@ printf STDERR ("fifi parent of meine=%s\n",$self->getParent());
 printf STDERR ("fifi search=%s\n",Dumper(\%q));
    
 
-   return(undef);
 
 #   my $userid=$self->getParent->getCurrentUserId();
 #   $userid=-1 if (!defined($userid) || $userid==0);
