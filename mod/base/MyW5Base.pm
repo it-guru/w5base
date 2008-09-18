@@ -447,6 +447,7 @@ sub Result
    if (defined($oldval) && exists($self->{SubDataObj}->{$oldval}) &&
        $self->{SubDataObj}->{$oldval}->can("Result")){
       my $curquery=$self->{SubDataObj}->{$oldval};
+      my $res=$curquery->SecureSetFilter();
       my $res=$curquery->Result();
       return($res) if (defined($res));
    }

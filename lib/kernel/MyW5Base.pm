@@ -274,7 +274,6 @@ sub SetFilter
 {
    my $self=shift;
    my $dataobj=$self->getDataObj();
-   return($dataobj->SetFilter(@_));
    return;
 }
 
@@ -282,7 +281,7 @@ sub SecureSetFilter
 {
    my $self=shift;
    my $dataobj=$self->getDataObj();
-   return($dataobj->SecureSetFilter(@_));
+   return($dataobj->SetFilter(@_));
    return;
 }
 
@@ -300,6 +299,21 @@ sub getOnlyFirst
    my $dataobj=$self->getDataObj();
    return($dataobj->getOnlyFirst(@_));
    return;
+}
+
+sub T
+{
+   my $self=shift;
+   my $txt=shift;
+   my @module=@_;
+   my @trtab;
+   if ($#module==-1){
+      $trtab[0]=(caller())[0];
+   }
+   else{
+      @trtab=@module;
+   }
+   return($self->getParent->T($txt,@trtab));
 }
 
 #######################################################################

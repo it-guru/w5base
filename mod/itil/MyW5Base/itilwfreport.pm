@@ -70,14 +70,54 @@ sub isSelectable
 sub getQueryTemplate
 {
    my $self=shift;
+
+   #######################################################################
+   my @wfclass=('');
+   push(@wfclass,"problem");
+   push(@wfclass,"change");
+   push(@wfclass,"incident");
+   push(@wfclass,"eventnotify");
+
+   my $reptyp="<select name=search_wfclass style=\"width:100%\">";
+   my $oldval=Query->Param("search_wfclass");
+   foreach my $wfclass (@wfclass){
+      $reptyp.="<option value=\"$wfclass\"";
+      $reptyp.=" selected" if ($wfclass eq $oldval);
+      $reptyp.=">".$self->T($wfclass)."</option>";
+   }
+   $reptyp.="</select>";
+   #######################################################################
+   my @refto=();
+   push(@refto,"eventstart");
+   push(@refto,"eventend");
+   push(@refto,"mdate");
+   push(@refto,"eventnotify");
+
+
+
    my $m1=$self->getParent->T("enclose all not finshed eventnotifications");
    my $showallsel;
    $showallsel="checked" if (Query->Param("SHOWALL"));
+
+
+
+
+
    my $d=<<EOF;
 <div class=searchframe>
-Hier wird die Suchseite für Problem, Change und Incident-Manager entstehen
-<!--
 <table class=searchframe>
+<tr>
+<td class=fname width=10%>Workflow Klasse:</td>
+<td class=finput width=40%>$reptyp</td>
+<td class=fname width=10%>Bezugsfeld:</td>
+<td class=finput width=40%>&nbsp;</td>
+</tr>
+<tr>
+<td class=fname width=10%>von:</td>
+<td class=finput width=40%>&nbsp;</td>
+<td class=fname width=10%>bis:</td>
+<td class=finput width=40%>&nbsp;</td>
+</tr>
 <tr>
 <td class=fname width=10%>\%affectedapplication(label)\%:</td>
 <td class=finput width=40%>\%affectedapplication(search)\%</td>
@@ -85,12 +125,12 @@ Hier wird die Suchseite für Problem, Change und Incident-Manager entstehen
 <td class=finput width=40%>\%affectedcontract(search)\%</td>
 </tr>
 <tr>
-<td class=fname width=10%>&nbsp;</td>
-<td class=finput width=40%>&nbsp;</td>
-<td class=fname colspan=2><input type=checkbox $showallsel name=SHOWALL>$m1</td>
+<td class=fname width=10%>\%state(label)\%:</td>
+<td class=finput width=40%>\%state(search)\%</td>
+<td class=fname width=10%>\%prio(label)\%:</td>
+<td class=finput width=40%>\%prio(search)\%</td>
 </tr>
 </table>
--->
 </div>
 %xStdButtonBar(bookmark,search)%
 EOF

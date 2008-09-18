@@ -113,7 +113,7 @@ sub ProcessHead
       $d.="<table width=100% style=\"table-layout:fixed\">".
           "<tr><td><div style=\"overflow:hidden\">\n";
    }
-   $d.=<<EOF;
+   $d.=<<EOF if ($param->{ParentMode} eq "HtmlDetail");
 <script language="JavaScript">
 var SortTable$tableid;
 function addClassName$tableid(el, sClassName) {

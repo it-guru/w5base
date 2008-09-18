@@ -458,7 +458,6 @@ $LastMsg
 </div>
 </div>
 <script language="JavaScript">
-var submitCount=0;
 function ProcessResize()
 {
    var h=getViewportHeight();
@@ -558,6 +557,7 @@ function disableButtons()
    document.btnWhich.value="Working ...";
 }
 
+var submitCount=0;
 function ValidateSubmit(f)
 {
    if (submitCount>0){   // prevent doubleclick idiots
