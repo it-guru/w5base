@@ -107,47 +107,48 @@ Normale Gründe für eine solche Löschung sind z.B. dass die Namenskonvetionen nic
 '},
 'MSG005'=>{en=>'%s: INSERT
 
-The Config-Item "%s" at mandator "%s" has been new inserted by "%s".
+The Config-Item "%s" %shas been new inserted by "%s".
 
 Depending on your user rights, it is posible that the new record is not accessable by you.
 
 ',de=>'%s: NEUEINGABE
 
-Das Config-Item "%s" im Mandaten "%s" wurde durch den User "%s" neu erzeugt.
+Das Config-Item "%s" %swurde durch den User "%s" neu erzeugt.
 
 Abhängig von Ihren Rechten ist es möglich, dass der neue Datensatz von Ihnen nicht abgefragt werden darf.
 '},
 'MSG006'=>{en=>'%s: DELETE
 
-The Config-Item "%s" at mandator "%s" has been new deleted by "%s".
+The Config-Item "%s" %shas been new deleted by "%s".
 ',de=>'%s: LÖSCHUNG
 
-Das Config-Item "%s" im Mandaten "%s" wurde durch den User "%s" gelöscht.
+Das Config-Item "%s" %swurde durch den User "%s" gelöscht.
 '},
 'MSG007'=>{en=>'%s: ACTIVATE
 
-The Config-Item "%s" at mandator "%s" has been acivated by "%s".
+The Config-Item "%s" %shas been acivated by "%s".
 
 Depending on your user rights, it is posible that the new record is not accessable by you.
 
 ',de=>'%s: AKTIVIERUNG
 
-Das Config-Item "%s" im Mandaten "%s" wurde durch den User "%s" aktiviert.
+Das Config-Item "%s" %swurde durch den User "%s" aktiviert.
 
 Abhängig von Ihren Rechten ist es möglich, dass der neue Datensatz von Ihnen nicht abgefragt werden darf.
 '},
 'MSG008'=>{en=>'%s: DEACTIVATE
 
-The Config-Item "%s" at mandator "%s" has been deacivated by "%s".
+The Config-Item "%s" %shas been deacivated by "%s".
 
 Depending on your user rights, it is posible that the new record is not accessable by you.
 
 ',de=>'%s: DEAKTIVIERUNG
 
-Das Config-Item "%s" im Mandaten "%s" wurde durch den User "%s" deaktiviert.
+Das Config-Item "%s" %swurde durch den User "%s" deaktiviert.
 
 Abhängig von Ihren Rechten ist es möglich, dass der neue Datensatz von Ihnen nicht abgefragt werden darf.
 '},
 
 
-"invalid character in key field '\%s'"=>{de=>"ungültiges Zeichen in Schlüsselfeld '\%s'"}
+"invalid character in key field '\%s'"=>{de=>"ungültiges Zeichen in Schlüsselfeld '\%s'"},
+'MSG010'=>{de=>'im Mandaten "%s" ',en=>'at mandator "%s" '},

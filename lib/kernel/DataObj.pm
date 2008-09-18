@@ -1277,6 +1277,7 @@ sub getHtmlSelect
    push(@style,"width:$width");
    my $style=join(";",@style);
    $d="<select name=$name style=\"$style\"$autosubmit$multiple$size>";
+printf STDERR ("fifi @{$fld},$key\n",);
    my @l=$self->getHashList(@{$fld},$key);
    my %len=();
    foreach my $rec (@l){

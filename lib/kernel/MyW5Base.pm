@@ -20,11 +20,11 @@ package kernel::MyW5Base;
 use vars qw(@ISA);
 use strict;
 use kernel;
+use kernel::App;
 use kernel::date;
 use kernel::Universal;
-use Data::Dumper;
 
-@ISA=qw(kernel::Universal);
+@ISA=qw(kernel::App);
 
 sub new
 {
@@ -36,8 +36,10 @@ sub new
 sub Init
 {
    my $self=shift;
-
-   return(0);
+   my $dataobj=$self->getDataObj();
+   return(0) if (!defined($dataobj));
+   $dataobj->setParent($self);
+   return(1);
 }
 
 sub isSelectable
@@ -301,20 +303,18 @@ sub getOnlyFirst
    return;
 }
 
-sub T
+sub Config
 {
    my $self=shift;
-   my $txt=shift;
-   my @module=@_;
-   my @trtab;
-   if ($#module==-1){
-      $trtab[0]=(caller())[0];
-   }
-   else{
-      @trtab=@module;
-   }
-   return($self->getParent->T($txt,@trtab));
+   return($self->getParent->Config(@_));
 }
+
+sub ExpandTimeExpression
+{
+   my $self=shift;
+   return($self->getParent->ExpandTimeExpression(@_));
+}
+
 
 #######################################################################
 

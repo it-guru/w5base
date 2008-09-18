@@ -417,23 +417,28 @@ sub NotifyAddOrRemoveObject
          }
       }
       my $msg;
+      my $mandatorstr="";
+      if ($mandator ne ""){
+         $mandatorstr=$self->T("MSG010");
+         $mandatorstr=sprintf($mandatorstr,$mandator);
+      }
       if ($op eq "insert"){
          $msg=$self->T("MSG005");
-         $msg=sprintf($msg,$modulelabel,$name,$mandator,$fullname);
+         $msg=sprintf($msg,$modulelabel,$name,$mandatorstr,$fullname);
          $msg.="\n\nDirectLink:\n$url";
       }
       if ($op eq "delete"){
          $msg=$self->T("MSG006");
-         $msg=sprintf($msg,$modulelabel,$name,$mandator,$fullname);
+         $msg=sprintf($msg,$modulelabel,$name,$mandatorstr,$fullname);
       }
       if ($op eq "activate"){
          $msg=$self->T("MSG007");
-         $msg=sprintf($msg,$modulelabel,$name,$mandator,$fullname);
+         $msg=sprintf($msg,$modulelabel,$name,$mandatorstr,$fullname);
          $msg.="\n\nDirectLink:\n$url";
       }
       if ($op eq "deactivate"){
          $msg=$self->T("MSG008");
-         $msg=sprintf($msg,$modulelabel,$name,$mandator,$fullname);
+         $msg=sprintf($msg,$modulelabel,$name,$mandatorstr,$fullname);
          $msg.="\n\nDirectLink:\n$url";
       }
       my $sitename=$self->Config->Param("SITENAME");

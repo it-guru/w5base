@@ -28,6 +28,7 @@ sub new
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
    $self->{AllowEmpty}=0 if (!defined($self->{AllowEmpty}));
+   $self->{_permitted}->{AllowEmpty}=1;
    if (!defined($self->{depend}) && defined($self->{vjoinon})){
       $self->{depend}=[$self->{vjoinon}->[0]]; # if there is a vjoin, we must
    }                         # be sure, to select the local criteria
@@ -45,7 +46,9 @@ sub Validate
    my $name=$self->Name();
    return({}) if (!exists($newrec->{$name}));
    my $newval=$newrec->{$name};
-   my $filter={$self->{vjoindisp}=>'"'.$newval.'"'};
+   my $disp=$self->{vjoindisp};
+   $disp=$disp->[0] if (ref($disp) eq "ARRAY");
+   my $filter={$disp=>'"'.$newval.'"'};
 
    $self->FieldCache->{LastDrop}=undef;
 
@@ -56,7 +59,7 @@ sub Validate
       $self->vjoinobj->SetNamedFilter("EDITBASE",$self->{vjoineditbase});
    }
    $self->vjoinobj->SetFilter($filter);
-   my %param=(AllowEmpty=>$self->{AllowEmpty});
+   my %param=(AllowEmpty=>$self->AllowEmpty);
    my $fromquery=Query->Param("Formated_$name");
    if (defined($fromquery)){
       $param{Add}=[{key=>$fromquery,val=>$fromquery}];
@@ -64,16 +67,16 @@ sub Validate
    }
    my ($dropbox,$keylist,$vallist)=$self->vjoinobj->getHtmlSelect(
                                                   "Formated_$name",
-                                                  $self->{vjoindisp},
-                                                  [$self->{vjoindisp}],%param);
+                                                  $disp,
+                                                  [$disp],%param);
    if ($#{$keylist}<0 && $fromquery ne ""){
-      $filter={$self->{vjoindisp}=>'"*'.$newval.'*"'};
+      $filter={$disp=>'"*'.$newval.'*"'};
       $self->vjoinobj->ResetFilter();
       $self->vjoinobj->SetFilter($filter);
       ($dropbox,$keylist,$vallist)=$self->vjoinobj->getHtmlSelect(
                                                   "Formated_$name",
-                                                  $self->{vjoindisp},
-                                                  [$self->{vjoindisp}],%param);
+                                                  $disp,
+                                                  [$disp],%param);
    }
    if ($#{$keylist}>0){
       $self->FieldCache->{LastDrop}=$dropbox;

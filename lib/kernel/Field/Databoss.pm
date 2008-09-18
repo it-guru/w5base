@@ -29,6 +29,7 @@ sub new
    $param{name}='databoss'       if (!defined($param{name}));
    $param{label}='Databoss'      if (!defined($param{label}));
    $param{vjoinon}='databossid'  if (!defined($param{vjoinon}));
+   $param{AllowEmpty}='0'        if (!defined($param{AllowEmpty}));
 
    my $self=bless($type->SUPER::new(%param),$type);
    return($self);

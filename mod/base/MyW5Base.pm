@@ -447,7 +447,6 @@ sub Result
    if (defined($oldval) && exists($self->{SubDataObj}->{$oldval}) &&
        $self->{SubDataObj}->{$oldval}->can("Result")){
       my $curquery=$self->{SubDataObj}->{$oldval};
-      my $res=$curquery->SecureSetFilter();
       my $res=$curquery->Result();
       return($res) if (defined($res));
    }
@@ -462,7 +461,7 @@ sub Result
    if ($self->LastMsg()){
       @msglist=$self->LastMsg();
    }
-   print "<center><br><table><tr><td>";
+   print "<table width=100% cellpadding=20><tr><td>";
    print "<div class=lastmsg style=\"width:100%\">".
           join("<br>\n",map({
                               if ($_=~m/^ERROR/){
