@@ -184,7 +184,8 @@ sub addWebLinkToFacility
             $context=" cont=\"$param{contextMenu}\" ";
          }
          #$d="<div class=\"sublink\" $context onclick=$onclick>".$d."</div>";
-         $d="<span class=\"sublink\" $context onclick=$onclick>".$d."</span>";
+         $d="<span class=\"sublink\" $context onclick=\"$onclick\">".
+            $d."</span>";
       }
    }
    return($d);
