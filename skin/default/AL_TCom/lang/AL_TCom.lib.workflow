@@ -1,7 +1,7 @@
 'Activity'=>{de=>'Tätigkeit'},
 'Worktime'=>{de=>'Arbeitszeit'},
 
-'undef'=>              {de=>'nicht detailerte Leistung',
+'undef'=>              {de=>'nicht detailierte Leistung',
                         en=>'undefined Service'},
 'devsupport'=>         {de=>'Entwicklungsunterstützung',
                         en=>'Developer support'},
