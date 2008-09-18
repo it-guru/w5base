@@ -61,7 +61,7 @@ sub getQueryTemplate
 </tr>
 </table>
 </div>
-%StdButtonBar(_exviewcontrol,deputycontrol,teamviewcontrol,print,search)%
+%StdButtonBar(_exviewcontrol,deputycontrol,teamviewcontrol,bookmark,print,search)%
 EOF
    return($d);
 }
