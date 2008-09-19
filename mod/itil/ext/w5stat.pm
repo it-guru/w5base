@@ -51,6 +51,11 @@ sub getPresenter
                          opcode=>\&displayAsset,
                          overview=>\&overviewAsset,
                          prio=>1002,
+                      },
+          'swinstance'=>{
+                         opcode=>\&displaySWInstance,
+                         overview=>\&overviewSWInstance,
+                         prio=>1003,
                       }
          );
 
@@ -187,6 +192,50 @@ sub displayAsset
 }
 
 
+sub overviewSWInstance
+{  
+   my $self=shift;
+   my ($primrec,$hist)=@_;
+   my $app=$self->getParent();
+   my @l;
+
+   my $keyname='ITIL.SWInstance.Count';
+   if (defined($primrec->{stats}->{$keyname})){
+      my $color="black";
+      my $delta=$app->calcPOffset($primrec,$hist,$keyname);
+      push(@l,[$app->T('Count of Instance Config-Items'),
+               $primrec->{stats}->{$keyname}->[0],$color,$delta]);
+   }
+   return(@l);
+}
+
+sub displaySWInstance
+{  
+   my $self=shift;
+   my ($primrec,$hist)=@_;
+   my $app=$self->getParent();
+   my $data=$app->extractYear($primrec,$hist,"ITIL.SWInstance.Count");
+   my $user=$app->extractYear($primrec,$hist,"User",
+                              setUndefZero=>1);
+   return(undef) if (!defined($data));
+   my $chart=$app->buildChart("ofcSWInstance",$data,
+#                   greenline=>4,
+                   employees=>$user,
+                   label=>$app->T('swinstance'),
+                   legend=>$app->T('count of software instances'));
+
+   my $d=$app->getParsedTemplate("tmpl/ext.w5stat.swinstance",
+                              {current=>$primrec,
+                               static=>{
+                                    statname=>$primrec->{fullname},
+                                    chart1=>$chart
+                                       },
+                               skinbase=>'itil'
+                              });
+   return($d);
+}
+
+
 
 
 sub processData
@@ -212,6 +261,23 @@ sub processData
       } until(!defined($rec));
    }
    msg(INFO,"FINE of itil::appl  $count records");
+
+   my $swinstance=getModuleObject($self->getParent->Config,"itil::swinstance");
+   $swinstance->SetCurrentView(qw(ALL));
+   $swinstance->SetFilter({cistatusid=>'<=4'});
+   $swinstance->SetCurrentOrder("NONE");
+   msg(INFO,"starting collect of itil::swinstance");$count=0;
+   my ($rec,$msg)=$swinstance->getFirst();
+   if (defined($rec)){
+      do{
+         $self->getParent->processRecord('itil::swinstance',$monthstamp,$rec);
+         ($rec,$msg)=$swinstance->getNext();
+         $count++;
+      } until(!defined($rec));
+   }
+   msg(INFO,"FINE of itil::swinstance  $count records");
+
+
 
    my $system=getModuleObject($self->getParent->Config,"itil::system");
    $system->SetFilter({cistatusid=>'<=4'});
@@ -265,6 +331,12 @@ sub processRecord
       if ($rec->{cistatusid}==4){
          $self->getParent->storeStatVar("Group",[$rec->{adminteam}],{},
                                         "ITIL.System.Count",1);
+      }
+   }
+   if ($module eq "itil::swinstance"){
+      if ($rec->{cistatusid}==4){
+         $self->getParent->storeStatVar("Group",[$rec->{swteam}],{},
+                                        "ITIL.SWInstance.Count",1);
       }
    }
    if ($module eq "itil::asset"){
