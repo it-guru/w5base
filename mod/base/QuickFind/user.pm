@@ -61,6 +61,7 @@ sub CISearchResult
                      id=>undef,
                      parent=>$self->Self,
                      name=>"..."});
+            last;
          }
       }
    }

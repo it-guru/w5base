@@ -42,13 +42,27 @@ sub CISearchResult
    my $flt=[{fullname=>"*$searchtext*"}];
    my $dataobj=getModuleObject($self->getParent->Config,"itil::swinstance");
    $dataobj->SetFilter($flt);
+   my $limit=10;
+   $dataobj->Limit($limit+1);
+   my $c=0;
    foreach my $rec ($dataobj->getHashList(qw(id fullname))){
       my $dispname=$rec->{fullname};
-      push(@l,{group=>$self->getParent->T("itil::swinstance",
-                                          "itil::swinstance"),
-               id=>$rec->{id},
-               parent=>$self->Self,
-               name=>$dispname});
+      $c++;
+      if ($c<=$limit){
+         push(@l,{group=>$self->getParent->T("itil::swinstance",
+                                             "itil::swinstance"),
+                  id=>$rec->{id},
+                  parent=>$self->Self,
+                  name=>$dispname});
+      }
+      else{
+         push(@l,{group=>$self->getParent->T("itil::swinstance",
+                                             "itil::swinstance"),
+                   id=>undef,
+                   parent=>$self->Self,
+                   name=>"..."});
+         last;
+      }
    }
    return(@l);
 }
