@@ -325,6 +325,10 @@ sub Init
                       "itil::QuickFind::costcenter",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj('itil::QuickFind::swinstance$',
+                      "itil::QuickFind::swinstance",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("Tools.analytics.itilfault",
                       "itil::FaultAnalytics",
                       defaultacl=>['admin']);

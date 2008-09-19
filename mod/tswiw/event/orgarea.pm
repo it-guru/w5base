@@ -268,6 +268,7 @@ sub addGrpLinkToUser
          }
          my %newlnk=(roles=>[@newroles,@{$lnkrec->{roles}}],
                      expiration=>undef,
+                     alertstate=>undef,
                      srcsys=>$self->{SRCSYS},
                      srcid=>"none",
                      srcload=>$nowstamp);
@@ -281,6 +282,7 @@ sub addGrpLinkToUser
                      srcsys=>$self->{SRCSYS},
                      srcload=>$nowstamp,
                      expiration=>undef,
+                     alertstate=>undef,
                      grpid=>$grpid2add);
          #printf STDERR ("fifi try to create lnk %s\n",Dumper(\%newlnk));
          my $back=$grpuser->ValidatedInsertRecord(\%newlnk);

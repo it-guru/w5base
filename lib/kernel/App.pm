@@ -526,6 +526,9 @@ sub LoadSubObjs
       foreach my $modname (@sublist){
          my $o=getModuleObject($self->Config,$modname);
          if (defined($o)){
+            if (!$o->can("setParent")){
+               msg(ERROR,"cant call setParent on $o");
+            }
             $o->setParent($self);
             $self->{$hashkey}->{$modname}=$o;
             if ($o->can("Init")){

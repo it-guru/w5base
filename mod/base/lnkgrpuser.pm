@@ -165,6 +165,14 @@ sub new
                 vjoindisp     =>'email'),
 
       new kernel::Field::TextDrop(
+                name          =>'usertyp',
+                readonly      =>1,
+                label         =>'Usertyp',
+                vjointo       =>'base::user',
+                vjoinon       =>['userid'=>'userid'],
+                vjoindisp     =>'usertyp'),
+
+      new kernel::Field::TextDrop(
                 name          =>'office_phone',
                 readonly      =>1,
                 htmldetail    =>'0',

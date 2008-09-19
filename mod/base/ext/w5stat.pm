@@ -18,7 +18,6 @@ package base::ext::w5stat;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::Universal;
 @ISA=qw(kernel::Universal);
@@ -415,8 +414,12 @@ sub processRecord
 
    if ($module eq "base::grp"){
       my $name=$rec->{fullname};
-      my $users=$rec->{users};
-      $users=[] if (ref($users) ne "ARRAY");
+      my $allusers=$rec->{users};
+      $allusers=[] if (ref($allusers) ne "ARRAY");
+      my $users=[];
+      foreach my $user (@$allusers){
+         push(@$users,$user) if ($user->{usertyp} ne "service");
+      }
       my $subunits=$rec->{subunits};
       $subunits=[] if (ref($subunits) ne "ARRAY");
 

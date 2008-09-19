@@ -181,7 +181,7 @@ sub new
                 vjointo       =>'base::lnkgrpuser',
                 vjoinon       =>['grpid'=>'grpid'],
                 vjoindisp     =>['user','userweblink','roles'],
-                vjoininhash   =>['userid','email','user','roles']),
+                vjoininhash   =>['userid','email','user','usertyp','roles']),
 
       new kernel::Field::QualityText(),
       new kernel::Field::QualityState(),

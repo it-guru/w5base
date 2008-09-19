@@ -97,7 +97,7 @@ sub LnkGrpUser
    foreach my $lrec ($lnk->getHashList(qw(ALL))){
       my $dur=CalcDateDuration($lrec->{expiration},$nowstamp);
       my $days=$dur->{totalseconds}/86400;
-      if ($days>90){
+      if ($days>56){           # das muss irgenwann mal rein
          # sofort löschen
       }
       elsif($days>30){

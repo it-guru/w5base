@@ -73,7 +73,7 @@ sub w5statsend
    my $forcesend=0;
    {
       my ($year1,$mon1,$day1, $hour1,$min1,$sec1)=
-              Add_Delta_YMD("GMT",$year,$mon,$day, $hour,$min,$sec,0,0,7);
+              Add_Delta_YMD("GMT",$year,$mon,$day,0,0,7);
       if ($mon!=$mon1){
          $forcesend=1;
       }
@@ -91,6 +91,7 @@ sub w5statsend
    my $lnkrole=getModuleObject($self->Config,"base::lnkgrpuserrole");
 
    $grp->SetFilter({cistatusid=>[3,4]});
+   #$grp->SetFilter({cistatusid=>[3,4],fullname=>"*qso"});
    $grp->SetCurrentView(qw(grpid fullname));
    my ($rec,$msg)=$grp->getFirst();
    if (defined($rec)){
@@ -125,53 +126,62 @@ sub w5statsend
          }
          if (keys(%$emailto)){
             my @emailto=keys(%$emailto);
-            #my @emailto=qw(hartmut.vogler@t-systems.com);
-            msg(INFO,"email=".join(", ",@emailto));
-            msg(INFO,"process group $rec->{fullname}($rec->{grpid})");
-
-            $w5stat->ResetFilter();
-            $w5stat->SetFilter([{month=>\$month,
-                                 nameid=>\$rec->{grpid},
-                                 sgroup=>\'Group'},
-                                {month=>\$month,
-                                 fullname=>\$rec->{fullname},
-                                 sgroup=>\'Group'}]);
-            my ($chkrec,$msg)=$w5stat->getOnlyFirst(qw(id));
-            if (defined($chkrec)){
-               my ($primrec,$hist)=$w5stat->LoadStatSet(id=>$chkrec->{id});
-               if (defined($primrec) &&
-                   defined($w5stat->{w5stat}->{'base::ext::w5stat'})){
-                  msg(INFO,"primrec ok and stat processor found");
-                  my $obj=$w5stat->{w5stat}->{'base::ext::w5stat'};
-                  my %P=$obj->getPresenter();
-                  if (defined($P{'overview'}) &&
-                      defined($P{'overview'}->{opcode})){
-                     msg(INFO,"overview tag handler found");
-                     foreach my $emailto (@emailto){
-                        my $lang="en";
-                        $user->ResetFilter();
-                        $user->SetFilter({email=>\$emailto});
-                        my ($urec,$msg)=$user->getOnlyFirst(qw(lastlang));
-                        if (defined($urec)){
-                           if ($urec->{lastlang} ne ""){
-                              $lang=$urec->{lastlang};
-                           }
-                           $ENV{HTTP_FORCE_LANGUAGE}=$lang;
-                           my ($d,$ovdata)=&{$P{'overview'}->{opcode}}($obj,
-                                                                $primrec,$hist);
-                           my $needsend=$forcesend;
-                           foreach my $ovrec (@$ovdata){
-                              if (defined($ovrec->[2]) && $ovrec->[2] eq "red"){
-                                 $needsend=1;last;
+            foreach my $email (@emailto){
+               msg(INFO,"email=$email");
+               msg(INFO,"process group $rec->{fullname}($rec->{grpid})");
+              
+               $w5stat->ResetFilter();
+               $w5stat->SetFilter([{month=>\$month,
+                                    nameid=>\$rec->{grpid},
+                                    sgroup=>\'Group'},
+                                   {month=>\$month,
+                                    fullname=>\$rec->{fullname},
+                                    sgroup=>\'Group'}]);
+               my ($chkrec,$msg)=$w5stat->getOnlyFirst(qw(id));
+               if (defined($chkrec)){
+                  my ($primrec,$hist)=$w5stat->LoadStatSet(id=>$chkrec->{id});
+                  if (defined($primrec) &&
+                      defined($w5stat->{w5stat}->{'base::ext::w5stat'})){
+                     msg(INFO,"primrec ok and stat processor found");
+                     my $obj=$w5stat->{w5stat}->{'base::ext::w5stat'};
+                     my %P=$obj->getPresenter();
+                     if (defined($P{'overview'}) &&
+                         defined($P{'overview'}->{opcode})){
+                        msg(INFO,"overview tag handler found");
+                        foreach my $emailto (@emailto){
+                           my $lang="";
+                           $user->ResetFilter();
+                           $user->SetFilter({email=>\$emailto});
+                           my ($urec,$msg)=$user->getOnlyFirst(qw(lastlang 
+                                                                  lang));
+                           if (defined($urec)){
+                              if ($urec->{lastlang} ne ""){
+                                 $lang=$urec->{lastlang};
                               }
+                              if ($lang eq ""){
+                                 $lang=$urec->{lang};
+                              }
+                              $lang eq "en" if ($lang eq "");
+
+           
+                              $ENV{HTTP_FORCE_LANGUAGE}=$lang;
+                              my ($d,$ovdata)=&{$P{'overview'}->{opcode}}($obj,
+                                                               $primrec,$hist);
+                              my $needsend=$forcesend;
+                              foreach my $ovrec (@$ovdata){
+                                 if (defined($ovrec->[2]) && 
+                                     $ovrec->[2] eq "red"){
+                                    $needsend=1;last;
+                                 }
+                              }
+                              msg(INFO,"target=$emailto lang=$lang ".
+                                       "needsend=$needsend");
+                              if ($needsend && 1){
+                                 $self->sendOverviewData($emailto,$lang,
+                                                     $primrec,$hist,$d,$ovdata);
+                              }
+                              delete($ENV{HTTP_FORCE_LANGUAGE});
                            }
-                           msg(INFO,"target=$emailto lang=$lang ".
-                                    "needsend=$needsend");
-                           if ($needsend && 1){
-                              $self->sendOverviewData($emailto,$lang,
-                                                      $primrec,$hist,$d,$ovdata);
-                           }
-                           delete($ENV{HTTP_FORCE_LANGUAGE});
                         }
                      }
                   }
@@ -223,11 +233,13 @@ sub sendOverviewData
           emailfrom     =>$emailto,
           emailtext     =>\@emailtext,
           emailto       =>$emailto,
-          additional    =>{htmldata=>$d,month=>$month,
-                           directlink=>$joburl.
-                           "/auth/base/menu/msel/Tools/reflexion?search_id=".
-                           $primrec->{id},
-                           fullname=>$primrec->{fullname}},
+          additional    =>{
+             htmldata=>$d,month=>$month, 
+             directlink=>$joburl.
+                         "/auth/base/menu/msel/Tools/reflexion?search_id=".
+                         $primrec->{id},
+             fullname=>$primrec->{fullname}
+          },
          })){
       my $r=$wf->Store($id,step=>'base::workflow::mailsend::waitforspool');
       return({msg=>'versandt'});

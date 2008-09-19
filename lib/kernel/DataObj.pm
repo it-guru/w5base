@@ -41,6 +41,7 @@ sub Clone
    my $self=shift;
    my $name=$self->Self;
    my $config=$self->Config;
+printf STDERR ("fifi Clone of $name with config=$config\n");
    return(getModuleObject($config,$name));
 }
 
@@ -1277,7 +1278,6 @@ sub getHtmlSelect
    push(@style,"width:$width");
    my $style=join(";",@style);
    $d="<select name=$name style=\"$style\"$autosubmit$multiple$size>";
-printf STDERR ("fifi @{$fld},$key\n",);
    my @l=$self->getHashList(@{$fld},$key);
    my %len=();
    foreach my $rec (@l){
