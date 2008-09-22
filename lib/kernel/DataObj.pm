@@ -41,7 +41,6 @@ sub Clone
    my $self=shift;
    my $name=$self->Self;
    my $config=$self->Config;
-printf STDERR ("fifi Clone of $name with config=$config\n");
    return(getModuleObject($config,$name));
 }
 
