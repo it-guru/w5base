@@ -254,7 +254,7 @@ sub Validate
       }
    }
    my $cistatus=effVal($oldrec,$newrec,"cistatusid");
-   $newrec->{cistatusid}=4 if ($cistatus==0);
+   $newrec->{cistatusid}=4 if (!defined($oldrec) && $cistatus==0);
    if (!$self->SUPER::Validate($oldrec,$newrec,$origrec)){
       return(0);
    }
