@@ -136,6 +136,10 @@ sub HandleFILEADD
          if (my $fid=$fo->ValidatedInsertRecord(\%rec)){
             $self->getParent->LastMsg(INFO,"ok");
             $ok=1;
+            $rec{fid}=$fid;
+            if (ref($self->{onFileAdd}) eq "CODE"){
+               &{$self->{onFileAdd}}($self,\%rec);
+            }
          }
       }
       else{

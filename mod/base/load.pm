@@ -68,16 +68,19 @@ sub Run
             $content="image/jpg";
             $func=$self->Module."/img/".$func; 
             $param{cache}=3600;
+            $param{inline}=1 if (Query->Param("inline"));
          }
          if ($ext eq "png"){
             $content="image/png";
             $func=$self->Module."/img/".$func; 
             $param{cache}=3600;
+            $param{inline}=1 if (Query->Param("inline"));
          }
          if ($ext eq "gif"){
             $content="image/gif";
             $func=$self->Module."/img/".$func; 
             $param{cache}=3600;
+            $param{inline}=1 if (Query->Param("inline"));
          }
          if ($ext eq "ico"){
             $content="image/x-icon";

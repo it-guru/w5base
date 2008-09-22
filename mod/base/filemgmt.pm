@@ -603,6 +603,10 @@ sub sendFile
       $param{filename}="file.bin";
       $contenttype=$rec->{contenttype} if ($rec->{contenttype} ne "");
       $param{filename}=$rec->{name} if ($rec->{name} ne ""); 
+      if (Query->Param("inline")){
+         $param{inline}=1;
+         $inline=1;
+      }
       $param{attachment}=!($inline); 
       $param{cache}=10; 
       my $realfile="$w5root/$config/$rec->{realfile}";

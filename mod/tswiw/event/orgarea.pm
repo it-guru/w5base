@@ -72,7 +72,7 @@ sub UpdateOrgareaStructure
    if ($account ne ""){
       $mainuser->SetFilter({accounts=>$account});
    }
-   $mainuser->SetCurrentView(qw(email groups posix));
+   $mainuser->SetCurrentView(qw(email usertyp groups posix));
    my ($urec,$msg)=$mainuser->getFirst();
    if (!defined($urec)){
       msg(ERROR,"can't load any user accounts to verifiy");
@@ -81,7 +81,8 @@ sub UpdateOrgareaStructure
    msg(DEBUG,"ok, first record loaded");
    do{
       if (defined($urec) && $urec->{email} ne "" &&
-          $urec->{email} ne 'null@null.com'){
+          $urec->{email} ne 'null@null.com' &&
+          $urec->{usertyp} eq "user"){
          my @curgrpid=();
          msg(DEBUG,"processing email addr '%s'",$urec->{email});
          if (defined($urec->{groups}) && ref($urec->{groups}) eq "ARRAY"){

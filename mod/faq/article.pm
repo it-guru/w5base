@@ -188,6 +188,7 @@ sub new
                                    
       new kernel::Field::FileList(
                 name          =>'attachments',
+                onFileAdd     =>\&onFileAdd,
                 label         =>'Attachments',
                 group         =>'attachments'),
                                    
@@ -201,6 +202,33 @@ sub new
    $self->setWorktable("faq");
    $self->{DetailY}=520;
    return($self);
+}
+
+sub onFileAdd
+{
+   my $self=shift;
+   my $rec=shift;
+   my $dataobj=$self->getParent->Clone();
+   my $parentid=$rec->{parentrefid};
+   msg(INFO,"call of onFileAdd for $rec->{name}");
+   if ($rec->{name}=~m/^screenshot.*\.jpg$/){
+      $dataobj->ResetFilter();
+      $dataobj->SetFilter({faqid=>\$parentid});
+      my ($orgrec,$msg)=$dataobj->getOnlyFirst(qw(ALL));
+      if (defined($orgrec)){
+         my $imgurl="ViewProcessor/load/attachments/".
+                    "$parentid/$rec->{fid}/$rec->{name}";
+         $dataobj->ValidatedUpdateRecord($orgrec,{data=>$orgrec->{data}.
+                  "<br clear=all>".
+                  "<a href=\"$imgurl?inline=1\" target=_blank ".
+                  "rel=\"lytebox[screenshot]\">".
+                  "<img src=\"$imgurl\" ".
+                  "align=right width=300 height=200 border=0></a>".
+                  "<b><u>$rec->{name}:</u></b><br>".
+                  "Notes<br>about the screenshot".
+                  "<br clear=all>"},{faqid=>\$parentid});
+      }
+   }
 }
 
 sub SecureSetFilter
@@ -394,8 +422,11 @@ sub getHtmlDetailPageContent
       my $q=new kernel::cgi({});
       $q->Param("$idname"=>$idval);
       my $urlparam=$q->QueryString();
+      $page="<link rel=\"stylesheet\" ".
+            "href=\"../../../static/lytebox/lytebox.css\" ".
+            "type=\"text/css\" media=\"screen\" />";
 
-      $page="<iframe style=\"width:100%;height:100%;border-width:0;".
+      $page.="<iframe style=\"width:100%;height:100%;border-width:0;".
             "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
             "src=\"FullView?$urlparam\"></iframe>";
    }
@@ -532,6 +563,9 @@ sub FullView
             "<table width=100%>".$further."</table></div>");
    }
    print(<<EOF);
+<script type="text/javascript" src="../../../static/lytebox/lytebox.js"></script>
+<link rel="stylesheet" href="../../../static/lytebox/lytebox.css" type="text/css" media="screen" />
+
 <script language="JavaScript">
 function setTitle()
 {
