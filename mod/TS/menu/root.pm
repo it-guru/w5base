@@ -193,6 +193,15 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itts.kern.costcenter",
+                      "itil::costcenter",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itts.kern.costcenter.new",
+                      "itil::costcenter",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itts.kern.projectroom",
                       "OSY::projectroom",
                       defaultacl=>['valid_user']);
