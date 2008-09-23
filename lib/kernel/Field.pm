@@ -183,7 +183,6 @@ sub addWebLinkToFacility
          if (defined($param{contextMenu})){
             $context=" cont=\"$param{contextMenu}\" ";
          }
-         $d="<div class=\"sublink\" $context onclick=$onclick>".$d."</div>";
          $d="<span class=\"sublink\" $context onclick=\"$onclick\">".
             $d."</span>";
       }

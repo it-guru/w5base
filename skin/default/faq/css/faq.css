@@ -11,6 +11,9 @@
    margin-top:2px;
    margin-bottom:2px;
 }
+.WindowTitle{
+   font-size:18px;
+}
 a:link.attlink, a:visited.attlink, a:active.attlink  {
             font-family:Arial,Adobe Helvetica,Helvetica;
             color:black;
