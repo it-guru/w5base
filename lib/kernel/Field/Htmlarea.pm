@@ -57,6 +57,7 @@ sub FormatedDetail
 <script language=JavaScript>
 tinyMCE.init({
 	mode : "textareas",
+        plugins: "clearbr",
         theme_advanced_buttons1 : "separator,"+
                                   "bold,italic,underline,strikethrough,"+
                                   "forecolor,backcolor,separator,"+
@@ -66,7 +67,7 @@ tinyMCE.init({
                                   "separator,hr,sub,sup,separator,"+
                                   "indent,outdent,separator,bullist,numlist,"+
                                   "separator",
-        theme_advanced_buttons2 : "separator,code,image,separator",
+        theme_advanced_buttons2 : "separator,code,image,separator,clearbr,bullist",
         theme_advanced_buttons3 : "",
         language : "$lang",
         theme_advanced_toolbar_align : "left",

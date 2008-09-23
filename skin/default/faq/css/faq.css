@@ -4,6 +4,11 @@
 .further{
    margin-top:15px;
 }
+.thumbnail{
+   margin:15px;
+   margin-top:2px;
+   margin-bottom:2px;
+}
 a:link.attlink, a:visited.attlink, a:active.attlink  {
             font-family:Arial,Adobe Helvetica,Helvetica;
             color:black;

@@ -148,7 +148,7 @@ div.detailfunctions{
    padding:0px;
 }
 div.multilinehtml{
-   height:204px;
+   height:304px;
    overflow:auto;
    padding:2px;
    width:99%;
@@ -198,7 +198,7 @@ pre.multilinetext {
 }
 
 textarea.multilinehtml{
-   height:200px;
+   height:300px;
    width:100%;
    margin:0px;
    padding:0px;
