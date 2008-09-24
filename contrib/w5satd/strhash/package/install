@@ -1,0 +1,5 @@
+#! /bin/sh -e
+package/packagecheck || exit 1
+package/build
+package/upgrade
+package/run

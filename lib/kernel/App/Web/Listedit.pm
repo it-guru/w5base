@@ -45,7 +45,7 @@ sub addAttach
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css'],
                            js=>['toolbox.js'],
-                           title=>'Add Inline Attachment',
+                           title=>$self->T('Add Inline Attachment'),
                            multipart=>1,
                            form=>1);
    if (Query->Param("save")){
@@ -60,6 +60,9 @@ sub addAttach
       msg(INFO,"filename=$filename");
       if ($size<512 || !($filename=~m/\.jpg$/)){
          $self->LastMsg(ERROR,"invalid file or filetype");
+      }
+      elsif ($size>3145728){
+         $self->LastMsg(ERROR,"file is larger then the limit of 3MB");
       }
       else{
          my $newrec={parentobj=>$self->Self(),
@@ -1059,7 +1062,8 @@ sub Detail
                                                   -path=>"/",
                                                   -value=>$p));
    print $self->HtmlHeader(style=>['default.css','mainwork.css',
-                                   'kernel.TabSelector.css'],
+                                   'kernel.TabSelector.css',
+                                   '../../../static/lytebox/lytebox.css'],
                            body=>1,form=>1);
    if (!defined($rec)){
       print $self->getParsedTemplate("tmpl/kernel.notfound",{skinbase=>'base'});

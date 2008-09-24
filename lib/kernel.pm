@@ -601,7 +601,8 @@ sub _mkInlineAttachment
 {
    my $id=shift;
    my $d="<img height=80 src=\"../../base/filemgmt/load/inline/$id\">";
-   $d="<a href=\"../../base/filemgmt/load/inline/$id\" target=_blank>$d</a>";
+   $d="<a rel=\"lytebox[inline]\" href=\"../../base/filemgmt/load/inline/thumbnail/$id\" ".
+      "target=_blank>$d</a>";
    return($d);
 }
 sub mkInlineAttachment

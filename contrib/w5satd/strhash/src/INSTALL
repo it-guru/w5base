@@ -1,0 +1,73 @@
+
+                            How to install strhash
+     _________________________________________________________________
+   
+                                  DESCRIPTION
+                                       
+   This document describes how to download, compile, test and install
+   strhash.
+     _________________________________________________________________
+   
+System requirements:
+
+   The strhash package is meant to be compiled under UNIX and
+   -lookalikes. The library source files should compile with any ANSI C
+   compiler.
+     _________________________________________________________________
+   
+Downloading strhash:
+
+   The latest published strhash package is [1]strhash-0.6.0.tar.gz.
+     _________________________________________________________________
+   
+Unpack the package:
+
+  gunzip strhash-0.6.0.tar.gz
+  tar -xf strhash-0.6.0.tar
+  cd strhash-0.6.0
+     _________________________________________________________________
+   
+Compile the programs:
+
+   $ make
+     _________________________________________________________________
+   
+How to test:
+
+   $ make check
+   This runs a couple of small self checks.
+     _________________________________________________________________
+   
+Actual installation of strhash:
+
+   Only the manual pages are installed. The library source files are not
+   automatically installed, you have to copy them into your project by
+   hand.
+   
+   As root, install the manual pages under /usr/local:
+   
+   $ make install
+   
+   Alternatively you may install them into a different place:
+   
+   $ make nochown=true prefix=/home/me install
+     _________________________________________________________________
+   
+How to report success: (not mandatory)
+
+   $ make REALNAME=``My Name'' systype $ make REALNAME=``My Name''
+   systype |mail uwe-generic-counter@ohse.de
+   
+   do not send any email unless the checks were successful, please.
+   
+                                   SEE ALSO
+                                       
+  [2]Software by Uwe Ohse
+  
+  [3]The strhash package
+
+References
+
+   1. file://localhost/home/uwe/work/strhash/strhash-0.6.0.tar.gz
+   2. file://localhost/home/uwe/work/software.html
+   3. file://localhost/home/uwe/work/strhash.html

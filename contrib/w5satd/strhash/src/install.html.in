@@ -1,0 +1,79 @@
+<HTML>
+<HEAD>
+<TITLE>How to install strhash</TITLE>
+</HEAD>
+
+<BODY>
+
+<P>
+<H1>How to install strhash</H1>
+
+<P>
+<HR>
+<H1><A NAME="DESCRIPTION">DESCRIPTION</A></H1>
+<P>
+This document describes how to download, compile, test and install strhash.
+
+<P>
+<HR>
+<H2>System requirements:</H2>
+The strhash package is meant to be compiled under UNIX and -lookalikes.
+The library source files should compile with any ANSI C compiler.
+<P>
+<HR>
+<H2>Downloading strhash:</H2>
+The latest published strhash package is
+<a href="@PACKAGE_VERSION@.tar.gz">@PACKAGE_VERSION@.tar.gz</a>.
+
+<P>
+<HR>
+<H2>Unpack the package:</H2>
+<P>
+<PRE>  gunzip @PACKAGE_VERSION@.tar.gz
+  tar -xf @PACKAGE_VERSION@.tar
+  cd @PACKAGE_VERSION@
+</PRE>
+<P>
+<HR>
+<H2>Compile the programs:</H2>
+<P>
+<CODE>$ make</CODE>
+<br>
+<P>
+<HR>
+<H2>How to test:</H2>
+<P>
+<CODE>$ make check</CODE>
+<br> This runs a couple of small self checks.
+<P>
+<HR>
+<H2>Actual installation of @PACKAGE@:</H2>
+Only the manual pages are installed. The library source files are
+not automatically installed, you have to copy them into your 
+project by hand.
+<p>
+
+As root, install the manual pages under /usr/local:</H2>
+<P>
+<CODE>$ make install</CODE>
+<P>
+Alternatively you may install them into a different place:
+
+<P>
+<CODE>$ make nochown=true prefix=/home/me install</CODE>
+
+<P>
+<HR>
+<H2>How to report success: (not mandatory)</H2>
+<P>
+<CODE>$ make REALNAME=``My Name'' systype $ make REALNAME=``My Name'' systype
+|mail uwe-generic-counter@ohse.de</CODE>
+<P>
+do not send any email unless the checks were successful, please.
+
+<H1><A NAME="SEE_ALSO">SEE ALSO</A></H1>
+<h3><a href="../software.html">Software by Uwe Ohse</a></h3>
+<h3><a href="../strhash.html">The strhash package</a></h3>
+
+</BODY>
+</HTML>

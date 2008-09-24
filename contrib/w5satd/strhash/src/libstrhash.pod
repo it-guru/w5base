@@ -1,0 +1,217 @@
+=for html <a href="../uwe.html">Uwe Ohse</a> /
+<a href="../software.html">software</a> /
+<a href="../strhash.html">the strhash package</a>
+
+=head1 NAME
+
+strhash - hash table library using strings as keys
+
+=head1 SYNOPSIS
+
+#include "strhash.h"
+
+int B<strhash_create>(strhash *table, unsigned int mod, 
+unsigned int startsize, strhash_hashfunc);
+
+void B<strhash_destroy>(strhash *table);
+
+uint32 B<strhash_hash>(const char *key, unsigned int len);
+
+int B<strhash_enter> (strhash *table,
+int keyalloc, const char *key, uint32 keylen,
+int dataalloc, const char *data, uint32 datalen);
+
+void B<strhash_lookupstart>(strhash *table);
+
+int B<strhash_lookupnext>(strhash *table,
+const char *key, uint32 keylen,
+char **data, uint32 *datalen);
+
+int B<strhash_lookup>(strhash *table,
+const char *key, uint32 keylen,
+char **data, uint32 *datalen);
+
+void B<strhash_delete>(strhash *table);
+
+int B<strhash_change>(strhash *table,
+int dataalloc, const char *data, uint32 datalen);
+
+void B<strhash_walkstart>(strhash *table);
+
+int B<strhash_walk>(strhash *table, 
+char **key, uint32 *keylen,
+char **data, uint32 *datalen);
+
+#include "strhash_io.h"
+
+int B<strhash_load>(strhash *table, buffer *b);
+
+int B<strhash_save>(strhash *table, buffer *b);
+
+=head1 DESCRIPTION
+
+A strhash is an associative array, mapping keys to values. Keys and values 
+may be strings of up to 2 gigabytes (2^31) bytes of length, containing
+any possibly character. Keys need not be unique.
+
+=head1 FUNCTIONS
+
+=over 8
+
+=item B<strhash_create>
+
+creates a hash table. I<mod> is the table split
+to use. I<startsize> is the starting size of a second level table. 
+I<hashfunc> is a hashing function.
+
+B<strhash_create> returns -1 in case of an error. 
+
+=item B<strhash_destroy>
+
+destroys a hash table, freeing all memory
+used by it. The I<table> must not be used for further lookups, but may
+be used as argument to B<strhash_create> to create a new table.
+I<startsize> is the starting slot size. I<hashfunc> is a hashing
+function.
+
+=item B<strhash_hash>
+
+is a hash function. It's neither very good nor very bad, but is quite fast.
+CRC based algorithms usually give a better key distribution.
+
+Note: The B<strhash> library uses the modulus of the I<hash> and 
+the table split factor (in C terms: hash%mod) to select a second level
+table, and uses the remainder of the hash (hash / mod) modulus the
+second level size as a index into the second level table.
+
+=item B<strhash_enter>
+
+enters data into the table I<table>. 
+The key is described by I<key> and I<keylen>, the value by I<data>
+and I<datalen>. 
+
+If I<keyalloc> is set then B<strhash_enter> creates a copy of the
+key, otherwise B<strhash_enter> creates a reference to the key.
+I<key> and I<keylen> may be NULL respectively 0 if I<keyalloc>
+is not set (0).
+
+If I<dataalloc> is set then B<strhash_enter> creates a copy of the
+value, otherwise B<strhash_enter> creates a reference to the value.
+I<data> and I<datalen> may be NULL respectively 0 if I<dataalloc>
+is not set (0).
+
+B<strhash_enter> returns -1 in case of trouble, setting I<errno>
+appropriately. I<ENOENT> means that either I<datalen> or I<keylen>
+exceeded 31 bits. I<ENOMEM> means that strhash_enter ran out of
+memory.
+
+B<strhash_enter> returns 1 if can enter the new key.
+
+=item B<strhash_lookupstart>
+
+starts a new search.
+
+=item B<strhash_lookupnext>
+
+looks for the next record with key B<key> and B<keylen> in the table.
+It returns 1 if it finds the record; otherwise it returns 0. 
+All calls to B<strhash_lookupnext> must use the same B<key> and B<keylen>
+as the first call after B<strhash_lookupstart>.
+
+After B<strhash_lookupnext> returned 0 no further lookup may be done
+without first calling B<strhash_lookupstart>.
+
+If B<data> is not a NULL pointer then B<strhash_lookupnext> will put
+a pointer to the value into B<*data>. If B<datalen> is not a NULL
+pointer then B<strhash_lookupnext> will put a pointer to the values
+length into B<*datalen>.
+
+=item B<strhash_lookup>
+
+first calls B<strhash_lookupstart> and then calls B<strhash_lookupnext>.
+
+=item B<strhash_delete>
+
+deletes the record found by the last B<strhash_lookupnext> operation.
+
+=item B<strhash_change>
+
+changes the value of the record found by the last B<strhash_lookupnext>
+operation. It will create a copy of I<data> if I<dataalloc> is set,
+or store a reference to I<data> otherwise.
+
+=item B<strhash_walkstart>
+
+starts an operation to walk through the table.
+
+=item B<strhash_walk>
+
+walks through the table, returning for every record in it.
+It returns 1 if a record is found, and 0 otherwise.
+
+If 1 is returned then pointers to and length of key and
+value of the record are stored in the appropriate parameter, 
+provided it's not a NULL pointer.
+
+=item B<strhash_load>
+
+appends the content of the buffer to the hash. In case of
+trouble it sets I<errno> and returns -1. I<EPROTO> means that the buffers
+content was badly formatted.
+
+=item B<strhash_save>
+
+saves the content of the hash to the buffer. In case of
+trouble it sets I<errno> and returns -1.
+
+=back
+
+=head1 LAYOUT
+
+The top level hash table contains I<mod> slots (where I<mod> is 
+an argument given to the B<strhash_create> function). Each slot
+points to a second level table or to NULL if the second level
+table is still empty (unused). 
+
+Each second level table is allocated as soon as it is needed. It
+holds a number of pointers to B<entries>. The library grows the
+second level tables so that they are never more than 50% of the
+pointers in use. The library doesn't reduce the size of a second
+level table.
+
+Each B<entry> holds the hash of the key, a pointer to the data,
+then length of the data, the length of the key and either the
+key or a pointer to a key.
+
+=head1 MEMORY USAGE
+
+In short: quite high. On a system where pointers a 32 bits long
+each record eats 20 bytes for the entry, between 8 and 12 bytes 
+for the second level table, plus the size of the key and the value. 
+
+For short keys or data of less then a pointer size length the
+memory needed is somewhat lower.
+
+Additional memory is used during table splits.
+
+Note: the malloc implementation in the C standard library may
+waste additional memory.
+
+=head1 LIMITS
+
+=over 8
+
+=item keys are limited to 31 bits of length.
+
+=item values are limited to 31 bits of length.
+
+=item the order of records is not preserved.
+
+=back
+
+=head1 SEE ALSO
+
+L<S<Integration - how to integrate strhash into your projects: strhash-integration(3)>|integration>.
+
+=for html <hr><h4><a href="../uwe.html">Uwe Ohse homepage</a></h4>
+<h3><a href="../strhash.html">the strhash homepage</a></h3>

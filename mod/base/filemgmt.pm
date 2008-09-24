@@ -599,6 +599,7 @@ sub sendFile
    my $self=shift;
    my $id=shift;
    my $inline=shift;
+   my $thumbnail=shift;
    my $config=$self->Config->getCurrentConfigName();
    my $w5root=$self->Config->Param("W5DOCDIR");
 
@@ -665,14 +666,18 @@ sub load
    my $self=shift;
    my @fp=split(/\//,Query->Param("FunctionPath"));  
    my $inline=0;
+   my $thumbnail=0;
    while($#fp>0){
+      if ($fp[0] eq "thumbnail"){
+         $thumbnail=1;
+      }
       if ($fp[0] eq "inline"){
          $inline=1;
       }
       shift(@fp);
    }
    my $id=$fp[0];
-   $self->sendFile($id,$inline);
+   $self->sendFile($id,$inline,$thumbnail);
 }
 
 sub RemoveFile

@@ -1,0 +1,130 @@
+=for html <a href="../uwe.html">Uwe Ohse</a> /
+<a href="../software.html">software</a> /
+<a href="../strhash.html">the strhash package</a>
+
+=head1 NAME
+
+strhash-integration - how to integrate strhash into your projects
+
+=head1 DATA TYPES
+
+=head2 uint32
+
+is a 32bit unsigned integer type. On many systems you can use:
+
+  #include <inttypes.h>
+  #define uint32 uint32_t
+
+to get a definition. This is still somewhat unportable, unfortunately.
+Do not use unsigned int or unsigned long carelessly.
+
+=head1 INTEGRATION
+
+=head2 Header files
+
+strhash.h includes uint32.h, which is expected to define the uint32
+type. The uint32.h provided with the library source may be used together
+with GNU autoconf.
+
+strhash_io.h provides prototypes for strhash_load and strhash_save.
+
+I used the following invocation of autoconf magic for it, back when i
+used autoconf:
+
+	AC_CHECK_SIZEOF(unsigned short,2)
+	AC_CHECK_SIZEOF(short,2)
+	AC_CHECK_SIZEOF(int,4)
+	AC_CHECK_SIZEOF(unsigned int,4)
+	AC_CHECK_SIZEOF(long,4)
+	AC_CHECK_SIZEOF(unsigned long,4)
+	AC_CHECK_SIZEOF(long long,0)
+	AC_CHECK_SIZEOF(unsigned long long,0)
+
+If C<HAVE_CONFIG_H> is not defined then B<auto-typesize.h> has to
+define the following C macros, possibly to other values:
+
+	#define SIZEOF_SHORT 2
+	#define SIZEOF_INT 4
+	#define SIZEOF_LONG 4
+	#define SIZEOF_UNSIGNED_SHORT 2
+	#define SIZEOF_UNSIGNED_INT 4
+	#define SIZEOF_UNSIGNED_LONG 4
+	#define SIZEOF_LONG_LONG 8
+	#define SIZEOF_UNSIGNED_LONG_LONG 8
+
+If C<HAVE_CONFIG_H> is defined then B<config.h> has to be included before
+uint32.h.
+
+=head2 Source files
+
+Each strhash function of non-trivial size comes in an own source file.
+All files include another header besides "strhash.h": "I<strhashi.h>",
+which defines some internally used macros and functions.
+
+You only need to include those function you really use - with the
+exception of B<strhash_get>, which is used by B<strhash_lookup*>
+and B<strhash_walk*> functions.
+
+=over 8
+
+=item strhash_chng.c
+
+contains B<strhash_change>.
+
+=item strhash_crea.c
+
+contains B<strhash_create>.
+
+=item strhash_del.c
+
+contains B<strhash_delete>.
+
+=item strhash_dest.c
+
+contains B<strhash_destroy>.
+
+=item strhash_ente.c
+
+contains B<strhash_enter>.
+
+=item strhash_get.c
+
+contains B<strhash_get>, a function used by strhash_look.c and strhash_walk.c.
+
+=item strhash_hash.c
+
+contains B<strhash_hash>.
+
+=item strhash_look.c
+
+contains B<strhash_lookupstart>, B<strhash_lookupnext> and B<strhash_lookup>.
+
+=item strhash_walk.c
+
+contains B<strhash_walkstart> and B<strhash_walk>.
+
+=item strhash_load.c
+
+contains B<strhash_load>. Note that B<strhash_load> depends on the buffer,
+stralloc and byte interfaces and is not useful without them.
+
+=item strhash_save.c
+
+contains B<strhash_save>. Note that B<strhash_save> depends on the buffer,
+stralloc and byte interfaces and is not useful without them.
+
+=back
+
+=head1 DJB STYLE LIBRARIES
+
+If you choose to not use the standard C library functions then you may
+define the C<DJBLIBS> symbol before compiling the library files. This
+will make the library use I<alloc>, I<alloc_free> and I<byte_copy>
+instead of I<malloc>, I<free> and I<memcpy>.
+
+=head1 SEE ALSO
+
+L<S<The strhash library interface: libstrhash(3)>|libstrhash>,
+
+=for html <hr><h4><a href="../uwe.html">Uwe Ohse homepage</a></h4>
+<h3><a href="../strhash.html">the strhash homepage</a></h3>
