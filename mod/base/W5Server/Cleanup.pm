@@ -33,7 +33,7 @@ sub process
       if (defined($nextrun) && $nextrun<=time()){
          $self->doCleanup();
          $self->CleanupWorkflows();
-         $self->CleanupInlineAttachments();
+       #  $self->CleanupInlineAttachments(); tests are needed !!!
          sleep(1);
       }
       my $current=time();
