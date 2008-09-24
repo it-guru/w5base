@@ -79,7 +79,8 @@ use Unicode::String qw(utf8 latin1 utf16);
 @EXPORT = qw(&Query &LangTable &globalContext &NowStamp &CalcDateDuration
              &trim &rtrim &ltrim &hash2xml &effVal &Debug &UTF8toLatin1
              &Datafield2Hash &Hash2Datafield &CompressHash
-             &unHtml &quoteHtml &quoteQueryString &Dumper &FancyLinks
+             &unHtml &quoteHtml &quoteQueryString &Dumper 
+             &FancyLinks &mkInlineAttachment
              &getModuleObject &getConfigObject &generateToken
              &isDataInputFromUserFrontend
              &msg &ERROR &WARN &DEBUG &INFO &OK &utf8 &latin1 &utf16);
@@ -593,6 +594,21 @@ sub FancyLinks
 #   $data=~s/&lt;w5ITALIC&gt;/<i>/ig;
 #   $data=~s/&lt;\/w5ITALIC&gt;/<\/i>/ig;
 
+   return($data);
+}
+
+sub _mkInlineAttachment
+{
+   my $id=shift;
+   my $d="<img height=80 src=\"../../base/filemgmt/load/inline/$id\">";
+   $d="<a href=\"../../base/filemgmt/load/inline/$id\" target=_blank>$d</a>";
+   return($d);
+}
+sub mkInlineAttachment
+{
+   my $data=shift;
+   $data=~s#\[attachment\((\d+)\)\]#_mkInlineAttachment($1)#ge;
+   printf STDERR ("fifi mkInlineAttachment data=$data\n");
    return($data);
 }
 

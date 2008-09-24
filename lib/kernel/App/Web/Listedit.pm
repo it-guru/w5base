@@ -38,13 +38,64 @@ sub new
    return($self);
 }  
 
+sub addAttach
+{
+   my $self=shift;
+  
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css'],
+                           js=>['toolbox.js'],
+                           title=>'Add Inline Attachment',
+                           multipart=>1,
+                           form=>1);
+   if (Query->Param("save")){
+      no strict;
+      my $f=Query->Param("file");
+      msg(INFO,"got filetransfer request ref=$f");
+      my $bk=seek($f,0,SEEK_SET);
+      (undef,undef,undef,undef,undef,undef,undef,
+       $size,$atime,$mtime,$ctime,$blksize,$blocks)=stat($f);
+      msg(INFO,"size=$size");
+      my $filename=sprintf("%s",$f);
+      msg(INFO,"filename=$filename");
+      if ($size<512 || !($filename=~m/\.jpg$/)){
+         $self->LastMsg(ERROR,"invalid file or filetype");
+      }
+      else{
+         my $newrec={parentobj=>$self->Self(),
+                     inheritrights=>0,
+                     srcsys=>"inline",
+                     name=>$filename,
+                     file=>$f};
+         my $filemgmt=getModuleObject($self->Config,"base::filemgmt");
+         if (my ($id)=$filemgmt->ValidatedInsertRecord($newrec)){
+            print "<script language=\"javascript\">";
+            print "if (parent.currentObject){";
+            print "   insertAtCursor(parent.currentObject,". 
+                  "\" [attachment($id)] \");";
+            print "}";
+            print "else{";
+            print "  alert(\"can not find currentObject\");";
+            print "}";
+            print "parent.hidePopWin(true,false);";
+            print "</script>";
+            print $self->HtmlBottom(form=>1);
+         }
+      }
+   }
+   print $self->getParsedTemplate("tmpl/addTextareaAttachment");
+   print $self->HtmlBottom(form=>1);
+}
+
+
+
 sub getValidWebFunctions
 {  
    my ($self)=@_;
    if (!$self->{IsFrontendInitialized}){
       $self->{IsFrontendInitialized}=$self->FrontendInitialize();
    }
-   my @l=qw(NativMain Main MainWithNew 
+   my @l=qw(NativMain Main MainWithNew addAttach
             NativResult Result Upload UploadWelcome UploadFrame
             Welcome Empty Detail HtmlDetail HandleInfoAboSubscribe
             New Copy FormatSelect Bookmark startWorkflow

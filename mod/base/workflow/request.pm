@@ -568,51 +568,54 @@ sub generateWorkspacePages
    my $class="display:none;visibility:hidden";
 
    if (grep(/^wfacceptp$/,@$actions)){
-      $$selopt.="<option value=\"wfacceptp\" class=\"$class\">".
+      $$selopt.="<option value=\"wfacceptp\">".
                 $self->getParent->T("wfacceptp",$tr).
                 "</option>\n";
-      $$divset.="<div id=OPwfacceptp>".$self->getDefaultNoteDiv($WfRec,$actions).
+      $$divset.="<div id=OPwfacceptp class=\"$class\">".
+                $self->getDefaultNoteDiv($WfRec,$actions).
                 "</div>";
    }
    if (grep(/^wfacceptn$/,@$actions)){
-      $$selopt.="<option value=\"wfacceptn\" class=\"$class\">".
+      $$selopt.="<option value=\"wfacceptn\">".
                 $self->getParent->T("wfacceptn",$tr).
                 "</option>\n";
-      $$divset.="<div id=OPwfacceptn>".$self->getDefaultNoteDiv($WfRec,$actions).
+      $$divset.="<div id=OPwfacceptn class=\"$class\">".
+                $self->getDefaultNoteDiv($WfRec,$actions).
                 "</div>";
    }
    if (grep(/^wfapprove$/,@$actions)){
-      $$selopt.="<option value=\"wfapprove\" class=\"$class\">".
+      $$selopt.="<option value=\"wfapprove\">".
                 $self->getParent->T("wfapprove",$tr).
                 "</option>\n";
-      $$divset.="<div id=OPwfapprove><textarea name=note ".
+      $$divset.="<div id=OPwfapprove class=\"$class\"><textarea name=note ".
                 "style=\"width:100%;height:110px\"></textarea></div>";
    }
    if (grep(/^wfaccept$/,@$actions)){
-      $$selopt.="<option value=\"wfaccept\" class=\"$class\">".
+      $$selopt.="<option value=\"wfaccept\">".
                 $self->getParent->T("wfaccept",$tr).
                 "</option>\n";
-      $$divset.="<div id=OPwfaccept></div>";
+      $$divset.="<div id=OPwfaccept class=\"$class\"></div>";
    }
    if (grep(/^wffine$/,@$actions)){
-      $$selopt.="<option value=\"wffine\" class=\"$class\">".
+      $$selopt.="<option value=\"wffine\">".
                 $self->getParent->T("wffine",$tr).
                 "</option>\n";
-      $$divset.="<div id=OPwffine style=\"margin:15px\"><br>".
+      $$divset.="<div id=OPwffine style=\"$class;margin:15px\"><br>".
                 $self->getParent->T("use this action,".
                 " to finish this request and mark it as according to ".
                 "desire processed")."</div>";
    }
    if (grep(/^wffineproc$/,@$actions)){
-      $$selopt.="<option value=\"wffineproc\" class=\"$class\">".
+      $$selopt.="<option value=\"wffineproc\">".
                 $self->getParent->T("wffineproc",$tr).
                 "</option>\n";
       my $note=Query->Param("note");
-      $$divset.="<div id=OPwffineproc>".$self->getDefaultNoteDiv($WfRec,$actions).
+      $$divset.="<div id=OPwffineproc class=\"$class\">".
+                $self->getDefaultNoteDiv($WfRec,$actions).
                 "</div>";
    }
    if (grep(/^wfreprocess$/,@$actions)){
-      $$selopt.="<option value=\"wfreprocess\" class=\"$class\">".
+      $$selopt.="<option value=\"wfreprocess\">".
                 $self->getParent->T("wfreprocess",$tr).
                 "</option>\n";
       my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
@@ -641,20 +644,20 @@ sub generateWorkspacePages
       $$selopt.="<option value=\"wfcallback\" class=\"$class\">".
                 $self->getParent->T("wfcallback",$tr).
                 "</option>\n";
-      $$divset.="<div id=OPwfcallback style=\"margin:15px\"><br>".
+      $$divset.="<div id=OPwfcallback style=\"$class;margin:15px\"><br>".
                 $self->getParent->T("use this action,".
                 " to call the request back. This can be usefull, if the ".
                 "request needs to be corrected.")."</div>";
    }
    if (grep(/^wfreject$/,@$actions)){
-      $$selopt.="<option value=\"wfreject\" class=\"$class\">".
+      $$selopt.="<option value=\"wfreject\">".
                 $self->getParent->T("wfreject",$tr).
                 "</option>\n";
-      $$divset.="<div id=OPwfreject><textarea name=note ".
+      $$divset.="<div id=OPwfreject class=\"$class\"><textarea name=note ".
                 "style=\"width:100%;height:110px\"></textarea></div>";
    }
    if (grep(/^wfapprovalreq$/,@$actions)){
-      $$selopt.="<option value=\"wfapprovalreq\" class=\"$class\">".
+      $$selopt.="<option value=\"wfapprovalreq\">".
                 $self->getParent->T("wfapprovalreq",$tr).
                 "</option>\n";
       my $note=Query->Param("note");
@@ -666,10 +669,10 @@ sub generateWorkspacePages
           "<td>\%approverrequest(detail)\%".
           "</td></tr>";
       $d.="</table>";
-      $$divset.="<div id=OPwfapprovalreq>$d</div>";
+      $$divset.="<div id=OPwfapprovalreq class=\"$class\">$d</div>";
    }
    if (grep(/^wfapprovok$/,@$actions)){
-      $$selopt.="<option value=\"wfapprovok\" class=\"$class\">".
+      $$selopt.="<option value=\"wfapprovok\">".
                 $self->getParent->T("wfapprovok",$tr).
                 "</option>\n";
       my $note=Query->Param("note");
@@ -679,10 +682,10 @@ sub generateWorkspacePages
       $d.="<tr><td colspan=2>Ja, ich bin sicher, dass ich diese Anforderung ".
           "genehmigen möchte <input name=VERIFY type=checkbox></td></tr>";
       $d.="</table>";
-      $$divset.="<div id=OPwfapprovok>$d</div>";
+      $$divset.="<div id=OPwfapprovok class=\"$class\">$d</div>";
    }
    if (grep(/^wfapprovreject$/,@$actions)){
-      $$selopt.="<option value=\"wfapprovreject\" class=\"$class\">".
+      $$selopt.="<option value=\"wfapprovreject\">".
                 $self->getParent->T("wfapprovreject",$tr).
                 "</option>\n";
       my $note=Query->Param("note");
@@ -690,10 +693,10 @@ sub generateWorkspacePages
          "<td colspan=2><textarea name=note style=\"width:100%;height:70px\">".
          $note."</textarea></td></tr>";
       $d.="</table>";
-      $$divset.="<div id=OPwfapprovreject>$d</div>";
+      $$divset.="<div id=OPwfapprovreject class=\"$class\">$d</div>";
    }
    if (grep(/^wfapprovalcan$/,@$actions)){
-      $$selopt.="<option value=\"wfapprovalcan\" class=\"$class\">".
+      $$selopt.="<option value=\"wfapprovalcan\">".
                 $self->getParent->T("wfapprovalcan",$tr).
                 "</option>\n";
       my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
@@ -704,7 +707,7 @@ sub generateWorkspacePages
       #    "<td>\%approverrequest(detail)\%".
       #    "</td></tr>";
       $d.="</table>";
-      $$divset.="<div id=OPwfapprovalcan>$d</div>";
+      $$divset.="<div id=OPwfapprovalcan class=\"$class\">$d</div>";
    }
    return($self->SUPER::generateWorkspacePages($WfRec,$actions,
                                                $divset,$selopt));

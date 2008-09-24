@@ -2,17 +2,27 @@
    margin-top:15px;
 }
 .further{
-   margin-top:15px;
-   padding:5px;
+   margin:5px;
+   margin-top:50px;
    background-color:lightgray;
+   width:80%;
+   overflow:auto;
 }
 .thumbnail{
    margin:15px;
    margin-top:2px;
    margin-bottom:2px;
 }
-.WindowTitle{
+#WindowTitle{
    font-size:18px;
+   text-weight:bold;
+}
+#WindowSignature{
+   margin-top:10px;
+   font-size:10px;
+   text-align:right;
+   display:none;
+   visibility:hidden;
 }
 a:link.attlink, a:visited.attlink, a:active.attlink  {
             font-family:Arial,Adobe Helvetica,Helvetica;
@@ -21,6 +31,10 @@ a:link.attlink, a:visited.attlink, a:active.attlink  {
           }
 
 @media print {
+   #WindowSignature{
+      display:block;
+      visibility:visible;
+   }
    .further{
       display:none;
       visibility:hidden;

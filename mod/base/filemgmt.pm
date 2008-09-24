@@ -179,6 +179,19 @@ sub new
                                    label      =>'ParentID',
                                    dataobjattr=>'filemgmt.parentid'),
 
+      new kernel::Field::Link(     name       =>'viewcount',
+                                   label      =>'ViewCount',
+                                   dataobjattr=>'filemgmt.viewcount'),
+
+      new kernel::Field::Date(     name       =>'viewlast',
+                                   label      =>'ViewLast',
+                                   group      =>'source',
+                                   dataobjattr=>'filemgmt.viewlast'),
+
+      new kernel::Field::Link(     name       =>'viewfreq',
+                                   label      =>'ViewFreq',
+                                   dataobjattr=>'filemgmt.viewfreq'),
+
       new kernel::Field::Text(     name       =>'realfile',
                                    group      =>'source',
                                    label      =>'Realfile',
@@ -598,7 +611,34 @@ sub sendFile
    }
    if (defined($rec)){
       my %param=();
-      printf STDERR ("rec=%s\n",Dumper($rec));
+      #######################################################################
+      # häufigkeits Berechnung - erster Versuch
+      #
+      my $now=NowStamp("en");
+      my $viewfreq=defined($rec->{viewfreq}) ? $rec->{viewfreq}: 100;
+      if ($rec->{viewlast} ne ""){
+         my $t=CalcDateDuration($rec->{viewlast},$now,"GMT");
+         if ($t->{totalseconds}>15120000){  # halbes Jahr
+            $viewfreq=$viewfreq*0.2;
+         }
+         elsif ($t->{totalseconds}>604800){  # woche
+            $viewfreq=$viewfreq*0.3;
+         }
+         elsif ($t->{totalseconds}>86400){  # tag
+            $viewfreq=$viewfreq*0.8;
+         }
+         elsif ($t->{totalseconds}>3600){
+            $viewfreq=$viewfreq*1.3;
+         }
+         else{
+            $viewfreq=$viewfreq*1.05;
+         }
+         $viewfreq=int($viewfreq);
+      }
+      #######################################################################
+      $self->UpdateRecord({viewcount=>$rec->{viewcount}+1,
+                           viewlast=>$now,
+                           viewfreq=>$viewfreq},{fid=>$id});
       my $contenttype="application/octet-bin";
       $param{filename}="file.bin";
       $contenttype=$rec->{contenttype} if ($rec->{contenttype} ne "");

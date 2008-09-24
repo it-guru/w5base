@@ -110,7 +110,7 @@ sub ViewArea    # for module defined view areas (f.e. javascript areas)
       "<tr><td><img class=printspacer style=\"float:left\" ".
       "src=\"../../../public/base/load/empty.gif\" width=1 height=100>".
       "<div class=multilinetext>".
-      "<pre class=multilinetext>".FancyLinks($d).
+      "<pre class=multilinetext>".mkInlineAttachment(FancyLinks($d)).
       "</pre></div></td></tr></table>";
    return($d);
 }

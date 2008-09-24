@@ -46,3 +46,6 @@ alter table filemgmt add inheritrights int(1) default '1';
 alter table fileacl add comments   longtext;
 alter table fileacl add expiration datetime;
 alter table fileacl add alertstate varchar(10);
+alter table filemgmt add viewcount int(20) not null;
+alter table filemgmt add viewlast  datetime default NULL, add key(viewlast);
+alter table filemgmt add viewfreq  int(20)  default NULL;

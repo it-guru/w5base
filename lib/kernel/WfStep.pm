@@ -383,6 +383,7 @@ sub generateWorkspace
    }
    my $pa=$self->getParent->T("posible action");
    my $tabheight=$wsheight-30;
+   $tabheight=30 if ($tabheight<30);  # ensure, that tabheigh is not negativ
    $templ=<<EOF;
 <table width=100% height=$tabheight border=0 cellspacing=0 cellpadding=0>
 <tr height=1%><td width=1% nowrap>$pa &nbsp;</td>
@@ -431,7 +432,7 @@ sub generateWorkspacePages
    my $class="display:none;visibility:hidden";
 
    if (grep(/^wfforward$/,@$actions)){
-      $$selopt.="<option value=\"wfforward\" class=\"$class\">".
+      $$selopt.="<option value=\"wfforward\">".
                 $self->getParent->T("wfforward",$tr).
                 "</option>\n";
       my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
@@ -443,7 +444,7 @@ sub generateWorkspacePages
           "<td>\%fwdtargetname(detail)\%".
           "</td>";
       $d.="</tr></table>";
-      $$divset.="<div id=OPwfforward>$d</div>";
+      $$divset.="<div id=OPwfforward class=\"$class\">$d</div>";
    }
    if (grep(/^nop$/,@$actions)){  # put nop NO-Operation at the begin of list
       $$selopt="<option value=\"nop\" class=\"$class\">".
@@ -455,7 +456,7 @@ sub generateWorkspacePages
                 $$divset;
    }
    if (grep(/^wfmailsend$/,@$actions)){
-      $$selopt.="<option value=\"wfmailsend\" class=\"$class\">".
+      $$selopt.="<option value=\"wfmailsend\">".
                 $self->getParent->T("wfmailsend",$tr).
                 "</option>\n";
       my $d="<table width=100% border=0 cellspacing=0 cellpadding=0>".
@@ -475,22 +476,23 @@ sub generateWorkspacePages
          "style=\"width:100%;height:80px\">".
          "</textarea></td></tr>";
       $d.="</table>";
-      $$divset.="<div id=OPwfmailsend>$d</div>";
+      $$divset.="<div id=OPwfmailsend class=\"$class\">$d</div>";
    }
    if (grep(/^wfaddnote$/,@$actions)){
-      $$selopt.="<option value=\"wfaddnote\" class=\"$class\">".
+      $$selopt.="<option value=\"wfaddnote\">".
                 $self->getParent->T("wfaddnote",$tr).
                 "</option>\n";
       my $note=Query->Param("note");
-      $$divset.="<div id=OPwfaddnote>".$self->getDefaultNoteDiv($WfRec,$actions).
+      $$divset.="<div id=OPwfaddnote class=\"$class\">".
+                $self->getDefaultNoteDiv($WfRec,$actions).
                 "</div>";
    }
    if (grep(/^wfdefer$/,@$actions)){
-      $$selopt.="<option value=\"wfdefer\" class=\"$class\">".
+      $$selopt.="<option value=\"wfdefer\">".
                 $self->getParent->T("wfdefer",$tr).
                 "</option>\n";
-      $$divset.="<div id=OPwfdefer>".$self->getDefaultNoteDiv($WfRec,$actions,
-                                                              mode=>"defer").
+      $$divset.="<div id=OPwfdefer class=\"$class\">".
+                $self->getDefaultNoteDiv($WfRec,$actions,mode=>"defer").
                 "</div>";
    }
 
@@ -572,6 +574,7 @@ sub getDefaultNoteDiv
    my $note=Query->Param("note");
    my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
          "<td colspan=2><textarea name=note ".
+         "onkeydown=\"textareaKeyHandler(this,event);\" ".
          "style=\"width:100%;height:${noteheight}px\">".
          $note."</textarea></td></tr>";
    if ($mode eq "addnote"){

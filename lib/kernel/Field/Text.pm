@@ -55,9 +55,7 @@ sub FormatedDetail
    }
    $d=[$d] if (ref($d) ne "ARRAY");
    if ($mode eq "HtmlDetail"){
-printf STDERR ("fifi 1self=$self->{name} %s\n",Dumper($d));
       $d=[map({$self->addWebLinkToFacility(quoteHtml($_),$current)} @{$d})];
-printf STDERR ("fifi 2self=$self->{name} %s\n",Dumper($d));
    }
    if ($mode eq "HtmlV01"){
       $d=[map({quoteHtml($_)} @{$d})];

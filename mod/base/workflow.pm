@@ -1133,7 +1133,7 @@ sub getDetailBlockPriority
 sub getValidWebFunctions
 {
    my $self=shift;
-   return("Process","DirectAct","ShowState",
+   return("Process","DirectAct","ShowState","FullView",
           $self->SUPER::getValidWebFunctions());
 }
 

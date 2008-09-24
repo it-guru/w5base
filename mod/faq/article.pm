@@ -113,6 +113,20 @@ sub new
                 label         =>'View count',
                 dataobjattr   =>'faq.viewcount'),
 
+      new kernel::Field::Date(
+                name          =>'viewlast',
+                label         =>'View last',
+                readonly      =>1,
+                group         =>'sig',
+                dataobjattr   =>'faq.viewlast'),
+
+      new kernel::Field::Number(
+                name          =>'viewfreq',
+                readonly      =>1,
+                group         =>'sig',
+                label         =>'View frequeny',
+                dataobjattr   =>'faq.viewfreq'),
+
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'sig',
@@ -451,16 +465,39 @@ sub FullView
    $self->ResetFilter();
    $self->SecureSetFilter(\%flt);
    my ($rec,$msg)=$self->getOnlyFirst(qw(name data attachments viewcount faqid
-                                         furtherkeys kwords
+                                         furtherkeys kwords viewfreq viewlast
                                          mdate editor realeditor));
 
    if (defined($rec)){
-      my $oldcontext=$W5V2::OperationContext;
-      $W5V2::OperationContext="Kernel";
-      $self->ValidatedUpdateRecord($rec,{mdate=>$rec->{mdate},
-                                         viewcount=>$rec->{viewcount}+1},
-                                   {faqid=>\$rec->{faqid}});
-      $W5V2::OperationContext=$oldcontext;
+      #######################################################################
+      # häufigkeits Berechnung - erster Versuch
+      #
+      my $now=NowStamp("en");
+      my $viewfreq=defined($rec->{viewfreq}) ? $rec->{viewfreq}: 100;
+      if ($rec->{viewlast} ne ""){
+         my $t=CalcDateDuration($rec->{viewlast},$now,"GMT");
+         if ($t->{totalseconds}>15120000){  # halbes Jahr
+            $viewfreq=$viewfreq*0.2;
+         }
+         elsif ($t->{totalseconds}>604800){  # woche
+            $viewfreq=$viewfreq*0.3;
+         }
+         elsif ($t->{totalseconds}>86400){  # tag
+            $viewfreq=$viewfreq*0.8;
+         }
+         elsif ($t->{totalseconds}>3600){
+            $viewfreq=$viewfreq*1.3;
+         }
+         else{
+            $viewfreq=$viewfreq*1.05;
+         }
+         $viewfreq=int($viewfreq);
+      }
+      #######################################################################
+      $self->UpdateRecord({viewlast=>$now,
+                           viewfreq=>$viewfreq,
+                           viewcount=>$rec->{viewcount}+1},
+                           {faqid=>\$rec->{faqid}});
    }
    my $further;
    my @fl;
@@ -534,7 +571,7 @@ sub FullView
 #
    print("<body class=fullview><form>");
    print("<div class=fullview style=\"padding-bottom:10px\">".
-         "<b><div id=WindowTitle>".$rec->{name}."</div></b></div>");
+         "<div id=WindowTitle>".$rec->{name}."</div></div>");
    print("<div class=fullview>".$rec->{data}."</div>");
    if (defined($rec->{attachments}) && ref($rec->{attachments}) eq "ARRAY" &&
        $#{$rec->{attachments}}!=-1){
@@ -558,6 +595,11 @@ sub FullView
                "<table width=100%>".$att."</table></div>");
       }
    }
+   my $owner=$self->findtemplvar({current=>$rec,mode=>"HtmlDetail"},
+                                  "owner","formated");
+   my $mdate=$self->findtemplvar({current=>$rec,mode=>"HtmlV01"},
+                                  "mdate","formated");
+   print("<div id=WindowSignature>$owner<br>$mdate</div>");
    if ($further ne ""){
       print("<div class=further>".$self->T("further articles").":".
             "<table width=100%>".$further."</table></div>");

@@ -233,7 +233,8 @@ sub ProcessLine
             $data=~s/>/&gt;/g;
             $d.="<table cellspacing=0 cellpadding=0 border=0".
                 "width=99% style=\"table-layout:fixed\"><tr><td>";
-            $d.="<pre class=multilinetext>".FancyLinks($data)."</pre>";
+            $d.="<pre class=multilinetext>".
+                mkInlineAttachment(FancyLinks($data))."</pre>";
             $d.="</td></tr></table>";
          }
       }
