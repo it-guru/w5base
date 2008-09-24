@@ -600,8 +600,15 @@ sub FancyLinks
 sub _mkInlineAttachment
 {
    my $id=shift;
-   my $d="<img height=80 src=\"../../base/filemgmt/load/inline/$id\">";
-   $d="<a rel=\"lytebox[inline]\" href=\"../../base/filemgmt/load/inline/thumbnail/$id\" ".
+   my $size;
+
+   eval("use GD;");
+   if ($@ ne ""){
+      $size="height=90";
+   }
+   my $d="<img border=0 $size ".
+         "src=\"../../base/filemgmt/load/thumbnail/inline/$id\">";
+   $d="<a rel=\"lytebox[inline]\" href=\"../../base/filemgmt/load/inline/$id\" ".
       "target=_blank>$d</a>";
    return($d);
 }

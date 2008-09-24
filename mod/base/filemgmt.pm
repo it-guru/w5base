@@ -640,6 +640,35 @@ sub sendFile
       $self->UpdateRecord({viewcount=>$rec->{viewcount}+1,
                            viewlast=>$now,
                            viewfreq=>$viewfreq},{fid=>$id});
+      my $realfile="$w5root/$config/$rec->{realfile}";
+      eval("use GD;");
+      if ($@ eq "" && $thumbnail){
+         msg(INFO,"do scaling $rec->{name} to thumbnail");
+         my $img;
+         eval('$img=new GD::Image($realfile);');
+         if (defined($img)){
+            my ($width,$height)=(80,80);
+            my $k_h = $height / $img->height;
+            my $k_w = $width / $img->width;
+            my $k = ($k_h < $k_w ? $k_h : $k_w);
+            if ($img->height<$height &&
+                $img->width<$width){  # scale only if image is to large
+               $height=$img->height;
+               $width=$img->width;
+            }
+            else{
+               $height = int($img->height * $k);
+               $width  = int($img->width * $k);
+            }
+            my $image = GD::Image->new($width,$height); 
+            $image->copyResampled($img,0,0,0,0,$width,$height,
+                                  $img->width,$img->height);
+            print $self->HttpHeader("image/jpeg");
+            binmode STDOUT;
+            print $image->jpeg;
+            return(undef);
+         }
+      }
       my $contenttype="application/octet-bin";
       $param{filename}="file.bin";
       $contenttype=$rec->{contenttype} if ($rec->{contenttype} ne "");
@@ -650,12 +679,24 @@ sub sendFile
       }
       $param{attachment}=!($inline); 
       $param{cache}=10; 
-      my $realfile="$w5root/$config/$rec->{realfile}";
       if (open(F,"<$realfile")){
          print $self->HttpHeader($contenttype,%param);
          print join("",<F>);
          return();
       }
+   }
+   if ($thumbnail){
+      print $self->HttpHeader("image/gif");
+      my $filename=$self->getSkinFile("base/img/cleaned.gif"); 
+      if (open(MYF,"<$filename")){
+         binmode MYF;
+         binmode STDOUT;
+         while(<MYF>){
+            print $_;
+         }
+         close(MYF);
+      }
+      return(undef);
    }
    print $self->HttpHeader("text/html");
    printf("Not found FunctionPath=%s<br>\n",Query->Param("FunctionPath"));  

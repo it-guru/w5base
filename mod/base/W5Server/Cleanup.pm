@@ -21,6 +21,7 @@ sub process
    my $CleanupTime=$self->getParent->Config->Param("CleanupTime");
    my ($h,$m)=$CleanupTime=~m/^(\d+):(\d+)/;
 
+
    $h=0  if ($h<0);
    $h=23 if ($h>23);
    $m=0  if ($m<0);
@@ -32,6 +33,7 @@ sub process
       if (defined($nextrun) && $nextrun<=time()){
          $self->doCleanup();
          $self->CleanupWorkflows();
+         $self->CleanupInlineAttachments();
          sleep(1);
       }
       my $current=time();
@@ -65,6 +67,31 @@ sub doCleanup
       $j->ForeachFilteredRecord(sub{
                                      $j->ValidatedDeleteRecord($_);
                                 });
+   }
+}
+
+
+sub CleanupInlineAttachments
+{
+   my $self=shift;
+   my $inline=getModuleObject($self->getParent->Config,"base::filemgmt");
+   my $CleanupInline=$self->getParent->Config->Param("CleanupInline");
+   $CleanupInline="<now-84d" if ($CleanupInline eq "");
+
+   $inline->SetFilter({srcsys=>\'W5Base::InlineAttach',
+                       viewlast=>$CleanupInline});
+   $inline->SetCurrentView(qw(ALL));
+   $inline->SetCurrentOrder(qw(NONE));
+   $inline->Limit(100000);
+
+   my ($rec,$msg)=$inline->getFirst();
+   if (defined($rec)){
+      my $op=$inline->Clone();
+      do{
+         msg(INFO,"delete inline attachment $rec->{name} $rec->{fid}");
+         $op->ValidatedDeleteRecord($rec);
+         ($rec,$msg)=$inline->getNext();
+      } until(!defined($rec));
    }
 }
 

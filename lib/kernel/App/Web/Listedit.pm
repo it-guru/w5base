@@ -58,7 +58,7 @@ sub addAttach
       msg(INFO,"size=$size");
       my $filename=sprintf("%s",$f);
       msg(INFO,"filename=$filename");
-      if ($size<512 || !($filename=~m/\.jpg$/)){
+      if ($size<512 || !($filename=~m/\.(jpg|png|gif)$/)){
          $self->LastMsg(ERROR,"invalid file or filetype");
       }
       elsif ($size>3145728){
@@ -67,7 +67,7 @@ sub addAttach
       else{
          my $newrec={parentobj=>$self->Self(),
                      inheritrights=>0,
-                     srcsys=>"inline",
+                     srcsys=>"W5Base::InlineAttach",
                      name=>$filename,
                      file=>$f};
          my $filemgmt=getModuleObject($self->Config,"base::filemgmt");
