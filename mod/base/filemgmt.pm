@@ -380,8 +380,9 @@ sub Validate
          ($filename)=$filename=~m/filename=\"(.+)\"/;
       }
       $filename=~s/^.*[\/\\]//;
-      if (!defined($newrec->{name}) || $newrec->{name} eq ""){
-         $newrec->{name}=$filename;
+      if (!defined($newrec->{name}) || $newrec->{name} eq "" ||
+          ($newrec->{name}=~m/[\\\/]/)){   # if name is not set or has path
+         $newrec->{name}=$filename;        # included
       }
       if (length($newrec->{name})>80){
          $self->LastMsg(ERROR,"filename '%s' to long",$newrec->{name});
