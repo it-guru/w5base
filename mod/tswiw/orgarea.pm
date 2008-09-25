@@ -63,6 +63,24 @@ sub new
                                    vjoinon    =>['mgrwiwid'=>'id'],
                                    vjoindisp  =>'id'),
 
+      new kernel::Field::TextDrop( name       =>'bosssurname',
+                                   label      =>'Boss (surname)',
+                                   vjointo    =>'tswiw::user',
+                                   vjoinon    =>['mgrwiwid'=>'id'],
+                                   vjoindisp  =>'surname'),
+
+      new kernel::Field::TextDrop( name       =>'bossgivenname',
+                                   label      =>'Boss (givenname)',
+                                   vjointo    =>'tswiw::user',
+                                   vjoinon    =>['mgrwiwid'=>'id'],
+                                   vjoindisp  =>'givenname'),
+
+      new kernel::Field::TextDrop( name       =>'bossemail',
+                                   label      =>'Boss (email)',
+                                   vjointo    =>'tswiw::user',
+                                   vjoinon    =>['mgrwiwid'=>'id'],
+                                   vjoindisp  =>'email'),
+
       new kernel::Field::SubList(  name       =>'users',
                                    label      =>'Users',
                                    group      =>'userro',
