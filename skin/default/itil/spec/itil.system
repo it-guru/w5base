@@ -26,6 +26,16 @@ words. This can be used, to do a
 simple grouping of systems by
 search function.
 '},
+'hostid'=>{de=>'
+Eine HostID existiert in der
+Regel nur auf Systemen mit dem
+Betriebssystem Solaris.
+(Systemkomando hostid)
+',en=>'
+A hostid only exists on systems
+with operation system solaris.
+(systemcommand hostid)
+'},
 'shortdesc'=>{de=>'
 Die Beschreibung die hier eingetragen
 ist, wird bei den Auflistungen der

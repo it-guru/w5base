@@ -616,7 +616,6 @@ sub mkInlineAttachment
 {
    my $data=shift;
    $data=~s#\[attachment\((\d+)\)\]#_mkInlineAttachment($1)#ge;
-   printf STDERR ("fifi mkInlineAttachment data=$data\n");
    return($data);
 }
 

@@ -667,3 +667,5 @@ alter table appl       add databoss2 bigint(20)  default NULL;
 alter table asset      add databoss2 bigint(20)  default NULL;
 alter table system     add databoss2 bigint(20)  default NULL;
 alter table swinstance add databoss2 bigint(20)  default NULL;
+alter table system     add hostid    varchar(20) default NULL;
+alter table system     add vhostsystem bigint(20) default NULL;

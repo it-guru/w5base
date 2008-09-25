@@ -285,10 +285,12 @@ sub new
                                  'vPartition',
                                  'nPartition',
                                  'IntegrityVM',
-                                 'gZone',
-                                 'lZone',
-                                 'lpar',
-                                 'LDomain'],
+                                 'gZone',                # solaris
+                                 'lZone',                # solaris
+                                 'LDomain',              # sun logische Domain
+                                 'HDomain',              # sun hardware Domain
+                                 'lpar',                 # z/os
+                                 ],
                 dataobjattr   =>'system.systemtype'),,
 
       new kernel::Field::Link(
@@ -308,6 +310,24 @@ sub new
                 label         =>'Memory',
                 unit          =>'MB',
                 dataobjattr   =>'system.memory'),
+
+      new kernel::Field::Text(
+                name          =>'hostid',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current})){
+                      my $osobj=$self->getParent->getField("osrelease");
+                      my $os=$osobj->RawValue($param{current});
+                      return(1) if ($os=~m/^solaris/i);
+                   }
+                   return(0);
+                },
+                depend        =>['osrelease','osreleaseid'],
+                group         =>'logsys',
+                label         =>'HostID',
+                dataobjattr   =>'system.hostid'),
 
       new kernel::Field::Text(
                 name          =>'consoleip',
