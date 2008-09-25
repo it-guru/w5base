@@ -243,7 +243,7 @@ EOF
    }
    if (!($d=~m/\[\?\]$/)){
       $d=$self->addWebLinkToFacility($d,$current) if ($mode eq "HtmlDetail");
-      $d.=$self->getHtmlContextMenu($current);
+      $d.=$self->getHtmlContextMenu($current) if ($mode eq "HtmlDetail");
    }
    return($d);
 }
