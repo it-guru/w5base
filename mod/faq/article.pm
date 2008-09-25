@@ -225,7 +225,7 @@ sub onFileAdd
    my $dataobj=$self->getParent->Clone();
    my $parentid=$rec->{parentrefid};
    msg(INFO,"call of onFileAdd for $rec->{name}");
-   if ($rec->{name}=~m/^screenshot.*\.jpg$/){
+   if ($rec->{name}=~m/^screenshot.*\.jpg$/i){
       $dataobj->ResetFilter();
       $dataobj->SetFilter({faqid=>\$parentid});
       my ($orgrec,$msg)=$dataobj->getOnlyFirst(qw(ALL));

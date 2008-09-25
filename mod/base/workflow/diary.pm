@@ -291,7 +291,7 @@ sub generateWorkspace
    my $templ=<<EOF;
 <table border=0 cellspacing=0 cellpadding=0 width=100% height=110>
 <tr><td align=center valign=top>
-<textarea name=note $Dnote style=\"width:100%;height:80\"></textarea>
+<textarea onkeydown="textareaKeyHandler(this,event);" name=note $Dnote style=\"width:100%;height:80\"></textarea>
 <table border=0 width=100% cellspacing=0 cellpadding=0>
 <tr>
 <td width=25% nowrap>&nbsp;$t0:</td>
