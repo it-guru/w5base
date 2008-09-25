@@ -40,7 +40,9 @@ sub FormatedDetail
    my $d=$self->RawValue($current);
    my $lang=$self->getParent->Lang();
    if ($mode eq "HtmlDetail"){
-      $d="<table border=0 style=\"width:100%;table-layout:fixed;padding:0;border-width:0;margin:0\">".
+      $d="<table border=0 ".
+         "style=\"width:100%;table-layout:fixed;padding:0;".
+                 "border-width:0;margin:0\">".
          "<tr><td><div class=multilinehtml>$d</div></td></tr></table>";
    }
    if ($mode eq "edit" || $mode eq "workflow"){
@@ -76,6 +78,7 @@ tinyMCE.init({
         content_css : "../../../public/base/load/default.css,"+
                       "../../../public/base/load/work.css"
 });
+
 </script>
 EOF
    }

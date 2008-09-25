@@ -136,9 +136,13 @@ sub HandleFILEADD
          if (my $fid=$fo->ValidatedInsertRecord(\%rec)){
             $self->getParent->LastMsg(INFO,"ok");
             $ok=1;
-            $rec{fid}=$fid;
-            if (ref($self->{onFileAdd}) eq "CODE"){
-               &{$self->{onFileAdd}}($self,\%rec);
+            if ($fid ne ""){
+               if (ref($self->{onFileAdd}) eq "CODE"){
+                  $fo->ResetFilter();
+                  $fo->SetFilter({fid=>\$fid}); 
+                  my ($rec,$msg)=$fo->getOnlyFirst(qw(ALL));
+                  &{$self->{onFileAdd}}($self,$rec);
+               }
             }
          }
       }

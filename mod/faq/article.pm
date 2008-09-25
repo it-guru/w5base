@@ -222,6 +222,8 @@ sub onFileAdd
 {
    my $self=shift;
    my $rec=shift;
+
+printf STDERR ("fifi rec=%s\n",Dumper($rec));
    my $dataobj=$self->getParent->Clone();
    my $parentid=$rec->{parentrefid};
    msg(INFO,"call of onFileAdd for $rec->{name}");

@@ -57,8 +57,9 @@ sub addAttach
        $size,$atime,$mtime,$ctime,$blksize,$blocks)=stat($f);
       msg(INFO,"size=$size");
       my $filename=sprintf("%s",$f);
+      $filename=~s/^.*[\/\\]//;
       msg(INFO,"filename=$filename");
-      if ($size<512 || !($filename=~m/\.(jpg|png|gif)$/)){
+      if ($size<512 || !($filename=~m/\.(jpg|jpeg|png|gif)$/)){
          $self->LastMsg(ERROR,"invalid file or filetype");
       }
       elsif ($size>3145728){
