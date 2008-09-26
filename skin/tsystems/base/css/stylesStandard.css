@@ -1479,15 +1479,15 @@ table.tableformat--invisiblePadding tr td
   color:#000000;
 }
 
-.conContentDetailsviewMagWhiteVertSingle .content .text .thumbnails .thumbnail,
-.conContentDetailsviewMagWhiteHorSingle .content .text .thumbnails .thumbnail,
-.conContentDetailsviewMagWhiteVertMulti .content .text .thumbnails .thumbnail,
-.conContentDetailsviewGreyWhiteVertSingle .content .text .thumbnails .thumbnail,
-.conContentDetailsviewGreyWhiteHorSingle .content .text .thumbnails .thumbnail,
-.conContentDetailsviewGreyWhiteVertMulti .content .text .thumbnails .thumbnail,
-.conContentDetailsviewBlueGreyVertSingle .content .text .thumbnails .thumbnail,
-.conContentDetailsviewBlueGreyHorSingle .content .text .thumbnails .thumbnail,
-.conContentDetailsviewBlueGreyVertMulti .content .text .thumbnails .thumbnail
+.conContentDetailsviewMagWhiteVertSingle .content .text .thumbnails ,
+.conContentDetailsviewMagWhiteHorSingle .content .text .thumbnails ,
+.conContentDetailsviewMagWhiteVertMulti .content .text .thumbnails ,
+.conContentDetailsviewGreyWhiteVertSingle .content .text .thumbnails ,
+.conContentDetailsviewGreyWhiteHorSingle .content .text .thumbnails ,
+.conContentDetailsviewGreyWhiteVertMulti .content .text .thumbnails ,
+.conContentDetailsviewBlueGreyVertSingle .content .text .thumbnails ,
+.conContentDetailsviewBlueGreyHorSingle .content .text .thumbnails ,
+.conContentDetailsviewBlueGreyVertMulti .content .text .thumbnails 
 {
   padding-right:3px;
   float:left;

@@ -59,17 +59,21 @@ sub FormatedDetail
 <script language=JavaScript>
 tinyMCE.init({
 	mode : "textareas",
+        theme : "advanced",
         plugins: "clearbr",
         theme_advanced_buttons1 : "separator,"+
                                   "bold,italic,underline,strikethrough,"+
-                                  "forecolor,backcolor,separator,"+
-                                  "justifyleft,justifycenter,justifyright,"+
-                                  "justifyfull,formatselect,"+
-                                  "separator,link,unlink"+
+                                  "forecolor,backcolor,"+
+                                  "separator,link,unlink,"+
                                   "separator,hr,sub,sup,separator,"+
                                   "indent,outdent,separator,bullist,numlist,"+
                                   "separator",
-        theme_advanced_buttons2 : "separator,code,image,separator,clearbr,bullist",
+        theme_advanced_buttons2 : "separator,justifyleft,justifycenter,"+
+                                  "justifyright,"+
+                                  "justifyfull,formatselect,fontsizeselect,"+
+                                  "removeformat,cleanup,"+
+                                  "separator,image,separator,"+
+                                  "code,clearbr,separator",
         theme_advanced_buttons3 : "",
         language : "$lang",
         theme_advanced_toolbar_align : "left",
