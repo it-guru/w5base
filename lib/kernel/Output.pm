@@ -187,7 +187,10 @@ sub WriteToStdout
       }
    }
    if ($msg ne ""){
-      printf("Content-type:text/html\n\n%s",$msg);
+      if ($self->getParent->can("HttpHeader")){
+         print $self->getParent->HttpHeader("text/plain");
+         printf("%s",$msg);
+      }
       close(TMP);
       close($fh);
       return(); 
