@@ -481,6 +481,22 @@ sub new
                 vjoindisp     =>'name'),
 
       new kernel::Field::Select(
+                name          =>'opmode',
+                group         =>'misc',
+                label         =>'primary operation mode',
+                transprefix   =>'opmode.',
+                value         =>['',
+                                 'prod',
+                                 'test',
+                                 'devel',
+                                 'education',
+                                 'approvtest',
+                                 'reference',
+                                 'license'],  # see also opmode at system
+                htmleditwidth =>'200px',
+                dataobjattr   =>'appl.opmode'),
+
+      new kernel::Field::Select(
                 name          =>'slacontroltool',
                 group         =>'misc',
                 label         =>'SLA control tool type',
@@ -515,6 +531,12 @@ sub new
                 htmleditwidth =>'100px',
                 dataobjattr   =>'appl.slacontrbase'),
 
+      new kernel::Field::Text(
+                name          =>'kwords',
+                group         =>'misc',
+                label         =>'Keywords',
+                dataobjattr   =>'appl.kwords'),
+
       new kernel::Field::Textarea(
                 name          =>'maintwindow',
                 group         =>'misc',
@@ -528,12 +550,6 @@ sub new
                 label         =>'Comments',
                 searchable    =>0, 
                 dataobjattr   =>'appl.comments'),
-
-      new kernel::Field::Text(
-                name          =>'kwords',
-                group         =>'misc',
-                label         =>'Keywords',
-                dataobjattr   =>'appl.kwords'),
 
       new kernel::Field::FileList(
                 name          =>'attachments',

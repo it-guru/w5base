@@ -84,7 +84,7 @@ sub ApplicationModified
               50=>'ACCEPTANCE',
               60=>'DEVELOPMENT',
               70=>'PRODUCTION');
-  # $filter{name}="*w5base*";
+#   $filter{name}="*w5base*";
    $app->SetFilter(\%filter);
    $app->SetCurrentView(qw(ALL));
   # $app->SetCurrentView(qw(id name sem tsm tsm2 conumber currentvers
@@ -160,8 +160,6 @@ sub ApplicationModified
                                               shortdesc systemid));
                foreach my $lnk (@l){
                   my $SysU=0;
-                  #$SysU=10 if ($SysU<10 && $lnk->{isnosysappl}); 
-                                                          # noch nicht drin
                   $SysU=20 if ($SysU<20 && $lnk->{istest}); 
                   $SysU=30 if ($SysU<30 && $lnk->{iseducation}); 
                   $SysU=40 if ($SysU<40 && $lnk->{isref}); 
@@ -271,6 +269,14 @@ sub ApplicationModified
                $CurrentEventId="Add Application $CurrentAppl";
                $ApplU=10 if ($rec->{isnosysappl} && $SysCount==0);
                $ApplU=5  if (lc($rec->{mandator}) eq "extern");
+               if ($rec->{opmode} ne ""){
+                  $ApplU=70 if ($rec->{opmode} eq "prod");
+                  $ApplU=60 if ($rec->{opmode} eq "devel");
+                  $ApplU=50 if ($rec->{opmode} eq "approvtest");
+                  $ApplU=40 if ($rec->{opmode} eq "reference");
+                  $ApplU=30 if ($rec->{opmode} eq "education");
+                  $ApplU=20 if ($rec->{opmode} eq "test");
+               }
                my $acftprec={
                                 Appl=>{
                                    Security_Unit=>"TS.DE",
