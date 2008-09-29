@@ -13,7 +13,7 @@
 /* External */
 .defaultSkin .mceExternalToolbar {position:absolute; border:1px solid #CCC; border-bottom:0; display:none;}
 .defaultSkin .mceExternalToolbar td.mceToolbar {padding-right:13px;}
-.defaultSkin .mceExternalClose {position:absolute; top:3px; right:3px; width:7px; height:7px; background:url(../../img/icons.gif) -820px 0}
+.defaultSkin .mceExternalClose {position:absolute; top:3px; right:3px; width:7px; height:7px; background:url(../../img/icons.gif) -520px 0}
 
 /* Layout */
 .defaultSkin table.mceLayout {border:0; border-left:1px solid #CCC; border-right:1px solid #CCC}
@@ -24,7 +24,7 @@
 .defaultSkin .mceIframeContainer {border-top:1px solid #CCC; border-bottom:1px solid #CCC}
 .defaultSkin .mceStatusbar {font-family:'MS Sans Serif',sans-serif,Verdana,Arial; font-size:9pt; line-height:16px; overflow:visible; color:#000; display:block; height:20px}
 .defaultSkin .mceStatusbar div {float:left; margin:2px}
-.defaultSkin .mceStatusbar a.mceResize {display:block; float:right; background:url(../../img/icons.gif) -800px 0; width:20px; height:20px; cursor:se-resize}
+.defaultSkin .mceStatusbar a.mceResize {display:block; float:right; background:url(../../img/icons.gif) -500px 0; width:20px; height:20px; cursor:se-resize}
 .defaultSkin .mceStatusbar a:hover {text-decoration:underline}
 .defaultSkin table.mceToolbar {margin-left:3px}
 .defaultSkin span.mceIcon, .defaultSkin img.mceIcon {display:block; width:20px; height:20px}

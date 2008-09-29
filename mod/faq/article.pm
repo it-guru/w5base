@@ -240,8 +240,8 @@ printf STDERR ("fifi rec=%s\n",Dumper($rec));
                   "rel=\"lytebox[screenshot]\" title=\"$rec->{name}\">".
                   "<img class=thumbnail alt=\"$rec->{name}\" src=\"$imgurl\" ".
                   "align=right width=300 height=200 border=0></a>".
-                  "<b><u>$rec->{name}:</u></b><br>".
-                  "Notes<br>about the screenshot".
+                  "<br>".
+                  "<br>".
                   "<br clear=all>"},{faqid=>\$parentid});
       }
    }
