@@ -50,8 +50,13 @@ sub FormatedDetail
       if (defined($fromquery)){
          $d=$fromquery;
       }
-      $d="<textarea name=Formated_$name ".
-         "class=multilinehtml>$d</textarea>";
+      my $orgd=$d;
+      $d="";
+      $d.="<table border=0 style=\"width:100%;table-layout:fixed;".
+          "padding:0;border-width:0;margin:0\">".
+          "<tr><td></div>";
+      $d.="<textarea name=Formated_$name class=multilinehtml>$orgd</textarea>";
+      $d.="</td></tr></table>";
       $d=<<EOF.$d;
 <script language=JavaScript 
         src="../../../static/tinymce/jscripts/tiny_mce/tiny_mce.js">
@@ -75,9 +80,9 @@ tinyMCE.init({
                                   "separator,image,separator,"+
                                   "code,clearbr,separator",
         theme_advanced_buttons3 : "",
+        theme_advanced_toolbar_location : "external",
         language : "$lang",
         theme_advanced_toolbar_align : "left",
-        theme_advanced_toolbar_location : "top",
         theme_advanced_blockformats : "p,h1,h2,h3,pre,xmp",
         content_css : "../../../public/base/load/default.css,"+
                       "../../../public/base/load/work.css"

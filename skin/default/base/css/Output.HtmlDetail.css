@@ -147,8 +147,12 @@ div.detailfunctions{
    margin:0px;
    padding:0px;
 }
+div.mceExternalToolbar{
+   bottom:150px;
+   left:140px;
+}
 div.multilinehtml{
-   height:304px;
+   height:254px;
    overflow:auto;
    padding:2px;
    width:99%;
@@ -198,7 +202,7 @@ pre.multilinetext {
 }
 
 textarea.multilinehtml{
-   height:300px;
+   height:250px;
    width:100%;
    margin:0px;
    padding:0px;
