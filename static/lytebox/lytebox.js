@@ -116,6 +116,7 @@ LyteBox.prototype.initialize = function() {
 	var objIframe = this.doc.createElement("iframe");
 		objIframe.setAttribute('id','lbIframe');
 		objIframe.setAttribute('name','lbIframe');
+		objIframe.setAttribute('src','Welcome');
 		objIframe.style.display = 'none';
 		objIframeContainer.appendChild(objIframe);
 	var objImageContainer = this.doc.createElement("div");
