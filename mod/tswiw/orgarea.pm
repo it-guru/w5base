@@ -57,6 +57,13 @@ sub new
                                    vjoinon    =>['parentid'=>'touid'],
                                    vjoindisp  =>'name'),
 
+      new kernel::Field::TextDrop( name       =>'bossfullname',
+                                   label      =>'Boss',
+                                   vjointo    =>'tswiw::user',
+                                   depend     =>['mgrwiwid'],
+                                   vjoinon    =>['mgrwiwid'=>'id'],
+                                   vjoindisp  =>'fullname'),
+
       new kernel::Field::TextDrop( name       =>'boss',
                                    label      =>'Boss (tOuMgr)',
                                    vjointo    =>'tswiw::user',
@@ -66,6 +73,8 @@ sub new
 
       new kernel::Field::TextDrop( name       =>'bosssurname',
                                    label      =>'Boss (surname)',
+                                   htmldetail =>0,
+                                   searchable =>0,
                                    vjointo    =>'tswiw::user',
                                    depend     =>['mgrwiwid'],
                                    vjoinon    =>['mgrwiwid'=>'id'],
@@ -73,6 +82,8 @@ sub new
 
       new kernel::Field::TextDrop( name       =>'bossgivenname',
                                    label      =>'Boss (givenname)',
+                                   htmldetail =>0,
+                                   searchable =>0,
                                    depend     =>['mgrwiwid'],
                                    vjointo    =>'tswiw::user',
                                    vjoinon    =>['mgrwiwid'=>'id'],
@@ -80,6 +91,8 @@ sub new
 
       new kernel::Field::TextDrop( name       =>'bossemail',
                                    label      =>'Boss (email)',
+                                   htmldetail =>0,
+                                   searchable =>0,
                                    depend     =>['mgrwiwid'],
                                    vjointo    =>'tswiw::user',
                                    vjoinon    =>['mgrwiwid'=>'id'],

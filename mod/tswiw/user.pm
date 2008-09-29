@@ -52,6 +52,25 @@ sub new
                                    align      =>'left',
                                    dataobjattr=>'uid'),
 
+      new kernel::Field::Text(     name       =>'fullname',
+                                   label      =>'Fullname',
+                                   searchable =>0,
+                                   onRawValue =>sub{
+                                      my $self=shift;
+                                      my $current=shift;
+                                      my $d=$current->{givenname};
+                                      my $v=$current->{surname};
+                                      $d.=", " if ($d ne "" && $v ne "");
+                                      $d.=$v;
+                                      $d.=" " if ($d ne "");
+                                      if ($current->{email} ne ""){
+                                         $d.="($current->{email})";
+                                      }
+                                      return($d);
+                                   },
+                                   depend     =>['surname','givenname',
+                                   'email']),
+
       new kernel::Field::Text(     name       =>'surname',
                                    label      =>'Surname',
                                    size       =>'10',
