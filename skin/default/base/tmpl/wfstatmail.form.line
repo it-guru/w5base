@@ -1,0 +1,11 @@
+  <tr> 
+    <td class=col1 nowrap>
+    <div class=timestamp>
+    %emailtstamp%
+    %emailprefix%
+    </div></td>
+    <td class="zelleWeiss">
+       <pre class="text">%emailtext%</pre>
+    </td><td class=col3 valign=top>%emailpostfix%&nbsp;</td>
+  </tr>
+  <tr style="height:2px;background-color: #e6e6e6;"><td colspan=3 style="height:2px;background-color: #e6e6e6;"></td></tr>

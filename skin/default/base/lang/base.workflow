@@ -62,3 +62,5 @@
 'NEXTSTART'=>{de=>'Mit dem nächsten Schritt wird der Workflow erzeugt und u.U. automatische Aktion zur Bearbeitung in die Wege geleitet.',en=>'The next step starts the workflow and initiate all automatic actions'},
 'W5Stat Responsibility by'=>{de=>'W5Stat Verantwortet durch'},
 'Short Actionlog'=>{de=>'Aktions-Log'},
+'STEVwfstatsendWeek'=>{de=>'wöchentlicher Status-Report über offene Workflows',
+                       en=>'weekly Report about current jobs'},

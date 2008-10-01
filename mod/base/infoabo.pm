@@ -622,7 +622,7 @@ sub WinHandleInfoAboSubscribe
    $d.=<<EOF;
 <style>body{overflow:hidden;padding:4px}optgroup{margin-bottom:5px}</style>
 <table width=580 height=98% border=0>
-<tr height=50><td>$handlermask</td></tr>
+<tr height=60><td>$handlermask</td></tr>
 <tr>
 <td>
 <div style="height:100%;margin:0">
