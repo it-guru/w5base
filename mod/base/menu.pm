@@ -580,6 +580,7 @@ sub root
             "<form method=post action=${rootpath}root>");
       print("<input type=hidden name=menu value=\"$fp\">");
       foreach my $v (Query->Param()){ 
+         next if ($v=~m/^DIRECT_/);
          next if ($v=~m/^search_/);
          next if ($v=~m/^AutoSearch$/);
          next if ($v=~m/^MyW5BaseSUBMOD$/);
@@ -729,6 +730,7 @@ sub msel
 
    my %qu=Query->MultiVars();
    foreach my $sv (keys(%qu)){
+      next if ($sv=~m/^DIRECT_/);
       next if ($sv=~m/^search_/);
       next if ($sv=~m/^AutoSearch$/);
       next if ($sv=~m/^MyW5BaseSUBMOD$/);
@@ -796,7 +798,7 @@ EOF
             }
             my %forwardquery;
             foreach my $q (Query->Param()){
-               next if (!($q=~m/^(search_|Auto|MyW5Base)/));
+               next if (!($q=~m/^(search_|Auto|MyW5Base|DIRECT_)/));
                $forwardquery{$q}=[Query->Param($q)];
             }
             if (keys(%forwardquery)){

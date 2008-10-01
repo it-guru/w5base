@@ -388,6 +388,35 @@ sub Validate
    return(1);
 }
 
+sub Main
+{
+   my $self=shift;
+   my $cleanupid=Query->Param("DIRECT_cleanupid");
+
+   return($self->SUPER::Main(@_)) if ($cleanupid eq "");
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','mainwork.css',
+                                   'kernel.App.Web.css'],
+                           submodal=>1,
+                           body=>1,form=>1,
+                           title=>$self->T($self->Self,$self->Self));
+   print ("<style>body{overflow:hidden}</style>");
+   print <<EOF;
+<script language=JavaScript src="../../../public/base/load/toolbox.js">
+</script>
+<script language=JavaScript src="../../../public/base/load/kernel.App.Web.js">
+</script>
+EOF
+   print("<table style=\"border-collapse:collapse;width:100%;height:100%\" ".
+         "border=0 cellspacing=0 cellpadding=0>");
+   printf("<tr><td height=1%% style=\"padding:1px\" ".
+          "valign=top>%s</td></tr>",$self->getAppTitleBar());
+   printf("<tr><td valign=top>%s</td></tr>","InfoAbo abmelden");
+   printf("</table>");
+   print $self->HttpBottom();
+}
+
 
 sub isViewValid
 {
@@ -446,10 +475,13 @@ sub LoadTargets
       $self->ResetFilter();
       $self->SetFilter({refid=>$refid,mode=>$mode,
                         parent=>$parent,userid=>$userlist});
-      foreach my $rec ($self->getHashList(qw(userid email active))){
+      foreach my $rec ($self->getHashList(qw(userid email id active))){
          @{$userlist}=grep(!/^$rec->{userid}$/,@{$userlist}); 
          if ($rec->{active}){
-            $desthash->{lc($rec->{email})}++;
+            if (!defined($desthash->{lc($rec->{email})})){
+               $desthash->{lc($rec->{email})}=[];
+            }
+            push(@{$desthash->{lc($rec->{email})}},$rec->{id});
             $c++;
          }
       }

@@ -30,7 +30,7 @@ li{
    padding: 0px;
    margin: 0px;
    padding-left: 4px;
-   width: 500px;
+   width: 490px;
 }
 #tabelle td {
    height: 20px;
@@ -75,6 +75,15 @@ p.header {
    padding: 1px;
 }
 
+p.unsubscribe {
+   vertical-align: top;
+   margin: 0px;
+   margin-top:5px;
+   padding: 1px;
+   font-size:10px;
+   text-align:center;
+}
+
 -->
 </style>
 <body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
@@ -92,9 +101,9 @@ p.header {
     <td colspan=3">
        <div style="width:100%;background-color:#ffffff;margin:20px;padding:10px;margin-top:0;margin-bottom:5px;overflow:hidden">
           <p class=header>Sehr geehrte Damen und Herren,<br><br>
-im Folgenden erhalten Sie eine Aufstellung aller aktuell für Sie anstehenden Workflows. Diese Mail dient als Erinnerung, damit die Bearbeitung einzelnern Workflows nicht vergessen wird.<br>
+im Folgenden erhalten Sie eine Aufstellung aller aktuell für Sie anstehenden Workflows. Diese Mail dient als Erinnerung, damit die Bearbeitung einzelnern Workflows nicht vergessen wird.<br>Für den Kontakt <b>"%contact%"</b> stehen aktuell <b>%wfcount% Workflow(s)</b> zur Bearbeitung an bzw. es sind Aktionen von Ihnen auszuführen.<br>
 <br>
-Für den Kontakt "%contact%" stehen aktuell %wfcount% Workflows zur Bearbeitung an bzw. es sind Aktionen von Ihnen auszuführen.
+<b><u>Aktuell anstehende Aufgaben/Workflows:</u></b>
        </div>
     </td>
   </tr>

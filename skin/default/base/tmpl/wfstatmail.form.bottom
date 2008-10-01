@@ -4,7 +4,15 @@
   <tr>
     <td colspan=3">
        <div style="width:100%;background-color:#ffffff;margin:20px;padding:10px;margin-top:20px;margin-bottom:80px;overflow:hidden">
-          <p class=header>Sie können den aktuellen Stand dieser Liste direkt in der W5Base unter <a href="%baseurl%/auth/base/menu/msel/MyW5Base?MyW5BaseSUBMOD=base::MyW5Base::wfmyjobs">"MyW5Base" => "meine aktuell anstehenden Aufgaben"</a> abrufen. Sie sind in der W5Base mit den Account(s) "%accounts%" bekannt. Informationen über die Login-Prozedur finden Sie auf der <a href="%baseurl%/public/base/menu/root">Startseite</a>.
+          <p class=header>Den aktuellen Stand dieser Liste finden Sie unter:
+<br>
+<br><center>
+<a href="%baseurl%/auth/base/menu/msel/MyW5Base?MyW5BaseSUBMOD=base::MyW5Base::wfmyjobs">"MyW5Base" => "meine aktuell anstehenden Aufgaben"</a><br>
+</center><p class=header><br>Sie sind in der W5Base mit den Account(s) "<b>%accounts%</b>" bekannt. Informationen über die Login-Prozedur finden Sie auf der <a href="%baseurl%/public/base/menu/root">Startseite</a>.<br>
+</p>
+<p class="unsubscribe">
+Wenn Sie diesen Report nicht mehr zugesandt haben möchten, dann können Sie ihn  über diesen <a href="%baseurl%/auth/base/menu/msel/sysadm/userenv/infoabo?DIRECT_cleanupid=%infoabo%">&lt;-&nbsp;Link&nbsp;-&gt;</a> deaktivieren.
+</p>
        </div>
     </td>
   </tr>

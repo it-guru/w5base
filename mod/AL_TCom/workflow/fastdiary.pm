@@ -277,18 +277,22 @@ sub ProcessNext
       #                                                            "+1M-1s");
       $h->{eventstart}=$entrytime;
       $h->{eventend}=$entrytime;
+      my $applrec={};
       {
          my $applobj=getModuleObject($self->Config,"itil::appl");
          $applobj->SetFilter({cistatusid=>"<=4",
                               name=>\$h->{affectedapplication}});
-         my ($applrec,$msg)=$applobj->getOnlyFirst(qw(id));
+         my $msg;
+         ($applrec,$msg)=$applobj->getOnlyFirst(qw(id tsmid tsm2id 
+                                                         semid sem2id));
       }
       my ($oldrec,$msg);
-
-      my $id=$wf->Store(undef,$h);
-      if (defined($id) && $id ne ""){
-         $wf->SetFilter({id=>\$id});
-         ($oldrec,$msg)=$wf->getOnlyFirst(qw(ALL));
+      if (defined($applrec)){
+         my $id=$wf->Store(undef,$h);
+         if (defined($id) && $id ne ""){
+            $wf->SetFilter({id=>\$id});
+            ($oldrec,$msg)=$wf->getOnlyFirst(qw(ALL));
+         }
       }
 
       if (defined($oldrec)){
@@ -301,6 +305,19 @@ sub ProcessNext
                             step=>"AL_TCom::workflow::diary::wfclose",
                             tcomworktime=>$tcomworktime,
                             stateid=>17});
+            my $userid=$self->getParent->getParent->getCurrentUserId();
+            if ($userid==$applrec->{tsmid}  ||
+                $userid==$applrec->{tsm2id} ||
+                $userid==$applrec->{semid}  ||
+                $userid==$applrec->{sem2id} ){
+               my $id=$wf->Store($oldrec,{
+                               step=>"base::workflow::diary::wffinish",
+                               fwdtarget=>undef,
+                               fwdtargetid=>undef,
+                               fwddebtarget=>undef,
+                               fwddebtargetid=>undef,
+                               stateid=>21});
+            }
          }
       }
       else{
