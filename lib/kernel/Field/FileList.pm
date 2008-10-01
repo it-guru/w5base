@@ -19,7 +19,6 @@ package kernel::Field::FileList;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use Data::Dumper;
 use kernel::MenuTree;
 @ISA    = qw(kernel::Field);
 
@@ -95,9 +94,11 @@ sub ListFiles
    }
    $d="";
    if ($#filelist!=-1){
-      $d=BuildHtmlTree(tree     => \@filelist,
-                       rootimg  =>'minifileroot.gif',
-                       hrefclass=>'filelink');
+
+      my %p=('tree'     => \@filelist,
+             'rootimg'  =>'minifileroot.gif',
+             'hrefclass'=>'filelink');
+      $d=kernel::MenuTree::BuildHtmlTree(%p);
    }
    return($d);
 }
