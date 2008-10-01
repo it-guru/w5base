@@ -297,8 +297,8 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    
-   return(qw(header default)) if (defined($rec->{grpid}) && $rec->{grpid}<=0);
-   return("default") if (!defined($rec));
+   return(qw(header default)) if (!defined($rec) || 
+                                  (defined($rec->{grpid}) && $rec->{grpid}<=0));
    return("ALL");
 }
 
