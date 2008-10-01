@@ -33,6 +33,7 @@ sub new
 sub Init
 {
    my $self=shift;
+   $self->SUPER::Init();
    $self->{DataObj}=getModuleObject($self->getParent->Config,"base::workflow");
    return(0) if (!defined($self->{DataObj}));
    return(1);
@@ -119,14 +120,47 @@ sub Result
    my $self=shift;
    my %q=$self->{DataObj}->getSearchHash();
 
-   my $userid=$self->getParent->getCurrentUserId();
-   my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},"RMember","both");
+   $q{userid}=$self->getParent->getCurrentUserId();
+   $q{exviewcontrol}=Query->Param("EXVIEWCONTROL");
+   $q{viewstate}=Query->Param("VIEWSTATE");
+
+   if (!$self->SetFilter(\%q)){
+      if ($self->LastMsg()==0){
+         $self->LastMsg(ERROR,"can not SetFilter on DataObj - unknown problem");
+      }
+      return(undef);
+   }
+
+
+   $self->{DataObj}->setDefaultView(qw(prio mdate state class name editor));
+   
+   return($self->{DataObj}->Result(ExternalFilter=>1));
+}
+
+
+sub SetFilter
+{
+   my $self=shift;
+   my $flt=shift;
+
+   my $dataobj=$self->getDataObj();
+   $dataobj->ResetFilter();
+
+
+   my $dc=$flt->{exviewcontrol};
+   delete($flt->{exviewcontrol});
+   my $vs=$flt->{viewstate};
+   delete($flt->{viewstate});
+   my $userid=$flt->{userid};
+   delete($flt->{userid});
+   
+   my %grp=$self->getParent->getGroupsOf($userid,"RMember","both");
    my @grpids=keys(%grp);
    @grpids=(qw(NONE)) if ($#grpids==-1);
 
    $userid=-1 if (!defined($userid) || $userid==0);
-   my $dc=Query->Param("EXVIEWCONTROL");
-   my $vs=Query->Param("VIEWSTATE");
+
+   my %q=%{$flt};
    my @q=();
    if ($dc eq "ADDDEP" || $dc eq "DEPONLY"){
       my %q1=%q;
@@ -186,8 +220,8 @@ sub Result
          $q2{stateid}.="5";
       }
       my %id=();  # this hack prevents searches over two keys (this is bad)
-      $self->{DataObj}->SetFilter([\%q1,\%q2]);
-      my @l=$self->{DataObj}->getHashList(qw(id));
+      $dataobj->SetFilter([\%q1,\%q2]);
+      my @l=$dataobj->getHashList(qw(id));
       map({$id{$_->{id}}=1} @l);
 
       $q3{owner}=\$userid;
@@ -202,23 +236,22 @@ sub Result
          $q3{stateid}.="<=6";
       }
 
-      $self->{DataObj}->SetFilter([\%q3]);
-      my @l=$self->{DataObj}->getHashList(qw(id));
+      $dataobj->SetFilter([\%q3]);
+      my @l=$dataobj->getHashList(qw(id));
       map({$id{$_->{id}}=1} @l);
 
-      my $ws=$self->getParent->getPersistentModuleObject("base::workflowws");
+      my $ws=$self->getParent->getPersistentModuleObject("base::workflow");
       $ws->SetFilter([{fwdtargetid=>\$userid,fwdtarget=>\'base::user'},
                       {fwdtargetid=>\@grpids,fwdtarget=>\'base::grp'}]); 
       map({$id{$_->{wfheadid}}=1;} $ws->getHashList(qw(wfheadid)));
 
       push(@q,{id=>[keys(%id)]});
    }
-   $self->{DataObj}->ResetFilter();
-   $self->{DataObj}->SecureSetFilter(\@q);
-   $self->{DataObj}->setDefaultView(qw(prio mdate state class name editor));
-   
-   return($self->{DataObj}->Result(ExternalFilter=>1));
+   printf STDERR ("fifi flt=%s\n",Dumper(\@q));
+   $dataobj->ResetFilter();
+   $dataobj->SecureSetFilter(\@q);
 }
+
 
 
 

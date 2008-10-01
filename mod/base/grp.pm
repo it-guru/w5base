@@ -298,6 +298,7 @@ sub isViewValid
    my $rec=shift;
    
    return(qw(header default)) if (defined($rec->{grpid}) && $rec->{grpid}<=0);
+   return("default") if (!defined($rec));
    return("ALL");
 }
 

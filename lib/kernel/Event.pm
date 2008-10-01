@@ -20,10 +20,10 @@ package kernel::Event;
 use vars qw(@ISA);
 use strict;
 use kernel;
+use kernel::App;
 use kernel::Universal;
-use Data::Dumper;
 
-@ISA=qw(kernel::Universal);
+@ISA=qw(kernel::App);
 
 sub new
 {
@@ -100,18 +100,23 @@ sub W5ServerCall
    return($bk);
 }
 
-sub getPersistentModuleObject
-{
+sub getPersistentModuleObject    # kann u.U. demnächst durch die App.pm ersetzt
+{                                # werden
    my $self=shift;
    my $label=shift;
    my $module=shift;
 
+   $module=$label if (!defined($module) || $module eq "");
    if (!defined($self->{$label})){
-      my $m=getModuleObject($self->Config,$module);
+      my $config=$self->Config();
+      my $m=getModuleObject($config,$module);
       $self->{$label}=$m
    }
+   $self->{$label}->ResetFilter();
    return($self->{$label});
 }
+
+
 
 
 sub Config()

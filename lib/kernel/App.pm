@@ -21,7 +21,6 @@ use vars qw(@ISA);
 use kernel;
 use kernel::date;
 use kernel::TemplateParsing;
-use Data::Dumper;
 use XML::Smart;
 use kernel::Universal;
 @ISA    = qw(kernel::Universal kernel::TemplateParsing);

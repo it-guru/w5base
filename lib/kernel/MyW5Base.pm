@@ -30,6 +30,7 @@ sub new
 {
    my $type=shift;
    my $self=bless({@_},$type);
+   $self->{isInitalized}=0;
    return($self);
 }
 
@@ -39,6 +40,7 @@ sub Init
    my $dataobj=$self->getDataObj();
    return(0) if (!defined($dataobj));
    $dataobj->setParent($self);
+   $self->{isInitalized}=1;
    return(1);
 }
 
@@ -272,9 +274,18 @@ sub getHashList
    return;
 }
 
+sub ResetFilter
+{
+   my $self=shift;
+   $self->Init() if (!defined($self->{DataObj}));
+   my $dataobj=$self->getDataObj();
+   return($dataobj->ResetFilter());
+}
+
 sub SetFilter
 {
    my $self=shift;
+   $self->Init() if (!defined($self->{DataObj}));
    my $dataobj=$self->getDataObj();
    return;
 }

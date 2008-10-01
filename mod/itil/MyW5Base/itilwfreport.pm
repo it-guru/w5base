@@ -260,38 +260,10 @@ sub Result
       return(undef);
    }
 
-printf STDERR ("fifi parent of DataObj=%s\n",$self->getDataObj()->getParent());
-printf STDERR ("fifi parent of meine=%s\n",$self->getParent());
-printf STDERR ("fifi search=%s\n",Dumper(\%q));
+#printf STDERR ("fifi parent of DataObj=%s\n",$self->getDataObj()->getParent());
+#printf STDERR ("fifi parent of meine=%s\n",$self->getParent());
+#printf STDERR ("fifi search=%s\n",Dumper(\%q));
    
-
-
-#   my $userid=$self->getParent->getCurrentUserId();
-#   $userid=-1 if (!defined($userid) || $userid==0);
-#
-#   my %q1=%q;
-#   my %q2=%q;
-#   if (Query->Param("SHOWALL")){
-#      $q1{stateid}='<20';
-#      $q1{class}=[grep(/^.*::eventnotify$/,
-#                  keys(%{$self->{DataObj}->{SubDataObj}}))];
-#   }
-#   else{
-#      $q1{stateid}='<20';
-#      $q1{eventend}="[EMPTY]";
-#      $q1{class}=[grep(/^.*::eventnotify$/,
-#                       keys(%{$self->{DataObj}->{SubDataObj}}))];
-#      $q2{stateid}='<20';
-#      $q2{eventend}=">now";
-#      $q2{class}=[grep(/^.*::eventnotify$/,
-#                       keys(%{$self->{DataObj}->{SubDataObj}}))];
-#   }
-#
-#
-#   $self->{DataObj}->ResetFilter();
-#   $self->{DataObj}->SecureSetFilter([\%q1,\%q2]);
-#   $self->{DataObj}->setDefaultView(qw(linenumber eventstart name  
-#                                       eventduration state));
    my %param=(ExternalFilter=>1,
               Limit=>50);
    return($self->{DataObj}->Result(%param));
