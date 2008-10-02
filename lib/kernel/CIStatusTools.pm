@@ -241,15 +241,16 @@ sub NotifyAdmin
    $fromname=$creatorrec->{email} if ($fromname eq "");
 
    my $url=$ENV{SCRIPT_URI};
-   $url=~s/[^\/]+$//;
-   my $publicurl=$url;
-   my $listurl=$url;
+   $url=~s#/(auth|public).*$##g;
+   my $spath=$self->Self();
+   $spath=~s/::/\//g;
+   my $publicurl=$url."/public/".$spath."/";
+   my $listurl=$url."/auth/".$spath."/";
+   my $cistatuspath=$url."/public/base/cistatus/show/".$spath;
+
    my $itemname=$self->T($self->Self,$self->Self);;
-   $url.="Detail?$idname=$id";
-   $listurl.="Main";
-   $publicurl=~s#/auth/#/public/#g;
-   my $cistatuspath=$self->Self;
-   $cistatuspath=~s/::/\//g;
+   $url=$listurl."Detail?$idname=$id";
+   $listurl=$listurl."Main";
    $cistatuspath.="/$id";
    $cistatuspath.="?HTTP_ACCEPT_LANGUAGE=".$self->Lang();
 
@@ -303,7 +304,8 @@ sub NotifyAdmin
       $notiy{emailpostfix}=<<EOF;
 <br>
 <br>
-<img title="$imgtitle" src="${publicurl}../../base/cistatus/show/$cistatuspath">
+<br>
+<img title="$imgtitle" src="${cistatuspath}">
 EOF
    }
    $notiy{emailtext}=$msg;
@@ -377,15 +379,16 @@ sub NotifyAddOrRemoveObject
    }
 
    my $url=$ENV{SCRIPT_URI};
-   $url=~s/[^\/]+$//;
-   my $publicurl=$url;
-   my $listurl=$url;
+   $url=~s#/(auth|public).*$##g;
+   my $spath=$self->Self();
+   $spath=~s/::/\//g;
+   my $publicurl=$url."/public/".$spath."/";
+   my $listurl=$url."/auth/".$spath."/";
+   my $cistatuspath=$url."/public/base/cistatus/show/".$spath;
+
    my $itemname=$self->T($self->Self,$self->Self);;
-   $url.="Detail?$idname=$id";
-   $listurl.="Main";
-   $publicurl=~s#/auth/#/public/#g;
-   my $cistatuspath=$self->Self;
-   $cistatuspath=~s/::/\//g;
+   $url=$listurl."Detail?$idname=$id";
+   $listurl=$listurl."Main";
    $cistatuspath.="/$id";
    $cistatuspath.="?HTTP_ACCEPT_LANGUAGE=".$self->Lang();
 
@@ -484,6 +487,11 @@ sub NotifyAddOrRemoveObject
          $notiy{emailto}=\@emailto;
          $notiy{class}='base::workflow::mailsend';
          $notiy{step}='base::workflow::mailsend::dataload';
+         if ($op ne "delete"){
+            $notiy{emailpostfix}=<<EOF;
+<img src="${cistatuspath}">
+EOF
+         }
          my $wf=getModuleObject($self->Config,"base::workflow");
          if (my $id=$wf->Store(undef,\%notiy)){
             my %d=(step=>'base::workflow::mailsend::waitforspool');

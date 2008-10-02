@@ -13,3 +13,6 @@
 'subscribed'=>{de=>'aboniert'},
 'default handling'=>{de=>'standard Behandlung'},
 'Current State'=>{de=>'aktueller Status'},
+'Are you sure, you want to inactivate the shown InfoAbos?'=>{de=>'Sind Sie sicher, dass die aufgeführten InfoAbos deaktiviert werden sollen?'},
+'OK - no changes has been done'=>{de=>'OK, es wurden keine Änderungen vorgenommen'},
+'InfoAbo has been inactivated as requested'=>{de=>'Das InfoAbo wurde wie gefordert deaktiviert'},

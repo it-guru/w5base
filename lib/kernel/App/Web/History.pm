@@ -62,8 +62,8 @@ EOF
    push(@tt,">now-7d", $self->T("last Week"));
    push(@tt,">now-28d",$self->T("last 4 Weeks"));
    push(@tt,">now-84d",$self->T("last 12 Weeks"));
-   push(@tt,">now-84d",$self->T("last 12 Weeks"));
-   push(@tt,">now-365d",$self->T("last 365 Tage"));
+   push(@tt,">now-180d",$self->T("last 180 days"));
+   push(@tt,">now-365d",$self->T("last 365 days"));
    push(@tt,"",$self->T("all"));
    my $tt="<select name=ListTime style=\"width:150px\">";
    while(my $k=shift(@tt)){

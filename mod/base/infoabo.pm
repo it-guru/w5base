@@ -425,22 +425,49 @@ EOF
    if ($cleanupmode ne ""){
       $flt->{mode}=$cleanupmode;
    }
+   if ($self->IsMemberOf("admin")){
+      delete($flt->{userid});
+   }
    $self->SetFilter($flt);
-   my @l=$self->getHashList(qw(id mode));
-   if ($#l!=-1){
+   my @l=$self->getHashList(qw(ALL));
+   if ($#l==-1){
       $d="<br><br><center><b>requested InfoAbos not found</b></center>";
    }
    else{
-      $d.="<table border=1>";
-      $d.="<tr><td>Info-Mode</td><td>Target</td></tr>";
-      foreach my $rec (@l){
-         $d.="<tr><td>$rec->{mode}".Dumper($rec)."</td></tr>";
+      if (Query->Param("yes") eq "" && Query->Param("no") eq ""){
+         $d.="<center><br><br><table border=1 width=500>";
+         $d.="<tr><td><b>InfoAbo</b></td></tr>";
+         foreach my $rec (@l){
+            my $mode=$rec->{targetname};
+            $d.="<tr><td>$mode</td></tr>";
+         }
+         $d.="</table>";
+         $d.="<br>";
+         $d.=$self->T("Are you sure, you want to inactivate the shown InfoAbos?");
+         $d.="<input type=submit name=yes style=\"width:80px\" ".
+             "value=\" ".$self->T("yes")." \">";
+         $d.="<input type=submit name=no style=\"width:80px\" ".
+             "value=\" ".$self->T("no")." \">";
+         $d.="</center>";
+         $d.="<input type=hidden name=DIRECT_cleanupmode ".
+             "value=\"$cleanupmode\">";
+         $d.="<input type=hidden name=DIRECT_cleanupid ".
+             "value=\"$cleanupid\">";
       }
-      $d.="</table>";
-      $d.="<br>";
-      $d.="Sind Sie sicher, dass die aufgeführten InfoAbos deaktiviert werden sollen?";
-      $d.="<input type=submit name=yes value=\" Yes \">";
-      $d.="<input type=submit name=yes value=\" No \">";
+      else{
+         if (Query->Param("yes") ne ""){
+            foreach my $rec (@l){
+               $self->ValidatedUpdateRecord($rec,{active=>0},{id=>\$rec->{id}});
+            }
+            $d="<br><br><center>".
+               $self->T("InfoAbo has been inactivated as requested").
+               "</center>";
+         }
+         else{
+            $d="<br><br><center>".$self->T("OK - no changes has been done").
+               "</center>";
+         }
+      }
    }
 
    printf("<tr><td valign=top>%s</td></tr>",$d);
