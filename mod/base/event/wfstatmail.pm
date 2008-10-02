@@ -37,6 +37,7 @@ sub Init
 
 
    $self->RegisterEvent("wfstatmail","SendMyJobs");
+   $self->RegisterEvent("wfstatsend","SendMyJobs");
    return(1);
 }
 
