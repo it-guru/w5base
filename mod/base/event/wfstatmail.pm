@@ -47,10 +47,11 @@ sub SendMyJobs
    my $ia=getModuleObject($self->Config,"base::infoabo");
    my $user=getModuleObject($self->Config,"base::user");
    my $flt={usertyp=>\'user',cistatusid=>\'4'};
-   $flt->{fullname}="vogl* bichler* *hanno.ernst*";
-   $flt->{fullname}="ladegast*";
+   #$flt->{fullname}="vogl* bichler* *hanno.ernst*";
+   #$flt->{fullname}="ladegast* ernst*";
+   $flt->{groups}="DTAG.TSI.ES.ITO.CSS.T-Com.ST.DB";
    $user->SetFilter($flt);
-   $user->SetCurrentView(qw(userid fullname email accounts));
+   $user->SetCurrentView(qw(userid fullname email accounts lang));
    my $wf=getModuleObject($self->Config,"base::MyW5Base::wfmyjobs");
    $wf->setParent($self);
 
@@ -106,7 +107,7 @@ sub SendMyJobs
                            $bold0="</b>";
                         }
                      }
-                     my $msg=$self->T("unbearbeitet\nseit \%d Tagen");
+                     my $msg=$self->T("unprocessed\nsince \%d days");
                      $msg=~s/\n/<br>/g;
                           
                      $emailprefix=

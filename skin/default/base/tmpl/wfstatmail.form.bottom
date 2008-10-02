@@ -4,16 +4,15 @@
   <tr>
     <td colspan=3">
        <div style="width:100%;background-color:#ffffff;margin:20px;padding:10px;margin-top:20px;margin-bottom:80px;overflow:hidden">
-          <p class=header>Den aktuellen Stand dieser Liste finden Sie unter:
+          <p class=header>The current list of your pending workflows can be found online at:
 <br>
 <br><center>
-<a target=W5Base href="%baseurl%/auth/base/menu/msel/MyW5Base?MyW5BaseSUBMOD=base::MyW5Base::wfmyjobs">"MyW5Base" => "meine aktuell anstehenden Aufgaben"</a><br>
-</center><p class=header><br>Sie sind in der W5Base mit den Account(s) "<b>%accounts%</b>" bekannt. Mit einer dieser Accounts sollten Sie sich also anmelden können. Weitere Informationen über die Login-Prozedur finden Sie auf der <a href="%baseurl%/public/base/menu/root">Startseite</a>.<br>
+<a target=W5Base href="%baseurl%/auth/base/menu/msel/MyW5Base?MyW5BaseSUBMOD=base::MyW5Base::wfmyjobs">"MyW5Base" => "my current jobs"</a><br>
+</center><p class=header><br>You are known with one of the accounts "<b>%accounts%</b>". With this account, you can login. Further informations about the loiginprocess you will find at the <a href="%baseurl%/public/base/menu/root">Start-Page</a>.<br>
 </p>
 <p class="unsubscribe">
-Wenn Sie diesen Report nicht mehr zugesandt haben möchten, dann können Sie ihn  über diesen <a target=W5Base href="%baseurl%/auth/base/menu/msel/sysadm/userenv/infoabo?DIRECT_cleanupid=%infoabo%">&lt;-&nbsp;Link&nbsp;-&gt;</a> deaktivieren.
+If you want to unsubscribe this report, you can do this by click at this <a target=W5Base href="%baseurl%/auth/base/menu/msel/sysadm/userenv/infoabo?DIRECT_cleanupid=%infoabo%">&lt;-&nbsp;Link&nbsp;-&gt;</a>.
 </p>
-<a target=W5Base href="%baseurl%/auth/base/menu/msel/sysadm/userenv/infoabo?DIRECT_cleanupmode=STEVwfstatsendWeek">&lt;-&nbsp;Link&nbsp;-&gt;</a>
        </div>
     </td>
   </tr>

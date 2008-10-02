@@ -1401,7 +1401,8 @@ sub findtemplvar
       my $res=$self->DataObj_findtemplvar(@_);
       return($res) if (defined($res));
    }
-   if (grep(/^$var$/,Query->Param())){
+   my $qvar=quotemeta($var);
+   if (grep(/^$qvar$/,Query->Param())){
       return(Query->Param($var));
    }
    #return("unknown-vari:$var");
