@@ -7,12 +7,13 @@
           <p class=header>Den aktuellen Stand dieser Liste finden Sie unter:
 <br>
 <br><center>
-<a href="%baseurl%/auth/base/menu/msel/MyW5Base?MyW5BaseSUBMOD=base::MyW5Base::wfmyjobs">"MyW5Base" => "meine aktuell anstehenden Aufgaben"</a><br>
-</center><p class=header><br>Sie sind in der W5Base mit den Account(s) "<b>%accounts%</b>" bekannt. Informationen über die Login-Prozedur finden Sie auf der <a href="%baseurl%/public/base/menu/root">Startseite</a>.<br>
+<a target=W5Base href="%baseurl%/auth/base/menu/msel/MyW5Base?MyW5BaseSUBMOD=base::MyW5Base::wfmyjobs">"MyW5Base" => "meine aktuell anstehenden Aufgaben"</a><br>
+</center><p class=header><br>Sie sind in der W5Base mit den Account(s) "<b>%accounts%</b>" bekannt. Mit einer dieser Accounts sollten Sie sich also anmelden können. Weitere Informationen über die Login-Prozedur finden Sie auf der <a href="%baseurl%/public/base/menu/root">Startseite</a>.<br>
 </p>
 <p class="unsubscribe">
-Wenn Sie diesen Report nicht mehr zugesandt haben möchten, dann können Sie ihn  über diesen <a href="%baseurl%/auth/base/menu/msel/sysadm/userenv/infoabo?DIRECT_cleanupid=%infoabo%">&lt;-&nbsp;Link&nbsp;-&gt;</a> deaktivieren.
+Wenn Sie diesen Report nicht mehr zugesandt haben möchten, dann können Sie ihn  über diesen <a target=W5Base href="%baseurl%/auth/base/menu/msel/sysadm/userenv/infoabo?DIRECT_cleanupid=%infoabo%">&lt;-&nbsp;Link&nbsp;-&gt;</a> deaktivieren.
 </p>
+<a target=W5Base href="%baseurl%/auth/base/menu/msel/sysadm/userenv/infoabo?DIRECT_cleanupmode=STEVwfstatsendWeek">&lt;-&nbsp;Link&nbsp;-&gt;</a>
        </div>
     </td>
   </tr>

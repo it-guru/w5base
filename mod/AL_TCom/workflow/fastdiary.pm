@@ -257,6 +257,16 @@ sub ProcessNext
       $self->LastMsg(ERROR,"invalid or to short description");
       return(0);
    }
+   #
+   # check tcomcodcause
+   #
+   my $tcomcodcause=Query->Param("Formated_tcomcodcause");
+   if ($tcomcodcause=~m/^\s*$/ || $tcomcodcause eq "undef"){
+      $self->LastMsg(ERROR,"invalid activity selected");
+      return(0);
+   }
+
+
 
    #
    # create or update workflow
@@ -305,6 +315,8 @@ sub ProcessNext
                             step=>"AL_TCom::workflow::diary::wfclose",
                             tcomworktime=>$tcomworktime,
                             stateid=>17});
+            my $c=$self->getParent->Context();
+            $c->{InsertId}=$oldrec->{id};
             my $userid=$self->getParent->getParent->getCurrentUserId();
             if ($userid==$applrec->{tsmid}  ||
                 $userid==$applrec->{tsm2id} ||
@@ -330,14 +342,7 @@ sub ProcessNext
       return(0);
    }
 
-  # $wf->SetFilter({srcsys=>'AL_TCom::workflow::shortdiary
-
-
-
-
-
    my $nextstep=$self->getParent->getNextStep($self->Self(),$WfRec);
-   printf STDERR ("fifi nextstep=$nextstep\n");
    if (defined($nextstep)){
       Query->Param("WorkflowStep"=>$nextstep);
       return(0);
@@ -375,7 +380,18 @@ sub generateWorkspace
    my $m1=$self->T("MSG");
    $m1="" if ($m1 eq "MSG");
 
-   my $templ="<br><center><b>".$self->T("OK entry appended")."</b></center>";
+   my $c=$self->getParent->Context();
+   my $id=$c->{InsertId};
+
+   my $templ="<br><center><b>".$self->T("OK entry appended")."</b>";
+   if (defined($id)){
+      my $dest="../../base/workflow/ById/$id";
+      my $detailx=$self->getParent->getParent->DetailX();
+      my $detaily=$self->getParent->getParent->DetailY();
+
+      $templ.=" (<a href=\"$dest\" target=WF$id>$id</a>)";
+   }
+   $templ.="</center>";
    return($templ);
 }
 

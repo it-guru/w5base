@@ -392,8 +392,10 @@ sub Main
 {
    my $self=shift;
    my $cleanupid=Query->Param("DIRECT_cleanupid");
+   my $cleanupmode=Query->Param("DIRECT_cleanupmode");
 
-   return($self->SUPER::Main(@_)) if ($cleanupid eq "");
+   return($self->SUPER::Main(@_)) if ($cleanupid eq "" &&
+                                      $cleanupmode eq "");
 
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','mainwork.css',
@@ -412,9 +414,38 @@ EOF
          "border=0 cellspacing=0 cellpadding=0>");
    printf("<tr><td height=1%% style=\"padding:1px\" ".
           "valign=top>%s</td></tr>",$self->getAppTitleBar());
-   printf("<tr><td valign=top>%s</td></tr>","InfoAbo abmelden");
+   my $d;
+   my $userid=$self->getCurrentUserId();
+   $cleanupid=~s/[:;,]/ /g;
+   $self->ResetFilter();
+   my $flt={userid=>\$userid};
+   if ($cleanupid ne ""){
+      $flt->{id}=$cleanupid;
+   }
+   if ($cleanupmode ne ""){
+      $flt->{mode}=$cleanupmode;
+   }
+   $self->SetFilter($flt);
+   my @l=$self->getHashList(qw(id mode));
+   if ($#l!=-1){
+      $d="<br><br><center><b>requested InfoAbos not found</b></center>";
+   }
+   else{
+      $d.="<table border=1>";
+      $d.="<tr><td>Info-Mode</td><td>Target</td></tr>";
+      foreach my $rec (@l){
+         $d.="<tr><td>$rec->{mode}".Dumper($rec)."</td></tr>";
+      }
+      $d.="</table>";
+      $d.="<br>";
+      $d.="Sind Sie sicher, dass die aufgeführten InfoAbos deaktiviert werden sollen?";
+      $d.="<input type=submit name=yes value=\" Yes \">";
+      $d.="<input type=submit name=yes value=\" No \">";
+   }
+
+   printf("<tr><td valign=top>%s</td></tr>",$d);
    printf("</table>");
-   print $self->HttpBottom();
+   print $self->HtmlBottom(body=>1,form=>1);
 }
 
 
