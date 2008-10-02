@@ -565,7 +565,10 @@ sub LoadTargets
          $self->SetFilter({refid=>$refid,mode=>$mode,active=>\'1',
                            parent=>$parent,userid=>$userlist});
          foreach my $rec ($self->getHashList(qw(email))){
-            $desthash->{lc($rec->{email})}++;
+            if (!defined($desthash->{lc($rec->{email})})){
+               $desthash->{lc($rec->{email})}=[];
+            }
+            push(@{$desthash->{lc($rec->{email})}},$rec->{id});
          }
       }
    }
