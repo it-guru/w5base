@@ -65,7 +65,7 @@ sub QuickFindDetail
    my $dataobj=getModuleObject($self->getParent->Config,"itil::asset");
    $dataobj->SetFilter({id=>\$id});
    my ($rec,$msg)=$dataobj->getOnlyFirst(qw(guardian guardian2  databoss
-                                         phonenumbers
+                                         phonenumbers guardianteam
                                          location room place));
 
    $dataobj->ResetFilter();
@@ -78,7 +78,7 @@ sub QuickFindDetail
          $htmlresult.=$self->addDirectLink($dataobj,search_id=>$id);
       }
       $htmlresult.="<table>";
-      my @l=qw(guardian guardian2 databoss location room place);
+      my @l=qw(guardian guardian2 databoss location room place guardianteam);
       foreach my $v (@l){
          if ($rec->{$v} ne ""){
             my $name=$dataobj->getField($v)->Label();

@@ -73,7 +73,7 @@ sub QuickFindDetail
    my ($rec,$msg)=$appl->getOnlyFirst(qw(delmgr delmgr2 conumber cistatus 
                                          sem sem2 tsm tsm2 databoss 
                                          customerprio phonenumbers
-                                         description));
+                                         description businessteam));
    $appl->ResetFilter();
    $appl->SecureSetFilter([{id=>\$id}]);
    my ($secrec,$msg)=$appl->getOnlyFirst(qw(id));
@@ -84,7 +84,7 @@ sub QuickFindDetail
          $htmlresult.=$self->addDirectLink($appl,search_id=>$id);
       }
       $htmlresult.="<table>";
-      my @l=qw(sem sem2 delmgr delmgr2 tsm tsm2 databoss);
+      my @l=qw(sem sem2 delmgr delmgr2 tsm tsm2 databoss businessteam);
       foreach my $v (@l){
          if ($rec->{$v} ne ""){
             my $name=$appl->getField($v)->Label();

@@ -76,7 +76,7 @@ sub QuickFindDetail
    my $dataobj=getModuleObject($self->getParent->Config,"itil::system");
    $dataobj->SetFilter({id=>\$id});
    my ($rec,$msg)=$dataobj->getOnlyFirst(qw(systemid adm adm2 databoss
-                                            phonenumbers
+                                            phonenumbers adminteam
                                             applications));
 
    $dataobj->ResetFilter();
@@ -89,7 +89,7 @@ sub QuickFindDetail
          $htmlresult.=$self->addDirectLink($dataobj,search_id=>$id);
       }
       $htmlresult.="<table>";
-      my @l=qw(systemid adm adm2 databoss admteam);
+      my @l=qw(systemid adm adm2 databoss adminteam);
       foreach my $v (@l){
          if ($rec->{$v} ne ""){
             my $name=$dataobj->getField($v)->Label();
