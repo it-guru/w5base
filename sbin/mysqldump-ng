@@ -24,6 +24,7 @@ use Date::Calc qw( Today_and_Now
                    Week_of_Year
                    Day_of_Week_to_Text
                    Delta_YMDHMS
+                   Delta_DHMS
                    Day_of_Week );
 use IPC::Open3;
 use IO::Handle;
@@ -34,7 +35,7 @@ use Cwd;
 use File::Path;
 use POSIX;
 
-my @starttime=Today_and_Now();
+my $starttime=sprintf("%04d-%02d-%02d %02d:%02d:%02d",Today_and_Now);
 $Data::Dumper::Terse = 1;          
 $Data::Dumper::Indent = 1;  
 my @prog=qw(mysql mysqldump gunzip);
@@ -862,7 +863,48 @@ You really want to overite the folder? [y/N]: ");
    exit(1);
 }
 
-my @take=Delta_YMDHMS(@starttime,Today_and_Now());                         
-printf("INFO: the mysqldump-ng operation takes: %sh %smin %ssec\n"
-       ,$take[3],$take[4],$take[5]);                         
+sub CalcDateDuration
+{
+   my $d1=shift;
+   my $d2=shift;
+   if (ref($d1)){
+      $d1=$d1->ymd." ".$d1->hms;
+   }
+   if (ref($d2)){
+      $d2=$d2->ymd." ".$d2->hms;
+   }
+   if ((my ($wsY,$wsM,$wsD,$wsh,$wsm,$wss)=$d1=~
+          m/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/) &&
+       (my ($weY,$weM,$weD,$weh,$wem,$wes)=$d2=~
+          m/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/)){
+      my ($dd,$dh,$dm,$ds);
+      eval('($dd,$dh,$dm,$ds)=Delta_DHMS($wsY,$wsM,$wsD,$wsh,$wsm,$wss,
+                                         $weY,$weM,$weD,$weh,$wem,$wes);');
+      if ($@ ne ""){
+         return(undef);
+      }
+      $dd=0 if (!defined($dd));
+      $dh=0 if (!defined($dh));
+      $dm=0 if (!defined($dm));
+      $ds=0 if (!defined($ds));
+      my $duration={days=>$dd,hours=>$dh,minutes=>$dm, seconds=>$ds};
+      $duration->{totalminutes}=($dd*24*60)+($dh*60)+$dm+(1/60*$ds);
+      $duration->{totalseconds}=($dd*24*60*60)+($dh*60*60)+($dm*60)+$ds;
+      my $d="";
+      $d.="${dd}d" if ($dd!=0);
+      $d.=" "      if ($dh!=0 && $d ne "");
+      $d.="${dh}h" if ($dh!=0);
+      $d.=" "      if ($dm!=0 && $d ne "");
+      $d.="${dm}m" if ($dm!=0);
+      $d.=" "      if ($ds!=0 && $d ne "");
+      $d.="${ds}s" if ($ds!=0);
+      $duration->{string}=$d;
+      return($duration);
+   }
+   return(undef);
+}
+
+my $endtime=sprintf("%04d-%02d-%02d %02d:%02d:%02d",Today_and_Now);
+my $take=CalcDateDuration($starttime,$endtime);
+printf("INFO: the mysqldump-ng operation takes: %s\n",$take->{'string'});                         
                                
