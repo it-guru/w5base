@@ -11,5 +11,6 @@
 'count of software instance'=>{de=>'Anzahl Software Instanzen'},
 'logical systems'=>{de=>'logische Systeme'},
 'count of logical systems'=>{de=>'Anzahl logische Systeme'},
+'count of software instances'=>{de=>'Anzahl Software Instanzen'},
 'assets'=>{de=>'Assets (physische Systeme)'},
 'count of physical systems'=>{de=>'Anzahl physische Systeme'},
