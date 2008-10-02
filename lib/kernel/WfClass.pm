@@ -982,28 +982,19 @@ EOF
       $templ.="<tr>";
       $templ.="<td class=emailpreviewemailprefix>".
               $param{emailprefix}->[$blk]."</td>";
+      my $emailtext=$param{emailtext}->[$blk];
+      $emailtext=~s/</&lt;/g;
+      $emailtext=~s/>/&gt;/g;
+      $emailtext=~s/\%/\\\%/g;
       $templ.="<td class=emailpreviewemailtext>".
               "<table style=\"table-layout:fixed;width:100%\" ".
               "cellspacing=0 cellpadding=0><tr><td>".
               "<div style=\"overflow:hidden\"><pre class=emailpreview>".
-              FancyLinks($param{emailtext}->[$blk])."</pre></div>".
+              FancyLinks($emailtext)."</pre></div>".
               "</td></tr></table></td>";
       $templ.="</tr>";
    }
    $templ.=$sepend."</td></tr></table></div>";
-
-#   sub processlink
-#   {
-#      my $link=shift;
-#      my $prefix=shift;
-#      my $res="<a href=\"$link\">$link</a>".$prefix;
-#      if (length($link)>20){
-#         $res="<a href=\"$link\">".
-#              "&lt;direct link&gt;</a>".$prefix;
-#      }
-#      return($res);
-#   }
-#   $templ=~s#(http|https|telnet|news)(://\S+?)(\?\S+){0,1}(["']{0,1}\s)#processlink("$1$2$3",$4)#ge;
 
    return($templ);
 
