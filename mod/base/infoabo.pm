@@ -522,7 +522,10 @@ sub LoadTargets
                          parent=>$parent,
                          active=>\'1'});
       foreach my $rec ($self->getHashList(qw(email))){
-         $desthash->{lc($rec->{email})}++;
+         if (!defined($desthash->{lc($rec->{email})})){
+            $desthash->{lc($rec->{email})}=[];
+         }
+         push(@{$desthash->{lc($rec->{email})}},$rec->{id});
          $c++;
       }
    }
