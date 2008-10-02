@@ -51,7 +51,7 @@ sub SendMyJobs
    #$flt->{fullname}="ladegast* ernst*";
    $flt->{groups}="DTAG.TSI.ES.ITO.CSS.T-Com.ST.DB";
    $user->SetFilter($flt);
-   $user->SetCurrentView(qw(userid fullname email accounts lang));
+   $user->SetCurrentView(qw(userid fullname email accounts lang lastlang));
    my $wf=getModuleObject($self->Config,"base::MyW5Base::wfmyjobs");
    $wf->setParent($self);
 
@@ -59,18 +59,18 @@ sub SendMyJobs
    my $baseurl=$self->Config->Param("EventJobBaseUrl");
    my ($urec,$msg)=$user->getFirst();
    if (defined($urec)){
-      #######################################################################
-      my $userlang="";
-      if ($urec->{lastlang} ne ""){
-         $userlang=$urec->{lastlang};
-      }
-      if ($userlang eq ""){
-         $userlang=$urec->{lang};
-      }
-      $userlang eq "en" if ($userlang eq "");
-      #######################################################################
-
       do{
+         #######################################################################
+         my $userlang="";
+         if ($urec->{lastlang} ne ""){
+            $userlang=$urec->{lastlang};
+         }
+         if ($userlang eq ""){
+            $userlang=$urec->{lang};
+         }
+         $userlang eq "en" if ($userlang eq "");
+         #######################################################################
+
          my $emailto={};
          $ia->LoadTargets($emailto,'base::staticinfoabo',\'STEVwfstatsendWeek',
                                    '110000003',[$urec->{userid}],default=>1);
