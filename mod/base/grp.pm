@@ -31,7 +31,9 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=3;
    my $self=bless($type->SUPER::new(%param),$type);
+
    
    $self->AddFields(
       new kernel::Field::Linenumber(
@@ -77,6 +79,17 @@ sub new
                 name          =>'description',
                 label         =>'Description',
                 dataobjattr   =>'grp.description'),
+
+      new kernel::Field::SubList(
+                name          =>'users',
+                subeditmsk    =>'subedit.group',
+                label         =>'Users',
+                group         =>'users',
+                forwardSearch =>1,
+                vjointo       =>'base::lnkgrpuser',
+                vjoinon       =>['grpid'=>'grpid'],
+                vjoindisp     =>['user','userweblink','roles'],
+                vjoininhash   =>['userid','email','user','usertyp','roles']),
 
       new kernel::Field::TextDrop(
                 name          =>'parent',
@@ -173,16 +186,6 @@ sub new
                 vjoindisp     =>['name','cistatus'],
                 vjoininhash   =>['grpid','name','fullname']),
 
-      new kernel::Field::SubList(
-                name          =>'users',
-                subeditmsk    =>'subedit.group',
-                label         =>'Users',
-                group         =>'users',
-                vjointo       =>'base::lnkgrpuser',
-                vjoinon       =>['grpid'=>'grpid'],
-                vjoindisp     =>['user','userweblink','roles'],
-                vjoininhash   =>['userid','email','user','usertyp','roles']),
-
       new kernel::Field::QualityText(),
       new kernel::Field::QualityState(),
       new kernel::Field::QualityOk(),
@@ -214,6 +217,17 @@ sub PhoneUsage
    return(@l);
 
 }
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_cistatus"))){
+     Query->Param("search_cistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
+
 
 
 sub getValidWebFunctions
