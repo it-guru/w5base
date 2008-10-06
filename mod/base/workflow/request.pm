@@ -281,7 +281,7 @@ sub getPosibleActions
                }
             }
          }
-         printf STDERR ("fifi actions=%s\n",Dumper($WfRec));
+         #printf STDERR ("fifi actions=%s\n",Dumper($WfRec));
       }
    }
 
