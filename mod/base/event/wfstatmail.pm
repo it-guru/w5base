@@ -55,6 +55,7 @@ sub SendMyJobs
    if ($#target==-1){
       $flt[0]->{groups}=["DTAG.TSI.ES.ITO.CSS.T-Com.ST.DB",
                          "DTAG.TSI.ES.ITO.CSS.T-Com.PMAQ.QSO",
+                         "DTAG.TSI.ES.ITO.CSS.T-Com.ST.WINDOWS",
                          "DTAG.TSI.ES.ITO.CSS.T-Com.PMAQ.QSC"];
    }
    else{
@@ -88,7 +89,7 @@ sub SendMyJobs
          $ia->LoadTargets($emailto,'base::staticinfoabo',\'STEVwfstatsendWeek',
                                    '110000003',[$urec->{userid}],default=>1);
          if (ref($urec->{accounts}) eq "ARRAY" &&
-             $#{$urec->{accounts}}>0 && keys(%{$emailto})>0){
+             $#{$urec->{accounts}}>-1 && keys(%{$emailto})>0){
             $ENV{HTTP_FORCE_LANGUAGE}=$userlang;
             my $accounts=join(", ",map({$_->{account}} @{$urec->{accounts}}));
             $wf->ResetFilter();
