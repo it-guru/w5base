@@ -44,14 +44,26 @@ sub Init
 sub SendMyJobs
 {
    my $self=shift;
+   my @target=@_;
 
    my $ia=getModuleObject($self->Config,"base::infoabo");
    my $user=getModuleObject($self->Config,"base::user");
-   my $flt={usertyp=>\'user',cistatusid=>\'4'};
+   my @flt;
+   $flt[0]={usertyp=>\'user',cistatusid=>\'4'};
    #$flt->{fullname}="vogl* bichler* *hanno.ernst*";
    #$flt->{fullname}="ladegast* ernst*";
-   $flt->{groups}="DTAG.TSI.ES.ITO.CSS.T-Com.ST.DB";
-   $user->SetFilter($flt);
+   if ($#target==-1){
+      $flt[0]->{groups}=["DTAG.TSI.ES.ITO.CSS.T-Com.ST.DB",
+                         "DTAG.TSI.ES.ITO.CSS.T-Com.PMAQ.QSO",
+                         "DTAG.TSI.ES.ITO.CSS.T-Com.PMAQ.QSC"];
+   }
+   else{
+      my %f=%{$flt[0]};
+      $flt[1]=\%f;
+      $flt[0]->{groups}=\@target;
+      $flt[1]->{email}=\@target;
+   }
+   $user->SetFilter(\@flt);
    $user->SetCurrentView(qw(userid fullname email accounts lang lastlang));
    my $wf=getModuleObject($self->Config,"base::MyW5Base::wfmyjobs");
    $wf->setParent($self);
@@ -138,19 +150,21 @@ sub SendMyJobs
                   }
                }
             }
-            my $infoabo=join(",",map({@{$_}} values(%{$emailto})));
-            if ($baseurl ne ""){
-               $self->sendNotify(emailtext=>\@emailtext,
-                                 emailpostfix=>\@emailpostfix,
-                                 emailprefix=>\@emailprefix,
-                                 additional=>{contact=>$urec->{fullname},
-                                              wfcount=>$wfcount,
-                                              accounts=>$accounts,
-                                              baseurl=>$baseurl,
-                                              infoabo=>$infoabo,
-                                             },
-                                 emailfrom=>[keys(%{$emailto})],
-                                 emailto=>[keys(%{$emailto})]);
+            if ($#l!=-1){
+               my $infoabo=join(",",map({@{$_}} values(%{$emailto})));
+               if ($baseurl ne ""){
+                  $self->sendNotify(emailtext=>\@emailtext,
+                                    emailpostfix=>\@emailpostfix,
+                                    emailprefix=>\@emailprefix,
+                                    additional=>{contact=>$urec->{fullname},
+                                                 wfcount=>$wfcount,
+                                                 accounts=>$accounts,
+                                                 baseurl=>$baseurl,
+                                                 infoabo=>$infoabo,
+                                                },
+                                    emailfrom=>[keys(%{$emailto})],
+                                    emailto=>[keys(%{$emailto})]);
+               }
             }
          }
          delete($ENV{HTTP_FORCE_LANGUAGE});
@@ -174,6 +188,9 @@ sub sendNotify
    $rec{name}=$self->T('weekly report current jobs');
    if ($sitename ne ""){
       $rec{name}=$sitename.": ".$rec{name};
+   }
+   if (defined($rec{additional}->{wfcount})){
+      $rec{name}.=" (".$rec{additional}->{wfcount}.")";
    }
    $rec{emailtemplate}='wfstatmail';
    $rec{emailcc}=['hartmut.vogler@t-systems.com'];
