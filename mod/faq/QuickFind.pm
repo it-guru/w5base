@@ -121,10 +121,25 @@ sub doSearch
    my $found=0;
    if (grep(/^ci$/,@stags)){
       my $tree="foldersTree";
-      if (!$found){
-         print treeViewHeader($label,1);
+      $self->LoadSubObjs("QuickFind","QuickFind");
+      my @s;
+      foreach my $sobj (values(%{$self->{QuickFind}})){
+         my $acl=$self->getMenuAcl($ENV{REMOTE_USER},
+                                   $sobj->Self());
+         if (defined($acl)){
+            next if (!grep(/^read$/,@$acl));
+         }
+         msg(INFO,"mod=%s acl=%s",$sobj->Self(),Dumper($acl));
+         if ($sobj->can("CISearchResult")){
+            push(@s,$sobj->CISearchResult($tag,$searchtext));
+         }
       }
-      print <<EOF;
+      my $group=undef;
+      foreach my $res (sort({$a->{group} cmp 
+                             $b->{group}} @s)){
+         if (!$found){
+            print treeViewHeader($label,1);
+            print <<EOF;
 function switchTag(id)
 {
    var e=document.getElementById(id);
@@ -154,25 +169,8 @@ function switchTag(id)
    }
 }
 EOF
-      $self->LoadSubObjs("QuickFind","QuickFind");
-      my @s;
-      foreach my $sobj (values(%{$self->{QuickFind}})){
-         my $acl=$self->getMenuAcl($ENV{REMOTE_USER},
-                                   $sobj->Self());
-         if (defined($acl)){
-            next if (!grep(/^read$/,@$acl));
-         }
-         msg(INFO,"mod=%s acl=%s",$sobj->Self(),Dumper($acl));
-         if ($sobj->can("CISearchResult")){
-            push(@s,$sobj->CISearchResult($tag,$searchtext));
-         }
-      }
-      if ($#s!=-1){
-         $found++;
-      }
-      my $group=undef;
-      foreach my $res (sort({$a->{group} cmp 
-                             $b->{group}} @s)){
+          }
+          $found++;
           if ($group ne $res->{group}){
              $tree="foldersTree";
              my $gtag=$res->{group};
