@@ -13,9 +13,11 @@
    margin-top:2px;
    margin-bottom:2px;
 }
-#WindowTitle{
+#WindowTitle, a:link.WindowTitle, a:visited.WindowTitle, a:active.WindowTitle  {
    font-size:18px;
    text-weight:bold;
+   text-decoration:none;
+   color:black;
 }
 #WindowSignature{
    margin-top:10px;

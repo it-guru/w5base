@@ -573,7 +573,11 @@ sub FullView
 #
    print("<body class=fullview><form>");
    print("<div class=fullview style=\"padding-bottom:10px\">".
-         "<div id=WindowTitle>".$rec->{name}."</div></div>");
+         "<a target=_blank class=WindowTitle ".
+         "href=\"ById/$rec->{faqid}\" ".
+         "title=\"".$self->T("use this link to reference this ".
+         "record (f.e. in mail)")."\"><div id=WindowTitle>".
+         $rec->{name}."</div></a></div>");
    print("<div class=fullview>".$rec->{data}."</div>");
    if (defined($rec->{attachments}) && ref($rec->{attachments}) eq "ARRAY" &&
        $#{$rec->{attachments}}!=-1){

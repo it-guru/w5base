@@ -45,4 +45,5 @@
 'now'=>{de=>'jetzt'},
 'no access'=>{de=>'kein Zugriff'},
 'allow automatic updates by interfaces'=>{de=>'automatisierte Updates durch Schnittstellen zulassen'},
+'use this link to reference this record (f.e. in mail)'=>{de=>'verwenden Sie diesen Link, um auf diesen Datensatz zu verweisen (z.B. in E-Mails)'},
 
