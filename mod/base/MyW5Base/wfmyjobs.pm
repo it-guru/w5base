@@ -247,7 +247,6 @@ sub SetFilter
 
       push(@q,{id=>[keys(%id)]});
    }
-   printf STDERR ("fifi flt=%s\n",Dumper(\@q));
    $dataobj->ResetFilter();
    $dataobj->SecureSetFilter(\@q);
 }

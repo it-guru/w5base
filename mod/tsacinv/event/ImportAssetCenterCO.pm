@@ -62,7 +62,7 @@ sub ImportAssetCenterCO
      next if (!($rec->{name}=~m/^\d{5,20}$/));
      $w5co->ResetFilter();
      $w5co->SetFilter({name=>\$rec->{name}});
-     my ($w5rec,$msg)=$w5co->getOnlyFirst(qw(name));
+     my ($w5rec,$msg)=$w5co->getOnlyFirst(qw(ALL));
      my $newrec={cistatusid=>4,
                  fullname=>$rec->{description},
                  comments=>"authority at AssetCenter",
