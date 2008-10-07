@@ -196,6 +196,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'applcistatus',
                 readonly      =>1,
+                htmlwidth     =>'100px',
                 group         =>'applinfo',
                 label         =>'Application CI-State',
                 vjointo       =>'base::cistatus',

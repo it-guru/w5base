@@ -151,9 +151,9 @@ sub new
                 group         =>'appl',
                 readonly      =>1,
                 vjointo       =>'itil::lnkapplsystem',
-                #vjoinbase     =>[{cistatusid=>"<=4"}],
+                vjoinbase     =>[{applcistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'assetid'],
-                vjoindisp     =>['appl','applcistatus','customer']),
+                vjoindisp     =>['appl','applcistatus','applcustomer']),
 
       new kernel::Field::SubList(
                 name          =>'customer',
@@ -163,9 +163,9 @@ sub new
                 readonly      =>1,
                 htmldetail    =>0,
                 vjointo       =>'itil::lnkapplsystem',
-                #vjoinbase     =>[{cistatusid=>"<=4"}],
+                vjoinbase     =>[{applcistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'assetid'],
-                vjoindisp     =>['customer','appl']),
+                vjoindisp     =>['applcustomer','appl']),
 
       new kernel::Field::Number(
                 name          =>'cpucount',

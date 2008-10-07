@@ -240,14 +240,14 @@ sub SetFilter
       my @l=$dataobj->getHashList(qw(id));
       map({$id{$_->{id}}=1} @l);
 
-      my $ws=$self->getParent->getPersistentModuleObject("base::workflow");
-      $ws->SetFilter([{fwdtargetid=>\$userid,fwdtarget=>\'base::user'},
-                      {fwdtargetid=>\@grpids,fwdtarget=>\'base::grp'}]); 
-      map({$id{$_->{wfheadid}}=1;} $ws->getHashList(qw(wfheadid)));
+  #    my $ws=$self->getParent->getPersistentModuleObject("base::workflow");
+  #    $ws->SetFilter([{fwdtargetid=>\$userid,fwdtarget=>\'base::user'},
+  #                    {fwdtargetid=>\@grpids,fwdtarget=>\'base::grp'}]); 
+  #    map({$id{$_->{wfheadid}}=1;} $ws->getHashList(qw(wfheadid)));
 
-
-
-      my $wspace=$self->getPersistentModuleObject("base::workflowws");
+      # workspace must ALWAYS be added
+      my $wspace=$self->getParent->getPersistentModuleObject(
+                                        "base::workflowws");
       if (defined($wspace)){   # Links of the workspace table add
          $wspace->SetFilter([{fwdtargetid=>\$userid,fwdtarget=>\'base::user'},
                              {fwdtargetid=>\@grpids,fwdtarget=>\'base::grp'}]); 

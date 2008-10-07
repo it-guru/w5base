@@ -23,6 +23,8 @@ use kernel;
 use kernel::Event;
 @ISA=qw(kernel::Event);
 
+my $TMPDIR="/tmp/accheck";
+
 sub new
 {
    my $type=shift;
@@ -53,8 +55,10 @@ sub ImportAssetCenterCO
    $self->{wf}=getModuleObject($self->Config,"base::workflow");
    $self->{user}=getModuleObject($self->Config,"base::user");
    $self->{mandator}=getModuleObject($self->Config,"base::mandator");
+   my $flt={bc=>['AL T-COM']};
+   #$flt->{name}=\'9100007746';
 
-   $co->SetFilter({bc=>['AL T-COM']});
+   $co->SetFilter($flt);
    my @l=$co->getHashList(qw(name bc description sememail));
    my $cocount=0;
    foreach my $rec (@l){
@@ -89,6 +93,7 @@ sub ImportAssetCenterCO
        my $WfRec=$_;
        my $bk=$wf->Store($WfRec,{stateid=>25});
    });
+#   $self->SendOpMsg();
 
    return({exitcode=>0}); 
 }
@@ -122,11 +127,27 @@ sub VerifyAssetCenterData
                $desc.="There are no application relations in AssetCenter\n"; 
 
                $w5sys->ResetFilter();
-               $w5sys->SetFilter({systemid=>\$sysrec->{systemid}});
+               $w5sys->SetFilter({systemid=>\$sysrec->{systemid},
+                                  cistatusid=>"<=5"});
                my ($w5sysrec,$msg)=$w5sys->getOnlyFirst(qw(id applications
                                                            cistatusid));
                if (!defined($w5sysrec)){
                   $desc.="- SystemID not found in W5Base/Darwin\n";
+                  $self->OpMsg($corec->{sememail},
+                       "SystemID:$sysrec->{systemid}",
+                       "Die SystemID '$sysrec->{systemid}' ".
+                       "(Systemname laut AssetCenter: $sysrec->{systemname}) ".
+                       "ist in W5Base/Darwin nicht definiert.\n".
+                       "Das System mit der SystemID '$sysrec->{systemid}' ".
+                       "ist in AssetCenter der CO-Nummer '$corec->{name}' ".
+                       "(CO Bezeichnung: $corec->{description}) ".
+                       "zugeordnet, für die Sie SeM sind. ".
+                       "Tragen Sie das System mit der SystemID ".
+                       "'$sysrec->{systemid}' entsprechend den ".
+                       "Config-Management Regeln der AL T-Com in ".
+                       "W5Base/Darwin ein! (bzw. tragen Sie die SystemID ".
+                       "ein, falls Sie diese beim entsprechenden System ".
+                       "vergessen haben)");
                }
                else{
                   if (!defined($w5sysrec->{applications}) ||
@@ -134,6 +155,18 @@ sub VerifyAssetCenterData
                       $#{$w5sysrec->{applications}}==-1){
                      $desc.="- no application relations found in ".
                             "W5Base/Darwin\n";
+                     $self->OpMsg($corec->{sememail},
+                          "SystemID:$sysrec->{systemid}",
+                          "Das System '$w5sysrec->{systemname}' mit der ".
+                          "SystemID '$sysrec->{systemid}' ist in ".
+                          "W5Base/Darwin erzeugt, aber keiner Anwendung ".
+                          "zugeordnet. Sie sind als SeM für die CO-Nummer ".
+                          "'$corec->{name}' des Systems in AssetCenter ".
+                          "erfasst. Die Zuorndung eines Systems zu ".
+                          "einer Anwendung ist nach den Config-Management ".
+                          "Regeln der AL T-Com zwingend. Sorgen Sie dafür, ".
+                          "dass die korrekte Zuorndung zu einer Anwendung ".
+                          "in W5Base/Darwin eingetragen wird.");
                   }
                }
 
@@ -182,7 +215,91 @@ sub VerifyAssetCenterData
          }
       }
    }
+}
 
+sub SendOpMsg()
+{
+   my $self=shift;
+
+   my $user=$self->{user};
+   my $wf=$self->{wf};
+   $user->ResetFilter();
+   $user->SetFilter({posix=>['hvogler','hmerx']});
+   my @cc=map({$_->{email}} $user->getHashList(qw(email))); 
+
+
+   foreach my $msgfile (glob($TMPDIR."/*.txt")){
+      if (my ($email)=$msgfile=~m/\/([^\/]+\@.+)\.txt$/){
+         msg(INFO,"send $msgfile");
+         msg(INFO,"to=$email cc=%s",join(", ",@cc));
+         my $msg;
+         my $curcount;
+         if (open(F,"<$msgfile")){
+            my @l=<F>;
+            my @sep=grep(/^---\s*$/,@l);
+            $curcount=$#sep+1;
+            $msg=join("",@l);
+            close(F);
+         }
+         my $newmsgfile=$msgfile;
+         $newmsgfile=~s/\.txt$/.old/g;
+         my $postfix;
+         if (open(F,"<$newmsgfile")){
+            my @l=<F>;
+            my @sep=grep(/^---\s*$/,@l);
+            my $lastcount=$#sep+1;
+            if ($lastcount==$curcount){
+               $postfix="keine Verbesserung";
+            }
+            if ($lastcount<$curcount){
+               $postfix="Verschlechterung um ".($curcount-$lastcount);
+            }
+            if ($lastcount>$curcount){
+               $postfix="Verbesserung um ".($lastcount-$curcount);
+            }
+            $postfix=" ($postfix)";
+         }
+         $postfix=" - $curcount Probleme $postfix";
+         rename($msgfile,$newmsgfile);
+         if ($msg ne ""){
+            my %notiy;
+            $notiy{name}="Mangelhafte Datenpflege in W5Base/Darwin".$postfix;
+            $notiy{emailtext}=$msg."\n\n\n".
+                              "Bei Fragen wenden Sie sich bitte an den ".
+                              "\nConfig-Manager der ".
+                              "AL T-Com Hr. Merx Hans-Peter.";
+            $notiy{emailto}=$email;
+            $notiy{emailcc}=\@cc;
+            $notiy{class}='base::workflow::mailsend';
+            $notiy{step}='base::workflow::mailsend::dataload';
+            if (my $id=$wf->Store(undef,\%notiy)){
+               my %d=(step=>'base::workflow::mailsend::waitforspool');
+               my $r=$wf->Store($id,%d);
+            }
+         }
+      }
+   }
+}
+
+
+sub OpMsg
+{
+   my $self=shift;
+   my $email=shift;
+   my $target=shift;
+   my $msg=shift;
+
+   my $tmpdir=$TMPDIR."/";
+
+   if ($email ne ""){
+      if (!-d $tmpdir){
+         mkdir($tmpdir);
+      }
+      if (open(F,">>$tmpdir/$email.txt")){
+         printf F ("%s\n---\n\n",$msg);
+         close(F);
+      }
+   }
 }
 
 
