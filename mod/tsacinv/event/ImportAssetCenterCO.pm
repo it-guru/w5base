@@ -76,6 +76,8 @@ sub ImportAssetCenterCO
         $w5co->ValidatedInsertRecord($newrec);
      }
      else{
+        delete($newrec->{comments});
+        delete($newrec->{cistatusid}) if ($w5rec->{cistatusid}==5);
         $w5co->ValidatedUpdateRecord($w5rec,$newrec,{name=>\$rec->{name}});
      }
      $self->VerifyAssetCenterData($rec);
