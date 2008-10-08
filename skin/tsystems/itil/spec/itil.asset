@@ -1,0 +1,12 @@
+#######################################################################
+'conumber'=>{de=>'
+Die Eingabe einer gültigen CO-Nummer ist zwingend, wenn der Datensatz
+nach AssetCenter übertragen werden soll!
+',en=>'
+The definition of a valid co-number is needed, if this record
+should be transfered to AssetCenter.
+'},
+
+
+
+

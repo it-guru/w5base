@@ -232,6 +232,15 @@ sub new
                 dataobjattr   =>'asset.comments'),
 
       new kernel::Field::Text(
+                name          =>'conumber',
+                htmlwidth     =>'100px',
+                group         =>'misc',
+                label         =>'CO-Number',
+                weblinkto     =>'itil::costcenter',
+                weblinkon     =>['conumber'=>'name'],
+                dataobjattr   =>'asset.conumber'),
+
+      new kernel::Field::Text(
                 name          =>'kwords',
                 group         =>'misc',
                 label         =>'Keywords',

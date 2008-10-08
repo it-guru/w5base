@@ -30,3 +30,5 @@
 'Producer Service&Support Class'=>{de=>'Hersteller Service&Support Class'},
 'Keywords'=>{de=>'Schlüsselworte'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
+'CO-Number'=>{de=>'Kostenstelle/CO-Nummer',en=>'CostCenter/CO-Number'},
+

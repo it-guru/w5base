@@ -326,11 +326,19 @@ sub processRecord
                                                  $rec->{responseteam}],{},
                                         "ITIL.Application.Count",1);
       }
+      if ($rec->{cistatusid}<=5){
+         $self->getParent->storeStatVar("Group",["admin"],{},
+                                        "ITIL.Total.Application.Count",1);
+      }
    }
    if ($module eq "itil::system"){
       if ($rec->{cistatusid}==4){
          $self->getParent->storeStatVar("Group",[$rec->{adminteam}],{},
                                         "ITIL.System.Count",1);
+      }
+      if ($rec->{cistatusid}<=5){
+         $self->getParent->storeStatVar("Group",["admin"],{},
+                                        "ITIL.Total.System.Count",1);
       }
    }
    if ($module eq "itil::swinstance"){
@@ -338,11 +346,19 @@ sub processRecord
          $self->getParent->storeStatVar("Group",[$rec->{swteam}],{},
                                         "ITIL.SWInstance.Count",1);
       }
+      if ($rec->{cistatusid}<=5){
+         $self->getParent->storeStatVar("Group",["admin"],{},
+                                        "ITIL.Total.SWInstance.Count",1);
+      }
    }
    if ($module eq "itil::asset"){
       if ($rec->{cistatusid}==4){
          $self->getParent->storeStatVar("Group",[$rec->{guardianteam}],{},
                                         "ITIL.Asset.Count",1);
+      }
+      if ($rec->{cistatusid}<=5){
+         $self->getParent->storeStatVar("Group",["admin"],{},
+                                        "ITIL.Total.Asset.Count",1);
       }
    }
    if ($module eq "base::workflow::active"){

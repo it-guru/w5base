@@ -670,3 +670,6 @@ alter table swinstance add databoss2 bigint(20)  default NULL;
 alter table system     add hostid    varchar(20) default NULL;
 alter table system     add vhostsystem bigint(20) default NULL;
 alter table appl       add opmode     varchar(20) default NULL;
+alter table asset      add conumber   varchar(20) default NULL;
+alter table system     add key(conumber);
+alter table asset      add key(conumber);

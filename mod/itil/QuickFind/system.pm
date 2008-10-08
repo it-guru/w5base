@@ -54,6 +54,10 @@ sub CISearchResult
             push(@$flt,{dnsnamelist=>"$searchtext.*"});
          }
       }
+      if ($searchtext=~m/^\d{3,20}$/){
+         push(@$flt,{conumber=>\"$searchtext",
+                     cistatusid=>"<=5"});
+      }
       my $dataobj=getModuleObject($self->getParent->Config,"itil::system");
       $dataobj->SetFilter($flt);
       foreach my $rec ($dataobj->getHashList(qw(name))){

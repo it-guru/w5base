@@ -357,6 +357,15 @@ sub new
                 dataobjattr   =>'system.comments'),
 
       new kernel::Field::Text(
+                name          =>'conumber',
+                group         =>'misc',
+                htmlwidth     =>'100px',
+                label         =>'CO-Number',
+                weblinkto     =>'itil::costcenter',
+                weblinkon     =>['conumber'=>'name'],
+                dataobjattr   =>'system.conumber'),
+
+      new kernel::Field::Text(
                 name          =>'kwords',
                 group         =>'misc',
                 label         =>'Keywords',

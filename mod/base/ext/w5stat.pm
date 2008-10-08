@@ -334,6 +334,21 @@ sub processData
    }
    msg(INFO,"FINE of base::grp $count records");
 
+   msg(INFO,"starting collect of base::user");
+   my $user=getModuleObject($self->getParent->Config,"base::user");
+   $user->SetFilter({cistatusid=>\"4"});
+   $user->SetCurrentView(qw(ALL));
+   msg(INFO,"getFirst of base::user");$count=0;
+   my ($rec,$msg)=$user->getFirst();
+   if (defined($rec)){
+      do{
+         $self->getParent->processRecord('base::user',$monthstamp,$rec);
+         $count++;
+         ($rec,$msg)=$user->getNext();
+      } until(!defined($rec));
+   }
+   msg(INFO,"FINE of base::user $count records");
+
 
    my @wfstat=qw(id eventstart class step eventend stateid
                           fwdtarget fwdtargetid responsiblegrp);
@@ -412,6 +427,14 @@ sub processRecord
    my $month=shift;
    my $rec=shift;
 
+   if ($module eq "base::user"){
+      $self->getParent->storeStatVar("Group",["admin"],{},
+                                     "Base.Total.Contact.Count",1);
+      if ($rec->{usertyp} eq "user"){
+         $self->getParent->storeStatVar("Group",["admin"],{},
+                                        "Base.Total.User.Count",1);
+      }
+   }
    if ($module eq "base::grp"){
       my $name=$rec->{fullname};
       my $allusers=$rec->{users};
@@ -435,6 +458,9 @@ sub processRecord
       $self->getParent->storeStatVar("Group",$name,{},"User",$userscount);
       $self->getParent->storeStatVar("Group",$name,{maxlevel=>0},
                                      "User.Direct",$userscount);
+
+      $self->getParent->storeStatVar("Group",["admin"],{},
+                                     "Base.Total.Group.Count",1);
    }
    elsif ($module eq "base::workflow::notfinished"){
       if ($rec->{class} eq "base::workflow::DataIssue"){
@@ -449,6 +475,8 @@ sub processRecord
          }
          msg(DEBUG,"response %s\n",Dumper($rec->{responsiblegrp}));
       }
+      $self->getParent->storeStatVar("Group",["admin"],{},
+                                     "Base.Total.Workflow.Active.Count",1);
    }
 }
 

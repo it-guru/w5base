@@ -5,7 +5,7 @@
 'fieldgroup.stats'=>{de=>'Statistik Daten',en=>'Statistic Data'},
 'condition'=>{de=>'Stand'},
 'employees'=>{de=>'Mitarbeiter'},
-'Month'=>{de=>'Monat'},
+'Month'=>{de=>'Monat/KW/Tag',en=>'Month/CW/Day'},
 'count of employees'=>{de=>'Mitarbeiteranzahl'},
 'averange'=>{de=>'Bereichs Mittelwert'},
 'complete list'=>{de=>'vollständige Liste'},

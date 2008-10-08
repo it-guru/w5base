@@ -66,7 +66,13 @@ sub new
       new kernel::Field::Text(
                 name          =>'month',
                 label         =>'Month',
-                dataobjattr   =>'w5stat.month'),
+                dataobjattr   =>'w5stat.monthkwday'),
+
+      new kernel::Field::Link(
+                name          =>'descmonth',
+                sqlorder      =>'desc',
+                label         =>'Month',
+                dataobjattr   =>'w5stat.monthkwday'),
 
 
       new kernel::Field::Container(
@@ -394,7 +400,8 @@ Quality Report $M/$Y - $primrec->{fullname}
 <div class=chartsublabel>
 $subtitle
 </div>
-<script type="text/javascript" src="../../../static/open-flash-chart/js/swfobject.js"></script>
+<script type="text/javascript" 
+        src="../../../static/open-flash-chart/js/swfobject.js"></script>
 EOF
       if ($requesttag ne ""){
          my @Presenter;
@@ -491,10 +498,46 @@ sub Presenter
    print("<style>body{overflow:hidden}</style>");
 
 
+
    my $requestid=$p;
    $requestid=~s/[^\d]//g;
+   if (Query->Param("search_name") ne ""){
+      my $name=Query->Param("search_name");
+      my $statname;
+      my $statgrp;
+      if (my ($g,$n)=$name=~m/^([^:]+)\s*:\s*(.*$)/){
+         $statname=$n;
+         $statgrp=$g;
+      }
+      else{
+         $statgrp="Group";
+         $statname=$name;
+      }
+      $statname=~s/[\*\?]//g;
+      $statgrp=~s/[\*\?]//g;
+      $self->ResetFilter();
+      $self->SetFilter({fullname=>$statname,sgroup=>$statgrp});
+      my ($srec,$msg)=$self->getOnlyFirst(qw(descmonth sgroup id));
+      if (defined($srec)){
+         $requestid=$srec->{id};
+      }
+   }
    if (Query->Param("search_id") ne ""){
-      $requestid=Query->Param("search_id");
+      my $id=Query->Param("search_id");
+      $self->ResetFilter();
+      $self->SetFilter({id=>\$id});
+      my ($srec,$msg)=$self->getOnlyFirst(qw(id sgroup fullname));
+      if (defined($srec)){
+         $requestid=$srec->{id};
+      }
+   }
+   if ($requestid ne ""){
+      $self->ResetFilter();
+      $self->SetFilter({id=>\$requestid});
+      my ($srec,$msg)=$self->getOnlyFirst(qw(id sgroup fullname));
+      if (defined($srec)){
+         Query->Param("search_name"=>$srec->{sgroup}.":".$srec->{fullname});
+      }
    }
 
    my ($primrec,$hist)=$self->LoadStatSet(id=>$requestid);
@@ -580,13 +623,27 @@ sub Presenter
 
    print("<tr height=1%><td>");
    print("<table width=100%><tr>\n");
-   print("<td width=1%><select name=selid onchange=\"changeid(this);\" ".
-         "style=\"width:300px\">");
-   while(my $k=shift(@ol)){
-      my $label=shift(@ol);
-      printf("<option value=\"%s\">%s</option>",$k,$label);
+   if ($self->IsMemberOf("admin")){
+      print("<td width=300>");
+      print("<table width=100% border=0 cellspacing=0 cellpadding=0><tr><td>");
+      my $oldval=Query->Param("search_name"); 
+      print("<input type=text name=search_name value=\"$oldval\" ".
+            "style=\"width:100%\">");
+      print("</td><td><input type=submit value=\"find\" ".
+            "onclick=\"refreshTag('');\"></td></tr>");
+      print("</table>");
    }
-   print("</select></td>");
+   else{
+      print("<td width=1%>");
+      print("<select name=selid onchange=\"changeid(this);\" ".
+            "style=\"width:300px\">");
+      while(my $k=shift(@ol)){
+         my $label=shift(@ol);
+         printf("<option value=\"%s\">%s</option>",$k,$label);
+      }
+      print("</select>");
+   }
+   print("</td>");
    
    my $mstr="";
    my ($Y1,$M1)=($Y,$M);
@@ -595,13 +652,21 @@ sub Presenter
       my $histid=shift;
       my $M1=shift;
       my $Y1=shift;
+      my $curM=shift;
+      my $curY=shift;
       my $k=sprintf("%04d%02d",$Y1,$M1);
-      if (defined($histid->{$k})){
-         return(sprintf("<td align=center>".
-                 "<a class=sublink href=javascript:refreshTag($histid->{$k})>".
-                 "%02d<br>%4d</a></td>",$M1,$Y1));
+      my $u1="";
+      my $u0="";
+      if ($M1==$curM && $Y1==$curY){
+         $u1="<u>";
+         $u0="</u>";
       }
-      return(sprintf("<td align=center>%02d<br>%4d</td>",$M1,$Y1));
+      if (defined($histid->{$k})){
+         return(sprintf("<td align=center>$u1".
+                 "<a class=sublink href=javascript:refreshTag($histid->{$k})>".
+                 "%02d<br>%4d</a>$u0</td>",$M1,$Y1));
+      }
+      return(sprintf("<td align=center>$u1%02d<br>%4d$u0</td>",$M1,$Y1));
       
    }
    if (defined($primrec)){
@@ -609,8 +674,8 @@ sub Presenter
          $histid{$h->{month}}=$h->{id};
       }
    }
-   for(my $c=0;$c<=7;$c++){
-      $mstr.=getLabelString(\%histid,$M1,$Y1);
+   for(my $c=0;$c<=4;$c++){
+      $mstr.=getLabelString(\%histid,$M1,$Y1,$M,$Y);
       $M1++;
       if ($M1>12){
          $Y1++;
@@ -618,13 +683,13 @@ sub Presenter
       }
    }
    my ($Y1,$M1)=($Y,$M);
-   for(my $c=0;$c<7;$c++){
+   for(my $c=0;$c<12;$c++){
       $M1--;
       if ($M1<1){
          $Y1--;
          $M1=12;
       }
-      $mstr=getLabelString(\%histid,$M1,$Y1).$mstr;
+      $mstr=getLabelString(\%histid,$M1,$Y1,$M,$Y).$mstr;
    }
 
    print($mstr."</tr></table>\n");
@@ -694,8 +759,15 @@ function setTag(id,tag)
 }
 function refreshTag(id)
 {
-   document.forms[0].elements['id'].value=id;
-   document.forms[0].action=id;
+   if (id!=""){
+      document.forms[0].elements['search_name'].value="";
+      document.forms[0].elements['id'].value=id;
+      document.forms[0].action=id;
+   }
+   else{
+      document.forms[0].elements['id'].value="";
+      document.forms[0].action="Main";
+   }
    document.forms[0].target="_self";
    document.forms[0].submit();
 }
