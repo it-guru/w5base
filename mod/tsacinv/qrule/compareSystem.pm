@@ -13,17 +13,14 @@ a missing systemid.
 
 =head3 IMPORTS
 
-From AssetCenter the fields Memory, CPU-Count, Application Number,
-CurrentVersion and Description are imported. SeM and TSM are imported, if
-it was successfuly to import the relatied contacts.
+From AssetCenter the fields Memory, CPU-Count, CO-Number,
+Description are imported.
 IP-Addresses can only be synced, if the field "Allow automatic interface
 updates" is set to "yes".
 If Mandator is set to "Extern" and "Allow automatic interface updates"
 is set to "yes", some aditional Imports are posible:
 
 - "W5Base Administrator" field is set to the supervisor of Assignmentgroup in AC
-
-- "AC CO-Number" is imported to comments field in W5Base
 
 - "AC Assignmentgroup" is imported to comments field in W5Base
 
@@ -120,6 +117,16 @@ sub qcheckRecord
                              $forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'integer');
+         if (defined($parrec->{conumber}) && 
+             !($parrec->{conumber}=~m/^\d+$/)){
+            $parrec->{conumber}=undef;
+         }
+         $self->IfaceCompare($dataobj,
+                             $rec,"conumber",
+                             $parrec,"conumber",
+                             $forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'string');
       }
       if ($rec->{allowifupdate}){
 #printf STDERR ("ac=%s\n",Dumper($parrec->{ipaddresses}));

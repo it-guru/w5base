@@ -337,6 +337,7 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'servicesupport',
+                AllowEmpty    =>1,
                 group         =>'misc',
                 label         =>'Service&Support Class',
                 vjointo       =>'itil::servicesupport',

@@ -99,12 +99,14 @@ sub qcheckRecord
                               $forcedupd,$wfrequest,
                               \@qmsg,\@dataissue,\$errorlevel,
                               mode=>'string');
+
           $self->IfaceCompare($dataobj,
                               $rec,"serialno",
                               $parrec,"serialno",
                               $forcedupd,$wfrequest,
                               \@qmsg,\@dataissue,\$errorlevel,
                               mode=>'string');
+
          $self->IfaceCompare($dataobj,
                              $rec,"memory",
                              $parrec,"memory",
@@ -117,11 +119,13 @@ sub qcheckRecord
                              $parrec,"cpucount",
                              $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
                              mode=>'integer');
+
          $self->IfaceCompare($dataobj,
                              $rec,"corecount",
                              $parrec,"corecount",
                              $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
                              mode=>'integer');
+
          my $w5aclocation=$self->getW5ACLocationname($parrec->{locationid});
          msg(INFO,"rec location=$rec->{location}");
          msg(INFO,"ac  location=$w5aclocation");
@@ -130,6 +134,18 @@ sub qcheckRecord
                              {location=>$w5aclocation},"location",
                              $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
                              mode=>'string');
+
+         if (defined($parrec->{conumber}) &&
+             !($parrec->{conumber}=~m/^\d+$/)){
+            $parrec->{conumber}=undef;
+         }
+         $self->IfaceCompare($dataobj,
+                             $rec,"conumber",
+                             $parrec,"conumber",
+                             $forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'string');
+
       }
    }
    else{
