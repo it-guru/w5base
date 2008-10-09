@@ -721,12 +721,16 @@ sub Presenter
       foreach my $p (sort({$P{$a}->{prio} <=> $P{$b}->{prio}} keys(%P))){
          if (defined($P{$p}->{opcode})){
             my $prec=$P{$p};
-            my $tag=$prec->{module}."::".$p;
-            my $label=$self->T($tag,$prec->{module});
-            my $link="javascript:setTag($requestid,\"$tag\")";
-            print "<li><a class=sublink href=$link>".$label."</a></li>";
-            if ($p eq "overview"){
-               print "</ul><br><u>".$self->T("Details").":</u><ul>";
+            my $opcode=$P{$p}->{opcode};
+            my $show=&{$opcode}($self->{w5stat}->{$prec->{module}},$primrec);
+            if ($show){
+               my $tag=$prec->{module}."::".$p;
+               my $label=$self->T($tag,$prec->{module});
+               my $link="javascript:setTag($requestid,\"$tag\")";
+               print "<li><a class=sublink href=$link>".$label."</a></li>";
+               if ($p eq "overview"){
+                  print "</ul><br><u>".$self->T("Details").":</u><ul>";
+               }
             }
          }
       }

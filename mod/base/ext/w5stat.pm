@@ -185,6 +185,9 @@ sub displayW5Base
    my ($primrec,$hist)=@_;
    my $app=$self->getParent();
    my $d;
+   if ((!defined($primrec->{stats}->{'Base.Total.User.Count'}))){
+      return(undef);
+   }
 
    my @flds=("Base.Total.User.Count"     =>'Users',
              "Base.Total.Group.Count"    =>'Groups',

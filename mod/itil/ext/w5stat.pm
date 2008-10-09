@@ -96,6 +96,11 @@ sub displayW5Base
    my $app=$self->getParent();
    my $d;
 
+   if ((!defined($primrec->{stats}->{'ITIL.Total.Application.Count'}))){
+      return(undef);
+   }
+
+
    my @flds=("ITIL.Total.Application.Count" =>'total Applications',
              "ITIL.Total.Asset.Count"       =>'total Assets',
              "ITIL.Total.System.Count"      =>'total Systems');
