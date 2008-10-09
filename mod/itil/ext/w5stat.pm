@@ -75,18 +75,16 @@ sub overviewW5Base
 
    my @flds=("ITIL.Total.Application.Count"=>'W5Base total application count',
              "ITIL.Total.Asset.Count"      =>'W5Base total asset count',
-             "ITIL.Total.System.Count"     =>'W5Base total system count',
-            );
-   my $keyname='base.DataIssue.open';
+             "ITIL.Total.System.Count"     =>'W5Base total system count');
    
    while(my $k=shift(@flds)){
       my $label=shift(@flds);
       my $val=0;
       if (defined($primrec->{stats}->{$k})){
          $val=$primrec->{stats}->{$k}->[0];
+         my $color="black";
+         push(@l,[$app->T($label),$val,$color,undef]);
       }
-      my $color="black";
-      push(@l,[$app->T($label),$val,$color,undef]);
    }   
    return(@l);
 }
@@ -100,13 +98,11 @@ sub displayW5Base
 
    my @flds=("ITIL.Total.Application.Count" =>'total Applications',
              "ITIL.Total.Asset.Count"       =>'total Assets',
-             "ITIL.Total.System.Count"      =>'total Systems',
-             );
+             "ITIL.Total.System.Count"      =>'total Systems');
    
    while(my $k=shift(@flds)){ 
       my $label=shift(@flds);
-      my $data=$app->extractYear($primrec,$hist,$k,
-                                 setUndefZero=>1);
+      my $data=$app->extractYear($primrec,$hist,$k);
       my $v="Chart".$k;
       $v=~s/\./_/g;
       my $chart=$app->buildChart($v,$data,

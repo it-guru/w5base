@@ -172,9 +172,9 @@ sub overviewW5Base
       my $val=0;
       if (defined($primrec->{stats}->{$k})){
          $val=$primrec->{stats}->{$k}->[0];
+         my $color="black";
+         push(@l,[$app->T($label),$val,$color,undef]);
       }
-      my $color="black";
-      push(@l,[$app->T($label),$val,$color,undef]);
    }   
    return(@l);
 }
@@ -194,8 +194,7 @@ sub displayW5Base
 
    while(my $k=shift(@flds)){
       my $label=shift(@flds);
-      my $data=$app->extractYear($primrec,$hist,$k,
-                                 setUndefZero=>1);
+      my $data=$app->extractYear($primrec,$hist,$k);
       my $v="Chart".$k;
       $v=~s/\./_/g;
       my $chart=$app->buildChart($v,$data,
