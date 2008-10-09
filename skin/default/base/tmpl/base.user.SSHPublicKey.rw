@@ -1,0 +1,17 @@
+<table border=0 style="width:100%;table-layout:fixed" cellpadding=2>
+<tr><td>
+By this function, you can distribute your SSH Public key. If you store this key here, all outher users can view them. This allow system administrators easy to grant access to server systems.
+</td></tr>
+<tr><td>
+SSH1 Key:
+<textarea name=ssh1publickey wrap=off
+          style="width:100%;height:100px">%ssh1publickey%</textarea>
+</td></tr>
+<tr><td>
+OpenSSH DSA SSH2 Key:
+<textarea name=ssh2publickey wrap=off
+          style="width:100%;height:100px">%ssh2publickey%</textarea>
+</td></tr>
+<tr><td>%LASTMSG%</td></tr>
+<tr><td align=right><input type=submit name=save value=" save "></td></tr>
+</table>

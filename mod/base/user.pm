@@ -298,6 +298,20 @@ sub new
                 label         =>'allow automatic updates by interfaces',
                 dataobjattr   =>'user.allowifupdate'),
 
+      new kernel::Field::Textarea(
+                name          =>'ssh1publickey',
+                label         =>'SSH1 Public Key',
+                group         =>'control',
+                htmldetail    =>0,
+                dataobjattr   =>'user.ssh1publickey'),
+
+      new kernel::Field::Textarea(
+                name          =>'ssh2publickey',
+                label         =>'SSH2 Public Key',
+                group         =>'control',
+                htmldetail    =>0,
+                dataobjattr   =>'user.ssh2publickey'),
+
       new kernel::Field::Container(
                 name          =>'options',
                 dataobjattr   =>'user.options'),
@@ -539,6 +553,77 @@ sub Validate
       $self->LastMsg(ERROR,"invalid fullname");
       return(0);
    }
+   #######################################################################
+   # SSH 1 Key Handling
+   my $sshpublickey=effVal($oldrec,$newrec,"ssh1publickey");
+   if ($sshpublickey eq ""){
+      if (defined($sshpublickey)){
+         $newrec->{ssh1publickey}=undef;
+      }
+   }
+   else{
+      if (defined($newrec->{ssh1publickey})){
+         my $fail=0;
+         $sshpublickey=~s/\s*$//;
+         my %k;
+         foreach my $sshkey (split(/[\r]{0,1}\n/,$sshpublickey)){
+            if (!($sshkey=~m/^\s*$/)){
+               $sshkey=~s/^\s*//;
+               $sshkey=~s/\s*$//;
+               if ($sshkey=~m/^\d+\s\d+\s+\d{100,600}/){
+                  $k{$sshkey}=1;
+               }
+               else{
+                  $fail++;
+               }
+            }
+         }
+         if ($fail){
+            $self->LastMsg(ERROR,"invalid SSH1 key format");
+            return(undef);
+         }
+         else{
+            $sshpublickey=join("\n",sort(keys(%k)));
+         }
+         $newrec->{ssh1publickey}=$sshpublickey;
+      }
+   }
+   #######################################################################
+   # SSH 2 Key Handling
+   my $sshpublickey=effVal($oldrec,$newrec,"ssh2publickey");
+   if ($sshpublickey eq ""){
+      if (defined($sshpublickey)){
+         $newrec->{ssh2publickey}=undef;
+      }
+   }
+   else{
+      if (defined($newrec->{ssh2publickey})){
+         my $fail=0;
+         $sshpublickey=~s/\s*$//;
+         my %k;
+         foreach my $sshkey (split(/[\r]{0,1}\n/,$sshpublickey)){
+            if (!($sshkey=~m/^\s*$/)){
+               $sshkey=~s/^\s*//;
+               $sshkey=~s/\s*$//;
+               if ($sshkey=~m/^ssh-dss\s+\S{100,600}/){
+                  $k{$sshkey}=1;
+               }
+               else{
+                  $fail++;
+               }
+            }
+         }
+         if ($fail){
+            $self->LastMsg(ERROR,"invalid ssh-dss SSH2 key format");
+            return(undef);
+         }
+         else{
+            $sshpublickey=join("\n",sort(keys(%k)));
+         }
+         $newrec->{ssh2publickey}=$sshpublickey;
+      }
+   }
+   #######################################################################
    if ($usertyp eq "service"){
       my $email=effVal($oldrec,$newrec,"email");
       $newrec->{fullname}="service: ".$newrec->{fullname};
@@ -633,20 +718,23 @@ sub isViewValid
       push(@pic,"picture","roles");
    }
    if ($rec->{usertyp} eq "extern"){
-      return(qw(header name default comments groups userro control office private));
+      return(qw(header name default comments groups userro control 
+                office private));
    }  
    if ($rec->{usertyp} eq "function"){
       if ($self->IsMemberOf("admin")){
-         return(qw(header name default nativcontact comments control userro));
+         return(qw(header name default nativcontact comments 
+                   control userro));
       }
      return(qw(header name default nativcontact comments));
    }  
    if ($rec->{usertyp} eq "service"){
-      return(qw(header name default comments groups usersubst userro control userparam));
+      return(qw(header name default comments groups usersubst userro 
+                control userparam));
    }  
    return(@pic,
-          qw(default name office private userparam groups userro control usersubst 
-             header));
+          qw(default name office private userparam groups 
+             userro control usersubst header));
 }
 
 sub isWriteValid
@@ -718,7 +806,46 @@ sub FinishDelete
 sub getValidWebFunctions
 {  
    my ($self)=@_;
-   return($self->SUPER::getValidWebFunctions(), qw(MyDetail)); 
+   return($self->SUPER::getValidWebFunctions(), qw(MyDetail SSHPublicKey)); 
+}
+
+sub SSHPublicKey
+{
+   my $self=shift;
+   my $userid=Query->Param("userid");
+   $self->ResetFilter(); 
+   $self->SetFilter({userid=>\$userid});
+   my ($urec,$msg)=$self->getOnlyFirst(qw(ALL));
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','work.css',
+                                   'kernel.App.Web.css'],
+                           body=>1,form=>1,
+                           title=>$self->T("Modify/View SSH Public Key"));
+   if (defined($urec)){
+      my $opt={static=>{ssh1publickey=>$urec->{ssh1publickey},
+                        ssh2publickey=>$urec->{ssh2publickey}}};
+      if ($self->IsMemberOf("admin") ||
+          $self->getCurrentUserId()==$urec->{userid}){ 
+         if (Query->Param("save") ne ""){
+            my $ssh1publickey=Query->Param("ssh1publickey");
+            my $ssh2publickey=Query->Param("ssh2publickey");
+            $opt->{static}->{ssh1publickey}=$ssh1publickey;
+            $opt->{static}->{ssh2publickey}=$ssh2publickey;
+            if ($self->ValidatedUpdateRecord($urec,
+                         {ssh1publickey=>$ssh1publickey,
+                          ssh2publickey=>$ssh2publickey},{userid=>\$userid})){
+               $self->LastMsg(OK,"key has been stored");
+            }
+         }
+         print $self->getParsedTemplate("tmpl/base.user.SSHPublicKey.rw",$opt);
+         print("<input type=hidden name=userid value=\"$userid\">");
+      }
+      else{
+         print $self->getParsedTemplate("tmpl/base.user.SSHPublicKey.ro",$opt);
+      }
+   }
+   print $self->HtmlBottom(body=>1,form=>1);
 }
 
 sub MyDetail
@@ -745,6 +872,42 @@ sub getDetailBlockPriority
    return("header","name","picture","default","nativcontact","office","private",
           "userparam","control","groups","usersubst");
 }
+
+sub getDetailFunctions
+{
+   my $self=shift;
+   my $rec=shift;
+   my $userid=$self->getCurrentUserId();
+   my @f=($self->T("SSH Public Key")=>'SSHPublicKey',
+         );
+   if (!defined($rec) || ($rec->{ssh1publickey} eq "" && 
+                          $rec->{ssh2publickey} eq "" &&
+       !($self->IsMemberOf("admin")) && !($userid==$rec->{userid}))){
+      return($self->SUPER::getDetailFunctions($rec));
+   }
+   return(@f,$self->SUPER::getDetailFunctions($rec));
+}
+
+sub getDetailFunctionsCode
+{
+   my $self=shift;
+   my $rec=shift;
+   my $idname=$self->IdField->Name();
+   my $id=$rec->{$idname};
+   my $d=<<EOF;
+function SSHPublicKey(id)
+{
+   showPopWin('SSHPublicKey?userid=$id',null,360,FinishSSHPublicKey);
+}
+function FinishSSHPublicKey()
+{
+}
+
+EOF
+   return($d.$self->SUPER::getDetailFunctionsCode($rec));
+}
+
+
 
 
 #sub isQualityCheckValid

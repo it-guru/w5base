@@ -272,3 +272,5 @@ alter table user add lastqcheck datetime default NULL,add key(lastqcheck);
 alter table grp  add lastqcheck datetime default NULL,add key(lastqcheck);
 alter table grp  add description varchar(128);
 alter table grp  add lastknownbossemail blob;
+alter table user add ssh1publickey blob default NULL;
+alter table user add ssh2publickey blob default NULL;

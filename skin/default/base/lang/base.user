@@ -54,3 +54,5 @@
 'SMS.homenight'=>{de=>'Privat-Kontakt Handynummer nachts',
 	            en=>'Private-Contact Mobile by night'},
 'STEVuserchanged'=>{de=>'Benachrichtigung bei hinzufügen/entfernen von Kontakten',en=>'notify on change or add of contacts'},
+'Modify/View SSH Public Key'=>{de=>'Änderung/Abfrage des SSH Public Key'},
+'key has been stored'=>{de=>'Schlüssel konnte erfolgreich gespeichert werden'},

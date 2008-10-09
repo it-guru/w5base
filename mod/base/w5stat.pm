@@ -647,6 +647,7 @@ sub Presenter
    print("</td>");
    
    my $mstr="";
+   my $cstr="";
    my ($Y1,$M1)=($Y,$M);
    sub getLabelString
    {
@@ -662,12 +663,18 @@ sub Presenter
          $u1="<u>";
          $u0="</u>";
       }
+      my $ms;
       if (defined($histid->{$k})){
-         return(sprintf("<td align=center>$u1".
+         $ms=sprintf("<td align=center>$u1".
                  "<a class=sublink href=javascript:refreshTag($histid->{$k})>".
-                 "%02d<br>%4d</a>$u0</td>",$M1,$Y1));
+                 "%02d<br>%4d</a>$u0</td>",$M1,$Y1);
       }
-      return(sprintf("<td align=center>$u1%02d<br>%4d$u0</td>",$M1,$Y1));
+      else{
+         $ms=sprintf("<td align=center>$u1%02d<br>%4d$u0</td>",$M1,$Y1);
+      }
+      my $cw="<td><font size=2>KW00</font></td>";
+      $cw.=$cw;
+      return($ms,$cw);
       
    }
    if (defined($primrec)){
@@ -676,7 +683,9 @@ sub Presenter
       }
    }
    for(my $c=0;$c<=4;$c++){
-      $mstr.=getLabelString(\%histid,$M1,$Y1,$M,$Y);
+      my ($ms,$cw)=getLabelString(\%histid,$M1,$Y1,$M,$Y);
+      $mstr.=$ms;
+      $cstr.=$cw;
       $M1++;
       if ($M1>12){
          $Y1++;
@@ -690,11 +699,14 @@ sub Presenter
          $Y1--;
          $M1=12;
       }
-      $mstr=getLabelString(\%histid,$M1,$Y1,$M,$Y).$mstr;
+      my ($ms,$cw)=getLabelString(\%histid,$M1,$Y1,$M,$Y);
+      $mstr=$ms.$mstr;
+      $cstr=$cw.$cstr;
    }
 
    print($mstr."</tr></table>\n");
    printf("</td></tr>");
+  # printf("<tr><td>X1Woche: KW01 KW02 KW03 KW04</td></tr>");
 
 
    printf("<tr><td valign=top>");
