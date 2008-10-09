@@ -37,6 +37,10 @@ sub getPresenter
    my $self=shift;
 
    my @l=(
+          'w5baseitil'=>{
+                         overview=>\&overviewW5Base,
+                         prio=>500,
+                      },
           'appl'=>{
                          opcode=>\&displayAppl,
                          overview=>\&overviewAppl,
@@ -60,6 +64,33 @@ sub getPresenter
          );
 
 }
+
+sub overviewW5Base
+{
+   my $self=shift;
+   my ($primrec,$hist)=@_;
+   my $app=$self->getParent();
+   my @l;
+
+   my @flds=("ITIL.Total.Application.Count"=>'W5base total application count',
+             "ITIL.Total.Asset.Count"      =>'W5base total asset count',
+             "ITIL.Total.System.Count"     =>'W5base total system count',
+            );
+   my $keyname='base.DataIssue.open';
+   
+   while(my $k=shift(@flds)){
+      my $label=shift(@flds);
+      my $val=0;
+      if (defined($primrec->{stats}->{$k})){
+         $val=$primrec->{stats}->{$k}->[0];
+      }
+      my $color="black";
+      push(@l,[$app->T($label),$val,$color,undef]);
+   }   
+   return(@l);
+}
+
+
 
 sub overviewAppl
 {  

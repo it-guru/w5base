@@ -420,7 +420,8 @@ EOF
          foreach my $p (sort({$P{$a}->{prio} <=> $P{$b}->{prio}} keys(%P))){
             if (defined($P{$p}->{opcode}) && 
                 ($rtag eq $p || $requesttag eq "ALL")){
-               my ($d,$ovdata)=&{$P{$p}->{opcode}}($P{$p}->{obj},$primrec,$hist);
+               my ($d,$ovdata)=
+                      &{$P{$p}->{opcode}}($P{$p}->{obj},$primrec,$hist);
                print($d);
             }
          }
@@ -718,13 +719,15 @@ sub Presenter
       my %P=@Presenter;
       print("<ul>");
       foreach my $p (sort({$P{$a}->{prio} <=> $P{$b}->{prio}} keys(%P))){
-         my $prec=$P{$p};
-         my $tag=$prec->{module}."::".$p;
-         my $label=$self->T($tag,$prec->{module});
-         my $link="javascript:setTag($requestid,\"$tag\")";
-         print "<li><a class=sublink href=$link>".$label."</a></li>";
-         if ($p eq "overview"){
-            print "</ul><br><u>".$self->T("Details").":</u><ul>";
+         if (defined($P{$p}->{opcode})){
+            my $prec=$P{$p};
+            my $tag=$prec->{module}."::".$p;
+            my $label=$self->T($tag,$prec->{module});
+            my $link="javascript:setTag($requestid,\"$tag\")";
+            print "<li><a class=sublink href=$link>".$label."</a></li>";
+            if ($p eq "overview"){
+               print "</ul><br><u>".$self->T("Details").":</u><ul>";
+            }
          }
       }
       if (keys(%P)>1){

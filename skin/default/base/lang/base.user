@@ -29,7 +29,7 @@
 'fieldgroup.private'=>{ de=>'Privat-Kontakt',en=>'Private-ContactProfile'},
 'fieldgroup.userparam'=>{ de=>'Umgebungseinstellungen',en=>'Profile'},
 'fieldgroup.userro'=>{ de=>'Kontakt-Identifikation',en=>'Contact-Identification'},
-'fieldgroup.groups'=>{ de=>'Grupenmitgliedschaften',en=>'Group-Memberships'},
+'fieldgroup.groups'=>{ de=>'Gruppenmitgliedschaften',en=>'Group-Memberships'},
 'fieldgroup.roles'=>{ de=>'Rollen',en=>'Roles'},
 'fieldgroup.picture'=>{ de=>'Bild',en=>'Picure'},
 'picture'=>{ de=>'Bild',en=>'Picure'},

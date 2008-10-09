@@ -41,6 +41,10 @@ sub getPresenter
                          opcode=>\&displayOverview,
                          prio=>1,
                       },
+          'w5basestat'=>{
+                         overview=>\&overviewW5Base,
+                         prio=>500,
+                      },
           'dataissue'=>{
                          overview=>\&overviewDataIssue,
                          opcode=>\&displayDataIssue,
@@ -147,6 +151,33 @@ sub displayOverview
    return($d,\@ovdata);
 }
 
+
+sub overviewW5Base
+{
+   my $self=shift;
+   my ($primrec,$hist)=@_;
+   my $app=$self->getParent();
+   my @l;
+
+   my @flds=("Base.Total.User.Count"     =>'W5base total user count',
+             "Base.Total.Group.Count"    =>'W5base total group count',
+             "Base.Total.Contact.Count"  =>'W5base total contact count',
+             "Base.Total.Workflow.Active.Count"  
+                                         =>'W5base total active workflows',
+             );
+   my $keyname='base.DataIssue.open';
+
+   while(my $k=shift(@flds)){
+      my $label=shift(@flds);
+      my $val=0;
+      if (defined($primrec->{stats}->{$k})){
+         $val=$primrec->{stats}->{$k}->[0];
+      }
+      my $color="black";
+      push(@l,[$app->T($label),$val,$color,undef]);
+   }   
+   return(@l);
+}
 
 sub overviewDataIssue
 {
