@@ -2,6 +2,7 @@
 'itil::ext::w5stat::system'=>{de=>'Systeme',en=>'Systems'},
 'itil::ext::w5stat::asset'=>{de=>'Hardware',en=>'Assets'},
 'itil::ext::w5stat::swinstance'=>{de=>'SWInstanz',en=>'SWInstance'},
+'itil::ext::w5stat::w5baseitil'=>{de=>'W5Base ITIL Kern',en=>'W5Base ITIL Kern'},
 'Count of Application Config-Items'=>{de=>'Anzahl Anwendungs Config-Items'},
 'Count of System Config-Items'=>{de=>'Anzahl System Config-Items'},
 'Count of Instance Config-Items'=>{de=>'Anzahl Sofware-Instanz Config-Items'},

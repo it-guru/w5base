@@ -38,6 +38,7 @@ sub getPresenter
 
    my @l=(
           'w5baseitil'=>{
+                         opcode=>\&displayW5Base,
                          overview=>\&overviewW5Base,
                          prio=>500,
                       },
@@ -89,6 +90,35 @@ sub overviewW5Base
    }   
    return(@l);
 }
+
+sub displayW5Base
+{
+   my $self=shift;
+   my ($primrec,$hist)=@_;
+   my $app=$self->getParent();
+   my $d;
+
+   my @flds=("ITIL.Total.Application.Count" =>'total Applications',
+             "ITIL.Total.Asset.Count"       =>'total Assets',
+             "ITIL.Total.System.Count"      =>'total Systems',
+             );
+   
+   while(my $k=shift(@flds)){ 
+      my $label=shift(@flds);
+      my $data=$app->extractYear($primrec,$hist,$k,
+                                 setUndefZero=>1);
+      my $v="Chart".$k;
+      $v=~s/\./_/g;
+      my $chart=$app->buildChart($v,$data,
+                      width=>500,height=>200,
+                      label=>$app->T($label));
+      $d.=$chart;
+
+   }   
+   return($d);
+}
+
+
 
 
 

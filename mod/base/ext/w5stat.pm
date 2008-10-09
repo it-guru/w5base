@@ -42,6 +42,7 @@ sub getPresenter
                          prio=>1,
                       },
           'w5basestat'=>{
+                         opcode=>\&displayW5Base,
                          overview=>\&overviewW5Base,
                          prio=>500,
                       },
@@ -165,7 +166,6 @@ sub overviewW5Base
              "Base.Total.Workflow.Active.Count"  
                                          =>'W5base total active workflows',
              );
-   my $keyname='base.DataIssue.open';
 
    while(my $k=shift(@flds)){
       my $label=shift(@flds);
@@ -178,6 +178,34 @@ sub overviewW5Base
    }   
    return(@l);
 }
+
+sub displayW5Base
+{
+   my $self=shift;
+   my ($primrec,$hist)=@_;
+   my $app=$self->getParent();
+   my $d;
+
+   my @flds=("Base.Total.User.Count"     =>'Users',
+             "Base.Total.Group.Count"    =>'Groups',
+             "Base.Total.Contact.Count"  =>'Contacts',
+             "Base.Total.Workflow.Active.Count"=>'active Workflows',
+             );
+
+   while(my $k=shift(@flds)){
+      my $label=shift(@flds);
+      my $data=$app->extractYear($primrec,$hist,$k,
+                                 setUndefZero=>1);
+      my $v="Chart".$k;
+      $v=~s/\./_/g;
+      my $chart=$app->buildChart($v,$data,
+                      width=>500,height=>200, label=>$app->T($label));
+      $d.=$chart;
+
+   }   
+   return($d);
+}
+
 
 sub overviewDataIssue
 {
