@@ -73,9 +73,9 @@ sub overviewW5Base
    my $app=$self->getParent();
    my @l;
 
-   my @flds=("ITIL.Total.Application.Count"=>'W5base total application count',
-             "ITIL.Total.Asset.Count"      =>'W5base total asset count',
-             "ITIL.Total.System.Count"     =>'W5base total system count',
+   my @flds=("ITIL.Total.Application.Count"=>'W5Base total application count',
+             "ITIL.Total.Asset.Count"      =>'W5Base total asset count',
+             "ITIL.Total.System.Count"     =>'W5Base total system count',
             );
    my $keyname='base.DataIssue.open';
    

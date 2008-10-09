@@ -160,11 +160,11 @@ sub overviewW5Base
    my $app=$self->getParent();
    my @l;
 
-   my @flds=("Base.Total.User.Count"     =>'W5base total user count',
-             "Base.Total.Group.Count"    =>'W5base total group count',
-             "Base.Total.Contact.Count"  =>'W5base total contact count',
+   my @flds=("Base.Total.User.Count"     =>'W5Base total user count',
+             "Base.Total.Group.Count"    =>'W5Base total group count',
+             "Base.Total.Contact.Count"  =>'W5Base total contact count',
              "Base.Total.Workflow.Active.Count"  
-                                         =>'W5base total active workflows',
+                                         =>'W5Base total active workflows',
              );
 
    while(my $k=shift(@flds)){
