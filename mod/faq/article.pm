@@ -18,7 +18,6 @@ package faq::article;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
@@ -605,7 +604,7 @@ sub FullView
                                   "owner","formated");
    my $mdate=$self->findtemplvar({current=>$rec,mode=>"HtmlV01"},
                                   "mdate","formated");
-   print("<div id=WindowSignature>$owner<br>$mdate</div>");
+#   print("<div id=WindowSignature>$owner<br>$mdate</div>");
    if ($further ne ""){
       print("<div class=further>".$self->T("further articles").":".
             "<table width=100%>".$further."</table></div>");

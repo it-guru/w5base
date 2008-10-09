@@ -23,7 +23,7 @@ use kernel;
 use kernel::Event;
 @ISA=qw(kernel::Event);
 
-my $TMPDIR="/tmp/accheck";
+my $TMPDIR="/tmp/accheck2";
 
 sub new
 {
@@ -95,7 +95,7 @@ sub ImportAssetCenterCO
        my $WfRec=$_;
        my $bk=$wf->Store($WfRec,{stateid=>25});
    });
-   $self->SendOpMsg();
+#   $self->SendOpMsg();
 
    return({exitcode=>0}); 
 }
