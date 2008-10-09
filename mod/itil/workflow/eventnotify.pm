@@ -977,12 +977,13 @@ sub generateMailSet
 {
    my $self=shift;
    my ($WfRec,$action,$eventlang,$additional,$emailprefix,$emailpostfix,
-       $emailtext,$emailsep,$emailsubheader,$allowsms,$smstext)=@_;
+       $emailtext,$emailsep,$emailsubheader,$emailsubtitle,$allowsms,$smstext)=@_;
    my @emailprefix=();
    my @emailpostfix=();
    my @emailtext=();
    my @emailsep=();
    my @emailsubheader=();
+   my @emailsubtitle=();
 
    $$allowsms=0;
    $$smstext="";
@@ -1084,6 +1085,7 @@ sub generateMailSet
    @$emailtext=@emailtext;
    @$emailsep=@emailsep;
    @$emailsubheader=@emailsubheader;
+   @$emailsubtitle=@emailsubtitle;
 }
 
 

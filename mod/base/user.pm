@@ -275,6 +275,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'sms',
                 label         =>'SMS Notification',
+                group         =>'control',
                 transprefix   =>'SMS.',
                 htmldetail    =>sub{
                    my $self=shift;
@@ -285,7 +286,6 @@ sub new
                    return(1);
                 },
                 default       =>'',
-                group         =>'userparam',
 #                value         =>['',qw( officealways officenight officeday
 #                                        homealways   homenight   homeday)],
                 value         =>['',qw( officealways
@@ -294,7 +294,7 @@ sub new
 
       new kernel::Field::Boolean(
                 name          =>'allowifupdate',
-                group         =>'userparam',
+                group         =>'control',
                 label         =>'allow automatic updates by interfaces',
                 dataobjattr   =>'user.allowifupdate'),
 
@@ -633,19 +633,19 @@ sub isViewValid
       push(@pic,"picture","roles");
    }
    if ($rec->{usertyp} eq "extern"){
-      return(qw(header name default comments userro office private));
+      return(qw(header name default comments groups userro control office private));
    }  
    if ($rec->{usertyp} eq "function"){
       if ($self->IsMemberOf("admin")){
-         return(qw(header name default nativcontact comments userro));
+         return(qw(header name default nativcontact comments control userro));
       }
      return(qw(header name default nativcontact comments));
    }  
    if ($rec->{usertyp} eq "service"){
-      return(qw(header name default comments groups usersubst userro userparam));
+      return(qw(header name default comments groups usersubst userro control userparam));
    }  
    return(@pic,
-          qw(default name office private userparam groups userro usersubst 
+          qw(default name office private userparam groups userro control usersubst 
              header));
 }
 
@@ -656,13 +656,14 @@ sub isWriteValid
    return("default","name") if (!defined($rec));
    return(undef) if (!defined($rec));
    if ($self->IsMemberOf("admin")){
-      return(qw(default name office private userparam groups usersubst 
+      return(qw(default name office private userparam groups usersubst control
                 comments header picture nativcontact));
    }
    my $userid=$self->getCurrentUserId();
    if ($userid eq $rec->{userid} ||
        ($rec->{creator}==$userid && $rec->{cistatusid}<3)){
-      return("name","userparam","office","private","nativcontact","usersubst");
+      return("name","userparam","office","private","nativcontact",
+             "usersubst","control");
    }
    return(undef);
 }
@@ -742,7 +743,7 @@ sub getDetailBlockPriority
    my $grp=shift;
    my %param=@_;
    return("header","name","picture","default","nativcontact","office","private",
-          "userparam","groups");
+          "userparam","control","groups","usersubst");
 }
 
 

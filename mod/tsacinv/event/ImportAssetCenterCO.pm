@@ -95,7 +95,7 @@ sub ImportAssetCenterCO
        my $WfRec=$_;
        my $bk=$wf->Store($WfRec,{stateid=>25});
    });
-#   $self->SendOpMsg();
+   $self->SendOpMsg();
 
    return({exitcode=>0}); 
 }
