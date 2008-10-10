@@ -1,6 +1,6 @@
 <table border=0 style="width:100%;table-layout:fixed" cellpadding=2>
 <tr><td>
-Mit dieser Fuktion können Sie Ihre SSH-Public Keys "veröffentlichen". Wenn Sie die entsprechenden Schlüssel hir abspeichern, können alle User auf diese zugreifen. Dies ermöglicht es, Systemadministratoren ihnen den Zugriff über SSH auf bestimmte Systeme einzurichten.
+Mit dieser Fuktion können Sie Ihre SSH-Public Keys "veröffentlichen". Wenn Sie die entsprechenden Schlüssel hier abspeichern, können alle User auf diese zugreifen. Dies ermöglicht es, Systemadministratoren ihnen den Zugriff über SSH auf bestimmte Systeme einzurichten.
 </td></tr>
 <tr><td>
 SSH1 Key:
