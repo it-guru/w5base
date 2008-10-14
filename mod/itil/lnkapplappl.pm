@@ -73,7 +73,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'conproto',
                 label         =>'Interfaceprotocol',
-                value         =>[qw( unknown Corba dce DSO ftp html http
+                value         =>[qw( unknown CAPI Corba dce DSO ftp html http
                                      jdbc ldap Netegrity NFS ODBC papier
                                      RMI rsh rcp rfc sldap ssh sftp smtp
                                      snmp tuxedo xml X.31 openFT pkix-cmp
