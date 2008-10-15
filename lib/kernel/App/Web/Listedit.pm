@@ -87,7 +87,8 @@ sub addAttach
          }
       }
    }
-   print $self->getParsedTemplate("tmpl/addTextareaAttachment");
+   print $self->getParsedTemplate("tmpl/addTextareaAttachment",
+                                  {skinbase=>'base'});
    print $self->HtmlBottom(form=>1);
 }
 

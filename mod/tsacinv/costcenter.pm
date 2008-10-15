@@ -76,6 +76,7 @@ sub new
      new kernel::Field::TextDrop(
                 name          =>'sem',
                 label         =>'Service Manager',
+                searchable    =>0,
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['semid'=>'lempldeptid'],
                 vjoindisp     =>'fullname'),
