@@ -121,17 +121,22 @@ sub getNotifyDestinations
    my $ia=getModuleObject($self->Config,"base::infoabo");
    my $cat=getModuleObject($self->Config,"faq::category");
    my $nextcat=$rec->{faqcat};
-   while(1){
-      last if (!defined($nextcat) || $nextcat==0);
-      msg(INFO,"Check $nextcat");
-      my $catrec;
-      $cat->SetFilter({faqcatid=>\$nextcat});
-      my ($catrec,$msg)=$cat->getOnlyFirst(qw(faqcatid name parentid));
-      $ia->LoadTargets($emailto,'faq::category',\$mode,$catrec->{faqcatid});
-      last if (!defined($catrec) ||
-               !defined($catrec->{parentid}) ||
-               $catrec->{parentid}<=0);
-      $nextcat=$catrec->{parentid};
+   if ($mode eq "faqartchanged"){
+      $ia->LoadTargets($emailto,'faq::article',\$mode,$rec->{faqid});
+   }
+   else{
+      while(1){
+         last if (!defined($nextcat) || $nextcat==0);
+         msg(INFO,"Check $nextcat");
+         my $catrec;
+         $cat->SetFilter({faqcatid=>\$nextcat});
+         my ($catrec,$msg)=$cat->getOnlyFirst(qw(faqcatid name parentid));
+         $ia->LoadTargets($emailto,'faq::category',\$mode,$catrec->{faqcatid});
+         last if (!defined($catrec) ||
+                  !defined($catrec->{parentid}) ||
+                  $catrec->{parentid}<=0);
+         $nextcat=$catrec->{parentid};
+      }
    }
 }
 
