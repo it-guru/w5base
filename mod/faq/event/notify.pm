@@ -18,7 +18,6 @@ package faq::event::notify;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::Event;
 @ISA=qw(kernel::Event);
@@ -73,39 +72,40 @@ sub FaqNotify
    my %email;
    $self->getNotifyDestinations($faqrec,"faqchanged",\%email);
    $self->getNotifyDestinations($faqrec,"faqartchanged",\%email);
-   my @emailto=keys(%email);
 
-   if (defined($link)){
-      push(@$emailprefix,$self->getParent->T("FAQ Article").":");
-      push(@$emailtext,$link." ");
-   }
-   my $label=$self->getParent->T("faq::article","faq::article");
-   delete($ENV{HTTP_FORCE_LANGUAGE});
-   return({exitcode=>'0'}) if ($#emailto==-1);
-   #push(@$emailtext,join(", ",@emailto));
-   my $fromemail='noreply@w5base.net';
-
-
-   if ($faqrec->{ownerid}>0){
-      my $user=getModuleObject($self->Config,"base::user");
-      $user->SetFilter({userid=>\$faqrec->{ownerid}});
-      my ($urec,$msg)=$user->getOnlyFirst(qw(email));
-      $fromemail=$urec->{email} if (defined($urec) && $urec->{email} ne "");
-   }
-
-
-
-   if ($id=$wf->Store(undef,{class  =>'base::workflow::mailsend',
-                             step   =>'base::workflow::mailsend::dataload',
-                             name   =>$subject,
-                             emailfrom    =>$fromemail,
-                             emailbcc     =>\@emailto,
-                             additional   =>{label=>$label},
-                             emailprefix  =>$emailprefix,
-                             emailtemplate=>"faq/faqmail",
-                             emailtext    =>$emailtext})){
-      my %d=(step=>'base::workflow::mailsend::waitforspool');
-      my $r=$wf->Store($id,%d);
+   if (keys(%email)){
+      my @emailto=keys(%email);
+      if (defined($link)){
+         push(@$emailprefix,$self->getParent->T("FAQ Article").":");
+         push(@$emailtext,$link." ");
+      }
+      my $label=$self->getParent->T("faq::article","faq::article");
+      delete($ENV{HTTP_FORCE_LANGUAGE});
+      return({exitcode=>'0'}) if ($#emailto==-1);
+      #push(@$emailtext,join(", ",@emailto));
+      my $fromemail='noreply@w5base.net';
+     
+     
+      if ($faqrec->{ownerid}>0){
+         my $user=getModuleObject($self->Config,"base::user");
+         $user->SetFilter({userid=>\$faqrec->{ownerid}});
+         my ($urec,$msg)=$user->getOnlyFirst(qw(email));
+         $fromemail=$urec->{email} if (defined($urec) && $urec->{email} ne "");
+      }
+     
+     
+      if ($id=$wf->Store(undef,{class  =>'base::workflow::mailsend',
+                                step   =>'base::workflow::mailsend::dataload',
+                                name   =>$subject,
+                                emailfrom    =>$fromemail,
+                                emailbcc     =>\@emailto,
+                                additional   =>{label=>$label},
+                                emailprefix  =>$emailprefix,
+                                emailtemplate=>"faq/faqmail",
+                                emailtext    =>$emailtext})){
+         my %d=(step=>'base::workflow::mailsend::waitforspool');
+         my $r=$wf->Store($id,%d);
+      }
    }
    return({exitcode=>'0'});
 }

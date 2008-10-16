@@ -410,6 +410,13 @@ EOF
                         $self->getParent->getParent->Self(),
                         $self->getParent->getParent->Self());
          }
+         if ($group=~m/^privacy_/){
+            my $privacy=$self->getParent->getParent->T(
+                        "privacy information - ".
+                        "only readable with rule write or privacy read");
+            $grouplabel.="&nbsp;<a title=\"$privacy\">".
+                         "<font color=red>!</font></a>";
+         }
          $template{$group}.=<<EOF;
 <div class=detailframe>
 EOF

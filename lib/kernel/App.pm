@@ -118,13 +118,31 @@ sub getCurrentAclModes      # extracts the current acl
    my %grps=$self->getGroupsOf($useraccount,$roles,$direction);
    my %u=();
    foreach my $rec (@{$acllist}){
-      if ($rec->{acltarget} eq "base::user" &&
-          $rec->{acltargetid} eq $userid){
-         $u{$rec->{aclmode}}=1;
+      if (defined($rec->{acltarget})){
+         if ($rec->{acltarget} eq "base::user" &&
+             $rec->{acltargetid} eq $userid){
+            $u{$rec->{aclmode}}=1;
+         } 
+         if ($rec->{acltarget} eq "base::grp" &&
+             grep(/^$rec->{acltargetid}$/,keys(%grps))){
+            $u{$rec->{aclmode}}=1;
+         } 
       } 
-      if ($rec->{acltarget} eq "base::grp" &&
-          grep(/^$rec->{acltargetid}$/,keys(%grps))){
-         $u{$rec->{aclmode}}=1;
+      if (defined($rec->{target})){  # to be compatible to contact object
+         my $match=0;
+         if ($rec->{target} eq "base::user" &&
+             $rec->{targetid} eq $userid){
+            $match=1;
+         } 
+         if ($rec->{target} eq "base::grp" &&
+             grep(/^$rec->{targetid}$/,keys(%grps))){
+            $match=1;
+         } 
+         if ($match && ref($rec->{roles}) eq "ARRAY"){
+            foreach my $role (@{$rec->{roles}}){
+               $u{$role}=1;
+            }
+         }
       } 
    }
    return(keys(%u));

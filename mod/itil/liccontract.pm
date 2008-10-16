@@ -80,6 +80,12 @@ sub new
                 label         =>'SoftwareID',
                 dataobjattr   =>'liccontract.software'),
 
+      new kernel::Field::Databoss(),
+
+      new kernel::Field::Link(
+                name          =>'databossid',
+                dataobjattr   =>'liccontract.databoss'),
+
       new kernel::Field::TextDrop(
                 name          =>'responseteam',
                 htmlwidth     =>'300px',
@@ -126,15 +132,98 @@ sub new
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
                 class         =>'mandator',
-                vjoinbase     =>[{'parentobj'=>\'itil::appl'}],
+                vjoinbase     =>[{'parentobj'=>\'itil::liccontract'}],
                 vjoininhash   =>['targetid','target','roles'],
                 group         =>'contacts'),
 
+      new kernel::Field::Number(
+                name          =>'unitcount',
+                group         =>'licdesc',
+                label         =>'unit count',
+                dataobjattr   =>'liccontract.unitcount'),
+
+      new kernel::Field::Select(
+                name          =>'unittype',
+                group         =>'licdesc',
+                default       =>'',
+                htmleditwidth =>'40%',
+                label         =>'unit type',
+                transprefix   =>'UT.',
+                value         =>[
+                                 'logicalSystem',
+                                 'logicalCPU',
+                                 'concurrentUser',
+                                 'namedUser',
+                                 'project',
+                                 '',        
+                                 ],
+                dataobjattr   =>'liccontract.unittype'),,
+
+
       new kernel::Field::Textarea(
                 name          =>'comments',
-                group         =>'misc',
+                group         =>'licdesc',
                 label         =>'Comments',
                 dataobjattr   =>'liccontract.comments'),
+
+      new kernel::Field::SubList(
+                name          =>'lickeys',
+                label         =>'License keys',
+                group         =>'privacy_lickeys',
+                allowcleanup  =>1,
+                subeditmsk    =>'subedit.liccontract',
+                vjointo       =>'itil::lnklickey',
+                vjoinon       =>['id'=>'liccontractid'],
+                vjoindisp     =>['name','comments']),
+
+      new kernel::Field::Number(
+                name          =>'licuse',
+                group         =>'licuse',
+                label         =>'License use count',
+                onRawValue    =>sub{
+                           my $self=shift;
+                           my $current=shift;
+                           my $fo=$self->getParent->getField("licusesys"); 
+                           my $d=$fo->RawValue($current);
+                           if (ref($d) eq "ARRAY"){
+                              $d=$#{$d}+1;
+                           }
+                           else{
+                              $d=0;
+                           }
+                           return($d);
+                        },
+                depend        =>['licusesys']
+                ),
+
+      new kernel::Field::Number(
+                name          =>'licfree',
+                group         =>'licuse',
+                label         =>'License free count',
+                onRawValue    =>sub{
+                           my $self=shift;
+                           my $current=shift;
+                           my $fo=$self->getParent->getField("licuse"); 
+                           my $d=$fo->RawValue($current);
+                           my $fo=$self->getParent->getField("unitcount");
+                           my $max=$fo->RawValue($current);
+                           if (defined($max) && $max>0){
+                              return($max-$d);
+                           }
+                           return(undef);
+                        },
+                depend        =>['licuse','unitcount']
+                ),
+
+      new kernel::Field::SubList(
+                name          =>'licusesys',
+                label         =>'License use by',
+                group         =>'licuse',
+                htmldetail    =>0,
+                vjointo       =>'itil::lnksoftwaresystem',
+                vjoinon       =>['id'=>'liccontractid'],
+                vjoinbase     =>[{systemcistatusid=>"<=5"}],
+                vjoindisp     =>['system','systemcistatus','systemsystemid']),
 
       new kernel::Field::FileList(
                 name          =>'attachments',
@@ -298,14 +387,26 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   return("ALL");
+
+   my @grplist=qw(header default finance licdesc licuse 
+                 contacts misc attachments source);
+   my @l=$self->isWriteValid($rec);
+   if (grep(/^privacy_lickeys$/,@l)){
+      push(@grplist,"privacy_lickeys");
+   }
+   else{
+      my @acl=$self->getCurrentAclModes($ENV{REMOTE_USER},$rec->{contacts});
+      push(@grplist,"privacy_lickeys") if (grep(/^privread$/,@acl));
+   }
+   return(@grplist);
 }
 
 sub getDetailBlockPriority
 {
    my $self=shift;
    return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default finance contacts misc attachments));
+          qw(default finance licdesc licuse privacy_lickeys 
+             contacts misc attachments));
 }
 
 
@@ -317,7 +418,8 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default finance  contacts misc attachments);
+   my @databossedit=qw(default finance privacy_lickeys 
+                       contacts licdesc attachments);
    if (!defined($rec)){
       return("default");
    }

@@ -5,3 +5,4 @@
 'CostCenter-No.'=>{de=>'Kostenstellennummer'},
 'Center-Code'=>{de=>'Kostenstellencode'},
 'Description'=>{de=>'Beschreibung'},
+'is locked'=>{de=>'gesperrt'},

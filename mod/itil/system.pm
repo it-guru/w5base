@@ -775,7 +775,7 @@ sub new
                 vjointo       =>'itil::lnkapplsystem',
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
                 vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>['customer','appl']),
+                vjoindisp     =>['applcustomer','appl']),
 
       new kernel::Field::SubList(
                 name          =>'customerprio',

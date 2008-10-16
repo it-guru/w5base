@@ -68,7 +68,7 @@ sub CleanupWorkflows
                    {translation=>'base::workflowaction'},"",undef)){
                   my $closedate=$rec->{closedate};
                   $closedate=NowStamp("en") if ($closedate eq "");
-                  printf STDERR ("info: fifi autoclose wfid=$rec->{id}\n");
+                  #printf STDERR ("info: fifi autoclose wfid=$rec->{id}\n");
                 
                   $wf->UpdateRecord({stateid=>21,closedate=>$closedate},
                                     {id=>\$rec->{id}});

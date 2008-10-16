@@ -77,6 +77,18 @@ sub getPosibleRoles
              "write"           =>$self->getParent->T("write instance",
                                                      $self->Self));
    }
+   if ($parentobj=~m/^.+::liccontract$/ ||
+       (defined($self->getParent) &&
+        defined($self->getParent->getParent) &&
+       $self->getParent->getParent->Self()=~m/^.+::liccontract$/)){
+      return(
+             "read"            =>$self->getParent->T("read contract",
+                                                     $self->Self),
+             "write"           =>$self->getParent->T("write contract",
+                                                     $self->Self),
+             "privread"        =>$self->getParent->T("privacy read",
+                                                     $self->Self));
+   }
    if ($parentobj=~m/^.+::network$/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&

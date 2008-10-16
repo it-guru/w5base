@@ -673,3 +673,25 @@ alter table appl       add opmode     varchar(20) default NULL;
 alter table asset      add conumber   varchar(20) default NULL;
 alter table system     add key(conumber);
 alter table asset      add key(conumber);
+alter table liccontract  add unitcount int(2) default 1;
+alter table liccontract  add unittype  varchar(20) default NULL;
+alter table liccontract  add databoss bigint(20)  default NULL;
+alter table liccontract  add databoss2 bigint(20)  default NULL;
+create table lickey (
+  id           bigint(20)  NOT NULL,
+  liccontract  bigint(20)  NOT NULL,
+  name         varchar(128) NOT NULL,
+  comments     longtext    default NULL,
+  createdate   datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate   datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser   bigint(20) default NULL,
+  modifyuser   bigint(20) default NULL,
+  editor       varchar(100) NOT NULL default '',
+  realeditor   varchar(100) NOT NULL default '',
+  srcsys       varchar(10) default 'w5base',
+  srcid        varchar(30) default NULL,
+  srcload      datetime    default NULL,
+  PRIMARY KEY  (id),
+  KEY liccontract (liccontract),UNIQUE name (name,liccontract),
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+);

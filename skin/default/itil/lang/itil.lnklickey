@@ -1,0 +1,5 @@
+'itil::lnklickey'=>{de=>'Lizenz Key',en=>'License Key'},
+'License Key'=>{de=>'Lizenz Key'},
+'invalid license key specified'=>{de=>'ungültiger Lizenz Key'},
+'fieldgroup.liccontractinfo'=>{de=>'Lizenz-Vertrag Infos',en=>'license contract infos'},
+

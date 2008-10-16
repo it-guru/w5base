@@ -46,6 +46,11 @@ sub new
                 label      =>'CostCenter-No.',
                 dataobjattr=>'amcostcenter.trimmedtitle'),
 
+      new kernel::Field::Boolean(
+                name       =>'islocked',
+                label      =>'is locked',
+                dataobjattr=>"decode(amcostcenter.flag9,'X',1,0)"),
+
       new kernel::Field::Text(
                 name       =>'code',
                 label      =>'CostCenter-Code',
@@ -64,14 +69,14 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'delmgr',
-                label         =>'Delivery Manager',
+                label         =>'lead Delivery Manager',
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['delmgrid'=>'lempldeptid'],
                 vjoindisp     =>'fullname'),
 
       new kernel::Field::Link(
                 name          =>'delmgrid',
-                dataobjattr   =>'amcostcenter.arldeliverymanagementid'),
+                dataobjattr   =>'amcostcenter.lleadingdeliverymanagerid'),
                                     
      new kernel::Field::TextDrop(
                 name          =>'sem',
@@ -92,12 +97,39 @@ sub new
       new kernel::Field::Link(
                 name          =>'semid',
                 dataobjattr   =>'amcostcenter.lservicemanagerid'),
-                                    
 
+      new kernel::Field::Text(
+                name          =>'srcsys',
+                group         =>'source',
+                label         =>'Source-System',
+                dataobjattr   =>'amcostcenter.externalsystem'),
+
+      new kernel::Field::Text(
+                name          =>'srcid',
+                group         =>'source',
+                label         =>'Source-Id',
+                dataobjattr   =>'amcostcenter.externalid'),
+
+      new kernel::Field::Date(
+                name          =>'srcload',
+                history       =>0,
+                group         =>'source',
+                label         =>'Source-Load',
+                dataobjattr   =>'amcostcenter.dtimport'),
    );
    $self->setDefaultView(qw(linenumber id name code description));
    return($self);
 }
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_islocked"))){
+     Query->Param("search_islocked"=>$self->T("no"));
+   }
+}
+
+
 
 sub Initialize
 {
