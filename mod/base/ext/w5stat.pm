@@ -496,7 +496,7 @@ sub processRecord
                                         "Base.Total.User.Count",1);
       }
    }
-   if ($module eq "base::grp"){
+   elsif ($module eq "base::grp"){
       my $name=$rec->{fullname};
       my $allusers=$rec->{users};
       $allusers=[] if (ref($allusers) ne "ARRAY");
@@ -524,8 +524,9 @@ sub processRecord
                                      "Base.Total.Group.Count",1);
    }
    elsif ($module eq "base::workflow::notfinished"){
-      if ($rec->{class} eq "base::workflow::DataIssue"){
-         if (ref($rec->{responsiblegrp}) eq "ARRAY"){
+      if ($rec->{class} eq "base::workflow::DataIssue" &&
+          defined($rec->{responsiblegrp})){
+      #   if (ref($rec->{responsiblegrp}) eq "ARRAY"){
             foreach my $resp (@{$rec->{responsiblegrp}}){
                $self->getParent->storeStatVar("Group",$resp,{},
                                               "base.DataIssue.open",1);
@@ -533,7 +534,7 @@ sub processRecord
                                  {maxlevel=>1,method=>'concat'},
                                  "base.DataIssue.IdList.open",$rec->{id});
             }
-         }
+      #   }
          msg(DEBUG,"response %s\n",Dumper($rec->{responsiblegrp}));
       }
       $self->getParent->storeStatVar("Group",["admin"],{},

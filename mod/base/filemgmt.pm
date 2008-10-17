@@ -532,7 +532,14 @@ sub checkacl
                   if ($issubofdata && !$aclsfound){
                      $foundad=0;
                      $foundrw=0;
-                     $foundro=1;
+                     if ($context->{$fid}->{isprivate}){
+                        $foundro=0; # now we need an extended check for privacy
+                                    # access
+                        
+                     }
+                     else{
+                        $foundro=1;
+                     }
                   }
                }
             }

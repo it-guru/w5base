@@ -84,6 +84,13 @@ sub ListFiles
          $d.=$rec->{name}."<br>\n";
          my %clone=(%{$rec});
          $clone{label}=$clone{name};
+         if ($rec->{isprivate}){
+            my $privacy=$self->getParent->T(
+                        "privacy information - ".
+                        "only readable with rule write or privacy read");
+            $clone{label}.="&nbsp;<a title=\"$privacy\">".
+                         "<font color=red><b>!</b></font></a>";
+         }
          $clone{href}="ViewProcessor/load/$self->{name}/".
                       "$refid/$clone{fid}/$clone{name}";
          if ($mode eq "FileListMode.DELENT"){

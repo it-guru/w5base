@@ -114,7 +114,7 @@ create table w5stat (
   statgroup  varchar(40)  NOT NULL,
   name       varchar(128) NOT NULL, nameid bigint(20),
   month      char(6)      NOT NULL,
-  stats      blob,comments blob,
+  stats      mediumblob,comments blob,
   modifydate datetime NOT NULL default '0000-00-00 00:00:00',
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   srcsys     varchar(10) default 'w5base', 
