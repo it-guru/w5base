@@ -24,7 +24,7 @@ use kernel::Event;
 @ISA=qw(kernel::Event);
 
 my $TMPDIR="/tmp/accheck2";
-my $TMPDIR="/tmp/aclockcheck";
+my $TMPDIR="/tmp/aclockcheck2";
 
 sub new
 {
@@ -101,7 +101,7 @@ sub ImportAssetCenterCO
        my $WfRec=$_;
        my $bk=$wf->Store($WfRec,{stateid=>25});
    });
-   $self->SendOpMsg();
+#   $self->SendOpMsg();
 
    return({exitcode=>0}); 
 }
