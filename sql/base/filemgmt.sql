@@ -49,3 +49,4 @@ alter table fileacl add alertstate varchar(10);
 alter table filemgmt add viewcount int(20) not null;
 alter table filemgmt add viewlast  datetime default NULL, add key(viewlast);
 alter table filemgmt add viewfreq  int(20)  default NULL;
+alter table filemgmt add isprivate int(2)   default '0';

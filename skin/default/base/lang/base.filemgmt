@@ -14,3 +14,4 @@
 'Create directory'=>{de=>'Verzeichnis erstellen'},
 'Modify rights'=>{de=>'Rechte anpassen'},
 "invalid filename '\%s' specified"=>{de=>"ungültiger Dateiname '\%s'"},
+'is private'=>{de=>'Vertraulich behandeln'},

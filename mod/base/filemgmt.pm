@@ -77,6 +77,10 @@ sub new
                                    transprefix=>'boolean.',
                                    dataobjattr=>'filemgmt.inheritrights'),
 
+      new kernel::Field::Boolean(  name       =>'isprivate',
+                                   label      =>'is private',
+                                   dataobjattr=>'filemgmt.isprivate'),
+
       new kernel::Field::Text(     name       =>'parentobj',
                                    htmldetail =>0,
                                    label      =>'parent Object',
