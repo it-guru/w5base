@@ -17,7 +17,7 @@ create table appl (
     mandator       bigint(20)  default NULL,
     desiredsla     float(5,2)  default NULL,
     is_licenseapp  bool        default '0',
-    customerprio   int(2)      default NULL,
+    customerprio   int(2)      default '2',
     avgusercount   int(11),namedusercount int(11),
     currentvers    text        default NULL,
     maintwindow    text        default NULL,

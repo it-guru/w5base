@@ -202,8 +202,8 @@ sub UpdateOrgareaStructure
                my $exp="now+21d";
                $exp=$app->ExpandTimeExpression($exp,"en","GMT","GMT");
                $grpuser->ValidatedUpdateRecord($rec,{expiration=>$exp,
-                                               roles=>$rec->{roles}},
-                                               {userid=>\$rec->{userid}});
+                                                     roles=>$rec->{roles}},
+                 {userid=>\$rec->{userid},lnkgrpuserid=>\$rec->{lnkgrpuserid}});
             }
             ($rec,$msg)=$grpuser->getNext();
          }until(!defined($rec));
