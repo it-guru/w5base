@@ -129,7 +129,9 @@ sub Result
    my ($usrrec)=$user->getOnlyFirst(qw(fullname));
 
    print("<center><table width=500>");
-   printf("<tr><td align=center><h2>%s<br>\n%s</h2></td></tr>",
+   printf("<tr><td align=center>".
+          "<a href=\"Result?MyW5BaseSUBMOD=base::MyW5Base::myefforts\">".
+          "<h2>%s<br>\n%s</h2></a></td></tr>",
           $self->T("Effort statistics of the last 14 days of"),
           $usrrec->{fullname});
    print("<tr><td>");
@@ -156,6 +158,10 @@ sub Result
 <td nowrap>$l4</td><td width=40 align=right>$wfcount&nbsp;</td></tr>
 <tr><td nowrap>$l5</td><td align=right width=40 >$sumeff</td></tr>
 </table>
+<input type=hidden name=MyW5BaseSUBMOD value="base::MyW5Base::myefforts">
+<script language="JavaScript">
+window.setTimeout(function(){document.forms[0].submit()},60000);
+</script>
 EOF
    print("</td></tr>");
    print("<tr><td align=right>$condition: $cond</td></tr>");
