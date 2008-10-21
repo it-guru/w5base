@@ -149,12 +149,12 @@ sub Result
    print(<<EOF);
 <table width=100% border=1>
 <tr>
-<td width=45%>$l1</td><td align=right width=40><b>$mwteff</b></td>
-<td width=45%>$l2</td><td width=40 align=right>$wtcount&nbsp;</td></tr>
+<td width=45% nowrap>$l1</td><td align=right width=40><b>$mwteff</b></td>
+<td width=45% nowrap>$l2</td><td width=40 align=right>$wtcount&nbsp;</td></tr>
 <tr>
-<td>$l3</td><td align=right width=40>$miteff</td>
-<td>$l4</td><td width=40 align=right>$wfcount&nbsp;</td></tr>
-<tr><td>$l5</td><td align=right width=40 >$sumeff</td></tr>
+<td nowrap>$l3</td><td align=right width=40>$miteff</td>
+<td nowrap>$l4</td><td width=40 align=right>$wfcount&nbsp;</td></tr>
+<tr><td nowrap>$l5</td><td align=right width=40 >$sumeff</td></tr>
 </table>
 EOF
    print("</td></tr>");
