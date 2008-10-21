@@ -1,0 +1,8 @@
+'base::MyW5Base::myefforts'=>{de=>'Tool: Arbeitszeitanalyse - (AER - mein Status)',en=>'Tool: Worktimeanalyse - my state'},
+'my documented efforts'=>{de=>'meine dokumentierten Aufwände'},
+'Effort statistics of the last 14 days of'=>{de=>'Arbeitsaufwand-Statistik der letzten 14 Tage von'},
+'averanged work efforts/weekday'=>{de=>'durchschnittliche Arbeitszeit/Werktag'},
+'count weekdays'=>{de=>'Anzahl Werktage'},
+'averanged work efforts/day'=>{de=>'durchschnittliche Arbeitszeit/Tag'},
+'count workflows'=>{de=>'Anzahl Workflows'},
+'sum efforts in the last 14 days'=>{de=>'Summe Aufwände der letzten 14 Tage'},

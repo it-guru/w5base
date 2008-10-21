@@ -20,7 +20,9 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::MyW5Base;
-@ISA=qw(kernel::MyW5Base);
+use kernel::date;
+use kernel::FlashChart;
+@ISA=qw(kernel::MyW5Base kernel::FlashChart);
 
 sub new
 {
@@ -33,15 +35,15 @@ sub new
 sub Init
 {
    my $self=shift;
-   $self->{DataObj}=getModuleObject($self->getParent->Config,"base::workflow");
-   return(0) if (!defined($self->{DataObj}));
+   $self->{DataObj}=getModuleObject($self->getParent->Config,
+                                    "base::cistatus");  # dummy dataobject
    return(1);
 }
 
 sub getDefaultStdButtonBar
 {
    my $self=shift;
-   return('%StdButtonBar(deputycontrol,print,search)%');
+   return('%StdButtonBar(bookmark,print,search)%');
 }
 
 sub isSelectable
@@ -55,53 +57,119 @@ sub isSelectable
 #   if (defined($acl)){
 #      return(1) if (grep(/^read$/,@$acl));
 #   }
-   return(0);
+   return(1);
 }
 
 sub Result
 {
    my $self=shift;
-   my %q=$self->{DataObj}->getSearchHash();
+   my $app=$self->getParent();
 
+   print $app->HttpHeader("text/html"); 
+   print $app->HtmlHeader(style=>['default.css','work.css',
+                                   'kernel.App.Web.css'],
+                      js=>['toolbox.js',
+                           '../../../static/open-flash-chart/js/swfobject.js'],
+                      body=>1,form=>1,
+                      title=>'my effort state');
+
+   my $tz=$app->UserTimezone();
    my $userid=$self->getParent->getCurrentUserId();
-   my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},"RMember","both");
-   my @grpids=keys(%grp);
-   @grpids=(qw(NONE)) if ($#grpids==-1);
-
    $userid=-1 if (!defined($userid) || $userid==0);
-   my $dc=Query->Param("EXVIEWCONTROL");
-   my @q=();
-   if ($dc eq "ADDDEP" || $dc eq "DEPONLY"){
-      my %q1=%q;
-      my %q2=%q;
-      $q1{fwddebtargetid}=\$userid;
-      $q1{fwddebtarget}=\'base::user';
-      $q1{stateid}="<20";
-      $q2{fwddebtargetid}=\@grpids;
-      $q2{fwddebtarget}=\'base::grp';
-      $q2{stateid}="<20";
-      push(@q,\%q1,\%q2);
+
+   my $wa=getModuleObject($self->getParent->Config,"base::workflowaction");
+   $wa->SetFilter({cdate=>">today-14d AND <now",
+                   creatorid=>\$userid});
+   $wa->SetCurrentOrder(qw(NONE));
+   my %wfheadid;
+   my %day;
+   my $sumeff;
+   $wa->SetCurrentView(qw(wfheadid cdate effort));
+   my ($rec,$msg)=$wa->getFirst();
+   if (defined($rec)){
+      do{
+         $wfheadid{$rec->{wfheadid}}++;
+         my $utime=Date_to_Time("GMT",$rec->{cdate});
+         my @ldate=Time_to_Date($tz,$utime);
+         my $day=sprintf("%04d-%02d-%02d",$ldate[0],$ldate[1],$ldate[2]);
+         $day{$day}+=($rec->{effort}+0);
+         $sumeff+=($rec->{effort}+0);
+         #printf ("<pre>@ldate=%s</pre>\n",Dumper($rec));
+         ($rec,$msg)=$wa->getNext();
+      } until(!defined($rec));
    }
-   if ($dc ne "DEPONLY"){
-      my %q1=%q;
-      my %q2=%q;
-      my %q3=%q;
-      $q1{fwdtargetid}=\$userid;
-      $q1{fwdtarget}=\'base::user';
-      $q1{stateid}="<20";
-      $q2{fwdtargetid}=\@grpids;
-      $q2{fwdtarget}=\'base::grp';
-      $q2{stateid}="<20";
-      $q3{owner}=\$userid;
-      $q3{stateid}="<=6";
-      push(@q,\%q1,\%q2,\%q3);
+   my $wfcount=keys(%wfheadid);
+   my @now=Today_and_Now($tz);
+   my $now=sprintf("%04d-%02d-%02d",$now[0],$now[1],$now[2]);
+   my $data=[];
+   my $xlabel=[];
+   my @n=@now;
+   my $wtcount=0;
+   for(my $d=0;$d<=14;$d++){
+      my $day=sprintf("%04d-%02d-%02d",$n[0],$n[1],$n[2]);
+      my ($y,$m,$d)=$day=~m/^(\d+)-(\d+)-(\d+)$/;
+      my $dow=Day_of_Week($n[0],$n[1],$n[2]);
+      if ($dow==7 || $dow==6){
+         unshift(@$xlabel,"-");
+      }
+      else{
+         $wtcount++;
+         unshift(@$xlabel,"$d.");
+      }
+      unshift(@$data,sprintf("%0.1f",$day{$day}/60.0));
+
+      @n=Add_Delta_YMD($tz,$n[0],$n[1],$n[2],0,0,-1);
    }
-   $self->{DataObj}->{OnlyOpenRecords}=1;
-   $self->{DataObj}->ResetFilter();
-   $self->{DataObj}->SecureSetFilter(\@q);
-   $self->{DataObj}->setDefaultView(qw(prio mdate state class name editor));
+   my $mwteff=sprintf("%.2f&nbsp;h&nbsp;",$sumeff/$wtcount/60);
+   my $miteff=sprintf("%.2f&nbsp;h&nbsp;",$sumeff/14.0/60);
+   $sumeff=sprintf("%.2f&nbsp;h&nbsp;",$sumeff/60);
+
+   my $user=getModuleObject($self->getParent->Config,"base::user");
+   $user->SetFilter({userid=>\$userid});
+   my ($usrrec)=$user->getOnlyFirst(qw(fullname));
+
+   print("<center><table width=500>");
+   printf("<tr><td align=center><h2>%s<br>\n%s</h2></td></tr>",
+          $self->T("Effort statistics of the last 14 days of"),
+          $usrrec->{fullname});
+   print("<tr><td>");
+   print  $self->buildChart("MyEffortChart",$data,
+                      xlabel=>$xlabel,minymax=>1,
+                      width=>500,height=>200, 
+                      label=>$self->T("my documented efforts"));
+   print("</td></tr>");
+   print("<tr><td>");
+   my $l1=$self->T("averanged work efforts/weekday");
+   my $l2=$self->T("count weekdays");
+   my $l3=$self->T("averanged work efforts/day");
+   my $l4=$self->T("count workflows");
+   my $l5=$self->T("sum efforts in the last 14 days");
+   my $condition=$self->T("condition");
+   my $cond=Date_to_String("de",@now);
+   print(<<EOF);
+<table width=100% border=1>
+<tr>
+<td width=45%>$l1</td><td align=right width=40><b>$mwteff</b></td>
+<td width=45%>$l2</td><td width=40 align=right>$wtcount&nbsp;</td></tr>
+<tr>
+<td>$l3</td><td align=right width=40>$miteff</td>
+<td>$l4</td><td width=40 align=right>$wfcount&nbsp;</td></tr>
+<tr><td>$l5</td><td align=right width=40 >$sumeff</td></tr>
+</table>
+EOF
+   print("</td></tr>");
+   print("<tr><td align=right>$condition: $cond</td></tr>");
+   print("</table>");
+
    
-   return($self->{DataObj}->Result(ExternalFilter=>1));
+
+  
+#   $self->{DataObj}->{OnlyOpenRecords}=1;
+#   $self->{DataObj}->ResetFilter();
+#   $self->{DataObj}->SecureSetFilter(\@q);
+#   $self->{DataObj}->setDefaultView(qw(prio mdate state class name editor));
+#   
+#   return($self->{DataObj}->Result(ExternalFilter=>1));
 }
 
 

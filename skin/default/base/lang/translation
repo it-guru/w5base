@@ -47,3 +47,5 @@
 'allow automatic updates by interfaces'=>{de=>'automatisierte Updates durch Schnittstellen zulassen'},
 'use this link to reference this record (f.e. in mail)'=>{de=>'verwenden Sie diesen Link, um auf diesen Datensatz zu verweisen (z.B. in E-Mails)'},
 'privacy information - only readable with rule write or privacy read'=>{de=>'Vertrauliche Information - nur lesbar mit Schreibrechten oder vertrauchlichem lesen'},
+'condition'=>{de=>'Stand'},
+

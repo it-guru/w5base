@@ -94,7 +94,9 @@ sub Main
       my $templ=$curquery->getQueryTemplate();
       $DefaultFormat=$curquery->getDefaultFormat();
       $doAutoSearch=$curquery->doAutoSearch();
-      $o->ParseTemplateVars(\$templ);
+      if (defined($o)){
+         $o->ParseTemplateVars(\$templ);
+      }
       printf("<tr><td valign=top height=1%%>%s</td></tr>",$templ);
       my $if="<iframe src=\"../../base/load/loading\" ".
              "name=Result style=\"width:100%;height:100%\">".
