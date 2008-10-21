@@ -13,7 +13,15 @@ a:link.h2,a:visited.h2,a:active.h2{
             font-family:Arial,Adobe Helvetica,Helvetica;
             text-decoration:none;
             color:black;
-            font-size:15px;
+            font-size:18px;
+            color:#16305e;
+}
+h2{
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:black;
+            font-size:18px;
+            color:#16305e;
 }
 body{
   overflow:hidden;

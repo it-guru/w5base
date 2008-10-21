@@ -133,17 +133,22 @@ function buildChart$name()
 {
    var $so=new SWFObject("../../../$swfobjcode","$name",
                          "$w","$h","9","#FFFFFF");
-   $so.addVariable("variables","true");
-   $so.addVariable("title","$param{label},{font-size: 15;}");
-   $so.addVariable("bg_colour","#f4f4f4");
-   $so.addVariable("y_label_size","15");
-   $so.addVariable("y_ticks","5,10,5");
-   $datacode
-   $so.addVariable("x_labels","$xlabel");
-   //$so.addVariable("x_axis_steps","2");
-   $so.addParam("allowScriptAccess", "always" );//"sameDomain");
-   //$so.addParam("onmouseout", "onrollout2();" );
-   $so.write("$name");
+   if ($so){
+      $so.addVariable("variables","true");
+      $so.addVariable("title","$param{label},{font-size: 15;}");
+      $so.addVariable("bg_colour","#f4f4f4");
+      $so.addVariable("y_label_size","15");
+      $so.addVariable("y_ticks","5,10,5");
+      $datacode
+      $so.addVariable("x_labels","$xlabel");
+      //$so.addVariable("x_axis_steps","2");
+      $so.addParam("allowScriptAccess", "always" );//"sameDomain");
+      //$so.addParam("onmouseout", "onrollout2();" );
+      $so.write("$name");
+   }
+   else{
+      alert("error: can not create a flash object");
+   }
 }
 addEvent(window,"load",buildChart$name);
 </script>

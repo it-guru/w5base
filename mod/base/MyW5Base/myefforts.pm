@@ -167,7 +167,7 @@ EOF
    print("</td></tr>");
    print("<tr><td align=right>$condition: $cond</td></tr>");
    print("</table>");
-   print $self->HtmlBottom(body=>1,form=>1);
+   print $app->HtmlBottom(body=>1,form=>1);
    return("");
 }
 
