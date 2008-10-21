@@ -72,7 +72,7 @@ sub Result
                            '../../../static/open-flash-chart/js/swfobject.js'],
                       body=>1,form=>1,
                       title=>'my effort state');
-   return if ($ENV{REMOTE_USER} eq "anonymous");
+   return("") if ($ENV{REMOTE_USER} eq "anonymous");
 
    my $tz=$app->UserTimezone();
    my $userid=$self->getParent->getCurrentUserId();
