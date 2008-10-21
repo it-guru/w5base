@@ -68,6 +68,8 @@
 typedef long long int64_t;
 #endif
 
+#define W5AGENTPL "sbin/w5agent.pl"
+
 
 static char* argv0;
 static int debug;
@@ -88,6 +90,10 @@ static char* user;
 static char* charset;
 static char* p3p;
 static int max_age;
+static int   w5agentpid;
+static char* w5agentpl;
+
+
 
 
 typedef struct {
@@ -327,6 +333,7 @@ handle_alrm( int sig )
     }
 
 
+
 static void
 re_open_logfile( void )
     {
@@ -368,6 +375,7 @@ main( int argc, char** argv )
     httpd_sockaddr sa6;
     int gotv4, gotv6;
     struct timeval tv;
+    size_t slen;
 
     argv0 = argv[0];
 
@@ -605,7 +613,33 @@ main( int argc, char** argv )
 	    exit( 1 );
 	    }
 	}
+    //*w5agentpl=0;
+    #ifdef PREFIX
+    w5agentpl = e_strdup( PREFIX );
+    #else
+    w5agentpl = e_strdup( "" );
+    #endif
+    slen=strlen(w5agentpl);
+    if (w5agentpl[strlen(w5agentpl)]!='/'){
+       httpd_realloc_str( &w5agentpl, &slen, slen+1 );
+       (void) strcpy(&w5agentpl[strlen(w5agentpl)],"/");
+    }
+    httpd_realloc_str( &w5agentpl, &slen, slen+strlen(W5AGENTPL) );
+    (void) strcpy(&w5agentpl[strlen(w5agentpl)],W5AGENTPL);
 
+    /* start w5agent.pl  */
+    switch ( w5agentpid=fork() )
+        {
+        case 0:
+        	syslog( LOG_INFO, "initialize %s",w5agentpl);
+                execl(w5agentpl,"");
+                exit(-1);
+        case -1:
+        syslog( LOG_CRIT, "fork - %m" );
+        exit( 1 );
+        }
+    sleep(2);
+    syslog( LOG_INFO, "w5agent.pl PID=%d",w5agentpid);
     /* Set up to catch signals. */
 #ifdef HAVE_SIGSET
     (void) sigset( SIGTERM, handle_term );

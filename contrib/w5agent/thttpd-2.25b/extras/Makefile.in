@@ -79,6 +79,8 @@ install:	all
 	cp htpasswd.1 $(MANDIR)/man1/htpasswd.1
 	rm -f $(MANDIR)/man8/syslogtocern.8
 	cp syslogtocern.8 $(MANDIR)/man8/syslogtocern.8
+	rm -f $(BINDIR)/w5agent.pl
+	cp w5agent.pl $(BINDIR)/w5agent.pl
 
 clean:
 	rm -f $(CLEANFILES)
