@@ -1,0 +1,17 @@
+2003-07-31	Uwe Ohse <uwe@ranan.ohse.de>
+
+version:  0.6.0
+internal: a number of library files updated.
+ui:       new functions strhash_save and strhash_load
+
+2001-01-27	Uwe Ohse <uwe@fjoras.ohse.de>
+
+version:  0.5.1
+internal: changed to use scan_ulong/fmt_ulong instead of str2ulong/str_ulong
+internal: a number of library file updated.
+bugfix:   strhash_enter allocated not enough space if !keyalloc.
+
+2000-09-12	Uwe Ohse <uwe@fjoras.ohse.de>
+
+version: 0.5.0
+news:    first release

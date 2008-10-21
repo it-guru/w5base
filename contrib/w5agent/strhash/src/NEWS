@@ -1,0 +1,11 @@
+Version 0.6.0 July 2003:
+
+* added strhash_save and strhash_load functions.
+
+Version 0.5.1 March 2001:
+
+* fixed a stupid mistake in strhash_enter
+
+Version 0.5.0 September 2000:
+
+* first release

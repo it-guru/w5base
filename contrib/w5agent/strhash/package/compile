@@ -1,0 +1,39 @@
+#! /bin/sh -e
+
+umask 022
+package/packagecheck || exit 1
+
+here=`env - PATH=$PATH pwd`
+
+mkdir -p compile 
+test -r compile/home || echo $here > compile/home
+test -h compile/src || ln -s $here/src compile/src
+
+echo 'Linking ./src/* into ./compile...'
+for i in `ls src` ; do
+	test -h compile/$i || ln -s src/$i compile/$i
+done
+
+echo 'Compiling everything in ./compile...'
+( cd compile; exec make ) || exit 1
+
+doit() {
+  WHAT=$1
+  DIR=$2
+  ALL=`cat package/$WHAT 2>/dev/null || true` 
+  if test "x$ALL" = x ; then
+    return;
+  fi
+  mkdir -p $DIR
+  echo "Copying $WHAT into ./$DIR..."
+  for i in $ALL ; do
+    rm -f $DIR/$i'{new}'
+    cp -p compile/$i $DIR/$i'{new}'
+    mv -f $DIR/$i'{new}' $DIR/$i
+  done
+}
+
+doit documentation doc
+if test -f package/finish ; then
+  . package/finish
+fi

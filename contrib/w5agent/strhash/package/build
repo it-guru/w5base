@@ -1,0 +1,4 @@
+#! /bin/sh -e
+package/packagecheck || exit 1
+package/compile
+package/check
