@@ -67,7 +67,7 @@ sub Result
 
    print $app->HttpHeader("text/html"); 
    print $app->HtmlHeader(style=>['default.css','work.css',
-                                   'kernel.App.Web.css'],
+                                   'kernel.App.Web.css','myw5base.css'],
                       js=>['toolbox.js',
                            '../../../static/open-flash-chart/js/swfobject.js'],
                       body=>1,form=>1,
@@ -131,7 +131,7 @@ sub Result
 
    print("<center><table width=500>");
    printf("<tr><td align=center>".
-          "<a href=\"Result?MyW5BaseSUBMOD=base::MyW5Base::myefforts\">".
+          "<a class=h2 href=\"Result?MyW5BaseSUBMOD=base::MyW5Base::myefforts\">".
           "<h2>%s<br>\n%s</h2></a></td></tr>",
           $self->T("Effort statistics of the last 14 days of"),
           $usrrec->{fullname});
@@ -167,16 +167,8 @@ EOF
    print("</td></tr>");
    print("<tr><td align=right>$condition: $cond</td></tr>");
    print("</table>");
-
-   
-
-  
-#   $self->{DataObj}->{OnlyOpenRecords}=1;
-#   $self->{DataObj}->ResetFilter();
-#   $self->{DataObj}->SecureSetFilter(\@q);
-#   $self->{DataObj}->setDefaultView(qw(prio mdate state class name editor));
-#   
-#   return($self->{DataObj}->Result(ExternalFilter=>1));
+   print $self->HtmlBottom(body=>1,form=>1);
+   return("");
 }
 
 
