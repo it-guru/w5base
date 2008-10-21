@@ -9,7 +9,7 @@
 
 # Defaults:
 ac_help=
-ac_default_prefix=/usr/local
+ac_default_prefix=/opt/w5agent
 # Any additions from configure.in:
 
 # Initialize some variables set by options.

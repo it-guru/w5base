@@ -57,7 +57,7 @@
 ** as a security measure that's how you do it, just don't define any
 ** pattern here and don't run with the -c flag.
 */
-#ifdef notdef
+//#ifdef notdef
 /* Some sample patterns.  Allow programs only in one central directory: */
 //#define CGI_PATTERN "/cgi-bin/*"
 /* Allow programs in a central directory, or anywhere in a trusted
@@ -66,8 +66,8 @@
 /* Allow any program ending with a .cgi: */
 //#define CGI_PATTERN "**.cgi"
 /* When virtual hosting, enable the central directory on every host: */
-#define CGI_PATTERN "/*/cgi-bin/*"
-#endif
+#define CGI_PATTERN "/*/cgi-bin/*|/cgi-bin/*"
+//#endif
 
 /* CONFIGURE: How many seconds to allow CGI programs to run before killing
 ** them.  This is in case someone writes a CGI program that goes into an
@@ -243,9 +243,9 @@
 ** to the home directory of the user specified by -u or DEFAULT_USER.
 ** An explicit -d still overrides this.
 */
-#ifdef notdef
+//#ifdef notdef
 #define USE_USER_DIR
-#endif
+//#endif
 
 /* CONFIGURE: If this is defined, some of the built-in error pages will
 ** have more explicit information about exactly what the problem is.

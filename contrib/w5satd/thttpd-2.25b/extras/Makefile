@@ -25,7 +25,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-prefix =	/opt/thttpd
+prefix =	/opt/w5agent
 exec_prefix =	${prefix}
 BINDIR =	${exec_prefix}/sbin
 WEBDIR =	$(prefix)/www
@@ -68,6 +68,7 @@ htpasswd.o:	htpasswd.c ../config.h
 
 install:	all
 	rm -f $(BINDIR)/makeweb $(BINDIR)/htpasswd $(BINDIR)/syslogtocern
+	-mkdir -p $(MANDIR)/man1
 	cp makeweb $(BINDIR)/makeweb
 	chgrp $(WEBGROUP) $(BINDIR)/makeweb
 	chmod 2755 $(BINDIR)/makeweb

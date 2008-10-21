@@ -25,7 +25,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-prefix =	/opt/thttpd
+prefix =	/opt/w5agent
 exec_prefix =	${prefix}
 WEBDIR =	$(prefix)/www
 CGIBINDIR =	$(WEBDIR)/cgi-bin

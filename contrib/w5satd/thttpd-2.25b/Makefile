@@ -28,7 +28,7 @@
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
 
 # Top level hierarchy.
-prefix = /opt/thttpd
+prefix = /opt/w5agent
 exec_prefix = ${prefix}
 # Pathname of directory to install the binary.
 BINDIR = ${exec_prefix}/sbin
@@ -40,7 +40,7 @@ WEBDIR = $(prefix)/www
 # CONFIGURE: The group that the web directory belongs to.  This is so that
 # the makeweb program can be installed set-group-id to that group, and make
 # subdirectories.  If you're not going to use makeweb, ignore this.
-WEBGROUP =	www
+WEBGROUP =	w5agent
 
 # CONFIGURE: Directory for CGI executables.
 CGIBINDIR =	$(WEBDIR)/cgi-bin
@@ -111,11 +111,13 @@ install:	installthis install-man installsubdirs
 
 installthis:
 	-mkdir -p $(DESTDIR)$(BINDIR)
-	$(INSTALL) -m 555 -o bin -g bin thttpd $(DESTDIR)$(BINDIR)
+	-cp thttpd w5agent
+	$(INSTALL) -m 555 -o bin -g bin w5agent $(DESTDIR)$(BINDIR)
 
 install-man:
 	-mkdir -p $(DESTDIR)$(MANDIR)/man8
-	$(INSTALL) -m 444 -o bin -g bin thttpd.8 $(DESTDIR)$(MANDIR)/man8
+	-cp thttpd.8 w5agent.8
+	$(INSTALL) -m 444 -o bin -g bin w5agent.8 $(DESTDIR)$(MANDIR)/man8
 
 installsubdirs:
 	for i in $(SUBDIRS) ; do ( \
