@@ -60,7 +60,7 @@ sub new
                                                    
       new kernel::Field::Number(
                 name          =>'quantity',
-                htmlwidth     =>'30px',
+                htmlwidth     =>'40px',
                 precision     =>2,
                 label         =>'Quantity',
                 dataobjattr   =>'lnksoftwaresystem.quantity'),
@@ -311,6 +311,10 @@ sub Validate
          return(undef);
       }
    }
+   if (exists($newrec->{quantity}) && ! defined($newrec->{quantity})){
+      delete($newrec->{quantity});
+   }
+
    return(1);
 }
 

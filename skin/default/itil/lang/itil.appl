@@ -2,6 +2,7 @@
 'fieldgroup.default'=>{de=>'Anwendung-Daten',en=>'Application-Informations'},
 'fieldgroup.custcontracts'=>{de=>'Kundenverträge',en=>'Customer Contracts'},
 'fieldgroup.interfaces'=>{de=>'Schnittstellen',en=>'Interfaces'},
+'fieldgroup.licenses'=>{de=>'Lizenzen',en=>'Licenses'},
 'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
 'active systemnames'=>{de=>'aktive Systemnamen'},
 'active systemids'=>{de=>'aktive SystemIDs'},
@@ -86,3 +87,4 @@
 'opmode.approvtest'=>{de=>'Abnahme',en=>'Approvaltest'},
 'opmode.reference'=>{de=>'Referenz',en=>'Reference'},
 'opmode.license'=>{de=>'Lizenz',en=>'License'},
+'direct linked Licenses'=>{de=>'direkt verknüpfte Lizenzen'},

@@ -523,7 +523,8 @@ sub Validate
    my $newrec=shift;
 
    if ((!defined($oldrec) || defined($newrec->{name})) &&
-       (($newrec->{name}=~m/^\s*$/) || length($newrec->{name})<3)){
+       (($newrec->{name}=~m/^\s*$/) || length($newrec->{name})<3 ||
+         haveSpecialChar($newrec->{name}))){
       $self->LastMsg(ERROR,"invalid name specified");
       return(0);
    }

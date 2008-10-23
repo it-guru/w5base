@@ -80,7 +80,7 @@ use Unicode::String qw(utf8 latin1 utf16);
              &trim &rtrim &ltrim &hash2xml &effVal &Debug &UTF8toLatin1
              &Datafield2Hash &Hash2Datafield &CompressHash
              &unHtml &quoteHtml &quoteQueryString &Dumper 
-             &FancyLinks &mkInlineAttachment
+             &FancyLinks &mkInlineAttachment &haveSpecialChar
              &getModuleObject &getConfigObject &generateToken
              &isDataInputFromUserFrontend
              &msg &ERROR &WARN &DEBUG &INFO &OK &utf8 &latin1 &utf16);
@@ -99,11 +99,23 @@ sub Dumper
 }
 
 
+
 sub ERROR() {return("ERROR")}
 sub OK()    {return("OK")}
 sub WARN()  {return("WARN")}
 sub DEBUG() {return("DEBUG")}
 sub INFO()  {return("INFO")}
+
+sub haveSpecialChar
+{
+   my $str=shift;
+   my %param=@_;
+
+   if ($str=~m/[\~§\s,äöüß\\,;\*\?\r\n\t]/i){
+      return(1);
+   }
+   return(0);
+}
 
 
 sub ltrim

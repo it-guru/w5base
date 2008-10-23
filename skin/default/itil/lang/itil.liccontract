@@ -17,4 +17,4 @@
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'License use count'=>{de=>'aktuell genutzte Einheiten'},
 'License free count'=>{de=>'aktuell verfügbare Einheiten'},
-
+'invalid license name specified'=>{de=>'ungültiger Lizenzname eingegeben'},

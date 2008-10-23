@@ -170,6 +170,16 @@ sub new
                 vjoinon       =>['tsmid'=>'userid'],
                 vjoindisp     =>'fullname'),
 
+      new kernel::Field::SubList(
+                name          =>'directlicenses',
+                label         =>'direct linked Licenses',
+                group         =>'licenses',
+                allowcleanup  =>1,
+                vjointo       =>'itil::lnklicappl',
+                vjoinbase     =>[{licensecistatusid=>"<=4"}],
+                vjoinon       =>['id'=>'applid'],
+                vjoindisp     =>['liccontract','quantity','comments']),
+
       new kernel::Field::Text(
                 name          =>'businessteambossid',
                 group         =>'technical',
@@ -841,7 +851,7 @@ sub Validate
 
    my $name=trim(effVal($oldrec,$newrec,"name"));
    
-   if (length($name)<3 || ($name=~m/[;,\s\&\\\*]/)){
+   if (length($name)<3 || haveSpecialChar($name)){
       $self->LastMsg(ERROR,
            sprintf($self->T("invalid application name '%s' specified"),$name));
       return(0);

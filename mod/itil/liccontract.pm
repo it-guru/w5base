@@ -381,8 +381,9 @@ sub Validate
    my $newrec=shift;
 
    if ((!defined($oldrec) || defined($newrec->{name})) &&
-       $newrec->{name}=~m/^\s*$/){
-      $self->LastMsg(ERROR,"invalid name specified");
+       (($newrec->{name}=~m/^\s*$/) || 
+        (haveSpecialChar($newrec->{name})))){
+      $self->LastMsg(ERROR,"invalid license name specified");
       return(0);
    }
    if (defined($newrec->{cistatusid}) && $newrec->{cistatusid}>4){

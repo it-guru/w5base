@@ -930,7 +930,7 @@ sub Validate
    my $newrec=shift;
 
    my $name=trim(effVal($oldrec,$newrec,"name"));
-   if (length($name)<3 || ($name=~m/[\s,äöüß\\,;]/i)){
+   if (length($name)<3 || haveSpecialChar($name)){
       $self->LastMsg(ERROR,"invalid system name '%s' specified",$name);
       return(0);
    }

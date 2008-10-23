@@ -61,7 +61,7 @@ sub getQueryTemplate
 </tr>
 </table>
 </div>
-%StdButtonBar(_exviewcontrol,deputycontrol,teamviewcontrol,bookmark,print,search)%
+%StdButtonBar(exviewcontrol,deputycontrol,teamviewcontrol,bookmark,print,search)%
 EOF
    return($d);
 }
@@ -79,6 +79,17 @@ sub Result
    my $dc=Query->Param("EXVIEWCONTROL");
    my @q=();
    my @grpids;
+   if ($dc eq "CUSTOMER"){
+      my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
+                                            ["REmployee","RChief",
+                                             "RINManager","RQManager"],"both");
+      @grpids=keys(%grp);
+      @grpids=(qw(-1)) if ($#grpids==-1);
+      my (%q1,%q2);
+      $q1{cistatusid}='<=4';
+      $q1{customerid}=\@grpids;
+      push(@q,\%q1,\%q2);
+   }
    if ($dc eq "TEAM"){
       my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
                                             ["REmployee","RChief",
@@ -115,7 +126,12 @@ sub Result
    }
 
    $self->{appl}->ResetFilter();
-   $self->{appl}->SecureSetFilter(\@q);
+   if ($dc ne "CUSTOMER"){
+      $self->{appl}->SecureSetFilter(\@q);
+   }
+   else{
+      $self->{appl}->SetFilter(\@q);
+   }
    my @l=$self->{appl}->getHashList("id");
    my @appl=("none");
    if ($#l>-1){
@@ -128,7 +144,8 @@ sub Result
    $q1{class}=[grep(/^.*::eventnotify$/,
                     keys(%{$self->{DataObj}->{SubDataObj}}))];
    $q1{affectedapplicationid}=\@appl;
-   if ($#grpids!=-1){   # hack to find delete applications over mandatorid
+   if ($#grpids!=-1 && $dc ne "CUSTOMER"){ # hack to find delete 
+                                           # applications over mandatorid
       $self->{DataObj}->ResetFilter();    # (most only needed for incidenmanager
       $self->{DataObj}->SecureSetFilter([\%q1]);
       my @l1=$self->{DataObj}->getHashList("id");
