@@ -128,9 +128,9 @@ sub new
                 dataobjattr   =>'liccontract.sem2'),
 
 
-
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
+                label         =>'Contacts',
                 class         =>'mandator',
                 vjoinbase     =>[{'parentobj'=>\'itil::liccontract'}],
                 vjoininhash   =>['targetid','target','roles'],
@@ -324,6 +324,18 @@ sub new
    $self->setWorktable("liccontract");
    return($self);
 }
+
+sub isDeleteValid
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my $fo=$self->getField("licuse");
+   my $d=$fo->RawValue($rec);
+   return(0) if ($d>0);
+   
+   return($self->SUPER::isDeleteValid($rec));
+}  
 
 
 sub getSqlFrom

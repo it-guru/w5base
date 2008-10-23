@@ -66,7 +66,7 @@
 /* Allow any program ending with a .cgi: */
 //#define CGI_PATTERN "**.cgi"
 /* When virtual hosting, enable the central directory on every host: */
-#define CGI_PATTERN "/*/cgi-bin/*|/cgi-bin/*"
+#define CGI_PATTERN "/*/cgi-bin/*|/cgi-bin/*|/mod/*"
 //#endif
 
 /* CONFIGURE: How many seconds to allow CGI programs to run before killing

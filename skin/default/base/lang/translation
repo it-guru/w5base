@@ -19,6 +19,7 @@
 'Owner'                  =>{de=>'Eigentümer/Bearbeiter'                     },
 'Editor'                 =>{de=>'Bearbeiter'                                },
 'Creator'                =>{de=>'Ersteller'                                 },
+'Contacts'               =>{de=>'Kontakte'                                  },
 'Mandator'               =>{de=>'Mandant'                                   },
 'RealEditor'             =>{de=>'Echter-Bearbeiter'                         },
 'CI-State'               =>{de=>'CI-Status',       en=>'CI-State'           },

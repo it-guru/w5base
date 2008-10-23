@@ -695,3 +695,4 @@ create table lickey (
   KEY liccontract (liccontract),UNIQUE name (name,liccontract),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 );
+alter table lnksoftwaresystem add key(liccontract);

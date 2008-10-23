@@ -56,6 +56,7 @@
 
 #include "fdwatch.h"
 #include "libhttpd.h"
+#include "w5bb.h"
 #include "mmc.h"
 #include "timers.h"
 #include "match.h"
@@ -378,6 +379,7 @@ main( int argc, char** argv )
     size_t slen;
 
     argv0 = argv[0];
+    setenv("TZ","UTC",1);
 
     cp = strrchr( argv0, '/' );
     if ( cp != (char*) 0 )
@@ -504,7 +506,8 @@ main( int argc, char** argv )
 	(void) fclose( stdin );
 	if ( logfp != stdout )
 	    (void) fclose( stdout );
-	(void) fclose( stderr );
+        if ( ! debug )
+	    (void) fclose( stderr );
 
 	/* Daemonize - make ourselves a subprocess. */
 #ifdef HAVE_DAEMON
@@ -632,7 +635,7 @@ main( int argc, char** argv )
         {
         case 0:
         	syslog( LOG_INFO, "initialize %s",w5agentpl);
-                execl(w5agentpl,"");
+                execl(w5agentpl,"w5agent.pl",(char *)0);
                 exit(-1);
         case -1:
         syslog( LOG_CRIT, "fork - %m" );
@@ -1662,6 +1665,14 @@ handle_read( connecttab* c, struct timeval* tvP )
 	}
     hc->read_idx += sz;
     c->active_at = tvP->tv_sec;
+    if (sz=is_w5bbrequest( hc )){
+       if (!process_w5bbrequest(sz, hc)){
+	  syslog( LOG_ERR, "bad bb request" );
+       }
+       finish_connection( c, tvP );
+       return;
+    }
+
 
     /* Do we have a complete request yet? */
     switch ( httpd_got_request( hc ) )

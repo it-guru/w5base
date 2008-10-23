@@ -1941,6 +1941,7 @@ httpd_parse_request( httpd_conn* hc )
     char* cp;
     char* pi;
 
+
     hc->checked_idx = 0;	/* reset */
     method_str = bufgets( hc );
     url = strpbrk( method_str, " \t\012\015" );

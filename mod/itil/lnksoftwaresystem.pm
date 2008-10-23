@@ -29,7 +29,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{MainSearchFieldLines}=3;
+   $param{MainSearchFieldLines}=4 if (!defined($param{MainSearchFieldLines}));
    my $self=bless($type->SUPER::new(%param),$type);
    
 
@@ -76,6 +76,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'liccontract',
                 htmlwidth     =>'100px',
+                AllowEmpty    =>1,
                 label         =>'License contract',
                 vjointo       =>'itil::liccontract',
                 vjoinon       =>['liccontractid'=>'id'],
@@ -83,6 +84,7 @@ sub new
 
       new kernel::Field::Textarea(
                 name          =>'comments',
+                searchable    =>0,
                 group         =>'misc',
                 label         =>'Comments',
                 dataobjattr   =>'lnksoftwaresystem.comments'),
@@ -102,6 +104,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'softwarecistatus',
                 group         =>'link',
+                searchable    =>0,
                 readonly      =>1,
                 label         =>'Software CI-State',
                 vjointo       =>'base::cistatus',

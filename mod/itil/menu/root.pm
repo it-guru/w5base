@@ -194,6 +194,11 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itil.liccontract.sys",
+                      "itil::lnklicsystem",
+                      func=>'Main',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itil.swinstance",
                       "itil::swinstance",
                       defaultacl=>['valid_user']);

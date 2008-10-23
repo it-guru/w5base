@@ -36,6 +36,8 @@ BINDIR = ${exec_prefix}/sbin
 MANDIR = ${prefix}/man
 # Pathname of directory to install the CGI programs.
 WEBDIR = $(prefix)/www
+# W5Agent modules
+MODDIR = $(WEBDIR)/mod
 
 # CONFIGURE: The group that the web directory belongs to.  This is so that
 # the makeweb program can be installed set-group-id to that group, and make
@@ -63,7 +65,7 @@ INSTALL =	/usr/bin/install -c
 	@rm -f $@
 	$(CC) $(CFLAGS) -c $*.c
 
-SRC =		thttpd.c libhttpd.c fdwatch.c mmc.c timers.c match.c tdate_parse.c
+SRC =		thttpd.c libhttpd.c fdwatch.c mmc.c timers.c match.c tdate_parse.c w5bb.c getdate.c xmalloc.c gettime.c xalloc-die.c
 
 OBJ =		$(SRC:.c=.o) 
 
@@ -111,6 +113,7 @@ install:	installthis install-man installsubdirs
 
 installthis:
 	-mkdir -p $(DESTDIR)$(BINDIR)
+	-mkdir -p $(DESTDIR)$(MODDIR)
 	-cp thttpd w5agent
 	$(INSTALL) -m 555 -o bin -g bin w5agent $(DESTDIR)$(BINDIR)
 
