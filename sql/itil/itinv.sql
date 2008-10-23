@@ -696,3 +696,27 @@ create table lickey (
   UNIQUE KEY `srcsys` (srcsys,srcid)
 );
 alter table lnksoftwaresystem add key(liccontract);
+create table lnklicappl (
+  id           bigint(20) NOT NULL,
+  appl         bigint(20) NOT NULL,
+  liccontract  bigint(20),
+  comments     longtext    default NULL,
+  additional   longtext    default NULL,
+  quantity     double(8,2) NOT NULL default '1.00',
+  is_avforfuse bool        default '0',
+  createdate   datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate   datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser   bigint(20) default NULL,
+  modifyuser   bigint(20) default NULL,
+  editor       varchar(100) NOT NULL default '',
+  realeditor   varchar(100) NOT NULL default '',
+  srcsys       varchar(10) default 'w5base',
+  srcid        varchar(20) default NULL,
+  srcload      datetime    default NULL,
+  PRIMARY KEY  (id),
+  KEY liccontract (liccontract),key(is_avforfuse),
+  KEY appl (appl),
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+);
+alter table system add is_avforfuse bool default '0', add key(is_avforfuse);
+alter table asset  add is_avforfuse bool default '0', add key(is_avforfuse);

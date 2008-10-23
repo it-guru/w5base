@@ -199,6 +199,16 @@ sub Init
                       func=>'Main',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itil.liccontract.appl",
+                      "itil::lnklicappl",
+                      func=>'Main',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itil.liccontract.appl.new",
+                      "itil::lnklicappl",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itil.swinstance",
                       "itil::swinstance",
                       defaultacl=>['valid_user']);

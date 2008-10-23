@@ -35,6 +35,8 @@
 'itil.liccontract'=>{de=>'Lizenzvertrag',en=>'License Contract'},
 'itil.liccontract.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.liccontract.sys'=>{de=>'Systemzuordnung',en=>'System-Relation'},
+'itil.liccontract.appl'=>{de=>'Anwendungszuordnung',en=>'Application-Relation'},
+'itil.liccontract.appl.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.swinstance'=>{de=>'Software-Instanz',en=>'Software-Instance'},
 'itil.swinstance.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.swinstance.lnksystem'=>{de=>'Verkn. System',en=>'Link System'},

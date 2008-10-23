@@ -183,15 +183,23 @@ sub new
                 onRawValue    =>sub{
                            my $self=shift;
                            my $current=shift;
+                           my $n=0;
                            my $fo=$self->getParent->getField("licusesys"); 
                            my $d=$fo->RawValue($current);
                            if (ref($d) eq "ARRAY"){
-                              $d=$#{$d}+1;
+                              foreach my $r (@$d){
+                                 $n+=$r->{quantity};
+                              } 
                            }
-                           else{
-                              $d=0;
+                           my $fo=$self->getParent->getField("licuseappl"); 
+                           my $d=$fo->RawValue($current);
+                           if (ref($d) eq "ARRAY"){
+                              foreach my $r (@$d){
+                                 $n+=$r->{quantity};
+                              } 
                            }
-                           return($d);
+
+                           return($n);
                         },
                 depend        =>['licusesys']
                 ),
@@ -217,13 +225,25 @@ sub new
 
       new kernel::Field::SubList(
                 name          =>'licusesys',
-                label         =>'License use by',
+                label         =>'License use by (systems)',
                 group         =>'licuse',
                 htmldetail    =>0,
                 vjointo       =>'itil::lnksoftwaresystem',
                 vjoinon       =>['id'=>'liccontractid'],
                 vjoinbase     =>[{systemcistatusid=>"<=5"}],
-                vjoindisp     =>['system','systemcistatus','systemsystemid']),
+                vjoindisp     =>['system','systemcistatus','quantity'],
+                vjoininhash   =>['system','systemcistatus','quantity']),
+
+      new kernel::Field::SubList(
+                name          =>'licuseappl',
+                label         =>'License use by (application)',
+                group         =>'licuse',
+                htmldetail    =>0,
+                vjointo       =>'itil::lnklicappl',
+                vjoinon       =>['id'=>'liccontractid'],
+                vjoinbase     =>[{applcistatusid=>"<=5"}],
+                vjoindisp     =>['appl','applcistatus','quantity'],
+                vjoininhash   =>['appl','applcistatus','quantity']),
 
       new kernel::Field::FileList(
                 name          =>'attachments',
