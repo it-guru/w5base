@@ -179,9 +179,8 @@ sub recreateStats
    my $dstrangestamp=shift;
    my ($year,$mon,$day, $hour,$min,$sec) = Today_and_Now("GMT");
    my $currentmonth=sprintf("%04d%02d",$year,$mon);
-   my ($week,$year)=Week_of_Year($year,$mon,$day);
-   my $currentweek=sprintf("%04dKW%02d",$year,$week);
-   my ($year,$month)=$dstrangestamp=~m/^(\d{4})(\d{2})$/;
+   my ($week,$wyear)=Week_of_Year($year,$mon,$day);
+   my $currentweek=sprintf("%04dKW%02d",$wyear,$week);
 
 
    $self->{stats}={};
@@ -204,17 +203,34 @@ sub recreateStats
    msg(INFO,"===========================");
    msg(INFO,"current=$currentmonth,$currentweek");
    msg(INFO,"dsttirange=$dstrangestamp");
-   exit(1);
+   delete($self->{stats});
+   #return(1);
 
-   my $d1=new DateTime(year=>$year, month=>$month, day=>1,
-                       hour=>0, minute=>0, second=>0,
-                       time_zone=>'GMT');
-   my $dm=DateTime::Duration->new( months=>1);
-
-   my $d2=$d1+$dm;
    my $basespan;
-   eval('$basespan=DateTime::Span->from_datetimes(start=>$d1,end=>$d2);');
-   my $baseduration=CalcDateDuration($d1,$d2);
+   my $baseduration;
+   if (my ($year,$month)=$dstrangestamp=~m/^(\d{4})(\d{2})$/){
+      my $d1=new DateTime(year=>$year, month=>$month, day=>1,
+                          hour=>0, minute=>0, second=>0,
+                          time_zone=>'GMT');
+      my $dm=DateTime::Duration->new( months=>1);
+    
+      my $d2=$d1+$dm;
+      eval('$basespan=DateTime::Span->from_datetimes(start=>$d1,end=>$d2);');
+      $baseduration=CalcDateDuration($d1,$d2);
+   }
+   else{
+      my ($syear,$smon,$sday)=Monday_of_Week($week,$wyear);
+      my $d1=new DateTime(year=>$syear, month=>$smon, day=>$sday,
+                          hour=>0, minute=>0, second=>0,
+                          time_zone=>'GMT');
+      my $dm=DateTime::Duration->new( days=>7);
+    
+      my $d2=$d1+$dm;
+      eval('$basespan=DateTime::Span->from_datetimes(start=>$d1,end=>$d2);');
+      $baseduration=CalcDateDuration($d1,$d2);
+   }
+
+
 
    foreach my $obj (values(%{$self->{$mode}})){
       if ($obj->can("processData")){
@@ -266,6 +282,7 @@ sub recreateStats
       }
    }
    delete($self->{stats});
+   return(1);
 }
 
 sub processRecord
@@ -639,14 +656,14 @@ sub Presenter
 
 
    print("<tr height=1%><td>");
-   print("<table width=100%><tr>\n");
+   print("<table width=100% border=0><tr>\n");
    if ($self->IsMemberOf("admin")){
-      print("<td width=300>");
-      print("<table width=100% border=0 cellspacing=0 cellpadding=0><tr><td>");
+      print("<td width=250>");
+      print("<table width=250 border=0 cellspacing=0 cellpadding=0><tr><td>");
       my $oldval=Query->Param("search_name"); 
-      print("<input type=text name=search_name value=\"$oldval\" ".
+      print("<input type=text size=30 name=search_name value=\"$oldval\" ".
             "style=\"width:100%\">");
-      print("</td><td><input type=submit value=\"find\" ".
+      print("</td><td width=1%><input type=submit value=\"find\" ".
             "onclick=\"refreshTag('');\"></td></tr>");
       print("</table>");
    }

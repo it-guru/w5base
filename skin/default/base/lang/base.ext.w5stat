@@ -1,6 +1,6 @@
 'base::ext::w5stat::w5basestat'=>{de=>'W5Base Kernsystem',en=>'W5Base Kernel'},
 'base::ext::w5stat::overview'=>{de=>'Übersicht',en=>'Overview'},
-'base::ext::w5stat::dataissue'=>{de=>'Datenqualität',en=>'Datquality'},
+'base::ext::w5stat::dataissue'=>{de=>'Datenqualität',en=>'Dataquality'},
 'base::ext::w5stat::org'=>{de=>'Organisation',en=>'Organisational'},
 'unprocessed DataIssue Workflows'=>{de=>'unbearbeitete DataIssue Workflows'},
 'Subunit'=>{de=>'Unterbereich'},

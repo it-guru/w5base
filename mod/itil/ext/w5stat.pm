@@ -303,10 +303,10 @@ sub displaySWInstance
 sub processData
 {
    my $self=shift;
-   my $monthstamp=shift;
+   my $dstrange=shift;
    my $currentmonth=shift;
    my $currentweek=shift;
-   my ($year,$month)=$monthstamp=~m/^(\d{4})(\d{2})$/;
+   my ($year,$month)=$dstrange=~m/^(\d{4})(\d{2})$/;
    my $count;
 
 
@@ -318,7 +318,7 @@ sub processData
    my ($rec,$msg)=$appl->getFirst();
    if (defined($rec)){
       do{
-         $self->getParent->processRecord('itil::appl',$monthstamp,$rec);
+         $self->getParent->processRecord('itil::appl',$dstrange,$rec);
          ($rec,$msg)=$appl->getNext();
          $count++;
       } until(!defined($rec));
@@ -333,7 +333,7 @@ sub processData
    my ($rec,$msg)=$swinstance->getFirst();
    if (defined($rec)){
       do{
-         $self->getParent->processRecord('itil::swinstance',$monthstamp,$rec);
+         $self->getParent->processRecord('itil::swinstance',$dstrange,$rec);
          ($rec,$msg)=$swinstance->getNext();
          $count++;
       } until(!defined($rec));
@@ -350,7 +350,7 @@ sub processData
    my ($rec,$msg)=$system->getFirst();
    if (defined($rec)){
       do{
-         $self->getParent->processRecord('itil::system',$monthstamp,$rec);
+         $self->getParent->processRecord('itil::system',$dstrange,$rec);
          $count++;
          ($rec,$msg)=$system->getNext();
       } until(!defined($rec));
@@ -365,7 +365,7 @@ sub processData
    my ($rec,$msg)=$asset->getFirst();
    if (defined($rec)){
       do{
-         $self->getParent->processRecord('itil::asset',$monthstamp,$rec);
+         $self->getParent->processRecord('itil::asset',$dstrange,$rec);
          $count++;
          ($rec,$msg)=$asset->getNext();
       } until(!defined($rec));

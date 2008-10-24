@@ -374,10 +374,9 @@ sub displayOrg
 sub processData
 {
    my $self=shift;
-   my $monthstamp=shift;
+   my $dstrange=shift;
    my $currentmonth=shift;
    my $currentweek=shift;
-   my ($year,$month)=$monthstamp=~m/^(\d{4})(\d{2})$/;
    my $count;
 
 
@@ -389,7 +388,7 @@ sub processData
    my ($rec,$msg)=$grp->getFirst();
    if (defined($rec)){
       do{
-         $self->getParent->processRecord('base::grp',$monthstamp,$rec);
+         $self->getParent->processRecord('base::grp',$dstrange,$rec);
          $count++;
          ($rec,$msg)=$grp->getNext();
       } until(!defined($rec));
@@ -404,7 +403,7 @@ sub processData
    my ($rec,$msg)=$user->getFirst();
    if (defined($rec)){
       do{
-         $self->getParent->processRecord('base::user',$monthstamp,$rec);
+         $self->getParent->processRecord('base::user',$dstrange,$rec);
          $count++;
          ($rec,$msg)=$user->getNext();
       } until(!defined($rec));
@@ -412,74 +411,74 @@ sub processData
    msg(INFO,"FINE of base::user $count records");
 
 
-   my @wfstat=qw(id eventstart class step eventend stateid
-                          fwdtarget fwdtargetid responsiblegrp);
-
-
-   my $wf=getModuleObject($self->getParent->Config,"base::workflow");
-
-   msg(INFO,"starting collect of base::workflow set1.1");
-   $wf->SetFilter({eventend=>">=$month/$year AND <$month/$year+1M"});
-   # not posible because sequential search
-   #               {eventstart=>">=$month/$year AND <$month/$year+1M"}]);
-   #               {eventstart=>"<$month/$year",eventend=>">$month/$year+1M"}]);
-   $wf->SetCurrentView(@wfstat);
-   $wf->SetCurrentOrder("NONE");
-   my $c=0;
-
-   msg(INFO,"getFirst of base::workflow set1.1");$count=0;
-   my ($rec,$msg)=$wf->getFirst();
-   if (defined($rec)){
-      do{
-         $self->getParent->processRecord('base::workflow::active',
-                                         $monthstamp,$rec);
-         $count++;
-         $c++;
-         ($rec,$msg)=$wf->getNext();
-      } until(!defined($rec));
+   if (my ($year,$month)=$dstrange=~m/^(\d{4})(\d{2})$/){
+      my @wfstat=qw(id eventstart class step eventend stateid
+                             fwdtarget fwdtargetid responsiblegrp);
+     
+     
+      my $wf=getModuleObject($self->getParent->Config,"base::workflow");
+     
+      msg(INFO,"starting collect of base::workflow set1.1");
+      $wf->SetFilter({eventend=>">=$month/$year AND <$month/$year+1M"});
+      # not posible because sequential search
+      #            {eventstart=>">=$month/$year AND <$month/$year+1M"}]);
+      #            {eventstart=>"<$month/$year",eventend=>">$month/$year+1M"}]);
+      $wf->SetCurrentView(@wfstat);
+      $wf->SetCurrentOrder("NONE");
+      my $c=0;
+     
+      msg(INFO,"getFirst of base::workflow set1.1");$count=0;
+      my ($rec,$msg)=$wf->getFirst();
+      if (defined($rec)){
+         do{
+            $self->getParent->processRecord('base::workflow::active',
+                                            $dstrange,$rec);
+            $count++;
+            $c++;
+            ($rec,$msg)=$wf->getNext();
+         } until(!defined($rec));
+      }
+      msg(INFO,"FINE of base::workflow set1.1 $count records");
+     
+      msg(INFO,"starting collect of base::workflow set1.2");
+      $wf->SetFilter({eventend=>"[EMPTY]"});
+      $wf->SetCurrentView(@wfstat);
+      $wf->SetCurrentOrder("NONE");
+      my $c=0;
+     
+      msg(INFO,"getFirst of base::workflow set1.2");$count=0;
+      my ($rec,$msg)=$wf->getFirst();
+      if (defined($rec)){
+         do{
+            $self->getParent->processRecord('base::workflow::active',
+                                            $dstrange,$rec);
+            $count++;
+            $c++;
+            ($rec,$msg)=$wf->getNext();
+         } until(!defined($rec));
+      }
+      msg(INFO,"FINE of base::workflow set1.2 $count records");
+     
+      msg(INFO,"starting collect of base::workflow set2");
+      $wf->ResetFilter();
+      $wf->SetFilter([{stateid=>"<20",fwdtarget=>'![EMPTY]'}]);
+      $wf->SetCurrentView(@wfstat);
+      $wf->SetCurrentOrder("NONE");
+      my $c=0;
+     
+      msg(INFO,"getFirst of base::workflow set2");$count=0;
+      my ($rec,$msg)=$wf->getFirst();
+      if (defined($rec)){
+         do{
+            $self->getParent->processRecord('base::workflow::notfinished',
+                                            $dstrange,$rec);
+            $c++;
+            $count++;
+            ($rec,$msg)=$wf->getNext();
+         } until(!defined($rec));
+      }
+      msg(INFO,"FINE of base::workflow set2 $count records");
    }
-   msg(INFO,"FINE of base::workflow set1.1 $count records");
-
-   msg(INFO,"starting collect of base::workflow set1.2");
-   $wf->SetFilter({eventend=>"[EMPTY]"});
-   $wf->SetCurrentView(@wfstat);
-   $wf->SetCurrentOrder("NONE");
-   my $c=0;
-
-   msg(INFO,"getFirst of base::workflow set1.2");$count=0;
-   my ($rec,$msg)=$wf->getFirst();
-   if (defined($rec)){
-      do{
-         $self->getParent->processRecord('base::workflow::active',
-                                         $monthstamp,$rec);
-         $count++;
-         $c++;
-         ($rec,$msg)=$wf->getNext();
-      } until(!defined($rec));
-   }
-   msg(INFO,"FINE of base::workflow set1.2 $count records");
-
-   msg(INFO,"starting collect of base::workflow set2");
-   $wf->ResetFilter();
-   $wf->SetFilter([{stateid=>"<20",fwdtarget=>'![EMPTY]'}]);
-   $wf->SetCurrentView(@wfstat);
-   $wf->SetCurrentOrder("NONE");
-   my $c=0;
-
-   msg(INFO,"getFirst of base::workflow set2");$count=0;
-   my ($rec,$msg)=$wf->getFirst();
-   if (defined($rec)){
-      do{
-         $self->getParent->processRecord('base::workflow::notfinished',
-                                         $monthstamp,$rec);
-         $c++;
-         $count++;
-         ($rec,$msg)=$wf->getNext();
-      } until(!defined($rec));
-   }
-   msg(INFO,"FINE of base::workflow set2 $count records");
-
-
 }
 
 sub processRecord
