@@ -93,6 +93,7 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'parent',
+                AllowEmpty    =>1,
                 label         =>'Parentgroup',
                 vjointo       =>'base::grp',
                 vjoinon       =>['parentid'=>'grpid'],

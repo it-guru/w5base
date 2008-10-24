@@ -176,7 +176,7 @@ sub new
                 group         =>'licenses',
                 allowcleanup  =>1,
                 vjointo       =>'itil::lnklicappl',
-                vjoinbase     =>[{licensecistatusid=>"<=4"}],
+                vjoinbase     =>[{liccontractcistatusid=>"<=4"}],
                 vjoinon       =>['id'=>'applid'],
                 vjoindisp     =>['liccontract','quantity','comments']),
 

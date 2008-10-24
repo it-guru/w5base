@@ -180,6 +180,7 @@ sub recreateStats
    my ($year,$mon,$day, $hour,$min,$sec) = Today_and_Now("GMT");
    my $currentmonth=sprintf("%04d%02d",$year,$mon);
    my ($year,$month)=$monthstamp=~m/^(\d{4})(\d{2})$/;
+   system("ps -xo pid,vsz,ppid,command>/tmp/recreateStats.start");
 
 
    $self->{stats}={};
@@ -252,6 +253,9 @@ sub recreateStats
                                              fullname=>\$statrec->{fullname}});
       }
    }
+   system("ps -xo pid,vsz,ppid,command>/tmp/recreateStats.end0");
+   delete($self->{stats});
+   system("ps -xo pid,vsz,ppid,command>/tmp/recreateStats.end1");
 }
 
 sub processRecord
@@ -386,7 +390,8 @@ sub ShowEntry
    my ($primrec,$hist)=$self->LoadStatSet(id=>$requestid);
 
    if (defined($primrec)){
-      my $load=$self->findtemplvar({current=>$primrec,mode=>"HtmlV01"},"mdate","formated");
+      my $load=$self->findtemplvar({current=>$primrec,
+                                    mode=>"HtmlV01"},"mdate","formated");
       my $month=$primrec->{month};
       my $condition=$self->T("condition");
       my ($Y,$M)=$month=~m/^(\d{4})(\d{2})$/;
