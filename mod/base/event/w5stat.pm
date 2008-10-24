@@ -138,10 +138,10 @@ sub w5statsend
             msg(INFO,"process group $rec->{fullname}($rec->{grpid})");
             
             $w5stat->ResetFilter();
-            $w5stat->SetFilter([{month=>\$month,
+            $w5stat->SetFilter([{dstrange=>\$month,
                                  nameid=>\$rec->{grpid},
                                  sgroup=>\'Group'},
-                                {month=>\$month,
+                                {dstrange=>\$month,
                                  fullname=>\$rec->{fullname},
                                  sgroup=>\'Group'}]);
             my ($chkrec,$msg)=$w5stat->getOnlyFirst(qw(id));
@@ -222,7 +222,7 @@ sub sendOverviewData
          push(@emailtext,$ovrec->[0].": ".$ovrec->[1]);
       }
    }
-   my $month=$primrec->{month};
+   my $month=$primrec->{dstrange};
    my ($Y,$M)=$month=~m/^(\d{4})(\d{2})$/;
    my $month=sprintf("%02d/%04d",$M,$Y);
  
