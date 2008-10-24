@@ -101,6 +101,7 @@ sub new
 
       new kernel::Field::Textarea(
                 name          =>'comments',
+                group         =>'misc',
                 label         =>'Comments',
                 dataobjattr   =>'grp.comments'),
 
@@ -112,6 +113,12 @@ sub new
                 vjoinon       =>['grpid'=>'refid'],
                 vjoinbase     =>[{'parentobj'=>\'base::grp'}],
                 subeditmsk    =>'subedit'),
+
+      new kernel::Field::FileList(
+                name          =>'attachments',
+                parentobj     =>'base::grp',
+                label         =>'Attachments',
+                group         =>'attachments'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
@@ -329,11 +336,11 @@ sub isWriteValid
 
    return(qw(default)) if (!defined($rec) && $self->IsMemberOf("admin"));
    return(undef) if ($rec->{grpid}<=0);
-   return(qw(default users phonenumbers)) if ($self->IsMemberOf("admin"));
+   return(qw(default users phonenumbers misc attachments)) if ($self->IsMemberOf("admin"));
    if (defined($rec)){
       my $grpid=$rec->{grpid};
       if ($self->IsMemberOf([$grpid],"RAdmin","down")){
-         return(qw(users phonenumbers));
+         return(qw(users phonenumbers misc attachments));
       }
    }
    return(undef);
@@ -399,7 +406,7 @@ sub ValidateDelete
 sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
-   return(qw(header default users phonenumbers subunits));
+   return(qw(header default users subunits phonenumbers misc attachments));
 }
 
 
