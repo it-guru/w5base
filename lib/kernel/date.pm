@@ -212,6 +212,11 @@ sub Day_of_Week_to_Text
    return(Date::Calc::Day_of_Week_to_Text(@_));
 }
 
+sub Day_of_Week
+{
+   return(Date::Calc::Day_of_Week(@_));
+}
+
 sub Month_to_Text
 {
    return(Date::Calc::Month_to_Text(@_));
