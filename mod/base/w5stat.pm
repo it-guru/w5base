@@ -550,7 +550,8 @@ sub Presenter
       $statname=~s/[\*\?]//g;
       $statgrp=~s/[\*\?]//g;
       $self->ResetFilter();
-      $self->SetFilter({fullname=>$statname,sgroup=>$statgrp});
+      $self->SetFilter({fullname=>$statname,sgroup=>$statgrp,
+                        dstrange=>"!*KW*"});
       my ($srec,$msg)=$self->getOnlyFirst(qw(descmonth sgroup id));
       if (defined($srec)){
          $requestid=$srec->{id};
