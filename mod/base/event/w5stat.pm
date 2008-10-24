@@ -37,7 +37,7 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("w5stat","w5stat",timeout=>21600);
+   $self->RegisterEvent("w5stat","w5stat",timeout=>3600);
    $self->RegisterEvent("w5statsend","w5statsend");
    return(1);
 }
@@ -45,16 +45,26 @@ sub Init
 sub w5stat
 {
    my $self=shift;
-   my $month=shift;
+   my $dstrange=shift;
+   my @dstrange;
 
-   if (!defined($month)){
+   if (!defined($dstrange)){
       my ($year,$mon,$day, $hour,$min,$sec) = Today_and_Now("GMT");
-      $month=sprintf("%04d%02d",$year,$mon);
+      $dstrange=sprintf("%04d%02d",$year,$mon);
+      push(@dstrange,$dstrange);
+      my ($week,$year)=Week_of_Year($year,$mon,$day);
+      my $dstrange=sprintf("%04dKW%02d",$year,$week);
+      push(@dstrange,$dstrange);
+   }
+   else{
+      push(@dstrange,$dstrange);
    }
 
    my $stat=getModuleObject($self->Config,"base::w5stat");
 
-   $stat->recreateStats("w5stat",$month);
+   foreach my $dstrange (@dstrange){
+      $stat->recreateStats("w5stat",$dstrange);
+   }
 
    return({exitcode=>0});
 }

@@ -65,12 +65,12 @@ sub new
                 dataobjattr   =>'w5stat.nameid'),
 
       new kernel::Field::Text(
-                name          =>'month',
+                name          =>'dstrange',
                 label         =>'Month',
                 dataobjattr   =>'w5stat.monthkwday'),
 
       new kernel::Field::Link(
-                name          =>'descmonth',
+                name          =>'descdstrange',
                 sqlorder      =>'desc',
                 label         =>'Month',
                 dataobjattr   =>'w5stat.monthkwday'),
@@ -132,7 +132,7 @@ sub new
    );
    $self->LoadSubObjs("ext/w5stat","w5stat");
    $self->LoadSubObjs("ext/w5workflowstat","w5workflowstat");
-   $self->setDefaultView(qw(linenumber month sgroup fullname mdate));
+   $self->setDefaultView(qw(linenumber dstrange sgroup fullname mdate));
    $self->setWorktable("w5stat");
    return($self);
 }
@@ -176,11 +176,12 @@ sub recreateStats
 {
    my $self=shift;
    my $mode=shift;
-   my $monthstamp=shift;
+   my $dstrangestamp=shift;
    my ($year,$mon,$day, $hour,$min,$sec) = Today_and_Now("GMT");
    my $currentmonth=sprintf("%04d%02d",$year,$mon);
-   my ($year,$month)=$monthstamp=~m/^(\d{4})(\d{2})$/;
-   system("ps -xo pid,vsz,ppid,command>/tmp/recreateStats.start");
+   my ($week,$year)=Week_of_Year($year,$mon,$day);
+   my $currentweek=sprintf("%04dKW%02d",$year,$week);
+   my ($year,$month)=$dstrangestamp=~m/^(\d{4})(\d{2})$/;
 
 
    $self->{stats}={};
@@ -198,19 +199,30 @@ sub recreateStats
          msg(INFO,"found processRecord handler in %s",$obj->Self);
       }
    }
-   foreach my $obj (values(%{$self->{$mode}})){
-      if ($obj->can("processData")){
-         $obj->processData($monthstamp,$currentmonth);
-      }
-   }
+
+   msg(INFO,"starting recreateStats for:");
+   msg(INFO,"===========================");
+   msg(INFO,"current=$currentmonth,$currentweek");
+   msg(INFO,"dsttirange=$dstrangestamp");
+   exit(1);
 
    my $d1=new DateTime(year=>$year, month=>$month, day=>1,
-                       hour=>0, minute=>0, second=>0);
+                       hour=>0, minute=>0, second=>0,
+                       time_zone=>'GMT');
    my $dm=DateTime::Duration->new( months=>1);
+
    my $d2=$d1+$dm;
    my $basespan;
    eval('$basespan=DateTime::Span->from_datetimes(start=>$d1,end=>$d2);');
    my $baseduration=CalcDateDuration($d1,$d2);
+
+   foreach my $obj (values(%{$self->{$mode}})){
+      if ($obj->can("processData")){
+         $obj->processData($dstrangestamp,$currentmonth);
+      }
+   }
+
+
    foreach my $group (keys(%{$self->{stats}})){
       foreach my $name (keys(%{$self->{stats}->{$group}})){
          foreach my $v (keys(%{$self->{stats}->{$group}->{$name}})){
@@ -244,18 +256,16 @@ sub recreateStats
          }
          my $statrec={stats=>$self->{stats}->{$group}->{$name},
                       sgroup=>$group,
-                      month=>$monthstamp,
+                      dstrange=>$dstrangestamp,
                       nameid=>$nameid,
                       fullname=>$name};
          $self->ValidatedInsertOrUpdateRecord($statrec,
                                             {sgroup=>\$statrec->{sgroup},
-                                             month=>\$monthstamp,
+                                             dstrange=>\$dstrangestamp,
                                              fullname=>\$statrec->{fullname}});
       }
    }
-   system("ps -xo pid,vsz,ppid,command>/tmp/recreateStats.end0");
    delete($self->{stats});
-   system("ps -xo pid,vsz,ppid,command>/tmp/recreateStats.end1");
 }
 
 sub processRecord
@@ -392,7 +402,7 @@ sub ShowEntry
    if (defined($primrec)){
       my $load=$self->findtemplvar({current=>$primrec,
                                     mode=>"HtmlV01"},"mdate","formated");
-      my $month=$primrec->{month};
+      my $month=$primrec->{dstrange};
       my $condition=$self->T("condition");
       my ($Y,$M)=$month=~m/^(\d{4})(\d{2})$/;
       print(<<EOF);
@@ -455,7 +465,7 @@ sub LoadStatSet
       $self->SecureSetFilter({id=>\$id});
    }
    if ($type eq "grpid"){
-      $self->SecureSetFilter({sgroup=>\'Group',nameid=>\$id,month=>\$month});
+      $self->SecureSetFilter({sgroup=>\'Group',nameid=>\$id,dstrange=>\$month});
    }
    my ($primrec,$msg)=$self->getOnlyFirst(qw(ALL));
    if (defined($primrec)){
@@ -465,7 +475,7 @@ sub LoadStatSet
       $self->ResetFilter();
       $self->SecureSetFilter({fullname=>\$primrec->{fullname},
                               sgroup=>\$primrec->{sgroup}});
-      my $month=$primrec->{month};
+      my $month=$primrec->{dstrange};
       my ($Y,$M)=$month=~m/^(\d{4})(\d{2})$/;
       $M--;
       if ($M<=0){
@@ -479,7 +489,7 @@ sub LoadStatSet
             $srec->{stats}={Datafield2Hash($srec->{stats})};
          }
          push(@{$hist->{area}},$srec);
-         if ($lastmonth eq $srec->{month}){
+         if ($lastmonth eq $srec->{dstrange}){
             $hist->{lastmonth}=$srec;
          }
       }
@@ -569,7 +579,7 @@ sub Presenter
    my ($Y,$M,$month);
    if (defined($primrec)){
       push(@ol,$primrec->{id},$primrec->{fullname});
-      $month=$primrec->{month};
+      $month=$primrec->{dstrange};
       ($Y,$M)=$month=~m/^(\d{4})(\d{2})$/;
    }
    else{
@@ -611,9 +621,9 @@ sub Presenter
 
    $self->ResetFilter();
    $self->SecureSetFilter([
-                           {month=>\$month,sgroup=>\'Group',
+                           {dstrange=>\$month,sgroup=>\'Group',
                             fullname=>\@grpnames},
-                           {month=>\$month,sgroup=>\'Group',
+                           {dstrange=>\$month,sgroup=>\'Group',
                             nameid=>\@grpids},
                           ]);
 
@@ -685,7 +695,7 @@ sub Presenter
    }
    if (defined($primrec)){
       foreach my $h (@{$hist->{area}}){
-         $histid{$h->{month}}=$h->{id};
+         $histid{$h->{dstrange}}=$h->{id};
       }
    }
    for(my $c=0;$c<=4;$c++){
@@ -814,12 +824,12 @@ sub extractYear
    my $name=shift;
    my %param=@_;
 
-   my ($Y,$M)=$primrec->{month}=~m/^(\d{4})(\d{2})$/;
+   my ($Y,$M)=$primrec->{dstrange}=~m/^(\d{4})(\d{2})$/;
 
    my %p;
    foreach my $hrec (@{$hist->{area}}){
-      if ($hrec->{month}=~m/^$Y/){
-         $p{$hrec->{month}}=$hrec;
+      if ($hrec->{dstrange}=~m/^$Y/){
+         $p{$hrec->{dstrange}}=$hrec;
       }
    }
    my @d;

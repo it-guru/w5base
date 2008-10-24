@@ -103,7 +103,7 @@ sub displayOverview
    $self->processOverviewRecords(\@ovdata,$P,$primrec,$hist);
    if (defined($primrec->{nameid}) && $primrec->{nameid} ne "" 
        && $primrec->{sgroup} eq "Group"){
-      my $month=$primrec->{month};
+      my $month=$primrec->{dstrange};
       my $grp=getModuleObject($app->Config,"base::grp");
       $grp->SetFilter({parentid=>\$primrec->{nameid}});
       my @l=$grp->getHashList(qw(fullname grpid));
@@ -376,6 +376,7 @@ sub processData
    my $self=shift;
    my $monthstamp=shift;
    my $currentmonth=shift;
+   my $currentweek=shift;
    my ($year,$month)=$monthstamp=~m/^(\d{4})(\d{2})$/;
    my $count;
 

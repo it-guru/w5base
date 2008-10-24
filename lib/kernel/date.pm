@@ -26,7 +26,7 @@ use DateTime::SpanSet;
 use POSIX;
 use Exporter;
 @ISA = qw(Exporter);
-@EXPORT = qw(&Today_and_Now &Mktime &Localtime &Date_to_Time &Date_to_String &Time_to_Date &Delta_DHMS &Add_Delta_YM &Add_Delta_YMD &Add_Delta_YMDHMS &Days_in_Month &Day_of_Week &Day_of_Week_to_Text &Month_to_Text &Decode_Language &Language);
+@EXPORT = qw(&Today_and_Now &Mktime &Localtime &Date_to_Time &Date_to_String &Time_to_Date &Delta_DHMS &Add_Delta_YM &Add_Delta_YMD &Add_Delta_YMDHMS &Days_in_Month &Day_of_Week &Week_of_Year &Day_of_Week_to_Text &Month_to_Text &Decode_Language &Language);
 
 
 sub BEGIN
@@ -197,9 +197,9 @@ sub Days_in_Month
    return(Date::Calc::Days_in_Month(@_));
 }
 
-sub Day_of_Week
+sub Week_of_Year
 {
-   return(Date::Calc::Day_of_Week(@_));
+   return(Date::Calc::Week_of_Year(@_));
 }
 
 sub Day_of_Week_to_Text

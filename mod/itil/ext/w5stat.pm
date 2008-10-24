@@ -305,6 +305,7 @@ sub processData
    my $self=shift;
    my $monthstamp=shift;
    my $currentmonth=shift;
+   my $currentweek=shift;
    my ($year,$month)=$monthstamp=~m/^(\d{4})(\d{2})$/;
    my $count;
 

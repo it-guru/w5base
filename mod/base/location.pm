@@ -394,6 +394,9 @@ sub Normalize
    if ($rec->{location}=~m/^berlin$/i){
       $rec->{location}="Berlin";
    }
+   if ($rec->{address1}=~m/Detmolder.*380$/ && $rec->{location} eq "Bielefeld"){
+      $rec->{label}="T-Systems SCZ Mitte";
+   }
    if ($rec->{address1}=~m/Gutenberg.*$/ && $rec->{location} eq "Bamberg"){
       $rec->{label}="T-Systems SCZ S\xFCd";
    }

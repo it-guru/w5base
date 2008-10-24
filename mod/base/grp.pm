@@ -44,6 +44,7 @@ sub new
                 name          =>'grpid',
                 label         =>'W5BaseID',
                 size          =>'10',
+                group         =>'source',
                 dataobjattr   =>'grp.grpid'),
                                   
       new kernel::Field::Text(
