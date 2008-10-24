@@ -207,7 +207,7 @@ sub new
                          uniquesize=>255};
 
    $self->setWorktable("grp");
-   $self->setDefaultView(qw(fullname grpid editor comments));
+   $self->setDefaultView(qw(fullname cistatus editor description grpid));
    $self->{locktables}="grp write,user write,lnkgrpuser write,wfhead write, ".
                        "wfkey write, wfaction write";
    return($self);
