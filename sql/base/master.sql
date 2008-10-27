@@ -162,3 +162,21 @@ alter table location add response2 bigint(20) default NULL;
 alter table mailsignatur add fromaddress varchar(128) default NULL;
 alter table userbookmark add comments blob;
 alter table w5stat change month monthkwday varchar(8) not NULL;
+create table w5statmaster (
+  id         bigint(20)   NOT NULL,
+  statgroup  varchar(40)  NOT NULL,
+  name       varchar(128) NOT NULL,
+  monthkwday char(8)      NOT NULL,
+  statval    text,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifyuser bigint(20) NOT NULL default '0',
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) NOT NULL default '0',
+  srcsys     varchar(10) default 'w5base', 
+  srcid      varchar(20) default NULL,
+  srcload    datetime    default NULL,
+  PRIMARY KEY  (id),UNIQUE KEY `srcsys` (srcsys,srcid),key srcload(srcload),
+  UNIQUE userid(monthkwday,name,statgroup),key name (statgroup,name)
+);

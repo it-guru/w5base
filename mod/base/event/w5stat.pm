@@ -39,8 +39,26 @@ sub Init
 
    $self->RegisterEvent("w5stat","w5stat",timeout=>3600);
    $self->RegisterEvent("w5statsend","w5statsend");
+   $self->RegisterEvent("w5statmix","w5statmix");
    return(1);
 }
+
+sub w5statmix
+{
+   my $self=shift;
+   my $s=getModuleObject($self->Config,"base::w5stat");
+   my $m=getModuleObject($self->Config,"base::w5statmaster");
+
+   $m->SetFilter({mdate=>">now-48h"});
+   $m->SetCurrentView(qw(ALL));
+
+
+
+
+
+   return({exitcode=>0});
+}
+
 
 sub w5stat
 {

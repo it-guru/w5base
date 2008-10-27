@@ -47,6 +47,8 @@
 'Tools.filebrowser'=>{de=>'WebFS',en=>'WebFS'},
 'Tools.reflexion'=>{de=>'Reflexion',en=>'Reflexion'},
 'Tools.reflexion.w5stat'=>{de=>'Statistiken',en=>'Statistics'},
+'Tools.reflexion.w5stat.master'=>{de=>'Master',en=>'Master'},
+'Tools.reflexion.w5stat.master.new'=>{de=>'Neueingabe',en=>'New'},
 'Tools.reflexion.fields'=>{de=>'Feldliste',en=>'Fields'},
 'Tools.reflexion.translation'=>{de=>'Translation Tabelle',en=>'Translation table'},
 'Tools.translation'=>{de=>'Übersetzung',en=>'Translation'},

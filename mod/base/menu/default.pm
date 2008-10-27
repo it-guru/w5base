@@ -273,6 +273,15 @@ sub Init
                       "base::w5stat",
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("Tools.reflexion.w5stat.master",
+                      "base::w5statmaster",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("Tools.reflexion.w5stat.master.new",
+                      "base::w5statmaster",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("Tools.reflexion.fields",
                       "base::reflexion_fields",
                       defaultacl=>['admin']);
