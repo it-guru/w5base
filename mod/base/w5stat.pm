@@ -130,8 +130,7 @@ sub new
 
 
    );
-   $self->LoadSubObjs("ext/w5stat","w5stat");
-   $self->LoadSubObjs("ext/w5workflowstat","w5workflowstat");
+   $self->LoadSubObjs("w5stat/","w5stat");
    $self->setDefaultView(qw(linenumber dstrange sgroup fullname mdate));
    $self->setWorktable("w5stat");
    return($self);
@@ -292,8 +291,7 @@ sub processRecord
    my $month=shift;
    my $rec=shift;
 
-   foreach my $obj (values(%{$self->{w5stat}}),
-                    values(%{$self->{w5workflowstat}})){
+   foreach my $obj (values(%{$self->{w5stat}})){
       if ($obj->can("processRecord")){
          $obj->processRecord($module,$month,$rec,$self->{stats}); 
       }
@@ -761,7 +759,7 @@ sub Presenter
             push(@Presenter,%P);
          }
       }
-      $oldtag="base::ext::w5stat::overview" if ($oldtag eq "");
+      $oldtag="base::w5stat::base::overview" if ($oldtag eq "");
       my %P=@Presenter;
       print("<ul>");
       foreach my $p (sort({$P{$a}->{prio} <=> $P{$b}->{prio}} keys(%P))){

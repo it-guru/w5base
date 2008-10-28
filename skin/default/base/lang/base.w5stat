@@ -5,6 +5,6 @@
 'fieldgroup.stats'=>{de=>'Statistik Daten',en=>'Statistic Data'},
 'Month'=>{de=>'Monat/KW/Tag',en=>'Month/CW/Day'},
 'averange'=>{de=>'Bereichs Mittelwert'},
-'complete list'=>{de=>'vollständige Liste'},
+'complete list'=>{de=>'vollständiger Report'},
 'more'=>{de=>'weitere'},
 'click to see full list'=>{de=>'klicken Sie hier, um die vollständige Liste zu erhalten'},
