@@ -1,4 +1,4 @@
-package itil::ext::w5stat;
+package itil::w5stat::base;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
