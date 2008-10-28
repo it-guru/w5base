@@ -37,6 +37,7 @@ sub BuildHtmlTree
    # tree->{label}        = dargestellter text
    # tree->{tree}         = array pointer auf untermenu
 
+   $control{rootpath}="../"          if (!defined($control{rootpath}));
    $control{rootimg}="miniglobe.gif" if (!defined($control{rootimg}));
    my $d="<div>";
    $d.=_ProcessTreeLayer(\%control,[$#{$control{tree}}+1],$control{tree});
@@ -91,7 +92,9 @@ sub _TreeLine
       my $hrefclass;
       $hrefclass="class=$control->{hrefclass}" if (defined($control->{hrefclass}));
       $d.=$ment->{labelprefix}  if (defined($ment->{labelprefix}));
-      $d.="<a $hrefclass href=\"$href\" title=\"$desc\">" if (defined($href));
+      my $usehref="href=\"$href\"";
+      $usehref="href=$href" if ($href=~m/^javascript:/i);
+      $d.="<a $hrefclass $usehref title=\"$desc\">" if (defined($href));
       $d.=$text  if (defined($text));
       $d.="</a>" if (defined($href));
       $d.="</td></tr></table>";

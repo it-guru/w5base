@@ -27,6 +27,7 @@ use kernel::FlashChart;
 use DateTime;
 use DateTime::Span;
 use DateTime::SpanSet;
+use kernel::MenuTree;
 use POSIX qw(floor);
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::FlashChart);
 
@@ -130,7 +131,7 @@ sub new
 
 
    );
-   $self->LoadSubObjs("w5stat/","w5stat");
+   $self->LoadSubObjs("w5stat","w5stat");
    $self->setDefaultView(qw(linenumber dstrange sgroup fullname mdate));
    $self->setWorktable("w5stat");
    return($self);
@@ -521,7 +522,7 @@ sub Presenter
    my ($func,$p)=$self->extractFunctionPath();
    my $rootpath=Query->Param("RootPath");
    print $self->HttpHeader("text/html");
-   print $self->HtmlHeader(style=>['default.css'],
+   print $self->HtmlHeader(style=>['default.css','menu.css'],
                            js=>['toolbox.js','subModal.js'],
                            body=>1,form=>1,action=>'../ShowEntry',
                            prefix=>$rootpath,
@@ -660,6 +661,9 @@ sub Presenter
       print("<td width=250>");
       print("<table width=250 border=0 cellspacing=0 cellpadding=0><tr><td>");
       my $oldval=Query->Param("search_name"); 
+      if ($oldval eq ""){
+         $oldval=$primrec->{fullname};
+      }
       print("<input type=text size=30 name=search_name value=\"$oldval\" ".
             "style=\"width:100%\">");
       print("</td><td width=1%><input type=submit value=\"find\" ".
@@ -759,32 +763,92 @@ sub Presenter
             push(@Presenter,%P);
          }
       }
-      $oldtag="base::w5stat::base::overview" if ($oldtag eq "");
+      $oldtag="base::w5stat::overview::overview" if ($oldtag eq "");
       my %P=@Presenter;
-      print("<ul>");
+
+      my @ml;
+      my $mid=0;
+      my %dirindex;
       foreach my $p (sort({$P{$a}->{prio} <=> $P{$b}->{prio}} keys(%P))){
+         my $parent;
          if (defined($P{$p}->{opcode})){
             my $prec=$P{$p};
             my $opcode=$P{$p}->{opcode};
             my $show=&{$opcode}($self->{w5stat}->{$prec->{module}},$primrec);
             if ($show){
+               my %mrec;
                my $tag=$prec->{module}."::".$p;
-               my $label=$self->T($tag,$prec->{module});
-               my $link="javascript:setTag($requestid,\"$tag\")";
-               print "<li><a class=sublink href=$link>".$label."</a></li>";
-               if ($p eq "overview"){
-                  print "</ul><br><u>".$self->T("Details").":</u><ul>";
+           #    $mrec{fullname}=$self->T($tag,$prec->{module});
+               $mrec{label}=$self->T($tag,$prec->{module});
+               my @path=split(/;/,$mrec{label});
+               my $targetml=\@ml;
+               if ($#path>0){
+                  $mrec{label}=$path[$#path];
+                  for(my $l=0;$l<$#path;$l++){
+                     my $fullpath=join(";",@path[0 .. $l]);
+                     if (!defined($dirindex{$fullpath})){ 
+                        my %pmrec=(label=>$path[$l],menuid=>$mid++,
+                                   tree=>[],fullpath=>$fullpath);
+                        $pmrec{label}=~s/ /&nbsp;/g;
+                        $pmrec{label}.="&nbsp";
+                        if (defined($parent)){
+                           $pmrec{parent}=$parent;
+                        }
+                        push(@$targetml,\%pmrec);
+                        $parent=\%pmrec;
+                        $targetml=$pmrec{tree};
+                        $dirindex{$fullpath}=\%pmrec;
+                     }
+                     else{
+                        $parent=$dirindex{$fullpath};
+                        $targetml=$dirindex{$fullpath}->{tree};
+                     }
+                  }
                }
+               if (defined($parent)){
+                  $mrec{parent}=$parent;
+               }
+               $mrec{label}=~s/ /&nbsp;/g;
+               $mrec{label}.="&nbsp";
+               $mrec{href}="javascript:setTag($requestid,\"$tag\")";
+               $mrec{menuid}=$mid++;
+               push(@$targetml,\%mrec);
             }
          }
       }
-      if (keys(%P)>1){
-         my $link="javascript:setTag($requestid,\"ALL\")";
-         print "<br><br><li>".
-               "<a class=sublink href=$link>".
-               $self->T("complete list")."</a></li>";
-      }
-      printf("</ul>");
+      print kernel::MenuTree::BuildHtmlTree(tree     => \@ml,
+                     hrefclass=>'menulink',
+                     rootlink =>"javascript:setTag($requestid,\"ALL\")");
+      
+
+
+#      print("<ul>");
+#      foreach my $p (sort({$P{$a}->{prio} <=> $P{$b}->{prio}} keys(%P))){
+#         if (defined($P{$p}->{opcode})){
+#            my $prec=$P{$p};
+#            my $opcode=$P{$p}->{opcode};
+#            my $show=&{$opcode}($self->{w5stat}->{$prec->{module}},$primrec);
+#            if ($show){
+#               my $tag=$prec->{module}."::".$p;
+#               my $label=$self->T($tag,$prec->{module});
+#               my $link="javascript:setTag($requestid,\"$tag\")";
+#               print "<li><a class=sublink href=$link>".$label."</a></li>";
+#               if ($p eq "overview"){
+#                  print "</ul><br><u>".$self->T("Details").":</u><ul>";
+#               }
+#            }
+#         }
+#      }
+#      if (keys(%P)>1){
+#         my $link="javascript:setTag($requestid,\"ALL\")";
+#         print "<br><br><li>".
+#               "<a class=sublink href=$link>".
+#               $self->T("complete list")."</a></li>";
+#      }
+#      printf("</ul>");
+
+
+
    }
 
    printf("</td>");

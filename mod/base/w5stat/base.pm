@@ -37,10 +37,6 @@ sub getPresenter
    my $self=shift;
 
    my @l=(
-          'overview'=>{
-                         opcode=>\&displayOverview,
-                         prio=>1,
-                      },
           'w5basestat'=>{
                          opcode=>\&displayW5Base,
                          overview=>\&overviewW5Base,
@@ -57,99 +53,6 @@ sub getPresenter
                       }
          );
 
-}
-
-
-sub processOverviewRecords
-{
-   my $self=shift;
-   my $ovdata=shift;
-   my $P=shift;
-   my $primrec=shift;
-   my $hist=shift;
-
-   foreach my $p (sort({$P->{$a}->{prio} <=> $P->{$b}->{prio}} keys(%{$P}))){
-      my $prec=$P->{$p};
-      if (defined($prec) && defined($prec->{overview})){
-         if (my @ov=&{$prec->{overview}}($prec->{obj},$primrec,$hist)){
-            push(@{$ovdata},@ov);
-         }
-      }
-   }
-}
-
-sub displayOverview
-{
-   my $self=shift;
-   my ($primrec,$hist)=@_;
-   my $app=$self->getParent();
-   my $d="";
-
-   my @ovdata;
-
-
-   my @Presenter;
-   foreach my $obj (values(%{$app->{w5stat}})){
-      if ($obj->can("getPresenter")){
-         my %P=$obj->getPresenter();
-         foreach my $p (values(%P)){
-            $p->{module}=$obj->Self();
-            $p->{obj}=$obj;
-         }
-         push(@Presenter,%P);
-      }
-   }
-   my $P={@Presenter};
-   $self->processOverviewRecords(\@ovdata,$P,$primrec,$hist);
-   if (defined($primrec->{nameid}) && $primrec->{nameid} ne "" 
-       && $primrec->{sgroup} eq "Group"){
-      my $month=$primrec->{dstrange};
-      my $grp=getModuleObject($app->Config,"base::grp");
-      $grp->SetFilter({parentid=>\$primrec->{nameid}});
-      my @l=$grp->getHashList(qw(fullname grpid));
-      if ($#l!=-1){
-         foreach my $grprec (@l){
-            my ($primrec,$hist)=$app->LoadStatSet(grpid=>$grprec->{grpid},
-                                                   $month);
-            if (defined($primrec)){
-               push(@ovdata,[$primrec->{fullname}]);
-               $self->processOverviewRecords(\@ovdata,$P,$primrec,$hist);
-
-            }
-         }
-      }
-   }
-   $d.="\n<div class=overview>";
-   $d.="<table width=100% height=70%>";
-   my $class="unitdata";
-   foreach my $rec (@ovdata){
-      if ($#{$rec}!=0){
-         my $color="black";
-         if (defined($rec->[2])){
-            $color=$rec->[2];
-         }
-         $d.="\n<tr height=1%>";
-         $d.="<td><div class=\"$class\">".$rec->[0]."</div></td>";
-         $d.="<td align=right width=50><font color=\"$color\"><b>".
-             $rec->[1]."</b></font></td>";
-         $d.="<td align=right width=50>".$rec->[3]."</td>";
-         $d.="</tr>";
-      }
-      else{
-         if ($class eq "unitdata"){
-            $d.="\n<tr height=1%><td colspan=3>&nbsp;</td></tr>";
-            $class="subunitdata";
-         }
-         $d.="\n<tr height=1%>";
-         $d.="<td colspan=3><div class=subunit>".$app->T("Subunit").": ".
-              $rec->[0]."</div></td>";
-         $d.="</tr>";
-      }
-   }
-   $d.="\n<tr><td colspan=3></td></tr>";
-   $d.="</table>";
-   $d.="</div>\n";
-   return($d,\@ovdata);
 }
 
 
