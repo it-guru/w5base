@@ -9,6 +9,7 @@ at least 1 link to an application. If there are no applications assigned,
 this will produce an error. In this case the databoss of the logical
 system has to contact one (the corret one) databoss of an application
 to assign the system to the application.
+This rule is inactive, if the system is a workstation and no server/applicationserver.
 
 
 =head3 IMPORTS
@@ -61,6 +62,7 @@ sub qcheckRecord
    my $rec=shift;
 
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
+   return(0,undef) if (!($rec->{isapplserver}) && ($rec->{isworkstation}));
    if (ref($rec->{applications}) ne "ARRAY" || $#{$rec->{applications}}==-1){
       return(3,{qmsg=>['no application relations'],
                 dataissue=>['no application relations']});

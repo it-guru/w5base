@@ -420,14 +420,21 @@ sub ShowEntry
                                     mode=>"HtmlV01"},"mdate","formated");
       my $month=$primrec->{dstrange};
       my $condition=$self->T("condition");
-      my ($Y,$M)=$month=~m/^(\d{4})(\d{2})$/;
+      my $label;
+      if (my ($Y,$M)=$month=~m/^(\d{4})(\d{2})$/){
+         $label="$M/$Y";
+      }
+      elsif (my ($Y,$W)=$month=~m/^(\d{4})KW(\d{2})$/){
+         $label="$Y/KW$W";
+      }
+
       print(<<EOF);
 <input type=hidden name=id value="$requestid">
 <input type=hidden name=tag value="$requesttag">
 <div style="margin:10px;padding:15px;width:600px;background:#ffffff;
             border-color:black;border-style:solid;border-width:1px;">
 <div class=chartlabel>
-Quality Report $M/$Y - $primrec->{fullname}
+Quality Report $label - $primrec->{fullname}
 </div>
 <div class=chartsublabel>
 $subtitle
@@ -491,22 +498,25 @@ sub LoadStatSet
       $self->ResetFilter();
       $self->SecureSetFilter({fullname=>\$primrec->{fullname},
                               sgroup=>\$primrec->{sgroup}});
-      my $month=$primrec->{dstrange};
-      my ($Y,$M)=$month=~m/^(\d{4})(\d{2})$/;
-      $M--;
-      if ($M<=0){
-         $M=12;
-         $Y--;
+      my $dstrange=$primrec->{dstrange};
+      my $lastrange=undef;
+
+      if (my ($Y,$M)=$dstrange=~m/^(\d{4})(\d{2})$/){
+         $M--;
+         if ($M<=0){
+            $M=12;
+            $Y--;
+         }
+         $lastrange=sprintf("%04d%02d",$Y,$M);
       }
-      my $lastmonth=sprintf("%04d%02d",$Y,$M);
       my $hist={area=>[]};
       foreach my $srec ($self->getHashList(qw(ALL))){
          if (ref($srec->{stats}) ne "HASH"){
             $srec->{stats}={Datafield2Hash($srec->{stats})};
          }
          push(@{$hist->{area}},$srec);
-         if ($lastmonth eq $srec->{dstrange}){
-            $hist->{lastmonth}=$srec;
+         if ($lastrange eq $srec->{dstrange}){
+            $hist->{lastdstrange}=$srec;
          }
       }
       return($primrec,$hist);
@@ -593,17 +603,17 @@ sub Presenter
 
    my %histid;
    my @ol;
-   my ($Y,$M,$month);
+   my ($Y,$M,$dstrange);
    if (defined($primrec)){
       push(@ol,$primrec->{id},$primrec->{fullname});
-      $month=$primrec->{dstrange};
-      ($Y,$M)=$month=~m/^(\d{4})(\d{2})$/;
+      $dstrange=$primrec->{dstrange};
+      ($Y,$M)=$dstrange=~m/^(\d{4})(\d{2})$/;
    }
    else{
       my ($year,$mon,$day, $hour,$min,$sec) = Today_and_Now("GMT");
       $Y=$year;
       $M=$mon;
-      $month=sprintf("%04d%02d",$year,$mon);
+      $dstrange=sprintf("%04d%02d",$year,$mon);
    }
    my $lnkrole=getModuleObject($self->Config,"base::lnkgrpuserrole");
    my $userid=$self->getCurrentUserId();
@@ -638,9 +648,9 @@ sub Presenter
 
    $self->ResetFilter();
    $self->SecureSetFilter([
-                           {dstrange=>\$month,sgroup=>\'Group',
+                           {dstrange=>\$dstrange,sgroup=>\'Group',
                             fullname=>\@grpnames},
-                           {dstrange=>\$month,sgroup=>\'Group',
+                           {dstrange=>\$dstrange,sgroup=>\'Group',
                             nameid=>\@grpids},
                           ]);
 
@@ -656,7 +666,7 @@ sub Presenter
 
 
    print("<tr height=1%><td>");
-   print("<table width=100% border=0><tr>\n");
+   print("<table border=0 width=100% border=0><tr>\n");
    if ($self->IsMemberOf("admin")){
       print("<td width=250>");
       print("<table width=250 border=0 cellspacing=0 cellpadding=0><tr><td>");
@@ -684,7 +694,6 @@ sub Presenter
    
    my $mstr="";
    my $cstr="";
-   my ($Y1,$M1)=($Y,$M);
    sub getLabelString
    {
       my $histid=shift;
@@ -693,23 +702,35 @@ sub Presenter
       my $curM=shift;
       my $curY=shift;
       my $k=sprintf("%04d%02d",$Y1,$M1);
-      my $u1="";
-      my $u0="";
+      my $style="";
+      my $cw;
       if ($M1==$curM && $Y1==$curY){
-         $u1="<u>";
-         $u0="</u>";
+         $style="border-color:black;border-width:1px;border-style:solid";
+         my ($sY,$sM,$sD)=Add_Delta_YMD("GMT",$curY,$curM,1,0,0,-30);
+         for(my $w=0;$w<10;$w++){
+            ($sY,$sM,$sD)=Add_Delta_YMD("GMT",$sY,$sM,$sD,0,0,7);
+            my ($week,$year)=Week_of_Year($sY,$sM,$sD);
+            $cw.=" - " if ($cw ne "");
+            my $tag=sprintf("%04dKW%02d",$year,$week);
+            my $frond=sprintf("KW%02d",$week);
+            if (defined($histid->{$tag})){
+               $cw.="<a class=sublink ".
+                    "href=javascript:refreshTag($histid->{$tag})>$frond</a>";
+            }
+            else{
+               $cw.="$frond";
+            }
+         }
       }
       my $ms;
       if (defined($histid->{$k})){
-         $ms=sprintf("<td align=center>$u1".
+         $ms=sprintf("<td align=center style=\"$style\">".
                  "<a class=sublink href=javascript:refreshTag($histid->{$k})>".
-                 "%02d<br>%4d</a>$u0</td>",$M1,$Y1);
+                 "%02d<br>%4d</a></td>",$M1,$Y1);
       }
       else{
-         $ms=sprintf("<td align=center>$u1%02d<br>%4d$u0</td>",$M1,$Y1);
+         $ms=sprintf("<td align=center>%02d<br>%4d</td>",$M1,$Y1);
       }
-      my $cw="<td><font size=2>KW00</font></td>";
-      $cw.=$cw;
       return($ms,$cw);
       
    }
@@ -718,8 +739,15 @@ sub Presenter
          $histid{$h->{dstrange}}=$h->{id};
       }
    }
-   for(my $c=0;$c<=4;$c++){
-      my ($ms,$cw)=getLabelString(\%histid,$M1,$Y1,$M,$Y);
+   my ($KWyear,$KWweek);
+   if (($KWyear,$KWweek)=$dstrange=~m/^(\d{4})KW(\d{2})$/){
+      my ($yy,$mm,$dd)=Monday_of_Week($KWweek,$KWyear);
+      $M=$mm;
+      $Y=$yy;
+   }
+   my ($Y1,$M1)=($Y,$M);
+   for(my $c=0;$c<=2;$c++){
+      my ($ms,$cw)=getLabelString(\%histid,$M1,$Y1,$M,$Y,$KWyear,$KWweek);
       $mstr.=$ms;
       $cstr.=$cw;
       $M1++;
@@ -741,8 +769,13 @@ sub Presenter
    }
 
    print($mstr."</tr></table>\n");
+   print("<table border=0 width=100% border=0><tr>\n");
+   printf("<td></td><td align=right>$cstr</td>");
+   print("</tr></table>");
+
+
+
    printf("</td></tr>");
-  # printf("<tr><td>X1Woche: KW01 KW02 KW03 KW04</td></tr>");
 
 
    printf("<tr><td valign=top>");
@@ -875,7 +908,9 @@ function setTag(id,tag)
 function refreshTag(id)
 {
    if (id!=""){
-      document.forms[0].elements['search_name'].value="";
+      if (document.forms[0].elements['search_name']){
+         document.forms[0].elements['search_name'].value="";
+      }
       document.forms[0].elements['id'].value=id;
       document.forms[0].action=id;
    }
@@ -943,10 +978,10 @@ sub calcPOffset
    my ($primrec,$hist,$name)=@_;
    my $delta;
 
-   if (defined($hist->{lastmonth}) && 
-       $hist->{lastmonth}->{stats}->{$name}->[0]>0){
+   if (defined($hist->{lastdstrange}) && 
+       $hist->{lastdstrange}->{stats}->{$name}->[0]>0){
       my $cur=$primrec->{stats}->{$name}->[0];
-      my $lst=$hist->{lastmonth}->{stats}->{$name}->[0];
+      my $lst=$hist->{lastdstrange}->{stats}->{$name}->[0];
       $delta=floor(($cur-$lst)*100.0/$lst);
       if ($delta!=0){
          if ($delta<0){

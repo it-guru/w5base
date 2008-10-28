@@ -118,6 +118,7 @@ sub overviewDataIssue
    my ($primrec,$hist)=@_;
    my $app=$self->getParent();
    my @l;
+   return() if ($primrec->{dstrange}=~m/KW/);
    my $keyname='base.DataIssue.open';
    my $users=0;
    if (defined($primrec->{stats}->{User})){
@@ -145,6 +146,7 @@ sub displayDataIssue
    my $self=shift;
    my ($primrec,$hist)=@_;
    my $app=$self->getParent();
+   return() if ($primrec->{dstrange}=~m/KW/);
    my $showall=Query->Param("FullDataIssueList");
    #my $data=$app->extractYear($primrec,$hist,"base.DataIssue.IdList.open");
    my $data=$app->extractYear($primrec,$hist,"base.DataIssue.open",
