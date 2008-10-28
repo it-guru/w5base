@@ -701,6 +701,8 @@ sub Presenter
       my $Y1=shift;
       my $curM=shift;
       my $curY=shift;
+      my $KWyear=shift;
+      my $KWweek=shift;
       my $k=sprintf("%04d%02d",$Y1,$M1);
       my $style="";
       my $cw;
@@ -708,13 +710,17 @@ sub Presenter
          $style="border-color:black;border-width:1px;border-style:solid";
          my ($sY,$sM,$sD)=Add_Delta_YMD("GMT",$curY,$curM,1,0,0,-30);
          for(my $w=0;$w<10;$w++){
+            my $wstyle;
             ($sY,$sM,$sD)=Add_Delta_YMD("GMT",$sY,$sM,$sD,0,0,7);
             my ($week,$year)=Week_of_Year($sY,$sM,$sD);
+            if ($week==$KWweek && $year==$KWyear){
+               $wstyle=$style;
+            }
             $cw.=" - " if ($cw ne "");
             my $tag=sprintf("%04dKW%02d",$year,$week);
             my $frond=sprintf("KW%02d",$week);
             if (defined($histid->{$tag})){
-               $cw.="<a class=sublink ".
+               $cw.="<a class=sublink style=\"$wstyle\" ".
                     "href=javascript:refreshTag($histid->{$tag})>$frond</a>";
             }
             else{

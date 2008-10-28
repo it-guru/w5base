@@ -145,6 +145,7 @@ sub displayAppl
 {  
    my $self=shift;
    my ($primrec,$hist)=@_;
+   return() if ($primrec->{dstrange}=~m/KW/);
    my $app=$self->getParent();
    my $data=$app->extractYear($primrec,$hist,"ITIL.Application.Count");
    my $user=$app->extractYear($primrec,$hist,"User",
@@ -187,6 +188,7 @@ sub displaySystem
 {  
    my $self=shift;
    my ($primrec,$hist)=@_;
+   return() if ($primrec->{dstrange}=~m/KW/);
    my $app=$self->getParent();
    my $data=$app->extractYear($primrec,$hist,"ITIL.System.Count");
    my $user=$app->extractYear($primrec,$hist,"User",
@@ -231,6 +233,7 @@ sub displayAsset
 {  
    my $self=shift;
    my ($primrec,$hist)=@_;
+   return() if ($primrec->{dstrange}=~m/KW/);
    my $app=$self->getParent();
    my $data=$app->extractYear($primrec,$hist,"ITIL.Asset.Count");
    my $user=$app->extractYear($primrec,$hist,"User",
@@ -275,6 +278,7 @@ sub displaySWInstance
 {  
    my $self=shift;
    my ($primrec,$hist)=@_;
+   return() if ($primrec->{dstrange}=~m/KW/);
    my $app=$self->getParent();
    my $data=$app->extractYear($primrec,$hist,"ITIL.SWInstance.Count");
    my $user=$app->extractYear($primrec,$hist,"User",

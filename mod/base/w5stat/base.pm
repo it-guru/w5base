@@ -245,6 +245,7 @@ sub displayOrg
    my $self=shift;
    my ($primrec,$hist)=@_;
    my $app=$self->getParent();
+   return() if ($primrec->{dstrange}=~m/KW/);
    #my $data=$app->extractYear($primrec,$hist,"base.DataIssue.IdList.open");
    my $data=$app->extractYear($primrec,$hist,"User",
                               setUndefZero=>1);
