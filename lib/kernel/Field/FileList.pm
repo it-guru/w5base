@@ -104,6 +104,7 @@ sub ListFiles
 
       my %p=('tree'     => \@filelist,
              'rootimg'  =>'minifileroot.gif',
+             'rootpath' =>'./',
              'hrefclass'=>'filelink');
       $d=kernel::MenuTree::BuildHtmlTree(%p);
    }
