@@ -88,6 +88,10 @@ sub Validate
                           (defined($newrec->{$name}) && 
                            $newrec->{$name} ne $oldrec->{$name}))){
       if ($newrec->{$name} eq "" && $self->{AllowEmpty}){
+         if (defined($self->{altnamestore})){
+            return({$self->{vjoinon}->[0]=>undef,
+                    $self->{altnamestore}=>undef});
+         }
          return({$self->{vjoinon}->[0]=>undef});
       }
       $self->getParent->LastMsg(ERROR,"'%s' value '%s' not found",$self->Label,

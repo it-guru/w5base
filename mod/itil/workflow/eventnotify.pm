@@ -327,19 +327,32 @@ sub getDynamicFields
                 container     =>'headref'),
 
       new kernel::Field::Text(
-                name          =>'eventprmticket',
+                name          =>'eventstaticmailsubject',
                 xlswidth      =>'15',
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'eventnotifyinternal',
-                label         =>'related problem ticket',
+                label         =>'static mail subject',
                 container     =>'headref'),
 
-      new kernel::Field::Text(
-                name          =>'eventinmticket',
-                xlswidth      =>'15',
-                translation   =>'itil::workflow::eventnotify',
+      new kernel::Field::TextDrop(
+                name          =>'eventstaticemailgroup',
+                label         =>'static additional notify distribution list',
+                AllowEmpty    =>1,
                 group         =>'eventnotifyinternal',
-                label         =>'related incident ticket',
+                vjointo       =>'base::grp',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['eventstaticemailgroupid'=>'grpid'],
+                vjoindisp     =>'fullname',
+                altnamestore  =>'eventstaticemailgroupname'),
+
+      new kernel::Field::Link (
+                name          =>'eventstaticemailgroupid',
+                group         =>'eventnotifyinternal',
+                container     =>'headref'),
+
+      new kernel::Field::Link (
+                name          =>'eventstaticemailgroupname',
+                group         =>'eventnotifyinternal',
                 container     =>'headref'),
 
       new kernel::Field::Textarea(
@@ -930,6 +943,23 @@ sub getNotifyDestinations
    if ($mode eq "mgmtinfo"){
 
    }
+   if ($WfRec->{eventstaticemailgroupid} ne ""){
+      my @mem=$self->getParent->getMembersOf($WfRec->{eventstaticemailgroupid},
+                                             ['RMember']);
+      my $user=getModuleObject($self->Config,"base::user");
+      $user->SetFilter({userid=>\@mem,usertyp=>['user','extern']});
+      $user->SetCurrentView(qw(email)); 
+      my ($rec,$msg)=$user->getFirst();
+      if (defined($rec)){
+         do{
+            $emailto->{$rec->{email}}++;
+            ($rec,$msg)=$user->getNext();
+         } until(!defined($rec));
+      }
+   }
+
+
+
    return(undef);
 }
 
@@ -977,7 +1007,8 @@ sub generateMailSet
 {
    my $self=shift;
    my ($WfRec,$action,$eventlang,$additional,$emailprefix,$emailpostfix,
-       $emailtext,$emailsep,$emailsubheader,$emailsubtitle,$allowsms,$smstext)=@_;
+       $emailtext,$emailsep,$emailsubheader,$emailsubtitle,
+       $subject,$allowsms,$smstext)=@_;
    my @emailprefix=();
    my @emailpostfix=();
    my @emailtext=();
@@ -1078,6 +1109,15 @@ sub generateMailSet
       push(@emailsep,0);
       push(@emailpostfix,"");
    }
+   my $wf=$self->getParent();
+   my $ssfld=$wf->getField("wffields.eventstaticmailsubject",$WfRec);
+   if (defined($ssfld)){
+      my $sstext=$ssfld->RawValue($WfRec);
+      if ($sstext ne ""){
+         $$subject=$sstext;
+      }
+   }
+
    delete($ENV{HTTP_FORCE_LANGUAGE});
 
    @$emailprefix=@emailprefix;
@@ -1569,6 +1609,9 @@ sub Validate
          return(0);
       }
    }
+   if ($newrec->{eventstatnature} eq "EVn.info"){
+      $newrec->{eventstatclass}=4;
+   }
    if ($newrec->{eventmode} eq "EVk.appl"){
       my $applid=$newrec->{affectedapplicationid};
       if (!ref($newrec->{affectedapplicationid}) eq "ARRAY"){
@@ -1954,13 +1997,16 @@ sub generateWorkspace
    my $smsallow=();
    my $smstext=();
    my %additional=();
+   my $subject;
    $self->getParent->generateMailSet($WfRec,"sendcustinfo",
                     \$emaillang,\%additional,
                     \@emailprefix,\@emailpostfix,\@emailtext,\@emailsep,
-                    \@emailsubheader,\@emailsubtitle,\$smsallow,\$smstext);
+                    \@emailsubheader,\@emailsubtitle,
+                    \$subject,\$smsallow,\$smstext);
    return($self->generateNotificationPreview(emailtext=>\@emailtext,
                                              emailprefix=>\@emailprefix,
                                              emailsep=>\@emailsep,
+                                             subject=>$subject,
                                              emailsubheader=>\@emailsubheader,
                                              emailsubtitle=>\@emailsubtitle,
                                              to=>\@email));
@@ -2089,7 +2135,8 @@ sub Process
                       creationtime=>$creationtime);
       $self->getParent->generateMailSet($WfRec,$action,\$eventlang,\%additional,
                        \@emailprefix,\@emailpostfix,\@emailtext,\@emailsep,
-                       \@emailsubheader,\@emailsubtitle,\$smsallow,\$smstext);
+                       \@emailsubheader,\@emailsubtitle,
+                       \$subject,\$smsallow,\$smstext);
       #
       # calc from address
       #

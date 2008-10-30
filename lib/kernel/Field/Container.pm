@@ -97,7 +97,7 @@ sub finishWriteRequestHash
    foreach my $fo ($p->getFieldObjsByView([$p->getCurrentView()],
                                           current=>$newrec,oldrec=>$oldrec)){
       if (defined($fo->{container}) && $fo->{container} eq $self->Name()){
-         if (defined($newrec->{$fo->Name()})){
+         if (exists($newrec->{$fo->Name()})){
             $oldhash->{$fo->Name()}=$newrec->{$fo->Name()};
             delete($newrec->{$fo->Name()});
             $changed=1;

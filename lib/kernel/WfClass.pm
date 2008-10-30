@@ -929,26 +929,36 @@ sub generateNotificationPreview
 
    my $preview=$self->getParent->T("Preview");
    $preview.=":";
-   if (defined($param{subject})){
-      $preview=$param{subject};
-   }
+#   if (defined($param{subject})){
+#      $preview=$param{subject};
+#   }
    my $tomsg=$self->getParent->T("To");
    my $ccmsg=$self->getParent->T("CC");
+   my $subjectmsg=$self->getParent->T("Subject");
    my $sepstart="<table class=emailpreviewset border=1>";
    my $sepend="</table>";
    my $templ=<<EOF;
+<center>
 <div class=emailpreview>
+<table>
+<tr><td align=left>
 &nbsp;<b>$preview</b>
 <table class=emailpreview>
 <tr>
-<td valign=top>$tomsg:</td>
+<td valign=top width=50><b>$tomsg:</b></td>
 <td>$email</td>
 </tr>
 EOF
    $templ.=<<EOF if ($emailcc ne "");
 <tr>
-<td valign=top>$ccmsg:</td>
+<td valign=top><b>$ccmsg:</b></td>
 <td>$emailcc</td>
+</tr>
+EOF
+   $templ.=<<EOF if ($param{subject});
+<tr>
+<td valign=top><b>$subjectmsg:</b></td>
+<td>$param{subject}</td>
 </tr>
 EOF
    $templ.=<<EOF;
@@ -983,8 +993,16 @@ EOF
       $templ.="<td class=emailpreviewemailprefix>".
               $param{emailprefix}->[$blk]."</td>";
       my $emailtext=$param{emailtext}->[$blk];
-      $emailtext=~s/</&lt;/g;
-      $emailtext=~s/>/&gt;/g;
+
+      if (!(($emailtext=~m/<a/) ||
+            ($emailtext=~m/<b>/) ||
+            ($emailtext=~m/<\/b>/) ||
+            ($emailtext=~m/<\/ul>/) ||
+            ($emailtext=~m/<i>/) ||
+            ($emailtext=~m/<div/))){
+         $emailtext=~s/</&lt;/g;
+         $emailtext=~s/>/&gt;/g;
+      }
       $emailtext=~s/\%/\\\%/g;
       $templ.="<td class=emailpreviewemailtext>".
               "<table style=\"table-layout:fixed;width:100%\" ".
@@ -995,6 +1013,7 @@ EOF
       $templ.="</tr>";
    }
    $templ.=$sepend."</td></tr></table></div>";
+   $templ.="</td></table>";
 
    return($templ);
 

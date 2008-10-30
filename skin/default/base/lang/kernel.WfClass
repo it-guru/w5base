@@ -4,4 +4,5 @@
 'Break the current workflow - are you sure?'=>{de=>'Wenn Sie den Workflow abbrechen wird keinerlei Bearbeitung dieses Workflows mehr möglich sein. - Sind Sie sicher, dass Sie diesen Workflow abbrechen wollen?'},
 
 'To'=>{de=>'An'},
+'Subject'=>{de=>'Betreff'},
 'Preview'=>{de=>'Vorschau'},

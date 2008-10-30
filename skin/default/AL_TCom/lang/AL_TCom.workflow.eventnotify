@@ -23,4 +23,5 @@
 'Send Root-Cause Info'=>{de=>'Ursachenanalyse versenden'},
 'rootcausi'=>{de=>'Ursachenanalyse versandt',en=>'root cause analyse send'},
 'invalid problemticket registered'=>{de=>'ungültiges Problem Ticket eingetragen'},
-
+'related problem ticket'=>{de=>'relevantes ServiceCenter Problem-Ticket'},
+'related incident ticket'=>{de=>'relevantes ServiceCenter Incident-Ticket'},

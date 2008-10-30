@@ -41,13 +41,31 @@ sub getDynamicFields
 
    return($self->InitFields(
       $self->SUPER::getDynamicFields(@_),
+
+      new kernel::Field::Text(
+                name          =>'eventprmticket',
+                xlswidth      =>'15',
+                translation   =>'AL_TCom::workflow::eventnotify',
+                group         =>'eventnotifyinternal',
+                label         =>'related problem ticket',
+                container     =>'headref'),
+
+      new kernel::Field::Text(
+                name          =>'eventinmticket',
+                xlswidth      =>'15',
+                translation   =>'AL_TCom::workflow::eventnotify',
+                group         =>'eventnotifyinternal',
+                label         =>'related incident ticket',
+                container     =>'headref'),
+
+
       new kernel::Field::Textarea(
                 name          =>'eventscproblemsolution',
                 translation   =>'AL_TCom::workflow::eventnotify',
                 group         =>'eventnotifyinternal',
                 depend        =>['eventprmticket'],
                 readonly      =>1,
-                htmldetail    =>1,
+                htmldetail    =>\&isSCproblemSet,
                 onRawValue    =>\&loadDataFromSC,
                 label         =>'SC Problem soultion'),
       new kernel::Field::Textarea(
@@ -56,11 +74,23 @@ sub getDynamicFields
                 onRawValue    =>\&loadDataFromSC,
                 group         =>'eventnotifyinternal',
                 readonly      =>1,
-                htmldetail    =>1,
+                htmldetail    =>\&isSCproblemSet,
                 depend        =>['eventprmticket'],
                 label         =>'SC Problem cause'),
       ));
 }
+
+sub isSCproblemSet
+{
+   my $self=shift;
+   my $mode=shift;
+   my %param=@_;
+   my $current=$param{current};
+   return(1) if ($current->{eventprmticket} ne "");
+   return(0);
+}
+
+
 
 sub loadDataFromSC
 {
@@ -300,7 +330,8 @@ sub generateMailSet
 {
    my $self=shift;
    my ($WfRec,$action,$eventlang,$additional,$emailprefix,$emailpostfix,
-       $emailtext,$emailsep,$emailsubheader,$emailsubtitle,$allowsms,$smstext)=@_;
+       $emailtext,$emailsep,$emailsubheader,$emailsubtitle,
+       $subject,$allowsms,$smstext)=@_;
    my @emailprefix=();
    my @emailpostfix=();
    my @emailtext=();
@@ -490,6 +521,15 @@ sub generateMailSet
          push(@emailpostfix,"");
       }
    }
+   my $wf=$self->getParent();
+   my $ssfld=$wf->getField("wffields.eventstaticmailsubject",$WfRec);
+   if (defined($ssfld)){
+      my $sstext=$ssfld->RawValue($WfRec);
+      if ($sstext ne ""){
+         $$subject=$sstext;
+      }
+   }
+
    delete($ENV{HTTP_FORCE_LANGUAGE});
    @$emailprefix=@emailprefix;
    @$emailpostfix=@emailpostfix;

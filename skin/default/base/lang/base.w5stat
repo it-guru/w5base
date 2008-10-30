@@ -1,4 +1,4 @@
-'base::w5stat'=>{de=>'W5Base Statistik Rohdaten',en=>'W5Base statistic raw data'},
+'base::w5stat'=>{de=>'W5Base Statistik Knoten',en=>'W5Base statistic knot'},
 'Statistic Group'=>{de=>'Statistik Gruppe'},
 'Statistic Name'=>{de=>'Statistik Name'},
 'fieldgroup.default'=>{de=>'Statistik Kopf',en=>'Statistic Header'},

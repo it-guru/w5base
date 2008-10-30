@@ -635,7 +635,7 @@ sub RawValue
             if ($myfieldobj ne $self){
                my $myval=$myfieldobj->RawValue($current);
                $flt{$joinfield}=\$myval;
-               $joinval=1 if (defined($myval));
+               $joinval=1 if (defined($myval) && $myval ne "");
             }
          #   else{
          #      if (defined($self->{container})){
