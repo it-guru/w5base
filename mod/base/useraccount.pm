@@ -281,7 +281,7 @@ sub Validate
    my $origrec=shift;
 
    my $name=trim(effVal($oldrec,$newrec,"account"));
-   if ((!($name=~m/^[a-z0-9_\-\.\/\@]+$/i)) || ($name=~m/\d+$/)){
+   if ((!($name=~m/^[a-z0-9_\-\.\/\@]+$/i)) || ($name=~m/^\d+$/)){
       $self->LastMsg(ERROR,"invalid account name '%s' specified",$name);
       return(0);
    }
