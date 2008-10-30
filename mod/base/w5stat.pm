@@ -592,6 +592,15 @@ sub Presenter
       print $self->HtmlBottom(body=>1,form=>1);
       return();
    }
+   print(<<EOF);
+<script language="JavaScript">
+function doPrint()
+{
+   window.frames['entry'].focus();
+   window.frames['entry'].print();
+}
+</script>
+EOF
 
    print("<table width=100% height=100% border=0>");
 
@@ -774,21 +783,30 @@ sub Presenter
       $cstr=$cw.$cstr;
    }
 
-   print($mstr."</tr></table>\n");
-   print("<table border=0 width=100% border=0><tr>\n");
-   printf("<td></td><td align=right>$cstr</td>");
-   print("</tr></table>");
-
-
-
+   print($mstr."</tr></table>");
    printf("</td></tr>");
 
 
    printf("<tr><td valign=top>");
 
    print("<table width=100% height=100% border=0 cellspacing=0 cellpadding=0>");
+   printf("<tr height=1%%>");
+   printf("<td valign=top></td>");
+   printf("<td valign=top>");
+   print("<table border=0 width=100% cellspacing=0 ".
+         "cellpadding=0 border=0><tr>\n");
+   printf("<td>".
+          "<span class=sublink>".
+          "<img border=0 style=\"margin-bottom:2px\" onclick=doPrint() ".
+          "src=\"../../../../public/base/load/miniprint.gif\"></span>".
+          "</td><td align=right>$cstr</td>");
+   print("</tr></table>");
+
+   printf("</td>");
+   printf("</tr>");
+
    printf("<tr>");
-   printf("<td width=150 valign=top>");
+   printf("<td valign=top width=1%>");
 
    my @Presenter;
    my $oldtag=Query->Param("tag");
