@@ -9,6 +9,8 @@
 #include <sys/wait.h>
 #include <sys/uio.h>
 
+#include <sys/stat.h>
+
 #include <errno.h>
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
@@ -71,167 +73,97 @@ int is_w5bbrequest( httpd_conn* hc )
    return(0);
 }
 
-#define MAXSTR 255
-#define MAXLONGSTR 1024
-
-typedef struct {
-   int  msgtype;
-   char rawmsglabel[MAXLONGSTR];
-   char hostname[MAXSTR];
-   char service[MAXSTR];
-   char msgcolor[MAXSTR];
-   char msgdate[MAXSTR];
-   char shortdesc[MAXLONGSTR];
-   char rawdate[MAXLONGSTR];
-   time_t time;
-} w5bbmsg;
-
-int parse_msgcolor(int op, httpd_conn* hc , w5bbmsg* m)
+int mkSpoolPath(httpd_conn* hc,char *spoolpath,char *spoolfile)
 {
-   int c;
-   char* chkbuf;
+   struct stat bbdir;
+   char requestfile[MAXPATHLEN+1];
 
-   chkbuf=&hc->read_buf[hc->checked_idx];
-   for(c=0;c<MAXLONGSTR;c++){
-      if (chkbuf[c]==' ' || chkbuf[c]=='\t'){
-         strncpy(m->msgcolor,chkbuf,c);
-         m->msgcolor[c]=0;
-         hc->checked_idx+=c; 
-         break;
+   strcpy(spoolpath,W5BBDIR);
+   if (strlen(spoolpath)<MAXPATHLEN-1 &&
+       spoolpath[strlen(spoolpath)-1]!='/') (void) strcat( spoolpath,"/");
+   if (strlen(spoolpath)<MAXPATHLEN-5) (void) strcat( spoolpath,"spool");
+
+   sprintf(requestfile,"%015ld.txt",hc->request_num);
+
+   strcpy(spoolfile,spoolpath);
+   if (strlen(spoolfile)<MAXPATHLEN-1 &&
+       spoolfile[strlen(spoolfile)-1]!='/') (void) strcat( spoolfile,"/");
+   if (strlen(spoolfile)<MAXPATHLEN-20) (void) strcat(spoolfile,requestfile);
+
+   if (!stat(spoolpath,&bbdir)){
+      if (S_ISDIR(bbdir.st_mode)){
+         if (!access(spoolpath,W_OK|X_OK)){
+            fprintf(stderr,"DEBUG: access to %s OK\n",spoolpath);
+            return(1);
+         }
+         else{
+            syslog(LOG_ERR,"incorrect rights on %s to handel w5bb request!",
+                   spoolpath );
+         }
       }
-   }
-   while(hc->read_buf[hc->checked_idx]==' ' ||
-         hc->read_buf[hc->checked_idx]=='\t') hc->checked_idx++;
-   return(1);
-}
-
-
-int parse_msgdate(int op, httpd_conn* hc , w5bbmsg* m)
-{
-   int c;
-   char* chkbuf;
-   char str_mon[MAXSTR], str_wday[MAXSTR],rawdate[MAXSTR];
-   int  tm_sec, tm_min, tm_hour, tm_mday, tm_year;
-   long tm_mon, tm_wday;
-   int  nChar;
-   time_t t;
-   struct timespec  tm;
-
-
-   chkbuf=&hc->read_buf[hc->checked_idx];
-   bool r=get_date(&tm,"Wed Oct 22 19:51:17 CEST 2008",NULL); 
-   t=tm.tv_sec;
-   
-   fprintf(stderr,"fifi 01 r=%d\n",r);
-   if (t==(time_t) -1){
-      fprintf(stderr,"fifi time error\n");
+      else{
+         syslog(LOG_ERR,"spool path %s is not a directory!",spoolpath );
+      }
    }
    else{
-      m->time=t;
-      strcpy(m->rawdate,rawdate);
-      hc->checked_idx+=nChar;
-      fprintf(stderr,"found %s\n",asctime(localtime(&t)));
-   }
- //  while(hc->read_buf[hc->checked_idx]==' ' ||
- //        hc->read_buf[hc->checked_idx]=='\t') hc->checked_idx++;
-
-   return(1);
-}
-
-int parse_shortdesc(int op, httpd_conn* hc , w5bbmsg* m)
-{
-   int c;
-   char* chkbuf;
-   char str_mon[MAXSTR], str_wday[MAXSTR],timezone[MAXSTR];
-   int  tm_sec, tm_min, tm_hour, tm_mday, tm_year;
-   long tm_mon, tm_wday;
-   int  nChar;
-   time_t t;
-
-   chkbuf=&hc->read_buf[hc->checked_idx];
-   for(c=0;c<MAXLONGSTR;c++){
-      if (chkbuf[c]=='\n' || chkbuf[c]=='\r'){
-         strncpy(m->shortdesc,chkbuf,c);
-         m->shortdesc[c]=0;
-         hc->checked_idx+=c; 
-         break;
+      if (stat(W5BBDIR,&bbdir)){
+         mkdir(W5BBDIR,0777); 
+      }
+      if (stat(spoolpath,&bbdir)){
+         mkdir(spoolpath,0777); 
       }
    }
-
-   while(hc->read_buf[hc->checked_idx]==' ' || 
-         hc->read_buf[hc->checked_idx]=='\r' ||
-         hc->read_buf[hc->checked_idx]=='\n' ||
-         hc->read_buf[hc->checked_idx]=='\t') hc->checked_idx++;
-
-   return(1);
+   syslog(LOG_ERR,"insuficent rights to access to %s to handel w5bb request!",
+          spoolpath );
+   return(0);
 }
 
-int parse_rawmsglabel(int op, httpd_conn* hc , w5bbmsg* m)
-{
-   int c;
-   char* chkbuf;
-
-   chkbuf=&hc->read_buf[hc->checked_idx];
-   for(c=0;c<MAXLONGSTR;c++){
-      if (chkbuf[c]==' ' || chkbuf[c]=='\t'){
-         strncpy(m->rawmsglabel,chkbuf,c);
-         m->rawmsglabel[c]=0;
-         hc->checked_idx+=c; 
-         break;
-      }
-   }
-   for(c=0;c<MAXSTR;c++){
-      if (m->rawmsglabel[c]=='.'){
-         strncpy(m->hostname,m->rawmsglabel,c);
-         m->hostname[c]=0;
-         if (strlen(&m->rawmsglabel[c])<MAXSTR){
-            strcpy(m->service,&m->rawmsglabel[c+1]);
-         }
-         chkbuf=m->hostname;
-         while(*chkbuf){
-            if (*chkbuf==',') *chkbuf='.';
-            chkbuf++;
-         }
-         break;
-      }
-   }
-   while(hc->read_buf[hc->checked_idx]==' ' ||
-         hc->read_buf[hc->checked_idx]=='\t') hc->checked_idx++;
-
-   return(1);
-}
 
 int process_w5bbrequest(int op, httpd_conn* hc )
 {
-   w5bbmsg m;
-
-   (void) memset( &m, 0, sizeof(m) );
-   m.msgtype=op;
-   if (op==W5BBREQ_STATUS){
-      fprintf(stderr,"W5BBREQ_STATUS message\n");
-      fprintf(stderr,"pre parse=%s\n",&hc->read_buf[hc->checked_idx]);
-      parse_rawmsglabel(op,hc,&m);
-      fprintf(stderr,"rawmsglabel=%s\n",m.rawmsglabel);
-      fprintf(stderr,"hostname=%s\n",m.hostname);
-      fprintf(stderr,"service=%s\n",m.service);
-      parse_msgcolor(op,hc,&m);
-      fprintf(stderr,"msgcolor=%s\n",m.msgcolor);
-      parse_msgdate(op,hc,&m);
-  //    parse_shortdesc(op,hc,&m);
-  //    fprintf(stderr,"shortdesc=%s\n",m.shortdesc);
-  //   fprintf(stderr,"post parse=%s\n",&hc->read_buf[hc->checked_idx]);
-      syslog( LOG_INFO, "process status msg");
-      return(1);
+   struct stat bbdir;
+   char spoolpath[MAXPATHLEN+1];
+   char spoolfile[MAXPATHLEN+1];
+   int  fh,r,wc,reqsize=0,wrsize;
+   char buf[128];
+   
+   if (mkSpoolPath(hc,spoolpath,spoolfile)){
+      if (fh=open(spoolfile,O_CREAT|O_WRONLY,S_IWUSR|S_IROTH|S_IRGRP)){
+         fprintf(stderr,"OK spoolfile=%s readsize=%d fh=%d\n",
+                        spoolfile,hc->read_size,fh);
+         wrsize=hc->read_size;
+         if (strlen(hc->read_buf)<wrsize){
+            wrsize=strlen(hc->read_buf);
+         }    
+         wc=write(fh,hc->read_buf,wrsize);
+         reqsize+=wc;
+         fprintf(stderr,"fifi01 conn_fd=%d errno=%d\n",hc->conn_fd,errno);
+         while(reqsize<1024*1024*10){
+         fprintf(stderr,"fifi02-0 read=%d\n",sizeof(buf));
+            errno=0;
+            memset(buf,0,sizeof(buf));
+            r=read(hc->conn_fd,buf,sizeof(buf)-1);
+         fprintf(stderr,"fifi02-1 r=%d errno=%d\n",r,errno);
+            if ( r < 0 && ( errno == EINTR || errno == EAGAIN )){
+         fprintf(stderr,"fifi03\n");
+              sleep( 1 );
+              continue;
+            }
+            if ( r <= 0 ) break;
+         fprintf(stderr,"fifi04\n");
+            if (strlen(buf)<r){
+               r=strlen(buf);
+            }
+            
+            wc=write(fh,buf,r);
+            reqsize+=wc;
+         }
+         write(fh,"\n",1);
+         fprintf(stderr,"fifi05\n");
+         close(fh);
+         return(1);
+      }
    }
-   else if (op==W5BBREQ_PAGE){
-      syslog( LOG_INFO, "process page msg");
-      return(1);
-   }
-   else if (op==W5BBREQ_COMBO){
-      syslog( LOG_INFO, "process combo msg");
-      return(1);
-   }
-
    return(0);
 }
 

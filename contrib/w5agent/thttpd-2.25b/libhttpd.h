@@ -142,6 +142,7 @@ typedef struct {
     struct stat sb;
     int conn_fd;
     char* file_address;
+    unsigned long request_num;
     } httpd_conn;
 
 /* Methods. */

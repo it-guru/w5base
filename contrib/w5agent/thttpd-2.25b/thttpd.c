@@ -91,7 +91,7 @@ static char* user;
 static char* charset;
 static char* p3p;
 static int max_age;
-static unsigned long reqcount=0;
+static unsigned long request_num=0;
 static int   w5agentpid;
 static char* w5agentpl;
 
@@ -1581,6 +1581,8 @@ handle_newconnect( struct timeval* tvP, int listen_fd )
 	    c->hc->initialized = 0;
 	    ++httpd_conn_count;
 	    }
+        request_num++;
+        c->hc->request_num=request_num;
 
 	/* Get the connection. */
 	switch ( httpd_get_conn( hs, listen_fd, c->hc ) )

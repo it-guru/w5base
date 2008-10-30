@@ -37,7 +37,7 @@ MANDIR = ${prefix}/man
 # Pathname of directory to install the CGI programs.
 WEBDIR = $(prefix)/www
 # W5Agent modules
-MODDIR = $(WEBDIR)/mod
+MODDIR = $(prefix)/mod
 
 # CONFIGURE: The group that the web directory belongs to.  This is so that
 # the makeweb program can be installed set-group-id to that group, and make
