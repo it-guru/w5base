@@ -91,6 +91,7 @@ static char* user;
 static char* charset;
 static char* p3p;
 static int max_age;
+static unsigned long reqcount=0;
 static int   w5agentpid;
 static char* w5agentpl;
 

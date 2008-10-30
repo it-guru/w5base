@@ -28,7 +28,6 @@
 #include <unistd.h>
 
 
-#include "getdate.h"
 #include "w5bb.h"
 
 

@@ -856,6 +856,7 @@ sub Presenter
          }
       }
       print kernel::MenuTree::BuildHtmlTree(tree     => \@ml,
+                     rootimg  =>'miniw5stat.gif',
                      hrefclass=>'menulink',
                      rootlink =>"javascript:setTag($requestid,\"ALL\")");
       
@@ -1003,6 +1004,16 @@ sub calcPOffset
    }
    return($delta);
 }
+
+sub getRecordImageUrl
+{  
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/base/load/w5stat.jpg?".$cgi->query_string());
+}
+   
+   
+
 
 
 
