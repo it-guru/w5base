@@ -54,7 +54,8 @@ CC =		@CC@
 CCOPT =		@V_CCOPT@
 DEFS =		@DEFS@
 INCLS =		-I.
-CFLAGS =	$(CCOPT) $(DEFS) $(INCLS) -DPREFIX="\"$(prefix)\""
+CFLAGS =	$(CCOPT) $(DEFS) $(INCLS) -DPREFIX="\"$(prefix)\"" \
+                -DMODDIR="\"$(MODDIR)\"" -DLIBDIR="\"$(LIBDIR)\""
 LDFLAGS =	@LDFLAGS@
 LIBS =		@LIBS@
 NETLIBS =	@V_NETLIBS@
