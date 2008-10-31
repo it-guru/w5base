@@ -29,6 +29,8 @@ prefix =	/opt/w5agent
 exec_prefix =	${prefix}
 BINDIR =	${exec_prefix}/sbin
 WEBDIR =	$(prefix)/www
+MODDIR =	$(prefix)/mod
+LIBDIR =	$(prefix)/lib
 CGIBINDIR =	$(WEBDIR)/cgi-bin
 MANDIR =	${prefix}/man
 
@@ -82,6 +84,7 @@ install:	all
 	cp syslogtocern.8 $(MANDIR)/man8/syslogtocern.8
 	rm -f $(BINDIR)/w5agent.pl
 	cp w5agent.pl $(BINDIR)/w5agent.pl
+	cp w5agent.pm $(LIBDIR)/w5agent.pm
 
 clean:
 	rm -f $(CLEANFILES)

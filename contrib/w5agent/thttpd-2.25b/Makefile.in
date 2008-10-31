@@ -37,6 +37,8 @@ MANDIR = @mandir@
 WEBDIR = $(prefix)/www
 # W5Agent modules
 MODDIR = $(prefix)/mod
+# W5Agent libdir
+LIBDIR = $(prefix)/lib
 
 # CONFIGURE: The group that the web directory belongs to.  This is so that
 # the makeweb program can be installed set-group-id to that group, and make
@@ -102,6 +104,8 @@ subdirs:
 	    pwd ; \
 	    $(MAKE) $(MFLAGS) \
 		WEBDIR=$(WEBDIR) \
+		MODDIR=$(MODDIR) \
+		LIBDIR=$(LIBDIR) \
 		CGIBINDIR=$(CGIBINDIR) \
 		MANDIR=$(MANDIR) \
 		WEBGROUP=$(WEBGROUP) \
@@ -113,6 +117,7 @@ install:	installthis install-man installsubdirs
 installthis:
 	-mkdir -p $(DESTDIR)$(BINDIR)
 	-mkdir -p $(DESTDIR)$(MODDIR)
+	-mkdir -p $(DESTDIR)$(LIBDIR)
 	-cp thttpd w5agent
 	$(INSTALL) -m 555 -o bin -g bin w5agent $(DESTDIR)$(BINDIR)
 

@@ -387,7 +387,6 @@ sub Validate
          if (!defined($newrec->{databossid}) ||
              $newrec->{databossid}==0){
             $newrec->{databossid}=$userid;
-            return(0);
          }
       }
       if (!$self->IsMemberOf("admin")){
@@ -399,6 +398,11 @@ sub Validate
             return(0);
          }
       }
+   }
+   my $durationstart=trim(effVal($oldrec,$newrec,"durationstart"));
+   if ($durationstart eq ""){
+      $self->LastMsg(ERROR,"no duration start defined");
+      return(0);
    }
    ########################################################################
 
