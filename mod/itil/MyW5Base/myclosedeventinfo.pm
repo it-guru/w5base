@@ -87,7 +87,7 @@ sub Result
       @grpids=(qw(-1)) if ($#grpids==-1);
       my %q1=%q;
       $q1{cistatusid}='<=4';
-      $q1{affectedcustomerid}=\@grpids;
+      $q1{customerid}=\@grpids;
       push(@q,\%q1);
    }
    if ($dc eq "TEAM"){
