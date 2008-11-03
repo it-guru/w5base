@@ -511,6 +511,7 @@ sub LoadStatSet
       }
       my $hist={area=>[]};
       foreach my $srec ($self->getHashList(qw(ALL))){
+      my $hist={area=>[]};
          if (ref($srec->{stats}) ne "HASH"){
             $srec->{stats}={Datafield2Hash($srec->{stats})};
          }
@@ -749,7 +750,6 @@ EOF
       
    }
    if (defined($primrec)){
-      printf STDERR ("fifi d=%s\n",Dumper($hist));
       if (ref($hist) eq "HASH" && ref($hist->{area}) eq "ARRAY"){
          foreach my $h (@{$hist->{area}}){
             $histid{$h->{dstrange}}=$h->{id};
