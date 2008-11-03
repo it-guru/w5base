@@ -85,10 +85,10 @@ sub Result
                                              "RINManager","RQManager"],"both");
       @grpids=keys(%grp);
       @grpids=(qw(-1)) if ($#grpids==-1);
-      my (%q1,%q2);
+      my %q1=%q;
       $q1{cistatusid}='<=4';
-      $q1{customerid}=\@grpids;
-      push(@q,\%q1,\%q2);
+      $q1{affectedcustomerid}=\@grpids;
+      push(@q,\%q1);
    }
    if ($dc eq "TEAM"){
       my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
