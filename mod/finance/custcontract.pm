@@ -400,7 +400,8 @@ sub Validate
       }
    }
    my $durationstart=trim(effVal($oldrec,$newrec,"durationstart"));
-   if ($durationstart eq ""){
+   if ((!defined($oldrec) || exists($newrec->{durationstart})) &&
+       $durationstart eq ""){
       $self->LastMsg(ERROR,"no duration start defined");
       return(0);
    }
