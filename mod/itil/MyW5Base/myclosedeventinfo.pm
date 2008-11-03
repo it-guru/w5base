@@ -85,7 +85,7 @@ sub Result
                                              "RINManager","RQManager"],"both");
       @grpids=keys(%grp);
       @grpids=(qw(-1)) if ($#grpids==-1);
-      my %q1=%q;
+      my %q1;
       $q1{cistatusid}='<=4';
       $q1{customerid}=\@grpids;
       push(@q,\%q1);
