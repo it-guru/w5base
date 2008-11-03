@@ -638,7 +638,6 @@ EOF
    map({$grpids{$_->{grpid}}++;
         $grpids{$_->{parentid}}++;} $grp->getHashList("grpid","parentid"));
    my @grpids=grep(!/^\s*$/,keys(%grpids));
-   printf STDERR ("fifi d=%s\n",Dumper(\@grpids));
    $grp->ResetFilter();
    $grp->SetFilter({grpid=>\@grpids});
    my @grps=$grp->getHashList("fullname","grpid");
@@ -750,8 +749,11 @@ EOF
       
    }
    if (defined($primrec)){
-      foreach my $h (@{$hist->{area}}){
-         $histid{$h->{dstrange}}=$h->{id};
+      printf STDERR ("fifi d=%s\n",Dumper($hist));
+      if (ref($hist) eq "HASH" && ref($hist->{area}) eq "ARRAY"){
+         foreach my $h (@{$hist->{area}}){
+            $histid{$h->{dstrange}}=$h->{id};
+         }
       }
    }
    my ($KWyear,$KWweek);
