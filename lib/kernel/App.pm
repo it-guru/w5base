@@ -893,6 +893,32 @@ sub PreParseTimeExpression
          $f=sprintf("%04d/%02d",$Y,$M);
       }
    }
+   elsif (my ($Y,$M)=$val=~m/^\((\d{4})(\d{2})\)$/gi){
+      my $max;
+      eval('$max=Days_in_Month($Y,$M);');
+      if ($@ eq ""){
+         $val="\">=$Y-$M-01 00:00:00\" AND \"<=$Y-$M-$max 23:59:59\"";
+         $f=sprintf("%04d/%02d",$Y,$M);
+      }
+   }
+   elsif (my ($Y,$W)=$val=~m/^\((\d+)[CK]W(\d+)\)$/gi){
+      my ($syear,$smon,$sday);
+      eval('($syear,$smon,$sday)=Monday_of_Week($W,$Y);');
+      if ($@ eq ""){
+         $val="\">=$syear-$smon-$sday 00:00:00\" AND ".
+              "\"<=$syear-$smon-$sday 23:59:59+7d\"";
+         $f=sprintf("%04d/CW%02d",$Y,$W);
+      }
+   }
+   elsif (my ($Y,$W)=$val=~m/^\((\d+)Q(\d+)\)$/gi){   # Quartal def is todo!
+   #   my ($syear,$smon,$sday);   
+   #   eval('($syear,$smon,$sday)=Monday_of_Week($W,$Y);');
+   #   if ($@ eq ""){
+   #      $val="\">=$syear-$smon-$sday 00:00:00\" AND ".
+   #           "\"<=$syear-$smon-$sday 23:59:59+7d\"";
+   #      $f=sprintf("%04d/CW%02d",$Y,$W);
+   #   }
+   }
    elsif (my ($Y)=$val=~m/^\((\d{4,4})\)$/gi){
       my $max;
       eval('$max=Days_in_Month($Y,12);');

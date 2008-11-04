@@ -34,6 +34,16 @@ can use the following expressions to specify the desired date:<br>
 </tr>
 
 <tr>
+<td><a href=JavaScript:SendData("(11/2008)")>(11/2008)</a></td>
+<td>this specifies any timestamp in the month 11 of the year 2008</td>
+</tr>
+
+<tr>
+<td><a href=JavaScript:SendData("(2008CW11)")>(2008CW11)</a></td>
+<td>this specifies any timestamp in the calendar week 11 of the year 2008</td>
+</tr>
+
+<tr>
 <td>...</td>
 <td>there are more expression, but they are'nt documented at now</td>
 </tr>

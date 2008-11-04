@@ -33,6 +33,16 @@ Fall können Sie folgenden Ausdrücke verwenden:<br>
 <td>... mit diesem Ausdruck können Sie alle Datensätze suchen, die in dem jeweiligen Feld den Zeitpunkt vor 5 Stunden eingetragen haben.</td>
 </tr>
 
+<tr>
+<td nowrap valign=top><b><a href=JavaScript:SendData("(11/2008)")>(11/2008)</a></b></td>
+<td>... mit diesem Ausdruck können Sie alle Datensätze suchen, die in dem jeweiligen Feld einen Zeitpunkt innerhalb des Monats 11 des Jahres 2008 eingetragen haben.</td>
+</tr>
+
+<tr>
+<td nowrap valign=top><b><a href=JavaScript:SendData("(2008KW11)")>(2008KW11)</a></b></td>
+<td>... mit diesem Ausdruck können Sie alle Datensätze suchen, die in dem jeweiligen Feld einen Zeitpunkt innerhalb der Kalenderwoche 11 des Jahres 2008 eingetragen haben. Per Definition fängt eine Woche immer am Montag um 00:00:00 an.</td>
+</tr>
+
 </table>
 <script language="JavaScript">
 function SendData(t)

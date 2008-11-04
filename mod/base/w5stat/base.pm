@@ -281,8 +281,7 @@ sub processData
 {
    my $self=shift;
    my $dstrange=shift;
-   my $currentmonth=shift;
-   my $currentweek=shift;
+   my %param=@_;
    my $count;
 
 
@@ -309,7 +308,7 @@ sub processData
    my ($rec,$msg)=$user->getFirst();
    if (defined($rec)){
       do{
-         $self->getParent->processRecord('base::user',$dstrange,$rec);
+         $self->getParent->processRecord('base::user',$dstrange,$rec,%param);
          $count++;
          ($rec,$msg)=$user->getNext();
       } until(!defined($rec));
@@ -338,7 +337,7 @@ sub processData
       if (defined($rec)){
          do{
             $self->getParent->processRecord('base::workflow::active',
-                                            $dstrange,$rec);
+                                            $dstrange,$rec,%param);
             $count++;
             $c++;
             ($rec,$msg)=$wf->getNext();
@@ -357,7 +356,7 @@ sub processData
       if (defined($rec)){
          do{
             $self->getParent->processRecord('base::workflow::active',
-                                            $dstrange,$rec);
+                                            $dstrange,$rec,%param);
             $count++;
             $c++;
             ($rec,$msg)=$wf->getNext();
@@ -377,7 +376,7 @@ sub processData
       if (defined($rec)){
          do{
             $self->getParent->processRecord('base::workflow::notfinished',
-                                            $dstrange,$rec);
+                                            $dstrange,$rec,%param);
             $c++;
             $count++;
             ($rec,$msg)=$wf->getNext();
@@ -393,6 +392,7 @@ sub processRecord
    my $module=shift;
    my $month=shift;
    my $rec=shift;
+   my %param=@_;
 
    if ($module eq "base::user"){
       $self->getParent->storeStatVar("Group",["admin"],{},

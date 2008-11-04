@@ -39,33 +39,17 @@ sub Init
 
    $self->RegisterEvent("w5stat","w5stat",timeout=>3600);
    $self->RegisterEvent("w5statsend","w5statsend");
-   $self->RegisterEvent("w5statmix","w5statmix");
    return(1);
 }
-
-sub w5statmix
-{
-   my $self=shift;
-   my $s=getModuleObject($self->Config,"base::w5stat");
-   my $m=getModuleObject($self->Config,"base::w5statmaster");
-
-   $m->SetFilter({mdate=>">now-48h"});
-   $m->SetCurrentView(qw(ALL));
-
-
-
-
-
-   return({exitcode=>0});
-}
-
 
 sub w5stat
 {
    my $self=shift;
+   my $module=shift;
    my $dstrange=shift;
    my @dstrange;
 
+   $module="*" if (!defined($module));
    if (!defined($dstrange)){
       my ($year,$mon,$day, $hour,$min,$sec) = Today_and_Now("GMT");
       $dstrange=sprintf("%04d%02d",$year,$mon);
@@ -81,7 +65,7 @@ sub w5stat
    my $stat=getModuleObject($self->Config,"base::w5stat");
 
    foreach my $dstrange (@dstrange){
-      $stat->recreateStats("w5stat",$dstrange);
+      $stat->recreateStats("w5stat",$module,$dstrange);
    }
 
    return({exitcode=>0});

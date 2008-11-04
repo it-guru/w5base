@@ -176,6 +176,7 @@ sub recreateStats
 {
    my $self=shift;
    my $mode=shift;
+   my $module=shift;
    my $dstrangestamp=shift;
    my ($year,$mon,$day, $hour,$min,$sec) = Today_and_Now("GMT");
    my $currentmonth=sprintf("%04d%02d",$year,$mon);
@@ -216,9 +217,11 @@ sub recreateStats
     
       my $d2=$d1+$dm;
       eval('$basespan=DateTime::Span->from_datetimes(start=>$d1,end=>$d2);');
-      $baseduration=CalcDateDuration($d1,$d2);
+      if ($@ eq ""){
+         $baseduration=CalcDateDuration($d1,$d2);
+      }
    }
-   else{
+   elsif (my ($wyear,$week)=$dstrangestamp=~m/^(\d{4})[CK]W(\d{2})$/){
       my ($syear,$smon,$sday)=Monday_of_Week($week,$wyear);
       my $d1=new DateTime(year=>$syear, month=>$smon, day=>$sday,
                           hour=>0, minute=>0, second=>0,
@@ -227,14 +230,23 @@ sub recreateStats
     
       my $d2=$d1+$dm;
       eval('$basespan=DateTime::Span->from_datetimes(start=>$d1,end=>$d2);');
-      $baseduration=CalcDateDuration($d1,$d2);
+      if ($@ eq ""){
+         $baseduration=CalcDateDuration($d1,$d2);
+      }
    }
 
 
 
    foreach my $obj (values(%{$self->{$mode}})){
       if ($obj->can("processData")){
-         $obj->processData($dstrangestamp,$currentmonth);
+         my %param;
+         $param{currentmonth}=$currentmonth if (defined($currentmonth));
+         $param{currentweek}=$currentweek if (defined($currentweek));
+         $param{basespan}=$basespan if (defined($basespan));
+         $param{baseduration}=$baseduration if (defined($baseduration));
+         if ($obj->Self eq $module || $module eq "*" || !defined($module)){
+            $obj->processData($dstrangestamp,%param);
+         }
       }
    }
 
@@ -291,10 +303,11 @@ sub processRecord
    my $module=shift;
    my $month=shift;
    my $rec=shift;
+   my %param=@_;
 
    foreach my $obj (values(%{$self->{w5stat}})){
       if ($obj->can("processRecord")){
-         $obj->processRecord($module,$month,$rec,$self->{stats}); 
+         $obj->processRecord($module,$month,$rec,%param); 
       }
    }
 }
