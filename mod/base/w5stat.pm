@@ -511,13 +511,14 @@ sub LoadStatSet
       }
       my $hist={area=>[]};
       foreach my $srec ($self->getHashList(qw(ALL))){
-      my $hist={area=>[]};
          if (ref($srec->{stats}) ne "HASH"){
             $srec->{stats}={Datafield2Hash($srec->{stats})};
          }
          push(@{$hist->{area}},$srec);
-         if ($lastrange eq $srec->{dstrange}){
-            $hist->{lastdstrange}=$srec;
+         if (defined($lastrange)){
+            if ($lastrange eq $srec->{dstrange}){
+               $hist->{lastdstrange}=$srec;
+            }
          }
       }
       return($primrec,$hist);
