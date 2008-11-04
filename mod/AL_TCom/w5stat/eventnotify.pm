@@ -74,13 +74,10 @@ sub processRecord
                          {method=>'concat'},
                          "ITIL.Workflow.AL_TCom.Eventinfo.Valid.ID",$rec->{id});
                my $ss=DateTime::SpanSet->from_spans(spans=>[$span]);
-printf STDERR ("fifi1=%s\n",Dumper($span));
-printf STDERR ("fifi2=%s\n",Dumper($param{basespan}));
                $ss=$ss->intersection($param{basespan});
                my $tsum=0;
                foreach my $span ($ss->as_list()){
                   my $d=CalcDateDuration($span->start,$span->end);
-printf STDERR ("fifi id=$rec->{id} d=%s\n",Dumper($d));
                   $tsum+=$d->{totalseconds};
                }
                $self->getParent->storeStatVar("Group",[$team],{},
