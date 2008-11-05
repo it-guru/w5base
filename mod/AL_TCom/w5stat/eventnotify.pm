@@ -72,7 +72,7 @@ sub processRecord
             if (defined($param{basespan})){
                $self->getParent->storeStatVar("Group",[$team],
                          {method=>'concat'},
-                         "ITIL.Workflow.AL_TCom.Eventinfo.Valid.ID",$rec->{id});
+                         "ITIL.Workflow.AL_TCom.Eventinfo.IdList",$rec->{id});
                my $ss=DateTime::SpanSet->from_spans(spans=>[$span]);
                $ss=$ss->intersection($param{basespan});
                my $tsum=0;

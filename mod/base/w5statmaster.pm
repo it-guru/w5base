@@ -28,6 +28,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=3;
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
@@ -37,7 +38,8 @@ sub new
 
       new kernel::Field::Id(
                 name          =>'id',
-                uivisible     =>0,
+                htmldetail    =>0,
+                searchable    =>0,
                 sqlorder      =>'desc',
                 label         =>'W5BaseID',
                 dataobjattr   =>'w5statmaster.id'),
@@ -60,8 +62,13 @@ sub new
                 dataobjattr   =>'w5statmaster.monthkwday'),
 
       new kernel::Field::Text(
+                name          =>'dataname',
+                label         =>'Staistic Variable Name',
+                dataobjattr   =>'w5statmaster.statname'),
+
+      new kernel::Field::Text(
                 name          =>'dataval',
-                label         =>'Staistic Value',
+                label         =>'Staistic Variable Value',
                 dataobjattr   =>'w5statmaster.statval'),
 
       new kernel::Field::CDate(
@@ -132,6 +139,13 @@ sub isWriteValid
    my $rec=shift;
    return("default") if ($self->IsMemberOf("admin"));
    return(undef);
+}
+
+sub isDeleteValid
+{
+   my $self=shift;
+   return(0) if (!$self->IsMemberOf("admin"));
+   return(1);
 }
 
 sub getRecordImageUrl

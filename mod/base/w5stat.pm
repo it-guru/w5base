@@ -172,6 +172,60 @@ sub getDetailBlockPriority
 }
 
 
+sub loadLateModifies
+{
+   my $self=shift;
+   my $excldst=shift;
+
+   msg(INFO,"==== load late master overwrite data ====");
+   my $stat=getModuleObject($self->Config,"base::w5stat");
+   my $mst=getModuleObject($self->Config,"base::w5statmaster");
+   $mst->SetFilter({mdate=>">now-3d"});
+   $mst->SetCurrentView(qw(dstrange sgroup fullname dataname dataval));
+   delete($self->{stats});
+   my $olddstrange;
+   my ($rec,$msg)=$mst->getFirst();
+   if (defined($rec)){
+      do{
+         my $qdstrange=quotemeta($rec->{dstrange});
+         if (!grep(/^$qdstrange$/,@$excldst)){
+            if ($olddstrange ne $rec->{dstrange}){
+               if (defined($self->{stats})){
+                  $self->_storeStats($olddstrange);
+                  delete($self->{stats});
+               }
+               $olddstrange=$rec->{dstrange};
+            }
+            if (!defined($self->{stats}) || 
+                !exists($self->{stats}->{$rec->{sgroup}}->{$rec->{fullname}})){
+               $stat->ResetFilter();
+               $stat->SetFilter({dstrange=>\$rec->{dstrange},
+                                 fullname=>\$rec->{fullname},
+                                 sgroup=>\$rec->{sgroup}});
+               my ($oldrec,$msg)=$stat->getOnlyFirst(qw(ALL));
+               if (defined($oldrec)){
+                  my %stats=Datafield2Hash($oldrec->{stats});
+                  my $stats=CompressHash(\%stats);
+                  $self->{stats}->{$oldrec->{sgroup}}->{$oldrec->{fullname}}=
+                                          $stats;
+               }
+           
+            }
+            $self->storeStatVar($rec->{sgroup},$rec->{fullname},
+                                {maxlevel=>0,method=>'set'},
+                                $rec->{dataname},$rec->{dataval});
+         }
+         ($rec,$msg)=$mst->getNext();
+      } until(!defined($rec));
+   }
+   if (defined($self->{stats})){
+      printf STDERR ("stats=%s\n",Dumper($self->{stats}));
+      $self->_storeStats($olddstrange);
+      delete($self->{stats});
+   }
+}
+
+
 sub recreateStats
 {
    my $self=shift;
@@ -249,32 +303,70 @@ sub recreateStats
          }
       }
    }
+   #
+   # insert overwrite data
+   #
+   msg(INFO,"==== load master overwrite data ====");
+   my $mst=getModuleObject($self->Config,"base::w5statmaster");
+   $mst->SetFilter({dstrange=>\$dstrangestamp});
+   $mst->SetCurrentOrder(qw(NONE));
+   $mst->SetCurrentView(qw(dstrange sgroup fullname dataname dataval));
+   my ($rec,$msg)=$mst->getFirst();
+   if (defined($rec)){
+      do{
+         print STDERR ("fifi rec=%s\n",Dumper($rec));
+         $self->storeStatVar($rec->{sgroup},$rec->{fullname},
+                             {maxlevel=>0,method=>'set'},
+                             $rec->{dataname},$rec->{dataval});
 
+         ($rec,$msg)=$mst->getNext();
+      } until(!defined($rec));
+   }
+   msg(INFO,"====================================");
+   $self->_storeStats($dstrangestamp,$baseduration,$basespan);
+
+   
+
+
+   return(1);
+}
+
+
+sub _storeStats
+{
+   my $self=shift;
+   my $dstrangestamp=shift;
+   my $baseduration=shift;
+   my $basespan=shift;
 
    foreach my $group (keys(%{$self->{stats}})){
       foreach my $name (keys(%{$self->{stats}->{$group}})){
-         foreach my $v (keys(%{$self->{stats}->{$group}->{$name}})){
-            if (ref($self->{stats}->{$group}->{$name}->{$v})){
-               my $spanobj=$self->{stats}->{$group}->{$name}->{$v};
-               $spanobj=$spanobj->intersection($basespan);
-               my $vv=$v.".count";
-               my @splist=$spanobj->as_list();
-               $self->{stats}->{$group}->{$name}->{$vv}=$#splist+1;
-               my $minsum=0;
-               my $minmax=0;
-               foreach my $span (@splist){ 
-                  my $d=CalcDateDuration($span->start,$span->end);
-                  $minsum+=$d->{totalminutes};
-                  $minmax=$d->{totalminutes} if ($minmax<$d->{totalminutes});
-               }
-               my $vv=$v.".total";
-               $self->{stats}->{$group}->{$name}->{$vv}=sprintf('%.4f',$minsum);
-               my $vv=$v.".max";
-               $self->{stats}->{$group}->{$name}->{$vv}=sprintf('%.4f',$minmax);
-               my $vv=$v.".base";
-               $self->{stats}->{$group}->{$name}->{$vv}=sprintf('%.4f',
+         if (defined($baseduration) && defined($basespan)){
+            foreach my $v (keys(%{$self->{stats}->{$group}->{$name}})){
+               if (ref($self->{stats}->{$group}->{$name}->{$v})){
+                  my $spanobj=$self->{stats}->{$group}->{$name}->{$v};
+                  $spanobj=$spanobj->intersection($basespan);
+                  my $vv=$v.".count";
+                  my @splist=$spanobj->as_list();
+                  $self->{stats}->{$group}->{$name}->{$vv}=$#splist+1;
+                  my $minsum=0;
+                  my $minmax=0;
+                  foreach my $span (@splist){ 
+                     my $d=CalcDateDuration($span->start,$span->end);
+                     $minsum+=$d->{totalminutes};
+                     $minmax=$d->{totalminutes} if ($minmax<$d->{totalminutes});
+                  }
+                  my $vv=$v.".total";
+                  $self->{stats}->{$group}->{$name}->{$vv}=
+                                                        sprintf('%.4f',$minsum);
+                  my $vv=$v.".max";
+                  $self->{stats}->{$group}->{$name}->{$vv}=
+                                                        sprintf('%.4f',$minmax);
+                  my $vv=$v.".base";
+                  $self->{stats}->{$group}->{$name}->{$vv}=sprintf('%.4f',
                                                 $baseduration->{totalminutes});
-               delete($self->{stats}->{$group}->{$name}->{$v});
+                  delete($self->{stats}->{$group}->{$name}->{$v});
+               }
             }
          }
          my $nameid;
@@ -287,15 +379,22 @@ sub recreateStats
                       dstrange=>$dstrangestamp,
                       nameid=>$nameid,
                       fullname=>$name};
-         $self->ValidatedInsertOrUpdateRecord($statrec,
-                                            {sgroup=>\$statrec->{sgroup},
-                                             dstrange=>\$dstrangestamp,
-                                             fullname=>\$statrec->{fullname}});
+         my $flt={sgroup=>\$statrec->{sgroup},
+                  dstrange=>\$dstrangestamp,
+                  fullname=>\$statrec->{fullname}};
+         $self->SetFilter($flt);
+         my ($oldrec,$msg)=$self->getOnlyFirst(qw(ALL));
+         if (defined($oldrec)){
+            $self->ValidatedUpdateRecord($oldrec,$statrec,$flt);
+         }
+         else{
+            $self->ValidatedInsertRecord($statrec);
+         }
       }
    }
    delete($self->{stats});
-   return(1);
 }
+
 
 sub processRecord
 {
@@ -343,6 +442,9 @@ sub storeStatVar
             if ($key ne "" && !defined($isAlreadyCounted{$key})){
                if (defined($nameid) && $level==0){
                   $self->{stats}->{$group}->{$key}->{nameid}=$nameid;
+               }
+               if (lc($method) eq "set"){
+                  $self->{stats}->{$group}->{$key}->{$var}=$val[0];
                }
                if (lc($method) eq "count"){
                   $self->{stats}->{$group}->{$key}->{$var}+=$val[0];

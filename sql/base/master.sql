@@ -167,7 +167,7 @@ create table w5statmaster (
   statgroup  varchar(40)  NOT NULL,
   name       varchar(128) NOT NULL,
   monthkwday char(8)      NOT NULL,
-  statval    text,
+  statname   varchar(128) NOT NULL,statval    text,
   editor     varchar(100) NOT NULL default '',
   realeditor varchar(100) NOT NULL default '',
   modifydate datetime NOT NULL default '0000-00-00 00:00:00',
@@ -178,5 +178,5 @@ create table w5statmaster (
   srcid      varchar(20) default NULL,
   srcload    datetime    default NULL,
   PRIMARY KEY  (id),UNIQUE KEY `srcsys` (srcsys,srcid),key srcload(srcload),
-  UNIQUE userid(monthkwday,name,statgroup),key name (statgroup,name)
+  UNIQUE statkey(monthkwday,name,statgroup,statname),key name (statgroup,name)
 );

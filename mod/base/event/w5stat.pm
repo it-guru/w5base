@@ -67,9 +67,16 @@ sub w5stat
    foreach my $dstrange (@dstrange){
       $stat->recreateStats("w5stat",$module,$dstrange);
    }
+   $stat->loadLateModifies(\@dstrange);
 
    return({exitcode=>0});
 }
+
+
+
+
+
+
 
 sub w5statsend
 {
