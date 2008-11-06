@@ -51,6 +51,7 @@ sub FormatedDetail
          $d=$fromquery;
       }
       my $orgd=$d;
+      $orgd=~s/&/&amp;/g;
       $d="";
       $d.="<table border=0 style=\"width:100%;table-layout:fixed;".
           "padding:0;border-width:0;margin:0\">".
@@ -63,7 +64,8 @@ sub FormatedDetail
 </script>
 <script language=JavaScript>
 tinyMCE.init({
-	mode : "textareas",
+	mode : "exact",
+        elements : "Formated_$name",
         theme : "advanced",
         plugins: "clearbr",
         theme_advanced_buttons1 : "separator,"+
