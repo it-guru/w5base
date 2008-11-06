@@ -312,7 +312,7 @@ sub EditProcessor
    }
    return() if (Query->Param("DO") ne "");
    print <<EOF;
-<iframe src=Welcome style="width:100%;height:25px;overflow:hidden;border-style:none;padding:0;margin:0" 
+<iframe src=Empty style="width:100%;height:25px;overflow:hidden;border-style:none;padding:0;margin:0" 
         name=DO scrolling="no" frameborder="0"></iframe>
 EOF
    print("</div>");
