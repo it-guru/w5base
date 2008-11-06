@@ -179,7 +179,18 @@ sub generateWorkspace
 </tr>
 <tr>
 <td class=fname width=20%>$l1:</td>
-<td class=finput>${e} min</td>
+<td class=finput>${e} min
+<input type=button value="1,0h" onclick="seteffort(60);" style="width:35px">
+<input type=button value="1,5h" onclick="seteffort(90);" style="width:35px">
+<input type=button value="2,0h" onclick="seteffort(120);" style="width:35px">
+<input type=button value="2,5h" onclick="seteffort(150);" style="width:35px">
+<input type=button value="3h" onclick="seteffort(180);" style="width:25px">
+<input type=button value="4h" onclick="seteffort(240);" style="width:25px">
+<input type=button value="5h" onclick="seteffort(300);" style="width:25px">
+<input type=button value="6h" onclick="seteffort(360);" style="width:25px">
+<input type=button value="7h" onclick="seteffort(420);" style="width:25px">
+<input type=button value="8h" onclick="seteffort(480);" style="width:25px">
+</td>
 </tr>
 <tr>
 <td class=fname width=20%>%affectedapplication(label)%:</td>
@@ -191,6 +202,20 @@ $m1
 </tr>
 </table>
 <script language="JavaScript">
+function seteffort(min)
+{
+   var o=document.forms[0].elements["Formated_effort"];
+   if (o){
+      for(i=0;i<o.options.length;i++){
+         if (o.options[i].value==min){
+            o.options[i].selected=true;
+         }
+         else{
+            o.options[i].selected=false;
+         }
+      }
+   }
+}
 setFocus("Formated_fwdtargetname");
 setEnterSubmit(document.forms[0],"NextStep");
 </script>

@@ -94,7 +94,6 @@
 			};
 
 			// example: [b] to <strong>
-                        alert("fifi");
                         rep(/&lt;/gi,"&amp;lt;");
                         rep(/&gt;/gi,"&amp;gt;");
 			rep(/\n/gi,"<br />");
