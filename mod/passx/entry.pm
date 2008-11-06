@@ -83,6 +83,11 @@ sub new
                 dataobjattr   =>'passxentry.scriptkey'),
 
       new kernel::Field::Text(
+                name        =>'quickpath',
+                label       =>'Quick-Path',
+                dataobjattr =>'passxentry.quickpath'),
+
+      new kernel::Field::Text(
                 name        =>'comments',
                 label       =>'Comments',
                 dataobjattr =>'passxentry.comments'),
@@ -308,6 +313,8 @@ sub Validate
       }
       $newrec->{name}=$name;
    }
+   my $quickpath=trim(effVal($oldrec,$newrec,"quickpath"));
+   $newrec->{quickpath}=$quickpath if (exists($newrec->{quickpath}));
    #if ($entrytype==1){
    #   my $sys=$self->getPersistentModuleObject("itil::system");
    #   my $ok=0;

@@ -84,3 +84,4 @@ CREATE TABLE passxlog (
 alter table passxacl add comments   longtext;
 alter table passxacl add expiration datetime;
 alter table passxacl add alertstate varchar(10);
+alter table passxentry add quickpath varchar(128),add key(quickpath);

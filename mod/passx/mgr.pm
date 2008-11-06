@@ -23,7 +23,7 @@ use kernel::App::Web;
 use kernel::App::Web::Listedit;
 use kernel::DataObj::DB;
 use kernel::Field;
-use Data::Dumper;
+use kernel::MenuTree;
 use kernel::TabSelector;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::TabSelector);
 
@@ -626,47 +626,106 @@ sub pstore
 {
    my $self=shift;
    my $PasswordFolders=$self->T("Password folders");
+   my $flt=Query->Param("filter");
+   my $curpath=Query->Param("curpath");
 
    my $d=<<EOF;
+<input type=hidden name=curpath>
 <link rel=stylesheet type="text/css" href="../../../public/passx/load/passx.css"></link>
+<link rel=stylesheet type="text/css" href="../../../public/base/load/menu.css"></link>
 <table width=100% height=100% 
        cellspacing=0 cellpadding=5 border=0 style="table-layout:fixed">
 <tr>
-<td width=30% valign=bottom><b>$PasswordFolders:</b><br>
-<div id=sl style="width:100%;height:200px;overflow:auto;border-width:1px;border-style:solid">
+<td width=30% valign=bottom>
+<table width=100% border=0>
+<tr>
+<td><b>$PasswordFolders:</b></td><td><input type=text name=filter value="$flt" size=13></td><td><input type=submit name=go value="GO"></td></tr></table>
+<div id=sl style="width:100%;height:220px;overflow:auto;border-width:1px;border-style:solid">
 EOF
 
    my $ent=$self->getPersistentModuleObject("passx::entry");
    $ent->FrontendSetFilter();
-   $ent->SetCurrentView(qw(name entrytype account id));
+   $ent->SetCurrentView(qw(quickpath name entrytype account id));
+   if ($flt ne ""){
+      $ent->SecureSetFilter([{name=>"*$flt*"},{account=>"*$flt*"}]);
+   }
    my ($rec,$msg)=$ent->getFirst();
+   my $simplem;
+   my @ml;
+   my $mid=1;
+   my %padd;
+   my $targetml=\@ml;
    if (defined($rec)){
-      $d.="<table width=100%>";
+      $simplem.="<table width=100%>";
       my $line=1;
       do{
-        my $lineclass="line$line";
-        my $dispname=$rec->{name};
-        if (length($dispname)>20){
-           $dispname=substr($dispname,0,15)."...".
-                     substr($dispname,length($dispname)-5,5);
+        my $onclick="showCryptoOut($rec->{id})";
+        if ($rec->{quickpath} ne "" && $flt eq ""){
+           foreach my $subquickpath (split(/;/,$rec->{quickpath})){
+              my @quickpath=split(/\./,$subquickpath);
+              my @curpath=split(/\./,$curpath);
+              my $pathdepth=$#curpath+1;
+              for(my $chkpathdepth=0;$chkpathdepth<=$pathdepth;$chkpathdepth++){
+                 if ($chkpathdepth<$#quickpath+1){
+                    my $chkpath=join(".",@quickpath[0..$chkpathdepth]);
+                    if (!defined($padd{$chkpath})){
+                       $targetml=\@ml if ($chkpathdepth==0);
+                       if ($chkpathdepth==0 ||
+                           join(".",@quickpath[0..$chkpathdepth-1]) eq
+                           join(".",@curpath[0..$chkpathdepth-1])){
+                          my %mrec;
+                          $mrec{tree}=[];
+                          $mrec{label}=$quickpath[$chkpathdepth];
+                          $mrec{href}="javascript:setCurPath(\"$chkpath\")";
+                          $mrec{menuid}=$mid++;
+                          push(@$targetml,\%mrec);
+                          $padd{$chkpath}=\%mrec;
+                       }
+                    }
+                    $targetml=$padd{$chkpath}->{tree};
+                 }
+              }
+              if (join(".",@curpath) eq join(".",@quickpath)){
+                 my %mrec;
+                 $mrec{label}=$rec->{account}.'@'.$rec->{name};
+                 $mrec{menuid}=$rec->{id};
+                 $mrec{parent}=$padd{join(".",@quickpath)};
+                 $mrec{href}="javascript:$onclick";
+                 push(@$targetml,\%mrec);
+              }
+           }
         }
-        $d.="<tr class=$lineclass ".
-            "onMouseOver=\"this.className='linehighlight'\" ".
-            "onMouseOut=\"this.className='$lineclass'\">\n";
-        my $onclick="onClick=\"showCryptoOut($rec->{id})\"";
-        $d.="<td $onclick width=1%>".
-            "<img src=\"../../../public/passx/load/".
-            "actype.$rec->{entrytype}.gif\"></td>";
-        $d.="<td $onclick>$dispname</td>";
-        $d.="<td $onclick>$rec->{account}</td>";
-        $d.="</td>";
-        $d.="</tr>";
-        $line++;
-        $line=1 if ($line>2);
+        if ($rec->{quickpath} eq "" || $flt ne ""){
+           my $lineclass="line$line";
+           my $dispname=$rec->{name};
+           if (length($dispname)>20){
+              $dispname=substr($dispname,0,15)."...".
+                        substr($dispname,length($dispname)-5,5);
+           }
+           $simplem.="<tr class=$lineclass ".
+               "onMouseOver=\"this.className='linehighlight'\" ".
+               "onMouseOut=\"this.className='$lineclass'\">\n";
+           $simplem.="<td onClick=\"$onclick\" width=1%>".
+               "<img src=\"../../../public/passx/load/".
+               "actype.$rec->{entrytype}.gif\"></td>";
+           $simplem.="<td $onclick>$dispname</td>";
+           $simplem.="<td $onclick>$rec->{account}</td>";
+           $simplem.="</td>";
+           $simplem.="</tr>";
+           $line++;
+           $line=1 if ($line>2);
+        }
         ($rec,$msg)=$ent->getNext();
       } until(!defined($rec));
-      $d.="</table>";
+      $simplem.="</table>";
    }
+   if ($#ml!=-1){
+      $d.=kernel::MenuTree::BuildHtmlTree(tree=>\@ml, 
+                                          hrefclass=>'menulink',
+                                          rootpath=>'./',
+                                         );
+   }
+   $d.=$simplem;
    my $detailx=$ent->DetailX();
    my $detaily=$ent->DetailY();
    my $newlabel=$self->T("Create new Distribution entry");
@@ -710,6 +769,15 @@ sl.style.height=h-60;
 function showCryptoOut(id)
 {
    window.frames['CryptoOut'].document.location.href="CryptoOut?id="+id;
+}
+function setCurPath(p)
+{
+   e=document.forms[0].elements['curpath'];
+   if (e){
+      e.value=p;
+      document.forms[0].submit();
+   }
+
 }
 </script>
 EOF
