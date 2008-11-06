@@ -153,7 +153,12 @@ sub generateWorkspace
    for(my $ef=5;$ef<=480;$ef+=5){
       $e.="<option value=\"$ef\"";
       $e.=" selected" if ($ef==$oldval);
-      $e.=">$ef</option>";
+      my $hnum=$ef/60.0;
+      my $h="";
+      if ($hnum==int($hnum)){
+         $h=" = ${hnum}h";
+      }
+      $e.=">$ef$h</option>";
 
    }
    $e.="</select>";
