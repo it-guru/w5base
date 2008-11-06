@@ -647,7 +647,33 @@ EOF
    $ent->FrontendSetFilter();
    $ent->SetCurrentView(qw(quickpath name entrytype account id));
    if ($flt ne ""){
-      $ent->SecureSetFilter([{name=>"*$flt*"},{account=>"*$flt*"}]);
+      my $userid=$self->getCurrentUserId();
+      my %groups=$self->getGroupsOf($ENV{REMOTE_USER},'RMember','both');
+      $ent->SecureSetFilter([{modifyuser=>\$userid,
+                              name=>"*$flt*"},
+                             {modifyuser=>\$userid,
+                              account=>"*$flt*"},
+                             {aclmode=>['write','read'],
+                              acltarget=>\'base::user',
+                              acltargetid=>[$userid],
+                              entrytypeid=>'<=10',
+                              name=>"*$flt*"},
+                             {aclmode=>['write','read'],
+                              acltarget=>\'base::user',
+                              acltargetid=>[$userid],
+                              entrytypeid=>'<=10',
+                              account=>"*$flt*"},
+                             {aclmode=>['write','read'],
+                              acltarget=>\'base::grp',
+                              acltargetid=>[keys(%groups)],
+                              entrytypeid=>'<=10',
+                              name=>"$flt*"},
+                             {aclmode=>['write','read'],
+                              acltarget=>\'base::grp',
+                              acltargetid=>[keys(%groups)],
+                              entrytypeid=>'<=10',
+                              account=>"*$flt*"},
+                             ]);
    }
    my ($rec,$msg)=$ent->getFirst();
    my $simplem;
