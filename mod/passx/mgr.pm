@@ -327,11 +327,11 @@ sub CryptoOut
          print("<table width=100% border=1>");
          my $comments=$erec->{comments};
          $comments=" ($comments)" if (!($comments=~m/^\s*$/));
-         print("<tr><td nowrap width=1%>Systemname</td>".
+         print("<tr><td nowrap width=1% valign=top>Systemname</td>".
                "<td>$erec->{name}$comments</td></tr>");
          my $detailx=$ent->DetailX();
          my $detaily=$ent->DetailY();
-         print("<tr><td nowrap>Account</td><td>".
+         print("<tr><td nowrap valign=top>Account</td><td>".
                "<a class=entrylink ".
                "href=JavaScript:openwin(\"../entry/Detail?id=$id\",".
                "\"_blank\",\"height=$detaily,width=$detailx,toolbar=no,".
@@ -413,8 +413,10 @@ function do_unecryptkeys(key)
 }
 function rsaunecrypt()
 {
-  document.forms[0].unencryptdata.value = "*** unencrypt start ... ***";
-  window.setTimeout("Background_rsaunecrypt()", 10);
+  if (document.forms[0].cryptdata.value!=""){
+     document.forms[0].unencryptdata.value = "*** unencrypt start ... ***";
+     window.setTimeout("Background_rsaunecrypt()", 10);
+  }
 }
 
 function Background_rsaunecrypt()
