@@ -57,9 +57,13 @@ sub qcheckRecord
       foreach my $fld (qw(office_phone office_street office_zipcode 
                           office_location office_mobile
                           office_facsimile)){
+          my $wiwdata={$fld=>$wiwrec->{$fld}};
+          if (ref($wiwdata->{$fld}) eq "ARRAY"){
+             $wiwdata->{$fld}=$wiwdata->{$fld}->[0];
+          }
           $self->IfaceCompare($dataobj,
                      $rec,$fld,
-                     $wiwrec,$fld,
+                     $wiwdata,$fld,
                      $forcedupd,$wfrequest,
                      \@qmsg,\@dataissue,\$errorlevel,
                      mode=>'string');
