@@ -197,7 +197,7 @@ sub isViewValid
 sub getValidWebFunctions
 {
    my $self=shift;
-   return("UserFrontend","Workspace","CryptoOut","KeyStore",
+   return("UserFrontend","Workspace","CryptoOut","KeyStore","helptmpl",
           $self->SUPER::getValidWebFunctions());
 }
 
@@ -607,9 +607,20 @@ sub help
    my $d=<<EOF;
 <iframe frameborder=0 style="border-style:none;padding:0px;
                             margin:0px;width:100%;height:100%" 
-                            src="../../../static/passx/index.html">
+                            src="helptmpl">
 </iframe>
 EOF
+}
+
+sub helptmpl
+{
+   my $self=shift;
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css'],
+                           );
+
+   print $self->getParsedTemplate("tmpl/help.html",{});
+   print $self->HtmlBottom();
 }
 
 sub keydist
