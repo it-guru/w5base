@@ -217,6 +217,19 @@ sub new
    return($self);
 }
 
+sub InitRequest
+{
+   my $self=shift;
+   my $bk=$self->SUPER::InitRequest(@_);
+
+   if ($ENV{REMOTE_USER} eq "" || $ENV{REMOTE_USER} eq "anonymous"){
+      print($self->noAccess());
+      return(undef);
+   }
+   return($bk);
+}
+
+
 sub DirectLink
 {
    my $self=shift;

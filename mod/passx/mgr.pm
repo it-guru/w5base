@@ -161,6 +161,18 @@ sub Initialize
    return($self->SUPER::Initialize());
 }
 
+sub InitRequest
+{
+   my $self=shift;
+   my $bk=$self->SUPER::InitRequest(@_);
+
+   if ($ENV{REMOTE_USER} eq "" || $ENV{REMOTE_USER} eq "anonymous"){
+      print($self->noAccess());
+      return(undef);
+   }
+   return($bk);
+}
+
 
 sub Validate
 {
@@ -324,14 +336,14 @@ sub CryptoOut
                                                  $erec->{name}.' read',
                                            entryid=>$id});
          print("<div class=passxinfo>");
-         print("<table width=100% border=1>");
+         print("<table width=100% border=0>");
          my $comments=$erec->{comments};
          $comments=" ($comments)" if (!($comments=~m/^\s*$/));
-         print("<tr><td nowrap width=1% valign=top>Systemname</td>".
+         print("<tr><td nowrap width=1% valign=top>Systemname:</td>".
                "<td>$erec->{name}$comments</td></tr>");
          my $detailx=$ent->DetailX();
          my $detaily=$ent->DetailY();
-         print("<tr><td nowrap valign=top>Account</td><td>".
+         print("<tr><td nowrap valign=top>Account:</td><td>".
                "<a class=entrylink ".
                "href=JavaScript:openwin(\"../entry/Detail?id=$id\",".
                "\"_blank\",\"height=$detaily,width=$detailx,toolbar=no,".
@@ -342,7 +354,7 @@ sub CryptoOut
          my ($fdate)=$df->getFrontendTimeString("HtmlDetail", $rec->{mdate});
          my $u=$rec->{realeditor}; 
          $u=" ; $u" if ($u ne "");
-         print("<tr><td nowrap>$LastUpdate</td><td>$fdate$u</td></tr>");
+         print("<tr><td nowrap>$LastUpdate:</td><td>$fdate$u</td></tr>");
          print("</table>");
          print("</div>");
          my $cryptdata="<center>- No crypted informations stored -</center>";
@@ -744,8 +756,8 @@ EOF
            $simplem.="<td onClick=\"$onclick\" width=1%>".
                "<img src=\"../../../public/passx/load/".
                "actype.$rec->{entrytype}.gif\"></td>";
-           $simplem.="<td $onclick>$dispname</td>";
-           $simplem.="<td $onclick>$rec->{account}</td>";
+           $simplem.="<td onClick=\"$onclick\">$dispname</td>";
+           $simplem.="<td onClick=\"$onclick\">$rec->{account}</td>";
            $simplem.="</td>";
            $simplem.="</tr>";
            $line++;
