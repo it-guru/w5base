@@ -1,4 +1,6 @@
+<html class=docu>
 <body class=docu>
+<link rel=stylesheet type="text/css" href="../../../public/base/load/default.css"></link>
 <link rel=stylesheet type="text/css" href="../../../public/passx/load/passx.css"></link>
 <link rel=stylesheet type="text/css" href="../../../public/passx/load/style.css"></link>
 
@@ -113,7 +115,7 @@ ein zus&auml;tzlicher angenehmer Nebeneffekt.
 <td colspan=2>
 <b>Downloads:</b><br>
 <ul>
-<li><a href="../../public/passx/io/ChangePassword">PassX Commandline-Client</a>
+<li><a href="../../../public/passx/io/ChangePassword">PassX Commandline-Client</a>
 </ul>
 </td>
 </tr>
@@ -129,8 +131,26 @@ erzeugen, dass das Script zu lange läuft.<br>
 <br>
 
 
+<u>Per Commandline Passworte ändern und in PassX abspeichern</u><br>
+Mit dem Commandline Tool "ChangePassword" können (aktuell nur auf Unix-Systemen) Passworte geändert und zum PassX Server übertagen werden. "ChangePassword" kennt div. Optionen, die mit "ChangePassword --help" abrufbar sind. Die einfachste Variaten ist z.B. das zyklische Ändern des root Passwortes mit folgendem cron Eintrag:<br>
+10 * * * * /usr/local/bin/ChangePassword --base http://mypassxserver/w5base/public/<br>
+Die grunsätzliche Arbeitsweise von ChangePassword läuft dann wie folgt ab:
+<ul>
+<li>Es werden die Public-Keys der User vom PassX Server angefordert, die lesenden Zugang auf die jeweilige Kennung (in diesem Fall root) erhalten sollen.
+<li>Es wird ein zufälliges Passwort generiert.
+<li>Das Passwort wird in die /etc/passwd bzw. /etc/shadow eingetragen
+<li>Für die Lister der Public-Keys wird das Passwort mittels OpenSSL verschlüsselt und in verschlüsselter Form an den PassX Server übermittelt (Web-Request).
+</ul>
+Da ChangePassword auch die Möglichkeit alternativer PasswordChanger bietet, kann z.B. auch das Passwort in einer Anwendung geändert werden. Aktuell stehen folgende PasswordChanger zur Verfügung: 010Shadow, 020Passwd, oracle und storeonly<br>
+<br>
+
 <u>Mit ChangePassword Passworte ändern, die als Privat gekennzeichnet sind</u><br>
 Beim Kommando ChangePassword die Option --entrytypeid 11 mitgeben!<br>
+<br>
+
+<u>Wie kann ich eine Liste von Passworten per Script in PassX laden?</u><br>
+Dies ist nicht über den Web-Browser möglich, da der Upload von Listen über Excel erfoglt, und Excel die Daten nicht verschlüsseln kann. Es ist aber möglich, diese Listen mit dem ChangePassword Tool in PassX zu laden. z.B.:<br>
+ChangePassword --changer storeonly --host myhost --user root --base http://myw5baseserver/w5base/public/ --pass 1234<br>
 <br>
 
 
@@ -142,3 +162,4 @@ Beim Kommando ChangePassword die Option --entrytypeid 11 mitgeben!<br>
 
 </table>
 </body>
+</html>

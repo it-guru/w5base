@@ -616,11 +616,8 @@ sub helptmpl
 {
    my $self=shift;
    print $self->HttpHeader("text/html");
-   print $self->HtmlHeader(style=>['default.css'],
-                           );
 
    print $self->getParsedTemplate("tmpl/help.html",{});
-   print $self->HtmlBottom();
 }
 
 sub keydist
