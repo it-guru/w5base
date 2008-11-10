@@ -59,7 +59,7 @@ sub PutOQB
                           additional.ServiceCenterCreator));
 
    my (%fh,%filename);
-   my $ftp=new kernel::FTP($self,"tsacftp");
+   my $ftp=new kernel::FTP($self,"oqbftp");
    if (defined($ftp)){
       if (!($ftp->Connect())){
          return({exitcode=>1,msg=>msg(ERROR,"can't connect to ftp server ".
@@ -135,11 +135,11 @@ sub TransferFile
    }
    if ($ftp->Connect()){
       msg(INFO,"Connect to FTP Server OK");
-      my $jobname="w5base.".$self->{jobstart}.".xml";
-      my $jobfile="$object/$jobname";
+      my $jobname="DARWIN.".$self->{jobstart}.".xml";
+      my $jobfile="$jobname";
       msg(INFO,"Processing  job : '%s'",$jobfile);
       msg(INFO,"Processing  file: '%s'",$filename);
-      if (0){
+      if (1){
          if (!$ftp->Put($filename,$jobfile)){
             msg(ERROR,"File $filename to $jobfile could not be transfered");
          }

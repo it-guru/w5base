@@ -50,6 +50,7 @@ sub new
                 label         =>'account type',
                 transprefix   =>'actype.',
                 value         =>['1',
+                                 '5',
                                  '4',
                                  '2',
                                  '3',
@@ -227,6 +228,129 @@ sub InitRequest
       return(undef);
    }
    return($bk);
+}
+
+sub generateMenuTree
+{
+   my $self=shift;
+   my $mode=shift;
+   my $userid=shift;
+   my $flt=shift;
+   my $curpath=shift;
+   my $d;
+
+   $self->ResetFilter();
+   if ($flt ne ""){
+      my %groups=$self->getGroupsOf($userid,'RMember','both');
+      $self->SecureSetFilter([{modifyuser=>\$userid,
+                              name=>"*$flt*"},
+                             {modifyuser=>\$userid,
+                              account=>"*$flt*"},
+                             {aclmode=>['write','read'],
+                              acltarget=>\'base::user',
+                              acltargetid=>[$userid],
+                              entrytypeid=>'<=10',
+                              name=>"*$flt*"},
+                             {aclmode=>['write','read'],
+                              acltarget=>\'base::user',
+                              acltargetid=>[$userid],
+                              entrytypeid=>'<=10',
+                              account=>"*$flt*"},
+                             {aclmode=>['write','read'],
+                              acltarget=>\'base::grp',
+                              acltargetid=>[keys(%groups)],
+                              entrytypeid=>'<=10',
+                              name=>"$flt*"},
+                             {aclmode=>['write','read'],
+                              acltarget=>\'base::grp',
+                              acltargetid=>[keys(%groups)],
+                              entrytypeid=>'<=10',
+                              account=>"*$flt*"},
+                             ]);
+   }
+   else{
+      $self->FrontendSetFilter();
+   }
+   $self->SetCurrentView(qw(quickpath name entrytype account id));
+   my ($rec,$msg)=$self->getFirst();
+   my $simplem;
+   my @ml;
+   my $mid=1;
+   my %padd;
+   my $targetml=\@ml;
+   if (defined($rec)){
+      $simplem.="<table width=100%>";
+      my $line=1;
+      do{
+        my $onclick="showCryptoOut($rec->{id})";
+        if ($rec->{quickpath} ne "" && $flt eq ""){
+           foreach my $subquickpath (split(/;/,$rec->{quickpath})){
+              my @quickpath=split(/\./,$subquickpath);
+              my @curpath=split(/\./,$curpath);
+              my $pathdepth=$#curpath+1;
+              for(my $chkpathdepth=0;$chkpathdepth<=$pathdepth;$chkpathdepth++){
+                 if ($chkpathdepth<$#quickpath+1){
+                    my $chkpath=join(".",@quickpath[0..$chkpathdepth]);
+                    if (!defined($padd{$chkpath})){
+                       $targetml=\@ml if ($chkpathdepth==0);
+                       if ($chkpathdepth==0 ||
+                           join(".",@quickpath[0..$chkpathdepth-1]) eq
+                           join(".",@curpath[0..$chkpathdepth-1])){
+                          my %mrec;
+                          $mrec{tree}=[];
+                          $mrec{label}=$quickpath[$chkpathdepth];
+                          $mrec{href}="javascript:setCurPath(\"$chkpath\")";
+                          $mrec{menuid}=$mid++;
+                          push(@$targetml,\%mrec);
+                          $padd{$chkpath}=\%mrec;
+                       }
+                    }
+                    $targetml=$padd{$chkpath}->{tree};
+                 }
+              }
+              if (join(".",@curpath) eq join(".",@quickpath)){
+                 my %mrec;
+                 $mrec{label}=$rec->{account}.'@'.$rec->{name};
+                 $mrec{menuid}=$rec->{id};
+                 $mrec{parent}=$padd{join(".",@quickpath)};
+                 $mrec{href}="javascript:$onclick";
+                 push(@$targetml,\%mrec);
+              }
+           }
+        }
+        if ($rec->{quickpath} eq "" || $flt ne ""){
+           my $lineclass="line$line";
+           my $dispname=$rec->{name};
+           if (length($dispname)>20){
+              $dispname=substr($dispname,0,15)."...".
+                        substr($dispname,length($dispname)-5,5);
+           }
+           $simplem.="<tr class=$lineclass ".
+               "onMouseOver=\"this.className='linehighlight'\" ".
+               "onMouseOut=\"this.className='$lineclass'\">\n";
+           $simplem.="<td onClick=\"$onclick\" width=1%>".
+               "<img src=\"../../../public/passx/load/".
+               "actype.$rec->{entrytype}.gif\"></td>";
+           $simplem.="<td onClick=\"$onclick\">$dispname</td>";
+           $simplem.="<td onClick=\"$onclick\">$rec->{account}</td>";
+           $simplem.="</td>";
+           $simplem.="</tr>";
+           $line++;
+           $line=1 if ($line>2);
+        }
+        ($rec,$msg)=$self->getNext();
+      } until(!defined($rec));
+      $simplem.="</table>";
+   }
+   if ($#ml!=-1){
+      $d.=kernel::MenuTree::BuildHtmlTree(tree=>\@ml, 
+                                          hrefclass=>'menulink',
+                                          rootpath=>'./',
+                                         );
+   }
+   $d.=$simplem;
+
+   return($d);
 }
 
 

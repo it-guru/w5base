@@ -36,7 +36,20 @@ sub new
 sub getValidWebFunctions
 {
    my ($self)=@_;
-   return(qw(GetPublicKeys SendCryptedData ChangePassword));
+   return(qw(GetPublicKeys SendCryptedData ChangePassword fvwmmenu));
+}
+
+sub fvwmmenu
+{
+   my $self=shift;
+   my ($func,$p)=$self->extractFunctionPath();
+
+   $p=~s/\///g; 
+   my $userid;
+   print $self->HttpHeader("text/plain");
+   my $ent=$self->getPersistentModuleObject("passx::entry");
+   print $ent->generateMenuTree("fvwm",$userid,"","");
+
 }
 
 sub LoadTarget
@@ -127,13 +140,7 @@ sub GetPublicKeys
       printf("-----END PUBLIC KEY-----\n");
 
    }
-
-
-
-
    printf("OK\n");
-
-
 }
 
 
