@@ -379,7 +379,7 @@ sub generateMenuTree
          $d=hash2xml({menu=>{entry=>\@ml}},{header=>1});
       }
       if ($mode eq "fvwm" || $mode eq "dynfvwm"){
-         my $mainmenu={FvwmLoginMenu=>{label=>'System Login',
+         my $mainmenu={W5BaseFvwmLoginMenu=>{label=>'System Login',
                        cmdentrys=>[],mentrys=>[]}};
 
          sub processEntry
@@ -400,7 +400,7 @@ sub generateMenuTree
                   }
                }
                else{
-                  my $mkey='FvwmLoginMenu'.$m->{menuid};
+                  my $mkey='W5BaseFvwmLoginMenu'.$m->{menuid};
                   push(@{$targetm->{mentrys}},
                        {label=>$m->{label},
                         cmd=>"Popup ".$mkey});
@@ -412,7 +412,7 @@ sub generateMenuTree
                }
             }
          }
-         processEntry(\@ml,$mainmenu,$mainmenu->{FvwmLoginMenu});
+         processEntry(\@ml,$mainmenu,$mainmenu->{W5BaseFvwmLoginMenu});
          foreach my $mkey (keys(%$mainmenu)){
             $d.="AddToMenu $mkey ".
                 "\"$mainmenu->{$mkey}->{label}\" Title\n";
@@ -423,9 +423,12 @@ sub generateMenuTree
                $d.="+ \"$entry->{label}\" $entry->{cmd}\n";
             }
             $d.="\n\n\n";
-            $d.="AddToFunc ResetFvwmLoginMenu  ".
+            $d.="AddToFunc ResetW5BaseFvwmLoginMenu  ".
                 "I DestroyMenu recreate $mkey\n\n";
          }
+         $d.="AddToMenu W5BaseFvwmLoginMenu \"\"      Nop\n";
+         $d.="AddToMenu W5BaseFvwmLoginMenu \"Reload Menu\" ".
+             "recreateW5BaseFvwmLoginMenu\n";
          #$d=Dumper($mainmenu);
 
 
