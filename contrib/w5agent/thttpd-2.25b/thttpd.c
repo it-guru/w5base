@@ -53,6 +53,8 @@
 #include <time.h>
 #endif
 #include <unistd.h>
+#include <sys/ipc.h> 
+#include <sys/shm.h>
 
 #include "fdwatch.h"
 #include "libhttpd.h"
@@ -94,7 +96,7 @@ static int max_age;
 static unsigned long request_num=0;
 static int   w5agentpid;
 static char* w5agentpl;
-static char* w5agentcfg;
+static char* w5cfg;
 
 
 
@@ -381,6 +383,8 @@ main( int argc, char** argv )
     size_t slen;
     int    w5agentexitcode;
     char   w5libpath[MAXPATHLEN+1];
+    int    w5cnfshmid;
+    struct shmid_ds w5ipcbuf;
 
 
     argv0 = argv[0];
@@ -392,6 +396,22 @@ main( int argc, char** argv )
     else
 	cp = argv0;
     openlog( cp, LOG_NDELAY|LOG_PID, LOG_FACILITY );
+
+    if (w5cnfshmid=shmget(IPC_PRIVATE,4096,IPC_CREAT)==-1){
+       syslog( LOG_ERR, "shmget - %m" );
+       exit( 1 );
+    }
+fprintf(stderr,"fifi ipcid=%d\n",w5cnfshmid);
+    if (w5cfg=(char *)shmat(w5cnfshmid,NULL,0)){
+fprintf(stderr,"fifi w5cfg=%ld\n",w5cfg);
+//       shmctl(w5cnfshmid,IPC_RMID,&w5ipcbuf);
+    }
+    else{
+       syslog( LOG_ERR, "shmat - %m" );
+       exit( 1 );
+    }
+    
+    
 
     /* Handle command-line arguments. */
     parse_args( argc, argv );
@@ -644,25 +664,40 @@ main( int argc, char** argv )
     }
     httpd_realloc_str( &w5agentpl, &slen, slen+strlen(W5AGENTPL) );
     (void) strcpy(&w5agentpl[strlen(w5agentpl)],W5AGENTPL);
-
-    if (w5agentcfg){
-       if (access(w5agentcfg,R_OK|F_OK)){
-          syslog( LOG_ERR, "can not access w5agentcfg '%s'",w5agentcfg);
-          exit(-1);
-       }
-    }
+    
 
 
     /* start w5agent.pl  */
     switch ( w5agentpid=fork() )
         {
         case 0:
-                if (w5agentcfg){
-                   setenv("W5AGENTCFG",w5agentcfg,1);
-                }
         	syslog( LOG_INFO, "initialize %s",w5agentpl);
                 setenv("PERL5LIB",w5libpath,1);
+                if (getuid()==0){
+        	   syslog( LOG_INFO, "try to set uid=%d on w5agent.pl",uid);
+                   /* Set aux groups to null. */
+                   if (setgroups( 0, (const gid_t*) 0 ) < 0 ){
+                       syslog( LOG_CRIT, "setgroups - %m" );
+                       exit( 1 );
+                   }
+                   /* Set primary group. */
+                   if (setgid(gid) < 0){
+                       syslog( LOG_CRIT, "setgid - %m" );
+                       exit( 1 );
+                   }
+                   /* Try setting aux groups correctly  */
+                   /* - not critical if this fails. */
+                   if ( initgroups( user, gid ) < 0 )
+                       syslog( LOG_WARNING, "initgroups - %m" );
+                   /* Set uid. */
+                   if ( setuid( uid ) < 0 ){
+                       syslog( LOG_CRIT, "setuid - %m" );
+                       exit( 1 );
+                   }
+                }
+                syslog( LOG_INFO, "now exec w5agent.pl");
                 execl(w5agentpl,"w5agent.pl",(char *)0);
+                syslog( LOG_CRIT, "can not exec w5agent.pl");
                 exit(-1);
         case -1:
         syslog( LOG_CRIT, "fork - %m" );
@@ -670,8 +705,9 @@ main( int argc, char** argv )
         }
     sleep(2);
     if (w5agentpid>0){
-       if (waitpid(w5agentpid,&w5agentexitcode,WNOHANG)==0){
+       if (waitpid(w5agentpid,&w5agentexitcode,WNOHANG)>0){
           syslog( LOG_ERR, "unexpected termination of w5agent.pl");
+          exit(-1);
        }
     }
     if (w5agentpid<=0 || kill(w5agentpid,0)){
@@ -950,7 +986,6 @@ parse_args( int argc, char** argv )
     throttlefile = (char*) 0;
     hostname = (char*) 0;
     logfile = (char*) 0;
-    w5agentcfg = (char*) 0;
     pidfile = (char*) 0;
     user = DEFAULT_USER;
     charset = DEFAULT_CHARSET;
@@ -1023,11 +1058,6 @@ parse_args( int argc, char** argv )
 	    ++argn;
 	    logfile = argv[argn];
 	    }
-	else if ( strcmp( argv[argn], "-w" ) == 0 && argn + 1 < argc )
-	    {
-	    ++argn;
-	    w5agentcfg = argv[argn];
-	    }
 	else if ( strcmp( argv[argn], "-v" ) == 0 )
 	    do_vhost = 1;
 	else if ( strcmp( argv[argn], "-nov" ) == 0 )
@@ -1071,7 +1101,7 @@ static void
 usage( void )
     {
     (void) fprintf( stderr,
-"usage:  %s [-C configfile] [-p port] [-d dir] [-r|-nor] [-dd data_dir] [-s|-nos] [-v|-nov] [-g|-nog] [-u user] [-c cgipat] [-t throttles] [-h host] [-l logfile] [-w w5agentcfgfile] [-i pidfile] [-T charset] [-P P3P] [-M maxage] [-V] [-D]\n",
+"usage:  %s [-C configfile] [-p port] [-d dir] [-r|-nor] [-dd data_dir] [-s|-nos] [-v|-nov] [-g|-nog] [-u user] [-c cgipat] [-t throttles] [-h host] [-l logfile] [-i pidfile] [-T charset] [-P P3P] [-M maxage] [-V] [-D]\n",
 	argv0 );
     exit( 1 );
     }
@@ -1145,6 +1175,25 @@ read_config( char* filename )
 		do_chroot = 0;
 		no_symlink_check = 0;
 		}
+	    else if ( strcasecmp( name, "w5user" ) == 0 )
+		{
+                fprintf(stderr,"w5user=%s\n",value);
+		value_required( name, value );
+		}
+	    else if ( strcasecmp( name, "w5pass" ) == 0 )
+		{
+                fprintf(stderr,"w5pass=%s\n",value);
+		value_required( name, value );
+		}
+	    else if ( strcasecmp( name, "w5server" ) == 0 )
+		{
+                fprintf(stderr,"w5server=%s\n",value);
+		value_required( name, value );
+		}
+	    else if ( strncasecmp( name, "w5",2 ) == 0 )
+		{
+		value_required( name, value );
+		}
 	    else if ( strcasecmp( name, "data_dir" ) == 0 )
 		{
 		value_required( name, value );
@@ -1214,11 +1263,6 @@ read_config( char* filename )
 		{
 		value_required( name, value );
 		logfile = e_strdup( value );
-		}
-	    else if ( strcasecmp( name, "w5agentcfg" ) == 0 )
-		{
-		value_required( name, value );
-		w5agentcfg = e_strdup( value );
 		}
 	    else if ( strcasecmp( name, "vhost" ) == 0 )
 		{

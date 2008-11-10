@@ -67,7 +67,7 @@ INSTALL =	@INSTALL@
 	@rm -f $@
 	$(CC) $(CFLAGS) -c $*.c
 
-SRC =		thttpd.c libhttpd.c fdwatch.c mmc.c timers.c match.c tdate_parse.c w5bb.c getdate.c xmalloc.c gettime.c xalloc-die.c
+SRC =		thttpd.c libhttpd.c fdwatch.c mmc.c timers.c match.c tdate_parse.c w5bb.c 
 
 OBJ =		$(SRC:.c=.o) @LIBOBJS@
 

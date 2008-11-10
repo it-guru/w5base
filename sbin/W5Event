@@ -11,7 +11,7 @@ use kernel::EventController;
 use Getopt::Long;
 use kernel::cgi;
 use vars qw($opt_v $opt_h $opt_c $configname);
-
+$0="W5Event ".join(" ",@ARGV);
 exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'debug'=>\$opt_v,
                         'help'=>\$opt_h,

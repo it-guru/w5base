@@ -398,15 +398,21 @@ EOF
    my $limitstart=$self->getParent->getParent->{_LimitStart};
    my $currentlimit=$self->getParent->getParent->{_Limit};
    my $r=$self->getParent->getParent->Rows();
-   if (defined($r) && $pagelimit>0){
-      my $totalpages=$r/$pagelimit;
+ #  if (defined($r) && $pagelimit>0){
+      my $totalpages=0;
+      if ($pagelimit>0){
+         $totalpages=$r/$pagelimit;
+      }
       $totalpages=int($totalpages)+1 if (int($totalpages)!=$totalpages);
-      my $currentpage=int($limitstart/$pagelimit);
+      my $currentpage=0;
+      if ($pagelimit>0){
+         $currentpage=int($limitstart/$pagelimit);
+      }
 
       $d.="<hr>" if ($limitreached || ($currentlimit>0 && $r>$currentlimit));
       $d.=$self->getPagingLine($pagelimit,$currentpage,$totalpages,
                                $currentlimit,$r);
-   }
+ #  }
 
 
    return($d);

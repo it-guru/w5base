@@ -9,6 +9,8 @@ use kernel::config;
 use Getopt::Long;
 use vars qw($opt_v $opt_h $opt_c $opt_n $configname);
 
+$0="W5ServerClient ".join(" ",@ARGV);
+
 exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'debug'=>\$opt_v,
                         'noconnecterror'=>\$opt_n,

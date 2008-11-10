@@ -3,6 +3,7 @@ use strict;
 use POSIX;
 use w5agent;
 
+$0="w5agent.pl";
 while(1){
     my $ppid=getppid();
     exit(-1) if ($ppid==1);
