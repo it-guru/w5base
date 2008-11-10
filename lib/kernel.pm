@@ -226,7 +226,11 @@ sub hash2xml {
                  indent($depth)."</$k>\n";
         }
         elsif (ref($request->{$k}) eq "ARRAY"){
-           $xml.=hash2xml($request->{$k},$param,$k,$depth);
+           foreach my $subrec (@{$request->{$k}}){
+              $xml.=indent($depth).
+                    "<$k>\n".hash2xml($subrec,$param,$k,$depth+1).
+                    indent($depth)."</$k>\n";
+           }
         }
         else{
            my $d=$request->{$k};

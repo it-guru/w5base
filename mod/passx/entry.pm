@@ -269,9 +269,9 @@ sub generateMenuTree
                              ]);
    }
    else{
-      $self->FrontendSetFilter();
+      $self->FrontendSetFilter($userid);
    }
-   $self->SetCurrentView(qw(quickpath name entrytype account id));
+   $self->SetCurrentView(qw(quickpath name entrytype account id comments));
    my ($rec,$msg)=$self->getFirst();
    my $simplem;
    my @ml;
@@ -293,7 +293,7 @@ sub generateMenuTree
                     my $chkpath=join(".",@quickpath[0..$chkpathdepth]);
                     if (!defined($padd{$chkpath})){
                        $targetml=\@ml if ($chkpathdepth==0);
-                       if ($chkpathdepth==0 ||
+                       if (($chkpathdepth==0 || $mode ne "web") ||
                            join(".",@quickpath[0..$chkpathdepth-1]) eq
                            join(".",@curpath[0..$chkpathdepth-1])){
                           my %mrec;
@@ -301,6 +301,9 @@ sub generateMenuTree
                           $mrec{label}=$quickpath[$chkpathdepth];
                           $mrec{href}="javascript:setCurPath(\"$chkpath\")";
                           $mrec{menuid}=$mid++;
+                          if ($mode ne "web"){
+                             delete($mrec{href});
+                          }
                           push(@$targetml,\%mrec);
                           $padd{$chkpath}=\%mrec;
                        }
@@ -308,47 +311,132 @@ sub generateMenuTree
                     $targetml=$padd{$chkpath}->{tree};
                  }
               }
-              if (join(".",@curpath) eq join(".",@quickpath)){
+              if (($mode ne "web" && $rec->{entrytype}<=10) || 
+                  join(".",@curpath) eq join(".",@quickpath)){
                  my %mrec;
                  $mrec{label}=$rec->{account}.'@'.$rec->{name};
                  $mrec{menuid}=$rec->{id};
-                 $mrec{parent}=$padd{join(".",@quickpath)};
+                 $mrec{entrytype}=$rec->{entrytype};
+                 $mrec{name}=$rec->{name};
+                 $mrec{account}=$rec->{account};
+                 $mrec{comments}=$rec->{comments};
+                 if ($mode eq "web"){
+                    $mrec{parent}=$padd{join(".",@quickpath)};
+                 }
                  $mrec{href}="javascript:$onclick";
+                 if ($mode ne "web"){
+                    delete($mrec{href});
+                 }
                  push(@$targetml,\%mrec);
               }
            }
         }
         if ($rec->{quickpath} eq "" || $flt ne ""){
-           my $lineclass="line$line";
-           my $dispname=$rec->{name};
-           if (length($dispname)>20){
-              $dispname=substr($dispname,0,15)."...".
-                        substr($dispname,length($dispname)-5,5);
+           if ($mode eq "web"){
+              my $lineclass="line$line";
+              my $dispname=$rec->{name};
+              if (length($dispname)>20){
+                 $dispname=substr($dispname,0,15)."...".
+                           substr($dispname,length($dispname)-5,5);
+              }
+              $simplem.="<tr class=$lineclass ".
+                  "onMouseOver=\"this.className='linehighlight'\" ".
+                  "onMouseOut=\"this.className='$lineclass'\">\n";
+              $simplem.="<td onClick=\"$onclick\" width=1%>".
+                  "<img src=\"../../../public/passx/load/".
+                  "actype.$rec->{entrytype}.gif\"></td>";
+              $simplem.="<td onClick=\"$onclick\">$dispname</td>";
+              $simplem.="<td onClick=\"$onclick\">$rec->{account}</td>";
+              $simplem.="</td>";
+              $simplem.="</tr>";
+              $line++;
+              $line=1 if ($line>2);
            }
-           $simplem.="<tr class=$lineclass ".
-               "onMouseOver=\"this.className='linehighlight'\" ".
-               "onMouseOut=\"this.className='$lineclass'\">\n";
-           $simplem.="<td onClick=\"$onclick\" width=1%>".
-               "<img src=\"../../../public/passx/load/".
-               "actype.$rec->{entrytype}.gif\"></td>";
-           $simplem.="<td onClick=\"$onclick\">$dispname</td>";
-           $simplem.="<td onClick=\"$onclick\">$rec->{account}</td>";
-           $simplem.="</td>";
-           $simplem.="</tr>";
-           $line++;
-           $line=1 if ($line>2);
+           if ($mode ne "web" && $rec->{entrytype}<=10){
+              my %mrec;
+              $mrec{label}=$rec->{account}.'@'.$rec->{name};
+              $mrec{menuid}=$rec->{id};
+              $mrec{entrytype}=$rec->{entrytype};
+              $mrec{comments}=$rec->{comments};
+              $mrec{name}=$rec->{name};
+              $mrec{account}=$rec->{account};
+              $targetml=\@ml;
+              push(@$targetml,\%mrec);
+           }
         }
         ($rec,$msg)=$self->getNext();
       } until(!defined($rec));
       $simplem.="</table>";
    }
    if ($#ml!=-1){
-      $d.=kernel::MenuTree::BuildHtmlTree(tree=>\@ml, 
-                                          hrefclass=>'menulink',
-                                          rootpath=>'./',
-                                         );
+      if ($mode eq "web"){
+         $d.=kernel::MenuTree::BuildHtmlTree(tree=>\@ml, 
+                                             hrefclass=>'menulink',
+                                             rootpath=>'./',
+                                            );
+      }
+      if ($mode eq "xml"){
+         $d=hash2xml({menu=>{entry=>\@ml}},{header=>1});
+      }
+      if ($mode eq "fvwm" || $mode eq "dynfvwm"){
+         my $mainmenu={FvwmLoginMenu=>{label=>'System Login',
+                       cmdentrys=>[],mentrys=>[]}};
+
+         sub processEntry
+         {
+            my $ml=shift;
+            my $meinmenu=shift;
+            my $targetm=shift;
+
+            foreach my $m (@$ml){
+               if (exists($m->{entrytype})){
+                  if ($m->{entrytype}==1 || $m->{entrytype}==2){
+                     my $label=$m->{label};
+                     $label.=" ($m->{comments})" if ($m->{comments} ne "");
+                     push(@{$targetm->{cmdentrys}},
+                          {label=>$label,
+                           cmd=>"Exec \$[HOME]/bin/FvwmSSHLogin \"".$m->{label}.
+                                "\" \"$m->{label}\""});
+                  }
+               }
+               else{
+                  my $mkey='FvwmLoginMenu'.$m->{menuid};
+                  push(@{$targetm->{mentrys}},
+                       {label=>$m->{label},
+                        cmd=>"Popup ".$mkey});
+                  $mainmenu->{$mkey}={label=>$m->{label},
+                              cmdentrys=>[],mentrys=>[]};
+                  if (exists($m->{tree})){
+                     processEntry($m->{tree},$mainmenu,$mainmenu->{$mkey});
+                  }
+               }
+            }
+         }
+         processEntry(\@ml,$mainmenu,$mainmenu->{FvwmLoginMenu});
+         foreach my $mkey (keys(%$mainmenu)){
+            $d.="AddToMenu $mkey ".
+                "\"$mainmenu->{$mkey}->{label}\" Title\n";
+            foreach my $entry (sort({$a->{label} cmp $b->{label}} 
+                               @{$mainmenu->{$mkey}->{mentrys}}),
+                               sort({$a->{label} cmp $b->{label}} 
+                               @{$mainmenu->{$mkey}->{cmdentrys}})){
+               $d.="+ \"$entry->{label}\" $entry->{cmd}\n";
+            }
+            $d.="\n\n\n";
+            $d.="AddToFunc ResetFvwmLoginMenu  ".
+                "I DestroyMenu recreate $mkey\n\n";
+         }
+         #$d=Dumper($mainmenu);
+
+
+      }
+      if ($mode eq "perl"){
+         $d=Dumper(\@ml);
+      }
    }
-   $d.=$simplem;
+   if ($mode eq "web"){
+      $d.=$simplem;
+   }
 
    return($d);
 }
@@ -382,8 +470,8 @@ sub Initialize
 sub FrontendSetFilter
 {
    my $self=shift;
-   my $userid=$self->getCurrentUserId();
-   my %groups=$self->getGroupsOf($ENV{REMOTE_USER},'RMember','both');
+   my $userid=shift;
+   my %groups=$self->getGroupsOf($userid,'RMember','both');
    return($self->SUPER::SecureSetFilter([{modifyuser=>\$userid},
                                          {aclmode=>['write','read'],
                                           acltarget=>\'base::user',

@@ -36,20 +36,33 @@ sub new
 sub getValidWebFunctions
 {
    my ($self)=@_;
-   return(qw(GetPublicKeys SendCryptedData ChangePassword fvwmmenu));
+   return(qw(GetPublicKeys SendCryptedData ChangePassword TechMenu));
 }
 
-sub fvwmmenu
+sub TechMenu
 {
    my $self=shift;
    my ($func,$p)=$self->extractFunctionPath();
-
+   my $format=Query->Param("format");
+   my @fl=qw(xml fvwm perl);
    $p=~s/\///g; 
-   my $userid;
-   print $self->HttpHeader("text/plain");
-   my $ent=$self->getPersistentModuleObject("passx::entry");
-   print $ent->generateMenuTree("fvwm",$userid,"","");
 
+   $format="xml" if (!grep(/^$format$/,@fl));
+   my $user=$self->getPersistentModuleObject("base::user");
+   $user->SetFilter({posix=>\$p});
+   my ($urec,$msg)=$user->getOnlyFirst(qw(userid));
+   if (defined($urec)){ 
+      my $userid=$urec->{userid};
+      my $ent=$self->getPersistentModuleObject("passx::entry");
+      if ($format eq "xml"){
+         print $self->HttpHeader("text/xml");
+         print $ent->generateMenuTree($format,$userid,"","");
+      }
+      if ($format eq "fvwm"){
+         print $self->HttpHeader("text/plain");
+         print $ent->generateMenuTree($format,$userid,"","");
+      }
+   }
 }
 
 sub LoadTarget
