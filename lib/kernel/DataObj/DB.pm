@@ -680,7 +680,7 @@ sub getFirst
       $msg.=";user=$ENV{REMOTE_USER}" if ($ENV{REMOTE_USER} ne "");
       msg(INFO,"sqlcmd=%s (%s)",$sqlcmd[0],$msg);
       if ($self->{_LimitStart}>0){
-         for(my $c=0;$c<$self->{_LimitStart};$c++){
+         for(my $c=0;$c<$self->{_LimitStart}+1;$c++){
             my ($temprec,$error)=$self->{DB}->fetchrow();
             last if (!defined($temprec));
          }
