@@ -630,10 +630,12 @@ sub generateWorkspace
    my %additional=();
    my $smsallow;
    my $smstext;
+   my $subject;
    $self->getParent->generateMailSet($WfRec,"rootcausei",
                     \$emaillang,\%additional,
                     \@emailprefix,\@emailpostfix,\@emailtext,\@emailsep,
-                    \@emailsubheader,\@emailsubtitle,\$smsallow,\$smstext);
+                    \@emailsubheader,\@emailsubtitle,
+                    \$subject,\$smsallow,\$smstext);
    return($self->generateNotificationPreview(emailtext=>\@emailtext,
                                              emailprefix=>\@emailprefix,
                                              emailsep=>\@emailsep,
@@ -720,7 +722,8 @@ sub Process
       $self->getParent->generateMailSet($WfRec,"rootcausei",
                        \$eventlang,\%additional,
                        \@emailprefix,\@emailpostfix,\@emailtext,\@emailsep,
-                       \@emailsubheader,\@emailsubtitle,\$smsallow,\$smstext);
+                       \@emailsubheader,\@emailsubtitle,\$subject,
+                       \$smsallow,\$smstext);
       #
       # calc from address
       #

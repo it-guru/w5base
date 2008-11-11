@@ -1104,8 +1104,10 @@ parse_args( int argc, char** argv )
 	    ++argn;
 	    max_age = atoi( argv[argn] );
 	    }
-	else if ( strcmp( argv[argn], "-D" ) == 0 )
+	else if ( strcmp( argv[argn], "-D" ) == 0 ){
 	    debug = 1;
+            add2W5cfg("DEBUG","1");
+        }
 	else
 	    usage();
 	++argn;
@@ -1168,6 +1170,7 @@ read_config( char* filename )
 	    if ( strcasecmp( name, "debug" ) == 0 )
 		{
 		no_value_required( name, value );
+                add2W5cfg("DEBUG","1");
 		debug = 1;
 		}
 	    else if ( strcasecmp( name, "port" ) == 0 )
@@ -1194,19 +1197,16 @@ read_config( char* filename )
 		}
 	    else if ( strcasecmp( name, "w5user" ) == 0 )
 		{
-                fprintf(stderr,"w5user=%s\n",value);
                 add2W5cfg(name,value);
 		value_required( name, value );
 		}
 	    else if ( strcasecmp( name, "w5pass" ) == 0 )
 		{
-                fprintf(stderr,"w5pass=%s\n",value);
                 add2W5cfg(name,value);
 		value_required( name, value );
 		}
 	    else if ( strcasecmp( name, "w5base" ) == 0 )
 		{
-                fprintf(stderr,"w5base=%s\n",value);
                 add2W5cfg(name,value);
 		value_required( name, value );
 		}

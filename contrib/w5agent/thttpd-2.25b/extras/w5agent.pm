@@ -1,17 +1,52 @@
 # This is the w5agent kernel
 package w5agent;
+use Data::Dumper;
+use Exporter;
+@ISA = qw(Exporter);
+@EXPORT = qw(&Dumper &ERROR &OK &WARN &DEBUG &INFO &msg);
 
-my %config;
+sub Dumper { return(Data::Dumper::Dumper(@_)); }
 
 sub readConfigIPC
 {
-   %config=();
+   my %config=();
    my $buff;
    shmread($ENV{W5CFGIPCID}, $buff, 0, 4096) || die "$!";
-printf("fifi buf=$buff\n");
    substr($buff, index($buff, "\0")) = '';
    eval($buff);
+   if ($@ eq ""){
+      %w5agent::config=%config;
+   }
+   else{
+      msg(ERROR,"can't load config from IPC shared memory");
+      exit(-1);
+   }
 }
+
+sub ERROR() {return("ERROR")}
+sub OK()    {return("OK")}
+sub WARN()  {return("WARN")}
+sub DEBUG() {return("DEBUG")}
+sub INFO()  {return("INFO")}
+
+sub msg
+{
+   my $type=shift;
+   my $msg=shift;
+   $msg=~s/%/%%/g if ($#_==-1);
+   $msg=sprintf($msg,@_);
+   return("") if ($type eq "DEBUG" && !($w5agent::config{DEBUG}));
+   my $d;
+   foreach my $linemsg (split(/\n/,$msg)){
+      $d.=sprintf("%-6s %s\n",$type.":",$linemsg);
+   }
+   if ($type eq "ERROR" || $type eq "DEBUG" || $type eq "WARN"){
+      print STDERR $d;
+   }
+   return($d);
+}
+
+
 
 
 
