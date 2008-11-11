@@ -1,6 +1,19 @@
 # This is the w5agent kernel
 package w5agent;
 
+my %config;
+
+sub readConfigIPC
+{
+   %config=();
+   my $buff;
+   shmread($ENV{W5CFGIPCID}, $buff, 0, 4096) || die "$!";
+printf("fifi buf=$buff\n");
+   substr($buff, index($buff, "\0")) = '';
+   eval($buff);
+}
+
+
 
 package W5AgentModule;
 
