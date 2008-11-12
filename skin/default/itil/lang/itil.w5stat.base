@@ -1,3 +1,4 @@
+'itil::w5stat::base::itilchange'=>{de=>'Change Management (CHM);Changes',en=>'Change Management (CHM);Change'},
 'itil::w5stat::base::appl'=>{de=>'Config Management (CFM);Anwendungen',en=>'Config Management (CFM);Applications'},
 'itil::w5stat::base::system'=>{de=>'Config Management (CFM);Systeme',en=>'Config Management (CFM);Systems'},
 'itil::w5stat::base::asset'=>{de=>'Config Management (CFM);Hardware',en=>'Config Management (CFM);Assets'},
@@ -16,3 +17,5 @@
 'count of software instances'=>{de=>'Anzahl Software Instanzen'},
 'assets'=>{de=>'Assets (physische Systeme)'},
 'count of physical systems'=>{de=>'Anzahl physische Systeme'},
+'count of changes by businessteam'=>{de=>'Anzahl Changes des Betriebsteam'},
+'changes'=>{de=>'Anzahl Changes'},

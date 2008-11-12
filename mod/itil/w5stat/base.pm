@@ -61,6 +61,10 @@ sub getPresenter
                          opcode=>\&displaySWInstance,
                          overview=>\&overviewSWInstance,
                          prio=>1003,
+                      },
+          'itilchange'=>{
+                         opcode=>\&displayChange,
+                         prio=>1101,
                       }
          );
 
@@ -246,6 +250,31 @@ sub displayAsset
                    legend=>$app->T('count of physical systems'));
 
    my $d=$app->getParsedTemplate("tmpl/ext.w5stat.asset",
+                              {current=>$primrec,
+                               static=>{
+                                    statname=>$primrec->{fullname},
+                                    chart1=>$chart
+                                       },
+                               skinbase=>'itil'
+                              });
+   return($d);
+}
+
+
+sub displayChange
+{  
+   my $self=shift;
+   my ($primrec,$hist)=@_;
+   return() if ($primrec->{dstrange}=~m/KW/);
+   my $app=$self->getParent();
+   my $data=$app->extractYear($primrec,$hist,"ITIL.Change.Finish.Count");
+   return(undef) if (!defined($data));
+   my $chart=$app->buildChart("ofcChange",$data,
+#                   greenline=>4,
+                   label=>$app->T('changes'),
+                   legend=>$app->T('count of changes by businessteam'));
+
+   my $d=$app->getParsedTemplate("tmpl/ext.w5stat.changes",
                               {current=>$primrec,
                                static=>{
                                     statname=>$primrec->{fullname},

@@ -84,6 +84,7 @@ install:	all
 	rm -f $(BINDIR)/w5agent.pl
 	cp w5agent.pl $(BINDIR)/w5agent.pl
 	cp w5agent.pm $(LIBDIR)/w5agent.pm
+	cp W5AgentModule.pm $(LIBDIR)/W5AgentModule.pm
 	cp w5bb.pm    $(MODDIR)/w5bb.pm
 
 clean:

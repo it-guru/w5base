@@ -65,6 +65,9 @@ int is_w5bbrequest( httpd_conn* hc )
    else if (!strcmp(cmdbuffer,"page")){
       return(W5BBREQ_PAGE); 
    }
+   else if (!strcmp(cmdbuffer,"data")){
+      return(W5BBREQ_DATA); 
+   }
    else if (!strcmp(cmdbuffer,"combo")){
       return(W5BBREQ_COMBO); 
    }
@@ -93,7 +96,7 @@ int mkSpoolPath(httpd_conn* hc,char *spoolpath,char *spoolfile)
    if (!stat(spoolpath,&bbdir)){
       if (S_ISDIR(bbdir.st_mode)){
          if (!access(spoolpath,W_OK|X_OK)){
-            fprintf(stderr,"DEBUG: access to %s OK\n",spoolpath);
+           // fprintf(stderr,"DEBUG: access to %s OK\n",spoolpath);
             return(1);
          }
          else{
@@ -128,29 +131,29 @@ int process_w5bbrequest(int op, httpd_conn* hc )
    char buf[128];
    
    if (mkSpoolPath(hc,spoolpath,spoolfile)){
-      if (fh=open(spoolfile,O_CREAT|O_WRONLY,S_IWUSR|S_IROTH|S_IRGRP)){
-         fprintf(stderr,"OK spoolfile=%s readsize=%d fh=%d\n",
-                        spoolfile,hc->read_size,fh);
+      if (fh=open(spoolfile,O_CREAT|O_RDWR,S_IWUSR|S_IRUSR)){
+         //fprintf(stderr,"OK spoolfile=%s readsize=%d fh=%d\n",
+         //               spoolfile,hc->read_size,fh);
          wrsize=hc->read_size;
          if (strlen(hc->read_buf)<wrsize){
             wrsize=strlen(hc->read_buf);
          }    
          wc=write(fh,hc->read_buf,wrsize);
          reqsize+=wc;
-         fprintf(stderr,"fifi01 conn_fd=%d errno=%d\n",hc->conn_fd,errno);
+         //fprintf(stderr,"fifi01 conn_fd=%d errno=%d\n",hc->conn_fd,errno);
          while(reqsize<1024*1024*10){
-         fprintf(stderr,"fifi02-0 read=%d\n",sizeof(buf));
+         //fprintf(stderr,"fifi02-0 read=%d\n",sizeof(buf));
             errno=0;
             memset(buf,0,sizeof(buf));
             r=read(hc->conn_fd,buf,sizeof(buf)-1);
-         fprintf(stderr,"fifi02-1 r=%d errno=%d\n",r,errno);
+         //fprintf(stderr,"fifi02-1 r=%d errno=%d\n",r,errno);
             if ( r < 0 && ( errno == EINTR || errno == EAGAIN )){
-         fprintf(stderr,"fifi03\n");
+         //fprintf(stderr,"fifi03\n");
               sleep( 1 );
               continue;
             }
             if ( r <= 0 ) break;
-         fprintf(stderr,"fifi04\n");
+         //fprintf(stderr,"fifi04\n");
             if (strlen(buf)<r){
                r=strlen(buf);
             }
@@ -159,7 +162,7 @@ int process_w5bbrequest(int op, httpd_conn* hc )
             reqsize+=wc;
          }
          write(fh,"\n",1);
-         fprintf(stderr,"fifi05\n");
+         //fprintf(stderr,"fifi05\n");
          close(fh);
          return(1);
       }

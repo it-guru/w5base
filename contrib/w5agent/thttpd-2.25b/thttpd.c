@@ -673,6 +673,7 @@ main( int argc, char** argv )
     strcat(w5libpath,MODDIR);
     add2W5cfg("MODDIR",MODDIR);
     #endif
+    add2W5cfg("W5BBDIR",W5BBDIR);
     slen=strlen(w5agentpl);
     if (w5agentpl[strlen(w5agentpl)]!='/'){
        httpd_realloc_str( &w5agentpl, &slen, slen+1 );
