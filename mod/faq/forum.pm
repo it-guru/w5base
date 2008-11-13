@@ -51,6 +51,7 @@ sub Main
                            js=>['toolbox.js','subModal.js',
                                 'TextTranslation.js'],
                            prefix=>$rootpath,
+                           form=>1,
                            title=>$self->T($self->Self()));
    $rootpath.="/" if ($rootpath eq "..");
    my @param=split(/\//,$p);
@@ -59,7 +60,7 @@ sub Main
    $p=~s/\///g;
    $self->ShowBoards($rootpath) if ($p eq ""); 
    $self->ShowBoard($rootpath,$p) if ($p ne ""); 
-   print $self->HtmlBottom(body=>1);
+   print $self->HtmlBottom(body=>1,form=>1);
 }
 
 
@@ -185,7 +186,7 @@ sub getShowTopicDetailFunctions
 <script language="JavaScript">
 function DetailHandleInfoAboSubscribe()
 {
-   showPopWin('${rootpath}HandleInfoAboSubscribe?CurrentIdToEdit=$id,$mode',null,300,
+   showPopWin('${rootpath}HandleInfoAboSubscribe?CurrentIdToEdit=$id,$mode',585,300,
               FinishHandleInfoAboSubscribe);
 }
 function FinishHandleInfoAboSubscribe(returnVal,isbreak)
@@ -515,7 +516,7 @@ EOF
 <script language="JavaScript">
 function DetailHandleInfoAboSubscribe()
 {
-   showPopWin('${rootpath}HandleInfoAboSubscribe?CurrentIdToEdit=$id,$mode',null,300,
+   showPopWin('${rootpath}HandleInfoAboSubscribe?CurrentIdToEdit=$id,$mode',585,300,
               FinishHandleInfoAboSubscribe);
 }
 function FinishHandleInfoAboSubscribe(returnVal,isbreak)
@@ -525,7 +526,35 @@ function FinishHandleInfoAboSubscribe(returnVal,isbreak)
    }
 }
 </script>
+
+<script language="JavaScript">
+function DetailHandleDirectInfoAboSubscribe()
+{
+   alert("subscribe");
+   document.forms[0].submit();
+}
+function DetailHandleDirectInfoAboUnSubscribe()
+{
+   alert("unsubscribe");
+   document.forms[0].submit();
+}
+</script>
 EOF
+
+   return($d);
+   # todo = direct subscript on one click
+   if (1){
+      $d.=" &bull; ".
+          "<a href=\"javascript:DetailHandleDirectInfoAboSubscribe()\" ".
+          "class=detailfunctions>".
+          $self->T("Subscribe new messages")."</a>";
+   }
+   else{
+      $d.=" &bull; ".
+          "<a href=\"javascript:DetailHandleDirectInfoAboUnSubscribe()\" ".
+          "class=detailfunctions>".
+          $self->T("unSubscribe all new messages")."</a>";
+   }
 
 
    return($d);
