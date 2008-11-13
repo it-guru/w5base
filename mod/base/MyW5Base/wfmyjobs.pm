@@ -42,7 +42,7 @@ sub Init
 sub getDefaultStdButtonBar
 {
    my $self=shift;
-   return('%StdButtonBar(deputycontrol,wfstatecontrol,print,search)%');
+   return('%StdButtonBar(deputycontrol,wfstatecontrol,teamviewcontrol,print,search)%');
 }
 
 sub getQueryTemplate
@@ -252,6 +252,39 @@ sub SetFilter
          $wspace->SetFilter([{fwdtargetid=>\$userid,fwdtarget=>\'base::user'},
                              {fwdtargetid=>\@grpids,fwdtarget=>\'base::grp'}]); 
          map({$id{$_->{wfheadid}}=1;} $wspace->getHashList(qw(wfheadid)));
+      }
+      if ($dc ne "TEAM"){  # filter out records, witch are forwared to a
+                           # group and already in process by one other person
+         $dataobj->SetFilter({id=>[keys(%id)]});
+         $dataobj->SetCurrentOrder(qw(NONE));
+         %id=();
+         foreach my $rec ($dataobj->getHashList(qw(stateid 
+                                                   fwdtarget 
+                                                   fwdtargetid id))){
+            if ($rec->{stateid}==4 && $rec->{fwdtarget} eq "base::grp" &&
+                $rec->{owner}!=$userid){
+               next;
+            }
+            $id{$rec->{id}}++;
+         }
+      }
+      else{
+         # filter out records, witch are assigned to me personaly
+         $dataobj->SetFilter({id=>[keys(%id)]});
+         $dataobj->SetCurrentOrder(qw(NONE));
+         %id=();
+         foreach my $rec ($dataobj->getHashList(qw(stateid 
+                                                   fwdtarget 
+                                                   fwdtargetid id))){
+            if ($rec->{fwdtarget} eq "base::user" &&
+                $rec->{fwdtargetid}==$userid){
+               next;
+            }
+            if ($rec->{owner}==$userid){
+               next;
+            }
+            $id{$rec->{id}}++;
+         }
       }
       push(@q,{id=>[keys(%id)]});
    }
