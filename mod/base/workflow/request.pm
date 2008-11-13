@@ -312,7 +312,7 @@ sub getPosibleActions
       push(@l,"wfaddnote");    # notiz hinzufügen        (jeder)
       push(@l,"wfdefer");      # notiz hinzufügen        (jeder)
    }
-   if (($stateid==2 || $stateid==7 || $stateid==10) &&
+   if (($stateid==2 || $stateid==7 || $stateid==10 || $stateid==5) &&
        ((($lastworker!=$userid) && 
         (($userid!=$creator) || ($userid!=$initiatorid)) &&  $iscurrent) ||
         $iscurrent || $isworkspace)){
