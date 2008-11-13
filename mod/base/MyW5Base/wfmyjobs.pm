@@ -261,7 +261,8 @@ sub SetFilter
          foreach my $rec ($dataobj->getHashList(qw(stateid 
                                                    fwdtarget 
                                                    fwdtargetid id))){
-            if ($rec->{stateid}==4 && $rec->{fwdtarget} eq "base::grp" &&
+            if (($rec->{stateid}==4 || $rec->{stateid}==1)  && 
+                $rec->{fwdtarget} eq "base::grp" &&
                 $rec->{owner}!=$userid){
                next;
             }
