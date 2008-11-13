@@ -178,6 +178,7 @@ sub activateMailSend
    my $wf=shift;
    my $id=shift;
    my $newmailrec=shift;
+   my $action=shift;
 
    my %d=(step=>'base::workflow::mailsend::waitforspool',
           emailsignatur=>'EventNotification: AL T-Com');
@@ -776,7 +777,8 @@ sub Process
              additional     =>\%additional
             };
       if (my $id=$wf->Store(undef,$newmailrec)){
-         if ($self->getParent->activateMailSend($WfRec,$wf,$id,$newmailrec)){
+         if ($self->getParent->activateMailSend($WfRec,$wf,
+                                                $id,$newmailrec,$action)){
             if ($wf->Action->StoreRecord(
                 $WfRec->{id},"rootcausi",
                 {translation=>'AL_TCom::workflow::eventnotify'},

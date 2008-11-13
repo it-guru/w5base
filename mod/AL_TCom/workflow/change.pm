@@ -191,6 +191,7 @@ sub activateMailSend
    my $wf=shift;
    my $id=shift;
    my $newmailrec=shift;
+   my $action=shift;
 
    my %d=(step=>'base::workflow::mailsend::waitforspool',
           emailsignatur=>'ChangeNotification: AL T-Com');
