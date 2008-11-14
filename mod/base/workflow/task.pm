@@ -419,17 +419,17 @@ sub Process
       if ($self->LastMsg()){
          return(undef);
       }
-      if ($target ne ""){
-         $h->{fwdtargetname}=$target;
-      }
-      if ($fwdtarget ne "" && $fwdtargetid ne ""){
-         $h->{fwdtarget}=$fwdtarget;
-         $h->{fwdtargetid}=$fwdtargetid;
-      }
-      if ($fwddebtarget ne "" && $fwddebtargetid ne ""){
-         $h->{fwddebtarget}=$fwddebtarget;
-         $h->{fwddebtargetid}=$fwddebtargetid;
-      }
+#      if ($target ne ""){
+#         $h->{fwdtargetname}=$target;
+#      }
+#      if ($fwdtarget ne "" && $fwdtargetid ne ""){
+#         $h->{fwdtarget}=$fwdtarget;
+#         $h->{fwdtargetid}=$fwdtargetid;
+#      }
+#      if ($fwddebtarget ne "" && $fwddebtargetid ne ""){
+#         $h->{fwddebtarget}=$fwddebtarget;
+#         $h->{fwddebtargetid}=$fwddebtargetid;
+#      }
       $h->{stateid}=1;
       $h->{eventstart}=NowStamp("en");
       $h->{eventend}=undef;
@@ -459,14 +459,14 @@ sub Process
       }
       if (my $id=$self->StoreRecord($WfRec,$h)){
          $h->{id}=$id;
-         if ($#wsref!=-1){
-            while(my $target=shift(@wsref)){
-               my $targetid=shift(@wsref);
-               last if ($targetid eq "" || $target eq "");
-               $self->getParent->getParent->AddToWorkspace($id,
-                                                           $target,$targetid);
-            }
-         }
+#         if ($#wsref!=-1){
+#            while(my $target=shift(@wsref)){
+#               my $targetid=shift(@wsref);
+#               last if ($targetid eq "" || $target eq "");
+#               $self->getParent->getParent->AddToWorkspace($id,
+#                                                           $target,$targetid);
+#            }
+#         }
          $self->PostProcess($action,$h,$actions);
       }
       else{
