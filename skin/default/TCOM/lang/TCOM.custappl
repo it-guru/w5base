@@ -20,3 +20,7 @@
 'Customer Application ID'=>{de=>'Kunden-Anwendungs ID'},
 'Customer Contracts'=>{de=>'Verträge'},
 'TS Applicationname'=>{de=>'TS Anwendungsbezeichnung'},
+'primary Order in'=>{de=>'Auftragseingang'},
+'secondary Order in'=>{de=>'Auftragseingang Vertretung'},
+'primary Order in E-Mail'=>{de=>'Auftragseingang E-Mail'},
+'secondary Order in E-Mail'=>{de=>'Auftragseingang Vertretung E-Mail'},

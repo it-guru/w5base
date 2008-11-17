@@ -68,6 +68,10 @@ sub new
                 name          =>'grpid',
                 dataobjattr   =>'grp.grpid'),
 
+      new kernel::Field::Link(
+                name          =>'email',
+                dataobjattr   =>'user.email'),
+
       new kernel::Field::Text(
                 name          =>'lnkgrpuserid',
                 label         =>'LinkId',

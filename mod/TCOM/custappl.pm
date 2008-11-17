@@ -309,6 +309,43 @@ sub new
                 name          =>'businessteamid',
                 dataobjattr   =>'appl.businessteam'),
 
+      new kernel::Field::Interface(
+                name          =>'orderin1email',
+                label         =>'primary Order in E-Mail',
+                group         =>'tscontact',
+                onRawValue    =>\&getOrderIn),
+
+      new kernel::Field::Interface(
+                name          =>'orderin2email',
+                label         =>'secondary Order in E-Mail',
+                group         =>'tscontact',
+                onRawValue    =>\&getOrderIn),
+
+      #new kernel::Field::Interface(
+      new kernel::Field::Text(
+                name          =>'orderin1name',
+                label         =>'primary Order in',
+                group         =>'tscontact',
+                onRawValue    =>\&getOrderIn),
+
+      new kernel::Field::Text(
+                name          =>'orderin2name',
+                label         =>'secondary Order in',
+                group         =>'tscontact',
+                onRawValue    =>\&getOrderIn),
+
+      new kernel::Field::Interface(
+                name          =>'orderin1id',
+                label         =>'primary Order in ID',
+                group         =>'tscontact',
+                onRawValue    =>\&getOrderIn),
+
+      new kernel::Field::Interface(
+                name          =>'orderin2id',
+                label         =>'secondary Order in ID',
+                group         =>'tscontact',
+                onRawValue    =>\&getOrderIn),
+
       new kernel::Field::Text(
                 name          =>'custnameid',
                 htmlwidth     =>'200px',
@@ -361,6 +398,64 @@ sub new
    return($self);
 }
 
+
+sub getOrderIn
+{
+   my $self=shift;
+   my $current=shift;
+   my $id=$current->{id};
+   my @l;
+   if ($id ne ""){
+      my %email;
+      my $u=$self->getParent->getPersistentModuleObject("base::user");
+      my $g=$self->getParent->getPersistentModuleObject("base::lnkgrpuserrole");
+      my $l=$self->getParent->getPersistentModuleObject("itil::lnkapplcontact");
+      $l->SetFilter({refid=>\$id,parentobj=>\'itil::appl'});
+      $l->SetCurrentOrder(qw(NONE));
+      foreach my $rec ($l->getHashList(qw(targetid roles target))){
+         my @roles=($rec->{roles});
+         @roles=@{$rec->{roles}} if (ref($rec->{roles}) eq "ARRAY");
+         
+         if ($self->{name} eq "orderin1id" && grep(/^orderin1$/,@roles)){
+            push(@l,$rec->{targetid});
+         }
+         if ($self->{name} eq "orderin1name" && grep(/^orderin1$/,@roles)){
+            push(@l,$rec->{targetname});
+         }
+         if ($self->{name} eq "orderin2id" && grep(/^orderin2$/,@roles)){
+            push(@l,$rec->{targetid});
+         }
+         if ($self->{name} eq "orderin2name" && grep(/^orderin2$/,@roles)){
+            push(@l,$rec->{targetname});
+         }
+         if (($self->{name} eq "orderin2email" && grep(/^orderin2$/,@roles)) ||
+             ($self->{name} eq "orderin1email" && grep(/^orderin1$/,@roles))){
+            if ($rec->{target} eq "base::user"){ 
+               $u->SetFilter({userid=>\$rec->{targetid},cistatusid=>\'4'});
+               $u->SetCurrentOrder(qw(NONE));
+               my ($urec,$msg)=$u->getOnlyFirst(qw(email));
+               if (defined($urec) && $urec->{email} ne ""){
+                  $email{$urec->{email}}++;
+               }
+            }
+            if ($rec->{target} eq "base::grp"){ 
+               $g->SetFilter({grpid=>\$rec->{targetid},
+                              nativrole=>\'RMember',cistatusid=>\'4'});
+               $g->SetCurrentOrder(qw(NONE));
+               foreach my $urec ($g->getHashList(qw(email))){
+                  $email{$urec->{email}}++;
+               }
+            }
+         }
+      }
+      if ($self->{name} eq "orderin2email" ||
+          $self->{name} eq "orderin1email"){
+         return([keys(%email)]);
+      }
+   }
+
+   return(\@l);
+}
 
 sub getTeamBossID
 {

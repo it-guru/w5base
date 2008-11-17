@@ -60,9 +60,11 @@ sub FormatedDetail
    if ($mode eq "HtmlV01"){
       $d=[map({quoteHtml($_)} @{$d})];
    }
-   my $vjoinconcat=$self->{vjoinconcat};
-   $vjoinconcat="; " if (!defined($vjoinconcat));
-   $d=join($vjoinconcat,@$d);
+   if ($mode ne "XMLV01"){
+      my $vjoinconcat=$self->{vjoinconcat};
+      $vjoinconcat="; " if (!defined($vjoinconcat));
+      $d=join($vjoinconcat,@$d);
+   }
    $d.=" ".$self->{unit} if ($d ne "" && $mode eq "HtmlDetail");
    return($d);
 }
