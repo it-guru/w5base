@@ -624,7 +624,7 @@ sub SecureValidate
    my $oldrec=shift;
    my $newrec=shift;
    my $wrgroups=shift;
-   msg(INFO,"SecureValidate in $self x");
+   #msg(INFO,"SecureValidate in $self x");
    foreach my $wrfield (keys(%{$newrec})){
        my $fo=$self->getField($wrfield,$oldrec);
        if (defined($fo)){

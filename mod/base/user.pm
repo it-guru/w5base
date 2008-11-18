@@ -380,6 +380,7 @@ sub new
                 group         =>'groups',
                 subeditmsk    =>'subedit.user',
                 allowcleanup  =>1,
+                forwardSearch =>1,
                 vjointo       =>'base::lnkgrpuser',
                 vjoinon       =>['userid'=>'userid'],
                 vjoindisp     =>['group','grpweblink','roles'],

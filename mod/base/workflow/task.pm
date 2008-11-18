@@ -90,12 +90,6 @@ sub getDynamicFields
       new kernel::Field::Link (
                 name          =>'initiatorgroup',
                 container     =>'headref'),
-
-      new kernel::Field::Text (
-                name          =>'implementedto',
-                group         =>'init',
-                label         =>'implemented to',
-                container     =>'headref'),
     ));
 }
 
@@ -434,7 +428,6 @@ sub Process
       $h->{eventstart}=NowStamp("en");
       $h->{eventend}=undef;
       $h->{closedate}=undef;
-      $h->{implementedto}="?";
       $h->{initiatorid}=$self->getParent->getParent->getCurrentUserId();
 
       my $UserCache=$self->Cache->{User}->{Cache};
@@ -592,59 +585,6 @@ sub generateWorkspacePages
                 "</option>\n";
       $$divset.="<div id=OPwfreject class=\"$class\"><textarea name=note ".
                 "style=\"width:100%;height:110px\"></textarea></div>";
-   }
-   if (grep(/^wfapprovalreq$/,@$actions)){
-      $$selopt.="<option value=\"wfapprovalreq\">".
-                $self->getParent->T("wfapprovalreq",$tr).
-                "</option>\n";
-      my $note=Query->Param("note");
-      my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
-         "<td colspan=2><textarea name=note style=\"width:100%;height:70px\">".
-         $note."</textarea></td></tr>";
-      $d.="<tr><td width=1% nowrap>&nbsp;Genehmigungs ".
-          "Anforderung bei:&nbsp;</td>".
-          "<td>\%approvertask(detail)\%".
-          "</td></tr>";
-      $d.="</table>";
-      $$divset.="<div id=OPwfapprovalreq class=\"$class\">$d</div>";
-   }
-   if (grep(/^wfapprovok$/,@$actions)){
-      $$selopt.="<option value=\"wfapprovok\">".
-                $self->getParent->T("wfapprovok",$tr).
-                "</option>\n";
-      my $note=Query->Param("note");
-      my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
-         "<td colspan=2><textarea name=note style=\"width:100%;height:70px\">".
-         $note."</textarea></td></tr>";
-      $d.="<tr><td colspan=2>Ja, ich bin sicher, dass ich diese Anforderung ".
-          "genehmigen möchte <input name=VERIFY type=checkbox></td></tr>";
-      $d.="</table>";
-      $$divset.="<div id=OPwfapprovok class=\"$class\">$d</div>";
-   }
-   if (grep(/^wfapprovreject$/,@$actions)){
-      $$selopt.="<option value=\"wfapprovreject\">".
-                $self->getParent->T("wfapprovreject",$tr).
-                "</option>\n";
-      my $note=Query->Param("note");
-      my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
-         "<td colspan=2><textarea name=note style=\"width:100%;height:70px\">".
-         $note."</textarea></td></tr>";
-      $d.="</table>";
-      $$divset.="<div id=OPwfapprovreject class=\"$class\">$d</div>";
-   }
-   if (grep(/^wfapprovalcan$/,@$actions)){
-      $$selopt.="<option value=\"wfapprovalcan\">".
-                $self->getParent->T("wfapprovalcan",$tr).
-                "</option>\n";
-      my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
-         "<td colspan=2><textarea name=note style=\"width:100%;height:70px\">".
-         "</textarea></td></tr>";
-      #$d.="<tr><td width=1% nowrap>&nbsp;Genehmigungs ".
-      #    "Anforderung bei:&nbsp;</td>".
-      #    "<td>\%approvertask(detail)\%".
-      #    "</td></tr>";
-      $d.="</table>";
-      $$divset.="<div id=OPwfapprovalcan class=\"$class\">$d</div>";
    }
    return($self->SUPER::generateWorkspacePages($WfRec,$actions,
                                                $divset,$selopt));
@@ -892,29 +832,6 @@ sub Process
          return(0);
       }
      
-      if ($op eq "wfapprovreject"){
-         my $note=Query->Param("note");
-         if ($note=~m/^\s*$/ || length($note)<10){
-            $self->LastMsg(ERROR,"you need to specified a descriptive note");
-            return(0);
-         }
-         $note=trim($note);
-         if ($self->getParent->getParent->Action->StoreRecord(
-             $WfRec->{id},"wfapprovereject",
-             {translation=>'base::workflow::task'},$note,undef)){
-            my $openuserid=$WfRec->{openuser};
-            $self->StoreRecord($WfRec,{stateid=>10});
-            $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
-            #
-            # MAIL versenden: Workflow wurde abgelehnt
-            #
-            $self->PostProcess($action.".".$op,$WfRec,$actions,
-                               note=>$note);
-            return(1);
-         }
-         return(0);
-      }
-     
       if ($op eq "wfcallback"){
          if ($self->getParent->getParent->Action->StoreRecord(
              $WfRec->{id},"wfcallback",
@@ -971,95 +888,7 @@ sub Process
          }
          return(0);
       }
-     
-      if ($op eq "wfapprovalreq"){
-         my $note=Query->Param("note");
-         $note=trim($note);
-    
-         my $approvertask="approvertask"; 
-         my $fobj=$self->getParent->getField($approvertask);
-        # my $f=defined($newrec->{$approvertask}) ?
-        #       $newrec->{$approvertask} :
-        #       Query->Param("Formated_$approvertask");
-         my $f=Query->Param("Formated_$approvertask");
-
-         my $new1;
-         if ($new1=$fobj->Validate($WfRec,{$approvertask=>$f})){
-            if (!defined($new1->{"${approvertask}id"}) ||
-                $new1->{"${approvertask}id"}==0){
-               if ($self->LastMsg()==0){
-                  $self->LastMsg(ERROR,"invalid approve target");
-               }
-               return(0);
-            }
-         }
-         else{
-            return(0);
-         }
-         if ($self->getParent->getParent->getCurrentUserId()==
-             $new1->{"${approvertask}id"}){
-            $self->LastMsg(ERROR,"you could'nt task approve by your self");
-            return(0);
-         }
-         if ($note=~m/^\s*$/ ||
-             length($note)<10){
-            $self->LastMsg(ERROR,"you need to specified a descriptive note");
-            return(0);
-         }
-
-         my $approvertaskname=Query->Param("Formated_approvertask");
-         my $info="\@:".$approvertaskname;
-         $info.="\n".$note;
-         if ($self->getParent->getParent->Action->StoreRecord(
-             $WfRec->{id},"wfapprovereq",
-             {translation=>'base::workflow::task',
-              additional=>{
-                            approvereqtarget=>'base::user',
-                            approvereqtargetid=>$new1->{"${approvertask}id"}
-                          }},$info,undef)){
-            my $openuserid=$WfRec->{openuser};
-            if ($self->getParent->getParent->AddToWorkspace($WfRec->{id},
-                               "base::user",$new1->{"${approvertask}id"})){
-               if ($self->StoreRecord($WfRec,{stateid=>6})){
-                  Query->Delete("OP");
-                  #
-                  # Mail versenden - Genehmigungsanforderung
-                  #
-                  $self->PostProcess($action.".".$op,$WfRec,$actions,
-                                 note=>$note,
-                                 fwdtarget=>'base::user',
-                                 fwdtargetid=>$new1->{"${approvertask}id"},
-                                 fwdtargetname=>$approvertaskname);
-                  return(1);
-               }
-            }
-         }
-         return(0);
-      }
-
-
-      if ($op eq "wfapprovalcan"){
-         my $note=Query->Param("note");
-         $note=trim($note);
-    
-         if ($note=~m/^\s*$/ ||
-             length($note)<10){
-            $self->LastMsg(ERROR,"you need to specified a descriptive reason");
-            return(0);
-         }
-         if ($self->getParent->getParent->Action->StoreRecord(
-             $WfRec->{id},"wfapprovecan",
-             {translation=>'base::workflow::task'},$note,undef)){
-            if ($self->StoreRecord($WfRec,{stateid=>2})){
-               $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
-               Query->Delete("OP");
-               return(1);
-            }
-         }
-         return(0);
-      }
-
-   }
+   }     
    return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
