@@ -204,6 +204,7 @@ sub new
    );
    $self->{PhoneLnkUsage}=\&PhoneUsage;
    $self->{CI_Handling}={uniquename=>"fullname",
+                         altname=>'name',
                          activator=>["admin","admin.base.grp"],
                          uniquesize=>255};
 
@@ -266,17 +267,20 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
+   my $cistatus=effVal($oldrec,$newrec,"cistatusid");
    if (defined($newrec->{name}) || !defined($oldrec)){
       trim(\$newrec->{name});
       $newrec->{name}=~s/[\.\s]/_/g;
-      if ($newrec->{name} eq "" ||
-           !($newrec->{name}=~m/^[\@\(\)a-zA-Z0-9_-]+$/)){
+      my $chkname=$newrec->{name};
+      if ($cistatus==6 || $oldrec->{cistatusid}==6){
+         $chkname=~s/\[.*?\]$//g;
+      }
+      if ($chkname eq "" || !($chkname=~m/^[\@\(\)a-zA-Z0-9_-]+$/)){
          $self->LastMsg(ERROR,"invalid groupname '\%s' specified",
                         $newrec->{name});
          return(undef);
       }
    }
-   my $cistatus=effVal($oldrec,$newrec,"cistatusid");
    $newrec->{cistatusid}=4 if (!defined($oldrec) && $cistatus==0);
    if (!$self->SUPER::Validate($oldrec,$newrec,$origrec)){
       return(0);

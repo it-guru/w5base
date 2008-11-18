@@ -107,9 +107,13 @@ sub ValidatedUpdateRecord
       msg(DEBUG,"lock $locktables");
       my @dep=(\%{$oldrec});
       my @loadlist=($oldrec->{$idfield});
+      my @fieldlist=qw(fullname parentid name);
+      if ($self->getField("cistatusid")){
+         push(@fieldlist,"cistatusid");
+      }
       while($#loadlist!=-1){
          $self->SetFilter({parentid=>\@loadlist});
-         my @d=$self->getHashList(qw(fullname parentid name));
+         my @d=$self->getHashList(@fieldlist);
          @loadlist=();
          foreach my $rec (@d){  # load recursive the full dependency
             push(@loadlist,$rec->{$idfield});

@@ -56,6 +56,21 @@ sub HandleCIStatusModification
    my $oldrec=shift;
    my $newrec=shift;
    my @primarykey=@_;
+   my @altname;
+   if (ref($_[0]) eq "ARRAY"){
+      my $primarykey=shift;
+      @primarykey=@$primarykey;
+      if (ref($_[0]) eq "ARRAY"){
+         my $altname=shift;
+         @altname=@$altname;
+      }
+      else{
+         @altname=@_;
+      }
+   }
+   else{
+      @primarykey=@_;
+   }
 
    my $idfield=$self->IdField->Name();
    my $id=effVal($oldrec,$newrec,$idfield);
@@ -83,6 +98,7 @@ sub HandleCIStatusModification
       }
    }
    if ($adduniq){
+      my $altnamechanged=0;
       foreach my $primarykey (@primarykey){
          if (defined($newrec->{$primarykey})){
             my $found=0;
@@ -93,11 +109,21 @@ sub HandleCIStatusModification
                if (!defined($chkid)){
                   $newrec->{$primarykey}=$chkname;
                   $found++;
+                  if (!$altnamechanged){
+                     foreach my $altname (@altname){
+                        next if ($altname eq "");
+                        my $altval=effVal($oldrec,$newrec,$altname);
+                        $altval=~s/\[\d*?\]$//;
+                        $newrec->{$altname}=$altval."[$c]"; 
+                     }
+                     $altnamechanged++;
+                  }
                   last;
                }
             }
             if (!$found){
-               $self->LastMsg(ERROR,"can't find a unique name for '%s'",$primarykey);
+               $self->LastMsg(ERROR,"can't find a unique name for '%s'",
+                              $primarykey);
                return(0);
             }
          }
@@ -106,7 +132,13 @@ sub HandleCIStatusModification
    }
    if ($deluniq){
       foreach my $primarykey (@primarykey){
-         $newrec->{$primarykey}=~s/\[.*\]$//;
+         $newrec->{$primarykey}=~s/\[\d*?\]$//;
+      }
+      foreach my $altname (@altname){
+         next if ($altname eq "");
+         my $altval=effVal($oldrec,$newrec,$altname);
+         $altval=~s/\[\d*?\]$//;
+         $newrec->{$altname}=$altval; 
       }
    }
    if ($cistatusid!=6){
@@ -178,7 +210,8 @@ sub HandleCIStatus
    }
    if ($param{mode} eq "Validate"){
       return($self->HandleCIStatusModification($oldrec,$newrec,
-                                               $param{uniquename}));
+                                               [$param{uniquename}],
+                                               $param{altname}));
    }
    if ($param{mode} eq "FinishWrite"){
       if (!defined($oldrec)){
