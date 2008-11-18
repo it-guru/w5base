@@ -29,6 +29,8 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=3;
+
    my $self=bless($type->SUPER::new(%param),$type);
    
 
@@ -374,6 +376,11 @@ sub Validate
    if (effVal($oldrec,$newrec,"userid")==0){
       $self->LastMsg(ERROR,"invalid user specified");
       return(undef);
+   }
+   if (effVal($oldrec,$newrec,"expiration") eq "" &&
+       effVal($oldrec,$newrec,"alertstate") ne "" &&
+       !exists($newrec->{alertstate})){
+      $newrec->{alertstate}=undef;
    }
    my $grpid=effVal($oldrec,$newrec,"grpid");
    return(1) if (!$self->isDataInputFromUserFrontend());

@@ -118,24 +118,30 @@ sub LnkGrpUser
       }
       elsif($days>14){
          if ($lrec->{alertstate} ne "orange"){
-            $lnk->ValidatedUpdateRecord($lrec,{alertstate=>'orange',
-                                               editor=>$lrec->{editor},
-                                               roles=>$lrec->{roles},
-                                               realeditor=>$lrec->{realeditor},
-                                               mdate=>$lrec->{mdate}},
-                                       {lnkgrpuserid=>\$lrec->{lnkgrpuserid}});
+            if ($lnk->ValidatedUpdateRecord($lrec,
+                                            {alertstate=>'orange',
+                                             editor=>$lrec->{editor},
+                                             roles=>$lrec->{roles},
+                                             realeditor=>$lrec->{realeditor},
+                                             mdate=>$lrec->{mdate}},
+                                       {lnkgrpuserid=>\$lrec->{lnkgrpuserid}})){
+               $self->NotifyUser($lrec);
+            }
          }
          # orange setzen und mail verschicken
       } 
       else{
          # yellow setzen und mail verschicken
          if ($lrec->{alertstate} ne "yellow"){
-            $lnk->ValidatedUpdateRecord($lrec,{alertstate=>'yellow',
-                                               editor=>$lrec->{editor},
-                                               realeditor=>$lrec->{realeditor},
-                                               roles=>$lrec->{roles},
-                                               mdate=>$lrec->{mdate}},
-                                       {lnkgrpuserid=>\$lrec->{lnkgrpuserid}});
+            if ($lnk->ValidatedUpdateRecord($lrec,
+                      {alertstate=>'yellow',
+                       editor=>$lrec->{editor},
+                       realeditor=>$lrec->{realeditor},
+                       roles=>$lrec->{roles},
+                       mdate=>$lrec->{mdate}},
+                      {lnkgrpuserid=>\$lrec->{lnkgrpuserid}})){
+               $self->NotifyAdmin($lrec);
+            }
          }
       }
       
@@ -155,6 +161,130 @@ sub LnkGrpUser
 #      return({msg=>'versandt'});
 #   }
    return({msg=>'shit'});
+}
+
+
+sub getAdmins
+{
+   my $self=shift;
+
+   my $lnkgrp=getModuleObject($self->Config,"base::lnkgrpuser");
+   my $user=getModuleObject($self->Config,"base::user");
+   my @userid;
+   $lnkgrp->SetFilter({group=>\"admin"});
+   foreach my $lnk ($lnkgrp->getHashList(qw(userid))){
+      push(@userid,$lnk->{userid});
+   }
+   my @res;
+   if ($#userid!=-1){
+      $user->SetFilter({userid=>\@userid,cistatusid=>\'4',
+                        usertyp=>\'user'});
+      foreach my $urec ($user->getHashList(qw(fullname lastlang email))){
+         push(@res,{fullname=>$urec->{fullname},
+                    lastlang=>$urec->{lastlang},
+                    email=>$urec->{email}});
+      }
+   }
+   return(@res);
+}
+
+sub NotifyAdmin
+{
+   my $self=shift;
+   my $lrec=shift;
+
+   if (ref($lrec->{roles}) eq "ARRAY"){
+      my $lnkgrp=getModuleObject($self->Config,"base::lnkgrpuser");
+      my $user=getModuleObject($self->Config,"base::user");
+      my $userid=$lrec->{userid};
+      my $group=$lrec->{group};
+      $user->SetFilter({userid=>\$userid});
+      my ($urec,$msg)=$user->getOnlyFirst(qw(fullname cistatusid email));
+      if (defined($urec) && $urec->{cistatusid}==4){
+         foreach my $arec ($self->getAdmins()){
+            if ($arec->{lastlang} ne ""){
+               $ENV{HTTP_FORCE_LANGUAGE}=$arec->{lastlang};
+            }
+            my $tmpl=$lnkgrp->getParsedTemplate(
+                     "tmpl/event.cleanup.relation.admin",
+                     {current=>$lrec});
+            my $baseurl=$self->Config->Param("EventJobBaseUrl");
+            my $directlink=$baseurl."/auth/base/lnkgrpuser/Detail?".
+                           "search_lnkgrpuserid=$lrec->{lnkgrpuserid}";
+            my %notiy;
+            $notiy{emailfrom}=$urec->{email};
+            $notiy{emailto}=$arec->{email};
+            $notiy{name}=$self->T("admin info: relation expired").": ".$group;
+            my $sitename=$self->Config->Param("SITENAME");
+            if ($sitename ne ""){
+               $notiy{name}=$sitename.": ".$notiy{name};
+            }
+            $notiy{emailtext}=$tmpl."\nDirectLink:\n".$directlink;
+            $notiy{class}='base::workflow::mailsend';
+            $notiy{step}='base::workflow::mailsend::dataload';
+            
+            my $wf=getModuleObject($self->Config,"base::workflow");
+            if (my $id=$wf->Store(undef,\%notiy)){
+               my %d=(step=>'base::workflow::mailsend::waitforspool');
+               my $r=$wf->Store($id,%d);
+            }
+            delete($ENV{HTTP_FORCE_LANGUAGE});
+         }
+      }
+   }
+}
+
+
+sub NotifyUser
+{
+   my $self=shift;
+   my $lrec=shift;
+
+   if ($lrec->{usertyp} eq "user"){   # the relation effects on an real user
+      my %admins;
+      foreach my $arec ($self->getAdmins()){
+         $admins{$arec->{email}}++;
+      }
+      if ($lrec->{email} ne "" && ref($lrec->{roles}) eq "ARRAY"){
+         my $lnkgrp=getModuleObject($self->Config,"base::lnkgrpuser");
+         my $user=getModuleObject($self->Config,"base::user");
+         my $userid=$lrec->{userid};
+         my $group=$lrec->{group};
+         $user->SetFilter({userid=>\$userid});
+         my ($urec,$msg)=$user->getOnlyFirst(qw(fullname lastlang email
+                                                cistatusid));
+         if (defined($urec) && $urec->{cistatusid}==4){
+            if ($urec->{lastlang} ne ""){
+               $ENV{HTTP_FORCE_LANGUAGE}=$urec->{lastlang};
+            }
+            my $tmpl=$lnkgrp->getParsedTemplate(
+                     "tmpl/event.cleanup.relation.user",
+                     {current=>$lrec});
+            my $baseurl=$self->Config->Param("EventJobBaseUrl");
+            my $directlink=$baseurl."/auth/base/lnkgrpuser/Detail?".
+                           "search_lnkgrpuserid=$lrec->{lnkgrpuserid}";
+            my %notiy;
+            $notiy{emailto}=$urec->{email};
+            $notiy{emailcc}=[keys(%admins)];
+            $notiy{name}=$self->T("relation expired").": ".$group;
+            my $sitename=$self->Config->Param("SITENAME");
+            if ($sitename ne ""){
+               $notiy{name}=$sitename.": ".$notiy{name};
+            }
+            $notiy{emailtext}=$tmpl."\nDirectLink:\n".$directlink;
+            $notiy{class}='base::workflow::mailsend';
+            $notiy{step}='base::workflow::mailsend::dataload';
+            
+            my $wf=getModuleObject($self->Config,"base::workflow");
+            if (my $id=$wf->Store(undef,\%notiy)){
+               my %d=(step=>'base::workflow::mailsend::waitforspool');
+               my $r=$wf->Store($id,%d);
+            }
+            delete($ENV{HTTP_FORCE_LANGUAGE});
+         }
+         #printf STDERR ("lrec=%s\n",Dumper($lrec));
+      }
+   }
 }
 
 
