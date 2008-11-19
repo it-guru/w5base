@@ -295,7 +295,7 @@ sub new
       new kernel::Field::DynWebIcon(
                 name          =>'userweblink',
                 searchable    =>0,
-                depend        =>['userid'],
+                depend        =>['userid','alertstate'],
                 htmlwidth     =>'5px',
                 htmldetail    =>0,
                 weblink       =>sub{
@@ -308,6 +308,14 @@ sub new
                    my $userid=$userido->RawValue($current);
 
                    my $img="<img ";
+                   if ($current->{alertstate} ne ""){
+                      $img.="style=\"border-width:1px;border-color:".
+                            "$current->{alertstate};border-style:solid; ".
+                            "background:$current->{alertstate}\" "; 
+                   }
+                   else{
+                      $img.="border=0 ";
+                   }
                    $img.="src=\"../../base/load/directlink.gif\" ";
                    $img.="title=\"\" border=0>";
                    my $dest="../../base/user/Detail?userid=$userid";
@@ -326,7 +334,7 @@ sub new
       new kernel::Field::DynWebIcon(
                 name          =>'grpweblink',
                 searchable    =>0,
-                depend        =>['grpid'],
+                depend        =>['grpid','alertstate'],
                 htmlwidth     =>'5px',
                 htmldetail    =>0,
                 weblink       =>sub{
@@ -339,8 +347,16 @@ sub new
                    my $grpid=$grpido->RawValue($current);
 
                    my $img="<img ";
+                   if ($current->{alertstate} ne ""){
+                      $img.="style=\"border-width:1px;border-color:".
+                            "$current->{alertstate};border-style:solid; ".
+                            "background:$current->{alertstate}\" "; 
+                   }
+                   else{
+                      $img.="border=0 ";
+                   }
                    $img.="src=\"../../base/load/directlink.gif\" ";
-                   $img.="title=\"\" border=0>";
+                   $img.="title=\"\">";
                    my $dest="../../base/grp/Detail?grpid=$grpid";
                    my $detailx=$app->DetailX();
                    my $detaily=$app->DetailY();
