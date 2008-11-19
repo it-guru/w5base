@@ -54,6 +54,7 @@ sub SendMyJobs
    #$flt->{fullname}="ladegast* ernst*";
    if ($#target==-1){
       $flt[0]->{groups}=["DTAG.TSI.ES.ITO.CSS.T-Com.ST.DB",
+                         "DTAG.TSI.ES.ITO.CSS.T-Com.ST.DeM",
                          "DTAG.TSI.ES.ITO.CSS.T-Com.PMAQ.QSO",
                          "DTAG.TSI.ES.ITO.CSS.OSS.OCTC.T-Com.C3",
                          "DTAG.TSI.ES.ITO.CSS.T-Com.ST.WINDOWS",

@@ -377,11 +377,29 @@ sub Validate
       $self->LastMsg(ERROR,"invalid user specified");
       return(undef);
    }
-   if (effVal($oldrec,$newrec,"expiration") eq "" &&
-       effVal($oldrec,$newrec,"alertstate") ne "" &&
-       !exists($newrec->{alertstate})){
-      $newrec->{alertstate}=undef;
+   if ((my $expiration=effVal($oldrec,$newrec,"expiration")) eq ""){
+      if (effVal($oldrec,$newrec,"alertstate") ne "" &&
+          !exists($newrec->{alertstate})){
+        $newrec->{alertstate}=undef;
+      }
    }
+   else{
+      my $nowstamp=NowStamp("en");
+      my $duration=CalcDateDuration($nowstamp,$expiration);
+      if (defined($duration)){
+         if ($duration->{days}<-14){
+            $self->LastMsg(ERROR,"expiration to long in the past");
+            return(undef);  
+         }
+         else{
+            $newrec->{alertstate}=undef;
+         }
+      }
+      
+      printf STDERR ("fifi expiration=$expiration\n");
+   }
+   
+
    my $grpid=effVal($oldrec,$newrec,"grpid");
    return(1) if (!$self->isDataInputFromUserFrontend());
    return(1) if ($self->IsMemberOf("admin")); 
