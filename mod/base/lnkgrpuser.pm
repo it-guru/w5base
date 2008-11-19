@@ -384,19 +384,20 @@ sub Validate
       }
    }
    else{
-      my $nowstamp=NowStamp("en");
-      my $duration=CalcDateDuration($nowstamp,$expiration);
-      if (defined($duration)){
-         if ($duration->{days}<-14){
-            $self->LastMsg(ERROR,"expiration to long in the past");
-            return(undef);  
-         }
-         else{
-            $newrec->{alertstate}=undef;
+      if (exists($newrec->{expiration}) &&
+          $newrec->{expiration} ne $oldrec->{expiration}){
+         my $nowstamp=NowStamp("en");
+         my $duration=CalcDateDuration($nowstamp,$expiration);
+         if (defined($duration)){
+            if ($duration->{days}<-14){
+               $self->LastMsg(ERROR,"expiration to long in the past");
+               return(undef);  
+            }
+            else{
+               $newrec->{alertstate}=undef;
+            }
          }
       }
-      
-      printf STDERR ("fifi expiration=$expiration\n");
    }
    
 
