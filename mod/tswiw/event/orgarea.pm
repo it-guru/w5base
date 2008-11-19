@@ -199,7 +199,7 @@ sub UpdateOrgareaStructure
       if (defined($rec)){
          do{
             if ($rec->{expiration} eq ""){
-               my $exp="now+21d";
+               my $exp="now+7d";
                $exp=$app->ExpandTimeExpression($exp,"en","GMT","GMT");
                $grpuser->ValidatedUpdateRecord($rec,{expiration=>$exp,
                                                      roles=>$rec->{roles}},
