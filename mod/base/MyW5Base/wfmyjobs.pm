@@ -42,7 +42,7 @@ sub Init
 sub getDefaultStdButtonBar
 {
    my $self=shift;
-   return('%StdButtonBar(deputycontrol,wfstatecontrol,teamviewcontrol,print,search)%');
+   return('%StdButtonBar(bookmark,deputycontrol,wfstatecontrol,teamviewcontrol,print,search)%');
 }
 
 sub getQueryTemplate
