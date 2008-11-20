@@ -274,6 +274,7 @@ sub getPosibleActions
       push(@l,"wfmailsend");   # mail versenden hinzufügen        (jeder)
       push(@l,"wfaddnote");    # notiz hinzufügen        (jeder)
       push(@l,"wfaddsubtask"); # unteraufgabe erstellen  (jeder)
+      push(@l,"setprioexecs"); # Prio und erledigungsgrad setzen
    }
 #   if (($stateid==2 || $stateid==7 || $stateid==10 || $stateid==5) &&
 #       ((($lastworker!=$userid) && 
@@ -550,6 +551,13 @@ sub generateWorkspacePages
                 $self->getParent->T("wfaddsubtask","base::workflow::task").
                 "</option>\n";
       $$divset.="<div id=OPwfaddsubtask class=\"$class\"><textarea name=note ".
+                "style=\"width:100%;height:110px\"></textarea></div>";
+   }
+   if (grep(/^setprioexecs$/,@$actions)){
+      $$selopt.="<option value=\"setprioexecs\">".
+                $self->getParent->T("setprioexecs","base::workflow::task").
+                "</option>\n";
+      $$divset.="<div id=OPsetprioexecs class=\"$class\"><textarea name=note ".
                 "style=\"width:100%;height:110px\"></textarea></div>";
    }
    $self->SUPER::generateWorkspacePages($WfRec,$actions,$divset,$selopt);
