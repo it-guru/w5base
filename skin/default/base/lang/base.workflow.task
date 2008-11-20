@@ -2,7 +2,6 @@
 'base::workflow::task::tip'=>{de=>'Eine Aufgabe stelt eine perönliche Notiz für eine bestimmte Aktion oder Tätigkeit dar. Aus einer Aufgabe heraus können Unter-Aufgaben gerneriert werden, die dann anderen Personen oder Gruppen zugewiesen werden können. Diese können diese Unteraufgaben dann annehmen, ablehnen oder deren Fortgang dokumentieren.',en=>'task is your personal task manager to manage tast in your daily work'},
 'wffine'=>{de=>'Aufgabe abschließen',en=>'finsh task'},
 'wfaddsubtask'=>{de=>'Unteraufgabe erstellen und zuweisen',en=>'add sub task and assign it'},
-#'wfaccept'=>{de=>'Angenommen',en=>'Accepted'},
 #'wfbreak'=>{de=>'Abgebrochen',en=>'Breaked'},
 #'wffine'=>{de=>'Abgeschlossen',en=>'Finished'},
 #'wfreject'=>{de=>'Abgelehnt',en=>'Rejected'},
