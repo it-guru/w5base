@@ -601,10 +601,10 @@ sub xlsExport
       $ws->write($xlsexp->{xls}->{line},0,
            sprintf("%02d.%02d.%04d",$wD,$wM,$wY),
            $xlsexp->{xls}->{format}->{default});
-      $ws->write($xlsexp->{xls}->{line},1,
+      $ws->write_string($xlsexp->{xls}->{line},1,
            join(", ",@$ag),
            $xlsexp->{xls}->{format}->{default});
-      $ws->write($xlsexp->{xls}->{line},2,
+      $ws->write_string($xlsexp->{xls}->{line},2,
            join(", ",@$vert),
            $xlsexp->{xls}->{format}->{default});
       $ws->write($xlsexp->{xls}->{line},3,
@@ -617,18 +617,18 @@ sub xlsExport
       my $cause=$rec->{headref}->{tcomcodcause};
       $cause=join("",@$cause) if (ref($cause) eq "ARRAY");
       $cause=$self->getParent->T($cause,"AL_TCom::lib::workflow");
-      $ws->write($xlsexp->{xls}->{line},5,$cause,
+      $ws->write_string($xlsexp->{xls}->{line},5,$cause,
            $xlsexp->{xls}->{format}->{default});
       my $name=$rec->{name};
       if ($self->getParent->Config->Param("UseUTF8")){
          $name=utf8($name)->latin1();
       }
-      $ws->write($xlsexp->{xls}->{line},6,$name,
+      $ws->write_string($xlsexp->{xls}->{line},6,$name,
            $xlsexp->{xls}->{format}->{default});
 
       my $extid=$rec->{headref}->{tcomexternalid};
       $extid=join("",@$extid) if (ref($extid) eq "ARRAY");
-      $ws->write($xlsexp->{xls}->{line},7,
+      $ws->write_string($xlsexp->{xls}->{line},7,
            $extid,
            $xlsexp->{xls}->{format}->{default});
 
