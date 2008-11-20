@@ -258,7 +258,7 @@ sub SetFilter
          $dataobj->SetFilter({id=>[keys(%id)]});
          $dataobj->SetCurrentOrder(qw(NONE));
          %id=();
-         foreach my $rec ($dataobj->getHashList(qw(stateid 
+         foreach my $rec ($dataobj->getHashList(qw(stateid  owner
                                                    fwdtarget 
                                                    fwdtargetid id))){
             if (($rec->{stateid}==4 || $rec->{stateid}==1)  && 
