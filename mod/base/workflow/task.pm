@@ -59,6 +59,7 @@ sub getDynamicFields
                 name          =>'initiator',
                 label         =>'Initiated by',
                 group         =>'init',
+                htmldetail    =>0,
                 vjointo       =>'base::user',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['initiatorid'=>'userid'],
@@ -69,6 +70,7 @@ sub getDynamicFields
                 name          =>'initiatorgroupname',
                 label         =>'Initiated by group',
                 group         =>'init',
+                htmldetail    =>0,
                 vjointo       =>'base::grp',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['initiatorgroupid'=>'grpid'],
@@ -132,11 +134,6 @@ sub isWriteValid
    push(@l,"default") if ($rec->{state}<10 &&
                          ($self->isCurrentForward() ||
                           $self->getParent->IsMemberOf("admin")));
-   if (grep(/^default$/,@l) &&
-       ($self->getParent->getCurrentUserId() != $rec->{initiatorid} ||
-        $self->getParent->IsMemberOf("admin"))){
-      push(@l,"init");
-   }
    return(@l);
 }
 
@@ -233,6 +230,7 @@ sub getPosibleActions
    if (!$iscurrent){  # check Workspace only if not current
       $isworkspace=$self->isCurrentWorkspace($WfRec); 
    }
+   push(@l,"iscurrent") if ($iscurrent);
    my $iscurrentapprover=0;
 
    if ($stateid==6){
@@ -263,43 +261,29 @@ sub getPosibleActions
       push(@l,"wfapprovreject"); # reject
    }
 
-   if ($iscurrent){
-      push(@l,"iscurrent"); # Merker, dass der Workflow aktuell ansteht
-   }
-   if (!$iscurrent && !$iscurrentapprover){
-      push(@l,"nop");       # No operation as first entry in Action list
-   }
-   if ($iscurrent && $stateid==6){
-      push(@l,"nop");       # Worker, but there are open approve tasks
-      push(@l,"wfapprovalreq"); # Genehmigung anfordern      (durch Bearbeiter)
-      push(@l,"wfapprovalcan"); # Genehmigung abbrechen      (durch Bearbeiter)
-   }
+#   if (!$iscurrent && !$iscurrentapprover){
+#      push(@l,"nop");       # No operation as first entry in Action list
+#   }
    if ((($isadmin && !$iscurrent) || ($userid==$creator && !$iscurrent)) &&
        $stateid<3){
       push(@l,"wfbreak");   # workflow abbrechen      (durch Anforderer o admin)
    #   push(@l,"wfcallback");# workflow zurueckholen   (durch Anforderer o admin)
    }
    if ((($stateid==4 || $stateid==3) && ($lastworker==$userid || $isadmin)) ||
-       ($iscurrent && $userid==$creator)){
-      push(@l,"wfmailsend");   # notiz hinzufügen        (jeder)
+       ($iscurrent || $userid==$creator)){
+      push(@l,"wfmailsend");   # mail versenden hinzufügen        (jeder)
       push(@l,"wfaddnote");    # notiz hinzufügen        (jeder)
+      push(@l,"wfaddsubtask"); # unteraufgabe erstellen  (jeder)
    }
-   if (($stateid==2 || $stateid==7 || $stateid==10 || $stateid==5) &&
-       ((($lastworker!=$userid) && 
-        (($userid!=$creator) || ($userid!=$initiatorid)) &&  $iscurrent) ||
-        $iscurrent || $isworkspace)){
-      push(@l,"wfaccept");  # workflow annehmen              (durch Bearbeiter)
-      push(@l,"wfacceptp"); # workflow annehmen und bearbeit.(durch Bearbeiter)
-      push(@l,"wfacceptn"); # workflow annehmen und notiz anf(durch Bearbeiter)
-      push(@l,"wfreject");  # workflow bearbeitung abgelehnt (durch Bearbeiter)
-   }
-   if (($stateid==2 || $stateid==4 || $stateid==10) && ($iscurrent || 
-                                        ($isadmin && !$lastworker==$userid))){
-      push(@l,"wfforward"); # workflow weiterleiten   (neuen Bearbeiter setzen)
-   }
-   if ($isadmin){
-      push(@l,"wfforward"); # workflow weiterleiten   (neuen Bearbeiter setzen)
-   }
+#   if (($stateid==2 || $stateid==7 || $stateid==10 || $stateid==5) &&
+#       ((($lastworker!=$userid) && 
+#        (($userid!=$creator) || ) &&  $iscurrent) ||
+#        $iscurrent || $isworkspace)){
+#      push(@l,"wfaccept");  # workflow annehmen              (durch Bearbeiter)
+#      push(@l,"wfacceptp"); # workflow annehmen und bearbeit.(durch Bearbeiter)
+#      push(@l,"wfacceptn"); # workflow annehmen und notiz anf(durch Bearbeiter)
+#      push(@l,"wfreject");  # workflow bearbeitung abgelehnt (durch Bearbeiter)
+#   }
    if (($stateid==4 || $stateid==3) && 
        ($lastworker==$userid || $isadmin) && ($userid!=$creator)){
       push(@l,"wffineproc");# Bearbeiten und zurück an Anf.  (durch Bearbeiter)
@@ -413,21 +397,12 @@ sub Process
       if ($self->LastMsg()){
          return(undef);
       }
-#      if ($target ne ""){
-#         $h->{fwdtargetname}=$target;
-#      }
-#      if ($fwdtarget ne "" && $fwdtargetid ne ""){
-#         $h->{fwdtarget}=$fwdtarget;
-#         $h->{fwdtargetid}=$fwdtargetid;
-#      }
-#      if ($fwddebtarget ne "" && $fwddebtargetid ne ""){
-#         $h->{fwddebtarget}=$fwddebtarget;
-#         $h->{fwddebtargetid}=$fwddebtargetid;
-#      }
-      $h->{stateid}=1;
+      $h->{stateid}=4;
       $h->{eventstart}=NowStamp("en");
       $h->{eventend}=undef;
       $h->{closedate}=undef;
+      $h->{fwdtargetid}=$self->getParent->getParent->getCurrentUserId();
+      $h->{fwdtarget}="base::user";
       $h->{initiatorid}=$self->getParent->getParent->getCurrentUserId();
 
       my $UserCache=$self->Cache->{User}->{Cache};
@@ -460,7 +435,7 @@ sub Process
 #                                                           $target,$targetid);
 #            }
 #         }
-         $self->PostProcess($action,$h,$actions);
+#         $self->PostProcess($action,$h,$actions);
       }
       else{
          return(0);
@@ -539,13 +514,6 @@ sub generateWorkspacePages
                 $self->getDefaultNoteDiv($WfRec,$actions).
                 "</div>";
    }
-   if (grep(/^wfapprove$/,@$actions)){
-      $$selopt.="<option value=\"wfapprove\">".
-                $self->getParent->T("wfapprove",$tr).
-                "</option>\n";
-      $$divset.="<div id=OPwfapprove class=\"$class\"><textarea name=note ".
-                "style=\"width:100%;height:110px\"></textarea></div>";
-   }
    if (grep(/^wfaccept$/,@$actions)){
       $$selopt.="<option value=\"wfaccept\">".
                 $self->getParent->T("wfaccept",$tr).
@@ -554,7 +522,7 @@ sub generateWorkspacePages
    }
    if (grep(/^wffine$/,@$actions)){
       $$selopt.="<option value=\"wffine\">".
-                $self->getParent->T("wffine",$tr).
+                $self->getParent->T("wffine","base::workflow::task").
                 "</option>\n";
       $$divset.="<div id=OPwffine style=\"$class;margin:15px\"><br>".
                 $self->getParent->T("use this action,".
@@ -570,15 +538,6 @@ sub generateWorkspacePages
                 $self->getDefaultNoteDiv($WfRec,$actions).
                 "</div>";
    }
-   if (grep(/^wfcallback$/,@$actions)){
-      $$selopt.="<option value=\"wfcallback\" class=\"$class\">".
-                $self->getParent->T("wfcallback",$tr).
-                "</option>\n";
-      $$divset.="<div id=OPwfcallback style=\"$class;margin:15px\"><br>".
-                $self->getParent->T("use this action,".
-                " to call the task back. This can be usefull, if the ".
-                "task needs to be corrected.")."</div>";
-   }
    if (grep(/^wfreject$/,@$actions)){
       $$selopt.="<option value=\"wfreject\">".
                 $self->getParent->T("wfreject",$tr).
@@ -586,8 +545,15 @@ sub generateWorkspacePages
       $$divset.="<div id=OPwfreject class=\"$class\"><textarea name=note ".
                 "style=\"width:100%;height:110px\"></textarea></div>";
    }
-   return($self->SUPER::generateWorkspacePages($WfRec,$actions,
-                                               $divset,$selopt));
+   if (grep(/^wfaddsubtask$/,@$actions)){
+      $$selopt.="<option value=\"wfaddsubtask\">".
+                $self->getParent->T("wfaddsubtask","base::workflow::task").
+                "</option>\n";
+      $$divset.="<div id=OPwfaddsubtask class=\"$class\"><textarea name=note ".
+                "style=\"width:100%;height:110px\"></textarea></div>";
+   }
+   $self->SUPER::generateWorkspacePages($WfRec,$actions,$divset,$selopt);
+   return("wfaddnote");
 }
 
 sub Validate
@@ -809,86 +775,8 @@ sub Process
          return(0);
       }
      
-      if ($op eq "wfapprovok"){
-         my $note=Query->Param("note");
-         $note=trim($note);
-         if (Query->Param("VERIFY") eq ""){
-            $self->LastMsg(ERROR,"you don't have check the ensure checkbox");
-            return(0);
-         }
-         if ($self->getParent->getParent->Action->StoreRecord(
-             $WfRec->{id},"wfapprove",
-             {translation=>'base::workflow::task'},$note,undef)){
-            my $openuserid=$WfRec->{openuser};
-            $self->StoreRecord($WfRec,{stateid=>7});
-            $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
-            #
-            # MAIL versenden: Workflow wurde genehmigt
-            #
-            $self->PostProcess($action.".".$op,$WfRec,$actions,
-                               note=>$note);
-            return(1);
-         }
-         return(0);
-      }
+   }
      
-      if ($op eq "wfcallback"){
-         if ($self->getParent->getParent->Action->StoreRecord(
-             $WfRec->{id},"wfcallback",
-             {translation=>'base::workflow::task'},undef,undef)){
-            $self->StoreRecord($WfRec,{stateid=>4,
-                                       fwdtargetid=>$userid,
-                                       fwdtarget=>'base::user',
-                                       fwddebtarget=>undef,
-                                       fwddebtargetid=>undef
-                                   });
-            $self->PostProcess($action.".".$op,$WfRec,$actions);
-            return(1);
-         }
-         return(0);
-      }
-     
-      if ($op eq "wfreprocess"){
-         my $note=Query->Param("note");
-         $note=trim($note);
-     
-         my $fobj=$self->getParent->getField("fwdtargetname");
-         my $h=$self->getWriteRequestHash("web");
-         my $newrec;
-         if ($newrec=$fobj->Validate($WfRec,$h)){
-            if (!defined($newrec->{fwdtarget}) ||
-                !defined($newrec->{fwdtargetid} ||
-                $newrec->{fwdtargetid}==0)){
-               if ($self->LastMsg()==0){
-                  $self->LastMsg(ERROR,"invalid forwarding target");
-               }
-               return(0);
-            }
-         }
-         my $fwdtargetname=Query->Param("Formated_fwdtargetname");
-     
-         if ($self->StoreRecord($WfRec,{stateid=>2,
-                                       fwdtarget=>$newrec->{fwdtarget},
-                                       fwdtargetid=>$newrec->{fwdtargetid},
-                                       eventend=>undef,
-                                       closedate=>undef,
-                                       fwddebtarget=>undef,
-                                       fwddebtargetid=>undef })){
-            if ($self->getParent->getParent->Action->StoreRecord(
-                $WfRec->{id},"wfforward",
-                {translation=>'base::workflow::task'},$fwdtargetname."\n".
-                                                         $note,undef)){
-               $self->PostProcess($action.".".$op,$WfRec,$actions,
-                                  note=>$note,
-                                  fwdtarget=>$newrec->{fwdtarget},
-                                  fwdtargetid=>$newrec->{fwdtargetid},
-                                  fwdtargetname=>$fwdtargetname);
-               return(1);
-            }
-         }
-         return(0);
-      }
-   }     
    return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
@@ -902,57 +790,17 @@ sub PostProcess
    my $aobj=$self->getParent->getParent->Action();
    my $workflowname=$self->getParent->getWorkflowMailName();
 
-   if ($action eq "SaveStep.wfapprovalreq"){
-      $aobj->NotifyForward($WfRec->{id},
-                           $param{fwdtarget},
-                           $param{fwdtargetid},
-                           $param{fwdtargetname},
-                           $param{note},
-                           mode=>'APRREQ:',
-                           workflowname=>$workflowname,
-                           sendercc=>1);
-   }
-   if ($action eq "SaveStep.wfapprovok"){
-      $aobj->NotifyForward($WfRec->{id},
-                           $WfRec->{fwdtarget},
-                           $WfRec->{fwdtargetid},
-                           undef,
-                           $param{note},
-                           mode=>'APROK:',
-                           workflowname=>$workflowname,
-                           sendercc=>1);
-   }
-   if ($action eq "SaveStep.wfapprovreject"){
-      $aobj->NotifyForward($WfRec->{id},
-                           $WfRec->{fwdtarget},
-                           $WfRec->{fwdtargetid},
-                           undef,
-                           $param{note},
-                           mode=>'APRREJ:',
-                           workflowname=>$workflowname,
-                           sendercc=>1);
-   }
-   if ($action eq "SaveStep.wfforward" ||
-       $action eq "SaveStep.wfreprocess"){
-      $aobj->NotifyForward($WfRec->{id},
-                           $param{fwdtarget},
-                           $param{fwdtargetid},
-                           $param{fwdtargetname},
-                           $param{note},
-                           workflowname=>$workflowname,
-                           sendercc=>1);
-   }
-   if ($action eq "SaveStep.wfreject" ||
-       $action eq "SaveStep.wffineproc" ||
-       $action eq "SaveStep.wfacceptp" ||
-       $action eq "BreakWorkflow" ){
-      $aobj->NotifyForward($WfRec->{id},
-                           $param{fwdtarget},
-                           $param{fwdtargetid},
-                           $param{fwdtargetname},
-                           $param{note},
-                           workflowname=>$workflowname);
-   }
+#   if ($action eq "SaveStep.wfreject" ||
+#       $action eq "SaveStep.wffineproc" ||
+#       $action eq "SaveStep.wfacceptp" ||
+#       $action eq "BreakWorkflow" ){
+#      $aobj->NotifyForward($WfRec->{id},
+#                           $param{fwdtarget},
+#                           $param{fwdtargetid},
+#                           $param{fwdtargetname},
+#                           $param{note},
+#                           workflowname=>$workflowname);
+#   }
 
    return($self->SUPER::PostProcess($action,$WfRec,$actions));
 }

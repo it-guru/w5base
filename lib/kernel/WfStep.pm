@@ -216,7 +216,8 @@ sub Process
          my $oprec={};
          if (grep(/^iscurrent$/,@{$actions})){ # state "in bearbeitung" darf
             $oprec->{stateid}=4;               # nur gesetzt werden, wenn
-         }                                     # wf aktuell an mich zugewiesen
+            $oprec->{postponeduntil}=undef;    # wf aktuell an mich zugewiesen
+         }                                     # u. Rückstellung wird entfernt.
          my $effort=Query->Param("Formated_effort");
          if ($self->getParent->getParent->Action->StoreRecord(
              $WfRec->{id},"wfaddnote",
@@ -375,8 +376,11 @@ sub generateWorkspace
    $wsheight=~s/px//g;
 
 
-   $self->generateWorkspacePages($WfRec,$actions,\$divset,\$selopt);   
+   my $defo=$self->generateWorkspacePages($WfRec,$actions,\$divset,\$selopt);   
    my $oldop=Query->Param("OP");
+   if (!defined($oldop) || $oldop eq "" || !grep(/^$oldop$/,@{$actions})){
+      $oldop=$defo;
+   }
    my $templ;
    if ($divset eq ""){
       return("<table width=100%><tr><td>&nbsp;</td></tr></table>");
