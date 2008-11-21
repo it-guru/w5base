@@ -92,6 +92,19 @@ sub getDynamicFields
       new kernel::Field::Link (
                 name          =>'initiatorgroup',
                 container     =>'headref'),
+
+      new kernel::Field::Select(
+                name          =>'taskexecstate',
+                label         =>'Execution state',
+                htmleditwidth =>'40px',
+                htmlwidth     =>'10px',
+                value         =>[qw(0 5 10 15 20 25 30 35 40 45 50 
+                                    55 65 70 75 80 85 90 95 100)],
+                default       =>0,
+                unit          =>'%',
+                container     =>'headref'),
+
+
     ));
 }
 
@@ -557,10 +570,17 @@ sub generateWorkspacePages
       $$selopt.="<option value=\"setprioexecs\">".
                 $self->getParent->T("setprioexecs","base::workflow::task").
                 "</option>\n";
+      my $app=$self->getParent->getParent;
+      my $f1=$app->getField("prio",$WfRec);
+      my $f2=$app->getField("wffields.taskexecstate",$WfRec);
+      my $l1=$f1->Label();
+      my $l2=$f2->Label();
+      my $s1=$f1->FormatedDetail($WfRec,"edit");
+      my $s2=$f2->FormatedDetail($WfRec,"edit");
       $$divset.="<div id=OPsetprioexecs class=\"$class\">".
-                "<table width=100% border=1>".
-                "<tr><td>Priorität:</td><td>1-10</td></tr>".
-                "<tr><td>Erledigungsgrad:</td><td>0-100%</td></tr>".
+                "<table width=100% border=0 style=\"margin-top:10px\">".
+                "<tr><td width=20%>$l1:</td><td>$s1</td></tr>".
+                "<tr><td>$l2:</td><td>$s2</td></tr>".
                 "</table></div>";
    }
    $self->SUPER::generateWorkspacePages($WfRec,$actions,$divset,$selopt);
@@ -644,6 +664,17 @@ sub Process
          return(0);
       }
      
+
+      if ($op eq "setprioexecs"){
+         my $prio=Query->Param("Formated_prio");
+         my $execstate=Query->Param("Formated_taskexecstate");
+         if ($self->StoreRecord($WfRec,{prio=>$prio,
+                                        taskexecstate=>$execstate})){
+            $self->PostProcess($action.".".$op,$WfRec,$actions);
+         }
+         return(0);
+      }
+
       if ($op eq "wfacceptn"){
          my $note=Query->Param("note");
          if ($note=~m/^\s*$/  || length($note)<10){

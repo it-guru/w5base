@@ -3,6 +3,7 @@
 'wffine'=>{de=>'Aufgabe abschließen',en=>'finsh task'},
 'wfaddsubtask'=>{de=>'Unteraufgabe erstellen und zuweisen',en=>'add sub task and assign it'},
 'setprioexecs'=>{de=>'Priorität oder Erledigungsgrad anpassen',en=>'modifiy priority or execution grad'},
+'Execution state'=>{de=>'Erledigungsgrad'},
 #'wffine'=>{de=>'Abgeschlossen',en=>'Finished'},
 #'wfreject'=>{de=>'Abgelehnt',en=>'Rejected'},
 #'wfapprove'=>{de=>'Genehmigt',en=>'Approved'},

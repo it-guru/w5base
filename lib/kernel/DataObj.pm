@@ -2010,7 +2010,7 @@ sub DataObj_findtemplvar
          return($fieldbase->{$var}->RawValue($current));
       }
       if ($param[0] eq "formated" || $param[0] eq "detail" || 
-          $param[0] eq "sublistedit"){
+          $param[0] eq "sublistedit" || $param[0] eq "forceedit"){
          if (exists($opt->{viewgroups})){
             my @fieldgrouplist=($fieldbase->{$var}->{group});
             if (ref($fieldbase->{$var}->{group}) eq "ARRAY"){
@@ -2057,7 +2057,7 @@ sub DataObj_findtemplvar
             my $d=$fieldbase->{$var}->FormatedDetail($current,$mode,%FOpt);
             return($d);
          }
-         if ($param[0] eq "sublistedit"){
+         if ($param[0] eq "sublistedit" || $param[0] eq "forceedit"){
             return($fieldbase->{$var}->FormatedDetail($current,"edit",%FOpt));
          }
       }

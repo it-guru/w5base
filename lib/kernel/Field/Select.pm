@@ -151,6 +151,9 @@ sub FormatedDetail
       $res=[map({$self->addWebLinkToFacility($_,$current)} @{$res})];
    }
    $res=join($self->{vjoinconcat},@$res);
+   if ($mode eq "HtmlDetail"){
+      $res.=" ".$self->{unit} if (defined($self->{unit}));
+   }
 
    return($res);
 }
