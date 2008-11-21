@@ -6,7 +6,7 @@
 <tr>
 <td colspan=2>Ihr Benutzername oder Passwort ist nicht
 korret. Bitte überprüfen Sie Ihre Login-Daten. Nähere Information
-zum Ameldeprozess finden Sie auf der Login-Seite.
+zum Anmeldeprozess finden Sie auf der Login-Seite.
 </td></tr>
 <tr>
 <td colspan=2 align=center><input type=button onclick="document.location.href='../../../public/base/menu/root';" value=" zurück zur Login-Seite "></td>

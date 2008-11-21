@@ -223,11 +223,11 @@ sub new
 #                label         =>'AC-ComputerID',
 #                dataobjattr   =>'amcomputer.lcomputerid'),
 #
-#      new kernel::Field::Link(
-#                name          =>'lassetid',
-#                label         =>'AC-AssetID',
-#                dataobjattr   =>'amportfolio.lparentid'),
-#
+      new kernel::Field::Text(
+                name          =>'lassetid',
+                label         =>'AC-AssetID',
+                dataobjattr   =>'amportfolio.lparentid'),
+
       new kernel::Field::Link(
                 name          =>'lportfolioitemid',
                 label         =>'PortfolioID',

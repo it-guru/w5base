@@ -557,8 +557,11 @@ sub generateWorkspacePages
       $$selopt.="<option value=\"setprioexecs\">".
                 $self->getParent->T("setprioexecs","base::workflow::task").
                 "</option>\n";
-      $$divset.="<div id=OPsetprioexecs class=\"$class\"><textarea name=note ".
-                "style=\"width:100%;height:110px\"></textarea></div>";
+      $$divset.="<div id=OPsetprioexecs class=\"$class\">".
+                "<table width=100% border=1>".
+                "<tr><td>Priorität:</td><td>1-10</td></tr>".
+                "<tr><td>Erledigungsgrad:</td><td>0-100%</td></tr>".
+                "</table></div>";
    }
    $self->SUPER::generateWorkspacePages($WfRec,$actions,$divset,$selopt);
    return("wfaddnote");
