@@ -379,7 +379,9 @@ sub generateWorkspace
    my $defo=$self->generateWorkspacePages($WfRec,$actions,\$divset,\$selopt);   
    my $oldop=Query->Param("OP");
    if (!defined($oldop) || $oldop eq "" || !grep(/^$oldop$/,@{$actions})){
-      $oldop=$defo;
+      if (length($defo)<30 && ($defo=~m/^[a-z0-9]+$/i)){
+         $oldop=$defo;
+      }
    }
    my $templ;
    if ($divset eq ""){
