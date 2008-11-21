@@ -222,7 +222,6 @@ sub onFileAdd
    my $self=shift;
    my $rec=shift;
 
-printf STDERR ("fifi rec=%s\n",Dumper($rec));
    my $dataobj=$self->getParent->Clone();
    my $parentid=$rec->{parentrefid};
    msg(INFO,"call of onFileAdd for $rec->{name}");
@@ -303,6 +302,10 @@ sub Validate
          $self->LastMsg(ERROR,"no keywords");
          return(0);
       }
+   }
+   if (exists($newrec->{data})){
+      $newrec->{data}=~s/<script/<div style="visible:hidden" script/gi;
+      $newrec->{data}=~s/<\script>/<\/div>/gi;
    }
    return(1);
 }
