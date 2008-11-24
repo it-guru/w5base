@@ -906,6 +906,9 @@ sub HandleSave
       #$self->SetCurrentView();
    }
    my $newrec=$self->getWriteRequestHash("web",$oldrec);
+   if ($self->LastMsg()!=0){
+      return(undef);
+   }
    if (defined($oldrec) && defined($newrec) && defined($newrec->{$idname})){
       if (!defined($self->{UseSqlReplace}) || $self->{UseSqlReplace}==0){
          delete($newrec->{$idname});
