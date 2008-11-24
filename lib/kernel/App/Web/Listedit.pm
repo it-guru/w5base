@@ -895,7 +895,7 @@ sub HandleSave
    my $idobj=$self->IdField();
    my $idname=$idobj->Name();
    my $flt=undef;
-   msg(INFO,"id=$id");
+   #msg(INFO,"id=$id");
    if (defined($id)){
       $id=~s/&quote;/"/g;
       $flt={$idname=>\$id};
