@@ -649,8 +649,7 @@ sub xlsFinish
       $repmon=~s/\//./g;
       my $filename=$repmon.".xls";
       if (open(F,"<".$xlsexp->{xls}->{filename})){
-         my $dir=
-            "TSI-Connect/DTAG.T-Com/Auslastungsreport nach Konzernstandard";
+         my $dir="TSI-Connect/DTAG.T-Com/ICTO-Sonderleistungsreports";
          $file->ValidatedInsertOrUpdateRecord({name=>$filename,
                                                parent=>$dir,
                                                file=>\*F},
