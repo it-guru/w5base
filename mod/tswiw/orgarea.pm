@@ -111,6 +111,7 @@ sub new
                                    dataobjattr=>'tOuSuperior'),
 
       new kernel::Field::Link(     name       =>'mgrwiwid',
+                                   htmldetail =>0,
                                    dataobjattr=>'tOuMgr'),
 
       new kernel::Field::QualityText(),

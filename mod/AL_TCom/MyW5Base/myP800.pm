@@ -136,6 +136,7 @@ sub Result
       my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
                                             ["REmployee","RChief"],
                                             "down");
+printf STDERR ("fifi groups=%s\n",Dumper(\%grp));
       my @grpids=keys(%grp);
       @grpids=(qw(-1)) if ($#grpids==-1);
    

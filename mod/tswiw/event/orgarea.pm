@@ -158,16 +158,12 @@ sub UpdateOrgareaStructure
             goto NEXT;
          }
          $wiworg->SetFilter({mgrwiwid=>\$wiwid});
-         $wiworg->SetCurrentView(qw(touid name parentid parent shortname));
-         my ($wiwrec,$msg)=$wiworg->getFirst();
-         if (defined($wiwrec)){
+         foreach my $wiwrec ($wiworg->getHashList(
+                              qw(touid name parentid parent shortname))){
             my $bk=$self->addGrpLinkToUser($grp,$wiworg,$grpuser,
                                            $wiwrec,$urec,
                                            ['RBoss']);
             return($bk) if (defined($bk));
-         }
-         if (defined($msg)){
-            msg(ERROR,"LDAP problem - Boss Orgsearch:%s",$msg);
          }
 
 
