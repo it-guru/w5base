@@ -585,28 +585,38 @@ sub loadPrivacyAcl
       my $idobj=$pobj->IdField();
       if (defined($idobj)){
          $pobj->SetFilter({$idobj->Name()=>\$parentrefid});
-         my ($prec,$msg)=$pobj->getOnlyFirst(qw(contacts));
-         if (defined($prec) && defined($prec->{contacts}) && 
-             ref($prec->{contacts}) eq "ARRAY"){
-            my %grps=$self->getGroupsOf($userid,["RMember"],"both");
-            my @grpids=keys(%grps);
-            foreach my $contact (@{$prec->{contacts}}){
-               if ($contact->{target} eq "base::user" &&
-                   $contact->{targetid} ne $userid){
-                  next;
-               }
-               if ($contact->{target} eq "base::grp"){
-                  my $grpid=$contact->{targetid};
-                  next if (!grep(/^$grpid$/,@grpids));
-               }
-               my @roles=($contact->{roles});
-               @roles=@{$contact->{roles}} if (ref($contact->{roles}) eq "ARRAY");
-               if (grep(/^(write)$/,@roles)){       
-                  $foundrw=1;
-                  $foundro=1;
-               }
-               if (grep(/^(privread)$/,@roles)){       
-                  $foundro=1;
+         my @fl=qw(contacts);
+         if ($pobj->getField("databossid")){
+            push(@fl,"databossid");
+         }
+         my ($prec,$msg)=$pobj->getOnlyFirst(@fl);
+         if (exists($prec->{databossid}) && $userid==$prec->{databossid}){
+            $foundrw=1;
+            $foundro=1;
+         }
+         else{
+            if (defined($prec) && defined($prec->{contacts}) && 
+                ref($prec->{contacts}) eq "ARRAY"){
+               my %grps=$self->getGroupsOf($userid,["RMember"],"both");
+               my @grpids=keys(%grps);
+               foreach my $contact (@{$prec->{contacts}}){
+                  if ($contact->{target} eq "base::user" &&
+                      $contact->{targetid} ne $userid){
+                     next;
+                  }
+                  if ($contact->{target} eq "base::grp"){
+                     my $grpid=$contact->{targetid};
+                     next if (!grep(/^$grpid$/,@grpids));
+                  }
+                  my @roles=($contact->{roles});
+                  @roles=@{$contact->{roles}} if (ref($contact->{roles}) eq "ARRAY");
+                  if (grep(/^(write)$/,@roles)){       
+                     $foundrw=1;
+                     $foundro=1;
+                  }
+                  if (grep(/^(privread)$/,@roles)){       
+                     $foundro=1;
+                  }
                }
             }
          }
