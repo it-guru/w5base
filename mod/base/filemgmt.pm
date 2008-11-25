@@ -305,9 +305,18 @@ sub Validate
       }
       $newrec->{parentid}=undef if (!exists($newrec->{parentid}) ||
                                      $newrec->{parentid}==0);
-     # if ($newrec->{parentrefid} ne ""){
-     #     
-     # }
+      if ($newrec->{parentrefid} ne "" && 
+          $newrec->{parentobj} ne "base::filemgmt"){
+         my $isprivate=effVal($oldrec,$newrec,"isprivate");
+         if ($isprivate){
+            my $prirec=$self->loadPrivacyAcl($newrec->{parentobj},
+                              $newrec->{parentrefid});
+            if (!$prirec->{rw}){
+               $self->LastMsg(ERROR,"insuficient rights to write privacy data");
+               return(undef);
+            }
+         }
+      }
    }
    else{
       delete($newrec->{parentobj});
@@ -461,7 +470,9 @@ sub checkacl
    my $fm=$self->getPersistentModuleObject("base::filemgmt");
    my $context=$self->Context();
    $context->{aclmode}={} if (!defined($context->{aclmode}));
+   $context->{privacl}={} if (!defined($context->{privacl}));
    $context=$context->{aclmode};
+   my $privcontext=$context->{privacl};
    if (!defined($context->{$rec->{fid}}->{$mode})){
       # acl des eigenen Records laden und im context abspeichern
       # Achtung: Die ACL's der parents müssen recursiv nach oben
@@ -532,10 +543,17 @@ sub checkacl
                   if ($issubofdata && !$aclsfound){
                      $foundad=0;
                      $foundrw=0;
+                     $foundro=0;
                      if ($context->{$fid}->{isprivate}){
-                        $foundro=0; # now we need an extended check for privacy
-                                    # access
-                        
+                        my $privkey=$context->{$fid}->{parentobj}."->".
+                                    $context->{$fid}->{parentrefid};
+                        if (!exists($privcontext->{$privkey})){ # cache check
+                           $privcontext->{$privkey}=$self->loadPrivacyAcl(
+                                         $context->{$fid}->{parentobj},
+                                         $context->{$fid}->{parentrefid});
+                        }
+                        $foundro=$privcontext->{$privkey}->{ro};
+                        $foundrw=$privcontext->{$privkey}->{rw};
                      }
                      else{
                         $foundro=1;
@@ -553,6 +571,49 @@ sub checkacl
 
 }
 
+sub loadPrivacyAcl
+{
+   my $self=shift;
+   my $parentobj=shift;
+   my $parentrefid=shift;
+   my $foundrw=0;
+   my $foundro=0;
+   my $userid=$self->getCurrentUserId();
+
+   my $pobj=getModuleObject($self->Config,$parentobj);
+   if (defined($pobj) && $parentrefid ne ""){
+      my $idobj=$pobj->IdField();
+      if (defined($idobj)){
+         $pobj->SetFilter({$idobj->Name()=>\$parentrefid});
+         my ($prec,$msg)=$pobj->getOnlyFirst(qw(contacts));
+         if (defined($prec) && defined($prec->{contacts}) && 
+             ref($prec->{contacts}) eq "ARRAY"){
+            my %grps=$self->getGroupsOf($userid,["RMember"],"both");
+            my @grpids=keys(%grps);
+            foreach my $contact (@{$prec->{contacts}}){
+               if ($contact->{target} eq "base::user" &&
+                   $contact->{targetid} ne $userid){
+                  next;
+               }
+               if ($contact->{target} eq "base::grp"){
+                  my $grpid=$contact->{targetid};
+                  next if (!grep(/^$grpid$/,@grpids));
+               }
+               my @roles=($contact->{roles});
+               @roles=@{$contact->{roles}} if (ref($contact->{roles}) eq "ARRAY");
+               if (grep(/^(write)$/,@roles)){       
+                  $foundrw=1;
+                  $foundro=1;
+               }
+               if (grep(/^(privread)$/,@roles)){       
+                  $foundro=1;
+               }
+            }
+         }
+      }
+   }
+   return({ro=>$foundro,rw=>$foundrw});
+}
 
 sub isViewValid
 {

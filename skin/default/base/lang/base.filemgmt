@@ -15,3 +15,4 @@
 'Modify rights'=>{de=>'Rechte anpassen'},
 "invalid filename '\%s' specified"=>{de=>"ungültiger Dateiname '\%s'"},
 'is private'=>{de=>'Vertraulich behandeln'},
+'insuficient rights to write privacy data'=>{de=>'ungenügende Rechte, um vertrauliche Daten zu schreiben'},

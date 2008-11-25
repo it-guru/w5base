@@ -62,6 +62,8 @@ sub getPosibleRoles
                                                      $self->Self),
              "read"            =>$self->getParent->T("read application",
                                                      $self->Self),
+             "privread"        =>$self->getParent->T("privacy read",
+                                                     $self->Self),
              "write"           =>$self->getParent->T("write application",
                                                      $self->Self),
              "support"         =>$self->getParent->T("Support",

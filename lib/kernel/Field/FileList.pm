@@ -80,7 +80,8 @@ sub ListFiles
                    parentrefid=>$refid});
    foreach my $rec ($fo->getHashList(qw(ALL))){
       if (defined($rec)){
-         next if ($mode eq "" && !$fo->isViewValid($rec));
+         #next if ($mode eq "" && !$fo->isViewValid($rec));
+         next if (!$fo->isViewValid($rec));
          $d.=$rec->{name}."<br>\n";
          my %clone=(%{$rec});
          $clone{label}=$clone{name};
@@ -134,12 +135,19 @@ sub HandleFILEADD
       $parentobj=$self->getParent->Self();
    }
    if (Query->Param("DO") ne ""){
+      my $isprivate=0;
+      if (Query->Param("isprivate") ne ""){
+         $isprivate=1;
+      }
       my $fh=Query->Param("file");
+      my $comments=Query->Param("comments");
       my $ok=0;
       if (defined($fh) && $fh ne ""){
          my $fo=$self->getFileManagementObj();
          my %rec=(file=>$fh,
+                  isprivate=>$isprivate,
                   parentobj=>$parentobj,
+                  comments=>$comments,
                   parentrefid=>$refid,
                   name=>$fh);
          if (my $fid=$fo->ValidatedInsertRecord(\%rec)){
@@ -152,6 +160,9 @@ sub HandleFILEADD
                   my ($rec,$msg)=$fo->getOnlyFirst(qw(ALL));
                   &{$self->{onFileAdd}}($self,$rec);
                }
+               Query->Delete("isprivate");
+               Query->Delete("comments");
+               Query->Delete("file");
             }
          }
       }
@@ -169,14 +180,28 @@ parent.document.forms[0].submit();
 EOF
       return();
    }
+   my $comments=Query->Param("comments");
+   my $isprivate="";
+   if (Query->Param("isprivate") ne ""){
+      $isprivate=" checked ";
+   }
    $d.="<div class=FileListModeWork>";
-   $d.="<table width=100% height=40 border=0>";
+   $d.="<table width=100% height=80 border=0>";
    $d.="<tr height=1%>";
    $d.="<td>".$self->getParent->T("File to upload",'kernel::FileList').":</td>";
-   $d.="<td width=30%><input type=file name=file size=50></td>";
-   $d.="<td><input type=submit name=DO style=\"width:100%\" value=\"".
+   $d.="<td colspan=2><input type=file name=file size=50></td>";
+   $d.="</tr><tr>".
+       "<tr><td width=1% nowrap>".
+       $self->getParent->T("comments",'kernel::FileList')."</td>".
+       "<td colspan=2><input name=comments value=\"$comments\" ".
+       "type=text style=\"width:100%\"></tr>".
+       "<tr><td width=1% nowrap>".
+       $self->getParent->T("handle file as private",'kernel::FileList')."</td>".
+       "<td><input type=checkbox $isprivate name=isprivate></td>";
+   $d.="<td valign=bottom>".
+       "<input type=submit name=DO style=\"width:100%\" value=\"".
        $self->getParent->T("Upload",'kernel::FileList')."\"></td>";
-   $d.="</tr><tr><td></td></tr>";
+   $d.="</tr>";
    $d.="</table>";
    $d.="</div>";
    print $d;
