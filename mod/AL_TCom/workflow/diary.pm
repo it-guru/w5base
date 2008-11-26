@@ -558,6 +558,20 @@ EOF
    return($templ);
 }
 
+sub nativProcess
+{
+   my $self=shift;
+   my $action=shift;
+   my $h=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+
+   return($self->SUPER::nativProcess($action,$h,$WfRec,$actions));
+}
+
+
+
 sub preValidate                 # das muﬂ in preValidate behandelt werden,
 {                               # da sp‰ter noch die KeyHandler beeinfluﬂt
    my $self=shift;              # werden

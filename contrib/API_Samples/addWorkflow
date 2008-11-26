@@ -39,7 +39,6 @@ else{
 
 my $WfRec={ class=>'AL_TCom::workflow::businesreq',
             name=>'Hallo Welt 1',
-            action=>'NextStep',
             reqnature=>'install',
             detaildescription=>"Dies ist der lange Text\n".
                                "mit mehreren Zeilen",
@@ -53,8 +52,6 @@ my $WfRec={ class=>'AL_TCom::workflow::businesreq',
 msg(INFO,"create Workflow");
 if (my $id=$wf->storeRecord($WfRec)){
    msg(INFO,"ok newid=$id");
-   my $id=$wf->storeRecord({note=>'Hallo',action=>'SaveStep.addnote'},$id);
-   $wf->dieOnERROR();
    $wf->SetFilter({id=>[$id]});
    foreach my $WfRec ($wf->getHashList(qw(name posibleactions shortactionlog
                                           step class))){

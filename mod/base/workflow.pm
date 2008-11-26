@@ -132,7 +132,7 @@ sub new
                 uivisible     =>\&isOptionalFieldVisible,
                 vjointo       =>'base::workflowaction',
                 vjoinon       =>['id'=>'wfheadid'],
-                vjoindisp     =>[qw(cdate id name actionref
+                vjoindisp     =>[qw(ascid cdate id name actionref
                                   translation owner additional
                                   effort comments)]),
                                    
@@ -1507,7 +1507,7 @@ sub nativProcess
       }
       $WfRec=$rec;
       $class=$WfRec->{class};
-      $step=$WfRec->{step};
+      $step=$WfRec->{step} if (!defined($step));
    }
    if (!defined($class)){
       $self->LastMsg(ERROR,"no class specified");
@@ -1520,6 +1520,9 @@ sub nativProcess
    my $classobj=$self->{SubDataObj}->{$class};
    if (!defined($step)){
       $step=$classobj->getNextStep(undef,undef);
+      if (!defined($action) || $action eq ""){
+         $action="NextStep";
+      }
    }
    if (!defined($step)){
       $self->LastMsg(ERROR,"no step specified");

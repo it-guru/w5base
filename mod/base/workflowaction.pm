@@ -43,6 +43,11 @@ sub new
                 label         =>'ActionID',
                 dataobjattr   =>'wfaction.wfactionid'),
                                   
+      new kernel::Field::Link(
+                name          =>'ascid',        # only for other ordering
+                label         =>'ActionID',  
+                dataobjattr   =>'wfaction.wfactionid'),
+                                  
       new kernel::Field::Text(
                 name          =>'wfheadid',
                 weblinkto     =>'base::workflow',

@@ -232,6 +232,27 @@ sub Validate
    return(1);
 }
 
+sub nativProcess
+{
+   my $self=shift;
+   my $action=shift;
+   my $h=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   if ($action eq "NextStep"){
+      $h->{stateid}=1;
+      $h->{eventstart}=NowStamp("en");
+      $h->{eventend}=undef;
+      $h->{closedate}=undef;
+      if (my $id=$self->StoreRecord($WfRec,$h)){
+         $h->{id}=$id;
+         return(1);
+      }
+   }
+   return(0);
+}
+
 sub Process
 {
    my $self=shift;
@@ -241,13 +262,7 @@ sub Process
 
    if ($action eq "NextStep"){
       my $h=$self->getWriteRequestHash("web");
-      $h->{stateid}=1;
-      $h->{eventstart}=NowStamp("en");
-      $h->{eventend}=undef;
-      $h->{closedate}=undef;
-      if (!$self->StoreRecord($WfRec,$h)){
-         return(0);
-      }
+      return($self->nativProcess($action,$h,$WfRec,$actions)); 
    }
    return($self->SUPER::Process($action,$WfRec));
 }
@@ -357,6 +372,34 @@ sub Validate
    return(1);
 }
 
+sub nativProcess
+{
+   my $self=shift;
+   my $action=shift;
+   my $h=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   if ($action eq "SaveStep.addnote"){
+      my $note=$h->{note};
+      my $effort=$h->{effort};
+      if ($note=~m/^\s*$/){
+         $self->LastMsg(ERROR,"nix drin");
+         return(0);
+      }
+      $note=trim($note);
+      if ($self->getParent->getParent->Action->StoreRecord(
+          $WfRec->{id},"note",
+          {translation=>'base::workflow::diary'},$note,$effort)){
+         $self->StoreRecord($WfRec,{stateid=>4});
+         $h->{id}=$WfRec->{id};
+         return(1);
+      }
+      return(0);
+   }
+   return(0);
+}
+
 sub Process
 {
    my $self=shift;
@@ -366,20 +409,13 @@ sub Process
 
    if (!defined($action) && Query->Param("addnote")){
       my $note=Query->Param("note");
-      if ($note=~m/^\s*$/){
-         $self->LastMsg(ERROR,"nix drin");
-         return(0);
-      }
-      $note=trim($note);
       my $effort=Query->Param("Formated_effort");
-      if ($self->getParent->getParent->Action->StoreRecord(
-          $WfRec->{id},"note",
-          {translation=>'base::workflow::diary'},$note,$effort)){
-         $self->StoreRecord($WfRec,{stateid=>4});
+      my $bk=$self->nativProcess("SaveStep.addnote",
+                                {note=>$note,effort=>$effort},$WfRec,$actions);
+      if ($bk){
          Query->Delete("WorkflowStep");
-         return(1);
       }
-      return(0);
+      return($bk);
    }
    if (!defined($action) && Query->Param("addsup")){
       return(undef) if (!$self->ValidActionCheck(1,$actions,"addsup"));
@@ -678,6 +714,34 @@ sub getWorkHeight
    return(80);
 }
 
+sub nativProcess
+{
+   my $self=shift;
+   my $action=shift;
+   my $h=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   if ($action eq "SaveStep.wffinish"){
+      if ($self->StoreRecord($WfRec,{
+                                step=>'base::workflow::diary::wffinish',
+                                fwdtarget=>undef,
+                                fwdtargetid=>undef,
+                                closedate=>NowStamp("en"),
+                                stateid=>21})){
+         if ($self->getParent->getParent->Action->StoreRecord(
+             $WfRec->{id},"wffinish", 
+             {translation=>'base::workflow::diary'},undef)){
+            $h->{id}=$WfRec->{id};
+            return(1);
+         }
+         return(0);
+      }
+      return(0);
+   }
+   return(0);
+}
+
 sub Process
 {
    my $self=shift;
@@ -694,21 +758,9 @@ sub Process
    }
    if (!defined($action) && Query->Param("wffinish")){
       return(undef) if (!$self->ValidActionCheck(1,$actions,"wffinish"));
-      if ($self->StoreRecord($WfRec,{
-                                step=>'base::workflow::diary::wffinish',
-                                fwdtarget=>undef,
-                                fwdtargetid=>undef,
-                                closedate=>NowStamp("en"),
-                                stateid=>21})){
-         if ($self->getParent->getParent->Action->StoreRecord(
-             $WfRec->{id},"wffinish", 
-             {translation=>'base::workflow::diary'},undef)){
-            Query->Delete("WorkflowStep");
-            return(1);
-         }
-         return(0);
-      }
-      return(0);
+      my $bk=$self->nativProcess("SaveStep.wffinish",{},$WfRec,$actions);
+      Query->Delete("WorkflowStep") if ($bk);
+      return($bk);
    }
    return(0);
 }

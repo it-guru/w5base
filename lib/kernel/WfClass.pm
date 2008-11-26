@@ -123,7 +123,7 @@ sub nativProcess
       my @actions=$self->getPosibleActions($WfRec);
       return($stepobj->nativProcess($action,$h,$WfRec,\@actions));
    }
-   $self->LastMsg(ERROR,"step does not support nativ action requests");
+   $self->LastMsg(ERROR,"step '\%s' does not support nativ action requests",$step);
    return(undef);
 }
 
