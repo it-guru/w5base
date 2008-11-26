@@ -331,10 +331,14 @@ sub storeRecord
       return(interface::SOAP::kernel::Finish({exitcode=>128,
              lastmsg=>['invalid dataobject name']}));
    }
+   if (ref($newrec) ne "HASH"){
+      return(interface::SOAP::kernel::Finish({exitcode=>128,
+             lastmsg=>[msg(ERROR,'invalid or emtpy data record specified')]}));
+   }
    my $o=getModuleObject($self->Config,$objectname);
    if (!defined($o)){
       return(interface::SOAP::kernel::Finish({exitcode=>128,
-             lastmsg=>['invalid dataobject specified']}));
+             lastmsg=>[msg(ERROR,'invalid dataobject specified')]}));
    }
    foreach my $k (keys(%$newrec)){
       if (ref($newrec->{$k}) eq "ARRAY" &&
@@ -342,49 +346,63 @@ sub storeRecord
          $newrec->{$k}=$envelope->parts()->[$newrec->{$k}->[1]];
       }
    }
-
-   if (defined($id)){
-      my $idfield=$o->IdField();
-      if (defined($idfield)){
-         my $idname=$idfield->Name();
-         my $filter={$idname=>\$id};
-         $o->SecureSetFilter($filter); 
-         my ($oldrec,$msg)=$o->getOnlyFirst(qw(ALL));
-         if (defined($oldrec)){
-            if (my @grps=$o->isWriteValid($oldrec,$newrec)){
-               if ($o->SecureValidatedUpdateRecord($oldrec,$newrec,$filter)){
-                  $id=~s/^0*//g if (defined($id) && $id=~m/^\d+$/);
-                  return(interface::SOAP::kernel::Finish({exitcode=>0,
-                                                          IdentifiedBy=>$id})); 
-               }
-               return(interface::SOAP::kernel::Finish({exitcode=>10,
-                      lastmsg=>[$o->LastMsg()]})); 
-            }
-            else{
-               return(interface::SOAP::kernel::Finish({exitcode=>12,
-                      lastmsg=>["no write access to specified record"]})); 
-            }
-         }
-         return(interface::SOAP::kernel::Finish({exitcode=>10,
-                lastmsg=>[msg(ERROR,'can not find record for update')]})); 
+   if ($objectname eq "base::workflow"){
+      my $action=$newrec->{action};
+      delete($newrec->{action});
+      if ($o->nativProcess($action,$newrec,$id)){
+         return(interface::SOAP::kernel::Finish({exitcode=>0,
+                      IdentifiedBy=>$newrec->{id}})); 
       }
-      return(interface::SOAP::kernel::Finish({exitcode=>20,
-             lastmsg=>[
-                msg(ERROR,'no unique idenitifier in dataobject found')]})); 
+      if ($o->LastMsg()==0){
+         $o->LastMsg(ERROR,"unknown problem");
+      }
+      return(interface::SOAP::kernel::Finish({exitcode=>10,
+             lastmsg=>[$o->LastMsg()]})); 
    }
    else{
-      if (my @grps=$o->isWriteValid(undef,$newrec)){
-         if (my $id=$o->SecureValidatedInsertRecord($newrec)){
-            $id=~s/^0*//g if (defined($id) && $id=~m/^\d+$/);
-            return(interface::SOAP::kernel::Finish({exitcode=>0,
-                                                    IdentifiedBy=>$id})); 
+      if (defined($id)){
+         my $idfield=$o->IdField();
+         if (defined($idfield)){
+            my $idname=$idfield->Name();
+            my $filter={$idname=>\$id};
+            $o->SecureSetFilter($filter); 
+            my ($oldrec,$msg)=$o->getOnlyFirst(qw(ALL));
+            if (defined($oldrec)){
+               if (my @grps=$o->isWriteValid($oldrec,$newrec)){
+                  if ($o->SecureValidatedUpdateRecord($oldrec,$newrec,$filter)){
+                     $id=~s/^0*//g if (defined($id) && $id=~m/^\d+$/);
+                     return(interface::SOAP::kernel::Finish({exitcode=>0,
+                                                          IdentifiedBy=>$id})); 
+                  }
+                  return(interface::SOAP::kernel::Finish({exitcode=>10,
+                         lastmsg=>[$o->LastMsg()]})); 
+               }
+               else{
+                  return(interface::SOAP::kernel::Finish({exitcode=>12,
+                         lastmsg=>["no write access to specified record"]})); 
+               }
+            }
+            return(interface::SOAP::kernel::Finish({exitcode=>10,
+                   lastmsg=>[msg(ERROR,'can not find record for update')]})); 
          }
-         return(interface::SOAP::kernel::Finish({exitcode=>10,
-                lastmsg=>[$o->LastMsg()]})); 
+         return(interface::SOAP::kernel::Finish({exitcode=>20,
+                lastmsg=>[
+                   msg(ERROR,'no unique idenitifier in dataobject found')]})); 
       }
       else{
-         return(interface::SOAP::kernel::Finish({exitcode=>12,
-                lastmsg=>["no write (insert) access to specified data"]})); 
+         if (my @grps=$o->isWriteValid(undef,$newrec)){
+            if (my $id=$o->SecureValidatedInsertRecord($newrec)){
+               $id=~s/^0*//g if (defined($id) && $id=~m/^\d+$/);
+               return(interface::SOAP::kernel::Finish({exitcode=>0,
+                                                       IdentifiedBy=>$id})); 
+            }
+            return(interface::SOAP::kernel::Finish({exitcode=>10,
+                   lastmsg=>[$o->LastMsg()]})); 
+         }
+         else{
+            return(interface::SOAP::kernel::Finish({exitcode=>12,
+                   lastmsg=>["no write (insert) access to specified data"]})); 
+         }
       }
    }
    return(interface::SOAP::kernel::Finish({exitcode=>-1}));

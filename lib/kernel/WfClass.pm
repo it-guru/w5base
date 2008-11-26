@@ -101,6 +101,34 @@ sub getStepObject
    return($obj);
 }
 
+#
+# SOAP Interface connector
+#
+sub nativProcess
+{
+   my $self=shift;
+   my $action=shift;
+   my $h=shift;
+   my $step=shift;
+   my $WfRec=shift;
+
+   my $stepobj=$self->getStepObject($self->getParent->Config,$step);
+   if (!defined($stepobj)){
+      $self->LastMsg(ERROR,"invalid stepname specified");
+      return(undef);
+   }
+   if ($stepobj->can("nativProcess")){
+      msg(INFO,"call nativProcess class=$self step=$stepobj");
+      msg(INFO,"process request\n%s",Dumper($h));
+      my @actions=$self->getPosibleActions($WfRec);
+      return($stepobj->nativProcess($action,$h,$WfRec,\@actions));
+   }
+   $self->LastMsg(ERROR,"step does not support nativ action requests");
+   return(undef);
+}
+
+
+
 sub Validate
 {
    my $self=shift;

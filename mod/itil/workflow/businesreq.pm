@@ -112,18 +112,39 @@ sub getDefaultContractor
    my $self=shift;
    my $WfRec=shift;
    my $actions=shift;
-   my $applid;
    my $target;
+   my $flt;
+
+   if (defined($WfRec->{affectedapplication})){
+      my $applname=$WfRec->{affectedapplication};
+      if (ref($applname) eq "ARRAY"){
+         $flt={name=>\$applname->[0]};
+      } 
+      else{
+         $flt={name=>\$applname};
+      }
+   }
    if (defined($WfRec->{affectedapplicationid})){
-      $applid=$WfRec->{affectedapplicationid};
-      $applid=$applid->[0] if (ref($applid) eq "ARRAY");
+      my $applid=$WfRec->{affectedapplicationid};
+      if (ref($applid) eq "ARRAY"){
+         $flt={id=>\$applid->[0]};
+      } 
+      else{
+         $flt={id=>\$applid};
+      }
    }
    my @devcon;
-   if (defined($applid)){
+   if (defined($flt)){
       my $appl=getModuleObject($self->getParent->Config,"itil::appl");
-      $appl->SetFilter({id=>\$applid});
-      my ($cur,$msg)=$appl->getOnlyFirst(qw(allowbusinesreq contacts));
+      $appl->SetFilter($flt);
+      my ($cur,$msg)=$appl->getOnlyFirst(qw(allowbusinesreq contacts id name));
       if (defined($cur) && defined($cur->{contacts})){
+         if (!defined($WfRec->{affectedapplicationid})){
+            $WfRec->{affectedapplicationid}=$cur->{id};
+         }
+         if (!defined($WfRec->{affectedapplication})){
+            $WfRec->{affectedapplication}=$cur->{name};
+         }
          my $c=$cur->{contacts};
          if (ref($c) eq "ARRAY"){
             foreach my $con (@$c){
@@ -146,6 +167,10 @@ sub getDefaultContractor
             return(undef);
          }
       }
+   }
+   else{
+      $self->LastMsg(ERROR,"no reference to related application specified");
+      return(undef);
    }
    if ($#devcon==-1){
       $self->LastMsg(ERROR,"no orderin found");
@@ -280,18 +305,27 @@ sub Validate
    my $self=shift;
    my $oldrec=$_[0];
    my $newrec=$_[1];
+   my $found=0;
 
    my $aid=effVal($oldrec,$newrec,"affectedapplicationid");
-   $aid=[$aid] if (ref($aid) ne "ARRAY");
-   my $appl=getModuleObject($self->Config,"itil::appl");
-   $appl->SetFilter({id=>$aid});
-   my %conumber;
-   foreach my $arec ($appl->getHashList(qw(conumber))){
-      $conumber{$arec->{conumber}}++ if ($arec->{conumber} ne "");
+   if ($aid ne ""){
+      $aid=[$aid] if (ref($aid) ne "ARRAY");
+      my $appl=getModuleObject($self->Config,"itil::appl");
+      $appl->SetFilter({id=>$aid});
+      my %conumber;
+      foreach my $arec ($appl->getHashList(qw(conumber))){
+         $conumber{$arec->{conumber}}++ if ($arec->{conumber} ne "");
+         $found++;
+      }
+      if (keys(%conumber)){
+         $newrec->{conumber}=[keys(%conumber)];
+      }
    }
-   if (keys(%conumber)){
-      $newrec->{conumber}=[keys(%conumber)];
+   if ($found!=1){
+      $self->LastMsg(ERROR,"no application found in request");
+      return(0);
    }
+   
    return($self->SUPER::Validate(@_));
 
 }

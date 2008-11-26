@@ -438,15 +438,15 @@ sub addInitialParameters
    return(1);
 }
 
-sub Process
+sub nativProcess
 {
    my $self=shift;
    my $action=shift;
+   my $h=shift;
    my $WfRec=shift;
    my $actions=shift;
 
    if ($action eq "NextStep"){
-      my $h=$self->getWriteRequestHash("web");
       my ($target,$fwdtarget,$fwdtargetid,$fwddebtarget,$fwddebtargetid,@wsref)=
              $self->getParent->getDefaultContractor($h,$actions);
 #printf STDERR ("fifi fwdtarget=$fwdtarget\n");
@@ -471,7 +471,7 @@ sub Process
       $h->{eventstart}=NowStamp("en");
       $h->{eventend}=undef;
       $h->{closedate}=undef;
-      $h->{implementedto}="?";
+      $h->{implementedto}="?" if ($h->{implementedto} eq "");
       $h->{initiatorid}=$self->getParent->getParent->getCurrentUserId();
 
       my $UserCache=$self->Cache->{User}->{Cache};
@@ -510,6 +510,20 @@ sub Process
          return(0);
       }
       return(1);
+   }
+   return(undef);
+}
+
+sub Process
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   if ($action eq "NextStep"){
+      my $h=$self->getWriteRequestHash("web");
+      return($self->nativProcess($action,$h,$WfRec,$actions));
    }
    return($self->SUPER::Process($action,$WfRec,$actions));
 }

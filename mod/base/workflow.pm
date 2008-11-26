@@ -104,6 +104,11 @@ sub new
                                     17 21 22 23 24 25 26)],
                 readonly      =>1,
                 dataobjattr   =>'wfhead.wfstate'),
+
+      new kernel::Field::Interface(
+                name          =>'posibleactions',
+                onRawValue    =>\&getPosibleActions,
+                depend        =>['id']),
                                    
       new kernel::Field::Link(
                 name          =>'stateid',         # for fast
@@ -705,6 +710,29 @@ EOF
    return($H);
 }
 
+sub getPosibleActions
+{
+   my $self=shift;
+   my $current=shift;
+   my @actions;
+   if (defined($current->{id}) && $current->{id} ne ""){
+      my $wf=$self->getParent->Clone();
+      $wf->ResetFilter();
+      $wf->SetFilter({id=>\$current->{id}});
+      my ($WfRec)=$wf->getOnlyFirst(qw(ALL));
+      if (defined($WfRec)){
+         my $class=$WfRec->{class};
+         msg(INFO,"check of actions in $class");
+         my $app=$self->getParent;
+         if (defined($class) && defined($app->{SubDataObj}->{$class})){
+            msg(INFO,"load posible actions from $class");
+            @actions=$app->{SubDataObj}->{$class}->getPosibleActions($WfRec);
+         }
+      }
+   }
+   return(\@actions);
+}
+
 
 sub Action                 # to access base::workflowaction
 {
@@ -957,6 +985,9 @@ sub Validate
       }
       if (!exists($newrec->{eventend})){
          $newrec->{eventend}=undef;
+      }
+      if (!exists($newrec->{eventstart})){
+         $newrec->{eventstart}=NowStamp("en");
       }
    }
    my $eventend=effVal($oldrec,$newrec,"eventend");
@@ -1451,6 +1482,55 @@ sub Store
       }
    }
    return($bk);
+}
+
+
+#
+# SOAP Interface connector
+#
+sub nativProcess
+{
+   my $self=shift;
+   my $action=shift;
+   my $h=shift;
+   my $id=shift;
+   my $WfRec;
+   my $class=$h->{class};
+   my $step=$h->{step};
+   if (defined($id)){
+      $self->ResetFilter();
+      $self->SetFilter({id=>\$id});
+      my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
+      if (!defined($rec)){
+         $self->LastMsg(ERROR,"invalid workflow reference");
+         return(undef);
+      }
+      $WfRec=$rec;
+      $class=$WfRec->{class};
+      $step=$WfRec->{step};
+   }
+   if (!defined($class)){
+      $self->LastMsg(ERROR,"no class specified");
+      return(undef);
+   }
+   if (!defined(defined($self->{SubDataObj}->{$class}))){
+      $self->LastMsg(ERROR,"unknown class specified");
+      return(undef);
+   }
+   my $classobj=$self->{SubDataObj}->{$class};
+   if (!defined($step)){
+      $step=$classobj->getNextStep(undef,undef);
+   }
+   if (!defined($step)){
+      $self->LastMsg(ERROR,"no step specified");
+      return(undef);
+   }
+   if (!defined($action) || $action eq ""){
+      $self->LastMsg(ERROR,"no action specified");
+      return(undef);
+   }
+   msg(INFO,"request on class=$class step=$step");
+   return($classobj->nativProcess($action,$h,$step,$WfRec));
 }
 
 sub ById
