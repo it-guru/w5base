@@ -391,11 +391,18 @@ sub generateMenuTree
             foreach my $m (@$ml){
                if (exists($m->{entrytype})){
                   if ($m->{entrytype}==1 || $m->{entrytype}==2){
+                     my $fvwmcmd="FvwmConnectCommand";
+                     if ($m->{entrytype}==1){
+                        $fvwmcmd="FvwmSSHLogin";
+                     }
+                     elsif ($m->{entrytype}==2){
+                        $fvwmcmd="FvwmRDesktopLogin";
+                     }
                      my $label=$m->{label};
                      $label.=" ($m->{comments})" if ($m->{comments} ne "");
                      push(@{$targetm->{cmdentrys}},
                           {label=>$label,
-                           cmd=>"Exec \$[HOME]/bin/FvwmSSHLogin \"".$m->{label}.
+                           cmd=>"Exec \$[HOME]/bin/$fvwmcmd \"".$m->{label}.
                                 "\" \"$m->{label}\""});
                   }
                }
