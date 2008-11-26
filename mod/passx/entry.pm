@@ -282,86 +282,89 @@ sub generateMenuTree
       $simplem.="<table width=100%>";
       my $line=1;
       do{
-        my $onclick="showCryptoOut($rec->{id})";
-        if ($rec->{quickpath} ne "" && $flt eq ""){
-           foreach my $subquickpath (split(/;/,$rec->{quickpath})){
-              my @quickpath=split(/\./,$subquickpath);
-              my @curpath=split(/\./,$curpath);
-              my $pathdepth=$#curpath+1;
-              for(my $chkpathdepth=0;$chkpathdepth<=$pathdepth;$chkpathdepth++){
-                 if ($chkpathdepth<$#quickpath+1){
-                    my $chkpath=join(".",@quickpath[0..$chkpathdepth]);
-                    if (!defined($padd{$chkpath})){
-                       $targetml=\@ml if ($chkpathdepth==0);
-                       if (($chkpathdepth==0 || $mode ne "web") ||
-                           join(".",@quickpath[0..$chkpathdepth-1]) eq
-                           join(".",@curpath[0..$chkpathdepth-1])){
-                          my %mrec;
-                          $mrec{tree}=[];
-                          $mrec{label}=$quickpath[$chkpathdepth];
-                          $mrec{href}="javascript:setCurPath(\"$chkpath\")";
-                          $mrec{menuid}=$mid++;
-                          if ($mode ne "web"){
-                             delete($mrec{href});
+        if ($rec->{quickpath} ne "" || $mode ne "fvwm"){
+           my $onclick="showCryptoOut($rec->{id})";
+           if ($rec->{quickpath} ne "" && $flt eq ""){
+              foreach my $subquickpath (split(/;/,$rec->{quickpath})){
+                 my @quickpath=split(/\./,$subquickpath);
+                 my @curpath=split(/\./,$curpath);
+                 my $pathdepth=$#curpath+1;
+                 for(my $chkpathdepth=0;$chkpathdepth<=$pathdepth;
+                     $chkpathdepth++){
+                    if ($chkpathdepth<$#quickpath+1){
+                       my $chkpath=join(".",@quickpath[0..$chkpathdepth]);
+                       if (!defined($padd{$chkpath})){
+                          $targetml=\@ml if ($chkpathdepth==0);
+                          if (($chkpathdepth==0 || $mode ne "web") ||
+                              join(".",@quickpath[0..$chkpathdepth-1]) eq
+                              join(".",@curpath[0..$chkpathdepth-1])){
+                             my %mrec;
+                             $mrec{tree}=[];
+                             $mrec{label}=$quickpath[$chkpathdepth];
+                             $mrec{href}="javascript:setCurPath(\"$chkpath\")";
+                             $mrec{menuid}=$mid++;
+                             if ($mode ne "web"){
+                                delete($mrec{href});
+                             }
+                             push(@$targetml,\%mrec);
+                             $padd{$chkpath}=\%mrec;
                           }
-                          push(@$targetml,\%mrec);
-                          $padd{$chkpath}=\%mrec;
                        }
+                       $targetml=$padd{$chkpath}->{tree};
                     }
-                    $targetml=$padd{$chkpath}->{tree};
+                 }
+                 if (($mode ne "web" && $rec->{entrytype}<=10) || 
+                     join(".",@curpath) eq join(".",@quickpath)){
+                    my %mrec;
+                    $mrec{label}=$rec->{account}.'@'.$rec->{name};
+                    $mrec{menuid}=$rec->{id};
+                    $mrec{entrytype}=$rec->{entrytype};
+                    $mrec{name}=$rec->{name};
+                    $mrec{account}=$rec->{account};
+                    $mrec{comments}=$rec->{comments};
+                    if ($mode eq "web"){
+                       $mrec{parent}=$padd{join(".",@quickpath)};
+                    }
+                    $mrec{href}="javascript:$onclick";
+                    if ($mode ne "web"){
+                       delete($mrec{href});
+                    }
+                    push(@$targetml,\%mrec);
                  }
               }
-              if (($mode ne "web" && $rec->{entrytype}<=10) || 
-                  join(".",@curpath) eq join(".",@quickpath)){
+           }
+           if ($rec->{quickpath} eq "" || $flt ne ""){
+              if ($mode eq "web"){
+                 my $lineclass="line$line";
+                 my $dispname=$rec->{name};
+                 if (length($dispname)>20){
+                    $dispname=substr($dispname,0,15)."...".
+                              substr($dispname,length($dispname)-5,5);
+                 }
+                 $simplem.="<tr class=$lineclass ".
+                     "onMouseOver=\"this.className='linehighlight'\" ".
+                     "onMouseOut=\"this.className='$lineclass'\">\n";
+                 $simplem.="<td onClick=\"$onclick\" width=1%>".
+                     "<img src=\"../../../public/passx/load/".
+                     "actype.$rec->{entrytype}.gif\"></td>";
+                 $simplem.="<td onClick=\"$onclick\">$dispname</td>";
+                 $simplem.="<td onClick=\"$onclick\">$rec->{account}</td>";
+                 $simplem.="</td>";
+                 $simplem.="</tr>";
+                 $line++;
+                 $line=1 if ($line>2);
+              }
+              if ($mode ne "web" && $rec->{entrytype}<=10){
                  my %mrec;
                  $mrec{label}=$rec->{account}.'@'.$rec->{name};
                  $mrec{menuid}=$rec->{id};
                  $mrec{entrytype}=$rec->{entrytype};
+                 $mrec{comments}=$rec->{comments};
                  $mrec{name}=$rec->{name};
                  $mrec{account}=$rec->{account};
-                 $mrec{comments}=$rec->{comments};
-                 if ($mode eq "web"){
-                    $mrec{parent}=$padd{join(".",@quickpath)};
-                 }
-                 $mrec{href}="javascript:$onclick";
-                 if ($mode ne "web"){
-                    delete($mrec{href});
-                 }
+                 $targetml=\@ml;
                  push(@$targetml,\%mrec);
               }
-           }
-        }
-        if ($rec->{quickpath} eq "" || $flt ne ""){
-           if ($mode eq "web"){
-              my $lineclass="line$line";
-              my $dispname=$rec->{name};
-              if (length($dispname)>20){
-                 $dispname=substr($dispname,0,15)."...".
-                           substr($dispname,length($dispname)-5,5);
-              }
-              $simplem.="<tr class=$lineclass ".
-                  "onMouseOver=\"this.className='linehighlight'\" ".
-                  "onMouseOut=\"this.className='$lineclass'\">\n";
-              $simplem.="<td onClick=\"$onclick\" width=1%>".
-                  "<img src=\"../../../public/passx/load/".
-                  "actype.$rec->{entrytype}.gif\"></td>";
-              $simplem.="<td onClick=\"$onclick\">$dispname</td>";
-              $simplem.="<td onClick=\"$onclick\">$rec->{account}</td>";
-              $simplem.="</td>";
-              $simplem.="</tr>";
-              $line++;
-              $line=1 if ($line>2);
-           }
-           if ($mode ne "web" && $rec->{entrytype}<=10){
-              my %mrec;
-              $mrec{label}=$rec->{account}.'@'.$rec->{name};
-              $mrec{menuid}=$rec->{id};
-              $mrec{entrytype}=$rec->{entrytype};
-              $mrec{comments}=$rec->{comments};
-              $mrec{name}=$rec->{name};
-              $mrec{account}=$rec->{account};
-              $targetml=\@ml;
-              push(@$targetml,\%mrec);
            }
         }
         ($rec,$msg)=$self->getNext();
@@ -385,7 +388,7 @@ sub generateMenuTree
          sub processEntry
          {
             my $ml=shift;
-            my $meinmenu=shift;
+            my $mainmenu=shift;
             my $targetm=shift;
 
             foreach my $m (@$ml){
