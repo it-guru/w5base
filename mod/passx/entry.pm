@@ -390,15 +390,17 @@ sub generateMenuTree
 
             foreach my $m (@$ml){
                if (exists($m->{entrytype})){
-                  if ($m->{entrytype}==1 || $m->{entrytype}==2){
+                  if ($m->{entrytype}==1 || $m->{entrytype}==5){
                      my $fvwmcmd="FvwmConnectCommand";
+                     my $label=$m->{label};
                      if ($m->{entrytype}==1){
                         $fvwmcmd="FvwmSSHLogin";
+                        $label.=" SSH";
                      }
-                     elsif ($m->{entrytype}==2){
+                     elsif ($m->{entrytype}==5){
                         $fvwmcmd="FvwmRDesktopLogin";
+                        $label.=" RDesk";
                      }
-                     my $label=$m->{label};
                      $label.=" ($m->{comments})" if ($m->{comments} ne "");
                      push(@{$targetm->{cmdentrys}},
                           {label=>$label,
