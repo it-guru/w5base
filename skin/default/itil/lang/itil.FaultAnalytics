@@ -6,4 +6,5 @@
 'reason'=>{de=>'Grund'},
 'tech. Contact'=>{de=>'tech. Ansprechpartner'},
 'deputy tech. Contact'=>{de=>'tech. Ansprechpartner Vertr.'},
-
+'Contact'=>{de=>'Kontakt'},
+'Components'=>{de=>'Komponenten'},

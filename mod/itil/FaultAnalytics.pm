@@ -59,18 +59,37 @@ sub AddComponent
          push(@$comp,"itil::system($rec->{id})");
       }
    }
-   if ($objecttype eq "base::location(name)"){
-      my $o=getModuleObject($self->Config,"base::location");
+   if ($objecttype eq "itil::appl(name)"){
+      my $o=getModuleObject($self->Config,"itil::appl");
       $o->SetFilter(name=>\$objectname);
       my ($rec,$msg)=$o->getOnlyFirst(qw(id));
       if (!defined($rec)){
          $self->LastMsg(ERROR,"object not found"); 
          return();
       }
-      my $compname="base::location($rec->{id})";
+      my $compname="itil::appl($rec->{id})";
       my $qcompname=quotemeta($compname);
       if (!grep(/^$qcompname$/,@$comp)){
-         push(@$comp,"base::location($rec->{id})");
+         push(@$comp,"itil::appl($rec->{id})");
+      }
+   }
+   if ($objecttype eq "base::location(name)"){
+      my $o=getModuleObject($self->Config,"base::location");
+      $objectname=~s/\*//g;
+      $objectname=~s/\?//g;
+      $o->SetFilter([{name=>\$objectname},{location=>$objectname}]);
+      my $found=0;
+      foreach my $rec ($o->getHashList(qw(id))){
+         my $compname="base::location($rec->{id})";
+         my $qcompname=quotemeta($compname);
+         if (!grep(/^$qcompname$/,@$comp)){
+            push(@$comp,"base::location($rec->{id})");
+         }
+         $found++;
+      }
+      if (!$found){
+         $self->LastMsg(ERROR,"object not found"); 
+         return();
       }
    }
 }
@@ -144,6 +163,7 @@ EOF
    my $lastmsg=$self->findtemplvar({},"LASTMSG");
    my $objecttype=Query->Param("objecttype");
    my @objecttypes=("itil::system(name)"=>"System",
+                    "itil::appl(name)"=>'Anwendung',
                     "base::location(name)"=>"Standort");
    my $objecttypes="<select name=objecttype style=\"width:100px\">";
    while(my $k=shift(@objecttypes)){
@@ -277,6 +297,9 @@ sub doAnalyse
    my ($detailhtm,$detailtxt)=$self->FormatDetail(\%incomp,\%outcomp,
                                                          %param);
 
+   my ($usercomphtm,$usercomptxt)=$self->FormatUserComp(\%incomp,\%outcomp,
+                                                         %param);
+
    my $ndirect=keys(%{$outcomp{direct}->{system}->{name}})+
                keys(%{$outcomp{direct}->{application}->{name}});
    my $nindirect=keys(%{$outcomp{indirect}->{system}->{name}})+
@@ -287,6 +310,7 @@ sub doAnalyse
                                              NOW=>$nowstamp,
                                              INCOMP=>$incomphtm,
                                              DETAIL=>$detailhtm,
+                                             USERCOMP=>$usercomphtm,
                                              DIRECT=>$directhtm,
                                              NDIRECT=>$ndirect,
                                              INDIRECT=>$indirecthtm,
@@ -360,6 +384,42 @@ sub FormatIndirect
    return($d);
 }
    
+sub FormatUserComp
+{
+   my ($self,$incomp,$outcomp,%param)=@_;
+
+   my $d="<table>";
+   $d.="<tr>";
+   $d.="<td width=200 class=detailth>".$self->T("Contact")."</td>";
+   $d.="<td class=detailth>".$self->T("Components")."</td>";
+   $d.="</tr>";
+
+   my %user;
+
+   foreach my $k (sort(keys(%{$outcomp->{detail}}))){
+      foreach my $user ($outcomp->{detail}->{$k}->{techcontact},
+                        $outcomp->{detail}->{$k}->{techboss}){
+         $user{$user}={} if (!exists($user{$user}));
+         $user{$user}->{$outcomp->{detail}->{$k}->{name}}++;
+      }
+   }
+   my $u=getModuleObject($self->Config,"base::user");
+   $u->SetFilter({userid=>[keys(%user)],cistatusid=>\'4'});
+   foreach my $userrec ($u->getHashList(qw(fullname userid))){
+      my $userid=$userrec->{userid};
+      $d.="<tr>";
+      $d.="<td class=detailname>".
+          $self->FormatUser($outcomp,$userid).
+          "</td>";
+      $d.="<td class=detail>".
+          join(", ",sort(keys(%{$user{$userid}}))).
+          "</td>";
+      $d.="</tr>";
+   }
+   $d.="</table>";
+   return($d);
+}
+
 sub FormatDetail
 {
    my ($self,$incomp,$outcomp,%param)=@_;
@@ -515,6 +575,10 @@ sub analyse
          $outcomp->{direct}->{location}->{name}->{$rec->{name}}++;
          $outcomp->{direct}->{location}->{id}->{$rec->{id}}->{'location selected'}++;
       }
+      if ($rec->{objname} eq "itil::appl"){
+         $outcomp->{direct}->{application}->{name}->{$rec->{name}}->{'application selected'};
+         $outcomp->{direct}->{application}->{id}->{$rec->{id}}->{'application selected'}++;
+      }
       if ($rec->{objname} eq "itil::system"){
          $outcomp->{direct}->{system}->{systemid}->{$rec->{systemid}}++;
          $outcomp->{direct}->{system}->{name}->{$rec->{name}}->{'system selected'}++;
@@ -583,16 +647,38 @@ sub analyse
                  toapplcistatus=>\'4');
    my @l=$o->getHashList(qw(toappl));
    foreach my $lnkrec (@l){
-      $outcomp->{indirect}->{application}->{name}->{$lnkrec->{toappl}}->
-                {'by interface'}++;
+      next if ($lnkrec->{toappl} eq "");
+      if (!exists($outcomp->{direct}->{application}->
+                  {name}->{$lnkrec->{toappl}})){
+         $outcomp->{indirect}->{application}->{name}->{$lnkrec->{toappl}}->
+                   {'by interface'}++;
+      }
+      else{
+         $outcomp->{direct}->{application}->{name}->{$lnkrec->{toappl}}->
+                   {'by interface'}++;
+      }
    }
        # at this, the fromapplcistatus should be considered
    $o->ResetFilter();
    $o->SetFilter(toappl=>[keys(%{$outcomp->{direct}->{application}->{name}})]);
-   my @l=$o->getHashList(qw(fromappl));
+  # my @l=$o->getHashList(qw(fromappl));
+   my @l=$o->getHashList(qw(fromapplid));
+   my @idl=map({$_->{fromapplid}} @l);
+   my $o=getModuleObject($self->Config,"itil::appl");
+   $o->SetFilter(id=>\@idl,cistatusid=>\'4');
+   my @l=$o->getHashList(qw(name));
+   
    foreach my $lnkrec (@l){
-      $outcomp->{indirect}->{application}->{name}->{$lnkrec->{fromappl}}->
-                {'by interface'}++;
+      next if ($lnkrec->{fromappl} eq "");
+      if (!exists($outcomp->{direct}->{application}->
+                  {name}->{$lnkrec->{fromappl}})){
+         $outcomp->{indirect}->{application}->{name}->{$lnkrec->{fromappl}}->
+                   {'by interface'}++;
+      }
+      else{
+         $outcomp->{direct}->{application}->{name}->{$lnkrec->{fromappl}}->
+                   {'by interface'}++;
+      }
    }
 
    #

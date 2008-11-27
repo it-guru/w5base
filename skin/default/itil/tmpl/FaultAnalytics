@@ -40,6 +40,12 @@ table{
     font-size:12px;
     background-color:silver;
 }
+.detail{
+    overflow:hidden;
+    vertical-align:top;
+    font-size:10px;
+    background-color:#ffffff;
+}
 .detailname{
     width:100px;overflow:hidden;
     vertical-align:top;
@@ -141,10 +147,18 @@ function doPrint()
 
     <div class=BlockHead onclick=BlockSwitch("DETAIL")>
          <span id=DETAILflag>&rarr;</span> 
-         detailierte Kontakte
+         detailierte Komponenten Kontakte
     </div>
     <div id=DETAIL class=DataBlock style="display:none;visibility:hidden">
          %DETAIL%
+    </div>
+
+    <div class=BlockHead onclick=BlockSwitch("USERCOMP")>
+         <span id=USERCOMPflag>&rarr;</span> 
+         Kontakte
+    </div>
+    <div id=USERCOMP class=DataBlock style="display:none;visibility:hidden">
+         %USERCOMP%
     </div>
 
   </div>
