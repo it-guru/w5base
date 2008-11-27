@@ -74,17 +74,15 @@ sub Main
                            form=>1,
                            body=>1,
                            title=>$self->T($self->Self()));
-   if (Query->Param("DEL") ne ""){
-      my @comp=Query->Param("comp");
-      my $qd=quotemeta(Query->Param("DEL"));
-      @comp=grep(!/^$qd$/,@comp);
-      Query->Param("comp"=>\@comp);
-   }
    if (Query->Param("ADD")){
       $self->AddComponent();
    }
-   my $objectname=Query->Param("objectname");
    my @comp=Query->Param("comp");
+   if (Query->Param("DEL") ne ""){
+      my $qd=quotemeta(Query->Param("DEL"));
+      @comp=grep(!/^$qd$/,@comp);
+   }
+   my $objectname=Query->Param("objectname");
    my $comp;
    foreach my $curcomp (@comp){
       if (my ($objname,$id,$add)=$curcomp=~m/^(.+?)\((\d+)\)(.*)$/){
@@ -96,7 +94,10 @@ sub Main
                    "<input type=hidden name=comp ".
                    "value=\"$objname($id)\">$rec->{name}</td>".
                    "<td width=1% class=complistdel>".
-                   "<img src=\"../../base/load/minidelete.gif\"></td>";
+                   "<span class=sublink>".
+                   "<img onclick=RemoveComponent('$objname($id)') ".
+                   "src=\"../../base/load/minidelete.gif\" border=0>".
+                   "</span></td>";
          }
       }
    }
@@ -128,6 +129,7 @@ EOF
 
    printf("<tr><td colspan=2 height=1%% style=\"padding:1px\" ".
              "valign=top>%s</td></tr>",$self->getAppTitleBar());
+   my $lastmsg=$self->findtemplvar({},"LASTMSG");
    print <<EOF;
 <tr height=10%>
 <td width=500 valign=top>
@@ -146,14 +148,16 @@ EOF
 <td colspan=3 align=right>
 <table width=100% cellspacing=0 cellpadding=0>
 <tr>
-<td>Mit dem Ausfallsanalyse Werkzeug können die Auswirkungen eines Ausfalls einer Komponente des IT-Betriebes und die entsprechenden Kontakte analysiert werden. <font color=red><b>Achtung:&nbsp;pre&nbsp;Beta!!</b></font>
+<td>Mit dem Ausfallsanalyse Werkzeug können die Auswirkungen eines Ausfalls einer Komponente des IT-Betriebes und die entsprechenden Kontakte analysiert werden.
 <td>
 </td>
 <td valign=bottom>
 <select style="width:120px">
 <option>HTML Ausgabe</option>
+<!--
 <option>native HTML</option>
 <option>Text only</option>
+-->
 </select>
 <input style="width:120px" onclick="doAnalyse();" type=button value=" analysieren ">
 </td></tr></table>
@@ -178,7 +182,7 @@ EOF
 <td colspan=2><hr></td>
 </tr>
 <tr height=1%>
-<td colspan=2>&nbsp;</td>
+<td colspan=2>$lastmsg</td>
 </tr>
 <tr>
 <td colspan=2>
@@ -196,6 +200,11 @@ function doAnalyse()
    document.forms[0].submit();
    document.forms[0].target=oldtarget;
    document.forms[0].action=oldaction;
+}
+function RemoveComponent(oname)
+{
+   document.forms[0].elements['DEL'].value=oname;
+   document.forms[0].submit();
 }
 </script>
 <input type=hidden name="DEL">

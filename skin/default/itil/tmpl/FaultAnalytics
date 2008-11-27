@@ -134,7 +134,7 @@ function doPrint()
 
     <div class=BlockHead onclick=BlockSwitch("INDIRECT")>
          <span id=INDIRECTflag>&darr;</span> 
-         %NINDIRECT% direkt betroffene bzw. beeinträchtiget 
+         %NINDIRECT% indirekt betroffene bzw. beeinträchtiget 
          Anwendung (Schnittstellen)
     </div>
     <div id=INDIRECT class=DataBlock>%INDIRECT%</div>
