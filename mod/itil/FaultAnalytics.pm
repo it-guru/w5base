@@ -41,7 +41,7 @@ sub getValidWebFunctions
 
 sub AddComponent
 {
-   my ($self)=@_;
+   my ($self,$comp)=@_;
    my $objecttype=Query->Param("objecttype");
    my $objectname=Query->Param("objectname");
 
@@ -53,13 +53,25 @@ sub AddComponent
          $self->LastMsg(ERROR,"object not found"); 
          return();
       }
-      my @comp=Query->Param("comp");
       my $compname="itil::system($rec->{id})";
       my $qcompname=quotemeta($compname);
-      if (!grep(/^$qcompname$/,@comp)){
-         push(@comp,"itil::system($rec->{id})");
+      if (!grep(/^$qcompname$/,@$comp)){
+         push(@$comp,"itil::system($rec->{id})");
       }
-      Query->Param("comp"=>\@comp);
+   }
+   if ($objecttype eq "base::location(name)"){
+      my $o=getModuleObject($self->Config,"base::location");
+      $o->SetFilter(name=>\$objectname);
+      my ($rec,$msg)=$o->getOnlyFirst(qw(id));
+      if (!defined($rec)){
+         $self->LastMsg(ERROR,"object not found"); 
+         return();
+      }
+      my $compname="base::location($rec->{id})";
+      my $qcompname=quotemeta($compname);
+      if (!grep(/^$qcompname$/,@$comp)){
+         push(@$comp,"base::location($rec->{id})");
+      }
    }
 }
 
@@ -74,10 +86,10 @@ sub Main
                            form=>1,
                            body=>1,
                            title=>$self->T($self->Self()));
-   if (Query->Param("ADD")){
-      $self->AddComponent();
-   }
    my @comp=Query->Param("comp");
+   if (Query->Param("ADD")){
+      $self->AddComponent(\@comp);
+   }
    if (Query->Param("DEL") ne ""){
       my $qd=quotemeta(Query->Param("DEL"));
       @comp=grep(!/^$qd$/,@comp);
@@ -130,6 +142,20 @@ EOF
    printf("<tr><td colspan=2 height=1%% style=\"padding:1px\" ".
              "valign=top>%s</td></tr>",$self->getAppTitleBar());
    my $lastmsg=$self->findtemplvar({},"LASTMSG");
+   my $objecttype=Query->Param("objecttype");
+   my @objecttypes=("itil::system(name)"=>"System",
+                    "base::location(name)"=>"Standort");
+   my $objecttypes="<select name=objecttype style=\"width:100px\">";
+   while(my $k=shift(@objecttypes)){
+      my $n=shift(@objecttypes);
+      $objecttypes.="<option value=\"$k\"";
+      if ($k eq $objecttype){
+         $objecttypes.=" selected";
+      }
+      $objecttypes.=">$n</option>";
+   }
+   $objecttypes.="</select>";
+
    print <<EOF;
 <tr height=10%>
 <td width=500 valign=top>
@@ -137,10 +163,7 @@ EOF
 <div style="height:120px;background:silver;padding:5px;margin:5px;margin-left:1;margin-top:0;border-style:solid;border-color:black;border-width:1px">
 <table height=100% border=0 cellspacing=0 cellpadding=3>
 <tr>
-<td width=1%>
-<select name=objecttype style="width:100px">
-<option value="itil::system(name)">System</option>
-</select></td>
+<td width=1%>$objecttypes</td>
 <td><input name=objectname value="$objectname" type=text style="width:100%"></td>
 <td width=1%><input name=ADD style="width:120px" type=submit value=" => hinzufügen =>"></td>
 </tr>
@@ -285,7 +308,7 @@ sub inRecords
       foreach my $id (keys(%{$incomp->{$objname}})){
          $o->ResetFilter();
          $o->SetFilter(id=>\$id);
-         my ($rec,$msg)=$o->getOnlyFirst(qw(name));
+         my ($rec,$msg)=$o->getOnlyFirst(qw(ALL));
          if (defined($rec)){
             $rec->{objname}=$objname;
             push(@l,$rec);
@@ -401,6 +424,12 @@ sub FormatDirect
    my ($self,$incomp,$outcomp,%param)=@_;
 
    my $d="<table>";
+   if (keys(%{$outcomp->{direct}->{location}->{name}})){
+      $d.="<tr><td class=col1>".$self->T("base::location","base::location").
+          "</td><td class=col2>".
+          join(", ",sort(keys(%{$outcomp->{direct}->{location}->{name}}))).
+          "</td></tr>";
+   }
    if (keys(%{$outcomp->{direct}->{system}->{name}})){
       $d.="<tr><td class=col1>".$self->T("itil::system","itil::system").
           "</td><td class=col2>".
@@ -451,8 +480,14 @@ sub FormatIncomp
    
    my %l;
    foreach my $rec ($self->inRecords($incomp)){
-      my $objlabel=$self->T($rec->{objname},$rec->{objname});
-      $l{$rec->{name}}={name=>$rec->{name},objlabel=>$objlabel};
+      if ($rec->{objname} eq "base::location"){
+         my $objlabel=$self->T($rec->{objname},$rec->{objname});
+         $l{$rec->{name}}={name=>$rec->{name},objlabel=>$objlabel};
+      }
+      else{
+         my $objlabel=$self->T($rec->{objname},$rec->{objname});
+         $l{$rec->{name}}={name=>$rec->{name},objlabel=>$objlabel};
+      }
    }
    my $d="<table>";
    my $dtxt="";
@@ -469,12 +504,17 @@ sub FormatIncomp
 sub analyse
 {
    my ($self,$incomp,$outcomp,%param)=@_;
+   my $location=$self->getPersistentModuleObject("base::location");
    my $user=$self->getPersistentModuleObject("base::user");
    my $system=$self->getPersistentModuleObject("itil::system");
    my $appl=$self->getPersistentModuleObject("itil::appl");
    my $applappl=$self->getPersistentModuleObject("itil::lnkapplappl");
 
    foreach my $rec ($self->inRecords($incomp)){
+      if ($rec->{objname} eq "base::location"){
+         $outcomp->{direct}->{location}->{name}->{$rec->{name}}++;
+         $outcomp->{direct}->{location}->{id}->{$rec->{id}}->{'location selected'}++;
+      }
       if ($rec->{objname} eq "itil::system"){
          $outcomp->{direct}->{system}->{systemid}->{$rec->{systemid}}++;
          $outcomp->{direct}->{system}->{name}->{$rec->{name}}->{'system selected'}++;
@@ -518,6 +558,23 @@ sub analyse
    }
 
    
+   #
+   # check direct interfaces
+   #
+   my $o=getModuleObject($self->Config,"itil::system");
+   $o->SetFilter(location=>[keys(%{$outcomp->{direct}->{location}->{name}})],
+                 cistatusid=>\'4');
+   my @l=$o->getHashList(qw(name applications));
+   foreach my $sysrec (@l){
+      $outcomp->{direct}->{system}->
+                {name}->{$sysrec->{name}}->{'by location'}++;
+      if (ref($sysrec->{applications}) eq "ARRAY"){
+         foreach my $apprec (@{$sysrec->{applications}}){
+            $outcomp->{direct}->{application}->
+                      {name}->{$apprec->{appl}}->{'system at location'}++;
+         }
+      }
+   }
    #
    # check direct interfaces
    #

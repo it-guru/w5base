@@ -171,6 +171,7 @@ sub new
                 name          =>'toapplcistatus',
                 label         =>'to Appl CI-Status',
                 dataobjattr   =>'toappl.cistatus'),
+
    );
    $self->setDefaultView(qw(id fromappl toappl cdate editor));
    $self->setWorktable("lnkapplappl");
