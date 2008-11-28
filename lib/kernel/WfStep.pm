@@ -576,6 +576,9 @@ sub getDefaultNoteDiv
    $wsheight=~s/px//g;
 
    my $noteheight=$wsheight-90;
+   if (defined($param{height})){
+      $noteheight=$param{height};
+   }
 
    my $note=Query->Param("note");
    my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".

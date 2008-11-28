@@ -14,6 +14,7 @@
 'Technical Solution Manager Office-Phone'=>{de=>'Technical Solution Manager Telefonnummer'},
 'Technical Solution Manager Mobile-Phone'=>{de=>'Technical Solution Manager Handy-Nummer'},
 'Deputy Technical Solution Manager E-Mail'=>{de=>'TSM Vertreter E-Mail'},
+'Application name'=>{de=>'Anwendungsname'},
 'Application Group'=>{de=>'Anwendungsgruppe'},
 'Application Description'=>{de=>'Anwendungsbeschreibung'},
 'fieldgroup.finance'=>{de=>'Finanzielle Verantwortung',en=>'finanze'},

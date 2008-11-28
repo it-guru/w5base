@@ -21,3 +21,4 @@
 'Approve requested by'=>{de=>'Genehmigung angefordert bei'},
 'Alternate approve requested by'=>{de=>'Genehmigung alternativ angefordert bei'},
 'forward to'=>{de=>'Weiterleitung an'},
+'transform'=>{de=>'Umwandlung'},

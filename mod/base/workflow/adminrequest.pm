@@ -27,6 +27,29 @@ sub new
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
+   $self->{ITIL_installed}=0;
+
+   my $i=getModuleObject($self->Config,"itil::appl");
+   if (defined($i)){
+      $self->{ITIL_installed}=1;
+      $self->AddFrontendFields(
+         new kernel::Field::TextDrop(
+                   name          =>'affectedapplication',
+                   label         =>'Application name',
+                   htmldetail    =>0,
+                   translation   =>'itil::appl',
+                   group         =>'init',
+                   vjointo       =>'itil::appl',
+                   vjoineditbase =>{'cistatusid'=>[3,4]},
+                   vjoinon       =>['affectedapplicationid'=>'id'],
+                   vjoindisp     =>'name'),
+     
+         new kernel::Field::Link (
+                   name          =>'affectedapplicationid',
+                   container     =>'headref'),
+       );
+   }
+
    return($self);
 }
 
@@ -55,8 +78,12 @@ sub getPosibleActions
    my $isadmin=$self->getParent->IsMemberOf("admin");
    my $stateid=$WfRec->{stateid};
 
+   my @actions=$self->SUPER::getPosibleActions($WfRec);
+   if ($isadmin){
+      push(@actions,"wftrans2devreq");
+   }
 
-   return("transform",$self->SUPER::getPosibleActions($WfRec));
+   return(@actions);
 }
 
 
@@ -70,6 +97,9 @@ sub getStepByShortname
    my $WfRec=shift;
 
    if ($shortname eq "dataload"){
+      return("base::workflow::adminrequest::".$shortname);
+   }
+   if ($shortname eq "main"){
       return("base::workflow::adminrequest::".$shortname);
    }
    return("base::workflow::request::".$shortname);
@@ -158,5 +188,153 @@ sub getWorkHeight
 
    return("200");
 }
+
+
+#######################################################################
+package base::workflow::adminrequest::main;
+use vars qw(@ISA);
+use kernel;
+@ISA=qw(base::workflow::request::main);
+
+
+sub generateWorkspacePages
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my $divset=shift;
+   my $selopt=shift;
+   my $tr="base::workflow::adminrequest";
+   my $class="display:none;visibility:hidden";
+
+   if ($self->getParent->{ITIL_installed}){
+      if (grep(/^wftrans2devreq$/,@$actions)){
+         $$selopt.="<option value=\"wftrans2devreq\">".
+                   $self->getParent->T("wftrans2devreq",$tr).
+                   "</option>\n";
+         my $d="<table width=100% border=0 cellspacing=0 cellpadding=0>".
+               "<tr>".
+               "<td colspan=2>Umwandeln in einen Entwickler-Request ".
+               "für folgende Anwendung</td>".
+               "</tr>".
+               "<tr>".
+               "<td width=15%>\%affectedapplication(label)\%: </td>".
+               "<td>\%affectedapplication(detail)\%</td>".
+               "</tr>".
+               "<tr>".
+               "<td colspan=2>".
+               $self->getDefaultNoteDiv($WfRec,$actions,
+                                        mode=>'native',height=>60).
+               "</td>".
+               "</tr>";
+         $d.="</table>";
+         $$divset.="<div id=OPwftrans2devreq class=\"$class\">$d</div>";
+      }
+   }
+
+   return($self->SUPER::generateWorkspacePages($WfRec,$actions,$divset,$selopt));
+}
+
+sub Process
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my $userid=$self->getParent->getParent->getCurrentUserId();
+
+   if ($action eq "SaveStep"){
+      my $op=Query->Param("OP");
+      if ($op eq "wftrans2devreq"){
+         my $fname="affectedapplication";
+         my $fobj=$self->getParent->getField($fname);
+         my $f=Query->Param("Formated_$fname");
+
+         my $new1;
+         my $applid;
+         if ($new1=$fobj->Validate($WfRec,{$fname=>$f})){
+            if (!defined($new1->{"${fname}id"}) ||
+                $new1->{"${fname}id"}==0){
+               if ($self->LastMsg()==0){
+                  $self->LastMsg(ERROR,"invalid application selected");
+               }
+               return(0);
+            }
+            $applid=$new1->{"${fname}id"};
+         }
+         else{
+            return(0);
+         }
+         my $appl=Query->Param("Formated_$fname");
+         my $note=Query->Param("note");
+         if ($note ne ""){
+            $note="==>".$appl."\n\n".$note;
+         }
+         else{
+            $note="==>".$appl;
+         }
+         if ($self->getParent->getParent->Action->StoreRecord(
+             $WfRec->{id},"transform",
+             {translation=>'base::workflow::request'},$note)){
+            my $newWfRec={name                  =>$WfRec->{name},
+               class                 =>"itil::workflow::devrequest",
+               step                  =>"itil::workflow::devrequest::dataload",
+               stateid               =>$WfRec->{stateid},
+               reqnature             =>'other',
+               affectedapplication   =>$appl,
+               openuser              =>$WfRec->{openuser},
+               mdate                 =>$WfRec->{mdate},
+               openusername          =>$WfRec->{openusername},
+               affectedapplicationid =>$applid,
+               detaildescription     =>$WfRec->{detaildescription},
+               initiatorid           =>$WfRec->{initiatorid},
+               initiatorgroupid      =>$WfRec->{initiatorgroupid},
+               implementedto         =>$WfRec->{implementedto},
+               initiatorcomments     =>$WfRec->{initiatorcomments},
+               eventstart            =>$WfRec->{eventstart}};
+            my $oldcontext=$W5V2::OperationContext;
+            $W5V2::OperationContext="Kernel";
+            my $wf=$self->getParent->getParent;
+            $wf->nativProcess("NextStep",$newWfRec);
+            $W5V2::OperationContext=$oldcontext;
+            if (defined($newWfRec->{id})){
+               my $wr=$wf->getPersistentModuleObject("base::workflowrelation");
+               my $srcid=$WfRec->{id};
+               my $dstid=$newWfRec->{id};
+               $wr->ValidatedInsertOrUpdateRecord(
+                                      {srcwfid=>$srcid,dstwfid=>$dstid},
+                                      {srcwfid=>\$srcid,dstwfid=>\$dstid});
+               my $store={stateid=>25,
+                          step=>"base::workflow::request::break",
+                          fwdtargetid=>undef,
+                          fwdtarget=>undef,
+                          closedate=>NowStamp("en"),
+                          eventend=>NowStamp("en"),
+                          fwddebtarget=>undef,
+                          fwddebtargetid=>undef};
+               if ($self->StoreRecord($WfRec,$store)){
+                  return(0);
+               }
+            }
+            if ($self->LastMsg()==0){
+               $self->LastMsg(ERROR,"problem while tranformation");
+            }
+            return(0);
+         }
+
+
+
+         $self->LastMsg(ERROR,"action not implemented");
+
+         return(0);
+      }
+  }
+
+
+
+   return($self->SUPER::Process($action,$WfRec,$actions));
+}
+
+
 
 1;

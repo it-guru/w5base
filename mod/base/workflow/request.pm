@@ -468,24 +468,26 @@ sub nativProcess
          $h->{fwddebtargetid}=$fwddebtargetid;
       }
       $h->{stateid}=1;
-      $h->{eventstart}=NowStamp("en");
       $h->{eventend}=undef;
       $h->{closedate}=undef;
-      $h->{implementedto}="?" if ($h->{implementedto} eq "");
-      $h->{initiatorid}=$self->getParent->getParent->getCurrentUserId();
 
-      my $UserCache=$self->Cache->{User}->{Cache};
-      if (defined($UserCache->{$ENV{REMOTE_USER}})){
-         my $fullname=$UserCache->{$ENV{REMOTE_USER}}->{rec}->{fullname};
-         $h->{initiatorname}=$fullname;
-      }
-
-      my %groups=$self->getGroupsOf($ENV{REMOTE_USER},
-                                    [qw(REmployee RBoss)],'direct');
-      if (keys(%groups)>0){
-         my @k=keys(%groups);
-         $h->{initiatorgroupid}=$k[0];
-         $h->{initiatorgroup}=$groups{$k[0]}->{fullname};
+      if ($W5V2::OperationContext ne "Kernel"){
+         $h->{eventstart}=NowStamp("en");
+         $h->{implementedto}="?" if ($h->{implementedto} eq "");
+         $h->{initiatorid}=$self->getParent->getParent->getCurrentUserId();
+         my $UserCache=$self->Cache->{User}->{Cache};
+         if (defined($UserCache->{$ENV{REMOTE_USER}})){
+            my $fullname=$UserCache->{$ENV{REMOTE_USER}}->{rec}->{fullname};
+            $h->{initiatorname}=$fullname;
+         }
+        
+         my %groups=$self->getGroupsOf($ENV{REMOTE_USER},
+                                       [qw(REmployee RBoss)],'direct');
+         if (keys(%groups)>0){
+            my @k=keys(%groups);
+            $h->{initiatorgroupid}=$k[0];
+            $h->{initiatorgroup}=$groups{$k[0]}->{fullname};
+         }
       }
       if (!$self->addInitialParameters($h)){
          if (!$self->getParent->LastMsg()){
@@ -581,6 +583,7 @@ sub generateWorkspacePages
    my $tr="base::workflow::actions";
    my $class="display:none;visibility:hidden";
 
+   my $defop;
    if (grep(/^wfacceptp$/,@$actions)){
       $$selopt.="<option value=\"wfacceptp\">".
                 $self->getParent->T("wfacceptp",$tr).
@@ -588,6 +591,7 @@ sub generateWorkspacePages
       $$divset.="<div id=OPwfacceptp class=\"$class\">".
                 $self->getDefaultNoteDiv($WfRec,$actions).
                 "</div>";
+      $defop="wfacceptp";
    }
    if (grep(/^wfacceptn$/,@$actions)){
       $$selopt.="<option value=\"wfacceptn\">".
@@ -723,8 +727,11 @@ sub generateWorkspacePages
       $d.="</table>";
       $$divset.="<div id=OPwfapprovalcan class=\"$class\">$d</div>";
    }
-   return($self->SUPER::generateWorkspacePages($WfRec,$actions,
-                                               $divset,$selopt));
+   $self->SUPER::generateWorkspacePages($WfRec,$actions,$divset,$selopt);
+   if ($WfRec->{stateid}==4){
+      $defop="wfaddnote";
+   }
+   return($defop); 
 }
 
 sub Validate
@@ -784,6 +791,7 @@ sub Process
       my $op=Query->Param("OP");
       if ($action ne "" && !grep(/^$op$/,@{$actions})){
          $self->LastMsg(ERROR,"invalid disalloed action requested");
+         return(0);
       }
      
       if ($op eq "wfaccept"){

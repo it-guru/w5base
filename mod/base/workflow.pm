@@ -918,7 +918,9 @@ sub preValidate
    my $origrec=shift;
 
    if (!defined($oldrec)){
-      if ($W5V2::OperationContext eq "QualityCheck"){
+      if ($W5V2::OperationContext eq "Kernel"){
+      }
+      elsif ($W5V2::OperationContext eq "QualityCheck"){
          if (!defined($newrec->{openuser})){
             $newrec->{openuser}=undef;
          }
