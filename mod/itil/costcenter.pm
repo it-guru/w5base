@@ -87,6 +87,16 @@ sub ValidateDelete
    return(1);
 }
 
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   return(qw(header default delmgmt applications contacts control misc source));
+}  
+
+
+   
+
+
 
 
 

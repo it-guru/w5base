@@ -43,6 +43,17 @@ sub new
                                      vjoinbase  =>[{applcistatusid=>'<=4'}],
                                      vjoininhash=>['applid','applcistatusid',
                                                    'appl']),
+
+      new kernel::Field::SubList(    name       =>'applicationids',
+                                     label      =>'ApplicationIDs',
+                                     group      =>'applications',
+                                     uivisible  =>0,
+                                     vjointo    =>'itil::lnkapplcustcontract',
+                                     vjoinon    =>['id'=>'custcontractid'],
+                                     vjoindisp  =>['applid'],
+                                     vjoinbase  =>[{applcistatusid=>'<=4'}],
+                                     vjoininhash=>['applid','applcistatusid',
+                                                   'appl']),
    );
    return($self);
 }

@@ -234,6 +234,15 @@ sub new
    return($self);
 }
 
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   return($self->SUPER::getDetailBlockPriority(@_),
+          qw(default delmgmt contacts control misc source));
+}
+
+
+
 
 sub getRecordImageUrl
 {

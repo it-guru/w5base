@@ -1,7 +1,7 @@
 'finance::costcenter'=>{de=>'Kostenstelle',
                         en=>'Costcenter'},
 'fieldgroup.default'=>{de=>'Kostenstellendaten'},
-'fieldgroup.delmgmt'=>{de=>'Delivery-Management'},
+'fieldgroup.delmgmt'=>{de=>'Betriebs Delivery-Management'},
 'CO-Number'=>{de=>'CO-/Kostenstellen-Nummer'},
 'Contacts'=>{de=>'Kontakte'},
 'CO-Shortdescription'=>{de=>'Kostenstellenbezeichnung'},

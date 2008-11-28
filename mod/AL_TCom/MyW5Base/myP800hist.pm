@@ -20,7 +20,8 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::MyW5Base;
-@ISA=qw(kernel::MyW5Base);
+use AL_TCom::lib::tool;
+@ISA=qw(kernel::MyW5Base AL_TCom::lib::tool);
 
 sub new
 {
@@ -100,39 +101,14 @@ sub Result
    }
    $mainq1{stateid}=['1','21'];
 
-   my %q1;
-   my %q2;
-   my %q3;
-   my %q4;
-   my %q5;
-   my %q6;
-   my %q7;
-   my %q8;
-   my %q9;
-   $q1{semid}=\$userid;
-   $q2{tsmid}=\$userid;
-   $q3{databossid}=\$userid;
-   $q4{sem2id}=\$userid;
-   $q5{tsm2id}=\$userid;
-   $q6{delmgrid}=\$userid;
-   $q7{delmgr2id}=\$userid;
-   $q8{ldelmgrid}=\$userid;
-   $q9{ldelmgr2id}=\$userid;
-   push(@q,\%q1,\%q2,\%q3,\%q4,\%q5,\%q6,\%q7,\%q8,\%q9);
-
-
-   $self->{appl}->ResetFilter();
-   $self->{appl}->SecureSetFilter(\@q);
-   my @l=$self->{appl}->getHashList("id");
-   my @appl=("none");
-   if ($#l>-1){
-      @appl=map({$_->{id}} @l);
-   }
+   my @appl=$self->getRequestedApplicationIds($userid,user=>1,
+                                                      dep=>1,team=>1);
    $mainq1{affectedapplicationid}=\@appl;
    #my $m=Query->Param("P800_TimeRange");
    #$m="now" if (!defined($m) || $m eq ""); 
    return($self->FinalDataFilter(\%mainq1));
 }
+
 
 sub FinalDataFilter
 {
@@ -168,55 +144,39 @@ sub getContractList
    my %l=();
    my $userid=$self->getParent->getCurrentUserId();
 
-   my (%q1,%q2,%q3,%q4,%q5); 
-   my @q;
-
-   $q1{semid}=\$userid;
-   $q1{cistatusid}='<=5';
-   $q2{databossid}=\$userid;
-   $q2{cistatusid}='<=5';
-   $q3{sem2id}=\$userid;
-   $q3{cistatusid}='<=5';
-   $q4{tsmid}=\$userid;
-   $q4{cistatusid}='<=5';
-   $q5{tsm2id}=\$userid;
-   $q5{cistatusid}='<=5';
-   push(@q,\%q1,\%q2,\%q3,\%q4,\%q5);
-   $c->ResetFilter(); 
-   $c->SetFilter(\@q); 
-   my %contractlist=();
-   my $maxlen=0;
-   foreach my $arec ($c->getHashList("id","name","custcontracts")){
-      if (ref($arec->{custcontracts}) eq "ARRAY"){
-         foreach my $crec (@{$arec->{custcontracts}}){
-            if ($crec->{custcontract} ne ""){
-               $contractlist{$crec->{custcontract}}={
-                                               id=>$crec->{custcontractid},
-                                               no=>$crec->{custcontract},
-                                               name=>$crec->{custcontractname}};
-               if ($maxlen<length($crec->{custcontract})){
-                  $maxlen=length($crec->{custcontract});
-               }
-            }
-         }
+   my @applids=$self->getRequestedApplicationIds($userid,user=>1,
+                                                         dep=>1,team=>1);
+   my $contr=$self->getParent->getPersistentModuleObject("itil::custcontract");
+   $contr->SetFilter({applicationids=>\@applids,cistatusid=>"<6"});
+   my $maxlen=5;
+   my %contractlist;
+   foreach my $crec ($contr->getHashList("id","name","fullname")){
+      $contractlist{$crec->{name}}={ id=>$crec->{id},
+                                     no=>$crec->{name},
+                                     name=>$crec->{fullname}};
+      if ($maxlen<length($crec->{name})){
+         $maxlen=length($crec->{name});
       }
    }
-
  
    if ($mode eq "raw"){
       return(values(%contractlist));
    }
    if ($mode eq "html"){
       my $oldval=Query->Param("search_affectedcontract");
-      my $s="<select name=search_affectedcontract style=\"width:100%\">".
+      my $s="<select name=search_affectedcontract style=\"width:100%\">\n".
             "<option></option>";
       foreach my $crec (values(%contractlist)){
          $s.="<option value=\"$crec->{no}\" ";
          $s.="selected" if ($oldval eq $crec->{no});
-         $s.=">".sprintf("%${maxlen}s %s",$crec->{no},$crec->{name}).
-             "</option>";
+         my $name=$crec->{name};
+         $name=~s/  / /g;
+         $name=~s/  / /g;
+         my $label=sprintf("%-${maxlen}s %s",$crec->{no},$name);
+         $label=~s/ /&nbsp;/g;
+         $s.=">".$label."</option>\n";
       }
-      $s.="</select>";
+      $s.="</select>\n";
     #  my @s=$c->getHtmlSelect("search_affectedcontract","name",
     #                          ["name","fullname"],AllowEmpty=>1);
       return($s)

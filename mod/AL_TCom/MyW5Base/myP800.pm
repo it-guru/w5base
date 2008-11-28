@@ -21,8 +21,8 @@ use vars qw(@ISA);
 use kernel;
 use kernel::date;
 use kernel::MyW5Base;
-use Data::Dumper;
-@ISA=qw(kernel::MyW5Base);
+use AL_TCom::lib::tool;
+@ISA=qw(kernel::MyW5Base AL_TCom::lib::tool);
 
 sub new
 {
@@ -96,76 +96,16 @@ sub Result
    my @q=();
    my %mainq1=%q;
    $mainq1{stateid}=['1','21'];
-   if ($dc eq "ADDDEP" || $dc eq "DEPONLY"){
-      my %q1;
-      my %q2;
-      $q1{sem2id}=\$userid;
-      $q2{tsm2id}=\$userid;
 
-      my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
-                                            ["RChief2"],
-                                            "down");
-      my @grpids=keys(%grp);
-      @grpids=(qw(-1)) if ($#grpids==-1);
-      my %q3=%q;
-      $q3{businessteamid}=\@grpids;
-      my %q4=%q;
-      my %q5=%q;
-      my %q6=%q;
-      $q4{responseteamid}=\@grpids;
-      $q5{delmgr2id}=\$userid;
-      $q6{ldelmgr2id}=\$userid;
-
-      push(@q,\%q1,\%q2,\%q3,\%q4,\%q5,\%q6);
+   my @appl=("none");
+   if ($dc eq "ADDDEP"){
+      @appl=$self->getRequestedApplicationIds($userid,user=>1,dep=>1);
    }
-   if ($dc ne "DEPONLY" && $dc ne "CUSTOMER"){
-      my %q1;
-      my %q2;
-      my %q3;
-      my %q4;
-      my %q5;
-      $q1{semid}=\$userid;
-      $q2{tsmid}=\$userid;
-      $q3{databossid}=\$userid;
-      $q4{delmgrid}=\$userid;
-      $q5{ldelmgrid}=\$userid;
-
-      push(@q,\%q1,\%q2,\%q3,\%q4,\%q5);
+   if ($dc eq "DEPONLY"){
+      @appl=$self->getRequestedApplicationIds($userid,dep=>1);
    }
    if ($dc eq "TEAM"){
-      my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
-                                            ["REmployee","RChief"],
-                                            "down");
-      my @grpids=keys(%grp);
-      @grpids=(qw(-1)) if ($#grpids==-1);
-   
-      my %q1=();
-      $q1{cistatusid}='<=4';
-      $q1{businessteamid}=\@grpids;
-   
-      my %q2=();
-      $q2{cistatusid}='<=4';
-      $q2{responseteamid}=\@grpids;
-
-      my %q3;
-      $q3{cistatusid}='<=4';
-      $q3{delmgrteamid}=\@grpids;
-   
-      push(@q,\%q1,\%q2,\%q3);
-   }
-   if ($dc ne "" &&
-       $dc ne "ADDDEP" &&
-       $dc ne "DEPONLY" &&
-       $dc ne "TEAM"){
-      return(undef);
-   }
-
-   $self->{appl}->ResetFilter();
-   $self->{appl}->SecureSetFilter(\@q);
-   my @l=$self->{appl}->getHashList("id");
-   my @appl=("none");
-   if ($#l>-1){
-      @appl=map({$_->{id}} @l);
+      @appl=$self->getRequestedApplicationIds($userid,team=>1);
    }
    $mainq1{affectedapplicationid}=\@appl;
    my $p800m=Query->Param("P800_TimeRange");

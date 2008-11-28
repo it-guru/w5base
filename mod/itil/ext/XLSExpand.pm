@@ -83,6 +83,12 @@ sub GetKeyCriterion
                                                        itil::asset::name
                                                        itil::system::ipaddress::name
                                                        itil::system::name)]},
+                'itil::appl::applid'        =>{label=>'IT-Inventar: Application: ApplicationID',
+                                               in=>[qw(itil::appl::name
+                                                       itil::system::systemid
+                                                       itil::asset::name
+                                                       itil::system::ipaddress::name
+                                                       itil::system::name)]},
                 'itil::appl::customer'      =>{label=>'IT-Inventar: Application: Kunde',
                                                in=>[qw(itil::appl::name
                                                        itil::system::systemid
@@ -188,7 +194,7 @@ sub ProcessLine
 
  
    # output
-   foreach my $appsekvar (qw(sem tsm sememail tsmemail businessteam 
+   foreach my $appsekvar (qw(sem tsm sememail tsmemail businessteam applid
                              customerprio customer)){
       if (defined($in->{'itil::appl::id'}) && 
           exists($out->{'itil::appl::'.$appsekvar})){
