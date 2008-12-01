@@ -239,13 +239,13 @@ sub tcomcodcause
    db.baseext.secmgmt
    db.baseext.support
    db.baseext.waround
-   db.add.inst
-   db.add.firstcfg
-   db.add.fstcfgrac
-   db.add.docbhb
-   db.add.ftest
-   db.add.swupd
-   db.add.dbsnonbhb
+   db.addfix.inst
+   db.addfix.firstcfg
+   db.addfix.fstcfgrac
+   db.addfix.docbhb
+   db.addfix.ftest
+   db.addfix.swupd
+   db.addfix.dbsnonbhb
    db.addfix.hastandby
    db.addfix.licinvent
    db.addfix.desrec
