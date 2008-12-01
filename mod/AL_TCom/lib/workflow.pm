@@ -158,8 +158,8 @@ sub tcomcodcause
    appl.base.secmgmt
    appl.base.inm
    appl.base.prm
-   appl.base.contmgmt
-   appl.base.recovery
+   appl.base.conmgmt
+   appl.base.recov
    appl.base.waround
    appl.base.arundown
    appl.base.sdesign
@@ -187,9 +187,9 @@ sub tcomcodcause
    appl.baseext.slamgmt
    appl.baseext.escmgmt
    appl.baseext.slumpm
-   appl.addfix.devdessup
+   appl.addfix.devsup
    appl.addfix.pilot
-   appl.addfix.install
+   appl.addfix.inst
    appl.addfix.firstcfg
    appl.addfix.testinst
    appl.addfix.doc
@@ -202,7 +202,7 @@ sub tcomcodcause
    appl.addfix.applunin
    appl.add.devsup
    appl.add.pilot
-   appl.add.install
+   appl.add.inst
    appl.add.firstcfg
    appl.add.testinst
    appl.add.doc
@@ -221,9 +221,9 @@ sub tcomcodcause
    db.base.swrundown
    db.base.dbservice
    db.base.cfm
-   db.base.recovery
+   db.base.recov
    db.base.doc
-   db.base.secmgmgt
+   db.base.secmgmt
    db.base.support
    db.base.waround
    db.baseext.swmon
@@ -234,9 +234,9 @@ sub tcomcodcause
    db.baseext.swrundown
    db.baseext.dbservice
    db.baseext.cfm
-   db.baseext.recovery
+   db.baseext.recov
    db.baseext.doc
-   db.baseext.secmgmgt
+   db.baseext.secmgmt
    db.baseext.support
    db.baseext.waround
    db.add.inst
