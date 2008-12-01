@@ -1,0 +1,94 @@
+#!/usr/bin/perl
+use lib qw(/opt/w5base2/lib /opt/w5base/lib);
+use strict;                   
+use W5Base::API;
+use Data::Dumper;
+
+my $DefaultBase="https://w5base.net/w5base/auth/";
+my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang);
+my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
+       "webuser=s"=>\$loginuser,"webpass=s"=> \$loginpass,
+       "verbose+"=>\$verbose);
+my $optresult=XGetOptions(\%P,\&Help,undef,undef,".W5Base.Interface");
+
+#######################################################################
+# create connection config
+#
+my $apidebug=$verbose>=3 ? 1 : 0;
+my $Config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug);
+if (!defined($Config)){
+   msg(ERROR,"base url or username/password is not valid");exit(1);
+}
+else{
+   msg(DEBUG,"create of config ok");
+}
+msg(DEBUG,"verbose=$verbose");
+
+
+#######################################################################
+# load ModuleObject
+#
+my $objectname="base::workflow";
+my $wf=getModuleObject($Config,$objectname);
+if (!defined($wf)){
+   msg(ERROR,"can't load object $objectname");exit(2);
+}
+else{
+   msg(DEBUG,"create of ModuleObject $wf ok");
+}
+
+my $WfRec={ class=>'AL_TCom::workflow::diary',
+            name=>'Hallo Welt 1',
+            step=>'AL_TCom::workflow::diary::dataload',
+            action=>'NextStep',
+            detaildescription=>"Dies ist der lange Text\n".
+                               "mit mehreren Zeilen",
+            affectedapplication=>'W5Base/Darwin'
+          };
+
+#######################################################################
+#
+msg(INFO,"create Workflow");
+if (my $id=$wf->storeRecord($WfRec)){
+   msg(INFO,"ok newid=$id");
+   my $id=$wf->storeRecord({note=>'Hallo',effort=>123,
+                            action=>'SaveStep.addnote'},$id);
+   $wf->dieOnERROR();
+   my $id=$wf->storeRecord({note=>'Hallo2',effort=>456,
+                            action=>'SaveStep.addnote'},$id);
+
+   $wf->dieOnERROR();
+   my $id=$wf->storeRecord({step=>'AL_TCom::workflow::diary::wfclose',
+                            action=>'SaveStep.wffinish'},$id);
+   $wf->dieOnERROR();
+   $wf->SetFilter({id=>[$id]});
+   foreach my $WfRec ($wf->getHashList(qw(name posibleactions shortactionlog
+                                          step class))){
+      printf("WfRec=%s\n",Dumper($WfRec));
+   }
+   exit(0);
+}
+else{
+   $wf->dieOnERROR();
+}
+exit(1);
+
+#######################################################################
+sub Help
+{
+   print(<<EOF);
+$RealScript [options] FullnameFilter
+
+   --verbose display more details of operation process
+   --quiet   only errors would be displayed
+   --base    base url of filemgmt (default: $DefaultBase)
+
+   --webuser username
+   --webpass password
+   --store   stores the parameters (not help,verbose and store)
+   --help    show this help
+
+EOF
+}
+#######################################################################
+exit(255);

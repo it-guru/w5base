@@ -126,6 +126,8 @@ sub mkp800
       $wf->SetFilter(eventend=>"\">=$starttime\" AND \"<=$endtime\"",
                      class=>[grep(/^AL_TCom::.*$/,keys(%{$wf->{SubDataObj}}))]);
       #$wf->SetFilter({srcid=>"CHM00283030"});
+      ## DEBUG
+      #$wf->SetFilter({id=>[qw(12272520340002)]});
       my %nocontract=();
       my %p800=();
       my ($rec,$msg)=$wf->getFirst();
@@ -452,15 +454,15 @@ sub bflexxFinish
    my $now=shift;
    my $repmon=shift;
 
-#   my $opobj=$bflexxp800->Clone();
-#   if (my ($m,$y)=$repmon=~m/^(\d+)\/(\d{4})/){
-#      $repmon=sprintf("%04d%02d",$y,$m);
-#   }
-#   $bflexxp800->ResetFilter(); 
-#   $bflexxp800->SetFilter(srcload=>"\"<$now\"",month=>\$repmon);
-#   $bflexxp800->ForeachFilteredRecord(sub{
-#       $opobj->ValidatedDeleteRecord($_);
-#   });
+   my $opobj=$bflexxp800->Clone();
+   if (my ($m,$y)=$repmon=~m/^(\d+)\/(\d{4})/){
+      $repmon=sprintf("%04d%02d",$y,$m);
+   }
+   $bflexxp800->ResetFilter(); 
+   $bflexxp800->SetFilter(srcload=>"\"<$now\"",month=>\$repmon);
+   $bflexxp800->ForeachFilteredRecord(sub{
+       $opobj->ValidatedDeleteRecord($_);
+   });
 
 }
 
@@ -570,19 +572,39 @@ sub xlsExport
                $ws->set_column(4,4,12);
 
                $ws->write($xlsexp->{xls}->{line},5,
-                          "Tätigkeit",
+                          "Tätigkeit (ID)",
                           $xlsexp->{xls}->{format}->{header});
                $ws->set_column(5,5,30);
 
                $ws->write($xlsexp->{xls}->{line},6,
-                          "Beschreibung",
+                          "Servicemodul",
                           $xlsexp->{xls}->{format}->{header});
-               $ws->set_column(6,6,140);
+               $ws->set_column(6,6,30);
 
                $ws->write($xlsexp->{xls}->{line},7,
+                          "Leistungs-Typ",
+                          $xlsexp->{xls}->{format}->{header});
+               $ws->set_column(7,7,30);
+
+               $ws->write($xlsexp->{xls}->{line},8,
+                          "Tätigkeit",
+                          $xlsexp->{xls}->{format}->{header});
+               $ws->set_column(8,8,30);
+
+               $ws->write($xlsexp->{xls}->{line},9,
+                          "Tätigkeit (Eingabe)",
+                          $xlsexp->{xls}->{format}->{header});
+               $ws->set_column(9,9,30);
+
+               $ws->write($xlsexp->{xls}->{line},10,
+                          "Beschreibung",
+                          $xlsexp->{xls}->{format}->{header});
+               $ws->set_column(10,10,140);
+
+               $ws->write($xlsexp->{xls}->{line},11,
                           "ExternalID",
                           $xlsexp->{xls}->{format}->{header});
-               $ws->set_column(7,7,18);
+               $ws->set_column(11,11,18);
 
                $xlsexp->{xls}->{line}++;
             }
@@ -598,37 +620,65 @@ sub xlsExport
       my $ws=$xlsexp->{xls}->{worksheet};
       my $srcid=$rec->{srcid};
       $srcid=$rec->{id} if ($srcid eq "");
+      my $col=1;
       $ws->write($xlsexp->{xls}->{line},0,
            sprintf("%02d.%02d.%04d",$wD,$wM,$wY),
            $xlsexp->{xls}->{format}->{default});
-      $ws->write_string($xlsexp->{xls}->{line},1,
+      $ws->write_string($xlsexp->{xls}->{line},$col++,
            join(", ",@$ag),
            $xlsexp->{xls}->{format}->{default});
-      $ws->write_string($xlsexp->{xls}->{line},2,
+      $ws->write_string($xlsexp->{xls}->{line},$col++,
            join(", ",@$vert),
            $xlsexp->{xls}->{format}->{default});
-      $ws->write($xlsexp->{xls}->{line},3,
+      $ws->write($xlsexp->{xls}->{line},$col++,
            $srcid,
            $xlsexp->{xls}->{format}->{default});
-      $ws->write($xlsexp->{xls}->{line},4,
+      $ws->write($xlsexp->{xls}->{line},$col++,
            $rec->{headref}->{specialt}/60,
            $xlsexp->{xls}->{format}->{default});
 
       my $cause=$rec->{headref}->{tcomcodcause};
       $cause=join("",@$cause) if (ref($cause) eq "ARRAY");
+
+      $ws->write_string($xlsexp->{xls}->{line},$col++,$cause,
+           $xlsexp->{xls}->{format}->{default});
+
+
+      my $smodule;
+      if (my ($t)=$cause=~m/^(\S+?)\./){
+         $smodule=$self->getParent->T($t,"AL_TCom::lib::workflow");
+      }
+      $ws->write_string($xlsexp->{xls}->{line},$col++,$smodule,
+           $xlsexp->{xls}->{format}->{default});
+
+      my $styp;
+      if (my ($t)=$cause=~m/(\.\S+?\.)/){
+         $styp=$self->getParent->T($t,"AL_TCom::lib::workflow");
+      }
+      $ws->write_string($xlsexp->{xls}->{line},$col++,$styp,
+           $xlsexp->{xls}->{format}->{default});
+
+      my $scause;
+      if (my ($t)=$cause=~m/^\S+\.\S+(\.\S+)$/){
+         $scause=$self->getParent->T($t,"AL_TCom::lib::workflow");
+      }
+      $ws->write_string($xlsexp->{xls}->{line},$col++,$scause,
+           $xlsexp->{xls}->{format}->{default});
+
+
       $cause=$self->getParent->T($cause,"AL_TCom::lib::workflow");
-      $ws->write_string($xlsexp->{xls}->{line},5,$cause,
+      $ws->write_string($xlsexp->{xls}->{line},$col++,$cause,
            $xlsexp->{xls}->{format}->{default});
       my $name=$rec->{name};
       if ($self->getParent->Config->Param("UseUTF8")){
          $name=utf8($name)->latin1();
       }
-      $ws->write_string($xlsexp->{xls}->{line},6,$name,
+      $ws->write_string($xlsexp->{xls}->{line},$col++,$name,
            $xlsexp->{xls}->{format}->{default});
 
       my $extid=$rec->{headref}->{tcomexternalid};
       $extid=join("",@$extid) if (ref($extid) eq "ARRAY");
-      $ws->write_string($xlsexp->{xls}->{line},7,
+      $ws->write_string($xlsexp->{xls}->{line},$col++,
            $extid,
            $xlsexp->{xls}->{format}->{default});
 
