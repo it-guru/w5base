@@ -41,21 +41,40 @@ sub Main
 {
    my ($self)=@_;
 
-   print $self->HttpHeader("text/html");
-   print $self->HtmlHeader(style=>'default.css',
-                           title=>$self->T($self->Self()));
-   print("<xmp>");
-   print("Enviroment:\n");
-   print("===========\n");
-   foreach my $v (sort(keys(%ENV))){
-      my $val=$ENV{$v};
-      $val=~s/\n/\\n/g;
-      printf("%-25s='%s'\n",$v,$val);
+   if ($ENV{HTTP_ACCEPT}=~m/wap.wml/){
+      print $self->HttpHeader("text/wap");
+      print(<<EOF);
+<?xml version="1.0"?>
+<!DOCTYPE wml PUBLIC "-//WAPFORUM//DTD WML 1.1//EN" "http://www.wapforum.org/DTD/wml_1.1.xml">
+<wml>
+  <card id="eins">
+    <p>
+  	Dies ist <a href="xx">die</a> erste Card.
+    </p>
+<form>
+<input type="text" name=hans>
+</form>
+  </card>
+</wml>
+EOF
    }
-   
-
-   print("</xmp>");
-   print $self->HtmlBottom(body=>1,form=>1);
+   else{
+      print $self->HttpHeader("text/html");
+      print $self->HtmlHeader(style=>'default.css',
+                              title=>$self->T($self->Self()));
+      print("<xmp>");
+      print("Enviroment:\n");
+      print("===========\n");
+      foreach my $v (sort(keys(%ENV))){
+         my $val=$ENV{$v};
+         $val=~s/\n/\\n/g;
+         printf("%-25s='%s'\n",$v,$val);
+      }
+      
+     
+      print("</xmp>");
+      print $self->HtmlBottom(body=>1,form=>1);
+   }
 }
 
 
