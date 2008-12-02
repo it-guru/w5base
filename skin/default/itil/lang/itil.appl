@@ -90,3 +90,4 @@
 'opmode.reference'=>{de=>'Referenz',en=>'Reference'},
 'opmode.license'=>{de=>'Lizenz',en=>'License'},
 'direct linked Licenses'=>{de=>'direkt verknüpfte Lizenzen'},
+'default language for eventinformations'=>{de=>'Standard Spracheinstellung für den Workflow Ereignismeldung'},

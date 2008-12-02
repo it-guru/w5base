@@ -994,6 +994,7 @@ sub getNotificationSubject
 sub getNotificationSkinbase
 {
    my $self=shift;
+   my $WfRec=shift;
    return('base');
 }
 
@@ -1604,6 +1605,7 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
+   my $eventlang;
    foreach my $v (qw(name eventstartofevent)){
       if ((!defined($oldrec) || exists($newrec->{$v})) && $newrec->{$v} eq ""){
          $self->LastMsg(ERROR,"field '%s' is empty",
@@ -1625,13 +1627,14 @@ sub Validate
           %customer,%customerid,%custcontract,%custcontractid);
       foreach my $rec ($appl->getHashList(qw(mandator mandatorid 
                                customer customerid businessteam responseteam
-                               custcontracts))){
+                               custcontracts eventlang))){
          $responseteam{$rec->{responseteam}}=1 if ($rec->{responseteam} ne "");
          $businessteam{$rec->{businessteam}}=1 if ($rec->{businessteam} ne "");
          $customer{$rec->{customer}}=1 if ($rec->{customer} ne "");
          $customerid{$rec->{customerid}}=1 if ($rec->{customerid} ne "");
          $mandator{$rec->{mandator}}=1 if ($rec->{mandator} ne "");
          $mandatorid{$rec->{mandatorid}}=1 if ($rec->{mandatorid} ne "");
+         $eventlang=$rec->{eventlang};
          if (ref($rec->{custcontracts}) eq "ARRAY"){
             foreach my $contr (@{$rec->{custcontracts}}){
                if ($contr->{custcontract} ne ""){
@@ -1667,6 +1670,9 @@ sub Validate
          $newrec->{initiatorgroup}=[map({$groups{$_}->{fullname}} @grpids)];
       }
    }
+   $eventlang=$self->getParent->Lang() if ($eventlang eq "");
+   $eventlang="en" if ($eventlang eq "");
+   $newrec->{eventlang}=$eventlang;
    #printf STDERR ("fifi affectedapplicationid=%s",Dumper($newrec));
    if (!$self->getParent->ValidateCreate($newrec)){
       return(0);
@@ -2176,7 +2182,7 @@ sub Process
              step     =>'base::workflow::mailsend::dataload',
              name     =>$subject,
              emailtemplate  =>'eventnotification',
-             skinbase       =>$self->getParent->getNotificationSkinbase(),
+             skinbase       =>$self->getParent->getNotificationSkinbase($WfRec),
              emailfrom      =>$emailfrom,
              emailto        =>\@emailto,
              emailcc        =>\@emailcc,

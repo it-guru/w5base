@@ -473,13 +473,21 @@ sub new
                 label         =>'allow business request workflows',
                 container     =>'additional'),
 
+      new kernel::Field::Select(
+                name          =>'eventlang',
+                group         =>'control',
+                htmleditwidth =>'30%',
+                value         =>['en','de','en-de','de-en'],
+                label         =>'default language for eventinformations',
+                dataobjattr   =>'appl.eventlang'),
+
+
       new kernel::Field::Boolean(
                 name          =>'issoxappl',
                 group         =>'control',
                 htmleditwidth =>'30%',
                 label         =>'Application is mangaged by rules of SOX',
                 dataobjattr   =>'appl.is_soxcontroll'),
-
 
       new kernel::Field::TextDrop(
                 name          =>'servicesupport',
@@ -914,6 +922,9 @@ sub Validate
       $newrec->{applid}=undef;
    }
    ########################################################################
+   if (!defined($oldrec) && !exists($newrec->{eventlang})){
+      $newrec->{eventlang}=$self->Lang(); 
+   }
 
    return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"name"));
    return(1);

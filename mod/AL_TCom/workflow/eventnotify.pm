@@ -324,13 +324,21 @@ EOF
 sub getNotificationSkinbase
 {
    my $self=shift;
+   my $WfRec=shift;
+   if ($WfRec->{eventlang} ne "de"){
+      return($self->SUPER::getNotificationSkinbase($WfRec));
+   }
    return('AL_TCom');
 }
 
 sub generateMailSet
 {
    my $self=shift;
-   my ($WfRec,$action,$eventlang,$additional,$emailprefix,$emailpostfix,
+   my $WfRec=shift;
+   if ($WfRec->{eventlang} ne "de"){
+      return($self->SUPER::generateMailSet($WfRec,@_));
+   }
+   my ($action,$eventlang,$additional,$emailprefix,$emailpostfix,
        $emailtext,$emailsep,$emailsubheader,$emailsubtitle,
        $subject,$allowsms,$smstext)=@_;
    my @emailprefix=();
@@ -762,7 +770,7 @@ sub Process
              step     =>'base::workflow::mailsend::dataload',
              name     =>$subject,
              emailtemplate  =>'eventnotification',
-             skinbase       =>$self->getParent->getNotificationSkinbase(),
+             skinbase       =>$self->getParent->getNotificationSkinbase($WfRec),
              emailfrom      =>$emailfrom,
              emailto        =>\@emailto,
              emailcc        =>\@emailcc,
