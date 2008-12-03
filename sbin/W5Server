@@ -794,6 +794,10 @@ if ($ENV{REMOTE_USER} eq ""){
    $port=4711 if ($port eq "");
    msg(DEBUG,"W5ServerPort=%s",$port);
    $ServerParam{'port'}=$port;
+   my $allow=$curconfig->Param("W5SERVERALLOW");
+   my @allow=split(/\s*,\s*/,$allow);
+   @allow=("0.0.0.0") if ($allow eq "" || $#allow==-1);
+   $ServerParam{'allow'}=\@allow;
    my $user=$curconfig->Param("W5SERVERUSER");
    $user="nobody" if ($user eq "");
    $ServerParam{'user'}=$user;

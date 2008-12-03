@@ -44,6 +44,13 @@ if (!$configcheck->readconfig("$FindBin::Bin/..",$configname)){
    $ClientParam{'PeerPort'}=$port;
 }
 
+{
+   my $host=$configcheck->Param("W5SERVERHOST");
+   $host="localhost" if ($host eq "");
+   msg(DEBUG,"W5ServerHost=%s",$host);
+   $ClientParam{'PeerAddr'}=$host;
+}
+
 my $MyClient=new RPC::Smart::Client(%ClientParam);
 
 if (! defined($MyClient->Connect())){
