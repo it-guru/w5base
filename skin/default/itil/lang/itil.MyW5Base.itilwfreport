@@ -14,6 +14,6 @@
 'To'=>{de=>'bis'},
 'missing query param to prozess this request'=>{de=>'zwingende Abfrageparameter wurden nicht angegeben'},
 'from is later then to'=>{de=>'der "von" Zeitpunkt liegt nach dem "bis" Zeitpunkt'},
-'range is larger then the allowed limit of 100d'=>{de=>'Abfragezeitraum ist länger als das Maximum von 100 Tagen'},
+'range is larger then the allowed limit of 366d'=>{de=>'Abfragezeitraum ist länger als das Maximum von 366 Tagen'},
 'invalid application filter'=>{de=>'unzulässige Eingrenzung der Anwendung'},
 

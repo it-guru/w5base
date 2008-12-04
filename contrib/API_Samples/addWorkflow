@@ -39,7 +39,7 @@ else{
 
 my $WfRec={ class=>'AL_TCom::workflow::businesreq',
             name=>'Hallo Welt 1',
-            reqnature=>'install',
+            reqnature=>'undef',
             detaildescription=>"Dies ist der lange Text\n".
                                "mit mehreren Zeilen",
             affectedapplication=>'W5Base/Darwin',

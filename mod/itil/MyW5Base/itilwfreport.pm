@@ -192,8 +192,8 @@ sub SetFilter
       $self->LastMsg(ERROR,"from is later then to");
       return(undef);
    }
-   if ($flt->{duration}->{totalseconds}>8640000){
-      $self->LastMsg(ERROR,"range is larger then the allowed limit of 100d");
+   if ($flt->{duration}->{totalseconds}>31622400){
+      $self->LastMsg(ERROR,"range is larger then the allowed limit of 366d");
       return(undef);
    }
    if (defined($flt->{affectedapplication}) &&

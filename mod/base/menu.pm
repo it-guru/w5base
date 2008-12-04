@@ -594,6 +594,37 @@ sub root
       print("</html>");
    }
    else{
+      if ($ENV{HTTP_UA_OS}=~m/Windows CE/){
+         print $self->HttpHeader("text/vnd.wap.wml");
+         print(<<EOF);
+<?xml version="1.0"?>
+<!DOCTYPE wml PUBLIC "-//WAPFORUM//DTD WML 1.1//EN" "http://www.wapforum.org/DTD/wml_1.1.xml">
+<wml>
+  <card id="1">
+    <form>
+    <p align="center">W5Base Mobile Interface</p>
+    <p>please select operation mode:</p>
+    <p>
+<anchor>
+  Senden
+  <go href="root" method="post">
+    <postfield name="pfvn" value="vn"/>
+    <postfield name="pfnn" value="nn"/>
+  </go>
+</anchor>
+</p>
+<p>
+<anchor>
+ Click Here! <go href="Ziel-URL.wml"/>
+</anchor>
+</p>
+    </form>
+  </card>
+</wml>
+
+EOF
+         return();
+      }
       print $self->HttpHeader("text/html");
       print $self->HtmlHeader(style=>['default.css'],
                               js=>'toolbox.js',

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+               xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" 
+               xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+               soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" 
+               xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+   <soap:Body>
+      <getHashListResponse xmlns="http://w5base.net/interface/SOAP">
+      <s-gensym18><lastmsg soapenc:arrayType="xsd:anyType[0]" 
+                           xsi:type="soapenc:Array"/>
+         <records soapenc:arrayType="xsd:anyType[1]" xsi:type="soapenc:Array">
+            <item>
+               <step xsi:type="xsd:string">base::workflow::request::main</step>
+               <posibleactions soapenc:arrayType="xsd:string[12]" 
+                               xsi:type="soapenc:Array">
+                  <item xsi:type="xsd:string">wfaddnote</item>
+                  <item xsi:type="xsd:string">wffine</item>
+               </posibleactions>
+               <name xsi:type="xsd:string">Hallo Welt 1</name>
+               <class xsi:type="xsd:string">AL_TCom::workflow::businesreq
+               </class>
+            </item>
+        </records>
+        <exitcode xsi:type="xsd:int">0</exitcode>
+     </s-gensym18>
+     </getHashListResponse>
+   </soap:Body>
+</soap:Envelope>

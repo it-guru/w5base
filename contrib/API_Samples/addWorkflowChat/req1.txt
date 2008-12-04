@@ -1,0 +1,49 @@
+Request:
+========
+SOAPAction: "http://w5base.net/interface/SOAP#storeRecord"
+
+<?xml version="1.0" encoding="UTF-8"?>
+ <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+                xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" 
+                xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+                soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" 
+                xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+   <storeRecord xmlns="http://w5base.net/interface/SOAP">
+    <c-gensym9>
+     <lang xsi:type="xsd:string">en</lang>
+     <data>
+      <implementedto xsi:type="xsd:string">in 2 weeks</implementedto>
+      <customerrefno xsi:type="xsd:int">11223344</customerrefno>
+      <affectedapplication xsi:type="xsd:string">W5Base/Darwin
+      </affectedapplication>
+      <detaildescription xsi:type="xsd:string">Dies ist der lange Text
+      mit mehreren Zeilen</detaildescription>
+      <name xsi:type="xsd:string">Hallo Welt 1</name>
+      <reqnature xsi:type="xsd:string">undef</reqnature>
+      <class xsi:type="xsd:string">AL_TCom::workflow::businesreq</class>
+     </data>
+     <IdentifiedBy xsi:nil="true" />
+     <dataobject xsi:type="xsd:string">base::workflow</dataobject>
+    </c-gensym9>
+   </storeRecord>
+  </soap:Body>
+</soap:Envelope>
+
+Answer:
+=======
+<?xml version="1.0" encoding="UTF-8"?>
+ <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+                xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" 
+                xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+                soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" 
+                xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+   <storeRecordResponse xmlns="http://w5base.net/interface/SOAP">
+    <s-gensym15>
+     <IdentifiedBy xsi:type="xsd:long">12283058770002</IdentifiedBy>
+     <exitcode xsi:type="xsd:int">0</exitcode>
+    </s-gensym15>
+   </storeRecordResponse>
+  </soap:Body>
+</soap:Envelope>
