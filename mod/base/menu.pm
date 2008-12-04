@@ -595,35 +595,33 @@ sub root
    }
    else{
       if ($ENV{HTTP_UA_OS}=~m/Windows CE/){
-         print $self->HttpHeader("text/vnd.wap.wml");
-         print(<<EOF);
-<?xml version="1.0"?>
-<!DOCTYPE wml PUBLIC "-//WAPFORUM//DTD WML 1.1//EN" "http://www.wapforum.org/DTD/wml_1.1.xml">
-<wml>
-  <card id="1">
-    <form>
-    <p align="center">W5Base Mobile Interface</p>
-    <p>please select operation mode:</p>
-    <p>
-<anchor>
-  Senden
+         my $nomobileask=Query->Param("NOMOBILEASK");
+         if ($nomobileask ne "1"){
+            my $qf=getModuleObject($self->Config,"faq::QuickFind");
+            my $mqf;
+            if (defined($qf)){
+               $mqf="\n<p>\n<anchor>Mobile WAP Interface\n".
+                    "<go href=\"../../faq/QuickFind/mobileWAP\" ".
+                    "method=\"post\">".
+                    "\n<postfield name=\"NOMOBILEASK\" value=\"1\"/>\n".
+                    "</go></anchor>\n</p>\n";
+            }
+            my $d=<<EOF;
+<p align="center">W5Base Mobile Interface</p>
+<p>please select operation mode:</p>
+$mqf
+<p><anchor>
+  Classic HTML Interface
   <go href="root" method="post">
-    <postfield name="pfvn" value="vn"/>
-    <postfield name="pfnn" value="nn"/>
+    <postfield name="NOMOBILEASK" value="1"/>
   </go>
-</anchor>
-</p>
-<p>
-<anchor>
- Click Here! <go href="Ziel-URL.wml"/>
-</anchor>
-</p>
-    </form>
-  </card>
-</wml>
-
+</anchor></p>
 EOF
-         return();
+            print $self->HttpHeader("text/vnd.wap.wml");
+            print $self->Wap($d);
+            print STDERR $self->Wap($d);
+            return();
+         }
       }
       print $self->HttpHeader("text/html");
       print $self->HtmlHeader(style=>['default.css'],

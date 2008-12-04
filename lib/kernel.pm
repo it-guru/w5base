@@ -79,7 +79,7 @@ use Unicode::String qw(utf8 latin1 utf16);
 @EXPORT = qw(&Query &LangTable &globalContext &NowStamp &CalcDateDuration
              &trim &rtrim &ltrim &hash2xml &effVal &Debug &UTF8toLatin1
              &Datafield2Hash &Hash2Datafield &CompressHash
-             &unHtml &quoteHtml &quoteQueryString &Dumper 
+             &unHtml &quoteHtml &quoteWap &quoteQueryString &Dumper 
              &FancyLinks &mkInlineAttachment &haveSpecialChar
              &getModuleObject &getConfigObject &generateToken
              &isDataInputFromUserFrontend
@@ -177,6 +177,27 @@ sub unHtml
 }
 
 sub quoteHtml
+{
+   my $d=shift;
+
+   $d=~s/&/&amp;/g;
+   $d=~s/</&lt;/g;
+   $d=~s/>/&gt;/g;
+   $d=~s/\xC4/&Auml;/g;
+   $d=~s/\xD6/&Ouml;/g;
+   $d=~s/\xDC/&Uuml;/g;
+   $d=~s/\xE4/&auml;/g;
+   $d=~s/\xF6/&ouml;/g;
+   $d=~s/\xFC/&uuml;/g;
+   $d=~s/\xDF/&szlig;/g;
+   $d=~s/"/&quot;/g;
+   $d=~s/'/&prime;/g;
+   $d=~s/&amp;nbsp;/&nbsp;/g;
+
+   return($d);
+}
+
+sub quoteWap
 {
    my $d=shift;
 

@@ -1155,6 +1155,18 @@ EOF
    return($d);
 }
 
+sub Wap
+{
+   my $self=shift;
+   my $d=shift;
+   my %param=@_;
+
+   return('<?xml version="1.0"?>'."\n".
+          '<!DOCTYPE wml PUBLIC "-//WAPFORUM//DTD WML 1.1//EN" '.
+          '"http://www.wapforum.org/DTD/wml_1.1.xml">'."\n".
+          "<wml><card id=\"1\"><form>\n".$d."</form></card></wml>\n");
+}
+
 sub HtmlReply
 {
    my $self=shift;

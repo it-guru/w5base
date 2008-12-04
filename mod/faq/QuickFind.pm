@@ -49,6 +49,59 @@ sub Main
    return(0);
 }
 
+sub mobileWAP
+{
+   my $self=shift;
+   my $s=Query->Param("search");
+   my $d=<<EOF;
+<p align="center">W5Base : Quickfind</p>
+<p align="center">
+Schl&#xFC;sselwort:<input type="text" value="$s" name="search" size="10"/>
+<anchor>Suchen
+<go href="mobileWAP" method="post">
+<postfield name="search" value="\$(search)"/>
+</go>
+</anchor>
+</p>
+EOF
+   if ($s ne ""){
+      my $tag=undef;
+      if (my ($stag,$stxt)=$s=~m/^\s*(\S+)\s*:\s*(\S+.*)\S*$/){
+         $tag=lc($stag);
+         $s=$stxt;
+      }
+      my $searchtext=trim($s);
+      my @s;
+      $self->LoadSubObjs("QuickFind","QuickFind");
+      foreach my $sobj (values(%{$self->{QuickFind}})){
+         my $acl=$self->getMenuAcl($ENV{REMOTE_USER},
+                                   $sobj->Self());
+         if (defined($acl)){
+            next if (!grep(/^read$/,@$acl));
+         }
+         msg(INFO,"mod=%s acl=%s",$sobj->Self(),Dumper($acl));
+         if ($sobj->can("CISearchResult")){
+            push(@s,$sobj->CISearchResult($tag,$searchtext));
+         }
+      }
+      my %s;
+      foreach my $srec (@s){
+         push(@{$s{$srec->{group}}},$srec);
+      }
+      foreach my $group (sort(keys(%s))){
+         $d.="<p><b>".quoteWap($group)."</b></p>";
+         foreach my $srec (sort({$a->{name} cmp $b->{name}} @{$s{$group}})){
+            $d.="<p>".quoteWap($srec->{name})."</p>";
+         }
+      }
+      printf STDERR ("s=%s\n",Dumper(\@s));
+   }
+   printf STDERR ("d=%s\n",$d);
+   print $self->HttpHeader("text/vnd.wap.wml");
+   print $self->Wap($d);
+   return(undef);
+}
+
 sub globalHelp
 {
    my $self=shift;
@@ -380,7 +433,7 @@ EOF
 sub getValidWebFunctions
 {
    my ($self)=@_;
-   return(qw(Main globalHelp Welcome Result QuickFindDetail));
+   return(qw(Main globalHelp Welcome Result QuickFindDetail mobileWAP));
 }
 
 sub QuickFindDetail
