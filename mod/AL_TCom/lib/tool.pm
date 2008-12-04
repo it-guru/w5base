@@ -1,0 +1,77 @@
+package AL_TCom::lib::tool;
+#  W5Base Framework
+#  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+use strict;
+use vars qw(@ISA);
+use kernel;
+
+
+
+sub getRequestedApplicationIds
+{
+   my $self=shift;
+   my $userid=shift;
+   my %param=@_;
+
+   my @grps;
+   if ($param{team} || $param{dep}){
+      my @r=();
+      push(@r,qw(RMember REmployee RChief RQManager)) if ($param{team});
+      push(@r,qw(RChief2)) if ($param{dep});
+      my %grp=$self->getParent->getGroupsOf($userid,\@r,"down");
+      @grps=keys(%grp);
+   }
+   push(@grps,"none") if ($#grps==-1);
+   if ($#grps>15){
+      @grps=("overflow");
+   }
+   my $flt=[];
+   if ($param{user}){
+      push(@$flt,{ semid=>\$userid,cistatusid=>"<6" },
+                 { tsmid=>\$userid,cistatusid=>"<6" },
+                 { delmgrid=>\$userid,cistatusid=>"<6" },
+                 { ldelmgrid=>\$userid,cistatusid=>"<6" },
+                 { databossid=>\$userid,cistatusid=>"<6" });
+   }
+   if ($param{dep}){
+      push(@$flt,{ sem2id=>\$userid,cistatusid=>"<6" },
+                 { tsm2id=>\$userid,cistatusid=>"<6" },
+                 { delmgr2id=>\$userid,cistatusid=>"<6" },
+                 { ldelmgr2id=>\$userid,cistatusid=>"<6" });
+   }
+   if ($param{dep} || $param{team}){
+      push(@$flt,{ responseteamid=>\@grps,cistatusid=>"<6"},
+                 { businessteamid=>\@grps,cistatusid=>"<6"});
+   }
+   my @appl=("none");
+   return(@appl) if ($#{$flt}==-1);
+   $self->{appl}->ResetFilter();
+   $self->{appl}->SecureSetFilter($flt);
+   my @l=$self->{appl}->getHashList("id");
+   if ($#l>-1){
+      @appl=map({$_->{id}} @l);
+   }
+   return(@appl);
+}
+
+
+
+
+
+
+1;
