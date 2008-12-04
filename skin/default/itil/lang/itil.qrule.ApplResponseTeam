@@ -1,0 +1,3 @@
+'itil::qrule::ApplResponseTeam'=>{de=>'Prüfung ob ServiceManagement Team bei Anwendung eingetragen ist',
+                             en=>'check if ther is a valid responseteam defined on application'},
+'no responseteam defined'=>{de=>'kein ServiceManagement Team definiert'},

@@ -1,0 +1,3 @@
+'itil::qrule::ApplBusinessTeam'=>{de=>'Prüfung ob Betriebsteam bei Anwendung eingetragen ist',
+                             en=>'check if ther is a valid buisnessteam defined on application'},
+'no businessteam defined'=>{de=>'kein Betriebsteam definiert'},
