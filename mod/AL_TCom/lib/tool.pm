@@ -37,7 +37,7 @@ sub getRequestedApplicationIds
       @grps=keys(%grp);
    }
    push(@grps,"none") if ($#grps==-1);
-   if ($#grps>15){
+   if ($#grps>30){
       @grps=("overflow");
    }
    my $flt=[];
