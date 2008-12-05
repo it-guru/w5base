@@ -420,7 +420,6 @@ sub Result
 
    print(<<EOF);
 </script>
-
 <div style="margin:5px">
 <script language="JavaScript">
 initializeDocument();
