@@ -536,6 +536,7 @@ sub DeleteRec
                            body=>1,form=>1,
                            title=>$self->T("Verification query"));
    my $id=Query->Param("CurrentIdToEdit");
+   $self->ResetFilter();
    my $flt=undef;
    if (defined($id)){
       $flt={$self->IdField->Name()=>\$id};
