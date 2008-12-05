@@ -54,7 +54,7 @@
 'misc'=>                {de=>'sonstiges',
                          en=>'misc'},
 
-'appl'=>                {de=>'Applicationsbetrieb',
+'appl'=>                {de=>'Applikationsbetrieb',
                          en=>'Applicationoperation'},
 'db'=>                  {de=>'Datenbank',
                          en=>'Database'},
