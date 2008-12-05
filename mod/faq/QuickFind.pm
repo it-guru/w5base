@@ -420,9 +420,22 @@ sub Result
 
    print(<<EOF);
 </script>
-<div style="margin:5px">
+<style>
+body{overflow:hidden;}
+</style>
+<div id=result style="margin-left:2px;overflow:auto">
 <script language="JavaScript">
 initializeDocument();
+function resizeResult()
+{
+   h=getViewportHeight();
+   w=getViewportWidth();
+   var r=document.getElementById('result');
+   r.style.height=(h-2)+"px";
+   r.style.width=(w-2)+"px";
+}
+resizeResult();
+addEvent(window,"resize",resizeResult);
 </script>
 </div>
 EOF
