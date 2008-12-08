@@ -142,7 +142,6 @@ sub CleanupWorkflows
       $wf->SetFilter({stateid=>\$stateid});
       $wf->SetCurrentView(qw(ALL));
       $wf->SetCurrentOrder(qw(NONE));
-      $wf->Limit(1000);
 
       my ($rec,$msg)=$wf->getFirst();
       if (defined($rec)){
@@ -153,7 +152,7 @@ sub CleanupWorkflows
                my $postponeduntil=$rec->{postponeduntil};
                $postponeduntil=$now if ($postponeduntil eq "");
                my $d=CalcDateDuration($now,$postponeduntil);
-               if (1 || !defined($d) || $d->{totalseconds}<=0){
+               if (!defined($d) || $d->{totalseconds}<=0){
                   if ($wfop->Action->StoreRecord($rec->{id},"reactivate",
                       {translation=>'base::workflowaction'},"",undef)){
                      $wfop->Store($rec,{stateid=>4,postponeduntil=>undef});
