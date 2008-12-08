@@ -197,7 +197,7 @@ sub sendNotify
       $rec{name}.=" (".$rec{additional}->{wfcount}.")";
    }
    $rec{emailtemplate}='wfstatmail';
-   $rec{emailcc}=['hartmut.vogler@t-systems.com'];
+   #$rec{emailcc}=['hartmut.vogler@t-systems.com'];
    #       emaillang     =>$lang,
 
    if (my $id=$wf->Store(undef,\%rec)){
