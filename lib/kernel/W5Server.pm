@@ -2,7 +2,6 @@ package kernel::W5Server;
 use strict;
 use kernel;
 use kernel::Universal;
-use Data::Dumper;
 use vars(qw(@ISA));
 
 @ISA=qw(kernel::Universal);
@@ -12,6 +11,11 @@ sub new
    my $type=shift;
    my $self=bless({@_},$type);
    return($self);
+}
+
+sub Config
+{
+   return($_[0]->getParent->Config());
 }
 
 sub Init

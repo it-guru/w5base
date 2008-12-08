@@ -110,8 +110,8 @@ sub SendMyJobs
                my $color="black";
                my $bold1="";
                my $bold0="";
-               if ($dur->{days}>1){
-                  $wfcount++;
+               if ($dur->{days}>1 && $wfrec->{stateid}!=5){ # list no defereds
+                  $wfcount++;                             
                   if ($wfcount<50){
                      if ($wfrec->{stateid}<17){
                         if ( ($wfrec->{prio}<3 && $dur->{days}>3) ||

@@ -30,4 +30,5 @@
 'wfautofinish'=>{de=>'automatisch beendet',en=>'auto finished'},
 'forwardto'=>{de=>'Weitergeleitet'},
 'note'=>{de=>'Notiz'},
+'reactivate'=>{de=>'Reaktivierung'},
 

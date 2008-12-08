@@ -99,6 +99,7 @@ sub CleanupWorkflows
 {
    my $self=shift;
    my $wf=getModuleObject($self->getParent->Config,"base::workflow");
+   my $wfop=getModuleObject($self->getParent->Config,"base::workflow");
    my $CleanupWorkflow=$self->getParent->Config->Param("CleanupWorkflow");
    $CleanupWorkflow="<now-84d" if ($CleanupWorkflow eq "");
 
@@ -117,25 +118,53 @@ sub CleanupWorkflows
          do{
             msg(INFO,"process $rec->{id} class=$rec->{class}");
             if (1){
-               if ($wf->Action->StoreRecord($rec->{id},"wfautofinish",
+               if ($wfop->Action->StoreRecord($rec->{id},"wfautofinish",
                    {translation=>'base::workflowaction'},"",undef)){
                   my $closedate=$rec->{closedate};
                   $closedate=NowStamp("en") if ($closedate eq "");
 
-                  $wf->UpdateRecord({stateid=>21,closedate=>$closedate},
-                                    {id=>\$rec->{id}});
-                  $wf->{DB}->do("update wfkey set wfstate='21',".
-                                "closedate='$closedate' where id='$rec->{id}'");
-                  $wf->StoreUpdateDelta({id=>$rec->{id},
-                                         stateid=>$rec->{stateid}},
-                                        {id=>$rec->{id},
-                                         stateid=>21});
+                  $wfop->UpdateRecord({stateid=>21,closedate=>$closedate},
+                                      {id=>\$rec->{id}});
+                  $wfop->{DB}->do("update wfkey set wfstate='21',".
+                                  "closedate='$closedate' ".
+                                  "where id='$rec->{id}'");
+                  $wfop->StoreUpdateDelta({id=>$rec->{id},
+                                           stateid=>$rec->{stateid}},
+                                          {id=>$rec->{id},
+                                           stateid=>21});
                }
             }
             ($rec,$msg)=$wf->getNext();
          } until(!defined($rec));
       }
    }
+   foreach my $stateid (qw(5)){
+      $wf->SetFilter({stateid=>\$stateid});
+      $wf->SetCurrentView(qw(ALL));
+      $wf->SetCurrentOrder(qw(NONE));
+      $wf->Limit(1000);
+
+      my ($rec,$msg)=$wf->getFirst();
+      if (defined($rec)){
+         do{
+            msg(INFO,"process $rec->{id} class=$rec->{class}");
+            if (1){
+               my $now=NowStamp("en");
+               my $postponeduntil=$rec->{postponeduntil};
+               $postponeduntil=$now if ($postponeduntil eq "");
+               my $d=CalcDateDuration($now,$postponeduntil);
+               if (1 || !defined($d) || $d->{totalseconds}<=0){
+                  if ($wfop->Action->StoreRecord($rec->{id},"reactivate",
+                      {translation=>'base::workflowaction'},"",undef)){
+                     $wfop->Store($rec,{stateid=>4,postponeduntil=>undef});
+                  }
+               }
+            }
+            ($rec,$msg)=$wf->getNext();
+         } until(!defined($rec));
+      }
+   }
+
 }
 
 
