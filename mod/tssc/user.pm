@@ -85,6 +85,34 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'scadm1.contactsm1.email'),
 
+      new kernel::Field::Phonenumber(
+                name          =>'office_phone',
+                group         =>'office',
+                label         =>'Phonenumber',
+                dataobjattr   =>'scadm1.contactsm1.phone'),
+
+      new kernel::Field::Phonenumber(
+                name          =>'office_mobile',
+                group         =>'office',
+                label         =>'Mobile-Phonenumber',
+                dataobjattr   =>'scadm1.contactsm1.car_phone'),
+
+      new kernel::Field::Phonenumber(
+                name          =>'office_facsimile',
+                group         =>'office',
+                label         =>'FAX-Number',
+                dataobjattr   =>'scadm1.contactsm1.fax'),
+
+      new kernel::Field::Text(
+                name          =>'sclocation',
+                label         =>'SC-Location',
+                group         =>'office',
+                ignorecase    =>1,
+                dataobjattr   =>'scadm1.contactsm1.location_name'),
+
+
+
+
 #      new kernel::Field::Text(
 #                name          =>'ldapid',
 #                label         =>'LDAPID',
@@ -130,6 +158,14 @@ sub new
                 group         =>'source',
                 label         =>'Source-Id',
                 dataobjattr   =>'scadm1.contactsm1.external_id'),
+
+      new kernel::Field::Date(
+                name          =>'srcload',
+                group         =>'source',
+                label         =>'Source-Load',
+                dataobjattr   =>'scadm1.contactsm1.last_update'),
+
+
                                                    
    );
    $self->setDefaultView(qw(id loginname name firstname email));
@@ -222,7 +258,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","groups","source");
+   return("header","default","office","groups","source");
 }
 
 

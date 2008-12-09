@@ -28,7 +28,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{MainSearchFieldLines}=4;
+#   $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->AddFields(
@@ -53,19 +53,30 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'scadm1.assignmentm1.name'),
 
-      new kernel::Field::SubList(
-                name          =>'users',
-                label         =>'Users',
-                group         =>'users',
-                vjointo       =>'tssc::lnkusergroup',
-                vjoinon       =>['groupid'=>'lgroup'],
-                vjoindisp     =>['username','luser']),
-
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
                 ignorecase    =>1,
                 dataobjattr   =>'scadm1.assignmentm1.name'),
+
+      new kernel::Field::SubList(
+                name          =>'users',
+                label         =>'Users',
+                group         =>'users',
+                searchable    =>0,
+                vjointo       =>'tssc::lnkusergroup',
+                vjoinon       =>['groupid'=>'lgroup'],
+                vjoindisp     =>['username','luser']),
+
+      new kernel::Field::SubList(
+                name          =>'loginname',
+                translation   =>'tssc::user',
+                label         =>'User-Login',
+                group         =>'users',
+                htmldetail    =>0,
+                vjointo       =>'tssc::lnkusergroup',
+                vjoinon       =>['groupid'=>'lgroup'],
+                vjoindisp     =>['luser']),
 
       new kernel::Field::Text(
                 name          =>'description',
