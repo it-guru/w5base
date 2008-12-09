@@ -1,0 +1,6 @@
+'tssc::group'=>{de=>'ServiceCenter Gruppe',en=>'ServiceCenter Group'},
+'Group ID'=>{de=>'Gruppen ID'},
+'fieldgroup.users'             =>{ de=>'Gruppenmitglieder',en=>'Group-Members'},
+'Fullname'    =>{ de=>'vollqualifizierter Name'},
+'Description' =>{ de=>'Beschreibung'},
+

@@ -75,6 +75,22 @@ sub Init
                       "tssc::mandator",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("sc.krn.group.lnkuser",
+                      "tssc::lnkusergroup",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("sc.krn.group",
+                      "tssc::group",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("sc.krn.user",
+                      "tssc::user",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("sc.krn.user.lnkgroup",
+                      "tssc::lnkusergroup",
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("sc.krn.dictonary",
                       "tssc::DBDataDiconary",
                       defaultacl=>['admin']);

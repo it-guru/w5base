@@ -1,0 +1,3 @@
+'tssc::lnkusergroup'=>{de=>'ServiceCenter Gruppenzuordnung',
+                       en=>'ServiceCenter Grouprelation'},
+'User-Fullname'=>{de=>'vollqualifizierter Username'},

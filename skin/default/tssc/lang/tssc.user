@@ -1,0 +1,6 @@
+'tssc::user'=>{de=>'ServiceCenter User',en=>'ServiceCenter User'},
+'fieldgroup.groups'=>{ de=>'Gruppenmitgliedschaften',en=>'Group-Memberships'},
+'Fullname'    =>{ de=>'vollqualifizierter Name'},
+'Firstname'   =>{ de=>'Vorname'},
+'Name'   =>{ de=>'Nachname'},
+
