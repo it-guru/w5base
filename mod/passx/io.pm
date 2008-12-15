@@ -44,7 +44,7 @@ sub TechMenu
    my $self=shift;
    my ($func,$p)=$self->extractFunctionPath();
    my $format=Query->Param("format");
-   my @fl=qw(xml fvwm perl);
+   my @fl=qw(xml fvwm perl enlightenment);
    $p=~s/\///g; 
 
    $format="xml" if (!grep(/^$format$/,@fl));
@@ -59,6 +59,10 @@ sub TechMenu
          print $ent->generateMenuTree($format,$userid,"","");
       }
       if ($format eq "fvwm"){
+         print $self->HttpHeader("text/plain");
+         print $ent->generateMenuTree($format,$userid,"","");
+      }
+      if ($format eq "enlightenment"){
          print $self->HttpHeader("text/plain");
          print $ent->generateMenuTree($format,$userid,"","");
       }

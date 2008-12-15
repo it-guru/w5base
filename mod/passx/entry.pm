@@ -445,6 +445,9 @@ sub generateMenuTree
 
 
       }
+      if ($mode eq "enlightenment"){
+         print ("ok");
+      }
       if ($mode eq "perl"){
          $d=Dumper(\@ml);
       }
@@ -537,7 +540,7 @@ sub Validate
    my $entrytype=effVal($oldrec,$newrec,"entrytype");
    if ($entrytype<10){
       my $name=lc(trim(effVal($oldrec,$newrec,"name")));
-      if ($name eq "" || !($name=~m/^[a-z0-9_\.:]+$/)){
+      if ($name eq "" || !($name=~m/^[a-z0-9_\.:-]+$/)){
          $self->LastMsg(ERROR,
               sprintf($self->T("invalid systemname '%s' specified"),$name));
          return(0);
