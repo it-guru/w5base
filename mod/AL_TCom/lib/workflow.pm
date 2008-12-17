@@ -145,118 +145,35 @@ sub tcomcodcause
 #
    return(qw(
    undef
-   appl.base.mon
-   appl.base.rep
-   appl.base.tuning
-   appl.base.opchange
-   appl.base.doc
-   appl.base.control
-   appl.base.usermgmt
-   appl.base.confmgmt
-   appl.base.relmgmt
-   appl.base.capmgmt
-   appl.base.secmgmt
-   appl.base.inm
-   appl.base.prm
-   appl.base.conmgmt
-   appl.base.recov
-   appl.base.waround
-   appl.base.arundown
-   appl.base.sdesign
-   appl.base.slamgmt
-   appl.base.escmgmt
-   appl.base.slumpm
-   appl.baseext.mon
-   appl.baseext.rep
-   appl.baseext.tuning
-   appl.baseext.change
-   appl.baseext.doc
-   appl.baseext.control
-   appl.baseext.usrmgmt
-   appl.baseext.cfm
-   appl.baseext.relmgmt
-   appl.baseext.capmgmt
-   appl.baseext.secmgmt
-   appl.baseext.inm
-   appl.baseext.prm
-   appl.baseext.conmgmt
-   appl.baseext.recov
-   appl.baseext.waround
-   appl.baseext.arundown
-   appl.baseext.sdesign
-   appl.baseext.slamgmt
-   appl.baseext.escmgmt
-   appl.baseext.slumpm
-   appl.addfix.devsup
-   appl.addfix.pilot
-   appl.addfix.inst
-   appl.addfix.firstcfg
-   appl.addfix.testinst
-   appl.addfix.doc
-   appl.addfix.rollout
-   appl.addfix.fixes
-   appl.addfix.minorrel
-   appl.addfix.majorrel
-   appl.addfix.fallback
-   appl.addfix.desrec
-   appl.addfix.applunin
+   appl.add.impl
+   appl.add.baseext
    appl.add.devsup
    appl.add.pilot
    appl.add.inst
-   appl.add.firstcfg
-   appl.add.testinst
+   appl.add.fcfg
+   appl.add.test
    appl.add.doc
    appl.add.rollout
    appl.add.fixes
-   appl.add.minorrel
-   appl.add.majorrel
+   appl.add.minor
+   appl.add.major
    appl.add.fallback
-   appl.add.desrec
-   appl.add.applunin
-   db.base.swmon
-   db.base.swinvent
-   db.base.swrep
-   db.base.swinstall
-   db.base.swdeinst
-   db.base.swrundown
-   db.base.dbservice
-   db.base.cfm
-   db.base.recov
-   db.base.doc
-   db.base.secmgmt
-   db.base.support
-   db.base.waround
-   db.baseext.swmon
-   db.baseext.swinvent
-   db.baseext.swrep
-   db.baseext.swinstall
-   db.baseext.swdeinst
-   db.baseext.swrundown
-   db.baseext.dbservice
-   db.baseext.cfm
-   db.baseext.recov
-   db.baseext.doc
-   db.baseext.secmgmt
-   db.baseext.support
-   db.baseext.waround
-   db.addfix.inst
+   appl.add.rectest
+   appl.add.uninst
+   db.addeff.base
+   db.addfix.swinst
    db.addfix.firstcfg
-   db.addfix.fstcfgrac
-   db.addfix.docbhb
+   db.addfix.fcfgcompl
+   db.addfix.initdoc
    db.addfix.ftest
-   db.addfix.swupd
-   db.addfix.dbsnonbhb
-   db.addfix.hastandby
-   db.addfix.licinvent
-   db.addfix.desrec
-   db.addfix.licdeliv
-   db.addfix.swmaint
-   db.add.hastandby
-   db.add.3thwarent
-   db.add.licinvent
-   db.add.desrec
-   db.add.licdeliv
-   db.add.swmaint
+   db.addfix.upd
+   db.addfix.dbserv
+   db.addeff.haserv
+   db.addeff.3th
+   db.addeff.licinv
+   db.addeff.rtest
+   db.addeff.licprov
+   db.addeff.maint
    ETAbusiness
    ETAplan
    ETApromblemanalyse
