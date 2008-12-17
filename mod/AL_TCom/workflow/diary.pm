@@ -234,6 +234,7 @@ sub getDynamicFields
                                          label      =>'Activity',
                                          htmleditwidth=>'80%',
                                          translation=>'AL_TCom::lib::workflow',
+                                         allownative=>['sw.addeff.base'],
                                          value      =>
                              [AL_TCom::lib::workflow::tcomcodcause()],
                                          default    =>'undef',

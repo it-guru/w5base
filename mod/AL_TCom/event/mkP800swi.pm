@@ -51,6 +51,8 @@ sub mkP800swi
    my $start=sprintf("%02d/%04d",$month,$year);
    $sw->ResetFilter();
    $sw->SetFilter({custcostalloc=>1,cistatusid=>4});
+   #$sw->SetFilter({fullname=>'adslnidb.Oracle.primary.1521.u8nc0'}); for debugging
+
    $sw->SetCurrentView("fullname","appl","applid","id","servicesupportid",
                        "swteam","databoss","databossid","swnature");
 
@@ -94,6 +96,7 @@ sub mkP800swi
                      openusername=>$rec->{databoass},
                      openuser=>$rec->{databoassid},
                      tcomworktime=>$tcomworktime,
+                     tcomcodcause=>'sw.addeff.base',
                      detaildescription=>$detaildescription,
                      tcomcodcomments=>$tcomcodcomments,
                     };

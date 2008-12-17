@@ -30,6 +30,7 @@ sub new
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
    $self->{_permitted}->{jsonchanged}=1;      # On Changed Handling
+   $self->{allownative}=undef if (!exists($self->{allownative}));
    return($self);
 }
 
@@ -251,12 +252,18 @@ sub Validate
          my $failfound=0;
          my $chkval=$val;
          my $chkval=[$chkval] if (ref($chkval) ne "ARRAY");
+         if (ref($self->{allownative}) eq "ARRAY"){
+            push(@nativ,@{$self->{allownative}});
+         }
          foreach my $v (@$chkval){
             my $qv=quotemeta($v);
             if (!grep(/^$qv$/,@nativ)){
                $failfound++;
                last;
             }
+         }
+         if ($self->{allownative} eq "1"){
+            $failfound=0;
          }
          return({$self->Name()=>$val}) if (!$failfound);
          $self->getParent->LastMsg(ERROR,"invalid native value ".

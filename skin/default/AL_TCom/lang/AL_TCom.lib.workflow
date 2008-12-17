@@ -86,7 +86,7 @@
                          en=>'AppOps/add.svcs/documentation'},
 'appl.add.rollout'=>    {de=>'AppBetr/SL/Roll-Outs',
                          en=>'AppOps/add.svcs/roll-outs'},
-'appl.add.fixes'=>      {de=>'"AppBetr/SL/Einspielen von Fixes',
+'appl.add.fixes'=>      {de=>'AppBetr/SL/Einspielen von Fixes',
                          en=>'AppOps/add.svcs/depl. of fixes'},
 'appl.add.minor'=>      {de=>'AppBetr/SL/Einspielen Minor Release',
                          en=>'AppOps/add.svcs/depl. of minor releases'},
