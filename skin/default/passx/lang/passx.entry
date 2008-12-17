@@ -1,7 +1,7 @@
 'passx::entry'=>{de=>'Passwort Verteilung',en=>'Password distribution'},
 'fieldgroup.default'=>{de=>'Verteilung',en=>'distribution'},
 'Accesscontrol'=>{de=>'Zugriffssteuerung'},
-'actype.1'=>{de=>'Betriebssystem(Unix)',en=>'Operationsystem(Unix)'},
+'actype.1'=>{de=>'Betriebssystem',en=>'Operationsystem'},
 'actype.2'=>{de=>'Datenbank',en=>'Database'},
 'actype.3'=>{de=>'Konsole',en=>'Console'},
 'actype.4'=>{de=>'Anwendung',en=>'Application'},

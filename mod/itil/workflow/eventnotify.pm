@@ -2085,21 +2085,31 @@ sub Process
 
       my $eventlango=$self->getField("wffields.eventlang",$WfRec);
       $eventlang=$eventlango->RawValue($WfRec) if (defined($eventlango));
-      $ENV{HTTP_FORCE_LANGUAGE}=$eventlang;
-      $ENV{HTTP_FORCE_LANGUAGE}=~s/-.*$//;
-
-      my $subjectlabel="first information";
-      my $headtext=$self->T($subjectlabel,'itil::workflow::eventnotify');
-      if ($sendcustinfocount>1){
-         $subjectlabel="follow info";
-         $headtext=$sendcustinfocount.". ".$self->T($subjectlabel,
-                                          'itil::workflow::eventnotify');
+      my @langlist=split(/-/,$eventlang);
+      my $headtext="";
+      my $altheadtext="";
+      for(my $cl=0;$cl<=$#langlist;$cl++){
+         $ENV{HTTP_FORCE_LANGUAGE}=$langlist[$cl];
+         my $ht;
+         my $subjectlabel="first information";
+         my $ht=$self->T($subjectlabel,'itil::workflow::eventnotify');
+         if ($sendcustinfocount>1){
+            $subjectlabel="follow info";
+            $ht=$sendcustinfocount.". ".$self->T($subjectlabel,
+                                             'itil::workflow::eventnotify');
+         }
+         if ($WfRec->{eventendofevent} ne ""){ 
+            $subjectlabel="finish info";
+            $ht=$self->T($subjectlabel,'itil::workflow::eventnotify');
+         }
+         delete($ENV{HTTP_FORCE_LANGUAGE});
+         if ($cl==0){
+            $headtext=$ht;
+         }
+         else{
+            $altheadtext=$ht;
+         }
       }
-      if ($WfRec->{eventendofevent} ne ""){ 
-         $subjectlabel="finish info";
-         $headtext=$self->T($subjectlabel,'itil::workflow::eventnotify');
-      }
-      delete($ENV{HTTP_FORCE_LANGUAGE});
       my $ag="";
       if ($WfRec->{eventmode} eq "EVk.appl"){ 
          foreach my $appl (@{$WfRec->{affectedapplication}}){
@@ -2109,8 +2119,9 @@ sub Process
       }
 
       my $failclass=$WfRec->{eventstatclass};
-      my $subject=$self->getParent->getNotificationSubject($WfRec,
-                               "sendcustinfo",$subjectlabel,$failclass,$ag);
+      my $subject=$headtext;
+#      my $subject=$self->getParent->getNotificationSubject($WfRec,
+#                               "sendcustinfo",$subjectlabel,$failclass,$ag);
       my $salutation=$self->getParent->getSalutation($WfRec,$action,$ag);
 #   elsif ($variname eq "HEADCOLOR"){
 #      my $val=$self->findtemplvar("referenz_failend");
@@ -2130,7 +2141,8 @@ sub Process
      my $eventstat=$WfRec->{stateid};
      my $failcolor="blue";
      my $utz=$self->getParent->getParent->UserTimezone();
-     my $creationtime=$self->getParent->getParent->ExpandTimeExpression('now',"de",$utz,$utz);
+     my $creationtime=$self->getParent->getParent->ExpandTimeExpression('now',
+                                                              "de",$utz,$utz);
      if ($eventstat==17){
         $failcolor="green";
      }elsif ($failclass==1 || $failclass==2){

@@ -258,7 +258,8 @@ sub new
                 dontrename    =>1,
                 group         =>'delmgmt',
                 fields        =>[qw(ldelmgr   ldelmgr2   delmgr   delmgr2
-                                    ldelmgrid ldelmgr2id delmgrid delmgr2id)]),
+                                    ldelmgrid ldelmgr2id delmgrid delmgr2id
+                                    delmgrteamid)]),
 
       new kernel::Field::TextDrop(
                 name          =>'customer',
