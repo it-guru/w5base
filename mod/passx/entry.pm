@@ -289,15 +289,18 @@ sub generateMenuTree
                  my @quickpath=split(/\./,$subquickpath);
                  my @curpath=split(/\./,$curpath);
                  my $pathdepth=$#curpath+1;
+                 if ($mode ne "web"){
+                    $pathdepth=$#quickpath+1;
+                 }
                  for(my $chkpathdepth=0;$chkpathdepth<=$pathdepth;
                      $chkpathdepth++){
                     if ($chkpathdepth<$#quickpath+1){
                        my $chkpath=join(".",@quickpath[0..$chkpathdepth]);
                        if (!defined($padd{$chkpath})){
                           $targetml=\@ml if ($chkpathdepth==0);
-                          if (($chkpathdepth==0 || $mode ne "web") ||
+                          if ($mode ne "web" || ($chkpathdepth==0 ||
                               join(".",@quickpath[0..$chkpathdepth-1]) eq
-                              join(".",@curpath[0..$chkpathdepth-1])){
+                              join(".",@curpath[0..$chkpathdepth-1]))){
                              my %mrec;
                              $mrec{tree}=[];
                              $mrec{label}=$quickpath[$chkpathdepth];
