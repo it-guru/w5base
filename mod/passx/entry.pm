@@ -387,31 +387,33 @@ sub generateMenuTree
       if ($mode eq "fvwm" || $mode eq "dynfvwm"){
          my $mainmenu={W5BaseFvwmLoginMenu=>{label=>'System Login',
                        cmdentrys=>[],mentrys=>[]}};
-
          sub processEntry
          {
             my $ml=shift;
             my $mainmenu=shift;
             my $targetm=shift;
-
             foreach my $m (@$ml){
                if (exists($m->{entrytype})){
                   if ($m->{entrytype}==1 || $m->{entrytype}==5){
                      my $fvwmcmd="FvwmConnectCommand";
                      my $label=$m->{label};
+                     my $cmd;
                      if ($m->{entrytype}==1){
                         $fvwmcmd="FvwmSSHLogin";
                         $label.=" SSH";
+                        $cmd="Exec \$[HOME]/bin/$fvwmcmd \"".$m->{label}.
+                                "\" \"$m->{label}\"";
                      }
                      elsif ($m->{entrytype}==5){
                         $fvwmcmd="FvwmRDesktopLogin";
                         $label.=" RDesk";
+                        $cmd="Exec \$[HOME]/bin/$fvwmcmd \"".$m->{name}.
+                                "\" \"$m->{label}\"";
                      }
                      $label.=" ($m->{comments})" if ($m->{comments} ne "");
                      push(@{$targetm->{cmdentrys}},
                           {label=>$label,
-                           cmd=>"Exec \$[HOME]/bin/$fvwmcmd \"".$m->{label}.
-                                "\" \"$m->{label}\""});
+                           cmd=>$cmd});
                   }
                }
                else{
@@ -444,12 +446,10 @@ sub generateMenuTree
          $d.="AddToMenu W5BaseFvwmLoginMenu \"\"      Nop\n";
          $d.="AddToMenu W5BaseFvwmLoginMenu \"Reload Menu\" ".
              "recreateW5BaseFvwmLoginMenu\n";
-         #$d=Dumper($mainmenu);
-
-
+         $d=Dumper($mainmenu);
       }
       if ($mode eq "enlightenment"){
-         print ("ok");
+         $d=Dumper(\@ml);
       }
       if ($mode eq "perl"){
          $d=Dumper(\@ml);
