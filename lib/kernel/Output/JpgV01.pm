@@ -87,7 +87,8 @@ sub Init
    my ($id,$res);
    binmode($$fh);
    my ($dtp,$zip);
-   eval('use Archive::Zip;$zip=new Archive::Zip();');
+   eval('use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
+         $zip=new Archive::Zip();');
    if ($@ eq ""){
       $self->{zip}=$zip;
    }else{
@@ -185,6 +186,9 @@ sub Finish
          die("ERROR: write error zipfile error=$?");
       }
    ');
+   if ($@ ne ""){
+      printf STDERR ("ERROR: $@");
+   }
    if (open(F,"<$dirhandler/pics.zip")){
       my $buf;
       while(sysread(F,$buf,8192)){

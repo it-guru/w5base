@@ -73,7 +73,8 @@ sub Init
    my ($id,$res);
    binmode($$fh);
    my ($dtp,$zip);
-   eval('use Archive::Zip;$zip=new Archive::Zip();');
+   eval('use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
+         $zip=new Archive::Zip();');
    if ($@ eq ""){
       $self->{zip}=$zip;
    }else{
