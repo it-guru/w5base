@@ -446,7 +446,7 @@ sub generateMenuTree
          $d.="AddToMenu W5BaseFvwmLoginMenu \"\"      Nop\n";
          $d.="AddToMenu W5BaseFvwmLoginMenu \"Reload Menu\" ".
              "recreateW5BaseFvwmLoginMenu\n";
-         $d=Dumper($mainmenu);
+         #$d=Dumper($mainmenu);
       }
       if ($mode eq "enlightenment"){
          $d=Dumper(\@ml);
