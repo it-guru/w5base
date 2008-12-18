@@ -86,8 +86,14 @@ sub Init
    $|=1;
    my ($id,$res);
    binmode($$fh);
-   my $dtp;
-   eval('use DTP::jpg;$dtp=new DTP::jpg();$self->{zip}=new Archive::Zip();');
+   my ($dtp,$zip);
+   eval('use Archive::Zip;$zip=new Archive::Zip();');
+   if ($@ eq ""){
+      $self->{zip}=$zip;
+   }else{
+      printf STDERR ("ERROR: $@\n");
+   }
+   eval('use DTP::jpg;$dtp=new DTP::jpg();');
    if ($@ eq ""){
       $self->{dtp}=$dtp;
    }else{
