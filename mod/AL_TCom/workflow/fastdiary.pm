@@ -291,7 +291,9 @@ sub ProcessNext
    # check tcomcodcause
    #
    my $tcomcodcause=Query->Param("Formated_tcomcodcause");
-   if ($tcomcodcause=~m/^\s*$/ || $tcomcodcause eq "undef"){
+   my $tcomcodrelevant=Query->Param("Formated_tcomcodrelevant");
+   if ($tcomcodcause=~m/^\s*$/ ||
+       ($tcomcodrelevant eq "yes" && $tcomcodcause eq "undef")){
       $self->LastMsg(ERROR,"invalid activity selected");
       return(0);
    }
