@@ -306,7 +306,7 @@ sub ApplicationModified
                if (!($rec->{businessteam}=~m/\.BILLING/i)){
                   $acftprec->{Appl}->{Usage}=$w52ac{$ApplU};
                   $acftprec->{Appl}->{Customer}='TS.DE';
-                  if ($rec->{customer}=~m/^DTAG.T-Com/i){
+                  if ($rec->{customer}=~m/^DTAG.T-Home/i){
                      $acftprec->{Appl}->{Customer}="DTAG, T-COM";
                   }
                }
