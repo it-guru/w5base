@@ -70,9 +70,9 @@ sub new
                 vjoindisp     =>['acltargetname','aclmode']),
 
       new kernel::Field::Text(
-                name          =>'remoteuser',
+                name          =>'defaultremoteuser',
                 group         =>'control',
-                label         =>'Remote-User',
+                label         =>'default Remote-User',
                 dataobjattr   =>'systemjob.remoteuser'),
 
       new kernel::Field::SubList(

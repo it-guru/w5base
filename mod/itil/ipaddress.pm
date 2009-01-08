@@ -143,10 +143,10 @@ sub new
                 dataobjattr   =>'ipaddress.addresstyp'),
 
       new kernel::Field::Select(
-                name          =>'iscontrolpartner',
+                name          =>'isjobserverpartner',
                 transprefix   =>'boolean.',
                 htmleditwidth =>'30%',
-                label         =>'ControlCenter Partner',
+                label         =>'JobServer Partner',
                 value         =>[0,1],
                 dataobjattr   =>'ipaddress.is_controllpartner'),
 
