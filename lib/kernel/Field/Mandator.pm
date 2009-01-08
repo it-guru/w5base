@@ -45,8 +45,8 @@ sub new
 sub getPostibleValues
 {
    my $self=shift;
-   my $oldrec=shift;
    my $current=shift;
+   my $newrec=shift;
    my $mode=shift;
 
    if ($mode eq "edit"){
@@ -73,7 +73,7 @@ sub getPostibleValues
       }
       return(@res);
    }
-   my @res=$self->SUPER::getPostibleValues($current,$mode);
+   my @res=$self->SUPER::getPostibleValues($current,$newrec,$mode);
    if ($self->{allowany}){
       push(@res,0,"[any]");
    }
