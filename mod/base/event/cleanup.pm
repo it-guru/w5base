@@ -111,10 +111,7 @@ sub LnkGrpUser
                                                mdate=>$lrec->{mdate}},
                                        {lnkgrpuserid=>\$lrec->{lnkgrpuserid}});
          }
-         # löschen wenn alertstate=red
-         {
-            # red setzen
-         }
+         # red setzen
       }
       elsif($days>14){
          if ($lrec->{alertstate} ne "orange"){

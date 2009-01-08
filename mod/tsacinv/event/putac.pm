@@ -276,6 +276,7 @@ sub ApplicationModified
                   $ApplU=40 if ($rec->{opmode} eq "reference");
                   $ApplU=30 if ($rec->{opmode} eq "education");
                   $ApplU=20 if ($rec->{opmode} eq "test");
+                  $ApplU=5  if ($rec->{opmode} eq "license");
                }
                my $acftprec={
                                 Appl=>{
