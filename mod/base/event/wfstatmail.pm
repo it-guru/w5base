@@ -154,7 +154,7 @@ sub SendMyJobs
                   }
                }
             }
-            if ($#wfcount>0){
+            if ($wfcount>0){
                my $infoabo=join(",",map({@{$_}} values(%{$emailto})));
                if ($baseurl ne ""){
                   $self->sendNotify(emailtext=>\@emailtext,
