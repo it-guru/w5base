@@ -249,10 +249,21 @@ sub Sendmail
                       "mail template not found";
          msg(DEBUG,"loading and parsing mail template");
          $app->setSkinBase($skinbase);
+         my $sep=0;
+         my %useadditional=%additional;
+         foreach my $k (keys(%useadditional)){
+            if ($k=~m/PAGE$sep$/){
+               my $knew=$k;
+               $knew=~s/PAGE\d+$//;
+               $useadditional{$knew}=$additional{$k};
+            }
+         }
+
+
          if ($app->getSkinFile($app->SkinBase()."/".$formname)){
             $maildata=$app->getParsedTemplate($formname,
                                      {static=>{
-                                        %additional,
+                                        %useadditional,
                                         currentlang =>$currentlang,
                                         langcontrol =>$langcontrol,
                                       }
@@ -260,7 +271,6 @@ sub Sendmail
          }
          $mail.=$maildata;
          msg(DEBUG,"adding $blkcount datablocks to mail body");
-         my $sep=0;
          $mail.="<a name=\"separation.$sep\"></a>";
          $mail.="<div class=separation id=\"separation.$sep\">";
          $mail.="<div class=separationbackground\">";
@@ -305,7 +315,7 @@ sub Sendmail
                }
                $maildata=$app->getParsedTemplate($formname,{
                                   static=>{
-                                     %additional,
+                                     %useadditional,
                                      emailtext   =>$emailtext,
                                      emailhead   =>$rec->{emailhead}->[$blk],
                                      emailbottom =>$emailbottom,
@@ -328,12 +338,20 @@ sub Sendmail
                   $mail.="</div>";
                   $mail.="</div>";
                   $sep++;
+                  %useadditional=%additional;
+                  foreach my $k (keys(%useadditional)){
+                     if ($k=~m/PAGE$sep$/){
+                        my $knew=$k;
+                        $knew=~s/PAGE\d+$//;
+                        $useadditional{$knew}=$additional{$k};
+                     }
+                  }
                   my $formname="tmpl/$template.form.sep";
                   my $maildata="ERROR: Mail template not found";
                   if ($app->getSkinFile($app->SkinBase()."/".$formname)){
                      my $sep=$app->getParsedTemplate($formname,{
                                         static=>{
-                                           %additional,
+                                           %useadditional,
                                            currentlang=>$currentlang,
                                            separation=>$sep,
                                            septext=>$septext,

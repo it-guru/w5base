@@ -2086,7 +2086,7 @@ sub Process
       my $eventlango=$self->getField("wffields.eventlang",$WfRec);
       $eventlang=$eventlango->RawValue($WfRec) if (defined($eventlango));
       my @langlist=split(/-/,$eventlang);
-      my $headtext="";
+      my %headtext=();
       my $altheadtext="";
       my $subjectlabel;
       for(my $cl=0;$cl<=$#langlist;$cl++){
@@ -2104,12 +2104,7 @@ sub Process
             $ht=$self->T($subjectlabel,'itil::workflow::eventnotify');
          }
          delete($ENV{HTTP_FORCE_LANGUAGE});
-         if ($cl==0){
-            $headtext=$ht;
-         }
-         else{
-            $altheadtext=$ht;
-         }
+         $headtext{"headtextPAGE".$cl}=$ht;
       }
       my $ag="";
       if ($WfRec->{eventmode} eq "EVk.appl"){ 
@@ -2120,7 +2115,6 @@ sub Process
       }
 
       my $failclass=$WfRec->{eventstatclass};
-#      my $subject=$headtext;
       my $subject=$self->getParent->getNotificationSubject($WfRec,
                                "sendcustinfo",$subjectlabel,$failclass,$ag);
 #      my $subject=$self->getParent->getNotificationSubject($WfRec,
@@ -2154,7 +2148,7 @@ sub Process
         $failcolor="yellow";
      }
       my %additional=(headcolor=>$failcolor,eventtype=>'Event',    
-                      headtext=>$headtext,headid=>$id,salutation=>$salutation,
+                      %headtext,headid=>$id,salutation=>$salutation,
                       creationtime=>$creationtime);
       $self->getParent->generateMailSet($WfRec,$action,\$eventlang,\%additional,
                        \@emailprefix,\@emailpostfix,\@emailtext,\@emailsep,
