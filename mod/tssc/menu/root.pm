@@ -83,6 +83,10 @@ sub Init
                       "tssc::group",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("sc.krn.approval",
+                      "tssc::approval",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("sc.krn.user",
                       "tssc::user",
                       defaultacl=>['valid_user']);

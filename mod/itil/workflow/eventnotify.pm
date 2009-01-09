@@ -2088,10 +2088,11 @@ sub Process
       my @langlist=split(/-/,$eventlang);
       my $headtext="";
       my $altheadtext="";
+      my $subjectlabel;
       for(my $cl=0;$cl<=$#langlist;$cl++){
          $ENV{HTTP_FORCE_LANGUAGE}=$langlist[$cl];
          my $ht;
-         my $subjectlabel="first information";
+         $subjectlabel="first information";
          my $ht=$self->T($subjectlabel,'itil::workflow::eventnotify');
          if ($sendcustinfocount>1){
             $subjectlabel="follow info";
@@ -2119,7 +2120,9 @@ sub Process
       }
 
       my $failclass=$WfRec->{eventstatclass};
-      my $subject=$headtext;
+#      my $subject=$headtext;
+      my $subject=$self->getParent->getNotificationSubject($WfRec,
+                               "sendcustinfo",$subjectlabel,$failclass,$ag);
 #      my $subject=$self->getParent->getNotificationSubject($WfRec,
 #                               "sendcustinfo",$subjectlabel,$failclass,$ag);
       my $salutation=$self->getParent->getSalutation($WfRec,$action,$ag);
