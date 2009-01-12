@@ -14,6 +14,11 @@ Fall können Sie folgenden Ausdrücke verwenden:<br>
 </tr>
 
 <tr>
+<td nowrap valign=top><b><a href=JavaScript:SendData("heute")>heute</a></b></td>
+<td>... dies verwendet aktuelle Datum aber als Zeit 00:00:00 zur Suche</td>
+</tr>
+
+<tr>
 <td nowrap valign=top><b><a href=JavaScript:SendData("lastmonth")>lastmonth</a></b></td>
 <td>... es werden alle Datensätze aufgelistet, bei denen der geweilige Zeitstempel innerhalb des letzten (Kalendermonats) Monats lagen.</td>
 </tr>
@@ -26,6 +31,11 @@ Fall können Sie folgenden Ausdrücke verwenden:<br>
 <tr>
 <td nowrap valign=top><b><a href=JavaScript:SendData("currentmonth")>currentmonth</a></b></td>
 <td>... es werden alle Datensätze aufgelistet, bei denen der geweilige Zeitstempel innerhalb des aktuellen (Kalendermonats) Monats liegt.</td>
+</tr>
+
+<tr>
+<td nowrap valign=top><b><a href=JavaScript:SendData("heute+1d")>heute+1d</a></b></td>
+<td>... mit diesem Ausdruck können Sie alle Datensätze suchen, die morgen 00:00:00 als Zeitpunkt eingetragen haben.</td>
 </tr>
 
 <tr>
