@@ -8,6 +8,7 @@
 'Downtime Start'=>{de=>'Ereignis Beginn'},
 'Downtime End'=>{de=>'Ereignis Ende'},
 'Reason'=>{de=>'Grund'},
+'Customer Application'=>{de=>'Kunden Anwendung'},
 'Priority'=>{de=>'Priorität'},
 'SysModTime'=>{de=>'letzte Bearbeitung'},
 'Incident No.'=>{de=>'Incidentnummer'},

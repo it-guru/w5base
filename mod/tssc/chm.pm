@@ -123,6 +123,12 @@ sub new
                 vjoinon       =>['changenumber'=>'changenumber'],
                 vjoindisp     =>[qw(name)]),
 
+      # geht nicht, da im scadm schema dsc_service nicht existiert
+      #new kernel::Field::Text(
+      #          name          =>'custapplication',
+      #          label         =>'Customer Application',
+      #          dataobjattr   =>'cm3rm1.dsc_service'),
+
       new kernel::Field::Text(
                 name          =>'srcid',
                 label         =>'Extern Change ID',

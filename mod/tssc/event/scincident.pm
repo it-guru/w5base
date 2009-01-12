@@ -53,7 +53,7 @@ sub scincident
    $chm->SetCurrentView(qw(closetime incidentnumber name description status 
                            hassignment iassignment priority causecode reason
                            downtimestart downtimeend opentime 
-                           workstart workend resolution
+                           workstart workend resolution custapplication
                            softwareid deviceid reportedby
                            action sysmodtime involvedassignment));
    my $focus="now";

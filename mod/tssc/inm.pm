@@ -66,6 +66,11 @@ sub new
                 label         =>'DeviceID',
                 dataobjattr   =>'problemm1.logical_name'),
 
+      new kernel::Field::Text(
+                name          =>'custapplication',
+                label         =>'Customer Application',
+                dataobjattr   =>'probsummarym1.dsc_service'),
+
       new kernel::Field::Date(
                 name          =>'cdate',
                 timezone      =>'CET',

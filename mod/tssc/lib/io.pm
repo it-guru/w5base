@@ -522,6 +522,12 @@ sub extractAffectedApplication
       @l1=split(/[,\s;]+/,$rec->{softwareid});
    }
 
+   if (defined($rec->{custapplication})){
+      push(@l1,split(/[,\s;]+/,$rec->{custapplication}));
+   }
+
+
+
    #  pass 2 : description
    my @l2;
    if (defined($rec->{description})){
