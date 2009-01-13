@@ -185,7 +185,7 @@ sub new
                 dataobjattr   =>'forumboard.modifydate'),
                                    
    );
-   $self->setDefaultView(qw(name boardgroup acls));
+   $self->setDefaultView(qw(name boardgroup));
    $self->{DetailY}=520;
    $self->setWorktable("forumboard");
    return($self);
@@ -291,7 +291,17 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
+   my $moderator=0;
+
    return("default","acl") if ($self->IsMemberOf("admin"));
+
+   my @acl=$self->getCurrentAclModes($ENV{REMOTE_USER},$rec->{acls});
+   if (grep(/^moderate$/,@acl)){
+      $moderator=1;
+   }
+   if ($moderator){
+      return("acl");
+   }
 
    return(undef);
 }

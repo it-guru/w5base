@@ -38,6 +38,49 @@ sub new
    return($self);
 }
 
+sub isWriteValid
+{
+   my $self=shift;
+   my $rec=shift;
+
+   #
+   # hier muß noch eine Prüfung rein, das nur Moderatoren Änderungen
+   # vornehmen können.
+   #
+
+   if (!$self->IsMemberOf("admin")){
+      my $userid=$self->getCurrentUserId();
+      if (defined($rec) && $rec->{acltarget} eq "base::user" &&
+          $userid==$rec->{acltargetid}){
+         return(undef);
+      }
+   }
+   return($self->SUPER::isWriteValid($rec));
+}
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $origrec=shift;
+
+   if (!$self->IsMemberOf("admin")){
+      my $userid=$self->getCurrentUserId();
+      my $target=effVal($oldrec,$newrec,"acltarget");
+      my $targetid=effVal($oldrec,$newrec,"acltargetid");
+      if ($target eq "base::user" &&
+          $userid==$targetid){
+         $self->LastMsg(ERROR,"modification of self rights is not allowed");
+         return(undef);
+      }
+   }
+
+   return($self->SUPER::Validate($oldrec,$newrec,$origrec));
+}
+
+
+
 
 
 1;
