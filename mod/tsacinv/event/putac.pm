@@ -195,9 +195,10 @@ sub ApplicationModified
                   #
                   # Workaround für AktiveBilling (Fachbereich Billing)
                   #
-                  if (!($rec->{businessteam}=~m/\.BILLING/i)){
-                     $acftprec->{CI_APPL_REL}->{Usage}=$w52ac{$SysU};
-                  }
+                  #if (!($rec->{businessteam}=~m/\.BILLING/i)){
+                  # laut Peter soll die Sache am 13.01. auch für Billing gelten
+                  $acftprec->{CI_APPL_REL}->{Usage}=$w52ac{$SysU};
+                  #}
                   my $fh=$fh{ci_appl_rel};
                   print $fh hash2xml($acftprec,{header=>0});
                   print $onlinefh hash2xml($acftprec,{header=>0});
@@ -305,12 +306,14 @@ sub ApplicationModified
                # Workaround für AktiveBilling (Fachbereich Billing)
                #
                if (!($rec->{businessteam}=~m/\.BILLING/i)){
-                  $acftprec->{Appl}->{Usage}=$w52ac{$ApplU};
                   $acftprec->{Appl}->{Customer}='TS.DE';
                   if ($rec->{customer}=~m/^DTAG.T-Home/i){
                      $acftprec->{Appl}->{Customer}="DTAG, T-COM";
                   }
                }
+               # laut Peter soll die Sache am 13.01. auch für Billing gelten
+               $acftprec->{Appl}->{Usage}=$w52ac{$ApplU};
+            
                if (defined($acapplrec) && $acapplrec->{applid} ne ""){
                   $acftprec->{Appl}->{Code}=$acapplrec->{applid};
                   $acftprec->{Appl}->{ExternalID}=$rec->{id};
