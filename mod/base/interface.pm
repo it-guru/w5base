@@ -471,6 +471,25 @@ sub getHashList
       return(interface::SOAP::kernel::Finish({exitcode=>128,
              lastmsg=>[msg(ERROR,'invalid dataobject name')]}));
    }
+   if ($objectname eq "base::workflow"){
+      msg(DEBUG,"SOAP base::workflow filter %s",Dumper($filter));
+      my $fltchk=0;
+      if (ref($filter) eq "HASH" &&
+          keys(%$filter)==1 &&
+          $filter->{id}=~m/^\d{10,20}$/){
+          $fltchk++;
+      }
+      if (ref($filter) eq "HASH" &&
+          keys(%$filter)==1 &&
+          ref($filter->{id}) eq "ARRAY" &&
+          $filter->{id}->[0]=~m/^\d{10,20}$/){
+          $fltchk++;
+      }
+      if (!$fltchk){
+         return(interface::SOAP::kernel::Finish({exitcode=>128,
+             lastmsg=>[msg(ERROR,'base::workflow allows only filter to id')]}));
+      }
+   }
    my $o=getModuleObject($self->Config,$objectname);
    if (!defined($o)){
       return(interface::SOAP::kernel::Finish({exitcode=>128,

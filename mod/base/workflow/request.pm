@@ -418,8 +418,10 @@ sub Validate
 
    foreach my $v (qw(name detaildescription)){
       if ((!defined($oldrec) || exists($newrec->{$v})) && $newrec->{$v} eq ""){
-         $self->LastMsg(ERROR,"field '%s' is empty",
-                        $self->getField($v)->Label());
+         if ($self->LastMsg()==0){
+            $self->LastMsg(ERROR,"field '%s' is empty",
+                           $self->getField($v)->Label());
+         }
          return(0);
       }
    }

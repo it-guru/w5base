@@ -64,3 +64,4 @@
 'Short Actionlog'=>{de=>'Aktions-Log'},
 'STEVwfstatsendWeek'=>{de=>'wöchentlicher Status-Report über offene Workflows',
                        en=>'weekly Report about current jobs'},
+'invalid workflow short description spezified'=>{de=>'keine gültige Kurzbeschreibung'},

@@ -57,6 +57,7 @@ if (my $id=$wf->storeRecord($WfRec)){
                                           step class))){
       printf("WfRec=%s\n",Dumper($WfRec));
    }
+   $wf->dieOnERROR();
    exit(0);
 }
 else{
