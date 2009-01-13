@@ -1190,6 +1190,20 @@ sub DeleteAllFilteredRecords
    return($ncount);
 }
 
+sub CountRecords
+{
+   my $self=shift;
+   my $n=0;
+   my ($rec,$msg)=$self->getFirst();
+   if (defined($rec)){
+      do{
+         $n++;
+         ($rec,$msg)=$self->getNext();
+      } until(!defined($rec));
+   }
+   return($n);
+}
+
 sub SecureValidatedDeleteRecord
 {
    my $self=shift;

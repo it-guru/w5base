@@ -120,7 +120,11 @@ sub SampleEvent2
 {
    my $self=shift;
 
+   my $user=getModuleObject($self->Config,"tsacinv::system");
+   msg(DEBUG,"user=$user");
    msg(DEBUG,"Start(Event2):");
+   my $n=$user->CountRecords();
+   msg(DEBUG,"End(Event2): n=$n");
    return({exitcode=>-1});
 }
 

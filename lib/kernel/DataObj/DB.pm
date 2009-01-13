@@ -377,6 +377,38 @@ sub getSqlSelect
    return(join(" UNION ",@cmd));
 }
 
+
+sub getSqlCount
+{
+   my $self=shift;
+
+   my @filter=$self->getFilterSet();
+   my $where=$self->getSqlWhere("select",@filter);
+   my @from=$self->getSqlFrom("select",@filter);
+   my $group=$self->getSqlGroup("select",@filter);
+   my @cmd;
+   foreach my $from (@from){
+      my $cmd="select  count(*) from $from";
+      $cmd.=" where ".$where if ($where ne "");
+      $cmd.=" group by ".$group if ($group ne "");
+      my $disp=$cmd;
+      $disp=~tr/\n/ /;
+      if (!defined($where)){
+         msg(ERROR,"ilegal filter for '%s'\n%s",$cmd,Dumper(\@filter));
+         return(undef);
+      }
+      push(@cmd,$cmd);
+   }
+   if ($#cmd>0){
+      map({$_="(".$_.")"} @cmd);
+   }
+
+   return(join(" UNION ",@cmd));
+}
+
+
+
+
 sub QuoteHashData
 {
    my $self=shift;
@@ -696,6 +728,34 @@ sub getFirst
    }
    return(undef,$self->{DB}->getErrorMsg());
 }
+
+sub CountRecords
+{
+   my $self=shift;
+
+   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+   if (!defined($self->{DB})){
+      $self->{isInitalized}=0;
+      return(undef,
+             msg(ERROR,
+             $self->T("no database connection or invalid database handle")));
+   }
+   $self->{DB}->finish();
+   my @sqlcmd=($self->getSqlCount());
+   if (!defined($sqlcmd[0])){
+      return(undef,join("\n",$self->LastMsg()));
+   }
+   my $t0=[gettimeofday()];
+   my @res=$self->{DB}->getArrayList($sqlcmd[0]);
+   my $n=undef;
+   foreach my $rec (@res){
+      $n=0 if (!defined($n));
+      $n+=$rec->[0];
+   }
+   return($n);
+}
+
+
 
 sub getOnlyFirst
 {
