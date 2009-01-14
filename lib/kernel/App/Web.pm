@@ -836,12 +836,22 @@ sub HandleNewUser
                               body=>1,form=>1,
                               title=>'W5Base - account verification');
       if (!defined($uarec->{requestemailwf})){
-         print $self->getParsedTemplate("tmpl/accountverification",{
+         if ($self->Config->Param("W5BaseOperationMode") eq "test"){
+            print $self->getParsedTemplate("tmpl/accountverificationtestmode",{
                                      static=>{ email=>$em,
                                                account=>$ENV{REMOTE_USER}},
                                      translation=>'base::accountverification',
                                      skinbase=>'base'
                                       });
+         }
+         else{
+            print $self->getParsedTemplate("tmpl/accountverification",{
+                                     static=>{ email=>$em,
+                                               account=>$ENV{REMOTE_USER}},
+                                     translation=>'base::accountverification',
+                                     skinbase=>'base'
+                                      });
+         }
       }
       else{
          print $self->getParsedTemplate("tmpl/accountverificationwait",{

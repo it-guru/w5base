@@ -1,0 +1,16 @@
+<table border=0 width=100% height=100%>
+<tr>
+<td align=center valign=top><br><br><br>
+<div style="border-width:2px;padding:5px;background:red;border-style:outset;width:500px">
+<table border=0>
+<tr>
+<td>
+You have use your account at first time on this system. This application is working in testmode. In testmode no new accounts can be created. Please use the production enviroment to create your account and wait for the next update from production to test system.
+</td>
+</tr>
+</table>
+</div>
+</td>
+</tr>
+</table>
+
