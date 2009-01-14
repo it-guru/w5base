@@ -545,15 +545,19 @@ sub PostProcess
    $self->getParent->getParent->SetFilter({id=>\$WfRec->{id}});
    my ($cur,$msg)=$self->getParent->getParent->getOnlyFirst(
                   qw(fwdtarget fwdtargetid));
-   if (defined($cur) && $cur->{fwdtarget} ne "" && $cur->{fwdtargetid} ne ""){ 
-      my $aobj=$self->getParent->getParent->Action();
-      my $workflowname=$self->getParent->getWorkflowMailName();
-      $aobj->NotifyForward($WfRec->{id},
-                           $cur->{fwdtarget},$cur->{fwdtargetid},undef,
-                           $WfRec->{detaildescription},
-                           workflowname=>$workflowname,
-                           sendercc=>1);
+
+   if (defined($cur)){
+      if ($cur->{fwdtarget} ne "" && $cur->{fwdtargetid} ne ""){ 
+         my $aobj=$self->getParent->getParent->Action();
+         my $workflowname=$self->getParent->getWorkflowMailName();
+         $aobj->NotifyForward($WfRec->{id},
+                              $cur->{fwdtarget},$cur->{fwdtargetid},undef,
+                              $WfRec->{detaildescription},
+                              workflowname=>$workflowname,
+                              sendercc=>1);
+      }
    }
+       
 }
 
 
@@ -1212,6 +1216,20 @@ sub PostProcess
                            workflowname=>$workflowname);
    }
 
+   if ($action eq "SaveStep.wfacceptp" ||
+       $action eq "SaveStep.wffineproc"){
+     # if ($WfRec->{initiatorid} ne "" &&
+     #     $WfRec->{initiatorid} ne $WfRec->{openuser}){
+         $aobj->NotifyForward($WfRec->{id},
+                              'base::user',
+                              $WfRec->{initiatorid},
+                              'Initiator',
+                              'Your request has been processed. For further informations use the attached link',
+                              mode=>'INFO:',
+                              workflowname=>$workflowname);
+         printf STDERR ("fifi fine=%s\n",Dumper($WfRec));
+     # }
+   }
    return($self->SUPER::PostProcess($action,$WfRec,$actions));
 }
 

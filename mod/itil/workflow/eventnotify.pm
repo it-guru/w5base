@@ -611,11 +611,15 @@ sub isViewValid
          push(@grps,"alteventnotify");
       }
    }
+
+   my %inmmgr=$self->getGroupsOf($userid,'RINManager','up');
+
    # if (is in mandator)
    my $mandators=$rec->{mandatorid};
    $mandators=[$rec->{mandatorid}] if (!ref($rec->{mandatorid}) eq "ARRAY");
    my $mandatorok=0;
    my @mymandators=$self->getMandatorsOf($ENV{REMOTE_USER},"direct"); 
+   push(@mymandators,keys(%inmmgr));
    foreach my $mid (@$mandators){
       if (grep(/^$mid$/,@mymandators)){
          $mandatorok=1;
