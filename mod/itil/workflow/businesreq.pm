@@ -137,7 +137,7 @@ sub getDefaultContractor
    if (defined($flt)){
       my $appl=getModuleObject($self->getParent->Config,"itil::appl");
       $appl->SetFilter($flt);
-      my ($cur,$msg)=$appl->getOnlyFirst(qw(allowbusinesreq tsm tsmid 
+      my ($cur,$msg)=$appl->getOnlyFirst(qw(allowbusinesreq sem semid 
                                             contacts id name));
       if (defined($cur) && defined($cur->{contacts})){
          if (!defined($WfRec->{affectedapplicationid})){
@@ -163,8 +163,8 @@ sub getDefaultContractor
             }
          }
          if ($#devcon==-1){
-            if ($cur->{tsm} ne ""){
-               push(@devcon,"base::user",$cur->{tsmid});
+            if ($cur->{sem} ne "" && $cur->{semid} ne ""){
+               push(@devcon,{target=>"base::user",targetid=>$cur->{semid}});
             }
          }
          if (!$cur->{allowbusinesreq}){
