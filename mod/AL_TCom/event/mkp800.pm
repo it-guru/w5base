@@ -153,6 +153,7 @@ sub mkp800
          } until(!defined($rec));
       }
      
+      my $startnow=$app->ExpandTimeExpression("now","en","GMT");
       my $now=$app->ExpandTimeExpression("now","en","CET");
       my $contr=getModuleObject($self->Config,"itil::custcontract");
       $contr->SetFilter(cistatusid=>[3,4]);
@@ -322,7 +323,7 @@ sub mkp800
              $wf->ValidatedDeleteRecord($_);
          });
          $self->xlsFinish($xlsexp,$month);  # stores the xls export in webfs
-         $self->bflexxFinish($bflexxp800,$now,$month); 
+         $self->bflexxFinish($bflexxp800,$startnow,$month); 
       }
    }
    return({exitcode=>0});

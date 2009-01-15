@@ -1051,37 +1051,37 @@ sub Process
          my $note=Query->Param("note");
          $note=trim($note);
      
-         my $fobj=$self->getParent->getField("fwdtargetname");
-         my $h=$self->getWriteRequestHash("web");
-         my $newrec;
-         if ($newrec=$fobj->Validate($WfRec,$h)){
-            if (!defined($newrec->{fwdtarget}) ||
-                !defined($newrec->{fwdtargetid} ||
-                $newrec->{fwdtargetid}==0)){
-               if ($self->LastMsg()==0){
-                  $self->LastMsg(ERROR,"invalid forwarding target");
-               }
-               return(0);
-            }
+         my ($target,$fwdtarget,$fwdtargetid,$fwddebtarget,
+             $fwddebtargetid,@wsref)=
+             $self->getParent->getDefaultContractor($WfRec,$actions);
+         if (!defined($fwdtargetid)){
+            return(0);
          }
-         my $fwdtargetname=Query->Param("Formated_fwdtargetname");
      
          if ($self->StoreRecord($WfRec,{stateid=>2,
-                                       fwdtarget=>$newrec->{fwdtarget},
-                                       fwdtargetid=>$newrec->{fwdtargetid},
-                                       eventend=>undef,
-                                       closedate=>undef,
-                                       fwddebtarget=>undef,
-                                       fwddebtargetid=>undef })){
+                                       fwdtarget=>$fwdtarget,
+                                       fwdtargetid=>$fwdtargetid,
+                                       fwddebtarget=>$fwddebtarget,
+                                       fwddebtargetid=>$fwddebtargetid,
+                                       eventstart=>NowStamp("en"),
+                                       closedate=>undef})){
             if ($self->getParent->getParent->Action->StoreRecord(
-                $WfRec->{id},"wfforward",
-                {translation=>'base::workflow::request'},$fwdtargetname."\n".
-                                                         $note,undef)){
+                $WfRec->{id},"wfactivate",
+                {translation=>'base::workflow::request'},$note,undef)){
+               my $id=$WfRec->{id};
+               if ($#wsref!=-1){
+                  while(my $target=shift(@wsref)){
+                     my $targetid=shift(@wsref);
+                     last if ($targetid eq "" || $target eq "");
+                     $self->getParent->getParent->AddToWorkspace($id,
+                                                          $target,$targetid);
+                  }
+               }
                $self->PostProcess($action.".".$op,$WfRec,$actions,
                                   note=>$note,
-                                  fwdtarget=>$newrec->{fwdtarget},
-                                  fwdtargetid=>$newrec->{fwdtargetid},
-                                  fwdtargetname=>$fwdtargetname);
+                                  fwdtarget=>$fwdtarget,
+                                  fwdtargetid=>$fwdtargetid,
+                                  fwdtargetname=>"Contractor");
                return(1);
             }
          }
