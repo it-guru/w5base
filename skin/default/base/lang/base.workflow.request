@@ -7,6 +7,7 @@
 'wfreject'=>{de=>'Abgelehnt',en=>'Rejected'},
 'wfapprove'=>{de=>'Genehmigt',en=>'Approved'},
 'wfapprovereject'=>{de=>'Genehmigung abgelehnt',en=>'Approve rejected'},
+'wfactivate'=>{de=>'Aktiviert',en=>'Activated'},
 'wfapprovereq'=>{de=>'Genehmigungsanforderung',en=>'Approve request'},
 'wfapprovecan'=>{de=>'Genehmigungsabbruch',en=>'canncel approve request'},
 'wfforward'=>{de=>'Weiterleitung',en=>'Forward'},

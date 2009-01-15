@@ -91,6 +91,10 @@ sub mkp800
                   sprintf("%02d/%04d",$month,$year));
    }
    my $bflexxp800=getModuleObject($self->Config,"tsbflexx::p800sonder");
+   if (!defined($bflexxp800)){
+      msg(ERROR,"can not connect to b:flexx inteface database");
+      return({exicode=>1});
+   }
 
    my %p800special=();
    foreach my $month (@monthlist){

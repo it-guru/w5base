@@ -20,4 +20,5 @@
 'wfdifine'=>{de=>'DataIssue bearbeiten und abschließen',en=>'process DataIssue and close it'},
 'wfdireproc'=>{de=>'Nachbesserung anfordern',en=>'amendment request'},
 'wfmailsend'=>{de=>'E-Mail Nachricht versenden (auch an externe E-Mail Adressen)',en=>'send E-Mail message (to externel adresses too)'},
+'wfactivate'=>{de=>'Workflow an den Auftragnehmer zuweisen',en=>'assign workflow to contractor'},
 

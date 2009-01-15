@@ -294,7 +294,10 @@ sub getPosibleActions
    if ($iscurrent){
       push(@l,"iscurrent"); # Merker, dass der Workflow aktuell ansteht
    }
-   if (!$iscurrent && !$iscurrentapprover){
+   if ($stateid==1 && ($userid==$creator)){
+      push(@l,"wfactivate");
+   }
+   if ((!$iscurrent && !$iscurrentapprover) && $stateid>1){
       push(@l,"nop");       # No operation as first entry in Action list
    }
    if ($iscurrent && $stateid==6){
@@ -303,7 +306,7 @@ sub getPosibleActions
       push(@l,"wfapprovalcan"); # Genehmigung abbrechen      (durch Bearbeiter)
    }
    if ((($isadmin && !$iscurrent) || ($userid==$creator && !$iscurrent)) &&
-       $stateid<3){
+       $stateid<3 && $stateid>1){
       push(@l,"wfbreak");   # workflow abbrechen      (durch Anforderer o admin)
       push(@l,"wfcallback");# workflow zurueckholen   (durch Anforderer o admin)
    }
@@ -426,7 +429,9 @@ sub Validate
          return(0);
       }
    }
-   $newrec->{stateid}=2; # zugewiesen
+   if (!defined($newrec->{stateid}) || $newrec->{stateid}==0){
+      $newrec->{stateid}=1; # erfassen
+   }
   # $self->LastMsg(ERROR,"no op");
   # return(0);
    $newrec->{step}=$self->getNextStep();
@@ -459,20 +464,24 @@ sub nativProcess
       if ($self->LastMsg()){
          return(undef);
       }
-      if ($target ne ""){
-         $h->{fwdtargetname}=$target;
-      }
-      if ($fwdtarget ne "" && $fwdtargetid ne ""){
-         $h->{fwdtarget}=$fwdtarget;
-         $h->{fwdtargetid}=$fwdtargetid;
-      }
-      if ($fwddebtarget ne "" && $fwddebtargetid ne ""){
-         $h->{fwddebtarget}=$fwddebtarget;
-         $h->{fwddebtargetid}=$fwddebtargetid;
-      }
       $h->{stateid}=1;
+      if (!$h->{noautoassign}){
+         $h->{stateid}=2;
+         if ($target ne ""){
+            $h->{fwdtargetname}=$target;
+         }
+         if ($fwdtarget ne "" && $fwdtargetid ne ""){
+            $h->{fwdtarget}=$fwdtarget;
+            $h->{fwdtargetid}=$fwdtargetid;
+         }
+         if ($fwddebtarget ne "" && $fwddebtargetid ne ""){
+            $h->{fwddebtarget}=$fwddebtarget;
+            $h->{fwddebtargetid}=$fwddebtargetid;
+         }
+      }
       $h->{eventend}=undef;
       $h->{closedate}=undef;
+      delete($h->{noautoassign});
 
       if ($W5V2::OperationContext ne "Kernel"){
          $h->{eventstart}=NowStamp("en");
@@ -528,6 +537,12 @@ sub Process
 
    if ($action eq "NextStep"){
       my $h=$self->getWriteRequestHash("web");
+      if (Query->Param("Formated_noautoassign") ne ""){
+         $h->{noautoassign}=1;
+      }
+      else{
+         $h->{noautoassign}=0;
+      }
       return($self->nativProcess($action,$h,$WfRec,$actions));
    }
    return($self->SUPER::Process($action,$WfRec,$actions));
@@ -614,6 +629,12 @@ sub generateWorkspacePages
                 "</option>\n";
       $$divset.="<div id=OPwfapprove class=\"$class\"><textarea name=note ".
                 "style=\"width:100%;height:110px\"></textarea></div>";
+   }
+   if (grep(/^wfactivate$/,@$actions)){
+      $$selopt.="<option value=\"wfactivate\">".
+                $self->getParent->T("wfactivate",$tr).
+                "</option>\n";
+      $$divset.="<div id=OPwfactivate class=\"$class\"></div>";
    }
    if (grep(/^wfaccept$/,@$actions)){
       $$selopt.="<option value=\"wfaccept\">".
@@ -737,6 +758,9 @@ sub generateWorkspacePages
    $self->SUPER::generateWorkspacePages($WfRec,$actions,$divset,$selopt);
    if ($WfRec->{stateid}==4){
       $defop="wfaddnote";
+   }
+   if ($WfRec->{stateid}==1){
+      $defop="wfactivate";
    }
    return($defop); 
 }
@@ -1019,6 +1043,47 @@ sub Process
                                    });
             $self->PostProcess($action.".".$op,$WfRec,$actions);
             return(1);
+         }
+         return(0);
+      }
+     
+      if ($op eq "wfactivate"){
+         my $note=Query->Param("note");
+         $note=trim($note);
+     
+         my $fobj=$self->getParent->getField("fwdtargetname");
+         my $h=$self->getWriteRequestHash("web");
+         my $newrec;
+         if ($newrec=$fobj->Validate($WfRec,$h)){
+            if (!defined($newrec->{fwdtarget}) ||
+                !defined($newrec->{fwdtargetid} ||
+                $newrec->{fwdtargetid}==0)){
+               if ($self->LastMsg()==0){
+                  $self->LastMsg(ERROR,"invalid forwarding target");
+               }
+               return(0);
+            }
+         }
+         my $fwdtargetname=Query->Param("Formated_fwdtargetname");
+     
+         if ($self->StoreRecord($WfRec,{stateid=>2,
+                                       fwdtarget=>$newrec->{fwdtarget},
+                                       fwdtargetid=>$newrec->{fwdtargetid},
+                                       eventend=>undef,
+                                       closedate=>undef,
+                                       fwddebtarget=>undef,
+                                       fwddebtargetid=>undef })){
+            if ($self->getParent->getParent->Action->StoreRecord(
+                $WfRec->{id},"wfforward",
+                {translation=>'base::workflow::request'},$fwdtargetname."\n".
+                                                         $note,undef)){
+               $self->PostProcess($action.".".$op,$WfRec,$actions,
+                                  note=>$note,
+                                  fwdtarget=>$newrec->{fwdtarget},
+                                  fwdtargetid=>$newrec->{fwdtargetid},
+                                  fwdtargetname=>$fwdtargetname);
+               return(1);
+            }
          }
          return(0);
       }

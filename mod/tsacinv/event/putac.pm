@@ -288,6 +288,7 @@ sub ApplicationModified
                                    AssignmentGroup=>$assignment,
                                    CO_CC=>$rec->{conumber},
                                    Description=>$rec->{description},
+                                   CustBusinessDesc=>$rec->{description},
                                    Remarks=>$rec->{comments},
                                    MaintWindow=>$rec->{maintwindow},
                                    IncidentAG=>$rec->{acinmassingmentgroup},

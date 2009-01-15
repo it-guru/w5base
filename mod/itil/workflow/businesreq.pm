@@ -237,25 +237,29 @@ sub generateWorkspace
       $d.=">".$self->T($n,"base::workflow")."</option>";
    }
    $d.="</select>";
+   my $checknoautoassign;
+   if (Query->Param("Formated_noautoassign") ne ""){
+      $checknoautoassign="checked";
+   }
 
    my $nextstart=$self->getParent->getParent->T("NEXTSTART","base::workflow");
    my $templ=<<EOF;
 <table border=0 cellspacing=0 cellpadding=0 width=100%>
 <tr>
 <td class=fname width=20%>%name(label)%:</td>
-<td class=finput>%name(detail)%</td>
+<td colspan=3 class=finput>%name(detail)%</td>
 </tr>
 <tr>
 <td class=fname valign=top width=20%>%detaildescription(label)%:</td>
-<td class=finput>%detaildescription(detail)%</td>
+<td colspan=3 class=finput>%detaildescription(detail)%</td>
 </tr>
 <tr>
 <td class=fname>%affectedapplication(label)%:</td>
-<td class=finput>%affectedapplication(detail)%</td>
+<td colspan=3 class=finput>%affectedapplication(detail)%</td>
 </tr>
 <tr>
 <td class=fname>%reqnature(label)%:</td>
-<td class=finput>%reqnature(detail)%</td>
+<td colspan=3 class=finput>%reqnature(detail)%</td>
 </tr>
 <script language="JavaScript">
 setFocus("Formated_name");
@@ -263,14 +267,16 @@ setEnterSubmit(document.forms[0],"NextStep");
 </script>
 <tr>
 <td class=fname width=20%>%prio(label)%:</td>
-<td class=finput>$d</td>
+<td width=80 class=finput>$d</td>
+<td class=fname width=20%>Workflow NICHT automatisch der Bearbeitung zuführen</td>
+<td class=finput><input $checknoautoassign name=Formated_noautoassign type=checkbox></td>
 </tr>
 <tr>
 <td class=fname>%customerrefno(label)%:</td>
-<td class=finput>%customerrefno(detail)%</td>
+<td colspan=3 class=finput>%customerrefno(detail)%</td>
 </tr>
 <tr>
-<td colspan=2 align=center><br>$nextstart</td>
+<td colspan=4 align=center><br>$nextstart</td>
 </tr>
 </table>
 EOF
@@ -341,7 +347,7 @@ sub getWorkHeight
    my $self=shift;
    my $WfRec=shift;
 
-   return("300");
+   return("320");
 }
 
 1;
