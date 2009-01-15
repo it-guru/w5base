@@ -96,6 +96,7 @@ sub mkp800
       return({exicode=>1});
    }
 
+   my $startnow=$app->ExpandTimeExpression("now","en","GMT");
    my %p800special=();
    foreach my $month (@monthlist){
       my ($sM,$sY)=$month=~m/^(\d+)\/(\d+)$/;
@@ -153,7 +154,6 @@ sub mkp800
          } until(!defined($rec));
       }
      
-      my $startnow=$app->ExpandTimeExpression("now","en","GMT");
       my $now=$app->ExpandTimeExpression("now","en","CET");
       my $contr=getModuleObject($self->Config,"itil::custcontract");
       $contr->SetFilter(cistatusid=>[3,4]);
