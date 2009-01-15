@@ -69,7 +69,7 @@ sub getDynamicFields
                 name          =>'initiatorgroupname',
                 label         =>'Initiated by group',
                 group         =>'init',
-                allowempty    =>1,
+                AllowEmpty    =>1,
                 vjointo       =>'base::grp',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['initiatorgroupid'=>'grpid'],
