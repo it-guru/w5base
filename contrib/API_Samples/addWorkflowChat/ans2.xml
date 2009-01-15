@@ -11,7 +11,7 @@
          <records soapenc:arrayType="xsd:anyType[1]" xsi:type="soapenc:Array">
             <item>
                <step xsi:type="xsd:string">base::workflow::request::main</step>
-               <posibleactions soapenc:arrayType="xsd:string[12]" 
+               <posibleactions soapenc:arrayType="xsd:string[2]" 
                                xsi:type="soapenc:Array">
                   <item xsi:type="xsd:string">wfaddnote</item>
                   <item xsi:type="xsd:string">wffine</item>

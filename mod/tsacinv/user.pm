@@ -182,7 +182,9 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("ALL");
+   
+   return("ALL") if ($self->IsMemberOf("admin"));
+   return("default","source","header");
 }
 
 sub isWriteValid
