@@ -41,6 +41,7 @@ sub CISearchResult
    my @l;
    if (!defined($tag) || grep(/^$tag$/,qw(ag appl anwendung))){
       my $flt=[{name=>"*$searchtext*", cistatusid=>"<=5"},
+               {applid=>\"$searchtext",cistatusid=>"<=5"},
                {systems=>"$searchtext",cistatusid=>"<=5"}];
       if ($searchtext=~m/^\d{3,20}$/){
          push(@$flt,{conumber=>\"$searchtext",
