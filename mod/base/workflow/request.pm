@@ -1218,17 +1218,24 @@ sub PostProcess
 
    if ($action eq "SaveStep.wfacceptp" ||
        $action eq "SaveStep.wffineproc"){
-     # if ($WfRec->{initiatorid} ne "" &&
-     #     $WfRec->{initiatorid} ne $WfRec->{openuser}){
+      if ($WfRec->{initiatorid} ne "" &&
+          $WfRec->{initiatorid} ne $WfRec->{openuser}){
+         my $n=$param{note};
+         $n="\n\n".$n if ($n ne "");
          $aobj->NotifyForward($WfRec->{id},
                               'base::user',
                               $WfRec->{initiatorid},
                               'Initiator',
-                              'Your request has been processed. For further informations use the attached link',
+                              $self->T('Your request has been processed. '.
+                              'For further informations use the '.
+                              'attached link','base::workflow::request').$n.
+                              "\n\n-- ".
+                              $self->T("original request text",
+                                       'base::workflow::request').
+                              " --\n".$WfRec->{detaildescription}."\n----\n",
                               mode=>'INFO:',
                               workflowname=>$workflowname);
-         printf STDERR ("fifi fine=%s\n",Dumper($WfRec));
-     # }
+      }
    }
    return($self->SUPER::PostProcess($action,$WfRec,$actions));
 }

@@ -22,3 +22,6 @@
 'Alternate approve requested by'=>{de=>'Genehmigung alternativ angefordert bei'},
 'forward to'=>{de=>'Weiterleitung an'},
 'transform'=>{de=>'Umwandlung'},
+'Your request has been processed. For further informations use the attached link'=>{de=>'Ihre Anforderung wurde bearbeitet. Für weitere Informationen nutzen Sie bitte den beigefügten Link.'},
+'original request text'=>{de=>'Orginal Anforderungstext'},
+

@@ -249,7 +249,7 @@ sub AddSecureSetFilter
    my $self=shift;
 
    my $userid=$self->getCurrentUserId();
-   my %groups=$self->getGroupsOf($ENV{REMOTE_USER},'RMember','both');
+   my %groups=$self->getGroupsOf($ENV{REMOTE_USER},'RMember','down');
    return($self->SUPER::SecureSetFilter([
                    {aclmode=>['write','read','moderate'],
                     acltarget=>\'base::user',
