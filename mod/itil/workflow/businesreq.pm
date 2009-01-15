@@ -243,6 +243,7 @@ sub generateWorkspace
    }
 
    my $nextstart=$self->getParent->getParent->T("NEXTSTART","base::workflow");
+   my $l1=$self->T("do NOT automaticly process this workflow");
    my $templ=<<EOF;
 <table border=0 cellspacing=0 cellpadding=0 width=100%>
 <tr>
@@ -268,7 +269,7 @@ setEnterSubmit(document.forms[0],"NextStep");
 <tr>
 <td class=fname width=20%>%prio(label)%:</td>
 <td width=80 class=finput>$d</td>
-<td class=fname width=20%>Workflow NICHT automatisch der Bearbeitung zuführen</td>
+<td class=fname width=20%>$l1</td>
 <td class=finput><input $checknoautoassign name=Formated_noautoassign type=checkbox></td>
 </tr>
 <tr>
