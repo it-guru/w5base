@@ -582,6 +582,7 @@ return(true);
 function disableButtons()
 {
    document.btnWhich.disabled=true;
+   document.btnWhich.oldvalue=document.btnWhich.value;
    document.btnWhich.value="Working ...";
 }
 
@@ -609,7 +610,16 @@ function ValidateSubmit(f)
 function defaultValidateSubmit(f,b)
 {
    if (b.name=="BreakWorkflow"){
-      return(confirm("$breakmsg"));
+      if (confirm("$breakmsg")){
+         b.disabled=false;
+         return(true);
+      }
+      else{
+         b.value=b.oldvalue;
+         b.disabled=false;
+         submitCount=0;
+         return(false);
+      }
    }
    return(true);
 }

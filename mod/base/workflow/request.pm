@@ -261,6 +261,12 @@ sub getPosibleActions
    if (!$iscurrent){  # check Workspace only if not current
       $isworkspace=$self->isCurrentWorkspace($WfRec); 
    }
+   my $isininitiatorgroup=0;
+   if ($WfRec->{initiatorgroupid} ne ""){
+      if ($app->IsMemberOf($WfRec->{initiatorgroupid},"RMember","direct")){
+         $isininitiatorgroup=1;
+      }
+   }
    my $iscurrentapprover=0;
 
    if ($stateid==6){
@@ -294,7 +300,7 @@ sub getPosibleActions
    if ($iscurrent){
       push(@l,"iscurrent"); # Merker, dass der Workflow aktuell ansteht
    }
-   if ($stateid==1 && ($userid==$creator)){
+   if ($stateid==1 && ($userid==$creator || $isininitiatorgroup)){
       push(@l,"wfactivate");
    }
    if ((!$iscurrent && !$iscurrentapprover) && $stateid>1){
@@ -309,6 +315,9 @@ sub getPosibleActions
        $stateid<3 && $stateid>1){
       push(@l,"wfbreak");   # workflow abbrechen      (durch Anforderer o admin)
       push(@l,"wfcallback");# workflow zurueckholen   (durch Anforderer o admin)
+   }
+   if (($userid==$creator || $isininitiatorgroup || $isadmin) && $stateid==1){
+      push(@l,"wfbreak");   # workflow abbrechen      (durch Anforderer o admin)
    }
    if ((($stateid==4 || $stateid==3) && ($lastworker==$userid || $isadmin)) ||
        ($iscurrent && $userid==$creator)){
@@ -557,20 +566,22 @@ sub PostProcess
    my $actions=shift;
    my %param=@_;
 
-   $self->getParent->getParent->ResetFilter();
-   $self->getParent->getParent->SetFilter({id=>\$WfRec->{id}});
-   my ($cur,$msg)=$self->getParent->getParent->getOnlyFirst(
-                  qw(fwdtarget fwdtargetid));
-
-   if (defined($cur)){
-      if ($cur->{fwdtarget} ne "" && $cur->{fwdtargetid} ne ""){ 
-         my $aobj=$self->getParent->getParent->Action();
-         my $workflowname=$self->getParent->getWorkflowMailName();
-         $aobj->NotifyForward($WfRec->{id},
-                              $cur->{fwdtarget},$cur->{fwdtargetid},undef,
-                              $WfRec->{detaildescription},
-                              workflowname=>$workflowname,
-                              sendercc=>1);
+   if ($action eq "NextStep"){
+      $self->getParent->getParent->ResetFilter();
+      $self->getParent->getParent->SetFilter({id=>\$WfRec->{id}});
+      my ($cur,$msg)=$self->getParent->getParent->getOnlyFirst(
+                     qw(fwdtarget fwdtargetid));
+     
+      if (defined($cur)){
+         if ($cur->{fwdtarget} ne "" && $cur->{fwdtargetid} ne ""){ 
+            my $aobj=$self->getParent->getParent->Action();
+            my $workflowname=$self->getParent->getWorkflowMailName();
+            $aobj->NotifyForward($WfRec->{id},
+                                 $cur->{fwdtarget},$cur->{fwdtargetid},undef,
+                                 $WfRec->{detaildescription},
+                                 workflowname=>$workflowname,
+                                 sendercc=>1);
+         }
       }
    }
        
@@ -790,6 +801,7 @@ sub Process
    my $WfRec=shift;
    my $actions=shift;
    my $userid=$self->getParent->getParent->getCurrentUserId();
+
 
    if ($action eq "BreakWorkflow"){
       if ($self->getParent->getParent->Action->StoreRecord(
@@ -1215,7 +1227,6 @@ sub Process
          }
          return(0);
       }
-
    }
    return($self->SUPER::Process($action,$WfRec,$actions));
 }
@@ -1301,6 +1312,24 @@ sub PostProcess
                               " --\n".$WfRec->{detaildescription}."\n----\n",
                               mode=>'INFO:',
                               workflowname=>$workflowname);
+      }
+   }
+   if ($action eq "SaveStep.wfactivate"){
+      $self->getParent->getParent->ResetFilter();
+      $self->getParent->getParent->SetFilter({id=>\$WfRec->{id}});
+      my ($cur,$msg)=$self->getParent->getParent->getOnlyFirst(
+                     qw(fwdtarget fwdtargetid));
+     
+      if (defined($cur)){
+         if ($cur->{fwdtarget} ne "" && $cur->{fwdtargetid} ne ""){ 
+            my $aobj=$self->getParent->getParent->Action();
+            my $workflowname=$self->getParent->getWorkflowMailName();
+            $aobj->NotifyForward($WfRec->{id},
+                                 $cur->{fwdtarget},$cur->{fwdtargetid},undef,
+                                 $WfRec->{detaildescription},
+                                 workflowname=>$workflowname,
+                                 sendercc=>1);
+         }
       }
    }
    return($self->SUPER::PostProcess($action,$WfRec,$actions));
