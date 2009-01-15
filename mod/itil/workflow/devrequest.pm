@@ -200,6 +200,10 @@ setEnterSubmit(document.forms[0],"NextStep");
 <td class=finput>$d</td>
 </tr>
 <tr>
+<td class=fname>%forceinitiatorgroupid(label)%:</td>
+<td class=finput>%forceinitiatorgroupid(detail)%</td>
+</tr>
+<tr>
 <td colspan=2 align=center><br>$nextstart</td>
 </tr>
 </table>
@@ -241,7 +245,7 @@ sub getWorkHeight
    my $self=shift;
    my $WfRec=shift;
 
-   return("270");
+   return("300");
 }
 
 1;

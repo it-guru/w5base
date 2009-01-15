@@ -276,6 +276,10 @@ setEnterSubmit(document.forms[0],"NextStep");
 <td colspan=3 class=finput>%customerrefno(detail)%</td>
 </tr>
 <tr>
+<td class=fname>%forceinitiatorgroupid(label)%:</td>
+<td colspan=3 class=finput>%forceinitiatorgroupid(detail)%</td>
+</tr>
+<tr>
 <td colspan=4 align=center><br>$nextstart</td>
 </tr>
 </table>

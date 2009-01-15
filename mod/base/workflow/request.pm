@@ -40,12 +40,40 @@ sub new
                 vjoinon       =>['approverrequestid'=>'userid'],
                 vjoindisp     =>'fullname'),
 
+      new kernel::Field::Select(
+                name          =>'forceinitiatorgroupid',
+                label         =>'Initiatorgroup',
+                translation   =>'base::workflow::request',
+                htmldetail    =>0,
+                group         =>'init',
+                getPostibleValues=>sub{
+                   my $self=shift;
+                   my %groups=$self->getParent->getPosibleInitiatorGroups();
+                   my @l;
+                   foreach my $grp (sort({$a->{fullname} cmp $b->{fullname}} 
+                                    values(%groups))){
+                      push(@l,$grp->{grpid},$grp->{fullname});
+                   }
+               
+                   return(@l); 
+                }),
+
       new kernel::Field::Link (
                 name          =>'approverrequestid',
                 container     =>'headref'),
 
     );
    return($self);
+}
+
+sub getPosibleInitiatorGroups
+{
+   my $self=shift;
+   my $userid=$self->getParent->getCurrentUserId();
+
+   my %groups=$self->getGroupsOf($userid,
+                  [qw(REmployee RBoss RBackoffice RBoss2)],'direct');
+   return(%groups);
 }
 
 sub getDynamicFields
@@ -288,7 +316,6 @@ sub getPosibleActions
                }
             }
          }
-         #printf STDERR ("fifi actions=%s\n",Dumper($WfRec));
       }
    }
 
@@ -466,10 +493,6 @@ sub nativProcess
    if ($action eq "NextStep"){
       my ($target,$fwdtarget,$fwdtargetid,$fwddebtarget,$fwddebtargetid,@wsref)=
              $self->getParent->getDefaultContractor($h,$actions);
-#printf STDERR ("fifi fwdtarget=$fwdtarget\n");
-#printf STDERR ("fifi fwdtargetid=$fwdtargetid\n");
-#printf STDERR ("fifi fwddebtarget=$fwddebtarget\n");
-#printf STDERR ("fifi fwddebtargetid=$fwddebtargetid\n");
       if ($self->LastMsg()){
          return(undef);
       }
@@ -501,13 +524,20 @@ sub nativProcess
             my $fullname=$UserCache->{$ENV{REMOTE_USER}}->{rec}->{fullname};
             $h->{initiatorname}=$fullname;
          }
-        
-         my %groups=$self->getGroupsOf($ENV{REMOTE_USER},
-                                       [qw(REmployee RBoss)],'direct');
+       
+         my %groups=$self->getParent->getPosibleInitiatorGroups(); 
          if (keys(%groups)>0){
-            my @k=keys(%groups);
-            $h->{initiatorgroupid}=$k[0];
-            $h->{initiatorgroup}=$groups{$k[0]}->{fullname};
+            if ($h->{forceinitiatorgroupid} ne "" &&
+                exists($groups{$h->{forceinitiatorgroupid}})){
+               $h->{initiatorgroupid}=$h->{forceinitiatorgroupid};
+               $h->{initiatorgroup}=
+                   $groups{$h->{forceinitiatorgroupid}}->{fullname};
+            }
+            else{
+               my @k=keys(%groups);
+               $h->{initiatorgroupid}=$k[0];
+               $h->{initiatorgroup}=$groups{$k[0]}->{fullname};
+            }
          }
       }
       if (!$self->addInitialParameters($h)){
@@ -546,6 +576,10 @@ sub Process
 
    if ($action eq "NextStep"){
       my $h=$self->getWriteRequestHash("web");
+      if (Query->Param("Formated_forceinitiatorgroupid") ne ""){
+         $h->{forceinitiatorgroupid}=
+             Query->Param("Formated_forceinitiatorgroupid");
+      }
       if (Query->Param("Formated_noautoassign") ne ""){
          $h->{noautoassign}=1;
       }
