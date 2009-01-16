@@ -63,11 +63,20 @@ sub overviewW5Base
    my $app=$self->getParent();
    my @l;
 
-   my @flds=("Base.Total.User.Count"     =>'W5Base total user count',
+   my @flds=(
+             "Base.Total.User.Count"     =>'W5Base total user count',
              "Base.Total.Group.Count"    =>'W5Base total group count',
              "Base.Total.Contact.Count"  =>'W5Base total contact count',
              "Base.Total.Workflow.Active.Count"  
                                          =>'W5Base total active workflows',
+             "Base.Total.Workflow.Count"  
+                                         =>'W5Base total workflows',
+             "Base.Total.WorkflowAction.Count"  
+                                         =>'W5Base total workflow actions',
+             "Base.Total.UserLogon.Count"  
+                                         =>'W5Base User Logon Entrys',
+             "Base.Total.JobLog.Count"  
+                                         =>'W5Base Job-Log Entrys',
              );
 
    while(my $k=shift(@flds)){
@@ -88,7 +97,8 @@ sub displayW5Base
    my ($primrec,$hist)=@_;
    my $app=$self->getParent();
    my $d;
-   if ((!defined($primrec->{stats}->{'Base.Total.User.Count'}))){
+   if ((!defined($primrec->{stats}->{'Base.Total.User.Count'}))&&
+       (!defined($primrec->{stats}->{'Base.Total.Workflow.Count'}))){
       return(undef);
    }
 
@@ -96,6 +106,14 @@ sub displayW5Base
              "Base.Total.Group.Count"    =>'Groups',
              "Base.Total.Contact.Count"  =>'Contacts',
              "Base.Total.Workflow.Active.Count"=>'active Workflows',
+             "Base.Total.Workflow.Count"  
+                                         =>'W5Base total workflows',
+             "Base.Total.WorkflowAction.Count"  
+                                         =>'W5Base total workflow actions',
+             "Base.Total.UserLogon.Count"  
+                                         =>'W5Base User Logon Entrys',
+             "Base.Total.JobLog.Count"  
+                                         =>'W5Base Job-Log Entrys',
              );
 
    while(my $k=shift(@flds)){
@@ -284,7 +302,22 @@ sub processData
    my %param=@_;
    my $count;
 
+   foreach my $objname (qw(base::workflow
+                           base::workflowaction
+                           base::userlogon
+                           base::joblog
+                           )){
+      msg(INFO,"starting count of $objname");
+      my $o=getModuleObject($self->getParent->Config,$objname);
+      my $n=$o->CountRecords();
+      msg(INFO,"result of $objname is $n");
+      $self->getParent->processRecord('objectcount',$dstrange,
+                                      {objectname=>$objname,count=>$n});
+   }
+   
 
+
+   return();
    msg(INFO,"starting collect of base::grp");
    my $grp=getModuleObject($self->getParent->Config,"base::grp");
    $grp->SetFilter({cistatusid=>\"4"});
@@ -394,7 +427,29 @@ sub processRecord
    my $rec=shift;
    my %param=@_;
 
-   if ($module eq "base::user"){
+   if ($module eq "objectcount"){
+      if ($rec->{objectname} eq "base::workflow"){
+         $self->getParent->storeStatVar("Group",["admin"],{},
+                                        "Base.Total.Workflow.Count",
+                                        $rec->{count});
+      }
+      elsif ($rec->{objectname} eq "base::workflowaction"){
+         $self->getParent->storeStatVar("Group",["admin"],{},
+                                        "Base.Total.WorkflowAction.Count",
+                                        $rec->{count});
+      }
+      elsif ($rec->{objectname} eq "base::userlogon"){
+         $self->getParent->storeStatVar("Group",["admin"],{},
+                                        "Base.Total.UserLogon.Count",
+                                        $rec->{count});
+      }
+      elsif ($rec->{objectname} eq "base::joblog"){
+         $self->getParent->storeStatVar("Group",["admin"],{},
+                                        "Base.Total.JobLog.Count",
+                                        $rec->{count});
+      }
+   }
+   elsif ($module eq "base::user"){
       $self->getParent->storeStatVar("Group",["admin"],{},
                                      "Base.Total.Contact.Count",1);
       if ($rec->{usertyp} eq "user"){
