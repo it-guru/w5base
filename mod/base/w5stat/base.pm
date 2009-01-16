@@ -314,10 +314,7 @@ sub processData
       $self->getParent->processRecord('objectcount',$dstrange,
                                       {objectname=>$objname,count=>$n});
    }
-   
 
-
-   return();
    msg(INFO,"starting collect of base::grp");
    my $grp=getModuleObject($self->getParent->Config,"base::grp");
    $grp->SetFilter({cistatusid=>\"4"});
