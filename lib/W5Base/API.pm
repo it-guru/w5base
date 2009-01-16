@@ -569,6 +569,18 @@ sub createConfig
    }
    my $SOAP=SOAP::Lite->uri($uri)->proxy($proxy);
 
+
+#   my @r=$SOAP->Ping({lang=>\$lang})->result;
+
+
+#   use Data::Dumper;
+#
+#   printf STDERR ("fifi exitcode=%s\n",Dumper(\@r));
+#
+#   exit(0);
+
+
+
    my $SOAPresult=eval("\$SOAP->Ping({lang=>\$lang});");
    my $result;
    if (!($SOAP->transport->status=~m/^(200|500)\s.*$/)){
@@ -603,7 +615,6 @@ sub createConfig
       }
       $result=$SOAPresult->result;
    }
-   
 
    return(undef) if (!defined($result) || ref($result) ne "HASH" ||
                      $result->{result}==0);

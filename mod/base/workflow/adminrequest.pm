@@ -34,18 +34,18 @@ sub new
       $self->{ITIL_installed}=1;
       $self->AddFrontendFields(
          new kernel::Field::TextDrop(
-                   name          =>'affectedapplication',
+                   name          =>'newaffectedapplication',
                    label         =>'Application name',
                    htmldetail    =>0,
                    translation   =>'itil::appl',
                    group         =>'init',
                    vjointo       =>'itil::appl',
                    vjoineditbase =>{'cistatusid'=>[3,4]},
-                   vjoinon       =>['affectedapplicationid'=>'id'],
+                   vjoinon       =>['newaffectedapplicationid'=>'id'],
                    vjoindisp     =>'name'),
      
          new kernel::Field::Link (
-                   name          =>'affectedapplicationid',
+                   name          =>'newaffectedapplicationid',
                    container     =>'headref'),
        );
    }
@@ -218,8 +218,8 @@ sub generateWorkspacePages
                "für folgende Anwendung</td>".
                "</tr>".
                "<tr>".
-               "<td width=15%>\%affectedapplication(label)\%: </td>".
-               "<td>\%affectedapplication(detail)\%</td>".
+               "<td width=15%>\%newaffectedapplication(label)\%: </td>".
+               "<td>\%newaffectedapplication(detail)\%</td>".
                "</tr>".
                "<tr>".
                "<td colspan=2>".
@@ -246,7 +246,7 @@ sub Process
    if ($action eq "SaveStep"){
       my $op=Query->Param("OP");
       if ($op eq "wftrans2devreq"){
-         my $fname="affectedapplication";
+         my $fname="newaffectedapplication";
          my $fobj=$self->getParent->getField($fname);
          my $f=Query->Param("Formated_$fname");
 

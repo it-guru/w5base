@@ -311,8 +311,10 @@ sub showFields
       }
       push(@l,$fielddesc);
    }
-   return(interface::SOAP::kernel::Finish({exitcode=>0,
-          lastmsg=>[],records=>\@l}));
+   return(interface::SOAP::kernel::Finish(
+          SOAP::Data->name(output=>{exitcode=>0,
+                                    lastmsg=>[],
+                                    records=>\@l})->type("HASH")));
 }
 
 sub storeRecord
@@ -537,7 +539,10 @@ sub validateObjectname
 sub Ping
 {
    my $self=$W5Base::SOAP;
-   return({exitcode=>0,result=>1});
+#   return({SOAP::Data->name(exitcode=>0),
+#          SOAP::Data->name(text=>'Hans'),
+#          SOAP::Data->name(result=>1)});
+   return(SOAP::Data->name(output=>{exitcode=>0,result=>1})->type("HASH"));
 }
 
 package interface::SOAP::kernel;
