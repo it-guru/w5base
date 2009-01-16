@@ -90,6 +90,20 @@ sub getDynamicFields
     ),$self->SUPER::getDynamicFields(%param));
 }
 
+sub getSpecificDataloadForm
+{
+   my $self=shift;
+
+   my $templ=<<EOF;
+<tr>
+<td class=fname>%customerrefno(label)%:</td>
+<td colspan=3 class=finput>%customerrefno(detail)%</td>
+</tr>
+EOF
+   return($templ);
+}
+
+
 sub XgetRequestNatureOptions
 {
    my $self=shift;
@@ -250,6 +264,7 @@ sub generateWorkspace
 
    my $nextstart=$self->getParent->getParent->T("NEXTSTART","base::workflow");
    my $l1=$self->T("do NOT automaticly process this workflow");
+   my $secial=$self->getParent->getSpecificDataloadForm();
    my $templ=<<EOF;
 <table border=0 cellspacing=0 cellpadding=0 width=100%>
 <tr>
@@ -278,10 +293,7 @@ setEnterSubmit(document.forms[0],"NextStep");
 <td class=fname width=20%>$l1</td>
 <td class=finput><input $checknoautoassign name=Formated_noautoassign type=checkbox></td>
 </tr>
-<tr>
-<td class=fname>%customerrefno(label)%:</td>
-<td colspan=3 class=finput>%customerrefno(detail)%</td>
-</tr>
+$secial
 <tr>
 <td class=fname>%forceinitiatorgroupid(label)%:</td>
 <td colspan=3 class=finput>%forceinitiatorgroupid(detail)%</td>
@@ -293,7 +305,6 @@ setEnterSubmit(document.forms[0],"NextStep");
 EOF
    return($templ);
 }
-
 
 sub Process
 {
@@ -358,7 +369,7 @@ sub getWorkHeight
    my $self=shift;
    my $WfRec=shift;
 
-   return("320");
+   return("340");
 }
 
 1;

@@ -149,10 +149,11 @@ sub IsModuleSelectable
    my $self=shift;
    my $acl;
 
+   my $s=$self->Self();
    $acl=$self->getParent->getMenuAcl($ENV{REMOTE_USER},
                           "base::workflow",
                           func=>'New',
-                          param=>'WorkflowClass=base::workflow::request');
+                          param=>'WorkflowClass='.$s);
    if (defined($acl)){
       return(1) if (grep(/^read$/,@$acl));
    }
