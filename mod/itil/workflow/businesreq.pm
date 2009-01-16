@@ -30,14 +30,6 @@ sub new
    return($self);
 }
 
-sub IsModuleSelectable
-{
-   my $self=shift;
-   my %env=@_;
-
-   return(1);
-}
-
 sub Init
 {
    my $self=shift;

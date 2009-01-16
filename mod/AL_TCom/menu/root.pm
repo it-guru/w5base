@@ -297,6 +297,12 @@ sub Init
                       param=>'WorkflowClass=AL_TCom::workflow::eventnotify',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj('AL_TCom::workflow::businesreq$',
+                      "base::workflow",
+                      func=>'New',
+                      param=>'WorkflowClass=AL_TCom::workflow::businesreq',
+                      defaultacl=>['DTAG.TSI']);
+
    return(1);
 }
 

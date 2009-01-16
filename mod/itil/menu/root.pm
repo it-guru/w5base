@@ -318,6 +318,12 @@ sub Init
                       "itil::costcenter",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj('itil::workflow::businesreq$',
+                      "base::workflow",
+                      func=>'New',
+                      param=>'WorkflowClass=itil::workflow::businesreq',
+                      defaultacl=>['admin']);
+
    $self->RegisterObj('itil::workflow::eventnotify$',
                       "base::workflow",
                       func=>'New',

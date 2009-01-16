@@ -1,0 +1,3 @@
+'THOMEZMS::workflow::businesreq'=>{de=>'T-Home ZMS: Anfrage/Auftrag an den Anwendungsbetrieb oder an die Anwendungsbetreuung',en=>'T-Home ZMS: Question or request to applications businessteam'},
+'THOMEZMS::workflow::businesreq::tip'=>{de=>'Dieser Workflow nimmt speziell Aufträge des Kunden <b>T-Home ZMS</b> an, die dann von <b>AL T-Com</b> Anwendungsbetreuung bearbeitet werden. Der Workflow wird automatisch an den Auftragseingang der jeweiligen Anwendung weitergeleitet.<br>Sollte bei der ausgewählten Anwendung kein Kundenauftragseingang registriert sein, so wird die Weiterleitung des Workflows nicht gestattet.'},
+
