@@ -388,6 +388,10 @@ sub getSC
    my $SCuser=$dataobjuser->{tsscui};
    my $SCpass=$dataobjpass->{tsscui};
 
+   msg(DEBUG,"SC uri=$SCuri");
+   msg(DEBUG,"SC user=$SCuser");
+   msg(DEBUG,"SC pass=$SCpass");
+
    if (!$sc->Connect($SCuri,$SCuser,$SCpass)){
       printf STDERR ("ERROR: ServiceCenter connect failed\n");
       printf STDERR ("ERROR: $SCuser \@ $SCuri\n");
