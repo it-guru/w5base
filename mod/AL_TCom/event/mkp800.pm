@@ -97,6 +97,7 @@ sub mkp800
    }
 
    my $startnow=$app->ExpandTimeExpression("now","en","GMT");
+   msg(INFO,"start operation with time = $startnow");
    my %p800special=();
    foreach my $month (@monthlist){
       my ($sM,$sY)=$month=~m/^(\d+)\/(\d+)$/;
