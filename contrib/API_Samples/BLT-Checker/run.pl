@@ -38,7 +38,6 @@ sub Help
 #
 my $ua=new LWP::UserAgent(env_proxy=>1);
 my $jar=HTTP::Cookies->new(file => "$ENV{HOME}/.cookies.txt");
-$jar->clear();
 $ua->cookie_jar($jar);
 
 $ua->timeout(60);

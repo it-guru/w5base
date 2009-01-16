@@ -41,6 +41,7 @@
 'IP-Adresses list'=>{de=>'IP-Adressen Liste'},
 'DNS-Name list'=>{de=>'DNS-Names Liste'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
+'Admin Team Boss'=>{de=>'Teamleiter des Adminteams'},
 'Asset-Name'=>{de=>'Asset-Name/AssetID',en=>'Asset-Name/AssetID'},
 'CO-Number'=>{de=>'Kostenstelle/CO-Nummer',en=>'CostCenter/CO-Number'},
 'availabel for further use'=>{de=>'verfügbar für den Wiedereinsatz'},
