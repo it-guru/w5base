@@ -470,6 +470,8 @@ sub FinishWrite
       my $okstep=$WfRec->{class};
       $okstep.="::main";
       $wf->Store($WfRec,{stateid=>21,
+                         eventend=>NowStamp("en"),
+                         closedate=>NowStamp("en"),
                          screqlastsync=>NowStamp("en"),
                          scworkflowid=>$IncidentNumber,
                          step=>$okstep});
