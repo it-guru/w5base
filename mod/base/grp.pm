@@ -341,11 +341,15 @@ sub isWriteValid
 
    return(qw(default)) if (!defined($rec) && $self->IsMemberOf("admin"));
    return(undef) if ($rec->{grpid}<=0);
-   return(qw(default users phonenumbers misc attachments)) if ($self->IsMemberOf("admin"));
+   return(qw(default users phonenumbers 
+             misc attachments)) if ($self->IsMemberOf("admin"));
    if (defined($rec)){
       my $grpid=$rec->{grpid};
       if ($self->IsMemberOf([$grpid],"RAdmin","down")){
          return(qw(users phonenumbers misc attachments));
+      }
+      if ($self->IsMemberOf([$grpid],["RBoss","RBoss2"],"direct")){
+         return(qw(phonenumbers misc attachments));
       }
    }
    return(undef);
