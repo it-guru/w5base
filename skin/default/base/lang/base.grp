@@ -14,6 +14,7 @@
 'base::grp'                    =>{ de=>'Gruppe',en=>'Group'},
 'phoneMISC'                    =>{ de=>'Sonstiges',en=>'Misc'},
 'phoneONCALL'                  =>{ de=>'Rufbereitschaft',en=>'on call'},
+'phoneHOTLINE'                 =>{ de=>'Hotline',en=>'Hotline'},
 'STEVqreportbyorg'=>{
           de=>'Quality-Report Empfang über organisatorische Role (Leiter)',
           en=>'Quality-Report by organisaional role (boss)'},

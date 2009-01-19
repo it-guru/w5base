@@ -219,7 +219,7 @@ sub PhoneUsage
 {
    my $self=shift;
    my $current=shift;
-   my @codes=qw(phoneMISC phoneONCALL);
+   my @codes=qw(phoneMISC phoneONCALL phoneHOTLINE);
    my @l;
    foreach my $code (@codes){
       push(@l,$code,$self->T($code));
