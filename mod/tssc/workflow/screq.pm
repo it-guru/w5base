@@ -200,6 +200,7 @@ sub getPosibleActions
    if ($stateid<21){
       if ($isadmin){
          push(@l,"scresync");
+         push(@l,"screfresh");
       }
    }
 
@@ -278,15 +279,87 @@ sub Process
          return(0);
       }
       if ($op eq "scresync"){
-         if ($self->StoreRecord($WfRec,{stateid=>3,
+         if ($self->StoreRecord($WfRec,{stateid=>4,
                                         step=>'tssc::workflow::screq::Wait4SC',
                                         })){
          }
          return(0);
       }
    }
+
    return($self->SUPER::Process($action,$WfRec,$actions));
 }
+
+
+sub nativProcess
+{
+   my $self=shift;
+   my $action=shift;
+   my $h=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   printf STDERR ("fifi action=$action actions=%s\n",Dumper($actions));
+   if ($action eq "screfresh"){
+      msg(DEBUG,"processing screfresh event for ".$WfRec->{scworkflowid});
+      my $sc=$self->getSC();
+      return(undef) if (!defined($sc));
+      msg(DEBUG,"connect to ServiceCenter seems to be successfull");
+      my $searchResult;
+      if (!defined($searchResult=$sc->IncidentSearch(
+                     'number'=>$WfRec->{scworkflowid},
+                     'search.open.flag'=>'either'))){
+         printf STDERR ("ERROR: ServiceCenter SearchIncident failed\n");
+      }
+      if (defined($searchResult)){
+         printf STDERR ("SC=%s\n",Dumper($searchResult));
+         $self->HandelNewSCdata($WfRec,$searchResult);
+         
+      }
+      $sc->Logout();
+      return(1);
+   }
+   return(0);
+}
+
+sub HandelNewSCdata
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $searchResult=shift;
+   my $record=$searchResult->{record};
+
+
+}
+
+sub getSC
+{
+   my $self=shift;
+   my $app=$self->getParent->getParent();
+
+   my $sc=new SC::Customer::TSystems;
+
+   my $dataobjconnect=$app->Config->Param('DATAOBJCONNECT');
+   my $dataobjuser=$app->Config->Param('DATAOBJUSER');
+   my $dataobjpass=$app->Config->Param('DATAOBJPASS');
+   my $SCuri=$dataobjconnect->{tsscui};
+   my $SCuser=$dataobjuser->{tsscui};
+   my $SCpass=$dataobjpass->{tsscui};
+
+   if (!$sc->Connect($SCuri,$SCuser,$SCpass)){
+      printf STDERR ("ERROR: ServiceCenter connect failed\n");
+      printf STDERR ("ERROR: $SCuser \@ $SCuri\n");
+      return(undef);
+   }
+   if (!$sc->Login()){
+      printf STDERR ("ERROR: ServiceCenter login failed\n");
+      $sc->Logout();
+      return(undef);
+   }
+   return($sc);
+}
+
+
 
 
 #######################################################################
@@ -330,14 +403,14 @@ sub FinishWrite
       if (defined($res) && $res->{exitcode}==0){
          if ($self->getParent->getParent->Action->StoreRecord(
              $id,"info",
-             {translation=>'base::workflow::action'},"Sync",undef)){
+             {translation=>'base::workflow::actions'},"Sync",undef)){
             return(1);
          }
       }
       else{
          if ($self->getParent->getParent->Action->StoreRecord(
              $id,"info",
-             {translation=>'base::workflow::action'},
+             {translation=>'base::workflow::actions'},
                           "Sync request failed",undef)){
             return(1);
          }
@@ -373,39 +446,6 @@ sub Validate
 
    return(1);
 }
-
-sub getSC
-{
-   my $self=shift;
-   my $app=$self->getParent->getParent();
-
-   my $sc=new SC::Customer::TSystems;
-
-   my $dataobjconnect=$app->Config->Param('DATAOBJCONNECT');
-   my $dataobjuser=$app->Config->Param('DATAOBJUSER');
-   my $dataobjpass=$app->Config->Param('DATAOBJPASS');
-   my $SCuri=$dataobjconnect->{tsscui};
-   my $SCuser=$dataobjuser->{tsscui};
-   my $SCpass=$dataobjpass->{tsscui};
-
-   msg(DEBUG,"SC uri=$SCuri");
-   msg(DEBUG,"SC user=$SCuser");
-   msg(DEBUG,"SC pass=$SCpass");
-
-   if (!$sc->Connect($SCuri,$SCuser,$SCpass)){
-      printf STDERR ("ERROR: ServiceCenter connect failed\n");
-      printf STDERR ("ERROR: $SCuser \@ $SCuri\n");
-      return(undef);
-   }
-   if (!$sc->Login()){
-      printf STDERR ("ERROR: ServiceCenter login failed\n");
-      $sc->Logout();
-      return(undef);
-   }
-   return($sc);
-}
-
-
 
 
 1;

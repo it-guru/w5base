@@ -44,7 +44,8 @@ sub getDynamicFields
                 group         =>'init',
                 container     =>'additional',
                 value         =>['AssetCenter Wirksystem (AC01_Prod_FFM)',
-                                 'ServiceCenter Wirksystem (cssa-isc14)']),
+                                 'ServiceCenter Wirksystem (cssa-isc14)',
+                                 'W5Base/Darwin (Prod; Service-Kennungen)']),
 
       new kernel::Field::Text(
                 name          =>'targetuser',
@@ -237,6 +238,11 @@ sub nativProcess
       if ($W5V2::OperationContext ne "Kernel"){
          $h->{eventstart}=NowStamp("en");
       }
+      if ($h->{targetuser}=~m/[^a-z0-9_]/i){
+         $self->LastMsg(ERROR,
+                   "invalid characters in target user account");
+         return(0);
+      }
       if (!$self->addInitialParameters($h)){
          if (!$self->getParent->LastMsg()){
             $self->getParent->LastMsg(ERROR,
@@ -357,6 +363,23 @@ sub getWorkHeight
    return("240");
 }
 
+
+sub HandelNewSCdata
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $searchResult=shift;
+   my $record=$searchResult->{record};
+
+   if (lc($record->{'problem.status'}) ne "open"){
+      my $wf=$self->getParent->getParent->Clone();
+      $wf->Store($WfRec,{stateid=>21,
+                         closedate=>NowStamp("en"),
+                         screqlastsync=>NowStamp("en")});
+   }
+}
+
+
 #######################################################################
 package tssc::workflow::scpassreq::SCworking;
 use vars qw(@ISA);
@@ -409,19 +432,39 @@ sub FinishWrite
    }
    my $sc=$self->getSC();
    return(undef) if (!defined($sc));
-   printf STDERR ("INFO:  Connect is ok\n");
-
+   msg(DEBUG,"connect to ServiceCenter seems to be successfull");
    my ($IncidentNumber,$msg);
-   printf STDERR ("INFO:  Login is ok\n");
-   my $action="Sehr geehrte Damen und Herren,\n".
-              "bitte setzten Sie fuer den Account '$WfRec->{targetuser}' ".
-              "im System '$WfRec->{targetsys}' ".
-              "das Passwort neu.";
+   msg(DEBUG,"sending scpassreq for ".
+             "'$WfRec->{targetuser}'\@'$WfRec->{targetsys}'");
+   my $action;
+   if ( ($WfRec->{targetsys}=~m/^AssetCenter/i) ||
+        ($WfRec->{targetsys}=~m/^ServiceCenter/i)){
+      $action="Ladies and Gentlemen,\n".
+              "please reset the password for the account ".
+              "'$WfRec->{targetuser}' at system '$WfRec->{targetsys}'.";
+      if ($reportedemail ne ""){
+         $action.="\nAfter reset please send the new initial ".
+                  "password as an email to '$reportedemail' .";
+      }
+      if ($WfRec->{detaildescription} ne ""){
+         $action.="\r\nComments: ".$WfRec->{detaildescription};
+      }
+      $action.="\r\n\r\nRegards";
+      $action.="\n---\n";
+   }
+
+   $action.="Sehr geehrte Damen und Herren,\n".
+            "bitte setzten Sie für den Account '$WfRec->{targetuser}' ".
+            "im System '$WfRec->{targetsys}' ".
+            "das Passwort neu.";
    if ($reportedemail ne ""){
-      $action.="\nDas neue Initialpasswort senden Sie bitte ".
+      $action.="\r\nDas neue Initialpasswort senden Sie bitte ".
                "per E-Mail an '$reportedemail' .";
    }
-   $action.="\n\nMit freundlichen Gruessen";
+   if ($WfRec->{detaildescription} ne ""){
+      $action.="\r\nBemerkungen:".$WfRec->{detaildescription};
+   }
+   $action.="\r\n\r\nMit freundlichen Grüßen";
 
    my $subcategory2="OTHER";
    my $assignment="CSS.TCOM.ST.DB";
@@ -429,12 +472,15 @@ sub FinishWrite
    if ($WfRec->{targetsys}=~m/^AssetCenter/i){
       $subcategory2="ASSETCENTER";
       $assignment="CSS.IAS.AR.IO.IAC";
-      $causecode="AC.PWD.GER";
+      $causecode="AC.PWD.ENG";
    }
    if ($WfRec->{targetsys}=~m/^ServiceCenter/i){
       $subcategory2="SERVICECENTER";
       $assignment="DSS.ISD.KR.OLIBSS-ADMIN";
-      $causecode="SC.PWD.GER";
+      $causecode="SC.PWD.ENG";
+   }
+   if ($WfRec->{targetsys}=~m/^w5base/i){
+      $assignment="CSS.TCOM.ST.DB";
    }
 
    
@@ -443,7 +489,12 @@ sub FinishWrite
                  'assignment'           =>$assignment,
                  'home.assignment'      =>'CSS.TCOM.W5BASE',
                  'priority.code'        =>'3',
+                 'urgency'              =>'Medium',
+                 'business.impact'      =>'Medium',
+                 'dsc.criticality'      =>'Low',
+                 'sla.relevant'         =>'No',
                  'category'             =>'ACCESS',
+                 'company'              =>'T-Systems',
                  'subcategory1'         =>'PASSWORD',
                  'subcategory2'         =>$subcategory2,
                  'reported.lastname'    =>$reportedlastname,
@@ -469,12 +520,18 @@ sub FinishWrite
    if ($IncidentNumber ne ""){
       my $okstep=$WfRec->{class};
       $okstep.="::main";
-      $wf->Store($WfRec,{stateid=>21,
+      $wf->Action->StoreRecord(
+             $WfRec->{id},"procinfo",
+             {translation=>'base::workflow::actions'},
+             "succsefuly created ".$IncidentNumber,undef);
+      $wf->Store($WfRec,{stateid=>6,
                          eventend=>NowStamp("en"),
-                         closedate=>NowStamp("en"),
+   #                      closedate=>NowStamp("en"),
                          screqlastsync=>NowStamp("en"),
                          scworkflowid=>$IncidentNumber,
                          step=>$okstep});
+   # 17 is close
+   # 21 is finish
    }
    printf STDERR ("INFO:  Logout is ok\n\n");
    printf STDERR ("Incident Number=%s\n",$IncidentNumber);

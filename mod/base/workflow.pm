@@ -336,6 +336,14 @@ sub new
                 label         =>'Modification-Date',
                 dataobjattr   =>'wfhead.modifydate'),
                                    
+      new kernel::Field::Date(
+                name          =>'mdaterev',
+                group         =>'state',
+                sqlorder      =>'desc',
+                uivisible     =>0,
+                label         =>'Modification-Date reverse',
+                dataobjattr   =>'wfhead.modifydate'),
+                                   
       new kernel::Field::Text(
                 name          =>'step',
                 selectfix     =>1,
