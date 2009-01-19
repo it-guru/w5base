@@ -9,6 +9,8 @@
 'REmployee'=>{ de=>'Mitarbeiter', en=>'Employee'},
 'RBoss'=>{ de=>'Leiter', en=>'Chef'},
 'RBoss2'=>{ de=>'Leiter-Vertreter', en=>'Debuty-Chef'},
+'RApprentice'=>{ de=>'Auszubildender', en=>'Apprentice'},
+'RFreelancer'=>{ de=>'freier Mitarbeiter', en=>'Freelancer'},
 'RQManager'=>{ de=>'Qualitäts-Manager', en=>'Quality-Manager'},
 'RINManager'=>{ de=>'Incident-Manager', en=>'Incident-Manager'},
 'RCHManager'=>{ de=>'Change-Manager', en=>'Change-Manager'},

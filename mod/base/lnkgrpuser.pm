@@ -46,7 +46,7 @@ sub new
                                        value      =>$role->{value});
    {
       $roles->{userrole}=$self->{lnkgrpuserrole};
-      $roles->{multisize}=6;
+      $roles->{multisize}=7;
       $roles->{searchable}=0;
       $roles->{onRawValue}=
          sub {

@@ -82,18 +82,23 @@ sub new
       new kernel::Field::Select(
                 name          =>'role',
                 label         =>'Role',
-                value         =>['RMember','REmployee','RAdmin','RDataAdmin', 
+                value         =>['RMember',
+                                 'REmployee',
                                  'RReportReceive',
                                  'RBoss','RBoss2',
+                                 'RApprentice','RFreelancer',
+                                 'RQManager',
+                                 'RAuditor',
                                  'RINManager',
                                  'RCHManager',
                                  'RCFManager',
                                  'RPRManager',
-                                 'RQManager',
                                  'RControlling',
                                  'RBackoffice',
-                                 'RAuditor',
-                                 'RTimeManager'],
+                                 'RTimeManager',
+                                 'RAdmin',
+                                 'RDataAdmin'
+                                ],
                 dataobjattr   =>'lnkgrpuserrole.role'),
 
       new kernel::Field::Text(

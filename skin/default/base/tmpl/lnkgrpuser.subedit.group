@@ -1,16 +1,20 @@
 <div class=editframe>
    <table class=editframe>
-      <tr>
+      <tr height=25>
          <td class=fname width=10%>%user(label)%:</td>
          <td class=finput width=40%>%user(sublistedit)%</td>
          <td class=fname width=10%>%roles(label)%:</td>
-         <td class=finput width=40% valign=top rowspan=2>%roles(sublistedit)%</td>
+         <td class=finput width=40% valign=top rowspan=3>%roles(sublistedit)%</td>
+      </tr>
+      <tr height=25>
+         <td class=fname >%expiration(label)%:</td>
+         <td class=finput colspan=2 >%expiration(sublistedit)%</td>
       </tr>
       <tr>
-         <td class=fname >&nbsp;</td>
-         <td class=finput ></td>
-         <td class=fname >&nbsp;</td>
+         <td class=fname valign=top >%comments(label)%:</td>
+         <td class=finput colspan=2 >%comments(sublistedit)%</td>
       </tr>
+
    </table>
 </div>
 %StdButtonBar(subadd,subdelete,subsave,subcancel)%
