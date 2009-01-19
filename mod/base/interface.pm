@@ -314,7 +314,7 @@ sub showFields
    return(interface::SOAP::kernel::Finish(
           SOAP::Data->name(output=>{exitcode=>0,
                                     lastmsg=>[],
-                                    records=>\@l})->type("struct")));
+                                    records=>\@l})->type("Struct")));
 }
 
 sub storeRecord
@@ -542,7 +542,7 @@ sub Ping
 #   return({SOAP::Data->name(exitcode=>0),
 #          SOAP::Data->name(text=>'Hans'),
 #          SOAP::Data->name(result=>1)});
-   return(SOAP::Data->name(output=>{exitcode=>0,result=>1})->type("struct"));
+   return(SOAP::Data->name(output=>{exitcode=>0,result=>1})->type("Struct"));
 }
 
 package interface::SOAP::kernel;

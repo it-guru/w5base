@@ -617,7 +617,7 @@ sub createConfig
    }
 
    return(undef) if (!defined($result) || 
-                     (ref($result) ne "HASH" && ref($result) ne "struct") ||
+                     (ref($result) ne "HASH" && ref($result) ne "Struct") ||
                      $result->{result}==0);
 
    return({base=>$base,user=>$user,pass=>$pass,SOAP=>$SOAP,
