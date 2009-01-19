@@ -250,7 +250,7 @@ sub SecureSetFilter
    my $self=shift;
    if (!$self->IsMemberOf("admin")){
       my $userid=$self->getCurrentUserId();
-      my %groups=$self->getGroupsOf($ENV{REMOTE_USER},'RMember','down');
+      my %groups=$self->getGroupsOf($ENV{REMOTE_USER},'RMember','up');
       return($self->SUPER::SecureSetFilter([{owner=>\$userid},
                                             {aclmode=>['write','read'],
                                              acltarget=>\'base::user',
