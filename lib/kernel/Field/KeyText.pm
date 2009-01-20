@@ -178,38 +178,45 @@ sub Validate
                                                   "Formated_$name",
                                                   $self->{vjoindisp},
                                                   [$self->{vjoindisp}],%param);
-         if ($#{$keylist}<0 && $fromquery ne ""){
-            $filter={$self->{vjoindisp}=>'"*'.$newval.'*"'};
-            $self->vjoinobj->ResetFilter();
-            $self->vjoinobj->SetFilter($filter);
-            ($dropbox,$keylist,$vallist)=$self->vjoinobj->getHtmlSelect(
-                                                     "Formated_$name",
-                                                     $self->{vjoindisp},
-                                                  [$self->{vjoindisp}],%param);
-         }
-         if ($#{$keylist}>0){
-            $self->FieldCache->{LastDrop}=$dropbox;
-            $self->getParent->LastMsg(ERROR,"'%s' value '%s' is not unique",
-                                             $self->Label,$newval);
-            return(undef);
-         }
-         if ($#{$keylist}<0 && ((defined($fromquery) && $fromquery ne "") ||
-                                (defined($newrec->{$name}) && 
-                                 $newrec->{$name} ne $oldrec->{$name}))){
-            $self->getParent->LastMsg(ERROR,"'%s' value '%s' not found",
-                                      $self->Label,$newval);
-            return(undef);
-         }
-         my $dstkey=$self->vjoinobj->getVal($self->vjoinobj->IdField->Name(),
-                    $filter);
-         Query->Param("Formated_".$name=>$vallist->[0]);
-         if ($self->{vjoinon}->[0] ne $name){
-            Query->Param("Formated_".$self->{vjoinon}->[0]=>$dstkey);
-            return({$self->{vjoinon}->[0]=>$dstkey,
-                    $self->Name()=>$vallist->[0]});
+         if (ref($newval) ne "ARRAY"){
+            if ($#{$keylist}<0 && $fromquery ne ""){
+               $filter={$self->{vjoindisp}=>'"*'.$newval.'*"'};
+               $self->vjoinobj->ResetFilter();
+               $self->vjoinobj->SetFilter($filter);
+               ($dropbox,$keylist,$vallist)=$self->vjoinobj->getHtmlSelect(
+                                                        "Formated_$name",
+                                                        $self->{vjoindisp},
+                                                     [$self->{vjoindisp}],%param);
+            }
+            if ($#{$keylist}>0){
+               $self->FieldCache->{LastDrop}=$dropbox;
+               $self->getParent->LastMsg(ERROR,"'%s' value '%s' is not unique",
+                                                $self->Label,$newval);
+               return(undef);
+            }
+            if ($#{$keylist}<0 && ((defined($fromquery) && $fromquery ne "") ||
+                                   (defined($newrec->{$name}) && 
+                                    $newrec->{$name} ne $oldrec->{$name}))){
+               $self->getParent->LastMsg(ERROR,"'%s' value '%s' not found",
+                                         $self->Label,$newval);
+               return(undef);
+            }
+            my $dstkey=$self->vjoinobj->getVal($self->vjoinobj->IdField->Name(),
+                       $filter);
+            Query->Param("Formated_".$name=>$vallist->[0]);
+            if ($self->{vjoinon}->[0] ne $name){
+               Query->Param("Formated_".$self->{vjoinon}->[0]=>$dstkey);
+               return({$self->{vjoinon}->[0]=>$dstkey,
+                       $self->Name()=>$vallist->[0]});
+            }
+            else{
+               return({$self->Name()=>$vallist->[0]});
+            }
          }
          else{
-            return({$self->Name()=>$vallist->[0]});
+            @$newval=grep(!/^\s*$/,@$newval);
+            $newval=undef if ($#{$newval}==-1);
+            return({$self->Name()=>$newval});
          }
 
 
