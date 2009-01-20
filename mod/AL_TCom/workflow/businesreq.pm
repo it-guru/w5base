@@ -70,7 +70,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("customerdata","tcomcod","init","flow");
+   return("affected","customerdata","tcomcod","init","flow");
 }
 
 sub getRequestNatureOptions

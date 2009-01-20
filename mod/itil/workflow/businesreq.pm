@@ -20,7 +20,8 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use base::workflow::request;
-@ISA=qw(base::workflow::request);
+use itil::workflow::base;
+@ISA=qw(base::workflow::request itil::workflow::base);
 
 sub new
 {
@@ -34,6 +35,7 @@ sub Init
 {
    my $self=shift;
    $self->AddGroup("customerdata",translation=>'itil::workflow::businesreq');
+   $self->itil::workflow::base::Init();
    return($self->SUPER::Init(@_));
 }
 
@@ -51,27 +53,6 @@ sub getDynamicFields
                                   getPostibleValues=>\&XgetRequestNatureOptions,
                                   container  =>'headref'),
 
-      new kernel::Field::KeyText( name       =>'affectedapplication',
-                                  translation=>'itil::workflow::base',
-                                  readonly   =>sub {
-                                     my $self=shift;
-                                     my $current=shift;
-                                     return(0) if (!defined($current));
-                                     return(1);
-                                  },
-                                  vjointo    =>'itil::appl',
-                                  vjoinon    =>['affectedapplicationid'=>'id'],
-                                  vjoindisp  =>'name',
-                                  keyhandler =>'kh',
-                                  container  =>'headref',
-                                  label      =>'Affected Application'),
-      new kernel::Field::KeyText( name       =>'affectedapplicationid',
-                                  htmldetail =>0,
-                                  translation=>'itil::workflow::base',
-                                  searchable =>0,
-                                  keyhandler =>'kh',
-                                  container  =>'headref',
-                                  label      =>'Affected Application ID'),
       new kernel::Field::Text(    name       =>'customerrefno',
                                   htmleditwidth=>'100px',
                                   group      =>'customerdata',
@@ -207,12 +188,12 @@ sub getStepByShortname
 sub isViewValid
 {
    my $self=shift;
-   return($self->SUPER::isViewValid(@_),"customerdata");
+   return($self->SUPER::isViewValid(@_),"affected","customerdata");
 }
 
 sub getDetailBlockPriority            # posibility to change the block order
 {
-   return("customerdata","init","flow");
+   return("header","affected","customerdata","init","flow");
 }
 
 sub getRecordImageUrl
@@ -298,6 +279,21 @@ EOF
    return($templ);
 }
 
+sub nativProcess
+{
+   my $self=shift;
+   my $action=shift;
+   my $h=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+
+   return($self->SUPER::nativProcess($action,$h,$WfRec,$actions));
+}
+
+
+
+
 sub Process
 {
    my $self=shift;
@@ -316,6 +312,7 @@ sub Process
          $self->LastMsg(ERROR,"unknown error") if (!$self->LastMsg());
          return(0);
       }
+      
    }
    return($self->SUPER::Process($action,$WfRec));
 }
@@ -330,19 +327,66 @@ sub Validate
    my $aid=effVal($oldrec,$newrec,"affectedapplicationid");
    if ($aid ne ""){
       $aid=[$aid] if (ref($aid) ne "ARRAY");
-      my $appl=getModuleObject($self->Config,"itil::appl");
-      $appl->SetFilter({id=>$aid});
+      my $co=getModuleObject($self->getParent->Config,"itil::costcenter");
+      my $app=getModuleObject($self->getParent->Config,"itil::appl");
+
+      $app->SetFilter({id=>$aid});
+      my @l=$app->getHashList(qw(custcontracts mandator 
+                                 conumber mandatorid));
+
+
+      my %custcontract;
+      my %custcontractid;
+      my %mandator;
+      my %mandatorid;
       my %conumber;
-      foreach my $arec ($appl->getHashList(qw(conumber))){
-         $conumber{$arec->{conumber}}++ if ($arec->{conumber} ne "");
-         $found++;
+      foreach my $apprec (@l){
+         if (defined($apprec->{mandator})){
+            $mandator{$apprec->{mandator}}=1;
+         }
+         if (defined($apprec->{mandatorid})){
+            $mandatorid{$apprec->{mandatorid}}=1;
+         }
+         if (defined($apprec->{conumber}) && $apprec->{conumber} ne ""){
+            $co->ResetFilter();
+            $co->SetFilter({name=>\$apprec->{conumber},cistatusid=>"<=4"});
+            my ($corec)=$co->getOnlyFirst("id");
+            if (!defined($corec)){
+               $self->LastMsg(ERROR,"invalid or inactive costcenter ".
+                                    "used in application configuration");
+               return(0);
+            }
+            $conumber{$apprec->{conumber}}=1;
+         }
+         next if (!defined($apprec->{custcontracts}));
+         foreach my $rec (@{$apprec->{custcontracts}}){
+            if (defined($rec->{custcontractid})){
+               $custcontractid{$rec->{custcontractid}}=1;
+            }
+            if (defined($rec->{custcontract})){
+               $custcontract{$rec->{custcontract}}=1;
+            }
+         }
+      }
+      if (keys(%custcontractid)){
+         $newrec->{affectedcontractid}=[keys(%custcontractid)];
+      }
+      if (keys(%custcontract)){
+         $newrec->{affectedcontract}=[keys(%custcontract)];
+      }
+      if (keys(%mandator)){
+         $newrec->{mandator}=[keys(%mandator)];
+      }
+      if (keys(%mandatorid)){
+         $newrec->{mandatorid}=[keys(%mandatorid)];
       }
       if (keys(%conumber)){
-         $newrec->{conumber}=[keys(%conumber)];
+         $found++;
+         $newrec->{involvedcostcenter}=[keys(%conumber)];
       }
    }
    if ($found!=1){
-      $self->LastMsg(ERROR,"no application found in request");
+      $self->LastMsg(ERROR,"no valid application found in request");
       return(0);
    }
    

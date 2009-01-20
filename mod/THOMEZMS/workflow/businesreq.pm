@@ -45,6 +45,7 @@ sub getDynamicFields
                                   translation=>'THOMEZMS::workflow::businesreq',
                                          value      =>[
 
+        "",
         "174524-0000; Basisleistungen Applikationsbetrieb",
         "174524-0001; Operativer Change",
         "174524-0002; Incident",
@@ -108,7 +109,7 @@ sub getDynamicFields
 
                                          ],
                                          default    =>'undef',
-                                         group      =>'default',
+                                         group      =>'customerdata',
                                          container  =>'headref'),
    ));
 }
@@ -124,6 +125,25 @@ sub getSpecificDataloadForm
 </tr>
 EOF
    return($templ.$self->SUPER::getSpecificDataloadForm());
+}
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $origrec=shift;
+
+   if (!defined($oldrec) &&
+       $newrec->{zmsarticleno} eq ""){
+      $self->LastMsg(ERROR,"no article number selected");
+      return(undef);
+   }
+
+   printf STDERR ("fifi oldrec=%s\n",Dumper($oldrec));
+   printf STDERR ("fifi newrec=%s\n",Dumper($newrec));
+
+   return($self->SUPER::Validate($oldrec,$newrec,$origrec));
 }
 
 
