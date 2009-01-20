@@ -380,13 +380,15 @@ sub generateMailSet
       # wffields.eventstatreason entfernt lt. Request ID:12077277280002  
       #push(@baseset,"wffields.eventstatreason");
    }
-   # my $fo=$self->getField("wffields.eventmode",$WfRec);
-   # if (defined($fo)){
-   #    my $v=$fo->FormatedResult($WfRec,"HtmlMail");
-   #    if ($v ne ""){
-   #       $$smstext.=$v."\n";
-   #    }
-   # }
+   if ($WfRec->{eventmode} ne "EVk.appl"){
+      my $fo=$self->getField("wffields.eventmode",$WfRec);
+      if (defined($fo)){
+         my $v=$fo->FormatedResult($WfRec,"HtmlMail");
+         if ($v ne ""){
+            $$smstext.=$v."\n";
+         }
+      }
+   }
 
    my @sets=([@baseset,qw(
                           wffields.eventimpact

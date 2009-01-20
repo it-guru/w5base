@@ -961,9 +961,14 @@ sub generateNotificationPreview
    my $self=shift;
    my %param=@_;
    my $email=$param{to};
-   $email=join("; ",@{$param{to}})   if (ref($param{to}) eq "ARRAY");;
+   if (ref($param{to}) eq "ARRAY"){
+      $email=join("; ",grep(!/^\s*$/,@{$param{to}}));
+   }
    my $emailcc="";
-   $emailcc=join("; ",@{$param{cc}}) if (ref($param{cc}) eq "ARRAY");
+ 
+   if (ref($param{cc}) eq "ARRAY"){
+      $emailcc=join("; ",grep(!/^\s*$/,@{$param{cc}}));
+   }
 
    my $preview=$self->getParent->T("Preview");
    $preview.=":";

@@ -649,13 +649,35 @@ sub getDetailBlockPriority                # posibility to change the block order
 sub isWriteValid
 {
    my $self=shift;
-   my $rec=shift;
-   return(1) if (!defined($rec));
+   my $WfRec=shift;
+   return(1) if (!defined($WfRec));
    my @grplist=("eventnotify","alteventnotify","eventnotifystat",
              "eventnotifyinternal","relations");
-   if (($rec->{state}<=20 &&
-       $self->getParent->getCurrentUserId()==$rec->{openuser}) ||
-        $self->IsIncidentManager($rec) ||
+
+   my $teammember=0;
+   if (defined($WfRec->{initiatorgroupid})){
+      my $gid=$WfRec->{initiatorgroupid};
+      if (ref($gid) ne "ARRAY"){
+         $gid=[$gid];
+      }
+      @$gid=grep(!/^\s*$/,@$gid);
+      if ($#{$gid}!=-1){
+         my %groups=$self->getGroupsOf($ENV{REMOTE_USER},
+                                       ['REmployee','RBoss','RBoss2'],'direct');
+         foreach my $mygid (keys(%groups)){
+            if (grep(/^$mygid$/,@$gid)){
+               $teammember++;
+            }
+         }
+      }
+   }
+
+
+
+   if (($WfRec->{state}<=20 &&
+       $self->getParent->getCurrentUserId()==$WfRec->{openuser}) ||
+        $self->IsIncidentManager($WfRec) ||
+        $teammember!=0 ||
         $self->getParent->IsMemberOf("admin")){
       return(@grplist);
    }
@@ -782,8 +804,29 @@ sub getPosibleActions
    my $userid=$self->getParent->getCurrentUserId();
    my @l=();
 
+
+   my $teammember=0;
+   if (defined($WfRec->{initiatorgroupid})){
+      my $gid=$WfRec->{initiatorgroupid};
+      if (ref($gid) ne "ARRAY"){
+         $gid=[$gid];
+      }
+      @$gid=grep(!/^\s*$/,@$gid);
+      if ($#{$gid}!=-1){
+         my %groups=$self->getGroupsOf($ENV{REMOTE_USER},
+                                       ['REmployee','RBoss','RBoss2'],'direct');
+         foreach my $mygid (keys(%groups)){
+            if (grep(/^$mygid$/,@$gid)){
+               $teammember++;
+            }
+         }
+      }
+   }
+
+
    if (($WfRec->{state}<21 && 
        $WfRec->{openuser}==$userid) || 
+       $teammember!=0 || 
         $self->IsIncidentManager($WfRec) ||
         $self->getParent->IsMemberOf(["admin","admin.workflow"])){
       push(@l,"addnote");
@@ -1627,10 +1670,11 @@ sub Validate
       }
       my $appl=getModuleObject($self->Config,"itil::appl");
       $appl->SetFilter({id=>$applid,cistatusid=>"<=4"});
-      my (%mandator,%mandatorid,%responseteam,%businessteam,
+      my (%mandator,%mandatorid,%responseteam,%businessteam,%conumber,
           %customer,%customerid,%custcontract,%custcontractid);
       foreach my $rec ($appl->getHashList(qw(mandator mandatorid 
                                customer customerid businessteam responseteam
+                               conumber
                                custcontracts eventlang))){
          $responseteam{$rec->{responseteam}}=1 if ($rec->{responseteam} ne "");
          $businessteam{$rec->{businessteam}}=1 if ($rec->{businessteam} ne "");
@@ -1638,6 +1682,7 @@ sub Validate
          $customerid{$rec->{customerid}}=1 if ($rec->{customerid} ne "");
          $mandator{$rec->{mandator}}=1 if ($rec->{mandator} ne "");
          $mandatorid{$rec->{mandatorid}}=1 if ($rec->{mandatorid} ne "");
+         $conumber{$rec->{conumber}}=1 if ($rec->{conumber} ne "");
          $eventlang=$rec->{eventlang};
          if (ref($rec->{custcontracts}) eq "ARRAY"){
             foreach my $contr (@{$rec->{custcontracts}}){
@@ -1663,16 +1708,16 @@ sub Validate
       $newrec->{affectedcustomer}=[keys(%customer)];
       $newrec->{affectedcustomerid}=[keys(%customerid)];
       $newrec->{involvedcustomer}=[keys(%customer)];
+      $newrec->{involvedcostcenter}=[keys(%conumber)];
       $newrec->{involvedbusinessteam}=[keys(%businessteam)];
       $newrec->{involvedresponseteam}=[keys(%responseteam)];
-      my %groups=$self->getGroupsOf($ENV{REMOTE_USER},
-                                    ['REmployee','RBoss','RBoss2'],'direct');
-      printf STDERR ("fifi groups=%s\n",Dumper(\%groups));
-      my @grpids=keys(%groups);
-      if ($#grpids!=-1){
-         $newrec->{initiatorgroupid}=\@grpids;
-         $newrec->{initiatorgroup}=[map({$groups{$_}->{fullname}} @grpids)];
-      }
+   }
+   my %groups=$self->getGroupsOf($ENV{REMOTE_USER},
+                                 ['REmployee','RBoss','RBoss2'],'direct');
+   my @grpids=keys(%groups);
+   if ($#grpids!=-1){
+      $newrec->{initiatorgroupid}=\@grpids;
+      $newrec->{initiatorgroup}=[map({$groups{$_}->{fullname}} @grpids)];
    }
    $eventlang=$self->getParent->Lang() if ($eventlang eq "");
    $eventlang="en" if ($eventlang eq "");
