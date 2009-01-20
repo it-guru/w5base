@@ -8,7 +8,7 @@
                   'dokumentiert werden. Dieses spezielle Betriebstagebuch '.
                   'ist zur schellen und effektiven Dokumentation von '.
                   'Kleinarbeiten ausgerichtet. Es sind nur Einträge erlaubt '.
-                  'mit einem Aufwand von weniger als 60 Minuten. '.
+                  'mit einem Aufwand von weniger als 8 Stunden. '.
                   'Dieser Workflow erzeugt keine speziellen '.
                   'Betriebstagebücher sondern stellt nur eine schnelle '.
                   'Eingabemöglichkeit dar.',
@@ -17,7 +17,7 @@
                   'This diary is specaliy designed to documentate '.
                   'short jobs. '.
                   'It is only allowed for jobs with a duration less than '.
-                  '60 minutes ',
+                  '8 hours ',
                   },
 
 'Application'=>{de=>'Anwendung'},
