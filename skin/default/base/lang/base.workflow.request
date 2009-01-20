@@ -13,6 +13,7 @@
 'wfforward'=>{de=>'Weiterleitung',en=>'Forward'},
 'wfreactiv'=>{de=>'Reaktiviert',en=>'Reactivate'},
 'wfdefer'=>{de=>'Zurückgestellt',en=>'defered'},
+'initinfo'=>{de=>'Initiator Info versandt',en=>'initiator info send'},
 'wfcallback'=>{de=>'Zurückgerufen',en=>'Calledback'},
 'fieldgroup.init'=>{de=>'Anforderungszuordnung',en=>'Initiator infos'},
 'Initiated by'=>{de=>'Initiert/angefordert durch'},

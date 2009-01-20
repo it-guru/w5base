@@ -1329,24 +1329,38 @@ sub PostProcess
    }
 
    if ($action eq "SaveStep.wfacceptp" ||
+       $action eq "SaveStep.wffine" ||
        $action eq "SaveStep.wffineproc"){
       if ($WfRec->{initiatorid} ne "" &&
           $WfRec->{initiatorid} ne $WfRec->{openuser}){
          my $n=$param{note};
          $n="\n\n".$n if ($n ne "");
-         $aobj->NotifyForward($WfRec->{id},
-                              'base::user',
-                              $WfRec->{initiatorid},
-                              'Initiator',
-                              $self->T('Your request has been processed. '.
-                              'For further informations use the '.
-                              'attached link','base::workflow::request').$n.
-                              "\n\n-- ".
-                              $self->T("original request text",
-                                       'base::workflow::request').
-                              " --\n".$WfRec->{detaildescription}."\n----\n",
-                              mode=>'INFO:',
-                              workflowname=>$workflowname);
+         my $foundinfo=0;
+         if (ref($WfRec->{shortactionlog}) eq "ARRAY" &&
+             $#{$WfRec->{shortactionlog}}>0 &&
+             $WfRec->{shortactionlog}->[$#{$WfRec->{shortactionlog}}-1]->{name}
+             eq "initinfo"){
+            $foundinfo=1;
+         } 
+         if (!$foundinfo){
+            if ($aobj->StoreRecord(
+                $WfRec->{id},"initinfo",
+                {translation=>'base::workflow::request'},"",undef)){
+               $aobj->NotifyForward($WfRec->{id},
+                                 'base::user',
+                                 $WfRec->{initiatorid},
+                                 'Initiator',
+                                 $self->T('Your request has been processed. '.
+                                 'For further informations use the '.
+                                 'attached link','base::workflow::request').$n.
+                                 "\n\n-- ".
+                                 $self->T("original request text",
+                                          'base::workflow::request').
+                                 " --\n".$WfRec->{detaildescription}."\n----\n",
+                                 mode=>'INFO:',
+                                 workflowname=>$workflowname);
+            }
+         }
       }
    }
    if ($action eq "SaveStep.wfactivate"){
