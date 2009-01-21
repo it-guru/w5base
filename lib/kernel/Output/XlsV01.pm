@@ -212,7 +212,7 @@ sub ProcessHead
    my @view=@{$self->{fieldobjects}};
 
    for(my $cellno=0;$cellno<=$#view;$cellno++){
-      next if (!($view[$cellno]->UiVisible()));
+      #next if (!($view[$cellno]->UiVisible()));   # ist nicht mehr notwendig
       next if ($view[$cellno]->Type() eq "Interface");
       next if ($view[$cellno]->Type() eq "Container");
       my $xlscellno=$self->{xlscollindex}->{$view[$cellno]->Name()};
