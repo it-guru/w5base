@@ -519,7 +519,7 @@ sub FullView
          my @not=qw(mit einer einen eines der die das ich du er sie es wir
                     auf in dem dessen ab meinen im gehe gehen vom wie was
                     und nicht für voll nach bringen bringt oder bei
-                    finden finde greift gegeben 
+                    finden finde greift gegeben zur nur
                     ihr euer werden wird kann man muß eingegeben);
          foreach my $keyword (@kw){
             my $qkeyword=quotemeta($keyword);
