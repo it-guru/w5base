@@ -103,6 +103,14 @@ sub new
                 label         =>'Analyse type',
                 dataobjattr   =>'rootcausem1.analyse_type'),
 
+      new kernel::Field::Select(
+                name          =>'solutiontype',
+                group         =>'status',
+                value         =>["",1,2],
+                transprefix   =>'SOLT.',
+                label         =>'Solution type',
+                dataobjattr   =>'rootcausem1.solution_type'),
+
       new kernel::Field::Text(
                 name          =>'subcat1',
                 group         =>'status',
