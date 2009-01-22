@@ -35,7 +35,7 @@
 'ANAT.1'=>{de=>'Grund gefunden',en=>'cause found'},
 'ANAT.2'=>{de=>'Grund nicht gefunden',en=>'cause not found'},
 'Analyse type'=>{de=>'Analyse Ergebnis'},
-'Solution type'=>{de=>'Solution Ergebnis'},
+'Solution type'=>{de=>'Lösungstyp'},
 'SOLT.'=>{de=>'',en=>''},
 'SOLT.1'=>{de=>'kein Fehler',en=>'Works as designed'},
 'SOLT.2'=>{de=>'ServiceCenter Change',en=>'ServiceCenter Change'},
