@@ -95,6 +95,14 @@ sub new
                 label         =>'Category',
                 dataobjattr   =>'rootcausem1.category'),
 
+      new kernel::Field::Select(
+                name          =>'analysetype',
+                group         =>'status',
+                value         =>["",1,2],
+                transprefix   =>'ANAT.',
+                label         =>'Analyse type',
+                dataobjattr   =>'rootcausem1.analyse_type'),
+
       new kernel::Field::Text(
                 name          =>'subcat1',
                 group         =>'status',

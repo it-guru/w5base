@@ -31,4 +31,7 @@
 'Sub Category 3'=>{de=>'Unterkategorie 3'},
 'Problem No.'=>{de=>'Problemnummer'},
 'SysModTime'=>{de=>'letzte Bearbeitung'},
-
+'ANAT.'=>{de=>'',en=>''},
+'ANAT.1'=>{de=>'Grund gefunden',en=>'cause found'},
+'ANAT.2'=>{de=>'Grund nicht gefunden',en=>'cause not found'},
+'Analyse type'=>{de=>'Analyse Ergebnis'},
