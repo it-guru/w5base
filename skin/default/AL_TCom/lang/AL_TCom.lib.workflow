@@ -58,6 +58,8 @@
                          en=>'Applicationoperation'},
 'db'=>                  {de=>'Datenbankbetrieb',
                          en=>'Databaseoperation'},
+'.base.'=>              {de=>'Basisleistung',
+                         en=>'Base service'},
 '.add.'=>               {de=>'Sonderleistung',
                          en=>'Add service'},
 '.addeff.'=>            {de=>'Sonderleistung nach Aufwand',
@@ -66,6 +68,8 @@
                          en=>'Add service out of SSK'},
 '.addfix.'=>            {de=>'Sonderleistung Festpreis',
                          en=>'Add service fix-price'},
+'.base'=>               {de=>'Basisleistung',
+                         en=>'Base service'},
 
 
 'appl.add.impl'=>       {de=>'AppBetr/SL/Einführungsphase',
@@ -98,6 +102,8 @@
                          en=>'AppOps/add.svcs/desaster-recovery tests'},
 'appl.add.uninst'=>     {de=>'AppBetr/SL/Deinst. von Appl.-Teilen',
                          en=>'AppOps/add.svcs/deinst. parts of appl.'},
+'appl.base.base'=>      {de=>'AppBetr/BL/Basisleistung',
+                         en=>'AppOps/base/base service'},
 'db.addeff.base'=>      {de=>'DB-Betr/SL/Basisleistung außerh. SSK',
                          en=>'DB-Ops/add.svcs/basic svcs out of SSK'},
 'db.addfix.swinst'=>    {de=>'DB-Betr/SL/Installation der Software',
@@ -126,6 +132,8 @@
                          en=>'DB-Ops/add svcs/licence provisioning (T+M)'},
 'db.addeff.maint'=>     {de=>'DB-Betr/SL/Wartung der Software',
                          en=>'DB-Ops/add svcs/provisioning of SW maint. (T+M)'},
+'db.base.base'=>        {de=>'DB-Betr/BL/Basisleistung',
+                         en=>'DB-Ops/base/base service'},
 'sw.addeff.base'=>      {de=>'Basisleistung',
                          en=>'basic svcs'},
 

@@ -160,6 +160,7 @@ sub tcomcodcause
    appl.add.fallback
    appl.add.rectest
    appl.add.uninst
+   appl.base.base
    db.addeff.base
    db.addfix.swinst
    db.addfix.firstcfg
@@ -174,6 +175,7 @@ sub tcomcodcause
    db.addeff.rtest
    db.addeff.licprov
    db.addeff.maint
+   db.base.base
    ETAbusiness
    ETAplan
    ETApromblemanalyse
