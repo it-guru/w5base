@@ -1,4 +1,4 @@
-package THOMEZMS::workflow::businesreq;
+package THOMEZMD::workflow::businesreq;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -42,7 +42,7 @@ sub getDynamicFields
            new kernel::Field::Select(    name       =>'zmsarticleno',
                                          label      =>'ZMD Article number',
                                   htmleditwidth=>'80%',
-                                  translation=>'THOMEZMS::workflow::businesreq',
+                                  translation=>'THOMEZMD::workflow::businesreq',
                                          value      =>[
 
         "",

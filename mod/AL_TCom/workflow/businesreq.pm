@@ -102,6 +102,7 @@ sub isWriteValid
    if (grep(/^init$/,@grps)){
       push(@grps,"tcomcod");
    }
+printf STDERR ("fifi grps=%s\n",Dumper(\@grps));
    return(@grps);
 }
 

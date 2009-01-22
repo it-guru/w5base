@@ -1,4 +1,4 @@
-package THOMEZMS::menu::root;
+package THOMEZMD::menu::root;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -34,11 +34,11 @@ sub Init
 {
    my $self=shift;
 
-   $self->RegisterObj('THOMEZMS::workflow::businesreq$',
+   $self->RegisterObj('THOMEZMD::workflow::businesreq$',
                       "base::workflow",
                       func=>'New',
-                      param=>'WorkflowClass=THOMEZMS::workflow::businesreq',
-                      defaultacl=>['DTAG.T-Home.ZMS']);
+                      param=>'WorkflowClass=THOMEZMD::workflow::businesreq',
+                      defaultacl=>['DTAG.T-Home.ZMD']);
 
    return(1);
 }
