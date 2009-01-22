@@ -64,16 +64,7 @@ sub TestMail1
    my $self=shift;
 
    my $wf=getModuleObject($self->Config,"base::workflow");
-   if (my $id=$wf->Store(undef,{
-          mandator=>class    =>'base::workflow::mailsend',
-          step     =>'base::workflow::mailsend::dataload',
-          name     =>'eine Mail vom Testevent1 mit äöüß',
-          emailto  =>'hartmut.vogler@xxxxxxxx.com',
-          emailtext=>'Hallo Welt'
-         })){
-      my $r=$wf->Store($id,step=>'base::workflow::mailsend::waitforspool');
-      return({msg=>'versandt'});
-   }
+   my $r=$wf->Store(12295216960002,{mandator=>['AL T-Com','xx',mandatorid=>44]});
    return({msg=>'shit'});
 }
 

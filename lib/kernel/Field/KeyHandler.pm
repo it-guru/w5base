@@ -143,14 +143,14 @@ sub FinishWrite
       my %data;
       if (ref($newval->{$k}) eq "ARRAY"){
          foreach my $data (@{$newval->{$k}}){
-            $data{$data}=1;
+            $data{lc($data)}=$data if (!exists($data{lc($data)}));
          }
       }
       else{
-         $data{$newval->{$k}}=1;
+         $data{lc($newval->{$k})}=$newval->{$k};
       }
       foreach my $data (keys(%data)){
-         $insdata{fval}=$data;
+         $insdata{fval}=$data{$data};
          my $cmd="(".join(",",map({$self->{db}->quotemeta($insdata{$_})}
                                   @insvar)).")";
          push(@insertvalue,$cmd);
