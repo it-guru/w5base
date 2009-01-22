@@ -101,7 +101,6 @@ sub isWriteValid
    my @grps=$self->SUPER::isWriteValid($rec);
    if (grep(/^init$/,@grps)){
       my $mandatorid=$rec->{mandatorid}; 
-      printf STDERR ("fifi mandator=%s\n",Dumper($mandatorid));
       $mandatorid=[$mandatorid] if (ref($mandatorid) ne "ARRAY");
       @$mandatorid=grep(!/^\s*$/,@$mandatorid);
       if ($#{$mandatorid}!=-1){
@@ -113,7 +112,6 @@ sub isWriteValid
          push(@grps,"tcomcod");
       }
    }
-#printf STDERR ("fifi grps=%s\n",Dumper(\@grps));
    return(@grps);
 }
 
