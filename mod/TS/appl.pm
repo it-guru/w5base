@@ -58,6 +58,7 @@ sub new
                                             OSY::workflow::diary
                                             itil::workflow::devrequest
                                             AL_TCom::workflow::businesreq
+                                            THOMEZMD::workflow::businesreq
                                             base::workflow::DataIssue
                                             AL_TCom::workflow::change
                                             AL_TCom::workflow::problem

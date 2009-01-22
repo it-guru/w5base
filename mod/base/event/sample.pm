@@ -65,7 +65,7 @@ sub TestMail1
 
    my $wf=getModuleObject($self->Config,"base::workflow");
    if (my $id=$wf->Store(undef,{
-          class    =>'base::workflow::mailsend',
+          mandator=>class    =>'base::workflow::mailsend',
           step     =>'base::workflow::mailsend::dataload',
           name     =>'eine Mail vom Testevent1 mit äöüß',
           emailto  =>'hartmut.vogler@xxxxxxxx.com',
