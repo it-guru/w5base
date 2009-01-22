@@ -134,7 +134,7 @@ sub new
                 vjoinon       =>['id'=>'wfheadid'],
                 vjoindisp     =>[qw(ascid cdate id name actionref
                                   translation owner additional
-                                  effort comments)]),
+                                  effort comments creator)]),
                                    
       new kernel::Field::WorkflowRelation(
                 name          =>'relations',
@@ -279,21 +279,24 @@ sub new
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
-                   my $fobj=$self->getParent->getField("shortactionlog");
-                   my $d=$fobj->RawValue($current);
-                   my $dsum;
-                   if (defined($d) && ref($d) eq "ARRAY"){
-                      foreach my $arec (@{$d}){
-                         if (defined($arec->{effort}) &&
-                             $arec->{effort}!=0){
-                            $dsum+=$arec->{effort};
+                   if ($self->getParent->isEffortReadAllowed($current)){
+                      my $fobj=$self->getParent->getField("shortactionlog");
+                      my $d=$fobj->RawValue($current);
+                      my $dsum;
+                      if (defined($d) && ref($d) eq "ARRAY"){
+                         foreach my $arec (@{$d}){
+                            if (defined($arec->{effort}) &&
+                                $arec->{effort}!=0){
+                               $dsum+=$arec->{effort};
+                            }
                          }
                       }
+                      return($dsum);
                    }
-                   return($dsum);
+                   return(undef);
                 },
                 label         =>'sum documented efforts',
-                depend        =>['shortactionlog']),
+                depend        =>['shortactionlog','class','mandatorid']),
                                    
       new kernel::Field::Number(
                 name          =>'documentedefforth',
@@ -305,23 +308,26 @@ sub new
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
-                   my $fobj=$self->getParent->getField("shortactionlog");
-                   my $d=$fobj->RawValue($current);
-                   my $dsum;
-                   if (defined($d) && ref($d) eq "ARRAY"){
-                      foreach my $arec (@{$d}){
-                         if (defined($arec->{effort}) &&
-                             $arec->{effort}!=0){
-                            $dsum+=$arec->{effort};
+                   if ($self->getParent->isEffortReadAllowed($current)){
+                      my $fobj=$self->getParent->getField("shortactionlog");
+                      my $d=$fobj->RawValue($current);
+                      my $dsum;
+                      if (defined($d) && ref($d) eq "ARRAY"){
+                         foreach my $arec (@{$d}){
+                            if (defined($arec->{effort}) &&
+                                $arec->{effort}!=0){
+                               $dsum+=$arec->{effort};
+                            }
                          }
                       }
+                      return(undef) if ($dsum==0);
+                      $dsum=$dsum/60.0;
+                      return($dsum);
                    }
-                   return(undef) if ($dsum==0);
-                   $dsum=$dsum/60.0;
-                   return($dsum);
+                   return(undef);
                 },
                 label         =>'sum efforts in hours',
-                depend        =>['shortactionlog']),
+                depend        =>['shortactionlog','class','mandatorid']),
                                    
       new kernel::Field::Duration(
                 name          =>'eventdurationmin',
@@ -867,6 +873,16 @@ sub getPosibleRelations
    return     if (!defined($WfRec) || 
                   !defined($self->{SubDataObj}->{$WfRec->{class}}));
    return($self->{SubDataObj}->{$WfRec->{class}}->getPosibleRelations($WfRec,@_));
+}
+
+
+sub isEffortReadAllowed
+{
+   my $self=shift;
+   my $WfRec=shift;
+   return     if (!defined($WfRec) || 
+                  !defined($self->{SubDataObj}->{$WfRec->{class}}));
+   return($self->{SubDataObj}->{$WfRec->{class}}->isEffortReadAllowed($WfRec,@_));
 }
 
 
@@ -1839,11 +1855,14 @@ sub getSubListData
    my %param=@_;
 
    $param{ParentMode}=$mode;
+   $param{ShowEffort}=$self->getParent->isEffortReadAllowed($current);
    if ($mode=~m/^.{0,1}Html.*$/){
       $mode="WfShortActionlog";
    }
    return($self->SUPER::getSubListData($current,$mode,%param));
 }
+
+
 
 
 package base::workflow::Textarea;

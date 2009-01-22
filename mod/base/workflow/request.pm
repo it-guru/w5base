@@ -187,7 +187,7 @@ sub isWriteValid
    return(1) if (!defined($rec));
    my @l;
    push(@l,"default") if ($rec->{state}<10 &&
-                         ($self->isCurrentForward() ||
+                         ($self->isCurrentForward($rec) ||
                           $self->getParent->IsMemberOf("admin")));
    if (grep(/^default$/,@l) &&
        ($self->getParent->getCurrentUserId() != $rec->{initiatorid} ||
@@ -363,8 +363,8 @@ sub getPosibleActions
       push(@l,"wfacceptn"); # workflow annehmen und notiz anf(durch Bearbeiter)
       push(@l,"wfreject");  # workflow bearbeitung abgelehnt (durch Bearbeiter)
    }
-   if (($stateid==2 || $stateid==4 || $stateid==10) && ($iscurrent || 
-                                        ($isadmin && !$lastworker==$userid))){
+   if (($stateid==2 || $stateid==3 || $stateid==4 || $stateid==10) && 
+       ($iscurrent || ($isadmin && !$lastworker==$userid))){
       push(@l,"wfforward"); # workflow weiterleiten   (neuen Bearbeiter setzen)
    }
    if ($isadmin){

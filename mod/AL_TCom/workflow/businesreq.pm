@@ -100,9 +100,20 @@ sub isWriteValid
    my $rec=shift;
    my @grps=$self->SUPER::isWriteValid($rec);
    if (grep(/^init$/,@grps)){
-      push(@grps,"tcomcod");
+      my $mandatorid=$rec->{mandatorid}; 
+      printf STDERR ("fifi mandator=%s\n",Dumper($mandatorid));
+      $mandatorid=[$mandatorid] if (ref($mandatorid) ne "ARRAY");
+      @$mandatorid=grep(!/^\s*$/,@$mandatorid);
+      if ($#{$mandatorid}!=-1){
+         if ($self->getParent->IsMemberOf($mandatorid,"RMember")){
+            push(@grps,"tcomcod");
+         }
+      }
+      else{
+         push(@grps,"tcomcod");
+      }
    }
-printf STDERR ("fifi grps=%s\n",Dumper(\@grps));
+#printf STDERR ("fifi grps=%s\n",Dumper(\@grps));
    return(@grps);
 }
 

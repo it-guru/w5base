@@ -467,6 +467,15 @@ sub FinishWrite
    return($self->SUPER::FinishWrite($oldrec,$newrec));
 }
 
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my $grp=shift;
+   my %param=@_;
+   return("header","default","actiondata","additional","source");
+}
+
+
 
 
 1;

@@ -123,6 +123,7 @@ sub ProcessLine
    my $app=$self->getParent->getParent();
    my $view=$app->getCurrentViewName();
    my @view=$app->getCurrentView();
+   my $userid=$app->getCurrentUserId();
    $self->{lineclass}=1 if (!exists($self->{lineclass}));
    my $d="";
    my $lineclass="subline".$self->{lineclass};
@@ -130,17 +131,24 @@ sub ProcessLine
    my $idfield=$app->IdField();
    my $idfieldname=$idfield->Name();
    my $id=$idfield->RawValue($rec);
+   my $isadmin=0;
+   $isadmin=1 if ($app->IsMemberOf("admin"));
+   $isadmin=0;
 
-   if (grep(/^Detail$/,$app->getValidWebFunctions())){
-      if ($idfield){
-         my $dest=$app->Self();
-         $dest=~s/::/\//g;
-         $dest="../../$dest/Detail?$idfieldname=$id&AllowClose=1";
-         my $detailx=$app->DetailX();
-         my $detaily=$app->DetailY();
-         $lineonclick="openwin(\"$dest\",\"_blank\",".
-             "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
-             "resizable=yes,scrollbars=no\")";
+   my $showeffort=$self->{ShowEffort};
+
+   if ($showeffort){
+      if (grep(/^Detail$/,$app->getValidWebFunctions())){
+         if ($idfield){
+            my $dest=$app->Self();
+            $dest=~s/::/\//g;
+            $dest="../../$dest/Detail?$idfieldname=$id&AllowClose=1";
+            my $detailx=$app->DetailX();
+            my $detaily=$app->DetailY();
+            $lineonclick="openwin(\"$dest\",\"_blank\",".
+                "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
+                "resizable=yes,scrollbars=no\")";
+         }
       }
    }
 
@@ -148,9 +156,15 @@ sub ProcessLine
    $d.="<tr class=$lineclass ".
        "onMouseOver=\"this.className='linehighlight'\" ".
        "onMouseOut=\"this.className='$lineclass'\">\n";
-   
-   $d.="<td class=subdatafield onClick=$lineonclick ".
-       "valign=top nowrap style=\"width:10%\">";
+  
+   if ($lineonclick ne ""){
+      $d.="<td class=subdatafield onClick=$lineonclick ".
+          "valign=top nowrap style=\"width:10%\">";
+   }
+   else{
+      $d.="<td class=subdatafield valign=top nowrap ".
+          "style=\"width:auto;cursor:auto\">";
+   }
    { # process mdate field
       my $fieldname="cdate";
       if (exists($self->{fieldkeys}->{$fieldname})){
@@ -168,7 +182,9 @@ sub ProcessLine
                                       mode=>'HtmlWfActionlog',
                                       current=>$rec
                                      },$fieldname,"formated");
-         $d.="<br>($data min)" if ($data ne "");
+        if ($showeffort){
+           $d.="<br>($data min)" if ($data ne "");
+        }
       }
    }
    $d.="</td>";

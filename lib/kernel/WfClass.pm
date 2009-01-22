@@ -81,6 +81,29 @@ sub getPosibleDirectActions
    return();
 }
 
+sub isEffortReadAllowed
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $app=$self->getParent();
+
+   my $mandatorid=$WfRec->{kh}->{mandatorid};
+   $mandatorid=[$mandatorid] if (ref($mandatorid) ne "ARRAY");
+   @$mandatorid=grep(!/^\s*$/,@$mandatorid);
+   if ($#{$mandatorid}!=-1){
+      my @m=$app->getMandatorsOf($app->getCurrentUserId(),["read","direct"]);
+      foreach my $mid (@$mandatorid){
+         if (grep(/^$mid$/,@m)){
+            return(1);
+         }
+      }
+   }
+   else{
+      return(1);
+   }
+   return(0);
+}
+
 
 sub getStepObject
 {
