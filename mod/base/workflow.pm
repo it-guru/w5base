@@ -107,6 +107,7 @@ sub new
 
       new kernel::Field::Interface(
                 name          =>'posibleactions',
+                label         =>'Posible actions',
                 onRawValue    =>\&getPosibleActions,
                 depend        =>['id']),
                                    
@@ -165,6 +166,15 @@ sub new
                 group         =>'state',
                 label         =>'Mandator'),
 
+      new kernel::Field::KeyText(
+                name          =>'mandatorid',
+                keyhandler    =>'kh',
+                selectfix     =>1,
+                htmldetail    =>0,
+                searchable    =>0,
+                group         =>'state',
+                label         =>'MandatorID'),
+
       new kernel::Field::MultiDst (
                 name          =>'fwdtargetname',
                 group         =>'state',
@@ -175,14 +185,6 @@ sub new
                                  'base::user'=>'fullname'],
                 dsttypfield   =>'fwdtarget',
                 dstidfield    =>'fwdtargetid'),
-
-      new kernel::Field::KeyText(
-                name          =>'mandatorid',
-                keyhandler    =>'kh',
-                selectfix     =>1,
-                uivisible     =>0,
-                group         =>'state',
-                label         =>'MandatorID'),
 
       new kernel::Field::Link(
                 name          =>'fwdtarget',   
@@ -210,22 +212,6 @@ sub new
                 label         =>'Event-Start',
                 dataobjattr   =>'wfhead.eventstart'),
 
-      new kernel::Field::Date(
-                name          =>'postponeduntil',
-                searchable    =>0,
-                depend        =>['stateid'],
-                htmldetail    =>sub {
-                   my $self=shift;
-                   my $mode=shift;
-                   my %param=@_;
-                   my $current=$param{current};
-                   return(1) if ($current->{stateid}==5);
-                   return(0);
-                },
-                group         =>'state',
-                label         =>'postponed until',
-                container     =>'headref'),
-                                  
       new kernel::Field::Text(
                 name          =>'eventstartday',
                 htmldetail    =>0,
@@ -442,6 +428,7 @@ sub new
       new kernel::Field::Container(
                 name          =>'headref',
                 group         =>'headref', 
+                label         =>'Workflow internel data',
                 selectfix     =>1,
                 uivisible     =>0,
                 dataobjattr   =>'wfhead.headref'),
@@ -546,6 +533,22 @@ sub new
                 group         =>'state',
                 label         =>'Responsible Group ID'),
 
+      new kernel::Field::Date(
+                name          =>'postponeduntil',
+                searchable    =>0,
+                depend        =>['stateid'],
+                htmldetail    =>sub {
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(1) if ($current->{stateid}==5);
+                   return(0);
+                },
+                group         =>'state',
+                label         =>'postponed until',
+                container     =>'headref'),
+                                  
       new kernel::Field::KeyHandler(
                 name          =>'kh',
                 label         =>'Key Handler',
