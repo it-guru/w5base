@@ -1,4 +1,4 @@
-package AL_TCom::event::ExpandImportV1;
+package AL_TCom::event::ExcelImportV1;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -83,7 +83,6 @@ sub ProcessLineData
    $newrec->{zmsarticleno}="701841-0002; Sonstige Abrufleistungen"; 
    $newrec->{affectedapplication}="Prokom_B_Prod" if ($data->[5] eq "P");
    $newrec->{affectedapplication}="Prokom_B_ETA"  if ($data->[5] eq "T");
-   $newrec->{affectedapplication}="PM-N";
    $self->{appl}->ResetFilter();
    $self->{appl}->SetFilter({name=>\$newrec->{affectedapplication}});
    my ($arec,$msg)=$self->{appl}->getOnlyFirst(qw(ALL));
