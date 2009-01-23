@@ -834,11 +834,12 @@ sub isViewValid
    my $rec=shift;
    my %param=@_;
 
+
    my @addgroups=();
    if ($param{format} ne "kernel::Output::HtmlDetail"){
       @addgroups=qw(default state source initstate);
    }
-   return("default") if (!defined($rec) || 
+   return("default","source","state") if (!defined($rec) || 
                          !defined($self->{SubDataObj}->{$rec->{class}}));
    my @grplist=(@addgroups,
                 $self->{SubDataObj}->{$rec->{class}}->isViewValid($rec));
