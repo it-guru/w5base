@@ -1,4 +1,4 @@
-package AL_TCom::event::ExcelImportV1;
+package AL_TCom::event::ExcelImportV01;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
