@@ -75,6 +75,9 @@ sub ProcessLineData
    $newrec->{eventstart}=$self->getParent->ExpandTimeExpression("$d.$m.".(2000+$y),"GMT");
    my ($m,$d,$y)=$data->[2]=~m/^(\d+)-(\d+)-(\d+)$/;
    $newrec->{eventend}=$self->getParent->ExpandTimeExpression("$d.$m.".(2000+$y),"GMT");
+   $newrec->{mdate}=$self->getParent->ExpandTimeExpression("now","GMT");
+   $newrec->{opendate}=$self->getParent->ExpandTimeExpression("now","GMT");
+   $newrec->{cdate}=$self->getParent->ExpandTimeExpression("now","GMT");
    $newrec->{customerrefno}=$data->[0];
    $newrec->{name}=$data->[6];
    $newrec->{stateid}=21;
@@ -83,6 +86,12 @@ sub ProcessLineData
    $newrec->{zmsarticleno}="701841-0002; Sonstige Abrufleistungen"; 
    $newrec->{affectedapplication}="Prokom_B_Prod" if ($data->[5] eq "P");
    $newrec->{affectedapplication}="Prokom_B_ETA"  if ($data->[5] eq "T");
+   $newrec->{initiatorid}=12319309800001;
+   $newrec->{initiatorname}="Naumann, Thomas";
+   $newrec->{initiatorgroupname}="DTAG.T-Home.ZMD.ZMD6";
+   $newrec->{initiatorgroupid}=12318382710002;
+   $newrec->{openuser}=12319309800001;
+   $newrec->{openusername}="Naumann, Thomas";
    $self->{appl}->ResetFilter();
    $self->{appl}->SetFilter({name=>\$newrec->{affectedapplication}});
    my ($arec,$msg)=$self->{appl}->getOnlyFirst(qw(ALL));
@@ -100,7 +109,10 @@ sub ProcessLineData
       $newrec->{affectedcontract}=[keys(%contract)];
       $newrec->{affectedcontractid}=[keys(%contractid)];
       printf STDERR ("newrec=%s\n",Dumper($newrec));
+      my $old=$W5V2::OperationContext;
+      $W5V2::OperationContext="Kernel";
       $self->{wf}->ValidatedInsertRecord($newrec);
+      $W5V2::OperationContext=$old;
    }
    
 #   msg(INFO,"Referenz=%s",$data->[0]);
