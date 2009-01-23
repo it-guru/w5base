@@ -77,7 +77,7 @@ sub ProcessLineData
    $newrec->{eventend}=$self->getParent->ExpandTimeExpression("$d.$m.".(2000+$y),"GMT");
    $newrec->{mdate}=$self->getParent->ExpandTimeExpression("now","GMT");
    $newrec->{opendate}=$self->getParent->ExpandTimeExpression("now","GMT");
-   $newrec->{cdate}=$self->getParent->ExpandTimeExpression("now","GMT");
+   $newrec->{closedate}=$self->getParent->ExpandTimeExpression("now","GMT");
    $newrec->{customerrefno}=$data->[0];
    $newrec->{name}=$data->[6];
    $newrec->{stateid}=21;
