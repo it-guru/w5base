@@ -138,7 +138,6 @@ sub Validate
    my $name=$self->Name();
 
 
-printf STDERR ("====Start: fifi name=$name\n");
    if (exists($newrec->{$name})){
       my $khrec={}; 
       my $keyname=$self->keyName();
