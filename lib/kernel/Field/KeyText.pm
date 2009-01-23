@@ -138,8 +138,10 @@ sub Validate
    my $name=$self->Name();
 
 
+printf STDERR ("====Start: fifi name=$name\n");
    if (exists($newrec->{$name})){
       my $khrec={}; 
+      my $keyname=$self->keyName();
       if (defined($currentstate->{$self->{keyhandler}})){
          $khrec=$currentstate->{$self->{keyhandler}};
       }
@@ -178,16 +180,23 @@ sub Validate
                                                   "Formated_$name",
                                                   $self->{vjoindisp},
                                                   [$self->{vjoindisp}],%param);
-         if (ref($newval) ne "ARRAY"){
-            if ($#{$keylist}<0 && $fromquery ne ""){
+         if ($#{$keylist}<0 && $fromquery ne ""){
+            if (ref($newval) ne "ARRAY"){
                $filter={$self->{vjoindisp}=>'"*'.$newval.'*"'};
-               $self->vjoinobj->ResetFilter();
-               $self->vjoinobj->SetFilter($filter);
-               ($dropbox,$keylist,$vallist)=$self->vjoinobj->getHtmlSelect(
-                                                        "Formated_$name",
-                                                        $self->{vjoindisp},
-                                                     [$self->{vjoindisp}],%param);
             }
+            else{
+               $filter={$self->{vjoindisp}=>$newval};
+            }
+            $self->vjoinobj->ResetFilter();
+            $self->vjoinobj->SetFilter($filter);
+            ($dropbox,$keylist,$vallist)=$self->vjoinobj->getHtmlSelect(
+                                                     "Formated_$name",
+                                                     $self->{vjoindisp},
+                                                  [$self->{vjoindisp}],%param);
+         }
+         my $srcval;
+         my $dstkey;
+         if (ref($newval) ne "ARRAY"){
             if ($#{$keylist}>0){
                $self->FieldCache->{LastDrop}=$dropbox;
                $self->getParent->LastMsg(ERROR,"'%s' value '%s' is not unique",
@@ -201,28 +210,36 @@ sub Validate
                                          $self->Label,$newval);
                return(undef);
             }
-            my $dstkey=$self->vjoinobj->getVal($self->vjoinobj->IdField->Name(),
+            $dstkey=$self->vjoinobj->getVal($self->vjoinobj->IdField->Name(),
                        $filter);
-            Query->Param("Formated_".$name=>$vallist->[0]);
-            if ($self->{vjoinon}->[0] ne $name){
-               Query->Param("Formated_".$self->{vjoinon}->[0]=>$dstkey);
-               return({$self->{vjoinon}->[0]=>$dstkey,
-                       $self->Name()=>$vallist->[0]});
-            }
-            else{
-               return({$self->Name()=>$vallist->[0]});
-            }
+            $srcval=$vallist->[0];
          }
          else{
-            @$newval=grep(!/^\s*$/,@$newval);
-            $newval=undef if ($#{$newval}==-1);
-            return({$self->Name()=>$newval});
+            my @dstkey=$self->vjoinobj->getVal($self->vjoinobj->IdField->Name(),
+                       $filter);
+            $dstkey=\@dstkey;
+            $srcval=$newval;
          }
 
-
+         if (ref($newval) ne "ARRAY"){
+            Query->Param("Formated_".$name=>$srcval);
+         }
+         if ($self->{vjoinon}->[0] ne $name){
+            Query->Param("Formated_".$self->{vjoinon}->[0]=>$dstkey);
+         }
+         $khrec->{$keyname}=$srcval;
+         $khrec->{$self->{vjoinon}->[0]}=$dstkey;
+         
+         if (!defined($self->{container})){
+            delete($newrec->{$keyname});
+            return({$self->{keyhandler}=>$khrec});
+         }
+         else{
+            return({$keyname=>$srcval,
+                    $self->{keyhandler}=>$khrec});
+         }
          return(undef);
       }
-      my $keyname=$self->keyName();
       $khrec->{$keyname}=\@d;
       if (!defined($self->{container})){
          delete($newrec->{$keyname});
