@@ -110,11 +110,13 @@ sub w5statsend
    my $lnkrole=getModuleObject($self->Config,"base::lnkgrpuserrole");
    $grp->SetFilter({cistatusid=>[3,4]});
    #$grp->SetFilter({cistatusid=>[3,4],fullname=>"*t-com.st"});
+   #$grp->SetFilter({cistatusid=>[3,4],fullname=>"*.ST.DB"});
    $grp->SetCurrentView(qw(grpid fullname));
    my ($rec,$msg)=$grp->getFirst();
    if (defined($rec)){
       do{
          my $emailto={};
+         msg(INFO,"start processing group $rec->{fullname}");
          $lnkgrp->ResetFilter();
          $lnkgrp->SetFilter({grpid=>\$rec->{grpid}});
          my @RBoss;
@@ -155,11 +157,12 @@ sub w5statsend
                                  sgroup=>\'Group'}]);
             my ($chkrec,$msg)=$w5stat->getOnlyFirst(qw(id));
             if (defined($chkrec)){
+               msg(INFO,"chk record found - now try to find id $chkrec->{id}");
                my ($primrec,$hist)=$w5stat->LoadStatSet(id=>$chkrec->{id});
                if (defined($primrec) &&
-                   defined($w5stat->{w5stat}->{'base::ext::w5stat'})){
+                   defined($w5stat->{w5stat}->{'base::w5stat::overview'})){
                   msg(INFO,"primrec ok and stat processor found");
-                  my $obj=$w5stat->{w5stat}->{'base::ext::w5stat'};
+                  my $obj=$w5stat->{w5stat}->{'base::w5stat::overview'};
                   my %P=$obj->getPresenter();
                   if (defined($P{'overview'}) &&
                       defined($P{'overview'}->{opcode})){
@@ -181,7 +184,8 @@ sub w5statsend
 
            
                            $ENV{HTTP_FORCE_LANGUAGE}=$lang;
-                           my ($d,$ovdata)=&{$P{'overview'}->{opcode}}($obj,
+                           my ($d,$ovdata)=
+                                &{$P{overview}->{opcode}}($obj,
                                                             $primrec,$hist);
                            my $needsend=$forcesend;
                            foreach my $ovrec (@$ovdata){
@@ -199,6 +203,9 @@ sub w5statsend
                            delete($ENV{HTTP_FORCE_LANGUAGE});
                         }
                      }
+                  }
+                  else{
+                     msg(ERROR,"can not find w5stat overview handler");
                   }
                }
             }
