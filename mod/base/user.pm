@@ -757,18 +757,18 @@ sub isViewValid
    }
    if ($rec->{usertyp} eq "extern"){
       return(qw(header name default comments groups userro control 
-                office private));
+                office private qc));
    }  
    if ($rec->{usertyp} eq "function"){
       if ($self->IsMemberOf("admin")){
          return(qw(header name default nativcontact comments 
-                   control userro));
+                   control userro qc));
       }
      return(qw(header name default nativcontact comments));
    }  
    if ($rec->{usertyp} eq "service"){
       return(qw(header name default comments groups usersubst userro 
-                control userparam));
+                control userparam qc));
    }  
    return(@pic,
           qw(default name office private userparam groups 
