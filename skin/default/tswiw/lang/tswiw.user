@@ -7,6 +7,8 @@
 'electronical FAX-Number'=>{ de=>'elektronisches FAX'},
 'FAX-Number'=>{ de=>'FAX'},
 'Phonenumber'=>{ de=>'Telefonnummer'},
+'CostCenter'=>{ de=>'Kostenstelle'},
+'Accounting Area'=>{ de=>'Buchungskreis'},
 'Moible-Phonenumber'=>{ de=>'Handy-Nummer'},
 'tswiw::user'=>{ de=>'WiW-Person',en=>'WiW-Person'},
 'fieldgroup.default'=>{ de=>'Personalien',en=>'Person-Informations'},

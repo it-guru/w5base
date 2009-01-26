@@ -274,3 +274,5 @@ alter table grp  add description varchar(128);
 alter table grp  add lastknownbossemail blob;
 alter table user add ssh1publickey blob default NULL;
 alter table user add ssh2publickey blob default NULL;
+alter table user add office_costcenter varchar(20) default NULL,add key(office_costcenter);
+alter table user add office_accarea    varchar(20) default NULL,add key(office_accarea);

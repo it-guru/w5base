@@ -29,3 +29,4 @@ alter table costcenter add is_directwfuse int(2) default '0';
 alter table costcenter add ldelmgr  bigint(20) default NULL,add key(ldelmgr);
 alter table costcenter add ldelmgr2 bigint(20) default NULL,add key(ldelmgr2);
 alter table costcenter add databoss2 bigint(20)  default NULL;
+alter table costcenter add accarea  varchar(20) default NULL,add key(accarea);

@@ -3,6 +3,7 @@
 'fieldgroup.default'=>{de=>'Kostenstellendaten'},
 'fieldgroup.delmgmt'=>{de=>'Betriebs Delivery-Management'},
 'CO-Number'=>{de=>'CO-/Kostenstellen-Nummer'},
+'Accounting Area'=>{de=>'Buchungskreis'},
 'Contacts'=>{de=>'Kontakte'},
 'CO-Shortdescription'=>{de=>'Kostenstellenbezeichnung'},
 "invalid CO-Numer '\%s' specified"=>{de=>"ungültige CO-Nummer '\%s' eingegeben"},

@@ -54,8 +54,22 @@ sub FormatedDetail
          my $format=sprintf("%%.%df",$self->{precision});
          $d=sprintf($format,$d);
          $d=~s/\./,/g;
+         $d=[$d] if (ref($d) ne "ARRAY");
+         if ($mode eq "HtmlDetail"){
+            $d=[map({$self->addWebLinkToFacility(quoteHtml($_),$current)} 
+                    @{$d})];
+         }
+         if ($mode eq "HtmlV01"){
+            $d=[map({quoteHtml($_)} @{$d})];
+         }
+         if ($mode ne "XMLV01"){
+            my $vjoinconcat=$self->{vjoinconcat};
+            $vjoinconcat="; " if (!defined($vjoinconcat));
+            $d=join($vjoinconcat,@$d);
+         }
          $d.=" ".$self->{unit} if ($d ne "" && $mode eq "HtmlDetail");
       }
+
       return($d);
    }
    if (($mode eq "edit" || $mode eq "workflow") && 

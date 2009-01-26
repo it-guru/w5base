@@ -184,6 +184,43 @@ sub new
                 label         =>'Personal-Number',
                 dataobjattr   =>'user.office_persnum'),
 
+      new kernel::Field::Number(
+                name          =>'office_costcenter',
+                group         =>'office',
+                weblinkto     =>'finance::costcenter',
+                weblinkon     =>['costcenterid'=>'id'],
+                label         =>'CostCenter',
+                dataobjattr   =>'user.office_costcenter'),
+
+      new kernel::Field::Number(
+                name          =>'office_accarea',
+                group         =>'office',
+                label         =>'Accounting Area',
+                dataobjattr   =>'user.office_accarea'),
+
+      new kernel::Field::Link(
+                name          =>'costcenterid',
+                group         =>'office',
+                label         =>'CostCenterID',
+                depend        =>['office_accarea','office_costcenter'],
+                onRawValue    =>sub {
+                                   my $self=shift;
+                                   my $current=shift;
+                                   my $app=$self->getParent();
+                                   my $co=getModuleObject($app->Config,
+                                                         "finance::costcenter");
+                                   if (defined($co)){
+                                      $co->SetFilter({
+                                         accarea=>\$current->{office_accarea},
+                                         name=>\$current->{office_costcenter}});
+                                      my ($rec,$msg)=$co->getOnlyFirst("id");
+                                      if (defined($rec)){
+                                         return($rec->{id});
+                                      }
+                                   }
+                                   return(undef);
+                                }),
+
       new kernel::Field::Text(
                 name          =>'private_street',
                 group         =>'private',

@@ -45,6 +45,12 @@ sub new
                 label         =>'CO-Number',
                 dataobjattr   =>'costcenter.name'),
 
+      new kernel::Field::Text(
+                name          =>'accarea',
+                htmlwidth     =>'120px',
+                label         =>'Accounting Area',
+                dataobjattr   =>'costcenter.accarea'),
+
       new kernel::Field::Select(
                 name          =>'cistatus',
                 htmleditwidth =>'40%',
