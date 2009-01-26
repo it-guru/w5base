@@ -140,3 +140,36 @@ CREATE TABLE wfworkspace (
   PRIMARY KEY (id),key fwd(fwdtarget,fwdtargetid)
 );
 alter table wfhead add directlnktype varchar(40) default NULL, add directlnkid bigint(20) default NULL,add directlnkmode varchar(20) default NULL,add key directlnk(directlnktype,directlnkid,wfstate,directlnkmode),add key directlnkev(directlnktype,directlnkid,eventend);
+CREATE TABLE wfrepjob (
+  id          bigint(20) NOT NULL default '0',
+  targetfile  varchar(255) default NULL,
+  reportname  varchar(20)  default NULL,
+  mday        int default '1',
+  runmday     varchar(20) default NULL,
+  flt_name    text default NULL,
+  flt_state   text default NULL,
+  flt_class   text default NULL,
+  flt_desc    text default NULL,
+  flt_step    text default NULL,
+  flt1_name   varchar(20) default NULL,
+  flt1_value  text default NULL,
+  flt2_name   varchar(20) default NULL,
+  flt2_value  text default NULL,
+  flt3_name   varchar(20) default NULL,
+  flt3_value  text default NULL,
+  flt4_name   varchar(20) default NULL,
+  flt4_value  text default NULL,
+  flt_code    text default NULL,
+  repfields   text default NULL,
+  sumcount1on varchar(20) default NULL,
+  createdate   datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate   datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser   bigint(20) default NULL,
+  modifyuser   bigint(20) default NULL,
+  editor       varchar(100) NOT NULL default '',
+  realeditor   varchar(100) NOT NULL default '',
+  srcsys       varchar(10) default 'w5base',
+  srcid        varchar(20) default NULL,
+  srcload      datetime    default NULL,
+  PRIMARY KEY (id)
+);

@@ -206,6 +206,10 @@ sub Init
                       "OSY::projectroom",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itts.proc",
+                      "tmpl/welcome",
+                      prio=>20000);
+
    $self->RegisterObj("itts.kern.projectroom.new",
                       "OSY::projectroom",
                       func=>'New',

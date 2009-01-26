@@ -54,6 +54,8 @@
 'itts.kern.projectroom.new'=>{de=>'Neueingabe',en=>'New'},
 'itts.kern.costcenter'=>{de=>'Kostenstelle/CO',en=>'CostCenter/CO'},
 'itts.kern.costcenter.new'=>{de=>'Neueingabe',en=>'New'},
+'itts.proc'=>{de=>'Prozesssteuerung',en=>'Processcontrol'},
+
 
 
 

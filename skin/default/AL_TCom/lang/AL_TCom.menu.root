@@ -52,5 +52,4 @@
 'AL_TCom.kern.costcenter.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.kern.bp'=>{de=>'Geschäftsprozess',en=>'Business process'},
 'AL_TCom.kern.bp.new'=>{de=>'Neueingabe',en=>'New'},
-
-
+'AL_TCom.proc'=>{de=>'Prozesssteuerung',en=>'Processcontrol'},

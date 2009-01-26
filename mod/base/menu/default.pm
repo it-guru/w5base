@@ -198,6 +198,16 @@ sub Init
                       "base::workflowaction",
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("Tools.workflow.repjob",
+                      "base::workflowrepjob",
+                      prio=>2000,
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("Tools.workflow.repjob.new",
+                      "base::workflowrepjob",
+                      func=>'New',
+                      defaultacl=>['admin']);
+   
    $self->RegisterObj("Tools.workflow.relation",
                       "base::workflowrelation",
                       defaultacl=>['admin']);

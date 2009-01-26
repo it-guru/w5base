@@ -18,7 +18,6 @@ package AL_TCom::menu::root;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::MenuRegistry;
 @ISA=qw(kernel::MenuRegistry);
@@ -290,6 +289,10 @@ sub Init
                       "itil::businessprocess",
                       func=>'New',
                       defaultacl=>['admin']);
+
+   $self->RegisterObj("AL_TCom.proc",
+                      "tmpl/welcome",
+                      prio=>20000);
 
    $self->RegisterObj('AL_TCom::workflow::eventnotify$',
                       "base::workflow",

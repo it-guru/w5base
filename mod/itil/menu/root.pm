@@ -318,6 +318,10 @@ sub Init
                       "itil::costcenter",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itil.proc",
+                      "tmpl/welcome",
+                      prio=>20000);
+   
    $self->RegisterObj('itil::workflow::businesreq$',
                       "base::workflow",
                       func=>'New',
