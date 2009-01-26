@@ -294,6 +294,10 @@ sub Init
                       "tmpl/welcome",
                       prio=>20000);
 
+   $self->RegisterObj("AL_TCom.proc.ChangeManagement",
+                      "TS::chmmgmt",
+                      defaultacl=>['admin']);
+
    $self->RegisterObj('AL_TCom::workflow::eventnotify$',
                       "base::workflow",
                       func=>'New',

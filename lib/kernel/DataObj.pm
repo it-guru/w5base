@@ -124,7 +124,8 @@ sub _preProcessFilter
       foreach my $field (keys(%{$hflt})){
          my $fobj=$self->getField($field);
          if (!defined($fobj)){
-            msg(ERROR,"can't find field object for name '%s' at %s",
+            msg(ERROR,"can't find field object for name ".
+                      "'%s' at %s (_preProcessFilter)",
                       $field,$self);
             # Last Message handling
             #

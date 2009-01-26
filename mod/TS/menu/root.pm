@@ -210,6 +210,10 @@ sub Init
                       "tmpl/welcome",
                       prio=>20000);
 
+   $self->RegisterObj("itts.proc.ChangeManagement",
+                      "TS::chmmgmt",
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("itts.kern.projectroom.new",
                       "OSY::projectroom",
                       func=>'New',

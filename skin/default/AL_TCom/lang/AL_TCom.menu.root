@@ -53,3 +53,5 @@
 'AL_TCom.kern.bp'=>{de=>'Geschäftsprozess',en=>'Business process'},
 'AL_TCom.kern.bp.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.proc'=>{de=>'Prozesssteuerung',en=>'Processcontrol'},
+'AL_TCom.proc.ChangeManagement'=>{de=>'Change Management',
+                                  en=>'Change Management'},

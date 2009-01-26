@@ -55,6 +55,8 @@
 'itts.kern.costcenter'=>{de=>'Kostenstelle/CO',en=>'CostCenter/CO'},
 'itts.kern.costcenter.new'=>{de=>'Neueingabe',en=>'New'},
 'itts.proc'=>{de=>'Prozesssteuerung',en=>'Processcontrol'},
+'itts.proc.ChangeManagement'=>{de=>'Change Management',
+                               en=>'Change Management'},
 
 
 

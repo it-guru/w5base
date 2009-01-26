@@ -65,3 +65,4 @@
 'itil.kern.bp.lnkappl'=>{de=>'Verkn. Anw.',en=>'Link Appl.'},
 'Tools.analytics.itilfault'=>{de=>'ITIL Ausfallsanalyse',en=>'ITIL fault analytics'},
 'itil.proc'=>{de=>'Prozesssteuerung',en=>'Processcontrol'},
+'itil.proc.ChangeManagement'=>{de=>'Change Management',en=>'Change Management'},

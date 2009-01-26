@@ -322,6 +322,10 @@ sub Init
                       "tmpl/welcome",
                       prio=>20000);
    
+   $self->RegisterObj("itil.proc.ChangeManagement",
+                      "itil::chmmgmt",
+                      defaultacl=>['admin']);
+
    $self->RegisterObj('itil::workflow::businesreq$',
                       "base::workflow",
                       func=>'New',
