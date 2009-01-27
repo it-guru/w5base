@@ -344,6 +344,9 @@ sub getPosibleActions
       push(@l,"wfbreak");   # workflow abbrechen      (durch Anforderer o admin)
       push(@l,"wfcallback");# workflow zurueckholen   (durch Anforderer o admin)
    }
+   if ($stateid==2 && $lastworker==$userid){
+     push(@l,"wfcallback"); # if last editor has an mismatched forward done
+   }
    if (($userid==$creator || $isininitiatorgroup || $isadmin) && $stateid==1){
       push(@l,"wfbreak");   # workflow abbrechen      (durch Anforderer o admin)
    }
