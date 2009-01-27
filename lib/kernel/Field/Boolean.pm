@@ -32,6 +32,7 @@ sub new
    $self->{value}=[0,1]            if (!defined($self->{values}));
    $self->{transprefix}="boolean." if (!defined($self->{transprefix}));
    $self->{default}="0"            if (!defined($self->{default}));
+   $self->{htmleditwidth}="60px"   if (!defined($self->{htmleditwidth}));
    return($self);
 }
 

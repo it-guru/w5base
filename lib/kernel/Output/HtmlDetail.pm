@@ -289,6 +289,7 @@ EOF
          my $subfunctions="topedit,editend";
          my $subblock="";
          my $grpentry=$app->getGroup($group,current=>$rec);
+         my $col=0;
          for(my $c=0;$c<=$#fieldlist;$c++){
             my $name=$fieldlist[$c]->Name();
             next if (!($uivisibleof[$c]));
@@ -342,52 +343,67 @@ EOF
                      push(@{$self->Context->{jsonchanged}},$n);
                   }
                }
+               my $halfwidth=$fieldlist[$c]->htmlhalfwidth();
+               $subblock.="<tr class=fline>" if ($col==0);
                if ($fieldlist[$c]->Type() eq "Textarea" ||
                    $fieldlist[$c]->Type() eq "Container" ||
                    $fieldlist[$c]->Type() eq "Htmlarea"){
+                  my $datacolspan=4;
+                  $datacolspan=2 if ($halfwidth);
                   $subblock.=<<EOF;
-<tr class=fline><td class=fname$valign colspan=2><span $fieldspecfunc>$prefix\%$name(label)%:</span><br>$fieldspec \%$name(detail)\%</td></tr>
+<td class=fname$valign colspan=$datacolspan><span $fieldspecfunc>$prefix\%$name(label)%:</span><br>$fieldspec \%$name(detail)\%</td>
 EOF
                }
-               elsif (
-                   $fieldlist[$c]->Type() eq "TimeSpans" 
-                   ){
+               elsif ($fieldlist[$c]->Type() eq "TimeSpans"){
+                  my $datacolspan=4;
+                  $datacolspan=2 if ($halfwidth);
                   $subblock.=<<EOF;
-<tr class=fline><td class=fname$valign colspan=2>\%$name(detail)\%</td></tr>
+<td class=fname$valign colspan=$datacolspan>\%$name(detail)\%</td>
 EOF
                }
                elsif ($fieldlist[$c]->can("EditProcessor")){
+                  my $datacolspan=4;
+                  $datacolspan=2 if ($halfwidth);
                   $subblock.=<<EOF;
-<tr class=fline><td class=fname$valign colspan=2 $fieldspecfunc>$fieldspec\%$name(detail)\%</td></tr>
+<td class=fname$valign colspan=$datacolspan $fieldspecfunc>$fieldspec\%$name(detail)\%</td>
 EOF
 
                }
                elsif ($fieldlist[$c]->Type() eq "Message" ||
                       $fieldlist[$c]->Type() eq "GoogleMap"){
+                  my $datacolspan=4;
+                  $datacolspan=2 if ($halfwidth);
                   $subblock.=<<EOF;
-      <tr class=fline>
-         <td class=finput$valign colspan=2>
-\%$name(detail)\%
-</td>
-      </tr>
+<td class=finput$valign colspan=$datacolspan>\%$name(detail)\%</td>
 EOF
 
                }
                else{
+                  my $datacolspan=3;
+                  $datacolspan=1 if ($halfwidth);
                   $subblock.=<<EOF;
-      <tr class=fline>
          <td class=fname$valign style="width:20%;">$fieldspec<span $fieldspecfunc>$prefix\%$name(label)%:</span></td>
-         <td class=finput>
+         <td class=finput colspan=$datacolspan>
 <table border=0 cellspacing=0 cellpadding=0 width=100% style="table-layout:fixed;overflow:hidden"><tr>
 <td>
 <div style="width=100%;overflow:hidden">
                           \%$name(detail)\%</div>
 </td></tr></table>
 </td>
-
-      </tr>
 EOF
                }
+               $col++;
+               if ($halfwidth){
+                  if ($col==2){
+                     $col=0;
+                  } 
+               }
+               else{
+                  if ($col==1){
+                     $col=0;
+                  } 
+               }
+               $subblock.="</tr>" if ($col==0);
             }
          }
          my $grouplabel="fieldgroup.".$group;

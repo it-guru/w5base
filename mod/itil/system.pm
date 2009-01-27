@@ -466,166 +466,118 @@ sub new
                 vjoinon       =>['assetid'=>'id'],
                 vjoindisp     =>'hwmodelid'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'isprod',
                 group         =>'opmode',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
+                htmlhalfwidth =>1,
                 label         =>'Productionsystem',
-                value         =>[0,1],
                 dataobjattr   =>'system.is_prod'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'istest',
                 group         =>'opmode',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
+                htmlhalfwidth =>1,
                 label         =>'Testsystem',
-                value         =>[0,1],
                 dataobjattr   =>'system.is_test'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'isdevel',
                 group         =>'opmode',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
+                htmlhalfwidth =>1,
                 label         =>'Developmentsystem',
-                value         =>[0,1],
                 dataobjattr   =>'system.is_devel'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'iseducation',
                 group         =>'opmode',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
+                htmlhalfwidth =>1,
                 label         =>'Educationsystem',
-                value         =>[0,1],
                 dataobjattr   =>'system.is_education'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'isapprovtest',
                 group         =>'opmode',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
+                htmlhalfwidth =>1,
                 label         =>'Approval Testsystem',
-                value         =>[0,1],
                 dataobjattr   =>'system.is_approvtest'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'isreference',
                 group         =>'opmode',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
+                htmlhalfwidth =>1,
                 label         =>'Referencesystem',
-                value         =>[0,1],
                 dataobjattr   =>'system.is_reference'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'isapplserver',
                 group         =>'systemclass',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
                 label         =>'Server/Applicationserver',
-                value         =>[0,1],
                 dataobjattr   =>'system.is_applserver'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'isworkstation',
                 group         =>'systemclass',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
                 label         =>'Workstation',
-                value         =>[0,1],
                 dataobjattr   =>'system.is_workstation'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'isprinter',
                 group         =>'systemclass',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
                 label         =>'Printer/Printserver',
-                value         =>[0,1],
                 dataobjattr   =>'system.is_printer'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'isbackupsrv',
                 group         =>'systemclass',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
                 label         =>'Backupserver',
-                value         =>[0,1],
                 dataobjattr   =>'system.is_backupsrv'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'isdatabasesrv',
                 group         =>'systemclass',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
                 label         =>'Databaseserver',
-                value         =>[0,1],
                 dataobjattr   =>'system.is_databasesrv'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'iswebserver',
                 group         =>'systemclass',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
                 label         =>'WEB-Server',
-                value         =>[0,1],
                 dataobjattr   =>'system.is_webserver'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'ismailserver',
                 group         =>'systemclass',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
                 label         =>'Mail/Mailrelay-Server',
-                value         =>[0,1],
                 dataobjattr   =>'system.is_mailserver'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'isrouter',
                 group         =>'systemclass',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
                 label         =>'Router/Networkrouter',
-                value         =>[0,1],
                 dataobjattr   =>'system.is_router'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'isnetswitch',
                 group         =>'systemclass',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
                 label         =>'Switch/Networkswitch',
-                value         =>[0,1],
                 dataobjattr   =>'system.is_netswitch'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'isterminalsrv',
                 group         =>'systemclass',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
                 label         =>'Terminalserver',
-                value         =>[0,1],
                 dataobjattr   =>'system.is_terminalsrv'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'isnas',
                 group         =>'systemclass',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
                 label         =>'Network Attached Storage NAS',
-                value         =>[0,1],
                 dataobjattr   =>'system.is_nas'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'isclusternode',
                 group         =>'systemclass',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
                 label         =>'ClusterNode',
-                value         =>[0,1],
                 dataobjattr   =>'system.is_clusternode'),
 
       new kernel::Field::SubList(
