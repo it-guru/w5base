@@ -166,6 +166,12 @@ sub new
                 label         =>'Location',
                 dataobjattr   =>'user.office_location'),
 
+      new kernel::Field::Text(
+                name          =>'office_room',
+                group         =>'office',
+                label         =>'Room number',
+                dataobjattr   =>'user.office_room'),
+
       new kernel::Field::Phonenumber(
                 name          =>'office_facsimile',
                 group         =>['office','nativcontact'],
