@@ -62,7 +62,6 @@ if ($response->code ne "200"){
 }
 #printf("result=%s\n",$response->content);
 
-
 msg(INFO,"load XML request form");
 my $response=$ua->request(GET($base."link_start_kls1.do"));
 #my $response=$ua->request(GET($base."start/xml.jsp"));
@@ -73,8 +72,6 @@ if ($response->code ne "200"){
    msg(ERROR,"fail to get XML request form - code was ".$response->message);
    exit(1); 
 }
-
-
 
 msg(INFO,"process XML Request");
 my $XMLrequest=<<EOF;
@@ -115,24 +112,12 @@ if ($response->code ne "200"){
 
 printf("result=%s\n",$response->content);
 
-
-
-
 #eval('$html->parse($response->content);');
 #if ($@ ne ""){
 #   printf STDERR ("%s\n",$@);
 #   printf STDERR ("ERROR: parsing loginurl=$loginurl\n");
 #   exit(1); 
 #}  
-
-
-
-
-
-
-
-
-
 
 package LWP::UserAgent;
 
