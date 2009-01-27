@@ -328,6 +328,10 @@ sub storeRecord
    my $newrec=$param->{data};
    my $id=$param->{IdentifiedBy};
 
+   $self->Log(INFO,"soap",
+              "storeRecord: user='$ENV{REMOTE_USER}' ip='$ENV{REMOTE_ADDR}'");
+   $self->Log(INFO,"soap",
+              "[$objectname] ($id)\nnewrec=%s",Dumper($newrec));
    $ENV{HTTP_FORCE_LANGUAGE}=$param->{lang} if (defined($param->{lang}));
    if (!($objectname=~m/^.+::.+$/)){
       return(interface::SOAP::kernel::Finish({exitcode=>128,
@@ -419,6 +423,10 @@ sub deleteRecord
    my $filter=$param->{filter};
    my $id=$param->{IdentifiedBy};
 
+   $self->Log(INFO,"soap",
+              "deleteRecord: user='$ENV{REMOTE_USER}' ip='$ENV{REMOTE_ADDR}'");
+   $self->Log(INFO,"soap",
+              "[$objectname] ($id)");
    $ENV{HTTP_FORCE_LANGUAGE}=$param->{lang} if (defined($param->{lang}));
    if (!($objectname=~m/^.+::.+$/)){
       return(interface::SOAP::kernel::Finish({exitcode=>128,
@@ -542,6 +550,8 @@ sub Ping
 #   return({SOAP::Data->name(exitcode=>0),
 #          SOAP::Data->name(text=>'Hans'),
 #          SOAP::Data->name(result=>1)});
+   $self->Log(INFO,"soap",
+              "Ping: user='$ENV{REMOTE_USER}' ip='$ENV{REMOTE_ADDR}'");
    return(SOAP::Data->name(output=>{exitcode=>0,result=>1})->type("HASH"));
 }
 

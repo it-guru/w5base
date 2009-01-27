@@ -22,6 +22,7 @@ use kernel;
 use kernel::date;
 use kernel::TemplateParsing;
 use XML::Smart;
+use IO::File;
 use kernel::Universal;
 @ISA    = qw(kernel::Universal kernel::TemplateParsing);
 
@@ -727,6 +728,89 @@ sub UserTimezone
    }
    return($utimezone);
 }
+
+sub Log
+{
+   my $self=shift;
+   my $mode=shift;
+   my $facility=lc(shift);
+   return(undef) if ($facility eq "" || length($facility)>20);
+   my $Cache=$self->Cache;
+   if (!exists($Cache->{LogCache})){
+      $Cache->{LogCache}={}; 
+   }
+   my $LogCache=$Cache->{LogCache};
+   if (!exists($LogCache->{$facility})){
+      $LogCache->{$facility}={};
+      my @logfac=split(/\s*[,;]\s*/,lc($self->Config->Param("Logging")));
+      if (grep(/^\+{0,1}$facility$/,@logfac)){
+         my $target=$self->Config->Param("LogTarget");
+         if ($target=~m/^\//){ # file logging
+            $target=~s/\%f/$facility/g;
+            my $oldumask=umask(0000);
+            my $fh=new IO::File();
+            if (! -f $target){
+               msg(INFO,"try to create logfile '$target'");
+               if ($fh->open(">$target")){
+                  $fh->autoflush();
+                  $LogCache->{$facility}->{file}=$target; 
+                  $LogCache->{$facility}->{fh}=$fh; 
+                  printf $fh ("create\n");
+                  $fh->close();
+               }
+            }
+            else{
+               msg(INFO,"open logfile '$target'");
+               if ($fh->open(">>$target")){
+                  $fh->autoflush();
+                  printf $fh ("reopen\n");
+                  $LogCache->{$facility}->{file}=$target; 
+                  $LogCache->{$facility}->{fh}=$fh; 
+               }
+            }
+            if (! defined($LogCache->{$facility}->{fh})){
+               msg(WARN,"fail to open logfile '$target' - $!");
+            }
+            umask($oldumask);
+         }
+      }
+      else{
+         if (!grep(/^-{0,1}$facility$/,@logfac)){
+            $LogCache->{$facility}->{usemsg}=1; 
+         }
+      }
+   }
+   if (defined($LogCache->{$facility})){
+      if (defined($LogCache->{$facility}) &&
+          exists($LogCache->{$facility}->{usemsg})){
+         msg($mode,@_);
+      }
+      if (defined($LogCache->{$facility}->{fh})){
+         if (! -f $LogCache->{$facility}->{file}){
+            close($LogCache->{$facility}->{fh});
+            delete($LogCache->{$facility});
+            msg(INFO,"logs close for facility '$facility'");
+         }
+         else{
+            my $fout=*{$LogCache->{$facility}->{fh}};
+            my $fout=$LogCache->{$facility}->{fh};
+            my $txt=shift;
+            if ($txt=~m/\%/ && $#_!=-1){
+               $txt=sprintf($txt,@_);
+            }
+            $!=undef;
+            foreach my $l (split(/[\r\n]+/,$txt)){
+               print $fout (sprintf("%s [%d] %-6s %s\n",
+                                    NowStamp(),$$,$mode,$l));
+            }
+#msg(DEBUG,"log done pid=$$ for $facility errno=$? $! fout=$fout");
+            return(1);
+         }
+      }
+   }
+   return(undef);
+}
+
 
 sub Lang
 {
