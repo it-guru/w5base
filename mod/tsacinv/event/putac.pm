@@ -72,7 +72,13 @@ sub ApplicationModified
    my $mand=getModuleObject($self->Config,"base::mandator");
    my $acuser=getModuleObject($self->Config,"tsacinv::user");
    my %filter=(cistatusid=>\'4');
+   $self->{DebugMode}=0;
    if ($#appid!=-1){
+      if (grep(/^debug$/i,@appid)){
+         @appid=grep(!/^debug$/i,@appid);
+         $self->{DebugMode}=1;
+         msg(ERROR,"processing DebugMode - loading ids '%s'",join(",",@appid));
+      }
       $filter{id}=\@appid;
    }
    my %w52ac=(0 =>'OTHER',
@@ -84,7 +90,7 @@ sub ApplicationModified
               50=>'ACCEPTANCE',
               60=>'DEVELOPMENT',
               70=>'PRODUCTION');
-#   $filter{name}="*w5base*";
+  # $filter{name}="*w5base*";
    $app->SetFilter(\%filter);
    $app->SetCurrentView(qw(ALL));
   # $app->SetCurrentView(qw(id name sem tsm tsm2 conumber currentvers
@@ -222,7 +228,8 @@ sub ApplicationModified
                   }
                }
                my %posix=();
-               foreach my $userent (qw(tsm tsm2 sem databoss)){
+               foreach my $userent (qw(tsm tsm2 sem databoss 
+                                       ldelmgr delmgr delmgr2)){
                   if ($rec->{$userent} ne ""){
                      $user->SetFilter({fullname=>\$rec->{$userent}});
                      $user->SetCurrentView("posix");
@@ -299,6 +306,9 @@ sub ApplicationModified
                                    DataSupervisor=>$posix{databoss},
                                    Service_Manager=>$posix{sem},
                                    Deputy_Technical_Contact=>$posix{tsm2},
+                                   Lead_Del_manager=>$posix{ldelmgr},
+                                   Del_manager=>$posix{delmgr},
+                                   Deputy_Del_manager=>$posix{delmgr2},
                                    bDelete=>'0',
                                    Name=>$rec->{name}
                                 }
@@ -752,7 +762,7 @@ sub TransferFile
       my $jobfile="$object/$jobname";
       msg(INFO,"Processing  job : '%s'",$jobfile);
       msg(INFO,"Processing  file: '%s'",$filename);
-      if (1){
+      if (!$self->{DebugMode}){
          if (!$ftp->Put($filename,$jobfile)){
             msg(ERROR,"File $filename to $jobfile could not be transfered");
          }
