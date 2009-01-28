@@ -112,7 +112,7 @@ sub w5statsend
    #$grp->SetFilter({cistatusid=>[3,4],fullname=>"*t-com.st"});
    #$grp->SetFilter({cistatusid=>[3,4],fullname=>"*.ST.DB"});
    $grp->SetCurrentView(qw(grpid fullname));
-   my ($rec,$msg)=$grp->getFirst();
+   my ($rec,$msg)=$grp->getFirst(unbuffered=>1);
    if (defined($rec)){
       do{
          my $emailto={};

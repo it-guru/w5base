@@ -690,6 +690,7 @@ sub tieRec
 sub getFirst
 {
    my $self=shift;
+   my %attr=@_;
 
    if (!defined($self->{DB})){
       $self->{isInitalized}=0;
@@ -705,7 +706,7 @@ sub getFirst
    my $baselimit=$self->Limit();
    $self->Context->{CurrentLimit}=$baselimit if ($baselimit>0);
    my $t0=[gettimeofday()];
-   if ($self->{DB}->execute($sqlcmd[0])){
+   if ($self->{DB}->execute($sqlcmd[0],\%attr)){
       my $t=tv_interval($t0,[gettimeofday()]);
       my $p=$self->Self();
       my $msg=sprintf("%s:time=%0.4fsec;mod=$p",NowStamp(),$t);
@@ -767,7 +768,7 @@ sub getOnlyFirst
    my @view=@_;
    $self->SetCurrentView(@view);
    $self->Limit(1,1);
-   my @res=$self->getFirst();
+   my @res=$self->getFirst(unbuffered=>1);
    if (defined($self->{DB})){
       $self->{DB}->finish();
    }

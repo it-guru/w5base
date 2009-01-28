@@ -155,7 +155,7 @@ sub checksoftlimit
    my $cmd=shift;
    delete($self->{softlimit});
 
-   if ($self->getDriverName() eq "ODBC"){
+   if ($self->DriverName() eq "ODBC"){
       if (my ($n)=$$cmd=~m/\s+limit\s+(\d+)/){
          $self->{softlimit}=$n;
          $$cmd=~s/\s+limit\s+(\d+)//;
@@ -172,6 +172,13 @@ sub execute
    if ($ENV{REMOTE_USER} ne ""){
       $statement.=" /* W5BaseUser: $ENV{REMOTE_USER} */";
    }
+   if (lc($self->DriverName()) eq "mysql"){
+      if ($attr->{unbuffered}){
+         $attr->{mysql_use_result}=1;
+      }
+   }
+   delete($attr->{unbuffered});
+   
    if ($self->{db}){
        $self->{sth}=$self->{'db'}->prepare($statement,$attr);
        #printf STDERR ("fifi $c->{$self->{dataobjattr}}->{sth}\n");

@@ -303,37 +303,32 @@ sub processData
    my $count;
 
    #######################################################################
-   if (my ($year,$month)=$dstrange=~m/^(\d{4})(\d{2})$/){
+   if ($param{currentmonth} eq $dstrange){
       my $wf=getModuleObject($self->getParent->Config,"base::workflow");
       my $wfw=$wf->Clone();
       msg(INFO,"starting collect of base::workflow set0 ".
                "- all modified $dstrange");
-      $wf->SetFilter({eventend=>">monthbase-1M-2d AND <now"});
+      $wf->SetFilter({mdate=>">monthbase-1M-2d AND <now"});
       $wf->SetCurrentView(qw(ALL));
-      #$wf->SetCurrentView(qw(id class eventend name detaildescription));
       $wf->SetCurrentOrder("NONE");
       my $c=0;
      
       msg(INFO,"getFirst of base::workflow set0");$count=0;
-      my ($rec,$msg)=$wf->getFirst();
+      my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
       if (defined($rec)){
          do{
-          #  $wfw->ResetFilter();
-          #  $wfw->SetFilter({id=>\$rec->{id}});
-          #  $wfw->SetCurrentView(qw(id));
-          #  my ($WfRec,$msg)=$wfw->getOnlyFirst(qw(ALL));
-          #  if (defined($WfRec)){
-             msg(INFO,"process line $count");
-               $self->getParent->processRecord('base::workflow::modified',
+             if (($rec->{class}=~m/^.*diary$/) ||
+                 ($rec->{class}=~m/^.*req$/)){
+             msg(INFO,"process line $count $rec->{id} - $rec->{eventstart}");
+               $self->getParent->processRecord('base::workflow::stat',
                                                $dstrange,$rec,%param);
-               $count++;
                $c++;
-          #  }
+            }
+            $count++;
             ($rec,$msg)=$wf->getNext();
          } until(!defined($rec));
       }
       msg(INFO,"FINE of base::workflow set0 $count records");
-      exit(0);
    }
    #######################################################################
      
@@ -355,7 +350,7 @@ sub processData
    $grp->SetFilter({cistatusid=>\"4"});
    $grp->SetCurrentView(qw(ALL));
    msg(INFO,"getFirst of base::grp");$count=0;
-   my ($rec,$msg)=$grp->getFirst();
+   my ($rec,$msg)=$grp->getFirst(unbuffered=>1);
    if (defined($rec)){
       do{
          $self->getParent->processRecord('base::grp',$dstrange,$rec);
@@ -370,7 +365,7 @@ sub processData
    $user->SetFilter({cistatusid=>\"4"});
    $user->SetCurrentView(qw(ALL));
    msg(INFO,"getFirst of base::user");$count=0;
-   my ($rec,$msg)=$user->getFirst();
+   my ($rec,$msg)=$user->getFirst(unbuffered=>1);
    if (defined($rec)){
       do{
          $self->getParent->processRecord('base::user',$dstrange,$rec,%param);
@@ -398,7 +393,7 @@ sub processData
       my $c=0;
      
       msg(INFO,"getFirst of base::workflow set1.1");$count=0;
-      my ($rec,$msg)=$wf->getFirst();
+      my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
       if (defined($rec)){
          do{
             $self->getParent->processRecord('base::workflow::active',
@@ -411,13 +406,14 @@ sub processData
       msg(INFO,"FINE of base::workflow set1.1 $count records");
      
       msg(INFO,"starting collect of base::workflow set1.2");
+      $wf->ResetFilter();
       $wf->SetFilter({eventend=>"[EMPTY]"});
       $wf->SetCurrentView(@wfstat);
       $wf->SetCurrentOrder("NONE");
       my $c=0;
      
       msg(INFO,"getFirst of base::workflow set1.2");$count=0;
-      my ($rec,$msg)=$wf->getFirst();
+      my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
       if (defined($rec)){
          do{
             $self->getParent->processRecord('base::workflow::active',
@@ -437,7 +433,7 @@ sub processData
       my $c=0;
      
       msg(INFO,"getFirst of base::workflow set2");$count=0;
-      my ($rec,$msg)=$wf->getFirst();
+      my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
       if (defined($rec)){
          do{
             $self->getParent->processRecord('base::workflow::notfinished',
@@ -528,7 +524,7 @@ sub processRecord
                                  "base.DataIssue.IdList.open",$rec->{id});
             }
       #   }
-         msg(DEBUG,"response %s\n",Dumper($rec->{responsiblegrp}));
+         #msg(DEBUG,"response %s\n",Dumper($rec->{responsiblegrp}));
       }
       $self->getParent->storeStatVar("Group",["admin"],{},
                                      "Base.Total.Workflow.Active.Count",1);

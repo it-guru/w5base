@@ -54,7 +54,7 @@ sub processData
    $wf->SetCurrentOrder("NONE");
    $wf->SetCurrentView(qw(ALL));
    msg(INFO,"starting collect of itil::workflow::eventinfo");$count=0;
-   my ($rec,$msg)=$wf->getFirst();
+   my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
    if (defined($rec)){
       do{
          $self->getParent->processRecord('itil::workflow::eventinfo',
