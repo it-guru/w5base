@@ -511,66 +511,84 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'isapplserver',
                 group         =>'systemclass',
+                htmlhalfwidth =>1,
                 label         =>'Server/Applicationserver',
                 dataobjattr   =>'system.is_applserver'),
 
       new kernel::Field::Boolean(
+                name          =>'isinfrastruct',
+                group         =>'systemclass',
+                htmlhalfwidth =>1,
+                label         =>'Infrastructursystem',
+                dataobjattr   =>'system.is_infrastruct'),
+
+      new kernel::Field::Boolean(
                 name          =>'isworkstation',
                 group         =>'systemclass',
+                htmlhalfwidth =>1,
                 label         =>'Workstation',
                 dataobjattr   =>'system.is_workstation'),
 
       new kernel::Field::Boolean(
                 name          =>'isprinter',
                 group         =>'systemclass',
+                htmlhalfwidth =>1,
                 label         =>'Printer/Printserver',
                 dataobjattr   =>'system.is_printer'),
 
       new kernel::Field::Boolean(
                 name          =>'isbackupsrv',
                 group         =>'systemclass',
+                htmlhalfwidth =>1,
                 label         =>'Backupserver',
                 dataobjattr   =>'system.is_backupsrv'),
 
       new kernel::Field::Boolean(
                 name          =>'isdatabasesrv',
                 group         =>'systemclass',
+                htmlhalfwidth =>1,
                 label         =>'Databaseserver',
                 dataobjattr   =>'system.is_databasesrv'),
 
       new kernel::Field::Boolean(
                 name          =>'iswebserver',
                 group         =>'systemclass',
+                htmlhalfwidth =>1,
                 label         =>'WEB-Server',
                 dataobjattr   =>'system.is_webserver'),
 
       new kernel::Field::Boolean(
                 name          =>'ismailserver',
                 group         =>'systemclass',
+                htmlhalfwidth =>1,
                 label         =>'Mail/Mailrelay-Server',
                 dataobjattr   =>'system.is_mailserver'),
 
       new kernel::Field::Boolean(
                 name          =>'isrouter',
                 group         =>'systemclass',
+                htmlhalfwidth =>1,
                 label         =>'Router/Networkrouter',
                 dataobjattr   =>'system.is_router'),
 
       new kernel::Field::Boolean(
                 name          =>'isnetswitch',
                 group         =>'systemclass',
+                htmlhalfwidth =>1,
                 label         =>'Switch/Networkswitch',
                 dataobjattr   =>'system.is_netswitch'),
 
       new kernel::Field::Boolean(
                 name          =>'isterminalsrv',
                 group         =>'systemclass',
+                htmlhalfwidth =>1,
                 label         =>'Terminalserver',
                 dataobjattr   =>'system.is_terminalsrv'),
 
       new kernel::Field::Boolean(
                 name          =>'isnas',
                 group         =>'systemclass',
+                htmlhalfwidth =>1,
                 label         =>'Network Attached Storage NAS',
                 dataobjattr   =>'system.is_nas'),
 

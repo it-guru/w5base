@@ -122,6 +122,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'servicesupport',
                 group         =>'physasset',
+                AllowEmpty    =>1,
                 label         =>'Producer Service&Support Class',
                 vjointo       =>'itil::servicesupport',
                 vjoineditbase =>{'cistatusid'=>[3,4]},

@@ -394,12 +394,12 @@ EOF
                }
                $col++;
                if ($halfwidth){
-                  if ($col==2){
+                  if ($col>=2){
                      $col=0;
                   } 
                }
                else{
-                  if ($col==1){
+                  if ($col>=1){
                      $col=0;
                   } 
                }

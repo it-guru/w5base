@@ -27,6 +27,7 @@
 'Educationsystem'=>{de=>'Schulungssystem'},
 'Approval Testsystem'=>{de=>'Abnahmesystem'},
 'Referencesystem'=>{de=>'Referenzsystem'},
+'Infrastructursystem'=>{de=>'Infrastruktursystem'},
 'Databaseserver'=>{de=>'Datenbankserver'},
 'Workstation'=>{de=>'Workstation/DesktopPC',en=>'Workstation/DesktopPC'},
 'you are not authorized to set other persons as databoss'=>{de=>'sie sind nicht berechtig andere Personen als Datanverantwortlicher einzutragen'},

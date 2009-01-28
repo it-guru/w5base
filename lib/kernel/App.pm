@@ -755,15 +755,13 @@ sub Log
                   $fh->autoflush();
                   $LogCache->{$facility}->{file}=$target; 
                   $LogCache->{$facility}->{fh}=$fh; 
-                  printf $fh ("create\n");
                   $fh->close();
                }
             }
             else{
-               msg(INFO,"open logfile '$target'");
+               msg(INFO,"reopen logfile '$target'");
                if ($fh->open(">>$target")){
                   $fh->autoflush();
-                  printf $fh ("reopen\n");
                   $LogCache->{$facility}->{file}=$target; 
                   $LogCache->{$facility}->{fh}=$fh; 
                }
@@ -1036,6 +1034,7 @@ sub ExpandTimeExpression
       $srctimezone=$self->UserTimezone();
    }
    ####################################################################
+   my $monthbase=$self->T("monthbase");
    my $todaylabel=$self->T("today");
    my $nowlabel=$self->T("now");
 
@@ -1069,6 +1068,18 @@ sub ExpandTimeExpression
       $h=0;
       $m=0;
       $s=0;
+      eval('$time=Mktime($srctimezone,$Y,$M,$D,$h,$m,$s);');
+      ($Y,$M,$D,$h,$m,$s)=Localtime($dsttimezone,$time);
+      $found=1;
+      $fail=0;
+   }
+   elsif ($val=~m/^monthbase/gi){
+      $val=~s/^monthbase//;
+      ($Y,$M,undef,undef,undef,undef)=Today_and_Now($srctimezone); 
+      $h=0;
+      $m=0;
+      $s=0;
+      $D=1;
       eval('$time=Mktime($srctimezone,$Y,$M,$D,$h,$m,$s);');
       ($Y,$M,$D,$h,$m,$s)=Localtime($dsttimezone,$time);
       $found=1;
