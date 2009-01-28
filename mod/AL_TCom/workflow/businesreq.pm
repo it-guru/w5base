@@ -100,19 +100,65 @@ sub isWriteValid
    my $rec=shift;
    my @grps=$self->SUPER::isWriteValid($rec);
    if (grep(/^init$/,@grps)){
-      my $mandatorid=$rec->{mandatorid}; 
-      $mandatorid=[$mandatorid] if (ref($mandatorid) ne "ARRAY");
-      @$mandatorid=grep(!/^\s*$/,@$mandatorid);
-      if ($#{$mandatorid}!=-1){
-         if ($self->getParent->IsMemberOf($mandatorid,"RMember")){
-            push(@grps,"tcomcod");
-         }
-      }
-      else{
+      if ($self->isUserTrusted($rec)){
          push(@grps,"tcomcod");
       }
    }
    return(@grps);
+}
+
+sub isUserTrusted          # allow extended edit on Workflow
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my $mandatorid=$rec->{mandatorid}; 
+   $mandatorid=[$mandatorid] if (ref($mandatorid) ne "ARRAY");
+   @$mandatorid=grep(!/^\s*$/,@$mandatorid);
+   if ($#{$mandatorid}!=-1){
+      if ($self->getParent->IsMemberOf($mandatorid,"RMember")){
+         return(1);
+      }
+      my $affectedapplicationid=$rec->{affectedapplicationid};
+      if (ref($affectedapplicationid) ne "ARRAY"){
+         $affectedapplicationid=[$affectedapplicationid];
+      }
+      if ($#{$affectedapplicationid}!=-1){
+         my $app=getModuleObject($self->Config,"itil::appl");
+         $app->SetFilter({id=>$affectedapplicationid});
+         my ($arec,$msg)=$app->getOnlyFirst(qw(responseteamid 
+                            businessteamid tsmid semid tsm2id sem2id));
+         return(0) if (!defined($arec));
+         my $userid=$self->getParent->getCurrentUserId();
+
+         if (($arec->{tsmid} ne "" && $arec->{tsmid}==$userid) ||
+             ($arec->{tsm2id} ne "" && $arec->{tsm2id}==$userid) ||
+             ($arec->{semid} ne "" && $arec->{semid}==$userid) ||
+             ($arec->{sem2id} ne "" && $arec->{sem2id}==$userid) ){
+            return(1);
+         }
+         my @g=();
+         push(@g,$arec->{responseteamid}) if ($arec->{responseteamid} ne "");
+         push(@g,$arec->{businessteamid}) if ($arec->{businessteamid} ne "");
+         if ($#g!=-1){
+            if ($self->getParent->IsMemberOf(\@g,"RMember")){
+               return(1);
+            }
+         }
+      }
+   }
+   else{
+      return(1);
+   }
+   return(0);
+}
+
+sub isEffortReadAllowed
+{
+   my $self=shift;
+   my $WfRec=shift;
+   return(1) if ($self->isUserTrusted($WfRec));
+   return($self->SUPER::isEffortReadAllowed($WfRec));
 }
 
 
