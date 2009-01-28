@@ -259,8 +259,13 @@ sub isWriteValid
       if (defined($WfRec)){
          return(undef) if ($WfRec->{stateid}>=20);
          my $userid=$self->getCurrentUserId();
-         return("actiondata") if (defined($rec) && 
-                                  $userid == $rec->{creatorid});
+         if (defined($rec) && $userid == $rec->{creatorid} &&
+             $rec->{cdate} ne ""){
+            my $d=CalcDateDuration($rec->{cdate},NowStamp("en"));
+            if ($d->{totalminutes}<5000){ # modify only allowed for 3 days
+               return("actiondata");
+            }
+         }
          my @grps=$wf->isWriteValid($WfRec,%param);
          return("actiondata") if (grep(/^ALL$/,@grps) ||
                            grep(/^actions$/,@grps) ||

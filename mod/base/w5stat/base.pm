@@ -303,29 +303,38 @@ sub processData
    my $count;
 
    #######################################################################
-#   if (my ($year,$month)=$dstrange=~m/^(\d{4})(\d{2})$/){
-#      my $wf=getModuleObject($self->getParent->Config,"base::workflow");
-#      msg(INFO,"starting collect of base::workflow set0 ".
-#               "- all modified $dstrange");
-#      $wf->SetFilter({eventend=>"<=monthbase+24d AND >monthbase+24d-1M"});
-#      $wf->SetCurrentView(qw(ALL));
-#      $wf->SetCurrentOrder("NONE");
-#      my $c=0;
-#     
-#      msg(INFO,"getFirst of base::workflow set0");$count=0;
-#      my ($rec,$msg)=$wf->getFirst();
-#      if (defined($rec)){
-#         do{
-#            $self->getParent->processRecord('base::workflow::modified',
-#                                            $dstrange,$rec,%param);
-#            $count++;
-#            $c++;
-#            ($rec,$msg)=$wf->getNext();
-#         } until(!defined($rec));
-#      }
-#      msg(INFO,"FINE of base::workflow set0 $count records");
-#      exit(0);
-#   }
+   if (my ($year,$month)=$dstrange=~m/^(\d{4})(\d{2})$/){
+      my $wf=getModuleObject($self->getParent->Config,"base::workflow");
+      my $wfw=$wf->Clone();
+      msg(INFO,"starting collect of base::workflow set0 ".
+               "- all modified $dstrange");
+      $wf->SetFilter({eventend=>">monthbase-1M-2d AND <now"});
+      $wf->SetCurrentView(qw(ALL));
+      #$wf->SetCurrentView(qw(id class eventend name detaildescription));
+      $wf->SetCurrentOrder("NONE");
+      my $c=0;
+     
+      msg(INFO,"getFirst of base::workflow set0");$count=0;
+      my ($rec,$msg)=$wf->getFirst();
+      if (defined($rec)){
+         do{
+          #  $wfw->ResetFilter();
+          #  $wfw->SetFilter({id=>\$rec->{id}});
+          #  $wfw->SetCurrentView(qw(id));
+          #  my ($WfRec,$msg)=$wfw->getOnlyFirst(qw(ALL));
+          #  if (defined($WfRec)){
+             msg(INFO,"process line $count");
+               $self->getParent->processRecord('base::workflow::modified',
+                                               $dstrange,$rec,%param);
+               $count++;
+               $c++;
+          #  }
+            ($rec,$msg)=$wf->getNext();
+         } until(!defined($rec));
+      }
+      msg(INFO,"FINE of base::workflow set0 $count records");
+      exit(0);
+   }
    #######################################################################
      
    foreach my $objname (qw(base::workflow

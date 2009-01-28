@@ -480,6 +480,9 @@ sub CalcDateDuration
       $duration->{string}=$d;
       return($duration);
    }
+   else{
+      msg(WARN,"parsing error d1='$d1' d2='$d2'");
+   }
    return(undef);
 }
 
