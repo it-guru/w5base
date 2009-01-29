@@ -645,6 +645,7 @@ sub Connector
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','mainwork.css',
                                    'kernel.TabSelector.css'],
+                           title=>'PassX Connector',
                            js=>[qw( toolbox.js)],
                            body=>1,form=>1);
    my $flt=Query->Param("filter");
