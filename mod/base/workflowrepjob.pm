@@ -45,13 +45,44 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'targetfile',
-                label         =>'Target File',
+                label         =>'WebFS target file/URL/Mail',
                 dataobjattr   =>'wfrepjob.targetfile'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Report name',
                 dataobjattr   =>'wfrepjob.reportname'),
+
+      new kernel::Field::Number(
+                name          =>'mday',
+                label         =>'due day',
+                default       =>'1',
+                dataobjattr   =>'wfrepjob.mday'),
+
+      new kernel::Field::Text(
+                name          =>'runmday',
+                label         =>'run on day',
+                dataobjattr   =>'wfrepjob.runmday'),
+
+      new kernel::Field::Text(
+                name          =>'fltclass',
+                label         =>'Filter: Class',
+                dataobjattr   =>'wfrepjob.flt_class'),
+
+      new kernel::Field::Text(
+                name          =>'fltstep',
+                label         =>'Filter: Step',
+                dataobjattr   =>'wfrepjob.flt_step'),
+
+      new kernel::Field::Text(
+                name          =>'fltname',
+                label         =>'Filter: Name',
+                dataobjattr   =>'wfrepjob.flt_name'),
+
+      new kernel::Field::Text(
+                name          =>'fltdesc',
+                label         =>'Filter: Description',
+                dataobjattr   =>'wfrepjob.flt_desc'),
 
       new kernel::Field::Text(
                 name          =>'srcid',

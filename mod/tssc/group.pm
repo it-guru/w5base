@@ -39,25 +39,25 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 label         =>'Group ID',
-                dataobjattr   =>'scadm1.assignmentm1.unique_id'),
+                dataobjattr   =>'scadm1.dsccentralassignmentm1.unique_id'),
 
       new kernel::Field::Link(
                 name          =>'groupid',
                 label         =>'GroupId',
                 uppersearch   =>1,
-                dataobjattr   =>'scadm1.assignmentm1.name'),
+                dataobjattr   =>'scadm1.dsccentralassignmentm1.name'),
 
       new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'Fullname',
                 ignorecase    =>1,
-                dataobjattr   =>'scadm1.assignmentm1.name'),
+                dataobjattr   =>'scadm1.dsccentralassignmentm1.name'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
                 ignorecase    =>1,
-                dataobjattr   =>'scadm1.assignmentm1.name'),
+                dataobjattr   =>'scadm1.dsccentralassignmentm1.name'),
 
       new kernel::Field::SubList(
                 name          =>'users',
@@ -78,11 +78,11 @@ sub new
                 vjoinon       =>['groupid'=>'lgroup'],
                 vjoindisp     =>['luser']),
 
-      new kernel::Field::Text(
+      new kernel::Field::Textarea(
                 name          =>'description',
                 label         =>'Description',
                 ignorecase    =>1,
-                dataobjattr   =>'scadm1.assignmentm1.ass_description'),
+                dataobjattr   =>'scadm1.dsccentralassignmentm1.brief_description'),
 
    );
    $self->setDefaultView(qw(id name description));
@@ -110,7 +110,7 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="scadm1.assignmentm1";
+   my $from="scadm1.dsccentralassignmentm1";
    return($from);
 }
 

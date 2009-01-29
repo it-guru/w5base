@@ -292,6 +292,17 @@ sub recreateStats
 
 
    foreach my $obj (values(%{$self->{$mode}})){
+      if ($obj->can("processDataInit")){
+         my %param;
+         if ($obj->Self eq $module || $module eq "*" || !defined($module)){
+            if (!$obj->{InitIsDone}){
+               $obj->processDataInit($dstrangestamp,%param);
+            }
+            $obj->{InitIsDone}++;
+         }
+      }
+   }
+   foreach my $obj (values(%{$self->{$mode}})){
       if ($obj->can("processData")){
          my %param;
          $param{currentmonth}=$currentmonth if (defined($currentmonth));
@@ -300,6 +311,16 @@ sub recreateStats
          $param{baseduration}=$baseduration if (defined($baseduration));
          if ($obj->Self eq $module || $module eq "*" || !defined($module)){
             $obj->processData($dstrangestamp,%param);
+         }
+      }
+   }
+   foreach my $obj (values(%{$self->{$mode}})){
+      if ($obj->can("processDataFinish")){
+         my %param;
+         if ($obj->Self eq $module || $module eq "*" || !defined($module)){
+            if ($obj->{InitIsDone}){
+               $obj->processDataFinish($dstrangestamp,%param);
+            }
          }
       }
    }

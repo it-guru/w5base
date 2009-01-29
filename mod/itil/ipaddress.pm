@@ -122,7 +122,7 @@ sub new
       new kernel::Field::DynWebIcon(
                 name          =>'webaddresstyp',
                 searchable    =>0,
-                depend        =>['type'],
+                depend        =>['type','name','dnsname'],
                 htmlwidth     =>'5px',
                 htmldetail    =>0,
                 weblink       =>sub{
@@ -131,12 +131,22 @@ sub new
                    my $mode=shift;
                    my $typeo=$self->getParent->getField("type");
                    my $d=$typeo->FormatedDetail($current,"AscV01");
+
+                   my $ipo=$self->getParent->getField("dnsname");
+                   my $ipname=$ipo->RawValue($current);
+                   if ($ipname eq ""){
+                      $ipo=$self->getParent->getField("name");
+                      $ipname=$ipo->RawValue($current);
+                   }
+                   $ipname=~s/"//g;
+
                    my $e=$self->RawValue($current);
                    my $name=$self->Name();
                    my $app=$self->getParent();
                    if ($mode=~m/html/i){
-                      return("<img ".
-                         "src=\"../../itil/load/iptyp${e}.gif\" title=\"$d\">");
+                      return("<a href=\"ssh://$ipname\"><img ".
+                         "src=\"../../itil/load/iptyp${e}.gif\" ".
+                         "title=\"$d\" border=0></a>");
                    }
                    return($d);
                 },

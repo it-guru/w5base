@@ -302,35 +302,6 @@ sub processData
    my %param=@_;
    my $count;
 
-   #######################################################################
-   if ($param{currentmonth} eq $dstrange){
-      my $wf=getModuleObject($self->getParent->Config,"base::workflow");
-      my $wfw=$wf->Clone();
-      msg(INFO,"starting collect of base::workflow set0 ".
-               "- all modified $dstrange");
-      $wf->SetFilter({mdate=>">monthbase-1M-2d AND <now"});
-      $wf->SetCurrentView(qw(ALL));
-      $wf->SetCurrentOrder("NONE");
-      my $c=0;
-     
-      msg(INFO,"getFirst of base::workflow set0");$count=0;
-      my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
-      if (defined($rec)){
-         do{
-             if (($rec->{class}=~m/^.*diary$/) ||
-                 ($rec->{class}=~m/^.*req$/)){
-             msg(INFO,"process line $count $rec->{id} - $rec->{eventstart}");
-               $self->getParent->processRecord('base::workflow::stat',
-                                               $dstrange,$rec,%param);
-               $c++;
-            }
-            $count++;
-            ($rec,$msg)=$wf->getNext();
-         } until(!defined($rec));
-      }
-      msg(INFO,"FINE of base::workflow set0 $count records");
-   }
-   #######################################################################
      
    foreach my $objname (qw(base::workflow
                            base::workflowaction
