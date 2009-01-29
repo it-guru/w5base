@@ -248,8 +248,11 @@ sub generateMenuTree
    $self->ResetFilter();
    if ($flt ne ""){
       my %groups=$self->getGroupsOf($userid,'RMember','both');
-      $self->SecureSetFilter([{modifyuser=>\$userid,
+      $self->SecureSetFilter([
+                             {modifyuser=>\$userid,
                               name=>"*$flt*"},
+                             {modifyuser=>\$userid,
+                              comments=>"*$flt*"},
                              {modifyuser=>\$userid,
                               account=>"*$flt*"},
                              {aclmode=>['write','read'],
@@ -261,12 +264,22 @@ sub generateMenuTree
                               acltarget=>\'base::user',
                               acltargetid=>[$userid],
                               entrytypeid=>'<=10',
+                              comments=>"*$flt*"},
+                             {aclmode=>['write','read'],
+                              acltarget=>\'base::user',
+                              acltargetid=>[$userid],
+                              entrytypeid=>'<=10',
                               account=>"*$flt*"},
                              {aclmode=>['write','read'],
                               acltarget=>\'base::grp',
                               acltargetid=>[keys(%groups)],
                               entrytypeid=>'<=10',
                               name=>"$flt*"},
+                             {aclmode=>['write','read'],
+                              acltarget=>\'base::grp',
+                              acltargetid=>[keys(%groups)],
+                              entrytypeid=>'<=10',
+                              comments=>"$flt*"},
                              {aclmode=>['write','read'],
                               acltarget=>\'base::grp',
                               acltargetid=>[keys(%groups)],
@@ -357,6 +370,9 @@ sub generateMenuTree
                      $rec->{entrytype}==3 ||
                      $rec->{entrytype}==5){
                     $mrec{label}=$rec->{account}.'@'.$rec->{name};
+                    if ($rec->{comments} ne ""){
+                       $mrec{label}.="</a> (".$rec->{comments}.")";
+                    }
                     $mrec{menuid}=$rec->{id};
                     $mrec{entrytype}=$rec->{entrytype};
                     $mrec{name}=$rec->{name};
