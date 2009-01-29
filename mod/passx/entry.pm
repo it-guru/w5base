@@ -233,7 +233,7 @@ sub InitRequest
 sub mkConnectorURL
 {
    my $rec=shift;
-   return("ssh://".$rec->{account}.'@'.$rec->{name}.":22");
+   return("ssh://".$rec->{account}.'@'.$rec->{name});
 }
 
 sub generateMenuTree
