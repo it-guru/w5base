@@ -347,9 +347,22 @@ sub generateMenuTree
                  $simplem.="<tr class=$lineclass ".
                      "onMouseOver=\"this.className='linehighlight'\" ".
                      "onMouseOut=\"this.className='$lineclass'\">\n";
-                 $simplem.="<td onClick=\"$onclick\" width=1%>".
-                     "<img src=\"../../../public/passx/load/".
-                     "actype.$rec->{entrytype}.gif\"></td>";
+                 my $onclicktag=" onClick=\"$onclick\" ";
+                 my $ho;
+                 my $hc;
+                 if ($rec->{entrytype}==1){
+                    $ho="<a href=\"ssh://$rec->{account}\@$rec->{name}\">";
+                 }
+                 if ($rec->{entrytype}==5){
+                    $ho="<a href=\"rdesktop://$rec->{account}\@$rec->{name}\">";
+                 }
+                 if ($rec->{entrytype}==3){
+                    $ho="<a href=\"telnet://$rec->{account}\@$rec->{name}\">";
+                 }
+                 $hc="</a>" if ($ho ne "");
+                 $simplem.="<td $onclicktag width=1%>".
+                     "$ho<img border=0 src=\"../../../public/passx/load/".
+                     "actype.$rec->{entrytype}.gif\">$hc</td>";
                  $simplem.="<td onClick=\"$onclick\">$dispname</td>";
                  $simplem.="<td onClick=\"$onclick\">$rec->{account}</td>";
                  $simplem.="</td>";
