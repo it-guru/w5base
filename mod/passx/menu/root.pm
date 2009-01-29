@@ -41,6 +41,12 @@ sub Init
                       func=>'UserFrontend',
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("Tools.passx.connector",
+                      "passx::mgr",
+                      prio=>1,
+                      func=>'Connector',
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("Tools.passx.key",
                       "passx::key",
                       defaultacl=>['admin']);

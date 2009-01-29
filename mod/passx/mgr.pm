@@ -210,6 +210,7 @@ sub getValidWebFunctions
 {
    my $self=shift;
    return("UserFrontend","Workspace","CryptoOut","KeyStore","helptmpl",
+          "Connector",
           $self->SUPER::getValidWebFunctions());
 }
 
@@ -534,22 +535,24 @@ EOF
    my $pages=[pstore=>'Password Store',
               keymgmt=>'Key Management',
               keydist=>'Distribution Management',
+              connector=>'Connector',
               help=>'Help'];
    if (!defined($pkrec)){
       $p="keymgmt" if ($p eq "pstore" || $p eq "");
       $pages=[keymgmt=>'Key Management',help=>'Help'];
    }
    my $page="none";
-   $page=$self->pstore()  if ($p eq "pstore");
-   $page=$self->keymgmt() if ($p eq "keymgmt");
-   $page=$self->keydist() if ($p eq "keydist");
-   $page=$self->help()    if ($p eq "help");
+   $page=$self->pstore()    if ($p eq "pstore");
+   $page=$self->keymgmt()   if ($p eq "keymgmt");
+   $page=$self->keydist()   if ($p eq "keydist");
+   $page=$self->connector() if ($p eq "connector");
+   $page=$self->help()      if ($p eq "help");
 
    my @WfFunctions=();
    my %param=(functions   =>\@WfFunctions,
               pages       =>$pages,
               activpage  =>$p,
-              tabwidth    =>"23%",
+              tabwidth    =>"18%",
               page        =>$page,
              );
    print TabSelectorTool("ModeSelect",%param);
@@ -622,6 +625,71 @@ sub help
                             src="helptmpl">
 </iframe>
 EOF
+}
+
+sub connector
+{
+   my $self=shift;
+
+   my $d=<<EOF;
+<iframe frameborder=0 style="border-style:none;padding:0px;
+                            margin:0px;width:100%;height:100%" 
+                            src="Connector">
+</iframe>
+EOF
+}
+
+sub Connector
+{
+   my $self=shift;
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','mainwork.css',
+                                   'kernel.TabSelector.css'],
+                           js=>[qw( toolbox.js)],
+                           body=>1,form=>1);
+   my $flt=Query->Param("filter");
+   my $curpath=Query->Param("curpath");
+   my $search=$self->T("search");
+
+   my $d=<<EOF;
+<input type=hidden name=curpath>
+<link rel=stylesheet type="text/css" href="../../../public/passx/load/passx.css"></link>
+<link rel=stylesheet type="text/css" href="../../../public/base/load/menu.css"></link>
+<script language="JavaScript">
+function setCurPath(p)
+{
+   e=document.forms[0].elements['curpath'];
+   if (e){
+      e.value=p;
+      document.forms[0].submit();
+   }
+
+}
+function resizeDiv()
+{
+   var h=getViewportHeight();
+   var sl=document.getElementById("sl");
+   sl.style.height=h-60;
+}
+addEvent(window,"load",resizeDiv);
+addEvent(window,"resize",resizeDiv);
+
+</script>
+<table width=100% border=0>
+<tr>
+<td width=1% nowrap>&nbsp;<b>PassX Connector: &nbsp;</b></td><td><input type=text name=filter value="$flt" size=10 style="width:100%"></td><td width=100><input type=submit name=go value="$search" style="width:100%"></td></tr></table>
+<div id=sl style="width:100%;height:3px;overflow:auto;border-width:1px;border-style:solid">
+EOF
+   my $userid=$self->getCurrentUserId();
+   my $ent=$self->getPersistentModuleObject("passx::entry");
+   $d.=$ent->generateMenuTree("connector",$userid,$flt,$curpath);
+   $d.=<<EOF;
+</div>
+<center>&bull; <a class=sublink href=javascript:openwin("Connector","_blank","height=300,width=400,toolbar=no,status=no,resizable=yes,scrollbars=auto")>new window</a> &bull;</center>
+</table>
+EOF
+   print $d;
+   print $self->HtmlBottom(body=>1,form=>1);
 }
 
 sub helptmpl
@@ -722,6 +790,7 @@ function setCurPath(p)
    }
 
 }
+
 </script>
 EOF
 }

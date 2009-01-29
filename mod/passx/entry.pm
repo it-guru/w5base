@@ -230,6 +230,12 @@ sub InitRequest
    return($bk);
 }
 
+sub mkConnectorURL
+{
+   my $rec=shift;
+   return("ssh://".$rec->{account}.'@'.$rec->{name}.":22");
+}
+
 sub generateMenuTree
 {
    my $self=shift;
@@ -283,13 +289,16 @@ sub generateMenuTree
       my $line=1;
       do{
         if ($rec->{quickpath} ne "" || $mode ne "fvwm"){
-           my $onclick="showCryptoOut($rec->{id})";
+           my $onclick="javascript:showCryptoOut($rec->{id})";
+           if ($mode eq "connector"){
+              $onclick=mkConnectorURL($rec);
+           }
            if ($rec->{quickpath} ne "" && $flt eq ""){
               foreach my $subquickpath (split(/;/,$rec->{quickpath})){
                  my @quickpath=split(/\./,$subquickpath);
                  my @curpath=split(/\./,$curpath);
                  my $pathdepth=$#curpath+1;
-                 if ($mode ne "web"){
+                 if ($mode ne "web" && $mode ne "connector"){
                     $pathdepth=$#quickpath+1;
                  }
                  for(my $chkpathdepth=0;$chkpathdepth<=$pathdepth;
@@ -298,15 +307,16 @@ sub generateMenuTree
                        my $chkpath=join(".",@quickpath[0..$chkpathdepth]);
                        if (!defined($padd{$chkpath})){
                           $targetml=\@ml if ($chkpathdepth==0);
-                          if ($mode ne "web" || ($chkpathdepth==0 ||
-                              join(".",@quickpath[0..$chkpathdepth-1]) eq
-                              join(".",@curpath[0..$chkpathdepth-1]))){
+                          if (($mode ne "web" || $mode eq "connector") || 
+                              ($chkpathdepth==0 ||
+                               join(".",@quickpath[0..$chkpathdepth-1]) eq
+                               join(".",@curpath[0..$chkpathdepth-1]))){
                              my %mrec;
                              $mrec{tree}=[];
                              $mrec{label}=$quickpath[$chkpathdepth];
                              $mrec{href}="javascript:setCurPath(\"$chkpath\")";
                              $mrec{menuid}=$mid++;
-                             if ($mode ne "web"){
+                             if ($mode ne "web" && $mode ne "connector"){
                                 delete($mrec{href});
                              }
                              push(@$targetml,\%mrec);
@@ -316,20 +326,24 @@ sub generateMenuTree
                        $targetml=$padd{$chkpath}->{tree};
                     }
                  }
-                 if (($mode ne "web" && $rec->{entrytype}<=10) || 
+                 if ((($mode ne "web" && $mode ne "connector") && 
+                      $rec->{entrytype}<=10) || 
                      join(".",@curpath) eq join(".",@quickpath)){
                     my %mrec;
                     $mrec{label}=$rec->{account}.'@'.$rec->{name};
+                    if ($rec->{comments} ne ""){
+                       $mrec{label}.="</a> (".$rec->{comments}.")";
+                    }
                     $mrec{menuid}=$rec->{id};
                     $mrec{entrytype}=$rec->{entrytype};
                     $mrec{name}=$rec->{name};
                     $mrec{account}=$rec->{account};
                     $mrec{comments}=$rec->{comments};
-                    if ($mode eq "web"){
+                    if ($mode eq "web" || $mode eq "connector"){
                        $mrec{parent}=$padd{join(".",@quickpath)};
                     }
-                    $mrec{href}="javascript:$onclick";
-                    if ($mode ne "web"){
+                    $mrec{href}="$onclick";
+                    if ($mode ne "web" && $mode ne "connector"){
                        delete($mrec{href});
                     }
                     push(@$targetml,\%mrec);
@@ -337,6 +351,22 @@ sub generateMenuTree
               }
            }
            if ($rec->{quickpath} eq "" || $flt ne ""){
+              if ($mode eq "connector"){
+                 my %mrec;
+                 if ($rec->{entrytype}==1 ||
+                     $rec->{entrytype}==3 ||
+                     $rec->{entrytype}==5){
+                    $mrec{label}=$rec->{account}.'@'.$rec->{name};
+                    $mrec{menuid}=$rec->{id};
+                    $mrec{entrytype}=$rec->{entrytype};
+                    $mrec{name}=$rec->{name};
+                    $mrec{account}=$rec->{account};
+                    $mrec{comments}=$rec->{comments};
+                    #   $mrec{parent}=$padd{join(".",@quickpath)};
+                    $mrec{href}=mkConnectorURL($rec);
+                    push(@$targetml,\%mrec);
+                 }
+              }
               if ($mode eq "web"){
                  my $lineclass="line$line";
                  my $dispname=$rec->{name};
@@ -347,7 +377,9 @@ sub generateMenuTree
                  $simplem.="<tr class=$lineclass ".
                      "onMouseOver=\"this.className='linehighlight'\" ".
                      "onMouseOut=\"this.className='$lineclass'\">\n";
-                 my $onclicktag=" onClick=\"$onclick\" ";
+                 my $onclicktag=$onclick;
+                 $onclicktag=~s/^javascript://;
+                 $onclicktag=" onclick=$onclicktag ";
                  my $ho;
                  my $hc;
                  if ($rec->{entrytype}==1){
@@ -363,14 +395,15 @@ sub generateMenuTree
                  $simplem.="<td $onclicktag width=1%>".
                      "$ho<img border=0 src=\"../../../public/passx/load/".
                      "actype.$rec->{entrytype}.gif\">$hc</td>";
-                 $simplem.="<td onClick=\"$onclick\">$dispname</td>";
-                 $simplem.="<td onClick=\"$onclick\">$rec->{account}</td>";
+                 $simplem.="<td $onclicktag>$dispname</td>";
+                 $simplem.="<td $onclicktag>$rec->{account}</td>";
                  $simplem.="</td>";
                  $simplem.="</tr>";
                  $line++;
                  $line=1 if ($line>2);
               }
-              if ($mode ne "web" && $rec->{entrytype}<=10){
+              if (($mode ne "web" && $mode ne "connector") 
+                  && $rec->{entrytype}<=10){
                  my %mrec;
                  $mrec{label}=$rec->{account}.'@'.$rec->{name};
                  $mrec{menuid}=$rec->{id};
@@ -388,7 +421,7 @@ sub generateMenuTree
       $simplem.="</table>";
    }
    if ($#ml!=-1){
-      if ($mode eq "web"){
+      if ($mode eq "web" || $mode eq "connector"){
          $d.=kernel::MenuTree::BuildHtmlTree(tree=>\@ml, 
                                              hrefclass=>'menulink',
                                              rootpath=>'./',
@@ -468,7 +501,7 @@ sub generateMenuTree
          $d=Dumper(\@ml);
       }
    }
-   if ($mode eq "web"){
+   if ($mode eq "web" || $mode eq "connector"){
       $d.=$simplem;
    }
 
