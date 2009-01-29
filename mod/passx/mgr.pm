@@ -686,7 +686,7 @@ EOF
    $d.=$ent->generateMenuTree("connector",$userid,$flt,$curpath);
    $d.=<<EOF;
 </div>
-<center>&bull; <a class=sublink href=javascript:openwin("Connector","_blank","height=300,width=400,toolbar=no,status=no,resizable=yes,scrollbars=auto")>new window</a> &bull;</center>
+<center>&bull; <a class=sublink href=javascript:openwin("Connector","_blank","height=300,width=450,toolbar=no,status=no,resizable=yes,scrollbars=auto")>new window</a> &bull;</center>
 </table>
 EOF
    print $d;
