@@ -38,6 +38,15 @@ sub Init
    return(1);
 }
 
+sub doAutoSearch
+{
+   my $self=shift;
+   
+   return(0);
+}
+
+
+
 sub getQueryTemplate
 {
    my $self=shift;

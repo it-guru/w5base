@@ -30,6 +30,15 @@ sub new
    return($self);
 }
 
+sub doAutoSearch
+{
+   my $self=shift;
+   
+   return(0);
+}
+
+
+
 sub Init
 {
    my $self=shift;

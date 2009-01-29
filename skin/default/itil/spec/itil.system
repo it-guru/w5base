@@ -46,4 +46,14 @@ This description will be displayed
 in the detail view of the related
 applications.
 '},
+'isinfrastruct'=>{de=>'
+Die Beschreibung die hier eingetragen
+ist, wird bei den Auflistungen der
+Systeme in der Anwendungs-Seite
+angezeigt.
+',en=>'
+This description will be displayed
+in the detail view of the related
+applications.
+'},
 
