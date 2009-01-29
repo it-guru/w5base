@@ -788,13 +788,17 @@ sub getNext
             while(my $temprec=$self->{DB}->fetchrow()){  # on oracle DBD
             }                                     # we must read to the end
          }                                        # of request to count rows
+         $self->{DB}->finish();
          return(undef,"Limit reached");
       }
    }
-   my $temprec=$self->{DB}->fetchrow();
-   if (defined($temprec)){
-      $temprec=$self->tieRec($temprec);
-      return($temprec);
+   if (defined($self->{DB})){
+      my $temprec=$self->{DB}->fetchrow();
+      if (defined($temprec)){
+         $temprec=$self->tieRec($temprec);
+         return($temprec);
+      }
+      $self->{DB}->finish();
    }
    return(undef,undef);
 }
