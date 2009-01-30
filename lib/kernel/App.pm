@@ -80,7 +80,9 @@ sub getPersistentModuleObject
       my $m=getModuleObject($config,$module);
       $self->{$label}=$m
    }
-   $self->{$label}->ResetFilter();
+   if (defined($self->{$label})){
+      $self->{$label}->ResetFilter();
+   }
    return($self->{$label});
 }
 
