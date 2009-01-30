@@ -1060,11 +1060,11 @@ sub ValidateDelete
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default finance technical delmgmt customer custcontracts 
+   return(
+          qw(header default finance technical delmgmt customer custcontracts 
              contacts phonenumbers 
              interfaces systems misc attachments control 
-             accountnumbers source));
+             accountnumbers licenses source));
 }
 
 sub HandleInfoAboSubscribe

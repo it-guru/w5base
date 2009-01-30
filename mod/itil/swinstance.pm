@@ -603,50 +603,10 @@ sub isWriteValid
    return(undef);
 }
 
-#sub FinishDelete
-#{
-#   my $self=shift;
-#   my $oldrec=shift;
-#   my $bak=$self->SUPER::FinishDelete($oldrec);
-#
-#   my $refobj=getModuleObject($self->Config,"itil::lnkdbinstancecustcontract");
-#   if (defined($refobj)){
-#      my $idname=$self->IdField->Name();
-#      my $id=$oldrec->{$idname};
-#      $refobj->SetFilter({'dbinstance'=>\$id});
-#      $refobj->SetCurrentView(qw(ALL));
-#      $refobj->ForeachFilteredRecord(sub{
-#                         $refobj->ValidatedDeleteRecord($_);
-#                      });
-#   }
-#   my $refobj=getModuleObject($self->Config,"itil::lnkdbinstancesystem");
-#   if (defined($refobj)){
-#      my $idname=$self->IdField->Name();
-#      my $id=$oldrec->{$idname};
-#      $refobj->SetFilter({'dbinstanceid'=>\$id});
-#      $refobj->SetCurrentView(qw(ALL));
-#      $refobj->ForeachFilteredRecord(sub{
-#                         $refobj->ValidatedDeleteRecord($_);
-#                      });
-#   }
-#   my $refobj=getModuleObject($self->Config,"itil::lnkdbinstancedbinstance");
-#   if (defined($refobj)){
-#      my $idname=$self->IdField->Name();
-#      my $id=$oldrec->{$idname};
-#      $refobj->SetFilter({'fromdbinstanceid'=>\$id});
-#      $refobj->SetCurrentView(qw(ALL));
-#      $refobj->ForeachFilteredRecord(sub{
-#                         $refobj->ValidatedDeleteRecord($_);
-#                      });
-#   }
-#   return($bak);
-#}
-#
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default adm systems misc contacts source));
+   return(qw(header default adm systems misc contacts source));
 }
 
 

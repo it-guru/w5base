@@ -437,8 +437,7 @@ sub isViewValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default finance licdesc licuse privacy_lickeys 
+   return( qw(header default finance licdesc licuse privacy_lickeys 
              contacts misc attachments));
 }
 

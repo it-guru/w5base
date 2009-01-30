@@ -2139,7 +2139,7 @@ sub getUserviewList
 
 sub getDetailBlockPriority                # posibility to change the block order
 {
-   return(qw(header default));
+   return(qw(header default contacts misc source));
 }
 
 sub getSpecPaths

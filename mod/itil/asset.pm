@@ -637,8 +637,7 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default guardian phonenumbers location 
+   return(qw(header default guardian phonenumbers location 
              physasset contacts misc systems 
              appl attachments control source));
 }

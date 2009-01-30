@@ -80,6 +80,7 @@ sub new
                 label         =>'Employee count',
                 depend        =>['grpid'],
                 searchable    =>0,
+                htmldetail    =>0,
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;

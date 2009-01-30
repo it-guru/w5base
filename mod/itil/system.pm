@@ -1065,8 +1065,9 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default admin phonenumbers logsys location physys systemclass 
+   return(
+          qw(header default admin phonenumbers logsys location 
+             physys systemclass 
              opmode applications software ipaddresses
              contacts misc attachments control source));
 }
