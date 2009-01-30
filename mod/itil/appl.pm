@@ -180,6 +180,16 @@ sub new
                 vjoinon       =>['id'=>'applid'],
                 vjoindisp     =>['liccontract','quantity','comments']),
 
+      new kernel::Field::SubList(
+                name          =>'swinstances',
+                htmldetail    =>0,
+                label         =>'Software instances',
+                group         =>'swinstances',
+                vjointo       =>'itil::swinstance',
+                vjoinbase     =>[{cistatusid=>"<=4"}],
+                vjoinon       =>['id'=>'applid'],
+                vjoindisp     =>['fullname','cistatus']),
+
       new kernel::Field::Text(
                 name          =>'businessteambossid',
                 group         =>'technical',
@@ -1046,9 +1056,10 @@ sub ValidateDelete
    my $rec=shift;
 
    if ($#{$rec->{systems}}!=-1 ||
+       $#{$rec->{swinstances}}!=-1 ||
        $#{$rec->{custcontracts}}!=-1){
       $self->LastMsg(ERROR,
-          "delete only posible, if there are no system and contract relations");
+          "delete only posible, if there are no system, software instance and contract relations");
       return(0);
    }
 
