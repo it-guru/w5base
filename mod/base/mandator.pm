@@ -75,6 +75,19 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'mandator.comments'),
 
+      new kernel::Field::Number(
+                name          =>'usercount',
+                label         =>'Employee count',
+                depend        =>['grpid'],
+                searchable    =>0,
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my @n=$self->getParent->getMembersOf($current->{grpid},
+                                                      "REmployee","down");
+                   return($#n+1);
+                }),
+
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
                 label         =>'Contacts',

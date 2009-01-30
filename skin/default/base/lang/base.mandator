@@ -3,3 +3,4 @@
 'fieldgroup.contacts'=>{de=>'Kontakte',en=>'Contacts'},
 'Groupname'=>{de=>'Gruppenname'},
 'Mandator'=>{de=>'Mandant'},
+'Employee count'=>{de=>'Mitarbeiteranzahl'},
