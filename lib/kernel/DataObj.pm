@@ -2168,8 +2168,12 @@ sub LoadSpec
    my @libs=$self->getSpecPaths($rec);
    my %spec;
    my $lang=$self->Lang();
-   foreach my $lib (@libs){
-      my $filename=$self->getSkinFile($lib);
+
+   sub processSpecfile
+   {
+      my $filename=shift;
+      my $spec=shift;
+
       my $speccode="";
       if (open(F,"<$filename")){
          $speccode=join("",<F>);
@@ -2185,9 +2189,24 @@ sub LoadSpec
       else{
          foreach my $k (keys(%$s)){
             if (defined($s->{$k}->{$lang})){
-               $spec{$k}=$s->{$k}->{$lang};
+               $spec->{$k}=$s->{$k}->{$lang};
             }
          }
+      }
+   }
+   my %filedone;
+   foreach my $lib (@libs){
+      my $filename=$self->getSkinFile($lib,addskin=>'default');
+      if ($filename ne "" && !$filedone{$filename}){
+         processSpecfile($filename,\%spec);
+         $filedone{$filename}++;
+      }
+   }
+   foreach my $lib (@libs){
+      my $filename=$self->getSkinFile($lib);
+      if ($filename ne "" && !$filedone{$filename}){
+         processSpecfile($filename,\%spec);
+         $filedone{$filename}++;
       }
    }
    return(\%spec);

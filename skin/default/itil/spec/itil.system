@@ -47,13 +47,14 @@ in the detail view of the related
 applications.
 '},
 'isinfrastruct'=>{de=>'
-Die Beschreibung die hier eingetragen
-ist, wird bei den Auflistungen der
-Systeme in der Anwendungs-Seite
-angezeigt.
+Systeme die zum Betrieb von anderen Serversystemen
+notwendig sind (VIOs, Kontrolstations, 
+Hardware Überwachungsrechner)
+sind als Infrastruktursystem zu kennzeichnen.
 ',en=>'
-This description will be displayed
-in the detail view of the related
-applications.
+Systems witch are neasessary to run other
+server systems like VIOs, control stations 
+or hardware monitoring servers are need
+to be marked als infrastructur systems.
 '},
 

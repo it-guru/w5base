@@ -871,6 +871,7 @@ sub getSkinFile
 {
    my $self=shift;
    my $conftag=shift;
+   my %param=@_;
    my $skindir=$self->getSkinDir();
    my @skin=$self->getSkin();
  
@@ -878,6 +879,9 @@ sub getSkinFile
    $conftag=~s/^\///g;                 # security hack
 
    my @filename=();
+   if (defined($param{addskin})){
+      unshift(@skin,$param{addskin});
+   }
    foreach my $skin (@skin){
       my $chkname=$skindir."/".$skin."/".$conftag;
       #msg(INFO,"chkname='$chkname'");
