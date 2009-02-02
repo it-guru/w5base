@@ -646,13 +646,14 @@ sub Connector
    print $self->HtmlHeader(style=>['default.css','mainwork.css',
                                    'kernel.TabSelector.css'],
                            title=>'PassX Connector',
-                           js=>[qw( toolbox.js)],
+                           js=>[qw( toolbox.js ContextMenu.js)],
                            body=>1,form=>1);
    my $flt=Query->Param("filter");
    my $curpath=Query->Param("curpath");
    my $search=$self->T("search");
 
    my $d=<<EOF;
+<div id="context_menu" class="context_menu"></div>
 <input type=hidden name=curpath>
 <link rel=stylesheet type="text/css" href="../../../public/passx/load/passx.css"></link>
 <link rel=stylesheet type="text/css" href="../../../public/base/load/menu.css"></link>

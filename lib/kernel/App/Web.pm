@@ -354,6 +354,34 @@ sub Empty
 }
 
 
+sub getHtmlContextMenu
+{
+   my $self=shift;
+   my $name=shift;
+   my @contextMenu=@_;
+
+   my $contextMenu;
+   if ($#contextMenu!=-1){
+      $contextMenu="<div id=\"contextMenu_$name\" "
+                   ."class=\"context_menu\">";
+      $contextMenu.="<table cellspacing=\"1\" cellpadding=\"2\" ".
+                    "border=\"0\">";
+      while(my $label=shift(@contextMenu)){
+         my $link=shift(@contextMenu);
+         $contextMenu.="\n<tr>";
+         $contextMenu.="<td class=\"std\" ".
+                       "onMouseOver=\"this.className='active';\" ".
+                       "onMouseOut=\"this.className='std';\">";
+         $contextMenu.="<div onMouseUp=\"$link\">$label</div>";
+         $contextMenu.="</td></tr>";
+      }
+      $contextMenu.="\n</table>";
+      $contextMenu.="</div>";
+   }
+   return($contextMenu);
+}
+
+
 sub ValidateCaches
 {
    my $self=shift;

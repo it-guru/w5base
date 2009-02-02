@@ -230,6 +230,23 @@ sub InitRequest
    return($bk);
 }
 
+sub mkContextMenu
+{
+   my $self=shift;
+   my $rec=shift;
+
+
+   my $onclick="openwin('../entry/Detail?".
+               "AllowClose=1&search_id=$rec->{id}',".
+               "'_blank',".
+               "'height=480,width=640,toolbar=no,status=no,".
+               "resizable=yes,scrollbars=no')";
+   my @ml=($self->T("Detail")=>$onclick);
+
+
+   return(\@ml);
+}
+
 sub mkConnectorURL
 {
    my $rec=shift;
@@ -372,6 +389,7 @@ sub generateMenuTree
                     if ($rec->{comments} ne ""){
                        $mrec{label}.="</a> (".$rec->{comments}.")";
                     }
+                    $mrec{contextMenu}=$self->mkContextMenu($rec);
                     $mrec{menuid}=$rec->{id};
                     $mrec{entrytype}=$rec->{entrytype};
                     $mrec{name}=$rec->{name};
@@ -405,6 +423,7 @@ sub generateMenuTree
                     $mrec{comments}=$rec->{comments};
                     #   $mrec{parent}=$padd{join(".",@quickpath)};
                     $mrec{href}=mkConnectorURL($rec);
+                    $mrec{contextMenu}=$self->mkContextMenu($rec);
                     push(@$targetml,\%mrec);
                  }
               }
