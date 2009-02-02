@@ -233,7 +233,17 @@ sub InitRequest
 sub mkConnectorURL
 {
    my $rec=shift;
-   return("ssh://".$rec->{account}.'@'.$rec->{name});
+   my $ho;
+   if ($rec->{entrytype}==1){
+      $ho="ssh://$rec->{account}\@$rec->{name}";
+   }
+   if ($rec->{entrytype}==5){
+      $ho="rdesktop://$rec->{account}\@$rec->{name}";
+   }
+   if ($rec->{entrytype}==3){
+      $ho="telnet://$rec->{account}\@$rec->{name}";
+   }
+   return($ho);
 }
 
 sub generateMenuTree
@@ -408,17 +418,10 @@ sub generateMenuTree
                  my $onclicktag=$onclick;
                  $onclicktag=~s/^javascript://;
                  $onclicktag=" onclick=$onclicktag ";
+                 my $connecturl=mkConnectorURL($rec);
                  my $ho;
                  my $hc;
-                 if ($rec->{entrytype}==1){
-                    $ho="<a href=\"ssh://$rec->{account}\@$rec->{name}\">";
-                 }
-                 if ($rec->{entrytype}==5){
-                    $ho="<a href=\"rdesktop://$rec->{account}\@$rec->{name}\">";
-                 }
-                 if ($rec->{entrytype}==3){
-                    $ho="<a href=\"telnet://$rec->{account}\@$rec->{name}\">";
-                 }
+                 $ho="<a href=\"$connecturl\">" if ($connecturl ne "");
                  $hc="</a>" if ($ho ne "");
                  $simplem.="<td $onclicktag width=1%>".
                      "$ho<img border=0 src=\"../../../public/passx/load/".
