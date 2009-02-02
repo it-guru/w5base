@@ -237,11 +237,14 @@ sub mkConnectorURL
    if ($rec->{entrytype}==1){
       $ho="ssh://$rec->{account}\@$rec->{name}";
    }
-   if ($rec->{entrytype}==5){
+   elsif ($rec->{entrytype}==5){
       $ho="rdesktop://$rec->{account}\@$rec->{name}";
    }
-   if ($rec->{entrytype}==3){
+   elsif($rec->{entrytype}==3){
       $ho="telnet://$rec->{account}\@$rec->{name}";
+   }
+   else{
+      $ho="connect://$rec->{account}\@$rec->{name}";
    }
    return($ho);
 }
