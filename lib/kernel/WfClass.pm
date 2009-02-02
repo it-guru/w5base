@@ -1086,6 +1086,12 @@ EOF
 
 }
 
+sub getHtmlContextMenu
+{
+   my $self=shift;
+   return($self->getParent->getHtmlContextMenu(@_));
+}
+
 
 
 
