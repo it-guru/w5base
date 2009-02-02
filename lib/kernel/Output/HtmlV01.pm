@@ -398,6 +398,7 @@ EOF
    my $limitstart=$self->getParent->getParent->{_LimitStart};
    my $currentlimit=$self->getParent->getParent->{_Limit};
    my $r=$self->getParent->getParent->Rows();
+printf STDERR ("fifi rows=$r\n");
    if (defined($r) && $pagelimit>0){
       my $totalpages=0;
       if ($pagelimit>0){

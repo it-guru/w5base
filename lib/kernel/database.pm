@@ -128,7 +128,6 @@ sub finish
     if (defined($self->{sth})){
        $self->{sth}->finish();
     }
-    delete($self->{sth});
     return();
 }
 
@@ -174,7 +173,10 @@ sub execute
    }
    if (lc($self->DriverName()) eq "mysql"){
       if ($attr->{unbuffered}){
-         $attr->{mysql_use_result}=1;
+         $attr->{mysql_use_result}=0;
+      }
+      else{
+         $attr->{mysql_use_result}=0;
       }
    }
    delete($attr->{unbuffered});

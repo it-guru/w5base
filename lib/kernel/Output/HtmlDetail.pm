@@ -172,7 +172,6 @@ sub ProcessLine
 function setBG(){
    var e=document.getElementById("HtmlDetail");
    if (e){
-      e.style.backgroundAttachment="fixed";
       e.style.backgroundPosition="top left";
       e.style.backgroundImage="url($watermark)";
       e.style.backgroundRepeat="repeat";
