@@ -173,7 +173,7 @@ sub execute
    }
    if (lc($self->DriverName()) eq "mysql"){
       if ($attr->{unbuffered}){
-         $attr->{mysql_use_result}=0;
+         $attr->{mysql_use_result}=1;
       }
       else{
          $attr->{mysql_use_result}=0;

@@ -249,7 +249,6 @@ sub Finish
    my ($self,$fh)=@_;
    $self->{'workbook'}->close();
 
-   $self->{'workbook'}->close();
    if (open(F,"<$self->{filename}")){
       my $buf;
       while(sysread(F,$buf,8192)){

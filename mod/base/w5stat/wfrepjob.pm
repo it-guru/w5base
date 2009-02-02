@@ -20,6 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Universal;
+use File::Temp;
 @ISA=qw(kernel::Universal);
 
 
@@ -44,7 +45,12 @@ sub processDataInit
    my $wfrepjob=getModuleObject(
                 $self->getParent->Config,"base::workflowrepjob");
    $self->{RJ}=[$wfrepjob->getHashList(qw(ALL))];
-   $self->{SSTORE}={} if (!defined($self->{SSTORE}));
+   if (!defined($self->{SSTORE})){
+      eval("use Spreadsheet::WriteExcel::Big;");
+      if ($@ eq ""){
+         $self->{SSTORE}={};
+      }
+   }
 }
 
 
@@ -58,11 +64,12 @@ sub processData
    #######################################################################
    if ($param{currentmonth} eq $dstrange){
       my $wf=getModuleObject($self->getParent->Config,"base::workflow");
+      $param{DataObj}=$wf;
       my $wfw=$wf->Clone();
       msg(INFO,"starting collect of base::workflow set0 ".
                "- all modified $dstrange");
       $wf->SetFilter({mdate=>">monthbase-1M-2d AND <now"});
-      $wf->Limit(20);
+   #   $wf->Limit(20);
       $wf->SetCurrentView(qw(ALL));
       $wf->SetCurrentOrder("NONE");
      
@@ -94,7 +101,7 @@ sub processRecord
 #      msg(INFO,"         class=$rec->{class}");
       foreach my $repjob (@{$self->{RJ}}){
          if ($self->matchJob($repjob,$rec)){
-            $self->storeWorkflow($repjob,$rec);
+            $self->storeWorkflow($repjob,$rec,\%param);
          }
       }
    }
@@ -148,12 +155,47 @@ sub storeWorkflow
    my $self=shift;
    my $repjob=shift;
    my $WfRec=shift;
+   my $param=shift;
    my $ss=$self->{SSTORE};
+   return(undef) if (!defined($self->{SSTORE}));
 
    my $wbslot=$repjob->{targetfile};
-   my $shslot=$repjob->{name};
+   my $sheetn=$repjob->{name};
+   my $period="current";
+
+   my $slot;
+   if (!exists($ss->{$period}->{$wbslot})){
+      $ss->{$period}->{$wbslot}={}; 
+      $slot=$ss->{$period}->{$wbslot}; 
+      my $fh=new File::Temp();
+      $slot->{fh}=$fh;
+      $slot->{'workbook'}->{o}=Spreadsheet::WriteExcel::Big->new($fh->filename);
+      $slot->{'workbook'}->{targetfile}=$repjob->{targetfile};
+   }
+   $slot=$ss->{$period}->{$wbslot};
+#      printf STDERR ("fifi workbook=$slot->{'workbook'}\n");
+   if (!exists($slot->{sheet}->{$sheetn." Detail"})){
+      $slot->{sheet}->{$sheetn." Detail"}->{o}=
+                      $slot->{'workbook'}->{o}->addworksheet($sheetn." Detail");
+      $slot->{sheet}->{$sheetn." Detail"}->{line}=1;
+   }
+   my $sheet=$slot->{sheet}->{$sheetn." Detail"};
+
+   my $fields=["eventstart","eventend","name"];
+
+   for(my $col=0;$col<=$#{$fields};$col++){
+      my $fieldname=$fields->[$col];
+      my $fobj=$param->{DataObj}->getField($fieldname,$WfRec);
+      my $v=$fobj->FormatedResult($WfRec,"XlsV01");
+#      printf STDERR ("fobj of $fieldname = $fobj v=$v\n");
+      $v=~s/=//g;
+      $sheet->{o}->write($sheet->{line},$col,$v);
+   }
+   $sheet->{line}++;
+   
 
 #   if (!exists($ss->{$wbslot}));
+
 
    msg(INFO,"store $WfRec->{id}:'$WfRec->{name}'");
 
@@ -168,7 +210,37 @@ sub processDataFinish
    my %param=@_;
    my $count;
 
+   my $ss=$self->{SSTORE};
+   return(undef) if (!defined($self->{SSTORE}));
+
    msg(INFO,"processDataFinish in $self");
+
+   foreach my $period (keys(%{$ss})){
+      foreach my $wbslot (keys(%{$ss->{$period}})){
+         my $slot=$ss->{$period}->{$wbslot};
+         $slot->{workbook}->{o}->close();
+         if (open(O,">$slot->{'workbook'}->{targetfile}")){
+            if (open(F,"<".$slot->{fh}->filename)){
+               my $buf;
+               while(sysread(F,$buf,8192)){
+                  print O $buf;
+               }
+               close(F);
+            }
+            else{
+               printf STDERR ("ERROR: can't open $self->{filename}\n");
+            }
+            unlink($self->{filename});
+            close(O);
+         }
+
+         
+      #   printf STDERR ("fifi store period=$period wbslot=$wbslot\n");
+      }
+   }
+
+   
+
    delete($self->{SSTORE});
 }
 
