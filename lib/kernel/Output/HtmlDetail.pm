@@ -170,11 +170,13 @@ sub ProcessLine
       $d.=<<EOF
 <script language="JavaScript">
 function setBG(){
-   window.document.body.style.backgroundAttachment="fixed";
-   window.document.body.style.backgroundPosition="top left";
-   window.document.body.style.backgroundImage="url($watermark)";
-   window.document.body.style.background="#ff0000";
-   window.document.body.style.backgroundRepeat="repeat";
+   var e=document.getElementById("HtmlDetail");
+   if (e){
+      e.style.backgroundAttachment="fixed";
+      e.style.backgroundPosition="top left";
+      e.style.backgroundImage="url($watermark)";
+      e.style.backgroundRepeat="repeat";
+   }
 }
 addEvent(window, "load", setBG);
 </script>

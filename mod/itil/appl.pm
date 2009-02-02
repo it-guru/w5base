@@ -818,12 +818,12 @@ sub getRecordWatermarkUrl
 {
    my $self=shift;
    my $rec=shift;
-printf STDERR ("fifi rec=%s\n",Dumper($rec));
-printf STDERR ("fifi secstate=$rec->{secstate}\n");
    if ($rec->{secstate} eq "vsnfd"){
       my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-      return("../../../public/itil/load/HtmlDetail.watermark.vsnfd.jpg?".$cgi->query_string());
+      return("../../../public/itil/load/HtmlDetail.watermark.vsnfd.jpg?".
+             $cgi->query_string());
    }
+   return(undef);
 }
 
 
