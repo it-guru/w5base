@@ -594,7 +594,7 @@ sub isWriteValid
    my @databossedit=qw(default guardian physasset contacts control location
                        phonenumbers misc attachments);
    if (!defined($rec)){
-      return("default");
+      return("default","control");
    }
    else{
       if ($rec->{databossid}==$userid){

@@ -1021,7 +1021,8 @@ sub isWriteValid
                        physys ipaddresses phonenumbers
                        attachments control systemclass);
    if (!defined($rec)){
-      return("default","admin","misc","opmode","control","systemclass");
+      return("default","physys","admin","misc",
+             "opmode","control","systemclass");
    }
    else{
       if ($rec->{databossid}==$userid){
