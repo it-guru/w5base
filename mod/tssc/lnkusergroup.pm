@@ -35,8 +35,8 @@ sub new
                                   label      =>'LinkID',
                                   align      =>'left',
                                   dataobjattr=>
-         "concat(scadm1.assignmenta1.name,concat('-',".
-         "scadm1.assignmenta1.operators))"),
+         "concat(scadm1.dsccentralassignmenta1.name,concat('-',".
+         "scadm1.dsccentralassignmenta1.operators))"),
 
       new kernel::Field::TextDrop( name       =>'groupname',
                                    label      =>'Groupname',
@@ -58,12 +58,12 @@ sub new
                                    htmlwidth  =>'80px',
                                    label      =>'Loginname',
                                    dataobjattr=>
-                                     'scadm1.assignmenta1.operators'),
+                                     'scadm1.dsccentralassignmenta1.operators'),
                                   
       new kernel::Field::Text(     name       =>'lgroup',
                                    uppersearch=>1,
                                    label      =>'Group',
-                                   dataobjattr=>'scadm1.assignmenta1.name'),
+                                   dataobjattr=>'scadm1.dsccentralassignmenta1.name'),
 
    );
    $self->setDefaultView(qw(id userfullname lgroup));
@@ -93,7 +93,7 @@ sub getSqlFrom
 {
    my $self=shift;
    my $from=
-      "scadm1.assignmenta1";
+      "scadm1.dsccentralassignmenta1";
    return($from);
 }
 

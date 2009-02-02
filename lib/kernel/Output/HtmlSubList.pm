@@ -86,7 +86,7 @@ sub getStyle
 
 sub ProcessHead
 {
-   my ($self,$fh,$param)=@_;
+   my ($self,$fh,$rec,$msg,$param)=@_;
    my $app=$self->getParent->getParent();
    my $view=$app->getCurrentViewName();
    my @view=$app->getCurrentView();
