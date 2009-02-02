@@ -19,7 +19,7 @@
 'Create time'=>{de=>'Erstellungszeitpunkt'},
 'Closeing time'=>{de=>'Abschlusszeitpunkt'},
 'Work Duration'=>{de=>'Bearbeitungsdauer'},
-'Business Impact'=>{de=>'Geschäftsprocessbeeinträchtigung'},
+'Business Impact'=>{de=>'Geschäftsprozessbeeinträchtigung'},
 'Urgency'=>{de=>'Dringlichkeit'},
 'closetype.'=>{de=>'Undefiniert',  en=>'Undefined'},
 'closetype.1'=>{de=>'Bekannter Fehler',  en=>'Known Error'},

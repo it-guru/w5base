@@ -91,3 +91,6 @@
 'opmode.license'=>{de=>'Lizenz',en=>'License'},
 'direct linked Licenses'=>{de=>'direkt verknüpfte Lizenzen'},
 'default language for eventinformations'=>{de=>'Standard Spracheinstellung für den Workflow Ereignismeldung'},
+'Security state'=>{de=>'Sicherheitsstatus'},
+'SECST.'=>{de=>'Normal',en=>'normal'},
+'SECST.vsnfd'=>{de=>'Verschlusssache - nur für den dienstlichen Gebrauch',en=>'VS-nfd'},

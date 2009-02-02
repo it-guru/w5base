@@ -367,6 +367,15 @@ sub new
                 htmleditwidth =>'100px',
                 dataobjattr   =>'appl.namedusercount'),
 
+      new kernel::Field::Select(
+                name          =>'secstate',
+                group         =>'customer',
+                label         =>'Security state',
+                allowempty    =>1,
+                value         =>['','vsnfd'],
+                transprefix   =>'SECST.',
+                dataobjattr   =>'appl.secstate'),
+
       new kernel::Field::Link(
                 name          =>'businessteamid',
                 dataobjattr   =>'appl.businessteam'),
@@ -804,6 +813,20 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/itil/load/appl.jpg?".$cgi->query_string());
 }
+
+sub getRecordWatermarkUrl
+{
+   my $self=shift;
+   my $rec=shift;
+printf STDERR ("fifi rec=%s\n",Dumper($rec));
+printf STDERR ("fifi secstate=$rec->{secstate}\n");
+   if ($rec->{secstate} eq "vsnfd"){
+      my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+      return("../../../public/itil/load/HtmlDetail.watermark.vsnfd.jpg?".$cgi->query_string());
+   }
+}
+
+
 
 
 sub getSqlFrom

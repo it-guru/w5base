@@ -205,7 +205,7 @@ sub WriteToStdout
       print STDOUT ($self->Format->DownloadHeader().
                     $self->Format->getHttpHeader());
    }
-   my $d=$self->Format->ProcessHead(\$fh,\%param);
+   my $d=$self->Format->ProcessHead(\$fh,undef,$msg,\%param);
    $self->Format->Finish(\$fh,%param);
    print STDOUT ($d) if (defined($d));
    sysseek($fh,0,SEEK_SET);
@@ -300,7 +300,7 @@ sub WriteToScalar    # ToDo: viewgroups implementation
       return("");
    }
    my $bk="";
-   my $d=$self->Format->ProcessHead(\$fh,\%param);
+   my $d=$self->Format->ProcessHead(\$fh,undef,$msg,\%param);
    $self->Format->Finish(\$fh,%param);
    $bk.=$d if (defined($d));
    sysseek($fh,0,SEEK_SET);

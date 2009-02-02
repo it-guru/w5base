@@ -76,7 +76,7 @@ sub getStyle
 
 sub ProcessHead
 {
-   my ($self,$fh,$rec,$msg)=@_;
+   my ($self,$fh,$rec,$msg,$param)=@_;
    my $app=$self->getParent->getParent();
    my $view=$app->getCurrentViewName();
    my @view=$app->getCurrentView();
@@ -164,6 +164,21 @@ sub ProcessLine
       $d.="<div style=\"height:2px;overflow:hidden;padding:0;maring:0\">".
           "&nbsp;</div>";
       $d.="<hr class=detailseperator>";
+   }
+   my $watermark=$app->getRecordWatermarkUrl($rec);
+   if ($watermark ne ""){
+      $d.=<<EOF
+<script language="JavaScript">
+function setBG(){
+   window.document.body.style.backgroundAttachment="fixed";
+   window.document.body.style.backgroundPosition="top left";
+   window.document.body.style.backgroundImage="url($watermark)";
+   window.document.body.style.background="#ff0000";
+   window.document.body.style.backgroundRepeat="repeat";
+}
+addEvent(window, "load", setBG);
+</script>
+EOF
    }
 
    my $module=$app->Module();
@@ -575,7 +590,7 @@ sub ProcessBottom
    if (defined($UserCache->{fullname})){
       $user.=" - ".$UserCache->{fullname};
    }
-
+   $d.="<br><br>";
    $d.="<div style=\"width:100%;padding:0px;margin:0px\">";
    if (!($self->getParent->{NewRecord})){
        $d.="<div class=detailbottomline>".

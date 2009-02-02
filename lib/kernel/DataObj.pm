@@ -1943,6 +1943,14 @@ sub getRecordImageUrl
    return("../../../public/base/load/world.jpg?".$cgi->query_string());
 }
 
+sub getRecordWatermarkUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return(undef);
+   return("../../../public/base/load/world.jpg?".$cgi->query_string());
+}
+
 sub getRecordHeader
 {
    my $self=shift;
