@@ -109,6 +109,16 @@ sub calcWorkflowStart
    return($r);
 }
 
+sub getSpecPaths
+{
+   my $self=shift;
+   my $rec=shift;
+   my @l=$self->SUPER::getSpecPaths($rec);
+   push(@l,"TS/spec/TS.appl");
+   return(@l);
+}
+
+
 sub isWriteValid
 {
    my $self=shift;

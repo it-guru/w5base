@@ -57,7 +57,8 @@ sub qcheckRecord
       foreach my $fld (qw(office_phone office_street office_zipcode 
                           office_location office_mobile office_costcenter
                           office_accarea
-                          office_facsimile)){
+                          office_facsimile
+                          givenname surname)){
           my $wiwdata={$fld=>$wiwrec->{$fld}};
           if (ref($wiwdata->{$fld}) eq "ARRAY"){
              $wiwdata->{$fld}=$wiwdata->{$fld}->[0];
