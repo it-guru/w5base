@@ -815,8 +815,10 @@ EOF
                #printf STDERR ("fifi read of $fp NOT ok\n");
             }
             if (defined($target)){
-               if ($target=~m/^http[s]{0,1}:\/\//){
+               if (($target=~m/^http[s]{0,1}:\/\//) ||
+                   ($target=~m/^\/.*\/.*\?.*$/)){
                   $currenturl=$self->targetUrl($m);
+printf STDERR ("fifi currenturl=$currenturl\n");
                }
                else{
                   $currenturl=${rootpath}.$self->targetUrl($m);
@@ -861,6 +863,9 @@ sub targetUrl
       $tr=~s/::.*$//;
       $tr="base" if ($tr eq "");
       $target="../../$tr/load/$target";
+   }
+   elsif ($target=~m/^\/.*\/.*\?.*$/){
+      $target="../../..$target";
    }
    elsif ($target=~m/::/){
       $target=~s/::/\//;

@@ -38,7 +38,7 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 label         =>'UserID',
-                dataobjattr   =>'scadm1.contactsm1.contact_name'),
+                dataobjattr   =>'contactsm1.contact_name'),
 
       new kernel::Field::Text(
                 name          =>'fullname',
@@ -59,7 +59,7 @@ sub new
                 name          =>'loginname',
                 label         =>'User-Login',
                 ignorecase    =>1,
-                dataobjattr   =>'scadm1.contactsm1.user_id'),
+                dataobjattr   =>'contactsm1.user_id'),
 
 #      new kernel::Field::Text(
 #                name          =>'contactid',
@@ -71,44 +71,44 @@ sub new
                 name          =>'name',
                 label         =>'Name',
                 ignorecase    =>1,
-                dataobjattr   =>'scadm1.contactsm1.last_name'),
+                dataobjattr   =>'contactsm1.last_name'),
 
       new kernel::Field::Text(
                 name          =>'firstname',
                 label         =>'Firstname',
                 ignorecase    =>1,
-                dataobjattr   =>'scadm1.contactsm1.first_name'),
+                dataobjattr   =>'contactsm1.first_name'),
 
       new kernel::Field::Text(
                 name          =>'email',
                 label         =>'E-Mail',
                 ignorecase    =>1,
-                dataobjattr   =>'scadm1.contactsm1.email'),
+                dataobjattr   =>'contactsm1.email'),
 
       new kernel::Field::Phonenumber(
                 name          =>'office_phone',
                 group         =>'office',
                 label         =>'Phonenumber',
-                dataobjattr   =>'scadm1.contactsm1.phone'),
+                dataobjattr   =>'contactsm1.phone'),
 
       new kernel::Field::Phonenumber(
                 name          =>'office_mobile',
                 group         =>'office',
                 label         =>'Mobile-Phonenumber',
-                dataobjattr   =>'scadm1.contactsm1.car_phone'),
+                dataobjattr   =>'contactsm1.car_phone'),
 
       new kernel::Field::Phonenumber(
                 name          =>'office_facsimile',
                 group         =>'office',
                 label         =>'FAX-Number',
-                dataobjattr   =>'scadm1.contactsm1.fax'),
+                dataobjattr   =>'contactsm1.fax'),
 
       new kernel::Field::Text(
                 name          =>'sclocation',
                 label         =>'SC-Location',
                 group         =>'office',
                 ignorecase    =>1,
-                dataobjattr   =>'scadm1.contactsm1.location_name'),
+                dataobjattr   =>'contactsm1.location_name'),
 
 
 
@@ -145,25 +145,25 @@ sub new
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'scadm1.contactsm1.external_system'),
+                dataobjattr   =>'contactsm1.external_system'),
                                                 
       new kernel::Field::Link(
                 name          =>'userid',
                 label         =>'User-ID',
                 upperserarch  =>1,
-                dataobjattr   =>'scadm1.contactsm1.operator_id'),
+                dataobjattr   =>'contactsm1.operator_id'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
                 label         =>'Source-Id',
-                dataobjattr   =>'scadm1.contactsm1.external_id'),
+                dataobjattr   =>'contactsm1.external_id'),
 
       new kernel::Field::Date(
                 name          =>'srcload',
                 group         =>'source',
                 label         =>'Source-Load',
-                dataobjattr   =>'scadm1.contactsm1.last_update'),
+                dataobjattr   =>'contactsm1.last_update'),
 
 
                                                    
