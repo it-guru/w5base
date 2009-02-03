@@ -9,8 +9,8 @@ auswählbar.
 '},
 'scapprgroup'=>{de=>'
 Wählen Sie hier die Approvergroup, die
-bei Changes für diese Anwendung verwendet
-mindestens werden soll. Dies ist in
+bei Changes für diese Anwendung mindestens 
+verwendet werden soll. Dies ist in
 der Regel die Approvergroup des betreffenden
 Betriebsteams.
 '}
