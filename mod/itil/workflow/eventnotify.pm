@@ -1017,15 +1017,16 @@ sub getNotificationSubject
 {
    my $self=shift;
    my $WfRec=shift;
+   my $action=shift;
    my $subjectlabel=shift;
    my $failclass=shift;
    my $ag=shift;
 
    my $subject="Event: $ag";
-   my $sitename=$self->Config->Param("SITENAME");
-   if ($sitename ne ""){
-      $subject=$sitename.": ".$subject;
-   }
+#   my $sitename=$self->Config->Param("SITENAME");  # verwirrt anscheinend nur
+#   if ($sitename ne ""){
+#      $subject=$sitename.": ".$subject;
+#   }
    if ($WfRec->{eventmode} eq "EVk.net"){ 
       $subject.=" Network";
    }

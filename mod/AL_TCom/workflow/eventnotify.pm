@@ -229,6 +229,9 @@ sub getNotificationSubject
 {
    my $self=shift;
    my $WfRec=shift;
+   if ($WfRec->{eventlang} ne "de"){
+      return($self->SUPER::getNotificationSubject($WfRec,@_));
+   }
    my $action=shift;
    my $subjectlabel=shift;
    my $failclass=shift;
@@ -708,6 +711,10 @@ sub Process
 
       my $subjectlabel="Ergebnis der Ursachenanalyse";
       my $headtext="Ergebnis der Ursachenanalyse";
+      if ($WfRec->{eventlang}=~m/^en/){
+         $subjectlabel="result of root cause analyse";
+         $headtext="result of root cause analyse";
+      }
       delete($ENV{HTTP_FORCE_LANGUAGE});
       my $ag="";
       if ($WfRec->{eventmode} eq "EVk.appl"){ 
