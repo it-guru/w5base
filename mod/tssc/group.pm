@@ -39,25 +39,25 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 label         =>'Group ID',
-                dataobjattr   =>'scadm1.dsccentralassignmentm1.unique_id'),
+                dataobjattr   =>'dsccentralassignmentm1.unique_id'),
 
       new kernel::Field::Link(
                 name          =>'groupid',
                 label         =>'GroupId',
                 uppersearch   =>1,
-                dataobjattr   =>'scadm1.dsccentralassignmentm1.name'),
+                dataobjattr   =>'dsccentralassignmentm1.name'),
 
       new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'Fullname',
                 ignorecase    =>1,
-                dataobjattr   =>'scadm1.dsccentralassignmentm1.name'),
+                dataobjattr   =>'dsccentralassignmentm1.name'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
                 ignorecase    =>1,
-                dataobjattr   =>'scadm1.dsccentralassignmentm1.name'),
+                dataobjattr   =>'dsccentralassignmentm1.name'),
 
       new kernel::Field::SubList(
                 name          =>'users',
@@ -82,7 +82,43 @@ sub new
                 name          =>'description',
                 label         =>'Description',
                 ignorecase    =>1,
-                dataobjattr   =>'scadm1.dsccentralassignmentm1.brief_description'),
+                dataobjattr   =>'dsccentralassignmentm1.brief_description'),
+
+      new kernel::Field::Boolean(
+                name          =>'ismanager',
+                label         =>'is manager group',
+                ignorecase    =>1,
+                group         =>'grouptype',
+                htmlhalfwidth =>1,
+                dataobjattr   =>
+                "decode(dsccentralassignmentm1.group_type_manager,'t',1,0)"),
+
+      new kernel::Field::Boolean(
+                name          =>'isapprover',
+                label         =>'is approver group',
+                ignorecase    =>1,
+                group         =>'grouptype',
+                htmlhalfwidth =>1,
+                dataobjattr   =>
+                "decode(dsccentralassignmentm1.group_type_approver,'t',1,0)"),
+
+      new kernel::Field::Boolean(
+                name          =>'isassignment',
+                label         =>'is assignment group',
+                ignorecase    =>1,
+                group         =>'grouptype',
+                htmlhalfwidth =>1,
+                dataobjattr   =>
+                "decode(dsccentralassignmentm1.group_type_assignment,'t',1,0)"),
+
+      new kernel::Field::Boolean(
+                name          =>'isreviewer',
+                label         =>'is reviewer group',
+                ignorecase    =>1,
+                group         =>'grouptype',
+                htmlhalfwidth =>1,
+                dataobjattr   =>
+                "decode(dsccentralassignmentm1.group_type_reviewer,'t',1,0)"),
 
    );
    $self->setDefaultView(qw(id name description));
@@ -133,7 +169,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","users");
+   return("header","default","grouptype","users");
 }
 
 

@@ -33,16 +33,32 @@ sub new
       new kernel::Field::Link(
                 name          =>'acinmassignmentgroupid',
                 group         =>'control',
-                label         =>'AssetCenter Incient Assignmentgroup ID',
+                label         =>'Incient Assignmentgroup ID',
                 container     =>'additional'),
 
       new kernel::Field::TextDrop(
                 name          =>'acinmassingmentgroup',
-                label         =>'AssetCenter Incident Assignmentgroup',
-                group         =>'inm',
+                label         =>'Incident Assignmentgroup',
+                group         =>'inmchm',
                 async         =>'1',
                 vjointo       =>'tsacinv::group',
                 vjoinon       =>['acinmassignmentgroupid'=>'lgroupid'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'scapprgroupid',
+                group         =>'control',
+                label         =>'Change Approvergroup ID',
+                container     =>'additional'),
+
+      new kernel::Field::TextDrop(
+                name          =>'scapprgroup',
+                label         =>'Change Approvergroup',
+                vjoineditbase =>{isapprover=>\'1'},
+                group         =>'inmchm',
+                async         =>'1',
+                vjointo       =>'tssc::group',
+                vjoinon       =>['scapprgroupid'=>'id'],
                 vjoindisp     =>'name'),
    );
  
@@ -98,7 +114,7 @@ sub isWriteValid
    my $self=shift;
    my @l=$self->SUPER::isWriteValid(@_);
    if (grep(/^(technical|ALL)$/,@l)){
-      push(@l,"inm");
+      push(@l,"inmchm");
    }
    return(@l);
 }
@@ -111,7 +127,7 @@ sub getDetailBlockPriority
    for(my $c=0;$c<=$#l;$c++){
       $inserti=$c+1 if ($l[$c] eq "technical");
    }
-   splice(@l,$inserti,$#l-$inserti,("inm",@l[$inserti..($#l+-1)]));
+   splice(@l,$inserti,$#l-$inserti,("inmchm",@l[$inserti..($#l+-1)]));
    return(@l);
 
 }  
