@@ -151,7 +151,7 @@ sub new
                 name          =>'userid',
                 label         =>'User-ID',
                 upperserarch  =>1,
-                dataobjattr   =>'contactsm1.operator_id'),
+                dataobjattr   =>'contactsm1.user_id'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
@@ -176,6 +176,8 @@ sub mkFullname
 {
    my $self=shift;
    my $current=shift;
+
+printf STDERR ("fifi current=%s\n",Dumper($current));
 
    my $fullname="";
    my $name=$current->{name};
