@@ -734,6 +734,7 @@ sub mkIncidentStoreRec
       ServiceCenterPriority=>$rec->{priority},
       ServiceCenterHomeAssignment=>$rec->{hassignment},
       ServiceCenterInitialAssignment=>$rec->{iassignment},
+      ServiceCenterResolvedAssignment=>$rec->{rassignment},
       ServiceCenterSysModTime=>$rec->{sysmodtime},
       ServiceCenterInvolvedAssignment=>$rec->{involvedassignment},
       ServiceCenterSoftwareID=>$rec->{softwareid},
