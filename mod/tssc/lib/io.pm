@@ -801,10 +801,14 @@ sub mkIncidentStoreRec
       }
       else{
          $wfrec{class}='itil::workflow::incident';
-         $wfrec{stateid}=21;           # non AL-T-Com is automaticly finished
-         # sollte jetzt auch mit sofort beenden funktionieren
       }
       $wfrec{step}='itil::workflow::incident::extauthority';
+   }
+   if ($oldclass eq "itil::workflow::incident" ||
+       (defined($wfrec{class}) && 
+        ($wfrec{class}=~m/itil::workflow::incident/))){
+      $wfrec{stateid}=21;           # non AL-T-Com is automaticly finished
+      # sollte jetzt auch mit sofort beenden funktionieren
    }
    if (!($oldrec[0]->{step}=~m/::postreflection$/ &&
        $wfrec{class}=~m/^AL_TCom::/)){
