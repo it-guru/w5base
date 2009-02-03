@@ -2217,8 +2217,6 @@ sub LoadSpec
          $filedone{$filename}++;
       }
    }
-   printf STDERR ("fifi ====>spec = %s\n",join(":",sort(keys(%filedone))));
-   printf STDERR ("fifi ====>ISA = %s\n",join(":",@ISA));
    return(\%spec);
 }
 
