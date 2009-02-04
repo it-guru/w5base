@@ -73,19 +73,16 @@ sub new
 
       new kernel::Field::Text(     name       =>'surname',
                                    label      =>'Surname',
-                                   htmlwidth  =>'100',
                                    size       =>'10',
                                    dataobjattr=>'sn'),
 
       new kernel::Field::Text(     name       =>'givenname',
                                    label      =>'Givenname',
-                                   htmlwidth  =>'80',
                                    size       =>'10',
                                    dataobjattr=>'givenname'),
 
       new kernel::Field::Email(    name       =>'email',
                                    label      =>'E-Mail',
-                                   htmlwidth  =>'220',
                                    size       =>'10',
                                    dataobjattr=>'mail'),
                                   

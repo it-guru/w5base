@@ -87,6 +87,7 @@ sub getStyle
 sub ProcessHead
 {
    my ($self,$fh,$rec,$msg,$param)=@_;
+
    my $app=$self->getParent->getParent();
    my $view=$app->getCurrentViewName();
    my @view=$app->getCurrentView();
@@ -107,6 +108,7 @@ sub ProcessHead
       push(@sortnames,"String");
    }
    my $sortline=join(",",map({'"'.$_.'"'} @sortnames));
+
 
    if ($param->{ParentMode} ne "HtmlV01" &&
        $param->{ParentMode} ne "HtmlNative"){
@@ -155,7 +157,8 @@ function InitTab$tableid()
 addEvent(window,"load",InitTab$tableid);
 </script>
 EOF
-   if ($param->{ParentMode} eq "HtmlNative"){
+   if ($param->{ParentMode} eq "HtmlNative" ||
+       $param->{ParentMode} eq "HtmlDetail"){
       $d.="<table width=100%>\n";
    }
    else{
