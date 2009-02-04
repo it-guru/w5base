@@ -157,8 +157,7 @@ function InitTab$tableid()
 addEvent(window,"load",InitTab$tableid);
 </script>
 EOF
-   if ($param->{ParentMode} eq "HtmlNative" ||
-       $param->{ParentMode} eq "HtmlDetail"){
+   if ($param->{ParentMode} eq "HtmlNative"){
       $d.="<table width=100%>\n";
    }
    else{
