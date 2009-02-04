@@ -213,11 +213,6 @@ sub getNotifyDestinations
    my $emailcc=shift;
    my $ifappl=shift;
 
-   $emailto->{'hartmut.vogler@t-systems.com'}++;
-   $emailto->{'alexander.bartsch@t-systems.com'}++;
-   $emailto->{'vogler.hartmut@googlemail.com'}++;
-   return(undef);
-
    if ($mode ne "ALTCOMmode"){
       return($self->SUPER::getNotifyDestinations($mode,
                                                  $WfRec,$emailto,$emailcc));
