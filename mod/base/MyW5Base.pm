@@ -108,7 +108,7 @@ sub Main
       my $bm=$self->getPersistentModuleObject("BookMark","base::userbookmark");
       $bm->ResetFilter();
       $bm->SetFilter({userid=>\$userid});
-      my @bm=$bm->getHashList(qw(ALL));
+      my @bm=$bm->getHashList(qw(name srclink target));
       my $l1=$self->T("monitor my workflows");
       my $l2=$self->T("my current jobs");
       my $l3=$self->T("start a new workflow");
