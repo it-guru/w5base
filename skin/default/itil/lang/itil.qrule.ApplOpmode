@@ -1,4 +1,4 @@
-'itil::qrule::ApplOpmode'=>{de=>'prüfen ob vorwiegende Betriebsart gültig',
+'itil::qrule::ApplOpmode'=>{de=>'Prüfen ob vorwiegende Betriebsart gültig',
                              en=>'check if primary operation mode is valid'},
 'no primary operation mode selected'=>{de=>'keine vorwiegende Betriebsart ausgewählt'},
 
