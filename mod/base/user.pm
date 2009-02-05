@@ -63,13 +63,13 @@ sub new
                          my $userid=$self->getParent->getCurrentUserId();
                          if (!defined($userid) ||
                               $current->{userid}!=$userid){
-                            sub replEmail
+                            sub ureplEmail
                             {
                                my $e=$_[0];
                                $e=~s/[a-z]/?/g;
                                return("($e)");
                             } 
-                            $d=~s/\((.*\@.*)\)/replEmail($1)/e; 
+                            $d=~s/\((.*\@.*)\)/ureplEmail($1)/e; 
                          }
                       }
                       return($d);
@@ -1022,8 +1022,10 @@ sub getDetailFunctions
    my $self=shift;
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
-   my @f=($self->T("SSH Public Key")=>'SSHPublicKey',
-         );
+   my @f;
+   if ($self->getCurrentSecState()>1){ 
+      @f=($self->T("SSH Public Key")=>'SSHPublicKey');
+   }
    if (!defined($rec) || ($rec->{ssh1publickey} eq "" && 
                           $rec->{ssh2publickey} eq "" &&
        !($self->IsMemberOf("admin")) && !($userid==$rec->{userid}))){
