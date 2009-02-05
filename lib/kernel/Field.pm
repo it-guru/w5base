@@ -659,7 +659,8 @@ sub RawValue
             my $disp=$self->{vjoindisp};
             $disp=$disp->[0] if (ref($disp) eq "ARRAY");
             map({
-                   my $bk=$_->{$disp};
+                   my $dispobj=$self->vjoinobj->getField($disp,$_);
+                   my $bk=$dispobj->RawValue($_);
                    $bk=join(", ",@$bk) if (ref($bk) eq "ARRAY");
                    $u{$bk}=1;
                 } @{$c->{$joinkey}});

@@ -94,14 +94,10 @@ sub SampleEvent1
    my $self=shift;
 
    msg(DEBUG,"Start(Event1): ... sleep no");
-   my $focus="now";
-   my ($lastrun,$lastexitcode)=$self->getLastRunDate();
-   $focus=$lastrun if (defined($lastrun));
-   $focus="\">".$focus."-15m\"";
-
-   msg(DEBUG,"monitor beispiel=  %s  ",$focus);
-   #system("ls -al /tmp/xxo21");
-   #sleep(6);
+   my $user=getModuleObject($self->Config,"base::user");
+   $user->SetFilter({fullname=>'vog* wiescho*'});
+   my @l=$user->getHashList(qw(fullname owner accounts));
+   printf STDERR ("fifi l=%s\n",Dumper(\@l));
    msg(DEBUG,"End  (Event1):");
    return({msg=>'heinz',exitcode=>0});
 }

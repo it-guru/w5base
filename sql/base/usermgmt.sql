@@ -277,3 +277,4 @@ alter table user add ssh2publickey blob default NULL;
 alter table user add office_costcenter varchar(20) default NULL,add key(office_costcenter);
 alter table user add office_accarea varchar(20) default NULL,add key(office_accarea);
 alter table user add office_room varchar(20) default NULL;
+alter table user add secstate int(1) default '2';

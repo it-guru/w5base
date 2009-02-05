@@ -304,7 +304,7 @@ sub _LoadUserInUserCache
    my $UserCache=$self->Cache->{User}->{Cache};
    if ($o){
          $o->SetCurrentView(qw(surname userid givenname posix groups tz lang
-                               cistatusid
+                               cistatusid secstate
                                email usersubst usertyp fullname));
          if ($AccountOrUserID=~m/^\d+$/){
             $o->SetFilter({userid=>\$AccountOrUserID});

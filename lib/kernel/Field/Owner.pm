@@ -96,8 +96,14 @@ sub FormatedDetail
       $c->{"UserFullnameCache"}={} if (!defined($c->{"UserFullnameCache"}));
       my $targetval=$c->{"UserFullnameCache"}->{$targetid};
       if (!defined($targetval)){
-         $targetval=$self->{joinobj}->getVal("fullname",
-                             {$self->{joinobj}->IdField->Name()=>$targetid});
+         $self->{joinobj}->ResetFilter();
+         $self->{joinobj}->SetFilter(
+                   {$self->{joinobj}->IdField->Name()=>\$targetid});
+         my ($rec)=$self->{joinobj}->getOnlyFirst(qw(fullname));
+         if (ref($rec) eq "HASH"){
+            my $fobj=$self->{joinobj}->getField("fullname",$rec);
+            $targetval=$fobj->RawValue($rec);
+         }
          if ($targetval ne ""){
             $c->{"UserFullnameCache"}->{$targetid}=$targetval;
          }

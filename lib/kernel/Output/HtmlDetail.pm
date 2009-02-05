@@ -479,7 +479,7 @@ EOF
    my @blocks=$self->getParent->getParent->sortDetailBlocks([keys(%template)],
                                                             current=>$rec,
                                                             mode=>'HtmlDetail');
-   my @indexdata=$app->getRecordHtmlIndex($rec,$id,\@blocks,\%grouplabel);
+   my @indexdata=$app->getRecordHtmlIndex($rec,$id,$viewgroups,\@blocks,\%grouplabel);
    if ($#indexdata!=-1){
       my @set;
       my $setno=0;

@@ -1292,7 +1292,24 @@ sub getHtmlSelect
    push(@style,"width:$width");
    my $style=join(";",@style);
    $d="<select name=$name style=\"$style\"$autosubmit$multiple$size>";
-   my @l=$self->getHashList(@{$fld},$key);
+   my @l;
+   foreach my $rec ($self->getHashList(@{$fld},$key)){
+      my %frec;
+      foreach my $k (keys(%$rec)){
+         if (grep(/^$k$/,@{$fld})){
+            my $fo=$self->getField($k,$rec);
+            $frec{$k}=$fo->RawValue($rec);
+         }
+         else{
+            $frec{$k}=$rec->{$k};
+         }
+      }
+      push(@l,\%frec);
+   }
+
+
+
+
    my %len=();
    foreach my $rec (@l){
       foreach my $f (@{$fld}){
@@ -1907,13 +1924,15 @@ sub getRecordHtmlIndex
    my $self=shift;
    my $rec=shift;
    my $id=shift;
+   my $viewgroups=shift;
    my $grouplist=shift;
    my $grouplabel=shift;
    my @indexlist;
    return() if (!defined($rec));
+   $viewgroups=[$viewgroups] if (ref($viewgroups) ne "ARRAY");
 
    foreach my $group (@$grouplist){
-      if ($group ne "header"){
+      if ($group ne "header" && grep(/^$group$/,@$viewgroups)){
         push(@indexlist,
              $self->makeHtmlIndexRecord($id,$group,$grouplabel->{$group}));
       }

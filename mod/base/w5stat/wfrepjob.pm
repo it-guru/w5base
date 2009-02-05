@@ -44,7 +44,10 @@ sub processDataInit
    msg(INFO,"processDataInit in $self");
    my $wfrepjob=getModuleObject(
                 $self->getParent->Config,"base::workflowrepjob");
-   $self->{RJ}=[$wfrepjob->getHashList(qw(ALL))];
+   $self->{RJ}=[];
+   foreach my $repjob ($wfrepjob->getHashList(qw(ALL))){
+      push(@{$self->{RJ}},$repjob);
+   }
    if (!defined($self->{SSTORE})){
       eval("use Spreadsheet::WriteExcel::Big;");
       if ($@ eq ""){
@@ -101,6 +104,10 @@ sub processRecord
 #      msg(INFO,"         class=$rec->{class}");
       foreach my $repjob (@{$self->{RJ}}){
          if ($self->matchJob($repjob,$rec)){
+            #
+            # Period berechnen
+            #
+            #
             $self->storeWorkflow($repjob,$rec,\%param);
          }
       }
@@ -219,23 +226,34 @@ sub processDataFinish
       foreach my $wbslot (keys(%{$ss->{$period}})){
          my $slot=$ss->{$period}->{$wbslot};
          $slot->{workbook}->{o}->close();
-         if (open(O,">$slot->{'workbook'}->{targetfile}")){
-            if (open(F,"<".$slot->{fh}->filename)){
-               my $buf;
-               while(sysread(F,$buf,8192)){
-                  print O $buf;
-               }
-               close(F);
-            }
-            else{
-               printf STDERR ("ERROR: can't open $self->{filename}\n");
-            }
-            unlink($self->{filename});
-            close(O);
+         my $file=getModuleObject($self->getParent->Config,"base::filemgmt");
+         my ($dir,$filename)=$slot->{'workbook'}->{targetfile}=~
+            m/^(.*)\/([^\/]+)\.xls$/i;
+         $dir=~s/^\///;
+         if ($filename eq ""){
+            msg(ERROR,"invalid target filename ".
+                      "$slot->{'workbook'}->{targetfile}");
          }
-
-         
-      #   printf STDERR ("fifi store period=$period wbslot=$wbslot\n");
+         else{ 
+            foreach my $dstfile ("$filename.Cur.xls","$filename.$period.xls"){
+               printf STDERR ("fifi filename=$dstfile dir=$dir\n");
+               if (open(F,"<".$slot->{fh}->filename)){
+                  if (!($file->ValidatedInsertOrUpdateRecord(
+                               {name=>$dstfile, parent=>$dir,file=>\*F},
+                               {name=>\$dstfile,parent=>\$dir}))){
+                     msg(ERROR,"fail to store ".
+                               "$slot->{'workbook'}->{targetfile}");
+                  }
+                  close(F);
+               }
+               else{
+                  printf STDERR ("ERROR: can't open $self->{filename}\n");
+               }
+           
+           
+            }
+         }
+         unlink($slot->{fh}->filename);
       }
    }
 

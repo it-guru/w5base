@@ -118,7 +118,9 @@ sub RawValue
                $dststruct->{obj}->SetFilter({$idobj->Name()=>\$targetid});
                my ($rec,$msg)=$dststruct->{obj}->getOnlyFirst($dststruct->{disp});
                if (defined($rec)){
-                  return($rec->{$dststruct->{disp}});
+                  my $dstfld=$dststruct->{obj}->getField($dststruct->{disp},
+                                                         $rec);
+                  return($dstfld->RawValue($rec));
                }
                if (defined($self->{altnamestore})){
                   my $alt=$self->getParent->getField($self->{altnamestore});
@@ -252,7 +254,9 @@ sub Validate
             my $idname=$dststruct->{obj}->IdField->Name();
             my @l=$dststruct->{obj}->getHashList($dststruct->{disp},$idname);
             foreach my $rec (@l){
-               push(@select,{disp=>$rec->{$dststruct->{disp}},
+               my $fo=$dststruct->{obj}->getField($dststruct->{disp},$rec);
+              
+               push(@select,{disp=>$fo->RawValue($rec),
                              name=>$dststruct->{name},
                              id=>$rec->{$idname}});
             }

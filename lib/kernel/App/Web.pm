@@ -261,7 +261,8 @@ sub InitRequest
    #
    $ENV{REAL_REMOTE_USER}=$ENV{REMOTE_USER};
    my $substuser=Query->Cookie("remote_user");
-   if (defined($substuser) && $substuser ne $ENV{REAL_REMOTE_USER}){
+   if ($ENV{REMOTE_USER} ne "anonymous" &&
+       defined($substuser) && $substuser ne $ENV{REAL_REMOTE_USER}){
       my $usermask=getModuleObject($self->Config,"base::usermask");
       my @l=$usermask->isSubstValid($ENV{REAL_REMOTE_USER},$substuser);
       if ($#l==0){
@@ -906,6 +907,21 @@ sub getCurrentUserId
       $userid=$UserCache->{userid};
    }
    return($userid);
+}
+
+
+sub getCurrentSecState
+{
+   my $self=shift;
+   my $secstate=1;
+   my $UserCache=$self->Cache->{User}->{Cache};
+   if (defined($UserCache->{$ENV{REMOTE_USER}})){
+      $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
+   }
+   if (defined($UserCache->{tz})){
+      $secstate=$UserCache->{secstate};
+   }
+   return($secstate);
 }
 
 

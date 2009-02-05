@@ -34,7 +34,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{MainSearchFieldLines}=3;
+   $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->AddFields(
@@ -53,8 +53,30 @@ sub new
                     #  return(1) if (!$self->getParent->IsMemberOf("admin"));
                     #  return(0);
                    },
+                prepRawValue   =>
+                   sub{
+                      my $self=shift;
+                      my $d=shift;
+                      my $current=shift;
+                      my $secstate=$self->getParent->getCurrentSecState();
+                      if ($secstate<2){
+                         my $userid=$self->getParent->getCurrentUserId();
+                         if (!defined($userid) ||
+                              $current->{userid}!=$userid){
+                            sub replEmail
+                            {
+                               my $e=$_[0];
+                               $e=~s/[a-z]/?/g;
+                               return("($e)");
+                            } 
+                            $d=~s/\((.*\@.*)\)/replEmail($1)/e; 
+                         }
+                      }
+                      return($d);
+                   },
                 label         =>'Fullname',
                 dataobjattr   =>'user.fullname'),
+
 
       new kernel::Field::Select(
                 name          =>'usertyp',
@@ -89,16 +111,6 @@ sub new
                 group         =>'name',
                 label         =>'CI-StateID',
                 dataobjattr   =>'user.cistatus'),
-
-      new kernel::Field::SubList(
-                name          =>'accounts',
-                label         =>'Accounts',
-                allowcleanup  =>1,
-                group         =>'userro',
-                vjointo       =>'base::useraccount',
-                vjoinon       =>['userid'=>'userid'],
-                vjoindisp     =>['account','cdate'],
-                vjoininhash   =>['account','userid']),
 
       new kernel::Field::Id(
                 name          =>'userid',
@@ -135,6 +147,31 @@ sub new
                                 },
                 label         =>'Surname',
                 dataobjattr   =>'user.surname'),
+
+      new kernel::Field::Text(
+                name          =>'posix',
+                label         =>'POSIX-Identifier',
+                group         =>'userro',
+                dataobjattr   =>'user.posix_identifier'),
+
+      new kernel::Field::Select(
+                name          =>'secstate',
+                label         =>'security state',
+                value         =>['1','2','3','4'],
+                transprefix   =>'SECSTATE.',
+                group         =>'userro',
+                dataobjattr   =>'user.secstate'),
+
+      new kernel::Field::SubList(
+                name          =>'accounts',
+                label         =>'Accounts',
+                allowcleanup  =>1,
+                readonly      =>1,
+                group         =>'userro',
+                vjointo       =>'base::useraccount',
+                vjoinon       =>['userid'=>'userid'],
+                vjoindisp     =>['account','cdate'],
+                vjoininhash   =>['account','userid']),
 
       new kernel::Field::Phonenumber(
                 name          =>'office_mobile',
@@ -186,13 +223,13 @@ sub new
 
       new kernel::Field::Number(
                 name          =>'office_persnum',
-                group         =>'office',
+                group         =>'officeacc',
                 label         =>'Personal-Number',
                 dataobjattr   =>'user.office_persnum'),
 
       new kernel::Field::Number(
                 name          =>'office_costcenter',
-                group         =>'office',
+                group         =>'officeacc',
                 weblinkto     =>'finance::costcenter',
                 weblinkon     =>['costcenterid'=>'id'],
                 label         =>'CostCenter',
@@ -200,13 +237,13 @@ sub new
 
       new kernel::Field::Number(
                 name          =>'office_accarea',
-                group         =>'office',
+                group         =>'officeacc',
                 label         =>'Accounting Area',
                 dataobjattr   =>'user.office_accarea'),
 
       new kernel::Field::Link(
                 name          =>'costcenterid',
-                group         =>'office',
+                group         =>'officeacc',
                 label         =>'CostCenterID',
                 depend        =>['office_accarea','office_costcenter'],
                 onRawValue    =>sub {
@@ -298,13 +335,6 @@ sub new
                 name          =>'email',
                 label         =>'E-Mail',
                 dataobjattr   =>'user.email'),
-
-      new kernel::Field::Text(
-                name          =>'posix',
-                label         =>'POSIX-Identifier',
-                group         =>'userro',
-                readonly      =>1,
-                dataobjattr   =>'user.posix_identifier'),
 
       new kernel::Field::Select(
                 name          =>'winsize',
@@ -403,6 +433,7 @@ sub new
 
       new kernel::Field::Date(
                 name          =>'lastlogon',
+                readonly      =>1,
                 group         =>'userro',
                 searchable    =>0,
                 depend        =>["accounts"],
@@ -411,6 +442,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'lastlang',
+                readonly      =>1,
                 group         =>'userro',
                 depend        =>["accounts"],
                 onRawValue    =>\&getLastLogon,
@@ -547,6 +579,7 @@ sub SecureValidate
             return(0);
          }
       }
+      delete($newrec->{secstate});
    }
    my $userid=$self->getCurrentUserId();
    if (defined($oldrec) && $oldrec->{userid}==$userid){
@@ -571,6 +604,9 @@ sub Validate
    if (!defined($cistatusid) && !defined($oldrec)){
       $newrec->{cistatusid}=1;
    } 
+   if (!defined($oldrec)){
+      $newrec->{secstate}=$self->Config->Param("DefaultUserSecState");
+   }
    my $usertyp=effVal($oldrec,$newrec,"usertyp");
    $newrec->{surname}="FMB" if ($usertyp eq "function");
    if ($usertyp eq "service"){
@@ -755,6 +791,7 @@ sub isViewValid
    return("default","header") if (!defined($rec));
    my @pic;
    my $userid=$self->getCurrentUserId();
+   my @gl;
    #if ($userid eq $rec->{userid} || $self->IsMemberOf("admin")){
    #   push(@pic,"picture");
    #}
@@ -762,23 +799,39 @@ sub isViewValid
       push(@pic,"picture","roles");
    }
    if ($rec->{usertyp} eq "extern"){
-      return(qw(header name default comments groups userro control 
-                office private qc));
+      @gl=qw(header name default comments groups userro control 
+                office private qc);
    }  
    if ($rec->{usertyp} eq "function"){
       if ($self->IsMemberOf("admin")){
-         return(qw(header name default nativcontact comments 
-                   control userro qc));
+         @gl=qw(header name default nativcontact comments 
+                   control userro qc);
       }
-     return(qw(header name default nativcontact comments));
+      @gl=qw(header name default nativcontact comments);
    }  
    if ($rec->{usertyp} eq "service"){
-      return(qw(header name default comments groups usersubst userro 
-                control userparam qc));
+      @gl=qw(header name default comments groups usersubst userro 
+                control officeacc userparam qc);
    }  
-   return(@pic,
-          qw(default name office private userparam groups 
+   @gl=(@pic,
+          qw(default name office officeacc private userparam groups 
              userro control usersubst header));
+   my $secstate=$self->getCurrentSecState();
+   if ($rec->{userid}!=$userid){
+      if ($secstate<2){
+         @gl=grep(/^(name|header)$/,@gl);
+      }
+      elsif ($secstate<3){
+         @gl=grep(/^(name|header|office|default|groups|comments|nativcontact)$/,@gl);
+      }
+      elsif ($secstate<4){
+         @gl=grep(/^(name|header|office|officeacc|private|default|groups|comments|nativcontact)$/,@gl);
+      }
+     
+   }
+ 
+
+   return(@gl);
 }
 
 sub initSearchQuery
@@ -799,12 +852,12 @@ sub isWriteValid
    return(undef) if (!defined($rec));
    if ($self->IsMemberOf("admin")){
       return(qw(default name office private userparam groups usersubst control
-                comments header picture nativcontact));
+                comments header picture nativcontact userro));
    }
    my $userid=$self->getCurrentUserId();
    if ($userid eq $rec->{userid} ||
        ($rec->{creator}==$userid && $rec->{cistatusid}<3)){
-      return("name","userparam","office","private","nativcontact",
+      return("name","userparam","office","officeacc","private","nativcontact",
              "usersubst","control");
    }
    return(undef);
@@ -923,8 +976,8 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","name","picture","default","nativcontact","office","private",
-          "userparam","control","groups","usersubst");
+   return(qw(header name picture default nativcontact office 
+             officeacc private userparam control groups usersubst));
 }
 
 sub getDetailFunctions

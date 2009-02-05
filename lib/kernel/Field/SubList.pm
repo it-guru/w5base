@@ -91,7 +91,18 @@ sub FormatedDetail
    my $id=$idfield->RawValue($current);
    my $name=$self->Name();
    $self->{Sequence}++;
-   if ($mode eq "HtmlDetail"){
+   my $readonly=$self->readonly($current);
+   if ($mode eq "edit" && !$readonly){
+      my $h=$self->getParent->DetailY()-80;
+      return(<<EOF);
+<iframe id=iframe.sublist.$name.$self->{Sequence}.$id 
+        src="EditProcessor?RefFromId=$id&Field=$name&Seq=$self->{Sequence}"
+        style="width:99%;height:${h}px;border-style:solid;border-width:1px;">
+</iframe>
+EOF
+
+   }
+   if ($mode eq "HtmlDetail" || ($mode eq "edit" && $readonly)){
       $param{nodetaillink}=1 if ($self->{nodetaillink});
       return(<<EOF) if ($self->{async}==1 && $app->can('AsyncSubListView'));
 <div id=div.sublist.$name.$self->{Sequence}.$id class=sublist>
@@ -137,16 +148,6 @@ EOF
          }
       }
       return($d);
-   }
-   if ($mode eq "edit"){
-      my $h=$self->getParent->DetailY()-80;
-      return(<<EOF);
-<iframe id=iframe.sublist.$name.$self->{Sequence}.$id 
-        src="EditProcessor?RefFromId=$id&Field=$name&Seq=$self->{Sequence}"
-        style="width:99%;height:${h}px;border-style:solid;border-width:1px;">
-</iframe>
-EOF
-
    }
    return("unknown mode '$mode'");
 }
