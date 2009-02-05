@@ -156,7 +156,16 @@ sub new
                 onRawValue    =>\&faq::lib::forum::getShortLastworker,
                 readonly      =>1,
                 sqlorder      =>'none'),
-                                    
+
+      new kernel::Field::SubList(
+                name          =>'answers',
+                label         =>'Answers',
+                group         =>'answers',
+                allowcleanup  =>1,
+                vjointo       =>'faq::forumentry',
+                vjoinon       =>['id'=>'forumtopic'],
+                vjoindisp     =>['cdate','owner']),
+
       new kernel::Field::Id(
                 name          =>'id',
                 label         =>'Topic-No',
@@ -361,7 +370,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
 
-   return("header","default","stat","source");
+   return("header","default","answers","stat","source");
 }
 
 

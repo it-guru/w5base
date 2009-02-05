@@ -196,9 +196,22 @@ function FinishHandleInfoAboSubscribe(returnVal,isbreak)
    }
 }
 </script>
-
-
 EOF
+   my $to=$self->getPersistentModuleObject("faq::forumtopic");
+   $to->SetFilter({id=>\$id});
+   my ($torec,$msg)=$to->getOnlyFirst(qw(all));
+   my @wr=$to->isWriteValid($torec);
+   if ($#wr!=-1){
+         my $detailx=$to->DetailX();
+         my $detaily=$to->DetailY();
+         my $onclick="openwin('../../forumtopic/ById/$id',".
+                     "'_blank',".
+                     "'height=$detaily,width=$detailx,toolbar=no,status=no,".
+                     "resizable=yes,scrollbars=no');";
+      $d.=" &bull; <span class=detailfunctions onclick=$onclick>".
+          $self->T("edit","kernel::Output::HtmlDetail")."</span>";
+
+   }
 
 
    return($d);
@@ -279,7 +292,7 @@ sub ShowTopic
           "<tr><td><b>".
           $self->T("Topic","faq::forumtopic").":</b> <a class=topiclink ".
           "href=\"./$torec->{id}$Q\">$torec->{name}</a>".
-          "</td><td width=1%% valign=top>".
+          "</td><td width=1%% valign=top nowrap>".
           "<div class=OnlyInBrowser>%s</div></td></tr></table></td></tr>",
           $self->getShowTopicDetailFunctions($rootpath,"topic",$id));
    my $label=$self->T("topic answers")." ($torec->{entrycount})";

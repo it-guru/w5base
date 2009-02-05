@@ -233,10 +233,12 @@ span.readonlyinput{
    color:gray;
 }
 
-a.detailfunctions:link, a.detailfunctions:visited, a.detailfunctions:active {
+span.detailfunctions, a.detailfunctions:link, a.detailfunctions:visited, a.detailfunctions:active {
             font-family:Arial,Adobe Helvetica,Helvetica;
             text-decoration:none;
             color:#353534;
+            cursor: pointer;
+            cursor: hand;
           }
 
 a.HtmlDetailIndex:link, a.HtmlDetailIndex:visited, a.HtmlDetailIndex:active {

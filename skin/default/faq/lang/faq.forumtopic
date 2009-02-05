@@ -6,6 +6,7 @@
 'Last-Entry Date'=>{de=>'Letzte Anwort am'},
 'Last-Entry ID'=>{de=>'Letzte Anwort ID'},
 'fieldgroup.stat'=>{de=>'Board Statistik',en=>'Board statistics'},
+'fieldgroup.answers'=>{de=>'Antworten',en=>'Answers'},
 'Creator surname'=>{de=>'Autor'},
 'Answers'=>{de=>'Antworten'},
 'Topic Symbol'=>{de=>'Thema-Symbol'},

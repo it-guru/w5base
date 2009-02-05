@@ -163,6 +163,7 @@ sub IsModuleSelectable
 {
    my $self=shift;
    my $to=$self->to;
+  # return(1) if ($self->getParent->IsMemberOf("admin"));
    if (ref($to) eq "ARRAY"){
       my @view=$self->getParent->getCurrentView();
       foreach my $t (@$to){
