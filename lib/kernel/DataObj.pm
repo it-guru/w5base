@@ -328,6 +328,20 @@ sub getNext
    return(undef);
 }
 
+sub allowHtmlFullList
+{
+   my $self=shift;
+
+   return(1);
+}
+
+sub allowFurtherOutput
+{
+   my $self=shift;
+
+   return(1);
+}
+
 sub getHtmlDetailPageContent
 {
    my $self=shift;

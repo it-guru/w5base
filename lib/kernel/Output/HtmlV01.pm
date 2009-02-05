@@ -277,6 +277,7 @@ sub getPagingLine
    }
    my $recordstext="<b>".sprintf($app->T("Total: %d records"),$records)."</b>";
    if (($records<500 || $app->IsMemberOf("admin")) && 
+       $app->allowHtmlFullList() &&
        $currentlimit>0 && $records>$currentlimit){
       $recordstext="<a class=pageswitch ".
                    "href=Javascript:showall()>$recordstext</a>";
@@ -398,7 +399,6 @@ EOF
    my $limitstart=$self->getParent->getParent->{_LimitStart};
    my $currentlimit=$self->getParent->getParent->{_Limit};
    my $r=$self->getParent->getParent->Rows();
-printf STDERR ("fifi rows=$r\n");
    if (defined($r) && $pagelimit>0){
       my $totalpages=0;
       if ($pagelimit>0){

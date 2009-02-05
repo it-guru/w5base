@@ -334,6 +334,27 @@ sub new
       new kernel::Field::Email(
                 name          =>'email',
                 label         =>'E-Mail',
+                prepRawValue   =>
+                   sub{
+                      my $self=shift;
+                      my $d=shift;
+                      my $current=shift;
+                      my $secstate=$self->getParent->getCurrentSecState();
+                      if ($secstate<2){
+                         my $userid=$self->getParent->getCurrentUserId();
+                         if (!defined($userid) ||
+                              $current->{userid}!=$userid){
+                            sub replEmail
+                            {
+                               my $e=$_[0];
+                               $e=~s/[a-z]/?/g;
+                               return("$e");
+                            } 
+                            $d=~s/(.*\@.*)/replEmail($1)/e; 
+                         }
+                      }
+                      return($d);
+                   },
                 dataobjattr   =>'user.email'),
 
       new kernel::Field::Select(
@@ -833,6 +854,22 @@ sub isViewValid
 
    return(@gl);
 }
+
+sub allowHtmlFullList
+{
+   my $self=shift;
+   return(0) if ($self->getCurrentSecState()<4);
+   return(1);
+}
+
+sub allowFurtherOutput
+{
+   my $self=shift;
+   return(0) if ($self->getCurrentSecState()<4);
+   return(1);
+}
+
+
 
 sub initSearchQuery
 {

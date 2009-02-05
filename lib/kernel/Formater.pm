@@ -193,6 +193,8 @@ sub getHtmlViewLine
    my @userviewlist=sort($self->getParent->getParent->getUserviewList());
    my $app=$self->getParent->getParent;
    my $curview=$app->getCurrentViewName();
+   my $allowfurther=$app->allowFurtherOutput();
+
 
    $d.="<tr><td height=1% class=mainblock>\n";
    $d.="<table class=viewlist><tr>\n";
@@ -217,18 +219,24 @@ sub getHtmlViewLine
             $d.="<img border=0 src=\"../../base/load/empty.gif\" ".
                 "width=18 height=18>";
          }
-         $d.="</td>".
-             "<td align=center>".
+         $d.="</td><td align=center>".
              "<span class=viewselect ".
-             "OnClick=ChangeView(\"$view\",\"$dest\")>$view</span>".
-             "</td>".
-             "<td align=right>".
-             "<a title=\"".
-             $self->getParent->getParent->T("use further functions or ".
-                                            "select output format").
-             "\" href=JavaScript:FormatSelect(\"$view\",\"$dest\")>".
-             "<img border=0 src=\"../../base/load/functions.gif\"></a></td>".
-             "</tr></table>".
+             "OnClick=ChangeView(\"$view\",\"$dest\")>$view</span></td>";
+         if ($allowfurther){
+            $d.="<td align=right>".
+                "<a title=\"".
+                $self->getParent->getParent->T("use further functions or ".
+                                               "select output format").
+                "\" href=JavaScript:FormatSelect(\"$view\",\"$dest\")>".
+                "<img border=0 src=\"../../base/load/functions.gif\"></a>".
+                "</td>";
+         }
+         else{
+            $d.="<td align=right>".
+                "<img border=0 src=\"../../base/load/empty.gif\" ".
+                "width=18 height=18></td>";
+         }
+         $d.="</tr></table>".
              "</div>".
              "</td>\n";
       }

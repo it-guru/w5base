@@ -79,6 +79,11 @@ sub new
       new kernel::Field::Email(
                 name          =>'requestemail',
                 label         =>'requested E-Mail',
+                uivisible     =>sub{
+                   my $self=shift;
+                   return(1) if ($self->getParent->IsMemberOf("admin"));
+                   return(0);
+                },
                 group         =>'control',
                 dataobjattr   =>'useraccount.requestemail'),
 
@@ -127,6 +132,22 @@ sub getLastLogon
 
    return(undef);
 }
+
+sub allowHtmlFullList
+{
+   my $self=shift;
+   return(0) if ($self->getCurrentSecState()<4);
+   return(1);
+}
+
+sub allowFurtherOutput
+{
+   my $self=shift;
+   return(0) if ($self->getCurrentSecState()<4);
+   return(1);
+}
+
+
 
 
 sub passwordVisible
