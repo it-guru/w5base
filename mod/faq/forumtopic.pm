@@ -354,8 +354,18 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default") if ($self->IsMemberOf("admin"));
 
+
+   my $bo=$self->getPersistentModuleObject("faq::forumboard");
+   $bo->SetFilter({id=>\$rec->{forumboard}});
+   my ($borec,$msg)=$bo->getOnlyFirst(qw(ALL));
+   if (defined($borec)){
+      my @acl=$bo->getCurrentAclModes($ENV{REMOTE_USER},$borec->{acls});
+      if ($self->IsMemberOf("admin") ||
+          grep(/^moderate$/,@acl)){
+         return("default");
+      }
+   }
    return(undef);
 }
 

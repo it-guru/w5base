@@ -199,9 +199,9 @@ function FinishHandleInfoAboSubscribe(returnVal,isbreak)
 EOF
    my $to=$self->getPersistentModuleObject("faq::forumtopic");
    $to->SetFilter({id=>\$id});
-   my ($torec,$msg)=$to->getOnlyFirst(qw(all));
+   my ($torec,$msg)=$to->getOnlyFirst(qw(ALL));
    my @wr=$to->isWriteValid($torec);
-   if ($#wr!=-1){
+   if ($#wr!=-1 && grep(/^default$/,@wr)){
          my $detailx=$to->DetailX();
          my $detaily=$to->DetailY();
          my $onclick="openwin('../../forumtopic/ById/$id',".
