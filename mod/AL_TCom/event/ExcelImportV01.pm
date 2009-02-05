@@ -68,7 +68,7 @@ sub ProcessLineData
 
    my $msgcol=35; 
    my $newrec={};
-   printf STDERR ("fifi line=%s\n",Dumper($data));
+   #printf STDERR ("fifi line=%s\n",Dumper($data));
    $newrec->{class}="THOMEZMD::workflow::businesreq";
    $newrec->{step}="base::workflow::request::main";
    my ($m,$d,$y)=$data->[1]=~m/^(\d+)-(\d+)-(\d+)$/;

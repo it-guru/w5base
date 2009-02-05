@@ -97,7 +97,7 @@ sub SampleEvent1
    my $user=getModuleObject($self->Config,"base::user");
    $user->SetFilter({fullname=>'vog* wiescho*'});
    my @l=$user->getHashList(qw(fullname owner accounts));
-   printf STDERR ("fifi l=%s\n",Dumper(\@l));
+   msg(INFO,"fifi l=%s\n",Dumper(\@l));
    msg(DEBUG,"End  (Event1):");
    return({msg=>'heinz',exitcode=>0});
 }
