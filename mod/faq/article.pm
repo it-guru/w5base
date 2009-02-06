@@ -276,7 +276,7 @@ sub getSqlFrom
    my $self=shift;
    my $from="faq left outer join faqacl ".
             "on faq.faqid=faqacl.refid and ".
-            "faqacl.aclmode='read' and ".
+            "(faqacl.aclmode='read' or faqacl.aclmode='write') and ".
             "faqacl.aclparentobj='faq::article'";
    return($from);
 }

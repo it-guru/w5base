@@ -72,7 +72,7 @@ sub processData
       msg(INFO,"starting collect of base::workflow set0 ".
                "- all modified $dstrange");
       $wf->SetFilter({mdate=>">monthbase-1M-2d AND <now"});
-   #   $wf->Limit(20);
+      $wf->Limit(540);
       $wf->SetCurrentView(qw(ALL));
       $wf->SetCurrentOrder("NONE");
      
@@ -104,11 +104,17 @@ sub processRecord
 #      msg(INFO,"         class=$rec->{class}");
       foreach my $repjob (@{$self->{RJ}}){
          if ($self->matchJob($repjob,$rec)){
+            my $reftime=$rec->{eventend};
+            #############################################################
             #
             # Period berechnen
+            my ($Y,$M,$D)=$self->getParent->ExpandTimeExpression(
+                                "$reftime-$repjob->{mday}d-1d",
+                                undef,"GMT","GMT");
+            my $period=sprintf("%04d%02d",$Y,$M);
             #
-            #
-            $self->storeWorkflow($repjob,$rec,\%param);
+            #############################################################
+            $self->storeWorkflow($repjob,$rec,$period,\%param);
          }
       }
    }
@@ -162,13 +168,13 @@ sub storeWorkflow
    my $self=shift;
    my $repjob=shift;
    my $WfRec=shift;
+   my $period=shift;
    my $param=shift;
    my $ss=$self->{SSTORE};
    return(undef) if (!defined($self->{SSTORE}));
 
    my $wbslot=$repjob->{targetfile};
    my $sheetn=$repjob->{name};
-   my $period="current";
 
    my $slot;
    if (!exists($ss->{$period}->{$wbslot})){
@@ -188,15 +194,26 @@ sub storeWorkflow
    }
    my $sheet=$slot->{sheet}->{$sheetn." Detail"};
 
-   my $fields=["eventstart","eventend","name"];
+   my $fields=["srcid","eventstart","eventend","name"];
 
    for(my $col=0;$col<=$#{$fields};$col++){
+      $ENV{HTTP_FORCE_LANGUAGE}="de";
       my $fieldname=$fields->[$col];
       my $fobj=$param->{DataObj}->getField($fieldname,$WfRec);
-      my $v=$fobj->FormatedResult($WfRec,"XlsV01");
+      my $data=$fobj->FormatedResult($WfRec,"XlsV01");
+      my $format=$fobj->getXLSformatname($data);
 #      printf STDERR ("fobj of $fieldname = $fobj v=$v\n");
-      $v=~s/=//g;
-      $sheet->{o}->write($sheet->{line},$col,$v);
+
+      if ($format=~m/^date\./){
+         $sheet->{'o'}->write_date_time($sheet->{line},$col,$data,
+                                               $self->Format($slot,$format));
+      }
+      else{
+         $data="'".$data if ($data=~m/^=/);
+         $sheet->{'o'}->write($sheet->{line},$col,$data,
+                                     $self->Format($slot,$format));
+      }
+      delete($ENV{HTTP_FORCE_LANGUAGE});
    }
    $sheet->{line}++;
    
@@ -208,6 +225,54 @@ sub storeWorkflow
 
    return(1);
 }
+
+
+sub Format
+{
+   my $self=shift;
+   my $slot=shift;
+   my $name=shift;
+   my $wb=$slot->{workbook};
+   return($wb->{format}->{$name}) if (exists($wb->{format}->{$name}));
+
+   my $format;
+   if ($name eq "default"){
+      $format=$wb->{o}->addformat(text_wrap=>1,align=>'top');
+   }
+   elsif ($name eq "date.de"){
+      $format=$wb->{o}->addformat(align=>'top',
+                                          num_format => 'dd.mm.yyyy HH:MM:SS');
+   }
+   elsif ($name eq "date.en"){
+      $format=$wb->{o}->addformat(align=>'top',
+                                          num_format => 'yyyy-mm-dd HH:MM:SS');
+   }
+   elsif ($name eq "longint"){
+      $format=$wb->{o}->addformat(align=>'top',num_format => '#');
+   }
+   elsif ($name eq "header"){
+      $format=$wb->{o}->addformat();
+      $format->copy($self->Format("default"));
+      $format->set_bold();
+   }
+   elsif (my ($precsision)=$name=~m/^number\.(\d+)$/){
+      $format=$wb->{o}->addformat();
+      $format->copy($self->Format("default"));
+      my $xf="#";
+      if ($precsision>0){
+         $xf="0.";
+         for(my $c=1;$c<=$precsision;$c++){$xf.="0";};
+      }
+      $format->set_num_format($xf);
+   }
+   if (defined($format)){
+      $self->{format}->{$name}=$format;
+      return($self->{format}->{$name});
+   }
+   print STDERR msg(WARN,"XLS: setting format '$name' as 'default'");
+   return($self->Format("default"));
+}
+
 
 
 sub processDataFinish
