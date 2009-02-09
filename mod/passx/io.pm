@@ -96,6 +96,15 @@ sub LoadTarget
                     entrytypeid=>\$entrytypeid});
    my ($erec,$msg)=$ent->getOnlyFirst(qw(ALL));
    if (!defined($erec)){
+      $ent->ResetFilter();
+      $ent->SetFilter({name=>"$host.*",account=>\$account,
+                       entrytypeid=>\$entrytypeid});
+      my @l=$ent->getHashList(qw(ALL));
+      if ($#l==0){
+         $erec=$l[0];
+      }
+   }
+   if (!defined($erec)){
       printf("ERROR: no distribution entry for host '%s' and account '%s'\n",
              $host,$account);
       return;
