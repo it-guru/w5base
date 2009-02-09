@@ -10,4 +10,4 @@
 'fieldgroup.customerdata'=>{de=>'Zusatzinformationen des Auftraggebers',
                             en=>'Additional informations from the orderer'},
 'no orderin found'=>{de=>'für die ausgewählte Anwendung ist kein Auftragseingang registriert'},
-
+'desired date'=>{de=>'Wunschausführungszeitpunkt'},

@@ -184,9 +184,23 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
+   my $userid=$self->getParent->getCurrentUserId();
    return(1) if (!defined($rec));
    my @l;
-   push(@l,"default") if ($rec->{state}<10 &&
+   if ($rec->{state}==1){
+      if ($rec->{initiatorid}==$userid){
+         push(@l,"default");
+      }
+      else{
+         if ($rec->{initiatorgroupid} ne ""){
+            if ($self->getParent->IsMemberOf($rec->{initiatorgroupid},
+                                             "RMember","direct")){
+               push(@l,"default");
+            }
+         }
+      }
+   }
+   push(@l,"default") if ($rec->{state}<10 && $rec->{state}>1 &&
                          ($self->isCurrentForward($rec) ||
                           $self->getParent->IsMemberOf("admin")));
    if (grep(/^default$/,@l) &&

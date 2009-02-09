@@ -60,7 +60,16 @@ sub getDynamicFields
                                   searchable =>0,
                                   container  =>'headref',
                                   label      =>'Reference'),
+
+      new kernel::Field::Text(    name       =>'reqdesdate',
+                                  label      =>'desired date',
+                                  group      =>'default',
+                                  container  =>'headref'),
+
     ),$self->SUPER::getDynamicFields(%param));
+
+
+
 }
 
 sub getSpecificDataloadForm
@@ -191,6 +200,16 @@ sub isViewValid
    return($self->SUPER::isViewValid(@_),"affected","customerdata");
 }
 
+sub isWriteValid
+{
+   my $self=shift;
+   my @l=$self->SUPER::isWriteValid(@_);
+   if (grep(/^default$/,@l)){
+      push(@l,"customerdata");
+   }
+   return(@l);
+}
+
 sub getDetailBlockPriority            # posibility to change the block order
 {
    return("header","affected","customerdata","init","flow");
@@ -287,6 +306,11 @@ sub nativProcess
    my $WfRec=shift;
    my $actions=shift;
 
+   if ($action eq "NextStep"){
+      if ($h->{reqdesdate} eq ""){
+         $h->{reqdesdate}="as soon as posible / baldmöglichst";
+      }
+   }
 
    return($self->SUPER::nativProcess($action,$h,$WfRec,$actions));
 }
