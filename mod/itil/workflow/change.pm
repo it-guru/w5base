@@ -688,7 +688,7 @@ sub Process
 
       my $headtext=$self->getParent->T("Changenumber","itil::workflow::change");
 
-      my %additional=(headcolor=>'#4f84ac',eventtype=>'Change',
+      my %additional=(headcolor=>'#e6e6e6',eventtype=>'Change',
                       headtext=>$headtext.": ".$WfRec->{srcid});
       my $info=Query->Param("PublishInfoMsg");
       $info=~s/</&lt;/g;

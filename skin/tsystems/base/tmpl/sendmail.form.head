@@ -78,9 +78,9 @@ p.header {
 <body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 <table id=tabelle width="752" border="0" cellspacing="0" cellpadding="0">
   <tr>
-    <td class=col1><img src="cid:sendmail.bild1.jpg" width="121" height="119" /></td>
-    <td class=col2><img width="530" height="119" src="cid:sendmail.bild2.jpg" /></td>
-    <td class=col3 background="cid:sendmail.bild3.jpg" width="103"></td>
+    <td class=col1><img width=121 height=119 src="cid:sendmail.bild1.jpg" /></td>
+    <td class=col2><img width=530 height=119 src="cid:sendmail.bild2.jpg" /></td>
+    <td class=col3><img width=103 height=119 src="cid:sendmail.bild3.jpg"></td>
   </tr>
 </table>
 

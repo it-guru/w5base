@@ -1,8 +1,11 @@
-<table id=tabelle width="754" border="0" cellspacing="0" cellpadding="0">
-  <tr>
-    <td class=col1 nowrap align=left>
-  %emailbottom%
-    </td>
-  </tr>
+<table width=640 cellspacing=2 cellpadding=2 border=0>
+  <tr><td bgcolor=silver valign=top>&nbsp;</td></tr>
+  <tr><td valign=top><p style="font-size:10px">
+       Rot hinterlegte Kopfzeile=&gt;Ereignisklasse 1 oder 2; 
+       Gelb hinterlegte Kopfzeile=&gt;Ereignisklasse 3,4 oder 5; 
+       Grün hinterlegte Kopfzeile=&gt;Ereignis abgeschlosse (Gutmeldung);
+       Blau hinterlegte Kopfzeile=&gt;Ergebnis der Ursachenanalyse</td></tr>
+  <tr><td bgcolor=silver valign=top align=center><b>Kontakt</b></td></tr>
 </table>
-</form>
+</td></tr>
+</table>

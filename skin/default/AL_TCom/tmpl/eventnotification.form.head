@@ -1,126 +1,110 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<body marginheight="0" marginwidth="0" 
+            topmargin="15" leftmargin="15" 
+            rightmargin="15" bgcolor="#F3F3F3">
 <style type="text/css">
-<!--
-body,p {
-   margin: 0px;
-   font-family: Arial, Helvetica, sans-serif;
-   font-size: 12px;
-   padding: 0px;
-   border: 0px;
-   background-color: #ffffff;
+body    {
+            font-family:Arial,Helvetica;
+            text-decoration:none;
+            color:#000000;
+          }
+a:link    {
+            font-family:Arial,Helvetica;
+            text-decoration:none;
+            color:#006666;
+          }
+a:visited {
+            font-family:Arial,Helvetica;
+            text-decoration:none;
+            color:#006666;
+          }
+a:active  {
+            font-family:Arial,Helvetica;
+            text-decoration:none;
+            color:#006666;
+          }
+pre.text {
+            margin: 0px;
+            padding: 4px;
+            padding-bottom: 6px;
+            font-family:Courier New,Courier;
+            font-size:15px;
+            white-space: pre-wrap;       /* css-3 should we be so lucky... */
+            white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+            white-space: -pre-wrap;      /* Opera 4-6 ?? */
+            white-space: -o-pre-wrap;    /* Opera 7 ?? */
+            word-wrap: break-word;       /* Internet Explorer 5.5+ */
+         }
+td.MAILpconnectlist{
+   padding:3px;
+   background:#efefef;
 }
-li{
-   font-family: Arial, Helvetica, sans-serif;
-   font-size: 12px;
-   margin-top: 2px;
-   margin-bottom: 2px;
-}
-.tabelle {
+ul.workflowrelations{
+   margin:6px;
+   padding:6px; 
+}  
+li.workflowrelations{
+   margin:0px;  
+   padding:0px; 
+}  
+
+.tabelle { 
    font-family: Arial, Helvetica, sans-serif;
    font-size: 14px;
-   background-color: #e6e6e6;
+   background-color: #ffffff;
    margin: 0px;
    padding: 0px;
    border: 0px;
    table-layout: fixed;
 }
-#tabelle .zelleWeiss {
-   background-color: #FFFFFF;
-   padding: 0px;
-   margin: 0px;
-   width: 530px;
-}
-ul.workflowrelations{
-   margin:6px;
-   padding:6px;
-}
-li.workflowrelations{
-   margin:0px;
-   padding:0px;
-}
-a:link     { color: #E20074; }
-a:visited  { color: #E20074; }
-a:hover    { color: #E20074; }
-a:active   { color: #E20074; }
-a:link.langcontrol     {  text-decoration: none; color: black;font-size: 12px; }
-a:visited.langcontrol  {  text-decoration: none; color: black;font-size: 12px; }
-a:hover.langcontrol    {  text-decoration: none; color: black;font-size: 12px; }
-a:active.langcontrol   {  text-decoration: none; color: black;font-size: 12px; }
-a:link.userlink     { color: #E20074;font-size: 10px; }
-a:visited.userlink  { color: #E20074;font-size: 10px; }
-a:hover.userlink    { color: #E20074;font-size: 10px; }
-a:active.userlink   { color: #E20074;font-size: 10px; }
+
 td.col1   { width:121; }
 td.col2   { width:530; }
 td.col3   { width:103; }
 div.timestamp {
    vertical-align: top;
    margin: 0px;
-   margin-top: 2px;
    padding: 4px;
-   font-size: 11px;
+   font-size: 13px;
    overflow:hidden;
-   width:121;
 }
-pre.text {
-   margin: 0px;
-   padding: 4px;
-   padding-bottom: 6px;
-   font-family:Courier New,Courier;
-   font-size:12px;
-   white-space: pre-wrap;       /* css-3 should we be so lucky... */
-   white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-   white-space: -pre-wrap;      /* Opera 4-6 ?? */
-   white-space: -o-pre-wrap;    /* Opera 7 ?? */
-   word-wrap: break-word;       /* Internet Explorer 5.5+ */
-}
-pre.notitytext {
-   font-family: Georgia, Arial, Helvetica, sans-serif;
-   font-size: 26px;
-   color: #C1BDBD;
-p.header {
-   vertical-align: top;
-   margin: 0px;
-   padding: 1px;
-}
-div.separation{
-   height:820px;
-   width:754px;
-   background-color: #e6e6e6;
-}
-
--->
 </style>
-<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
-<form>
-<a name="lang.%currentlang%"></a>
-<table class=tabelle width="754"
-       border="0" cellspacing="0" cellpadding="0">
-  <tr>                           
-    <td class=col1 width=121 rowspan=2 background="cid:eventnotification.bild1.jpg" height=119>
-       <table cellspacing=0 cellpadding=0>
-          <tr><td height=40></td></tr>
-          <tr><td><pre class=notitytext><font face="Georgia, Arial, Helvetica, sans-serif">%eventtype%</font></pre></td></tr>
-       </table>
-    </td>
-    <td class=col2 bgcolor="%headcolor%">
-       <table width=100% border=0>
-            <tr><td><br><br><br><br><br></td></tr>
-            <tr><td>&nbsp;%headtext% %altheadtext%</td></tr>
-       </table>
-    </td>
-    <td class=col3 bgcolor="%headcolor%">
-       <table width=100% height=100% border=0 cellspacing="0" cellpadding="0">
-            <tr><td width=100%><br><br><br></td></tr>
-            <tr><td align=center>%langcontrol%</td></tr>
-       </table>
-    </td>
-  </tr>
-  <tr height=13 width=100%>
-    <td class=col2 bgcolor="%headcolor%"></td>
-    <td class=col3 bgcolor="%headcolor%"></td>
-  </tr>
 
+<table width=640 border=0 cellspacing=0 cellpadding=0>
+<tr><td valign=bottom align=left>
+<font face="Adobe Helvetica,Helvetica,Arial" style="font-size:10px">
+<br>
+%creationtime%
+<br>
+</td>
+<td valign=top nowrap width=1%><img src="cid:eventnotification.bild1.jpg"></td>
+</tr>
+<tr><td valign=bottom align=left colspan=2><hr><font face="Adobe Helvetica,Helvetica,Arial"></td></tr>
+<!------------------------------------------------------------------------>
 </table>
+
+
+<table width=640 style="border-style:solid;
+border-width:1px;" bgcolor=white >
+<tr><td valign=top bgcolor=%headcolor%>
+<table width=100% cellspacing=0 cellpadding=0 border=0><tr>
+<td align=left><font face="Adobe Helvetica,Helvetica,Arial"><b>Ereignisinformation</b> - %headtext% </b></td>
+<td align=right><font face="Adobe Helvetica,Helvetica,Arial">Nr.:%headid%</td>
+</tr>
+</table>
+</td></tr></table>
+
+<table border=0 cellspacing=3 cellpadding=3 width=640>
+</tr>
+<tr><td height=100 valign=top>
+<table cellspacing=0 cellpadding=0 width=640>
+<tr><td valign=top><font face="Courier New,Courier"><pre class="text">%salutation%</pre>
+</font>
+</td></tr>
+</table>
+</td>
+</tr>
+
+
+

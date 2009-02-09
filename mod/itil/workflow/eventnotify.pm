@@ -2191,7 +2191,7 @@ sub Process
      my $creationtime=$self->getParent->getParent->ExpandTimeExpression('now',
                                                               "de",$utz,$utz);
      if ($eventstat==17){
-        $failcolor="green";
+        $failcolor="limegreen";
      }elsif ($failclass==1 || $failclass==2){
         $failcolor="red";
      }elsif ($failclass==3 || $failclass==4 || $failclass==5){
