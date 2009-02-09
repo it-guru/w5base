@@ -36,6 +36,7 @@ sub Init
    my $self=shift;
 
 
+   $self->RegisterEvent("test","test");
    $self->RegisterEvent("sample","SampleEvent1");
    $self->RegisterEvent("sample1","SampleEvent1",timeout=>180);
    $self->RegisterEvent("timeoutcheck","TimeOutError",timeout=>5);
@@ -49,6 +50,18 @@ sub Init
    $self->RegisterEvent("testmail2","TestMail2");
    $self->CreateIntervalEvent("MyTime",10);
    return(1);
+}
+
+sub test
+{
+   my $self=shift;
+   my $wf=getModuleObject($self->Config,"base::workflow");
+
+   $wf->SetFilter({id=>[qw(11990656270002 11990656260004 11990656260002)],
+                   involvedcustomer=>'DTAG.T-Com.*'});
+   my @l=$wf->getHashList(qw(class name));
+
+   return({exitcode=>0,msg=>'ok'});
 }
 
 sub TimeOutError

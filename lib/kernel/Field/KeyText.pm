@@ -38,6 +38,7 @@ sub preProcessFilter
    my $self=shift;
    my $hflt=shift;
    my $changed=0;
+
    if (defined($hflt->{$self->{name}}) &&
        $hflt->{$self->{name}} ne ""){
       my $name=$self->Name();

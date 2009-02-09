@@ -228,13 +228,13 @@ sub processFilterHash
    my $filter=shift;
 
    foreach my $fieldname (keys(%{$filter})){
+      my %sqlparam=(orgfieldname=>$fieldname);
       my $fo=$self->getField($fieldname);
       if (!defined($fo)){
          msg(ERROR,"invalid filter request on unknown field '$fieldname'");
          next;
       }
       my $fotype=$fo->Type();
-      my %sqlparam=();
       my $preparedFilter=$fo->prepareToSearch($filter->{$fieldname});
       if (defined($preparedFilter)){
          if ($fotype eq "Fulltext"){

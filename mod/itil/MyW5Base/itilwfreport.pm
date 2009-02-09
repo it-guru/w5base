@@ -150,6 +150,12 @@ sub getQueryTemplate
 <td class=finput width=40%>\%involvedbusinessteam(search)\%</td>
 </tr>
 <tr>
+<td class=fname width=10%>\%mandator(label)\%(Test):</td>
+<td class=finput width=40%>\%mandator(search)\%</td>
+<td class=fname width=10%>\%involvedcustomer(label)\%(Test):</td>
+<td class=finput width=40%>\%involvedcustomer(search)\%</td>
+</tr>
+<tr>
 <td class=fname width=10%>\%state(label)\%:</td>
 <td class=finput width=40%>\%state(search)\%</td>
 <td class=fname width=10%>\%prio(label)\%:</td>
@@ -169,14 +175,14 @@ EOF
 }
 
 
-sub SetFilter
-{
-   my $self=shift;
-   my $dataobj=$self->getDataObj();
-
-
-
-}
+#sub SetFilter
+#{
+#   my $self=shift;
+#   my $dataobj=$self->getDataObj();
+#
+#
+#
+#}
 
 sub SetFilter
 {
@@ -199,6 +205,11 @@ sub SetFilter
    if (defined($flt->{affectedapplication}) &&
        $flt->{affectedapplication} eq "*"){
       $self->LastMsg(ERROR,"invalid application filter");
+      return(undef);
+   }
+   if (defined($flt->{mandator}) &&
+       $flt->{mandator} eq "*"){
+      $self->LastMsg(ERROR,"invalid mandator filter");
       return(undef);
    }
    if (defined($flt->{srcid}) &&
@@ -231,11 +242,11 @@ sub SetFilter
    delete ($flt->{to});
    delete ($flt->{from});
 
+   msg(INFO,"MyW5Base Dataobj Filter=%s",Dumper($flt));
    $dataobj->SetFilter($flt);
    #######################################################################
 
 
-   printf STDERR ("fifi SetFilter=%s\n",Dumper($flt));
    return(1);
 }
 
@@ -252,6 +263,8 @@ sub Result
 
    return(undef) if (!(my $f=$self->{Field}->{to}->Unformat($q{to})));
    $q{to}=$f->{to};
+
+   msg(INFO,"MyW5Base Filter=%s",Dumper(\%q));
 
    if (!$self->SetFilter(\%q)){
       if ($self->LastMsg()==0){

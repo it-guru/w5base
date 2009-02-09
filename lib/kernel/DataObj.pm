@@ -2435,7 +2435,7 @@ sub FilterPart2SQLexp
    my $exp="";
 
    my @workfilter=(@$filter);
-   if (!defined($sqlparam{containermode})){
+#   if (!defined($sqlparam{containermode})){
       my $conjunction=$sqlparam{conjunction};
       if ($sqlparam{allow_sql_in}){
          if ($#workfilter>10){
@@ -2508,6 +2508,12 @@ sub FilterPart2SQLexp
             }
             $val=dbQuote($val,%sqlparam);
          }
+         if (defined($sqlparam{containermode})){
+            $compop=" like ";
+            $val=~s/^'/\\'/;
+            $val=~s/'$/\\'/;
+            $val="'".'%'."$sqlfieldname=$val=$sqlfieldname".'%'."'";
+         }
          my $setescape="";
          if (defined($sqlparam{sqldbh}) &&
              lc($sqlparam{sqldbh}->DriverName()) eq "oracle" &&
@@ -2540,23 +2546,26 @@ sub FilterPart2SQLexp
                }
             }
          }
-         if (defined($sqlparam{containermode})){
-            $self->LastMsg(ERROR,
-                           "container search not implemented at now - ".
-                           "contatct the developer");
-            return(undef);
-            $sqlfieldname=$sqlparam{containermode};
-         }
          if (lc($sqlparam{sqldbh}->DriverName()) eq "oracle" &&
              $sqlparam{ignorecase}==1){
             $sqlfieldname="lower($sqlfieldname)";
             $val="lower($val)";
          }
+         if (defined($sqlparam{containermode})){
+            $sqlfieldname=$sqlparam{containermode};
+         }
          $exp.=" ".$conjunction." " if ($exp ne "");
          $exp.="(".$sqlfieldname.$compop.$val.$setescape.")"
       }
       $exp="($exp)" if ($exp ne "");
-   }
+#   }
+#   else{
+#     # $self->LastMsg(ERROR,
+#     #                "container search not implemented at now - ".
+#     #                "contatct the developer");
+#     # return(undef);
+#      $sqlfieldname=$sqlparam{containermode};
+#   }
    return($exp);
 }
 #######################################################################

@@ -510,6 +510,11 @@ sub getSelectField     # returns the name/function to place in select
    my $db=shift;
 
    if ($mode eq "select" || $mode=~m/^where\..*/){
+      if (!defined($self->{dataobjattr}) && defined($self->{container})){
+         if ($mode eq "where.select"){
+            return($self->Name()); 
+         }
+      }
       return(undef) if (!defined($self->{dataobjattr}));
       if (ref($self->{dataobjattr}) eq "ARRAY"){
          $_=$db->DriverName();
