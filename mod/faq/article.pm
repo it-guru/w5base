@@ -82,19 +82,34 @@ sub new
                 dataobjattr   =>'faq.faqcat'),
                                     
       new kernel::Field::Link(
-                name          =>'aclmode',
+                name          =>'raclmode',
                 selectable    =>0,
-                dataobjattr   =>'faqacl.aclmode'),
+                dataobjattr   =>'rfaqacl.aclmode'),
                                     
       new kernel::Field::Link(
-                name          =>'acltarget',
+                name          =>'racltarget',
                 selectable    =>0,
-                dataobjattr   =>'faqacl.acltarget'),
+                dataobjattr   =>'rfaqacl.acltarget'),
                                     
       new kernel::Field::Link(
-                name          =>'acltargetid',
+                name          =>'racltargetid',
                 selectable    =>0,
-                dataobjattr   =>'faqacl.acltargetid'),
+                dataobjattr   =>'rfaqacl.acltargetid'),
+                                   
+      new kernel::Field::Link(
+                name          =>'waclmode',
+                selectable    =>0,
+                dataobjattr   =>'wfaqacl.aclmode'),
+                                    
+      new kernel::Field::Link(
+                name          =>'wacltarget',
+                selectable    =>0,
+                dataobjattr   =>'wfaqacl.acltarget'),
+                                    
+      new kernel::Field::Link(
+                name          =>'wacltargetid',
+                selectable    =>0,
+                dataobjattr   =>'wfaqacl.acltargetid'),
                                    
       new kernel::Field::Id(
                 name          =>'faqid',
@@ -252,13 +267,19 @@ sub SecureSetFilter
       my $userid=$self->getCurrentUserId();
       my %groups=$self->getGroupsOf($ENV{REMOTE_USER},'RMember','up');
       return($self->SUPER::SecureSetFilter([{owner=>\$userid},
-                                            {aclmode=>['write','read'],
-                                             acltarget=>\'base::user',
-                                             acltargetid=>[$userid]},
-                                            {aclmode=>['write','read'],
-                                             acltarget=>\'base::grp',
-                                             acltargetid=>[keys(%groups),-2]},
-                                            {acltargetid=>[undef]},
+                                            {raclmode=>['read'],
+                                             racltarget=>\'base::user',
+                                             racltargetid=>[$userid]},
+                                            {raclmode=>['write','read'],
+                                             racltarget=>\'base::grp',
+                                             racltargetid=>[keys(%groups),-2]},
+                                            {waclmode=>['write','read'],
+                                             wacltarget=>\'base::user',
+                                             wacltargetid=>[$userid]},
+                                            {waclmode=>['write'],
+                                             wacltarget=>\'base::grp',
+                                             wacltargetid=>[keys(%groups),-2]},
+                                            {racltargetid=>[undef]},
                                             ],@_));
    }
    return($self->SUPER::SecureSetFilter(@_));
@@ -274,10 +295,14 @@ sub getDetailBlockPriority
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="faq left outer join faqacl ".
-            "on faq.faqid=faqacl.refid and ".
-            "(faqacl.aclmode='read' or faqacl.aclmode='write') and ".
-            "faqacl.aclparentobj='faq::article'";
+   my $from="faq left outer join faqacl as rfaqacl ".
+            "on faq.faqid=rfaqacl.refid and ".
+            "rfaqacl.aclmode='read' and ".
+            "rfaqacl.aclparentobj='faq::article' ".
+            "left outer join faqacl as wfaqacl ".
+            "on faq.faqid=wfaqacl.refid and ".
+            "wfaqacl.aclmode='write' and ".
+            "wfaqacl.aclparentobj='faq::article' ";
    return($from);
 }
 
