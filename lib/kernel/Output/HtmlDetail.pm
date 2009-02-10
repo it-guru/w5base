@@ -150,7 +150,6 @@ sub ProcessLine
    my $editgroups=[$app->isWriteValid($rec)];
    my $currentfieldgroup=Query->Param("CurrentFieldGroupToEdit"); 
    my $currentid=Query->Param("CurrentIdToEdit"); 
-   my $spec=$self->getParent->getParent->LoadSpec($rec);
    
    if ($self->getParent->{NewRecord}){
       $currentfieldgroup="default";
@@ -300,6 +299,7 @@ EOF
             $grouplabel{$fieldgroup}=1 if ($grouplabel);
          }
       }
+      my $spec=$self->getParent->getParent->LoadSpec($rec);
  
       foreach my $group (@grouplist){
          my $subfunctions="topedit,editend";

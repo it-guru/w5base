@@ -63,6 +63,7 @@ sub preProcessFilter
          my $bk=$self->getParent->Data2SQLwhere(\$where,"name",
                                      $name,%sqlparam);
          return(undef) if (!$bk);
+         my @useindex;
          if (defined($keyfield->{extselect})){
             foreach my $sfld (keys(%{$keyfield->{extselect}}),$idfield){
                my $fo=$self->getParent->getField($sfld);
@@ -70,6 +71,9 @@ sub preProcessFilter
                my $sqltype="STRING";
                $sqltype="DATE" if ($type=~m/Date$/); 
                if (exists($hflt->{$sfld})){
+                  if ($sfld eq "eventend"){
+                     push(@useindex,"eventend");
+                  }
                   my %sqlparam=(sqldbh=>$db,datatype=>$sqltype);
                   my $searchfield;
                   if ($sfld eq $idfield){
@@ -84,6 +88,9 @@ sub preProcessFilter
                   return(undef) if (!$bk);
                }
             }
+         }
+         if ($#useindex!=-1){
+            $cmd.=" use index(".join(",",@useindex).")";
          }
          my $subcmd="$cmd where $where";
          msg(INFO,"key searchcmd or=%s",$subcmd);

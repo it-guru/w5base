@@ -20,6 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Universal;
+use kernel::date;
 use File::Temp;
 @ISA=qw(kernel::Universal);
 
@@ -109,12 +110,16 @@ sub processRecord
             #
             # Period berechnen
             my ($Y,$M,$D)=$self->getParent->ExpandTimeExpression(
-                                "$reftime-$repjob->{mday}d-1d",
+                                "$reftime-$repjob->{mday}d-1s",
                                 undef,"GMT","GMT");
             my $period=sprintf("%04d%02d",$Y,$M);
-            #
-            #############################################################
-            $self->storeWorkflow($repjob,$rec,$period,\%param);
+            ($Y,$M,$D)=Add_Delta_YMD("GMT",$Y,$M,1,0,-1,0);
+            my $period1=sprintf("%04d%02d",$Y,$M);
+
+            if ($period eq $param{currentmonth}||
+                $period1 eq $param{currentmonth}){
+               $self->storeWorkflow($repjob,$rec,$period,\%param);
+            }
          }
       }
    }

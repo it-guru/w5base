@@ -66,6 +66,7 @@ sub new
                 name          =>'nature',
                 htmldetail    =>0,
                 htmlwidth     =>'200px',
+                searchable    =>0,
                 label         =>'Workflow nature',
                 onRawValue    =>sub {
                                    my $self=shift;

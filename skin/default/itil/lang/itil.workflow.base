@@ -1,6 +1,7 @@
 'fieldgroup.affected'=>{de=>'betroffene Komponente',
                         en=>'Affected Component'},
 'Affected Application'=>{de=>'betroffene Anwendung'},
+'Affected Project'=>{de=>'zugeordnetes Projekt'},
 'Affected Customer Contract'=>{de=>'betroffener Kundenvertrag'},
 'Affected Customer'=>{de=>'betroffener Kunde'},
 'Affected System'=>{de=>'betroffenes System'},

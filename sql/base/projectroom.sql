@@ -60,3 +60,6 @@ create table lnkprojectroom (
   UNIQUE KEY `sortkey` (sortkey),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 );
+alter table projectroom add is_commercial  int(1) default '0';
+alter table projectroom add conumber       varchar(20) default NULL;
+alter table projectroom add is_allowlnkact int(1) default '0';

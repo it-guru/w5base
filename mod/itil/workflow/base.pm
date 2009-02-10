@@ -72,6 +72,7 @@ sub Init
                 name       =>'affectedcontract',
                 translation=>'itil::workflow::base',
                 keyhandler =>'kh',
+                readonly   =>1,
                 vjointo    =>'itil::custcontract',
                 vjoinon    =>['affectedcontractid'=>'id'],
                 vjoindisp  =>'name',
@@ -93,6 +94,7 @@ sub Init
                 name       =>'affectedapplication',
                 translation=>'itil::workflow::base',
                 keyhandler =>'kh',
+                readonly   =>1,
                 vjointo    =>'itil::appl',
                 vjoinon    =>['affectedapplicationid'=>'id'],
                 vjoindisp  =>'name',
@@ -105,6 +107,7 @@ sub Init
                 htmldetail =>0,
                 translation=>'itil::workflow::base',
                 searchable =>0,
+                readonly   =>1,
                 keyhandler =>'kh',
                 container  =>'headref',
                 group      =>'affected',
@@ -114,6 +117,7 @@ sub Init
                 name       =>'affectedsystem',
                 translation=>'itil::workflow::base',
                 keyhandler =>'kh',
+                readonly   =>1,
                 weblinkto  =>'itil::system',
                 weblinkon  =>['name'],
                 container  =>'headref',
@@ -129,6 +133,27 @@ sub Init
                 container  =>'headref',
                 group      =>'affected',
                 label      =>'Affected System ID'),
+
+      new kernel::Field::KeyText( 
+                name       =>'affectedproject',
+                translation=>'itil::workflow::base',
+                keyhandler =>'kh',
+                vjointo    =>'base::projectroom',
+                vjoinon    =>['affectedprojectid'=>'id'],
+                vjoindisp  =>'name',
+                container  =>'headref',
+                group      =>'affected',
+                label      =>'Affected Project'),
+
+      new kernel::Field::KeyText( 
+                name       =>'affectedprojectid',
+                htmldetail =>0,
+                translation=>'itil::workflow::base',
+                searchable =>0,
+                keyhandler =>'kh',
+                container  =>'headref',
+                group      =>'affected',
+                label      =>'Affected Project ID'),
 
    );
    $self->AddGroup("affected",translation=>'itil::workflow::base');

@@ -78,6 +78,44 @@ sub new
                 name          =>'databossid',
                 dataobjattr   =>'projectroom.databoss'),
 
+      new kernel::Field::Contact(
+                name          =>'projectboss',
+                vjoinon       =>'projectbossid',
+                AllowEmpty    =>1,
+                group         =>'commercial',
+                label         =>'Project boss'),
+
+      new kernel::Field::Link(
+                name          =>'projectbossid',
+                group         =>'commercial',
+                dataobjattr   =>'projectroom.projectboss'),
+
+      new kernel::Field::Contact(
+                name          =>'projectboss2',
+                vjoinon       =>'projectboss2id',
+                AllowEmpty    =>1,
+                group         =>'commercial',
+                label         =>'deputy Project boss'),
+
+      new kernel::Field::Link(
+                name          =>'projectboss2id',
+                group         =>'commercial',
+                dataobjattr   =>'projectroom.projectboss2'),
+
+      new kernel::Field::Boolean(
+                name          =>'iscommercial',
+                group         =>'projectclass',
+                htmlhalfwidth =>1,
+                label         =>'commercial project',
+                dataobjattr   =>'projectroom.is_commercial'),
+
+      new kernel::Field::Boolean(
+                name          =>'isallowlnkact',
+                group         =>'projectclass',
+                htmlhalfwidth =>1,
+                label         =>'allow link of actions',
+                dataobjattr   =>'projectroom.is_allowlnkact'),
+
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
                 label         =>'Contacts',
@@ -215,8 +253,7 @@ sub new
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default misc control attachments contacts));
+   return(qw(header default projectclass commercial misc control attachments contacts));
 }
 
 
@@ -314,7 +351,12 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   return("ALL");
+   my @grps=qw(header default contacts projectclass
+               misc control attachments source);
+   if ($rec->{iscommercial}){
+      push(@grps,"commercial");
+   }
+   return(@grps);
 }
 
 sub isWriteValid
@@ -323,7 +365,8 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default contacts misc control attachments);
+   my @databossedit=qw(default contacts projectclass commercial
+                       misc control attachments);
    if (!defined($rec)){
       return("default");
    }

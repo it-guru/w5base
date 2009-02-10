@@ -26,11 +26,11 @@ CREATE TABLE wfkey (
   realeditor varchar(100) default NULL,
   UNIQUE KEY nameval (fval,name,id),
   KEY name (name,id), key id(id),
-  KEY search1 (fval,name,eventstart,wfclass),
-  KEY search2 (fval,name,eventend,wfclass),
-  KEY search3 (fval,name,opendate,wfclass),
-  KEY search4 (fval,name,closedate,wfclass),
-  KEY search5 (fval,name,wfstate,wfclass)
+  KEY nameeventstart (name,eventstart,wfclass,fval),
+  KEY nameeventend (name,eventend,wfclass,fval),
+  KEY nameopendate (name,opendate,wfclass,fval),
+  KEY nameclosedate (name,closedate,wfclass,fval),
+  KEY wfstate (name,wfstate,wfclass,fval),KEY eventend (eventend,wfclass)
 );
 CREATE TABLE wfaction (
   wfactionid bigint(20) NOT NULL default '0',

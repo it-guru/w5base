@@ -142,6 +142,7 @@ sub getDynamicFields
                                                    
            new kernel::Field::Number(    name        =>'truecustomerprio',
                                          label       =>'true customer prio',
+                                         htmldetail  =>0,
                                          group       =>'affected',
                                          container   =>'headref'),
 
@@ -171,7 +172,7 @@ sub isWriteValid
    return(undef) if ($rec->{stateid}==21);
    return() if (!($rec->{step}=~m/::postreflection$/));
    if ($self->isPostReflector($rec)){
-      push(@edit,"tcomcod");
+      push(@edit,"tcomcod","affected");
    }
 
    return(@edit);  # ALL means all groups - else return list of fieldgroups
