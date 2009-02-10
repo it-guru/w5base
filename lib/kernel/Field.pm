@@ -20,6 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Field::Id;
+use kernel::Field::Vector;
 use kernel::Field::Text;
 use kernel::Field::Databoss;
 use kernel::Field::Password;

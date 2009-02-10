@@ -46,11 +46,9 @@ sub getDynamicFields
                                          value      =>[
 
         "",
-        "174524-0000; Basisleistungen Applikationsbetrieb",
         "174524-0001; Operativer Change",
         "174524-0002; Incident",
         "174524-0003; Lizenz-Management",
-        "175084-0000; Sonderleistungen Applikationsbetrieb",
         "175084-0001; Abschluss von Wartungsverträgen",
         "175084-0002; Abschluss von Supportverträgen",
         "175084-0003; Entwicklungsunterstützung",
@@ -73,7 +71,6 @@ sub getDynamicFields
         "175084-0020; Ergebnisprüfung (z. B. für Datenabgabe)",
         "175084-0021; Offline Eingriffe (z.B Heli)",
         "175084-0022; Besondere Monitoring Anforderungen",
-        "700700-0000; Sonderleistungen ETA-Betrieb",
         "700700-0001; Neuaufbau durch Cloning",
         "700700-0002; Last und Performance Test",
         "700700-0003; Abnahmetest",
@@ -99,11 +96,9 @@ sub getDynamicFields
         "700700-0023; Administration (Passwörter, Firewall, Benutzer)",
         "700700-0024; Testdaten einspielen",
         "700700-0025; Testumgebungen sichern und restoren",
-        "701841-0000; Betrieb und Wartungssteuerung proKom",
         "701841-0001; Abrufleistung Reporting",
         "701841-0002; Sonstige Abrufleistungen",
         "701841-0003; Kümmerer E2E für Incidents nach Leistungsnachweis",
-        "701842-0000; Prüfung von Verbesserungspotential proKom",
         "701842-0001; Analysen"
 
 
