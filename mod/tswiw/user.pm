@@ -91,6 +91,11 @@ sub new
                                    size       =>'10',
                                    dataobjattr=>'MailAlternateAddress'),
                                   
+      new kernel::Field::Email(    name       =>'email3',
+                                   label      =>'E-Mail3',
+                                   size       =>'10',
+                                   dataobjattr=>'MailRoutingAddress'),
+                                  
       new kernel::Field::TextDrop( name       =>'office',
                                    label      =>'Office',
                                    group      =>'office',

@@ -105,7 +105,9 @@ sub UpdateOrgareaStructure
          # loading the "should" sitiuation from wiw
          #
          msg(DEBUG,"trying to load userinformations from wiw");
-         $wiwusr->SetFilter([{email=>$urec->{email}},{email2=>$urec->{email}}]);
+         $wiwusr->SetFilter([{email=>$urec->{email}},
+                             {email2=>$urec->{email}},
+                             {email3=>$urec->{email}}]);
          $wiwusr->SetCurrentView(qw(ALL));
          my ($wiwrec,$msg)=$wiwusr->getFirst();
          if (!defined($wiwrec)){
