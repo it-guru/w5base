@@ -87,12 +87,12 @@ sub new
                                    dataobjattr=>'mail'),
                                   
       new kernel::Field::Email(    name       =>'email2',
-                                   label      =>'E-Mail2',
+                                   label      =>'E-Mail (alternate)',
                                    size       =>'10',
                                    dataobjattr=>'MailAlternateAddress'),
                                   
       new kernel::Field::Email(    name       =>'email3',
-                                   label      =>'E-Mail3',
+                                   label      =>'E-Mail (routing)',
                                    size       =>'10',
                                    dataobjattr=>'MailRoutingAddress'),
                                   
