@@ -45,6 +45,7 @@ sub processDataInit
    msg(INFO,"processDataInit in $self");
    my $wfrepjob=getModuleObject(
                 $self->getParent->Config,"base::workflowrepjob");
+   $wfrepjob->SetFilter({cistatusid=>\'4'});
    $self->{RJ}=[];
    foreach my $repjob ($wfrepjob->getHashList(qw(ALL))){
       push(@{$self->{RJ}},$repjob);
@@ -68,12 +69,14 @@ sub processData
    #######################################################################
    if ($param{currentmonth} eq $dstrange){
       my $wf=getModuleObject($self->getParent->Config,"base::workflow");
-      $param{DataObj}=$wf;
+      my $wfrec=$wf->Clone();
+      $param{DataObj}=$wfrec;
       my $wfw=$wf->Clone();
       msg(INFO,"starting collect of base::workflow set0 ".
                "- all modified $dstrange");
       $wf->SetFilter({mdate=>">monthbase-1M-2d AND <now"});
-      $wf->Limit(540);
+      $wf->SetFilter({mdate=>">monthbase AND <now"});
+      $wf->Limit(1550);
       $wf->SetCurrentView(qw(ALL));
       $wf->SetCurrentOrder("NONE");
      
@@ -104,16 +107,16 @@ sub processRecord
       msg(INFO,"workflow id=$rec->{id} month=$month");
 #      msg(INFO,"         class=$rec->{class}");
       foreach my $repjob (@{$self->{RJ}}){
-         if ($self->matchJob($repjob,$rec)){
+         if ($self->matchJob($repjob,$rec,\%param)){
             my $reftime=$rec->{eventend};
             #############################################################
             #
             # Period berechnen
             my ($Y,$M,$D)=$self->getParent->ExpandTimeExpression(
                                 "$reftime-$repjob->{mday}d-1s",
-                                undef,"GMT","GMT");
+                                undef,"GMT",$repjob->{tz});
             my $period=sprintf("%04d%02d",$Y,$M);
-            ($Y,$M,$D)=Add_Delta_YMD("GMT",$Y,$M,1,0,-1,0);
+            ($Y,$M,$D)=Add_Delta_YMD($repjob->{tz},$Y,$M,1,0,1,0);
             my $period1=sprintf("%04d%02d",$Y,$M);
 
             if ($period eq $param{currentmonth}||
@@ -129,6 +132,7 @@ sub matchAttribute
 {
    my $repjob=shift;
    my $WfRec=shift;
+   my $param=shift;
    my $flt=shift;
    my $attr=shift;
 
@@ -142,11 +146,14 @@ sub matchAttribute
          $flt=~s/^\///;
          $flt=~s/\/[i]{0,1}$//;
          #$flt=quotemeta($flt);
+         my $fldobj=$param->{DataObj}->getField($attr,$WfRec);
+         my $d=$fldobj->RawValue($WfRec);
+         return(0) if (!defined($d) || $d eq "");
          if ($orgflt=~m/i$/){
-            return(0) if (!($WfRec->{$attr}=~m/$flt/i));
+            return(0) if (!($d=~m/$flt/i));
          }
          else{
-            return(0) if (!($WfRec->{$attr}=~m/$flt/));
+            return(0) if (!($d=~m/$flt/));
          }
       }
    }
@@ -159,11 +166,12 @@ sub matchJob
    my $self=shift;
    my $repjob=shift;
    my $WfRec=shift;
+   my $param=shift;
 
-   return(0) if (!matchAttribute($repjob,$WfRec,'fltclass','class'));
-   return(0) if (!matchAttribute($repjob,$WfRec,'fltstep','step'));
-   return(0) if (!matchAttribute($repjob,$WfRec,'fltname','name'));
-   return(0) if (!matchAttribute($repjob,$WfRec,'fltdesc','detaildescription'));
+   return(0) if (!matchAttribute($repjob,$WfRec,$param,'fltclass','class'));
+   return(0) if (!matchAttribute($repjob,$WfRec,$param,'fltstep','step'));
+   return(0) if (!matchAttribute($repjob,$WfRec,$param,'fltname','name'));
+   return(0) if (!matchAttribute($repjob,$WfRec,$param,'fltdesc','detaildescription'));
 
    return(1);
 }
@@ -199,7 +207,7 @@ sub storeWorkflow
    }
    my $sheet=$slot->{sheet}->{$sheetn." Detail"};
 
-   my $fields=["srcid","eventstart","eventend","name"];
+   my $fields=[split(/\s*[;,]\s*/,$repjob->{repfields})];
 
    for(my $col=0;$col<=$#{$fields};$col++){
       $ENV{HTTP_FORCE_LANGUAGE}="de";
@@ -209,6 +217,20 @@ sub storeWorkflow
       my $format=$fobj->getXLSformatname($data);
 #      printf STDERR ("fobj of $fieldname = $fobj v=$v\n");
 
+      if (!exists($sheet->{col}->{$col})){
+         my $xlswidth;
+         if (defined($fobj->htmlwidth())){
+            $xlswidth=$fobj->htmlwidth()*0.4;
+         }
+         if (defined($fobj->xlswidth())){
+            $xlswidth=$fobj->xlswidth();
+         }
+         $xlswidth=15 if (defined($xlswidth) && $xlswidth<15);
+
+         $sheet->{col}->{$col}={};
+         $sheet->{col}->{$col}->{label}=$fobj->Label();
+         $sheet->{col}->{$col}->{width}=$xlswidth;
+      }
       if ($format=~m/^date\./){
          $sheet->{'o'}->write_date_time($sheet->{line},$col,$data,
                                                $self->Format($slot,$format));
@@ -257,12 +279,12 @@ sub Format
    }
    elsif ($name eq "header"){
       $format=$wb->{o}->addformat();
-      $format->copy($self->Format("default"));
+      $format->copy($self->Format($slot,"default"));
       $format->set_bold();
    }
    elsif (my ($precsision)=$name=~m/^number\.(\d+)$/){
       $format=$wb->{o}->addformat();
-      $format->copy($self->Format("default"));
+      $format->copy($self->Format($slot,"default"));
       my $xf="#";
       if ($precsision>0){
          $xf="0.";
@@ -295,6 +317,16 @@ sub processDataFinish
    foreach my $period (keys(%{$ss})){
       foreach my $wbslot (keys(%{$ss->{$period}})){
          my $slot=$ss->{$period}->{$wbslot};
+         foreach my $sheet (values(%{$slot->{sheet}})){
+            foreach my $col (keys(%{$sheet->{col}})){
+                $sheet->{'o'}->write(0,$col,$sheet->{col}->{$col}->{label},
+                                     $self->Format($slot,"header"));
+                $sheet->{'o'}->set_column($col,$col,
+                                          $sheet->{col}->{$col}->{width});
+            }
+         }
+
+
          $slot->{workbook}->{o}->close();
          my $file=getModuleObject($self->getParent->Config,"base::filemgmt");
          my ($dir,$filename)=$slot->{'workbook'}->{targetfile}=~
@@ -305,7 +337,11 @@ sub processDataFinish
                       "$slot->{'workbook'}->{targetfile}");
          }
          else{ 
-            foreach my $dstfile ("$filename.Cur.xls","$filename.$period.xls"){
+            my @fl=("$filename.$period.xls");
+            if ($period eq $dstrange){
+               push(@fl,"$filename.current.xls");
+            }
+            foreach my $dstfile (@fl){
                printf STDERR ("fifi filename=$dstfile dir=$dir\n");
                if (open(F,"<".$slot->{fh}->filename)){
                   if (!($file->ValidatedInsertOrUpdateRecord(

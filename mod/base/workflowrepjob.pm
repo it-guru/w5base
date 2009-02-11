@@ -22,6 +22,7 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use DateTime::TimeZone;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -53,6 +54,26 @@ sub new
                 label         =>'Report name',
                 dataobjattr   =>'wfrepjob.reportname'),
 
+      new kernel::Field::Select(
+                name          =>'cistatus',
+                htmleditwidth =>'40%',
+                label         =>'CI-State',
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['cistatusid'=>'id'],
+                vjoineditbase =>{id=>">0"},
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'cistatusid',
+                label         =>'CI-StateID',
+                dataobjattr   =>'wfrepjob.cistatus'),
+
+      new kernel::Field::Select(
+                name          =>'tz',
+                label         =>'Timezone',
+                value         =>['CET','GMT',DateTime::TimeZone::all_names()],
+                dataobjattr   =>'wfrepjob.timezone'),
+
       new kernel::Field::Number(
                 name          =>'mday',
                 label         =>'due day',
@@ -83,6 +104,26 @@ sub new
                 name          =>'fltdesc',
                 label         =>'Filter: Description',
                 dataobjattr   =>'wfrepjob.flt_desc'),
+
+      new kernel::Field::Text(
+                name          =>'flt1name',
+                label         =>'Filter1: Fieldname',
+                dataobjattr   =>'wfrepjob.flt1_name'),
+
+      new kernel::Field::Text(
+                name          =>'flt1value',
+                label         =>'Filter1: Fieldvalue',
+                dataobjattr   =>'wfrepjob.flt1_value'),
+
+      new kernel::Field::Textarea(
+                name          =>'repfields',
+                label         =>'Report Fieldnames',
+                dataobjattr   =>'wfrepjob.repfields'),
+
+      new kernel::Field::Textarea(
+                name          =>'funccode',
+                label         =>'function code',
+                dataobjattr   =>'wfrepjob.funccode'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
@@ -141,6 +182,23 @@ sub new
    $self->setWorktable("wfrepjob");
    return($self);
 }
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $origrec=shift;
+
+   my $name=effVal($oldrec,$newrec,"name");
+   if ($name eq "" || $name=~m/\s/){
+      $self->LastMsg(ERROR,"invalid report name '\%s' specified",
+                     $name);
+      return(undef);
+   }
+   return(1);
+}
+
 
 
 sub isViewValid

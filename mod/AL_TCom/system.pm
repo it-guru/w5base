@@ -42,7 +42,7 @@ sub new
                 vjoindisp     =>'assignmentgroup'),
       new kernel::Field::TextDrop(
                 name          =>'accontrolcenter',
-                label         =>'AssetCenter ControlCenter',
+                label         =>'AC System ControlCenter',
                 group         =>'admin',
                 weblinkto     =>'none',
                 async         =>'1',
@@ -50,6 +50,18 @@ sub new
                 vjointo       =>'tsacinv::system',
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>'controlcenter'),
+
+      new kernel::Field::TextDrop(
+                name          =>'accontrolcenter2',
+                label         =>'AC Application ControlCenter',
+                group         =>'admin',
+                weblinkto     =>'none',
+                async         =>'1',
+                readonly      =>1,
+                vjointo       =>'tsacinv::system',
+                vjoinon       =>['systemid'=>'systemid'],
+                vjoindisp     =>'controlcenter2'),
+
       new kernel::Field::TextDrop(
                 name          =>'acsystemname',
                 label         =>'AssetCenter Systemname',

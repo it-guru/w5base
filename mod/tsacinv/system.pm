@@ -136,8 +136,15 @@ sub new
                 name          =>'controlcenter',
                 weblinkto     =>'tsacinv::group',
                 weblinkon     =>['controlcenter'=>'name'],
-                label         =>'ControlCenter',
+                label         =>'System ControlCenter',
                 dataobjattr   =>'amportfolio.controlcenter'),
+
+      new kernel::Field::Text(
+                name          =>'controlcenter2',
+                weblinkto     =>'tsacinv::group',
+                weblinkon     =>['controlcenter2'=>'name'],
+                label         =>'Application ControlCenter',
+                dataobjattr   =>'amportfolio.controlcenter2'),
 
       new kernel::Field::Text(
                 name          =>'status',

@@ -173,3 +173,6 @@ CREATE TABLE wfrepjob (
   srcload      datetime    default NULL,
   PRIMARY KEY (id)
 );
+alter table wfrepjob add cistatus int(2) NOT NULL;
+alter table wfrepjob add timezone varchar(20) NOT NULL;
+alter table wfrepjob add funccode text NOT NULL;

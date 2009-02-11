@@ -913,14 +913,16 @@ sub T
    }
    #printf STDERR ("TRANSLATE: $txt with $trtab\n");
    foreach my $trtab (@trtab){
-      if (!defined($W5V2::Translation->{tab}->{$trtab})){
-         msg(INFO,"load translation table for '$trtab'");
-         $W5V2::Translation->{tab}->{$trtab}=
-                          $W5V2::Translation->{self}->LoadTranslation($trtab,0);
-      }
-      if (exists($W5V2::Translation->{tab}->{$trtab}->{$lang}) &&
-          exists($W5V2::Translation->{tab}->{$trtab}->{$lang}->{$txt})){
-         return($W5V2::Translation->{tab}->{$trtab}->{$lang}->{$txt});
+      if ($trtab ne ""){
+         if (!defined($W5V2::Translation->{tab}->{$trtab})){
+            #msg(INFO,"load translation table for '$trtab'");
+            $W5V2::Translation->{tab}->{$trtab}=
+                         $W5V2::Translation->{self}->LoadTranslation($trtab,0);
+         }
+         if (exists($W5V2::Translation->{tab}->{$trtab}->{$lang}) &&
+             exists($W5V2::Translation->{tab}->{$trtab}->{$lang}->{$txt})){
+            return($W5V2::Translation->{tab}->{$trtab}->{$lang}->{$txt});
+         }
       }
    }
    return($txt);
