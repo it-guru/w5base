@@ -57,6 +57,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'cistatus',
                 htmleditwidth =>'40%',
+                vjoineditbase =>{id=>">0"},
                 label         =>'CI-State',
                 vjointo       =>'base::cistatus',
                 vjoinon       =>['cistatusid'=>'id'],
@@ -139,6 +140,7 @@ sub new
       new kernel::Field::Number(
                 name          =>'unitcount',
                 group         =>'licdesc',
+                htmleditwidth =>'100',
                 label         =>'unit count',
                 dataobjattr   =>'liccontract.unitcount'),
 
@@ -146,7 +148,7 @@ sub new
                 name          =>'unittype',
                 group         =>'licdesc',
                 default       =>'',
-                htmleditwidth =>'40%',
+                htmleditwidth =>'250',
                 label         =>'unit type',
                 transprefix   =>'UT.',
                 value         =>[
@@ -159,6 +161,18 @@ sub new
                                  ],
                 dataobjattr   =>'liccontract.unittype'),,
 
+
+      new kernel::Field::Date(
+                name          =>'durationstart',
+                group         =>'licdesc',
+                label         =>'Duration start',
+                dataobjattr   =>'liccontract.durationstart'),
+
+      new kernel::Field::Date(
+                name          =>'durationend',
+                group         =>'licdesc',
+                label         =>'Duration end',
+                dataobjattr   =>'liccontract.durationend'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',

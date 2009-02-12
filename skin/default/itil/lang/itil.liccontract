@@ -16,5 +16,7 @@
 'unit count'=>{de=>'Anzahl insgesammt verfügbare Einheiten'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'License use count'=>{de=>'aktuell genutzte Einheiten'},
+'Duration start'=>{de=>'Lizenzlaufzeitbeginn'},
+'Duration end'=>{de=>'Lizenzlaufzeitende'},
 'License free count'=>{de=>'aktuell verfügbare Einheiten'},
 'invalid license name specified'=>{de=>'ungültiger Lizenzname eingegeben'},
