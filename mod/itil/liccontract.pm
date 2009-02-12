@@ -390,6 +390,29 @@ sub Validate
       # validate if subdatastructures have a cistauts <=4 
       # if true, the new cistatus isn't alowed
    }
+
+   ########################################################################
+   # standard security handling
+   #
+   if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
+      my $userid=$self->getCurrentUserId();
+      if (!defined($oldrec)){
+         if (!defined($newrec->{databossid}) ||
+             $newrec->{databossid}==0){
+            my $userid=$self->getCurrentUserId();
+            $newrec->{databossid}=$userid;
+         }
+      }
+      if (defined($newrec->{databossid}) &&
+          $newrec->{databossid}!=$userid &&
+          $newrec->{databossid}!=$oldrec->{databossid}){
+         $self->LastMsg(ERROR,"you are not authorized to set other persons ".
+                              "as databoss");
+         return(0);
+      }
+   }
+   ########################################################################
+
    return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"name"));
 
    return(1);
