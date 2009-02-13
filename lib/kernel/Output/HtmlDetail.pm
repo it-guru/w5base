@@ -249,7 +249,7 @@ EOF
 </div>
 <a name="index"></a>
 <div style="height:4px;border-width:0;overflow:hidden">&nbsp;</div>
-<div class=detailtopline>
+<div id=detailtopline class=detailtopline>
    <table width=100% cellspacing=0 cellpadding=0>
       <tr>
 <td rowspan=2 width=1%>$ByIdLinkStart$recordimg$ByIdLinkEnd</a></td>

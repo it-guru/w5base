@@ -53,20 +53,24 @@ sub FormatedDetail
       my $orgd=$d;
       $orgd=~s/&/&amp;/g;
       $d="";
-      $d.="<table border=0 style=\"width:100%;table-layout:fixed;".
-          "padding:0;border-width:0;margin:0\">".
-          "<tr><td></div>";
-      $d.="<textarea name=Formated_$name class=multilinehtml>$orgd</textarea>";
-      $d.="</td></tr></table>";
+     # $d.="<table border=0 style=\"width:100%;table-layout:fixed;".
+     #     "padding:0;border-width:0;margin:0\">".
+     #     "<tr><td></div>";
+      $d.="<textarea id=Formated_$name name=Formated_$name class=multilinehtml></textarea>";
+      $d.="<div id=Data_$name style=\"visible:hidden;display:none\">$orgd</textarea>";
+     # $d.="</td></tr></table>";
       $d=<<EOF.$d;
 <script language=JavaScript 
         src="../../../static/tinymce/jscripts/tiny_mce/tiny_mce.js">
 </script>
 <script language=JavaScript>
+function initTinyMCE_$name()
+{
 tinyMCE.init({
 	mode : "exact",
         elements : "Formated_$name",
         theme : "advanced",
+        theme_advanced_layout_manager : "SimpleLayout",
         plugins: "clearbr",
         theme_advanced_buttons1 : "separator,"+
                                   "bold,italic,underline,strikethrough,"+
@@ -84,11 +88,18 @@ tinyMCE.init({
         theme_advanced_buttons3 : "",
         language : "$lang",
         theme_advanced_toolbar_align : "center",
-        theme_advanced_toolbar_location : "external",
+        theme_advanced_toolbar_location : "top",
+        strict_loading_mode : true,
+        auto_reset_designmode : true,
         theme_advanced_blockformats : "p,h1,h2,h3,pre,xmp",
         content_css : "../../../public/base/load/default.css,"+
                       "../../../public/base/load/work.css"
 });
+var e=window.document.getElementById("Formated_$name");
+var d=window.document.getElementById("Data_$name");
+e.value=d.innerHTML;   // data late filling - hack for IE rendering
+}
+addEvent(window, "load",initTinyMCE_$name);
 
 </script>
 EOF

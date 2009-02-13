@@ -320,9 +320,9 @@ sub FormatedDetail
       if ($self->frontreadonly($current)){
          $readonly=1;
       }
-      if ($mode eq "workflow"){
-         $readonly=0;
-      }
+      if ($mode eq "workflow"){ # if the developer has request an element
+         $readonly=0;           # in workflow edit mode, then readonly makes
+      }                         # no sense
       my $fromquery=Query->Param("Formated_$name");
       if (defined($fromquery)){
          $d=$fromquery;

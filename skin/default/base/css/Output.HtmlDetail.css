@@ -148,9 +148,10 @@ div.detailfunctions{
    padding:0px;
 }
 div.mceExternalToolbar{
-   bottom:150px;
-   left:140px;
+   right:15px;
 }
+
+
 div.multilinehtml{
    height:254px;
    overflow:auto;
