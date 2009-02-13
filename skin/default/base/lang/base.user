@@ -14,6 +14,7 @@
 'Accounts'=>{ de=>'Kennungen'},
 'Groups'=>{ de=>'Gruppen'},
 'Pagelimit'=>{ de=>'Seitenbegrenzung'},
+'simialr contacts'=>{ de=>'ähnliche Kontakte'},
 'Room number'=>{ de=>'Raumnummer'},
 'Entrys'=>{ de=>'Zeilen'},
 'Window-Size'=>{ de=>'Fenster-Größe'},

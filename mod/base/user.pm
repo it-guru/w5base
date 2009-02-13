@@ -406,6 +406,15 @@ sub new
                 htmldetail    =>0,
                 dataobjattr   =>'user.ssh2publickey'),
 
+      new kernel::Field::Textarea(
+                name          =>'similarcontacts',
+                htmldetail    =>0,
+                label         =>'simialr contacts',
+                depend        =>['userid','email','surname','givenname'],
+                searchable    =>0,
+                onRawValue    =>\&findSimilarContacts,
+                group         =>'qc'),
+
       new kernel::Field::Container(
                 name          =>'options',
                 dataobjattr   =>'user.options'),
@@ -553,33 +562,33 @@ sub getLastLogon
    return("");
 }
 
-
-
-sub FrontendInitialize
-{
+sub findSimilarContacts            # check for similar contacts to reduce
+{                                  # the posibility of double created contacts
    my $self=shift;
-   $self->AddOperator("mailsend",
-      new base::workflow::mailsend(to=>['email'],
-                                   subject=>'Testmail',
-                                   cc=>'xx@y',
-                                   bcc=>'yy@cc',
-                                   from=>'yy@cc',
-                                   data=>'xxxx...',
-                                   attachment=>\&new,
-                                   )
-   );
-   $self->AddOperator("mailsendfifi",
-      new base::workflow::mailsend(to=>"null\@null.com",
-                                   subject=>'Testmail',
-                                   cc=>'xx@y',
-                                   bcc=>'yy@cc',
-                                   from=>'yy@cc',
-                                   data=>'xxxx...',
-                                   attachment=>\&new,
-                                   )
-   );
+   my $current=shift;
+   my %res;
 
-   return($self->SUPER::FrontendInitialize());
+   my $user=$self->getParent->Clone();
+   my $chkemail=$current->{email};
+   $chkemail=~s/\@.*/\@*/;
+   my @flt;
+   if ($chkemail ne ""){
+      push(@flt,{email=>$chkemail});
+   }
+   if ($current->{surname} ne "" && $current->{givenname} ne ""){
+      push(@flt,{surname=>\$current->{surname},
+                 givenname=>\$current->{givenname}});
+   }
+   if ($#flt!=-1){
+      $user->SetFilter(\@flt);
+      foreach my $rec ($user->getHashList(qw(fullname))){
+         if ($rec->{userid}!=$current->{userid}){
+            $res{$rec->{userid}}=$rec->{fullname};
+         }
+      }
+      return(join("\n",sort(values(%res))));
+   }
+   return(undef);
 }
 
 
@@ -821,32 +830,32 @@ sub isViewValid
    }
    if ($rec->{usertyp} eq "extern"){
       @gl=qw(header name default comments groups userro control 
-                office private qc);
+                office private);
    }  
    if ($rec->{usertyp} eq "function"){
       if ($self->IsMemberOf("admin")){
          @gl=qw(header name default nativcontact comments 
-                   control userro qc);
+                   control userro);
       }
       @gl=qw(header name default nativcontact comments);
    }  
    if ($rec->{usertyp} eq "service"){
       @gl=qw(header name default comments groups usersubst userro 
-                control officeacc userparam qc);
+                control officeacc userparam);
    }  
    @gl=(@pic,
           qw(default name office officeacc private userparam groups 
-             userro control usersubst header));
+             userro control usersubst header qc));
    my $secstate=$self->getCurrentSecState();
    if ($rec->{userid}!=$userid){
       if ($secstate<2){
          @gl=grep(/^(name|header)$/,@gl);
       }
       elsif ($secstate<3){
-         @gl=grep(/^(name|header|office|default|groups|comments|nativcontact)$/,@gl);
+         @gl=grep(/^(name|header|office|default|groups|comments|nativcontact|qc)$/,@gl);
       }
       elsif ($secstate<4){
-         @gl=grep(/^(name|header|office|officeacc|private|default|groups|comments|nativcontact)$/,@gl);
+         @gl=grep(/^(name|header|office|officeacc|private|default|groups|comments|nativcontact|qc)$/,@gl);
       }
      
    }
