@@ -57,6 +57,174 @@ sub new
                 label         =>'ApplicationID',
                 dataobjattr   =>'amtsicustappl.code'),
 
+      new kernel::Field::Textarea(
+                name          =>'appldescription',
+                group         =>'appldata',
+                htmldetail    =>0,
+                label         =>'Application Description',
+                dataobjattr   =>'amtsicustappl.description'),
+
+      new kernel::Field::Text(
+                name          =>'usage',
+                label         =>'Usage',
+                group         =>'appldata',
+                htmldetail    =>0,
+                translation   =>'tsacinv::appl',
+                dataobjattr   =>'amtsicustappl.usage'),
+
+      new kernel::Field::Text(
+                name          =>'applconumber',
+                label         =>'CO-Number of application',
+                size          =>'15',
+                group         =>'appldata',
+                htmldetail    =>0,
+                weblinkto     =>'tsacinv::costcenter',
+                weblinkon     =>['lcostid'=>'id'],
+                dataobjattr   =>'amcostcenter.trimmedtitle'),
+
+      new kernel::Field::Text(
+                name          =>'applcodescription',
+                group         =>'appldata',
+                htmldetail    =>0,
+                label         =>'CO-Nummer desc of application',
+                dataobjattr   =>'amcostcenter.field1'),
+
+      new kernel::Field::TextDrop(
+                name          =>'sem',
+                label         =>'Service Manager',
+                group         =>'appldata',
+                translation   =>'tsacinv::appl',
+                htmldetail    =>0,
+                vjointo       =>'tsacinv::user',
+                vjoinon       =>['semid'=>'lempldeptid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'semid',
+                group         =>'appldata',
+                translation   =>'tsacinv::appl',
+                htmldetail    =>0,
+                dataobjattr   =>'amtsicustappl.lservicecontactid'),
+
+      new kernel::Field::TextDrop(
+                name          =>'tsm',
+                label         =>'Technical Contact',
+                group         =>'appldata',
+                htmldetail    =>0,
+                translation   =>'tsacinv::appl',
+                vjointo       =>'tsacinv::user',
+                vjoinon       =>['tsmid'=>'lempldeptid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'tsmid',
+                group         =>'appldata',
+                htmldetail    =>0,
+                translation   =>'tsacinv::appl',
+                dataobjattr   =>'amtsicustappl.ltechnicalcontactid'),
+
+      new kernel::Field::TextDrop(
+                name          =>'iassignmentgroup',
+                label         =>'INM Assignment Group',
+                group         =>'appldata',
+                htmldetail    =>0,
+                translation   =>'tsacinv::appl',
+                vjointo       =>'tsacinv::group',
+                vjoinon       =>['lincidentagid'=>'lgroupid'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'lincidentagid',
+                group         =>'appldata',
+                htmldetail    =>0,
+                translation   =>'tsacinv::appl',
+                label         =>'AC-Incident-AssignmentID',
+                dataobjattr   =>'amtsicustappl.lincidentagid'),
+
+
+
+      new kernel::Field::Text(
+                name          =>'sysconumber',
+                label         =>'CO-Number of system',
+                size          =>'15',
+                group         =>'sysdata',
+                htmldetail    =>0,
+                weblinkto     =>'tsacinv::costcenter',
+                weblinkon     =>['lcostid'=>'id'],
+                dataobjattr   =>'sysamcostcenter.trimmedtitle'),
+
+      new kernel::Field::Text(
+                name          =>'syscodescription',
+                group         =>'sysdata',
+                htmldetail    =>0,
+                label         =>'CO-Nummer desc of system',
+                dataobjattr   =>'sysamcostcenter.field1'),
+
+      new kernel::Field::TextDrop(
+                name          =>'sysiassignmentgroup',
+                label         =>'Incident Assignment Group',
+                group         =>'sysdata',
+                htmldetail    =>0,
+                vjointo       =>'tsacinv::group',
+                vjoinon       =>['lincidentagid'=>'lgroupid'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'lassignmentid',
+                label         =>'AC-AssignmentID',
+                group         =>'sysdata',
+                htmldetail    =>0,
+                translation   =>'tsacinv::system',
+                dataobjattr   =>'amportfolio.lassignmentid'),
+
+      new kernel::Field::Text(
+                name          =>'sysstatus',
+                group         =>'sysdata',
+                label         =>'Status of system',
+                dataobjattr   =>'amcomputer.status'),
+
+      new kernel::Field::Float(
+                name          =>'systemcpucount',
+                label         =>'System CPU count',
+                group         =>'sysdata',
+                htmldetail    =>0,
+                translation   =>'tsacinv::system',
+                unit          =>'CPU',
+                precision     =>0,
+                dataobjattr   =>'amcomputer.lcpunumber'),
+
+      new kernel::Field::Float(
+                name          =>'systemcpuspeed',
+                label         =>'System CPU speed',
+                group         =>'sysdata',
+                htmldetail    =>0,
+                translation   =>'tsacinv::system',
+                unit          =>'MHz',
+                precision     =>0,
+                dataobjattr   =>'amcomputer.lcpuspeedmhz'),
+
+      new kernel::Field::Text(
+                name          =>'systemcputype',
+                label         =>'System CPU type',
+                group         =>'sysdata',
+                htmldetail    =>0,
+                translation   =>'tsacinv::system',
+                unit          =>'MHz',
+                dataobjattr   =>'amcomputer.cputype'),
+
+      new kernel::Field::Float(
+                name          =>'systemmemory',
+                label         =>'System Memory',
+                group         =>'sysdata',
+                htmldetail    =>0,
+                translation   =>'tsacinv::system',
+                unit          =>'MB',
+                precision     =>0,
+                dataobjattr   =>'amcomputer.lmemorysizemb'),
+
+
+
+
       new kernel::Field::TextDrop(
                 name          =>'child',
                 label         =>'Child System',
@@ -174,7 +342,11 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="amtsirelportfappl,amportfolio,amcomputer,amtsicustappl";
+   my $from="amtsirelportfappl,amportfolio,amcomputer,amtsicustappl,".
+            "(select amcostcenter.* from amcostcenter ".
+            " where amcostcenter.bdelete=0) amcostcenter,".
+            "(select amcostcenter.* from amcostcenter ".
+            " where amcostcenter.bdelete=0) sysamcostcenter";
    return($from);
 }
 
@@ -185,6 +357,8 @@ sub initSqlWhere
           "amtsirelportfappl.lapplicationid=amtsicustappl.ltsicustapplid and ".
           "amtsirelportfappl.bactive=1 and amportfolio.bdelete=0 and ".
           "amtsirelportfappl.lportfolioid=amportfolio.lportfolioitemid and ".
+          "amtsicustappl.lcostcenterid=amcostcenter.lcostid(+) and ".
+          "amportfolio.lcostid=sysamcostcenter.lcostid(+) and ".
           "amportfolio.lportfolioitemid=amcomputer.litemid and ".
           "amcomputer.status<>'out of operation'");
 }

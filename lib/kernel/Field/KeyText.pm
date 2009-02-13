@@ -320,6 +320,9 @@ sub FormatedDetail
       if ($self->frontreadonly($current)){
          $readonly=1;
       }
+      if ($mode eq "workflow"){
+         $readonly=0;
+      }
       my $fromquery=Query->Param("Formated_$name");
       if (defined($fromquery)){
          $d=$fromquery;
