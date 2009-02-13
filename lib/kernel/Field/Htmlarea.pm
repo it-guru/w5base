@@ -82,9 +82,9 @@ tinyMCE.init({
                                   "separator,image,separator,"+
                                   "code,clearbr,separator",
         theme_advanced_buttons3 : "",
-        theme_advanced_toolbar_location : "external",
         language : "$lang",
-        theme_advanced_toolbar_align : "left",
+        theme_advanced_toolbar_align : "center",
+        theme_advanced_toolbar_location : "external",
         theme_advanced_blockformats : "p,h1,h2,h3,pre,xmp",
         content_css : "../../../public/base/load/default.css,"+
                       "../../../public/base/load/work.css"
