@@ -87,7 +87,7 @@ sub FormatedDetail
       if (defined($fromquery)){
          $d=$fromquery;
       }
-      return($self->getSimpleTextInputField($d,$readonly));
+      return($self->getSimpleInputField($d,$readonly));
    }
    return($d);
 }

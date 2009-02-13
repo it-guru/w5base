@@ -145,7 +145,6 @@ sub Validate
    my $currentstate=shift;   # current state of write record
    my $name=$self->Name();
 
-
    if (exists($newrec->{$name})){
       my $khrec={}; 
       my $keyname=$self->keyName();
@@ -294,6 +293,9 @@ sub Unformat
    my $r={};
    if (defined($formated)){
       $r->{$self->{name}}=[split(/\s+/,$formated->[0])];
+      if ($#{$r->{$self->{name}}}==0){
+         $r->{$self->{name}}=$r->{$self->{name}}->[0];
+      }
    }
    return($r);
 }
@@ -330,7 +332,7 @@ sub FormatedDetail
       if ($self->FieldCache->{LastDrop}){
          return($self->FieldCache->{LastDrop});
       }
-      return($self->getSimpleTextInputField($d,$readonly));
+      return($self->getSimpleInputField($d,$readonly));
    }
    $d=[$d] if (ref($d) ne "ARRAY");
    if ($mode eq "HtmlDetail"){

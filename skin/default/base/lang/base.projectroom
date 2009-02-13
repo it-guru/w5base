@@ -1,4 +1,4 @@
-'base::projectroom'=>{de=>'Projektraum',en=>'Projectroom'},
+'base::projectroom'=>{de=>'Projekt/Projektraum',en=>'Project/Projectroom'},
 'Projectroom name'=>{de=>'Projektraum Name'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'Contacts'=>{de=>'Kontakte'},

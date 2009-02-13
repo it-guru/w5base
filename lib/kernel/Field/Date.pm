@@ -54,7 +54,7 @@ sub FormatedDetail
       if (defined($fromquery)){
          $d=$fromquery;
       }
-      return($self->getSimpleTextInputField($d,$self->{readonly}));
+      return($self->getSimpleInputField($d,$self->{readonly}));
    }
    if ($d ne ""){
       my $usertimezone=$self->getParent->UserTimezone();

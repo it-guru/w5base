@@ -133,7 +133,7 @@ sub isWriteValid
    return(undef) if ($rec->{stateid}==21);
    return(undef) if (!($rec->{step}=~m/::postreflection$/));
    if ($self->isPostReflector($rec)){
-      push(@edit,"tcomcod");
+      push(@edit,"tcomcod","affected");
    }
 
    return(@edit);  # ALL means all groups - else return list of fieldgroups

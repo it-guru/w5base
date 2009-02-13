@@ -51,7 +51,7 @@ sub FormatedDetail
       if (defined($fromquery)){
          $d=$fromquery;
       }
-      return($self->getSimpleTextInputField($d,$readonly));
+      return($self->getSimpleInputField($d,$readonly));
    }
    $d=[$d] if (ref($d) ne "ARRAY");
    if ($mode eq "HtmlDetail"){

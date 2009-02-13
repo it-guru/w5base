@@ -192,7 +192,7 @@ sub addWebLinkToFacility
    return($d);
 }
 
-sub getSimpleTextInputField
+sub getSimpleInputField
 {
    my $self=shift;
    my $value=shift;
@@ -203,22 +203,23 @@ sub getSimpleTextInputField
 
    my $unit=$self->unit;
    $unit="<td width=40>$unit</td>" if ($unit ne "");
+   my $inputfield="<input type=text value=\"$value\" ".
+                  "name=Formated_$name class=finput>";
+   if ($self->{getHtmlImputCode} eq "CODE"){
+      $inputfield=&{$self->{getHtmlImputCode}}($value);
+   }
    if (!$readonly){
       my $width="100%";
       $width=$self->{htmleditwidth} if (defined($self->{htmleditwidth}));
       $d=<<EOF;
 <table style="table-layout:fixed;width:$width" cellspacing=0 cellpadding=0>
-<tr><td>
-<input type=text value="$value" name=Formated_$name class=finput>
-</td>$unit</tr></table>
+<tr><td>$inputfield</td>$unit</tr></table>
 EOF
    }
    else{
       $d=<<EOF;
 <table style="table-layout:fixed;width:100%" cellspacing=0 cellpadding=0>
-<tr><td>
-<span class="readonlyinput">$value</span>
-</td>$unit</tr></table>
+<tr><td><span class="readonlyinput">$value</span></td>$unit</tr></table>
 EOF
    }
    return($d);

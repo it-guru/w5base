@@ -97,14 +97,14 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
    return(1) if (!defined($rec));
-   return("default","tcomcod","relations") if ($rec->{state}<21 &&
+   return("default","tcomcod","relations","affected") if ($rec->{state}<21 &&
                          ($self->getParent->getCurrentUserId()==$rec->{owner} ||
                           $self->getParent->IsMemberOf("admin")));
    if ($rec->{state}<21){
       my @acl=$self->getFinishUseridList($rec);
       my $userid=$self->getParent->getCurrentUserId();
       if (grep(/^$userid$/,@acl) || $self->getParent->IsMemberOf("admin")){
-         return("default","tcomcod","relations");
+         return("default","tcomcod","affected","relations");
       }
    }
 
