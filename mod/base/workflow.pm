@@ -389,6 +389,7 @@ sub new
                 name          =>'srcid',
                 selectfix     =>1,
                 weblinkto     =>\&addSRCLinkToFacility,
+                xlswidth      =>'18',
                 sqlorder      =>'desc',
                 group         =>'source',
                 label         =>'Source-Id',

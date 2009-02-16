@@ -93,6 +93,7 @@ sub Init
       new kernel::Field::KeyText( 
                 name       =>'affectedapplication',
                 translation=>'itil::workflow::base',
+                xlswidth   =>'30',
                 keyhandler =>'kh',
                 readonly   =>1,
                 vjointo    =>'itil::appl',

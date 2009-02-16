@@ -198,13 +198,23 @@ sub getFuncCode
    my @fl;
 
    foreach my $f (split(/\s*;\s*/,$code)){
-      if (my ($fname,$fdata)=$f=~m/^(\S+)\(.*\)$/){
-         if ($fname eq "EntryCount"){
-            printf STDERR ("fifi fname='%s'\n",$fname);
-            push(@fl,{rawcode=>$f,
-                      init =>\&init_EntryCount,
-                      store=>\&store_EntryCount,
-                      finish=>\&finish_EntryCount}); 
+      if (my ($fname,$fdata)=$f=~m/^(\S+)\((.*)\)$/){
+         my %r=(rawcode=>$f);
+         if ($fdata ne ""){
+            my @words=parse_line(',',0,$fdata);
+            if ($#words!=-1){
+               $r{fparam}=\@words;
+            }
+         }
+         if ($fname eq "EntryCount" &&    # check function name
+             ($#{$r{fparam}}==1 ||        # check param count
+              $#{$r{fparam}}==2)    &&
+             $r{fparam}->[0] ne ""  &&     # check param val
+             $r{fparam}->[1] ne ""){
+            $r{init}=\&init_EntryCount;
+            $r{store}=\&store_EntryCount;
+            $r{finish}=\&finish_EntryCount;
+            push(@fl,\%r);
          }
       }
    }
@@ -214,20 +224,59 @@ sub getFuncCode
 sub init_EntryCount
 {
    my ($self,$DataObj,$fentry,$repjob,$slot,$param,$period,$WfRec,$sheet)=@_;
-   printf STDERR ("Init_EntryCount $fentry->{rawcode}\n");
 }
 
 sub store_EntryCount
 {
    my ($self,$DataObj,$fentry,$repjob,$slot,$param,$period,$WfRec,$sheet)=@_;
-   printf STDERR ("Collect_EntryCount $fentry->{rawcode}\n");
 
+   my $countkey=$fentry->{fparam}->[0];
+   my $countname=$fentry->{fparam}->[1];
+   my $countinfo=$fentry->{fparam}->[2];
+   if (exists($WfRec->{$countkey})){
+      my $d=$WfRec->{$countkey};
+      $d=[$d] if (ref($d) ne "ARRAY");
+      if (defined($d)){
+         foreach my $countval (@{$d}){
+            if (!defined($slot->{'EntryCount'.$countkey}->{$countval})){
+               $slot->{'EntryCount'.$countkey}->{$countval}=[];
+            }
+            my $countdata=1;
+            if ($countinfo ne ""){
+               $countdata=$WfRec->{$countinfo}; 
+            }
+            push(@{$slot->{'EntryCount.'.$countkey}->{$countval}},$countdata); 
+         }
+      }
+   }
 }
 
 sub finish_EntryCount
 {
    my ($self,$DataObj,$fentry,$repjob,$slot,$param,$period,$WfRec,$sheet)=@_;
-   printf STDERR ("Finish_EntryCount $fentry->{rawcode}\n");
+
+   my $countkey=$fentry->{fparam}->[0];
+   my $countname=$fentry->{fparam}->[1];
+   my $countinfo=$fentry->{fparam}->[2];
+   my $sheet=$slot->{'workbook'}->{o}->addworksheet($countname);
+   my @linelabels=keys(%{$slot->{'EntryCount.'.$countkey}});
+   for(my $row=0;$row<=$#linelabels;$row++){
+      $sheet->write_string($row,0,$linelabels[$row],
+                    $self->Format($slot,'default'));
+      $sheet->write_number($row,1,
+         $#{$slot->{'EntryCount.'.$countkey}->{$linelabels[$row]}}+1,
+         $self->Format($slot,'longint'));
+      if ($countinfo ne ""){
+         $sheet->write_string($row,2,
+            join(", ",@{$slot->{'EntryCount.'.$countkey}->{$linelabels[$row]}}),
+            $self->Format($slot,'default'));
+      }
+   }
+   $sheet->set_column(0,0,18);
+   $sheet->set_column(1,1,10);
+   if ($countinfo ne ""){
+      $sheet->set_column(2,2,200);
+   }
 }
 
 

@@ -77,8 +77,8 @@ sub processData
       msg(INFO,"starting collect of base::workflow set0 ".
                "- all modified $dstrange");
       $wf->SetFilter({mdate=>">monthbase-1M-2d AND <now"});
-      $wf->SetFilter({mdate=>">monthbase AND <now"});
-      $wf->Limit(50);
+   #   $wf->SetFilter({mdate=>">monthbase AND <now"});
+   #   $wf->Limit(15500);
       $wf->SetCurrentView(qw(ALL));
       $wf->SetCurrentOrder("NONE");
      
@@ -253,7 +253,6 @@ sub storeWorkflow
    $sheet->{line}++;
    
 
-#   if (!exists($ss->{$wbslot}));
 
 
    msg(INFO,"store $WfRec->{id}:'$WfRec->{name}'");
@@ -326,11 +325,12 @@ sub processDataFinish
       foreach my $wbslot (keys(%{$ss->{$period}})){
          my $slot=$ss->{$period}->{$wbslot};
          foreach my $repjob (@{$self->{RJ}}){
-printf STDERR ("check repjob=====\n");
-            foreach my $fentry (@{$repjob->{funccode}}){
-               if (ref($fentry->{finish}) eq "CODE"){
-                  &{$fentry->{finish}}($self,$param{DataObj},$fentry,$repjob,
-                                      $slot,\%param,$period);
+            if ($repjob->{targetfile} eq $wbslot){
+               foreach my $fentry (@{$repjob->{funccode}}){
+                  if (ref($fentry->{finish}) eq "CODE"){
+                     &{$fentry->{finish}}($self,$param{DataObj},$fentry,$repjob,
+                                         $slot,\%param,$period);
+                  }
                }
             }
          }
