@@ -57,7 +57,7 @@ sub FormatedDetail
      #     "padding:0;border-width:0;margin:0\">".
      #     "<tr><td></div>";
       $d.="<textarea id=Formated_$name name=Formated_$name class=multilinehtml></textarea>";
-      $d.="<div id=Data_$name style=\"visible:hidden;display:none\">$orgd</textarea>";
+      $d.="<textarea id=Data_$name style=\"visible:hidden;display:none\">$orgd</textarea>";
      # $d.="</td></tr></table>";
       $d=<<EOF.$d;
 <script language=JavaScript 
@@ -97,7 +97,7 @@ tinyMCE.init({
 });
 var e=window.document.getElementById("Formated_$name");
 var d=window.document.getElementById("Data_$name");
-e.value=d.innerHTML;   // data late filling - hack for IE rendering
+e.value=d.value;   // data late filling - hack for IE rendering
 }
 addEvent(window, "load",initTinyMCE_$name);
 
