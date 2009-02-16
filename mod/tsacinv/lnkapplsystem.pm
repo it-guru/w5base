@@ -22,7 +22,8 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
+use tsacinv::lib::tools;
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB tsacinv::lib::tools);
 
 sub new
 {
@@ -88,6 +89,14 @@ sub new
                 htmldetail    =>0,
                 label         =>'CO-Nummer desc of application',
                 dataobjattr   =>'amcostcenter.field1'),
+
+      new kernel::Field::Text(
+                name          =>'altbc',
+                htmldetail    =>0,
+                readonly      =>1,
+                translation   =>'tsacinv::appl',
+                label         =>'Alternate BC',
+                dataobjattr   =>'amcostcenter.alternatebusinesscenter'),
 
       new kernel::Field::TextDrop(
                 name          =>'sem',
@@ -320,6 +329,16 @@ sub new
    $self->setDefaultView(qw(id parent applid child systemid systemola));
    return($self);
 }
+
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   return($self->addAltBCSetFilter(@flt));
+}
+
+
 
 sub Initialize
 {

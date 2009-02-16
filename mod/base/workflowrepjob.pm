@@ -23,6 +23,7 @@ use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
 use DateTime::TimeZone;
+use Text::ParseWords;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -121,9 +122,15 @@ sub new
                 dataobjattr   =>'wfrepjob.repfields'),
 
       new kernel::Field::Textarea(
-                name          =>'funccode',
+                name          =>'funcrawcode',
                 label         =>'function code',
                 dataobjattr   =>'wfrepjob.funccode'),
+
+      new kernel::Field::Link(
+                name          =>'funccode',
+                depend        =>['funcrawcode'],
+                label         =>'function code',
+                onRawValue    =>\&getFuncCode),
 
       new kernel::Field::Text(
                 name          =>'srcid',
@@ -182,6 +189,48 @@ sub new
    $self->setWorktable("wfrepjob");
    return($self);
 }
+
+sub getFuncCode
+{
+   my $self=shift;
+   my $current=shift;
+   my $code=$current->{funcrawcode};
+   my @fl;
+
+   foreach my $f (split(/\s*;\s*/,$code)){
+      if (my ($fname,$fdata)=$f=~m/^(\S+)\(.*\)$/){
+         if ($fname eq "EntryCount"){
+            printf STDERR ("fifi fname='%s'\n",$fname);
+            push(@fl,{rawcode=>$f,
+                      init =>\&init_EntryCount,
+                      store=>\&store_EntryCount,
+                      finish=>\&finish_EntryCount}); 
+         }
+      }
+   }
+   return(\@fl);
+}
+
+sub init_EntryCount
+{
+   my ($self,$DataObj,$fentry,$repjob,$slot,$param,$period,$WfRec,$sheet)=@_;
+   printf STDERR ("Init_EntryCount $fentry->{rawcode}\n");
+}
+
+sub store_EntryCount
+{
+   my ($self,$DataObj,$fentry,$repjob,$slot,$param,$period,$WfRec,$sheet)=@_;
+   printf STDERR ("Collect_EntryCount $fentry->{rawcode}\n");
+
+}
+
+sub finish_EntryCount
+{
+   my ($self,$DataObj,$fentry,$repjob,$slot,$param,$period,$WfRec,$sheet)=@_;
+   printf STDERR ("Finish_EntryCount $fentry->{rawcode}\n");
+}
+
+
 
 sub Validate
 {

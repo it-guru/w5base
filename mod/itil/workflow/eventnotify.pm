@@ -2546,8 +2546,8 @@ sub Process
                                 step=>'itil::workflow::eventnotify::main',
                                 fwdtarget=>undef,
                                 fwdtargetid=>undef,
-                                closedate=>NowStamp("en"),
-                                stateid=>21})){
+                                closedate=>undef,
+                                stateid=>17})){
          if ($self->getParent->getParent->Action->StoreRecord(
              $WfRec->{id},"reactivate", 
              {translation=>'itil::workflow::eventnotify'},undef)){

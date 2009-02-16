@@ -48,7 +48,9 @@ sub processDataInit
    $wfrepjob->SetFilter({cistatusid=>\'4'});
    $self->{RJ}=[];
    foreach my $repjob ($wfrepjob->getHashList(qw(ALL))){
-      push(@{$self->{RJ}},$repjob);
+      my %d=%{$repjob};
+      printf STDERR ("d=%s\n",Dumper(\%d));
+      push(@{$self->{RJ}},\%d);
    }
    if (!defined($self->{SSTORE})){
       eval("use Spreadsheet::WriteExcel::Big;");
@@ -76,7 +78,7 @@ sub processData
                "- all modified $dstrange");
       $wf->SetFilter({mdate=>">monthbase-1M-2d AND <now"});
       $wf->SetFilter({mdate=>">monthbase AND <now"});
-      $wf->Limit(1550);
+      $wf->Limit(50);
       $wf->SetCurrentView(qw(ALL));
       $wf->SetCurrentOrder("NONE");
      
@@ -242,6 +244,12 @@ sub storeWorkflow
       }
       delete($ENV{HTTP_FORCE_LANGUAGE});
    }
+   foreach my $fentry (@{$repjob->{funccode}}){
+      if (ref($fentry->{store}) eq "CODE"){
+         &{$fentry->{store}}($self,$param->{DataObj},$fentry,$repjob,
+                             $slot,$param,$period,$WfRec,$sheet);
+      }
+   }
    $sheet->{line}++;
    
 
@@ -317,6 +325,15 @@ sub processDataFinish
    foreach my $period (keys(%{$ss})){
       foreach my $wbslot (keys(%{$ss->{$period}})){
          my $slot=$ss->{$period}->{$wbslot};
+         foreach my $repjob (@{$self->{RJ}}){
+printf STDERR ("check repjob=====\n");
+            foreach my $fentry (@{$repjob->{funccode}}){
+               if (ref($fentry->{finish}) eq "CODE"){
+                  &{$fentry->{finish}}($self,$param{DataObj},$fentry,$repjob,
+                                      $slot,\%param,$period);
+               }
+            }
+         }
          foreach my $sheet (values(%{$slot->{sheet}})){
             foreach my $col (keys(%{$sheet->{col}})){
                 $sheet->{'o'}->write(0,$col,$sheet->{col}->{$col}->{label},
