@@ -1946,7 +1946,8 @@ sub getRecordHtmlIndex
    $viewgroups=[$viewgroups] if (ref($viewgroups) ne "ARRAY");
 
    foreach my $group (@$grouplist){
-      if ($group ne "header" && grep(/^$group$/,@$viewgroups)){
+      if ($group ne "header" && 
+          (grep(/^$group$/,@$viewgroups) || grep(/^ALL$/,@$viewgroups))){
         push(@indexlist,
              $self->makeHtmlIndexRecord($id,$group,$grouplabel->{$group}));
       }
