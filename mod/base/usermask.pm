@@ -218,7 +218,9 @@ EOF
    my $currentuserlabel=$self->T("Current logged in useraccount");
    my $effectuserlabel=$self->T("Effective useraccount");
    my $lastlabel=$self->T("List of last used substitution accounts");
-   print <<EOF;
+   my $resetlabel=$self->T("reset to user");
+   if ($ENV{REAL_REMOTE_USER} eq $ENV{REMOTE_USER}){
+      print <<EOF;
 <form method=post><center>
 <table border=0 cellspacing=2 cellpadding=1 width=98% height=180>
 <tr height=1%>
@@ -244,6 +246,34 @@ EOF
 </tr>
 </table>
 EOF
+   }
+   else{
+      print <<EOF;
+<form method=post><center>
+<table border=0 cellspacing=2 cellpadding=1 width=98% height=180>
+<tr height=1%>
+<td nowrap align=center><h3><b>$effectuserlabel $ENV{REMOTE_USER}</b></h3></td>
+<td>
+</tr>
+<tr >
+<td nowrap align=center valign=center><input type=button 
+                  onclick=doResetAccount()
+                  value="$resetlabel $ENV{REAL_REMOTE_USER}"
+                  style="width:80%;height:40px"></td>
+<td>
+</tr>
+</table>
+<input type="hidden" value="" name=setnewuser id=setnewuser>
+<script language="JavaScript">
+function doResetAccount()
+{
+   var dst=document.getElementById("setnewuser");
+   dst.value="$ENV{REAL_REMOTE_USER}";
+   document.forms[0].submit();
+}
+</script>
+EOF
+   }
       
    print $self->HtmlBottom(body=>1,form=>1);
 }

@@ -3,3 +3,4 @@
 'Effective useraccount'=>{de=>'effektive Benutzerkennung'},
 'List of last used substitution accounts'=>{de=>'Liste der zuletzt benutzen Benutzerkennungen'},
 'account set by substitution id %s to \'%s\''=>{de=>'Benutzer durch Vertretungs-ID %s gesetzt auf \'%s\''},
+'reset to user'=>{de=>'zurücksetzen auf Benutzerkennung'}

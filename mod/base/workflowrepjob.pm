@@ -259,7 +259,7 @@ sub finish_EntryCount
    my $countname=$fentry->{fparam}->[1];
    my $countinfo=$fentry->{fparam}->[2];
    my $sheet=$slot->{'workbook'}->{o}->addworksheet($countname);
-   my @linelabels=keys(%{$slot->{'EntryCount.'.$countkey}});
+   my @linelabels=sort(keys(%{$slot->{'EntryCount.'.$countkey}}));
    for(my $row=0;$row<=$#linelabels;$row++){
       $sheet->write_string($row,0,$linelabels[$row],
                     $self->Format($slot,'default'));
