@@ -176,14 +176,20 @@ sub tcomcodcause
    db.addeff.licprov
    db.addeff.maint
    db.base.base
-   ETAbusiness
-   ETAplan
-   ETApromblemanalyse
-   ETArelization
-   ETAtestSIT1
-   ETAtestSIT2
-   ETAtestSIT3
-   ETAtestSIT4
+   eta.baseeff.ETAbusiness
+   eta.baseeff.ETAplan
+   eta.baseeff.ETApromblemanalyse
+   eta.baseeff.ETArelization
+   eta.baseeff.ETAtestSIT1
+   eta.baseeff.ETAtestSIT2
+   eta.baseeff.ETAtestSIT3
+   eta.baseeff.ETAtestSIT4
+   eta.addeff.etaproject
+   eta.addeff.etabusiness
+   eta.baseeff.etabusinear
+   eta.baseeff.etabusioffs
+   eta.baseeff.etabusioffon
+   eta.addeff.etabusisencons
    ));
 }
 

@@ -67,7 +67,7 @@ EOF
    print("<th>Tätigkeit (en-XLS Report)</th>");
    print("</tr>");
    my $t="AL_TCom::lib::workflow";
-   foreach my $cause ($self->tcomcodcause()){
+   foreach my $cause ($self->tcomcodcause(),"sw.addeff.swbase"){
       print("<tr>");
       printf("<td>%s</td>",$cause);
       $ENV{HTTP_FORCE_LANGUAGE}="de";

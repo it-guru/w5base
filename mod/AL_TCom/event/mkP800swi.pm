@@ -96,7 +96,7 @@ sub mkP800swi
                      openusername=>$rec->{databoass},
                      openuser=>$rec->{databoassid},
                      tcomworktime=>$tcomworktime,
-                     tcomcodcause=>'sw.addeff.base',
+                     tcomcodcause=>'sw.addeff.swbase',
                      detaildescription=>$detaildescription,
                      tcomcodcomments=>$tcomcodcomments,
                     };
