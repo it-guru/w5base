@@ -164,8 +164,8 @@
                                      de=>'ETA/BL/ETA Applikationsbetrieb Offshore'},
 'eta.baseeff.etabusioffon'=>{en=>'ETA/basic svcs/ETA-business offshore-onshore',
                          de=>'ETA/BL/ETA Applikationsbetrieb Offshore-Onshore'},
-'eta.addeff.etabusisencons'=>{en=>'ETA/basic svcs/ETA-business senior consultant',
-                         de=>'ETA/BL/ETA Applikationsbetrieb Senior-Consultant'},
+'eta.addeff.etabusisencons'=>{en=>'ETA/add svcs/ETA-business senior consultant',
+                         de=>'ETA/SL/ETA Applikationsbetrieb Senior-Consultant'},
 'sw.addeff.swbase'=>    {de=>'Basisleistung',
                          en=>'basic svcs'},
 
