@@ -42,14 +42,14 @@ sub FormatedDetail
    my $name=$self->Name();
    if ($mode=~m/html/i){
       if (defined($d) && ref($d) eq "HASH" && keys(%{$d})>0){
-         my $r="<table border=1 width=100%>"; 
+         my $r="<table class=containerframe>"; 
          foreach my $k (sort(keys(%{$d}))){
             $r.="<tr>"; 
             my $descwidth="width=1%";
             if (defined($self->{desccolwidth})){
                $descwidth="width=$self->{desccolwidth}"; 
             }
-            $r.="<td $descwidth valign=top>$k</td>"; 
+            $r.="<td class=containerfname $descwidth valign=top>$k</td>"; 
             my $dd=join(", ",@{$d->{$k}});
             $dd="&nbsp;" if ($dd=~m/^\s*$/);
             #$dd=~s/\n/<br>\n/g;
@@ -60,7 +60,7 @@ sub FormatedDetail
                    "style=\"height:auto;border-style:none\">".
                    "<pre class=multilinetext>$dd</pre></div></td></tr></table>";
             }
-            $r.="<td valign=top>$dd</td>"; 
+            $r.="<td class=containerfval valign=top>$dd</td>"; 
             $r.="</tr>"; 
          }
          $r.="</table>"; 

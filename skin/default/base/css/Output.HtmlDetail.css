@@ -32,6 +32,14 @@ table.detailframe{
    padding:0px;
    width:100%;
 }
+table.containerframe{
+   border-style:none;
+   border-spacing:0px;
+   border-collapse:collapse;
+   margin:0px;
+   padding:0px;
+   width:100%;
+}
 
 div.detailbottomline{
    font-size:9px;

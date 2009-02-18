@@ -73,6 +73,25 @@ td.finput{
    padding-left:3px;
    padding-right:5px;
 }
+td.containerfname{
+   white-space:nowrap;
+   border-style:solid;
+   border-width:1px;
+   border-color:gray;
+   padding-top:2px;
+   padding-left:4px;
+   padding-right:5px;
+   font-weight:bold;
+}
+td.containerfval{
+   border-style:solid;
+   border-width:1px;
+   border-color:gray;
+   padding-left:3px;
+   padding-right:5px;
+   padding-bottom:5px;
+   padding-top:2px;
+}
 span.buttontext{
    line-height:11px;
 }
