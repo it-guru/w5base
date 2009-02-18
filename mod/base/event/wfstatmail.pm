@@ -59,6 +59,7 @@ sub SendMyJobs
                          "DTAG.TSI.ES.ITO.CSS.T-Com.GHS-TSI.GT2",
                          "DTAG.TSI.ES.ITO.CSS.OSS.OCTC.T-Com.C3",
                          "DTAG.TSI.ES.ITO.CSS.T-Com.ST.WINDOWS",
+                         "DTAG.TSI.ES.CC.DT.SV.SV01.SeM-PS",
                          "DTAG.TSI.ES.ITO.CSS.T-Com.PMAQ.QSC"];
    }
    else{
