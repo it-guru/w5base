@@ -481,11 +481,8 @@ sub mkChangeStoreRec
           $wfrec{tcomcodcomments}=
                   $rec->{tssc_chm_closingcommentsclosingcomments};
        }
-       if (lc($rec->{reason}) eq "cus"){
-          $wfrec{tcomcodchangetype}="customer";
-       }
-       else{
-          $wfrec{tcomcodchangetype}="noncustomer";
+       if (lc($rec->{reason}) ne "cus"){
+          $wfrec{tcomcodcause}="appl.base.base";
        }
    }
    $wfrec{srcload}=$app->ExpandTimeExpression($rec->{sysmodtime},"en","CET");
@@ -715,7 +712,7 @@ sub mkIncidentStoreRec
    my %wfrec=(srcsys=>$selfname);
    my $app=$self->getParent();
    $wf->SetFilter({srcsys=>\$selfname,srcid=>\$rec->{incidentnumber}});
-   my @oldrec=$wf->getHashList("id","class");
+   my @oldrec=$wf->getHashList("id","class","step");
    if ($#oldrec==0){
       $updateto=$oldrec[0]->{id};
       $oldclass=$oldrec[0]->{class};
@@ -811,8 +808,7 @@ sub mkIncidentStoreRec
       $wfrec{stateid}=21;           # non AL-T-Com is automaticly finished
       # sollte jetzt auch mit sofort beenden funktionieren
    }
-   if (!($oldrec[0]->{step}=~m/::postreflection$/ &&
-       $wfrec{class}=~m/^AL_TCom::/)){
+   if (!defined($oldrec[0]) || !($oldrec[0]->{step}=~m/::postreflection$/)){
        my $ws=$app->ExpandTimeExpression($rec->{workstart},"en","CET");
        my $we=$app->ExpandTimeExpression($rec->{workend},"en","CET");
        my $wt=0;
@@ -834,11 +830,7 @@ sub mkIncidentStoreRec
        else{
           $wfrec{tcomcodrelevant}="no";
        }
-       #$wfrec{tcomcodcontract}=join(", ",@{$wfrec{affectedcontract}});
-#       $wfrec{tcomcodcause}="std";
-#       $wfrec{tcomcodchmrisk}="middle";
-#       $wfrec{tcomcoddownstart}=$ws;
-#       $wfrec{tcomcoddownend}=$we;
+       $wfrec{tcomcodcause}="appl.base.base";
        $wfrec{tcomworktime}=$wt;
        if ($rec->{resolution} ne ""){
           $wfrec{tcomcodcomments}=$rec->{resolution};

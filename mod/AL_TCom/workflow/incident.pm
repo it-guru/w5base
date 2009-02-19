@@ -87,6 +87,15 @@ EOF
                                          group      =>'tcomcod',
                                          container  =>'headref'),
 
+           new kernel::Field::Select(    name       =>'tcomcodcause',
+                                         label      =>'Activity',
+                                         translation=>'AL_TCom::lib::workflow',
+                                         default    =>'undef',
+                                         value      =>
+                             [AL_TCom::lib::workflow::tcomcodcause()],
+                                         group      =>'tcomcod',
+                                         container  =>'headref'),
+
            new kernel::Field::Textarea(  name        =>'tcomcodcomments',
                                          label       =>'Comments',
                                          group       =>'tcomcod',
@@ -144,7 +153,7 @@ sub isWriteValid
 sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),"tcomcod");
+   return("header","itilincident","affected","tcomcod","state","relations","source");
 }
 
 

@@ -98,8 +98,13 @@ sub getDynamicFields
                                          group      =>'tcomcod',
                                          container  =>'headref'),
 
+           #
+           # Das Feld tcomcodchangetype kann demnaechst entfallen 
+           # (Stand:02/2009)
+           #
            new kernel::Field::Select(    name       =>'tcomcodchangetype',
                                          label      =>'Type',
+                                         uivisible  =>0,
                                          value      =>[
                                          qw(customer
                                             noncustomer)],
