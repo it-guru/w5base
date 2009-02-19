@@ -193,6 +193,12 @@ sub new
                 dataobjattr   =>'amcomputer.lmemorysizemb'),
 
       new kernel::Field::Text(
+                name          =>'virtualization',
+                htmldetail    =>0,
+                label         =>'Virualization Status',
+                dataobjattr   =>'amcomputer.virtualization'),
+
+      new kernel::Field::Text(
                 name          =>'systemos',
                 label         =>'System OS',
                 dataobjattr   =>'amcomputer.operatingsystem'),
