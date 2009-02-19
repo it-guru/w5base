@@ -192,10 +192,10 @@ sub ApplicationModified
                                };
                   if ($lnk->{systemsystemid} ne ""){
                      $acftprec->{CI_APPL_REL}->{Portfolio}=
-                            $lnk->{systemsystemid};
+                            uc($lnk->{systemsystemid});
                   }
                   if ($rec->{applid} ne ""){
-                     $acftprec->{CI_APPL_REL}->{Application}=$rec->{applid};
+                     $acftprec->{CI_APPL_REL}->{Application}=uc($rec->{applid});
                   }    
 
                   #
@@ -512,7 +512,7 @@ sub ApplicationModified
                                 EventID=>$CurrentEventId,
                                 ExternalSystem=>'W5Base',
                                 ExternalID=>$irec->{id},
-                                Parent=>$systemid,
+                                Parent=>uc($systemid),
                                 Name=>$irec->{fullname},
                                 Status=>"in operation",
                                 Model=>$model,
