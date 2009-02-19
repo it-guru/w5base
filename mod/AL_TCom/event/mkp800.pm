@@ -66,9 +66,9 @@ sub mkp800
          }
          my $eM=$sM-1;
          my $eY=$sY;
-         if ($eM==1){
-            $sM=12;
-            $sY=$eY-1;
+         if ($sM==1){
+            $eM=12;
+            $eY=$sY-1;
          }
          @monthlist=(sprintf("%02d/%04d",$eM,$eY),$param{month});
       }
