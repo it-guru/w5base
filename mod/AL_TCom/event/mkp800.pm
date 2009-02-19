@@ -126,17 +126,19 @@ sub mkp800
                                      wffields.tcomcodcause
                                      wffields.tcomexternalid
                                      wffields.tcomcodcomments
+                                     tcomworktimespecial
+                                     tcomworktime
                                      affectedapplication
                              headref class step stateid eventend
                              srcid srcsys));
       $wf->SetFilter(eventend=>"\">=$starttime\" AND \"<=$endtime\"",
                      class=>[grep(/^AL_TCom::.*$/,keys(%{$wf->{SubDataObj}}))]);
-      #$wf->SetFilter({srcid=>"CHM00283030"});
+      #$wf->SetFilter({srcid=>"INM02876055"});
       ## DEBUG
       #$wf->SetFilter({id=>[qw(12272520340002)]});
       my %nocontract=();
       my %p800=();
-      my ($rec,$msg)=$wf->getFirst();
+      my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
       if (defined($rec)){
          do{
             if (ref($rec->{affectedcontractid}) eq "ARRAY" &&
@@ -358,35 +360,33 @@ sub processRec
       if ($rec->{class}=~m/::change$/){
          $p800->{$cid}->{p800_app_changecount}++;
          $p800->{$cid}->{p800_app_changewt}+=$rec->{headref}->{tcomworktime};
-         if (ref($rec->{headref}->{tcomcodchangetype}) ne "ARRAY"){
-            $rec->{headref}->{tcomcodchangetype}=[];
-         }
-         if ($rec->{headref}->{tcomcodchangetype}->[0] eq "customer"){
-            if ($rec->{tcomcodcause} ne "std"){
-               $p800->{$cid}->{p800_app_changecount_customer}+=1;
-               $p800->{$cid}->{p800_app_customerwt}+=
-                               $rec->{headref}->{tcomworktime};
-               $p800->{$cid}->{p800_app_change_customerwt}+=
-                               $rec->{headref}->{tcomworktime};
-            }
+         if ($rec->{tcomcodcause} ne "db.base.base" &&
+             $rec->{tcomcodcause} ne "undef" &&
+             $rec->{tcomcodcause} ne "appl.base.base"){
+            $p800->{$cid}->{p800_app_changecount_customer}+=1;
+            $p800->{$cid}->{p800_app_customerwt}+=
+                            $rec->{headref}->{tcomworktime};
+            $p800->{$cid}->{p800_app_change_customerwt}+=
+                            $rec->{headref}->{tcomworktime};
          }
       }
       if ($rec->{class}=~m/::diary$/ || $rec->{class}=~m/::businesreq$/){
-         if ($rec->{tcomcodcause} ne "std"){
+         if ($rec->{tcomcodcause} ne "db.base.base" &&
+             $rec->{tcomcodcause} ne "undef" &&
+             $rec->{tcomcodcause} ne "appl.base.base"){
             $p800->{$cid}->{p800_app_specialcount}++;
             $p800->{$cid}->{p800_app_speicalwt}+=
                            $rec->{headref}->{tcomworktime};
             $p800->{$cid}->{p800_app_customerwt}+=
                            $rec->{headref}->{tcomworktime};
          }
-         if (ref($rec->{headref}->{tcomcodchangetype}) ne "ARRAY"){
-            $rec->{headref}->{tcomcodchangetype}=[];
-         }
       }
       if ($rec->{class}=~m/::incident$/){
          $p800->{$cid}->{p800_app_incidentcount}++;
          $p800->{$cid}->{p800_app_incidentwt}+=$rec->{headref}->{tcomworktime};
-         if ($rec->{tcomcodcause} ne "std"){
+         if ($rec->{tcomcodcause} ne "db.base.base" &&
+             $rec->{tcomcodcause} ne "undef" &&
+             $rec->{tcomcodcause} ne "appl.base.base"){
             $p800->{$cid}->{p800_app_speicalwt}+=
                                    $rec->{headref}->{tcomworktimespecial};
          }
@@ -407,6 +407,8 @@ sub processRecSpecial
 
    msg(DEBUG,"special process %s:%s end=%s",
               $rec->{id},$rec->{srcid},$rec->{eventend});
+   msg(DEBUG,"special process %s: tcomcodcause=%s",
+              $rec->{id},$rec->{tcomcodcause});
    if ((my ($eY,$eM,$eD,$eh,$em,$es)=$rec->{eventend}=~
           m/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/)){
       my ($wY,$wM,$wD,$wh,$wm,$ws)=($eY,$eM,$eD,$eh,$em,$es);
@@ -414,24 +416,25 @@ sub processRecSpecial
       if ($@ eq ""){
          my $mon=sprintf("%02d/%04d",$wM,$wY);
          return(undef) if ($mon ne $specialmon);
-         msg(DEBUG,"report month =%s",$mon);
-         if ($rec->{class}=~m/::incident$/){
-            $rec->{headref}->{specialt}=$rec->{headref}->{tcomworktimespecial};
-         }
-         if ($rec->{class}=~m/::diary$/ || $rec->{class}=~m/::businesreq$/){
-            $rec->{headref}->{specialt}=$rec->{headref}->{tcomworktime};
-         }
-         if ($rec->{class}=~m/::change$/){
-            if ($rec->{headref}->{tcomcodchangetype}->[0] eq "customer"){
-               $rec->{headref}->{specialt}=$rec->{headref}->{tcomworktime};
-            }
-         }
-         if ($rec->{tcomcodcause} ne "std"){
+         msg(DEBUG,"special process %s: report month =%s",$rec->{id},$mon);
+         if ($rec->{tcomcodcause} ne "db.base.base" &&
+             $rec->{tcomcodcause} ne "undef" &&
+             $rec->{tcomcodcause} ne "appl.base.base"){
+            msg(DEBUG,"special process %s: is special",$rec->{id});
+            $rec->{headref}->{specialt}=0;
+            #
+            # Da in Changes und Incidents verschiedene Felder verwendet wurden
+            #
+            $rec->{headref}->{specialt}+=$rec->{headref}->{tcomworktime};
+            $rec->{headref}->{specialt}+=$rec->{headref}->{tcomworktimespecial};
+            
             $self->xlsExport($xlsexp,$rec,$mon,$eY,$eM,$eD);
             $self->bflexxExport($bflexxp800,$rec,$mon,$eY,$eM,$eD);
             for(my $c=0;$c<=$#{$rec->{affectedcontractid}};$c++){
                my $cid=$rec->{affectedcontractid}->[$c];
                my $wt=$rec->{headref}->{specialt};
+               msg(DEBUG,"special process %s: for contractid=%s wt=%d",
+                         $rec->{id},$cid,$wt);
                if ($wt>0){
                   $p800->{$mon}={} if (!defined($p800->{$mon}));
                   $p800->{$mon}->{$cid}={} if (!defined($p800->{$mon}->{$cid}));

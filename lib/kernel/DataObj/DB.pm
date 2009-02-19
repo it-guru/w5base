@@ -43,6 +43,15 @@ sub AddDatabase
    my $obj=shift;
 
    my ($dbh,$msg)=$obj->Connect();
+######### erster Versuch der Transationssicherung - so funktionierts nicht
+#   if ($self->TryToHandleTransactionSafe()){
+#      msg(INFO,"setting autocommit to false");
+#      $dbh->do("set autocommit=0;");
+#      $dbh->do("start transaction;");
+#   }
+#   else{
+#      $dbh->do("set autocommit=1;");
+#   }
    if (!$dbh){
       if ($msg ne ""){
          return("InitERROR",$msg);
@@ -52,6 +61,44 @@ sub AddDatabase
    $self->{$db}=$obj;
    return($dbh);
 }  
+
+sub TransactionStart                  # hook to handle commits 
+{
+   my $self=shift;
+   if ($self->Config->Param("W5BaseTransactionSave") eq "yes"){
+      $W5V2::OpenTransactions->{$self}=[$self];
+   }
+   return(1);
+}
+
+sub TransactionEnd                    # hook to handle commits in 
+{                                     # transaction save database engines
+   my $self=shift;
+   my $trcount=shift;
+   my ($worktable,$workdb)=$self->getWorktable();
+   $workdb=$self->{DB} if (!defined($workdb));
+
+   msg(INFO,"try commit");
+   if (!defined($worktable) || $worktable eq ""){
+      $self->LastMsg(ERROR,"can't commit in $self - no Worktable");
+      return(undef);
+   }
+   msg(INFO,"do rollback");
+  
+   if ($trcount==0){ 
+      if ($workdb->do("rollback")){
+         msg(INFO,"commit done in $self");
+      }
+   }
+   else{
+      if ($workdb->do("commit;")){
+         msg(INFO,"commit done in $self for $trcount commands");
+      }
+   }
+   return(1);
+}
+
+
 
 sub Rows 
 {

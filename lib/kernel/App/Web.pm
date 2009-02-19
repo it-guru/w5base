@@ -63,7 +63,9 @@ sub RunWebApp
    }
    return if (!$W5V2::ObjCache{$objectkey}->InitRequest(cgi=>$cgi));
 
-   return($W5V2::ObjCache{$objectkey}->Run());
+   my $bk=$W5V2::ObjCache{$objectkey}->Run();
+   $W5V2::ObjCache{$objectkey}->CloseOpenTransations();
+   return($bk);
 }
 
 sub DisplayMaintenanceWindow

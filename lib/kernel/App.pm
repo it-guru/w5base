@@ -599,6 +599,27 @@ sub getDataObj
    return($o);
 }
 
+sub CloseOpenTransations
+{
+   my $self=shift;
+
+   if (keys(%{$W5V2::OpenTransactions})){
+      msg(INFO,"====>CloseOpenTransations found transactions");
+      foreach my $dataobj (values(%{$W5V2::OpenTransactions})){
+         msg(INFO,"close Transactions for $dataobj->[0]");
+         if ($dataobj->[0]->can("TransactionEnd")){
+            msg(INFO,"closing");
+            $dataobj->[0]->TransactionEnd(
+                           $W5V2::OpenTransactions{$dataobj}->[1]);
+         }
+         else{
+            msg(ERROR,"close TransactionEnd requested an not in $dataobj");
+         }
+      }
+   }
+   $W5V2::OpenTransactions={};
+}
+
 sub LoadTranslation
 {
    my $self=shift;

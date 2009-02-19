@@ -91,7 +91,7 @@ sub isViewValid
 
 sub getDetailBlockPriority                # posibility to mod the block order
 {
-   return("itilincident");
+   return("header","itilincident","affected","state","relations","source");
 }
 
 

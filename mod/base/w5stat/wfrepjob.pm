@@ -49,7 +49,7 @@ sub processDataInit
    $self->{RJ}=[];
    foreach my $repjob ($wfrepjob->getHashList(qw(ALL))){
       my %d=%{$repjob};
-      printf STDERR ("d=%s\n",Dumper(\%d));
+      #printf STDERR ("d=%s\n",Dumper(\%d));
       push(@{$self->{RJ}},\%d);
    }
    if (!defined($self->{SSTORE})){
@@ -114,16 +114,18 @@ sub processRecord
             #############################################################
             #
             # Period berechnen
-            my ($Y,$M,$D)=$self->getParent->ExpandTimeExpression(
-                                "$reftime-$repjob->{mday}d-1s",
-                                undef,"GMT",$repjob->{tz});
-            my $period=sprintf("%04d%02d",$Y,$M);
-            ($Y,$M,$D)=Add_Delta_YMD($repjob->{tz},$Y,$M,1,0,1,0);
-            my $period1=sprintf("%04d%02d",$Y,$M);
-
-            if ($period eq $param{currentmonth}||
-                $period1 eq $param{currentmonth}){
-               $self->storeWorkflow($repjob,$rec,$period,\%param);
+            if ($reftime ne ""){
+               my ($Y,$M,$D)=$self->getParent->ExpandTimeExpression(
+                                   "$reftime-$repjob->{mday}d-1s",
+                                   undef,"GMT",$repjob->{tz});
+               my $period=sprintf("%04d%02d",$Y,$M);
+               ($Y,$M,$D)=Add_Delta_YMD($repjob->{tz},$Y,$M,1,0,1,0);
+               my $period1=sprintf("%04d%02d",$Y,$M);
+              
+               if ($period eq $param{currentmonth}||
+                   $period1 eq $param{currentmonth}){
+                  $self->storeWorkflow($repjob,$rec,$period,\%param);
+               }
             }
          }
       }

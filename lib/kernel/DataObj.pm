@@ -415,16 +415,25 @@ sub getDefaultHtmlDetailPage
    return($d);
 }
 
+sub TryToHandleTransactionSafe
+{
+   my $self=shift;  
+   if ($self->Config->Param("W5BaseTransactionSave") eq "yes"){
+      return(1);
+   }
+   return(0);
+}
 
-sub DBTransactionStart                  # hook to handle commits 
+
+sub TransactionStart                  # hook to handle commits 
 {
    my $self=shift;
-   msg(INFO,"=====> DBTransactionStart");
+   msg(INFO,"=====> TransactionStart");
    return(1);
 }
 
-sub DBTransactionEnd                    # hook to handle commits in 
-{                                       # transaction save database engines
+sub TransactionEnd                    # hook to handle commits in 
+{                                     # transaction save database engines
    my $self=shift;
    my $docommit=shift;
    msg(INFO,"=====> DBTransactionEnd docommit=$docommit");
@@ -1022,7 +1031,7 @@ sub ValidatedInsertRecord
    my $newrec=shift;
 
    $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
-   $self->DBTransactionStart();
+   $self->TransactionStart();
    if (!$self->preValidate(undef,$newrec)){
       if ($self->LastMsg()==0){
          $self->LastMsg(ERROR,"ValidatedInsertRecord: ".
@@ -1039,7 +1048,6 @@ sub ValidatedInsertRecord
                $eh->HandleEvent("InsertRecord",$self->Self,undef,$newrec);
             }
             $self->FinishWrite(undef,$newrec) if ($bak);
-            $self->DBTransactionEnd($bak);
             return($bak);
          }
          else{
@@ -1056,7 +1064,6 @@ sub ValidatedInsertRecord
          }
       }
    }
-   $self->DBTransactionEnd(undef);
    return(undef);
 }
 sub InsertRecord
@@ -1099,7 +1106,7 @@ sub ValidatedUpdateRecord
 
    $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
    my %comprec=%{$newrec};
-   $self->DBTransactionStart();
+   $self->TransactionStart();
    if (!$self->preValidate($oldrec,$newrec,\%comprec)){
       if ($self->LastMsg()==0){
          $self->LastMsg(ERROR,"ValidatedUpdateRecord: ".
@@ -1122,7 +1129,6 @@ sub ValidatedUpdateRecord
                   $oldrec->{$v}=$newrec->{$v};
                }
             }
-            $self->DBTransactionEnd($bak);
             return($bak);
          }
          else{
@@ -1139,7 +1145,6 @@ sub ValidatedUpdateRecord
          }
       }
    }
-   $self->DBTransactionEnd(undef);
    return(undef);
 }
 sub UpdateRecord

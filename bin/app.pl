@@ -20,7 +20,7 @@ use strict;
 use FindBin ;
 $W5V2::INSTDIR="/opt/w5base";
 $W5V2::OperationContext="WebFrontend";
-$W5V2::OpenTransactions=[];
+$W5V2::OpenTransactions={};
 if (defined(&{FindBin::again})){
    FindBin::again();
    $W5V2::INSTDIR="$FindBin::Bin/..";
