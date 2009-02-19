@@ -305,9 +305,8 @@ sub ProcessNext
    #
    my $wf=$self->getParent->getParent();
    my $h=$self->getWriteRequestHash("web");
-   if (ref($h->{affectedapplication}) eq "ARRAY" && 
-       $#{$h->{affectedapplication}}==0){
-      $h->{affectedapplication}=$h->{affectedapplication}->[0];
+   if ($h->{affectedapplication} ne ""){
+     # $h->{affectedapplication}=$h->{affectedapplication}->[0];
       $h->{stateid}=4;
       $h->{class}="AL_TCom::workflow::diary";
       $h->{step}="AL_TCom::workflow::diary::dataload";
