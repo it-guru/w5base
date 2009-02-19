@@ -25,3 +25,5 @@
 'Services'=>{de=>'Leistungsarten'},
 'Assignment Group Supervisor'=>{de=>'Assignment Group Leiter'},
 'Assignment Group Supervisor E-Mail'=>{de=>'Assignment Group Leiter E-Mail'},
+'Asset complete deprecation start'=>{de=>'Asset total Abschreibungsbeginn'},
+'Asset complete deprecation end'=>{de=>'Asset total Abschreibungsende'},

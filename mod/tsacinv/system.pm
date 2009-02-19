@@ -239,6 +239,24 @@ sub new
                 group         =>"assetfinanz",
                 fields        =>[qw( mdepr mmaint)]),
 
+      new kernel::Field::Date(
+                name          =>'compdeprstart',
+                vjointo       =>'tsacinv::asset',
+                vjoinon       =>['lassetid'=>'lassetid'],
+                vjoindisp     =>'compdeprstart',
+                htmldetail    =>0,
+                group         =>"assetfinanz",
+                label         =>'Asset complete deprecation start'),
+
+      new kernel::Field::Date(
+                name          =>'compdeprend',
+                vjointo       =>'tsacinv::asset',
+                vjoinon       =>['lassetid'=>'lassetid'],
+                vjoindisp     =>'compdeprend',
+                htmldetail    =>0,
+                group         =>"assetfinanz",
+                label         =>'Asset complete deprecation end'),
+
       new kernel::Field::Link(
                 name          =>'partofassetdec',
                 label         =>'System Part of Asset',
