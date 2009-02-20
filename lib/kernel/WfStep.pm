@@ -222,10 +222,22 @@ sub Process
          if ($self->getParent->getParent->Action->StoreRecord(
              $WfRec->{id},"wfaddnote",
              {translation=>'base::workflow::request'},$note,$effort)){
+            my $intiatornotify=Query->Param("intiatornotify");
+            if ($intiatornotify ne "" && defined($WfRec->{initiatorid}) &&
+                $WfRec->{initiatorid} ne ""){
+               my $user=getModuleObject($self->Config,"base::user");
+               $user->SetFilter({userid=>\$WfRec->{initiatorid}});
+               my ($urec,$msg)=$user->getOnlyFirst(qw(email));
+               if ($urec->{email} ne ""){
+                  $self->sendMail($WfRec,emailtext=>$note,
+                                         emailto=>$urec->{email}); 
+               }
+            }
             $self->StoreRecord($WfRec,$oprec);
             $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
             $self->PostProcess($action.".".$op,$WfRec,$actions);
             Query->Delete("note");
+            Query->Delete("intiatornotify");
             return(1);
          }
          return(0);
@@ -302,8 +314,10 @@ sub Process
          return(0);
       }
       if ($op eq "wfmailsend"){    # default mailsending handling
+          
          my $emailto=Query->Param("emailto");
          my $shortnote=Query->Param("emailmsg");
+
          $shortnote=trim($shortnote);
          my $note=$shortnote;
          if ($ENV{SCRIPT_URI} ne ""){
@@ -354,13 +368,66 @@ sub Process
          }
       }
    }
-
-
-
-
-
    return(0);
 }
+
+sub sendMail
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my %param=@_;
+   my %m;
+
+   $m{name}=trim($param{subject});
+   $m{emailtext}=trim($param{emailtext});
+   if (ref($param{emailto}) ne "ARRAY"){
+      $m{emailto}=$param{emailto};
+   }
+   else{
+      $m{emailto}=trim($param{emailto});
+   }
+   if ($ENV{SCRIPT_URI} ne ""){
+      my $baseurl=$ENV{SCRIPT_URI};
+      $baseurl=~s#/(auth|public)/.*$##;
+      my $url=$baseurl;
+      $url.="/auth/base/workflow/ById/".$WfRec->{id};
+      $m{emailtext}.="\n\n\n".$self->T("Workflow Link").":\n";
+      $m{emailtext}.=$url;
+      $m{emailtext}.="\n\n";
+   }
+   my $wf=$self->getParent->getParent->Clone();
+   if (!defined($m{name})){
+      $m{name}="Info: ".$WfRec->{name};
+   }
+   $m{emailfrom}='no_reply@w5base.net';
+   my @to=();
+   my $UserCache=$self->Cache->{User}->{Cache};
+   if ($m{emailto}=~m/^\s*$/){
+      $self->LastMsg(ERROR,"no email address specified");
+      return(0);
+   }
+   if (defined($UserCache->{$ENV{REMOTE_USER}})){
+      $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
+   }
+   if (defined($UserCache->{email}) &&
+       $UserCache->{email} ne ""){
+      $m{emailfrom}=$UserCache->{email};
+      if (!defined($m{emailfrom})){
+         $m{emailcc}=$UserCache->{email};
+      }
+   }
+   $m{class}='base::workflow::mailsend';
+   $m{step}='base::workflow::mailsend::dataload';
+   if (my $id=$wf->Store(undef,\%m)){
+      my %d=(step=>'base::workflow::mailsend::waitforspool');
+      if ($wf->Store($id,%d)){
+         return(1);
+      }
+      return(0);
+   }
+   return(0);
+}
+
 
 sub generateWorkspace
 {
@@ -392,7 +459,7 @@ sub generateWorkspace
    $tabheight=30 if ($tabheight<30);  # ensure, that tabheigh is not negativ
    $templ=<<EOF;
 <table width=100% height=$tabheight border=0 cellspacing=0 cellpadding=0>
-<tr height=1%><td width=1% nowrap>$pa &nbsp;</td>
+<tr height=1%><td width=1% nowrap>&nbsp;$pa &nbsp;</td>
 <td><select id=OP name=OP style="width:100%">$selopt</select></td></tr>
 <tr><td colspan=3 valign=top>$divset</td></tr>
 </table>
@@ -602,10 +669,11 @@ sub getDefaultNoteDiv
              '480'=>'1 day',
              '720'=>'1,5 days',
              '960'=>'2 days');
-      $d.="<tr><td width=1% nowrap>".
-          $self->getParent->getParent->T("Effort","base::workflowaction").
+      $d.="<tr><td width=1% nowrap>&nbsp;".
+          $self->getParent->getParent->T("personal Effort",
+                                         "base::workflowaction").
           ":&nbsp;</td>".
-          "<td><select name=Formated_effort style=\"width:80px\">";
+          "<td nowrap><select name=Formated_effort style=\"width:80px\">";
       my $oldval=Query->Param("Formated_effort");
       while(defined(my $min=shift(@t))){
          my $l=shift(@t);
@@ -613,7 +681,21 @@ sub getDefaultNoteDiv
          $d.=" selected" if ($min==$oldval);
          $d.=">$l</option>";
       }
-      $d.="</select></td>";
+      $d.="</select>";
+      if (defined($WfRec->{initiatorid})){
+         $d.="&nbsp;&nbsp;&nbsp;";
+         $d.="&nbsp;&nbsp;&nbsp;";
+         $d.=$self->getParent->getParent->T("notify intiator",
+                                         "base::workflowaction");
+         my $oldval=Query->Param("intiatornotify");
+         my $checked;
+         $checked=" checked " if ($oldval ne "");
+         $d.="&nbsp;<input style=\"background-color:transparent\" ".
+             "type=checkbox $checked name=\"intiatornotify\">";
+      }
+
+
+      $d.="</td>";
       $d.="</tr>";
    }
    if ($mode eq "defer"){

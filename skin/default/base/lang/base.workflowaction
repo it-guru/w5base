@@ -23,6 +23,8 @@
      de=>'Eine Genehmigungsanforderung für den Workflow %s wurde an Sie gerichtet'},
 'Edit'=>{de=>'Bearbeiten'},
 'Effort'=>{de=>'Zeitaufwand'},
+'personal Effort'=>{de=>'persönlicher Zeitaufwand'},
+'notify intiator'=>{de=>'Initiator informieren'},
 'Private State'=>{de=>'Sichtbarkeit'},
 'privatestate.0'=>{de=>'standard',en=>'standard'},
 'privatestate.1'=>{de=>'History ist nur für Admin und Ersteller sichtbar',en=>'>History ony for Admins and creator'},
