@@ -915,6 +915,7 @@ sub getCurrentUserId
 sub getCurrentSecState
 {
    my $self=shift;
+   return(5) if ($W5V2::OperationContext eq "W5Server");
    my $secstate=1;
    my $UserCache=$self->Cache->{User}->{Cache};
    if (defined($UserCache->{$ENV{REMOTE_USER}})){
