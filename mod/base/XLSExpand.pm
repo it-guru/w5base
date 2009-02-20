@@ -356,19 +356,25 @@ sub ProcessFile
         }
         if ($haveindata){
            $maxrow=$row;
-           printf STDERR ("in=%s out=%s\n",Dumper(\%inrec),Dumper(\%out));
+           printf STDERR ("==>ourrec=%s\n---\n",Dumper(\%outrec));
+           printf STDERR ("==>in=%s\n---\n",Dumper(\%inrec));
            my $res=$self->ProcessLine($row,\%inrec,\%out);
+           printf STDERR ("==>out=%s\n---\n",Dumper(\%out));
            foreach my $kout (keys(%out)){
               if (defined($out{$kout})){
                  my @d=($out{$kout});
-                 my @d=sort(keys(%{$out{$kout}})) if (ref($out{$kout}) eq "HASH");
+                 if (ref($out{$kout}) eq "HASH"){
+                    @d=sort(keys(%{$out{$kout}}));
+                 }
                  foreach my $v (@d){
                     $globalrec{$kout}->{$v}++;
                  }
                  my $sep=",";
                  my $sep=";" if ($kout=~m/mail/);
                  my $d=join("$sep ",@d);
-                 $oBook->AddCell($iSheet,$row,$outrec{$kout},$d,0);
+                 if (defined($outrec{$kout})){
+                    $oBook->AddCell($iSheet,$row,$outrec{$kout},$d,0);
+                 }
               }
            }
         }
@@ -426,7 +432,7 @@ sub ProcessLine
    my @proclist=sort({$a->getPriority() <=> $b->getPriority()} values(%{$self->{XLSExpand}}));
    my @failproc;
 
-   do{
+   while($#proclist!=-1 && $loopcount<10){
       @failproc=();
       foreach my $obj (@proclist){
          my $isprocessed=$obj->ProcessLine($line,$in,$out,$loopcount);
@@ -434,9 +440,11 @@ sub ProcessLine
             push(@failproc,$obj);
          }
       }
+      if ($loopcount>1){
+         @proclist=@failproc;
+      }
       $loopcount++;
-      @proclist=@failproc;
-   }unless($#failproc!=-1 || $loopcount>50);
+   }
 
    return(1);
 }

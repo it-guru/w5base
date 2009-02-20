@@ -147,7 +147,13 @@ sub ProcessLine
    }
    if (defined($in->{'itil::appl::name'})){
       my $appl=$self->getParent->getPersistentModuleObject('itil::appl');
-      $appl->SetFilter({name=>\$in->{'itil::appl::name'},cistatusid=>'4'});
+      if (ref($in->{'itil::appl::name'}) eq "HASH"){
+         $appl->SetFilter({name=>[keys(%{$in->{'itil::appl::name'}})],
+                           cistatusid=>'4'});
+      }
+      else{
+         $appl->SetFilter({name=>\$in->{'itil::appl::name'},cistatusid=>'4'});
+      }
       foreach my $applrec ($appl->getHashList(qw(id systems))){
          $in->{'itil::appl::id'}->{$applrec->{id}}++;
          if (grep(/^itil::system::.*$/,keys(%{$out}))){
