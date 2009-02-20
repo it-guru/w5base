@@ -124,7 +124,10 @@ sub GetKeyCriterion
                                                        itil::system::systemid
                                                        itil::asset::name
                                                        itil::system::ipaddress::name
-                                                       itil::system::name)]}
+                                                       itil::system::name)]},
+                'itil::system::location'   =>{
+                   label=>'IT-Inventar: System: Location'
+                }
               }
          };
    return($d);
@@ -220,7 +223,7 @@ sub ProcessLine
          }
       }
    }
-   foreach my $syssekvar (qw(osrelease name)){
+   foreach my $syssekvar (qw(osrelease name location)){
       if (exists($out->{'itil::system::'.$syssekvar}) &&
           defined($in->{'itil::system::id'})){
          my $sys=$self->getParent->getPersistentModuleObject('itil::system');

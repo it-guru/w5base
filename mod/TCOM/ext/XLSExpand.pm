@@ -53,8 +53,7 @@ sub ProcessLine
 
    if (defined($in->{'TCOM::custappl::custname'})){
       my $appl=$self->getParent->getPersistentModuleObject('TCOM::custappl');
-      $appl->SetFilter({custname=>\$in->{'TCOM::custappl::custname'},
-                        cistatusid=>'4'});
+      $appl->SetFilter({custname=>$in->{'TCOM::custappl::custname'}});
       foreach my $applrec ($appl->getHashList(qw(id name))){
          $in->{'itil::appl::id'}->{$applrec->{id}}++;
          $in->{'itil::appl::name'}->{$applrec->{name}}++;
