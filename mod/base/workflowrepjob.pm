@@ -108,11 +108,13 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'flt1name',
+                group         =>'wffieldsfilter',
                 label         =>'Filter1: Fieldname',
                 dataobjattr   =>'wfrepjob.flt1_name'),
 
       new kernel::Field::Text(
                 name          =>'flt1value',
+                group         =>'wffieldsfilter',
                 label         =>'Filter1: Fieldvalue',
                 dataobjattr   =>'wfrepjob.flt1_value'),
 
@@ -189,6 +191,15 @@ sub new
    $self->setWorktable("wfrepjob");
    return($self);
 }
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my $grp=shift;
+   my %param=@_;
+   return("header","default","wffieldsfilter","source");
+}
+
 
 sub getFuncCode
 {

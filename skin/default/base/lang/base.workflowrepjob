@@ -1,2 +1,4 @@
 'base::workflowrepjob'=>{de=>'Workflow-System Reporting Job',
                          en=>'Workflow-System Reporting Job'},
+'fieldgroup.wffieldsfilter'=>{de=>'Workflow speziefische Filter',
+                              en=>'Workflow spcific filters'},
