@@ -669,11 +669,12 @@ sub getDefaultNoteDiv
              '480'=>'1 day',
              '720'=>'1,5 days',
              '960'=>'2 days');
-      $d.="<tr><td width=1% nowrap>&nbsp;".
+      $d.="<tr><td width=1% nowrap valign=bottom>&nbsp;".
           $self->getParent->getParent->T("personal Effort",
                                          "base::workflowaction").
           ":&nbsp;</td>".
-          "<td nowrap><select name=Formated_effort style=\"width:80px\">";
+          "<td nowrap valign=bottom>".
+          "<select name=Formated_effort style=\"width:80px\">";
       my $oldval=Query->Param("Formated_effort");
       while(defined(my $min=shift(@t))){
          my $l=shift(@t);
