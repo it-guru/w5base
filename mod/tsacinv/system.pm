@@ -330,6 +330,7 @@ sub new
                 name          =>'applicationnames',
                 label         =>'Applicationnames',
                 group         =>'applications',
+                searchable    =>0,
                 htmldetail    =>0,
                 vjointo       =>'tsacinv::lnkapplsystem',
                 vjoinon       =>['lportfolioitemid'=>'lchildid'],
