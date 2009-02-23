@@ -159,8 +159,10 @@ sub qcheckRecord
       }
    }
    else{
-      push(@qmsg,'no applicationid specified');
-      $errorlevel=3 if ($errorlevel<3);
+      if ($rec->{mandator} ne "Extern"){
+         push(@qmsg,'no applicationid specified');
+         $errorlevel=3 if ($errorlevel<3);
+      }
    }
 
 
