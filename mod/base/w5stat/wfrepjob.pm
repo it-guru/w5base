@@ -77,7 +77,7 @@ sub processData
       msg(INFO,"starting collect of base::workflow set0 ".
                "- all modified $dstrange");
       $wf->SetFilter({mdate=>">monthbase-1M-2d AND <now"});
-   #   $wf->SetFilter({mdate=>">monthbase AND <now"});
+   #   $wf->SetFilter({id=>"12312433930002"});
    #   $wf->Limit(15500);
       $wf->SetCurrentView(qw(ALL));
       $wf->SetCurrentOrder("NONE");
@@ -151,13 +151,24 @@ sub matchAttribute
          $flt=~s/\/[i]{0,1}$//;
          #$flt=quotemeta($flt);
          my $fldobj=$param->{DataObj}->getField($attr,$WfRec);
+         return(0) if (!defined($fldobj));
          my $d=$fldobj->RawValue($WfRec);
          return(0) if (!defined($d) || $d eq "");
          if ($orgflt=~m/i$/){
-            return(0) if (!($d=~m/$flt/i));
+            if (ref($d) eq "ARRAY"){
+               return(0) if (!grep(/$flt/i,@$d));
+            }
+            else{
+               return(0) if (!($d=~m/$flt/i));
+            }
          }
          else{
-            return(0) if (!($d=~m/$flt/));
+            if (ref($d) eq "ARRAY"){
+               return(0) if (!grep(/$flt/,@$d));
+            }
+            else{
+               return(0) if (!($d=~m/$flt/));
+            }
          }
       }
    }
@@ -175,7 +186,16 @@ sub matchJob
    return(0) if (!matchAttribute($repjob,$WfRec,$param,'fltclass','class'));
    return(0) if (!matchAttribute($repjob,$WfRec,$param,'fltstep','step'));
    return(0) if (!matchAttribute($repjob,$WfRec,$param,'fltname','name'));
-   return(0) if (!matchAttribute($repjob,$WfRec,$param,'fltdesc','detaildescription'));
+   return(0) if (!matchAttribute($repjob,$WfRec,$param,'fltdesc',
+                                                       'detaildescription'));
+   foreach my $fltnum (qw(flt1 flt2 flt3)){
+      if ($repjob->{$fltnum.'name'} ne ""){
+         if (!matchAttribute($repjob,$WfRec,$param,$fltnum.'value',
+                                                   $repjob->{$fltnum.'name'})){
+            return(0);
+         }
+      }
+   }
 
    return(1);
 }
@@ -217,32 +237,33 @@ sub storeWorkflow
       $ENV{HTTP_FORCE_LANGUAGE}="de";
       my $fieldname=$fields->[$col];
       my $fobj=$param->{DataObj}->getField($fieldname,$WfRec);
-      my $data=$fobj->FormatedResult($WfRec,"XlsV01");
-      my $format=$fobj->getXLSformatname($data);
-#      printf STDERR ("fobj of $fieldname = $fobj v=$v\n");
-
-      if (!exists($sheet->{col}->{$col})){
-         my $xlswidth;
-         if (defined($fobj->htmlwidth())){
-            $xlswidth=$fobj->htmlwidth()*0.4;
+      if (defined($fobj)){
+         my $data=$fobj->FormatedResult($WfRec,"XlsV01");
+         my $format=$fobj->getXLSformatname($data);
+       
+         if (!exists($sheet->{col}->{$col})){
+            my $xlswidth;
+            if (defined($fobj->htmlwidth())){
+               $xlswidth=$fobj->htmlwidth()*0.4;
+            }
+            if (defined($fobj->xlswidth())){
+               $xlswidth=$fobj->xlswidth();
+            }
+            $xlswidth=15 if (defined($xlswidth) && $xlswidth<15);
+       
+            $sheet->{col}->{$col}={};
+            $sheet->{col}->{$col}->{label}=$fobj->Label();
+            $sheet->{col}->{$col}->{width}=$xlswidth;
          }
-         if (defined($fobj->xlswidth())){
-            $xlswidth=$fobj->xlswidth();
+         if ($format=~m/^date\./){
+            $sheet->{'o'}->write_date_time($sheet->{line},$col,$data,
+                                                  $self->Format($slot,$format));
          }
-         $xlswidth=15 if (defined($xlswidth) && $xlswidth<15);
-
-         $sheet->{col}->{$col}={};
-         $sheet->{col}->{$col}->{label}=$fobj->Label();
-         $sheet->{col}->{$col}->{width}=$xlswidth;
-      }
-      if ($format=~m/^date\./){
-         $sheet->{'o'}->write_date_time($sheet->{line},$col,$data,
-                                               $self->Format($slot,$format));
-      }
-      else{
-         $data="'".$data if ($data=~m/^=/);
-         $sheet->{'o'}->write($sheet->{line},$col,$data,
-                                     $self->Format($slot,$format));
+         else{
+            $data="'".$data if ($data=~m/^=/);
+            $sheet->{'o'}->write($sheet->{line},$col,$data,
+                                        $self->Format($slot,$format));
+         }
       }
       delete($ENV{HTTP_FORCE_LANGUAGE});
    }
@@ -361,7 +382,7 @@ sub processDataFinish
                push(@fl,"$filename.current.xls");
             }
             foreach my $dstfile (@fl){
-               printf STDERR ("fifi filename=$dstfile dir=$dir\n");
+               #printf STDERR ("fifi filename=$dstfile dir=$dir\n");
                if (open(F,"<".$slot->{fh}->filename)){
                   if (!($file->ValidatedInsertOrUpdateRecord(
                                {name=>$dstfile, parent=>$dir,file=>\*F},

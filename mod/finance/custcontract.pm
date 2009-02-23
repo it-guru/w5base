@@ -174,6 +174,7 @@ sub new
 
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
+                label         =>'Contacts',
                 class         =>'mandator',
                 vjoinbase     =>[{'parentobj'=>\'finance::custcontract'}],
                 vjoininhash   =>['targetid','target','roles'],

@@ -102,6 +102,15 @@ sub new
                 group         =>'commercial',
                 dataobjattr   =>'projectroom.projectboss2'),
 
+      new kernel::Field::Text(
+                name          =>'conumber',
+                htmlwidth     =>'100px',
+                group         =>'commercial',
+                label         =>'CO-Number',
+                weblinkto     =>'itil::costcenter',
+                weblinkon     =>['conumber'=>'name'],
+                dataobjattr   =>'projectroom.conumber'),
+
       new kernel::Field::Boolean(
                 name          =>'iscommercial',
                 group         =>'projectclass',
@@ -243,6 +252,8 @@ sub new
       new kernel::Field::QualityLastDate(
                 dataobjattr   =>'projectroom.lastqcheck'),
    );
+   $self->{workflowlink}={ workflowkey=>[id=>'affectedprojectid']
+                         };
    $self->{history}=[qw(modify delete)];
    $self->setDefaultView(qw(linenumber name cistatus mandator mdate));
    $self->setWorktable("projectroom");
@@ -327,6 +338,20 @@ sub Validate
          $self->LastMsg(ERROR,"you are not authorized to set other persons ".
                               "as databoss");
          return(0);
+      }
+   }
+   if (exists($newrec->{conumber})){
+      my $conumber=trim(effVal($oldrec,$newrec,"conumber"));
+      if ($conumber ne ""){
+         $conumber=~s/^0+//g;
+         if (!($conumber=~m/^\d{5,13}$/)){
+            my $fo=$self->getField("conumber");
+            my $msg=sprintf($self->T("value of '%s' is not correct ".
+                                     "numeric"),$fo->Label());
+            $self->LastMsg(ERROR,$msg);
+            return(0);
+         }
+         $newrec->{conumber}=$conumber;
       }
    }
    ########################################################################

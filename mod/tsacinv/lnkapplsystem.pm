@@ -87,7 +87,7 @@ sub new
                 name          =>'applcodescription',
                 group         =>'appldata',
                 htmldetail    =>0,
-                label         =>'CO-Nummer desc of application',
+                label         =>'CO-Number desc of application',
                 dataobjattr   =>'amcostcenter.field1'),
 
       new kernel::Field::Text(
@@ -166,7 +166,7 @@ sub new
                 name          =>'syscodescription',
                 group         =>'sysdata',
                 htmldetail    =>0,
-                label         =>'CO-Nummer desc of system',
+                label         =>'CO-Number desc of system',
                 dataobjattr   =>'sysamcostcenter.field1'),
 
       new kernel::Field::TextDrop(
@@ -221,6 +221,15 @@ sub new
                 unit          =>'MHz',
                 dataobjattr   =>'amcomputer.cputype'),
 
+      new kernel::Field::Text(
+                name          =>'systemtpmc',
+                label         =>'System tpmC',
+                group         =>'sysdata',
+                htmldetail    =>0,
+                translation   =>'tsacinv::system',
+                unit          =>'tpmC',
+                dataobjattr   =>'amcomputer.lProcCalcSpeed'),
+
       new kernel::Field::Float(
                 name          =>'systemmemory',
                 label         =>'System Memory',
@@ -230,8 +239,6 @@ sub new
                 unit          =>'MB',
                 precision     =>0,
                 dataobjattr   =>'amcomputer.lmemorysizemb'),
-
-
 
 
       new kernel::Field::TextDrop(

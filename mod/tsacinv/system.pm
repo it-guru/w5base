@@ -185,6 +185,12 @@ sub new
                 unit          =>'MHz',
                 dataobjattr   =>'amcomputer.cputype'),
 
+      new kernel::Field::Text(
+                name          =>'systemtpmc',
+                label         =>'System tpmC',
+                unit          =>'tpmC',
+                dataobjattr   =>'amcomputer.lProcCalcSpeed'),
+
       new kernel::Field::Float(
                 name          =>'systemmemory',
                 label         =>'System Memory',

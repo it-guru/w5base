@@ -108,15 +108,45 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'flt1name',
+                htmlhalfwidth =>1,
                 group         =>'wffieldsfilter',
                 label         =>'Filter1: Fieldname',
                 dataobjattr   =>'wfrepjob.flt1_name'),
 
       new kernel::Field::Text(
                 name          =>'flt1value',
+                htmlhalfwidth =>1,
                 group         =>'wffieldsfilter',
                 label         =>'Filter1: Fieldvalue',
                 dataobjattr   =>'wfrepjob.flt1_value'),
+
+      new kernel::Field::Text(
+                name          =>'flt2name',
+                htmlhalfwidth =>1,
+                group         =>'wffieldsfilter',
+                label         =>'Filter2: Fieldname',
+                dataobjattr   =>'wfrepjob.flt2_name'),
+
+      new kernel::Field::Text(
+                name          =>'flt2value',
+                htmlhalfwidth =>1,
+                group         =>'wffieldsfilter',
+                label         =>'Filter2: Fieldvalue',
+                dataobjattr   =>'wfrepjob.flt2_value'),
+
+      new kernel::Field::Text(
+                name          =>'flt3name',
+                htmlhalfwidth =>1,
+                group         =>'wffieldsfilter',
+                label         =>'Filter3: Fieldname',
+                dataobjattr   =>'wfrepjob.flt3_name'),
+
+      new kernel::Field::Text(
+                name          =>'flt3value',
+                htmlhalfwidth =>1,
+                group         =>'wffieldsfilter',
+                label         =>'Filter3: Fieldvalue',
+                dataobjattr   =>'wfrepjob.flt3_value'),
 
       new kernel::Field::Textarea(
                 name          =>'repfields',
