@@ -362,7 +362,7 @@ sub generateMenuTree
                        my $chkpath=join(".",@quickpath[0..$chkpathdepth]);
                        if (!defined($padd{$chkpath})){
                           $targetml=\@ml if ($chkpathdepth==0);
-                          if (($mode ne "web" || $mode eq "connector") && 
+                          if (($mode ne "web" && $mode ne "connector") || 
                               ($chkpathdepth==0 ||
                                join(".",@quickpath[0..$chkpathdepth-1]) eq
                                join(".",@curpath[0..$chkpathdepth-1]))){
