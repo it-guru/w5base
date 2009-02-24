@@ -147,40 +147,46 @@ sub getPosibleActions
         $self->getParent->IsMemberOf(["admin","admin.workflow"]))){
       push(@l,"reactivate");
    }
-
-   if ($WfRec->{fwdtarget} eq 'base::grp'){
-      if ($app->IsMemberOf($WfRec->{fwdtargetid},undef,"both")){
-         push(@l,"addnote");
+   if ($WfRec->{state}<21){
+      if ($WfRec->{fwdtarget} eq 'base::grp'){
+         if ($app->IsMemberOf($WfRec->{fwdtargetid},undef,"both")){
+            push(@l,"addnote");
+         }
+         else{
+            if ($app->IsMemberOf(["admin","admin.workflow"],undef,"direct")){
+               push(@l,"addnote","addsup");
+            }
+         }
       }
-   }
-   elsif ($WfRec->{fwdtarget} eq 'base::user' && 
-       $userid==$WfRec->{fwdtargetid}){
-         push(@l,"addnote");
-   }
-   elsif ($WfRec->{fwddebtarget} eq 'base::grp'){
-      if ($app->IsMemberOf($WfRec->{fwddebtargetid},undef,"both")){
-         push(@l,"addnote");
+      elsif ($WfRec->{fwdtarget} eq 'base::user' && 
+          $userid==$WfRec->{fwdtargetid}){
+            push(@l,"addnote");
       }
-      else{
-         if ($app->IsMemberOf(["admin","admin.workflow"])){
+      elsif ($WfRec->{fwddebtarget} eq 'base::grp'){
+         if ($app->IsMemberOf($WfRec->{fwddebtargetid},undef,"both")){
+            push(@l,"addnote");
+         }
+         else{
+            if ($app->IsMemberOf(["admin","admin.workflow"],undef,"direct")){
+               push(@l,"addnote","addsup");
+            }
+         }
+      }
+      elsif ($WfRec->{fwddeptarget} eq 'base::user'){
+         if ($userid==$WfRec->{fwddeptargetid}){
             push(@l,"addnote");
          }
       }
-   }
-   elsif ($WfRec->{fwddeptarget} eq 'base::user'){
-      if ($userid==$WfRec->{fwddeptargetid}){
+      if ($WfRec->{owner}==$userid || $WfRec->{openuser}==$userid){
          push(@l,"addnote");
+         if ($WfRec->{fwdtarget} ne ""){
+            push(@l,"remsup");
+         }
+         else{
+            push(@l,"addsup");
+         }
+         push(@l,"wfclose");
       }
-   }
-   if ($WfRec->{owner}==$userid || $WfRec->{openuser}==$userid){
-      push(@l,"addnote");
-      if ($WfRec->{fwdtarget} ne ""){
-         push(@l,"remsup");
-      }
-      else{
-         push(@l,"addsup");
-      }
-      push(@l,"wfclose");
    }
    #msg(INFO,"valid operations=%s",join(",",@l));
 
@@ -791,14 +797,34 @@ sub generateWorkspace
    my ($Dwfreact);
    $Dwfreact="disabled"  if (!$self->ValidActionCheck(0,$actions,"reactivate"));
    my $label=$self->T("reactivate");
+   my $msg=$self->T("Reactivation modifies the eventend witch can result reporting problems. Are you sure to want reactivate this workflow?");
 
    my $templ=<<EOF;
 <table border=0 cellspacing=0 cellpadding=0 width=100% height=50>
 <tr><td align=center>
 <input type=submit $Dwfreact 
+       onclick="document.btnWhich=this;"
        class=workflowbutton name=reactivate value="$label">
 </td></tr> 
 </table>
+<script language="JavaScript">
+function doValidateSubmit(f,b)
+{
+   if (b.name=="reactivate"){
+      if (confirm("$msg")){
+         b.disabled=false;
+         return(true);
+      }
+      else{
+         b.value=b.oldvalue;
+         b.disabled=false;
+         submitCount=0;
+         return(false);
+      }
+   }
+   return(true);
+}
+</script>
 EOF
    return($templ);
 }

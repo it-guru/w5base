@@ -1,1 +1,2 @@
-'reactivate'=>{de=>'wieder aktivieren'}
+'reactivate'=>{de=>'wieder aktivieren'},
+'Reactivation modifies the eventend witch can result reporting problems. Are you sure to want reactivate this workflow?'=>{de=>'Eine Reaktivierung verändert das Ereignisende des Workflows. Dies kann zu Problemen beim Reporting führen. Sind Sie sicher, dass Sie den Workflow reaktivieren wollen?'},

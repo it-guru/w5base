@@ -710,7 +710,6 @@ sub Process
       if ($WfRec->{tcomworktime}<10){
          my $fa=$self->getParent->getField("shortactionlog");
          my $al=$fa->RawValue($WfRec);
-         printf STDERR ("fifi d=%s\n",Dumper($al));
          my $def=0;
          if (defined($al) && ref($al) eq "ARRAY"){
             foreach my $action (@$al){ 

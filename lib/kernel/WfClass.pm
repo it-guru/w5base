@@ -624,10 +624,10 @@ function ValidateSubmit(f)
    if (!document.btnWhich){
       return(true);
    }
-   if (document.doValidateSubmit){
+   window.setTimeout("disableButtons();",10);
+   if (doValidateSubmit){
       return(doValidateSubmit(f,document.btnWhich));
    }
-   window.setTimeout("disableButtons();",1);
    return(defaultValidateSubmit(f,document.btnWhich));
 }
 function defaultValidateSubmit(f,b)
