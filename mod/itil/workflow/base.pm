@@ -139,8 +139,22 @@ sub Init
                 name       =>'affectedproject',
                 translation=>'itil::workflow::base',
                 keyhandler =>'kh',
-                weblinkto  =>'base::projectroom',
-                weblinkon  =>['affectedprojectid'],
+                getHtmlImputCode=>sub{
+                   my $self=shift;
+                   my $d=shift;
+                   my $readonly=shift;
+                   my %param=(AllowEmpty=>1,selected=>[$d]);
+                   my $name=$self->{name};
+                   $self->vjoinobj->ResetFilter();
+                   $self->vjoinobj->SecureSetFilter({cistatusid=>[4,3],
+                                                     isallowlnkact=>\'1'});
+                   my ($dropbox,$keylist,$vallist)=
+                                 $self->vjoinobj->getHtmlSelect(
+                                                  "Formated_$name",
+                                                  $self->{vjoindisp},
+                                                  [$self->{vjoindisp}],%param);
+                   return($dropbox);
+                },
                 vjointo    =>'base::projectroom',
                 vjoinon    =>['affectedprojectid'=>'id'],
                 vjoindisp  =>'name',

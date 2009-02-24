@@ -243,7 +243,7 @@ sub Validate
             return({$self->{keyhandler}=>$khrec});
          }
          else{
-            return({$keyname=>$srcval,
+            return({%$khrec,
                     $self->{keyhandler}=>$khrec});
          }
          return(undef);

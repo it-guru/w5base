@@ -205,8 +205,8 @@ sub getSimpleInputField
    $unit="<td width=40>$unit</td>" if ($unit ne "");
    my $inputfield="<input type=text value=\"$value\" ".
                   "name=Formated_$name class=finput>";
-   if ($self->{getHtmlImputCode} eq "CODE"){
-      $inputfield=&{$self->{getHtmlImputCode}}($value);
+   if (ref($self->{getHtmlImputCode}) eq "CODE"){
+      $inputfield=&{$self->{getHtmlImputCode}}($self,$value,$readonly);
    }
    if (!$readonly){
       my $width="100%";
