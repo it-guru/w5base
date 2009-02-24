@@ -362,7 +362,7 @@ sub generateMenuTree
                        my $chkpath=join(".",@quickpath[0..$chkpathdepth]);
                        if (!defined($padd{$chkpath})){
                           $targetml=\@ml if ($chkpathdepth==0);
-                          if (($mode ne "web" || $mode eq "connector") || 
+                          if (($mode ne "web" || $mode eq "connector") && 
                               ($chkpathdepth==0 ||
                                join(".",@quickpath[0..$chkpathdepth-1]) eq
                                join(".",@curpath[0..$chkpathdepth-1]))){
@@ -387,7 +387,10 @@ sub generateMenuTree
                     my %mrec;
                     $mrec{label}=$rec->{account}.'@'.$rec->{name};
                     if ($rec->{comments} ne ""){
-                       $mrec{label}.="</a> (".$rec->{comments}.")";
+                       if ($mode eq "connector"){
+                          $mrec{label}.="</a>";
+                          $mrec{label}.=" (".$rec->{comments}.")";
+                       }
                     }
                     $mrec{contextMenu}=$self->mkContextMenu($rec);
                     $mrec{menuid}=$rec->{id};
@@ -407,14 +410,17 @@ sub generateMenuTree
               }
            }
            if ($rec->{quickpath} eq "" || $flt ne ""){
-              if ($mode eq "connector"){
+              if ($mode eq "connector" && $flt ne ""){
                  my %mrec;
                  if ($rec->{entrytype}==1 ||
                      $rec->{entrytype}==3 ||
                      $rec->{entrytype}==5){
                     $mrec{label}=$rec->{account}.'@'.$rec->{name};
                     if ($rec->{comments} ne ""){
-                       $mrec{label}.="</a> (".$rec->{comments}.")";
+                       if ($mode eq "connector"){ 
+                          $mrec{label}.="</a>";
+                          $mrec{label}.=" (".$rec->{comments}.")";
+                       }
                     }
                     $mrec{menuid}=$rec->{id};
                     $mrec{entrytype}=$rec->{entrytype};
