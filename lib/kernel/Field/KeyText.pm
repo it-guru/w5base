@@ -72,7 +72,8 @@ sub preProcessFilter
                $sqltype="DATE" if ($type=~m/Date$/); 
                if (exists($hflt->{$sfld})){
                   if ($sfld eq "eventend" && 
-                      ref($hflt->{$self->{name}}) ne "ARRAY"){
+                      ref($hflt->{$self->{name}}) ne "ARRAY" &&
+                      ref($hflt->{$self->{name}}) ne "SCALAR"){
                      push(@useindex,"eventend");
                   }
                   my %sqlparam=(sqldbh=>$db,datatype=>$sqltype);

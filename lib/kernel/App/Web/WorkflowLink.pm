@@ -184,7 +184,7 @@ sub WorkflowLinkResult
       Query->Delete("Search_ListTime");
       my $class=Query->Param("class");
       if ($class ne "*" && $class ne ""){
-         $q{class}=$class;
+         $q{class}=[$class];
       }
       if ($class eq "*" && defined($self->{workflowlink}->{workflowtyp})){
          $q{class}=$self->{workflowlink}->{workflowtyp};
