@@ -234,6 +234,7 @@ textarea.multilinetext{
 
 img.toplineimage{
    margin:5px;
+   border-color:black;
    border-style:outset;
    border-width:2px
 }

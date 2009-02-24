@@ -139,7 +139,7 @@ sub ViewProcessor
       }
       print $self->getParent->HttpHeader("text/xml");
       print hash2xml($response,{header=>1});
-      msg(INFO,hash2xml($response,{header=>1}));
+      #msg(INFO,hash2xml($response,{header=>1})); # only for debug
       return;
    }
    return;
