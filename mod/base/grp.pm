@@ -345,24 +345,36 @@ sub getHtmlDetailPageContent
    return($page);
 }
 
+sub getGrpDiv
+{
+   my $self=shift;
+   my $grec=shift;
+   my $d;
+   $d.="<div class=groupicon>";
+   my $img=$self->getRecordImageUrl($grec);
+   my $desc=$grec->{description}; 
+   my $comm=$grec->{comments}; 
+ 
+   $d.="<table width=100%>".
+       "<tr><td width=1%><img class=groupicon src=\"$img\"></td>".
+       "<td valign=top align=left><u>$desc</u><br>$comm</td></tr></table>";
+
+   
+   $d.="</div>";
+   return($d);
+}
+
 sub getUserDiv
 {
    my $self=shift;
    my $user=shift;
+   my $usrec=shift;
    my $urec=shift;
    my $d;
    my $name;
-   $d.="<div style=\"width:140px;".
-                           "border-style:none;".
-                           "border-color:black;".
-                           "float:left;".
-                           "padding:2px;".
-                           "text-align:center;".
-                           "overflow:hidden;".
-                           "display:inline-block;".
-                           "height:120px\">";
+   $d.="<div class=\"usericon\">";
    my $img=$user->getRecordImageUrl($urec);
-   $d.="<img src=\"$img\"><br>";
+   $d.="<img class=usericon src=\"$img\"><br>";
 
    
    $name.=$urec->{surname};
@@ -389,7 +401,8 @@ sub TeamView   # erster Versuch der Teamview
                            title=>"TeamView",
                            js=>['toolbox.js'],
                            style=>['default.css','work.css',
-                                   'kernel.App.Web.css']);
+                                   'kernel.App.Web.css',
+                                   'public/base/load/grpteamview.css']);
    if (defined($rec)){
       my $employee;
       my $boss;
@@ -402,18 +415,21 @@ sub TeamView   # erster Versuch der Teamview
             my ($urec,$msg)=$user->getOnlyFirst(qw(ALL));
             if ($usrec->{usertyp} ne "service" && defined($urec)){
                if (grep(/^RBoss$/,@{$usrec->{roles}})){
-                  $boss.=$self->getUserDiv($user,$urec);
+                  $boss.=$self->getUserDiv($user,$usrec,$urec);
                }
                else{
                   if (grep(/^REmployee$/,@{$usrec->{roles}})){
-                     $employee.=$self->getUserDiv($user,$urec);
+                     $employee.=$self->getUserDiv($user,$usrec,$urec);
                   }
                }
             }
          }
       }
-      print "<div style=\"margin:20px;border-color:red;border-style:none;display:inline-block;border-width:2px\">$boss<div style=\"clear:both\"></div></div>";
-      print "<div style=\"margin:20px;border-color:red;border-style:none;display:inline-block;border-width:2px\">$employee<div style=\"clear:both\"></div></div>";
+      my $group=$self->getGrpDiv($rec);
+      my $cleardiv="<div style=\"clear:both\"></div>";
+      print "<div class=topframe>$rec->{fullname}$cleardiv</div>";
+      print "<div class=groupframe>$group$boss$cleardiv</div>";
+      print "<div class=userframe>$employee$cleardiv</div>";
    }
    print $self->HtmlBottom(body=>1,form=>1);
 }
