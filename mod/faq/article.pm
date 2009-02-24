@@ -651,7 +651,7 @@ function setTitle()
 addEvent(window, "load", setTitle);
 </script>
 EOF
-   print("</form></body></html>");
+   print $self->HtmlBottom(body=>1,form=>1);
 
 
 

@@ -298,6 +298,128 @@ sub getRecordImageUrl
    return("../../../public/base/load/grp.jpg?".$cgi->query_string());
 }
 
+sub getValidWebFunctions
+{
+   my $self=shift;
+
+   return($self->SUPER::getValidWebFunctions(@_),"TeamView");
+}
+
+sub getHtmlDetailPages
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+
+   return($self->SUPER::getHtmlDetailPages($p,$rec),
+          "TView"=>$self->T("Team View"));
+}
+
+
+
+
+sub getHtmlDetailPageContent
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+   return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "TView");
+   my $page;
+   my $idname=$self->IdField->Name();
+   my $idval=$rec->{$idname};
+
+   if ($p eq "TView"){
+      Query->Param("$idname"=>$idval);
+      $idval="NONE" if ($idval eq "");
+
+      my $q=new kernel::cgi({});
+      $q->Param("$idname"=>$idval);
+      my $urlparam=$q->QueryString();
+      $page="<link rel=\"stylesheet\" ".
+            "href=\"../../../static/lytebox/lytebox.css\" ".
+            "type=\"text/css\" media=\"screen\" />";
+
+      $page.="<iframe style=\"width:100%;height:100%;border-width:0;".
+            "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
+            "src=\"TeamView?$urlparam\"></iframe>";
+   }
+   $page.=$self->HtmlPersistentVariables($idname);
+   return($page);
+}
+
+sub getUserDiv
+{
+   my $self=shift;
+   my $user=shift;
+   my $urec=shift;
+   my $d;
+   my $name;
+   $d.="<div style=\"width:140px;".
+                           "border-style:none;".
+                           "border-color:black;".
+                           "float:left;".
+                           "padding:2px;".
+                           "text-align:center;".
+                           "overflow:hidden;".
+                           "display:inline-block;".
+                           "height:120px\">";
+   my $img=$user->getRecordImageUrl($urec);
+   $d.="<img src=\"$img\"><br>";
+
+   
+   $name.=$urec->{surname};
+   $name.=", " if ($name ne "");
+   $name.=$urec->{givenname};
+   $name=$urec->{email} if ($name=~m/^\s*$/);
+   
+   $d.=$name."</div>";
+   return($d);
+}
+
+sub TeamView   # erster Versuch der Teamview
+{
+   my $self=shift;
+
+   my %flt=$self->getSearchHash();
+   $self->ResetFilter();
+   $self->SecureSetFilter(\%flt);
+   my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
+
+
+   print $self->HttpHeader();
+   print $self->HtmlHeader(
+                           title=>"TeamView",
+                           js=>['toolbox.js'],
+                           style=>['default.css','work.css',
+                                   'kernel.App.Web.css']);
+   if (defined($rec)){
+      my $employee;
+      my $boss;
+      if (ref($rec->{users}) eq "ARRAY"){
+         my $user=getModuleObject($self->Config,"base::user");
+         foreach my $usrec (sort({$a->{user} cmp $b->{user}} 
+                                 @{$rec->{users}})){
+            $user->ResetFilter();
+            $user->SetFilter({userid=>\$usrec->{userid},cistatusid=>"<=4"});
+            my ($urec,$msg)=$user->getOnlyFirst(qw(ALL));
+            if ($usrec->{usertyp} ne "service" && defined($urec)){
+               if (grep(/^RBoss$/,@{$usrec->{roles}})){
+                  $boss.=$self->getUserDiv($user,$urec);
+               }
+               else{
+                  if (grep(/^REmployee$/,@{$usrec->{roles}})){
+                     $employee.=$self->getUserDiv($user,$urec);
+                  }
+               }
+            }
+         }
+      }
+      print "<div style=\"margin:20px;border-color:red;border-style:none;display:inline-block;border-width:2px\">$boss<div style=\"clear:both\"></div></div>";
+      print "<div style=\"margin:20px;border-color:red;border-style:none;display:inline-block;border-width:2px\">$employee<div style=\"clear:both\"></div></div>";
+   }
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+
+
 
 sub isDeleteValid
 {
