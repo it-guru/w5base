@@ -682,24 +682,20 @@ sub ShowBoards
    my $rootpath=shift;
 
    my $bo=$self->getPersistentModuleObject("faq::forumboardnativ");
+   my $boacl=$self->getPersistentModuleObject("faq::forumboardacl");
    print $self->getAppTitleBar(prefix=>$rootpath,
                                title=>'Forum:'.
                                     ' <a class=toplink href="Main">Boards</a>');
    print "<br>";  
    my $grp; 
    my $class="class=boardgroup";
-   print("<center>".
-         "<table $self->{maintabparam}>");
+   print("<center><table $self->{maintabparam}>");
 
    print("<tr><td colspan=5 align=right>&nbsp;</td></tr>");
-   print("<tr><th $class>Board</th>".
-         "<th $class style=\"text-align:center\">".
-         $self->T("topics")."</th>".
-         "<th $class style=\"text-align:center\">".
-         $self->T("entrys")."</th>".
-         "<th $class>".
-         $self->T("last posting by")."</th>".
-         "<th $class>Moderator</th></tr>");
+   print("<tr><th $class>Board</th><th $class style=\"text-align:center\">".
+         $self->T("topics")."</th><th $class style=\"text-align:center\">".
+         $self->T("entrys")."</th><th $class>".
+         $self->T("last posting by")."</th><th $class>Moderator</th></tr>");
    my $l=1;
    $bo->SecureSetFilter();
    foreach my $rec ($bo->getHashList(qw(boardgroup name id 
@@ -718,13 +714,25 @@ sub ShowBoards
       if (!($comments=~m/^\s*$/)){
          $comments="<br><div class=boardcomments>".$comments."</div>";
       }
+      $boacl->ResetFilter();
+      $boacl->SetFilter({aclparentobj=>\'faq::forumboard',
+                         refid=>\$rec->{id},aclmode=>\'moderate'});
+      my @mod=$boacl->getHashList(qw(acltargetname));
+      my $admin="admin";
+      if ($#mod!=-1){
+         $admin=join(", ",map({my $n=$_->{acltargetname};
+                               if ($n=~m/\(.*\@.*\)$/){
+                                  $n=~s/,\s.*$//;
+                               }
+                               $n;} @mod));
+      }
       print("<tr class=l$l>".
-            "<td><a class=listlink href=\"Main/$rec->{id}\">".
+            "<td valign=top><a class=listlink href=\"Main/$rec->{id}\">".
             "$rec->{name}</a>$comments</td>");
       print("<td width=20 align=center valign=top>$rec->{topiccount}</td>");
       print("<td width=20 align=center valign=top>$rec->{entrycount}</td>");
       print("<td width=120 valign=top>$rec->{lastworkershort}</td>");
-      print("<td width=120 valign=top>admin</td>");
+      print("<td width=120 valign=top>$admin</td>");
       print("</tr>");
       $l++;
       $l=1 if ($l>2);
