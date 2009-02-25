@@ -1758,7 +1758,7 @@ sub Process
       }
       elsif ($h->{eventmode} eq "EVk.appl"){
          $h->{name}=$self->getParent->T("Application-notification:").
-                    " ".$h->{affectedapplication}->[0];
+                    " ".$h->{affectedapplication};
       }
       elsif ($h->{eventmode} eq "EVk.net"){
          my $region=$self->getParent->T($h->{affectedregion},
