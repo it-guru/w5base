@@ -386,7 +386,8 @@ sub generateMenuTree
                        }
                     }
                     $mrec{contextMenu}=$self->mkContextMenu($rec);
-                    $mrec{menuid}=$rec->{id};
+                    #$mrec{menuid}=$rec->{id};
+                    $mrec{menuid}=$mid++;
                     $mrec{entrytype}=$rec->{entrytype};
                     $mrec{name}=$rec->{name};
                     $mrec{account}=$rec->{account};
@@ -415,7 +416,8 @@ sub generateMenuTree
                           $mrec{label}.=" (".$rec->{comments}.")";
                        }
                     }
-                    $mrec{menuid}=$rec->{id};
+                    #$mrec{menuid}=$rec->{id};
+                    $mrec{menuid}=$mid++;
                     $mrec{entrytype}=$rec->{entrytype};
                     $mrec{name}=$rec->{name};
                     $mrec{account}=$rec->{account};
