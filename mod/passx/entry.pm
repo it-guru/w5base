@@ -533,10 +533,8 @@ sub generateMenuTree
          foreach my $mkey (keys(%$mainmenu)){
             $d.="AddToMenu $mkey ".
                 "\"$mainmenu->{$mkey}->{label}\" Title\n";
-            foreach my $entry (sort({$a->{label} cmp $b->{label}} 
-                               @{$mainmenu->{$mkey}->{mentrys}}),
-                               sort({$a->{label} cmp $b->{label}} 
-                               @{$mainmenu->{$mkey}->{cmdentrys}})){
+            foreach my $entry (@{$mainmenu->{$mkey}->{mentrys}},
+                               @{$mainmenu->{$mkey}->{cmdentrys}}){
                $d.="+ \"$entry->{label}\" $entry->{cmd}\n";
             }
             $d.="\n\n\n";
