@@ -477,8 +477,15 @@ sub generateMenuTree
    sub sortTree
    {
       my $mlist=shift;
-      $mlist=[sort({ lc($a->{label}.$a->{name}.$a->{account}) cmp 
-                     lc($b->{label}.$b->{name}.$b->{account});
+      $mlist=[sort({ my $s1=$a->{label};
+                     my $s2=$b->{label};
+                     if (exists($a->{account})){
+                        $s1=$a->{name}.'@'.$a->{account};
+                     }
+                     if (exists($b->{account})){
+                        $s2=$b->{name}.'@'.$b->{account};
+                     }
+                     lc($s1) cmp lc($s2);
                    } @$mlist)];
       foreach my $mrec (@$mlist){
          if (ref($mrec->{tree}) eq "ARRAY" && $#{$mrec->{tree}}!=-1){
