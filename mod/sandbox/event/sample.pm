@@ -37,8 +37,26 @@ sub Init
 
 
    $self->RegisterEvent("rangetest","rangetest");
+   $self->RegisterEvent("usertest","usertest");
    return(1);
 }
+
+sub usertest
+{
+   my $self=shift;
+   my $user=getModuleObject($self->Config,"base::user");
+
+   $user->SetFilter({fullname=>"Vogle*"});
+   my ($urec)=$user->getOnlyFirst(qw(fullname));
+
+   printf STDERR ("d=%s\n",Dumper($urec));
+
+
+
+
+
+}
+
 
 sub rangetest
 {

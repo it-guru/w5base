@@ -197,6 +197,8 @@ sub NotifyAdmin
       my $group=$lrec->{group};
       $user->SetFilter({userid=>\$userid});
       my ($urec,$msg)=$user->getOnlyFirst(qw(fullname cistatusid email));
+printf STDERR ("fifi urec=%s\n",Dumper($urec));
+printf STDERR ("fifi lrec=%s\n",Dumper($lrec));
       if (defined($urec) && $urec->{cistatusid}==4){
          foreach my $arec ($self->getAdmins()){
             if ($arec->{lastlang} ne ""){
