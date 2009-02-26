@@ -566,7 +566,7 @@ sub generateMenuTree
                   $d.="+ \"\" Nop\n";
                }
                $d.="+ \"$entry->{label}";
-               $d.='%'.$entry->{icon}.'%' if ($entry->{icon} ne "");
+               $d.=' %'.$entry->{icon}.'% ' if ($entry->{icon} ne "");
                $d.="\" $entry->{cmd}\n";
                $lasthost=$entry->{hostname};
             }
