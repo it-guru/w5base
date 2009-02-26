@@ -619,6 +619,15 @@ sub Initialize
    return($self->SUPER::Initialize());
 }
 
+sub isCopyValid
+{
+   my $self=shift;
+   my $rec=shift;  # if $rec is not defined, insert is validated
+
+   return(1);
+}
+
+
 
 
 sub FrontendSetFilter
@@ -770,6 +779,27 @@ sub isWriteValid
                            $self->IsMemberOf("admin") ||
                            grep(/^write$/,@acl));
    return(undef);
+}
+
+sub FinishWrite
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   my $isCopyFromId=Query->Param("isCopyFromId");
+   my $id=effVal($oldrec,$newrec,"id");
+   if ($isCopyFromId ne ""){
+      my $acl=getModuleObject($self->Config,"passx::acl");
+      $acl->SetFilter({refid=>\$isCopyFromId,aclparentobj=>\"passx::entry"});
+      my @l=$acl->getHashList(qw(aclparentobj aclmode expiration
+                                 acltarget acltargetid));
+      foreach my $newacl (@l){
+         my %newrec=%{$newacl};
+         $newrec{refid}=$id;
+         $acl->ValidatedInsertRecord(\%newrec);
+      }
+   }
 }
 
 
