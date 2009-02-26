@@ -477,9 +477,11 @@ sub generateMenuTree
    sub sortTree
    {
       my $mlist=shift;
+      $mlist=[sort({ lc($a->{label}.$a->{name}.$a->{account}) cmp 
+                     lc($b->{label}.$a->{name}.$a->{account});
+                   } @$mlist)];
       foreach my $mrec (@$mlist){
          if (ref($mrec->{tree}) eq "ARRAY" && $#{$mrec->{tree}}!=-1){
-            printf STDERR ("fifi sorttree for $mrec->{label}\n");
             $mrec->{tree}=sortTree($mrec->{tree});
          }
       }
@@ -525,6 +527,7 @@ sub generateMenuTree
                      $label.=" ($m->{comments})" if ($m->{comments} ne "");
                      push(@{$targetm->{cmdentrys}},
                           {label=>$label,
+                           hostname=>$m->{name},
                            cmd=>$cmd});
                   }
                }
@@ -545,9 +548,14 @@ sub generateMenuTree
          foreach my $mkey (keys(%$mainmenu)){
             $d.="AddToMenu $mkey ".
                 "\"$mainmenu->{$mkey}->{label}\" Title\n";
+            my $lasthost;
             foreach my $entry (@{$mainmenu->{$mkey}->{mentrys}},
                                @{$mainmenu->{$mkey}->{cmdentrys}}){
+               if (defined($lasthost) && $lasthost ne $entry->{hostname}){
+                  $d.="+ \"\" Nop\n";
+               }
                $d.="+ \"$entry->{label}\" $entry->{cmd}\n";
+               $lasthost=$entry->{hostname};
             }
             $d.="\n\n\n";
             $d.="AddToFunc ResetW5BaseFvwmLoginMenu  ".
