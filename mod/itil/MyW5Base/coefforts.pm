@@ -47,6 +47,9 @@ sub Init
                 group         =>'efforts',
                 unit          =>'min',
                 depend        =>['name'],
+                onSummaryValue=>sub {
+                   return(112233);
+                },
                 onRawValue    =>sub {
                    my $fieldself=shift;
                    my $current=shift;
