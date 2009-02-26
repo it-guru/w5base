@@ -566,7 +566,7 @@ sub generateMenuTree
                   $d.="+ \"\" Nop\n";
                }
                my $l=$entry->{label};
-               $l=~s/"//g;
+               $l=~s/["%]//g;
                $d.="+ \"$l";
                $d.=' %'.$entry->{icon}.'% ' if ($entry->{icon} ne "");
                $d.="\" $entry->{cmd}\n";
