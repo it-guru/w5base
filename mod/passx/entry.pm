@@ -474,6 +474,18 @@ sub generateMenuTree
       } until(!defined($rec));
       $simplem.="</table>";
    }
+   sub sortTree
+   {
+      my $mlist=shift;
+      foreach my $mrec (@$mlist){
+         if (ref($mrec->{tree}) eq "ARRAY" && $#{$mrec->{tree}}!=-1){
+            printf STDERR ("fifi sorttree for $mrec->{label}\n");
+            $mrec->{tree}=sortTree($mrec->{tree});
+         }
+      }
+      return($mlist);
+   }
+   @ml=@{sortTree(\@ml)};
    if ($#ml!=-1){
       if ($mode eq "web" || $mode eq "connector"){
          $d.=kernel::MenuTree::BuildHtmlTree(tree=>\@ml, 

@@ -161,7 +161,7 @@ sub tcomcodcause
    appl.add.rectest
    appl.add.uninst
    appl.base.base
-   db.addeff.base
+   db.addeff.baseext
    db.addfix.swinst
    db.addfix.firstcfg
    db.addfix.fcfgcompl

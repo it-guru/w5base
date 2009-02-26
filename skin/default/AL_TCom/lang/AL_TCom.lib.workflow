@@ -108,7 +108,7 @@
                          en=>'AppOps/add.svcs/deinst. parts of appl.'},
 'appl.base.base'=>      {de=>'AppBetr/BL/Basisleistung',
                          en=>'AppOps/base/base service'},
-'db.baseeff.base'=>     {de=>'DB-Betr/SL/Basisleistung außerh. SSK',
+'db.addeff.baseext'=>   {de=>'DB-Betr/SL/Basisleistung außerh. SSK',
                          en=>'DB-Ops/add.svcs/basic svcs out of SSK'},
 'db.addfix.swinst'=>    {de=>'DB-Betr/SL/Installation der Software',
                          en=>'DB-Ops/add svcs/deployment (fix-price)'},
