@@ -478,7 +478,7 @@ sub generateMenuTree
    {
       my $mlist=shift;
       $mlist=[sort({ lc($a->{label}.$a->{name}.$a->{account}) cmp 
-                     lc($b->{label}.$a->{name}.$a->{account});
+                     lc($b->{label}.$b->{name}.$b->{account});
                    } @$mlist)];
       foreach my $mrec (@$mlist){
          if (ref($mrec->{tree}) eq "ARRAY" && $#{$mrec->{tree}}!=-1){
@@ -512,22 +512,26 @@ sub generateMenuTree
                      my $fvwmcmd="FvwmConnectCommand";
                      my $label=$m->{label};
                      my $cmd;
+                     my $icon;
                      if ($m->{entrytype}==1){
                         $fvwmcmd="FvwmSSHLogin";
                         $label.=" SSH";
                         $cmd="Exec \$[HOME]/bin/$fvwmcmd \"".$m->{label}.
                                 "\" \"$m->{label}\"";
+                        $icon="mini.W5BasePassX.ssh.xpm";
                      }
                      elsif ($m->{entrytype}==5){
                         $fvwmcmd="FvwmRDesktopLogin";
                         $label.=" RDesk";
                         $cmd="Exec \$[HOME]/bin/$fvwmcmd \"".$m->{name}.
                                 "\" \"$m->{label}\"";
+                        $icon="mini.W5BasePassX.rdesk.xpm";
                      }
                      $label.=" ($m->{comments})" if ($m->{comments} ne "");
                      push(@{$targetm->{cmdentrys}},
                           {label=>$label,
                            hostname=>$m->{name},
+                           icon=>$icon,
                            cmd=>$cmd});
                   }
                }
@@ -554,7 +558,9 @@ sub generateMenuTree
                if (defined($lasthost) && $lasthost ne $entry->{hostname}){
                   $d.="+ \"\" Nop\n";
                }
-               $d.="+ \"$entry->{label}\" $entry->{cmd}\n";
+               $d.="+ \"$entry->{label}";
+               $d.='%'.$entry->{icon}.'%' if ($entry->{icon} ne "");
+               $d.="\" $entry->{cmd}\n";
                $lasthost=$entry->{hostname};
             }
             $d.="\n\n\n";
