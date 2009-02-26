@@ -565,7 +565,9 @@ sub generateMenuTree
                if (defined($lasthost) && $lasthost ne $entry->{hostname}){
                   $d.="+ \"\" Nop\n";
                }
-               $d.="+ \"$entry->{label}";
+               my $l=$entry->{label};
+               $l=~s/"//g;
+               $d.="+ \"$l";
                $d.=' %'.$entry->{icon}.'% ' if ($entry->{icon} ne "");
                $d.="\" $entry->{cmd}\n";
                $lasthost=$entry->{hostname};
