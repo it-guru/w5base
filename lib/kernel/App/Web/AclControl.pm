@@ -56,7 +56,10 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'aclparentobj',
-                readonly      =>'1',
+                readonly      =>sub{
+                    my $self=shift;
+                    return(1);
+                },
                 label         =>'AclParentObj',
                 dataobjattr   =>$acltable.'.aclparentobj'),
 

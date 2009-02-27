@@ -662,7 +662,7 @@ sub SecureValidate
           }
           my $writeok=0;
           foreach my $group (@fieldgrouplist){
-             if (grep(/^$group$/,@$wrgroups)){
+             if (grep(/^[$group|ALL]$/,@$wrgroups)){
                 $writeok=1;last;
              }
           }
