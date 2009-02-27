@@ -161,6 +161,7 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
+
    if ((!defined($oldrec) && !defined($newrec->{refid})) ||
        (defined($newrec->{refid}) && $newrec->{refid}==0)){
       $self->LastMsg(ERROR,"no '%s' specified",
@@ -177,10 +178,18 @@ sub Validate
       $newrec->{aclparentobj}=$self->getParent->SelfAsParentObject();
    }
    my $parentobj=effVal($oldrec,$newrec,"aclparentobj");
+   if ($parentobj eq ""){
+      $newrec->{aclparentobj}=$self->getParent;
+   }
+   my $parentobj=effVal($oldrec,$newrec,"aclparentobj");
+   my $refid=effVal($oldrec,$newrec,"refid");
 
-   if (defined($newrec->{refid})){
-      if ($self->getParent){
-         my $pobj=getModuleObject($self->Config,$self->getParent->Self());
+   if ($refid ne ""){
+      my $pobj;
+      if ($parentobj ne ""){
+         $pobj=getModuleObject($self->Config,$parentobj);
+      }
+      if (defined($pobj)){
          $pobj->SetFilter({$pobj->IdField->Name()=>\$newrec->{refid}});
          my @l=$pobj->getHashList(qw(ALL));
          if ($#l!=0){
@@ -190,11 +199,22 @@ sub Validate
          }
          my $prec=$l[0];
          my @grps=$pobj->isWriteValid($prec);
-         if (!grep(/^[acls|ALL]$/,@grps)){
+         if (!grep(/^acls$/,@grps) &&
+             !grep(/^acl$/,@grps) &&
+             !grep(/^ALL$/,@grps)){
+            msg(INFO,"access only for '%s'\n",join(",",@grps));
             $self->LastMsg(ERROR,"insufficient access to parent object");
             return(undef);
          }
       }
+      else{
+         $self->LastMsg(ERROR,"no parentobj specified");
+         return(undef);
+      }
+   }
+   else{
+      $self->LastMsg(ERROR,"no refid specified");
+      return(undef);
    }
    return(1);
 }

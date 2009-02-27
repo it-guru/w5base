@@ -1,4 +1,4 @@
-'passx::entry'=>{de=>'Passwort Verteilung',en=>'Password distribution'},
+'passx::entry'=>{de=>'Zugangskennungen/Passwort Verteilung',en=>'Access accounts/Password distribution'},
 'fieldgroup.default'=>{de=>'Verteilung',en=>'distribution'},
 'Accesscontrol'=>{de=>'Zugriffssteuerung'},
 'actype.1'=>{de=>'Betriebssystem',en=>'Operationsystem'},
