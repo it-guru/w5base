@@ -625,7 +625,7 @@ function ValidateSubmit(f)
       return(true);
    }
    window.setTimeout("disableButtons();",10);
-   if (doValidateSubmit){
+   if (window.doValidateSubmit && typeof(window.doValidateSubmit)=='function'){
       return(doValidateSubmit(f,document.btnWhich));
    }
    return(defaultValidateSubmit(f,document.btnWhich));
