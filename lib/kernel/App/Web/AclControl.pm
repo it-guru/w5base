@@ -56,10 +56,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'aclparentobj',
-                readonly      =>sub{
-                    my $self=shift;
-                    return(1);
-                },
+                frontreadonly =>1,
                 label         =>'AclParentObj',
                 dataobjattr   =>$acltable.'.aclparentobj'),
 
@@ -176,20 +173,28 @@ sub Validate
                            $self->getField("acltargetname")->Label());
       return(undef);
    }
+   if (defined($self->getParent)){
+      $newrec->{aclparentobj}=$self->getParent->SelfAsParentObject();
+   }
+   my $parentobj=effVal($oldrec,$newrec,"aclparentobj");
+
    if (defined($newrec->{refid})){
       if ($self->getParent){
-         my $faq=getModuleObject($self->Config,$self->getParent->Self());
-         $faq->SetFilter({$faq->IdField->Name()=>\$newrec->{refid}});
-         my @l=$faq->getHashList($faq->IdField->Name());
+         my $pobj=getModuleObject($self->Config,$self->getParent->Self());
+         $pobj->SetFilter({$pobj->IdField->Name()=>\$newrec->{refid}});
+         my @l=$pobj->getHashList(qw(ALL));
          if ($#l!=0){
             $self->LastMsg(ERROR,"invalid '%s' specified",
                               $self->getField("refid")->Label());
             return(undef);
          }
+         my $prec=$l[0];
+         my @grps=$pobj->isWriteValid($prec);
+         if (!grep(/^[acls|ALL]$/,@grps)){
+            $self->LastMsg(ERROR,"insufficient access to parent object");
+            return(undef);
+         }
       }
-   }
-   if (defined($self->getParent)){
-      $newrec->{aclparentobj}=$self->getParent->SelfAsParentObject();
    }
    return(1);
 }
@@ -206,6 +211,7 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
+   return("ALL") if (!defined($rec));
    return("ALL") if (defined($self->getParent));
    return("ALL") if ($self->IsMemberOf("admin"));
    return(undef);

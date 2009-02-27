@@ -325,7 +325,8 @@ sub generateMenuTree
    else{
       $self->FrontendSetFilter($userid);
    }
-   $self->SetCurrentView(qw(quickpath name entrytype account id comments));
+   $self->SetCurrentView(qw(quickpath name 
+                            entrytype account id comments));
    my ($rec,$msg)=$self->getFirst();
    my $simplem;
    my @ml;
