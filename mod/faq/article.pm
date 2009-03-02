@@ -445,8 +445,11 @@ sub getHtmlDetailPages
    my $self=shift;
    my ($p,$rec)=@_;
 
-   return($self->SUPER::getHtmlDetailPages($p,$rec),
-          "FView"=>$self->T("Full-View"));
+   if (defined($rec)){
+      return($self->SUPER::getHtmlDetailPages($p,$rec),
+             "FView"=>$self->T("Full-View"));
+   }
+   return($self->SUPER::getHtmlDetailPages($p,$rec));
 }
 
 sub getHtmlDetailPageContent

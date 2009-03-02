@@ -223,11 +223,14 @@ EOF
       }
       my $ByIdLinkStart="";
       my $ByIdLinkEnd="";
-      if (grep(/^ById$/,$self->getParent->getParent->getValidWebFunctions())){
-         $ByIdLinkStart="<a target=_blank title=\"".
-         $self->getParent->getParent->T("use this link to reference this ".
-         "record (f.e. in mail)")."\" href=\"ById/$id\">";
-         $ByIdLinkEnd="</a>";
+      if ($id ne ""){
+         if (grep(/^ById$/,
+                  $self->getParent->getParent->getValidWebFunctions())){
+            $ByIdLinkStart="<a target=_blank title=\"".
+            $self->getParent->getParent->T("use this link to reference this ".
+            "record (f.e. in mail)")."\" href=\"ById/$id\">";
+            $ByIdLinkEnd="</a>";
+         }
       }
       my $sfocus;
       if ($currentfieldgroup ne ""){
