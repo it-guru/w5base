@@ -113,9 +113,18 @@ sub globalHelp
                            action=>'Result',
                            js=>['toolbox.js','cookie.js'],
                            body=>1,form=>1);
+   my $kwords=Query->Param("searchtext");
+   my $autosearch=Query->Param("AutoSearch");
+   $kwords=~s/"//g;
+   my $result="Result";
+   $result="Empty" if ($kwords ne "");
+   $autosearch="0" if ($autosearch ne "1");
    print $self->getParsedTemplate("tmpl/globalHelp",{
                translation=>'faq::QuickFind',
                static=>{
+                 result=>$result,
+                 AutoSearch=>$autosearch,
+                 searchtext=>$kwords,
                  remote_user=>$ENV{REMOTE_USER},
                  newwf=>$self->T("start a new workflow","base::MyW5Base"),
                  myjobs=>$self->T("my current jobs","base::MyW5Base")
@@ -445,7 +454,7 @@ EOF
 sub getValidWebFunctions
 {
    my ($self)=@_;
-   return(qw(Main globalHelp Welcome Result QuickFindDetail mobileWAP));
+   return(qw(Main globalHelp Welcome Result QuickFindDetail mobileWAP Empty));
 }
 
 sub QuickFindDetail
