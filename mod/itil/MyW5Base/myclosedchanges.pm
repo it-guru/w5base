@@ -129,6 +129,20 @@ sub Result
 
       push(@q,\%q1,\%q2,\%q3,\%q4,\%q5,\%q6);
    }
+   if ($dc eq "CUSTOMER"){
+      my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
+                                            ["REmployee","RChief",
+                                             "RQManager"],
+                                            "both");
+      my @grpids=keys(%grp);
+      @grpids=(qw(-1)) if ($#grpids==-1);
+
+      my %q1=();
+      $q1{cistatusid}='<=4';
+      $q1{customerid}=\@grpids;
+
+      push(@q,\%q1);
+   }
    if ($dc ne "DEPONLY" && $dc ne "TEAM" && $dc ne "CUSTOMER"){
       my %q1;
       my %q2;

@@ -120,7 +120,8 @@ sub Result
    }
    if ($dc eq "CUSTOMER"){
       my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
-                                            ["REmployee","RChief"],
+                                            ["REmployee","RChief",
+                                             "RQManager"],
                                             "both");
       my @grpids=keys(%grp);
       @grpids=(qw(-1)) if ($#grpids==-1);
