@@ -144,7 +144,8 @@ sub SecureSetFilter
    my @flt=@_;
 
    my $userid=$self->getCurrentUserId();
-   my %grp=$self->getGroupsOf($ENV{REMOTE_USER},"RMember","both");
+   my %grp=$self->getGroupsOf($ENV{REMOTE_USER},
+                              [qw(RMember RBoss RBoss2 RQManager)],"both");
    my @grpids=keys(%grp);
    @grpids=(qw(NONE)) if ($#grpids==-1);
    $self->SetNamedFilter("Customer",{customerid=>\@grpids});

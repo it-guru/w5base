@@ -81,7 +81,7 @@ sub Result
       $q2{tsm2id}=\$userid;
 
       my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
-                                            ["RChief2"],
+                                            ["RBoss2"],
                                             "down");
       my @grpids=keys(%grp);
       @grpids=(qw(-1)) if ($#grpids==-1);
@@ -103,7 +103,7 @@ sub Result
    }
    if ($dc eq "TEAM"){
       my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
-                                            ["REmployee","RChief"],
+                                            ["REmployee","RBoss"],
                                             "down");
       my @grpids=keys(%grp);
       @grpids=(qw(-1)) if ($#grpids==-1);
@@ -120,7 +120,7 @@ sub Result
    }
    if ($dc eq "CUSTOMER"){
       my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
-                                            ["REmployee","RChief",
+                                            ["REmployee","RBoss",
                                              "RQManager"],
                                             "both");
       my @grpids=keys(%grp);
