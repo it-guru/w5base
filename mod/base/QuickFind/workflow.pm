@@ -44,6 +44,9 @@ sub CISearchResult
       if ($searchtext=~m/^\d{10,20}$/){
          push(@$flt,{id=>\"$searchtext"});
       }
+      if ($searchtext=~m/^[A-Z]{3}\d{5,20}$/){
+         push(@$flt,{srcid=>\"$searchtext"});
+      }
       my $dataobj=getModuleObject($self->getParent->Config,"base::workflow");
       $dataobj->SetFilter($flt);
       foreach my $rec ($dataobj->getHashList(qw(name))){
