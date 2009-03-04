@@ -78,6 +78,9 @@ sub addDirectLink
    my $detailx=$dataobj->DetailX();
    my $detaily=$dataobj->DetailY();
    my $target="../../".$dataobj->Self()."/Detail";
+   if ($dataobj->Self() eq "base::workflow"){
+      $target="../../".$dataobj->Self()."/Process";
+   }
    $target=~s/::/\//g;
    my $qstr=kernel::cgi::Hash2QueryString(%param);
 
