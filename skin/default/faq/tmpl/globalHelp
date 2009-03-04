@@ -73,13 +73,18 @@ function InitCheckboxes()
 {
    for(c=0;c<checklist.length;c++){
       var v=checklist[c];
-      var s=rdCookie("QuickFind_"+v);
-      if (s!=null){
-         if (s=="1"){
-            document.forms[0].elements[v].checked=true;
-         }
-         else{
-            document.forms[0].elements[v].checked=false;
+      if (%AutoSearch%==1){
+         document.forms[0].elements[v].checked=true;
+      }
+      else{
+         var s=rdCookie("QuickFind_"+v);
+         if (s!=null){
+            if (s=="1"){
+               document.forms[0].elements[v].checked=true;
+            }
+            else{
+               document.forms[0].elements[v].checked=false;
+            }
          }
       }
    }
@@ -89,13 +94,15 @@ function InitCheckboxes()
 }
 function onSubmit()
 {
-   for(c=0;c<checklist.length;c++){
-      var v=checklist[c];
-      if (document.forms[0].elements[v].checked==true){
-         wrCookie("QuickFind_"+v,"1","/",2400);
-      }
-      else{
-         wrCookie("QuickFind_"+v,"0","/",2400);
+   if (%AutoSearch%!=1){
+      for(c=0;c<checklist.length;c++){
+         var v=checklist[c];
+         if (document.forms[0].elements[v].checked==true){
+            wrCookie("QuickFind_"+v,"1","/",2400);
+         }
+         else{
+            wrCookie("QuickFind_"+v,"0","/",2400);
+         }
       }
    }
 }
