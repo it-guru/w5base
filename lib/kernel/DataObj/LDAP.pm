@@ -226,6 +226,7 @@ sub getFinalLdapFilter
          
          my $fname=$fieldobject->Name();
          foreach my $q (@list){
+            $q=$q;
             $$where.="($sqlfield=$q)";
          }
       }
@@ -240,7 +241,7 @@ sub getFinalLdapFilter
       foreach my $filter (@subflt){
          my $subwhere="";
          foreach my $field (keys(%{$filter})){
-            msg(INFO,"getFinalLdapFilter: process field '$field'");
+            #msg(INFO,"getFinalLdapFilter: process field '$field'");
             my $fo=$self->getField($field);
             if (!defined($fo)){
                msg(ERROR,"getFinalLdapFilter: can't process unknown ".
@@ -249,8 +250,8 @@ sub getFinalLdapFilter
             }
             if (defined($fo->{dataobjattr})){
                my $dataobjattr=$fo->{dataobjattr};
-               msg(INFO,"getFinalLdapFilter: process field '$field' ".
-                        "dataobjattr=$dataobjattr");
+               #msg(INFO,"getFinalLdapFilter: process field '$field' ".
+               #         "dataobjattr=$dataobjattr");
                if (ref($filter->{$field}) eq "ARRAY"){
                   AddOrList(\$subwhere,$fo,$dataobjattr,{wildcards=>0},
                             @{$filter->{$field}});
@@ -419,8 +420,7 @@ sub getFirst
       }
    }
    my $ldapfilter=$self->getLdapFilter();
-   msg(INFO,"filter=$ldapfilter");
-   my ($sth,$mesg)=$self->{LDAP}->execute(filter=>$ldapfilter,
+   my ($sth,$mesg)=$self->{LDAP}->execute(filter=>latin1($ldapfilter)->utf8,
                                           base=>$self->getBase,
                                           attrs=>\@attr);
    my $t=tv_interval($t0,[gettimeofday()]);
