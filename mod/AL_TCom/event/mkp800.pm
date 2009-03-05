@@ -615,6 +615,11 @@ sub xlsExport
                           $xlsexp->{xls}->{format}->{header});
                $ws->set_column(11,11,18);
 
+               $ws->write($xlsexp->{xls}->{line},12,
+                          "Bemerkungen",
+                          $xlsexp->{xls}->{format}->{header});
+               $ws->set_column(12,12,30);
+
                $xlsexp->{xls}->{line}++;
             }
          }
@@ -689,6 +694,12 @@ sub xlsExport
       $extid=join("",@$extid) if (ref($extid) eq "ARRAY");
       $ws->write_string($xlsexp->{xls}->{line},$col++,
            $extid,
+           $xlsexp->{xls}->{format}->{default});
+
+      my $comments=$rec->{tcomcodcomments};
+      $comments=join("\n",@$comments) if (ref($comments) eq "ARRAY");
+      $ws->write_string($xlsexp->{xls}->{line},$col++,
+           $comments,
            $xlsexp->{xls}->{format}->{default});
 
       $xlsexp->{xls}->{line}++;
