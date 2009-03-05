@@ -434,12 +434,6 @@ sub HandleInfoAboSubscribe
 }
 
 
-sub getDefaultHtmlDetailPage
-{
-   my $self=shift;
-   return("StandardDetail");
-}
-
 sub getHtmlDetailPages
 {
    my $self=shift;
@@ -498,6 +492,7 @@ sub FullView
    $self->SecureSetFilter(\%flt);
    my ($rec,$msg)=$self->getOnlyFirst(qw(name data attachments viewcount faqid
                                          furtherkeys kwords viewfreq viewlast
+                                         owner
                                          mdate editor realeditor));
 
    if (defined($rec)){
@@ -572,8 +567,6 @@ sub FullView
             @fl=values(%kl);
          }
       }
-
-      printf STDERR ("fifi kworks=%s\n",Dumper($rec->{kwords}));
    }
    foreach my $frec (@fl){
       next if ($frec->{faqid}==$rec->{faqid});
@@ -609,6 +602,19 @@ sub FullView
          "record (f.e. in mail)")."\"><div id=WindowTitle>".
          $rec->{name}."</div></a></div>");
    print("<div class=fullview>".$rec->{data}."</div>");
+
+   print("<div class=authorline>");
+
+   my $fldobj=$self->getField("owner",$rec);
+   my $d=$fldobj->FormatedResult($rec,"HtmlDetail");
+   print(" by ".$d) if ($d ne "");
+
+   my $fldobj=$self->getField("mdate",$rec);
+   my $d=$fldobj->FormatedResult($rec,"HtmlV01");
+   print(" at ".$d) if ($d ne "");
+   print(" powered by W5Base technology");
+
+   print("</div>");
    if (defined($rec->{attachments}) && ref($rec->{attachments}) eq "ARRAY" &&
        $#{$rec->{attachments}}!=-1){
       my $att;
@@ -682,7 +688,7 @@ sub getDefaultHtmlDetailPage
    my $cookievar=shift;
 
    my $d=Query->Cookie($cookievar);
-   $d="StandardDetail" if ($d eq "");
+   $d="StandardDetail" if ($d eq "" || $self->extractFunctionPath() eq "New");
    return($d);
 }
 
