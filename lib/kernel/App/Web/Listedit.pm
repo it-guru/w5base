@@ -100,7 +100,7 @@ sub getValidWebFunctions
    if (!$self->{IsFrontendInitialized}){
       $self->{IsFrontendInitialized}=$self->FrontendInitialize();
    }
-   my @l=qw(NativMain Main MainWithNew addAttach
+   my @l=qw(NativMain Main MainWithNew addAttach 
             NativResult Result Upload UploadWelcome UploadFrame
             Welcome Empty Detail HtmlDetail HandleInfoAboSubscribe
             New Copy FormatSelect Bookmark startWorkflow
@@ -1232,6 +1232,7 @@ function DetailClose(){
       }
    }
 }
+
 function DetailDelete(id)
 {
    showPopWin('DeleteRec?CurrentIdToEdit=$id',500,180,FinishDelete);
@@ -1268,6 +1269,15 @@ function FinishHandleInfoAboSubscribe(returnVal,isbreak)
       document.location.href=document.location.href;
    }
 }
+
+function checkEditmode(e) // this handling prevents klick on X in window
+{
+   if (this.SubFrameEditMode==1){
+      e.returnValue=DataLoseQuestion();
+   }
+}
+addEvent(window, "beforeunload",   checkEditmode);
+
 
 EOF
    return($d);
@@ -1319,8 +1329,8 @@ sub isQualityCheckValid
    $qc->SetFilter({target=>$compatible});
    my @reclist=$qc->getHashList(qw(id));
    my @idl=map({$_->{id}} @reclist);
-   my $qc=$self->getPersistentModuleObject("base::lnkqrulemandator");
    if ($#idl!=-1){
+      my $qc=$self->getPersistentModuleObject("base::lnkqrulemandator");
       $qc->SetFilter({mandatorid=>$mandator,qruleid=>\@idl});
       my @reclist=$qc->getHashList(qw(id));
       return(1) if ($#reclist!=-1);
