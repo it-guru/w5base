@@ -77,8 +77,6 @@ sub isRecordHandler
    return(0);
 }
 
-
-
 sub ProcessHead
 {
    my ($self,$fh)=@_;
@@ -251,6 +249,7 @@ function DoUp()
       }
    }
 }
+
 function DoDown()
 {
    var view=document.forms[0].elements['ViewFieldList'];
@@ -327,7 +326,15 @@ EOF
    $d.="</td></tr>";
    $d.="<tr><td colspan=3><table width=100% border=1 height=100%>";
    $d.="<tr height=1%>";
-   $d.="<td width=50%>".$app->T("MSG004",$self->Self())."</td>";
+   $d.="<td width=50%><table width= 100% ><tr><td width=30% align=left>".
+       $app->T("MSG004",$self->Self())."</td><td width=70% align=right>".
+       "Filter: <input size=8 OnKeyUp=\"ShSearch();\" ".
+       "id=shortsearch value=''/><input type=button value=\"".
+       $app->T("Expand All",$self->Self()).
+       "\" name=exall OnClick=\"expandTree('tree_route');\" />".
+       "<input type=button value=\"".
+       $app->T("Collapse All",$self->Self())."\" name=coall ".
+       "onClick=\"collapseTree('tree_route');\"/></td></tr></table>";
    $d.="<td width=1%></td>";
    $d.="<td width=50%>".$app->T("MSG005",$self->Self())."</td>";
    $d.="</tr>";
@@ -354,7 +361,7 @@ EOF
    $d.="</td></tr>";
    my $lastmsg=$app->findtemplvar({},"LASTMSG");
    $d.="<tr height=1%><td colspan=3 nowrap align=left>".
-       "$lastmsg</td><tr>";
+       "$lastmsg </td><tr>";
    $d.="</table>";
    $d.="</td></tr>";
    $d.="</table>";
@@ -396,9 +403,6 @@ sub getViewFieldSelect
    }
    $d.="</select>";
    return($d);
-
-
-
 }
 
 sub getFullFieldTreeSelect
@@ -450,7 +454,7 @@ sub getFullFieldTreeSelect
          $trgrp=$app->T($app->Self(),$app->Self());
       }
       $d.="<li class=liClosed id=tree_$c ".
-          "onMouseDown=\"return(false)\" onSelectStart=\"return(false)\" ".
+          "onMouseDown=\"return(false)\" xhead=1 onSelectStart=\"return(false)\" ".
           ">$trgrp";
       $c++;
       foreach my $fobj (@checkedobjs){
