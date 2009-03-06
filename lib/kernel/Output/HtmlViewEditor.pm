@@ -57,7 +57,6 @@ sub getHttpHeader
        "src=\"../../../public/base/load/MkTree.js\"></script>\n";
    $d.="<script language=JavaScript ".
        "src=\"../../../public/base/load/toolbox.js\"></script>\n";
-
    $d.="<body onload=\"ResizeObj()\" onresize=\"ResizeObj()\">";
    return($d);
 }
@@ -95,6 +94,12 @@ sub ProcessHead
    $d.="</style>\n\n";
    $d.="<script language=JavaScript ".
          "src=\"../../../public/base/load/toolbox.js\"></script>\n";
+#   $d.="<script language=JavaScript ".
+#         "src=\"../../../public/base/load/firebug-lite.js\"></script>\n";
+#   $d.="<script language=JavaScript ".
+#         "src=\"../../../public/base/load/firebugx.js\"></script>\n";
+#   $d.="<script language=JavaScript ".
+#         "src=\"../../../public/base/load/firebug.js\"></script>\n";
    $d.="<script language=JavaScript ".
          "src=\"../../../public/base/load/OutputHtml.js\"></script>\n";
    $d.="<table id=viewline class=maintable>\n";
@@ -326,9 +331,9 @@ EOF
    $d.="</td></tr>";
    $d.="<tr><td colspan=3><table width=100% border=1 height=100%>";
    $d.="<tr height=1%>";
-   $d.="<td width=50%><table width= 100% ><tr><td width=30% align=left>".
-       $app->T("MSG004",$self->Self())."</td><td width=70% align=right>".
-       "Filter: <input size=8 OnKeyUp=\"ShSearch();\" ".
+   $d.="<td width=50%><table width= 100% ><tr><td align=left>".
+       $app->T("MSG004",$self->Self())."</td><td align=right>".
+       "Filter: <input size=8 onKeyup=\"ShSearch();\" ".
        "id=shortsearch value=''/><input type=button value=\"".
        $app->T("Expand All",$self->Self()).
        "\" name=exall OnClick=\"expandTree('tree_route');\" />".
