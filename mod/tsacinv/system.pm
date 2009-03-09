@@ -170,7 +170,7 @@ sub new
                 label         =>'System CPU count',
                 unit          =>'CPU',
                 precision     =>0,
-                dataobjattr   =>'amcomputer.lcpunumber'),
+                dataobjattr   =>'amcomputer.itotalnumberofcores'),
 
       new kernel::Field::Float(
                 name          =>'systemcpuspeed',

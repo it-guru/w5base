@@ -5,4 +5,5 @@ Daten verknüpft.
 ',en=>'
 This Informations are linked from W5Base/Darwin to the AssetCenter data.
 '},
-
+'systemcpucount'=>{de=>'
+Die CPU Anzahl gibt die Anzahl der logischen CPUs wieder, die das Betriebssystem "sieht". Dies kann z.B. unter Unix mit dem top Komando abgefragt werden. In der AssetCenter Oberfläche wird dies als "total number of cores" bezeichnet.'},
