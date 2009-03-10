@@ -516,6 +516,21 @@ sub getSqlFrom
    return($from);
 }
 
+sub ValidateDelete
+{
+   my $self=shift;
+   my $rec=shift;
+
+   if ($#{$rec->{systems}}!=-1){
+      $self->LastMsg(ERROR,
+          "delete only posible, if there are no system relations");
+      return(0);
+   }
+
+   return(1);
+}
+
+
 
 sub Validate
 {
