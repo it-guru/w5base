@@ -334,7 +334,7 @@ EOF
    $d.="<td width=50%><table width=100%  border=0><tr><td align=left valign=middle>".
        $app->T("MSG004",$self->Self())."</td><td valign=middle align=right>".
        "<input title=\"".$app->T("filter fields",$self->Self()).
-       "\" size=10 onKeyup=\"ShSearch();\" ".
+       "\" size=8 onKeyup=\"ShSearch();\" class=\"inputbox\"".
        "id=shortsearch value=''/>&nbsp;&nbsp;&nbsp;&nbsp;".
        "<img src=\"../../base/load/expandall.gif\" style=\"cursor:pointer\"".
        "title=\"".$app->T("Expand All",$self->Self())."\" name=exall ".

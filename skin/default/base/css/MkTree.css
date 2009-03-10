@@ -81,3 +81,8 @@
    background:none
    width:30px;
 }
+.inputbox {
+   font-size: 10px;
+   background-color: #ccc;
+   font-family: sans-serif;
+}
