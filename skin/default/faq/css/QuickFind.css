@@ -3,6 +3,11 @@ div.QuickFindDetail{
    border-color:silver;
    border-width:1px;
 }
+div.specialClass{
+   width:100%;
+   white-space:normal;
+   overflow:hidden;
+}
 
 a:link, a:visited, a:active  {
             font-family:Arial,Adobe Helvetica,Helvetica;
