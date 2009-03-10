@@ -31,5 +31,6 @@ EOF
 'Field of current View order down'=>{de=>'Feld der aktuellen Ansicht niedriger ordnen'},
 'direct edit view'=>{de=>'direktes bearbeiten der View-Daten'},
 "are you sure, that you want to delete '\%s'"=>{de=>"Sind Sie sicher, dass Sie die Ansicht '\%s' löschen möchten?"},
+'filter fields'=>{de=>'Felder filtern'},
 'Expand All'=>{de=>'alle aufklappen'},
 'Collapse All'=>{de=>'alle zuklappen'},

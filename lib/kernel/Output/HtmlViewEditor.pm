@@ -331,15 +331,18 @@ EOF
    $d.="</td></tr>";
    $d.="<tr><td colspan=3><table width=100% border=1 height=100%>";
    $d.="<tr height=1%>";
-   $d.="<td width=50%><table width= 100% ><tr><td align=left>".
-       $app->T("MSG004",$self->Self())."</td><td align=right>".
-       "Filter: <input size=8 onKeyup=\"ShSearch();\" ".
-       "id=shortsearch value=''/><input type=button value=\"".
-       $app->T("Expand All",$self->Self()).
-       "\" name=exall OnClick=\"expandTree('tree_route');\" />".
-       "<input type=button value=\"".
-       $app->T("Collapse All",$self->Self())."\" name=coall ".
-       "onClick=\"collapseTree('tree_route');\"/></td></tr></table>";
+   $d.="<td width=50%><table width=100%  border=0><tr><td align=left valign=middle>".
+       $app->T("MSG004",$self->Self())."</td><td valign=middle align=right>".
+       "<input title=\"".$app->T("filter fields",$self->Self()).
+       "\" size=10 onKeyup=\"ShSearch();\" ".
+       "id=shortsearch value=''/>&nbsp;&nbsp;&nbsp;&nbsp;".
+       "<img src=\"../../base/load/expandall.gif\" style=\"cursor:pointer\"".
+       "title=\"".$app->T("Expand All",$self->Self())."\" name=exall ".
+       "OnClick=\"expandTree('tree_route');\">&nbsp;".
+       "<img src=\"../../base/load/collapseall.gif\" style=\"cursor:pointer\"".
+       "title=\"".$app->T("Collapse All",$self->Self())."\" name=coall ".
+       "OnClick=\"collapseTree('tree_route');\">".
+       "</td></tr></table>";
    $d.="<td width=1%></td>";
    $d.="<td width=50%>".$app->T("MSG005",$self->Self())."</td>";
    $d.="</tr>";
