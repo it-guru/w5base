@@ -101,8 +101,10 @@ sub FormatedDetail
    my $d=$self->RawValue($current);
    my $name=$self->Name();
    $d=[$d] if (ref($d) ne "ARRAY");
+   my $readonly=$self->readonly($current);
+printf STDERR ("fifi $name=readonly=$readonly\n");
    if (($mode eq "workflow" || $mode eq "edit" ) 
-       && !($self->readonly($current))){
+       && !($readonly)){
       my @fromquery=Query->Param("Formated_$name");
       if (defined($self->{vjointo}) && defined($self->{vjoinon})){
          $d=$current->{$self->{vjoinon}->[0]};
@@ -117,6 +119,9 @@ sub FormatedDetail
       }
       my $width="100%";
       $width=$self->{htmleditwidth} if (defined($self->{htmleditwidth}));
+      my $disabled="";
+
+
       my $s="<select name=Formated_$name";
       if ($self->{multisize}>0){
          $s.=" multiple";

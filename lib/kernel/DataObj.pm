@@ -1612,7 +1612,7 @@ sub getFieldObjsByView
 
    if ($view->[0] eq "ALL" && $#{$view}==0){
       @view=@{$self->{'FieldOrder'}} if (defined($self->{'FieldOrder'}));
-      
+      @view=grep(!/^(qctext|qcstate|qcok)$/,@view); # remove qc data
    }
    else{
       @view=@{$view};
@@ -1746,6 +1746,39 @@ sub getField
    return(undef);
 }
 
+sub getFieldParam
+{
+   my $self=shift;
+   my $name=shift;
+   my $param=shift;
+
+   my $fobj=$self->getField($name);
+   if (defined($fobj) && ref($fobj) eq "HASH"){
+      return($fobj->{$param});
+   }
+
+   return(undef);
+}
+
+sub setFieldParam
+{
+   my $self=shift;
+   my $name=shift;
+   my %param=@_;
+
+   my $fobj=$self->getField($name);
+   if (defined($fobj) && ref($fobj)){
+      my $c=0;
+      foreach my $k (keys(%param)){
+         $fobj->{$k}=$param{$k};
+         $c++;
+      }
+      return($c);
+   }
+
+   return(undef);
+}
+
 sub RawValue
 {
    my $self=shift;
@@ -1857,6 +1890,9 @@ sub SetCurrentView
             push(@{$self->Context->{'CurrentView'}},$f);
          }
       }
+      @{$self->Context->{'CurrentView'}}=
+         grep(!/^(qctext|qcstate|qcok)$/,@{$self->Context->{'CurrentView'}}); 
+         # remove qc data
    }
    else{
       $self->Context->{'CurrentView'}=[@_];
