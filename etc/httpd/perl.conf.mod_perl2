@@ -1,0 +1,6 @@
+PerlModule Apache::DBI
+<Perl>
+$W5V2::INSTDIR="/opt/w5base2";
+require '/opt/w5base2/sbin/ApacheStartup.pl';
+</Perl>
+
