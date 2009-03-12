@@ -567,7 +567,7 @@ sub Validate
            $newrec->{databossid}!=$userid &&
            $newrec->{databossid}!=$oldrec->{databossid})){
          $self->LastMsg(ERROR,"you are not authorized to set other persons ".
-                              "as guardian");
+                              "as databoss");
          return(0);
       }
    }

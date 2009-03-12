@@ -927,16 +927,18 @@ sub Validate
             $newrec->{databossid}=$userid;
          }
       }
-      if (defined($newrec->{databossid}) &&
-          $newrec->{databossid}!=$userid &&
-          !($self->IsMemberOf("databossin")) &&
-          $newrec->{databossid}!=$oldrec->{databossid}){
+      if (!$self->IsMemberOf("admin") &&
+          (defined($newrec->{databossid}) &&
+           $newrec->{databossid}!=$userid &&
+           $newrec->{databossid}!=$oldrec->{databossid})){
          $self->LastMsg(ERROR,"you are not authorized to set other persons ".
                               "as databoss");
          return(0);
       }
    }
    ########################################################################
+
+
    return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"name"));
    return(1);
 }
