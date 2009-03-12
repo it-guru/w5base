@@ -8,7 +8,7 @@ div.searchframe{
    padding-bottom:5px;
    margin-bottom:4px;
    background:#dadada;
-   overflow:auto;
+   overflow:hidden;
 }
 iframe.result{
    height:100%;
@@ -24,7 +24,7 @@ div.extsearchframe{
    margin:0px;
    padding-top:5px;
    padding-bottom:5px;
-   margin-bottom:4px;
+   margin-bottom:0px;
    background:#dadada;
    overflow:auto;
    display:block;visibility:visible;
