@@ -45,6 +45,11 @@ sub new
                 label         =>'Name',
                 dataobjattr   =>'servicesupport.name'),
 
+      new kernel::Field::Text(
+                name          =>'fullname',
+                label         =>'long description',
+                dataobjattr   =>'servicesupport.fullname'),
+
       new kernel::Field::Select(
                 name          =>'cistatus',
                 htmleditwidth =>'40%',
@@ -230,8 +235,7 @@ sub new
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default finance oncallservice support service 
+   return(qw(header default finance oncallservice support service 
              callcenter saprelation source));
 }
 

@@ -725,3 +725,4 @@ update appl set eventlang='de';
 alter table appl   add chmgrteam    bigint(20) default NULL;
 alter table system add is_infrastruct bool default '0', add key(is_infrastruct);
 alter table appl   add secstate  varchar(20) default NULL;
+alter table servicesupport add fullname varchar(128) default NULL;

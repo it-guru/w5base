@@ -17,10 +17,11 @@
 'support active'=>{de=>'Support-Zeiten definiert'},
 'callcenter active'=>{de=>'CallCenter-Zeiten definiert'},
 'SAP relation posible'=>{de=>'SAP Zuordnung möglich'},
-'Flat hours per month'=>{de=>'Pauschaler monatlicher Stundenansatz'},
+'Flat hours per month'=>{de=>'Pauschaler monatlicher Stundenansatz (extern)'},
 'WELCOME'=>{de=>'
 Eine Service & Support Klasse ist die Definition einer
 Leistung oder eines Services.',en=>'
 '},
 'SAP Company Code'=>{de=>'SAP Buchungskreis'},
 'SAP Service Name'=>{de=>'SAP Leistungsart'},
+'long description'=>{de=>'lang Bezeichnung'},
