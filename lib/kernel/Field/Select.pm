@@ -102,7 +102,6 @@ sub FormatedDetail
    my $name=$self->Name();
    $d=[$d] if (ref($d) ne "ARRAY");
    my $readonly=$self->readonly($current);
-printf STDERR ("fifi $name=readonly=$readonly\n");
    if (($mode eq "workflow" || $mode eq "edit" ) 
        && !($readonly)){
       my @fromquery=Query->Param("Formated_$name");
