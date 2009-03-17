@@ -62,7 +62,7 @@ sub getControlRecord
 }
 
 
-sub completeWriteRequest
+sub DataIssueCompleteWriteRequest
 {
    my $self=shift;
    my $oldrec=shift;
@@ -190,7 +190,7 @@ sub completeWriteRequest
          }
       }
    }
-   #printf STDERR ("itil:completeWriteRequest=%s\n",Dumper($newrec));
+   #printf STDERR ("itil:DataIssueCompleteWriteRequest=%s\n",Dumper($newrec));
    return(1);
 }
 

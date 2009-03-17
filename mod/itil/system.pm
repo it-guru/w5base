@@ -102,6 +102,16 @@ sub new
                                  'applid']),
 
       new kernel::Field::SubList(
+                name          =>'applicationnames',
+                label         =>'Applicationnames',
+                group         =>'applications',
+                htmldetail    =>0,
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{applcistatusid=>"<=4"}],
+                vjoinon       =>['id'=>'systemid'],
+                vjoindisp     =>['appl']),
+
+      new kernel::Field::SubList(
                 name          =>'software',
                 label         =>'Software',
                 group         =>'software',

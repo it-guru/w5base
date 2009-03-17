@@ -178,5 +178,37 @@ sub Init
    return(0);
 }
 
+sub DataIssueCompleteWriteRequest
+{
+   my $self=shift;
+   my $oldIssueRec=shift;
+   my $newIssueRec=shift;
+   my $rec=shift;
+   my $applid=$rec->{affectedapplicationid};
+   if (!ref($applid) eq "ARRAY"){
+      $applid=[$applid];
+   }
+   if ($#{$applid}!=-1){
+      my $appl=getModuleObject($self->Config,"itil::appl");
+      $appl->SetFilter({id=>$applid});
+      my ($arec,$msg)=$appl->getOnlyFirst(qw(name tsmid tsm2id));
+      if (defined($arec)){
+         $newIssueRec->{fwdtarget}="base::user";
+         $newIssueRec->{fwdtargetid}=$arec->{tsmid};
+         if ($rec->{tsm2id} ne ""){
+            $newIssueRec->{fwddebtarget}="base::user";
+            $newIssueRec->{fwddebtargetid}=$arec->{tsm2id};
+         }
+         $newIssueRec->{mandator}=$rec->{mandator};
+         $newIssueRec->{mandatorid}=$rec->{mandatorid};
+      }
+   }
+   else{
+      return(undef);
+   }
+   return(1);
+}
+
+
 
 1;

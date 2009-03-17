@@ -334,6 +334,7 @@ sub getPosibleButtons
    my $self=shift;
    my $WfRec=shift;
    my %buttons=();
+
    if ($self->getParent->can("isPostReflector") &&
        $self->getParent->isPostReflector($WfRec)){
       $buttons{"PostReflection"}=$self->T('initiate postreflection');
