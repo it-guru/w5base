@@ -86,12 +86,12 @@ sub getStyle
 
 sub ProcessHead
 {
-   my ($self,$fh,$param)=@_;
+   my ($self,$fh,$rec,$msg,$param)=@_;
    my $app=$self->getParent->getParent();
    my $view=$app->getCurrentViewName();
    my @view=$app->getCurrentView();
    my $d="";
-   $d.="<style>";
+   $d.="\n\n<!------ ProcessHead Mode=$param->{ParentMode} ----->\n<style>";
    $d.=$self->getStyle($fh);
    $d.="</style>\n\n";
    #$d.="<script language=\"JavaScript\">";
@@ -99,8 +99,8 @@ sub ProcessHead
    #$d.="</script>\n\n";
    if ($param->{ParentMode} ne "HtmlV01"){
       $d.="<table width=100% style=\"table-layout:fixed\"><tr><td>".
+          "<tr><td class=mainblock>".
           "<div style=\"overflow:hidden\">\n";
-      $d.="<tr><td class=mainblock>";
    }
    $d.="<table class=subdatatable width=100%>\n<tr class=subheadline>";
    my $col=0;
@@ -266,7 +266,8 @@ sub ProcessBottom
    my $app=$self->getParent->getParent();
    my $view=$app->getCurrentViewName();
    my @view=$app->getCurrentView();
-   my $d="</table>";
+   my $d="\n\n<!------ ProcessBottom : Mode=$param->{ParentMode} ----->\n";
+   $d.="</table>";
   # $d.="</td></tr></table>\n";
    my $AutoScroll=<<EOF;
 <script language="JavaScript\">
@@ -322,6 +323,7 @@ EOF
       $d.="</div></td></tr></table>";
    }
    $d.="<a id=\"EndOfActionList\"></a>";
+   $d.="\n<!--------------------------------->\n\n\n";
 
    return($d);
 }
