@@ -249,6 +249,7 @@ sub Process
       $StepObj=$self->getStepObject($self->Config,$step);
    }
 
+
    if (!defined($StepObj)){
       print $app->HttpHeader("text/html");
       print $app->HtmlHeader(style=>['default.css','work.css'],
