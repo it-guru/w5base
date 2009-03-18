@@ -44,6 +44,11 @@ sub getControlRecord
              dataobj   =>'base::grp',
              target    =>'fullname',
              targetid  =>'grpid'
+           },
+           {
+             dataobj   =>'base::workflow',
+             target    =>'name',
+             targetid  =>'id'
            }
          ];
 
@@ -53,7 +58,7 @@ sub getControlRecord
 
 
 
-sub completeWriteRequest
+sub DataIssueCompleteWriteRequest
 {
    my $self=shift;
    my $oldrec=shift;
@@ -68,38 +73,19 @@ sub completeWriteRequest
          $newrec->{directlnkid}=$newrec->{affectedobjectid};
          $newrec->{directlnkmode}="DataIssue";
       }
-     # my $obj=getModuleObject($self->getParent->Config,$affectedobject);
-     # my $affectedobjectid=effVal($oldrec,$newrec,"directlnkid");
-     # $obj->SetFilter(id=>\$affectedobjectid);
-     # my ($confrec,$msg)=$obj->getOnlyFirst(qw(databossid mandatorid mandator));
-     # if (defined($confrec)){
-     #    if ($confrec->{databossid} ne ""){
-     #       $newrec->{fwdtarget}="base::user";
-     #       $newrec->{fwdtargetid}=$confrec->{databossid};
-     #    }
-     #    if ($confrec->{mandatorid} ne ""){
-     #       $newrec->{kh}->{mandatorid}=$confrec->{mandatorid};
-     #       if (!defined($newrec->{fwdtargetid}) ||
-     #            $newrec->{fwdtargetid} eq ""){
-     #          # now search a Config-Manager
-     #          my @confmgr=$self->getParent->getMembersOf(
-     #                         $confrec->{mandatorid},"RCFManager");
-     #          my $cfmgr1=shift(@confmgr);
-     #          my $cfmgr2=shift(@confmgr);
-     #          if ($cfmgr1 ne ""){
-     #             $newrec->{fwdtarget}="base::user";
-     #             $newrec->{fwdtargetid}=$cfmgr1;
-     #          }
-     #          if ($cfmgr2 ne ""){
-     #             $newrec->{fwddebtarget}="base::user";
-     #             $newrec->{fwddebtargetid}=$cfmgr2;
-     #          }
-     #       }
-     #    }
-     #    if ($confrec->{mandator} ne ""){
-     #       $newrec->{kh}->{mandator}=$confrec->{mandator};
-     #    }
-     # }
+   }
+   if ($affectedobject=~m/^base::workflow$/){
+      $newrec->{directlnktype}=effVal($oldrec,$newrec,"affectedobject");
+      $newrec->{directlnkid}=effVal($oldrec,$newrec,"affectedobjectid");
+      $newrec->{directlnkmode}="DataIssue";
+      my $obj=getModuleObject($self->getParent->Config,$affectedobject);
+      my $affectedobjectid=effVal($oldrec,$newrec,"affectedobjectid");
+      $obj->SetFilter(id=>\$affectedobjectid);
+      my ($WfRec,$msg)=$obj->getOnlyFirst(qw(ALL));
+      $newrec->{srcsys}=$WfRec->{class};
+      if (defined($WfRec)){
+         return($obj->DataIssueCompleteWriteRequest($oldrec,$newrec,$WfRec));
+      }
    }
    return(1);
 }

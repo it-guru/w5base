@@ -1,3 +1,4 @@
 'base::qrule'=>{de=>'Qualtiätsregel',en=>'Qualityrule'},
 'fail'=>{de=>'fehlgeschlagen'},
 'messy'=>{de=>'unschön'},
+'posible Target'=>{de=>'mögliche Datenobjekte'},

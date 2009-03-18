@@ -64,7 +64,7 @@ var f=document.forms[0];
 if (!f){return}
 var self=f.elements['Formated_tcomcodrootcauseanalyse'];
 if (!self){return}
-var e=f.elements['Formated_tcomworktime'];
+var e=f.elements['Formated_tcomworktimeproblem'];
 if (!e){return}
 if (self.options[self.selectedIndex].value=="yes"){
    e.readOnly=false;
@@ -115,15 +115,15 @@ EOF
                                          group       =>'tcomcod',
                                          container   =>'headref'),
 
-           new kernel::Field::Number(    name       =>'tcomworktime',
+           new kernel::Field::Number(    name       =>'tcomworktimeproblem',
                                          unit       =>'min',
                                          label      =>'Worktime Problem-Mgmt',
                                          group      =>'tcomcod',
                                          container  =>'headref'),
 
-           new kernel::Field::Number(    name       =>'tcomworktimespecial',
+           new kernel::Field::Number(    name       =>'tcomworktime',
                                          unit       =>'min',
-                                         label      =>'Worktime Special',
+                                         label      =>'Worktime',
                                          group      =>'tcomcod',
                                          container  =>'headref'),
 

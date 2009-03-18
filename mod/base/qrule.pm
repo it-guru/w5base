@@ -52,7 +52,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'target',
-                label         =>'posible Targets'),
+                label         =>'posible Target'),
 
       new kernel::Field::Htmlarea(
                 name          =>'longdescription',
@@ -143,7 +143,7 @@ sub nativQualityCheck
    $objlist=[$objlist] if (ref($objlist) ne "ARRAY");
    my $lnkr=getModuleObject($self->Config,"base::lnkqrulemandator");
    $lnkr->SetFilter({mandatorid=>$mandator});
-   foreach my $lnkrec ($lnkr->getHashList(qw(mdate qruleid))){
+   foreach my $lnkrec ($lnkr->getHashList(qw(mdate qruleid dataobj))){
       my $qrulename=$lnkrec->{qruleid};
       if (defined($self->{qrule}->{$qrulename})){
          my $qrule=$self->{qrule}->{$qrulename};
@@ -156,6 +156,10 @@ sub nativQualityCheck
                   last;
                }
             }
+         }
+         if (($lnkrec->{dataobj}=~m/::workflow::/) &&
+             $lnkrec->{dataobj} ne $rec->{class}){
+            $found=0;
          }
          if ($found){
             my $oldcontext=$W5V2::OperationContext;
@@ -243,6 +247,7 @@ sub nativQualityCheck
                $objectname;
       $ENV{HTTP_FORCE_LANGUAGE}=$oldforce;
       delete($ENV{HTTP_FORCE_LANGUAGE}) if ($ENV{HTTP_FORCE_LANGUAGE} eq "");
+      $wf->ResetFilter();
       $wf->SetFilter({stateid=>"<20",class=>\"base::workflow::DataIssue",
                       directlnktype=>\$affectedobject,
                       directlnkid=>\$affectedobjectid});
@@ -251,8 +256,10 @@ sub nativQualityCheck
       my $oldcontext=$W5V2::OperationContext;
       $W5V2::OperationContext="QualityCheck";
       msg(INFO,"QualityRule Level5");
-      msg(INFO,sprintf("check old wfrec=%s",Dumper($WfRec)));
+     # msg(INFO,sprintf("check old wfrec=%s",Dumper($WfRec)));
       if (!defined($WfRec)){
+         msg(INFO,"QualtiyCheck: ".
+                  "an old record does not exists - so i create a new one");
          my $newrec={name=>$name,
                      detaildescription=>$detaildescription,
                      class=>"base::workflow::DataIssue",
@@ -264,10 +271,14 @@ sub nativQualityCheck
                      eventend=>undef,
                      eventstart=>NowStamp("en"),
                      srcload=>NowStamp("en"),
+                     srcsys=>$affectedobject,
                      DATAISSUEOPERATIONSRC=>$directlnkmode};
          my $bk=$wf->Store(undef,$newrec);
+         $result->{wfheadid}=$bk;
       }
       else{
+         msg(INFO,"QualtiyCheck: ".
+                  "an old record exists - so i update the record");
          my $newrec={name=>$name,
                      mdate=>$WfRec->{mdate},
                      owner=>$WfRec->{owner},
@@ -276,7 +287,7 @@ sub nativQualityCheck
                      srcload=>NowStamp("en"),
                      detaildescription=>$detaildescription};
          my $bk=$wf->Store($WfRec,$newrec);
-         #printf STDERR ("updstore bk=%s\n",Dumper(\$bk));
+         $result->{wfheadid}=$WfRec->{id};
       }
 
       $W5V2::OperationContext=$oldcontext;
@@ -325,6 +336,8 @@ sub WinHandleQualityCheck
    my $CurrentIdToEdit=Query->Param("CurrentIdToEdit");
    my $mode=Query->Param("Mode");
    if (defined($mode) && $mode eq "process" && $CurrentIdToEdit ne ""){
+      #printf STDERR ("fifi env=%s\n",Dumper(\%ENV));
+      #printf STDERR ("fifi query=%s\n",Query->Dumper());
       print $self->HttpHeader("text/xml");
       my $res=hash2xml({},{header=>1});
       print $res."<document>";
@@ -332,6 +345,11 @@ sub WinHandleQualityCheck
       print STDERR Dumper($checkresult);
       foreach my $ruleres (@{$checkresult->{rule}}){
          my $res=hash2xml({rule=>$ruleres},{});
+         print $res;
+         printf STDERR ($res."\n");
+      }
+      if ($checkresult->{wfheadid} ne ""){
+         my $res=hash2xml({wfheadid=>$checkresult->{wfheadid}},{});
          print $res;
          printf STDERR ($res."\n");
       }
@@ -406,6 +424,12 @@ function addToResult(ruleid)
        var xmlobject = xmlhttp.responseXML;
        var r=document.getElementById("reslist");
        r.innerHTML="";
+       var wfheadidobj=xmlobject.getElementsByTagName("wfheadid");
+       var wfheadid;
+       if (wfheadidobj && wfheadidobj[0] && wfheadidobj[0].childNodes &&
+           wfheadidobj[0].childNodes[0]){
+          wfheadid=wfheadidobj[0].childNodes[0].nodeValue;
+       }
        var results=xmlobject.getElementsByTagName("rule");
        var ok=0;
        var warn=0;
@@ -461,7 +485,11 @@ function addToResult(ruleid)
           }
           var r=document.getElementById("summary");
           if (r){
-             var t="R:"+results.length+"/<font color=green>"+ok+"</font>";
+             var t="R:";
+             if (wfheadid){
+                t="<a class=rulelink href=javascript:openwin('../../base/workflow/ById/"+wfheadid+"','_blank','height=480,width=640,toolbar=no,status=no,resizeable=yes,scrollbars=no')>"+t+'</a>';
+             }
+             t=t+results.length+"/<font color=green>"+ok+"</font>";
              if (warn>0){
                  t+="/<font color=orange>"+warn+"</font>";
              }

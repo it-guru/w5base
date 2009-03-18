@@ -332,6 +332,10 @@ sub Validate
       $newrec->{data}=~s/<script/<div style="visible:hidden" script/gi;
       $newrec->{data}=~s/<\script>/<\/div>/gi;
    }
+   if (exists($newrec->{data})){
+      $newrec->{data}=~s/(^|[^>])FAQ(\d{10,20})([^<]|$)/<i>FAQ$2<\/i>/gi;
+      $newrec->{data}=~s/<\script>/<\/div>/gi;
+   }
    return(1);
 }
 

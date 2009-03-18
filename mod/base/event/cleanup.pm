@@ -48,12 +48,14 @@ sub CleanupWorkflows
 {
    my $self=shift;
    my $wf=getModuleObject($self->Config,"base::workflow");
+   my $CleanupWorkflow=$self->Config->Param("CleanupWorkflow");
+   $CleanupWorkflow="<now-84d" if ($CleanupWorkflow eq "");
 
 
    foreach my $stateid (qw(16 17 10)){
       $wf->SetFilter({stateid=>\$stateid,
                       class=>"*::diary",
-                      mdate=>'<now-56d'});
+                      mdate=>$CleanupWorkflow."+28d"});
       $wf->SetCurrentView(qw(id closedate stateid class));
       $wf->SetCurrentOrder(qw(NONE));
       $wf->Limit(100);

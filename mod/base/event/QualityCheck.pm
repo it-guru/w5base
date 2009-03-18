@@ -18,7 +18,6 @@ package base::event::QualityCheck;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::Event;
 @ISA=qw(kernel::Event);
@@ -47,7 +46,7 @@ sub QualityCheck
    my $dataobj=shift;
    msg(DEBUG,"starting QualityCheck");
    my %dataobjtocheck=$self->LoadQualitCheckActivationLinks();
-   msg(INFO,Dumper(\%dataobjtocheck));
+   #msg(INFO,Dumper(\%dataobjtocheck));
    if ($dataobj eq ""){
       foreach my $dataobj (sort(keys(%dataobjtocheck))){
             msg(INFO,"calling QualityCheck for '$dataobj'");
@@ -61,7 +60,8 @@ sub QualityCheck
    else{
       my $obj=getModuleObject($self->Config,$dataobj);
       if (defined($obj)){
-         if (!grep(/^0$/,keys(%{$dataobjtocheck{$dataobj}}))){
+         if (!grep(/^0$/,keys(%{$dataobjtocheck{$dataobj}})) &&
+             $dataobj ne "base::workflow"){
             msg(INFO,"set mandatorid filter='%s'",
                      join(",",keys(%{$dataobjtocheck{$dataobj}})));
             $obj->SetNamedFilter("MANDATORID",
@@ -95,7 +95,7 @@ sub doQualityCheck
       return({exitcode=>0,msg=>'ok'});
    }
 
-   my ($rec,$msg)=$dataobj->getFirst();
+   my ($rec,$msg)=$dataobj->getFirst(unbuffered=>1);
    my $time=time();
    if (defined($rec)){
       do{
@@ -127,7 +127,7 @@ sub LoadQualitCheckActivationLinks
    my %dataobjtocheck;
    $lnkq->ResetFilter();
    $lnkq->SetCurrentView("dataobj","mandatorid");
-   my ($rec,$msg)=$lnkq->getFirst();
+   my ($rec,$msg)=$lnkq->getFirst(unbuffered=>1);
    if (defined($rec)){
       do{
          msg(INFO,"dataobject=$rec->{dataobj} ".
@@ -135,7 +135,12 @@ sub LoadQualitCheckActivationLinks
          if ($rec->{dataobj} ne ""){
             my $mandatorid=$rec->{mandatorid};
             $mandatorid=0 if (!defined($mandatorid));
-            $dataobjtocheck{$rec->{dataobj}}->{$mandatorid}++;
+            if ($rec->{dataobj}=~m/::workflow::/){
+               $dataobjtocheck{'base::workflow'}->{$mandatorid}++;
+            }
+            else{
+               $dataobjtocheck{$rec->{dataobj}}->{$mandatorid}++;
+            }
          }
          ($rec,$msg)=$lnkq->getNext();
       }until(!defined($rec));

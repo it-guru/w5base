@@ -1815,7 +1815,7 @@ EOF
    print("<tr><td>");
    print("<table width=100%>");
    printf("<tr><td><b><u>%s:</u></b></td></tr>",$self->T("Upload File"));
-   print("<tr><td><input size=90 type=file name=file></td></tr>");
+   print("<tr><td><input size=50 type=file name=file></td></tr>");
    print("<tr><td>".
          "<input type=checkbox name=DEBUG>Debug</td></tr>");
    printf("<tr><td>".

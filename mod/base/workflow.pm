@@ -569,8 +569,10 @@ sub new
                 name          =>'wffields',
                 searchable    =>0,
                 label         =>'Workflow specific fields',
-                fields        =>\&getDynamicFields)
-
+                fields        =>\&getDynamicFields),
+      new kernel::Field::QualityText(),
+      new kernel::Field::QualityState(),
+      new kernel::Field::QualityOk()
    );
    $self->LoadSubObjs("workflow");
    $self->setDefaultView(qw(id class state name editor));
@@ -579,6 +581,23 @@ sub new
 
    return($self);
 }
+
+sub ById
+{
+   my ($self)=@_;
+   my $idfield=$self->IdField();
+   my $idname=$idfield->Name();
+   my $val="undefined";
+   if (defined(Query->Param("FunctionPath"))){
+      $val=Query->Param("FunctionPath");
+   }
+   $val=~s/^\///;
+   $val="UNDEF" if ($val eq "");
+   $self->HtmlGoto("../Process",post=>{$idname=>$val});
+   return();
+}
+
+
 
 sub calcResponsibilityBy
 {
@@ -932,6 +951,51 @@ sub isDeleteValid
                  !defined($self->{SubDataObj}->{$rec->{class}}));
    return($self->{SubDataObj}->{$rec->{class}}->isDeleteValid($rec));
 }
+
+sub DataIssueCompleteWriteRequest
+{
+   my $self=shift;
+   my $oldIssueRec=shift;
+   my $newIssueRec=shift;
+   my $rec=shift;
+   return(undef) if (!defined($rec) || 
+                 !defined($self->{SubDataObj}->{$rec->{class}}));
+   if ($self->{SubDataObj}->{$rec->{class}}->
+       can("DataIssueCompleteWriteRequest")){
+      return($self->{SubDataObj}->{$rec->{class}}->
+                DataIssueCompleteWriteRequest($oldIssueRec,$newIssueRec,$rec));
+   }
+   if ($rec->{openuser}=~m/^\d+$/){
+      $newIssueRec->{fwdtarget}="base::user";
+      $newIssueRec->{fwdtargetid}=$rec->{openuser};
+      $newIssueRec->{mandator}=$rec->{mandator};
+      $newIssueRec->{mandatorid}=$rec->{mandatorid};
+   }
+   return(1);
+}
+
+sub SetFilterForQualityCheck    # prepaire dataobject for automatic 
+{                               # quality check (nightly)
+   my $self=shift;
+   my @view=@_;                 # predefinition for request view
+   my $qrulelnk=getModuleObject($self->Config,"base::lnkqrulemandator");
+   $qrulelnk->SetFilter({dataobj=>'*::workflow::*'});
+   my @l=$qrulelnk->getHashList(qw(dataobj));
+   my %wf;
+   foreach my $rec (@l){
+      $wf{$rec->{dataobj}}++;
+   }
+   if (!keys(%wf)){
+      $wf{none}++;
+   }
+   
+   $self->ResetFilter();
+   $self->SetFilter({mdate=>">now-48h",class=>[keys(%wf)]});
+   $self->SetCurrentView(@view);
+   return(1);
+}
+
+
 
 sub allowAutoScroll
 {
@@ -1568,20 +1632,6 @@ sub nativProcess
    }
    msg(INFO,"request on class=$class step=$step");
    return($classobj->nativProcess($action,$h,$step,$WfRec));
-}
-
-sub ById
-{
-   my ($self)=@_;
-   my $idfield=$self->IdField();
-   my $idname=$idfield->Name();
-   my $val="undefined";
-   if (defined(Query->Param("FunctionPath"))){
-      $val=Query->Param("FunctionPath");
-   }
-   $val=~s/^\///;
-   $self->HtmlGoto("../Process",post=>{$idname=>$val});
-   return();
 }
 
 sub getRecordHtmlIndex

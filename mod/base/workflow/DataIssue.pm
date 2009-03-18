@@ -161,7 +161,7 @@ sub getObjectList
 }
 
 
-sub completeWriteRequest
+sub DataIssueCompleteWriteRequest
 {
    my $self=shift;
    my $oldrec=shift;
@@ -169,8 +169,8 @@ sub completeWriteRequest
 
    foreach my $objname (keys(%{$self->{DI}})){
       my $obj=$self->{DI}->{$objname};
-      if ($obj->can("completeWriteRequest")){
-         if (!($obj->completeWriteRequest($oldrec,$newrec))){
+      if ($obj->can("DataIssueCompleteWriteRequest")){
+         if (!($obj->DataIssueCompleteWriteRequest($oldrec,$newrec))){
             return(undef);
          }
       }
@@ -307,11 +307,11 @@ sub getPosibleActions
    my $iscurrent=$self->isCurrentForward($WfRec);
 
    if ($stateid==2 || $stateid==4){
-      push(@l,"wfaddnote");
+      push(@l,"wfaddsnote");
    }
    if ($iscurrent && ($stateid==5)){
       push(@l,"nop");
-      push(@l,"wfaddnote");
+      push(@l,"wfaddsnote");
    }
    if ($iscurrent && ($stateid==2 || $stateid==4)){
       push(@l,"wfdefer");
@@ -441,8 +441,15 @@ sub Validate
    $newrec->{affectedobject}=effVal($oldrec,$newrec,"affectedobject");
    $newrec->{affectedobjectid}=effVal($oldrec,$newrec,"affectedobjectid");
    $newrec->{step}=$self->getNextStep();
-   if (!$self->getParent->completeWriteRequest($oldrec,$newrec)){
-      $self->LastMsg(ERROR,"can't complete Write Request");
+   if (!$self->getParent->DataIssueCompleteWriteRequest($oldrec,$newrec)){
+      my $msg="can't complete Write Request - ".
+              "DataIssueCompleteWriteRequest false";
+      if ($W5V2::OperationContext eq "QualityCheck"){
+         $self->LastMsg(INFO,$msg);
+      }
+      else{
+         $self->LastMsg(ERROR,$msg);
+      }
       return(undef);
    }
 
@@ -511,54 +518,54 @@ use kernel;
 use kernel::WfStep;
 @ISA=qw(kernel::WfStep);
 
-sub generateWorkspace
-{
-   my $self=shift;
-   my $WfRec=shift;
-   my $actions=shift;
-
-   my $divset="";
-   my $selopt="";
-
-   return("") if ($#{$actions}==-1);
-   $self->generateWorkspacePages($WfRec,$actions,\$divset,\$selopt);   
-   my $oldop=Query->Param("OP");
-   my $templ;
-   my $pa=$self->getParent->T("posible action");
-   $templ=<<EOF;
-<table width=100% height=148 border=0 cellspacing=0 cellpadding=0>
-<tr height=1%><td width=1% nowrap>$pa &nbsp;</td>
-<td><select id=OP name=OP style="width:100%">$selopt</select></td></tr>
-<tr><td colspan=3 valign=top>$divset</td></tr>
-</table>
-<script language="JavaScript">
-function fineSwitch(s)
-{
-   var sa=document.forms[0].elements['SaveStep'];
-   if (s.value=="nop"){
-      if (sa){
-         sa.disabled=true;
-      }
-   }
-   else{
-      if (sa){
-         sa.disabled=false;
-      }
-   }
-}
-function InitDivs()
-{
-   var s=document.getElementById("OP");
-   divSwitcher(s,"$oldop",fineSwitch);
-}
-addEvent(window,"load",InitDivs);
-//InitDivs();
-//window.setTimeout(InitDivs,1000);   // ensure to disable button (mozilla bug)
-</script>
-EOF
-
-   return($templ);
-}
+#sub generateWorkspace
+#{
+#   my $self=shift;
+#   my $WfRec=shift;
+#   my $actions=shift;
+#
+#   my $divset="";
+#   my $selopt="";
+#
+#   return("") if ($#{$actions}==-1);
+#   $self->generateWorkspacePages($WfRec,$actions,\$divset,\$selopt);   
+#   my $oldop=Query->Param("OP");
+#   my $templ;
+#   my $pa=$self->getParent->T("posible action");
+#   $templ=<<EOF;
+#<table width=100% height=148 border=0 cellspacing=0 cellpadding=0>
+#<tr height=1%><td width=1% nowrap>$pa &nbsp;</td>
+#<td><select id=OP name=OP style="width:100%">$selopt</select></td></tr>
+#<tr><td colspan=3 valign=top>$divset</td></tr>
+#</table>
+#<script language="JavaScript">
+#function fineSwitch(s)
+#{
+#   var sa=document.forms[0].elements['SaveStep'];
+#   if (s.value=="nop"){
+#      if (sa){
+#         sa.disabled=true;
+#      }
+#   }
+#   else{
+#      if (sa){
+#         sa.disabled=false;
+#      }
+#   }
+#}
+#function InitDivs()
+#{
+#   var s=document.getElementById("OP");
+#   divSwitcher(s,"$oldop",fineSwitch);
+#}
+#addEvent(window,"load",InitDivs);
+#//InitDivs();
+#//window.setTimeout(InitDivs,1000);   // ensure to disable button (mozilla bug)
+#</script>
+#EOF
+#
+#   return($templ);
+#}
 
 sub Validate
 {
@@ -595,7 +602,7 @@ sub Validate
                                                                 "en","GMT");;
    }
    else{
-      if (!$self->getParent->completeWriteRequest($oldrec,$newrec)){
+      if (!$self->getParent->DataIssueCompleteWriteRequest($oldrec,$newrec)){
          $self->LastMsg(ERROR,"can't complete Write Request");
          return(undef);
       }
@@ -634,7 +641,7 @@ sub Process
          $self->LastMsg(ERROR,"invalid disalloed action requested");
          return(0);
       }
-      if ($op eq "wfaddnote"){
+      if ($op eq "wfaddsnote"){
          my $note=Query->Param("note");
          if ($note=~m/^\s*$/  || length($note)<10){
             $self->LastMsg(ERROR,"empty or to short notes are not allowed");
@@ -645,7 +652,7 @@ sub Process
          $oprec->{stateid}=4;
          my $effort=Query->Param("Formated_effort");
          if ($self->getParent->getParent->Action->StoreRecord(
-             $WfRec->{id},"wfaddnote",
+             $WfRec->{id},"wfaddsnote",
              {translation=>'base::workflow::request'},$note,$effort)){
             $self->StoreRecord($WfRec,$oprec);
             $self->PostProcess($action.".".$op,$WfRec,$actions);
@@ -712,7 +719,7 @@ sub Process
          $oprec->{step}='base::workflow::DataIssue::main';
          $oprec->{affectedobject}=effVal($WfRec,$oprec,"affectedobject");
          $oprec->{affectedobjectid}=effVal($WfRec,$oprec,"affectedobjectid");
-         if (!$self->getParent->completeWriteRequest(undef,$oprec)){
+         if (!$self->getParent->DataIssueCompleteWriteRequest(undef,$oprec)){
             $self->LastMsg(ERROR,"can't complete Write Request");
             return(undef);
          }
@@ -801,14 +808,14 @@ sub generateWorkspacePages
    my $tr="base::workflow::actions";
    my $class="display:none;visibility:hidden";
 
-   if (grep(/^nop$/,@$actions)){
-      $$selopt.="<option value=\"nop\" class=\"$class\">".
-                $self->getParent->T("nop",$tr).
-                "</option>\n";
-      $$divset.="<div id=OPnop style=\"margin:15px\"><br>".
-                $self->getParent->T("The current workflow isn't forwared ".
-                "to you. At now there is no action nessasary.",$tr)."</div>";
-   }
+#   if (grep(/^nop$/,@$actions)){
+#      $$selopt.="<option value=\"nop\" class=\"$class\">".
+#                $self->getParent->T("nop",$tr).
+#                "</option>\n";
+#      $$divset.="<div id=OPnop style=\"margin:15px\"><br>".
+#                $self->getParent->T("The current workflow isn't forwared ".
+#                "to you. At now there is no action nessasary.",$tr)."</div>";
+#   }
    if (grep(/^wffine$/,@$actions)){
       $$selopt.="<option value=\"wffine\" class=\"$class\">".
                 $self->getParent->T("wffine",$tr).
@@ -830,8 +837,9 @@ sub generateWorkspacePages
       $$divset.="<div id=OPwfdireproc>".$self->getDefaultNoteDiv($WfRec,$actions).
                 "</div>";
    }
-   return($self->SUPER::generateWorkspacePages($WfRec,$actions,
-                                               $divset,$selopt));
+   $self->SUPER::generateWorkspacePages($WfRec,$actions,
+                                               $divset,$selopt);
+   return("wfaddsnote");
 }
 
 

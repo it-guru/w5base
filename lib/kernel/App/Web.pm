@@ -1170,6 +1170,11 @@ EOF
         $self->T("With this action, it is posible to lose data!").
        "\"));\n";
    $d.="}\n";
+   $d.="function DataLoseQuestion(){\n";
+   $d.="return(\"".
+        $self->T("With this action, it is posible to lose data!").
+       "\");\n";
+   $d.="}\n";
    $d.="</script>\n\n";
    if (defined($param{'refresh'})){
       $d.="<meta http-equiv=\"refresh\" content=\"$param{'refresh'}\">";

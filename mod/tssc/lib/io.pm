@@ -38,6 +38,7 @@ sub ProcessServiceCenterRecord
    my $selfname=shift;
    my $rec=shift;
    my $wf=$self->{wf};
+   my $oldrec=shift;
 
    #msg(DEBUG,"chm=%s",Dumper($rec));
    my ($wfstorerec,$updateto);
@@ -61,13 +62,13 @@ sub ProcessServiceCenterRecord
             msg(ERROR,"failed to create workflow");
          }
       }
-      elsif ($#==0){
+      elsif (defined($oldrec)){
          msg(DEBUG,"PROCESS: update workflow entry '$updateto'");
          $wf->SetFilter({id=>\$updateto});
          $wf->SetCurrentView(qw(ALL));
          $wf->ForeachFilteredRecord(sub{
             msg(DEBUG,"PROCESS: du update to '$updateto'");
-            $wf->ValidatedUpdateRecord($_,$wfstorerec,{id=>\$_->{id}});
+            $wf->ValidatedUpdateRecord($_,$wfstorerec,{id=>\$oldrec->{id}});
          });
       }
    }

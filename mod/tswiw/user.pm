@@ -103,6 +103,11 @@ sub new
                                    vjoinon    =>['touid'=>'touid'],
                                    vjoindisp  =>'name'),
 
+      new kernel::Field::Text(     name       =>'office_state',
+                                   group      =>'office',
+                                   label      =>'Status',
+                                   dataobjattr=>'organizationalstatus'),
+
       new kernel::Field::Text(     name       =>'office_persnum',
                                    group      =>'office',
                                    label      =>'Personal-Number',

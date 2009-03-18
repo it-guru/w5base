@@ -33,6 +33,7 @@ if ($ENV{REMOTE_USER} eq ""){
    }
    $ENV{REAL_REMOTE_USER}="system/W5Event";
 }
+$W5V2::OperationContext="W5Server";
 
 
 

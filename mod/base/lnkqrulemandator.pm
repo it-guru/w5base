@@ -39,7 +39,7 @@ sub new
 
       new kernel::Field::Id(
                 name          =>'id',
-                label         =>'LinkID',
+                label         =>'Qrule activation LinkID',
                 dataobjattr   =>'lnkqrulemandator.lnkqrulemandatorid'),
 
       new kernel::Field::Mandator(allowany=>1),
@@ -150,6 +150,15 @@ sub new
    return($self);
 }
 
+sub isCopyValid
+{
+   my $self=shift;
+
+   return(1);
+}
+
+
+
 
 sub Validate
 {
@@ -162,7 +171,8 @@ sub Validate
    if (defined($dataobj)){
       $dataobj=trim($dataobj);
       if ($dataobj eq "" ||
-          !($dataobj=~m/^[a-z,0-9,_]+::[a-z,0-9,_]+$/i)){
+          !($dataobj=~m/^[a-z,0-9,_]+::[a-z,0-9,_]+$/i) &&
+          !($dataobj=~m/^[a-z,0-9,_]+::workflow::[a-z,0-9,_]+$/i)){
          $self->LastMsg(ERROR,"invalid dataobject nameing");
          return(undef);  
       }

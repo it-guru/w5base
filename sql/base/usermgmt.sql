@@ -261,7 +261,7 @@ CREATE TABLE lnkqrulemandator (
   editor varchar(100) NOT NULL default '',
   realeditor varchar(100) NOT NULL default '',
   PRIMARY KEY  (lnkqrulemandatorid),
-  UNIQUE KEY mandator (mandator,qrule),
+  UNIQUE KEY mandator (mandator,qrule,dataobj),
   KEY qrule (qrule),key(expiration)
 );
 alter table lnkgrpuser add comments longtext default NULL;

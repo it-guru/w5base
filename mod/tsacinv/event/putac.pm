@@ -47,12 +47,95 @@ sub Init
 
 
    $self->RegisterEvent("putac","ApplicationModified");
+   $self->RegisterEvent("putacasset","AssetModified",timeout=>40000);
    $self->RegisterEvent("putacappl","ApplicationModified",timeout=>40000);
 #   $self->RegisterEvent("putac","SWInstallModified");
    $self->RegisterEvent("SWInstallModified","SWInstallModified");
    $self->RegisterEvent("ApplicationModified","ApplicationModified");
    $self->RegisterEvent("send2ac","sendFileToAssetCenterOnlineInterface");
    return(1);
+}
+
+
+#
+# Bedingungen für einen Asset/System Export
+#
+# - CO-Nummer muß eingetragen sein, und in W5Base/Darwin als 
+#   installiert/aktiv markiert sein.
+# - Betreuungsteam muß innerhalb von DTAG.TSI.ES.ITO.CSS.T-Com* liegen
+#   oder das Adminteam muß innerhalb von DTAG.TSI.ES.ITO.CSS.T-Com* liegen.
+# - Es darf NICHT "automatisierte Updates durch Schnittstellen" zugelassen sein
+# - CI-Status muß "installiert/aktiv" sein
+# - Dem Asset muß min. ein System zugeordnet sein. 
+# - Beim System muß ein Asset eingetragen sein, das in AssetCenter aktiv ist.
+#
+
+sub AssetModified
+{
+   my $self=shift;
+   my @assetname=@_;
+
+   my $system=getModuleObject($self->Config,"itil::system");
+   my $asset=getModuleObject($self->Config,"itil::asset");
+   my $acsystem=getModuleObject($self->Config,"tsacinv::system");
+   my $acasset=getModuleObject($self->Config,"tsacinv::asset");
+
+   my %filter=(cistatusid=>\'4',assetid=>\'',allowifupdate=>\'0');
+   $self->{DebugMode}=0;
+   if ($#assetname!=-1){
+      if (grep(/^debug$/i,@assetname)){
+         @assetname=grep(!/^debug$/i,@assetname);
+         $self->{DebugMode}=1;
+         msg(ERROR,"processing DebugMode - loading '%s'",join(",",@assetname));
+      }
+      $filter{name}=\@assetname;
+   }
+   my (%fh,%filename);
+   my $ftp=new kernel::FTP($self,"tsacftp");
+   if (defined($ftp)){
+      if (!($ftp->Connect())){
+         return({exitcode=>1,msg=>msg(ERROR,"can't connect to ftp server ".
+                "- login fails")});
+      }
+      $self->{ftp}=$ftp;
+   }
+   else{
+      return({exitcode=>1,msg=>msg(ERROR,"can't create ftp object")});
+   }
+
+   $self->{jobstart}=NowStamp();
+   ($fh{asset},       $filename{asset}               )=$self->InitTransfer();
+   ($fh{system},      $filename{system}              )=$self->InitTransfer();
+   $asset->SetFilter(\%filter);
+   $asset->SetCurrentView(qw(ALL));
+
+   my ($rec,$msg)=$asset->getFirst(unbuffered=>1);
+
+   if (defined($rec)){
+      do{
+         msg(INFO,"dump=%s",Dumper($rec));
+         if (1){
+            my $CurrentEventId="Process Asset '$rec->{name}'";
+            my $acftprec={
+                             Asset=>{
+                                EventID=>$CurrentEventId,
+                                ExternalSystem=>'W5Base',
+                                ExternalID=>$rec->{id},
+                                Security_Unit=>"TS.DE",
+                                Description=>$rec->{comments},
+                                bDelete=>'0'
+                             }
+                         };
+printf STDERR ("acftprec=%s\n",Dumper($acftprec));
+         }
+         
+         ($rec,$msg)=$asset->getNext();
+      } until(!defined($rec));
+   }
+   $self->TransferFile($fh{asset},$filename{asset},
+                       $ftp,"asset");
+   $self->TransferFile($fh{system},$filename{system},
+                       $ftp,"system");
 }
 
 

@@ -56,6 +56,8 @@ sub getPosibleRoles
              "read"            =>$self->getParent->T("read",
                                                      $self->Self),
              "write"           =>$self->getParent->T("write",
+                                                     $self->Self),
+             "PMember"         =>$self->getParent->T("project member",
                                                      $self->Self));
    }
    if ($parentobj eq "base::location" ||

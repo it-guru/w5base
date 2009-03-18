@@ -206,7 +206,7 @@ sub Process
                               "requested");
          return(0);
       }
-      if ($op eq "wfaddnote"){
+      if ($op eq "wfaddnote" || $op eq "wfaddsnote"){
          my $note=Query->Param("note");
          if ($note=~m/^\s*$/  || length($note)<10){
             $self->LastMsg(ERROR,"empty or to short notes are not allowed");
@@ -555,9 +555,16 @@ sub generateWorkspacePages
       $$selopt.="<option value=\"wfaddnote\">".
                 $self->getParent->T("wfaddnote",$tr).
                 "</option>\n";
-      my $note=Query->Param("note");
       $$divset.="<div id=OPwfaddnote class=\"$class\">".
                 $self->getDefaultNoteDiv($WfRec,$actions).
+                "</div>";
+   }
+   if (grep(/^wfaddsnote$/,@$actions)){
+      $$selopt.="<option value=\"wfaddsnote\">".
+                $self->getParent->T("wfaddsnote",$tr).
+                "</option>\n";
+      $$divset.="<div id=OPwfaddsnote class=\"$class\">".
+                $self->getDefaultNoteDiv($WfRec,$actions,mode=>'simple').
                 "</div>";
    }
    if (grep(/^wfdefer$/,@$actions)){
@@ -653,7 +660,7 @@ sub getDefaultNoteDiv
          "onkeydown=\"textareaKeyHandler(this,event);\" ".
          "style=\"width:100%;height:${noteheight}px\">".
          $note."</textarea></td></tr>";
-   if ($mode eq "addnote"){
+   if ($mode eq "addnote" || $mode eq "simple"){
       my @t=(''=>'',
              '10'=>'10 min',
              '20'=>'20 min',
@@ -669,20 +676,25 @@ sub getDefaultNoteDiv
              '480'=>'1 day',
              '720'=>'1,5 days',
              '960'=>'2 days');
-      $d.="<tr><td width=1% nowrap valign=bottom>&nbsp;".
-          $self->getParent->getParent->T("personal Effort",
-                                         "base::workflowaction").
-          ":&nbsp;</td>".
-          "<td nowrap valign=bottom>".
-          "<select name=Formated_effort style=\"width:80px\">";
-      my $oldval=Query->Param("Formated_effort");
-      while(defined(my $min=shift(@t))){
-         my $l=shift(@t);
-         $d.="<option value=\"$min\"";
-         $d.=" selected" if ($min==$oldval);
-         $d.=">$l</option>";
+      if ($mode eq "simple"){
+         $d.="<tr><td width=1% nowrap valign=bottom>&nbsp;";
       }
-      $d.="</select>";
+      else{
+         $d.="<tr><td width=1% nowrap valign=bottom>&nbsp;".
+             $self->getParent->getParent->T("personal Effort",
+                                            "base::workflowaction").
+             ":&nbsp;</td>".
+             "<td nowrap valign=bottom>".
+             "<select name=Formated_effort style=\"width:80px\">";
+         my $oldval=Query->Param("Formated_effort");
+         while(defined(my $min=shift(@t))){
+            my $l=shift(@t);
+            $d.="<option value=\"$min\"";
+            $d.=" selected" if ($min==$oldval);
+            $d.=">$l</option>";
+         }
+         $d.="</select>";
+      }
       if (defined($WfRec->{initiatorid})){
          $d.="&nbsp;&nbsp;&nbsp;";
          $d.="&nbsp;&nbsp;&nbsp;";

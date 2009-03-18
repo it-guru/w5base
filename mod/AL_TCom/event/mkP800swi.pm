@@ -63,7 +63,7 @@ sub mkP800swi
          if ($rec->{servicesupportid} ne ""){
             $ss->ResetFilter();
             $ss->SetFilter({id=>\$rec->{servicesupportid},cistatusid=>'<=4'});
-            ($ssrec)=$ss->getOnlyFirst(qw(flathourscost comments name
+            ($ssrec)=$ss->getOnlyFirst(qw(flathourscost comments name fullname
                                           servicedescription));
          }
          if (defined($ssrec) && $rec->{appl} ne ""){

@@ -1,4 +1,4 @@
-'finance'=>{de=>'Finanz',en=>'Finance'},
+'finance'=>{de=>'Finanz/CRM',en=>'Finance/CRM'},
 'finance.custcontract'=>{de=>'Kundenvertrag',en=>'Customer Contract'},
 'finance.custcontract.new'=>{de=>'Neueingabe',en=>'New'},
 'finance.costcenter'=>{de=>'Kostenstelle',en=>'Costcenter'},
