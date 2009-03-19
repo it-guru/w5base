@@ -435,7 +435,12 @@ div.OnlyInBrowser{
 </style>
 EOF
   print $self->HtmlPersistentVariables("AllowClose");
-   
+  my $forumtopicread=$self->getPersistentModuleObject("faq::forumtopicread");
+  my $now=$self->ExpandTimeExpression('now');
+  $forumtopicread->InsertRecord({forumtopicid=>$torec->{id},
+                                 cdate=>$now,
+                                 clientipaddr=>$ENV{REMOTE_ADDR},
+                                 creatorid=>$self->getCurrentUserId()});
 }
 
 sub HandleInfoAboSubscribe

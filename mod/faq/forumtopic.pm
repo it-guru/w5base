@@ -72,7 +72,7 @@ sub new
                 htmlwidth     =>'5px',
                 group         =>'stat',
                 htmldetail    =>1,
-                depend        =>['viewcount','entrycount'],
+                depend        =>['viewcount','entrycount','isreaded'],
                 label         =>'Topic Symbol',
                 weblink       =>sub{
                                    my $self=shift;
@@ -83,6 +83,9 @@ sub new
                                    if ($current->{viewcount}>100 ||
                                        $current->{entrycount}>30){
                                       $ico="forum_hottopic";
+                                   }
+                                   if ($current->{isreaded}){
+                                      $ico.="_readed";
                                    }
                                    if ($mode=~m/html/i){
                                       return("<img ".
@@ -234,6 +237,11 @@ sub new
                 sqlorder      =>'desc',
                 group         =>'source',
                 dataobjattr   =>'forumtopic.modifydate'),
+
+      new kernel::Field::Link(
+                name          =>'isreaded',
+                label         =>'IsReaded',
+                dataobjattr   =>'forumtopicread.createuser'),
                                    
       new kernel::Field::Fulltext(
                 dataobjattr   =>'forumtopic.comments,forumtopic.name'),
@@ -306,9 +314,15 @@ sub getSqlFrom
    my @flt=@_;
    my ($worktable,$workdb)=$self->getWorktable();
    my $from="$worktable";
+   my $userid=$self->getCurrentUserId();
+   $userid=0 if (!defined($userid));
 
    $from.=" left outer join forumentry ".
-          "on forumtopic.id=forumentry.forumtopic ";
+          "on forumtopic.id=forumentry.forumtopic ".
+          "left outer join forumtopicread ".
+          "on forumtopic.id=forumtopicread.forumtopic ".
+          " and forumtopicread.createuser='$userid' ".
+          " and forumtopicread.createdate>=forumtopic.modifydate";
 
    return($from);
 }

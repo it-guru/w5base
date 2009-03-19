@@ -1,0 +1,5 @@
+'faq::forumtopicread'=>{de=>'Forum Themen Lesezugriff',
+                        en=>'Forum Topic read access'},
+'Topic'=>{de=>'Thema'},
+'Reader'=>{de=>'Leser'},
+'Read-Date'=>{de=>'lese Datum'},

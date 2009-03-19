@@ -74,3 +74,12 @@ CREATE TABLE forumboardacl (
 alter table forumboardacl add comments longtext;
 alter table forumboardacl add expiration datetime;
 alter table forumboardacl add alertstate varchar(10);
+CREATE TABLE forumtopicread (
+  id bigint(20) NOT NULL default '0',
+  forumtopic bigint(20),
+  createdate    datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser    bigint(20) default NULL,
+  clientipaddr  varchar(40) default NULL,
+  PRIMARY KEY  (id),
+  KEY forumread(forumtopic),key forumuser(createuser), key cdate(createdate)
+);
