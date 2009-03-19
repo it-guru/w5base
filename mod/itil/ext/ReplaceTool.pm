@@ -124,7 +124,7 @@ sub doReplaceOperation
       }
       $dataobj->SetFilter(\%flt);
       $dataobj->SetCurrentView(qw(ALL));
-      my ($rec,$msg)=$dataobj->getFirst();
+      my ($rec,$msg)=$dataobj->getFirst(unbuffered=>1);
       if (defined($rec)){
          do{
             $opdataobj->ValidatedUpdateRecord($rec,
