@@ -86,6 +86,10 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("faq.forum.topic.read",
+                      "faq::forumtopicread",
+                      defaultacl=>['admin']);
+   
    $self->RegisterObj("faq.forum.entry",
                       "faq::forumentry",
                       func=>'Main',

@@ -9,4 +9,5 @@
 'faq.forum.board.new'=>{de=>'Neueingabe',en=>'New'},
 'faq.forum.topic'=>{de=>'Thema',en=>'Topic'},
 'faq.forum.topic.new'=>{de=>'Neueingabe',en=>'New'},
+'faq.forum.topic.read'=>{de=>'Lesezugriffe',en=>'Topicreads'},
 'faq.forum.entry'=>{de=>'Eintrag',en=>'Entry'},
