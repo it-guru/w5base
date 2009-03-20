@@ -604,12 +604,14 @@ sub RawValue
       else{
          @view=($self->{vjoindisp},$self->{vjoinon}->[1]);
       }
-      foreach my $fieldname ($self->getParent->getCurrentView()){
-         my $fobj=$self->getParent->getField($fieldname);
-         next if (!defined($fobj));
-         if ($fobj->vjoinContext() eq $joincontext){
-            if (!grep(/^$fobj->{vjoindisp}$/,@view)){
-               push(@view,$fobj->{vjoindisp});
+      if ($self->getParent->can("getCurrentView")){
+         foreach my $fieldname ($self->getParent->getCurrentView()){
+            my $fobj=$self->getParent->getField($fieldname);
+            next if (!defined($fobj));
+            if ($fobj->vjoinContext() eq $joincontext){
+               if (!grep(/^$fobj->{vjoindisp}$/,@view)){
+                  push(@view,$fobj->{vjoindisp});
+               }
             }
          }
       }
@@ -619,25 +621,17 @@ sub RawValue
       my @joinon=@{$self->{vjoinon}};
       my %flt=();
       my $joinval=0;
-      while(my $myfield=shift(@joinon)){
-         my $joinfield=shift(@joinon);
-         my $myfieldobj=$self->getParent->getField($myfield);
-         if (defined($myfieldobj)){
-            if ($myfieldobj ne $self){
-               my $myval=$myfieldobj->RawValue($current);
-               $flt{$joinfield}=\$myval;
-               $joinval=1 if (defined($myval) && $myval ne "");
+      if ($self->getParent->can("getField")){
+         while(my $myfield=shift(@joinon)){
+            my $joinfield=shift(@joinon);
+            my $myfieldobj=$self->getParent->getField($myfield);
+            if (defined($myfieldobj)){
+               if ($myfieldobj ne $self){
+                  my $myval=$myfieldobj->RawValue($current);
+                  $flt{$joinfield}=\$myval;
+                  $joinval=1 if (defined($myval) && $myval ne "");
+               }
             }
-         #   else{
-         #      if (defined($self->{container})){
-         #         my $container=$self->getParent->getField($self->{container});
-         #         if (defined($container)){
-         #            my $containerdata=$container->RawValue($current);
-         #            $flt{$joinfield}=$containerdata->{$myfield};
-         #            $joinval=1 if (defined($containerdata->{$myfield}));
-         #         }
-         #      }
-         #   }
          }
       }
 

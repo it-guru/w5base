@@ -485,25 +485,158 @@ sub HandleShowSubscribers
 {
    my $self=shift;
    my ($id,$mode)=split(/,/,Query->Param("CurrentIdToEdit"));
+   my ($borec,$msg);
+   my $ismoderator=0;
    my $ia=$self->getPersistentModuleObject("base::infoabo");
    if ($id ne ""){
+      my $bo=$self->getPersistentModuleObject("faq::forumboard");
+      $bo->SetFilter({id=>\$id});
+      ($borec,$msg)=$bo->getOnlyFirst(qw(ALL));
+      my @acl=$bo->getCurrentAclModes($ENV{REMOTE_USER},$borec->{acls});
+      if ($self->IsMemberOf("admin") ||
+          grep(/^moderate$/,@acl)){
+         $ismoderator=1;
+      }
+   }
+   if (defined($borec)){
       print $self->HttpHeader("text/html");
       print $self->HtmlHeader(style=>['default.css'],
+                              form=>1,body=>1,
                               title=>$self->T("subscribers"));
+      my $d;
+      if ($ismoderator){
+         my $subjectprefix=$self->T("moderator info");
+         my $sitename=$self->Config->Param("SITENAME");
+         if ($sitename ne ""){
+            $subjectprefix="$sitename: ".$subjectprefix;
+         }
+         my $user=$self->getPersistentModuleObject("base::user");
+         my $msg=$self->T("remove user from list");
+         $d.=<<EOF;
+<script language="JavaScript">
+function removeUser(userid)
+{
+   if (confirm("$msg ?")){
+      var e=document.getElementById("ruserid");
+      e.value=userid;
+      document.forms[0].submit();
+   }
+}
+</script>
+EOF
+         my $ruserid=Query->Param("ruserid");
+         if ($ruserid=~m/^\d+$/){
+            $user->SetFilter({userid=>\$ruserid});
+            my ($urec,$msg)=$user->getOnlyFirst(qw(email));
+            if (defined($urec)){
+               foreach my $mode (qw(foaddtopic foboardansw)){
+                  $ia->ValidatedInsertOrUpdateRecord(
+                       {refid=>$id,mode=>$mode,active=>'0',
+                        userid=>$ruserid,
+                        parentobj=>'faq::forumboard'},
+                       {refid=>\$id,mode=>\$mode,userid=>\$ruserid,
+                        parentobj=>\'faq::forumboard'});
+               }
+               my $wf=getModuleObject($self->Config,"base::workflow");
+               my %notiy;
+               $notiy{name}="$subjectprefix: ".$borec->{name};
+               $notiy{emailto}=$urec->{email};
+               $notiy{emailtext}=sprintf($self->T(
+                                 "The Board manager has removed ".
+                                 "you from board \"%s\"."),
+                                 $borec->{name});
+               $notiy{class}='base::workflow::mailsend';
+               $notiy{step}='base::workflow::mailsend::dataload';
+               if (my $id=$wf->Store(undef,\%notiy)){
+                  my %d=(step=>'base::workflow::mailsend::waitforspool');
+                  my $r=$wf->Store($id,%d);
+               }
+            }
+         }
+         ####################################################################
+         # for add operations
+         ####################################################################
+         my $oldval=Query->Param("Formated_addcon");
+         my ($n,$userfullname,$edt,
+             $keylist,$vallist,$list)=$user->getHtmlTextDrop("addcon",$oldval,
+                                             vjoindisp=>'fullname',
+                                             fields=>['userid','email'],
+                                             vjoineditbase=>{cistatusid=>'4'});
+         if (defined($n) && $n==1 && $list->[0]->{userid}=~m/^\d+$/){
+            my $adduserid=$list->[0]->{userid};
+            my $email=$list->[0]->{email};
+            foreach my $mode (qw(foaddtopic foboardansw)){
+               $ia->ValidatedInsertOrUpdateRecord(
+                    {refid=>$id,mode=>$mode,active=>'1',
+                     userid=>$adduserid,
+                     parentobj=>'faq::forumboard'},
+                    {refid=>\$id,mode=>\$mode,userid=>\$adduserid,
+                     parentobj=>\'faq::forumboard'});
+            }
+            Query->Param("Formated_addcon"=>'');
+            $oldval="";
+            ($n,$userfullname,$edt,
+             $keylist,$vallist)=$user->getHtmlTextDrop("addcon",$oldval,
+                                             vjoindisp=>'fullname',
+                                             fields=>['userid','email'],
+                                             vjoineditbase=>{cistatusid=>'4'});
+
+
+            my $wf=getModuleObject($self->Config,"base::workflow");
+            my $accessurl=$ENV{SCRIPT_URI};
+            $accessurl=~s/HandleShowSubscribers/Main\/$id/;
+            my %notiy;
+            $notiy{name}="$subjectprefix: ".$borec->{name};
+            $notiy{emailto}=$email;
+            $notiy{emailtext}=sprintf($self->T("The Board manager has add ".
+                              "you to board \"%s\"."),$borec->{name}).
+                              "\n\n".$accessurl;
+                             
+            $notiy{class}='base::workflow::mailsend';
+            $notiy{step}='base::workflow::mailsend::dataload';
+            if (my $id=$wf->Store(undef,\%notiy)){
+               my %d=(step=>'base::workflow::mailsend::waitforspool');
+               my $r=$wf->Store($id,%d);
+            }
+
+
+
+         }
+         ####################################################################
+         $d.="<table width=100%>";
+         $d.="<tr>";
+         $d.="<td>$edt</td>"; 
+         $d.="<td width=1%><input type=submit value=\"".
+             $self->T("add")."\"></td>"; 
+         $d.="</tr>";
+         $d.="</table>";
+      }
       $ia->SetFilter({refid=>\$id,
                       mode=>\'foaddtopic',
                       active=>\'1',
                       parentobj=>\'faq::forumboard'});
-      my @l=$ia->getHashList(qw(user));
-      my $d="<div style=\"padding:5px;\">".
-            "<div style=\"margin-bottom:2px\">".
-            "<b><u>".$self->T("current active subscribers").":</u></b></div>";
+      my @l=$ia->getHashList(qw(user userid));
+      $d.="<div style=\"padding:5px;\">".
+          "<div style=\"margin-bottom:2px\">".
+          "<b><u>".$self->T("current active subscribers").":</u></b></div>";
       foreach my $rec (sort({$a->{user} cmp $b->{user}} @l)){
-         $d.=$rec->{user}."<br>";
+         if ($ismoderator){
+            $d.="<table cellspacing=0 cellpadding=0>".
+                "<tr><td valign=center width=1%>".
+                "<img onclick=removeUser($rec->{userid}) ".
+                "style=\"cursor:pointer;cursor:hand\" ".
+                "src=\"../../base/load/minidelete.gif\"></td>".
+                "<td valign=center>".$rec->{user}."</td></tr></table>";
+         }
+         else{
+            $d.=$rec->{user}."<br>";
+         }
       }
       $d.="</div>";
+      $d.="<input type=hidden name=CurrentIdToEdit value=\"$id\">";
+      $d.="<input type=hidden id=ruserid name=ruserid value=\"\">";
       print $d;
-
+      print $self->HtmlBottom(body=>1,form=>1);
    }
    else{
       print($self->noAccess());

@@ -1270,7 +1270,7 @@ sub getHtmlSelect
 {
    my $self=shift;
    my $name=shift;
-   my $key=shift;
+   my $uniquekey=shift;
    my $fld=shift;
    my %opt=@_;
    my $d;
@@ -1312,7 +1312,18 @@ sub getHtmlSelect
    my $style=join(";",@style);
    $d="<select name=$name style=\"$style\"$autosubmit$multiple$size>";
    my @l;
-   foreach my $rec ($self->getHashList(@{$fld},$key)){
+   my @list;
+   my @selectfields=(@{$fld},$uniquekey);
+   if (defined($opt{fields})){
+      push(@selectfields,@{$opt{fields}});
+   }
+    
+   foreach my $rec ($self->getHashList(@selectfields)){
+      my %lrec;
+      foreach my $k (keys(%$rec)){
+         $lrec{$k}=$rec->{$k};
+      }
+      push(@list,\%lrec);
       my %frec;
       foreach my $k (keys(%$rec)){
          if (grep(/^$k$/,@{$fld})){
@@ -1325,9 +1336,6 @@ sub getHtmlSelect
       }
       push(@l,\%frec);
    }
-
-
-
 
    my %len=();
    foreach my $rec (@l){
@@ -1344,7 +1352,7 @@ sub getHtmlSelect
       }
    }
    foreach my $rec (@l){
-      push(@{$keylist},$rec->{$key});
+      push(@{$keylist},$rec->{$uniquekey});
       my @d=();
       foreach my $f (@{$fld}){
          push(@d,$rec->{$f});
@@ -1352,22 +1360,6 @@ sub getHtmlSelect
       push(@{$vallist},sprintf($format,@d));
    }
 
-
-
-#   $self->SetCurrentView($key,@{$fld});
-#   {
-#      my @l;
-#      my ($rec,$msg)=$self->getFirst();
-#      if (defined($rec)){
-#         do{
-#            push(@l,$rec);
-#            ($rec,$msg)=$self->getNext();
-#         } until(!defined($rec));
-#      }
-#      map({ push(@{$keylist},$_->{$key});
-#            push(@{$vallist},$_->{$fld->[0]});
-#          } sort({$a->{$fld->[0]} cmp $b->{$fld->[0]}} @l));
-#   }
    if (exists($opt{AllowEmpty}) && $opt{AllowEmpty}==1){
       $d.="<option value=\"\"";
       if (grep(/^$/,@selected)){
@@ -1408,7 +1400,87 @@ sub getHtmlSelect
 #printf STDERR ("keylist=%s\n",Dumper($keylist));
 #printf STDERR ("vallist=%s\n",Dumper($vallist));
 
-   return($d,$keylist,$vallist);
+   return($d,$keylist,$vallist,\@list);
+}
+
+sub getHtmlTextDrop
+{
+   my $self=shift;
+   my $name=shift;
+   my $newval=shift;
+   my %p=@_;
+   my %param;
+   my $disp=$p{vjoindisp};
+   if (ref($disp) ne "ARRAY"){
+      $disp=[$disp];
+   }
+   my $filter={$disp->[0]=>'"'.$newval.'"'};
+
+   my $txtinput="<input style=\"width:100%\" ".
+                "type=text name=Formated_$name value=\"$newval\">";
+   if ($newval=~m/^\s*$/){
+      return(undef,undef,$txtinput,undef,undef);
+   }
+
+
+   $self->ResetFilter();
+   if (defined($p{vjoinbase})){
+      $self->SetNamedFilter("BASE",$p{vjoinbase});
+   }
+   if (defined($p{vjoineditbase})){
+      $self->SetNamedFilter("EDITBASE",$p{vjoineditbase});
+   }
+   $self->SetFilter($filter);
+   my $fromquery=Query->Param("Formated_$name");
+   if (defined($fromquery)){
+      $param{Add}=[{key=>$fromquery,val=>$fromquery},
+                   {key=>'',val=>''}];
+      $param{selected}=$fromquery;
+   }
+   if (defined($p{fields})){
+      $param{fields}=$p{fields};
+   }
+   my $key=$disp;
+#=$disp;
+#   if (defined($p{vjoinkey})){
+#      $key=$p{vjoinkey};
+#   }
+   if (ref($key) eq "ARRAY"){
+      $key=$key->[0];
+   }
+   my ($dropbox,$keylist,$vallist,$list)=$self->getHtmlSelect(
+                                                  "Formated_$name",
+                                                  $key,$disp,%param);
+   if ($#{$keylist}<0 && $fromquery ne ""){
+      $filter={$disp->[0]=>'"*'.$fromquery.'*"'};
+      $self->ResetFilter();
+      if (defined($self->{vjoineditbase})){
+         $self->SetNamedFilter("EDITBASE",$self->{vjoineditbase});
+      }
+      $self->SetFilter($filter);
+      ($dropbox,$keylist,$vallist,$list)=$self->getHtmlSelect(
+                                                  "Formated_$name",
+                                                  $key,$disp,%param);
+   }
+#printf STDERR ("fifi keylist=%s filter=%s\n",Dumper($keylist),Dumper($filter));
+#printf STDERR ("fifi disp=%s\n",Dumper($disp));
+#printf STDERR ("fifi vallist=%s\n",Dumper($vallist));
+   if ($#{$keylist}>0){
+      $self->LastMsg(ERROR,"value '%s' is not unique",$newval);
+      return($#{$keylist}+1,$newval,$dropbox,$keylist,$vallist,$list);
+   }
+   if ($#{$keylist}<0 && ((defined($fromquery) && $fromquery ne ""))){
+      if ($p{AllowEmpty}){
+         return(0,undef,$txtinput,undef,undef);
+      }
+      $self->LastMsg(ERROR,"value '%s' not found",$newval);
+      return(undef,undef,$txtinput,undef,undef);
+   }
+   my $txtinput="<input style=\"width:100%\" ".
+                "type=text name=Formated_$name value=\"$vallist->[0]\">";
+
+   return(1,$vallist->[0],$txtinput,$keylist,$vallist,$list);
+   # (resultcount,resultval,htmleditfield,rawkeylist,rawvallist)
 }
 
 sub IdField
