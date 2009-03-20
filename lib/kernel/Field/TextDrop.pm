@@ -60,7 +60,7 @@ sub Validate
    }
    $self->vjoinobj->SetFilter($filter);
    my %param=(AllowEmpty=>$self->AllowEmpty);
-   my $fromquery=Query->Param("Formated_$name");
+   my $fromquery=trim(Query->Param("Formated_$name"));
    if (defined($fromquery)){
       $param{Add}=[{key=>$fromquery,val=>$fromquery}];
       $param{selected}=$fromquery;
