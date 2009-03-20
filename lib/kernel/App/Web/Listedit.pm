@@ -363,8 +363,6 @@ EOF
       $d.=$self->getParsedTemplate($name);
    }
    else{
-      my $newbutton="";
-      $newbutton="new," if ($param{allowNewButton});
       # autogen search template
       my @field=$self->getFieldList();
     
@@ -405,7 +403,24 @@ EOF
          $c++;
       }
       $searchframe.="</tr>" if (!($searchframe=~m/<\/tr>$/));
-      $d.=<<EOF;
+
+      $d.=$self->arrangeSearchData($searchframe,$extframe,$defaultsearch,%param);
+      $self->ParseTemplateVars(\$d);
+   }
+   return($d);
+}
+
+sub arrangeSearchData
+{
+   my $self=shift;
+   my $searchframe=shift;
+   my $extframe=shift;
+   my $defaultsearch=shift;
+   my %param=@_;
+
+   my $newbutton="";
+   $newbutton="new," if ($param{allowNewButton});
+   my $d=<<EOF;
 <img width=450 border=0 height=1 src="../../../public/base/load/empty.gif"><div class=searchframe><table class=searchframe>$searchframe</table></div>
 %StdButtonBar(search,$newbutton,defaults,reset,bookmark,print,extended,upload)%
 <div style="width:100%;
@@ -419,8 +434,6 @@ EOF
 setFocus("$defaultsearch");
 </script>
 EOF
-      $self->ParseTemplateVars(\$d);
-   }
    return($d);
 }
 

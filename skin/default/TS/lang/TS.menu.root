@@ -57,6 +57,7 @@
 'itts.proc'=>{de=>'Prozesssteuerung',en=>'Processcontrol'},
 'itts.proc.ChangeManagement'=>{de=>'Change Management',
                                en=>'Change Management'},
+'itts.appl.prio'=>{de=>'Prio Anwendungen',en=>'prio applications'},
 
 
 
