@@ -327,7 +327,7 @@ sub Format
       return($self->{format}->{$name});
    }
    print STDERR msg(WARN,"XLS: setting format '$name' as 'default'");
-   return($self->Format("default"));
+   return($self->Format($slot,"default"));
 }
 
 
