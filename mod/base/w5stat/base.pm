@@ -485,6 +485,7 @@ sub processRecord
    }
    elsif ($module eq "base::workflow::notfinished"){
       if ($rec->{class} eq "base::workflow::DataIssue" &&
+          $rec->{stateid}!=5 &&
           defined($rec->{responsiblegrp})){
       #   if (ref($rec->{responsiblegrp}) eq "ARRAY"){
             foreach my $resp (@{$rec->{responsiblegrp}}){
