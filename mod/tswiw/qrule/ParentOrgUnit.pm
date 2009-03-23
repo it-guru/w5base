@@ -78,6 +78,7 @@ sub qcheckRecord
             my ($prec,$msg)=$grp->getOnlyFirst(qw(ALL));
             if (!defined($prec)){
                push(@qmsg,"parent unit in WhoIsWho doesn't matches");
+               push(@qmsg,"parent ID in WhoIsWho is: ",$wiwrec->{parentid});
                return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
             }
          }
