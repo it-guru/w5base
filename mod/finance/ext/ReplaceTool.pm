@@ -35,17 +35,41 @@ sub getControlRecord
 {
    my $self=shift;
    my $d=[ 
-           databosscontract=>{
+           databosscustcontract=>{
              replaceoptype=>'base::user',
              dataobj      =>'finance::custcontract',
              target       =>'databoss',
              idfield      =>'databossid'
+           },
+           semcustcontract=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'finance::custcontract',
+             target       =>'sem',
+             idfield      =>'semid'
+           },
+           sem2custcontract=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'finance::custcontract',
+             target       =>'sem2',
+             idfield      =>'sem2id'
            },
            databosscostcenter=>{
              replaceoptype=>'base::user',
              dataobj      =>'finance::costcenter',
              target       =>'databoss',
              idfield      =>'databossid'
+           },
+           delmgrcostcenter=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'finance::costcenter',
+             target       =>'delmgr',
+             idfield      =>'delmgrid'
+           },
+           delmgr2costcenter=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'finance::costcenter',
+             target       =>'delmgr2',
+             idfield      =>'delmgr2id'
            },
          ];
    return($d);
