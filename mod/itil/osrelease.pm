@@ -60,6 +60,12 @@ sub new
                 dataobjattr   =>'osrelease.cistatus'),
 
       new kernel::Field::Text(
+                name          =>'osclass',
+                readonly      =>1,
+                label         =>'Operationsystem class',
+                dataobjattr   =>'osrelease.osclass'),
+                                                   
+      new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
@@ -117,7 +123,7 @@ sub new
    
 
    );
-   $self->setDefaultView(qw(name id cistatus mdate cdate));
+   $self->setDefaultView(qw(name osclass cistatus mdate cdate));
    $self->setWorktable("osrelease");
    $self->{history}=[qw(insert modify delete)];
    $self->{CI_Handling}={uniquename=>"name",
@@ -149,6 +155,29 @@ sub Validate
    if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
       return(0);
    }
+   my $name=effVal($oldrec,$newrec,"name");
+   if ($name=~m/^AIX/i){
+      $newrec->{osclass}="AIX";
+   }
+   elsif ($name=~m/linux/i){
+      $newrec->{osclass}="LINUX";
+   }
+   elsif ($name=~m/^(solaris)/i){
+      $newrec->{osclass}="SOLARIS";
+   }
+   elsif ($name=~m/^(HPUX|HP-UX)/i){
+      $newrec->{osclass}="HPUX";
+   }
+   elsif ($name=~m/^(win)/i){
+      $newrec->{osclass}="WIN";
+   }
+   elsif ($name=~m/^(os\/390|osd|z\/OS)/i){
+      $newrec->{osclass}="MAINFRAME";
+   }
+   else{
+      $newrec->{osclass}="MISC";
+   }
+  
    return(1);
 }
 

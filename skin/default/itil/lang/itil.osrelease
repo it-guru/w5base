@@ -2,3 +2,4 @@
 'fieldgroup.default'=>{de=>'Betriebsystem-Daten',en=>'Operationsystem-Informations'},
 'fieldgroup.source'=>{de=>'Datenquelle',en=>'Datasource'},
 'you are only authorized to add in \'order\' or \'reserved\' state'=>{de=>'Sie sind nur berechtig, im Status \'angefordert\' oder \'reserviert\' Datensätze zu erzeugen'},
+'Operationsystem class'=>{de=>'Betriebssystemklasse'},

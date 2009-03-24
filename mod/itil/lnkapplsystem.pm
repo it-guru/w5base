@@ -105,6 +105,20 @@ sub new
                 vjoinon       =>['osreleaseid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::Select(
+                name          =>'osclass',
+                group         =>'systeminfo',
+                readonly      =>1,
+                translation   =>'itil::system',
+                htmleditwidth =>'40%',
+                readonly      =>1,
+                htmldetail    =>0,
+                label         =>'OS-Class',
+                vjointo       =>'itil::osrelease',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['osreleaseid'=>'id'],
+                vjoindisp     =>'osclass'),
+
       new kernel::Field::Link(
                 name          =>'osreleaseid',
                 label         =>'OSReleaseID',

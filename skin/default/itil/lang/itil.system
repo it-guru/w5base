@@ -47,3 +47,4 @@
 'Asset-Name'=>{de=>'Asset-Name/AssetID',en=>'Asset-Name/AssetID'},
 'CO-Number'=>{de=>'Kostenstelle/CO-Nummer',en=>'CostCenter/CO-Number'},
 'availabel for further use'=>{de=>'verfügbar für den Wiedereinsatz'},
+'OS-Class'=>{de=>'Betriebssystemklasse'},

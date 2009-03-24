@@ -284,6 +284,17 @@ sub new
                 vjoindisp     =>'name'),
 
       new kernel::Field::Select(
+                name          =>'osclass',
+                group         =>'logsys',
+                label         =>'OS-Class',
+                readonly      =>1,
+                htmldetail    =>0,
+                vjointo       =>'itil::osrelease',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['osreleaseid'=>'id'],
+                vjoindisp     =>'osclass'),
+
+      new kernel::Field::Select(
                 name          =>'systemtype',
                 group         =>'logsys',
                 default       =>'standard',
