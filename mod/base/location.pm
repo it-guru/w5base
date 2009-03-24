@@ -432,11 +432,14 @@ sub Normalize
    if (($rec->{location}=~m/^M\xFC[h]{0,1}lheim .*Main$/i) ){
       $rec->{location}="M\xFChlheim am Main";
    }
-   if (($rec->{location}=~m/^frankfurt.*main.*$/i) ){
+   if (($rec->{location}=~m/^frankfurt.*main.*$/i) ||
+       ($rec->{location}=~m/^frankfurt a\.m\.$/i) ||
+       ($rec->{location}=~m/^frankfurt\/m$/i) ||
+       ($rec->{location}=~m/^frankfurt$/i) ){
       $rec->{location}="Frankfurt am Main";
    }
    if (($rec->{location}=~m/^frankfurt.*oder.*$/i) ){
-      $rec->{location}="Frankfurt a.d. Oder";
+      $rec->{location}="Frankfurt/Oder";
    }
    $rec->{country}=trim($rec->{country});
    if (lc($rec->{country}) eq "de"){
