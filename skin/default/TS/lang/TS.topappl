@@ -1,4 +1,4 @@
-'TS::topappl'=>{de=>'Prio Anwendungen',en=>'prio applications'},
+'TS::topappl'=>{de=>'Top Anwendungen',en=>'top applications'},
 'fieldgroup.topagaddinfos'=>{de=>'Top Anwendungs- Zusatzinformationen',en=>'Top Application additional infos'},
 'System locations'=>{de=>'System Standorte'},
 'on call phone number'=>{de=>'Rufbereitschaftsnummer'},
