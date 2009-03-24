@@ -38,7 +38,6 @@ sub ProcessServiceCenterRecord
    my $selfname=shift;
    my $rec=shift;
    my $wf=$self->{wf};
-   my $oldrec=shift;
 
    #msg(DEBUG,"chm=%s",Dumper($rec));
    my ($wfstorerec,$updateto);
@@ -52,7 +51,7 @@ sub ProcessServiceCenterRecord
       ($wfstorerec,$updateto)=$self->mkIncidentStoreRec($rec,$wf,$selfname);
    }
    if (defined($wfstorerec)){
-      if (!defined($updateto)){
+      if (!defined($updateto) || $updateto eq ""){
          # create new
          msg(DEBUG,"PROCESS: try to create new workflow entry");
          if (my $id=$wf->Store(undef,$wfstorerec)){
@@ -62,15 +61,18 @@ sub ProcessServiceCenterRecord
             msg(ERROR,"failed to create workflow");
          }
       }
-      elsif (defined($oldrec)){
+      else{
          msg(DEBUG,"PROCESS: update workflow entry '$updateto'");
          $wf->SetFilter({id=>\$updateto});
          $wf->SetCurrentView(qw(ALL));
          $wf->ForeachFilteredRecord(sub{
             msg(DEBUG,"PROCESS: du update to '$updateto'");
-            $wf->ValidatedUpdateRecord($_,$wfstorerec,{id=>\$oldrec->{id}});
+            $wf->ValidatedUpdateRecord($_,$wfstorerec,{id=>\$updateto});
          });
       }
+   }
+   else{
+      msg(DEBUG,"no wfstorerec created");
    }
 }
 
@@ -248,8 +250,10 @@ sub mkChangeStoreRec
    my $oldclass;
    my %wfrec=(srcsys=>$selfname);
    my $app=$self->getParent();
+   $wf->ResetFilter();
    $wf->SetFilter({srcsys=>\$selfname,srcid=>\$rec->{changenumber}});
    my @oldrec=$wf->getHashList("id","class","stateid","step");
+   msg(DEBUG,"found on oldsearch %s",Dumper(\@oldrec));
    if ($#oldrec==0){
       $updateto=$oldrec[0]->{id};
       $oldclass=$oldrec[0]->{class};

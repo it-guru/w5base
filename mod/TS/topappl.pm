@@ -68,7 +68,7 @@ sub new
                 onRawValue    =>\&calcCleanBSTL),
    );
 
-   $self->setDefaultView(qw(name criticality businessteam 
+   $self->setDefaultView(qw(name criticality servicesupport businessteam 
                             systemlocations systemosclass
                             tsmclearname businessteamtlclearname 
                             oncallphones databoss));
