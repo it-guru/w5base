@@ -119,6 +119,10 @@ sub Init
                       "itil::lnkapplcontact",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.appl.prio",
+                      "TS::topappl",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.system",
                       "AL_TCom::system",
                       defaultacl=>['valid_user']);

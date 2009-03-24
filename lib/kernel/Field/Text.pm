@@ -65,6 +65,13 @@ sub FormatedDetail
       $vjoinconcat="; " if (!defined($vjoinconcat));
       $d=join($vjoinconcat,@$d);
    }
+   if ($mode eq "HtmlV01"){
+      $d=~s/\n/<br>\n/g;
+      if ($self->{htmlnowrap}){
+         $d=~s/[ \t]/&nbsp;/g;
+         $d=~s/-/&minus;/g;
+      }
+   }
    $d.=" ".$self->{unit} if ($d ne "" && $mode eq "HtmlDetail");
    return($d);
 }

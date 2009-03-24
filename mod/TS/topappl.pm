@@ -29,8 +29,114 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
 
-   $self->setDefaultView(qw(name criticality));
+   $self->AddFields(
+      new kernel::Field::Text(
+                name          =>'systemlocations',
+                readonly      =>1,
+                group         =>'topagaddinfos',
+                htmlwidth     =>'200px',
+                htmlnowrap    =>1,
+                vjoinconcat   =>"\n\n",
+                label         =>'System locations',
+                onRawValue    =>\&calcSystemLocations),
+      new kernel::Field::Text(
+                name          =>'tsmclearname',
+                readonly      =>1,
+                depend        =>'tsmid',
+                group         =>'topagaddinfos',
+                htmlwidth     =>'200px',
+                htmlnowrap    =>1,
+                vjoinconcat   =>"\n\n",
+                label         =>'TSM',
+                onRawValue    =>\&calcClearTSM),
+      new kernel::Field::Text(
+                name          =>'businessteamtlclearname',
+                readonly      =>1,
+                depend        =>'businessteambossid',
+                group         =>'topagaddinfos',
+                htmlwidth     =>'200px',
+                htmlnowrap    =>1,
+                vjoinconcat   =>"\n\n",
+                label         =>'Businessteam TL',
+                onRawValue    =>\&calcCleanBSTL),
+   );
+
+   $self->setDefaultView(qw(name criticality businessteam 
+                            systemlocations tsmclearname 
+                            businessteamtlclearname 
+                            oncallphones databoss));
+
    return($self);
+}
+
+sub calcClearTSM
+{
+   my $self=shift;
+   my $current=shift;
+   my $id=$current->{id};
+   my $app=$self->getParent();
+   my $targetfld=$app->getField("tsmid",$current);
+   my $targetid=$targetfld->RawValue($current);
+   $targetid=[$targetid] if (ref($targetid) ne "ARRAY");
+
+   my $u=$app->getPersistentModuleObject("base::user");
+   $u->SetFilter({userid=>$targetid});
+   my %u=();
+   foreach my $urec ($u->getHashList(qw(phonename))){
+      $u{$urec->{phonename}}++;
+   }
+   return([sort(keys(%u))]);
+}
+
+sub calcCleanBSTL
+{
+   my $self=shift;
+   my $current=shift;
+   my $id=$current->{id};
+   my $app=$self->getParent();
+   my $targetfld=$app->getField("businessteambossid",$current);
+   my $targetid=$targetfld->RawValue($current);
+   $targetid=[$targetid] if (ref($targetid) ne "ARRAY");
+
+   my $u=$app->getPersistentModuleObject("base::user");
+printf STDERR ("fifi d=%s\n",Dumper($targetid));
+   $u->SetFilter({userid=>$targetid});
+   my %u=();
+   foreach my $urec ($u->getHashList(qw(phonename))){
+      $u{$urec->{phonename}}++;
+   }
+   return([sort(keys(%u))]);
+}
+
+sub calcSystemLocations
+{
+   my $self=shift;
+   my $current=shift;
+   my $id=$current->{id};
+   my $app=$self->getParent();
+
+   if ($id ne ""){
+      my $lnk=$app->getPersistentModuleObject("itil::lnkapplsystem");
+      $lnk->SetFilter({systemcistatusid=>\'4',applid=>\$id});
+      my %lid=();
+      my %l=();
+      foreach my $sys ($lnk->getHashList(qw(assetlocationid))){
+         if ($sys->{assetlocationid} ne ""){
+            $lid{$sys->{assetlocationid}}++;
+         }
+      }
+      my $loc=$app->getPersistentModuleObject("base::location");
+      $loc->SetFilter({cistatusid=>\'4',id=>[keys(%lid)]});
+      foreach my $locrec ($loc->getHashList(qw(location address1))){
+         my $l=$locrec->{location};
+         $l.="\n" if ($l ne "" && $locrec->{address1} ne "");
+         $l.=$locrec->{address1} if ($locrec->{address1} ne "");
+         $l{$l}++; 
+      }
+
+      return([sort(keys(%l))]);
+   }
+   return(undef);
 }
 
 
@@ -40,14 +146,9 @@ sub isWriteValid
    return(undef);
 }
 
-sub arrangeSearchData
+sub getCustomerControlRecords
 {
    my $self=shift;
-   my $searchframe=shift;
-   my $extframe=shift;
-   my $defaultsearch=shift;
-   my %param=@_;
-   my $d;
    my @customer=(
                  {
                   name=>'tcom',
@@ -75,7 +176,18 @@ sub arrangeSearchData
                   customer=>'DTAG.TSI DTAG.TSI.*'
                  },
                 );
- 
+   return(@customer);
+}
+
+sub arrangeSearchData
+{
+   my $self=shift;
+   my $searchframe=shift;
+   my $extframe=shift;
+   my $defaultsearch=shift;
+   my %param=@_;
+   my $d;
+   my @customer=$self->getCustomerControlRecords();
    $d.="<input type=hidden name=search_customer value=\"NONE\">";
    $d.="<input type=hidden name=search_cistatusid value=\"4\">";
    $d.="<input type=hidden name=search_customerprio value=\"1\">";
@@ -85,7 +197,13 @@ sub arrangeSearchData
           "type=button ".
           "onclick=topSearch(\"$rec->{name}\") value=\"$rec->{label}\">";
    }
-   $d.="<td></tr></table>";
+   $d.="<td>";
+   $d.="<td width=1%>";
+   $d.="<img onclick=DoPrint() style=\"cursor:pointer;cursor:hand\" ".
+       "border=0 src=\"../../base/load/miniprint.gif\">";
+   $d.="</td>";
+   $d.="</tr>";
+   $d.="</table>";
    $d.=<<EOF;
 <script language="JavaScript">
 function topSearch(l)

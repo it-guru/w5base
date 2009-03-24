@@ -341,7 +341,6 @@ package AL_TCom::workflow::diary::loadtxt;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfStep;
-use Data::Dumper;
 @ISA=qw(kernel::WfStep);
 
 sub generateStoredWorkspace
@@ -351,15 +350,10 @@ sub generateStoredWorkspace
    my @steplist=@_;
 
    my $d=<<EOF;
-<tr>
-<td class=fname width=20%>%name(label)%:</td>
-<td class=finput>%name(storedworkspace)%</td>
-</tr>
-<tr>
-<td class=fname colspan=2>
-%detaildescription(label)%:<br>
-%detaildescription(storedworkspace)%</td>
-</tr>
+<tr><td class=fname width=20%>%name(label)%:</td>
+<td class=finput>%name(storedworkspace)%</td></tr>
+<tr><td class=fname colspan=2>
+%detaildescription(label)%:<br>%detaildescription(storedworkspace)%</td></tr>
 EOF
    $d.=$self->getParent->getParent->HtmlPersistentVariables(
             qw(Formated_tcomcodrelevant Formated_tcomcodcomments 
@@ -377,16 +371,10 @@ sub generateWorkspace
 
    my $templ=<<EOF;
 <table border=0 cellspacing=0 cellpadding=0 width=100%>
-<tr>
-<td class=fname width=20%>%name(label)%:</td>
-<td class=finput>%name(detail)%</td>
-</tr>
-<tr>
-<td class=fname colspan=2>
-%detaildescription(label)%:<br>
-%detaildescription(detail)%</td>
-</tr>
-</table>
+<tr><td class=fname width=20%>%name(label)%:</td>
+<td class=finput>%name(detail)%</td></tr>
+<tr><td class=fname colspan=2>%detaildescription(label)%:<br>
+%detaildescription(detail)%</td></tr></table>
 <script language="JavaScript">
 setFocus("Formated_name");
 setEnterSubmit(document.forms[0],"NextStep");

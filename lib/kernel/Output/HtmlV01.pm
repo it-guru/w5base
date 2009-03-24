@@ -441,6 +441,7 @@ sub getStyle
    $d.=$app->getTemplate("css/default.css","base");
    $d.=$app->getTemplate("css/Output.HtmlSubList.css","base");
    $d.=$app->getTemplate("css/Output.HtmlV01.css","base");
+   $d.="\@page { size:landscape }";
    return($d);
 }
 

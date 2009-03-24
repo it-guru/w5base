@@ -48,7 +48,6 @@ sub getDynamicFields
    my $class;
 
 
-   #printf STDERR ("param in getDynamicFields=%s\n",Dumper(\%param));
    #printf STDERR ("Query in getDynamicFields=%s\n",
    #               Dumper(scalar(Query->MultiVars())));
    my $affectedobject;
@@ -364,7 +363,6 @@ package base::workflow::DataIssue::dataload;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfStep;
-use Data::Dumper;
 @ISA=qw(kernel::WfStep);
 
 sub generateWorkspace
@@ -849,7 +847,6 @@ package base::workflow::DataIssue::finish;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfStep;
-use Data::Dumper;
 @ISA=qw(kernel::WfStep);
 
 

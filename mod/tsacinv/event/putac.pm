@@ -70,6 +70,82 @@ sub Init
 # - Beim System muß ein Asset eingetragen sein, das in AssetCenter aktiv ist.
 #
 
+sub getAcGroupByW5BaseGroup
+{
+   my $self=shift;
+   my $grpname=shift;
+   my $app=$self->getParent;
+
+   my $acgrp=$app->getPersistentModuleObject("tsacgroup","tsacinv::group");
+
+   $grpname=~s/^.*\.CSS\.T-Com/CSS.TCOM/i;
+   if ($grpname ne ""){
+      $acgrp->SetFilter({name=>$grpname}); 
+      my ($acgrprec,$msg)=$acgrp->getOnlyFirst(qw(name));
+      if (defined($acgrprec)){
+         return($acgrprec->{name});
+      }
+   }
+   else{
+      return(undef);
+   }
+   return(undef);
+}
+
+sub mkAcFtpRecAsset
+{
+   my $self=shift;
+   my $rec=shift;
+   my %param=@_;
+
+   my $CurrentEventId="Process Asset '$rec->{name}'";
+   if ($rec->{conumber} eq ""){
+      msg(ERROR,$rec->{name}.
+                ": export request without conumber");
+      return(undef);
+   }
+   my $assignment=$self->getAcGroupByW5BaseGroup($rec->{guardianteam});
+   if (!defined($assignment)){
+      msg(ERROR,$rec->{name}.
+                ": no ac coresponding group '$rec->{guardianteam}'");
+      return(undef);
+   }
+
+   my $acrec={
+               Asset=>{
+                    EventID=>$CurrentEventId,
+                    ExternalSystem=>'W5Base',
+                    ExternalID=>$rec->{id},
+                    Security_Unit=>"TS.DE",
+                    Description=>$rec->{comments},
+                    Security_Unit=>"TS.DE",
+                    bDelete=>'0',
+                    Sender_CostCenter=>$rec->{conumber},
+                    AssignmentGroup=>$assignment,
+                    IncidentAG=>$assignment,
+               }
+             };
+   if ($rec->{hwmodel} eq "PROLIANT DL580"){
+      $acrec->{Asset}->{Model_Code}="MGER033852";
+   }
+   else{
+      msg(ERROR,$rec->{name}.
+                ": export request model $rec->{hwmodel} not defined");
+      return(undef);
+   }
+
+   if ($rec->{mandator}=~m/AL T-Com/){
+      $acrec->{Asset}->{SC_Location_ID}="3826.0000.0000";# T-Com Bonn Land
+      $acrec->{Asset}->{CustomerLink}="TS.DE";           # ?
+   }
+   else{
+      msg(ERROR,$rec->{name}.
+                ": export request mandator $rec->{mandator} not defined");
+      return(undef);
+   }
+   return($acrec);
+}
+
 sub AssetModified
 {
    my $self=shift;
@@ -80,7 +156,7 @@ sub AssetModified
    my $acsystem=getModuleObject($self->Config,"tsacinv::system");
    my $acasset=getModuleObject($self->Config,"tsacinv::asset");
 
-   my %filter=(cistatusid=>\'4',assetid=>\'',allowifupdate=>\'0');
+   my %filter=(cistatusid=>\'2',assetid=>\'',allowifupdate=>\'0');
    $self->{DebugMode}=0;
    if ($#assetname!=-1){
       if (grep(/^debug$/i,@assetname)){
@@ -106,36 +182,47 @@ sub AssetModified
    $self->{jobstart}=NowStamp();
    ($fh{asset},       $filename{asset}               )=$self->InitTransfer();
    ($fh{system},      $filename{system}              )=$self->InitTransfer();
-   $asset->SetFilter(\%filter);
+   $asset->SetFilter({cistatusid=>\'2'});
    $asset->SetCurrentView(qw(ALL));
 
    my ($rec,$msg)=$asset->getFirst(unbuffered=>1);
 
+   my $acnew=0;
+   my $acnewback=0;
    if (defined($rec)){
       do{
-         msg(INFO,"dump=%s",Dumper($rec));
          if (1){
-            my $CurrentEventId="Process Asset '$rec->{name}'";
-            my $acftprec={
-                             Asset=>{
-                                EventID=>$CurrentEventId,
-                                ExternalSystem=>'W5Base',
-                                ExternalID=>$rec->{id},
-                                Security_Unit=>"TS.DE",
-                                Description=>$rec->{comments},
-                                bDelete=>'0'
-                             }
-                         };
-printf STDERR ("acftprec=%s\n",Dumper($acftprec));
+            msg(INFO,"now searching externid W5Base/$rec->{id} in ac");
+            $acasset->SetFilter([{srcsys=>\'W5Base',srcid=>$rec->{id}},
+                                 {assetid=>$rec->{name}}]); 
+            my ($acrec,$msg)=$acasset->getOnlyFirst(qw(assetid));
+            if (defined($acrec)){
+               if (lc($acrec->{assetid}) ne lc($rec->{name})){
+                  # transfer erfolgreich - Namensupdate in W5Base durchführen
+                  # cistatus auf verfügbar stellen
+                  $acnewback++;
+               }
+            }
+            else{
+               # asset existiert noch nicht in AC und muß neu angelegt werden
+               my $acftprec=$self->mkAcFtpRecAsset($rec,initial=>1);
+               if (defined($acftprec)){
+                  my $fh=$fh{asset};
+                  print $fh hash2xml($acftprec,{header=>0});
+               printf STDERR ("acftprec=%s\n",Dumper($acftprec));
+                  $acnew++;
+               }
+            }
          }
          
          ($rec,$msg)=$asset->getNext();
       } until(!defined($rec));
    }
+   msg(INFO,"count status: acnew=$acnew acnewback=$acnewback");
    $self->TransferFile($fh{asset},$filename{asset},
                        $ftp,"asset");
    $self->TransferFile($fh{system},$filename{system},
-                       $ftp,"system");
+                       $ftp,"logsys");
 }
 
 

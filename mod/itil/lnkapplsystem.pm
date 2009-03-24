@@ -83,6 +83,15 @@ sub new
                 group         =>'systeminfo',
                 dataobjattr   =>'system.shortdesc'),
 
+      new kernel::Field::TextDrop(
+                name          =>'assetlocation',
+                group         =>'systeminfo',
+                readonly      =>1,
+                label         =>'Asset Location',
+                vjointo       =>'base::location',
+                vjoinon       =>['assetlocationid'=>'id'],
+                vjoindisp     =>'name'),
+
       new kernel::Field::Select(
                 name          =>'osrelease',
                 group         =>'systeminfo',
@@ -357,7 +366,6 @@ sub new
                 label         =>'WEB-Server',
                 dataobjattr   =>'system.is_webserver'),
 
-                                                   
       new kernel::Field::Interface(
                 name          =>'systemcistatusid',
                 label         =>'SystemCiStatusID',
@@ -384,6 +392,11 @@ sub new
                 name          =>'mandatorid',
                 label         =>'MandatorID',
                 dataobjattr   =>'appl.mandator'),
+
+      new kernel::Field::Link(
+                name          =>'assetlocationid',
+                label         =>'AssetLocationID',
+                dataobjattr   =>'asset.location'),
 
       new kernel::Field::DynWebIcon(
                 name          =>'applweblink',
@@ -467,7 +480,9 @@ sub getSqlFrom
    my $from="lnkapplsystem left outer join appl ".
             "on lnkapplsystem.appl=appl.id ".
             "left outer join system ".
-            "on lnkapplsystem.system=system.id";
+            "on lnkapplsystem.system=system.id ".
+            "left outer join asset ".
+            "on system.asset=asset.id";
    return($from);
 }
 

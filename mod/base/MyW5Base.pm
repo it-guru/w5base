@@ -22,7 +22,6 @@ use kernel;
 use kernel::config;
 use kernel::App::Web;
 use kernel::Output;
-use Data::Dumper;
 @ISA    = qw(kernel::App::Web);
 
 sub new
@@ -408,7 +407,7 @@ sub getNews
       my $newscount=0;
       $to->SetCurrentOrder(qw(cdate));
       foreach my $rec ($to->getHashList(qw(name cdate entrycount mdate
-                                           topicicon))){
+                                           topicicon isreaded))){
          my $name=$rec->{name};
          $name=~s/</&lt;/g;
          $name=~s/>/&gt;/g;

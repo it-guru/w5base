@@ -8,6 +8,7 @@
 'electronical FAX-Number'=>{ de=>'elektronisches FAX'},
 'FAX-Number'=>{ de=>'FAX'},
 'Phonenumber'=>{ de=>'Telefonnummer'},
+'Phonename'=>{ de=>'Rufnummernname'},
 'CostCenter'=>{ de=>'Kostenstelle'},
 'Accounting Area'=>{ de=>'Buchungskreis'},
 'Mobile-Phonenumber'=>{ de=>'Handy-Nummer'},

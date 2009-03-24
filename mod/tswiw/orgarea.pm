@@ -153,5 +153,36 @@ sub isWriteValid
    return(undef);
 }
 
+sub getValidWebFunctions
+{
+   my ($self)=@_;
+   return($self->SUPER::getValidWebFunctions(),qw(ImportOrgarea));
+}
+
+
+sub ImportOrgarea
+{
+   my $self=shift;
+
+   my $importname=Query->Param("importname");
+   if (Query->Param("DOIT")){
+     # if ($self->Import({importname=>$importname})){
+     #    Query->Delete("importname");
+     #    $self->LastMsg(OK,"orgarea has been successfuly imported");
+     # }
+      $self->LastMsg(ERROR,"function not implemented at now");
+      Query->Delete("DOIT");
+   }
+
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','work.css',
+                                   'kernel.App.Web.css'],
+                           static=>{importname=>$importname},
+                           body=>1,form=>1,
+                           title=>"WhoIsWho Import");
+   print $self->getParsedTemplate("tmpl/minitool.orgarea.import",{});
+   print $self->HtmlBottom(body=>1,form=>1);
+}
 
 1;

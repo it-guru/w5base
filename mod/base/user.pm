@@ -77,6 +77,36 @@ sub new
                 label         =>'Fullname',
                 dataobjattr   =>'user.fullname'),
 
+      new kernel::Field::Text(
+                name          =>'phonename',
+                htmlwidth     =>'280',
+                group         =>'name',
+                readonly      =>1,
+                searchable    =>0,
+                htmldetail    =>0,
+                depend        =>['surname','givenname',
+                                 'office_phone','office_mobile'],
+                label         =>'Phonename',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $secstate=$self->getParent->getCurrentSecState();
+                   my $d=$current->{surname};
+                   $d.=", " if ($d ne "" && $current->{givenname} ne "");
+                   $d.=$current->{givenname} if ($current->{givenname} ne "");
+                   if ($secstate>1){
+                      $d.="\n" if ($d ne "" && $current->{office_phone} ne "");
+                      if ($current->{office_phone} ne ""){
+                         $d.=$current->{office_phone};
+                      }
+                      $d.="\n" if ($d ne "" && $current->{office_mobile} ne "");
+                      if ($current->{office_mobile} ne ""){
+                         $d.=$current->{office_mobile};
+                      }
+                   }
+                   return($d);
+                }),
+
 
       new kernel::Field::Select(
                 name          =>'usertyp',

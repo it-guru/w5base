@@ -278,3 +278,9 @@ alter table user add office_costcenter varchar(20) default NULL,add key(office_c
 alter table user add office_accarea varchar(20) default NULL,add key(office_accarea);
 alter table user add office_room varchar(20) default NULL;
 alter table user add secstate int(1) default '2';
+alter table grp  add is_org      int(1) default '0';
+alter table grp  add is_line     int(1) default '0';
+alter table grp  add is_depart   int(1) default '0';
+alter table grp  add is_resort   int(1) default '0';
+alter table grp  add is_team     int(1) default '0';
+alter table grp  add is_orggroup int(1) default '0';
