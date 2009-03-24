@@ -3,3 +3,4 @@
 'System locations'=>{de=>'System Standorte'},
 'on call phone number'=>{de=>'Rufbereitschaftsnummer'},
 'Businessteam TL'=>{de=>'Betriebsteamleiter'},
+'Operationsystem class'=>{de=>'Betriebsystemklasse'},

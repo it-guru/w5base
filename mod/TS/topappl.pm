@@ -40,6 +40,13 @@ sub new
                 label         =>'System locations',
                 onRawValue    =>\&calcSystemLocations),
       new kernel::Field::Text(
+                name          =>'systemosclass',
+                readonly      =>1,
+                group         =>'topagaddinfos',
+                htmlwidth     =>'200px',
+                label         =>'Operationsystem class',
+                onRawValue    =>\&calcSystemOSClass),
+      new kernel::Field::Text(
                 name          =>'tsmclearname',
                 readonly      =>1,
                 depend        =>'tsmid',
@@ -62,8 +69,8 @@ sub new
    );
 
    $self->setDefaultView(qw(name criticality businessteam 
-                            systemlocations tsmclearname 
-                            businessteamtlclearname 
+                            systemlocations systemosclass
+                            tsmclearname businessteamtlclearname 
                             oncallphones databoss));
 
    return($self);
@@ -135,6 +142,28 @@ sub calcSystemLocations
       }
 
       return([sort(keys(%l))]);
+   }
+   return(undef);
+}
+
+
+sub calcSystemOSClass
+{
+   my $self=shift;
+   my $current=shift;
+   my $id=$current->{id};
+   my $app=$self->getParent();
+
+   if ($id ne ""){
+      my $lnk=$app->getPersistentModuleObject("itil::lnkapplsystem");
+      $lnk->SetFilter({systemcistatusid=>\'4',applid=>\$id});
+      my %o=();
+      foreach my $sys ($lnk->getHashList(qw(osclass))){
+         if ($sys->{osclass} ne ""){
+            $o{$sys->{osclass}}++;
+         }
+      }
+      return([sort(keys(%o))]);
    }
    return(undef);
 }
