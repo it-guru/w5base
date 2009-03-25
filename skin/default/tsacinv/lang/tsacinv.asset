@@ -1,4 +1,4 @@
-'tsacinv::asset'=>{de=>'AssetCenter phys. Anlage/Gerät',
+'tsacinv::asset'=>{de=>'AssetCenter phys. Anlage/Hardware',
                     en=>'AssetCenter phys. Asset'},
 'fieldgroup.default'=>{de=>'Allgemeine Asset Daten',
                        en=>'common asset informations'},
