@@ -727,3 +727,24 @@ alter table system add is_infrastruct bool default '0', add key(is_infrastruct);
 alter table appl   add secstate  varchar(20) default NULL;
 alter table servicesupport add fullname varchar(128) default NULL;
 alter table osrelease add osclass varchar(20) default NULL,add key(osclass);
+create table lnkapplclust   (
+  id           bigint(20) NOT NULL,
+  appl         bigint(20) NOT NULL,
+  clust        bigint(20) NOT NULL,
+  comments     longtext    default NULL,
+  additional   longtext    default NULL,
+  fraction     double(8,2) default '100.00',
+  createdate   datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate   datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser   bigint(20) default NULL,
+  modifyuser   bigint(20) default NULL,
+  editor       varchar(100) NOT NULL default '',
+  realeditor   varchar(100) NOT NULL default '',
+  srcsys       varchar(10) default 'w5base',
+  srcid        varchar(20) default NULL,
+  srcload      datetime    default NULL,
+  PRIMARY KEY  (id),
+  KEY appl (appl),UNIQUE applcl(appl,clust),
+  KEY clust(clust),
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+);

@@ -352,7 +352,22 @@ sub tieRec
       if (exists($fobj->{dataobjattr}) && exists($rec->{$fobj->{dataobjattr}})){
          $trrec->{$fname}=$rec->{$fobj->{dataobjattr}};
       }
+      if (defined($fobj->{depend})){
+         if (ref($fobj->{depend}) ne "ARRAY"){
+            $fobj->{depend}=[$fobj->{depend}];
+         }
+         foreach my $field (@{$fobj->{depend}}){
+            my $dfobj=$self->getField($field);
+            if (defined($dfobj->{dataobjattr})){
+               $trrec->{$field}=$rec->{$dfobj->{dataobjattr}};
+            }
+         }
+      }
    }
+
+
+
+
    tie(%rec,'kernel::DataObj::LDAP::rec',$self,$trrec,$view);
    return(\%rec);
    return(undef);
@@ -402,6 +417,22 @@ sub getFirst
 
    my @view=$self->getCurrentView();
 
+   foreach my $fullfieldname (@view){
+      my ($container,$fieldname)=(undef,$fullfieldname);
+      if ($fullfieldname=~m/^\S+\.\S+$/){
+         ($container,$fieldname)=split(/\./,$fullfieldname);
+      }
+      my $field=$self->getField($fieldname);
+      if (defined($field->{depend})){
+         if (ref($field->{depend}) ne "ARRAY"){
+            $field->{depend}=[$field->{depend}];
+         }
+         foreach my $field (@{$field->{depend}}){
+            push(@view,$field) if (!grep(/^$field$/,@view));
+         }
+      }
+   }
+
    my @attrview=@view;
    my $idfield=$self->IdField();
    if (defined($idfield)){
@@ -411,6 +442,11 @@ sub getFirst
          push(@attrview,$idname);        # should always
       }                              # be selected
    }
+
+
+
+
+
    #printf STDERR ("fifi --------- %s\n",join(",",@attrview));
    foreach my $field (@attrview){
       my $fobj=$self->getField($field);
@@ -419,6 +455,8 @@ sub getFirst
          push(@attr,$fobj->{dataobjattr});
       }
    }
+
+
    my $ldapfilter=$self->getLdapFilter();
    my ($sth,$mesg)=$self->{LDAP}->execute(filter=>latin1($ldapfilter)->utf8,
                                           base=>$self->getBase,
