@@ -95,7 +95,7 @@ sub doQualityCheck
       return({exitcode=>0,msg=>'ok'});
    }
 
-   my ($rec,$msg)=$dataobj->getFirst(unbuffered=>1);
+   my ($rec,$msg)=$dataobj->getFirst();
    my $time=time();
    if (defined($rec)){
       do{
@@ -108,7 +108,7 @@ sub doQualityCheck
             msg(DEBUG,"no qcok field");
          }
          ($rec,$msg)=$dataobj->getNext();
-         if (time()-$time>3600){ # 1 hours quality check
+         if (time()-$time>3500){ # 1 hours quality check
             last;
          }
       }until(!defined($rec));
