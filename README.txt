@@ -20,17 +20,70 @@ min number of cores               : 1
        libnet-server-perl  libxml-dom-perl libunicode-string-perl \
        libcrypt-des-perl libio-stringy-perl libdate-calc-perl libmime-perl \
        libdatetime-perl libdigest-sha1-perl libset-infinite-perl \
-       libole-storage-lite-perl libnetaddr-ip-perl \
+       libole-storage-lite-perl libnetaddr-ip-perl libarchive-zip-perl \
        libgd-gd2-perl libapache-dbi-perl \
        libapache2-mod-perl2 libapache2-mod-perl2-dev libapache2-mod-perl2-doc \
 
 
  Step6: setup webserver/basic auth for webserv and database enviroment 
  ======
+   Modifing apache envvars
+   -----------------------
    # change /etc/apache2/envvars to
    export APACHE_RUN_GROUP=daemon
    test -s /etc/profile.local   && . /etc/profile.local
-   
+
+   Adding basic auth module to apache
+   ----------------------------------
+   W5Base only needs a apache module, witch provides ...
+
+       "HTTP Basic Authentication"
+
+   ... There are no special requirements from W5Base system self. It is 
+   recommented to use mod_auth_ae. Install Documentation follows soon ...
+   [ this is need to documentation - comming sone ]
+
+
+   Creating MySQL kernel database and service user account in database
+   -------------------------------------------------------------------
+   At first, you should set a root password for your mysql database.
+
+    mysql mysql
+      update user set password=password('XXXXXXX') where user='root';
+      flush privileges;
+
+   This password should be inserted in your ~/.my.cnf (rights to 0600!) 
+   at block [client] like this
+
+     [client]
+     user           = root
+     password       = XXXXXXX
+
+   For the w5base system self, you should NOT use the user root as database
+   account. Create a new user "w5base" in the database:
+
+      INSERT INTO user (Host, User, Password) 
+                  values ('localhost','w5base',password('MyW5BaseDBPass'));
+      update user set Select_priv='Y',         Shutdown_priv='N',
+                      Insert_priv='Y',         Process_priv='Y',
+                      Update_priv='Y',         File_priv='Y',
+                      Delete_priv='Y',         Grant_priv='Y',
+                      Drop_priv='N',           References_priv='N',
+                      Reload_priv='N',         Index_priv='Y',
+                      Alter_priv='Y',          Show_db_priv='Y',
+                      Super_priv='Y',          Create_tmp_table_priv='Y',
+                      Lock_tables_priv='Y',    Execute_priv='Y',
+                      Repl_slave_priv='N',     Repl_client_priv='N',
+                      Create_view_priv='N',    Show_view_priv='Y',
+                      Create_routine_priv='N', Alter_routine_priv='N',
+                      Create_user_priv='N'
+               where user='w5base';
+      flush privileges;
+       
+
+   Create the database:
+
+     mysqladmin create w5base
  
    
  Step4: add some enviroment in /etc/profile.local
@@ -187,8 +240,6 @@ min number of cores               : 1
                cd PDFlib-*[!.tar.gz] && \
                ./configure && \
                make && sudo make install)
-       
-   cl perl-dtp
    (umask 022; cd perl-dtp && \
                perl Makefile.PL && make && sudo make install)
   
