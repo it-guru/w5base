@@ -21,7 +21,7 @@ min number of cores               : 1
        libcrypt-des-perl libio-stringy-perl libdate-calc-perl libmime-perl \
        libdatetime-perl libdigest-sha1-perl libset-infinite-perl \
        libole-storage-lite-perl libnetaddr-ip-perl libarchive-zip-perl \
-       libgd-gd2-perl libapache-dbi-perl \
+       libgd-gd2-perl libapache-dbi-perl libnet-ldap-perl \
        libapache2-mod-perl2 libapache2-mod-perl2-dev libapache2-mod-perl2-doc \
 
 
@@ -229,7 +229,13 @@ min number of cores               : 1
 
     perl -MDBD::Oracle 
 
-   ... should produce no errors.
+   ... should produce no errors. To complete the installation, create
+   /etc/oracle and the needed oracle connection files:
+
+      install -m 2755 -o root -g root -d /etc/oracle
+
+   Do not forget the files tnsnames.ora and sqlnet.ora!
+
  
    Installing DTP Module
    ---------------------
