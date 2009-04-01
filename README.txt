@@ -16,7 +16,7 @@ min number of cores               : 1
  ======
   sudo aptitude install openssh-server openssh-client sudo subversion \
        apache2-mpm-prefork mysql-server mysql-client \
-       make libc6-dev libxml-smart-perl libio-multiplex-perl  \
+       alien make libc6-dev libxml-smart-perl libio-multiplex-perl  \
        libnet-server-perl  libxml-dom-perl libunicode-string-perl \
        libcrypt-des-perl libio-stringy-perl libdate-calc-perl libmime-perl \
        libdatetime-perl libdigest-sha1-perl libset-infinite-perl \
@@ -42,11 +42,29 @@ min number of cores               : 1
    Set W5BASEDEVUSER to your account as witch you want
    to develop or edit in the w5base source. Set W5BASEDEVGROUP in witch
    other developers are. 
+
    # f.e. /etc/profile.local additional variables
-   export W5BASEINSTDIR=/opt/w5base
-   export W5BASEDEVUSER=voglerh
-   export W5BASESRVUSER=w5base
-   export W5BASEDEVGROUP=w5base
+
+     # W5Base
+     export W5BASEINSTDIR=/opt/w5base
+     export W5BASEDEVUSER=voglerh
+     export W5BASESRVUSER=w5base
+     export W5BASEDEVGROUP=w5base
+
+     # DBD::Oracle
+     export ORACLE_HOME=`echo /usr/lib/oracle/10.*/client`
+     export TNS_ADMIN=/etc/oracle
+     export LD_LIBRARY_PATH=${ORACLE_HOME}/lib
+     export NLS_LANG=German_Germany.WE8ISO8859P15
+     export ORA_NLS33=${ORACLE_HOME}/ocommon/nls/admin/data
+
+     # Internet-PROXY
+     export ftp_proxy=http://localhost:3129
+     export http_proxy=http://localhost:3129
+     export FTP_PROXY=${ftp_proxy}
+     export HTTP_PROXY=${http_proxy}
+    
+     
  
    Ensure that /etc/profile.local is sourced from your
    current shell and the default /etc/profile!
@@ -105,6 +123,59 @@ min number of cores               : 1
    (umask 022; tar -xzvf Env-C-*.tar.gz && \
                cd Env-C-*[!.tar.gz] && \
                perl Makefile.PL && make && sudo make install)
+
+   Installing DBD::Oracle
+   ----------------------
+   Installing DBD::Oracle is a litle bit complicated.
+   You have to add the following line (if the are not exists ) 
+   to /etc/apt/sources.list ...
+
+    deb http://ftp.de.debian.org/debian/ lenny main contrib non-free
+    deb-src http://ftp.de.debian.org/debian/ lenny main contrib non-free
+    deb http://oss.oracle.com/debian unstable main non-free
+   
+   ... then run "sudo aptidude update" to load the current depot index
+   files from all depots.
+   After this, you have to download the Oracle Instance Client from ...
+
+    http://www.oracle.com/technology/software/tech/oci/instantclient/
+
+   ... as rpm. You should use "Instant Client for Linux x86" in the
+   rpm "oracle-instantclient-basic-10.2.0.4-1.i386.rpm". In Debian, you
+   couldn't install rpms, soo you have to convert the rpm to an dep
+   package.
+
+    sudo alien oracle-instantclient-basic-10.2.0.4-1.i386.rpm
+
+   After this convert process, you can install oracle instance client
+   like a "normale" debian package.
+
+    sudo dpkg -i ./oracle-instantclient-basic_10.2.0.4-2_i386.deb
+   
+   Now ensure, that your enviroment is refreshed with ...
+
+    . /etc/profile.local
+
+   ... to set ORACLE_HOME in current state. Ensure that only one oracle
+   Version is installed on your system. In not, you maybee have to modify
+   /etc/profile.local!
+
+   Installing DBD::Oracle have to posibilities:
+
+       Variant 1 (recommened):
+       -----------------------
+       
+      
+       Variant 2:
+       ----------
+        sudo bash -l
+        perl -MCPAN -e 'install "DBD::Oracle";'
+
+   Now ...
+
+    perl -MDBD::Oracle 
+
+   ... should produce no errors.
  
  
  Step7: check your installation
