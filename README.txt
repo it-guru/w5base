@@ -21,7 +21,7 @@ min number of cores               : 1
        libcrypt-des-perl libio-stringy-perl libdate-calc-perl libmime-perl \
        libdatetime-perl libdigest-sha1-perl libset-infinite-perl \
        libole-storage-lite-perl libnetaddr-ip-perl \
-       libapache-dbi-perl \
+       libgd-gd2-perl libapache-dbi-perl \
        libapache2-mod-perl2 libapache2-mod-perl2-dev libapache2-mod-perl2-doc \
 
 
@@ -164,6 +164,7 @@ min number of cores               : 1
 
        Variant 1 (recommened):
        -----------------------
+        aptitude install libdbd-oracle-perl
        
       
        Variant 2:
@@ -177,6 +178,20 @@ min number of cores               : 1
 
    ... should produce no errors.
  
+   Installing DTP Module
+   ---------------------
+   cd /usr/src
+   svn co https://perl-dtp.svn.sourceforge.net/svnroot/perl-dtp perl-dtp 
+   (umask 022; cd perl-dtp/dependence && 
+               tar -xzvf PDFlib-Lite-*.tar.gz && \
+               cd PDFlib-*[!.tar.gz] && \
+               ./configure && \
+               make && sudo make install)
+       
+   cl perl-dtp
+   (umask 022; cd perl-dtp && \
+               perl Makefile.PL && make && sudo make install)
+  
  
  Step7: check your installation
  ======
