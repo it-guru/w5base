@@ -25,7 +25,7 @@ min number of cores               : 1
        libapache2-mod-perl2 libapache2-mod-perl2-dev libapache2-mod-perl2-doc \
 
 
- Step6: setup webserver/basic auth for webserv and database enviroment 
+ Step3: setup webserver/basic auth for webserv and database enviroment 
  ======
    Modifing apache envvars
    -----------------------
@@ -127,7 +127,7 @@ min number of cores               : 1
    umask 007  # special for working in team with outer developers
  
  
- Step3: checkout w5base from sourceforge and setup w5base /etc/w5base
+ Step5: checkout w5base from sourceforge and setup w5base /etc/w5base
  ======
    # as development user or user in witch the webserver should run
  
@@ -157,7 +157,7 @@ min number of cores               : 1
    svn co https://w5base.svn.sourceforge.net/svnroot/w5base/HEAD w5base
  
  
- Step5: add special packages from w5base repository
+ Step6: add special packages from w5base repository
  ======
    cd $W5BASEINSTDIR/dependence/mandatory/IPC-Smart
    (umask 022; perl Makefile.PL && make && sudo make install)
@@ -244,7 +244,13 @@ min number of cores               : 1
                perl Makefile.PL && make && sudo make install)
   
  
- Step7: check your installation
+ Step7: modify the apache configuration
+ ======
+ Modify your apache configuration in your way. A sample can be found
+ at $W5BASEINSTDIR/etc/httpd
+
+
+ Step8: check your installation
  ======
  In $W5BASEINSTDIR/sbin you will find a small tool called 
  W5InstallCheck. By calling $W5BASEINSTDIR/sbin/W5InstallCheck you can
