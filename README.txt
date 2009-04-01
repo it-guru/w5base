@@ -180,7 +180,7 @@ min number of cores               : 1
    Installing DBD::Oracle
    ----------------------
    Installing DBD::Oracle is a litle bit complicated.
-   You have to add the following line (if the are not exists ) 
+   You have to add the following line (if they are not exists ) 
    to /etc/apt/sources.list ...
 
     deb http://ftp.de.debian.org/debian/ lenny main contrib non-free
