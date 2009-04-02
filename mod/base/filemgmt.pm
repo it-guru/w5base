@@ -643,7 +643,8 @@ sub isWriteValid
    my $rec=shift;
 #   return(undef) if (!defined($rec));
    return(qw(default)) if (!defined($rec));
-   return(qw(default acl)) if ($self->checkacl($rec,"write"));
+   return(qw(default acl)) if ($self->checkacl($rec,"admin"));
+   return(qw(default)) if ($self->checkacl($rec,"write"));
    return(qw(default acl)) if ($self->IsMemberOf("admin"));
    return(undef);
 }
