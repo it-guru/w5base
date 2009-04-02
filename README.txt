@@ -1,3 +1,11 @@
+Technical description
+=====================
+W5Base is a Application/Database Framework.
+This Framework is basicly build on Apache, Mod_Perl2, MySQL.
+
+
+
+
 Installation on Debian 5.0 (Lenny):
 ===================================
 total diskspace needed (incl. os) : 2GB
@@ -14,14 +22,16 @@ min number of cores               : 1
 
  Step2: add some packages stock debian
  ======
-  sudo aptitude install openssh-server openssh-client sudo subversion \
-       apache2-mpm-prefork mysql-server mysql-client \
+  sudo aptitude install openssh-server openssh-client \
+       sudo subversion less \
+       apache2-mpm-prefork apache2-prefork-dev mysql-server mysql-client \
        alien make libc6-dev libxml-smart-perl libio-multiplex-perl  \
        libnet-server-perl  libxml-dom-perl libunicode-string-perl \
        libcrypt-des-perl libio-stringy-perl libdate-calc-perl libmime-perl \
        libdatetime-perl libdigest-sha1-perl libset-infinite-perl \
        libole-storage-lite-perl libnetaddr-ip-perl libarchive-zip-perl \
-       libgd-gd2-perl libapache-dbi-perl libnet-ldap-perl \
+       libgd-gd2-perl libapache-dbi-perl libsoap-lite-perl \
+       libnet-ldap-perl libnet-ssleay-perl libio-socket-ssl-perl \
        libapache2-mod-perl2 libapache2-mod-perl2-dev libapache2-mod-perl2-doc \
 
 
@@ -40,8 +50,28 @@ min number of cores               : 1
        "HTTP Basic Authentication"
 
    ... There are no special requirements from W5Base system self. It is 
-   recommented to use mod_auth_ae. Install Documentation follows soon ...
-   [ this is need to documentation - comming sone ]
+   recommented to use mod_auth_ae. 
+
+   Installing apache-mod-ae
+   ------------------------
+   mod_auth_ae is a authentification "snapin" for apache and apache2.
+   It allows to call external programms for authentification and the
+   exit code of this external programm will be used as auth result.
+   All auths will be cached, soo only evey max. 15min a call to the
+   external programm will be done.
+   
+     cd /usr/src
+     svn co https://apache-mod-ae.svn.sourceforge.net/svnroot/apache-mod-ae\
+            apache-mod-ae
+     cd apache-mod-ae/src && make clean && make
+     sudo install -m 750 -g root -o root acache /usr/sbin/acache
+     sudo install -m 750 -g root -o root client /usr/sbin/acache-client
+     cd ../contrib
+     tar -xzvf startup.debian5.0.tgz
+     sudo cp -av startup.debian5.0/aetools.conf \
+                 startup.debian5.0/acache.conf /etc
+     sudo cp -av startup.debian5.0/init.d/acache /etc/init.d
+     sudo update-rc.d acache defaults
 
 
    Creating MySQL kernel database and service user account in database
@@ -124,7 +154,7 @@ min number of cores               : 1
    # add add ent of /etc/profile
    test -s /etc/profile.local   && . /etc/profile.local
    test -s /etc/apache2/envvars && . /etc/apache2/envvars
-   umask 007  # special for working in team with outer developers
+   umask 002  # special for working in team with outer developers
  
  
  Step5: checkout w5base from sourceforge and setup w5base /etc/w5base
@@ -140,11 +170,15 @@ min number of cores               : 1
    http-compression = yes
  
    # checkout w5base from sf and setting up /etc/w5base
-   sudo bash -l
+   sudo -i
    groupadd $W5BASEDEVGROUP                               # w5base dev group
-   useradd -d $W5BASEINSTDIR -g $APACHE_RUN_GROUP w5base  # w5base service user
+   useradd -d $W5BASEINSTDIR -g $APACHE_RUN_GROUP $W5BASESRVUSER
    usermod -a -G $APACHE_RUN_GROUP $W5BASEDEVUSER         
    usermod -a -G $W5BASEDEVGROUP $W5BASEDEVUSER
+   install -m 2770 -o $W5BASESRVUSER -g $APACHE_RUN_GROUP \
+           -d /var/opt/w5base
+   install -m 2770 -o $W5BASESRVUSER -g $APACHE_RUN_GROUP \
+           -d /var/opt/w5base/state
    install -m 2750 -o $W5BASESRVUSER -g $APACHE_RUN_GROUP -d /etc/w5base
    echo 'include /etc/w5base/databases.conf' >> /etc/w5base/w5server.conf
    echo 'include /etc/w5base/databases.conf' >> /etc/w5base/w5base.conf
@@ -236,6 +270,18 @@ min number of cores               : 1
 
    Do not forget the files tnsnames.ora and sqlnet.ora!
 
+   Installing ServiceCenter API
+   ----------------------------
+   The ServiceCenter API can remote control Peragren ServiceCenter via
+   Perl. This Modul is very experimental - but it works :-)
+
+      cd /usr/src
+      svn co https://sc-perl-api.svn.sourceforge.net/svnroot/sc-perl-api \
+          sc-perl-api 
+      cd sc-perl-api/ServiceCenter-API
+      perl Makefile.PL && make && sudo make install
+
+
  
    Installing DTP Module
    ---------------------
@@ -265,11 +311,25 @@ min number of cores               : 1
   
 
 
+
 Known Problems on Debian 5.0:
 =============================
  - using Net::LDAP and DBD::Oracle in the same prozess enviroment
    may result in segmentation faults. This problem ist already
    comunicated to the related developers.
+
+
+
+
+Running W5Base and operating hints
+==================================
+- W5Base Web-Frontend needs a running sbin/W5Server . This Prozess-Server
+  can be started in Debug-Mode with "sbin/W5Server -d". Running W5Server
+  in Debug Mode is recomented for developers. 
+
+- if you use mod_auth_ae, you must ensure, that acache process is running
+
+
 
 
 Development:
