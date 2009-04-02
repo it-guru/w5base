@@ -370,8 +370,8 @@ sub mkChangeStoreRec
    my @tcom=();
    push(@tcom,grep(/^CSS\.TCOM$/,keys(%approver)));
    push(@tcom,grep(/^CSS\.TCOM\..*$/,keys(%approver)));
-   push(@tcom,grep(!/^CSS\.TCOM\.APPROVE$/,@tcom));
-   push(@tcom,grep(!/^CSS\.TCOM\.CAB\.APPROVE$/,@tcom));
+   @tcom=grep(!/^CSS\.TCOM\.APPROVE$/,@tcom);
+   @tcom=grep(!/^CSS\.TCOM\.CAB\.APPROVE$/,@tcom);
    if ($#tcom!=-1){
       my $AlApproveCompletly=0;
       my %approved=();
