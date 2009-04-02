@@ -108,9 +108,12 @@ sub doQualityCheck
             msg(DEBUG,"no qcok field");
          }
          ($rec,$msg)=$dataobj->getNext();
-         if (time()-$time>3500){ # 1 hours quality check
+         if (time()-$time>1800){ # 30 min - ein Test wegen des exitcode-fehlers
             last;
          }
+        # if (time()-$time>3500){ # 1 hours quality check
+        #    last;
+        # }
       }until(!defined($rec));
    }
 
