@@ -24,8 +24,10 @@ min number of cores               : 1
  ======
   sudo aptitude install openssh-server openssh-client \
        sudo subversion less \
-       apache2-mpm-prefork apache2-prefork-dev mysql-server mysql-client \
-       alien make libc6-dev libxml-smart-perl libio-multiplex-perl  \
+       apache2-mpm-prefork apache2-prefork-dev \
+       mysql-server mysql-client \
+       alien make libc6-dev \
+       perl-doc libxml-smart-perl libio-multiplex-perl  \
        libnet-server-perl  libxml-dom-perl libunicode-string-perl \
        libcrypt-des-perl libio-stringy-perl libdate-calc-perl libmime-perl \
        libdatetime-perl libdigest-sha1-perl libset-infinite-perl \
@@ -61,17 +63,50 @@ min number of cores               : 1
    external programm will be done.
    
      cd /usr/src
+     #
+     # checkout from repository
+     #
      svn co https://apache-mod-ae.svn.sourceforge.net/svnroot/apache-mod-ae\
             apache-mod-ae
+     #
+     # build acache process server
+     #
      cd apache-mod-ae/src && make clean && make
      sudo install -m 750 -g root -o root acache /usr/sbin/acache
      sudo install -m 750 -g root -o root client /usr/sbin/acache-client
-     cd ../contrib
+     cd ..
+     #
+     # install acache configuration files
+     #
+     cd contrib
      tar -xzvf startup.debian5.0.tgz
      sudo cp -av startup.debian5.0/aetools.conf \
                  startup.debian5.0/acache.conf /etc
      sudo cp -av startup.debian5.0/init.d/acache /etc/init.d
      sudo update-rc.d acache defaults
+     cd ..
+     #
+     # add a default auth script
+     #
+     sudo install -m 0700 -o root -g root -d /usr/share/lib/acache
+     sudo install -m 0500 -o root -g root contrib/authscripts/dummy.sh \
+                                          /usr/share/lib/acache/dummy.sh
+     #
+     # build apache modul
+     #
+     cd ../apache2
+     sudo make clean
+     sudo make
+     #
+     # apache config
+     #
+     # ensure that file /etc/apache2/mods-available/mod_ae contains ...
+     LoadModule ae_auth_module     /usr/lib/apache2/modules/ae_module.so
+
+     # ensure that softlink exists, to enable module
+     cd /etc/apache2/mods-enabled
+     sudo ln -sf /etc/apache2/mods-available/mod_ae mod_auth_ae.load
+     sudo rm auth_basic.load 
 
 
    Creating MySQL kernel database and service user account in database
@@ -98,6 +133,7 @@ min number of cores               : 1
                       Insert_priv='Y',         Process_priv='Y',
                       Update_priv='Y',         File_priv='Y',
                       Delete_priv='Y',         Grant_priv='Y',
+                      Create_priv='Y',
                       Drop_priv='N',           References_priv='N',
                       Reload_priv='N',         Index_priv='Y',
                       Alter_priv='Y',          Show_db_priv='Y',
@@ -173,16 +209,18 @@ min number of cores               : 1
    sudo -i
    groupadd $W5BASEDEVGROUP                               # w5base dev group
    useradd -d $W5BASEINSTDIR -g $APACHE_RUN_GROUP $W5BASESRVUSER
+   usermod -a -G $APACHE_RUN_GROUP $APACHE_RUN_USER
    usermod -a -G $APACHE_RUN_GROUP $W5BASEDEVUSER         
-   usermod -a -G $W5BASEDEVGROUP $W5BASEDEVUSER
+   usermod -a -G $W5BASEDEVGROUP   $W5BASEDEVUSER
    install -m 2770 -o $W5BASESRVUSER -g $APACHE_RUN_GROUP \
            -d /var/opt/w5base
    install -m 2770 -o $W5BASESRVUSER -g $APACHE_RUN_GROUP \
            -d /var/opt/w5base/state
    install -m 2750 -o $W5BASESRVUSER -g $APACHE_RUN_GROUP -d /etc/w5base
-   echo 'include /etc/w5base/databases.conf' >> /etc/w5base/w5server.conf
-   echo 'include /etc/w5base/databases.conf' >> /etc/w5base/w5base.conf
-   echo 'DATAOBJCONNECT[w5base]="dbi:mysql:w5base"' >> /etc/w5base/database.conf
+   umask 022
+   echo 'INCLUDE /etc/w5base/databases.conf'>>/etc/w5base/w5server.conf
+   echo 'INCLUDE /etc/w5base/databases.conf'>>/etc/w5base/w5base.conf
+   echo 'DATAOBJCONNECT[w5base]="dbi:mysql:w5base"'>>/etc/w5base/databases.conf
    echo 'DATAOBJUSER[w5base]="w5base"' >> /etc/w5base/database.conf
    echo 'DATAOBJPASS[w5base]="MyW5BaseDBPass"' >> /etc/w5base/database.conf
    install -m 2770 -o $W5BASEDEVUSER -g $W5BASEDEVGROUP -d $W5BASEINSTDIR
@@ -298,8 +336,31 @@ min number of cores               : 1
  
  Step7: modify the apache configuration
  ======
+ Activate some modules in apache config ...
+   
+   sudo a2enmod proxy 
+   sudo a2enmod rewrite 
+  
  Modify your apache configuration in your way. A sample can be found
  at $W5BASEINSTDIR/etc/httpd
+
+   #
+   # copy default config to /etc/apache2 and include them
+   #
+   sudo cp /opt/w5base/etc/httpd/httpd2.conf /etc/apache2/w5base.conf
+   #
+   # ensure that /etc/apache2/w5base.conf is included in your 
+   # default config at /etc/apache2/sites-available/default in the
+   # default VirtualHost block.
+   # like this ...
+   #
+      ...
+      </Directory>
+      Include /etc/apache2/w5base.conf
+    </VirtualHost>
+    ...
+   #
+   # don't forget to restart apache to activated the config changes!
 
 
  Step8: check your installation
@@ -308,6 +369,7 @@ min number of cores               : 1
  W5InstallCheck. By calling $W5BASEINSTDIR/sbin/W5InstallCheck you can
  verify the integrity of your installation. With this tool most of
  mitakes can be checked.
+
   
 
 
@@ -323,11 +385,21 @@ Known Problems on Debian 5.0:
 
 Running W5Base and operating hints
 ==================================
+- With the documented default configuration, the W5Base Main-Menu is
+  located at http://myservername/w5base/auth/base/menu/root. If there
+  are no changes done in /etc/aetools.conf, the default user is
+  dummy/admin with password acache.
+  To allow the default admin in the W5Base Application, add the param
+  MASTERADMIN="dummy/admin" in /etc/w5base/w5base.conf.
+
 - W5Base Web-Frontend needs a running sbin/W5Server . This Prozess-Server
   can be started in Debug-Mode with "sbin/W5Server -d". Running W5Server
   in Debug Mode is recomented for developers. 
 
-- if you use mod_auth_ae, you must ensure, that acache process is running
+- If you use mod_auth_ae, you must ensure, that acache process is running
+
+- A good debugging command for apache (hard restart) is f.e.:
+  > sudo killall -HUP apache2; sudo tail -f /var/log/apache2/error.log
 
 
 
@@ -338,13 +410,17 @@ Development:
  filesystem layout:
  ------------------
  /etc/w5base                contains all configruation files
- $W5BASEINSTDIR/mod         all modules
- $W5BASEINSTDIR/lib         librarys - this and mod/base is w5base kernel
- $W5BASEINSTDIR/skin        the frontend layout and language files
- $W5BASEINSTDIR/sbin        files needed for admin and W5Server     
  $W5BASEINSTDIR/bin         initial app dir for cgi web interface
+ $W5BASEINSTDIR/sbin        files needed for admin and W5Server     
+ $W5BASEINSTDIR/lib         librarys - this and mod/base is w5base kernel
+ $W5BASEINSTDIR/static      static HTML pages distributed by W5Base code
+ $W5BASEINSTDIR/skin        the frontend layout and language files
+ $W5BASEINSTDIR/mod/MODUL   all modules programmcode directorys
+ $W5BASEINSTDIR/sql/MODUL   module dependes sql scripts for tableversion chk
  $W5BASEINSTDIR/etc/httpd   sample web server config file
  $W5BASEINSTDIR/etc/w5base  default config of w5base application
+ $W5BASEINSTDIR/contrib     sample scripts and contributed programms
+ $W5BASEINSTDIR/dependence  directory to distribute perl modules 
 
  $W5BASEINSTDIR/etc/w5base/default.conf is the config deliverd by the
  W5Base development. In this file als default values for config variables
