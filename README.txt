@@ -1,13 +1,21 @@
-Technical description
-=====================
+Technical overview
+==================
 W5Base is a Application/Database Framework.
 This Framework is basicly build on Apache, Mod_Perl2, MySQL.
 
+W5Base is best used with Debian as server operation system. All
+documentations are related to this linux distribution. Debian is
+used, because most of needed packages are already included in
+this distribution.
+
+Debian documentations can be found at:
+http://www.debian.org/
+http://www.debian.org/releases/stable/installmanual
 
 
 
-Installation on Debian 5.0 (Lenny):
-===================================
+Installation of W5Base on Debian 5.0 (Lenny):
+=============================================
 total diskspace needed (incl. os) : 2GB
 diskspace needed only for w5base  : ca. 100-150MB for the programmcode in /opt
 total os memory recommended       : 512MB (DBD::Oracle needs mutch space!)
@@ -416,8 +424,8 @@ Running W5Base and operating hints
 
 
 
-Development:
-============
+Development overview:
+=====================
 
  filesystem layout:
  ------------------
@@ -437,5 +445,9 @@ Development:
  $W5BASEINSTDIR/etc/w5base/default.conf is the config deliverd by the
  W5Base development. In this file als default values for config variables
  are defined. There is no need to modify these files by W5Base operating!
+
+ All web transactions are started from $W5BASEINSTDIR/bin/app.pl trow
+ the apache rewrite engine. As process server, a W5Server process must
+ be started and accessable.
 
 
