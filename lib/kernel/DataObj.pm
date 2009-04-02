@@ -1246,12 +1246,15 @@ sub ValidatedDeleteRecord
    my $oldrec=shift;
 
    $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
-   my $bak=$self->DeleteRecord($oldrec);
-   $self->LoadSubObjs("ObjectEventHandler","ObjectEventHandler");
-   foreach my $eh (values(%{$self->{ObjectEventHandler}})){
-      $eh->HandleEvent("DeleteRecord",$self->Self,$oldrec,undef);
+   my $bak=undef;
+   if ($self->ValidateDelete($oldrec)){
+      $bak=$self->DeleteRecord($oldrec);
+      $self->LoadSubObjs("ObjectEventHandler","ObjectEventHandler");
+      foreach my $eh (values(%{$self->{ObjectEventHandler}})){
+         $eh->HandleEvent("DeleteRecord",$self->Self,$oldrec,undef);
+      }
+      $self->FinishDelete($oldrec) if ($bak); 
    }
-   $self->FinishDelete($oldrec) if ($bak); 
 
    return($bak);
 }

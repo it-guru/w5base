@@ -190,19 +190,7 @@ sub Validate
          $pobj=getModuleObject($self->Config,$parentobj);
       }
       if (defined($pobj)){
-         $pobj->SetFilter({$pobj->IdField->Name()=>\$newrec->{refid}});
-         my @l=$pobj->getHashList(qw(ALL));
-         if ($#l!=0){
-            $self->LastMsg(ERROR,"invalid '%s' specified",
-                              $self->getField("refid")->Label());
-            return(undef);
-         }
-         my $prec=$l[0];
-         my @grps=$pobj->isWriteValid($prec);
-         if (!grep(/^acls$/,@grps) &&
-             !grep(/^acl$/,@grps) &&
-             !grep(/^ALL$/,@grps)){
-            msg(INFO,"access only for '%s'\n",join(",",@grps));
+         if (!$self->checkParentWriteAccess($pobj,$refid)){
             $self->LastMsg(ERROR,"insufficient access to parent object");
             return(undef);
          }
@@ -218,6 +206,62 @@ sub Validate
    }
    return(1);
 }
+
+sub checkParentWriteAccess
+{
+   my $self=shift;
+   my $pobj=shift;
+   my $refid=shift;
+
+   $pobj->SetFilter({$pobj->IdField->Name()=>\$refid});
+   my @l=$pobj->getHashList(qw(ALL));
+   if ($#l!=0){
+      $self->LastMsg(ERROR,"invalid '%s' specified",
+                        $self->getField("refid")->Label());
+      return(undef);
+   }
+   my $prec=$l[0];
+   my @grps=$pobj->isWriteValid($prec);
+   if (!grep(/^acls$/,@grps) &&
+       !grep(/^acl$/,@grps) &&
+       !grep(/^ALL$/,@grps)){
+      msg(INFO,"access only for '%s'\n",join(",",@grps));
+      return(0);
+   }
+
+   return(1);
+}
+
+sub ValidateDelete
+{
+   my $self=shift;
+   my $rec=shift;
+   my $parentobj=$rec->{aclparentobj};
+   my $refid=$rec->{refid};
+   if ($refid ne ""){
+      my $pobj;
+      if ($parentobj ne ""){
+         $pobj=getModuleObject($self->Config,$parentobj);
+      }
+      if (defined($pobj)){
+         if (!$self->checkParentWriteAccess($pobj,$refid)){
+            $self->LastMsg(ERROR,"insufficient access to parent object");
+            return(undef);
+         }
+         return(1);
+      }
+      else{
+         $self->LastMsg(ERROR,"no parentobj specified");
+         return(undef);
+      }
+   }
+   else{
+      $self->LastMsg(ERROR,"no refid specified");
+      return(undef);
+   }
+   return(0);
+}
+
 
 
 sub isViewValid
