@@ -153,7 +153,7 @@ sub ProcessOp
       my $name=Query->Param("CurrentView");
       my $delcount=0;
       my $module=$app->ViewEditorModuleName();
-      my %flt=(name=>$name,module=>$module);
+      my %flt=(name=>$name,module=>\$module,userid=>\$curruserid);
       $app->{userview}->SetFilter(\%flt);
       $app->{userview}->ForeachFilteredRecord(sub{
          if ($app->{userview}->ValidatedDeleteRecord($_)){
