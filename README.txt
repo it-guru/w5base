@@ -23,7 +23,7 @@ min number of cores               : 1
  Step2: add some packages stock debian
  ======
   sudo aptitude install openssh-server openssh-client \
-       sudo subversion less \
+       sudo subversion less sendmail \
        apache2-mpm-prefork apache2-prefork-dev \
        mysql-server mysql-client \
        alien make libc6-dev \
@@ -215,6 +215,8 @@ min number of cores               : 1
    install -m 2770 -o $W5BASESRVUSER -g $APACHE_RUN_GROUP \
            -d /var/opt/w5base
    install -m 2770 -o $W5BASESRVUSER -g $APACHE_RUN_GROUP \
+           -d /var/log/w5base
+   install -m 2770 -o $W5BASESRVUSER -g $APACHE_RUN_GROUP \
            -d /var/opt/w5base/state
    install -m 2750 -o $W5BASESRVUSER -g $APACHE_RUN_GROUP -d /etc/w5base
    umask 022
@@ -359,7 +361,17 @@ min number of cores               : 1
       Include /etc/apache2/w5base.conf
     </VirtualHost>
     ...
-   #
+
+   Mod_Perl2 works better, if Apache::DBI is loaded, and as mutch as
+   posible modules are preloaded. To configure this, ensure values
+   in /etc/apache2/mods-enabled/perl.conf like this ...
+ 
+   PerlModule Apache::DBI
+   <Perl>
+   $W5V2::INSTDIR="/opt/w5base";
+   require $W5V2::INSTDIR.'/sbin/ApacheStartup.pl';
+   </Perl>
+
    # don't forget to restart apache to activated the config changes!
 
 

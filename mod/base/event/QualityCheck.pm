@@ -91,14 +91,18 @@ sub doQualityCheck
    if (defined($idfieldobj)){
       push(@view,$idfieldobj->Name());
    }
+   msg(DEBUG,"check SetFilterForQualityCheck");
    if (!($dataobj->SetFilterForQualityCheck(@view))){
       return({exitcode=>0,msg=>'ok'});
    }
 
+   msg(DEBUG,"check run sql");
    my ($rec,$msg)=$dataobj->getFirst();
+   msg(DEBUG,"check run sql:OK");
    my $time=time();
    if (defined($rec)){
       do{
+         msg(DEBUG,"check record start");
          my $qcokobj=$dataobj->getField("qcok");
          if (defined($qcokobj)){
             my $qcok=$qcokobj->RawValue($rec); 
@@ -107,6 +111,7 @@ sub doQualityCheck
          else{
             msg(DEBUG,"no qcok field");
          }
+         msg(DEBUG,"check record end");
          ($rec,$msg)=$dataobj->getNext();
          if (time()-$time>1800){ # 30 min - ein Test wegen des exitcode-fehlers
             last;

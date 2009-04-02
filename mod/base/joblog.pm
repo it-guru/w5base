@@ -50,7 +50,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'event',
-                htmlwidth     =>'1%',
+                htmlwidth     =>'200px',
                 label         =>'Event',
                 dataobjattr   =>'joblog.event'),
 

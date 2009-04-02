@@ -715,7 +715,7 @@ EOF
       }
    }
    my $BookmarkName=Query->Param("BookmarkName");
-   my $PostOrder=Query->Param("PostOrder");
+   my $ForceOrder=Query->Param("ForceOrder");
    print(<<EOF);
 <tr><td><iframe class=result id=result 
                 name="Result" src="$welcomeurl"></iframe></td></tr>
@@ -725,7 +725,7 @@ EOF
 <input type=hidden name=FormatAs value="HtmlV01">
 <input type=hidden name=BookmarkName value="$BookmarkName">
 <input type=hidden name=CurrentView value="$CurrentView">
-<input type=hidden name=PostOrder value="$PostOrder">
+<input type=hidden name=ForceOrder value="$ForceOrder">
 EOF
    print $self->HtmlBottom(body=>1,form=>1);
 }
@@ -1872,6 +1872,18 @@ sub Result
       }
 
       my $view=Query->Param("CurrentView");
+
+      if (defined($param{ForceOrder})){
+         $self->setCurrentOrder(split(/\s*,\s*/,$param{ForceOrder}));
+      }
+      else{
+         my $order=Query->Param("ForceOrder");
+         if ($order ne ""){
+            $self->setCurrentOrder(split(/\s*,\s*/,$order));
+         }
+      }
+
+
       my $format=Query->Param("FormatAs");
       msg(INFO,"FormatAs from query: $format");
       if (defined($param{FormatAs})){
@@ -1879,6 +1891,8 @@ sub Result
          $format=$param{FormatAs};
       }
       $format=~s/;-*//;  # this is a hack, to allow enveloped formats
+
+
       if ((!defined($format) || $format eq "")){
          Query->Param("FormatAs"=>"HtmlFormatSelector");
          $self->Limit(1);

@@ -18,7 +18,6 @@ package base::ext::lnkcontact;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::Universal;
 @ISA=qw(kernel::Universal);

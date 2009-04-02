@@ -102,6 +102,7 @@ sub AUTOLOAD {
    my $self=shift;
    my @param=@_;
    my $name = $AUTOLOAD;
+
    my $type=ref($self) or die("$self is not an object ".join(",",$name));
 
    $name =~ s/.*://;   # strip fully-qualified portion

@@ -564,13 +564,25 @@ sub getSelectField     # returns the name/function to place in select
       return($self->{dataobjattr});
    }
    if ($mode eq "order"){
-      my $db=shift;
+      my $ordername=shift;
     
       if (defined($self->{dataobjattr}) && 
           ref($self->{dataobjattr}) ne "ARRAY"){
          my $orderstring=$self->{dataobjattr};
          $orderstring=$self->{name} if ($self->{dataobjattr}=~m/^max\(.*\)$/);
-         $orderstring.=" ".$self->{sqlorder} if (defined($self->{sqlorder}));
+         my $sqlorder="";
+         if (defined($self->{sqlorder})){
+            $sqlorder=$self->{sqlorder};
+         }
+         if ($ordername=~m/^-/){
+            if ($sqlorder eq "desc"){
+               $sqlorder="";
+            }
+            else{
+               $sqlorder="desc";
+            }
+         }
+         $orderstring.=" ".$sqlorder;
          return(undef) if (lc($self->{sqlorder}) eq "none");
          return($orderstring);
       }

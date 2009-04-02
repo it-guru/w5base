@@ -236,10 +236,12 @@ sub getSqlOrder
          return(join(", ",@order));
       }
       else{
-         foreach my $fieldname (@o){
+         foreach my $ofield (@o){
+            my $fieldname=$ofield;
+            $fieldname=~s/^[+-]//;
             my $field=$self->getField($fieldname);
             next if (!defined($field));
-            my $orderstring=$field->getSelectField("order",$self->{DB});
+            my $orderstring=$field->getSelectField("order",$self->{DB},$ofield);
             next if (!defined($orderstring));
             push(@order,$orderstring);
          }

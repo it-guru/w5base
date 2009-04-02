@@ -97,9 +97,6 @@ sub getLinenumber
 sub getFirst
 {
    my $self=shift;
-   if (Query->Param("PostOrder") ne ""){
-      return(undef); # PostOrder technologie isn't implemented at now
-   }
 
    my ($rec,$msg)=$self->getParent->getFirst();
 

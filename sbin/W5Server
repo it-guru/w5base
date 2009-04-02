@@ -71,6 +71,7 @@ sub rpcCallSerialEvent
    my $event=shift;
    my @p=@_;
 
+   my $eventlabel=$event."(".join(",",map({"'".$_."'"} @p)).")";
    if ($self->{EventController}->isEvent($event)){
       my $timeout=$self->{EventController}->getMaxEventTimeout($event);
       return($self->async(sub {
@@ -84,7 +85,7 @@ sub rpcCallSerialEvent
          my $joblog=getModuleObject($self->Config,"base::joblog");
          msg(DEBUG,"joblog=$joblog");
          foreach my $method (@methods){
-            my %jobrec=(name=>$method,event=>$event,pid=>$$);
+            my %jobrec=(name=>$method,event=>$eventlabel,pid=>$$);
             my $jobid=$joblog->ValidatedInsertRecord(\%jobrec);
             msg(DEBUG,"jobid=$jobid");
             my @subbk=$self->{EventController}->ProcessEvent($event,
