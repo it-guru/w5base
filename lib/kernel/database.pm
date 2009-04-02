@@ -59,7 +59,7 @@ sub Connect
    $p{dbuser}=$self->getParent->Config->Param('DATAOBJUSER');
    $p{dbpass}=$self->getParent->Config->Param('DATAOBJPASS');
    $p{dbschema}=$self->getParent->Config->Param('DATAOBJBASE');
-
+   
    foreach my $v (qw(dbconnect dbuser dbpass dbschema)){
       if ((ref($p{$v}) ne "HASH" || !defined($p{$v}->{$dbname})) && 
           $v ne "dbschema"){

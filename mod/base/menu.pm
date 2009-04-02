@@ -404,7 +404,12 @@ sub TableVersionModifications
    $op.="<th width=1%>processed</th>";
    $op.="<th>lines</th>";
    $op.="</tr>\n";
-   foreach my $sqlfile (sort(keys(%c))){
+   my @order=sort({my $A=$a;
+                   my $B=$b;
+                   $A=~tr/[A-Z][a-z]/[a-z][A-Z]/;
+                   $B=~tr/[A-Z][a-z]/[a-z][A-Z]/;
+                   $A cmp $B} keys(%c));
+   foreach my $sqlfile (@order){
       my $style;
       my $rec=$c{$sqlfile};
       my $bk=1;
