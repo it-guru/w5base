@@ -22,10 +22,10 @@ CREATE TABLE grp (
   KEY parentid (parentid),
   KEY name (name,cistatus),key(cistatus)
 );
-insert into grp (grpid,fullname,name) values(2,'support','support');
-insert into grp (grpid,fullname,name) values(1,'admin','admin');
-insert into grp (grpid,fullname,name) values(-1,'valid_user','valid_user');
-insert into grp (grpid,fullname,name) values(-2,'anonymous','anonymous');
+insert into grp (grpid,fullname,name,cistatus) values(2,'support','support',4);
+insert into grp (grpid,fullname,name,cistatus) values(1,'admin','admin',4);
+insert into grp (grpid,fullname,name,cistatus) values(-1,'valid_user','valid_user',4);
+insert into grp (grpid,fullname,name,cistatus) values(-2,'anonymous','anonymous',4);
 CREATE TABLE lnkgrpuser (
   lnkgrpuserid bigint(20) NOT NULL default '0',
   grpid bigint(20) NOT NULL default '0',
