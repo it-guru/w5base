@@ -136,7 +136,9 @@ sub FormatedDetail
          my $val=shift(@options);
          $s.="<option value=\"$key\"";
          my $qkey=quotemeta($key);
-         $s.=" selected" if (grep(/^$qkey$/,@{$d}));
+         my $qval=quotemeta($val);
+         $s.=" selected" if (($qkey ne "" && grep(/^$qkey$/,@{$d})) || 
+                             ($qval ne "" && grep(/^$qval$/,@{$d})));
          $s.=">".$self->getParent->T($self->{transprefix}.$val,
                                      $self->{translation})."</option>";
       }

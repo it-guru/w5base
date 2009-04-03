@@ -482,6 +482,7 @@ sub PrepairCopy
          }
       }
       Query->Delete($self->IdField->Name());
+      Query->Delete("Formated_".$self->IdField->Name());
    }
    else{
       print($self->noAccess());

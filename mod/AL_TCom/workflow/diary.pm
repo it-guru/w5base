@@ -328,6 +328,7 @@ sub InitCopy
    my $appl=$copyinit->{Formated_affectedapplication};
    $copyinit->{WorkflowStep}=[qw(AL_TCom::workflow::diary::loadtxt)];
    $copyinit->{WorkflowClass}=$self->Self();
+
 }
 
 
@@ -357,6 +358,7 @@ sub generateStoredWorkspace
 EOF
    $d.=$self->getParent->getParent->HtmlPersistentVariables(
             qw(Formated_tcomcodrelevant Formated_tcomcodcomments 
+               Formated_tcomcodcause
                Formated_tcomworktime));
 
    return($self->SUPER::generateStoredWorkspace($WfRec,@steplist).$d);
@@ -382,6 +384,7 @@ setEnterSubmit(document.forms[0],"NextStep");
 EOF
    $templ.=$self->getParent->getParent->HtmlPersistentVariables(
             qw(Formated_tcomcodrelevant Formated_tcomcodcomments 
+               Formated_tcomcodcause
                Formated_tcomworktime Formated_affectedapplication));
    return($templ);
 }
