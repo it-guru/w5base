@@ -1,0 +1,3 @@
+'itil::qrule::ApplSSClass'=>{de=>'Prüfung ob eine Service&Support Klasse bei Anwendung eingetragen ist',
+                             en=>'check if ther is a valid service&support class defined on application'},
+'no service and support class defined'=>{de=>'keine Service&Support Klasse definiert'},

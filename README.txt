@@ -16,7 +16,7 @@ http://www.debian.org/releases/stable/installmanual
 
 Installation of W5Base on Debian 5.0 (Lenny):
 =============================================
-total diskspace needed (incl. os) : 2GB
+total diskspace needed (incl. os) : 3GB
 diskspace needed only for w5base  : ca. 100-150MB for the programmcode in /opt
 total os memory recommended       : 512MB (DBD::Oracle needs mutch space!)
 min cpu speed recommended         : 800MHz
