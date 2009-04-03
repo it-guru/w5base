@@ -704,7 +704,7 @@ sub Validate
       $newrec->{name}=$name;
    }
    my $quickpath=trim(effVal($oldrec,$newrec,"quickpath"));
-   $quickpath=~s/[^a-z0-9-\(\)\/;]/_/ig;
+   $quickpath=~s/[^a-z0-9-\(\)\/;\.]/_/ig;
    $newrec->{quickpath}=$quickpath if (exists($newrec->{quickpath}));
    #if ($entrytype==1){
    #   my $sys=$self->getPersistentModuleObject("itil::system");
