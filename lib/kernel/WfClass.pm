@@ -371,12 +371,12 @@ sub Process
 
    my $template;
    my $workarea=<<EOF;
-<table width=100% border=0 cellspacing=0 cellpadding=0>
-<tr>
-<td valign=top>$workspace</td>
-<td width=1% valign=top>$addbuttons</td>
-</tr>
+
+<table id=WorkareaTable width=100% border=0 cellspacing=0 cellpadding=0>
+<tr><td valign=top>$workspace</td>
+<td width=1% valign=top>$addbuttons</td></tr>
 </table>
+
 EOF
    my $LastMsg="";
    if ($self->LastMsg){
