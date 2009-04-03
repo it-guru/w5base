@@ -361,7 +361,6 @@ sub processRec
          $p800->{$cid}->{p800_app_changecount}++;
          $p800->{$cid}->{p800_app_changewt}+=$rec->{headref}->{tcomworktime};
          if ($rec->{tcomcodcause} ne "db.base.base" &&
-             $rec->{tcomcodcause} ne "undef" &&
              $rec->{tcomcodcause} ne "appl.base.base"){
             $p800->{$cid}->{p800_app_changecount_customer}+=1;
             $p800->{$cid}->{p800_app_customerwt}+=
@@ -372,7 +371,6 @@ sub processRec
       }
       if ($rec->{class}=~m/::diary$/ || $rec->{class}=~m/::businesreq$/){
          if ($rec->{tcomcodcause} ne "db.base.base" &&
-             $rec->{tcomcodcause} ne "undef" &&
              $rec->{tcomcodcause} ne "appl.base.base"){
             $p800->{$cid}->{p800_app_specialcount}++;
             $p800->{$cid}->{p800_app_speicalwt}+=
@@ -385,7 +383,6 @@ sub processRec
          $p800->{$cid}->{p800_app_incidentcount}++;
          $p800->{$cid}->{p800_app_incidentwt}+=$rec->{headref}->{tcomworktime};
          if ($rec->{tcomcodcause} ne "db.base.base" &&
-             $rec->{tcomcodcause} ne "undef" &&
              $rec->{tcomcodcause} ne "appl.base.base"){
             $p800->{$cid}->{p800_app_speicalwt}+=
                                    $rec->{headref}->{tcomworktimespecial};
@@ -418,7 +415,6 @@ sub processRecSpecial
          return(undef) if ($mon ne $specialmon);
          msg(DEBUG,"special process %s: report month =%s",$rec->{id},$mon);
          if ($rec->{tcomcodcause} ne "db.base.base" &&
-             $rec->{tcomcodcause} ne "undef" &&
              $rec->{tcomcodcause} ne "appl.base.base"){
             msg(DEBUG,"special process %s: is special",$rec->{id});
             $rec->{headref}->{specialt}=0;
