@@ -370,11 +370,11 @@ sub WinHandleQualityCheck
    my $DetailClose=$self->T("DetailClose","kernel::App::Web::Listedit");
    my $DetailPrint=$self->T("DetailPrint","kernel::App::Web::Listedit");
    $d.=<<EOF;
-<table width=100% height=98% border=0>
+<table width=100% height=100% border=0>
 <tr height=50><td>$handlermask</td></tr>
 <tr>
 <td valign=top>
-<div height=100% id=reslist >
+<div id=reslist class=QualityCheckResultList>
 </div>
 </td>
 </tr>
@@ -516,13 +516,21 @@ function addToResult(ruleid)
    xmlhttp.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
    var r=xmlhttp.send('Mode=process&CurrentIdToEdit='+'$CurrentIdToEdit');
 }
+function resizeOut()
+{
+   var r=document.getElementById("reslist");
+   var h=getViewportHeight(); 
+   r.style.height=(h-140)+"px";  // set height of output fix
+}
 function processCheck()
 {
    var r=document.getElementById("reslist");
+   resizeOut();
    r.innerHTML="";
    addToResult(1);
 }
 addEvent(window,"load",processCheck);
+addEvent(window,"resize",resizeOut);
 
 </script>
 EOF
