@@ -131,11 +131,13 @@ sub new
                 name          =>'sapcompanycode',
                 label         =>'SAP Company Code',
                 group         =>'saprelation',
+                depend        =>['issaprelation'],
                 dataobjattr   =>'servicesupport.sapcompanycode'),
 
       new kernel::Field::Text(
                 name          =>'sapservicename',
                 label         =>'SAP Service name',
+                depend        =>['issaprelation'],
                 group         =>'saprelation',
                 dataobjattr   =>'servicesupport.sapservicename'),
 
