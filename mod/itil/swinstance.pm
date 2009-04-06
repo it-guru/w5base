@@ -370,6 +370,22 @@ sub new
    return($self);
 }
 
+sub isCopyValid
+{
+   my $self=shift;
+
+   return(1);
+}
+
+sub InitCopy
+{
+   my ($self,$copyfrom,$newrec)=@_;
+   delete($newrec->{'Formated_databoss'});
+}
+
+
+
+
 
 sub getRecordImageUrl
 {
