@@ -744,7 +744,7 @@ sub Validate
    }
 
    my $account=trim(effVal($oldrec,$newrec,"account"));
-   if ($account eq "" || !($account=~m/^[a-zA-Z0-9_\.\-]+$/)){
+   if ($account eq "" || !($account=~m/^[a-zA-Z0-9_\.\-\@]+$/)){
       $self->LastMsg(ERROR,
            sprintf($self->T("invalid account '%s' specified"),
                    $account));
