@@ -35,7 +35,7 @@ sub new
 sub getValidWebFunctions
 {
    my ($self)=@_;
-   return(qw(Main));
+   return(qw(Main XML));
 }
 
 sub Main
@@ -92,6 +92,44 @@ EOF
       delete($ENV{HTTP_FORCE_LANGUAGE});
    }
    print("</table>");
+}
+
+sub XML
+{
+   my ($self)=@_;
+
+   print $self->HttpHeader("text/xml");
+   my $droot={root=>{cause=>[]}};
+   my $d=$droot->{root}->{cause};
+
+
+
+   my $t="AL_TCom::lib::workflow";
+   foreach my $cause ($self->tcomcodcause(),"sw.addeff.swbase"){
+      my %rec=(name=>$cause);
+      foreach my $lang (qw(de en)){
+         $ENV{HTTP_FORCE_LANGUAGE}=$lang;
+         $rec{"description_$lang"}=$self->T($cause,$t);
+         my ($smodule)=$cause=~m/^(\S+?)\./;
+         $rec{"servicemodule_$lang"}=$self->T($smodule,$t);
+      }
+#      printf("<td>%s</td>",$self->T($smodule,$t));
+#      my ($styp)=$cause=~m/(\.\S+?\.)/;
+#      printf("<td>%s</td>",$self->T($styp,$t));
+#      my ($scause)=$cause=~m/^\S+\.\S+(\.\S+)$/;
+#      printf("<td>%s</td>",$self->T($scause,$t));
+#      $ENV{HTTP_FORCE_LANGUAGE}="en";
+#      my ($smodule)=$cause=~m/^(\S+?)\./;
+#      printf("<td>%s</td>",$self->T($smodule,$t));
+#      my ($styp)=$cause=~m/(\.\S+?\.)/;
+#      printf("<td>%s</td>",$self->T($styp,$t));
+#      my ($scause)=$cause=~m/^\S+\.\S+(\.\S+)$/;
+#      printf("<td>%s</td>",$self->T($scause,$t));
+#      print("</tr>");
+      delete($ENV{HTTP_FORCE_LANGUAGE});
+      push(@$d,\%rec);
+   }
+   print(hash2xml($droot,{header=>1}));
 }
 
 1;
