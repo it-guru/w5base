@@ -570,6 +570,10 @@ sub preValidate                 # das muß in preValidate behandelt werden,
    my $oldrec=shift;
    my $newrec=shift;
 
+   if (!defined($newrec->{tcomcodcause}) || $newrec->{tcomcodcause} eq ""){
+      $newrec->{tcomcodcause}="undef";
+   }
+
    my $f=defined($newrec->{affectedapplication}) ?
          $newrec->{affectedapplication} : 
          Query->Param("Formated_affectedapplication");
