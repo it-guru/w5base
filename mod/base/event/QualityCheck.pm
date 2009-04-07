@@ -113,12 +113,9 @@ sub doQualityCheck
          }
          msg(DEBUG,"check record end");
          ($rec,$msg)=$dataobj->getNext();
-         if (time()-$time>1800){ # 30 min - ein Test wegen des exitcode-fehlers
+         if (time()-$time>3500){ # 1 hours quality check
             last;
          }
-        # if (time()-$time>3500){ # 1 hours quality check
-        #    last;
-        # }
       }until(!defined($rec));
    }
 
