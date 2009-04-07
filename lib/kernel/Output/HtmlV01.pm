@@ -225,6 +225,7 @@ sub ProcessLine
          $style.="white-space:nowrap;";
          $nowrap=" nowrap";
       }
+      $data=~s/-/&#x2011;/g;
       $l[$self->{fieldkeys}->{$fieldname}]={data=>$data,
                                             fclick=>$fclick,
                                             align=>$align,
