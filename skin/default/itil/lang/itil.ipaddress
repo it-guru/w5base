@@ -23,3 +23,6 @@
 "invalid IPV4 address '\%s'"=>{de=>"ungültige IPV4 IP-Adresse '\%s'"},
 'unknown ip-address format'=>{de=>'unbekanntes IP-Adressformat'},
 'invalid dns name'=>{de=>'ungüliger DNS Name'},
+'Systems location'=>{de=>'Systemstandort'},
+'Applicationnames'=>{de=>'Anwendungsnamen'},
+'fieldgroup.further'=>{de=>'weiterführende Informationen',en=>'further informations'},

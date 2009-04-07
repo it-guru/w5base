@@ -250,6 +250,19 @@ sub new
                 vjoinon       =>['tsmid'=>'userid'],
                 vjoindisp     =>'fullname'),
 
+      new kernel::Field::TextDrop(
+                name          =>'tsmemail',
+                group         =>'applinfo',
+                label         =>'Technical Solution Manager E-Mail',
+                htmlwidth     =>'280px',
+                readonly      =>1,
+                htmldetail    =>0,
+                group         =>'furtherinfos',
+                vjointo       =>'base::user',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['tsmid'=>'userid'],
+                vjoindisp     =>'email'),
+
       new kernel::Field::Link(
                 name          =>'businessteamid',
                 label         =>'Businessteam ID',

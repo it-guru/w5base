@@ -65,6 +65,8 @@ sub new
                 vjoinon       =>['systemid'=>'id'],
                 vjoindisp     =>'name'),
 
+
+
       new kernel::Field::Select(
                 name          =>'network',
                 htmleditwidth =>'190px',
@@ -205,6 +207,36 @@ sub new
                 },
                 dataobjattr   =>'ipaddress.additional'),
 
+      new kernel::Field::TextDrop(
+                name          =>'systemlocation',
+                htmlwidth     =>'280px',
+                group         =>'further',
+                htmldetail    =>0,
+                label         =>'Systems location',
+                vjointo       =>'itil::system',
+                vjoinon       =>['systemid'=>'id'],
+                vjoindisp     =>'location'),
+
+      new kernel::Field::Text(
+                name          =>'applicationnames',
+                label         =>'Applicationnames',
+                group         =>'further',
+                htmldetail    =>0,
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{applcistatusid=>"<=4"}],
+                vjoinon       =>['systemid'=>'systemid'],
+                vjoindisp     =>['appl']),
+
+      new kernel::Field::Text(
+                name          =>'tsmemail',
+                label         =>'TSM E-Mail',
+                group         =>'further',
+                htmldetail    =>0,
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{applcistatusid=>"<=4"}],
+                vjoinon       =>['systemid'=>'systemid'],
+                vjoindisp     =>['tsmemail']),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
@@ -267,6 +299,18 @@ sub new
    $self->setWorktable("ipaddress");
    return($self);
 }
+
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_cistatus"))){
+     Query->Param("search_cistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
+
 
 
 sub Validate
