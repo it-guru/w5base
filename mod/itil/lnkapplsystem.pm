@@ -40,7 +40,7 @@ sub new
                 name          =>'id',
                 label         =>'LinkID',
                 searchable    =>0,
-                dataobjattr   =>'lnkas.id'),
+                dataobjattr   =>'lnkapplsystem.id'),
                                                  
       new kernel::Field::TextDrop(
                 name          =>'appl',
@@ -144,67 +144,67 @@ sub new
                 name          =>'fraction',
                 label         =>'Fraction',
                 htmlwidth     =>'60px',
-                dataobjattr   =>'lnkas.fraction'),
+                dataobjattr   =>'lnkapplsystem.fraction'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
                 searchable    =>0,
                 label         =>'Comments',
-                dataobjattr   =>'lnkas.comments'),
+                dataobjattr   =>'lnkapplsystem.comments'),
 
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
                 label         =>'Creator',
-                dataobjattr   =>'lnkas.createuser'),
+                dataobjattr   =>'lnkapplsystem.createuser'),
                                    
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'source',
                 label         =>'Owner',
-                dataobjattr   =>'lnkas.modifyuser'),
+                dataobjattr   =>'lnkapplsystem.modifyuser'),
                                    
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'lnkas.srcsys'),
+                dataobjattr   =>'lnkapplsystem.srcsys'),
                                                    
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
                 label         =>'Source-Id',
-                dataobjattr   =>'lnkas.srcid'),
+                dataobjattr   =>'lnkapplsystem.srcid'),
                                                    
       new kernel::Field::Date(
                 name          =>'srcload',
                 group         =>'source',
                 label         =>'Last-Load',
-                dataobjattr   =>'lnkas.srcload'),
+                dataobjattr   =>'lnkapplsystem.srcload'),
                                                    
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
                 label         =>'Creation-Date',
-                dataobjattr   =>'lnkas.createdate'),
+                dataobjattr   =>'lnkapplsystem.createdate'),
                                                 
       new kernel::Field::MDate(
                 name          =>'mdate',
                 group         =>'source',
                 label         =>'Modification-Date',
-                dataobjattr   =>'lnkas.modifydate'),
+                dataobjattr   =>'lnkapplsystem.modifydate'),
                                                    
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'source',
                 label         =>'Editor',
-                dataobjattr   =>'lnkas.editor'),
+                dataobjattr   =>'lnkapplsystem.editor'),
                                                   
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 group         =>'source',
                 label         =>'RealEditor',
-                dataobjattr   =>'lnkas.realeditor'),
+                dataobjattr   =>'lnkapplsystem.realeditor'),
 
       new kernel::Field::Mandator(
                 group         =>'applinfo',
@@ -407,13 +407,13 @@ sub new
                 name          =>'applid',
                 htmldetail    =>0,
                 label         =>'W5Base Application ID',
-                dataobjattr   =>'lnkas.appl'),
+                dataobjattr   =>'lnkapplsystem.appl'),
                                                    
       new kernel::Field::Text(
                 name          =>'systemid',
                 htmldetail    =>0,
                 label         =>'W5Base System ID',
-                dataobjattr   =>'lnkas.system'),
+                dataobjattr   =>'lnkapplsystem.system'),
 
       new kernel::Field::Link(
                 name          =>'mandatorid',
@@ -489,7 +489,7 @@ sub new
 
    );
    $self->setDefaultView(qw(appl system systemsystemid fraction cdate));
-   $self->setWorktable("lnkapplsystem as lnkas");
+   $self->setWorktable("lnkapplsystem");
    return($self);
 }
 
@@ -504,10 +504,10 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="lnkapplsystem as lnkas left outer join appl ".
-            "on lnkas.appl=appl.id ".
+   my $from="lnkapplsystem left outer join appl ".
+            "on lnkapplsystem.appl=appl.id ".
             "left outer join system ".
-            "on lnkas.system=system.id ".
+            "on lnkapplsystem.system=system.id ".
             "left outer join asset ".
             "on system.asset=asset.id";
    return($from);
