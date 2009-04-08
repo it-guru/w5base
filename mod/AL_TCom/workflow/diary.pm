@@ -55,8 +55,6 @@ sub new
 
    $self->{history}=[qw(insert modify delete)];
 
-
-
    return($self);
 }
 
@@ -558,7 +556,6 @@ sub nativProcess
    my $WfRec=shift;
    my $actions=shift;
 
-
    return($self->SUPER::nativProcess($action,$h,$WfRec,$actions));
 }
 
@@ -701,6 +698,12 @@ sub Process
       my $newstep=$self->getParent->getStepByShortname('wfclose',$WfRec);
       my $tcomworktime;
       my %p800mod=();
+
+#      if ($WfRec->{tcomcodcause} eq "" ||
+#          $WfRec->{tcomcodcause} eq "undef"){
+#         $self->getParent->LastMsg(ERROR,"no correct P800 cause selection");
+#         return(0);
+#      }
 
       if ($WfRec->{tcomworktime}<10){
          my $fa=$self->getParent->getField("shortactionlog");
