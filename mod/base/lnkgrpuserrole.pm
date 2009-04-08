@@ -97,7 +97,8 @@ sub new
                                  'RBackoffice',
                                  'RTimeManager',
                                  'RAdmin',
-                                 'RDataAdmin'
+                                 'RDataAdmin',
+                                 'W5BaseSupport'
                                 ],
                 dataobjattr   =>'lnkgrpuserrole.role'),
 
