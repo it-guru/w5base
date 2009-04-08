@@ -1,0 +1,2 @@
+'itil::qrule::RBNum'=>{de=>'Überprüfung der Rufbereitschaftsnummer',en=>'check on call service phone number'},
+'missing on call service phone number'=>{de=>'keine Rufbereitschaftsnummer erfasst'},
