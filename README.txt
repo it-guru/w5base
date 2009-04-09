@@ -383,7 +383,18 @@ min number of cores               : 1
    # don't forget to restart apache to activated the config changes!
 
 
- Step8: check your installation
+ Step8: configure W5MailGate
+ ======
+ add the following line to /etc/mail/aliases:
+
+  admin:"/opt/w5base/sbin/W5MailGate -c w5base2 adminrequest>>/tmp/adm.log 2>&1"
+ 
+ You can use alternate mail adreesses - if you want. After the modification
+ don't forgett to call "newaliases"
+
+
+
+ Step9: check your installation
  ======
  In $W5BASEINSTDIR/sbin you will find a small tool called 
  W5InstallCheck. By calling $W5BASEINSTDIR/sbin/W5InstallCheck you can

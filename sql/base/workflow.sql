@@ -176,3 +176,15 @@ CREATE TABLE wfrepjob (
 alter table wfrepjob add cistatus int(2) NOT NULL;
 alter table wfrepjob add timezone varchar(20) NOT NULL;
 alter table wfrepjob add funccode text NOT NULL;
+CREATE TABLE mailreqspool (
+  id          bigint(20) NOT NULL default '0',
+  subject     varchar(255) NOT NULL, mailmode    varchar(128) NOT NULL,
+  fromemail   varchar(255) NOT NULL, usedaccount varchar(128) NOT NULL,
+  md5sechash  char(22) NOT NULL,     userid      bigint(20)   default NULL,
+  textdata    longtext NOT NULL,     wfstate     int(2)       NOT NULL,
+  attadata    blob default NULL,
+  createdate  datetime NOT NULL default '0000-00-00 00:00:00',
+  procdate    datetime default NULL,
+  PRIMARY KEY (id),
+  key(md5sechash),key(createdate)
+);

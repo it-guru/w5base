@@ -1,0 +1,4 @@
+'base::mailreqspool'=>{de=>'E-Mail Workflow Operation Request',
+                       en=>'E-Mail Workflow Operation Request'},
+'From'=>{de=>'Von'},
+'Subject'=>{de=>'Betreff'},

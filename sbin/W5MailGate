@@ -1,0 +1,272 @@
+#!/usr/bin/env perl
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/../mod";
+use RPC::Smart::Client;
+use strict;
+use kernel;
+use kernel::config;
+use kernel::EventController;
+use Getopt::Long;
+use kernel::cgi;
+use MIME::Entity;
+use MIME::Parser;
+use vars qw($opt_v $opt_h $opt_c $configname);
+$0="W5Event ".join(" ",@ARGV);
+exit(1) if (!GetOptions('verbose'=>\$opt_v,
+                        'debug'=>\$opt_v,
+                        'help'=>\$opt_h,
+                        'config=s'=>\$opt_c));
+
+if ($opt_v){
+   $W5V2::Debug=1;
+}
+else{
+   $W5V2::Debug=0;
+}
+
+if ($ENV{REMOTE_USER} eq ""){
+   if ($ENV{USER} ne ""){
+      $ENV{REMOTE_USER}="system/$ENV{USER}";
+   }
+   else{
+      $ENV{REMOTE_USER}="system/unknown";
+   }
+   $ENV{REAL_REMOTE_USER}="system/W5Event";
+}
+
+my $mailmode="adminmail";
+
+if ($ARGV[0] ne ""){
+   $mailmode=$ARGV[0];
+}
+
+
+
+if ($opt_c eq ""){
+   $opt_c="w5server";
+}
+$configname=$opt_c;
+
+my %ClientParam=();
+
+my $curconfig=new kernel::config();
+
+if (!$curconfig->readconfig("$FindBin::Bin/..",$configname)){
+   msg(ERROR,"can't read configfile '%s'",$configname);
+   exit(1);
+}
+{
+   my $port=$curconfig->Param("W5SERVERPORT");
+   $port=4711 if ($port eq "");
+   msg(DEBUG,"W5ServerPort=%s",$port);
+   $ClientParam{'PeerPort'}=$port;
+}
+
+my $MyClient=new RPC::Smart::Client(%ClientParam);
+my $self=new kernel::App(Config=>$curconfig);
+if (!defined($W5V2::Translation{$self})){
+   $W5V2::Translation{$self}={self=>$self,tab=>{}};
+}
+$W5V2::Translation=$W5V2::Translation{$self};
+
+
+if (! defined($MyClient->Connect())){
+   msg(ERROR,"can't connect to server");
+   exit(1);
+}
+#my $res=$MyClient->Call($method,@ARGV);
+#printf("%s",Dumper($res));
+if (!defined($W5V2::W5Server)){
+   my %ClientParam;
+   $ClientParam{'PeerAddr'}=$self->Config->Param("W5SERVERHOST");
+   $ClientParam{'PeerPort'}=$self->Config->Param("W5SERVERPORT");
+   $W5V2::W5Server=new RPC::Smart::Client(%ClientParam);
+   $W5V2::W5Server->Connect();
+   $self->Cache->{W5Server}=$W5V2::W5Server;
+}
+$W5V2::Query=new kernel::cgi({});
+
+chdir("/tmp");
+my $mp=new MIME::Parser();
+my $m=$mp->parse(\*STDIN) or die "parse failed\n";
+if (defined($m)){
+   my $mailhead=$m->head();
+   $mailhead->decode();
+   $mailhead->unfold();
+   my $mailtext;
+   if ($m->mime_type() eq "text/plain"){
+      $mailtext=$m;
+   }
+   else{ 
+      foreach my $part ($m->parts()){
+         if ($part->mime_type() eq "text/plain"){
+            $mailtext=$part;
+            last;
+         }
+         printf STDERR ("fifi part=%s\n",$part->mime_type());
+      }
+   }
+   if (defined($mailtext)){
+      my $fromuserid;
+      my $requestfrom=$mailhead->get("From");
+      my $useremail=$requestfrom;
+      if (my ($e)=$useremail=~m/<(\S+\@\S+)>$/){
+         $useremail=$e;
+      }
+      $useremail=lc($useremail);
+      my $user=getModuleObject($curconfig,"base::user");
+      $user->SetFilter({email=>\$useremail});
+      my ($urec,$msg)=$user->getOnlyFirst(qw(userid accounts lastlang));
+      if (defined($urec)){
+         $fromuserid=$urec->{userid};
+         if (ref($urec->{accounts}) eq "ARRAY"){
+            $ENV{REMOTE_USER}=$urec->{accounts}->[0]->{account};
+         }
+         $ENV{HTTP_ACCEPT_LANGUAGE}=$urec->{lastlang};
+         $ENV{HTTP_ACCEPT_LANGUAGE}="en" if ($urec->{lastlang} eq "");
+      }
+
+      
+      { # setting up from adress
+         my $from=$mailhead->get("To");
+         $from=~s/^\".*\"//;
+         my $myname="W5MailGate";
+         my $sitename=$curconfig->Param("SITENAME");
+         if ($sitename ne ""){
+            $myname="$myname: $sitename";
+         }
+         $from="\"$myname\" $from";
+         $mailtext->head->replace("From",$from);
+      }
+      if ($fromuserid ne ""){
+         my $textdata;
+         my $textdatafull=0;
+         my $md5sechash;
+         if (my $io=$mailtext->bodyhandle->open("r")){
+            while(my $l=$io->getline()){
+               if (!$textdatafull){
+                  foreach my $breaktext ("Mit freundlichen Grüßen",
+                                         "Regards","Gruss","kind regards",
+                                         "--"){
+                     if ($l=~m/^$breaktext\s+$/i){
+                        $textdatafull++;
+                     }
+                  }
+                  if (!$textdatafull){
+                     $textdata.=$l;
+                  } 
+                  $textdatafull++ if (length($textdata)>64000);
+               }
+               if (my ($sec)=$l=~m/RequestSec: #(\S+)#/){
+                  $md5sechash=$sec;
+                  last;
+               }
+            }
+            $textdata=~s/\r\n/\n/g;
+            $io->close();
+         }
+         $mailtext->head->replace("To",$requestfrom);
+         my $ms=getModuleObject($curconfig,"base::mailreqspool");
+         if ($md5sechash ne ""){
+            $ms->SetFilter({fromemail=>$useremail,mailmode=>\$mailmode,
+                            state=>\'6',
+                            md5sechash=>\$md5sechash});
+            my ($rrec,$msg)=$ms->getOnlyFirst(qw(ALL));
+            if (defined($rrec)){
+               my $state=23;
+               my $answer=$rrec->{textdata};
+               if ($ms->Process($rrec,\$answer)){
+                  $mailtext->head->replace("Subject","ACCEPT: ".$rrec->{name});
+                  if (my $io=$mailtext->bodyhandle->open("w")){
+                     $io->print("OK - request has been accepted\n\n--\n");
+                     $io->print($answer);
+                     $io->close();
+                  }
+                  $mailtext->smtpsend();
+                  $state=21;
+               }
+               else{
+                  $mailtext->head->replace("Subject","FAIL: ".
+                                            $mailhead->get("Subject"));
+                  if (my $io=$mailtext->bodyhandle->open("w")){
+                     $io->print(join("\r\n",$self->LastMsg())."\r\n\r\n");
+                     $io->print($answer);
+                     $io->close();
+                  }
+                  $mailtext->smtpsend();
+               }
+               $ms->ValidatedUpdateRecord($rrec,
+                                          {procdate=>NowStamp("en"),
+                                           state=>$state},
+                                          {id=>\$rrec->{id}});
+               exit(0);
+ 
+            }
+            else{
+               $mailtext->head->replace("Subject","REJECT: ".
+                                         $mailhead->get("Subject"));
+               if (my $io=$mailtext->bodyhandle->open("w")){
+                  $io->print("ERROR: invalid RequestSec - request rejected");
+                  $io->close();
+               }
+               msg(INFO,NowStamp().
+                        " reject mail $useremail by invalid RequestSec");
+               $mailtext->smtpsend();
+               exit(0);
+            }
+         }
+         my $reqid=$ms->ValidatedInsertRecord({fromemail=>$useremail,
+                                               state=>'6',
+                                               userid=>$fromuserid,
+                                               name=>$mailhead->get("Subject"),
+                                               textdata=>$textdata,
+                                               account=>$ENV{REMOTE_USER}, 
+                                               mailmode=>$mailmode});
+         if ($reqid ne ""){
+            $ms->SetFilter({id=>\$reqid});
+            my ($rrec,$msg)=$ms->getOnlyFirst(qw(md5sechash));
+            if (defined($rrec)){
+               $md5sechash=$rrec->{md5sechash};
+            }
+         }
+         if ($md5sechash ne ""){
+            $mailtext->head->replace("Subject","VERIFY: ".
+                                      $mailhead->get("Subject"));
+            if (my $io=$mailtext->bodyhandle->open("w")){
+               $io->print("Your request has been recorded. To complete\r\n".
+                          "the request, answer these mail. Do not edit\r\n".
+                          "the RequestSec line!\n\n");
+               $io->print("RequestSec: #".$md5sechash."#\n\n");
+               $io->print("If you did not send these request, please\n".
+                          "ignore these mail.\n\n\n-- \n");
+               $io->print("Your request text:\n\n");
+               $io->print($textdata);
+               $io->close();
+            }
+         }
+     
+         msg(INFO,"mailprozessing from:%s",$mailtext->get("From"));
+         msg(INFO,"mailprozessing to:%s",$mailtext->get("To"));
+         $mailtext->smtpsend();
+         msg(INFO,"ok");
+         exit(0);
+      }
+      else{
+         $mailtext->head->replace("To",$requestfrom);
+         $mailtext->head->replace("Subject","REJECT: ".
+                                            $mailhead->get("Subject"));
+         if (my $io=$mailtext->bodyhandle->open("w")){
+            $io->print("ERROR: you are not known as contact in W5Base");
+            $io->close();
+         }
+         msg(INFO,NowStamp()." reject mail $useremail as unknown user");
+         $mailtext->smtpsend();
+         exit(0);
+      }
+   }
+}
+msg(INFO,"fail");
+exit(-1);
+
+
