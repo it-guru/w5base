@@ -12,6 +12,29 @@ use kernel::cgi;
 use MIME::Entity;
 use MIME::Parser;
 use vars qw($opt_v $opt_h $opt_c $configname);
+
+sub FindMimePart
+{
+   my $part=shift;
+   my $type=shift;
+
+   printf STDERR ("fifi 0 $part\n");
+   if ($part->mime_type() eq $type){
+      return($part);
+   }
+   foreach my $mpart ($part->parts()){
+      printf STDERR ("fifi check %s\n",$mpart->mime_type());
+      if ($mpart->mime_type() eq "multipart/alternative"){
+         my $f=FindMimePart($mpart,$type);
+         return($f) if (defined($f));
+      }
+      if ($mpart->mime_type() eq $type){
+         return($mpart);
+         last;
+      }
+   }
+   return(undef);
+}
 $0="W5Event ".join(" ",@ARGV);
 exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'debug'=>\$opt_v,
@@ -94,19 +117,7 @@ if (defined($m)){
    my $mailhead=$m->head();
    $mailhead->decode();
    $mailhead->unfold();
-   my $mailtext;
-   if ($m->mime_type() eq "text/plain"){
-      $mailtext=$m;
-   }
-   else{ 
-      foreach my $part ($m->parts()){
-         if ($part->mime_type() eq "text/plain"){
-            $mailtext=$part;
-            last;
-         }
-         printf STDERR ("fifi part=%s\n",$part->mime_type());
-      }
-   }
+   my $mailtext=FindMimePart($m,"text/plain");
    if (defined($mailtext)){
       my $fromuserid;
       my $requestfrom=$mailhead->get("From");
@@ -147,8 +158,9 @@ if (defined($m)){
             while(my $l=$io->getline()){
                if (!$textdatafull){
                   foreach my $breaktext ("Mit freundlichen Grüßen",
-                                         "Regards","Gruss","kind regards",
-                                         "--"){
+                          "Regards","Gruss","kind regards",
+                          "______________________________________________",
+                          "--"){
                      if ($l=~m/^$breaktext\s+$/i){
                         $textdatafull++;
                      }
