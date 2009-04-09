@@ -185,6 +185,7 @@ sub new
       new kernel::Field::Date(
                 name          =>'deprend',
                 group         =>'finanz',
+                searchable    =>0,
                 depend        =>'assetid',
                 onRawValue    =>\&CalcDep,
                 label         =>'Deprecation End',
@@ -194,6 +195,7 @@ sub new
                 name          =>'compdeprstart',
                 group         =>'finanz',
                 depend        =>'assetid',
+                searchable    =>0,
                 onRawValue    =>\&CalcDep,
                 label         =>'Component Deprecation Start',
                 timezone      =>'CET'),
@@ -201,6 +203,7 @@ sub new
       new kernel::Field::Date(
                 name          =>'compdeprend',
                 group         =>'finanz',
+                searchable    =>0,
                 depend        =>'assetid',
                 onRawValue    =>\&CalcDep,
                 label         =>'Component Deprecation End',
