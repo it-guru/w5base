@@ -198,6 +198,10 @@ sub getHtmlViewLine
 
    $d.="<tr><td height=1% class=mainblock>\n";
    $d.="<table class=viewlist><tr>\n";
+   my $ro=0;
+   if ($self->Config->Param("W5BaseOperationMode") eq "readonly"){
+      $ro=1;
+   }
    if (defined($curview)){
       for(my $c=0;$c<=$#userviewlist;$c++){
          my $view=$userviewlist[$c];
@@ -208,7 +212,7 @@ sub getHtmlViewLine
              "<div class=viewtab_$state>".
              "<table border=0 width=100% cellpadding=0 cellspacing=0><tr>".
              "<td align=left>";
-         if (!($view=~m/^\*/)){
+         if (!($view=~m/^\*/) && !$ro){
             $d.="<a title=\"".
                 $self->getParent->getParent->T(
                 "modify view or create new views").

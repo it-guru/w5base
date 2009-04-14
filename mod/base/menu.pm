@@ -116,10 +116,13 @@ sub DatabaseLowInit
    my $self=shift;
 
    my ($func,$p)=$self->extractFunctionPath();
-   if ($func eq "root"){
-      if (!$self->TableVersionValidate()){
-         $self->TableVersionChecker();
-         return(0);
+
+   if ($self->Config->Param("W5BaseOperationMode") ne "readonly"){
+      if ($func eq "root"){
+         if (!$self->TableVersionValidate()){
+            $self->TableVersionChecker();
+            return(0);
+         }
       }
    }
    return($self->SUPER::DatabaseLowInit());
@@ -715,7 +718,17 @@ sub menutop
                                    'kernel.App.Web.css'],
                            js=>['toolbox.js'],
                            body=>1,form=>1);
-   print $self->getParsedTemplate("tmpl/menuheader",{static=>{rootpath=>$rootpath}});
+   my $operationmode=$self->Config->Param("W5BaseOperationMode");
+   my $opmode=$operationmode;
+   $opmode="" if ($opmode eq "normal");
+   $opmode="<font color=darkred>$opmode</font>" if ($opmode eq "readonly");
+
+   print $self->getParsedTemplate("tmpl/menuheader",{
+                                   static=>{
+                                       opmode=>$opmode,
+                                       operationmode=>$operationmode,
+                                       rootpath=>$rootpath
+                                   }});
    print $self->HtmlBottom(body=>1,form=>1);
 }
 

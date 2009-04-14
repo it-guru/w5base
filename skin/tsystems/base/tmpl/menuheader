@@ -34,6 +34,10 @@
 <div class="conNavigationHorizontal" id="conNavigation1346">
 
 <div class="navLevel1">
+<div class=OpMode>&nbsp;&nbsp;%opmode%
+</div>
+
+<div class="navLevel1">
 <div class="navItem"><a target=_top href="../menu/root" title="W5Base/Darwin Startseite">Startseite</a>
 </div>
 

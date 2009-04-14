@@ -232,12 +232,15 @@ sub ShowTopic
       print("no access or topic not found");
       return();
    }
-   $to->ValidatedUpdateRecord($torec,{viewcount=>$torec->{viewcount}+1,
-                                      mdate=>$torec->{mdate},
-                                      owner=>$torec->{owner},
-                                      editor=>$torec->{editor},
-                                      realeditor=>$torec->{realeditor}},
-                             {id=>\$torec->{id}});
+
+   if ($self->Config->Param("W5BaseOperationMode") ne "readonly"){
+      $to->ValidatedUpdateRecord($torec,{viewcount=>$torec->{viewcount}+1,
+                                         mdate=>$torec->{mdate},
+                                         owner=>$torec->{owner},
+                                         editor=>$torec->{editor},
+                                         realeditor=>$torec->{realeditor}},
+                                {id=>\$torec->{id}});
+   }
 
    my $bo=$self->getPersistentModuleObject("faq::forumboard");
    $bo->SetFilter({id=>$torec->{forumboard}});
@@ -359,6 +362,9 @@ EOF
    }
    my $answer=$self->T("answer");
    my $send=$self->T("send");
+   if ($self->Config->Param("W5BaseOperationMode") eq "readonly"){
+      $answerok=0;
+   }
    print(<<EOF) if ($answerok);
 <tr>
 <th class=boardgroup colspan=3>$answer:</th></tr>
@@ -437,10 +443,12 @@ EOF
   print $self->HtmlPersistentVariables("AllowClose");
   my $forumtopicread=$self->getPersistentModuleObject("faq::forumtopicread");
   my $now=$self->ExpandTimeExpression('now');
-  $forumtopicread->InsertRecord({forumtopicid=>$torec->{id},
-                                 cdate=>$now,
-                                 clientipaddr=>$ENV{REMOTE_ADDR},
-                                 creatorid=>$self->getCurrentUserId()});
+  if ($self->Config->Param("W5BaseOperationMode") ne "readonly"){
+     $forumtopicread->InsertRecord({forumtopicid=>$torec->{id},
+                                    cdate=>$now,
+                                    clientipaddr=>$ENV{REMOTE_ADDR},
+                                    creatorid=>$self->getCurrentUserId()});
+  }
 }
 
 sub HandleInfoAboSubscribe

@@ -239,14 +239,18 @@ sub InitRequest
          }
          $lang=$self->Lang();
 
-
          $user="anonymous" if ($user eq "");
-         my $cmd="replace delayed into userlogon";
-         $cmd.=" (account,loghour,logondate,logonbrowser,logonip,lang,site)";
-         $cmd.=" values('$user','$now','$now',".
-               "'$ENV{HTTP_USER_AGENT}','$ENV{REMOTE_ADDR}','$lang',".
-               "'$site')";
-         $db->do($cmd); 
+         if ($self->Config->Param("W5BaseOperationMode") eq "readonly"){
+            msg(INFO,"user '$user' logon from '$ENV{REMOTE_ADDR}'");
+         }
+         else{
+            my $cmd="replace delayed into userlogon";
+            $cmd.=" (account,loghour,logondate,logonbrowser,logonip,lang,site)";
+            $cmd.=" values('$user','$now','$now',".
+                  "'$ENV{HTTP_USER_AGENT}','$ENV{REMOTE_ADDR}','$lang',".
+                  "'$site')";
+            $db->do($cmd); 
+         }
       }
    }
    if (!defined($self->Cache->{User}) || 

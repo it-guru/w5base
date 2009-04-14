@@ -151,6 +151,10 @@ sub ProcessLine
    my $currentfieldgroup=Query->Param("CurrentFieldGroupToEdit"); 
    my $currentid=Query->Param("CurrentIdToEdit"); 
    
+   if ($self->Config->Param("W5BaseOperationMode") eq "readonly"){
+      $editgroups=[];
+   }
+
    if ($self->getParent->{NewRecord}){
       $currentfieldgroup="default";
    #   $currentid="[new]";
