@@ -325,7 +325,7 @@ sub ProcessNext
                               name=>\$h->{affectedapplication}});
          my $msg;
          ($applrec,$msg)=$applobj->getOnlyFirst(qw(id tsmid tsm2id 
-                                                         semid sem2id));
+                                                   semid sem2id));
       }
       my ($oldrec,$msg);
       if (defined($applrec)){
