@@ -462,3 +462,28 @@ Development overview:
  be started and accessable.
 
 
+Setting W5Base in READONLY mode
+===============================
+Readonly mode should be used, if you want to access a stand-by mirror
+of mysql. To ensure, that no write operations can be done, you should
+modify the user permissions to:
+
+      update user set Select_priv='Y',         Shutdown_priv='N',
+                      Insert_priv='N',         Process_priv='Y',
+                      Update_priv='N',         File_priv='Y',
+                      Delete_priv='N',         Grant_priv='Y',
+                      Create_priv='N',
+                      Drop_priv='N',           References_priv='N',
+                      Reload_priv='N',         Index_priv='Y',
+                      Alter_priv='N',          Show_db_priv='Y',
+                      Super_priv='N',          Create_tmp_table_priv='N',
+                      Lock_tables_priv='Y',    Execute_priv='Y',
+                      Repl_slave_priv='N',     Repl_client_priv='N',
+                      Create_view_priv='N',    Show_view_priv='Y',
+                      Create_routine_priv='N', Alter_routine_priv='N',
+                      Create_user_priv='N'
+               where user='w5base';
+      flush privileges;
+
+And the change the W5BaseOperationMode to "readonly" in the W5Base config.
+Ensure, that the W5BaseOperationMode is set for W5Server AND Userfrontend!
