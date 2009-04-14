@@ -825,6 +825,9 @@ sub generateWorkspacePages
    if ($WfRec->{stateid}==1){
       $defop="wfactivate";
    }
+   if ($WfRec->{stateid}==16){
+      $defop="wffine";
+   }
    return($defop); 
 }
 
@@ -922,11 +925,23 @@ sub Process
             if ($self->getParent->getParent->Action->StoreRecord(
                 $WfRec->{id},"wfaddnote",
                 {translation=>'base::workflow::request'},$note,$effort)){
+               my $intiatornotify=Query->Param("intiatornotify");
+               if ($intiatornotify ne "" && defined($WfRec->{initiatorid}) &&
+                   $WfRec->{initiatorid} ne ""){
+                  my $user=getModuleObject($self->Config,"base::user");
+                  $user->SetFilter({userid=>\$WfRec->{initiatorid}});
+                  my ($urec,$msg)=$user->getOnlyFirst(qw(email));
+                  if ($urec->{email} ne ""){
+                     $self->sendMail($WfRec,emailtext=>$note,
+                                            emailto=>$urec->{email});
+                  }
+               }
                if ($self->StoreRecord($WfRec,{fwdtarget=>'base::user',
                                               fwdtargetid=>$userid,
                                               fwddebtarget=>undef,
                                               fwddebtargetid=>undef,
                                               stateid=>4})){
+
                   $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
                   $self->PostProcess($action.".".$op,$WfRec,$actions);
                }
