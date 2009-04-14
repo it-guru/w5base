@@ -85,6 +85,12 @@ sub Connect
    }
 
    if (!$self->{'db'}){
+      if ($ENV{ORACLE_HOME} ne ""){
+         msg(ERROR,"env ORACLE_HOME='$ENV{ORACLE_HOME}'");
+      }
+      if ($ENV{NLS_LANG} ne ""){
+         msg(ERROR,"env NLS_LANG='$ENV{NLS_LANG}'");
+      }
       return(undef,msg(ERROR,"Connect(%s): DBI '%s'",$dbname,
                        $self->getErrorMsg()));
    }
