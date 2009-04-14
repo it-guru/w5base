@@ -212,7 +212,7 @@ sub isWriteValid
 
 sub getDetailBlockPriority            # posibility to change the block order
 {
-   return("header","affected","customerdata","init","flow");
+   return("header","default","affected","customerdata","init","flow");
 }
 
 sub getRecordImageUrl
