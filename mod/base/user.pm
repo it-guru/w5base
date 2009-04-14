@@ -18,7 +18,6 @@ package base::user;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
@@ -989,7 +988,20 @@ sub FinishDelete
 sub getValidWebFunctions
 {  
    my ($self)=@_;
-   return($self->SUPER::getValidWebFunctions(), qw(MyDetail SSHPublicKey)); 
+   return($self->SUPER::getValidWebFunctions(), qw(MyDetail SSHPublicKey 
+          AddrBook)); 
+}
+
+sub AddrBook
+{
+   my $self=shift;
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','work.css',
+                                   'kernel.App.Web.css'],
+                           body=>1,form=>1,
+                           title=>$self->T("Address book"));
+   print $self->HtmlBottom(body=>1,form=>1);
 }
 
 sub SSHPublicKey
