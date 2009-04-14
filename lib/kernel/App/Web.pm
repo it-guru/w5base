@@ -1414,7 +1414,9 @@ sub findtemplvar
          AddButton(\$d,"SwitchExt()","Extended");
       }
       if (grep(/^bookmark$/,@param)){
-         AddButton(\$d,"DoBookmark()","Bookmark");
+         if ($self->Config->Param("W5BaseOperationMode") ne "readonly"){
+            AddButton(\$d,"DoBookmark()","Bookmark");
+         }
       }
       if (grep(/^print$/,@param)){
          AddButton(\$d,"DoPrint()","Print");
@@ -1427,9 +1429,11 @@ sub findtemplvar
          AddButton(\$d,"DoResetMask('$msg')","Reset Search");
       }
       if (grep(/^upload$/,@param)){
-         if ($self->can("isUploadValid") && $self->isUploadValid()){
-            if ($self->IsMemberOf(["admin","uploader"])){
-               AddButton(\$d,"DoUpload()","Upload");
+         if ($self->Config->Param("W5BaseOperationMode") ne "readonly"){
+            if ($self->can("isUploadValid") && $self->isUploadValid()){
+               if ($self->IsMemberOf(["admin","uploader"])){
+                  AddButton(\$d,"DoUpload()","Upload");
+               }
             }
          }
       }
