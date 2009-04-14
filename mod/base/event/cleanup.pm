@@ -37,44 +37,57 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("CleanupWorkflows","CleanupWorkflows");
+   $self->RegisterEvent("AutoFinishWorkflows","AutoFinishWorkflows");
    $self->RegisterEvent("CleanupLnkGrpUser","LnkGrpUser");
    return(1);
 }
 
 
 
-sub CleanupWorkflows
+sub AutoFinishWorkflows  
 {
    my $self=shift;
+   my $class=shift;
+   if ($class=~m/^\s*$/ || $class=~m/^\*+$/){
+      msg(ERROR,"no class defined in AutoFinishWorkflows");
+      return({exitcode=>1,msg=>'commandline error'});
+   }
+   if ($class=~m/[,; ]/ && !($class=~m/\*/)){
+      my @class=split(/[,; ]+/,$class);
+      $class=\@class;
+   }
+   my $CleanupWorkflow=shift;
    my $wf=getModuleObject($self->Config,"base::workflow");
-   my $CleanupWorkflow=$self->Config->Param("CleanupWorkflow");
+   my $wfop=$wf->Clone();
+   if ($CleanupWorkflow eq ""){
+      $CleanupWorkflow=$self->Config->Param("AutoFinishWorkflow");
+   }
    $CleanupWorkflow="<now-84d" if ($CleanupWorkflow eq "");
 
 
    foreach my $stateid (qw(16 17 10)){
       $wf->SetFilter({stateid=>\$stateid,
-                      class=>"*::diary",
+                      class=>$class,
                       mdate=>$CleanupWorkflow."+28d"});
       $wf->SetCurrentView(qw(id closedate stateid class));
       $wf->SetCurrentOrder(qw(NONE));
       $wf->Limit(100);
       my $c=0;
       
-      my ($rec,$msg)=$wf->getFirst();
+      my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
       if (defined($rec)){
          do{
             msg(INFO,"process $rec->{id} class=$rec->{class}");
             if (1){
-               if ($wf->Action->StoreRecord($rec->{id},"wfautofinish",
+               if ($wfop->Action->StoreRecord($rec->{id},"wfautofinish",
                    {translation=>'base::workflowaction'},"",undef)){
                   my $closedate=$rec->{closedate};
                   $closedate=NowStamp("en") if ($closedate eq "");
                   #printf STDERR ("info: fifi autoclose wfid=$rec->{id}\n");
                 
-                  $wf->UpdateRecord({stateid=>21,closedate=>$closedate},
-                                    {id=>\$rec->{id}});
-                  $wf->StoreUpdateDelta({id=>$rec->{id},
+                  $wfop->UpdateRecord({stateid=>21,closedate=>$closedate},
+                                      {id=>\$rec->{id}});
+                  $wfop->StoreUpdateDelta({id=>$rec->{id},
                                          stateid=>$rec->{stateid}},
                                         {id=>$rec->{id},
                                          stateid=>21});

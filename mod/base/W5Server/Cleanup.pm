@@ -100,7 +100,7 @@ sub CleanupWorkflows
    my $self=shift;
    my $wf=getModuleObject($self->getParent->Config,"base::workflow");
    my $wfop=getModuleObject($self->getParent->Config,"base::workflow");
-   my $CleanupWorkflow=$self->getParent->Config->Param("CleanupWorkflow");
+   my $CleanupWorkflow=$self->getParent->Config->Param("AutoFinishWorkflow");
    $CleanupWorkflow="<now-84d" if ($CleanupWorkflow eq "");
 
 
