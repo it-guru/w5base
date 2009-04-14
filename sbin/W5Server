@@ -77,6 +77,7 @@ sub rpcCallSerialEvent
       return($self->async(sub {
          $0="W5Server '$event'";
          $self->initAsyncEnv($event,{param=>[@p]},'any');
+         $SIG{CHLD}='DEFAULT';
          $self->{EventController}->setParent($self);
          my @methods=$self->{EventController}->getEventMethods($event);
          msg(DEBUG,"rpcCallSerialEvent: name=$event timeout=$timeout ".
@@ -356,6 +357,7 @@ sub initAsyncEnv
       $SIG{HUP}='DEFAULT';
       $0.=" MONITOR";
       my @e;
+      my $exitstate="unknown";
       my @output;
       my $ppid=POSIX::getppid();
       my $evname="event $label ";
@@ -396,6 +398,11 @@ sub initAsyncEnv
         # else{
         #    sleep(1);
         # }
+        if ((my $sysexitcode=waitpid($ppid,WNOHANG))>0){
+           my $sig=$sysexitcode&8;
+           $exitstate="SIGNAL".$sig;
+           last;
+        }
         last if (!kill(0,$ppid));
       }
       $SIG{INT}='DEFAULT';
@@ -488,7 +495,6 @@ sub initAsyncEnv
          foreach my $m (@{$ipcresult->{handlerresult}}){
             if (defined($m->{jobid}) && $m->{jobid} ne ""){
                my $exitcode;
-               my $exitstate="unknown";
                if (defined($m->{exitcode})){
                   $exitcode=$m->{exitcode};
                   $exitstate="retry" if ($exitcode<0);
@@ -508,7 +514,7 @@ sub initAsyncEnv
                             if (!defined($_->{exitstate}) ||
                                 $_->{exitstate} eq ""){
                                $joblog->ValidatedUpdateRecord($_,
-                                    {exitstate=>'abort'},{id=>\$_->{id}});
+                                    {exitstate=>$exitstate},{id=>\$_->{id}});
                             }
                             });
       msg(DEBUG,"controll process for pid=%d end",$ppid);
