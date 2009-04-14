@@ -13,4 +13,7 @@
 '1'=>{en=>'yes',de=>'ja'},
 '0'=>{en=>'no',de=>'nein'},
 'FView'=>{en=>'true mail view',de=>'Echt Mail-Darstellung'},
+'To'=>{de=>'An'},
+'Subject'=>{de=>'Betreff'},
+'Send message'=>{de=>'Nachricht versenden'},
 
