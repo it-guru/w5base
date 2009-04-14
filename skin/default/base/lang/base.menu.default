@@ -56,6 +56,7 @@
 'Tools.translation'=>{de=>'Übersetzung',en=>'Translation'},
 'Tools.translation.acronym'=>{de=>'Acronym Creator',en=>'Acronym Creator'},
 'sysadm.joblog'=>{de=>'Event Log',en=>'Event Log'},
+'sysadm.mailreqspool'=>{de=>'EMail OPRequests',en=>'EMail OPRequests'},
 'sysadm.useraccount'=>{de=>'Accountverwaltung',en=>'Account-Administration'},
 'sysadm.useraccount.new'=>{de=>'Neueingabe',en=>'New'},
 'sysadm.useraccount.logon'=>{de=>'Benutzeranmeldung',en=>'Userlogon'},

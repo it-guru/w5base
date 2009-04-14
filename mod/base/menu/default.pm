@@ -317,6 +317,10 @@ sub Init
                       "base::joblog",
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("sysadm.mailreqspool",
+                      "base::mailreqspool",
+                      defaultacl=>['admin']);
+   
    $self->RegisterObj('base::workflow::interflow$',
                       "base::workflow",
                       func=>'New',
