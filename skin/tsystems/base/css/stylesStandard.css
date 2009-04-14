@@ -1671,7 +1671,17 @@ table.tableformat--invisiblePadding tr td
 
 .conNavigationHorizontal
 {
-  margin-left:200px;
+ xmargin-left:200px;
+}
+
+.OpMode
+{
+  padding:0px;
+  margin:0px;
+  padding-top:4px;
+  width:200px;
+  float:left;
+  font-weight:bold;
 }
 
 .conNavigationHorizontal .navLevel1
