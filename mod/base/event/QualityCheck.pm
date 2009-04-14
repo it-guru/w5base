@@ -97,7 +97,7 @@ sub doQualityCheck
    }
 
    msg(DEBUG,"check run sql");
-   my ($rec,$msg)=$dataobj->getFirst();
+   my ($rec,$msg)=$dataobj->getFirst(unbuffered=>1);
    msg(DEBUG,"check run sql:OK");
    my $time=time();
    if (defined($rec)){
