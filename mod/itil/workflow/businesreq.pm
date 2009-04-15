@@ -222,6 +222,16 @@ sub getRecordImageUrl
    return("../../../public/itil/load/workflow_appl.jpg?".$cgi->query_string());
 }
 
+sub getPosibleRelations
+{
+   my $self=shift;
+   my $WfRec=shift;
+   return("itil::workflow::businesreq"=>'relchange',
+          ); 
+}
+
+
+
 
 
 

@@ -70,7 +70,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("affected","customerdata","tcomcod","init","flow");
+   return("affected","customerdata","tcomcod","init","flow","relations");
 }
 
 sub getRequestNatureOptions
@@ -101,7 +101,7 @@ sub isWriteValid
    my @grps=$self->SUPER::isWriteValid($rec);
    if (grep(/^init$/,@grps)){
       if ($self->isUserTrusted($rec)){
-         push(@grps,"tcomcod");
+         push(@grps,"tcomcod","relations");
       }
    }
    return(@grps);
@@ -160,9 +160,6 @@ sub isEffortReadAllowed
    return(1) if ($self->isUserTrusted($WfRec));
    return($self->SUPER::isEffortReadAllowed($WfRec));
 }
-
-
-
 
 
 
