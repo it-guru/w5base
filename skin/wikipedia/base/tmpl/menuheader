@@ -7,6 +7,9 @@
 <td style="xbackground:28416f">
 <img id=ecklogo style="top:0px;left:1px;position:absolute" src="../load/ecklogo.jpg">
 </td>
+<td align=right>
+%opmode%&nbsp;&nbsp;
+</td>
 </tr>
 </table>
 <style>
