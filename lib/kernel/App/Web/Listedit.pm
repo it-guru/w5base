@@ -554,7 +554,7 @@ sub DeleteRec
    my $flt=undef;
    if (defined($id)){
       $flt={$self->IdField->Name()=>\$id};
-      $self->SetFilter($flt);
+      $self->SecureSetFilter($flt);
    }
    if (defined($flt)){
       $self->SetCurrentView(qw(ALL));
