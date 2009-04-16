@@ -994,7 +994,7 @@ sub HandleDelete
    my $flt=undef;
    if (defined($id)){
       $flt={$self->IdField->Name()=>\$id};
-      $self->SecureSetFilter($flt);
+      $self->SetFilter($flt);
    }
    if (defined($flt)){
       $self->SetCurrentView(qw(ALL));
