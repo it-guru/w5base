@@ -1357,7 +1357,7 @@ sub isQualityCheckValid
          }
          else{
             if ($self->Self() eq $qrec->{dataobj} ||
-                $self->SelfAsParent eq $qrec->{dataobj}){
+                $self->SelfAsParentObject() eq $qrec->{dataobj}){
                $found++;
                last;
             }
