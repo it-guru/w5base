@@ -77,10 +77,7 @@ sub scchange
      #    printf STDERR ("focus=$focus nowstamp=$nowstamp\n");
      #    exit(1);
 
-
-
-
-         %flt=(sysmodtime=>"\">$focus-10m\"");
+         %flt=(sysmodtime=>"\">$focus-8m\"");
       }
    }
    else{
