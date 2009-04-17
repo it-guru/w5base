@@ -114,11 +114,62 @@ chdir("/tmp");
 my $mp=new MIME::Parser();
 my $m=$mp->parse(\*STDIN) or die "parse failed\n";
 if (defined($m)){
+   my $requestsafe=0;
    my $mailhead=$m->head();
    $mailhead->decode();
    $mailhead->unfold();
    my $mailtext=FindMimePart($m,"text/plain");
    if (defined($mailtext)){
+      if ($mailmode eq "postmaster"){
+         my $isdelerror=0;
+         my $email;
+         my $textdata;
+         if (my $io=$mailtext->bodyhandle->open("r")){
+            while(my $l=$io->getline()){
+               $textdata.=$l;
+               if ($l=~m/Delivery to the following recipients failed./){
+                  $isdelerror++;
+               }
+               if ($isdelerror){
+                  if (my ($e)=$l=~m/(\S+\@\S+)/){
+                     $email=lc($e);
+                  }
+               }
+            }
+            $io->close();
+            if ($isdelerror && defined($email)){ # check on delivery error
+               $ENV{REMOTE_USER}="anonymous";
+               my $ms=getModuleObject($curconfig,"base::mailreqspool");
+               my $useremail=$mailhead->get("From");
+               my $reqid=$ms->ValidatedInsertRecord({
+                                           fromemail=>$useremail,
+                                           state=>'6',
+                                           account=>$ENV{REMOTE_USER},
+                                           name=>$mailhead->get("Subject"),
+                                           textdata=>$textdata,
+                                           mailmode=>$mailmode});
+               if ($reqid ne ""){
+                  $ms->SetFilter({id=>\$reqid});
+                  my ($rrec,$msg)=$ms->getOnlyFirst(qw(md5sechash));
+                  if (defined($rrec)){
+                     if (my $io=$mailtext->bodyhandle->open("w")){
+                        $io->print("RequestSec: #".$rrec->{md5sechash}."#\n");
+                        $io->close();
+                        $requestsafe++;
+                     }
+                  }
+               }
+               printf STDERR ("delerror on $email\n");
+            }
+            else{
+               $mailtext->head->replace("To","admin");
+               $mailtext->head->replace("Subject","POSTMASTER: ".
+                                                  $mailhead->get("Subject"));
+               $mailtext->head->replace("From",$mailhead->get("From"));
+               $mailtext->smtpsend();
+            }
+         }
+      }
       my $fromuserid;
       my $requestfrom=$mailhead->get("From");
       my $useremail=$requestfrom;
@@ -150,7 +201,7 @@ if (defined($m)){
          $from="\"$myname\" $from";
          $mailtext->head->replace("From",$from);
       }
-      if ($fromuserid ne ""){
+      if ($fromuserid ne "" || $requestsafe){
          my $textdata;
          my $textdatafull=0;
          my $md5sechash;
