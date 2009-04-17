@@ -40,6 +40,13 @@ sub new
                 label         =>'System locations',
                 onRawValue    =>\&calcSystemLocations),
       new kernel::Field::Text(
+                name          =>'customerapplname',
+                readonly      =>1,
+                group         =>'topagaddinfos',
+                htmlwidth     =>'200px',
+                label         =>'Customer Application name',
+                onRawValue    =>\&calcCustApplName),
+      new kernel::Field::Text(
                 name          =>'systemosclass',
                 readonly      =>1,
                 group         =>'topagaddinfos',
@@ -68,7 +75,8 @@ sub new
                 onRawValue    =>\&calcCleanBSTL),
    );
 
-   $self->setDefaultView(qw(name criticality servicesupport businessteam 
+   $self->setDefaultView(qw(name customerapplname 
+                            criticality servicesupport businessteam 
                             systemlocations systemosclass
                             tsmclearname businessteamtlclearname 
                             oncallphones databoss));
@@ -95,6 +103,22 @@ sub calcClearTSM
    return([sort(keys(%u))]);
 }
 
+sub calcCustApplName
+{
+   my $self=shift;
+   my $current=shift;
+   my $id=$current->{id};
+   my $app=$self->getParent();
+
+   my $ca=$app->getPersistentModuleObject("TCOM::custappl");
+   $ca->SetFilter({id=>\$id});
+   my ($carec)=$ca->getOnlyFirst(qw(custname));
+   if (defined($carec) && $carec->{custname} ne ""){
+      return($carec->{custname});
+   }
+   return(undef);
+}
+
 sub calcCleanBSTL
 {
    my $self=shift;
@@ -106,7 +130,6 @@ sub calcCleanBSTL
    $targetid=[$targetid] if (ref($targetid) ne "ARRAY");
 
    my $u=$app->getPersistentModuleObject("base::user");
-printf STDERR ("fifi d=%s\n",Dumper($targetid));
    $u->SetFilter({userid=>$targetid});
    my %u=();
    foreach my $urec ($u->getHashList(qw(phonename))){
