@@ -398,7 +398,7 @@ sub createGrp
 #      }
 #   }
    ################################################################
-   $newname=~s/\/\s/_/g;    # rewriting for some shit names
+   $newname=~s/[\/\s]/_/g;    # rewriting for some shit names
    my %newgrp=(name=>$newname,
                srcsys=>$self->{SRCSYS},
                srcid=>$wiwrec->{touid},
