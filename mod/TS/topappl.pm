@@ -63,6 +63,18 @@ sub new
                 vjoinconcat   =>"\n\n",
                 label         =>'TSM',
                 onRawValue    =>\&calcClearTSM),
+
+      new kernel::Field::Text(
+                name          =>'wbvclearname',
+                readonly      =>1,
+                depend        =>'contacts',
+                group         =>'topagaddinfos',
+                htmlwidth     =>'200px',
+                htmlnowrap    =>1,
+                vjoinconcat   =>"\n\n",
+                label         =>'WBV',
+                onRawValue    =>\&calcClearWBV),
+
       new kernel::Field::Text(
                 name          =>'businessteamtlclearname',
                 readonly      =>1,
@@ -78,7 +90,8 @@ sub new
    $self->setDefaultView(qw(name customerapplname 
                             criticality servicesupport businessteam 
                             systemlocations systemosclass
-                            tsmclearname businessteamtlclearname 
+                            tsmclearname wbvclearname 
+                            businessteamtlclearname 
                             oncallphones databoss));
 
    return($self);
@@ -101,6 +114,39 @@ sub calcClearTSM
       $u{$urec->{phonename}}++;
    }
    return([sort(keys(%u))]);
+}
+
+sub calcClearWBV
+{
+   my $self=shift;
+   my $current=shift;
+   my $id=$current->{id};
+   my $app=$self->getParent();
+   my $targetfld=$app->getField("tsmid",$current);
+   my $targetid=$targetfld->RawValue($current);
+   $targetid=[$targetid] if (ref($targetid) ne "ARRAY");
+
+   my $contacts=$app->getField("contacts")->RawValue($current);
+   my @wbv;
+   if (ref($contacts) eq "ARRAY"){
+      foreach my $crec (@{$contacts}){
+         my $role=$crec->{roles};
+         $role=[$role] if (ref($role) ne "ARRAY");
+         if (grep(/^wbv$/,@$role) && $crec->{target} eq "base::user"){
+            push(@wbv,$crec->{targetid});
+         }
+      }
+   }
+   if ($#wbv!=-1){
+      my $u=$app->getPersistentModuleObject("base::user");
+      $u->SetFilter({userid=>\@wbv});
+      my %u=();
+      foreach my $urec ($u->getHashList(qw(phonename))){
+         $u{$urec->{phonename}}++;
+      }
+      return([sort(keys(%u))]);
+   }
+   return(undef);
 }
 
 sub calcCustApplName
