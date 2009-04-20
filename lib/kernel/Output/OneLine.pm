@@ -115,16 +115,16 @@ sub ProcessHead
    if (grep(/^\S+\@\S+\.\S+$/,@l)){   # output seems to be an email list
       $d.=join("; ",@l);
    }
-   elsif (grep(!/\s/,@l)){
+   elsif (!grep(/\s/,@l)){
       $d.=join(" ",@l);
    }
-   elsif (grep(!/,/,@l)){
+   elsif (!grep(/,/,@l)){
       $d.=join(", ",@l);
    }
-   elsif (grep(!/;/,@l)){
+   elsif (!grep(/;/,@l)){
       $d.=join("; ",@l);
    }
-   elsif (grep(!/\t/,@l)){
+   elsif (!grep(/\t/,@l)){
       $d.=join("\t",@l);
    }
    $d.="\r\n";
