@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+<definitions 
+ xmlns="http://schemas.xmlsoap.org/wsdl/"
+ xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
  xmlns:s="http://www.w3.org/2001/XMLSchema" 
+ xmlns:W5Kernel="http://w5base.net/webservice/lib/kernel"
  xmlns:W5BaseUser="http://w5base.net/webservice/mod/base/user"
- xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
- xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/"
- xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
- targetNamespace="http://w5base.net/webservice/mod/base/user"
- xmlns="http://schemas.xmlsoap.org/wsdl/">
+ targetNamespace="http://w5base.net/webservice/mod/base/user">
  <types>
   <s:schema elementFormDefault="qualified">
+
 
    <s:element name="doPing">
     <s:complexType>
@@ -43,6 +43,7 @@
       <s:element name="lang" type="s:string" nillable="true" />
      </s:sequence>
     </s:complexType>
+
 
 
    <s:element name="showFields">
@@ -88,8 +89,10 @@
     </s:complexType>
 
     <s:complexType name="FieldList">
+
         <s:sequence>
-              <s:element name="item" type="W5BaseUser:Field"/>
+              <s:element minOccurs="0" maxOccurs="unbounded"
+                name="item" type="W5BaseUser:Field"/>
         </s:sequence>
     </s:complexType>
 

@@ -1,4 +1,5 @@
 import net.w5base.webservice.mod.base.user.*;
+import net.w5base.webservice.mod.base.grp.*;
 import org.apache.axis.client.Stub;
 import org.apache.axis.client.Call;
 
