@@ -110,6 +110,9 @@ sub AddDiary
          }
       }
    }
+   if ($newrec->{tcomcodcause} eq "sw.addeff.swbase"){ # this type isn't allowed
+      $newrec->{tcomcodcause}="appl.base.base";        # over interface io
+   }
     
    $newrec->{srcsys}=$srcsys;
    $newrec->{srcload}=$app->ExpandTimeExpression("now","en","GMT","GMT");
@@ -138,8 +141,13 @@ sub AddDiary
          $app->LastMsg(ERROR,"eventend in the furture isn't allowed");
          return(201);
       }
-      if ($duration->{totalminutes}>4320){  
-         $app->LastMsg(ERROR,"eventend is older then 3 days");
+     # if ($duration->{totalminutes}>4320){  
+     #    $app->LastMsg(ERROR,"eventend is older then 3 days");
+     #    return(202);
+     # }
+      if ($duration->{totalminutes}>432000){  # temp modification for post
+                                              # reflection in 01/2009-03/2009
+         $app->LastMsg(ERROR,"eventend is older then 300 days");
          return(202);
       }
    }
