@@ -47,8 +47,10 @@ else{
 #
 if (my @fields=$obj->showFields()){
    foreach my $field (@fields){
+      my $group=$field->{group};
+      $group=join(", ",@$group) if (ref($group) eq "ARRAY");
       printf("%-25s: %-20s: %s\n",
-             $field->{name},$field->{group},$field->{longtype});
+             $field->{name},$group,$field->{longtype});
    }
    print("\n");
 }
