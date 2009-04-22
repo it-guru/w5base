@@ -110,7 +110,7 @@ sub AddDiary
          }
       }
    }
-   if ($newrec->{tcomcodcause} eq "sw.addeff.swbase"){ # this type isn't allowed
+   if ($newrec->{tcomcodcause} eq "sw.addeff.base"){   # this type isn't allowed
       $newrec->{tcomcodcause}="appl.base.base";        # over interface io
    }
     
@@ -163,10 +163,10 @@ sub AddDiary
       $newrec->{step}="AL_TCom::workflow::diary::wfclose";
    }
    if (defined($oldrec)){
-      if ($oldrec->{stateid}>20){  # temp removed
-         $app->LastMsg(ERROR,"desired workflow already closed");
-         return(111);
-      }
+     # if ($oldrec->{stateid}>20){  # temp removed
+     #    $app->LastMsg(ERROR,"desired workflow already closed");
+     #    return(111);
+     # }
       # process update
       msg(INFO,"update record oldrec=%s",Dumper($oldrec));
       delete($newrec->{affectedapplication});
