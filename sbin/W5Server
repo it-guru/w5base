@@ -71,6 +71,9 @@ sub rpcCallSerialEvent
    my $event=shift;
    my @p=@_;
 
+   if ($self->Config->Param("W5BaseOperationMode") eq "readonly"){
+      return({exitcode=>0,msg=>'readonly mode'});
+   }
    my $eventlabel=$event."(".join(",",map({"'".$_."'"} @p)).")";
    if ($self->{EventController}->isEvent($event)){
       my $timeout=$self->{EventController}->getMaxEventTimeout($event);

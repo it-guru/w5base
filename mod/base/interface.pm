@@ -24,6 +24,7 @@ use kernel::App::Web;
 use SOAP::Lite;
 use SOAP::Transport::HTTP;
 use File::Temp(qw(tempfile));
+use File::Find;
 use CGI;
 @ISA=qw(kernel::App::Web);
 
@@ -33,6 +34,26 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
    $self->LoadSubObjs("ext/io","io");
+
+   my $instdir=$self->Config->Param("INSTDIR");
+   printf STDERR ("fifi pref File::Find instdir=$instdir\n");
+   my $SOAPop='interface::SOAP';
+   $self->{NS}={'http://w5base.net/webservice/kernel'=>$SOAPop};
+   find({wanted=>sub{
+            my $f=$File::Find::name;
+            if (-f $f && ($f=~m/\.pm$/)){
+               my $qinstdir=quotemeta($instdir);
+               $f=~s#^$qinstdir##;
+               $f=~s/\.pm$//; 
+               if (!($f=~m/\/.svn/)){
+                  $self->{NS}->{'http://w5base.net/webservice'.$f}=$SOAPop;
+               }
+            }
+         },
+         no_chdir=>1},
+         $instdir."/mod");
+
+
    return($self);
 }
 
@@ -262,9 +283,39 @@ sub SOAP
    my $self=shift;
 
    $W5Base::SOAP=$self;
-   SOAP::Transport::HTTP::CGI   
-    -> dispatch_to('interface::SOAP')
-    -> handle;
+   $self->{SOAP}=SOAP::Transport::HTTP::CGI   
+    -> dispatch_with($self->{NS})
+    -> dispatch_to('interface::SOAP');
+   $self->{SOAP} -> handle;
+}
+
+sub _SOAPaction2param
+{
+   my $self=shift;
+   my $act=shift;
+   my $param=shift;
+   if ($param->{dataobject} eq ""){   # fill up dataobject depending on
+      my $mod=$act;                      # uri if no dataobject specified
+      $mod=~s/"//;
+      $mod=~s/#.*$//;
+      $mod=~s#http://w5base.net/webservice/##;
+      if ($mod=~m/^mod\//){
+         $mod=~s/^mod\///;
+      }
+      if ($mod=~m/^workflow\//){
+         $mod=~s/^workflow\///;
+         $mod=~s/\//::/g;
+         $param->{class}=$mod;
+         $mod="base::workflow";
+      }
+      $mod=~s/\//::/g;
+
+      $param->{dataobject}=$mod;
+   }
+   if ($param->{lang} eq ""){
+      $param->{lang}="en";
+   }
+printf STDERR ("param=%s\n",Dumper($param));
 }
 
 package interface::SOAP;
@@ -278,6 +329,8 @@ sub showFields
    my $self=$W5Base::SOAP;
    my $uri=shift;
    my $param=shift;
+   $self->_SOAPaction2param($self->{SOAP}->action(),$param);
+
    my $objectname=$param->{dataobject};
 
    $ENV{HTTP_FORCE_LANGUAGE}=$param->{lang} if (defined($param->{lang}));
@@ -314,7 +367,8 @@ sub showFields
    return(interface::SOAP::kernel::Finish(
           SOAP::Data->name(output=>{exitcode=>0,
                                     lastmsg=>[],
-                                    records=>\@l})->type("HASH")));
+          records=>SOAP::Data->name("records"=>\@l)->type("ResultRecords"),
+                                    })->type("HASH")));
 }
 
 sub storeRecord
@@ -553,6 +607,17 @@ sub Ping
    $self->Log(INFO,"soap",
               "Ping: user='$ENV{REMOTE_USER}' ip='$ENV{REMOTE_ADDR}'");
    return(SOAP::Data->name(output=>{exitcode=>0,result=>1})->type("HASH"));
+}
+
+sub doPing
+{
+   my $self=$W5Base::SOAP;
+   my $uri=shift;
+   my $param=shift;
+   $self->_SOAPaction2param($self->{SOAP}->action(),$param);
+   $self->Log(INFO,"soap",
+              "Ping: user='$ENV{REMOTE_USER}' ip='$ENV{REMOTE_ADDR}'");
+   return(SOAP::Data->name(output=>{exitcode=>0,result=>1})->type("PingOutput"));
 }
 
 package interface::SOAP::kernel;

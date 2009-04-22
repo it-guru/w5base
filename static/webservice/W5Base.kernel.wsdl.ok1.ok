@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+ xmlns:s="http://www.w3.org/2001/XMLSchema" 
+ xmlns:W5Kernel="http://w5base.net/webservice/lib/kernel"
+ xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+ xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/"
+ xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+ targetNamespace="http://w5base.net/webservice/lib/kernel"
+ xmlns="http://schemas.xmlsoap.org/wsdl/">
+ <types>
+  <s:schema elementFormDefault="qualified">
+   <s:element name="doPing">
+    <s:complexType>
+     <s:sequence>
+      <s:element minOccurs="1" maxOccurs="1"
+       name="input" type="W5Kernel:PingInput" />
+     </s:sequence>
+    </s:complexType>
+   </s:element>
+
+   <s:element name="PingResponse">
+    <s:complexType>
+     <s:sequence>
+      <s:element minOccurs="1" maxOccurs="1"
+       name="output" type="W5Kernel:PingOutput" />
+     </s:sequence>
+    </s:complexType>
+   </s:element>
+
+    <s:complexType name="PingOutput">
+     <s:sequence>
+      <s:element minOccurs="1" maxOccurs="1"
+       name="exitcode" type="s:int" />
+      <s:element minOccurs="1" maxOccurs="1"
+       name="result" type="s:int" />
+     </s:sequence>
+    </s:complexType>
+
+    <s:complexType name="PingInput">
+     <s:sequence>
+      <s:element name="lang" type="s:string" />
+     </s:sequence>
+    </s:complexType>
+
+   </s:schema>
+ </types>
+
+ <message name="doPingIn">
+  <part name="parameters" element="W5Kernel:doPing" />
+ </message>
+
+ <message name="doPingOut">
+  <part name="parameters" element="W5Kernel:PingResponse" />
+ </message>
+
+
+ <portType name="W5KernelPort">
+  <operation name="doPing">
+   <input message="W5Kernel:doPingIn" />
+   <output message="W5Kernel:doPingOut" />
+  </operation>
+ </portType>
+
+
+ <binding name="W5KernelPort" type="W5Kernel:W5KernelPort">
+  <soap:binding transport="http://schemas.xmlsoap.org/soap/http"
+                style="document" />
+  <operation name="doPing">
+   <soap:operation soapAction="http://w5base.net/webservice/lib/kernel#doPing"
+    style="document" />
+   <input><soap:body use="literal" /></input>
+   <output><soap:body use="literal" /></output>
+  </operation>
+ </binding>
+
+
+ <service name="W5Base">
+  <port name="W5Kernel" binding="W5Kernel:W5KernelPort">
+   <soap:address
+    location="http://localhost/w5base2/auth/base/interface/SOAP" />
+  </port>
+ </service>
+
+
+</definitions>
+

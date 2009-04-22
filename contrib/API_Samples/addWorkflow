@@ -43,7 +43,7 @@ my $WfRec={ class=>'AL_TCom::workflow::businesreq',
             detaildescription=>"Dies ist der lange Text\n".
                                "mit mehreren Zeilen",
             affectedapplication=>'W5Base/Darwin',
-            implementedto=>'in 2 weeks',
+            reqdesdate=>'in 2 weeks',
             customerrefno=>'11223344'
           };
 

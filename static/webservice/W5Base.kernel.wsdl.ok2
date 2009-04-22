@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+ xmlns:s="http://www.w3.org/2001/XMLSchema" 
+ xmlns:W5BaseUser="http://w5base.net/webservice/mod/base/user"
+ xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+ xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/"
+ xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+ targetNamespace="http://w5base.net/webservice/mod/base/user"
+ xmlns="http://schemas.xmlsoap.org/wsdl/">
+ <types>
+  <s:schema elementFormDefault="qualified">
+
+   <s:element name="doPing">
+    <s:complexType>
+     <s:sequence>
+      <s:element minOccurs="1" maxOccurs="1"
+       name="input" type="W5BaseUser:PingInput" />
+     </s:sequence>
+    </s:complexType>
+   </s:element>
+
+   <s:element name="PingResponse">
+    <s:complexType>
+     <s:sequence>
+      <s:element minOccurs="1" maxOccurs="1"
+       name="output" type="W5BaseUser:PingOutput" />
+     </s:sequence>
+    </s:complexType>
+   </s:element>
+
+    <s:complexType name="PingOutput">
+     <s:sequence>
+      <s:element minOccurs="1" maxOccurs="1"
+       name="exitcode" type="s:int" />
+      <s:element minOccurs="1" maxOccurs="1"
+       name="result" type="s:int" />
+     </s:sequence>
+    </s:complexType>
+
+    <s:complexType name="PingInput">
+     <s:sequence>
+      <s:element name="lang" type="s:string" nillable="true" />
+     </s:sequence>
+    </s:complexType>
+
+
+   <s:element name="showFields">
+    <s:complexType>
+     <s:sequence>
+      <s:element minOccurs="1" maxOccurs="1"
+       name="input" type="W5BaseUser:ShowFieldsInput" />
+     </s:sequence>
+    </s:complexType>
+   </s:element>
+
+   <s:element name="ShowFieldsResponse">
+    <s:complexType>
+     <s:sequence>
+      <s:element minOccurs="1" maxOccurs="1"
+       name="output" type="W5BaseUser:ShowFieldsOutput" />
+     </s:sequence>
+    </s:complexType>
+   </s:element>
+
+    <s:complexType name="ShowFieldsOutput">
+     <s:sequence>
+      <s:element minOccurs="1" maxOccurs="1"
+       name="exitcode" type="s:int" />
+      <s:element name="lastmsg" type="W5BaseUser:lastmsg" />
+      <s:element name="records" type="W5BaseUser:FieldList" />
+     </s:sequence>
+    </s:complexType>
+
+    <s:complexType name="ShowFieldsInput">
+     <s:sequence>
+      <s:element name="lang" type="s:string" nillable="true" />
+     </s:sequence>
+    </s:complexType>
+
+
+    <s:complexType name="lastmsg">
+        <s:complexContent>
+           <s:restriction base="soapenc:Array">
+               <s:attribute ref="soapenc:arrayType" arrayType="s:string[]"/>
+           </s:restriction>
+        </s:complexContent>
+    </s:complexType>
+
+    <s:complexType name="FieldList">
+        <s:sequence>
+              <s:element name="item" type="W5BaseUser:Field"/>
+        </s:sequence>
+    </s:complexType>
+
+    <s:complexType name="Field">
+     <s:sequence>
+      <s:element name="type" type="s:string" />
+      <s:element name="longtype" type="s:string" />
+      <s:element name="group" type="W5BaseUser:group" />
+      <s:element name="name" type="s:string" />
+      <s:element name="primarykey" minOccurs="0" maxOccurs="1" type="s:int" />
+     </s:sequence>
+    </s:complexType>
+
+    <s:complexType name="group">
+        <s:complexContent>
+           <s:restriction base="soapenc:Array">
+               <s:attribute ref="soapenc:arrayType" arrayType="s:string[]"/>
+           </s:restriction>
+        </s:complexContent>
+    </s:complexType>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   </s:schema>
+ </types>
+
+ <message name="doPingIn">
+  <part name="parameters" element="W5BaseUser:doPing" />
+ </message>
+
+ <message name="doPingOut">
+  <part name="parameters" element="W5BaseUser:PingResponse" />
+ </message>
+
+ <message name="showFieldsIn">
+  <part name="parameters" element="W5BaseUser:showFields" />
+ </message>
+
+ <message name="showFieldsOut">
+  <part name="parameters" element="W5BaseUser:ShowFieldsResponse" />
+ </message>
+
+
+ <portType name="W5BaseUserPort">
+
+  <operation name="doPing">
+   <input message="W5BaseUser:doPingIn" />
+   <output message="W5BaseUser:doPingOut" />
+  </operation>
+
+  <operation name="showFields">
+   <input message="W5BaseUser:showFieldsIn" />
+   <output message="W5BaseUser:showFieldsOut" />
+  </operation>
+
+ </portType>
+
+
+ <binding name="W5BaseUserPort" type="W5BaseUser:W5BaseUserPort">
+  <soap:binding transport="http://schemas.xmlsoap.org/soap/http"
+                style="document" />
+  <operation name="doPing">
+   <soap:operation soapAction="http://w5base.net/webservice/mod/base/user#doPing"
+    style="document" />
+   <input><soap:body use="literal" /></input>
+   <output><soap:body use="literal" /></output>
+  </operation>
+  <operation name="showFields">
+   <soap:operation soapAction="http://w5base.net/webservice/mod/base/user#showFields"
+    style="document" />
+   <input><soap:body use="literal" /></input>
+   <output><soap:body use="literal" /></output>
+  </operation>
+ </binding>
+
+ <service name="W5Base">
+  <port name="W5BaseUser" binding="W5BaseUser:W5BaseUserPort">
+   <soap:address
+    location="http://localhost/w5base2/auth/base/interface/SOAP" />
+  </port>
+ </service>
+
+
+
+
+</definitions>
+

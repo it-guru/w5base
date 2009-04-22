@@ -42,6 +42,7 @@ sub Init
    $self->RegisterEvent("timeoutcheck","TimeOutError",timeout=>5);
    $self->RegisterEvent("sample","SampleEvent2");
    $self->RegisterEvent("sample2","SampleEvent2");
+   $self->RegisterEvent("sample3","SampleEvent3");
    $self->RegisterEvent("MyTime","SampleEvent2");
    $self->RegisterEvent("long","base::event::sample::SampleEvent1");
    $self->RegisterEvent("long","SampleEvent3");

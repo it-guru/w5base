@@ -532,11 +532,18 @@ sub generateWorkspacePages
       $$selopt.="<option value=\"wfmailsend\">".
                 $self->getParent->T("wfmailsend",$tr).
                 "</option>\n";
+      my $onclick="openwin(\"externalMailHandler?".
+                   "id=123&parent=base::workflow&mode=simple\",".
+                   "\"_blank\",".
+                   "\"height=400,width=600,toolbar=no,status=no,".
+                   "resizable=yes,scrollbars=no\")";
+
       my $d="<table width=100% border=0 cellspacing=0 cellpadding=0>".
          "<tr>".
          "<td colspan=2>".
          $self->getParent->T("This action sends a E-Mail with automaticly ".
                              "dokumentation in the workflow log").
+         " <span class=sublink onclick=$onclick>&para;</span>".
          "</td></tr><tr>".
          "<td colspan=2>".
          "<table width=100% cellspacing=0 cellpadding=0><tr>".

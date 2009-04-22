@@ -985,9 +985,7 @@ sub SetFilterForQualityCheck    # prepaire dataobject for automatic
    foreach my $rec (@l){
       $wf{$rec->{dataobj}}++;
    }
-   if (!keys(%wf)){
-      $wf{none}++;
-   }
+   $wf{none}++ if (!keys(%wf));
    
    $self->ResetFilter();
    $self->SetFilter({mdate=>">now-48h",class=>[keys(%wf)]});
@@ -1262,7 +1260,7 @@ sub getDetailBlockPriority
 sub getValidWebFunctions
 {
    my $self=shift;
-   return("Process","DirectAct","ShowState","FullView",
+   return("Process","DirectAct","ShowState","FullView","externalMailHandler",
           $self->SUPER::getValidWebFunctions());
 }
 
@@ -1339,7 +1337,11 @@ sub New                   # Workflow starten
    my %disp=();
    my $tips;
    my %env=('frontendnew'=>'1');
-   foreach my $wfclass ($self->getSelectableModules(%env)){
+   my @selectable=$self->getSelectableModules(%env);
+   if ($self->Config->Param("W5BaseOperationMode") eq "readonly"){
+      @selectable=();
+   }
+   foreach my $wfclass (@selectable){
       my $name=$self->{SubDataObj}->{$wfclass}->Label();
       $disp{$name}=$wfclass;
       my $tiptag=$wfclass."::tip";
@@ -1478,6 +1480,88 @@ sub Welcome
 
    print $self->HtmlBottom(body=>1,form=>1);
 }
+
+sub externalMailHandler 
+{
+   my $self=shift;
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','work.css'],
+                           body=>1,form=>1,
+                           title=>'W5Base Mail Client');
+   my $to=$self->T("To","base::workflow::mailsend");
+   my $subject=$self->T("Subject","base::workflow::mailsend");
+   my $send=$self->T("Send message","base::workflow::mailsend");
+   my $s=Query->Param("subject");
+   my $m=Query->Param("msg");
+   my @t=split(/\s*[,;]\s*/,Query->Param("to"));
+   my @c=split(/\s*[,;]\s*/,Query->Param("cc"));
+   my %u=(); map({$u{lc($_)}++} @t); @t=grep(!/^\s*$/,sort(keys(%u)));
+   my %u=(); map({$u{lc($_)}++} @c); @c=grep(!/^\s*$/,sort(keys(%u)));
+   my $t=join("; ",@t);
+   my $c=join("; ",@c);
+   $s=~s/"//g;
+   $t=~s/"//g;
+   $c=~s/"//g;
+   print('<table style="margin:5px;padding-right:10px" border=0 '.
+         'cellspacing=0 cellpadding=0 width=100% height=100%>');
+   #printf("<tr><td height=1%%>Mail related to</td></tr>");
+   print <<EOF;
+ <tr height=1%><td height=1%>
+  <table width=100%><tr>
+  <td width=50 valign=top>
+  <img src=\"../../base/load/addrbook.gif\">&nbsp;$to:</td>
+  <td><textarea name=to style="width:100%;height:40px">$t</textarea></td>
+  </tr></table>
+ </td></tr>
+ <tr height=1%><td height=1%>
+  <table width=100%><tr>
+  <td width=50 valign=top>
+  <img src=\"../../base/load/addrbook.gif\">&nbsp;CC:</td>
+  <td><textarea name=to style="width:100%;height:30px">$c</textarea></td>
+  </tr></table>
+ </td></tr>
+ <tr height=1%><td height=1%>
+  <table width=100%><tr>
+  <td width=50>$subject:</td>
+  <td><input name=subject value="$s" style="width:100%"></td>
+  </tr></table>
+ </td></tr>
+ <tr><td>
+  <textarea name=msg style="width:100%;height:100%">$m</textarea>
+ </td></tr>
+ <tr height=1%><td height=1% align=left>&nbsp;</td>
+ </tr>
+ <tr height=1%><td height=1% align=right>
+ <input type=button onclick=doSend() name=send 
+        value="$send">
+ </td></tr>
+</table>
+<script language="JavaScript">
+function refreshParent()
+{
+   if (opener){
+      opener.ModeSelectSet("StandardDetail");
+   }
+
+}
+function doSend()
+{
+   if (document.forms[0].elements['subject'].value==""){
+      alert("no subject");
+   }
+   if (document.forms[0].elements['to'].value==""){
+      alert("no to");
+   }
+   document.forms[0].submit();
+
+}
+</script>
+EOF
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+
 
 sub DirectAct                        # Workflow User-View
 {

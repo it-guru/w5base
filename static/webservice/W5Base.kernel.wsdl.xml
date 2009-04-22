@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+ xmlns:s="http://www.w3.org/2001/XMLSchema" 
+ xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+ xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/"
+ xmlns:W5Kernel="http://w5base.net/webservice/lib/kernel"
+ xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+ targetNamespace="http://w5base.net/webservice"
+ xmlns="http://schemas.xmlsoap.org/wsdl/">
+ <import location="./W5Base.kernel.wsdl.ok1" namespace="http://w5base.net/webservice/lib/kernel"/>
+ <import location="./W5Base.kernel.wsdl.ok2" namespace="http://w5base.net/webservice/mod/base/user"/>
+
+
+</definitions>
+

@@ -78,7 +78,7 @@ sub getSqlFrom
    my $self=shift;
    my ($year,$month,$day,$hour,$min,$sec)=Today_and_Now("CET");
 
-   my $hourcheck=100;
+   my $hourcheck=500;
    my $wf=getModuleObject($self->Config,"base::workflow");
    $wf->SetFilter(srcsys=>'tssc::event::scchange',
                   srcload=>">now-${hourcheck}h");

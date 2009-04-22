@@ -111,15 +111,24 @@ sub mkAcFtpRecAsset
       return(undef);
    }
 
+ 	
    my $acrec={
                Asset=>{
                     EventID=>$CurrentEventId,
                     ExternalSystem=>'W5Base',
                     ExternalID=>$rec->{id},
                     Security_Unit=>"TS.DE",
+                    Status=>"in work",
+                    Usage=>"Productive",
+                    SerialNo=>$rec->{serialno},
+                    lCPUNumber=>$rec->{cpucount},
+                    Remarks=>$rec->{comments},
+                    BriefDescription=>$rec->{kwords},
+                    Place=>$rec->{place},
                     Description=>$rec->{comments},
                     Security_Unit=>"TS.DE",
                     bDelete=>'0',
+                    Location=>'/DE-BAMBERG-GUTENBERGSTR-13/',
                     Sender_CostCenter=>$rec->{conumber},
                     AssignmentGroup=>$assignment,
                     IncidentAG=>$assignment,
