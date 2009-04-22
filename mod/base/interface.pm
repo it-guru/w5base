@@ -289,14 +289,14 @@ sub WSDLcommon
    my $XMLmessage=shift;
    my $XMLtypes=shift;
 
-   $$XMLtypes.="<s:complexType name=\"ArrayOfString\">";
-   $$XMLtypes.="<s:complexContent>";
-   $$XMLtypes.="<s:restriction base=\"soapenc:Array\">";
-   $$XMLtypes.="<s:attribute ".
-               "ref=\"soapenc:arrayType\" arrayType=\"s:string[]\"/>";
-   $$XMLtypes.="</s:restriction>";
-   $$XMLtypes.="</s:complexContent>";
-   $$XMLtypes.="</s:complexType>";
+   $$XMLtypes.="<xsd:complexType name=\"ArrayOfString\">";
+   $$XMLtypes.="<xsd:complexContent>";
+   $$XMLtypes.="<xsd:restriction base=\"soapenc:Array\">";
+   $$XMLtypes.="<xsd:attribute ".
+               "ref=\"soapenc:arrayType\" arrayType=\"xsd:string[]\"/>";
+   $$XMLtypes.="</xsd:restriction>";
+   $$XMLtypes.="</xsd:complexContent>";
+   $$XMLtypes.="</xsd:complexType>";
 
 }
 
@@ -335,41 +335,41 @@ sub WSDLdoPing
                  "element=\"${ns}:doPingResponse\" />";
    $$XMLmessage.="</message>";
 
-   $$XMLtypes.="<s:element name=\"doPing\">";
-   $$XMLtypes.="<s:complexType>";
-   $$XMLtypes.="<s:sequence>";
-   $$XMLtypes.="<s:element name=\"input\" ".
+   $$XMLtypes.="<xsd:element name=\"doPing\">";
+   $$XMLtypes.="<xsd:complexType>";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element name=\"input\" ".
               "type=\"${ns}:doPingInput\" />";
               "minOccurs=\"1\" maxOccurs=\"1\" />";
-   $$XMLtypes.="</s:sequence>";
-   $$XMLtypes.="</s:complexType>";
-   $$XMLtypes.="</s:element>";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
+   $$XMLtypes.="</xsd:element>";
 
-   $$XMLtypes.="<s:element name=\"doPingResponse\">";
-   $$XMLtypes.="<s:complexType>";
-   $$XMLtypes.="<s:sequence>";
-   $$XMLtypes.="<s:element name=\"output\" ".
+   $$XMLtypes.="<xsd:element name=\"doPingResponse\">";
+   $$XMLtypes.="<xsd:complexType>";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element name=\"output\" ".
               "type=\"${ns}:doPingOutput\" />";
               "minOccurs=\"1\" maxOccurs=\"1\" />";
-   $$XMLtypes.="</s:sequence>";
-   $$XMLtypes.="</s:complexType>";
-   $$XMLtypes.="</s:element>";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
+   $$XMLtypes.="</xsd:element>";
 
-   $$XMLtypes.="<s:complexType name=\"doPingOutput\">";
-   $$XMLtypes.="<s:sequence>";
-   $$XMLtypes.="<s:element minOccurs=\"1\" maxOccurs=\"1\" ".
-              "name=\"exitcode\" type=\"s:int\" />";
-   $$XMLtypes.="<s:element minOccurs=\"1\" maxOccurs=\"1\" ".
-              "name=\"result\" type=\"s:int\" />";
-   $$XMLtypes.="</s:sequence>";
-   $$XMLtypes.="</s:complexType>";
+   $$XMLtypes.="<xsd:complexType name=\"doPingOutput\">";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element minOccurs=\"1\" maxOccurs=\"1\" ".
+              "name=\"exitcode\" type=\"xsd:int\" />";
+   $$XMLtypes.="<xsd:element minOccurs=\"1\" maxOccurs=\"1\" ".
+              "name=\"result\" type=\"xsd:int\" />";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
 
-   $$XMLtypes.="<s:complexType name=\"doPingInput\">";
-   $$XMLtypes.="<s:sequence>";
-   $$XMLtypes.="<s:element name=\"lang\" ".
-              "type=\"s:string\" nillable=\"true\" />";
-   $$XMLtypes.="</s:sequence>";
-   $$XMLtypes.="</s:complexType>";
+   $$XMLtypes.="<xsd:complexType name=\"doPingInput\">";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element name=\"lang\" ".
+              "type=\"xsd:string\" nillable=\"true\" />";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
 }
 
 sub WSDLshowFields
@@ -407,61 +407,61 @@ sub WSDLshowFields
                  "element=\"${ns}:showFieldsResponse\" />";
    $$XMLmessage.="</message>";
 
-   $$XMLtypes.="<s:element name=\"showFields\">";
-   $$XMLtypes.="<s:complexType>";
-   $$XMLtypes.="<s:sequence>";
-   $$XMLtypes.="<s:element name=\"input\" ".
+   $$XMLtypes.="<xsd:element name=\"showFields\">";
+   $$XMLtypes.="<xsd:complexType>";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element name=\"input\" ".
               "type=\"${ns}:showFieldsInput\" />";
               "minOccurs=\"1\" maxOccurs=\"1\" />";
-   $$XMLtypes.="</s:sequence>";
-   $$XMLtypes.="</s:complexType>";
-   $$XMLtypes.="</s:element>";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
+   $$XMLtypes.="</xsd:element>";
 
-   $$XMLtypes.="<s:element name=\"showFieldsResponse\">";
-   $$XMLtypes.="<s:complexType>";
-   $$XMLtypes.="<s:sequence>";
-   $$XMLtypes.="<s:element name=\"output\" ".
+   $$XMLtypes.="<xsd:element name=\"showFieldsResponse\">";
+   $$XMLtypes.="<xsd:complexType>";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element name=\"output\" ".
               "type=\"${ns}:showFieldsOutput\" />";
               "minOccurs=\"1\" maxOccurs=\"1\" />";
-   $$XMLtypes.="</s:sequence>";
-   $$XMLtypes.="</s:complexType>";
-   $$XMLtypes.="</s:element>";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
+   $$XMLtypes.="</xsd:element>";
 
-   $$XMLtypes.="<s:complexType name=\"showFieldsOutput\">";
-   $$XMLtypes.="<s:sequence>";
-   $$XMLtypes.="<s:element minOccurs=\"1\" maxOccurs=\"1\" ".
-              "name=\"exitcode\" type=\"s:int\" />";
-   $$XMLtypes.="<s:element minOccurs=\"0\" maxOccurs=\"1\" ".
+   $$XMLtypes.="<xsd:complexType name=\"showFieldsOutput\">";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element minOccurs=\"1\" maxOccurs=\"1\" ".
+              "name=\"exitcode\" type=\"xsd:int\" />";
+   $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
               "name=\"lastmsg\" type=\"${ns}:ArrayOfString\" />";
-   $$XMLtypes.="<s:element minOccurs=\"0\" maxOccurs=\"1\" ".
+   $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
               "name=\"records\" type=\"${ns}:FieldList\" />";
-   $$XMLtypes.="</s:sequence>";
-   $$XMLtypes.="</s:complexType>";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
 
-   $$XMLtypes.="<s:complexType name=\"FieldList\">";
-   $$XMLtypes.="<s:sequence>";
-   $$XMLtypes.="<s:element minOccurs=\"0\" maxOccurs=\"unbounded\" ".
+   $$XMLtypes.="<xsd:complexType name=\"FieldList\">";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"unbounded\" ".
                "name=\"item\" type=\"${ns}:Field\" />";
-   $$XMLtypes.="</s:sequence>";
-   $$XMLtypes.="</s:complexType>";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
 
-   $$XMLtypes.="<s:complexType name=\"Field\">";
-   $$XMLtypes.="<s:sequence>";
-   $$XMLtypes.="<s:element name=\"type\" type=\"s:string\" />";
-   $$XMLtypes.="<s:element name=\"longtype\" type=\"s:string\" />";
-   $$XMLtypes.="<s:element name=\"name\" type=\"s:string\" />";
-   $$XMLtypes.="<s:element name=\"group\" type=\"${ns}:ArrayOfString\" />";
-   $$XMLtypes.="<s:element name=\"primarykey\" ".
-               "minOccurs=\"0\" maxOccurs=\"1\" type=\"s:int\"  />";
-   $$XMLtypes.="</s:sequence>";
-   $$XMLtypes.="</s:complexType>";
+   $$XMLtypes.="<xsd:complexType name=\"Field\">";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element name=\"type\" type=\"xsd:string\" />";
+   $$XMLtypes.="<xsd:element name=\"longtype\" type=\"xsd:string\" />";
+   $$XMLtypes.="<xsd:element name=\"name\" type=\"xsd:string\" />";
+   $$XMLtypes.="<xsd:element name=\"group\" type=\"${ns}:ArrayOfString\" />";
+   $$XMLtypes.="<xsd:element name=\"primarykey\" ".
+               "minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:int\"  />";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
 
-   $$XMLtypes.="<s:complexType name=\"showFieldsInput\">";
-   $$XMLtypes.="<s:sequence>";
-   $$XMLtypes.="<s:element name=\"lang\" ".
-              "type=\"s:string\" nillable=\"true\" />";
-   $$XMLtypes.="</s:sequence>";
-   $$XMLtypes.="</s:complexType>";
+   $$XMLtypes.="<xsd:complexType name=\"showFieldsInput\">";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element name=\"lang\" ".
+              "type=\"xsd:string\" nillable=\"true\" />";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
 }
 
 
@@ -501,79 +501,79 @@ sub WSDLfindRecord
                  "element=\"${ns}:findRecordResponse\" />";
    $$XMLmessage.="</message>";
 
-   $$XMLtypes.="<s:element name=\"findRecord\">";
-   $$XMLtypes.="<s:complexType>";
-   $$XMLtypes.="<s:sequence>";
-   $$XMLtypes.="<s:element name=\"input\" ".
+   $$XMLtypes.="<xsd:element name=\"findRecord\">";
+   $$XMLtypes.="<xsd:complexType>";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element name=\"input\" ".
               "type=\"${ns}:findRecordInput\" />";
               "minOccurs=\"1\" maxOccurs=\"1\" />";
-   $$XMLtypes.="</s:sequence>";
-   $$XMLtypes.="</s:complexType>";
-   $$XMLtypes.="</s:element>";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
+   $$XMLtypes.="</xsd:element>";
 
-   $$XMLtypes.="<s:element name=\"findRecordResponse\">";
-   $$XMLtypes.="<s:complexType>";
-   $$XMLtypes.="<s:sequence>";
-   $$XMLtypes.="<s:element name=\"output\" ".
+   $$XMLtypes.="<xsd:element name=\"findRecordResponse\">";
+   $$XMLtypes.="<xsd:complexType>";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element name=\"output\" ".
               "type=\"${ns}:findRecordOutput\" />";
               "minOccurs=\"1\" maxOccurs=\"1\" />";
-   $$XMLtypes.="</s:sequence>";
-   $$XMLtypes.="</s:complexType>";
-   $$XMLtypes.="</s:element>";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
+   $$XMLtypes.="</xsd:element>";
 
-   $$XMLtypes.="<s:complexType name=\"findRecordOutput\">";
-   $$XMLtypes.="<s:sequence>";
-   $$XMLtypes.="<s:element minOccurs=\"1\" maxOccurs=\"1\" ".
-              "name=\"exitcode\" type=\"s:int\" />";
-   $$XMLtypes.="<s:element minOccurs=\"0\" maxOccurs=\"1\" ".
+   $$XMLtypes.="<xsd:complexType name=\"findRecordOutput\">";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element minOccurs=\"1\" maxOccurs=\"1\" ".
+              "name=\"exitcode\" type=\"xsd:int\" />";
+   $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
               "name=\"lastmsg\" type=\"${ns}:ArrayOfString\" />";
-   $$XMLtypes.="<s:element minOccurs=\"0\" maxOccurs=\"1\" ".
+   $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
               "name=\"records\" type=\"${ns}:RecordList\" />";
-   $$XMLtypes.="</s:sequence>";
-   $$XMLtypes.="</s:complexType>";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
 
-   $$XMLtypes.="<s:complexType name=\"RecordList\">";
-   $$XMLtypes.="<s:sequence>";
-   $$XMLtypes.="<s:element minOccurs=\"0\" maxOccurs=\"unbounded\" ".
+   $$XMLtypes.="<xsd:complexType name=\"RecordList\">";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"unbounded\" ".
                "name=\"item\" type=\"${ns}:Record\" />";
-   $$XMLtypes.="</s:sequence>";
-   $$XMLtypes.="</s:complexType>";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
 
-   $$XMLtypes.="<s:complexType name=\"Record\">";
-   $$XMLtypes.="<s:sequence>";
+   $$XMLtypes.="<xsd:complexType name=\"Record\">";
+   $$XMLtypes.="<xsd:sequence>";
    foreach my $fobj (@flist){
-      my $type="s:string";
-      $type="s:integer" if ($fobj->Type() eq "Id");
+      my $type="xsd:string";
+      $type="xsd:integer" if ($fobj->Type() eq "Id");
 
       my $name=$fobj->Name();
-      $$XMLtypes.="<s:element minOccurs=\"0\" ".
+      $$XMLtypes.="<xsd:element minOccurs=\"0\" ".
                   "maxOccurs=\"1\" name=\"$name\" type=\"$type\" />";
    }
-   $$XMLtypes.="</s:sequence>";
-   $$XMLtypes.="</s:complexType>";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
 
-   $$XMLtypes.="<s:complexType name=\"findRecordInput\">";
-   $$XMLtypes.="<s:sequence>";
-   $$XMLtypes.="<s:element name=\"lang\" ".
-              "type=\"s:string\" nillable=\"true\" />";
-   $$XMLtypes.="<s:element name=\"view\" ".
-              "type=\"s:string\" nillable=\"true\" />";
-   $$XMLtypes.="<s:element name=\"filter\" ".
+   $$XMLtypes.="<xsd:complexType name=\"findRecordInput\">";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element name=\"lang\" ".
+              "type=\"xsd:string\" nillable=\"true\" />";
+   $$XMLtypes.="<xsd:element name=\"view\" ".
+              "type=\"xsd:string\" nillable=\"true\" />";
+   $$XMLtypes.="<xsd:element name=\"filter\" ".
               "type=\"${ns}:Filter\" />";
-   $$XMLtypes.="</s:sequence>";
-   $$XMLtypes.="</s:complexType>";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
 
-   $$XMLtypes.="<s:complexType name=\"Filter\">";
-   $$XMLtypes.="<s:sequence>";
+   $$XMLtypes.="<xsd:complexType name=\"Filter\">";
+   $$XMLtypes.="<xsd:sequence>";
    foreach my $fobj (@flist){
       next if ($fobj->Type() eq "Linenumber");
-      my $type="s:string";
+      my $type="xsd:string";
       my $name=$fobj->Name();
-      $$XMLtypes.="<s:element minOccurs=\"0\" ".
+      $$XMLtypes.="<xsd:element minOccurs=\"0\" ".
                   "maxOccurs=\"1\" name=\"$name\" type=\"$type\" />";
    }
-   $$XMLtypes.="</s:sequence>";
-   $$XMLtypes.="</s:complexType>";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
 
 }
 
@@ -626,14 +626,14 @@ Content-type: text/xml
  xmlns="http://schemas.xmlsoap.org/wsdl/"
  xmlns:SOAP="http://schemas.xmlsoap.org/wsdl/soap/"
  xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
- xmlns:s="http://www.w3.org/2001/XMLSchema" 
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
  xmlns:W5Kernel="http://w5base.net/webservice/lib/kernel"
  xmlns:$ns="http://w5base.net/webservice/mod/$fp"
  targetNamespace="http://w5base.net/webservice/mod/$fp">
 <types>
-<s:schema elementFormDefault="qualified">
+<xsd:schema elementFormDefault="qualified">
 $XMLtypes
-</s:schema>
+</xsd:schema>
 </types>
 $XMLmessage
 <portType name="${ns}Port">$XMLportType</portType>
@@ -953,7 +953,7 @@ sub getHashList
    for(my $c=0;$c<=$#l;$c++){
       my %cprec;
       foreach my $k (keys(%{$l[$c]})){
-         $cprec{$k}=SOAP::Data->type('s:string')->value($l[$c]->{$k});
+         $cprec{$k}=SOAP::Data->type('xsd:string')->value($l[$c]->{$k});
       }
       $l[$c]=SOAP::Data->type('Record')->value(\%cprec);
    }
