@@ -1,10 +1,12 @@
 import net.w5base.mod.AL_TCom.workflow.businesreq.*;
 import org.apache.axis.client.Stub;
 import org.apache.axis.client.Call;
+import org.apache.log4j.PropertyConfigurator; 
+import org.apache.log4j.Logger; 
 
 public class businessreq {
   public static void main(String [] args) throws Exception {
-
+    PropertyConfigurator.configure("log4j.properties"); 
     // define the needed variables
     net.w5base.mod.AL_TCom.workflow.businesreq.W5Base        W5Service;
     net.w5base.mod.AL_TCom.workflow.businesreq.Port          W5Port;
@@ -48,9 +50,9 @@ public class businessreq {
     //
     FInput=new net.w5base.mod.AL_TCom.workflow.businesreq.FindRecordInp();
     Flt=new net.w5base.mod.AL_TCom.workflow.businesreq.Filter();
-    Flt.setId(Res.getIdentifiedBy().toString());
+    Flt.setId(Res.getIdentifiedBy());
     FInput.setFilter(Flt);
-    FInput.setView("name,stateid");
+    FInput.setView("name,stateid,posibleactions");
 
     // do the Query
     Result=W5Port.findRecord(FInput);
