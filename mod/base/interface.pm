@@ -37,7 +37,7 @@ sub new
 
    my $instdir=$self->Config->Param("INSTDIR");
    my $SOAPop='interface::SOAP';
-   $self->{NS}={'http://w5base.net/webservice/kernel'=>$SOAPop};
+   $self->{NS}={'http://w5base.net/kernel'=>$SOAPop};
    find({wanted=>sub{
             my $f=$File::Find::name;
             if (-f $f && ($f=~m/\.pm$/)){
@@ -45,7 +45,7 @@ sub new
                $f=~s#^$qinstdir##;
                $f=~s/\.pm$//; 
                if (!($f=~m/\/.svn/)){
-                  $self->{NS}->{'http://w5base.net/webservice'.$f}=$SOAPop;
+                  $self->{NS}->{'http://w5base.net'.$f}=$SOAPop;
                }
             }
          },
@@ -277,307 +277,6 @@ sub XmlBottom
    return("</root>");
 }
 
-sub WSDLcommon
-{
-   my $self=shift;
-   my $o=shift;
-   my $uri=shift;
-   my $ns=shift;
-   my $fp=shift;
-   my $XMLbinding=shift;
-   my $XMLportType=shift;
-   my $XMLmessage=shift;
-   my $XMLtypes=shift;
-
-   $$XMLtypes.="<xsd:complexType name=\"ArrayOfString\">";
-   $$XMLtypes.="<xsd:complexContent>";
-   $$XMLtypes.="<xsd:restriction base=\"soapenc:Array\">";
-   $$XMLtypes.="<xsd:attribute ".
-               "ref=\"soapenc:arrayType\" arrayType=\"xsd:string[]\"/>";
-   $$XMLtypes.="</xsd:restriction>";
-   $$XMLtypes.="</xsd:complexContent>";
-   $$XMLtypes.="</xsd:complexType>";
-
-}
-
-sub WSDLdoPing
-{
-   my $self=shift;
-   my $o=shift;
-   my $uri=shift;
-   my $ns=shift;
-   my $fp=shift;
-   my $XMLbinding=shift;
-   my $XMLportType=shift;
-   my $XMLmessage=shift;
-   my $XMLtypes=shift;
-
-   $$XMLbinding.="<operation name=\"doPing\">";
-   $$XMLbinding.="<SOAP:operation ".
-                "soapAction=\"http://w5base.net/webservice/mod/${fp}".
-                "#doPing\" style=\"document\" />";
-   $$XMLbinding.="<input><SOAP:body use=\"literal\" /></input>";
-   $$XMLbinding.="<output><SOAP:body use=\"literal\" /></output>";
-   $$XMLbinding.="</operation>";
-
-
-   $$XMLportType.="<operation name=\"doPing\">";
-   $$XMLportType.="<input message=\"${ns}:doPingInpParameter\" />";
-   $$XMLportType.="<output message=\"${ns}:doPingOutParameter\" />";
-   $$XMLportType.="</operation>";
-
-   $$XMLmessage.="<message name=\"doPingInpParameter\">";
-   $$XMLmessage.="<part name=\"parameters\" ".
-                 "element=\"${ns}:doPing\" />";
-   $$XMLmessage.="</message>";
-   $$XMLmessage.="<message name=\"doPingOutParameter\">";
-   $$XMLmessage.="<part name=\"parameters\" ".
-                 "element=\"${ns}:doPingResponse\" />";
-   $$XMLmessage.="</message>";
-
-   $$XMLtypes.="<xsd:element name=\"doPing\">";
-   $$XMLtypes.="<xsd:complexType>";
-   $$XMLtypes.="<xsd:sequence>";
-   $$XMLtypes.="<xsd:element name=\"input\" ".
-              "type=\"${ns}:doPingInput\" />";
-              "minOccurs=\"1\" maxOccurs=\"1\" />";
-   $$XMLtypes.="</xsd:sequence>";
-   $$XMLtypes.="</xsd:complexType>";
-   $$XMLtypes.="</xsd:element>";
-
-   $$XMLtypes.="<xsd:element name=\"doPingResponse\">";
-   $$XMLtypes.="<xsd:complexType>";
-   $$XMLtypes.="<xsd:sequence>";
-   $$XMLtypes.="<xsd:element name=\"output\" ".
-              "type=\"${ns}:doPingOutput\" />";
-              "minOccurs=\"1\" maxOccurs=\"1\" />";
-   $$XMLtypes.="</xsd:sequence>";
-   $$XMLtypes.="</xsd:complexType>";
-   $$XMLtypes.="</xsd:element>";
-
-   $$XMLtypes.="<xsd:complexType name=\"doPingOutput\">";
-   $$XMLtypes.="<xsd:sequence>";
-   $$XMLtypes.="<xsd:element minOccurs=\"1\" maxOccurs=\"1\" ".
-              "name=\"exitcode\" type=\"xsd:int\" />";
-   $$XMLtypes.="<xsd:element minOccurs=\"1\" maxOccurs=\"1\" ".
-              "name=\"result\" type=\"xsd:int\" />";
-   $$XMLtypes.="</xsd:sequence>";
-   $$XMLtypes.="</xsd:complexType>";
-
-   $$XMLtypes.="<xsd:complexType name=\"doPingInput\">";
-   $$XMLtypes.="<xsd:sequence>";
-   $$XMLtypes.="<xsd:element name=\"lang\" ".
-              "type=\"xsd:string\" nillable=\"true\" />";
-   $$XMLtypes.="</xsd:sequence>";
-   $$XMLtypes.="</xsd:complexType>";
-}
-
-sub WSDLshowFields
-{
-   my $self=shift;
-   my $o=shift;
-   my $uri=shift;
-   my $ns=shift;
-   my $fp=shift;
-   my $XMLbinding=shift;
-   my $XMLportType=shift;
-   my $XMLmessage=shift;
-   my $XMLtypes=shift;
-
-   $$XMLbinding.="<operation name=\"showFields\">";
-   $$XMLbinding.="<SOAP:operation ".
-                "soapAction=\"http://w5base.net/webservice/mod/${fp}".
-                "#showFields\" style=\"document\" />";
-   $$XMLbinding.="<input><SOAP:body use=\"literal\" /></input>";
-   $$XMLbinding.="<output><SOAP:body use=\"literal\" /></output>";
-   $$XMLbinding.="</operation>";
-
-
-   $$XMLportType.="<operation name=\"showFields\">";
-   $$XMLportType.="<input message=\"${ns}:showFieldsInpParameter\" />";
-   $$XMLportType.="<output message=\"${ns}:showFieldsOutParameter\" />";
-   $$XMLportType.="</operation>";
-
-   $$XMLmessage.="<message name=\"showFieldsInpParameter\">";
-   $$XMLmessage.="<part name=\"parameters\" ".
-                 "element=\"${ns}:showFields\" />";
-   $$XMLmessage.="</message>";
-   $$XMLmessage.="<message name=\"showFieldsOutParameter\">";
-   $$XMLmessage.="<part name=\"parameters\" ".
-                 "element=\"${ns}:showFieldsResponse\" />";
-   $$XMLmessage.="</message>";
-
-   $$XMLtypes.="<xsd:element name=\"showFields\">";
-   $$XMLtypes.="<xsd:complexType>";
-   $$XMLtypes.="<xsd:sequence>";
-   $$XMLtypes.="<xsd:element name=\"input\" ".
-              "type=\"${ns}:showFieldsInput\" />";
-              "minOccurs=\"1\" maxOccurs=\"1\" />";
-   $$XMLtypes.="</xsd:sequence>";
-   $$XMLtypes.="</xsd:complexType>";
-   $$XMLtypes.="</xsd:element>";
-
-   $$XMLtypes.="<xsd:element name=\"showFieldsResponse\">";
-   $$XMLtypes.="<xsd:complexType>";
-   $$XMLtypes.="<xsd:sequence>";
-   $$XMLtypes.="<xsd:element name=\"output\" ".
-              "type=\"${ns}:showFieldsOutput\" />";
-              "minOccurs=\"1\" maxOccurs=\"1\" />";
-   $$XMLtypes.="</xsd:sequence>";
-   $$XMLtypes.="</xsd:complexType>";
-   $$XMLtypes.="</xsd:element>";
-
-   $$XMLtypes.="<xsd:complexType name=\"showFieldsOutput\">";
-   $$XMLtypes.="<xsd:sequence>";
-   $$XMLtypes.="<xsd:element minOccurs=\"1\" maxOccurs=\"1\" ".
-              "name=\"exitcode\" type=\"xsd:int\" />";
-   $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
-              "name=\"lastmsg\" type=\"${ns}:ArrayOfString\" />";
-   $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
-              "name=\"records\" type=\"${ns}:FieldList\" />";
-   $$XMLtypes.="</xsd:sequence>";
-   $$XMLtypes.="</xsd:complexType>";
-
-   $$XMLtypes.="<xsd:complexType name=\"FieldList\">";
-   $$XMLtypes.="<xsd:sequence>";
-   $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"unbounded\" ".
-               "name=\"item\" type=\"${ns}:Field\" />";
-   $$XMLtypes.="</xsd:sequence>";
-   $$XMLtypes.="</xsd:complexType>";
-
-   $$XMLtypes.="<xsd:complexType name=\"Field\">";
-   $$XMLtypes.="<xsd:sequence>";
-   $$XMLtypes.="<xsd:element name=\"type\" type=\"xsd:string\" />";
-   $$XMLtypes.="<xsd:element name=\"longtype\" type=\"xsd:string\" />";
-   $$XMLtypes.="<xsd:element name=\"name\" type=\"xsd:string\" />";
-   $$XMLtypes.="<xsd:element name=\"group\" type=\"${ns}:ArrayOfString\" />";
-   $$XMLtypes.="<xsd:element name=\"primarykey\" ".
-               "minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:int\"  />";
-   $$XMLtypes.="</xsd:sequence>";
-   $$XMLtypes.="</xsd:complexType>";
-
-   $$XMLtypes.="<xsd:complexType name=\"showFieldsInput\">";
-   $$XMLtypes.="<xsd:sequence>";
-   $$XMLtypes.="<xsd:element name=\"lang\" ".
-              "type=\"xsd:string\" nillable=\"true\" />";
-   $$XMLtypes.="</xsd:sequence>";
-   $$XMLtypes.="</xsd:complexType>";
-}
-
-
-sub WSDLfindRecord
-{
-   my $self=shift;
-   my $o=shift;
-   my $uri=shift;
-   my $ns=shift;
-   my $fp=shift;
-   my $XMLbinding=shift;
-   my $XMLportType=shift;
-   my $XMLmessage=shift;
-   my $XMLtypes=shift;
-   my @flist=$o->getFieldObjsByView(["ALL"]);
-
-   $$XMLbinding.="<operation name=\"findRecord\">";
-   $$XMLbinding.="<SOAP:operation ".
-                "soapAction=\"http://w5base.net/webservice/mod/${fp}".
-                "#findRecord\" style=\"document\" />";
-   $$XMLbinding.="<input><SOAP:body use=\"literal\" /></input>";
-   $$XMLbinding.="<output><SOAP:body use=\"literal\" /></output>";
-   $$XMLbinding.="</operation>";
-
-
-   $$XMLportType.="<operation name=\"findRecord\">";
-   $$XMLportType.="<input message=\"${ns}:findRecordInpParameter\" />";
-   $$XMLportType.="<output message=\"${ns}:findRecordOutParameter\" />";
-   $$XMLportType.="</operation>";
-
-   $$XMLmessage.="<message name=\"findRecordInpParameter\">";
-   $$XMLmessage.="<part name=\"parameters\" ".
-                 "element=\"${ns}:findRecord\" />";
-   $$XMLmessage.="</message>";
-   $$XMLmessage.="<message name=\"findRecordOutParameter\">";
-   $$XMLmessage.="<part name=\"parameters\" ".
-                 "element=\"${ns}:findRecordResponse\" />";
-   $$XMLmessage.="</message>";
-
-   $$XMLtypes.="<xsd:element name=\"findRecord\">";
-   $$XMLtypes.="<xsd:complexType>";
-   $$XMLtypes.="<xsd:sequence>";
-   $$XMLtypes.="<xsd:element name=\"input\" ".
-              "type=\"${ns}:findRecordInput\" />";
-              "minOccurs=\"1\" maxOccurs=\"1\" />";
-   $$XMLtypes.="</xsd:sequence>";
-   $$XMLtypes.="</xsd:complexType>";
-   $$XMLtypes.="</xsd:element>";
-
-   $$XMLtypes.="<xsd:element name=\"findRecordResponse\">";
-   $$XMLtypes.="<xsd:complexType>";
-   $$XMLtypes.="<xsd:sequence>";
-   $$XMLtypes.="<xsd:element name=\"output\" ".
-              "type=\"${ns}:findRecordOutput\" />";
-              "minOccurs=\"1\" maxOccurs=\"1\" />";
-   $$XMLtypes.="</xsd:sequence>";
-   $$XMLtypes.="</xsd:complexType>";
-   $$XMLtypes.="</xsd:element>";
-
-   $$XMLtypes.="<xsd:complexType name=\"findRecordOutput\">";
-   $$XMLtypes.="<xsd:sequence>";
-   $$XMLtypes.="<xsd:element minOccurs=\"1\" maxOccurs=\"1\" ".
-              "name=\"exitcode\" type=\"xsd:int\" />";
-   $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
-              "name=\"lastmsg\" type=\"${ns}:ArrayOfString\" />";
-   $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
-              "name=\"records\" type=\"${ns}:RecordList\" />";
-   $$XMLtypes.="</xsd:sequence>";
-   $$XMLtypes.="</xsd:complexType>";
-
-   $$XMLtypes.="<xsd:complexType name=\"RecordList\">";
-   $$XMLtypes.="<xsd:sequence>";
-   $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"unbounded\" ".
-               "name=\"item\" type=\"${ns}:Record\" />";
-   $$XMLtypes.="</xsd:sequence>";
-   $$XMLtypes.="</xsd:complexType>";
-
-   $$XMLtypes.="<xsd:complexType name=\"Record\">";
-   $$XMLtypes.="<xsd:sequence>";
-   foreach my $fobj (@flist){
-      my $type="xsd:string";
-      $type="xsd:integer" if ($fobj->Type() eq "Id");
-
-      my $name=$fobj->Name();
-      $$XMLtypes.="<xsd:element minOccurs=\"0\" ".
-                  "maxOccurs=\"1\" name=\"$name\" type=\"$type\" />";
-   }
-   $$XMLtypes.="</xsd:sequence>";
-   $$XMLtypes.="</xsd:complexType>";
-
-   $$XMLtypes.="<xsd:complexType name=\"findRecordInput\">";
-   $$XMLtypes.="<xsd:sequence>";
-   $$XMLtypes.="<xsd:element name=\"lang\" ".
-              "type=\"xsd:string\" nillable=\"true\" />";
-   $$XMLtypes.="<xsd:element name=\"view\" ".
-              "type=\"xsd:string\" nillable=\"true\" />";
-   $$XMLtypes.="<xsd:element name=\"filter\" ".
-              "type=\"${ns}:Filter\" />";
-   $$XMLtypes.="</xsd:sequence>";
-   $$XMLtypes.="</xsd:complexType>";
-
-   $$XMLtypes.="<xsd:complexType name=\"Filter\">";
-   $$XMLtypes.="<xsd:sequence>";
-   foreach my $fobj (@flist){
-      next if ($fobj->Type() eq "Linenumber");
-      my $type="xsd:string";
-      my $name=$fobj->Name();
-      $$XMLtypes.="<xsd:element minOccurs=\"0\" ".
-                  "maxOccurs=\"1\" name=\"$name\" type=\"$type\" />";
-   }
-   $$XMLtypes.="</xsd:sequence>";
-   $$XMLtypes.="</xsd:complexType>";
-
-}
-
-
 
 
 sub WSDL
@@ -599,23 +298,19 @@ sub WSDL
    my $XMLportType="";
    my $XMLbinding="";
    my $XMLservice="";
-   if (my $o=getModuleObject($self->Config,$module)){
+   my $wfclass;
+   my $usemodule=$module;
+   if ($usemodule=~m/^.+::workflow::.+$/){
+      $usemodule="base::workflow";
+   }
+   if (my $o=getModuleObject($self->Config,$usemodule)){
       $XMLservice.="<service name=\"W5Base\">";
-      $XMLservice.="<port name=\"${ns}\" binding=\"${ns}:${ns}Port\">";
+      $XMLservice.="<port name=\"${ns}\" binding=\"${ns}:Port\">";
       $XMLservice.="<SOAP:address location=\"$uri\" />";
       $XMLservice.="</port>";
       $XMLservice.="</service>";
-      $self->WSDLcommon($o,$uri,$ns,$fp,
-                        \$XMLbinding,\$XMLportType,\$XMLmessage,\$XMLtypes);
-      $self->WSDLdoPing($o,$uri,$ns,$fp,
-                        \$XMLbinding,\$XMLportType,\$XMLmessage,\$XMLtypes);
-      $self->WSDLshowFields($o,$uri,$ns,$fp,
-                        \$XMLbinding,\$XMLportType,\$XMLmessage,\$XMLtypes);
-      $self->WSDLfindRecord($o,$uri,$ns,$fp,
-                        \$XMLbinding,\$XMLportType,\$XMLmessage,\$XMLtypes);
-
-
-
+      $o->WSDLcommon($uri,$ns,$fp,$module,
+                     \$XMLbinding,\$XMLportType,\$XMLmessage,\$XMLtypes);
    }
 
    print(<<EOF);
@@ -627,17 +322,17 @@ Content-type: text/xml
  xmlns:SOAP="http://schemas.xmlsoap.org/wsdl/soap/"
  xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
- xmlns:W5Kernel="http://w5base.net/webservice/lib/kernel"
- xmlns:$ns="http://w5base.net/webservice/mod/$fp"
- targetNamespace="http://w5base.net/webservice/mod/$fp">
+ xmlns:W5Kernel="http://w5base.net/lib/kernel"
+ xmlns:$ns="http://w5base.net/mod/$fp"
+ targetNamespace="http://w5base.net/mod/$fp">
 <types>
 <xsd:schema elementFormDefault="qualified">
 $XMLtypes
 </xsd:schema>
 </types>
 $XMLmessage
-<portType name="${ns}Port">$XMLportType</portType>
-<binding name="${ns}Port" type="${ns}:${ns}Port">
+<portType name="Port">$XMLportType</portType>
+<binding name="Port" type="${ns}:Port">
 <SOAP:binding transport="http://schemas.xmlsoap.org/soap/http"
               style="document" />
 $XMLbinding
@@ -670,13 +365,15 @@ sub _SOAPaction2param
       my $mod=$act;                      # uri if no dataobject specified
       $mod=~s/"//;
       $mod=~s/#.*$//;
-      $mod=~s#http://w5base.net/webservice/##;
+      $mod=~s#http://w5base.net/##;
       if ($mod=~m/^mod\//){
          $mod=~s/^mod\///;
       }
-      if ($mod=~m/^workflow\//){
-         $mod=~s/^workflow\///;
+      if ($mod=~m/\/workflow\//){
          $mod=~s/\//::/g;
+         if (exists($param->{data}) && ref($param->{data}) eq "HASH"){
+            $param->{data}->{class}=$mod;
+         }
          $param->{class}=$mod;
          $mod="base::workflow";
       }
@@ -687,6 +384,20 @@ sub _SOAPaction2param
    if ($param->{lang} eq ""){
       $param->{lang}="en";
    }
+   #
+   # this is the fix, to handel "default" parameters with wsdl2java
+   #
+   foreach my $store (grep(/^___STORE_TAG_AT_.*_PARAM___$/,keys(%$param))){
+      if (my ($var,$val)=
+          $store=~m/___STORE_TAG_AT_([A-Z,a-z]+)_(.*)_PARAM___$/){
+         if (!exists($param->{$var})){
+            $param->{$var}=$val;
+         }
+         delete($param->{$store});
+      }
+   }
+
+
 printf STDERR ("param=%s\n",Dumper($param));
 }
 
@@ -751,6 +462,7 @@ sub storeRecord
    my $self=$W5Base::SOAP;
    my $uri=shift;
    my $param=shift;
+   $self->_SOAPaction2param($self->{SOAP}->action(),$param);
    my $envelope=pop;
    my $objectname=$param->{dataobject};
    my $filter=$param->{filter};
@@ -786,13 +498,13 @@ sub storeRecord
       delete($newrec->{action});
       if ($o->nativProcess($action,$newrec,$id)){
          return(interface::SOAP::kernel::Finish({exitcode=>0,
-                      IdentifiedBy=>$newrec->{id}})); 
+                                                IdentifiedBy=>$newrec->{id}})); 
       }
       if ($o->LastMsg()==0){
          $o->LastMsg(ERROR,"unknown problem");
       }
       return(interface::SOAP::kernel::Finish({exitcode=>10,
-             lastmsg=>[$o->LastMsg()]})); 
+                                              lastmsg=>[$o->LastMsg()]})); 
    }
    else{
       if (defined($id)){
@@ -806,8 +518,9 @@ sub storeRecord
                if (my @grps=$o->isWriteValid($oldrec,$newrec)){
                   if ($o->SecureValidatedUpdateRecord($oldrec,$newrec,$filter)){
                      $id=~s/^0*//g if (defined($id) && $id=~m/^\d+$/);
-                     return(interface::SOAP::kernel::Finish({exitcode=>0,
-                                                          IdentifiedBy=>$id})); 
+                     return(interface::SOAP::kernel::Finish(
+                            SOAP::Data->name(output=>{exitcode=>0,
+                                           IdentifiedBy=>$id})->type("HASH"))); 
                   }
                   return(interface::SOAP::kernel::Finish({exitcode=>10,
                          lastmsg=>[$o->LastMsg()]})); 
@@ -828,8 +541,13 @@ sub storeRecord
          if (my @grps=$o->isWriteValid(undef,$newrec)){
             if (my $id=$o->SecureValidatedInsertRecord($newrec)){
                $id=~s/^0*//g if (defined($id) && $id=~m/^\d+$/);
-               return(interface::SOAP::kernel::Finish({exitcode=>0,
-                                                       IdentifiedBy=>$id})); 
+
+               return(interface::SOAP::kernel::Finish({
+                                                         exitcode=>0,
+                                                         IdentifiedBy=>$id
+                                                      })); 
+
+
             }
             return(interface::SOAP::kernel::Finish({exitcode=>10,
                    lastmsg=>[$o->LastMsg()]})); 
@@ -957,8 +675,8 @@ sub getHashList
       }
       $l[$c]=SOAP::Data->type('Record')->value(\%cprec);
    }
-   return(interface::SOAP::kernel::Finish({exitcode=>0,
-          lastmsg=>[],records=>\@l}));
+   return(interface::SOAP::kernel::Finish(SOAP::Data->name(output=>{exitcode=>0,
+          lastmsg=>[],records=>\@l})));
 }
 
 sub validateObjectname
@@ -1016,7 +734,15 @@ sub Finish
          $result->{lastmsg}->[$c]=~s/\s*$//g;
       }
    }
-   return($result);
+   if (exists($result->{IdentifiedBy})){
+      $result->{IdentifiedBy}=
+             SOAP::Data->type('xsd:integer')->value($result->{IdentifiedBy});
+   }
+   if (exists($result->{exitcode})){
+      $result->{exitcode}=
+             SOAP::Data->type('xsd:int')->value($result->{exitcode});
+   }
+   return(SOAP::Data->name(output=>$result)->type("HASH"));
 }
 
 1;

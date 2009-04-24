@@ -1093,6 +1093,31 @@ sub getHtmlContextMenu
    return($self->getParent->getHtmlContextMenu(@_));
 }
 
+sub WSDLcommon
+{
+   my $self=shift;
+   my $o=$self;
+   my $uri=shift;
+   my $ns=shift;
+   my $fp=shift;
+   my $class=shift;
+   my $XMLbinding=shift;
+   my $XMLportType=shift;
+   my $XMLmessage=shift;
+   my $XMLtypes=shift;
+
+   $$XMLbinding.="<!-- no $class specified methods/types --> ";
+
+}
+
+sub WSDLsimple
+{
+   my $self=shift;
+ 
+   return($self->getParent->WSDLsimple(@_))
+}
+
+
 
 
 

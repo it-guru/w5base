@@ -39,9 +39,20 @@
 
     <s:complexType name="PingInput">
      <s:sequence>
-      <s:element name="lang" type="s:string" />
+
+      <s:element minOccurs="1" maxOccurs="1"
+       name="lang" type="W5Kernel:xlan" />
+
+
      </s:sequence>
     </s:complexType>
+   <s:simpleType name="xlan">
+     <s:restriction base="s:string">
+       <s:enumeration value="addnote"/>
+       <s:enumeration value="wfclose"/>
+       <s:enumeration value="wffinish"/>
+     </s:restriction>
+   </s:simpleType>
 
    </s:schema>
  </types>
@@ -60,6 +71,10 @@
    <input message="W5Kernel:doPingIn" />
    <output message="W5Kernel:doPingOut" />
   </operation>
+  <operation name="doPong">
+   <input message="W5Kernel:doPingIn" />
+   <output message="W5Kernel:doPingOut" />
+  </operation>
  </portType>
 
 
@@ -67,6 +82,12 @@
   <soap:binding transport="http://schemas.xmlsoap.org/soap/http"
                 style="document" />
   <operation name="doPing">
+   <soap:operation soapAction="http://w5base.net/webservice/lib/kernel#doPing"
+    style="document" />
+   <input><soap:body use="literal" /></input>
+   <output><soap:body use="literal" /></output>
+  </operation>
+  <operation name="doPong">
    <soap:operation soapAction="http://w5base.net/webservice/lib/kernel#doPing"
     style="document" />
    <input><soap:body use="literal" /></input>

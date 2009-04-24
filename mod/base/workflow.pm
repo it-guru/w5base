@@ -836,6 +836,35 @@ sub getDynamicFields
    return;
 }
 
+
+#######################################################################
+# WSDL integration
+#######################################################################
+sub WSDLcommon
+{
+   my $self=shift;
+   my $o=$self;
+   my $uri=shift;
+   my $ns=shift;
+   my $fp=shift;
+   my $class=shift;
+   my $XMLbinding=shift;
+   my $XMLportType=shift;
+   my $XMLmessage=shift;
+   my $XMLtypes=shift;
+
+printf STDERR ("fifi class=$class\n");
+   if (defined($class) && defined($self->{SubDataObj}->{$class})){
+      my $classobj=$self->{SubDataObj}->{$class};
+printf STDERR ("fifi1 class=$class\n");
+      $classobj->WSDLcommon($uri,$ns,$fp,$class,
+                              $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes);
+   }
+
+   return($self->SUPER::WSDLcommon($uri,$ns,$fp,$class,
+                              $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes));
+}
+
 sub Main
 {
    my $self=shift;

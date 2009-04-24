@@ -1,5 +1,5 @@
 MOD=base/user base/grp itil/appl itil/system AL_TCom/appl
-MOD=base/grp base/user
+MOD=base/grp base/user base/workflow AL_TCom/workflow/businesreq
 all:
 	@(rm -Rf net; exit 0)
 	@( for m in $(MOD); do  echo "loading $${m}"; \
