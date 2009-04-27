@@ -1110,12 +1110,23 @@ sub WSDLcommon
 
 }
 
-sub WSDLsimple
+
+sub WSDLaddNativFieldList
 {
    my $self=shift;
- 
-   return($self->getParent->WSDLsimple(@_))
+   my $o=$self;
+   my $uri=shift;
+   my $ns=shift;
+   my $fp=shift;
+   my $module=shift;
+   my $mode=shift;
+   my $XMLbinding=shift;
+   my $XMLportType=shift;
+   my $XMLmessage=shift;
+   my $XMLtypes=shift;
+
 }
+
 
 
 

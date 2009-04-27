@@ -3,6 +3,9 @@ import org.apache.axis.client.Stub;
 import org.apache.axis.client.Call;
 import org.apache.log4j.PropertyConfigurator; 
 import org.apache.log4j.Logger; 
+import java.util.*;
+import java.text.*;
+
 
 public class businessreq {
   public static void main(String [] args) throws Exception {
@@ -11,6 +14,7 @@ public class businessreq {
     net.w5base.mod.AL_TCom.workflow.businesreq.W5Base        W5Service;
     net.w5base.mod.AL_TCom.workflow.businesreq.Port          W5Port;
     net.w5base.mod.AL_TCom.workflow.businesreq.WfRec         WfRec;
+    net.w5base.mod.AL_TCom.workflow.businesreq.Record        CurRec;
     net.w5base.mod.AL_TCom.workflow.businesreq.StoreRecInp   Inp;
     net.w5base.mod.AL_TCom.workflow.businesreq.StoreRecOut   Res;
     net.w5base.mod.AL_TCom.workflow.businesreq.Filter        Flt;
@@ -52,17 +56,35 @@ public class businessreq {
     Flt=new net.w5base.mod.AL_TCom.workflow.businesreq.Filter();
     Flt.setId(Res.getIdentifiedBy());
     FInput.setFilter(Flt);
-    FInput.setView("name,stateid,posibleactions");
+    FInput.setView("posibleactions,detaildescription,mdate,name,stateid");
 
     // do the Query
     Result=W5Port.findRecord(FInput);
 
     // show the Result
+    CurRec=null;
     for (net.w5base.mod.AL_TCom.workflow.businesreq.Record rec: 
          Result.getRecords()){
-       System.out.println(rec.getName()+" = "+rec.getStateid());
+       CurRec=rec;
     }
+    //
+    //  work arround with CurRec
+    //
 
+    if (CurRec!=null){
+       System.out.println(CurRec.getName()+" = "+CurRec.getStateid());
+       SimpleDateFormat df = new SimpleDateFormat( "dd.MM.yyyy HH:mm:ss" );
+       System.out.println("mdate = "+df.format(CurRec.getMdate().getTime()));
+       System.out.println("posible actions= "+
+                    itguru.join(CurRec.getPosibleactions(),", "));
+      
+       if (itguru.exitsIn(CurRec.getPosibleactions(),"wfbreak")){
+          System.out.printf("break is OK at now\n");
+       }
+       else{
+          System.out.printf("break is NOT OK at now\n");
+       }
+    }
 
   }
 }

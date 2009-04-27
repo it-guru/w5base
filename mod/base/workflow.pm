@@ -109,6 +109,7 @@ sub new
       new kernel::Field::Interface(
                 name          =>'posibleactions',
                 label         =>'Posible actions',
+                WSDLfieldType =>'ArrayOfString',
                 onRawValue    =>\&getPosibleActions,
                 depend        =>['id']),
                                    
@@ -825,6 +826,9 @@ sub getDynamicFields
    my $newrec=$param{current};
    my $class=effVal($oldrec,$newrec,"class");
 
+   if (!defined($class) && defined($param{class})){
+      $class=$param{class};
+   }
    if (!defined($class)){
       $class=Query->Param("WorkflowClass");
    }
@@ -835,6 +839,7 @@ sub getDynamicFields
    }
    return;
 }
+
 
 
 #######################################################################
@@ -853,10 +858,8 @@ sub WSDLcommon
    my $XMLmessage=shift;
    my $XMLtypes=shift;
 
-printf STDERR ("fifi class=$class\n");
    if (defined($class) && defined($self->{SubDataObj}->{$class})){
       my $classobj=$self->{SubDataObj}->{$class};
-printf STDERR ("fifi1 class=$class\n");
       $classobj->WSDLcommon($uri,$ns,$fp,$class,
                               $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes);
    }
@@ -864,6 +867,28 @@ printf STDERR ("fifi1 class=$class\n");
    return($self->SUPER::WSDLcommon($uri,$ns,$fp,$class,
                               $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes));
 }
+
+sub WSDLaddNativFieldList
+{
+   my $self=shift;
+   my $o=$self;
+   my $uri=shift;
+   my $ns=shift;
+   my $fp=shift;
+   my $class=shift;
+   my $mode=shift;
+   my $XMLbinding=shift;
+   my $XMLportType=shift;
+   my $XMLmessage=shift;
+   my $XMLtypes=shift;
+
+   if (defined($class) && defined($self->{SubDataObj}->{$class})){
+      my $classobj=$self->{SubDataObj}->{$class};
+      $classobj->WSDLaddNativFieldList($uri,$ns,$fp,$class,$mode,
+                              $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes);
+   }
+}
+
 
 sub Main
 {
@@ -1242,6 +1267,9 @@ sub getSubDataObjFieldObjsByView
    elsif (defined($param{oldrec}) && defined($param{oldrec}->{class})){
       $class=$param{oldrec}->{class};
    }
+   elsif (defined($param{class})){
+      $class=$param{class};
+   }
    else{
       $class=Query->Param("WorkflowClass");
    }
@@ -1251,6 +1279,7 @@ sub getSubDataObjFieldObjsByView
       next if (defined($class) && $class ne $SubDataObj);
       my $sobj=$self->{SubDataObj}->{$SubDataObj};
       if ($sobj->can("getFieldObjsByView")){
+printf STDERR ("fifi getFieldObjsByView on $sobj\n");
          push(@fobjs,$sobj->getFieldObjsByView($view,%param));
       }
    }
@@ -1270,6 +1299,9 @@ sub getDetailBlockPriority
    }
    elsif (defined($param{oldrec}) && defined($param{oldrec}->{class})){
       $class=$param{oldrec}->{class};
+   }
+   elsif (defined($param{class})){
+      $class=$param{class};
    }
    my @sub=();
    if (defined($class) && exists($self->{SubDataObj}->{$class})){

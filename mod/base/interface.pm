@@ -667,13 +667,18 @@ sub getHashList
    }
    $o->SecureSetFilter($filter); 
    msg(INFO,"SOAPgetHashList in search objectname=$objectname");
+   my @fobjs=$o->getFieldObjsByView($view);
    my @l=$o->getHashList(@$view);
    for(my $c=0;$c<=$#l;$c++){
       my %cprec;
-      foreach my $k (keys(%{$l[$c]})){
-         $cprec{$k}=SOAP::Data->type('xsd:string')->value($l[$c]->{$k});
+      foreach my $fobj (@fobjs){
+         my $k=$fobj->Name();
+         my $wsdl=$fobj->{WSDLfieldType};
+         $wsdl="xsd:string" if ($wsdl eq "");
+         my $v=$fobj->FormatedResult($l[$c],"SOAP");
+         $cprec{$k}=SOAP::Data->type($wsdl)->value($v);
       }
-      $l[$c]=SOAP::Data->type('Record')->value(\%cprec);
+      $l[$c]=SOAP::Data->name('record')->type('Record')->value(\%cprec);
    }
    return(interface::SOAP::kernel::Finish(SOAP::Data->name(output=>{exitcode=>0,
           lastmsg=>[],records=>\@l})));

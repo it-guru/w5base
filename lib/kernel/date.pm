@@ -119,6 +119,9 @@ sub Date_to_String
    elsif ($lang eq "ISO8601"){
       $d=sprintf("%04d-%02d-%02dT%02d:%02d:%02d",$Y,$M,$D,$h,$m,$s);
    }
+   elsif ($lang eq "SOAP"){
+      $d=sprintf("%04d-%02d-%02dT%02d:%02d:%02dZ",$Y,$M,$D,$h,$m,$s);
+   }
    elsif($lang eq "ultrashort"){
       my ($nY,$nM,$nD,$nh,$nm,$ns)=Today_and_Now($timezone);
       if ($Y==$nY && $M==$nM && $D==$nD){

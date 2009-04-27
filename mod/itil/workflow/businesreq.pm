@@ -230,6 +230,32 @@ sub getPosibleRelations
           ); 
 }
 
+sub WSDLaddNativFieldList
+{
+   my $self=shift;
+   my $o=$self;
+   my $uri=shift;
+   my $ns=shift;
+   my $fp=shift;
+   my $class=shift;
+   my $mode=shift;
+   my $XMLbinding=shift;
+   my $XMLportType=shift;
+   my $XMLmessage=shift;
+   my $XMLtypes=shift;
+
+   if ($mode eq "store"){
+      $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
+                  "name=\"affectedapplication\" type=\"xsd:string\" />";
+   }
+
+
+   return($self->SUPER::WSDLaddNativFieldList($uri,$ns,$fp,$class,$mode,
+                              $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes));
+}
+
+
+
 
 
 

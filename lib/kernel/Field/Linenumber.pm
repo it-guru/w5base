@@ -29,6 +29,7 @@ sub new
    $self->{htmlwidth}="1%"   if (!defined($self->{htmlwidth}));
    $self->{align}="right"    if (!defined($self->{align}));
    $self->{searchable}=0     if (!defined($self->{searchable}));
+   $self->{readonly}=1       if (!defined($self->{readonly}));
    $self->{htmldetail}=0     if (!defined($self->{htmldetail}));
    $self=bless($type->SUPER::new(%$self),$type);
    return($self);

@@ -2714,6 +2714,15 @@ sub WSDLcommon
    $$XMLtypes.="</xsd:complexContent>";
    $$XMLtypes.="</xsd:complexType>";
 
+
+   $$XMLtypes.="<xsd:complexType name=\"ArrayOfStringItems\">";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"unbounded\" ".
+               "name=\"item\" type=\"xsd:string\" />";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
+
+
    $self->WSDLdoPing($uri,$ns,$fp,$module,
                      $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes);
    $self->WSDLshowFields($uri,$ns,$fp,$module,
@@ -3070,6 +3079,22 @@ sub WSDLstoreRecord
    $$XMLtypes.="</xsd:complexType>";
 }
 
+sub WSDLaddNativFieldList
+{
+   my $self=shift;
+   my $o=$self;
+   my $uri=shift;
+   my $ns=shift;
+   my $fp=shift;
+   my $module=shift;
+   my $mode=shift;
+   my $XMLbinding=shift;
+   my $XMLportType=shift;
+   my $XMLmessage=shift;
+   my $XMLtypes=shift;
+
+}
+
 sub WSDLfieldList
 {
    my $self=shift;
@@ -3085,11 +3110,13 @@ sub WSDLfieldList
    my $XMLtypes=shift;
    my @flist;
    if ($o->can("getFieldObjsByView")){
-      @flist=$o->getFieldObjsByView(["ALL"]);
+      @flist=$o->getFieldObjsByView(["ALL"],class=>$module);
    }
    if ($mode eq "store"){
       foreach my $fobj (@flist){
-         my $type="xsd:string";
+         next if ($fobj->Type() ne "Id" && $fobj->readonly);
+         my $type=$fobj->WSDLfieldType($ns,$mode);
+         next if (!defined($type));
          my $minOccurs="0";
          if ($fobj->Type() eq "Id"){
             $type="xsd:integer";
@@ -3102,10 +3129,10 @@ sub WSDLfieldList
    }
    if ($mode eq "result"){
       foreach my $fobj (@flist){
-         my $type="xsd:string";
+         my $type=$fobj->WSDLfieldType($ns,$mode);
+         next if (!defined($type));
          my $minOccurs="0";
          if ($fobj->Type() eq "Id"){
-            $type="xsd:integer";
             $minOccurs="1";
          }
      
@@ -3116,14 +3143,17 @@ sub WSDLfieldList
    }
    if ($mode eq "filter"){
       foreach my $fobj (@flist){
-         next if ($fobj->Type() eq "Linenumber");
-         my $type="xsd:string";
+         my $type=$fobj->WSDLfieldType($ns,$mode);
+         next if (!defined($type));
          my $name=$fobj->Name();
          $$XMLtypes.="<xsd:element minOccurs=\"0\" ".
                      "maxOccurs=\"1\" name=\"$name\" type=\"$type\" />";
       }
    }
+   $self->WSDLaddNativFieldList($uri,$ns,$fp,$module,$mode,
+                         $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes);
 }
+
 
 
 sub WSDLfindRecord

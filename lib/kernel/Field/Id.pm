@@ -27,12 +27,13 @@ sub new
 {
    my $type=shift;
    my %self=@_;
-   $self{selectfix}=1 if (!defined($self{selectfix}));
-   $self{autogen}=1   if (!defined($self{autogen}));
-   $self{readonly}=1  if (!defined($self{readonly}));
-   $self{htmlwidth}="1%"  if (!exists($self{htmlwidth}));
-   $self{xlswidth}="16"   if (!exists($self{xlswidth}));
-   $self{align}="right"   if (!defined($self{align}));
+   $self{selectfix}=1                   if (!defined($self{selectfix}));
+   $self{autogen}=1                     if (!defined($self{autogen}));
+   $self{readonly}=1                    if (!defined($self{readonly}));
+   $self{htmlwidth}="1%"                if (!exists($self{htmlwidth}));
+   $self{xlswidth}="16"                 if (!exists($self{xlswidth}));
+   $self{align}="right"                 if (!defined($self{align}));
+   $self{WSDLfieldType}="xsd:integer"   if (!defined($self{WSDLfieldType}));
    my $self=bless($type->SUPER::new(%self),$type);
    $self->{_permitted}->{thoupoint}=1;
    $self->{_permitted}->{autogen}=1;
@@ -108,6 +109,16 @@ sub getXLSformatname
    my $data=shift;
    return("longint");
 }
+
+sub WSDLfieldType
+{
+   my $self=shift;
+   my $ns=shift;
+   my $mode=shift;
+   return("xsd:integer");
+}
+
+
 
 
 

@@ -395,7 +395,7 @@ sub Validate
       }
       return({});
    }
-   return({$self->Name()=>$newrec->{$self->Name()}});
+   return({$self->Name()=>trim($newrec->{$self->Name()})});
 }
 
 sub copyFrom
@@ -791,6 +791,7 @@ sub FormatedDetail
 {
    my $self=shift;
    my $current=shift;
+   my $FormatAs=shift;
    my $d=$self->RawValue($current);
    return($d);
 }
@@ -889,6 +890,20 @@ sub getXLSformatname
 {
    my $self=shift;
    return("default");
+}
+
+sub WSDLfieldType
+{
+   my $self=shift;
+   my $ns=shift;
+   my $mode=shift;
+   if (exists($self->{WSDLfieldType})){
+      if (!($self->{WSDLfieldType}=~m/:/)){
+         return($ns.":".$self->{WSDLfieldType});
+      }
+      return($self->{WSDLfieldType});
+   }
+   return("xsd:string");
 }
 
 

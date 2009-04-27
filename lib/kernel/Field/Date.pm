@@ -28,8 +28,9 @@ sub new
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
    $self->{_permitted}->{timezone}=1;           # Zeitzone des feldes in DB
-   $self->{timezone}="GMT" if (!defined($self->{timezone}));
-   $self->{htmlwidth}="150" if (!defined($self->{htmlwidth}));
+   $self->{timezone}="GMT"               if (!defined($self->{timezone}));
+   $self->{htmlwidth}="150"              if (!defined($self->{htmlwidth}));
+   $self->{WSDLfieldType}="xsd:dateTime" if (!defined($self->{WSDLfieldType}));
    return($self);
 }
 
@@ -209,6 +210,12 @@ sub FormatedDetail
          $d=$self->getParent->ExpandTimeExpression($d,"ISO8601",
                                                       $usertimezone,
                                                       $usertimezone);
+      }
+      if ($mode eq "SOAP"){
+         my $usertimezone=$self->getParent->UserTimezone();
+         $d=$self->getParent->ExpandTimeExpression($d,"SOAP",
+                                                      $usertimezone,
+                                                      "GMT");
       }
       return($d);
    }
