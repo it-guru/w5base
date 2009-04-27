@@ -79,7 +79,23 @@ public class businessreq {
        System.out.println("mdate = "+df.format(CurRec.getMdate().getTime()));
        System.out.println("posible actions= "+
                     itguru.join(CurRec.getPosibleactions(),", "));
-      
+     
+       if (itguru.exitsIn(CurRec.getPosibleactions(),"wffollowup")){
+          System.out.printf("try to send a followup note\n");
+          WfRec=new net.w5base.mod.AL_TCom.workflow.businesreq.WfRec();
+          WfRec.setAction("wffollowup");
+          WfRec.setNote("Hallo Welt");
+          Inp.setData(WfRec);
+          Inp.setIdentifiedBy(Res.getIdentifiedBy());
+          Res=W5Port.storeRecord(Inp);
+          if (Res.getExitcode()==0){
+             System.out.printf("note has been successfuly send\n");
+          }
+          else{
+             System.out.println(itguru.join(Res.getLastmsg(),"\n"));
+          }
+       }
+ 
        if (itguru.exitsIn(CurRec.getPosibleactions(),"wfbreak")){
           System.out.printf("break is OK at now\n");
           WfRec=new net.w5base.mod.AL_TCom.workflow.businesreq.WfRec();

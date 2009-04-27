@@ -160,6 +160,19 @@ sub PostProcess
    my $action=shift;
    my $WfRec=shift;
    my $actions=shift;
+   my %param=@_;
+   my $aobj=$self->getParent->getParent->Action();
+
+   if ($action eq "SaveStep.wffollowup"){
+      $aobj->NotifyForward($WfRec->{id},
+                           $param{fwdtarget},
+                           $param{fwdtargetid},
+                           $param{fwdtargetname},
+                           $param{note},
+                           mode=>'FOLLOWUP:',
+                           workflowname=>$WfRec->{name},
+                           sendercc=>1);
+   }
 
    if ($action=~m/^SaveStep\..*$/){
       Query->Delete("WorkflowStep");
@@ -171,6 +184,40 @@ sub PostProcess
 
    return(undef);           # return isn't matter
 }
+
+
+sub nativProcess
+{
+   my $self=shift;
+   my $op=shift;
+   my $h=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   if ($op eq "wffollowup"){
+      my $note=$h->{note};
+      if ($note=~m/^\s*$/  || length($note)<10){
+         $self->LastMsg(ERROR,"empty or to short notes are not allowed");
+         return(0);
+      }
+      $note=trim($note);
+      if ($self->getParent->getParent->Action->StoreRecord(
+          $WfRec->{id},"wfaddnote",
+          {translation=>'base::workflow::request'},$note)){
+         $self->PostProcess("SaveStep.".$op,$WfRec,$actions,
+                            note=>$note,
+                            fwdtarget=>$WfRec->{fwdtarget},
+                            fwdtargetid=>$WfRec->{fwdtargetid});
+         return(1);
+      }
+      return(0);
+   }
+
+   return(0);
+}
+
+
+
 
 sub Process
 {
@@ -242,7 +289,7 @@ sub Process
          }
          return(0);
       }
-      if ($op eq "wfforward"){    # default forwarding Handler
+      elsif ($op eq "wfforward"){    # default forwarding Handler
          my $note=Query->Param("note");
          $note=trim($note);
 
@@ -286,7 +333,7 @@ sub Process
          }
          return(0);
       }
-      if ($op eq "wfdefer"){
+      elsif ($op eq "wfdefer"){
          my $app=$self->getParent->getParent;
          my $note=Query->Param("note");
          if ($note=~m/^\s*$/  || length($note)<10){
@@ -313,7 +360,7 @@ sub Process
          }
          return(0);
       }
-      if ($op eq "wfmailsend"){    # default mailsending handling
+      elsif ($op eq "wfmailsend"){    # default mailsending handling
           
          my $emailto=Query->Param("emailto");
          my $shortnote=Query->Param("emailmsg");
@@ -367,6 +414,12 @@ sub Process
             return(1);
          }
       }
+      else{
+         my $h=$self->getWriteRequestHash("web");
+         return($self->nativProcess($op,$h,$WfRec,$actions));
+      }
+
+
    }
    return(0);
 }

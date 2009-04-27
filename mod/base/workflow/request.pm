@@ -855,18 +855,19 @@ sub Validate
 sub nativProcess
 {
    my $self=shift;
-   my $action=shift;
+   my $op=shift;
    my $h=shift;
    my $WfRec=shift;
    my $actions=shift;
    my $userid=$self->getParent->getParent->getCurrentUserId();
 
-   if ($action eq "BreakWorkflow" || $action eq "wfbreak"){
-      $action="wfbreak" if ($action eq "BreakWorkflow");
-      if ($action ne "" && !grep(/^$action$/,@{$actions})){
-         $self->LastMsg(ERROR,"invalid disalloed action requested");
-         return(0);
-      }
+   if ($op ne "" && !grep(/^$op$/,@{$actions})){
+      $self->LastMsg(ERROR,"invalid disalloed action requested");
+      return(0);
+   }
+printf STDERR ("fifi ===== op=$op\n");
+
+   if ($op eq "wfbreak"){
       if ($self->getParent->getParent->Action->StoreRecord(
           $WfRec->{id},"wfbreak",
           {translation=>'base::workflow::request'},"",undef)){
@@ -882,7 +883,7 @@ sub nativProcess
                                     fwdtarget=>undef,
                                    });
          if ($openuserid!=$userid){
-            $self->PostProcess($action,$WfRec,$actions,
+            $self->PostProcess($op,$WfRec,$actions,
                                "breaked by $ENV{REMOTE_USER}",
                                fwdtarget=>'base::user',
                                fwdtargetid=>$openuserid,
@@ -891,9 +892,24 @@ sub nativProcess
          return(1);
       }
       return(0);
-
    }
-
+   elsif($op eq "wfaccept"){
+      if ($self->StoreRecord($WfRec,{stateid=>3,
+                                     fwdtarget=>'base::user',
+                                     fwdtargetid=>$userid,
+                                     fwddebtarget=>undef,
+                                     fwddebtargetid=>undef})){
+         if ($self->getParent->getParent->Action->StoreRecord(
+             $WfRec->{id},"wfaccept",
+             {translation=>'base::workflow::request'},"",undef)){
+            $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
+            $self->PostProcess("SaveStep.".$op,$WfRec,$actions);
+            return(1);
+         }
+      }
+      return(0);
+   }
+   return($self->SUPER::nativProcess($op,$h,$WfRec,$actions));
 }
 
 sub Process
@@ -907,31 +923,13 @@ sub Process
 
    if ($action eq "BreakWorkflow"){
       my $h=$self->getWriteRequestHash("web");
-      return($self->nativProcess($action,$h,$WfRec,$actions));
+      return($self->nativProcess("wfbreak",$h,$WfRec,$actions));
    }
 
    if ($action eq "SaveStep"){
       my $op=Query->Param("OP");
       if ($action ne "" && !grep(/^$op$/,@{$actions})){
          $self->LastMsg(ERROR,"invalid disalloed action requested");
-         return(0);
-      }
-     
-      if ($op eq "wfaccept"){
-     
-         if ($self->StoreRecord($WfRec,{stateid=>3,
-                                        fwdtarget=>'base::user',
-                                        fwdtargetid=>$userid,
-                                        fwddebtarget=>undef,
-                                        fwddebtargetid=>undef})){
-            if ($self->getParent->getParent->Action->StoreRecord(
-                $WfRec->{id},"wfaccept",
-                {translation=>'base::workflow::request'},"",undef)){
-               $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
-               $self->PostProcess($action.".".$op,$WfRec,$actions);
-               return(1);
-            }
-         }
          return(0);
       }
      
@@ -975,8 +973,7 @@ sub Process
          }
          return(0);
       }
-     
-      if ($op eq "wfacceptp"){
+      elsif ($op eq "wfacceptp"){
          my $note=Query->Param("note");
          if ($note=~m/^\s*$/  || length($note)<10){
             $self->LastMsg(ERROR,"empty or to short notes are not allowed");
@@ -1008,8 +1005,7 @@ sub Process
          }
          return(0);
       }
-     
-      if ($op eq "wffine"){
+      elsif ($op eq "wffine"){
          if ($self->getParent->getParent->Action->StoreRecord(
              $WfRec->{id},"wffine",
              {translation=>'base::workflow::request'},"",undef)){
@@ -1031,8 +1027,7 @@ sub Process
          }
          return(0);
       }
-     
-      if ($op eq "wffineproc"){
+      elsif ($op eq "wffineproc"){
          my $note=Query->Param("note");
          if ($note=~m/^\s*$/  || length($note)<10){
             $self->LastMsg(ERROR,"empty or to short notes are not allowed");
@@ -1060,8 +1055,7 @@ sub Process
          }
          return(0);
       }
-     
-      if ($op eq "wfreject"){
+      elsif ($op eq "wfreject"){
          my $note=Query->Param("note");
          if ($note=~m/^\s*$/ || length($note)<10){
             $self->LastMsg(ERROR,"empty or to short notes are not allowed");
@@ -1088,8 +1082,7 @@ sub Process
          }
          return(0);
       }
-     
-      if ($op eq "wfapprovok"){
+      elsif ($op eq "wfapprovok"){
          my $note=Query->Param("note");
          $note=trim($note);
          if (Query->Param("VERIFY") eq ""){
@@ -1111,8 +1104,7 @@ sub Process
          }
          return(0);
       }
-     
-      if ($op eq "wfapprovreject"){
+      elsif ($op eq "wfapprovreject"){
          my $note=Query->Param("note");
          if ($note=~m/^\s*$/ || length($note)<10){
             $self->LastMsg(ERROR,"you need to specified a descriptive note");
@@ -1134,8 +1126,7 @@ sub Process
          }
          return(0);
       }
-     
-      if ($op eq "wfcallback"){
+      elsif ($op eq "wfcallback"){
          if ($self->getParent->getParent->Action->StoreRecord(
              $WfRec->{id},"wfcallback",
              {translation=>'base::workflow::request'},undef,undef)){
@@ -1150,8 +1141,7 @@ sub Process
          }
          return(0);
       }
-     
-      if ($op eq "wfactivate"){
+      elsif ($op eq "wfactivate"){
          my $note=Query->Param("note");
          $note=trim($note);
      
@@ -1191,8 +1181,7 @@ sub Process
          }
          return(0);
       }
-     
-      if ($op eq "wfreprocess"){
+      elsif ($op eq "wfreprocess"){
          my $note=Query->Param("note");
          $note=trim($note);
      
@@ -1232,8 +1221,7 @@ sub Process
          }
          return(0);
       }
-     
-      if ($op eq "wfapprovalreq"){
+      elsif ($op eq "wfapprovalreq"){
          my $note=Query->Param("note");
          $note=trim($note);
     
@@ -1297,9 +1285,7 @@ sub Process
          }
          return(0);
       }
-
-
-      if ($op eq "wfapprovalcan"){
+      elsif ($op eq "wfapprovalcan"){
          my $note=Query->Param("note");
          $note=trim($note);
     
@@ -1318,6 +1304,10 @@ sub Process
             }
          }
          return(0);
+      }
+      else{
+         my $h=$self->getWriteRequestHash("web");
+         return($self->nativProcess($op,$h,$WfRec,$actions));
       }
    }
    return($self->SUPER::Process($action,$WfRec,$actions));
@@ -1438,7 +1428,7 @@ sub PostProcess
          }
       }
    }
-   return($self->SUPER::PostProcess($action,$WfRec,$actions));
+   return($self->SUPER::PostProcess($action,$WfRec,$actions,%param));
 }
 
 

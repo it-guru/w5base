@@ -497,8 +497,13 @@ sub storeRecord
       my $action=$newrec->{action};
       delete($newrec->{action});
       if ($o->nativProcess($action,$newrec,$id)){
+         
+         my $IdentifiedBy=$id;
+         if ($IdentifiedBy eq ""){
+            $IdentifiedBy=$newrec->{id};
+         }
          return(interface::SOAP::kernel::Finish({exitcode=>0,
-                                                IdentifiedBy=>$newrec->{id}})); 
+                                                IdentifiedBy=>$IdentifiedBy})); 
       }
       if ($o->LastMsg()==0){
          my $msg="unknown problem";

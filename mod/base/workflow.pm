@@ -1279,7 +1279,6 @@ sub getSubDataObjFieldObjsByView
       next if (defined($class) && $class ne $SubDataObj);
       my $sobj=$self->{SubDataObj}->{$SubDataObj};
       if ($sobj->can("getFieldObjsByView")){
-printf STDERR ("fifi getFieldObjsByView on $sobj\n");
          push(@fobjs,$sobj->getFieldObjsByView($view,%param));
       }
    }
