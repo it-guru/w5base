@@ -3045,6 +3045,10 @@ sub WSDLstoreRecord
    $$XMLtypes.="<xsd:sequence>";
    $$XMLtypes.="<xsd:element name=\"lang\" ".
               "type=\"xsd:string\" nillable=\"true\" />";
+   if ($self->Self() eq "base::workflow"){
+      $$XMLtypes.="<xsd:element name=\"IdentifiedBy\" ".
+                 "type=\"xsd:integer\" nillable=\"true\" />";
+   }
    $$XMLtypes.="<xsd:element name=\"data\" ".
               "type=\"${ns}:$recordname\" />";
    $$XMLtypes.="</xsd:sequence>";

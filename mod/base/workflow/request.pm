@@ -353,6 +353,9 @@ sub getPosibleActions
       push(@l,"wfapprovalreq"); # Genehmigung anfordern      (durch Bearbeiter)
       push(@l,"wfapprovalcan"); # Genehmigung abbrechen      (durch Bearbeiter)
    }
+   if ($userid==$creator && $stateid<17){
+      push(@l,"wffollowup"); # add a followup note for current worker
+   }
    if ((($isadmin && !$iscurrent) || ($userid==$creator && !$iscurrent)) &&
        $stateid<3 && $stateid>1){
       push(@l,"wfbreak");   # workflow abbrechen      (durch Anforderer o admin)
@@ -849,16 +852,21 @@ sub Validate
    return(1);
 }
 
-sub Process
+sub nativProcess
 {
    my $self=shift;
    my $action=shift;
+   my $h=shift;
    my $WfRec=shift;
    my $actions=shift;
    my $userid=$self->getParent->getParent->getCurrentUserId();
 
-
-   if ($action eq "BreakWorkflow"){
+   if ($action eq "BreakWorkflow" || $action eq "wfbreak"){
+      $action="wfbreak" if ($action eq "BreakWorkflow");
+      if ($action ne "" && !grep(/^$action$/,@{$actions})){
+         $self->LastMsg(ERROR,"invalid disalloed action requested");
+         return(0);
+      }
       if ($self->getParent->getParent->Action->StoreRecord(
           $WfRec->{id},"wfbreak",
           {translation=>'base::workflow::request'},"",undef)){
@@ -883,6 +891,23 @@ sub Process
          return(1);
       }
       return(0);
+
+   }
+
+}
+
+sub Process
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my $userid=$self->getParent->getParent->getCurrentUserId();
+
+
+   if ($action eq "BreakWorkflow"){
+      my $h=$self->getWriteRequestHash("web");
+      return($self->nativProcess($action,$h,$WfRec,$actions));
    }
 
    if ($action eq "SaveStep"){

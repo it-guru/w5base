@@ -1125,6 +1125,12 @@ sub WSDLaddNativFieldList
    my $XMLmessage=shift;
    my $XMLtypes=shift;
 
+   if ($mode eq "store"){
+      $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
+                  "name=\"action\" type=\"xsd:string\" />";
+   }
+
+
 }
 
 

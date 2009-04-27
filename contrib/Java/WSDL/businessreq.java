@@ -41,10 +41,11 @@ public class businessreq {
     WfRec.setAffectedapplication("W5Base/Darwin");
 
     Inp.setData(WfRec);
+    Inp.setLang("de");
 
     Res=W5Port.storeRecord(Inp);
     if (Res.getExitcode()!=0){
-       System.out.println("BUG="+Res.getLastmsg()[0]);
+       System.out.println(itguru.join(Res.getLastmsg(),"\n"));
        System.exit(1);
     }
     System.out.println("new WorkflowID="+Res.getIdentifiedBy());
@@ -56,7 +57,7 @@ public class businessreq {
     Flt=new net.w5base.mod.AL_TCom.workflow.businesreq.Filter();
     Flt.setId(Res.getIdentifiedBy());
     FInput.setFilter(Flt);
-    FInput.setView("posibleactions,detaildescription,mdate,name,stateid");
+    FInput.setView("posibleactions,detaildescription,mdate,name,stateid,step");
 
     // do the Query
     Result=W5Port.findRecord(FInput);
@@ -68,22 +69,38 @@ public class businessreq {
        CurRec=rec;
     }
     //
-    //  work arround with CurRec
+    //  work arround with CurRec and at the end, break the workflow
     //
 
     if (CurRec!=null){
        System.out.println(CurRec.getName()+" = "+CurRec.getStateid());
        SimpleDateFormat df = new SimpleDateFormat( "dd.MM.yyyy HH:mm:ss" );
+       System.out.println("step = "+CurRec.getStep());
        System.out.println("mdate = "+df.format(CurRec.getMdate().getTime()));
        System.out.println("posible actions= "+
                     itguru.join(CurRec.getPosibleactions(),", "));
       
        if (itguru.exitsIn(CurRec.getPosibleactions(),"wfbreak")){
           System.out.printf("break is OK at now\n");
+          WfRec=new net.w5base.mod.AL_TCom.workflow.businesreq.WfRec();
+          WfRec.setAction("wfbreak");
+          Inp.setData(WfRec);
+          Inp.setIdentifiedBy(Res.getIdentifiedBy());
+          Res=W5Port.storeRecord(Inp);
+          if (Res.getExitcode()==0){
+             System.out.printf("break was ok\n");
+          }
+          else{
+             System.out.println(itguru.join(Res.getLastmsg(),"\n"));
+             System.exit(1);
+          }
        }
        else{
           System.out.printf("break is NOT OK at now\n");
        }
+
+
+
     }
 
   }

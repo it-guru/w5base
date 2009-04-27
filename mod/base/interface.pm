@@ -501,7 +501,9 @@ sub storeRecord
                                                 IdentifiedBy=>$newrec->{id}})); 
       }
       if ($o->LastMsg()==0){
-         $o->LastMsg(ERROR,"unknown problem");
+         my $msg="unknown problem";
+         $msg.=" or '$action' is not accessable via SOAP" if ($action ne "");
+         $o->LastMsg(ERROR,$msg);
       }
       return(interface::SOAP::kernel::Finish({exitcode=>10,
                                               lastmsg=>[$o->LastMsg()]})); 
