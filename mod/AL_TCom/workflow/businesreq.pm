@@ -161,56 +161,6 @@ sub isEffortReadAllowed
    return($self->SUPER::isEffortReadAllowed($WfRec));
 }
 
-#sub WSDLcommon
-#{
-#   my $self=shift;
-#   my $o=$self;
-#   my $uri=shift;
-#   my $ns=shift;
-#   my $fp=shift;
-#   my $class=shift;
-#   my $XMLbinding=shift;
-#   my $XMLportType=shift;
-#   my $XMLmessage=shift;
-#   my $XMLtypes=shift;
-#
-#   $$XMLbinding.="<!-- AL T-Com Kundenauftrag --> ";
-#
-#   $self->WSDLsimple($fp,$ns,"addBuisReq","storeRecord",
-#                     $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes,
-#                     in =>[
-#                            lang            =>{type=>'xsd:string',
-#                                               minOccurs=>'1',
-#                                               maxOccurs=>'1',
-#                                               nillable=>'true'},
-#                            data =>[ name                =>{type=>'xsd:string',
-#                                                            minOccurs=>'0',
-#                                                            maxOccurs=>'1',
-#                                                            nillable=>'true'},
-#                                     detaildescription   =>{type=>'xsd:string',
-#                                                            minOccurs=>'0',
-#                                                            maxOccurs=>'1',
-#                                                            nillable=>'true'},
-#                                     affectedapplication =>{type=>'xsd:string',
-#                                                            minOccurs=>'0',
-#                                                            maxOccurs=>'1',
-#                                                            nillable=>'true'},
-#                                   ],
-#                          ],
-#                     out=>[
-#                            lastmsg         =>{type=>$ns.':ArrayOfString',
-#                                               minOccurs=>'1',
-#                                               maxOccurs=>'1' },
-#                            exitcode        =>{type=>'xsd:int',
-#                                               minOccurs=>'1',
-#                                               maxOccurs=>'1' },
-#                            result          =>{type=>'xsd:int',
-#                                               minOccurs=>'1',
-#                                               maxOccurs=>'1' }
-#                     ]);
-#}
-
-
 
 
 

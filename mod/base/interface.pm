@@ -304,6 +304,8 @@ sub WSDL
       $usemodule="base::workflow";
    }
    if (my $o=getModuleObject($self->Config,$usemodule)){
+      $o->setParent($self);
+      $o->Init();
       $XMLservice.="<service name=\"W5Base\">";
       $XMLservice.="<port name=\"${ns}\" binding=\"${ns}:Port\">";
       $XMLservice.="<SOAP:address location=\"$uri\" />";
@@ -426,6 +428,8 @@ sub showFields
       return(interface::SOAP::kernel::Finish({exitcode=>128,
              lastmsg=>['invalid dataobject specified']}));
    }
+   $o->setParent($self);
+   $o->Init();
 
    my @l;
    my $idfield=$o->IdField();
@@ -487,6 +491,8 @@ sub storeRecord
       return(interface::SOAP::kernel::Finish({exitcode=>128,
              lastmsg=>[msg(ERROR,'invalid dataobject specified')]}));
    }
+   $o->setParent($self);
+   $o->Init();
    foreach my $k (keys(%$newrec)){
       if (ref($newrec->{$k}) eq "ARRAY" &&
           $newrec->{$k}->[0] eq "MIME::Entity"){
@@ -591,6 +597,8 @@ sub deleteRecord
       return(interface::SOAP::kernel::Finish({exitcode=>128,
              lastmsg=>['invalid dataobject specified']}));
    }
+   $o->setParent($self);
+   $o->Init();
 
    if (defined($id)){
       my $idfield=$o->IdField();
@@ -637,6 +645,7 @@ sub getHashList
    my $objectname=$param->{dataobject};
    my $view=$param->{view};
    my $filter=$param->{filter};
+   $filter={} if ($filter eq "");
 
    $view=[split(/\s*[,;]\s*/,$view)] if (ref($view) ne "ARRAY");
    $ENV{HTTP_FORCE_LANGUAGE}=$param->{lang} if (defined($param->{lang}));
@@ -668,6 +677,8 @@ sub getHashList
       return(interface::SOAP::kernel::Finish({exitcode=>128,
              lastmsg=>[msg(ERROR,'invalid dataobject specified')]}));
    }
+   $o->setParent($self);
+   $o->Init();
    if (!$o->isViewValid()){
       return(interface::SOAP::kernel::Finish({exitcode=>128,
              lastmsg=>[msg(ERROR,'no access to dataobject')]}));
@@ -707,6 +718,11 @@ sub validateObjectname
    if (!defined($o)){
       return(interface::SOAP::kernel::Finish({exitcode=>128,
              lastmsg=>[msg(ERROR,'invalid dataobject specified')]}));
+   }
+   $o->setParent($self);
+   if (!$o->Init()){
+      return(interface::SOAP::kernel::Finish({exitcode=>128,
+             lastmsg=>[msg(ERROR,'inactive dataobject specified')]}));
    }
 
    return(interface::SOAP::kernel::Finish({exitcode=>0}));

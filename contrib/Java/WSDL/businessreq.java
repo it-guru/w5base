@@ -39,6 +39,9 @@ public class businessreq {
     WfRec.setDetaildescription("This is the description of my request\n"+
                                "This description can have more than one line");
     WfRec.setAffectedapplication("W5Base/Darwin");
+    WfRec.setCustomerrefno("INETWORK:112233");
+    WfRec.setReqnature("appl.base.base");
+    WfRec.setReqdesdate("yesterday would be best");
 
     Inp.setData(WfRec);
     Inp.setLang("de");
@@ -84,7 +87,8 @@ public class businessreq {
           System.out.printf("try to send a followup note\n");
           WfRec=new net.w5base.mod.AL_TCom.workflow.businesreq.WfRec();
           WfRec.setAction("wffollowup");
-          WfRec.setNote("Hallo Welt");
+          WfRec.setNote("This is a note, whitch should be send to the\n"+
+                        "current user, to witch the workflow is forwared");
           Inp.setData(WfRec);
           Inp.setIdentifiedBy(Res.getIdentifiedBy());
           Res=W5Port.storeRecord(Inp);

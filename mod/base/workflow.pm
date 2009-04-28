@@ -113,7 +113,7 @@ sub new
                 onRawValue    =>\&getPosibleActions,
                 depend        =>['id']),
                                    
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'stateid',         # for fast
                 label         =>'Worflow state ID',
                 selectfix     =>1,

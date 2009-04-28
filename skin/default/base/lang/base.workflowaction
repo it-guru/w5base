@@ -11,6 +11,7 @@
 'LABEL:APRREJ:'=>{de=>'Genehmigung abgelehnt',en=>'Approved rejected'},
 'LABEL:APROK:'=>{de=>'Genehmigt',en=>'Approved'},
 'LABEL:FW:'=>{de=>'Weiterleitung',en=>'Forward'},
+'LABEL:FOLLOWUP:'=>{de=>'Nachtrag',en=>'Followup'},
 'LABEL:APRREQ:'=>{de=>'Genehmigungsanforderung',en=>'Approve request'},
 'LABEL:INFO:'=>{de=>'Workflow Status Information',en=>'Workflow state information'},
 'The Workflow %s has been forwared to you without comments'=>{

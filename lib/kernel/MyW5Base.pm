@@ -23,14 +23,28 @@ use kernel;
 use kernel::App;
 use kernel::date;
 use kernel::Universal;
+use kernel::WSDLbase;
 
-@ISA=qw(kernel::App);
+@ISA=qw(kernel::App kernel::WSDLbase);
 
 sub new
 {
+   no strict 'refs';
    my $type=shift;
    my $self=bless({@_},$type);
    $self->{isInitalized}=0;
+
+   foreach my $method (qw(IdField getFieldList getFieldObjsByView
+                          getField ViewEditor
+                          isViewValid isWriteValid
+                          getHashList ResetFilter
+                          SetCurrentView 
+                          getOnlyFirst)){
+      *$method = sub {
+            my $s = shift;
+            return ($s->getDataObj()->$method(@_));
+        }
+   } 
    return($self);
 }
 
@@ -92,13 +106,6 @@ sub getQueryTemplate
    my $self=shift;
    my $bb=$self->getDefaultStdButtonBar();
    return($bb);
-}
-
-sub ViewEditor
-{
-   my $self=shift;
-
-   return($self->{DataObj}->ViewEditor());
 }
 
 
@@ -266,59 +273,19 @@ sub getTimeRangeDrop
 #
 # DataObj compatibility Interface
 #
-sub getHashList
-{
-   my $self=shift;
-   my $dataobj=$self->getDataObj();
-   return($dataobj->getHashList(@_));
-   return;
-}
-
-sub ResetFilter
-{
-   my $self=shift;
-   $self->Init() if (!defined($self->{DataObj}));
-   my $dataobj=$self->getDataObj();
-   return($dataobj->ResetFilter());
-}
-
-sub SetFilter
-{
-   my $self=shift;
-   $self->Init() if (!defined($self->{DataObj}));
-   my $dataobj=$self->getDataObj();
-   return;
-}
-
-sub SecureSetFilter
-{
-   my $self=shift;
-   my $dataobj=$self->getDataObj();
-   return($dataobj->SetFilter(@_));
-   return;
-}
-
-sub SetCurrentView
-{
-   my $self=shift;
-   my $dataobj=$self->getDataObj();
-   return($dataobj->SetCurrentView(@_));
-   return;
-}
-
-sub getOnlyFirst
-{
-   my $self=shift;
-   my $dataobj=$self->getDataObj();
-   return($dataobj->getOnlyFirst(@_));
-   return;
-}
-
 sub Config
 {
    my $self=shift;
    return($self->getParent->Config(@_));
 }
+
+sub SecureSetFilter
+{
+   my $self=shift;
+   return($self->SetFilter(@_));
+}
+
+
 
 sub ExpandTimeExpression
 {
@@ -328,6 +295,36 @@ sub ExpandTimeExpression
 
 
 #######################################################################
+
+
+sub WSDLaddNativFieldList
+{
+   my $self=shift;
+   my $o=$self;
+   my $uri=shift;
+   my $ns=shift;
+   my $fp=shift;
+   my $class=shift;
+   my $mode=shift;
+   my $XMLbinding=shift;
+   my $XMLportType=shift;
+   my $XMLmessage=shift;
+   my $XMLtypes=shift;
+
+   if ($mode eq "filter"){
+      $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
+                  "name=\"viewstate\" type=\"xsd:string\" />";
+      $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
+                  "name=\"exviewcontrol\" type=\"xsd:string\" />";
+   }
+
+
+   return($self->SUPER::WSDLaddNativFieldList($uri,$ns,$fp,$class,$mode,
+                              $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes));
+}
+
+
+
 
 
 
