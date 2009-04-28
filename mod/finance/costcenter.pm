@@ -83,40 +83,40 @@ sub new
                 name          =>'databossid',
                 dataobjattr   =>'costcenter.databoss'),
 
-      new kernel::Field::TextDrop(
-                name          =>'ldelmgr',
-                group         =>'delmgmt',
-                label         =>'lead Delivery Manager',
-                AllowEmpty    =>1,
-                vjointo       =>'base::user',
-                vjoinon       =>['ldelmgrid'=>'userid'],
-                vjoindisp     =>'fullname'),
-
-      new kernel::Field::Link(
-                name          =>'ldelmgrid',
-                group         =>'delmgmt',
-                dataobjattr   =>'costcenter.ldelmgr'),
-
-      new kernel::Field::TextDrop(
-                name          =>'ldelmgr2',
-                group         =>'delmgmt',
-                label         =>'lead Deputy Delivery Manager',
-                AllowEmpty    =>1,
-                vjointo       =>'base::user',
-                vjoinon       =>['ldelmgr2id'=>'userid'],
-                vjoindisp     =>'fullname'),
-
-      new kernel::Field::Link(
-                name          =>'ldelmgr2id',
-                group         =>'delmgmt',
-                dataobjattr   =>'costcenter.ldelmgr2'),
+#      new kernel::Field::TextDrop(
+#                name          =>'ldelmgr',
+#                group         =>'delmgmt',
+#                label         =>'lead Delivery Manager',
+#                AllowEmpty    =>1,
+#                vjointo       =>'base::user',
+#                vjoinon       =>['ldelmgrid'=>'userid'],
+#                vjoindisp     =>'fullname'),
+#
+#      new kernel::Field::Link(
+#                name          =>'ldelmgrid',
+#                group         =>'delmgmt',
+#                dataobjattr   =>'costcenter.ldelmgr'),
+#
+#      new kernel::Field::TextDrop(
+#                name          =>'ldelmgr2',
+#                group         =>'delmgmt',
+#                label         =>'lead Deputy Delivery Manager',
+#                AllowEmpty    =>1,
+#                vjointo       =>'base::user',
+#                vjoinon       =>['ldelmgr2id'=>'userid'],
+#                vjoindisp     =>'fullname'),
+#
+#      new kernel::Field::Link(
+#                name          =>'ldelmgr2id',
+#                group         =>'delmgmt',
+#                dataobjattr   =>'costcenter.ldelmgr2'),
 
 
       new kernel::Field::TextDrop(
                 name          =>'delmgrteam',
                 group         =>'delmgmt',
                 htmlwidth     =>'300px',
-                label         =>'Delivery-Management Team',
+                label         =>'Service Delivery-Management Team',
                 vjointo       =>'base::grp',
                 vjoinon       =>['delmgrteamid'=>'grpid'],
                 vjoindisp     =>'fullname'),
@@ -124,7 +124,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'delmgr',
                 group         =>'delmgmt',
-                label         =>'Delivery Manager',
+                label         =>'Service Delivery Manager',
                 AllowEmpty    =>1,
                 vjointo       =>'base::user',
                 vjoinon       =>['delmgrid'=>'userid'],
@@ -139,7 +139,7 @@ sub new
                 name          =>'delmgr2',
                 group         =>'delmgmt',
                 AllowEmpty    =>1,
-                label         =>'Deputy Delivery Manager',
+                label         =>'Deputy Service Delivery Manager',
                 vjointo       =>'base::user',
                 vjoinon       =>['delmgr2id'=>'userid'],
                 vjoindisp     =>'fullname'),
