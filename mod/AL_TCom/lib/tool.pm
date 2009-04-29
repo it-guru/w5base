@@ -45,14 +45,12 @@ sub getRequestedApplicationIds
       push(@$flt,{ semid=>\$userid,cistatusid=>"<6" },
                  { tsmid=>\$userid,cistatusid=>"<6" },
                  { delmgrid=>\$userid,cistatusid=>"<6" },
-                 { ldelmgrid=>\$userid,cistatusid=>"<6" },
                  { databossid=>\$userid,cistatusid=>"<6" });
    }
    if ($param{dep}){
       push(@$flt,{ sem2id=>\$userid,cistatusid=>"<6" },
                  { tsm2id=>\$userid,cistatusid=>"<6" },
-                 { delmgr2id=>\$userid,cistatusid=>"<6" },
-                 { ldelmgr2id=>\$userid,cistatusid=>"<6" });
+                 { delmgr2id=>\$userid,cistatusid=>"<6" });
    }
    if ($param{dep} || $param{team}){
       push(@$flt,{ responseteamid=>\@grps,cistatusid=>"<6"},

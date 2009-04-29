@@ -314,6 +314,10 @@ sub WSDL
       $o->WSDLcommon($uri,$ns,$fp,$module,
                      \$XMLbinding,\$XMLportType,\$XMLmessage,\$XMLtypes);
    }
+   utf8::encode($XMLbinding);
+   utf8::encode($XMLportType);
+   utf8::encode($XMLmessage);
+   utf8::encode($XMLtypes);
 
    print(<<EOF);
 Content-type: text/xml
@@ -669,7 +673,8 @@ sub getHashList
       }
       if (!$fltchk){
          return(interface::SOAP::kernel::Finish({exitcode=>128,
-             lastmsg=>[msg(ERROR,'base::workflow allows only filter to id')]}));
+             lastmsg=>[msg(ERROR,'base::workflow allows only '.
+                                 'SOAP filter to id or srcid')]}));
       }
    }
    my $o=getModuleObject($self->Config,$objectname);

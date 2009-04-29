@@ -1,5 +1,5 @@
 MOD=base/user base/grp itil/appl itil/system AL_TCom/appl
-MOD=base/grp base/user base/workflow AL_TCom/workflow/businesreq base/MyW5Base/wfmyjobs
+MOD=base/grp base/user base/workflow AL_TCom/workflow/businesreq base/MyW5Base/wfmyjobs AL_TCom/workflow/change
 all:
 	@(rm -Rf net; exit 0)
 	@( for m in $(MOD); do  \

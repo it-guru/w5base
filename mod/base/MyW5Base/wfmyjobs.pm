@@ -39,6 +39,32 @@ sub Init
    return(1);
 }
 
+sub WSDLcommon
+{
+   my $self=shift;
+   my $o=$self;
+   my $uri=shift;
+   my $ns=shift;
+   my $fp=shift;
+   my $module=shift;
+   my $XMLbinding=shift;
+   my $XMLportType=shift;
+   my $XMLmessage=shift;
+   my $XMLtypes=shift;
+
+   $$XMLtypes.="<xsd:simpleType name=\"viewstate\">";
+   $$XMLtypes.="<xsd:restriction base=\"xsd:string\">";
+   $$XMLtypes.="<xsd:enumeration value=\"\" />";
+   $$XMLtypes.="<xsd:enumeration value=\"HIDEUNNECESSARY\" />";
+   $$XMLtypes.="<xsd:enumeration value=\"ONLYDEFFERED\" />";
+   $$XMLtypes.="</xsd:restriction>";
+   $$XMLtypes.="</xsd:simpleType>";
+
+ 
+   return($self->SUPER::WSDLcommon($uri,$ns,$fp,$module,
+                              $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes));
+}
+
 
 sub WSDLaddNativFieldList
 {
@@ -54,18 +80,14 @@ sub WSDLaddNativFieldList
    my $XMLmessage=shift;
    my $XMLtypes=shift;
 
-   if ($mode eq "store"){
+   if ($mode eq "filter"){
       $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
-                  "name=\"affectedapplication\" type=\"xsd:string\" />";
+                  "name=\"viewstate\" type=\"$ns:viewstate\" />";
    }
-
 
    return($self->SUPER::WSDLaddNativFieldList($uri,$ns,$fp,$class,$mode,
                               $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes));
 }
-
-
-
 
 
 

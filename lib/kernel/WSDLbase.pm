@@ -17,6 +17,7 @@ package kernel::WSDLbase;
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 use strict;
+use kernel;
 
 #######################################################################
 # WSDL integration
@@ -445,44 +446,27 @@ sub WSDLfieldList
    if ($o->can("getFieldObjsByView")){
       @flist=$o->getFieldObjsByView(["ALL"],class=>$module);
    }
-   if ($mode eq "store"){
-      foreach my $fobj (@flist){
-         next if ($fobj->Type() ne "Id" && $fobj->readonly);
-         next if ($fobj->Type() eq "Link");
-         my $type=$fobj->WSDLfieldType($ns,$mode);
-         next if (!defined($type));
-         my $minOccurs="0";
-         if ($fobj->Type() eq "Id"){
-            $type="xsd:integer";
-         }
-     
-         my $name=$fobj->Name();
-         $$XMLtypes.="<xsd:element minOccurs=\"$minOccurs\" ".
-                     "maxOccurs=\"1\" name=\"$name\" type=\"$type\" />";
-      }
-   }
-   if ($mode eq "result"){
+   if ($mode eq "filter" || $mode eq "result" || $mode eq "store"){
       foreach my $fobj (@flist){
          my $type=$fobj->WSDLfieldType($ns,$mode);
          next if (!defined($type));
-         next if ($fobj->Type() eq "Link");
+         next if ($fobj->Type() ne "Id" && $fobj->readonly && $mode eq "store");
+         next if ($fobj->Type() eq "Link" && 
+                  ($mode eq "result" || $mode eq "store"));
          my $minOccurs="0";
-         if ($fobj->Type() eq "Id"){
+         if ($fobj->Type() eq "Id" && $mode eq "result"){
             $minOccurs="1";
          }
-     
+         my $label=$fobj->Label();
          my $name=$fobj->Name();
          $$XMLtypes.="<xsd:element minOccurs=\"$minOccurs\" ".
-                     "maxOccurs=\"1\" name=\"$name\" type=\"$type\" />";
-      }
-   }
-   if ($mode eq "filter"){
-      foreach my $fobj (@flist){
-         my $type=$fobj->WSDLfieldType($ns,$mode);
-         next if (!defined($type));
-         my $name=$fobj->Name();
-         $$XMLtypes.="<xsd:element minOccurs=\"0\" ".
-                     "maxOccurs=\"1\" name=\"$name\" type=\"$type\" />";
+                     "maxOccurs=\"1\" name=\"$name\" type=\"$type\">";
+         $$XMLtypes.="<xsd:annotation>";
+         $$XMLtypes.="<xsd:documentation>";
+         $$XMLtypes.=$label;
+         $$XMLtypes.="</xsd:documentation>";
+         $$XMLtypes.="</xsd:annotation>";
+         $$XMLtypes.="</xsd:element>";
       }
    }
    $self->WSDLaddNativFieldList($uri,$ns,$fp,$module,$mode,

@@ -67,7 +67,8 @@ sub ProcessServiceCenterRecord
          $wf->SetCurrentView(qw(ALL));
          $wf->ForeachFilteredRecord(sub{
             msg(DEBUG,"PROCESS: du update to '$updateto'");
-            $wf->ValidatedUpdateRecord($_,$wfstorerec,{id=>\$updateto});
+            my $oldrec=$_;
+            $wf->ValidatedUpdateRecord($oldrec,$wfstorerec,{id=>\$updateto});
          });
       }
    }

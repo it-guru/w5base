@@ -395,7 +395,10 @@ sub Validate
       }
       return({});
    }
-   return({$self->Name()=>trim($newrec->{$self->Name()})});
+   if (!ref($newrec->{$self->Name()})){
+      return({$self->Name()=>trim($newrec->{$self->Name()})});
+   }
+   return({$self->Name()=>$newrec->{$self->Name()}});
 }
 
 sub copyFrom

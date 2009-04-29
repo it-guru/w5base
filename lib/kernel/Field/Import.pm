@@ -49,10 +49,11 @@ sub new
       return()
    }
    my @res;
+   my $pname=$parent->Self();
    foreach my $field (@{$param{fields}}){
       my $fo=$obj->getField($field);
       if (!defined($fo)){
-         msg(ERROR,"can't Import '$field' from '$param{vjointo}'");
+         msg(ERROR,"can't Import '$field' from '$param{vjointo}' in $pname");
          next;
       }
       my %fo=%{$fo};

@@ -313,8 +313,6 @@ sub WSDLaddNativFieldList
 
    if ($mode eq "filter"){
       $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
-                  "name=\"viewstate\" type=\"xsd:string\" />";
-      $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
                   "name=\"exviewcontrol\" type=\"xsd:string\" />";
    }
 
