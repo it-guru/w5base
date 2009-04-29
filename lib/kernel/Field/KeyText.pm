@@ -30,6 +30,7 @@ sub new
    my $self=bless($type->SUPER::new(@_),$type);
    $self->{conjunction}="or" if (!defined($self->{conjunction}));
    $self->{vjoinconcat}=", " if (!defined($self->{vjoinconcat}));
+   $self->{WSDLfieldType}="ArrayOfString" if (!defined($self->{WSDLfieldType}));
    return($self);
 }
 
@@ -339,6 +340,9 @@ sub FormatedDetail
    $d=[$d] if (ref($d) ne "ARRAY");
    if ($mode eq "HtmlDetail"){
       $d=[map({$self->addWebLinkToFacility(quoteHtml($_),$current)} @{$d})];
+   }
+   if ($mode eq "SOAP"){
+      return($d);
    }
    if ($mode eq "HtmlV01"){
       $d=[map({quoteHtml($_)} @{$d})];

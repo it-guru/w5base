@@ -277,6 +277,17 @@ sub XmlBottom
    return("</root>");
 }
 
+sub WSDLmodule2ns
+{
+   my $module=shift;
+
+   $module=~s/\//::/g;
+   my $ns="W5::".$module;
+   $ns=~s/:([a-z])/":".uc($1)/eg;
+   $ns=~s/://g;
+   return($ns);
+}
+
 
 
 sub WSDL
@@ -286,9 +297,7 @@ sub WSDL
    $fp=~s/^\///;
    my $module=$fp;
    $module=~s/\//::/g;
-   my $ns="W5::".$module;
-   $ns=~s/:([a-z])/":".uc($1)/eg;
-   $ns=~s/://g;
+   my $ns=WSDLmodule2ns($module);
    my $uri=$ENV{SCRIPT_URI};
    $uri=~s/\/WSDL\/.*/\/SOAP/;
    $uri=~s/\/public\//\/auth\//;
@@ -367,6 +376,7 @@ sub _SOAPaction2param
    my $self=shift;
    my $act=shift;
    my $param=shift;
+   my $ns;
    if ($param->{dataobject} eq ""){   # fill up dataobject depending on
       my $mod=$act;                      # uri if no dataobject specified
       $mod=~s/"//;
@@ -384,8 +394,13 @@ sub _SOAPaction2param
          $mod="base::workflow";
       }
       $mod=~s/\//::/g;
-
       $param->{dataobject}=$mod;
+      if ($mod eq "base::workflow"){
+         $ns=WSDLmodule2ns($param->{class});
+      }
+      else{
+         $ns=WSDLmodule2ns($mod);
+      }
    }
    if ($param->{lang} eq ""){
       $param->{lang}="en";
@@ -402,6 +417,7 @@ sub _SOAPaction2param
          delete($param->{$store});
       }
    }
+   return($ns);
 
 
 printf STDERR ("param=%s\n",Dumper($param));
@@ -645,7 +661,7 @@ sub getHashList
    my $self=$W5Base::SOAP;
    my $uri=shift;
    my $param=shift;
-   $self->_SOAPaction2param($self->{SOAP}->action(),$param);
+   my $ns=$self->_SOAPaction2param($self->{SOAP}->action(),$param);
    my $objectname=$param->{dataobject};
    my $view=$param->{view};
    my $filter=$param->{filter};
@@ -660,16 +676,18 @@ sub getHashList
    if ($objectname eq "base::workflow"){
       msg(DEBUG,"SOAP base::workflow filter %s",Dumper($filter));
       my $fltchk=0;
-      if (ref($filter) eq "HASH" &&
-          keys(%$filter)==1 &&
-          $filter->{id}=~m/^\d{10,20}$/){
-          $fltchk++;
-      }
-      if (ref($filter) eq "HASH" &&
-          keys(%$filter)==1 &&
-          ref($filter->{id}) eq "ARRAY" &&
-          $filter->{id}->[0]=~m/^\d{10,20}$/){
-          $fltchk++;
+      for my $validkey (qw(srcid id)){
+         if (ref($filter) eq "HASH" &&
+             keys(%$filter)==1 &&
+             $filter->{$validkey}=~m/^[0-9,A-Z,_]{5,20}$/i){
+             $fltchk++;
+         }
+         if (ref($filter) eq "HASH" &&
+             keys(%$filter)==1 &&
+             ref($filter->{$validkey}) eq "ARRAY" &&
+             $filter->{$validkey}->[0]=~m/^[0-9,A-Z,_]{5,20}$/i){
+             $fltchk++;
+         }
       }
       if (!$fltchk){
          return(interface::SOAP::kernel::Finish({exitcode=>128,
@@ -698,6 +716,9 @@ sub getHashList
          my $k=$fobj->Name();
          my $wsdl=$fobj->{WSDLfieldType};
          $wsdl="xsd:string" if ($wsdl eq "");
+         if (!($wsdl=~m/^.*:.*$/)){
+            $wsdl=$ns.":".$wsdl;
+         }
          my $v=$fobj->FormatedResult($l[$c],"SOAP");
          $cprec{$k}=SOAP::Data->type($wsdl)->value($v);
       }

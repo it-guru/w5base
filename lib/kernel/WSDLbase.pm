@@ -52,6 +52,19 @@ sub WSDLcommon
    $$XMLtypes.="</xsd:sequence>";
    $$XMLtypes.="</xsd:complexType>";
 
+   $$XMLtypes.="<xsd:complexType name=\"Container\">";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"unbounded\" ".
+               "name=\"item\" type=\"$ns:CItem\" />";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
+
+   $$XMLtypes.="<xsd:complexType name=\"CItem\">";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element name=\"name\" type=\"xsd:string\" />";
+   $$XMLtypes.="<xsd:element name=\"value\" type=\"xsd:string\" />";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
 
    $self->WSDLdoPing($uri,$ns,$fp,$module,
                      $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes);

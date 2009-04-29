@@ -29,6 +29,7 @@ sub new
    my %self=(@_);
    $self{uivisible}=0 if (!defined($self{uivisible}));
    my $self=bless($type->SUPER::new(%self),$type);
+   $self->{WSDLfieldType}="Container" if (!defined($self->{WSDLfieldType}));
    return($self);
 }
 
@@ -40,6 +41,17 @@ sub FormatedDetail
    my $mode=shift;
    my $d=$self->RawValue($current);
    my $name=$self->Name();
+   if ($mode eq "SOAP"){
+      my $xml;
+      if (ref($d) eq "HASH"){
+         foreach my $k (sort(keys(%$d))){
+            my $val=$d->{$k};
+            $val=join("\n",@$val) if (ref($val) eq "ARRAY");
+            $xml.="<item><name>$k</name><value>$val</value></item>";
+         }
+      }
+      return($xml);
+   }
    if ($mode=~m/html/i){
       if (defined($d) && ref($d) eq "HASH" && keys(%{$d})>0){
          my $r="<table class=containerframe>"; 

@@ -154,12 +154,12 @@ sub getFinishUseridList
       my @app=@{$WfRec->{affectedapplicationid}};
       my $app=getModuleObject($self->getParent->Config,"itil::appl");
       $app->SetFilter(id=>\@app);
-      my @rec=$app->getHashList(qw(tsmid tsm2id));
-      foreach my $rec (@rec){
-         push(@l,$rec->{tsmid})  if (defined($rec->{tsmid}));
-      }
-      foreach my $rec (@rec){
-         push(@l,$rec->{tsm2id}) if (defined($rec->{tsm2id}));
+      my @idnames=qw(tsmid tsm2id);
+      my @rec=$app->getHashList(@idnames);
+      foreach my $idname (@idnames){
+         foreach my $rec (@rec){
+            push(@l,$rec->{$idname})  if (defined($rec->{$idname}));
+         }
       }
       if ($#l==-1){
          push(@l,$WfRec->{openuser});
