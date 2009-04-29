@@ -341,7 +341,8 @@ Content-type: text/xml
  xmlns:$ns="http://w5base.net/mod/$fp"
  targetNamespace="http://w5base.net/mod/$fp">
 <types>
-<xsd:schema elementFormDefault="qualified">
+<xsd:schema elementFormDefault="qualified" 
+            targetNamespace="http://w5base.net/mod/$fp">
 $XMLtypes
 </xsd:schema>
 </types>
