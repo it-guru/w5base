@@ -365,6 +365,8 @@ sub SOAP
 {
    my $self=shift;
 
+   $self->Log(INFO,"soap",
+              "request: user='$ENV{REMOTE_USER}' ip='$ENV{REMOTE_ADDR}'");
    $W5Base::SOAP=$self;
    $self->{SOAP}=SOAP::Transport::HTTP::CGI   
     -> dispatch_with($self->{NS})
@@ -419,9 +421,6 @@ sub _SOAPaction2param
       }
    }
    return($ns);
-
-
-printf STDERR ("param=%s\n",Dumper($param));
 }
 
 package interface::SOAP;
@@ -495,9 +494,7 @@ sub storeRecord
    my $id=$param->{IdentifiedBy};
 
    $self->Log(INFO,"soap",
-              "storeRecord: user='$ENV{REMOTE_USER}' ip='$ENV{REMOTE_ADDR}'");
-   $self->Log(INFO,"soap",
-              "[$objectname] ($id)\nnewrec=%s",Dumper($newrec));
+              "storeRecord: [$objectname] ($id)\n%s",Dumper($newrec));
    $ENV{HTTP_FORCE_LANGUAGE}=$param->{lang} if (defined($param->{lang}));
    if (!($objectname=~m/^.+::.+$/)){
       return(interface::SOAP::kernel::Finish({exitcode=>128,
