@@ -323,8 +323,8 @@ sub Format
       $format->set_num_format($xf);
    }
    if (defined($format)){
-      $self->{format}->{$name}=$format;
-      return($self->{format}->{$name});
+      $wb->{format}->{$name}=$format;
+      return($wb->{format}->{$name});
    }
    print STDERR msg(WARN,"XLS: setting format '$name' as 'default'");
    return($self->Format($slot,"default"));
