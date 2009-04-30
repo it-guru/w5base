@@ -229,7 +229,7 @@
                          en=>''},
 '.ETAbusiness'=>        {de=>'ETA-Betrieb',
                          en=>'ETA-Buisiness'},
-'.ETAplan'=>            {de=>'ETA-Planung',
+'.ETAplan'=>            {de=>'ETA-Plannung',
                          en=>'ETA-Planning'},
 '.ETApromblemanalyse'=> {de=>'ETA-Realisation',
                          en=>'ETA-Realisation'},
