@@ -74,6 +74,9 @@ sub WSDLcommon
                          $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes);
    $self->WSDLstoreRecord($uri,$ns,$fp,$module,
                          $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes);
+   $self->WSDLdeleteRecord($uri,$ns,$fp,$module,
+                         $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes);
+
 }
 
 sub WSDLsimple
@@ -388,10 +391,8 @@ sub WSDLstoreRecord
    $$XMLtypes.="<xsd:sequence>";
    $$XMLtypes.="<xsd:element name=\"lang\" ".
               "type=\"xsd:string\" nillable=\"true\" />";
-   if ($self->Self() eq "base::workflow"){
-      $$XMLtypes.="<xsd:element name=\"IdentifiedBy\" ".
-                 "type=\"xsd:integer\" nillable=\"true\" />";
-   }
+   $$XMLtypes.="<xsd:element name=\"IdentifiedBy\" ".
+              "type=\"xsd:integer\" nillable=\"true\" />";
    $$XMLtypes.="<xsd:element name=\"data\" ".
               "type=\"${ns}:$recordname\" />";
    $$XMLtypes.="</xsd:sequence>";
@@ -424,6 +425,88 @@ sub WSDLstoreRecord
                          $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes);
    $$XMLtypes.="</xsd:sequence>";
    $$XMLtypes.="</xsd:complexType>";
+}
+
+sub WSDLdeleteRecord
+{
+   my $self=shift;
+   my $o=$self;
+   my $uri=shift;
+   my $ns=shift;
+   my $fp=shift;
+   my $module=shift;
+   my $XMLbinding=shift;
+   my $XMLportType=shift;
+   my $XMLmessage=shift;
+   my $XMLtypes=shift;
+   my @flist;
+
+
+   $$XMLbinding.="<!-- the deleteRecord() method delete a record -->";
+   $$XMLbinding.="<operation name=\"deleteRecord\">";
+   $$XMLbinding.="<SOAP:operation ".
+                "soapAction=\"http://w5base.net/mod/${fp}".
+                "#deleteRecord\" style=\"document\" />";
+   $$XMLbinding.="<input><SOAP:body use=\"literal\" /></input>";
+   $$XMLbinding.="<output><SOAP:body use=\"literal\" /></output>";
+   $$XMLbinding.="</operation>";
+
+
+   $$XMLportType.="<operation name=\"deleteRecord\">";
+   $$XMLportType.="<input message=\"${ns}:deleteRecordInpParameter\" />";
+   $$XMLportType.="<output message=\"${ns}:deleteRecordOutParameter\" />";
+   $$XMLportType.="</operation>";
+
+   $$XMLmessage.="<message name=\"deleteRecordInpParameter\">";
+   $$XMLmessage.="<part name=\"parameters\" ".
+                 "element=\"${ns}:deleteRecord\" />";
+   $$XMLmessage.="</message>";
+
+   $$XMLmessage.="<message name=\"deleteRecordOutParameter\">";
+   $$XMLmessage.="<part name=\"parameters\" ".
+                 "element=\"${ns}:deleteRecordResponse\" />";
+   $$XMLmessage.="</message>";
+
+   $$XMLtypes.="<xsd:element name=\"deleteRecord\">";
+   $$XMLtypes.="<xsd:complexType>";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element name=\"input\" ".
+              "type=\"${ns}:deleteRecInp\" />";
+              "minOccurs=\"1\" maxOccurs=\"1\" />";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
+   $$XMLtypes.="</xsd:element>";
+
+   $$XMLtypes.="<xsd:complexType name=\"deleteRecInp\">";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element name=\"lang\" ".
+              "type=\"xsd:string\" nillable=\"true\" />";
+   $$XMLtypes.="<xsd:element name=\"IdentifiedBy\" ".
+              "type=\"xsd:integer\" nillable=\"true\" />";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
+
+   $$XMLtypes.="<xsd:element name=\"deleteRecordResponse\">";
+   $$XMLtypes.="<xsd:complexType>";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element name=\"output\" ".
+              "type=\"${ns}:deleteRecOut\" />";
+              "minOccurs=\"1\" maxOccurs=\"1\" />";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
+   $$XMLtypes.="</xsd:element>";
+
+   $$XMLtypes.="<xsd:complexType name=\"deleteRecOut\">";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element minOccurs=\"1\" maxOccurs=\"1\" ".
+              "name=\"exitcode\" type=\"xsd:int\" />";
+   $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
+              "name=\"IdentifiedBy\" type=\"xsd:integer\" />";
+   $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
+              "name=\"lastmsg\" type=\"${ns}:ArrayOfString\" />";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
+
 }
 
 sub WSDLaddNativFieldList
@@ -464,13 +547,14 @@ sub WSDLfieldList
          my $type=$fobj->WSDLfieldType($ns,$mode);
          next if (!defined($type));
          next if ($fobj->Type() ne "Id" && $fobj->readonly && $mode eq "store");
-         next if ($fobj->Type() eq "Link" && 
-                  ($mode eq "result" || $mode eq "store"));
+        # next if ($fobj->Type() eq "Link" && 
+        #          ($mode eq "result" || $mode eq "store"));
          my $minOccurs="0";
          if ($fobj->Type() eq "Id" && $mode eq "result"){
             $minOccurs="1";
          }
          my $label=$fobj->Label();
+         $label=~s/&/&amp;/g;
          my $name=$fobj->Name();
          $$XMLtypes.="<xsd:element minOccurs=\"$minOccurs\" ".
                      "maxOccurs=\"1\" name=\"$name\" type=\"$type\">";

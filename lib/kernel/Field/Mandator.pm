@@ -80,6 +80,22 @@ sub getPostibleValues
    return(@res);
 }
 
+#sub Unformat
+#{
+#   my $self=shift;
+#   my $formated=shift;
+#   my $rec=shift;
+#   my $mandatoridname=$self->{vjoinon}->[0];
+#   my $r={};
+#   if (!ref($formated) && $formated ne "" && 
+#       !defined($rec->{$mandatoridname})){
+#   }
+#
+#   return({$self->Name()=>$formated});
+#}
+
+
+
 sub Validate
 {
    my $self=shift;
@@ -109,6 +125,17 @@ sub Validate
                  $newrec->{$mandatoridname})){
                $app->LastMsg(ERROR,"you are not authorized to write in the ".
                                     "requested mandator");
+               return(undef);
+            }
+         }
+         else{ # check mandatorid
+            my $chkid=effVal($oldrec,$newrec,$mandatoridname);
+            my $m=getModuleObject($self->getParent->Config,"base::mandator");
+            $m->SetFilter({grpid=>\$chkid,
+                           cistatusid=>"<6"});
+            my ($mrec,$msg)=$m->getOnlyFirst(qw(grpid));
+            if (!defined($mrec)){
+               $app->LastMsg(ERROR,"invalid mandatorid");
                return(undef);
             }
          }

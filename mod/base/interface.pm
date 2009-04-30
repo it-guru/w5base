@@ -550,8 +550,7 @@ sub storeRecord
                   if ($o->SecureValidatedUpdateRecord($oldrec,$newrec,$filter)){
                      $id=~s/^0*//g if (defined($id) && $id=~m/^\d+$/);
                      return(interface::SOAP::kernel::Finish(
-                            SOAP::Data->name(output=>{exitcode=>0,
-                                           IdentifiedBy=>$id})->type("HASH"))); 
+                            {exitcode=>0, IdentifiedBy=>$id})); 
                   }
                   return(interface::SOAP::kernel::Finish({exitcode=>10,
                          lastmsg=>[$o->LastMsg()]})); 
@@ -597,6 +596,7 @@ sub deleteRecord
    my $self=$W5Base::SOAP;
    my $uri=shift;
    my $param=shift;
+   $self->_SOAPaction2param($self->{SOAP}->action(),$param);
    my $objectname=$param->{dataobject};
    my $filter=$param->{filter};
    my $id=$param->{IdentifiedBy};
