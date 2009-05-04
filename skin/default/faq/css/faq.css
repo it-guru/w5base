@@ -15,6 +15,10 @@
    max-width:500px;
    overflow:auto;
 }
+li{
+   margin-top:3px;
+   margin-bottom:3px;
+}
 .thumbnail{
    margin:15px;
    margin-top:2px;

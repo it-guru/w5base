@@ -412,9 +412,18 @@ sub NotifyForward
    my $baseurl;
    if ($ENV{SCRIPT_URI} ne ""){
       $baseurl=$ENV{SCRIPT_URI};
-      $baseurl=~s#/auth/.*$##;
+      $baseurl=~s/\/auth\/.*$//;
       my $url=$baseurl;
       $url.="/auth/base/workflow/ById/".$wfheadid;
+      $comments.="\n\n\n".$self->T("Edit").":\n";
+      $comments.=$url;
+      $comments.="\n\n";
+   }
+   else{
+      my $baseurl=$self->Config->Param("EventJobBaseUrl");
+      $baseurl.="/" if (!($baseurl=~m/\/$/));
+      my $url=$baseurl;
+      $url.="auth/base/workflow/ById/".$wfheadid;
       $comments.="\n\n\n".$self->T("Edit").":\n";
       $comments.=$url;
       $comments.="\n\n";
