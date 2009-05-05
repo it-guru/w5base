@@ -119,6 +119,9 @@ sub Format
       $format=$self->{'workbook'}->addformat(align=>'top',
                                           num_format => 'yyyy-mm-dd HH:MM:SS');
    }
+   elsif ($name eq "longint"){
+      $format=$self->{'workbook'}->addformat(align=>'top',num_format => '#');
+   }
    elsif (my ($precsision)=$name=~m/^number\.(\d+)$/){
       $format=$self->{'workbook'}->addformat();
       $format->copy($self->Format("default"));
@@ -133,7 +136,7 @@ sub Format
       $self->{format}->{$name}=$format;
       return($self->{format}->{$name}); 
    }
-   print STDERR msg(WARN,"XLS: setting format '$name' as 'default'");
+  # print STDERR msg(WARN,"XLS: setting format '$name' as 'default'");
    return($self->Format("default"));
 }
 

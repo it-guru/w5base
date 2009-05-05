@@ -134,7 +134,7 @@ sub Format
       $self->{format}->{$name}=$format;
       return($self->{format}->{$name}); 
    }
-   print STDERR msg(WARN,"XLS: setting format '$name' as 'default'");
+ #  print STDERR msg(WARN,"XLS: setting format '$name' as 'default'");
    return($self->Format("default"));
 }
 

@@ -721,6 +721,15 @@ sub new
                 noselect      =>'1',
                 dataobjattr   =>'lnkcontact.croles'),
 
+      new kernel::Field::Email(
+                name          =>'wfdataeventnotifytargets',
+                label         =>'WF:event notification customer info targets',
+                htmldetail    =>0,
+                searchable    =>0,
+                group         =>'workflowbasedata',
+                onRawValue    =>\&getWfEventNotifyTargets),
+ 
+
       new kernel::Field::QualityText(),
       new kernel::Field::QualityState(),
       new kernel::Field::QualityOk(),
@@ -790,6 +799,83 @@ sub getTeamBoss
       }
    }
    return(\@teamboss);
+}
+
+
+sub getWfEventNotifyTargets     # calculates the target email addresses
+{                               # for an customer information in
+   my $self=shift;              # itil::workflow::eventnotify
+   my $current=shift;
+   my $emailto={};
+
+   my $applid=$current->{id};
+   my $ia=getModuleObject($self->getParent->Config,"base::infoabo");
+   my $appl=getModuleObject($self->getParent->Config,"itil::appl");
+   $appl->SetFilter({id=>\$applid});
+
+
+   my @byfunc;
+   my @byorg;
+   my @team;
+   my %allcustgrp;
+   foreach my $rec ($appl->getHashList(qw(semid sem2id tsmid tsm2id
+                                          responseteamid customerid
+                                          businessteamid))){
+      foreach my $v (qw(semid sem2id tsmid tsm2id)){
+         my $userid=$rec->{$v};
+         push(@byfunc,$userid) if ($userid>0);
+      }
+      foreach my $v (qw(responseteamid businessteamid)){
+         my $grpid=$rec->{$v};
+         push(@team,$grpid) if ($grpid>0);
+      }
+      if ($rec->{customerid}!=0){
+         $self->getParent->LoadGroups(\%allcustgrp,"up",
+                                      $rec->{customerid});
+         
+      }
+   }
+   if (keys(%allcustgrp)){
+      $ia->LoadTargets($emailto,'base::grp',\'eventnotify',
+                                [keys(%allcustgrp)]);
+   }
+   $ia->LoadTargets($emailto,'*::appl *::custappl',\'eventnotify',
+                             $applid);
+   $ia->LoadTargets($emailto,'base::staticinfoabo',\'eventnotify',
+                             '100000002',\@byfunc,default=>1);
+
+   my $grp=getModuleObject($self->getParent->Config,"base::grp");
+   for(my $level=0;$level<=100;$level++){
+      my @nextlevel=();
+      $grp->ResetFilter();
+      $grp->SetFilter({grpid=>\@team});
+      foreach my $rec ($grp->getHashList(qw(users parentid))){ 
+         push(@nextlevel,$rec->{parentid}) if ($rec->{parentid}>0);
+         if (ref($rec->{users}) eq "ARRAY"){
+            foreach my $user (@{$rec->{users}}){
+               if (ref($user->{roles}) eq "ARRAY" &&
+                   (grep(/^RBoss$/,@{$user->{roles}}) ||
+                    grep(/^RBoss2$/,@{$user->{roles}}))){
+                  push(@byorg,$user->{userid});
+               }
+            }
+         }
+  #       print STDERR Dumper($rec);
+      }
+      if ($#nextlevel!=-1){
+         @team=@nextlevel;
+      }
+      else{
+         last;
+      }
+   }
+  # print STDERR "byorg=".Dumper(\@byorg);
+   $ia->LoadTargets($emailto,'base::staticinfoabo',\'eventnotify',
+                             '100000001',\@byorg,default=>1);
+
+
+
+   return([sort(keys(%$emailto))]);
 }
 
 

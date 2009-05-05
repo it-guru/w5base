@@ -127,7 +127,7 @@ sub ProcessLine
             }
             $o->setParent($self->getParent());
             my %env=(mode=>'Init');
-printf STDERR ("fifi pre IsModuleSelectable on $o\n");
+#printf STDERR ("fifi pre IsModuleSelectable on $o\n");
             if ($o->IsModuleSelectable(%env)){
                $self->Cache->{OutputHandlerCache}->{$f}=$o;
             }

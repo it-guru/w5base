@@ -496,7 +496,7 @@ sub xlsFormat
       $wb->{format}->{$name}=$format;
       return($wb->{format}->{$name});
    }
-   print STDERR msg(WARN,"XLS: setting format '$name' as 'default'");
+ #  print STDERR msg(WARN,"XLS: setting format '$name' as 'default'");
    return($self->xlsFormat($xls,"default"));
 }
 
