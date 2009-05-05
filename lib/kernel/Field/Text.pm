@@ -57,6 +57,9 @@ sub FormatedDetail
    if ($mode eq "HtmlDetail"){
       $d=[map({$self->addWebLinkToFacility(quoteHtml($_),$current)} @{$d})];
    }
+   if ($mode eq "SOAP"){
+      $d=[map({my $f=$_; $f=~s/&/&amp;/g; $f} @{$d})];
+   }
    if ($mode eq "HtmlV01"){
       $d=[map({quoteHtml($_)} @{$d})];
    }
@@ -65,6 +68,7 @@ sub FormatedDetail
       $vjoinconcat="; " if (!defined($vjoinconcat));
       $d=join($vjoinconcat,@$d);
    }
+   
    if ($mode eq "HtmlV01"){
       $d=~s/\n/<br>\n/g;
       if ($self->{htmlnowrap}){
