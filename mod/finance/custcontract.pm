@@ -372,7 +372,7 @@ sub Validate
    my $newrec=shift;
 
    my $name=trim(effVal($oldrec,$newrec,"name"));
-   if ($name=~m/[\s,äöüß]/i){
+   if (($name=~m/[\s,äöüß]/i) || ($name=~m/^\s*$/)){
       $self->LastMsg(ERROR,"invalid contract number '%s' specified",$name);
       return(0);
    }
