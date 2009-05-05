@@ -181,8 +181,8 @@ sub WorkflowLinkResult
       else{
          $q{eventend}=[$tt,undef];
       }
-      Query->Delete("Search_ListTime");
-      my $class=Query->Param("class");
+      #Query->Delete("Search_ListTime");  # a test - to allo search time in
+      my $class=Query->Param("class");    # bookmark entries
       if ($class ne "*" && $class ne ""){
          $q{class}=[$class];
       }

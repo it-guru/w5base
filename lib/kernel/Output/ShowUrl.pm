@@ -106,6 +106,7 @@ sub ProcessHead
    my ($d,$p);
    my $url=$ENV{SCRIPT_URI};
    my $q=Query->MultiVars(); 
+
    foreach my $v (keys(%$q)){
       delete($q->{$v}) if (!defined($q->{$v}) || $q->{$v} eq "");
    }
