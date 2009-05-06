@@ -212,6 +212,43 @@ sub nativProcess
       }
       return(0);
    }
+   elsif ($op eq "wfaddnote" || $op eq "wfaddsnote"){
+      my $note=$h->{note};
+      if ($note=~m/^\s*$/  || length($note)<10){
+         $self->LastMsg(ERROR,"empty or to short notes are not allowed");
+         return(0);
+      }
+      $note=trim($note);
+      my $oprec={};
+      if (grep(/^iscurrent$/,@{$actions})){ # state "in bearbeitung" darf
+         $oprec->{stateid}=4;               # nur gesetzt werden, wenn
+         $oprec->{postponeduntil}=undef;    # wf aktuell an mich zugewiesen
+      }                                     # u. Rückstellung wird entfernt.
+      my $effort=$h->{effort};
+      if ($self->getParent->getParent->Action->StoreRecord(
+          $WfRec->{id},"wfaddnote",
+          {translation=>'base::workflow::request'},$note,$effort)){
+         my $intiatornotify=$h->{intiatornotify};
+         if ($intiatornotify ne "" && defined($WfRec->{initiatorid}) &&
+             $WfRec->{initiatorid} ne ""){
+            my $user=getModuleObject($self->Config,"base::user");
+            $user->SetFilter({userid=>\$WfRec->{initiatorid}});
+            my ($urec,$msg)=$user->getOnlyFirst(qw(email));
+            if ($urec->{email} ne ""){
+               $self->sendMail($WfRec,emailtext=>$note,
+                                      emailto=>$urec->{email}); 
+            }
+         }
+         $self->StoreRecord($WfRec,$oprec);
+         $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
+         $self->PostProcess("SaveStep.".$op,$WfRec,$actions);
+         Query->Delete("note");
+         Query->Delete("intiatornotify");
+         return(1);
+      }
+      return(0);
+   }
+
 
    return(0);
 }
@@ -255,39 +292,13 @@ sub Process
       }
       if ($op eq "wfaddnote" || $op eq "wfaddsnote"){
          my $note=Query->Param("note");
-         if ($note=~m/^\s*$/  || length($note)<10){
-            $self->LastMsg(ERROR,"empty or to short notes are not allowed");
-            return(0);
-         }
-         $note=trim($note);
-         my $oprec={};
-         if (grep(/^iscurrent$/,@{$actions})){ # state "in bearbeitung" darf
-            $oprec->{stateid}=4;               # nur gesetzt werden, wenn
-            $oprec->{postponeduntil}=undef;    # wf aktuell an mich zugewiesen
-         }                                     # u. Rückstellung wird entfernt.
          my $effort=Query->Param("Formated_effort");
-         if ($self->getParent->getParent->Action->StoreRecord(
-             $WfRec->{id},"wfaddnote",
-             {translation=>'base::workflow::request'},$note,$effort)){
-            my $intiatornotify=Query->Param("intiatornotify");
-            if ($intiatornotify ne "" && defined($WfRec->{initiatorid}) &&
-                $WfRec->{initiatorid} ne ""){
-               my $user=getModuleObject($self->Config,"base::user");
-               $user->SetFilter({userid=>\$WfRec->{initiatorid}});
-               my ($urec,$msg)=$user->getOnlyFirst(qw(email));
-               if ($urec->{email} ne ""){
-                  $self->sendMail($WfRec,emailtext=>$note,
-                                         emailto=>$urec->{email}); 
-               }
-            }
-            $self->StoreRecord($WfRec,$oprec);
-            $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
-            $self->PostProcess($action.".".$op,$WfRec,$actions);
-            Query->Delete("note");
-            Query->Delete("intiatornotify");
-            return(1);
-         }
-         return(0);
+         my $intiatornotify=Query->Param("intiatornotify");
+         my $h={};
+         $h->{note}=$note                     if ($note ne "");
+         $h->{effort}=$effort                 if ($effort ne "");
+         $h->{intiatornotify}=$intiatornotify if ($intiatornotify ne "");
+         return($self->nativProcess($op,$h,$WfRec,$actions));
       }
       elsif ($op eq "wfforward"){    # default forwarding Handler
          my $note=Query->Param("note");
