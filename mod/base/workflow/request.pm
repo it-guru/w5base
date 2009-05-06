@@ -865,7 +865,6 @@ sub nativProcess
       $self->LastMsg(ERROR,"invalid disalloed action requested");
       return(0);
    }
-printf STDERR ("fifi ===== op=$op\n");
 
    if ($op eq "wfbreak"){
       if ($self->getParent->getParent->Action->StoreRecord(
@@ -1304,10 +1303,6 @@ sub Process
             }
          }
          return(0);
-      }
-      else{
-         my $h=$self->getWriteRequestHash("web");
-         return($self->nativProcess($op,$h,$WfRec,$actions));
       }
    }
    return($self->SUPER::Process($action,$WfRec,$actions));
