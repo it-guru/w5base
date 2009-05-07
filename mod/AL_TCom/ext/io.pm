@@ -141,13 +141,8 @@ sub AddDiary
          $app->LastMsg(ERROR,"eventend in the furture isn't allowed");
          return(201);
       }
-     # if ($duration->{totalminutes}>4320){  
-     #    $app->LastMsg(ERROR,"eventend is older then 3 days");
-     #    return(202);
-     # }
-      if ($duration->{totalminutes}>432000){  # temp modification for post
-                                              # reflection in 01/2009-03/2009
-         $app->LastMsg(ERROR,"eventend is older then 300 days");
+      if ($duration->{totalminutes}>4320){  
+         $app->LastMsg(ERROR,"eventend is older then 3 days");
          return(202);
       }
    }
@@ -163,10 +158,10 @@ sub AddDiary
       $newrec->{step}="AL_TCom::workflow::diary::wfclose";
    }
    if (defined($oldrec)){
-     # if ($oldrec->{stateid}>20){  # temp removed
-     #    $app->LastMsg(ERROR,"desired workflow already closed");
-     #    return(111);
-     # }
+      if ($oldrec->{stateid}>20){  # temp removed
+         $app->LastMsg(ERROR,"desired workflow already closed");
+         return(111);
+      }
       # process update
       msg(INFO,"update record oldrec=%s",Dumper($oldrec));
       delete($newrec->{affectedapplication});
