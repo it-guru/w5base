@@ -572,6 +572,8 @@ use Config;
 use Encode;
 use Data::HexDump;
 use vars qw($GUI $Window);
+my $tzorg=$ENV{TZ};
+$ENV{TZ}="UTC";
 
 
 my $DefaultBase="https://w5base.net/w5base/auth/";
@@ -646,6 +648,7 @@ if ($os eq "MSWin32" && !$nogui){
          }
          Win32::GUI::Dialog();');
    msg(ERROR,"--gui only on windows systems \n $@") if ($@);
+   $ENV{TZ}=$tzorg;
 }else{
    # create connection config
    my $Config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug);
@@ -696,6 +699,7 @@ if ($os eq "MSWin32" && !$nogui){
       }
    }
    my @vol=volume();
+   $ENV{TZ}=$tzorg;
    msg(INFO,"transfervolume $vol[0] $vol[1]");
    msg(INFO,"files          $files");
    msg(INFO,"warnings       $warnings");
@@ -901,7 +905,7 @@ sub readRemoteDescList
       &{$stepit}($mywin) if ($stepit);
       foreach my $key (keys(%$rec)){
          if ($key eq "mdate"){
-            my @time=split(/[- :]/,$$rec{$key});
+            my @time=split(/[- :TZ]/,$$rec{$key});
             $$rec{mdatestamp}=mktime($time[5],$time[4],$time[3],
                                $time[2],$time[1]-1,$time[0]-1900,0,0,-1);
          }
