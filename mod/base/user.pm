@@ -451,6 +451,7 @@ sub new
       new kernel::Field::File(
                 name          =>'picture',
                 label         =>'picture',
+                searchable    =>0,
                 group         =>'picture',
                 dataobjattr   =>'user.picture'),
 

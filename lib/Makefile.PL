@@ -6,6 +6,9 @@ WriteMakefile(
     'NAME'      => 'W5Base-API',
     'VERSION_FROM' => 'W5Base/API.pm', # finds $VERSION
     'MAN1PODS'     =>{'W5Base/API.pm'=>'blib/man1/W5Base::API.1'},
+    'PMLIBDIRS'    =>['./W5Base/'],
+    'PM'     => {'W5Base/API.pm' => '$(INST_LIBDIR)/W5Base/API.pm',
+                 'kernel.pm'=>undef},
     'PREREQ_PM' => { 
          XML::DOM   => undef,
          HTTP::Response => undef,
