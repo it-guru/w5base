@@ -80,7 +80,7 @@ sub Result
       my %q3=%q;
       $q3{businessteamid}=\@grpids;
       my %q4=%q;
-    #  $q4{responseteamid}=\@grpids;
+      $q4{responseteamid}=\@grpids;
 
       my %q5=%q;
       my %q6=%q;
