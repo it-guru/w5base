@@ -719,10 +719,10 @@ sub getHashList
          }
          my $v=$fobj->FormatedResult($l[$c],"SOAP");
          if (ref($v) eq "ARRAY"){
-            $v=[map({utf8::encode($_);$_;} @$v)];
+            $v=[map({latin1($_)->utf8();} @$v)];
          }
          else{
-            utf8::encode($_);
+            $v=latin1($v)->utf8();
          }
          $cprec{$k}=SOAP::Data->type($wsdl)->value($v);
       }
