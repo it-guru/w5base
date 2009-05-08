@@ -572,14 +572,14 @@ use Config;
 use Encode;
 use Data::HexDump;
 use vars qw($GUI $Window);
-my $tzorg=$ENV{TZ};
-$ENV{TZ}="UTC";
 
 
 my $DefaultBase="https://w5base.net/w5base/auth/";
 my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang,$admin);
 my ($mode,$force,$rdir,$ldir,$nogui,$nowarn,%o,$Revision,$empty,$autostart);
 my $os=$Config{'osname'};
+print Dumper(\%ENV);
+exit;
 my $action=0;
 my $volume=0;
 my $count=0;
@@ -648,8 +648,9 @@ if ($os eq "MSWin32" && !$nogui){
          }
          Win32::GUI::Dialog();');
    msg(ERROR,"--gui only on windows systems \n $@") if ($@);
-   $ENV{TZ}=$tzorg;
 }else{
+   my $tzorg=$ENV{TZ};
+   $ENV{TZ}="UTC";
    # create connection config
    my $Config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug);
    my $directorycount=0;
