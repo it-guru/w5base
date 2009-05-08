@@ -275,6 +275,8 @@ sub NotifyUser
             my $baseurl=$self->Config->Param("EventJobBaseUrl");
             my $directlink=$baseurl."/auth/base/lnkgrpuser/Detail?".
                            "search_lnkgrpuserid=$lrec->{lnkgrpuserid}";
+            my $groupinfo=$baseurl."/auth/base/menu/msel/sysadm/userenv".
+                          "?OpenURL=%23groups";
             my %notiy;
             $notiy{emailto}=$urec->{email};
             $notiy{emailcc}=[keys(%admins)];
@@ -283,7 +285,10 @@ sub NotifyUser
             if ($sitename ne ""){
                $notiy{name}=$sitename.": ".$notiy{name};
             }
-            $notiy{emailtext}=$tmpl."\nDirectLink:\n".$directlink;
+            $tmpl.="\n".$self->T("list your current group relations").
+                   ":\n".$groupinfo;
+            $tmpl.="\nDirectLink:\n".$directlink;
+            $notiy{emailtext}=$tmpl;
             $notiy{class}='base::workflow::mailsend';
             $notiy{step}='base::workflow::mailsend::dataload';
             

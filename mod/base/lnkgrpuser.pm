@@ -295,7 +295,7 @@ sub new
       new kernel::Field::DynWebIcon(
                 name          =>'userweblink',
                 searchable    =>0,
-                depend        =>['userid','alertstate'],
+                depend        =>['userid','alertstate','expiration'],
                 htmlwidth     =>'5px',
                 htmldetail    =>0,
                 weblink       =>sub{
@@ -306,18 +306,28 @@ sub new
 
                    my $userido=$self->getParent->getField("userid");
                    my $userid=$userido->RawValue($current);
+                   my $expirationo=$self->getParent->getField("expiration");
+                   my $expiration=$expirationo->FormatedDetail($current,
+                                                               "HtmlDetail");
 
+                   my $msg;
                    my $img="<img ";
                    if ($current->{alertstate} ne ""){
                       $img.="style=\"border-width:1px;border-color:".
                             "$current->{alertstate};border-style:solid; ".
                             "background:$current->{alertstate}\" "; 
+                      $msg=$self->getParent->T("entry expieres at")." ".
+                           $expiration;
                    }
                    else{
                       $img.="border=0 ";
                    }
                    $img.="src=\"../../base/load/directlink.gif\" ";
-                   $img.="title=\"\" border=0>";
+                   if ($msg ne ""){
+                      $img.=" title=\"$msg\"";
+                   }
+                   $img.=" border=0>";
+               
                    my $dest="../../base/user/Detail?userid=$userid";
                    my $detailx=$app->DetailX();
                    my $detaily=$app->DetailY();
@@ -326,7 +336,14 @@ sub new
                        "resizable=yes,scrollbars=no\")";
 
                    if ($mode=~m/html/i){
-                      return("<a href=javascript:$onclick>$img</a>");
+                      my $d="<a";
+                      if ($msg ne ""){
+                         $d.=" title=\"$msg\"";
+                      }
+                      $d.=" href=javascript:$onclick";
+                      $d.=">$img</a>";
+ 
+                      return($d);
                    }
                    return("-only a web useable link-");
                 }),
@@ -334,7 +351,7 @@ sub new
       new kernel::Field::DynWebIcon(
                 name          =>'grpweblink',
                 searchable    =>0,
-                depend        =>['grpid','alertstate'],
+                depend        =>['grpid','alertstate','expiration'],
                 htmlwidth     =>'5px',
                 htmldetail    =>0,
                 weblink       =>sub{
@@ -345,18 +362,28 @@ sub new
 
                    my $grpido=$self->getParent->getField("grpid");
                    my $grpid=$grpido->RawValue($current);
+                   my $expirationo=$self->getParent->getField("expiration");
+                   my $expiration=$expirationo->FormatedDetail($current,
+                                                               "HtmlDetail");
 
+
+                   my $msg;
                    my $img="<img ";
                    if ($current->{alertstate} ne ""){
                       $img.="style=\"border-width:1px;border-color:".
                             "$current->{alertstate};border-style:solid; ".
                             "background:$current->{alertstate}\" "; 
+                      $msg=$self->getParent->T("entry expieres at")." ".
+                           $expiration;
                    }
                    else{
                       $img.="border=0 ";
                    }
                    $img.="src=\"../../base/load/directlink.gif\" ";
-                   $img.="title=\"\">";
+                   if ($msg ne ""){
+                      $img.=" title=\"$msg\"";
+                   }
+                   $img.=">";
                    my $dest="../../base/grp/Detail?grpid=$grpid";
                    my $detailx=$app->DetailX();
                    my $detaily=$app->DetailY();
@@ -365,7 +392,14 @@ sub new
                        "resizable=yes,scrollbars=no\")";
 
                    if ($mode=~m/html/i){
-                      return("<a href=javascript:$onclick>$img</a>");
+                      my $d="<a";
+                      if ($msg ne ""){
+                         $d.=" title=\"$msg\"";
+                      }
+                      $d.=" href=javascript:$onclick";
+                      $d.=">$img</a>";
+ 
+                      return($d);
                    }
                    return("-only a web useable link-");
                 }),
