@@ -272,13 +272,14 @@ sub Sendmail
          $mail.=$maildata;
          msg(DEBUG,"adding $blkcount datablocks to mail body");
          $mail.="<a name=\"separation.$sep\"></a>";
-         $mail.="<div class=separation id=\"separation.$sep\">";
-         $mail.="<div class=separationbackground\">";
+         $mail.="<div class=\"separation\" id=\"separation.$sep\">";
+         $mail.="<div class=\"separationbackground\">";
          for(my $blk=0;$blk<=$blkcount;$blk++){
             my $formname="tmpl/$template.form.line";
             my $maildata="ERROR: Mail template not found";
-            if ($app->getSkinFile($app->SkinBase()."/".$formname)){
-               my $emailtext=$rec->{emailtext}->[$blk];
+            if (my $skinfile=$app->getSkinFile($app->SkinBase()."/".$formname)){
+               my $emailtext="<!-- skinfile=$skinfile -->\n".
+                             $rec->{emailtext}->[$blk];
                if (!(($emailtext=~m/<a/) ||
                      ($emailtext=~m/<b>/) ||
                      ($emailtext=~m/<\/b>/) ||
@@ -361,8 +362,8 @@ sub Sendmail
                 
                   }
                   $mail.="<a name=\"separation.$sep\"></a>";
-                  $mail.="<div class=separation id=\"separation.$sep\">";
-                  $mail.="<div class=separationbackground\">";
+                  $mail.="<div class=\"separation\" id=\"separation.$sep\">";
+                  $mail.="<div class=\"separationbackground\">";
                }
                msg(DEBUG,"add blk $blk ok");
             }

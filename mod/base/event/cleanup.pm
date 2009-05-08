@@ -285,9 +285,9 @@ sub NotifyUser
             if ($sitename ne ""){
                $notiy{name}=$sitename.": ".$notiy{name};
             }
-            $tmpl.="\n".$self->T("list your current group relations").
-                   ":\n".$groupinfo;
-            $tmpl.="\nDirectLink:\n".$directlink;
+            $tmpl.="\n<br>".$self->T("list your current group relations").
+                   ":<br>".$groupinfo;
+            $tmpl.="\n<br>DirectLink:<br>".$directlink;
             $notiy{emailtext}=$tmpl;
             $notiy{class}='base::workflow::mailsend';
             $notiy{step}='base::workflow::mailsend::dataload';
