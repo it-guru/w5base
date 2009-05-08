@@ -357,6 +357,11 @@ sub getHtmlDetailPageContent
       my $q=new kernel::cgi({});
       $q->Param("$idname"=>$idval);
       my $urlparam=$q->QueryString();
+      my $OpenURL=Query->Param("OpenURL");
+      if ($OpenURL=~m/^#/){   # allow ancor access fia OpenURL param
+         $urlparam.=$OpenURL;
+      }
+      Query->Delete("OpenURL");
 
       $page="<iframe style=\"width:100%;height:100%;border-width:0;".
             "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".

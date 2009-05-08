@@ -217,6 +217,8 @@ sub addInitialParameters
    $newrec->{name}="Password reset request for ".
                    $newrec->{targetuser}.'@'.$targetsys;
    $newrec->{step}="tssc::workflow::screq::Wait4SC";
+   $newrec->{directlnktype}="tssc::incident";
+   $newrec->{directlnkmode}="externAuthority";
    return(1);
 }
 
@@ -374,6 +376,7 @@ sub HandelNewSCdata
    if (lc($record->{'problem.status'}) ne "open"){
       my $wf=$self->getParent->getParent->Clone();
       $wf->Store($WfRec,{stateid=>21,
+                         directlnkmode=>'finish',
                          closedate=>NowStamp("en"),
                          screqlastsync=>NowStamp("en")});
    }

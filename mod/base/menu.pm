@@ -815,7 +815,8 @@ EOF
           "name=menuframe src=\"${rootpath}menuframe$fpfine\"></frame>\n");
    {
       my $currenturl="${rootpath}../../base/user/Main";
-      if (my $openurl=Query->Param("OpenURL")){
+      my $openurl=Query->Param("OpenURL");
+      if ($openurl=~m/^(http|https|news|telnet):/){
          Query->Delete("OpenURL");
          $currenturl=$openurl;
       }
@@ -837,7 +838,6 @@ EOF
                if (($target=~m/^http[s]{0,1}:\/\//) ||
                    ($target=~m/^\/.*\/.*\?.*$/)){
                   $currenturl=$self->targetUrl($m);
-printf STDERR ("fifi currenturl=$currenturl\n");
                }
                else{
                   $currenturl=${rootpath}.$self->targetUrl($m);
@@ -848,7 +848,7 @@ printf STDERR ("fifi currenturl=$currenturl\n");
             }
             my %forwardquery;
             foreach my $q (Query->Param()){
-               next if (!($q=~m/^(search_|Auto|MyW5Base|DIRECT_)/));
+               next if (!($q=~m/^(OpenURL|search_|Auto|MyW5Base|DIRECT_)/));
                $forwardquery{$q}=[Query->Param($q)];
             }
             if (keys(%forwardquery)){
