@@ -575,7 +575,6 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
-printf STDERR ("fifi p0=%s\n",Dumper($newrec));
    $newrec->{id}=$oldrec->{id};
    if (!defined($newrec->{id}) || $newrec->{id} eq ""){
       $self->LastMsg(ERROR,"invalid write request to empty id");
@@ -589,7 +588,6 @@ printf STDERR ("fifi p0=%s\n",Dumper($newrec));
    if (exists($newrec->{custnameid})){
       $newrec->{custnameid}=trim(effVal($oldrec,$newrec,"custnameid"));
    }
-printf STDERR ("fifi p1=%s\n",Dumper($newrec));
 
    return(1);
 }
