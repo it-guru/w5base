@@ -352,6 +352,9 @@ sub getSC
       return(undef);
    }
    if (!$sc->Login()){
+      printf STDERR ("ERROR: SC URL=$SCuri\n");
+      printf STDERR ("ERROR: SC User=$SCuser\n");
+      printf STDERR ("ERROR: SC Pass=$SCpass\n");
       printf STDERR ("ERROR: ServiceCenter login failed\n");
       $sc->Logout();
       return(undef);
