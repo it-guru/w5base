@@ -278,8 +278,8 @@ sub Sendmail
             my $formname="tmpl/$template.form.line";
             my $maildata="ERROR: Mail template not found";
             if (my $skinfile=$app->getSkinFile($app->SkinBase()."/".$formname)){
-               my $emailtext="<!-- skinfile=$skinfile -->\n".
-                             $rec->{emailtext}->[$blk];
+#               my $emailtext="<!-- skinfile=$skinfile -->\n".
+               my $emailtext=$rec->{emailtext}->[$blk];
                if (!(($emailtext=~m/<a/) ||
                      ($emailtext=~m/<b>/) ||
                      ($emailtext=~m/<\/b>/) ||
