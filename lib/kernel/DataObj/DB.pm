@@ -523,14 +523,7 @@ sub UpdateRecord
    my %raw=$self->QuoteHashData($workdb,oldrec=>undef,current=>$newdata);
    my $cmd;
    my $logcmd;
-   if ($self->{UseSqlReplace}==1){
-      my @flist=keys(%raw);
-      $cmd="replace into $worktable (".
-           join(",",@flist).") ".
-           "values(".join(",",map({$raw{$_}} @flist)).")";
-      $logcmd=$cmd;
-   }
-   else{
+   {
       $cmd="update $worktable set ".
            join(",",map({
                            $_."=".$raw{$_};
@@ -547,12 +540,25 @@ sub UpdateRecord
    }
    #msg(INFO,"fifi UpdateRecord data=%s\n",Dumper($newdata));
    my $t0=[gettimeofday()];
-   if ($workdb->do($cmd)){
+   if (my $rows=$workdb->do($cmd)){
+      if ($rows eq "0E0" && $self->{UseSqlReplace}==1){
+         my @flist=keys(%raw);
+         $cmd="insert into $worktable (".
+              join(",",@flist).") ".
+              "values(".join(",",map({$raw{$_}} @flist)).")";
+         if (!($workdb->do($cmd))){
+            $self->LastMsg(ERROR,
+                           $self->preProcessDBmsg($workdb->getErrorMsg()));
+            return(undef);
+         }
+      }
       my $t=tv_interval($t0,[gettimeofday()]);
       my $p=$self->Self();
       my $msg=sprintf("%s:time=%0.4fsec;mod=$p",NowStamp(),$t);
       $msg.=";user=$ENV{REMOTE_USER}" if ($ENV{REMOTE_USER} ne "");
       msg(INFO,"updcmd=%s (%s)",$logcmd,$msg);
+
+
       return(1);
    }
    $self->LastMsg(ERROR,$self->preProcessDBmsg($workdb->getErrorMsg()));
