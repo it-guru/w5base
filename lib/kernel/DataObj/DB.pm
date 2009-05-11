@@ -546,8 +546,13 @@ sub UpdateRecord
       $logcmd.=" where ".$where if ($where ne "");
    }
    #msg(INFO,"fifi UpdateRecord data=%s\n",Dumper($newdata));
-   msg(INFO,"updcmd=%s",$logcmd);
+   my $t0=[gettimeofday()];
    if ($workdb->do($cmd)){
+      my $t=tv_interval($t0,[gettimeofday()]);
+      my $p=$self->Self();
+      my $msg=sprintf("%s:time=%0.4fsec;mod=$p",NowStamp(),$t);
+      $msg.=";user=$ENV{REMOTE_USER}" if ($ENV{REMOTE_USER} ne "");
+      msg(INFO,"updcmd=%s (%s)",$logcmd,$msg);
       return(1);
    }
    $self->LastMsg(ERROR,$self->preProcessDBmsg($workdb->getErrorMsg()));

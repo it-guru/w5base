@@ -1770,7 +1770,7 @@ sub Process
       $h->{closedate}=undef;
       if ($h->{eventmode} eq "EVk.infraloc"){
          $h->{name}=$self->getParent->T("Location-notification:").
-                    " ".$h->{affectedlocation}->[0];
+                    " ".$h->{affectedlocation};
       }
       elsif ($h->{eventmode} eq "EVk.appl"){
          $h->{name}=$self->getParent->T("Application-notification:").
