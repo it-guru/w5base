@@ -290,8 +290,8 @@ sub do
 
    $cmd.=" /* W5BaseUser: $ENV{REMOTE_USER} */" if ($ENV{REMOTE_USER} ne "");
    if ($self->{'db'}){
-      if ($self->{'db'}->do($cmd,{},@_)){
-         return($self->{'db'});
+      if (my $rows=$self->{'db'}->do($cmd,{},@_)){
+         return($rows); # return of "0E0" means not lines effedted (see DBI)
       }
       else{
          msg(ERROR,"do('%s')",$cmd);
