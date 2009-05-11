@@ -82,15 +82,29 @@ sub new
       new kernel::Field::Link(
                 name          =>'lassignmentid',
                 label         =>'AC-AssignmentID',
-                dataobjattr   =>'assetportfolio.lassignmentid'),
+	dataobjattr   =>'assetportfolio.lassignmentid'),
 
       new kernel::Field::Text(
                 name          =>'conumber',
+                label         =>'CO-Number',
+                size          =>'15',
+                weblinkto     =>'tsacinv::costcenter',
+                weblinkon     =>['lcostcenterid'=>'id'],
+                dataobjattr   =>'amcostcenter.trimmedtitle'),
+
+      new kernel::Field::Link(
+                name          =>'lcostcenterid',
+                label         =>'CostCenterID',
+                dataobjattr   =>'amcostcenter.lcostid'),
+
+      new kernel::Field::Text(
+                name          =>'sysconumber',
                 vjointo       =>'tsacinv::system',
                 vjoinon       =>['lassetid'=>'lassetid'],
                 weblinkto     =>'none',
                 vjoindisp     =>'conumber',
-                label         =>'CO-Number'),
+                label         =>'System CO-Number'),
+
 
       new kernel::Field::Import( $self,
                 weblinkto     =>'tsacinv::location',
@@ -273,7 +287,7 @@ sub new
 
    );
    $self->setDefaultView(qw(assetid tsacinv_locationfullname 
-                            systemname serialno));
+                            systemname conumber serialno));
    return($self);
 }
 
@@ -371,7 +385,10 @@ sub CalcDepr
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="amasset, amportfolio assetportfolio,ammodel, amlocation";
+   my $from="amasset, amportfolio assetportfolio,ammodel, amlocation,".
+            "(select amcostcenter.* from amcostcenter ".
+            " where amcostcenter.bdelete=0) amcostcenter";
+
    return($from);
 }
 
@@ -382,6 +399,7 @@ sub initSqlWhere
       "assetportfolio.assettag=amasset.assettag ".
       "and assetportfolio.lmodelid=ammodel.lmodelid ".
       "and assetportfolio.llocaid=amlocation.llocaid(+) ".
+      "and amasset.lsendercostcenterid=amcostcenter.lcostid(+) ".
       "and assetportfolio.bdelete=0 ".
       "and ammodel.fullname like '/HARDWARE/%'";
    return($where);
