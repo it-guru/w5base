@@ -186,10 +186,6 @@ sub Init
                       param=>'MSG=Hallo%20dies%20ist%20die%20Nachricht',
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("Tools.analytics",
-                      "tmpl/welcome",
-                      defaultacl=>['valid_user']);
-
    $self->RegisterObj("Tools.workflow",
                       "base::workflow",
                       defaultacl=>['admin']);
@@ -275,10 +271,9 @@ sub Init
                       defaultacl=>['admin']);
    
    $self->RegisterObj("Tools.analytics",
-                      "base::w5stat",
-                      func=>'Presenter/Main',
+                      "tmpl/welcome",
                       defaultacl=>['valid_user']);
-   
+
    $self->RegisterObj("Tools.analytics.w5stat",
                       "base::w5stat",
                       defaultacl=>['admin']);
