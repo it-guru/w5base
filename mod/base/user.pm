@@ -519,7 +519,7 @@ sub new
                 vjointo       =>'base::lnkgrpuser',
                 vjoinon       =>['userid'=>'userid'],
                 vjoindisp     =>['group','grpweblink','roles'],
-                vjoininhash   =>['group','grpid','roles']),
+                vjoininhash   =>['group','grpid','roles','cdate']),
 
       new kernel::Field::SubList(
                 name          =>'roles',
