@@ -231,6 +231,10 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("Tools.teamtools",
+                      "tmpl/welcome",
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("Tools.projectroom",
                       "base::projectroom",
                       defaultacl=>['valid_user']);

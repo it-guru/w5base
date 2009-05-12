@@ -45,6 +45,7 @@
 'sysadm.qmgmt.qrule.lnkmandator'=>{de=>'Verkn. Mandant',en=>'Mandator Link'},
 'sysadm.qmgmt.qrule.lnkmandator.new'=>{de=>'Neueingabe',en=>'New'},
 'Tools.filemgmt'=>{de=>'Dateiverwaltung',en=>'Filemanagement'},
+'Tools.teamtools'=>{de=>'Team-Tools',en=>'Team-Tools'},
 'Tools.filemgmt.new'=>{de=>'Neuer Upload',en=>'New'},
 'Tools.filebrowser'=>{de=>'WebFS',en=>'WebFS'},
 'Tools.analytics.w5stat'=>{de=>'Statistiken',en=>'Statistics'},

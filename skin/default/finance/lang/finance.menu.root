@@ -3,3 +3,5 @@
 'finance.custcontract.new'=>{de=>'Neueingabe',en=>'New'},
 'finance.costcenter'=>{de=>'Kostenstelle',en=>'Costcenter'},
 'finance.costcenter.new'=>{de=>'Neueingabe',en=>'New'},
+'Tools.teamtools.costteamfixup'=>{de=>'CO/Kostenstellen Fix',en=>'CO/Costcenter Fix'},
+'Tools.teamtools.costteamfixup.new'=>{de=>'Neueingabe',en=>'New'},

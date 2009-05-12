@@ -56,6 +56,16 @@ sub Init
                       "finance::costcenter",
                       func=>'New',
                       defaultacl=>['admin']);
+
+   $self->RegisterObj("Tools.teamtools.costteamfixup",
+                      "finance::costteamfixup",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("Tools.teamtools.costteamfixup.new",
+                      "finance::costteamfixup",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+   
    return($self);
 }
 

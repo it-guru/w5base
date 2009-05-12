@@ -30,3 +30,27 @@ alter table costcenter add ldelmgr  bigint(20) default NULL,add key(ldelmgr);
 alter table costcenter add ldelmgr2 bigint(20) default NULL,add key(ldelmgr2);
 alter table costcenter add databoss2 bigint(20)  default NULL;
 alter table costcenter add accarea  varchar(20) default NULL,add key(accarea);
+create table costteamfixup (
+  id         bigint(20)   NOT NULL,
+  name       varchar(20)  NOT NULL,
+  accarea    varchar(20)  default NULL,
+  grpid      bigint(20)   NOT NULL,
+  durationstart datetime     NOT NULL default '0000-00-00 00:00:00',
+  durationend   datetime     default NULL,
+  fixupmode     char(10)     NOT NULL,
+  fixupminutes  double(36,0) default NULL,
+  comments      longtext     default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20)   default NULL,
+  modifyuser bigint(20)   default NULL,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  srcsys     varchar(10)  default 'w5base',
+  srcid      varchar(20)  default NULL,
+  srcload    datetime     default NULL,
+  PRIMARY KEY  (id),
+  KEY durationstart(grpid,durationstart), KEY durationend(grpid,durationend),
+  KEY name (name),KEY grpid (grpid),
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+);
