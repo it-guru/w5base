@@ -328,6 +328,35 @@ sub _LoadUserInUserCache
    return(0);
 }
 
+sub getInitiatorGroupsOf
+{
+   my $self=shift;
+   my $AccountOrUserID=shift;
+
+   my %groups=$self->getGroupsOf($AccountOrUserID,
+                  [qw(REmployee RBoss RBackoffice RBoss2)],'direct');
+   my $now=NowStamp("en");
+   my %age;
+   foreach my $grpid (keys(%groups)){
+      my $cdate=$groups{$grpid}->{'cdate'};
+      my $a=99999999999999;
+      if ($cdate ne ""){
+         if (my $duration=CalcDateDuration($cdate,$now,"GMT")){ 
+            $a=$duration->{totalseconds};
+            
+         }
+      }
+      $age{$grpid}=$a;
+   }
+   my @grplist;
+   foreach my $grpid (sort({$age{$a} <=> $age{$b}} keys(%groups))){
+      push(@grplist,$grpid);
+      push(@grplist,$groups{$grpid}->{fullname});
+   }
+   return(@grplist) if (wantarray());
+   return($grplist[1]);
+}
+
 
 sub getGroupsOf
 {
@@ -348,12 +377,16 @@ sub getGroupsOf
    if (!defined($UserCache->{$AccountOrUserID})){
       $self->_LoadUserInUserCache($AccountOrUserID);
    }
+   my %directgroupage;
    if (defined($UserCache->{$AccountOrUserID})){
       $UserCache=$UserCache->{$AccountOrUserID}->{rec};
       if (defined($UserCache->{groups}) && 
           ref($UserCache->{groups}) eq "ARRAY"){
          foreach my $role (@{$roles}){
-            push(@directgroups,map({$_->{grpid}} 
+            push(@directgroups,map({
+                                    $directgroupage{$_->{grpid}}=$_->{cdate};
+                                    $_->{grpid};
+                                   } 
                                    grep({
                                           if (!defined($_->{roles})){
                                              $_->{roles}=[];
@@ -393,6 +426,11 @@ sub getGroupsOf
                      grpid=>1,
                      roles=>['RMember']
                     };
+      }
+   }
+   if ($direction eq "direct"){  # store age of relation for later use
+      foreach my $directgrpid (keys(%directgroupage)){
+         $allgrp{$directgrpid}->{cdate}=$directgroupage{$directgrpid};
       }
    }
 
