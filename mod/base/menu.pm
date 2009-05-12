@@ -174,7 +174,7 @@ sub isWriteValid
    my $self=shift;
    my $oldrec=shift;
 
-   return(qw(default)) if (!defined($oldrec));
+   return(qw(default acls)) if (!defined($oldrec));
    return(qw(ALL)) if ($self->IsMemberOf("admin"));
    return(undef);
 }

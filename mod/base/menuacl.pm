@@ -55,6 +55,17 @@ sub FinishDelete
    return($bak);
 }
 
+sub checkParentWriteAccess
+{
+   my $self=shift;
+   my $pobj=shift;
+   my $refid=shift;
+
+   return(1) if ($self->IsMemberOf("admin"));
+   return(0);
+}
+
+
 sub getRecordImageUrl
 {
    my $self=shift;
