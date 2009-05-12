@@ -1,0 +1,8 @@
+'finance::costteamfixup'=>{de=>'CO/Kostenstellen Fix',en=>'CO/Costcenter Fix'},
+'Fixup mode'=>{de=>'Korrekturmodus'},
+'Fixup time/per month'=>{de=>'Korrektur Zeit/pro Monat'},
+'Fixup duration start'=>{de=>'Korrektur Beginn'},
+'Fixup duration end'=>{de=>'Korrektur Ende'},
+'you are not member of target group'=>{de=>'Sie sind nicht Mitglied des angegebenen Teams'},
+'invalid or missing co number'=>{de=>'ungültige oder fehlende CO-Nummer'},
+'you are not member of old group'=>{de=>'Sie sind nicht Mitglied des alten Teams'},
