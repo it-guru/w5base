@@ -209,7 +209,7 @@ sub isViewValid
 sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
-   return("p800_msg","p800_app","p800_sys");
+   return("p800_msg","p800_app","p800_sys","affected","state","source");
 }
 
 sub getPosibleActions

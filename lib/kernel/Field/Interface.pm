@@ -26,7 +26,19 @@ sub new
 {
    my $type=shift;
    my $self={@_};
-   $self->{uivisible}=0 if (!defined($self->{uivisible}));
+   $self->{searchable}=0 if (!defined($self->{searchable}));
+   $self->{htmldetail}=0 if (!defined($self->{htmldetail}));
+   $self->{uivisible}=sub {
+      my $self=shift;
+      if ($self->getParent->can("IsMemberOf")){
+         return(1) if ($self->getParent->IsMemberOf("admin"));
+      }
+      if ($self->getParent->can("getParent") && 
+          defined($self->getParent->getParent())){
+         return(1) if ($self->getParent->getParent->IsMemberOf("admin"));
+      }
+      return(0);
+   } if (!defined($self->{uivisible}));
    $self=bless($type->SUPER::new(%$self),$type);
    return($self);
 }

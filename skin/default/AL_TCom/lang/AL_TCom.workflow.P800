@@ -5,6 +5,7 @@
 'total count of changes'=>{de=>'Gesamtanzahl Changes'},
 'worktime of "special service" changes'=>{de=>'Arbeitsaufwand für "Sonderleistung" Changes'},
 'count of changes "special service"'=>{de=>'Anzahl Changes "Sonderleistung"'},
+'count of changes "base service"'=>{de=>'Anzahl Changes "Basisleistung"'},
 'total count of incidents'=>{de=>'Gesamtanzahl Incidents'},
 'total worktime of incidents'=>{de=>'Arbeitsaufwand für Incidents (RootCauseAnalyse)'},
 'total count of interfaces'=>{de=>'Gesamtanzahl Schnittstellen'},
