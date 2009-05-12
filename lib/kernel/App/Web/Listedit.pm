@@ -495,12 +495,20 @@ sub InitCopy
    my ($self,$copyfrom,$newrec)=@_;
 }
 
+sub InitNew    # Initialize Web New Form
+{
+   my ($self)=@_;
+}
+
 sub New
 {
    my ($self)=@_;
    if (!$self->isWriteValid()){
       print($self->noAccess());
       return(undef);
+   }
+   if (!defined(my $op=Query->Param("OP"))){
+      $self->InitNew();
    }
    $self->ProcessDataModificationOP();
    if (my $CopyFromId=Query->Param("isCopyFromId")){
