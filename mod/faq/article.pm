@@ -29,7 +29,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{MainSearchFieldLines}=4;
+   $param{MainSearchFieldLines}=3;
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
@@ -68,6 +68,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'furtherkeys',
                 label         =>'Further keywords',
+                searchable    =>0,
                 htmldetail    =>sub{
                                     my $self=shift;
                                     my $mode=shift;
@@ -213,9 +214,17 @@ sub new
                 sqlorder      =>'desc',
                 group         =>'sig',
                 dataobjattr   =>'faq.modifydate'),
+
+      new kernel::Field::Textarea(
+                name          =>'rawdata',
+                searchable    =>1,
+                label         =>'raw data',
+                dataobjattr   =>'faq.data'),
+
                                    
       new kernel::Field::FileList(
                 name          =>'attachments',
+                searchable    =>0,
                 onFileAdd     =>\&onFileAdd,
                 label         =>'Attachments',
                 group         =>'attachments'),
