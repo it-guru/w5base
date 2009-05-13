@@ -12,8 +12,6 @@ div.newworkflowtip{
    width:99%;
    height:200px;
    overflow:auto;
-   xborder-style:solid;
-   xborder-width:1px;
 }
 
 input.workflowbutton{
@@ -47,7 +45,6 @@ div.multilinetext{
 }
 textarea.multilinetext{
    height:96px;
-   xoverflow:auto;
    width:100%;
    margin:0px;
    padding:0px;
@@ -99,25 +96,18 @@ div.WorkArea{
 }
 
 div.WorkBorder{
-   xbackground:#8dafb5;
    background:#b0bdcc;
    width:100%;
    overflow:hidden;
    margin:0;
    padding:0;
    border-width:0
-   xborder-top-width:1px;
-   xborder-top-style:solid;
-   xborder-top-color:black;
 }
 
 iframe.ProcessWindow{
    width:100%;
-   xborder-style:solid;
-   xborder-color:black;
    border-width:0px;
-   xborder-style:inset;
-   overflow:hidden
+   overflow:auto;
    height:5px;
    margin:0px;
 }
@@ -127,7 +117,7 @@ iframe.tip{
    border-style:solid;
    border-color:black;
    border-style:inset;
-   overflow:hidden
+   overflow:hidden;
    height:40px;
    margin:0px;
    padding:0px;
