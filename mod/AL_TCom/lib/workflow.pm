@@ -193,6 +193,19 @@ sub tcomcodcause
 }
 
 
+sub tcomworktimeadd
+{
+   my $self=shift;
+   my $current=shift;
+   my $min=$current->{tcomworktime};
+   if ($min>60){
+      my $s=sprintf("%.2lf",$min/60);
+      return(" ( =${s} h)");
+   }
+   return(undef);
+}
+
+
 
 
 

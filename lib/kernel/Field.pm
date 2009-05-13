@@ -95,6 +95,7 @@ sub new
    $self->{_permitted}->{uivisible}=1;  # Anzeige in der Detailsicht bzw. Listen
    $self->{_permitted}->{history}=1;    # Über das Feld braucht History
    $self->{_permitted}->{htmldetail}=1; # Anzeige in der Detailsicht
+   $self->{_permitted}->{detailadd}=1;  # zusätzliche Daten bei HtmlDetail
    $self->{_permitted}->{translation}=1;# Übersetzungsbasis für Labels
    $self->{_permitted}->{selectfix}=1;  # ?
    $self->{_permitted}->{default}=1;    # Default value on new records

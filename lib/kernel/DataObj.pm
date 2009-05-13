@@ -2234,6 +2234,10 @@ sub DataObj_findtemplvar
                }
             }
             my $d=$fieldbase->{$var}->FormatedDetail($current,$mode,%FOpt);
+            if ($mode eq "HtmlDetail"){
+               my $add=$fieldbase->{$var}->detailadd($current,%FOpt);
+               $d.=$add if (defined($add));
+            }
             return($d);
          }
          if ($param[0] eq "sublistedit" || $param[0] eq "forceedit"){
