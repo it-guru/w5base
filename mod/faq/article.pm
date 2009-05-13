@@ -218,6 +218,7 @@ sub new
       new kernel::Field::Textarea(
                 name          =>'rawdata',
                 searchable    =>1,
+                htmldetail    =>0,
                 label         =>'raw data',
                 dataobjattr   =>'faq.data'),
 
