@@ -217,10 +217,33 @@ sub new
                 vjoinon       =>['systemid'=>'id'],
                 vjoindisp     =>'location'),
 
+      new kernel::Field::TextDrop(
+                name          =>'systemsystemid',
+                htmlwidth     =>'280px',
+                group         =>'further',
+                htmldetail    =>0,
+                readonly      =>1,
+                label         =>'Systems SystemID',
+                vjointo       =>'itil::system',
+                vjoinon       =>['systemid'=>'id'],
+                vjoindisp     =>'systemid'),
+
+      new kernel::Field::TextDrop(
+                name          =>'systemcistatus',
+                htmlwidth     =>'280px',
+                group         =>'further',
+                htmldetail    =>0,
+                readonly      =>1,
+                label         =>'Systems CI-Status',
+                vjointo       =>'itil::system',
+                vjoinon       =>['systemid'=>'id'],
+                vjoindisp     =>'cistatus'),
+
       new kernel::Field::Text(
                 name          =>'applicationnames',
                 label         =>'Applicationnames',
                 group         =>'further',
+                readonly      =>1,
                 htmldetail    =>0,
                 vjointo       =>'itil::lnkapplsystem',
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
@@ -228,14 +251,37 @@ sub new
                 vjoindisp     =>['appl']),
 
       new kernel::Field::Text(
+                name          =>'applcustomer',
+                label         =>'Application Customer',
+                readonly      =>1,
+                htmldetail    =>0,
+                group         =>'further',
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{applcistatusid=>"<=4"}],
+                vjoinon       =>['systemid'=>'systemid'],
+                vjoindisp     =>'applcustomer'),
+
+      new kernel::Field::Text(
                 name          =>'tsmemail',
                 label         =>'TSM E-Mail',
                 group         =>'further',
+                readonly      =>1,
                 htmldetail    =>0,
                 vjointo       =>'itil::lnkapplsystem',
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>['tsmemail']),
+
+      new kernel::Field::Text(
+                name          =>'tsm2email',
+                label         =>'deputy TSM E-Mail',
+                group         =>'further',
+                readonly      =>1,
+                htmldetail    =>0,
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{applcistatusid=>"<=4"}],
+                vjoinon       =>['systemid'=>'systemid'],
+                vjoindisp     =>['tsm2email']),
 
       new kernel::Field::Text(
                 name          =>'srcsys',

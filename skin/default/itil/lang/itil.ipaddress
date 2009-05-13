@@ -26,3 +26,5 @@
 'Systems location'=>{de=>'Systemstandort'},
 'Applicationnames'=>{de=>'Anwendungsnamen'},
 'fieldgroup.further'=>{de=>'weiterführende Informationen',en=>'further informations'},
+'deputy TSM E-Mail'=>{de=>'TSM Vertreter E-Mail'},
+'Application Customer'=>{de=>'Anwendungskunde'},

@@ -264,6 +264,36 @@ sub new
                 vjoindisp     =>'email'),
 
       new kernel::Field::Link(
+                name          =>'tsm2id',
+                label         =>'TSM ID',
+                readonly      =>1,
+                dataobjattr   =>'appl.tsm2'),
+
+      new kernel::Field::TextDrop(
+                name          =>'tsm2',
+                group         =>'applinfo',
+                label         =>'deputy Technical Solution Manager',
+                htmlwidth     =>'280px',
+                readonly      =>1,
+                vjointo       =>'base::user',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['tsm2id'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::TextDrop(
+                name          =>'tsm2email',
+                group         =>'applinfo',
+                label         =>'deputy Technical Solution Manager E-Mail',
+                htmlwidth     =>'280px',
+                readonly      =>1,
+                htmldetail    =>0,
+                group         =>'furtherinfos',
+                vjointo       =>'base::user',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['tsm2id'=>'userid'],
+                vjoindisp     =>'email'),
+
+      new kernel::Field::Link(
                 name          =>'businessteamid',
                 label         =>'Businessteam ID',
                 readonly      =>1,
