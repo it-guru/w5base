@@ -59,7 +59,7 @@ sub addAttach
       my $filename=sprintf("%s",$f);
       $filename=~s/^.*[\/\\]//;
       msg(INFO,"filename=$filename");
-      if ($size<512 || !($filename=~m/\.(jpg|jpeg|png|gif)$/)){
+      if ($size<128 || !($filename=~m/\.(jpg|jpeg|png|gif|xls|pdf)$/i)){
          $self->LastMsg(ERROR,"invalid file or filetype");
       }
       elsif ($size>3145728){

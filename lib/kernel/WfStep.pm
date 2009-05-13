@@ -593,11 +593,12 @@ sub generateWorkspacePages
                 $$divset;
    }
    if (grep(/^wfmailsend$/,@$actions)){
+      my $wfheadid=$WfRec->{id};
       $$selopt.="<option value=\"wfmailsend\">".
                 $self->getParent->T("wfmailsend",$tr).
                 "</option>\n";
       my $onclick="openwin(\"externalMailHandler?".
-                   "id=123&parent=base::workflow&mode=simple\",".
+                   "id=$wfheadid&parent=base::workflow&mode=simple\",".
                    "\"_blank\",".
                    "\"height=400,width=600,toolbar=no,status=no,".
                    "resizable=yes,scrollbars=no\")";

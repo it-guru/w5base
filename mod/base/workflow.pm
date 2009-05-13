@@ -1545,13 +1545,9 @@ sub externalMailHandler
 {
    my $self=shift;
 
-   print $self->HttpHeader("text/html");
-   print $self->HtmlHeader(style=>['default.css','work.css'],
-                           body=>1,form=>1,
-                           title=>'W5Base Mail Client');
-   my $to=$self->T("To","base::workflow::mailsend");
-   my $subject=$self->T("Subject","base::workflow::mailsend");
-   my $send=$self->T("Send message","base::workflow::mailsend");
+   my $parent=Query->Param("parent");
+   my $addref=Query->Param("addref");
+   my $id=Query->Param("id");
    my $s=Query->Param("subject");
    my $m=Query->Param("msg");
    my @t=split(/\s*[,;]\s*/,Query->Param("to"));
@@ -1560,6 +1556,86 @@ sub externalMailHandler
    my %u=(); map({$u{lc($_)}++} @c); @c=grep(!/^\s*$/,sort(keys(%u)));
    my $t=join("; ",@t);
    my $c=join("; ",@c);
+
+#printf STDERR ("fifi s=$s\n");
+#printf STDERR ("fifi m=$m\n");
+#printf STDERR ("fifi t=$t\n");
+   if ($addref ne ""){
+      $addref="checked";
+   }
+
+   if (Query->Param("ACTION") eq "send"){
+      my $chkfail=0;
+      if ($#t==-1 && $#c==-1){
+         $chkfail=1;
+         $self->LastMsg(ERROR,"no target email adress specified");
+      }
+      my %notiy;
+      $notiy{name}=$s;
+      $notiy{emailtext}=$m;
+      if ($addref ne ""){
+         if ($ENV{SCRIPT_URI} ne ""){
+            $notiy{emailtext}.="\n\nDirectLink:\n";
+            my $baseurl=$ENV{SCRIPT_URI};
+            $baseurl=~s/\/(auth|public)\/.*$//;
+            my $url=$baseurl;
+            my $p=$parent;
+            $p=~s/::/\//g;
+            $url.="/auth/$p/ById/".$id;
+            $notiy{emailtext}.=$url;
+            $notiy{emailtext}.="\n\n";
+         }
+      }
+      $notiy{emailto}=\@t;
+      $notiy{emailcc}=\@c;
+      $notiy{class}='base::workflow::mailsend';
+      $notiy{step}='base::workflow::mailsend::dataload';
+      if (my $mailid=$self->Store(undef,\%notiy)){
+         my %d=(step=>'base::workflow::mailsend::waitforspool');
+         if ($parent eq "base::workflow"){
+            my $additional={};
+            $additional->{to}=$t if ($t ne "");
+            $additional->{cc}=$c if ($c ne "");
+            $additional->{subject}=$s if ($s ne "");
+            $self->Action->StoreRecord($id,"mail",
+                                       {translation=>'base::workflow',
+                                        additional=>$additional},
+                                       "To: $t\n\n".$m);
+         }
+         if (my $r=$self->Store($mailid,%d)){
+            $self->LastMsg(OK,"mail has been successfuly transfered to spool");
+         }
+      }
+      print $self->HttpHeader("text/html");
+      print $self->HtmlHeader(style=>['default.css','work.css'],
+                              body=>1,form=>1,target=>'action',
+                              title=>'W5Base Mail Client');
+      my $lastmsg=$self->findtemplvar({},"LASTMSG");
+      print $lastmsg;
+      print $self->HtmlBottom(body=>1,form=>1);
+
+
+
+   }
+   else{
+      if ($parent eq "base::workflow" && $id ne "" && $s eq ""){
+         $self->ResetFilter();
+         $self->SetFilter({id=>\$id});
+         my ($rec,$msg)=$self->getOnlyFirst(qw(name));
+         $s=$rec->{name};
+      }
+   }
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','work.css'],
+                           body=>1,form=>1,target=>'action',
+                           js=>['TextTranslation.js','toolbox.js','subModal.js'],
+                           title=>'W5Base Mail Client');
+   print $self->HtmlSubModalDiv();
+   my $to=$self->T("To","base::workflow::mailsend");
+   my $subject=$self->T("Subject","base::workflow::mailsend");
+   my $send=$self->T("Send message","base::workflow::mailsend");
+   my $lastmsg=$self->findtemplvar({},"LASTMSG");
    $s=~s/"//g;
    $t=~s/"//g;
    $c=~s/"//g;
@@ -1578,7 +1654,7 @@ sub externalMailHandler
   <table width=100%><tr>
   <td width=50 valign=top>
   <img src=\"../../base/load/addrbook.gif\">&nbsp;CC:</td>
-  <td><textarea name=to style="width:100%;height:30px">$c</textarea></td>
+  <td><textarea name=cc style="width:100%;height:30px">$c</textarea></td>
   </tr></table>
  </td></tr>
  <tr height=1%><td height=1%>
@@ -1587,12 +1663,25 @@ sub externalMailHandler
   <td><input name=subject value="$s" style="width:100%"></td>
   </tr></table>
  </td></tr>
- <tr><td>
-  <textarea name=msg style="width:100%;height:100%">$m</textarea>
+ <tr height=1%><td height=1%>
+  <table width=100%><tr>
+  <td width=50>Anlage:</td>
+  <td><input disabled name=file size=35 type=file></td>
+  <td width=120>Referenz hinzufügen:</td>
+  <td><input name=addref $addref type=checkbox></td>
+  </tr></table>
  </td></tr>
- <tr height=1%><td height=1% align=left>&nbsp;</td>
+ <tr><td>
+  <textarea onkeydown="textareaKeyHandler(this,event);" name=msg style="width:100%;height:100%">$m</textarea>
+ </td></tr>
+ <tr height=1%><td height=1% align=left>
+<iframe style="height:15px;width:100%;margin:0px;padding:0px;border-style:none; border-width:0pt;" src="Empty" name=action></iframe>
+</td>
  </tr>
  <tr height=1%><td height=1% align=right>
+ <input type=hidden name=parent value="$parent">
+ <input type=hidden name=id value="$id">
+ <input type=hidden name=ACTION value="send">
  <input type=button onclick=doSend() name=send 
         value="$send">
  </td></tr>

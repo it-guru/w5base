@@ -16,6 +16,12 @@ iframe.result{
    margin:0px;
    padding:0px;
 }
+iframe.nativ{
+   height:100%;
+   margin:0px;
+   padding:0px;
+   border-style:none; border-width:0pt;
+}
 div.extsearchframe{
    height:100px;
    border-style:outset;

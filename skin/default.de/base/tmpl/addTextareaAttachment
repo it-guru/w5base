@@ -9,7 +9,7 @@ Aktuell sind nur Anlagen vom Typ JPG erlaubt. Bitte fügen Sie keine Anlagen mit 
 </tr>
 <tr height=1%>
 <td>
-<input type=file name=file size=30 style="width:100%">
+<input type=file name=file size=22 style="width:100%">
 </td>
 <td width=1%>
 <input type=submit value=" Datei hinzufügen " name=save>

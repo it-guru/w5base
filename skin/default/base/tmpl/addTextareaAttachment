@@ -9,7 +9,7 @@ Actualy there are only attachment of type JPG allowed. Please don't attach any s
 </tr>
 <tr height=1%>
 <td>
-<input type=file name=file size=30 style="width:100%">
+<input type=file name=file size=22 style="width:100%">
 </td>
 <td width=1%>
 <input type=submit value=" add File " name=save>

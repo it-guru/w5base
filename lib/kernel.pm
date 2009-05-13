@@ -80,7 +80,8 @@ use Unicode::String qw(utf8 latin1 utf16);
              &trim &rtrim &ltrim &hash2xml &effVal &Debug &UTF8toLatin1
              &Datafield2Hash &Hash2Datafield &CompressHash
              &unHtml &quoteHtml &quoteWap &quoteQueryString &Dumper 
-             &FancyLinks &mkInlineAttachment &haveSpecialChar
+             &FancyLinks &mkInlineAttachment 
+             &mkMailInlineAttachment &haveSpecialChar
              &getModuleObject &getConfigObject &generateToken
              &isDataInputFromUserFrontend
              &msg &ERROR &WARN &DEBUG &INFO &OK &utf8 &latin1 &utf16);
@@ -657,10 +658,33 @@ sub _mkInlineAttachment
       "target=_blank>$d</a>";
    return($d);
 }
+sub _mkMailInlineAttachment
+{
+   my $id=shift;
+   my $baseurl=shift;
+   my $size;
+
+   eval("use GD;");
+   if ($@ ne ""){
+      $size="height=90";
+   }
+   my $d="&lt;Attachment&gt;";
+   $d="<a rel=\"lytebox[inline]\" ".
+      "href=\"$baseurl/public/base/filemgmt/load/inline/$id\" ".
+      "target=_blank>$d</a>";
+   return($d);
+}
 sub mkInlineAttachment
 {
    my $data=shift;
    $data=~s#\[attachment\((\d+)\)\]#_mkInlineAttachment($1)#ge;
+   return($data);
+}
+sub mkMailInlineAttachment
+{
+   my $baseurl=shift;
+   my $data=shift;
+   $data=~s#\[attachment\((\d+)\)\]#_mkMailInlineAttachment($1,$baseurl)#ge;
    return($data);
 }
 

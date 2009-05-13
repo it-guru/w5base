@@ -50,6 +50,9 @@ sub Sendmail
    my @processed=();
    my $app=$self->getParent();
    msg(DEBUG,"start Event Sendmail");
+
+   my $baseurl=$self->Config->Param("EventJobBaseUrl");
+   my $opmode=$self->Config->Param("W5BaseOperationMode");
    my @sendmailpath=qw(/usr/local/sbin/sendmail 
                        /sbin/sendmail 
                        /usr/sbin/sendmail 
@@ -139,7 +142,6 @@ sub Sendmail
             $skinbase=$b;
             $template=$t;
          }
-         my $opmode=$self->Config->Param("W5BaseOperationMode");
          my @mailallow=split(/[,;]/,$self->Config->Param("W5BaseMailAllow"));
          msg(DEBUG,"sendmail:W5BaseOperationMode=$opmode");
          msg(DEBUG,"sendmail:W5BaseMailAllow=".join(" ",@mailallow));
@@ -290,6 +292,7 @@ sub Sendmail
                   $emailtext=~s/>/&gt;/g;
                }
                $emailtext=FancyLinks($emailtext);
+               $emailtext=mkMailInlineAttachment($baseurl,$emailtext);
                my $emailbottom=$rec->{emailbottom};
                if (ref($rec->{emailbottom}) eq "ARRAY"){
                   $emailbottom=$rec->{emailbottom}->[$blk];

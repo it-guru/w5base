@@ -752,6 +752,19 @@ sub sendFile
             print $image->jpeg;
             return(undef);
          }
+         my $icon="icon_undefcode.gif";
+         if ($rec->{contenttype} eq "application/pdf"){
+            $icon="icon_pdf.gif";
+         }
+         elsif ($rec->{contenttype}=~m/application.*excel/){
+            $icon="icon_xls.gif";
+         }
+         print $self->HttpHeader("image/gif");
+         my $filename=$self->getSkinFile("base/img/$icon"); 
+         if (open(F,"<$filename")){
+            print join("",<F>);
+            close(F);
+         }
       }
       my $contenttype="application/octet-bin";
       $param{filename}="file.bin";
