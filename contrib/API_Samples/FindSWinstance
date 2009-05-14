@@ -2,6 +2,7 @@
 use lib qw(/opt/w5base2/lib /opt/w5base/lib);
 use strict;                   
 use W5Base::API;
+use Data::Dumper qw(Dumper);
 
 my $DefaultBase="https://w5base.net/w5base/auth/";
 my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang);
@@ -47,13 +48,13 @@ if ($flt eq ""){
 # do search
 #
 $swi->SetFilter({id=>$flt});
-if (my @l=$swi->getHashList(qw(fullname additional))){
+if (my @l=$swi->getHashList(qw(fullname additional contacts systems))){
    if ($#l==-1){
       msg(INFO,"no data found in $objectname matching fullname=$flt");exit(2);
    }
    else{
       foreach my $rec (@l){
-          printf("$rec->{fullname}\n");
+          printf Dumper($rec);
       }
    }
 }

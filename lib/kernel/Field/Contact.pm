@@ -83,6 +83,9 @@ sub contextMenu
       if ($email ne ""){
          push(@ml,$self->getParent->T("send a mail"),
                   "window.location.href = 'mailto:$email';");
+
+         push(@ml,$self->getParent->T("W5Base Mail"),
+                  "window.location.href = 'mailto:$email';");
       }
       my $office_phone=$rec->[0]->{office_phone};
       if ($office_phone ne ""){

@@ -22,6 +22,7 @@
 'Event-Duration Minutes'=>{de=>'Ereignis Dauer in Minuten'},
 'Event-Duration'=>{de=>'Ereignis Dauer'},
 'sum documented efforts'=>{de=>'Summe dokumentierter Aufwände (intern)'},
+'marked as delete'=>{de=>'gelöscht markiert'},
 'sum efforts in hours'=>{de=>'Summe Aufwände in Stunden (intern)'},
 'Forward to'=>{de=>'Weiterleitung an/ Vorlage bei'},
 'Close-Date'=>{de=>'Abschlusszeitpunkt'},

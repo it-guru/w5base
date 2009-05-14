@@ -398,13 +398,14 @@ sub _SOAPaction2param
       }
       $mod=~s/\//::/g;
       $param->{dataobject}=$mod;
-      if ($mod eq "base::workflow"){
+      if ($param->{dataobject} eq "base::workflow"){
          $ns=WSDLmodule2ns($param->{class});
       }
       else{
-         $ns=WSDLmodule2ns($mod);
+         $ns=WSDLmodule2ns($param->{dataobject});
       }
    }
+
    if ($param->{lang} eq ""){
       $param->{lang}="en";
    }
@@ -710,13 +711,13 @@ sub getHashList
    my @l=$o->getHashList(@$view);
    for(my $c=0;$c<=$#l;$c++){
       my %cprec;
+      my $objns=$ns;
+      $objns="W5Kernel" if ($ns eq "");
       foreach my $fobj (@fobjs){
          my $k=$fobj->Name();
          my $wsdl=$fobj->{WSDLfieldType};
          $wsdl="xsd:string" if ($wsdl eq "");
          if (!($wsdl=~m/^.*:.*$/)){
-            my $objns=$ns;
-            $objns="namesp1";
             $wsdl=$objns.":".$wsdl;
          }
          my $v=$fobj->FormatedResult($l[$c],"SOAP");
@@ -729,6 +730,9 @@ sub getHashList
          $cprec{$k}=SOAP::Data->type($wsdl)->value($v);
       }
       $l[$c]=SOAP::Data->name('record')->type('Record')->value(\%cprec);
+      if ($ns eq ""){
+         $l[$c]=$l[$c]->attr({'xmlns:'.$objns=>'http://w5base.net/kernel'});
+      }
    }
    return(interface::SOAP::kernel::Finish(SOAP::Data->name(output=>{exitcode=>0,
           lastmsg=>[],records=>\@l})));

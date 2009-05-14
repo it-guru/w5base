@@ -66,6 +66,21 @@ sub WSDLcommon
    $$XMLtypes.="</xsd:sequence>";
    $$XMLtypes.="</xsd:complexType>";
 
+   $$XMLtypes.="<xsd:complexType name=\"Contacts\">";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"unbounded\" ".
+               "name=\"item\" type=\"$ns:ContactLnk\" />";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
+
+   $$XMLtypes.="<xsd:complexType name=\"ContactLnk\">";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element name=\"roles\" type=\"xsd:string\" />";
+   $$XMLtypes.="<xsd:element name=\"targetname\" type=\"xsd:string\" />";
+   $$XMLtypes.="<xsd:element name=\"comments\" type=\"xsd:string\" />";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
+
    $self->WSDLdoPing($uri,$ns,$fp,$module,
                      $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes);
    $self->WSDLshowFields($uri,$ns,$fp,$module,
