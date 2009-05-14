@@ -48,7 +48,7 @@ if ($flt eq ""){
 # do search
 #
 $swi->SetFilter({id=>$flt});
-if (my @l=$swi->getHashList(qw(fullname additional contacts systems))){
+if (my @l=$swi->getHashList(qw(name appl comments fullname additional contacts systems))){
    if ($#l==-1){
       msg(INFO,"no data found in $objectname matching fullname=$flt");exit(2);
    }

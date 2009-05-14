@@ -129,6 +129,9 @@ sub FormatedResult
       }
       $d=~s/\n/<br>\n/g;
    }
+   if ($FormatAs eq "SOAP"){
+      $d=~s/&/&amp;/g;; 
+   }
    #printf STDERR ("fifi FormatAs=$FormatAs\n");
    return($d);
 }

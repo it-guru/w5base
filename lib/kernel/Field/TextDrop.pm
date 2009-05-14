@@ -252,6 +252,9 @@ EOF
       $d=$self->addWebLinkToFacility($d,$current) if ($mode eq "HtmlDetail");
       $d.=$self->getHtmlContextMenu($current) if ($mode eq "HtmlDetail");
    }
+   if ($mode eq "SOAP"){
+      $d=~s/&/&amp;/g;;
+   }
    return($d);
 }
 
