@@ -52,7 +52,7 @@ sub patchSWInstance
    my $user=getModuleObject($self->Config,"base::user");
    my $swi=getModuleObject($self->Config,"itil::swinstance");
    my $opswi=$swi->Clone();
-   $swi->SetFilter({cistatusid=>4});
+   $swi->SetFilter({cistatusid=>"<=5"});
    $swi->SetCurrentOrder("NONE");
    $swi->SetCurrentView(qw(ALL));
    my ($rec,$msg)=$swi->getFirst(unbuffered=>1);
