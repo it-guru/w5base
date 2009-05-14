@@ -954,6 +954,9 @@ sub HandleHistory
           $W5V2::OperationContext ne ""){
          $comments.="CONTEXT = $W5V2::OperationContext \n";
       }
+      if ($W5V2::HistoryComments ne ""){
+         $comments.=$W5V2::HistoryComments;
+      }
       if (defined($comments)){
          $histrec->{comments}=$comments;
       }

@@ -722,7 +722,7 @@ sub menutop
    my $opmode=$operationmode;
    $opmode="" if ($opmode eq "normal");
    $opmode="<font color=darkred>$opmode</font>" if ($opmode eq "readonly");
-   $opmode="OP-Mode: $opmode" if ($opmode ne "");
+   $opmode="OP-Mode: $opmode" if ($opmode ne "" && $opmode ne "online");
 
    print $self->getParsedTemplate("tmpl/menuheader",{
                                    static=>{

@@ -847,6 +847,7 @@ else{
 }
 $W5V2::Config=$curconfig;
 $W5V2::OperationContext="W5Server";
+$W5V2::HistoryComments=undef;
 @ARGV=@ARGV_bak;
 $0="W5Server";
 W5Server->run(%ServerParam);

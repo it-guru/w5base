@@ -29,10 +29,12 @@ sub process
 
    my $nextrun;
 
+         $self->CleanupHistory();
    while(1){
       if (defined($nextrun) && $nextrun<=time()){
          $self->doCleanup();
          $self->CleanupWorkflows();
+         $self->CleanupHistory();
        #  $self->CleanupInlineAttachments(); tests are needed !!!
          sleep(1);
       }
@@ -91,6 +93,29 @@ sub CleanupInlineAttachments
          msg(INFO,"delete inline attachment $rec->{name} $rec->{fid}");
          $op->ValidatedDeleteRecord($rec);
          ($rec,$msg)=$inline->getNext();
+      } until(!defined($rec));
+   }
+}
+
+sub CleanupHistory
+{
+   my $self=shift;
+   my $hist=getModuleObject($self->getParent->Config,"base::history");
+   my $CleanupHistory=$self->getParent->Config->Param("CleanupHistory");
+   $CleanupHistory="<now-365d" if ($CleanupHistory eq "");
+
+   $hist->SetFilter({cdate=>$CleanupHistory});
+   $hist->SetCurrentView(qw(ALL));
+   $hist->SetCurrentOrder(qw(NONE));
+   $hist->Limit(100000);
+
+   my ($rec,$msg)=$hist->getFirst(unbuffered=>1);
+   if (defined($rec)){
+      my $op=$hist->Clone();
+      do{
+         msg(INFO,"delete history $rec->{id}");
+         $op->ValidatedDeleteRecord($rec);
+         ($rec,$msg)=$hist->getNext();
       } until(!defined($rec));
    }
 }

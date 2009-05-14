@@ -153,6 +153,14 @@ sub new
                #                   effort comments)]
                 ),
                                    
+      new kernel::Field::Boolean(
+                name          =>'isdeleted',
+                selectfix     =>1,
+                htmlwidth     =>'1%',
+                group         =>'state',
+                label         =>'marked as delete',
+                dataobjattr   =>'wfhead.is_deleted'),
+
       new kernel::Field::Text(
                 name          =>'class',
                 selectfix     =>1,
@@ -643,6 +651,9 @@ sub initSearchQuery
    my $self=shift;
    if (!defined(Query->Param("search_mdate"))){
       Query->Param("search_mdate"=>'>now-60m');
+   }
+   if (!defined(Query->Param("search_isdeleted"))){
+      Query->Param("search_isdeleted"=>$self->T("no"));
    }
 }
 
