@@ -715,7 +715,9 @@ sub getHashList
          my $wsdl=$fobj->{WSDLfieldType};
          $wsdl="xsd:string" if ($wsdl eq "");
          if (!($wsdl=~m/^.*:.*$/)){
-            $wsdl=$ns.":".$wsdl;
+            my $objns=$ns;
+            $objns="namesp1";
+            $wsdl=$objns.":".$wsdl;
          }
          my $v=$fobj->FormatedResult($l[$c],"SOAP");
          if (ref($v) eq "ARRAY"){
