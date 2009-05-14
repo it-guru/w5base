@@ -29,7 +29,6 @@ sub process
 
    my $nextrun;
 
-         $self->CleanupHistory();
    while(1){
       if (defined($nextrun) && $nextrun<=time()){
          $self->doCleanup();
