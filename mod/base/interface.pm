@@ -295,7 +295,14 @@ sub WSDL
    my $self=shift;
    my $fp=Query->Param("FunctionPath");
    $fp=~s/^\///;
+   my $fileexists=1;
    my $module=$fp;
+   my $instdir=$self->Config->Param("INSTDIR");
+   if (($module=~m/\.\./) || ! -f $instdir."/mod/".$module.".pm"){
+      $fileexists=0;
+      $self->Log(ERROR,"soap","invalid or not existing NS '$module'");
+   }
+
    $module=~s/\//::/g;
    my $ns=WSDLmodule2ns($module);
    my $uri=$ENV{SCRIPT_URI};
@@ -312,7 +319,8 @@ sub WSDL
    if ($usemodule=~m/^.+::workflow::.+$/){
       $usemodule="base::workflow";
    }
-   if (my $o=getModuleObject($self->Config,$usemodule)){
+   if (defined(my $o=getModuleObject($self->Config,$usemodule)) &&
+       $fileexists==1){
       $o->setParent($self);
       $o->Init();
       $XMLservice.="<service name=\"W5Base\">";
@@ -322,6 +330,8 @@ sub WSDL
       $XMLservice.="</service>";
       $o->WSDLcommon($uri,$ns,$fp,$module,
                      \$XMLbinding,\$XMLportType,\$XMLmessage,\$XMLtypes);
+      $self->Log(INFO,"soap",
+              "WSDL Query from $ENV{REMOTE_ADDR} for module $module");
    }
    utf8::encode($XMLbinding);
    utf8::encode($XMLportType);
@@ -359,7 +369,6 @@ EOF
    print(<<EOF);
 </definitions>
 EOF
-   msg(INFO,"WSDL Query from $ENV{REMOTE_ADDR} for module $module done");
 }
 sub SOAP
 {
