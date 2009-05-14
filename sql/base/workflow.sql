@@ -188,3 +188,4 @@ CREATE TABLE mailreqspool (
   PRIMARY KEY (id),
   key(md5sechash),key(createdate)
 );
+alter table wfhead add md5sechash char(22) default NULL, add key(md5sechash), add is_deleted boolean default '0', add eventtrigger varchar(128) default NULL, add acopymode char(20) default NULL, add key acopy(opendate,acopymode), add acopydate datetime default NULL;
