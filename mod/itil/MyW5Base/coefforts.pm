@@ -59,6 +59,21 @@ sub Init
                 }),
 
       new kernel::Field::Number(
+                name          =>'efforts_effectiv',
+                label         =>'effectiv Effort',
+                searchable    =>0,
+                group         =>'efforts',
+                unit          =>'min',
+                depend        =>['name'],
+                onRawValue    =>sub {
+                   my $fieldself=shift;
+                   my $current=shift;
+                   my $id=$current->{name};
+
+                   return($self->Context->{eff}->{$id});
+                }),
+
+      new kernel::Field::Number(
                 name          =>'efforts_employecount',
                 label         =>'Effort employecount',
                 searchable    =>0,
@@ -85,12 +100,12 @@ sub addSpecialSearchMask
 sub calculateEfforts
 {
    my $self=shift;
-   my ($year,$mon,$invoiceday,$Y1,$M1,$invoiceday1,$user,$fineQuery)=@_;
+   my ($year,$mon,$invoiceday,$Y1,$M1,$invoiceday1,$user,$grpid,$fineQuery)=@_;
 
    $self->{DataObj}->setDefaultView(qw(linenumber name fullname 
                                        efforts_treal
+                                       efforts_effectiv
                                        efforts_employecount
-                                       efforts_tprojection
                                        ));
 
    my $wfact=getModuleObject($self->getParent->Config,"base::workflowaction");
@@ -115,24 +130,60 @@ sub calculateEfforts
       my $wf=getModuleObject($self->getParent->Config,"base::workflow");
       $wf->SetFilter({id=>[keys(%wfheadid)]});
       foreach my $rec ($wf->getHashList(qw(id wffields.conumber))){
-printf STDERR Dumper(\%wfheadid);
-printf STDERR Dumper($rec);
+#printf STDERR Dumper(\%wfheadid);
+#printf STDERR Dumper($rec);
          my $conumber=$rec->{conumber};
          $conumber=[$conumber] if (ref($conumber) ne "ARRAY");
          if ($#{$conumber}!=-1){
             my $wfheadid=$rec->{id};
             my $effort=($wfheadid{$wfheadid})/($#{$conumber}+1);
-printf STDERR ("effort=$effort\n");
             foreach my $lco (@$conumber){
                $self->Context->{treal}->{$lco}+=$effort;
+               $self->Context->{eff}->{$lco}=$self->Context->{treal}->{$lco};
             }
          }
       }
-      $fineQuery->{name}=[keys(%{$self->Context->{treal}})];
+   }
+   if ($grpid ne ""){
+      my $f=getModuleObject($self->getParent->Config,"finance::costteamfixup");
+      my $date="$invoiceday1.$mon.$year";
+      $f->SetFilter([{grpid=>\$grpid,
+                     durationstart=>"<=$date",durationend=>[undef]},
+                    {grpid=>\$grpid,
+                     durationstart=>"<=$date",durationend=>">=$date"}]);
+      foreach my $rec ($f->getHashList(qw(name fixupmode fixupminutes))){
+         my $lco=$rec->{name};
+         if ($rec->{fixupmode} eq "fix"){
+            $self->Context->{eff}->{$lco}=$rec->{fixupminutes};
+         }
+         if ($rec->{fixupmode} eq "min"){
+            if ($self->Context->{eff}->{$lco}<$rec->{fixupminutes}){
+               $self->Context->{eff}->{$lco}=$rec->{fixupminutes};
+            }
+         }
+         if ($rec->{fixupmode} eq "max"){
+            if ($self->Context->{eff}->{$lco}>$rec->{fixupminutes}){
+               $self->Context->{eff}->{$lco}=$rec->{fixupminutes};
+            }
+         }
+         if ($rec->{fixupmode} eq "delta"){
+            $self->Context->{eff}->{$lco}+=$rec->{fixupminutes};
+         }
+      }
+   }
+
+   if (keys(%{$self->Context->{treal}}) ||
+       keys(%{$self->Context->{eff}})){
+      $fineQuery->{name}=[keys(%{$self->Context->{treal}}),
+                          keys(%{$self->Context->{eff}})];
    }
    else{
       $fineQuery->{name}=["NONE"];
    }
+
+
+
+
    return(1);
 }  
 

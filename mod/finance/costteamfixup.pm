@@ -55,6 +55,16 @@ sub new
                 label         =>'CO-Number',
                 dataobjattr   =>'costteamfixup.name'),
 
+      new kernel::Field::Text(
+                name          =>'costatus',
+                htmlwidth     =>'120px',
+                label         =>'CO-Status',
+                weblinkto     =>undef,
+                weblinkon     =>undef,
+                vjoinon       =>['name'=>'name'],
+                vjointo       =>'finance::costcenter',
+                vjoindisp     =>'cistatus'),
+
       new kernel::Field::Select(
                 name          =>'fixupmode',
                 label         =>'Fixup mode',
@@ -155,7 +165,7 @@ sub new
 
    );
    $self->{history}=[qw(modify delete)];
-   $self->setDefaultView(qw(team name fixupmode fixupminutes mdate));
+   $self->setDefaultView(qw(team name costatus fixupmode fixupminutes mdate));
    $self->setWorktable("costteamfixup");
    return($self);
 }

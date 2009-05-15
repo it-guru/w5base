@@ -10,3 +10,4 @@
 'Orgunit'=>{de=>'Orgnisationsbereich'},
 'Applicationname'=>{de=>'Anwendungsname'},
 'all calculations based on GMT'=>{de=>'alle Berechungen basieren auf GMT'},
+'effective timerange'=>{de=>'effektiver Zeitbereich'},

@@ -116,7 +116,11 @@ sub getTimeRangeDrop
    my $name=shift;
    my $app=shift;
    my @modes=@_;
-   my $d="<select style=\"width:100%\" name=$name>\n";
+   my $d="<select style=\"width:100%\" name=$name";
+   if (grep(/^rangeChangedEvent$/,@modes)){
+      $d.=" onchange=\"rangeChangedEvent()\"";
+   }
+   $d.=">\n";
    my ($year,$month,$day, $hour,$min,$sec) = Today_and_Now("GMT");
    my %k=();
 

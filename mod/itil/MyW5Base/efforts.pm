@@ -137,13 +137,14 @@ sub getQueryTemplate
    $orgsel.="</select>";
 
    my $msel=$self->getTimeRangeDrop("search_mon",$self->getParent,
-                                    "fixmonth",
+                                    "fixmonth","rangeChangedEvent",
                                     "shorthist","lastmonth");
    my $ivday=$self->getParent->T("Invoice Day");
    my $Month=$self->getParent->T("Timerange");
    my $Orgunit=$self->getParent->T("Orgunit");
+   my $efftr=$self->getParent->T("effective timerange");
    my $InvoiceInfo=$self->getParent->T("all calculations based on GMT");
-   my $invoiceday="<select name=search_invoiceday>";
+   my $invoiceday="<select name=search_invoiceday onchange=\"recalcEffTime()\">";
    my $oldivday=Query->Param("search_invoiceday");
    for(my $c=1;$c<=25;$c++){
       $invoiceday.="<option value=\"$c\"";
@@ -165,12 +166,51 @@ sub getQueryTemplate
 <td class=fname width=10%>$Orgunit:</td>
 <td class=finput colspan=3>$orgsel</td>
 </tr>
+<tr>
+<td class=fname width=10%>$efftr:</td>
+<td class=finput colspan=3><div id=efftime></div></td>
+</tr>
 EOF
    $d.=$self->addSpecialSearchMask();
    $d.=<<EOF;
 </table>
 </div>
 %StdButtonBar(bookmark,print,search)%
+
+<script language=JavaScript>
+
+function rangeChangedEvent()
+{
+   recalcEffTime();
+}
+
+function recalcEffTime()
+{
+   var e=document.getElementById("efftime");
+   var m=document.forms[0].elements["search_mon"];
+   var d=document.forms[0].elements["search_invoiceday"];
+   var Ausdruck = /(\\d.+)\\/(\\d.+)/;
+   if (Ausdruck.exec(m.value)){
+      var mon=RegExp.\$1;
+      var year=RegExp.\$2;
+     
+      var mon2=parseInt(mon)+1;
+      var year2=parseInt(year);
+      if (mon2>12){
+         mon2=1;
+         year2=parseInt(year)+1;
+      }
+       
+      e.innerHTML=d.value+"."+mon+"."+year+" 00:00:00  -  "+
+                  d.value+"."+mon2+"."+year2+" 00:00:00";
+   }
+   else{
+      e.innerHTML="???";
+   }
+}
+addEvent(window,"load",recalcEffTime);
+
+</script>
 EOF
    return($d);
 }
@@ -231,7 +271,8 @@ sub Result
    my %fineQuery;
    $self->{DataObj}->ResetFilter();
    my $result=$self->calculateEfforts($year,$mon,$invoiceday,
-                                      $Y1,$M1,$invoiceday,\%user,\%fineQuery);
+                                      $Y1,$M1,$invoiceday,\%user,
+                                      $grpid,\%fineQuery);
 
    #print STDERR Dumper($self->Context->{treal});
 
@@ -243,7 +284,7 @@ sub Result
 sub calculateEfforts
 {
    my $self=shift;
-   my ($year,$mon,$invoiceday,$Y1,$M1,$invoiceday1,$user,$fineQuery)=@_;
+   my ($year,$mon,$invoiceday,$Y1,$M1,$invoiceday1,$user,$grpid,$fineQuery)=@_;
 
    $self->{DataObj}->setDefaultView(qw(linenumber name customer conumber
                                        efforts_treal

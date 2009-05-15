@@ -4,6 +4,7 @@
 'fieldgroup.efforts'=>{de=>'Arbeitsaufwand',
                        en=>'efforts'},
 'Effort real'=>{de=>'erfasster Arbeitsaufwand'},
+'effectiv Effort'=>{de=>'effektiver Arbeitsaufwand'},
 'Effort employecount'=>{de=>'Anzahl berücksichtigter Mitarbeiter'},
 'Invoice Day'=>{de=>'Abrechnungstag'},
 'Timerange'=>{de=>'Zeitbereich'},
