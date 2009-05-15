@@ -6,3 +6,4 @@
 'averanged work efforts/day'=>{de=>'durchschnittliche Arbeitszeit/Tag'},
 'count workflows'=>{de=>'Anzahl Workflows'},
 'sum efforts in the last 14 days'=>{de=>'Summe Aufwände der letzten 14 Tage'},
+'sum efforts today'=>{de=>'Heute erfassten Aufwände'},

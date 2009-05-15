@@ -85,6 +85,8 @@ sub Result
    my %wfheadid;
    my %day;
    my $sumeff;
+   my $sumtoday;
+   my @now=Today_and_Now($tz);
    $wa->SetCurrentView(qw(wfheadid cdate effort));
    my ($rec,$msg)=$wa->getFirst();
    if (defined($rec)){
@@ -95,12 +97,14 @@ sub Result
          my $day=sprintf("%04d-%02d-%02d",$ldate[0],$ldate[1],$ldate[2]);
          $day{$day}+=($rec->{effort}+0);
          $sumeff+=($rec->{effort}+0);
+         if ($ldate[0]==$now[0] && $ldate[1]==$now[1] && $ldate[2]==$now[2]){
+            $sumtoday+=($rec->{effort}+0);
+         }
          #printf ("<pre>@ldate=%s</pre>\n",Dumper($rec));
          ($rec,$msg)=$wa->getNext();
       } until(!defined($rec));
    }
    my $wfcount=keys(%wfheadid);
-   my @now=Today_and_Now($tz);
    my $now=sprintf("%04d-%02d-%02d",$now[0],$now[1],$now[2]);
    my $data=[];
    my $xlabel=[];
@@ -124,6 +128,7 @@ sub Result
    my $mwteff=sprintf("%.2f&nbsp;h&nbsp;",$sumeff/$wtcount/60);
    my $miteff=sprintf("%.2f&nbsp;h&nbsp;",$sumeff/14.0/60);
    $sumeff=sprintf("%.2f&nbsp;h&nbsp;",$sumeff/60);
+   my $sumnoweff=sprintf("%.2f&nbsp;h&nbsp;",$sumtoday/60);
 
    my $user=getModuleObject($self->getParent->Config,"base::user");
    $user->SetFilter({userid=>\$userid});
@@ -147,6 +152,7 @@ sub Result
    my $l3=$self->T("averanged work efforts/day");
    my $l4=$self->T("count workflows");
    my $l5=$self->T("sum efforts in the last 14 days");
+   my $l6=$self->T("sum efforts today");
    my $condition=$self->T("condition");
    my $cond=Date_to_String("de",@now);
    print(<<EOF);
@@ -157,7 +163,8 @@ sub Result
 <tr>
 <td nowrap>$l3</td><td align=right width=40>$miteff</td>
 <td nowrap>$l4</td><td width=40 align=right>$wfcount&nbsp;</td></tr>
-<tr><td nowrap>$l5</td><td align=right width=40 >$sumeff</td></tr>
+<tr><td nowrap>$l5</td><td align=right width=40 >$sumeff</td>
+<td nowrap>$l6</td><td align=right width=40 >$sumnoweff</td></tr>
 </table>
 <input type=hidden name=MyW5BaseSUBMOD value="base::MyW5Base::myefforts">
 <script language="JavaScript">
