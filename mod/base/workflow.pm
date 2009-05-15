@@ -236,6 +236,8 @@ sub new
                 name          =>'eventstartrev',
                 label         =>'Event-Start reverse',
                 sqlorder      =>'desc',
+                htmldetail    =>0,
+                group         =>'state',
                 dataobjattr   =>'wfhead.eventstart'),
                                   
       new kernel::Field::Date(
@@ -345,6 +347,8 @@ sub new
                 group         =>'state',
                 sqlorder      =>'desc',
                 uivisible     =>0,
+                htmldetail    =>0,
+                group         =>'state',
                 label         =>'Modification-Date reverse',
                 dataobjattr   =>'wfhead.modifydate'),
                                    
@@ -1168,10 +1172,27 @@ sub Validate
       $self->LastMsg(ERROR,"invalid workflow short description spezified");
       return(0);
    }
-   if ((defined($newrec->{fwdtarget}) && 
+
+
+   #
+   # recalculation of responsible group
+   # primary depending on srcload (sec mdate) a recalculation is done at
+   # maximum every 6 hours (or if the record is new created)
+   #
+   my $mdate=$oldrec->{srcload};
+   if ($mdate eq ""){
+      $mdate=$oldrec->{mdate};
+   }
+   my $duration;
+   if ($mdate ne ""){
+      $duration=CalcDateDuration($mdate,NowStamp("en"));
+   }
+   if ((defined($newrec->{fwdtarget}) &&
         effVal($oldrec,$newrec,"fwdtarget") ne $oldrec->{fwdtarget}) ||
-       (defined($newrec->{fwdtargetid}) && 
-        effVal($oldrec,$newrec,"fwdtargetid") ne $oldrec->{fwdtargetid})){
+       (defined($newrec->{fwdtargetid}) &&
+        effVal($oldrec,$newrec,"fwdtargetid") ne $oldrec->{fwdtargetid}) ||
+       $mdate eq "" ||
+       $duration->{totalseconds}>3600*6){ # recalc group max every 6h
       # no the last responsegroup has to be posible changed
       my $fwdtargetid=effVal($oldrec,$newrec,"fwdtargetid");
       my $fwdtarget=effVal($oldrec,$newrec,"fwdtarget");
@@ -1206,6 +1227,7 @@ sub Validate
          }
       }
    }
+   #######################################################################
    return($bk);
 }
 
