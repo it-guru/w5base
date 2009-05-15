@@ -797,6 +797,7 @@ sub FormatedDetail
    my $current=shift;
    my $FormatAs=shift;
    my $d=$self->RawValue($current);
+   $d=join("; ",@$d) if (ref($d) eq "ARRAY" && $FormatAs=~m/^Html/);
    return($d);
 }
 
