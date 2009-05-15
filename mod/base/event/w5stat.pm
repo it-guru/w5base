@@ -255,8 +255,7 @@ sub sendOverviewData
           emailto       =>$emailto,
           additional    =>{
              htmldata=>$d,month=>$month, 
-             directlink=>$joburl.
-                         "/auth/base/menu/msel/Tools/reflexion?search_id=".
+             directlink=>$joburl."/auth/base/menu/msel/Reporting?search_id=".
                          $primrec->{id},
              fullname=>$primrec->{fullname}
           },
