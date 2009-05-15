@@ -205,6 +205,26 @@ sub tcomworktimeadd
    return(undef);
 }
 
+sub minUnformat
+{
+   my $self=shift;
+   my $formated=shift;
+   my $rec=shift;
+
+   return({}) if ($self->readonly);
+   if (defined($formated)){
+      my $d=$formated;
+      $d=$d->[0] if (ref($d) eq "ARRAY");
+      my $used=$d;
+      $used=~s/,/./g;
+      if (my ($h)=$used=~m/^\s*([\d\.]+)\s*h\s*$/){
+         $d=$h*60;
+      }
+      $formated=[$d];
+   }
+   return($self->kernel::Field::Number::Unformat($formated,$rec));
+}
+
 
 
 

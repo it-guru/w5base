@@ -286,6 +286,8 @@ EOF
       my @grouplist;
       my @fieldlist=@$recordview;
       my @uivisibleof=();
+      my %grouphavehalfwidth; 
+      my %fieldhalfwidth; 
 
       for(my $c=0;$c<=$#fieldlist;$c++){
          my $name=$fieldlist[$c]->Name();
@@ -298,12 +300,16 @@ EOF
             @fieldgrouplist=@{$fieldlist[$c]->{group}};
          }
          my $grouplabel=$fieldlist[$c]->grouplabel($rec);
+         $fieldhalfwidth{$name}=$fieldlist[$c]->htmlhalfwidth();
          foreach my $fieldgroup (@fieldgrouplist){
             if (!grep(/^$fieldgroup$/,@grouplist)){
                push(@grouplist,$fieldgroup);
                $grouplabel{$fieldgroup}=0;
             }
             $grouplabel{$fieldgroup}=1 if ($grouplabel);
+            if ($fieldhalfwidth{$name}){
+               $grouphavehalfwidth{$fieldgroup}++;
+            }
          }
       }
       my $spec=$self->getParent->getParent->LoadSpec($rec);
@@ -366,26 +372,29 @@ EOF
                      push(@{$self->Context->{jsonchanged}},$n);
                   }
                }
-               my $halfwidth=$fieldlist[$c]->htmlhalfwidth();
+               my $halfwidth=$fieldhalfwidth{$name};
                $subblock.="<tr class=fline>" if ($col==0);
                if ($fieldlist[$c]->Type() eq "Textarea" ||
                    $fieldlist[$c]->Type() eq "Container" ||
                    $fieldlist[$c]->Type() eq "Htmlarea"){
-                  my $datacolspan=4;
+                  my $datacolspan=2;
+                  $datacolspan=4 if ($grouphavehalfwidth{$group});
                   $datacolspan=2 if ($halfwidth);
                   $subblock.=<<EOF;
 <td class=fname$valign colspan=$datacolspan><span $fieldspecfunc>$prefix\%$name(label)%:</span><br>$fieldspec \%$name(detail)\%</td>
 EOF
                }
                elsif ($fieldlist[$c]->Type() eq "TimeSpans"){
-                  my $datacolspan=4;
+                  my $datacolspan=1;
+                  $datacolspan=4 if ($grouphavehalfwidth{$group});
                   $datacolspan=2 if ($halfwidth);
                   $subblock.=<<EOF;
 <td class=fname$valign colspan=$datacolspan>\%$name(detail)\%</td>
 EOF
                }
                elsif ($fieldlist[$c]->can("EditProcessor")){
-                  my $datacolspan=4;
+                  my $datacolspan=1;
+                  $datacolspan=4 if ($grouphavehalfwidth{$group});
                   $datacolspan=2 if ($halfwidth);
                   $subblock.=<<EOF;
 <td class=fname$valign colspan=$datacolspan $fieldspecfunc>$fieldspec\%$name(detail)\%</td>
@@ -394,7 +403,8 @@ EOF
                }
                elsif ($fieldlist[$c]->Type() eq "Message" ||
                       $fieldlist[$c]->Type() eq "GoogleMap"){
-                  my $datacolspan=4;
+                  my $datacolspan=1;
+                  $datacolspan=4 if ($grouphavehalfwidth{$group});
                   $datacolspan=2 if ($halfwidth);
                   $subblock.=<<EOF;
 <td class=finput$valign colspan=$datacolspan>\%$name(detail)\%</td>
@@ -402,7 +412,8 @@ EOF
 
                }
                else{
-                  my $datacolspan=3;
+                  my $datacolspan=1;
+                  $datacolspan=3 if ($grouphavehalfwidth{$group});
                   $datacolspan=1 if ($halfwidth);
                   $subblock.=<<EOF;
          <td class=fname$valign style="width:20%;">$fieldspec<span $fieldspecfunc>$prefix\%$name(label)%:</span></td>

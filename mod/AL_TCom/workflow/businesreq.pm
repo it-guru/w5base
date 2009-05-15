@@ -58,6 +58,8 @@ sub getDynamicFields
 
            new kernel::Field::Number(    name       =>'tcomworktime',
                                          unit       =>'min',
+                                         onUnformat =>
+                                      \&AL_TCom::lib::workflow::minUnformat,
                                          detailadd  =>
                                       \&AL_TCom::lib::workflow::tcomworktimeadd,
                                          label      =>'Worktime',

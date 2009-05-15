@@ -547,7 +547,7 @@ sub getWriteRequestHash
          if ($#val==-1){
             @val=Query->Param("Formated_".$field);
             if ($#val!=-1){
-               my $rawWrRequest=$fobj->Unformat(\@val,$rec);
+               my $rawWrRequest=$fobj->doUnformat(\@val,$rec);
                #msg(INFO,"getWriteRequestHash: var=$field $rawWrRequest");
                if (!defined($rawWrRequest)){
                   return(undef) if ($self->LastMsg()!=0);

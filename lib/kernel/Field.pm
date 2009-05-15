@@ -97,7 +97,7 @@ sub new
    $self->{_permitted}->{htmldetail}=1; # Anzeige in der Detailsicht
    $self->{_permitted}->{detailadd}=1;  # zusätzliche Daten bei HtmlDetail
    $self->{_permitted}->{translation}=1;# Übersetzungsbasis für Labels
-   $self->{_permitted}->{selectfix}=1;  # ?
+   $self->{_permitted}->{selectfix}=1;  # force to use this field alwasy in sql
    $self->{_permitted}->{default}=1;    # Default value on new records
    $self->{_permitted}->{unit}=1;       # Unit prefix in detail view
    $self->{_permitted}->{label}=1;      # Die Beschriftung des Felds
@@ -483,6 +483,16 @@ sub preProcessFilter
    return($changed,$err);
 }
 
+sub doUnformat
+{
+   my $self=shift;
+
+   if (defined($self->{onUnformat}) && ref($self->{onUnformat}) eq "CODE"){
+      return(&{$self->{onUnformat}}($self,@_));
+   }
+   return($self->Unformat(@_));
+}
+
 
 sub Unformat
 {
@@ -490,9 +500,6 @@ sub Unformat
    my $formated=shift;
    my $rec=shift;
 
-   if (defined($self->{onUnformat}) && ref($self->{onUnformat}) eq "CODE"){
-      return(&{$self->{onUnformat}}($self,$formated,$rec));
-   }
    return({}) if ($self->readonly);
    if ($#{$formated}>0){
       return({$self->Name()=>$formated});
