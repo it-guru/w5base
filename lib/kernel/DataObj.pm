@@ -900,7 +900,7 @@ sub StoreUpdateDelta
                $new=[$new] if (ref($new) ne "ARRAY");
                $old=join(", ",sort(@{$old}));
                $new=join(", ",sort(@{$new}));
-               if ($new ne $old){
+               if (trim($new) ne trim($old)){
                   $delta{$field}={'old'=>$old,'new'=>$new};
                }
             }
