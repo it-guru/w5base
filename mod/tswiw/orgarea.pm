@@ -166,11 +166,10 @@ sub ImportOrgarea
 
    my $importname=Query->Param("importname");
    if (Query->Param("DOIT")){
-     # if ($self->Import({importname=>$importname})){
-     #    Query->Delete("importname");
-     #    $self->LastMsg(OK,"orgarea has been successfuly imported");
-     # }
-      $self->LastMsg(ERROR,"function not implemented at now");
+      if ($self->Import({importname=>$importname})){
+   #      Query->Delete("importname");
+         $self->LastMsg(OK,"orgarea has been successfuly imported");
+      }
       Query->Delete("DOIT");
    }
 
@@ -183,6 +182,100 @@ sub ImportOrgarea
                            title=>"WhoIsWho Import");
    print $self->getParsedTemplate("tmpl/minitool.orgarea.import",{});
    print $self->HtmlBottom(body=>1,form=>1);
+}
+
+sub Import
+{
+   my $self=shift;
+   my $param=shift;
+
+   my $orgid=$param->{importname};
+   if (!($orgid=~m/^\S{3,10}$/)){
+      $self->LastMsg(ERROR,"invalid name specified");
+      return(undef);
+   }
+   my @idimp;
+   my $wiw=getModuleObject($self->Config,"tswiw::orgarea");
+   my $grp=getModuleObject($self->Config,"base::grp");
+
+   my $ok=0;
+   my $chkid=$orgid;
+   while($#idimp<20){
+      $wiw->ResetFilter();
+      $wiw->SetFilter({touid=>\$chkid});
+      my ($wiwrec)=$wiw->getOnlyFirst(qw(ALL));
+      if (defined($wiwrec)){
+         $grp->ResetFilter();
+         $grp->SetFilter({srcid=>\$wiwrec->{touid},srcsys=>\'WhoIsWho'});
+         my ($grprec)=$grp->getOnlyFirst(qw(ALL));
+         if (defined($grprec)){ # ok, grp already exists in W5Base
+            $self->LastMsg(INFO,"$wiwrec->{touid} = $grprec->{fullname}");
+            last;
+         }
+         else{
+            msg(INFO,"wiwid $wiwrec->{touid} not found in W5Base");
+            push(@idimp,$wiwrec->{touid});
+         }
+         $chkid=$wiwrec->{parentid};
+         last if ($chkid eq "");
+      }
+      else{
+         $self->LastMsg(ERROR,"invalid orgid $chkid in tree");
+         return(undef);
+      }
+   }
+   foreach my $wiwid (reverse(@idimp)){
+      $wiw->ResetFilter();
+      $wiw->SetFilter({touid=>\$wiwid});
+      my ($wiwrec)=$wiw->getOnlyFirst(qw(ALL));
+      if (defined($wiwrec)){
+         my $grprec;
+         $grp->ResetFilter();
+         if ($wiwrec->{parentid} ne ""){
+            $grp->SetFilter({srcid=>\$wiwrec->{parentid},
+                             srcid=>\'WhoIsWho'});
+         }
+         else{
+            $grp->SetFilter({fullname=>\'DTAG.TSI'});
+         }
+         my ($grprec)=$grp->getOnlyFirst(qw(ALL));
+         if (defined($grprec)){
+
+            my $newname=$wiwrec->{shortname};
+            if ($newname eq ""){
+               $self->LastMsg(ERROR,"no shortname for ".
+                                    "id '$wiwrec->{touid}' found");
+               return(undef);
+            }
+            $newname=~s/[\/\s]/_/g;    # rewriting for some shit names
+            $newname=~s/&/_u_/g;
+            my %newgrp=(name=>$newname,
+                        srcsys=>'WhoIsWho',
+                        srcid=>$wiwrec->{touid},
+                        parentid=>$grprec->{grpid},
+                        cistatusid=>4,
+                        srcload=>NowStamp(),
+                        comments=>"Description from WhoIsWho: ".
+                                  $wiwrec->{name});
+            msg(DEBUG,"Write=%s",Dumper(\%newgrp));
+            if (my $back=$grp->ValidatedInsertRecord(\%newgrp)){
+               $ok++;    
+               msg(DEBUG,"ValidatedInsertRecord returned=$back");
+            }
+           # printf STDERR ("wiwrec=%s\n",Dumper($wiwrec));
+           # printf STDERR ("grprec=%s\n",Dumper($grprec));
+           # printf STDERR ("fifi importing $wiwid\n");
+         }
+         else{
+            printf STDERR ("fifi parentid $wiwrec->{parentid} not found\n");
+         }
+      }
+   }
+   if ($ok==$#idimp+1){
+      return(1);
+   }
+   $self->LastMsg(ERROR,"one or more operations failed");
+   return(undef);
 }
 
 1;

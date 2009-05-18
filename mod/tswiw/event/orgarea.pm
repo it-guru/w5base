@@ -374,29 +374,13 @@ sub createGrp
          $parentid=$rec->{grpid}; 
       }
    }
+
+
    my $newname=$wiwrec->{shortname};
    if ($newname eq ""){
       msg(ERROR,"no shortname for id '$wiwrec->{touid}' found");
       return(undef);
    }
-#   my $w5v1id;
-#   ################################################################
-#   #
-#   # W5V1 Interface
-#   #
-#   {
-#      if (defined($v1)){
-#         $v1->SetFilter({ldapid=>$wiwrec->{touid}});
-#         $v1->SetCurrentView(qw(id name));
-#         my ($rec,$msg)=$v1->getFirst();
-#         if (defined($rec)){
-#            $w5v1id=$rec->{id};
-#            if ($rec->{name} ne ""){
-#               $newname=$rec->{name};
-#            }
-#         }
-#      }
-#   }
    ################################################################
    $newname=~s/[\/\s]/_/g;    # rewriting for some shit names
    my %newgrp=(name=>$newname,
@@ -406,7 +390,6 @@ sub createGrp
                srcload=>NowStamp(),
                comments=>"Description from WhoIsWho: ".$wiwrec->{name});
    $newgrp{name}=~s/&/_u_/g;
-#   $newgrp{grpid}=$w5v1id if (defined($w5v1id));
    $newgrp{parentid}=$parentid if (defined($parentid));
    msg(DEBUG,"Write=%s",Dumper(\%newgrp));
    my $back=$grp->ValidatedInsertRecord(\%newgrp);
