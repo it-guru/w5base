@@ -224,6 +224,7 @@ sub Import
          return(undef);
       }
    }
+printf STDERR ("fifi try to import %s\n",Dumper(\@idimp));
    foreach my $wiwid (reverse(@idimp)){
       $wiw->ResetFilter();
       $wiw->SetFilter({touid=>\$wiwid});
@@ -233,7 +234,7 @@ sub Import
          $grp->ResetFilter();
          if ($wiwrec->{parentid} ne ""){
             $grp->SetFilter({srcid=>\$wiwrec->{parentid},
-                             srcid=>\'WhoIsWho'});
+                             srcsys=>\'WhoIsWho'});
          }
          else{
             $grp->SetFilter({fullname=>\'DTAG.TSI'});
