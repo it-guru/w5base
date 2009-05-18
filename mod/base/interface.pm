@@ -776,11 +776,8 @@ sub validateObjectname
 sub Ping
 {
    my $self=$W5Base::SOAP;
-#   return({SOAP::Data->name(exitcode=>0),
-#          SOAP::Data->name(text=>'Hans'),
-#          SOAP::Data->name(result=>1)});
    $self->Log(INFO,"soap","Ping:'");
-   return(SOAP::Data->name(output=>{exitcode=>0,result=>1})->type("HASH"));
+   return(SOAP::Data->name(output=>{exitcode=>0,result=>1}));
 }
 
 sub doPing
@@ -788,9 +785,10 @@ sub doPing
    my $self=$W5Base::SOAP;
    my $uri=shift;
    my $param=shift;
-   $self->_SOAPaction2param($self->{SOAP}->action(),$param);
+   my $ns=$self->_SOAPaction2param($self->{SOAP}->action(),$param);
    $self->Log(INFO,"soap", "Ping: ".$self->{SOAP}->action());
-   return(SOAP::Data->name(output=>{exitcode=>0,result=>1})->type("PingOutput"));
+   my $d=SOAP::Data->name(output=>{exitcode=>0,result=>1});
+   return($d);
 }
 
 package interface::SOAP::kernel;
