@@ -20,7 +20,6 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::TemplateParsing;
-use Data::Dumper;
 use base::load;
 use kernel::TabSelector;
 use kernel::Field::Date;
@@ -393,7 +392,7 @@ EOF
 EOF
                }
                elsif ($fieldlist[$c]->can("EditProcessor")){
-                  my $datacolspan=1;
+                  my $datacolspan=2;
                   $datacolspan=4 if ($grouphavehalfwidth{$group});
                   $datacolspan=2 if ($halfwidth);
                   $subblock.=<<EOF;
@@ -403,7 +402,7 @@ EOF
                }
                elsif ($fieldlist[$c]->Type() eq "Message" ||
                       $fieldlist[$c]->Type() eq "GoogleMap"){
-                  my $datacolspan=1;
+                  my $datacolspan=2;
                   $datacolspan=4 if ($grouphavehalfwidth{$group});
                   $datacolspan=2 if ($halfwidth);
                   $subblock.=<<EOF;
