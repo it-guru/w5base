@@ -22,6 +22,8 @@
 'Deputy Administrator'=>{de=>'Administrator Vertreter'},
 'Administrationteam'=>{de=>'Administrationsteam'},
 'Applications'=>{de=>'Anwendungen'},
+'Applicationnames'=>{de=>'Anwendungsname'},
+'Application business teams'=>{de=>'Anwendungs-Betriebsteams'},
 'Short Description'=>{de=>'Kurzbeschreibung'},
 'Productionsystem'=>{de=>'Produktionssystem'},
 'Developmentsystem'=>{de=>'Entwicklungssystem'},

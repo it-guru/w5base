@@ -261,6 +261,7 @@ sub new
                 group         =>'admin',
                 label         =>'Admin Team Boss ID',
                 onRawValue    =>\&getTeamBossID,
+                searchable    =>0,
                 readonly      =>1,
                 uivisible     =>0,
                 depend        =>['adminteamid']),
@@ -270,6 +271,7 @@ sub new
                 group         =>'admin',
                 label         =>'Admin Team Boss',
                 onRawValue    =>\&getTeamBoss,
+                searchable    =>0,
                 htmldetail    =>0,
                 readonly      =>1,
                 depend        =>['adminteambossid']),
@@ -680,6 +682,17 @@ sub new
                 vjoinbase     =>[{'parentobj'=>\'itil::system'}],
                 vjoininhash   =>['targetid','target','roles'],
                 group         =>'contacts'),
+
+      new kernel::Field::SubList(
+                name          =>'applicationteams',
+                label         =>'Application business teams',
+                group         =>'applications',
+                htmldetail    =>0,
+                searchable    =>1,
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{applcistatusid=>"<=4"}],
+                vjoinon       =>['id'=>'systemid'],
+                vjoindisp     =>['businessteam']),
 
       new kernel::Field::PhoneLnk(
                 name          =>'phonenumbers',

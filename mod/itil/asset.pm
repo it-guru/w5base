@@ -149,7 +149,7 @@ sub new
                 name          =>'applications',
                 label         =>'Applications',
                 htmlwidth     =>'300px',
-                group         =>'appl',
+                group         =>'applications',
                 readonly      =>1,
                 vjointo       =>'itil::lnkapplsystem',
                 vjoinbase     =>[{applcistatusid=>"<=5"}],
@@ -157,10 +157,21 @@ sub new
                 vjoindisp     =>['appl','applcistatus','applcustomer']),
 
       new kernel::Field::SubList(
+                name          =>'applicationteams',
+                label         =>'Application business teams',
+                group         =>'applications',
+                htmldetail    =>0,
+                searchable    =>1,
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{applcistatusid=>"<=4"}],
+                vjoinon       =>['id'=>'systemid'],
+                vjoindisp     =>['businessteam']),
+
+      new kernel::Field::SubList(
                 name          =>'customer',
                 label         =>'Customer',
                 htmlwidth     =>'200px',
-                group         =>'appl',
+                group         =>'applications',
                 readonly      =>1,
                 htmldetail    =>0,
                 vjointo       =>'itil::lnkapplsystem',
@@ -654,7 +665,7 @@ sub getDetailBlockPriority
    my $self=shift;
    return(qw(header default guardian phonenumbers location 
              physasset contacts misc systems 
-             appl attachments control source));
+             applications attachments control source));
 }
 
 
