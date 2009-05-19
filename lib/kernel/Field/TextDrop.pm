@@ -267,8 +267,13 @@ sub RawValue
    if ($self->{VJOINSTATE} eq "not found"){
       if (defined($self->{altnamestore})){
          my $alt=$self->getParent->getField($self->{altnamestore});
-         $d=$alt->RawValue($current);
-         $d.="[?]";
+         if (!defined($alt)){
+            $d="ERROR - no alt field $self->{altnamestore}";
+         }
+         else{
+            $d=$alt->RawValue($current);
+            $d.="[?]";
+         }
       }
    }
    return($d);
