@@ -274,6 +274,7 @@ sub new
 
       new kernel::Field::FileList(
                 name          =>'attachments',
+                searchable    =>0,
                 parentobj     =>'itil::asset',
                 label         =>'Attachments',
                 group         =>'attachments'),

@@ -400,6 +400,7 @@ sub new
       new kernel::Field::FileList(
                 name          =>'attachments',
                 label         =>'Attachments',
+                searchable    =>0,
                 parentobj     =>'itil::system',
                 group         =>'attachments'),
 
