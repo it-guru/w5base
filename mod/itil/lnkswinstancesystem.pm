@@ -78,6 +78,7 @@ sub new
                                                    
       new kernel::Field::Select(
                 name          =>'systemcistatus',
+                readonly      =>1,
                 group         =>'systeminfo',
                 label         =>'System CI-State',
                 vjointo       =>'base::cistatus',
@@ -86,12 +87,14 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'systemsystemid',
+                readonly      =>1,
                 label         =>'SystemID',
                 group         =>'systeminfo',
                 dataobjattr   =>'system.systemid'),
 
       new kernel::Field::Text(
                 name          =>'shortdesc',
+                readonly      =>1,
                 label         =>'Short Description',
                 group         =>'systeminfo',
                 dataobjattr   =>'system.shortdesc'),
@@ -117,6 +120,7 @@ sub new
                 name          =>'isprod',
                 group         =>'systeminfo',
                 transprefix   =>'boolean.',
+                readonly      =>1,
                 htmleditwidth =>'30%',
                 label         =>'Productionsystem',
                 value         =>[0,1],
@@ -127,6 +131,7 @@ sub new
                 group         =>'systeminfo',
                 transprefix   =>'boolean.',
                 htmleditwidth =>'30%',
+                readonly      =>1,
                 label         =>'Testsystem',
                 value         =>[0,1],
                 dataobjattr   =>'system.is_test'),
@@ -204,6 +209,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'swinstancecistatus',
                 group         =>'swinstanceinfo',
+                readonly      =>1,
                 label         =>'Instance CI-State',
                 vjointo       =>'base::cistatus',
                 vjoinon       =>['swinstancecistatusid'=>'id'],
@@ -212,6 +218,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'swnature',
                 group         =>'swinstanceinfo',
+                readonly      =>1,
                 translation   =>'itil::swinstance',
                 label         =>'Instance type',
                 dataobjattr   =>'swinstance.swnature'),
@@ -219,6 +226,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'swtype',
                 group         =>'swinstanceinfo',
+                readonly      =>1,
                 translation   =>'itil::swinstance',
                 label         =>'Instance operation type',
                 dataobjattr   =>'swinstance.swtype'),
@@ -238,6 +246,7 @@ sub new
                 group         =>'systeminfo',
                 transprefix   =>'boolean.',
                 htmleditwidth =>'30%',
+                readonly      =>1,
                 label         =>'Developmentsystem',
                 value         =>[0,1],
                 dataobjattr   =>'system.is_devel'),
@@ -246,6 +255,7 @@ sub new
                 name          =>'iseducation',
                 group         =>'systeminfo',
                 transprefix   =>'boolean.',
+                readonly      =>1,
                 htmleditwidth =>'30%',
                 label         =>'Educationsystem',
                 value         =>[0,1],
@@ -255,6 +265,7 @@ sub new
                 name          =>'isapprovtest',
                 group         =>'systeminfo',
                 transprefix   =>'boolean.',
+                readonly      =>1,
                 htmleditwidth =>'30%',
                 label         =>'Approval Testsystem',
                 value         =>[0,1],
@@ -264,6 +275,7 @@ sub new
                 name          =>'isreference',
                 group         =>'systeminfo',
                 transprefix   =>'boolean.',
+                readonly      =>1,
                 htmleditwidth =>'30%',
                 label         =>'Referencesystem',
                 value         =>[0,1],
