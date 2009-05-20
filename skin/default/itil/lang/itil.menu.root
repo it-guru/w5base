@@ -40,6 +40,7 @@
 'itil.swinstance'=>{de=>'Software-Instanz',en=>'Software-Instance'},
 'itil.swinstance.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.swinstance.lnksystem'=>{de=>'Verkn. System',en=>'Link System'},
+'itil.swinstance.lnkswinstancecontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
 'itil.kern'=>{de=>'Stammdaten',en=>'Basedata'},
 'itil.kern.network'=>{de=>'Netzwerk Bereich',en=>'Networkarea'},
 'itil.kern.network.new'=>{de=>'Neueingabe',en=>'New'},
