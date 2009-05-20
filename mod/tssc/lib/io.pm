@@ -533,25 +533,28 @@ sub extractAffectedApplication
 
    #  pass 2 : description
    my @l2;
-   if (defined($rec->{description})){
-      my ($workdescription)=$rec->{description};
-      while(my ($line)=$workdescription=~m/^(.*?)[\n]/){
-         $workdescription=~s/^(.*?)[\n]//;
-         last if (!($line=~m/^AG[: ]+/) && $#l2==-1);
-         $line=~s/^AG[: ]+//;
-         last if ($line=~m/^\s*$/);
-         push(@l2,split(/[,\s;]+/,$line));
-         last if (!($line=~m/[,;]\s*$/));
-      }
-      if (my ($aglist)=$rec->{description}=~
-             m/^.*\[AGLIST_START\](.*)\[AGLIST_END\].*$/sm){
-         $aglist=~s/[\n\r]/ /g;
-         $aglist=~s/^\s*//g;
-         $aglist=~s/\s*$//g;
-         msg(DEBUG,"add AGLIST='%s' by Interface descrition",$aglist);
-         push(@l2,split(/[,\s;]+/,$aglist));
-      }
-   }
+   # entfernung des Parsings auf Basis des Requests ...
+   # https://darwin.telekom.de/darwin/auth/base/workflow/ById/12428113140002
+   #
+   #if (defined($rec->{description})){
+   #   my ($workdescription)=$rec->{description};
+   #   while(my ($line)=$workdescription=~m/^(.*?)[\n]/){
+   #      $workdescription=~s/^(.*?)[\n]//;
+   #      last if (!($line=~m/^AG[: ]+/) && $#l2==-1);
+   #      $line=~s/^AG[: ]+//;
+   #      last if ($line=~m/^\s*$/);
+   #      push(@l2,split(/[,\s;]+/,$line));
+   #      last if (!($line=~m/[,;]\s*$/));
+   #   }
+   #   if (my ($aglist)=$rec->{description}=~
+   #          m/^.*\[AGLIST_START\](.*)\[AGLIST_END\].*$/sm){
+   #      $aglist=~s/[\n\r]/ /g;
+   #      $aglist=~s/^\s*//g;
+   #      $aglist=~s/\s*$//g;
+   #      msg(DEBUG,"add AGLIST='%s' by Interface descrition",$aglist);
+   #      push(@l2,split(/[,\s;]+/,$aglist));
+   #   }
+   #}
 
    #   pass 3 : affacted Softare
    my @l3;
