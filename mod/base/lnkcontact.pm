@@ -327,22 +327,32 @@ sub Validate
    return(1) if ($self->IsMemberOf("admin"));
 
    if ($self->isDataInputFromUserFrontend()){
-      my @write=$p->isWriteValid($l[0]);
-      if ($#write!=-1){
-         return(1) if (grep(/^ALL$/,@write));
-         foreach my $fo ($p->getFieldObjsByView(["ALL"],current=>$l[0])){
-            if ($fo->Type() eq "ContactLnk"){
-               my $grp=quotemeta($fo->{group});
-               $grp="default" if ($grp eq "");
-               return(1) if (grep(/^$grp$/,@write));
-            }
-         }
-      }
+      return(1) if ($self->checkWriteAccess($p,$l[0]));
    }
    else{
       return(1);
    }
    $self->LastMsg(ERROR,"no write access to requested contact");
+   return(0);
+}
+
+sub checkWriteAccess
+{
+   my $self=shift;
+   my $p=shift;
+   my $current=shift;
+
+   my @write=$p->isWriteValid($current);
+   if ($#write!=-1){
+      return(1) if (grep(/^ALL$/,@write));
+      foreach my $fo ($p->getFieldObjsByView(["ALL"],current=>$current)){
+         if ($fo->Type() eq "ContactLnk"){
+            my $grp=quotemeta($fo->{group});
+            $grp="default" if ($grp eq "");
+            return(1) if (grep(/^$grp$/,@write));
+         }
+      }
+   }
    return(0);
 }
 
@@ -359,7 +369,20 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-#   return("default") if ($self->IsMemberOf("admin"));
+   if (defined($rec)){
+      return("default") if ($self->IsMemberOf("admin"));
+      my $p=getModuleObject($self->Config,$rec->{parentobj});
+      my $refid=$rec->{refid};
+      return(undef) if ($refid eq "");
+      return(undef) if (!defined($p));
+      my $idname=$p->IdField->Name();
+      my %flt=($idname=>\$refid);
+      $p->SetFilter(\%flt);
+      my @l=$p->getHashList(qw(ALL));
+      return(undef) if ($#l!=0);
+      return("default") if ($self->checkWriteAccess($p,$l[0]));
+      return(undef);
+   }
    return("default");
 }
 

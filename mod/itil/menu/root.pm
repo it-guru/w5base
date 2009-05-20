@@ -222,6 +222,10 @@ sub Init
                       "itil::lnkswinstancesystem",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("itil.swinstance.lnkswinstancecontact",
+                      "itil::lnkswinstancecontact",
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("itil.kern",
                       "tmpl/welcome");
    

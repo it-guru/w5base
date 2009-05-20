@@ -201,6 +201,10 @@ sub Init
                       "itil::lnkswinstancesystem",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.swinstance.lnkswinstancecontact",
+                      "itil::lnkswinstancecontact",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.kern",
                       "tmpl/welcome");
    

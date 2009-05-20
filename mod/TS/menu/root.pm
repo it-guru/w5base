@@ -131,6 +131,23 @@ sub Init
                       "itil::lnkassetcontact",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itts.swinstance",
+                      "itil::swinstance",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itts.swinstance.new",
+                      "itil::swinstance",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itts.swinstance.lnksystem",
+                      "itil::lnkswinstancesystem",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itts.swinstance.lnkswinstancecontact",
+                      "itil::lnkswinstancecontact",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itts.kern",
                       "tmpl/welcome");
    
