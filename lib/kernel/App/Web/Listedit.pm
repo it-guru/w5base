@@ -1663,6 +1663,10 @@ sub Upload
       return(undef); 
    }
    my $file=Query->Param("file");
+   my $HistoryComments=Query->Param("HistoryComments");
+   if (trim($HistoryComments) ne ""){
+      $W5V2::HistoryComments=$HistoryComments;
+   }
    my $countok=0;
    my $countfail=0;
    if (defined($file) && $file ne "" && ref($file) eq "Fh"){
@@ -1825,12 +1829,16 @@ function ScrollDown()
 }
 </script>
 EOF
-   print("<center><table border=0 width=100% height=100% cellpadding=10>");
+   print("<center><table border=0 width=100% height=100% cellpadding=5>");
    print("<tr><td align=center valign=top>");
-   print("<table class=uploadframe border=0>");
+   print("<table width=70% class=uploadframe border=0>");
    print("<tr><td>");
-   print("<table width=100%>");
-   printf("<tr><td><b><u>%s:</u></b></td></tr>",$self->T("Upload Templates"));
+   print("<table width=100% cellspacing=0 cellpadding=0>");
+   print("<tr><td><table width=100% border=0 ".
+         "cellspacing=0 cellpadding=0><tr><td valign=top>");
+
+
+   printf("<table><tr><td><b><u>%s:</u></b></td></tr>",$self->T("Upload Templates"));
    print("<tr><td align=center>");
    my @formats=(icon_xls=>'XlsV01',
                 icon_xml=>'XMLV01');
@@ -1842,20 +1850,42 @@ EOF
             "border=0 src=\"../../base/load/$ico.gif\">");
       print("</a>");
    }
+   print("</td></tr></table>");
+   my $w=20;
+   if (!$self->IsMemberOf("admin")){
+      $w=50;
+   }
+
+   print("</td><td width=$w% valign=bottom>"); ##############################
+
+   printf("<table><tr><td><br></td></tr>");
+   print("<tr><td align=center>");
+   print("<input type=checkbox name=DEBUG>Debug");
+   print("</td><tr>");
+   print("<tr><td align=center>");
+   printf("<input class=uploadbutton type=submit value=\"%s\" ".
+         "></td></tr>",$self->T("start upload"));
    print("</td></tr>");
+
+   print("</table>");
+
+   print("</td>");
+   if ($self->IsMemberOf("admin")){
+      print("<td width=45% valign=bottom>"); ################################
+      print("<table width=100% cellspacing=0 cellpadding=0>");
+      print("<tr><td>History note:<br>".
+            "<textarea style=\"width:100%\" ".
+            "name=HistoryComments wrap=off rows=3 cols=10></textarea>");
+      print("</td><tr></table>");
+      print("</td>");
+   }
+   print("</tr>");
    print("</table></td>");
    print("</td></tr>");
    print("<tr><td>");
    print("<table width=100%>");
    printf("<tr><td><b><u>%s:</u></b></td></tr>",$self->T("Upload File"));
-   print("<tr><td><input size=50 type=file name=file></td></tr>");
-   print("<tr><td>".
-         "<input type=checkbox name=DEBUG>Debug</td></tr>");
-   printf("<tr><td>".
-         "<input class=uploadbutton type=submit value=\"%s\" ".
-         "style=\"width:100%\"></td></tr>",$self->T("start upload"));
-   print("</table></td>");
-   print("</td></tr>");
+   print("<tr><td align=center><input size=55 type=file name=file></td></tr>");
    print("<tr><td>");
    print("<table width=100%>");
    printf("<tr><td><b><u>%s:</u></b></td></tr>",$self->T("Upload Result"));

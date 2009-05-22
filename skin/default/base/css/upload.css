@@ -13,7 +13,7 @@ iframe.uploadresult{
 }
 input.uploadbutton{
    width:90px;
-   height:25px;
+   height:23px;
    background:#dadada;
    overflow:hidden;
    border-style:outset;
@@ -22,5 +22,4 @@ input.uploadbutton{
    padding-left:2px;
    padding-left:2px;
    margin:2px;
-   float:right;
 }

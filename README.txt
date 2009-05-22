@@ -390,7 +390,7 @@ min number of cores               : 1
   admin:"/opt/w5base/sbin/W5MailGate -c w5base2 adminrequest>>/tmp/adm.log 2>&1"
  
  You can use alternate mail adreesses - if you want. After the modification
- don't forgett to call "newaliases"
+ don't forget to call "newaliases"
 
 
 

@@ -48,7 +48,7 @@ sub Validate
    my $newval=$newrec->{$name};
    my $disp=$self->{vjoindisp};
    $disp=$disp->[0] if (ref($disp) eq "ARRAY");
-   my $filter={$disp=>'"'.$newval.'"'};
+   my $filter={$disp=>'"'.trim($newval).'"'};
 
    $self->FieldCache->{LastDrop}=undef;
 
