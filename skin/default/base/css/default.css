@@ -3,7 +3,6 @@
       background: #FFFFFF;
    }
 }
-
    body{
       background: #F3F3F3;
    }
@@ -27,6 +26,11 @@
       font-size:11px;
       background-color:#ffffff;
    }
+   input.checkbox{
+      background: transparent;
+      border: 0;
+   }
+
    p{
       margin-top: 0px;
       margin-bottom: 1px;

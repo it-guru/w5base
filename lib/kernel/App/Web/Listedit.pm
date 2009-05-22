@@ -1861,7 +1861,7 @@ EOF
 
    printf("<table><tr><td><br></td></tr>");
    print("<tr><td align=center>");
-   print("<input type=checkbox name=DEBUG>Debug");
+   print("<input type=checkbox class=checkbox name=DEBUG>Debug");
    print("</td><tr>");
    print("<tr><td align=center>");
    printf("<input class=uploadbutton type=submit value=\"%s\" ".
