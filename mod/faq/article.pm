@@ -554,6 +554,7 @@ sub FullView
       #   my @kw=@{$rec->{kwords}};
          my @ll;
          my @not=qw(mit einer einen eines der die das ich du er sie es wir
+                    durch andere anderes infos info aus wie wird
                     auf in dem dessen ab meinen im gehe gehen vom wie was
                     und nicht für voll nach bringen bringt oder bei
                     finden finde greift gegeben zur nur
