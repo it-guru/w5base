@@ -1241,11 +1241,11 @@ function DetailClose(){
       document.location.href="Welcome";
    }
    else{
-      if (this.SubFrameEditMode==1){
-         if (!DataLoseWarn()){
-            return;
-         }
-      }
+//      if (this.SubFrameEditMode==1){
+//         if (!DataLoseWarn()){
+//            return;
+//         }
+//      }
       window.opener=self;
       window.open('','_parent','');
       window.close();
@@ -1294,7 +1294,8 @@ function FinishHandleInfoAboSubscribe(returnVal,isbreak)
 
 function checkEditmode(e) // this handling prevents klick on X in window
 {
-   if (this.SubFrameEditMode==1){
+   if (window.SubFrameEditMode==1){
+      window.SubFrameEditMode=0;
       e.returnValue=DataLoseQuestion();
    }
 }
