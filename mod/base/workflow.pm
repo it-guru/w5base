@@ -450,6 +450,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'directlnktype',
+                selectfix     =>1,
                 group         =>'source',
                 htmldetail    =>sub {
                    my $self=shift;
@@ -464,6 +465,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'directlnkid',
+                selectfix     =>1,
                 group         =>'source',
                 htmldetail    =>sub {
                    my $self=shift;
@@ -478,6 +480,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'directlnkmode',
+                selectfix     =>1,
                 group         =>'source',
                 htmldetail    =>sub {
                    my $self=shift;
@@ -1623,17 +1626,46 @@ sub externalMailHandler
       $notiy{emailcc}=\@c;
       $notiy{class}='base::workflow::mailsend';
       $notiy{step}='base::workflow::mailsend::dataload';
+
+      my $file=Query->Param("file");
+      my ($attinfo,$att);
+      if (defined($attinfo=Query->UploadInfo($file))){
+         printf STDERR ("fifi found Attachment\n");
+         no strict;
+         my $f=Query->Param("file");
+         seek($f,0,SEEK_SET);
+         my $buffer;
+         my $size=0;
+         while (my $bytesread=read($f,$buffer,1024)) {
+            $att.=$buffer;
+            $size+=$bytesread;
+            if ($size>5242880){
+               $self->LastMsg(ERROR,"file to large");
+               return(0);
+            }
+         }
+         Query->Delete("file");
+      }
       if (my $mailid=$self->Store(undef,\%notiy)){
+         if (defined($att) && defined($attinfo)){
+            my $newrec;
+            $newrec->{data}=$att;
+            $newrec->{name}=trim($file);
+            $newrec->{wfheadid}=$mailid;
+            $newrec->{contenttype}=$attinfo->{'Content-Type'};
+            my $wfa=getModuleObject($self->Config,"base::wfattach");
+            my $bk=$wfa->ValidatedInsertRecord($newrec);
+         }
          my %d=(step=>'base::workflow::mailsend::waitforspool');
          if ($parent eq "base::workflow"){
             my $additional={};
             $additional->{to}=$t if ($t ne "");
             $additional->{cc}=$c if ($c ne "");
             $additional->{subject}=$s if ($s ne "");
+            my $msg="To: $t\n\n".$m;
             $self->Action->StoreRecord($id,"mail",
                                        {translation=>'base::workflow',
-                                        additional=>$additional},
-                                       "To: $t\n\n".$m);
+                                        additional=>$additional},$msg);
          }
          if (my $r=$self->Store($mailid,%d)){
             $self->LastMsg(OK,"mail has been successfuly transfered to spool");
@@ -1661,7 +1693,7 @@ sub externalMailHandler
 
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','work.css'],
-                           body=>1,form=>1,target=>'action',
+                           body=>1,form=>1,target=>'action',multipart=>1,
                            js=>['TextTranslation.js','toolbox.js','subModal.js'],
                            title=>'W5Base Mail Client');
    print $self->HtmlSubModalDiv();
@@ -1699,7 +1731,7 @@ sub externalMailHandler
  <tr height=1%><td height=1%>
   <table width=100%><tr>
   <td width=50>Anlage:</td>
-  <td><input disabled name=file size=35 type=file></td>
+  <td><input name=file size=35 type=file></td>
   <td width=120>Referenz hinzufügen:</td>
   <td><input name=addref $addref type=checkbox></td>
   </tr></table>

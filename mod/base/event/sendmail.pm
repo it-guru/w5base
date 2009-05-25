@@ -130,6 +130,7 @@ sub Sendmail
          }
          
          my $bound="d6f5".time()."af".time()."jhdfjasd";
+         my $mixbound="d345".time()."af".time()."j34fjasd";
          my $from=$rec->{emailfrom};
          if ($from eq ""){
             $from="no_reply\@".$rec->{initialsite};
@@ -206,6 +207,9 @@ sub Sendmail
                 $rec->{initialsite}.'@'."W5Base>\n";
          $mail.="Mime-Version: 1.0\n";
          $mail.="X-Vacation-Reply-To: hartmut.vogler\@t-systems.com\n";
+         $mail.="Content-Type: multipart/mixed; boundary=\"$mixbound\"\n";
+         $mail.="--$mixbound";
+         $mail.="\n";
          $mail.="Content-Type: multipart/alternative; boundary=\"$bound\"\n";
          $mail.="--$bound";
          $mail.="\n";
@@ -414,6 +418,26 @@ sub Sendmail
          }
          $mail.="--\n";
          $mail.="\n--$bound--\n";
+         {
+            my $wfa=getModuleObject($self->Config,"base::wfattach");
+            $wfa->SetFilter({wfheadid=>\$rec->{id}});
+            my ($attrec,$msg)=$wfa->getOnlyFirst(qw(ALL));
+            $wfa->SetCurrentView(qw(contenttype name data));
+            my ($attrec,$msg)=$wfa->getFirst(unbuffered=>1);
+            if (defined($attrec)){
+               do{
+                  $mail.="\n--$mixbound\n";
+                  $mail.="Content-Type: $attrec->{contenttype}\n";
+                  $mail.="Content-Name: $attrec->{name}\n";
+                  $mail.="Content-Disposition: attachment; ".
+                         "filename=$attrec->{name}\n";
+                  $mail.="Content-Transfer-Encoding: base64\n\n";
+                  $mail.=encode_base64($attrec->{data});
+                  ($attrec,$msg)=$wfa->getNext();
+               }until(!defined($attrec));
+            }
+         }
+         $mail.="\n--$mixbound--\n";
          ####################################################################
          # SMS Handling
          if ($rec->{allowsms}==1 &&

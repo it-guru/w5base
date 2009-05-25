@@ -811,6 +811,10 @@ sub Finish
       $result->{exitcode}=
              SOAP::Data->type('xsd:int')->value($result->{exitcode});
    }
+   if (exists($result->{lastmsg})){
+      $result->{lastmsg}=
+             SOAP::Data->type('ArrayOfString')->value($result->{exitcode});
+   }
    return(SOAP::Data->name(output=>$result));
 }
 
