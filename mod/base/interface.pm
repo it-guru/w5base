@@ -414,6 +414,12 @@ sub _SOAPaction2param
          $ns=WSDLmodule2ns($param->{dataobject});
       }
    }
+   if ($act ne ""){
+      my $ns=$act;
+      $ns=~s/#.*$//;
+      my $ser=$self->{SOAP}->serializer();
+      $ser->register_ns( $ns, 'curns' );
+   }
 
    if ($param->{lang} eq ""){
       $param->{lang}="en";
@@ -811,9 +817,17 @@ sub Finish
       $result->{exitcode}=
              SOAP::Data->type('xsd:int')->value($result->{exitcode});
    }
-   if (exists($result->{lastmsg})){
-      $result->{lastmsg}=
-             SOAP::Data->type('ArrayOfString')->value($result->{lastmsg});
+   if (exists($result->{lastmsg})){  # .Net needs every element coded as string
+      if (ref($result->{lastmsg}) eq "ARRAY"){
+         my @l;
+         map({my $u=SOAP::Data->type('xsi:string')->value($_);push(@l,$u);} 
+             @{$result->{lastmsg}});
+         $result->{lastmsg}=SOAP::Data->value(\@l);
+      }
+      else{
+         $result->{lastmsg}=SOAP::Data->type('xsi:string')
+                                      ->value($result->{lastmsg});
+      }
    }
    return(SOAP::Data->name(output=>$result));
 }
