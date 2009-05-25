@@ -280,6 +280,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'businessteambossid',
+                searchable    =>0,
                 group         =>'tscontact',
                 label         =>'Business Team Boss ID',
                 onRawValue    =>\&getTeamBossID,
@@ -292,12 +293,14 @@ sub new
                 group         =>'tscontact',
                 label         =>'Business Team Boss',
                 onRawValue    =>\&getTeamBoss, 
+                searchable    =>0,
                 htmldetail    =>1,
                 readonly      =>1,             
                 depend        =>['businessteambossid']),
 
       new kernel::Field::Text( 
                 name          =>'businessteambossemail',
+                searchable    =>0,
                 group         =>'tscontact',
                 label         =>'Business Team Boss EMail',
                 onRawValue    =>\&getTeamBossEMail, 
