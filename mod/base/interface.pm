@@ -813,7 +813,7 @@ sub Finish
    }
    if (exists($result->{lastmsg})){
       $result->{lastmsg}=
-             SOAP::Data->type('ArrayOfString')->value($result->{exitcode});
+             SOAP::Data->type('ArrayOfString')->value($result->{lastmsg});
    }
    return(SOAP::Data->name(output=>$result));
 }
