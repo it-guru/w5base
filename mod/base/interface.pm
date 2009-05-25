@@ -353,6 +353,8 @@ Content-type: text/xml
 <types>
 <xsd:schema elementFormDefault="qualified" 
             targetNamespace="http://w5base.net/mod/$fp">
+<xsd:import namespace="http://xml.apache.org/xml-soap" />
+<xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
 $XMLtypes
 </xsd:schema>
 </types>
