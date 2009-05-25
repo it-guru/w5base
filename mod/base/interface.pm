@@ -811,7 +811,7 @@ sub Finish
       $result->{exitcode}=
              SOAP::Data->type('xsd:int')->value($result->{exitcode});
    }
-   return(SOAP::Data->name(output=>$result)->type("HASH"));
+   return(SOAP::Data->name(output=>$result));
 }
 
 1;
