@@ -6,7 +6,7 @@ all:
 	@( for m in $(MOD); do  \
         URL="http://$(HOST)/$(CONFIG)/public/base/interface/WSDL/$${m}"; \
 	echo "loading $${URL}"; \
-	java org.apache.axis.wsdl.WSDL2Java \
+	java -Dhttp.proxyHost=localhost -Dhttp.proxyPort=11833 org.apache.axis.wsdl.WSDL2Java  \
 		$${URL}; \
 	 done )
 	find net | wc -l

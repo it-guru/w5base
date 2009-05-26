@@ -355,6 +355,7 @@ sub getPosibleActions
    }
    if ($userid==$creator && $stateid<17){
       push(@l,"wffollowup"); # add a followup note for current worker
+      push(@l,"wfmailsend"); # add a mailsend note for current worker
    }
    if ((($isadmin && !$iscurrent) || ($userid==$creator && !$iscurrent)) &&
        $stateid<3 && $stateid>1){
@@ -737,7 +738,15 @@ sub generateWorkspacePages
           "<td>\%fwdtargetname(detail)\%".
           "</td>";
       $d.="</tr></table>";
-      my $devpartner=$self->getParent->getDefaultContractor($WfRec,$actions);
+      my $devpartner;
+      my $userid=$self->getParent->getParent->getCurrentUserId();
+      if ($userid ne $WfRec->{owner} && $WfRec->{owner} ne ""){
+         my $oo=$self->getParent->getParent->getField("owner");
+         $devpartner=$oo->FormatedDetail($WfRec,"AscV01");
+      }
+      if ($devpartner eq ""){
+         ($devpartner)=$self->getParent->getDefaultContractor($WfRec,$actions);
+      }
       $d.='<script language="JavaScript">'.
           'function setDevReprocess(){'.
           ' var d=document.getElementById("OPwfreprocess");'.

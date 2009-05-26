@@ -602,6 +602,7 @@ sub generateWorkspacePages
    }
    if (grep(/^wfmailsend$/,@$actions)){
       my $wfheadid=$WfRec->{id};
+      my $userid=$self->getParent->getParent->getCurrentUserId();
       $$selopt.="<option value=\"wfmailsend\">".
                 $self->getParent->T("wfmailsend",$tr).
                 "</option>\n";
@@ -611,19 +612,23 @@ sub generateWorkspacePages
                    "\"height=400,width=600,toolbar=no,status=no,".
                    "resizable=yes,scrollbars=no\")";
       my @m;
-      if (defined($WfRec->{openuser}) && $WfRec->{openuser}=~m/^\d+$/){
+      if (defined($WfRec->{openuser}) && $WfRec->{openuser}=~m/^\d+$/ &&
+          $WfRec->{openuser} ne $userid){
          push(@m,$self->getParent->T("to opener")); 
          push(@m,{to=>"base::user($WfRec->{openuser})"});
       }
-      if (defined($WfRec->{initiatorid}) && $WfRec->{initiatorid}=~m/^\d+$/){
+      if (defined($WfRec->{initiatorid}) && $WfRec->{initiatorid}=~m/^\d+$/ &&
+          $WfRec->{initiatorid} ne $userid){
          push(@m,$self->getParent->T("to initiator")); 
          push(@m,{to=>"base::user($WfRec->{initiatorid})"});
       }
-      if (defined($WfRec->{owner}) && $WfRec->{owner}=~m/^\d+$/){
+      if (defined($WfRec->{owner}) && $WfRec->{owner}=~m/^\d+$/ &&
+          $WfRec->{owner} ne $userid){
          push(@m,$self->getParent->T("to current owner")); 
          push(@m,{to=>"base::user($WfRec->{owner})"});
       }
-      if (defined($WfRec->{owner}) && $WfRec->{owner}=~m/^\d+$/){
+      if (defined($WfRec->{fwdtargetid}) && $WfRec->{fwdtargetid}=~m/^\d+$/ &&
+          !($WfRec->{fwdtarget} eq "base::user" && $WfRec->{fwdtargetid} eq $userid)){
          push(@m,$self->getParent->T("to current forward")); 
          push(@m,{to=>"$WfRec->{fwdtarget}($WfRec->{fwdtargetid})"});
       }
