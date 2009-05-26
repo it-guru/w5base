@@ -763,6 +763,10 @@ sub Validate
          $newrec->{ssh2publickey}=$sshpublickey;
       }
    }
+   if (!defined($oldrec) && !exists($newrec->{allowifupdate}) &&
+       $newrec->{usertyp} eq "extern"){
+      $newrec->{allowifupdate}=1;
+   }
    #######################################################################
    if ($usertyp eq "service"){
       my $email=effVal($oldrec,$newrec,"email");
