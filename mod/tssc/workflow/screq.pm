@@ -269,7 +269,9 @@ sub getSC
    my $self=shift;
    my $app=$self->getParent->getParent();
 
-   my $sc=new SC::Customer::TSystems;
+   my $sc;
+   eval("use SC::Customer::TSystems;\$sc=new SC::Customer::TSystems;");
+   return(undef) if (!defined($sc));
 
    my $dataobjconnect=$app->Config->Param('DATAOBJCONNECT');
    my $dataobjuser=$app->Config->Param('DATAOBJUSER');
