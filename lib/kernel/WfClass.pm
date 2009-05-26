@@ -141,8 +141,9 @@ sub nativProcess
       return(undef);
    }
    if ($stepobj->can("nativProcess")){
-      msg(INFO,"call nativProcess class=$self step=$stepobj");
-      msg(INFO,"process request\n%s",Dumper($h));
+      my $d=Dumper($h);
+      $d=~s/^.*?=\s*//;
+      msg(INFO,"*nativProcess on $self\n action='$action'\n dataload=%s",$d);
       my @actions=$self->getPosibleActions($WfRec);
       return($stepobj->nativProcess($action,$h,$WfRec,\@actions));
    }

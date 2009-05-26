@@ -655,7 +655,12 @@ sub InsertRecord
            "values(".join(",",map({$raw{$_}} @flist)).")";
    }
    #msg(INFO,"fifi InsertRecord data=%s into '$worktable'\n",Dumper($newdata));
-   msg(INFO,"insert=%s",$cmd);
+   if (length($cmd)<65535){
+      msg(INFO,"insert=%s",$cmd);
+   }
+   else{
+      msg(INFO,"insert=(long insert >64k)");
+   }
    if ($workdb->do($cmd)){
       $workdb->finish();
       if (!defined($id)){

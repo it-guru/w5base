@@ -3,7 +3,7 @@ CREATE TABLE wfattach (
   wfattachid bigint(20) NOT NULL default '0',
   wfdataid bigint(20) default NULL,
   wfheadid bigint(20) default NULL,
-  data blob,
+  data longblob,
   createuser bigint(20) NOT NULL default '0',
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   PRIMARY KEY  (wfattachid),

@@ -507,7 +507,8 @@ sub generateWorkspace
    $wsheight=~s/px//g;
 
 
-   my $defo=$self->generateWorkspacePages($WfRec,$actions,\$divset,\$selopt);   
+   my $defo=$self->generateWorkspacePages($WfRec,$actions,\$divset,\$selopt,
+                                          $wsheight);   
    my $oldop=Query->Param("OP");
    if (!defined($oldop) || $oldop eq "" || !grep(/^$oldop$/,@{$actions})){
       if (length($defo)<30 && ($defo=~m/^[a-z0-9]+$/i)){
@@ -565,6 +566,7 @@ sub generateWorkspacePages
    my $actions=shift;
    my $divset=shift;
    my $selopt=shift;
+   my $height=shift;
    my $tr="base::workflow::actions";
    my $class="display:none;visibility:hidden";
 
@@ -587,10 +589,16 @@ sub generateWorkspacePages
       $$selopt="<option value=\"nop\" class=\"$class\">".
                 $self->getParent->T("nop",$tr).
                 "</option>\n".$$selopt;
-      $$divset="<div id=OPnop style=\"margin:15px\"><br>".
-                $self->getParent->T("The current workflow isn't forwared ".
-                "to you. At now there is no action nessasary.",$tr)."</div>".
-                $$divset;
+      if ($height>100){
+         $$divset="<div id=OPnop style=\"margin:15px\"><br>".
+                   $self->getParent->T("The current workflow isn't forwared ".
+                   "to you. At now there is no action nessasary.",$tr)."</div>".
+                   $$divset;
+      }
+      else{
+         $$divset="<div id=OPnop style=\"margin:15px\"></div>".
+                   $$divset;
+      }
    }
    if (grep(/^wfmailsend$/,@$actions)){
       my $wfheadid=$WfRec->{id};
@@ -602,14 +610,88 @@ sub generateWorkspacePages
                    "\"_blank\",".
                    "\"height=400,width=600,toolbar=no,status=no,".
                    "resizable=yes,scrollbars=no\")";
+      my @m;
+      if (defined($WfRec->{openuser}) && $WfRec->{openuser}=~m/^\d+$/){
+         push(@m,$self->getParent->T("to opener")); 
+         push(@m,{to=>"base::user($WfRec->{openuser})"});
+      }
+      if (defined($WfRec->{initiatorid}) && $WfRec->{initiatorid}=~m/^\d+$/){
+         push(@m,$self->getParent->T("to initiator")); 
+         push(@m,{to=>"base::user($WfRec->{initiatorid})"});
+      }
+      if (defined($WfRec->{owner}) && $WfRec->{owner}=~m/^\d+$/){
+         push(@m,$self->getParent->T("to current owner")); 
+         push(@m,{to=>"base::user($WfRec->{owner})"});
+      }
+      if (defined($WfRec->{owner}) && $WfRec->{owner}=~m/^\d+$/){
+         push(@m,$self->getParent->T("to current forward")); 
+         push(@m,{to=>"$WfRec->{fwdtarget}($WfRec->{fwdtargetid})"});
+      }
+      if (defined($WfRec->{initiatorgroupid}) && 
+          $WfRec->{initiatorgroupid}=~m/^\d+$/){
+         push(@m,$self->getParent->T("to initiator group")); 
+         push(@m,{to=>"base::grp($WfRec->{initiatorgroupid})"});
+      }
+#      if (defined($WfRec->{initiatorgroupid}) && 
+#          $WfRec->{initiatorgroupid}=~m/^\d+$/){
+#         push(@m,$self->getParent->T("to all related")); 
+#         push(@m,{to=>"AllRelated_base::workflow($WfRec->{id})"});
+#      }
 
-      my $d="<table width=100% border=0 cellspacing=0 cellpadding=0>".
-         "<tr>".
-         "<td colspan=2>".
-         $self->getParent->T("This action sends a E-Mail with automaticly ".
+      sub Hash2Onclick
+      {
+         my $param=shift;
+         my $p=kernel::cgi::Hash2QueryString($param);
+         
+         return("openwin(\"externalMailHandler?$p\",".
+                      "\"_blank\",".
+                      "\"height=400,width=600,toolbar=no,status=no,".
+                      "resizable=yes,scrollbars=no\")");
+      }
+      my $d="<table width=100% border=0 cellspacing=0 cellpadding=0>";
+      if ($#m!=-1){
+         my $param={}; 
+         $param->{parent}="base::workflow";
+         $param->{mode}="workflowrepeat($wfheadid)";
+         $param->{id}=$wfheadid;
+         $onclick=Hash2Onclick($param);
+         $onclick=~s/%/\\%/g;
+         $d.="<tr><td width=40% valign=top><span onclick=$onclick>".
+             "<div style=\"cursor:pointer;cursor:hand;".
+             "margin:2px;font-size:9px;margin-right:20px\">".
+             $self->getParent->T("This action sends a E-Mail with automaticly ".
                              "dokumentation in the workflow log").
-         " <span class=sublink onclick=$onclick>&para;</span>".
-         "</td></tr><tr>".
+             "</div></span></td><td>";
+         $d.="<table border=0>";
+         my $col=0;
+         while(my $label=shift(@m)){
+            my $param=shift(@m);
+            $param->{parent}="base::workflow";
+            $param->{mode}="simple";
+            $param->{id}=$wfheadid;
+            $onclick=Hash2Onclick($param);
+            $onclick=~s/%/\\%/g;
+            $d.="<tr>" if ($col==0);
+            $d.="<td valign=center width=1%>".
+                "<span class=sublink onclick=$onclick>".
+                "<img style=\"margin-left:4px\" ".
+                "src=\"../../../public/base/load/minimail.gif\">".
+                "</span></td>";
+            $d.="<td valign=center nowrap>".
+                "<span class=sublink onclick=$onclick>".$label."</span></td>";
+            $col++;
+            if ($col==3){
+               $d.="</tr>";
+               $col=0;
+            }
+         }
+         $d.="</tr>" if ($col==1 || $col==2);
+         $d.="</table>";
+         $d.="</td></tr>";
+      }
+
+
+      $d.="<tr>".
          "<td colspan=2>".
          "<table width=100% cellspacing=0 cellpadding=0><tr>".
          "<td nowrap width=1%>".
@@ -618,7 +700,7 @@ sub generateWorkspacePages
          "</td></tr></table></td></tr>".
          "<tr>".
          "<td colspan=2><textarea name=emailmsg ".
-         "style=\"width:100%;height:80px\">".
+         "style=\"width:100%;height:50px\">".
          "</textarea></td></tr>";
       $d.="</table>";
       $$divset.="<div id=OPwfmailsend class=\"$class\">$d</div>";

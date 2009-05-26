@@ -396,7 +396,8 @@ sub Validate
       }
       return({});
    }
-   if (!ref($newrec->{$self->Name()})){
+   if (!ref($newrec->{$self->Name()}) &&
+       $self->Type() ne "File"){
       return({$self->Name()=>trim($newrec->{$self->Name()})});
    }
    return({$self->Name()=>$newrec->{$self->Name()}});

@@ -42,6 +42,7 @@ sub end
 {
    my $self=shift;
    printf STDERR ("W5Server end ($self)\n");
+   exit(0);
 }
 
 sub reload

@@ -253,10 +253,16 @@ sub InitRequest
          }
       }
    }
-   if (!defined($self->Cache->{User}) || 
-       !defined($self->Cache->{User}->{DataObj})){
-      my $o=getModuleObject($self->Config,"base::user");
-      $self->Cache->{User}={DataObj=>$o,Cache=>{}};
+   if ($W5V2::OperationContext eq "W5Server"){
+      $self->Cache->{User}={Cache=>{
+                         $ENV{REMOTE_USER}=>{userid=>1,tz=>'GMT',lang=>'en'}}};
+   }
+   else{
+      if (!defined($self->Cache->{User}) || 
+          !defined($self->Cache->{User}->{DataObj})){
+         my $o=getModuleObject($self->Config,"base::user");
+         $self->Cache->{User}={DataObj=>$o,Cache=>{}};
+      }
    }
    $ENV{REMOTE_USER}="anonymous" if (!defined($ENV{REMOTE_USER}) || 
                                      $ENV{REMOTE_USER} eq "");
@@ -657,6 +663,9 @@ sub ValidateUserCache
    my $multistate=shift;
 
    my $UserCache=$self->Cache->{User}->{Cache};
+   if ($W5V2::OperationContext eq "W5Server"){
+      $UserCache->{$ENV{REMOTE_USER}}={};
+   }
    if (defined($UserCache->{$ENV{REMOTE_USER}}) &&
        $ENV{REMOTE_USER} ne "anonymous"){
       my $res={state=>$multistate};
@@ -684,7 +693,8 @@ sub ValidateUserCache
       $UserCache->{$ENV{REMOTE_USER}}->{state}=1;
       $UserCache->{$ENV{REMOTE_USER}}->{atime}=time();
    }
-   if (!defined($UserCache->{$ENV{REMOTE_USER}})){
+   if ($W5V2::OperationContext ne "W5Server" &&   # do not load cache as W5Srv
+       !defined($UserCache->{$ENV{REMOTE_USER}})){
       my $res=$self->W5ServerCall("rpcCacheQuery","User",$ENV{REMOTE_USER});
       my $o=$self->Cache->{User}->{DataObj};
       if ($o){

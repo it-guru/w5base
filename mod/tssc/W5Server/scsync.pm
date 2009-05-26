@@ -28,12 +28,13 @@ sub process
       $forceSync++;
       if ($self->{doCheckSyncJob} || $forceSync>$forceSyncInterval){
          $self->{doCheckSyncJob}=0;
+         $self->CheckSyncJob("*");
          if ($forceSync>$forceSyncInterval){
             msg(DEBUG,"running scsync forceSync");
             $forceSync=0;
-            $self->returnSync();
+            #$self->CheckSyncJob("*");
          }
-         while($self->CheckSyncJob()){}
+   #      while($self->CheckSyncJob()){}
       }
    }
 }
@@ -41,50 +42,26 @@ sub process
 
 
 
-sub returnSync
-{
-   my $self=shift;
-   my $wf=getModuleObject($self->Config,"base::workflow");
-   my $wfop=$wf->Clone();
-   printf STDERR ("W5Server now syncing data to sc ($self) wf=$wf\n");
-   $wf->SetFilter({step=>"tssc::workflow::sc*",
-                   stateid=>6});
-   $wf->SetCurrentView(qw(id 
-                          wffields.scworkflowid wffields.screqlastsync mdate));
-   $wf->SetCurrentOrder(qw(mdaterev));
-   my ($WfRec,$msg)=$wf->getFirst();
-   if (defined($WfRec)){
-      do{
-         $WfRec->{action}="screfresh";
-         $wfop->nativProcess("screfresh",{},$WfRec->{id});
-         ($WfRec,$msg)=$wf->getNext();
-      } until(!defined($WfRec));
-   }
-   sleep(5);
-   return(0);
-}
-
 sub CheckSyncJob
 {
    my $self=shift;
+   my $stateid=shift;
    my $wf=getModuleObject($self->Config,"base::workflow");
    my $wfop=$wf->Clone();
    printf STDERR ("W5Server now syncing data to sc ($self) wf=$wf\n");
-   $wf->SetFilter({step=>"tssc::workflow::screq::Wait4SC*"});
-   $wf->SetCurrentView(qw(ALL));
+   $wf->SetFilter({directlnkmode=>['w5base2extern','extern2w5base'],
+                   directlnktype=>\'tssc::incident',
+                   stateid=>$stateid});
+   $wf->SetCurrentView(qw(id));
    my ($WfRec,$msg)=$wf->getFirst();
    if (defined($WfRec)){
       do{
-         my $okstep=$WfRec->{class};
-         $okstep.="::SCworking";
-         $wfop->Store($WfRec,{stateid=>3,
-                              step=>$okstep});
+         printf STDERR ("fifi pre Store\n");
+         $wfop->nativProcess('extrefresh',{},$WfRec->{id});
+         printf STDERR ("fifi post Store\n");
          ($WfRec,$msg)=$wf->getNext();
       } until(!defined($WfRec));
    }
-
- 
-
 
    sleep(5);
    return(0);
@@ -93,6 +70,7 @@ sub CheckSyncJob
 sub reload
 {
    my $self=shift;
+printf STDERR ("reload $self\n");
    $self->{doCheckSyncJob}++;
 }
 

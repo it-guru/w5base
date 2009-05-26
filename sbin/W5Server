@@ -339,6 +339,48 @@ sub W5ServerConnect
    $W5V2::Query=new kernel::cgi({});
 
 }
+
+sub NotifyAdmin
+{
+   my $self=shift;
+   my $subject=shift;
+   my $text=shift;
+
+   my @sendmailpath=qw(/usr/local/sbin/sendmail 
+                       /sbin/sendmail 
+                       /usr/sbin/sendmail 
+                       /usr/lib/sendmail
+                       /usr/lib/sbin/sendmail);
+   my $sendmail=undef;
+   foreach my $s (@sendmailpath){
+      if (-x $s){
+         $sendmail=$s;
+         last;
+      }
+   }
+   if (!defined($sendmail)){
+      printf STDERR ("ERROR no sendmail found\n");
+      exit(1);
+   }
+
+   my $user=$self->Config->Param("W5SERVERUSER");
+   $user="root" if ($user eq "");
+   my ($fh,$filename)=tempfile();
+   if (defined($fh)){ 
+      printf $fh ("cat << EOF | $sendmail -t\n");
+      printf $fh ("To: %s\n",$user);
+      printf $fh ("From: %s\n","W5Server");
+      printf $fh ("Subject: %s\n",$subject);
+      printf $fh ("Content-Type: text/plain; charset=\"iso-8859-1\"\n\n");
+      print $fh ($text);
+      print $fh "\nEOF\n";
+      close($fh);
+      system("sh $filename");
+      unlink($filename);
+   }
+}
+
+
 sub initAsyncEnv
 {
    my $self=shift;
@@ -445,52 +487,8 @@ sub initAsyncEnv
             push(@e,"\n\n","last 10 lines output dump:\n",
                            "==========================\n",@output);
          }
-         my @sendmailpath=qw(/usr/local/sbin/sendmail 
-                             /sbin/sendmail 
-                             /usr/sbin/sendmail 
-                             /usr/lib/sendmail
-                             /usr/lib/sbin/sendmail);
-         my $sendmail=undef;
-         foreach my $s (@sendmailpath){
-            if (-x $s){
-               $sendmail=$s;
-               last;
-            }
-         }
-         if (!defined($sendmail)){
-            printf STDERR ("ERROR no sendmail found\n");
-            exit(1);
-         }
-
-         my $user=$self->Config->Param("W5SERVERUSER");
-         $user="root" if ($user eq "");
-         my ($fh,$filename)=tempfile();
-         if (defined($fh)){ 
-            printf $fh ("cat << EOF | $sendmail -t\n");
-            printf $fh ("To: %s\n",$user);
-            printf $fh ("From: %s\n","W5Server");
-            printf $fh ("Subject: %s\n","ERROR: ".
-                   "messages while processing $evname messages");
-            printf $fh ("Content-Type: text/plain; charset=\"iso-8859-1\"\n\n");
-            print $fh join("",@e);
-            print $fh "\nEOF\n";
-            close($fh);
-            system("sh $filename");
-            unlink($filename);
-         }
-      #   if (open(F,"|".$sendmail." -t")){
-      #      F->autoflush(1);
-      #      printf F ("To: %s\n",$user);
-      #      printf F ("From: %s\n","W5Server");
-      #      printf F ("Subject: %s\n","ERROR: ".
-      #             "messages while processing $evname messages");
-      #      printf F ("Content-Type: text/plain; charset=\"iso-8859-1\"\n\n");
-      #      print F join("",@e);
-      #      print F join("\n\n\n");
-      #      print F join("\n\n\n");
-      #      print F join("\n\n\n");
-      #      close(F);
-      #   }
+         $self->NotifyAdmin("ERROR: messages while processing $evname messages",
+                            join("",@e));
       }
       my $joblog=getModuleObject($self->Config,"base::joblog");
       if (defined($ipcresult->{handlerresult}) &&
@@ -694,7 +692,6 @@ sub StartW5ServerProcess
                                }
                                sub shutdown{
                                    $srv->end();
-                                   exit(0);
                                }
                                $SIG{HUP}=\&hup;
                                $SIG{INT}=\&shutdown;
@@ -714,6 +711,11 @@ sub CheckW5ServerProcess
    foreach my $server (keys(%{$self->{W5Server}})){
       my $pid=$self->{W5ServerProcess}->{$server}->{AsyncID};
       if (!kill(0,$pid)){
+         msg(ERROR,"W5Server $server was crashed - now restarting");
+         $self->NotifyAdmin("W5Server $server unexpected termination",
+                            "The W5Server $server has been terminated ".
+                            "unexpected. Now trying to restart. ".
+                            "Sorry, but no further informations available");
          $self->StartW5ServerProcess($server);
       }
    }

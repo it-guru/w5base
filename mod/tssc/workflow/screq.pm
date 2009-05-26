@@ -29,22 +29,6 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
    $self->{history}=[qw(insert modify delete)];
 
-#   $self->AddFrontendFields(
-#      new kernel::Field::TextDrop(
-#                name          =>'approverrequest',
-#                label         =>'Approve requested by',
-#                htmldetail    =>0,
-#                group         =>'init',
-#                vjointo       =>'base::user',
-#                vjoineditbase =>{'cistatusid'=>[3,4]},
-#                vjoinon       =>['approverrequestid'=>'userid'],
-#                vjoindisp     =>'fullname'),
-#
-#      new kernel::Field::Link (
-#                name          =>'approverrequestid',
-#                container     =>'headref'),
-#
-#    );
    return($self);
 }
 
@@ -55,15 +39,6 @@ sub getDynamicFields
    my $class;
 
    return($self->InitFields(
-#      new kernel::Field::TextDrop(
-#                name          =>'scid',
-#                label         =>'SC Operation ID',
-#                group         =>'init',
-#                vjointo       =>'base::user',
-#                vjoineditbase =>{'cistatusid'=>[3,4]},
-#                vjoinon       =>['initiatorid'=>'userid'],
-#                vjoindisp     =>'fullname',
-#                altnamestore  =>'initiatorname'),
 
       new kernel::Field::Date (
                 name          =>'screqlastsync',
@@ -71,7 +46,20 @@ sub getDynamicFields
                 label         =>'last sync to SC',
                 container     =>'headref'),
 
+      new kernel::Field::Select (
+                name          =>'scsyncronisationstate',
+                readonly      =>1,
+                value         =>['fixlink','w5base2extern','extern2w5base'],
+                group         =>'init',
+                translation   =>'base::workflowaction',
+                label         =>'Sync state',
+                alias         =>'directlnkmode'),
 
+      new kernel::Field::Text (
+                name          =>'scworkflowid',
+                group         =>'init',
+                label         =>'SC WorkflowID',
+                container     =>'headref'),
     ));
 }
 
@@ -89,12 +77,6 @@ sub InitWorkflow
    return(undef);
 }
 
-sub getDefaultContractor
-{
-   my $self=shift;
-   return('');
-}
-
 sub isViewValid
 {
    my $self=shift;
@@ -107,9 +89,6 @@ sub getDetailBlockPriority            # posibility to change the block order
 {
    return("init","flow");
 }
-
-
-
 
 
 sub getStepByShortname
@@ -144,28 +123,19 @@ sub isOptionalFieldVisible
    my %param=@_;
    my $name=$param{field}->Name();
 
-   return(1) if ($name eq "relations");
+   return(0) if ($name eq "relations");
    return(1) if ($name eq "prio");
    return(1) if ($name eq "name");
    return(1) if ($name eq "shortactionlog");
-   return(1) if ($name eq "detaildescription");
+   return(0) if ($name eq "detaildescription");
    return(0);
-}
-
-sub getPosibleRelations
-{
-   my $self=shift;
-   my $WfRec=shift;
-   return("tssc::workflow::screq"=>'relinfo');
 }
 
 sub Init
 {  
    my $self=shift;
 
-   $self->AddGroup("init",
-                   translation=>'tssc::workflow::screq');
-
+   $self->AddGroup("init",translation=>'tssc::workflow::screq');
    return(1);
 }
 
@@ -184,35 +154,29 @@ sub getPosibleActions
    my $self=shift;
    my $WfRec=shift;
    my $app=$self->getParent;
-   my $userid=$self->getParent->getCurrentUserId();
-   my $isadmin=$self->getParent->IsMemberOf("admin");
+#   my $userid=$self->getParent->getCurrentUserId();
+#   my $isadmin=$self->getParent->IsMemberOf("admin");
    my $stateid=$WfRec->{stateid};
-   my $lastworker=$WfRec->{owner};
-   my $creator=$WfRec->{openuser};
-   my $initiatorid=$WfRec->{initiatorid};
+#   my $lastworker=$WfRec->{owner};
+#   my $creator=$WfRec->{openuser};
+#   my $initiatorid=$WfRec->{initiatorid};
    my @l=();
-   my $iscurrent=$self->isCurrentForward($WfRec);
-   my $isworkspace=0;
-   if (!$iscurrent){  # check Workspace only if not current
-      $isworkspace=$self->isCurrentWorkspace($WfRec); 
-   }
-   my $iscurrentapprover=0;
+#   my $iscurrent=$self->isCurrentForward($WfRec);
+#   my $isworkspace=0;
+
+
+#   if (!$iscurrent){  # check Workspace only if not current
+#      $isworkspace=$self->isCurrentWorkspace($WfRec); 
+#   }
+#   my $iscurrentapprover=0;
    if ($stateid<21){
-      if ($isadmin){
-         push(@l,"scresync");
-         push(@l,"screfresh");
-      }
+      push(@l,"extrefresh");
    }
 
    return(@l);
 }
 
 
-sub NotifyUsers
-{
-   my $self=shift;
-
-}
 
 #######################################################################
 package tssc::workflow::screq::step;
@@ -222,24 +186,24 @@ use kernel::WfStep;
 @ISA=qw(kernel::WfStep);
 
 
-sub getPosibleButtons
-{
-   my $self=shift;
-   my $WfRec=shift;
-   my $actions=shift;
-   my @WorkflowStep=Query->Param("WorkflowStep");
-   my %b=();
-   my @saveables=grep(!/^wfbreak$/,@$actions);
-   if ($#saveables!=-1){
-      %b=(SaveStep=>$self->T('Save')) if ($#{$actions}!=-1);
-   }
-   if (defined($WfRec->{id})){
-      if (grep(/^wfbreak$/,@$actions)){
-         $b{BreakWorkflow}=$self->T('abbort request');
-      }
-   }
-   return(%b);
-}
+#sub getPosibleButtons
+#{
+#   my $self=shift;
+#   my $WfRec=shift;
+#   my $actions=shift;
+#   my @WorkflowStep=Query->Param("WorkflowStep");
+#   my %b=();
+#   my @saveables=grep(!/^wfbreak$/,@$actions);
+#   if ($#saveables!=-1){
+#      %b=(SaveStep=>$self->T('Save')) if ($#{$actions}!=-1);
+#   }
+#   if (defined($WfRec->{id})){
+#      if (grep(/^wfbreak$/,@$actions)){
+#         $b{BreakWorkflow}=$self->T('abbort request');
+#      }
+#   }
+#   return(%b);
+#}
 
 sub generateWorkspacePages
 {
@@ -264,72 +228,40 @@ sub generateWorkspacePages
    return($defop);
 }
 
-sub Process
+sub processExternalData
 {
    my $self=shift;
-   my $action=shift;
+   my $scid=shift;
    my $WfRec=shift;
-   my $actions=shift;
-   my $userid=$self->getParent->getParent->getCurrentUserId();
-   
-   if ($action eq "SaveStep"){
-      my $op=Query->Param("OP");
-      if ($action ne "" && !grep(/^$op$/,@{$actions})){
-         $self->LastMsg(ERROR,"invalid disalloed action requested");
-         return(0);
-      }
-      if ($op eq "scresync"){
-         if ($self->StoreRecord($WfRec,{stateid=>4,
-                                        step=>'tssc::workflow::screq::Wait4SC',
-                                        })){
-         }
-         return(0);
-      }
-   }
 
-   return($self->SUPER::Process($action,$WfRec,$actions));
+   msg(DEBUG,"processing screfresh event for ".$WfRec->{scworkflowid});
+   my $sc=$self->getSC();
+   return(undef) if (!defined($sc));
+   msg(DEBUG,"connect to ServiceCenter seems to be successfull");
+   my $searchResult;
+   if (!defined($searchResult=$sc->IncidentSearch(
+                  'number'=>$WfRec->{scworkflowid},
+                  'search.open.flag'=>'either'))){
+      printf STDERR ("ERROR: ServiceCenter SearchIncident failed\n");
+   }
+   if (defined($searchResult)){
+   #   printf STDERR ("SC=%s\n",Dumper($searchResult));
+      $self->handleExternalData($WfRec,$searchResult);
+ 
+   }
+   $sc->Logout();
+   msg(DEBUG,"logout on ServiceCenter OK");
+   return(1);
 }
 
 
-sub nativProcess
-{
-   my $self=shift;
-   my $action=shift;
-   my $h=shift;
-   my $WfRec=shift;
-   my $actions=shift;
-
-   printf STDERR ("fifi action=$action actions=%s\n",Dumper($actions));
-   if ($action eq "screfresh"){
-      msg(DEBUG,"processing screfresh event for ".$WfRec->{scworkflowid});
-      my $sc=$self->getSC();
-      return(undef) if (!defined($sc));
-      msg(DEBUG,"connect to ServiceCenter seems to be successfull");
-      my $searchResult;
-      if (!defined($searchResult=$sc->IncidentSearch(
-                     'number'=>$WfRec->{scworkflowid},
-                     'search.open.flag'=>'either'))){
-         printf STDERR ("ERROR: ServiceCenter SearchIncident failed\n");
-      }
-      if (defined($searchResult)){
-         printf STDERR ("SC=%s\n",Dumper($searchResult));
-         $self->HandelNewSCdata($WfRec,$searchResult);
-         
-      }
-      $sc->Logout();
-      return(1);
-   }
-   return(0);
-}
-
-sub HandelNewSCdata
+sub handleExternalData
 {
    my $self=shift;
    my $WfRec=shift;
    my $searchResult=shift;
    my $record=$searchResult->{record};
-
-
+   printf STDERR ("fifi default HandelNewSCdata %s\n",Dumper($record));
 }
 
 sub getSC
@@ -363,40 +295,11 @@ sub getSC
 }
 
 
-
-
-#######################################################################
-package tssc::workflow::screq::Wait4SC;
-use vars qw(@ISA);
-use kernel;
-@ISA=qw(tssc::workflow::screq::step);
-
-
-sub Validate
+sub triggerSync
 {
    my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-   my $origrec=shift;
+   my $id=shift;
 
-#   foreach my $v (qw(name)){
-#      if ((!defined($oldrec) || exists($newrec->{$v})) && $newrec->{$v} eq ""){
-#         $self->LastMsg(ERROR,"field '%s' is empty",
-#                        $self->getField($v)->Label());
-#         return(0);
-#      }
-#   }
-
-   return(1);
-}
-
-sub FinishWrite
-{
-   my $self=shift;
-   my $WfRec=shift;
-   my $newrec=shift;
-
-   my $id=effVal($WfRec,$newrec,"id");
    my $app=$self->getParent->getParent();
    my $res;
 
@@ -425,10 +328,9 @@ sub FinishWrite
 
 
 #######################################################################
-package tssc::workflow::screq::SCworking;
+package tssc::workflow::screq::wait4external;
 use vars qw(@ISA);
 use kernel;
-use SC::Customer::TSystems;
 @ISA=qw(tssc::workflow::screq::step);
 
 
@@ -439,16 +341,19 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
-#   foreach my $v (qw(name)){
-#      if ((!defined($oldrec) || exists($newrec->{$v})) && $newrec->{$v} eq ""){
-#         $self->LastMsg(ERROR,"field '%s' is empty",
-#                        $self->getField($v)->Label());
-#         return(0);
-#      }
-#   }
-
    return(1);
 }
+
+sub getWorkHeight
+{
+   my $self=shift;
+   my $WfRec=shift;
+
+   return("80");
+}
+
+
+
 
 
 1;

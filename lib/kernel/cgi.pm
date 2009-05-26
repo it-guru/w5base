@@ -73,6 +73,7 @@ sub Param
    return($self->{'cgi'}->param(@_));
 }
 
+
 sub QueryString
 {
    my $self=shift;

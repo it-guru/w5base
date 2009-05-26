@@ -1577,19 +1577,74 @@ sub Welcome
    print $self->HtmlBottom(body=>1,form=>1);
 }
 
+sub preparseEmail
+{
+   my $self=shift;
+   my $tag=shift;
+   if (my ($grpid)=$tag=~m/^base::grp\((\d+)\)$/){
+      my $grp=getModuleObject($self->Config,"base::grp");
+      $grp->SetFilter({grpid=>\$grpid});
+      my ($grprec,$msg)=$grp->getOnlyFirst(qw(users));
+      if (defined($grprec) && ref($grprec->{users}) eq "ARRAY"){
+         my @l;
+         foreach my $urec (@{$grprec->{users}}){
+            push(@l,$urec->{email}) if ($urec->{email} ne "");
+         }
+         return(@l);
+      }
+   }
+   if (my ($userid)=$tag=~m/^base::user\((\d+)\)$/){
+      my $user=getModuleObject($self->Config,"base::user");
+      $user->SetFilter({userid=>\$userid});
+      my ($userrec,$msg)=$user->getOnlyFirst(qw(email));
+      if (defined($userrec)){
+         return($userrec->{email});
+      }
+   }
+   return(lc($tag));
+}
+
 sub externalMailHandler 
 {
    my $self=shift;
 
    my $parent=Query->Param("parent");
    my $addref=Query->Param("addref");
+   my $mode=Query->Param("mode");
    my $id=Query->Param("id");
+   if (my ($wfheadid)=$mode=~m/^workflowrepeat\((\d+)\)$/){
+      my $userid=$self->getCurrentUserId();
+      my $wa=getModuleObject($self->Config,"base::workflowaction");
+      $wa->SetFilter({wfheadid=>\$wfheadid});
+      my $i={};
+      my @l=$wa->getHashList(qw(cdate name additional comments creator));
+      foreach my $arec (reverse(@l)){
+         my $add=$arec->{additional};
+         $add={Datafield2Hash($add)} if (ref($add) ne "HASH");
+         if ($arec->{name} eq "wfmailsend"){
+            $i->{to}=$add->{to};
+            $i->{cc}=$add->{cc};
+            $i->{subject}=$add->{subject};
+            $i->{msg}="\n\n---\n".$self->T("Mail from")." ".$arec->{cdate}."\n".
+                      $arec->{comments};
+            last if ($userid==$arec->{creator});
+         }
+      }
+      foreach my $v (qw(to cc msg subject)){
+         Query->Param($v=>$i->{$v}) if ($i->{$v} ne "");
+      }
+      $mode="simple";
+   }
+
+
    my $s=Query->Param("subject");
    my $m=Query->Param("msg");
    my @t=split(/\s*[,;]\s*/,Query->Param("to"));
    my @c=split(/\s*[,;]\s*/,Query->Param("cc"));
-   my %u=(); map({$u{lc($_)}++} @t); @t=grep(!/^\s*$/,sort(keys(%u)));
-   my %u=(); map({$u{lc($_)}++} @c); @c=grep(!/^\s*$/,sort(keys(%u)));
+   my %u=(); map({foreach my $t ($self->preparseEmail($_)){$u{$t}++}} @t); 
+             @t=grep(!/^\s*$/,sort(keys(%u)));
+   my %u=(); map({foreach my $t ($self->preparseEmail($_)){$u{$t}++}} @c); 
+             @c=grep(!/^\s*$/,sort(keys(%u)));
    my $t=join("; ",@t);
    my $c=join("; ",@c);
 
@@ -1602,6 +1657,7 @@ sub externalMailHandler
 
    if (Query->Param("ACTION") eq "send"){
       my $chkfail=0;
+      my $opok=0;
       if ($#t==-1 && $#c==-1){
          $chkfail=1;
          $self->LastMsg(ERROR,"no target email adress specified");
@@ -1630,45 +1686,55 @@ sub externalMailHandler
       my $file=Query->Param("file");
       my ($attinfo,$att);
       if (defined($attinfo=Query->UploadInfo($file))){
-         printf STDERR ("fifi found Attachment\n");
          no strict;
          my $f=Query->Param("file");
+         my $maxmail=$self->Config->Param("MaxMailAttachment");
          seek($f,0,SEEK_SET);
          my $buffer;
          my $size=0;
          while (my $bytesread=read($f,$buffer,1024)) {
             $att.=$buffer;
             $size+=$bytesread;
-            if ($size>5242880){
-               $self->LastMsg(ERROR,"file to large");
-               return(0);
+            if ($size>$maxmail){
+               $self->LastMsg(ERROR,"file larger then max attachment size %d",
+                                     $maxmail);
+               last;
             }
          }
+         msg(INFO,"attachment with $size bytes was send");
          Query->Delete("file");
       }
-      if (my $mailid=$self->Store(undef,\%notiy)){
-         if (defined($att) && defined($attinfo)){
-            my $newrec;
-            $newrec->{data}=$att;
-            $newrec->{name}=trim($file);
-            $newrec->{wfheadid}=$mailid;
-            $newrec->{contenttype}=$attinfo->{'Content-Type'};
-            my $wfa=getModuleObject($self->Config,"base::wfattach");
-            my $bk=$wfa->ValidatedInsertRecord($newrec);
-         }
-         my %d=(step=>'base::workflow::mailsend::waitforspool');
-         if ($parent eq "base::workflow"){
-            my $additional={};
-            $additional->{to}=$t if ($t ne "");
-            $additional->{cc}=$c if ($c ne "");
-            $additional->{subject}=$s if ($s ne "");
-            my $msg="To: $t\n\n".$m;
-            $self->Action->StoreRecord($id,"mail",
-                                       {translation=>'base::workflow',
-                                        additional=>$additional},$msg);
-         }
-         if (my $r=$self->Store($mailid,%d)){
-            $self->LastMsg(OK,"mail has been successfuly transfered to spool");
+      if (!$self->LastMsg()){
+         if (my $mailid=$self->Store(undef,\%notiy)){
+            my $msg;
+            if (defined($att) && defined($attinfo)){
+               my $newrec;
+               $newrec->{data}=$att;
+               $newrec->{name}=trim($file);
+               $newrec->{name}=~s/.*[\/\\]//;
+               $newrec->{wfheadid}=$mailid;
+               $newrec->{contenttype}=$attinfo->{'Content-Type'};
+               my $wfa=getModuleObject($self->Config,"base::wfattach");
+               my $bk=$wfa->ValidatedInsertRecord($newrec);
+               $msg="\nAttachment: $newrec->{name} (".length($att)." bytes)";
+            }
+            my %d=(step=>'base::workflow::mailsend::waitforspool');
+            if ($parent eq "base::workflow"){
+               my $additional={};
+               $additional->{to}=$t if ($t ne "");
+               $additional->{cc}=$c if ($c ne "");
+               $additional->{subject}=$s if ($s ne "");
+               $t=substr($t,0,40)."..." if (length($t)>42);
+               $msg="To: $t\n\n".$m.$msg;
+               $self->Action->StoreRecord($id,"wfmailsend",
+                                          {translation=>'kernel::WfStep',
+                                           additional=>$additional},$msg);
+            }
+            if (my $r=$self->Store($mailid,%d)){
+               $self->LastMsg(OK,
+                              "mail has been successfuly transfered to spool");
+               $opok=1;
+            }
          }
       }
       print $self->HttpHeader("text/html");
@@ -1677,6 +1743,25 @@ sub externalMailHandler
                               title=>'W5Base Mail Client');
       my $lastmsg=$self->findtemplvar({},"LASTMSG");
       print $lastmsg;
+      if ($opok){
+         print <<EOF;
+<script language="JavaScript">
+function doRefresh()
+{
+   if (parent.opener){
+      parent.opener.document.forms[0].submit();
+   }
+}
+function doClose()
+{
+   parent.close();
+}
+window.setTimeout("doRefresh();",1000);
+window.setTimeout("doClose();",1100);
+</script>
+
+EOF
+      }
       print $self->HtmlBottom(body=>1,form=>1);
 
 
@@ -1745,6 +1830,7 @@ sub externalMailHandler
  </tr>
  <tr height=1%><td height=1% align=right>
  <input type=hidden name=parent value="$parent">
+ <input type=hidden name=mode value="$mode">
  <input type=hidden name=id value="$id">
  <input type=hidden name=ACTION value="send">
  <input type=button onclick=doSend() name=send 

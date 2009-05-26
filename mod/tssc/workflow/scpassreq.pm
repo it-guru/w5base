@@ -46,28 +46,15 @@ sub getDynamicFields
                 value         =>['AssetCenter Wirksystem (AC01_Prod_FFM)',
                                  'ServiceCenter Wirksystem (cssa-isc14)',
                                  'W5Base/Darwin (Prod; Service-Kennungen)']),
-
       new kernel::Field::Text(
                 name          =>'targetuser',
+                group         =>'init',
                 htmlwidth     =>'100px',
                 label         =>'user account to reset password',
-                container     =>'additional',
-                group         =>'init'),
-         $self->SUPER::getDynamicFields(%param),
-      new kernel::Field::TextDrop(
-                name          =>'scworkflow',
-                group         =>'init',
-                label         =>'SC Operation ID',
-                vjointo       =>'tssc::inm',
-                vjoinon       =>['scworkflowid'=>'incidentnumber'],
-                vjoindisp     =>'incidentnumber',
-                altnamestore  =>'scworkflowid',
                 container     =>'additional'),
-      new kernel::Field::Link(
-                name          =>'scworkflowid',
-                group         =>'init',
-                label         =>'interanl SC Operation ID',
-                container     =>'additional'),
+
+      $self->SUPER::getDynamicFields(%param),
+
    ));
 }
 
@@ -136,12 +123,15 @@ sub getNextStep
 #}
 
 
+
+
+
 #######################################################################
 package tssc::workflow::scpassreq::dataload;
 use vars qw(@ISA);
 use kernel;
-use kernel::WfStep;
-@ISA=qw(kernel::WfStep);
+use tssc::workflow::screq;
+@ISA=qw(tssc::workflow::screq::step);
 
 sub generateWorkspace
 {
@@ -174,9 +164,6 @@ sub generateWorkspace
       $d.=">".$self->T($n,"base::workflow")."</option>";
    }
    $d.="</select>";
-   my $l1=$self->T("Comments");
-   my $l2=$self->T("Comments are only needed, if you do not want ".
-                   "a normal password reset");
 
 
    my $templ=<<EOF;
@@ -190,15 +177,8 @@ sub generateWorkspace
 <td class=finput>%targetuser(detail)%</td>
 </tr>
 <tr>
-<td class=fname valign=top width=20%>$l1:</td>
-<td class=finput>%detaildescription(detail)%</td>
-</tr>
-<tr>
 <td class=fname width=20%>%prio(label)%:</td>
 <td class=finput>$d</td>
-</tr>
-<tr>
-<td colspan=2 align=center>$l2</td>
 </tr>
 </table>
 EOF
@@ -216,9 +196,9 @@ sub addInitialParameters
    }
    $newrec->{name}="Password reset request for ".
                    $newrec->{targetuser}.'@'.$targetsys;
-   $newrec->{step}="tssc::workflow::screq::Wait4SC";
+   $newrec->{step}="tssc::workflow::scpassreq::wait4sc";
    $newrec->{directlnktype}="tssc::incident";
-   $newrec->{directlnkmode}="externAuthority";
+   $newrec->{directlnkmode}="w5base2extern";
    return(1);
 }
 
@@ -232,8 +212,9 @@ sub nativProcess
    my $WfRec=shift;
    my $actions=shift;
 
+
    if ($action eq "NextStep"){
-      $h->{stateid}=1;
+      $h->{stateid}=6;
       $h->{eventend}=undef;
       $h->{closedate}=undef;
 
@@ -264,6 +245,19 @@ sub nativProcess
    return(undef);
 }
 
+
+sub PostProcess
+{
+   my $self=shift;
+   my $action=shift;
+   my $h=shift;
+   my $actions=shift;
+
+   if ($action eq "NextStep"){
+      $self->triggerSync($h->{id});
+   }
+}
+
 sub Process
 {
    my $self=shift;
@@ -286,8 +280,7 @@ sub getWorkHeight
    my $self=shift;
    my $WfRec=shift;
 
-   return(0) if ($WfRec->{stateid}>=21);
-   return("240");
+   return("100");
 }
 
 
@@ -383,28 +376,84 @@ sub HandelNewSCdata
 }
 
 
+
+
+
+
 #######################################################################
-package tssc::workflow::scpassreq::SCworking;
+package tssc::workflow::scpassreq::wait4sc;
 use vars qw(@ISA);
 use kernel;
-@ISA=qw(tssc::workflow::screq::SCworking);
+use tssc::workflow::screq;
+@ISA=qw(tssc::workflow::screq::wait4external);
 
 
-sub Validate
+
+sub nativProcess
 {
    my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-   my $origrec=shift;
+   my $action=shift;
+   my $h=shift;
+   my $WfRec=shift;
+   my $actions=shift;
 
-   return(1);
+
+   if ($action eq "extrefresh"){
+      if ($WfRec->{scworkflowid} eq ""){
+         $self->openNew($WfRec);
+      }
+      else{
+         $self->processExternalData($WfRec->{scworkflowid},$WfRec);
+      }
+      return(1);
+   }
 }
 
-sub FinishWrite
+sub handleExternalData
 {
    my $self=shift;
    my $WfRec=shift;
-   my $newrec=shift;
+   my $searchResult=shift;
+   my $app=$self->getParent->getParent();
+   my $record=$searchResult->{record};
+
+   msg(INFO,"Current state for $WfRec->{id} on ".
+            "SC $searchResult->{recordid} = $record->{'problem.status'}");
+#printf STDERR ("fifi rec=%s\n",Dumper($searchResult));
+   if ($record->{'problem.status'} ne "Open"){ # hier müssen vermutlich 
+                                               # noch mehr Stati berücksichtigt
+                                               # werden.
+      my $msg="no msg from SC";
+      if (ref($searchResult->{activity}) eq "ARRAY"){
+         foreach my $act (@{$searchResult->{activity}}){
+            if ($act->{type} eq "Resolved"){
+               $msg=$act->{operator}.":\n".$act->{description};
+               last;
+            }
+         }
+      }
+      $app->Action->StoreRecord(
+             $WfRec->{id},"note",
+             {translation=>'base::workflowaction'},
+             $msg,undef);
+      $app->Store($WfRec,{stateid=>17,
+                          directlnkmode=>'fixlink',
+                          step=>'tssc::workflow::scpassreq::main',
+                          closedate=>NowStamp("en"),
+                          screqlastsync=>NowStamp("en")});
+      $app->Action->NotifyForward($WfRec->{id},'base::user',
+                                  $WfRec->{openuser},$WfRec->{openusername},
+                                  'Your request has been processed.',
+                                  mode=>'INFO');
+   }
+ #  printf STDERR ("fifi default HandelNewSCdata %s\n",Dumper($searchResult));
+}
+
+
+sub openNew
+{
+   my $self=shift;
+   my $WfRec=shift;
 
    my $reportedby="W5BASE";
    my $reportedlastname="";
@@ -433,6 +482,7 @@ sub FinishWrite
          $reportedemail=$urec->{email};
       }
    }
+   msg(DEBUG,"try to connect to ServiceCenter");
    my $sc=$self->getSC();
    return(undef) if (!defined($sc));
    msg(DEBUG,"connect to ServiceCenter seems to be successfull");
@@ -522,17 +572,15 @@ sub FinishWrite
    $sc->Logout();
    if ($IncidentNumber ne ""){
       my $okstep=$WfRec->{class};
-      $okstep.="::main";
       $wf->Action->StoreRecord(
              $WfRec->{id},"procinfo",
              {translation=>'base::workflow::actions'},
              "succsefuly created ".$IncidentNumber,undef);
-      $wf->Store($WfRec,{stateid=>6,
+      $wf->Store($WfRec,{stateid=>4,
                          eventend=>NowStamp("en"),
-   #                      closedate=>NowStamp("en"),
                          screqlastsync=>NowStamp("en"),
-                         scworkflowid=>$IncidentNumber,
-                         step=>$okstep});
+                         directlnkmode=>'extern2w5base',
+                         scworkflowid=>$IncidentNumber});
    # 17 is close
    # 21 is finish
    }
@@ -540,8 +588,55 @@ sub FinishWrite
    printf STDERR ("Incident Number=%s\n",$IncidentNumber);
 
    return(1);
+
 }
 
+sub Process
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+printf STDERR ("fifi action=$action\n");
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+########################################################################
+#package tssc::workflow::scpassreq::SCworking;
+#use vars qw(@ISA);
+#use kernel;
+#@ISA=qw(tssc::workflow::screq::SCworking);
+#
+#
+#sub Validate
+#{
+#   my $self=shift;
+#   my $oldrec=shift;
+#   my $newrec=shift;
+#   my $origrec=shift;
+#
+#   return(1);
+#}
+#
 
 
 
