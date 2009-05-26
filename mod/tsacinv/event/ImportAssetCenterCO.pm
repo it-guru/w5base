@@ -229,13 +229,17 @@ sub VerifyAssetCenterData
                                   directlnkmode=>\$issue->{directlnkmode}});
                   my ($WfRec,$msg)=$wf->getOnlyFirst(qw(ALL));
                   $W5V2::OperationContext="QualityCheck";
-                  if (!defined($WfRec)){
-                     my $bk=$wf->Store(undef,$issue);
-                  }
-                  else{
-                     map({delete($issue->{$_})} qw(eventstart class step));
-                     my $bk=$wf->Store($WfRec,$issue);
-                  }
+                  #
+                  # Da die Issues nicht bearbeiter werden, entferne ich diese
+                  # Prüfung (vogler 26.05.)
+                  #
+           #       if (!defined($WfRec)){
+           #          my $bk=$wf->Store(undef,$issue);
+           #       }
+           #       else{
+           #          map({delete($issue->{$_})} qw(eventstart class step));
+           #          my $bk=$wf->Store($WfRec,$issue);
+           #       }
                   #############################################################
                #exit(1) if ($sysrec->{systemid} eq "S01312120");
            
