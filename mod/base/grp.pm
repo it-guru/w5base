@@ -115,6 +115,48 @@ sub new
                 vjoinbase     =>[{'parentobj'=>\'base::grp'}],
                 subeditmsk    =>'subedit'),
 
+      new kernel::Field::Boolean(
+                name          =>'is_org',
+                label         =>'organisational Organisation',
+                htmlhalfwidth =>1,
+                group         =>'grptype',
+                dataobjattr   =>'is_org'),
+
+      new kernel::Field::Boolean(
+                name          =>'is_line',
+                label         =>'organisational Line',
+                htmlhalfwidth =>1,
+                group         =>'grptype',
+                dataobjattr   =>'is_line'),
+
+      new kernel::Field::Boolean(
+                name          =>'is_depart',
+                label         =>'organisational Department',
+                htmlhalfwidth =>1,
+                group         =>'grptype',
+                dataobjattr   =>'is_depart'),
+
+      new kernel::Field::Boolean(
+                name          =>'is_resort',
+                label         =>'organisational Resort',
+                htmlhalfwidth =>1,
+                group         =>'grptype',
+                dataobjattr   =>'is_resort'),
+
+      new kernel::Field::Boolean(
+                name          =>'is_team',
+                label         =>'organisational Team',
+                htmlhalfwidth =>1,
+                group         =>'grptype',
+                dataobjattr   =>'is_team'),
+
+      new kernel::Field::Boolean(
+                name          =>'is_orggroup',
+                label         =>'organisational Subunit',
+                htmlhalfwidth =>1,
+                group         =>'grptype',
+                dataobjattr   =>'is_orggroup'),
+
       new kernel::Field::FileList(
                 name          =>'attachments',
                 parentobj     =>'base::grp',
@@ -480,14 +522,14 @@ sub isWriteValid
    return(qw(default)) if (!defined($rec) && $self->IsMemberOf("admin"));
    return(undef) if ($rec->{grpid}<=0);
    return(qw(default users phonenumbers 
-             misc attachments)) if ($self->IsMemberOf("admin"));
+             misc grptype attachments)) if ($self->IsMemberOf("admin"));
    if (defined($rec)){
       my $grpid=$rec->{grpid};
       if ($self->IsMemberOf([$grpid],"RAdmin","down")){
          return(qw(users phonenumbers misc attachments));
       }
       if ($self->IsMemberOf([$grpid],["RBoss","RBoss2"],"direct")){
-         return(qw(phonenumbers misc attachments));
+         return(qw(phonenumbers misc grptype attachments));
       }
    }
    return(undef);
@@ -553,7 +595,8 @@ sub ValidateDelete
 sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
-   return(qw(header default users subunits phonenumbers misc attachments));
+   return(qw(header default users subunits phonenumbers grptype 
+             misc attachments));
 }
 
 
