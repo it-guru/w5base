@@ -162,6 +162,40 @@ sub new
                 vjoindisp     =>'fullname'),
 
       new kernel::Field::TextDrop(
+                name          =>'businessdepart',
+                htmlwidth     =>'300px',
+                htmldetail    =>0,
+                searchable    =>0,
+                readonly      =>1,
+                group         =>'technical',
+                label         =>'Business Department',
+                vjointo       =>'base::grp',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['businessdepartid'=>'grpid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'businessdepartid',
+                searchable    =>0,
+                readonly      =>1,
+                label         =>'Business Department ID',
+                group         =>'technical',
+                depend        =>['businessteamid'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $businessteamid=$current->{businessteamid};
+                   if ($businessteamid ne ""){
+                      my $grp=getModuleObject($self->getParent->Config,
+                                              "base::grp");
+                      my $businessdepartid=
+                         $grp->getParentGroupIdByType($businessteamid,"depart");
+                      return($businessdepartid);
+                   }
+                   return(undef);
+                }),
+
+      new kernel::Field::TextDrop(
                 name          =>'tsm',
                 group         =>'technical',
                 label         =>'Technical Solution Manager',

@@ -34,6 +34,7 @@
 'Contacts'=>{de=>'Kontakte'},
 'Customer'=>{de=>'Kunde'},
 'Business Team'=>{de=>'Betriebsteam'},
+'Business Department'=>{de=>'Betriebsfachbereich'},
 'Customers Application Prioritiy'=>{de=>'Priorität der Anwendung'},
 'you are not authorized to set other persons as databoss'=>{
           de=>'sie sind nicht berechtigt, andere Personen als Datenverantwortlicher zu definieren'},

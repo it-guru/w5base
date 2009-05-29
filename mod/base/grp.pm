@@ -671,25 +671,6 @@ sub TreeCreate
             }
          }
          else{
-          #  my $grpid;
-          #  if ($tree){
-          #     $grpid=$g->SecureValidatedUpdateRecord($grprec,{
-          #                cistatusid=>4},{grpid=>\$grprec->{grpid}});
-          #  }
-          #  else{ 
-          #     $grpid=$g->ValidatedUpdateRecord($grprec,{
-          #                cistatusid=>4},{grpid=>\$grprec->{grpid}});
-          #  }
-          #  if ($grpid){
-          #     $self->LastMsg(OK,"update cistatus of $grp as $grpid OK");
-          #     if ($createname eq $fullname){
-          #        $createid=$grprec->{grpid};
-          #     }
-          #  }
-          #  else{
-          #     $self->LastMsg(ERROR,"update cistatus of $grp failed");
-          #     last;
-          #  }
             $createid=$grprec->{grpid};
          }
 
@@ -735,6 +716,41 @@ sub HandleInfoAboSubscribe
    else{
       print($self->noAccess());
    }
+}
+
+
+sub getParentGroupIdByType
+{
+   my $self=shift;
+   my $grpid=shift;
+   my $type=shift;
+   my @flags=qw(org line depart resort team orggroup);
+   my @fields=qw(parentid grpid fullname);
+
+   return(undef) if ($grpid eq "");
+   return(undef) if (!grep(/^$type$/,@flags));
+   foreach my $flag (@flags){
+      push(@fields,"is_".$flag);
+   }
+   if (exists($self->Cache->{getParentGroupIdByType}->{$grpid.".".$type})){
+      return($self->Cache->{getParentGroupIdByType}->{$grpid.".".$type});
+   }
+
+   $self->SetFilter({grpid=>\$grpid});
+   my ($grec,$msg)=$self->getOnlyFirst(@fields);
+   if (defined($grec)){
+      if ($grec->{"is_".$type}){
+         $self->Cache->{getParentGroupIdByType}->{$grpid.".".$type}=
+                       $grec->{grpid};
+         return($grec->{grpid});
+      }
+      my $parentid=$grec->{parentid};
+      if ($parentid ne ""){
+         return($self->getParentGroupIdByType($parentid,$type));
+      }
+   }
+   return(undef);
+
 }
 
 

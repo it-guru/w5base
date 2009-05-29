@@ -88,7 +88,9 @@ sub new
    );
 
    $self->setDefaultView(qw(name customerapplname 
-                            criticality servicesupport businessteam 
+                            criticality servicesupport 
+                            businessdepart
+                            businessteam 
                             systemlocations systemosclass
                             tsmclearname wbvclearname 
                             businessteamtlclearname 
