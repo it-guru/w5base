@@ -16,6 +16,8 @@ package AL_TCom::event::mkappcomreport;
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+#  AppComII Report auf Anforderung durch den Workflow :
+#  https://darwin.telekom.de/darwin/auth/base/workflow/ById/12434305750002
 use strict;
 use vars qw(@ISA);
 use kernel;
