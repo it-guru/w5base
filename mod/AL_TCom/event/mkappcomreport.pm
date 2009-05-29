@@ -130,7 +130,7 @@ sub xlsExport
          $ws->write($xlsexp->{xls}->{line},0,
                     "Fachbereich",
                     $xlsexp->{xls}->{format}->{header});
-         $ws->set_column(0,0,30);
+         $ws->set_column(0,0,35);
          $ws->write($xlsexp->{xls}->{line},1,
                     "Classic Systeme\n(OSY C *)",
 
