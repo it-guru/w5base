@@ -76,6 +76,14 @@ sub new
                 group         =>'systeminfo',
                 dataobjattr   =>'system.systemid'),
 
+      new kernel::Field::TextDrop(
+                name          =>'systemconumber',
+                htmlwidth     =>'100px',
+                htmdetail     =>0,
+                readonly      =>1,
+                label         =>'System costcenter',
+                dataobjattr   =>'system.conumber'),
+                                                   
       new kernel::Field::Text(
                 name          =>'shortdesc',
                 label         =>'Short Description',
@@ -233,6 +241,15 @@ sub new
                 group         =>'applinfo',
                 dataobjattr   =>'appl.applid'),
 
+      new kernel::Field::TextDrop(
+                name          =>'applconumber',
+                htmlwidth     =>'100px',
+                group         =>'applinfo',
+                htmdetail     =>0,
+                readonly      =>1,
+                label         =>'Application costcenter',
+                dataobjattr   =>'appl.conumber'),
+                                                   
       new kernel::Field::Link(
                 name          =>'tsmid',
                 label         =>'TSM ID',

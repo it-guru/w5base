@@ -31,3 +31,5 @@ then these applications-system links are not listed.
 '},
 'Asset Location'=>{de=>'Hardware Standort'},
 'OS-Class'=>{de=>'Betriebsystemklasse'},
+'System costcenter'=>{de=>'System CO-Nummer'},
+'Application costcenter'=>{de=>'Anwendungs CO-Nummer'},
