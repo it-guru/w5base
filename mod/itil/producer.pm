@@ -70,7 +70,7 @@ sub new
                 group         =>'software',
                 vjointo       =>'itil::software',
                 vjoinon       =>['id'=>'producerid'],
-                vjoindisp     =>['linenumber','name','cistatus'],
+                vjoindisp     =>['name','cistatus'],
                 vjoinbase     =>[{cistatusid=>\'4'}]),
 
       new kernel::Field::SubList(
@@ -79,7 +79,7 @@ sub new
                 group         =>'models',
                 vjointo       =>'itil::hwmodel',
                 vjoinon       =>['id'=>'producerid'],
-                vjoindisp     =>['linenumber','name','cistatus'],
+                vjoindisp     =>['name','cistatus'],
                 vjoinbase     =>[{cistatusid=>\'4'}]),
 
       new kernel::Field::Container(
