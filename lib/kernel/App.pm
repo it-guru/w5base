@@ -766,7 +766,9 @@ sub LowLevelLang
       return($languages[0]) if (!defined($lang));
       return($lang);
    }
-   if (grep(/^$ENV{LANG}$/,@languages)){
+   my $envlang=lc($ENV{LANG});
+   $envlang=~s/_.*$//;
+   if (grep(/^$envlang$/,@languages)){
       return($ENV{LANG});
    }
    return("en") if ($ENV{LANG} eq "C");

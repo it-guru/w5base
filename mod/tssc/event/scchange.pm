@@ -52,7 +52,7 @@ sub scchange
    msg(DEBUG,"ServiceCenter chm is connected");
    $chm->SetCurrentView(qw(sysmodtime closetime changenumber name description 
                            fallback status assignedto
-                           plannedstart plannedend srcid
+                           plannedstart plannedend srcid device
                            tssc_chm_closingcommentsclosingcomments assignarea
                            workstart workend workduration resolvedby closedby
                            requestedby editor softwareid software deviceid

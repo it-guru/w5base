@@ -519,6 +519,8 @@ sub extractAffectedApplication
    my %customername=();
    my $truecustomerprio;
 
+
+   my @chkapplid;
    #  pass 1 : softwareid
    my @l1;
    if (defined($rec->{softwareid})){
@@ -533,6 +535,16 @@ sub extractAffectedApplication
 
    #  pass 2 : description
    my @l2;
+   if (defined($rec->{device}) && ref($rec->{device}) eq "ARRAY"){
+      foreach my $r (@{$rec->{device}}){
+printf STDERR ("fifi r=%s\n",Dumper($r));
+         if (my ($applid)=$r->{name}=~m/^.*\(((APPL|GER)\d+)\)$/){
+            push(@chkapplid,$applid);
+         }
+      }
+   }
+printf STDERR ("fifi chkapplid=%s\n",Dumper(\@chkapplid));
+
    # entfernung des Parsings auf Basis des Requests ...
    # https://darwin.telekom.de/darwin/auth/base/workflow/ById/12428113140002
    #
@@ -600,10 +612,13 @@ sub extractAffectedApplication
    my $novalidappl=0;
    $novalidappl=1 if ($#applid==-1);
    my $dev=$rec->{deviceid};
-   if (my ($applid)=$dev=~m/^.*\(((APPL|GER)\d+)\)$/){ # im change steht ag (id) drin
+   if (my ($applid)=$dev=~m/^.*\(((APPL|GER)\d+)\)$/){
       msg(DEBUG,"ApplicationID=%s",$applid);
+      push(@chkapplid,$applid);
+   }
+   if ($#chkapplid!=-1){
       $appl->ResetFilter();
-      $appl->SetFilter({applid=>\$applid});
+      $appl->SetFilter({applid=>\@chkapplid});
       my @l1=$appl->getHashList(qw(id name custcontracts 
                                mandator mandatorid customer 
                                businessteam responseteam conumber));

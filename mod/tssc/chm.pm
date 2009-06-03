@@ -119,6 +119,7 @@ sub new
                 label         =>'Device',
                 group         =>'device',
                 htmlwidth     =>'300px',
+                nodetaillink  =>1,
                 vjointo       =>'tssc::chm_device',
                 vjoinon       =>['changenumber'=>'changenumber'],
                 vjoindisp     =>[qw(name)]),

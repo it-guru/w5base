@@ -1127,6 +1127,12 @@ sub Validate
    my $origrec=shift;
 
 
+   if (exists($newrec->{name}) && defined($newrec->{name}) &&
+       length($newrec->{name})>125){
+      $newrec->{name}=substr($newrec->{name},0,125)."...";
+      $origrec->{name}=$newrec->{name};
+   }
+
    #
    # global Workflow validation
    #
