@@ -118,14 +118,11 @@ sub new
                 dataobjattr   =>'appl.responseteam'),
 
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Contact(
                 name          =>'sem',
                 group         =>'finance',
                 label         =>'Service Manager',
-                vjointo       =>'base::user',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['semid'=>'userid'],
-                vjoindisp     =>'fullname'),
+                vjoinon       =>['semid'=>'userid']),
 
       new kernel::Field::TextDrop(
                 name          =>'sememail',
@@ -195,14 +192,11 @@ sub new
                    return(undef);
                 }),
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Contact(
                 name          =>'tsm',
                 group         =>'technical',
                 label         =>'Technical Solution Manager',
-                vjointo       =>'base::user',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['tsmid'=>'userid'],
-                vjoindisp     =>'fullname'),
+                vjoinon       =>['tsmid'=>'userid']),
 
       new kernel::Field::SubList(
                 name          =>'directlicenses',
@@ -318,29 +312,24 @@ sub new
                 name          =>'customerid',
                 dataobjattr   =>'appl.customer'),
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Contact(
                 name          =>'sem2',
                 AllowEmpty    =>1,
                 group         =>'finance',
                 label         =>'Deputy Service Manager',
-                vjointo       =>'base::user',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['sem2id'=>'userid'],
-                vjoindisp     =>'fullname'),
+                vjoinon       =>['sem2id'=>'userid']),
 
       new kernel::Field::Link(
                 name          =>'sem2id',
                 dataobjattr   =>'appl.sem2'),
 
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Contact(
                 name          =>'tsm2',
                 AllowEmpty    =>1,
                 group         =>'technical',
                 label         =>'Deputy Technical Solution Manager',
-                vjointo       =>'base::user',
-                vjoinon       =>['tsm2id'=>'userid'],
-                vjoindisp     =>'fullname'),
+                vjoinon       =>['tsm2id'=>'userid']),
 
       new kernel::Field::TextDrop(
                 name          =>'tsm2email',

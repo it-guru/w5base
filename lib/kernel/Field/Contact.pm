@@ -83,9 +83,28 @@ sub contextMenu
       if ($email ne ""){
          push(@ml,$self->getParent->T("send a mail"),
                   "window.location.href = 'mailto:$email';");
+         my $subject;
+         if (defined($param{current}->{fullname})){
+            $subject=$param{current}->{fullname};
+         }
+         if ($subject eq "" && defined($param{current}->{name})){
+            $subject=$param{current}->{name};
+         }
+         my $id;
+         my $idobj=$self->getParent->IdField();
+         if (defined($idobj)){
+            $id=$idobj->RawValue($param{current});
+         }
+         my $qs=kernel::cgi::Hash2QueryString(to=>$email,
+                                  id=>$id,
+                                  subject=>$subject,
+                                  parent=>$self->getParent->Self());
+         my $onclick="openwin('../../base/workflow/externalMailHandler?$qs',".
+                     "'_blank',".
+                     "'height=$detaily,width=$detailx,toolbar=no,status=no,".
+                     "resizable=yes,scrollbars=no')";
 
-#         push(@ml,$self->getParent->T("W5Base Mail"),
-#                  "window.location.href = 'mailto:$email';");
+         push(@ml,$self->getParent->T("W5Base Mail"),$onclick);
       }
       my $office_phone=$rec->[0]->{office_phone};
       if ($office_phone ne ""){
