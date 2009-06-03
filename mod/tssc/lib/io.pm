@@ -537,13 +537,11 @@ sub extractAffectedApplication
    my @l2;
    if (defined($rec->{device}) && ref($rec->{device}) eq "ARRAY"){
       foreach my $r (@{$rec->{device}}){
-printf STDERR ("fifi r=%s\n",Dumper($r));
          if (my ($applid)=$r->{name}=~m/^.*\(((APPL|GER)\d+)\)$/){
             push(@chkapplid,$applid);
          }
       }
    }
-printf STDERR ("fifi chkapplid=%s\n",Dumper(\@chkapplid));
 
    # entfernung des Parsings auf Basis des Requests ...
    # https://darwin.telekom.de/darwin/auth/base/workflow/ById/12428113140002
