@@ -88,6 +88,8 @@ sub new
                                  'DB2',
                                  'IIS',
                                  'Informix',
+                                 'JacORB',
+                                 'MuleSource',
                                  'MQSeries',
                                  'MSSQL',
                                  'MySQL',
