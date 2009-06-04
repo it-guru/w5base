@@ -347,7 +347,7 @@ sub SetFilter
       push(@q,{id=>[keys(%id)]});
    }
    $dataobj->ResetFilter();
-   $dataobj->SecureSetFilter(@q);
+   $dataobj->SecureSetFilter(\@q);
 }
 
 
