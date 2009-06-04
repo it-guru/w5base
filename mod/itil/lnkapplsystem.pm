@@ -256,16 +256,26 @@ sub new
                 readonly      =>1,
                 dataobjattr   =>'appl.tsm'),
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Link(
+                name          =>'appldatabossid',
+                label         =>'Databosss ID',
+                readonly      =>1,
+                dataobjattr   =>'appl.databoss'),
+
+      new kernel::Field::Contact(
+                name          =>'appldataboss',
+                group         =>'applinfo',
+                label         =>'Databoss',
+                translation   =>'itil::appl',
+                readonly      =>1,
+                vjoinon       =>'appldatabossid'),
+
+      new kernel::Field::Contact(
                 name          =>'tsm',
                 group         =>'applinfo',
                 label         =>'Technical Solution Manager',
-                htmlwidth     =>'280px',
                 readonly      =>1,
-                vjointo       =>'base::user',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['tsmid'=>'userid'],
-                vjoindisp     =>'fullname'),
+                vjoinon       =>'tsmid'),
 
       new kernel::Field::TextDrop(
                 name          =>'tsmemail',
@@ -274,7 +284,7 @@ sub new
                 htmlwidth     =>'280px',
                 readonly      =>1,
                 htmldetail    =>0,
-                group         =>'furtherinfos',
+                group         =>'applinfo',
                 vjointo       =>'base::user',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['tsmid'=>'userid'],
@@ -289,7 +299,8 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'tsm2',
                 group         =>'applinfo',
-                label         =>'deputy Technical Solution Manager',
+                label         =>'Deputy Technical Solution Manager',
+                translation   =>'itil::appl',
                 htmlwidth     =>'280px',
                 readonly      =>1,
                 vjointo       =>'base::user',
@@ -304,7 +315,7 @@ sub new
                 htmlwidth     =>'280px',
                 readonly      =>1,
                 htmldetail    =>0,
-                group         =>'furtherinfos',
+                group         =>'applinfo',
                 vjointo       =>'base::user',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['tsm2id'=>'userid'],
@@ -316,26 +327,36 @@ sub new
                 readonly      =>1,
                 dataobjattr   =>'appl.businessteam'),
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Group(
                 name          =>'businessteam',
-                htmlwidth     =>'300px',
                 readonly      =>1,
-                htmlwidth     =>'280px',
                 group         =>'applinfo',
                 label         =>'Business Team',
-                vjointo       =>'base::grp',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['businessteamid'=>'grpid'],
-                vjoindisp     =>'fullname'),
+                vjoinon       =>'businessteamid'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Group(
+                name          =>'businessdepart',
+                label         =>'Business Department',
+                readonly      =>1,
+                translation   =>'itil::appl',
+                group         =>'applinfo',
+                vjoinon       =>'businessdepartid'),
+
+      new kernel::Field::Link(
+                name          =>'businessdepartid',
+                label         =>'Businessdepartment ID',
+                readonly      =>1,
+                translation   =>'itil::appl',
+                vjointo       =>'itil::appl',
+                vjoinon       =>['applid'=>'id'],
+                vjoindisp     =>'businessdepartid'),
+
+      new kernel::Field::Group(
                 name          =>'applcustomer',
                 label         =>'Application Customer',
                 readonly      =>1,
                 group         =>'applinfo',
-                vjointo       =>'base::grp',
-                vjoinon       =>['customerid'=>'grpid'],
-                vjoindisp     =>'fullname'),
+                vjoinon       =>'customerid'),
 
       new kernel::Field::Text(
                 name          =>'applcustomerprio',
@@ -344,6 +365,15 @@ sub new
                 readonly      =>1,
                 group         =>'applinfo',
                 dataobjattr   =>'appl.customerprio'),
+
+      new kernel::Field::Select(
+                name          =>'applcriticality',
+                group         =>'applinfo',
+                label         =>'Criticality',
+                readonly      =>1,
+                translation   =>'itil::appl',
+                dataobjattr   =>'appl.criticality'),
+
 
       new kernel::Field::Text(
                 name          =>'oncallphones',

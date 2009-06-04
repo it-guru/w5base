@@ -45,6 +45,7 @@ use kernel::Field::ListWebLink;
 use kernel::Field::Select;
 use kernel::Field::Boolean;
 use kernel::Field::SubList;
+use kernel::Field::Group;
 use kernel::Field::Contact;
 use kernel::Field::ContactLnk;
 use kernel::Field::PhoneLnk;

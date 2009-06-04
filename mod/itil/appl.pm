@@ -103,15 +103,11 @@ sub new
                 label         =>'Application ID',
                 dataobjattr   =>'appl.applid'),
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Group(
                 name          =>'responseteam',
-                htmlwidth     =>'300px',
                 group         =>'finance',
                 label         =>'Service Management Team',
-                vjointo       =>'base::grp',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['responseteamid'=>'grpid'],
-                vjoindisp     =>'fullname'),
+                vjoinon       =>'responseteamid'),
 
       new kernel::Field::Link(
                 name          =>'responseteamid',
@@ -122,7 +118,7 @@ sub new
                 name          =>'sem',
                 group         =>'finance',
                 label         =>'Service Manager',
-                vjoinon       =>['semid'=>'userid']),
+                vjoinon       =>'semid'),
 
       new kernel::Field::TextDrop(
                 name          =>'sememail',
@@ -148,15 +144,11 @@ sub new
                 name          =>'semid',
                 dataobjattr   =>'appl.sem'),
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Group(
                 name          =>'businessteam',
-                htmlwidth     =>'300px',
                 group         =>'technical',
                 label         =>'Business Team',
-                vjointo       =>'base::grp',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['businessteamid'=>'grpid'],
-                vjoindisp     =>'fullname'),
+                vjoinon       =>'businessteamid'),
 
       new kernel::Field::TextDrop(
                 name          =>'businessdepart',
@@ -196,7 +188,7 @@ sub new
                 name          =>'tsm',
                 group         =>'technical',
                 label         =>'Technical Solution Manager',
-                vjoinon       =>['tsmid'=>'userid']),
+                vjoinon       =>'tsmid'),
 
       new kernel::Field::SubList(
                 name          =>'directlicenses',
@@ -317,7 +309,7 @@ sub new
                 AllowEmpty    =>1,
                 group         =>'finance',
                 label         =>'Deputy Service Manager',
-                vjoinon       =>['sem2id'=>'userid']),
+                vjoinon       =>'sem2id'),
 
       new kernel::Field::Link(
                 name          =>'sem2id',
@@ -329,7 +321,7 @@ sub new
                 AllowEmpty    =>1,
                 group         =>'technical',
                 label         =>'Deputy Technical Solution Manager',
-                vjoinon       =>['tsm2id'=>'userid']),
+                vjoinon       =>'tsm2id'),
 
       new kernel::Field::TextDrop(
                 name          =>'tsm2email',
