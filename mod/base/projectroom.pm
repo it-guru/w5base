@@ -67,12 +67,10 @@ sub new
                 label         =>'CI-StateID',
                 dataobjattr   =>'projectroom.cistatus'),
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Contact(
                 name          =>'databoss',
                 label         =>'Databoss',
-                vjointo       =>'base::user',
-                vjoinon       =>['databossid'=>'userid'],
-                vjoindisp     =>'fullname'),
+                vjoinon       =>'databossid'),
 
       new kernel::Field::Link(
                 name          =>'databossid',
