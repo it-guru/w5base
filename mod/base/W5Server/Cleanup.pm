@@ -30,7 +30,8 @@ sub process
    my $nextrun;
 
    while(1){
-      if (defined($nextrun) && $nextrun<=time()){
+      if ((defined($nextrun) && $nextrun<=time()) || $self->{doForceCleanup}){
+         $self->{doForceCleanup}=0;
          $self->doCleanup();
          $self->CleanupWorkflows();
          $self->CleanupHistory();
@@ -62,12 +63,18 @@ sub doCleanup
 
    msg(DEBUG,"(%s) Processing doCleanup",$self->Self);
    my $j=$self->getParent->getPersistentModuleObject("base::joblog");
+   my $jop=$self->getParent->getPersistentModuleObject("base::joblog");
    if (defined($j)){
       $j->SetFilter({'mdate'=>$CleanupJobLog});
       $j->SetCurrentView(qw(ALL));
-      $j->ForeachFilteredRecord(sub{
-                                     $j->ValidatedDeleteRecord($_);
-                                });
+
+      my ($rec,$msg)=$j->getFirst(unbuffered=>1);
+      if (defined($rec)){
+         do{
+            $jop->ValidatedDeleteRecord($rec);
+            ($rec,$msg)=$j->getNext();
+         } until(!defined($rec));
+      }
    }
 }
 
@@ -85,7 +92,7 @@ sub CleanupInlineAttachments
    $inline->SetCurrentOrder(qw(NONE));
    $inline->Limit(100000);
 
-   my ($rec,$msg)=$inline->getFirst();
+   my ($rec,$msg)=$inline->getFirst(unbuffered=>1);
    if (defined($rec)){
       my $op=$inline->Clone();
       do{
@@ -137,7 +144,7 @@ sub CleanupWorkflows
       $wf->Limit(100000);
       my $c=0;
 
-      my ($rec,$msg)=$wf->getFirst();
+      my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
       if (defined($rec)){
          do{
             msg(INFO,"process $rec->{id} class=$rec->{class}");
@@ -189,6 +196,14 @@ sub CleanupWorkflows
    }
 
 }
+
+sub reload
+{
+   my $self=shift;
+   $self->{doForceCleanup}++;
+}
+
+
 
 
 
