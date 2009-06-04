@@ -1,0 +1,5 @@
+'itil::qrule::checkGroups'=>{de=>'Prüfung der referenzierenten Gruppen',
+                             en=>'check group references'},
+'target group is marked as deleted'=>{de=>'Gruppe ist als gelöscht markiert'},
+'target group seems to be deleted'=>{de=>'Gruppe scheint nicht mehr zu existieren'},
+
