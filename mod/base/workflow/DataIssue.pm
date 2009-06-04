@@ -119,6 +119,11 @@ sub getDynamicFields
                              label              =>'affected Dataelement Name',
                              container          =>'additional'),
                    new kernel::Field::Link(  
+                             name               =>'dataissuemetric',
+                             translation        =>'base::workflow::DataIssue',
+                             label              =>'DataIssue Metrics',
+                             container          =>'additional'),
+                   new kernel::Field::Link(  
                              name               =>'DATAISSUEOPERATIONSRC',
                              translation        =>'base::workflow::DataIssue',
                              label              =>'DataIssue Source',

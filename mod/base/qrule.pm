@@ -272,6 +272,7 @@ sub nativQualityCheck
                      eventstart=>NowStamp("en"),
                      srcload=>NowStamp("en"),
                      srcsys=>$affectedobject,
+                     dataissuemetric=>[sort(keys(%alldataissuemsg))],
                      DATAISSUEOPERATIONSRC=>$directlnkmode};
          my $bk=$wf->Store(undef,$newrec);
          $result->{wfheadid}=$bk;
@@ -285,6 +286,7 @@ sub nativQualityCheck
                      editor=>$WfRec->{editor},
                      realeditor=>$WfRec->{realeditor},
                      srcload=>NowStamp("en"),
+                     dataissuemetric=>[sort(keys(%alldataissuemsg))],
                      detaildescription=>$detaildescription};
          my $bk=$wf->Store($WfRec,$newrec);
          $result->{wfheadid}=$WfRec->{id};
