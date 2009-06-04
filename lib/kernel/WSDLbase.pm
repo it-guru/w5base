@@ -43,6 +43,7 @@ sub WSDLcommon
    $$XMLtypes.="</xsd:restriction>";
    $$XMLtypes.="</xsd:complexContent>";
    $$XMLtypes.="</xsd:complexType>";
+   $$XMLtypes.="\n";
 
 
    $$XMLtypes.="<xsd:complexType name=\"ArrayOfStringItems\">";
@@ -51,13 +52,7 @@ sub WSDLcommon
                "name=\"item\" type=\"xsd:string\" />";
    $$XMLtypes.="</xsd:sequence>";
    $$XMLtypes.="</xsd:complexType>";
-
-   $$XMLtypes.="<xsd:complexType name=\"Container\">";
-   $$XMLtypes.="<xsd:sequence>";
-   $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"unbounded\" ".
-               "name=\"item\" type=\"$ns:CItem\" />";
-   $$XMLtypes.="</xsd:sequence>";
-   $$XMLtypes.="</xsd:complexType>";
+   $$XMLtypes.="\n";
 
    $$XMLtypes.="<xsd:complexType name=\"CItem\">";
    $$XMLtypes.="<xsd:sequence>";
@@ -65,6 +60,15 @@ sub WSDLcommon
    $$XMLtypes.="<xsd:element name=\"value\" type=\"xsd:string\" />";
    $$XMLtypes.="</xsd:sequence>";
    $$XMLtypes.="</xsd:complexType>";
+   $$XMLtypes.="\n";
+
+   $$XMLtypes.="<xsd:complexType name=\"Container\">";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"unbounded\" ".
+               "name=\"item\" type=\"$ns:CItem\" />";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
+   $$XMLtypes.="\n";
 
    $$XMLtypes.="<xsd:complexType name=\"Contacts\">";
    $$XMLtypes.="<xsd:sequence>";
@@ -72,6 +76,7 @@ sub WSDLcommon
                "name=\"item\" type=\"$ns:ContactLnk\" />";
    $$XMLtypes.="</xsd:sequence>";
    $$XMLtypes.="</xsd:complexType>";
+   $$XMLtypes.="\n";
 
    $$XMLtypes.="<xsd:complexType name=\"ContactLnk\">";
    $$XMLtypes.="<xsd:sequence>";
@@ -80,6 +85,7 @@ sub WSDLcommon
    $$XMLtypes.="<xsd:element name=\"comments\" type=\"xsd:string\" />";
    $$XMLtypes.="</xsd:sequence>";
    $$XMLtypes.="</xsd:complexType>";
+   $$XMLtypes.="\n";
 
    $self->WSDLdoPing($uri,$ns,$fp,$module,
                      $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes);
@@ -313,7 +319,7 @@ sub WSDLshowFields
    $$XMLtypes.="<xsd:element minOccurs=\"1\" maxOccurs=\"1\" ".
               "name=\"exitcode\" type=\"xsd:int\" />";
    $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
-              "name=\"lastmsg\" type=\"${ns}:ArrayOfString\" />";
+              "name=\"lastmsg\" type=\"${ns}:ArrayOfStringItems\" />";
    $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
               "name=\"records\" type=\"${ns}:FieldList\" />";
    $$XMLtypes.="</xsd:sequence>";
@@ -430,7 +436,7 @@ sub WSDLstoreRecord
    $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
               "name=\"IdentifiedBy\" type=\"xsd:integer\" />";
    $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
-              "name=\"lastmsg\" type=\"${ns}:ArrayOfString\" />";
+              "name=\"lastmsg\" type=\"${ns}:ArrayOfStringItems\" />";
    $$XMLtypes.="</xsd:sequence>";
    $$XMLtypes.="</xsd:complexType>";
 
@@ -518,7 +524,7 @@ sub WSDLdeleteRecord
    $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
               "name=\"IdentifiedBy\" type=\"xsd:integer\" />";
    $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
-              "name=\"lastmsg\" type=\"${ns}:ArrayOfString\" />";
+              "name=\"lastmsg\" type=\"${ns}:ArrayOfStringItems\" />";
    $$XMLtypes.="</xsd:sequence>";
    $$XMLtypes.="</xsd:complexType>";
 
@@ -653,7 +659,7 @@ sub WSDLfindRecord
    $$XMLtypes.="<xsd:element minOccurs=\"1\" maxOccurs=\"1\" ".
               "name=\"exitcode\" type=\"xsd:int\" />";
    $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
-              "name=\"lastmsg\" type=\"${ns}:ArrayOfString\" />";
+              "name=\"lastmsg\" type=\"${ns}:ArrayOfStringItems\" />";
    $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
               "name=\"records\" type=\"${ns}:RecordList\" />";
    $$XMLtypes.="</xsd:sequence>";

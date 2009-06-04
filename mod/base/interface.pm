@@ -824,7 +824,7 @@ sub Finish
          my @l;
          map({my $u=SOAP::Data->type('xsi:string')->value($_);push(@l,$u);} 
              @{$result->{lastmsg}});
-         $result->{lastmsg}=SOAP::Data->value(\@l);
+         $result->{lastmsg}=SOAP::Data->type("curns:ArrayOfStringItems")->value(\@l);
       }
       else{
          $result->{lastmsg}=SOAP::Data->type('xsi:string')
