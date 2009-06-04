@@ -42,7 +42,10 @@ sub new
                           getOnlyFirst)){
       *$method = sub {
             my $s = shift;
-            return ($s->getDataObj()->$method(@_));
+            $s->Init();
+            my $dataobj=$s->getDataObj();
+            return(undef) if (!defined($dataobj));
+            return ($dataobj->$method(@_));
         }
    } 
    return($self);

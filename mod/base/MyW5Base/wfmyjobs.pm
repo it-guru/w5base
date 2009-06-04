@@ -33,6 +33,7 @@ sub new
 sub Init
 {
    my $self=shift;
+   return(1) if (defined($self->{DataObj}));
    $self->SUPER::Init();
    $self->{DataObj}=getModuleObject($self->getParent->Config,"base::workflow");
    return(0) if (!defined($self->{DataObj}));
@@ -197,9 +198,11 @@ sub SetFilter
    my $flt=shift;
 
    my $dataobj=$self->getDataObj();
-   $dataobj->ResetFilter();
+   $dataobj->ResetFilter() if (defined($dataobj));
 
-   $flt->{userid}=$self->getParent->getCurrentUserId();
+   if (!exists($flt->{userid})){
+      $flt->{userid}=$self->getParent->getCurrentUserId();
+   }
 
    my $dc=$flt->{exviewcontrol};
    delete($flt->{exviewcontrol});
@@ -344,7 +347,7 @@ sub SetFilter
       push(@q,{id=>[keys(%id)]});
    }
    $dataobj->ResetFilter();
-   $dataobj->SecureSetFilter(\@q);
+   $dataobj->SecureSetFilter(@q);
 }
 
 
