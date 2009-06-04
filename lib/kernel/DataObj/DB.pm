@@ -310,6 +310,9 @@ sub processFilterHash
          }
          $sqlparam{sqldbh}=$self->{DB};
          my $sqlfieldname=$fo->getSelectField("where.$wheremode",$self->{DB});
+         if ($wheremode eq "update" || $wheremode eq "delete"){
+            $sqlfieldname=~s/^.*\.//; # test to make update/delete shorter
+         }
          next if (!defined($sqlfieldname));
          my $bk=$self->Data2SQLwhere($where,$sqlfieldname,$preparedFilter,
                                      %sqlparam);
@@ -478,13 +481,15 @@ sub QuoteHashData
    #      return(undef);
       }
       if (defined($fobj->{dataobjattr})){
-         if (!defined($newdata->{$field})){
-            $raw{$fobj->{dataobjattr}}="NULL";
+         my $rawname=$fobj->{dataobjattr};
+         $rawname=~s/^.*\.//;               # this is a test to make update
+         if (!defined($newdata->{$field})){ # and insert statements shorter
+            $raw{$rawname}="NULL";
          }elsif (ref($newdata->{$field}) eq "SCALAR"){
-            $raw{$fobj->{dataobjattr}}=${$newdata->{$field}};
+            $raw{$rawname}=${$newdata->{$field}};
          }
          else{
-            $raw{$fobj->{dataobjattr}}=$workdb->quotemeta($newdata->{$field});
+            $raw{$rawname}=$workdb->quotemeta($newdata->{$field});
          }
       }
       else{
