@@ -1753,17 +1753,10 @@ sub externalMailHandler
          print <<EOF;
 <script language="JavaScript">
 function doRefresh()
-{
-   if (parent.opener){
-      parent.opener.document.forms[0].submit();
-   }
-}
+{ if (parent.opener){ parent.opener.document.forms[0].submit(); } }
 function doClose()
-{
-   parent.close();
-}
-window.setTimeout("doRefresh();",1000);
-window.setTimeout("doClose();",1100);
+{ parent.close(); }
+window.setTimeout("doRefresh();",1000); window.setTimeout("doClose();",1100);
 </script>
 
 EOF
@@ -1780,6 +1773,7 @@ EOF
          my ($rec,$msg)=$self->getOnlyFirst(qw(name));
          $s=$rec->{name};
       }
+      $addref="checked";
    }
 
    print $self->HttpHeader("text/html");
