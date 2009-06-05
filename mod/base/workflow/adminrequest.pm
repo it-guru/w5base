@@ -207,6 +207,7 @@ sub generateWorkspacePages
    my $tr="base::workflow::adminrequest";
    my $class="display:none;visibility:hidden";
 
+   my $bk=$self->SUPER::generateWorkspacePages($WfRec,$actions,$divset,$selopt);
    if ($self->getParent->{ITIL_installed}){
       if (grep(/^wftrans2devreq$/,@$actions)){
          $$selopt.="<option value=\"wftrans2devreq\">".
@@ -232,7 +233,7 @@ sub generateWorkspacePages
       }
    }
 
-   return($self->SUPER::generateWorkspacePages($WfRec,$actions,$divset,$selopt));
+   return($bk);
 }
 
 sub Process
