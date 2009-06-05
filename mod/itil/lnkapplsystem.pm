@@ -370,6 +370,8 @@ sub new
                 name          =>'applcriticality',
                 group         =>'applinfo',
                 label         =>'Criticality',
+                value         =>['CRnone','CRlow','CRmedium','CRhigh',
+                                 'CRcritical'],
                 readonly      =>1,
                 translation   =>'itil::appl',
                 dataobjattr   =>'appl.criticality'),
