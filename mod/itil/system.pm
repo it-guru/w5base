@@ -445,24 +445,21 @@ sub new
                 name          =>'hwcpucount',
                 readonly      =>1,
                 group         =>'physys',
-                label         =>'CPU-Count',
-                translation   =>'itil::asset',
+                label         =>'phys. CPU-Count',
                 dataobjattr   =>'asset.cpucount'),
 
       new kernel::Field::Number(
                 name          =>'hwcorecount',
                 readonly      =>1,
                 group         =>'physys',
-                label         =>'Core-Count',
-                translation   =>'itil::asset',
+                label         =>'phys. Core-Count',
                 dataobjattr   =>'asset.corecount'),
 
       new kernel::Field::Number(
                 name          =>'hwmemory',
                 readonly      =>1,
                 group         =>'physys',
-                label         =>'Memory',
-                translation   =>'itil::asset',
+                label         =>'phys. Memory',
                 unit          =>'MB',
                 dataobjattr   =>'asset.memory'),
 
