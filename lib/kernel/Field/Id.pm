@@ -32,6 +32,7 @@ sub new
    $self{readonly}=1                    if (!defined($self{readonly}));
    $self{htmlwidth}="1%"                if (!exists($self{htmlwidth}));
    $self{xlswidth}="16"                 if (!exists($self{xlswidth}));
+   $self{searchable}=0                  if (!exists($self{searchable}));
    $self{align}="right"                 if (!defined($self{align}));
    $self{WSDLfieldType}="xsd:integer"   if (!defined($self{WSDLfieldType}));
    my $self=bless($type->SUPER::new(%self),$type);

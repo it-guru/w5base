@@ -371,11 +371,24 @@ EOF
       my $c=0;
       my $mainlines=$self->{MainSearchFieldLines};
       $mainlines=2 if (!defined($mainlines));
-      for(my $nr=0;$nr<=$#field;$nr++){
-         my $fieldname=$field[$nr];
-         my $fo=$self->getField($fieldname);
+      my @searchfields=@field;
+
+      while(my $fieldname=shift(@searchfields)){
+         my $fo=$self->getField($fieldname); 
+         my $type=$fo->Type();
          next if (!$fo->UiVisible("SearchMask"));
-         next if (!$fo->searchable());
+         if (!$fo->searchable()){
+            if ($type eq "Id"){
+               if ($#searchfields!=-1){
+                  push(@searchfields,$fieldname);
+                  next;
+               }
+            }
+            else{
+               next;
+            }
+         }
+         next if (!($fo->searchable()) && $type ne "Id");
          $defaultsearch=$fieldname if ($fo->defsearch);
          my $work=\$searchframe;
          $work=\$extframe if ($c>=$mainlines*2);
