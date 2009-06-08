@@ -363,7 +363,10 @@ sub NotifyAdmin
       exit(1);
    }
 
-   my $user=$self->Config->Param("W5SERVERUSER");
+   my $user=$self->Config->Param("W5SERVERSERVICE");
+   if ($user eq ""){
+      $user=$self->Config->Param("W5SERVERUSER");
+   }
    $user="root" if ($user eq "");
    my ($fh,$filename)=tempfile();
    if (defined($fh)){ 

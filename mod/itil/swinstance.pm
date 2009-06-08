@@ -101,7 +101,7 @@ sub new
                                  'SunONE',
                                  'Tomcat',
                                  'Visibroker',
-                                 'WebSphere',
+                                 'WebSphere Appl Server',
                                  'Other'],
                 dataobjattr   =>'swinstance.swnature'),
 
