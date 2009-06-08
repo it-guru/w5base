@@ -22,6 +22,7 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use Digest::MD5 qw(md5_base64);
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -530,6 +531,12 @@ sub new
                 group         =>'state',
                 label         =>'Creator ID',
                 dataobjattr   =>'wfhead.openuser'),
+
+      new kernel::Field::Link(
+                name          =>'md5sechash',
+                group         =>'state',
+                label         =>'MD5 security hash',
+                dataobjattr   =>'wfhead.md5sechash'),
 
       new kernel::Field::Owner(
                 name          =>'owner',
@@ -1131,6 +1138,9 @@ sub Validate
        length($newrec->{name})>125){
       $newrec->{name}=substr($newrec->{name},0,125)."...";
       $origrec->{name}=$newrec->{name};
+   }
+   if (!defined($oldrec) || $oldrec->{md5sechash} eq ""){ #generate a sec hash
+      $newrec->{md5sechash}=md5_base64($newrec->{name}.rand().time().rand());
    }
 
    #
