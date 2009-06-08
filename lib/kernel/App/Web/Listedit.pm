@@ -373,6 +373,7 @@ EOF
       $mainlines=2 if (!defined($mainlines));
       my @searchfields=@field;
 
+      my $idshifted=0;
       while(my $fieldname=shift(@searchfields)){
          my $fo=$self->getField($fieldname); 
          my $type=$fo->Type();
@@ -380,7 +381,8 @@ EOF
          if (!$fo->searchable()){
             if ($type eq "Id"){
                if ($#searchfields!=-1){
-                  push(@searchfields,$fieldname);
+                  push(@searchfields,$fieldname) if (!$idshifted);
+                  $idshifted++;
                   next;
                }
             }
@@ -388,7 +390,7 @@ EOF
                next;
             }
          }
-         next if (!($fo->searchable()) && $type ne "Id");
+      #   next if (!($fo->searchable()) && $type ne "Id");
          $defaultsearch=$fieldname if ($fo->defsearch);
          my $work=\$searchframe;
          $work=\$extframe if ($c>=$mainlines*2);
