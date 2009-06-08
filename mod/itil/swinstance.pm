@@ -89,6 +89,7 @@ sub new
                                  'IIS',
                                  'Informix',
                                  'JacORB',
+                                 'JBoss',
                                  'MuleSource',
                                  'MQSeries',
                                  'MSSQL',
@@ -99,7 +100,9 @@ sub new
                                  'SAP/R3',
                                  'SunONE',
                                  'Tomcat',
-                                 'Visibroker'],
+                                 'Visibroker',
+                                 'WebSphere',
+                                 'Other'],
                 dataobjattr   =>'swinstance.swnature'),
 
       new kernel::Field::TextDrop(
