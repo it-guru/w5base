@@ -761,7 +761,7 @@ sub getHashList
 
    return(interface::SOAP::kernel::Finish(SOAP::Data->name(output=>{exitcode=>0,
           lastmsg=>[],
-          records=>SOAP::Data->type('curns::RecordList')->value(\@l)})));
+          records=>SOAP::Data->type('curns:RecordList')->value(\@l)})));
 }
 
 sub validateObjectname

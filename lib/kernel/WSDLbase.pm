@@ -668,7 +668,7 @@ sub WSDLfindRecord
    $$XMLtypes.="<xsd:complexType name=\"RecordList\">";
    $$XMLtypes.="<xsd:sequence>";
    $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"unbounded\" ".
-               "name=\"item\" type=\"${ns}:Record\" />";
+               "name=\"record\" type=\"${ns}:Record\" />";
    $$XMLtypes.="</xsd:sequence>";
    $$XMLtypes.="</xsd:complexType>";
 
