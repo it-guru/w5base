@@ -20,7 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::App::Web;
-#use SOAP::Lite +trace => 'all', +debug=>'all';
+#use SOAP::Lite +trace => 'all';
 use SOAP::Lite;
 use SOAP::Transport::HTTP;
 use File::Temp(qw(tempfile));
@@ -383,6 +383,7 @@ sub SOAP
     -> dispatch_with($self->{NS})
     -> dispatch_to('interface::SOAP');
    $self->{SOAP} -> handle;
+   $self->Log(INFO,"soap","done");
 }
 
 sub _SOAPaction2param
@@ -419,6 +420,7 @@ sub _SOAPaction2param
    if ($act ne ""){
       my $ns=$act;
       $ns=~s/#.*$//;
+      $ns=~s/^"//;
       my $ser=$self->{SOAP}->serializer();
       $ser->register_ns( $ns, 'curns' );
    }
@@ -683,6 +685,9 @@ sub getHashList
    my $filter=$param->{filter};
    $filter={} if ($filter eq "");
 
+   $self->Log(INFO,"soap",
+              "findRecord: [$objectname] ($view)\n%s",Dumper($filter));
+
    $view=[split(/\s*[,;]\s*/,$view)] if (ref($view) ne "ARRAY");
    $ENV{HTTP_FORCE_LANGUAGE}=$param->{lang} if (defined($param->{lang}));
    if (!($objectname=~m/^.+::.+$/)){
@@ -746,13 +751,17 @@ sub getHashList
          }
          $cprec{$k}=SOAP::Data->type($wsdl)->value($v);
       }
-      $l[$c]=SOAP::Data->name('record')->type('Record')->value(\%cprec);
+      $l[$c]=SOAP::Data->name('record')->type('curns:Record')->value(\%cprec);
       if ($ns eq ""){
          $l[$c]=$l[$c]->attr({'xmlns:'.$objns=>'http://w5base.net/kernel'});
       }
    }
+   my $reccount=$#l+1;
+   $self->Log(INFO,"soap","findRecord: return $reccount records - exitcode:0");
+
    return(interface::SOAP::kernel::Finish(SOAP::Data->name(output=>{exitcode=>0,
-          lastmsg=>[],records=>\@l})));
+          lastmsg=>[],
+          records=>SOAP::Data->type('curns::RecordList')->value(\@l)})));
 }
 
 sub validateObjectname
@@ -824,7 +833,8 @@ sub Finish
          my @l;
          map({my $u=SOAP::Data->type('xsi:string')->value($_);push(@l,$u);} 
              @{$result->{lastmsg}});
-         $result->{lastmsg}=SOAP::Data->type("curns:ArrayOfStringItems")->value(\@l);
+         $result->{lastmsg}=SOAP::Data->type("curns:ArrayOfStringItems")
+                                      ->value(\@l);
       }
       else{
          $result->{lastmsg}=SOAP::Data->type('xsi:string')
