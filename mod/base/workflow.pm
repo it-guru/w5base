@@ -49,6 +49,7 @@ sub new
                 name          =>'id',
                 label         =>'WorkflowID',
                 htmldetail    =>0,
+                searchable    =>1,
                 sqlorder      =>'desc',
                 size          =>'10',
                 readonly      =>1,
