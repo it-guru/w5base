@@ -32,6 +32,7 @@ sub new
    $self=bless($self,$type);
    $self->{isInitalized}=0;
    $self->{use_distinct}=1 if (!exists($self->{use_distinct}));
+   $self->{dontSendRemoteEvent}=1 if (!exists($self->{dontSendRemoteEvent}));
    
    return($self);
 }
@@ -444,6 +445,13 @@ sub TransactionEnd                    # hook to handle commits in
    my $docommit=shift;
    msg(INFO,"=====> DBTransactionEnd docommit=$docommit");
    return(1);
+}
+
+sub doInitialize
+{
+   my $self=shift;
+   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+   return($self->{isInitalized});
 }
 
 sub getHashIndexed
@@ -1052,10 +1060,7 @@ sub ValidatedInsertRecord
          if ($self->Validate(undef,$newrec)){
             $self->finishWriteRequestHash(undef,$newrec);
             my $bak=$self->InsertRecord($newrec);
-            $self->LoadSubObjs("ObjectEventHandler","ObjectEventHandler");
-            foreach my $eh (values(%{$self->{ObjectEventHandler}})){
-               $eh->HandleEvent("InsertRecord",$self->Self,undef,$newrec);
-            }
+            $self->SendRemoteEvent("InsertRecord",undef,$newrec) if ($bak);
             $self->FinishWrite(undef,$newrec) if ($bak);
             return($bak);
          }
@@ -1128,10 +1133,7 @@ sub ValidatedUpdateRecord
             $self->finishWriteRequestHash($oldrec,$validatednewrec);
             my $bak=$self->UpdateRecord($validatednewrec,@filter);
             if ($bak){
-               $self->LoadSubObjs("ObjectEventHandler","ObjectEventHandler");
-               foreach my $eh (values(%{$self->{ObjectEventHandler}})){
-                  $eh->HandleEvent("UpdateRecord",$self->Self,$oldrec,$newrec);
-               }
+               $self->SendRemoteEvent("UpdateRecord",$oldrec,$newrec);
                $self->FinishWrite($oldrec,$validatednewrec,\%comprec);
                $self->StoreUpdateDelta($oldrec,\%comprec) if ($bak);
                foreach my $v (keys(%$newrec)){
@@ -1258,15 +1260,48 @@ sub ValidatedDeleteRecord
    my $bak=undef;
    if ($self->ValidateDelete($oldrec)){
       $bak=$self->DeleteRecord($oldrec);
-      $self->LoadSubObjs("ObjectEventHandler","ObjectEventHandler");
-      foreach my $eh (values(%{$self->{ObjectEventHandler}})){
-         $eh->HandleEvent("DeleteRecord",$self->Self,$oldrec,undef);
-      }
+      $self->SendRemoteEvent("DeleteRecord",$oldrec,undef) if ($bak);
       $self->FinishDelete($oldrec) if ($bak); 
    }
 
    return($bak);
 }
+
+sub SendRemoteEvent
+{
+   my $self=shift;
+   my $mode=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   $self->LoadSubObjs("ObjectEventHandler","ObjectEventHandler");
+   foreach my $eh (values(%{$self->{ObjectEventHandler}})){
+      $eh->HandleEvent($mode,$self->Self,$oldrec,$newrec);
+   }
+   if (!$self->{dontSendRemoteEvent}){
+      my $idobj=$self->IdField();
+      my ($id,$sub);
+      if (defined($idobj)){
+         $id=$oldrec->{$idobj->Name};
+      }
+      if ($self->Self() eq "base::workflow"){
+         $sub=effVal($oldrec,$newrec,"class");
+      }
+      my $source=$self->Self;
+      my $altsource=effVal($oldrec,$newrec,"alteventsource");
+      if ($altsource ne ""){
+         $source=$altsource;
+      }
+      $self->W5ServerCall("rpcSendRemoteEvent",$self->Self,$mode,$id,$sub);
+   }
+}
+
+
+
+
+
+
+
 sub DeleteRecord
 {
    my $self=shift;
