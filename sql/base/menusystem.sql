@@ -13,7 +13,7 @@ CREATE TABLE menu (
   editor varchar(100) NOT NULL default '',
   realeditor varchar(100) NOT NULL default '',
   PRIMARY KEY  (menuid),
-  UNIQUE KEY name (fullname)
+  UNIQUE KEY name (config,fullname)
 );
 CREATE TABLE menuacl (
   aclid bigint(20) NOT NULL,
