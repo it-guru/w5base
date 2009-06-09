@@ -250,6 +250,36 @@ sub rpcCacheQuery
    return($self->QueryCache($name,$subkey));
 }
 
+sub rpcSendRemoteEvent
+{
+   my $self=shift;
+   my $modulename=shift;
+   my $operation=shift;
+   my $identifiedBy=shift;
+   my $submodule=shift;
+   my $id=$self->rpcGetUniqueId->{id};
+
+   my $msg="rpcSendRemoteEvent: name=$modulename $submodule($operation) ".
+           "$identifiedBy";
+   msg(DEBUG,$msg);
+   my $spooltag="rpcSendRemoteEvent.".$id."(".$modulename.")";
+   my $name="testEvent";
+   my $interval=60;
+   my $retrycount=5;
+   my $firstcalldelay=2;
+   my $control={spooltag       =>$spooltag,
+                eventname      =>$name,
+                eventparam     =>["x","y"],
+                retryinterval  =>$interval,
+                maxretry       =>$retrycount,
+                failcount      =>0,
+                unixcalltime   =>time(),
+                lasttrytime    =>undef,
+                firstcalldelay =>$firstcalldelay};
+   $self->{EventSpool}->{$spooltag}=$control;
+   return({exitcode=>0});
+}
+
 sub QueryCache
 {
    my $self=shift;
