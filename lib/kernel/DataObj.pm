@@ -1060,7 +1060,7 @@ sub ValidatedInsertRecord
          if ($self->Validate(undef,$newrec)){
             $self->finishWriteRequestHash(undef,$newrec);
             my $bak=$self->InsertRecord($newrec);
-            $self->SendRemoteEvent("InsertRecord",undef,$newrec) if ($bak);
+            $self->SendRemoteEvent("InsertRecord",undef,$newrec,$bak) if ($bak);
             $self->FinishWrite(undef,$newrec) if ($bak);
             return($bak);
          }
@@ -1273,6 +1273,7 @@ sub SendRemoteEvent
    my $mode=shift;
    my $oldrec=shift;
    my $newrec=shift;
+   my $insertid=shift;
 
    $self->LoadSubObjs("ObjectEventHandler","ObjectEventHandler");
    foreach my $eh (values(%{$self->{ObjectEventHandler}})){
@@ -1280,9 +1281,15 @@ sub SendRemoteEvent
    }
    if (!$self->{dontSendRemoteEvent}){
       my $idobj=$self->IdField();
+      my $userid=$self->getCurrentUserId();
       my ($id,$sub);
       if (defined($idobj)){
-         $id=$oldrec->{$idobj->Name};
+         if (defined($oldrec)){
+            $id=$oldrec->{$idobj->Name};
+         }
+         else{
+            $id=$insertid;
+         }
       }
       if ($self->Self() eq "base::workflow"){
          $sub=effVal($oldrec,$newrec,"class");
@@ -1292,7 +1299,9 @@ sub SendRemoteEvent
       if ($altsource ne ""){
          $source=$altsource;
       }
-      $self->W5ServerCall("rpcSendRemoteEvent",$self->Self,$mode,$id,$sub);
+      $userid=0 if (!defined($userid));
+      $self->W5ServerCall("rpcSendRemoteEvent",
+                          $userid,$self->Self,$mode,$id,$sub);
    }
 }
 

@@ -58,6 +58,7 @@
 'sysadm.eventhandling'=>{de=>'Ereignisbehandlung',en=>'Event Handling'},
 'sysadm.eventhandling.joblog'=>{de=>'Ereignis Log',en=>'Event Log'},
 'sysadm.eventhandling.router'=>{de=>'Ereignis Router',en=>'Event Router'},
+'sysadm.eventhandling.router.net'=>{de=>'Neueingabe',en=>'New'},
 'sysadm.mailreqspool'=>{de=>'EMail OPRequests',en=>'EMail OPRequests'},
 'sysadm.useraccount'=>{de=>'Accountverwaltung',en=>'Account-Administration'},
 'sysadm.useraccount.new'=>{de=>'Neueingabe',en=>'New'},

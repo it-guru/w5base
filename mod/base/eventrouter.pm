@@ -41,16 +41,76 @@ sub new
                 sqlorder      =>'desc',
                 label         =>'W5BaseID',
                 dataobjattr   =>'eventrouter.id'),
+
+      new kernel::Field::Select(
+                name          =>'cistatus',
+                htmleditwidth =>'40%',
+                label         =>'CI-State',
+                vjoineditbase =>{id=>">0"},
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['cistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'cistatusid',
+                label         =>'CI-StateID',
+                dataobjattr   =>'eventrouter.cistatus'),
                                                   
       new kernel::Field::Text(
-                name          =>'name',
-                label         =>'Site',
-                dataobjattr   =>'eventrouter.name'),
+                name          =>'srcmoduleobject',
+                label         =>'Source Object',
+                dataobjattr   =>'eventrouter.srcmoduleobject'),
 
       new kernel::Field::Text(
-                name          =>'apikey',
-                label         =>'GooglMapsAPI Key',
-                dataobjattr   =>'eventrouter.googlekey'),
+                name          =>'srcsubclass',
+                label         =>'Source Subclass',
+                dataobjattr   =>'eventrouter.srcsubclass'),
+
+      new kernel::Field::Select(
+                name          =>'srceventtype',
+                label         =>'Source Operation',
+                value         =>['InsertRecord','UpdateRecord',
+                                 'DeleteRecord','Any'],
+                htmleditwidth =>'140px',
+                dataobjattr   =>'eventrouter.srceventtype'),
+
+      new kernel::Field::Text(
+                name          =>'dstevent',
+                label         =>'Destination Event',
+                dataobjattr   =>'eventrouter.dstevent'),
+
+      new kernel::Field::Number(
+                name          =>'controldelay',
+                precision     =>0,
+                unit          =>'sec',
+                label         =>'Initial Delay',
+                dataobjattr   =>'eventrouter.controldelay'),
+
+      new kernel::Field::Number(
+                name          =>'controlretryinterval',
+                precision     =>0,
+                unit          =>'sec',
+                label         =>'Retry interval',
+                dataobjattr   =>'eventrouter.controlretryinterval'),
+
+      new kernel::Field::Text(
+                name          =>'fullname',
+                label         =>'event route',
+                readonly      =>1,
+                htmldetail    =>0,
+                searchable    =>0,
+                dataobjattr   =>'concat(eventrouter.srcmoduleobject,'.
+                                'if (eventrouter.srcsubclass<>"",'.
+                                    'concat("(",eventrouter.srcsubclass,")")'.
+                                ',""),".",eventrouter.srceventtype," - ",'.
+                                'eventrouter.dstevent)'),
+
+      new kernel::Field::Number(
+                name          =>'controlmaxretry',
+                precision     =>0,
+                unit          =>'n',
+                label         =>'Retry count',
+                dataobjattr   =>'eventrouter.controlmaxretry'),
 
       new kernel::Field::CDate(
                 name          =>'cdate',
@@ -91,7 +151,7 @@ sub new
                 dataobjattr   =>'eventrouter.realeditor'),
 
    );
-   $self->setDefaultView(qw(linenumber name groupname cistatus cdate mdate));
+   $self->setDefaultView(qw(linenumber fullname cistatus cdate mdate));
    $self->setWorktable("eventrouter");
    return($self);
 }
@@ -102,12 +162,25 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
-   my $name=trim(effVal($oldrec,$newrec,"name"));
-   if ($name=~m/\s/i){
-      $self->LastMsg(ERROR,"invalid sitename '%s' specified",$name); 
+   my $name=effVal($oldrec,$newrec,"srcmoduleobject");
+   if ($name=~m/\s/i || $name =~m/^\s*$/){
+      $self->LastMsg(ERROR,"invalid srcmoduleobject"); 
       return(undef);
    }
-   $newrec->{'name'}=$name;
+
+   my $name=effVal($oldrec,$newrec,"srceventtype");
+   if ($name=~m/\s/i || $name =~m/^\s*$/){
+      $self->LastMsg(ERROR,"invalid srceventtype"); 
+      return(undef);
+   }
+
+   my $name=effVal($oldrec,$newrec,"dstevent");
+   if ($name=~m/\s/i || $name =~m/^\s*$/){
+      $self->LastMsg(ERROR,"invalid dstevent"); 
+      return(undef);
+   }
+
+
    return(1);
 }
 

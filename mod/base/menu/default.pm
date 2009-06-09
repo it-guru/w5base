@@ -324,6 +324,11 @@ sub Init
                       "base::eventrouter",
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("sysadm.eventhandling.router.net",
+                      "base::eventrouter",
+                      func=>'New',
+                      defaultacl=>['admin']);
+   
    $self->RegisterObj("sysadm.mailreqspool",
                       "base::mailreqspool",
                       defaultacl=>['admin']);

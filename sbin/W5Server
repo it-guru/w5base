@@ -250,33 +250,83 @@ sub rpcCacheQuery
    return($self->QueryCache($name,$subkey));
 }
 
+sub loadEventRouterTable
+{
+   my $self=shift;
+   eval('
+my $er=getModuleObject($self->Config,"base::eventrouter");
+$er->SetFilter({cistatusid=>\"4"});
+$self->{EventRouterTable}=[$er->getHashList(qw(srceventtype srcmoduleobject srcsubclass dstevent controldelay controlmaxretry controlretryinterval fullname))];
+');
+   if ($@ ne ""){
+      msg(ERROR,"loadEventRouterTable=$@");
+   }
+}
+
 sub rpcSendRemoteEvent
 {
    my $self=shift;
+   my $userid=shift;
    my $modulename=shift;
    my $operation=shift;
    my $identifiedBy=shift;
    my $submodule=shift;
-   my $id=$self->rpcGetUniqueId->{id};
 
    my $msg="rpcSendRemoteEvent: name=$modulename $submodule($operation) ".
            "$identifiedBy";
    msg(DEBUG,$msg);
-   my $spooltag="rpcSendRemoteEvent.".$id."(".$modulename.")";
-   my $name="testEvent";
-   my $interval=60;
-   my $retrycount=5;
-   my $firstcalldelay=2;
-   my $control={spooltag       =>$spooltag,
-                eventname      =>$name,
-                eventparam     =>["x","y"],
-                retryinterval  =>$interval,
-                maxretry       =>$retrycount,
-                failcount      =>0,
-                unixcalltime   =>time(),
-                lasttrytime    =>undef,
-                firstcalldelay =>$firstcalldelay};
-   $self->{EventSpool}->{$spooltag}=$control;
+   if ($modulename eq "base::eventrouter"){
+      delete($self->{EventRouterTable});
+   }
+   if (!defined($self->{EventRouterTable})){
+      $self->loadEventRouterTable();
+   }
+   if (ref($self->{EventRouterTable}) eq "ARRAY"){
+      msg(DEBUG,"EventRouterTable OK");
+      foreach my $r (@{$self->{EventRouterTable}}){
+      msg(DEBUG,"check $r->{fullname}");
+         if ($r->{srcmoduleobject} eq $modulename ||
+             $r->{srcmoduleobject} eq "Any"){
+            if ($r->{srcsubclass} eq "Any" ||
+                $r->{srcsubclass} eq $submodule){
+               if ($r->{srceventtype} eq "Any" ||
+                   $r->{srceventtype} eq $operation){
+                  if ($r->{dstevent} ne ""){
+                     my $id=$self->rpcGetUniqueId->{id};
+                     my $spooltag="rpcSendRemoteEvent.".$id."(".$modulename.")";
+                     my $interval=60;
+                     my $retrycount=5;
+                     my $firstcalldelay=$r->{controldelay};
+                     $firstcalldelay=2 if ($firstcalldelay<2);
+                     my @eventparam;
+                     push(@eventparam,"eventid",$id);
+                     push(@eventparam,"op",$operation);
+                     push(@eventparam,"module",$modulename);
+                     if ($submodule ne ""){
+                        push(@eventparam,"subclass",$submodule);
+                     }
+                     if ($userid!=0){
+                        push(@eventparam,"userid",$userid);
+                     }
+                     if ($identifiedBy ne ""){
+                        push(@eventparam,"identifiedBy",$identifiedBy);
+                     }
+                     my $control={spooltag       =>$spooltag,
+                                  eventname      =>$r->{dstevent},
+                                  eventparam     =>\@eventparam,
+                                  retryinterval  =>$r->{controlretryinterval},
+                                  maxretry       =>$r->{controlmaxretry},
+                                  failcount      =>0,
+                                  unixcalltime   =>time(),
+                                  lasttrytime    =>undef,
+                                  firstcalldelay =>$firstcalldelay};
+                     $self->{EventSpool}->{$spooltag}=$control;
+                  }
+               }
+            }
+         }
+      }
+   }
    return({exitcode=>0});
 }
 
@@ -308,6 +358,7 @@ sub QueryCache
    return({exitcode=>0,
            state=>$ca->{subkey}->{$name}->{subkey}->{$subkey}->{state}});
 }
+
 
 sub rpcCacheInvalidate
 {
@@ -580,8 +631,9 @@ sub ProcessSpoolEvent
       return();
    }
    $control->{lasttrytime}=time();
-   $control->{run}=$self->rpcCallSerialEvent($control->{eventname},
-                                             $control->{eventparam});
+   my @param=$control->{eventparam};
+   @param=@{$control->{eventparam}} if (ref($control->{eventparam}) eq "ARRAY");
+   $control->{run}=$self->rpcCallSerialEvent($control->{eventname},@param);
 }
 
 sub run_dequeue

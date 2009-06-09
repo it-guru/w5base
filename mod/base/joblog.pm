@@ -107,6 +107,7 @@ sub new
     #                                visual      =>'min',
     #                                depend      =>['cdate','mdate']),
    );
+   $self->{dontSendRemoteEvent}=1;
    $self->setDefaultView(qw(id event method exitstate exitcode 
                             duration cdate mdate));
    $self->setWorktable("joblog");
