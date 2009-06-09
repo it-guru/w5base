@@ -44,7 +44,7 @@ sub TechMenu
    my $self=shift;
    my ($func,$p)=$self->extractFunctionPath();
    my $format=Query->Param("format");
-   my @fl=qw(xml fvwm perl enlightenment);
+   my @fl=qw(xml fvwm perl enlightenment sshmenu);
    $p=~s/\///g; 
 
    $format="xml" if (!grep(/^$format$/,@fl));
@@ -56,6 +56,10 @@ sub TechMenu
       my $ent=$self->getPersistentModuleObject("passx::entry");
       if ($format eq "xml"){
          print $self->HttpHeader("text/xml");
+         print $ent->generateMenuTree($format,$userid,"","");
+      }
+      if ($format eq "sshmenu"){
+         print $self->HttpHeader("text/plain");
          print $ent->generateMenuTree($format,$userid,"","");
       }
       if ($format eq "fvwm"){

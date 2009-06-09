@@ -152,7 +152,9 @@ sub _ProcessTreeLayer
    my $menu=shift;
    my $d="";
    $d.=_TreeLine($control,$layer,0,undef) if ($#{$layer}==0);
-   my @mlist=sort({
+   my @mlist=@{$menu};
+   if (!exists($control->{treesort}) || $control->{treesort}==1){ 
+      @mlist=sort({
                      my $bk;
                      if ($a->{prio}==$b->{prio}){
                         $bk=$a->{menuid}<=>$b->{menuid};
@@ -162,6 +164,7 @@ sub _ProcessTreeLayer
                      }
                      $bk;
                   } @{$menu});
+   }
    for(my $c=0;$c<=$#mlist;$c++){
       my $m=$mlist[$c];
       my $modid=2;
