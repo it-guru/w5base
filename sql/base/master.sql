@@ -180,3 +180,25 @@ create table w5statmaster (
   PRIMARY KEY  (id),UNIQUE KEY `srcsys` (srcsys,srcid),key srcload(srcload),
   UNIQUE statkey(monthkwday,name,statgroup,statname),key name (statgroup,name)
 );
+create table eventrouter (
+  id         bigint(20)  NOT NULL,
+  cistatus   int(2)      NOT NULL,
+  srceventtype         varchar(40) NOT NULL,
+  srcmoduleobject      varchar(40) NOT NULL,
+  srcsubclass          varchar(40) default NULL,
+  dstevent             varchar(40) NOT NULL,
+  controldelay         int(2) default '0',
+  controlmaxretry      int(2) default '0',
+  controlretryinterval int(2) default '0',
+  comments   blob,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifyuser bigint(20) NOT NULL default '0',
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) NOT NULL default '0',
+  srcsys     varchar(10) default 'w5base', 
+  srcid      varchar(20) default NULL,
+  srcload    datetime    default NULL,
+  PRIMARY KEY  (id),UNIQUE KEY `srcsys` (srcsys,srcid),key srcload(srcload)
+);
