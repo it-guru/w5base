@@ -96,6 +96,7 @@ sub new
                                  'MySQL',
                                  'Oracle',
                                  'Oracle Appl Server',
+                                 'PostgeSQL',
                                  'SAP/R2',
                                  'SAP/R3',
                                  'SunONE',
