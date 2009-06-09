@@ -82,6 +82,7 @@ sub new
                                     dataobjattr =>'history.realeditor'),
 
    );
+   $self->{dontSendRemoteEvent}=1;
    $self->setDefaultView(qw(cdate editor name newstate));
    $self->setWorktable("history");
    return($self);
