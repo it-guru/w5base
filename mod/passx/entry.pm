@@ -277,7 +277,7 @@ sub generateMenuTree
 
    $self->ResetFilter();
    if ($flt ne ""){
-      my %groups=$self->getGroupsOf($userid,'RMember','both');
+      my %groups=$self->getGroupsOf($userid,'RMember','direct');
       $self->SecureSetFilter([
                              {modifyuser=>\$userid,
                               name=>"*$flt*"},
@@ -596,14 +596,23 @@ sub generateMenuTree
             my $ml=shift;
             my $intend="";
             for(my $c=0;$c<$level*2;$c++){$intend.=" "}
+            my $lasthost;
             foreach my $mrec (@$ml){
                if (exists($mrec->{entrytype})){
                   if ($mrec->{entrytype}==1 && $level>0){
-                     $$d.=$intend."- title: $mrec->{label}\n";
+                     if (defined($lasthost) && $lasthost ne $mrec->{name}){
+                        $$d.=$intend."- type: separator\n";
+                     }
+                     my $title=$mrec->{label};
+                     if ($mrec->{comments} ne ""){
+                        $title.=" (".$mrec->{comments}.")";
+                     }
+                     $$d.=$intend."- title: $title\n";
                      $$d.=$intend."  profile: Default\n";
                      $$d.=$intend."  sshparams: $mrec->{label}\n";
                      $$d.=$intend."  type: host\n";
                      $$d.=$intend."  geometry: \"\"\n";
+                     $lasthost=$mrec->{name};
                   }
                }
                else{
