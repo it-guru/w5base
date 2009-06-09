@@ -637,6 +637,7 @@ sub generateMenuTree
          $d.="  height: 360\n";
          $d.="  width: 370\n";
          $d.="  menus_open_tabs: 0\n";
+         $d=latin1($d)->utf8();
          #$d.=Dumper(\@ml);
       }
       if ($mode eq "perl"){
