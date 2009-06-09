@@ -555,8 +555,10 @@ sub ValidateMenuCache
    if (!defined($self->Cache->{Menu}->{Cache})){
       printf STDERR ("-------------- Menus loaded --------------\n");
       my $menu=getModuleObject($self->Config,"base::menu");
+      my $configname=$self->Config->getCurrentConfigName();
       $menu->SetCurrentView(qw(prio menuid fullname config target acls
                                parent param func translation subid));
+      $menu->SetFilter({config=>\$configname});
       $self->Cache->{Menu}->{Cache}=$menu->getHashIndexed(qw(menuid fullname));
       $self->Cache->{Menu}->{DataObj}=$menu;
       my $ca=$self->Cache->{Menu}->{Cache};

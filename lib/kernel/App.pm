@@ -581,6 +581,8 @@ sub LoadSubObjs
                     $_=~s/\//::/g;
                     $_;
                    } @sublist);
+      my $p;
+      $p=$self->getParent->Self if (defined($self->getParent()));
       foreach my $modname (@sublist){
          my $o=getModuleObject($self->Config,$modname);
          if (defined($o)){

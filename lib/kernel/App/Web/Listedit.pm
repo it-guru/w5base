@@ -97,9 +97,7 @@ sub addAttach
 sub getValidWebFunctions
 {  
    my ($self)=@_;
-   if (!$self->{IsFrontendInitialized}){
-      $self->{IsFrontendInitialized}=$self->FrontendInitialize();
-   }
+   $self->doFrontendInitialize();
    my @l=qw(NativMain Main MainWithNew addAttach 
             NativResult Result Upload UploadWelcome UploadFrame
             Welcome Empty Detail HtmlDetail HandleInfoAboSubscribe
@@ -138,6 +136,16 @@ sub isUploadValid  # validates if upload functionality is allowed
 
    return(1);
 }
+
+sub doFrontendInitialize
+{
+   my $self=shift;
+   if (!$self->{IsFrontendInitialized}){
+      $self->{IsFrontendInitialized}=$self->FrontendInitialize();
+   }
+   return($self->{IsFrontendInitialized});
+}
+
 
 sub FrontendInitialize
 {
@@ -1922,9 +1930,7 @@ sub Result
 {
    my $self=shift;
    my %param=@_;
-   if (!$self->{IsFrontendInitialized}){
-      $self->{IsFrontendInitialized}=$self->FrontendInitialize();
-   }
+   $self->doFrontendInitialize();
    my $output=new kernel::Output($self);
    if ($self->validateSearchQuery()){
       if (!$param{ExternalFilter}){
