@@ -41,6 +41,7 @@ sub new
                 name          =>'problemnumber',
                 label         =>'Problem No.',
                 uppersearch   =>1,
+                searchable    =>1,
                 htmlwidth     =>'20',
                 align         =>'left',
                 dataobjattr   =>'rootcausem1.id'),

@@ -39,6 +39,7 @@ sub new
       new kernel::Field::Id(
                 name          =>'incidentnumber',
                 sqlorder      =>'desc',
+                searchable    =>1,
                 label         =>'Incident No.',
                 htmlwidth     =>'20',
                 align         =>'left',

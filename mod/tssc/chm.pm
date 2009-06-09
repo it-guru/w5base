@@ -40,6 +40,7 @@ sub new
       new kernel::Field::Id(
                 name          =>'changenumber',
                 sqlorder      =>'desc',
+                searchable    =>1,
                 label         =>'Change No.',
                 htmlwidth     =>'20',
                 align         =>'left',
