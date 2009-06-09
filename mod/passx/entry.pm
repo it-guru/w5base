@@ -501,6 +501,7 @@ sub generateMenuTree
          $d.=kernel::MenuTree::BuildHtmlTree(tree=>\@ml, 
                                              hrefclass=>'menulink',
                                              rootpath=>'./',
+                                             treesort=>0,
                                             );
       }
       if ($mode eq "xml"){
@@ -584,6 +585,50 @@ sub generateMenuTree
       }
       if ($mode eq "enlightenment"){
          $d=Dumper(\@ml);
+      }
+      if ($mode eq "sshmenu"){
+         $d="---\n";
+         $d.="items:\n";
+         sub add2m
+         {
+            my $level=shift;
+            my $d=shift;
+            my $ml=shift;
+            my $intend="";
+            for(my $c=0;$c<$level*2;$c++){$intend.=" "}
+            foreach my $mrec (@$ml){
+               if (exists($mrec->{entrytype})){
+                  if ($mrec->{entrytype}==1 && $level>0){
+                     $$d.=$intend."- title: $mrec->{label}\n";
+                     $$d.=$intend."  profile: Default\n";
+                     $$d.=$intend."  sshparams: $mrec->{label}\n";
+                     $$d.=$intend."  type: host\n";
+                     $$d.=$intend."  geometry: \"\"\n";
+                  }
+               }
+               else{
+                  $$d.=$intend."- items:\n";
+                  if (exists($mrec->{tree})){
+                     add2m($level+1,$d,$mrec->{tree});
+                  }
+                  $$d.=$intend."  title: \"".$mrec->{label}."\"\n";
+                  $$d.=$intend."  type: menu\n";
+               }
+            }
+         }
+         my $level=0;
+         add2m($level,\$d,\@ml);
+         $d.="classes: {}\n";
+         $d.="\n";
+         $d.="global:\n";
+         $d.="  menus_tearoff: 0\n";
+         $d.="  menus_open_all: 0\n";
+         $d.="  back_up_config: 1\n";
+         $d.="  tooltip: Open an SSH session in a new window\n";
+         $d.="  height: 360\n";
+         $d.="  width: 370\n";
+         $d.="  menus_open_tabs: 0\n";
+         #$d.=Dumper(\@ml);
       }
       if ($mode eq "perl"){
          $d=Dumper(\@ml);
