@@ -137,6 +137,7 @@ sub Result
    if ($#l>-1){
       @appl=map({$_->{id}} @l);
    }
+   $self->DataObj->doInitialize();
    my %q1=%q;
    $q1{stateid}='>15';
    $q1{eventend}=Query->Param("Search_TimeRange");

@@ -20,8 +20,8 @@ sub process
 {
    my $self=shift;
    my $forceSyncInterval=7200;
-   #my $forceSyncInterval=5;
-   my $forceSync=0;
+   my $forceSyncInterval=600;
+   my $forceSync=$forceSyncInterval;
    while(1){
       printf STDERR ("W5Server process ($self)\n");
       sleep(1);
@@ -32,9 +32,7 @@ sub process
          if ($forceSync>$forceSyncInterval){
             msg(DEBUG,"running scsync forceSync");
             $forceSync=0;
-            #$self->CheckSyncJob("*");
          }
-   #      while($self->CheckSyncJob()){}
       }
    }
 }
@@ -56,9 +54,7 @@ sub CheckSyncJob
    my ($WfRec,$msg)=$wf->getFirst();
    if (defined($WfRec)){
       do{
-         printf STDERR ("fifi pre Store\n");
          $wfop->nativProcess('extrefresh',{},$WfRec->{id});
-         printf STDERR ("fifi post Store\n");
          ($WfRec,$msg)=$wf->getNext();
       } until(!defined($WfRec));
    }
@@ -70,7 +66,6 @@ sub CheckSyncJob
 sub reload
 {
    my $self=shift;
-printf STDERR ("reload $self\n");
    $self->{doCheckSyncJob}++;
 }
 

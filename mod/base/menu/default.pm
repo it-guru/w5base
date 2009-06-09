@@ -312,8 +312,16 @@ sub Init
                       func=>'Text2Acronym',
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("sysadm.joblog",
+   $self->RegisterObj("sysadm.eventhandling",
                       "base::joblog",
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("sysadm.eventhandling.joblog",
+                      "base::joblog",
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("sysadm.eventhandling.router",
+                      "base::eventrouter",
                       defaultacl=>['admin']);
    
    $self->RegisterObj("sysadm.mailreqspool",
