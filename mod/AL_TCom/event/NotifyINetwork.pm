@@ -20,6 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Event;
+use SOAP::Lite +trace=>'all';
 @ISA=qw(kernel::Event);
 
 sub new
@@ -44,6 +45,33 @@ sub NotifyINetwork
 {
    my $self=shift;
    my %param=@_;
+
+   my $wsuser=$self->Config->Param("WEBSERVICEUSER");
+   my $wspass=$self->Config->Param("WEBSERVICEPASS");
+   my $wsproxy=$self->Config->Param("WEBSERVICEPROXY");
+   $wsuser=$wsuser->{inetwork} if (ref($wsuser) eq "HASH");
+   $wspass=$wspass->{inetwork} if (ref($wspass) eq "HASH");
+   $wsproxy=$wsproxy->{inetwork} if (ref($wsproxy) eq "HASH");
+
+   sub SOAP::Transport::HTTP::Client::get_basic_credentials { 
+       return $wsuser => $wspass;
+   }
+   my $inetwxmlns="http://tempuri.org";
+
+   my $method = SOAP::Data->name('TriggerINetwork')->attr({xmlns=>$inetwxmlns});
+
+   my @params=( SOAP::Data->name('module')->value('a'),
+                SOAP::Data->name('submodule')->value('a'),
+                SOAP::Data->name('operation')->value('a'),
+                SOAP::Data->name('identifyBy')->value('a')  );
+
+   my $res=SOAP::Lite->uri($inetwxmlns)->proxy($wsproxy)
+                     ->on_action(sub{'"'.join('/',$inetwxmlns,$_[1]).'"'})
+                     ->call($method=>@params);
+
+
+printf STDERR ("fifi d=%s\n",Dumper($res));
+
 
    if (open(F,">>/tmp/event.log")){
       printf F ("Event=%s\n",time());
