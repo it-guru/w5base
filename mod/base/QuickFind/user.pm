@@ -79,6 +79,8 @@ sub QuickFindDetail
    my @fl=qw(givenname surname  
              office_mobile office_phone
              privat_mobile privat_phone
+             ssh1publickey
+             ssh2publickey
              );
    my ($rec,$msg)=$dataobj->getOnlyFirst(@fl);
 
@@ -98,6 +100,10 @@ sub QuickFindDetail
             my $name=$dataobj->getField($v)->Label();
             my $data=$dataobj->findtemplvar({current=>$rec,mode=>"HtmlDetail"},
                                          $v,"formated");
+            if ($v=~m/^ssh/){
+               $data=join("<wbr />",split(/(.{0,11})/,$data));
+              # $data="<div style=\"width:400px\">$data</div>";
+            }
             $htmlresult.="<tr><td nowrap valign=top width=1%>$name:</td>".
                          "<td valign=top>$data</td></tr>";
          }
