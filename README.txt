@@ -432,6 +432,14 @@ Running W5Base and operating hints
 - A good debugging command for apache (hard restart) is f.e.:
   > sudo killall -HUP apache2; sudo tail -f /var/log/apache2/error.log
 
+- W5Base makes sometimes very long querys direct over the network. This
+  can produce the error "Lost connection to MySQL server during query"
+  In this case modify the /etc/mysql/my.cnf as follows:
+  [mysqld]
+  set-variable = net_read_timeout=600
+  set-variable = net_write_timeout=600
+
+
 
 
 
