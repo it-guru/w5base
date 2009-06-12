@@ -537,7 +537,7 @@ sub extractAffectedApplication
    my @l2;
    if (defined($rec->{device}) && ref($rec->{device}) eq "ARRAY"){
       foreach my $r (@{$rec->{device}}){
-         if (my ($applid)=$r->{name}=~m/^.*\(((APPL|GER)\d+)\)$/){
+         if (my ($applid)=$r->{name}=~m/^.*\(((APPLGER|APPL|GER)\d+)\)$/){
             push(@chkapplid,$applid);
          }
       }
@@ -610,7 +610,7 @@ sub extractAffectedApplication
    my $novalidappl=0;
    $novalidappl=1 if ($#applid==-1);
    my $dev=$rec->{deviceid};
-   if (my ($applid)=$dev=~m/^.*\(((APPL|GER)\d+)\)$/){
+   if (my ($applid)=$dev=~m/^.*\(((APPLGER|APPL|GER)\d+)\)$/){
       msg(DEBUG,"ApplicationID=%s",$applid);
       push(@chkapplid,$applid);
    }
