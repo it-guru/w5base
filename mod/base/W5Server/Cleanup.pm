@@ -174,7 +174,7 @@ sub CleanupWorkflows
       $wf->SetCurrentView(qw(ALL));
       $wf->SetCurrentOrder(qw(NONE));
 
-      my ($rec,$msg)=$wf->getFirst();
+      my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
       if (defined($rec)){
          do{
             msg(INFO,"process $rec->{id} class=$rec->{class}");
