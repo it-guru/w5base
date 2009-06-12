@@ -445,6 +445,9 @@ sub Normalize
    if (lc($rec->{country}) eq "de"){
       $rec->{zipcode}=~s/^D-//i;
    }
+   if ($rec->{zipcode} eq "0"){
+      $rec->{zipcode}="";
+   }
    $rec->{country}=~s/\.//;
    $rec->{label}=~s/\.//;
    $rec->{address1}=~s/\.//;
