@@ -18,6 +18,7 @@ package AL_TCom::event::mkappcomreport;
 #
 #  AppComII Report auf Anforderung durch den Workflow :
 #  https://darwin.telekom.de/darwin/auth/base/workflow/ById/12434305750002
+#  https://darwin.telekom.de/darwin/auth/base/workflow/ById/12445390340002
 use strict;
 use vars qw(@ISA);
 use kernel;
@@ -52,7 +53,7 @@ sub mkappcomreport
    my $xlsexp={};
 
    $param{timezone}="GMT" if (!defined($param{timezone}));
-   $param{month}="lastmonth" if (!defined($param{month}));
+   $param{month}="currentmonth" if (!defined($param{month}));
 
    my $f;
    my $filename="AppComII-SystemStatus";
@@ -60,15 +61,19 @@ sub mkappcomreport
    if (defined($f)){
       $filename.="-$f";
    }
+   $filename=~s/\//-/g;
    $filename.=".xls";
 
    my %S=();
+   my $glong={businessteam   => 'Betriebsteam',
+              businessdepart => 'Betriebsfachbereich'};
    my $sys=getModuleObject($self->Config,"itil::system");
    my $appl=getModuleObject($self->Config,"itil::appl");
    $sys->SetCurrentOrder("NONE");
    $sys->SetCurrentView(qw(id name applications servicesupport));
    $sys->SetFilter({cistatusid=>\"4"});
    my ($rec,$msg)=$sys->getFirst(unbuffered=>1);
+   #my ($rec,$msg)=$sys->getFirst();
    if (defined($rec)){
       do{
          msg(INFO,"process $rec->{id} ($rec->{name})");
@@ -76,29 +81,32 @@ sub mkappcomreport
             foreach my $a (@{$rec->{applications}}){
                $appl->ResetFilter();
                $appl->SetFilter({id=>\$a->{applid}});
-               my ($arec,$msg)=$appl->getOnlyFirst(qw(businessdepart));
-               my $businessdepart=$arec->{businessdepart};
-               $businessdepart="unknown" if ($businessdepart eq "");
-               my $servicesupport=$rec->{servicesupport};
-
-               if ($servicesupport=~m/^OSY C .*/){
-                  $S{$businessdepart}->{classic}++
-               }
-               elsif($servicesupport=~m/^OSY AC .*/){
-                  $S{$businessdepart}->{appcom}++
-               }
-               elsif($servicesupport=~m/^OSY S .*/){
-                  $S{$businessdepart}->{std}++
-               }
-               else{
-                  $S{$businessdepart}->{other}++
+               my ($arec,$msg)=$appl->getOnlyFirst(keys(%$glong));
+               foreach my $gname (keys(%$glong)){
+                  my $gvalue=$arec->{$gname};
+                  $gvalue="unknown" if ($gvalue eq "");
+                  my $servicesupport=$rec->{servicesupport};
+                 
+                  if ($servicesupport=~m/^OSY C .*/){
+                     $S{$gname}->{$gvalue}->{classic}++
+                  }
+                  elsif($servicesupport=~m/^OSY AC .*/){
+                     $S{$gname}->{$gvalue}->{appcom}++
+                  }
+                  elsif($servicesupport=~m/^OSY S .*/){
+                     $S{$gname}->{$gvalue}->{std}++
+                  }
+                  else{
+                     $S{$gname}->{$gvalue}->{other}++
+                  }
                }
             }
          }
          ($rec,$msg)=$sys->getNext();
       } until(!defined($rec));
    }
-   $self->xlsExport(\%S,$filename);
+   msg(INFO,"pre xlsExport");
+   $self->xlsExport(\%S,$glong,$filename);
    return({exitcode=>0});
 }
 
@@ -106,10 +114,12 @@ sub xlsExport
 {
    my $self=shift;
    my $S=shift;
+   my $glong=shift;
    my $filename=shift;
    my $xlsexp={};
    my $ws;
 
+   msg(INFO,"writing excel to $filename");
    eval("use Spreadsheet::WriteExcel::Big;");
    $xlsexp->{xls}->{state}="bad";
    if ($@ eq ""){
@@ -118,52 +128,63 @@ sub xlsExport
                                             $xlsexp->{xls}->{filename});
       if (defined($xlsexp->{xls}->{workbook})){
          $xlsexp->{xls}->{state}="ok";
-         $xlsexp->{xls}->{worksheet}=$xlsexp->{xls}->{workbook}->
-                                     addworksheet("logical System counter");
-         $xlsexp->{xls}->{format}->{default}=$xlsexp->{xls}->{workbook}->
-                                             addformat(text_wrap=>1,
-                                                       align=>'top');
-         $xlsexp->{xls}->{format}->{header}=$xlsexp->{xls}->{workbook}->
-                                             addformat(text_wrap=>1,
-                                                       align=>'top',
-                                                       bold=>1);
-         $xlsexp->{xls}->{line}=0;
-         $ws=$xlsexp->{xls}->{worksheet};
-         $ws->write($xlsexp->{xls}->{line},0,
-                    "Fachbereich",
-                    $xlsexp->{xls}->{format}->{header});
-         $ws->set_column(0,0,35);
-         $ws->write($xlsexp->{xls}->{line},1,
-                    "Classic Systeme\n(OSY C *)",
-
-                    $xlsexp->{xls}->{format}->{header});
-         $ws->set_column(1,1,22);
-         $ws->write($xlsexp->{xls}->{line},2,
-                    "AppCom Systeme\n(OSY AC *)",
-                    $xlsexp->{xls}->{format}->{header});
-         $ws->set_column(2,2,22);
-         $ws->write($xlsexp->{xls}->{line},3,
-                    "Standardized Systeme\n(OSY S *)",
-                    $xlsexp->{xls}->{format}->{header});
-         $ws->set_column(3,3,22);
-         $ws->write($xlsexp->{xls}->{line},4,
-                    "sonstige Systeme",
-                    $xlsexp->{xls}->{format}->{header});
-         $ws->set_column(4,4,22);
-         $xlsexp->{xls}->{line}++;
+         foreach my $gname (sort(keys(%$glong))){
+            $xlsexp->{xls}->{worksheet}->{$gname}=$xlsexp->{xls}->{workbook}->
+                                        addworksheet("Systems - ".
+                                                     $glong->{$gname});
+            $xlsexp->{xls}->{format}->{default}=$xlsexp->{xls}->{workbook}->
+                                                addformat(text_wrap=>1,
+                                                          align=>'top');
+            $xlsexp->{xls}->{format}->{header}=$xlsexp->{xls}->{workbook}->
+                                                addformat(text_wrap=>1,
+                                                          align=>'top',
+                                                          bold=>1);
+            $xlsexp->{xls}->{line}->{$gname}=0;
+            $ws=$xlsexp->{xls}->{worksheet}->{$gname};
+            $ws->write($xlsexp->{xls}->{line}->{$gname},0,
+                       $glong->{$gname},
+                       $xlsexp->{xls}->{format}->{header});
+            $ws->set_column(0,0,50);
+            $ws->write($xlsexp->{xls}->{line}->{$gname},1,
+                       "Classic Systeme\n(OSY C *)",
+           
+                       $xlsexp->{xls}->{format}->{header});
+            $ws->set_column(1,1,22);
+            $ws->write($xlsexp->{xls}->{line}->{$gname},2,
+                       "AppCom Systeme\n(OSY AC *)",
+                       $xlsexp->{xls}->{format}->{header});
+            $ws->set_column(2,2,22);
+            $ws->write($xlsexp->{xls}->{line}->{$gname},3,
+                       "Standardized Systeme\n(OSY S *)",
+                       $xlsexp->{xls}->{format}->{header});
+            $ws->set_column(3,3,22);
+            $ws->write($xlsexp->{xls}->{line}->{$gname},4,
+                       "sonstige Systeme",
+                       $xlsexp->{xls}->{format}->{header});
+            $ws->set_column(4,4,22);
+            $xlsexp->{xls}->{line}->{$gname}++;
+         }
       }
-      foreach my $depart (sort(keys(%$S))){
-         $ws->write_string($xlsexp->{xls}->{line},0,$depart,
-              $xlsexp->{xls}->{format}->{default});
-         $ws->write_number($xlsexp->{xls}->{line},1,$S->{$depart}->{classic},
-              $xlsexp->{xls}->{format}->{default});
-         $ws->write_number($xlsexp->{xls}->{line},2,$S->{$depart}->{appcom},
-              $xlsexp->{xls}->{format}->{default});
-         $ws->write_number($xlsexp->{xls}->{line},3,$S->{$depart}->{std},
-              $xlsexp->{xls}->{format}->{default});
-         $ws->write_number($xlsexp->{xls}->{line},4,$S->{$depart}->{other},
-              $xlsexp->{xls}->{format}->{default});
-         $xlsexp->{xls}->{line}++;
+      foreach my $gname (sort(keys(%$glong))){
+         $ws=$xlsexp->{xls}->{worksheet}->{$gname};
+         foreach my $depart (sort(keys(%{$S->{$gname}}))){
+            $ws->write_string($xlsexp->{xls}->{line}->{$gname},0,
+                 $depart,
+                 $xlsexp->{xls}->{format}->{default});
+            $ws->write_number($xlsexp->{xls}->{line}->{$gname},1,
+                 $S->{$gname}->{$depart}->{classic},
+                 $xlsexp->{xls}->{format}->{default});
+            $ws->write_number($xlsexp->{xls}->{line}->{$gname},2,
+                 $S->{$gname}->{$depart}->{appcom},
+                 $xlsexp->{xls}->{format}->{default});
+            $ws->write_number($xlsexp->{xls}->{line}->{$gname},3,
+                 $S->{$gname}->{$depart}->{std},
+                 $xlsexp->{xls}->{format}->{default});
+            $ws->write_number($xlsexp->{xls}->{line}->{$gname},4,
+                 $S->{$gname}->{$depart}->{other},
+                 $xlsexp->{xls}->{format}->{default});
+            $xlsexp->{xls}->{line}->{$gname}++;
+         }
       }
       $xlsexp->{xls}->{workbook}->close(); 
       my $file=getModuleObject($self->Config,"base::filemgmt");
