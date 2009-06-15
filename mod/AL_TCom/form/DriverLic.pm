@@ -57,7 +57,16 @@ sub Validate
 {
    my $self=shift;
    my $f=shift;
-printf STDERR ("fifi f=%s\n",Dumper($f));
+   foreach my $v (qw(DriverLic_office_persnum DriverLic_licno 
+                     fullname DriverLic_licorg )){
+      if (length($f->{$v})<3){
+         my $l=$self->getParent->{FrontendField}->{$v};
+         $self->getParent->LastMsg(ERROR,
+                                   "missing necessary '\%s' informations",
+                                   $l->Label());
+         return(0);
+      }
+   }
    return(1);
 }
 
