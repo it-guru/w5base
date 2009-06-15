@@ -145,6 +145,14 @@ sub CheckFilter
                      }
                   }
                }
+               elsif (ref($rec->{$k}) eq "HASH"){
+                  foreach my $subval (values(%{$rec->{$k}})){
+                     if ($v eq $subval){
+                        $subcheck=1;
+                        last FLTCHK;
+                     }
+                  }
+               }
                else{
                   if ($v eq $rec->{$k}){
                      $subcheck=1;
@@ -166,38 +174,48 @@ sub CheckFilter
             }
             else{
                foreach my $chk (@words){
-                  if ($chk=~m/^>/){
-                     $chk=~s/^>//;
-                     if (!($rec->{$k}>$chk)){
-                        $failcount++;
-                        last CHK;
+                  my @dataval=($rec->{$k});
+                  @dataval=@{$rec->{$k}} if (ref($rec->{$k}) eq "ARRAY");
+                  @dataval=values(%{$rec->{$k}}) if (ref($rec->{$k}) eq "HASH");
+                  my $recok;
+                  DATACHK: foreach my $dataval (@dataval){
+                     if ($chk=~m/^>/){
+                        $chk=~s/^>//;
+                        if (!($dataval>$chk)){
+                           $recok=0 if (!defined($recok));
+                        }
                      }
-                  }
-                  elsif ($chk=~m/^</){
-                     $chk=~s/^<//;
-                     if (!($rec->{$k}<$chk)){
-                        $failcount++;
-                        last CHK;
+                     elsif ($chk=~m/^</){
+                        $chk=~s/^<//;
+                        if (!($dataval<$chk)){
+                           $recok=0 if (!defined($recok));
+                        }
                      }
-                  }
-                  elsif ($chk=~m/^!/){
-                     $chk=~s/^!//;
-                     $chk=~s/\?/\./g;
-                     $chk=~s/\*/\.*/g;
-                     if (($rec->{$k}=~m/^$chk$/i)){
-                        $failcount++;
-                        last CHK;
-                     }
-                  }
-                  else{
-                     $chk=~s/\?/\./g;
-                     $chk=~s/\*/\.*/g;
-                     if (!($rec->{$k}=~m/^$chk$/i)){
-                        $failcount++;
+                     elsif ($chk=~m/^!/){
+                        $chk=~s/^!//;
+                        $chk=~s/\?/\./g;
+                        $chk=~s/\*/\.*/g;
+                        if (($dataval=~m/^$chk$/i)){
+                           $recok=0 if (!defined($recok));
+                        }
                      }
                      else{
-                        $okcount++;   # to allow OR search  - AND not supported
+                        $chk=~s/\?/\./g;
+                        $chk=~s/\*/\.*/g;
+                        if (!($dataval=~m/^$chk$/i)){
+                           $recok=0 if (!defined($recok));
+                        }
+                        else{
+                           $recok++;
+                        }
                      }
+                  }
+                  if (defined($recok) && $recok>0){
+                     $okcount++;
+                  }
+                  if (defined($recok) && $recok==0){
+                     $failcount++;
+                     last CHK;
                   }
                }
             }
