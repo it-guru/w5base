@@ -57,6 +57,7 @@ sub Validate
 {
    my $self=shift;
    my $f=shift;
+printf STDERR ("fifi f=%s\n",Dumper($f));
    return(1);
 }
 

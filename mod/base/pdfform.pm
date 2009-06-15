@@ -46,7 +46,6 @@ sub new
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Formular description',
-                searchable    =>0,
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
@@ -185,54 +184,64 @@ sub Form
       my $F=Query->MultiVars();
       foreach my $n (keys(%$F)){
          if (my ($name)=$n=~m/^Formated_(.*)$/){
-            $form->{$name}=$F->{$n};
+            $form->{$name}=trim($F->{$n});
          }
       }
       if ($o->Validate($form)){
          my $url=$current->{url};
          my $pdf=get($url);
-         my $filename=$id.".pdf";
-         $filename=~s/::/./g;
-         print $self->HttpHeader("application/pdf",attachment=>1,
-                                                   filename=>$filename);
-         my ($fsrc, $src) = tempfile();
-         my ($fdst, $dst) = tempfile();
-         print $fsrc ($pdf);
-         close($fsrc);
-         my $left=1;
-         my $pageNumber=0;
-         prFile($dst);
-         {
-            no strict;
-            *{$id."::prAreaText"}=\&{"base::pdfform::prAreaText"};
-            foreach my $f (qw(prFontSize)){
-               *{$id."::$f"}=\&{"PDF::Reuse::$f"};
-            }
-         }
-         while ($left){   
-            $pageNumber++;
-            $o->Fill($form,$pageNumber);
-            $left = prSinglePage($src);
-         }
-         prEnd();
-         my $needstore=0;
-         foreach my $v (keys(%$form)){
-            if (!exists($urec->{$v})){
-               if ($formdata->{$v} ne $form->{$v}){
-                  $formdata->{$v}=$form->{$v};
-                  $needstore++;
+         if ($pdf ne "" && ($pdf=~m/^\%PDF/)){
+            my $filename=$id.".pdf";
+            $filename=~s/::/./g;
+            print $self->HttpHeader("application/pdf",attachment=>1,
+                                                      filename=>$filename);
+            my ($fsrc, $src) = tempfile();
+            my ($fdst, $dst) = tempfile();
+            print $fsrc ($pdf);
+            close($fsrc);
+            my $left=1;
+            my $pageNumber=0;
+            prFile($dst);
+            {
+               no strict;
+               *{$id."::prAreaText"}=\&{"base::pdfform::prAreaText"};
+               foreach my $f (qw(prFontSize)){
+                  *{$id."::$f"}=\&{"PDF::Reuse::$f"};
                }
             }
+            while ($left){   
+               $pageNumber++;
+               $o->Fill($form,$pageNumber);
+               $left = prSinglePage($src);
+            }
+            prEnd();
+            my $needstore=0;
+            foreach my $v (keys(%$form)){
+               if (!exists($urec->{$v})){
+                  if ($formdata->{$v} ne $form->{$v}){
+                     $formdata->{$v}=$form->{$v};
+                     $needstore++;
+                  }
+               }
+            }
+            if ($needstore){
+               $user->ValidatedUpdateRecord($urec,{formdata=>$formdata},
+                                            {userid=>\$urec->{userid}});
+            }
+            if (open(F,"<$dst")){
+               print join("",<F>);
+               close(F);
+            }
+            return();
          }
-         if ($needstore){
-            $user->ValidatedUpdateRecord($urec,{formdata=>$formdata},
-                                         {userid=>\$urec->{userid}});
+         else{
+            $self->LastMsg(ERROR,"can not fetch source pdf");
          }
-         if (open(F,"<$dst")){
-            print join("",<F>);
-            close(F);
+      }
+      else{
+         if ($self->LastMsg()==0){
+            $self->LastMsg(ERROR,"unknown problem");
          }
-         return();
       }
    }
    print $self->HttpHeader();
@@ -269,6 +278,7 @@ sub Form
     
     
       $d.=sprintf("<div id=FormControl>".
+                  '%LASTMSG%'.
                   "<center><input name=DOIT type=submit value=\"%s\"></center>".
                   "</div>",
              $self->T("gernerate formular"));

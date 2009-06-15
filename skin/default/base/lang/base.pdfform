@@ -1,4 +1,6 @@
 'base::pdfform'=>{de=>'online Formular',en=>'online form'},
 'Formular description'=>{de=>'Formular Beschreibung'},
 'Form fill'=>{de=>'Formular Bearbeitung'},
+'Form'=>{de=>'Formular'},
 'gernerate formular'=>{de=>'Formular erzeugen'},
+'can not fetch source pdf'=>{de=>'Quellformular konnte nicht geladen werden'},
