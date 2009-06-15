@@ -507,8 +507,8 @@ sub processRecord
          }
          my $involvedresponseteam=$rec->{involvedresponseteam};
          my $involvedbusinessteam=$rec->{involvedbusinessteam};
-         $involvedresponseteam=[] if (!ref($involvedresponseteam));
-         $involvedbusinessteam=[] if (!ref($involvedbusinessteam));
+       #  $involvedresponseteam=[] if (!ref($involvedresponseteam));
+       #  $involvedbusinessteam=[] if (!ref($involvedbusinessteam));
          my @groups=();
          push(@groups,@$involvedresponseteam);
          push(@groups,@$involvedbusinessteam);
