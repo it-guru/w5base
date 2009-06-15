@@ -226,7 +226,7 @@ sub Form
          }
          if ($needstore){
             $user->ValidatedUpdateRecord($urec,{formdata=>$formdata},
-                                         id=>\$urec->{userid});
+                                         {userid=>\$urec->{userid}});
          }
          if (open(F,"<$dst")){
             print join("",<F>);
