@@ -1,0 +1,4 @@
+'base::pdfform'=>{de=>'online Formular',en=>'online form'},
+'Formular description'=>{de=>'Formular Beschreibung'},
+'Form fill'=>{de=>'Formular Bearbeitung'},
+'gernerate formular'=>{de=>'Formular erzeugen'},

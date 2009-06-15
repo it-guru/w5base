@@ -448,6 +448,10 @@ sub new
                 name          =>'options',
                 dataobjattr   =>'user.options'),
 
+      new kernel::Field::Container(
+                name          =>'formdata',
+                dataobjattr   =>'user.formdata'),
+
       new kernel::Field::File(
                 name          =>'picture',
                 label         =>'picture',

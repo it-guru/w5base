@@ -234,6 +234,10 @@ sub Init
    $self->RegisterObj("Tools.teamtools",
                       "tmpl/welcome",
                       defaultacl=>['valid_user']);
+
+   $self->RegisterObj("Tools.teamtools.forms",
+                      "base::pdfform",
+                      defaultacl=>['valid_user']);
    
    $self->RegisterObj("Tools.projectroom",
                       "base::projectroom",

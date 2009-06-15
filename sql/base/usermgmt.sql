@@ -284,3 +284,4 @@ alter table grp  add is_depart   int(1) default '0';
 alter table grp  add is_resort   int(1) default '0';
 alter table grp  add is_team     int(1) default '0';
 alter table grp  add is_orggroup int(1) default '0';
+alter table user add formdata    longtext    default NULL;

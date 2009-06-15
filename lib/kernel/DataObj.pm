@@ -800,7 +800,7 @@ sub FinishDelete
    my $wf=getModuleObject($self->Config,"base::workflow");
    my $selfname=$self->SelfAsParentObject();
    my $idfield=$self->IdField();
-   if (defined($idfield)){
+   if (defined($idfield) && $self->Self() ne "base::history"){
       my $id=$idfield->RawValue($oldrec);
       if ($id ne ""){
          $wf->SetFilter({stateid=>"<20",class=>\"base::workflow::DataIssue",

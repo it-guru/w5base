@@ -132,6 +132,11 @@ sub Date_to_String
          $d=sprintf("%02d.%02d.%02d",$D,$M,$Y);
       }
    }
+   elsif($lang eq "deday"){
+      my ($nY,$nM,$nD,$nh,$nm,$ns)=Today_and_Now($timezone);
+      $Y-=2000 if ($Y>=2000);
+      $d=sprintf("%02d.%02d.%02d",$D,$M,$Y);
+   }
    elsif(defined($lang) && $lang ne "stamp"){
       $d=sprintf("%04d-%02d-%02d %02d:%02d:%02d",$Y,$M,$D,$h,$m,$s);
    }
