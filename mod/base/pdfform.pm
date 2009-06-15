@@ -171,10 +171,10 @@ sub Form
    my ($urec,$msg)=$user->getOnlyFirst(qw(ALL));
    my $o=getModuleObject($self->Config,$id);
    $o->setParent($self);
+   delete($self->{'FrontendFieldOrder'});
+   delete($self->{'FrontendField'});
    $o->AddFrontendFields();
 
-   my $pref=$id;
-   $pref=~s/^.*:://;
    my $form={};
    my $formdata=$urec->{formdata};
    if (!ref($urec->{formdata})){
@@ -217,7 +217,7 @@ sub Form
          prEnd();
          my $needstore=0;
          foreach my $v (keys(%$form)){
-            if (($v=~m/^${pref}_/)){
+            if (!exists($urec->{$v})){
                if ($formdata->{$v} ne $form->{$v}){
                   $formdata->{$v}=$form->{$v};
                   $needstore++;
