@@ -261,7 +261,10 @@ sub Form
             Query->Param($v=>$f{$v});
          }
       }
-      my $d='Formname: <b>%name%</b><br>';
+      my $d=$self->T("Form").": <b><a title=\"".
+            $self->T("use this link to reference this ".
+            "record (f.e. in mail)")."\" ".
+            "target=_top href=\"ById/$id\">%name%</a></b><br>";
       $d.="<div style=\"margin:5px\" id=Form>".$o->Form()."</div>";
     
     
