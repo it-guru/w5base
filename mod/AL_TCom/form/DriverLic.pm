@@ -36,7 +36,7 @@ sub AddFrontendFields
                 label         =>'Fax'),
       new kernel::Field::Select(
                 name          =>'DriverLic_class',
-                value         =>['B/B1 (3)'],
+                value         =>['B/BE (3)'],
                 label         =>'Kraftfahrzeugklasse'),
       new kernel::Field::Text(
                 name          =>'DriverLic_licno',
