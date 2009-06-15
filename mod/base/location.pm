@@ -434,7 +434,7 @@ sub Normalize
    }
    if (($rec->{location}=~m/^frankfurt.*main.*$/i) ||
        ($rec->{location}=~m/^frankfurt a\.m\.$/i) ||
-       ($rec->{location}=~m/^frankfurt\/m$/i) ||
+       ($rec->{location}=~m/^frankfurt\/m.*$/i) ||
        ($rec->{location}=~m/^frankfurt$/i) ){
       $rec->{location}="Frankfurt am Main";
    }
