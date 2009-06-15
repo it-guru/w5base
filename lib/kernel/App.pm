@@ -979,8 +979,14 @@ sub T
       if ($trtab ne ""){
          if (!defined($W5V2::Translation->{tab}->{$trtab})){
             #msg(INFO,"load translation table for '$trtab'");
-            $W5V2::Translation->{tab}->{$trtab}=
+            if (exists($W5V2::Translation->{self})){
+               $W5V2::Translation->{tab}->{$trtab}=
                          $W5V2::Translation->{self}->LoadTranslation($trtab,0);
+            }
+            else{
+               $W5V2::Translation->{tab}->{$trtab}=
+                         $self->LoadTranslation($trtab,0);
+            }
          }
          if (exists($W5V2::Translation->{tab}->{$trtab}->{$lang}) &&
              exists($W5V2::Translation->{tab}->{$trtab}->{$lang}->{$txt})){
