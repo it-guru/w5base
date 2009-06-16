@@ -282,9 +282,7 @@ sub rpcSendRemoteEvent
       $self->loadEventRouterTable();
    }
    if (ref($self->{EventRouterTable}) eq "ARRAY"){
-      msg(DEBUG,"EventRouterTable OK");
       foreach my $r (@{$self->{EventRouterTable}}){
-      msg(DEBUG,"check $r->{fullname}");
          if ($r->{srcmoduleobject} eq $modulename ||
              $r->{srcmoduleobject} eq "Any"){
             if ($r->{srcsubclass} eq "Any" ||

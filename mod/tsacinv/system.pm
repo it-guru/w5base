@@ -165,6 +165,12 @@ sub new
                 group         =>'form',
                 dataobjattr   =>'amcomputer.computertype'),
 
+      new kernel::Field::Boolean(
+                name          =>'soxrelevant',
+                label         =>'SOX relevant',
+                group         =>'form',
+                dataobjattr   =>"decode(amportfolio.soxrelevant,'YES',1,0)"),
+
       new kernel::Field::Float(
                 name          =>'systemcpucount',
                 label         =>'System CPU count',

@@ -43,7 +43,7 @@ sub new
                 vjoindisp     =>'assignmentgroup'),
       new kernel::Field::TextDrop(
                 name          =>'accontrolcenter',
-                label         =>'AC System ControlCenter',
+                label         =>'AM System ControlCenter',
                 group         =>'admin',
                 weblinkto     =>'tsacinv::group',
                 weblinkon     =>['accontrolcenter'=>'name'],
@@ -55,7 +55,7 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'accontrolcenter2',
-                label         =>'AC Application ControlCenter',
+                label         =>'AM Application ControlCenter',
                 group         =>'admin',
                 weblinkto     =>'tsacinv::group',
                 weblinkon     =>['accontrolcenter2'=>'name'],
