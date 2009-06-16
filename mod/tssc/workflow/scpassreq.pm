@@ -43,7 +43,7 @@ sub getDynamicFields
                 label         =>'Target System where user exists',
                 group         =>'init',
                 container     =>'additional',
-                value         =>['AssetCenter Wirksystem (AC01_Prod_FFM)',
+                value         =>['AssetManager Wirksystem (AC01_Prod_FFM)',
                                  'ServiceCenter Wirksystem (cssa-isc14)',
                                  'W5Base/Darwin (Prod; Service-Kennungen)']),
       new kernel::Field::Text(
@@ -490,7 +490,7 @@ sub openNew
    msg(DEBUG,"sending scpassreq for ".
              "'$WfRec->{targetuser}'\@'$WfRec->{targetsys}'");
    my $action;
-   if ( ($WfRec->{targetsys}=~m/^AssetCenter/i) ||
+   if ( ($WfRec->{targetsys}=~m/^AssetManager/i) ||
         ($WfRec->{targetsys}=~m/^ServiceCenter/i)){
       $action="Ladies and Gentlemen,\n".
               "please reset the password for the account ".
@@ -522,7 +522,7 @@ sub openNew
    my $subcategory2="OTHER";
    my $assignment="CSS.TCOM.ST.DB";
    my $causecode="";
-   if ($WfRec->{targetsys}=~m/^AssetCenter/i){
+   if ($WfRec->{targetsys}=~m/^AssetManager/i){
       $subcategory2="ASSETCENTER";
       $assignment="CSS.IAS.AR.IO.IAC";
       $causecode="AC.PWD.ENG";

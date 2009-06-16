@@ -1,10 +1,3 @@
 'AL_TCom::system'=>{de=>'AL T-Com log. System',
                     en=>'AL T-Com log. System'},
-'acsync.w5base2ac'=>{de=>'W5Base => AssetCenter',
-                     en=>'W5Base => AssetCenter'},
-'acsync.ac2w5base'=>{de=>'AssetCenter => W5Base',
-                     en=>'AssetCenter => W5Base'},
-'acsync.'         =>{de=>'keine Syncronisation',
-                     en=>'no syncronisation'},
-'AssetCenter syncronisation'=>{de=>'AssetCenter Syncronisation'},
 

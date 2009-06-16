@@ -32,7 +32,7 @@ sub new
    $self->AddFields(
       new kernel::Field::TextDrop(
                 name          =>'acassingmentgroup',
-                label         =>'AssetCenter Assignmentgroup',
+                label         =>'AssetManager Assignmentgroup',
                 group         =>'admin',
                 weblinkto     =>'none',
                 readonly      =>1,
@@ -42,7 +42,7 @@ sub new
                 vjoindisp     =>'assignmentgroup'),
       new kernel::Field::TextDrop(
                 name          =>'aciassingmentgroup',
-                label         =>'AssetCenter Incident Assignmentgroup',
+                label         =>'AssetManager Incident Assignmentgroup',
                 group         =>'admin',
                 weblinkto     =>'none',
                 readonly      =>1,

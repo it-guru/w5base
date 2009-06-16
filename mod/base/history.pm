@@ -113,4 +113,11 @@ sub isWriteValid
    return(undef);
 }
 
+sub FinishDelete
+{
+   my $self=shift;
+   my $oldrec=shift;
+   return(1);
+}
+
 1;

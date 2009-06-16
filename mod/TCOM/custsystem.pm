@@ -52,7 +52,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'systemid',
                 readonly      =>1,
-                label         =>'AssetCenter SystemID',
+                label         =>'AssetManager SystemID',
                 dataobjattr   =>'system.systemid'),
 
       new kernel::Field::Select(  

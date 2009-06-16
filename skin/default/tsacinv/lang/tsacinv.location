@@ -1,4 +1,4 @@
-'tsacinv::location'=>{de=>'AssetCenter Standort',en=>'AssetCenter Location'},
+'tsacinv::location'=>{de=>'AssetManager Standort',en=>'AssetManager Location'},
 'Fullname'=>{de=>'Standortname',en=>'Locationname'},
 'fieldgroup.default'=>{de=>'Standortdaten',en=>'Location data'},
 'fieldgroup.location'=>{de=>'Standort', en=>'Location'},

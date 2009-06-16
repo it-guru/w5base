@@ -177,7 +177,7 @@ sub getSqlFrom
 {
    my $self=shift;
    my $from=<<EOF;
-(select decode(externalsystem,'','AssetCenter',externalsystem) as srcsys,  
+(select decode(externalsystem,'','AssetManager',externalsystem) as srcsys,  
         count(*)                                               as cicount,
         sum(decode(lservicecontactid,0,0,1))                   as sem,     
         sum(decode(ltechnicalcontactid,0,0,1))                 as tsm,

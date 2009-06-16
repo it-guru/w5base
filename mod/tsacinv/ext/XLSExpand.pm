@@ -37,7 +37,7 @@ sub GetKeyCriterion
 {
    my $self=shift;
    my $d={in=>{},
-          out=>{'tsacinv::system::systemola'=>{label=>'AssetCenter: System: SystemOLA',
+          out=>{'tsacinv::system::systemola'=>{label=>'AssetManager: System: SystemOLA',
                                                in=>[qw(itil::system::systemid)]},
               }
          };

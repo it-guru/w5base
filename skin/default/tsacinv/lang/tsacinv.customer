@@ -1,2 +1,2 @@
-'tsacinv::customer'=>{de=>'AssetCenter Kunde',en=>'AssetCenter Customer'},
+'tsacinv::customer'=>{de=>'AssetManager Kunde',en=>'AssetManager Customer'},
 'Description'=>{de=>'Langbeschreibung'},

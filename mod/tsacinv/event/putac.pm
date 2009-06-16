@@ -52,7 +52,7 @@ sub Init
 #   $self->RegisterEvent("putac","SWInstallModified");
    $self->RegisterEvent("SWInstallModified","SWInstallModified");
    $self->RegisterEvent("ApplicationModified","ApplicationModified");
-   $self->RegisterEvent("send2ac","sendFileToAssetCenterOnlineInterface");
+   $self->RegisterEvent("send2ac","sendFileToAssetManagerOnlineInterface");
    return(1);
 }
 
@@ -67,7 +67,7 @@ sub Init
 # - Es darf NICHT "automatisierte Updates durch Schnittstellen" zugelassen sein
 # - CI-Status muß "installiert/aktiv" sein
 # - Dem Asset muß min. ein System zugeordnet sein. 
-# - Beim System muß ein Asset eingetragen sein, das in AssetCenter aktiv ist.
+# - Beim System muß ein Asset eingetragen sein, das in AssetManager aktiv ist.
 #
 
 sub getAcGroupByW5BaseGroup
@@ -741,11 +741,11 @@ sub ApplicationModified
    my $back=$self->TransferFile($fh{appl},$filename{appl},$ftp,"appl");
 
 # temp deakiv, da div. Schnittstellenprobleme noch nicht geklärt sind.
-#   $self->sendFileToAssetCenterOnlineInterface($onlinefilename,$elements);
+#   $self->sendFileToAssetManagerOnlineInterface($onlinefilename,$elements);
    return($back);
 }
 
-sub sendFileToAssetCenterOnlineInterface
+sub sendFileToAssetManagerOnlineInterface
 {
    my $self=shift;
    my $filename=shift;

@@ -4,19 +4,19 @@ package tsacinv::qrule::compareAppl;
 
 =head3 PURPOSE
 
-This qulaity rule compares a W5Base application to an AssetCenter application
+This qulaity rule compares a W5Base application to an AssetManager application
 and updates on demand nessasary fields.
 Unattended Imports are only done, if the field "Allow automatic interface
 updates" is set to "yes".
 
 =head3 IMPORTS
 
-From AssetCenter the fields CO-Number, ApplicationID, Application Number,
+From AssetManager the fields CO-Number, ApplicationID, Application Number,
 CurrentVersion and Description are imported. SeM and TSM are imported, if
 it was successfuly to import the relatied contacts.
 #If Mandator is "Extern" and "Allow automatic interface updates" is set to "yes",
 #there will be also the Name of the application, the databoss and the cistatus 
-#imported from AssetCenter.
+#imported from AssetManager.
 
 =cut
 #######################################################################
@@ -77,7 +77,7 @@ sub qcheckRecord
       $par->SetFilter({applid=>\$rec->{applid}});
       my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       if (!defined($parrec)){
-         push(@qmsg,'given applicationid not found as active in AssetCenter');
+         push(@qmsg,'given applicationid not found as active in AssetManager');
          $errorlevel=3 if ($errorlevel<3);
       }
       else{

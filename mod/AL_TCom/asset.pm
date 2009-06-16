@@ -32,7 +32,7 @@ sub new
 #   $self->AddFields(
 #      new kernel::Field::Select(
 #                name          =>'acsync',
-#                label         =>'AssetCenter syncronisation',
+#                label         =>'AssetManager syncronisation',
 #                htmleditwidth =>'50%',
 #                group         =>'control',
 #                default       =>'w5base2ac',

@@ -1,5 +1,5 @@
-'tsacinv::asset'=>{de=>'AssetCenter phys. Anlage/Hardware',
-                    en=>'AssetCenter phys. Asset'},
+'tsacinv::asset'=>{de=>'AssetManager phys. Anlage/Hardware',
+                    en=>'AssetManager phys. Asset'},
 'fieldgroup.default'=>{de=>'Allgemeine Asset Daten',
                        en=>'common asset informations'},
 'fieldgroup.finanz'=>{de=>'Finanz Daten',

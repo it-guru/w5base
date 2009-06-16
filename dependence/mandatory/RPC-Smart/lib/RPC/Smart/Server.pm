@@ -79,8 +79,8 @@ sub run_dequeue
       foreach my $pid (keys(%{$tasks})){
          if (exists($tasks->{$pid}->{end})){
             if ($tasks->{$pid}->{end}<time()-60){
-               printf STDERR ("run_dequeue PID $pid cleanup:%s\n",
-                              Dumper($tasks->{$pid}));
+             #  printf STDERR ("run_dequeue PID $pid cleanup:%s\n",
+             #                 Dumper($tasks->{$pid}));
                delete($tasks->{$pid});
             }
          }

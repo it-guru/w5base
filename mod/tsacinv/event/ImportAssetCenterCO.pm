@@ -1,4 +1,4 @@
-package tsacinv::event::ImportAssetCenterCO;
+package tsacinv::event::ImportAssetManagerCO;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -39,11 +39,11 @@ sub Init
 {
    my $self=shift;
 
-   $self->RegisterEvent("ImportAssetCenterCO","ImportAssetCenterCO");
+   $self->RegisterEvent("ImportAssetManagerCO","ImportAssetManagerCO");
    return(1);
 }
 
-sub ImportAssetCenterCO
+sub ImportAssetManagerCO
 {
    my $self=shift;
 
@@ -70,7 +70,7 @@ sub ImportAssetCenterCO
      my ($w5rec,$msg)=$w5co->getOnlyFirst(qw(ALL));
      my $newrec={cistatusid=>4,
                  fullname=>$rec->{description},
-                 comments=>"authority at AssetCenter",
+                 comments=>"authority at AssetManager",
                  srcload=>NowStamp(),
                  name=>$rec->{name}};
      if (!defined($w5rec)){
@@ -86,7 +86,7 @@ sub ImportAssetCenterCO
         delete($newrec->{cistatusid}) if ($w5rec->{cistatusid}==5);
         $w5co->ValidatedUpdateRecord($w5rec,$newrec,{name=>\$rec->{name}});
      }
-     $self->VerifyAssetCenterData($rec);
+     $self->VerifyAssetManagerData($rec);
      #last if ($cocount++==80);
    }
 
@@ -107,7 +107,7 @@ sub ImportAssetCenterCO
 }
 
 
-sub VerifyAssetCenterData
+sub VerifyAssetManagerData
 {
    my $self=shift;
    my $corec=shift;
@@ -130,7 +130,7 @@ sub VerifyAssetCenterData
               $self->OpMsg($sysrec->{assignmentgroupsupervisoremail},
                    "SystemID:$sysrec->{systemid}",
                    "Das System mit der SystemID '$sysrec->{systemid}' ".
-                   "ist in AssetCenter der AssignmentGroup ".
+                   "ist in AssetManager der AssignmentGroup ".
                    "'$sysrec->{assignmentgroup}' für die Sie als ".
                    "Leiter eingetragen sind. Die CO-Nummer '$conumber', ".
                    "die bei diesem System eingetragen ist, ist aktuell ".
@@ -152,7 +152,7 @@ sub VerifyAssetCenterData
                      $self->{configmgr}->{$altbc}=$urec->{userid};
                   }
                   my $desc="[W5TRANSLATIONBASE=".$self->Self."]\n";
-                  $desc.="There are no application relations in AssetCenter\n"; 
+                  $desc.="There are no application relations in AssetManager\n"; 
            
                   $w5sys->ResetFilter();
                   $w5sys->SetFilter({systemid=>\$sysrec->{systemid},
@@ -164,10 +164,10 @@ sub VerifyAssetCenterData
               #       $self->OpMsg($corec->{sememail},
               #            "SystemID:$sysrec->{systemid}",
               #            "Die SystemID '$sysrec->{systemid}' ".
-              #            "(Systemname laut AssetCenter: $sysrec->{systemname}) ".
+              #            "(Systemname laut AssetManager: $sysrec->{systemname}) ".
               #            "ist in W5Base/Darwin nicht definiert.\n".
               #            "Das System mit der SystemID '$sysrec->{systemid}' ".
-              #            "ist in AssetCenter der CO-Nummer '$corec->{name}' ".
+              #            "ist in AssetManager der CO-Nummer '$corec->{name}' ".
               #            "(CO Bezeichnung: $corec->{description}) ".
               #            "zugeordnet, für die Sie SeM sind. ".
               #            "Tragen Sie das System mit der SystemID ".
@@ -189,7 +189,7 @@ sub VerifyAssetCenterData
               #               "SystemID '$sysrec->{systemid}' ist in ".
               #               "W5Base/Darwin erzeugt, aber keiner Anwendung ".
               #               "zugeordnet. Sie sind als SeM für die CO-Nummer ".
-              #               "'$corec->{name}' des Systems in AssetCenter ".
+              #               "'$corec->{name}' des Systems in AssetManager ".
               #               "erfasst. Die Zuorndung eines Systems zu ".
               #               "einer Anwendung ist nach den Config-Management ".
               #               "Regeln der AL T-Com zwingend. Sorgen Sie dafür, ".
@@ -202,7 +202,7 @@ sub VerifyAssetCenterData
                   #############################################################
                   # Issue Create
                   #
-                  my $issue={name=>"DataIssue: AssetCenter: no applications ".
+                  my $issue={name=>"DataIssue: AssetManager: no applications ".
                                    "on systemid \"$sysrec->{systemid}\" ".
                                    "($sysrec->{systemname})",
                              class=>'base::workflow::DataIssue',

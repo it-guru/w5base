@@ -419,7 +419,7 @@ sub ImportAppl
                                    'kernel.App.Web.css'],
                            static=>{importname=>$importname},
                            body=>1,form=>1,
-                           title=>"AssetCenter Application Import");
+                           title=>"AssetManager Application Import");
    print $self->getParsedTemplate("tmpl/minitool.appl.import",{});
    print $self->HtmlBottom(body=>1,form=>1);
 }
@@ -443,11 +443,11 @@ sub Import
    $self->SetFilter($flt);
    my @l=$self->getHashList(qw(applid name lassignmentid));
    if ($#l==-1){
-      $self->LastMsg(ERROR,"ApplicationID not found in AssetCenter");
+      $self->LastMsg(ERROR,"ApplicationID not found in AssetManager");
       return(undef);
    }
    if ($#l>0){
-      $self->LastMsg(ERROR,"ApplicationID not unique in AssetCenter");
+      $self->LastMsg(ERROR,"ApplicationID not unique in AssetManager");
       return(undef);
    }
 

@@ -47,7 +47,7 @@ sub LoadBCBS
    my $srcsys="AC_BCBS";
    my $app=$self->getParent();
 
-   msg(INFO,"loading data for BCBS from AssetCenter to W5Base");
+   msg(INFO,"loading data for BCBS from AssetManager to W5Base");
    msg(INFO,"loadstart = $loadstart");
 
 

@@ -2,10 +2,10 @@
 <!------------------------------------------------------>
 <div class=dialog style="width:400px">
 <table width=100% cellpadding=4 cellspacing=4>
-<tr><td colspan=2><b>AssetCenter Application Import Tool</b></td></tr>
+<tr><td colspan=2><b>AssetManager Application Import Tool</b></td></tr>
 <tr>
 <td colspan=2>With this tool, it is posible to import applications
-from T-Systems AssetCenter into the W5base 'IT-Invantar'.
+from T-Systems AssetManager into the W5base 'IT-Invantar'.
 You have to specify the ApplicationID of the application, you
 want to import.
 </td></tr>

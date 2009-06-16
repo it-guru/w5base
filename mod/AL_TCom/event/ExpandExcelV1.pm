@@ -70,7 +70,7 @@ sub ProcessLineData
       $data->[46]="W5Base Anwendung";
       $data->[47]="W5Base SeM";
       $data->[48]="W5Base TSM";
-      $data->[49]="AssetCenter Assignmentgroup Leiter";
+      $data->[49]="AssetManager Assignmentgroup Leiter";
       return();
    }
 

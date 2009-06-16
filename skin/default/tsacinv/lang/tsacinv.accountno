@@ -1,5 +1,5 @@
-'tsacinv::accountno'=>{de=>'AssetCenter Account Nummer',
-                       en=>'AssetCenter Account Number'},
+'tsacinv::accountno'=>{de=>'AssetManager Account Nummer',
+                       en=>'AssetManager Account Number'},
 'fieldgroup.default'=>{de=>'Account Daten',en=>'Account Data'},
 'Account Number'=>{de=>'Account Nummer'},
 'Application'=>{de=>'Anwendung'},

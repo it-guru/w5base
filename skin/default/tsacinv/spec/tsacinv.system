@@ -1,9 +1,9 @@
 #######################################################################
 'fieldgroup.w5basedata'=>{de=>'
-Diese Informationen wurden aus der W5Base/Darwin zu den AssetCenter
+Diese Informationen wurden aus der W5Base/Darwin zu den AssetManager
 Daten verknüpft.
 ',en=>'
-This Informations are linked from W5Base/Darwin to the AssetCenter data.
+This Informations are linked from W5Base/Darwin to the AssetManager data.
 '},
 'systemcpucount'=>{de=>'
-Die CPU Anzahl gibt die Anzahl der logischen CPUs wieder, die das Betriebssystem "sieht". Dies kann z.B. unter Unix mit dem top Komando abgefragt werden. In der AssetCenter Oberfläche wird dies als "total number of cores" bezeichnet.'},
+Die CPU Anzahl gibt die Anzahl der logischen CPUs wieder, die das Betriebssystem "sieht". Dies kann z.B. unter Unix mit dem top Komando abgefragt werden. In der AssetManager Oberfläche wird dies als "total number of cores" bezeichnet.'},

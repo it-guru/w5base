@@ -96,11 +96,11 @@ sub ProcessLineData
          my ($accorec,$msg)=$accon->getOnlyFirst(qw(id bc description 
                                                     sememail)); 
          if (!defined($accorec)){
-            $data->[$msgcol]="CO-Number not found in AssetCenter";
+            $data->[$msgcol]="CO-Number not found in AssetManager";
             return();
          }
          if ($accorec->{bc} ne "AL T-COM"){
-            $data->[$msgcol]="CO-Number owned in AssetCenter ".
+            $data->[$msgcol]="CO-Number owned in AssetManager ".
                              "by '$accorec->{bc}'";
             return();
          }
@@ -163,7 +163,7 @@ sub ProcessLineData
 #      $data->[46]="W5Base Anwendung";
 #      $data->[47]="W5Base SeM";
 #      $data->[48]="W5Base TSM";
-#      $data->[49]="AssetCenter Assignmentgroup Leiter";
+#      $data->[49]="AssetManager Assignmentgroup Leiter";
 #      return();
 #   }
 #

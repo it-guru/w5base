@@ -32,7 +32,7 @@ sub new
    $self->AddFields(
       new kernel::Field::TextDrop(
                 name          =>'acassingmentgroup',
-                label         =>'AssetCenter Assignmentgroup',
+                label         =>'AssetManager Assignmentgroup',
                 group         =>'admin',
                 weblinkto     =>'tsacinv::group',
                 weblinkon     =>['acassingmentgroup'=>'name'],
@@ -67,7 +67,7 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'acsystemname',
-                label         =>'AssetCenter Systemname',
+                label         =>'AssetManager Systemname',
                 group         =>'logsys',
                 async         =>'1',
                 readonly      =>1,

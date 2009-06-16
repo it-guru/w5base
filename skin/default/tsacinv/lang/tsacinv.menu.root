@@ -1,4 +1,4 @@
-'ac'=>{de=>'AssetCenter',en=>'AssetCenter'},
+'ac'=>{de=>'AssetManager',en=>'AssetManager'},
 'ac.asset.fixedasset'=>{de=>'Komponente',en=>'FixedAsset'},
 'ac.asset'=>{de=>'Hardware',en=>'Asset'},
 'ac.appl'=>{de=>'Anwendung',en=>'Application'},
@@ -22,5 +22,5 @@
 'ac.krn.accountno'=>{de=>'Account-Nummer',en=>'Account-Number'},
 'ac.quality'=>{de=>'Qualitätsanalysen',en=>'Quality-Analysys'},
 'ac.quality.appl'=>{de=>'Anwendung',en=>'Application'},
-'AL_TCom.system.acimport'=>{de=>'AssetCenter Import',en=>'AssetCenter Import'},
-'AL_TCom.appl.acimport'=>{de=>'AssetCenter Import',en=>'AssetCenter Import'},
+'AL_TCom.system.acimport'=>{de=>'AssetManager Import',en=>'AssetManager Import'},
+'AL_TCom.appl.acimport'=>{de=>'AssetManager Import',en=>'AssetManager Import'},

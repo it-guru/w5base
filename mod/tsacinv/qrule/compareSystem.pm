@@ -4,7 +4,7 @@ package tsacinv::qrule::compareSystem;
 
 =head3 PURPOSE
 
-This qulaity rule compares a W5Base logical system to an AssetCenter logical
+This qulaity rule compares a W5Base logical system to an AssetManager logical
 system and updates on demand nessasary fields.
 Unattended Imports are only done, if the field "Allow automatic interface
 updates" is set to "yes".
@@ -13,7 +13,7 @@ a missing systemid.
 
 =head3 IMPORTS
 
-From AssetCenter the fields Memory, CPU-Count, CO-Number,
+From AssetManager the fields Memory, CPU-Count, CO-Number,
 Description are imported.
 IP-Addresses can only be synced, if the field "Allow automatic interface
 updates" is set to "yes".
@@ -89,8 +89,8 @@ sub qcheckRecord
       $par->SetFilter({systemid=>\$rec->{systemid}});
       my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       if (!defined($parrec)){
-         push(@qmsg,'given systemid not found as active in AssetCenter');
-         push(@dataissue,'given systemid not found as active in AssetCenter');
+         push(@qmsg,'given systemid not found as active in AssetManager');
+         push(@dataissue,'given systemid not found as active in AssetManager');
          $errorlevel=3 if ($errorlevel<3);
       }
       else{
@@ -218,12 +218,12 @@ sub qcheckRecord
          my $comments="";
          if ($parrec->{assignmentgroup} ne ""){
             $comments.="\n" if ($comments ne "");
-            $comments.="AssetCenter AssignmentGroup: ".
+            $comments.="AssetManager AssignmentGroup: ".
                        $parrec->{assignmentgroup};
          }
          if ($parrec->{conumber} ne ""){
             $comments.="\n" if ($comments ne "");
-            $comments.="AssetCenter CO-Number: ".
+            $comments.="AssetManager CO-Number: ".
                        $parrec->{conumber};
          }
          $self->IfaceCompare($dataobj,
@@ -237,7 +237,7 @@ sub qcheckRecord
          $par->SetFilter({assetid=>\$rec->{asset}});
          my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
          if (!defined($parrec)){
-            push(@qmsg,'given assetid not found as active in AssetCenter');
+            push(@qmsg,'given assetid not found as active in AssetManager');
             $errorlevel=3 if ($errorlevel<3);
          }
       }
@@ -269,7 +269,7 @@ sub qcheckRecord
       }
    }
    if (keys(%$wfrequest)){
-      my $msg="different values stored in AssetCenter: ";
+      my $msg="different values stored in AssetManager: ";
       push(@qmsg,$msg);
       push(@dataissue,$msg);
       $errorlevel=3 if ($errorlevel<3);

@@ -1,4 +1,4 @@
-'tsacinv::mandator'=>{de=>'AC Mandantenverknüpfung',
-                      en=>'AC Mandatorrelation'},
-'fieldgroup.acrelation'=>{de=>'AssetCenter Verknüpfung',
-                          en=>'AssetCenter Relation'},
+'tsacinv::mandator'=>{de=>'AssetManager Mandantenverknüpfung',
+                      en=>'AssetManager Mandatorrelation'},
+'fieldgroup.acrelation'=>{de=>'AssetManager Verknüpfung',
+                          en=>'AssetManager Relation'},

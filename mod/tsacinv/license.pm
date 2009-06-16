@@ -477,7 +477,7 @@ sub ImportSystem
                                    'kernel.App.Web.css'],
                            static=>{importname=>$importname},
                            body=>1,form=>1,
-                           title=>"AssetCenter System Import");
+                           title=>"AssetManager System Import");
    print $self->getParsedTemplate("tmpl/minitool.system.import",{});
    print $self->HtmlBottom(body=>1,form=>1);
 }
@@ -501,11 +501,11 @@ sub Import
    $self->SetFilter($flt);
    my @l=$self->getHashList(qw(systemid systemname lassignmentid assetid));
    if ($#l==-1){
-      $self->LastMsg(ERROR,"SystemID not found in AssetCenter");
+      $self->LastMsg(ERROR,"SystemID not found in AssetManager");
       return(undef);
    }
    if ($#l>0){
-      $self->LastMsg(ERROR,"SystemID not unique in AssetCenter");
+      $self->LastMsg(ERROR,"SystemID not unique in AssetManager");
       return(undef);
    }
 

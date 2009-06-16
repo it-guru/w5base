@@ -3,7 +3,7 @@ Geben Sie die Incident Assignmentgroup
 an, die im ServiceCenter bei Incidents
 für diese Anwendung verwendet werden soll.
 Die Assignmentgroup muß in ServiceCenter
-so angelegt sein, dass diese nach AssetCenter
+so angelegt sein, dass diese nach AssetManager
 übertragen wird. Nur dann ist sie hier
 auswählbar.
 '},

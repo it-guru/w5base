@@ -1,6 +1,6 @@
-'tsacinv::qrule::compareAppl'=>{de=>'AssetCenter Abgleich Anwendung',
-                                  en=>'AssetCenter compare of application'},
+'tsacinv::qrule::compareAppl'=>{de=>'AssetManager Abgleich Anwendung',
+                                  en=>'AssetManager compare of application'},
 
 'no applicationid specified'=>{de=>'keine AnwendungsID definiert'},
-'given applicationid not found as active in AssetCenter'=>{de=>'angegebene AnwendungsID im AssetCenter nich aktiv'},
+'given applicationid not found as active in AssetManager'=>{de=>'angegebene AnwendungsID im AssetManager nich aktiv'},
 'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},

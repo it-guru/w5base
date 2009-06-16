@@ -131,6 +131,7 @@ EOF
                   if (ref($self->{vjoinbase}->[0]) eq "HASH"){
                      foreach my $k (keys(%{$self->{vjoinbase}->[0]})){
                          my $v=$self->{vjoinbase}->[0]->{$k};
+                         $v=$$v if (ref($v) eq "SCALAR");
                          $target.="&search_$k=".quoteQueryString($v);
                      }
                      $vjoinbaseok=1;

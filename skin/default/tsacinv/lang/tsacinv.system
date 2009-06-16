@@ -1,5 +1,5 @@
-'tsacinv::system'=>{de=>'AssetCenter log. System',
-                    en=>'AssetCenter log. System'},
+'tsacinv::system'=>{de=>'AssetManager log. System',
+                    en=>'AssetManager log. System'},
 'fieldgroup.default'=>{de=>'allgemeine Systemdaten', en=>'common system data'},
 'fieldgroup.services'=>{de=>'Leistungsarten', en=>'Services'},
 'fieldgroup.ipaddresses'=>{de=>'IP-Adressen', en=>'IP-Addresses'},

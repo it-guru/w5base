@@ -32,6 +32,7 @@ sub new
    $self{vjointo}="base::lnkcontact"   if (!defined($self{vjointo}));
    $self{vjoinon}=['id'=>'refid']      if (!defined($self{vjoinon}));
    $self{allowcleanup}=1               if (!defined($self{allowcleanup}));
+   $self{forwardSearch}=1              if (!defined($self{forwardSearch}));
    if (!defined($self{vjoindisp})){
       $self{vjoindisp}=['targetname','comments',"roles"];
    }

@@ -1,10 +1,10 @@
-'tsacinv::qrule::compareSystem'=>{de=>'AssetCenter Abgleich log. System',
-                                  en=>'AssetCenter compare of log. system'},
+'tsacinv::qrule::compareSystem'=>{de=>'AssetManager Abgleich log. System',
+                                  en=>'AssetManager compare of log. system'},
 
 'no systemid specified'=>{de=>'keine SystemID definiert'},
-'given systemid not found as active in AssetCenter'=>{de=>'angegebene SystemID im AssetCenter nich aktiv'},
+'given systemid not found as active in AssetManager'=>{de=>'angegebene SystemID im AssetManager nich aktiv'},
 
 'no assetid specified'=>{de=>'keine AssetID definiert'},
-'given assetid not found as active in AssetCenter'=>{de=>'angegebene AssetID konnte im AssetCenter nicht aktiv'},
+'given assetid not found as active in AssetManager'=>{de=>'angegebene AssetID konnte im AssetManager nicht aktiv'},
 'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
-'different values stored in AssetCenter'=>{de=>'in AssetCenter sind andere Inhalte gespeichert'},
+'different values stored in AssetManager'=>{de=>'in AssetManager sind andere Inhalte gespeichert'},

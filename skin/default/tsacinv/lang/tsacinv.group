@@ -1,4 +1,4 @@
-'tsacinv::group'=>{de=>'AssetCenter Gruppe',en=>'AssetCenter Group'},
+'tsacinv::group'=>{de=>'AssetManager Gruppe',en=>'AssetManager Group'},
 'fieldgroup.default'=>{de=>'Gruppendaten',en=>'Groupinformations'},
 'Supervisor'=>{de=>'Leiter'},
 'Parentgroup'=>{de=>'Elterngruppe'},

@@ -1,10 +1,10 @@
 #######################################################################
 'applid'=>{de=>'
-Bei T-Systems ist in diesem Feld die ApplicationID aus AssetCenter
+Bei T-Systems ist in diesem Feld die ApplicationID aus AssetManager
 einzutragen. Wenn die Anwendung in W5Base/Darwin erzeugt wird, dann
 ist dieses Feld leer zu lassen - es sei den Sie wollen die
-neue Anwendung mit einer bereits in AssetCenter vorhanden Anwendung
-"verbinden", d.h. es soll keine neue Anwendung in AssetCenter
+neue Anwendung mit einer bereits in AssetManager vorhanden Anwendung
+"verbinden", d.h. es soll keine neue Anwendung in AssetManager
 hinzugefügt werden.
 ',en=>'
 At T-Systems is this field the ApplicationID from Asset Center 

@@ -1,4 +1,4 @@
-'tsacinv::service'=>{de=>'AssetCenter Service/Leistung',en=>'AssetCenter Service'},
+'tsacinv::service'=>{de=>'AssetManager Service/Leistung',en=>'AssetManager Service'},
 'fieldgroup.default'=>{de=>'Service/Leistung',en=>'Service'},
 'Ammount'=>{de=>'Menge/Anzahl'},
 'Service Name'=>{de=>'Leistungsbez.'},

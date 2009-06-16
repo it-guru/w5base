@@ -293,7 +293,8 @@ sub rpcSendRemoteEvent
                    $r->{srceventtype} eq $operation){
                   if ($r->{dstevent} ne ""){
                      my $id=$self->rpcGetUniqueId->{id};
-                     my $spooltag="rpcSendRemoteEvent.".$id."(".$modulename.")";
+                     my $spooltag="rpcSendRemoteEvent.".
+                                  $identifiedBy."(".$modulename.")";
                      my $interval=60;
                      my $retrycount=5;
                      my $firstcalldelay=$r->{controldelay};
@@ -625,9 +626,12 @@ sub ProcessSpoolEvent
 {
    my $self = shift;
    my $control = shift;
+   my $tasks=$self->getTasksHash();
+   return() if (keys(%$tasks)>10);
+
    msg(DEBUG,"Run spooled event: %s",$control->{spooltag});
    if (defined($control->{run})){
-      msg(DEBUG,"name=%s d=%s",$control->{eventname},Dumper($control->{run}));
+     # msg(DEBUG,"name=%s d=%s",$control->{eventname},Dumper($control->{run}));
       return();
    }
    $control->{lasttrytime}=time();
@@ -649,6 +653,12 @@ sub run_dequeue
          }
          if (defined($control->{run}) && defined($control->{run}->{AsyncID})){
             my $st=$self->rpcAsyncState($control->{run}->{AsyncID});
+            if ($st->{exitcode}==1){
+               if ($st->{invalidAsyncID}){
+                  msg(WARN,"EventSpool: cleanup old run entry");
+                  delete($control->{run});
+               }
+            }
             if ($st->{exitcode}==0){
                if (exists($st->{process}->{exitcode})){
                   my $e=$st->{process}->{exitcode};
@@ -660,7 +670,8 @@ sub run_dequeue
                      $control->{failcount}=0 if ($control->{failcount}<0);
                   }
                   else{
-                     delete($self->{EventSpool}->{$control->{spooltag}}->{run});
+                     delete($self->{EventSpool}->{$control->{spooltag}}
+                            ->{run});
                   }
                }
             }

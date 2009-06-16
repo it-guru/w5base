@@ -2,10 +2,10 @@
 <!------------------------------------------------------>
 <div class=dialog style="width:400px">
 <table width=100% cellpadding=4 cellspacing=4>
-<tr><td colspan=2><b>AssetCenter SystemID Import Tool</b></td></tr>
+<tr><td colspan=2><b>AssetManager SystemID Import Tool</b></td></tr>
 <tr>
 <td colspan=2>With this tool, it is posible to import systems
-from T-Systems AssetCenter into the W5base 'IT-Invantar'.
+from T-Systems AssetManager into the W5base 'IT-Invantar'.
 You have to specify the SystemID of the system, you
 want to import.
 </td></tr>

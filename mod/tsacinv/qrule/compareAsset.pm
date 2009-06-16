@@ -4,7 +4,7 @@ package tsacinv::qrule::compareAsset;
 
 =head3 PURPOSE
 
-This qulaity rule compares a W5Base physical system to an AssetCenter physical
+This qulaity rule compares a W5Base physical system to an AssetManager physical
 system (Asset) and updates on demand nessasary fields.
 Unattended Imports are only done, if the field "Allow automatic interface
 updates" is set to "yes".
@@ -79,8 +79,8 @@ sub qcheckRecord
       $par->SetFilter({assetid=>\$rec->{name}});
       my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       if (!defined($parrec)){
-         push(@qmsg,'given assetid not found as active in AssetCenter');
-         push(@dataissue,'given assetid not found as active in AssetCenter');
+         push(@qmsg,'given assetid not found as active in AssetManager');
+         push(@dataissue,'given assetid not found as active in AssetManager');
          $errorlevel=3 if ($errorlevel<3);
       }
       else{
@@ -166,7 +166,7 @@ sub qcheckRecord
       }
    }
    if (keys(%$wfrequest)){
-      my $msg="different values stored in AssetCenter: ";
+      my $msg="different values stored in AssetManager: ";
       push(@qmsg,$msg);
       push(@dataissue,$msg);
       $errorlevel=3 if ($errorlevel<3);

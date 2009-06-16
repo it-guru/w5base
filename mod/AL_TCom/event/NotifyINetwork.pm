@@ -20,7 +20,8 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Event;
-use SOAP::Lite +trace=>'all';
+#use SOAP::Lite +trace=>'all';
+use SOAP::Lite;
 @ISA=qw(kernel::Event);
 
 sub new
@@ -53,14 +54,22 @@ sub NotifyINetwork
    $wspass=$wspass->{inetwork} if (ref($wspass) eq "HASH");
    $wsproxy=$wsproxy->{inetwork} if (ref($wsproxy) eq "HASH");
 
+   return({exitcode=>0,msg=>'ok'}) if ($wsuser eq "");
    sub SOAP::Transport::HTTP::Client::get_basic_credentials { 
        return $wsuser => $wspass;
    }
    my $inetwxmlns="http://tempuri.org";
 
+   my $header = SOAP::Header->name(AuthentifizierungsHeader => { 
+     userName => $wsuser,
+     password => $wspass
+   })->uri($inetwxmlns)->prefix(''); 
+
+
    my $method = SOAP::Data->name('TriggerINetwork')->attr({xmlns=>$inetwxmlns});
 
-   my @params=( SOAP::Data->name('module')->value('a'),
+   my @params=( $header,
+                SOAP::Data->name('module')->value('a'),
                 SOAP::Data->name('submodule')->value('a'),
                 SOAP::Data->name('operation')->value('a'),
                 SOAP::Data->name('identifyBy')->value('a')  );
@@ -70,7 +79,7 @@ sub NotifyINetwork
                      ->call($method=>@params);
 
 
-printf STDERR ("fifi d=%s\n",Dumper($res));
+#printf STDERR ("fifi d=%s\n",Dumper($res));
 
 
    if (open(F,">>/tmp/event.log")){

@@ -1,5 +1,5 @@
-'tsacinv::appl'=>{de=>'AssetCenter Anwendung',
-                  en=>'AssetCenter Application'},
+'tsacinv::appl'=>{de=>'AssetManager Anwendung',
+                  en=>'AssetManager Application'},
 'fieldgroup.default'=>{de=>'Anwendungsdaten',en=>'Applicationdata'},
 'CFM Assignment Group'=>{de=>'CFM Assignment Group'},
 'INM Assignment Group'=>{de=>'INM Assignment Group'},
