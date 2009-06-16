@@ -30,7 +30,7 @@ sub new
    my $self=bless($type->SUPER::new(@_),$type);
    $self->{conjunction}="or" if (!defined($self->{conjunction}));
    $self->{vjoinconcat}=", " if (!defined($self->{vjoinconcat}));
-   $self->{WSDLfieldType}="ArrayOfString" if (!defined($self->{WSDLfieldType}));
+   $self->{WSDLfieldType}="ArrayOfStringItems" if (!defined($self->{WSDLfieldType}));
    return($self);
 }
 

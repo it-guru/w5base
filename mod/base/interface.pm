@@ -740,11 +740,14 @@ sub getHashList
          my $wsdl=$fobj->{WSDLfieldType};
          $wsdl="xsd:string" if ($wsdl eq "");
          if (!($wsdl=~m/^.*:.*$/)){
-            $wsdl=$objns.":".$wsdl;
+            $wsdl="curns:".$wsdl;
          }
          my $v=$fobj->FormatedResult($l[$c],"SOAP");
          if (ref($v) eq "ARRAY"){
             $v=[map({latin1($_)->utf8();} @$v)];
+            if ($wsdl=~m/:ArrayOfStringItems$/){
+               $v=[map({SOAP::Data->type("xsd:string")->value($_);} @$v)];
+            }
          }
          else{
             $v=latin1($v)->utf8();
