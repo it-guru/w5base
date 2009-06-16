@@ -311,7 +311,7 @@ sub Validate
          if ($isprivate){
             my $prirec=$self->loadPrivacyAcl($newrec->{parentobj},
                               $newrec->{parentrefid});
-            if (!$prirec->{rw}){
+            if (!$prirec->{rw} && !$self->IsMemberOf("admin")){
                $self->LastMsg(ERROR,"insuficient rights to write privacy data");
                return(undef);
             }
@@ -1100,8 +1100,11 @@ sub browser
                   $select.=">";
                }
                $select.="</div>";
+               my $t=$self->ExpandTimeExpression($fl->{mdate},$self->Lang()).
+                     " by $fl->{editor}";
                $list.=sprintf("<div class=fileline>$select<a class=filelink ".
-                              "href=\"$prefix%s$post\">%s%s</a></div>\n",
+                              "href=\"$prefix%s$post\" ".
+                              "title=\"$t\">%s%s</a></div>\n",
                               $codedname,$img,$name);
             }
          }

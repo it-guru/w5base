@@ -92,6 +92,11 @@ sub ListFiles
             $clone{label}.="&nbsp;<a title=\"$privacy\">".
                          "<font color=red><b>!</b></font></a>";
          }
+         my $t=$self->getParent->ExpandTimeExpression($rec->{mdate},
+               $self->getParent->Lang())." by $rec->{editor}";
+
+         $clone{description}="$t";
+
          $clone{href}="ViewProcessor/load/$self->{name}/".
                       "$refid/$clone{fid}/$clone{name}";
          if ($mode eq "FileListMode.DELENT"){
@@ -189,7 +194,7 @@ EOF
    $d.="<table width=100% height=80 border=0>";
    $d.="<tr height=1%>";
    $d.="<td>".$self->getParent->T("File to upload",'kernel::FileList').":</td>";
-   $d.="<td colspan=2><input type=file name=file size=50></td>";
+   $d.="<td colspan=2><input type=file name=file size=40></td>";
    $d.="</tr><tr>".
        "<tr><td width=1% nowrap>".
        $self->getParent->T("comments",'kernel::FileList')."</td>".
