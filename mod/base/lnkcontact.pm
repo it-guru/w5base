@@ -96,6 +96,49 @@ sub new
                    return("-only a web useable link-");
                 }),
 
+      new kernel::Field::Text(
+                name          =>'phone',
+                htmlwidth     =>'100',
+                label         =>'Contact phone',
+                depend        =>['target','targetid'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $d="";
+                   if ($current->{target} eq "base::user"){
+                      my @t;
+                      my %t;
+                      my $o=getModuleObject($self->getParent->Config,
+                                            $current->{target});
+                      $o->SetFilter({userid=>\$current->{targetid}});
+                      my @fl=qw(office_phone office_mobile privat_mobile
+                                privat_phone);
+                      my ($urec,$msg)=$o->getOnlyFirst(@fl);
+                      if (defined($urec)){
+                         foreach my $n (@fl){
+                            if ($urec->{$n} ne "" && !exists($t{$urec->{$n}})){
+                               $t{$urec->{$n}}++;
+                               push(@t,$urec->{$n});
+                            }
+                         }
+                         $d=join("\n",@t);
+                      }
+                   }
+                   if ($current->{target} eq "base::grp"){
+                      my @t;
+                      my %t;
+                      my $o=getModuleObject($self->getParent->Config,
+                                            "base::phonenumber");
+                      $o->SetFilter({parentobj=>\$current->{target},
+                                     refid=>\$current->{targetid}});
+                      foreach my $prec ($o->getHashList(qw(phonenumber))){
+                         push(@t,$prec->{phonenumber});
+                      }
+                      $d=join("\n",@t);
+                   }
+                   return($d);
+                }),
+
 
       new kernel::Field::Date(
                 name          =>'expiration',
