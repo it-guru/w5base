@@ -1,4 +1,4 @@
-package tsacinv::event::ImportAssetManagerCO;
+package tsacinv::event::ImportAssetCenterCO;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
