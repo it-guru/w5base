@@ -74,6 +74,16 @@ sub new
                 vjointo       =>'tsacinv::system',
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>'systemname'),
+      new kernel::Field::Boolean(
+                name          =>'acsoxrelevant',
+                label         =>'AssetManager SOX relevant',
+                group         =>'logsys',
+                weblinkto     =>'NONE',
+                async         =>'1',
+                readonly      =>1,
+                vjointo       =>'tsacinv::system',
+                vjoinon       =>['systemid'=>'systemid'],
+                vjoindisp     =>'soxrelevant'),
    );
 
    return($self);
