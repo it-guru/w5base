@@ -91,6 +91,7 @@ sub Call
       $self->{sock}=undef if ($result eq ""); # try to reset socket
       last                if ($result ne "");
    }
+   #$result=~s/^\s*1//; # voglerh fix for mystery error
    return(undef) if ($result eq "");
    eval { $XML=new XML::Smart($result,'XML_Smart_Parser');};
    if ($@ ne ""){
