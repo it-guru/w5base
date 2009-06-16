@@ -67,7 +67,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'fullname',
-                htmlwidth     =>'120px',
+                htmlwidth     =>'220px',
                 label         =>'CO-Shortdescription',
                 dataobjattr   =>'costcenter.fullname'),
 
@@ -237,7 +237,7 @@ sub new
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","admin.finance.costcenter"],
                          uniquesize=>20};
-   $self->setDefaultView(qw(name cistatus fullname mdate));
+   $self->setDefaultView(qw(name fullname cistatus mdate));
    $self->setWorktable("costcenter");
    return($self);
 }
