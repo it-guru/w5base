@@ -56,11 +56,10 @@ sub Init
 sub test
 {
    my $self=shift;
-   my $wf=getModuleObject($self->Config,"base::workflow");
+   my $g=getModuleObject($self->Config,"base::googlekeys");
 
-   $wf->SetFilter({id=>[qw(11990656270002 11990656260004 11990656260002)],
-                   involvedcustomer=>'DTAG.T-Com.*'});
-   my @l=$wf->getHashList(qw(class name));
+   $g->ValidatedInsertRecord({name=>'time'.time(),apikey=>'k'.time()});
+
 
    return({exitcode=>0,msg=>'ok'});
 }
@@ -108,10 +107,10 @@ sub SampleEvent1
    my $self=shift;
 
    msg(DEBUG,"Start(Event1): ... sleep no");
-   my $user=getModuleObject($self->Config,"base::user");
-   $user->SetFilter({fullname=>'vog* wiescho*'});
-   my @l=$user->getHashList(qw(fullname owner accounts));
-   msg(INFO,"fifi l=%s\n",Dumper(\@l));
+#   my $user=getModuleObject($self->Config,"base::user");
+#   $user->SetFilter({fullname=>'vog* wiescho*'});
+#   my @l=$user->getHashList(qw(fullname owner accounts));
+#   msg(INFO,"fifi l=%s\n",Dumper(\@l));
    msg(DEBUG,"End  (Event1):");
    return({msg=>'heinz',exitcode=>0});
 }
