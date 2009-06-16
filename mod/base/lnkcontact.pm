@@ -100,6 +100,7 @@ sub new
                 name          =>'phone',
                 htmlwidth     =>'100',
                 label         =>'Contact phone',
+                readonly      =>1,
                 depend        =>['target','targetid'],
                 onRawValue    =>sub{
                    my $self=shift;
