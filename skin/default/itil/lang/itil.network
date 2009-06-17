@@ -7,3 +7,4 @@ Innerhalb eines Netzbereiches müssen IP-Adressen eindeutig
 vergeben werden. Ein Netzbereich ist nicht gleichzusetzen
 mit einem IP-Netzwerk. Ein Netzbereich besteht aus mehreren
 IP-Netzwerken.',en=>'Welcome'},
+'IP-Numbering unique'=>{de=>'eindeutig IP-Nummerierung'},

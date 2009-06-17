@@ -61,6 +61,11 @@ sub new
                 label         =>'CI-StateID',
                 dataobjattr   =>'network.cistatus'),
 
+      new kernel::Field::Boolean(
+                name          =>'uniquearea',
+                label         =>'IP-Numbering unique',
+                dataobjattr   =>'network.uniquearea'),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',

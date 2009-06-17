@@ -404,19 +404,40 @@ sub Validate
          return(0);
       }
    }
-   $newrec->{name}=$name;
-   if (exists($newrec->{dnsname})){
+   $newrec->{'name'}=$name;
+
+   #######################################################################
+   # unique IP-Handling
+   $newrec->{'uniqueflag'}=1;
+   my $networkid=effVal($oldrec,$newrec,"networkid");
+   if ($networkid eq ""){
+      $self->LastMsg(ERROR,"no network specified");
+      return(0);
+   }
+   my $n=getModuleObject($self->Config,"itil::network");
+   $n->SetFilter({id=>\$networkid,cistatusid=>[3,4]});
+   my ($nrec,$msg)=$n->getOnlyFirst(qw(uniquearea));
+   if (!defined($nrec)){
+      $self->LastMsg(ERROR,"no networkid specified");
+      return(0);
+   }
+   if (!$nrec->{uniquearea}){
+      $newrec->{'uniqueflag'}=undef;
+   }
+
+
+   if (exists($newrec->{'dnsname'})){
       my $dnsname=lc(trim(effVal($oldrec,$newrec,"dnsname")));
       $dnsname=~s/[^a-z0-9\[\]]*$//;
       $dnsname=~s/^[^a-z0-9]*//;
-      $newrec->{dnsname}=$dnsname;
+      $newrec->{'dnsname'}=$dnsname;
       if ($dnsname ne ""){
          if (($dnsname=~m/\s/) || !($dnsname=~m/.+\..+/)){
             $self->LastMsg(ERROR,"invalid dns name");
             return(0);
          }
       }
-      $newrec->{dnsname}=undef if ($newrec->{dnsname} eq "");
+      $newrec->{'dnsname'}=undef if ($newrec->{'dnsname'} eq "");
    }
 
    my $accountno=trim(effVal($oldrec,$newrec,"accountno"));
@@ -432,9 +453,9 @@ sub Validate
       $self->LastMsg(ERROR,"invalid system specified");
       return(0);
    } 
-   if (!defined($oldrec) && !exists($newrec->{type}) &&
-                            !exists($newrec->{addresstyp})){
-      $newrec->{addresstyp}=1;
+   if (!defined($oldrec) && !exists($newrec->{'type'}) &&
+                            !exists($newrec->{'addresstyp'})){
+      $newrec->{'addresstyp'}=1;
    }
    return(0) if (!($self->isParentWriteable($systemid)));
    #return(1) if ($self->IsMemberOf("admin"));
