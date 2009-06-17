@@ -587,11 +587,11 @@ sub Validate
    $newrec->{customerid}=effVal($oldrec,$newrec,"customerid");
    if (exists($newrec->{custname})){
       $newrec->{custname}=trim(effVal($oldrec,$newrec,"custname"));
-   }
-   if ($newrec->{custname} eq ""){
-      $self->LastMsg(ERROR,"invalid customer application name - ".
-                           "please use delete to remove a relation");
-      return(undef);
+      if ($newrec->{custname} eq ""){
+         $self->LastMsg(ERROR,"invalid customer application name - ".
+                              "please use delete to remove a relation");
+         return(undef);
+      }
    }
    if (exists($newrec->{custnameid})){
       $newrec->{custnameid}=trim(effVal($oldrec,$newrec,"custnameid"));
