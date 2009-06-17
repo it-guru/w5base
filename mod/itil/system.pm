@@ -978,7 +978,7 @@ sub Validate
          foreach my $iprec (@{$oldrec->{ipaddresses}}){
             if ($iprec->{cistatusid}!=6){
                $self->LastMsg(ERROR,
-                          "there are still linked ipaddresses on this system");
+                          "there are still linked active ipaddresses on this system");
                return(undef);
             }
          }
