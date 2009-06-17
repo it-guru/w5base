@@ -98,7 +98,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'phone',
-                htmlwidth     =>'100',
+                htmlwidth     =>'130',
                 label         =>'Contact phone',
                 readonly      =>1,
                 depend        =>['target','targetid'],
