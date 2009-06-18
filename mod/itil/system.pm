@@ -881,9 +881,10 @@ sub calcPhyCpuCount   #calculates the relative physical cpucount
    }
    else{
       my $lcpucount=$current->{cpucount};
-      if ($current->{hwcpucount}>0){
+      if ($current->{hwcpucount}>0 && $syscpucount>0 && $lcpucount>0){
          return($current->{hwcpucount}/$syscpucount*$lcpucount); 
       }
+      return(undef);
    }  
    return(undef);
 }
