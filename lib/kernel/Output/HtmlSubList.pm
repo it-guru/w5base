@@ -118,41 +118,12 @@ sub ProcessHead
    $d.=<<EOF if ($param->{ParentMode} eq "HtmlDetail");
 <script language="JavaScript">
 var SortTable$tableid;
-function addClassName$tableid(el, sClassName) {
-	var s = el.className;
-	var p = s.split(" ");
-	var l = p.length;
-	for (var i = 0; i < l; i++) {
-		if (p[i] == sClassName)
-			return;
-	}
-	p[p.length] = sClassName;
-	el.className = p.join(" ").replace( /(^\s+)|(\s+\$)/g, "" );
-}
-
-function removeClassName$tableid(el) {
-	var s = el.className;
-	var p = s.split(" ");
-	var np = [];
-	var l = p.length;
-	var j = 0;
-	el.className = "";
-}
-
-
-function InitTab$tableid()
-{
-  SortTable$tableid = new SortableTable(document.getElementById("$tableid"),
-                                        [$sortline]);
-  SortTable$tableid.onsort=function () {
-        var rows = SortTable$tableid.tBody.rows;
-        var l = rows.length;
-        for (var i = 0; i < l; i++) {
-                removeClassName$tableid(rows[i]);
-                addClassName$tableid(rows[i], i % 2 ? "subline2":"subline1");
-        }
-  };
-  SortTable$tableid.sort(0,false);
+function InitTab$tableid(){
+SortTable$tableid=new SortableTable(document.getElementById("$tableid"), [$sortline]);
+SortTable$tableid.onsort=function () {
+var rows = SortTable$tableid.tBody.rows;
+var l = rows.length;
+for (var i = 0; i < l; i++) { SortableTableremoveClassName(rows[i]); SortableTableaddClassName(rows[i], i % 2 ? "subline2":"subline1"); } }; SortTable$tableid.sort(0,false);
 }
 addEvent(window,"load",InitTab$tableid);
 </script>

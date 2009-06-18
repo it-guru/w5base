@@ -13,6 +13,8 @@
 'CPU-Count'=>{de=>'CPU-Anzahl'},
 'Memory'=>{de=>'Arbeitsspeicher'},
 'phys. CPU-Count'=>{de=>'phys. CPU-Anzahl'},
+'phys. Core-Count'=>{de=>'phys. Core-Anzahl'},
+'relative phys. CPU-Count'=>{de=>'relative phys. CPU-Anzahl'},
 'phys. Memory'=>{de=>'phys. Arbeitsspeicher'},
 'Name'=>{de=>'Systemname'},
 'OS-Release'=>{de=>'Betriebssystemversion'},

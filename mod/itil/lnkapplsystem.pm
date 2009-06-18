@@ -106,12 +106,30 @@ sub new
                 readonly      =>1,
                 translation   =>'itil::system',
                 htmleditwidth =>'40%',
-                readonly      =>1,
                 label         =>'OS-Release',
                 vjointo       =>'itil::osrelease',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['osreleaseid'=>'id'],
                 vjoindisp     =>'name'),
+
+      new kernel::Field::Number(
+                name          =>'logicalcpucount',
+                group         =>'systeminfo',
+                readonly      =>1,
+                label         =>'log. CPU count',
+                dataobjattr   =>'system.cpucount'),
+
+      new kernel::Field::Number(
+                name          =>'relphysicalcpucount',
+                group         =>'systeminfo',
+                label         =>'relative phys. CPU count',
+                readonly      =>1,
+                searchable    =>0,
+                precision     =>2,
+                weblinkto     =>"NONE",
+                vjointo       =>'itil::system',
+                vjoinon       =>['systemid'=>'id'],
+                vjoindisp     =>'relphysicalcpucount'),
 
       new kernel::Field::Select(
                 name          =>'osclass',
@@ -570,6 +588,35 @@ sub new
    $self->setDefaultView(qw(appl system systemsystemid fraction cdate));
    $self->setWorktable("lnkapplsystem");
    return($self);
+}
+
+
+sub calcPhyCpuCount
+{
+   my $self=shift;
+   my $current=shift;
+
+   my $assetid=$current->{assetid};
+   my $lcpucount=$current->{logicalcpucount};
+   my $sys=getModuleObject($self->getParent->Config,"itil::system");
+   my $ass=getModuleObject($self->getParent->Config,"itil::asset");
+   $ass->SetFilter({id=>\$assetid});
+   my ($arec)=$ass->getOnlyFirst(qw(cpucount corecount));
+   if (defined($arec)){
+      $sys->SetFilter({assetid=>\$assetid,cistatusid=>[qw(3 4 5)]}); 
+      my $syscount;
+      my $syscpucount;
+      foreach my $subsysrec ($sys->getHashList(qw(cpucount))){
+         $syscount++;
+         $syscpucount+=$subsysrec->{cpucount}; 
+      }
+      if ($syscount>1){
+      }
+      return($arec->{cpucount});
+   }
+
+   return(undef);
+
 }
 
 sub getRecordImageUrl

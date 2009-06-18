@@ -440,6 +440,7 @@ sub new
                 label         =>'active systemnames',
                 group         =>'systems',
                 htmldetail    =>0,
+                readonly      =>1,
                 htmlwidth     =>'130px',
                 vjointo       =>'itil::lnkapplsystem',
                 vjoinbase     =>[{systemcistatusid=>"4"}],
@@ -451,11 +452,43 @@ sub new
                 label         =>'active systemids',
                 group         =>'systems',
                 htmldetail    =>0,
+                readonly      =>1,
                 htmlwidth     =>'130px',
                 vjointo       =>'itil::lnkapplsystem',
                 vjoinbase     =>[{systemcistatusid=>"4"}],
                 vjoinon       =>['id'=>'applid'],
                 vjoindisp     =>['systemsystemid']),
+
+      new kernel::Field::Number(
+                name          =>'systemcount',
+                label         =>'system count',
+                group         =>'systems',
+                htmldetail    =>0,
+                readonly      =>1,
+                searchable    =>0,
+                depend        =>['systems'],
+                onRawValue    =>\&calculateSysCount),
+
+      new kernel::Field::Number(
+                name          =>'systemslogicalcpucount',
+                label         =>'log cpucount',
+                group         =>'systems',
+                htmldetail    =>0,
+                readonly      =>1,
+                searchable    =>0,
+                depend        =>['id'],
+                onRawValue    =>\&calculateLogicalCpuCount),
+
+      new kernel::Field::Number(
+                name          =>'systemsrelphyscpucount',
+                label         =>'relative phys. cpucount',
+                group         =>'systems',
+                htmldetail    =>0,
+                precision     =>2,
+                readonly      =>1,
+                searchable    =>0,
+                depend        =>['id'],
+                onRawValue    =>\&calculateRelPhysCpuCount),
 
       new kernel::Field::Text(
                 name          =>'applgroup',
@@ -815,6 +848,49 @@ sub getTeamBoss
    }
    return(\@teamboss);
 }
+
+sub calculateLogicalCpuCount
+{
+   my $self=shift;
+   my $current=shift;
+   my $applid=$current->{id};
+
+   my $l=getModuleObject($self->getParent->Config(),"itil::lnkapplsystem");
+   $l->SetFilter({applid=>\$applid,systemcistatusid=>[qw(3 4 5)]});
+
+   my $cpucount;
+   foreach my $lrec ($l->getHashList(qw(logicalcpucount))){
+      $cpucount+=$lrec->{logicalcpucount};
+   }
+   return($cpucount);
+}
+
+sub calculateRelPhysCpuCount
+{
+   my $self=shift;
+   my $current=shift;
+   my $applid=$current->{id};
+
+   my $l=getModuleObject($self->getParent->Config(),"itil::lnkapplsystem");
+   $l->SetFilter({applid=>\$applid,systemcistatusid=>[qw(3 4 5)]});
+
+   my $cpucount;
+   foreach my $lrec ($l->getHashList(qw(relphysicalcpucount))){
+      $cpucount+=$lrec->{relphysicalcpucount};
+   }
+   return($cpucount);
+}
+
+sub calculateSysCount
+{
+   my $self=shift;
+   my $current=shift;
+   my $sysfld=$self->getParent->getField("systems");
+   my $s=$sysfld->RawValue($current);
+   return(0) if (!ref($s) eq "ARRAY");
+   return($#{$s}+1);
+}
+
 
 
 sub getWfEventNotifyTargets     # calculates the target email addresses

@@ -330,6 +330,17 @@ sub new
                 dataobjattr   =>'system.cpucount'),
 
       new kernel::Field::Number(
+                name          =>'relphysicalcpucount',
+                searchable    =>0,
+                precision     =>2,
+                htmldetail    =>0,
+                readonly      =>1,
+                depend        =>['cpucount','assetid','hwcpucount'],
+                group         =>'logsys',
+                label         =>'relative phys. CPU-Count',
+                onRawValue    =>\&calcPhyCpuCount),
+
+      new kernel::Field::Number(
                 name          =>'memory',
                 group         =>'logsys',
                 label         =>'Memory',
@@ -849,6 +860,34 @@ sub getTeamBossID
    }
    return(\@teambossid);
 }
+
+sub calcPhyCpuCount   #calculates the relative physical cpucount
+{
+   my $self=shift;
+   my $current=shift;
+
+   my $assetid=$current->{assetid};
+
+   my $sys=getModuleObject($self->getParent->Config,"itil::system");
+   $sys->SetFilter({assetid=>\$assetid,cistatusid=>[qw(3 4 5)]});
+   my $syscount;
+   my $syscpucount;
+   foreach my $subsysrec ($sys->getHashList(qw(cpucount))){
+      $syscount++;
+      $syscpucount+=$subsysrec->{cpucount};
+   }
+   if ($syscount==1){
+      return($current->{hwcpucount});
+   }
+   else{
+      my $lcpucount=$current->{cpucount};
+      if ($current->{hwcpucount}>0){
+         return($current->{hwcpucount}/$syscpucount*$lcpucount); 
+      }
+   }  
+   return(undef);
+}
+
 
 sub PhoneUsage
 {
