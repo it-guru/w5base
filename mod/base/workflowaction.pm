@@ -67,6 +67,26 @@ sub new
                 label         =>'Workflow Name'),
 
       new kernel::Field::Text(
+                name          =>'wfclass',
+                vjointo       =>'base::workflow',
+                vjoinon       =>['wfheadid'=>'id'],
+                vjoindisp     =>'class',
+                sqlorder      =>'none',
+                htmldetail    =>'0',
+                searchable    =>'0',
+                label         =>'Workflow Class'),
+
+      new kernel::Field::Text(
+                name          =>'wfnature',
+                vjointo       =>'base::workflow',
+                vjoinon       =>['wfheadid'=>'id'],
+                vjoindisp     =>'nature',
+                sqlorder      =>'none',
+                htmldetail    =>'0',
+                searchable    =>'0',
+                label         =>'Workflow Nature'),
+
+      new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Action',
                 sqlorder      =>'none',
