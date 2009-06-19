@@ -46,45 +46,42 @@ sub cleanupwf
 {
    my $self=shift;
    my $wf=getModuleObject($self->Config,"base::workflow");
-   my $wfchk=getModuleObject($self->Config,"base::workflow");
+   my $wfop=$wf->Clone();
 
-   my $db=new kernel::database($self->getParent,"w5base");
-   if (!$db->Connect()){
-      return({exitcode=>1,msg=>msg(ERROR,"failed to connect database")});
-   }
-   my $cmd="select wfheadid,srcsys,srcid from wfhead";
-   if (!$db->execute($cmd)){
-      return({exitcode=>2,msg=>msg(ERROR,"can't execute '%s'",$cmd)});
-   }
-
-
-   while(my ($rec,$msg)=$db->fetchrow()){
-      last if (!defined($rec));
-      if ($rec->{srcid} ne "" && $rec->{srcsys} ne ""){
-         printf("Process srcid=%s srcsys=%s\n",$rec->{srcid},$rec->{srcsys});
-         $wfchk->ResetFilter();
-         $wfchk->SetFilter({srcsys=>\$rec->{srcsys},srcid=>\$rec->{srcid}});
-         my @l=map({$_->{id}} $wfchk->getHashList(qw(id)));
-         msg(INFO,"found idlist(%s)=%s",$rec->{srcid},join(",",@l));
-         if ($#l>0){
-            my $minid=undef;
-            foreach my $chkid (@l){
-               $minid=$chkid if (!defined($minid) || $minid>$chkid);
+   $wf->SetFilter({class=>\'base::workflow::DataIssue',
+                   state=>\'2'});
+   $wf->SetCurrentView(qw(ALL));
+   my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
+   if (defined($rec)){
+      do{
+         msg(INFO,"process $rec->{id}: $rec->{name}");
+         msg(INFO,"                  | ".
+                  "$rec->{affectedobject} - $rec->{affectedobjectid}");
+         my $ok=0;
+         if ($rec->{affectedobject} ne ""){
+            my $chk=getModuleObject($self->Config,$rec->{affectedobject});
+            if (defined($chk)){
+               my $idobj=$chk->IdField();
+               if (defined($idobj)){
+                  my $idname=$idobj->Name();
+                  $chk->SetFilter({$idname=>\$rec->{affectedobjectid}});
+                  my ($chkrec)=$chk->getOnlyFirst($idname);
+                  if (defined($chkrec)){
+                     $ok++
+                  }
+               }
             }
-           
-            foreach my $delid (@l){
-               next if ($delid==$minid);
-               msg(INFO,"srcid=$rec->{srcid} srcsys=$rec->{srcsys} DEL:$delid");
-               $wf->ResetFilter();
-               $wf->SetFilter({id=>\$delid});
-               $wf->ForeachFilteredRecord(sub{
-                   $wf->ValidatedDeleteRecord($_);
-               });
-
-            }
-            
          }
-      }
+         if (!$ok){
+            msg(WARN,"invalid referenz for workflow $rec->{id}");
+            $wfop->Store($rec,{stateid=>'25',
+                               fwddebtarget=>undef,
+                               fwddebtargetid=>undef,
+                               fwdtarget=>undef,
+                               fwdtarget=>undef});
+         }
+         ($rec,$msg)=$wf->getNext();
+      } until(!defined($rec));
    }
    return({exitcode=>0});
 }

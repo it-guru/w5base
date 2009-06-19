@@ -68,11 +68,12 @@ sub NotifyINetwork
 
    my $method = SOAP::Data->name('TriggerINetwork')->attr({xmlns=>$inetwxmlns});
 
-   my @params=( $header,
-                SOAP::Data->name('module')->value('a'),
-                SOAP::Data->name('submodule')->value('a'),
-                SOAP::Data->name('operation')->value('a'),
-                SOAP::Data->name('identifyBy')->value('a')  );
+   my @params=(
+# $header,
+                SOAP::Data->name('Module')->type("")->value('myMod'),
+                SOAP::Data->name('Submodule')->type("")->value('MySub'),
+                SOAP::Data->name('Operation')->type("")->value('MyOp'),
+                SOAP::Data->name('IdentifyBy')->type("")->value('MyId')  );
 
    my $res=SOAP::Lite->uri($inetwxmlns)->proxy($wsproxy)
                      ->on_action(sub{'"'.join('/',$inetwxmlns,$_[1]).'"'})
