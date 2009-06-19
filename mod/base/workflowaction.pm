@@ -57,6 +57,16 @@ sub new
                 dataobjattr   =>'wfaction.wfheadid'),
 
       new kernel::Field::Text(
+                name          =>'wfname',
+                vjointo       =>'base::workflow',
+                vjoinon       =>['wfheadid'=>'id'],
+                vjoindisp     =>'name',
+                sqlorder      =>'none',
+                htmldetail    =>'0',
+                searchable    =>'0',
+                label         =>'Workflow Name'),
+
+      new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Action',
                 sqlorder      =>'none',
