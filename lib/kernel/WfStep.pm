@@ -300,7 +300,7 @@ sub Process
          $h->{intiatornotify}=$intiatornotify if ($intiatornotify ne "");
          return($self->nativProcess($op,$h,$WfRec,$actions));
       }
-      elsif ($op eq "wfforward"){    # default forwarding Handler
+      elsif ($op eq "wfforward" || $op eq "wfreprocess"){ #default forwarding
          my $note=Query->Param("note");
          $note=trim($note);
 
@@ -315,6 +315,18 @@ sub Process
                   $self->LastMsg(ERROR,"invalid forwarding target");
                }
                return(0);
+            }
+            if ($newrec->{fwdtarget} eq "base::user"){
+               # check against distribution contacts
+               my $user=getModuleObject($self->Config,"base::user");
+               $user->SetFilter({userid=>\$newrec->{fwdtargetid}});
+               my ($urec,$msg)=$user->getOnlyFirst(qw(usertyp));
+               if (!defined($urec) || 
+                   ($urec->{usertyp} ne "user" &&
+                    $urec->{usertyp} ne "service")){
+                  $self->LastMsg(ERROR,"selected forward user is not allowed");
+                  return(0);
+               }
             }
          }
          else{

@@ -170,6 +170,9 @@ sub InitWorkflow
 sub getDefaultContractor
 {
    my $self=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my $action=shift;
    return('');
 }
 
@@ -745,20 +748,23 @@ sub generateWorkspacePages
          $devpartner=$oo->FormatedDetail($WfRec,"AscV01");
       }
       if ($devpartner eq ""){
-         ($devpartner)=$self->getParent->getDefaultContractor($WfRec,$actions);
+         ($devpartner)=$self->getParent->getDefaultContractor($WfRec,$actions,
+                                                              "wfreprocess");
       }
-      $d.='<script language="JavaScript">'.
-          'function setDevReprocess(){'.
-          ' var d=document.getElementById("OPwfreprocess");'.
-          ' var f=d.getElementsByTagName("input");'.
-          ' for(var i=0;i<f.length;i++){'.
-          '    if (f[i].name=="Formated_fwdtargetname"){'.
-          '       f[i].value="'.$devpartner.'";'.
-          '    }'.
-          ' }'.
-          '}'.
-          'addEvent(window, "load", setDevReprocess);'.
-          '</script>';
+      if ($devpartner ne ""){
+         $d.='<script language="JavaScript">'.
+             'function setDevReprocess(){'.
+             ' var d=document.getElementById("OPwfreprocess");'.
+             ' var f=d.getElementsByTagName("input");'.
+             ' for(var i=0;i<f.length;i++){'.
+             '    if (f[i].name=="Formated_fwdtargetname"){'.
+             '       f[i].value="'.$devpartner.'";'.
+             '    }'.
+             ' }'.
+             '}'.
+             'addEvent(window, "load", setDevReprocess);'.
+             '</script>';
+      }
       $$divset.="<div id=OPwfreprocess>$d</div>";
    }
    if (grep(/^wfcallback$/,@$actions)){
@@ -1155,7 +1161,8 @@ sub Process
      
          my ($target,$fwdtarget,$fwdtargetid,$fwddebtarget,
              $fwddebtargetid,@wsref)=
-             $self->getParent->getDefaultContractor($WfRec,$actions);
+             $self->getParent->getDefaultContractor($WfRec,$actions,
+                                                    "wfactivate");
          if (!defined($fwdtargetid)){
             return(0);
          }
@@ -1189,46 +1196,47 @@ sub Process
          }
          return(0);
       }
-      elsif ($op eq "wfreprocess"){
-         my $note=Query->Param("note");
-         $note=trim($note);
-     
-         my $fobj=$self->getParent->getField("fwdtargetname");
-         my $h=$self->getWriteRequestHash("web");
-         my $newrec;
-         if ($newrec=$fobj->Validate($WfRec,$h)){
-            if (!defined($newrec->{fwdtarget}) ||
-                !defined($newrec->{fwdtargetid} ||
-                $newrec->{fwdtargetid}==0)){
-               if ($self->LastMsg()==0){
-                  $self->LastMsg(ERROR,"invalid forwarding target");
-               }
-               return(0);
-            }
-         }
-         my $fwdtargetname=Query->Param("Formated_fwdtargetname");
-     
-         if ($self->StoreRecord($WfRec,{stateid=>2,
-                                       fwdtarget=>$newrec->{fwdtarget},
-                                       fwdtargetid=>$newrec->{fwdtargetid},
-                                       eventend=>undef,
-                                       closedate=>undef,
-                                       fwddebtarget=>undef,
-                                       fwddebtargetid=>undef })){
-            if ($self->getParent->getParent->Action->StoreRecord(
-                $WfRec->{id},"wfforward",
-                {translation=>'base::workflow::request'},$fwdtargetname."\n".
-                                                         $note,undef)){
-               $self->PostProcess($action.".".$op,$WfRec,$actions,
-                                  note=>$note,
-                                  fwdtarget=>$newrec->{fwdtarget},
-                                  fwdtargetid=>$newrec->{fwdtargetid},
-                                  fwdtargetname=>$fwdtargetname);
-               return(1);
-            }
-         }
-         return(0);
-      }
+#     # wurde durch den default Handler in kernel::WfStep erstetzt
+#      elsif ($op eq "wfreprocess"){
+#         my $note=Query->Param("note");
+#         $note=trim($note);
+#     
+#         my $fobj=$self->getParent->getField("fwdtargetname");
+#         my $h=$self->getWriteRequestHash("web");
+#         my $newrec;
+#         if ($newrec=$fobj->Validate($WfRec,$h)){
+#            if (!defined($newrec->{fwdtarget}) ||
+#                !defined($newrec->{fwdtargetid} ||
+#                $newrec->{fwdtargetid}==0)){
+#               if ($self->LastMsg()==0){
+#                  $self->LastMsg(ERROR,"invalid forwarding target");
+#               }
+#               return(0);
+#            }
+#         }
+#         my $fwdtargetname=Query->Param("Formated_fwdtargetname");
+#     
+#         if ($self->StoreRecord($WfRec,{stateid=>2,
+#                                       fwdtarget=>$newrec->{fwdtarget},
+#                                       fwdtargetid=>$newrec->{fwdtargetid},
+#                                       eventend=>undef,
+#                                       closedate=>undef,
+#                                       fwddebtarget=>undef,
+#                                       fwddebtargetid=>undef })){
+#            if ($self->getParent->getParent->Action->StoreRecord(
+#                $WfRec->{id},"wfforward",
+#                {translation=>'base::workflow::request'},$fwdtargetname."\n".
+#                                                         $note,undef)){
+#               $self->PostProcess($action.".".$op,$WfRec,$actions,
+#                                  note=>$note,
+#                                  fwdtarget=>$newrec->{fwdtarget},
+#                                  fwdtargetid=>$newrec->{fwdtargetid},
+#                                  fwdtargetname=>$fwdtargetname);
+#               return(1);
+#            }
+#         }
+#         return(0);
+#      }
       elsif ($op eq "wfapprovalreq"){
          my $note=Query->Param("note");
          $note=trim($note);

@@ -21,3 +21,4 @@
 'to current owner'=>{de=>'an aktuellen Bearbeiter'},
 'to current forward'=>{de=>'an aktuelle Weiterleitung'},
 'to all related'=>{de=>'an alle Beteiligten'},
+'selected forward user is not allowed'=>{de=>'der gewählte Kontakt kann keine Weiterleitungen empfangen'},
