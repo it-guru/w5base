@@ -834,13 +834,13 @@ sub Finish
    if (exists($result->{lastmsg})){  # .Net needs every element coded as string
       if (ref($result->{lastmsg}) eq "ARRAY"){
          my @l;
-         map({my $u=SOAP::Data->type('xsi:string')->value($_);push(@l,$u);} 
+         map({my $u=SOAP::Data->type('xsd:string')->value($_);push(@l,$u);} 
              @{$result->{lastmsg}});
          $result->{lastmsg}=SOAP::Data->type("curns:ArrayOfStringItems")
                                       ->value(\@l);
       }
       else{
-         $result->{lastmsg}=SOAP::Data->type('xsi:string')
+         $result->{lastmsg}=SOAP::Data->type('xsd:string')
                                       ->value($result->{lastmsg});
       }
    }
