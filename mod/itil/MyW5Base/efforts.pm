@@ -247,10 +247,15 @@ sub Result
       foreach my $rec (@d){
          next if (!defined($rec->{users}) || ref($rec->{users}) ne "ARRAY");
          foreach my $urec (@{$rec->{users}}){
-            $user{$urec->{userid}}=1;
+            my @r=$urec->{roles};
+            @r=@{$urec->{roles}} if (ref($urec->{roles}) eq "ARRAY");
+            if (grep(/^(REmployee|RBoss|RFreelancer)$/,@r)){
+           #    printf STDERR ("fifi urec=%s\n",Dumper($urec));
+               $user{$urec->{userid}}++;
+            }
          }
       }
-      $self->{usercount}=keys(%user)+1;
+      $self->{usercount}=keys(%user);
    }
    else{
       my $userid=$self->getParent->getCurrentUserId();
