@@ -71,7 +71,7 @@ min number of cores               : 1
    external programm will be done.
    
      # setup your svn env
-     # add to ~/.subversion/servers
+     # add to ~/.subversion/servers (if necessary)
      [global]
      http-proxy-exceptions = *.yourintranet.de
      http-proxy-host = yourhost.de
@@ -212,6 +212,15 @@ min number of cores               : 1
  Step5: checkout w5base from sourceforge and setup w5base /etc/w5base
  ======
    # as development user or user in witch the webserver should run
+
+   # setup your svn env
+   # add to ~/.subversion/servers (if necessary)
+   [global]
+   http-proxy-exceptions = *.yourintranet.de
+   http-proxy-host = yourhost.de
+   http-proxy-port = yourport
+   http-compression = yes
+ 
  
    # checkout w5base from sf and setting up /etc/w5base
    sudo -i
@@ -323,6 +332,15 @@ min number of cores               : 1
    The ServiceCenter API can remote control Peragren ServiceCenter via
    Perl. This Modul is very experimental - but it works :-)
 
+      # setup your svn env
+      # add to ~/.subversion/servers (if necessary)
+      [global]
+      http-proxy-exceptions = *.yourintranet.de
+      http-proxy-host = yourhost.de
+      http-proxy-port = yourport
+      http-compression = yes
+
+
       cd /usr/src
       svn co https://sc-perl-api.svn.sourceforge.net/svnroot/sc-perl-api \
           sc-perl-api 
@@ -333,6 +351,14 @@ min number of cores               : 1
  
    Installing DTP Module
    ---------------------
+   # setup your svn env
+   # add to ~/.subversion/servers (if necessary)
+   [global]
+   http-proxy-exceptions = *.yourintranet.de
+   http-proxy-host = yourhost.de
+   http-proxy-port = yourport
+   http-compression = yes
+
    cd /usr/src
    svn co https://perl-dtp.svn.sourceforge.net/svnroot/perl-dtp perl-dtp 
    (umask 022; cd perl-dtp/dependence && 
