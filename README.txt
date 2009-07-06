@@ -70,6 +70,14 @@ min number of cores               : 1
    All auths will be cached, soo only evey max. 15min a call to the
    external programm will be done.
    
+     # setup your svn env
+     # add to ~/.subversion/servers
+     [global]
+     http-proxy-exceptions = *.yourintranet.de
+     http-proxy-host = yourhost.de
+     http-proxy-port = yourport
+     http-compression = yes
+ 
      cd /usr/src
      #
      # checkout from repository
@@ -204,14 +212,6 @@ min number of cores               : 1
  Step5: checkout w5base from sourceforge and setup w5base /etc/w5base
  ======
    # as development user or user in witch the webserver should run
- 
-   # setup your svn env
-   # add to ~/.subversion/servers
-   [global]
-   http-proxy-exceptions = *.yourintranet.de
-   http-proxy-host = yourhost.de
-   http-proxy-port = yourport
-   http-compression = yes
  
    # checkout w5base from sf and setting up /etc/w5base
    sudo -i
