@@ -222,13 +222,15 @@ min number of cores               : 1
    http-compression = yes
  
  
-   # checkout w5base from sf and setting up /etc/w5base
+   # checkout w5base from SourceForge and setting up /etc/w5base
    sudo -i
    groupadd $W5BASEDEVGROUP                               # w5base dev group
    useradd -d $W5BASEINSTDIR -g $APACHE_RUN_GROUP $W5BASESRVUSER
    usermod -a -G $APACHE_RUN_GROUP $APACHE_RUN_USER
    usermod -a -G $APACHE_RUN_GROUP $W5BASEDEVUSER         
    usermod -a -G $W5BASEDEVGROUP   $W5BASEDEVUSER
+   install -m 2770 -o $W5BASESRVUSER -g $APACHE_RUN_GROUP \
+           -d /etc/w5base
    install -m 2770 -o $W5BASESRVUSER -g $APACHE_RUN_GROUP \
            -d /var/opt/w5base
    install -m 2770 -o $W5BASESRVUSER -g $APACHE_RUN_GROUP \
