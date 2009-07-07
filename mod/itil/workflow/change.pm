@@ -267,6 +267,10 @@ sub generateMailSet
             my $data=$v;
             $data=~s/</&lt;/g;
             $data=~s/>/&gt;/g;
+            if ($field eq "changedescription"){
+               $data=~s/^AG\s+.+$//m;
+               $data=trim($data);
+            }
             if ($field eq "srcid"){
                $data.=" $baseurl/auth/base/workflow/ById/$WfRec->{id} " 
             }

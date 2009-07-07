@@ -58,39 +58,31 @@ sub NotifyINetwork
    sub SOAP::Transport::HTTP::Client::get_basic_credentials { 
        return $wsuser => $wspass;
    }
-   my $inetwxmlns="http://tempuri.org";
+   my $inetwxmlns="http://tempuri.org/";
 
-   my $header = SOAP::Header->name(AuthentifizierungsHeader => { 
-     userName => $wsuser,
-     password => $wspass
-   })->uri($inetwxmlns)->prefix(''); 
+   my $method = SOAP::Data->name('TriggerINetwork')->prefix('ns');
 
-
-   my $method = SOAP::Data->name('TriggerINetwork')->attr({xmlns=>$inetwxmlns});
-
-   my @params=(
-# $header,
-                SOAP::Data->name('Module')->type("")->value('myMod'),
-                SOAP::Data->name('Submodule')->type("")->value('MySub'),
-                SOAP::Data->name('Operation')->type("")->value('MyOp'),
-                SOAP::Data->name('IdentifyBy')->type("")->value('MyId')  );
-
-   my $res=SOAP::Lite->uri($inetwxmlns)->proxy($wsproxy)
-                     ->on_action(sub{'"'.join('/',$inetwxmlns,$_[1]).'"'})
-                     ->call($method=>@params);
-
-
-#printf STDERR ("fifi d=%s\n",Dumper($res));
-
-
-   if (open(F,">>/tmp/event.log")){
-      printf F ("Event=%s\n",time());
-      printf F ("Data=%s\n",Dumper(\%param));
-      close(F);
+   my %tr=('identifiedBy'=>'IdentifyBy',    'module'      =>'Module',
+           'subclass'    =>'Submodule',     'op'          =>'Operation');
+   my @SOAPparam;
+   foreach my $k (keys(%tr)){
+      if ($param{$k} ne ""){
+         push(@SOAPparam,SOAP::Data->name($tr{$k})
+                                   ->type("")->prefix('ns')->value($param{$k}));
+      }
    }
 
+   my $soap=SOAP::Lite->uri($inetwxmlns)->proxy($wsproxy)
+                      ->on_action(sub{'"'.$inetwxmlns.$_[1].'"'});
+   $soap->serializer->register_ns($inetwxmlns,'ns');
 
+   my $res=$soap->call($method=>@SOAPparam); 
 
+   if ($res->fault){
+      $self->Log(ERROR,"trigger","INetwork: ".$res->fault->{faultstring});
+      return({exitcode=>2,msg=>$res->fault->{faultstring}});
+   }
+   $self->Log(INFO,"trigger","INetwork: ".$res->result());
    return({exitcode=>0,msg=>'ok'});
 }
 
