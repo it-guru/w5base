@@ -75,13 +75,13 @@ sub SWInstanceCertCheck
          if ($msg ne ""){
             my $now=NowStamp();
             my $newrec={sslcheck=>$now,sslstate=>$msg};
-            if ($end ne ""){
+            if (defined($end)){
                $newrec->{sslend}=$end;
             }
             else{
                $newrec->{sslend}=undef;
             }
-            if ($begin ne ""){
+            if (defined($begin)){
                $newrec->{sslbegin}=$begin;
             }
             else{
