@@ -124,8 +124,8 @@ sub checkSSL
    my $expire_date = DateTime->from_epoch(epoch => str2time($expire_date_str));
 
 
-   printf STDERR ("fifi begin_date_str $begin_date\n");
-   printf STDERR ("fifi expire_date_str $expire_date\n");
+   #printf STDERR ("fifi begin_date_str $begin_date\n");
+   #printf STDERR ("fifi expire_date_str $expire_date\n");
 
    return("check OK",$begin_date,$expire_date);
 }
