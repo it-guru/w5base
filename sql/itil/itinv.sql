@@ -748,3 +748,8 @@ create table lnkapplclust   (
   KEY clust(clust),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 );
+alter table swinstance add ssl_url varchar(128) default NULL;
+alter table swinstance add ssl_cert_check datetime default NULL;
+alter table swinstance add ssl_cert_end datetime default NULL;
+alter table swinstance add ssl_cert_begin datetime default NULL;
+alter table swinstance add ssl_state varchar(128) default NULL;
