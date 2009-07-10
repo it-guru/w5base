@@ -255,6 +255,43 @@ sub new
                 label         =>'Automationsname/IP-Address',
                 dataobjattr   =>'swinstance.autompartner'),
 
+      new kernel::Field::Text(
+                name          =>'sslurl',
+                group         =>'ssl',
+                label         =>'SSL Check URL',
+                dataobjattr   =>'swinstance.ssl_url'),
+
+      new kernel::Field::Date(
+                name          =>'sslbegin',
+                history       =>0,
+                readonly      =>1,
+                group         =>'ssl',
+                label         =>'SSL Certificate Begin',
+                dataobjattr   =>'swinstance.ssl_cert_begin'),
+
+      new kernel::Field::Date(
+                name          =>'sslend',
+                history       =>0,
+                readonly      =>1,
+                group         =>'ssl',
+                label         =>'SSL Certificate End',
+                dataobjattr   =>'swinstance.ssl_cert_end'),
+
+      new kernel::Field::Date(
+                name          =>'sslcheck',
+                history       =>0,
+                readonly      =>1,
+                group         =>'ssl',
+                label         =>'SSL last Certificate check',
+                dataobjattr   =>'swinstance.ssl_cert_check'),
+
+      new kernel::Field::Text(
+                name          =>'sslstate',
+                readonly      =>1,
+                group         =>'ssl',
+                label         =>'SSL State',
+                dataobjattr   =>'swinstance.ssl_state'),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 group         =>'misc',
@@ -584,7 +621,7 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default adm systems contacts misc);
+   my @databossedit=qw(default adm systems contacts ssl misc);
    if (!defined($rec)){
       return(@databossedit);
    }
@@ -630,7 +667,7 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default adm systems misc contacts source));
+   return(qw(header default adm systems ssl misc contacts source));
 }
 
 
