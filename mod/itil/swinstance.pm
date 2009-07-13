@@ -589,6 +589,13 @@ sub Validate
       $newrec->{swport}=undef;
    }
    ########################################################################
+   if (effChanged($oldrec,$newrec,"sslurl")){
+      $newrec->{sslbegin}=undef;
+      $newrec->{sslend}=undef;
+      $newrec->{sslstate}=undef;
+      $newrec->{sslcheck}=undef;
+   }
+
 
    return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"fullname"));
    return(1);
