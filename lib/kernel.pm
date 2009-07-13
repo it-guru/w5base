@@ -77,7 +77,8 @@ use Encode;
 use Unicode::String qw(utf8 latin1 utf16);
 @ISA = qw(Exporter);
 @EXPORT = qw(&Query &LangTable &globalContext &NowStamp &CalcDateDuration
-             &trim &rtrim &ltrim &hash2xml &effVal &Debug &UTF8toLatin1
+             &trim &rtrim &ltrim &hash2xml &effVal &effChanged 
+             &Debug &UTF8toLatin1
              &Datafield2Hash &Hash2Datafield &CompressHash
              &unHtml &quoteHtml &quoteWap &quoteQueryString &Dumper 
              &FancyLinks &mkInlineAttachment 
@@ -404,6 +405,22 @@ sub effVal
    if (defined($oldrec) && exists($oldrec->{$var}) && 
        !(exists($newrec->{$var}))){
       return($oldrec->{$var});
+   }
+   return(undef);
+}
+
+#
+# detects the effective change of a given variable
+#
+sub effChanged
+{
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $var=shift;
+   if (exists($newrec->{$var})){
+      if ($newrec->{$var} ne $oldrec->{$var}){
+         return(1);
+      }
    }
    return(undef);
 }
