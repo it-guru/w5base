@@ -193,7 +193,7 @@ sub quoteHtml
    $d=~s/\xFC/&uuml;/g;
    $d=~s/\xDF/&szlig;/g;
    $d=~s/"/&quot;/g;
-   $d=~s/'/&prime;/g;
+   $d=~s/'/&#x0027;/g;
    $d=~s/&amp;nbsp;/&nbsp;/g;
 
    return($d);
