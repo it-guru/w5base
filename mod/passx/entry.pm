@@ -51,6 +51,7 @@ sub new
                 transprefix   =>'actype.',
                 value         =>['1',
                                  '5',
+                                 '6',
                                  '4',
                                  '2',
                                  '3',
@@ -260,6 +261,15 @@ sub mkConnectorURL
    elsif($rec->{entrytype}==3){
       $ho="telnet://$rec->{account}\@$rec->{name}";
    }
+   elsif($rec->{entrytype}==6){
+      my $ac=$rec->{account};
+      $ac=~s/\//_/g;
+      $ho=$rec->{name};
+      if ($ac ne ""){
+        # $ho=~s/^(.*):\/\/(.*$)/\1:\/\/$ac:@\2/;
+      }
+    #  $ho="telnet://$rec->{account}\@$rec->{name}";
+   }
    else{
       $ho="connect://$rec->{account}\@$rec->{name}";
    }
@@ -409,8 +419,12 @@ sub generateMenuTree
                  my %mrec;
                  if ($rec->{entrytype}==1 ||
                      $rec->{entrytype}==3 ||
-                     $rec->{entrytype}==5){
+                     $rec->{entrytype}==5 ||
+                     $rec->{entrytype}==6){
                     $mrec{label}=$rec->{account}.'@'.$rec->{name};
+                    if ($rec->{entrytype}==6){
+                       $mrec{hreftarget}.="_blank";
+                    }
                     if ($rec->{comments} ne ""){
                        if ($mode eq "connector"){ 
                           $mrec{label}.="</a>";
@@ -445,7 +459,11 @@ sub generateMenuTree
                  my $connecturl=mkConnectorURL($rec);
                  my $ho;
                  my $hc;
-                 $ho="<a href=\"$connecturl\">" if ($connecturl ne "");
+                 my $target;
+                 if ($rec->{entrytype}==6){
+                    $target="target=_blank";
+                 }
+                 $ho="<a $target href=\"$connecturl\">" if ($connecturl ne "");
                  $hc="</a>" if ($ho ne "");
                  $simplem.="<td $onclicktag width=1%>".
                      "$ho<img border=0 src=\"../../../public/passx/load/".
@@ -740,14 +758,23 @@ sub Validate
    $newrec->{userid}=$self->getCurrentUserId();
    my $entrytype=effVal($oldrec,$newrec,"entrytype");
    if ($entrytype<10){
-
-      my $name=lc(trim(effVal($oldrec,$newrec,"name")));
-      if ($name eq "" || !($name=~m/^[^\.][a-z0-9_\.:-]+[^\.]$/)){
-         $self->LastMsg(ERROR,
-              sprintf($self->T("invalid systemname '%s' specified"),$name));
-         return(0);
+      if ($entrytype==6){
+         my $name=lc(trim(effVal($oldrec,$newrec,"name")));
+         if (!($name=~m/^(http|https|news|telnet|ssh|call|mailto):\/\/.+$/)){
+            $self->LastMsg(ERROR,
+                 sprintf($self->T("invalid url '%s' specified"),$name));
+            return(0);
+         }
       }
-      $newrec->{name}=$name;
+      else{
+         my $name=lc(trim(effVal($oldrec,$newrec,"name")));
+         if ($name eq "" || !($name=~m/^[^\.][a-z0-9_\.:-]+[^\.]$/)){
+            $self->LastMsg(ERROR,
+                 sprintf($self->T("invalid systemname '%s' specified"),$name));
+            return(0);
+         }
+         $newrec->{name}=$name;
+      }
    }
    else{
       my $name=trim(effVal($oldrec,$newrec,"name"));
@@ -799,7 +826,7 @@ sub Validate
    }
 
    my $account=trim(effVal($oldrec,$newrec,"account"));
-   if ($account eq "" || (!($account=~m/^[a-zA-Z0-9_\.\-\@]+$/) && 
+   if ($account eq "" || (!($account=~m/^[a-zA-Z0-9_\.\-\@\/]+$/) && 
        $account ne '$LOGNAME' && $account ne '$LOGIN')){
       $self->LastMsg(ERROR,
            sprintf($self->T("invalid account '%s' specified"),

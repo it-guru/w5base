@@ -35,6 +35,7 @@ sub BuildHtmlTree
    # tree->{prio}         = sortierreihenfolge
    # tree->{href}         = href link für den link
    # tree->{label}        = dargestellter text
+   # tree->{target}       = target window
    # tree->{tree}         = array pointer auf untermenu
 
    $control{rootpath}="../"          if (!defined($control{rootpath}));
@@ -99,7 +100,13 @@ sub _TreeLine
       if (defined($ment->{contextMenu})){
          $contextM=" cont=\"contextMenu_M$ment->{menuid}\" ";
       }
-      $d.="<a $hrefclass $contextM $usehref title=\"$desc\">" if (defined($href));
+      my $target;
+      if (defined($ment->{hreftarget}) && $ment->{hreftarget} ne ""){
+         $target="target=\"$ment->{hreftarget}\"";
+      }
+      if (defined($href)){
+         $d.="<a $target $hrefclass $contextM $usehref title=\"$desc\">";
+      }
       $d.=$text  if (defined($text));
       $d.="</a>" if (defined($href));
       $d.="</td></tr></table>";
