@@ -405,6 +405,11 @@ sub new
                 noselect      =>'1',
                 dataobjattr   =>'lnkcontact.croles'),
 
+      new kernel::Field::QualityText(),
+      new kernel::Field::QualityState(),
+      new kernel::Field::QualityOk(),
+      new kernel::Field::QualityLastDate(
+                dataobjattr   =>'swinstance.lastqcheck'),
    );
    $self->{history}=[qw(insert modify delete)];
    $self->{use_distinct}=1;

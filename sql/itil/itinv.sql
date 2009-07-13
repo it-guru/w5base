@@ -753,3 +753,4 @@ alter table swinstance add ssl_cert_check datetime default NULL;
 alter table swinstance add ssl_cert_end datetime default NULL;
 alter table swinstance add ssl_cert_begin datetime default NULL;
 alter table swinstance add ssl_state varchar(128) default NULL;
+alter table swinstance add lastqcheck datetime default NULL,add key(lastqcheck);
