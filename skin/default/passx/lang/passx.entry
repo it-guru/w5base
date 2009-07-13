@@ -6,6 +6,7 @@
 'actype.3'=>{de=>'Konsole',en=>'Console'},
 'actype.4'=>{de=>'Anwendung',en=>'Application'},
 'actype.5'=>{de=>'RDesktop(Windows)',en=>'RDesktop(Windows)'},
+'actype.6'=>{de=>'Web-URL',en=>'Web-URL'},
 'actype.10'=>{de=>'Sonstiges',en=>'Misc'},
 'actype.11'=>{de=>'Privat',en=>'Private'},
 'account type'=>{de=>'Account Typ'},
