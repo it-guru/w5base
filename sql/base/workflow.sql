@@ -96,7 +96,7 @@ CREATE TABLE wfhead (
 CREATE TABLE joblog (
   id bigint(20) NOT NULL default '0',
   method    varchar(128) NOT NULL default '',
-  event     varchar(128)  NOT NULL default '',
+  event     varchar(254)  NOT NULL default '',
   exitcode  int(20)      default NULL,srcsys varchar(10) default 'w5base',
   pid       int(20)      default NULL,srcid varchar(20) default NULL,
   exitstate varchar(20)  default NULL,srcload datetime default NULL,
