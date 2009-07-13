@@ -1,0 +1,2 @@
+'itil::qrule::SWInstanceCertCheck'=>{de=>'SSL URL Prüfung',en=>'SSL URL check'},
+'SSL certificate is nearly exiration'=>{de=>'SSL Zertifikat verfällt demnächst'},
