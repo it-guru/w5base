@@ -45,9 +45,13 @@ sub FormatedDetail
    my $dayoffset;
    my $timeonly;
 
+   my $usertimezone=$ENV{HTTP_FORCE_TZ};
+   if (!defined($usertimezone)){
+      $usertimezone=$self->getParent->UserTimezone();
+   }
    if (defined($d)){
       ($d,undef,$dayoffset,$timeonly,$delta)=$self->getFrontendTimeString(
-                                             $mode,$d);
+                                             $mode,$d,$usertimezone);
    }
    if (($mode eq "edit" || $mode eq "workflow")){
       my $name=$self->Name();
@@ -58,7 +62,6 @@ sub FormatedDetail
       return($self->getSimpleInputField($d,$self->{readonly}));
    }
    if ($d ne ""){
-      my $usertimezone=$self->getParent->UserTimezone();
       if (length($usertimezone)<=3 && $mode=~m/html/i){
          $d.="&nbsp;"; 
          $d.="$usertimezone";
@@ -324,7 +327,7 @@ sub Unformat
    if (defined($formated)){
       $formated=[$formated] if (ref($formated) ne "ARRAY");
       return(undef) if (!defined($formated->[0]));
-      my $usertimezone;
+      my $usertimezone=$ENV{HTTP_FORCE_TZ};
       if (!defined($usertimezone)){
          my $UserCache=$self->getParent->Cache->{User}->{Cache};
          if (defined($UserCache->{$ENV{REMOTE_USER}})){

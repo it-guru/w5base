@@ -62,8 +62,8 @@ sub NotifyINetwork
 
    my $method = SOAP::Data->name('TriggerINetwork')->prefix('ns');
 
-   my %tr=('identifiedBy'=>'IdentifyBy',    'module'      =>'Module',
-           'subclass'    =>'Submodule',     'op'          =>'Operation');
+   my %tr=('id'     =>'IdentifyBy',  'mod'      =>'Module',
+           'sclass' =>'Submodule',   'op'       =>'Operation');
    my @SOAPparam;
    foreach my $k (keys(%tr)){
       if ($param{$k} ne ""){

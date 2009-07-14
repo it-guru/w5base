@@ -69,8 +69,11 @@ sub new
       new kernel::Field::Select(
                 name          =>'srceventtype',
                 label         =>'Source Operation',
-                value         =>['InsertRecord','UpdateRecord',
-                                 'DeleteRecord','Any'],
+                value         =>['ins',  # insert record
+                                 'upd',  # update record
+                                 'del',  # delete record
+                                 'sch',  # state change
+                                 'Any'],
                 htmleditwidth =>'140px',
                 dataobjattr   =>'eventrouter.srceventtype'),
 
@@ -155,6 +158,15 @@ sub new
    $self->setWorktable("eventrouter");
    return($self);
 }
+
+sub isCopyValid
+{
+   my $self=shift;
+
+   return(1);
+}
+
+
 
 sub Validate
 {

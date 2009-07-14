@@ -133,7 +133,9 @@ sub Sendmail
          my $mixbound="d345".time()."af".time()."j34fjasd";
          my $from=$rec->{emailfrom};
          if ($from eq ""){
-            $from="no_reply\@".$rec->{initialsite};
+            my $sitename=$self->Config->Param("SiteName");
+            $sitename="W5Base" if ($sitename eq "");
+            $from="\"$sitename\" <no_reply\@".$rec->{initialsite}.">";
          }
          my $template=$rec->{emailtemplate};
          $template="sendmail" if ($template eq "");
@@ -301,7 +303,7 @@ sub Sendmail
                if (ref($rec->{emailbottom}) eq "ARRAY"){
                   $emailbottom=$rec->{emailbottom}->[$blk];
                }
-               if ($emailbottom eq ""){
+               if (defined($emailbottom) && $emailbottom eq ""){
                   $emailbottom="<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>";
                }
                msg(DEBUG,"try add blk $blk");

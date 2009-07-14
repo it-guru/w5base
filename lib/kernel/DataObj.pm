@@ -1060,7 +1060,7 @@ sub ValidatedInsertRecord
          if ($self->Validate(undef,$newrec)){
             $self->finishWriteRequestHash(undef,$newrec);
             my $bak=$self->InsertRecord($newrec);
-            $self->SendRemoteEvent("InsertRecord",undef,$newrec,$bak) if ($bak);
+            $self->SendRemoteEvent("ins",undef,$newrec,$bak) if ($bak);
             $self->FinishWrite(undef,$newrec) if ($bak);
             return($bak);
          }
@@ -1133,7 +1133,13 @@ sub ValidatedUpdateRecord
             $self->finishWriteRequestHash($oldrec,$validatednewrec);
             my $bak=$self->UpdateRecord($validatednewrec,@filter);
             if ($bak){
-               $self->SendRemoteEvent("UpdateRecord",$oldrec,$newrec);
+               if (effChanged($oldrec,$newrec,"stateid")){
+                  $self->SendRemoteEvent("sch",$oldrec,$newrec);
+               }
+               if (effChanged($oldrec,$newrec,"cistatusid")){
+                  $self->SendRemoteEvent("sch",$oldrec,$newrec);
+               }
+               $self->SendRemoteEvent("upd",$oldrec,$newrec);
                $self->FinishWrite($oldrec,$validatednewrec,\%comprec);
                $self->StoreUpdateDelta($oldrec,\%comprec) if ($bak);
                foreach my $v (keys(%$newrec)){
@@ -1260,7 +1266,7 @@ sub ValidatedDeleteRecord
    my $bak=undef;
    if ($self->ValidateDelete($oldrec)){
       $bak=$self->DeleteRecord($oldrec);
-      $self->SendRemoteEvent("DeleteRecord",$oldrec,undef) if ($bak);
+      $self->SendRemoteEvent("del",$oldrec,undef) if ($bak);
       $self->FinishDelete($oldrec) if ($bak); 
    }
 
@@ -1837,7 +1843,7 @@ sub getField
    my $deprec=shift;
    my ($container,$name)=(undef,$fullfieldname);
    if ($fullfieldname=~m/\./){
-      ($container,$name)=$fullfieldname=~m/^(\S+)\.(\S+)/;
+      ($container,$name)=$fullfieldname=~m/^([^.]+)\.(\S+)/;
    }
    if (defined($container)){
       if (!defined($deprec)){

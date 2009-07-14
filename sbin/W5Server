@@ -74,7 +74,7 @@ sub rpcCallSerialEvent
    if ($self->Config->Param("W5BaseOperationMode") eq "readonly"){
       return({exitcode=>0,msg=>'readonly mode'});
    }
-   my $eventlabel=$event."(".join(",",map({"'".$_."'"} @p)).")";
+   my $eventlabel=$event." ".join(" ",map({"'".$_."'"} @p));
    if ($self->{EventController}->isEvent($event)){
       my $timeout=$self->{EventController}->getMaxEventTimeout($event);
       return($self->async(sub {
@@ -292,24 +292,25 @@ sub rpcSendRemoteEvent
                   if ($r->{dstevent} ne ""){
                      my $id=$self->rpcGetUniqueId->{id};
                      my $spooltag="rpcSendRemoteEvent.".
-                                  $identifiedBy."(".$modulename.")";
+                                  $identifiedBy."-".$operation.
+                                  "(".$modulename.")";
                      my $interval=60;
                      my $retrycount=5;
                      my $firstcalldelay=$r->{controldelay};
                      $firstcalldelay=2 if ($firstcalldelay<2);
                      my @eventparam;
-                     push(@eventparam,"eventid",$id);
+                     if ($identifiedBy ne ""){
+                        push(@eventparam,"id",$identifiedBy);
+                     }
                      push(@eventparam,"op",$operation);
-                     push(@eventparam,"module",$modulename);
+                     push(@eventparam,"mod",$modulename);
                      if ($submodule ne ""){
-                        push(@eventparam,"subclass",$submodule);
+                        push(@eventparam,"sclass",$submodule);
                      }
                      if ($userid!=0){
-                        push(@eventparam,"userid",$userid);
+                        push(@eventparam,"uid",$userid);
                      }
-                     if ($identifiedBy ne ""){
-                        push(@eventparam,"identifiedBy",$identifiedBy);
-                     }
+                     push(@eventparam,"eid",$id);
                      my $control={spooltag       =>$spooltag,
                                   eventname      =>$r->{dstevent},
                                   eventparam     =>\@eventparam,

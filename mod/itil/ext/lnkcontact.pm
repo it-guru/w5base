@@ -60,14 +60,17 @@ sub getPosibleRoles
                                                      $self->Self),
              "techcontact"     =>$self->getParent->T("Technical Contact",
                                                      $self->Self),
+             "infocontact"     =>$self->getParent->T("Information contact",
+                                                     $self->Self),
+             "support"         =>$self->getParent->T("Support",
+                                                     $self->Self),
              "read"            =>$self->getParent->T("read application",
                                                      $self->Self),
              "privread"        =>$self->getParent->T("privacy read",
                                                      $self->Self),
              "write"           =>$self->getParent->T("write application",
                                                      $self->Self),
-             "support"         =>$self->getParent->T("Support",
-                                                     $self->Self));
+            );
    }
    if ($parentobj=~m/^.+::swinstance$/ ||
        (defined($self->getParent) &&

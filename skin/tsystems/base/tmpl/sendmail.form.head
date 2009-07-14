@@ -51,6 +51,8 @@ div.timestamp {
    vertical-align: top;
    margin: 0px;
    padding: 0px;
+   padding-top: 6px;
+   padding-left: 2px;
    font-size: 10px;
    overflow:hidden;
    width:121;
@@ -72,15 +74,28 @@ p.header {
    margin: 0px;
    padding: 1px;
 }
+div.separation{
+   height:820px;
+   width:754px;
+   background-color: #e6e6e6;
+}
 
 -->
 </style>
 <body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
-<table id=tabelle width="752" border="0" cellspacing="0" cellpadding="0">
+<table id=tabelle width="754" border="0" cellspacing="0" cellpadding="0">
   <tr>
     <td class=col1><img width=121 height=119 src="cid:sendmail.bild1.jpg" /></td>
     <td class=col2><img width=530 height=119 src="cid:sendmail.bild2.jpg" /></td>
     <td class=col3><img width=103 height=119 src="cid:sendmail.bild3.jpg"></td>
   </tr>
+</table>
+<a name="lang.%currentlang%"></a>
+<table id=tabelle width="754" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td align=right>
+%langcontrol%&nbsp;&nbsp;
+</td>
+</tr>
 </table>
 
