@@ -456,6 +456,7 @@ sub showFields
    my $self=$W5Base::SOAP;
    my $uri=shift;
    my $param=shift;
+   $param={} if (!ref($param));
    $self->_SOAPaction2param($self->{SOAP}->action(),$param);
 
    my $objectname=$param->{dataobject};
@@ -508,6 +509,7 @@ sub storeRecord
    my $self=$W5Base::SOAP;
    my $uri=shift;
    my $param=shift;
+   $param={} if (!ref($param));
    $self->_SOAPaction2param($self->{SOAP}->action(),$param);
    my $envelope=pop;
    my $objectname=$param->{dataobject};
@@ -618,6 +620,7 @@ sub deleteRecord
    my $self=$W5Base::SOAP;
    my $uri=shift;
    my $param=shift;
+   $param={} if (!ref($param));
    $self->_SOAPaction2param($self->{SOAP}->action(),$param);
    my $objectname=$param->{dataobject};
    my $filter=$param->{filter};
@@ -681,6 +684,7 @@ sub getHashList
    my $self=$W5Base::SOAP;
    my $uri=shift;
    my $param=shift;
+   $param={} if (!ref($param));
    my $ns=$self->_SOAPaction2param($self->{SOAP}->action(),$param);
    my $objectname=$param->{dataobject};
    my $view=$param->{view};
@@ -780,6 +784,7 @@ sub validateObjectname
    my $self=$W5Base::SOAP;
    my $uri=shift;
    my $param=shift;
+   $param={} if ($param eq "");
    my $objectname=$param->{dataobject};
 
    $ENV{HTTP_FORCE_LANGUAGE}=$param->{lang} if (defined($param->{lang}));
@@ -813,6 +818,7 @@ sub doPing
    my $self=$W5Base::SOAP;
    my $uri=shift;
    my $param=shift;
+   $param={} if (!ref($param));
    my $ns=$self->_SOAPaction2param($self->{SOAP}->action(),$param);
    $self->Log(INFO,"soap", "Ping: ".$self->{SOAP}->action());
    my $d=SOAP::Data->name(output=>{exitcode=>0,result=>1});
