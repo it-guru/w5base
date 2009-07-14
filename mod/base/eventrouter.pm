@@ -51,6 +51,18 @@ sub new
                 vjoinon       =>['cistatusid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::Text(
+                name          =>'fullname',
+                label         =>'event route',
+                readonly      =>1,
+                htmldetail    =>0,
+                searchable    =>0,
+                dataobjattr   =>'concat(eventrouter.srcmoduleobject,'.
+                                'if (eventrouter.srcsubclass<>"",'.
+                                    'concat("(",eventrouter.srcsubclass,")")'.
+                                ',""),".",eventrouter.srceventtype," - ",'.
+                                'eventrouter.dstevent)'),
+
       new kernel::Field::Link(
                 name          =>'cistatusid',
                 label         =>'CI-StateID',
@@ -95,18 +107,6 @@ sub new
                 unit          =>'sec',
                 label         =>'Retry interval',
                 dataobjattr   =>'eventrouter.controlretryinterval'),
-
-      new kernel::Field::Text(
-                name          =>'fullname',
-                label         =>'event route',
-                readonly      =>1,
-                htmldetail    =>0,
-                searchable    =>0,
-                dataobjattr   =>'concat(eventrouter.srcmoduleobject,'.
-                                'if (eventrouter.srcsubclass<>"",'.
-                                    'concat("(",eventrouter.srcsubclass,")")'.
-                                ',""),".",eventrouter.srceventtype," - ",'.
-                                'eventrouter.dstevent)'),
 
       new kernel::Field::Number(
                 name          =>'controlmaxretry',
@@ -175,7 +175,7 @@ sub Validate
    my $newrec=shift;
 
    my $name=effVal($oldrec,$newrec,"srcmoduleobject");
-   if ($name=~m/\s/i || $name =~m/^\s*$/){
+   if ($name=~m/\s/i || $name =~m/^\s*$/ || !($name=~m/^\S+::\S+$/)){
       $self->LastMsg(ERROR,"invalid srcmoduleobject"); 
       return(undef);
    }
@@ -190,6 +190,18 @@ sub Validate
    if ($name=~m/\s/i || $name =~m/^\s*$/){
       $self->LastMsg(ERROR,"invalid dstevent"); 
       return(undef);
+   }
+   my $controldelay=effVal($oldrec,$newrec,"controldelay");
+   if ($controldelay<2){
+      $newrec->{controldelay}=2;
+   }
+   my $controlretryinterval=effVal($oldrec,$newrec,"controlretryinterval");
+   if ($controlretryinterval<10){
+      $newrec->{controlretryinterval}=10;
+   }
+   my $controlmaxretry=effVal($oldrec,$newrec,"controlmaxretry");
+   if ($controlmaxretry eq ""){
+      $newrec->{controlmaxretry}=0;
    }
 
 
