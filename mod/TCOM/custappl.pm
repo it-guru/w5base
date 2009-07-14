@@ -86,6 +86,14 @@ sub new
                 vjoinon       =>['cistatusid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::Boolean(
+                name          =>'allowbusinesreq',
+                searchable    =>0,
+                readonly      =>1,
+                htmleditwidth =>'30%',
+                label         =>'allow business request workflows',
+                container     =>'additional'),
+
       new kernel::Field::Interface(
                 name          =>'cistatusid',   # function is needed to 
                 label         =>'CI-StatusID',  # show undefined state
@@ -393,6 +401,14 @@ sub new
                                  'isdatabasesrv','iswebserver',
                                  'osrelease',
                                  'shortdesc']),
+
+      new kernel::Field::Container(
+                name          =>'additional',
+                label         =>'Additionalinformations',
+                htmldetail    =>0,
+                uivisible     =>0,
+                dataobjattr   =>'appl.additional'),
+
    );
    $self->{history}=[qw(insert modify delete)];
 
