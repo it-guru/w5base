@@ -11,7 +11,7 @@ public class findChange {
     PropertyConfigurator.configure("log4j.properties");
     // define the needed variables
     net.w5base.mod.AL_TCom.workflow.change.W5Base        W5Service;
-    net.w5base.mod.AL_TCom.workflow.change.Port          W5Port;
+    net.w5base.mod.AL_TCom.workflow.change.W5AL_TComWorkflowChangePort  W5Port;
     net.w5base.mod.AL_TCom.workflow.change.Filter        Flt;
     net.w5base.mod.AL_TCom.workflow.change.FindRecordInp FindRecordInput;
     net.w5base.mod.AL_TCom.workflow.change.FindRecordOut Result;
