@@ -312,6 +312,17 @@ sub mkChangeStoreRec
       $wfrec{additional}->{ServiceCenterResolvedBy}=$rec->{resolvedby};
    }
 
+   $wfrec{owner}=0;
+   if (!($rec->{implementor}=~m/^\s*$/)){
+      $wfrec{additional}->{ServiceCenterImplementor}=$rec->{implementor};
+      my $implementor=lc($rec->{implementor});
+      $self->{user}->ResetFilter();
+      $self->{user}->SetFilter({posix=>\$implementor});
+      my $userid=$self->{user}->getVal("userid");
+      if (defined($userid)){
+         $wfrec{owner}=$userid;
+      }
+   }
    if (!($rec->{coordinator}=~m/^\s*$/)){
       $wfrec{additional}->{ServiceCenterCoordinator}=$rec->{coordinator};
    }

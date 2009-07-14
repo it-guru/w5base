@@ -159,6 +159,7 @@ sub new
                 name          =>'isdeleted',
                 selectfix     =>1,
                 htmlwidth     =>'1%',
+                htmldetail    =>0,
                 group         =>'state',
                 label         =>'marked as delete',
                 dataobjattr   =>'wfhead.is_deleted'),

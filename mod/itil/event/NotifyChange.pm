@@ -52,6 +52,8 @@ sub NotifyChange
          my $fo=$wf->getField("additional");
          my $additional=$fo->RawValue($wfrec);
          my $scstate=lc($additional->{ServiceCenterState}->[0]);
+         return({exitcode=>0,msg=>'ok'}) if ($scstate ne "resolved" &&
+                                             $scstate ne "released");
          my $srcid=$wfrec->{srcid};
          my $aid=$wfrec->{affectedapplicationid};
          $aid=[$aid] if ($aid ne "" && !ref($aid));

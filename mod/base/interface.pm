@@ -324,7 +324,7 @@ sub WSDL
       $o->setParent($self);
       $o->Init();
       $XMLservice.="<service name=\"W5Base\">";
-      $XMLservice.="<port name=\"${ns}\" binding=\"${ns}:Port\">";
+      $XMLservice.="<port name=\"${ns}\" binding=\"${ns}:${ns}Port\">";
       $XMLservice.="<SOAP:address location=\"$uri\" />";
       $XMLservice.="</port>";
       $XMLservice.="</service>";
@@ -353,14 +353,16 @@ Content-type: text/xml
 <types>
 <xsd:schema elementFormDefault="qualified" 
             targetNamespace="http://w5base.net/mod/$fp">
+<!--
 <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/"
             schemaLocation="http://schemas.xmlsoap.org/soap/encoding/" />
+-->
 $XMLtypes
 </xsd:schema>
 </types>
 $XMLmessage
-<portType name="Port">$XMLportType</portType>
-<binding name="Port" type="${ns}:Port">
+<portType name="${ns}Port">$XMLportType</portType>
+<binding name="${ns}Port" type="${ns}:${ns}Port">
 <SOAP:binding transport="http://schemas.xmlsoap.org/soap/http"
               style="document" />
 $XMLbinding

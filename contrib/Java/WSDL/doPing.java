@@ -11,7 +11,7 @@ public class doPing {
           new net.w5base.mod.base.user.W5BaseLocator();
 
     // Now use the service to get a stub which implements the SDI.
-    net.w5base.mod.base.user.Port W5Port = service.getW5BaseUser();
+    net.w5base.mod.base.user.W5BaseUserPort W5Port = service.getW5BaseUser();
 
     ((Stub) W5Port)._setProperty(Call.USERNAME_PROPERTY, "dummy/admin");
     ((Stub) W5Port)._setProperty(Call.PASSWORD_PROPERTY, "acache");
