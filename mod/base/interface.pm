@@ -402,7 +402,7 @@ sub _SOAPaction2param
       }
       if ($mod=~m/\/workflow\//){
          $mod=~s/\//::/g;
-         if (exists($param->{data}) && ref($param->{data}) eq "HASH"){
+         if (exists($param->{data}) && ref($param->{data})){
             $param->{data}->{class}=$mod;
          }
          $param->{class}=$mod;
@@ -520,7 +520,7 @@ sub storeRecord
       return(interface::SOAP::kernel::Finish({exitcode=>128,
              lastmsg=>['invalid dataobject name']}));
    }
-   if (ref($newrec) ne "HASH"){
+   if (ref($newrec) ne "HASH" && ref($newrec) ne "WfRec"){
       return(interface::SOAP::kernel::Finish({exitcode=>128,
              lastmsg=>[msg(ERROR,'invalid or emtpy data record specified')]}));
    }
@@ -698,12 +698,12 @@ sub getHashList
       msg(DEBUG,"SOAP base::workflow filter %s",Dumper($filter));
       my $fltchk=0;
       for my $validkey (qw(srcid id)){
-         if (ref($filter) eq "HASH" &&
+         if ((ref($filter) eq "HASH" || ref($filter) eq "Filter") &&
              keys(%$filter)==1 &&
              $filter->{$validkey}=~m/^[0-9,A-Z,_]{5,20}$/i){
              $fltchk++;
          }
-         if (ref($filter) eq "HASH" &&
+         if ((ref($filter) eq "HASH" || ref($filter) eq "Filter") &&
              keys(%$filter)==1 &&
              ref($filter->{$validkey}) eq "ARRAY" &&
              $filter->{$validkey}->[0]=~m/^[0-9,A-Z,_]{5,20}$/i){
