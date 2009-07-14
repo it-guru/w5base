@@ -701,13 +701,17 @@ sub getHashList
          if ((ref($filter) eq "HASH" || ref($filter) eq "Filter") &&
              keys(%$filter)==1 &&
              $filter->{$validkey}=~m/^[0-9,A-Z,_]{5,20}$/i){
-             $fltchk++;
+            my $v=$filter->{$validkey};
+            $filter->{$validkey}=\$v;
+            $fltchk++;
          }
          if ((ref($filter) eq "HASH" || ref($filter) eq "Filter") &&
              keys(%$filter)==1 &&
              ref($filter->{$validkey}) eq "ARRAY" &&
              $filter->{$validkey}->[0]=~m/^[0-9,A-Z,_]{5,20}$/i){
-             $fltchk++;
+            my $v=$filter->{$validkey}->[0];
+            $filter->{$validkey}=\$v;
+            $fltchk++;
          }
       }
       if (!$fltchk){
@@ -715,6 +719,8 @@ sub getHashList
              lastmsg=>[msg(ERROR,'base::workflow allows only '.
                                  'SOAP filter to id or srcid')]}));
       }
+      my %f=%$filter;
+      $filter=\%f;  # ensure to get an hash;
    }
    my $o=getModuleObject($self->Config,$objectname);
    if (!defined($o)){
