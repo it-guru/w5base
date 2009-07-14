@@ -33,6 +33,7 @@ sub new
    $self->{transprefix}="boolean." if (!defined($self->{transprefix}));
    $self->{default}="0"            if (!defined($self->{default}));
    $self->{htmleditwidth}="60px"   if (!defined($self->{htmleditwidth}));
+   $self->{WSDLfieldType}="xsd:boolean" if (!defined($self->{WSDLfieldType}));
    return($self);
 }
 
@@ -42,6 +43,11 @@ sub FormatedResult
    my $current=shift;
    my $mode=shift;
    my $d=$self->RawValue($current);
+   if ($mode eq "SOAP"){
+      return("true") if ($d);
+      return("false");
+   }
+
    return($d) if ($mode eq "XMLV01");
    return($self->SUPER::FormatedResult($current,$mode));
 }
