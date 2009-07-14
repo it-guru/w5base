@@ -358,6 +358,13 @@ sub new
                 dataobjattr   =>'cm3rm1.assigned_to'),
 
       new kernel::Field::Text(
+                name          =>'implementor',
+                uppersearch   =>1,
+                group         =>'contact',
+                label         =>'Implementor',
+                dataobjattr   =>'cm3rm1.assign_firstname'),
+
+      new kernel::Field::Text(
                 name          =>'coordinator',
                 uppersearch   =>1,
                 group         =>'contact',

@@ -34,6 +34,7 @@
 'Resources'=>{de=>'Resourcen (Resources)'},
 'Close Code'=>{de=>'Abschluß Code (Close Code)'},
 'Coordinator'=>{de=>'Koordinator (Coordinator)'},
+'Implementor'=>{de=>'Ausführender (Implementor)'},
 'Extern Change ID'=>{de=>'externe Change ID (Extern Change ID)'},
 'Customer'=>{de=>'Kunde (Customer)'},
 "none or invalid mandator base filter '\%s'"=>{de=>"kein oder ungültiger Mandaten Basis-Filter '\%s'"},
