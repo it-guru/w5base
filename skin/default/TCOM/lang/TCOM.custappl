@@ -25,3 +25,4 @@
 'primary Order in E-Mail'=>{de=>'Auftragseingang E-Mail'},
 'secondary Order in E-Mail'=>{de=>'Auftragseingang Vertretung E-Mail'},
 'invalid customer application name - please use delete to remove a relation'=>{de=>'ungüliger Kundenanwendungsname - bitte verwenden Sie "löschen", um eine Relation zu löschen'},
+'allow business request workflows'=>{de=>'Anforderungs-Workflow erlaubt'},
