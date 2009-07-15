@@ -26,7 +26,7 @@
 'Planed Duration'=>{de=>'Geplante Dauer (Planed Duration)'},
 'Planed End'=>{de=>'Geplantes Ende (Planed End)'},
 'Planed Start'=>{de=>'Geplanter Start (Planed Start)'},
-'Work End'=>{de=>'Arbeitsende'},
+'Work End'=>{de=>'Arbeitsende (Work End)'},
 'Create time'=>{de=>'Erstellungszeitpunkt'},
 'Closeing time'=>{de=>'Abschluﬂzeitpunkt'},
 'Closed by'=>{de=>'Abschluﬂ durch'},
