@@ -1,4 +1,4 @@
-package itil::event::NotifyChange;
+package TS::event::NotifyChange;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -104,7 +104,7 @@ sub NotifyChange
 
          foreach my $lang (split(/,/,$notiy{emaillang})){
             $ENV{HTTP_FORCE_LANGUAGE}=$lang; 
-            $ENV{HTTP_FORCE_TZ}="GMT" if ($lang eq "en");
+            $ENV{HTTP_FORCE_TZ}="CET" if ($lang eq "en");
             $ENV{HTTP_FORCE_TZ}="CET" if ($lang eq "de");
             if ($#emailsep==-1){
                push(@emailsep,0);
@@ -112,7 +112,16 @@ sub NotifyChange
             else{
                push(@emailsep,"$lang:");
             }
-            push(@emailprefix,"");
+            my $url=$self->Config->Param("EventJobBaseUrl");
+            if ($url ne ""){
+               push(@emailprefix,"<center>".
+                    "<a title=\"click to get current informations of change\" ".
+                    "href=\"$url/auth/tssc/chm/ById/$srcid\">".
+                    "$srcid</a></center>");
+            }
+            else{
+               push(@emailprefix,$srcid);
+            }
             if ($lang eq "en"){
                push(@emailtext,"Ladies and Gentelman,\n\n".
                                "the Change <b>$srcid</b> state has been ".
@@ -125,8 +134,8 @@ sub NotifyChange
                                "der Change <b>$srcid</b> hat den Status ".
                                "<b>$scstate</b> erreicht.\n".
                                "Diese Mail ist nur als Information für Sie. ".
-                               "Auf diese Mail sind keine Aktionen für Sie ".
-                               "notwendig.");
+                               "Aufgrund dieser Mail sind keine Aktionen ".
+                               "für Sie notwendig.");
             }
             push(@emailsubheader,0);
            
@@ -164,7 +173,7 @@ sub NotifyChange
          
 
          $notiy{emailto}=$emailto;
-         $notiy{name}=$wfrec->{name};
+         $notiy{name}=$scstate.": ".$wfrec->{name};
          $notiy{emailprefix}=\@emailprefix;
          $notiy{emailtext}=\@emailtext;
          $notiy{emailsep}=\@emailsep;
