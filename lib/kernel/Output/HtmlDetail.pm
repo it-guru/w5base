@@ -242,6 +242,17 @@ EOF
       #   $sfocus="setFocus(\"\");".
       #           "setEnterSubmit(document.forms[0],DetailEditSave);";
       }
+      my $dynamicLinkCode="";
+      if (defined($app->{userview})){
+         my $userview=$app->{userview};
+         if ($userview->can("findDynamicLinkHandler")){
+            my @l=$userview->findDynamicLinkHandler($app->Self());
+            foreach my $r (@l){
+               $dynamicLinkCode.=
+                  "window.setTimeout(\"addDynamicLink('$r')\",1);";
+            }
+         }
+      }
       $template{"header"}=<<EOF;
 <div id="context_menu" class="context_menu">
  <table cellspacing="1" cellpadding="2" border="0">
@@ -276,9 +287,65 @@ function setTitle()
 {
    var t=window.document.getElementById("WindowTitle");
    parent.document.title=t.innerHTML;
+
    return(true);
 }
+function addDynamicLink(dynLinkId)
+{
+   var xmlhttp=getXMLHttpRequest();
+   xmlhttp.open("POST",dynLinkId,true);
+   xmlhttp.onreadystatechange=function() {
+    if (xmlhttp.readyState==4 && (xmlhttp.status==200 || xmlhttp.status==304)){
+
+       var xmlobject = xmlhttp.responseXML;
+
+       var urlValue;
+       var labelValue;
+       var targetValue="_self";
+
+       var url=xmlobject.getElementsByTagName("url")[0];
+       if (url){
+           var urlNode=url.childNodes[0];
+           urlValue=urlNode.nodeValue;
+       }
+
+       var label=xmlobject.getElementsByTagName("label")[0];
+       if (label){
+          var labelNode=label.childNodes[0];
+          labelValue=labelNode.nodeValue;
+       }
+
+       var target=xmlobject.getElementsByTagName("target")[0];
+       if (target){
+          var targetNode=target.childNodes[0];
+          targetValue=targetNode.nodeValue;
+       }
+
+       if (labelValue!="" && urlValue!=""){
+          var t=window.document.getElementById("dynamicLinks");
+          var destWidth="150px";
+          if (t.style.width!=destWidth){
+             t.style.width=destWidth;
+             t.innerHTML="<ul id=dynamicLinksUl></ul>";
+          }
+          var ul=window.document.getElementById("dynamicLinksUl");
+          if (ul){
+             var newLI = document.createElement("li");
+             newLI.innerHTML="<a class=HtmlDetailIndex "+
+                             "target=\\""+targetValue+"\\" "+
+                             "href=\\""+urlValue+"\\">"+labelValue+"</a>";
+             ul.appendChild(newLI);
+          }
+       }
+    }
+   };
+   xmlhttp.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+   var r=xmlhttp.send('Mode=process');
+   return(true);
+}
+function initAjaxDynamicLinks(){$dynamicLinkCode}
 addEvent(window, "load", setTitle);
+addEvent(window, "load", initAjaxDynamicLinks);
 $sfocus
 </script>
 EOF
@@ -511,20 +578,21 @@ EOF
       $template{"header"}.=<<EOF;
 <center><div class=HtmlDetailIndex style="text-align:center;width:95%">
 <hr>
-<table style="table-layout:fixed;width:98%" border=0 cellspacing=0 cellpadding=0>
+<table style="xtable-layout:fixed;width:98%" border=0 cellspacing=0 cellpadding=0>
 <tr>
-<td width=50% valign=top>
+<td width=40% valign=top>
 <table style="table-layout:fixed;width:100%" 
        cellspacing=0 cellpadding=0 border=0><tr><td>
 <ul>$set[0]</ul>
 </td></tr></table>
 </td>
-<td width=50% valign=top>
+<td width=40% valign=top>
 <table style="table-layout:fixed;width:100%" 
        cellspacing=0 cellpadding=0 border=0><tr><td>
 <ul>$set[1]</ul>
 </td></tr></table>
 </td>
+<td width=1% valign=top><div id=dynamicLinks></div></td>
 </tr>
 </table>
 

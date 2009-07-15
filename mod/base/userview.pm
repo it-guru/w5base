@@ -266,6 +266,54 @@ sub getRecordImageUrl
    return("../../../public/base/load/userviews.jpg?".$cgi->query_string());
 }
 
+sub findDynamicLinkHandler
+{
+   my $self=shift;
+   my $mod=shift;
+  
+   if (!exists($self->Cache->{DynamicLinkHandler})){
+      $self->Cache->{DynamicLinkHandler}={};
+      my $dh=$self->Cache->{DynamicLinkHandler};
+      $self->LoadSubObjs("ext/dynamicDetailLink","dynamicDetailLink");
+      foreach my $o (values(%{$self->{dynamicDetailLink}})){
+         my @h=$o->getHandler();
+         while(my $k=shift(@h)){
+            my $v=shift(@h);
+            push(@{$dh->{$k}},$v);
+         }
+      }
+   }
+   my $dh=$self->Cache->{DynamicLinkHandler};
+   if (exists($dh->{$mod})){
+      return(@{$dh->{$mod}});
+   }
+   return;
+}
+
+sub dynamicDetailLink
+{
+   my $self=shift;
+   my ($func,$p)=$self->extractFunctionPath();
+   $p=~s/^\///;
+   my @p=split(/\//,$p);
+   my $mod=shift(@p);
+   $self->LoadSubObjs("ext/dynamicDetailLink","dynamicDetailLink");
+
+   my $res={};
+   if (exists($self->{dynamicDetailLink}->{$mod})){
+      $res=$self->{dynamicDetailLink}->{$mod}->doHandler($self,@p);
+   }
+   print $self->HttpHeader("text/xml");
+   print hash2xml({document=>$res},{header=>1});
+}
+
+sub getValidWebFunctions
+{
+   my ($self)=@_;
+   return($self->SUPER::getValidWebFunctions(),"dynamicDetailLink");
+}
+
+
 
 
 1;
