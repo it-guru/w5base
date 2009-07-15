@@ -572,7 +572,7 @@ sub WSDLfieldList
         #          ($mode eq "result" || $mode eq "store"));
          my $minOccurs="0";
          if ($fobj->Type() eq "Id" && $mode eq "result"){
-            $minOccurs="1";
+            $minOccurs="0";
          }
          my $label=$fobj->Label();
          $label=~s/&/&amp;/g;
