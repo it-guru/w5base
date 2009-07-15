@@ -571,9 +571,6 @@ sub WSDLfieldList
         # next if ($fobj->Type() eq "Link" && 
         #          ($mode eq "result" || $mode eq "store"));
          my $minOccurs="0";
-         if ($fobj->Type() eq "Id" && $mode eq "result"){
-            $minOccurs="0";
-         }
          my $label=$fobj->Label();
          $label=~s/&/&amp;/g;
          my $name=$fobj->Name();
@@ -656,12 +653,12 @@ sub WSDLfindRecord
 
    $$XMLtypes.="<xsd:complexType name=\"findRecordOut\">";
    $$XMLtypes.="<xsd:sequence>";
-   $$XMLtypes.="<xsd:element minOccurs=\"1\" maxOccurs=\"1\" ".
-              "name=\"exitcode\" type=\"xsd:int\" />";
    $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
               "name=\"lastmsg\" type=\"${ns}:ArrayOfStringItems\" />";
    $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
               "name=\"records\" type=\"${ns}:RecordList\" />";
+   $$XMLtypes.="<xsd:element minOccurs=\"1\" maxOccurs=\"1\" ".
+              "name=\"exitcode\" type=\"xsd:int\" />";
    $$XMLtypes.="</xsd:sequence>";
    $$XMLtypes.="</xsd:complexType>";
 

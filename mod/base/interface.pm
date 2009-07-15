@@ -353,10 +353,8 @@ Content-type: text/xml
 <types>
 <xsd:schema elementFormDefault="qualified" 
             targetNamespace="http://w5base.net/mod/$fp">
-<!--
 <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/"
             schemaLocation="http://schemas.xmlsoap.org/soap/encoding/" />
--->
 $XMLtypes
 </xsd:schema>
 </types>
@@ -498,10 +496,9 @@ sub showFields
 
 
    return(interface::SOAP::kernel::Finish(
-          SOAP::Data->name(output=>{exitcode=>0,
-                                    lastmsg=>[],
+          {exitcode=>0, lastmsg=>[],
           records=>SOAP::Data->name("records"=>\@l)->type("ResultRecords"),
-                                    })->type("HASH")));
+                                    }));
 }
 
 sub storeRecord
@@ -774,9 +771,9 @@ sub getHashList
    my $reccount=$#l+1;
    $self->Log(INFO,"soap","findRecord: return $reccount records - exitcode:0");
 
-   return(interface::SOAP::kernel::Finish(SOAP::Data->name(output=>{exitcode=>0,
+   return(interface::SOAP::kernel::Finish({exitcode=>0,
           lastmsg=>[],
-          records=>SOAP::Data->type('curns:RecordList')->value(\@l)})));
+          records=>SOAP::Data->type('curns:RecordList')->value(\@l)}));
 }
 
 sub validateObjectname
@@ -832,7 +829,7 @@ sub Finish
 {
    my $result=shift;
    delete($ENV{HTTP_FORCE_LANGUAGE});
-   if (defined($result->{lastmsg})){
+   if (defined($result->{lastmsg}) && ref($result->{lastmsg})){
       for(my $c=0;$c<=$#{$result->{lastmsg}};$c++){
          $result->{lastmsg}->[$c]=~s/\s*$//g;
       }
@@ -846,7 +843,7 @@ sub Finish
              SOAP::Data->type('xsd:int')->value($result->{exitcode});
    }
    if (exists($result->{lastmsg})){  # .Net needs every element coded as string
-      if (ref($result->{lastmsg}) eq "ARRAY"){
+      if (ref($result->{lastmsg})){
          my @l;
          map({my $u=SOAP::Data->type('xsd:string')->value($_);push(@l,$u);} 
              @{$result->{lastmsg}});
@@ -858,6 +855,7 @@ sub Finish
                                       ->value($result->{lastmsg});
       }
    }
+#printf STDERR ("fifi d=%s\n",Dumper($result));
    return(SOAP::Data->name(output=>$result));
 }
 
