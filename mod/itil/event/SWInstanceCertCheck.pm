@@ -73,7 +73,7 @@ sub SWInstanceCertCheck
          }
 
          if ($msg ne ""){
-            my $now=NowStamp();
+            my $now=NowStamp("en");
             my $newrec={sslcheck=>$now,sslstate=>$msg};
             if (defined($end)){
                $newrec->{sslend}=$end;
@@ -87,6 +87,8 @@ sub SWInstanceCertCheck
             else{
                $newrec->{sslbegin}=undef;
             }
+            $newrec->{mdate}=$swrec->{mdate};
+            $newrec->{editor}=$swrec->{editor};
             $swop->ValidatedUpdateRecord($swrec,$newrec,{id=>\$swrec->{id}});
          }
 
