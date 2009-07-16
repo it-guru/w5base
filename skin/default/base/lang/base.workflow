@@ -70,3 +70,6 @@
 'MandatorID'=>{de=>'Mandanten ID'},
 'mail has been successfuly transfered to spool'=>{de=>'Nachricht wurde erfolgreich an den Nachrichtenspool übergeben'},
 'file larger then max attachment size %d'=>{de=>'Anlage ist größer als %d bytes'},
+'DetailMarkDelete'=>{de=>'gelöscht markieren',en=>'mark as delete'},
+'DetailoUnMarkDelete'=>{de=>'Löschung entfernen',en=>'unmark deleted'},
+

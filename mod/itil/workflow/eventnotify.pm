@@ -20,7 +20,6 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfClass;
-use Data::Dumper;
 @ISA=qw(kernel::WfClass);
 
 sub new
@@ -691,6 +690,18 @@ sub getStepByShortname
    my $WfRec=shift;
 
    return("itil::workflow::eventnotify::".$shortname);
+}
+
+sub isMarkDeleteValid
+{
+   my $self=shift;
+   my $WfRec=shift;
+   if ($self->getParent->IsMemberOf("admin") || 
+       $self->IsIncidentManager($WfRec)){
+      return(1);
+   }
+
+   return(0);
 }
 
 

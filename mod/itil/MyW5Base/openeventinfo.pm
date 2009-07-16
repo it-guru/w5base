@@ -79,15 +79,18 @@ sub Result
    my %q2=%q;
    if (Query->Param("SHOWALL")){
       $q1{stateid}='<20';
+      $q1{isdeleted}=\'0';
       $q1{class}=[grep(/^.*::eventnotify$/,
                   keys(%{$self->{DataObj}->{SubDataObj}}))];
    }
    else{
       $q1{stateid}='<20';
+      $q1{isdeleted}=\'0';
       $q1{eventend}="[EMPTY]";
       $q1{class}=[grep(/^.*::eventnotify$/,
                        keys(%{$self->{DataObj}->{SubDataObj}}))];
       $q2{stateid}='<20';
+      $q2{isdeleted}=\'0';
       $q2{eventend}=">now";
       $q2{class}=[grep(/^.*::eventnotify$/,
                        keys(%{$self->{DataObj}->{SubDataObj}}))];

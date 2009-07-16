@@ -174,6 +174,16 @@ sub Validate
    return($StepObj->Validate($oldrec,$newrec,$origrec));
 }
 
+sub isMarkDeleteValid
+{
+   my $self=shift;
+   my $rec=shift;
+   if ($self->getParent->IsMemberOf("admin")){
+      return(1);
+   }
+   return(0);
+}
+
 
 sub preValidate
 {
@@ -668,6 +678,14 @@ sub getDetailFunctions
    my @f=($self->T('WorkflowPrint')=>'WorkflowPrint',
           $self->T('WorkflowClose')=>'WorkflowClose'
          );
+   if (defined($rec) && $self->isMarkDeleteValid($rec)){
+      if (!$rec->{isdeleted}){
+         unshift(@f,$self->T("DetailMarkDelete")=>"DetailMarkDelete");
+      }
+      else{
+         unshift(@f,$self->T("DetailUnMarkDelete")=>"DetailUnMarkDelete");
+      }
+   }
    if (defined($rec) && $self->getParent->isDeleteValid($rec)){
       my $idname=$self->IdField->Name();
       my $id=$rec->{$idname};
@@ -730,6 +748,30 @@ function DetailHandleQualityCheck()
    openwin('HandleQualityCheck?CurrentIdToEdit=$id',"qc$id",
            "height=240,width=$detailx,toolbar=no,status=no,"+
            "resizable=yes,scrollbars=auto");
+}
+function DetailMarkDelete()
+{
+   var ua=getXMLHttpRequest();
+   ua.open("GET","DetailMarkDelete?CurrentIdToEdit=$id",true);
+   ua.onreadystatechange=function() {
+    if (ua.readyState==4){
+       document.forms[0].submit();
+    }
+   };
+   ua.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+   var r=ua.send('');
+}
+function DetailUnMarkDelete()
+{
+   var ua=getXMLHttpRequest();
+   ua.open("GET","DetailUnMarkDelete?CurrentIdToEdit=$id",true);
+   ua.onreadystatechange=function() {
+    if (ua.readyState==4 && (ua.status==200 || ua.status==304)){
+       document.forms[0].submit();
+    }
+   };
+   ua.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+   var r=ua.send('');
 }
 
 EOF

@@ -98,30 +98,40 @@ sub Result
       @grpids=(qw(-1)) if ($#grpids==-1);
       my (%q1,%q2,%q3);
       $q1{cistatusid}='<=4';
+      $q1{isdeleted}=\'0';
       $q1{businessteamid}=\@grpids;
       $q2{cistatusid}='<=4';
+      $q2{isdeleted}=\'0';
       $q2{responseteamid}=\@grpids;
       $q3{cistatusid}='<=4';
+      $q3{isdeleted}=\'0';
       $q3{mandatorid}=\@grpids;
       push(@q,\%q1,\%q2,\%q3);
    }
    if ($dc eq "ADDDEP" || $dc eq "DEPONLY"){
       my (%q1,%q2,%q3,%q4);
       $q1{sem2id}=\$userid;
+      $q1{isdeleted}=\'0';
       $q2{tsm2id}=\$userid;
+      $q2{isdeleted}=\'0';
       my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
                                             ["RChief2"],"down");
       my @grpids=keys(%grp);
       @grpids=(qw(-1)) if ($#grpids==-1);
       $q3{businessteamid}=\@grpids;
+      $q3{isdeleted}=\'0';
       $q4{responseteamid}=\@grpids;
+      $q4{isdeleted}=\'0';
       push(@q,\%q1,\%q2,\%q3,\%q4);
    }
    if ($dc ne "DEPONLY" && $dc ne "TEAM" && $dc ne "CUSTOMER"){
       my (%q1,%q2,%q3);
       $q1{semid}=\$userid;
+      $q1{isdeleted}=\'0';
       $q2{tsmid}=\$userid;
+      $q2{isdeleted}=\'0';
       $q3{databossid}=\$userid;
+      $q3{isdeleted}=\'0';
       push(@q,\%q1,\%q2,\%q3);
    }
 
@@ -140,6 +150,7 @@ sub Result
    $self->DataObj->doInitialize();
    my %q1=%q;
    $q1{stateid}='>15';
+   $q1{isdeleted}=\'0';
    $q1{eventend}=Query->Param("Search_TimeRange");
    $q1{eventend}="<now AND >now-24h" if (!defined($q1{eventend}));
    $q1{class}=[grep(/^.*::eventnotify$/,

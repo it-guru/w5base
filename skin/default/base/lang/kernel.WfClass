@@ -6,3 +6,5 @@
 'To'=>{de=>'An'},
 'Subject'=>{de=>'Betreff'},
 'Preview'=>{de=>'Vorschau'},
+'DetailMarkDelete'=>{de=>'gelöscht markieren',en=>'mark as delete'},
+'DetailUnMarkDelete'=>{de=>'Löschmarkierung entfernen',en=>'unmark deleted'},
