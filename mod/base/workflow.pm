@@ -622,6 +622,34 @@ sub ById
    return();
 }
 
+sub isMarkDeleteValid
+{
+   my $self=shift;
+   my $rec=shift;
+   my $class=$rec->{class};
+   if (defined($self->{SubDataObj}->{$class})){
+      return($self->{SubDataObj}->{$class}->isMarkDeleteValid($rec));
+   }
+   return(0);
+}
+
+sub getDetailFunctions
+{
+   my $self=shift;
+   my $rec=shift;
+   my @f;
+   if (defined($rec) && $self->isMarkDeleteValid($rec)){
+      if (!$rec->{isdeleted}){
+         unshift(@f,$self->T("DetailMarkDelete")=>"DetailMarkDelete");
+      }
+      else{
+         unshift(@f,$self->T("DetailUnMarkDelete")=>"DetailUnMarkDelete");
+      }
+   }
+   return(@f);
+}
+
+
 
 
 sub calcResponsibilityBy
@@ -1374,8 +1402,62 @@ sub getDetailBlockPriority
 sub getValidWebFunctions
 {
    my $self=shift;
-   return("Process","DirectAct","ShowState","FullView","externalMailHandler",
+   return("Process","DirectAct","ShowState","FullView",
+          "externalMailHandler",
+          "DetailMarkDelete",
+          "DetailUnMarkDelete",
           $self->SUPER::getValidWebFunctions());
+}
+
+sub setMarkDelete
+{
+   my $self=shift;
+   my $mode=shift;
+
+   my $id=Query->Param("CurrentIdToEdit");
+   $id=~s/\D//g;
+   my $flt={id=>\$id};
+   $self->SecureSetFilter($flt);
+   $self->SetCurrentView(qw(ALL));
+   my ($WfRec,$msg)=$self->getOnlyFirst(qw(ALL));
+   if (defined($WfRec)){
+      if ($self->isMarkDeleteValid($WfRec)){
+         my $res=$self->ValidatedUpdateRecord($WfRec,
+                                              {isdeleted=>$mode},{id=>\$id});
+         if ($res){
+            my $msg=sprintf($self->T(
+                    'Workflow %s has been successfuly marked as deleted'),$id);
+            my $msgmode="mark as deleted:";
+            if ($mode==0){
+               $msg=sprintf($self->T(
+                    'Workflow %s has been successfuly unmarked as deleted'),
+                     $id);
+               $msgmode="unmark as deleted:";
+            }
+            $self->Action->NotifyForward($id,
+                                         "base::user",$self->getCurrentUserId(),
+                                         undef,$msg,mode=>$msgmode);
+            print $self->HttpHeader("text/xml");
+            print hash2xml({document=>{ok=>'1',newstate=>$mode}},{header=>1});
+            return;
+         }
+      }
+   }
+   print $self->HttpHeader("text/xml");
+   print hash2xml({document=>{ok=>'0'}},{header=>1});
+   return;
+}
+
+sub DetailMarkDelete
+{
+   my $self=shift;
+   $self->setMarkDelete(1);
+}
+
+sub DetailUnMarkDelete
+{
+   my $self=shift;
+   $self->setMarkDelete(0);
 }
 
 
@@ -1666,9 +1748,6 @@ sub externalMailHandler
    my $t=join("; ",@t);
    my $c=join("; ",@c);
 
-#printf STDERR ("fifi s=$s\n");
-#printf STDERR ("fifi m=$m\n");
-#printf STDERR ("fifi t=$t\n");
    if ($addref ne ""){
       $addref="checked";
    }
