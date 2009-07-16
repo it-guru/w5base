@@ -72,4 +72,6 @@
 'file larger then max attachment size %d'=>{de=>'Anlage ist größer als %d bytes'},
 'DetailMarkDelete'=>{de=>'gelöscht markieren',en=>'mark as delete'},
 'DetailoUnMarkDelete'=>{de=>'Löschung entfernen',en=>'unmark deleted'},
+'Workflow %s has been successfuly marked as deleted'=>{de=>'Workflow %s wurde erfolgreich als gelöscht markiert'},
+'Workflow %s has been successfuly unmarked as deleted'=>{de=>'Die Löschmarkierung am Workflow %s wurde erfolgreich entfernt'},
 

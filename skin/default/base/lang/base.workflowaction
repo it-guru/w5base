@@ -8,6 +8,8 @@
 'APRREQ:'=>{de=>'GENANF:'},
 'APROK:'=>{de=>'GENOK:'},
 'APRREJ:'=>{de=>'GENABG:'},
+'LABEL:unmark as deleted:'=>{de=>'Löschung entfernt',en=>'unmark as deleted'},
+'LABEL:mark as deleted:'=>{de=>'gelöscht markiert',en=>'mark as deleted'},
 'LABEL:APRREJ:'=>{de=>'Genehmigung abgelehnt',en=>'Approved rejected'},
 'LABEL:APROK:'=>{de=>'Genehmigt',en=>'Approved'},
 'LABEL:FW:'=>{de=>'Weiterleitung',en=>'Forward'},
