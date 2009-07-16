@@ -53,6 +53,7 @@ sub NotifyChange
          my $additional=$fo->RawValue($wfrec);
          my $scstate=lc($additional->{ServiceCenterState}->[0]);
          return({exitcode=>0,msg=>'ok'}) if ($scstate ne "resolved" &&
+                                             $scstate ne "planning" &&
                                              $scstate ne "released");
          my $srcid=$wfrec->{srcid};
          my $aid=$wfrec->{affectedapplicationid};
@@ -60,7 +61,7 @@ sub NotifyChange
          my $appl=getModuleObject($self->Config,"itil::appl");
          my $user=getModuleObject($self->Config,"base::user");
          my $grp=getModuleObject($self->Config,"base::grp");
-         $appl->SetFilter({id=>$aid});
+         $appl->SetFilter({id=>$aid,name=>'SIT*'}); # first test only for sit
          my %emailto;
          foreach my $arec ($appl->getHashList(qw(contacts name))){
             if (ref($arec->{contacts}) eq "ARRAY"){

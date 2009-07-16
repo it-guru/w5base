@@ -626,7 +626,7 @@ sub ProcessSpoolEvent
    my $self = shift;
    my $control = shift;
    my $tasks=$self->getTasksHash();
-   return() if (keys(%$tasks)>10);
+   return() if (keys(%$tasks)>30);
 
    msg(DEBUG,"Run spooled event: %s",$control->{spooltag});
    if (defined($control->{run})){
