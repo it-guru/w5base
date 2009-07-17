@@ -32,53 +32,74 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->AddFields(
-      new kernel::Field::Linenumber(name     =>'linenumber',
-                                  label      =>'No.'),
+      new kernel::Field::Linenumber(
+                name          =>'linenumber',
+                label         =>'No.'),
 
-      new kernel::Field::Id(      name       =>'name',
-                                  label      =>'FixedAssetId',
-                                  size       =>'20',
-                                  uppersearch=>1,
-                                  align      =>'left',
-                                  dataobjattr=>'amfixedasset.fixedastno'),
+      new kernel::Field::Id(
+                name          =>'name',
+                label         =>'FixedAssetId',
+                size          =>'20',
+                uppersearch   =>1,
+                align         =>'left',
+                dataobjattr   =>'amfixedasset.fixedastno'),
 
-      new kernel::Field::Text(    name       =>'assetid',
-                                  label      =>'AssetId',
-                                  size       =>'20',
-                                  uppersearch=>1,
-                                  align      =>'left',
-                                  dataobjattr=>'amfixedasset.assettag'),
+      new kernel::Field::Text(
+                name          =>'description',
+                htmlwidth     =>'250px',
+                label         =>'Name',
+                dataobjattr   =>'amfixedasset.name'),
 
-      new kernel::Field::Date(    name       =>'deprstart',
-                                  label      =>'Deprecation Start',
-                                  timezone   =>'CET',
-                                  dataobjattr=>'amfixedasset.ddeprstart'),
+      new kernel::Field::Text(
+                name          =>'assetid',
+                label         =>'AssetId',
+                size          =>'20',
+                uppersearch   =>1,
+                align         =>'left',
+                dataobjattr   =>'amfixedasset.assettag'),
 
-      new kernel::Field::Date(    name       =>'deprend',
-                                  label      =>'Deprecation End',
-                                  timezone   =>'CET',
-                                  dataobjattr=>'amfixedasset.ddeprend'),
+      new kernel::Field::Date(
+                name          =>'deprstart',
+                label         =>'Deprecation Start',
+                htmlwidth     =>'80px',
+                timezone      =>'CET',
+                dataobjattr   =>'amfixedasset.ddeprstart'),
 
-      new kernel::Field::Currency(name       =>'deprbase',
-                                  htmlwidth  =>'50px',
-                                  label      =>'Deprecation Base',
-                                  dataobjattr=>'amfixedasset.mdeprbasis'),
+      new kernel::Field::Date(
+                name          =>'deprend',
+                label         =>'Deprecation End',
+                htmlwidth     =>'80px',
+                timezone      =>'CET',
+                dataobjattr   =>'amfixedasset.ddeprend'),
 
-      new kernel::Field::Currency(name       =>'deprrate',
-                                  label      =>'monthly Deprecation',
-                                  dataobjattr=>'amfixedasset.mdeprrate'),
+      new kernel::Field::Currency(
+                name          =>'deprbase',
+                htmlwidth     =>'80px',
+                label         =>'Deprecation Base',
+                dataobjattr   =>'amfixedasset.mdeprbasis'),
 
-      new kernel::Field::Text(    name       =>'inventoryno',
-                                  label      =>'Inventory No.',
-                                  dataobjattr=>'amfixedasset.inventoryno'),
+      new kernel::Field::Currency(
+                name          =>'residualvalue',
+                label         =>'residual value',
+                size          =>'20',
+                dataobjattr   =>'amfixedasset.mresidualvalue'),
+
+      new kernel::Field::Currency(
+                name          =>'deprrate',
+                label         =>'monthly Deprecation',
+                dataobjattr   =>'amfixedasset.mdeprrate'),
+
+      new kernel::Field::Text(
+                name          =>'inventoryno',
+                label         =>'Inventory No.',
+                dataobjattr   =>'amfixedasset.inventoryno'),
 
       new kernel::Field::Import( $self,
-                                  vjointo    =>'tsacinv::system',
-                                  vjoinon    =>['assetid'=>'assetassetid'],
-                                  group      =>'systemdata',
-                                  vjoinconcat=>', ',
-                                  fields     =>['systemid','systemname',
-                                                'conumber']),
+                vjointo       =>'tsacinv::system',
+                vjoinon       =>['assetid'=>'assetassetid'],
+                group         =>'systemdata',
+                vjoinconcat   =>', ',
+                fields        =>['systemid','systemname','conumber']),
 
    );
    $self->setDefaultView(qw(name assetid deprstart deprend deprbase inventoryno));

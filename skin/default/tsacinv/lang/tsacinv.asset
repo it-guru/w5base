@@ -25,3 +25,5 @@
 'Deprecation End'=>{de=>'Abschreibungsende'},
 'Component Deprecation Start'=>{de=>'Komponenten Abschreibungsbegin'},
 'Component Deprecation End'=>{de=>'Komponenten Abschreibungsende'},
+'residual value'=>{de=>'Restbuchwert'},
+'deprication base'=>{de=>'Anschaffungswert'},

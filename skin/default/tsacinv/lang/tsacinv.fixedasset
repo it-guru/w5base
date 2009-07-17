@@ -4,3 +4,6 @@
 'Deprecation Base'=>{de=>'Abschreibungsbasis'},
 'Deprecation Start'=>{de=>'Abschreibungsbeginn'},
 'Deprecation End'=>{de=>'Abschreibungsende'},
+'monthly Deprecation'=>{de=>'monatliche Abschreibung'},
+'FixedAssetId'=>{de=>'KomponentenID'},
+'residual value'=>{de=>'Restbuchwert'},

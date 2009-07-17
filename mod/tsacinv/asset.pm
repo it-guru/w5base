@@ -224,6 +224,22 @@ sub new
                 timezone      =>'CET'),
 
       new kernel::Field::Currency(
+                name          =>'deprbase',
+                group         =>'finanz',
+                searchable    =>0,
+                depend        =>'assetid',
+                onRawValue    =>\&CalcDep,
+                label         =>'deprication base'),
+
+      new kernel::Field::Currency(
+                name          =>'residualvalue',
+                group         =>'finanz',
+                searchable    =>0,
+                depend        =>'assetid',
+                onRawValue    =>\&CalcDep,
+                label         =>'residual value'),
+
+      new kernel::Field::Currency(
                 name          =>'mdepr',
                 label         =>'Asset Depr./Month',
                 size          =>'20',
@@ -269,9 +285,10 @@ sub new
                 name          =>'fixedassets',
                 label         =>'Components',
                 group         =>'components',
+                forwardSearch =>1,
                 vjointo       =>'tsacinv::fixedasset',
                 vjoinon       =>['assetid'=>'assetid'],
-                vjoindisp     =>['name','deprstart','deprend','deprbase']),
+                vjoindisp     =>['description','deprstart','deprend','deprbase']),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
@@ -347,15 +364,19 @@ sub CalcDepr
    my $compdeprstart;
    my $deprend;
    my $deprstart;
+   my $residualvalue;
+   my $deprbase;
    if ($assetid ne ""){
       $ac->ResetFilter();
       $ac->SetFilter({assetid=>\$assetid});
-      my @fal=$ac->getHashList(qw(deprend deprstart deprbase));
+      my @fal=$ac->getHashList(qw(deprend deprstart deprbase residualvalue));
       my $maxdeprbase=0; 
       foreach my $fa (@fal){
          $maxdeprbase=$fa->{deprbase} if ($fa->{deprbase}>$maxdeprbase);
       }
       foreach my $fa (@fal){
+         $residualvalue+=$fa->{residualvalue};
+         $deprbase+=$fa->{deprbase};
          if ($maxdeprbase==$fa->{deprbase}){
             $deprend=$fa->{deprend}         if (!defined($deprend));
             $deprstart=$fa->{deprstart}     if (!defined($deprstart));
@@ -376,7 +397,9 @@ sub CalcDepr
    $compdeprstart=$deprstart if (!defined($compdeprstart));
 
    return({compdeprend=>$compdeprend,compdeprstart=>$compdeprstart,
-           deprend=>$deprend,deprstart=>$deprstart});
+           deprend=>$deprend,deprstart=>$deprstart,
+           deprbase=>$deprbase,
+           residualvalue=>$residualvalue});
 
 
 }
@@ -418,6 +441,13 @@ sub isWriteValid
    my $rec=shift;
    return(undef);
 }
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   return(qw(header default location finanz components source));
+}
+
 
 
 1;

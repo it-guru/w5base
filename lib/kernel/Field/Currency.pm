@@ -55,6 +55,9 @@ sub FormatedDetail
                $d=~s/(\d)(\d\d\d[,\.])/$1.$2/;
             };
          }
+         if ($mode eq "HtmlDetail" && $self->{unit} ne ""){
+            $d.=" ".$self->{unit};
+         }
       }
    }
 

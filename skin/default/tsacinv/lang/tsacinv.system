@@ -6,6 +6,7 @@
 'fieldgroup.software'=>{de=>'Software', en=>'Software'},
 'fieldgroup.applications'=>{de=>'Anwendungen', en=>'Applications'},
 'fieldgroup.form'=>{de=>'Ausprägung', en=>'Characteristic'},
+'fieldgroup.systemdata'=>{de=>'Systemdaten',en=>'Systemdata'},
 'Cost allocation active'=>{de=>'interne Leistungsverrechung aktiv'},
 'System CPU count'=>{de=>'CPU Anzahl'},
 'System CPU speed'=>{de=>'CPU Taktfrequenz'},
