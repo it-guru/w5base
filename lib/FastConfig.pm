@@ -240,7 +240,19 @@ sub Dumper
       $maxlen=length($v) if ($maxlen<length($v));
    }
    foreach my $varname (sort(@vl)){
-      $d.=sprintf("%-${maxlen}s = \"%s\"\n",$varname,$self->Param($varname));
+      my $val=$self->Param($varname);
+      if (ref($val)){
+         my @vvl=sort(keys(%$val));
+         foreach my $vv (@vvl){
+            $d.=sprintf("%-${maxlen}s %-12s = \"%s\"\n",
+                        $varname,"[".$vv."]",$val->{$vv});
+            
+          
+         }
+      }
+      else{
+         $d.=sprintf("%-${maxlen}s = \"%s\"\n",$varname,$val);
+      }
    }
    return($d);
 }
@@ -254,7 +266,7 @@ sub ExpandConfigVariables
    if (defined($mask)){
       while(my ($variname)=$mask=~m/\$([a-z,A-Z,_,\.]+)/m){
 
-         my $varival=$self->var($variname);
+         my $varival=$self->Param($variname);
          $mask=~s/\$$variname/$varival/m;
       }
    }
