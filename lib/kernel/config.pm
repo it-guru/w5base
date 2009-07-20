@@ -19,7 +19,7 @@ package kernel::config;
 
 use strict;
 use kernel;
-use FastConfig;
+use W5FastConfig;
 use kernel::Universal;
 use vars(qw(@ISA));
 
@@ -32,7 +32,7 @@ sub new
    my $type=shift;
    my $conffile=shift;
    my $self={};
-   $self->{c}=new FastConfig(sysconfdir=>'/etc/w5base');
+   $self->{c}=new W5FastConfig(sysconfdir=>'/etc/w5base');
    
    bless($self,$type);
 }

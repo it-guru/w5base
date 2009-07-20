@@ -1,4 +1,4 @@
-package FastConfig;
+package W5FastConfig;
 #  W5Base Framework
 #  Copyright (C) 2002  Hartmut Vogler (hartmut.vogler@epost.de)
 #
