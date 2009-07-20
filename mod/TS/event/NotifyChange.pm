@@ -62,8 +62,12 @@ sub NotifyChange
          my $user=getModuleObject($self->Config,"base::user");
          my $grp=getModuleObject($self->Config,"base::grp");
          $appl->SetFilter({id=>$aid,name=>'SIT*'}); # first test only for sit
+#         $appl->SetFilter({id=>$aid}); # first test only for sit
          my %emailto;
-         foreach my $arec ($appl->getHashList(qw(contacts name))){
+         $aid=[];
+         foreach my $arec ($appl->getHashList(qw(contacts name id))){
+            msg(INFO,"check application $arec->{name}");
+            push(@$aid,$arec->{id});
             if (ref($arec->{contacts}) eq "ARRAY"){
                foreach my $crec (@{$arec->{contacts}}){
                   my $r=$crec->{roles};
@@ -81,6 +85,7 @@ sub NotifyChange
                }
             }
          }
+         return({exitcode=>0,msg=>'ok'}) if ($#{$aid}==-1);
          my $ia=getModuleObject($self->Config,"base::infoabo");
          $ia->LoadTargets(\%emailto,'*::appl',\'changenotify',$aid);
         # $ia->LoadTargets($emailto,'base::staticinfoabo',
@@ -96,106 +101,99 @@ sub NotifyChange
          $desc=~s/^AG\s+.*$//m;
          $desc=trim($desc);
 
-         my @emailtext;
-         my @emailsubheader;
-         my @emailprefix;
-         my @emailsep;
-         my %notiy;
-         $notiy{emaillang}="en,de";
 
-         foreach my $lang (split(/,/,$notiy{emaillang})){
-            $ENV{HTTP_FORCE_LANGUAGE}=$lang; 
-            $ENV{HTTP_FORCE_TZ}="CET" if ($lang eq "en");
-            $ENV{HTTP_FORCE_TZ}="CET" if ($lang eq "de");
-            if ($#emailsep==-1){
+         my @dispfields=qw(affectedapplication 
+                           wffields.changestart
+                           wffields.changeend);
+
+         my @eventlist=($scstate);
+
+         foreach my $curscstate (@eventlist){
+            my @emailtext;
+            my @emailsubheader;
+            my @emailprefix;
+            my @emailsep;
+            my %notiy;
+            $notiy{emaillang}="en,de";
+           
+            foreach my $lang (split(/,/,$notiy{emaillang})){
+               $ENV{HTTP_FORCE_LANGUAGE}=$lang; 
+               $ENV{HTTP_FORCE_TZ}="CET" if ($lang eq "en");
+               $ENV{HTTP_FORCE_TZ}="CET" if ($lang eq "de");
+               if ($#emailsep==-1){
+                  push(@emailsep,0);
+               }
+               else{
+                  push(@emailsep,"$lang:");
+               }
+               my $url=$self->Config->Param("EventJobBaseUrl");
+               if ($url ne ""){
+                  push(@emailprefix,"<center>".
+                       "<a title=\"click to get current ".
+                                  "informations of change\" ".
+                       "href=\"$url/auth/tssc/chm/ById/$srcid\">".
+                       "$srcid</a></center>");
+               }
+               else{
+                  push(@emailprefix,$srcid);
+               }
+               if ($lang eq "en"){
+                  push(@emailtext,"Ladies and Gentelman,\n\n".
+                                  "the Change <b>$srcid</b> state has been ".
+                                  "switched to <b>$curscstate</b>\n".
+                                  "This is only an information for you. ".
+                                  "There are no actions need to be done.");
+               }
+               if ($lang eq "de"){
+                  push(@emailtext,"Sehr geehrte Damen und Herren,\n\n".
+                                  "der Change <b>$srcid</b> hat den Status ".
+                                  "<b>$curscstate</b> erreicht.\n".
+                                  "Diese Mail ist nur als Information für Sie. ".
+                                  "Aufgrund dieser Mail sind keine Aktionen ".
+                                  "für Sie notwendig.");
+               }
+               push(@emailsubheader,0);
+              
+               foreach my $field (@dispfields){ 
+                  my $fo=$wf->getField($field,$wfrec);
+                  my $d=$fo->FormatedDetail($wfrec,"HtmlMail");
+                  push(@emailsep,0);
+                  push(@emailprefix,$fo->Label());
+                  push(@emailtext,$d);
+                  push(@emailsubheader,0);
+               }
+               
                push(@emailsep,0);
+               my $fo=$wf->getField("wffields.changedescription",$wfrec);
+               push(@emailprefix,$fo->Label());
+               push(@emailtext,$desc);
+               push(@emailsubheader,0);
+              
+               delete($ENV{HTTP_FORCE_LANGUAGE});
+               delete($ENV{HTTP_FORCE_TZ});
             }
-            else{
-               push(@emailsep,"$lang:");
-            }
-            my $url=$self->Config->Param("EventJobBaseUrl");
-            if ($url ne ""){
-               push(@emailprefix,"<center>".
-                    "<a title=\"click to get current informations of change\" ".
-                    "href=\"$url/auth/tssc/chm/ById/$srcid\">".
-                    "$srcid</a></center>");
-            }
-            else{
-               push(@emailprefix,$srcid);
-            }
-            if ($lang eq "en"){
-               push(@emailtext,"Ladies and Gentelman,\n\n".
-                               "the Change <b>$srcid</b> state has been ".
-                               "switched to <b>$scstate</b>\n".
-                               "This is only an information for you. ".
-                               "There are no actions need to be done.");
-            }
-            if ($lang eq "de"){
-               push(@emailtext,"Sehr geehrte Damen und Herren,\n\n".
-                               "der Change <b>$srcid</b> hat den Status ".
-                               "<b>$scstate</b> erreicht.\n".
-                               "Diese Mail ist nur als Information für Sie. ".
-                               "Aufgrund dieser Mail sind keine Aktionen ".
-                               "für Sie notwendig.");
-            }
-            push(@emailsubheader,0);
-           
-           
-            my $fo=$wf->getField("affectedapplication",$wfrec);
-            my $d=$fo->FormatedDetail($wfrec,"HtmlMail");
-            push(@emailsep,0);
-            push(@emailprefix,$fo->Label());
-            push(@emailtext,$d);
-            push(@emailsubheader,0);
             
-            my $fo=$wf->getField("wffields.changestart",$wfrec);
-            my $d=$fo->FormatedDetail($wfrec,"HtmlMail");
-            push(@emailsep,0);
-            push(@emailprefix,$fo->Label());
-            push(@emailtext,$d);
-            push(@emailsubheader,0);
-            
-            my $fo=$wf->getField("wffields.changeend",$wfrec);
-            my $d=$fo->FormatedDetail($wfrec,"HtmlMail");
-            push(@emailsep,0);
-            push(@emailprefix,$fo->Label());
-            push(@emailtext,$d);
-            push(@emailsubheader,0);
-            
-            push(@emailsep,0);
-            my $fo=$wf->getField("wffields.changedescription",$wfrec);
-            push(@emailprefix,$fo->Label());
-            push(@emailtext,$desc);
-            push(@emailsubheader,0);
            
-            delete($ENV{HTTP_FORCE_LANGUAGE});
-            delete($ENV{HTTP_FORCE_TZ});
+            $notiy{emailto}=$emailto;
+            $notiy{name}="change:".$curscstate.": ".$wfrec->{name};
+            $notiy{emailprefix}=\@emailprefix;
+            $notiy{emailtext}=\@emailtext;
+            $notiy{emailsep}=\@emailsep;
+            #$notiy{emailtemplate}='changenotification';
+            $notiy{emailsubheader}=\@emailsubheader;
+            $notiy{emailcc}=['hartmut.vogler@t-systems.com'];
+            $notiy{class}='base::workflow::mailsend';
+            $notiy{step}='base::workflow::mailsend::dataload';
+            if (my $wid=$wf->Store(undef,\%notiy)){
+               my %d=(step=>'base::workflow::mailsend::waitforspool');
+               my $r=$wf->Store($wid,%d);
+               $wf->Action->ValidatedInsertRecord({
+                             wfheadid=>$wfrec->{id},
+                             name=>'note',
+                             comments=>"auto notify $curscstate",
+                             actionref=>{"autonotify.$curscstate"=>'send'}});
+            }
          }
-         
-
-         $notiy{emailto}=$emailto;
-         $notiy{name}=$scstate.": ".$wfrec->{name};
-         $notiy{emailprefix}=\@emailprefix;
-         $notiy{emailtext}=\@emailtext;
-         $notiy{emailsep}=\@emailsep;
-         #$notiy{emailtemplate}='changenotification';
-         $notiy{emailsubheader}=\@emailsubheader;
-         $notiy{emailcc}=['hartmut.vogler@t-systems.com'];
-         $notiy{class}='base::workflow::mailsend';
-         $notiy{step}='base::workflow::mailsend::dataload';
-         if (my $id=$wf->Store(undef,\%notiy)){
-            my %d=(step=>'base::workflow::mailsend::waitforspool');
-            my $r=$wf->Store($id,%d);
-         }
-
-
-         
-         
-    #     printf STDERR ("d=%s\n",Dumper($wfrec->{affectedapplicationid}));
-        
-
-
- 
          return({exitcode=>0,msg=>'ok'});
       }
       return({exitcode=>1,msg=>'workflow not found'});
