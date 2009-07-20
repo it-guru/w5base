@@ -123,6 +123,9 @@ sub LoadIntoCurrentConfig
             if ( -f "$self->{sysconfdir}/".$configfile ){
                $self->{conffile}="$self->{sysconfdir}/".$configfile;
             }
+            elsif( -f "../$self->{sysconfdir}/".$configfile){
+               $self->{conffile}="../$self->{sysconfdir}/".$configfile;
+            }
             else{
                $self->{conffile}="../../$self->{sysconfdir}/".$configfile;
             }
@@ -223,6 +226,23 @@ sub VarList
    $list{$_}=1 for (keys(%{$self->{currrentconfig}}));
 
    return(keys(%list));
+}
+
+
+sub Dumper
+{
+   my $self=shift;
+
+   my $d="Dumper($self):\n";
+   my @vl=$self->VarList();
+   my $maxlen=5;
+   foreach my $v (@vl){
+      $maxlen=length($v) if ($maxlen<length($v));
+   }
+   foreach my $varname (sort(@vl)){
+      $d.=sprintf("%-${maxlen}s = \"%s\"\n",$varname,$self->Param($varname));
+   }
+   return($d);
 }
 
 sub ExpandConfigVariables
