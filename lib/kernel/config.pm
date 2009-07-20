@@ -32,7 +32,7 @@ sub new
    my $type=shift;
    my $conffile=shift;
    my $self={};
-   $self->{c}=new FastConfig();
+   $self->{c}=new FastConfig(sysconfdir=>'/etc/w5base');
    
    bless($self,$type);
 }
@@ -47,7 +47,17 @@ sub getCurrentConfigName
 sub readconfig
 {
    my $self=shift;
-   return($self->{c}->readconfig(@_));
+   my $instdir=shift;
+   my $configfile=shift;
+   my $basemod=shift;
+   my $sub=shift;
+   $self->{c}->setPreLoad("$instdir/etc/w5base/$basemod/default.conf",
+                          "$instdir/etc/w5base/default.conf");
+   my $bk=$self->{c}->readconfig($configfile);
+   if ($bk){
+      $self->{c}->setParam("INSTDIR",$instdir);
+   }
+   return($bk);
 }
 
 sub debug

@@ -25,9 +25,26 @@ sub new
    my $type=shift;
    my %param=@_;
    my $self={};
+   if (ref($param{'preload'}) eq "ARRAY"){
+      $self->{'preload'}=$param{'preload'};
+   }
+   if ($param{'sysconfdir'} ne ""){
+      $self->{'sysconfdir'}=$param{'sysconfdir'};
+   }
    $self->{currrentconfig}={};
    $self->{configname}=undef;
    bless($self,$type);
+}
+
+sub setPreLoad
+{
+   my $self=shift;
+   if (ref($_[0]) eq "ARRAY"){
+      $self->{'preload'}=$_[0];
+   }
+   else{
+      $self->{'preload'}=[@_];
+   }
 }
 
 sub getCurrentConfigName
@@ -41,9 +58,7 @@ sub getCurrentConfigName
 sub readconfig
 {
    my $self=shift;
-   my $instdir=shift;
    my $configfile=shift;
-   my $basemod=shift;
    my $sub=shift;
 
    if (!$sub){
@@ -56,28 +71,24 @@ sub readconfig
          $config=~s/\.[^\.]*$//;
          $config=~s/^.*\///;
       }
-      $self->{currrentconfig}={CONFIG=>$config,INSTDIR=>$instdir};
-      if ( -f "$instdir/etc/w5base/$basemod/default.conf"){
-         $self->LoadIntoCurrentConfig($self->{currrentconfig},
-                      "$instdir/etc/w5base/$basemod/default.conf");
-      }
-      if ( -f "$instdir/etc/w5base/default.conf"){
-         $self->LoadIntoCurrentConfig($self->{currrentconfig},
-                      "$instdir/etc/w5base/default.conf");
+      $self->{currrentconfig}={CONFIG=>$config};
+      if (ref($self->{preload}) eq "ARRAY"){
+         foreach my $f (@{$self->{preload}}){
+            if ( -f $f){
+               $self->LoadIntoCurrentConfig($self->{currrentconfig},$f);
+            }
+         }
       }
    }
 
    my $back=$self->LoadIntoCurrentConfig($self->{currrentconfig},$configfile);
    if ($back){
-      if ( -f "/etc/w5base/$self->{currrentconfig}->{CONFIG}/$basemod.conf"){
-         $self->LoadIntoCurrentConfig($self->{currrentconfig},
-                "/etc/w5base/$self->{currrentconfig}->{CONFIG}/$basemod.conf");
-
-      }
-      if ( -f "/etc/w5base/$self->{currrentconfig}->{CONFIG}/global.conf"){
-         $self->LoadIntoCurrentConfig($self->{currrentconfig},
-                "/etc/w5base/$self->{currrentconfig}->{CONFIG}/global.conf");
-
+      if ($self->{sysconfdir} ne ""){
+         my $gconfdir="$self->{sysconfdir}/$self->{currrentconfig}->{CONFIG}";
+         if ( -f "$gconfdir/global.conf"){
+            $self->LoadIntoCurrentConfig($self->{currrentconfig},
+                                         "$gconfdir/global.conf");
+         }
       }
       delete($self->{conffile});
    }
@@ -88,7 +99,9 @@ sub debug
 {
    my $self=shift;
 
-   return(1) if (-f "/etc/w5base/DEBUG");
+   if ($self->{sysconfdir} ne ""){
+      return(1) if (-f "$self->{sysconfdir}/DEBUG");
+   }
    return(0);
 }
 
@@ -106,11 +119,13 @@ sub LoadIntoCurrentConfig
          $self->{conffile}=$configfile;
       }
       else{
-         if ( -f "/etc/w5base/".$configfile ){
-            $self->{conffile}="/etc/w5base/".$configfile;
-         }
-         else{
-            $self->{conffile}="../../etc/w5base/".$configfile;
+         if ($self->{sysconfdir} ne ""){
+            if ( -f "$self->{sysconfdir}/".$configfile ){
+               $self->{conffile}="$self->{sysconfdir}/".$configfile;
+            }
+            else{
+               $self->{conffile}="../../$self->{sysconfdir}/".$configfile;
+            }
          }
       }
    }
@@ -189,6 +204,14 @@ sub Param($)
    else{
       return($self->ExpandConfigVariables($varset->{$name}));
    }
+}
+
+sub setParam
+{
+   my $self=shift;
+   my $name=shift;
+   my $value=shift;
+   $self->{currrentconfig}->{$name}=$value;
 }
 
 
