@@ -1,0 +1,132 @@
+#!/usr/bin/env perl 
+package Server;
+
+use Net::Server::Multiplex;
+use base qw(Net::Server::Multiplex);
+use FindBin;
+use kernel;
+use threads;
+
+sub configure
+{
+  my $self = shift;
+
+  $self->{server}->{check_for_dequeue}=1;
+  return($self->SUPER::configure(@_));
+}
+
+sub run_dequeue
+{
+   my $self = shift;
+
+   msg(INFO,"run_dequeue");
+}
+
+sub mux_input
+{
+   my $self=shift;
+   my $mux=shift;
+   my $io=shift;
+   my $d=shift;
+
+   $$d=~s/\s*$//;
+   my ($sleep)=$$d=~m/^sleep (\d+)$/;
+   msg(DEBUG,"$io command='%s'",$$d);
+   if ($sleep){
+      Tsleep($io,$sleep);
+   }
+   printf("command '%s' done\n",$$d);
+   $$d='';
+}
+
+sub Tsleep
+{
+   my $io=shift;
+   my $sec=shift;
+   my $thr = threads->create(sub{
+         for(my $c=0;$c<$sec;$c++){
+            printf STDERR ("Tsleep - $io %d\n",$c);
+            sleep(1);
+         }
+      });
+}
+
+
+
+
+
+
+
+
+package main;
+
+use strict;
+use Getopt::Long;
+use kernel;
+use FastConfig;
+use vars qw( $opt_v $opt_v $opt_h $opt_c $appname);
+
+#######################################################################
+# INIT
+#######################################################################
+my @ARGV_bak=@ARGV;
+$appname="bbserver";
+exit(1) if (!GetOptions('verbose'=>\$opt_v,
+                        'debug'=>\$opt_v,
+                        'help'=>\$opt_h,
+                        'config=s'=>\$opt_c));
+$W5V2::Debug=0; $W5V2::Debug=1 if ($opt_v);
+if (defined($opt_h)){ help(); exit(1); }
+
+$0=$main::appname;
+@ARGV=@ARGV_bak;
+
+my %ServerParam=();
+my $cfg=new FastConfig();
+#######################################################################
+msg(INFO,"setting server parameters ...");
+{
+   my $port=$cfg->Param("serverport");
+   $port=4712 if ($port eq "");
+   msg(DEBUG,"serverport=%s",$port);
+   $ServerParam{'port'}=$port;
+
+   my $user=$cfg->Param("serveruser");
+   $user="bb" if ($user eq "");
+   msg(DEBUG,"serveruser=%s",$user);
+   $ServerParam{'user'}=$user;
+
+   my $group=$cfg->Param("servergroup");
+   $group="daemon" if ($group eq "");
+   msg(DEBUG,"servergroup=%s",$group);
+   $ServerParam{'group'}=$group;
+}
+
+if (!($opt_v)){
+   $ServerParam{'setsid'}=1;
+   {
+      my $logfile="/var/log/bb/mylog.log";
+      $ServerParam{'log_file'}=$logfile;
+      msg(DEBUG,"${main::appname}.logfile=%s",$logfile);
+   }
+}
+else{
+   $ServerParam{'debug'}=1;
+}
+
+
+#######################################################################
+msg(INFO,"starting bbserver process ...");
+msg(INFO,Dumper(\%ServerParam));
+Server->run(%ServerParam);
+
+
+
+
+#######################################################################
+sub help
+{
+   printf STDERR ("Usage: $main::appname -c {config} [-v]\n");
+}
+#######################################################################
+   
