@@ -75,7 +75,7 @@ CREATE TABLE usersubstusage (
   account          varchar(100) NOT NULL default '0',
   PRIMARY KEY  (userid,account,usersubstusageid)
 );
-CREATE TABLE user (
+CREATE TABLE contact (
   userid bigint(20) NOT NULL default '0',
   fullname varchar(255) NOT NULL default '',
   cistatus int(11) NOT NULL default '0',
@@ -267,21 +267,21 @@ CREATE TABLE lnkqrulemandator (
 alter table lnkgrpuser add comments longtext default NULL;
 alter table lnkqrulemandator add dataobj varchar(40) default NULL,add key(dataobj);
 alter table lnkqrulemandator add additional blob;
-alter table user add allowifupdate int(2) default 0;
-alter table user add lastqcheck datetime default NULL,add key(lastqcheck);
+alter table contact add allowifupdate int(2) default 0;
+alter table contact add lastqcheck datetime default NULL,add key(lastqcheck);
 alter table grp  add lastqcheck datetime default NULL,add key(lastqcheck);
 alter table grp  add description varchar(128);
 alter table grp  add lastknownbossemail blob;
-alter table user add ssh1publickey blob default NULL;
-alter table user add ssh2publickey blob default NULL;
-alter table user add office_costcenter varchar(20) default NULL,add key(office_costcenter);
-alter table user add office_accarea varchar(20) default NULL,add key(office_accarea);
-alter table user add office_room varchar(20) default NULL;
-alter table user add secstate int(1) default '2';
+alter table contact add ssh1publickey blob default NULL;
+alter table contact add ssh2publickey blob default NULL;
+alter table contact add office_costcenter varchar(20) default NULL,add key(office_costcenter);
+alter table contact add office_accarea varchar(20) default NULL,add key(office_accarea);
+alter table contact add office_room varchar(20) default NULL;
+alter table contact add secstate int(1) default '2';
 alter table grp  add is_org      int(1) default '0';
 alter table grp  add is_line     int(1) default '0';
 alter table grp  add is_depart   int(1) default '0';
 alter table grp  add is_resort   int(1) default '0';
 alter table grp  add is_team     int(1) default '0';
 alter table grp  add is_orggroup int(1) default '0';
-alter table user add formdata    longtext    default NULL;
+alter table contact add formdata    longtext    default NULL;

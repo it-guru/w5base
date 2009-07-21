@@ -74,7 +74,7 @@ sub new
                       return($d);
                    },
                 label         =>'Fullname',
-                dataobjattr   =>'user.fullname'),
+                dataobjattr   =>'contact.fullname'),
 
       new kernel::Field::Text(
                 name          =>'phonename',
@@ -113,7 +113,12 @@ sub new
                 htmleditwidth =>'100px',
                 default       =>'extern',
                 value         =>[qw(extern service user function)],
-                dataobjattr   =>'user.usertyp'),
+                dataobjattr   =>'contact.usertyp'),
+
+      new kernel::Field::Link(
+                name          =>'usertypid',
+                label         =>'nativ Usertyp',
+                dataobjattr   =>'contact.usertyp'),
 
       new kernel::Field::Select(
                 name          =>'cistatus',
@@ -139,14 +144,14 @@ sub new
                 name          =>'cistatusid',
                 group         =>'name',
                 label         =>'CI-StateID',
-                dataobjattr   =>'user.cistatus'),
+                dataobjattr   =>'contact.cistatus'),
 
       new kernel::Field::Id(
                 name          =>'userid',
                 label         =>'W5BaseID',
                 size          =>'10',
                 group         =>'userro',
-                dataobjattr   =>'user.userid'),
+                dataobjattr   =>'contact.userid'),
                                   
       new kernel::Field::Text(
                 name          =>'givenname',
@@ -160,7 +165,7 @@ sub new
                                 },
                 group         =>'name',
                 label         =>'Givenname',
-                dataobjattr   =>'user.givenname'),
+                dataobjattr   =>'contact.givenname'),
                                   
       new kernel::Field::Text(
                 name          =>'surname',
@@ -175,13 +180,13 @@ sub new
                                    return(1);
                                 },
                 label         =>'Surname',
-                dataobjattr   =>'user.surname'),
+                dataobjattr   =>'contact.surname'),
 
       new kernel::Field::Text(
                 name          =>'posix',
                 label         =>'POSIX-Identifier',
                 group         =>'userro',
-                dataobjattr   =>'user.posix_identifier'),
+                dataobjattr   =>'contact.posix_identifier'),
 
       new kernel::Field::Select(
                 name          =>'secstate',
@@ -189,7 +194,12 @@ sub new
                 value         =>['1','2','3','4'],
                 transprefix   =>'SECSTATE.',
                 group         =>'userro',
-                dataobjattr   =>'user.secstate'),
+                dataobjattr   =>'contact.secstate'),
+
+      new kernel::Field::Link(
+                name          =>'secstateid',
+                label         =>'Sec-StateID',
+                dataobjattr   =>'contact.secstate'),
 
       new kernel::Field::SubList(
                 name          =>'accounts',
@@ -206,55 +216,55 @@ sub new
                 name          =>'office_mobile',
                 group         =>'office',
                 label         =>'Mobile-Phonenumber',
-                dataobjattr   =>'user.office_mobile'),
+                dataobjattr   =>'contact.office_mobile'),
 
       new kernel::Field::Phonenumber(
                 name          =>'office_phone',
                 group         =>['office','nativcontact'],
                 label         =>'Phonenumber',
-                dataobjattr   =>'user.office_phone'),
+                dataobjattr   =>'contact.office_phone'),
 
       new kernel::Field::Text(
                 name          =>'office_street',
                 group         =>'office',
                 label         =>'Street',
-                dataobjattr   =>'user.office_street'),
+                dataobjattr   =>'contact.office_street'),
 
       new kernel::Field::Text(
                 name          =>'office_zipcode',
                 group         =>'office',
                 label         =>'ZIP-Code',
-                dataobjattr   =>'user.office_zipcode'),
+                dataobjattr   =>'contact.office_zipcode'),
 
       new kernel::Field::Text(
                 name          =>'office_location',
                 group         =>'office',
                 label         =>'Location',
-                dataobjattr   =>'user.office_location'),
+                dataobjattr   =>'contact.office_location'),
 
       new kernel::Field::Text(
                 name          =>'office_room',
                 group         =>'office',
                 label         =>'Room number',
-                dataobjattr   =>'user.office_room'),
+                dataobjattr   =>'contact.office_room'),
 
       new kernel::Field::Phonenumber(
                 name          =>'office_facsimile',
                 group         =>['office','nativcontact'],
                 label         =>'FAX-Number',
-                dataobjattr   =>'user.office_facsimile'),
+                dataobjattr   =>'contact.office_facsimile'),
 
       new kernel::Field::Text(
                 name          =>'office_elecfacsimile',
                 group         =>'office',
                 label         =>'electronical FAX-Number',
-                dataobjattr   =>'user.office_elecfacsimile'),
+                dataobjattr   =>'contact.office_elecfacsimile'),
 
       new kernel::Field::Number(
                 name          =>'office_persnum',
                 group         =>'officeacc',
                 label         =>'Personal-Number',
-                dataobjattr   =>'user.office_persnum'),
+                dataobjattr   =>'contact.office_persnum'),
 
       new kernel::Field::Number(
                 name          =>'office_costcenter',
@@ -262,13 +272,13 @@ sub new
                 weblinkto     =>'finance::costcenter',
                 weblinkon     =>['costcenterid'=>'id'],
                 label         =>'CostCenter',
-                dataobjattr   =>'user.office_costcenter'),
+                dataobjattr   =>'contact.office_costcenter'),
 
       new kernel::Field::Number(
                 name          =>'office_accarea',
                 group         =>'officeacc',
                 label         =>'Accounting Area',
-                dataobjattr   =>'user.office_accarea'),
+                dataobjattr   =>'contact.office_accarea'),
 
       new kernel::Field::Link(
                 name          =>'costcenterid',
@@ -297,50 +307,50 @@ sub new
                 name          =>'private_street',
                 group         =>'private',
                 label         =>'Street',
-                dataobjattr   =>'user.private_street'),
+                dataobjattr   =>'contact.private_street'),
 
       new kernel::Field::Text(
                 name          =>'private_zipcode',
                 group         =>'private',
                 label         =>'ZIP-Code',
-                dataobjattr   =>'user.private_zipcode'),
+                dataobjattr   =>'contact.private_zipcode'),
 
       new kernel::Field::Text(
                 name          =>'private_location',
                 group         =>'private',
                 label         =>'Location',
-                dataobjattr   =>'user.private_location'),
+                dataobjattr   =>'contact.private_location'),
 
       new kernel::Field::Phonenumber(
                 name          =>'private_facsimile',
                 group         =>'private',
                 label         =>'FAX-Number',
-                dataobjattr   =>'user.private_facsimile'),
+                dataobjattr   =>'contact.private_facsimile'),
 
       new kernel::Field::Phonenumber(
                 name          =>'private_elecfacsimile',
                 group         =>'private',
                 label         =>'electronical FAX-Number',
-                dataobjattr   =>'user.private_elecfacsimile'),
+                dataobjattr   =>'contact.private_elecfacsimile'),
 
       new kernel::Field::Phonenumber(
                 name          =>'private_mobile',
                 group         =>'private',
                 label         =>'Mobile-Phonenumber',
-                dataobjattr   =>'user.private_mobile'),
+                dataobjattr   =>'contact.private_mobile'),
 
       new kernel::Field::Phonenumber(
                 name          =>'private_phone',
                 group         =>'private',
                 label         =>'Phonenumber',
-                dataobjattr   =>'user.private_phone'),
+                dataobjattr   =>'contact.private_phone'),
 
       new kernel::Field::Select(
                 name          =>'tz',
                 label         =>'Timezone',
                 group         =>'userparam',
                 value         =>['CET','GMT',DateTime::TimeZone::all_names()],
-                dataobjattr   =>'user.timezone'),
+                dataobjattr   =>'contact.timezone'),
 
       new kernel::Field::Select(
                 name          =>'lang',
@@ -348,7 +358,7 @@ sub new
                 htmleditwidth =>'50%',
                 group         =>'userparam',
                 value         =>['',LangTable()],
-                dataobjattr   =>'user.lang'),
+                dataobjattr   =>'contact.lang'),
 
       new kernel::Field::Select(
                 name          =>'pagelimit',
@@ -358,7 +368,7 @@ sub new
                 group         =>'userparam',
                 value         =>[qw(10 15 20 30 40 50 100)],
                 default       =>'20',
-                dataobjattr   =>'user.pagelimit'),
+                dataobjattr   =>'contact.pagelimit'),
 
       new kernel::Field::Email(
                 name          =>'email',
@@ -384,7 +394,7 @@ sub new
                       }
                       return($d);
                    },
-                dataobjattr   =>'user.email'),
+                dataobjattr   =>'contact.email'),
 
       new kernel::Field::Select(
                 name          =>'winsize',
@@ -419,21 +429,21 @@ sub new
                 name          =>'allowifupdate',
                 group         =>'control',
                 label         =>'allow automatic updates by interfaces',
-                dataobjattr   =>'user.allowifupdate'),
+                dataobjattr   =>'contact.allowifupdate'),
 
       new kernel::Field::Textarea(
                 name          =>'ssh1publickey',
                 label         =>'SSH1 Public Key',
                 group         =>'control',
                 htmldetail    =>0,
-                dataobjattr   =>'user.ssh1publickey'),
+                dataobjattr   =>'contact.ssh1publickey'),
 
       new kernel::Field::Textarea(
                 name          =>'ssh2publickey',
                 label         =>'SSH2 Public Key',
                 group         =>'control',
                 htmldetail    =>0,
-                dataobjattr   =>'user.ssh2publickey'),
+                dataobjattr   =>'contact.ssh2publickey'),
 
       new kernel::Field::Textarea(
                 name          =>'similarcontacts',
@@ -446,54 +456,54 @@ sub new
 
       new kernel::Field::Container(
                 name          =>'options',
-                dataobjattr   =>'user.options'),
+                dataobjattr   =>'contact.options'),
 
       new kernel::Field::Container(
                 name          =>'formdata',
-                dataobjattr   =>'user.formdata'),
+                dataobjattr   =>'contact.formdata'),
 
       new kernel::Field::File(
                 name          =>'picture',
                 label         =>'picture',
                 searchable    =>0,
                 group         =>'picture',
-                dataobjattr   =>'user.picture'),
+                dataobjattr   =>'contact.picture'),
 
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'userro',
                 label         =>'Creator',
-                dataobjattr   =>'user.createuser'),
+                dataobjattr   =>'contact.createuser'),
 
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'userro',
                 label         =>'Owner',
-                dataobjattr   =>'user.modifyuser'),
+                dataobjattr   =>'contact.modifyuser'),
 
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'userro',
                 label         =>'Editor',
-                dataobjattr   =>'user.editor'),
+                dataobjattr   =>'contact.editor'),
 
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 group         =>'userro',
                 label         =>'RealEditor',
-                dataobjattr   =>'user.realeditor'),
+                dataobjattr   =>'contact.realeditor'),
 
       new kernel::Field::CDate(
                 name          =>'cdate',
                 label         =>'Creation-Date',
                 group         =>'userro',
-                dataobjattr   =>'user.createdate'),
+                dataobjattr   =>'contact.createdate'),
                                   
       new kernel::Field::MDate(
                 name          =>'mdate',
                 label         =>'Modification-Date',
                 group         =>'userro',
-                dataobjattr   =>'user.modifydate'),
+                dataobjattr   =>'contact.modifydate'),
 
       new kernel::Field::Date(
                 name          =>'lastlogon',
@@ -550,18 +560,18 @@ sub new
                 name          =>'comments',
                 group         =>'comments', 
                 label         =>'Comments',
-                dataobjattr   =>'user.comments'),
+                dataobjattr   =>'contact.comments'),
 
       new kernel::Field::QualityText(),
       new kernel::Field::QualityState(),
       new kernel::Field::QualityOk(),
       new kernel::Field::QualityLastDate(
-                dataobjattr   =>'user.lastqcheck'),
+                dataobjattr   =>'contact.lastqcheck'),
 
    );
    $self->{CI_Handling}={uniquename=>"fullname",
                          uniquesize=>255};
-   $self->setWorktable("user");
+   $self->setWorktable("contact");
    $self->LoadSubObjs("user");
    $self->setDefaultView(qw(fullname cistatus usertyp));
    return($self);
@@ -1042,11 +1052,11 @@ sub SSHPublicKey
                $self->LastMsg(OK,"key has been stored");
             }
          }
-         print $self->getParsedTemplate("tmpl/base.user.SSHPublicKey.rw",$opt);
+         print $self->getParsedTemplate("tmpl/base.contact.SSHPublicKey.rw",$opt);
          print("<input type=hidden name=userid value=\"$userid\">");
       }
       else{
-         print $self->getParsedTemplate("tmpl/base.user.SSHPublicKey.ro",$opt);
+         print $self->getParsedTemplate("tmpl/base.contact.SSHPublicKey.ro",$opt);
       }
    }
    print $self->HtmlBottom(body=>1,form=>1);

@@ -73,8 +73,8 @@ sub getSqlFrom
 {
    my $self=shift;
    my ($worktable,$workdb)=$self->getWorktable();
-   return("$worktable left outer join user ".
-          "on $worktable.userid=user.userid ");
+   return("$worktable left outer join contact ".
+          "on $worktable.userid=contact.userid ");
 }
 
 

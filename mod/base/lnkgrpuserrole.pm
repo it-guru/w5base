@@ -42,19 +42,19 @@ sub new
                 name          =>'userfullname',
                 label         =>'UserFullname',
                 readonly      =>1,
-                dataobjattr   =>'user.fullname'),
+                dataobjattr   =>'contact.fullname'),
 
       new kernel::Field::Link(
                 name          =>'userid',
                 label         =>'UserID',
                 readonly      =>1,
-                dataobjattr   =>'user.userid'),
+                dataobjattr   =>'contact.userid'),
 
       new kernel::Field::Link(
                 name          =>'cistatusid',
                 label         =>'User CI-StatusID',
                 readonly      =>1,
-                dataobjattr   =>'user.cistatus'),
+                dataobjattr   =>'contact.cistatus'),
 
       new kernel::Field::Text(
                 name          =>'grpfullname',
@@ -70,7 +70,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'email',
-                dataobjattr   =>'user.email'),
+                dataobjattr   =>'contact.email'),
 
       new kernel::Field::Text(
                 name          =>'lnkgrpuserid',
@@ -141,8 +141,8 @@ sub getSqlFrom
    my ($worktable,$workdb)=$self->getWorktable();
    return("$worktable left outer join lnkgrpuser ".
           "on $worktable.lnkgrpuserid=lnkgrpuser.lnkgrpuserid ".
-          "left outer join user ".
-          "on lnkgrpuser.userid=user.userid ".
+          "left outer join contact ".
+          "on lnkgrpuser.userid=contact.userid ".
           "left outer join grp ".
           "on lnkgrpuser.grpid=grp.grpid ");
 }
