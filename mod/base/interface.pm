@@ -489,6 +489,12 @@ sub showFields
          }
          $fielddesc->{longtype}=$fo->Self();
          $fielddesc->{type}=$fo->Type();
+         if (exists($fo->{dataobjattr})){
+            $fielddesc->{dataobjattr}=$fo->{dataobjattr};
+         }
+         else{
+            $fielddesc->{dataobjattr}="[NULL]";
+         }
       }
       push(@l,$fielddesc);
    }
