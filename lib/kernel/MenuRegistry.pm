@@ -83,6 +83,10 @@ sub RegisterObj
       $rec{func}="Main";
       $rec{func}=$param{func} if (defined($param{func}));
    }
+   if ($self->Config->Param("W5BaseOperationMode") eq "baseslave" ||
+       $self->Config->Param("W5BaseOperationMode") eq "readonly"){
+      return;
+   }
 
    if (!defined($mc->{fullname}->{$name})){
       #printf STDERR ("fifi insert $name\n");
