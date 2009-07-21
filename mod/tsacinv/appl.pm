@@ -19,7 +19,7 @@ package tsacinv::appl;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use kernel::App::Web;
+use kernel::App::Web::Listedit;
 use kernel::DataObj::DB;
 use kernel::Field;
 use tsacinv::lib::tools;
@@ -303,7 +303,7 @@ sub getRecordImageUrl
 {
    my $self=shift;
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-   return("../../../public/itil/load/appl.jpg?".$cgi->query_string());
+   return("../../../public/tsacinv/load/appl.jpg?".$cgi->query_string());
 }
          
 
@@ -417,10 +417,11 @@ sub ImportAppl
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','work.css',
                                    'kernel.App.Web.css'],
-                           static=>{importname=>$importname},
                            body=>1,form=>1,
                            title=>"AssetManager Application Import");
-   print $self->getParsedTemplate("tmpl/minitool.appl.import",{});
+   print $self->getParsedTemplate("tmpl/minitool.appl.import",{
+                                  static=>{importname=>$importname},
+                                  });
    print $self->HtmlBottom(body=>1,form=>1);
 }
 

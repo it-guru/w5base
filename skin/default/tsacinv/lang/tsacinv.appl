@@ -19,3 +19,4 @@
 'Priority'=>{de=>'Priorität'},
 'Application Maintenence Window'=>{de=>'Wartungsfenster'},
 'Account-Number'=>{de=>'Account-Nummer'},
+'ApplicationID not found in AssetManager'=>{de=>'ApplicationID konnte in AssetManager nicht gefunden werden'},
