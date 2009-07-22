@@ -560,18 +560,18 @@ sub LoadSubObjs
       }
       my @sublist=glob($pat); 
       @sublist=map({my $qi=quotemeta($instdir);
-                    $_=~s/^$instdir//;
+                    $_=~s/^$qi//;
                     $_=~s/\/mod\///; 
                     $_;
                    } @sublist);
 
-    
-      my @disabled=glob("$instdir/mod/*.DISABLED"); 
+      my @disabled=glob($pat.".DISABLED"); 
       @disabled=map({my $qi=quotemeta($instdir);
-                    $_=~s/^$instdir//;
+                    $_=~s/^$qi//;
                     $_=~s/\/mod\///; 
                     $_=~s/\.DISABLED//; 
                     $_."/" if (!($_=~m/\.pm$/));
+                    $_;
                    } @disabled);
       foreach my $dis (@disabled){
          @sublist=grep(!/^$dis/,@sublist);
