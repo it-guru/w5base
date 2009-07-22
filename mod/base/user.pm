@@ -880,20 +880,24 @@ sub isViewValid
       @gl=qw(header name default comments groups userro control 
                 office private);
    }  
-   if ($rec->{usertyp} eq "function"){
+   elsif ($rec->{usertyp} eq "function"){
       if ($self->IsMemberOf("admin")){
          @gl=qw(header name default nativcontact comments 
                    control userro);
       }
-      @gl=qw(header name default nativcontact comments);
+      else{
+         @gl=qw(header name default nativcontact comments);
+      }
    }  
-   if ($rec->{usertyp} eq "service"){
+   elsif ($rec->{usertyp} eq "service"){
       @gl=qw(header name default comments groups usersubst userro 
-                control officeacc userparam);
+                control userparam);
    }  
-   @gl=(@pic,
-          qw(default name office officeacc private userparam groups 
-             userro control usersubst header qc));
+   else{
+      @gl=(@pic,
+             qw(default name office officeacc private userparam groups 
+                userro control usersubst header qc));
+   }
    my $secstate=$self->getCurrentSecState();
    if ($rec->{userid}!=$userid){
       if ($secstate<2){
@@ -1083,7 +1087,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return(qw(header name picture default nativcontact office 
+   return(qw(header name picture default comments nativcontact office 
              officeacc private userparam control groups usersubst));
 }
 
