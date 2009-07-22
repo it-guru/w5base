@@ -512,6 +512,11 @@ sub getModuleObject
       $param=shift;
       $config=getConfigObject($instdir,$configname,$package);
    }
+   my $modconf=$config->Param("MODULE");
+   if (ref($modconf) eq "HASH"){
+      $modconf=$modconf->{$package};
+   }
+   return(undef) if (lc($modconf) eq "disabled");
    my ($basemod,$app)=$package=~m/^(\S+)::(.*)$/;
    return(undef) if (!defined($config));
    #printf STDERR ("dump%s\n",Dumper($config));
@@ -557,8 +562,18 @@ sub getModuleObject
          return(undef);
       }
    }
+   if (lc($modconf) eq "readonly"){
+      no strict;
+      my $f="${package}::isWriteValid";
+      *$f=sub {return undef};
+      my $f="${package}::isDeleteValid";
+      *$f=sub {return undef};
+   }
+
    return($o);
 }
+
+sub _isWriteValid {return undef};
 
 sub _FancyLinks
 {

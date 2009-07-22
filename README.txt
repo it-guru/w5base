@@ -523,3 +523,12 @@ modify the user permissions to:
 
 And the change the W5BaseOperationMode to "readonly" in the W5Base config.
 Ensure, that the W5BaseOperationMode is set for W5Server AND Userfrontend!
+
+Setting W5Base in BASESLAVE mode
+================================
+In "baseslave" W5BaseOperationMode you can use all main tables as readonly.
+In this mode, no tableversion control is done.
+You can disable submodules (f.e. like base/W5Server/Cleanup.pm) by touch
+on the file by extension (f.e. touch base/W5Server/Cleanup.pm.DISABLED).
+If you want to disable or set readonly on dataobj modules, you have to
+add configvar MODULE[base::user]="READONLY" or MODULE[base::user]="DISABLED"
