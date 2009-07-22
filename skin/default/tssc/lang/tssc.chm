@@ -8,6 +8,7 @@
 'fieldgroup.device'=>{de=>'betroffene Geräte/Systeme',en=>'affected Devices/Systems'},
 'Brief Description'=>{de=>'Kurzbeschreibung (Brief Description)'},
 'Description'=>{de=>'Beschreibung (Description)'},
+'Description length'=>{de=>'Beschreibungslänge'},
 'Requested By'=>{de=>'Angefordert von (Requested By)'},
 'Assign Area'=>{de=>'Zugewiesener Bereich (Assign Area)'},
 'Assigned To'=>{de=>'Zugewiesen an'},

@@ -163,6 +163,19 @@ sub new
                 vjoinon       =>['changenumber'=>'changenumber'],
                 vjoindisp     =>'description'),
 
+      new kernel::Field::Number(
+                name          =>'descriptionlength',
+                label         =>'Description length',
+                searchable    =>0,
+                depend        =>['description'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $fo=$self->getParent->getField("description",$current);
+                   my $d=$fo->RawValue($current);
+                   return(length($d));
+                }),
+
       new kernel::Field::Textarea(
                 name          =>'fallback',
                 label         =>'Fallback',
