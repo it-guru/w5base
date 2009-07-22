@@ -225,6 +225,7 @@ sub InitRequest
       if ($self->Self() ne "base::load"){
          my $db=$self->Cache->{W5Base};
          my $now=NowStamp();
+         my $loghour=substr($now,0,10);
          my $user=$ENV{REMOTE_USER};
          my $site=$ENV{SCRIPT_URI};
          if ($ENV{REMOTE_USER} ne ""){
@@ -244,11 +245,24 @@ sub InitRequest
             msg(INFO,"user '$user' logon from '$ENV{REMOTE_ADDR}'");
          }
          else{
+            my $fldlst="account,loghour,logondate,logonbrowser,".
+                       "logonip,lang,site";
+            my $vallst="'$user','$loghour','$now',".
+                       "'$ENV{HTTP_USER_AGENT}','$ENV{REMOTE_ADDR}','$lang',".
+                       "'$site'"; 
             my $cmd="replace delayed into userlogon";
-            $cmd.=" (account,loghour,logondate,logonbrowser,logonip,lang,site)";
-            $cmd.=" values('$user','$now','$now',".
-                  "'$ENV{HTTP_USER_AGENT}','$ENV{REMOTE_ADDR}','$lang',".
-                  "'$site')";
+            $cmd.=" ($fldlst)";
+            $cmd.=" values($vallst)";
+            if (lc($db->DriverName()) eq "oracle"){
+               $cmd="MERGE INTO userlogon a ".
+                    "USING (select '$loghour' loghour,
+                                   '$user' account from dual) b ".
+                    "ON (a.loghour=b.loghour and a.account=b.account) ".
+                    "WHEN NOT MATCHED THEN ".
+                    "INSERT ($fldlst) VALUES ($vallst) ".
+                    "WHEN MATCHED THEN ".
+                    "UPDATE SET loghour='$loghour',logondate='$now'";
+            }
             $db->do($cmd); 
          }
       }
