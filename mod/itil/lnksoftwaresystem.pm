@@ -73,6 +73,41 @@ sub new
                 vjoinon       =>['systemid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::Text(
+                name          =>'applications',
+                htmlwidth     =>'100px',
+                weblinkto     =>'NONE',
+                group         =>'useableby',
+                htmldetail    =>0,
+                label         =>'useable by application',
+                vjointo       =>'itil::system',
+                vjoinon       =>['systemid'=>'id'],
+                vjoindisp     =>'applicationnamesline'),
+
+      new kernel::Field::Text(
+                name          =>'custcontract',
+                htmlwidth     =>'100px',
+                weblinkto     =>'NONE',
+                group         =>'useableby',
+                searchable    =>0,
+                htmldetail    =>0,
+                label         =>'useable by customer contract',
+                vjointo       =>'itil::system',
+                vjoinon       =>['systemid'=>'id'],
+                vjoindisp     =>'custcontract'),
+
+      new kernel::Field::Text(
+                name          =>'customer',
+                htmlwidth     =>'100px',
+                weblinkto     =>'NONE',
+                searchable    =>0,
+                htmldetail    =>0,
+                group         =>'useableby',
+                label         =>'useable by customer',
+                vjointo       =>'itil::system',
+                vjoinon       =>['systemid'=>'id'],
+                vjoindisp     =>'customer'),
+
       new kernel::Field::TextDrop(
                 name          =>'liccontract',
                 htmlwidth     =>'100px',
@@ -259,6 +294,9 @@ sub new
 sub getSqlFrom
 {
    my $self=shift;
+   my $mode=shift;
+   my @filter=@_;
+
    my $from="lnksoftwaresystem left outer join software ".
             "on lnksoftwaresystem.software=software.id ".
             "left outer join system ".
@@ -359,7 +397,7 @@ sub isParentWriteable  # Eltern Object Schreibzugriff prüfen
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default misc link source));
+   return(qw(header default useableby misc link source));
 }
 
 

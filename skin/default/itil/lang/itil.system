@@ -27,6 +27,7 @@
 'Administrationteam'=>{de=>'Administrationsteam'},
 'Applications'=>{de=>'Anwendungen'},
 'Applicationnames'=>{de=>'Anwendungsname'},
+'Applicationnames line'=>{de=>'Anwendungsname (Zeile)'},
 'Application business teams'=>{de=>'Anwendungs-Betriebsteams'},
 'Short Description'=>{de=>'Kurzbeschreibung'},
 'Productionsystem'=>{de=>'Produktionssystem'},
@@ -55,3 +56,5 @@
 'availabel for further use'=>{de=>'verfügbar für den Wiedereinsatz'},
 'OS-Class'=>{de=>'Betriebssystemklasse'},
 'there are still linked active ipaddresses on this system'=>{de=>'diesem System sind noch aktive IP-Adressen zugeordnet'},
+'fieldgroup.customer'=>{de=>'verwendet durch Kunde',en=>'used by customer'},
+'Customer Contract'=>{de=>'Kundenvertrag'},

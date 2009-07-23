@@ -692,7 +692,7 @@ sub Validate
    }
    if ((!defined($oldrec) && !defined($newrec->{systemid})) ||
        (defined($newrec->{systemid}) && $newrec->{systemid}==0)){
-      $self->LastMsg(ERROR,"invalid contract specified");
+      $self->LastMsg(ERROR,"invalid systemid specified");
       return(undef);
    }
    my $applid=effVal($oldrec,$newrec,"applid");

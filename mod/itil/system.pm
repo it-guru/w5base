@@ -112,6 +112,91 @@ sub new
                 vjoinon       =>['id'=>'systemid'],
                 vjoindisp     =>['appl']),
 
+      new kernel::Field::Text(
+                name          =>'applicationnamesline',
+                label         =>'Applicationnames line',
+                group         =>'applications',
+                htmldetail    =>0,
+                searchable    =>0,
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{applcistatusid=>"<=4"}],
+                vjoinon       =>['id'=>'systemid'],
+                vjoindisp     =>['appl']),
+
+      new kernel::Field::Text(
+                name          =>'customer',
+                label         =>'Customer',
+                group         =>'customer',
+                depend        =>['applications'],
+                searchable    =>0,
+                htmldetail    =>0,
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $fo=$self->getParent->getField("applications");
+                   my $f=$fo->RawValue($current);
+                   my @aid=();
+                   my %customer;
+                   if (ref($f) eq "ARRAY"){
+                      foreach my $a (@{$f}){
+                         push(@aid,$a->{applid});
+                      }
+                   }
+                   if ($#aid!=-1){
+                      my $appl=getModuleObject($self->getParent->Config,
+                                               "itil::appl");
+                      $appl->SetFilter({id=>\@aid,cistatusid=>"<5"});
+                      foreach my $arec ($appl->getHashList(qw(customer))){
+                         if ($arec->{customer} ne ""){
+                            $customer{$arec->{customer}}++;
+                         }
+                      } 
+                      my $cont=getModuleObject($self->getParent->Config,
+                                               "itil::custcontract");
+                      $cont->SetFilter({applicationids=>\@aid,
+                                        cistatusid=>"<5"});
+                      foreach my $arec ($cont->getHashList(qw(customer))){
+                         if ($arec->{customer} ne ""){
+                            $customer{$arec->{customer}}++;
+                         }
+                      } 
+                   }
+                   return([keys(%customer)]);
+                }),
+
+      new kernel::Field::Text(
+                name          =>'custcontract',
+                label         =>'Customer Contract',
+                group         =>'customer',
+                depend        =>['applications'],
+                searchable    =>0,
+                htmldetail    =>0,
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $fo=$self->getParent->getField("applications");
+                   my $f=$fo->RawValue($current);
+                   my @aid=();
+                   my %customer;
+                   if (ref($f) eq "ARRAY"){
+                      foreach my $a (@{$f}){
+                         push(@aid,$a->{applid});
+                      }
+                   }
+                   if ($#aid!=-1){
+                      my $cont=getModuleObject($self->getParent->Config,
+                                               "itil::custcontract");
+                      $cont->SetFilter({applicationids=>\@aid,
+                                        cistatusid=>"<5"});
+                      foreach my $arec ($cont->getHashList(qw(name))){
+                         if ($arec->{name} ne ""){
+                            $customer{$arec->{name}}++;
+                         }
+                      } 
+                   }
+                   return([keys(%customer)]);
+                }),
+
       new kernel::Field::SubList(
                 name          =>'software',
                 label         =>'Software',
@@ -1158,7 +1243,7 @@ sub getDetailBlockPriority
    return(
           qw(header default admin phonenumbers logsys location 
              physys systemclass 
-             opmode applications software ipaddresses
+             opmode applications customer software ipaddresses
              contacts misc attachments control source));
 }
 
