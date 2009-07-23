@@ -541,7 +541,7 @@ sub getSelectField     # returns the name/function to place in select
                return(undef); # noch todo
             };
             /^oracle$/i and do {
-               my @fl=@{$self->{dataobjattr}});
+               my @fl=@{$self->{dataobjattr}};
                my $wcmd=$fl[0];
                if ($#fl>0){
                   my @flx=shift(@fl);
