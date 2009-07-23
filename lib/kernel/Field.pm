@@ -73,6 +73,8 @@ use kernel::Field::QualityOk;
 use kernel::Field::QualityLastDate;
 use kernel::Field::QualityResponseArea;
 use kernel::Field::Fulltext;
+use kernel::Field::Interview;
+use kernel::Field::InterviewState;
 use kernel::Universal;
 @ISA    = qw(kernel::Universal);
 
@@ -539,7 +541,17 @@ sub getSelectField     # returns the name/function to place in select
                return(undef); # noch todo
             };
             /^oracle$/i and do {
-               return(undef); # noch todo
+               my @fl=@{$self->{dataobjattr}});
+               my $wcmd=$fl[0];
+               if ($#fl>0){
+                  my @flx=shift(@fl);
+                  my @kl;
+                  map({push(@flx,"'-'",$_);
+                       push(@kl,"))")} @fl);
+                  my $last=pop(@flx);
+                  $wcmd=join(",",map({"concat($_"} @flx)).",$last".join("",@kl);
+               }
+               return($wcmd); 
             };
             /^odbc$/i and do {
                return(join("+'-'+",
