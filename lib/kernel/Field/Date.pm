@@ -376,6 +376,24 @@ sub prepUploadRecord   # prepair one record on upload
 }
 
 
+sub finishWriteRequestHash
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $parent=$self->getParent;
+   if (defined($parent->{DB}) && $parent->{DB}->DriverName() eq "oracle"){
+      my $name=$self->{name};
+      if (exists($newrec->{$name})){
+         my $d=$newrec->{$name};
+         if (defined($d)){
+            my $val="to_date('$d','YYYY-MM-DD HH24:MI:SS')";
+            $newrec->{$name}=\$val;
+         }
+      }
+   }
+   return(undef);
+}
 
 
 
