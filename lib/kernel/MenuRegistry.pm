@@ -83,7 +83,7 @@ sub RegisterObj
       $rec{func}="Main";
       $rec{func}=$param{func} if (defined($param{func}));
    }
-   if ($self->Config->Param("W5BaseOperationMode") eq "baseslave" ||
+   if ($self->Config->Param("W5BaseOperationMode") eq "slave" ||
        $self->Config->Param("W5BaseOperationMode") eq "readonly"){
       return;
    }

@@ -118,7 +118,7 @@ sub DatabaseLowInit
    my ($func,$p)=$self->extractFunctionPath();
 
    if ($self->Config->Param("W5BaseOperationMode") ne "readonly" &&
-       $self->Config->Param("W5BaseOperationMode") ne "baseslave"){
+       $self->Config->Param("W5BaseOperationMode") ne "slave"){
       if ($func eq "root"){
          if (!$self->TableVersionValidate()){
             $self->TableVersionChecker();

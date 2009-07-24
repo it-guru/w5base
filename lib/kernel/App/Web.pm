@@ -740,7 +740,7 @@ sub HandleNewUser
       return(0);
    }
    if ($self->Config->Param("W5BaseOperationMode") eq "readonly" ||
-       $self->Config->Param("W5BaseOperationMode") eq "baseslave"){
+       $self->Config->Param("W5BaseOperationMode") eq "slave"){
       my $msg="account needs to be activate in master system";
      # printf("Status: 403 Forbitten - $msg");
       printf("Content-type: text/html\n\n");
