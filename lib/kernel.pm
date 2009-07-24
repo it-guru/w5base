@@ -81,7 +81,7 @@ use Unicode::String qw(utf8 latin1 utf16);
              &trim &rtrim &ltrim &hash2xml &effVal &effChanged 
              &Debug &UTF8toLatin1
              &Datafield2Hash &Hash2Datafield &CompressHash
-             &unHtml &quoteHtml &quoteWap &quoteQueryString &Dumper 
+             &unHtml &quoteHtml &quoteSOAP &quoteWap &quoteQueryString &Dumper 
              &FancyLinks &mkInlineAttachment 
              &mkMailInlineAttachment &haveSpecialChar
              &getModuleObject &getConfigObject &generateToken
@@ -122,6 +122,17 @@ sub unHtml
 
    return($d);
 }
+
+sub quoteSOAP
+{
+   my $d=shift;
+
+   $d=~s/&/&amp;/g;
+   $d=~s/</&lt;/g;
+   $d=~s/>/&gt;/g;
+   return($d);
+}
+
 
 sub quoteHtml
 {

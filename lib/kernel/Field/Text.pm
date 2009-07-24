@@ -58,7 +58,7 @@ sub FormatedDetail
       $d=[map({$self->addWebLinkToFacility(quoteHtml($_),$current)} @{$d})];
    }
    if ($mode eq "SOAP"){
-      $d=[map({my $f=$_; $f=~s/&/&amp;/g; $f} @{$d})];
+      $d=[map({quoteSOAP($_)} @{$d})];
    }
    if ($mode eq "HtmlV01"){
       $d=[map({quoteHtml($_)} @{$d})];

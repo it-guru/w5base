@@ -130,7 +130,7 @@ sub FormatedResult
       $d=~s/\n/<br>\n/g;
    }
    if ($FormatAs eq "SOAP"){
-      $d=~s/&/&amp;/g;; 
+      return(quoteSOAP($d));
    }
    #printf STDERR ("fifi FormatAs=$FormatAs\n");
    return($d);
