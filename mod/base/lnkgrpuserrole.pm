@@ -100,13 +100,13 @@ sub new
                                  'RDataAdmin',
                                  'W5BaseSupport'
                                 ],
-                dataobjattr   =>'lnkgrpuserrole.role'),
+                dataobjattr   =>'lnkgrpuserrole.nativrole'),
 
       new kernel::Field::Text(
                 name          =>'nativrole',
                 label         =>'native role',
                 htmldetail    =>0,
-                dataobjattr   =>'lnkgrpuserrole.role'),
+                dataobjattr   =>'lnkgrpuserrole.nativrole'),
 
       new kernel::Field::Date(
                 name          =>'expiration',
