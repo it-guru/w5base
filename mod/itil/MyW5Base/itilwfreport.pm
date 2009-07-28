@@ -79,7 +79,8 @@ sub isSelectable
          }
       }
    }
-   return(1) if ($self->getParent->IsMemberOf("admin"));
+   my $dataobj=$self->getDataObj();
+   return(1) if ($dataobj->IsMemberOf("admin"));
    return(0);
 }
 
