@@ -78,13 +78,45 @@ sub ITILfullRep
                  filter=>\%flt,
                  view=>[qw(name mandator id applid conumber customer
                            criticality customerprio)]},
+
                 {DataObj=>'itil::system',
                  filter=>{cistatusid=>'4',applications=>[keys(%{$t->{name}})]},
                  view=>[qw(name systemid applicationnames asset cpucount)]},
+
                 {DataObj=>'itil::asset',
                  filter=>{cistatusid=>'4',applications=>[keys(%{$t->{name}})]},
-                 view=>[qw(name systemids applicationnames 
-                           hwmodel serialno memory cpucount)]},
+                 view=>[qw(name systemids 
+                           hwmodel serialno memory cpucount 
+                           applicationnames)]},
+
+                {DataObj=>'base::workflow',
+                 sheet=>'Change',
+                 filter=>{eventend=>">01/2009 AND <12/2009",
+                          class=>'AL_TCom::workflow::change',
+                          affectedapplicationid=>[keys(%{$t->{id}})]},
+                 view=>[qw(name id srcid eventstart eventend)]},
+
+                {DataObj=>'base::workflow',
+                 sheet=>'Incident',
+                 filter=>{eventend=>">01/2009 AND <12/2009",
+                          class=>'AL_TCom::workflow::incident',
+                          affectedapplicationid=>[keys(%{$t->{id}})]},
+                 view=>[qw(name id srcid eventstart eventend)]},
+
+                {DataObj=>'base::workflow',
+                 sheet=>'BTB',
+                 filter=>{eventend=>">01/2009 AND <12/2009",
+                          class=>'AL_TCom::workflow::diary',
+                          affectedapplicationid=>[keys(%{$t->{id}})]},
+                 view=>[qw(name id eventstart eventend)]},
+
+                {DataObj=>'base::workflow',
+                 sheet=>'Ereignismeldung',
+                 filter=>{eventend=>"(2009)",
+                          class=>'AL_TCom::workflow::eventnotify',
+                          affectedapplicationid=>[keys(%{$t->{id}})]},
+                 view=>[qw(name id wffields.eventstatclass 
+                           eventstart eventend)]},
                 );
 
    $out->Process(@control);
