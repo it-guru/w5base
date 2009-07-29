@@ -70,6 +70,21 @@ sub Config
    return($self->getParent->getParent->Config);
 }
 
+sub setDataObj
+{
+   my $self=shift;
+   my $o=shift;
+   $self->{DataObj}=$o;
+   return($o);
+}
+
+sub getDataObj
+{
+   my $self=shift;
+   return($self->{DataObj}) if (defined($self->{DataObj}));
+   return($self->getParent->getParent()); #default handler
+}
+
 sub DownloadHeader
 {
    my $self=shift;

@@ -67,7 +67,7 @@ sub getDownloadFilename
 sub getHttpHeader
 {  
    my $self=shift;
-   my $app=$self->getParent->getParent();
+   my $app=$self->getDataObj();
    my $d="";
    $d.="Content-type:".$self->MimeType()."\n\n";
    return($d);
@@ -77,22 +77,50 @@ sub Init
 {
    my $self=shift;
    my ($fh)=@_;
-   $self->{filename}="/tmp/tmp.$$.xls";
-   $|=1;
-   binmode($$fh);
-   eval("use Spreadsheet::WriteExcel::Big;");
-   if ($@ eq ""){
-      $self->{'workbook'}=Spreadsheet::WriteExcel::Big->new($self->{filename});
-   }
-   $self->{'worksheet'}=$self->{'workbook'}->addworksheet(
-                                           'W5Base');
-   $self->{'format'}={};
-   $self->{'maxlen'}=[];
-   $self->{xlscollindex}={};
-   $self->{maxcollindex}=0;
+   binmode($$fh) if (defined($fh));
+   $self->setFilename("/tmp/tmp.$$.xls");
+   $self->initWorkbook();
+   $self->addSheet("W5Base");
 
    return($self->SUPER::Init(@_));
 }
+
+
+sub setFilename
+{
+   my $self=shift;
+   my $filename=shift;
+   $self->{filename}=$filename;
+}
+
+sub initWorkbook
+{
+   my $self=shift;
+
+   eval("use Spreadsheet::WriteExcel::Big;");
+   if ($@ eq ""){
+      $self->{'workbook'}=Spreadsheet::WriteExcel::Big->new($self->{filename});
+      $self->{'format'}={};
+      $self->{'maxlen'}=[];
+      return($self->{'workbook'});
+   }
+   return(undef);
+}
+
+
+sub addSheet
+{
+   my $self=shift;
+   my $sheetname=shift;
+   $sheetname=~s/[^A-Z0-9]/_/gi;
+   $self->{'worksheet'}=$self->{'workbook'}->addworksheet($sheetname);
+   $self->{xlscollindex}={};
+   $self->{maxcollindex}=0;
+   return($self->{'worksheet'});
+}
+
+
+
 
 sub Format
 {
@@ -141,7 +169,7 @@ sub Format
 sub ProcessLine
 {
    my ($self,$fh,$viewgroups,$rec,$recordview,$fieldbase,$lineno,$msg)=@_;
-   my $app=$self->getParent->getParent();
+   my $app=$self->getDataObj();
    my $d;
    my @cell=();
    my @cellobj=();
@@ -244,12 +272,24 @@ sub ProcessHead
    return(undef);
 }
 
+sub closeWorkbook
+{
+   my $self=shift;
+
+   if (defined($self->{'workbook'})){
+      $self->{'workbook'}->close();
+      return($self->{'workbook'});
+   }
+   return(undef);
+}
+
 sub Finish
 {
    my ($self,$fh)=@_;
-   $self->{'workbook'}->close();
+   $self->closeWorkbook();
 
    if (open(F,"<$self->{filename}")){
+      $|=1;
       my $buf;
       while(sysread(F,$buf,8192)){
          print STDOUT $buf;
