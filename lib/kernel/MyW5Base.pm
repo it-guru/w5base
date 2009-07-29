@@ -51,6 +51,15 @@ sub new
    return($self);
 }
 
+sub IsMemberOf
+{
+   my $self=shift;
+   my $dataobj=$self->getDataObj();
+   return($dataobj->IsMemberOf(@_)) if ($dataobj->can("IsMemberOf"));
+   my $o=getModuleObject($self->Config,"base::user");
+   return($o->IsMemberOf(@_));
+}
+
 sub Init
 {
    my $self=shift;
