@@ -47,6 +47,7 @@ sub ITILfullRep
    my $self=shift;
    my %param=@_;
    my %flt;
+   msg(DEBUG,"param=%s",Dumper(\%param));
    if ($param{customer} ne ""){
       my $c=$param{customer};
       $flt{customer}="$param{customer} $param{customer}.*";
@@ -67,9 +68,23 @@ sub ITILfullRep
    my $appl=getModuleObject($self->Config,"itil::appl");
    $appl->SetFilter(\%flt);
    $appl->SetCurrentView(@keys);
+   my $eventend=">now";
+   if ($param{year} ne ""){
+      $eventend="($param{year})";
+   }
    my $t=$appl->getHashIndexed(@keys);
+   if ($param{'filename'} eq ""){
+      my $names=join("_",keys(%{$t->{name}}));
+      $names=substr($names,0,40)."___" if (length($names)>40);
+      my $tstr=$eventend;
+      $tstr=~s/[^a-z0-9]//gi;
+      $param{'filename'}="/tmp/FullIT-Report_${names}_${tstr}.xls";
+   }
+   msg(INFO,"start Report to $param{'filename'}");
+   my $t0=time();
+ 
 
-   my $out=new kernel::XLSReport($self,"/tmp/xx.xls");
+   my $out=new kernel::XLSReport($self,$param{'filename'});
    $out->initWorkbook();
 
    $flt{'cistatusid'}='4';
@@ -81,7 +96,8 @@ sub ITILfullRep
 
                 {DataObj=>'itil::system',
                  filter=>{cistatusid=>'4',applications=>[keys(%{$t->{name}})]},
-                 view=>[qw(name systemid applicationnames asset cpucount)]},
+                 view=>[qw(name systemid applicationnames asset 
+                           memory cpucount osrelease)]},
 
                 {DataObj=>'itil::asset',
                  filter=>{cistatusid=>'4',applications=>[keys(%{$t->{name}})]},
@@ -91,35 +107,45 @@ sub ITILfullRep
 
                 {DataObj=>'base::workflow',
                  sheet=>'Change',
-                 filter=>{eventend=>">01/2009 AND <12/2009",
+                 filter=>{eventend=>$eventend,
+                          isdeleted=>'0',
                           class=>'AL_TCom::workflow::change',
                           affectedapplicationid=>[keys(%{$t->{id}})]},
-                 view=>[qw(name id srcid eventstart eventend)]},
+                 view=>[qw(name id srcid eventstart eventend 
+                           wffields.changedescription)]},
 
                 {DataObj=>'base::workflow',
                  sheet=>'Incident',
-                 filter=>{eventend=>">01/2009 AND <12/2009",
+                 filter=>{eventend=>$eventend,
+                          isdeleted=>'0',
                           class=>'AL_TCom::workflow::incident',
                           affectedapplicationid=>[keys(%{$t->{id}})]},
-                 view=>[qw(name id srcid eventstart eventend)]},
+                 view=>[qw(name id srcid eventstart eventend
+                           wffields.incidentdescription)]},
 
                 {DataObj=>'base::workflow',
                  sheet=>'BTB',
-                 filter=>{eventend=>">01/2009 AND <12/2009",
+                 filter=>{eventend=>$eventend,
+                          isdeleted=>'0',
                           class=>'AL_TCom::workflow::diary',
                           affectedapplicationid=>[keys(%{$t->{id}})]},
-                 view=>[qw(name id eventstart eventend)]},
+                 view=>[qw(name id eventstart eventend
+                           detaildescription)]},
 
                 {DataObj=>'base::workflow',
                  sheet=>'Ereignismeldung',
-                 filter=>{eventend=>"(2009)",
+                 filter=>{eventend=>$eventend,
+                          isdeleted=>'0',
                           class=>'AL_TCom::workflow::eventnotify',
                           affectedapplicationid=>[keys(%{$t->{id}})]},
                  view=>[qw(name id wffields.eventstatclass 
-                           eventstart eventend)]},
+                           eventstart eventend
+                           wffields.eventdesciption)]},
                 );
 
    $out->Process(@control);
+   my $trep=time()-$t0;
+   msg(INFO,"end Report to $param{'filename'} ($trep sec)");
 
 
 
