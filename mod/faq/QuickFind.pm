@@ -216,11 +216,16 @@ function switchTag(id)
        if (xmlhttp.readyState==4 && 
            (xmlhttp.status==200 || xmlhttp.status==304)){
           var xmlobject = xmlhttp.responseXML;
-          var result=xmlobject.getElementsByTagName("htmlresult")[0];
-          var childNode=result.childNodes[0];
-          e.innerHTML=childNode.nodeValue;
-         // setFunc(fromlang,tolang,resulttext);
-         // alert("ifif");
+          var result=xmlobject.getElementsByTagName("htmlresult");
+
+          var d="";
+          for (var i = 0; i < result.length; ++i){
+              var childNode=result[i].childNodes[0];
+              if (childNode){
+                 d+=childNode.nodeValue;
+              }
+          }
+          e.innerHTML=d;
        }
       }
       var r=xmlhttp.send('');
@@ -477,10 +482,11 @@ sub QuickFindDetail
    else{
       msg(ERROR,"can't interpret $id");
    }
+   # block max lenght=512 on FireFox
+   $htmlresult=[split(/(.{512})/,$htmlresult)]; 
 
    print $self->HttpHeader("text/xml");
    my $res=hash2xml({document=>{htmlresult=>$htmlresult}},{header=>1});
-#printf STDERR ("fifi res=$res\n");
    print $res;
 
 
