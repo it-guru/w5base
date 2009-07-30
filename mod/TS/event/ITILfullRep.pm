@@ -72,12 +72,18 @@ sub ITILfullRep
    if ($param{year} ne ""){
       $eventend="($param{year})";
    }
+   if ($param{eventend} ne ""){
+      $eventend="$param{eventend}";
+   }
    my $t=$appl->getHashIndexed(@keys);
    if ($param{'filename'} eq ""){
       my $names=join("_",keys(%{$t->{name}}));
       $names=substr($names,0,40)."___" if (length($names)>40);
       my $tstr=$eventend;
-      $tstr=~s/[^a-z0-9]//gi;
+      $tstr=~s/</less_/gi;
+      $tstr=~s/>/more_/gi;
+      $tstr=~s/[^a-z0-9]/_/gi;
+      $names=~s/[^a-z0-9]/_/gi;
       $param{'filename'}="/tmp/FullIT-Report_${names}_${tstr}.xls";
    }
    msg(INFO,"start Report to $param{'filename'}");
@@ -112,6 +118,7 @@ sub ITILfullRep
                           class=>'AL_TCom::workflow::change',
                           affectedapplicationid=>[keys(%{$t->{id}})]},
                  view=>[qw(name id srcid eventstart eventend 
+                           additional.ServiceCenterReason 
                            wffields.changedescription)]},
 
                 {DataObj=>'base::workflow',

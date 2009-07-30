@@ -51,6 +51,14 @@ sub setFilename
 {
    my $self=shift;
    my $filename=shift;
+   if ($filename=~m/^webfs:/){
+      my $fh=new File::Temp();
+      $self->{FinalFilename}=$filename;
+      $self->{fh}=$fh; 
+      $filename=$fh->filename;
+      msg(DEBUG,"use TempFilename=$filename");
+      $self->{TempFilename}=$filename;
+   }
    return($self->{out}->setFilename($filename));
 }
 
@@ -90,9 +98,11 @@ sub Process
       $out->setDataObj($DataObj);
       my $sheetname=$self->crec('sheet');
       $sheetname=$DataObj->T($DataObj->Self(),$DataObj->Self()) if ($sheetname eq "");
-      $out->addSheet($sheetname);
       my $line=1;
       foreach my $rec ($DataObj->getHashList(@{$self->crec('view')})){
+         if ($line==1){
+            $out->addSheet($sheetname);
+         }
          my @recordview=$DataObj->getFieldObjsByView($self->crec('view'),
                                                  current=>$rec);
          my $fieldbase={};
@@ -109,10 +119,34 @@ sub Process
          $out->ProcessLine(undef,["ALL"],$rec,\@recordview,
                            $fieldbase,$line++,undef);
       }
-      $out->ProcessBottom(undef,undef,"",{});
-      $out->ProcessHead(undef,undef,"",{});
+      if ($line>1){
+         $out->ProcessBottom(undef,undef,"",{});
+         $out->ProcessHead(undef,undef,"",{});
+      }
    }
    $out->closeWorkbook();
+   if (my ($f)=$self->{FinalFilename}=~m/^webfs:(.*)$/){
+      my $filename=$self->{TempFilename};
+      close($self->{fh});
+      if (my ($dir,$dstfile)=$f=~m/^(.*)\/([^\/]+)$/){
+         $dir=~s/^\///;
+         my $file=getModuleObject($self->Config,"base::filemgmt");
+         msg(DEBUG,"temp name=$filename");
+         msg(DEBUG,"webfs dir=$dir file=$file");
+         if (open(F,"<$filename")){
+            if (!($file->ValidatedInsertOrUpdateRecord(
+                         {name=>$dstfile, parent=>$dir,file=>\*F},
+                         {name=>\$dstfile,parent=>\$dir}))){
+               msg(ERROR,"fail to store $self->{FinalFilename}");
+            }
+            close(F);
+         }
+         else{
+            msg(ERROR,"fail to open temp file $filename");
+         }
+      }
+      unlink($filename);
+   }
    return(1);
 }
 
