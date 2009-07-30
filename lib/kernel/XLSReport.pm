@@ -96,28 +96,39 @@ sub Process
       my $DataObj=getModuleObject($self->Config,$self->crec('DataObj'));
       $DataObj->SetFilter($self->crec('filter'));
       $out->setDataObj($DataObj);
+      $DataObj->SetCurrentView(@{$self->crec('view')});
+      my $sqlorder=$self->crec('order');
+      if ($sqlorder ne ""){
+         $DataObj->SetCurrentOrder($sqlorder);
+      }
+      my $sheetname=$self->crec('sheet');
+
       my $sheetname=$self->crec('sheet');
       $sheetname=$DataObj->T($DataObj->Self(),$DataObj->Self()) if ($sheetname eq "");
       my $line=1;
-      foreach my $rec ($DataObj->getHashList(@{$self->crec('view')})){
-         if ($line==1){
-            $out->addSheet($sheetname);
-         }
-         my @recordview=$DataObj->getFieldObjsByView($self->crec('view'),
-                                                 current=>$rec);
-         my $fieldbase={};
-         map({$fieldbase->{$_->Name()}=$_} @recordview);
-         $out->{fieldkeys}={};
-         $out->{fieldobjects}=[];
-         foreach my $fo (@recordview){
-            my $name=$fo->Name();
-            if (!defined($out->{fieldkeys}->{$name})){
-               push(@{$out->{fieldobjects}},$fo);
-               $out->{fieldkeys}->{$name}=$#{$out->{fieldobjects}};
+      my ($rec,$msg)=$DataObj->getFirst(unbuffered=>1);
+      if (defined($rec)){
+         do{
+            if ($line==1){
+               $out->addSheet($sheetname);
             }
-         }
-         $out->ProcessLine(undef,["ALL"],$rec,\@recordview,
-                           $fieldbase,$line++,undef);
+            my @recordview=$DataObj->getFieldObjsByView($self->crec('view'),
+                                                    current=>$rec);
+            my $fieldbase={};
+            map({$fieldbase->{$_->Name()}=$_} @recordview);
+            $out->{fieldkeys}={};
+            $out->{fieldobjects}=[];
+            foreach my $fo (@recordview){
+               my $name=$fo->Name();
+               if (!defined($out->{fieldkeys}->{$name})){
+                  push(@{$out->{fieldobjects}},$fo);
+                  $out->{fieldkeys}->{$name}=$#{$out->{fieldobjects}};
+               }
+            }
+            $out->ProcessLine(undef,["ALL"],$rec,\@recordview,
+                              $fieldbase,$line++,undef);
+            ($rec,$msg)=$DataObj->getNext();
+         } until(!defined($rec));
       }
       if ($line>1){
          $out->ProcessBottom(undef,undef,"",{});

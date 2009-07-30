@@ -119,6 +119,10 @@ sub ITILfullRep
                           affectedapplicationid=>[keys(%{$t->{id}})]},
                  view=>[qw(name id srcid eventstart eventend 
                            additional.ServiceCenterReason 
+                           additional.ServiceCenterImpact 
+                           additional.ServiceCenterRisk 
+                           additional.ServiceCenterType 
+                           additional.ServiceCenterUrgency 
                            wffields.changedescription)]},
 
                 {DataObj=>'base::workflow',
@@ -128,6 +132,10 @@ sub ITILfullRep
                           class=>'AL_TCom::workflow::incident',
                           affectedapplicationid=>[keys(%{$t->{id}})]},
                  view=>[qw(name id srcid eventstart eventend
+                           additional.ServiceCenterPriority 
+                           additional.ServiceCenterReason 
+                           additional.ServiceCenterDowntimeStart 
+                           additional.ServiceCenterDowntimeEnd 
                            wffields.incidentdescription)]},
 
                 {DataObj=>'base::workflow',
