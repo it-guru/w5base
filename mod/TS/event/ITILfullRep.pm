@@ -117,6 +117,7 @@ sub ITILfullRep
                           isdeleted=>'0',
                           class=>'AL_TCom::workflow::change',
                           affectedapplicationid=>[keys(%{$t->{id}})]},
+                 order=>'NONE',
                  view=>[qw(name id srcid eventstart eventend 
                            additional.ServiceCenterReason 
                            additional.ServiceCenterImpact 
@@ -131,6 +132,7 @@ sub ITILfullRep
                           isdeleted=>'0',
                           class=>'AL_TCom::workflow::incident',
                           affectedapplicationid=>[keys(%{$t->{id}})]},
+                 order=>'NONE',
                  view=>[qw(name id srcid eventstart eventend
                            additional.ServiceCenterPriority 
                            additional.ServiceCenterReason 
@@ -144,6 +146,7 @@ sub ITILfullRep
                           isdeleted=>'0',
                           class=>'AL_TCom::workflow::diary',
                           affectedapplicationid=>[keys(%{$t->{id}})]},
+                 order=>'NONE',
                  view=>[qw(name id eventstart eventend
                            detaildescription)]},
 
@@ -153,6 +156,7 @@ sub ITILfullRep
                           isdeleted=>'0',
                           class=>'AL_TCom::workflow::eventnotify',
                           affectedapplicationid=>[keys(%{$t->{id}})]},
+                 order=>'NONE',
                  view=>[qw(name id wffields.eventstatclass 
                            eventstart eventend
                            wffields.eventdesciption)]},
