@@ -124,6 +124,10 @@ sub ITILfullRep
                            additional.ServiceCenterRisk 
                            additional.ServiceCenterType 
                            additional.ServiceCenterUrgency 
+                           additional.ServiceCenterPriority 
+                           additional.ServiceCenterCloseCode
+                           additional.ServiceCenterState 
+                           additional.ServiceCenterCategory  
                            wffields.changedescription)]},
 
                 {DataObj=>'base::workflow',
