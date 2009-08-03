@@ -48,8 +48,8 @@ sub onRawValue
    my $idname=$parent->IdField->Name();
    my $id=$current->{$idname};
    my $parent=$self->getParent->SelfAsParentObject();
-   my $total=$self->getTotalActiveQuestions($parent,$idname,$id);
    my $answered=$self->getAnsweredQuestions($parent,$idname,$id);
+   my $total=$self->getTotalActiveQuestions($parent,$idname,$id,$answered);
    my $state={TotalActiveQuestions=>$total,
               AnsweredQuestions=>$answered};
               

@@ -28,7 +28,7 @@ sub new
 {
    my $type=shift;
    my $self={@_};
-   $self->{group}='qc'                      if (!defined($self->{qc}));
+   $self->{group}='qc'                      if (!defined($self->{group}));
    $self->{name}='qctext'                   if (!defined($self->{name}));
    $self->{label}='Quality Check Text'      if (!defined($self->{label}));
    $self->{history}=0;

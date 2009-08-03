@@ -18,6 +18,7 @@ package kernel::InterviewField;
 #
 #
 use kernel;
+use strict;
 
 sub getTotalActiveQuestions
 {
@@ -25,19 +26,29 @@ sub getTotalActiveQuestions
    my $parentobj=shift;
    my $idname=shift;
    my $id=shift;
+   my $answered=shift;
    my $p=getModuleObject($self->getParent->Config,$parentobj);
    $p->SetFilter({$idname=>\$id});
    my ($rec,$msg)=$p->getOnlyFirst(qw(ALL));
 
    my $i=getModuleObject($self->getParent->Config,"base::interview");
    $i->SetFilter({parentobj=>\$parentobj});
+   my $pwrite=$i->checkParentWrite($p,$rec);
    my @l;
-   foreach my $irec ($i->getHashList(qw(id name qname prio
+   foreach my $irec ($i->getHashList(qw(queryblock qtag id name qname prio
                                         questtyp questclust))){
+      my $write=$i->checkAnserWrite($pwrite,$irec,$p,$rec);
+      my ($HTMLanswer,$HTMLrelevant,$HTMLcomments)=
+         $i->getHtmlEditElements($write,$irec,
+                      $answered->{interviewid}->{$irec->{id}},$p,$rec);
+      $irec->{HTMLanswer}=$HTMLanswer;
+      $irec->{HTMLrelevant}=$HTMLrelevant;
+      $irec->{HTMLcomments}=$HTMLcomments;
       push(@l,$irec);
    }
    return(\@l);
 }
+
 
 sub getAnsweredQuestions
 {
@@ -46,7 +57,21 @@ sub getAnsweredQuestions
    my $idname=shift;
    my $id=shift;
 
-   return([]);
+   my $i=getModuleObject($self->getParent->Config,"base::interanswer");
+   $i->SetFilter({parentobj=>\$parentobj,
+                  parentid=>\$id});
+   $i->SetCurrentView(qw(interviewid answer relevant archiv comments));
+
+   my $ial=$i->getHashIndexed(qw(interviewid));
+
+   return($ial);
+}
+
+sub buildHtmlEditEntry
+{
+   my $self=shift;
+   my $mode=shift;
+
 }
 
 1;

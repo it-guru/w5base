@@ -23,6 +23,7 @@ use kernel::config;
 use kernel::App::Web;
 use kernel::App::Web::History;
 use kernel::App::Web::WorkflowLink;
+use kernel::App::Web::InterviewLink;
 use kernel::Output;
 use kernel::Input;
 use kernel::TabSelector;
@@ -110,6 +111,9 @@ sub getValidWebFunctions
    }
    if ($self->can("HtmlWorkflowLink")){
       push(@l,qw(HtmlWorkflowLink WorkflowLinkResult));
+   }
+   if ($self->can("HtmlInterviewLink")){
+      push(@l,qw(HtmlInterviewLink));
    }
    return(@l);
 }
@@ -2077,20 +2081,6 @@ function DoRemoteSearch(action,target,FormatAs,CurrentView,DisplayLoadingSet)
    document.forms[0].submit();
    return;
 }
-//function keyhandler(ev)
-//{
-//   if (ev && ev.keyCode==13){
-//      DoSearch();
-//   }
-//}
-//document.onkeypress=keyhandler;
-//function inputkeyhandler()
-//{
-//   if (window.event && window.event.keyCode==13){
-//      DoSearch();
-//   }
-//   return(true);
-//}
 function DoSearch()
 {
    var d;

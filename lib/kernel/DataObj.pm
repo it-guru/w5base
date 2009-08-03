@@ -392,6 +392,18 @@ sub getHtmlDetailPageContent
             "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
             "src=\"HtmlWorkflowLink?$urlparam\"></iframe>";
    }
+   elsif ($p eq "HtmlInterviewLink"){
+      Query->Param("$idname"=>$idval);
+      $idval="NONE" if ($idval eq "");
+
+      my $q=new kernel::cgi({});
+      $q->Param("$idname"=>$idval);
+      my $urlparam=$q->QueryString();
+
+      $page="<iframe style=\"width:100%;height:100%;border-width:0;".
+            "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
+            "src=\"HtmlInterviewLink?$urlparam\"></iframe>";
+   }
    $page.=$self->HtmlPersistentVariables($idname);
    return($page);
 }
@@ -408,6 +420,9 @@ sub getHtmlDetailPages
       }
       if (defined($self->{workflowlink})){
          push(@pa,'HtmlWorkflowLink'=>$self->T("Workflows"));
+      }
+      if ($self->can("HtmlInterviewLink")){
+         push(@pa,'HtmlInterviewLink'=>$self->T("Interview"));
       }
       return(@pa);
    }
@@ -1746,7 +1761,7 @@ sub getFieldObjsByView
 
    if ($view->[0] eq "ALL" && $#{$view}==0){
       @view=@{$self->{'FieldOrder'}} if (defined($self->{'FieldOrder'}));
-      @view=grep(!/^(qctext|qcstate|qcok)$/,@view); # remove qc data
+      @view=grep(!/^(qctext|qcstate|qcok|interview|interviewst)$/,@view); # remove qc data
    }
    else{
       @view=@{$view};
