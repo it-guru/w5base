@@ -1,0 +1,438 @@
+package base::interview;
+#  W5Base Framework
+#  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+use strict;
+use vars qw(@ISA);
+use kernel;
+use kernel::App::Web;
+use kernel::DataObj::DB;
+use kernel::Field;
+use kernel::InterviewField;
+use Text::ParseWhere;
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::InterviewField);
+
+sub new
+{
+   my $type=shift;
+   my %param=@_;
+   my $self=bless($type->SUPER::new(%param),$type);
+
+   $self->AddFields(
+      new kernel::Field::Linenumber(
+                name          =>'linenumber',
+                label         =>'No.'),
+
+      new kernel::Field::Id(
+                name          =>'id',
+                group         =>'source',
+                sqlorder      =>'desc',
+                label         =>'QuestionID',
+                dataobjattr   =>'interview.id'),
+                                                  
+      new kernel::Field::Text(
+                name          =>'name',
+                label         =>'Question',
+                dataobjattr   =>'interview.name'),
+
+      new kernel::Field::Link(
+                name          =>'contactid',
+                dataobjattr   =>'interview.contact'),
+
+      new kernel::Field::Link(
+                name          =>'contact2id',
+                dataobjattr   =>'interview.contact2'),
+
+      new kernel::Field::Contact(
+                name          =>'contact',
+                label         =>'Contact',
+                vjoinon       =>'contactid'),
+
+      new kernel::Field::Contact(
+                name          =>'contact2',
+                label         =>'Deputy Contact',
+                vjoinon       =>'contact2id'),
+
+      new kernel::Field::Text(
+                name          =>'qtag',
+                label         =>'unique query tag',
+                dataobjattr   =>'interview.qtag'),
+
+      new kernel::Field::Text(
+                name          =>'parentobj',
+                label         =>'parent Ojbect',
+                dataobjattr   =>'interview.parentobj'),
+
+      new kernel::Field::Text(
+                name          =>'queryblock',
+                label         =>'Query block',
+                dataobjattr   =>'interview.queryblock'),
+
+      new kernel::Field::Text(
+                name          =>'questclust',
+                label         =>'Questiongroup',
+                dataobjattr   =>'interview.questclust'),
+
+      new kernel::Field::Select(
+                name          =>'prio',
+                value         =>[qw(1 2 3 99)],   # 1-3 are need to answer
+                label         =>'Question prio',
+                dataobjattr   =>'interview.prio'),
+
+      new kernel::Field::Select(
+                name          =>'questtyp',
+                transprefix   =>'QT.', 
+                value         =>['percent','percenta','text'],
+                label         =>'Question Typ',
+                dataobjattr   =>'interview.questtyp'),
+
+
+#
+#  answer sufficient = yes         attainment level = 100% if an answer exists
+#
+#  else
+#  questtyp  boolean    0 =   0%
+#                       1 = 100%
+#
+#  questtyp  text       stringlen >  0    = 100%
+#                       stringlen == 0    = 0%
+#
+#  questtyp  percent    answer = percent value
+#
+#  prio 1  = the same as 10 answers
+#  prio 2  = the same as  3 answers
+#  prio 3  = 1 answer
+#  prio 99 = ignored by calc of attainment level
+#
+
+      new kernel::Field::Textarea(
+                name          =>'comments',
+                label         =>'Comments',
+                dataobjattr   =>'interview.comments'),
+
+      new kernel::Field::Textarea(
+                name          =>'restriction',
+                label         =>'restriction',
+                dataobjattr   =>'interview.restriction'),
+
+      new kernel::Field::CDate(
+                name          =>'cdate',
+                group         =>'source',
+                sqlorder      =>'desc',
+                label         =>'Creation-Date',
+                dataobjattr   =>'interview.createdate'),
+                                                  
+      new kernel::Field::MDate(
+                name          =>'mdate',
+                group         =>'source',
+                sqlorder      =>'desc',
+                label         =>'Modification-Date',
+                dataobjattr   =>'interview.modifydate'),
+
+      new kernel::Field::Creator(
+                name          =>'creator',
+                group         =>'source',
+                label         =>'Creator',
+                dataobjattr   =>'interview.createuser'),
+
+      new kernel::Field::Owner(
+                name          =>'owner',
+                group         =>'source',
+                label         =>'Owner',
+                dataobjattr   =>'interview.modifyuser'),
+
+      new kernel::Field::Editor(
+                name          =>'editor',
+                group         =>'source',
+                label         =>'Editor',
+                dataobjattr   =>'interview.editor'),
+
+      new kernel::Field::RealEditor(
+                name          =>'realeditor',
+                group         =>'source',
+                label         =>'RealEditor',
+                dataobjattr   =>'interview.realeditor'),
+
+   );
+   $self->setDefaultView(qw(linenumber questclust name groupname cdate mdate));
+   $self->setWorktable("interview");
+   return($self);
+}
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   my $name=trim(effVal($oldrec,$newrec,"name"));
+   if ($name=~m/^\s*$/i){
+      $self->LastMsg(ERROR,"invalid question specified"); 
+      return(undef);
+   }
+   my $questclust=trim(effVal($oldrec,$newrec,"questclust"));
+   if ($questclust=~m/^\s*$/i){
+      $self->LastMsg(ERROR,"invalid question group specified"); 
+      return(undef);
+   }
+   my $rest=effVal($oldrec,$newrec,"restriction");
+   if ($rest ne ""){
+      my $p=new Text::ParseWhere();
+      if (!defined($p->compileExpression($rest))){
+         $self->LastMsg(ERROR,"invalid restriction expression"); 
+         return(undef);
+      }
+   }
+   return(1);
+}
+
+sub prepUploadRecord
+{
+   my $self=shift;
+   my $newrec=shift;
+
+   if (!exists($newrec->{id}) || $newrec->{id} eq ""){
+      if (exists($newrec->{qtag}) && $newrec->{qtag} ne ""){
+         my $i=getModuleObject($self->Config,"base::interview");
+         $i->SetFilter({qtag=>\$newrec->{qtag}});
+         my ($rec,$msg)=$i->getOnlyFirst(qw(id));
+         if (defined($rec)){
+            $newrec->{id}=$rec->{id};
+         }
+      }
+   }
+
+
+   return(1);
+}
+
+
+sub isViewValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return("header","default") if (!defined($rec));
+   return("ALL");
+}
+
+sub isWriteValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return("default") if ($self->IsMemberOf("admin"));
+   return(undef);
+}
+
+sub checkParentWrite
+{
+   my $self=shift;
+   my $pobj=shift;
+   my $prec=shift;
+
+   my @rw=$pobj->isWriteValid($prec);
+   my $rw=0;
+   $rw=1 if (grep(/^interview$/,@rw));
+   return($rw);
+}
+
+sub checkAnserWrite
+{
+   my $self=shift;
+   my $parentrw=shift;
+   my $irec=shift;
+   my $pobj=shift;
+   my $prec=shift;
+
+   return($parentrw);
+}
+
+sub getHtmlEditElements
+{
+   my $self=shift;
+   my $write=shift;
+   my $irec=shift;
+   my $answer=shift;
+   my $pobj=shift;
+   my $prec=shift;
+   my $iid=$irec->{id};
+   my ($HTMLanswer,$HTMLrelevant,$HTMLcomments);
+
+   if ($write){
+      $HTMLrelevant="<select name=relevant onchange=submitChange(this) >".
+                    "<option value=\"1\">Ja</option>";
+      if (defined($answer) && !($answer->{relevant})){
+         $HTMLrelevant.="<option selected value=\"0\">Nein</option>";
+      }
+      else{
+         $HTMLrelevant.="<option value=\"0\">Nein</option>";
+      }
+      $HTMLrelevant.="</select>";
+   }
+   else{
+      if (defined($answer) && $answer->{relevant}){
+         $HTMLrelevant="Ja";
+      }
+      elsif (defined($answer) && !($answer->{relevant})){
+         $HTMLrelevant="Nein";
+      }
+      else{
+         $HTMLrelevant="?";
+      }
+   }
+   $HTMLcomments="<textarea name=comments onchange=submitChange(this) ".
+                 "rows=2 style=\"width:100%\">$answer->{comments}</textarea>";
+   $HTMLanswer=" - ? - ";
+   if ($irec->{questtyp} eq "percent" ||
+       $irec->{questtyp} eq "percenta"){
+      my $a=int($answer->{answer}/10);
+      my $p="";
+      my $sel="<select name=answer onchange=submitChange(this) ".
+              "style=\"width:55px\">";
+      for(my $c=0;$c<11;$c++){
+         $sel.="<option ";
+         $sel.="selected " if ($c==$a);
+         $sel.="value=\"".($c*10)."\">".($c*10)."%</option>";
+         my $class="class=Pseg1";
+         $class="class=Pseg0" if ($c>$a|| $a==0);
+         my $tdclass="class=Panswer";
+         if ($c==0){
+            $tdclass.=" style=\"width:5%\"";
+         }
+         
+         $p.="<td $tdclass><div onclick=setA('$iid',".($c*10).
+             ") $class></div></td>";
+      }
+      $sel.="</select>";
+      $p="<table class=Panswer><tr><td>$sel</td>$p</tr></table>";
+      $HTMLanswer="<div style=\"width:100%;padding:1px;margin:0\">$p</div>";
+   }
+   elsif ($irec->{questtyp} eq "text"){
+      my $p="<input style=\"width:100%\" ".
+            "type=text onchange=submitChange(this) name=answer ".
+            "value=\"$answer->{answer}\">";
+      $HTMLanswer="<div style=\"width:100%;padding:1px;margin:0\">$p</div>";
+   }
+
+   return($HTMLanswer,$HTMLrelevant,$HTMLcomments);
+}
+
+
+sub getValidWebFunctions
+{
+   my $self=shift;
+
+   return($self->SUPER::getValidWebFunctions(@_),"Question");
+}
+
+sub getHtmlDetailPages
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+
+   return($self->SUPER::getHtmlDetailPages($p,$rec),
+          "Question"=>$self->T("Question-Info"));
+}
+
+sub Question
+{
+   my $self=shift;
+   my %flt=$self->getSearchHash();
+   $self->ResetFilter();
+   $self->SecureSetFilter(\%flt);
+   my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
+
+   print $self->HttpHeader();
+   print $self->HtmlHeader(body=>1,
+                           js=>'toolbox.js',
+                           style=>['default.css',
+                                   'kernel.App.Web.css',
+                                   'kernel.App.Web.DetailPage.css']);
+   printf("<div style=\"margin-left:5px\">");
+   printf("<h2>%s:</h2>",$self->T("Interview Question Details"));
+   printf("<h3 style=\"margin-top:20px\">%s</h3>",$rec->{name});
+
+   printf("<div style=\"border-width:1px;border-style:solid;".
+          "border-color:silver;margin-top:20px;".
+          "padding-bottom:10px;margin-right:10px\">");
+   my $c=quoteHtml($rec->{comments});
+   $c=~s/\n/<br>\n/g;
+   printf("<div style=\"margin:5px;margin-top:5px\">".
+          "<b>%s:</b><br>%s</div>",$self->T("explanation"),$c);
+
+
+   my $contact=$self->findtemplvar({current=>$rec,mode=>"HtmlDetail"},
+                                   "contact","formated");
+   if ($contact ne ""){
+      printf("<div style=\"margin:5px;margin-top:20px\">".
+             "<b>%s:</b><br>%s</div>",
+             $self->findtemplvar({current=>$rec,mode=>"HtmlDetail"},
+                                 "contact","label"),$contact);
+   }
+
+   my $contact2=$self->findtemplvar({current=>$rec,mode=>"HtmlDetail"},
+                                   "contact2","formated");
+   if ($contact2 ne ""){
+      printf("<div style=\"margin:5px;margin-top:20px\">".
+             "<b>%s:</b><br>%s</div>",
+             $self->findtemplvar({current=>$rec,mode=>"HtmlDetail"},
+                                 "contact2","label"),$contact2);
+   }
+   print("</div>");
+
+
+   print $self->HtmlBottom(body=>1);
+
+
+}
+
+sub getHtmlDetailPageContent
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+   return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "Question");
+   my $page;
+   my $idname=$self->IdField->Name();
+   my $idval=$rec->{$idname};
+
+   if ($p eq "Question"){
+      Query->Param("$idname"=>$idval);
+      $idval="NONE" if ($idval eq "");
+
+      my $q=new kernel::cgi({});
+      $q->Param("$idname"=>$idval);
+      my $urlparam=$q->QueryString();
+      $page="<link rel=\"stylesheet\" ".
+            "href=\"../../../static/lytebox/lytebox.css\" ".
+            "type=\"text/css\" media=\"screen\" />";
+
+      $page.="<iframe style=\"width:100%;height:100%;border-width:0;".
+            "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
+            "src=\"Question?$urlparam\"></iframe>";
+   }
+   $page.=$self->HtmlPersistentVariables($idname);
+   return($page);
+}
+
+
+
+
+
+
+
+
+
+1;

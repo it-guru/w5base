@@ -19,6 +19,7 @@ package kernel::InterviewField;
 #
 use kernel;
 use strict;
+use Text::ParseWhere;
 
 sub getTotalActiveQuestions
 {
@@ -36,15 +37,26 @@ sub getTotalActiveQuestions
    my $pwrite=$i->checkParentWrite($p,$rec);
    my @l;
    foreach my $irec ($i->getHashList(qw(queryblock qtag id name qname prio
-                                        questtyp questclust))){
-      my $write=$i->checkAnserWrite($pwrite,$irec,$p,$rec);
-      my ($HTMLanswer,$HTMLrelevant,$HTMLcomments)=
-         $i->getHtmlEditElements($write,$irec,
-                      $answered->{interviewid}->{$irec->{id}},$p,$rec);
-      $irec->{HTMLanswer}=$HTMLanswer;
-      $irec->{HTMLrelevant}=$HTMLrelevant;
-      $irec->{HTMLcomments}=$HTMLcomments;
-      push(@l,$irec);
+                                        questtyp questclust restriction))){
+      my $restok=1;
+      if ($irec->{restriction} ne ""){
+         $restok=0;
+         my $p=new Text::ParseWhere();
+         my $pcode=$p->compileExpression($irec->{restriction});
+         if (defined($pcode) && &{$pcode}($rec)){
+            $restok=1;
+         }
+      }
+      if ($restok){
+         my $write=$i->checkAnserWrite($pwrite,$irec,$p,$rec);
+         my ($HTMLanswer,$HTMLrelevant,$HTMLcomments)=
+            $i->getHtmlEditElements($write,$irec,
+                         $answered->{interviewid}->{$irec->{id}},$p,$rec);
+         $irec->{HTMLanswer}=$HTMLanswer;
+         $irec->{HTMLrelevant}=$HTMLrelevant;
+         $irec->{HTMLcomments}=$HTMLcomments;
+         push(@l,$irec);
+      }
    }
    return(\@l);
 }

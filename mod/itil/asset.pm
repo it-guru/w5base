@@ -146,6 +146,29 @@ sub new
                 vjoindisp     =>['name','systemid','cistatus','shortdesc']),
 
       new kernel::Field::SubList(
+                name          =>'systemnames',
+                label         =>'System names',
+                htmlwidth     =>'200px',
+                htmldetail    =>0,
+                searchable    =>0,
+                group         =>'systems',
+                vjointo       =>'itil::system',
+                vjoinbase     =>[{cistatusid=>"<=4"}],
+                vjoinon       =>['id'=>'assetid'],
+                vjoindisp     =>['name']),
+
+      new kernel::Field::SubList(
+                name          =>'systemids',
+                label         =>'System IDs',
+                htmlwidth     =>'200px',
+                group         =>'systems',
+                htmldetail    =>0,
+                vjointo       =>'itil::system',
+                vjoinbase     =>[{cistatusid=>"<=4"}],
+                vjoinon       =>['id'=>'assetid'],
+                vjoindisp     =>['systemid']),
+
+      new kernel::Field::SubList(
                 name          =>'applications',
                 label         =>'Applications',
                 htmlwidth     =>'300px',
@@ -155,6 +178,19 @@ sub new
                 vjoinbase     =>[{applcistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'assetid'],
                 vjoindisp     =>['appl','applcistatus','applcustomer']),
+
+      new kernel::Field::SubList(
+                name          =>'applicationnames',
+                label         =>'Application names',
+                htmlwidth     =>'300px',
+                group         =>'applications',
+                readonly      =>1,
+                htmldetail    =>0,
+                searchable    =>0,
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{applcistatusid=>"<=5"}],
+                vjoinon       =>['id'=>'assetid'],
+                vjoindisp     =>['appl']),
 
       new kernel::Field::SubList(
                 name          =>'applicationteams',

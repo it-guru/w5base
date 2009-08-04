@@ -202,3 +202,47 @@ create table eventrouter (
   srcload    datetime    default NULL,
   PRIMARY KEY  (id),UNIQUE KEY `srcsys` (srcsys,srcid),key srcload(srcload)
 );
+create table interview (
+  id         bigint(20)   NOT NULL,
+  name       varchar(255) NOT NULL,
+  parentobj      varchar(30) NOT NULL,
+  questclust     varchar(255) NOT NULL,
+  isrelevant     int(1)       default '1',
+  prio           int(2)       default '1',
+  comments       blob,
+  questtyp       char(20) NOT NULL,
+  questenum      varchar(255) NOT NULL,
+  interviewstart datetime NOT NULL default '0000-00-00 00:00:00',
+  interviewend   datetime NOT NULL default '0000-00-00 00:00:00',
+  attadata   blob default NULL,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifyuser bigint(20) NOT NULL default '0',
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) NOT NULL default '0',
+  PRIMARY KEY  (id),KEY (parentobj)
+);
+create table interanswer(
+  id         bigint(20)   NOT NULL,
+  interviewid  bigint(20)   NOT NULL,
+  parentobj    varchar(30) NOT NULL,
+  parentid     bigint(20)   NOT NULL,
+  answer       varchar(255) NOT NULL,
+  prio         int(2)       default '1',
+  relevant     int(1)       default '1',
+  comments     blob,
+  problemdesc  blob,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifyuser bigint(20) NOT NULL default '0',
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) NOT NULL default '0',
+  PRIMARY KEY  (id),KEY (parentid)
+);
+alter table interview add name_de varchar(255);
+alter table interview add queryblock varchar(80) not null;
+alter table interview add qtag varchar(80) not null, add unique key(qtag);
+alter table interanswer add archiv varchar(80), add unique key(archiv);
+alter table interview add contact bigint(20),add contact2 bigint(20);

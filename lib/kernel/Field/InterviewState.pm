@@ -56,6 +56,33 @@ sub onRawValue
    return($state);
 }
 
+sub FormatedResult
+{
+   my $self=shift;
+   my $current=shift;
+   my $mode=shift;
+   my $d=$self->RawValue($current);
+   if ($mode=~m/^Html/){
+      my $total=$#{$d->{TotalActiveQuestions}}+1;
+      my $todo=0;
+      if ($total>0){
+         foreach my $q (@{$d->{TotalActiveQuestions}}){
+            if (!exists($d->{AnsweredQuestions}->{interviewid}->{$q->{id}})){
+               $todo++;
+            }
+         }
+         if ($todo>0){
+            return("Total: $total<br>\nOpen: $todo");
+         }
+      }
+      return("OK");
+      return("Total: $total\n");
+   }
+
+  # return($d); 
+   return($mode); 
+}
+
 
 
 

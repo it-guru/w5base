@@ -20,8 +20,8 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::InterviewField;
-use kernel::Field::Textarea;
-@ISA    = qw(kernel::Field::Select kernel::InterviewField);
+use kernel::Field::Percent;
+@ISA    = qw(kernel::Field::Percent kernel::InterviewField);
 
 
 sub new
@@ -37,7 +37,7 @@ sub new
    $self->{searchable}=0;
    $self->{onRawValue}=\&onRawValue;
    my $o=bless($type->SUPER::new(%$self),$type);
-   return($o);
+   return($o,new kernel::Field::InterviewState());
 }
 
 sub onRawValue
@@ -45,7 +45,26 @@ sub onRawValue
    my $self=shift;
    my $current=shift;
    my $parent=$self->getParent();
-   return("jo");
+   my $stf=$parent->getField("interviewst");
+   my $st=$stf->RawValue($current); 
+
+   if ($#{$st->{TotalActiveQuestions}}==-1){
+      return(undef);
+   }
+
+   my $s=100.00;
+#   my $total=$#{$d->{TotalActiveQuestions}}+1;
+#   foreach my $q (@{$d->{TotalActiveQuestions}}){
+#      if (!exists($d->{AnsweredQuestions}->{interviewid}->{$q->{id}})){
+#         $todo++;
+#      }
+#   }
+
+
+
+
+
+   return($s);
 }
 
 

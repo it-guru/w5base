@@ -101,6 +101,10 @@ sub Init
                       "itil::lnkapplcontact",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itil.appl.lnkapplinteranswer",
+                      "itil::lnkapplinteranswer",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itil.system",
                       "itil::system",
                       defaultacl=>['valid_user']);

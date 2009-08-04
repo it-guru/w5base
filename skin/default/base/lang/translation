@@ -33,7 +33,8 @@
 'fieldgroup.attachments' =>{de=>'Datei-Anlagen',     en=>'File-Attachments'},
 'fieldgroup.contacts'    =>{de=>'Kontakte',          en=>'Contacts'},
 'fieldgroup.misc'        =>{de=>'Sonstiges',         en=>'Miscellaneous'},
-'fieldgroup.acl'         =>{de=>'Zugriffssteuerung',  en=>'Accesscontrol'},
+'fieldgroup.acl'         =>{de=>'Zugriffssteuerung', en=>'Accesscontrol'},
+'fieldgroup.interview'   =>{de=>'Interview',         en=>'Interview'},
 'fieldgroup.qc'          =>{de=>'QualitiyCheck',     en=>'QualitiyCheck'},
 'fieldgroup.control'     =>{de=>'Steuerungs-/Automationsdaten',
                             en=>'Control-/Authomationinformations'},
@@ -50,4 +51,4 @@
 'privacy information - only readable with rule write or privacy read'=>{de=>'Vertrauliche Information - nur lesbar mit Schreibrechten oder vertrauchlichem lesen'},
 'condition'=>{de=>'Stand'},
 'invalid disalloed action requested'=>{de=>'ungültige oder nicht erlaubte Anforderung'},
-
+'Interview result'       =>{de=>'Interview Ergebnis'},

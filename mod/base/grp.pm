@@ -356,9 +356,6 @@ sub getHtmlDetailPages
           "TView"=>$self->T("Team View"));
 }
 
-
-
-
 sub getHtmlDetailPageContent
 {
    my $self=shift;

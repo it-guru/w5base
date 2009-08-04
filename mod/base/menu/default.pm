@@ -269,6 +269,20 @@ sub Init
                       "base::qrule",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("sysadm.qmgmt.interview",
+                      "base::interview",
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("sysadm.qmgmt.interview.new",
+                      "base::interview",
+                      func=>'New',
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("sysadm.qmgmt.interanswer",
+                      "base::interanswer",
+                      defaultacl=>['admin']);
+   
+   
    $self->RegisterObj("sysadm.qmgmt.qrule.lnkmandator",
                       "base::lnkqrulemandator",
                       defaultacl=>['admin']);

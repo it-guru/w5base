@@ -35,3 +35,5 @@
 'availabel for further use'=>{de=>'verfügbar für den Wiedereinsatz'},
 'delete only posible, if there are no system relations'=>{de=>'Das Löschen des Datensatzes ist nur zulässig, wenn keine Systeme zugeordnet sind'},
 'Systems'=>{de=>'Systeme'},
+'Systemnames'=>{de=>'System Namen'},
+'Application names'=>{de=>'Anwendungsnamen'},

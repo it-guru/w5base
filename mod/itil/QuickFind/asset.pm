@@ -41,8 +41,7 @@ sub CISearchResult
    my @l;
    if (!defined($tag) || grep(/^$tag$/,qw(asset))){
       my $flt=[{name=>"$searchtext",cistatusid=>"<=5"},
-               {systems=>"$searchtext"},
-               {assetid=>"$searchtext"}];
+               {systems=>"$searchtext"}];
       if ($searchtext=~m/^\d{3,20}$/){
          push(@$flt,{conumber=>\"$searchtext",
                      cistatusid=>"<=5"});

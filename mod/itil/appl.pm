@@ -23,7 +23,8 @@ use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
 use kernel::CIStatusTools;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::CIStatusTools);
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB 
+        kernel::App::Web::InterviewLink kernel::CIStatusTools);
 
 sub new
 {
@@ -778,6 +779,7 @@ sub new
                 onRawValue    =>\&getWfEventNotifyTargets),
  
 
+      new kernel::Field::Interview(),
       new kernel::Field::QualityText(),
       new kernel::Field::QualityState(),
       new kernel::Field::QualityOk(),
@@ -1171,7 +1173,7 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
 
    my @databossedit=qw(default interfaces finance technical contacts misc
-                       systems attachments accountnumbers 
+                       systems attachments accountnumbers interview
                        customer control phonenumbers);
    if (!defined($rec)){
       return("default");
