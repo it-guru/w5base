@@ -192,10 +192,15 @@ sub preProcessFilter
       }
       my @newsearch=();
       if (ref($oldval) eq "ARRAY"){
-         foreach my $chk (@{$oldval}){
-            foreach my $v (keys(%tr)){
-               push(@newsearch,$tr{$v}) if ($v eq $chk ||
-                                            $tr{$v} eq $chk);
+         foreach my $chk (@{$oldval}){ 
+            if (defined($chk)){
+               foreach my $v (keys(%tr)){
+                  push(@newsearch,$tr{$v}) if ($v eq $chk ||
+                                               $tr{$v} eq $chk);
+               }
+            }
+            else{
+               push(@newsearch,undef);
             }
          }
       }
@@ -217,14 +222,23 @@ sub preProcessFilter
             my $qchk='^'.quotemeta($chk).'$';
             $qchk=~s/\\\*/\.*/g;
             $qchk=~s/\\\?/\./g;
-            foreach my $v (keys(%tr)){
-               if ($v=~m/$qchk/i || $tr{$v} eq $chk){
-                  push(@newsearch,$tr{$v}) if (!grep(/^$tr{$v}$/,@newsearch));
-               }
+            if ($chk eq "[LEER]" || $chk eq "[EMPTY]" ){
+               push(@newsearch,undef);
             }
-            foreach my $v (keys(%raw)){
-               if ($v=~m/$qchk/i || $tr{$v} eq $chk){
-                  push(@newsearch,$raw{$v}) if (!grep(/^$raw{$v}$/,@newsearch));
+            else{
+               foreach my $v (keys(%tr)){
+                  if ($v=~m/$qchk/i || $tr{$v} eq $chk){
+                     if (!grep(/^$tr{$v}$/,@newsearch)){
+                        push(@newsearch,$tr{$v});
+                     }
+                  }
+               }
+               foreach my $v (keys(%raw)){
+                  if ($v=~m/$qchk/i || $tr{$v} eq $chk){
+                     if (!grep(/^$raw{$v}$/,@newsearch)){
+                        push(@newsearch,$raw{$v});
+                     }
+                  }
                }
             }
          }
