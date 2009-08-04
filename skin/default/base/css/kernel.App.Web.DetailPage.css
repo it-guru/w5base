@@ -1,0 +1,13 @@
+
+body{
+   overflow:auto;
+   background:#eaeaea;
+}
+
+@media print {
+   body{
+      overflow:visible;
+   }
+}
+
+
