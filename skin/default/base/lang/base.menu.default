@@ -5,6 +5,7 @@
 'Tools.projectroom.new'=>{de=>'Neueingabe',en=>'New'},
 'Tools.workflow'=>{de=>'Workflow System',en=>'Workflow System'},
 'Tools.workflow.action'=>{de=>'Actionen',en=>'Actions'},
+'Tools.workflow.action.x'=>{de=>'Erweitert',en=>'Extended'},
 'Tools.workflow.relation'=>{de=>'Verknüpfungen',en=>'Relations'},
 'Tools.workflow.relation.new'=>{de=>'Neueingabe',en=>'New'},
 'Tools.workflow.key'=>{de=>'Key-Index',en=>'Key-Index'},

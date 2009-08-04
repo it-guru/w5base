@@ -194,6 +194,10 @@ sub Init
                       "base::workflowaction",
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("Tools.workflow.action.x",
+                      "base::workflowxaction",
+                      defaultacl=>['admin']);
+   
    $self->RegisterObj("Tools.workflow.repjob",
                       "base::workflowrepjob",
                       prio=>2000,

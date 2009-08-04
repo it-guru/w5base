@@ -42,6 +42,7 @@ sub new
                 label         =>'AssetId',
                 size          =>'20',
                 uppersearch   =>1,
+                searchable    =>1,
                 align         =>'left',
                 dataobjattr   =>'assetportfolio.assettag'),
 
