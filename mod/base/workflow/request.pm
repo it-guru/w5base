@@ -309,7 +309,7 @@ sub getPosibleActions
    }
    my $isininitiatorgroup=0;
    if ($WfRec->{initiatorgroupid} ne ""){
-      if ($app->IsMemberOf($WfRec->{initiatorgroupid},"RMember","direct")){
+      if ($app->IsMemberOf($WfRec->{initiatorgroupid},"RMember","down")){
          $isininitiatorgroup=1;
       }
    }
@@ -363,10 +363,14 @@ sub getPosibleActions
    if ((($isadmin && !$iscurrent) || ($userid==$creator && !$iscurrent)) &&
        $stateid<3 && $stateid>1){
       push(@l,"wfbreak");   # workflow abbrechen      (durch Anforderer o admin)
-      push(@l,"wfcallback");# workflow zurueckholen   (durch Anforderer o admin)
+      if (!$iscurrent){
+         push(@l,"wfcallback");# workflow zurueckholen(durch Anforderer o admin)
+      }
    }
    if ($stateid==2 && $lastworker==$userid){
-     push(@l,"wfcallback"); # if last editor has an mismatched forward done
+      if (!$iscurrent){
+         push(@l,"wfcallback"); # if last editor has an mismatched forward done
+      }
    }
    if (($userid==$creator || $isininitiatorgroup || $isadmin) && $stateid==1){
       push(@l,"wfbreak");   # workflow abbrechen      (durch Anforderer o admin)
@@ -410,12 +414,19 @@ sub getPosibleActions
       }
       push(@l,"wffine");     # Workflow erfolgreich beenden   (durch Anforderer)
    }
+   if (($stateid==3 || $stateid==2) &&   # zugewiesen oder in Bearbeitung
+       !grep(/^wffine$/,@l)){ # allow all bosses of initiator to finish the wf
+      if ($iscurrent && $isininitiatorgroup){
+         push(@l,"wffine");
+      }
+   }
    if (($stateid==3 || $stateid==4) && ($lastworker==$userid || $isadmin)){
       push(@l,"wfdefer");    # Zurückstellen    (durch Anforderer o. Bearbeiter)
    }
    if (1){
       printf STDERR ("WFSTATE:\n".
                      "========\n");
+      printf STDERR (" - isininitiatorgroup   : %d\n",$isininitiatorgroup);
       printf STDERR (" - stateid              : %d\n",$stateid);
       printf STDERR (" - iscurrent            : %d\n",$iscurrent);
       printf STDERR (" - isadmin              : %d\n",$isadmin);
@@ -837,14 +848,18 @@ sub generateWorkspacePages
       $$divset.="<div id=OPwfapprovalcan class=\"$class\">$d</div>";
    }
    $self->SUPER::generateWorkspacePages($WfRec,$actions,$divset,$selopt);
-   if ($WfRec->{stateid}==4){
+   if ($WfRec->{stateid}==4 || $WfRec->{stateid}==3){
       $defop="wfaddnote";
    }
    if ($WfRec->{stateid}==1){
       $defop="wfactivate";
    }
    if ($WfRec->{stateid}==16){
-      $defop="wffine";
+      $defop="wfaddnote";
+      my $userid=$self->getParent->getParent->getCurrentUserId();
+      if ($WfRec->{initiatorid}==$userid){
+         $defop="wffine";
+      }
    }
    return($defop); 
 }
