@@ -212,7 +212,11 @@ sub ProcessLine
 sub ProcessHead
 {
    my ($self,$fh,$rec,$msg)=@_;
-   my @view=@{$self->{fieldobjects}};
+   my @view;
+   if (ref($self->{fieldobjects}) eq "ARRAY"){
+      @view=@{$self->{fieldobjects}};
+   }
+
 
    $self->{'worksheet'}->set_column(0,0,40);
    $self->{'worksheet'}->set_column(1,1,90);

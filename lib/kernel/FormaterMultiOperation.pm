@@ -80,7 +80,11 @@ sub ProcessHead
    my ($self,$fh)=@_;
    my $app=$self->getParent->getParent();
    my $view=$app->getCurrentViewName();
-   my @view=@{$self->{fieldobjects}};
+   my @view;
+   if (ref($self->{fieldobjects}) eq "ARRAY"){
+      @view=@{$self->{fieldobjects}};
+   }
+
    my $d="";
    $d.=$app->HtmlHeader(form=>1,body=>1,
                         style=>[qw(default.css MultiAct.css)]);

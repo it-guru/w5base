@@ -237,7 +237,10 @@ sub ProcessLine
 sub ProcessHead
 {
    my ($self,$fh,$rec,$msg)=@_;
-   my @view=@{$self->{fieldobjects}};
+   my @view;
+   if (ref($self->{fieldobjects}) eq "ARRAY"){
+      @view=@{$self->{fieldobjects}};
+   }
 
    for(my $cellno=0;$cellno<=$#view;$cellno++){
       #next if (!($view[$cellno]->UiVisible()));   # ist nicht mehr notwendig
