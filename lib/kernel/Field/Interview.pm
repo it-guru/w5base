@@ -51,20 +51,7 @@ sub onRawValue
    if ($#{$st->{TotalActiveQuestions}}==-1){
       return(undef);
    }
-
-   my $s=100.00;
-#   my $total=$#{$d->{TotalActiveQuestions}}+1;
-#   foreach my $q (@{$d->{TotalActiveQuestions}}){
-#      if (!exists($d->{AnsweredQuestions}->{interviewid}->{$q->{id}})){
-#         $todo++;
-#      }
-#   }
-
-
-
-
-
-   return($s);
+   return($st->{qStat}->{totalStat});
 }
 
 

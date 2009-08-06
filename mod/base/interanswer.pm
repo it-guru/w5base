@@ -48,6 +48,11 @@ sub new
                 label         =>'question',
                 dataobjattr   =>'interview.name'),
 
+      new kernel::Field::Boolean(
+                name          =>'relevant',
+                label         =>'Relevant',
+                dataobjattr   =>'interanswer.relevant'),
+
       new kernel::Field::Text(
                 name          =>'answer',
                 label         =>'answer',
@@ -55,23 +60,21 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'parentobj',
+                group         =>'relation',
                 label         =>'parent Ojbect',
                 dataobjattr   =>'interanswer.parentobj'),
 
       new kernel::Field::Text(
                 name          =>'parentid',
+                group         =>'relation',
                 label         =>'parent ID',
                 dataobjattr   =>'interanswer.parentid'),
 
       new kernel::Field::Text(
                 name          =>'interviewid',
+                group         =>'relation',
                 label         =>'Interview ID',
                 dataobjattr   =>'interanswer.interviewid'),
-
-      new kernel::Field::Boolean(
-                name          =>'relevant',
-                label         =>'Relevant',
-                dataobjattr   =>'interanswer.relevant'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
@@ -81,6 +84,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'archiv',
                 group         =>'archiv',
+                htmldetail    =>0,
                 label         =>'Archiv',
                 dataobjattr   =>'interanswer.archiv'),
 
@@ -175,7 +179,7 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default") if ($self->IsMemberOf("admin"));
+   return("default","relation") if ($self->IsMemberOf("admin"));
    return(undef);
 }
 

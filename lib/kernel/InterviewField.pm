@@ -86,4 +86,23 @@ sub buildHtmlEditEntry
 
 }
 
+
+package kernel::InterviewField::qStat;
+
+use strict;
+use vars qw(@ISA);
+use kernel;
+use Tie::Hash;
+
+@ISA=qw(Tie::Hash);
+
+sub TIEHASH
+{
+   my $type=shift;
+   my $self=bless({@_},$type);
+   return($self);
+}
+
+
+
 1;

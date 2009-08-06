@@ -89,7 +89,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'prio',
-                value         =>[qw(1 2 3 99)],   # 1-3 are need to answer
+                value         =>['', qw(1 2 3)],   # 1-3 are need to answer
                 label         =>'Question prio',
                 dataobjattr   =>'interview.prio'),
 
@@ -113,10 +113,10 @@ sub new
 #
 #  questtyp  percent    answer = percent value
 #
-#  prio 1  = the same as 10 answers
-#  prio 2  = the same as  3 answers
-#  prio 3  = 1 answer
-#  prio 99 = ignored by calc of attainment level
+#  prio 1     = the same as 10 answers
+#  prio 2     = the same as  3 answers
+#  prio 3     = 1 answer
+#  prio undef = ignored by calc of attainment level
 #
 
       new kernel::Field::Textarea(
@@ -196,6 +196,10 @@ sub Validate
          $self->LastMsg(ERROR,"invalid restriction expression"); 
          return(undef);
       }
+   }
+   my $prio=effVal($oldrec,$newrec,"prio");
+   if ($prio eq ""){
+      $newrec->{prio}=undef;
    }
    return(1);
 }
@@ -376,7 +380,7 @@ sub Question
 
    my $contact=$self->findtemplvar({current=>$rec,mode=>"HtmlDetail"},
                                    "contact","formated");
-   if ($contact ne ""){
+   if ($rec->{contact} ne ""){
       printf("<div style=\"margin:5px;margin-top:20px\">".
              "<b>%s:</b><br>%s</div>",
              $self->findtemplvar({current=>$rec,mode=>"HtmlDetail"},
@@ -385,7 +389,7 @@ sub Question
 
    my $contact2=$self->findtemplvar({current=>$rec,mode=>"HtmlDetail"},
                                    "contact2","formated");
-   if ($contact2 ne ""){
+   if ($rec->{contact2} ne ""){
       printf("<div style=\"margin:5px;margin-top:20px\">".
              "<b>%s:</b><br>%s</div>",
              $self->findtemplvar({current=>$rec,mode=>"HtmlDetail"},

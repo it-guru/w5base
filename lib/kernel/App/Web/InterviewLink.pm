@@ -250,6 +250,7 @@ EOF
    my $s;     
    $d.="<div class=header>";
    $d.="<table width=95%><tr><td></td>";
+   $d.="<td align=left>".$label."</td>";
    $d.="<td align=right>";
    $d.="<select name=archiv style=\"width:200px\">";
    $d.="<option value=\"\">aktueller Fragenkatalog</option>";

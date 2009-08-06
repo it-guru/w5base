@@ -49,7 +49,8 @@ sub FormatedDetail
    my $mode=shift;
    my $d=$self->RawValue($current);
    my $name=$self->Name();
-   if ($mode eq "HtmlSubList" || $mode eq "HtmlV01" || $mode eq "HtmlDetail"){
+   if ($mode eq "HtmlSubList" || $mode eq "HtmlV01" || 
+       $mode eq "HtmlDetail" || $mode eq "HtmlChart"){
       if (defined($d) && $d ne ""){
          my $format=sprintf("%%.%df",$self->{precision});
          $d=sprintf($format,$d);

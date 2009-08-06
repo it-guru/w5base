@@ -52,3 +52,4 @@
 'condition'=>{de=>'Stand'},
 'invalid disalloed action requested'=>{de=>'ungültige oder nicht erlaubte Anforderung'},
 'Interview result'       =>{de=>'Interview Ergebnis'},
+'Interview state'       =>{de=>'Interview Status'},

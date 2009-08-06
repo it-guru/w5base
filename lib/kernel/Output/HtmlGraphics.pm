@@ -19,9 +19,7 @@ package kernel::Output::HtmlGraphics;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use Data::Dumper;
-use base::load;
-use kernel::Output::HtmlSubList;
+use kernel::Formater;
 @ISA    = qw(kernel::Formater);
 
 
