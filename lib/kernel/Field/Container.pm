@@ -104,7 +104,8 @@ sub finishWriteRequestHash
    my $changed=0;
    my $p=$self->getParent;
 
-   my %oldcopy=%{$self->RawValue($oldrec)};
+   my %oldcopy;
+   %oldcopy=%{$self->RawValue($oldrec)} if (defined($oldrec));
    my $oldhash=\%oldcopy; 
    foreach my $fo ($p->getFieldObjsByView([$p->getCurrentView()],
                                           current=>$newrec,oldrec=>$oldrec)){

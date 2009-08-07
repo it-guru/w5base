@@ -471,7 +471,7 @@ addEvent(window, "load",   ProcessInit);
 </script>
 EOF
       }
-      $template.=$app->HtmlPersistentVariables(qw(id));
+      $template.=$app->HtmlPersistentVariables(qw(id isCopyFromId));
    }
    else{
       my $workheight=$StepObj->getWorkHeight();
@@ -561,7 +561,7 @@ addEvent(window, "load",   ProcessInit);
 </script>
 EOF
       Query->Param("WorkflowClass"=>$class);
-      $template.=$app->HtmlPersistentVariables(qw(WorkflowClass));
+      $template.=$app->HtmlPersistentVariables(qw(WorkflowClass isCopyFromId));
    }
    my @l=Query->Param("WorkflowStep");
    if ($#l!=-1){
@@ -691,6 +691,11 @@ sub getDetailFunctions
       my $id=$rec->{$idname};
       unshift(@f,$self->T("WorkflowDelete")=>"WorkflowDelete");
    }
+   if (defined($rec) && $self->getParent->isCopyValid($rec)){
+     # my $idname=$self->IdField->Name();
+     # my $id=$rec->{$idname};
+      unshift(@f,$self->T("DetailCopy")=>"DetailCopy");
+   }
    if (defined($rec) && $self->getParent->can("HandleQualityCheck") &&
        $self->getParent->isQualityCheckValid($rec)){
       unshift(@f,$self->T("QualityCheck")=>"DetailHandleQualityCheck");
@@ -706,6 +711,10 @@ sub getDetailFunctionsCode
    my $id=$rec->{$idname};
    my $detailx=$self->DetailX();
    my $detaily=$self->DetailY();
+   my $copyo="openwin(\"Copy?CurrentIdToEdit=$id\",\"_blank\",".
+          "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
+          "resizable=yes,scrollbars=auto\")";
+
 
    my $d=<<EOF;
 function WorkflowPrint(){
@@ -734,6 +743,11 @@ function WorkflowDelete(id)
 {
    showPopWin('DeleteRec?CurrentIdToEdit=$id',null,200,FinishDelete);
 }
+function DetailCopy(id)
+{
+   $copyo;
+}
+
 function FinishDelete()
 {
    if (window.name=="work"){

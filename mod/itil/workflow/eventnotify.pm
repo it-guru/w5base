@@ -739,6 +739,9 @@ sub getNextStep
    elsif($currentstep=~m/^.*::workflow::eventnotify::asknet$/){
       return($self->getStepByShortname("dataload",$WfRec)); 
    }
+   elsif($currentstep=~m/^.*::workflow::eventnotify::copydata$/){
+      return($self->getStepByShortname("main",$WfRec)); 
+   }
    elsif($currentstep=~m/^.*::workflow::eventnotify::dataload$/){
       return($self->getStepByShortname("main",$WfRec)); 
    }
@@ -865,17 +868,14 @@ sub allowAutoScroll
 }
 
 
-sub getDetailFunctions
+sub isCopyValid
 {
    my $self=shift;
-   my $rec=shift;
-   my @f;
-   if (defined($rec)){
-      @f=($self->T('WorkflowCopy')=>'WorkflowCopy');
-   }
-   return(@f,$self->SUPER::getDetailFunctions($rec));
-}
+   my $WfRec=shift;
 
+   return(1);
+
+}
 
 
 sub getDetailFunctionsCode
@@ -903,7 +903,7 @@ sub InitCopy
    
    my $appl=$copyinit->{Formated_affectedapplication};
    $copyinit->{Formated_appl}=$appl;
-   $copyinit->{WorkflowStep}=[qw(itil::workflow::eventnotify::copydataload)];
+   $copyinit->{WorkflowStep}=[qw(itil::workflow::eventnotify::copydata)];
    $copyinit->{WorkflowClass}=$self->Self();
 }
 
@@ -1625,7 +1625,6 @@ package itil::workflow::eventnotify::dataload;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfStep;
-use Data::Dumper;
 @ISA=qw(kernel::WfStep);
 
 sub generateWorkspace
@@ -1759,33 +1758,67 @@ sub Validate
    return(1);
 }
 
-sub Process
+sub nativProcess
 {
    my $self=shift;
    my $action=shift;
+   my $h=shift;
+   my $step=shift;
    my $WfRec=shift;
    my $actions=shift;
 
+
    if ($action eq "NextStep"){
-      my $h=$self->getWriteRequestHash("web");
-      $h->{stateid}=1;
-      sleep(1);
-      $h->{eventstart}=Query->Param("Formated_eventstartofevent");
-      $h->{eventend}=undef;
-      if (Query->Param("Formated_eventmode") ne ""){
-         $h->{eventmode}=Query->Param("Formated_eventmode");
-      }
-      if (Query->Param("Formated_eventendofevent") ne ""){
-         $h->{eventend}=Query->Param("Formated_eventendofevent");
-      }
       $h->{closedate}=undef;
       if ($h->{eventmode} eq "EVk.infraloc"){
+         my $loc=$h->{affectedlocation};
+         $loc=$h->{affectedlocation}->[0] if (ref($h->{affectedlocation}));
          $h->{name}=$self->getParent->T("Location-notification:").
-                    " ".$h->{affectedlocation};
+                    " ".$loc;
       }
       elsif ($h->{eventmode} eq "EVk.appl"){
+         my $app=$h->{affectedapplication};
+         if (ref($h->{affectedapplication})){
+            $app=$h->{affectedapplication}->[0];
+         }
+         my $appl=getModuleObject($self->getParent->getParent->Config,
+                                  "itil::appl");
+         $appl->SetFilter({cistatusid=>"<5",id=>$h->{affectedapplicationid}});
+         my ($arec,$msg)=$appl->getOnlyFirst(qw(name customer customerid 
+                                                custcontracts id));
+         if (defined($arec)){
+            $app=$arec->{name};
+            $h->{affectedapplicationid}=[$arec->{id}];   
+            $h->{affectedapplication}=[$arec->{name}];   
+            my @custcontract;
+            my @custcontractid;
+            foreach my $contr (@{$arec->{custcontracts}}){
+               push(@custcontract,$contr->{custcontract});
+               push(@custcontractid,$contr->{custcontractid});
+            }
+            if ($#custcontractid!=-1){
+               $h->{affectedcontract}=\@custcontract;
+               $h->{affectedcontractid}=\@custcontractid;
+            }
+            else{
+               delete($h->{affectedcontract});
+               delete($h->{affectedcontractid});
+            }
+            if ($arec->{customer} ne ""){
+               $h->{affectedcustomer}=[$arec->{customer}];
+               $h->{affectedcustomerid}=[$arec->{customerid}];
+            }
+            else{
+               delete($h->{affectedcustomer});
+               delete($h->{affectedcustomerid});
+            }
+         }
+         else{
+            $self->getParent->LastMsg(ERROR,"invalid or inactive application");
+            return(0);
+         }
          $h->{name}=$self->getParent->T("Application-notification:").
-                    " ".$h->{affectedapplication};
+                    " ".$app;
       }
       elsif ($h->{eventmode} eq "EVk.net"){
          my $region=$self->getParent->T($h->{affectedregion},
@@ -1797,10 +1830,34 @@ sub Process
          $self->getParent->LastMsg(ERROR,"invalid eventmode '$h->{eventmode}'");
          return(0);
       }
-
+      $h->{step}=$self->getNextStep() if ($h->{step} eq "");
       if (!$self->StoreRecord($WfRec,$h)){
          return(0);
       }
+      return(1);
+   }
+   return(0);
+}
+
+sub Process
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   if ($action eq "NextStep"){
+      my $h=$self->getWriteRequestHash("web");
+      $h->{stateid}=1;
+      $h->{eventstart}=Query->Param("Formated_eventstartofevent");
+      $h->{eventend}=undef;
+      if (Query->Param("Formated_eventmode") ne ""){
+         $h->{eventmode}=Query->Param("Formated_eventmode");
+      }
+      if (Query->Param("Formated_eventendofevent") ne ""){
+         $h->{eventend}=Query->Param("Formated_eventendofevent");
+      }
+      return($self->nativProcess("NextStep",$h,$self->Self,$WfRec,$actions));
    }
    return($self->SUPER::Process($action,$WfRec));
 }
@@ -1815,28 +1872,24 @@ sub getWorkHeight
 }
 
 #######################################################################
-package itil::workflow::eventnotify::copydataload;
+package itil::workflow::eventnotify::copydata;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfStep;
-use Data::Dumper;
-@ISA=qw(kernel::WfStep);
+@ISA=qw(itil::workflow::eventnotify::dataload);
 
 sub generateWorkspace
 {
    my $self=shift;
    my $WfRec=shift;
    my $actions=shift;
+   Query->Param("Formated_eventstartofevent"=>'now');
 
    my $templ=<<EOF;
 <table border=0 cellspacing=0 cellpadding=0 width=100%>
 <tr>
 <td class=fname width=20%>%eventstartofevent(label)%:</td>
 <td class=finput>%eventstartofevent(detail)%</td>
-</tr>
-<tr>
-<td class=fname width=20%>%eventendofevent(label)%:</td>
-<td class=finput>%eventendofevent(detail)%</td>
 </tr>
 </table>
 EOF
@@ -1849,15 +1902,8 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
    my $origrec=shift;
+   $newrec->{name}=1;
 
-   foreach my $v (qw(name)){
-      if ((!defined($oldrec) || exists($newrec->{$v})) && $newrec->{$v} eq ""){
-         $self->LastMsg(ERROR,"field '%s' is empty",
-                        $self->getField($v)->Label());
-         return(0);
-      }
-   }
-   $newrec->{step}=$self->getNextStep();
 
    return(1);
 }
@@ -1870,14 +1916,25 @@ sub Process
    my $actions=shift;
 
    if ($action eq "NextStep"){
+      my $isCopyFromId=Query->Param("isCopyFromId");
+      my $wf=$self->getParent->getParent;
+      $wf->ResetFilter();
+      $wf->SetFilter({id=>\$isCopyFromId});
+      my ($crec,$msg)=$wf->getOnlyFirst(qw(ALL));
       my $h=$self->getWriteRequestHash("web");
+      if (defined($crec)){
+         foreach my $cvar (qw(mandatorid mandator affectedapplication affectedapplicationid affectedlocation affectedlocationid affectedroom affectednetwork affectednetworkid affectedregion affectedcustomer affectedcustomerid eventdesciption eventreason eventimpact shorteventelimination longeventelimination eventaltdesciption eventaltreason eventaltimpact altshorteventelimination altlongeventelimination eventlang eventsla eventstaticmailsubject eventstaticemailgroupid eventinternalslacomments eventinternalcomments eventstatnature eventstattype eventstatreason eventstatclass eventmode)){
+            if (defined($crec->{$cvar})){
+               $h->{$cvar}=$crec->{$cvar};
+            }
+         }
+      }
       $h->{stateid}=1;
       $h->{eventstart}=NowStamp("en");
       $h->{eventend}=undef;
       $h->{closedate}=undef;
-      if (!$self->StoreRecord($WfRec,$h)){
-         return(0);
-      }
+      return($self->nativProcess($action,$h,$self->getNextStep(),
+                                 $WfRec,$actions));
    }
    return($self->SUPER::Process($action,$WfRec));
 }
@@ -1888,7 +1945,7 @@ sub getWorkHeight
    my $self=shift;
    my $WfRec=shift;
 
-   return(100);
+   return(280);
 }
 
 #######################################################################

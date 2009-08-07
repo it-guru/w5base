@@ -770,6 +770,45 @@ sub isInfoAboAdmin
 }
 
 
+sub expandDynamicDistibutionList
+{
+   my $self=shift;
+   my $dlname=shift;
+   my %email;
+
+   $self->LoadSubObjs("ext/distlist","distlist");
+
+   my $user=getModuleObject($self->Config,"base::user");
+
+   foreach my $obj (values(%{$self->{distlist}})){
+      my ($to,$cc,$bcc)=$obj->expandDynamicDistibutionList($self,$dlname);
+      foreach my $e (@$to){ $email{'to'}->{$e}++};
+      foreach my $e (@$cc){ $email{'cc'}->{$e}++};
+      foreach my $e (@$bcc){ $email{'bcc'}->{$e}++};
+      foreach my $et (keys(%email)){
+         my @userid;
+         foreach my $email (keys(%{$email{$et}})){
+            if ($email=~m/^\d+$/){
+               push(@userid,$email);
+               delete($email{$et}->{$email});
+            }
+         }
+     #    if ($#userid!=-1){
+     #       $user->ResetFilter();
+     #       $user->SetFilter({cistatuid=>\'4',userid=>\@userid});
+       #     map({$email{$et}->{$_->{email}}++} $user->getHashList("email"));
+     #    }
+         
+         msg(INFO,"process email type $et");
+
+      }
+   }
+   return([sort(keys(%{$email{'to'}}))],
+          [sort(keys(%{$email{'cc'}}))],
+          [sort(keys(%{$email{'bcc'}}))]);
+}
+
+
 
 
 

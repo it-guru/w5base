@@ -7,4 +7,5 @@
 'Subject'=>{de=>'Betreff'},
 'Preview'=>{de=>'Vorschau'},
 'DetailMarkDelete'=>{de=>'gelöscht markieren',en=>'mark as delete'},
+'DetailCopy'=>{de=>'kopieren',en=>'copy'},
 'DetailUnMarkDelete'=>{de=>'Löschmarkierung entfernen',en=>'unmark deleted'},

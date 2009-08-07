@@ -2241,6 +2241,7 @@ sub DataObj_findtemplvar
    my ($opt,$var,@param)=@_;
    my $fieldbase;
 
+
    if (defined($opt->{fieldbase})){
       $fieldbase=$opt->{fieldbase};
    }

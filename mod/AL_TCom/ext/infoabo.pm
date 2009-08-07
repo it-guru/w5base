@@ -18,7 +18,6 @@ package AL_TCom::ext::infoabo;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::Universal;
 @ISA=qw(kernel::Universal);

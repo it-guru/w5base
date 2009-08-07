@@ -120,7 +120,29 @@ if (defined($m)){
    $mailhead->unfold();
    my $mailtext=FindMimePart($m,"text/plain");
    if (defined($mailtext)){
-      if ($mailmode eq "postmaster"){
+      if (my (undef,$dlname)=$mailmode=~m/^(vl|dl)\.(.*)$/i){
+         msg(INFO,"distributionlist mailmode = $mailmode  dlname=$dlname");
+         my $i=getModuleObject($curconfig,"base::infoabo");
+         my @email=$i->expandDynamicDistibutionList($dlname);
+         $mailtext->head->replace("To","hartmut.vogler\@t-systems.com");
+         my $tag=$curconfig->Param("SITENAME");
+         if ($mailmode=~m/^dl\..*$/i){
+            $tag.=" DL:";
+         }
+         else{
+            $tag.=" VL:";
+         }
+         my $subject=$mailhead->get("Subject");
+         my $qtag=quotemeta($tag);
+         if (!($subject=~m/$tag/i)){
+            $subject=$tag." ".$subject;
+            $mailtext->head->replace("Subject",$subject);
+         }
+         $mailtext->head->replace("From",$mailhead->get("From"));
+         $mailtext->smtpsend();
+         exit(0);
+      }
+      elsif ($mailmode eq "postmaster"){
          my $isdelerror=0;
          my $email;
          my $textdata;
