@@ -668,6 +668,10 @@ sub RawValue
                   $flt{$joinfield}=\$myval;
                   $joinval=1 if (defined($myval) && $myval ne "");
                }
+               else{
+                  $flt{$joinfield}=\undef;
+                  $joinval=1;
+               }
             }
          }
       }
