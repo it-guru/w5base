@@ -56,7 +56,7 @@ sub ImportAssetManagerCO
    $self->{wf}=getModuleObject($self->Config,"base::workflow");
    $self->{user}=getModuleObject($self->Config,"base::user");
    $self->{mandator}=getModuleObject($self->Config,"base::mandator");
-   my $flt={bc=>['AL T-COM']};
+   my $flt={bc=>['AL T-COM','Notes & Collab. Ser.']};
    #$flt->{name}=\'9100007746';
 
    $co->SetFilter($flt);
