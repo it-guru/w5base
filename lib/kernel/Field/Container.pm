@@ -46,8 +46,10 @@ sub FormatedDetail
       if (ref($d) eq "HASH"){
          foreach my $k (sort(keys(%$d))){
             my $val=$d->{$k};
-            $val=join("\n",@$val) if (ref($val) eq "ARRAY");
-            $xml.="<item><name>$k</name><value>$val</value></item>";
+            $val=[$val] if (ref($val) ne "ARRAY");
+            foreach my $vval (@$val){
+               $xml.="<item><name>$k</name><value>$vval</value></item>";
+            }
          }
       }
       return($xml);
