@@ -76,7 +76,7 @@ sub getHttpHeader
 {  
    my $self=shift;
    my $d="";
-   $d.="Content-type:".$self->MimeType()."\n\n";
+   $d.="Content-type:".$self->MimeType().";charset=ISO-8895-1\n\n";
    return($d);
 }
 
