@@ -690,6 +690,8 @@ sub getHashList
    $param={} if (!ref($param));
    my $ns=$self->_SOAPaction2param($self->{SOAP}->action(),$param);
    my $objectname=$param->{dataobject};
+   my $limitstart=$param->{limitstart};
+   my $limit=$param->{limit};
    my $view=$param->{view};
    my $filter=$param->{filter};
    $filter={} if ($filter eq "");
@@ -743,6 +745,9 @@ sub getHashList
              lastmsg=>[msg(ERROR,'no access to dataobject')]}));
    }
    $o->SecureSetFilter($filter); 
+   if (defined($limit) && $limit>0 && $limit=~m/^\d+$/){
+      $o->Limit($limit,$limitstart);
+   }
    msg(INFO,"SOAPgetHashList in search objectname=$objectname");
    my @fobjs=$o->getFieldObjsByView($view);
    my @l=$o->getHashList(@$view);
