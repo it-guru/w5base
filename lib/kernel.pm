@@ -268,21 +268,6 @@ sub hash2xml {
   return $xml;
 }
 
-sub UTF8toLatin1
-{
-   my $dd=shift;
-   if ($dd=~m/\xC3/){
-      utf8::decode($dd);
-   }
-   if (utf8::is_utf8($dd)){
-      utf8::downgrade($dd,1);
-      $dd=~s/\x{201e}/"/g;
-      decode_utf8($dd,0);
-      $dd=encode("iso-8859-1", $dd);
-   }
-   return($dd);
-}
-
 
 sub Datafield2Hash
 {

@@ -2,6 +2,7 @@
 use lib qw(/opt/w5base2/lib /opt/w5base/lib);
 use strict;                   
 use W5Base::API;
+use W5Kernel;
 
 my $DefaultBase="https://w5base.net/w5base/auth/";
 my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang);
@@ -60,19 +61,29 @@ $user->dieOnERROR();
 # do search
 #
 $user->SetFilter({fullname=>$flt});
-if (my @l=$user->getHashList(qw(fullname surname accounts))){
-   if ($#l==-1){
-      msg(INFO,"no data found in $objectname matching fullname=$flt");exit(2);
-   }
-   else{
-      foreach my $rec (@l){
-          printf("$rec->{fullname}\n");
-          foreach my $arec (@{$rec->{accounts}}){
-             printf(" - $arec->{account}\n");
-          }
+my $st=0;
+my $blk=50;
+my @l;
+do{
+   $user->Limit($st+$blk,$st);
+   if (@l=$user->getHashList(qw(fullname surname accounts))){
+      if ($#l==-1){
+         msg(INFO,"no data found in $objectname matching fullname=$flt");
+         exit(2);
+      }
+      else{
+         foreach my $rec (@l){
+             printf("%s\n",UTF8toLatin1($rec->{fullname}));
+             if (ref($rec->{accounts}) eq "ARRAY"){
+                foreach my $arec (@{$rec->{accounts}}){
+                   printf(" - $arec->{account}\n");
+                }
+             }
+         }
       }
    }
-}
+   $st+=$blk;
+}while($#l==$blk-1);
 $user->dieOnERROR();
 exit(0);
 

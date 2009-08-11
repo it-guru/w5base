@@ -1,9 +1,10 @@
 package W5Kernel;
 use Exporter;
+use Encode;
 @ISA = qw(Exporter);
 @EXPORT = qw(
              &trim &rtrim &ltrim
-             &msg &ERROR &WARN &DEBUG &INFO &OK
+             &msg &ERROR &WARN &DEBUG &INFO &OK &UTF8toLatin1
              );
 
 sub ERROR() {return("ERROR")}
@@ -64,6 +65,23 @@ sub trim
   }
   return($_[0]);
 }
+
+sub UTF8toLatin1
+{
+   my $dd=shift;
+   if ($dd=~m/\xC3/){
+      utf8::decode($dd);
+   }
+   if (utf8::is_utf8($dd)){
+      utf8::downgrade($dd,1);
+      $dd=~s/\x{201e}/"/g;
+      decode_utf8($dd,0);
+      $dd=encode("iso-8859-1", $dd);
+   }
+   return($dd);
+}
+
+
 
 
 

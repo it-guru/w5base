@@ -327,7 +327,7 @@ use Getopt::Long;
 use FindBin qw($RealScript);
 use Config;
 
-$VERSION = "0.3";
+$VERSION = "0.4";
 @ISA = qw(Exporter);
 @EXPORT = qw(&msg &ERROR &WARN &DEBUG &INFO $RealScript
              &XGetOptions
@@ -730,14 +730,41 @@ sub SetFilter
    $self->{FILTER}=$filter;
 }
 
+sub Limit
+{
+   my $self=shift;
+   my $limit=shift;
+   my $limitstart=shift;
+   if (defined($limit) && $limit=~m/^\d+$/ && $limit>0){
+      $self->{LIMIT}=$limit;
+   }
+   else{
+      delete($self->{LIMIT});
+   }
+   if (defined($limitstart) && $limitstart=~m/^\d+$/){
+      $self->{LIMITSTART}=$limitstart;
+   }
+   else{
+      delete($self->{LIMITSTART});
+   }
+}
+
 sub getHashList
 {
    my $self=shift;
    my @view=@_;
-   my $SOAPresult=$self->SOAP->getHashList({dataobject=>$self->Name,
-                                            view=>\@view,
-                                            lang=>$self->Config->{lang},
-                                            filter=>$self->Filter});
+
+   my $req={dataobject=>$self->Name,
+            view=>\@view,
+            lang=>$self->Config->{lang},
+            filter=>$self->Filter};
+   if (defined($self->{LIMIT})){
+      $req->{limit}=$self->{LIMIT};
+   }
+   if (defined($self->{LIMITSTART})){
+      $req->{limitstart}=$self->{LIMITSTART};
+   }
+   my $SOAPresult=$self->SOAP->getHashList($req);
    my $result=$self->_analyseSOAPresult($SOAPresult);
    if (defined($result)){
       $self->{exitcode}=$result->{exitcode};
