@@ -682,6 +682,10 @@ sub WSDLfindRecord
               "type=\"xsd:string\" nillable=\"true\" />";
    $$XMLtypes.="<xsd:element name=\"view\" ".
               "type=\"xsd:string\" nillable=\"true\" />";
+   $$XMLtypes.="<xsd:element name=\"limit\" ".
+              "type=\"xsd:integer\" minOccurs=\"0\" nillable=\"true\" />";
+   $$XMLtypes.="<xsd:element name=\"limitstart\" ".
+              "type=\"xsd:integer\" minOccurs=\"0\" nillable=\"true\" />";
    $$XMLtypes.="<xsd:element name=\"filter\" ".
               "type=\"${ns}:Filter\" />";
    $$XMLtypes.="</xsd:sequence>";
