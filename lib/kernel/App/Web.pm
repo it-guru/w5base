@@ -289,6 +289,7 @@ sub InitRequest
    my $substuser=Query->Cookie("remote_user");
    if ($ENV{REMOTE_USER} ne "anonymous" &&
        defined($substuser) && $substuser ne $ENV{REAL_REMOTE_USER}){
+      $self->ValidateCaches();
       my $usermask=getModuleObject($self->Config,"base::usermask");
       my @l=$usermask->isSubstValid($ENV{REAL_REMOTE_USER},$substuser);
       if ($#l==0){
