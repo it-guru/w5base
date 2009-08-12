@@ -58,6 +58,14 @@ sub rtrim
 sub trim
 {
   return(undef) if (!defined($_[0]));
+  if (my $reft=ref($_[0])){
+     if ($reft eq "HASH"){
+        foreach my $k (keys(%{$_[0]})){
+           $_[0]->{$k}=trim($_[0]->{$k});
+        }
+        return($_[0]);
+     }
+  }
   ltrim($_[0]);
   rtrim($_[0]);
   if (ref($_[0])){
