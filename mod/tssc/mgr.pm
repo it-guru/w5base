@@ -52,13 +52,19 @@ sub Main
    my $user=getModuleObject($self->Config,"base::user");
    $user->SetFilter({userid=>\$userid});
    my ($urec,$msg)=$user->getOnlyFirst(qw(posix));
+   my $posix=uc($urec->{posix});
 
 
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css',],
-                           title=>'ServiceCenter Incident Creator',
-                           js=>[qw( toolbox.js ContextMenu.js)],
-                           body=>1,form=>1,target=>'result');
+                           title=>'W5Base ServiceCenter Manager',
+                           submodal=>1,
+                           js=>[qw( toolbox.js)],
+                           body=>1,form=>1);
+   print $self->HtmlSubModalDiv();
+   my $appline=sprintf("<tr><td height=1%% style=\"padding:1px\" ".
+                       "valign=top>%s</td></tr>",$self->getAppTitleBar());
+
    print <<EOF;
 <style>
 body{
@@ -68,14 +74,17 @@ body{
 <script language="JavaScript">
 function showWork(e)
 {
-   if (e.id=='NewApplIncident'){
+   if (e.id=='Restart' || e=='Restart'){
+      document.forms[0].submit();
+   }
+   if (e.id=='NewApplIncident' || e=='NewApplIncident'){
       frames['work'].document.location.href="../inm/Process";
    }
-   if (e.id=='MyIncidentMgr'){
+   if (e.id=='MyIncidentMgr' || e=='MyIncidentMgr'){
       frames['work'].document.location.href="../inm/Manager";
    }
-   if (e.id=='MyIncidentList'){
-      frames['work'].document.location.href="../inm/NativResult?search_openedby=HVOGLER&search_status=!closed&AutoSearch=1";
+   if (e.id=='MyIncidentList' || e=='MyIncidentList'){
+      frames['work'].document.location.href="../inm/NativResult?search_openedby=$posix&search_status=!closed&AutoSearch=1";
    }
 
 }
@@ -113,6 +122,16 @@ function doOP(o,op,target)
        }
        e.innerHTML=d;
        o.disabled="";
+       var result=xmlobject.getElementsByTagName("javascript");
+
+       var d="";
+       for (var i = 0; i < result.length; ++i){
+           var childNode=result[i].childNodes[0];
+           if (childNode){
+              d+=childNode.nodeValue;
+           }
+       }
+       eval(d);
     }
    }
    xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
@@ -125,16 +144,10 @@ function doOP(o,op,target)
 EOF
    my $SCUsername=Query->Param("SCUsername");
    my $SCPassword=Query->Param("SCPassword");
-   if (Query->Param("login")){
-      printf("login ok SCUsername=$SCUsername\n");
-   }
-   else{
-      if ($SCUsername eq ""){
-         $SCUsername=$urec->{posix};
-      }
-      print("<table width=100% height=100% border=0 cellspacing=0 cellpadding=0>");
-      print("<tr height=1%><td>");
-      print <<EOF;
+   print <<EOF;
+<table width=100% height=100% border=0 cellspacing=0 cellpadding=0>
+$appline
+<tr height=1%><td>
 <div id=loading style=\"width:0px;height:0px;padding:0px;margin:0px;overflow:hidden;postion:absolute;visibility:hidden;display:none">
 <center><img src="../../base/load/ajaxloader.gif"></center>
 </div>
@@ -144,29 +157,37 @@ EOF
 <td width=1%><input type=text id=SCUsername name=SCUsername
                     value="$SCUsername"></td>
 <td width=1% nowrap>SCPassword:</td>
-<td width=1%><input type=password id=SCPassword name=SCPassword></td>
+<td width=1%><input type=password id=SCPassword name=SCPassword
+                    value="$SCPassword"></td>
 <td></td>
-<td width=1%><input type=button id=Restart name=Restart value="Restart"></td>
+<td width=1%><input type=button onclick="showWork(this);" 
+                    id=Restart name=Restart value="Restart"></td>
 </tr>
 </table>
-EOF
-      print("</td></tr>");
-      print("<tr height=1%><td>");
-      print(<<EOF);
+
+</td></tr>
+<tr height=1%><td>
 <input id=NewApplIncident class=opbutton type=button onclick="showWork(this);"
        value="New Application Incident">
 <input id=MyIncidentList  class=opbutton type=button onclick="showWork(this);"
        value="list Incidents created by me">
 <input id=MyIncidentMgr  class=opbutton type=button onclick="showWork(this);"
        value="Incident Manager">
+</td></tr>
+
+<tr><td><iframe name=work class=subframe src="../inm/Manager"></iframe></td>
+</tr>
+
+<tr height=1%><td>
+<div style="padding:10px;height:40px;overflow:auto" id=result>
+W5Base/Darwin stellt ein Kern-Set an Funktionen zur Bedienung von
+ServiceCenter zur Verfügung. Sollten Sie Transaktionen in ServiceCenter
+durchführen wollen, die über die W5Base/Darwin Oberfläche nicht möglich
+sind, so nutzen Sie bitte dafür dann den "normalen" ServiceCenter Client!
+</div>
+</td></tr>
+</table>
 EOF
-      print("</td></tr>");
-      print("<tr><td><iframe name=work ".
-            "class=subframe src=\"../inm/Manager\"></iframe></td></tr>");
-      print("<tr height=1%><td><div style=\"padding:10px;height:40px\" ".
-            "id=result></div></td></tr>");
-      print("</table>");
-   }
    print $self->HtmlBottom(body=>1,form=>1);
 }
 

@@ -272,14 +272,11 @@ sub new
                                     some.customer.fail
                                     some.customer.restricted
                                     all.interfaces.fail
-                                    all.interfaces.restricted
                                     some.interfaces.fail
-                                    some.interfaces.restricted
-                                    other.applications.fail
-                                    other.applications.restricted
-                                    onlyme
+                                    onlyme.restricted
                                     none)],
-                label         =>'Impact'),
+                transprefix   =>'IM.',
+                label         =>'Incident impact'),
 
       new kernel::Field::Select(
                 name          =>'sctype',
@@ -287,7 +284,8 @@ sub new
                                     authorization
                                     interfaceproblem
                                     )],
-                label         =>'Impact'),
+                transprefix   =>'TY.',
+                label         =>'Incident type'),
 
       new kernel::Field::FlexBox(
                 name          =>'sccustapplication',
@@ -409,7 +407,7 @@ sub isWriteValid
 sub getValidWebFunctions
 {
    my $self=shift;
-   return("Manager","Process",
+   return("Manager","inmResolv","inmClose","inmAddNote","Process",
           $self->SUPER::getValidWebFunctions());
 }
 
@@ -489,6 +487,36 @@ sub InsertRecord   # fake write request to SC
       $self->LastMsg(ERROR,"ServiceCenter Login failed");
       return(undef);
    }
+   my $priority=3;
+   my $sla="No";
+   my $criticality="low";
+   my $urgency="Low";
+   if ($newrec->{scimpact}=~m/^all\.customer\.*/){
+      $priority=1;
+      $sla="Yes";
+      $criticality="critical";
+      $urgency="Critical";
+   }
+   if ($newrec->{scimpact}=~m/^some\.customer\.*/){
+      $priority=2;
+      $criticality="high";
+      $urgency="Medium";
+   }
+   if ($newrec->{scimpact}=~m/.*\.interfaces\.*/){
+      $priority=2;
+      $criticality="medium";
+      $urgency="Medium";
+   }
+   my $category0="SOFTWARE";
+   my $category1="OTHER";
+   if ($newrec->{sctype} eq "authorization"){
+      $category0="ACCESS";
+      $category1="OTHER";
+   }
+   if ($newrec->{sctype} eq "interfaceproblem"){
+      $category0="INTERFACE";
+      $category1="OTHER";
+   }
    msg(INFO,"start SC CreateIncident for $ENV{REMOTE_USER}");
    my %Incident=(
                  'brief.description'      =>$newrec->{scname},
@@ -514,14 +542,14 @@ sub InsertRecord   # fake write request to SC
                  'reported.country.code'  =>"DE",
                  'assignment'             =>$newrec->{'scassingmentgroup'},
                  'home.assignment'        =>'CSS.TCOM.W5BASE',
-                 'priority.code'          =>'3',
-                 'urgency'                =>'Medium',
+                 'priority.code'          =>$priority,
+                 'urgency'                =>$urgency,
                  'business.impact'        =>'Medium',
-                 'dsc.criticality'        =>'Low',
-                 'sla.relevant'           =>'No',
-                 'category'               =>'SOFTWARE',
+                 'dsc.criticality'        =>$criticality,
+                 'sla.relevant'           =>$sla,
+                 'category'               =>$category0,
                  'company'                =>'T-Systems International GmbH',
-                 'subcategory1'           =>'OTHER',
+                 'subcategory1'           =>$category1,
                  'dsc.service'            =>$newrec->{scapplname},
                  'reported.lastname'      =>$urec->{surname},
                  'reported.firstname'     =>$urec->{givenname},
@@ -531,7 +559,7 @@ sub InsertRecord   # fake write request to SC
                  'contact.name'           =>uc($urec->{posix}),
                  'referral.no'            =>"W5Base",
                  'contact.mail.address'   =>$urec->{email},
-                 'category.type'          =>'APPLICATION',
+                 'category.type'          =>$newrec->{class},
                  'action'                 =>$newrec->{scdescription});
 
    printf STDERR ("fifi d=%s\n",Dumper(\%Incident));
@@ -589,12 +617,13 @@ sub CreateApplicationIncident
    my $password=Query->Param("SCPassword");
    my $IncidentNumber;
    my $newrec=$self->getWriteRequestHash("nativweb");;
+   $newrec->{class}="APPLICATION";
    foreach my $k (keys(%$newrec)){ # remove utf8 code while ajax request
        $newrec->{$k}=utf8($newrec->{$k})->latin1();
    }
    print STDERR "WriteRequestHash:".Dumper($newrec);
 
-   if (my $IncidentNumber=$self->ValidatedInsertRecord($newrec)){
+   if ($IncidentNumber=$self->ValidatedInsertRecord($newrec)){
       $self->LastMsg(OK,"CreateIncident ($IncidentNumber) is ok");
    }
    return($IncidentNumber);
@@ -605,20 +634,25 @@ sub Process
 {
    my $self=shift;
    if (my $op=Query->Param("Do")){
+      my $finecode;
       Query->Delete("Do"); 
       if ($op eq "Login"){
          $self->LastMsg(OK,"ServiceCenter login successful");
       }
       if ($op eq "CreateApplicationIncident"){
-         if (!($self->CreateApplicationIncident())){
+         if (!defined(my $IncidentNumber=$self->CreateApplicationIncident())){
             if ($self->LastMsg()==0){
                $self->LastMsg(ERROR,"create failed - unknown problem");
             }
          }
+         else{
+            $finecode="showWork('MyIncidentMgr');";
+         }
       }
       print $self->HttpHeader("text/xml");
       my $res=hash2xml({document=>{
-             htmlresult=>$self->findtemplvar({},"LASTMSG")}},{header=>1});
+             htmlresult=>$self->findtemplvar({},"LASTMSG"),
+             javascript=>$finecode}},{header=>1});
       print $res;
       return;
    }
@@ -668,6 +702,26 @@ EOF
 }
 
 
+sub inmResolv
+{
+   my $self=shift;
+   my $id=Query->Param("id");
+
+   my $userid=$self->getCurrentUserId();
+   my $user=getModuleObject($self->Config,"base::user");
+   $user->SetFilter({userid=>\$userid});
+   my ($urec,$msg)=$user->getOnlyFirst(qw(ALL));
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css',
+                                   'work.css'],
+                           js=>[qw( kernel.App.Web.js toolbox.js)],
+                           body=>1,form=>1);
+   printf("Not implemented");
+   
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
 sub Manager
 {
    my $self=shift;
@@ -679,25 +733,37 @@ sub Manager
 
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css',
-                                   'kernel.App.Web.css',
-                                   'Output.HtmlDetail.css',
+                                   'work.css',
+                                  # 'Output.HtmlDetail.css',
                                  ],
                            title=>'ServiceCenter Incident Creator',
-                           js=>[qw( toolbox.js)],
-                           body=>1,form=>1,target=>'result');
+                           submodal=>1,
+                           js=>[qw( kernel.App.Web.js toolbox.js)],
+                           body=>1,form=>1);
 
    $self->ResetFilter();
    my $posix=uc($urec->{posix});
    $self->SetFilter({openedby=>\$posix,status=>'!closed'});
+#   print("<style>body{background:white}</style>");
+   print("<script>function refresh(){document.forms[0].submit(); return(1);}</script>");
    print("<table>");
-   print("<tr><th>Incidentnumber</th>".
-         "<th>State</th><th>Short description</th></tr>");
-   foreach my $irec ($self->getHashList(qw(status incidentnumber name
+   print("<tr><th align=left>Incidentnumber</th>".
+         "<th align=left>State</th><th align=left>Short description</th></tr>");
+   foreach my $irec ($self->getHashList(qw(incidentnumber status name
                                            downtimestart downtimeend))){
-      printf("<form name=\"%s\">",$irec->{incidentnumber});
-      printf("<tr><td>%s</td><td>%s</td><td>%s</td></tr>",
+      printf("<form name=\"%s\"><tr>",$irec->{incidentnumber});
+      printf("<td>%s</td><td>%s</td><td>%s</td>",
              $irec->{incidentnumber},$irec->{status},$irec->{name});
-      printf("</form>");
+      printf("<td>");
+      if ($irec->{status} eq "resolved"){
+       #  printf("<input type=button id=addnote value=\"add note\">");
+         printf("<input type=button onclick=\"parent.showPopWin('../inm/inmResolv?id=$irec->{incidentnumber}',500,180,refresh);\" id=close value=\"close\">");
+      }
+      else{
+       #  printf("<input type=button onclick=\"parent.showPopWin('../inm/inmResolv?id=$irec->{incidentnumber}',500,180);\" id=resolv value=\"resolv\">");
+      }
+      printf("</td>");
+      printf("</tr></form>");
    }
    print("</table>");
 
