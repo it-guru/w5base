@@ -558,44 +558,56 @@ sub getWriteRequestHash
       $mode="web";
    }
    my $rec={};
-   $self->SetCurrentView(qw(ALL));
-   my @fieldlist=$self->getFieldObjsByView([$self->getCurrentView()],
-                                           oldrec=>$oldrec,
-                                           opmode=>'getWriteRequestHash');
-
-   foreach my $fobj (@fieldlist){
-      my $field=$fobj->Name();
-      if ($mode eq "web"){
-         my @val=Query->Param($field);
-         if ($#val==-1){
-            @val=Query->Param("Formated_".$field);
-            if ($#val!=-1){
-               my $rawWrRequest=$fobj->doUnformat(\@val,$rec);
-               #msg(INFO,"getWriteRequestHash: var=$field $rawWrRequest");
-               if (!defined($rawWrRequest)){
-                  return(undef) if ($self->LastMsg()!=0);
-        
-                  next;
-               }
-               #msg(INFO,"Unformated $field:%s",Dumper($rawWrRequest));
-               foreach my $k (keys(%{$rawWrRequest})){
-                  $rec->{$k}=$rawWrRequest->{$k};
-               }
-            }
-        
-         }
-         else{
-            $rec->{$field}=$val[0];
-            $rec->{$field}=\@val if ($#val>0);
+   if ($mode eq "nativweb"){
+      my %rec=Query->MultiVars(); 
+      foreach my $k (keys(%rec)){
+         delete($rec{$k}) if ($k eq "");
+         if (my ($v)=$k=~m/^Formated_(.*)$/){ 
+            $rec{$v}=$rec{$k};
+            delete($rec{$k});
          }
       }
-      if ($mode eq "upload"){
-         if (!($fobj->prepUploadRecord($newrec,$oldrec))){
-            return(undef);
-         }
-      }
+      return(\%rec);
    }
-   return($newrec) if ($mode eq "upload");
+   else{
+      $self->SetCurrentView(qw(ALL));
+      my @fieldlist=$self->getFieldObjsByView([$self->getCurrentView()],
+                                              oldrec=>$oldrec,
+                                              opmode=>'getWriteRequestHash');
+      foreach my $fobj (@fieldlist){
+         my $field=$fobj->Name();
+         if ($mode eq "web"){
+            my @val=Query->Param($field);
+            if ($#val==-1){
+               @val=Query->Param("Formated_".$field);
+               if ($#val!=-1){
+                  my $rawWrRequest=$fobj->doUnformat(\@val,$rec);
+                  #msg(INFO,"getWriteRequestHash: var=$field $rawWrRequest");
+                  if (!defined($rawWrRequest)){
+                     return(undef) if ($self->LastMsg()!=0);
+           
+                     next;
+                  }
+                  #msg(INFO,"Unformated $field:%s",Dumper($rawWrRequest));
+                  foreach my $k (keys(%{$rawWrRequest})){
+                     $rec->{$k}=$rawWrRequest->{$k};
+                  }
+               }
+           
+            }
+            else{
+               $rec->{$field}=$val[0];
+               $rec->{$field}=\@val if ($#val>0);
+            }
+         }
+         if ($mode eq "upload"){
+            if (!($fobj->prepUploadRecord($newrec,$oldrec))){
+               return(undef);
+            }
+         }
+      }
+      return($newrec) if ($mode eq "upload");
+   }
    return($rec);
 }
 
@@ -1840,8 +1852,13 @@ sub getFieldHash
 {
    my $self=shift;
    my %param=@_;
-   my %fh=(%{$self->{'Field'}});
-
+   my %fh;
+   if (ref($self->{'FrontendField'}) eq "HASH"){
+      %fh=(%{$self->{'Field'}},%{$self->{'FrontendField'}});
+   }
+   else{
+      %fh=(%{$self->{'Field'}});
+   }
    if (defined($self->{SubDataObj})){
       foreach my $SubDataObj (sort(keys(%{$self->{SubDataObj}}))){
          my $so=$self->{SubDataObj}->{$SubDataObj};

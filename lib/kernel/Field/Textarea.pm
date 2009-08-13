@@ -76,7 +76,8 @@ sub EditArea    # for module defined edit areas (f.e. javascript areas)
    my $d=shift;
    my $name=$self->Name();
    $d="<div class=multilinetext>".
-      "<textarea onkeydown=\"textareaKeyHandler(this,event);\" ".
+      "<textarea onkeydown=\"if (window.textareaKeyHandler){".
+      "textareaKeyHandler(this,event);}\" ".
       "cols=80 name=Formated_$name ".
       "class=multilinetext>".quoteHtml($d)."</textarea></div>";
 

@@ -22,7 +22,8 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
+use tssc::lib::io;
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB tssc::lib::io);
 
 sub new
 {
@@ -228,6 +229,13 @@ sub new
                 dataobjattr   =>'problemm1.reported_by'),
 
       new kernel::Field::Text(
+                name          =>'openedby',
+                uppersearch   =>1,
+                group         =>'contact',
+                label         =>'Opened by',
+                dataobjattr   =>'problemm1.opened_by'),
+
+      new kernel::Field::Text(
                 name          =>'editor',
                 uppersearch   =>1,
                 group         =>'contact',
@@ -252,6 +260,46 @@ sub new
                 name          =>'page',
                 dataobjattr   =>'problemm1.page'),
    );
+   $self->AddFrontendFields(
+      new kernel::Field::Text(
+                name          =>'scname',
+                label         =>'Short description'),
+
+      new kernel::Field::Select(
+                name          =>'scimpact',
+                value         =>[qw(all.customer.fail
+                                    all.customer.restricted
+                                    some.customer.fail
+                                    some.customer.restricted
+                                    all.interfaces.fail
+                                    all.interfaces.restricted
+                                    some.interfaces.fail
+                                    some.interfaces.restricted
+                                    other.applications.fail
+                                    other.applications.restricted
+                                    onlyme
+                                    none)],
+                label         =>'Impact'),
+
+      new kernel::Field::Select(
+                name          =>'sctype',
+                value         =>[qw(application.generic
+                                    authorization
+                                    interfaceproblem
+                                    )],
+                label         =>'Impact'),
+
+      new kernel::Field::FlexBox(
+                name          =>'sccustapplication',
+                vjointo       =>'itil::appl',
+                vjoindisp     =>'name',
+                label         =>'Application'),
+
+      new kernel::Field::Textarea(
+                name          =>'scdescription',
+                label         =>'Description'),
+   );
+   
    $self->{use_distinct}=0;
 
    $self->setDefaultView(qw(linenumber incidentnumber 
@@ -356,6 +404,307 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
    return(undef);
+}
+
+sub getValidWebFunctions
+{
+   my $self=shift;
+   return("Manager","Process",
+          $self->SUPER::getValidWebFunctions());
+}
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   trim($newrec) if (defined($newrec));
+   my $name=$newrec->{"scname"};
+   if (($name=~m/^\s*$/) || length($name)<10){
+      $self->LastMsg(ERROR,"incident name invalid or to short");
+      return(undef);
+   }
+   my $desc=$newrec->{"scdescription"};
+   if (($desc=~m/^\s*$/) || length($desc)<20){
+      $self->LastMsg(ERROR,"incident description invalid or to short");
+      return(undef);
+   }
+
+
+   my $app=$newrec->{"sccustapplication"};
+   if ($app ne ""){
+      my $appl=getModuleObject($self->Config,"TS::appl");
+      $appl->SetFilter({name=>\$app});
+      my ($arec,$msg)=$appl->getOnlyFirst(qw(acapplname acinmassingmentgroup));
+      if (!defined($arec)){
+         $self->LastMsg(ERROR,"invalid application specified");
+         return(undef);
+      }
+      if ($arec->{acapplname} eq ""){
+         $self->LastMsg(ERROR,"can not detect the offizial applicationname");
+         return(undef);
+      }
+      if ($newrec->{scapplname} eq ""){
+         $newrec->{scapplname}=$arec->{acapplname};
+      }
+      if ($newrec->{scassingmentgroup} eq ""){
+         if ($arec->{acinmassingmentgroup} eq ""){
+            $self->LastMsg(ERROR,"no inm assignmentgroup for application");
+            return(undef);
+         }
+         else{
+            $newrec->{scassingmentgroup}=$arec->{acinmassingmentgroup};
+         }
+      }
+   }
+   else{
+      $self->LastMsg(ERROR,"no application specified");
+      return(undef);
+   }
+printf STDERR ("fifi Validate=%s\n",Dumper($newrec));
+   return(1);
+}
+
+
+sub InsertRecord   # fake write request to SC
+{
+   my $self=shift;
+   my $newrec=shift;
+   my $IncidentNumber;
+
+   my $userid=$self->getCurrentUserId();
+   my $user=getModuleObject($self->Config,"base::user");
+   $user->SetFilter({userid=>\$userid});
+   my ($urec,$msg)=$user->getOnlyFirst(qw(ALL));
+
+   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+   my $username=$newrec->{'SCUsername'};
+   delete($newrec->{'SCUsername'});
+   my $password=$newrec->{'SCPassword'};
+   delete($newrec->{'SCPassword'});
+   msg(INFO,"start SC login for $ENV{REMOTE_USER}");
+   my $sc=$self->getSC($username,$password);
+   if (!defined($sc)){
+      $self->LastMsg(ERROR,"ServiceCenter Login failed");
+      return(undef);
+   }
+   msg(INFO,"start SC CreateIncident for $ENV{REMOTE_USER}");
+   my %Incident=(
+                 'brief.description'      =>$newrec->{scname},
+                 'problem.shortname'      =>'TS_DE_BAMBERG_GUTENBERG_13',
+                 'reported.shortname'     =>'TS_DE_BAMBERG_GUTENBERG_13',
+                 'component.shortname'    =>'TS_DE_BAMBERG_GUTENBERG_13',
+                 'contact.shortname'      =>'TS_DE_BAMBERG_GUTENBERG_13',
+                 'dsc.device.city'        =>"Bamberg",
+                 'dsc.contact.city'       =>"Bamberg",
+                 'dsc.reported.city'      =>"Bamberg",
+                 'dsc.device.zip'         =>"96050",
+                 'dsc.contact.zip'        =>"96050",
+                 'dsc.reported.zip'       =>"96050",
+                 'dsc.device.street'      =>"Gutenbergstr. 13",
+                 'dsc.contact.street'     =>"Gutenbergstr. 13",
+                 'dsc.reported.street'    =>"Gutenbergstr. 13",
+                 'dsc.device.company'     =>"T-Systems International GmbH",
+                 'dsc.contact.company'    =>"T-Systems International GmbH",
+                 'dsc.reported.company'   =>"T-Systems International GmbH",
+                 'contact.company'        =>"T-Systems International GmbH",
+                 'contact.country.code'   =>"DE",
+                 'component.country.code' =>"DE",
+                 'reported.country.code'  =>"DE",
+                 'assignment'             =>$newrec->{'scassingmentgroup'},
+                 'home.assignment'        =>'CSS.TCOM.W5BASE',
+                 'priority.code'          =>'3',
+                 'urgency'                =>'Medium',
+                 'business.impact'        =>'Medium',
+                 'dsc.criticality'        =>'Low',
+                 'sla.relevant'           =>'No',
+                 'category'               =>'SOFTWARE',
+                 'company'                =>'T-Systems International GmbH',
+                 'subcategory1'           =>'OTHER',
+                 'dsc.service'            =>$newrec->{scapplname},
+                 'reported.lastname'      =>$urec->{surname},
+                 'reported.firstname'     =>$urec->{givenname},
+                 'reported.by'            =>uc($urec->{posix}),
+                 'contact.lastname'       =>$urec->{surname},
+                 'contact.firstname'      =>$urec->{givenname},
+                 'contact.name'           =>uc($urec->{posix}),
+                 'referral.no'            =>"W5Base",
+                 'contact.mail.address'   =>$urec->{email},
+                 'category.type'          =>'APPLICATION',
+                 'action'                 =>$newrec->{scdescription});
+
+   printf STDERR ("fifi d=%s\n",Dumper(\%Incident));
+
+   if (!defined($IncidentNumber=$sc->IncidentCreate(\%Incident))){
+      $self->LastMsg(ERROR,"SC: ".$sc->LastMessage());
+      $sc->Logout();
+      return(undef);
+   }
+   msg(INFO,"end SC CreateIncident for $ENV{REMOTE_USER}");
+
+   $sc->Logout();
+   return($IncidentNumber);
+}
+
+
+sub ValidatedInsertRecord
+{
+   my $self=shift;
+   my $newrec=shift;
+
+   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+   if (!$self->preValidate(undef,$newrec)){
+      if ($self->LastMsg()==0){
+         $self->LastMsg(ERROR,"ValidatedInsertRecord: ".
+                              "unknown error in ${self}::preValidate()");
+      }
+   }
+   else{
+      if ($self->Validate(undef,$newrec)){
+         $self->finishWriteRequestHash(undef,$newrec);
+         my $bak=$self->InsertRecord($newrec);
+         $self->SendRemoteEvent("ins",undef,$newrec,$bak) if ($bak);
+         $self->FinishWrite(undef,$newrec) if ($bak);
+         return($bak);
+      }
+      else{
+         if ($self->LastMsg()==0){
+            $self->LastMsg(ERROR,"ValidatedInsertRecord: ".
+                                 "unknown error in ${self}::Validate()");
+         }
+      }
+   }
+   return(undef);
+}
+
+
+
+sub CreateApplicationIncident
+{
+   my $self=shift;
+   my %param=@_;
+
+   my $username=Query->Param("SCUsername");
+   my $password=Query->Param("SCPassword");
+   my $IncidentNumber;
+   my $newrec=$self->getWriteRequestHash("nativweb");;
+   foreach my $k (keys(%$newrec)){ # remove utf8 code while ajax request
+       $newrec->{$k}=utf8($newrec->{$k})->latin1();
+   }
+   print STDERR "WriteRequestHash:".Dumper($newrec);
+
+   if (my $IncidentNumber=$self->ValidatedInsertRecord($newrec)){
+      $self->LastMsg(OK,"CreateIncident ($IncidentNumber) is ok");
+   }
+   return($IncidentNumber);
+}
+
+
+sub Process
+{
+   my $self=shift;
+   if (my $op=Query->Param("Do")){
+      Query->Delete("Do"); 
+      if ($op eq "Login"){
+         $self->LastMsg(OK,"ServiceCenter login successful");
+      }
+      if ($op eq "CreateApplicationIncident"){
+         if (!($self->CreateApplicationIncident())){
+            if ($self->LastMsg()==0){
+               $self->LastMsg(ERROR,"create failed - unknown problem");
+            }
+         }
+      }
+      print $self->HttpHeader("text/xml");
+      my $res=hash2xml({document=>{
+             htmlresult=>$self->findtemplvar({},"LASTMSG")}},{header=>1});
+      print $res;
+      return;
+   }
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css',
+                                   'kernel.App.Web.css',
+                                   'Output.HtmlDetail.css',
+                                   'jquery.autocomplete.css'
+                                 ],
+                           title=>'ServiceCenter Incident Creator',
+                           js=>[qw( toolbox.js jquery.js jquery.autocomplete.js)],
+                           body=>1,form=>1,target=>'result');
+   my $mask=<<EOF;
+<table border=1>
+</tr>
+<tr>
+<td class=fname> %scname(label)% </td>
+<td class=finput> %scname(forceedit)% </td>
+</tr>
+<tr>
+<td class=fname> %sccustapplication(label)% </td>
+<td class=finput> %sccustapplication(forceedit)% </td>
+</tr>
+<tr>
+<td class=fname> %sctype(label)% </td>
+<td class=finput> %sctype(forceedit)% </td>
+</tr>
+<tr>
+<td class=fname> %scimpact(label)% </td>
+<td class=finput> %scimpact(forceedit)% </td>
+</tr>
+<tr>
+<td class=fname valign=top> %scdescription(label)% </td>
+<td class=finput> %scdescription(forceedit)% </td>
+</tr>
+<tr>
+<td colspan=2>
+<input style="width:100%" type=button 
+       onclick="parent.doOP(this,'CreateApplicationIncident','result')" 
+       value="Create">
+</td>
+</table>
+EOF
+   $self->ParseTemplateVars(\$mask);
+   print $mask;
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+
+sub Manager
+{
+   my $self=shift;
+
+   my $userid=$self->getCurrentUserId();
+   my $user=getModuleObject($self->Config,"base::user");
+   $user->SetFilter({userid=>\$userid});
+   my ($urec,$msg)=$user->getOnlyFirst(qw(ALL));
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css',
+                                   'kernel.App.Web.css',
+                                   'Output.HtmlDetail.css',
+                                 ],
+                           title=>'ServiceCenter Incident Creator',
+                           js=>[qw( toolbox.js)],
+                           body=>1,form=>1,target=>'result');
+
+   $self->ResetFilter();
+   my $posix=uc($urec->{posix});
+   $self->SetFilter({openedby=>\$posix,status=>'!closed'});
+   print("<table>");
+   print("<tr><th>Incidentnumber</th>".
+         "<th>State</th><th>Short description</th></tr>");
+   foreach my $irec ($self->getHashList(qw(status incidentnumber name
+                                           downtimestart downtimeend))){
+      printf("<form name=\"%s\">",$irec->{incidentnumber});
+      printf("<tr><td>%s</td><td>%s</td><td>%s</td></tr>",
+             $irec->{incidentnumber},$irec->{status},$irec->{name});
+      printf("</form>");
+   }
+   print("</table>");
+
+
+   
+
+   print $self->HtmlBottom(body=>1,form=>1);
 }
 
 

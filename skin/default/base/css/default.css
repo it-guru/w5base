@@ -123,6 +123,15 @@ div.context_menu td.active {
         padding:0px;
 }
 
+iframe.subframe{
+	margin: 0px;
+	padding: 0px;
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+
+
 iframe.popupFrame {
 	margin: 0px;
 	padding: 0px;

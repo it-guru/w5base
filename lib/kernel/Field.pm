@@ -22,6 +22,7 @@ use kernel;
 use kernel::Field::Id;
 use kernel::Field::Vector;
 use kernel::Field::Text;
+use kernel::Field::FlexBox;
 use kernel::Field::Databoss;
 use kernel::Field::Password;
 use kernel::Field::Phonenumber;
@@ -207,8 +208,8 @@ sub getSimpleInputField
 
    my $unit=$self->unit;
    $unit="<td width=40>$unit</td>" if ($unit ne "");
-   my $inputfield="<input type=text value=\"$value\" ".
-                  "name=Formated_$name class=finput>";
+   my $inputfield="<input type=\"text\" id=\"$name\" value=\"$value\" ".
+                  "name=\"Formated_$name\" class=\"finput\">";
    if (ref($self->{getHtmlImputCode}) eq "CODE"){
       $inputfield=&{$self->{getHtmlImputCode}}($self,$value,$readonly);
    }
@@ -327,7 +328,10 @@ sub vjoinContext
 {
    my $self=shift;
    return(undef) if (!defined($self->{vjointo}));
-   my $context=$self->{vjointo}.";".join(",",@{$self->{vjoinon}});
+   my $context=$self->{vjointo}.";";
+   if (ref($self->{vjoinon}) eq "ARRAY"){
+      $context.=join(",",@{$self->{vjoinon}});
+   }
    if (defined($self->{vjoinbase})){
 #printf STDERR ("fifi vjoinbase=%s on %s\n",$self->{vjoinbase},$self->Name());
       my @l;
@@ -629,7 +633,8 @@ sub RawValue
       $current->{$self->Name()}=&{$self->{onRawValue}}($self,$current);
       $d=$current->{$self->Name()};
    }
-   elsif (defined($self->{vjointo})){
+   elsif (defined($self->{vjointo}) && 
+          $self->Self() ne "kernel::Field::FlexBox"){
       my $c=$self->getParent->Context();
       $c->{JoinData}={} if (!exists($c->{JoinData}));
       $c=$c->{JoinData};

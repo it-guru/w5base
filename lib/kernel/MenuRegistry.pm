@@ -21,7 +21,6 @@ use vars qw(@ISA);
 use strict;
 use kernel;
 use kernel::SubDataObj;
-use Data::Dumper;
 
 @ISA=qw(kernel::SubDataObj);
 

@@ -30,6 +30,23 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
+      new kernel::Field::Text(
+                name          =>'acapplname',
+                label         =>'official AssetManager Applicationname',
+                group         =>'source',
+                htmldetail    =>0,
+                searchable    =>0,
+                depend        =>['applid','name'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   if ($current->{name} ne "" &&
+                       $current->{applid} ne ""){
+                      return(uc($current->{name}." (".$current->{applid}.")"));
+                   }
+                   return(undef);
+                }),
+
       new kernel::Field::Link(
                 name          =>'acinmassignmentgroupid',
                 group         =>'control',

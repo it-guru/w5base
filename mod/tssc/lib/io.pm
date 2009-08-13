@@ -874,6 +874,36 @@ sub mkIncidentStoreRec
    return(\%wfrec,$updateto);
 }
 
+sub getSC
+{
+   my $self=shift;
+   my $username=shift;
+   my $password=shift;
+
+   my $sc;
+   eval("use SC::Customer::TSystems;\$sc=new SC::Customer::TSystems;");
+   return(undef) if (!defined($sc));
+
+   my $dataobjconnect=$self->Config->Param('DATAOBJCONNECT');
+   my $SCuri=$dataobjconnect->{tsscui};
+
+   if (!$sc->Connect($SCuri,uc($username),$password)){
+      printf STDERR ("ERROR: ServiceCenter connect failed\n");
+      printf STDERR ("ERROR: $username \@ $password\n");
+      $sc->Logout();
+      return(undef);
+   }
+   if (!$sc->Login()){
+      printf STDERR ("ERROR: SC URL=$SCuri\n");
+      printf STDERR ("ERROR: SC User=$username\n");
+      printf STDERR ("ERROR: ServiceCenter login failed\n");
+      $sc->Logout();
+      return(undef);
+   }
+   return($sc);
+}
+
+
 
 
 
