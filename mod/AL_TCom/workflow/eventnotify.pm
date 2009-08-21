@@ -152,9 +152,6 @@ sub getNotifyDestinations
    return($self->SUPER::getNotifyDestinations($mode,$WfRec,$emailto));
 }
 
-
-
-
 sub IsModuleSelectable
 {
    my $self=shift;
@@ -236,19 +233,37 @@ sub getNotificationSubject
    my $subjectlabel=shift;
    my $failclass=shift;
    my $ag=shift;
-   my $subject;
-   my $colon;
-   $colon=":" if ($ag ne "");              
-   $subject="$ag$colon Kundeninformation Anwendungsausfall/Störung";
+   my $state;
+   my $id=$WfRec->{id};
+   $self->getParent->Action->ResetFilter();
+   $self->getParent->Action->SetFilter({wfheadid=>\$id});
+   my @l=$self->getParent->Action->getHashList(qw(cdate name));
+   my $sendcustinfocount=1;
+   foreach my $arec (@l){
+      $sendcustinfocount++ if ($arec->{name} eq "sendcustinfo");
+   }
+
+#print STDERR ("fifi %s\n",Dumper($WfRec));
+   if ($WfRec->{stateid} == 17){
+     $state=$self->getParent->T("finish info","itil::workflow::eventnotify");
+   }elsif ($sendcustinfocount > 1){
+     $state=$self->getParent->T("follow info","itil::workflow::eventnotify");
+   }else{
+     $state=$self->getParent->T("first information","itil::workflow::eventnotify");
+   }
+   my $afcust=$WfRec->{affectedcustomer}->[0]; # only first customer will be displayed
+   my $subject="EK ".$WfRec->{eventstatclass};
+   my $subject2=" / $ag / $state Incident / ".$afcust." / Applikation / ";
    if ($WfRec->{eventmode} eq "EVk.net"){ 
-      $subject="Kundeninformation Netzausfall/Störung";
+      $subject2=" / $state Incident / $afcust / Netz / ";
    }
    if ($WfRec->{eventmode} eq "EVk.infraloc"){ 
-      $subject="Kundeninformation Infrastruktur-Störung";
+      $subject2=" / $state Incident / Infrastruktur / ";
    }
    if ($action eq "rootcausei"){
-      $subject="$ag$colon Ursachenanalyse";
+      $subject2=" / $ag / Ursachenanalyse / $afcust / Applikation /";
    }
+   $subject.=$subject2;
    $subject.=" HeadID ".$WfRec->{id};
    return($subject);
 }
@@ -726,7 +741,7 @@ sub Process
 
       my $failclass=$WfRec->{eventstatclass};
       my $subject=$self->getParent->getNotificationSubject($WfRec,"rootcausei",
-                                                $subjectlabel,$failclass,$ag);
+                                    $subjectlabel,$failclass,$ag);
       my $salutation=$self->getParent->getSalutation($WfRec,"rootcausei",$ag);
 
       my $eventstat=$WfRec->{stateid};
