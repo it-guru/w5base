@@ -1672,93 +1672,73 @@ EOF
    return($templ);
 }
 
-sub Validate
-{
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-   my $origrec=shift;
-
-   my $eventlang;
-   foreach my $v (qw(name eventstartofevent)){
-      if ((!defined($oldrec) || exists($newrec->{$v})) && $newrec->{$v} eq ""){
-         $self->LastMsg(ERROR,"field '%s' is empty",
-                        $self->getField($v)->Label());
-         return(0);
-      }
-   }
-   if ($newrec->{eventstatnature} eq "EVn.info"){
-      $newrec->{eventstatclass}=4;
-   }
-   if ($newrec->{eventmode} eq "EVk.appl"){
-      my $applid=$newrec->{affectedapplicationid};
-      if (!ref($newrec->{affectedapplicationid}) eq "ARRAY"){
-         $applid=[$newrec->{affectedapplicationid}];
-      }
-      my $appl=getModuleObject($self->Config,"itil::appl");
-      $appl->SetFilter({id=>$applid,cistatusid=>"<=4"});
-      my (%mandator,%mandatorid,%responseteam,%businessteam,%conumber,
-          %customer,%customerid,%custcontract,%custcontractid);
-      foreach my $rec ($appl->getHashList(qw(mandator mandatorid 
-                               customer customerid businessteam responseteam
-                               conumber
-                               custcontracts eventlang))){
-         $responseteam{$rec->{responseteam}}=1 if ($rec->{responseteam} ne "");
-         $businessteam{$rec->{businessteam}}=1 if ($rec->{businessteam} ne "");
-         $customer{$rec->{customer}}=1 if ($rec->{customer} ne "");
-         $customerid{$rec->{customerid}}=1 if ($rec->{customerid} ne "");
-         $mandator{$rec->{mandator}}=1 if ($rec->{mandator} ne "");
-         $mandatorid{$rec->{mandatorid}}=1 if ($rec->{mandatorid} ne "");
-         $conumber{$rec->{conumber}}=1 if ($rec->{conumber} ne "");
-         $eventlang=$rec->{eventlang};
-         if (ref($rec->{custcontracts}) eq "ARRAY"){
-            foreach my $contr (@{$rec->{custcontracts}}){
-               if ($contr->{custcontract} ne ""){
-                  $custcontract{$contr->{custcontract}}=1;
-                  $custcontractid{$contr->{custcontractid}}=1;
-               }
-            }
-         }
-      }
-      if (keys(%mandatorid)==0){
-         $self->LastMsg(ERROR,"invalid application specified");
-         return(0);
-      }
-      $newrec->{kh}->{mandatorid}=[keys(%mandatorid)];
-      $newrec->{kh}->{mandator}=[keys(%mandator)];
-      $newrec->{mandatorid}=[keys(%mandatorid)];
-      $newrec->{mandator}=[keys(%mandator)];
-      $newrec->{kh}->{affectedcontract}=[keys(%custcontract)];
-      $newrec->{kh}->{affectedcontractid}=[keys(%custcontractid)];
-      $newrec->{affectedcontract}=[keys(%custcontract)];
-      $newrec->{affectedcontractid}=[keys(%custcontractid)];
-      $newrec->{kh}->{affectedcustomer}=[keys(%customer)];
-      $newrec->{kh}->{affectedcustomerid}=[keys(%customerid)];
-      $newrec->{affectedcustomer}=[keys(%customer)];
-      $newrec->{affectedcustomerid}=[keys(%customerid)];
-      $newrec->{involvedcustomer}=[keys(%customer)];
-      $newrec->{involvedcostcenter}=[keys(%conumber)];
-      $newrec->{involvedbusinessteam}=[keys(%businessteam)];
-      $newrec->{involvedresponseteam}=[keys(%responseteam)];
-   }
-   my %groups=$self->getGroupsOf($ENV{REMOTE_USER},
-                                 ['REmployee','RBoss','RBoss2'],'direct');
-   my @grpids=keys(%groups);
-   if ($#grpids!=-1){
-      $newrec->{initiatorgroupid}=\@grpids;
-      $newrec->{initiatorgroup}=[map({$groups{$_}->{fullname}} @grpids)];
-   }
-   $eventlang=$self->getParent->Lang() if ($eventlang eq "");
-   $eventlang="en" if ($eventlang eq "");
-   $newrec->{eventlang}=$eventlang;
-   #printf STDERR ("fifi affectedapplicationid=%s",Dumper($newrec));
-   if (!$self->getParent->ValidateCreate($newrec)){
-      return(0);
-   }
-   $newrec->{step}=$self->getNextStep();
-
-   return(1);
-}
+#sub Validate
+#{
+#   my $self=shift;
+#   my $oldrec=shift;
+#   my $newrec=shift;
+#   my $origrec=shift;
+#
+#   my $eventlang;
+#   foreach my $v (qw(name eventstartofevent)){
+#      if ((!defined($oldrec) || exists($newrec->{$v})) && $newrec->{$v} eq ""){
+#         $self->LastMsg(ERROR,"field '%s' is empty",
+#                        $self->getField($v)->Label());
+#         return(0);
+#      }
+#   }
+#   if ($newrec->{eventmode} eq "EVk.appl"){
+#      my $applid=$newrec->{affectedapplicationid};
+#      if (!ref($newrec->{affectedapplicationid}) eq "ARRAY"){
+#         $applid=[$newrec->{affectedapplicationid}];
+#      }
+#      my $appl=getModuleObject($self->Config,"itil::appl");
+#      $appl->SetFilter({id=>$applid,cistatusid=>"<=4"});
+#      my (%mandator,%mandatorid,%responseteam,%businessteam,%conumber,
+#          %customer,%customerid,%custcontract,%custcontractid);
+#      foreach my $rec ($appl->getHashList(qw(mandator mandatorid 
+#                               customer customerid businessteam responseteam
+#                               conumber
+#                               custcontracts eventlang))){
+#         $responseteam{$rec->{responseteam}}=1 if ($rec->{responseteam} ne "");
+#         $businessteam{$rec->{businessteam}}=1 if ($rec->{businessteam} ne "");
+#         $customer{$rec->{customer}}=1 if ($rec->{customer} ne "");
+#         $customerid{$rec->{customerid}}=1 if ($rec->{customerid} ne "");
+#         $mandator{$rec->{mandator}}=1 if ($rec->{mandator} ne "");
+#         $mandatorid{$rec->{mandatorid}}=1 if ($rec->{mandatorid} ne "");
+#         $conumber{$rec->{conumber}}=1 if ($rec->{conumber} ne "");
+#         $eventlang=$rec->{eventlang};
+#         if (ref($rec->{custcontracts}) eq "ARRAY"){
+#            foreach my $contr (@{$rec->{custcontracts}}){
+#               if ($contr->{custcontract} ne ""){
+#                  $custcontract{$contr->{custcontract}}=1;
+#                  $custcontractid{$contr->{custcontractid}}=1;
+#               }
+#            }
+#         }
+#      }
+#      if (keys(%mandatorid)==0){
+#         $self->LastMsg(ERROR,"invalid application specified");
+#         return(0);
+#      }
+#      $newrec->{kh}->{mandatorid}=[keys(%mandatorid)];
+#      $newrec->{kh}->{mandator}=[keys(%mandator)];
+#      $newrec->{mandatorid}=[keys(%mandatorid)];
+#      $newrec->{mandator}=[keys(%mandator)];
+#      $newrec->{kh}->{affectedcontract}=[keys(%custcontract)];
+#      $newrec->{kh}->{affectedcontractid}=[keys(%custcontractid)];
+#      $newrec->{affectedcontract}=[keys(%custcontract)];
+#      $newrec->{affectedcontractid}=[keys(%custcontractid)];
+#      $newrec->{kh}->{affectedcustomer}=[keys(%customer)];
+#      $newrec->{kh}->{affectedcustomerid}=[keys(%customerid)];
+#      $newrec->{affectedcustomer}=[keys(%customer)];
+#      $newrec->{affectedcustomerid}=[keys(%customerid)];
+#      $newrec->{involvedcustomer}=[keys(%customer)];
+#   }
+#   $newrec->{step}=$self->getNextStep();
+#
+#   return(1);
+#}
 
 sub nativProcess
 {
@@ -1772,6 +1752,19 @@ sub nativProcess
 
    if ($action eq "NextStep"){
       $h->{closedate}=undef;
+
+      my $eventlang;
+      $eventlang=$self->getParent->Lang() if ($eventlang eq "");
+      $eventlang="en" if ($eventlang eq "");
+      $h->{eventlang}=$eventlang;
+
+      my %groups=$self->getGroupsOf($ENV{REMOTE_USER},
+                                    ['REmployee','RBoss','RBoss2'],'direct');
+      my @grpids=keys(%groups);
+      if ($#grpids!=-1){
+         $h->{initiatorgroupid}=\@grpids;
+         $h->{initiatorgroup}=[map({$groups{$_}->{fullname}} @grpids)];
+      }
       if ($h->{eventmode} eq "EVk.infraloc"){
          my $loc=$h->{affectedlocation};
          $loc=$h->{affectedlocation}->[0] if (ref($h->{affectedlocation}));
@@ -1783,17 +1776,30 @@ sub nativProcess
          if (ref($h->{affectedapplication})){
             $app=$h->{affectedapplication}->[0];
          }
+         if ($h->{eventstatnature} eq "EVn.info"){
+            $h->{eventstatclass}=4;
+         }
          my $appl=getModuleObject($self->getParent->getParent->Config,
                                   "itil::appl");
          $appl->SetFilter({cistatusid=>"<5",id=>$h->{affectedapplicationid}});
          my ($arec,$msg)=$appl->getOnlyFirst(qw(name customer customerid 
+                                                mandator mandatorid conumber
+                                                responseteam businessteam
                                                 custcontracts id));
          if (defined($arec)){
             $app=$arec->{name};
             $h->{affectedapplicationid}=[$arec->{id}];   
             $h->{affectedapplication}=[$arec->{name}];   
+            $h->{mandatorid}=[$arec->{mandatorid}];   
+            $h->{mandator}=[$arec->{mandator}];   
+            $h->{involvedbusinessteam}=[$arec->{businessteam}];
+            $h->{involvedresponseteam}=[$arec->{businessteam}];
+            $h->{involvedcostcenter}=[$arec->{conumber}];
             my @custcontract;
             my @custcontractid;
+            if (!$self->getParent->ValidateCreate($h)){
+               return(0);
+            }
             foreach my $contr (@{$arec->{custcontracts}}){
                push(@custcontract,$contr->{custcontract});
                push(@custcontractid,$contr->{custcontractid});
