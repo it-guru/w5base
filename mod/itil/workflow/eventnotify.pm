@@ -1726,6 +1726,8 @@ sub Validate
       }
       $newrec->{kh}->{mandatorid}=[keys(%mandatorid)];
       $newrec->{kh}->{mandator}=[keys(%mandator)];
+      $newrec->{mandatorid}=[keys(%mandatorid)];
+      $newrec->{mandator}=[keys(%mandator)];
       $newrec->{kh}->{affectedcontract}=[keys(%custcontract)];
       $newrec->{kh}->{affectedcontractid}=[keys(%custcontractid)];
       $newrec->{affectedcontract}=[keys(%custcontract)];
