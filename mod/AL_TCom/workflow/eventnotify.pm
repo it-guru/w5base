@@ -194,9 +194,9 @@ sub ValidateCreate
   #
   # laut Tino soll nun auch Extern zugelassen werden
   #
-   if (!defined($newrec->{kh}->{mandator}) ||    
-       ref($newrec->{kh}->{mandator}) ne "ARRAY" ||
-       !grep(/^(Extern|AL T-Com)$/,@{$newrec->{kh}->{mandator}})){
+   if (!defined($newrec->{mandator}) ||    
+       ref($newrec->{mandator}) ne "ARRAY" ||
+       !grep(/^(Extern|AL T-Com)$/,@{$newrec->{mandator}})){
       $self->LastMsg(ERROR,"no AL T-Com mandator included");
       return(0);
    }
