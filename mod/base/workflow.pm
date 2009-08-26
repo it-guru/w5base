@@ -2199,7 +2199,7 @@ sub DataObj_findtemplvar
             $mand->SetFilter({cistatusid=>[4]}); 
          }
          else{
-            $mand->SetFilter({grpid=>\@curval,cistatusid=>[4]}); 
+            $mand->SetFilter({grpid=>\@curval}); 
          }
          my @m=$mand->getHashList(qw(grpid name));
          $d.=join(", ",map({$_->{name}} @m));
