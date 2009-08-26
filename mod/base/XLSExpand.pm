@@ -379,15 +379,29 @@ sub ProcessFile
            }
         }
       }
+      my %outkey;
+      foreach my $obj (values(%{$self->{XLSExpand}})){
+         my $h=$obj->GetKeyCriterion();
+         foreach my $v (keys(%{$h->{out}})){
+            $outkey{$v}=$h->{out}->{$v}->{label};
+         }
+      }
+
       if (defined($maxrow) && keys(%globalrec)>0){
          my $c=0;
          $oBook->AddCell($iSheet,$maxrow+2,0,"Summary:",0);
+         my $sSheet=$oBook->AddWorksheet('Summary');
          $c++;
          my %l;
          foreach my $k (keys(%globalrec)){
-            $oBook->AddCell($iSheet,$maxrow+2+$c,0,$k.":",0);
+            $oBook->AddCell($iSheet,$maxrow+2+$c,0,$outkey{$k}.":",0);
             $oBook->AddCell($iSheet,$maxrow+2+$c,1,
                             join("; ",sort(keys(%{$globalrec{$k}}))),0);
+            $oBook->AddCell($sSheet,0,$c-1,$outkey{$k},0);
+            my $sRow=1;
+            foreach my $v (sort(keys(%{$globalrec{$k}}))){
+               $oBook->AddCell($sSheet,$sRow++,$c-1,$v,0);
+            }
             $c++;
          }
       }
@@ -429,16 +443,19 @@ sub ProcessLine
    my $in=shift;
    my $out=shift;
    my $loopcount=1; 
-   my @proclist=sort({$a->getPriority() <=> $b->getPriority()} values(%{$self->{XLSExpand}}));
+   my @proclist=sort({$a->getPriority() <=> $b->getPriority()} 
+                     values(%{$self->{XLSExpand}}));
    my @failproc;
 
    while($#proclist!=-1 && $loopcount<10){
       @failproc=();
       foreach my $obj (@proclist){
+         msg(INFO,"ProcessLine for $obj");
          my $isprocessed=$obj->ProcessLine($line,$in,$out,$loopcount);
          if (!$isprocessed){
             push(@failproc,$obj);
          }
+         msg(INFO,"ProcessLine for $obj returned $isprocessed");
       }
       if ($loopcount>1){
          @proclist=@failproc;

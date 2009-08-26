@@ -189,11 +189,12 @@ sub ProcessLine
       }
       map({$_->{cistatusid}=\'4'} @flt);
       $sys->SetFilter(\@flt);
-      if (grep(/^itil::appl::.*$/,keys(%{$out}))||
-          grep(/^itil::system::.*$/,keys(%{$out}))){
+      if (grep(/^.*::appl::.*$/,keys(%{$out}))||
+          grep(/^.*::system::.*$/,keys(%{$out}))){
+         $in->{'itil::appl::id'}=undef if (!exists($in->{'itil::appl::id'}));
          foreach my $rec ($sys->getHashList(qw(id applications))){
             $in->{'itil::system::id'}->{$rec->{'id'}}++;
-            if (grep(/^itil::appl::.*$/,keys(%{$out}))){
+            if (grep(/^.*::appl::.*$/,keys(%{$out}))){
                if (ref($rec->{applications}) eq "ARRAY"){
                   foreach my $app (@{$rec->{applications}}){
                      if (exists($out->{'itil::appl::name'})){
