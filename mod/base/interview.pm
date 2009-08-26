@@ -60,11 +60,25 @@ sub new
       new kernel::Field::Contact(
                 name          =>'contact',
                 label         =>'Contact',
+                readonly      =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+                   my $userid=$self->getParent->getCurrentUserId();
+                   return(1) if ($userid==$rec->{$self->{name}."id"});
+                   return(0);
+                },
                 vjoinon       =>'contactid'),
 
       new kernel::Field::Contact(
                 name          =>'contact2',
                 label         =>'Deputy Contact',
+                readonly      =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+                   my $userid=$self->getParent->getCurrentUserId();
+                   return(1) if ($userid==$rec->{$self->{name}."id"});
+                   return(0);
+                },
                 vjoinon       =>'contact2id'),
 
       new kernel::Field::Text(
@@ -96,7 +110,9 @@ sub new
       new kernel::Field::Select(
                 name          =>'questtyp',
                 transprefix   =>'QT.', 
-                value         =>['percent','percenta','text'],
+                htmleditwidth =>'200px',
+                value         =>['percent','percenta','text',
+                                 'boolean','booleana'],
                 label         =>'Question Typ',
                 dataobjattr   =>'interview.questtyp'),
 
@@ -168,6 +184,7 @@ sub new
                 dataobjattr   =>'interview.realeditor'),
 
    );
+   $self->{history}=[qw(insert modify delete)];
    $self->setDefaultView(qw(linenumber questclust name groupname cdate mdate));
    $self->setWorktable("interview");
    return($self);
@@ -180,7 +197,7 @@ sub Validate
    my $newrec=shift;
 
    my $name=trim(effVal($oldrec,$newrec,"name"));
-   if ($name=~m/^\s*$/i){
+   if (length($name)<10 || ($name=~m/^\s*$/i)){
       $self->LastMsg(ERROR,"invalid question specified"); 
       return(undef);
    }
@@ -233,11 +250,24 @@ sub isViewValid
    return("ALL");
 }
 
+sub isDeleteValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return($self->isWriteValid($rec)) if ($self->IsMemberOf("admin"));
+   return(undef); 
+}
 sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default") if ($self->IsMemberOf("admin"));
+   my $userid=$self->getCurrentUserId();
+  
+   return("default") if (!defined($rec) &&
+                         $self->IsMemberOf("admin"));
+   return("default") if ($rec->{contactid}==$userid ||
+                         $rec->{contact2id}==$userid ||
+                         $self->IsMemberOf("admin"));
    return(undef);
 }
 
@@ -300,6 +330,27 @@ sub getHtmlEditElements
    $HTMLcomments="<textarea name=comments onchange=submitChange(this) ".
                  "rows=2 style=\"width:100%\">$answer->{comments}</textarea>";
    $HTMLanswer=" - ? - ";
+   if ($irec->{questtyp} eq "boolean" ||
+       $irec->{questtyp} eq "booleana"){
+      my $a=$answer->{answer};
+      my $sel="<select name=answer onchange=submitChange(this) ".
+              "style=\"width:80px\">";
+      
+      $sel.="<option ";
+      $sel.="value=\"\"></option>";
+
+      $sel.="<option ";
+      $sel.="selected " if ($a==1);
+      $sel.="value=\"1\">".$self->T("yes")."</option>";
+
+      $sel.="<option ";
+      $sel.="selected " if ($a!=1 && $a ne "");
+      $sel.="value=\"0\">".$self->T("no")."</option>";
+
+      $sel.="</select>";
+      my $p="<table class=Panswer><tr><td align=center>$sel</td></tr></table>";
+      $HTMLanswer="<div style=\"width:100%;padding:1px;margin:0\">$p</div>";
+   }
    if ($irec->{questtyp} eq "percent" ||
        $irec->{questtyp} eq "percenta"){
       my $a=int($answer->{answer}/10);

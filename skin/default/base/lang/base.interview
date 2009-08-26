@@ -7,6 +7,8 @@
 'Question prio'=>{de=>'Priorität der Frage'},
 'Question Typ'=>{de=>'Frageart'},
 'QuestionID'=>{de=>'FrageID'},
+'QT.boolean'=>{de=>'Ja/Nein',en=>'yes/no'},
+'QT.booleana'=>{de=>'Ja/Nein (Antwort ausreichend)',en=>'yes/no (answer sufficient)'},
 'QT.percent'=>{de=>'Prozent',en=>'percent'},
 'QT.percenta'=>{de=>'Prozent (Antwort ausreichend)',en=>'percent (answer sufficient)'},
 'QT.text'=>{de=>'Freitext',en=>'free text'},
