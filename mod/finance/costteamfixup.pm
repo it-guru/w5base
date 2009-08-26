@@ -19,6 +19,7 @@ package finance::costteamfixup;
 use strict;
 use vars qw(@ISA);
 use kernel;
+use kernel::Field;
 use kernel::App::Web::Listedit;
 use kernel::DataObj::DB;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
