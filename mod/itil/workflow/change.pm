@@ -206,6 +206,39 @@ sub activateMailSend
    return(0);
 }
 
+sub getPosibleActions
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my @l=qw(wffollowup);
+   return(@l);
+}
+
+sub getFollowupTargetUserids
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $note=shift;
+   my @to;
+   my @cc;
+   my ($to,$cc)=$self->SUPER::getFollowupTargetUserids($WfRec,$note);
+   @to=@$to;
+   @cc=@$cc;
+
+   if (defined($WfRec->{affectedapplicationid}) &&
+       ref($WfRec->{affectedapplicationid}) eq "ARRAY"){
+      my $appl=getModuleObject($self->Config,"itil::appl");
+      $appl->SetFilter({id=>$WfRec->{affectedapplicationid}});
+      foreach my $arec ($appl->getHashList(qw(tsmid))){
+         push(@to,$arec->{tsmid}) if ($arec->{tsmid} ne "");
+      }
+   }
+
+   return(\@to,\@cc);
+}
+
+
+
 
 sub generateMailSet
 {
