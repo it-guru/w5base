@@ -171,6 +171,7 @@ sub PostProcess
                            $param{note},
                            mode=>'FOLLOWUP:',
                            workflowname=>$WfRec->{name},
+                           addtarget=>$param{addtarget},
                            sendercc=>1);
    }
 
@@ -201,15 +202,22 @@ sub nativProcess
          return(0);
       }
       $note=trim($note);
+      my ($to,$cc)=$self->getParent->getFollowupTargetUserids($WfRec,$note);
+
+     # printf STDERR ("to=%s\n",Dumper($to));
+     # printf STDERR ("cc=%s\n",Dumper($cc));
+
       if ($self->getParent->getParent->Action->StoreRecord(
-          $WfRec->{id},"wfaddnote",
+          $WfRec->{id},"wffollowup",
           {translation=>'base::workflow::request'},$note)){
          $self->PostProcess("SaveStep.".$op,$WfRec,$actions,
                             note=>$note,
+                            addtarget=>$to,
                             fwdtarget=>$WfRec->{fwdtarget},
                             fwdtargetid=>$WfRec->{fwdtargetid});
          return(1);
       }
+
       return(0);
    }
    elsif ($op eq "wfaddnote" || $op eq "wfaddsnote"){

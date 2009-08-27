@@ -711,7 +711,7 @@ sub getHashList
       for my $validkey (qw(srcid id)){
          if ((ref($filter) eq "HASH" || ref($filter) eq "Filter") &&
              keys(%$filter)==1 &&
-             $filter->{$validkey}=~m/^[0-9,A-Z,_]{5,20}$/i){
+             $filter->{$validkey}=~m/^[0-9,A-Z,_,-]{5,20}$/i){
             my $v=$filter->{$validkey};
             $filter->{$validkey}=\$v;
             $fltchk++;
@@ -719,7 +719,7 @@ sub getHashList
          if ((ref($filter) eq "HASH" || ref($filter) eq "Filter") &&
              keys(%$filter)==1 &&
              ref($filter->{$validkey}) eq "ARRAY" &&
-             $filter->{$validkey}->[0]=~m/^[0-9,A-Z,_]{5,20}$/i){
+             $filter->{$validkey}->[0]=~m/^[0-9,A-Z,_,-]{5,20}$/i){
             my $v=$filter->{$validkey}->[0];
             $filter->{$validkey}=\$v;
             $fltchk++;

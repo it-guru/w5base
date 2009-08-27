@@ -152,6 +152,21 @@ sub nativProcess
 }
 
 
+sub getFollowupTargetUserids
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $note=shift;
+   my @to;
+   my @cc;
+   if ($WfRec->{owner}!=0){
+      push(@to,$WfRec->{owner});
+   }
+
+   return(\@to,\@cc);
+}
+
+
 
 sub Validate
 {

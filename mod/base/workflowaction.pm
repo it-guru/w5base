@@ -343,6 +343,7 @@ sub NotifyForward
 
    $param{mode}="FW:" if (!defined($param{mode}));  # default ist forward
 
+   #printf STDERR ("fifi param=%s\n",Dumper(\%param));
    my $wf=getModuleObject($self->Config,"base::workflow");
    my $from='no_reply@w5base.net';
    my @to=();
@@ -388,6 +389,17 @@ sub NotifyForward
          }
       }
       @to=keys(%u);
+   }
+   if (defined($param{addtarget}) && ref($param{addtarget}) eq "ARRAY"){
+      my $u=getModuleObject($self->Config,"base::user");
+      foreach my $uid (@{$param{addtarget}}){
+         $u->ResetFilter();
+         $u->SetFilter(userid=>\$uid);
+         my ($rec,$msg)=$u->getOnlyFirst(qw(email));
+         if (defined($rec) && $rec->{email} ne ""){
+            push(@to,$rec->{email});
+         }
+      }
    }
    my $wf=$self->{workflow};
    if (!defined($wf)){
