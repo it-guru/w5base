@@ -1770,6 +1770,9 @@ sub nativProcess
          $loc=$h->{affectedlocation}->[0] if (ref($h->{affectedlocation}));
          $h->{name}=$self->getParent->T("Location-notification:").
                     " ".$loc;
+         if (!$self->getParent->ValidateCreate($h)){
+            return(0);
+         }
       }
       elsif ($h->{eventmode} eq "EVk.appl"){
          my $app=$h->{affectedapplication};
@@ -1833,6 +1836,9 @@ sub nativProcess
                                         $self->getParent->Self);
          $h->{name}=$self->getParent->T("Network-notification:").
                     " ".$self->T($region,"itil::workflow::eventnotify");
+         if (!$self->getParent->ValidateCreate($h)){
+            return(0);
+         }
       }
       else{
          $self->getParent->LastMsg(ERROR,"invalid eventmode '$h->{eventmode}'");

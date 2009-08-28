@@ -286,7 +286,7 @@ sub getPosibleActions
        ($iscurrent || $userid==$creator)){
       push(@l,"wfmailsend");   # mail versenden hinzufügen        (jeder)
       push(@l,"wfaddnote");    # notiz hinzufügen        (jeder)
-      push(@l,"wfaddsubtask"); # unteraufgabe erstellen  (jeder)
+    #  push(@l,"wfaddsubtask"); # unteraufgabe erstellen  (jeder)
       push(@l,"setprioexecs"); # Prio und erledigungsgrad setzen
    }
 #   if (($stateid==2 || $stateid==7 || $stateid==10 || $stateid==5) &&

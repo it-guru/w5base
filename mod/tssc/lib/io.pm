@@ -106,25 +106,13 @@ sub mkProblemStoreRec
       ServiceCenterAssignedTo=>$rec->{assignedto},
       ServiceCenterTriggeredBy=>$rec->{triggeredby},
       ServiceCenterHomeAssignment=>$rec->{homeassignment},
-#      ServiceCenterRisk=>$rec->{risk},
-#      ServiceCenterCategory=>$rec->{category},
       ServiceCenterUrgency=>$rec->{urgency},
       ServiceCenterPriority=>$rec->{priority},
       ServiceCenterImpact=>$rec->{impact},
-##      ServiceCenterRequestedBy=>$rec->{requestedby},
       ServiceCenterSysModTime=>$rec->{sysmodtime},
       ServiceCenterSoftwareID=>$rec->{softwareid},
       ServiceCenterCreator=>$rec->{creator},
-#      ServiceCenterWorkEnd=>$rec->{workend},
-#      ServiceCenterWorkDuration=>$rec->{workduration},
-#      ServiceCenterExternChangeID=>$rec->{srcid}
    };
-#   if (!($rec->{coordinator}=~m/^\s*$/)){
-#      $wfrec{additional}->{ServiceCenterCoordinator}=$rec->{coordinator};
-#   }
-#   if (!($rec->{resources}=~m/^\s*$/)){
-#      $wfrec{additional}->{ServiceCenterResources}=$rec->{resources};
-#   }
    $wfrec{eventstart}=$app->ExpandTimeExpression($rec->{createtime},
                                                  "en","CET");
    $wfrec{eventend}=$app->ExpandTimeExpression($rec->{closetime},
@@ -142,56 +130,6 @@ sub mkProblemStoreRec
       my $userid=$self->{user}->getVal("userid");
       $wfrec{openuser}=$userid if (defined($userid));
    }
-#   if (!($rec->{closecode}=~m/^\s*$/)){
-#      $wfrec{additional}->{ServiceCenterCloseCode}=$rec->{closecode};
-#   }
-#
-#   if (lc($rec->{status}) eq "closed"){ # anpassung damit I-Network mappen kan
-#      $wfrec{additional}->{State4INetwork}=$rec->{status}." ".$rec->{closecode};
-#   }
-#   else{
-#      $wfrec{additional}->{State4INetwork}=$rec->{status};
-#   }
-#   $wfrec{additional}->{EventStart4INetwork}=$app->ExpandTimeExpression(
-#                                        $rec->{plannedstart},"en","CET","CET");
-#   $wfrec{additional}->{EventEnd4INetwork}=$app->ExpandTimeExpression(
-#                                        $rec->{plannedend},"en","CET","CET");
-#   $wfrec{additional}->{Type4INetwork}=$rec->{type};
-#   if ($rec->{name}=~m/[^a-z]regel-ipl/i){
-#      $wfrec{additional}->{Type4INetwork}="trivial";
-#   }
-#   # approval check for I-Network (TSM hat zugestimmt)
-#   my %approver=();
-#   foreach my $agrp (split(/\s/,$rec->{addgrp})){
-#      my $g=trim($agrp);
-#      $approver{$g}=1 if ($g ne "");
-#   }
-#   my @tcom=();
-#   push(@tcom,grep(/^CSS\.TCOM$/,keys(%approver)));
-#   push(@tcom,grep(/^CSS\.TCOM\..*$/,keys(%approver)));
-#   if ($#tcom!=-1){
-#      my $AlApproveCompletly=0;
-#      my %approved=();
-#      my $done=0;
-#      if (ref($rec->{approved}) eq "ARRAY"){
-#         foreach my $a (@{$rec->{approved}}){
-#            foreach my $agrp (split(/\s/,$a->{name})){
-##               my $g=trim($agrp);
-#               $approved{$g}=1 if ($g ne "");
-#               my $qg=quotemeta($g);
-#               $done++ if (grep(/^$qg$/,@tcom)); 
-#            }
-#         }
-#      }
-#      $AlApproveCompletly=1 if ($#tcom+1==$done);
-#      msg(DEBUG,"approver=%s",Dumper(\%approver));
-#      msg(DEBUG,"approved=%s",Dumper(\%approved));
-#      msg(DEBUG,"tcom=%s",Dumper(\@tcom));
-#      $wfrec{additional}->{AlApproveCompletly4INetwork}=$AlApproveCompletly;
-#   }
-#
-#
-#   $wfrec{changefallback}=$rec->{fallback};
    my ($system,$systemid,
        $anames,$aids,$contrnames,$contrids,$mandator,$mandatorid,
        $costcenter,$customername,$responseteam,$businessteam,
