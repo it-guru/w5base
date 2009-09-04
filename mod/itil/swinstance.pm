@@ -86,6 +86,7 @@ sub new
                                  'BEA WebLogic',
                                  'BEA Tuxedo',
                                  'DB2',
+                                 'CICS',
                                  'IIS',
                                  'Informix',
                                  'JacORB',
