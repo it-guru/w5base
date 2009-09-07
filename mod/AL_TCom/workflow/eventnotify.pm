@@ -258,7 +258,9 @@ sub getNotificationSubject
       $subject2=" / $state Incident / $afcust / Netz / ";
    }
    if ($WfRec->{eventmode} eq "EVk.infraloc"){ 
-      $subject2=" / $state Incident / Infrastruktur / ";
+      my $loc=$WfRec->{affectedlocation};
+      $loc=$WfRec->{affectedlocation}->[0] if (ref($WfRec->{affectedlocation}));
+      $subject2=" / $state / $loc / ";
    }
    if ($action eq "rootcausei"){
       $subject2=" / $ag / Ursachenanalyse / $afcust / Applikation /";
@@ -292,11 +294,13 @@ Sehr geehrte Kundin, sehr geehrter Kunde,
 die Beeinträchtigung der Infrastruktur wurde beseitigt.
 EOF
    }elsif($WfRec->{eventmode} eq "EVk.infraloc"){
+      my $loc=$WfRec->{affectedlocation};
+      $loc=$WfRec->{affectedlocation}->[0] if (ref($WfRec->{affectedlocation}));
       $salutation=<<EOF;
 Sehr geehrte Damen und Herren,
 
-folgende Informationen zum Ereignis im Bereich
-der Rechenzentrums-Infrastruktur liegen derzeit vor:
+folgende Informationen zum Ereignis am Standort
+$loc liegen derzeit vor:
 $info
 EOF
    }elsif ($WfRec->{eventmode} eq "EVk.appl" && $eventstat==17){
