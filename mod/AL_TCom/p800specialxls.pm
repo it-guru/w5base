@@ -22,36 +22,44 @@ sub new
                                   label    =>'CO-Number'),
       new kernel::Field::Number(  name     =>'worktime_mminus1',
                                   searchable =>0,
-                                  unit     =>'min',
+                                  unit     =>'h',
+                                  precision=>2,
                                   label    =>'Sonderleistung aktueller Monat-1Monat'),
       new kernel::Field::Number(  name     =>'worktime_mminus2',
                                   searchable =>0,
-                                  unit     =>'min',
+                                  unit     =>'h',
+                                  precision=>2,
                                   label    =>'Sonderleistung aktueller Monat-2Monate'),
       new kernel::Field::Number(  name     =>'worktime_mminus3',
                                   searchable =>0,
-                                  unit     =>'min',
+                                  unit     =>'h',
+                                  precision=>2,
                                   label    =>'Sonderleistung aktueller Monat-3Monate'),
       new kernel::Field::Number(  name     =>'worktime_mminus4',
                                   searchable =>0,
-                                  unit     =>'min',
+                                  unit     =>'h',
+                                  precision=>2,
                                   label    =>'Sonderleistung aktueller Monat-4Monate'),
       new kernel::Field::Number(  name     =>'worktime_mminus5',
                                   searchable =>0,
-                                  unit     =>'min',
+                                  unit     =>'h',
+                                  precision=>2,
                                   label    =>'Sonderleistung aktueller Monat-5Monate'),
       new kernel::Field::Number(  name     =>'worktime_mminus6',
                                   searchable =>0,
-                                  unit     =>'min',
+                                  unit     =>'h',
+                                  precision=>2,
                                   label    =>'Sonderleistung aktueller Monat-6Monate'),
       new kernel::Field::Number(  name     =>'worktimesum',
                                   searchable =>0,
                                   group    =>'calc',
-                                  unit     =>'min',
+                                  unit     =>'h',
+                                  precision=>2,
                                   label    =>'Summe Sonderleistung 6 Monate'),
       new kernel::Field::Number(  name     =>'worktimeavg',
                                   searchable =>0,
-                                  unit     =>'min',
+                                  unit     =>'h',
+                                  precision=>2,
                                   group    =>'calc',
                                   label    =>'Mittlere Sonderleistung'),
       new kernel::Field::Percent( name     =>'maxdrift',
@@ -78,6 +86,14 @@ sub recalcData
 {
    my $self=shift;
 
+   $self->{off}=[];
+   for (my $off=1;$off<=6;$off++){
+       my $crmon=$self->ExpandTimeExpression("now-${off}M",
+                 "stamp");
+       $crmon=~s/^(\d{4})(\d{2}).*$/$2\/$1/;
+       push(@{$self->{off}},$crmon);
+   }
+
    if (!defined($self->{Data}) ||
        $self->{Data}->{T}<time()-10){
       $self->{Data}={List=>$self->loadDataList(),
@@ -92,6 +108,10 @@ sub loadDataList
    my $self=shift;
    my @l;
    my %l;
+   my $contr=getModuleObject($self->Config,"finance::custcontract");
+   $contr->SetFilter({cistatusid=>"<=5"});
+   $contr->SetCurrentView(qw(name conumber));
+   my $custcontr=$contr->getHashIndexed("name");
    my $wf=getModuleObject($self->Config,"base::workflow");
    $wf->SetFilter({class=>\'AL_TCom::workflow::P800special',
                    eventstart=>'>now-7M'});
@@ -109,9 +129,7 @@ sub loadDataList
                   my $wt=$rec->{'p800_app_speicalwt'};
                   my $rmon=$rec->{'p800_reportmonth'};
                   for (my $off=1;$off<=6;$off++){
-                      my $crmon=$self->ExpandTimeExpression("now-${off}M",
-                                "stamp");
-                      $crmon=~s/^(\d{4})(\d{2}).*$/$2\/$1/;
+                      my $crmon=$self->{off}->[$off-1];
                       if ($crmon eq $rmon){
                          $l{$custcontract}->{'worktime_mminus'.$off}+=$wt;
                       }
@@ -139,11 +157,16 @@ sub loadDataList
              my $drift=$d*100/$h->{worktimeavg};
              $maxdrift=$drift if ($maxdrift<$drift);
           }
+          if (defined($h->{'worktime_mminus'.$off})){
+             $h->{'worktime_mminus'.$off}=$h->{'worktime_mminus'.$off}/60;
+          }
       }
       if (defined($maxdrift)){
          $h->{maxdrift}=$maxdrift;
       }
-      
+      $h->{worktimeavg}=$h->{worktimeavg}/60;
+      $h->{worktimesum}=$h->{worktimesum}/60;
+      $h->{conumber}=$custcontr->{name}->{$h->{custcontract}}->{conumber};
       push(@l,$h);
    }
    return(\@l);

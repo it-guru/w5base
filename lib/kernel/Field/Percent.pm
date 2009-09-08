@@ -61,6 +61,9 @@ sub FormatedDetail
          $d=~s/\./,/g;
       }
       $d.=" %" if ($d ne "");
+      if ($mode=~m/^Html/){
+         $d=~s/\s/&nbsp;/g;
+      }
    }
 
    return($d);
