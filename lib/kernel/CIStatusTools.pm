@@ -82,6 +82,21 @@ sub HandleCIStatusModification
    my $adduniq=0;
    my $deluniq=0;
 
+   if (defined($oldrec) && defined($newrec) &&
+       $oldrec->{cistatusid}==6 && $cistatusid==6){
+      foreach my $primarykey (@primarykey){
+         if (exists($newrec->{$primarykey}) &&
+             !($newrec->{$primarykey}=~m/\[\d+\]$/)){
+            if (my ($olduniq)=$oldrec->{$primarykey}=~m/(\[\d+\])$/){
+               $newrec->{$primarykey}.=$olduniq;
+            }
+            else{
+               $adduniq=1;
+            }
+         }
+      }
+   }
+
    if (((defined($oldrec) && $oldrec->{cistatusid}<=5) || !defined($oldrec)) && 
          (defined($newrec->{cistatusid}) && $newrec->{cistatusid}>5)){ 
       $adduniq=1;
@@ -103,7 +118,9 @@ sub HandleCIStatusModification
          if (defined($newrec->{$primarykey})){
             my $found=0;
             for(my $c=0;$c<=100;$c++){
-               my $chkname=$newrec->{$primarykey}."[$c]";
+               my $chkname=$newrec->{$primarykey};
+               $chkname=~s/\[\d+\]$//;
+               $chkname.="[$c]";
                $self->SetFilter($primarykey=>\$chkname);
                my $chkid=$self->getVal($idfield);
                if (!defined($chkid)){
