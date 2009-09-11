@@ -245,7 +245,7 @@ sub getNotificationSubject
 #print STDERR ("fifi %s\n",Dumper($WfRec));
    if ($WfRec->{stateid} == 17){
      $state=$self->getParent->T("finish info","itil::workflow::eventnotify");
-   }elsif ($sendcustinfocount > 1){
+   }elsif ($sendcustinfocount > 0){
      $state=$sendcustinfocount.". ".$self->getParent->T("follow info","itil::workflow::eventnotify");
    }else{
      $state=$self->getParent->T("first information","itil::workflow::eventnotify");
