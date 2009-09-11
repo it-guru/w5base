@@ -242,12 +242,11 @@ sub getNotificationSubject
    foreach my $arec (@l){
       $sendcustinfocount++ if ($arec->{name} eq "sendcustinfo");
    }
-
 #print STDERR ("fifi %s\n",Dumper($WfRec));
    if ($WfRec->{stateid} == 17){
      $state=$self->getParent->T("finish info","itil::workflow::eventnotify");
    }elsif ($sendcustinfocount > 1){
-     $state=$self->getParent->T("follow info","itil::workflow::eventnotify");
+     $state=$sendcustinfocount.". ".$self->getParent->T("follow info","itil::workflow::eventnotify");
    }else{
      $state=$self->getParent->T("first information","itil::workflow::eventnotify");
    }
@@ -255,7 +254,7 @@ sub getNotificationSubject
    my $subject="EK ".$WfRec->{eventstatclass};
    my $subject2=" / $ag / $state Incident / ".$afcust." / Applikation / ";
    if ($WfRec->{eventmode} eq "EVk.net"){ 
-      $subject2=" / $state Incident / $afcust / Netz / ";
+      $subject2=" / Hitnet / $state Incident / DTAG.T-Home / Netz / ";
    }
    if ($WfRec->{eventmode} eq "EVk.infraloc"){ 
       my $loc=$WfRec->{affectedlocation};
