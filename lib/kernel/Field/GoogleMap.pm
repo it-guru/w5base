@@ -30,6 +30,7 @@ sub new
    $self->{_permitted}->{marker}=1;
    $self->{_permitted}->{address}=1;
    $self->{searchable}=0;
+   $self->{uploadable}=0;
    
    return($self);
 }
