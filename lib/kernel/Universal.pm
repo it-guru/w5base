@@ -120,6 +120,17 @@ sub AUTOLOAD {
    return($self->{$name});
 }
 
+sub DESTROY
+{
+   my $self=shift;
+   my $s=sprintf("-%s-",$self);
+   delete($W5V2::Context->{$s});
+
+}
+
+
+
+
 
 ######################################################################
 1;
