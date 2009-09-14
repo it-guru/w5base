@@ -317,7 +317,7 @@ sub Validate
       $self->LastMsg(ERROR,"invalid zipcode '\%s'",$zipcode);
       return(0);
    }
-   if ($location eq ""){
+   if ($location eq "" || $location eq "0" || $address1 eq "0"){
       $self->LastMsg(ERROR,"invalid location");
       return(0);
    }
