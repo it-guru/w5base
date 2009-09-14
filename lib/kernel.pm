@@ -130,6 +130,7 @@ sub quoteSOAP
    $d=~s/&/&amp;/g;
    $d=~s/</&lt;/g;
    $d=~s/>/&gt;/g;
+   $d=~s/\\/&#92;/g;
    return($d);
 }
 
