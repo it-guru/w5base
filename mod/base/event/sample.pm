@@ -36,6 +36,7 @@ sub Init
    my $self=shift;
 
 
+   $self->RegisterEvent("memtest","memtest");
    $self->RegisterEvent("test","test");
    $self->RegisterEvent("sample","SampleEvent1");
    $self->RegisterEvent("sample1","SampleEvent1",timeout=>180);
@@ -113,6 +114,29 @@ sub SampleEvent1
 #   msg(INFO,"fifi l=%s\n",Dumper(\@l));
    msg(DEBUG,"End  (Event1):");
    return({msg=>'heinz',exitcode=>0});
+}
+
+
+sub memtest
+{
+   my $self=shift;
+
+   msg(DEBUG,"Start(memtest):");
+   eval("use GTop;"); 
+   my $g0=GTop->new->proc_mem($$);
+   for(my $cc=0;$cc<600;$cc++){ 
+      my $g1=GTop->new->proc_mem($$);
+      for(my $c=0;$c<100;$c++){ 
+         my $evl=getModuleObject($self->Config,"base::joblog");
+         $evl->ValidatedInsertRecord({event=>"memtest($cc,$c)",
+                                      pid=>"$$",
+                                      exitcode=>9});
+      }
+      my $g=GTop->new->proc_mem($$);
+      msg(DEBUG,"loop=%02d mem=".$g->vsize." total=%d loopdelta=%d\n",$cc,$g-$g0,$g-$g1);
+   }
+   msg(DEBUG,"End  (memtest):");
+   return({exitcode=>0});
 }
 
 

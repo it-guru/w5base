@@ -43,9 +43,13 @@ sub new
                 label         =>'QuestionID',
                 dataobjattr   =>'interanswer.id'),
 
-      new kernel::Field::Text(
+      new kernel::Field::TextDrop(
                 name          =>'name',
                 label         =>'question',
+                readonly      =>1,
+                vjointo       =>'base::interview',
+                vjoinon       =>['interviewid'=>'id'],
+                vjoindisp     =>'name',
                 dataobjattr   =>'interview.name'),
 
       new kernel::Field::Boolean(
@@ -61,20 +65,33 @@ sub new
       new kernel::Field::Text(
                 name          =>'parentobj',
                 group         =>'relation',
+                uploadable    =>0,
                 label         =>'parent Ojbect',
                 dataobjattr   =>'interanswer.parentobj'),
 
       new kernel::Field::Text(
                 name          =>'parentid',
                 group         =>'relation',
+                uploadable    =>0,
                 label         =>'parent ID',
                 dataobjattr   =>'interanswer.parentid'),
 
       new kernel::Field::Text(
                 name          =>'interviewid',
                 group         =>'relation',
+                uploadable    =>0,
                 label         =>'Interview ID',
                 dataobjattr   =>'interanswer.interviewid'),
+
+      new kernel::Field::TextDrop(
+                name          =>'qtag',
+                label         =>'unique query tag',
+                translation   =>'base::interview',
+                group         =>'relation',
+                vjointo       =>'base::interview',
+                vjoinon       =>['interviewid'=>'id'],
+                vjoindisp     =>'qtag',
+                dataobjattr   =>'interview.qtag'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
@@ -85,6 +102,7 @@ sub new
                 name          =>'archiv',
                 group         =>'archiv',
                 htmldetail    =>0,
+                uploadable    =>0,
                 label         =>'Archiv',
                 dataobjattr   =>'interanswer.archiv'),
 
@@ -132,6 +150,25 @@ sub new
    return($self);
 }
 
+sub SecureValidate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   if (defined($oldrec)){
+      foreach my $k (keys(%{$newrec})){
+         next if ($k eq "comments" ||
+                  $k eq "answer"   ||
+                  $k eq "relevant");
+         delete($newrec->{$k});
+      }
+   }
+
+   #$self->LastMsg(ERROR,"is nich"); 
+   return(1);
+}
+
 sub Validate
 {
    my $self=shift;
@@ -154,6 +191,9 @@ sub Validate
    }
    return(1);
 }
+
+
+
 
 sub getSqlFrom
 {
@@ -179,8 +219,8 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default","relation") if ($self->IsMemberOf("admin"));
-   return(undef);
+   return("default") if (defined($rec));
+   return("default","relation");
 }
 
 sub getValidWebFunctions

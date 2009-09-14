@@ -170,7 +170,7 @@ sub Init
    $self->RegisterObj("sysadm.location.new",
                       "base::location",
                       func=>'New',
-                      defaultacl=>['valid_user']);
+                      defaultacl=>['admin']);
 
    $self->RegisterObj("sysadm.location.googlekeys",
                       "base::googlekeys",
