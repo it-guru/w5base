@@ -30,10 +30,18 @@ sub new
    return($self);
 }
 
+sub data
+{
+   my $self=shift;
+   if (ref($self->{data}) eq "CODE"){
+      return(&{$self->{data}}($self));
+   }
+   return($self->{data});
+}
+
 sub Initialize
 {
    my $self=shift;
-   $self->{_permitted}->{data}=1;
    return(1);
 }
 
@@ -222,7 +230,7 @@ sub CheckFilter
          } 
       }
    }
-   return(1) if ($okcount); 
+   return(1) if ($okcount>0 && $failcount==0); 
    return(0) if ($failcount); 
    return(1);
 }

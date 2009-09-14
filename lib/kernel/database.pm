@@ -311,7 +311,6 @@ sub Disconnect
 sub DESTROY
 {
    my $self=shift;
-
    $self->{'sth'}->finish()    if (defined($self->{'sth'}));;
    if (defined($Apache::DBI::VERSION)){
       $self->{'db'}->disconnect() if (defined($self->{'db'}));

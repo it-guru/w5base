@@ -38,8 +38,10 @@ sub Init
 
 
    $self->RegisterEvent("mkp800","mkp800");
+   $self->RegisterEvent("mkp800specialxls","mkp800specialxls");
    return(1);
 }
+
 
 sub mkp800
 {
@@ -726,6 +728,19 @@ sub xlsFinish
          msg(ERROR,"can't open $xlsexp->{xls}->{filename}");
       }
    }
+}
+
+
+sub mkp800specialxls
+{
+   my $self=shift;
+   my %param=@_;
+
+   msg(DEBUG,"param=%s",Dumper(\%param));
+   my $o=getModuleObject($self->Config,"AL_TCom::p800specialxls");
+   msg(DEBUG,"o=$o");
+
+   return({exitcode=>0,msg=>'OK'});
 }
 
 

@@ -348,11 +348,18 @@ sub Normalize
    $rec->{address1}=~s/^"//;
    $rec->{address1}=~s/"$//;
    $rec->{address1}=~s/; / /;
+   # reduce double space bugs
+   $rec->{address1}=~s/\s\s/ /g;
+   $rec->{address1}=~s/\s\s/ /g;
+   $rec->{address1}=~s/\s\s/ /g;
    $rec->{label}=trim($rec->{label});
    $rec->{address1}=trim($rec->{address1});
    $rec->{location}=trim($rec->{location});
    if ($rec->{address1}=~m/Schlo(\xDF|ss)str/){
       $rec->{address1}=~s/Schlo(\xDF|ss)str/Schlo\xDFstr/i;
+   }
+   if ($rec->{address1}=~m/[a-z]\d+$/i){
+      $rec->{address1}=~s/^(.*?)(\d+)$/$1 $2/;
    }
    if ($rec->{address1}=~m/ALTE POTSDAMER.*7/){
       $rec->{address1}="Alte Potsdamer Stra\xDFe 7";

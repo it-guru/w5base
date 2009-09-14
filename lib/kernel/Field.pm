@@ -447,7 +447,7 @@ sub preProcessFilter
        ref($self->{onPreProcessFilter}) eq "CODE"){
       return(&{$self->{onPreProcessFilter}}($self,$hflt));
    }
-   if (defined($fobj->{vjointo})){
+   if (defined($fobj->{vjointo}) && !defined($fobj->{dataobjattr})){
       $fobj->vjoinobj->ResetFilter();
       my $loadfield=$fobj->{vjoinon}->[1];
       my $searchfield=$fobj->{vjoindisp};

@@ -679,7 +679,7 @@ sub preValidate
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   msg(INFO,"preValidate in $self");
+   #msg(INFO,"preValidate in $self");
    return(1);
 }
 

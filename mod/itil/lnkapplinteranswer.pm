@@ -32,7 +32,16 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'application',
                 htmlwidth     =>'100px',
+                readonly      =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return(1) if (defined($current));
+                   return(0);
+                },
                 label         =>'Application',
+                vjointo       =>'itil::appl',
+                vjoinon       =>['parentid'=>'id'],
+                vjoindisp     =>'name',
                 dataobjattr   =>'appl.name'),
       insertafter=>'id'
    );
