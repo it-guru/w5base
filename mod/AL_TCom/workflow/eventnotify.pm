@@ -292,7 +292,9 @@ sub getSalutation
       $salutation=<<EOF;
 Sehr geehrte Kundin, sehr geehrter Kunde,
 
-die Beeinträchtigung am Standort $loc wurde beseitigt.
+die Beeinträchtigung am Standort 
+$loc 
+wurde beseitigt.
 EOF
    }elsif($WfRec->{eventmode} eq "EVk.infraloc"){
       my $loc=$WfRec->{affectedlocation};
