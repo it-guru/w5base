@@ -259,7 +259,7 @@ sub getNotificationSubject
    if ($WfRec->{eventmode} eq "EVk.infraloc"){ 
       my $loc=$WfRec->{affectedlocation};
       $loc=$WfRec->{affectedlocation}->[0] if (ref($WfRec->{affectedlocation}));
-      $subject2=" / $state / $loc / ";
+      $subject2=" / $loc / $state / ";
    }
    if ($action eq "rootcausei"){
       $subject2=" / $ag / Ursachenanalyse / $afcust / Applikation /";
@@ -287,10 +287,12 @@ sub getSalutation
    my $utz=$self->getParent->UserTimezone();
    my $creationtime=$self->getParent->ExpandTimeExpression($eventstart,"de","UTC",$utz);
    if ($WfRec->{eventmode} eq "EVk.infraloc" && $eventstat==17){
+      my $loc=$WfRec->{affectedlocation};
+      $loc=$WfRec->{affectedlocation}->[0] if (ref($WfRec->{affectedlocation}));
       $salutation=<<EOF;
 Sehr geehrte Kundin, sehr geehrter Kunde,
 
-die Beeinträchtigung der Infrastruktur wurde beseitigt.
+die Beeinträchtigung am Standort $loc wurde beseitigt.
 EOF
    }elsif($WfRec->{eventmode} eq "EVk.infraloc"){
       my $loc=$WfRec->{affectedlocation};
