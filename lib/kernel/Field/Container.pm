@@ -48,7 +48,8 @@ sub FormatedDetail
             my $val=$d->{$k};
             $val=[$val] if (ref($val) ne "ARRAY");
             foreach my $vval (@$val){
-               $xml.="<item><name>$k</name><value>$vval</value></item>";
+               $xml.="<item><name>$k</name><value>".
+                     quoteSOAP($vval)."</value></item>";
             }
          }
       }
