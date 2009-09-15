@@ -336,6 +336,9 @@ sub Validate
    $name=~s/\xDF/ss/g;
    $name=~s/[\s\/,]+/_/g;
    $newrec->{'name'}=$name;
+   if (!defined($oldrec) && !defined($newrec->{label})){
+      $newrec->{label}="";
+   }
 
    return(1);
 }
