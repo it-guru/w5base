@@ -12,7 +12,7 @@ public class businessreq {
     PropertyConfigurator.configure("log4j.properties"); 
     // define the needed variables
     net.w5base.mod.AL_TCom.workflow.businesreq.W5Base        W5Service;
-    net.w5base.mod.AL_TCom.workflow.businesreq.Port          W5Port;
+    net.w5base.mod.AL_TCom.workflow.businesreq.W5AL_TComWorkflowBusinesreqPort          W5Port;
     net.w5base.mod.AL_TCom.workflow.businesreq.WfRec         WfRec;
     net.w5base.mod.AL_TCom.workflow.businesreq.Record        CurRec;
     net.w5base.mod.AL_TCom.workflow.businesreq.StoreRecInp   Inp;
@@ -37,7 +37,7 @@ public class businessreq {
     Inp=new net.w5base.mod.AL_TCom.workflow.businesreq.StoreRecInp();
     WfRec.setName("This is a test AL_TCom Business Request");
     WfRec.setDetaildescription("This is the description of my request\n"+
-                               "This description can have more than one line");
+                               "This \\n description can have more than one line");
     WfRec.setAffectedapplication("W5Base/Darwin");
     WfRec.setCustomerrefno("INETWORK:112233");
     WfRec.setReqnature("appl.base.base");
