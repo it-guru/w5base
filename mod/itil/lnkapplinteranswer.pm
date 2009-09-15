@@ -30,7 +30,7 @@ sub new
 
    $self->AddFields(
       new kernel::Field::TextDrop(
-                name          =>'application',
+                name          =>'parentname',
                 htmlwidth     =>'100px',
                 readonly      =>sub{
                    my $self=shift;
@@ -48,7 +48,7 @@ sub new
    $self->getField("parentobj")->{searchable}=0;
    $self->getField("parentid")->{searchable}=0;
    $self->{secparentobj}='itil::appl';
-   $self->setDefaultView(qw(application name answer mdate editor));
+   $self->setDefaultView(qw(parentname name answer mdate editor));
    return($self);
 }
 

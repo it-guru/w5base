@@ -1,4 +1,6 @@
 'base::interanswer'=>{de=>'Interview Antwort',en=>'Interview Answer'},
 'answer'=>{de=>'Anwort'},
 'question'=>{de=>'Frage'},
+'AnswerID'=>{de=>'AntwortID'},
 'fieldgroup.relation'=>{de=>'Zuordnung',en=>'Relation'},
+'insuficient rights to answer this question'=>{de=>'Nicht genügend Rechte, um diese Frage zu beantworten'},

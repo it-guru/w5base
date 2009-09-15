@@ -244,6 +244,7 @@ create table interanswer(
 alter table interview add name_de varchar(255);
 alter table interview add queryblock varchar(80) not null;
 alter table interview add qtag varchar(80) not null, add unique key(qtag);
-alter table interanswer add archiv varchar(80), add unique key(archiv);
+alter table interanswer add archiv varchar(80) not NULL;
 alter table interview add contact bigint(20),add contact2 bigint(20);
 alter table interview add restriction blob;
+alter table interanswer add unique(parentobj,parentid,archiv,interviewid);

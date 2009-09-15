@@ -40,7 +40,7 @@ sub new
                 name          =>'id',
                 group         =>'source',
                 sqlorder      =>'desc',
-                label         =>'QuestionID',
+                label         =>'AnswerID',
                 dataobjattr   =>'interanswer.id'),
 
       new kernel::Field::TextDrop(
@@ -150,11 +150,65 @@ sub new
    return($self);
 }
 
+sub prepUploadRecord
+{
+   my $self=shift;
+   my $newrec=shift;
+
+   if (!exists($newrec->{id}) || $newrec->{id} eq ""){
+      if (exists($newrec->{qtag}) && $newrec->{qtag} ne "" &&
+          exists($newrec->{parentname}) && $newrec->{parentname} ne ""){
+         my $fobj=$self->getField("parentname");
+         if (defined($fobj)){
+            my $i=$self->Clone();
+            $i->SetFilter({qtag=>\$newrec->{qtag},
+                           parentname=>\$newrec->{parentname}});
+            my ($rec,$msg)=$i->getOnlyFirst(qw(id));
+            if (defined($rec)){
+               $newrec->{id}=$rec->{id};
+               delete($newrec->{qtag});
+               delete($newrec->{parentname});
+            }
+         }
+      }
+   }
+
+   return(1);
+}
+
+
 sub SecureValidate
 {
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
+
+   my $i=getModuleObject($self->Config,"base::interview");
+
+   my $fobj=$self->getField("parentname");
+   if (defined($fobj)){
+      my $rec={};
+      my $comprec={};
+      my $rawWrRequest=$fobj->Validate($oldrec,$newrec,$rec,$comprec);
+      if (defined($rawWrRequest)){
+         foreach my $k (keys(%{$rawWrRequest})){
+            $newrec->{$k}=$rawWrRequest->{$k};
+         }
+         delete($newrec->{parentname});
+      }
+   }
+   my $qid=effVal($oldrec,$newrec,"interviewid");
+   if ($qid eq ""){
+      my $qtag=effVal($oldrec,$newrec,"qtag");
+      if ($qtag ne ""){
+         $i->SetFilter({qtag=>\$qtag});
+         my ($irec,$msg)=$i->getOnlyFirst(qw(id)); 
+         if (defined($irec)){
+            delete($newrec->{qtag});
+            $newrec->{interviewid}=$irec->{id};
+         }
+      }
+   }
 
    if (defined($oldrec)){
       foreach my $k (keys(%{$newrec})){
@@ -164,8 +218,33 @@ sub SecureValidate
          delete($newrec->{$k});
       }
    }
+   my $parentobj=effVal($oldrec,$newrec,"parentobj");
+   my $parentid=effVal($oldrec,$newrec,"parentid");
+   my $qid=effVal($oldrec,$newrec,"interviewid");
+   if ($parentid eq ""){
+      $self->LastMsg(ERROR,"invalid parentid"); 
+      return(0);
+   }
+   if ($qid eq ""){
+      $self->LastMsg(ERROR,"invalid question id"); 
+      return(0);
+   }
+   my ($write,$irec)=$self->getAnswerWriteState($i,$qid,$parentid,$parentobj);
+   #printf STDERR ("parentobj=$parentobj parentid=$parentid qid=$qid SecureValidate=%s\n",Dumper($newrec));
+   if (!$write){
+      $self->LastMsg(ERROR,"insuficient rights to answer this question"); 
+      return(0);
+   }
+   if (!defined($oldrec)){
+      if ($newrec->{parentobj} eq ""){ 
+         $newrec->{parentobj}=$irec->{parentobj};
+      }
+      if ($irec->{parentobj} ne $newrec->{parentobj}){
+         $self->LastMsg(ERROR,"parentobj doesn't macht question parentobj"); 
+         return(0); 
+      }
+   }
 
-   #$self->LastMsg(ERROR,"is nich"); 
    return(1);
 }
 
@@ -175,6 +254,9 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
+   if (!defined($oldrec) && !defined($newrec->{archiv})){
+      $newrec->{archiv}="";
+   }
 #   my $name=trim(effVal($oldrec,$newrec,"name"));
 #   if ($name=~m/^\s*$/i){
 #      $self->LastMsg(ERROR,"invalid question specified"); 
@@ -185,10 +267,6 @@ sub Validate
 #      $self->LastMsg(ERROR,"invalid question group specified"); 
 #      return(undef);
 #   }
-   my $archiv=trim(effVal($oldrec,$newrec,"archiv"));
-   if ($archiv eq ""){
-      $newrec->{archiv}=undef;
-   }
    return(1);
 }
 
@@ -205,8 +283,6 @@ sub getSqlFrom
 
 
 
-
-
 sub isViewValid
 {
    my $self=shift;
@@ -219,7 +295,18 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default") if (defined($rec));
+   if (defined($rec)){
+      my $parentobj=$rec->{parentobj};
+      my $parentid=$rec->{parentid};
+      my $qid=$rec->{interviewid};
+      my $i=getModuleObject($self->Config,"base::interview");
+      my ($write,$irec,$oldans)=
+                       $self->getAnswerWriteState($i,$qid,$parentid,$parentobj);
+
+      return("default") if ($write);
+      return("default") if ($self->IsMemberOf("admin"));
+      return(undef);
+   }
    return("default","relation");
 }
 
@@ -227,6 +314,36 @@ sub getValidWebFunctions
 {
    my ($self)=@_;
    return($self->SUPER::getValidWebFunctions(), qw(Store));
+}
+
+sub getAnswerWriteState
+{
+   my $self=shift;
+   my $i=shift;
+   my $qid=shift;
+   my $parentid=shift;
+   my $parentobj=shift;
+
+   $i->ResetFilter();
+   $i->SetFilter({id=>\$qid});
+   my ($irec,$msg)=$i->getOnlyFirst(qw(ALL));
+   if ($parentobj eq ""){
+      $parentobj=$irec->{parentobj};
+   }
+
+   $self->ResetFilter();
+   $self->SetFilter({interviewid=>\$qid,
+                     parentobj=>\$parentobj,
+                     parentid=>\$parentid});
+   my ($oldrec,$msg)=$self->getOnlyFirst(qw(ALL));
+
+   my $p=getModuleObject($self->Config,$parentobj);
+   return(0,$irec,$oldrec,undef) if (!defined($p));
+   $p->SetFilter({id=>\$parentid});
+   my ($rec,$msg)=$p->getOnlyFirst(qw(ALL));
+
+   my $pwrite=$i->checkParentWrite($p,$rec);
+   return($i->checkAnserWrite($pwrite,$irec,$p,$rec),$irec,$oldrec,$rec);
 }
 
 sub Store
@@ -238,26 +355,12 @@ sub Store
    my $vname=Query->Param("vname");
    my $vval=Query->Param("vval");
 
-   printf STDERR ("AjaxStore: qid=$qid parentid=$parentid parentobj=$parentobj vname=$vname\nval=$vval\n\n");
-   $self->ResetFilter();
-   $self->SetFilter({interviewid=>\$qid,
-                     parentobj=>\$parentobj,
-                     parentid=>\$parentid});
-   my ($oldrec,$msg)=$self->getOnlyFirst(qw(ALL));
-
    my $i=getModuleObject($self->Config,"base::interview");
-   $i->SetFilter({id=>\$qid});
-   my ($irec,$msg)=$i->getOnlyFirst(qw(ALL));
+   printf STDERR ("AjaxStore: qid=$qid parentid=$parentid parentobj=$parentobj vname=$vname\nval=$vval\n\n");
 
-   my $p=getModuleObject($self->Config,$parentobj);
-   $p->SetFilter({id=>\$parentid});
-   my ($rec,$msg)=$p->getOnlyFirst(qw(ALL));
-
-   my $pwrite=$i->checkParentWrite($p,$rec);
-   my $write=$i->checkAnserWrite($pwrite,$irec,$p,$rec);
+   my ($write,$irec,$oldrec)=$self->getAnswerWriteState($i,$qid,$parentid,$parentobj);
 
    if ($vname eq "comments" || $vname eq "answer" || $vname eq "relevant"){
-
       if ($write){
          if (!defined($oldrec)){
             $self->ValidatedInsertRecord({$vname=>$vval,
@@ -277,7 +380,7 @@ sub Store
    my ($newrec,$msg)=$self->getOnlyFirst(qw(answer comments relevant));
 
    my ($HTMLanswer,$HTMLrelevant,$HTMLcomments)=
-         $i->getHtmlEditElements($write,$irec,$newrec,$p,$rec);
+         $i->getHtmlEditElements($write,$irec,$newrec);
 
    $newrec->{HTMLanswer}=$HTMLanswer;
    $newrec->{HTMLrelevant}=$HTMLrelevant;

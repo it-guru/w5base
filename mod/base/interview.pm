@@ -64,6 +64,7 @@ sub new
                    my $self=shift;
                    my $rec=shift;
                    my $userid=$self->getParent->getCurrentUserId();
+                   return(0) if ($self->getParent->IsMemberOf("admin"));
                    return(1) if ($userid==$rec->{$self->{name}."id"});
                    return(0);
                 },
@@ -291,6 +292,14 @@ sub checkAnserWrite
    my $pobj=shift;
    my $prec=shift;
 
+   my $userid=$self->getCurrentUserId();
+   #printf STDERR ("fifi w=%s\n",Dumper($irec));
+   if ($irec->{contactid}==$userid ||
+       $irec->{contact2id}==$userid){  # allow always the contact to answer
+      return(1);
+   }
+
+
    return($parentrw);
 }
 
@@ -300,8 +309,6 @@ sub getHtmlEditElements
    my $write=shift;
    my $irec=shift;
    my $answer=shift;
-   my $pobj=shift;
-   my $prec=shift;
    my $iid=$irec->{id};
    my ($HTMLanswer,$HTMLrelevant,$HTMLcomments);
 

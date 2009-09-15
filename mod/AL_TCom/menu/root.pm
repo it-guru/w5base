@@ -123,6 +123,10 @@ sub Init
                       "TS::topappl",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.appl.lnkapplinteranswer",
+                      "itil::lnkapplinteranswer",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.system",
                       "AL_TCom::system",
                       defaultacl=>['valid_user']);
