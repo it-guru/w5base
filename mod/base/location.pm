@@ -307,6 +307,17 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
+   my $country=trim(effVal($oldrec,$newrec,"country"));
+   my $location=trim(effVal($oldrec,$newrec,"location"));
+   my $label=trim(effVal($oldrec,$newrec,"label"));
+   my $address1=trim(effVal($oldrec,$newrec,"address1"));
+   my $zipcode=trim(effVal($oldrec,$newrec,"zipcode"));
+   $newrec->{country}=$country   if (!exists($newrec->{country}));
+   $newrec->{location}=$location if (!exists($newrec->{location}));
+   $newrec->{label}=$label       if (!exists($newrec->{label}));
+   $newrec->{address1}=$address1 if (!exists($newrec->{address1}));
+   $newrec->{zipcode}=$zipcode   if (!exists($newrec->{zipcode}));
+
    $self->Normalize($newrec);
    my $country=trim(effVal($oldrec,$newrec,"country"));
    my $location=trim(effVal($oldrec,$newrec,"location"));
