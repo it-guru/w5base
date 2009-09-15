@@ -441,6 +441,9 @@ sub Normalize
        $rec->{location} eq "Stuttgart"){
       $rec->{address1}="He\xDFbr\xFChlstra\xDFe 7";
    }
+   if ($rec->{address1}=~m/\s+\d+\s*-\s*\d+\s*$/){
+      $rec->{address1}=~s/^(.*)\s+(\d+)\s*-\s*(\d+)\s*$/$1 $2-$3/;
+   }
    if (($rec->{location}=~m/^M\xFC[h]{0,1}lheim$/i)){
       $rec->{location}="M\xFChlheim an der Donau";
    }
