@@ -1,2 +1,3 @@
 'tsinet::location'=>{de=>'TSINET Standort',en=>'TSINET Location'},
 'Location prio'=>{de=>'Standort Priorität'},
+'fieldgroup.w5baselocation'=>{de=>'W5Base Standort',en=>'W5Base Location'},

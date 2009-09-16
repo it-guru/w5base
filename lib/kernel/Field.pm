@@ -176,7 +176,7 @@ sub addWebLinkToFacility
          }
          $targetval=$linkfield->RawValue($current);
       }
-      if (defined($targetval) && $targetval ne ""){
+      if (defined($targetval) && $targetval ne "" && !ref($targetval)){
          my $detailx=$self->getParent->DetailX();
          my $detaily=$self->getParent->DetailY();
          $targetval=$targetval->[0] if (ref($targetval) eq "ARRAY");
@@ -670,7 +670,12 @@ sub RawValue
             if (defined($myfieldobj)){
                if ($myfieldobj ne $self){
                   my $myval=$myfieldobj->RawValue($current);
-                  $flt{$joinfield}=\$myval;
+                  if (!ref($myval)){
+                     $flt{$joinfield}=\$myval;
+                  }
+                  else{
+                     $flt{$joinfield}=$myval;
+                  }
                   $joinval=1 if (defined($myval) && $myval ne "");
                }
                else{

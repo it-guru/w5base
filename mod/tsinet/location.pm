@@ -72,15 +72,68 @@ sub new
                 dataobjattr   =>'prio'),
 
       new kernel::Field::Text(
+                name          =>'w5locid',
+                label         =>'W5Base Location ID',
+                group         =>'w5baselocation',
+                searchable    =>0,
+                depend        =>[qw(location address1 country zipcode)],
+                onRawValue    =>\&findW5LocID),
+
+      new kernel::Field::TextDrop(
+                name          =>'w5location',
+                group         =>'w5baselocation',
+                label         =>'W5Base Location',
+                vjointo       =>'base::location',
+                vjoindisp     =>'name',
+                vjoinon       =>['w5locid'=>'id'],
+                searchable    =>0),
+
+      new kernel::Field::Text(
                 name          =>'sla',
                 ignorecase    =>1,
                 label         =>'SLA',
                 dataobjattr   =>'service_option'),
 
    );
-   $self->setDefaultView(qw(country zipcode location address1 prio sla));
+   $self->setDefaultView(qw(country zipcode location address1 prio));
    $self->setWorktable("TSIIMP.V_DARWIN_STANDORT_PRIO");
    return($self);
+}
+
+sub findW5LocID
+{
+   my $self=shift;
+   my $current=shift;
+
+   my $loc=getModuleObject($self->getParent->Config,"base::location");
+   my $address1=$self->getParent->getField("address1")->RawValue($current);
+   my $location=$self->getParent->getField("location")->RawValue($current);
+   my $zipcode=$self->getParent->getField("zipcode")->RawValue($current);
+   my $country=$self->getParent->getField("country")->RawValue($current);
+   printf STDERR ("fifi $country $location $zipcode address1=$address1\n");
+   $address1=~s/\sSCZ$//;
+   my $newrec;
+   $newrec->{country}=$country;
+   $newrec->{location}=$location;
+   $newrec->{address1}=$address1;
+   $newrec->{zipcode}=$zipcode;
+
+   $loc->Normalize($newrec);
+
+   $loc->SetFilter({country=>\$newrec->{country},
+                    location=>\$newrec->{location},
+                    address1=>\$newrec->{address1},
+                    zipcode=>\$newrec->{zipcode}}); 
+   my @locid;
+   foreach my $locrec ($loc->getHashList(qw(id))){
+      push(@locid,$locrec->{id});
+   }
+  
+   my ($locrec)=$loc->getOnlyFirst(qw(id));
+   if ($#locid!=-1){
+      return(\@locid);
+   }
+   return(undef);
 }
 
 sub Initialize
@@ -100,7 +153,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default");
+   return("header","default","w5baselocation");
 }
 
 
