@@ -95,7 +95,7 @@ sub new
                 dataobjattr   =>'service_option'),
 
    );
-   $self->setDefaultView(qw(country zipcode location address1 prio));
+   $self->setDefaultView(qw(country zipcode location address1 prio w5location));
    $self->setWorktable("TSIIMP.V_DARWIN_STANDORT_PRIO");
    return($self);
 }
