@@ -124,12 +124,21 @@ sub findW5LocID
                     location=>\$newrec->{location},
                     address1=>\$newrec->{address1},
                     zipcode=>\$newrec->{zipcode}}); 
+   my @loclist;
+   @loclist=$loc->getHashList(qw(id));
+   if ($#loclist==-1){
+      $loc->ResetFilter();
+      $loc->SetFilter({country=>\$newrec->{country},
+                       location=>\$newrec->{location},
+                       address1=>\$newrec->{address1}}); 
+      @loclist=$loc->getHashList(qw(id));
+   }
+
    my @locid;
-   foreach my $locrec ($loc->getHashList(qw(id))){
+   foreach my $locrec (@loclist){
       push(@locid,$locrec->{id});
    }
   
-   my ($locrec)=$loc->getOnlyFirst(qw(id));
    if ($#locid!=-1){
       return(\@locid);
    }
