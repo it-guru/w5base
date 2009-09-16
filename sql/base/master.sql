@@ -248,3 +248,4 @@ alter table interanswer add archiv varchar(80) not NULL;
 alter table interview add contact bigint(20),add contact2 bigint(20);
 alter table interview add restriction blob;
 alter table interanswer add unique(parentobj,parentid,archiv,interviewid);
+alter table location add additional blob;

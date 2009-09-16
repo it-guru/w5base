@@ -276,6 +276,10 @@ sub new
                 label         =>'RealEditor',
                 dataobjattr   =>'location.realeditor'),
 
+      new kernel::Field::Container(
+                name          =>'additional',
+                group         =>'additional',
+                dataobjattr   =>'location.additional'),
 
    );
    $self->setDefaultView(qw(location address1 name cistatus));
@@ -289,7 +293,8 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","contacts","map","gps");
+   return("header","default","contacts","map","gps","control",
+          "additional","source");
 }
 
 
@@ -524,7 +529,7 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default","contacts","gps") if ($self->IsMemberOf("admin"));
+   return("default","contacts","gps","control") if ($self->IsMemberOf("admin"));
    return(undef);
 }
 
