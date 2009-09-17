@@ -9,4 +9,4 @@ Als TSM der Anwendung müssen Sie den Change im Servicecenter unter der Changenum
 en=>'Dear Sirs,
 
 we want to inform you about the attached change.'},
-'AL-TCom Change notification'=>{de=>'AL T-Com Benachrichtungsmodus'},
+'AL DTAG Change notification'=>{de=>'AL DTAG Benachrichtungsmodus'},

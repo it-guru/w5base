@@ -18,7 +18,6 @@ package tsacinv::event::putac;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::Event;
 use kernel::FTP;
@@ -62,8 +61,8 @@ sub Init
 #
 # - CO-Nummer muß eingetragen sein, und in W5Base/Darwin als 
 #   installiert/aktiv markiert sein.
-# - Betreuungsteam muß innerhalb von DTAG.TSI.ES.ITO.CSS.T-Com* liegen
-#   oder das Adminteam muß innerhalb von DTAG.TSI.ES.ITO.CSS.T-Com* liegen.
+# - Betreuungsteam muß innerhalb von DTAG.TSI.ES.ITO.CSS.AS.DTAG* liegen
+#   oder das Adminteam muß innerhalb von DTAG.TSI.ES.ITO.CSS.AS.DTAG* liegen.
 # - Es darf NICHT "automatisierte Updates durch Schnittstellen" zugelassen sein
 # - CI-Status muß "installiert/aktiv" sein
 # - Dem Asset muß min. ein System zugeordnet sein. 
@@ -78,7 +77,7 @@ sub getAcGroupByW5BaseGroup
 
    my $acgrp=$app->getPersistentModuleObject("tsacgroup","tsacinv::group");
 
-   $grpname=~s/^.*\.CSS\.T-Com/CSS.TCOM/i;
+   $grpname=~s/^.*\.CSS\.AO\.DTAG/CSS.TCOM/i;
    if ($grpname ne ""){
       $acgrp->SetFilter({name=>$grpname}); 
       my ($acgrprec,$msg)=$acgrp->getOnlyFirst(qw(name));
@@ -143,7 +142,7 @@ sub mkAcFtpRecAsset
       return(undef);
    }
 
-   if ($rec->{mandator}=~m/AL T-Com/){
+   if ($rec->{mandator}=~m/AL DTAG/){
       $acrec->{Asset}->{SC_Location_ID}="3826.0000.0000";# T-Com Bonn Land
       $acrec->{Asset}->{CustomerLink}="TS.DE";           # ?
    }
@@ -420,7 +419,7 @@ sub ApplicationModified
                   $posix{$userent}="[NULL]" if (!defined($posix{$userent}));
                }
                my $assignment=$rec->{businessteam};
-               $assignment=~s/^.*\.CSS\.T-Com/CSS.TCOM/i;
+               $assignment=~s/^.*\.CSS\.AO\.DTAG/CSS.TCOM/i;
                if ($assignment ne ""){
                   $acgrp->ResetFilter(); 
                   $acgrp->SetFilter({name=>$assignment}); 
@@ -656,7 +655,7 @@ sub ApplicationModified
                   }
                   if ($systemid ne ""){
                      my $assignment=$rec->{swteam};
-                     $assignment=~s/^.*\.CSS\.T-Com/CSS.TCOM/i;
+                     $assignment=~s/^.*\.CSS\.AO\.DTAG/CSS.TCOM/i;
                      if ($assignment ne ""){
                         $acgrp->ResetFilter(); 
                         $acgrp->SetFilter({name=>$assignment}); 

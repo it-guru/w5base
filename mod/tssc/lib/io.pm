@@ -162,7 +162,7 @@ sub mkProblemStoreRec
       }
       else{
          $wfrec{class}='itil::workflow::problem';
-         $wfrec{stateid}=21;           # non AL-T-Com is automaticly finished
+         $wfrec{stateid}=21;           # non AL DTAG is automaticly finished
       }
    }
    if (!defined($updateto)){
@@ -378,7 +378,7 @@ sub mkChangeStoreRec
       }
       else{
          $wfrec{class}='itil::workflow::change';
-         $wfrec{stateid}=21;           # non AL-T-Com is automaticly finished
+         $wfrec{stateid}=21;           # non AL DTAG is automaticly finished
       }
    }
    if (!defined($updateto)){
@@ -776,7 +776,7 @@ sub mkIncidentStoreRec
    if ($oldclass eq "itil::workflow::incident" ||
        (defined($wfrec{class}) && 
         ($wfrec{class}=~m/itil::workflow::incident/))){
-      $wfrec{stateid}=21;           # non AL-T-Com is automaticly finished
+      $wfrec{stateid}=21;           # non AL DTAG is automaticly finished
       # sollte jetzt auch mit sofort beenden funktionieren
    }
    if (!defined($oldrec[0]) || !($oldrec[0]->{step}=~m/::postreflection$/)){

@@ -107,13 +107,13 @@ sub Result
    my $search_sp=Query->Param("search_SP");
 
    my $flt={ eventstart=>$search_es,
-             mandator=>"\"AL T-Com\"",
+             mandator=>"\"AL DTAG\"",
              class=>[grep(/^AL_TCom::.*::change$/,
                           keys(%{$self->{DataObj}->{SubDataObj}}))]};
    if ($search_sp eq "prio1ag"){
       $self->{appl}->ResetFilter();
       $self->{appl}->SetFilter({customerprio=>1,
-                                mandator=>"\"AL T-Com\""});
+                                mandator=>"\"AL DTAG\""});
       my @l=$self->{appl}->getHashList(qw(id));
       if ($#l==-1){
          $flt->{affectedapplicationid}=-1;

@@ -61,7 +61,7 @@ sub mkchmfuturereport
    $wf->SetCurrentView(qw(id name affectedapplication affectedapplicationid
                           class stateid srcid));
    $wf->SetFilter(eventstart=>">now AND <now+15d",
-                  mandator=>"\"AL T-Com\"",
+                  mandator=>"\"AL DTAG\"",
                   class=>[grep(/^AL_TCom::.*::change$/,
                                keys(%{$wf->{SubDataObj}}))]);
    my %co=();

@@ -172,7 +172,7 @@ sub VerifyAssetManagerData
               #            "zugeordnet, für die Sie SeM sind. ".
               #            "Tragen Sie das System mit der SystemID ".
               #            "'$sysrec->{systemid}' entsprechend den ".
-              #            "Config-Management Regeln der AL T-Com in ".
+              #            "Config-Management Regeln der AL DTAG in ".
               #            "W5Base/Darwin ein! (bzw. tragen Sie die SystemID ".
               #            "ein, falls Sie diese beim entsprechenden System ".
               #            "vergessen haben)");
@@ -192,7 +192,7 @@ sub VerifyAssetManagerData
               #               "'$corec->{name}' des Systems in AssetManager ".
               #               "erfasst. Die Zuorndung eines Systems zu ".
               #               "einer Anwendung ist nach den Config-Management ".
-              #               "Regeln der AL T-Com zwingend. Sorgen Sie dafür, ".
+              #               "Regeln der AL DTAG zwingend. Sorgen Sie dafür, ".
               #               "dass die korrekte Zuorndung zu einer Anwendung ".
               #               "in W5Base/Darwin eingetragen wird.");
                      }
@@ -213,7 +213,7 @@ sub VerifyAssetManagerData
                              directlnkid=>'0',
                              altaffectedobjectname=>$sysrec->{systemid},
                              mandatorid=>['200'],
-                             mandator=>['AL T-Com'],
+                             mandator=>['AL DTAG'],
                              directlnkmode=>$sysrec->{systemid},
                              detaildescription=>$desc};
                   if (defined($self->{configmgr}->{$altbc})){
@@ -300,7 +300,7 @@ sub SendOpMsg()
             $notiy{emailtext}=$msg."\n\n\n".
                               "Bei Fragen wenden Sie sich bitte an den ".
                               "\nConfig-Manager der ".
-                              "AL T-Com Hr. Merx Hans-Peter.";
+                              "AL DTAG Hr. Merx Hans-Peter.";
             $notiy{emailto}=$email;
             $notiy{emailcc}=\@cc;
             $notiy{class}='base::workflow::mailsend';

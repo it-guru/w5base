@@ -54,7 +54,7 @@ sub SendMyJobs
    #$flt->{fullname}="ladegast* ernst*";
    if ($#target==-1){
       #
-      # basierend auf der Entscheidung des MC AL T-Com werden die
+      # basierend auf der Entscheidung des MC AL DTAG werden die
       # reports über anstehende Aufgaben jetzt an alle Darwin Nutzer erstellt.
       #
       #$flt[0]->{groups}=["DTAG.TSI.ES.ITO.CSS.T-Com.ST.DB",

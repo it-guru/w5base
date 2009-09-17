@@ -1,2 +1,2 @@
-'AL_TCom::workflow::problem'=>{de=>'AL T-Com: ITIL Problem individualisiert',
-                               en=>'AL T-Com: ITIL Problem spezicalized'},
+'AL_TCom::workflow::problem'=>{de=>'AL DTAG: ITIL Problem individualisiert',
+                               en=>'AL DTAG: ITIL Problem spezicalized'},

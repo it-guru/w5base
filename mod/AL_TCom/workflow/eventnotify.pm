@@ -178,7 +178,7 @@ sub activateMailSend
    my $action=shift;
 
    my %d=(step=>'base::workflow::mailsend::waitforspool',
-          emailsignatur=>'EventNotification: AL T-Com');
+          emailsignatur=>'EventNotification: AL DTAG');
    $self->linkMail($WfRec->{id},$id);
    if (my $r=$wf->Store($id,%d)){
       return(1);
@@ -196,8 +196,8 @@ sub ValidateCreate
   #
    if (!defined($newrec->{mandator}) ||    
        ref($newrec->{mandator}) ne "ARRAY" ||
-       !grep(/^(Extern|AL T-Com)$/,@{$newrec->{mandator}})){
-      $self->LastMsg(ERROR,"no AL T-Com mandator included");
+       !grep(/^(Extern|AL DTAG)$/,@{$newrec->{mandator}})){
+      $self->LastMsg(ERROR,"no AL DTAG mandator included");
       return(0);
    }
         

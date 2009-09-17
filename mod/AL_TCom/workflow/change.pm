@@ -204,7 +204,7 @@ sub activateMailSend
    my $action=shift;
 
    my %d=(step=>'base::workflow::mailsend::waitforspool',
-          emailsignatur=>'ChangeNotification: AL T-Com');
+          emailsignatur=>'ChangeNotification: AL DTAG');
    $self->linkMail($WfRec->{id},$id);
    if (my $r=$wf->Store($id,%d)){
       return(1);

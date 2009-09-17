@@ -1,9 +1,9 @@
-'AL_TCom::workflow::fastdiary'=>{de=>'AL T-Com: Betriebstagebuch Kleinarbeiten',
-                                  en=>'AL T-Com: Diary short jobs'},
+'AL_TCom::workflow::fastdiary'=>{de=>'AL DTAG: Betriebstagebuch Kleinarbeiten',
+                                 en=>'AL DTAG: Diary short jobs'},
 'AL_TCom::workflow::fastdiary::tip'=>{
               de=>'Das Betriebstagebuch dient zur Dokumentation von '.
                   'Projektarbeiten oder allgemeinen Veränderungen '.
-                  'in bestimmten Anwendungen. Für die AL-T-Com müssen '.
+                  'in bestimmten Anwendungen. Für die AL DTAG müssen '.
                   'im speziellen die P800 relevanten Aufwände '.
                   'dokumentiert werden. Dieses spezielle Betriebstagebuch '.
                   'ist zur schellen und effektiven Dokumentation von '.

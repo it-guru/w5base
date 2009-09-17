@@ -1,5 +1,5 @@
-'AL_TCom::workflow::eventnotify'=>{de=>'AL T-Com: IT-Ereignismeldung',en=>'AL T-Com: IT-Eventnotification'},
-'no AL T-Com mandator included'=>{de=>'kein AL T-Com Mandant eingeschlossen'},
+'AL_TCom::workflow::eventnotify'=>{de=>'AL DTAG: IT-Ereignismeldung',en=>'AL DTAG: IT-Eventnotification'},
+'no AL DTAG mandator included'=>{de=>'kein AL DTAG Mandant eingeschlossen'},
 'EVt.iswtsi'=>{de=>'Individual-SW TSI',en=>'Individual-SW TSI'},
 'EVt.iswext'=>{de=>'Individual-SW extern',en=>'Individual-SW extern'},
 'EVt.wrkerr'=>{de=>'Arbeitsfehler',en=>'Work mistake'},

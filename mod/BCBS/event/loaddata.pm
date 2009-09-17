@@ -53,13 +53,13 @@ sub LoadBCBS
 
    my $man=getModuleObject($self->Config,"base::mandator");
    my $wiw=getModuleObject($self->Config,"tswiw::user");
-   $man->SetFilter({name=>\'AL T-Com'});
+   $man->SetFilter({name=>\'AL DTAG'});
    my ($manrec,$msg)=$man->getOnlyFirst("grpid");
    my $mandatorid=$manrec->{grpid};
 
    my $grp=getModuleObject($self->Config,"base::grp");
    my $customerid=$grp->TreeCreate("DTAG.ACTIVEBILLING");
-   my $businessteam=$grp->TreeCreate("DTAG.TSI.ES.ITO.CSS.T-Com.BILLING");
+   my $businessteam=$grp->TreeCreate("DTAG.TSI.ES.ITO.CSS.AO.DTAG.BILLING");
 
 
 
@@ -204,7 +204,7 @@ sub LoadBCBS
                           serialno=>$aassetrec->{serialno},
                           guardianid=>$databossid,
                           comments=>'Initial load for BCBS '.
-                                    'while merge to AL T-Com',
+                                    'while merge to AL DTAG',
                           srcsys=>$srcsys,srcid=>$assetid};
 
             if ($aassetrec->{locationid} ne ""){  # find a w5base location
@@ -263,7 +263,7 @@ sub LoadBCBS
                           cpucount=>$asystemrec->{cpucount},
                           memory=>$asystemrec->{memory},
                           comments=>'Initial load for BCBS '.
-                                    'while merge to AL T-Com',
+                                    'while merge to AL DTAG',
                           srcsys=>$srcsys,srcid=>$systemid};
             if ($asystemrec->{assetassetid} ne ""){
                $systemrec->{asset}=$asystemrec->{assetassetid};
