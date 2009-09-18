@@ -176,7 +176,9 @@ sub addWebLinkToFacility
          }
          $targetval=$linkfield->RawValue($current);
       }
-      if (defined($targetval) && $targetval ne "" && !ref($targetval)){
+      if (defined($targetval) && $targetval ne "" && 
+          (!ref($targetval) || 
+           (ref($targetval) eq "ARRAY" && $#{$targetval}==0))){
          my $detailx=$self->getParent->DetailX();
          my $detaily=$self->getParent->DetailY();
          $targetval=$targetval->[0] if (ref($targetval) eq "ARRAY");
