@@ -397,6 +397,11 @@ sub Process
          my $shortnote=Query->Param("emailmsg");
 
          $shortnote=trim($shortnote);
+         if (length($shortnote)<10){
+            $self->LastMsg(ERROR,"empty or not descriptive messages ".
+                                 "are not allowed");
+            return(0);
+         }
          my $note=$shortnote;
          if ($ENV{SCRIPT_URI} ne ""){
             my $baseurl=$ENV{SCRIPT_URI};
