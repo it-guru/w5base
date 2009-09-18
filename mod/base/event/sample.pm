@@ -123,19 +123,20 @@ sub memtest
 
    msg(DEBUG,"Start(memtest):");
    eval("use GTop;"); 
+   msg(DEBUG,"W5V2::Cache=%s\n",join(",",keys(%{$W5V2::Cache->{w5base2}})));
+   msg(DEBUG,"W5V2::Context=%s\n",join(",",keys(%{$W5V2::Context})));
    my $g0=GTop->new->proc_mem($$);
-   for(my $cc=0;$cc<600;$cc++){ 
+   for(my $cc=0;$cc<50;$cc++){ 
       my $g1=GTop->new->proc_mem($$);
-      for(my $c=0;$c<100;$c++){ 
-         my $evl=getModuleObject($self->Config,"base::joblog");
-         $evl->ValidatedInsertRecord({event=>"memtest($cc,$c)",
-                                      pid=>"$$",
-                                      exitcode=>9});
+      for(my $c=0;$c<10000;$c++){ 
+         my $e=NowStamp("en");
       }
       my $g=GTop->new->proc_mem($$);
       msg(DEBUG,"loop=%02d mem=".$g->vsize." total=%d loopdelta=%d\n",$cc,$g-$g0,$g-$g1);
    }
    msg(DEBUG,"End  (memtest):");
+   msg(DEBUG,"W5V2::Context=%s\n",join(",",keys(%{$W5V2::Context})));
+   msg(DEBUG,"W5V2::Cache=%s\n",join(",",keys(%{$W5V2::Cache->{w5base2}})));
    return({exitcode=>0});
 }
 
