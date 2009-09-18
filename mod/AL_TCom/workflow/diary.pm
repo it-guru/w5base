@@ -313,24 +313,24 @@ sub isCopyValid
    return(1);
 }
 
-sub getDetailFunctionsCode
-{
-   my $self=shift;
-   my $rec=shift;
-   my $wfclass=$self->Self();
-   my $d;
-   if (defined($rec)){
-      my $idname=$self->IdField->Name();
-      my $id=$rec->{$idname};
-      $d=<<EOF;
-function WorkflowCopy()
-{
-   custopenwin("Copy?CurrentIdToEdit=$id","",640);
-}
-EOF
-   }
-   return($self->SUPER::getDetailFunctionsCode($rec).$d);
-}
+#sub getDetailFunctionsCode
+#{
+#   my $self=shift;
+#   my $rec=shift;
+#   my $wfclass=$self->Self();
+#   my $d;
+#   if (defined($rec)){
+#      my $idname=$self->IdField->Name();
+#      my $id=$rec->{$idname};
+#      $d=<<EOF;
+#function WorkflowCopy()
+#{
+#   custopenwin("Copy?CurrentIdToEdit=$id","",640);
+#}
+#EOF
+#   }
+#   return($self->SUPER::getDetailFunctionsCode($rec).$d);
+#}
 
 sub InitCopy
 {
