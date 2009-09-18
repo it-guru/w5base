@@ -295,16 +295,16 @@ sub getNextStep
    return($self->SUPER::getNextStep($currentstep,$WfRec));
 }
 
-sub getDetailFunctions
-{
-   my $self=shift;
-   my $rec=shift;
-   my @f;
-   if (defined($rec)){
-      @f=($self->T('WorkflowCopy')=>'WorkflowCopy');
-   }
-   return(@f,$self->SUPER::getDetailFunctions($rec));
-}
+#sub getDetailFunctions
+#{
+#   my $self=shift;
+#   my $rec=shift;
+#   my @f;
+#   if (defined($rec)){
+#      @f=($self->T('WorkflowCopy')=>'WorkflowCopy');
+#   }
+#   return(@f,$self->SUPER::getDetailFunctions($rec));
+#}
 
 sub isCopyValid
 {
