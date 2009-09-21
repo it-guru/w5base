@@ -51,6 +51,16 @@ sub getControlData
                                      'rootcauseinfo'=>'AL_TCom::appl',
                                 ],
                                },
+           'itil::network'=>   {target=>'name',
+                                mode  =>[
+                                     'rootcauseinfo'=>'AL_TCom::appl',
+                                ],
+                               },
+           'base::location'=>  {target=>'name',
+                                mode  =>[
+                                     'rootcauseinfo'=>'AL_TCom::appl',
+                                ],
+                               },
            'base::grp'=>       {target=>'fullname',
                                 mode  =>[
                                      'rootcauseinfo'=>'AL_TCom::appl',

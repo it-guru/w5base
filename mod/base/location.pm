@@ -536,5 +536,24 @@ sub isWriteValid
    return(undef);
 }
 
+sub HandleInfoAboSubscribe
+{
+   my $self=shift;
+   my $id=Query->Param("CurrentIdToEdit");
+   my $ia=$self->getPersistentModuleObject("base::infoabo");
+   if ($id ne ""){
+      $self->ResetFilter();
+      $self->SetFilter({id=>\$id});
+      my ($rec,$msg)=$self->getOnlyFirst(qw(name));
+      print($ia->WinHandleInfoAboSubscribe({},
+                      $self->SelfAsParentObject(),$id,$rec->{name},
+                      "base::staticinfoabo",undef,undef));
+   }
+   else{
+      print($self->noAccess());
+   }
+}
+
+
 
 1;
