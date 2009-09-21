@@ -197,6 +197,8 @@ sub getW5ACLocationname
    $lrec{country}=$aclocrec->{country};
    $lrec{cistatusid}=4;
 
+   return(undef) if ($lrec{zipcode} eq "0");
+   return(undef) if ($lrec{location} eq "0");
    #
    # pre process aclocation 
    #

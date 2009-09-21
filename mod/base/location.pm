@@ -335,6 +335,8 @@ sub Validate
    }
    if ($location eq "" || $location eq "0" || $address1 eq "0"){
       $self->LastMsg(ERROR,"invalid location");
+      msg(ERROR,"invalid location request with ".
+                "location='$location' and address1='$address1'");
       return(0);
    }
 
