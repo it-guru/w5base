@@ -76,7 +76,12 @@ sub NotifyINetwork
                       ->on_action(sub{'"'.$inetwxmlns.$_[1].'"'});
    $soap->serializer->register_ns($inetwxmlns,'ns');
 
-   my $res=$soap->call($method=>@SOAPparam); 
+   my $res;
+   eval('$res=$soap->call($method=>@SOAPparam);'); 
+   if ($@=~m/Connection refused/){
+      return({exitcode=>10,
+              msg=>'can not connect to INetwork - Connection refused'});
+   }
 
    if ($res->fault){
       $self->Log(ERROR,"trigger","INetwork: ".$res->fault->{faultstring});
