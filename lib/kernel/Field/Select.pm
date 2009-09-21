@@ -219,24 +219,39 @@ sub preProcessFilter
          my $procoldval=trim($oldval);
          my @chklist=parse_line(',{0,1}\s+',0,$procoldval);
          foreach my $chk (@chklist){
+            my $neg=0;
+            if ($chk=~m/^!/){
+               $neg++;
+               $chk=~s/^!//;
+            }
             my $qchk='^'.quotemeta($chk).'$';
             $qchk=~s/\\\*/\.*/g;
             $qchk=~s/\\\?/\./g;
             if ($chk eq "[LEER]" || $chk eq "[EMPTY]" ){
-               push(@newsearch,undef);
+               if ($neg){
+                  push(@newsearch,keys(%tr),keys(%raw));
+               }
+               else{
+                  push(@newsearch,undef);
+               }
             }
             else{
-               foreach my $v (keys(%tr)){
-                  if ($v=~m/$qchk/i || $tr{$v} eq $chk){
-                     if (!grep(/^$tr{$v}$/,@newsearch)){
-                        push(@newsearch,$tr{$v});
+               if ($neg){
+                  push(@newsearch,grep(!/$chk$/i,keys(%tr),keys(%raw)));
+               }
+               else{
+                  foreach my $v (keys(%tr)){
+                     if ($v=~m/$qchk/i || $tr{$v} eq $chk){
+                        if (!grep(/^$tr{$v}$/,@newsearch)){
+                           push(@newsearch,$tr{$v});
+                        }
                      }
                   }
-               }
-               foreach my $v (keys(%raw)){
-                  if ($v=~m/$qchk/i || $tr{$v} eq $chk){
-                     if (!grep(/^$raw{$v}$/,@newsearch)){
-                        push(@newsearch,$raw{$v});
+                  foreach my $v (keys(%raw)){
+                     if ($v=~m/$qchk/i || $tr{$v} eq $chk){
+                        if (!grep(/^$raw{$v}$/,@newsearch)){
+                           push(@newsearch,$raw{$v});
+                        }
                      }
                   }
                }
