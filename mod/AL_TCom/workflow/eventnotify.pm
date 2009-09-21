@@ -259,7 +259,7 @@ sub getNotificationSubject
    if ($WfRec->{eventmode} eq "EVk.infraloc"){ 
       my $loc=$WfRec->{affectedlocation};
       $loc=$WfRec->{affectedlocation}->[0] if (ref($WfRec->{affectedlocation}));
-      $subject2=" / $loc / $state / ";
+      $subject2=" / $loc / $state / Standort / ";
    }
    if ($action eq "rootcausei"){
       $subject2=" / $ag / Ursachenanalyse / $afcust / Applikation /";
