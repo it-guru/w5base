@@ -2242,7 +2242,7 @@ sub Process
          my $ht;
          $subjectlabel="first information";
          my $ht=$self->T($subjectlabel,'itil::workflow::eventnotify');
-         if ($sendcustinfocount>1){
+         if ($sendcustinfocount>0){
             $subjectlabel="follow info";
             $ht=$sendcustinfocount.". ".$self->T($subjectlabel,
                                              'itil::workflow::eventnotify');
