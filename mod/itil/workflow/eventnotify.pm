@@ -2216,7 +2216,7 @@ sub Process
       $self->getParent->getParent->Action->ResetFilter();
       $self->getParent->getParent->Action->SetFilter({wfheadid=>\$id});
       my @l=$self->getParent->getParent->Action->getHashList(qw(cdate name));
-      my $sendcustinfocount=1;
+      my $sendcustinfocount=0;
       foreach my $arec (@l){
          $sendcustinfocount++ if ($arec->{name} eq "sendcustinfo");
       }
