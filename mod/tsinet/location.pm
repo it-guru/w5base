@@ -133,6 +133,119 @@ sub findW5LocID
                        address1=>\$newrec->{address1}}); 
       @loclist=$loc->getHashList(qw(id));
    }
+   if ($#loclist==-1){
+      $loc->ResetFilter();
+      $loc->SetFilter({name=>"NONE"});
+      if (($newrec->{location}=~m/Bamberg/i) &&
+          ($newrec->{address1}=~m/Memmelsdorfer/i)){
+         $loc->SetFilter({name=>"*bamberg*memmelsdorfer*"});
+      }
+      if (($newrec->{location}=~m/Weiden/i) &&
+          ($newrec->{address1}=~m/Stockerhutweg/i)){
+         $loc->SetFilter({name=>"*weiden*Stockerhutweg*"});
+      }
+      if (($newrec->{location}=~m/Weiden/i) &&
+          ($newrec->{address1}=~m/Bauscher/i)){
+         $loc->SetFilter({name=>"*weiden*Bauscher*"});
+      }
+      if (($newrec->{location}=~m/Nürnberg/i) &&
+          ($newrec->{address1}=~m/Allersberger/i)){
+         $loc->SetFilter({name=>"*Nuernberg*Allersberger*"});
+      }
+      if (($newrec->{location}=~m/Traunstein/i) &&
+          ($newrec->{address1}=~m/Rosenheimer/i)){
+         $loc->SetFilter({name=>"*Traunstein*Rosenheimer*"});
+      }
+      if (($newrec->{location}=~m/Offenburg/i) &&
+          ($newrec->{address1}=~m/Okenstr/i)){
+         $loc->SetFilter({name=>"*Offenburg*Okenstr*"});
+      }
+      if (($newrec->{location}=~m/Göppingen/i) &&
+          ($newrec->{address1}=~m/Salamander/i)){
+         $loc->SetFilter({name=>"*Goeppingen*Salamander*"});
+      }
+      if (($newrec->{location}=~m/Neustadt/i) &&
+          ($newrec->{address1}=~m/Chemnitzer.*2/i)){
+         $loc->SetFilter({name=>"*Neustadt*Chemnitzer*2*"});
+      }
+      if (($newrec->{location}=~m/Hanau/i) &&
+          ($newrec->{address1}=~m/Rückinger/i)){
+         $loc->SetFilter({name=>"*Hanau*Ruckinger*"});
+      }
+      if (($newrec->{location}=~m/Heusenstamm/i) &&
+          ($newrec->{address1}=~m/Jahnstr/i)){
+         $loc->SetFilter({name=>"*Heusenstamm*Jahnstr*"});
+      }
+      if (($newrec->{location}=~m/Duisburg/i) &&
+          ($newrec->{address1}=~m/Saarstr/i)){
+         $loc->SetFilter({name=>"*Duisburg*Saarstr*"});
+      }
+      if (($newrec->{location}=~m/Bochum/i) &&
+          ($newrec->{address1}=~m/Karl-Lange.*29/i)){
+         $loc->SetFilter({name=>"*Bochum*Karl_Lange*29*"});
+      }
+      if (($newrec->{location}=~m/Magdeburg/i) &&
+          ($newrec->{address1}=~m/Lübecker.*13/i)){
+         $loc->SetFilter({name=>"*Magdeburg*Luebecker*13*"});
+      }
+      if (($newrec->{location}=~m/Detmold/i) &&
+          (my ($no)=$newrec->{address1}=~m/Braunen.*(\d+)/i)){
+         $loc->SetFilter({name=>"*Detmold*Braun*$no*"});
+      }
+      if (($newrec->{location}=~m/Hannover/i) &&
+          (my ($no)=$newrec->{address1}=~m/TÜV.*(\d+)/i)){
+         $loc->SetFilter({name=>"*Hannover*TUEV*$no*"});
+      }
+      if (($newrec->{location}=~m/Bremen/i) &&
+          (my ($no)=$newrec->{address1}=~m/Stresemann.*(\d+)/i)){
+         $loc->SetFilter({name=>"*Bremen*esemann*$no*"});
+      }
+      if (($newrec->{location}=~m/Heide/i) &&
+          (my ($no)=$newrec->{address1}=~m/Kleinbahnhof.*(\d+)/i)){
+         $loc->SetFilter({name=>"*Heide*Kleinbahnhof*$no*"});
+      }
+      if (($newrec->{location}=~m/Flensburg/i) &&
+          (my ($no)=$newrec->{address1}=~m/Eckernf.*(\d+)/i)){
+         $loc->SetFilter({name=>"*Flensburg*Eckernf*$no*"});
+      }
+      if (($newrec->{location}=~m/Kronshagen/i) &&
+          (my ($no)=$newrec->{address1}=~m/Posthorn.*3/i)){
+         $loc->SetFilter({name=>"*Kronshagen*Posthorn*3*"});
+      }
+      if (($newrec->{location}=~m/Rostock/i) &&
+          (my ($no)=$newrec->{address1}=~m/Deutsche.*(\d+)/i)){
+         $loc->SetFilter({name=>"*Rostock*Deutsche*$no*"});
+      }
+      if (($newrec->{location}=~m/Stahnsdorf/i) &&
+          (my ($no)=$newrec->{address1}=~m/Güterfelder.*(\d+)/i)){
+         $loc->SetFilter({name=>"*Stahnsdorf*Gueterfelder*$no*"});
+      }
+      if (($newrec->{location}=~m/Berlin/i) &&
+          (my ($no)=$newrec->{address1}=~m/Dernburgstr.*(\d+)/i)){
+         $loc->SetFilter({name=>"*Berlin*Dernburgerstr*$no*"});
+      }
+      if (($newrec->{location}=~m/Berlin/i) &&
+          (my ($no)=$newrec->{address1}=~m/Lankwitzer/i)){
+         $loc->SetFilter({name=>"*Berlin*Lankwitzer*13-17*"});
+      }
+      if (($newrec->{location}=~m/Berlin/i) &&
+          (my ($no)=$newrec->{address1}=~m/Winterfeld.*21/i)){
+         $loc->SetFilter({name=>"*Berlin*Winterfeld*21*"});
+      }
+      if (($newrec->{location}=~m/Leipzig/i) &&
+          (my ($no)=$newrec->{address1}=~m/Gutenberg/i)){
+         $loc->SetFilter({name=>"*Leipzig*Gutenberg*1*"});
+      }
+      if (($newrec->{location}=~m/Cottbus/i) &&
+          (my ($no)=$newrec->{address1}=~m/Heinrich.*(\d+)/i)){
+         $loc->SetFilter({name=>"*Cottbus*Heinrich*$no*"});
+      }
+      if (($newrec->{location}=~m/Radebeul/i) &&
+          (my ($no)=$newrec->{address1}=~m/Dresdner.*(\d+)/i)){
+         $loc->SetFilter({name=>"*Radebeul*Dresdner*$no*"});
+      }
+      @loclist=$loc->getHashList(qw(id));
+   }
 
    my @locid;
    foreach my $locrec (@loclist){
