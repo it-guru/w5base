@@ -3,6 +3,7 @@
 'fieldgroup.status'=>{de=>'Incident-Statusdaten',en=>'Incident-Status'},
 'fieldgroup.contact'=>{de=>'Incident-Kontaktdaten',en=>'Incident-Contacts'},
 'fieldgroup.close'=>{de=>'Abschluss Informationen',en=>'Closing Informations'},
+'fieldgroup.relations'=>{de=>'Verknüpfungen',en=>'Relations'},
 'Brief Description'=>{de=>'Kurzbeschreibung'},
 'Created'=>{de=>'Erstellt'},
 'Downtime Start'=>{de=>'Ereignis Beginn'},

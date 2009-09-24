@@ -239,6 +239,14 @@ sub new
                 searchable    =>0,
                 dataobjattr   =>'rootcausea3.resolution'),
 
+      new kernel::Field::SubList(
+                name          =>'relations',
+                label         =>'Relations',
+                group         =>'relations',
+                vjointo       =>'tssc::lnk',
+                vjoinon       =>['problemnumber'=>'src'],
+                vjoininhash   =>['dst'],
+                vjoindisp     =>[qw(dst dstname)]),
 
       new kernel::Field::Text(
                 name          =>'homeassignment',
@@ -318,7 +326,7 @@ sub getRecordImageUrl
 sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),qw(status contact));
+   return($self->SUPER::getDetailBlockPriority(@_),qw(status relations contact));
 }
 
 

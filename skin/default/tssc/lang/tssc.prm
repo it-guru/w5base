@@ -3,6 +3,7 @@
 'fieldgroup.status'=>{de=>'Problem-Klassifizierung',en=>'Problem-Classification'},
 'fieldgroup.contact'=>{de=>'Problem-Kontaktdaten',en=>'Problem-Contacts'},
 'fieldgroup.close'=>{de=>'Abschluss Informationen',en=>'Closing Informations'},
+'fieldgroup.relations'=>{de=>'Verknüpfungen',en=>'Relations'},
 'Brief Description'=>{de=>'Kurzbeschreibung'},
 'Created'=>{de=>'Erstellt'},
 'Category'=>{de=>'Kategorie'},

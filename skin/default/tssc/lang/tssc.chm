@@ -4,6 +4,8 @@
 'fieldgroup.default'=>{de=>'Change-Daten',en=>'Change-Data'},
 'fieldgroup.approvals'=>{de=>'Zustimmungen',en=>'Approvals'},
 'fieldgroup.software'=>{de=>'betroffene Software/Anwendungen',en=>'affected Software/Applications'},
+'fieldgroup.relations'=>{de=>'Verknüpfungen',en=>'Relations'},
+
 'fieldgroup.close'=>{de=>'Abschluss Informationen',en=>'Closing Informations'},
 'fieldgroup.device'=>{de=>'betroffene Geräte/Systeme',en=>'affected Devices/Systems'},
 'Brief Description'=>{de=>'Kurzbeschreibung (Brief Description)'},

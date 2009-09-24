@@ -47,6 +47,10 @@ sub Init
                       "tssc::chm",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("sc.change.relations",
+                      "tssc::lnk",
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("sc.change.software",
                       "tssc::chm_software",
                       defaultacl=>['valid_user']);
@@ -63,6 +67,10 @@ sub Init
                       "tssc::inm",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("sc.incident.relations",
+                      "tssc::lnk",
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("sc.incident.assignment",
                       "tssc::inm_assignment",
                       defaultacl=>['admin',"support"]);
@@ -71,6 +79,10 @@ sub Init
                       "tssc::prm",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("sc.problem.relations",
+                      "tssc::lnk",
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("sc.krn",
                       "tmpl/welcome",
                       defaultacl=>['valid_user']);

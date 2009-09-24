@@ -384,6 +384,15 @@ sub new
                 label         =>'Coordinator',
                 dataobjattr   =>'cm3rm1.coordinator'),
 
+      new kernel::Field::SubList(
+                name          =>'relations',
+                label         =>'Relations',
+                group         =>'relations',
+                vjointo       =>'tssc::lnk',
+                vjoinon       =>['changenumber'=>'src'],
+                vjoininhash   =>['dst'],
+                vjoindisp     =>[qw(dst dstname)]),
+
       new kernel::Field::Text(
                 name          =>'editor',
                 group         =>'contact',
@@ -479,7 +488,7 @@ sub SecureSetFilter
 sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),qw(status contact));
+   return($self->SUPER::getDetailBlockPriority(@_),qw(status relations contact));
 }
 
 sub getRecordImageUrl
@@ -513,7 +522,8 @@ sub isViewValid
       $st=$rec->{status};
    }
    if ($st ne "closed" && $st ne "rejected" && $st ne "resolved"){
-      return(qw(contact default status header software device approvals));
+      return(qw(contact default relations 
+                status header software device approvals));
    }
    return("ALL");
 }

@@ -116,6 +116,24 @@ sub new
                 vjoininhash   =>['assignment','status'],
                 vjoindisp     =>[qw(assignment status sysmodtime)]),
 
+      new kernel::Field::SubList(
+                name          =>'relations',
+                label         =>'Relations',
+                group         =>'relations',
+                vjointo       =>'tssc::lnk',
+                vjoinon       =>['incidentnumber'=>'src'],
+                vjoininhash   =>['dst'],
+                vjoindisp     =>[qw(dst dstname)]),
+
+    #  new kernel::Field::SubList(
+    #            name          =>'drelation',
+    #            label         =>'Sources',
+    #            group         =>'relations',
+    #            vjointo       =>'tssc::lnk',
+    #            vjoinon       =>['incidentnumber'=>'dst'],
+    #            vjoininhash   =>['src'],
+    #            vjoindisp     =>[qw(src srcname)]),
+
       new kernel::Field::Text(
                 name          =>'hassignment',
                 group         =>'status',
@@ -361,7 +379,7 @@ sub Initialize
 sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),qw(status contact));
+   return($self->SUPER::getDetailBlockPriority(@_),qw(status relations contact));
 }
 
 
