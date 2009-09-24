@@ -64,7 +64,7 @@ sub FormatedDetail
       mustMatch: true,
       minChars: 2,
       extraParams: {
-          FormatAs: 'CsvV02',
+          FormatAs: 'AutoFillData',
           CurrentView: '($disp)',
           UseLimit: '40',
           UseLimitStart: '0',

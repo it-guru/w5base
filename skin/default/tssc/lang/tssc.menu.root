@@ -6,6 +6,7 @@
 'sc.incident'=>{de=>'IncidentManagement',en=>'IncidentManagement'},
 'sc.incident.assignment'=>{de=>'Assignment',en=>'Assignment'},
 'sc.problem'=>{de=>'ProblemManagement',en=>'ProblemManagement'},
+'sc.mgr'=>{de=>'Manager',en=>'Manager'},
 'sc.krn'=>{de=>'Stammdaten',en=>'Kerneldata'},
 'sc.krn.mandator'=>{de=>'Mandanten',en=>'Mandator'},
 'sc.krn.dictonary'=>{de=>'DBDictonary',en=>'DBDictonary'},
