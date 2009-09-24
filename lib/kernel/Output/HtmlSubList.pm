@@ -179,8 +179,13 @@ sub ProcessLine
    if (grep(/^Detail$/,$app->getValidWebFunctions())){
       if ($idfield){
          my $dest=$app->Self();
+
+         my $lq=new kernel::cgi({});
+         $lq->Param($idfieldname=>$id);
+         $lq->Param(AllowClose=>1);
+         my $urlparam=$lq->QueryString();
          $dest=~s/::/\//g;
-         $dest="../../$dest/Detail?$idfieldname=$id&AllowClose=1";
+         $dest="../../$dest/Detail?$urlparam";
          my $detailx=$app->DetailX();
          my $detaily=$app->DetailY();
          $lineonclick="openwin(\"$dest\",\"_blank\",".
