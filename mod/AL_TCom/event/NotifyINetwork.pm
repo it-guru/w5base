@@ -78,7 +78,7 @@ sub NotifyINetwork
 
    my $res;
    eval('$res=$soap->call($method=>@SOAPparam);'); 
-   if ($@=~m/Connection refused/){
+   if (!defined($res) || ($@=~m/Connection refused/)){
       return({exitcode=>10,
               msg=>'can not connect to INetwork - Connection refused'});
    }

@@ -148,6 +148,7 @@ sub new
                                                  
       new kernel::Field::Text(
                 name          =>'comments',
+                sqlorder      =>'NONE',
                 htmlwidth     =>'150',
                 label         =>'Comments',
                 dataobjattr   =>'lnkcontact.comments'),
@@ -164,6 +165,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'parentobj',
                 frontreadonly =>1,
+                sqlorder      =>'NONE',
                 uploadable    =>0,
                 label         =>'Parent-Object',
                 dataobjattr   =>'lnkcontact.parentobj'),
@@ -177,6 +179,7 @@ sub new
 
       new kernel::Field::Container(
                 name          =>'croles',
+                sqlorder      =>'NONE',
                 dataobjattr   =>'lnkcontact.croles'),
 
       new kernel::Field::Link(
@@ -191,30 +194,35 @@ sub new
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
+                sqlorder      =>'NONE',
                 label         =>'Creator',
                 dataobjattr   =>'lnkcontact.createuser'),
 
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'source',
+                sqlorder      =>'NONE',
                 label         =>'Owner',
                 dataobjattr   =>'lnkcontact.modifyuser'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
+                sqlorder      =>'NONE',
                 label         =>'Source-System',
                 dataobjattr   =>'lnkcontact.srcsys'),
                                                  
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
+                sqlorder      =>'NONE',
                 label         =>'Source-Id',
                 dataobjattr   =>'lnkcontact.srcid'),
                                                  
       new kernel::Field::Date(
                 name          =>'srcload',
                 group         =>'source',
+                sqlorder      =>'NONE',
                 label         =>'Source-Load',
                 dataobjattr   =>'lnkcontact.srcload'),
                                                  
@@ -233,18 +241,21 @@ sub new
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'source',
+                sqlorder      =>'NONE',
                 label         =>'Editor',
                 dataobjattr   =>'lnkcontact.editor'),
                                                  
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 group         =>'source',
+                sqlorder      =>'NONE',
                 label         =>'RealEditor',
                 dataobjattr   =>'lnkcontact.realeditor'),
 
       new kernel::Field::Link(
                 name          =>'secparentobj',
                 label         =>'Security Parent-Object',
+                sqlorder      =>'NONE',
                 dataobjattr   =>'lnkcontact.parentobj'),
 
    );

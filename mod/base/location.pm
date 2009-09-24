@@ -422,6 +422,24 @@ sub Normalize
    if ($rec->{location}=~m/^berlin$/i){
       $rec->{location}="Berlin";
    }
+   if ($rec->{location}=~m/^Kempten.*\(.*Al.*\).*$/i){
+      $rec->{location}="Kempten";
+   }
+   if ($rec->{location}=~m/^Halle.*\(.*Sa.*\).*$/i){
+      $rec->{location}="Halle";
+   }
+   if ($rec->{location}=~m/^Leer.*\(.*Ost.*\).*$/i){
+      $rec->{location}="Leer";
+   }
+   if ($rec->{location}=~m/^Freiburg\s+i.*B.*$/i){
+      $rec->{location}="Freiburg";
+   }
+   if ($rec->{location}=~m/^Weiden\s+i.*O.*$/i){
+      $rec->{location}="Weiden";
+   }
+   if ($rec->{location}=~m/^Weilheim\s+i.*O.*$/i){
+      $rec->{location}="Weilheim";
+   }
    if ($rec->{address1}=~m/Detmolder.*380$/ && $rec->{location} eq "Bielefeld"){
       $rec->{label}="T-Systems SCZ Mitte";
    }
