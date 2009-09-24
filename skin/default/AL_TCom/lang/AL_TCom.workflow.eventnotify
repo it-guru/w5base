@@ -25,3 +25,4 @@
 'invalid problemticket registered'=>{de=>'ungültiges Problem Ticket eingetragen'},
 'related problem ticket'=>{de=>'relevantes ServiceCenter Problem-Ticket'},
 'related incident ticket'=>{de=>'relevantes ServiceCenter Incident-Ticket'},
+'event initiating change number'=>{de=>'Ereignisauslösende Changenummer'},

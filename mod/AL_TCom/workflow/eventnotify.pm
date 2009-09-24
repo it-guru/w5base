@@ -58,6 +58,14 @@ sub getDynamicFields
                 label         =>'related incident ticket',
                 container     =>'headref'),
 
+      new kernel::Field::Text(
+                name          =>'eventchmticket',
+                xlswidth      =>'15',
+                translation   =>'AL_TCom::workflow::eventnotify',
+                group         =>'eventnotifyinternal',
+                label         =>'event initiating change number',
+                container     =>'headref'),
+
 
       new kernel::Field::Textarea(
                 name          =>'eventscproblemsolution',
