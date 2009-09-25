@@ -129,11 +129,13 @@ sub qcheckRecord
          my $w5aclocation=$self->getW5ACLocationname($parrec->{locationid});
          msg(INFO,"rec location=$rec->{location}");
          msg(INFO,"ac  location=$w5aclocation");
-         $self->IfaceCompare($dataobj,
-                             $rec,"location",
-                             {location=>$w5aclocation},"location",
-                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
-                             mode=>'string');
+         if (defined($w5aclocation)){ # only if a valid W5Base Location found
+            $self->IfaceCompare($dataobj,
+                                $rec,"location",
+                                {location=>$w5aclocation},"location",
+                                $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
+                                mode=>'string');
+         }
 
          if (defined($parrec->{conumber}) &&
              !($parrec->{conumber}=~m/^\d+$/)){
@@ -199,6 +201,7 @@ sub getW5ACLocationname
 
    return(undef) if ($lrec{zipcode} eq "0");
    return(undef) if ($lrec{location} eq "0");
+   return(undef) if ($lrec{address1} eq "0");
    #
    # pre process aclocation 
    #
