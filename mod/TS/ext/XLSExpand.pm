@@ -36,8 +36,12 @@ sub GetKeyCriterion
 {
    my $self=shift;
    my $d={
-       out=>{'TS::appl::acapplname'=>{
+       out=>{
+             'TS::appl::acapplname'=>{
                          label=>'IT-Inventar: AssetManager Applicationname',
+                            in=>[qw(itil::appl::id)]},
+             'TS::appl::scapprgroup'=>{
+                         label=>'IT-Inventar: Change Approvergroup',
                             in=>[qw(itil::appl::id)]},
               }
          };
@@ -65,6 +69,17 @@ sub ProcessLine
       foreach my $rec ($appl->getHashList("acapplname")){
          if ($rec->{"acapplname"} ne ""){
              $out->{'TS::appl::acapplname'}->{$rec->{"acapplname"}}++;
+         } 
+      }
+   }
+   if (defined($in->{'itil::appl::id'}) && 
+       exists($out->{'TS::appl::scapprgroup'})){
+      my $appl=$self->getParent->getPersistentModuleObject('TS::appl');
+      my $id=[keys(%{$in->{'itil::appl::id'}})];
+      $appl->SetFilter({id=>$id});
+      foreach my $rec ($appl->getHashList("scapprgroup")){
+         if ($rec->{"scapprgroup"} ne ""){
+             $out->{'TS::appl::scapprgroup'}->{$rec->{"scapprgroup"}}++;
          } 
       }
    }
