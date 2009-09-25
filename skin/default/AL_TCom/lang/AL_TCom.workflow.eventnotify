@@ -26,3 +26,4 @@
 'related problem ticket'=>{de=>'relevantes ServiceCenter Problem-Ticket'},
 'related incident ticket'=>{de=>'relevantes ServiceCenter Incident-Ticket'},
 'event initiating change number'=>{de=>'Ereignisauslösende Changenummer'},
+'ServiceCenter event relations'=>{de=>'ServiceCenter Ereignisbeziehungen'},

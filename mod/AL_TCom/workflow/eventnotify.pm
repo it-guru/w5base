@@ -58,6 +58,18 @@ sub getDynamicFields
                 label         =>'related incident ticket',
                 container     =>'headref'),
 
+      new kernel::Field::Htmlarea(
+                name          =>'eventinmrelations',
+                translation   =>'AL_TCom::workflow::eventnotify',
+                group         =>'eventnotifyinternal',
+                label         =>'ServiceCenter event relations',
+                htmldetail    =>0,
+                searchable    =>0,
+                readonly      =>1,
+                delend        =>['eventinmticket'],
+                onRawValue    =>\&calcSCrelations,
+                container     =>'headref'),
+
       new kernel::Field::Text(
                 name          =>'eventchmticket',
                 xlswidth      =>'15',
@@ -88,6 +100,9 @@ sub getDynamicFields
       ));
 }
 
+
+
+
 sub isSCproblemSet
 {
    my $self=shift;
@@ -96,6 +111,81 @@ sub isSCproblemSet
    my $current=$param{current};
    return(1) if ($current->{eventprmticket} ne "");
    return(0);
+}
+
+
+sub calcSCrelations
+{
+   my $self=shift;
+   my $current=shift;
+   my $inm=$self->getParent->getField("eventinmticket")->RawValue($current);
+   my $sclnk=getModuleObject($self->getParent->Config,"tssc::lnk");
+   my $d;
+   if ($inm ne ""){
+      my %chk;
+      $d.=$self->getParent->calcSCrelationsSubTree($sclnk,\%chk,0,0,0,
+                                                   $inm,'tssc::inm');
+   }
+   return("<pre>$d</pre>");
+}
+
+sub calcSCrelationsSubTree
+{
+   my $self=shift;
+   my $sclnk=shift;
+   my $chk=shift;
+   my $level=shift;
+   my $uplaypos=shift;
+   my $uplaymax=shift;
+   my $id=shift;
+   my $idobj=shift;
+   my $d;
+   return($d."...") if ($level>10);
+   return("") if (exists($chk->{$id}));
+
+   my $off=$level*10;
+   my $offtd;
+   my $state="unknown";
+   if ($idobj ne ""){
+      my $idfield;
+      $idfield="problemnumber"   if ($idobj eq "tssc::prm");
+      $idfield="changenumber"    if ($idobj eq "tssc::chm");
+      $idfield="incidentnumber"  if ($idobj eq "tssc::inm");
+      if (defined($idfield)){
+         my $o=getModuleObject($self->Config,$idobj);
+         if (defined($o)){
+            $o->SetFilter({$idfield=>\$id});
+            my ($r,$msg)=$o->getOnlyFirst(qw(status description));
+            if (defined($r)){
+               $state=lc($r->{status});
+            }
+         }
+      }
+      if ($state eq "closed"){
+         $state="<font color=green>$state</font>";
+      }
+      else{
+         $state="<font color=red>$state</font>";
+      }
+   }
+   
+   $offtd="<td width=$off></td>" if ($off>0);
+   $d.="\n<table border=0 cellspacing=0 cellpadding=0 width=100%>".
+       "<tr>$offtd<td>$id ($state)</td></tr>\n"; 
+   $chk->{$id}++;
+   $sclnk->ResetFilter();
+   $sclnk->SetFilter({src=>\$id,dst=>"PRM* CHM*"});
+   my @rel=$sclnk->getHashList(qw(dst dstobj));
+   for(my $laypos=0;$laypos<=$#rel;$laypos++){
+      my $s=$self->calcSCrelationsSubTree($sclnk,$chk,$level+1,$laypos,$#rel,
+                                          $rel[$laypos]->{dst},
+                                          $rel[$laypos]->{dstobj});
+      if ($s ne ""){
+         $d.="<tr>$offtd<td>".$s."</td></tr>\n";
+      }
+   }
+   $d.="</table>";
+   return($d);
 }
 
 
