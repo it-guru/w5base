@@ -268,7 +268,7 @@ sub getCustomerControlRecords
                  {
                   name=>'tpg',
                   label=>'T-Punkte Gesellschaft',
-                  customer=>'DTAG.TPG DTAG.TPG.*'
+                  customer=>'DTAG.TSG DTAG.TSG.*'
                  },
                  {
                   name=>'tsi',
