@@ -225,7 +225,7 @@ sub ProcessLine
          $style.="white-space:nowrap;";
          $nowrap=" nowrap";
       }
-      $data=~s/-/&#x2011;/g;
+     # $data=~s/-/&#x2011;/g;   # nicht zulässig, da JavaScript vorkommen kann
       $l[$self->{fieldkeys}->{$fieldname}]={data=>$data,
                                             fclick=>$fclick,
                                             align=>$align,
