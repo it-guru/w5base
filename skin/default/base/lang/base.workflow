@@ -25,7 +25,7 @@
 'marked as delete'=>{de=>'gelöscht markiert'},
 'sum efforts in hours'=>{de=>'Summe Aufwände in Stunden (intern)'},
 'Forward to'=>{de=>'Weiterleitung an/ Vorlage bei'},
-'Close-Date'=>{de=>'Abschlusszeitpunkt'},
+'Close-Date'=>{de=>'Beendigungszeitpunkt'},
 'Creator Name'=>{de=>'Erstellername'},
 'Responsible Group'=>{de=>'verantwortliche Gruppe'},
 'Responsible Group ID'=>{de=>'verantwortliche Gruppen ID'},
