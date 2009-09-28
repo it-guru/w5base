@@ -55,10 +55,8 @@ sub RunWebApp
       }
       $W5V2::ObjCache{$objectkey}=$o;
    }
-   if ($W5V2::ObjCache{$objectkey}->Config->Param("W5BaseOperationMode") 
-       =~m/^offline/ ||
-       $W5V2::ObjCache{$objectkey}->Config->Param("W5BaseOperationMode") 
-       =~m/^maintenance/){
+   my $opmode=$W5V2::ObjCache{$objectkey}->Config->Param("W5BaseOperationMode");
+   if (($opmode=~m/^offline/) || ($opmode=~m/^maintenance/)){
       return($W5V2::ObjCache{$objectkey}->DisplayMaintenanceWindow());
    }
    return if (!$W5V2::ObjCache{$objectkey}->InitRequest(cgi=>$cgi));

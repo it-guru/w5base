@@ -27,7 +27,8 @@ if (defined(&{FindBin::again})){
    $W5V2::INSTDIR="$FindBin::Bin/..";
 }
 foreach my $path ("$W5V2::INSTDIR/mod","$W5V2::INSTDIR/lib"){
-   unshift(@INC,$path) if (!grep(/^$path$/,@INC));
+   my $qpath=quotemeta($path);
+   unshift(@INC,$path) if (!grep(/^$qpath$/,@INC));
 }
 do "$W5V2::INSTDIR/lib/kernel/App/Web.pm";
 print STDERR ("ERROR: $@\n") if ($@ ne "");

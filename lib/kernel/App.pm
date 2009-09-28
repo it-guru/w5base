@@ -554,18 +554,33 @@ sub LoadSubObjs
    $hashkey="SubDataObj" if (!defined($hashkey));
    if (!defined($self->{$hashkey})){
       my $instdir=$self->Config->Param("INSTDIR");
-      my $pat="$instdir/mod/*/$extender/*.pm";
-      if ($extender=~m/\//){
-         $pat="$instdir/mod/*/$extender.pm";
+      my @path=($instdir);
+      my @pat;
+      my $modpath=$self->Config->Param("MODPATH");
+      if ($modpath ne ""){
+         foreach my $path (split(/:/,$modpath)){
+            my $qpath=quotemeta($path);
+            unshift(@path,$path) if (!grep(/^$qpath$/,@path));
+         }
       }
-      my @sublist=glob($pat); 
+      my @sublist;
+      my @disabled;
+
+      foreach my $path (@path){
+         my $pat="$path/mod/*/$extender/*.pm";
+         if ($extender=~m/\//){
+            $pat="$path/mod/*/$extender.pm";
+         }
+         unshift(@sublist,glob($pat)); 
+         unshift(@disabled,glob($pat.".DISABLED")); 
+      }
+
       @sublist=map({my $qi=quotemeta($instdir);
                     $_=~s/^$qi//;
                     $_=~s/\/mod\///; 
                     $_;
                    } @sublist);
 
-      my @disabled=glob($pat.".DISABLED"); 
       @disabled=map({my $qi=quotemeta($instdir);
                     $_=~s/^$qi//;
                     $_=~s/\/mod\///; 
@@ -573,6 +588,7 @@ sub LoadSubObjs
                     $_."/" if (!($_=~m/\.pm$/));
                     $_;
                    } @disabled);
+
       foreach my $dis (@disabled){
          @sublist=grep(!/^$dis/,@sublist);
       }
@@ -935,7 +951,7 @@ sub getSkinFile
    my $self=shift;
    my $conftag=shift;
    my %param=@_;
-   my $skindir=$self->getSkinDir();
+   my $baseskindir=$self->getSkinDir();
    my @skin=$self->getSkin();
  
    $conftag=~s/\.\./\./g;              # security hack
@@ -945,16 +961,28 @@ sub getSkinFile
    if (defined($param{addskin})){
       unshift(@skin,$param{addskin});
    }
-   foreach my $skin (@skin){
-      my $chkname=$skindir."/".$skin."/".$conftag;
-      #msg(INFO,"chkname='$chkname'");
-      if ($conftag=~m/\*/){
-         my @flist=glob($chkname);
-         return(@flist) if ($#flist>=0);
+   my @skindir=($baseskindir);
+   my $modpath=$self->Config->Param("MODPATH");
+   if ($modpath ne ""){
+      foreach my $path (split(/:/,$modpath)){
+         $path.="/skin";
+         my $qpath=quotemeta($path);
+         unshift(@skindir,$path) if (!grep(/^$qpath$/,@skindir));
       }
-      else{
-         if (-f $chkname){
-            return($chkname);
+   }
+
+   foreach my $skindir (@skindir){
+      foreach my $skin (@skin){
+         my $chkname=$skindir."/".$skin."/".$conftag;
+         #msg(INFO,"chkname='$chkname'");
+         if ($conftag=~m/\*/){
+            my @flist=glob($chkname);
+            return(@flist) if ($#flist>=0);
+         }
+         else{
+            if (-f $chkname){
+               return($chkname);
+            }
          }
       }
    }

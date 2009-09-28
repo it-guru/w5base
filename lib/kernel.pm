@@ -509,6 +509,14 @@ sub getModuleObject
       $param=shift;
       $config=getConfigObject($instdir,$configname,$package);
    }
+   my $modpath=$config->Param("MODPATH");
+   if ($modpath ne ""){
+      foreach my $path (split(/:/,$modpath)){
+         $path.="/mod";
+         my $qpath=quotemeta($path);
+         unshift(@INC,$path) if (!grep(/^$qpath$/,@INC));
+      }
+   }
    my $modconf=$config->Param("MODULE");
    if (ref($modconf) eq "HASH"){
       $modconf=$modconf->{$package};
