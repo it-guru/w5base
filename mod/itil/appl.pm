@@ -203,13 +203,12 @@ sub new
 
       new kernel::Field::SubList(
                 name          =>'swinstances',
-                htmldetail    =>0,
                 label         =>'Software instances',
                 group         =>'swinstances',
                 vjointo       =>'itil::swinstance',
-                vjoinbase     =>[{cistatusid=>"<=4"}],
+                vjoinbase     =>[{cistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'applid'],
-                vjoindisp     =>['fullname','cistatus']),
+                vjoindisp     =>['fullname','swnature','cistatus']),
 
       new kernel::Field::Text(
                 name          =>'businessteambossid',
@@ -1276,7 +1275,7 @@ sub getDetailBlockPriority
    return(
           qw(header default finance technical delmgmt customer custcontracts 
              contacts phonenumbers 
-             interfaces systems misc attachments control 
+             interfaces systems swinstances misc attachments control 
              accountnumbers licenses source));
 }
 

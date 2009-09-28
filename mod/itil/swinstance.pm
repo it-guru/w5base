@@ -47,6 +47,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'Fullname',
+                htmlwidth     =>'300px',
                 readonly      =>'1',
                 dataobjattr   =>'swinstance.fullname'),
 
