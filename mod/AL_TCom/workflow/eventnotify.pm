@@ -88,6 +88,7 @@ sub getDynamicFields
                 htmldetail    =>\&isSCproblemSet,
                 onRawValue    =>\&loadDataFromSC,
                 label         =>'SC Problem soultion'),
+
       new kernel::Field::Textarea(
                 name          =>'eventscproblemcause',
                 translation   =>'AL_TCom::workflow::eventnotify',
