@@ -297,6 +297,12 @@ sub new
                 label         =>'Incident impact'),
 
       new kernel::Field::Select(
+                name          =>'scresolution',
+                value         =>[qw(unknown)],
+                transprefix   =>'IR.',
+                label         =>'Resolution class '),
+
+      new kernel::Field::Select(
                 name          =>'sctype',
                 value         =>[qw(application.generic
                                     authorization
@@ -313,6 +319,7 @@ sub new
 
       new kernel::Field::Textarea(
                 name          =>'scdescription',
+                cols          =>'40',
                 label         =>'Description'),
    );
    
@@ -425,7 +432,7 @@ sub isWriteValid
 sub getValidWebFunctions
 {
    my $self=shift;
-   return("Manager","inmResolv","inmClose","inmAddNote","Process",
+   return("Manager","inmFinish","inmResolv","inmClose","inmAddNote","Process",
           $self->SUPER::getValidWebFunctions());
 }
 
@@ -435,51 +442,111 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
-   trim($newrec) if (defined($newrec));
-   my $name=$newrec->{"scname"};
-   if (($name=~m/^\s*$/) || length($name)<10){
-      $self->LastMsg(ERROR,"incident name invalid or to short");
-      return(undef);
-   }
-   my $desc=$newrec->{"scdescription"};
-   if (($desc=~m/^\s*$/) || length($desc)<20){
-      $self->LastMsg(ERROR,"incident description invalid or to short");
-      return(undef);
-   }
 
-
-   my $app=$newrec->{"sccustapplication"};
-   if ($app ne ""){
-      my $appl=getModuleObject($self->Config,"TS::appl");
-      $appl->SetFilter({name=>\$app});
-      my ($arec,$msg)=$appl->getOnlyFirst(qw(acapplname acinmassingmentgroup));
-      if (!defined($arec)){
-         $self->LastMsg(ERROR,"invalid application specified");
+printf STDERR ("fifi Validate:oldrec=%s\n",Dumper($oldrec));
+printf STDERR ("fifi Validate:newrec=%s\n",Dumper($newrec));
+   if (!defined($oldrec)){
+      trim($newrec) if (defined($newrec));
+      my $name=$newrec->{"scname"};
+      if (($name=~m/^\s*$/) || length($name)<10){
+         $self->LastMsg(ERROR,"incident name invalid or to short");
          return(undef);
       }
-      if ($arec->{acapplname} eq ""){
-         $self->LastMsg(ERROR,"can not detect the offizial applicationname");
+      my $desc=$newrec->{"scdescription"};
+      if (($desc=~m/^\s*$/) || length($desc)<20){
+         $self->LastMsg(ERROR,"incident description invalid or to short");
          return(undef);
       }
-      if ($newrec->{scapplname} eq ""){
-         $newrec->{scapplname}=$arec->{acapplname};
-      }
-      if ($newrec->{scassingmentgroup} eq ""){
-         if ($arec->{acinmassingmentgroup} eq ""){
-            $self->LastMsg(ERROR,"no inm assignmentgroup for application");
+     
+     
+      my $app=$newrec->{"sccustapplication"};
+      if ($app ne ""){
+         my $appl=getModuleObject($self->Config,"TS::appl");
+         $appl->SetFilter({name=>\$app});
+         my ($arec,$msg)=$appl->getOnlyFirst(qw(acapplname acinmassingmentgroup));
+         if (!defined($arec)){
+            $self->LastMsg(ERROR,"invalid application specified");
             return(undef);
          }
-         else{
-            $newrec->{scassingmentgroup}=$arec->{acinmassingmentgroup};
+         if ($arec->{acapplname} eq ""){
+            $self->LastMsg(ERROR,"can not detect the offizial applicationname");
+            return(undef);
+         }
+         if ($newrec->{scapplname} eq ""){
+            $newrec->{scapplname}=$arec->{acapplname};
+         }
+         if ($newrec->{scassingmentgroup} eq ""){
+            if ($arec->{acinmassingmentgroup} eq ""){
+               $self->LastMsg(ERROR,"no inm assignmentgroup for application");
+               return(undef);
+            }
+            else{
+               $newrec->{scassingmentgroup}=$arec->{acinmassingmentgroup};
+            }
          }
       }
-   }
-   else{
-      $self->LastMsg(ERROR,"no application specified");
-      return(undef);
+      else{
+         $self->LastMsg(ERROR,"no application specified");
+         return(undef);
+      }
    }
 printf STDERR ("fifi Validate=%s\n",Dumper($newrec));
    return(1);
+}
+
+
+sub UpdateRecord   # fake write request to SC
+{
+   my $self=shift;
+   my $newrec=shift;
+   my $IncidentNumber;
+
+   my $userid=$self->getCurrentUserId();
+   my $user=getModuleObject($self->Config,"base::user");
+   $user->SetFilter({userid=>\$userid});
+   my ($urec,$msg)=$user->getOnlyFirst(qw(ALL));
+
+   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+
+printf STDERR ("fifi op newrec=%s\n",Dumper($newrec));
+
+   my $username=$newrec->{'SCUsername'};
+   delete($newrec->{'SCUsername'});
+   my $password=$newrec->{'SCPassword'};
+   delete($newrec->{'SCPassword'});
+   msg(INFO,"start SC login for $ENV{REMOTE_USER}");
+   my $sc=$self->getSC($username,$password);
+   if (!defined($sc)){
+      $self->LastMsg(ERROR,"ServiceCenter Login failed");
+      return(undef);
+   }
+   my $op=$newrec->{OP};
+   delete($newrec->{OP});
+
+   my %op;
+
+   msg(INFO,"start SC Operation($op) for $ENV{REMOTE_USER}");
+
+   if ($op eq "resolv"){
+      $IncidentNumber=$newrec->{id};
+      my $searchResult;
+      if (!defined($searchResult=$sc->IncidentSearch(number=>$IncidentNumber))){
+         $self->LastMsg(ERROR,"invalid id");
+         $sc->Logout();
+         return(undef);
+      }
+
+      $op{resolution}=$newrec->{scresolution};
+      $sc->IncidentResolve(%op);
+      printf STDERR ("fifi msg=%s\n",$sc->LastMessage());
+   }
+
+
+
+   msg(INFO,"end SC CreateIncident for $ENV{REMOTE_USER}");
+
+   $sc->Logout();
+   return($IncidentNumber);
 }
 
 
@@ -625,6 +692,38 @@ sub ValidatedInsertRecord
 }
 
 
+sub ValidatedUpdateRecord
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+   if (!$self->preValidate(undef,$newrec)){
+      if ($self->LastMsg()==0){
+         $self->LastMsg(ERROR,"ValidatedUpdateRecord: ".
+                              "unknown error in ${self}::preValidate()");
+      }
+   }
+   else{
+      if ($self->Validate($oldrec,$newrec)){
+         $self->finishWriteRequestHash($oldrec,$newrec);
+         my $bak=$self->UpdateRecord($newrec);
+         $self->SendRemoteEvent("upd",$oldrec,$newrec,$bak) if ($bak);
+         $self->FinishWrite($oldrec,$newrec) if ($bak);
+         return($bak);
+      }
+      else{
+         if ($self->LastMsg()==0){
+            $self->LastMsg(ERROR,"ValidatedUpdateRecord: ".
+                                 "unknown error in ${self}::Validate()");
+         }
+      }
+   }
+   return(undef);
+}
+
+
 
 sub CreateApplicationIncident
 {
@@ -635,7 +734,6 @@ sub CreateApplicationIncident
    my $password=Query->Param("SCPassword");
    my $IncidentNumber;
    my $newrec=$self->getWriteRequestHash("nativweb");;
-   print STDERR "WriteRequestHash0:".Dumper($newrec);
    $newrec->{class}="APPLICATION";
    print STDERR "WriteRequestHash1:".Dumper($newrec);
    foreach my $k (keys(%$newrec)){ # remove utf8 code while ajax request
@@ -645,6 +743,30 @@ sub CreateApplicationIncident
 
    if ($IncidentNumber=$self->ValidatedInsertRecord($newrec)){
       $self->LastMsg(OK,"CreateIncident ($IncidentNumber) is ok");
+   }
+   return($IncidentNumber);
+}
+
+
+sub ResolvApplicationIncident
+{
+   my $self=shift;
+   my %param=@_;
+
+   my $username=Query->Param("SCUsername");
+   my $password=Query->Param("SCPassword");
+   my $IncidentNumber;
+   my $newrec=$self->getWriteRequestHash("nativweb");;
+   print STDERR "Upd WriteRequestHash1:".Dumper($newrec);
+   foreach my $k (keys(%$newrec)){ # remove utf8 code while ajax request
+       $newrec->{$k}=utf8($newrec->{$k})->latin1();
+   }
+   print STDERR "Upd WriteRequestHash2:".Dumper($newrec);
+   my $id=$newrec->{id};
+   $newrec->{OP}="resolv";
+
+   if ($IncidentNumber=$self->ValidatedUpdateRecord({},$newrec,{id=>$id})){
+      $self->LastMsg(OK,"UpdateIncident ($IncidentNumber) is ok");
    }
    return($IncidentNumber);
 }
@@ -663,6 +785,16 @@ sub Process
          if (!defined(my $IncidentNumber=$self->CreateApplicationIncident())){
             if ($self->LastMsg()==0){
                $self->LastMsg(ERROR,"create failed - unknown problem");
+            }
+         }
+         else{
+            $finecode="showWork('MyIncidentMgr');";
+         }
+      }
+      if ($op eq "ResolvApplicationIncident"){
+         if (!defined(my $IncidentNumber=$self->ResolvApplicationIncident())){
+            if ($self->LastMsg()==0){
+               $self->LastMsg(ERROR,"resolv failed - unknown problem");
             }
          }
          else{
@@ -688,7 +820,6 @@ sub Process
    my $create=$self->T("Incident create");
    my $mask=<<EOF;
 <table border=1>
-</tr>
 <tr>
 <td class=fname> %scname(label)% </td>
 <td class=finput> %scname(forceedit)% </td>
@@ -712,9 +843,12 @@ sub Process
 <tr>
 <td colspan=2>
 <input style="width:100%" type=button 
-       onclick="parent.doOP(this,'CreateApplicationIncident','result')" 
+       onclick="parent.doOP(this,'CreateApplicationIncident',
+                            document.forms[0],
+                            parent.document.getElementById('result'))" 
        value="$create">
 </td>
+</tr>
 </table>
 EOF
    $self->ParseTemplateVars(\$mask);
@@ -723,7 +857,7 @@ EOF
 }
 
 
-sub inmResolv
+sub inmFinish
 {
    my $self=shift;
    my $id=Query->Param("id");
@@ -740,6 +874,56 @@ sub inmResolv
                            body=>1,form=>1);
    printf("Not implemented");
    
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+sub inmResolv
+{
+   my $self=shift;
+   my $id=Query->Param("id");
+
+   my $userid=$self->getCurrentUserId();
+   my $user=getModuleObject($self->Config,"base::user");
+   $user->SetFilter({userid=>\$userid});
+   my ($urec,$msg)=$user->getOnlyFirst(qw(ALL));
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css',
+                                   'Output.HtmlDetail.css',
+                                   'work.css'],
+                           js=>[qw( kernel.App.Web.js toolbox.js)],
+                           body=>1,form=>1);
+   
+   my $mask=<<EOF;
+<table border=0 width=100%>
+<tr>
+<td class=fname width=1% nowrap> %scresolution(label)% </td>
+<td class=finput> %scresolution(forceedit)% </td>
+</tr>
+<tr>
+<td colspan=2 class=finput> %scdescription(forceedit)% </td>
+</tr>
+<tr>
+<td colspan=2>
+<input style="width:100%" type=button 
+       onclick="parent.doOP(this,'ResolvApplicationIncident',
+                            document.forms[0],
+                            document.getElementById('result'))" 
+       value="save">
+</td>
+</tr>
+<tr>
+<td colspan=2>
+<div id=result>
+
+</div>
+</td>
+</tr>
+</table>
+EOF
+   $self->ParseTemplateVars(\$mask);
+   print $mask;
+   print $self->HtmlPersistentVariables("id");
    print $self->HtmlBottom(body=>1,form=>1);
 }
 
@@ -778,10 +962,11 @@ sub Manager
       printf("<td>");
       if ($irec->{status} eq "resolved"){
        #  printf("<input type=button id=addnote value=\"add note\">");
-         printf("<input type=button onclick=\"parent.showPopWin('../inm/inmResolv?id=$irec->{incidentnumber}',500,180,refresh);\" id=close value=\"close\">");
+         printf("<input type=button onclick=\"parent.showPopWin('../inm/inmFinish?id=$irec->{incidentnumber}',500,300,refresh);\" id=finish value=\"finish\">");
       }
       else{
-       #  printf("<input type=button onclick=\"parent.showPopWin('../inm/inmResolv?id=$irec->{incidentnumber}',500,180);\" id=resolv value=\"resolv\">");
+       #  printf("<input type=button id=addnote value=\"add note\">");
+         printf("<input type=button onclick=\"parent.showPopWin('../inm/inmResolv?id=$irec->{incidentnumber}',500,300,refresh);\" id=resolv value=\"resolv\">");
       }
       printf("</td>");
       printf("</tr></form>");

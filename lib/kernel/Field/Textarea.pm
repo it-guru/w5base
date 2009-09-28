@@ -32,6 +32,7 @@ sub new
    $self->{_permitted}->{editarea}=1;
    $self->{htmlheight}="300" if (!defined($self->{htmlheight}));
    $self->{valign}="top"     if (!defined($self->{valign}));
+   $self->{cols}="80"        if (!defined($self->{cols}));
    return($self);
 }
 
@@ -78,7 +79,7 @@ sub EditArea    # for module defined edit areas (f.e. javascript areas)
    $d="<div class=multilinetext>".
       "<textarea onkeydown=\"if (window.textareaKeyHandler){".
       "textareaKeyHandler(this,event);}\" ".
-      "cols=80 name=Formated_$name ".
+      "cols=$self->{cols} name=Formated_$name ".
       "class=multilinetext>".quoteHtml($d)."</textarea></div>";
 
    return($d);

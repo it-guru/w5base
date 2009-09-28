@@ -88,10 +88,15 @@ function showWork(e)
    }
 
 }
-function doOP(o,op,target)
+
+function testOP(e)
+{
+   e.innerHTML="yy";
+}
+
+function doOP(o,op,form,e)
 {
    var param="";
-   var e=document.getElementById(target);
    var l=document.getElementById("loading");
    o.disabled="disabled";
 
@@ -100,9 +105,9 @@ function doOP(o,op,target)
    param+="&SCPassword="+encodeURI(document.getElementById("SCPassword").value);
    param+="&Do="+encodeURI(op);
    if (op!="Login"){
-      for(c=0;c<frames['work'].document.forms[0].elements.length;c++){
-         param+="&"+frames['work'].document.forms[0].elements[c].name+"="+
-         encodeURIComponent(frames['work'].document.forms[0].elements[c].value);
+      for(c=0;c<form.elements.length;c++){
+         param+="&"+form.elements[c].name+"="+
+         encodeURIComponent(form.elements[c].value);
       }
    }
    var xmlhttp=getXMLHttpRequest();
