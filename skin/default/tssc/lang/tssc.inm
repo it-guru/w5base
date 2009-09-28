@@ -42,3 +42,8 @@
               de=>'nur meine eigene Arbeit mit der Anwendung ist beeinträchtig'},
 'IM.none'=>{en=>'no interfaces or user are restricted',
             de=>'weder Schnittstellen noch User der Anwendung haben Einschränkungen durch das Problem'},
+'Short description'=>{de=>'Kurzbeschreibung'},
+'Incident type'=>{de=>'Incident Typ'},
+'Application'=>{de=>'Anwendung'},
+'Description'=>{de=>'Beschreibung'},
+'Incident create'=>{de=>'Incident erstellen'},

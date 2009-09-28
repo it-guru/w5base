@@ -635,11 +635,13 @@ sub CreateApplicationIncident
    my $password=Query->Param("SCPassword");
    my $IncidentNumber;
    my $newrec=$self->getWriteRequestHash("nativweb");;
+   print STDERR "WriteRequestHash0:".Dumper($newrec);
    $newrec->{class}="APPLICATION";
+   print STDERR "WriteRequestHash1:".Dumper($newrec);
    foreach my $k (keys(%$newrec)){ # remove utf8 code while ajax request
        $newrec->{$k}=utf8($newrec->{$k})->latin1();
    }
-   print STDERR "WriteRequestHash:".Dumper($newrec);
+   print STDERR "WriteRequestHash2:".Dumper($newrec);
 
    if ($IncidentNumber=$self->ValidatedInsertRecord($newrec)){
       $self->LastMsg(OK,"CreateIncident ($IncidentNumber) is ok");
@@ -683,6 +685,7 @@ sub Process
                            title=>'ServiceCenter Incident Creator',
                            js=>[qw( toolbox.js jquery.js jquery.autocomplete.js)],
                            body=>1,form=>1,target=>'result');
+   my $create=$self->T("Incident create");
    my $mask=<<EOF;
 <table border=1>
 </tr>
@@ -710,7 +713,7 @@ sub Process
 <td colspan=2>
 <input style="width:100%" type=button 
        onclick="parent.doOP(this,'CreateApplicationIncident','result')" 
-       value="Create">
+       value="$create">
 </td>
 </table>
 EOF

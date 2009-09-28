@@ -62,6 +62,7 @@ sub FormatedDetail
       $address.=" " if ($address ne "");
       $address.=$current->{$v};
    }
+printf STDERR ("fifi k=%s\n",$apikey);
    $address=$self->address($current) if (exists($self->{address}));
    if ($mode=~m/^Html.*$/){
       $d.=<<EOF;

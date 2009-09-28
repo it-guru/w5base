@@ -102,7 +102,7 @@ function doOP(o,op,target)
    if (op!="Login"){
       for(c=0;c<frames['work'].document.forms[0].elements.length;c++){
          param+="&"+frames['work'].document.forms[0].elements[c].name+"="+
-                 encodeURI(frames['work'].document.forms[0].elements[c].value);
+         encodeURIComponent(frames['work'].document.forms[0].elements[c].value);
       }
    }
    var xmlhttp=getXMLHttpRequest();
