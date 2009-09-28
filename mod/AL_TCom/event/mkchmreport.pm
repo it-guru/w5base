@@ -66,7 +66,7 @@ sub mkchmreport
                           headref class stateid
                           srcid additional));
    $wf->SetFilter(eventend=>$param{month},
-                  mandator=>"\"AL DTAG\"",
+                  mandator=>"\"AL DTAG\" \"AL T-Com\"",
                   class=>[grep(/^AL_TCom::.*::change$/,
                                keys(%{$wf->{SubDataObj}}))]);
    my %co=();
