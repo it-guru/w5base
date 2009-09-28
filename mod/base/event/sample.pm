@@ -36,6 +36,7 @@ sub Init
    my $self=shift;
 
 
+   $self->RegisterEvent("wftest","wftest");
    $self->RegisterEvent("memtest","memtest");
    $self->RegisterEvent("test","test");
    $self->RegisterEvent("sample","SampleEvent1");
@@ -114,6 +115,27 @@ sub SampleEvent1
 #   msg(INFO,"fifi l=%s\n",Dumper(\@l));
    msg(DEBUG,"End  (Event1):");
    return({msg=>'heinz',exitcode=>0});
+}
+
+
+sub wftest
+{
+   my $self=shift;
+
+   eval("use Time::HiRes qw( usleep time clock);");
+   foreach my  $mod (qw(base::user base::grp base::workflow)){
+      my $st=Time::HiRes::time();
+      msg(DEBUG,"Start(wftest\@$mod): %lf",$st);
+      my $o=getModuleObject($self->Config,$mod);
+      if (defined($o)){
+         my $en=Time::HiRes::time();
+         my $t=$en-$st;
+         msg(DEBUG,"End(wftest\@$mod):%lf   = op:%lf",$en,$t);
+      }
+   }
+
+
+   return({exitcode=>0});
 }
 
 

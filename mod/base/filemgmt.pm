@@ -990,12 +990,23 @@ sub browser
          $flt{parent}=\$path;
       }
       print($self->HttpHeader("text/plain"));
+      if (!$ENV{HTTP_XCONTENT_OVERWRITE}){
+         $self->ResetFilter();
+         $self->SetFilter(\%flt);
+         my ($rec)=$self->getOnlyFirst("id");
+         if (defined($rec)){
+            printf("%-6s %s\n","ERROR:","$p/$file already exists");
+            close($t);
+            return(undef); 
+         }
+         $self->ResetFilter(); 
+      }
       if ($self->ValidatedInsertOrUpdateRecord(\%rec,\%flt)){
          $file=$ENV{HTTP_CONTENT_NAME} if ($ENV{HTTP_CONTENT_NAME} ne "");
          printf("%-6s %s\n","OK:","stored '$file' in '$p'");
       }
       else{
-         printf("%-6s %s\n","ERROR:","$p not stored");
+         printf("%-6s %s\n","ERROR:","$p/$file not stored");
       }
       close($t);
       return(undef); 
@@ -1101,7 +1112,7 @@ sub browser
                }
                $select.="</div>";
                my $t=$self->ExpandTimeExpression($fl->{mdate},$self->Lang()).
-                     " by $fl->{editor}";
+                     " GMT by $fl->{editor}";
                $list.=sprintf("<div class=fileline>$select<a class=filelink ".
                               "href=\"$prefix%s$post\" ".
                               "title=\"$t\">%s%s</a></div>\n",

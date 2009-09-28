@@ -6,13 +6,14 @@ use Getopt::Long;
 use File::Basename;
 use Fcntl qw(:DEFAULT);
 
-my ($help,$verbose,$loginuser,$loginpass,$quiet,$authstore);
+my ($help,$verbose,$force,$loginuser,$loginpass,$quiet,$authstore);
 my $base="https://w5base.sf.net/w5base/auth/base/filemgmt/browser/";
 my $optresult = GetOptions ("help"       => \$help,
                             "base=s"     => \$base,
                             "webuser=s"  => \$loginuser,
                             "webpass=s"  => \$loginpass,
                             "authstore"  => \$authstore,
+                            "force"      => \$force,
                             "quiet"      => \$quiet,
                             "verbose"    => \$verbose);
 #############################################################################
@@ -30,8 +31,9 @@ w5cp [options] source destination
 
    --webuser       username
    --webpass       password
-   #--authstore    stores the authentification informations in home
+   --authstore     stores the authentification informations in home
 
+   --force         overwrite target, if target exists
 EOF
    exit(1);
 }
@@ -104,7 +106,9 @@ if ($dst eq "" || $#src==-1){
 $dst=~s/^\///;
 $base=~s/\/$//;
 my $storeurl=$base."/base/filemgmt/browser/".$dst;
-msg("INFO","store to '$storeurl'");
+if ($verbose){
+   msg("INFO","store to '$storeurl'");
+}
 foreach my $src (@src){
    printf("INFO:  start upload of '%s'\n",$src)  if (!defined($quiet));
    my $srcSize;
@@ -124,7 +128,14 @@ foreach my $src (@src){
    #
    my $basename=basename($src);
    msg("INFO","Content-Name:'$basename'");
-   my $request=PUT($storeurl,'Content-Name'=>$basename);
+ 
+   msg("INFO","sending file to ".$storeurl);
+   my %http_param=('Content-Name'=>$basename);
+   if ($force){
+      $http_param{'XContent-Overwrite'}=1;
+   }
+   
+   my $request=PUT($storeurl,%http_param);
    $request->content_length($srcSize);
    my $blknum=0;
    my $block=65535;

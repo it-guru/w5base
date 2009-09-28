@@ -93,7 +93,7 @@ sub ListFiles
                          "<font color=red><b>!</b></font></a>";
          }
          my $t=$self->getParent->ExpandTimeExpression($rec->{mdate},
-               $self->getParent->Lang())." by $rec->{editor}";
+               $self->getParent->Lang())." GMT by $rec->{editor}";
 
          $clone{description}="$t";
 
