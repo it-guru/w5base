@@ -135,7 +135,6 @@ iframe.subframe{
    border-style:solid;
    border-color:gray;
 	position: relative;
-   z-index:10;
 }
 
 

@@ -129,7 +129,7 @@ sub FormatedDetail
       if (defined($self->{jsonchanged})){
          $s.=" onchange=\"jsonchanged_$name('onchange');\"";
       }
-      $s.=" style=\"width:$width\">";
+      $s.=" class=finput style=\"width:$width\">";
       my @options=$self->getPostibleValues($current,undef,"edit");
       while($#options!=-1){
          my $key=shift(@options);

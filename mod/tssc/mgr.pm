@@ -167,6 +167,7 @@ $appline
 <div id=loading style=\"width:0px;height:0px;padding:0px;margin:0px;overflow:hidden;postion:absolute;visibility:hidden;display:none">
 <center><img src="../../base/load/ajaxloader.gif"></center>
 </div>
+<div style="margin-left:5px;margin-right:5px;padding-bottom:4px;border-bottom-style:solid;border-width:1px;border-color:darkblue">
 <table border=0 cellspacing=0 cellpadding=0>
 <tr>
 <td width=1% nowrap>ServiceCenter SCUsername:</td>
@@ -175,11 +176,15 @@ $appline
 <td width=1% nowrap>SCPassword:</td>
 <td width=1%><input type=password id=SCPassword name=SCPassword
                     value="$SCPassword"></td>
-<td></td>
+<td>&nbsp;</td>
 <td width=1% align=right><input type=button onclick="showWork(this);" 
                     id=Restart name=Restart value="Restart"></td>
+<td width=20 align=right>
+<img style="margin:4px;margin-left:8px" src="../../../public/base/load/listweblink.gif">
+</td>
 </tr>
 </table>
+</div>
 
 </td></tr>
 <tr height=1%><td>
