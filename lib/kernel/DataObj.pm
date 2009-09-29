@@ -569,6 +569,17 @@ sub getWriteRequestHash
       }
       return(\%rec);
    }
+   elsif ($mode eq "ajaxcall"){
+      my %rec=Query->MultiVars(); 
+      foreach my $k (keys(%rec)){
+         delete($rec{$k}) if ($k eq "");
+         if (my ($v)=$k=~m/^Formated_(.*)$/){ 
+            $rec{$v}=utf8($rec{$k})->latin1();
+            delete($rec{$k});
+         }
+      }
+      return(\%rec);
+   }
    else{
       $self->SetCurrentView(qw(ALL));
       my @fieldlist=$self->getFieldObjsByView([$self->getCurrentView()],

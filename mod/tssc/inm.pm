@@ -523,22 +523,35 @@ printf STDERR ("fifi op newrec=%s\n",Dumper($newrec));
    my $op=$newrec->{OP};
    delete($newrec->{OP});
 
-   my %op;
 
    msg(INFO,"start SC Operation($op) for $ENV{REMOTE_USER}");
 
-   if ($op eq "resolv"){
-      $IncidentNumber=$newrec->{id};
-      my $searchResult;
-      if (!defined($searchResult=$sc->IncidentSearch(number=>$IncidentNumber))){
-         $self->LastMsg(ERROR,"invalid id");
-         $sc->Logout();
-         return(undef);
-      }
-
-      $op{resolution}=$newrec->{scresolution};
+   $IncidentNumber=$newrec->{id};
+   my $searchResult;
+   if (!defined($searchResult=$sc->IncidentSearch(number=>$IncidentNumber))){
+      $self->LastMsg(ERROR,"invalid id - incidentnumber '%s' can not be found",
+                     $IncidentNumber);
+      $sc->Logout();
+      return(undef);
+   }
+   if ($op eq "ResolvApplicationIncident"){
+      my %op;
+      $op{'resolution'}=$newrec->{'scdescription'};
       $sc->IncidentResolve(%op);
-      printf STDERR ("fifi msg=%s\n",$sc->LastMessage());
+      my $msg=$sc->LastMessage();
+      $self->LastMsg(OK,$msg);
+   }
+   elsif ($op eq "IncidentAddNote"){
+      my %op;
+      $sc->IncidentAddAction($searchResult,$newrec->{'scdescription'});
+      my $msg=$sc->LastMessage();
+      $self->LastMsg(OK,$msg);
+   }
+   elsif ($op eq "IncidentFinish"){
+      my %op;
+      $sc->IncidentClose();
+      my $msg=$sc->LastMessage();
+      $self->LastMsg(OK,$msg);
    }
 
 
@@ -725,80 +738,97 @@ sub ValidatedUpdateRecord
 
 
 
-sub CreateApplicationIncident
+sub WebInitiatedValidatedInsertRecord
 {
    my $self=shift;
-   my %param=@_;
-
-   my $username=Query->Param("SCUsername");
-   my $password=Query->Param("SCPassword");
    my $IncidentNumber;
-   my $newrec=$self->getWriteRequestHash("nativweb");;
+   my $newrec=$self->getWriteRequestHash("ajaxcall");;
    $newrec->{class}="APPLICATION";
    print STDERR "WriteRequestHash1:".Dumper($newrec);
-   foreach my $k (keys(%$newrec)){ # remove utf8 code while ajax request
-       $newrec->{$k}=utf8($newrec->{$k})->latin1();
-   }
-   print STDERR "WriteRequestHash2:".Dumper($newrec);
 
    if ($IncidentNumber=$self->ValidatedInsertRecord($newrec)){
       $self->LastMsg(OK,"CreateIncident ($IncidentNumber) is ok");
    }
-   return($IncidentNumber);
+   return($IncidentNumber,"showWork('MyIncidentMgr');");
+}
+
+sub CreateApplicationIncident
+{
+   my $self=shift;
+   return($self->WebInitiatedValidatedInsertRecord());
+}
+
+sub WebInitiatedValidatedUpdateRecord
+{
+   my $self=shift;
+
+   my $IncidentNumber;
+   my $newrec=$self->getWriteRequestHash("ajaxcall");;
+   print STDERR "Upd WriteRequestHash1:".Dumper($newrec);
+   my $id=$newrec->{id};
+
+   $self->ResetFilter();
+   $self->SetFilter({incidentnumber=>\$id});
+   my ($oldrec,$msg)=$self->getOnlyFirst("ALL");
+   $oldrec={};
+   if (!defined($oldrec)){
+      $self->LastMsg(ERROR,"invalid or unknown incident id %s",$id);
+      return(undef);
+   }
+
+   if ($IncidentNumber=$self->ValidatedUpdateRecord($oldrec,$newrec,{id=>$id})){
+      if ($self->LastMsg()==0){
+         $self->LastMsg(OK,"UpdateIncident ($IncidentNumber) is ok");
+      }
+   }
+   return($id,"hidePopWin();showWork('MyIncidentMgr');");
 }
 
 
 sub ResolvApplicationIncident
 {
    my $self=shift;
-   my %param=@_;
+   return($self->WebInitiatedValidatedUpdateRecord());
+}
 
-   my $username=Query->Param("SCUsername");
-   my $password=Query->Param("SCPassword");
-   my $IncidentNumber;
-   my $newrec=$self->getWriteRequestHash("nativweb");;
-   print STDERR "Upd WriteRequestHash1:".Dumper($newrec);
-   foreach my $k (keys(%$newrec)){ # remove utf8 code while ajax request
-       $newrec->{$k}=utf8($newrec->{$k})->latin1();
-   }
-   print STDERR "Upd WriteRequestHash2:".Dumper($newrec);
-   my $id=$newrec->{id};
-   $newrec->{OP}="resolv";
+sub IncidentAddNote
+{
+   my $self=shift;
+   return($self->WebInitiatedValidatedUpdateRecord());
+}
 
-   if ($IncidentNumber=$self->ValidatedUpdateRecord({},$newrec,{id=>$id})){
-      $self->LastMsg(OK,"UpdateIncident ($IncidentNumber) is ok");
-   }
-   return($IncidentNumber);
+sub IncidentFinish
+{
+   my $self=shift;
+   return($self->WebInitiatedValidatedUpdateRecord());
 }
 
 
 sub Process
 {
    my $self=shift;
-   if (my $op=Query->Param("Do")){
+   if (my $op=Query->Param("OP")){
       my $finecode;
-      Query->Delete("Do"); 
+      msg(INFO,"SC mgr OP=$op");
       if ($op eq "Login"){
          $self->LastMsg(OK,"ServiceCenter login successful");
       }
       if ($op eq "CreateApplicationIncident"){
-         if (!defined(my $IncidentNumber=$self->CreateApplicationIncident())){
-            if ($self->LastMsg()==0){
-               $self->LastMsg(ERROR,"create failed - unknown problem");
-            }
+         if (my ($IncidentNumber,$fcode)=$self->CreateApplicationIncident()){
+            $finecode=$fcode;
          }
-         else{
-            $finecode="showWork('MyIncidentMgr');";
+         if ($self->LastMsg()==0){
+            $self->LastMsg(ERROR,"create failed - unknown problem");
          }
       }
-      if ($op eq "ResolvApplicationIncident"){
-         if (!defined(my $IncidentNumber=$self->ResolvApplicationIncident())){
-            if ($self->LastMsg()==0){
-               $self->LastMsg(ERROR,"resolv failed - unknown problem");
-            }
+      if ($op eq "ResolvApplicationIncident" ||
+          $op eq "IncidentAddNote" ||
+          $op eq "IncidentFinish"){
+         if (my ($IncidentNumber,$fcode)=$self->$op()){
+            $finecode=$fcode;
          }
-         else{
-            $finecode="showWork('MyIncidentMgr');";
+         if ($self->LastMsg()==0){
+            $self->LastMsg(ERROR,"resolv failed - unknown problem");
          }
       }
       print $self->HttpHeader("text/xml");
@@ -882,11 +912,6 @@ sub inmResolv
    my $self=shift;
    my $id=Query->Param("id");
 
-   my $userid=$self->getCurrentUserId();
-   my $user=getModuleObject($self->Config,"base::user");
-   $user->SetFilter({userid=>\$userid});
-   my ($urec,$msg)=$user->getOnlyFirst(qw(ALL));
-
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css',
                                    'Output.HtmlDetail.css',
@@ -927,6 +952,52 @@ EOF
    print $self->HtmlBottom(body=>1,form=>1);
 }
 
+
+sub inmAddNote
+{
+   my $self=shift;
+   my $id=Query->Param("id");
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css',
+                                   'Output.HtmlDetail.css',
+                                   'work.css'],
+                           js=>[qw( kernel.App.Web.js toolbox.js)],
+                           body=>1,form=>1);
+   
+   my $mask=<<EOF;
+AddNote:
+<table border=0 width=100%>
+<tr>
+<td colspan=2 class=finput> %scdescription(forceedit)% </td>
+</tr>
+<tr>
+<td colspan=2>
+<input style="width:100%" type=button 
+       onclick="parent.doOP(this,'IncidentAddNote',
+                            document.forms[0],
+                            document.getElementById('result'))" 
+       value="save">
+</td>
+</tr>
+<tr>
+<td colspan=2>
+<div id=result>
+
+</div>
+</td>
+</tr>
+</table>
+EOF
+   $self->ParseTemplateVars(\$mask);
+   print $mask;
+   print $self->HtmlPersistentVariables("id");
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+
+
+
 sub Manager
 {
    my $self=shift;
@@ -957,24 +1028,22 @@ sub Manager
    foreach my $irec ($self->getHashList(qw(incidentnumber status name
                                            downtimestart downtimeend))){
       printf("<form name=\"%s\"><tr>",$irec->{incidentnumber});
+      printf("<input type=hidden name=id value=\"%s\">",
+             $irec->{incidentnumber});
       printf("<td>%s</td><td>%s</td><td>%s</td>",
              $irec->{incidentnumber},$irec->{status},$irec->{name});
       printf("<td>");
       if ($irec->{status} eq "resolved"){
-       #  printf("<input type=button id=addnote value=\"add note\">");
-         printf("<input type=button onclick=\"parent.showPopWin('../inm/inmFinish?id=$irec->{incidentnumber}',500,300,refresh);\" id=finish value=\"finish\">");
+         printf("<input type=button onclick=\"parent.doOP(this,'IncidentFinish',this.form,parent.document.getElementById('result'));\" id=finish value=\"finish\">");
       }
       else{
-       #  printf("<input type=button id=addnote value=\"add note\">");
-         printf("<input type=button onclick=\"parent.showPopWin('../inm/inmResolv?id=$irec->{incidentnumber}',500,300,refresh);\" id=resolv value=\"resolv\">");
+         printf("<input type=button onclick=\"parent.showPopWin('../inm/inmResolv?id=$irec->{incidentnumber}',500,300,refresh);\" id=inmResolv value=\"inmResolv\">");
+         printf("<input type=button onclick=\"parent.showPopWin('../inm/inmAddNote?id=$irec->{incidentnumber}',500,300,refresh);\" id=inmAddNote value=\"inmAddNote\">");
       }
       printf("</td>");
       printf("</tr></form>");
    }
    print("</table>");
-
-
-   
 
    print $self->HtmlBottom(body=>1,form=>1);
 }

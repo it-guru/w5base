@@ -86,13 +86,8 @@ function showWork(e)
    if (e.id=='MyIncidentList' || e=='MyIncidentList'){
       frames['work'].document.location.href="../inm/NativResult?search_openedby=$posix&search_status=!closed&AutoSearch=1";
    }
-
 }
 
-function testOP(e)
-{
-   e.innerHTML="yy";
-}
 
 function doOP(o,op,form,e)
 {
@@ -103,11 +98,13 @@ function doOP(o,op,form,e)
    e.innerHTML=l.innerHTML;
    param+="&SCUsername="+encodeURI(document.getElementById("SCUsername").value);
    param+="&SCPassword="+encodeURI(document.getElementById("SCPassword").value);
-   param+="&Do="+encodeURI(op);
+   param+="&OP="+encodeURI(op);
    if (op!="Login"){
-      for(c=0;c<form.elements.length;c++){
-         param+="&"+form.elements[c].name+"="+
-         encodeURIComponent(form.elements[c].value);
+      if (form){
+         for(c=0;c<form.elements.length;c++){
+            param+="&"+form.elements[c].name+"="+
+            encodeURIComponent(form.elements[c].value);
+         }
       }
    }
    var xmlhttp=getXMLHttpRequest();
