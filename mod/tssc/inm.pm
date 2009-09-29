@@ -870,6 +870,8 @@ sub Process
                            body=>1,form=>1,target=>'result');
    my $create=$self->T("Incident create");
    my $mask=<<EOF;
+<div style="margin:5px">
+<h2>create application incident:</h2>
 <table border=1>
 <tr>
 <td class=fname> %scname(label)% </td>
@@ -901,6 +903,7 @@ sub Process
 </td>
 </tr>
 </table>
+</div>
 EOF
    $self->ParseTemplateVars(\$mask);
    print $mask;

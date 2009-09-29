@@ -100,6 +100,12 @@ function doOP(o,op,form,e)
 {
    var param="";
    var l=document.getElementById("loading");
+
+   if (e.running==1){
+      alert("ERROR: other SC operation already running");
+      return;
+   }
+   e.running=1;
    o.disabled="disabled";
 
    e.innerHTML=l.innerHTML;
@@ -141,6 +147,7 @@ function doOP(o,op,form,e)
            }
        }
        eval(d);
+       e.running=0;
     }
    }
    xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
@@ -169,26 +176,30 @@ $appline
 <td width=1%><input type=password id=SCPassword name=SCPassword
                     value="$SCPassword"></td>
 <td></td>
-<td width=1%><input type=button onclick="showWork(this);" 
+<td width=1% align=right><input type=button onclick="showWork(this);" 
                     id=Restart name=Restart value="Restart"></td>
 </tr>
 </table>
 
 </td></tr>
 <tr height=1%><td>
+<div style="margin:5px">
 <input id=NewApplIncident class=opbutton type=button onclick="showWork(this);"
        value="New Application Incident">
 <input id=MyIncidentList  class=opbutton type=button onclick="showWork(this);"
        value="list Incidents created by me">
 <input id=MyIncidentMgr  class=opbutton type=button onclick="showWork(this);"
        value="Incident Manager">
+</div>
 </td></tr>
 
-<tr><td><iframe name=work class=subframe src="../inm/Manager"></iframe></td>
+<tr><td align=center>
+<iframe name=work class=subframe src="../inm/Manager"></iframe>
+</td>
 </tr>
 
 <tr height=1%><td>
-<div style="padding:10px;height:40px;overflow:auto" id=result>
+<div style="padding:5px;height:50px;overflow:auto" id=result>
 W5Base/Darwin stellt ein Kern-Set an Funktionen zur Bedienung von
 ServiceCenter zur Verfügung. Sollten Sie Transaktionen in ServiceCenter
 durchführen wollen, die über die W5Base/Darwin Oberfläche nicht möglich

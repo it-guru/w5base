@@ -126,9 +126,14 @@ div.context_menu td.active {
 
 iframe.subframe{
 	margin: 0px;
+	margin-left: 2px;
+	margin-right: 2px;
 	padding: 0px;
-	width: 100%;
-	height: 100%;
+	width: 98%;
+	height: 98%;
+   border:1px;
+   border-style:solid;
+   border-color:gray;
 	position: relative;
    z-index:10;
 }
