@@ -72,6 +72,21 @@ sub Main
    my $appline=sprintf("<tr><td height=1%% style=\"padding:1px\" ".
                        "valign=top>%s</td></tr>",$self->getAppTitleBar());
 
+   my %opNames=('NewApplIncident'=>{url=>'../inm/Process?'},
+                'MyIncidentMgr'  =>{url=>'../inm/Manager?'},
+                'MyIncidentList' =>{url=>"../inm/NativResult?".
+                                         "search_openedby=$posix&".
+                                         "search_status=!closed&".
+                                         "AutoSearch=1&"});
+   my $jsOPlocator="";
+   foreach my $k (keys(%opNames)){
+      my $url=$opNames{$k}->{url};
+      $jsOPlocator.="if (e.id=='$k' || e=='$k'){\n".
+                    "   frames['work'].document.location.href=\"$url\";\n".
+                    "   directLink.href=\"Main?OP=$k\";\n".
+                    "}\n";
+   }
+
    print <<EOF;
 <style>
 body{
@@ -81,18 +96,12 @@ body{
 <script language="JavaScript">
 function showWork(e)
 {
+   var directLink=document.getElementById("directLink");
    if (e.id=='Restart' || e=='Restart'){
+      document.forms[0].elements['OP'].value=directLink.href;
       document.forms[0].submit();
    }
-   if (e.id=='NewApplIncident' || e=='NewApplIncident'){
-      frames['work'].document.location.href="../inm/Process";
-   }
-   if (e.id=='MyIncidentMgr' || e=='MyIncidentMgr'){
-      frames['work'].document.location.href="../inm/Manager";
-   }
-   if (e.id=='MyIncidentList' || e=='MyIncidentList'){
-      frames['work'].document.location.href="../inm/NativResult?search_openedby=$posix&search_status=!closed&AutoSearch=1";
-   }
+   $jsOPlocator
 }
 
 
@@ -160,6 +169,23 @@ function doOP(o,op,form,e)
 EOF
    my $SCUsername=Query->Param("SCUsername");
    my $SCPassword=Query->Param("SCPassword");
+   my $showWork="../inm/Manager";
+   if (my $k=Query->Param("showWork")){
+      Query->Delete("showWork");
+      $showWork=$opNames{$k}->{'url'};
+   }
+   if (my $k=Query->Param("OP")){
+      Query->Delete("OP");
+      $showWork=$opNames{$k}->{'url'};
+   }
+   my %cgi;
+   foreach my $k (Query->Param()){
+      $cgi{$k}=[Query->Param($k)] if (uc($k) ne $k);
+   }
+   my $q=new kernel::cgi(\%cgi);
+   my $urlparam=$q->QueryString();
+
+   $showWork.=$urlparam;
    print <<EOF;
 <table width=100% height=100% border=0 cellspacing=0 cellpadding=0>
 $appline
@@ -180,12 +206,11 @@ $appline
 <td width=1% align=right><input type=button onclick="showWork(this);" 
                     id=Restart name=Restart value="Restart"></td>
 <td width=20 align=right>
-<img style="margin:4px;margin-left:8px" src="../../../public/base/load/listweblink.gif">
+<a id=directLink href="Main" target=_blank><img border=0 style="margin:4px;margin-left:8px" src="../../../public/base/load/listweblink.gif"></a>
 </td>
 </tr>
 </table>
 </div>
-
 </td></tr>
 <tr height=1%><td>
 <div style="margin:5px">
@@ -197,12 +222,7 @@ $appline
        value="Incident Manager">
 </div>
 </td></tr>
-
-<tr><td align=center>
-<iframe name=work class=subframe src="../inm/Manager"></iframe>
-</td>
-</tr>
-
+<tr><td align=center><iframe name=work class=subframe src="$showWork"></iframe></td></tr>
 <tr height=1%><td>
 <div style="padding:5px;height:50px;overflow:auto" id=result>
 W5Base/Darwin stellt ein Kern-Set an Funktionen zur Bedienung von
@@ -212,6 +232,7 @@ sind, so nutzen Sie bitte dafür dann den "normalen" ServiceCenter Client!
 </div>
 </td></tr>
 </table>
+<input type=hidden name=OP>
 EOF
    print $self->HtmlBottom(body=>1,form=>1);
 }
