@@ -20,6 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::App::Web;
+use kernel::App::Web::Listedit;
 use kernel::Field;
 use kernel::TemplateParsing;
 use tssc::lib::io;
@@ -38,8 +39,14 @@ sub new
 sub getValidWebFunctions
 {
    my $self=shift;
-   return("Main",
+   return("Main","addAttach",
           $self->SUPER::getValidWebFunctions());
+}
+
+sub addAttach
+{
+   my $self=shift;
+   return($self->kernel::App::Web::Listedit::addAttach());
 }
 
 

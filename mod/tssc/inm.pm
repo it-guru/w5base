@@ -285,13 +285,14 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'scimpact',
-                value         =>[qw(all.customer.fail
+                value         =>[qw(
+                                    onlyme.restricted
+                                    all.customer.fail
                                     all.customer.restricted
                                     some.customer.fail
                                     some.customer.restricted
                                     all.interfaces.fail
                                     some.interfaces.fail
-                                    onlyme.restricted
                                     none)],
                 transprefix   =>'IM.',
                 label         =>'Incident impact'),
@@ -443,8 +444,8 @@ sub Validate
    my $newrec=shift;
 
 
-printf STDERR ("fifi Validate:oldrec=%s\n",Dumper($oldrec));
-printf STDERR ("fifi Validate:newrec=%s\n",Dumper($newrec));
+#printf STDERR ("fifi Validate:oldrec=%s\n",Dumper($oldrec));
+#printf STDERR ("fifi Validate:newrec=%s\n",Dumper($newrec));
    if (!defined($oldrec)){
       trim($newrec) if (defined($newrec));
       my $name=$newrec->{"scname"};
@@ -534,24 +535,40 @@ printf STDERR ("fifi op newrec=%s\n",Dumper($newrec));
       $sc->Logout();
       return(undef);
    }
+   my $fail=1;
+   my $msg;
    if ($op eq "ResolvApplicationIncident"){
+      my ($Y,$M,$D,$h,$m,$s)=$self->ExpandTimeExpression("now","stamp",
+                                                         "CET","CET"); 
       my %op;
+      $op{'downtime.end'}=sprintf("%02d/%02d/%04d %02d:%02d:%02d",
+                                  $D,$M,$Y,$h,$m,$s);
       $op{'resolution'}=$newrec->{'scdescription'};
       $sc->IncidentResolve(%op);
-      my $msg=$sc->LastMessage();
-      $self->LastMsg(OK,$msg);
+      $msg=$sc->LastMessage();
+      $fail=0 if ($msg=~m/resolved/i);
    }
    elsif ($op eq "IncidentAddNote"){
       my %op;
       $sc->IncidentAddAction($searchResult,$newrec->{'scdescription'});
-      my $msg=$sc->LastMessage();
-      $self->LastMsg(OK,$msg);
+      $msg=$sc->LastMessage();
+      $fail=0 if ($msg=~m/updated/i);
    }
    elsif ($op eq "IncidentFinish"){
       my %op;
       $sc->IncidentClose();
-      my $msg=$sc->LastMessage();
-      $self->LastMsg(OK,$msg);
+      $msg=$sc->LastMessage();
+      $fail=0 if ($msg=~m/closed/i);
+   }
+   if (!$fail){
+      if ($msg ne ""){
+         $self->LastMsg(OK,$msg);
+      }
+   }
+   else{
+      $self->LastMsg(ERROR,$msg);
+      $sc->Logout();
+      return(undef);
    }
 
 
@@ -660,7 +677,7 @@ sub InsertRecord   # fake write request to SC
                  'category.type'          =>$newrec->{class},
                  'action'                 =>$newrec->{scdescription});
 
-   printf STDERR ("fifi d=%s\n",Dumper(\%Incident));
+   msg(INFO,"SC IncidentCreate request=%s",Dumper(\%Incident));
 
    if (!defined($IncidentNumber=$sc->IncidentCreate(\%Incident))){
       $self->LastMsg(ERROR,"SC: ".$sc->LastMessage());
@@ -744,12 +761,14 @@ sub WebInitiatedValidatedInsertRecord
    my $IncidentNumber;
    my $newrec=$self->getWriteRequestHash("ajaxcall");;
    $newrec->{class}="APPLICATION";
-   print STDERR "WriteRequestHash1:".Dumper($newrec);
 
    if ($IncidentNumber=$self->ValidatedInsertRecord($newrec)){
       $self->LastMsg(OK,"CreateIncident ($IncidentNumber) is ok");
    }
-   return($IncidentNumber,"showWork('MyIncidentMgr');");
+   if ($IncidentNumber ne ""){
+      return($IncidentNumber,"showWork('MyIncidentMgr');");
+   }
+   return;
 }
 
 sub CreateApplicationIncident
@@ -764,7 +783,6 @@ sub WebInitiatedValidatedUpdateRecord
 
    my $IncidentNumber;
    my $newrec=$self->getWriteRequestHash("ajaxcall");;
-   print STDERR "Upd WriteRequestHash1:".Dumper($newrec);
    my $id=$newrec->{id};
 
    $self->ResetFilter();
@@ -780,8 +798,9 @@ sub WebInitiatedValidatedUpdateRecord
       if ($self->LastMsg()==0){
          $self->LastMsg(OK,"UpdateIncident ($IncidentNumber) is ok");
       }
+      return($id,"hidePopWin();showWork('MyIncidentMgr');");
    }
-   return($id,"hidePopWin();showWork('MyIncidentMgr');");
+   return;
 }
 
 
@@ -807,6 +826,7 @@ sub IncidentFinish
 sub Process
 {
    my $self=shift;
+   msg(INFO,"SC Process call");
    if (my $op=Query->Param("OP")){
       my $finecode;
       msg(INFO,"SC mgr OP=$op");
@@ -845,7 +865,8 @@ sub Process
                                    'jquery.autocomplete.css'
                                  ],
                            title=>'ServiceCenter Incident Creator',
-                           js=>[qw( toolbox.js jquery.js jquery.autocomplete.js)],
+                           js=>[qw( toolbox.js TextTranslation.js
+                                    jquery.js jquery.autocomplete.js)],
                            body=>1,form=>1,target=>'result');
    my $create=$self->T("Incident create");
    my $mask=<<EOF;
@@ -900,7 +921,9 @@ sub inmFinish
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css',
                                    'work.css'],
-                           js=>[qw( kernel.App.Web.js toolbox.js)],
+                           js=>[qw( toolbox.js TextTranslation.js 
+                                    kernel.App.Web.js
+                                    jquery.js jquery.autocomplete.js)],
                            body=>1,form=>1);
    printf("Not implemented");
    
@@ -916,7 +939,9 @@ sub inmResolv
    print $self->HtmlHeader(style=>['default.css',
                                    'Output.HtmlDetail.css',
                                    'work.css'],
-                           js=>[qw( kernel.App.Web.js toolbox.js)],
+                           js=>[qw( toolbox.js TextTranslation.js 
+                                    kernel.App.Web.js
+                                    jquery.js jquery.autocomplete.js)],
                            body=>1,form=>1);
    
    my $mask=<<EOF;
@@ -962,7 +987,9 @@ sub inmAddNote
    print $self->HtmlHeader(style=>['default.css',
                                    'Output.HtmlDetail.css',
                                    'work.css'],
-                           js=>[qw( kernel.App.Web.js toolbox.js)],
+                           js=>[qw( toolbox.js TextTranslation.js 
+                                    kernel.App.Web.js
+                                    jquery.js jquery.autocomplete.js)],
                            body=>1,form=>1);
    
    my $mask=<<EOF;
