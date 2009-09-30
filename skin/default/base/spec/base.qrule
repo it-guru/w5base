@@ -1,0 +1,3 @@
+#######################################################################
+'target'=>{de=>'Dies beschreibt (als regex), auf welche Datenobjekte diese Regel angewendet werden könnte. Die Information wird direkt aus dem betreffenden qrule-Programmmodule geleasen.',en=>'This describes (as reges), on witch dataobjects dies qrule can be linked. This information is directly readed from the qrule programmcode'},
+

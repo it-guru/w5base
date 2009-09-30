@@ -6,3 +6,6 @@
 'Quality Rule Description'=>{de=>'Quality Regel Beschreibung'},
 'Expiration-Date'=>{de=>'Verfallsdatum'},
 'invalid dataobject nameing'=>{de=>'ungülige Datenobjektbezeichnung'},
+'invalid qruleid'=>{de=>'unkültige Quality Rule ID'},
+'dataobj not functional'=>{de=>'angegebenes Datenobjekt ist nicht funktionsfähig'},
+'dataobj not allowed for this qrule'=>{de=>'Datenobjekt ist für diese Quality Rule nicht zugelassen'},

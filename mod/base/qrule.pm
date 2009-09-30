@@ -143,11 +143,14 @@ sub nativQualityCheck
    $objlist=[$objlist] if (ref($objlist) ne "ARRAY");
    my $lnkr=getModuleObject($self->Config,"base::lnkqrulemandator");
    $lnkr->SetFilter({mandatorid=>$mandator});
+   my %qruledone;
    foreach my $lnkrec ($lnkr->getHashList(qw(mdate qruleid dataobj))){
       my $qrulename=$lnkrec->{qruleid};
+      next if ($qruledone{$qrulename});
       if (defined($self->{qrule}->{$qrulename})){
          my $qrule=$self->{qrule}->{$qrulename};
          my $postargets=$qrule->getPosibleTargets();
+         $postargets=[$postargets] if (ref($postargets) ne "ARRAY");
          my $found=0;
          if (ref($postargets) eq "ARRAY"){
             foreach my $target (@$postargets){
@@ -162,6 +165,7 @@ sub nativQualityCheck
             $found=0;
          }
          if ($found){
+            $qruledone{$qrulename}++;
             my $oldcontext=$W5V2::OperationContext;
             $W5V2::OperationContext="QualityCheck";
             my ($qresult,$control)=$qrule->qcheckRecord($parent,$rec);

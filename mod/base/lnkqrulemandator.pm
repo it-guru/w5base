@@ -178,6 +178,34 @@ sub Validate
       }
       $newrec->{dataobj};
    }
+   my $qruleid=effVal($oldrec,$newrec,"qruleid");
+   if ($qruleid eq ""){
+      $self->LastMsg(ERROR,"invalid qruleid");
+      return(undef);  
+   }
+   my $do=getModuleObject($self->Config(),$dataobj);
+   if (!defined($do)){
+      $self->LastMsg(ERROR,"dataobj not functional");
+      return(undef);  
+   }
+   my $qr=getModuleObject($self->Config(),"base::qrule");
+   my $found=0;
+   foreach my $qrulerec (@{$qr->{'data'}}){
+      if ($qrulerec->{id} eq $qruleid){
+         my $target=$qrulerec->{target};
+         $target=[$target] if (ref($target) ne "ARRAY");
+         foreach my $t (@$target){
+            if ($dataobj=~m/^$t$/){
+               $found++;
+               last;
+            }
+         }
+      }
+   }
+   if (!$found){
+      $self->LastMsg(ERROR,"dataobj not allowed for this qrule");
+      return(undef);  
+   }
    return(1);
 }
 
