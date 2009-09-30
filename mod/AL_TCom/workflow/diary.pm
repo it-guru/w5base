@@ -107,13 +107,15 @@ sub isWriteValid
    }
 
    # ab dem 15.04.2009 eingeführt - vereinbart war, dass das temp ist!
-   if ($rec->{state}==21){ # temporäres erlauben der P800 Nachbearbeitung
-      my @acl=$self->getFinishUseridList($rec);
-      my $userid=$self->getParent->getCurrentUserId();
-      if (grep(/^$userid$/,@acl) || $self->getParent->IsMemberOf("admin")){
-         return("tcomcod");
-      }
-   }
+  # if ($rec->{state}==21){ # temporäres erlauben der P800 Nachbearbeitung
+  #    my @acl=$self->getFinishUseridList($rec);
+  #    my $userid=$self->getParent->getCurrentUserId();
+  #    if (grep(/^$userid$/,@acl) || $self->getParent->IsMemberOf("admin")){
+  #       return("tcomcod");
+  #    }
+  # }
+  # temp Lösung wieder entfernt ...
+  # https://darwin.telekom.de/darwin/auth/base/workflow/ById/12391987130002
 
    return(undef);
 }
@@ -212,7 +214,18 @@ sub getPosibleActions
    if ($WfRec->{state}>17){
       my @acl=$self->getFinishUseridList($WfRec);
       if (grep(/^$userid$/,@acl)){
-         push(@l,"reactivate");
+         if (!$self->getParent->IsMemberOf("admin")){
+            if ($WfRec->{eventend} ne ""){
+               my $now=NowStamp("en");
+               my $d=CalcDateDuration($WfRec->{eventend},$now);
+               if ($d->{totalminutes}<4320){
+                  push(@l,"reactivate");
+               }
+            }
+         }
+         else{
+            push(@l,"reactivate");
+         }
       }
    }
    return(@l);
@@ -709,14 +722,23 @@ sub Process
          $fwd{detaildescription}=$note;
       }
       my $newstep=$self->getParent->getStepByShortname('wfclose',$WfRec);
+      my $tcomcodcomments;
       my $tcomworktime;
       my %p800mod=();
 
-#      if ($WfRec->{tcomcodcause} eq "" ||
-#          $WfRec->{tcomcodcause} eq "undef"){
-#         $self->getParent->LastMsg(ERROR,"no correct P800 cause selection");
-#         return(0);
-#      }
+      if ($WfRec->{tcomcodcause} eq "" ||
+          $WfRec->{tcomcodcause} eq "undef"){
+         $self->getParent->LastMsg(ERROR,"no correct P800 cause selection");
+         return(0);
+      }
+      if ($WfRec->{tcomcodcomments} eq "" && $note ne ""){
+         $p800mod{tcomcodcomments}=$note;
+         $tcomcodcomments=$p800mod{tcomcodcomments};
+      }
+      else{
+         $tcomcodcomments=$WfRec->{tcomcodcomments}; 
+      }
+
 
       if ($WfRec->{tcomworktime}<10){
          my $fa=$self->getParent->getField("shortactionlog");
@@ -731,8 +753,24 @@ sub Process
          }
          $def=10 if ($def<10);
          $p800mod{tcomworktime}=$def if ($WfRec->{tcomworktime}<10);
+         $tcomworktime=$p800mod{tcomworktime};
+      }
+      else{
+         $tcomworktime=$WfRec->{tcomworktime};
       }
       $p800mod{tcomcodrelevant}="yes" if ($WfRec->{tcomcodrelevant} eq "");
+
+      #
+      # check P800 requirements
+      # https://darwin.telekom.de/darwin/auth/base/workflow/ById/12391987130002
+      #
+      if ($tcomworktime>=1200 && length($tcomcodcomments)<20){
+         my $wth=sprintf("%.2lf",$tcomworktime/60);
+         $wth=~s/\./,/g;
+         $self->getParent->LastMsg(ERROR,
+                   'P800 worktime %sh needs detailed description',$wth);
+         return(0);
+      }
 
       if ($self->getParent->StoreRecord($WfRec,$newstep,{
                                 %fwd,
