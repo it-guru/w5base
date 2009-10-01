@@ -228,6 +228,18 @@ sub getNotifyDestinations
 
    if ($mode eq "rootcausei"){
       my $ia=getModuleObject($self->Config,"base::infoabo");
+      if ($WfRec->{eventmode} eq "EVk.infraloc"){
+         my $locid=$WfRec->{affectedlocationid};
+         $locid=[$locid] if (ref($locid) ne "ARRAY");
+         $ia->LoadTargets($emailto,'base::location',\'rootcauseinfo',
+                                   $locid);
+      }
+      if ($WfRec->{eventmode} eq "EVk.net"){
+         my $netid=$WfRec->{affectednetworkid};
+         $netid=[$netid] if (ref($netid) ne "ARRAY");
+         $ia->LoadTargets($emailto,'*::network',\'rootcauseinfo',
+                                   $netid);
+      }
       if ($WfRec->{eventmode} eq "EVk.appl"){
          my $applid=$WfRec->{affectedapplicationid};
          $applid=[$applid] if (ref($applid) ne "ARRAY");
@@ -360,8 +372,18 @@ sub getNotificationSubject
       $loc=$WfRec->{affectedlocation}->[0] if (ref($WfRec->{affectedlocation}));
       $subject2=" / $loc / $state / Standort / ";
    }
-   if ($action eq "rootcausei"){
+   if ($action eq "rootcausei" && $WfRec->{eventmode} eq "EVk.appl"){
       $subject2=" / $ag / Ursachenanalyse / $afcust / Applikation /";
+   }
+   if ($action eq "rootcausei" && $WfRec->{eventmode} eq "EVk.infraloc"){
+      my $loc=$WfRec->{affectedlocation};
+      $loc=$WfRec->{affectedlocation}->[0] if (ref($WfRec->{affectedlocation}));
+      $subject2=" / $loc / Ursachenanalyse / Standort /";
+   }
+   if ($action eq "rootcausei" && $WfRec->{eventmode} eq "EVk.net"){
+      my $net=$WfRec->{affectednetwork};
+      $net=$WfRec->{affectednetwork}->[0] if (ref($WfRec->{affectednetwork}));
+      $subject2=" / $net / Ursachenanalyse / IP-Netzwerk /";
    }
    $subject.=$subject2;
    $subject.=" HeadID ".$WfRec->{id};

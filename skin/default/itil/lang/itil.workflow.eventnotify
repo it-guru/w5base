@@ -51,7 +51,7 @@
 'EVr.inanalyse'=>{de=>'in Analyse',en=>'analyses'},
 'EVr.other'=>{de=>'Sonstige',en=>'other'},
 'EVk.appl'=>{de=>'Anwendungsereignis',en=>'Application'},
-'EVk.net'=>{de=>'IP-Netzwerk',en=>'IP-Network'},
+'EVk.net'=>{de=>'IP-Netzwerk Standort übergreifend',en=>'IP-Network location indipendent'},
 'EVk.infraloc'=>{de=>'Infrastruktur Standort',en=>'Infrastructure location'},
 'Networkarea'=>{de=>'Netzbereich'},
 'Affected Region'=>{de=>'betroffene Region'},
