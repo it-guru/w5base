@@ -143,6 +143,22 @@ sub getDynamicFields
     ));
 }
 
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $origrec=shift;
+
+   my $initiatorgroupid=effVal($oldrec,$newrec,"initiatorgroupid");
+   my $initiatorid=effVal($oldrec,$newrec,"initiatorid");
+   if ($initiatorgroupid eq "" && $initiatorid ne ""){
+      my @l=$self->getParent->getInitiatorGroupsOf($initiatorid);
+      $newrec->{initiatorgroupid}=$l[0] if ($l[0] ne "");
+   }
+   return(1);
+}
+
 
 sub IsModuleSelectable
 {
