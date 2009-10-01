@@ -659,8 +659,18 @@ sub run_dequeue
                }
             }
             if ($st->{exitcode}==0){
-               if (exists($st->{process}->{exitcode})){
-                  my $e=$st->{process}->{exitcode};
+               my $exitcode;
+               if (exists($st->{process}->{ipc}) &&
+                   ref($st->{process}->{ipc}->{handlerresult}) eq "ARRAY"){
+                  foreach my $hres (@{$st->{process}->{ipc}->{handlerresult}}){
+                     if ($exitcode<=$hres->{exitcode}){
+                        $exitcode=$hres->{exitcode};
+                     }
+                  }
+               }
+               $exitcode=-1 if (!defined($exitcode));
+               if (defined($exitcode)){
+                  my $e=$exitcode;
                   if ($e==0){
                      delete($self->{EventSpool}->{$control->{spooltag}});
                   }
@@ -684,7 +694,7 @@ sub run_dequeue
             }
             else{
                if ($control->{lasttrytime}+$control->{retryinterval}<time()){
-                  if ($control->{failcount}>$control->{maxretry}){
+                  if ($control->{failcount}>=$control->{maxretry}){
                      # event failed - notify admin 
                      delete($self->{EventSpool}->{$control->{spooltag}});
                   }

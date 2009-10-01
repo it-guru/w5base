@@ -1,7 +1,7 @@
 'base::eventrouter'=>{de=>'Ereignisroute',en=>'Eventroute'},
 'event route'=>{de=>'Ereignisroute'},
 'Initial Delay'=>{de=>'Anfangsverzögerung'},
-'Retry count'=>{de=>'maximale Anzahl Versuche'},
+'Retry count'=>{de=>'maximale Anzahl nochmaliger Versuche'},
 'Retry interval'=>{de=>'Wiederversuchsinterval'},
 'invalid srcmoduleobject'=>{de=>'ungültiges Quellobject'},
 'Source Object'=>{de=>'Quellobjekt'},

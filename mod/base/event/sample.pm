@@ -38,6 +38,7 @@ sub Init
 
    $self->RegisterEvent("wftest","wftest");
    $self->RegisterEvent("memtest","memtest");
+   $self->RegisterEvent("filecheck","filecheck");
    $self->RegisterEvent("test","test");
    $self->RegisterEvent("sample","SampleEvent1");
    $self->RegisterEvent("sample1","SampleEvent1",timeout=>180);
@@ -64,6 +65,16 @@ sub test
 
 
    return({exitcode=>0,msg=>'ok'});
+}
+
+sub filecheck
+{
+   my $self=shift;
+   if (-f "/tmp/file"){
+      return({exitcode=>0,msg=>'ok'});
+   }
+   return({exitcode=>1,msg=>'file not found'});
+   
 }
 
 sub TimeOutError

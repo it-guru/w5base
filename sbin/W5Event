@@ -87,12 +87,13 @@ $EventController->LoadEventHandler();
 my $event=shift(@ARGV);
 $event=~s/\.pm$//;
 msg(DEBUG,"ProcessEvent '%s'",$event);
-my $bk=$EventController->ProcessEvent($event,{param=>[@ARGV]});
-if (!defined($bk)){
+my @bk=$EventController->ProcessEvent($event,{param=>[@ARGV]});
+if (!defined(@bk)){
    msg(ERROR,"Event '%s' not known",$event);
    exit(1);
 }
 else{
-   msg(DEBUG,"Event '%s' processed at %d Handlers",$event,$bk);
+   msg(DEBUG,"Event '%s' processed at %d Handlers",$event,$#bk);
+   msg(DEBUG,"result=%s",Dumper(\@bk));
    exit(0);
 }
