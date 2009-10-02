@@ -60,29 +60,46 @@ sub tinyDBDump
    check_db($self,$param{db},$param{host});
    my $appl=getModuleObject($self->Config,"itil::appl");
    $appl->ResetFilter();
-   $appl->SetFilter(name=>'SEPT');
+   $appl->SetFilter(name=>'SEPT W5Base/Darwin ASS(A)');
    $appl->SetCurrentOrder("NONE");
 #   $appl->SetCurrentView(qw(id,name,systems));
-   my $view=$appl->getHashList(qw(id name systems));
-#   msg(DEBUG,Dumper(\%param));
-   process_engine($self,$param{db},$param{host}); 
+   my $s=$appl->getHashList(qw(id systems));
+   #msg(DEBUG,Dumper($s));
+   process_engine($self,$s,$param{db},$param{host}); 
    return(0);
 }
 
 sub process_engine
 {
    my $self=shift;
+   my $s=shift;
    my $db=shift;
    my $host=shift;
    my $mydsel=new IO::Select();
    my $mydrdr=new IO::Handle();
    my $myderr=new IO::Handle();
-   my (@ready,@myderr,@gz);
+   my (@ready,@myderr,@gz,$applid,$systemid,$data);
+   $data={appl => []};
+   $data={systems => []};
+
+   foreach my $rec (@{$s}){
+      push(@{$data->{appl}},$rec->{id});
+      foreach my $recsy (@{$rec->{systems}}){
+         push(@{$data->{systems}},$recsy->{systemid});
+      }
+   }
+
+msg(DEBUG,Dumper($data).$#{$data->{appl}});
+   my $gz=gzopen("/tmp/anonym_db_dump.sql.gz", "w9");
 
    my $mysqldump_pid=open3(undef,$mydrdr,$myderr,
-                     "$prog->{mysqldump} -h $host -c -t $db appl");
-                      $mydsel->add($myderr);
+                     $prog->{mysqldump}.' -h '.$host.
+                     ' -c -t -w "id in ('.$applid.')" '.$db.' appl');
+#   $mysqldump_pid=open3(undef,$mydrdr,$myderr,
+#                  $prog->{mysqldump}.' -h '.$host.
+#                  ' -c -t -w "id in ('.$systemid.')" '.$db.' system');
    $mydsel->add($myderr);
+
    # check for mysqldump errors
    @ready = $mydsel->can_read(0.5);
    foreach my $fh (@ready){
@@ -90,18 +107,18 @@ sub process_engine
          push(@myderr,$data);
       }
    }
+
    # print mysqldump errors
    if ($#myderr != -1){
       foreach my $fi (@myderr){
          if ($fi){
-            msg(ERROR,"$fi");
+            msg(ERROR,"mysqldump $fi");
          }
       }
       @ready=[];
    }
-   my $gz=gzopen("/tmp/anonym_db_dump.sql.gz", "w9");
    while(my $line=<$mydrdr>){
-#       msg(DEBUG,"$line");
+       msg(DEBUG,"line=$line");
        $gz->gzwrite("$line");
    }
    $gz->gzclose();
