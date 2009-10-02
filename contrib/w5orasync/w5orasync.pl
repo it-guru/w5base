@@ -155,7 +155,7 @@ $dst->disconnect();
 #######################################################################
 sub help
 {
-   printf STDERR ("Usage: $main::appname -c {config} [-v]\n");
+   printf STDERR ("Usage: $main::appname -c {config} [-v] SYNCOBJECT [...]\n");
 }
 #######################################################################
 

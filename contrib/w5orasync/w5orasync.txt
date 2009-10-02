@@ -1,0 +1,48 @@
+w5orasync
+=========
+With w5orasync, you can syncronize an external oracle table with
+an W5Base dataobject. To do this, you have to create a table
+in your oracle database witch is name like the dataobject (replace
+the doublepoints with _ chars). In this table you have to add
+alle fields, you want to be synced.
+f.e.:
+We have the dataobject base::user, and we need the fields 
+userid,givenname, surname and email in the external oracle 
+database.
+
+You have to do the folloing steps:
+
+1) Create your table like ...
+
+      CREATE TABLE base__user (userid     number(20) NOT NULL,
+                               surname    varchar2(80),
+                               givenname  varchar2(80),
+                               email      varchar2(80),
+                               w5lastsync datetime);
+   
+   The field w5lastsync is needed, to handel deltas on the
+   table correctly. 
+
+2) Create a configfile (f.e. mycon.conf) , in witch the 
+   account informations are stored:
+
+      ORAUSER="w5in"
+      ORAPASS="????????"
+      ORACONNECT="dbi:Oracle:orapslam"
+
+      W5BASEUSER="service/myservice"
+      W5BASEPASS="?????????"
+      W5BASEURL="https://darwin.telekom.de/darwin/auth"
+
+   Don't forget to create a tnsnames.ora entry for the oracle
+   database (in the example "orapslam") 
+
+
+3) Ensure, that all needed perl modules are installed. These
+   are Data::Dumper , W5Base::API , LWP::UserAgent , DBD::Oracle
+
+4) Call the sync (f.e. via cron):
+
+      w5orasync.pl -c mycon base::user
+
+
