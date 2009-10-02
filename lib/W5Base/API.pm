@@ -327,7 +327,7 @@ use Getopt::Long;
 use FindBin qw($RealScript);
 use Config;
 
-$VERSION = "0.4";
+$VERSION = "0.5";
 @ISA = qw(Exporter);
 @EXPORT = qw(&msg &ERROR &WARN &DEBUG &INFO $RealScript
              &XGetOptions
