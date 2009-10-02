@@ -65,20 +65,17 @@ sub tinyDBDump
 #   $appl->SetCurrentView(qw(id,name,systems));
    my $s=$appl->getHashList(qw(id systems));
    #msg(DEBUG,Dumper($s));
-   process_engine($self,$s,$param{db},$param{host}); 
+   my $strdata=calculate_data($self,$s);
+   process_engine($self,$strdata,$param{db},$param{host}); 
    return(0);
 }
 
-sub process_engine
+sub calculate_data
 {
    my $self=shift;
    my $s=shift;
-   my $db=shift;
-   my $host=shift;
-   my $mydsel=new IO::Select();
-   my $mydrdr=new IO::Handle();
-   my $myderr=new IO::Handle();
-   my (@ready,@myderr,@gz,$applid,$systemid,$data);
+   my ($data,$strdata);
+
    $data={appl => []};
    $data={systems => []};
 
@@ -88,13 +85,28 @@ sub process_engine
          push(@{$data->{systems}},$recsy->{systemid});
       }
    }
+   $strdata->{appl}=join(",",@{$data->{appl}});
+   $strdata->{systems}=join(",",@{$data->{systems}});
+   return($strdata);
+}
 
-msg(DEBUG,Dumper($data).$#{$data->{appl}});
+sub process_engine
+{
+   my $self=shift;
+   my $strdata=shift;
+   my $db=shift;
+   my $host=shift;
+   my $mydsel=new IO::Select();
+   my $mydrdr=new IO::Handle();
+   my $myderr=new IO::Handle();
+   my (@ready,@myderr,@gz);
+msg(DEBUG,Dumper($strdata));
+
    my $gz=gzopen("/tmp/anonym_db_dump.sql.gz", "w9");
-
-   my $mysqldump_pid=open3(undef,$mydrdr,$myderr,
-                     $prog->{mysqldump}.' -h '.$host.
-                     ' -c -t -w "id in ('.$applid.')" '.$db.' appl');
+   
+#   my $mysqldump_pid=open3(undef,$mydrdr,$myderr,
+#                     $prog->{mysqldump}.' -h '.$host.
+#                     ' -c -t -w "id in ('.$applid.')" '.$db.' appl');
 #   $mysqldump_pid=open3(undef,$mydrdr,$myderr,
 #                  $prog->{mysqldump}.' -h '.$host.
 #                  ' -c -t -w "id in ('.$systemid.')" '.$db.' system');
