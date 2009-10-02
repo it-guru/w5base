@@ -49,17 +49,17 @@ sub Init
    $self->RegisterObj('base::MyW5Base::myP800$',  # virtureller Eintrag für
                       'base::MyW5Base::myP800$',  # MyW5Base
                       func=>'Main',
-                      defaultacl=>['DTAG.TSI.ES.ITO.CSS.AO.DTAG',
-                                   'DTAG.TSI.ES.SSM']);
+                      defaultacl=>['DTAG.TSI.ITO.CSS.AO.DTAG',
+                                   'DTAG.TSI.SSM']);
 
    $self->RegisterObj('AL_TCom::MyW5Base::ChangeFuture$',
                       'AL_TCom::MyW5Base::ChangeFuture$',
                       func=>'Main',
-                      defaultacl=>['admin','DTAG.TSI.ES.ITO.CSS.AO.DTAG']);
+                      defaultacl=>['admin','DTAG.TSI.ITO.CSS.AO.DTAG']);
 
    $self->RegisterObj("AL_TCom",
                       "tmpl/welcome",
-                      defaultacl=>['admin','DTAG.TSI.ES.ITO.CSS.AO.DTAG']);
+                      defaultacl=>['admin','DTAG.TSI.ITO.CSS.AO.DTAG']);
    
    $self->RegisterObj("AL_TCom.custcontract",
                       "AL_TCom::custcontract",
