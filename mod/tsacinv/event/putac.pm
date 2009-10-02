@@ -61,8 +61,8 @@ sub Init
 #
 # - CO-Nummer muﬂ eingetragen sein, und in W5Base/Darwin als 
 #   installiert/aktiv markiert sein.
-# - Betreuungsteam muﬂ innerhalb von DTAG.TSI.ITO.CSS.AS.DTAG* liegen
-#   oder das Adminteam muﬂ innerhalb von DTAG.TSI.ITO.CSS.AS.DTAG* liegen.
+# - Betreuungsteam muﬂ innerhalb von DTAG.TSI.ICTO.CSS.AS.DTAG* liegen
+#   oder das Adminteam muﬂ innerhalb von DTAG.TSI.ICTO.CSS.AS.DTAG* liegen.
 # - Es darf NICHT "automatisierte Updates durch Schnittstellen" zugelassen sein
 # - CI-Status muﬂ "installiert/aktiv" sein
 # - Dem Asset muﬂ min. ein System zugeordnet sein. 

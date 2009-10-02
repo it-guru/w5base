@@ -59,7 +59,7 @@ sub LoadBCBS
 
    my $grp=getModuleObject($self->Config,"base::grp");
    my $customerid=$grp->TreeCreate("DTAG.ACTIVEBILLING");
-   my $businessteam=$grp->TreeCreate("DTAG.TSI.ITO.CSS.AO.DTAG.BILLING");
+   my $businessteam=$grp->TreeCreate("DTAG.TSI.ICTO.CSS.AO.DTAG.BILLING");
 
 
 

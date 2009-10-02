@@ -57,14 +57,6 @@ sub SendMyJobs
       # basierend auf der Entscheidung des MC AL DTAG werden die
       # reports über anstehende Aufgaben jetzt an alle Darwin Nutzer erstellt.
       #
-      #$flt[0]->{groups}=["DTAG.TSI.ITO.CSS.T-Com.ST.DB",
-      #                   "DTAG.TSI.ITO.CSS.T-Com.ST.DeM",
-      #                   "DTAG.TSI.ITO.CSS.T-Com.PMAQ.QSO",
-      #                   "DTAG.TSI.ITO.CSS.T-Com.GHS-TSI.GT2",
-      #                   "DTAG.TSI.ITO.CSS.OSS.OCTC.T-Com.C3",
-      #                   "DTAG.TSI.ITO.CSS.T-Com.ST.WINDOWS",
-      #                   "DTAG.TSI.CC.DT.SV.SV01.SeM-PS",
-      #                   "DTAG.TSI.ITO.CSS.T-Com.PMAQ.QSC"];
    }
    else{
       my %f=%{$flt[0]};
