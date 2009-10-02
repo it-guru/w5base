@@ -134,7 +134,7 @@ sub new
                                      address=>\&AddressBuild),
 
    );
-   $self->setDefaultView(qw(linenumber locationid fullname street zip location));
+   $self->setDefaultView(qw(linenumber locationid fullname zipcode location address1));
    $self->{MainSearchFieldLines}=4;
    return($self);
 }
