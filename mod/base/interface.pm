@@ -556,10 +556,12 @@ sub storeRecord
          return(interface::SOAP::kernel::Finish({exitcode=>0,
                                                 IdentifiedBy=>$IdentifiedBy})); 
       }
-      if ($o->LastMsg()==0){
-         my $msg="unknown problem";
-         $msg.=" or '$action' is not accessable via SOAP" if ($action ne "");
-         $o->LastMsg(ERROR,$msg);
+      else{
+         if ($o->LastMsg()==0){
+            my $msg="unknown problem";
+            $msg.=" or '$action' is not accessable via SOAP" if ($action ne "");
+            $o->LastMsg(ERROR,$msg);
+         }
       }
       return(interface::SOAP::kernel::Finish({exitcode=>10,
                                               lastmsg=>[$o->LastMsg()]})); 

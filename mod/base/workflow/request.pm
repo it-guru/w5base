@@ -466,6 +466,33 @@ sub NotifyUsers
 
 }
 
+sub WSDLaddNativFieldList
+{
+   my $self=shift;
+   my $o=$self;
+   my $uri=shift;
+   my $ns=shift;
+   my $fp=shift;
+   my $class=shift;
+   my $mode=shift;
+   my $XMLbinding=shift;
+   my $XMLportType=shift;
+   my $XMLmessage=shift;
+   my $XMLtypes=shift;
+
+   if ($mode eq "store"){
+      $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
+                  "name=\"noautoassign\" type=\"xsd:boolean\" />";
+   }
+
+
+   return($self->SUPER::WSDLaddNativFieldList($uri,$ns,$fp,$class,$mode,
+                              $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes));
+}
+
+
+
+
 
 
 #######################################################################
@@ -599,7 +626,6 @@ sub nativProcess
          }
          return(0);
       }
-printf STDERR ("fifi WfRec=%s\n",Dumper($WfRec));
       if (my $id=$self->StoreRecord($WfRec,$h)){
          $h->{id}=$id;
          if ($#wsref!=-1){
@@ -955,6 +981,46 @@ sub nativProcess
       }
       return(0);
    }
+   elsif ($op eq "wfactivate"){
+      my ($target,$fwdtarget,$fwdtargetid,$fwddebtarget,
+          $fwddebtargetid,@wsref)=
+          $self->getParent->getDefaultContractor($WfRec,$actions,
+                                                 "wfactivate");
+      if (!defined($fwdtargetid)){
+         return(0);
+      }
+   
+      if ($self->StoreRecord($WfRec,{stateid=>2,
+                                    fwdtarget=>$fwdtarget,
+                                    fwdtargetid=>$fwdtargetid,
+                                    fwddebtarget=>$fwddebtarget,
+                                    fwddebtargetid=>$fwddebtargetid,
+                                    eventstart=>NowStamp("en"),
+                                    closedate=>undef})){
+         if ($self->getParent->getParent->Action->StoreRecord(
+             $WfRec->{id},"wfactivate",
+             {translation=>'base::workflow::request'},$h->{note},undef)){
+            my $id=$WfRec->{id};
+            if ($#wsref!=-1){
+               while(my $target=shift(@wsref)){
+                  my $targetid=shift(@wsref);
+                  last if ($targetid eq "" || $target eq "");
+                  $self->getParent->getParent->AddToWorkspace($id,
+                                                       $target,$targetid);
+               }
+            }
+            $self->PostProcess($op,$WfRec,$actions,
+                               note=>$h->{note},
+                               fwdtarget=>$fwdtarget,
+                               fwdtargetid=>$fwdtargetid,
+                               fwdtargetname=>"Contractor");
+            return(1);
+         }
+      }
+      return(0);
+   }
+
+
    return($self->SUPER::nativProcess($op,$h,$WfRec,$actions));
 }
 
@@ -1190,85 +1256,10 @@ sub Process
       elsif ($op eq "wfactivate"){
          my $note=Query->Param("note");
          $note=trim($note);
-     
-         my ($target,$fwdtarget,$fwdtargetid,$fwddebtarget,
-             $fwddebtargetid,@wsref)=
-             $self->getParent->getDefaultContractor($WfRec,$actions,
-                                                    "wfactivate");
-         if (!defined($fwdtargetid)){
-            return(0);
-         }
-     
-         if ($self->StoreRecord($WfRec,{stateid=>2,
-                                       fwdtarget=>$fwdtarget,
-                                       fwdtargetid=>$fwdtargetid,
-                                       fwddebtarget=>$fwddebtarget,
-                                       fwddebtargetid=>$fwddebtargetid,
-                                       eventstart=>NowStamp("en"),
-                                       closedate=>undef})){
-            if ($self->getParent->getParent->Action->StoreRecord(
-                $WfRec->{id},"wfactivate",
-                {translation=>'base::workflow::request'},$note,undef)){
-               my $id=$WfRec->{id};
-               if ($#wsref!=-1){
-                  while(my $target=shift(@wsref)){
-                     my $targetid=shift(@wsref);
-                     last if ($targetid eq "" || $target eq "");
-                     $self->getParent->getParent->AddToWorkspace($id,
-                                                          $target,$targetid);
-                  }
-               }
-               $self->PostProcess($action.".".$op,$WfRec,$actions,
-                                  note=>$note,
-                                  fwdtarget=>$fwdtarget,
-                                  fwdtargetid=>$fwdtargetid,
-                                  fwdtargetname=>"Contractor");
-               return(1);
-            }
-         }
-         return(0);
+         my $h=$self->getWriteRequestHash("web");
+         $h->{note}=$note if ($note ne "");
+         return($self->nativProcess("wfactivate",$h,$WfRec,$actions));
       }
-#     # wurde durch den default Handler in kernel::WfStep erstetzt
-#      elsif ($op eq "wfreprocess"){
-#         my $note=Query->Param("note");
-#         $note=trim($note);
-#     
-#         my $fobj=$self->getParent->getField("fwdtargetname");
-#         my $h=$self->getWriteRequestHash("web");
-#         my $newrec;
-#         if ($newrec=$fobj->Validate($WfRec,$h)){
-#            if (!defined($newrec->{fwdtarget}) ||
-#                !defined($newrec->{fwdtargetid} ||
-#                $newrec->{fwdtargetid}==0)){
-#               if ($self->LastMsg()==0){
-#                  $self->LastMsg(ERROR,"invalid forwarding target");
-#               }
-#               return(0);
-#            }
-#         }
-#         my $fwdtargetname=Query->Param("Formated_fwdtargetname");
-#     
-#         if ($self->StoreRecord($WfRec,{stateid=>2,
-#                                       fwdtarget=>$newrec->{fwdtarget},
-#                                       fwdtargetid=>$newrec->{fwdtargetid},
-#                                       eventend=>undef,
-#                                       closedate=>undef,
-#                                       fwddebtarget=>undef,
-#                                       fwddebtargetid=>undef })){
-#            if ($self->getParent->getParent->Action->StoreRecord(
-#                $WfRec->{id},"wfforward",
-#                {translation=>'base::workflow::request'},$fwdtargetname."\n".
-#                                                         $note,undef)){
-#               $self->PostProcess($action.".".$op,$WfRec,$actions,
-#                                  note=>$note,
-#                                  fwdtarget=>$newrec->{fwdtarget},
-#                                  fwdtargetid=>$newrec->{fwdtargetid},
-#                                  fwdtargetname=>$fwdtargetname);
-#               return(1);
-#            }
-#         }
-#         return(0);
-#      }
       elsif ($op eq "wfapprovalreq"){
          my $note=Query->Param("note");
          $note=trim($note);
