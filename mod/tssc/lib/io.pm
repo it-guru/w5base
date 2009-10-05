@@ -469,6 +469,7 @@ sub extractAffectedApplication
    my $truecustomerprio;
 
 
+   my @chksystemid;
    my @chkapplid;
    #  pass 1 : softwareid
    my @l1;
@@ -496,6 +497,9 @@ sub extractAffectedApplication
       foreach my $r (@{$rec->{relations}}){
          if ($r->{dstobj} eq "tsacinv::appl"){
             push(@chkapplid,$r->{dst});
+         }
+         if ($r->{dstobj} eq "tsacinv::system"){
+            push(@chksystemid,$r->{dst});
          }
       }
    }
@@ -625,6 +629,16 @@ sub extractAffectedApplication
                                      businessteam responseteam conumber
                                      mandator mandatorid));
          }
+      }
+   }
+   if ($#chksystemid!=-1){
+      my $sys=$self->getPersistentModuleObject("W5BaseSys",
+                                               "itil::system");
+      $sys->SetFilter({systemid=>\@chksystemid});
+      my @sl=$sys->getHashList(qw(id name)); 
+      foreach my $s (@sl){
+         $system{$s->{name}}=1;
+         $systemid{$s->{id}}=1;
       }
    }
    my %mandator=();
