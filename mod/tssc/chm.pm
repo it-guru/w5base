@@ -111,6 +111,7 @@ sub new
                 label         =>'Software',
                 group         =>'software',
                 htmlwidth     =>'300px',
+                htmldetail    =>0,      # fällt demnächst raus - siehe relations
                 vjointo       =>'tssc::chm_software',
                 vjoinon       =>['changenumber'=>'changenumber'],
                 vjoindisp     =>[qw(name)]),
@@ -121,6 +122,7 @@ sub new
                 group         =>'device',
                 htmlwidth     =>'300px',
                 nodetaillink  =>1,
+                htmldetail    =>0,      # fällt demnächst raus - siehe relations
                 vjointo       =>'tssc::chm_device',
                 vjoinon       =>['changenumber'=>'changenumber'],
                 vjoindisp     =>[qw(name)]),
@@ -390,7 +392,7 @@ sub new
                 group         =>'relations',
                 vjointo       =>'tssc::lnk',
                 vjoinon       =>['changenumber'=>'src'],
-                vjoininhash   =>['dst'],
+                vjoininhash   =>['dst','dstobj'],
                 vjoindisp     =>[qw(dst dstname)]),
 
       new kernel::Field::Text(
@@ -488,7 +490,8 @@ sub SecureSetFilter
 sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),qw(status relations contact));
+   return($self->SUPER::getDetailBlockPriority(@_),
+          qw(status relations approvals contact));
 }
 
 sub getRecordImageUrl

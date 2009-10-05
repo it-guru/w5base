@@ -491,6 +491,14 @@ sub extractAffectedApplication
          }
       }
    }
+   
+   if (defined($rec->{relations}) && ref($rec->{relations} )eq "ARRAY"){
+      foreach my $r (@{$rec->{relations}}){
+         if ($r->{dstobj} eq "tsacinv::appl"){
+            push(@chkapplid,$r->{dst});
+         }
+      }
+   }
 
    # entfernung des Parsings auf Basis des Requests ...
    # https://darwin.telekom.de/darwin/auth/base/workflow/ById/12428113140002
@@ -838,6 +846,7 @@ sub getSC
       $sc->Logout();
       return(undef);
    }
+   $sc->setDebugDirectory("/tmp/sc");
    return($sc);
 }
 

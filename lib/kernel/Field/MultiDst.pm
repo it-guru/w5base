@@ -120,6 +120,10 @@ sub RawValue
                if (defined($rec)){
                   my $dstfld=$dststruct->{obj}->getField($dststruct->{disp},
                                                          $rec);
+                  if (!defined($dstfld)){
+                     msg(ERROR,"fail to find $dststruct->{disp} ".
+                               "in $dststruct->{obj}");
+                  }
                   return($dstfld->RawValue($rec));
                }
                if (defined($self->{altnamestore})){

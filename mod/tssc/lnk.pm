@@ -65,6 +65,8 @@ sub new
                 htmleditwidth =>'400',
                 dst           =>['tssc::chm' =>'name',
                                  'tssc::inm'=>'name',
+                                 'tsacinv::system'=>'systemname',
+                                 'tsacinv::appl'=>'name',
                                  'tssc::prm'=>'name'],
                 dsttypfield   =>'srcobj',
                 dstidfield    =>'src'),
@@ -86,11 +88,7 @@ sub new
                 name          =>'srcobj',
                 group         =>'src',
                 label         =>'Source-obj',
-                dataobjattr   =>"decode(screlationm1.source_filename,".
-                                "'cm3r','tssc::chm',".
-                                "'problem','tssc::inm',".
-                                "'rootcause','tssc::prm',".
-                                "NULL)"),
+                dataobjattr   =>getObjDecode("screlationm1.source_filename")),
 
       new kernel::Field::MultiDst (
                 name          =>'dstname',
@@ -100,6 +98,8 @@ sub new
                 htmleditwidth =>'400',
                 dst           =>['tssc::chm' =>'name',
                                  'tssc::inm'=>'name',
+                                 'tsacinv::system'=>'systemname',
+                                 'tsacinv::appl'=>'name',
                                  'tssc::prm'=>'name'],
                 dsttypfield   =>'dstobj',
                 dstidfield    =>'dst'),
@@ -121,11 +121,7 @@ sub new
                 name          =>'dstobj',
                 group         =>'dst',
                 label         =>'Destination-obj',
-                dataobjattr   =>"decode(screlationm1.depend_filename,".
-                                "'cm3r','tssc::chm',".
-                                "'problem','tssc::inm',".
-                                "'rootcause','tssc::prm',".
-                                "NULL)"),
+                dataobjattr   =>getObjDecode("screlationm1.depend_filename")),
 
       new kernel::Field::Date(
                 name          =>'sysmodtime',
@@ -145,6 +141,18 @@ sub new
 
    $self->setDefaultView(qw(linenumber src dst sysmodtime));
    return($self);
+}
+
+sub getObjDecode
+{
+   my $varname=shift;
+   return("decode($varname,".
+                  "'cm3r','tssc::chm',".
+                  "'problem','tssc::inm',".
+                  "'device',decode(substr(depend,0,4),'APPL','tsacinv::appl',".
+                           "decode(substr(depend,0,1),'A','tsacinv::asset',".
+                           "decode(substr(depend,0,1),'S','tsacinv::system',".
+                           "NULL))))");
 }
 
 
