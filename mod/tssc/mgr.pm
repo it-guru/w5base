@@ -84,6 +84,7 @@ sub Main
       $jsOPlocator.="if (e.id=='$k' || e=='$k'){\n".
                     "   frames['work'].document.location.href=\"$url\";\n".
                     "   directLink.href=\"Main?OP=$k\";\n".
+                    "   document.forms[0].elements['OP'].value='$k';".
                     "}\n";
    }
 
@@ -98,7 +99,9 @@ function showWork(e)
 {
    var directLink=document.getElementById("directLink");
    if (e.id=='Restart' || e=='Restart'){
-      document.forms[0].elements['OP'].value=directLink.href;
+      if (document.forms[0].elements['OP'].value==''){
+         document.forms[0].elements['OP'].value='MyIncidentMgr';
+      }
       document.forms[0].submit();
    }
    $jsOPlocator
@@ -109,6 +112,7 @@ function doOP(o,op,form,e)
 {
    var param="";
    var l=document.getElementById("loading");
+
 
    if (e.running==1){
       alert("ERROR: other SC operation already running");
@@ -124,8 +128,10 @@ function doOP(o,op,form,e)
    if (op!="Login"){
       if (form){
          for(c=0;c<form.elements.length;c++){
-            param+="&"+form.elements[c].name+"="+
-            encodeURIComponent(form.elements[c].value);
+            if (form.elements[c].name!="OP"){
+               param+="&"+form.elements[c].name+"="+
+               encodeURIComponent(form.elements[c].value);
+            }
          }
       }
    }

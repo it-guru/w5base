@@ -318,6 +318,12 @@ sub new
                 vjoindisp     =>'name',
                 label         =>'Application'),
 
+      new kernel::Field::FlexBox(
+                name          =>'scassignment',
+                vjointo       =>'tssc::group',
+                vjoindisp     =>'fullname',
+                label         =>'Assignment'),
+
       new kernel::Field::Textarea(
                 name          =>'scdescription',
                 cols          =>'40',
@@ -553,7 +559,8 @@ printf STDERR ("fifi op newrec=%s\n",Dumper($newrec));
    }
    elsif ($op eq "IncidentAddNote"){
       my %op;
-      $sc->IncidentAddAction($newrec->{'scdescription'});
+      $sc->IncidentAddAction($newrec->{'scdescription'},
+                             {assignment=>$newrec->{'scassignment'}} );
       $msg=$sc->LastMessage();
       $fail=0 if ($msg=~m/updated/i);
    }
@@ -565,7 +572,8 @@ printf STDERR ("fifi op newrec=%s\n",Dumper($newrec));
    }
    elsif ($op eq "ReopenApplicationIncident"){
       my %op;
-      $sc->IncidentReopen($newrec->{'scdescription'});
+      $sc->IncidentReopen($newrec->{'scdescription'},
+                          {assignment=>$newrec->{'scassignment'}});
       $msg=$sc->LastMessage();
       $fail=0 if ($msg=~m/reopened/i);
    }
@@ -1014,7 +1022,9 @@ sub inmReopen
 
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css',
+                                   'kernel.App.Web.css',
                                    'Output.HtmlDetail.css',
+                                   'jquery.autocomplete.css',
                                    'work.css'],
                            js=>[qw( toolbox.js TextTranslation.js 
                                     kernel.App.Web.js
@@ -1056,9 +1066,17 @@ sub inmAddNote
    my $self=shift;
    my $id=Query->Param("id");
 
+
+   $self->ResetFilter();
+   $self->SetFilter({incidentnumber=>\$id});
+   my ($irec,$msg)=$self->getOnlyFirst(qw(cassignment));
+   Query->Param("Formated_scassignment"=>$irec->{cassignment});
+
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css',
+                                   'kernel.App.Web.css',
                                    'Output.HtmlDetail.css',
+                                   'jquery.autocomplete.css',
                                    'work.css'],
                            js=>[qw( toolbox.js TextTranslation.js 
                                     kernel.App.Web.js
@@ -1068,6 +1086,10 @@ sub inmAddNote
    my $mask=<<EOF;
 AddNote:
 <table border=0 width=100%>
+<tr>
+<td class=fname width=1% nowrap> %scassignment(label)% </td>
+<td class=finput> %scassignment(forceedit)% </td>
+</tr>
 <tr>
 <td colspan=2 class=finput> %scdescription(forceedit)% </td>
 </tr>
