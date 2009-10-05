@@ -433,7 +433,9 @@ sub isWriteValid
 sub getValidWebFunctions
 {
    my $self=shift;
-   return("Manager","inmFinish","inmResolv","inmClose","inmAddNote","Process",
+   return("Manager",
+          "inmFinish","inmResolv","inmClose","inmAddNote","inmReopen",
+          "Process",
           $self->SUPER::getValidWebFunctions());
 }
 
@@ -518,7 +520,8 @@ printf STDERR ("fifi op newrec=%s\n",Dumper($newrec));
    msg(INFO,"start SC login for $ENV{REMOTE_USER}");
    my $sc=$self->getSC($username,$password);
    if (!defined($sc)){
-      $self->LastMsg(ERROR,"ServiceCenter Login failed");
+      $self->LastMsg(ERROR,"ServiceCenter Login failed or ".
+                           "maximum number of concurrent logins reached");
       return(undef);
    }
    my $op=$newrec->{OP};
@@ -550,7 +553,7 @@ printf STDERR ("fifi op newrec=%s\n",Dumper($newrec));
    }
    elsif ($op eq "IncidentAddNote"){
       my %op;
-      $sc->IncidentAddAction($searchResult,$newrec->{'scdescription'});
+      $sc->IncidentAddAction($newrec->{'scdescription'});
       $msg=$sc->LastMessage();
       $fail=0 if ($msg=~m/updated/i);
    }
@@ -560,13 +563,28 @@ printf STDERR ("fifi op newrec=%s\n",Dumper($newrec));
       $msg=$sc->LastMessage();
       $fail=0 if ($msg=~m/closed/i);
    }
+   elsif ($op eq "ReopenApplicationIncident"){
+      my %op;
+      $sc->IncidentReopen($newrec->{'scdescription'});
+      $msg=$sc->LastMessage();
+      $fail=0 if ($msg=~m/reopened/i);
+   }
+   if ($msg=~m/^\$/){
+      msg(ERROR,$msg);
+      $msg="ServiceCenter communication error";
+   }
    if (!$fail){
       if ($msg ne ""){
          $self->LastMsg(OK,$msg);
       }
    }
    else{
-      $self->LastMsg(ERROR,$msg);
+      if ($msg ne ""){
+         $self->LastMsg(ERROR,$msg);
+      }
+      else{
+         $self->LastMsg(ERROR,"action not allowed or unknown error");
+      }
       $sc->Logout();
       return(undef);
    }
@@ -599,7 +617,8 @@ sub InsertRecord   # fake write request to SC
    msg(INFO,"start SC login for $ENV{REMOTE_USER}");
    my $sc=$self->getSC($username,$password);
    if (!defined($sc)){
-      $self->LastMsg(ERROR,"ServiceCenter Login failed");
+      $self->LastMsg(ERROR,"ServiceCenter Login failed or ".
+                           "maximum number of concurrent logins reached");
       return(undef);
    }
    my $priority=3;
@@ -816,6 +835,12 @@ sub IncidentAddNote
    return($self->WebInitiatedValidatedUpdateRecord());
 }
 
+sub ReopenApplicationIncident
+{
+   my $self=shift;
+   return($self->WebInitiatedValidatedUpdateRecord());
+}
+
 sub IncidentFinish
 {
    my $self=shift;
@@ -843,6 +868,7 @@ sub Process
       }
       if ($op eq "ResolvApplicationIncident" ||
           $op eq "IncidentAddNote" ||
+          $op eq "ReopenApplicationIncident"  ||
           $op eq "IncidentFinish"){
          if (my ($IncidentNumber,$fcode)=$self->$op()){
             $finecode=$fcode;
@@ -981,6 +1007,50 @@ EOF
 }
 
 
+sub inmReopen
+{
+   my $self=shift;
+   my $id=Query->Param("id");
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css',
+                                   'Output.HtmlDetail.css',
+                                   'work.css'],
+                           js=>[qw( toolbox.js TextTranslation.js 
+                                    kernel.App.Web.js
+                                    jquery.js jquery.autocomplete.js)],
+                           body=>1,form=>1);
+   
+   my $mask=<<EOF;
+<table border=0 width=100%>
+<tr>
+<td colspan=2 class=finput> %scdescription(forceedit)% </td>
+</tr>
+<tr>
+<td colspan=2>
+<input style="width:100%" type=button 
+       onclick="parent.doOP(this,'ReopenApplicationIncident',
+                            document.forms[0],
+                            document.getElementById('result'))" 
+       value="save">
+</td>
+</tr>
+<tr>
+<td colspan=2>
+<div id=result>
+
+</div>
+</td>
+</tr>
+</table>
+EOF
+   $self->ParseTemplateVars(\$mask);
+   print $mask;
+   print $self->HtmlPersistentVariables("id");
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+
 sub inmAddNote
 {
    my $self=shift;
@@ -1065,6 +1135,7 @@ sub Manager
       printf("<td>");
       if ($irec->{status} eq "resolved"){
          printf("<input type=button onclick=\"parent.doOP(this,'IncidentFinish',this.form,parent.document.getElementById('result'));\" id=finish value=\"finish\">");
+         printf("<input type=button onclick=\"parent.showPopWin('../inm/inmReopen?id=$irec->{incidentnumber}',500,300,refresh);\" id=inmReopen value=\"inmReopen\">");
       }
       else{
          printf("<input type=button onclick=\"parent.showPopWin('../inm/inmResolv?id=$irec->{incidentnumber}',500,300,refresh);\" id=inmResolv value=\"inmResolv\">");
