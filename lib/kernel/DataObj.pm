@@ -575,6 +575,7 @@ sub getWriteRequestHash
          delete($rec{$k}) if ($k eq "");
          if (my ($v)=$k=~m/^Formated_(.*)$/){ 
             $rec{$v}=utf8($rec{$k})->latin1();
+            utf8::downgrade($rec{$v},1);
             delete($rec{$k});
          }
       }
