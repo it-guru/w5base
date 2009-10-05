@@ -96,19 +96,21 @@ sub new
                 name          =>'softwareid',
                 htmlwidth     =>'100px',
                 ignorecase    =>1,
-                label         =>'SoftwareID',
+                htmldetail    =>0,      # fällt demnächst raus - siehe relations
+                label         =>'SoftwareID (deprecated)',
                 dataobjattr   =>'cm3rm1.program_name'),
 
       new kernel::Field::Text(
                 name          =>'deviceid',
                 htmlwidth     =>'100px',
                 ignorecase    =>1,
-                label         =>'DeviceID',
+                htmldetail    =>0,      # fällt demnächst raus - siehe relations
+                label         =>'DeviceID (deprecated)',
                 dataobjattr   =>'cm3rm1.logical_name'),
 
       new kernel::Field::SubList(
                 name          =>'software',
-                label         =>'Software',
+                label         =>'Software (deprecated)',
                 group         =>'software',
                 htmlwidth     =>'300px',
                 htmldetail    =>0,      # fällt demnächst raus - siehe relations
@@ -118,7 +120,7 @@ sub new
 
       new kernel::Field::SubList(
                 name          =>'device',
-                label         =>'Device',
+                label         =>'Device (deprecated)',
                 group         =>'device',
                 htmlwidth     =>'300px',
                 nodetaillink  =>1,
