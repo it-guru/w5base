@@ -522,7 +522,6 @@ sub Validate
    }
   # $self->LastMsg(ERROR,"no op");
   # return(0);
-   $newrec->{step}=$self->getNextStep();
 
    return(1);
 }
@@ -549,6 +548,7 @@ sub nativProcess
          return(undef);
       }
       $h->{stateid}=1;
+      $h->{step}=$self->getNextStep();
       if (!$h->{noautoassign}){
          $h->{stateid}=2;
          if ($target ne ""){
@@ -599,6 +599,7 @@ sub nativProcess
          }
          return(0);
       }
+printf STDERR ("fifi WfRec=%s\n",Dumper($WfRec));
       if (my $id=$self->StoreRecord($WfRec,$h)){
          $h->{id}=$id;
          if ($#wsref!=-1){
