@@ -34,7 +34,12 @@ sub new
       new kernel::Field::Linenumber(name       =>'linenumber',
                                     label      =>'No.'),
 
-      new kernel::Field::Id(        name       =>'incidentnumber',
+      new kernel::Field::Id(        name       =>'id',
+                                    label      =>'AssignmentID',
+                                    align      =>'left',
+                                    dataobjattr=>'problemm1.ROWID'),
+
+      new kernel::Field::Text(      name       =>'incidentnumber',
                                     label      =>'Incident No.',
                                     align      =>'left',
                                     dataobjattr=>'problemm1.numberprgn'),
@@ -49,7 +54,7 @@ sub new
                                     label      =>'State',
                                     dataobjattr=>'problemm1.status'),
 
-      new kernel::Field::Text(      name       =>'page',
+      new kernel::Field::Number(    name       =>'page',
                                     ignorecase =>1,
                                     label      =>'Page',
                                     dataobjattr=>'problemm1.page'),
@@ -87,7 +92,7 @@ sub getSqlFrom
 
 sub initSqlOrder
 {
-   return("problemm1.page");
+   return("to_number(problemm1.page)");
 }
 
 

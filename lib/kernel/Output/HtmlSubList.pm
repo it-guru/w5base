@@ -104,8 +104,14 @@ sub ProcessHead
    }
    $tableidstr="id=\"$tableid\""; 
    my @sortnames;
-   foreach my $fname (@view){
-      push(@sortnames,"String");
+   foreach my $fieldname (@view){
+      my $field=$app->getField($fieldname);
+      if (defined($field) && $field->Type() eq "Number"){
+         push(@sortnames,"Number");
+      }
+      else{
+         push(@sortnames,"String");
+      }
    }
    my $sortline=join(",",map({'"'.$_.'"'} @sortnames));
 

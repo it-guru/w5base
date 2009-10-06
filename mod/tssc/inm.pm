@@ -68,10 +68,10 @@ sub new
                 label         =>'DeviceID',
                 dataobjattr   =>'problemm1.logical_name'),
 
-      new kernel::Field::Text(
-                name          =>'custapplication',
-                label         =>'Customer Application',
-                dataobjattr   =>'probsummarym1.dsc_service'),
+#      new kernel::Field::Text(
+#                name          =>'custapplication',
+#                label         =>'Customer Application',
+#                dataobjattr   =>'probsummarym1.dsc_service'),
 
       new kernel::Field::Date(
                 name          =>'cdate',
@@ -114,7 +114,7 @@ sub new
                 vjointo       =>'tssc::inm_assignment',
                 vjoinon       =>['incidentnumber'=>'incidentnumber'],
                 vjoininhash   =>['assignment','status'],
-                vjoindisp     =>[qw(assignment status sysmodtime)]),
+                vjoindisp     =>[qw(page assignment status sysmodtime)]),
 
       new kernel::Field::SubList(
                 name          =>'relations',
@@ -517,7 +517,6 @@ sub UpdateRecord   # fake write request to SC
 
    $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
 
-printf STDERR ("fifi op newrec=%s\n",Dumper($newrec));
 
    my $username=$newrec->{'SCUsername'};
    delete($newrec->{'SCUsername'});
@@ -572,6 +571,7 @@ printf STDERR ("fifi op newrec=%s\n",Dumper($newrec));
    }
    elsif ($op eq "ReopenApplicationIncident"){
       my %op;
+printf STDERR ("newrec=%s\n",Dumper($newrec));
       $sc->IncidentReopen($newrec->{'scdescription'},
                           {assignment=>$newrec->{'scassignment'}});
       $msg=$sc->LastMessage();
@@ -983,10 +983,12 @@ sub inmResolv
    
    my $mask=<<EOF;
 <table border=0 width=100%>
+<!--
 <tr>
 <td class=fname width=1% nowrap> %scresolution(label)% </td>
 <td class=finput> %scresolution(forceedit)% </td>
 </tr>
+-->
 <tr>
 <td colspan=2 class=finput> %scdescription(forceedit)% </td>
 </tr>
@@ -1030,9 +1032,21 @@ sub inmReopen
                                     kernel.App.Web.js
                                     jquery.js jquery.autocomplete.js)],
                            body=>1,form=>1);
+
+   my $hist=getModuleObject($self->Config,"tssc::inm_assignment");
+   $hist->SetFilter({incidentnumber=>\$id});
+   $hist->SetCurrentOrder("page");
+   my ($sbox,$keylist,$vallist,$list)=
+                     $hist->getHtmlSelect("Formated_scassignment",
+                                  "assignment",["assignment"],
+                                  selectindex=>-1);
    
    my $mask=<<EOF;
 <table border=0 width=100%>
+<tr>
+<td class=fname width=1% nowrap> %scassignment(label)% </td>
+<td class=finput> $sbox </td>
+</tr>
 <tr>
 <td colspan=2 class=finput> %scdescription(forceedit)% </td>
 </tr>

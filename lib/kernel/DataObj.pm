@@ -1418,8 +1418,35 @@ sub getHtmlSelect
    if (defined($opt{fields})){
       push(@selectfields,@{$opt{fields}});
    }
+
     
-   foreach my $rec ($self->getHashList(@selectfields)){
+   my @data;
+   my %data;
+   @data=$self->getHashList(@selectfields);
+   if (defined($opt{selectindex})){
+      $opt{selectindex}=sprintf("%d",$opt{selectindex});
+      @data=reverse(@data) if ($opt{selectindex}<0);
+   }
+      
+   if ($uniquekey ne ""){
+      my @sdata=@data;
+      @data=();
+      foreach my $chkrec (@sdata){
+         push(@data,$chkrec) if (!exists($data{$chkrec->{$uniquekey}}));
+         $data{$chkrec->{$uniquekey}}++;
+      }
+   }
+   if (defined($opt{selectindex})){
+      $opt{selectindex}=sprintf("%d",$opt{selectindex});
+      if ($opt{selectindex}<0){
+         (@selected)=$data[($opt{selectindex}*-1)]->{$uniquekey};
+      }
+      else{
+         (@selected)=$data[$opt{selectindex}]->{$uniquekey};
+      }
+   }
+
+   foreach my $rec (@data){
       my %lrec;
       foreach my $k (keys(%$rec)){
          $lrec{$k}=$rec->{$k};
