@@ -1206,7 +1206,7 @@ sub Manager
       printf("</tr></form>");
    }
    print("</table>");
-
+   print $self->HtmlPersistentVariables("mode");
    print $self->HtmlBottom(body=>1,form=>1);
 }
 
