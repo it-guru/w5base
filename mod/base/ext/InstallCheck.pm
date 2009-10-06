@@ -48,6 +48,7 @@ sub getOptionalModules
    # Digest/SHA1 for mysql server interface
 
    return qw(Spreadsheet::WriteExcel::Big 
+             Spreadsheet::ParseExcel Spreadsheet::ParseExcel::Utility
              DTP 
              Digest::SHA1
              pdflib_pl DTP::pdf Archive::Zip

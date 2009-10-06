@@ -38,7 +38,7 @@ foreach my $module (qw(Time::HiRes Digest::SHA1 Data::HexDump
                        Crypt::DES Digest::MD5
                        Spreadsheet::WriteExcel::Big
                        Net::Server XML::Smart IPC::Smart Data::Dumper RPC::Smart)){
-   printf("INFO:  check module %-33s           ... ","'$module'");
+   printf("INFO:  check module %-33s        ... ","'$module'");
    eval("use $module;"); 
    ysleep if ($module ne "Time::HiRes"); 
    printResult($@,$module);
@@ -56,11 +56,11 @@ printf("INFO:  W5InstallCheck Pass 2: ".
        "extend module search paths ...\n");
 
 foreach my $moddir ("$FindBin::Bin/../lib","$FindBin::Bin/../mod"){
-   printf("INFO:  check lib dir at %-35s     ... ","'$moddir'");
+   printf("INFO:  check lib dir at %-35s  ... ","'$moddir'");
    ysleep;printResult(-d $moddir ? "" : $failcount++);
-   printf("INFO:  extend lib path for %-33s    ... ","'$moddir'");
+   printf("INFO:  extend lib path for %-33s ... ","'$moddir'");
    eval("use lib \"$moddir\";");
-   ysleep;printResult($@,$moddir);
+   ysleep;printResult($@);
 }
 if ($failcount){
    printf("ERROR: search path extend failed\n");
@@ -95,14 +95,14 @@ if ($opt_c eq ""){
 printf("INFO:  W5InstallCheck Pass 3: ".
        "check native W5Base enviroment ...\n");
 my $configdir="/etc/w5base";
-printf("INFO:  check config dir at %-32s     ... ","'$configdir'");
+printf("INFO:  check config dir at %-32s  ... ","'$configdir'");
 ysleep;printResult(-d $configdir ? "" : $failcount++);
 
 my $configfile="/etc/w5base/$opt_c.conf";
-printf("INFO:  check config file at %-31s     ... ","'$configfile'");
+printf("INFO:  check config file at %-31s  ... ","'$configfile'");
 ysleep;printResult(-r $configfile ? "" : $failcount++);
 
-printf("INFO:  using W5Base kernel                                       ...");
+printf("INFO:  using W5Base kernel                                    ...");
 eval('
    use kernel;
    use kernel::App;
@@ -110,7 +110,7 @@ eval('
 ');
 ysleep;printResult($@);
 
-printf("INFO:  create W5Base configuration object                        ...");
+printf("INFO:  create W5Base configuration object                     ...");
 my $curconfig;
 eval('
 $configname=$opt_c;
@@ -131,15 +131,15 @@ print("\n");
 
 
 printf("INFO:  W5InstallCheck Pass 4: ".
-       "booting W5Base and run package tests ...\n");
-printf("INFO:  create W5Base testapp module                              ...");
+       "booting/run W5Base package tests ...\n");
+printf("INFO:  create W5Base testapp module                           ...");
 my $testapp;
 eval("
 \$testapp=new W5InstallCheckApp(Config=>\$curconfig);
 ");
 ysleep;printResult($@);
 
-printf("INFO:  loading package specified InstallCheck modules            ...");
+printf("INFO:  loading package specified InstallCheck modules         ...");
 eval('$testapp->LoadSubObjs("ext/InstallCheck","InstallCheck");');
 ysleep;printResult($@);
 exit(1) if ($@ ne "");
@@ -150,7 +150,7 @@ foreach my $smod (keys(%{$testapp->{InstallCheck}})){
    if ($testapp->{InstallCheck}->{$smod}->can("getMandatoryModules")){
       my $mod=$testapp->{InstallCheck}->{$smod};
       foreach my $module ($mod->getMandatoryModules()){
-         printf("INFO:  mandatory mod %-43s ...","'$module' vor '$smodname'");
+         printf("INFO:  mandatory %-45s...","'$module' for '$smodname'");
          eval("use $module;");
          ysleep;printResult($@);
       }
@@ -171,9 +171,9 @@ foreach my $smod (keys(%{$testapp->{InstallCheck}})){
    if ($testapp->{InstallCheck}->{$smod}->can("getOptionalModules")){
       my $mod=$testapp->{InstallCheck}->{$smod};
       foreach my $module ($mod->getOptionalModules()){
-         printf("INFO:  mandatory in %-43s ...","'$smodname' mod '$module'");
+         printf("INFO:  optional %-45s ...","'$smodname' mod '$module'");
          eval("use $module;");
-         ysleep;printResult($@);
+         ysleep;printResult($@,$module);
       }
    }
 }
@@ -204,7 +204,9 @@ sub printResult
    my $res=shift;
    my $module=shift;
    if ($res eq ""){
-      printf("\b\b\b\b    ok\n");
+      my $v=eval("\$${module}::VERSION");
+      $v=sprintf(" %10s",$v) if ($v ne "");
+      printf("\b\b\b\b    ok$v\n");
       $count++;
    }
    else{

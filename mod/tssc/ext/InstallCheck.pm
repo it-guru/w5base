@@ -39,6 +39,20 @@ sub getMandatoryModules
    return qw(DBD::Oracle);
 }
 
+sub getOptionalModules
+{
+   my $self=shift;
+   # Digest/SHA1 for mysql server interface
+
+   return qw(SC::API
+             SC::Customer::TSystems
+             LWP::UserAgent
+             SOAP::Lite
+             );
+}
+
+
+
 
 
 1;
