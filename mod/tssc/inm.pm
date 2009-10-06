@@ -68,10 +68,10 @@ sub new
                 label         =>'DeviceID',
                 dataobjattr   =>'problemm1.logical_name'),
 
-#      new kernel::Field::Text(
-#                name          =>'custapplication',
-#                label         =>'Customer Application',
-#                dataobjattr   =>'probsummarym1.dsc_service'),
+      new kernel::Field::Text(
+                name          =>'custapplication',
+                label         =>'Customer Application',
+                dataobjattr   =>'probsummarym1.dsc_service'),
 
       new kernel::Field::Date(
                 name          =>'cdate',
@@ -1164,9 +1164,19 @@ sub Manager
    foreach my $irec ($self->getHashList(qw(incidentnumber status name
                                            downtimestart downtimeend))){
       printf("<form name=\"%s\"><tr>",$irec->{incidentnumber});
+      my $detailx=$self->DetailX();
+      my $detaily=$self->DetailY();
+      my $onclick="openwin('../inm/ById/$irec->{incidentnumber}',".
+                  "'_blank',".
+                  "'height=$detaily,width=$detailx,toolbar=no,status=no,".
+                  "resizable=yes,scrollbars=no');";
+
+
       printf("<input type=hidden name=id value=\"%s\">",
              $irec->{incidentnumber});
-      printf("<td>%s</td><td>%s</td><td>%s</td>",
+
+      printf("<td><span class=sublink onclick=$onclick>%s</span>".
+             "</td><td>%s</td><td>%s</td>",
              $irec->{incidentnumber},$irec->{status},$irec->{name});
       printf("<td>");
       if ($irec->{status} eq "resolved"){
