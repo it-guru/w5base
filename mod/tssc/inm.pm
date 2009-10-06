@@ -1138,6 +1138,8 @@ sub Manager
 {
    my $self=shift;
 
+   my $mode=Query->Param("mode");
+   $mode="my" if ($mode eq "");
    my $userid=$self->getCurrentUserId();
    my $user=getModuleObject($self->Config,"base::user");
    $user->SetFilter({userid=>\$userid});
@@ -1146,7 +1148,7 @@ sub Manager
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css',
                                    'work.css',
-                                  # 'Output.HtmlDetail.css',
+                                   '../../../public/tssc/load/mgr.css',
                                  ],
                            title=>'ServiceCenter Incident Creator',
                            submodal=>1,
@@ -1155,7 +1157,20 @@ sub Manager
 
    $self->ResetFilter();
    my $posix=uc($urec->{posix});
-   $self->SetFilter({openedby=>\$posix,status=>'!closed'});
+   if ($mode eq "team"){
+      my $grp=getModuleObject($self->Config,"tssc::group");
+      $grp->SetFilter({loginname=>\$posix});
+      my @l=map({$_->{fullname}} $grp->getHashList("fullname"));
+      if ($#l!=-1){
+         $self->SetFilter({cassignment=>\@l,status=>'!closed'});
+      }
+      else{
+         $self->SetFilter({openedby=>\'NOBODY',status=>'!closed'});
+      }
+   }
+   else{
+      $self->SetFilter({openedby=>\$posix,status=>'!closed'});
+   }
 #   print("<style>body{background:white}</style>");
    print("<script>function refresh(){document.forms[0].submit(); return(1);}</script>");
    print("<table>");
@@ -1176,16 +1191,16 @@ sub Manager
              $irec->{incidentnumber});
 
       printf("<td><span class=sublink onclick=$onclick>%s</span>".
-             "</td><td>%s</td><td>%s</td>",
+             "</td><td nowrap>%s</td><td>%s</td>",
              $irec->{incidentnumber},$irec->{status},$irec->{name});
-      printf("<td>");
+      printf("<td nowrap>");
       if ($irec->{status} eq "resolved"){
-         printf("<input type=button onclick=\"parent.doOP(this,'IncidentFinish',this.form,parent.document.getElementById('result'));\" id=finish value=\"finish\">");
-         printf("<input type=button onclick=\"parent.showPopWin('../inm/inmReopen?id=$irec->{incidentnumber}',500,300,refresh);\" id=inmReopen value=\"inmReopen\">");
+         printf("<input type=button class=directButton onclick=\"parent.doOP(this,'IncidentFinish',this.form,parent.document.getElementById('result'));\" id=finish value=\"finish\">");
+         printf("<input type=button class=directButton onclick=\"parent.showPopWin('../inm/inmReopen?id=$irec->{incidentnumber}',500,300,refresh);\" id=inmReopen value=\"reopen\">");
       }
       else{
-         printf("<input type=button onclick=\"parent.showPopWin('../inm/inmResolv?id=$irec->{incidentnumber}',500,300,refresh);\" id=inmResolv value=\"inmResolv\">");
-         printf("<input type=button onclick=\"parent.showPopWin('../inm/inmAddNote?id=$irec->{incidentnumber}',500,300,refresh);\" id=inmAddNote value=\"inmAddNote\">");
+         printf("<input type=button class=directButton onclick=\"parent.showPopWin('../inm/inmResolv?id=$irec->{incidentnumber}',500,300,refresh);\" id=inmResolv value=\"resolv\">");
+         printf("<input type=button class=directButton onclick=\"parent.showPopWin('../inm/inmAddNote?id=$irec->{incidentnumber}',500,300,refresh);\" id=inmAddNote value=\"add note\">");
       }
       printf("</td>");
       printf("</tr></form>");

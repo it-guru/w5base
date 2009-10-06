@@ -73,7 +73,8 @@ sub Main
                        "valign=top>%s</td></tr>",$self->getAppTitleBar());
 
    my %opNames=('NewApplIncident'=>{url=>'../inm/Process?'},
-                'MyIncidentMgr'  =>{url=>'../inm/Manager?'},
+                'MyIncidentMgr'  =>{url=>'../inm/Manager?mode=my'},
+                'TeamIncidentMgr'=>{url=>'../inm/Manager?mode=team'},
                 'MyIncidentList' =>{url=>"../inm/NativResult?".
                                          "search_openedby=$posix&".
                                          "search_status=!closed&".
@@ -225,7 +226,9 @@ $appline
 <input id=MyIncidentList  class=opbutton type=button onclick="showWork(this);"
        value="list Incidents created by me">
 <input id=MyIncidentMgr  class=opbutton type=button onclick="showWork(this);"
-       value="Incident Manager">
+       value="My Incident Manager">
+<input id=TeamIncidentMgr  class=opbutton type=button onclick="showWork(this);"
+       value="Team Incident Manager">
 </div>
 </td></tr>
 <tr><td align=center><iframe name=work class=subframe src="$showWork"></iframe></td></tr>
