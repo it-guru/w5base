@@ -545,7 +545,7 @@ sub extractAffectedApplication
    my @applna=grep(!/\*/,@applna);
    my @applna=grep(!/\?/,@applna);
    my @applna=grep(!/^\s*$/,@applna);
-   msg(DEBUG,"validate aglist=%s",join(",",@applna));
+   msg(DEBUG,"pass4 validate aglist=%s",join(",",@applna));
 
 
    #  pass 5 : validate against W5Base
@@ -570,11 +570,25 @@ sub extractAffectedApplication
    }
    my $novalidappl=0;
    $novalidappl=1 if ($#applid==-1);
+   msg(DEBUG,"pass5 validate aglist=%s",join(",",@applid));
+   msg(DEBUG,"pre deviceid chkapplid=%s",join(",",@chkapplid));
+   msg(DEBUG,"createtime = %s",$rec->{createtime});
+   my $tchm;
+   my $breaktime="2009-10-05 00:00:00";
+   if (exists($rec->{changenumber}) && $rec->{createtime} ne ""){
+      my $d=CalcDateDuration($breaktime,$rec->{createtime});
+      $tchm=$d->{totalminutes};
+   }
    my $dev=$rec->{deviceid};
+   if (defined($tchm) && $tchm>0){
+      $dev=undef;
+      msg(INFO,"MODIFIED CHANGE Handling since $breaktime !!! locical_name");
+   }
    if (my ($applid)=$dev=~m/^.*\(((APPLGER|APPL|GER)\d+)\)$/){
       msg(DEBUG,"ApplicationID=%s",$applid);
       push(@chkapplid,$applid);
    }
+   msg(DEBUG,"post deviceid chkapplid=%s",join(",",@chkapplid));
    if ($#chkapplid!=-1){
       $appl->ResetFilter();
       $appl->SetFilter({applid=>\@chkapplid});
@@ -631,10 +645,11 @@ sub extractAffectedApplication
          }
       }
    }
+   msg(DEBUG,"after systemcheck aglist=%s",join(",",@applna));
    if ($#chksystemid!=-1){
       my $sys=$self->getPersistentModuleObject("W5BaseSys",
                                                "itil::system");
-      $sys->SetFilter({systemid=>\@chksystemid});
+      $sys->SetFilter({systemid=>\@chksystemid,cistatusid=>"<=4"});
       my @sl=$sys->getHashList(qw(id name)); 
       foreach my $s (@sl){
          $system{$s->{name}}=1;

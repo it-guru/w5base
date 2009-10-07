@@ -96,7 +96,7 @@ sub new
                 name          =>'softwareid',
                 htmlwidth     =>'100px',
                 ignorecase    =>1,
-                htmldetail    =>0,      # fällt demnächst raus - siehe relations
+                #htmldetail    =>0,      # fällt demnächst raus - siehe relations
                 label         =>'SoftwareID (deprecated)',
                 dataobjattr   =>'cm3rm1.program_name'),
 
@@ -104,7 +104,7 @@ sub new
                 name          =>'deviceid',
                 htmlwidth     =>'100px',
                 ignorecase    =>1,
-                htmldetail    =>0,      # fällt demnächst raus - siehe relations
+                #htmldetail    =>0,      # fällt demnächst raus - siehe relations
                 label         =>'DeviceID (deprecated)',
                 dataobjattr   =>'cm3rm1.logical_name'),
 
