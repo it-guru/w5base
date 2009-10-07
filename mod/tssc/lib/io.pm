@@ -842,6 +842,7 @@ sub getSC
 
    my $sc;
    eval("use SC::Customer::TSystems;\$sc=new SC::Customer::TSystems;");
+   msg(ERROR,"$@") if (!defined($sc));
    return(undef) if (!defined($sc));
 
    my $dataobjconnect=$self->Config->Param('DATAOBJCONNECT');
