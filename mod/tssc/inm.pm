@@ -554,6 +554,7 @@ sub UpdateRecord   # fake write request to SC
       $op{'resolution'}=$newrec->{'scdescription'};
       $op{'category'}="SOFTWARE";
       $op{'subcategory1'}="OTHER";
+      $op{'resolve.subcategory2'}="OT";
       $sc->IncidentResolve(%op);
       $msg=$sc->LastMessage();
       $fail=0 if ($msg=~m/resolved/i);
