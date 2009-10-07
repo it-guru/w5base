@@ -176,6 +176,9 @@ function doOP(o,op,form,e)
 EOF
    my $SCUsername=Query->Param("SCUsername");
    my $SCPassword=Query->Param("SCPassword");
+   if ($SCUsername eq ""){
+      $SCUsername=$posix;
+   }
    my $showWork="../inm/Manager";
    if (my $k=Query->Param("showWork")){
       Query->Delete("showWork");
