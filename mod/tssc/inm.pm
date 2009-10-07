@@ -552,11 +552,6 @@ sub UpdateRecord   # fake write request to SC
       $op{'downtime.end'}=sprintf("%02d/%02d/%04d %02d:%02d:%02d",
                                   $D,$M,$Y,$h,$m,$s);
       $op{'resolution'}=$newrec->{'scdescription'};
-      $op{'resolve.category'}="SOFTWARE";
-      $op{'resolve.subcategory1'}="OTHER";
-      $op{'resolve.subcategory2'}="OTHER";
-      $op{'resolve.subcategory3'}="HU_OTHER";
-      $op{'reason.causedby'}="OT";
       $sc->IncidentResolve(%op);
       $msg=$sc->LastMessage();
       $fail=0 if ($msg=~m/resolved/i);
