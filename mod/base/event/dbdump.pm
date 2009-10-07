@@ -32,6 +32,8 @@ use Date::Calc qw( Today_and_Now
                    Delta_DHMS
                    Day_of_Week );
 use File::Path;
+use DBI;
+use DBD::mysql;
 @ISA=qw(kernel::Event);
 my ($prog);
 my $starttime=sprintf("%04d-%02d-%02d %02d:%02d:%02d",Today_and_Now);
@@ -57,16 +59,28 @@ sub tinyDBDump
 {
    my $self=shift;
    my %param=@_;
+   my (@tables);
+   my $dataobjconnect=$self->Config->Param("DATAOBJCONNECT")->{w5base};
+   my $dataobjuser=$self->Config->Param('DATAOBJUSER')->{w5base};
+   my $dataobjpass=$self->Config->Param('DATAOBJPASS')->{w5base};
+
    check_db($self,$param{db},$param{host});
+
+   my $con=DBI->connect($dataobjconnect,$dataobjuser,$dataobjpass);
+   my $qh=$con->prepare("show tables");
+   $qh->execute();
+   while (my @w=$qh->fetchrow_array()){
+      $self->{tables}->{$w[0]}++;
+   }
    my $appl=getModuleObject($self->Config,"itil::appl");
    $appl->ResetFilter();
    $appl->SetFilter(name=>'SEPT W5Base/Darwin ASS(A)');
    $appl->SetCurrentOrder("NONE");
 #   $appl->SetCurrentView(qw(id,name,systems));
-   my $s=$appl->getHashList(qw(id systems));
+   my $s=$appl->getHashList(qw(id systems databoss tsm tsm2 sem sem2));
    #msg(DEBUG,Dumper($s));
-   my $strdata=calculate_data($self,$s);
-   process_engine($self,$strdata,$param{db},$param{host}); 
+   calculate_data($self,$s);
+   process_engine($self,$param{db},$param{host}); 
    return(0);
 }
 
@@ -74,65 +88,110 @@ sub calculate_data
 {
    my $self=shift;
    my $s=shift;
-   my ($data,$strdata);
+   my ($data);
 
-   $data={appl => []};
-   $data={systems => []};
+   $data={'appl' => []};
+   $data={'system' => []};
 
    foreach my $rec (@{$s}){
-      push(@{$data->{appl}},$rec->{id});
-      foreach my $recsy (@{$rec->{systems}}){
-         push(@{$data->{systems}},$recsy->{systemid});
+      push(@{$data->{'appl'}},$rec->{'id'});
+      push(@{$data->{'contact'}},$rec->{'tsmid'});
+      push(@{$data->{'contact'}},$rec->{'tsm2id'});
+      push(@{$data->{'contact'}},$rec->{'semid'});
+      push(@{$data->{'contact'}},$rec->{'sem2id'});
+      push(@{$data->{'contact'}},$rec->{'databossid'});
+      foreach my $recsy (@{$rec->{'systems'}}){
+         push(@{$data->{'system'}},$recsy->{'systemid'});
       }
    }
-   $strdata->{appl}=join(",",@{$data->{appl}});
-   $strdata->{systems}=join(",",@{$data->{systems}});
-   return($strdata);
+   $self->{'appl'}=join(",",@{$data->{'appl'}});
+   $self->{'system'}=join(",",@{$data->{'system'}});
+   $self->{'contact'}=join(",",@{$data->{'contact'}});
+
+   # no dumped tables
+   delete($self->{tables}->{'history'});
 }
 
 sub process_engine
 {
    my $self=shift;
-   my $strdata=shift;
    my $db=shift;
    my $host=shift;
    my $mydsel=new IO::Select();
    my $mydrdr=new IO::Handle();
    my $myderr=new IO::Handle();
-   my (@ready,@myderr,@gz);
-msg(DEBUG,Dumper($strdata));
+   my (@ready,@myderr,@gz,$id);
 
    my $gz=gzopen("/tmp/anonym_db_dump.sql.gz", "w9");
-   
-#   my $mysqldump_pid=open3(undef,$mydrdr,$myderr,
-#                     $prog->{mysqldump}.' -h '.$host.
-#                     ' -c -t -w "id in ('.$applid.')" '.$db.' appl');
-#   $mysqldump_pid=open3(undef,$mydrdr,$myderr,
-#                  $prog->{mysqldump}.' -h '.$host.
-#                  ' -c -t -w "id in ('.$systemid.')" '.$db.' system');
-   $mydsel->add($myderr);
-
-   # check for mysqldump errors
-   @ready = $mydsel->can_read(0.5);
-   foreach my $fh (@ready){
-      while (my $data=<$fh>){
-         push(@myderr,$data);
+  
+   foreach my $tab ("appl","system","contact","wfhead","wfkey","wfaction"){ 
+      delete($self->{tables}->{"$tab"});
+      $gz->gzwrite("delete from $tab");
+      if ($tab eq "contact"){
+         $id='userid in ('.$self->{"$tab"}.')';   
+      }elsif($tab eq "wfhead" || $tab eq "wfkey"){
+         $id='1=1 order by closedate limit 1000'
+      }elsif($tab eq "wfaction"){
+         $id='1=1 order by createdate limit 1000'
+      }else{
+         $id='id in ('.$self->{"$tab"}.')';   
       }
-   }
-
-   # print mysqldump errors
-   if ($#myderr != -1){
-      foreach my $fi (@myderr){
-         if ($fi){
-            msg(ERROR,"mysqldump $fi");
+      my $mysqldump_pid=open3(undef,$mydrdr,$myderr,
+                        $prog->{mysqldump}.' -h '.$host.
+                        ' -c -t -w "'.$id.'" '.$db.' '.$tab);
+      $mydsel->add($myderr);
+   
+      # check for mysqldump errors
+      @ready = $mydsel->can_read(0.5);
+      foreach my $fh (@ready){
+         while (my $data=<$fh>){
+            push(@myderr,$data);
          }
       }
-      @ready=[];
+   
+      # print mysqldump errors
+      if ($#myderr != -1){
+         foreach my $fi (@myderr){
+            if ($fi){
+               msg(ERROR,"mysqldump $fi");
+            }
+         }
+         @ready=[];
+      }
+      while(my $line=<$mydrdr>){
+#          msg(DEBUG,"line=$line");
+          $gz->gzwrite("$line");
+      }
    }
-   while(my $line=<$mydrdr>){
-       msg(DEBUG,"line=$line");
-       $gz->gzwrite("$line");
+  
+   foreach my $tab (keys(%{$self->{tables}})){
+      my $mysqldump_pid=open3(undef,$mydrdr,$myderr,
+                        $prog->{mysqldump}.' -h '.$host.
+                        ' -c -t '.$db.' '.$tab);
+      $mydsel->add($myderr);
+   
+      # check for mysqldump errors
+      @ready = $mydsel->can_read(0.5);
+      foreach my $fh (@ready){
+         while (my $data=<$fh>){
+            push(@myderr,$data);
+         }
+      }
+   
+      # print mysqldump errors
+      if ($#myderr != -1){
+         foreach my $fi (@myderr){
+            if ($fi){
+               msg(ERROR,"mysqldump $fi");
+            }
+         }
+         @ready=[];
+      }
+      while(my $line=<$mydrdr>){
+          $gz->gzwrite("$line");
+      }
    }
+
    $gz->gzclose();
 }
 
