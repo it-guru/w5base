@@ -126,7 +126,7 @@ sub process_engine
   
    foreach my $tab ("appl","system","contact","wfhead","wfkey","wfaction"){ 
       delete($self->{tables}->{"$tab"});
-      $gz->gzwrite("delete from $tab");
+      $gz->gzwrite("delete from $tab;\n");
       if ($tab eq "contact"){
          $id='userid in ('.$self->{"$tab"}.')';   
       }elsif($tab eq "wfhead" || $tab eq "wfkey"){
