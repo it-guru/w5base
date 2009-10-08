@@ -47,7 +47,7 @@ CREATE TABLE lnkgrpuser (
 CREATE TABLE lnkgrpuserrole (
   lnkgrpuserroleid bigint(20) NOT NULL default '0',
   lnkgrpuserid bigint(20) NOT NULL default '0',
-  role char(20) not null,
+  nativrole char(20) not null,
   createuser bigint(20) NOT NULL default '0',
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   deletedate datetime default NULL,
