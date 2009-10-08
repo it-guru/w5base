@@ -116,7 +116,8 @@ sub isUserTrusted          # allow extended edit on Workflow
    my $self=shift;
    my $rec=shift;
 
-   my $mandatorid=$rec->{mandatorid}; 
+   my $mandatoridfo=$self->getParent->getField("mandatorid");
+   my $mandatorid=$mandatoridfo->RawValue($rec);
    $mandatorid=[$mandatorid] if (ref($mandatorid) ne "ARRAY");
    @$mandatorid=grep(!/^\s*$/,@$mandatorid);
    if ($#{$mandatorid}!=-1){
@@ -161,7 +162,8 @@ sub isEffortReadAllowed
 {
    my $self=shift;
    my $WfRec=shift;
-   return(1) if ($self->isUserTrusted($WfRec));
+   my $tstate=$self->isUserTrusted($WfRec);
+   return(1) if ($tstate);
    return($self->SUPER::isEffortReadAllowed($WfRec));
 }
 

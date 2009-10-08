@@ -346,6 +346,30 @@ sub nativProcess
       if ($h->{reqdesdate} eq ""){
          $h->{reqdesdate}="as soon as posible / baldmöglichst";
       }
+      my $flt;
+      if ($h->{affectedapplication} ne ""){
+         $flt={name=>\$h->{affectedapplication}}; 
+      }
+      if ($h->{affectedapplicationid} ne ""){
+         $flt={id=>\$h->{affectedapplicationid}}; 
+      }
+      if (defined($flt)){
+         my $appl=getModuleObject($self->getParent->Config,"itil::appl");
+         $appl->SetFilter($flt);
+         my ($arec)=$appl->getOnlyFirst(qw(mandator mandatorid));
+         if (defined($arec)){
+            $h->{mandatorid}=[$arec->{mandatorid}];
+            $h->{mandator}=[$arec->{mandator}];
+         }
+         else{
+            $self->LastMsg(ERROR,"can not find a related mandator");
+            return(0);
+         }
+      }
+      else{
+         $self->LastMsg(ERROR,"no applicationid findable");
+         return(0);
+      }
    }
 
    return($self->SUPER::nativProcess($action,$h,$WfRec,$actions));

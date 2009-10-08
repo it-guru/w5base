@@ -135,8 +135,6 @@ sub Validate
       return(undef);
    }
 
-   printf STDERR ("fifi oldrec=%s\n",Dumper($oldrec));
-   printf STDERR ("fifi newrec=%s\n",Dumper($newrec));
 
    return($self->SUPER::Validate($oldrec,$newrec,$origrec));
 }

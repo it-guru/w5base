@@ -107,7 +107,7 @@ sub new
                 value         =>['0','1'],
                 dataobjattr   =>'wfaction.privatestate'),
 
-      new kernel::Field::Number(
+      new kernel::Field::EffortNumber(
                 name          =>'effort',
                 sqlorder      =>'none',
                 group         =>'actiondata',
@@ -530,6 +530,36 @@ sub getDetailBlockPriority
    my %param=@_;
    return("header","default","actiondata","additional","source");
 }
+
+
+package kernel::Field::EffortNumber;
+
+use strict;
+use vars qw(@ISA);
+@ISA=qw(kernel::Field::Number);
+
+sub new
+{
+   my $type=shift;
+   my $self=bless($type->SUPER::new(@_),$type);
+   return($self);
+}
+
+sub FormatedDetail
+{
+   my $self=shift;
+   my $current=shift;
+   my $FormatAs=shift;
+   return(undef) if ($FormatAs eq "SOAP" ||
+                     $FormatAs eq "XMLV01"); # security !!!
+   if ($FormatAs eq "HtmlDetail" || $FormatAs eq "edit"){
+      return($self->SUPER::FormatedDetail($current,$FormatAs));
+   } 
+   return(undef) if ($FormatAs ne "HtmlWfActionlog"); # security !!!
+   return($self->SUPER::FormatedDetail($current,$FormatAs));
+}
+
+
 
 
 
