@@ -153,7 +153,7 @@ sub getObjDecode
                            "decode(substr(depend,0,3),'GER','tsacinv::appl',".
                            "decode(substr(depend,0,1),'A','tsacinv::asset',".
                            "decode(substr(depend,0,1),'S','tsacinv::system',".
-                           "NULL))))");
+                           "NULL)))))");
 }
 
 
