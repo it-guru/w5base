@@ -165,6 +165,7 @@ sub process_engine
    }
   
    foreach my $tab (keys(%{$self->{tables}})){
+      $gz->gzwrite("delete from $tab;\n");
       my $mysqldump_pid=open3(undef,$mydrdr,$myderr,
                         $prog->{mysqldump}.' -h '.$host.
                         ' -c -t '.$db.' '.$tab);
