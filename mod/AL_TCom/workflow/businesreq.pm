@@ -69,6 +69,32 @@ sub getDynamicFields
    ));
 }
 
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $origrec=shift;
+   if (defined($oldrec) && defined($newrec) &&
+       $oldrec->{stateid}!=16 && $newrec->{stateid}==16){
+      if (($oldrec->{tcomcodcause} eq "undef" || 
+           $oldrec->{tcomcodcause} eq "") &&
+          $newrec->{tcomcodcause} eq ""){
+         $newrec->{tcomcodcause}=$oldrec->{reqnature};
+      }
+      if (($oldrec->{tcomworktime} eq "") &&
+          $newrec->{tcomworktime} eq ""){
+         if (ref($oldrec->{shortactionlog}) eq "ARRAY"){
+            foreach my $arec (@{$oldrec->{shortactionlog}}){
+               $newrec->{tcomworktime}+=$arec->{effort};
+            }
+         }
+      }
+   }
+   return($self->SUPER::Validate($oldrec,$newrec,$origrec));
+
+}
+
 sub getDetailBlockPriority
 {
    my $self=shift;
