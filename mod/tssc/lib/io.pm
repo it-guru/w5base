@@ -364,6 +364,7 @@ sub mkChangeStoreRec
    $wfrec{mandatorid}=$mandatorid;
    $wfrec{truecustomerprio}=$truecustomerprio;
    $wfrec{class}=$oldclass;
+   msg(DEBUG,"rec=%s",Dumper(\%wfrec));
    if (defined($updateto) && $#{$aids}!=-1 && 
        $oldclass eq "itil::workflow::change"){
       $wf->UpdateRecord({class=>'AL_TCom::workflow::change'},
@@ -635,6 +636,8 @@ sub extractAffectedApplication
                }
             }
          }
+         msg(DEBUG,"after systemcheck system=%s",join(",",keys(%system)));
+         msg(DEBUG,"after systemcheck systemid=%s",join(",",keys(%systemid)));
          if ($novalidappl){
             @applid=sort(keys(%applid));
             @applna=sort(keys(%applna));
@@ -656,6 +659,8 @@ sub extractAffectedApplication
          $systemid{$s->{id}}=1;
       }
    }
+   msg(DEBUG,"after chksystemid system=%s",join(",",keys(%system)));
+   msg(DEBUG,"after chksystemid systemid=%s",join(",",keys(%systemid)));
    my %mandator=();
    my %mandatorid=();
    my %custcontractid=();
