@@ -62,7 +62,7 @@ sub WSDLcommon
    $$XMLtypes.="</xsd:simpleType>";
 
  
-   return($self->SUPER::WSDLcommon($uri,$ns,$fp,$module,
+   return($self->{DataObj}->WSDLcommon($uri,$ns,$fp,$module,
                               $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes));
 }
 

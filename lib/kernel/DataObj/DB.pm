@@ -168,6 +168,9 @@ sub getSqlFields
       next if (!defined($field));
       next if (!$field->selectable());
       my $selectfield=$field->getSelectField("select",$self->{DB});
+      if ($field->Type() eq "Container"){
+         $fieldname="___raw_container___$fieldname";
+      }
       if (defined($selectfield)){
          push(@flist,"$selectfield $fieldname");
       }
@@ -906,7 +909,6 @@ use kernel;
 use kernel::Universal;
 use vars qw(@ISA);
 use Tie::Hash;
-use Data::Dumper;
 
 @ISA=qw(Tie::Hash kernel::Universal);
 

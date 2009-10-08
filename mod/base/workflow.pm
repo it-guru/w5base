@@ -913,6 +913,32 @@ sub WSDLcommon
    my $XMLmessage=shift;
    my $XMLtypes=shift;
 
+
+   $$XMLtypes.="<xsd:complexType name=\"WorkflowActions\">";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"unbounded\" ".
+               "name=\"item\" type=\"$ns:WorkflowAction\" />";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
+   $$XMLtypes.="\n";
+
+   $$XMLtypes.="<xsd:complexType name=\"WorkflowAction\">";
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="<xsd:element name=\"owner\" type=\"xsd:string\" />";
+   $$XMLtypes.="<xsd:element name=\"creator\" type=\"xsd:string\" />";
+   $$XMLtypes.="<xsd:element name=\"name\" type=\"xsd:string\" />";
+   $$XMLtypes.="<xsd:element name=\"cdate\" type=\"xsd:dateTime\" />";
+   $$XMLtypes.="<xsd:element name=\"effort\" type=\"xsd:int\" />";
+   $$XMLtypes.="<xsd:element name=\"comments\" type=\"xsd:string\" />";
+   $$XMLtypes.="<xsd:element name=\"additional\" type=\"$ns:Container\" />";
+   $$XMLtypes.="<xsd:element name=\"id\" type=\"xsd:integer\" />";
+   $$XMLtypes.="<xsd:element name=\"translation\" type=\"xsd:string\" />";
+   $$XMLtypes.="<xsd:element name=\"actionref\" type=\"$ns:Container\" />";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
+   $$XMLtypes.="\n";
+
+
    if (defined($class) && defined($self->{SubDataObj}->{$class})){
       my $classobj=$self->{SubDataObj}->{$class};
       $classobj->WSDLcommon($uri,$ns,$fp,$class,
@@ -2368,6 +2394,7 @@ sub new
 {
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
+   $self->{WSDLfieldType}="WorkflowActions" if (!defined($self->{WSDLfieldType}));
    return($self);
 }
 

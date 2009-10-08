@@ -59,9 +59,19 @@ sub Init
 sub test
 {
    my $self=shift;
-   my $g=getModuleObject($self->Config,"base::googlekeys");
+   my $wf=getModuleObject($self->Config,"base::workflow");
 
-   $g->ValidatedInsertRecord({name=>'time'.time(),apikey=>'k'.time()});
+   $wf->SetFilter({id=>\"12523107920002"});
+   my ($WfRec,$msg)=$wf->getOnlyFirst(qw(ALL));
+
+   msg(INFO,"WfRec=%s",Dumper($WfRec->{additional}));
+   my %newadd=%{$WfRec->{additional}};
+   delete($newadd{xxo});
+   $newadd{ServiceCenterState}="released";
+   $newadd{ServiceCenterState}="confirmed";
+   $newadd{ServiceCenterState}="closed";
+   $wf->Store($WfRec,{additional=>\%newadd});
+
 
 
    return({exitcode=>0,msg=>'ok'});

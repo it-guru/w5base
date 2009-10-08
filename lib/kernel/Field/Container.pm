@@ -33,6 +33,17 @@ sub new
    return($self);
 }
 
+#sub getSelectField     # returns the name/function to place in select
+#{
+#   my $self=shift;
+#   my $mode=shift;
+#   my $db=shift;
+#   if ($mode eq "select"){
+#      return("__raw_container_.".$self->{dataobjattr});
+#   }
+#   return($self->SUPER::getSelectField($mode,$db));
+#}
+
 
 sub FormatedDetail
 {
@@ -65,7 +76,9 @@ sub FormatedDetail
                $descwidth="width=$self->{desccolwidth}"; 
             }
             $r.="<td class=containerfname $descwidth valign=top>$k</td>"; 
-            my $dd=join(", ",@{$d->{$k}});
+            my $dk=$d->{$k};
+            $dk=[$dk] if (ref($dk) ne "ARRAY");
+            my $dd=join(", ",@{$dk});
             $dd="&nbsp;" if ($dd=~m/^\s*$/);
             #$dd=~s/\n/<br>\n/g;
             if ($dd=~m/\n/ || $dd=~m/\S{40}/){
@@ -91,8 +104,12 @@ sub RawValue
    my $self=shift;
    my $current=shift;
 
+   if (exists($current->{"___raw_container___".$self->Name})){
+      $current->{$self->Name}=$current->{"___raw_container___".$self->Name};
+   }
    if (ref($current->{$self->Name}) ne "HASH"){
       my %h=Datafield2Hash($current->{$self->Name});
+   #   CompressHash(\%h);  # should not be Standard
       $current->{$self->Name}=\%h;
    #   printf STDERR ("fifi RawValue=%s\n",Dumper($current->{$self->Name}));
    }

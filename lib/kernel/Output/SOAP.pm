@@ -109,7 +109,7 @@ sub ProcessLine
       my $data=$app->findtemplvar({viewgroups=>$viewgroups,
                                    fieldbase=>$fieldbase,
                                    current=>$rec,
-                                   mode=>'XMLV01',
+                                   mode=>'SOAP',
                                   },$name,"formated");
       if (defined($data)){
          $rec{$self->getRecordTag()}->{$name}=$data;
