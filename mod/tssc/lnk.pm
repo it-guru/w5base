@@ -150,6 +150,7 @@ sub getObjDecode
                   "'cm3r','tssc::chm',".
                   "'problem','tssc::inm',".
                   "'device',decode(substr(depend,0,4),'APPL','tsacinv::appl',".
+                           "decode(substr(depend,0,3),'GER','tsacinv::appl',".
                            "decode(substr(depend,0,1),'A','tsacinv::asset',".
                            "decode(substr(depend,0,1),'S','tsacinv::system',".
                            "NULL))))");
