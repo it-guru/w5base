@@ -126,7 +126,6 @@ sub process_engine
   
    foreach my $tab ("appl","system","contact","wfhead","wfkey","wfaction"){ 
       delete($self->{tables}->{"$tab"});
-      $gz->gzwrite("delete from $tab;\n");
       if ($tab eq "contact"){
          $id='userid in ('.$self->{"$tab"}.')';   
       }elsif($tab eq "wfhead" || $tab eq "wfkey"){
@@ -138,7 +137,7 @@ sub process_engine
       }
       my $mysqldump_pid=open3(undef,$mydrdr,$myderr,
                         $prog->{mysqldump}.' -h '.$host.
-                        ' -c -t -w "'.$id.'" '.$db.' '.$tab);
+                        ' --add-drop-table -c -w "'.$id.'" '.$db.' '.$tab);
       $mydsel->add($myderr);
    
       # check for mysqldump errors
@@ -165,10 +164,9 @@ sub process_engine
    }
   
    foreach my $tab (keys(%{$self->{tables}})){
-      $gz->gzwrite("delete from $tab;\n");
       my $mysqldump_pid=open3(undef,$mydrdr,$myderr,
                         $prog->{mysqldump}.' -h '.$host.
-                        ' -c -t '.$db.' '.$tab);
+                        ' --add-drop-table -c '.$db.' '.$tab);
       $mydsel->add($myderr);
    
       # check for mysqldump errors
