@@ -55,6 +55,11 @@ sub getControlRecord
              target    =>'name',
              targetid  =>'id'
            },
+           {
+             dataobj   =>'itil::swinstance',
+             target    =>'fullname',
+             targetid  =>'id'
+           },
          ];
 
 
