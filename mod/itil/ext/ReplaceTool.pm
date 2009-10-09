@@ -59,6 +59,18 @@ sub getControlRecord
              target       =>'sem',
              idfield      =>'semid'
            },
+           guardianteam=>{
+             replaceoptype=>'base::grp',
+             dataobj      =>'itil::asset',
+             target       =>'guardianteam',
+             idfield      =>'guardianteamid'
+           },
+           adminteam=>{
+             replaceoptype=>'base::grp',
+             dataobj      =>'itil::system',
+             target       =>'adminteam',
+             idfield      =>'adminteamid'
+           },
            businessteam=>{
              replaceoptype=>'base::grp',
              dataobj      =>'itil::appl',

@@ -16,3 +16,4 @@
 "invalid filename '\%s' specified"=>{de=>"ungültiger Dateiname '\%s'"},
 'is private'=>{de=>'Vertraulich behandeln'},
 'insuficient rights to write privacy data'=>{de=>'ungenügende Rechte, um vertrauliche Daten zu schreiben'},
+'invalid file upload "%s" (size=%d by %s)'=>{de=>'Ungültiger Datei upload "%s" (größe=%d von %s)'},

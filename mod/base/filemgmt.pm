@@ -384,7 +384,8 @@ sub Validate
       }
       if (!defined($f) || $size<=0){
          $self->LastMsg(ERROR,
-                 sprintf($self->T("invalid file upload '%s($size)'"),$f));
+              sprintf($self->T('invalid file upload "%s" (size=%d by %s)'),
+                               $f,$size,$ENV{REMOTE_USER}));
          return(undef);
       }
       my $filename=$f;
@@ -1286,7 +1287,7 @@ sub WebUpload
    print("<table width=100% style=\"table-layout:fixed\" ".
          "height=100% border=0>");
    print("<tr height=1%><td width=50>Datei:</td>");
-   print("<td><input size=50 type=file name=file></td></tr>");
+   print("<td><input size=40 type=file name=file></td></tr>");
    print("<tr><td colspan=2 valign=center align=center>".
          "<input type=submit name=do style=\"width:200px\" ".
          "value=\"Upload\"></td></tr>");
