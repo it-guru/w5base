@@ -48,7 +48,7 @@ sub new
 
 sub getPosibleTargets
 {
-   return(["itil::appl"]);
+   return(['^.*::appl$']);
 }
 
 sub qcheckRecord
@@ -72,7 +72,7 @@ sub qcheckRecord
    }
    else{
       my @words=grep(/\S{3}/,split(/\s+/,$rec->{description}));
-      if ($#words<30){
+      if ($#words<20){
          my $msg="description is not detailed enough";
          push(@{$desc->{dataissue}},$msg);
          push(@{$desc->{qmsg}},$msg);

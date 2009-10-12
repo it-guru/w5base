@@ -47,6 +47,8 @@ sub new
       new kernel::Field::Text(      name       =>'assignment',
                                     ignorecase =>1,
                                     label      =>'Assignment',
+                                    weblinkto  =>'tssc::group',
+                                    weblinkon  =>['assignment'=>'name'],
                                     dataobjattr=>'problemm1.assignment'),
 
       new kernel::Field::Text(      name       =>'status',
