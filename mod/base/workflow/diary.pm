@@ -137,9 +137,15 @@ sub getPosibleActions
    my $app=$self->getParent;
    my $userid=$self->getParent->getCurrentUserId();
    my @l=();
-   if ($WfRec->{state}==17 && $WfRec->{openuser}==$userid){
-      push(@l,"addsup");
-      push(@l,"wffinish");
+   if ($WfRec->{state}==17){
+      if ($WfRec->{openuser}==$userid){
+         push(@l,"addsup");
+         push(@l,"wffinish");
+      }
+      if ($WfRec->{fwdtarget} eq 'base::user' && 
+          $userid==$WfRec->{fwdtargetid}){ 
+         push(@l,"wffinish");
+      }
    }
 
    if ($WfRec->{state}>=21 && 
