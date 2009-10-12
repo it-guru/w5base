@@ -249,6 +249,7 @@ EOF
       return("<input class=finput type=text name=Formated_$name value=\"$d\">");
    }
    if (!($d=~m/\[\?\]$/)){
+      $d=$self->addWebLinkToFacility($d,$current) if ($mode eq "Html");
       $d=$self->addWebLinkToFacility($d,$current) if ($mode eq "HtmlDetail");
       $d.=$self->getHtmlContextMenu($current) if ($mode eq "HtmlDetail");
    }

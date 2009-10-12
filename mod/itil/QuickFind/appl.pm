@@ -84,20 +84,20 @@ sub QuickFindDetail
       if (defined($secrec)){
          $htmlresult.=$self->addDirectLink($appl,search_id=>$id);
       }
-      $htmlresult.="<table>";
+      $htmlresult.="<table>\n";
       my @l=qw(sem sem2 delmgr delmgr2 tsm tsm2 databoss businessteam);
       foreach my $v (@l){
          if ($rec->{$v} ne ""){
             my $name=$appl->getField($v)->Label();
-            my $data=$appl->findtemplvar({current=>$rec,mode=>"HtmlDetail"},
+            my $data=$appl->findtemplvar({current=>$rec,mode=>"Html"},
                                          $v,"formated");
             $htmlresult.="<tr><td nowrap valign=top width=1%>$name:</td>".
-                         "<td valign=top>$data</td></tr>";
+                         "<td valign=top>$data</td></tr>\n";
          }
       }
       $htmlresult.=$self->addPhoneNumbers($appl,$rec,"phonenumbers",
                                           ["phoneRB"]);
-      $htmlresult.="</table>";
+      $htmlresult.="</table>\n";
       if ($rec->{description} ne ""){
          my $desclabel=$appl->getField("description")->Label();
          my $desc=$rec->{description};
@@ -105,8 +105,8 @@ sub QuickFindDetail
         
          $htmlresult.="<table><tr><td>".
                       "<div style=\"height:60px;overflow:auto;color:gray\">".
-                      "<font color=black>$desclabel:</font><div>$desc".
-                      "</div></div></td></tr></table>";
+                      "\n<font color=black>$desclabel:</font><div>\n$desc".
+                      "</div></div>\n</td></tr></table>";
       }
    }
    return($htmlresult);

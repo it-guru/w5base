@@ -43,6 +43,7 @@ public class businessreq2 {
     WfRec.setCustomerrefno("INETWORK:112233");
     WfRec.setReqnature("appl.base.base");
     WfRec.setReqdesdate("yesterday would be best");
+    WfRec.setSrcsys("Plasma");
 
     Inp.setData(WfRec);
     Inp.setLang("de");

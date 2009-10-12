@@ -356,10 +356,33 @@ sub nativProcess
       if (defined($flt)){
          my $appl=getModuleObject($self->getParent->Config,"itil::appl");
          $appl->SetFilter($flt);
-         my ($arec)=$appl->getOnlyFirst(qw(mandator mandatorid));
+         my ($arec)=$appl->getOnlyFirst(qw(mandator mandatorid conumber
+                                           custcontracts
+                                           customer customerid));
          if (defined($arec)){
             $h->{mandatorid}=[$arec->{mandatorid}];
             $h->{mandator}=[$arec->{mandator}];
+            $h->{involvedcustomer}=[$arec->{customer}];
+            $h->{involvedcostcenter}=[$arec->{conumber}];
+            if (ref($arec->{custcontracts}) eq "ARRAY"){
+               my %custcontractid;
+               my %custcontract;
+               foreach my $rec (@{$arec->{custcontracts}}){
+                  if (defined($rec->{custcontractid})){
+                     $custcontractid{$rec->{custcontractid}}=1;
+                  }
+                  if (defined($rec->{custcontract})){
+                     $custcontract{$rec->{custcontract}}=1;
+                  }
+               }
+               if (keys(%custcontractid)){
+                  $h->{affectedcontractid}=[keys(%custcontractid)];
+               }
+               if (keys(%custcontract)){
+                  $h->{affectedcontract}=[keys(%custcontract)];
+               }
+            }
+
          }
          else{
             $self->LastMsg(ERROR,"can not find a related mandator");
