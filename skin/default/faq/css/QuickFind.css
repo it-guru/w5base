@@ -7,6 +7,8 @@ div.specialClass{
    width:100%;
    white-space:normal;
    overflow:hidden;
+   cursor: pointer;
+   cursor: hand;
 }
 
 a:link, a:visited, a:active  {

@@ -34,12 +34,14 @@ sub new
 sub CISearchResult
 {
    my $self=shift;
+   my $stag=shift;
    my $tag=shift;
    my $searchtext=shift;
    my %param=@_;
 
    my @l;
-   if (grep(/^$tag$/,qw(group team gruppe bereich grp))){
+   if (grep(/^ci$/,@$stag) &&
+       grep(/^$tag$/,qw(group team gruppe bereich grp))){
       my $flt=[{name=>"$searchtext",cistatusid=>"<=5"}];
       my $dataobj=getModuleObject($self->getParent->Config,"base::grp");
       $dataobj->SetFilter($flt);

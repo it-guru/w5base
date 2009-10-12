@@ -34,12 +34,14 @@ sub new
 sub CISearchResult
 {
    my $self=shift;
+   my $stag=shift;
    my $tag=shift;
    my $searchtext=shift;
    my %param=@_;
 
    my @l;
-   if ($searchtext=~m/^\d{3,20}$/){
+   if (grep(/^ci$/,@$stag) &&
+       ($searchtext=~m/^\d{3,20}$/)){
       my $flt=[{name=>\"$searchtext"}];
       my $dataobj=getModuleObject($self->getParent->Config,"itil::costcenter");
       $dataobj->SetFilter($flt);

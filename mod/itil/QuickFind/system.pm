@@ -34,12 +34,14 @@ sub new
 sub CISearchResult
 {
    my $self=shift;
+   my $stag=shift;
    my $tag=shift;
    my $searchtext=shift;
    my %param=@_;
 
    my @l;
-   if (!defined($tag) || grep(/^$tag$/,qw(system sys server))){
+   if (grep(/^ci$/,@$stag) &&
+       (!defined($tag) || grep(/^$tag$/,qw(system sys server)))){
       my $flt=[{name=>"$searchtext",cistatusid=>"<=5"},
                {applications=>"$searchtext",cistatusid=>"<=5"},
                {systemid=>"$searchtext"}];

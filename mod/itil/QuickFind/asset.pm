@@ -34,12 +34,14 @@ sub new
 sub CISearchResult
 {
    my $self=shift;
+   my $stag=shift;
    my $tag=shift;
    my $searchtext=shift;
    my %param=@_;
 
    my @l;
-   if (!defined($tag) || grep(/^$tag$/,qw(asset))){
+   if (grep(/^ci$/,@$stag) &&
+       (!defined($tag) || grep(/^$tag$/,qw(asset)))){
       my $flt=[{name=>"$searchtext",cistatusid=>"<=5"},
                {systems=>"$searchtext"}];
       if ($searchtext=~m/^\d{3,20}$/){

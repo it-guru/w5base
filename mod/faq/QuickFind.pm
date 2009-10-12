@@ -119,11 +119,41 @@ sub globalHelp
    my $result="Result";
    $result="Empty" if ($kwords ne "");
    $autosearch="0" if ($autosearch ne "1");
+   my @stags=('ci'=>$self->T("Config Item search"),
+              'article'=>$self->T("FAQ article search"),
+              'forum'=>$self->T("Forum fulltext search"));
+
+   $self->LoadSubObjs("QuickFind","QuickFind");
+   my @s;
+   foreach my $sobj (values(%{$self->{QuickFind}})){
+      if ($sobj->can("ExtendStags")){
+         $sobj->ExtendStags(\@stags);
+      }
+   }
+
+   my @selstags=Query->Param("stags");
+   if ($#selstags==-1){
+      @selstags=(qw(forum article));
+   }
+   my $s="<select name=stags style=\"width:100%\" multiple size=4>";
+    while($#stags!=-1){
+       my $key=shift(@stags);
+       my $val=shift(@stags);
+       $s.="<option value=\"$key\"";
+       my $qkey=quotemeta($key);
+       $s.=" selected" if (($qkey ne "" && grep(/^$qkey$/,@selstags)));
+       $s.=">".$val."</option>";
+    }
+    $s.="</select>";
+
+
+
    print $self->getParsedTemplate("tmpl/globalHelp",{
                translation=>'faq::QuickFind',
                static=>{
                  result=>$result,
                  AutoSearch=>$autosearch,
+                 stagsSelect=>$s,
                  searchtext=>$kwords,
                  remote_user=>$ENV{REMOTE_USER},
                  newwf=>$self->T("start a new workflow","base::MyW5Base"),
@@ -168,6 +198,9 @@ sub doSearch
    if (Query->Param("ci") ne ""){
       push(@stags,"ci");
    }
+   if (Query->Param("stags") ne ""){
+      @stags=Query->Param("stags");
+   }
    if ($searchtext ne "" && length($searchtext)<3){
       print treeViewHeader("<font color=red>".$self->T("search text to short").
                            "</font>",1);
@@ -181,7 +214,8 @@ sub doSearch
    $searchtext=trim($searchtext);
 
    my $found=0;
-   if (grep(/^ci$/,@stags)){
+   msg(INFO,"QuickFind at :%s",join(",",@stags));
+   if (grep(/^ci/,@stags)){
       my $tree="foldersTree";
       $self->LoadSubObjs("QuickFind","QuickFind");
       my @s;
@@ -193,7 +227,7 @@ sub doSearch
          }
          msg(INFO,"mod=%s acl=%s",$sobj->Self(),Dumper($acl));
          if ($sobj->can("CISearchResult")){
-            push(@s,$sobj->CISearchResult($tag,$searchtext));
+            push(@s,$sobj->CISearchResult(\@stags,$tag,$searchtext));
          }
       }
       my $group=undef;

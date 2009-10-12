@@ -34,12 +34,14 @@ sub new
 sub CISearchResult
 {
    my $self=shift;
+   my $stag=shift;
    my $tag=shift;
    my $searchtext=shift;
    my %param=@_;
 
    my @l;
-   if (!defined($tag) || grep(/^$tag$/,qw(user contact kontakt))){
+   if (grep(/^ci$/,@$stag) &&
+       (!defined($tag) || grep(/^$tag$/,qw(user contact kontakt)))){
       my $flt=[{fullname=>"*$searchtext*",cistatusid=>"<=5",
                 usertyp=>['user','extern']}];
       my $dataobj=getModuleObject($self->getParent->Config,"base::user");

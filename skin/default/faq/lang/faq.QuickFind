@@ -16,3 +16,6 @@ EOF
 'W5Base Documentation'=>{de=>'W5Base Dokumentation'},
 'nothing found'=>{de=>'nichts gefunden'},
 'search text to short'=>{de=>'Suchtext zu kurz'},
+'Config Item search'=>{de=>'Config Item suche'},
+'FAQ article search'=>{de=>'FAQ Artikel suche'},
+'Forum fulltext search'=>{de=>'Forum Volltext suche'},

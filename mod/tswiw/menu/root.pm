@@ -56,6 +56,10 @@ sub Init
                       "tswiw::orgarea",
                       func=>'ImportOrgarea',
                       defaultacl=>['admin']);
+
+   $self->RegisterObj('tswiw::QuickFind::user$',
+                      "tswiw::QuickFind::user",
+                      defaultacl=>['DTAG.TSI']);
    
    return(1);
 }
