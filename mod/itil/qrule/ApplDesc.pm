@@ -72,7 +72,7 @@ sub qcheckRecord
    }
    else{
       my @words=grep(/\S{3}/,split(/\s+/,$rec->{description}));
-      if ($#words<20){
+      if ($#words<15){
          my $msg="description is not detailed enough";
          push(@{$desc->{dataissue}},$msg);
          push(@{$desc->{qmsg}},$msg);
