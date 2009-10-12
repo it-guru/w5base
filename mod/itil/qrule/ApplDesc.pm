@@ -70,6 +70,17 @@ sub qcheckRecord
       push(@{$desc->{solvtip}},
            $self->T('descripe the application'));
    }
+   else{
+      my @words=grep(/\S{3}/,split(/\s+/,$rec->{description}));
+      if ($#words<30){
+         my $msg="description is not detailed enough";
+         push(@{$desc->{dataissue}},$msg);
+         push(@{$desc->{qmsg}},$msg);
+         $exitcode=3 if ($exitcode<3);
+      }
+      
+      printf STDERR ("fifi $#words words=%s\n",join(";",@words)); 
+   }
    return($exitcode,$desc);
 }
 
