@@ -917,7 +917,7 @@ sub WSDLcommon
    $$XMLtypes.="<xsd:complexType name=\"WorkflowActions\">";
    $$XMLtypes.="<xsd:sequence>";
    $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"unbounded\" ".
-               "name=\"item\" type=\"$ns:WorkflowAction\" />";
+               "name=\"record\" type=\"$ns:WorkflowAction\" />";
    $$XMLtypes.="</xsd:sequence>";
    $$XMLtypes.="</xsd:complexType>";
    $$XMLtypes.="\n";
@@ -928,12 +928,16 @@ sub WSDLcommon
    $$XMLtypes.="<xsd:element name=\"creator\" type=\"xsd:string\" />";
    $$XMLtypes.="<xsd:element name=\"name\" type=\"xsd:string\" />";
    $$XMLtypes.="<xsd:element name=\"cdate\" type=\"xsd:dateTime\" />";
-   $$XMLtypes.="<xsd:element name=\"effort\" type=\"xsd:int\" />";
-   $$XMLtypes.="<xsd:element name=\"comments\" type=\"xsd:string\" />";
-   $$XMLtypes.="<xsd:element name=\"additional\" type=\"$ns:Container\" />";
+   $$XMLtypes.="<xsd:element minOccurs=\"0\" ".
+               "name=\"effort\" type=\"xsd:int\" />";
+   $$XMLtypes.="<xsd:element minOccurs=\"0\" ".
+               "name=\"comments\" type=\"xsd:string\" />";
+   $$XMLtypes.="<xsd:element minOccurs=\"0\" ".
+               "name=\"additional\" type=\"$ns:Container\" />";
    $$XMLtypes.="<xsd:element name=\"id\" type=\"xsd:integer\" />";
    $$XMLtypes.="<xsd:element name=\"translation\" type=\"xsd:string\" />";
-   $$XMLtypes.="<xsd:element name=\"actionref\" type=\"$ns:Container\" />";
+   $$XMLtypes.="<xsd:element name=\"actionref\" ".
+               "minOccurs=\"0\" type=\"$ns:Container\" />";
    $$XMLtypes.="</xsd:sequence>";
    $$XMLtypes.="</xsd:complexType>";
    $$XMLtypes.="\n";
