@@ -18,7 +18,7 @@ You have to do the folloing steps:
                                surname    varchar2(80),
                                givenname  varchar2(80),
                                email      varchar2(80),
-                               w5lastsync datetime);
+                               w5lastsync date);
    
    The field w5lastsync is needed, to handel deltas on the
    table correctly. 
