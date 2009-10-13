@@ -1190,8 +1190,8 @@ sub Manager
       printf("<input type=hidden name=id value=\"%s\">",
              $irec->{incidentnumber});
 
-      printf("<td><span class=sublink onclick=$onclick>%s</span>".
-             "</td><td nowrap>%s</td><td>%s</td>",
+      printf("<td valign=top><span class=sublink onclick=$onclick>%s</span>".
+             "</td><td nowrap valign=top>%s</td><td valign=top>%s</td>",
              $irec->{incidentnumber},$irec->{status},$irec->{name});
       printf("<td nowrap>");
       if ($irec->{status} eq "resolved"){

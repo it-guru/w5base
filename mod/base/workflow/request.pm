@@ -361,7 +361,8 @@ sub getPosibleActions
    if ($iscurrent){
       push(@l,"iscurrent"); # Merker, dass der Workflow aktuell ansteht
    }
-   if ($stateid==1 && ($userid==$creator || $isininitiatorgroup)){
+   if ($stateid==1 && ($userid==$creator || $isininitiatorgroup ||
+                       $W5V2::OperationContext eq "W5Server")){ # for scheduler
       push(@l,"wfactivate");
    }
    if ((!$iscurrent && !$iscurrentapprover) && $stateid>1){

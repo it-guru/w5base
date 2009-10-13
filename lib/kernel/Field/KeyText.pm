@@ -19,7 +19,6 @@ package kernel::Field::KeyText;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use Data::Dumper;
 use Text::ParseWords;
 @ISA    = qw(kernel::Field);
 
@@ -278,6 +277,10 @@ sub RawValue
 {
    my $self=shift;
    my $current=shift;
+
+   if (exists($current->{$self->Name()})){
+      return($current->{$self->Name()});
+   }
    if (defined($self->{container})){
       my $keyfield=$self->getParent->getField($self->{container});
       my $keyval=$keyfield->RawValue($current);
@@ -285,7 +288,14 @@ sub RawValue
    }
    my $keyfield=$self->getParent->getField($self->{keyhandler});
    my $keyval=$keyfield->RawValue($current);
-   return($keyval->{$self->{name}});
+   my $d=$keyval->{$self->{name}};
+   if (ref($keyval->{$self->{name}}) eq "ARRAY"){
+      my @l=@{$keyval->{$self->{name}}};
+      $d=\@l;
+   }
+   $current->{$self->Name()}=$d;
+   
+   return($d);
 }
 
 sub Unformat

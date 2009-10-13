@@ -985,4 +985,13 @@ sub STORE
    $self->{View}->{$key}=undef if (!exists($self->{View}->{$key}));
    $self->{Rec}->{$key}=$val; 
 }
+
+sub DELETE
+{
+   my $self=shift;
+   my $key=shift;
+
+   delete($self->{View}->{$key});
+   delete($self->{Rec}->{$key});
+}
 1;

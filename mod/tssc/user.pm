@@ -177,7 +177,6 @@ sub mkFullname
    my $self=shift;
    my $current=shift;
 
-printf STDERR ("fifi current=%s\n",Dumper($current));
 
    my $fullname="";
    my $name=$current->{name};
