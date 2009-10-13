@@ -79,7 +79,6 @@ sub qcheckRecord
          $exitcode=3 if ($exitcode<3);
       }
       
-      printf STDERR ("fifi $#words words=%s\n",join(";",@words)); 
    }
    return($exitcode,$desc);
 }
