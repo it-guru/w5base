@@ -654,6 +654,7 @@ sub InsertRecord   # fake write request to SC
    if ($newrec->{sctype} eq "authorization"){
       $category0="ACCESS";
       $category1="OTHER";
+      $newrec->{class}="UNKNOWN";
    }
    if ($newrec->{sctype} eq "interfaceproblem"){
       $category0="INTERFACE";
