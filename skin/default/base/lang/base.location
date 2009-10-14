@@ -8,6 +8,7 @@
 'fieldgroup.default'=>{de=>'Standortdaten',en=>'location informations'},
 'fieldgroup.control'=>{de=>'Steuerinformationen',en=>'Control Informations'},
 'fieldgroup.map'=>{de=>'Karte',en=>'Map'},
+'fieldgroup.org'=>{de=>'Organisationszuorndung',en=>'Organisation relation'},
 'fieldgroup.gps'=>{de=>'GPS',en=>'GPS'},
 'Room Expression'=>{de=>'Raum Reg.Exp.'},
 'latitude'=>{de=>'Breitengrad'},
@@ -16,3 +17,5 @@
 'Deputy location responsible'=>{de=>'Standortverantwortlicher Vetreter'},
 "invalid zipcode '\%s'"=>{de=>"ungültige Postleitzahl '\%s'"},
 "invalid location"=>{de=>"ungültige Standortdaten"},
+'Organisation link'=>{de=>'Organisations Zuorndung'},
+'organisations location prio'=>{de=>'Organisations Standort Prio'},
