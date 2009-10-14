@@ -106,12 +106,12 @@ sub RawValue
 
    if (exists($current->{"___raw_container___".$self->Name})){
       $current->{$self->Name}=$current->{"___raw_container___".$self->Name};
+      delete($current->{"___raw_container___".$self->Name});
    }
    if (ref($current->{$self->Name}) ne "HASH"){
       my %h=Datafield2Hash($current->{$self->Name});
    #   CompressHash(\%h);  # should not be Standard
       $current->{$self->Name}=\%h;
-   #   printf STDERR ("fifi RawValue=%s\n",Dumper($current->{$self->Name}));
    }
    return($current->{$self->Name});
 }
