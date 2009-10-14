@@ -110,7 +110,6 @@ sub findW5LocID
    my $location=$self->getParent->getField("location")->RawValue($current);
    my $zipcode=$self->getParent->getField("zipcode")->RawValue($current);
    my $country=$self->getParent->getField("country")->RawValue($current);
-   printf STDERR ("fifi $country $location $zipcode address1=$address1\n");
    $address1=~s/\sSCZ$//;
    my $newrec;
    $newrec->{country}=$country;
