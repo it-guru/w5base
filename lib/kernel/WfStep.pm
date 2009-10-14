@@ -610,6 +610,32 @@ sub generateWorkspacePages
       $d.="</tr></table>";
       $$divset.="<div id=OPwfforward class=\"$class\">$d</div>";
    }
+   if (grep(/^wfschedule$/,@$actions)){
+      my @t=(''       =>$self->getParent->T("no automatic scheduling"),
+             'month'  =>$self->getParent->T("monthly"),
+             'week'   =>$self->getParent->T("weekly"));
+      my $s="<select name=Formated_autocopymode style=\"width:280px\">";
+      my $oldval=Query->Param("Formated_autocopymode");
+      while(defined(my $min=shift(@t))){
+         my $l=shift(@t);
+         $s.="<option value=\"$min\"";
+         $s.=" selected" if ($min eq $oldval);
+         $s.=">$l</option>";
+      }
+      $s.="</select>";
+
+      $$selopt.="<option value=\"wfschedule\">".
+                $self->getParent->T("wfschedule",$tr).
+                "</option>\n";
+      my $d="<table width=100% border=0 cellspacing=0 cellpadding=4><tr>".
+         "<td colspan=2><br>Automaticly scheduling will copy this worklow in a selectable interval. After copy process, the new workflow will be activated automaticly. The result of the operation will be mailed to the creator of this workflow".
+         "<br><br></td></tr>";
+      $d.="<tr><td width=1% nowrap>".
+          "select scheduling intervall:</td>".
+          "<td>".$s."</td>";
+      $d.="</tr></table>";
+      $$divset.="<div id=OPwfschedule class=\"$class\">$d</div>";
+   }
    if (grep(/^nop$/,@$actions)){  # put nop NO-Operation at the begin of list
       $$selopt="<option value=\"nop\" class=\"$class\">".
                 $self->getParent->T("nop",$tr).

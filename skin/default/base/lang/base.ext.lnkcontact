@@ -1,6 +1,6 @@
 'thinkabout'=>{de=>'denken'},
 'RINManager'=>{de=>'Incident Manager',en=>'Incident Manager'},
 'RCHManager'=>{de=>'Change Manager',en=>'Change Manager'},
-'infrastruct'=>{de=>'Infrastruktur',en=>'Infrastructur'},
-'itnetwork'=>{de=>'IT-Netzwerk',en=>'IT-Network'},
+'infrastruct'=>{de=>'Infrastruktur Ansprechpartner',en=>'Infrastructur'},
+'itnetwork'=>{de=>'IT-Netzwerk Ansprechpartner',en=>'IT-Network'},
 'project member'=>{de=>'Projektmitarbeiter'},

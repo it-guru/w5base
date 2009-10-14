@@ -497,6 +497,10 @@ Development overview:
  the apache rewrite engine. As process server, a W5Server process must
  be started and accessable.
 
+ Rules of Development:
+ ---------------------
+ Rule 1: The intend of loops will be done in spaces with a count of 3
+
 
 Setting W5Base in READONLY mode
 ===============================
