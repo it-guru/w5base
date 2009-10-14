@@ -244,8 +244,14 @@ sub loadsys
    my $name=shift;
    my $res={};
 
-   my $sys=getModuleObject($self->Config,"tsacinv::system");
-   $sys->SetFilter({systemname=>$name});
+   my $sys=getModuleObject($self->Config,"itil::system");
+   if (!$sys->Ping()){
+      return({msg=>'ping failed to dataobject '.$sys->Self(),exitcode=>1});
+   }
+
+
+
+   $sys->SetFilter({name=>$name});
    my @l=$sys->getHashList(qw(systemid assetassetid systemname));
 printf STDERR ("res=%s\n",Dumper(\@l));
    $res=$l[0]->{assetassetid};

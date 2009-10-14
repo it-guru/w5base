@@ -576,6 +576,34 @@ sub new
                 label         =>'postponed until',
                 container     =>'headref'),
                                   
+      new kernel::Field::Text(
+                name          =>'autocopymode',
+                searchable    =>0,
+                htmldetail    =>sub {
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(1) if ($current->{autocopymode}!="");
+                   return(0);
+                },
+                group         =>'state',
+                label         =>'auto copy mode'),
+                                  
+      new kernel::Field::Date(
+                name          =>'autocopydate',
+                searchable    =>0,
+                htmldetail    =>sub {
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(1) if ($current->{autocopydate}!="");
+                   return(0);
+                },
+                group         =>'state',
+                label         =>'auto copy workflow at'),
+
       new kernel::Field::KeyHandler(
                 name          =>'kh',
                 label         =>'Key Handler',

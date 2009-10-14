@@ -364,6 +364,7 @@ sub getPosibleActions
    if ($stateid==1 && ($userid==$creator || $isininitiatorgroup ||
                        $W5V2::OperationContext eq "W5Server")){ # for scheduler
       push(@l,"wfactivate");
+      push(@l,"wfschedule");
    }
    if ((!$iscurrent && !$iscurrentapprover) && $stateid>1){
       push(@l,"nop");       # No operation as first entry in Action list

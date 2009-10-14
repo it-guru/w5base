@@ -147,6 +147,8 @@ sub nativQualityCheck
    foreach my $lnkrec ($lnkr->getHashList(qw(mdate qruleid dataobj))){
       my $qrulename=$lnkrec->{qruleid};
       next if ($qruledone{$qrulename});
+      my $do=getModuleObject($self->Config,$lnkrec->{dataobj});
+      my $dataobjparent=$do->SelfAsParentObject();
       if (defined($self->{qrule}->{$qrulename})){
          my $qrule=$self->{qrule}->{$qrulename};
          my $postargets=$qrule->getPosibleTargets();
@@ -155,8 +157,13 @@ sub nativQualityCheck
          if (ref($postargets) eq "ARRAY"){
             foreach my $target (@$postargets){
                if (grep(/^$target$/,@$objlist)){
-                  $found=1;
-                  last;
+                  my $qdataobj=quotemeta($lnkrec->{dataobj});
+                  my $qdataobjparent=quotemeta($dataobjparent);
+                  if (grep(/^$qdataobj$/,@$objlist) ||
+                      grep(/^$dataobjparent$/,@$objlist)){
+                     $found=1;
+                     last;
+                  }
                }
             }
          }
