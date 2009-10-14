@@ -83,6 +83,11 @@ sub ResetFilter
                                              # the last order must be deleted
 }
 
+sub Ping
+{
+   return(1);
+}
+
 sub SetFilterForQualityCheck    # prepaire dataobject for automatic 
 {                               # quality check (nightly)
    my $self=shift;

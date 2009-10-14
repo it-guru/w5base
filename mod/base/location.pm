@@ -128,6 +128,25 @@ sub new
                 name          =>'response2id',
                 dataobjattr   =>'location.response2'),
 
+      new kernel::Field::Group(
+                name          =>'orggrp',
+                group         =>'org',
+                label         =>'Organisation link',
+                vjoinon       =>'orggrpid'),
+
+      new kernel::Field::Link(
+                name          =>'orggrpid',
+                dataobjattr   =>'location.orggrp'),
+
+      new kernel::Field::Select(
+                name          =>'orgprio',
+                group         =>'org',
+                label         =>'organisations location prio',
+                value         =>['1','2','3'],
+                default       =>'2',
+                htmleditwidth =>'50px',
+                dataobjattr   =>'location.orgprio'),
+
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
                 label         =>'Contacts',
@@ -293,7 +312,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","contacts","map","gps","control",
+   return("header","default",'org',"contacts","map","gps","control",
           "additional","source");
 }
 

@@ -606,6 +606,17 @@ sub DeleteRecord
    return(undef);
 }
 
+sub Ping
+{
+   my $self=shift;
+   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+
+   my ($worktable,$workdb)=$self->getWorktable();
+   $workdb=$self->{DB} if (!defined($workdb));
+   return(0) if (!defined($workdb));
+   return($workdb->Ping());
+}
+
 sub InsertRecord
 {
    my $self=shift;

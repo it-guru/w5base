@@ -249,3 +249,5 @@ alter table interview add contact bigint(20),add contact2 bigint(20);
 alter table interview add restriction blob;
 alter table interanswer add unique(parentobj,parentid,archiv,interviewid);
 alter table location add additional blob;
+alter table location add orggrp bigint(20);
+alter table location add orgprio int(2) default '2';
