@@ -626,7 +626,6 @@ sub LoadStatSet
    if ($type eq "grpid"){
       $self->SecureSetFilter({sgroup=>\'Group',nameid=>\$id,dstrange=>\$month});
    }
-printf STDERR ("==fifi type=$type id=$id\n");
    my ($primrec,$msg)=$self->getOnlyFirst(qw(ALL));
    if (defined($primrec)){
       if (ref($primrec->{stats}) ne "HASH"){
