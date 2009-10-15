@@ -60,8 +60,8 @@ sub qcheckRecord
    my $exitcode=0;
    my $desc={qmsg=>[],solvtip=>[]};
    return($exitcode,$desc) if ($rec->{cistatusid}!=4 
-                               && $rec->{cistatusid}!=3
-                               && $rec->{allowifupdate}!=1); # bei auto updates
+                               && $rec->{cistatusid}!=3);
+   return($exitcode,$desc) if ($rec->{allowifupdate}==1); # bei auto updates
                                      # kann der 
                                      # databoss keine
                                      # verantwortung für die beschreibung haben

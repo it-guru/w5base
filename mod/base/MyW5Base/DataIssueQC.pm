@@ -123,8 +123,8 @@ sub Result
 
    $dataobj->ResetFilter();
    $dataobj->SecureSetFilter([\%q1]);
-   $dataobj->setDefaultView(qw(createdate fwdtargetname responsiblegrp 
-                               name dataissueobjectname detaildescription));
+   $dataobj->setDefaultView(qw(linenumber createdate fwdtargetname responsiblegrp 
+                       name wffields.dataissueobjectname detaildescription));
    
    return($dataobj->Result(ExternalFilter=>1));
 }
