@@ -42,7 +42,8 @@ sub getDefaultStdButtonBar
    my $self=shift;
    my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
                                          ["RQManager"],"down");
-   if (keys(%grp)>0){
+   my @grpids=keys(%grp);
+   if ($#grpids<50){
       return('%StdButtonBar(teamviewcontrol,print,search)%');
    }
    return($self->SUPER::getDefaultStdButtonBar());
@@ -98,7 +99,7 @@ sub Result
                                             ["RQManager"],
                                             "down");
       my @grpids=keys(%grp);
-      if ($#grpids<5){
+      if ($#grpids<50){
          @grpids=(qw(-1)) if ($#grpids==-1);
          my $lnk=getModuleObject($self->getParent->Config,"base::lnkgrpuser");
          $lnk->SetFilter({grpid=>\@grpids});
