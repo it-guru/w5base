@@ -626,14 +626,17 @@ sub LoadStatSet
    if ($type eq "grpid"){
       $self->SecureSetFilter({sgroup=>\'Group',nameid=>\$id,dstrange=>\$month});
    }
+printf STDERR ("==fifi type=$type id=$id\n");
    my ($primrec,$msg)=$self->getOnlyFirst(qw(ALL));
    if (defined($primrec)){
       if (ref($primrec->{stats}) ne "HASH"){
          $primrec->{stats}={Datafield2Hash($primrec->{stats})};
       }
       $self->ResetFilter();
-      $self->SecureSetFilter({fullname=>\$primrec->{fullname},
-                              sgroup=>\$primrec->{sgroup}});
+      $self->SecureSetFilter([{fullname=>\$primrec->{'fullname'},
+                               sgroup=>\$primrec->{'sgroup'}},
+                              {nameid=>\$primrec->{'nameid'},
+                               sgroup=>\$primrec->{'sgroup'}}]);
       my $dstrange=$primrec->{dstrange};
       my $lastrange=undef;
 
