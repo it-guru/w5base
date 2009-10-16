@@ -220,7 +220,7 @@ sub new
       new kernel::Field::Textarea(
                 name          =>'description',
                 label         =>'Application Description',
-                dataobjattr   =>'amtsicustappl.description'),
+                dataobjattr   =>'businessdesc.memcomment'),
 
       new kernel::Field::Textarea(
                 name          =>'maintwindow',
@@ -314,7 +314,7 @@ sub getSqlFrom
       "amtsicustappl, ".
       "(select amcostcenter.* from amcostcenter ".
       " where amcostcenter.bdelete=0) amcostcenter,amemplgroup assigrp,".
-      "amcomment amtsimaint";
+      "amcomment amtsimaint,amcomment businessdesc";
 
    return($from);
 }
@@ -326,6 +326,7 @@ sub initSqlWhere
       "amtsicustappl.bdelete=0 and ".
       "amtsicustappl.lmaintwindowid=amtsimaint.lcommentid(+) ".
       "and amtsicustappl.lcostcenterid=amcostcenter.lcostid(+) ".
+      "and amtsicustappl.lcustbusinessdescid=businessdesc.lcommentid(+) ".
       "and amtsicustappl.lassignmentid=assigrp.lgroupid(+) ";
    return($where);
 }
