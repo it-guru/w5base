@@ -199,7 +199,7 @@ sub displayDataIssue
                my $statename=$wf->findtemplvar({current=>$WfRec},
                                                "state","formated");
 
-               my $dest="../../base/workflow/Detail?id=$WfRec->{id}";
+               my $dest="../../base/workflow/ById/$WfRec->{id}";
                my $detailx=$wf->DetailX();
                my $detaily=$wf->DetailY();
                my $onclick="openwin(\"$dest\",\"_blank\",".
