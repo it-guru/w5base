@@ -7,6 +7,8 @@ package itil::qrule::ApplDesc;
 Every application in CI-Status "installed/active" or "available" need to
 have an application description. If there is no application description
 defined, an error will be produced.
+If the description have less then 15 words, the description will be
+used as not detailed enough. This will also create a DataIssue.
 
 =head3 IMPORTS
 
