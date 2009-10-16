@@ -66,6 +66,12 @@ sub new
                 label         =>'Exitstate',
                 dataobjattr   =>'joblog.exitstate'),
 
+      new kernel::Field::Text(
+                name          =>'exitmsg',
+                htmlwidth     =>'1%',
+                label         =>'Exit message',
+                dataobjattr   =>'joblog.msg'),
+
       new kernel::Field::CDate(
                 name          =>'cdate',
                 sqlorder      =>'desc',

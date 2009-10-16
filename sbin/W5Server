@@ -586,8 +586,11 @@ sub initAsyncEnv
                   $exitstate="fail" if ($exitcode>0);
                   $exitstate="ok"   if (defined($exitcode) && $exitcode==0);
                }
+               my $msg=$m->{msg};
+               $msg="" if (!defined($msg));
                $joblog->ValidatedUpdateRecord({id=>$m->{jobid}},
                                              {exitcode=>$exitcode,
+                                              exitmsg=>$msg,
                                               exitstate=>$exitstate},
                                              {id=>\$m->{jobid}});
             }
