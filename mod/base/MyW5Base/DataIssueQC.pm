@@ -124,7 +124,7 @@ sub Result
    $dataobj->ResetFilter();
    $dataobj->SecureSetFilter([\%q1]);
    $dataobj->setDefaultView(qw(linenumber createdate fwdtargetname responsiblegrp 
-                       name wffields.dataissueobjectname detaildescription));
+                       name detaildescription));
    
    return($dataobj->Result(ExternalFilter=>1));
 }
