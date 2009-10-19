@@ -303,6 +303,10 @@ sub new
                 transprefix   =>'IR.',
                 label         =>'Resolution class '),
 
+      new kernel::Field::Boolean(
+                name          =>'scslarelevant',
+                label         =>'SLA relevant'),
+
       new kernel::Field::Select(
                 name          =>'sctype',
                 value         =>[qw(application.generic
@@ -552,6 +556,10 @@ sub UpdateRecord   # fake write request to SC
       $op{'downtime.end'}=sprintf("%02d/%02d/%04d %02d:%02d:%02d",
                                   $D,$M,$Y,$h,$m,$s);
       $op{'resolution'}=$newrec->{'scdescription'};
+      $op{'sla.relevant'}="No";
+      $op{'sla.relevant'}="Yes" if ($newrec->{'scslarelevant'});
+      
+      msg(INFO,"ReopenApplicationIncident=%s",Dumper(\%op));
       $sc->IncidentResolve(%op);
       $msg=$sc->LastMessage();
       $fail=0 if ($msg=~m/resolved/i);
@@ -571,7 +579,7 @@ sub UpdateRecord   # fake write request to SC
    }
    elsif ($op eq "ReopenApplicationIncident"){
       my %op;
-printf STDERR ("newrec=%s\n",Dumper($newrec));
+      msg(INFO,"ReopenApplicationIncident=%s",Dumper($newrec));
       $sc->IncidentReopen($newrec->{'scdescription'},
                           {assignment=>$newrec->{'scassignment'}});
       $msg=$sc->LastMessage();
@@ -977,6 +985,8 @@ sub inmResolv
    print $self->HtmlHeader(style=>['default.css',
                                    'Output.HtmlDetail.css',
                                    'work.css'],
+                           title=>"W5Base SC Interface: ".
+                                  $self->T('resolv').": ".$id,
                            js=>[qw( toolbox.js TextTranslation.js 
                                     kernel.App.Web.js
                                     jquery.js jquery.autocomplete.js)],
@@ -984,12 +994,10 @@ sub inmResolv
    
    my $mask=<<EOF;
 <table border=0 width=100%>
-<!--
 <tr>
-<td class=fname width=1% nowrap> %scresolution(label)% </td>
-<td class=finput> %scresolution(forceedit)% </td>
+<td class=fname width=1% nowrap> %scslarelevant(label)% </td>
+<td class=finput> %scslarelevant(forceedit)% </td>
 </tr>
--->
 <tr>
 <td colspan=2 class=finput> %scdescription(forceedit)% </td>
 </tr>
@@ -1029,6 +1037,8 @@ sub inmReopen
                                    'Output.HtmlDetail.css',
                                    'jquery.autocomplete.css',
                                    'work.css'],
+                           title=>"W5Base SC Interface: ".
+                                  $self->T('reopen').": ".$id,
                            js=>[qw( toolbox.js TextTranslation.js 
                                     kernel.App.Web.js
                                     jquery.js jquery.autocomplete.js)],
@@ -1093,13 +1103,14 @@ sub inmAddNote
                                    'Output.HtmlDetail.css',
                                    'jquery.autocomplete.css',
                                    'work.css'],
+                           title=>"W5Base SC Interface: ".
+                                  $self->T('addNote').": ".$id,
                            js=>[qw( toolbox.js TextTranslation.js 
                                     kernel.App.Web.js
                                     jquery.js jquery.autocomplete.js)],
                            body=>1,form=>1);
    
    my $mask=<<EOF;
-AddNote:
 <table border=0 width=100%>
 <tr>
 <td class=fname width=1% nowrap> %scassignment(label)% </td>

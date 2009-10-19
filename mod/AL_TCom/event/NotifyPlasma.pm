@@ -52,7 +52,21 @@ sub NotifyPlasma
 
    my $wsproxy=$self->Config->Param("WEBSERVICEPROXY");
    $wsproxy=$wsproxy->{plasma} if (ref($wsproxy) eq "HASH");
-   return({exitcode=>0,msg=>'ok'}) if ($wsproxy eq "");
+   return({exitcode=>0,msg=>'ok - no interface defined'}) if ($wsproxy eq "");
+
+   my $wf=getModuleObject($self->getParent->Config(),"base::workflow"); 
+   $wf->SetFilter({id=>\$param{'id'}});
+   my ($WfRec)=$wf->getOnlyFirst(qw(involvedcustomer));
+   my $involvedcustomer=$WfRec->{involvedcustomer};
+   $involvedcustomer=[$involvedcustomer] if (ref($involvedcustomer) ne "ARRAY");
+   if (!grep(/^DTAG\.ACTIVEBILLING.*/,@$involvedcustomer)){
+      return({exitcode=>0,
+              msg=>'no trigger needed'});
+   }
+
+
+
+
    msg(DEBUG,"wsproxy='%s'",$wsproxy);
    my $method = SOAP::Data->name('CreateNewWork');
 
@@ -70,16 +84,6 @@ sub NotifyPlasma
       return({exitcode=>11,
               msg=>'no data specified'});
    }
-   my $wf=getModuleObject($self->getParent->Config(),"base::workflow"); 
-   $wf->SetFilter({id=>\$param{'id'}});
-   my ($WfRec)=$wf->getOnlyFirst(qw(involvedcustomer));
-   my $involvedcustomer=$WfRec->{involvedcustomer};
-   $involvedcustomer=[$involvedcustomer] if (ref($involvedcustomer) ne "ARRAY");
-   if (!grep(/^DTAG\.ACTIVEBILLING.*/,@$involvedcustomer)){
-      return({exitcode=>0,
-              msg=>'no trigger needed'});
-   }
-
    my $soap=SOAP::Lite->proxy($wsproxy)
             ->on_action(sub{'"urn:PegaRULES:SOAP:DTAGZBBCPLASMADarwinTrigger:DarwinTriggerMain#CreateNewWork"'});
    my $res;
