@@ -126,6 +126,7 @@ sub ViewProcessor
       if (defined($idfield)){
          $obj->ResetFilter();
          $obj->SetFilter({$idfield->Name()=>\$refid});
+         $obj->SetCurrentOrder("NONE");
          my ($rec,$msg)=$obj->getOnlyFirst(qw(ALL));
          my $fo=$obj->getField($self->Name(),$rec);
          if (defined($fo) && defined($rec)){

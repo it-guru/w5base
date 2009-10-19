@@ -952,6 +952,7 @@ sub HandleSave
       $self->SecureSetFilter($flt);
       $self->SetCurrentView(qw(ALL));
       my $msg;
+      $self->SetCurrentOrder("NONE");
       ($oldrec,$msg)=$self->getOnlyFirst(qw(ALL));
       #$self->SetCurrentView();
    }
@@ -1088,6 +1089,7 @@ sub HtmlDetail
    my $output=new kernel::Output($self);
    $self->SetCurrentView(qw(ALL));
    $param{WindowMode}="Detail";
+   $self->SetCurrentOrder("NONE");
    if (!($output->setFormat("HtmlDetail",%param))){
       msg(ERROR,"can't set output format 'HtmlDetail'");
       return();
@@ -1104,6 +1106,7 @@ sub Detail
    my %flt=$self->getSearchHash();
    $self->ResetFilter();
    $self->SecureSetFilter(\%flt);
+   $self->SetCurrentOrder("NONE");
    my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
 
    my $cookievar="HtmlDetailPage_".$self->Self;
@@ -1421,6 +1424,7 @@ sub HandleQualityCheck
    if ($id ne "" && $idname ne ""){
       $self->ResetFilter();
       $self->SetFilter({$idname=>\$id});
+      $self->SetCurrentOrder("NONE");
       my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
       $qc->setParent($self);
       print($qc->WinHandleQualityCheck($self->getQualityCheckCompat($rec),$rec));
@@ -1611,6 +1615,7 @@ sub ProcessUploadRecord
          $self->ResetFilter();
          $id=$rec->{$idname};
          $self->SetFilter({$idname=>\$id});
+         $self->SetCurrentOrder("NONE");
          my ($chkoldrec,$msg)=$self->getOnlyFirst(qw(ALL));
          if (defined($chkoldrec)){
             $oldrec=$chkoldrec;
@@ -2030,6 +2035,7 @@ sub ListeditTabObjectSearch
    }
    $self->ResetFilter();
    $self->SetFilter({$idname=>\$id}); 
+   $self->SetCurrentOrder("NONE");
    my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
    if (!$self->isViewValid($rec,resultname=>$resultname)){
       print($self->noAccess());
