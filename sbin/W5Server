@@ -293,7 +293,7 @@ sub rpcSendRemoteEvent
                      my $id=$self->rpcGetUniqueId->{id};
                      my $spooltag="rpcSendRemoteEvent.".
                                   $identifiedBy."-".$operation.
-                                  "(".$modulename.")";
+                                  "(".$modulename."-".$r->{dstevent}.")";
                      my $interval=60;
                      my $retrycount=5;
                      my $firstcalldelay=$r->{controldelay};
