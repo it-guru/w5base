@@ -5,4 +5,6 @@
 'fieldgroup.map'=>{de=>'Karte', en=>'Map'},
 'Location'=>{de=>'Ort'},
 'Street'=>{de=>'Strasse'},
+'Location Type'=>{de=>'Standorttyp'},
+'Country'=>{de=>'Land'},
 'ZIP'=>{de=>'PLZ'},

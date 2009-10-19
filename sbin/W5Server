@@ -474,6 +474,7 @@ sub initAsyncEnv
 
    delete($self->{W5Server});
    delete($self->{W5ServerProcess});
+   closeall();
    $self->W5ServerConnect();
    #######################################################################
    # STDERR Handling
@@ -765,6 +766,8 @@ sub pre_loop_hook
    my $home=$ent[7];
    $ENV{HOME}=$home if (-d $home);
 
+#printf("fifi:%s\n",join(",",@{$self->commandline}));
+#exit(0);
    $self->RunScheduler();
    return(1);
 }
@@ -799,6 +802,7 @@ sub StartW5ServerProcess
                                    $srv->reload();
                                }
                                sub shutdown{
+                                   msg(DEBUG,"Server $srv normal shutdown");
                                    $srv->end();
                                }
                                $SIG{HUP}=\&hup;
@@ -847,6 +851,7 @@ sub pre_server_close_hook
    msg(DEBUG,"server shutdown initiated");
    foreach my $server (keys(%{$self->{W5Server}})){
       my $pid=$self->{W5ServerProcess}->{$server}->{AsyncID};
+      msg(DEBUG,"send ALRM to %s",$server);
       kill(2,$pid);
    }
    if (defined($self->{EventSpool}) && keys(%{$self->{EventSpool}}) &&
@@ -859,6 +864,16 @@ sub pre_server_close_hook
          close(F);
       }
    }
+   closeall();
+   return($self->SUPER::pre_server_close_hook());
+}
+
+sub closeall
+{
+   for(my $c=3;$c<254;$c++){  # ensure, that all filehandles are closed
+      POSIX::close($c);
+   }
+
 }
 #######################################################################
 package main;
@@ -881,6 +896,7 @@ if ($opt_v){
 else{
    $W5V2::Debug=0;
 }
+msg(DEBUG,"W5Server exec param: %s",join(" ",@ARGV_bak));
 
 if (defined($opt_h)){
    help();
@@ -958,7 +974,7 @@ $W5V2::Config=$curconfig;
 $W5V2::OperationContext="W5Server";
 $W5V2::HistoryComments=undef;
 @ARGV=@ARGV_bak;
-$0="W5Server";
+#$0="W5Server";  # brings problems while HUP
 W5Server->run(%ServerParam);
 
 

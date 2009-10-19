@@ -49,11 +49,23 @@ sub Init
    $self->RegisterEvent("MyTime","SampleEvent2");
    $self->RegisterEvent("long","base::event::sample::SampleEvent1");
    $self->RegisterEvent("long","SampleEvent3");
+   $self->RegisterEvent("LongRunner","LongRunner");
    $self->RegisterEvent("loadsys","loadsys");
    $self->RegisterEvent("testmail1","TestMail1");
    $self->RegisterEvent("testmail2","TestMail2");
    $self->CreateIntervalEvent("MyTime",10);
    return(1);
+}
+
+sub LongRunner
+{
+   my $self=shift;
+
+   for(my $c=0;$c<20;$c++){
+      msg(DEBUG,"LonRunner Loop $c");
+      sleep(1);
+   }
+   return({exitcode=>0,msg=>'ok'});
 }
 
 sub test
