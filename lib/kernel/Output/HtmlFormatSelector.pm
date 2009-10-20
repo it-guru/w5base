@@ -235,8 +235,8 @@ sub ProcessBottom
 #   $d.="<td valign=center align=left style=\"padding:5px\">";
    my $d.=<<EOF;
 <div style=\"padding:2px;padding-bottom:0px;padding-top:0px\">
-<div id=DirectViewFrame style="border-style:solid;
-                               visibility:visible;display:block;
+<div id=DirectViewFrame style="border-style:solid;height:20px;
+                               visibility:hidden;display:block;
                                margin:0px;padding:0px;border-width:1px">
    <div id=DirectViewTitleBar class=TitleBar>$title</div>
    <div class=DirectViewDiv 

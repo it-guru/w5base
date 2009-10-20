@@ -70,7 +70,7 @@
 'sysadm.useraccount.logon'=>{de=>'Benutzeranmeldung',en=>'Userlogon'},
 'sysadm.userenv'=>{de=>'Benutzereinstellungen',en=>'Userpreferences'},
 'sysadm.userenv.infoabo'=>{de=>'Informations-Abo',en=>'Info-Abo'},
-'sysadm.userenv.note'=>{de=>'PostIt',en=>'PostIt'},
+'sysadm.userenv.note'=>{de=>'Notiz/priv. Data',en=>'Note/priv. data'},
 'sysadm.userenv.userview'=>{de=>'Datensichten',en=>'Dataviews'},
 'sysadm.userenv.bookmarks'=>{de=>'Bookmarks',en=>'Bookmarks'},
 'sysadm.userenv.bookmarks.new'=>{de=>'Neueingabe',en=>'New'},

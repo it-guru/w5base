@@ -155,7 +155,7 @@ create table postitnote (
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   createuser bigint(20) NOT NULL default '0',
   PRIMARY KEY  (id),
-  UNIQUE name (name) 
+  key name (name) 
 );
 alter table location add response bigint(20) default NULL;
 alter table location add response2 bigint(20) default NULL;
@@ -251,3 +251,8 @@ alter table interanswer add unique(parentobj,parentid,archiv,interviewid);
 alter table location add additional blob;
 alter table location add orggrp bigint(20);
 alter table location add orgprio int(2) default '2';
+alter table postitnote add parentobj varchar(30) NOT NULL;
+alter table postitnote add parentid  varchar(30);
+alter table postitnote add grp  bigint(20);
+alter table postitnote add key parentg(parentobj,parentid,grp);
+alter table postitnote add key parentm(mandator,parentobj,parentid);

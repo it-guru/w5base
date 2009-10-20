@@ -47,10 +47,39 @@ sub new
                 label         =>'Label',
                 dataobjattr   =>'postitnote.name'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Group(
+                name          =>'grp',
+                group         =>'rel',
+                label         =>'share with group',
+                vjoinon       =>'grpid'),
+
+      new kernel::Field::Link(
+                name          =>'grpid',
+                group         =>'rel',
+                dataobjattr   =>'postitnote.grp'),
+
+      new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Note',
                 dataobjattr   =>'postitnote.comments'),
+
+      new kernel::Field::Text(
+                name          =>'parentobj',
+                group         =>'rel',
+                label         =>'parent object',
+                dataobjattr   =>'postitnote.parentobj'),
+
+      new kernel::Field::Text(
+                name          =>'parentid',
+                group         =>'rel',
+                label         =>'parent id',
+                dataobjattr   =>'postitnote.parentid'),
+
+      new kernel::Field::Boolean(
+                name          =>'publicstate',
+                group         =>'rel',
+                label         =>'direct display',
+                dataobjattr   =>'publicstate'),
 
       new kernel::Field::CDate(
                 name          =>'cdate',
@@ -68,8 +97,14 @@ sub new
 
       new kernel::Field::Creator(
                 name          =>'creator',
+                searchable    =>0,
                 group         =>'source',
                 label         =>'Creator',
+                dataobjattr   =>'postitnote.createuser'),
+
+      new kernel::Field::Link(
+                name          =>'creatorid',
+                label         =>'CreatorID',
                 dataobjattr   =>'postitnote.createuser'),
 
       new kernel::Field::Owner(
@@ -91,10 +126,35 @@ sub new
                 dataobjattr   =>'postitnote.realeditor'),
 
    );
-   $self->setDefaultView(qw(linenumber name groupname cistatus cdate mdate));
-   $self->setWorktable("note");
+   $self->setDefaultView(qw(linenumber name comments mdate));
+   $self->setWorktable("postitnote");
    return($self);
 }
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_isdeleted"))){
+      Query->Param("search_publicstate"=>$self->T("yes"));
+   }
+}
+
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+ #  if (!$self->IsMemberOf([qw(admin)],"RMember")){
+   my $userid=$self->getCurrentUserId();
+   foreach my $flt (@flt){
+      $flt->{creatorid}=\$userid; 
+   }
+   return($self->SetFilter(@flt));
+}
+
+
+
+
 
 
 sub Validate
@@ -104,11 +164,10 @@ sub Validate
    my $newrec=shift;
 
    my $name=trim(effVal($oldrec,$newrec,"name"));
-   if ($name=~m/\s/i){
-      $self->LastMsg(ERROR,"invalid sitename '%s' specified",$name); 
+   if ($name=~m/^\s*$/i){
+      $self->LastMsg(ERROR,"invalid name '%s' specified",$name); 
       return(undef);
    }
-   $newrec->{'name'}=$name;
    return(1);
 }
 
@@ -117,8 +176,9 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("header","default") if (!defined($rec) && $self->IsMemberOf("admin"));
-   return("ALL");
+   return("header","default") if (!defined($rec));
+   my $userid=$self->getCurrentUserId();
+   return("ALL") if ($rec->{creatorid}==$userid || $self->IsMemberOf("admin"));
 }
 
 
@@ -126,7 +186,10 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default") if ($self->IsMemberOf("admin"));
+   my $userid=$self->getCurrentUserId();
+   return("ALL") if (!defined($rec));
+   return("default") if ($rec->{creatorid}==$userid || 
+                         $self->IsMemberOf("admin"));
    return(undef);
 }
 

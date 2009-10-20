@@ -790,6 +790,21 @@ sub getSearchHash
          my $v2=$v;
          $v2=~s/^search_//;
          $h{$v2}=trim($h{$v});
+         if (my ($webclip)=$h{$v2}=~m/\[\@(WebClip.*)\@\]/){
+            my $nobj=getModuleObject($self->Config(),"base::note");
+            my $userid=$self->getCurrentUserId();
+            $nobj->SetFilter({creatorid=>\$userid,name=>\$webclip});
+            $nobj->SetCurrentView(qw(comments));
+            $h{$v2}=[];
+
+            my ($cliprec,$msg)=$nobj->getFirst();
+            if (defined($cliprec)){
+               do{
+                  push(@{$h{$v2}},$cliprec->{comments});
+                  ($cliprec,$msg)=$nobj->getNext();
+               } until(!defined($cliprec));
+            }
+         }
       }
       delete($h{$v});
    }
