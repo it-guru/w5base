@@ -1,0 +1,6 @@
+'base::note'=>{de=>'Datensatz Notiz/Private Information',en=>'Record note/Privat Info'},
+'Label'=>{de=>'Überschrift'},
+'Note'=>{de=>'Notiz'},
+'direct display'=>{de=>'direkt sichtbar'},
+'share with group'=>{de=>'teilen mit Gruppe'},
+
