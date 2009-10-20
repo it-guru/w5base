@@ -1,2 +1,5 @@
 'Output to WebClipboard'=>{de=>'Ausgabe ins WebClipboard'},
-'WebClipboard is a area direct on this server, in witch you can tempoary store data'=>{de=>'Das WebClipboard ist ein Datenspeicher, in dem zeitweise Daten zwischen gelagert werden können.'}
+'WebClipboard is a area direct on this server, in witch you can tempoary store data'=>{de=>'Das WebClipboard ist ein Datenspeicher, in dem zeitweise Daten zwischen gelagert werden können.'},
+'The webclipboard allows you to store temporary search results in a special data area. This data can be later used for further search operations'=>{de=>'Was WebClipboard erlaubt es Daten, auf dem Server zwischen zu speichern. Diese können dann bei späteren Suchanfragen wiederverwendet werden.'},
+'copy to webclipboard'=>{de=>'ins WebClipboard kopieren'},
+'There where %d values (%d Bytes) copied to clipboard %s - you can now use this values in search fields with the name [@%s@]'=>{de=>'Es wurden %d Werte (%d Bytes) in das WebClippboard %s kopiert - Sie können nun diese Werte in einem Suchfeld über den Namen [@%s@] abrufen.'},

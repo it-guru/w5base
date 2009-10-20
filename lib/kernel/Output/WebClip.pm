@@ -113,10 +113,7 @@ sub Init
       $nobj->SetFilter({creatorid=>\$userid,
                         parentobj=>\'kernel::Output::WebClip',
                         name=>\$self->{'WCLIPBOARD'}});
-      my $opnobj=$nobj->Clone();
-      $nobj->ForeachFilteredRecord(sub{
-         $opnobj->ValidatedDeleteRecord($_);
-      });
+      $nobj->DeleteAllFilteredRecords("DeleteRecord");
    }
 
    return($self->SUPER::Init(@_));
@@ -131,20 +128,21 @@ sub MimeType
 
 
 sub getHttpHeader
-{  
+{
    my $self=shift;
-   my $app=$self->getParent->getParent();
    my $d="";
-   $d.="Content-type:".$self->MimeType().";charset=ISO-8895-1\n\n";
+   $d.=$self->getParent->getParent->HttpHeader($self->MimeType());
 
    return($d);
 }
+
 
 sub ProcessBottom
 {
    my ($self,$fh,$rec,$msg)=@_;
    my $app=$self->getParent->getParent();
-   my $d="<form>";
+   my $d=$app->HtmlHeader(style=>['default.css','work.css'],
+                          body=>1,form=>1);
 
    my $sel="<select name=WCLIPFIELD>";
    foreach my $fname (keys(%{$self->Context->{'Fields'}})){
@@ -173,7 +171,7 @@ sub ProcessBottom
 
 
    if ($self->{'WCLIPFIELD'} ne "" && $self->{'WCLIPBOARD'} ne ""){
-      $donelabel="<hr style=\"width:80%\">".sprintf($app->T("There where %d values (%d Bytes) copied to clipboard %s - you can now use this values in search fields with the name [\@%s\@]"),$self->{'CLIPNO'},$self->{'CLIPSZ'},$self->{'WCLIPBOARD'},$self->{'WCLIPBOARD'});
+      $donelabel="<hr style=\"width:80%\">".sprintf($app->T('There where %d values (%d Bytes) copied to clipboard %s - you can now use this values in search fields with the name [@%s@]'),$self->{'CLIPNO'},$self->{'CLIPSZ'},$self->{'WCLIPBOARD'},$self->{'WCLIPBOARD'});
       
    }
    my $copylabel=$app->T("copy to webclipboard");
@@ -233,6 +231,7 @@ $donelabel
 
 EOF
 
+   $d.=$app->HtmlBottom(body=>1,form=>1);
 
 
    return($d);
