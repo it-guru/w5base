@@ -76,7 +76,7 @@ sub getHttpHeader
 sub Init
 {
    my $self=shift;
-   my ($fh)=@_;
+   my ($fh,$baseview)=@_;
    binmode($$fh) if (defined($fh));
    $self->setFilename("/tmp/tmp.$$.xls");
    $self->initWorkbook();
