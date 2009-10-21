@@ -54,10 +54,11 @@ sub getDynamicFields
                                   container  =>'headref'),
 
       new kernel::Field::Text(    name       =>'customerrefno',
-                                  htmleditwidth=>'100px',
+                                  htmleditwidth=>'150px',
                                   group      =>'customerdata',
                                   translation=>'itil::workflow::businesreq',
                                   searchable =>0,
+                                  expandvar  =>\&expandVar,
                                   container  =>'headref',
                                   label      =>'Reference'),
 
@@ -70,6 +71,19 @@ sub getDynamicFields
 
 
 
+}
+
+sub expandVar
+{
+   my $self=shift;
+   my $var=shift;
+   my $current=shift;
+
+   if ($var eq "W5BaseID"){
+      return($current->{id});
+   }
+
+   return("?");
 }
 
 sub getSpecificDataloadForm

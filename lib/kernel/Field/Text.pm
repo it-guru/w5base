@@ -39,6 +39,10 @@ sub FormatedDetail
    my $d=$self->RawValue($current);
    my $name=$self->Name();
 
+   if ($mode ne "edit" && defined($self->{expandvar})){
+      $d=~s/\%([a-zA-Z][^\%]+?)\%/&{$self->{expandvar}}($self,$1,$current)/ge;
+   }
+
    if (($mode eq "edit" || $mode eq "workflow") && !defined($self->{vjointo})){
       $d=join($self->{vjoinconcat},@$d) if (ref($d) eq "ARRAY");
       my $readonly=0;
