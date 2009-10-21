@@ -94,7 +94,7 @@ sub XgetRequestNatureOptions
 sub getRequestNatureOptions
 {
    my $self=shift;
-   my $vv=['operation','project','modification','other'];
+   my $vv=['operation','project','modification','inquiry','other'];
    my @l;
    foreach my $v (@$vv){
       push(@l,$v,$v);

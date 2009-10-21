@@ -4,6 +4,7 @@
 'operation'=>{de=>'normale Betriebsaufgaben'},
 'modification'=>{de=>'Veränderung der Anwendung'},
 'project'=>{de=>'Projektauftrag'},
+'inquiry'=>{de=>'Angebotsanfrage/Kostenabschätzung'},
 'other'=>{de=>'Sonstiges'},
 'business requests are disabled for the desired application'=>{de=>'Anforderungen an den Anwendungsbetrieb sind für die ausgewählte Anwendung (im CFM) nicht zugelassen'},
 'Reference'=>{de=>'Referenz'},
