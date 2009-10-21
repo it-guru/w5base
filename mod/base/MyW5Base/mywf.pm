@@ -121,6 +121,7 @@ sub Result
    else{
       $q1{stateid}=$q1{stateid}." AND <20"
    }
+   $q1{isdeleted}=\'0';
 
    $self->{DataObj}->ResetFilter();
    $self->{DataObj}->SecureSetFilter([\%q1]);

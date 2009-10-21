@@ -218,6 +218,7 @@ sub SetFilter
    $userid=-1 if (!defined($userid) || $userid==0);
 
    my %q=%{$flt};
+   $q{isdeleted}=\'0';
    my @q=();
    if ($dc eq "ADDDEP" || $dc eq "DEPONLY"){
       my %q1=%q;
