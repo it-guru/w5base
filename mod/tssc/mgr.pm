@@ -101,7 +101,9 @@ function showWork(e)
 {
    var directLink=document.getElementById("directLink");
    if (e==''){
-      document.forms[0].submit();
+      if (frames['work'].document.forms[0]){
+         frames['work'].document.forms[0].submit();
+      }
    }
    if (e.id=='Restart' || e=='Restart'){
       if (document.forms[0].elements['OP'].value==''){

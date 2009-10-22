@@ -149,6 +149,7 @@ sub getObjDecode
    return("decode($varname,".
                   "'cm3r','tssc::chm',".
                   "'problem','tssc::inm',".
+                  "'rootcause','tssc::prm',".
                   "'device',decode(substr(depend,0,4),'APPL','tsacinv::appl',".
                            "decode(substr(depend,0,3),'GER','tsacinv::appl',".
                            "decode(substr(depend,0,1),'A','tsacinv::asset',".
