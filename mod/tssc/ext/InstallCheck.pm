@@ -48,6 +48,7 @@ sub getOptionalModules
              SC::Customer::TSystems
              LWP::UserAgent
              SOAP::Lite
+             MIME::Base64
              );
 }
 

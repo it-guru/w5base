@@ -221,7 +221,7 @@ sub Actor
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','mainwork.css',
                                    'kernel.TabSelector.css'],
-                           js=>['toolbox.js'],
+                           js=>['toolbox.js','prototype.js'],
                            form=>1,body=>1,
                            title=>"W5Notes");
    if ($self->IsMemberOf("admin")){
@@ -236,12 +236,67 @@ PostIt
 </div>
 </div>
 <script language="JavaScript">
+
+parent.objDrag = null;  // Element, über dem Maus bewegt wurde
+
+parent.mouseX   = 0;    // X-Koordinate der Maus
+parent.mouseY   = 0;    // Y-Koordinate der Maus
+
+parent.offX = 0;        // X-Offset des Elements, das geschoben werden soll
+parent.offY = 0;        // Y-Offset des Elements, das geschoben werden soll
+
+   IE = document.all&&!window.opera;
+   DOM = document.getElementById&&!IE;
+
+
+function init(){
+   // Initialisierung der Überwachung der Events
+   parent.document.onmousemove = doDrag;
+   parent.document.onmouseup = stopDrag;
+}
+
+// Wird aufgerufen, wenn die Maus über einer Box gedrückt wird
+function startDrag(objElem) {
+   // Objekt der globalen Variabel zuweisen -> hierdurch wird Bewegung möglich
+    parent.objDrag = objElem;
+
+    // Offsets im zu bewegenden Element ermitteln
+    parent.offX = parent.mouseX - parent.objDrag.offsetLeft;
+    parent.offY = parent.mouseY - parent.objDrag.offsetTop;
+}
+
+// Wird ausgeführt, wenn die Maus bewegt wird
+function doDrag(ereignis) {
+   // Aktuelle Mauskoordinaten bei Mausbewegung ermitteln
+    parent.mouseX = (IE) ? parent.event.clientX : ereignis.pageX;
+    parent.mouseY = (IE) ? parent.event.clientY : ereignis.pageY;
+
+   // Wurde die Maus über einem Element gedrück, erfolgt eine Bewegung
+    if (parent.objDrag != null) {
+      // Element neue Koordinaten zuweisen
+      parent.objDrag.style.left = (parent.mouseX - parent.offX) + "px";
+      parent.objDrag.style.top = (parent.mouseY - parent.offY) + "px";
+
+    }
+}
+
+// Wird ausgeführt, wenn die Maustaste losgelassen wird
+function stopDrag(ereignis) {
+   // Objekt löschen -> beim Bewegen der Maus wird Element nicht mehr verschoben
+    parent.objDrag = null;
+}
+
+init();
+
+
+
+
+
 function addPostIt(x,y,id)
 {
    if (id==""){
       id="xx";
    }
-   if (parent.activateAni){
       var div = parent.document.createElement('div');
       var h=document.getElementById("headcode");
       div.innerHTML=h.innerHTML+
@@ -258,12 +313,11 @@ function addPostIt(x,y,id)
       div.style.height="120px";
       div.id=id;
       var postit=parent.document.getElementById("PostIT");
+      postit.onmousedown=function (){startDrag(postit);}
       if (!postit){
          alert("postit not found");
       }
       postit.appendChild(div);
-      parent.activateAni(div.id);
-   }
 }
 function showPublic()
 {

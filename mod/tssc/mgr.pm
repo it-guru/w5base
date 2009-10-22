@@ -24,6 +24,7 @@ use kernel::App::Web::Listedit;
 use kernel::Field;
 use kernel::TemplateParsing;
 use tssc::lib::io;
+use MIME::Base64;
 @ISA=qw(kernel::App::Web  kernel::TemplateParsing tssc::lib::io);
 
 sub new
@@ -39,7 +40,7 @@ sub new
 sub getValidWebFunctions
 {
    my $self=shift;
-   return("Main","addAttach",
+   return("Main","addAttach","Process",
           $self->SUPER::getValidWebFunctions());
 }
 
@@ -109,7 +110,7 @@ function showWork(e)
 }
 
 
-function doOP(o,op,form,e)
+function doOP(mod,o,op,form,e)
 {
    var param="";
    var l=document.getElementById("loading");
@@ -120,7 +121,9 @@ function doOP(o,op,form,e)
       return;
    }
    e.running=1;
-   o.disabled="disabled";
+   if (o){
+      o.disabled="disabled";
+   }
 
    e.innerHTML=l.innerHTML;
    param+="&SCUsername="+encodeURI(document.getElementById("SCUsername").value);
@@ -137,7 +140,7 @@ function doOP(o,op,form,e)
       }
    }
    var xmlhttp=getXMLHttpRequest();
-   xmlhttp.open("POST","../inm/Process",true);
+   xmlhttp.open("POST","../"+mod+"/Process",true);
    xmlhttp.onreadystatechange=function() {
     if (xmlhttp.readyState==4 && 
         (xmlhttp.status==200 || xmlhttp.status==304)){
@@ -176,6 +179,18 @@ function doOP(o,op,form,e)
 EOF
    my $SCUsername=Query->Param("SCUsername");
    my $SCPassword=Query->Param("SCPassword");
+
+   if ($SCUsername eq "" && $SCPassword eq "" && Query->Delete("OP") eq ""){
+      my $note=getModuleObject($self->Config,"base::note");
+      my $userid=$self->getCurrentUserId();
+      $note->SetFilter({createuserid=>\$userid,parentobj=>\'tssc::mgr',
+               parentid=>\'account'});
+      my ($arec)=$note->getOnlyFirst("comments");
+      if (defined($arec)){
+         ($SCUsername,$SCPassword)=decode_base64($arec->{comments})=~
+                                   m/^(\S+)?:(.*)$/;
+      }
+   }
    if ($SCUsername eq ""){
       $SCUsername=$posix;
    }
@@ -213,8 +228,13 @@ $appline
 <td width=1%><input type=password id=SCPassword name=SCPassword
                     value="$SCPassword"></td>
 <td>&nbsp;</td>
-<td width=1% align=right><input type=button onclick="showWork(this);" 
-                    id=Restart name=Restart value="Restart"></td>
+<td width=1% align=right nowrap>
+<input type=button onclick="doOP('mgr',this,'StoreAccount',
+                            null,
+                            document.getElementById('result'));" 
+       id=SaveAccount name=SaveAccount value="save access data">&nbsp;&nbsp;
+<input type=button onclick="showWork(this);" 
+       id=Restart name=Restart value="Restart"></td>
 <td width=20 align=right>
 <a id=directLink href="Main" target=_blank><img border=0 style="margin:4px;margin-left:8px" src="../../../public/base/load/listweblink.gif"></a>
 </td>
@@ -247,6 +267,34 @@ sind, so nutzen Sie bitte dafür dann den "normalen" ServiceCenter Client!
 <input type=hidden name=OP>
 EOF
    print $self->HtmlBottom(body=>1,form=>1);
+}
+
+sub Process
+{
+   my $self=shift;
+   my $OP=Query->Param("OP");
+   msg(INFO,"SC Process call OP=$OP");
+   if ($OP eq "StoreAccount"){
+      my $note=getModuleObject($self->Config,"base::note");
+      my $userid=$self->getCurrentUserId();
+      my $SCUsername=Query->Param("SCUsername");
+      my $SCPassword=Query->Param("SCPassword");
+      $note->ValidatedInsertOrUpdateRecord(
+              {name=>"ServiceCenterAccount",
+               publicstate=>0,
+               parentobj=>'tssc::mgr',
+               parentid=>'account',
+               createuserid=>$userid,
+               comments=>encode_base64("$SCUsername:$SCPassword")},
+              {createuserid=>\$userid,parentobj=>\'tssc::mgr',
+               parentid=>\'account'});
+   }
+
+   print $self->HttpHeader("text/xml");
+   my $res=hash2xml({document=>{
+          htmlresult=>$self->findtemplvar({},"LASTMSG"),
+          javascript=>""}},{header=>1});
+   print $res;
 }
 
 

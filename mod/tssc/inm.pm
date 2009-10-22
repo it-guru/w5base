@@ -666,7 +666,8 @@ sub InsertRecord   # fake write request to SC
    }
    if ($newrec->{sctype} eq "interfaceproblem"){
       $category0="INTERFACE";
-      $category1="OTHER";
+      $category1="INTERFACE";
+      $newrec->{class}="INCIDENT";
    }
    msg(INFO,"start SC CreateIncident for $ENV{REMOTE_USER}");
    my %Incident=(
@@ -939,7 +940,7 @@ sub Process
 <tr>
 <td colspan=2>
 <input style="width:100%" type=button 
-       onclick="parent.doOP(this,'CreateApplicationIncident',
+       onclick="parent.doOP("inm",this,'CreateApplicationIncident',
                             document.forms[0],
                             parent.document.getElementById('result'))" 
        value="$create">
@@ -1004,7 +1005,7 @@ sub inmResolv
 <tr>
 <td colspan=2>
 <input style="width:100%" type=button 
-       onclick="parent.doOP(this,'ResolvApplicationIncident',
+       onclick="parent.doOP("inm",this,'ResolvApplicationIncident',
                             document.forms[0],
                             document.getElementById('result'))" 
        value="save">
@@ -1064,7 +1065,7 @@ sub inmReopen
 <tr>
 <td colspan=2>
 <input style="width:100%" type=button 
-       onclick="parent.doOP(this,'ReopenApplicationIncident',
+       onclick="parent.doOP("inm",this,'ReopenApplicationIncident',
                             document.forms[0],
                             document.getElementById('result'))" 
        value="save">
@@ -1122,7 +1123,7 @@ sub inmAddNote
 <tr>
 <td colspan=2>
 <input style="width:100%" type=button 
-       onclick="parent.doOP(this,'IncidentAddNote',
+       onclick="parent.doOP("inm",this,'IncidentAddNote',
                             document.forms[0],
                             document.getElementById('result'))" 
        value="save">
@@ -1207,7 +1208,7 @@ sub Manager
              $irec->{incidentnumber},$irec->{status},$irec->{name});
       printf("<td nowrap>");
       if ($irec->{status} eq "resolved"){
-         printf("<input type=button class=directButton onclick=\"parent.doOP(this,'IncidentFinish',this.form,parent.document.getElementById('result'));\" id=finish value=\"finish\">");
+         printf("<input type=button class=directButton onclick=\"parent.doOP('inm',this,'IncidentFinish',this.form,parent.document.getElementById('result'));\" id=finish value=\"finish\">");
          printf("<input type=button class=directButton onclick=\"parent.showPopWin('../inm/inmReopen?id=$irec->{incidentnumber}',500,300,refresh);\" id=inmReopen value=\"reopen\">");
       }
       else{
