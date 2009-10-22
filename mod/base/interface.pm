@@ -543,6 +543,9 @@ sub storeRecord
           $newrec->{$k}->[0] eq "MIME::Entity"){
          $newrec->{$k}=$envelope->parts()->[$newrec->{$k}->[1]];
       }
+      else{
+         $newrec->{$k}=UTF8toLatin1($newrec->{$k});
+      }
    }
    if ($objectname eq "base::workflow"){
       my $action=$newrec->{action};
