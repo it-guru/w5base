@@ -18,3 +18,5 @@
 'Add Inline Attachment'=>{de=>'Hinzufügen von Inline-Anlagen'},
 'delete destination notfound or not unique'=>{de=>'Ziel der Löschoperation nicht eindeutig oder nicht gefunden'},
 'invalid file or filetype'=>{de=>'unzulässiger Dateityp'},
+'field "%s" is not allowed to be uploaded'=>{de=>'Feld "%s" ist nicht für den Upload von Daten freigegeben'},
+'record not update or update incomplete'=>{de=>'Datensatz wurde nicht oder nicht vollständig aktualisiert'},

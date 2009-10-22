@@ -1178,71 +1178,6 @@ sub Detail
       print("<div id=PostIT>");
       print("<iframe border=0 frameborder=0 src=\"../../base/note/Actor\" style=\"position:absolute;left:0px;top:0px;border-style:none;border-width:0px\" width=120 height=15></iframe>");
       print("</div>");
-      print(<<EOF);
-<script type="text/javascript" src="../../../static/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
-<script type="text/javascript" src="../../../static/yui/build/dragdrop/dragdrop.js"></script>
-
-
-<style type="text/css">
-    #dd-panel {
-        position: absolute; 
-        height: 200px; 
-        width: 150px;
-        top: 0px; 
-        left: 20px; 
-        border: 1px solid #333333;
-        background-color: #f7f7f7;
-    }
-</style>
-
-<script type="text/javascript">
-
-YAHOO.example.DDResize = function(panelElId, handleElId, sGroup, config) {
-    YAHOO.example.DDResize.superclass.constructor.call(this, panelElId, sGroup, config);
-    if (handleElId) {
-        this.setHandleElId(handleElId);
-    }
-};
-
-YAHOO.extend(YAHOO.example.DDResize, YAHOO.util.DragDrop, {
-
-    onMouseDown: function(e) {
-        var panel = this.getEl();
-        this.startWidth = panel.offsetWidth;
-        this.startHeight = panel.offsetHeight;
-
-        this.startPos = [YAHOO.util.Event.getPageX(e),
-                         YAHOO.util.Event.getPageY(e)];
-    },
-
-    onDrag: function(e) {
-        var newPos = [YAHOO.util.Event.getPageX(e),
-                      YAHOO.util.Event.getPageY(e)];
-
-        var offsetX = newPos[0] - this.startPos[0];
-        var offsetY = newPos[1] - this.startPos[1];
-
-        var newWidth = Math.max(this.startWidth + offsetX, 10);
-        var newHeight = Math.max(this.startHeight + offsetY, 10);
-
-        var panel = this.getEl();
-        panel.style.width = newWidth + "px";
-        panel.style.height = newHeight + "px";
-    }
-});
-
-function activateAni(id)
-{
-    var dd2;
-    YAHOO.util.Event.onDOMReady(function() {
-        dd2 = new YAHOO.util.DD(id, "paneldrag");
-    });
-}
-
-</script>
-
-
-EOF
 
    }
    print $self->HtmlBottom(body=>1,form=>1);
@@ -1653,10 +1588,23 @@ sub ProcessUploadRecord
       return(1);
    }
    if (defined($oldrec)){
-      if ($self->SecureValidatedUpdateRecord($oldrec,$newrec,$flt)){
+      my $fldchk=1;
+      foreach my $fieldname (keys(%$newrec)){
+         my $fobj=$self->getField($fieldname);
+         if (!defined($fobj) || !($fobj->Uploadable())){
+            my $label=$fieldname;
+            $label=$fobj->Label() if (defined($fobj));
+            $self->LastMsg(ERROR,'field "%s" is not allowed to be uploaded',
+                           $label);
+            $fldchk=0;
+            last;
+         }
+      }
+      if ($fldchk &&
+          $self->SecureValidatedUpdateRecord($oldrec,$newrec,$flt)){
          if ($self->LastMsg()){
             print join("\n",$self->LastMsg());
-            print msg(ERROR,"record not update or update incomplete");
+            print msg(ERROR,$self->T("record not update or update incomplete"));
             ${$param{countfail}}++ if (ref($param{countfail}) eq "SCALAR");
          }
          if ($param{debug}){
