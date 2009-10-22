@@ -100,6 +100,9 @@ body{
 function showWork(e)
 {
    var directLink=document.getElementById("directLink");
+   if (e==''){
+      document.forms[0].submit();
+   }
    if (e.id=='Restart' || e=='Restart'){
       if (document.forms[0].elements['OP'].value==''){
          document.forms[0].elements['OP'].value='MyIncidentMgr';

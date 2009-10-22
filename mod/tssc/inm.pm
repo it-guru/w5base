@@ -835,7 +835,8 @@ sub WebInitiatedValidatedUpdateRecord
       if ($self->LastMsg()==0){
          $self->LastMsg(OK,"UpdateIncident ($IncidentNumber) is ok");
       }
-      return($id,"hidePopWin();showWork('MyIncidentMgr');");
+      #return($id,"hidePopWin();showWork('MyIncidentMgr');");
+      return($id,"hidePopWin();showWork('');");
    }
    return;
 }
@@ -940,7 +941,7 @@ sub Process
 <tr>
 <td colspan=2>
 <input style="width:100%" type=button 
-       onclick="parent.doOP("inm",this,'CreateApplicationIncident',
+       onclick="parent.doOP('inm',this,'CreateApplicationIncident',
                             document.forms[0],
                             parent.document.getElementById('result'))" 
        value="$create">
@@ -1005,7 +1006,7 @@ sub inmResolv
 <tr>
 <td colspan=2>
 <input style="width:100%" type=button 
-       onclick="parent.doOP("inm",this,'ResolvApplicationIncident',
+       onclick="parent.doOP('inm',this,'ResolvApplicationIncident',
                             document.forms[0],
                             document.getElementById('result'))" 
        value="save">
@@ -1065,7 +1066,7 @@ sub inmReopen
 <tr>
 <td colspan=2>
 <input style="width:100%" type=button 
-       onclick="parent.doOP("inm",this,'ReopenApplicationIncident',
+       onclick="parent.doOP('inm',this,'ReopenApplicationIncident',
                             document.forms[0],
                             document.getElementById('result'))" 
        value="save">
@@ -1123,7 +1124,7 @@ sub inmAddNote
 <tr>
 <td colspan=2>
 <input style="width:100%" type=button 
-       onclick="parent.doOP("inm",this,'IncidentAddNote',
+       onclick="parent.doOP('inm',this,'IncidentAddNote',
                             document.forms[0],
                             document.getElementById('result'))" 
        value="save">
