@@ -1555,6 +1555,7 @@ sub ProcessUploadRecord
          print msg(INFO,"  %-15s = %s","'".$key."'","'".$val."'");
       }
    }
+
    my $oldrec;
    my $flt;
    my $id;
@@ -1588,20 +1589,7 @@ sub ProcessUploadRecord
       return(1);
    }
    if (defined($oldrec)){
-      my $fldchk=1;
-      foreach my $fieldname (keys(%$newrec)){
-         my $fobj=$self->getField($fieldname);
-         if (!defined($fobj) || !($fobj->Uploadable())){
-            my $label=$fieldname;
-            $label=$fobj->Label() if (defined($fobj));
-            $self->LastMsg(ERROR,'field "%s" is not allowed to be uploaded',
-                           $label);
-            $fldchk=0;
-            last;
-         }
-      }
-      if ($fldchk &&
-          $self->SecureValidatedUpdateRecord($oldrec,$newrec,$flt)){
+      if ($self->SecureValidatedUpdateRecord($oldrec,$newrec,$flt)){
          if ($self->LastMsg()){
             print join("\n",$self->LastMsg());
             print msg(ERROR,$self->T("record not update or update incomplete"));
@@ -1692,7 +1680,28 @@ sub Upload
                                    $ptyp=$p if (!defined($ptyp));
                                    $ptyp=~s/\//::/g;
                                    if ($ptyp eq $self->Self()){
-                                      if ($self->prepUploadRecord($prec)){
+
+
+                                      my $fldchk=1;
+                                      foreach my $fieldname (keys(%$prec)){
+                                         my $fobj=$self->getField($fieldname);
+                                         if (!defined($fobj) || 
+                                             !($fobj->Uploadable())){
+                                            my $label=$fieldname;
+                                            if (defined($fobj)){
+                                               $label=$fobj->Label();
+                                            }
+                                            $self->LastMsg(ERROR,
+                                                           'field "%s" is not '.
+                                                           'allowed to be '.
+                                                           'uploaded',
+                                                           $label);
+                                            $fldchk=0;
+                                            last;
+                                         }
+                                      }
+                                      if ($fldchk &&
+                                          $self->prepUploadRecord($prec)){
                                          $self->ProcessUploadRecord($prec,
                                                     debug=>$debug,
                                                     countok=>\$countok,
