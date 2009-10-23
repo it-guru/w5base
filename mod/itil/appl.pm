@@ -1213,7 +1213,7 @@ sub isWriteValid
          return(@databossedit);
       }
       if ($rec->{responseteamid}!=0 && 
-         $self->IsMemberOf($rec->{businessteamid},"RCFManager","down")){
+         $self->IsMemberOf($rec->{responseteamid},"RCFManager","down")){
          return(@databossedit);
       }
    }

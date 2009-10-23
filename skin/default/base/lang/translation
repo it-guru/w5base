@@ -51,5 +51,6 @@
 'privacy information - only readable with rule write or privacy read'=>{de=>'Vertrauliche Information - nur lesbar mit Schreibrechten oder vertrauchlichem lesen'},
 'condition'=>{de=>'Stand'},
 'invalid disalloed action requested'=>{de=>'ungültige oder nicht erlaubte Anforderung'},
-'Interview result'       =>{de=>'Interview Ergebnis'},
+'Interview result'      =>{de=>'Interview Ergebnis'},
 'Interview state'       =>{de=>'Interview Status'},
+'Additionalinformations'=>{de=>'Zusatzinformationen'},
