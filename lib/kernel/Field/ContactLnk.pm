@@ -29,10 +29,11 @@ sub new
    my $type=shift;
    my %self=@_;
    $self{WSDLfieldType}="Contacts"     if (!defined($self{WSDLfieldType}));
-   $self{vjointo}="base::lnkcontact"   if (!defined($self{vjointo}));
-   $self{vjoinon}=['id'=>'refid']      if (!defined($self{vjoinon}));
-   $self{allowcleanup}=1               if (!defined($self{allowcleanup}));
-   $self{forwardSearch}=1              if (!defined($self{forwardSearch}));
+   $self{'vjointo'}="base::lnkcontact"   if (!defined($self{'vjointo'}));
+   $self{'uploadable'}=0                 if (!defined($self{'uploadable'}));
+   $self{'vjoinon'}=['id'=>'refid']      if (!defined($self{'vjoinon'}));
+   $self{'allowcleanup'}=1               if (!defined($self{'allowcleanup'}));
+   $self{'forwardSearch'}=1              if (!defined($self{'forwardSearch'}));
    if (!defined($self{vjoindisp})){
       $self{vjoindisp}=['targetname','comments',"roles"];
    }
