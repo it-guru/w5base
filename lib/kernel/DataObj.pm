@@ -1263,6 +1263,10 @@ sub DeleteAllFilteredRecords
                $self->ValidatedDeleteRecord($rec);
                $ncount++;
             }
+            if ($method eq "DeleteRecord"){
+               $self->DeleteRecord($rec);
+               $ncount++;
+            }
             ($rec,$msg)=$self->getNext();
             return($ncount) if (!defined($rec));
          }until(!defined($rec));
