@@ -51,7 +51,8 @@ sub setFilename
 {
    my $self=shift;
    my $filename=shift;
-   if ($filename=~m/^webfs:/){
+   if (ref($filename) eq "ARRAY" || $filename=~m/^webfs:/){
+      $filename=[$filename] if (ref($filename) ne "ARRAY");
       my $fh=new File::Temp();
       $self->{FinalFilename}=$filename;
       $self->{fh}=$fh; 
@@ -92,8 +93,20 @@ sub Process
    my $out=$self->{out};
    foreach my $cr (@_){
       $self->{'crec'}=$cr;
+      delete($ENV{HTTP_ACCEPT_LANGUAGE});
+      if ($self->crec('lang') ne ""){
+         $ENV{HTTP_ACCEPT_LANGUAGE}=$self->crec('lang');
+      }
 
-      my $DataObj=getModuleObject($self->Config,$self->crec('DataObj'));
+
+      my $DataObj;
+      my $reqDataObj=$self->crec('DataObj');
+      if (ref($reqDataObj)){
+         $DataObj=$reqDataObj;
+      }
+      else{
+         $DataObj=getModuleObject($self->Config,$reqDataObj);
+      }
       $DataObj->SetFilter($self->crec('filter'));
       $out->setDataObj($DataObj);
       $DataObj->SetCurrentView(@{$self->crec('view')});
@@ -104,30 +117,54 @@ sub Process
       my $sheetname=$self->crec('sheet');
 
       my $sheetname=$self->crec('sheet');
-      $sheetname=$DataObj->T($DataObj->Self(),$DataObj->Self()) if ($sheetname eq "");
+      if ($sheetname eq ""){
+         $sheetname=$DataObj->T($DataObj->Self(),$DataObj->Self());
+      }
       my $line=1;
       my ($rec,$msg)=$DataObj->getFirst(unbuffered=>1);
       if (defined($rec)){
+         my $reproccount=0;
          do{
-            if ($line==1){
-               $out->addSheet($sheetname);
-            }
             my @recordview=$DataObj->getFieldObjsByView($self->crec('view'),
-                                                    current=>$rec);
-            my $fieldbase={};
-            map({$fieldbase->{$_->Name()}=$_} @recordview);
-            $out->{fieldkeys}={};
-            $out->{fieldobjects}=[];
-            foreach my $fo (@recordview){
-               my $name=$fo->Name();
-               if (!defined($out->{fieldkeys}->{$name})){
-                  push(@{$out->{fieldobjects}},$fo);
-                  $out->{fieldkeys}->{$name}=$#{$out->{fieldobjects}};
+                                                        current=>$rec);
+            my $recordPreProcessor=$self->{crec}->{'recPreProcess'};
+            my $doNext=1;
+            my $res=1;
+            if (ref($recordPreProcessor) eq "CODE"){
+               $res=&{$recordPreProcessor}($self->getParent(),$DataObj,$rec,
+                                           \@recordview,$reproccount);
+               # 0 = no display
+               # 1 = display
+               # 2 = display and reprocess
+               if ($res==2){
+                  $doNext=0;
                }
             }
-            $out->ProcessLine(undef,["ALL"],$rec,\@recordview,
-                              $fieldbase,$line++,undef);
-            ($rec,$msg)=$DataObj->getNext();
+            if ($res){
+               if ($line==1){
+                  $out->addSheet($sheetname);
+               }
+               my $fieldbase={};
+               map({$fieldbase->{$_->Name()}=$_} @recordview);
+               $out->{fieldkeys}={};
+               $out->{fieldobjects}=[];
+               foreach my $fo (@recordview){
+                  my $name=$fo->Name();
+                  if (!defined($out->{fieldkeys}->{$name})){
+                     push(@{$out->{fieldobjects}},$fo);
+                     $out->{fieldkeys}->{$name}=$#{$out->{fieldobjects}};
+                  }
+               }
+               $out->ProcessLine(undef,["ALL"],$rec,\@recordview,
+                                 $fieldbase,$line++,undef);
+            }
+            if ($doNext){
+               ($rec,$msg)=$DataObj->getNext();
+               $reproccount=0;
+            }
+            else{
+               $reproccount++;
+            }
          } until(!defined($rec));
       }
       if ($line>1){
@@ -136,24 +173,31 @@ sub Process
       }
    }
    $out->closeWorkbook();
-   if (my ($f)=$self->{FinalFilename}=~m/^webfs:(.*)$/){
+   if (ref($self->{FinalFilename}) eq "ARRAY"){
       my $filename=$self->{TempFilename};
-      close($self->{fh});
-      if (my ($dir,$dstfile)=$f=~m/^(.*)\/([^\/]+)$/){
-         $dir=~s/^\///;
-         my $file=getModuleObject($self->Config,"base::filemgmt");
-         msg(DEBUG,"temp name=$filename");
-         msg(DEBUG,"webfs dir=$dir file=$file");
-         if (open(F,"<$filename")){
-            if (!($file->ValidatedInsertOrUpdateRecord(
-                         {name=>$dstfile, parent=>$dir,file=>\*F},
-                         {name=>\$dstfile,parent=>\$dir}))){
-               msg(ERROR,"fail to store $self->{FinalFilename}");
+      foreach my $FinalFilename (@{$self->{FinalFilename}}){
+         if (my ($f)=$FinalFilename=~m/^webfs:(.*)$/){
+            close($self->{fh});
+            if (my ($dir,$dstfile)=$f=~m/^(.*)\/([^\/]+)$/){
+               $dir=~s/^\///;
+               my $file=getModuleObject($self->Config,"base::filemgmt");
+               msg(DEBUG,"temp name=$filename");
+               msg(DEBUG,"webfs dir=$dir file=$file");
+               if (open(F,"<$filename")){
+                  if (!($file->ValidatedInsertOrUpdateRecord(
+                               {name=>$dstfile, parent=>$dir,file=>\*F},
+                               {name=>\$dstfile,parent=>\$dir}))){
+                     msg(ERROR,"fail to store $self->{FinalFilename}");
+                  }
+                  close(F);
+               }
+               else{
+                  msg(ERROR,"fail to open temp file $filename");
+               }
             }
-            close(F);
          }
          else{
-            msg(ERROR,"fail to open temp file $filename");
+            msg(ERROR,"output to multiple files in filesystem not supported");
          }
       }
       unlink($filename);

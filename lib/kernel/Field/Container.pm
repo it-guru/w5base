@@ -54,7 +54,7 @@ sub FormatedDetail
    my $name=$self->Name();
    if ($mode eq "SOAP"){
       my $xml;
-      if (ref($d) eq "HASH"){
+      if (ref($d) eq "HASH" && keys(%$d)){
          foreach my $k (sort(keys(%$d))){
             my $val=$d->{$k};
             $val=[$val] if (ref($val) ne "ARRAY");

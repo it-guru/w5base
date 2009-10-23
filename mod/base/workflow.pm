@@ -253,6 +253,13 @@ sub new
                 label         =>'Event-End',
                 dataobjattr   =>'wfhead.eventend'),
                                    
+      new kernel::Field::Date(
+                name          =>'eventendrev',
+                htmldetail    =>0,
+                group         =>'state',
+                label         =>'Event-End reverse',
+                dataobjattr   =>'wfhead.eventend'),
+                                   
       new kernel::Field::Text(
                 name          =>'eventendday',
                 htmldetail    =>0,
@@ -2451,6 +2458,32 @@ sub getSubListData
    }
    return($self->SUPER::getSubListData($current,$mode,%param));
 }
+
+sub getLineSubListData
+{
+   my $self=shift;
+   my $current=shift;
+   my $mode=shift;
+
+   if ($mode eq "xls"){
+      my $dd=$current->{$self->Name};
+      my $d; 
+      if (ref($dd) eq "ARRAY"){
+         foreach my $arec (@{$dd}){
+            $d.="--\n" if ($d ne "");
+            $d.=$self->getParent->ExpandTimeExpression($arec->{cdate},
+                                               $self->getParent->Lang(),"GMT");
+            $d.=": ";
+            $d.=$self->getParent->T($arec->{name},$arec->{translation})."\n";
+            $d.=$arec->{comments}."\n" if ($arec->{comments} ne "");
+#Dumper($dd);
+         }
+      }
+      return($d);
+   }
+   return($self->SUPER::getLineSubListData($current,$mode));
+}
+
 
 
 

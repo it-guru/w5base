@@ -266,6 +266,7 @@ sub ProcessHead
             $xlswidth=$self->{'maxlen'}->[$xlscellno]*1.2;
          }
          $xlswidth=15 if (defined($xlswidth) && $xlswidth<15);
+         $xlswidth=100 if ($xlswidth>100);
          if (defined($xlswidth)){
             $self->{'worksheet'}->set_column($xlscellno,$xlscellno,$xlswidth);
          }

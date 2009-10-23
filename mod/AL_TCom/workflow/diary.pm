@@ -45,6 +45,7 @@ sub new
                                    vjointo    =>'itil::appl',
                                    vjoinon    =>['affectedapplicationid'=>'id'],
                                    vjoindisp  =>'name',
+                                   vjoineditbase  =>{cistatusid=>"<6"},
 
                                    keyhandler =>'kh',
                                    container  =>'headref',
@@ -617,18 +618,27 @@ sub preValidate                 # das muß in preValidate behandelt werden,
          my $app=getModuleObject($self->getParent->Config,"itil::appl");
          $app->SetFilter({id=>\$applid});
          my @l=$app->getHashList(qw(custcontracts mandator 
+                                    customerid customer 
                                     conumber mandatorid));
          my %custcontract;
          my %custcontractid;
          my %mandator;
          my %mandatorid;
          my %conumber;
+         my %customer;
+         my %customerid;
          foreach my $apprec (@l){
-            if (defined($apprec->{mandator})){
+            if (defined($apprec->{mandator}) && $apprec->{mandator} ne ""){
                $mandator{$apprec->{mandator}}=1;
             }
-            if (defined($apprec->{mandatorid})){
+            if (defined($apprec->{mandatorid}) && $apprec->{mandatorid} ne ""){
                $mandatorid{$apprec->{mandatorid}}=1;
+            }
+            if (defined($apprec->{customer}) && $apprec->{customer} ne ""){
+               $customer{$apprec->{customer}}=1;
+            }
+            if (defined($apprec->{customerid}) && $apprec->{customerid} ne ""){
+               $customerid{$apprec->{customerid}}=1;
             }
             if (defined($apprec->{conumber}) && $apprec->{conumber} ne ""){
                $co->ResetFilter();
@@ -656,6 +666,9 @@ sub preValidate                 # das muß in preValidate behandelt werden,
          }
          if (keys(%custcontract)){
             $newrec->{affectedcontract}=[keys(%custcontract)];
+         }
+         if (keys(%customer)){
+            $newrec->{involvedcustomer}=[keys(%customer)];
          }
          if (keys(%mandator)){
             $newrec->{mandator}=[keys(%mandator)];
