@@ -49,10 +49,10 @@ sub getQueryTemplate
    my $d=<<EOF;
 <div class=searchframe>
 <table class=searchframe><tr>
+<td class=fname width=10%>\%id(label)\%:</td>
+<td class=finput width=40% >\%id(search)\%</td>
 <td class=fname width=10%>\%name(label)\%:</td>
 <td class=finput width=40% >\%name(search)\%</td>
-<td class=fname width=10%>&nbsp;</td>
-<td class=finput width=40% >&nbsp;</td>
 </tr><tr>
 <td class=fname>$timelabel:</td>
 <td class=finput>$timedrop</td>
