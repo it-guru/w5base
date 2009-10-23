@@ -62,7 +62,6 @@ sub CustemerBTBreport
    foreach my $arec ($appl->getHashList(qw(id))){
       push(@{$self->{'onlyApplId'}},$arec->{id});
    }
-   printf STDERR ("fifix $self onlyApplId=%s\n",join(",",@{$self->{'onlyApplId'}}));
 
    my $eventend="currentmonth";
    if ($param{month} ne ""){
