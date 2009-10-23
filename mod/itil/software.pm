@@ -87,10 +87,11 @@ sub new
                    my $mode=shift;
                    my %param=@_;
                    my $rec=$param{current};
-                   if (!defined($rec->{$self->Name()})){
-                      return(0);
+                   my $d=$rec->{$self->Name()};
+                   if (ref($d) eq "HASH" && keys(%$d)){
+                      return(1);
                    }
-                   return(1);
+                   return(0);
                 },
                 dataobjattr   =>'software.additional'),
 
@@ -156,6 +157,8 @@ sub new
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","admin.itil.software"],
                          uniquesize=>255};
+   $self->{history}=[qw(insert modify delete)];
+
    $self->setWorktable("software");
    return($self);
 }
