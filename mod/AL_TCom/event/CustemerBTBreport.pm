@@ -139,7 +139,7 @@ sub CustemerBTBreport
 #   }
 
 
-   return({exitcode=>0,msg=>'OK (time $trep sec)'});
+   return({exitcode=>0,msg=>"OK (time $trep sec)"});
 }
 
 sub recPreProcess
