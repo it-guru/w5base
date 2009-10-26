@@ -188,7 +188,7 @@ EOF
    if ($SCUsername eq "" && $SCPassword eq "" && Query->Delete("OP") eq ""){
       my $note=getModuleObject($self->Config,"base::note");
       my $userid=$self->getCurrentUserId();
-      $note->SetFilter({createuserid=>\$userid,parentobj=>\'tssc::mgr',
+      $note->SetFilter({creatorid=>\$userid,parentobj=>\'tssc::mgr',
                parentid=>\'account'});
       my ($arec)=$note->getOnlyFirst("comments");
       if (defined($arec)){
@@ -289,9 +289,9 @@ sub Process
                publicstate=>0,
                parentobj=>'tssc::mgr',
                parentid=>'account',
-               createuserid=>$userid,
+               creatorid=>$userid,
                comments=>encode_base64("$SCUsername:$SCPassword")},
-              {createuserid=>\$userid,parentobj=>\'tssc::mgr',
+              {creatorid=>\$userid,parentobj=>\'tssc::mgr',
                parentid=>\'account'});
    }
 
