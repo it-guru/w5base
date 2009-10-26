@@ -113,7 +113,7 @@ sub doQualityCheck
          }
          msg(DEBUG,"check record end");
          ($rec,$msg)=$dataobj->getNext();
-         if (time()-$time>3500){ # 1 hours quality check
+         if (time()-$time>9000){ # 1 hours quality check
             last;
          }
       }until(!defined($rec));
