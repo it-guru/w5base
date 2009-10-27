@@ -221,6 +221,7 @@ sub Validate
    if ($newval ne ""){
       if (!($newval=~m/^\*/)){
          foreach my $dststruct (@{$self->{dstobj}}){
+printf STDERR ("fifi d=%s\n",join(",",keys(%{$dststruct})));
             next if (defined($selectivetyp) && 
                      $selectivetyp ne $dststruct->{name});
             $dststruct->{obj}->ResetFilter();
@@ -243,7 +244,8 @@ sub Validate
          }
       }
       my @select=();
-      my $altnewval='"*'.$newval.'*"';
+      my $altnewval=$newval;
+      $altnewval='"*'.$newval.'*"' if (!($newval=~m/[\*\?]/));
 
       if (defined($self->{dst})){
          foreach my $dststruct (@{$self->{dstobj}}){

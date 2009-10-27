@@ -67,6 +67,9 @@ sub new
                 label         =>'Target-Name',
                 dst           =>['base::grp' =>'fullname',
                                  'base::user'=>'fullname'],
+                vjoineditbase =>[{'cistatusid'=>[3,4]},
+                                 {'cistatusid'=>[4]}
+                                ],
                 dsttypfield   =>'acltarget',
                 dstidfield    =>'acltargetid'),
 
