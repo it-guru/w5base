@@ -101,6 +101,7 @@ sub initWorkbook
    if ($@ eq ""){
       $self->{'workbook'}=Spreadsheet::WriteExcel::Big->new($self->{filename});
       $self->{'format'}={};
+      $self->{'fcolors'}={};
       $self->{'maxlen'}=[];
       return($self->{'workbook'});
    }
@@ -120,13 +121,42 @@ sub addSheet
 }
 
 
+sub getColorIndex
+{
+   my $self=shift;
+   my $colorstring=shift;
+
+   if (!exists($self->{'fcolors'}->{$colorstring})){
+      my $n=keys(%{$self->{'fcolors'}});
+      $self->{'fcolors'}->{$colorstring}=
+        $self->{'workbook'}->set_custom_color($n+10,$colorstring);
+   }
+   return($self->{'fcolors'}->{$colorstring});
+}
+
+
 
 
 sub Format
 {
    my $self=shift;
-   my $name=shift;
-   return($self->{format}->{$name}) if (exists($self->{format}->{$name}));
+   my $formatname=shift;
+   if (exists($self->{format}->{$formatname})){
+      return($self->{format}->{$formatname});
+   }
+
+   my $name=$formatname;
+ 
+   my $usecolor;
+   if (my ($col)=$name=~m/\.color=\"(#[0-9a-fA-F]+)\"/){
+      $name=~s/\.color=\"(#[0-9a-fA-F]+)\"//g;
+      $usecolor=$self->getColorIndex($col);
+   }
+   my $usebgcolor;
+   if (my ($col)=$name=~m/\.bgcolor=\"(#[0-9a-fA-F]+)\"/){
+      $name=~s/\.bgcolor=\"(#[0-9a-fA-F]+)\"//g;
+      $usebgcolor=$self->getColorIndex($col);
+   }
 
    my $format;
    if ($name eq "default"){
@@ -159,8 +189,14 @@ sub Format
       $format->set_num_format($xf);
    }
    if (defined($format)){
-      $self->{format}->{$name}=$format;
-      return($self->{format}->{$name}); 
+      if (defined($usecolor)){
+         $format->set_color($usecolor);
+      }
+      if (defined($usebgcolor)){
+         $format->set_bg_color($usebgcolor);
+      }
+      $self->{format}->{$formatname}=$format;
+      return($self->{format}->{$formatname}); 
    }
  #  print STDERR msg(WARN,"XLS: setting format '$name' as 'default'");
    return($self->Format("default"));

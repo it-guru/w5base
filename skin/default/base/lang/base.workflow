@@ -12,6 +12,8 @@
 'fieldgroup.flow'=>{de=>'Verlauf',en=>'Flow'},
 'Short Description'=>{de=>'Kurzbeschreibung'},
 'Description'=>{de=>'Beschreibung'},
+'Involved Customer'=>{de=>'beteiligter Kunde'},
+'Involved Customer ID'=>{de=>'beteiligter Kunde ID'},
 'Relations'=>{de=>'Verknüpfungen/ Verweise'},
 'Workflow specific fields'=>{de=>'Workflow spezifische Felder'},
 'postponed until'=>{de=>'Zurückgestellt bis'},

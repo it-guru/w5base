@@ -35,17 +35,18 @@ sub FormatedDetail
 {
    my $self=shift;
    my $current=shift;
-   my $mode=shift;
+   my $FormatAs=shift;
    my $name=$self->Name();
    my $d=$self->RawValue($current);
+   $d=$self->FormatedDetailDereferncer($current,$FormatAs,$d);
    my $lang=$self->getParent->Lang();
-   if ($mode eq "HtmlDetail"){
+   if ($FormatAs eq "HtmlDetail"){
       $d="<table border=0 ".
          "style=\"width:100%;table-layout:fixed;padding:0;".
                  "border-width:0;margin:0\">".
          "<tr><td><div class=multilinehtml>$d</div></td></tr></table>";
    }
-   if ($mode eq "edit" || $mode eq "workflow"){
+   if ($FormatAs eq "edit" || $FormatAs eq "workflow"){
       my $fromquery=Query->Param("Formated_$name");
       if (defined($fromquery)){
          $d=$fromquery;
@@ -113,6 +114,7 @@ sub FormatedResult
    my $current=shift;
    my $FormatAs=shift;
    my $d=$self->RawValue($current);
+   $d=$self->FormatedDetailDereferncer($current,$FormatAs,$d);
  #  if ($FormatAs eq "HtmlV01"){
  #     if (!$self->{AllowHtmlInput}){
  #        $d=~s/</&lt;/g;

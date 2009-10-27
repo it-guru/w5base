@@ -188,6 +188,22 @@ sub new
                 group         =>'state',
                 label         =>'MandatorID'),
 
+      new kernel::Field::Text(
+                name       =>'involvedcustomer',
+                htmldetail =>0,
+                searchable =>0,
+                container  =>'headref',
+                group      =>'affected',
+                label      =>'Involved Customer'),
+
+      new kernel::Field::Text(
+                name       =>'involvedcustomerid',
+                htmldetail =>0,
+                searchable =>0,
+                container  =>'headref',
+                group      =>'affected',
+                label      =>'Involved Customer'),
+
       new kernel::Field::MultiDst (
                 name          =>'fwdtargetname',
                 group         =>'state',

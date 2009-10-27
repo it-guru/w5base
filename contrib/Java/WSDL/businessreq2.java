@@ -35,9 +35,9 @@ public class businessreq2 {
     //
     WfRec=new net.w5base.mod.AL_TCom.workflow.businesreq.WfRec();
     Inp=new net.w5base.mod.AL_TCom.workflow.businesreq.StoreRecInp();
-    WfRec.setName("This is a test AL_TCom Business Request");
+    WfRec.setName("This is a test AL_TCom הצü Business Request");
     WfRec.setDetaildescription("This is the description of my request\n"+
-                               "This \\n description can have more than one line");
+                               "This \\n description can \\\\n have more than one line");
     WfRec.setNoautoassign(true);
     WfRec.setAffectedapplication("W5Base/Darwin");
     WfRec.setCustomerrefno("INETWORK:112233");
@@ -55,50 +55,5 @@ public class businessreq2 {
     }
     System.out.println("new WorkflowID="+Res.getIdentifiedBy());
  
-    //
-    // find an existing workflow
-    //
-    FInput=new net.w5base.mod.AL_TCom.workflow.businesreq.FindRecordInp();
-    Flt=new net.w5base.mod.AL_TCom.workflow.businesreq.Filter();
-    Flt.setId(Res.getIdentifiedBy());
-    FInput.setFilter(Flt);
-    FInput.setView("posibleactions,detaildescription,mdate,name,stateid,step");
-
-    // do the Query
-    Result=W5Port.findRecord(FInput);
-
-    // show the Result
-    CurRec=null;
-    for (net.w5base.mod.AL_TCom.workflow.businesreq.Record rec: 
-         Result.getRecords()){
-       CurRec=rec;
-    }
-    //
-    //  work arround with CurRec and at the end, break the workflow
-    //
-
-    if (CurRec!=null){
-       System.out.println(CurRec.getName()+" = "+CurRec.getStateid());
-       SimpleDateFormat df = new SimpleDateFormat( "dd.MM.yyyy HH:mm:ss" );
-       System.out.println("step = "+CurRec.getStep());
-       System.out.println("mdate = "+df.format(CurRec.getMdate().getTime()));
-       System.out.println("posible actions= "+
-                    itguru.join(CurRec.getPosibleactions(),", "));
-     
-       if (itguru.exitsIn(CurRec.getPosibleactions(),"wfactivate")){
-          System.out.printf("try to send a wfactivate\n");
-          WfRec=new net.w5base.mod.AL_TCom.workflow.businesreq.WfRec();
-          WfRec.setAction("wfactivate");
-          Inp.setData(WfRec);
-          Inp.setIdentifiedBy(Res.getIdentifiedBy());
-          Res=W5Port.storeRecord(Inp);
-          if (Res.getExitcode()==0){
-             System.out.printf("activate has been successfuly send\n");
-          }
-          else{
-             System.out.println(itguru.join(Res.getLastmsg(),"\n"));
-          }
-       }
-    }
   }
 }

@@ -96,6 +96,8 @@ sub new
    $self->{_permitted}->{nowrap}=1;     # kein automatischer Zeilenumbruch
    $self->{_permitted}->{htmlwidth}=1;  # Breite in der HTML Ausgabe (Spalten)
    $self->{_permitted}->{xlswidth}=1;   # Breite in der XLS Ausgabe (Spalten)
+   $self->{_permitted}->{xlscolor}=1;   # Farbe der Spalte in XLS Ausgabe
+   $self->{_permitted}->{xlsbgcolor}=1; # Hintergrund der Spalte in XLS Ausgabe
    $self->{_permitted}->{uivisible}=1;  # Anzeige in der Detailsicht bzw. Listen
    $self->{_permitted}->{history}=1;    # Über das Feld braucht History
    $self->{_permitted}->{htmldetail}=1; # Anzeige in der Detailsicht
@@ -834,7 +836,33 @@ sub FormatedDetail
    my $current=shift;
    my $FormatAs=shift;
    my $d=$self->RawValue($current);
-   $d=join("; ",@$d) if (ref($d) eq "ARRAY" && $FormatAs=~m/^Html/);
+   return($self->FormatedDetailDereferncer($current,$FormatAs,$d));
+}
+
+sub FormatedDetailDereferncer
+{
+   my $self=shift;
+   my $current=shift;
+   my $FormatAs=shift;
+   my $d=shift;
+
+
+   if (ref($d)){
+      if (ref($self->{dereference}) eq "CODE"){
+         return(&{$self->{dereference}}($self,$current,$FormatAs,$d));
+      }
+      if (ref($d) eq "ARRAY"){
+         return(join("; ",@$d));
+      }
+      elsif (ref($d) eq "HASH"){
+         if (exists($d->{$FormatAs})){
+            $d=$d->{$FormatAs};
+         }
+         elsif (exists($d->{'RawValue'})){
+            $d=$d->{'RawValue'};
+         }
+      }
+   }
    return($d);
 }
 
@@ -931,7 +959,17 @@ sub FormatedStoredWorkspace
 sub getXLSformatname
 {
    my $self=shift;
-   return("default");
+   my $xlscolor=$self->xlscolor;
+   my $xlsbgcolor=$self->xlsbgcolor;
+   my $f="default";
+   if (defined($xlscolor)){
+      $f.=".color=\"".$xlscolor."\"";
+   }
+   if (defined($xlsbgcolor)){
+      $f.=".bgcolor=\"".$xlsbgcolor."\"";
+   }
+
+   return($f);
 }
 
 sub WSDLfieldType

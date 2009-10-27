@@ -13,6 +13,5 @@
 'Affected System ID'=>{de=>'betroffenes System ID'},
 'Involved Response Team'=>{de=>'beteiligtes Servicemanagement Team'},
 'Involved Business Team'=>{de=>'beteiligtes Betriebsteam Team'},
-'Involved Customer'=>{de=>'beteiligter Kunde'},
 'Involved CostCenter'=>{de=>'beteiligte Kostenstellen'},
 

@@ -35,15 +35,17 @@ sub FormatedDetail
 {
    my $self=shift;
    my $current=shift;
-   my $mode=shift;
+   my $FormatAs=shift;
    my $d=$self->RawValue($current);
    my $name=$self->Name();
+   $d=$self->FormatedDetailDereferncer($current,$FormatAs,$d);
 
-   if ($mode ne "edit" && defined($self->{expandvar})){
+   if ($FormatAs ne "edit" && defined($self->{expandvar})){
       $d=~s/\%([a-zA-Z][^\%]+?)\%/&{$self->{expandvar}}($self,$1,$current)/ge;
    }
 
-   if (($mode eq "edit" || $mode eq "workflow") && !defined($self->{vjointo})){
+   if (($FormatAs eq "edit" || $FormatAs eq "workflow") && 
+       !defined($self->{vjointo})){
       $d=join($self->{vjoinconcat},@$d) if (ref($d) eq "ARRAY");
       my $readonly=0;
       if ($self->readonly($current)){
@@ -59,29 +61,29 @@ sub FormatedDetail
       return($self->getSimpleInputField($d,$readonly));
    }
    $d=[$d] if (ref($d) ne "ARRAY");
-   if ($mode eq "HtmlDetail"){
+   if ($FormatAs eq "HtmlDetail"){
       $d=[map({$self->addWebLinkToFacility(quoteHtml($_),$current)} @{$d})];
    }
-   if ($mode eq "SOAP"){
+   if ($FormatAs eq "SOAP"){
       $d=[map({quoteSOAP($_)} @{$d})];
    }
-   if ($mode eq "HtmlV01"){
+   if ($FormatAs eq "HtmlV01"){
       $d=[map({quoteHtml($_)} @{$d})];
    }
-   if ($mode ne "XMLV01"){
+   if ($FormatAs ne "XMLV01"){
       my $vjoinconcat=$self->{vjoinconcat};
       $vjoinconcat="; " if (!defined($vjoinconcat));
       $d=join($vjoinconcat,@$d);
    }
    
-   if ($mode eq "HtmlV01"){
+   if ($FormatAs eq "HtmlV01"){
       $d=~s/\n/<br>\n/g;
       if ($self->{htmlnowrap}){
          $d=~s/[ \t]/&nbsp;/g;
          $d=~s/-/&minus;/g;
       }
    }
-   $d.=" ".$self->{unit} if ($d ne "" && $mode eq "HtmlDetail");
+   $d.=" ".$self->{unit} if ($d ne "" && $FormatAs eq "HtmlDetail");
    return($d);
 }
 

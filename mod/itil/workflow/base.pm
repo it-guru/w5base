@@ -53,14 +53,6 @@ sub Init
                 label      =>'Involved Business Team'),
 
       new kernel::Field::Text( 
-                name       =>'involvedcustomer',
-                htmldetail =>0,
-                searchable =>0,
-                container  =>'headref',
-                group      =>'affected',
-                label      =>'Involved Customer'),
-
-      new kernel::Field::Text( 
                 name       =>'involvedcostcenter',
                 htmldetail =>0,
                 searchable =>0,

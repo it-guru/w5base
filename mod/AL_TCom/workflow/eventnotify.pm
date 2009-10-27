@@ -122,12 +122,17 @@ sub calcSCrelations
    my $inm=$self->getParent->getField("eventinmticket")->RawValue($current);
    my $sclnk=getModuleObject($self->getParent->Config,"tssc::lnk");
    my $d;
+   my @treelist;
    if ($inm ne ""){
       my %chk;
-      $d.=$self->getParent->calcSCrelationsSubTree($sclnk,\%chk,0,0,0,
-                                                   $inm,'tssc::inm');
+      my @path;
+      $d.=$self->getParent->calcSCrelationsSubTree($sclnk,\%chk,\@treelist,
+                                                   \@path,
+                                                   0,0,0,$inm,'tssc::inm');
    }
-   return("<pre>$d</pre>");
+   my $raw=join("\n",map({join(",",@$_)} @treelist));
+   return({treelist=>\@treelist,RawValue=>$raw,
+           HtmlV01=>"<pre>$d</pre>"});
 }
 
 sub calcSCrelationsSubTree
@@ -135,6 +140,8 @@ sub calcSCrelationsSubTree
    my $self=shift;
    my $sclnk=shift;
    my $chk=shift;
+   my $treelist=shift;
+   my $path=shift;
    my $level=shift;
    my $uplaypos=shift;
    my $uplaymax=shift;
@@ -169,21 +176,34 @@ sub calcSCrelationsSubTree
          $state="<font color=red>$state</font>";
       }
    }
+   return() if ($level>2);
    
    $offtd="<td width=$off></td>" if ($off>0);
    $d.="\n<table border=0 cellspacing=0 cellpadding=0 width=100%>".
        "<tr>$offtd<td>$id ($state)</td></tr>\n"; 
    $chk->{$id}++;
    $sclnk->ResetFilter();
-   $sclnk->SetFilter({src=>\$id,dst=>"PRM* CHM*"});
+   if ($level==0){
+      $sclnk->SetFilter({src=>\$id,dst=>"PRM*"});
+   }
+   if ($level>0){
+      $sclnk->SetFilter({src=>\$id,dst=>"CHM*"});
+   }
    my @rel=$sclnk->getHashList(qw(dst dstobj));
    for(my $laypos=0;$laypos<=$#rel;$laypos++){
-      my $s=$self->calcSCrelationsSubTree($sclnk,$chk,$level+1,$laypos,$#rel,
+      push(@$path,$id);
+      my $s=$self->calcSCrelationsSubTree($sclnk,$chk,$treelist,$path,
+                                          $level+1,$laypos,$#rel,
                                           $rel[$laypos]->{dst},
                                           $rel[$laypos]->{dstobj});
+      pop(@$path);
       if ($s ne ""){
          $d.="<tr>$offtd<td>".$s."</td></tr>\n";
       }
+   }
+   if ($#rel==-1){
+      my @l=(@$path,$id);
+      push(@$treelist,\@l);
    }
    $d.="</table>";
    return($d);

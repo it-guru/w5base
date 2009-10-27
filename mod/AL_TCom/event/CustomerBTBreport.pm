@@ -1,4 +1,4 @@
-package AL_TCom::event::CustemerBTBreport;
+package AL_TCom::event::CustomerBTBreport;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -38,11 +38,11 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("CustemerBTBreport","CustemerBTBreport");
+   $self->RegisterEvent("CustomerBTBreport","CustomerBTBreport");
    return(1);
 }
 
-sub CustemerBTBreport
+sub CustomerBTBreport
 {
    my $self=shift;
    my %param=@_;
@@ -63,41 +63,9 @@ sub CustemerBTBreport
       push(@{$self->{'onlyApplId'}},$arec->{id});
    }
 
-   my $eventend="currentmonth";
-   if ($param{month} ne ""){
-      $eventend="$param{month}";
-   }
-   my $eventendfilename;
-   $eventend=$self->getParent->PreParseTimeExpression($eventend,"GMT",
-                                               \$eventendfilename);
-   if ($eventendfilename eq ""){
-      return({exitcode=>1,msg=>"no eventendfilename can be builded"});
-   }
+   $param{'defaultFilenamePrefix'}="BTB-Report_";
+   %param=kernel::XLSReport::StdReportParamHandling($self,%param);
 
-   if ($param{'filename'} eq "" || $param{'filename'}=~m/\/$/){
-      my $names=$param{customer};
-      $names=substr($names,0,40)."___" if (length($names)>40);
-      my $tstr=$eventendfilename;
-      $tstr=~s/</less_/gi;
-      $tstr=~s/>/more_/gi;
-      $tstr=~s/[^a-z0-9]/_/gi;
-      $names=~s/[^a-z0-9]/_/gi;
-      $names=~s/_$//;
-      $names=~s/^_//;
-      $tstr=~s/_$//;
-      $tstr=~s/^_//;
-      my $dir="/tmp/";
-      if ($param{'filename'}=~m/\/$/){
-         $dir=$param{'filename'};
-      }
-      if ($param{month} eq ""){
-         $param{'filename'}=["${dir}BTB-Report_${names}_${tstr}.xls",
-                             "${dir}BTB-Report_${names}_current.xls"];
-      }
-      else{ 
-         $param{'filename'}=["${dir}BTB-Report_${names}_${tstr}.xls"];
-      }
-   }
    msg(INFO,"start Report to %s",join(", ",@{$param{'filename'}}));
    my $t0=time();
  
@@ -109,7 +77,7 @@ sub CustemerBTBreport
 
    my @control=({DataObj=>'base::workflow',
                  sheet=>'BTB',
-                 filter=>{eventend=>$eventend,
+                 filter=>{eventend=>$param{'eventend'},
                           isdeleted=>'0',
                           class=>'AL_TCom::workflow::diary'},
                  order=>'eventendrev',

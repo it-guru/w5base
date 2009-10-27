@@ -197,12 +197,73 @@ sub Process
             }
          }
          else{
-            msg(ERROR,"output to multiple files in filesystem not supported");
+            if (open(OUT,">$FinalFilename")){
+               if (open(IN,"<$filename")){
+                  my $sblk=1024;
+                  my $blk;
+                  while(my $r=sysread(IN,$blk,$sblk)){
+                     my $w=syswrite(OUT,$blk);
+                     if ($r!=$w){
+                        msg(ERROR,"fail to write output to '%s'",$FinalFilename);
+                        return(undef);
+                     }
+                  }
+               }
+               close(OUT);
+            }
+            else{
+               msg(ERROR,"fail to open '%s'",$FinalFilename);
+            }
          }
       }
       unlink($filename);
    }
    return(1);
+}
+
+sub StdReportParamHandling
+{
+   my $self=shift;
+   my %param=@_;
+
+   my $eventend="currentmonth";
+   if ($param{month} ne ""){
+      $eventend="$param{month}";
+   }
+   my $eventendfilename;
+   $eventend=$self->getParent->PreParseTimeExpression($eventend,"GMT",
+                                               \$eventendfilename);
+   if ($eventendfilename eq ""){
+      return({exitcode=>1,msg=>"no eventendfilename can be builded"});
+   }
+   my $pref=$param{'defaultFilenamePrefix'};
+   $pref="Report" if ($pref eq "");
+   if ($param{'filename'} eq "" || $param{'filename'}=~m/\/$/){
+      my $names=$param{customer};
+      $names=substr($names,0,40)."___" if (length($names)>40);
+      my $tstr=$eventendfilename;
+      $tstr=~s/</less_/gi;
+      $tstr=~s/>/more_/gi;
+      $tstr=~s/[^a-z0-9]/_/gi;
+      $names=~s/[^a-z0-9]/_/gi;
+      $names=~s/_$//;
+      $names=~s/^_//;
+      $tstr=~s/_$//;
+      $tstr=~s/^_//;
+      my $dir="./";
+      if ($param{'filename'}=~m/\/$/){
+         $dir=$param{'filename'};
+      }
+      if ($param{month} eq ""){
+         $param{'filename'}=["${dir}${pref}${names}_${tstr}.xls",
+                             "${dir}${pref}${names}_current.xls"];
+      }
+      else{
+         $param{'filename'}=["${dir}${pref}${names}_${tstr}.xls"];
+      }
+   }
+   $param{'eventend'}=$eventend;
+   return(%param);
 }
 
 
