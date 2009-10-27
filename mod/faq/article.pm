@@ -454,8 +454,11 @@ sub getHtmlDetailPages
    my ($p,$rec)=@_;
 
    if (defined($rec)){
-      return($self->SUPER::getHtmlDetailPages($p,$rec),
-             "FView"=>$self->T("Full-View"));
+      if ($ENV{REMOTE_USER} ne "anonymous"){
+         return($self->SUPER::getHtmlDetailPages($p,$rec),
+                "FView"=>$self->T("Full-View"));
+      }
+      return("FView"=>$self->T("Full-View"));
    }
    return($self->SUPER::getHtmlDetailPages($p,$rec));
 }
@@ -542,44 +545,46 @@ sub FullView
    }
    my $further;
    my @fl;
-   if ($rec->{furtherkeys} ne ""){
-      $self->ResetFilter();
-      $self->SecureSetFilter({kwords=>$rec->{furtherkeys}});
-      $self->Limit(11);
-      @fl=$self->getHashList(qw(mdate faqid name));
-   }
-   else{
-      my @kw=grep(/^\S{3,100}$/,split(/[\s\/,]/,$rec->{name}));
-      if ($#kw>0){
-      #   my @kw=@{$rec->{kwords}};
-         my @ll;
-         my @not=qw(mit einer einen eines der die das ich du er sie es wir
-                    durch andere anderes infos info aus wie wird
-                    auf in dem dessen ab meinen im gehe gehen vom wie was
-                    und nicht für voll nach bringen bringt oder bei
-                    finden finde greift gegeben zur nur
-                    ihr euer werden wird kann man muß eingegeben);
-         foreach my $keyword (@kw){
-            my $qkeyword=quotemeta($keyword);
-            next if (grep(/^$qkeyword$/i,@not));
-            $self->ResetFilter();
-            $self->SecureSetFilter({kwords=>$keyword});
-            $self->Limit(11);
-            my @kl=$self->getHashList(qw(mdate faqid name));
-            if ($#kl!=-1){
-               push(@ll,\@kl);
+   if ($ENV{REMOTE_USER} ne "anonymous") {
+      if ($rec->{furtherkeys} ne ""){
+         $self->ResetFilter();
+         $self->SecureSetFilter({kwords=>$rec->{furtherkeys}});
+         $self->Limit(11);
+         @fl=$self->getHashList(qw(mdate faqid name));
+      }
+      else{
+         my @kw=grep(/^\S{3,100}$/,split(/[\s\/,]/,$rec->{name}));
+         if ($#kw>0){
+         #   my @kw=@{$rec->{kwords}};
+            my @ll;
+            my @not=qw(mit einer einen eines der die das ich du er sie es wir
+                       durch andere anderes infos info aus wie wird
+                       auf in dem dessen ab meinen im gehe gehen vom wie was
+                       und nicht für voll nach bringen bringt oder bei
+                       finden finde greift gegeben zur nur
+                       ihr euer werden wird kann man muß eingegeben);
+            foreach my $keyword (@kw){
+               my $qkeyword=quotemeta($keyword);
+               next if (grep(/^$qkeyword$/i,@not));
+               $self->ResetFilter();
+               $self->SecureSetFilter({kwords=>$keyword});
+               $self->Limit(11);
+               my @kl=$self->getHashList(qw(mdate faqid name));
+               if ($#kl!=-1){
+                  push(@ll,\@kl);
+               }
             }
-         }
-         my %kl;
-         foreach my $kl (sort({$#{$a}<=>$#{$b}} @ll)){
-            last if (keys(%kl)>10);
-            foreach my $klrec (@$kl){
-               $kl{$klrec->{faqid}}=$klrec;
+            my %kl;
+            foreach my $kl (sort({$#{$a}<=>$#{$b}} @ll)){
                last if (keys(%kl)>10);
+               foreach my $klrec (@$kl){
+                  $kl{$klrec->{faqid}}=$klrec;
+                  last if (keys(%kl)>10);
+               }
             }
-         }
-         if (keys(%kl)){
-            @fl=values(%kl);
+            if (keys(%kl)){
+               @fl=values(%kl);
+            }
          }
       }
    }
@@ -657,7 +662,7 @@ sub FullView
    my $mdate=$self->findtemplvar({current=>$rec,mode=>"HtmlV01"},
                                   "mdate","formated");
 #   print("<div id=WindowSignature>$owner<br>$mdate</div>");
-   if ($further ne ""){
+   if ($ENV{REMOTE_USER} ne "anonymous" && $further ne ""){
       print("<div class=further>".$self->T("further articles").":".
             "<table width=100%>".$further."</table></div>");
    }

@@ -67,28 +67,26 @@ a:link.ModeSelectFunctionLink,a:visited.ModeSelectFunctionLink,a:active.ModeSele
           }
 
 
+span.ModeSelectActiv,
+a:visited.ModeSelectActiv,
+a:active.ModeSelectActiv,
 a:link.ModeSelectActiv    {
             font-family:Arial,Adobe Helvetica,Helvetica;
             text-decoration:none;
             color:#16305e;
-          }
-a:visited.ModeSelectActiv {
-            font-family:Arial,Adobe Helvetica,Helvetica;
-            text-decoration:none;
-            color:#16305e;
-          }
-a:active.ModeSelectActiv  {
-            font-family:Arial,Adobe Helvetica,Helvetica;
-            text-decoration:none;
-            color:#16305e;
+            cursor: pointer;
+            cursor: hand;
           }
 
+span.ModeSelectInactiv,
 a:link.ModeSelectInactiv,
 a:visited.ModeSelectInactiv,
 a:active.ModeSelectInactiv    {
             font-family:Arial,Adobe Helvetica,Helvetica;
             text-decoration:none;
             color:#26507e;
+            cursor: pointer;
+            cursor: hand;
           }
 
 

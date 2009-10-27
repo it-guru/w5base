@@ -3,6 +3,7 @@
 'DetailDelete'=>{de=>'löschen',en=>'delete'},
 'DetailCopy'=>{de=>'kopieren',en=>'copy'},
 'DetailClose'=>{de=>'schließen',en=>'close'},
+'DetailLogin'=>{de=>'W5Base login',en=>'W5Base login'},
 'DetailPrint'=>{de=>'drucken',en=>'print'},
 "can't interpret input format"=>{de=>'Dateiformat kann nicht interpretiert werden'},
 'start upload'=>{de=>'Upload starten'},

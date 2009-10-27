@@ -1195,6 +1195,8 @@ sub getDetailFunctionsCode
    my $detaily=$self->DetailY();
    my $copyo="";
    my $UserCache=$self->Cache->{User}->{Cache};
+   my $loginurl="../../../auth/".$self->Self."/Detail";
+   $loginurl=~s/::/\//g;
    if (defined($UserCache->{$ENV{REMOTE_USER}})){
       $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
    }
@@ -1243,6 +1245,11 @@ function DetailCopy(id)
 {
    $copyo;
 }
+function DetailLogin()
+{
+   document.forms[0].action="$loginurl";
+   document.forms[0].submit(); 
+}
 function FinishDelete(returnVal,isbreak)
 {
    if (!isbreak){
@@ -1290,9 +1297,11 @@ sub getDetailFunctions
 {
    my $self=shift;
    my $rec=shift;
-   my @f=($self->T("DetailPrint")=>'DetailPrint',
-          $self->T("DetailClose")=>'DetailClose',
-         );
+   my @f=($self->T("DetailPrint")=>'DetailPrint');
+   if ($ENV{REMOTE_USER} eq "anonymous"){
+      push(@f,$self->T("DetailLogin")=>'DetailLogin');
+   }
+   push(@f,$self->T("DetailClose")=>'DetailClose');
    if (defined($rec) && $self->isDeleteValid($rec)){
      # my $idname=$self->IdField->Name();
      # my $id=$rec->{$idname};

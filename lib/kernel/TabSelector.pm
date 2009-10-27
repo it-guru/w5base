@@ -61,9 +61,9 @@ EOF
                          $param{activpage} eq "");
          my $state="Inactiv";
          $state="Activ" if ($CurMode eq $f);
-         my $flink="<a class=${name}$state ".
-                   "href=JavaScript:${name}Set(\"$f\")>".
-                   "$pages{${f}}</a>";
+         my $flink="<span class=${name}$state ".
+                   "onclick=${name}Set(\"$f\")>".
+                   "$pages{${f}}</span>";
          my $width="";
          $width=" width=$param{tabwidth}" if (defined($param{tabwidth}));
          push(@ml,"<td class=${name}$state$width>$flink</td>");

@@ -569,7 +569,7 @@ EOF
              $keylist,$vallist,$list)=$user->getHtmlTextDrop("addcon",$oldval,
                                              vjoindisp=>'fullname',
                                              fields=>['userid','email'],
-                                             vjoineditbase=>{cistatusid=>'4'});
+                                             vjoineditbase=>{cistatusid=>\'4'});
          if (defined($n) && $n==1 && $list->[0]->{userid}=~m/^\d+$/){
             my $adduserid=$list->[0]->{userid};
             my $email=$list->[0]->{email};
