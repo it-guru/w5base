@@ -79,6 +79,13 @@ sub new
                 label       =>'Account',
                 dataobjattr =>'passxentry.username'),
 
+      new kernel::Field::Text(
+                name        =>'sshloginname',
+                label       =>'SSH Loginname',
+                htmldetail  =>0,
+                dataobjattr =>"concat(passxentry.username,'\@',".
+                              "passxentry.systemname)"),
+
       new kernel::Field::Link(
                 name          =>'scriptkey',
                 label         =>'ScriptKey',
@@ -291,10 +298,16 @@ sub generateMenuTree
       $self->SecureSetFilter([
                              {modifyuser=>\$userid,
                               name=>"*$flt*"},
+
                              {modifyuser=>\$userid,
                               comments=>"*$flt*"},
+
                              {modifyuser=>\$userid,
                               quickpath=>"*$flt*"},
+
+                             {modifyuser=>\$userid,
+                              sshloginname=>"*$flt*"},
+
                              {aclmode=>['write','read'],
                               acltarget=>\'base::user',
                               acltargetid=>[$userid],
@@ -316,6 +329,12 @@ sub generateMenuTree
                               entrytypeid=>'<=10',
                               account=>"*$flt*"},
                              {aclmode=>['write','read'],
+                              acltarget=>\'base::user',
+                              acltargetid=>[$userid],
+                              entrytypeid=>'<=10',
+                              sshloginname=>"*$flt*"},
+
+                             {aclmode=>['write','read'],
                               acltarget=>\'base::grp',
                               acltargetid=>[keys(%groups)],
                               entrytypeid=>'<=10',
@@ -335,6 +354,12 @@ sub generateMenuTree
                               acltargetid=>[keys(%groups)],
                               entrytypeid=>'<=10',
                               account=>"*$flt*"},
+                             {aclmode=>['write','read'],
+                              acltarget=>\'base::grp',
+                              acltargetid=>[keys(%groups)],
+                              entrytypeid=>'<=10',
+                              sshloginname=>"*$flt*"},
+
                              ]);
    }
    else{
