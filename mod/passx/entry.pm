@@ -738,7 +738,7 @@ sub FrontendSetFilter
 {
    my $self=shift;
    my $userid=shift;
-   my %groups=$self->getGroupsOf($userid,'RMember','both');
+   my %groups=$self->getGroupsOf($userid,'RMember','direct');
    return($self->SUPER::SecureSetFilter([{modifyuser=>\$userid},
                                          {aclmode=>['write','read'],
                                           acltarget=>\'base::user',
