@@ -1594,6 +1594,9 @@ sub getHtmlTextDrop
       if (defined($self->{vjoineditbase})){
          $self->SetNamedFilter("EDITBASE",$self->{vjoineditbase});
       }
+      if (defined($p{vjoineditbase})){
+         $self->SetNamedFilter("EDITBASE",$p{vjoineditbase});
+      }
       $self->SetFilter($filter);
       ($dropbox,$keylist,$vallist,$list)=$self->getHtmlSelect(
                                                   "Formated_$name",
