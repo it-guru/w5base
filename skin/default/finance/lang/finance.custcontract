@@ -10,7 +10,7 @@
 'Contract Name'=>{de=>'Vertragbezeichnung'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'Applications'=>{de=>'Anwendungen'},
-'Debuty Service Manager'=>{de=>'Service Manager Vertreter'},
+'Debuty Customer Business Manager'=>{de=>'Customer Business Manager Vertreter'},
 'no valid databoss defined'=>{
           de=>'kein gültiger Datenverantwortlicher eingegeben'},
 'you are not authorized to set other persons as databoss'=>{

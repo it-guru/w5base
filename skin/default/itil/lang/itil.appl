@@ -10,7 +10,7 @@
 'you are only authorized to add in \'order\' or \'reserved\' state'=>{de=>'Sie sind nur berechtig, im Status \'angefordert\' oder \'reserviert\' Datensätze zu erzeugen'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'Databoss E-Mail'=>{de=>'Datenverantwortlicher E-Mail'},
-'Deputy Service Manager'=>{de=>'Service Manager Vertreter'},
+'Deputy Customer Business Manager'=>{de=>'Customer Business Manager Vertreter'},
 'Deputy Technical Solution Manager'=>{de=>'TSM Vertreter'},
 'Technical Solution Manager Office-Phone'=>{de=>'Technical Solution Manager Telefonnummer'},
 'Technical Solution Manager Mobile-Phone'=>{de=>'Technical Solution Manager Handy-Nummer'},
