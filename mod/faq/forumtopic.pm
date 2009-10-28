@@ -72,7 +72,7 @@ sub new
                 htmlwidth     =>'5px',
                 group         =>'stat',
                 htmldetail    =>1,
-                depend        =>['viewcount','entrycount','isreaded'],
+                depend        =>['viewcount','isreaded'],
                 label         =>'Topic Symbol',
                 weblink       =>sub{
                                    my $self=shift;
@@ -80,8 +80,7 @@ sub new
                                    my $mode=shift;
                                    
                                    my $ico="forum_topic";
-                                   if ($current->{viewcount}>100 ||
-                                       $current->{entrycount}>30){
+                                   if ($current->{viewcount}>100){
                                       $ico="forum_hottopic";
                                    }
                                    if ($current->{isreaded}){
@@ -116,7 +115,7 @@ sub new
                 searchable    =>0,
                 readonly      =>1,
                 sqlorder      =>'none',
-                dataobjattr   =>'count(forumentry.id)'),
+                onRawValue    =>\&countEntries),
                                     
       new kernel::Field::Date(
                 name          =>'lastentrymdate',
@@ -251,6 +250,16 @@ sub new
    $self->{DetailY}=520;
    $self->setWorktable("forumtopic");
    return($self);
+}
+
+sub countEntries
+{
+   my $self=shift;
+   my $current=shift;
+   my $e=$self->getParent->getPersistentModuleObject("faq::forumentry");
+   $e->ResetFilter();
+   $e->SetFilter({forumtopic=>\$current->{id}});
+   return($e->CountRecords());
 }
 
 
