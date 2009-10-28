@@ -74,7 +74,7 @@ sub mkchmreport
    if (defined($rec)){
       do{
          msg(INFO,"process $rec->{srcid}");
-         my $add=CompressHash(Datafield2Hash($rec->{additional}));
+         my $add=CompressHash($rec->{additional});
          msg(DEBUG,"ServiceCenterCoordinator=%s",
                    $add->{ServiceCenterCoordinator});
          if ($add->{ServiceCenterCoordinator} eq "CSS.TCOM.CHM-MGR"){

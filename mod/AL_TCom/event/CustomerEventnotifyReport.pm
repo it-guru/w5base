@@ -48,7 +48,6 @@ sub CustomerEventnotifyReport
    my $self=shift;
    my %param=@_;
    my %flt;
-   msg(DEBUG,"param=%s",Dumper(\%param));
    if ($param{customer} ne ""){
       my $c=$param{customer};
       $flt{customer}="$param{customer} $param{customer}.*";
@@ -134,7 +133,7 @@ sub CustomerEventnotifyReport
    my @control=({DataObj=>$wf,
                  sheet=>'Ereignisinfo',
                  filter=>{eventend=>$param{'eventend'},
-                          id=>\'12502631710002',
+#                         id=>\'12502631710002',
                           isdeleted=>'0',
                           class=>'AL_TCom::workflow::eventnotify'},
                  order=>'eventendrev',
