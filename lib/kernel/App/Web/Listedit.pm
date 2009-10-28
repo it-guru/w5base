@@ -39,6 +39,68 @@ sub new
    return($self);
 }  
 
+sub ModuleObjectInfo
+{
+   my $self=shift;
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css',
+                                   'kernel.App.Web.ModuleObjectInfo.css'],
+                           js=>['toolbox.js'],
+                           title=>$self->T('Module Object Information'),
+                           form=>1);
+   print("<table width=98%>");
+   printf("<tr><td valign=top nowrap><b>%s:</b></td>",$self->T("Frontend name"));
+   printf("<td>%s</td></tr>",$self->T($self->Self,$self->Self));
+   printf("<tr><td valign=top nowrap><b>%s:</b></td>",$self->T("Internal object name"));
+   printf("<td>%s</td></tr>",$self->Self);
+   printf("<tr><td valign=top nowrap><b>%s:</b></td>",$self->T("Self as parent object"));
+   printf("<td>%s</td></tr>",$self->SelfAsParentObject);
+   printf("<tr><td valign=top nowrap><b>%s:</b></td>",$self->T("Parent classes"));
+   printf("<td>%s</td></tr>",join(", ",@ISA));
+   printf("<tr><td valign=bottom><b>%s:</b></td>",$self->T("Datafields"));
+   printf("<td align=right><span class=sublink>".
+          "<img border=0 style=\"margin-bottom:2px\" onclick=doPrint() ".
+          "src=\"../../../public/base/load/miniprint.gif\"></span>".
+          "</td></tr>");
+   printf("<tr><td colspan=2>");
+   printf("<div class=fieldlist><center><table border=1 width=520>");
+      print("<tr>");
+      printf("<td><b>%s</b></td>",$self->T("Frontend field"));
+      printf("<td width=1%% nowrap><b>%s</b></td>",$self->T("Internal field"));
+      printf("<td width=1%% nowrap><b>%s</b></td>",$self->T("Field type"));
+      printf("<td width=1%% nowrap><b>%s</b></td>",$self->T("Searchable"));
+      print("</tr>");
+   foreach my $fo ($self->getFieldObjsByView([qw(ALL)])){
+      print("<tr>");
+      my $label=$fo->Label();
+      $label=~s/\// \/ /g;
+      $label=~s/-/ - /g;
+      $label="&nbsp; &nbsp;" if ($label=~m/^\s*$/);
+      printf("<td valign=top>%s</td>",$label);
+      printf("<td valign=top>%s</td>",$fo->Name());
+      printf("<td valign=top>%s</td>",$fo->Type());
+      printf("<td align=center>%s</td>",
+             $fo->searchable ? $self->T("yes") : $self->T("no"));
+      print("</tr>");
+   }
+   printf("</table></div>");
+   
+   printf("</td></tr>");
+   print("</table>");
+   print(<<EOF);
+<script language="JavaScript">
+function doPrint()
+{
+   window.print();
+}
+</script>
+EOF
+
+
+   print $self->HtmlBottom(form=>1);
+}
+
 sub addAttach
 {
    my $self=shift;
@@ -105,7 +167,7 @@ sub getValidWebFunctions
             New Copy FormatSelect Bookmark startWorkflow
             DeleteRec InitWorkflow AsyncSubListView 
             EditProcessor ViewProcessor HandleQualityCheck
-            ViewEditor ById);
+            ViewEditor ById ModuleObjectInfo);
    if ($self->can("HtmlHistory")){
       push(@l,qw(HtmlHistory HistoryResult));
    }

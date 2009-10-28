@@ -1,0 +1,23 @@
+body{
+  margin:5px;
+}
+
+div.fieldlist{
+   margin-top:3px;
+   height:240px;
+   overflow:auto;
+}
+
+@media print{
+   div.fieldlist{
+      height:auto;
+   }
+   div.sublink{
+      display:none;
+      visblitity:hidden;
+   }
+   body{
+      background: #FFFFFF;
+   }
+}
+

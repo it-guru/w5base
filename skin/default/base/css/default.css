@@ -167,6 +167,10 @@ iframe.popupFrame {
 	cursor: pointer;
 	cursor: hand;
 }
+#ModuleObjectInfo{
+	cursor: pointer;
+	cursor: hand;
+}
 #popupTitle {
 	float:left;
 	font-size: 1.1em;

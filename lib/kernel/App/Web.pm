@@ -314,6 +314,7 @@ sub DatabaseLowInit
    return(1);
 }
 
+
 sub getAppTitleBar
 {
    my $self=shift;
@@ -333,12 +334,18 @@ sub getAppTitleBar
       $onclick=" ";
    }
    $param{title}=$self->T($self->Self,$self->Self) if (!defined($param{title}));
+   my $titleonclick="";
+   if ($self->can("ModuleObjectInfo")){
+      $titleonclick="onclick=\"ModuleObjectInfo();\" id=ModuleObjectInfo";
+   }
    my $titlebar=sprintf("<tr class=TitleBar><td nowrap align=left>".
-                 "<div style=\"margin:0;padding:0;padding-left:5px;".
+                 "<div $titleonclick ".
+                 "style=\"margin:0;padding:0;padding-left:5px;".
                  "overflow:hidden\">".
                  "%s&nbsp;</div></td>".
                  "<td align=right nowrap><div $onclick ".
-                 "style=\"margin:0;padding:0;padding-right:5px;margin-left:10px;\">%s</div>".
+                 "style=\"margin:0;padding:0;padding-right:5px;".
+                 "margin-left:10px;\">%s</div>".
                  "</td></tr>",$param{title},
                                     $self->T("Logged in as")." ".$user);
    $d=<<EOF;
@@ -362,6 +369,10 @@ function RestartApp(retVal,isbreak)
 function UserMask()
 {
    showPopWin('$prefix../../base/usermask/Main',500,200,RestartApp);
+}
+function ModuleObjectInfo()
+{
+   showPopWin('${prefix}ModuleObjectInfo',580,400);
 }
 </script>
 EOF
