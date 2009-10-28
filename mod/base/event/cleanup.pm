@@ -52,9 +52,13 @@ sub CleanupWebFS
    if ($param{'path'} eq ""){
       return({exitcode=>1,msg=>'no cleanup path specified'});
    }
+   $param{'path'}=~s/^webfs:\///i;
+   $param{'path'}=~s/^\///i;
+
    if ($param{'cdate'} eq ""){
       return({exitcode=>1,msg=>'no cleanup cdate specified'});
    }
+   my $j=getModuleObject($self->Config,"base::joblog");
    my $webfs=getModuleObject($self->Config,"base::filemgmt");
    my $webfsop=$webfs->Clone();
    $webfs->SetFilter({fullname=>$param{'path'},
@@ -68,10 +72,20 @@ sub CleanupWebFS
       do{
          msg(INFO,"process $rec->{fullname}");
          if ($param{force} ne "1"){
-            msg(ERROR,"'$rec->{fullname}' should be deleted but no force set");
+            msg(ERROR,"'$rec->{fullname}' ($rec->{cdate}) ".
+                      "delete needed but no force set");
          }
          else{
-            $c++;
+            if ($webfsop->ValidatedDeleteRecord($rec)){
+               $j->ValidatedInsertRecord({event=>'CleanupWebFS '.
+                                         join(" ",map({"'".$_."'"} %param)),
+                                          pid=>$$,
+                                          exitcode=>0,
+                                          method=>"unlink('$rec->{fullname}')",
+                                          exitmsg=>"'$rec->{fullname}' deleted",
+                                          exitstate=>'OK'});
+               $c++;
+            }
          }
          ($rec,$msg)=$webfs->getNext();
       } until(!defined($rec));
