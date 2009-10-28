@@ -80,7 +80,7 @@ sub new
                                     
      new kernel::Field::TextDrop(
                 name          =>'sem',
-                label         =>'Service Manager',
+                label         =>'Customer Business Manager',
                 searchable    =>0,
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['semid'=>'lempldeptid'],
@@ -89,7 +89,7 @@ sub new
      new kernel::Field::TextDrop(
                 name          =>'sememail',
                 htmldetail    =>0,
-                label         =>'Service Manager E-Mail',
+                label         =>'Customer Business Manager E-Mail',
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['semid'=>'lempldeptid'],
                 vjoindisp     =>'email'),

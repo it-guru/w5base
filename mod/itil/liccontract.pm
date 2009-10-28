@@ -91,7 +91,7 @@ sub new
                 name          =>'responseteam',
                 htmlwidth     =>'300px',
                 group         =>'finance',
-                label         =>'Service Management Team',
+                label         =>'CBM Team',
                 vjointo       =>'base::grp',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['responseteamid'=>'grpid'],
@@ -105,7 +105,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'sem',
                 group         =>'finance',
-                label         =>'Service Manager',
+                label         =>'Customer Business Manager',
                 vjointo       =>'base::user',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['semid'=>'userid'],
@@ -118,7 +118,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'sem2',
                 group         =>'finance',
-                label         =>'Deputy Service Manager',
+                label         =>'Deputy Customer Business Manager',
                 vjointo       =>'base::user',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['sem2id'=>'userid'],

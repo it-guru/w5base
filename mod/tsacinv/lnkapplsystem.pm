@@ -100,7 +100,7 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'sem',
-                label         =>'Service Manager',
+                label         =>'Customer Business Manager',
                 group         =>'appldata',
                 translation   =>'tsacinv::appl',
                 htmldetail    =>0,

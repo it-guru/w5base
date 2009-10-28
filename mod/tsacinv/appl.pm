@@ -110,7 +110,7 @@ sub new
                                     
       new kernel::Field::TextDrop(
                 name          =>'sem',
-                label         =>'Service Manager',
+                label         =>'Customer Business Manager',
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['semid'=>'lempldeptid'],
                 vjoindisp     =>'fullname'),
@@ -118,7 +118,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'sememail',
                 htmldetail    =>0,
-                label         =>'Service Manager E-Mail',
+                label         =>'Customer Business Manager E-Mail',
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['semid'=>'lempldeptid'],
                 vjoindisp     =>'email'),
@@ -126,7 +126,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'semldapid',
                 htmldetail    =>0,
-                label         =>'Service Manager LDAPID',
+                label         =>'Customer Business Manager LDAPID',
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['semid'=>'lempldeptid'],
                 vjoindisp     =>'ldapid'),

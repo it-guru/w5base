@@ -203,7 +203,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'sem',
                 group         =>'tscontact',
-                label         =>'Service Manager',
+                label         =>'Customer Business Manager',
                 translation   =>'itil::appl',
                 vjointo       =>'base::user',
                 vjoineditbase =>{'cistatusid'=>[3,4]},

@@ -107,7 +107,7 @@ sub new
       new kernel::Field::Group(
                 name          =>'responseteam',
                 group         =>'finance',
-                label         =>'Service Management Team',
+                label         =>'CBM Team',
                 vjoinon       =>'responseteamid'),
 
       new kernel::Field::Link(
@@ -118,13 +118,13 @@ sub new
       new kernel::Field::Contact(
                 name          =>'sem',
                 group         =>'finance',
-                label         =>'Service Manager',
+                label         =>'Customer Business Manager',
                 vjoinon       =>'semid'),
 
       new kernel::Field::TextDrop(
                 name          =>'sememail',
                 group         =>'finance',
-                label         =>'Service Manager E-Mail',
+                label         =>'Customer Business Manager E-Mail',
                 searchable    =>0,
                 htmldetail    =>0,
                 vjointo       =>'base::user',
@@ -134,7 +134,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'sem2email',
                 group         =>'finance',
-                label         =>'Deputy Service Manager E-Mail',
+                label         =>'Deputy Customer Business Manager E-Mail',
                 searchable    =>0,
                 htmldetail    =>0,
                 vjointo       =>'base::user',
@@ -308,7 +308,7 @@ sub new
                 name          =>'sem2',
                 AllowEmpty    =>1,
                 group         =>'finance',
-                label         =>'Deputy Service Manager',
+                label         =>'Deputy Customer Business Manager',
                 vjoinon       =>'sem2id'),
 
       new kernel::Field::Link(
