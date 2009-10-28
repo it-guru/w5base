@@ -39,7 +39,44 @@ sub Init
 
    $self->RegisterEvent("AutoFinishWorkflows","AutoFinishWorkflows");
    $self->RegisterEvent("CleanupLnkGrpUser","LnkGrpUser");
+   $self->RegisterEvent("CleanupWebFS","CleanupWebFS");
    return(1);
+}
+
+
+sub CleanupWebFS
+{
+   my $self=shift;
+   my %param=@_;
+
+   if ($param{'path'} eq ""){
+      return({exitcode=>1,msg=>'no cleanup path specified'});
+   }
+   if ($param{'cdate'} eq ""){
+      return({exitcode=>1,msg=>'no cleanup cdate specified'});
+   }
+   my $webfs=getModuleObject($self->Config,"base::filemgmt");
+   my $webfsop=$webfs->Clone();
+   $webfs->SetFilter({fullname=>$param{'path'},
+                      cdate=>$param{'cdate'},
+                      parentobj=>\'base::filemgmt',
+                      entrytyp=>\'file'});
+   $webfs->SetCurrentView(qw(ALL));
+   my ($rec,$msg)=$webfs->getFirst(unbuffered=>1);
+   my $c=0;
+   if (defined($rec)){
+      do{
+         msg(INFO,"process $rec->{fullname}");
+         if ($param{force} ne "1"){
+            msg(ERROR,"'$rec->{fullname}' should be deleted but no force set");
+         }
+         else{
+            $c++;
+         }
+         ($rec,$msg)=$webfs->getNext();
+      } until(!defined($rec));
+   }
+   return({exitcode=>0,msg=>"$c files deleted"});
 }
 
 
