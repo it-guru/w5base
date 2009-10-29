@@ -208,7 +208,7 @@ sub new
                 vjointo       =>'itil::swinstance',
                 vjoinbase     =>[{cistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'applid'],
-                vjoindisp     =>['fullname','swnature','cistatus']),
+                vjoindisp     =>['fullname','swnature']),
 
       new kernel::Field::Text(
                 name          =>'businessteambossid',

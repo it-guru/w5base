@@ -225,7 +225,9 @@ sub ProcessLine
          $style.="white-space:nowrap;";
          $nowrap=" nowrap";
       }
-     # $data=~s/-/&#x2011;/g;   # nicht zulässig, da JavaScript vorkommen kann
+      if (!($data=~m/javascript/i)){
+         $data=~s/-/&#x2011;/g;   # nicht zulässig, wenn JavaScript vorkommt
+      }
       $l[$self->{fieldkeys}->{$fieldname}]={data=>$data,
                                             fclick=>$fclick,
                                             align=>$align,
