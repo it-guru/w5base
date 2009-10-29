@@ -117,6 +117,26 @@ sub CustomerEventnotifyReport
                 xlsbgcolor    =>'#F7DBC2',
                 htmldetail    =>0),
       new kernel::Field::Text(
+                name          =>'SCrelationProblemRCluster',
+                label         =>'SC Problem Reason Cluster',
+                xlsbgcolor    =>'#F7DBC2',
+                htmldetail    =>0),
+      new kernel::Field::Text(
+                name          =>'SCrelationProblemSolution',
+                label         =>'SC Problem Solution',
+                xlsbgcolor    =>'#F7DBC2',
+                htmldetail    =>0),
+      new kernel::Field::Text(
+                name          =>'SCrelationProblemSolutionType',
+                label         =>'SC Problem Solution type',
+                xlsbgcolor    =>'#F7DBC2',
+                htmldetail    =>0),
+      new kernel::Field::Text(
+                name          =>'SCrelationProblemCloseType',
+                label         =>'SC Problem Close type',
+                xlsbgcolor    =>'#F7DBC2',
+                htmldetail    =>0),
+      new kernel::Field::Text(
                 name          =>'SCrelationChangeNo',
                 label         =>'ServiceCenter Change',
                 xlsbgcolor    =>'#E2C2F7',
@@ -169,6 +189,11 @@ sub CustomerEventnotifyReport
                            SCrelationProblemNo
                            SCrelationProblemState
                            SCrelationProblemDesc
+                           SCrelationProblemCause
+                           SCrelationProblemRCluster
+                           SCrelationProblemSolution
+                           SCrelationProblemSolutionType
+                           SCrelationProblemCloseType
 
                            SCrelationChangeNo
                            SCrelationChangeState
@@ -240,11 +265,18 @@ sub recPreProcess
       if ($rec->{SCrelationProblemNo} ne ""){
          my $sc=getModuleObject($self->Config,"tssc::prm");
          $sc->SetFilter({problemnumber=>\$rec->{SCrelationProblemNo}});
-         my ($screc,$msg)=$sc->getOnlyFirst(qw(status name cause));
+         my ($screc,$msg)=$sc->getOnlyFirst(qw(status name cause solution
+                                               closetype solutiontype));
          if (defined($screc)){
             $rec->{SCrelationProblemState}=$screc->{status};
             $rec->{SCrelationProblemDesc}=$screc->{name};
             $rec->{SCrelationProblemCause}=$screc->{cause};
+            if (my ($clust)=$screc->{cause}=~m/^\s*(.*)\s*------------------/){
+               $rec->{SCrelationProblemRCluster}=$clust;
+            }
+            $rec->{SCrelationProblemSolution}=$screc->{solution};
+            $rec->{SCrelationProblemCloseType}=$screc->{closetype};
+            $rec->{SCrelationProblemSolutionType}=$screc->{solutiontype};
          }
       }
       # recharge change detail data
