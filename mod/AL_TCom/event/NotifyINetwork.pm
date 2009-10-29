@@ -55,6 +55,23 @@ sub NotifyINetwork
    $wsproxy=$wsproxy->{inetwork} if (ref($wsproxy) eq "HASH");
 
    return({exitcode=>0,msg=>'ok'}) if ($wsuser eq "");
+
+
+   my $wf=getModuleObject($self->getParent->Config(),"base::workflow");
+   $wf->SetFilter({id=>\$param{'id'}});
+   my ($WfRec)=$wf->getOnlyFirst(qw(involvedcustomer));
+   my $involvedcustomer=$WfRec->{involvedcustomer};
+   $involvedcustomer=[$involvedcustomer] if (ref($involvedcustomer) ne "ARRAY");
+   if (!grep(/^DTAG\.T-Home.*/,@$involvedcustomer) &&
+       !grep(/^DTAG$/,@$involvedcustomer){
+      return({exitcode=>0,
+              msg=>'no trigger needed'});
+   }
+
+
+
+
+
    sub SOAP::Transport::HTTP::Client::get_basic_credentials { 
        return $wsuser => $wspass;
    }
