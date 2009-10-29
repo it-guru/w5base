@@ -267,8 +267,8 @@ sub getCustomerControlRecords
                  },
                  {
                   name=>'tpg',
-                  label=>'T-Punkte Gesellschaft',
-                  customer=>'DTAG.TSG DTAG.TSG.*'
+                  label=>'TSG & others',
+                  customer=>'DTAG.TSG DTAG.TSG.* DTAG.GHS DTAG.GHS.*'
                  },
                  {
                   name=>'tsi',
