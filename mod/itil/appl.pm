@@ -910,11 +910,12 @@ sub getWfEventNotifyTargets     # calculates the target email addresses
    my @byorg;
    my @team;
    my %allcustgrp;
-   foreach my $rec ($appl->getHashList(qw(semid sem2id tsmid tsm2id
+   foreach my $rec ($appl->getHashList(qw(semid sem2id tsmid tsm2id delmgrid
                                           responseteamid customerid
                                           businessteamid))){
       foreach my $v (qw(semid sem2id tsmid tsm2id delmgrid)){
-         my $userid=$rec->{$v};
+         my $fo=$appl->getField($v);
+         my $userid=$appl->getField($v)->RawValue($rec);
          push(@byfunc,$userid) if ($userid ne "" && $userid>0);
       }
       foreach my $v (qw(responseteamid businessteamid)){
