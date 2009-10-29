@@ -112,6 +112,11 @@ sub CustomerEventnotifyReport
                 xlsbgcolor    =>'#F7DBC2',
                 htmldetail    =>0),
       new kernel::Field::Text(
+                name          =>'SCrelationProblemCause',
+                label         =>'SC Problem Cause',
+                xlsbgcolor    =>'#F7DBC2',
+                htmldetail    =>0),
+      new kernel::Field::Text(
                 name          =>'SCrelationChangeNo',
                 label         =>'ServiceCenter Change',
                 xlsbgcolor    =>'#E2C2F7',
@@ -153,7 +158,6 @@ sub CustomerEventnotifyReport
                            eventstart 
                            eventend
                            eventduration
-                           name
                            wffields.eventdesciption
 
                            SCrelationPathNo
@@ -192,11 +196,15 @@ sub recPreProcess
       }   
    }
    return(0) if (!$found);
+   return(0) if ($rec->{eventstatclass}!=1 &&
+                 $rec->{eventstatclass}!=2 &&
+                 $rec->{eventstatclass}!=3);
    my @newrecview;
    foreach my $fld (@$recordview){
       my $name=$fld->Name;
       next if ($name eq "affectedapplicationid");
       next if ($name eq "eventinmrelations");
+      next if ($name eq "SCrelationPathNo");
       push(@newrecview,$fld);
    }
    @{$recordview}=@newrecview;
@@ -220,10 +228,10 @@ sub recPreProcess
       if ($rec->{SCrelationIncidentNo} ne ""){
          my $sc=getModuleObject($self->Config,"tssc::inm");
          $sc->SetFilter({incidentnumber=>\$rec->{SCrelationIncidentNo}});
-         my ($screc,$msg)=$sc->getOnlyFirst(qw(status description));
+         my ($screc,$msg)=$sc->getOnlyFirst(qw(status name));
          if (defined($screc)){
             $rec->{SCrelationIncidentState}=$screc->{status};
-            $rec->{SCrelationIncidentDesc}=$screc->{description};
+            $rec->{SCrelationIncidentDesc}=$screc->{name};
          }
       }
       # recharge problem detail data
@@ -232,10 +240,11 @@ sub recPreProcess
       if ($rec->{SCrelationProblemNo} ne ""){
          my $sc=getModuleObject($self->Config,"tssc::prm");
          $sc->SetFilter({problemnumber=>\$rec->{SCrelationProblemNo}});
-         my ($screc,$msg)=$sc->getOnlyFirst(qw(status description));
+         my ($screc,$msg)=$sc->getOnlyFirst(qw(status name cause));
          if (defined($screc)){
             $rec->{SCrelationProblemState}=$screc->{status};
-            $rec->{SCrelationProblemDesc}=$screc->{description};
+            $rec->{SCrelationProblemDesc}=$screc->{name};
+            $rec->{SCrelationProblemCause}=$screc->{cause};
          }
       }
       # recharge change detail data
