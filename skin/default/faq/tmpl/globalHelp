@@ -57,6 +57,9 @@
 <td><input type=submit name=dosearch value="%TRANSLATE(Search)%"></td>
 </tr>
 </table>
+<script language="JavaScript">
+setFocus("searchtext");
+</script>
 
 </td>
 </tr>
