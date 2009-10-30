@@ -754,9 +754,9 @@ sub getHashList
       $o->Limit($limit,$limitstart);
    }
    msg(INFO,"SOAPgetHashList in search objectname=$objectname");
-   my @fobjs=$o->getFieldObjsByView($view);
    my @l=$o->getHashList(@$view);
    for(my $c=0;$c<=$#l;$c++){
+      my @fobjs=$o->getFieldObjsByView($view,current=>$l[$c]);
       my %cprec;
       my $objns=$ns;
       $objns="W5Kernel" if ($ns eq "");
