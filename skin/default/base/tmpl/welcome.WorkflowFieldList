@@ -1,0 +1,37 @@
+<table width=100% height=100%><tr><td align=center valign=center>
+<!------------------------------------------------------>
+<div class=dialog style="width:400px">
+<table width=100% cellspacing=4 cellpadding=4>
+<tr><td colspan=2><b>Workflow field lister</b></td></tr>
+<tr>
+<td colspan=2>With this tool, it is posible to list the internal fieldnames
+of a specific workflow ID.
+</td></tr>
+<td colspan=2>
+
+<input type=hidden name="CurrentView" value="(ALL)">
+<input type=hidden name="MyW5BaseSUBMOD" value="base::MyW5Base::searchWorkflow">
+<input type=hidden name="FormatAs" value="FieldnameTrans">
+WorkflowID:<input type=text   name="search_id" value="12560296470002">
+<script language="JavaScript">
+$(document).ready(function() {
+   $("#1").attr("action",
+                "../../../../auth/base/MyW5Base/Result");
+   });
+</script>
+
+</td></tr>
+
+
+
+<tr>
+<td colspan=2 align=center><input type=submit value="show field list of workflow"></td>
+</tr>
+</table>
+</div>
+<div style="text-align:left;width:400px;height:200px;overflow:auto">
+%LASTMSG(RAW)%
+</div>
+<!------------------------------------------------------>
+</td></tr></table>
+-->

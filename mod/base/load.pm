@@ -53,9 +53,8 @@ sub Run
       print $self->HtmlHeader(style=>['default.css','mainwork.css'],
                               prefix=>"../",
                               title=>$title,
+                              js=>['toolbox.js','jquery.js'],
                               body=>1,form=>1);
-      print "<script language=\"JavaScript\" ".
-            "src=\"../../../base/load/toolbox.js\"></script>";
       my $translation=$self->SkinBase();
       $translation.="::template.messages";
       print $self->getParsedTemplate($func,{translation=>$translation,
