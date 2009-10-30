@@ -53,7 +53,7 @@ sub Run
       print $self->HtmlHeader(style=>['default.css','mainwork.css'],
                               prefix=>"../",
                               title=>$title,
-                              js=>['toolbox.js','jquery.js'],
+                              js=>['toolbox.js','jquery.js','jquery.ui.js'],
                               body=>1,form=>1);
       my $translation=$self->SkinBase();
       $translation.="::template.messages";

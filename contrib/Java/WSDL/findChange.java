@@ -30,7 +30,8 @@ public class findChange {
     // prepare the query parameters
     Flt.setSrcid(args[0]);
     FindRecordInput.setFilter(Flt);
-    FindRecordInput.setView("id,srcid,name,additional,affectedapplication");
+    FindRecordInput.setView("id,srcid,name,additional,affectedapplication,"+
+                            "wffields.changedescription");
 
     // do the Query
     Result=W5Port.findRecord(FindRecordInput);

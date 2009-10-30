@@ -376,6 +376,7 @@ sub SOAP
 {
    my $self=shift;
 
+   $ENV{CONTENT_TYPE}=~s/application\/x-www-form-urlencoded,\s*//; # for IE JS
    $self->Log(INFO,"soap",
               "request: user='$ENV{REMOTE_USER}' ip='$ENV{REMOTE_ADDR}'");
    $W5Base::SOAP=$self;
@@ -871,7 +872,6 @@ sub Finish
                                       ->value($result->{lastmsg});
       }
    }
-#printf STDERR ("fifi d=%s\n",Dumper($result));
    return(SOAP::Data->name(output=>$result));
 }
 
