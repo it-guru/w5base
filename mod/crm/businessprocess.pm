@@ -245,6 +245,7 @@ sub Validate
    if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
       return(0);
    }
+
    ########################################################################
    # standard security handling
    #
@@ -271,6 +272,7 @@ sub Validate
       $self->LastMsg(ERROR,"invalid or no customer specified");
       return(0);
    }
+   return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"name"));
 
    return(1);
 }

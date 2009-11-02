@@ -197,11 +197,8 @@ sub SecureValidate
    my $oldrec=shift;
    my $newrec=shift;
 
-printf STDERR ("fifi 01 SecureValidate\n");
    if (!defined($oldrec)){
-printf STDERR ("fifi 02 SecureValidate\n");
       if (!$self->IsMemberOf("admin")){
-printf STDERR ("fifi 03 SecureValidate\n");
          my $userid=$self->getCurrentUserId();
          $newrec->{contactid}=$userid;
       }
@@ -209,6 +206,18 @@ printf STDERR ("fifi 03 SecureValidate\n");
 
    return(1);
 }
+
+
+sub isCopyValid
+{
+   my $self=shift;
+   my $rec=shift;  # if $rec is not defined, insert is validated
+   if ($self->isWriteValid()){
+      return(1);
+   }
+   return(0);
+}
+
 
 
 sub Validate
@@ -291,8 +300,9 @@ sub isWriteValid
   
    if (!defined($rec)){
       return("default") if ($self->IsMemberOf("admin"));
-      $self->SetFilter({contactid=>\$userid});
-      my ($rec,$msg)=$self->getOnlyFirst(qw(id));
+      my $o=$self->Clone();
+      $o->SetFilter({contactid=>\$userid});
+      my ($rec,$msg)=$o->getOnlyFirst(qw(id));
       if (defined($rec)){
          return("default");
       }
