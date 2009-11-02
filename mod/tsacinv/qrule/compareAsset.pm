@@ -8,6 +8,7 @@ This qulaity rule compares a W5Base physical system to an AssetManager physical
 system (Asset) and updates on demand nessasary fields.
 Unattended Imports are only done, if the field "Allow automatic interface
 updates" is set to "yes".
+Only assets in W5Base with state "installed/active" will be synced!
 
 =head3 IMPORTS
 

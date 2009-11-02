@@ -10,6 +10,8 @@ Unattended Imports are only done, if the field "Allow automatic interface
 updates" is set to "yes".
 If a logical system is a workstation, no DataIssue Workflow is started on
 a missing systemid.
+Only logical systems in W5Base with state "installed/active" will be synced!
+
 
 =head3 IMPORTS
 
