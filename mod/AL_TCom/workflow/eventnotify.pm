@@ -190,6 +190,19 @@ sub calcSCrelationsSubTree
       $sclnk->SetFilter({src=>\$id,dst=>"CHM*"});
    }
    my @rel=$sclnk->getHashList(qw(dst dstobj));
+   if ($level==0){
+      my @subprm;
+      foreach my $prm (@rel){
+         push(@subprm,$prm->{dst}) if ($prm->{dst}=~m/^PRM/);
+      }
+      if ($#subprm!=-1){
+         $sclnk->SetFilter({src=>\@subprm,dst=>"PRM*"});
+         my @subrel=$sclnk->getHashList(qw(dst dstobj));
+         if ($#subrel!=-1){
+            push(@rel,@subrel);
+         }
+      }
+   }
    for(my $laypos=0;$laypos<=$#rel;$laypos++){
       push(@$path,$id);
       my $s=$self->calcSCrelationsSubTree($sclnk,$chk,$treelist,$path,
