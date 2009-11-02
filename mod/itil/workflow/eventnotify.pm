@@ -1788,6 +1788,7 @@ sub nativProcess
          my ($arec,$msg)=$appl->getOnlyFirst(qw(name customer customerid 
                                                 mandator mandatorid conumber
                                                 responseteam businessteam
+                                                eventlang
                                                 custcontracts id));
          if (defined($arec)){
             $app=$arec->{name};
@@ -1798,6 +1799,7 @@ sub nativProcess
             $h->{involvedbusinessteam}=[$arec->{businessteam}];
             $h->{involvedresponseteam}=[$arec->{businessteam}];
             $h->{involvedcostcenter}=[$arec->{conumber}];
+            $h->{eventlang}=$arec->{eventlang};
             my @custcontract;
             my @custcontractid;
             if (!$self->getParent->ValidateCreate($h)){
