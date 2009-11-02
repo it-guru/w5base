@@ -1,4 +1,4 @@
-'base::interview'=>{de=>'Objekt Befragung',en=>'Object Interview'},
+'base::interview'=>{de=>'Config-Item Interview',en=>'Config-Item Interview'},
 'Question'=>{de=>'Frage'},
 'Questiongroup'=>{de=>'Fragegruppe'},
 'parent Ojbect'=>{de=>'Elternobjekt'},
@@ -18,3 +18,4 @@
 'explanation'=>{de=>'Erläuterung'},
 'Interview Question Details'=>{de=>'Interview Frage Details'},
 'Question-Info'=>{de=>'Frage-Erläuterung'},
+'invalid question group specified'=>{de=>'ungültige Fragegruppe'},

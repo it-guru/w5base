@@ -1,33 +1,41 @@
-<!--
 <script type='text/javascript' 
- src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'>
+        src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'>
 </script>
--->
-<script language="JavaScript" src="../../../../public/base/load/j5base.js">
+<script language="JavaScript" 
+        src="../../../../public/base/load/j5base.js">
 </script>
-
-<script language="JavaScript">
-function doSearch()
-{
-   var W5Base=getConfig();
-   var appl=getModuleObject(W5Base,"itil::appl");
-   appl.SetFilter({
-                    name:$("#searchtext").val(),
-                    cistatusid:"<=4"
-                  });
-
-   var res=appl.findRecord("name,tsm");
-   var v="";
-   for(c=0;c<res.length;c++){
-      v+=res[c].name+" TSM="+Utf8.decode(res[c].tsm)+"<br>";
-   }
-   $("#act").html(v);
-}
-document.title="J5Base";
+<script language="JavaScript" 
+        src="../../../../public/base/load/j5base.sampleapp.js">
 </script>
 
-Suche:<input type=text id=searchtext value="*base*">
-<input type=button id=search onClick="doSearch();" value="search">
+<table border=1 width=100%>
+<tr>
+<td colspan=2>
+Search text:<input type=text id=searchtext value="*base*">
+</td>
+</tr>
+<tr>
+<td>
+<input type=button 
+       class=searchButton
+       moduleobject="itil::appl"
+       style="width:100%"
+       value="Search in itil::appl">
+</td>
+<td>
+<input type=button 
+       class=searchButton
+       moduleobject="base::user"
+       style="width:100%"
+       value="Search in base::user">
+</td>
+</tr>
+<tr>
+<td colspan=2>
+<div id=Result></div>
+</td>
+</tr>
+</table>
 
 <div id="act">
 </div>

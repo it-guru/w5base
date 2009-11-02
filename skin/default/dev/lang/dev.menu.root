@@ -10,4 +10,5 @@
 'Tools.dev.texttranslation'=>{de=>'BubbleFish',en=>'BubbleFish'},
 'Tools.dev.tztest'=>{de=>'Timezone Test',en=>'Timezone Test'},
 'Tools.dev.sqlparser'=>{de=>'SQL Parser',en=>'SQL Parser'},
+'Tools.dev.J5Base'=>{de=>'J5Base Demo',en=>'J5Base Demo'},
 

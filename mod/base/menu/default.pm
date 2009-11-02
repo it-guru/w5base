@@ -267,7 +267,7 @@ sub Init
    
    $self->RegisterObj("sysadm.qmgmt",
                       "tmpl/welcome.qmgmt",
-                      defaultacl=>['admin']);
+                      defaultacl=>['valid_user']);
    
    $self->RegisterObj("sysadm.qmgmt.qrule",
                       "base::qrule",
@@ -275,12 +275,12 @@ sub Init
    
    $self->RegisterObj("sysadm.qmgmt.interview",
                       "base::interview",
-                      defaultacl=>['admin']);
+                      defaultacl=>['valid_user']);
    
    $self->RegisterObj("sysadm.qmgmt.interview.new",
                       "base::interview",
                       func=>'New',
-                      defaultacl=>['admin']);
+                      defaultacl=>['valid_user']);
 
    $self->RegisterObj("sysadm.qmgmt.interanswer",
                       "base::interanswer",

@@ -191,6 +191,26 @@ sub new
    return($self);
 }
 
+sub SecureValidate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+printf STDERR ("fifi 01 SecureValidate\n");
+   if (!defined($oldrec)){
+printf STDERR ("fifi 02 SecureValidate\n");
+      if (!$self->IsMemberOf("admin")){
+printf STDERR ("fifi 03 SecureValidate\n");
+         my $userid=$self->getCurrentUserId();
+         $newrec->{contactid}=$userid;
+      }
+   }
+
+   return(1);
+}
+
+
 sub Validate
 {
    my $self=shift;
@@ -200,6 +220,11 @@ sub Validate
    my $name=trim(effVal($oldrec,$newrec,"name"));
    if (length($name)<10 || ($name=~m/^\s*$/i)){
       $self->LastMsg(ERROR,"invalid question specified"); 
+      return(undef);
+   }
+   my $qtag=effVal($oldrec,$newrec,"qtag");
+   if (($qtag=~m/\s/i) || length($qtag)<3){
+      $self->LastMsg(ERROR,"invalid unique query tag specified"); 
       return(undef);
    }
    my $questclust=trim(effVal($oldrec,$newrec,"questclust"));
@@ -264,8 +289,18 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
   
-   return("default") if (!defined($rec) &&
-                         $self->IsMemberOf("admin"));
+   if (!defined($rec)){
+      return("default") if ($self->IsMemberOf("admin"));
+      $self->SetFilter({contactid=>\$userid});
+      my ($rec,$msg)=$self->getOnlyFirst(qw(id));
+      if (defined($rec)){
+         return("default");
+      }
+     
+      return(undef);
+   }
+
+
    return("default") if ($rec->{contactid}==$userid ||
                          $rec->{contact2id}==$userid ||
                          $self->IsMemberOf("admin"));
@@ -404,7 +439,9 @@ sub getHtmlDetailPages
 {
    my $self=shift;
    my ($p,$rec)=@_;
-
+   if (!defined($rec)){ 
+      return($self->SUPER::getHtmlDetailPages($p,$rec));
+   }
    return($self->SUPER::getHtmlDetailPages($p,$rec),
           "Question"=>$self->T("Question-Info"));
 }

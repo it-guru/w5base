@@ -52,8 +52,12 @@ sub Init
                       "../../../static/yui/index.html",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("Tools.dev.firebug",
-                      "http://www.getfirebug.com/docs.html",
+   $self->RegisterObj("Tools.dev.yui",
+                      "../../../static/yui/index.html",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("Tools.dev.J5Base",
+                      "../../../public/base/load/tmpl/welcome.j5base.html",
                       defaultacl=>['valid_user']);
    
    $self->RegisterObj("Tools.dev.selfhtml",

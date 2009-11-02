@@ -47,6 +47,7 @@ sub Validate
    return({}) if (!exists($newrec->{$name}));
    my $newval=$newrec->{$name};
    my $disp=$self->{vjoindisp};
+
    $disp=$disp->[0] if (ref($disp) eq "ARRAY");
    my $filter={$disp=>'"'.trim($newval).'"'};
 
@@ -57,6 +58,10 @@ sub Validate
    }
    if (defined($self->{vjoineditbase})){
       $self->vjoinobj->SetNamedFilter("EDITBASE",$self->{vjoineditbase});
+   }
+   if (defined($newrec->{$self->{vjoinon}->[0]}) &&  # just test !!
+       $newrec->{$self->{vjoinon}->[0]} ne ""){  # if id is already specified
+      $filter={$self->{vjoinon}->[1]=>\$newrec->{$self->{vjoinon}->[0]}};
    }
    $self->vjoinobj->SetFilter($filter);
    my %param=(AllowEmpty=>$self->AllowEmpty);

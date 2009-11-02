@@ -43,7 +43,7 @@
 'sysadm.menu.acl'=>{de=>'Zugriffssteuerung',en=>'Access-Control'},
 'sysadm.qmgmt'=>{de=>'Qualitätsmanagement',en=>'Qualitymanagement'},
 'sysadm.qmgmt.qrule'=>{de=>'Q-Regel',en=>'Q-Rule'},
-'sysadm.qmgmt.interview'=>{de=>'Objekt-Interview',en=>'Object-Interview'},
+'sysadm.qmgmt.interview'=>{de=>'CI-Interview',en=>'CI-Interview'},
 'sysadm.qmgmt.interanswer'=>{de=>'Interview-Antworten',en=>'Interview Answers'},
 'sysadm.qmgmt.interview.new'=>{de=>'Neueingabe',en=>'New'},
 'sysadm.qmgmt.qrule.lnkmandator'=>{de=>'Verkn. Mandant',en=>'Mandator Link'},
