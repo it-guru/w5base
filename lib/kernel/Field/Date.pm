@@ -30,6 +30,7 @@ sub new
    $self->{_permitted}->{timezone}=1;           # Zeitzone des feldes in DB
    $self->{timezone}="GMT"               if (!defined($self->{timezone}));
    $self->{htmlwidth}="150"              if (!defined($self->{htmlwidth}));
+   $self->{xlswidth}="20"                if (!defined($self->{xlswidth}));
    $self->{WSDLfieldType}="xsd:dateTime" if (!defined($self->{WSDLfieldType}));
    return($self);
 }
@@ -353,12 +354,33 @@ sub Unformat
    return({});
 }
 
+
 sub getXLSformatname
 {
    my $self=shift;
-   my $data=shift;
-   return("date.".$self->getParent->Lang());
+   my $xlscolor=$self->xlscolor;
+   my $xlsbgcolor=$self->xlsbgcolor;
+   my $xlsbcolor=$self->xlsbcolor;
+   my $f="date.".$self->getParent->Lang();
+   my $colset=0;
+   if (defined($xlscolor)){
+      $f.=".color=\"".$xlscolor."\"";
+   }
+   if (defined($xlsbgcolor)){
+      $f.=".bgcolor=\"".$xlsbgcolor."\"";
+      $colset++;
+   }
+   if ($colset || defined($xlsbcolor)){
+      if (!defined($xlsbcolor)){
+         $xlsbcolor="#8A8383";
+      }
+      $f.=".bcolor=\"".$xlsbcolor."\"";
+   }
+
+
+   return($f);
 }
+
 
 
 sub prepUploadRecord   # prepair one record on upload

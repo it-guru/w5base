@@ -98,6 +98,7 @@ sub new
    $self->{_permitted}->{xlswidth}=1;   # Breite in der XLS Ausgabe (Spalten)
    $self->{_permitted}->{xlscolor}=1;   # Farbe der Spalte in XLS Ausgabe
    $self->{_permitted}->{xlsbgcolor}=1; # Hintergrund der Spalte in XLS Ausgabe
+   $self->{_permitted}->{xlsbcolor}=1;  # Rahmen der Spalte in XLS Ausgabe
    $self->{_permitted}->{uivisible}=1;  # Anzeige in der Detailsicht bzw. Listen
    $self->{_permitted}->{history}=1;    # Über das Feld braucht History
    $self->{_permitted}->{htmldetail}=1; # Anzeige in der Detailsicht
@@ -961,13 +962,23 @@ sub getXLSformatname
    my $self=shift;
    my $xlscolor=$self->xlscolor;
    my $xlsbgcolor=$self->xlsbgcolor;
+   my $xlsbcolor=$self->xlsbcolor;
    my $f="default";
+   my $colset=0;
    if (defined($xlscolor)){
       $f.=".color=\"".$xlscolor."\"";
    }
    if (defined($xlsbgcolor)){
       $f.=".bgcolor=\"".$xlsbgcolor."\"";
+      $colset++;
    }
+   if ($colset || defined($xlsbcolor)){
+      if (!defined($xlsbcolor)){
+         $xlsbcolor="#8A8383";
+      }
+      $f.=".bcolor=\"".$xlsbcolor."\"";
+   }
+   
 
    return($f);
 }

@@ -816,8 +816,8 @@ EOF
    print("<tr height=1%><td>");
    print("<table border=0 width=100% border=0><tr>\n");
    if ($self->IsMemberOf("admin")){
-      print("<td width=250>");
-      print("<table width=250 border=0 cellspacing=0 cellpadding=0><tr><td>");
+      print("<td width=320>");
+      print("<table width=320 border=0 cellspacing=0 cellpadding=0><tr><td>");
       my $oldval=Query->Param("search_name"); 
       if ($oldval eq ""){
          $oldval=$primrec->{fullname};
@@ -831,7 +831,7 @@ EOF
    else{
       print("<td width=1%>");
       print("<select name=selid onchange=\"changeid(this);\" ".
-            "style=\"width:300px\">");
+            "style=\"width:320px\">");
       while(my $k=shift(@ol)){
          my $label=shift(@ol);
          printf("<option value=\"%s\">%s</option>",$k,$label);

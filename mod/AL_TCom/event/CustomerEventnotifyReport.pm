@@ -16,6 +16,7 @@ package AL_TCom::event::CustomerEventnotifyReport;
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+
 use strict;
 use vars qw(@ISA);
 use kernel;
@@ -57,12 +58,14 @@ sub CustomerEventnotifyReport
    }
 
    my $appl=getModuleObject($self->getParent->Config,"itil::appl");
-   $appl->SetFilter({customer=>$flt{customer}});
+   $appl->SetFilter({customer=>$flt{customer},
+                     criticality=>[qw(CRhigh CRcritical)]});
    $self->{'onlyApplId'}=[];
    foreach my $arec ($appl->getHashList(qw(id))){
       push(@{$self->{'onlyApplId'}},$arec->{id});
    }
    $param{'defaultFilenamePrefix'}="Eventinfo-Report_";
+   $param{'defaultEventend'}=">now-3M";
    %param=kernel::XLSReport::StdReportParamHandling($self,%param);
 
    msg(INFO,"start Report to %s",join(", ",@{$param{'filename'}}));
@@ -141,6 +144,16 @@ sub CustomerEventnotifyReport
                 label         =>'ServiceCenter Change',
                 xlsbgcolor    =>'#E2C2F7',
                 htmldetail    =>0),
+      new kernel::Field::Date(
+                name          =>'SCrelationChangeStart',
+                label         =>'ServiceCenter Change Planned Start',
+                xlsbgcolor    =>'#E2C2F7',
+                htmldetail    =>0),
+      new kernel::Field::Date(
+                name          =>'SCrelationChangeEnd',
+                label         =>'ServiceCenter Change Planned End',
+                xlsbgcolor    =>'#E2C2F7',
+                htmldetail    =>0),
       new kernel::Field::Text(
                 name          =>'SCrelationChangeState',
                 label         =>'SC Change State',
@@ -157,10 +170,12 @@ sub CustomerEventnotifyReport
 
    my @control=({DataObj=>$wf,
                  sheet=>'Ereignisinfo',
-                 filter=>{eventend=>$param{'eventend'},
+                 filter=>{
+                          eventend=>$param{'eventend'},
 #                         id=>\'12502631710002',
                           isdeleted=>'0',
-                          class=>'AL_TCom::workflow::eventnotify'},
+                          class=>'AL_TCom::workflow::eventnotify'
+                         },
                  order=>'eventendrev',
                  lang=>'de',
                  recPreProcess=>\&recPreProcess,
@@ -189,13 +204,14 @@ sub CustomerEventnotifyReport
                            SCrelationProblemNo
                            SCrelationProblemState
                            SCrelationProblemDesc
-                           SCrelationProblemCause
                            SCrelationProblemRCluster
                            SCrelationProblemSolution
                            SCrelationProblemSolutionType
                            SCrelationProblemCloseType
 
                            SCrelationChangeNo
+                           SCrelationChangeStart
+                           SCrelationChangeEnd
                            SCrelationChangeState
                            SCrelationChangeDesc
 
@@ -275,8 +291,14 @@ sub recPreProcess
                $rec->{SCrelationProblemRCluster}=$clust;
             }
             $rec->{SCrelationProblemSolution}=$screc->{solution};
-            $rec->{SCrelationProblemCloseType}=$screc->{closetype};
-            $rec->{SCrelationProblemSolutionType}=$screc->{solutiontype};
+            $rec->{SCrelationProblemCloseType}=
+                         $sc->DataObj_findtemplvar({current=>$screc,
+                                                    mode=>'XlsV01'},
+                                                   "closetype","formated");
+            $rec->{SCrelationProblemSolutionType}=
+                         $sc->DataObj_findtemplvar({current=>$screc,
+                                                    mode=>'XlsV01'},
+                                                   "solutiontype","formated");
          }
       }
       # recharge change detail data
@@ -285,10 +307,19 @@ sub recPreProcess
       if ($rec->{SCrelationChangeNo} ne ""){
          my $sc=getModuleObject($self->Config,"tssc::chm");
          $sc->SetFilter({changenumber=>\$rec->{SCrelationChangeNo}});
-         my ($screc,$msg)=$sc->getOnlyFirst(qw(status description));
+         my ($screc,$msg)=$sc->getOnlyFirst(qw(status name 
+                                               plannedstart plannedend));
          if (defined($screc)){
             $rec->{SCrelationChangeState}=$screc->{status};
-            $rec->{SCrelationChangeDesc}=$screc->{description};
+            $rec->{SCrelationChangeDesc}=$screc->{name};
+            $rec->{SCrelationChangeStart}=$screc->{plannedstart};
+                  #       $sc->DataObj_findtemplvar({current=>$screc,
+                  #                                  mode=>'XlsV01'},
+                  #                                 "plannedstart","formated");
+            $rec->{SCrelationChangeEnd}=$screc->{plannedend};
+                  #       $sc->DataObj_findtemplvar({current=>$screc,
+                  #                                  mode=>'XlsV01'},
+                  #                                 "plannedend","formated");
          }
       }
 

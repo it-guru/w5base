@@ -157,6 +157,11 @@ sub Format
       $name=~s/\.bgcolor=\"(#[0-9a-fA-F]+)\"//g;
       $usebgcolor=$self->getColorIndex($col);
    }
+   my $usebcolor;
+   if (my ($col)=$name=~m/\.bcolor=\"(#[0-9a-fA-F]+)\"/){
+      $name=~s/\.bcolor=\"(#[0-9a-fA-F]+)\"//g;
+      $usebcolor=$self->getColorIndex($col);
+   }
 
    my $format;
    if ($name eq "default"){
@@ -194,6 +199,10 @@ sub Format
       }
       if (defined($usebgcolor)){
          $format->set_bg_color($usebgcolor);
+      }
+      if (defined($usebcolor)){
+         $format->set_border(1);
+         $format->set_border_color($usebcolor);
       }
       $self->{format}->{$formatname}=$format;
       return($self->{format}->{$formatname}); 
@@ -252,19 +261,20 @@ sub ProcessLine
    for(my $cellno=0;$cellno<=$#cell;$cellno++){
       my $field=$cellobj[$cellno];
       my $data=$cell[$cellno];
-      if (defined($data)){
-         my $format=$field->getXLSformatname($data);
-         #printf STDERR ("fifi: field=%s format=%s data=%s\n",$field->Name(),
-         #               $format,$data);
-         if ($format=~m/^date\./){
-            $self->{'worksheet'}->write_date_time($lineno,$cellno,$data,
-                                                  $self->Format($format));
-         }
-         else{
-            $data="'".$data if ($data=~m/^=/);
-            $self->{'worksheet'}->write($lineno,$cellno,$data,
-                                        $self->Format($format));
-         }
+      my $format=$field->getXLSformatname($data);
+      if (!defined($data)){
+         $data="";
+      }
+      if ($format=~m/^date\./){
+     # printf STDERR ("fifi: field=%s format=%s data=%s\n",$field->Name(),
+     #                $format,$data);
+         $self->{'worksheet'}->write_date_time($lineno,$cellno,$data,
+                                               $self->Format($format));
+      }
+      else{
+         $data="'".$data if ($data=~m/^=/);
+         $self->{'worksheet'}->write($lineno,$cellno,$data,
+                                     $self->Format($format));
       }
    }
    return(undef);
@@ -285,6 +295,26 @@ sub ProcessHead
       my $xlscellno=$self->{xlscollindex}->{$view[$cellno]->Name()};
       my $label=$view[$cellno]->Label();
       my $format="header";
+      { # color handling
+         my $xlscolor=$view[$cellno]->xlscolor;
+         my $xlsbgcolor=$view[$cellno]->xlsbgcolor;
+         my $xlsbcolor=$view[$cellno]->xlsbcolor;
+         my $colset=0;
+         if (defined($xlscolor)){
+            $format.=".color=\"".$xlscolor."\"";
+         }
+         if (defined($xlsbgcolor)){
+            $format.=".bgcolor=\"".$xlsbgcolor."\"";
+            $colset++;
+         }
+         if ($colset || defined($xlsbcolor)){
+            if (!defined($xlsbcolor)){
+               $xlsbcolor="#000000";
+            }
+            $format.=".bcolor=\"".$xlsbcolor."\"";
+         }
+      }
+
       if (length($label)>$self->{'maxlen'}->[$cellno]){
          $self->{'maxlen'}->[$xlscellno]=length($label);
       }

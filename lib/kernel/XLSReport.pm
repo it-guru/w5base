@@ -230,6 +230,7 @@ sub StdReportParamHandling
    if ($param{month} ne ""){
       $eventend="$param{month}";
    }
+   my $origeventend=$param{month};
    my $eventendfilename;
    $eventend=$self->getParent->PreParseTimeExpression($eventend,"GMT",
                                                \$eventendfilename);
@@ -261,6 +262,9 @@ sub StdReportParamHandling
       else{
          $param{'filename'}=["${dir}${pref}${names}_${tstr}.xls"];
       }
+   }
+   if ($origeventend eq "" && $param{'defaultEventend'} ne ""){
+      $eventend=$param{'defaultEventend'};
    }
    $param{'eventend'}=$eventend;
    return(%param);
