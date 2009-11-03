@@ -45,6 +45,7 @@ sub Run
          $ENV{HTTP_ACCEPT_LANGUAGE}=Query->Param("HTTP_ACCEPT_LANGUAGE");
       }
    }
+printf STDERR ("fifi load $func\n");
 
    if ($func=~m/^tmpl\//){
       my $title=Query->Param("TITLE");

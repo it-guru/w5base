@@ -27,6 +27,7 @@ use kernel::App;
 use kernel::App::Web::Listedit;
 use RPC::Smart::Client;
 use Crypt::DES;
+use HTTP::Date;
 use Safe;
 use Exporter;
 @EXPORT = qw(&RunWebApp &W5Server);
@@ -1046,6 +1047,8 @@ sub HttpHeader
    }
    else{
       $d.=sprintf("Cache-Control: max-age=%d\n",$param{'cache'});
+      $d.=sprintf("Expires: %s\n",HTTP::Date::time2str(time + $param{'cache'}));
+   #   $d.=sprintf("Last-Modified: Tue, 03 Nov 2009 14:00:03 GMT\n");
    }
    my $disp;
    if (defined($param{'attachment'}) && $param{'attachment'}==1){
