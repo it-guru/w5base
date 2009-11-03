@@ -36,6 +36,7 @@ sub Init
    my $self=shift;
 
 
+   $self->RegisterEvent("wiwTest","wiwTest");
    $self->RegisterEvent("wftest","wftest");
    $self->RegisterEvent("memtest","memtest");
    $self->RegisterEvent("filecheck","filecheck");
@@ -232,6 +233,21 @@ sub SampleEvent2
    my $n=$user->CountRecords();
    msg(DEBUG,"End(Event2): n=$n");
    return({exitcode=>-1});
+}
+
+sub wiwTest
+{
+   my $self=shift;
+
+   my $st=Time::HiRes::time();
+   msg(DEBUG,"Start(wiwTest): %lf",$st);
+   my $user=getModuleObject($self->Config,"tswiw::user");
+   msg(DEBUG,"ModuleFount(wiwTest) \@ sec %lf",Time::HiRes::time()-$st);
+   $user->SetFilter({surname=>'Vog*',givenname=>'*mut'});
+   msg(DEBUG,"CountStart(wiwTest) \@ sec %lf",Time::HiRes::time()-$st);
+   my $n=$user->CountRecords();
+   msg(DEBUG,"End(wiwTest) \@ sec %lf",Time::HiRes::time()-$st);
+   return({exitcode=>0});
 }
 
 sub SampleEvent3

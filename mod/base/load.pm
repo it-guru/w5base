@@ -63,6 +63,23 @@ sub Run
    }
    else{
       if (my ($ext)=$func=~m/\.([a-z]{2,3})$/){
+         my $virtualfile=$self->getSkinFile($self->Module."/virtual/".$func);
+         if (-f $virtualfile){  # virtual file extension is primary to handle
+            $filename=[];       # packing of multiple files in one js file
+            if (open(VF,"<$virtualfile")){
+               while(my $f=<VF>){ 
+                  $f=trim($f);
+                  if ($f ne ""){
+                     $f.=";" if (!$f=~m/;$/);
+                     eval("\$f=$f");
+                     if ($@ eq ""){
+                        push(@$filename,$f);
+                     }
+                  }
+               }
+               close(VF);
+            }
+         }
          if ($ext eq "jpg"){
             $content="image/jpg";
             $func=$self->Module."/img/".$func; 
@@ -93,23 +110,33 @@ sub Run
          }
          if ($ext eq "js"){
             $content="text/javascript";
-            $filename=$instdir."/lib/javascript/".$func; 
+            if (!ref($filename)){
+               $filename=$instdir."/lib/javascript/".$func; 
+            }
             $param{cache}=3600;
          }
       }
-      if ($content ne "text/javascript"){
-         $filename=$self->getSkinFile($func);
+      if (ref($filename) ne "ARRAY"){
+         if ($content ne "text/javascript"){
+            $filename=$self->getSkinFile($func);
+         }
+         $filename=[$filename];
       }
       #msg(INFO,"base::load request=$func result filename=$filename");
      
       print $self->HttpHeader($content,%param);
-      if (open(MYF,"<$filename")){
-         binmode MYF;
-         binmode STDOUT;
-         while(<MYF>){
-            print $_;
+      foreach my $file (@$filename){
+         if (open(MYF,"<$file")){
+            binmode MYF;
+            binmode STDOUT;
+            while(<MYF>){
+               print $_;
+            }
+            close(MYF);
          }
-         close(MYF);
+         else{
+            msg(ERROR,"fail to open file '%s'",$file);
+         }
       }
    }
    return(0);

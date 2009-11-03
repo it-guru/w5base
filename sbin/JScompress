@@ -1,0 +1,59 @@
+#!/usr/bin/env perl 
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/../mod";
+use strict;
+use kernel;
+use kernel::config;
+use kernel::EventController;
+use Getopt::Long;
+use kernel::cgi;
+use vars qw($opt_v $opt_h $opt_c $configname);
+my $compressor="$FindBin::Bin/../contrib/javascript-compressor/yuicompressor-2.4.2/build/yuicompressor-2.4.2.jar";
+
+exit(1) if (!GetOptions('verbose'=>\$opt_v,
+                        'debug'=>\$opt_v,
+                        'help'=>\$opt_h,
+                        'config=s'=>\$opt_c));
+
+if ($opt_v){
+   $W5V2::Debug=1;
+}
+else{
+   $W5V2::Debug=0;
+}
+if ($#ARGV==-1 || $opt_h){
+   printf STDERR ("Usage: JScompress [javascript.js javascript.js ...]\n");
+   exit(255);
+}
+msg(INFO,"JScompress wrapper to YUI-Compressor for javascript");
+if (! -f $compressor){
+   msg(ERROR,"can not find yui compressor");
+   msg(ERROR,"jar:".$compressor);
+   exit(1);
+}
+system("java -h >/dev/null 2>&1");
+if ($?){
+   msg(ERROR,"java not in PATH");
+   exit(1);
+}
+printf STDERR ("fifi $?\n");
+
+foreach my $file (@ARGV){
+   if (-r $file){
+      msg(INFO,"process: $file");
+      $file=~s/\.COMPRESSED\.js$/.js/;
+      my $infile=$file;
+      my $outfile=$file;
+      $outfile=~s/\.js$/.COMPRESSED.js/;
+      msg(INFO,"do $infile -> $outfile");
+      my $cmd="java -jar '$compressor' '$infile' -o '$outfile'";
+printf STDERR ("$cmd\n");
+      system($cmd);
+   }
+   else{
+      msg(ERROR,"can not read file $file");
+   }
+}
+
+
