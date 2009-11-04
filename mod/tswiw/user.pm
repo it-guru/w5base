@@ -108,6 +108,11 @@ sub new
                                    label      =>'Status',
                                    dataobjattr=>'organizationalstatus'),
 
+      new kernel::Field::Text(     name       =>'office_wrs',
+                                   group      =>'office',
+                                   label      =>'Workrelationship',
+                                   dataobjattr=>'tTypeOfWorkrelationship'),
+
       new kernel::Field::Text(     name       =>'office_persnum',
                                    group      =>'office',
                                    label      =>'Personal-Number',
