@@ -67,8 +67,66 @@ sub getDynamicFields
                 searchable    =>0,
                 readonly      =>1,
                 delend        =>['eventinmticket'],
-                onRawValue    =>\&calcSCrelations,
-                container     =>'headref'),
+                onRawValue    =>\&calcSCrelations),
+
+      new kernel::Field::Number(
+                name          =>'eventkpistart2firstinfo',
+                translation   =>'AL_TCom::workflow::eventnotify',
+                group         =>'eventnotifyinternal',
+                label         =>'KPI latency eventstart to first info',
+                htmldetail    =>0,
+                searchable    =>0,
+                readonly      =>1,
+                delend        =>['eventstart','shortactionlog'],
+                onRawValue    =>\&calcKPIs),
+
+      new kernel::Field::Number(
+                name          =>'eventkpimintimefollowup',
+                translation   =>'AL_TCom::workflow::eventnotify',
+                group         =>'eventnotifyinternal',
+                label         =>'KPI minimal time between followup infos',
+                htmldetail    =>0,
+                searchable    =>0,
+                readonly      =>1,
+                unit          =>'min',
+                delend        =>['shortactionlog'],
+                onRawValue    =>\&calcKPIs),
+
+      new kernel::Field::Number(
+                name          =>'eventkpimaxtimefollowup',
+                translation   =>'AL_TCom::workflow::eventnotify',
+                group         =>'eventnotifyinternal',
+                label         =>'KPI max time between followup infos',
+                htmldetail    =>0,
+                searchable    =>0,
+                readonly      =>1,
+                unit          =>'min',
+                delend        =>['shortactionlog'],
+                onRawValue    =>\&calcKPIs),
+
+      new kernel::Field::Number(
+                name          =>'eventkpiavgtimefollowup',
+                translation   =>'AL_TCom::workflow::eventnotify',
+                group         =>'eventnotifyinternal',
+                label         =>'KPI avg time between followup infos',
+                htmldetail    =>0,
+                searchable    =>0,
+                readonly      =>1,
+                unit          =>'min',
+                delend        =>['shortactionlog'],
+                onRawValue    =>\&calcKPIs),
+
+      new kernel::Field::Number(
+                name          =>'eventkpieventend2lastinfo',
+                translation   =>'AL_TCom::workflow::eventnotify',
+                group         =>'eventnotifyinternal',
+                label         =>'KPI latency eventend to first info',
+                htmldetail    =>0,
+                searchable    =>0,
+                readonly      =>1,
+                unit          =>'min',
+                delend        =>['eventend','shortactionlog'],
+                onRawValue    =>\&calcKPIs),
 
       new kernel::Field::Text(
                 name          =>'eventchmticket',
@@ -112,6 +170,74 @@ sub isSCproblemSet
    my $current=$param{current};
    return(1) if ($current->{eventprmticket} ne "");
    return(0);
+}
+
+
+sub calcKPIs
+{
+   my $self=shift;
+   my $current=shift;
+
+   
+   my $al=$self->getParent->getField("shortactionlog")->RawValue($current);
+
+   my @tl;
+   if (ref($al) eq "ARRAY"){
+      foreach my $act (@$al){
+         if ($act->{name} eq "sendcustinfo"){
+            push(@tl,$act->{cdate});
+         }
+      }
+   }
+   if ($self->Name() eq "eventkpistart2firstinfo" && $#tl>=0){
+      my $start=$self->getParent->getField("eventstart")->RawValue($current);
+      my $d=CalcDateDuration($start,$tl[0]);
+      my $m=$d->{totalminutes};
+      return(0) if ($m<1);
+      return($m);
+   }
+   elsif ($self->Name() eq "eventkpieventend2lastinfo" && $#tl>0){
+      my $end=$self->getParent->getField("eventend")->RawValue($current);
+      if ($end ne ""){
+         my $d=CalcDateDuration($end,$tl[$#tl]);
+         my $m=$d->{totalminutes};
+         return($m);
+      }
+   }
+   elsif ($#tl>1){
+      my $min;
+      my $max;
+      my $avg;
+      for(my $fn=0;$fn<$#tl;$fn++){
+         my $t1=$tl[$fn];
+         my $t2=$tl[$fn+1];
+         my $d=CalcDateDuration($t1,$t2);
+         my $m=$d->{totalminutes};
+         if (!defined($min) || $min>$m){
+            $min=$m;
+         }
+         if (!defined($max) || $max<$m){
+            $max=$m;
+         }
+         if ($m!=0){
+            $avg=($avg+$m)/2;
+         }
+      }
+      if ($self->Name() eq "eventkpimintimefollowup"){
+         return($min);
+      }
+      if ($self->Name() eq "eventkpiavgtimefollowup"){
+         return($avg);
+      }
+      if ($self->Name() eq "eventkpimaxtimefollowup"){
+         return($max);
+      }
+   }
+
+   printf STDERR ("d=%s\n",Dumper(\@tl));
+
+
+   return(undef);
 }
 
 

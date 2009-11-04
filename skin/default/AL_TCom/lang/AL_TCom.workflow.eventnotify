@@ -27,3 +27,8 @@
 'related incident ticket'=>{de=>'relevantes ServiceCenter Incident-Ticket'},
 'event initiating change number'=>{de=>'Ereignisauslösende Changenummer'},
 'ServiceCenter event relations'=>{de=>'ServiceCenter Ereignisbeziehungen'},
+'KPI latency eventstart to first info'=>{de=>'KPI Verzögerung von Ereignisbeginn bis Erstmeldung'},
+'KPI minimal time between followup infos'=>{de=>'KPI minimale Zeitspanne zu einer Folgemeldung'},
+'KPI max time between followup infos'=>{de=>'KPI maximale Zeitspanne zu einer Folgemeldung'},
+'KPI avg time between followup infos'=>{de=>'KPI durchschnittliche Zeitspanne zu einer Folgemeldung'},
+'KPI latency eventend to first info'=>{de=>'KPI Verzögerung von Ereignisende bis Abschlussmeldung'},
