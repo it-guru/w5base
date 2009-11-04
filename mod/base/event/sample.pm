@@ -74,28 +74,6 @@ sub test
    my $self=shift;
    my $wf=getModuleObject($self->Config,"base::workflow");
 
-   $wf->SetFilter({id=>\"12554404790002"});
-   my ($WfRec,$msg)=$wf->getOnlyFirst(qw(ALL));
-
-   delete($WfRec->{shortactionlog});
-   my %WfRec=%{$WfRec};
-   delete($WfRec{id});
-   delete($WfRec{kh});
-   delete($WfRec{additional});
-   delete($WfRec{headref});
-   my $id=$wf->Store(undef,\%WfRec);
-
-   if ($id ne ""){
-      $wf->SetFilter({id=>\$id});
-      my ($WfRec,$msg)=$wf->getOnlyFirst(qw(ALL));
-      if (defined($WfRec)){
-         my $res=$wf->nativProcess('wfactivate',$WfRec,$id);
-      }
-   }
-   else{
-      die("can not copy");
-   }
-
 
 
 

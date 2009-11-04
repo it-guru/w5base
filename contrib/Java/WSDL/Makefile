@@ -1,4 +1,5 @@
-MOD=base/grp base/user base/workflow AL_TCom/workflow/businesreq base/MyW5Base/wfmyjobs AL_TCom/workflow/change itil/appl AL_TCom/custcontract base/filemgmt
+MOD=base/grp base/user base/workflow AL_TCom/workflow/businesreq base/MyW5Base/wfmyjobs AL_TCom/workflow/change itil/appl AL_TCom/custcontract base/filemgmt 
+
 HOST=localhost
 CONFIG=w5base2
 all:

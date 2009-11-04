@@ -488,6 +488,7 @@ sub initAsyncEnv
       $0.=" MONITOR";
       my @e;
       my $exitstate="unknown";
+      my $emsg;
       my @output;
       my $ppid=POSIX::getppid();
       my $evname="event $label ";
@@ -552,12 +553,14 @@ sub initAsyncEnv
       }
       else{
          my $res=$@;
-         push(@e,"ERROR: eval error on IPC Result");
+         $emsg="ERROR: eval error on IPC Result";
+         push(@e,$emsg);
          push(@e,msg(ERROR,$res));
          push(@e,"ipcval=$ipcval");
       }
       if (!defined($ipcresult)){
-         push(@e,msg(ERROR,"$evname maybe crashed? - no valid ipc results"));
+         $emsg=msg(ERROR,"$evname maybe crashed? - no valid ipc results");
+         push(@e,$emsg);
          push(@e,msg(ERROR,Dumper(\%taskenv)));
          push(@e,msg(ERROR,"old=".Dumper(\%oldtaskenv)));
          push(@e,"ipcval=$ipcval");
@@ -587,11 +590,13 @@ sub initAsyncEnv
                   $exitstate="fail" if ($exitcode>0);
                   $exitstate="ok"   if (defined($exitcode) && $exitcode==0);
                }
-               my $msg=$m->{msg};
-               $msg="" if (!defined($msg));
+               if (defined($m->{msg})){
+                  $emsg=$m->{msg};
+               }
+               $emsg="" if (!defined($emsg));
                $joblog->ValidatedUpdateRecord({id=>$m->{jobid}},
                                              {exitcode=>$exitcode,
-                                              exitmsg=>$msg,
+                                              exitmsg=>$emsg,
                                               exitstate=>$exitstate},
                                              {id=>\$m->{jobid}});
             }

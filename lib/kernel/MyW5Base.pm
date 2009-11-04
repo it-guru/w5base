@@ -337,6 +337,43 @@ sub WSDLaddNativFieldList
                               $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes));
 }
 
+sub WSDLstoreRecord
+{
+   return("");
+}
+
+sub WSDLdeleteRecord
+{
+   return("");
+}
+
+sub WSDLfindRecord
+{
+   my $self=shift;
+   my $uri=shift;
+   my $ns=shift;
+   my $fp=shift;
+   my $module=shift;
+   my $mode=shift;
+   my $XMLbinding=shift;
+   my $XMLportType=shift;
+   my $XMLmessage=shift;
+   my $XMLtypes=shift;
+
+   my $o=$self->getDataObj();
+
+   return("") if (!defined($o));
+   return($o->WSDLfindRecord($uri,$ns,$fp,$module,$mode,
+                         $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes));
+   return($o->WSDLfindRecordRecord($uri,$ns,$fp,$module,$mode,
+                         $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes));
+   return($self->WSDLfindRecordFilter($uri,$ns,$fp,$module,$mode,
+                         $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes));
+}
+
+
+
+
 
 
 

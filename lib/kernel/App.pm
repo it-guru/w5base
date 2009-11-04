@@ -100,6 +100,30 @@ sub W5ServerCall
    return($bk);
 }
 
+sub W5ServerCallGetUniqueIdCached
+{
+   my $self=shift;
+
+#
+#  ToDo - Cached UniqeIDs generieren
+#
+
+#   my $res=$self->W5ServerCall("rpcGetUniqueId");
+#   return($res) if (!defined($res));
+#   my $retry=15;
+#   while(!defined($res=$self->W5ServerCall("rpcGetUniqueId"))){
+#      sleep(1);
+#      last if ($retry--<=0);
+#      msg(WARN,"W5Server problem for user $ENV{REMOTE_USER} ($retry)");
+#   }
+#   if (defined($res) && $res->{exitcode}==0){
+#      $id=$res->{id};
+#   }
+#
+#   my $bk=$self->Cache->{W5Server}->Call($method,@param);
+
+}
+
 sub getCurrentAclModes      # extracts the current acl 
 {                           # (contrib to kernel::App::Web::AclControl)
    my $self=shift;

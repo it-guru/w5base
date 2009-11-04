@@ -100,6 +100,7 @@ sub doQualityCheck
    my ($rec,$msg)=$dataobj->getFirst(unbuffered=>1);
    msg(DEBUG,"check run sql:OK");
    my $time=time();
+   my $c=0;
    if (defined($rec)){
       do{
          msg(DEBUG,"check record start");
@@ -111,9 +112,11 @@ sub doQualityCheck
          else{
             msg(DEBUG,"no qcok field");
          }
+         $c++;
          msg(DEBUG,"check record end");
          ($rec,$msg)=$dataobj->getNext();
-         if (time()-$time>9000){ # 1 hours quality check
+         if (time()-$time>10000){ # 1 hours quality check
+            return({exitcode=>0,msg=>'ok '.$c.' records checked'});
             last;
          }
       }until(!defined($rec));

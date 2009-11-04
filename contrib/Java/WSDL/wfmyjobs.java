@@ -12,7 +12,8 @@ public class wfmyjobs {
 
     // define the needed variables
     net.w5base.mod.base.MyW5Base.wfmyjobs.W5Base        W5Service;
-    net.w5base.mod.base.MyW5Base.wfmyjobs.Port          W5Port;
+    net.w5base.mod.base.MyW5Base.wfmyjobs.W5BaseMyW5BaseWfmyjobsPort
+    W5Port;
     net.w5base.mod.base.MyW5Base.wfmyjobs.Filter        Flt;
     net.w5base.mod.base.MyW5Base.wfmyjobs.FindRecordOut Result;
     net.w5base.mod.base.MyW5Base.wfmyjobs.FindRecordInp FindRecordInput;

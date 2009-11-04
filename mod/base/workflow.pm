@@ -951,7 +951,7 @@ sub getDynamicFields
 #######################################################################
 # WSDL integration
 #######################################################################
-sub WSDLcommon
+sub WSDLWorkflowFieldTypes
 {
    my $self=shift;
    my $o=$self;
@@ -963,7 +963,6 @@ sub WSDLcommon
    my $XMLportType=shift;
    my $XMLmessage=shift;
    my $XMLtypes=shift;
-
 
    $$XMLtypes.="<xsd:complexType name=\"WorkflowActions\">";
    $$XMLtypes.="<xsd:sequence>";
@@ -992,6 +991,24 @@ sub WSDLcommon
    $$XMLtypes.="</xsd:sequence>";
    $$XMLtypes.="</xsd:complexType>";
    $$XMLtypes.="\n";
+
+}
+sub WSDLcommon
+{
+   my $self=shift;
+   my $o=$self;
+   my $uri=shift;
+   my $ns=shift;
+   my $fp=shift;
+   my $class=shift;
+   my $XMLbinding=shift;
+   my $XMLportType=shift;
+   my $XMLmessage=shift;
+   my $XMLtypes=shift;
+
+
+   $self->WSDLWorkflowFieldTypes($uri,$ns,$fp,$class,
+                           $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes);
 
 
    if (defined($class) && defined($self->{SubDataObj}->{$class})){

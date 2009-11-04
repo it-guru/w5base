@@ -85,7 +85,8 @@ sub NotifyPlasma
               msg=>'no data specified'});
    }
    my $soap=SOAP::Lite->proxy($wsproxy)
-            ->on_action(sub{'"urn:PegaRULES:SOAP:DTAGZBBCPLASMADarwinTrigger:DarwinTriggerMain#CreateNewWork"'});
+            ->on_action(sub{'"urn:PegaRULES:SOAP:DTAGZBBCPLASMADarwinTrigger:'.
+                            'DarwinTriggerMain#CreateNewWork"'});
    my $res;
    eval('$res=$soap->call($method=>@SOAPparam);'); 
    if (!defined($res) || ($@=~m/Connection refused/)){

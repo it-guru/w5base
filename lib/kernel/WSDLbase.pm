@@ -93,6 +93,10 @@ sub WSDLcommon
                          $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes);
    $self->WSDLfindRecord($uri,$ns,$fp,$module,
                          $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes);
+   $self->WSDLfindRecordRecord($uri,$ns,$fp,$module,
+                         $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes);
+   $self->WSDLfindRecordFilter($uri,$ns,$fp,$module,
+                         $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes);
    $self->WSDLstoreRecord($uri,$ns,$fp,$module,
                          $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes);
    $self->WSDLdeleteRecord($uri,$ns,$fp,$module,
@@ -247,6 +251,9 @@ sub WSDLdoPing
                                                nillable=>'true'}
                           ],
                      out=>[
+                            userid          =>{type=>'xsd:integer',
+                                               minOccurs=>'0',
+                                               maxOccurs=>'1' },
                             exitcode        =>{type=>'xsd:int',
                                                minOccurs=>'1',
                                                maxOccurs=>'1' },
@@ -602,10 +609,6 @@ sub WSDLfindRecord
    my $XMLportType=shift;
    my $XMLmessage=shift;
    my $XMLtypes=shift;
-   my @flist;
-   if ($o->can("getFieldObjsByView")){
-      @flist=$o->getFieldObjsByView(["ALL"]);
-   }
 
    $$XMLbinding.="<!-- the findRecord() method allows to access all data -->";
    $$XMLbinding.="<operation name=\"findRecord\">";
@@ -669,13 +672,6 @@ sub WSDLfindRecord
    $$XMLtypes.="</xsd:sequence>";
    $$XMLtypes.="</xsd:complexType>";
 
-   $$XMLtypes.="<xsd:complexType name=\"Record\">";
-   $$XMLtypes.="<xsd:sequence>";
-   $self->WSDLfieldList($uri,$ns,$fp,$module,"result",
-                         $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes);
-   $$XMLtypes.="</xsd:sequence>";
-   $$XMLtypes.="</xsd:complexType>";
-
    $$XMLtypes.="<xsd:complexType name=\"findRecordInp\">";
    $$XMLtypes.="<xsd:sequence>";
    $$XMLtypes.="<xsd:element name=\"lang\" ".
@@ -691,6 +687,43 @@ sub WSDLfindRecord
    $$XMLtypes.="</xsd:sequence>";
    $$XMLtypes.="</xsd:complexType>";
 
+}
+
+sub WSDLfindRecordRecord
+{
+   my $self=shift;
+   my $o=$self;
+   my $uri=shift;
+   my $ns=shift;
+   my $fp=shift;
+   my $module=shift;
+   my $XMLbinding=shift;
+   my $XMLportType=shift;
+   my $XMLmessage=shift;
+   my $XMLtypes=shift;
+
+   $$XMLtypes.="<xsd:complexType name=\"Record\">";
+   $$XMLtypes.="<xsd:sequence>";
+   $self->WSDLfieldList($uri,$ns,$fp,$module,"result",
+                         $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes);
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
+
+}
+
+sub WSDLfindRecordFilter
+{
+   my $self=shift;
+   my $o=$self;
+   my $uri=shift;
+   my $ns=shift;
+   my $fp=shift;
+   my $module=shift;
+   my $XMLbinding=shift;
+   my $XMLportType=shift;
+   my $XMLmessage=shift;
+   my $XMLtypes=shift;
+
    $$XMLtypes.="<xsd:complexType name=\"Filter\">";
    $$XMLtypes.="<xsd:sequence>";
    $self->WSDLfieldList($uri,$ns,$fp,$module,"filter",
@@ -698,10 +731,8 @@ sub WSDLfindRecord
    $$XMLtypes.="</xsd:sequence>";
    $$XMLtypes.="</xsd:complexType>";
 
+
 }
-
-
-
 
 
 

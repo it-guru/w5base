@@ -61,8 +61,12 @@ sub WSDLcommon
    $$XMLtypes.="</xsd:restriction>";
    $$XMLtypes.="</xsd:simpleType>";
 
+   $self->getDataObj()->WSDLWorkflowFieldTypes($uri,$ns,$fp,$module,
+                           $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes);
+
+
  
-   return($self->{DataObj}->WSDLcommon($uri,$ns,$fp,$module,
+   return($self->SUPER::WSDLcommon($uri,$ns,$fp,$module,
                               $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes));
 }
 
@@ -86,10 +90,9 @@ sub WSDLaddNativFieldList
                   "name=\"viewstate\" type=\"$ns:viewstate\" />";
    }
 
-   return($self->SUPER::WSDLaddNativFieldList($uri,$ns,$fp,$class,$mode,
+   return($self->getDataObj()->WSDLaddNativFieldList($uri,$ns,$fp,$class,$mode,
                               $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes));
 }
-
 
 
 

@@ -835,8 +835,24 @@ sub doPing
    $param={} if (!ref($param));
    my $ns=$self->_SOAPaction2param($self->{SOAP}->action(),$param);
    $self->Log(INFO,"soap", "Ping: ".$self->{SOAP}->action());
-   my $d=SOAP::Data->name(output=>{exitcode=>0,result=>1});
-   return($d);
+   my $d={exitcode=>0,result=>1};
+   if ($param->{'loadContext'}>0){
+      my $userid=$self->getCurrentUserId();
+      $d->{userid}=
+              SOAP::Data->type('xsd:integer')->value($userid);
+      $d->{user}=
+              SOAP::Data->type('xsd:string')->value($ENV{REMOTE_USER});
+      if ($param->{'loadContext'}>1){
+         my %REmployee=$self->getGroupsOf($userid, [qw(REmployee)], 'direct');
+         my %RMember=$self->getGroupsOf($userid, [qw(RMember)], 'direct');
+         my %RBoss=$self->getGroupsOf($userid, [qw(RBoss)], 'direct');
+         $d->{'groupids'}={REmployee=>SOAP::Data->type('xsd:integer')->value([keys(%REmployee)]),
+                           RMember=>[keys(%RMember)],
+                           RBoss=>[keys(%RBoss)]};
+printf STDERR ("fifi REmployee=%s\n",join(",",keys(%RMember)));
+      }
+   }
+   return(interface::SOAP::kernel::Finish($d));
 }
 
 package interface::SOAP::kernel;
