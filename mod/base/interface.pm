@@ -842,14 +842,28 @@ sub doPing
               SOAP::Data->type('xsd:integer')->value($userid);
       $d->{user}=
               SOAP::Data->type('xsd:string')->value($ENV{REMOTE_USER});
+      my $UserCache=$self->Cache->{User}->{Cache}->{$ENV{REMOTE_USER}}->{rec};
+      foreach my $v (qw(tz posix secstate surname givenname 
+                        fullname lang usertyp email)){
+         my $val=$UserCache->{$v};
+         utf8::encode($val);
+         $d->{$v}=SOAP::Data->type('xsd:string')->value($val);
+      }
+  
       if ($param->{'loadContext'}>1){
          my %REmployee=$self->getGroupsOf($userid, [qw(REmployee)], 'direct');
          my %RMember=$self->getGroupsOf($userid, [qw(RMember)], 'direct');
          my %RBoss=$self->getGroupsOf($userid, [qw(RBoss)], 'direct');
-         $d->{'groupids'}={REmployee=>SOAP::Data->type('xsd:integer')->value([keys(%REmployee)]),
-                           RMember=>[keys(%RMember)],
-                           RBoss=>[keys(%RBoss)]};
-printf STDERR ("fifi REmployee=%s\n",join(",",keys(%RMember)));
+         $d->{'groupids'}={
+            REmployee=>[keys(%REmployee)],
+            RMember=>[keys(%RMember)],
+            RBoss=>[keys(%RBoss)]
+         };
+         $d->{'groupnames'}={
+            REmployee=>[map({$_->{fullname}} values(%REmployee))],
+            RMember=>[map({$_->{fullname}} values(%RMember))],
+            RBoss=>[map({$_->{fullname}} values(%RBoss))]
+         };
       }
    }
    return(interface::SOAP::kernel::Finish($d));
