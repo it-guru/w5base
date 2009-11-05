@@ -519,7 +519,6 @@ sub checkacl
                $foundro=1;
             }
             else{
-printf STDERR ("fifi y00\n");
                if (ref($context->{$fid}->{acls}) eq "ARRAY"){
                   my $aclsfound=0;
                   foreach my $acl (@{$context->{$fid}->{acls}}){
@@ -542,9 +541,7 @@ printf STDERR ("fifi y00\n");
                         }
                      }
                   }
-printf STDERR ("fifi x00\n");
                   if ($issubofdata && !$aclsfound){
-printf STDERR ("fifi x01\n");
                      $foundad=0;
                      $foundrw=0;
                      $foundro=0;
@@ -562,20 +559,15 @@ printf STDERR ("fifi x01\n");
                      else{
                         my $parentobj=$context->{$fid}->{parentobj};
                         my $parentid=$context->{$fid}->{parentrefid};
-printf STDERR ("fifi x02  $parentobj $parentid\n");
                         my $do=getModuleObject($self->Config,$parentobj);
                         if (defined($do) && $parentid ne ""){
                            my $idobj=$do->IdField();
                            if (defined($idobj)){
                               my $idname=$idobj->Name();
-printf STDERR ("fifi 01\n");
                               $do->SecureSetFilter({$idname=>\$parentid});
-printf STDERR ("fifi 02\n");
                               my ($prec)=$do->getOnlyFirst(qw(ALL));
                               if (defined($prec)){
-printf STDERR ("fifi 03\n");
                                  my @acl=$do->isViewValid($prec);
-printf STDERR ("fifi 04 (%s)\n",join(",",@acl));
                                  if (grep(/^(ALL|attachment)$/,@acl)){ 
                                     $foundro=1;
                                  }
@@ -1007,7 +999,6 @@ sub browser
           my $nread = read(STDIN, $data, $clength);
           last if (!$nread);
           syswrite($t,$data,$nread);
-          #printf STDERR ("fifi nread=$nread data=$data\n");
       }
       seek($t,0,SEEK_SET);
       my %rec=(name=>$file,file=>$t);
@@ -1380,8 +1371,6 @@ EOF
 sub WebDAV
 {
    my $self=shift;
-   printf STDERR ("fifi request=%s URI=%s $ENV{REMOTE_USER}\n",$ENV{REQUEST_METHOD},
-                                             $ENV{REQUEST_URI});
    printf("Content-Type: text/xml\n\n".
           "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
    print <<EOF if ($ENV{REQUEST_URI} eq "/WebDAV");
