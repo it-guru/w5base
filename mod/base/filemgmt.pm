@@ -519,6 +519,7 @@ sub checkacl
                $foundro=1;
             }
             else{
+printf STDERR ("fifi y00\n");
                if (ref($context->{$fid}->{acls}) eq "ARRAY"){
                   my $aclsfound=0;
                   foreach my $acl (@{$context->{$fid}->{acls}}){
@@ -541,7 +542,9 @@ sub checkacl
                         }
                      }
                   }
+printf STDERR ("fifi x00\n");
                   if ($issubofdata && !$aclsfound){
+printf STDERR ("fifi x01\n");
                      $foundad=0;
                      $foundrw=0;
                      $foundro=0;
@@ -557,7 +560,28 @@ sub checkacl
                         $foundrw=$privcontext->{$privkey}->{rw};
                      }
                      else{
-                        $foundro=1;
+                        my $parentobj=$context->{$fid}->{parentobj};
+                        my $parentid=$context->{$fid}->{parentrefid};
+printf STDERR ("fifi x02  $parentobj $parentid\n");
+                        my $do=getModuleObject($self->Config,$parentobj);
+                        if (defined($do) && $parentid ne ""){
+                           my $idobj=$do->IdField();
+                           if (defined($idobj)){
+                              my $idname=$idobj->Name();
+printf STDERR ("fifi 01\n");
+                              $do->SecureSetFilter({$idname=>\$parentid});
+printf STDERR ("fifi 02\n");
+                              my ($prec)=$do->getOnlyFirst(qw(ALL));
+                              if (defined($prec)){
+printf STDERR ("fifi 03\n");
+                                 my @acl=$do->isViewValid($prec);
+printf STDERR ("fifi 04 (%s)\n",join(",",@acl));
+                                 if (grep(/^(ALL|attachment)$/,@acl)){ 
+                                    $foundro=1;
+                                 }
+                              }
+                           } 
+                        }
                      }
                   }
                }
@@ -694,6 +718,9 @@ sub sendFile
       $self->SetFilter({fid=>$id});
       $self->SetCurrentView(qw(ALL));
       ($rec,$msg)=$self->getFirst();
+      if (!$self->isViewValid($rec)){
+         return(undef);
+      }
    }
    if (defined($rec)){
       my %param=();

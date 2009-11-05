@@ -83,3 +83,4 @@ CREATE TABLE forumtopicread (
   PRIMARY KEY  (id),
   KEY forumread(forumtopic),key forumuser(createuser), key cdate(createdate)
 );
+alter table forumboard add boardheader blob;

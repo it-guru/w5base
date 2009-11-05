@@ -36,7 +36,7 @@ sub new
 sub getValidWebFunctions
 {
    my ($self)=@_;
-   return(qw(Main Topic NativNewTopic NewTopic HandleInfoAboSubscribe
+   return(qw(Main addAttach Topic NativNewTopic NewTopic HandleInfoAboSubscribe
              HandleShowSubscribers));
 }
 
@@ -112,6 +112,12 @@ sub NewTopic
       $self->ShowNewTopic();
    }
    print $self->HtmlBottom(body=>1,form=>1);
+}
+
+sub addAttach
+{
+   my $self=shift;
+   return($self->kernel::App::Web::Listedit::addAttach());
 }
 
 
@@ -328,7 +334,7 @@ sub ShowTopic
       my $comments=$rec->{comments};
       $comments=~s/</&lt;/g;
       $comments=~s/>/&gt;/g;
-      $comments=FancyLinks($comments);
+      $comments=mkInlineAttachment(FancyLinks($comments),$rootpath);
 
       print <<EOF;
 <td valign=top width=200 class=authorlabel>$creator<br>$cdate<br>
@@ -739,10 +745,17 @@ sub ShowBoard
    my $to=$self->getPersistentModuleObject("faq::forumtopic");
    $to->SetFilter({forumboard=>\$id});
    $to->SetCurrentOrder(qw(cdate));
+   my $boardheader=$borec->{boardheader};
    my $class="class=boardgroup valign=top";
    print("<br><center>".
          "<div id=mainarea style=\"overflow:auto\">".
          "<table $self->{maintabparam}>");
+   if ($boardheader ne ""){
+      printf("<tr><td colspan=6 align=left valign=top>".
+             "<iframe src=\"${rootpath}../forumboard/BoardHeader?id=%s\" ".
+             "width=100% height=80></iframe>".
+             "</td></tr>",$borec->{id});
+   }
    printf("<tr><td colspan=6 align=right valign=top>%s</td></tr>",
           $self->getShowBoardDetailFunctions($rootpath,"board",$id));
    print("<tr><th $class>&nbsp;</th><th $class>".

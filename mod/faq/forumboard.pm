@@ -122,7 +122,20 @@ sub new
                 name          =>'acltargetid',
                 selectable    =>0,
                 dataobjattr   =>'forumboardacl.acltargetid'),
-                                   
+
+      new kernel::Field::Htmlarea(
+                name          =>'boardheader',
+                searchable    =>0,
+                group         =>'boardheader',
+                label         =>'board header',
+                dataobjattr   =>'forumboard.boardheader'),
+
+      new kernel::Field::FileList(
+                name          =>'attachments',
+                label         =>'Attachments',
+                parentobj     =>'faq::forumboard',
+                group         =>'attachments'),
+
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
@@ -194,7 +207,26 @@ sub new
 sub getValidWebFunctions
 {
    my ($self)=@_;
-   return($self->SUPER::getValidWebFunctions(),"setSubscribe");
+   return($self->SUPER::getValidWebFunctions(),"setSubscribe","BoardHeader");
+}
+
+sub BoardHeader
+{
+   my $self=shift;
+   my $id=Query->Param("id");
+
+   my $bo=$self->getPersistentModuleObject("faq::forumboard");
+   $bo->SecureSetFilter({id=>\$id});
+   my ($borec,$msg)=$bo->getOnlyFirst(qw(boardheader));
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css',
+                                   'Output.HtmlDetail.css'],
+                           body=>1,form=>1);
+   if (defined($borec)){
+      print($borec->{boardheader});
+   }
+   print $self->HtmlBottom(body=>1,form=>1);
 }
 
 
@@ -213,6 +245,11 @@ sub Validate
          return(0);
       }
    }
+   if (exists($newrec->{boardheader})){
+      $newrec->{boardheader}=~s/<script/<div style="visible:hidden" script/gi;
+      $newrec->{boardheader}=~s/<\script>/<\/div>/gi;
+   }
+
    return(1);
 }
 
@@ -274,7 +311,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
 
-   return("header","default","stat","acl","source");
+   return("header","default","stat","acl","boardheader","attachments","source");
 }
 
 
@@ -293,14 +330,16 @@ sub isWriteValid
    my $rec=shift;
    my $moderator=0;
 
-   return("default","acl") if ($self->IsMemberOf("admin"));
+   if ($self->IsMemberOf("admin")){
+      return("default","acl","boardheader","attachments");
+   }
 
    my @acl=$self->getCurrentAclModes($ENV{REMOTE_USER},$rec->{acls});
    if (grep(/^moderate$/,@acl)){
       $moderator=1;
    }
    if ($moderator){
-      return("acl");
+      return("acl","boardheader","attachments");
    }
 
    return(undef);

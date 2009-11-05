@@ -74,7 +74,7 @@ sub preProcessFilter
                   if ($sfld eq "eventend" && 
                       ref($hflt->{$self->{name}}) ne "ARRAY" &&
                       ref($hflt->{$self->{name}}) ne "SCALAR"){
-                     push(@useindex,"eventend");
+                  #   push(@useindex,"eventend");
                   }
                   my %sqlparam=(sqldbh=>$db,datatype=>$sqltype);
                   my $searchfield;

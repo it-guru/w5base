@@ -628,15 +628,17 @@ sub FancyLinks
 sub _mkInlineAttachment
 {
    my $id=shift;
+   my $rootpath=shift;
    my $size;
 
    eval("use GD;");
    if ($@ ne ""){
       $size="height=90";
    }
+   $rootpath="" if ($rootpath eq "");
    my $d="<img border=0 $size ".
-         "src=\"../../base/filemgmt/load/thumbnail/inline/$id\">";
-   $d="<a rel=\"lytebox[inline]\" href=\"../../base/filemgmt/load/inline/$id\" ".
+         "src=\"${rootpath}../../base/filemgmt/load/thumbnail/inline/$id\">";
+   $d="<a rel=\"lytebox[inline]\" href=\"${rootpath}../../base/filemgmt/load/inline/$id\" ".
       "target=_blank>$d</a>";
    return($d);
 }
@@ -659,7 +661,8 @@ sub _mkMailInlineAttachment
 sub mkInlineAttachment
 {
    my $data=shift;
-   $data=~s#\[attachment\((\d+)\)\]#_mkInlineAttachment($1)#ge;
+   my $rootpath=shift;
+   $data=~s#\[attachment\((\d+)\)\]#_mkInlineAttachment($1,$rootpath)#ge;
    return($data);
 }
 sub mkMailInlineAttachment

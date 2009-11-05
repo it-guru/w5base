@@ -344,7 +344,6 @@ sub Validate
    }
    if (exists($newrec->{data})){
       $newrec->{data}=~s/(^|[^>])FAQ(\d{10,20})([^<]|$)/<i>FAQ$2<\/i>/gi;
-      $newrec->{data}=~s/<\script>/<\/div>/gi;
    }
    return(1);
 }

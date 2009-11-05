@@ -1,6 +1,8 @@
 'faq::forumboard'=>{de=>'Forum Board',en=>'Forum board'},
 'foaddtopic'=>{de=>'information bei neuem Thema hinzugefügt',en=>'info on add topic'},
 'Categorie'=>{de=>'FAQ Kategorie'},
+'fieldgroup.boardheader'=>{de=>'Forum Board Header',en=>'Forum Board Header'},
+'board header'=>{de=>'Board Header'},
 'Boardgroup'=>{de=>'Board Gruppe'},
 'Topic-Count'=>{de=>'Themen Anzahl'},
 'Entry-Count'=>{de=>'Antworten Anzahl'},
