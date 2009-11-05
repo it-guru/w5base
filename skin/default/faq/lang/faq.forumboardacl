@@ -1,2 +1,3 @@
+'faq::forumboardacl'=>{de=>'Boardzugriffsregel',en=>'Board ACL'},
 'moderate'=>{de=>'moderieren'},
 'answer'=>{de=>'antworten'},

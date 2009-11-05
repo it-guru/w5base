@@ -1,4 +1,5 @@
 'fieldgroup.default'=>{de=>'Zugriffsregel',en=>'AccessControl'},
+'fieldgroup.userinfo'=>{de=>'Kontaktinfo',en=>'Contactinfo'},
 'Target-Name'=>{de=>'Bezugsziel'},
 'ACL-Mode'=>{de=>'Zugriffsmodus'},
 "no '\%s' specified"=>{de=>"kein '\%s' angegeben"},

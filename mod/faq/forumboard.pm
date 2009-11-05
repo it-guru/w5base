@@ -90,6 +90,7 @@ sub new
                 group         =>'acl',
                 htmlwidth     =>'500px',
                 allowcleanup  =>1,
+                forwardSearch =>1,
                 vjoininhash   =>[qw(acltarget acltargetid aclmode)],
                 vjointo       =>'faq::forumboardacl',
                 vjoinbase     =>[{'aclparentobj'=>\'faq::forumboard'}],

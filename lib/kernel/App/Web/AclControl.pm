@@ -82,6 +82,17 @@ sub new
                 default       =>'read',
                 dataobjattr   =>$acltable.'.aclmode'),
 
+      new kernel::Field::Text(
+                name          =>'posix',
+                htmlwidth     =>'130',
+                label         =>'Posix',
+                readonly      =>1,
+                group         =>'userinfo',
+                vjointo       =>'base::user',
+                vjoinon       =>['acltargetid'=>'userid'],
+                vjoindisp     =>'posix'),
+
+
       new kernel::Field::Date(
                 name          =>'expiration',
                 label         =>'Expiration-Date',
@@ -271,6 +282,12 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
+   if ($rec->{acltarget} eq "base::user"){
+      return("default","header","userinfo");
+   }
+   if ($rec->{acltarget} eq "base::grp"){
+      return("default","header");
+   }
    return("ALL");
 }
 
