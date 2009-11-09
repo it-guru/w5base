@@ -53,6 +53,7 @@ sub NotifyPlasma
    my $wsproxy=$self->Config->Param("WEBSERVICEPROXY");
    $wsproxy=$wsproxy->{plasma} if (ref($wsproxy) eq "HASH");
    return({exitcode=>0,msg=>'ok - no interface defined'}) if ($wsproxy eq "");
+   return({exitcode=>0,msg=>'ok - ins not send'}) if ($param{'op'} eq "ins");
 
    my $wf=getModuleObject($self->getParent->Config(),"base::workflow"); 
    $wf->SetFilter({id=>\$param{'id'}});
@@ -65,9 +66,15 @@ sub NotifyPlasma
    }
 
 
-
-
    msg(DEBUG,"wsproxy='%s'",$wsproxy);
+   if ($param{'op'} eq "ins"){
+   #   printf STDERR ("fifi param=%s\n",Dumper(\%param));
+
+
+   }
+
+
+
    my $method = SOAP::Data->name('CreateNewWork');
 
    my %tr=('id'     =>'WF_ID');
@@ -100,6 +107,11 @@ sub NotifyPlasma
                        $res->fault->{faultstring});
       return({exitcode=>2,msg=>$res->fault->{faultstring}});
    }
+
+
+
+
+
    $self->Log(INFO,"trigger","Plasma: WF:%d = %s ",$param{id},$res->result());
    msg(DEBUG,"Plasma result=%s",$res->result());
    return({exitcode=>0,msg=>'ok'});

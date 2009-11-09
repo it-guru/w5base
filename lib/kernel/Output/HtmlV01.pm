@@ -85,6 +85,7 @@ sub ProcessHead
          "src=\"../../../public/base/load/toolbox.js\"></script>\n";
    $d.="<script language=JavaScript ".
          "src=\"../../../public/base/load/OutputHtml.js\"></script>\n";
+   $d.=$self->{fieldsPageHeader};
    $d.="<table class=maintable>\n";
    if (!Query->Param('$NOVIEWSELECT$')){
       $d.=$self->getHtmlViewLine($fh,$dest);
@@ -94,7 +95,8 @@ sub ProcessHead
    $d.="<table class=datatable width=100%>\n<tr class=headline>";
    if ($#view!=-1){
       foreach my $field (@view){
-         my $displayname=$field->Name();
+         my $name=$field->Name();
+         my $displayname=$name;
          if (defined($field)){
             $displayname=$field->Label();
          }
@@ -106,7 +108,7 @@ sub ProcessHead
             $style="width:$field->{htmlwidth};";
          }
          $d.="<th class=headfield valign=top style=\"$style\">".
-             $displayname."</th>";
+             $displayname.$self->{fieldHeaders}->{$name}."</th>";
       }
    }
    else{
@@ -124,6 +126,8 @@ sub ProcessLine
    my $fieldbase={};
    map({$fieldbase->{$_->Name()}=$_} @view);
    $self->{lineclass}=1 if (!exists($self->{lineclass}));
+   $self->{fieldHeaders}={} if (!exists($self->{fieldHeaders}));
+   $self->{fieldsPageHeader}="" if (!exists($self->{fieldsPageHeader}));
    my $d="";
    my $lineclass="subline".$self->{lineclass};
    my $lineonclick;
@@ -192,23 +196,30 @@ sub ProcessLine
             #   $data=utf8($data);
             #   $data=$data->latin1();
             #}
+            if (ref($field->{onClick}) eq "CODE"){
+               my $fc=&{$field->{onClick}}($self,$app);
+               $fclick=$fc if ($fc ne "");
+            }
+            if (exists($field->{weblink})){
+               $fclick=undef;
+            }
+            $fclick=undef if ($field->can("getSubListData"));
+           
+            if ($self->{SubListEdit}==1){
+               $fclick="SubListEdit('$id')";
+            }
+            if (!exists($self->{fieldHeaders}->{$fieldname})){
+               $self->{fieldHeaders}->{$fieldname}="";
+            }
+            $field->extendFieldHeader($self->{WindowMode},$rec,
+                                      \$self->{fieldHeaders}->{$fieldname});
+            $field->extendPageHeader($self->{WindowMode},$rec,
+                                     \$self->{fieldsPageHeader});
          }
          else{
             $data="-";
          }
         # my $data=$field->FormatedResult("html");
-         if (ref($field->{onClick}) eq "CODE"){
-            my $fc=&{$field->{onClick}}($self,$app);
-            $fclick=$fc if ($fc ne "");
-         }
-         if (exists($field->{weblink})){
-            $fclick=undef;
-         }
-         $fclick=undef if ($field->can("getSubListData"));
-      
-         if ($self->{SubListEdit}==1){
-            $fclick="SubListEdit('$id')";
-         }
       }
       my $style;
       my $align;

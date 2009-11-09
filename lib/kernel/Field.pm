@@ -269,6 +269,24 @@ sub UiVisible
    return($self->{uivisible});
 }
 
+sub extendFieldHeader
+{
+   my $self=shift;
+   my $mode=shift;
+   my $current=shift;
+   my $curFieldHeadRef=shift;
+#   $$curFieldHeadRef.="x";
+}
+
+sub extendPageHeader
+{
+   my $self=shift;
+   my $mode=shift;
+   my $current=shift;
+   my $curPageHeadRef=shift;
+#   $$curPageHeadRef.="z";
+}
+
 sub Uploadable
 {
    my $self=shift;
@@ -376,11 +394,17 @@ sub Label
 {
    my $self=shift;
    my $label=$self->{label};
-   my $d="-NoLabelSet-";
-   $d=$label if ($label ne "");
-   my $tr=$self->{translation};
-   $tr=$self->getParent->Self if (!defined($tr));
-   return($self->getParent->T($d,$tr));
+   my $d;
+   if ($label ne ""){
+      $d=$label;
+      my $tr=$self->{translation};
+      $tr=$self->getParent->Self if (!defined($tr));
+      $d=$self->getParent->T($d,$tr);
+   }
+   else{
+      $d="(".$self->Name().")";
+   }
+   return($d);
 }
 
 sub rawLabel

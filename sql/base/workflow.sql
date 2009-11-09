@@ -30,7 +30,7 @@ CREATE TABLE wfkey (
   KEY nameeventend (name,eventend,wfclass,fval),
   KEY nameopendate (name,opendate,wfclass,fval),
   KEY nameclosedate (name,closedate,wfclass,fval),
-  KEY wfstate (name,wfstate,wfclass,fval),KEY eventend (eventend,wfclass)
+  KEY wfstate (name,wfstate,wfclass,fval),KEY eventend (eventend), key wfclass (wfclass,wfstate,eventend)
 );
 CREATE TABLE wfaction (
   wfactionid bigint(20) NOT NULL default '0',
@@ -188,7 +188,7 @@ CREATE TABLE mailreqspool (
   PRIMARY KEY (id),
   key(md5sechash),key(createdate)
 );
-alter table wfhead add md5sechash char(22) default NULL, add key(md5sechash), add is_deleted boolean default '0', add eventtrigger varchar(128) default NULL, add acopymode char(20) default NULL, add key acopy(opendate,acopymode), add acopydate datetime default NULL;
+alter table wfhead add md5sechash char(22) default NULL, add key(md5sechash), add is_deleted boolean default '0', add eventtrigger varchar(128) default NULL, add acopymode char(20) default NULL, add acopydate datetime default NULL,add key acopy(wfstate,acopymode,acopydate);
 alter table wfattach add filename varchar(254) not NULL;
 alter table wfattach add mimetype varchar(128) not NULL;
 alter table joblog add msg varchar(254) default '';

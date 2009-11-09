@@ -164,6 +164,24 @@ sub FormatedStoredWorkspace
    return($d);
 }
 
+sub extendPageHeader
+{
+   my $self=shift;
+   my $mode=shift;
+   my $current=shift;
+   my $curPageHeadRef=shift;
+
+   if ($mode eq "Detail" || ($mode=~m/^html/i)){
+      if (!($$curPageHeadRef=~m/^<script id=TextTranslation /)){
+         $$curPageHeadRef.=
+              "<script id=TextTranslation language=\"JavaScript\" ".
+              "src=\"../../base/load/TextTranslation.js\"></script>\n";
+      }
+   }
+}
+
+
+
 
 
 

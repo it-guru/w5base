@@ -90,17 +90,7 @@ sub ProcessHead
    $d.="<form method=post target=_self enctype=\"multipart/form-data\">";
    $d.="<style>";
    $d.=$self->getStyle($fh,$rec,$msg,\@view,$view);
-   $d.="</style>\n";
-   $d.="<script language=\"JavaScript\" ".
-       "src=\"../../base/load/HtmlDetail.js\"></script>\n";
-   $d.="<script language=\"JavaScript\" ".
-       "src=\"../../base/load/toolbox.js\"></script>\n";
-   $d.="<script language=\"JavaScript\" ".
-       "src=\"../../base/load/ContextMenu.js\"></script>\n";
-   $d.="<script language=\"JavaScript\" ".
-       "src=\"../../base/load/sortabletable.js\"></script>\n";
-   $d.="<script language=\"JavaScript\" ".
-       "src=\"../../base/load/TextTranslation.js\"></script>\n";
+   $d.="</style>\n".$self->{fieldsPageHeader};
    $d.="<script language=\"JavaScript\">\n";
    if ($scrolly!=0){
       $d.=<<EOF;
@@ -149,6 +139,17 @@ sub ProcessLine
    my $editgroups=[$app->isWriteValid($rec)];
    my $currentfieldgroup=Query->Param("CurrentFieldGroupToEdit"); 
    my $currentid=Query->Param("CurrentIdToEdit"); 
+   $self->{fieldHeaders}={} if (!exists($self->{fieldHeaders}));
+   if (!exists($self->{fieldsPageHeader})){
+      $self->{fieldsPageHeader}=
+           "<script language=\"JavaScript\" ".
+           "src=\"../../base/load/HtmlDetail.js\"></script>\n".
+           "<script language=\"JavaScript\" ".
+           "src=\"../../base/load/toolbox.js\"></script>\n".
+           "<script language=\"JavaScript\" ".
+           "src=\"../../base/load/ContextMenu.js\"></script>\n";
+   }
+   
    
    if ($self->Config->Param("W5BaseOperationMode") eq "readonly"){
       $editgroups=[];
@@ -361,6 +362,12 @@ EOF
          $uivisibleof[$c]=$fieldlist[$c]->UiVisible("HtmlDetail",current=>$rec);
          next if (!($uivisibleof[$c]));
          next if (!($fieldlist[$c]->htmldetail("HtmlDetail",current=>$rec)));
+          
+         $fieldlist[$c]->extendFieldHeader($self->{WindowMode},$rec,
+                                           \$self->{fieldHeaders}->{$name});
+         $fieldlist[$c]->extendPageHeader($self->{WindowMode},$rec,
+                                          \$self->{fieldsPageHeader});
+
          my @fieldgrouplist=($fieldlist[$c]->{group});
          if (ref($fieldlist[$c]->{group}) eq "ARRAY"){
             @fieldgrouplist=@{$fieldlist[$c]->{group}};
@@ -412,26 +419,6 @@ EOF
                                   \"displaySpec(this,'fieldspec_$name');\"";
                }
                my $prefix=$fieldlist[$c]->dlabelpref(current=>$rec);
-           #    my @contextMenu=$fieldlist[$c]->contextMenu(current=>$rec);
-           #    my $contextMenu="";
-           #    if ($#contextMenu!=-1){
-           #       $contextMenu="<div id=\"contextMenu_$name\" "
-           #                    ."class=\"context_menu\">";
-           #       $contextMenu.="<table cellspacing=\"1\" cellpadding=\"2\" ".
-           #                     "border=\"0\">";
-           #       while(my $label=shift(@contextMenu)){
-           #          my $link=shift(@contextMenu);
-           #          $contextMenu.="<tr>";
-           #          $contextMenu.="<td class=\"std\" ".
-           #                        "onMouseOver=\"this.className='active'\" ".
-           #                        "onMouseOut=\"this.className='std'\">";
-           #          $contextMenu.="<div onMouseUp=\"$link\">$label</div>";
-           #          $contextMenu.="</td></tr>";
-           #       }
-
-           #       $contextMenu.="</table>";
-           #       $contextMenu.="</div>";
-           #    }
                if (defined($fieldlist[$c]->{jsonchanged})){
                   my $n="jsonchanged_".$name;
                   if (!grep(/^$n$/,@{$self->Context->{jsonchanged}})){
@@ -447,7 +434,7 @@ EOF
                   $datacolspan=4 if ($grouphavehalfwidth{$group});
                   $datacolspan=2 if ($halfwidth);
                   $subblock.=<<EOF;
-<td class=fname$valign colspan=$datacolspan><span $fieldspecfunc>$prefix\%$name(label)%:</span><br>$fieldspec \%$name(detail)\%</td>
+<td class=fname$valign colspan=$datacolspan><span $fieldspecfunc>$prefix\%$name(label)%:</span>$self->{'fieldHeaders'}->{$name}<br>$fieldspec \%$name(detail)\%</td>
 EOF
                }
                elsif ($fieldlist[$c]->Type() eq "TimeSpans"){
@@ -455,7 +442,7 @@ EOF
                   $datacolspan=4 if ($grouphavehalfwidth{$group});
                   $datacolspan=2 if ($halfwidth);
                   $subblock.=<<EOF;
-<td class=fname$valign colspan=$datacolspan>\%$name(detail)\%</td>
+<td class=fname$valign colspan=$datacolspan>$self->{'fieldHeaders'}->{$name}\%$name(detail)\%</td>
 EOF
                }
                elsif ($fieldlist[$c]->can("EditProcessor")){
@@ -463,7 +450,7 @@ EOF
                   $datacolspan=4 if ($grouphavehalfwidth{$group});
                   $datacolspan=2 if ($halfwidth);
                   $subblock.=<<EOF;
-<td class=fname$valign colspan=$datacolspan $fieldspecfunc>$fieldspec\%$name(detail)\%</td>
+<td class=fname$valign colspan=$datacolspan $fieldspecfunc>$self->{'fieldHeaders'}->{$name}$fieldspec\%$name(detail)\%</td>
 EOF
 
                }
@@ -473,7 +460,7 @@ EOF
                   $datacolspan=4 if ($grouphavehalfwidth{$group});
                   $datacolspan=2 if ($halfwidth);
                   $subblock.=<<EOF;
-<td class=finput$valign colspan=$datacolspan>\%$name(detail)\%</td>
+<td class=finput$valign colspan=$datacolspan>$self->{'fieldHeaders'}->{$name}\%$name(detail)\%</td>
 EOF
 
                }
@@ -482,7 +469,7 @@ EOF
                   $datacolspan=3 if ($grouphavehalfwidth{$group});
                   $datacolspan=1 if ($halfwidth);
                   $subblock.=<<EOF;
-         <td class=fname$valign style="width:20%;">$fieldspec<span $fieldspecfunc>$prefix\%$name(label)%:</span></td>
+         <td class=fname$valign style="width:20%;">$fieldspec<span $fieldspecfunc>$prefix\%$name(label)%:</span>$self->{'fieldHeaders'}->{$name}</td>
          <td class=finput colspan=$datacolspan>
 <table border=0 cellspacing=0 cellpadding=0 width=100% style="table-layout:fixed;overflow:hidden"><tr>
 <td>
