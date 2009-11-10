@@ -175,7 +175,8 @@ sub new
                 group         =>'applications',
                 readonly      =>1,
                 vjointo       =>'itil::lnkapplsystem',
-                vjoinbase     =>[{applcistatusid=>"<=5"}],
+                vjoinbase     =>[{applcistatusid=>"<=5",
+                                  systemcistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'assetid'],
                 vjoindisp     =>['appl','applcistatus','applcustomer']),
 
@@ -188,7 +189,8 @@ sub new
                 htmldetail    =>0,
                 searchable    =>0,
                 vjointo       =>'itil::lnkapplsystem',
-                vjoinbase     =>[{applcistatusid=>"<=5"}],
+                vjoinbase     =>[{applcistatusid=>"<=5",
+                                  systemcistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'assetid'],
                 vjoindisp     =>['appl']),
 
@@ -199,7 +201,8 @@ sub new
                 htmldetail    =>0,
                 searchable    =>1,
                 vjointo       =>'itil::lnkapplsystem',
-                vjoinbase     =>[{applcistatusid=>"<=4"}],
+                vjoinbase     =>[{applcistatusid=>"<=4",
+                                  systemcistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'systemid'],
                 vjoindisp     =>['businessteam']),
 
@@ -211,7 +214,8 @@ sub new
                 readonly      =>1,
                 htmldetail    =>0,
                 vjointo       =>'itil::lnkapplsystem',
-                vjoinbase     =>[{applcistatusid=>"<=5"}],
+                vjoinbase     =>[{applcistatusid=>"<=5",
+                                  systemcistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'assetid'],
                 vjoindisp     =>['applcustomer','appl']),
 
