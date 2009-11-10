@@ -259,9 +259,15 @@ sub ProcessLine
       }
    }
    for(my $cellno=0;$cellno<=$#cell;$cellno++){
-      my $field=$cellobj[$cellno];
+      my $field;
+      if (defined($cellobj[$cellno])){
+         $field=$cellobj[$cellno];
+      }
       my $data=$cell[$cellno];
-      my $format=$field->getXLSformatname($data);
+      my $format="default";
+      if (defined($field)){
+         $format=$field->getXLSformatname($data);
+      }
       if (!defined($data)){
          $data="";
       }
