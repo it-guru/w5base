@@ -79,6 +79,7 @@ sub qcheckRecord
       my $par=getModuleObject($self->getParent->Config(),"tsacinv::asset");
       $par->SetFilter({assetid=>\$rec->{name}});
       my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
+      return(undef,undef) if (!$par->Ping());
       if (!defined($parrec)){
          push(@qmsg,'given assetid not found as active in AssetManager');
          push(@dataissue,'given assetid not found as active in AssetManager');
@@ -149,6 +150,7 @@ sub qcheckRecord
                              \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'string');
 
+         return(undef,undef) if (!$par->Ping());
       }
    }
    else{

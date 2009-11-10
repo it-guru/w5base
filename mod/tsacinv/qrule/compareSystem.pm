@@ -90,6 +90,7 @@ sub qcheckRecord
       my $par=getModuleObject($self->getParent->Config(),"tsacinv::system");
       $par->SetFilter({systemid=>\$rec->{systemid}});
       my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
+      return(undef,undef) if (!$par->Ping());
       if (!defined($parrec)){
          push(@qmsg,'given systemid not found as active in AssetManager');
          push(@dataissue,'given systemid not found as active in AssetManager');

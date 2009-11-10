@@ -188,6 +188,15 @@ sub Validate
       $self->LastMsg(ERROR,"invalid producer specified");
       return(0);
    }
+   if (exists($newrec->{'releaseexp'})){
+      if ($newrec->{'releaseexp'}=~m/^\s*$/){
+         $newrec->{'releaseexp'}='/^\d{1,2}(\.\d{1,2}){1,1}$/';
+      }
+      $newrec->{'releaseexp'}.="/" if (!($newrec->{'releaseexp'}=~m/\/$/));
+      if (!($newrec->{'releaseexp'}=~m/^\//)){
+         $newrec->{'releaseexp'}="/".$newrec->{'releaseexp'};
+      }
+   }
    if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
       return(0);
    }

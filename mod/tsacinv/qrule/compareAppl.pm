@@ -76,6 +76,7 @@ sub qcheckRecord
       my $par=getModuleObject($self->getParent->Config(),"tsacinv::appl");
       $par->SetFilter({applid=>\$rec->{applid}});
       my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
+      return(undef,undef) if (!$par->Ping());
       if (!defined($parrec)){
          push(@qmsg,'given applicationid not found as active in AssetManager');
          $errorlevel=3 if ($errorlevel<3);

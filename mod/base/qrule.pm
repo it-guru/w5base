@@ -464,21 +464,25 @@ function addToResult(ruleid)
              var resulttext=resultChildNode.nodeValue;
 
              var exitcode=ruleres.getElementsByTagName("exitcode")[0];
-             var exitcodeChildNode=exitcode.childNodes[0];
-             var exitcodetext=exitcodeChildNode.nodeValue;
-             var color="<font color=green>";
-             if (exitcodetext!=0){
-                color="<font color=red>";
-                fail++;
-             }
-             else{
-                ok++;
-             }
-             if (exitcodetext==1){
-                color="<font color=#D7AD08>";
-             }
-             if (exitcodetext==2){
-                warn++;
+             var exitcodetext="?";
+             var color="";
+             if (exitcode.childNodes[0]){
+                var exitcodeChildNode=exitcode.childNodes[0];
+                var exitcodetext=exitcodeChildNode.nodeValue;
+                color="<font color=green>";
+                if (exitcodetext!=0){
+                   color="<font color=red>";
+                   fail++;
+                }
+                else{
+                   ok++;
+                }
+                if (exitcodetext==1){
+                   color="<font color=#D7AD08>";
+                }
+                if (exitcodetext==2){
+                   warn++;
+                }
              }
              r.innerHTML+="<a class=rulelink href=javascript:openwin('../../base/qrule/Detail?id="+ruleidtext+"','_blank','height=480,width=640,toolbar=no,status=no,resizeable=yes,scrollbars=no')>"+labeltext+"</a>"+": "+color+resulttext+"</font><br>";
 
