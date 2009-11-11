@@ -3,4 +3,7 @@
 'Note'=>{de=>'Notiz'},
 'direct display'=>{de=>'direkt sichtbar'},
 'share with group'=>{de=>'teilen mit Gruppe'},
+'parent object'=>{de=>'Elternobjekt'},
+'parent id'=>{de=>'Referenz ID'},
+'fieldgroup.rel'=>{de=>'Objekt Relation',en=>'Object relation'},
 

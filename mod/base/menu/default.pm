@@ -72,6 +72,7 @@ sub Init
 
    $self->RegisterObj("sysadm.userenv.note",
                       "base::note",
+                      func=>'MainWithNew',
                       defaultacl=>['admin']);
 
    $self->RegisterObj("sysadm.user",

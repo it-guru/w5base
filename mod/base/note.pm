@@ -49,12 +49,15 @@ sub new
 
       new kernel::Field::Group(
                 name          =>'grp',
+                htmldetail    =>0,
+                readonly      =>1,
                 group         =>'rel',
                 label         =>'share with group',
                 vjoinon       =>'grpid'),
 
       new kernel::Field::Link(
                 name          =>'grpid',
+                readonly      =>1,
                 group         =>'rel',
                 dataobjattr   =>'postitnote.grp'),
 
@@ -188,7 +191,7 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
    return("ALL") if (!defined($rec));
-   return("default") if ($rec->{creatorid}==$userid || 
+   return("default","rel") if ($rec->{creatorid}==$userid || 
                          $self->IsMemberOf("admin"));
    return(undef);
 }
@@ -201,155 +204,61 @@ sub getValidWebFunctions
 }
 
 
-sub Display
+sub getDetailBlockPriority
 {
    my $self=shift;
-   print $self->HttpHeader("text/html");
-   print $self->HtmlHeader(style=>['default.css'],
-                           form=>1,body=>1,
-                           title=>"W5Notes");
-   print("<style>body,form,html{background:#FDFBD6;overflow:hidden}</style>");
-   printf("<textarea style=\"width:100%;height:98px;background-color:#FDFBD6;border-style:none\">xxx</textarea>");
-
-   print $self->HtmlBottom(body=>1,form=>1);
+   my $grp=shift;
+   my %param=@_;
+   return("header","default","rel","soure");
 }
+
+
+
 
 sub Actor
 {
    my ($self)=@_;
 
    print $self->HttpHeader("text/html");
-   print $self->HtmlHeader(style=>['default.css','mainwork.css',
-                                   'kernel.TabSelector.css'],
-                           js=>['toolbox.js','prototype.js'],
+   print $self->HtmlHeader(style=>['default.css','mainwork.css'],
+                           js=>['toolbox.js','jquery.js','J5Base.js'],
                            form=>1,body=>1,
                            title=>"W5Notes");
-   if ($self->IsMemberOf("admin")){
-      print "<a class=ModeSelectFunctionLink href=\"JavaScript:addPostIt(10,10)\">Add</a>";
-      print "&bull;<a class=ModeSelectFunctionLink href=\"JavaScript:hidePrivate()\">Hide</a>";
-      print "&bull;<a class=ModeSelectFunctionLink href=\"JavaScript:showPrivate()\">Show</a>";
+   my $parentobj=Query->Param("parentobj");
+   my $parentid=Query->Param("parentid");
+   my $userid=$self->getCurrentUserId();
+   my $precode="";
+   my @flt;
+   if ($parentobj ne ""){
+      $precode.="var ParentObj=\"$parentobj\";\n";
+      push(@flt,{creatorid=>\$userid,
+                 parentobj=>undef,
+                 name=>'UserJavaScriptCode*'});
+      push(@flt,{creatorid=>\$userid,
+                 parentobj=>\$parentobj,
+                 name=>'UserJavaScript*'});
    }
-   print(<<EOF);
-<div id="headcode" style="display:none;visible:hidden">
-<div style="width:100%;height:20px;background:yellow">
-PostIt
-</div>
-</div>
-<script language="JavaScript">
-
-parent.objDrag = null;  // Element, über dem Maus bewegt wurde
-
-parent.mouseX   = 0;    // X-Koordinate der Maus
-parent.mouseY   = 0;    // Y-Koordinate der Maus
-
-parent.offX = 0;        // X-Offset des Elements, das geschoben werden soll
-parent.offY = 0;        // Y-Offset des Elements, das geschoben werden soll
-
-   IE = document.all&&!window.opera;
-   DOM = document.getElementById&&!IE;
-
-
-function init(){
-   // Initialisierung der Überwachung der Events
-   parent.document.onmousemove = doDrag;
-   parent.document.onmouseup = stopDrag;
-}
-
-// Wird aufgerufen, wenn die Maus über einer Box gedrückt wird
-function startDrag(objElem) {
-   // Objekt der globalen Variabel zuweisen -> hierdurch wird Bewegung möglich
-    parent.objDrag = objElem;
-
-    // Offsets im zu bewegenden Element ermitteln
-    parent.offX = parent.mouseX - parent.objDrag.offsetLeft;
-    parent.offY = parent.mouseY - parent.objDrag.offsetTop;
-}
-
-// Wird ausgeführt, wenn die Maus bewegt wird
-function doDrag(ereignis) {
-   // Aktuelle Mauskoordinaten bei Mausbewegung ermitteln
-    parent.mouseX = (IE) ? parent.event.clientX : ereignis.pageX;
-    parent.mouseY = (IE) ? parent.event.clientY : ereignis.pageY;
-
-   // Wurde die Maus über einem Element gedrück, erfolgt eine Bewegung
-    if (parent.objDrag != null) {
-      // Element neue Koordinaten zuweisen
-      parent.objDrag.style.left = (parent.mouseX - parent.offX) + "px";
-      parent.objDrag.style.top = (parent.mouseY - parent.offY) + "px";
-
-    }
-}
-
-// Wird ausgeführt, wenn die Maustaste losgelassen wird
-function stopDrag(ereignis) {
-   // Objekt löschen -> beim Bewegen der Maus wird Element nicht mehr verschoben
-    parent.objDrag = null;
-}
-
-init();
-
-
-
-
-
-function addPostIt(x,y,id)
-{
-   if (id==""){
-      id="xx";
+   if ($parentobj ne "" && $parentid ne ""){
+      $precode.="var ParentId=\"$parentid\";\n";
+      push(@flt,{creatorid=>\$userid,
+                 parentobj=>\$parentobj,
+                 parentid=>\$parentid,
+                 name=>'UserJavaScript*'});
    }
-      var div = parent.document.createElement('div');
-      var h=document.getElementById("headcode");
-      div.innerHTML=h.innerHTML+
-                    "<iframe frameborder=0 style=\\"border-style:none;\\" "+
-                    "src=\\"../../base/note/Display?id="+id+"\\" "+
-                    "width=100% height=100></iframe>";
-      div.style.background="#FDFBD6";
-      div.style.position="absolute";
-      div.style.overflow="hidden";
-      div.style.border="solid 1px";
-      div.style.left=x+"px";
-      div.style.top=y+"px";
-      div.style.width="160px";
-      div.style.height="120px";
-      div.id=id;
-      var postit=parent.document.getElementById("PostIT");
-      postit.onmousedown=function (){startDrag(postit);}
-      if (!postit){
-         alert("postit not found");
+   if ($#flt!=-1){
+      $self->ResetFilter();
+      $self->SetFilter(\@flt);
+      my $code="";
+      foreach my $rec ($self->getHashList(qw( name comments))){
+         $code.=$rec->{comments};
       }
-      postit.appendChild(div);
-}
-function showPublic()
-{
-   var postit=parent.document.getElementById("PostIT");
-   postit.style.display="block";
-   postit.style.visibility="visible";
-}
-function hidePublic()
-{
-   var postit=parent.document.getElementById("PostIT");
-   postit.style.display="none";
-   postit.style.visibility="hidden";
-
-}
-function showPrivate()
-{
-
-}
-function hidePrivate()
-{
-
-}
-function activatePostits()
-{
- //  addPostIt(200,40,"postit123");
- //  addPostIt(350,50,"postit456");
-
-}
-addEvent(window, "load", activatePostits);
-
-</script>
-EOF
+      $code=trim($code);
+      if ($code ne ""){
+         print("<script language=\"JavaScript\">".$precode."\n".
+               $code."</script>");
+      }
+   }
+   
    print $self->HtmlBottom(body=>1,form=>1);
 }
 
