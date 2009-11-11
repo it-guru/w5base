@@ -58,8 +58,8 @@ sub new
       new kernel::Field::Text(
                 name          =>'loginname',
                 label         =>'User-Login',
-                ignorecase    =>1,
-                dataobjattr   =>'contactsm1.user_id'),
+                uppersearch   =>1,
+                dataobjattr   =>'operatorm1.name'),
 
 #      new kernel::Field::Text(
 #                name          =>'contactid',
@@ -110,6 +110,31 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'contactsm1.location_name'),
 
+      new kernel::Field::Text(
+                name          =>'schomeassignment',
+                label         =>'SC-HomeAssignment',
+                group         =>'office',
+                ignorecase    =>1,
+                weblinkto     =>'tssc::group',
+                weblinkon     =>['schomeassignment'=>'fullname'],
+                dataobjattr   =>'operatorm1.home_assignment'),
+
+      new kernel::Field::Text(
+                name          =>'screspgroup',
+                label         =>'SC-ResponsibleGroup',
+                group         =>'source',
+                ignorecase    =>1,
+                weblinkto     =>'tssc::group',
+                weblinkon     =>['screspgroup'=>'fullname'],
+                dataobjattr   =>'operatorm1.resp_group'),
+
+      new kernel::Field::Text(
+                name          =>'sctimezone',
+                label         =>'SC-Timezone',
+                group         =>'office',
+                ignorecase    =>1,
+                dataobjattr   =>'operatorm1.time_zone'),
+
 
 
 
@@ -151,7 +176,7 @@ sub new
                 name          =>'userid',
                 label         =>'User-ID',
                 upperserarch  =>1,
-                dataobjattr   =>'contactsm1.user_id'),
+                dataobjattr   =>'operatorm1.name'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
@@ -209,8 +234,9 @@ sub mkFullname
 sub initSqlWhere
 {
    my $self=shift;
-   my $where="(scadm1.contactsm1.email is not NULL OR ".
-             "scadm1.contactsm1.groupprgn='YES')";
+   my $where="operatorm1.name=contactsm1.user_id(+) AND ".
+             "(contactsm1.email is not NULL OR ".
+             "contactsm1.groupprgn='YES')";
    return($where);
 }
 
@@ -236,7 +262,7 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="scadm1.contactsm1";
+   my $from="scadm.operatorm1,scadm.contactsm1";
    return($from);
 }
 
