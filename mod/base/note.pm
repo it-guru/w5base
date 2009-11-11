@@ -232,10 +232,7 @@ sub Actor
    if ($parentobj ne ""){
       $precode.="var ParentObj=\"$parentobj\";\n";
       push(@flt,{creatorid=>\$userid,
-                 parentobj=>undef,
-                 name=>'UserJavaScriptCode*'});
-      push(@flt,{creatorid=>\$userid,
-                 parentobj=>\$parentobj,
+                 parentobj=>[$parentobj,''],
                  name=>'UserJavaScript*'});
    }
    if ($parentobj ne "" && $parentid ne ""){
