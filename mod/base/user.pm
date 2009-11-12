@@ -956,7 +956,7 @@ sub isWriteValid
    if ($userid eq $rec->{userid} ||
        ($rec->{creator}==$userid && $rec->{cistatusid}<3)){
       return("name","userparam","office","officeacc","private","nativcontact",
-             "usersubst","control");
+             "usersubst","control","officeacc");
    }
    return(undef);
 }
