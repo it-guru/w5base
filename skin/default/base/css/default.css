@@ -124,6 +124,32 @@ div.context_menu td.active {
         padding:0px;
 }
 
+div#UserJavaScript{
+   position: absolute;
+   left:0px;
+   top:15px;
+   width:400px;
+   border-style:solid;
+   border-color:black;
+   border-width:1px;
+   height:50px;
+   overflow:auto;
+   background:#EAEBE9;
+   display:none;
+   padding:5px;
+}
+
+div#UserJavaScriptActivator{
+   position: absolute;
+   left:0px;
+   top:0px;
+   width:200px;
+   height:10px;
+   border-width:0px;
+   overflow:hidden;
+}
+
+
 iframe.subframe{
 	margin: 0px;
 	margin-left: 2px;

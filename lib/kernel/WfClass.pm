@@ -242,8 +242,8 @@ sub Process
       print $app->HttpHeader("text/html");
       print $app->HtmlHeader(style=>['default.css','kernel.App.Web.css',
                                      'work.css'],
-                              body=>1,form=>1,
-                              title=>"Workflow Process - ERROR");
+                             body=>1,form=>1,
+                             title=>"Workflow Process - ERROR");
       print msg(ERROR,"no step found in '%s'",$self->Self);
       print $app->HtmlBottom(body=>1,form=>1);
       return(undef); 
@@ -347,27 +347,32 @@ sub Process
    foreach my $b (sort(keys(%button))){
       if ($b eq "SaveStep"){
          $nextbutton.="<input type=submit class=workflowbutton ".
-                      "value=\"$button{$b}\" onclick=\"document.btnWhich=this;\" ".
+                      "value=\"$button{$b}\" ".
+                      "onclick=\"document.btnWhich=this;\" ".
                       "name=$b>";
       }
       elsif ($b eq "NextStep"){
          $nextbutton.="<input type=submit class=workflowbutton ".
-                      "value=\"$button{$b}\" onclick=\"document.btnWhich=this;\" ".
+                      "value=\"$button{$b}\" ".
+                      "onclick=\"document.btnWhich=this;\" ".
                       "name=$b>";
       }
       elsif ($b eq "PrevStep"){
          $prevbutton.="<input type=submit class=workflowbutton ".
-                      "value=\"$button{$b}\" onclick=\"document.btnWhich=this;\" ".
+                      "value=\"$button{$b}\" ".
+                      "onclick=\"document.btnWhich=this;\" ".
                       "name=$b>";
       }
       elsif ($b eq "BreakWorkflow"){
          $breakbutton.="<input type=submit class=workflowbutton ".
-                      "value=\"$button{$b}\" onclick=\"document.btnWhich=this;\" ".
+                      "value=\"$button{$b}\" ".
+                      "onclick=\"document.btnWhich=this;\" ".
                       "name=$b>";
       }
       else{
          $addbuttons.="<input type=submit class=workflowbutton ".
-                      "value=\"$button{$b}\" onclick=\"document.btnWhich=this;\" ".
+                      "value=\"$button{$b}\" ".
+                      "onclick=\"document.btnWhich=this;\" ".
                       "name=$b><br>";
       }
    }
@@ -381,7 +386,7 @@ sub Process
                                    'kernel.App.Web.css','workflow.css',
                                    'kernel.TabSelector.css'],
                           js=>['toolbox.js','subModal.js','Workflow.js',
-                               'TextTranslation.js'],
+                               'TextTranslation.js','jquery.js'],
                           body=>1,
                           title=>"Workflow Process - $label");
    print("<form method=POST onsubmit=\"return(ValidateSubmit(this));\">");
@@ -677,7 +682,7 @@ function defaultValidateSubmit(f,b)
 }
 </script>
 EOF
-
+   print($self->getParent->getUserJavaScriptDiv($self->Self,$id));
    print $app->HtmlBottom(body=>1,form=>1);
 
 }

@@ -255,6 +255,27 @@ sub Actor
                $code."</script>");
       }
    }
+   print(<<EOF);
+<script>
+//\$(document).ready(function (){
+//   var UserJavaScript=parent.document.getElementById("UserJavaScript");
+//   UserJavaScript.innerHTML="xxx<br>xxx<br>xxx<br>xxx<br>xxx<br>xxx<br>xxx<br>";
+//   alert("parent="+parent);
+//});
+if (parent){
+parent.addMenu("Hallo");
+parent.addMenu("Hallo");
+parent.addMenu("Hallo");
+parent.addMenu("Hallo");
+parent.addMenu("Hallo");
+parent.addMenu("Hallo");
+parent.showUserJavaScript();
+}
+
+</script>
+
+
+EOF
    
    print $self->HtmlBottom(body=>1,form=>1);
 }

@@ -1212,7 +1212,7 @@ EOF
    $d.="<meta http-equiv=\"content-type\" ".
        "content=\"text/html; charset=$charset\">";
    if (defined($param{'title'})){
-      $d.="<title>";
+      $d.="\n<title>";
       $d.=$param{'title'};
       $d.="</title>\n";
    }
