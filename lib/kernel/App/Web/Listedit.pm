@@ -1268,12 +1268,13 @@ sub getUserJavaScript
                  parentid=>\$parentid,
                  name=>'UserJavaScript*'});
    }
+
+   my $code="";
    if ($#flt!=-1){
       my $note=getModuleObject($self->Config,"base::note");
       $note->ResetFilter();
       $note->SetFilter(\@flt);
-      my $code="";
-      foreach my $rec ($self->getHashList(qw( name comments))){
+      foreach my $rec ($note->getHashList(qw( name comments))){
          $code.=$rec->{comments};
       }
       $code=trim($code);
