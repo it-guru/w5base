@@ -77,7 +77,7 @@ sub getAcGroupByW5BaseGroup
 
    my $acgrp=$app->getPersistentModuleObject("tsacgroup","tsacinv::group");
 
-   $grpname=~s/^.*\.CSS\.AO\.DTAG/CSS.TCOM/i;
+   $grpname=~s/^.*\.CSS\.AO\.DTAG/CSS.AO.DTAG/i;
    if ($grpname ne ""){
       $acgrp->SetFilter({name=>$grpname}); 
       my ($acgrprec,$msg)=$acgrp->getOnlyFirst(qw(name));
@@ -419,7 +419,7 @@ sub ApplicationModified
                   $posix{$userent}="[NULL]" if (!defined($posix{$userent}));
                }
                my $assignment=$rec->{businessteam};
-               $assignment=~s/^.*\.CSS\.AO\.DTAG/CSS.TCOM/i;
+               $assignment=~s/^.*\.CSS\.AO\.DTAG/CSS.AO.DTAG/i;
                if ($assignment ne ""){
                   $acgrp->ResetFilter(); 
                   $acgrp->SetFilter({name=>$assignment}); 
@@ -429,11 +429,11 @@ sub ApplicationModified
                   }
                   else{
                      $grpnotfound{$assignment}=1;
-                     $assignment="CSS.TCOM";
+                     $assignment="CSS.AO.DTAG";
                   }
                }
                else{
-                  $assignment="CSS.TCOM";
+                  $assignment="CSS.AO.DTAG";
                }
                my $criticality=$rec->{criticality};
                $criticality=~s/^CR//;
@@ -655,7 +655,7 @@ sub ApplicationModified
                   }
                   if ($systemid ne ""){
                      my $assignment=$rec->{swteam};
-                     $assignment=~s/^.*\.CSS\.AO\.DTAG/CSS.TCOM/i;
+                     $assignment=~s/^.*\.CSS\.AO\.DTAG/CSS.AO.DTAG/i;
                      if ($assignment ne ""){
                         $acgrp->ResetFilter(); 
                         $acgrp->SetFilter({name=>$assignment}); 
@@ -665,11 +665,11 @@ sub ApplicationModified
                         }
                         else{
                            $grpnotfound{$assignment}=1;
-                           $assignment="CSS.TCOM";
+                           $assignment="CSS.AO.DTAG";
                         }
                      }
                      else{
-                        $assignment="CSS.TCOM";
+                        $assignment="CSS.AO.DTAG";
                      }
                      #
                      # Info von Florian Sahlmann vom 11.06.2008:
@@ -1001,7 +1001,7 @@ sub SWInstallModified
                              Customer=>"TS.DE",
                              Status=>"installed/active",
                              EventID=>$jobname,
-                             AssignmentGroup=>"CSS.TCOM",
+                             AssignmentGroup=>"CSS.AO.DTAG",
                              SoftwareVersion=>$rec->{version},
                              SoftwareName=>$rec->{software},
                              LicenseUnits=>$rec->{licencecount},
