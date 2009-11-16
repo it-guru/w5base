@@ -165,8 +165,7 @@ sub getDefaultContractor
                   unshift(@devcon,{target=>$con->{target},
                                    targetid=>$con->{targetid}});
                } 
-               if (grep(/^orderin2$/,@$roles) ||
-                   grep(/^businessemployee$/,@$roles)){
+               if (grep(/^orderin2$/,@$roles)){
                   push(@devcon,{target=>$con->{target},
                                 targetid=>$con->{targetid}});
                } 
