@@ -705,7 +705,7 @@ sub generateWorkspacePages
                       "resizable=yes,scrollbars=no\")");
       }
       my $d="<table width=100% border=0 cellspacing=0 cellpadding=0>";
-      if ($#m!=-1){
+      #if ($#m!=-1){
          my $param={}; 
          $param->{parent}="base::workflow";
          $param->{mode}="workflowrepeat($wfheadid)";
@@ -744,7 +744,7 @@ sub generateWorkspacePages
          $d.="</tr>" if ($col==1 || $col==2);
          $d.="</table>";
          $d.="</td></tr>";
-      }
+      #}
 
 
       $d.="<tr>".

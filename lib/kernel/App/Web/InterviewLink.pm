@@ -247,12 +247,15 @@ function setA(formid,val)
 
 </script>
 EOF
-   my $s;     
+   my $s="<select name=IMODE style=\"width:200px\">";
+   $s.="</select>";
+
+
    $d.="<div class=header>";
    $d.="<table width=95%><tr><td></td>";
    $d.="<td align=left>".$label."</td>";
    $d.="<td align=right>";
-   $d.="<select name=archiv style=\"width:200px\">";
+   $d.="<select name=IMODE style=\"width:200px\">";
    $d.="<option value=\"\">aktueller Fragenkatalog</option>";
    $d.="</select>";
    $d.="</td></tr></table>";
@@ -291,19 +294,7 @@ EOF
    }
    $d.="</div>" if ($lastqblock ne "");
 
-
-
    $d.="</div></div>";
-   $d.=<<EOF;
-<script language="JavaScript">
-function loadAllForms()
-{
-   $s
-}
-addEvent(window, "load", loadAllForms);
-</script>
-
-EOF
 
 }
 

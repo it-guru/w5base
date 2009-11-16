@@ -215,12 +215,12 @@ sub WorkflowLinkResult
       my %qmax=%q;
       $h->ResetFilter();
       $h->SetFilter(\%qmax);
-      $h->Limit(1002);
+      $h->Limit(1502);
       $h->SetCurrentOrder("id");
       my @l=$h->getHashList("id");
       my %idl=();
       map({$idl{$_->{id}}=1} @l);
-      if (keys(%idl)>1000){
+      if (keys(%idl)>1500){
          print $self->noAccess(msg(ERROR,$self->T("selection to ".
                                "unspecified for search",
                                "kernel::App::Web::WorkflowLink")));
@@ -237,14 +237,14 @@ sub WorkflowLinkResult
             $qadd{directlnkmode}=\"DataIssue";
             $h->ResetFilter();
             $h->SetFilter(\%qadd);
-            $h->Limit(1002);
+            $h->Limit(1502);
             $h->SetCurrentOrder("id");
             printf STDERR ("fifi qadd=%s\n",Dumper(\%qadd));
             my @l=$h->getHashList("id");
             map({$idl{$_->{id}}=1} @l);
          }
       }
-      if (keys(%idl)>1000){
+      if (keys(%idl)>1500){
          print $self->noAccess(msg(ERROR,$self->T("selection to ".
                                "unspecified for search",
                                "kernel::App::Web::WorkflowLink")));

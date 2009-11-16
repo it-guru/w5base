@@ -319,8 +319,8 @@ sub getPosibleActions
    }
    if ($iscurrent && ($stateid==2 || $stateid==4)){
       push(@l,"wfdefer");
-      push(@l,"wfdifine");
-      push(@l,"wfforward");
+      #push(@l,"wfdifine");
+      #push(@l,"wfforward");
       push(@l,"wfmailsend");
    }
    if ($iscurrent && $creator==$userid && ($stateid==16)){

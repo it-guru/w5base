@@ -170,7 +170,8 @@ sub isUserTrusted          # allow extended edit on Workflow
          my $app=getModuleObject($self->Config,"itil::appl");
          $app->SetFilter({id=>$affectedapplicationid});
          my ($arec,$msg)=$app->getOnlyFirst(qw(responseteamid 
-                            businessteamid tsmid semid tsm2id sem2id));
+                                               businessteamid 
+                                               tsmid semid tsm2id sem2id));
          return(0) if (!defined($arec));
          my $userid=$self->getParent->getCurrentUserId();
 

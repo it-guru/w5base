@@ -409,7 +409,7 @@ sub CalcDepr
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="amasset, amportfolio assetportfolio,ammodel, amlocation,".
+   my $from="amasset,amnature, amportfolio assetportfolio,ammodel, amlocation,".
             "(select amcostcenter.* from amcostcenter ".
             " where amcostcenter.bdelete=0) amcostcenter";
 
@@ -423,9 +423,10 @@ sub initSqlWhere
       "assetportfolio.assettag=amasset.assettag ".
       "and assetportfolio.lmodelid=ammodel.lmodelid ".
       "and assetportfolio.llocaid=amlocation.llocaid(+) ".
+      "and ammodel.lnatureid=amnature.lnatureid(+) ".
       "and amasset.lsendercostcenterid=amcostcenter.lcostid(+) ".
       "and assetportfolio.bdelete=0 ".
-      "and ammodel.fullname like '/HARDWARE/%'";
+      "and amnature.name in ('SERVER','VIRTUAL ASSET')";
    return($where);
 }
 
