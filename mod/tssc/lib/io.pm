@@ -470,6 +470,13 @@ sub extractAffectedApplication
    my $truecustomerprio;
 
 
+   msg(DEBUG,"createtime = %s",$rec->{createtime});
+   my $tchm;
+   my $breaktime="2009-10-05 00:00:00";
+   if (exists($rec->{changenumber}) && $rec->{createtime} ne ""){
+      my $d=CalcDateDuration($breaktime,$rec->{createtime});
+      $tchm=$d->{totalminutes};
+   }
    my @chksystemid;
    my @chkapplid;
    #  pass 1 : softwareid
@@ -488,8 +495,15 @@ sub extractAffectedApplication
    my @l2;
    if (defined($rec->{device}) && ref($rec->{device}) eq "ARRAY"){
       foreach my $r (@{$rec->{device}}){
-         if (my ($applid)=$r->{name}=~m/^.*\(((APPLGER|APPL|GER)\d+)\)$/){
-            push(@chkapplid,$applid);
+         if (defined($tchm) && $tchm>0){
+            msg(INFO,"MODIFIED CHANGE Handling since $breaktime !!! ".
+                     "ignoreing device entries");
+         }
+         else{
+            if (my ($applid)=$r->{name}=~m/^.*\(((APPLGER|APPL|GER)\d+)\)$/){
+               push(@chkapplid,$applid);
+               msg(DEBUG,"add %s by entry in device field",$applid);
+            }
          }
       }
    }
@@ -498,6 +512,7 @@ sub extractAffectedApplication
       foreach my $r (@{$rec->{relations}}){
          if ($r->{dstobj} eq "tsacinv::appl"){
             push(@chkapplid,$r->{dst});
+            msg(DEBUG,"add %s by entry in relations table",$r->{dst});
          }
          if ($r->{dstobj} eq "tsacinv::system"){
             push(@chksystemid,$r->{dst});
@@ -573,13 +588,6 @@ sub extractAffectedApplication
    $novalidappl=1 if ($#applid==-1);
    msg(DEBUG,"pass5 validate aglist=%s",join(",",@applid));
    msg(DEBUG,"pre deviceid chkapplid=%s",join(",",@chkapplid));
-   msg(DEBUG,"createtime = %s",$rec->{createtime});
-   my $tchm;
-   my $breaktime="2009-10-05 00:00:00";
-   if (exists($rec->{changenumber}) && $rec->{createtime} ne ""){
-      my $d=CalcDateDuration($breaktime,$rec->{createtime});
-      $tchm=$d->{totalminutes};
-   }
    my $dev=$rec->{deviceid};
    if (defined($tchm) && $tchm>0){
       $dev=undef;

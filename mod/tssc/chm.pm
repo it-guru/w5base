@@ -113,7 +113,7 @@ sub new
                 label         =>'Software (deprecated)',
                 group         =>'software',
                 htmlwidth     =>'300px',
-                htmldetail    =>0,      # fällt demnächst raus - siehe relations
+                htmldetail    =>1,      # fällt demnächst raus - siehe relations
                 vjointo       =>'tssc::chm_software',
                 vjoinon       =>['changenumber'=>'changenumber'],
                 vjoindisp     =>[qw(name)]),
@@ -124,7 +124,7 @@ sub new
                 group         =>'device',
                 htmlwidth     =>'300px',
                 nodetaillink  =>1,
-                htmldetail    =>0,      # fällt demnächst raus - siehe relations
+                htmldetail    =>1,      # fällt demnächst raus - siehe relations
                 vjointo       =>'tssc::chm_device',
                 vjoinon       =>['changenumber'=>'changenumber'],
                 vjoindisp     =>[qw(name)]),
