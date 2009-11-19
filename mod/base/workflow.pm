@@ -57,7 +57,7 @@ sub new
                                   
       new kernel::Field::Text(
                 name          =>'name',
-                uivisible     =>\&isOptionalFieldVisible,
+                htmldetail    =>\&isOptionalFieldVisible,
                 label         =>'Short Description',
                 htmlwidth     =>'350px',
                 size          =>'20',
@@ -124,7 +124,7 @@ sub new
       new base::workflow::Textarea(
                 name          =>'detaildescription',     
                 label         =>'Description',
-                uivisible     =>\&isOptionalFieldVisible,
+                htmldetail    =>\&isOptionalFieldVisible,
                 selectfix     =>1,
                 dataobjattr   =>'wfhead.description'),
 
@@ -134,7 +134,7 @@ sub new
                 label         =>'Short Actionlog',
                 group         =>'flow',
                 allowcleanup  =>1,
-                uivisible     =>\&isOptionalFieldVisible,
+                htmldetail    =>\&isOptionalFieldVisible,
                 vjointo       =>'base::workflowaction',
                 vjoinon       =>['id'=>'wfheadid'],
                 vjoindisp     =>[qw(ascid cdate id name actionref
@@ -147,7 +147,7 @@ sub new
                 label         =>'Relations',
                 group         =>'relations',
                 allowcleanup  =>1,
-                uivisible     =>\&isOptionalFieldVisible,
+                htmldetail    =>\&isOptionalFieldVisible,
                # vjointo       =>'base::workflowaction',
                # vjoinon       =>['id'=>'wfheadid'],
                # vjoindisp     =>[qw(cdate id name actionref
