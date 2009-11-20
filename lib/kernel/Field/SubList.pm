@@ -255,6 +255,7 @@ sub RawValue
       return($current->{$self->Name()});
    }
    if (defined($self->{vjointo})){
+
       my $srcfield=$app->getField($self->{vjoinon}->[0]);
       my $srcval=$srcfield->RawValue($current);
       my $loadfield=$self->{vjoinon}->[1];

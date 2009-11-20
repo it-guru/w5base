@@ -519,7 +519,7 @@ sub getHashList
          ($rec,$msg)=$self->getNext();
       } until(!defined($rec));
    }
-   msg(INFO,"getHashList: msg=$msg") if ($msg ne "");
+   msg(INFO,"getHashList: (".join(",",caller()).") msg=$msg") if ($msg ne "");
    return(@l) if (wantarray());
    return(\@l);
 }

@@ -186,6 +186,25 @@ sub getDynamicFields
                 container     =>'headref',
                 label         =>'NetworkareaID'),
 
+      new kernel::Field::Text(
+                name          =>'affecteditemprio',
+                container     =>'headref',
+                group         =>'eventnotifyshort',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current}) &&
+                       exists($param{current}->{affecteditemprio})){
+                      my $o=$self->getParent->getField("affecteditemprio");
+                      my $d=$param{current}->{affecteditemprio};
+                      return(1) if ($d ne "");
+                   }
+                   return(0);
+                },
+                searchable    =>0,
+                label         =>'Affected Item Prio'),
+
       new kernel::Field::Select(
                 name          =>'affectedregion',
                 translation   =>'itil::workflow::eventnotify',
@@ -219,8 +238,8 @@ sub getDynamicFields
       new kernel::Field::KeyText( 
                 name          =>'affectedcustomerid',
                 htmldetail    =>0,
-                translation   =>'itil::workflow::base',
                 searchable    =>0,
+                translation   =>'itil::workflow::base',
                 keyhandler    =>'kh',
                 container     =>'headref',
                 group         =>'affected',
@@ -1040,7 +1059,7 @@ sub getNotifyDestinations
 }
 
 
-sub getNotificationSubject
+sub getNotificationSubject 
 {
    my $self=shift;
    my $WfRec=shift;
@@ -1048,23 +1067,64 @@ sub getNotificationSubject
    my $subjectlabel=shift;
    my $failclass=shift;
    my $ag=shift;
-
-   my $subject="Event: $ag";
-#   my $sitename=$self->Config->Param("SITENAME");  # verwirrt anscheinend nur
-#   if ($sitename ne ""){
-#      $subject=$sitename.": ".$subject;
-#   }
+   my $state;
+   my $id=$WfRec->{id};
+   $self->getParent->Action->ResetFilter();
+   $self->getParent->Action->SetFilter({wfheadid=>\$id});
+   my @l=$self->getParent->Action->getHashList(qw(cdate name));
+   my $sendcustinfocount=0;
+   foreach my $arec (@l){
+      $sendcustinfocount++ if ($arec->{name} eq "sendcustinfo");
+   }
+#print STDERR ("fifi %s\n",Dumper($WfRec));
+   if ($WfRec->{stateid} == 17){
+     $state=$self->getParent->T("finish info","itil::workflow::eventnotify");
+   }elsif ($sendcustinfocount > 0){
+     $state=$sendcustinfocount.". ".
+            $self->getParent->T("follow info","itil::workflow::eventnotify");
+   }else{
+     $state=$self->getParent->T("first information",
+                                "itil::workflow::eventnotify");
+   }
+   my $afcust=$WfRec->{affectedcustomer}->[0]; # only first customer 
+   my $subject="EK ".$WfRec->{eventstatclass};
+   my $prio="";
+   if ($WfRec->{affecteditemprio} ne ""){
+      $prio="Prio$WfRec->{affecteditemprio} ";
+   }
+   my $subject2=" / $ag / $state Incident / ".$afcust." / $prio".
+                $self->getParent->T("Application")." /";
    if ($WfRec->{eventmode} eq "EVk.net"){ 
-      $subject.=" Network";
+      $subject2=" / IP-Net / $state Incident / DTAG.T-Home / ".
+                $self->getParent->T("Networkarea")." /";
    }
    if ($WfRec->{eventmode} eq "EVk.infraloc"){ 
-      $subject.=" Infrastructure; ".$WfRec->{name};
+      my $loc=$WfRec->{affectedlocation};
+      $loc=$WfRec->{affectedlocation}->[0] if (ref($WfRec->{affectedlocation}));
+      $subject2=" / $loc / $state / ".$self->getParent->T("Location")." / ";
    }
-   $subject.="; ".$subjectlabel;
-   $subject.="; EKL: ".$failclass;
-   $subject.="; HeadID ".$WfRec->{id};
+   if ($action eq "rootcausei" && $WfRec->{eventmode} eq "EVk.appl"){
+      $subject2=" / $ag / ".$self->getParent->T("rootcause analyse").
+                " / $afcust / $prio".$self->getParent->T("Application").
+                " /";
+   }
+   if ($action eq "rootcausei" && $WfRec->{eventmode} eq "EVk.infraloc"){
+      my $loc=$WfRec->{affectedlocation};
+      $loc=$WfRec->{affectedlocation}->[0] if (ref($WfRec->{affectedlocation}));
+      $subject2=" / $loc / ".$self->getParent->T("rootcause analyse").
+                " / ".$self->getParent->T("Location")." /";
+   }
+   if ($action eq "rootcausei" && $WfRec->{eventmode} eq "EVk.net"){
+      my $net=$WfRec->{affectednetwork};
+      $net=$WfRec->{affectednetwork}->[0] if (ref($WfRec->{affectednetwork}));
+      $subject2=" / $net / ".$self->getParent->T("rootcause analyse").
+                " / ".$self->getParent->T("Networkarea")." /";
+   }
+   $subject.=$subject2;
+   $subject.=" ID:".$WfRec->{id};
    return($subject);
 }
+
 
 sub getNotificationSkinbase
 {
@@ -1077,9 +1137,42 @@ sub getSalutation
 {
    my $self=shift;
    my $WfRec=shift;
-   return(0);
+   my $action=shift;
+   my $ag=shift;
+   my $salutation;
+   my $st;
+   $ag="\"$ag\"";
+   if (length($ag) > 16){
+       $ag="<br>$ag";
+   }
+   my $eventstat=$WfRec->{stateid};
+   my $eventstart=$WfRec->{eventstartofevent};
+   my $utz=$self->getParent->UserTimezone();
+   my $creationtime=$self->getParent->ExpandTimeExpression(
+                                                  $eventstart,"de","UTC",$utz);
+   if ($WfRec->{eventmode} eq "EVk.infraloc" && $eventstat==17){
+      my $loc=$WfRec->{affectedlocation};
+      $loc=$WfRec->{affectedlocation}->[0] if (ref($WfRec->{affectedlocation}));
+      $salutation=sprintf($self->T("SALUTATION02.close"),$loc);
+   }elsif($WfRec->{eventmode} eq "EVk.infraloc"){
+      my $loc=$WfRec->{affectedlocation};
+      $loc=$WfRec->{affectedlocation}->[0] if (ref($WfRec->{affectedlocation}));
+      $salutation=sprintf($self->T("SALUTATION02.open"),$loc);
+   }elsif ($WfRec->{eventmode} eq "EVk.appl" && $eventstat==17){
+      $salutation=sprintf($self->T("SALUTATION03.close"),$ag);
+   }elsif($WfRec->{eventmode} eq "EVk.appl"){
+      $salutation=sprintf($self->T("SALUTATION03.open"),$ag,$creationtime);
+   }elsif ($WfRec->{eventmode} eq "EVk.net" && $eventstat==17){
+      $salutation=sprintf($self->T("SALUTATION04.close"));
+   }elsif($WfRec->{eventmode} eq "EVk.net"){   
+      $salutation=sprintf($self->T("SALUTATION04.open"));
+   }
+   if ($action eq "rootcausei"){
+      $salutation=sprintf($self->T("SALUTATION10"));
+   }
+   return($salutation);
 }
-
+ 
 
 sub generateMailSet
 {
@@ -1107,17 +1200,19 @@ sub generateMailSet
    }
 
    my @baseset=qw(wffields.eventstartofevent wffields.eventendofevent
-                  wffields.eventstatnature wffields.eventstatclass);
+                  wffields.eventstatclass);
+   push(@baseset,qw(wffields.affectedregion));
    if ($WfRec->{eventmode} eq "EVk.appl"){
       push(@baseset,"affectedapplication");
+      push(@baseset,"wffields.affectedcustomer");
    }
-   my $fo=$self->getField("wffields.eventmode",$WfRec);
-   if (defined($fo)){
-      my $v=$fo->FormatedResult($WfRec,"HtmlMail");
-      if ($v ne ""){
-         $$smstext.=$v."\n";
-      }
+   if ($WfRec->{eventmode} eq "EVk.infraloc"){
+      push(@baseset,"wffields.affectedlocation");
    }
+   if ($WfRec->{eventmode} eq "EVk.net"){
+      push(@baseset,"wffields.affectednetwork");
+   }
+
 
    my @sets=([@baseset,qw(  
                           wffields.eventimpact
@@ -1129,44 +1224,83 @@ sub generateMailSet
                           wffields.eventaltreason 
                           wffields.altshorteventelimination
                          )]);
-   foreach my $lang (split(/-/,$$eventlang)){
+   my @eventlanglist=split(/-/,$$eventlang);
+   for(my $langno=0;$langno<=$#eventlanglist;$langno++){
+      my $lang=$eventlanglist[$langno];
       my $line=0;
       my $mailsep=0;
       $mailsep="$lang:" if ($#emailsep!=-1); 
       $ENV{HTTP_FORCE_LANGUAGE}=$lang;
       my @fields=@{shift(@sets)};
+
+      if ($langno==0){
+         my $fo=$self->getField("wffields.eventmode",$WfRec);
+         if (defined($fo)){
+            my $v=$fo->FormatedResult($WfRec,"HtmlMail");
+            if ($v ne ""){
+               $$smstext.=$v."\n";
+            }
+         }
+      }
+
       foreach my $field (@fields){
          my $fo=$self->getField($field,$WfRec);
          my $sh=0;
          $sh=" " if ($field eq "wffields.eventaltdesciption" ||
                      $field eq "wffields.eventdesciption");
          if (defined($fo)){
+            if ($langno==0){
+               my $vv=$fo->FormatedResult($WfRec,"ShortMsg");
+               if ($vv ne ""){
+                  if ($field=~m/(eventstartofevent)/){
+                     $$smstext.="Start:".$vv."\n";
+                  }
+                  elsif ($field=~m/(eventendofevent)/){
+                     $$smstext.="Ende:".$vv."\n";
+                  }
+                  elsif ($field=~m/(affectedapplication)/){
+                     $$smstext.="AG:".$vv."\n";
+                  }
+                  elsif ($field=~m/(affectedlocation)/){
+                     $$smstext.="$vv\n";
+                  }
+                  elsif ($field=~m/(affectednetwork)/){
+                     $$smstext.="$vv\n";
+                  }
+                  elsif ($field=~m/(eventstatnature)/){
+                     $$smstext.=$vv."\n";
+                  }
+                  elsif ($field=~m/(affectedcustomer)/){
+                     $vv=~s/^([^\.]+\.[^\.]+).*$/$1/;
+                     $$smstext.=$vv."\n";
+                  }
+                  elsif ($field=~m/^id$/){
+                     $$smstext.="ID:".$vv."\n";
+                  }
+                  elsif (($field=~m/(eventstatclass)/)){
+                     $$smstext.=$fo->Label().":".$vv."\n";
+                  }
+               }
+            }
+
             my $v=$fo->FormatedResult($WfRec,"HtmlMail");
             if ($v ne ""){
                if ($field eq "wffields.eventstatclass" &&
                    $v eq "1" || $v eq "2"){
                   $$allowsms=1
                }
-               if (grep(/^$field$/,qw(wffields.eventstartofevent 
-                                      wffields.eventendofevent
-                                      wffields.eventstatclass 
-                                      affectedapplication))){
-                   my $vv=$v;
-                   $vv=~s/&nbsp;/ /g;;
-                   $$smstext.=$fo->Label().":".$vv."\n";
-               }
-               if ($baseurl ne "" && $line==0){
-                  my $ilang="?HTTP_ACCEPT_LANGUAGE=$lang";
-                  my $imgtitle=$self->getParent->T("current state of workflow",
-                                                   "base::workflow");
-                  push(@emailpostfix,
-                       "<img title=\"$imgtitle\" class=status border=0 ".
-                       "src=\"$baseurl/public/base/workflow/".
-                       "ShowState/$WfRec->{id}$ilang\">");
-               }
-               else{
+              # if ($baseurl ne "" && $line==0){
+              #    my $ilang="?HTTP_ACCEPT_LANGUAGE=$lang";
+              #    my $imgtitle=$self->getParent->T("current state of workflow",
+              #                                     "base::workflow");
+              #    push(@emailpostfix,
+              #         "<img title=\"$imgtitle\" class=status border=0 ".
+              #         "src=\"$baseurl/public/base/workflow/".
+              #         "ShowState/$WfRec->{id}$ilang\">");
+              # }
+              # else{
                   push(@emailpostfix,"");
-               }
+              # }
                push(@emailprefix,$fo->Label().":");
                my $data=$v;
                $data=~s/</&lt;/g;
@@ -1788,7 +1922,7 @@ sub nativProcess
          my ($arec,$msg)=$appl->getOnlyFirst(qw(name customer customerid 
                                                 mandator mandatorid conumber
                                                 responseteam businessteam
-                                                eventlang
+                                                eventlang customerprio
                                                 custcontracts id));
          if (defined($arec)){
             $app=$arec->{name};
@@ -1800,6 +1934,7 @@ sub nativProcess
             $h->{involvedresponseteam}=[$arec->{businessteam}];
             $h->{involvedcostcenter}=[$arec->{conumber}];
             $h->{eventlang}=$arec->{eventlang};
+            $h->{affecteditemprio}=$arec->{customerprio};
             my @custcontract;
             my @custcontractid;
             if (!$self->getParent->ValidateCreate($h)){
@@ -2239,8 +2374,30 @@ sub Process
       my %headtext=();
       my $altheadtext="";
       my $subjectlabel;
+
+
+      my $ag="";
+      if ($WfRec->{eventmode} eq "EVk.appl"){ 
+         foreach my $appl (@{$WfRec->{affectedapplication}}){
+            $ag.="; " if ($ag ne "");
+            $ag.=$appl;
+         }
+      }
+
+      my $failclass=$WfRec->{eventstatclass};
+      my $subject="Subject";
+      my $salutation="Sehr geehte Damen und Herren";
+      my $altsalutation=$salutation;
       for(my $cl=0;$cl<=$#langlist;$cl++){
          $ENV{HTTP_FORCE_LANGUAGE}=$langlist[$cl];
+         if ($cl==0){
+            $subject=$self->getParent->getNotificationSubject($WfRec,
+                                  "sendcustinfo",$subjectlabel,$failclass,$ag);
+            $salutation=$self->getParent->getSalutation($WfRec,$action,$ag);
+         }
+         else{
+            $altsalutation=$self->getParent->getSalutation($WfRec,$action,$ag);
+         }
          my $ht;
          $subjectlabel="first information";
          my $ht=$self->T($subjectlabel,'itil::workflow::eventnotify');
@@ -2256,20 +2413,6 @@ sub Process
          delete($ENV{HTTP_FORCE_LANGUAGE});
          $headtext{"headtextPAGE".$cl}=$ht;
       }
-      my $ag="";
-      if ($WfRec->{eventmode} eq "EVk.appl"){ 
-         foreach my $appl (@{$WfRec->{affectedapplication}}){
-            $ag.="; " if ($ag ne "");
-            $ag.=$appl;
-         }
-      }
-
-      my $failclass=$WfRec->{eventstatclass};
-      my $subject=$self->getParent->getNotificationSubject($WfRec,
-                               "sendcustinfo",$subjectlabel,$failclass,$ag);
-#      my $subject=$self->getParent->getNotificationSubject($WfRec,
-#                               "sendcustinfo",$subjectlabel,$failclass,$ag);
-      my $salutation=$self->getParent->getSalutation($WfRec,$action,$ag);
 #   elsif ($variname eq "HEADCOLOR"){
 #      my $val=$self->findtemplvar("referenz_failend");
 #      my $failclass=$self->findtemplvar("referenz_failclass"); 
@@ -2298,7 +2441,9 @@ sub Process
         $failcolor="yellow";
      }
       my %additional=(headcolor=>$failcolor,eventtype=>'Event',    
-                      %headtext,headid=>$id,salutation=>$salutation,
+                      %headtext,headid=>$id,
+                      salutation=>$salutation,
+                      altsalutation=>$altsalutation,
                       creationtime=>$creationtime);
       $self->getParent->generateMailSet($WfRec,$action,\$eventlang,\%additional,
                        \@emailprefix,\@emailpostfix,\@emailtext,\@emailsep,
@@ -2548,7 +2693,6 @@ sub Process
       my $h=$self->getWriteRequestHash("web",{class=>$self->getParent->Self});
       $h->{stateid}=21;
       my $newstep=$self->getParent->getStepByShortname("wfclose",$WfRec);
-printf STDERR ("fifi newstep=$newstep $h->{step}\n");
       $h->{step}=$newstep;
       if ($self->getParent->StoreRecord($WfRec,$newstep,$h)){
          if ($self->getParent->getParent->Action->StoreRecord(

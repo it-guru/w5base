@@ -16,7 +16,7 @@
 'Action for long event elimination'=>{de=>'Langfristige Maßnahmen'},
 'Action for short event elimination'=>{de=>'Kurzfristige Maßnahmen zur Service Wiederherstellung'},
 'Impact for customer'=>{de=>'Auswirkungen für den Kunden'},
-'Event reason'=>{de=>'Ursache'},
+'Event reason'=>{de=>'Beschreibung der Ursache'},
 'Whats happend'=>{de=>'Ereignisbeschreibung - (Was ist passiert)'},
 'Event Start'=>{de=>'Ereignisbeginn'},
 'Event End'=>{de=>'Ereignisende'},
@@ -54,6 +54,9 @@
 'EVk.net'=>{de=>'IP-Netzwerk Standort übergreifend',en=>'IP-Network location indipendent'},
 'EVk.infraloc'=>{de=>'Infrastruktur Standort',en=>'Infrastructure location'},
 'Networkarea'=>{de=>'Netzbereich'},
+'Application'=>{de=>'Applikation'},
+'Location'=>{de=>'Standort'},
+'rootcause analyse'=>{de=>'Ursachenanalyse'},
 'Affected Region'=>{de=>'betroffene Region'},
 'EVregion.unknown'=>{de=>'unklares Ausmaß',en=>'unknown area'},
 'EVregion.nord'=>{de=>'nord Deutschland',en=>'north germany'},
@@ -78,3 +81,64 @@
 'expected event end'=>{de=>'voraussichtliches Ende'},
 'static mail subject'=>{de=>'statischer Benachrichtigungs-Betreff'},
 'static additional notify distribution list'=>{de=>'statische zusätzliche Verteilerliste'},
+'Affected Item Prio'=>{de=>'Prio des betroffenen Elementes'},
+
+
+'SALUTATION02.open'=>{
+ 'de'=>"Sehr geehrte Damen und Herren,\n\n".
+       "im Folgenden erhalten Sie den aktuellen Stand zum Ereignis\n".
+       'am Standort %s .',
+ 'en'=>"Ladies and Gentlemen,\n\n".
+       "at the following mail, you will get informations about\n".
+       'the event at the location %s .'
+},
+'SALUTATION02.close'=>{
+ 'de'=>"Sehr geehrte Damen und Herren,\n\n".
+       "dies Beeinträchtigungen am Standort\n".
+       '%s sind beseitigt.',
+ 'en'=>"Ladies and Gentlemen,\n\n".
+       "the derogations in relation to\n".
+       'location %s are eliminated.'
+},
+
+'SALUTATION03.open'=>{
+ 'de'=>"Sehr geehrte Damen und Herren,\n\n".
+       "im Folgenden erhalten Sie den aktuellen Stand zum Ereignis\n".
+       'der Anwendung %s vom %s.',
+ 'en'=>"Ladies and Gentlemen,\n\n".
+       "at the following mail, you will get informations about\n".
+       'the event at the application %s from %s.'
+},
+'SALUTATION03.close'=>{
+ 'de'=>"Sehr geehrte Damen und Herren,\n\n".
+       "dies Beeinträchtigungen im Umfeld der\n".
+       'Anwendung %s sind beseitigt.',
+ 'en'=>"Ladies and Gentlemen,\n\n".
+       "the derogations in relation to\n".
+       'application %s are eliminated.'
+},
+
+'SALUTATION04.open'=>{
+ 'de'=>"Sehr geehrte Damen und Herren,\n\n".
+       "im Folgenden erhalten Sie den aktuellen Stand zum Ereignis\n".
+       'im Umfeld des TCP/IP-Netzes.',
+ 'en'=>"Ladies and Gentlemen,\n\n".
+       "at the following mail, you will get informations about\n".
+       'the event at the IP-Network.'
+},
+'SALUTATION04.close'=>{
+ 'de'=>"Sehr geehrte Damen und Herren,\n\n".
+       "dies Beeinträchtigungen im Umfeld der\n".
+       'TCP/IP-Netzes sind beseitigt.',
+ 'en'=>"Ladies and Gentlemen,\n\n".
+       "the derogations in relation to\n".
+       'the IP-Network are eliminated.'
+},
+
+'SALUTATION10'=>{
+ 'de'=>"Sehr geehrte Damen und Herren,\n\n".
+       "wir informieren Sie über das Ergebnis der\n".
+       'Ursachenanalyse und über die eingeleiteten Maßnahmen.',
+ 'en'=>"Ladies and Gentlemen,\n\n".
+       "we will inform you about the results of the rootcause analyse."
+},

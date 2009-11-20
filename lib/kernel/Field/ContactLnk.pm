@@ -34,8 +34,13 @@ sub new
    $self{'vjoinon'}=['id'=>'refid']      if (!defined($self{'vjoinon'}));
    $self{'allowcleanup'}=1               if (!defined($self{'allowcleanup'}));
    $self{'forwardSearch'}=1              if (!defined($self{'forwardSearch'}));
-   if (!defined($self{vjoindisp})){
-      $self{vjoindisp}=['targetname','comments',"roles"];
+   if (!defined($self{'vjoindisp'})){
+      $self{'vjoindisp'}=['targetname','comments',"roles"];
+   }
+   if (!defined($self{'vjoininhash'})){
+      $self{'vjoininhash'}=['mdate','id','target','targetid',
+                            'roles','expiration','mdate',
+                            'srcsys','srcid','srcload'];
    }
 
    my $self=bless($type->SUPER::new(%self),$type);

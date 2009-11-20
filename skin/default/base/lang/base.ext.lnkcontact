@@ -3,4 +3,5 @@
 'RCHManager'=>{de=>'Change Manager',en=>'Change Manager'},
 'infrastruct'=>{de=>'Infrastruktur Ansprechpartner',en=>'Infrastructur'},
 'itnetwork'=>{de=>'IT-Netzwerk Ansprechpartner',en=>'IT-Network'},
+'staffloc'=>{de=>'Personalstandort',en=>'Staff-location'},
 'project member'=>{de=>'Projektmitarbeiter'},

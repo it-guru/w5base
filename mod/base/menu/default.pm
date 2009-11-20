@@ -173,6 +173,10 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("sysadm.location.lnklocationcontact",
+                      "base::lnklocationcontact",
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("sysadm.location.googlekeys",
                       "base::googlekeys",
                       defaultacl=>['admin']);

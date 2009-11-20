@@ -46,9 +46,10 @@ sub ImportTSInetLocation
 
    my $tsiloc=getModuleObject($self->Config,"tsinet::location");
    my $loc=getModuleObject($self->Config,"base::location");
-   my $locop=getModuleObject($self->Config,"base::location");
+   my $lnk=getModuleObject($self->Config,"base::lnkcontact");
    my $grp=getModuleObject($self->Config,"base::grp");
    my $org="DTAG.T-HOME";
+   my $start=NowStamp("en");
 
    $grp->SetFilter({fullname=>\$org});
    my ($grprec,$msg)=$grp->getOnlyFirst(qw(id fullname name));
@@ -59,6 +60,7 @@ sub ImportTSInetLocation
    my %thloc;
 
    $tsiloc->SetCurrentView(qw(ALL));
+   #$tsiloc->SetFilter({location=>"Bamberg"});
    my ($rec,$msg)=$tsiloc->getFirst(unbuffered=>1);
    if (defined($rec)){
       do{
@@ -68,16 +70,42 @@ sub ImportTSInetLocation
             msg(DEBUG,"w5locid=%s",$w5id);
             $loc->SetFilter({id=>\$w5id});
             my ($w5loc)=$loc->getOnlyFirst(qw(ALL));
-            my $newrec={};
-            if ($w5loc->{orggrpid} ne $grprec->{grpid}){
-               $newrec->{orggrpid}=$grprec->{grpid};
+            printf STDERR ("d=%s\n",Dumper($w5loc));
+            my $found;
+            foreach my $crec (@{$w5loc->{contacts}}){
+                my $roles=$crec->{roles};
+                $roles=[$roles] if (ref($roles) ne "ARRAY");
+                if ($crec->{target} eq "base::grp" &&
+                    $crec->{targetid} eq $grprec->{grpid}){
+                   $found=$crec->{id};
+                }
             }
-            if ($w5loc->{orgprio} ne $rec->{prio}){
-               $newrec->{orgprio}=$rec->{prio};
+            if (!defined($found)){
+               my $lnkid=$lnk->ValidatedInsertRecord({
+                  target=>'base::grp',
+                  targetid=>$grprec->{grpid},
+                  srcsys=>"TSINET",
+                  srcload=>NowStamp("en"),
+                  parentobj=>"base::location",
+                  refid=>$w5loc->{id}
+               });
+               $found=$lnkid if ($lnkid);
             }
-            if (keys(%$newrec)){
-               msg(DEBUG,"write=%s",Dumper($newrec));
-               $loc->ValidatedUpdateRecord($w5loc,$newrec,{id=>\$w5loc->{id}});
+            if ($found){
+               $lnk->SetFilter({id=>\$found});
+               my ($lnkrec)=$lnk->getOnlyFirst(qw(ALL));
+               my $roles=$lnkrec->{roles};
+               $roles=[$roles] if (ref($roles) ne "ARRAY");
+               if (!grep(/^staffloc$/,@$roles)){
+                  push(@$roles,"staffloc");
+               }
+               @$roles=grep(!/^\s*$/,@$roles);
+               
+               $lnk->ValidatedUpdateRecord($lnkrec,{comments=>'Prio1',
+                                                    srcsys=>'TSINET',
+                                                    srcload=>$start,
+                                                    roles=>$roles},
+                                           {id=>\$found});
             }
             $thloc{$w5loc->{id}}++;
          }
@@ -90,25 +118,9 @@ sub ImportTSInetLocation
    }
 
 
-   $loc->ResetFilter();
-   $loc->SetFilter({orggrpid=>\$grprec->{grpid}});
-   $loc->SetCurrentView(qw(ALL));
-
-   my ($rec,$msg)=$loc->getFirst(unbuffered=>1);
-   if (defined($rec)){
-      do{
-         if (!exists($thloc{$rec->{id}})){
-            $locop->ValidatedUpdateRecord($rec,{orgprio=>'2',orggrpid=>undef},
-                                          {id=>\$rec->{id}});
-         }
-         ($rec,$msg)=$loc->getNext();
-      } until(!defined($rec));
-   }
-
-
-
-
-
+   $lnk->ResetFilter();
+   $lnk->SetFilter({srcsys=>\'TSINET',srcload=>"\"<$start\""});
+   $lnk->DeleteAllFilteredRecords("ValidatedDeleteRecord");
 
    return({exitcode=>0}); 
 }

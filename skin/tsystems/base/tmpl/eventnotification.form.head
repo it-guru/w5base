@@ -83,7 +83,7 @@ pre.text {
 #notityval {
    font-family: Georgia, Arial, Helvetica, sans-serif;
    font-size: 20px;
-   color: #FFFFFF;
+   color: #000000;
    text-align: left;
    vertical-align: top;
 }
@@ -93,7 +93,7 @@ p.header {
    padding: 1px;
 }
 div.separation{
-   height:820px;
+   xxxheight:820px;
    width:754px;
    background-color: #e6e6e6;
 }
@@ -103,12 +103,13 @@ div.separation{
 <body leftmargin=0 topmargin=0 marginwidth=0 marginheight=0>
 <form>
 <a name="lang.%currentlang%"></a>
-<table class=tabelle width=754 height=140 border=0 cellspacing=0 cellpadding=0>
+<table class=tabelle bgcolor="#FFFFFF" width=754 
+       border=0 cellspacing=0 cellpadding=0>
   <tr>                           
-    <td rowspan=2 width=121 height=100% bgcolor=#E20074>
-       <table border=0 height=100% width=100% cellspacing=0 cellpadding=0>
+    <td rowspan=2 width=121 height=100% >
+       <table bgcolor="#FFFFFF" border=0 
+              height=100% width=100% cellspacing=0 cellpadding=0>
           <tr><td width=5 rowspan=4></td></tr>
-          <tr><td height=70></td></tr>
           <tr><td valign=bottom id=notitytext>
                   %eventtype%
               </td></tr>
@@ -117,25 +118,31 @@ div.separation{
           </td></tr>
        </table>
     </td>
-    <td width=633>
-       <table width=100% height=100% border=0 cellspacing=0 cellpadding=0>
-            <tr><td width=100%>
-                <img src="cid:eventnotification.bild2.jpg"/> 
-            </td></tr>
-       </table>
-    </td>
   </tr>
-  <tr height=100% width=100%>
+  <tr height=100%>
     <td>
-       <table width=100% height=100% border=0 cellspacing=0 cellpadding=0>
-          <tr height=0><td></td></tr>
+       <table bgcolor="#FFFFFF" border=0 
+              width=100% height=100% cellspacing=0 cellpadding=0>
           <tr><td width=2></td>
           <td bgcolor="%headcolor%" valign=middle>
-              &nbsp; %headtext% %altheadtext%</td>
-          <td bgcolor="%headcolor%" width=60 valign=middle
+              &nbsp; &nbsp; &nbsp; %headtext% %altheadtext%</td>
+          <td bgcolor="%headcolor%" width=60 valign=top
               align=center>%langcontrol%</td>
           <tr><td height=1></td></tr>
        </table>
     </td>
+  </tr>
+</table>
+
+<table class=tabelle bgcolor="#FFFFFF" width=754 
+       border=0 cellspacing=0 cellpadding=0>
+  <tr>                           
+  <td>
+
+<table width=100% cellpadding=10>
+<tr><td><pre class="text">%salutation%</pre></td></tr>
+</table>
+
+  </td>
   </tr>
 </table>

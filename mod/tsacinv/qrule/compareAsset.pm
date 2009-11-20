@@ -12,7 +12,7 @@ Only assets in W5Base with state "installed/active" will be synced!
 
 =head3 IMPORTS
 
-Location, Room, Memory, CPU-Count, Core-Count, SerialNo
+Location, Room, Memory, CPU-Count, Core-Count, SerialNo, CO-Number
 
 =cut
 

@@ -405,16 +405,20 @@ sub Sendmail
          msg(DEBUG,"adding pictures to mail body as multiplart content");
          for(my $c=1;$c<=9;$c++){
             my $imgname="$template.bild$c.jpg";
-            if (my $pic=$app->getSkinFile($app->SkinBase()."/img/".$imgname)){
-               if (open(IMG,"<$pic")){
-                  my $imgbin=join("",<IMG>);
-                  close(IMG);
-                  $mail.="\nContent-ID: <$imgname>\n";
-                  $mail.="Content-Type: image/jpg\n";
-                  $mail.="Content-Name: $imgname\n";
-                  $mail.="Content-Transfer-Encoding: base64\n\n";
-                  $mail.=encode_base64($imgbin);
-                  $mail.="\n--$relbound";
+            my $qimgname=quotemeta($imgname);
+            if (grep(/cid:$qimgname/,$mail)){
+               if (my $pic=$app->getSkinFile($app->SkinBase()."/img/".
+                                             $imgname)){
+                  if (open(IMG,"<$pic")){
+                     my $imgbin=join("",<IMG>);
+                     close(IMG);
+                     $mail.="\nContent-ID: <$imgname>\n";
+                     $mail.="Content-Type: image/jpg\n";
+                     $mail.="Content-Name: $imgname\n";
+                     $mail.="Content-Transfer-Encoding: base64\n\n";
+                     $mail.=encode_base64($imgbin);
+                     $mail.="\n--$relbound";
+                  }
                }
             }
          }

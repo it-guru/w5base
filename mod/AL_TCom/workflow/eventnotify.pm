@@ -492,157 +492,10 @@ sub getPosibleEventStatType
    return(@l);
 }
 
-sub getNotificationSubject 
-{
-   my $self=shift;
-   my $WfRec=shift;
-   if ($WfRec->{eventlang} ne "de"){
-      return($self->SUPER::getNotificationSubject($WfRec,@_));
-   }
-   my $action=shift;
-   my $subjectlabel=shift;
-   my $failclass=shift;
-   my $ag=shift;
-   my $state;
-   my $id=$WfRec->{id};
-   $self->getParent->Action->ResetFilter();
-   $self->getParent->Action->SetFilter({wfheadid=>\$id});
-   my @l=$self->getParent->Action->getHashList(qw(cdate name));
-   my $sendcustinfocount=0;
-   foreach my $arec (@l){
-      $sendcustinfocount++ if ($arec->{name} eq "sendcustinfo");
-   }
-#print STDERR ("fifi %s\n",Dumper($WfRec));
-   if ($WfRec->{stateid} == 17){
-     $state=$self->getParent->T("finish info","itil::workflow::eventnotify");
-   }elsif ($sendcustinfocount > 0){
-     $state=$sendcustinfocount.". ".$self->getParent->T("follow info","itil::workflow::eventnotify");
-   }else{
-     $state=$self->getParent->T("first information","itil::workflow::eventnotify");
-   }
-   my $afcust=$WfRec->{affectedcustomer}->[0]; # only first customer will be displayed
-   my $subject="EK ".$WfRec->{eventstatclass};
-   my $subject2=" / $ag / $state Incident / ".$afcust." / Applikation / ";
-   if ($WfRec->{eventmode} eq "EVk.net"){ 
-      $subject2=" / Hitnet / $state Incident / DTAG.T-Home / Netz / ";
-   }
-   if ($WfRec->{eventmode} eq "EVk.infraloc"){ 
-      my $loc=$WfRec->{affectedlocation};
-      $loc=$WfRec->{affectedlocation}->[0] if (ref($WfRec->{affectedlocation}));
-      $subject2=" / $loc / $state / Standort / ";
-   }
-   if ($action eq "rootcausei" && $WfRec->{eventmode} eq "EVk.appl"){
-      $subject2=" / $ag / Ursachenanalyse / $afcust / Applikation /";
-   }
-   if ($action eq "rootcausei" && $WfRec->{eventmode} eq "EVk.infraloc"){
-      my $loc=$WfRec->{affectedlocation};
-      $loc=$WfRec->{affectedlocation}->[0] if (ref($WfRec->{affectedlocation}));
-      $subject2=" / $loc / Ursachenanalyse / Standort /";
-   }
-   if ($action eq "rootcausei" && $WfRec->{eventmode} eq "EVk.net"){
-      my $net=$WfRec->{affectednetwork};
-      $net=$WfRec->{affectednetwork}->[0] if (ref($WfRec->{affectednetwork}));
-      $subject2=" / $net / Ursachenanalyse / IP-Netzwerk /";
-   }
-   $subject.=$subject2;
-   $subject.=" HeadID ".$WfRec->{id};
-   return($subject);
-}
-
-sub getSalutation
-{
-   my $self=shift;
-   my $WfRec=shift;
-   my $action=shift;
-   my $ag=shift;
-   my $salutation;
-   my $info;
-   my $st;
-   $ag="\"$ag\"";
-   if (length($ag) > 16){
-       $ag="<br>$ag";
-   }
-   my $eventstat=$WfRec->{stateid};
-   my $eventstart=$WfRec->{eventstartofevent};
-   my $utz=$self->getParent->UserTimezone();
-   my $creationtime=$self->getParent->ExpandTimeExpression($eventstart,"de","UTC",$utz);
-   if ($WfRec->{eventmode} eq "EVk.infraloc" && $eventstat==17){
-      my $loc=$WfRec->{affectedlocation};
-      $loc=$WfRec->{affectedlocation}->[0] if (ref($WfRec->{affectedlocation}));
-      $salutation=<<EOF;
-Sehr geehrte Kundin, sehr geehrter Kunde,
-
-die Beeinträchtigung am Standort 
-$loc 
-wurde beseitigt.
-EOF
-   }elsif($WfRec->{eventmode} eq "EVk.infraloc"){
-      my $loc=$WfRec->{affectedlocation};
-      $loc=$WfRec->{affectedlocation}->[0] if (ref($WfRec->{affectedlocation}));
-      $salutation=<<EOF;
-Sehr geehrte Damen und Herren,
-
-folgende Informationen zum Ereignis am Standort
-$loc liegen derzeit vor:
-$info
-EOF
-   }elsif ($WfRec->{eventmode} eq "EVk.appl" && $eventstat==17){
-      $salutation=<<EOF;
-Sehr geehrte Kundin, sehr geehrter Kunde,
-
-die Beeinträchtigung im Umfeld der AG $ag wurde beseitigt.
-EOF
-   }elsif($WfRec->{eventmode} eq "EVk.appl"){
-      $salutation=<<EOF;
-Sehr geehrte Damen und Herren,
-
-im Folgenden erhalten Sie den aktuellen Stand zum Ereignis
-der Anwendung $ag vom $creationtime.
-EOF
-   }elsif ($WfRec->{eventmode} eq "EVk.net" && $eventstat==17){
-      $salutation=<<EOF;
-Sehr geehrte Kundin, sehr geehrter Kunde,
-
-die Beeinträchtigung im Umfeld des
-TCP/IP-Netzes (HitNet) wurde beseitigt.
-EOF
-   }elsif($WfRec->{eventmode} eq "EVk.net"){   
-      $salutation=<<EOF;
-Sehr geehrte Damen und Herren,
-
-folgende Informationen zum Ereignis im Bereich des 
-TCP/IP-Netzes (HitNet) liegen derzeit vor:
-$info
-EOF
-   }
-   if ($action eq "rootcausei"){
-      $salutation=<<EOF;
-Sehr geehrte Damen und Herren,
-
-wir informieren Sie über das Ergebnis der
-Ursachenanalyse und über die eingeleiteten Maßnahmen.
-EOF
-   }
-   return($salutation);
-}
- 
-sub getNotificationSkinbase
-{
-   my $self=shift;
-   my $WfRec=shift;
-   if ($WfRec->{eventlang} ne "de"){
-      return($self->SUPER::getNotificationSkinbase($WfRec));
-   }
-   return('AL_TCom');
-}
-
 sub generateMailSet
 {
    my $self=shift;
    my $WfRec=shift;
-   if ($WfRec->{eventlang} ne "de"){
-      return($self->SUPER::generateMailSet($WfRec,@_));
-   }
    my ($action,$eventlang,$additional,$emailprefix,$emailpostfix,
        $emailtext,$emailsep,$emailsubheader,$emailsubtitle,
        $subject,$allowsms,$smstext)=@_;
@@ -655,6 +508,7 @@ sub generateMailSet
 
    $$allowsms=0;
    $$smstext="\n";
+   return($self->SUPER::generateMailSet($WfRec,@_));
 
 
 
@@ -1037,7 +891,9 @@ sub Process
       my $creationtime=$self->getParent->getParent->ExpandTimeExpression('now',
                                                                 "de",$utz,$utz);
       my %additional=(headcolor=>$failcolor,eventtype=>'Event',    
-                      headtext=>$headtext,headid=>$id,salutation=>$salutation,
+                      headtext=>$headtext,headid=>$id,
+                      salutation=>$salutation,
+                      altsalutation=>$salutation,
                       creationtime=>$creationtime);
       $self->getParent->generateMailSet($WfRec,"rootcausei",
                        \$eventlang,\%additional,

@@ -25,6 +25,7 @@
 'sysadm.location.new'=>{de=>'Neueingabe',en=>'New'},
 'sysadm.location.googlekeys'=>{de=>'GoogleMaps',en=>'GoogleMaps'},
 'sysadm.location.googlekeys.new'=>{de=>'Neu',en=>'New'},
+'sysadm.location.lnklocationcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
 'sysadm.grp.new'=>{de=>'Neueingabe',en=>'New'},
 'sysadm.grp.treecreate'=>{de=>'TreeCreate',en=>'TreeCreate'},
 'sysadm.grp.rel'=>{de=>'Userzuordnungen',en=>'User-Relations'},
