@@ -892,7 +892,7 @@ sub isCopyValid
    my $self=shift;
    my $WfRec=shift;
 
-   return(1);
+   return($self->IsModuleSelectable());
 
 }
 
@@ -937,8 +937,6 @@ sub getNotifyDestinations
    if ($mode eq "custinfo"){
       my $ia=getModuleObject($self->Config,"base::infoabo");
       if ($WfRec->{eventmode} eq "EVk.appl"){ 
-
-
          my $applid=$WfRec->{affectedapplicationid};
          $applid=[$applid] if (ref($applid) ne "ARRAY");
          my $appl=getModuleObject($self->Config,"itil::appl");
@@ -950,74 +948,6 @@ sub getNotifyDestinations
                $emailto->{$email}++;
             }
          }
-
-
-
-#         my @byfunc;
-#         my @byorg;
-#         my @team;
-#         my %allcustgrp;
-#         foreach my $rec ($appl->getHashList(qw(semid sem2id 
-#                                                tsmid tsm2id
-#                                                responseteamid
-#                                                customerid
-#                                                businessteamid))){
-#            foreach my $v (qw(semid sem2id tsmid tsm2id)){
-#               my $userid=$rec->{$v};
-#               push(@byfunc,$userid) if ($userid>0);
-#            }
-#            foreach my $v (qw(responseteamid businessteamid)){
-#               my $grpid=$rec->{$v};
-#               push(@team,$grpid) if ($grpid>0);
-#            }
-#            if ($rec->{customerid}!=0){
-#               $self->getParent->LoadGroups(\%allcustgrp,"up",
-#                                            $rec->{customerid});
-#               
-#            }
-#         }
-#         if (keys(%allcustgrp)){
-#            $ia->LoadTargets($emailto,'base::grp',\'eventnotify',
-#                                      [keys(%allcustgrp)]);
-#         }
-#         $ia->LoadTargets($emailto,'*::appl *::custappl',\'eventnotify',
-#                                   $applid);
-#         $ia->LoadTargets($emailto,'base::staticinfoabo',\'eventnotify',
-#                                   '100000002',\@byfunc,default=>1);
-#
-#         my $grp=getModuleObject($self->Config,"base::grp");
-#         for(my $level=0;$level<=100;$level++){
-#            my @nextlevel=();
-#            $grp->ResetFilter();
-#            $grp->SetFilter({grpid=>\@team});
-#            foreach my $rec ($grp->getHashList(qw(users parentid))){ 
-#               push(@nextlevel,$rec->{parentid}) if ($rec->{parentid}>0);
-#               if (ref($rec->{users}) eq "ARRAY"){
-#                  foreach my $user (@{$rec->{users}}){
-#                     if (ref($user->{roles}) eq "ARRAY" &&
-#                         (grep(/^RBoss$/,@{$user->{roles}}) ||
-#                          grep(/^RBoss2$/,@{$user->{roles}}))){
-#                        push(@byorg,$user->{userid});
-#                     }
-#                  }
-#               }
-#               print STDERR Dumper($rec);
-#            }
-#            if ($#nextlevel!=-1){
-#               @team=@nextlevel;
-#            }
-#            else{
-#               last;
-#            }
-#         }
-#         print STDERR "byorg=".Dumper(\@byorg);
-#         $ia->LoadTargets($emailto,'base::staticinfoabo',\'eventnotify',
-#                                   '100000001',\@byorg,default=>1);
-
-
-
-
-
       }
       elsif ($WfRec->{eventmode} eq "EVk.net"){ 
          my $netid=$WfRec->{affectednetworkid};
@@ -1076,7 +1006,6 @@ sub getNotificationSubject
    foreach my $arec (@l){
       $sendcustinfocount++ if ($arec->{name} eq "sendcustinfo");
    }
-#print STDERR ("fifi %s\n",Dumper($WfRec));
    if ($WfRec->{stateid} == 17){
      $state=$self->getParent->T("finish info","itil::workflow::eventnotify");
    }elsif ($sendcustinfocount > 0){
@@ -1090,7 +1019,9 @@ sub getNotificationSubject
    my $subject="EK ".$WfRec->{eventstatclass};
    my $prio="";
    if ($WfRec->{affecteditemprio} ne ""){
-      $prio="Prio$WfRec->{affecteditemprio} ";
+      if ($WfRec->{affecteditemprio}==1){   # Aussage von Hr. Weidner
+         $prio="Top ";
+      }
    }
    my $subject2=" / $ag / $state Incident / ".$afcust." / $prio".
                 $self->getParent->T("Application")." /";
@@ -1101,7 +1032,8 @@ sub getNotificationSubject
    if ($WfRec->{eventmode} eq "EVk.infraloc"){ 
       my $loc=$WfRec->{affectedlocation};
       $loc=$WfRec->{affectedlocation}->[0] if (ref($WfRec->{affectedlocation}));
-      $subject2=" / $loc / $state / ".$self->getParent->T("Location")." / ";
+      $subject2=" / $loc / $state / $prio".
+                $self->getParent->T("Location")." / ";
    }
    if ($action eq "rootcausei" && $WfRec->{eventmode} eq "EVk.appl"){
       $subject2=" / $ag / ".$self->getParent->T("rootcause analyse").
@@ -1112,7 +1044,7 @@ sub getNotificationSubject
       my $loc=$WfRec->{affectedlocation};
       $loc=$WfRec->{affectedlocation}->[0] if (ref($WfRec->{affectedlocation}));
       $subject2=" / $loc / ".$self->getParent->T("rootcause analyse").
-                " / ".$self->getParent->T("Location")." /";
+                " / $prio".$self->getParent->T("Location")." /";
    }
    if ($action eq "rootcausei" && $WfRec->{eventmode} eq "EVk.net"){
       my $net=$WfRec->{affectednetwork};
@@ -1208,6 +1140,7 @@ sub generateMailSet
    }
    if ($WfRec->{eventmode} eq "EVk.infraloc"){
       push(@baseset,"wffields.affectedlocation");
+      push(@baseset,"wffields.affectedroom");
    }
    if ($WfRec->{eventmode} eq "EVk.net"){
       push(@baseset,"wffields.affectednetwork");
@@ -1665,9 +1598,6 @@ sub Process
          $self->LastMsg(ERROR,"unknown error") if (!$self->LastMsg()); 
          return(0);
       }
-#      if ($eventmode ne "EVk.appl"){
-#         $self->LastMsg(ERROR,"invalid eventmode '%s'",$eventmode);
-#      }
    }
    return($self->SUPER::Process($action,$WfRec));
 }
@@ -1806,73 +1736,6 @@ EOF
    return($templ);
 }
 
-#sub Validate
-#{
-#   my $self=shift;
-#   my $oldrec=shift;
-#   my $newrec=shift;
-#   my $origrec=shift;
-#
-#   my $eventlang;
-#   foreach my $v (qw(name eventstartofevent)){
-#      if ((!defined($oldrec) || exists($newrec->{$v})) && $newrec->{$v} eq ""){
-#         $self->LastMsg(ERROR,"field '%s' is empty",
-#                        $self->getField($v)->Label());
-#         return(0);
-#      }
-#   }
-#   if ($newrec->{eventmode} eq "EVk.appl"){
-#      my $applid=$newrec->{affectedapplicationid};
-#      if (!ref($newrec->{affectedapplicationid}) eq "ARRAY"){
-#         $applid=[$newrec->{affectedapplicationid}];
-#      }
-#      my $appl=getModuleObject($self->Config,"itil::appl");
-#      $appl->SetFilter({id=>$applid,cistatusid=>"<=4"});
-#      my (%mandator,%mandatorid,%responseteam,%businessteam,%conumber,
-#          %customer,%customerid,%custcontract,%custcontractid);
-#      foreach my $rec ($appl->getHashList(qw(mandator mandatorid 
-#                               customer customerid businessteam responseteam
-#                               conumber
-#                               custcontracts eventlang))){
-#         $responseteam{$rec->{responseteam}}=1 if ($rec->{responseteam} ne "");
-#         $businessteam{$rec->{businessteam}}=1 if ($rec->{businessteam} ne "");
-#         $customer{$rec->{customer}}=1 if ($rec->{customer} ne "");
-#         $customerid{$rec->{customerid}}=1 if ($rec->{customerid} ne "");
-#         $mandator{$rec->{mandator}}=1 if ($rec->{mandator} ne "");
-#         $mandatorid{$rec->{mandatorid}}=1 if ($rec->{mandatorid} ne "");
-#         $conumber{$rec->{conumber}}=1 if ($rec->{conumber} ne "");
-#         $eventlang=$rec->{eventlang};
-#         if (ref($rec->{custcontracts}) eq "ARRAY"){
-#            foreach my $contr (@{$rec->{custcontracts}}){
-#               if ($contr->{custcontract} ne ""){
-#                  $custcontract{$contr->{custcontract}}=1;
-#                  $custcontractid{$contr->{custcontractid}}=1;
-#               }
-#            }
-#         }
-#      }
-#      if (keys(%mandatorid)==0){
-#         $self->LastMsg(ERROR,"invalid application specified");
-#         return(0);
-#      }
-#      $newrec->{kh}->{mandatorid}=[keys(%mandatorid)];
-#      $newrec->{kh}->{mandator}=[keys(%mandator)];
-#      $newrec->{mandatorid}=[keys(%mandatorid)];
-#      $newrec->{mandator}=[keys(%mandator)];
-#      $newrec->{kh}->{affectedcontract}=[keys(%custcontract)];
-#      $newrec->{kh}->{affectedcontractid}=[keys(%custcontractid)];
-#      $newrec->{affectedcontract}=[keys(%custcontract)];
-#      $newrec->{affectedcontractid}=[keys(%custcontractid)];
-#      $newrec->{kh}->{affectedcustomer}=[keys(%customer)];
-#      $newrec->{kh}->{affectedcustomerid}=[keys(%customerid)];
-#      $newrec->{affectedcustomer}=[keys(%customer)];
-#      $newrec->{affectedcustomerid}=[keys(%customerid)];
-#      $newrec->{involvedcustomer}=[keys(%customer)];
-#   }
-#   $newrec->{step}=$self->getNextStep();
-#
-#   return(1);
-#}
 
 sub nativProcess
 {
@@ -1902,11 +1765,55 @@ sub nativProcess
       if ($h->{eventmode} eq "EVk.infraloc"){
          my $loc=$h->{affectedlocation};
          $loc=$h->{affectedlocation}->[0] if (ref($h->{affectedlocation}));
-         $h->{name}=$self->getParent->T("Location-notification:").
-                    " ".$loc;
+         $h->{name}=$self->getParent->T("Location-notification:")." ".$loc;
          if (!$self->getParent->ValidateCreate($h)){
             return(0);
          }
+      #   if ($h->{affectedlocationid} ne ""){
+      #      $h->{affectedlocationid}=[$h->{affectedlocationid}];
+      #   }
+         my %affectedlocation;
+         my %affectedlocationid;
+         if ($h->{affectedlocationid} ne ""){
+            my %affectedcustomer;
+            my %affectedcustomerid;
+            my $affecteditemprio;
+            my $l=getModuleObject($self->getParent->getParent->Config,
+                                     "base::location");
+            $l->SetFilter({id=>$h->{affectedlocationid},cistatusid=>"<=4"});
+            foreach my $lrec ($l->getHashList(qw(contacts cistatus id name))){
+               $affectedlocationid{$lrec->{id}}++; 
+               $affectedlocation{$lrec->{name}}++; 
+               if (ref($lrec->{contacts}) eq "ARRAY"){
+                  foreach my $crec (@{$lrec->{contacts}}){
+                     my $roles=$crec->{roles};
+                     $roles=[$roles] if (ref($roles) ne "ARRAY");
+                     if ($crec->{target} eq "base::grp"){
+                        if (grep(/^staffloc$/,@$roles)){
+                           $affectedcustomer{$crec->{targetname}}++;
+                           $affectedcustomerid{$crec->{targetid}}++;
+                           if (my ($prio)=$crec->{comments}=~m/Prio(\d+)/){
+                              if (!defined($affecteditemprio) ||
+                                  $affecteditemprio>$prio){
+                                 $affecteditemprio=$prio;
+                              }
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+            if (defined($affecteditemprio)){
+               $h->{affecteditemprio}=$affecteditemprio;
+            }
+            if (keys(%affectedcustomerid)){
+               $h->{affectedcustomerid}=[keys(%affectedcustomerid)];
+            }
+            if (keys(%affectedcustomer)){
+               $h->{affectedcustomer}=[keys(%affectedcustomer)];
+            }
+         }
+         return(0) if (!keys(%affectedlocationid));
       }
       elsif ($h->{eventmode} eq "EVk.appl"){
          my $app=$h->{affectedapplication};

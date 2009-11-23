@@ -138,16 +138,6 @@ sub getDynamicFields
 
 
       new kernel::Field::Textarea(
-                name          =>'eventscproblemsolution',
-                translation   =>'AL_TCom::workflow::eventnotify',
-                group         =>'eventnotifyinternal',
-                depend        =>['eventprmticket'],
-                readonly      =>1,
-                htmldetail    =>\&isSCproblemSet,
-                onRawValue    =>\&loadDataFromSC,
-                label         =>'SC Problem soultion'),
-
-      new kernel::Field::Textarea(
                 name          =>'eventscproblemcause',
                 translation   =>'AL_TCom::workflow::eventnotify',
                 onRawValue    =>\&loadDataFromSC,
@@ -156,7 +146,17 @@ sub getDynamicFields
                 htmldetail    =>\&isSCproblemSet,
                 depend        =>['eventprmticket'],
                 label         =>'SC Problem cause'),
+      new kernel::Field::Textarea(
+                name          =>'eventscproblemsolution',
+                translation   =>'AL_TCom::workflow::eventnotify',
+                group         =>'eventnotifyinternal',
+                depend        =>['eventprmticket'],
+                readonly      =>1,
+                htmldetail    =>\&isSCproblemSet,
+                onRawValue    =>\&loadDataFromSC,
+                label         =>'SC Problem soultion'),
       ));
+
 }
 
 
@@ -233,10 +233,6 @@ sub calcKPIs
          return($max);
       }
    }
-
-   printf STDERR ("d=%s\n",Dumper(\@tl));
-
-
    return(undef);
 }
 
@@ -508,7 +504,9 @@ sub generateMailSet
 
    $$allowsms=0;
    $$smstext="\n";
-   return($self->SUPER::generateMailSet($WfRec,@_));
+   if ($action ne "rootcausei"){
+      return($self->SUPER::generateMailSet($WfRec,@_));
+   }
 
 
 
@@ -517,38 +515,15 @@ sub generateMailSet
       $baseurl=$ENV{SCRIPT_URI};
       $baseurl=~s#/auth/.*$##;
    }
-   my @baseset=qw(wffields.eventstartofevent wffields.eventstatclass );
-   my $fo=$self->getField("wffields.eventendofevent",$WfRec);
-   if (defined($fo)){
-      my $v=$fo->FormatedResult($WfRec,"HtmlMail");
-      if (defined($v)){
-         push(@baseset,"wffields.eventendofevent");
-      }else{
-         push(@baseset,"wffields.eventendexpected");
-      }
-   }
-   if ($action eq "rootcausei"){
-      @baseset=qw(wffields.eventstartofevent
-                  wffields.eventendofevent wffields.eventstatclass);
-   }
+   my @baseset=qw(wffields.eventstartofevent 
+                  wffields.eventendofevent
+                  wffields.eventstatclass );
    # wffields.eventstatnature deleted w5baseid: 12039307490008 
    push(@baseset,qw(wffields.affectedregion));
    if ($WfRec->{eventmode} eq "EVk.appl"){
       push(@baseset,"affectedapplication");
       push(@baseset,"wffields.affectedcustomer");
-      # wffields.eventstatreason entfernt lt. Request ID:12077277280002  
-      #push(@baseset,"wffields.eventstatreason");
    }
-   if ($WfRec->{eventmode} ne "EVk.appl"){
-      my $fo=$self->getField("wffields.eventmode",$WfRec);
-      if (defined($fo)){
-         my $v=$fo->FormatedResult($WfRec,"HtmlMail");
-         if ($v ne ""){
-            $$smstext.=$v."\n";
-         }
-      }
-   }
-
    my @sets=([@baseset,qw(
                           wffields.eventimpact
                           wffields.eventreason
@@ -560,146 +535,58 @@ sub generateMailSet
                           wffields.altshorteventelimination
                          )]);
    if ($action eq "rootcausei"){
-      @sets=([@baseset,qw(wffields.eventimpact wffields.eventscproblemcause)],
-             [@baseset,qw(wffields.eventimpact wffields.eventscproblemcause)]);
+      @sets=([@baseset,qw(wffields.eventimpact wffields.eventscproblemcause 
+                          wffields.eventscproblemsolution)],
+             [@baseset,qw(wffields.eventimpact wffields.eventscproblemcause 
+                          wffields.eventscproblemsolution)]);
    }
-   my $lang="de";
-   my $line=0;
-   my $mailsep=0;
-   $mailsep="$lang:" if ($#emailsep!=-1); 
-   $ENV{HTTP_FORCE_LANGUAGE}=$lang;
-
-   my @fields=@{shift(@sets)};
- 
-   foreach my $field (qw(wffields.affectedcustomer
-                         affectedapplication
-                         wffields.eventstatclass
-                         wffields.eventstartofevent 
-                         wffields.eventendofevent id)){
-      my $fo=$self->getField($field,$WfRec);
-
-      my $vv=$fo->FormatedResult($WfRec,"ShortMsg");
-      if ($vv ne ""){
-         if ($field=~m/(eventstartofevent)/){
-            $$smstext.="Start:".$vv."\n";
-         }
-         elsif ($field=~m/(eventendofevent)/){
-            $$smstext.="Ende:".$vv."\n";
-         }
-         elsif ($field=~m/(affectedapplication)/){
-            $$smstext.="AG:".$vv."\n";
-         }
-         elsif ($field=~m/(eventstatnature)/){
-            $$smstext.=$vv."\n";
-         }
-         elsif ($field=~m/(affectedcustomer)/){
-            $vv=~s/^([^\.]+\.[^\.]+).*$/$1/;
-            $$smstext.=$vv."\n";
-         }
-         elsif ($field=~m/^id$/){
-            $$smstext.="HeadID:".$vv."\n";
-         }
-         else{
-            $$smstext.=$fo->Label().":".$vv."\n";
-         }
-      }
-   }
-   foreach my $field (@fields){
-      my $fo=$self->getField($field,$WfRec);
-      my $sh=0;
-      $sh=" " if ($field eq "wffields.eventaltdesciption" ||
-                  $field eq "wffields.eventdesciption");
-      if (defined($fo)){
-         my $v=$fo->FormatedResult($WfRec,"HtmlMail");
-         if($field eq "wffields.eventendexpected" && $v eq ""){
-            $v=" ";
-         }
-         if ($v ne ""){
-            if ($field eq "wffields.eventstatclass" &&
-               ( $v eq "1" || $v eq "2") && $action ne "rootcausei"){
-               $$allowsms=1
+   my @eventlanglist=split(/-/,$$eventlang);
+   for(my $langno=0;$langno<=$#eventlanglist;$langno++){
+      my $lang=$eventlanglist[$langno];
+      my $line=0;
+      my $mailsep=0;
+      $mailsep="$lang:" if ($#emailsep!=-1); 
+      $ENV{HTTP_FORCE_LANGUAGE}=$lang;
+     
+      my @fields=@{shift(@sets)};
+     
+      foreach my $field (@fields){
+         my $fo=$self->getField($field,$WfRec);
+         my $sh=0;
+         $sh=" " if ($field eq "wffields.eventaltdesciption" ||
+                     $field eq "wffields.eventdesciption");
+         if (defined($fo)){
+            my $v=$fo->FormatedResult($WfRec,"HtmlMail");
+            if($field eq "wffields.eventendexpected" && $v eq ""){
+               $v=" ";
             }
-                           
-            if ($baseurl ne "" && $line==0){
-               my $ilang="?HTTP_ACCEPT_LANGUAGE=$lang";
-               my $imgtitle=$self->getParent->T("current state of workflow",
-                                                "base::workflow");
-               push(@emailpostfix,
-                    "<img title=\"$imgtitle\" class=status border=0 ".
-                    "src=\"$baseurl/public/base/workflow/".
-                    "ShowState/$WfRec->{id}$ilang\">");
-            }
-            else{
+            if ($v ne ""){
                push(@emailpostfix,"");
+               my $data=$v;
+               $data=~s/</&lt;/g;
+               $data=~s/>/&gt;/g;
+               #$columns="50";
+               #$data=wrap("","",$data);
+     
+               push(@emailtext,$data);
+               push(@emailsubheader,$sh);
+               push(@emailsep,$mailsep);
+               push(@emailprefix,$fo->Label().":");
+               push(@emailsubtitle,"");
+               $line++;
+               $mailsep=0;
             }
-            my $data=$v;
-            $data=~s/</&lt;/g;
-            $data=~s/>/&gt;/g;
-            #$columns="50";
-            #$data=wrap("","",$data);
-
-            push(@emailtext,$data);
-            push(@emailsubheader,$sh);
-            push(@emailsep,$mailsep);
-            if ($line==0){ 
-                push(@emailprefix,$fo->Label().":");
-                push(@emailsubtitle,"Problemdetails");
-            }elsif($field eq "wffields.affectedcustomer"){
-                push(@emailsubtitle,"");    
-                push(@emailprefix,"betroffener Kunde:");
-            }elsif($field eq "wffields.eventimpact"){
-                push(@emailsubtitle,"");    
-                push(@emailprefix,"Auswirkungen für den Kunden:");
-            }elsif($field eq "wffields.eventreason"){
-                push(@emailsubtitle,"");    
-                push(@emailprefix,"Beschreibung der Ursache:");
-            }elsif($field eq "wffields.eventscproblemcause"){
-                push(@emailsubtitle,"");    
-                push(@emailprefix,"Ursachen-Cluster/ ".
-                                  "Beschreibung der Ursache:");
-            }elsif($field eq "wffields.shorteventelimination"){
-                push(@emailsubtitle,"");    
-                push(@emailprefix,"Kurzfristige Massnahme zur ".
-                                  "Servicewiederherstellung:");
-            }else{
-                push(@emailprefix,$fo->Label().":");
-                push(@emailsubtitle,"");
-            }
-            $line++;
-            $mailsep=0;
-         }
-     }
-   }
-   if ($action ne "rootcausei"){
-      my $rel=$self->getField("relations",$WfRec);
-      my $reldata=$rel->ListRel($WfRec->{id},"mail",{name=>\'consequenceof'});
-      push(@emailprefix,$rel->Label().":");
-      push(@emailtext,$reldata);
-      push(@emailsubheader,0);
-      push(@emailsep,0);
-      push(@emailpostfix,"");
-   }
-   if ($action eq "rootcausei"){
+        }
+      }
       my $wf=$self->getParent();
-      my $prmfld=$wf->getField("wffields.eventscproblemsolution",$WfRec);
-      my $prmticket=$prmfld->RawValue($WfRec);
-      if ($prmticket ne ""){
-         push(@emailprefix,"Umzusetzende Maßnahmen:");
-         push(@emailtext,$prmfld->FormatedResult($WfRec,"HtmlMail"));
-         push(@emailsubheader,0);
-         push(@emailsep,0);
-         push(@emailpostfix,"");
+      my $ssfld=$wf->getField("wffields.eventstaticmailsubject",$WfRec);
+      if (defined($ssfld)){
+         my $sstext=$ssfld->RawValue($WfRec);
+         if ($sstext ne ""){
+            $$subject=$sstext;
+         }
       }
    }
-   my $wf=$self->getParent();
-   my $ssfld=$wf->getField("wffields.eventstaticmailsubject",$WfRec);
-   if (defined($ssfld)){
-      my $sstext=$ssfld->RawValue($WfRec);
-      if ($sstext ne ""){
-         $$subject=$sstext;
-      }
-   }
-
    delete($ENV{HTTP_FORCE_LANGUAGE});
    @$emailprefix=@emailprefix;
    @$emailpostfix=@emailpostfix;
@@ -790,7 +677,7 @@ sub generateWorkspace
    my $self=shift;
    my $WfRec=shift;
    my @email=@{$self->Context->{CurrentTarget}};
-   my $emaillang=();
+   my $eventlang=();
    my @emailprefix=();
    my @emailpostfix=();
    my @emailtext=();
@@ -801,8 +688,12 @@ sub generateWorkspace
    my $smsallow;
    my $smstext;
    my $subject;
+
+   my $eventlango=$self->getField("wffields.eventlang",$WfRec);
+   $eventlang=$eventlango->RawValue($WfRec) if (defined($eventlango));
+
    $self->getParent->generateMailSet($WfRec,"rootcausei",
-                    \$emaillang,\%additional,
+                    \$eventlang,\%additional,
                     \@emailprefix,\@emailpostfix,\@emailtext,\@emailsep,
                     \@emailsubheader,\@emailsubtitle,
                     \$subject,\$smsallow,\$smstext);
@@ -871,7 +762,6 @@ sub Process
          $subjectlabel="result of root cause analyse";
          $headtext="result of root cause analyse";
       }
-      delete($ENV{HTTP_FORCE_LANGUAGE});
       my $ag="";
       if ($WfRec->{eventmode} eq "EVk.appl"){ 
          foreach my $appl (@{$WfRec->{affectedapplication}}){
@@ -900,6 +790,7 @@ sub Process
                        \@emailprefix,\@emailpostfix,\@emailtext,\@emailsep,
                        \@emailsubheader,\@emailsubtitle,\$subject,
                        \$smsallow,\$smstext);
+      delete($ENV{HTTP_FORCE_LANGUAGE});
       #
       # calc from address
       #

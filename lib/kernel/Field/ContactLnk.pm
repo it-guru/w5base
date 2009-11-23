@@ -38,8 +38,8 @@ sub new
       $self{'vjoindisp'}=['targetname','comments',"roles"];
    }
    if (!defined($self{'vjoininhash'})){
-      $self{'vjoininhash'}=['mdate','id','target','targetid',
-                            'roles','expiration','mdate',
+      $self{'vjoininhash'}=['mdate','id','target','targetid','targetname',
+                            'roles','expiration','mdate','comments',
                             'srcsys','srcid','srcload'];
    }
 

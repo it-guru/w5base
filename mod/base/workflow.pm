@@ -255,6 +255,7 @@ sub new
                 name          =>'eventstartrev',
                 label         =>'Event-Start reverse',
                 sqlorder      =>'desc',
+                searchable    =>0,
                 htmldetail    =>0,
                 group         =>'state',
                 dataobjattr   =>'wfhead.eventstart'),
@@ -272,6 +273,7 @@ sub new
       new kernel::Field::Date(
                 name          =>'eventendrev',
                 htmldetail    =>0,
+                searchable    =>0,
                 group         =>'state',
                 label         =>'Event-End reverse',
                 dataobjattr   =>'wfhead.eventend'),

@@ -104,9 +104,17 @@ sub new
                 label         =>'Location',
                 dataobjattr   =>'location.location'),
 
+      new kernel::Field::Databoss(
+                group         =>'management'),
+
+      new kernel::Field::Link(
+                name          =>'databossid',
+                dataobjattr   =>'location.databoss'),
+
       new kernel::Field::TextDrop(
                 name          =>'response',
                 label         =>'Location responsible',
+                group         =>'management',
                 vjointo       =>'base::user',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['responseid'=>'userid'],
@@ -120,6 +128,7 @@ sub new
                 name          =>'response2',
                 label         =>'Deputy location responsible',
                 vjointo       =>'base::user',
+                group         =>'management',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['response2id'=>'userid'],
                 vjoindisp     =>'fullname'),
@@ -128,24 +137,16 @@ sub new
                 name          =>'response2id',
                 dataobjattr   =>'location.response2'),
 
-#      new kernel::Field::Group(
-#                name          =>'orggrp',
-#                group         =>'org',
-#                label         =>'Organisation link',
-#                vjoinon       =>'orggrpid'),
-#
-#      new kernel::Field::Link(
-#                name          =>'orggrpid',
-#                dataobjattr   =>'location.orggrp'),
-#
-#      new kernel::Field::Select(
-#                name          =>'orgprio',
-#                group         =>'org',
-#                label         =>'organisations location prio',
-#                value         =>['1','2','3'],
-#                default       =>'2',
-#                htmleditwidth =>'50px',
-#                dataobjattr   =>'location.orgprio'),
+      new kernel::Field::Group(
+                name          =>'buildingservgrp',
+                group         =>'management',
+                label         =>'Building service team',
+                vjoinon       =>'buildingservgrpid'),
+
+      new kernel::Field::Link(
+                name          =>'buildingservgrpid',
+                group         =>'management',
+                dataobjattr   =>'location.buildingservgrp'),
 
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
@@ -311,8 +312,8 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","contacts","map","gps","control",
-          "additional","source");
+   return("header","default","management","contacts","gps","additional","map",
+          "control","source");
 }
 
 

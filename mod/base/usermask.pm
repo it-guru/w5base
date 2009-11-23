@@ -49,7 +49,9 @@ sub isSubstValid
    return() if (!defined($userrec));                      # is in mask mode
 
    my $isadmin=0;
-   if ($ENV{REAL_REMOTE_USER} eq $substuser || $self->IsMemberOf("admin")){
+   if ($ENV{REAL_REMOTE_USER} eq $substuser || 
+       $self->IsMemberOf("admin") ||
+       $self->IsMemberOf("support")){
       $isadmin=1;
    }
    if ($isadmin){
