@@ -70,7 +70,7 @@ sub ImportTSInetLocation
             msg(DEBUG,"w5locid=%s",$w5id);
             $loc->SetFilter({id=>\$w5id});
             my ($w5loc)=$loc->getOnlyFirst(qw(ALL));
-            printf STDERR ("d=%s\n",Dumper($w5loc));
+            #printf STDERR ("d=%s\n",Dumper($w5loc));
             my $found;
             foreach my $crec (@{$w5loc->{contacts}}){
                 my $roles=$crec->{roles};
