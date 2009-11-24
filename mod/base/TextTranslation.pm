@@ -79,8 +79,8 @@ $html=new HTML::Parser();
 
    if ($curdstlang ne "" && $cursrclang ne "" && $cursrc ne "" && defined($ua)){
      # my $googleurl01="http://www.google.de/language_tools";
-      my $googleurl02="http://translate.google.com/translate_t?".
-                      "langpair=$cursrclang|$curdstlang";  
+      my $googleurl02="http://translate.google.com/translate_a/t?".
+                      "sl=$cursrclang&tl=$curdstlang";  
      # my $response=$ua->request(GET($googleurl01));
      # if ($response->code ne "200"){
      #    msg(ERROR,"fail to init '$googleurl01' response code=".
@@ -102,38 +102,33 @@ $html=new HTML::Parser();
                        'Content'=>['hl'=>'en',
      #                            'ie'=>'UTF8',
                                  'text'=>$cursrc,
-                                 'langpair'=>"$cursrclang|$curdstlang"]));
+                                 'sl'=>"$cursrclang",
+                                 'otf'=>"2",
+                                 'pc'=>"0",
+                                 'client'=>"t",
+                                 'tl'=>"$curdstlang"]));
       #my $response=$ua->request(GET($googleurl02));
       if ($response->code ne "200"){
          msg(ERROR,"fail to get '$googleurl02' response code=".$response->code);
          $ua=undef;
       }
-      $curdst="";
-      $html->handler( start=>sub {
-                         my ($self,$tag,$attr,$dtext)=@_;
-                         if (lc($tag) eq "div" &&
-                             $attr->{id} eq "result_box"){
-                            $self->{_dst}=1;
-                         }
-                         if (lc($tag) eq "br" &&
-                            $self->{_dst}){
-                            $curdst.="\n";
-                         }
-                      },'self, tagname, attr, text');
-      $html->handler( end=>sub {
-                         my ($self,$tag)=@_;
-                         if (lc($tag) eq "div"){
-                            $self->{_dst}=0;
-                         }
-                      },'self, tagname');
-      $html->handler( text=>sub {
-                         my ($self,$dtext)=@_;
-                         if ($self->{_dst}){
-                            $dtext=~s/^\s//;
-                            $curdst.=$dtext;
-                         }
-                      },'self, text');
-
+      $curdst="???";
+      my $res=$response->content;
+      if ($res ne ""){
+         $res=UTF8toLatin1($res);
+         msg(INFO,"GoogleResponse=%s\n",$res);
+         my $ps;
+         eval('use JSON;
+         my $json=new JSON();
+         $ps=$json->decode($res);');
+         msg(INFO,"GoogleResponse=%s\n",Dumper($ps));
+         if (ref($ps->{sentences}) eq "ARRAY"){
+            $curdst="";
+            foreach my $r (@{$ps->{sentences}}){
+               $curdst.=$r->{trans};
+            }
+         }
+      }
       open(F,">/tmp/googletrans02.html");
       print F ($response->content());
       close(F);
