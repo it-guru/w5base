@@ -164,15 +164,16 @@ sub PostProcess
    my $aobj=$self->getParent->getParent->Action();
 
    if ($action eq "SaveStep.wffollowup"){
+      my %newparam=(mode=>'FOLLOWUP:',
+                    workflowname=>$WfRec->{name},
+                    addtarget=>$param{addtarget},
+                    addcctarget=>$param{addcctarget},
+                    sendercc=>1);
       $aobj->NotifyForward($WfRec->{id},
                            $param{fwdtarget},
                            $param{fwdtargetid},
                            $param{fwdtargetname},
-                           $param{note},
-                           mode=>'FOLLOWUP:',
-                           workflowname=>$WfRec->{name},
-                           addtarget=>$param{addtarget},
-                           sendercc=>1);
+                           $param{note},%newparam);
    }
 
    if ($action=~m/^SaveStep\..*$/){
@@ -202,19 +203,21 @@ sub nativProcess
          return(0);
       }
       $note=trim($note);
-      my ($to,$cc)=$self->getParent->getFollowupTargetUserids($WfRec,$note);
+      my %param=(note=>$note,
+                 addtarget=>[],
+                 addcctarget=>[],
+                 fwdtarget=>$WfRec->{fwdtarget},
+                 fwdtargetid=>$WfRec->{fwdtargetid});
+
+      $self->getParent->getFollowupTargetUserids($WfRec,\%param);
 
      # printf STDERR ("to=%s\n",Dumper($to));
      # printf STDERR ("cc=%s\n",Dumper($cc));
 
       if ($self->getParent->getParent->Action->StoreRecord(
           $WfRec->{id},"wffollowup",
-          {translation=>'base::workflow::request'},$note)){
-         $self->PostProcess("SaveStep.".$op,$WfRec,$actions,
-                            note=>$note,
-                            addtarget=>$to,
-                            fwdtarget=>$WfRec->{fwdtarget},
-                            fwdtargetid=>$WfRec->{fwdtargetid});
+          {translation=>'base::workflow::request'},$param{note})){
+         $self->PostProcess("SaveStep.".$op,$WfRec,$actions,%param);
          return(1);
       }
 

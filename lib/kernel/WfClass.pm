@@ -158,14 +158,10 @@ sub getFollowupTargetUserids
 {
    my $self=shift;
    my $WfRec=shift;
-   my $note=shift;
-   my @to;
-   my @cc;
+   my $param=shift;
    if ($WfRec->{owner}!=0){
-      push(@to,$WfRec->{owner});
+      push(@{$param->{addtarget}},$WfRec->{owner});
    }
-
-   return(\@to,\@cc);
 }
 
 

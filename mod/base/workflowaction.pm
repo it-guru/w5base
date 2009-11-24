@@ -409,10 +409,16 @@ sub NotifyForward
    my $subject=$self->Config->Param("SITENAME");
    $subject.=" " if ($subject ne "");
    $subject.=$self->T($param{mode});
-   my ($wfrec,$msg)=$wf->getOnlyFirst({id=>\$wfheadid},qw(name));
-   if (defined($wfrec)){
-      $subject.=" " if ($subject ne "" && $wfrec->{name} ne "");
-      $subject.=$wfrec->{name};
+   if (defined($param{forcesubject})){
+      $subject.=" " if ($subject ne "");
+      $subject.=$param{forcesubject};
+   }
+   else{
+      my ($wfrec,$msg)=$wf->getOnlyFirst({id=>\$wfheadid},qw(name));
+      if (defined($wfrec)){
+         $subject.=" " if ($subject ne "" && $wfrec->{name} ne "");
+         $subject.=$wfrec->{name};
+      }
    }
 
    msg(INFO,"forward subject: %s",$subject);
