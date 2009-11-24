@@ -620,17 +620,22 @@ sub InsertRecord   # fake write request to SC
    my $newrec=shift;
    my $IncidentNumber;
 
-   my $userid=$self->getCurrentUserId();
-   my $user=getModuleObject($self->Config,"base::user");
-   $user->SetFilter({userid=>\$userid});
-   my ($urec,$msg)=$user->getOnlyFirst(qw(ALL));
-
    $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
    my $username=$newrec->{'SCUsername'};
    delete($newrec->{'SCUsername'});
    my $password=$newrec->{'SCPassword'};
    delete($newrec->{'SCPassword'});
    msg(INFO,"start SC login for $ENV{REMOTE_USER}");
+
+   my $userid=$self->getCurrentUserId();
+   my $user=getModuleObject($self->Config,"base::user");
+   $user->SetFilter({userid=>\$userid});
+   my ($urec,$msg)=$user->getOnlyFirst(qw(ALL));
+
+   my $scuser=getModuleObject($self->Config,"tssc::user");
+   $scuser->SetFilter({loginname=>\$username});
+   my ($scurec,$msg)=$scuser->getOnlyFirst(qw(ALL));
+
    my $sc=$self->getSC($username,$password);
    if (!defined($sc)){
       $self->LastMsg(ERROR,"ServiceCenter Login failed or ".
@@ -669,6 +674,10 @@ sub InsertRecord   # fake write request to SC
       $category1="INTERFACE";
       $newrec->{class}="INCIDENT";
    }
+   my $homeassignment="CSS.DTAG.W5BASE";
+   if ($scurec->{schomeassignment} ne ""){
+      $homeassignment=$scurec->{schomeassignment};
+   }
    msg(INFO,"start SC CreateIncident for $ENV{REMOTE_USER}");
    my %Incident=(
                  'brief.description'      =>$newrec->{scname},
@@ -693,7 +702,7 @@ sub InsertRecord   # fake write request to SC
                  'component.country.code' =>"DE",
                  'reported.country.code'  =>"DE",
                  'assignment'             =>$newrec->{'scassingmentgroup'},
-                 'home.assignment'        =>'CSS.TCOM.W5BASE',
+                 'home.assignment'        =>$homeassignment,
                  'priority.code'          =>$priority,
                  'urgency'                =>$urgency,
                  'business.impact'        =>'Medium',
