@@ -121,7 +121,7 @@ sub isViewValid
 
 sub getDetailBlockPriority                # posibility to change the block order
 {
-   return("itilchange");
+   return("itilchange","flow");
 }
 
 

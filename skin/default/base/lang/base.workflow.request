@@ -12,6 +12,7 @@
 'wfapprovereq'=>{de=>'Genehmigungsanforderung',en=>'Approve request'},
 'wfapprovecan'=>{de=>'Genehmigungsabbruch',en=>'canncel approve request'},
 'wfforward'=>{de=>'Weiterleitung',en=>'Forward'},
+'wffollowup'=>{de=>'Nachtrag',en=>'Followup'},
 'wfreactiv'=>{de=>'Reaktiviert',en=>'Reactivate'},
 'wfdefer'=>{de=>'Zurückgestellt',en=>'defered'},
 'initinfo'=>{de=>'Initiator Info versandt',en=>'initiator info send'},

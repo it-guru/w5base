@@ -499,6 +499,9 @@ sub NotifyForward
    if (my $id=$wf->Store(undef,{
            class    =>'base::workflow::mailsend',
            step     =>'base::workflow::mailsend::dataload',
+           directlnktype =>'base::workflow',
+           directlnkid   =>$wfheadid,
+           directlnkmode =>"mail.".$param{mode},
            name     =>$subject,%adr,
            emailhead=>$self->T("LABEL:".$param{mode}).":",
            emailpostfix=>$emailpostfix,

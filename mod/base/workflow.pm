@@ -784,6 +784,14 @@ sub isOptionalFieldVisible
    my $name=$self->Name();
    return(1) if ($mode ne "HtmlDetail" && 
                  ($name eq "name"));
+   if ($name eq "shortactionlog"){
+      return(1) if ($mode ne "HtmlDetail");
+      if (defined($param{current}) && 
+          defined($param{current}->{shortactionlog}) &&
+          ref($param{current}->{shortactionlog}) eq "ARRAY"){
+         return(1);
+      }
+   }
    if (!defined($app->{SubDataObj}->{$class})){
       return(1) if ($mode eq "SearchMask");
       return(1) if ($mode eq "ViewEditor");

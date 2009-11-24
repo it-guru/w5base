@@ -9,4 +9,5 @@
 'Change-Planed-Start'=>{de=>'geplanter Beginn'},
 'Change-Planed-End'=>{de=>'geplantes Ende'},
 'Changenumber'=>{de=>'Changenummer'},
+'sendchangeinfo'=>{de=>'Changebenachrichtigung',en=>'Changenotification'},
 
