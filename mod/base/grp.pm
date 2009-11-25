@@ -233,6 +233,7 @@ sub new
                 label         =>'Subunits',
                 group         =>'subunits',
                 vjointo       =>'base::grp',
+                vjoinbase     =>{'cistatusid'=>"<6"},
                 vjoinon       =>['grpid'=>'parentid'],
                 vjoindisp     =>['name','cistatus'],
                 vjoininhash   =>['grpid','name','fullname']),
