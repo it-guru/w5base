@@ -245,6 +245,14 @@ sub mkChangeStoreRec
        $rec->{closedby}){
       $wfrec{additional}->{ServiceCenterClosedBy}=$rec->{closedby};
    }
+   if ($wfrec{additional}->{ServiceCenterCloseCode} ne
+       $rec->{closecode}){
+      $wfrec{additional}->{ServiceCenterCloseCode}=$rec->{closecode};
+   }
+   if ($wfrec{additional}->{ServiceCenterResolveTime} ne
+       $rec->{resolvetime}){
+      $wfrec{additional}->{ServiceCenterResolveTime}=$rec->{resolvetime};
+   }
    if ($wfrec{additional}->{ServiceCenterResolvedBy} ne
        $rec->{resolvedby}){
       $wfrec{additional}->{ServiceCenterResolvedBy}=$rec->{resolvedby};

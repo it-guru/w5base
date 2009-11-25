@@ -32,6 +32,8 @@
 'Work End'=>{de=>'Arbeitsende (Work End)'},
 'Create time'=>{de=>'Erstellungszeitpunkt'},
 'Closeing time'=>{de=>'Abschlußzeitpunkt'},
+'Resolved by'=>{de=>'Erledigt durch'},
+'Resolve time'=>{de=>'Erledigungszeitpunkt (Resolve time)'},
 'Closed by'=>{de=>'Abschluß durch'},
 'Business Impact'=>{de=>'Geschäftsprozess Beeinflussung'},
 'Resources'=>{de=>'Resourcen (Resources)'},

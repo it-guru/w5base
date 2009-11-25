@@ -1,0 +1,4 @@
+'base::interviewcat'=>{de=>'Interview Kathegorie',en=>'Interview categorie'},
+'Fullname'=>{de=>'Kathegorie-Bezeichnung'},
+'Parentgroup'=>{de=>'Eltern-Kathegorie'},
+'fieldgroup.id'=>{de=>'Identifikation',en=>'Identification'},

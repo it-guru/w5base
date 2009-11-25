@@ -287,6 +287,15 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("sysadm.qmgmt.interview.cat",
+                      "base::interviewcat",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("sysadm.qmgmt.interview.cat.new",
+                      "base::interviewcat",
+                      func=>'New',
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("sysadm.qmgmt.interanswer",
                       "base::interanswer",
                       defaultacl=>['admin']);

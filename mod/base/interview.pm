@@ -44,6 +44,18 @@ sub new
                 label         =>'QuestionID',
                 dataobjattr   =>'interview.id'),
                                                   
+      new kernel::Field::TextDrop(
+                name          =>'interviewcat',
+                label         =>'Interview categorie',
+                vjointo       =>'base::interviewcat',
+                vjoinon       =>['interviewcatid'=>'id'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'interviewcatid',
+                label         =>'Interview categorie id',
+                dataobjattr   =>'interview.interviewcat'),
+
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Question',
@@ -84,18 +96,20 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'qtag',
+                group         =>'tech',
                 label         =>'unique query tag',
                 dataobjattr   =>'interview.qtag'),
 
       new kernel::Field::Text(
                 name          =>'parentobj',
+                group         =>'tech',
                 label         =>'parent Ojbect',
                 dataobjattr   =>'interview.parentobj'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Link(
                 name          =>'queryblock',
-                label         =>'Query block',
-                dataobjattr   =>'interview.queryblock'),
+                label         =>'Questiongroup',
+                dataobjattr   =>'interviewcat.fullname'),
 
       new kernel::Field::Text(
                 name          =>'questclust',
@@ -143,6 +157,7 @@ sub new
 
       new kernel::Field::Textarea(
                 name          =>'restriction',
+                group         =>'tech',
                 label         =>'restriction',
                 dataobjattr   =>'interview.restriction'),
 
@@ -186,7 +201,7 @@ sub new
 
    );
    $self->{history}=[qw(insert modify delete)];
-   $self->setDefaultView(qw(linenumber questclust name groupname cdate mdate));
+   $self->setDefaultView(qw(linenumber interviewcat name mdate));
    $self->setWorktable("interview");
    return($self);
 }
@@ -236,11 +251,11 @@ sub Validate
       $self->LastMsg(ERROR,"invalid unique query tag specified"); 
       return(undef);
    }
-   my $questclust=trim(effVal($oldrec,$newrec,"questclust"));
-   if ($questclust=~m/^\s*$/i){
-      $self->LastMsg(ERROR,"invalid question group specified"); 
-      return(undef);
-   }
+  # my $questclust=trim(effVal($oldrec,$newrec,"questclust"));
+  # if ($questclust=~m/^\s*$/i){
+  #    $self->LastMsg(ERROR,"invalid question group specified"); 
+  #    return(undef);
+  # }
    my $rest=effVal($oldrec,$newrec,"restriction");
    if ($rest ne ""){
       my $p=new Text::ParseWhere();
@@ -255,6 +270,16 @@ sub Validate
    }
    return(1);
 }
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my ($worktable,$workdb)=$self->getWorktable();
+   return("$worktable left outer join interviewcat ".
+          "on $worktable.interviewcat=interviewcat.id ");
+}
+
+
 
 sub prepUploadRecord
 {
@@ -299,21 +324,21 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
   
    if (!defined($rec)){
-      return("default") if ($self->IsMemberOf("admin"));
+      return("default","tech") if ($self->IsMemberOf("admin"));
       my $o=$self->Clone();
       $o->SetFilter({contactid=>\$userid});
       my ($rec,$msg)=$o->getOnlyFirst(qw(id));
       if (defined($rec)){
-         return("default");
+         return("default","tech");
       }
      
       return(undef);
    }
 
 
-   return("default") if ($rec->{contactid}==$userid ||
-                         $rec->{contact2id}==$userid ||
-                         $self->IsMemberOf("admin"));
+   return("default","tech") if ($rec->{contactid}==$userid ||
+                                $rec->{contact2id}==$userid ||
+                                $self->IsMemberOf("admin"));
    return(undef);
 }
 
@@ -535,6 +560,16 @@ sub getHtmlDetailPageContent
    $page.=$self->HtmlPersistentVariables($idname);
    return($page);
 }
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my $grp=shift;
+   my %param=@_;
+   return("header","default","tech","source");
+}
+
+
 
 
 

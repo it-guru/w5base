@@ -206,7 +206,7 @@ create table interview (
   id         bigint(20)   NOT NULL,
   name       varchar(255) NOT NULL,
   parentobj      varchar(30) NOT NULL,
-  questclust     varchar(255) NOT NULL,
+  interviewcat   bigint(20),
   isrelevant     int(1)       default '1',
   prio           int(2)       default '1',
   comments       blob,
@@ -242,7 +242,7 @@ create table interanswer(
   PRIMARY KEY  (id),KEY (parentid)
 );
 alter table interview add name_de varchar(255);
-alter table interview add queryblock varchar(80) not null;
+alter table interview add questclust varchar(80);
 alter table interview add qtag varchar(80) not null, add unique key(qtag);
 alter table interanswer add archiv varchar(80) not NULL;
 alter table interview add contact bigint(20),add contact2 bigint(20);
@@ -256,3 +256,19 @@ alter table postitnote add parentid  varchar(30);
 alter table postitnote add grp  bigint(20);
 alter table postitnote add key parentg(parentobj,parentid,grp);
 alter table postitnote add key parentm(mandator,parentobj,parentid);
+CREATE TABLE interviewcat (
+  id bigint(20) NOT NULL default '0',
+  parentid bigint(20),
+  fullname varchar(128) NOT NULL default '',
+  name varchar(30) NOT NULL default '',
+   comments blob,
+   srcsys varchar(20) default NULL,
+   srcid varchar(20) default NULL,
+   srcload datetime default NULL,
+   createdate datetime NOT NULL default '0000-00-00 00:00:00',
+   modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+   editor varchar(100) NOT NULL default '',
+   realeditor varchar(100) NOT NULL default '',
+  PRIMARY KEY  (id),
+  UNIQUE KEY fullname (fullname),key name (name),key parentid (parentid)
+);
