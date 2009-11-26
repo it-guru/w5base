@@ -788,7 +788,8 @@ sub isOptionalFieldVisible
       return(1) if ($mode ne "HtmlDetail");
       if (defined($param{current}) && 
           defined($param{current}->{shortactionlog}) &&
-          ref($param{current}->{shortactionlog}) eq "ARRAY"){
+          ref($param{current}->{shortactionlog}) eq "ARRAY" &&
+          $#{$param{current}->{shortactionlog}}!=-1){
          return(1);
       }
    }

@@ -173,7 +173,7 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
    return(qw(default)) if ($self->IsMemberOf("admin"));
    if (!defined($rec)){
-      my $o=getModuleObject($self->Config,"base::inverview");
+      my $o=getModuleObject($self->Config,"base::interview");
       $o->SetFilter({contactid=>\$userid});
       my ($rec,$msg)=$o->getOnlyFirst(qw(id));
       if (defined($rec)){

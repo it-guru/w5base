@@ -17,7 +17,7 @@
 'Contact'=>{de=>'Ansprechpartner'},
 'Deputy Contact'=>{de=>'Ansprechpartner Vertreter'},
 'restriction'=>{de=>'Einschränkung'},
-'explanation'=>{de=>'Erläuterung'},
+'explanation'=>{de=>'Bemerkung'},
 'Interview Question Details'=>{de=>'Interview Frage Details'},
 'Question-Info'=>{de=>'Frage-Erläuterung'},
 'invalid question group specified'=>{de=>'ungültige Fragegruppe'},
