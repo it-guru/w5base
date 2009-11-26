@@ -327,6 +327,14 @@ sub SetFilter
                 $rec->{owner}!=$userid){
                next;
             }
+            if ($vs eq "HIDEUNNECESSARY"){
+               if (($rec->{stateid}==2)  && 
+                   $rec->{fwdtarget} eq "base::user" &&
+                   $rec->{owner}==$userid &&
+                   $rec->{fwdtargetid}!=$userid){
+                  next;
+               }
+            }
             $id{$rec->{id}}++;
          }
       }
@@ -337,7 +345,9 @@ sub SetFilter
          %id=();
          foreach my $rec ($dataobj->getHashList(qw(stateid 
                                                    fwdtarget 
-                                                   fwdtargetid id))){
+                                                   fwdtargetid 
+                                                   owner
+                                                   id))){
             if ($rec->{fwdtarget} eq "base::user" &&
                 $rec->{fwdtargetid}==$userid){
                next;
