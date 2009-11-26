@@ -38,7 +38,7 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("NotifyINetwork","NotifyINetwork");
+   $self->RegisterEvent("NotifyINetwork","NotifyINetwork",timeout=>30);
    return(1);
 }
 
