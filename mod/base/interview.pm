@@ -321,8 +321,8 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   my $userid=$self->getCurrentUserId();
   
+   my $userid=$self->getCurrentUserId();
    if (!defined($rec)){
       return("default","tech") if ($self->IsMemberOf("admin"));
       my $o=$self->Clone();

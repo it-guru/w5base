@@ -112,7 +112,8 @@ sub new
                 label         =>'ParentID',
                 dataobjattr   =>'interviewcat.parentid'),
    );
-   $self->{locktables}="interviewcat write";
+   $self->{history}=[qw(insert modify delete)];
+   $self->{locktables}="interviewcat write, history write";
    $self->setDefaultView(qw(fullname interviewcatid editor comments));
    $self->setWorktable("interviewcat");
    return($self);
@@ -159,15 +160,27 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return(qw(header default id));
+   if (defined($rec)){
+      return(qw(header default id history));
+   }
+   return(qw(header default));
 }
 
 sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-  # return("default") if (!defined($rec));  # new record is ok
+   my $userid=$self->getCurrentUserId();
    return(qw(default)) if ($self->IsMemberOf("admin"));
+   if (!defined($rec)){
+      my $o=getModuleObject($self->Config,"base::inverview");
+      $o->SetFilter({contactid=>\$userid});
+      my ($rec,$msg)=$o->getOnlyFirst(qw(id));
+      if (defined($rec)){
+         return("default");
+      }
+   }
+
    return(undef);
 }
 
