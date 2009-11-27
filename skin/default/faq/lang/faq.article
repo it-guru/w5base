@@ -11,7 +11,7 @@
 'Accesscontrol'=>{de=>'Zugriffssteuerung'},
 'attachments'=>{de=>'Anlagen'},
 'Keywords'=>{de=>'Schlüsselworte'},
-'Categorie'=>{de=>'Kathegorie'},
+'Categorie'=>{de=>'Kategorie'},
 'Category'=>{de=>'Kategorie'},
 'no keywords'=>{de=>'keine Schlüsselworte eingegeben'},
 'no valid article shortdescription'=>{de=>'keine gültige Kurzbezeichnung'},
