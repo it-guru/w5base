@@ -77,6 +77,39 @@ sub Validate
    return({$self->Name()=>$newvallist->[0]});
 }
 
+sub FormatedDetail
+{
+   my $self=shift;
+   my $current=shift;
+   my $mode=shift;
+   my $d=$self->RawValue($current);
+
+   if ($mode=~m/^Html/){
+      if ($d ne ""){
+         my $dform=$d;
+         my $UserCache=$self->getParent-> 
+                    Cache->{User}->{Cache}->{$ENV{REMOTE_USER}};
+         if (ref($UserCache) eq "HASH"){
+            my $jsdialcall=FormatJsDialCall($UserCache->{rec}->{dialermode},
+                                $UserCache->{rec}->{dialeripref},
+                                $UserCache->{rec}->{dialerurl},
+                                $d);
+            if (defined($jsdialcall)){
+               my $t="click to dial with ".$UserCache->{rec}->{dialermode};
+               $dform="<span title=\"$t\" ".
+                      "onclick=\"$jsdialcall\" class=sublink>".
+                      $dform."</span>";
+            }
+         }
+         return($dform);
+      } 
+      return($d);
+   }
+   else{
+      return($self->SUPER::FormatedDetail($current,$mode));
+   }
+}
+
 
 
 

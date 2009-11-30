@@ -82,7 +82,7 @@ use Unicode::String qw(utf8 latin1 utf16);
              &Debug &UTF8toLatin1
              &Datafield2Hash &Hash2Datafield &CompressHash
              &unHtml &quoteHtml &quoteSOAP &quoteWap &quoteQueryString &Dumper 
-             &FancyLinks &mkInlineAttachment 
+             &FancyLinks &mkInlineAttachment &FormatJsDialCall
              &mkMailInlineAttachment &haveSpecialChar
              &getModuleObject &getConfigObject &generateToken
              &isDataInputFromUserFrontend
@@ -112,6 +112,26 @@ sub haveSpecialChar
       return(1);
    }
    return(0);
+}
+
+sub FormatJsDialCall
+{
+   my ($dialermode,$dialeripref,$dialerurl,$phone)=@_;
+   my $qdialeripref=quotemeta($dialeripref);
+   if ($dialermode=~m/Cisco/i){
+      $phone=~s/[\s\/\-]//g;
+      $phone=~s/$qdialeripref/0/;
+      $phone=~s/[\s\/\-]//g;
+      $dialerurl=~s/\%phonenumber\%/$phone/g;
+
+      my $open="openwin('$dialerurl',".
+               "'_blank',".
+               "'height=260,width=530,toolbar=no,status=no,".
+               "resizable=no,scrollbars=no')";
+      my $cmd="$open;";
+      return($cmd);
+   }
+   return(undef);
 }
 
 

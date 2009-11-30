@@ -107,12 +107,28 @@ sub contextMenu
          push(@ml,$self->getParent->T("W5Base Mail"),$onclick);
       }
       my $office_phone=$rec->[0]->{office_phone};
-      if ($office_phone ne ""){
-         push(@ml,$office_phone,"alert('call $office_phone');");
-      }
-      my $office_mobile=$rec->[0]->{office_mobile};
-      if ($office_mobile ne ""){
-         push(@ml,$office_mobile,"alert('call $office_mobile');");
+      my $UserCache=$self->getParent-> 
+                    Cache->{User}->{Cache}->{$ENV{REMOTE_USER}};
+      if (ref($UserCache) eq "HASH" && $UserCache->{rec}->{dialermode} ne ""){
+         if ($office_phone ne ""){
+            my $jsdialcall=FormatJsDialCall($UserCache->{rec}->{dialermode},
+                                            $UserCache->{rec}->{dialeripref},
+                                            $UserCache->{rec}->{dialerurl},
+                                            $office_phone);
+            if (defined($jsdialcall)){
+               push(@ml,$office_phone,$jsdialcall);
+            }
+         }
+         my $office_mobile=$rec->[0]->{office_mobile};
+         if ($office_mobile ne ""){
+            my $jsdialcall=FormatJsDialCall($UserCache->{rec}->{dialermode},
+                                            $UserCache->{rec}->{dialeripref},
+                                            $UserCache->{rec}->{dialerurl},
+                                            $office_mobile);
+            if (defined($jsdialcall)){
+               push(@ml,$office_mobile,$jsdialcall);
+            }
+         }
       }
    }
    return(@ml);

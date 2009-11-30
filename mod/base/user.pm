@@ -370,6 +370,26 @@ sub new
                 default       =>'20',
                 dataobjattr   =>'contact.pagelimit'),
 
+      new kernel::Field::Select(
+                name          =>'dialermode',
+                label         =>'PC Phone Dialer Mode',
+                htmleditwidth =>'50%',
+                group         =>'userparam',
+                value         =>['',"Cisco WebDialer V1"],
+                dataobjattr   =>'contact.dialermode'),
+
+      new kernel::Field::Text(
+                name          =>'dialeripref',
+                group         =>'userparam',
+                label         =>'PC Phone own country code',
+                dataobjattr   =>'contact.dialeripref'),
+
+      new kernel::Field::Text(
+                name          =>'dialerurl',
+                group         =>'userparam',
+                label         =>'PC Phone Dialer URL',
+                dataobjattr   =>'contact.dialerurl'),
+
       new kernel::Field::Email(
                 name          =>'email',
                 label         =>'E-Mail',
