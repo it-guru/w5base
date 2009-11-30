@@ -84,7 +84,7 @@ sub FormatedDetail
    my $mode=shift;
    my $d=$self->RawValue($current);
 
-   if ($mode=~m/^Html/){
+   if ($mode=~m/^HtmlDetail/){
       if ($d ne ""){
          my $dform=$d;
          my $UserCache=$self->getParent-> 
