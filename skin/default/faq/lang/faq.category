@@ -10,6 +10,6 @@
                en=>'FAQ-Article changed oder added'},
 'faqadd'=>{de=>'FAQ-Artikel hinzugefügt',
                en=>'FAQ-Article added'},
-'ShowSubscribers'=>{en=>'Subscribers',de=>'Abonentenliste'},
-'current active subscribers'=>{de=>'aktuell eingetragene Abonenten'},
+'ShowSubscribers'=>{en=>'Subscribers',de=>'Abonnentenliste'},
+'current active subscribers'=>{de=>'aktuell eingetragene Abonnenten'},
 
