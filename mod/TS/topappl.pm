@@ -290,6 +290,8 @@ sub arrangeSearchData
    my @customer=$self->getCustomerControlRecords();
    $d.="<input type=hidden name=search_customer value=\"NONE\">";
    $d.="<input type=hidden name=search_cistatusid value=\"4\">";
+   # Anwendungen im Mandaten DSS sind laut Hr. Weidner keine Top-Anwendungen
+   $d.="<input type=hidden name=search_mandator value=\"!DSS\">";
    $d.="<input type=hidden name=search_customerprio value=\"1\">";
    $d.="<table width=100%><tr><td align=center>";
    foreach my $rec (@customer){
