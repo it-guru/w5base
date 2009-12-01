@@ -218,7 +218,9 @@ sub getMandatorsOf
       $userid=$UserCache->{userid};
    }
    my %groups=$self->getGroupsOf($AccountOrUserID,
-                                 [qw(REmployee RBoss RBoss2 RMember)],
+                                 [qw(REmployee 
+                                     RBoss RBoss2 
+                                     RMember RCFManager)],
                                  'both');
    my @grps=keys(%groups);
    my %m=();
