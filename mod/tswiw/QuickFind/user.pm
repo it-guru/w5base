@@ -98,7 +98,8 @@ sub QuickFindDetail
       foreach my $v (@l){
          if ($rec->{$v} ne ""){
             my $name=$tswiwuser->getField($v)->Label();
-            my $data=$tswiwuser->findtemplvar({current=>$rec,mode=>"Html"},
+            my $data=$tswiwuser->findtemplvar({current=>$rec,
+                                               mode=>"HtmlDetail"},
                                          $v,"formated");
             $htmlresult.="<tr><td nowrap valign=top width=1%>$name:</td>".
                          "<td valign=top>$data</td></tr>\n";

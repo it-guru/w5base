@@ -128,17 +128,17 @@ sub new
                                    label      =>'Accounting Area',
                                    dataobjattr=>'tCostCenterAccountingArea'),
 
-      new kernel::Field::Text(     name       =>'office_phone',
+      new kernel::Field::Phonenumber(name     =>'office_phone',
                                    group      =>'office',
                                    label      =>'Phonenumber',
                                    dataobjattr=>'telephoneNumber'),
 
-      new kernel::Field::Text(     name       =>'office_mobile',
+      new kernel::Field::Phonenumber(name     =>'office_mobile',
                                    group      =>'office',
                                    label      =>'Moible-Phonenumber',
                                    dataobjattr=>'mobile'),
 
-      new kernel::Field::Text(     name       =>'office_facsimile',
+      new kernel::Field::Phonenumber(name     =>'office_facsimile',
                                    group      =>'office',
                                    label      =>'FAX-Number',
                                    dataobjattr=>'facsimileTelephoneNumber'),
