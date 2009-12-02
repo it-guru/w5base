@@ -125,7 +125,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'customer',
-                label         =>'Customer',
+                label         =>'all Customers',
                 group         =>'customer',
                 depend        =>['applications'],
                 searchable    =>0,
@@ -163,6 +163,20 @@ sub new
                    }
                    return([keys(%customer)]);
                 }),
+
+      new kernel::Field::SubList(
+                name          =>'applcustomers',
+                label         =>'Application Customers',
+                htmlwidth     =>'200px',
+                group         =>'customer',
+                searchable    =>1,
+                readonly      =>1,
+                htmldetail    =>0,
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{applcistatusid=>"<=5",
+                                  systemcistatusid=>"<=5"}],
+                vjoinon       =>['id'=>'systemid'],
+                vjoindisp     =>['applcustomer','appl']),
 
       new kernel::Field::Text(
                 name          =>'custcontract',

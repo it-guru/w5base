@@ -208,7 +208,7 @@ sub new
 
       new kernel::Field::SubList(
                 name          =>'customer',
-                label         =>'Customer',
+                label         =>'Application Customers',
                 htmlwidth     =>'200px',
                 group         =>'applications',
                 readonly      =>1,
