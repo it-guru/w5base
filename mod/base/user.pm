@@ -706,6 +706,19 @@ sub Validate
    if ($usertyp eq "service"){
       $newrec->{givenname}="";
    }
+   if ($usertyp ne "service" &&
+       effVal($oldrec,$newrec,"surname") eq "" &&
+       effVal($oldrec,$newrec,"givenname") eq ""){
+         if (my ($p1,$p2)=effVal($oldrec,$newrec,"email")
+                         =~m/^(\S{2,})\.(\S{2,})\@.*$/){
+            $newrec->{givenname}=$p1;
+            $newrec->{surname}=$p2;
+            $newrec->{givenname}=~s/^([a-z])/uc($1)/ge;
+            $newrec->{givenname}=~s/[\s-]([a-z])/uc($1)/ge;
+            $newrec->{surname}=~s/^([a-z])/uc($1)/ge;
+            $newrec->{surname}=~s/[\s-]([a-z])/uc($1)/ge;
+         }
+   }
    if ((defined($newrec->{surname}) ||
         defined($newrec->{givenname}) ||
         defined($newrec->{email}) ||
