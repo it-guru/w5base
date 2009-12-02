@@ -714,9 +714,9 @@ sub Validate
             $newrec->{givenname}=$p1;
             $newrec->{surname}=$p2;
             $newrec->{givenname}=~s/^([a-z])/uc($1)/ge;
-            $newrec->{givenname}=~s/[\s-]([a-z])/uc($1)/ge;
+            $newrec->{givenname}=~s/([\s-][a-z])/uc($1)/ge;
             $newrec->{surname}=~s/^([a-z])/uc($1)/ge;
-            $newrec->{surname}=~s/[\s-]([a-z])/uc($1)/ge;
+            $newrec->{surname}=~s/([\s-][a-z])/uc($1)/ge;
          }
    }
    if ((defined($newrec->{surname}) ||
