@@ -458,12 +458,12 @@ sub ValidateCreate
    my $newrec=shift;
 
   #
-  # laut Tino soll nun auch Extern zugelassen werden
+  # laut Tino soll nun auch Extern und DSS zugelassen werden
   #
    if (!defined($newrec->{mandator}) ||    
        ref($newrec->{mandator}) ne "ARRAY" ||
        !grep(/^(Extern|AL DTAG|DSS)$/,@{$newrec->{mandator}})){
-      $self->LastMsg(ERROR,"no AL DTAG mandator included");
+      $self->LastMsg(ERROR,"no AL DTAG, Extern or DSS mandator included");
       return(0);
    }
         
