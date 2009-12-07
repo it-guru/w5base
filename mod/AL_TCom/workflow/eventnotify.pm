@@ -462,7 +462,7 @@ sub ValidateCreate
   #
    if (!defined($newrec->{mandator}) ||    
        ref($newrec->{mandator}) ne "ARRAY" ||
-       !grep(/^(Extern|AL DTAG)$/,@{$newrec->{mandator}})){
+       !grep(/^(Extern|AL DTAG|DSS)$/,@{$newrec->{mandator}})){
       $self->LastMsg(ERROR,"no AL DTAG mandator included");
       return(0);
    }
