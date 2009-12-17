@@ -76,12 +76,12 @@ sub CustomerChangeIncidentReport
 
    $wf->AddFields(
       new kernel::Field::Boolean(
-                name          =>'_isTop50',
-                label         =>'Top50',
+                name          =>'THOME_isTop50',
+                label         =>'T-Home Top50',
                 htmldetail    =>0),
       new kernel::Field::Boolean(
-                name          =>'_isTop20',
-                label         =>'Top20',
+                name          =>'THOME_isTop20',
+                label         =>'T-Home Top20',
                 htmldetail    =>0)
    );
  
@@ -109,13 +109,13 @@ sub CustomerChangeIncidentReport
                  view=>[qw(id srcid
                            eventstart 
                            eventend
-                           class
+                           mandator
                            affectedapplication
                            involvedcustomer
                            wffields.changedescription
                            description
-                           _isTop50
-                           _isTop20
+                           THOME_isTop50
+                           THOME_isTop20
                            additional.ServiceCenterCoordinator
                            additional.ServiceCenterReason 
                            additional.ServiceCenterImpact 
@@ -150,13 +150,13 @@ sub CustomerChangeIncidentReport
                  view=>[qw(id srcid
                            eventstart 
                            eventend
-                           class
+                           mandator
                            affectedapplication
                            involvedcustomer
                            wffields.incidentdescription
                            description
-                           _isTop50
-                           _isTop20
+                           THOME_isTop50
+                           THOME_isTop20
                            wffields.tcomcodrelevant
                            wffields.tcomcodcause
                            wffields.tcomcodcomments
@@ -188,17 +188,17 @@ sub recPreProcess
             my $arec=$self->{'onlyApplId'}->{$aid};
             if ($arec->{customerprio}==1){
                if ($arec->{criticality} eq "CRcritical"){
-                  $rec->{_isTop50}=1 if (!$rec->{_isTop50});
-                  $rec->{_isTop20}=1 if (!$rec->{_isTop20});
+                  $rec->{THOME_isTop50}=1 if (!$rec->{THOME_isTop50});
+                  $rec->{THOME_isTop20}=1 if (!$rec->{THOME_isTop20});
                }
                if ($arec->{criticality} eq "CRhigh"){
-                  $rec->{_isTop50}=1 if (!$rec->{_isTop50});
+                  $rec->{THOME_isTop50}=1 if (!$rec->{THOME_isTop50});
                }
             }
          }
       }   
    }
-   return(0) if (!$found);
+  # return(0) if (!$found);
    my @newrecview;
    foreach my $fld (@$recordview){
       my $name=$fld->Name;
