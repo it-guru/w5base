@@ -191,6 +191,12 @@ sub new
                 label         =>'Technical Solution Manager',
                 vjoinon       =>'tsmid'),
 
+      new kernel::Field::Contact(
+                name          =>'opm',
+                group         =>'opmgmt',
+                label         =>'Operation Manager',
+                vjoinon       =>'opmid'),
+
       new kernel::Field::SubList(
                 name          =>'directlicenses',
                 label         =>'direct linked Licenses',
@@ -282,6 +288,11 @@ sub new
                 group         =>'technical',
                 dataobjattr   =>'appl.tsm'),
 
+      new kernel::Field::Link(
+                name          =>'opmid',
+                group         =>'opmgmt',
+                dataobjattr   =>'appl.opm'),
+
       new kernel::Field::Import( $self,
                 vjointo       =>'itil::costcenter',
                 vjoinon       =>['conumber'=>'name'],
@@ -323,6 +334,13 @@ sub new
                 label         =>'Deputy Technical Solution Manager',
                 vjoinon       =>'tsm2id'),
 
+      new kernel::Field::Contact(
+                name          =>'opm2',
+                AllowEmpty    =>1,
+                group         =>'opmgmt',
+                label         =>'Deputy Operation Manager',
+                vjoinon       =>'opm2id'),
+
       new kernel::Field::TextDrop(
                 name          =>'tsm2email',
                 group         =>'technical',
@@ -338,6 +356,11 @@ sub new
                 name          =>'tsm2id',
                 group         =>'technical',
                 dataobjattr   =>'appl.tsm2'),
+
+      new kernel::Field::Link(
+                name          =>'opm2id',
+                group         =>'opmgmt',
+                dataobjattr   =>'appl.opm2'),
 
       new kernel::Field::Select(
                 name          =>'customerprio',
@@ -1173,7 +1196,7 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default interfaces finance technical contacts misc
+   my @databossedit=qw(default interfaces finance opmgmt technical contacts misc
                        systems attachments accountnumbers interview
                        customer control phonenumbers);
    if (!defined($rec)){
@@ -1275,7 +1298,8 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(
-          qw(header default finance technical delmgmt customer custcontracts 
+          qw(header default finance technical opmgmt delmgmt 
+             customer custcontracts 
              contacts phonenumbers 
              interfaces systems swinstances misc attachments control 
              accountnumbers licenses source));
