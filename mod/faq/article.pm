@@ -650,6 +650,12 @@ sub FullView
                   "<td><a class=attlink href=\"$frec->{href}\">".
                   "$frec->{label}</a></td></tr>";
          }
+         if ($frec->{label}=~m/\.zip$/i){
+            $att.="\n<tr><td width=1%><a class=attlink href=\"$frec->{href}\">".
+                  "<img src=\"../load/zip_icon.gif\"></a></td>".
+                  "<td><a class=attlink href=\"$frec->{href}\">".
+                  "$frec->{label}</a></td></tr>";
+         }
       }
       if ($att ne ""){
          print("<div class=attachments>".
