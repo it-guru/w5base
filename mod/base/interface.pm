@@ -754,35 +754,56 @@ sub getHashList
    if (defined($limit) && $limit>0 && $limit=~m/^\d+$/){
       $o->Limit($limit,$limitstart);
    }
+   my $idfield=$o->IdField();
+   my $idname=$idfield->Name();
    msg(INFO,"SOAPgetHashList in search objectname=$objectname");
-   my @l=$o->getHashList(@$view);
-   for(my $c=0;$c<=$#l;$c++){
-      my @fobjs=$o->getFieldObjsByView($view,current=>$l[$c]);
-      my %cprec;
-      my $objns=$ns;
-      $objns="W5Kernel" if ($ns eq "");
-      foreach my $fobj (@fobjs){
-         my $k=$fobj->Name();
-         my $wsdl=$fobj->{WSDLfieldType};
-         $wsdl="xsd:string" if ($wsdl eq "");
-         if (!($wsdl=~m/^.*:.*$/)){
-            $wsdl="curns:".$wsdl;
-         }
-         my $v=$fobj->FormatedResult($l[$c],"SOAP");
-         if (ref($v) eq "ARRAY"){
-            $v=[map({latin1($_)->utf8();} @$v)];
-            if ($wsdl=~m/:ArrayOfStringItems$/){
-               $v=[map({SOAP::Data->type("xsd:string")->value($_);} @$v)];
+   my @l=$o->getHashList(@$view,$idname);
+   if (defined($idfield)){
+      for(my $c=0;$c<=$#l;$c++){
+         $o->SetFilter({$idname=>$l[$c]->{$idname}});
+         my ($chkrec,$msg)=$o->getOnlyFirst(qw(ALL));
+         if (defined($chkrec)){
+            my @viewl=$o->isViewValid($chkrec);
+            if ($#viewl!=-1){
+               my @fobjs=$o->getFieldObjsByView($view,current=>$l[$c]);
+               my %cprec;
+               my $objns=$ns;
+               $objns="W5Kernel" if ($ns eq "");
+               fldloop: foreach my $fobj (@fobjs){
+                  my $k=$fobj->Name();
+                  my $grp=$fobj->{group};
+                  $grp=[$grp] if (!ref($grp));
+                  my $found=0;
+                  foreach my $g (@$grp){
+                     $found++ if (grep(/^$g$/,@viewl) || 
+                                  grep(/^ALL$/,@viewl));
+                  }
+                  next if (!$found);
+                  my $wsdl=$fobj->{WSDLfieldType};
+                  $wsdl="xsd:string" if ($wsdl eq "");
+                  if (!($wsdl=~m/^.*:.*$/)){
+                     $wsdl="curns:".$wsdl;
+                  }
+                  my $v=$fobj->FormatedResult($l[$c],"SOAP");
+                  if (ref($v) eq "ARRAY"){
+                     $v=[map({latin1($_)->utf8();} @$v)];
+                     if ($wsdl=~m/:ArrayOfStringItems$/){
+                        $v=[map({SOAP::Data->type("xsd:string")->value($_);} @$v)];
+                     }
+                  }
+                  else{
+                     $v=latin1($v)->utf8();
+                  }
+                  $cprec{$k}=SOAP::Data->type($wsdl)->value($v);
+               }
+               $l[$c]=SOAP::Data->name('record')->type('curns:Record')->value(
+                                        \%cprec);
+               if ($ns eq ""){
+                  $l[$c]=$l[$c]->attr({'xmlns:'.
+                                       $objns=>'http://w5base.net/kernel'});
+               }
             }
          }
-         else{
-            $v=latin1($v)->utf8();
-         }
-         $cprec{$k}=SOAP::Data->type($wsdl)->value($v);
-      }
-      $l[$c]=SOAP::Data->name('record')->type('curns:Record')->value(\%cprec);
-      if ($ns eq ""){
-         $l[$c]=$l[$c]->attr({'xmlns:'.$objns=>'http://w5base.net/kernel'});
       }
    }
    my $reccount=$#l+1;
