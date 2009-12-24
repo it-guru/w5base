@@ -758,6 +758,7 @@ sub getHashList
    my $idname=$idfield->Name();
    msg(INFO,"SOAPgetHashList in search objectname=$objectname");
    my @l=$o->getHashList(@$view,$idname);
+   my @resl;
    if (defined($idfield)){
       for(my $c=0;$c<=$#l;$c++){
          $o->SetFilter({$idname=>$l[$c]->{$idname}});
@@ -765,6 +766,7 @@ sub getHashList
          if (defined($chkrec)){
             my @viewl=$o->isViewValid($chkrec);
             if ($#viewl!=-1){
+               $resl[$c]=$l[$c];
                my @fobjs=$o->getFieldObjsByView($view,current=>$l[$c]);
                my %cprec;
                my $objns=$ns;
@@ -796,22 +798,22 @@ sub getHashList
                   }
                   $cprec{$k}=SOAP::Data->type($wsdl)->value($v);
                }
-               $l[$c]=SOAP::Data->name('record')->type('curns:Record')->value(
+               $resl[$c]=SOAP::Data->name('record')->type('curns:Record')->value(
                                         \%cprec);
                if ($ns eq ""){
-                  $l[$c]=$l[$c]->attr({'xmlns:'.
+                  $resl[$c]=$resl[$c]->attr({'xmlns:'.
                                        $objns=>'http://w5base.net/kernel'});
                }
             }
          }
       }
    }
-   my $reccount=$#l+1;
+   my $reccount=$#resl+1;
    $self->Log(INFO,"soap","findRecord: return $reccount records - exitcode:0");
 
    return(interface::SOAP::kernel::Finish({exitcode=>0,
           lastmsg=>[],
-          records=>SOAP::Data->type('curns:RecordList')->value(\@l)}));
+          records=>SOAP::Data->type('curns:RecordList')->value(\@resl)}));
 }
 
 sub validateObjectname
