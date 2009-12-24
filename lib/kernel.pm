@@ -481,6 +481,10 @@ sub getConfigObject($$$)
    my $package=shift;
 
    my ($basemod,$app)=$package=~m/^(\S+)::(.*)$/;
+
+   $W5V2::Config={} if (!defined($W5V2::Config));
+   my $configkey="$configname::$basemod";
+   return($W5V2::Config->{$configkey}) if (exists($W5V2::Config->{$configkey}));
    my $config=new kernel::config();
    if (!$config->readconfig($instdir,$configname,$basemod)){
       if ($ENV{SERVER_SOFTWARE} ne ""){
@@ -493,6 +497,7 @@ sub getConfigObject($$$)
          exit(1);
       }
    }
+   $W5V2::Config->{$configkey}=$config;
    return($config);
 }
 
