@@ -765,9 +765,9 @@ sub getHashList
          my ($chkrec,$msg)=$o->getOnlyFirst(qw(ALL));
          if (defined($chkrec)){
             my @viewl=$o->isViewValid($chkrec);
-            if ($#viewl!=-1){
+            if ($#viewl!=-1 && !($#viewl==0 && !defined($viewl[0]))){
                $resl[$c]=$l[$c];
-               my @fobjs=$o->getFieldObjsByView($view,current=>$l[$c]);
+               my @fobjs=$o->getFieldObjsByView($view,current=>$resl[$c]);
                my %cprec;
                my $objns=$ns;
                $objns="W5Kernel" if ($ns eq "");
@@ -786,7 +786,7 @@ sub getHashList
                   if (!($wsdl=~m/^.*:.*$/)){
                      $wsdl="curns:".$wsdl;
                   }
-                  my $v=$fobj->FormatedResult($l[$c],"SOAP");
+                  my $v=$fobj->FormatedResult($resl[$c],"SOAP");
                   if (ref($v) eq "ARRAY"){
                      $v=[map({latin1($_)->utf8();} @$v)];
                      if ($wsdl=~m/:ArrayOfStringItems$/){
