@@ -146,8 +146,8 @@ sub isDeleteValid
    my $rec=shift;
 
    my $g=getModuleObject($self->Config,"base::interview");
-   my $grpid=$rec->{interviewcatid};
-   $g->SetFilter({"parentid"=>\$grpid});
+   my $grpid=$rec->{id};
+   $g->SetFilter({"interviewcatid"=>\$grpid});
    my @l=$g->getHashList(qw(interviewcatid));
    if ($#l!=-1){
       return(undef);
