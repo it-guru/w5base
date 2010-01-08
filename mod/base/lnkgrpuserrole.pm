@@ -83,22 +83,22 @@ sub new
                 name          =>'role',
                 label         =>'Role',
                 value         =>['RMember',
-                                 'REmployee',
-                                 'RReportReceive',
-                                 'RBoss','RBoss2',
-                                 'RApprentice','RFreelancer',
+                                 'REmployee',                  # orgrole
+                                 'RBoss','RBoss2',             # orgrole
+                                 'RApprentice','RFreelancer',  # orgrole
+                                 'RBackoffice',                # orgrole
+                                 'W5BaseSupport',              # orgrole
                                  'RQManager',
+                                 'RReportReceive',
                                  'RAuditor',
                                  'RINManager',
                                  'RCHManager',
                                  'RCFManager',
                                  'RPRManager',
                                  'RControlling',
-                                 'RBackoffice',
                                  'RTimeManager',
                                  'RAdmin',
                                  'RDataAdmin',
-                                 'W5BaseSupport'
                                 ],
                 dataobjattr   =>'lnkgrpuserrole.nativrole'),
 
