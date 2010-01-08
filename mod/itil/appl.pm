@@ -434,6 +434,7 @@ sub new
                 name          =>'interfaces',
                 label         =>'Interfaces',
                 group         =>'interfaces',
+                forwardSearch =>1,
                 subeditmsk    =>'subedit.appl',
                 vjointo       =>'itil::lnkapplappl',
                 vjoinbase     =>[{toapplcistatus=>"<=5"}],
