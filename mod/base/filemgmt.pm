@@ -568,7 +568,7 @@ sub checkacl
                               my ($prec)=$do->getOnlyFirst(qw(ALL));
                               if (defined($prec)){
                                  my @acl=$do->isViewValid($prec);
-                                 if (grep(/^(ALL|attachment)$/,@acl)){ 
+                                 if (grep(/^(ALL|attachments)$/,@acl)){ 
                                     $foundro=1;
                                  }
                               }
