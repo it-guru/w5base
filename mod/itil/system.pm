@@ -772,6 +772,7 @@ sub new
       new kernel::Field::Container(
                 name          =>'additional',
                 label         =>'Additionalinformations',
+                htmldetail    =>0,
                 uivisible     =>sub{
                    my $self=shift;
                    my $mode=shift;

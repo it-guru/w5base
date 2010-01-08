@@ -246,6 +246,27 @@ sub new
                 vjoindisp     =>'sapservicename'),
 
       new kernel::Field::Boolean(
+                name          =>'issox',
+                readonly      =>1,
+                group         =>'sec',
+                htmleditwidth =>'30%',
+                label         =>'mangaged by rules of SOX',
+                dataobjattr   =>
+                'if (swinstance.no_sox_inherit,0,appl.is_soxcontroll)'),
+
+      new kernel::Field::Select(
+                name          =>'nosoxinherit',
+                group         =>'sec',
+                label         =>'SOX state',
+                searchable    =>0,
+                transprefix   =>'ApplInherit.',
+                htmleditwidth =>'180px',
+                value         =>['0','1'],
+                translation   =>'itil::appl',
+                dataobjattr   =>'swinstance.no_sox_inherit'),
+
+
+      new kernel::Field::Boolean(
                 name          =>'custcostalloc',
                 label         =>'Customer cost allocation',
                 group         =>'misc',
@@ -635,7 +656,7 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default adm systems contacts ssl misc);
+   my @databossedit=qw(default adm systems contacts ssl misc sec);
    if (!defined($rec)){
       return(@databossedit);
    }
@@ -681,7 +702,7 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default adm systems ssl misc contacts source));
+   return(qw(header default adm systems sec ssl misc contacts source));
 }
 
 

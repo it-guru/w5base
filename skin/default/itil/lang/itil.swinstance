@@ -10,6 +10,7 @@
 'Deputy Instance Administrator'=>{de=>'Instanz Administrator Vertreter'},
 'fieldgroup.adm'=>{de=>'Administration/DBA',en=>'Administration/DBA'},
 'fieldgroup.ssl'=>{de=>'SSL Prüfsystem',en=>'SSL Verification'},
+'fieldgroup.sec'=>{en=>'Security and data privacy',de=>'Sicherheit und Datenschutz'},
 'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
 'Database Administrator'=>{de=>'Datenbank Administrator'},
 'Instance guardian team'=>{de=>'Instanz Betreuungsteam'},
@@ -28,3 +29,4 @@
 'SSL Certificate End'=>{de=>'SSL Zertifikat Ende'},
 'SSL State'=>{de=>'SSL Status'},
 'SSL last Certificate check'=>{de=>'SSL letzte Zertifikat Überprüfung'},
+'mangaged by rules of SOX'=>{de=>'Betreuung nach SOX (USA) Regeln'},

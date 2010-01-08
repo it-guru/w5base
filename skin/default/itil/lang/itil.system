@@ -41,7 +41,7 @@
 'you are not authorized to set other persons as databoss'=>{de=>'sie sind nicht berechtig andere Personen als Datanverantwortlicher einzutragen'},
 'Room'=>{de=>'Raum'},
 'Place'=>{de=>'Platz'},
-'Customer'=>{de=>'Kunde'},
+'Application Customers'=>{de=>'Anwendungs Kunden'},
 'Contacts'=>{de=>'Kontakte'},
 'Producer System-Handle'=>{de=>'Hersteller System-Handle'},
 'Producer Service&Support Class'=>{de=>'Hersteller Service&Support Class'},

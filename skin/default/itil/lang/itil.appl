@@ -104,3 +104,8 @@
 'system count'=>{de=>'System Anzahl'},
 'log cpucount'=>{de=>'Anzahl logischer CPUs'},
 'relative phys. cpucount'=>{de=>'relative Anzahl phys. CPUs'},
+'ApplInherit.0'=>{de=>'erben aus Anwendung',en=>'inherit from application'},
+'ApplInherit.1'=>{de=>'nein',en=>'no'},
+'SOX state'=>{de=>'SOX (USA) status'},
+
+
