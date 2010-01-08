@@ -5,3 +5,4 @@
 'itnetwork'=>{de=>'IT-Netzwerk Ansprechpartner',en=>'IT-Network'},
 'staffloc'=>{de=>'Personalstandort',en=>'Staff-location'},
 'project member'=>{de=>'Projektmitarbeiter'},
+'privacy read'=>{de=>'vertrauliches lesen'},

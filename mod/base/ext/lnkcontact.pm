@@ -43,8 +43,8 @@ sub getPosibleRoles
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
        $self->getParent->getParent->Self() eq "base::mandator")){
-      return("read"=>$self->getParent->T("read",$self->Self),
-             "write"=>$self->getParent->T("write",$self->Self)
+      return("read"            =>$self->getParent->T("read",$self->Self),
+             "write"           =>$self->getParent->T("write",$self->Self)
              );
    }
    if ($parentobj=~m/^.+::projectroom$/ ||
@@ -55,6 +55,8 @@ sub getPosibleRoles
              "read"            =>$self->getParent->T("read",
                                                      $self->Self),
              "write"           =>$self->getParent->T("write",
+                                                     $self->Self),
+             "privread"        =>$self->getParent->T("privacy read",
                                                      $self->Self),
              "PMember"         =>$self->getParent->T("project member",
                                                      $self->Self));

@@ -1,4 +1,4 @@
-'base::usermask'=>{de=>'Benutzervertretung',en=>'Usermasquerading'},
+'base::usermask'=>{de=>'Stellvertretung aktivieren',en=>'Usermasquerading activation'},
 'Current logged in useraccount'=>{de=>'aktuell angemeldete Benutzerkennung'},
 'Effective useraccount'=>{de=>'effektive Benutzerkennung'},
 'List of last used substitution accounts'=>{de=>'Liste der zuletzt benutzen Benutzerkennungen'},

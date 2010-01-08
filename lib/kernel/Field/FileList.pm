@@ -81,7 +81,9 @@ sub ListFiles
    foreach my $rec ($fo->getHashList(qw(ALL))){
       if (defined($rec)){
          #next if ($mode eq "" && !$fo->isViewValid($rec));
+printf STDERR ("fifi f=$rec->{fullname}\n");
          next if (!$fo->isViewValid($rec));
+printf STDERR ("fifi f=$rec->{fullname}=ok\n");
          $d.=$rec->{name}."<br>\n";
          my %clone=(%{$rec});
          $clone{label}=$clone{name};

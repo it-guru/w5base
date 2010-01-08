@@ -77,3 +77,5 @@
 'Workflow %s has been successfuly marked as deleted'=>{de=>'Workflow %s wurde erfolgreich als gelöscht markiert'},
 'Workflow %s has been successfuly unmarked as deleted'=>{de=>'Die Löschmarkierung am Workflow %s wurde erfolgreich entfernt'},
 
+'auto copy mode'=>{de=>'Automatisches Scheduling',en=>'auto scheduling'},
+'last workflow copy at'=>{de=>'letzter Scheduling Zeitpunkt'},
