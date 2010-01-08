@@ -119,7 +119,7 @@ sub AutoFinishWorkflows
    foreach my $stateid (qw(16 17 10)){
       $wf->SetFilter({stateid=>\$stateid,
                       class=>$class,
-                      mdate=>$CleanupWorkflow."+28d"});
+                      mdate=>$CleanupWorkflow});
       $wf->SetCurrentView(qw(id closedate stateid class));
       $wf->SetCurrentOrder(qw(NONE));
       $wf->Limit(100);
