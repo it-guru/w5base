@@ -1,52 +1,34 @@
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<hr width=754 align=left>
-<br>
-<br>
-<br>
-<br>
+<hr align=left width=754>
 <a name="lang.%currentlang%"></a>
-<table class=tabelle bgcolor="#FFFFFF" width=754 
-       border=0 cellspacing=0 cellpadding=0>
-  <tr>                           
-    <td rowspan=2 width=121 height=100% >
-       <table bgcolor="#FFFFFF" border=0 
-              height=100% width=100% cellspacing=0 cellpadding=0>
-          <tr><td width=5 rowspan=4></td></tr>
-          <tr><td valign=bottom id=notitytext>
-                  %eventtype%
-              </td></tr>
-          <tr><td id=notityval>
-                  Notification
-          </td></tr>
-       </table>
-    </td>
-  </tr>
+<table class=tabelle width=754 border=0 cellspacing=0 cellpadding=0>
   <tr height=100%>
+    <td width=5 align=right height=100% >&nbsp;</td>
     <td>
-       <table bgcolor="#FFFFFF" border=0 
+       <table  border=0 
               width=100% height=100% cellspacing=0 cellpadding=0>
           <tr><td width=2></td>
           <td bgcolor="%headcolor%" valign=middle>
-              &nbsp; &nbsp; &nbsp; %headtext% %altheadtext%</td>
+              &nbsp; Ereignisinformation &nbsp; - &nbsp; %headtext% %altheadtext%</td>
           <td bgcolor="%headcolor%" width=60 valign=top
               align=center>%langcontrol%</td>
           <tr><td height=1></td></tr>
        </table>
     </td>
+    <td width=50 align=right height=100% >&nbsp;</td>
+    <td width=121 align=right height=100% >
+       <table border=0 
+              height=100% width=100% cellspacing=0 cellpadding=0>
+          <tr><td><img src="cid:eventnotification.bild1.jpg"></td></tr>
+       </table>
+    </td>
   </tr>
 </table>
+<hr align=left width=754>
 
-<table class=tabelle bgcolor="#FFFFFF" width=754
+
+<table class=tabelle width=754 
        border=0 cellspacing=0 cellpadding=0>
-  <tr>
+  <tr>                           
   <td>
 
 <table width=100% cellpadding=10>

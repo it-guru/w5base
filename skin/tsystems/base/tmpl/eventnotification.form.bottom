@@ -5,7 +5,13 @@
     </td>
   </tr>
 </table>
+<hr align=left width=754>
+<table id=tabelle2 width="754" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td class=col1 align=left><p style="font-size:10px">
+Rot hinterlegte Kopfzeile=>Ereignisklasse 1 oder 2; Gelb hinterlegte Kopfzeile=>Ereignisklasse 3,4 oder 5; Grün hinterlegte Kopfzeile=>Ereignis abgeschlosse (Gutmeldung); Blau hinterlegte Kopfzeile=>Ergebnis der Ursachenanalyse
+    </td>
+  </tr>
+</table>
+<hr align=left width=754>
 </form>
-<br>
-<br>
-<br>
