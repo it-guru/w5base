@@ -1,0 +1,115 @@
+#!/usr/bin/env perl
+use strict;
+use File::Find;
+use File::Basename;
+use FindBin;
+use XML::Parser;
+use Data::Dumper;
+use Date::Calc(qw(Day_of_Week_to_Text Week_of_Year Today_and_Now
+                  Day_of_Week));
+
+
+my $svndir=$ARGV[0];
+my $recovscript=$ARGV[1];
+
+if (!defined($recovscript)){
+   $recovscript="svn.recovery.%Y%M%D-%hh.sh";
+}
+
+if ($svndir eq "" || $recovscript eq ""){
+   help();
+   exit(1);
+}
+
+printf("Try to create a recovery script\n".
+       "for '%s' in the\n".
+       "script '%s'.\n",$svndir,$recovscript);
+my %format;
+
+($format{Y},$format{M},$format{D},
+ $format{h},$format{m},$format{s})=Today_and_Now();
+($format{w})=Week_of_Year($format{Y},$format{M},$format{D});
+($format{d})=Day_of_Week_to_Text(Day_of_Week($format{Y},$format{M},$format{D}));
+
+foreach my $v (qw(h m s M D w)){
+   $format{$v}=sprintf("%02d",$format{$v});
+}
+foreach my $key (keys(%format)){
+   $recovscript=~s/\%$key/$format{$key}/;
+}
+printf("Output: %s\n",$recovscript);
+printf("Pass1: start calculating major revision\n");
+my %rev;
+
+if (open(F,"svn info -R --xml $svndir|")){
+   my $XMLp=new XML::Parser(Handlers=>{
+                               Start => \&handle_pass1,
+                            });
+   $XMLp->parse(*F); 
+   close(F);
+}
+else{
+   printf STDERR ("ERROR: fail to read svn info\n");
+   exit(1);
+}
+my $maxrevcount=0;
+my $maxrev=0;
+foreach my $rev (keys(%rev)){
+   if ($rev{$rev}>$maxrevcount){
+      $maxrev=$rev;
+      $maxrevcount=$rev{$rev};
+   }
+}
+my $revcount=keys(%rev);
+printf("       found %d revsions, most revision=%s\n",$revcount,$maxrev);
+
+printf("Pass2: writing recovery script\n");
+if (open(OUT,">".$recovscript)){
+   printf OUT ("#!/bin/bash\n");
+   printf OUT ("svn update -r $maxrev '$svndir'\n");
+   if (open(F,"svn info -R --xml $svndir|")){
+      my $XMLp=new XML::Parser(Handlers=>{
+                                  Start => \&handle_pass2,
+                               });
+      $XMLp->parse(*F); 
+      close(F);
+   }
+
+   close(OUT);
+}
+else{
+   printf STDERR ("ERROR: fail to open output file '$recovscript'\n");
+   exit(1);
+}
+
+
+
+sub help
+{
+   my $bin=$FindBin::Bin;
+   printf STDERR ("Usage: %s <svn dir> <target script>\n",$bin);
+}
+
+sub handle_pass1
+{
+   my ($expat,$e,%attr)=@_;
+   if ($e eq "entry"){
+      $rev{$attr{'revision'}}++;
+   }
+}
+
+sub handle_pass2
+{
+   my ($expat,$e,%attr)=@_;
+   if ($e eq "entry"){
+      if ($attr{'revision'}==0){
+         printf STDERR ("WARN  : '%s' changed without commit!\n",
+                        $attr{'path'});
+      }
+      else{
+         if ($attr{'revision'} ne $maxrev ){
+            printf OUT ("svn update -r $attr{'revision'} '$attr{'path'}'\n");
+         }
+      }
+   }
+}
