@@ -919,7 +919,7 @@ sub isViewValid
                    control userro);
       }
       else{
-         @gl=qw(header name default nativcontact comments);
+         @gl=qw(header name default nativcontact comments userro);
       }
    }  
    elsif ($rec->{usertyp} eq "service"){
