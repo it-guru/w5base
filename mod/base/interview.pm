@@ -306,7 +306,7 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("header","default") if (!defined($rec));
+   return("header","default","tech") if (!defined($rec));
    return("ALL");
 }
 
