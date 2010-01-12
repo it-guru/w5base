@@ -2350,9 +2350,10 @@ sub DataObj_findtemplvar
          }
          if ($param[0] eq "detail"){
             if (defined($opt->{currentfieldgroup})){
-               if ($opt->{currentfieldgroup} eq $opt->{fieldgroup} &&
-                   $opt->{currentid} eq $opt->{id}){
-                  $mode="edit";
+               if (($opt->{currentfieldgroup} eq $opt->{fieldgroup} &&
+                    $opt->{currentid} eq $opt->{id}) ||
+                   !defined($current)){  # in New mode all fields are in edit
+                  $mode="edit";          # mode
                }
             }
             if (exists($opt->{editgroups})){
