@@ -177,7 +177,7 @@ sub execute
    my($statement, $attr, @bind_values) = @_;
 
    if ($ENV{REMOTE_USER} ne ""){
-      $statement.=" /* W5BaseUser: $ENV{REMOTE_USER} */";
+      $statement.=" /* W5BaseUser: $ENV{REMOTE_USER}($$) */";
    }
    if (lc($self->DriverName()) eq "mysql"){
       if ($attr->{unbuffered}){
@@ -296,7 +296,7 @@ sub do
    my $self=shift;
    my $cmd=shift;
 
-   $cmd.=" /* W5BaseUser: $ENV{REMOTE_USER} */" if ($ENV{REMOTE_USER} ne "");
+   $cmd.=" /* W5BaseUser: $ENV{REMOTE_USER}($$) */" if ($ENV{REMOTE_USER} ne "");
    if ($self->{'db'}){
       if (my $rows=$self->{'db'}->do($cmd,{},@_)){
          return($rows); # return of "0E0" means not lines effedted (see DBI)

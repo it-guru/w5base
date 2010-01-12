@@ -144,8 +144,9 @@ sub mkp800
       if (defined($rec)){
          do{
             if (ref($rec->{affectedcontractid}) eq "ARRAY" &&
-                $rec->{tcomcodrelevant} eq "yes" &&
-                $rec->{stateid}>=16 ){
+                ( ($rec->{stateid}>=17 && $rec->{tcomcodrelevant} eq "yes") ||
+                  ($rec->{stateid}>=16 && 
+                   $rec->{class} eq "AL_TCom::workflow::businesreq"))){
                $self->processRec($start,\%p800,$rec);
                $self->processRecSpecial($start,\%p800special,$rec,
                                         $xlsexp,$bflexxp800,$monthlist[1]);

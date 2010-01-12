@@ -126,8 +126,8 @@ sub FormatJsDialCall
 
       my $open="openwin('$dialerurl',".
                "'_blank',".
-               "'height=260,width=530,toolbar=no,status=no,".
-               "resizable=no,scrollbars=no')";
+               "'height=360,width=580,toolbar=no,status=no,".
+               "resizable=yes,scrollbars=no')";
       my $cmd="$open;";
       return($cmd);
    }

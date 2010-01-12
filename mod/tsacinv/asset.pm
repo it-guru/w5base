@@ -426,7 +426,8 @@ sub initSqlWhere
       "and ammodel.lnatureid=amnature.lnatureid(+) ".
       "and amasset.lsendercostcenterid=amcostcenter.lcostid(+) ".
       "and assetportfolio.bdelete=0 ".
-      "and amnature.name in ('SERVER','VIRTUAL ASSET','NAS-FILER','SWITCH')";
+      "and amnature.name in ('SERVER','VIRTUAL ASSET',".
+      "'NAS-FILER','SWITCH','CHASSIS')";
    return($where);
 }
 

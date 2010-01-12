@@ -22,7 +22,7 @@
 'Rack identifier'=>{de=>'Rack Bezeichnung'},
 'Applications'=>{de=>'Anwendungen'},
 'Application business teams'=>{de=>'Anwendungs-Betriebsteams'},
-'Customer'=>{de=>'Kunden'},
+'Application Customers'=>{de=>'Anwendungs Kunden'},
 'Contacts'=>{de=>'Kontakte'},
 'you are not authorized to set other persons as databoss'=>{de=>'Sie sind nicht berechtig, andere Personen als Datenverantwortlicher einzusetzen'},
 'fieldgroup.phonenumbers'=>{de=>'Rufnummernverzeichnis',en=>'Phonenumbers'},
