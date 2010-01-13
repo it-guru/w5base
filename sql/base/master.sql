@@ -272,3 +272,5 @@ CREATE TABLE interviewcat (
   PRIMARY KEY  (id),
   UNIQUE KEY fullname (fullname),key name (name),key parentid (parentid)
 );
+alter table interview add cistatus int(2) NOT NULL;
+alter table interviewcat add createuser bigint(20) NOT NULL default '0';
