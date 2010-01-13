@@ -24,7 +24,9 @@ use kernel::DataObj::DB;
 use kernel::Field;
 use kernel::InterviewField;
 use Text::ParseWhere;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::InterviewField);
+use kernel::CIStatusTools;
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::InterviewField
+        kernel::CIStatusTools);
 
 sub new
 {
@@ -60,6 +62,20 @@ sub new
                 name          =>'name',
                 label         =>'Question',
                 dataobjattr   =>'interview.name'),
+
+      new kernel::Field::Select(
+                name          =>'cistatus',
+                htmleditwidth =>'40%',
+                label         =>'CI-State',
+                vjoineditbase =>{id=>">0"},
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['cistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'cistatusid',
+                label         =>'CI-StateID',
+                dataobjattr   =>'interview.cistatus'),
 
       new kernel::Field::Link(
                 name          =>'contactid',
@@ -119,13 +135,15 @@ sub new
       new kernel::Field::Select(
                 name          =>'prio',
                 value         =>['', qw(1 2 3)],   # 1-3 are need to answer
+                transprefix   =>'QPRIO.',
+                htmleditwidth =>'130px',
                 label         =>'Question prio',
                 dataobjattr   =>'interview.prio'),
 
       new kernel::Field::Select(
                 name          =>'questtyp',
                 transprefix   =>'QT.', 
-                htmleditwidth =>'200px',
+                htmleditwidth =>'250px',
                 value         =>['percent','percenta','text',
                                  'boolean','booleana'],
                 label         =>'Question Typ',
@@ -206,6 +224,18 @@ sub new
    return($self);
 }
 
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_cistatus"))){
+     Query->Param("search_cistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
+
+
+
 sub SecureValidate
 {
    my $self=shift;
@@ -268,6 +298,24 @@ sub Validate
    if ($prio eq ""){
       $newrec->{prio}=undef;
    }
+
+   my $parentobj=effVal($oldrec,$newrec,"parentobj");
+   if (!($parentobj=~m/^\S+::\S+/)){
+      $self->LastMsg(ERROR,"invalid name of parentobj"); 
+      return(undef);
+   }
+   my $chk=getModuleObject($self->Config,$parentobj);
+   if (!defined($chk)){
+      $self->LastMsg(ERROR,"parentobj not found"); 
+      return(undef);
+   }
+   my $io=$chk->getField("interview");
+   if (!defined($io)){
+      $self->LastMsg(ERROR,"parentobj not prepaired for interview handling"); 
+      return(undef);
+   }
+
+   return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"qtag"));
    return(1);
 }
 
@@ -341,6 +389,17 @@ sub isWriteValid
                                 $self->IsMemberOf("admin"));
    return(undef);
 }
+
+sub FinishWrite
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
+   $self->NotifyOnCIStatusChange($oldrec,$newrec);
+   return($bak);
+}
+
 
 sub checkParentWrite
 {

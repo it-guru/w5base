@@ -33,7 +33,8 @@ sub getTotalActiveQuestions
    my ($rec,$msg)=$p->getOnlyFirst(qw(ALL));
 
    my $i=getModuleObject($self->getParent->Config,"base::interview");
-   $i->SetFilter({parentobj=>\$parentobj});
+   $i->SetFilter({parentobj=>\$parentobj,
+                  cistatusid=>[3,4]});
    my $pwrite=$i->checkParentWrite($p,$rec);
    my @l;
    foreach my $irec ($i->getHashList(qw(queryblock qtag id name qname prio

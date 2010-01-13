@@ -95,6 +95,12 @@ sub new
                 label         =>'Creation-Date',
                 dataobjattr   =>'interviewcat.createdate'),
 
+      new kernel::Field::Creator(
+                name          =>'creator',
+                group         =>'source',
+                label         =>'Creator',
+                dataobjattr   =>'interviewcat.createuser'),
+
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'id',
@@ -180,6 +186,7 @@ sub isWriteValid
          return("default");
       }
    }
+   return(qw(default)) if ($rec->{creator} == $userid);
 
    return(undef);
 }
