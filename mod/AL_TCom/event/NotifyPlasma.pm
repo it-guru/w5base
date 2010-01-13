@@ -53,7 +53,7 @@ sub NotifyPlasma
    my $wsproxy=$self->Config->Param("WEBSERVICEPROXY");
    $wsproxy=$wsproxy->{plasma} if (ref($wsproxy) eq "HASH");
    return({exitcode=>0,msg=>'ok - no interface defined'}) if ($wsproxy eq "");
-   return({exitcode=>0,msg=>'ok - ins not send'}) if ($param{'op'} eq "ins");
+   return({exitcode=>0,msg=>'ok - upd not send'}) if ($param{'op'} eq "upd");
 
    my $wf=getModuleObject($self->getParent->Config(),"base::workflow"); 
    $wf->SetFilter({id=>\$param{'id'}});
