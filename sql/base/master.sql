@@ -274,3 +274,5 @@ CREATE TABLE interviewcat (
 );
 alter table interview add cistatus int(2) NOT NULL;
 alter table interviewcat add createuser bigint(20) NOT NULL default '0';
+alter table interview add effectonmttr int(1) NOT NULL default '0';
+alter table interview add effectonmtbf int(1) NOT NULL default '0';

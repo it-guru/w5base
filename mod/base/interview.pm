@@ -122,6 +122,20 @@ sub new
                 label         =>'parent Ojbect',
                 dataobjattr   =>'interview.parentobj'),
 
+      new kernel::Field::Boolean(
+                name          =>'effect_on_mttr',
+                label         =>'effects on MTTR',
+                group         =>'tech',
+                htmlhalfwidth =>1,
+                dataobjattr   =>'effectonmttr'),
+
+      new kernel::Field::Boolean(
+                name          =>'effect_on_mtbf',
+                label         =>'effects on MTBF',
+                htmlhalfwidth =>1,
+                group         =>'tech',
+                dataobjattr   =>'effectonmtbf'),
+
       new kernel::Field::Link(
                 name          =>'queryblock',
                 label         =>'Questiongroup',

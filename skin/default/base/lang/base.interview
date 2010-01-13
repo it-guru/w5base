@@ -28,3 +28,5 @@
 'invalid name of parentobj'=>{de=>'ungültiger Elternobjekt name'},
 'parentobj not found'=>{de=>'kein passendes Elternobjekt gefunden'},
 'parentobj not prepaired for interview handling'=>{de=>'angegebenens Elternobjekt ist nicht für Interview-Handling vorbereitet'},
+'effects on MTTR'=>{de=>'beeinflusst MTTR'},
+'effects on MTBF'=>{de=>'beeinflusst MTBF'},
