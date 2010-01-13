@@ -22,7 +22,9 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
+use kernel::App::Web::InterviewLink;
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB
+        kernel::App::Web::InterviewLink);
 
 sub new
 {
