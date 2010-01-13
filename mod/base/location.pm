@@ -302,6 +302,8 @@ sub new
                 group         =>'additional',
                 dataobjattr   =>'location.additional'),
 
+      new kernel::Field::Interview(),
+
    );
    $self->setDefaultView(qw(location address1 name cistatus));
    $self->setWorktable("location");
