@@ -571,7 +571,9 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default","contacts","gps","control") if ($self->IsMemberOf("admin"));
+   if ($self->IsMemberOf("admin")){
+      return("default","contacts","management","gps","control");
+   }
    return(undef);
 }
 
