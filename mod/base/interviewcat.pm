@@ -136,7 +136,7 @@ sub Validate
    if (defined($newrec->{name}) || !defined($oldrec)){
       trim(\$newrec->{name});
       if ($newrec->{name} eq "" ||
-           !($newrec->{name}=~m/^[a-zA-Z0-9_-\s]+$/)){
+           !($newrec->{name}=~m/^[a-zäöüß0-9_-\s]+$/i)){
          $self->LastMsg(ERROR,"invalid groupname '%s' specified",
                         $newrec->{name});
          return(undef);
