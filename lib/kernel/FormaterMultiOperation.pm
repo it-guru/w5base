@@ -88,6 +88,11 @@ sub ProcessHead
    my $d="";
    $d.=$app->HtmlHeader(form=>1,body=>1,
                         style=>[qw(default.css MultiAct.css)]);
+   if ($self->{FAIL}){
+      $self->getParent->getParent->LastMsg(ERROR,
+          $self->getParent->getParent->T("some operations failed",
+                                         'kernel::Output::MultiDelete'));
+   }
    $d.=<<EOF;
 <script language="JavaScript">
 var allon=false;
@@ -193,6 +198,7 @@ sub ProcessLine
    my $lastmsg;
    if ($app->LastMsg()){
       $lastmsg=join("<br>\n",$app->LastMsg());
+      $self->{FAIL}++;
    }
    $lastmsg="ERROR: unknown problem" if ($fail==1 && $lastmsg eq "");
    my $rowspan=1;
@@ -217,9 +223,9 @@ sub ProcessLine
    if ($rowspan==2){
       $d.=sprintf("<tr><td colspan=%d>$lastmsg</td></tr>",$#view+1);
    }
-   if ($self->{VALID}){
+  # if ($self->{VALID}){
       $app->LastMsg("");
-   }
+  # }
    return($d);
 }
 

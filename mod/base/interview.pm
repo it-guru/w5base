@@ -376,9 +376,26 @@ sub isDeleteValid
 {
    my $self=shift;
    my $rec=shift;
-   return($self->isWriteValid($rec)) if ($self->IsMemberOf("admin"));
-   return(undef); 
+   return($self->isWriteValid($rec));
 }
+
+
+sub ValidateDelete
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my $iid=$rec->{id};
+   my $chkobj=getModuleObject($self->Config,"base::interanswer");
+   $chkobj->SetFilter({interviewid=>\$iid});
+   my $n=$chkobj->CountRecords();
+   if ($n>0){
+      $self->LastMsg(ERROR,"existing answers"); 
+      return(0);
+   }
+   return(1);
+}
+
 sub isWriteValid
 {
    my $self=shift;

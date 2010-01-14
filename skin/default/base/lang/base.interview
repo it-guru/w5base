@@ -30,3 +30,4 @@
 'parentobj not prepaired for interview handling'=>{de=>'angegebenens Elternobjekt ist nicht für Interview-Handling vorbereitet'},
 'effects on MTTR'=>{de=>'beeinflusst MTTR'},
 'effects on MTBF'=>{de=>'beeinflusst MTBF'},
+'existing answers'=>{de=>'es existieren bereits Anworten für diese Frage'},
