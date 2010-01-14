@@ -21,6 +21,7 @@
 'sysadm.grp'=>{de=>'Gruppenverwaltung',en=>'Group-Administration'},
 'sysadm.mandator'=>{de=>'Mandantenverwaltung',en=>'Mandator-Administration'},
 'sysadm.mandator.new'=>{de=>'Neueingabe',en=>'New'},
+'sysadm.mandator.dataacl'=>{de=>'DatenACLs',en=>'dataACLs'},
 'sysadm.location'=>{de=>'Standortverwaltung',en=>'Location-Administration'},
 'sysadm.location.new'=>{de=>'Neueingabe',en=>'New'},
 'sysadm.location.googlekeys'=>{de=>'GoogleMaps',en=>'GoogleMaps'},

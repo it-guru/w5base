@@ -1,6 +1,7 @@
 'base::mandator'=>{de=>'Mandant',en=>'Mandator'},
 'fieldgroup.default'=>{de=>'Mandanteninformationen',en=>'Mandatorinformations'},
 'fieldgroup.contacts'=>{de=>'Kontakte',en=>'Contacts'},
+'fieldgroup.dataacls'=>{de=>'Ebene II - Schreibzuriffsregeln',en=>'Layer II - write access rules'},
 'Groupname'=>{de=>'Gruppenname'},
 'Mandator'=>{de=>'Mandant'},
 'Employee count'=>{de=>'Mitarbeiteranzahl'},

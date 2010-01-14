@@ -276,3 +276,20 @@ alter table interview add cistatus int(2) NOT NULL;
 alter table interviewcat add createuser bigint(20) NOT NULL default '0';
 alter table interview add effectonmttr int(1) NOT NULL default '0';
 alter table interview add effectonmtbf int(1) NOT NULL default '0';
+create table mandatordataacl(
+  id         bigint(20)   NOT NULL,prio int(5) default '5000',
+  mandator   bigint(20)   NOT NULL,aclmode char(10) default 'allow',
+  parentobj  varchar(30)  NOT NULL,
+  dataname   varchar(40)  NOT NULL,
+  target     varchar(30) default NULL,
+  targetid   bigint(20) NOT NULL,
+  comments   blob,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifyuser bigint(20) NOT NULL default '0',
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) NOT NULL default '0',
+  PRIMARY KEY  (id),KEY m(parentobj,mandator),key (prio)
+);
+alter table mandator add key(grpid);

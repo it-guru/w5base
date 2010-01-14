@@ -23,8 +23,10 @@ use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
 use kernel::CIStatusTools;
+use kernel::MandatorDataACL;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB 
-        kernel::App::Web::InterviewLink kernel::CIStatusTools);
+        kernel::App::Web::InterviewLink kernel::CIStatusTools
+        kernel::MandatorDataACL);
 
 sub new
 {
@@ -92,6 +94,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'conumber',
+                htmleditwidth =>'150px',
                 htmlwidth     =>'100px',
                 label         =>'CO-Number',
                 weblinkto     =>'itil::costcenter',
@@ -101,6 +104,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'applid',
                 htmlwidth     =>'100px',
+                htmleditwidth =>'150px',
                 label         =>'Application ID',
                 dataobjattr   =>'appl.applid'),
 
@@ -1204,11 +1208,11 @@ sub isWriteValid
       return("default");
    }
    else{
-      if ($rec->{databossid}==$userid){
-         return(@databossedit);
-      }
       if ($self->IsMemberOf("admin")){
          return(@databossedit);
+      }
+      if ($rec->{databossid}==$userid){
+         return($self->expandByDataACL($rec->{mandatorid},@databossedit));
       }
       if (defined($rec->{contacts}) && ref($rec->{contacts}) eq "ARRAY"){
          my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
@@ -1226,24 +1230,24 @@ sub isWriteValid
             my @roles=($contact->{roles});
             @roles=@{$contact->{roles}} if (ref($contact->{roles}) eq "ARRAY");
             if (grep(/^write$/,@roles)){
-               return(@databossedit);
+               return($self->expandByDataACL($rec->{mandatorid},@databossedit));
             }
          }
       }
       if ($rec->{mandatorid}!=0 && 
          $self->IsMemberOf($rec->{mandatorid},"RCFManager","down")){
-         return(@databossedit);
+         return($self->expandByDataACL($rec->{mandatorid},@databossedit));
       }
       if ($rec->{businessteamid}!=0 && 
          $self->IsMemberOf($rec->{businessteamid},"RCFManager","down")){
-         return(@databossedit);
+         return($self->expandByDataACL($rec->{mandatorid},@databossedit));
       }
       if ($rec->{responseteamid}!=0 && 
          $self->IsMemberOf($rec->{responseteamid},"RCFManager","down")){
-         return(@databossedit);
+         return($self->expandByDataACL($rec->{mandatorid},@databossedit));
       }
    }
-   return(undef);
+   return($self->expandByDataACL($rec->{mandatorid}));
 }
 
 sub FinishDelete

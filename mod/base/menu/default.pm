@@ -165,6 +165,9 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("sysadm.mandator.dataacl",
+                      "base::mandatordataacl");
+
    $self->RegisterObj("sysadm.location",
                       "base::location");
    

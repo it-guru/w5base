@@ -725,7 +725,10 @@ sub SecureValidate
              }
           }
           if ($fo->Type() eq "SubList" ||
-              (!grep(/^ALL$/,@$wrgroups) && !$writeok &&
+              grep(/^!.*\.$wrfield$/,@$wrgroups) ||
+              (!grep(/^ALL$/,@$wrgroups) && 
+               !grep(/^.*\.$wrfield$/,@$wrgroups) && 
+               !$writeok &&
                !($fo->Type() eq "Id"))){
              my $msg=sprintf($self->T("write request to field '\%s' rejected"),
                              $wrfield);
@@ -752,7 +755,10 @@ sub isDeleteValid
    my $self=shift;
    my $rec=shift;
                    # (1/ALL=Ok) or undef if record could/should be not deleted
-   return($self->isWriteValid($rec));
+   my @l=grep(!/^$/,grep(!/^\!.*$/,grep(!/^.*\..+$/,
+              $self->isWriteValid($rec))));
+   return if ($#l==-1);
+   return(@l);
 }
 
 sub ValidateDelete
@@ -2363,8 +2369,15 @@ sub DataObj_findtemplvar
                }
                my $editok=0;
                foreach my $fieldgroup (@fieldgrouplist){
-                  if (grep(/^$fieldgroup$/,@{$opt->{editgroups}})){
+                  if (grep(/^$fieldgroup$/,@{$opt->{editgroups}})||
+                      grep(/^$fieldgroup\.$var$/,@{$opt->{editgroups}})){
                      $editok=1;last;
+                  }
+               }
+               foreach my $fieldgroup (@fieldgrouplist){
+                  if (grep(/^!$fieldgroup$/,@{$opt->{editgroups}})||
+                      grep(/^!$fieldgroup\.$var$/,@{$opt->{editgroups}})){
+                     $editok=0;last;
                   }
                }
                if (!$editok && 

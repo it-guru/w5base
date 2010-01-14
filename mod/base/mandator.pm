@@ -96,6 +96,18 @@ sub new
                 vjoininhash   =>['targetid','target','roles'],
                 group         =>'contacts'),
 
+      new kernel::Field::SubList(
+                name          =>'dataacls',
+                label         =>'DataACLs',
+                group         =>'dataacls',
+                allowcleanup  =>1,
+                subeditmsk    =>'subedit.mandator',
+                vjointo       =>'base::mandatordataacl',
+                vjoinon       =>['id'=>'mid'],
+                vjoindisp     =>[qw(parentobj dataname prio aclmode targetname)],
+                vjoininhash   =>['mandatorid','parentobj',
+                                 'dataname','prio','target','targetid','aclmode']),
+
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
@@ -144,6 +156,12 @@ sub new
    return($self);
 }
 
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   return(qw(header default contacts dataacls source));
+}
+
 
 sub getRecordImageUrl
 {
@@ -187,7 +205,7 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default","contacts") if ($self->IsMemberOf("admin"));
+   return("default","contacts","dataacls") if ($self->IsMemberOf("admin"));
    return(undef);
 }
 

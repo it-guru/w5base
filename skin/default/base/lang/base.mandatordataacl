@@ -1,0 +1,5 @@
+'base::mandatordataacl'=>{de=>'Mandaten Datenzugriffsregel',
+                          en=>'Mandator data ACL'},
+'Parent-Object'=>{de=>'Elternobjekt'},
+'Target-Name'=>{de=>'Kontakt'},
+'no contact specified'=>{de=>'kein Kontakt angegeben'},

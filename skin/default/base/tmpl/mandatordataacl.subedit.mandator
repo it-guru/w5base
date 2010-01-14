@@ -1,0 +1,21 @@
+<link rel=stylesheet type="text/css" 
+      href="../../../public/base/load/kernel.App.Web.css">
+<link rel=stylesheet type="text/css" 
+      href="../../../public/base/load/Output.HtmlSubListEdit.css">
+</link>
+<div class=editframe>
+   <table class=editframe>
+      <tr>
+         <td class=fname style="width:10%">%parentobj(label)%:</td>
+         <td class=finput style="width:35%">%parentobj(sublistedit)%</td>
+         <td class=fname style="width:10%">%dataname(label)%:</td>
+         <td class=finput style="width:35%">%dataname(sublistedit)%</td>
+         <td class=finput style="width:10%">%aclmode(sublistedit)%</td>
+      </tr>
+      <tr>
+         <td class=fname style="width:10%">%targetname(label)%:</td>
+         <td class=finput colspan=4>%targetname(sublistedit)%</td>
+      </tr>
+   </table>
+</div>
+%StdButtonBar(subadd,subdelete,subsave,subcancel)%
