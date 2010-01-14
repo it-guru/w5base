@@ -83,6 +83,7 @@ sub FinishWrite
                                      exists($oldrec->{$myname}));
    my $newval=$newrec->{$myname} if (defined($newrec) &&
                                      exists($newrec->{$myname}));
+#printf STDERR ("kh=%s\n",Dumper($newval));
    my $keytab=$self->{tablename};
    my $nowstamp=NowStamp();
    #printf STDERR ("fifi FinishWrite keyhandler %s my newval=%s\n",Dumper($newrec),Dumper($newval));
