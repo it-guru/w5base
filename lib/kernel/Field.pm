@@ -25,6 +25,7 @@ use kernel::Field::Text;
 use kernel::Field::FlexBox;
 use kernel::Field::Databoss;
 use kernel::Field::Password;
+use kernel::Field::JoinUniqMerge;
 use kernel::Field::Phonenumber;
 use kernel::Field::File;
 use kernel::Field::Float;
@@ -135,7 +136,7 @@ sub new
       $self->{uivisible}=0;
    }
    if (defined($self->{vjointo})){
-      $self->{vjoinconcat}="; " if (!defined($self->{vjoinconcat}));
+      $self->{vjoinconcat}="; " if (!exists($self->{vjoinconcat}));
       $self->{_permitted}->{vjoinconcat}=1;# Verkettung der Ergebnisse
       if (!defined($self->{weblinkto})){
          $self->{weblinkto}=$self->{vjointo};
@@ -755,7 +756,13 @@ sub RawValue
             else{
                $self->{VJOINSTATE}="not found";
             }
-            $current->{$self->Name()}=join($self->{vjoinconcat},sort(keys(%u)));
+            if (defined($self->{vjoinconcat})){
+               $current->{$self->Name()}=
+                       join($self->{vjoinconcat},sort(keys(%u)));
+            }
+            else{
+               $current->{$self->Name()}=[sort(keys(%u))];
+            }
             $d=$current->{$self->Name()};
          }
          else{

@@ -1,4 +1,4 @@
-package kernel::Field::Boolean;
+package kernel::Field::JoinUniqMerge;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -19,36 +19,61 @@ package kernel::Field::Boolean;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use kernel::Field::Select;
 
-@ISA    = qw(kernel::Field::Select);
+@ISA    = qw(kernel::Field);
 
 
 sub new
 {
    my $type=shift;
-   my $self=bless($type->SUPER::new(@_),$type);
+   my $self={@_};
    $self->{value}=[0,1]            if (!defined($self->{values}));
    $self->{transprefix}="boolean." if (!defined($self->{transprefix}));
+   $self->{master}="1"             if (!defined($self->{master}));
    $self->{default}="0"            if (!defined($self->{default}));
-   $self->{htmleditwidth}="60px"   if (!defined($self->{htmleditwidth}));
-   $self->{WSDLfieldType}="xsd:boolean" if (!defined($self->{WSDLfieldType}));
+   $self->{readonly}='1'           if (!defined($self->{htmleditwidth}));
+   $self->{WSDLfieldType}="xsd:string" if (!defined($self->{WSDLfieldType}));
+   $self=bless($type->SUPER::new(%{$self}),$type);
+   $self->{vjoinconcat}=undef;
    return($self);
 }
 
-sub FormatedResult
+sub FormatedDetail
 {
    my $self=shift;
    my $current=shift;
    my $mode=shift;
    my $d=$self->RawValue($current);
-   if ($mode eq "SOAP"){
-      return("true") if ($d);
-      return("false");
-   }
 
-   return($d) if ($mode eq "XMLV01");
-   return($self->SUPER::FormatedResult($current,$mode));
+   $d=[$d] if (ref($d) ne "ARRAY");
+   @$d=grep(!/^$/,@$d);
+   if ($#{$d}==-1){
+      $d=[$self->{default}];
+   }
+   my %out;
+   my %chk;
+   foreach my $v (@{$d}){
+      $chk{$v}++;
+   }
+   if ($mode=~m/Html/){
+      foreach my $v (@{$d}){
+         my $o=$self->getParent->T($self->{transprefix}.$v,
+                                   $self->{translation});
+         if ($v eq $self->{master} && keys(%chk)>1){
+            $o="<u><b>$o</b></u>";
+         }
+         $out{$o}++;
+      }
+   }
+   else{
+      foreach my $v (@$d){
+         my $o=$self->getParent->T($self->{transprefix}.$v,
+                                   $self->{translation});
+         $out{$o}++;
+      }
+   }
+   my $res=join("; ",sort(keys(%out)));
+   return($res);
 }
 
 

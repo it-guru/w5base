@@ -356,7 +356,27 @@ sub new
                 name          =>'guardianteamid',
                 dataobjattr   =>'asset.guardianteam'),
 
-      new kernel::Field::Boolean(
+      new kernel::Field::JoinUniqMerge(
+                name          =>'issox',
+                label         =>'mangaged by rules of SOX',
+                group         =>'sec',
+                searchable    =>1,
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{applcistatusid=>"<=4"}],
+                vjoinon       =>['id'=>'assetid'],
+                vjoindisp     =>'assetissox'),
+
+      new kernel::Field::Select(
+                name          =>'nosoxinherit',
+                group         =>'sec',
+                label         =>'SOX state',
+                searchable    =>0,
+                transprefix   =>'SysInherit.',
+                htmleditwidth =>'180px',
+                value         =>['0','1'],
+                dataobjattr   =>'asset.no_sox_inherit'),
+
+         new kernel::Field::Boolean(
                 name          =>'allowifupdate',
                 group         =>'control',
                 label         =>'allow automatic updates by interfaces',
@@ -659,8 +679,8 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default guardian physasset contacts control location
-                       phonenumbers misc attachments);
+   my @databossedit=qw(default guardian physasset contacts control location 
+                       phonenumbers misc attachments sec);
    if (!defined($rec)){
       return("default","control");
    }
@@ -706,7 +726,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header default guardian phonenumbers location 
-             physasset contacts misc systems 
+             physasset sec contacts misc systems 
              applications attachments control source));
 }
 

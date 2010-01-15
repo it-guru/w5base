@@ -9,6 +9,7 @@
 'fieldgroup.software'=>{de=>'Software',en=>'Software'},
 'fieldgroup.ipaddresses'=>{de=>'IP-Adressen',en=>'IP-Addresses'},
 'fieldgroup.phonenumbers'=>{de=>'Rufnummernverzeichnis',en=>'Phonenumbers'},
+'fieldgroup.sec'=>{en=>'Security and data privacy',de=>'Sicherheit und Datenschutz'},
 'Phonenumbers'=>{de=>'Rufnummernverzeichnis'},
 'CPU-Count'=>{de=>'CPU-Anzahl'},
 'Memory'=>{de=>'Arbeitsspeicher'},
@@ -58,3 +59,6 @@
 'there are still linked active ipaddresses on this system'=>{de=>'diesem System sind noch aktive IP-Adressen zugeordnet'},
 'fieldgroup.customer'=>{de=>'verwendet durch Kunde',en=>'used by customer'},
 'Customer Contract'=>{de=>'Kundenvertrag'},
+'mangaged by rules of SOX'=>{de=>'Betreuung nach SOX (USA) Regeln'},
+'SOX state'=>{de=>'SOX (USA) status'},
+

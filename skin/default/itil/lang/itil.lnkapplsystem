@@ -6,6 +6,8 @@
                         en=>'Applicationinformations'},
 'fieldgroup.systeminfo'=>{de=>'Systeminformationen',
                           en=>'Systeminformations'},
+'fieldgroup.assetinfo'=>{de=>'Hardwareinformationen',
+                          en=>'Assetinformations'},
 'Fraction'=>{de=>'Anteil des Systems an der Anwendung'},
 'Application'=>{de=>'Anwendung'},
 'Application Customer'=>{de=>'Anwendungs Kunde'},

@@ -484,6 +484,27 @@ sub new
                 name          =>'servicesupportid',
                 dataobjattr   =>'system.servicesupport'),
 
+      new kernel::Field::JoinUniqMerge(
+                name          =>'issox',
+                label         =>'mangaged by rules of SOX',
+                group         =>'sec',
+                searchable    =>1,
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{applcistatusid=>"<=4"}],
+                vjoinon       =>['id'=>'systemid'],
+                vjoindisp     =>'systemissox'),
+
+      new kernel::Field::Select(
+                name          =>'nosoxinherit',
+                group         =>'sec',
+                label         =>'SOX state',
+                searchable    =>0,
+                transprefix   =>'ApplInherit.',
+                htmleditwidth =>'180px',
+                value         =>['0','1'],
+                translation   =>'itil::appl',
+                dataobjattr   =>'system.no_sox_inherit'),
+
 
       new kernel::Field::Textarea(
                 name          =>'comments',
@@ -1207,11 +1228,11 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
 
    my @databossedit=qw(default software admin logsys contacts misc opmode 
-                       physys ipaddresses phonenumbers
+                       physys ipaddresses phonenumbers sec
                        attachments control systemclass);
    if (!defined($rec)){
       return("default","physys","admin","misc",
-             "opmode","control","systemclass");
+             "opmode","control","systemclass","sec");
    }
    else{
       if ($rec->{databossid}==$userid){
@@ -1257,7 +1278,7 @@ sub getDetailBlockPriority
    my $self=shift;
    return(
           qw(header default admin phonenumbers logsys location 
-             physys systemclass 
+             physys systemclass sec
              opmode applications customer software ipaddresses
              contacts misc attachments control source));
 }

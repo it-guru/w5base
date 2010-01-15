@@ -93,7 +93,7 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'assetlocation',
-                group         =>'systeminfo',
+                group         =>'assetinfo',
                 readonly      =>1,
                 label         =>'Asset Location',
                 vjointo       =>'base::location',
@@ -490,6 +490,28 @@ sub new
                 label         =>'WEB-Server',
                 dataobjattr   =>'system.is_webserver'),
 
+      new kernel::Field::Boolean(
+                name          =>'systemissox',
+                readonly      =>1,
+                uivisible     =>0,
+                group         =>'systeminfo',
+                htmleditwidth =>'30%',
+                translation   =>'itil::system',
+                label         =>'mangaged by rules of SOX',
+                dataobjattr   =>
+                'if (system.no_sox_inherit,0,appl.is_soxcontroll)'),
+
+      new kernel::Field::Boolean(
+                name          =>'assetissox',
+                readonly      =>1,
+                group         =>'assetinfo',
+                htmleditwidth =>'30%',
+                uivisible     =>0,
+                translation   =>'itil::system',
+                label         =>'mangaged by rules of SOX',
+                dataobjattr   =>
+                'if (asset.no_sox_inherit,0,if (system.no_sox_inherit,0,appl.is_soxcontroll))'),
+
       new kernel::Field::Interface(
                 name          =>'systemcistatusid',
                 label         =>'SystemCiStatusID',
@@ -727,7 +749,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default misc applinfo systeminfo ));
+          qw(default misc applinfo systeminfo assetinfo));
 }
 
 

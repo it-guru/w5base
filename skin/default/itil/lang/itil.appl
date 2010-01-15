@@ -6,6 +6,7 @@
 'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
 'fieldgroup.opmgmt'=>{de=>'Operation Management',en=>'Operation Management'},
 'fieldgroup.swinstances'=>{de=>'Software Instanzen',en=>'Software Instances'},
+'fieldgroup.sec'=>{en=>'Security and data privacy',de=>'Sicherheit und Datenschutz'},
 'active systemnames'=>{de=>'aktive Systemnamen'},
 'active systemids'=>{de=>'aktive SystemIDs'},
 'you are only authorized to add in \'order\' or \'reserved\' state'=>{de=>'Sie sind nur berechtig, im Status \'angefordert\' oder \'reserviert\' Datensätze zu erzeugen'},
