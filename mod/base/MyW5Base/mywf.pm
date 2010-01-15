@@ -43,7 +43,7 @@ sub getDefaultStdButtonBar
 {
    my $self=shift;
    my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
-                                         ["REmployee","RChief"],
+           [qw(REmployee RApprentice RFreelancer RBoss)],
                                          "down");
    my @grpids=keys(%grp);
    if ($#grpids<5){
@@ -99,7 +99,7 @@ sub Result
    my $searchuser=[$userid];
    if ($dc eq "TEAM"){
       my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
-                                            ["REmployee","RChief"],
+              [qw(REmployee RApprentice RFreelancer RBoss)],
                                             "down");
       my @grpids=keys(%grp);
       if ($#grpids<5){

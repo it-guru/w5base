@@ -681,7 +681,8 @@ sub isWriteValid
       @$gid=grep(!/^\s*$/,@$gid);
       if ($#{$gid}!=-1){
          my %groups=$self->getGroupsOf($ENV{REMOTE_USER},
-                                       ['REmployee','RBoss','RBoss2'],'direct');
+                                       [qw(REmployee RApprentice RFreelancer 
+                                           RBoss RBoss2)],'direct');
          foreach my $mygid (keys(%groups)){
             if (grep(/^$mygid$/,@$gid)){
                $teammember++;
@@ -847,7 +848,8 @@ sub getPosibleActions
       @$gid=grep(!/^\s*$/,@$gid);
       if ($#{$gid}!=-1){
          my %groups=$self->getGroupsOf($ENV{REMOTE_USER},
-                                       ['REmployee','RBoss','RBoss2'],'direct');
+                                       [qw(REmployee RApprentice RFreelancer 
+                                           RBoss RBoss2)],'direct');
          foreach my $mygid (keys(%groups)){
             if (grep(/^$mygid$/,@$gid)){
                $teammember++;
@@ -1756,7 +1758,8 @@ sub nativProcess
       $h->{eventlang}=$eventlang;
 
       my %groups=$self->getGroupsOf($ENV{REMOTE_USER},
-                                    ['REmployee','RBoss','RBoss2'],'direct');
+                                    [qw(REmployee RApprentice RFreelancer 
+                                        RBoss RBoss2)],'direct');
       my @grpids=keys(%groups);
       if ($#grpids!=-1){
          $h->{initiatorgroupid}=\@grpids;

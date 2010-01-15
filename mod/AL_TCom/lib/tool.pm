@@ -31,8 +31,9 @@ sub getRequestedApplicationIds
    my @grps;
    if ($param{team} || $param{dep}){
       my @r=();
-      push(@r,qw(RMember REmployee RChief RQManager)) if ($param{team});
-      push(@r,qw(RChief2)) if ($param{dep});
+      push(@r,qw(REmployee RApprentice RFreelancer RBoss 
+                 RBackoffice RQManager)) if ($param{team});
+      push(@r,qw(RBoss2)) if ($param{dep});
       my %grp=$self->getParent->getGroupsOf($userid,\@r,"down");
       @grps=keys(%grp);
    }

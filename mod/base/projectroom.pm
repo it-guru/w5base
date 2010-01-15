@@ -286,7 +286,7 @@ sub SecureSetFilter
    if (!$self->IsMemberOf("admin")){
       my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"direct");
       my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
-                                  ["REmployee","RMember"],"both");
+          [qw(REmployee RApprentice RFreelancer RBoss)],"both");
       my @grpids=keys(%grps);
       my $userid=$self->getCurrentUserId();
       push(@flt,[

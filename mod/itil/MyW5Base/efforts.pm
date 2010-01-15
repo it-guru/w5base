@@ -121,8 +121,8 @@ sub getQueryTemplate
    my $self=shift;
 
    my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
-                                            ["REmployee","RChief",
-                                             "RChief2","RAuditor"],
+                                            ["REmployee","RFreelancer","RBoss",
+                                             "RBoss2","RAuditor"],
                                             "down");
 
    my $orgsel="<select name=search_grpid style=\"width:100%\">";

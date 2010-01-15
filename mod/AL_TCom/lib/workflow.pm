@@ -60,8 +60,8 @@ sub isPostReflector
       my $userid=$self->getParent->getCurrentUserId();
       CHK: {
          my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
-                                               ["REmployee","RChief"],
-                                               "both");
+                       [qw(REmployee RApprentice RFreelancer RBoss)],
+                                 "both");
          my @grpids=keys(%grp);
 
          if (ref($rec->{affectedapplicationid}) eq "ARRAY" &&

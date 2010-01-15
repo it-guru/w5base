@@ -173,6 +173,16 @@ sub isSCproblemSet
 }
 
 
+sub getNotificationSkinbase
+{
+   my $self=shift;
+   my $WfRec=shift;
+   return('AL_TCom');
+}
+
+
+
+
 sub calcKPIs
 {
    my $self=shift;
@@ -719,6 +729,8 @@ sub getPosibleButtons
 
    return(%b);
 }
+
+
 
 sub Process
 {

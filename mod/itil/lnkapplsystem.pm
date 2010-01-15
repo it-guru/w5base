@@ -653,21 +653,8 @@ sub SecureSetFilter
        !$self->IsMemberOf([qw(admin w5base.itil.appl.read w5base.itil.read)],
                           "RMember")){
       my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
-#      my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
-#                                  ["REmployee","RMember"],"both");
-#      my @grpids=keys(%grps);
-#      my $userid=$self->getCurrentUserId();
       push(@flt,[
                  {mandatorid=>\@mandators},
-#                 {databossid=>$userid},
-#                 {semid=>$userid},       {sem2id=>$userid},
-#                 {tsmid=>$userid},       {tsm2id=>$userid},
-#                 {businessteamid=>\@grpids},
-#                 {responseteamid=>\@grpids},
-#                 {sectargetid=>\$userid,sectarget=>\'base::user',
-#                  secroles=>"*roles=?write?=roles* *roles=?read?=roles*"},
-#                 {sectargetid=>\@grpids,sectarget=>\'base::grp',
-#                  secroles=>"*roles=?write?=roles* *roles=?read?=roles*"}
                 ]);
    }
    return($self->SetFilter(@flt));

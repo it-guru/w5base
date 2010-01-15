@@ -83,8 +83,8 @@ sub Result
    my @q=();
    if ($dc eq "TEAM"){
       my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
-                                            ["REmployee","RBoss"],
-                                            "down");
+                     [qw(REmployee RApprentice RFreelancer RBoss)],
+                     "down");
       my @grpids=keys(%grp);
       @grpids=(qw(-1)) if ($#grpids==-1);
    
@@ -129,8 +129,8 @@ sub Result
    }
    if ($dc eq "CUSTOMER"){
       my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
-                                            ["REmployee","RBoss","RBoss2",
-                                             "RQManager"],
+                          [qw(REmployee RApprentice RFreelancer RBoss RBoss2
+                           RQManager)],
                                             "both");
       my @grpids=keys(%grp);
       @grpids=(qw(-1)) if ($#grpids==-1);
