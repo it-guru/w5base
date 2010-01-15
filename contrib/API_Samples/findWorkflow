@@ -39,7 +39,7 @@ else{
 
 my $WfRec;
 $wf->SetFilter({id=>[$ARGV[0]]});
-foreach my $WfRec ($wf->getHashList(qw(name))){
+foreach my $WfRec ($wf->getHashList(qw(name shortactionlog))){
    printf("WfRec=%s\n",Dumper($WfRec));
 }
 $wf->dieOnERROR();
