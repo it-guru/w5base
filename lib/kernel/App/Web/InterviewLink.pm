@@ -64,7 +64,8 @@ sub InterviewSubForm
    foreach my $qrec (@{$state->{TotalActiveQuestions}}){
       my $d;
       if ($queryblock eq $qrec->{queryblock}){
-         if ($lastquestclust ne $qrec->{questclust}){
+         if (!defined($lastquestclust) ||
+             $lastquestclust ne $qrec->{questclust}){
             $d.="<div class=InterviewQuestClust>$qrec->{questclust}</div>";
             $d.="\n<div class=InterviewQuestHead>".
                 "<table border=0 class=InterviewQuestHead width=95%>".
