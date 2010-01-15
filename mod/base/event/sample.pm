@@ -220,7 +220,7 @@ sub wiwTest
    my $st=Time::HiRes::time();
    msg(DEBUG,"Start(wiwTest): %lf",$st);
    my $user=getModuleObject($self->Config,"tswiw::user");
-   msg(DEBUG,"ModuleFount(wiwTest) \@ sec %lf",Time::HiRes::time()-$st);
+   msg(DEBUG,"ModuleFound(wiwTest) \@ sec %lf",Time::HiRes::time()-$st);
    $user->SetFilter({surname=>'Vog*',givenname=>'*mut'});
    msg(DEBUG,"CountStart(wiwTest) \@ sec %lf",Time::HiRes::time()-$st);
    my $n=$user->CountRecords();

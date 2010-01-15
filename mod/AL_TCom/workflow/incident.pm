@@ -157,7 +157,7 @@ sub isWriteValid
 sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
-   return("header","itilincident","affected","tcomcod","state","relations","source");
+   return("header","itilincident","flow","affected","tcomcod","state","relations","source");
 }
 
 

@@ -168,6 +168,7 @@ sub new
                 name          =>'class',
                 selectfix     =>1,
                 htmlwidth     =>'1%',
+                xlswidth      =>'25',
                 group         =>'state',
                 label         =>'Workflow-Class',
                 size          =>'20',
@@ -609,11 +610,12 @@ sub new
                    my $mode=shift;
                    my %param=@_;
                    my $current=$param{current};
-                   return(1) if ($current->{autocopymode}!="");
+                   return(1) if ($current->{autocopymode} ne "");
                    return(0);
                 },
                 group         =>'state',
-                label         =>'auto copy mode'),
+                label         =>'auto copy mode',
+                dataobjattr   =>'wfhead.acopymode'),
                                   
       new kernel::Field::Date(
                 name          =>'autocopydate',
@@ -623,11 +625,12 @@ sub new
                    my $mode=shift;
                    my %param=@_;
                    my $current=$param{current};
-                   return(1) if ($current->{autocopydate}!="");
+                   return(1) if ($current->{autocopymode} ne "");
                    return(0);
                 },
                 group         =>'state',
-                label         =>'auto copy workflow at'),
+                label         =>'last workflow copy at',
+                dataobjattr   =>'wfhead.acopydate'),
 
       new kernel::Field::KeyHandler(
                 name          =>'kh',
@@ -1330,6 +1333,15 @@ sub Validate
       $self->LastMsg(ERROR,"invalid workflow short description spezified");
       return(0);
    }
+   my $stateid=effVal($oldrec,$newrec,"stateid");
+   if ($stateid>1){
+      if ($oldrec->{autocopymode} ne ""){
+         $newrec->{autocopymode}=undef;
+      }
+      if ($oldrec->{autocopydate} ne ""){
+         $newrec->{autocopydate}=undef;
+      }
+   }
 
 
    #
@@ -1385,6 +1397,7 @@ sub Validate
          }
       }
    }
+#printf STDERR ("fifi Validate %s\n",Dumper($newrec->{kh}));
    #######################################################################
    return($bk);
 }
