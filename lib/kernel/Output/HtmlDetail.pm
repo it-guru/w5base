@@ -681,17 +681,21 @@ sub findtemplvar
              $opt->{currentid} eq $opt->{id}){
             if (grep(/^save$/,@param)){
                if (grep(/^$opt->{fieldgroup}$/,@{$editgroups}) ||
+                   grep(/^$opt->{fieldgroup}\..+$/,@{$editgroups}) ||
                    grep(/^ALL$/,@{$editgroups})){
-                  push(@func,$self->MkFunc("detailfunctions","DetailEditSave()","save")); 
+                  push(@func,$self->MkFunc("detailfunctions",
+                                           "DetailEditSave()","save")); 
                }
             }
             if (grep(/^cancel$/,@param)){
                if ($opt->{id} ne ""){
-                  push(@func,$self->MkFunc("detailfunctions","DetailEditBreak()","cancel")); 
+                  push(@func,$self->MkFunc("detailfunctions",
+                                           "DetailEditBreak()","cancel")); 
                }
             }
             if (grep(/^editend$/,@param)){
-               push(@func,$self->MkFunc("detailfunctions","DetailTopEditBreak()","finish edit")); 
+               push(@func,$self->MkFunc("detailfunctions",
+                                        "DetailTopEditBreak()","finish edit")); 
             }
          }
          else{
@@ -701,6 +705,7 @@ sub findtemplvar
       else{
          if (grep(/^edit$/,@param)){
             if (grep(/^$opt->{fieldgroup}$/,@{$editgroups}) ||
+                grep(/^$opt->{fieldgroup}\..+$/,@{$editgroups}) ||
                 grep(/^ALL$/,@{$editgroups})){
                my $qid=$opt->{id};
                $qid=~s/"/\\"/g;
@@ -712,8 +717,9 @@ sub findtemplvar
          if (grep(/^topedit$/,@param)){
             if (grep(/^$opt->{fieldgroup}$/,@{$editgroups}) ||
                 grep(/^ALL$/,@{$editgroups})){
-               push(@func,$self->MkFunc("detailfunctions","DetailTopEdit(\"$opt->{fieldgroup}\",".
-                                 "\"$opt->{id}\")","edit")); 
+               push(@func,$self->MkFunc("detailfunctions",
+                                        "DetailTopEdit(\"$opt->{fieldgroup}\",".
+                                        "\"$opt->{id}\")","edit")); 
             }
          }
       }

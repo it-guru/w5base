@@ -85,7 +85,7 @@ use Unicode::String qw(utf8 latin1 utf16);
              &FancyLinks &mkInlineAttachment &FormatJsDialCall
              &mkMailInlineAttachment &haveSpecialChar
              &getModuleObject &getConfigObject &generateToken
-             &isDataInputFromUserFrontend
+             &isDataInputFromUserFrontend &orgRoles
              &msg &ERROR &WARN &DEBUG &INFO &OK &utf8 &latin1 &utf16);
 
 sub utf8{return(&Unicode::String::utf8);}
@@ -204,6 +204,11 @@ sub quoteQueryString {
   $toencode = pack("C*", unpack("C*", $toencode));
   $toencode=~s/([^a-zA-Z0-9_.-])/uc sprintf("%%%02x",ord($1))/eg;
   return $toencode;
+}
+
+sub orgRoles
+{
+   return(qw(REmployee RApprentice RFreelancer RBoss));
 }
 
 

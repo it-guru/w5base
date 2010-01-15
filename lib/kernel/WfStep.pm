@@ -223,6 +223,22 @@ sub nativProcess
 
       return(0);
    }
+   elsif ($op eq "wfschedule"){
+#printf STDERR ("WfRec=%s\n",Dumper($WfRec));
+#printf STDERR ("h=%s\n",Dumper($h));
+      my $autocopymode=$h->{autocopymode};
+      my $oprec={autocopymode=>$autocopymode,
+                 fwdtarget=>undef,
+                 fwdtarget=>undef,
+                 fwdtargetid=>undef,
+                 fwddebtarget=>undef,
+                 fwddebtargetid=>undef};
+      if ($WfRec->{autocopymode} ne $autocopymode){
+         $oprec->{autocopydate}=undef;
+      }
+      $self->StoreRecord($WfRec,$oprec);
+      return(0);
+   }
    elsif ($op eq "wfaddnote" || $op eq "wfaddsnote"){
       my $note=$h->{note};
       if ($note=~m/^\s*$/  || length($note)<10){
@@ -616,7 +632,8 @@ sub generateWorkspacePages
    if (grep(/^wfschedule$/,@$actions)){
       my @t=(''       =>$self->getParent->T("no automatic scheduling"),
              'month'  =>$self->getParent->T("monthly"),
-             'week'   =>$self->getParent->T("weekly"));
+            # 'week'   =>$self->getParent->T("weekly")
+            );
       my $s="<select name=Formated_autocopymode style=\"width:280px\">";
       my $oldval=Query->Param("Formated_autocopymode");
       while(defined(my $min=shift(@t))){
@@ -631,7 +648,7 @@ sub generateWorkspacePages
                 $self->getParent->T("wfschedule",$tr).
                 "</option>\n";
       my $d="<table width=100% border=0 cellspacing=0 cellpadding=4><tr>".
-         "<td colspan=2><br>Automaticly scheduling will copy this worklow in a selectable interval. After copy process, the new workflow will be activated automaticly. The result of the operation will be mailed to the creator of this workflow".
+         "<td colspan=2><br>Automaticly scheduling will copy this worklow in a selectable interval. After copy process, the new workflow will be activated automaticly. The result of the operation will be mailed to the creator of this workflow. ATTENSION: This function is Test!!!".
          "<br><br></td></tr>";
       $d.="<tr><td width=1% nowrap>".
           "select scheduling intervall:</td>".
