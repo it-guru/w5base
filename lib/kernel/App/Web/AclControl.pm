@@ -227,11 +227,18 @@ sub checkParentWriteAccess
    my $pobj=shift;
    my $refid=shift;
 
-   $pobj->SetFilter({$pobj->IdField->Name()=>\$refid});
-   my @l=$pobj->getHashList(qw(ALL));
-   if ($#l!=0){
+   if ($refid eq ""){
       $self->LastMsg(ERROR,"invalid '%s' specified",
                         $self->getField("refid")->Label());
+   }
+   $pobj->SetFilter({$pobj->IdField->Name()=>\$refid});
+   my @l=$pobj->getHashList(qw(ALL));
+   if ($#l==-1){
+      return(1); # parent object id does not exists
+   }
+   if ($#l!=0){
+      $self->LastMsg(ERROR,"invalid '%s' specified '%s'",
+                        $self->getField("refid")->Label(),$refid);
       return(undef);
    }
    my $prec=$l[0];
