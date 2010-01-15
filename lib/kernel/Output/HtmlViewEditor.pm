@@ -52,8 +52,6 @@ sub getHttpHeader
    $d.="<link rel=stylesheet ".
        "href=\"../../base/load/MkTree.css\"></link>\n";
    $d.="<script language=JavaScript ".
-       "src=\"../../../public/base/load/ViewEditor.js\"></script>\n";
-   $d.="<script language=JavaScript ".
        "src=\"../../../public/base/load/MkTree.js\"></script>\n";
    $d.="<script language=JavaScript ".
        "src=\"../../../public/base/load/toolbox.js\"></script>\n";
