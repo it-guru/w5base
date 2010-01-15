@@ -172,6 +172,7 @@ sub ProcessLine
    my $marker="<input class=ACT type=checkbox name=$idtag>";
    my $tag=Query->Param($idtag);
    my $fail=0;
+   my $lastmsg;
    if ($tag ne ""){
       $fail=1;
       my ($id)=$idtag=~m/^ACT:(.+)$/;
@@ -187,6 +188,11 @@ sub ProcessLine
          }
       }
       Query->Delete($idtag);
+      if ($app->LastMsg()){
+         $lastmsg=join("<br>\n",$app->LastMsg());
+         $self->{FAIL}++;
+         $fail++;
+      }
       if (!$fail){
          $class="lineok";
          $marker="&nbsp;";
@@ -195,14 +201,9 @@ sub ProcessLine
          $class="linefail";
       }
    }
-   my $lastmsg;
-   if ($app->LastMsg()){
-      $lastmsg=join("<br>\n",$app->LastMsg());
-      $self->{FAIL}++;
-   }
    $lastmsg="ERROR: unknown problem" if ($fail==1 && $lastmsg eq "");
    my $rowspan=1;
-   $rowspan=2 if ($fail==1);
+   $rowspan=2 if ($fail>0);
    $d.="<tr class=$class>".
        "<td align=center valign=top rowspan=$rowspan>$marker</td>";
    for(my $cc;$cc<=$#view;$cc++){

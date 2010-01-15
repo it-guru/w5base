@@ -145,6 +145,7 @@ sub new
                 dataobjattr   =>'interanswer.realeditor'),
 
    );
+   $self->{history}=[qw(insert modify delete)];
    $self->setDefaultView(qw(mdate parentobj parentid name relevant answer));
    $self->setWorktable("interanswer");
    return($self);
@@ -175,6 +176,13 @@ sub prepUploadRecord
 
    return(1);
 }
+
+sub SelfAsParentObject    # this method is needed because existing derevations
+{
+   return("base::interanswer");
+}
+
+
 
 
 sub SecureValidate
@@ -356,10 +364,11 @@ sub Store
    my $vval=Query->Param("vval");
 
    my $i=getModuleObject($self->Config,"base::interview");
-   printf STDERR ("AjaxStore: qid=$qid parentid=$parentid parentobj=$parentobj vname=$vname\nval=$vval\n\n");
+   printf STDERR ("\n\nAjaxStore: qid=$qid parentid=$parentid ".
+                  "parentobj=$parentobj vname=$vname\nval=$vval\n\n");
 
-   my ($write,$irec,$oldrec)=$self->getAnswerWriteState($i,$qid,$parentid,$parentobj);
-
+   my ($write,$irec,$oldrec)=$self->getAnswerWriteState($i,$qid,
+                                                        $parentid,$parentobj);
    if ($vname eq "comments" || $vname eq "answer" || $vname eq "relevant"){
       if ($write){
          if (!defined($oldrec)){
@@ -389,7 +398,7 @@ sub Store
    print $self->HttpHeader("text/xml");
    my $res=hash2xml({document=>{result=>'ok',interanswer=>$newrec,exitcode=>0}},{header=>1});
    print $res;
-   print STDERR $res;
+   #print STDERR $res;
 }
 
 
