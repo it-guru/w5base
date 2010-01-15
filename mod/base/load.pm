@@ -127,16 +127,18 @@ sub Run
      
       print $self->HttpHeader($content,%param);
       foreach my $file (@$filename){
-         if (open(MYF,"<$file")){
-            binmode MYF;
-            binmode STDOUT;
-            while(<MYF>){
-               print $_;
+         if ($file ne ""){
+            if (open(MYF,"<$file")){
+               binmode MYF;
+               binmode STDOUT;
+               while(<MYF>){
+                  print $_;
+               }
+               close(MYF);
             }
-            close(MYF);
-         }
-         else{
-            msg(ERROR,"fail to open file '%s'",$file);
+            else{
+               msg(ERROR,"fail to open file '%s'",$file);
+            }
          }
       }
    }
