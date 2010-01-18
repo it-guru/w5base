@@ -70,7 +70,7 @@ sub isPostReflector
             my @applid=@{$rec->{affectedapplicationid}};
             my $appl=getModuleObject($self->Config,"itil::appl");
             $appl->SetFilter(id=>\@applid);
-            my @fl=qw(semid sem2id tsmid tsm2id);
+            my @fl=qw(semid sem2id tsmid tsm2id opmid opm2id);
             my @tl=qw(businessteamid);
             my @l=$appl->getHashList(@fl,@tl);
             foreach my $rec (@l){

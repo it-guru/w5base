@@ -96,10 +96,14 @@ sub Result
       my %q1=();
       my %q2=();
       my %q3=();
+      my %q4=();
+      my %q5=();
       $q1{semid}=\$userid;
       $q2{tsmid}=\$userid;
       $q3{databossid}=\$userid;
-      push(@q,\%q1,\%q2,\%q3);
+      $q4{delmgrid}=\$userid;
+      $q5{opmid}=\$userid;
+      push(@q,\%q1,\%q2,\%q3,\%q4,\%q5);
    }
    if ($dc eq "TEAM"){
       my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},

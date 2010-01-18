@@ -102,6 +102,7 @@ sub Result
       my %q4;
       $q4{responseteamid}=\@grpids;
       $q5{delmgr2id}=\$userid;
+      $q5{opm2id}=\$userid;
 
 
       push(@q,\%q1,\%q2,\%q3,\%q4,\%q5,\%q6);
@@ -116,6 +117,7 @@ sub Result
       $q2{tsmid}=\$userid;
       $q3{databossid}=\$userid;
       $q4{delmgrid}=\$userid;
+      $q5{opmid}=\$userid;
 
       push(@q,\%q1,\%q2,\%q3,\%q4,\%q5);
    }

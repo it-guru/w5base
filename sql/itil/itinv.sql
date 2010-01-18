@@ -759,3 +759,4 @@ alter table appl  add opm2 bigint(20)  default NULL;
 alter table swinstance add no_sox_inherit int(2) default 0;
 alter table system     add no_sox_inherit int(2) default 0;
 alter table asset      add no_sox_inherit int(2) default 0;
+alter table appl add key opm(opm);

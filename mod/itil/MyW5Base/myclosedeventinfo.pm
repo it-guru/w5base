@@ -106,7 +106,7 @@ sub Result
       push(@q,\%q1,\%q2,\%q3);
    }
    if ($dc eq "ADDDEP" || $dc eq "DEPONLY"){
-      my (%q1,%q2,%q3,%q4);
+      my (%q1,%q2,%q3,%q4,%q5,%q6);
       $q1{sem2id}=\$userid;
       $q2{tsm2id}=\$userid;
       my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
@@ -115,14 +115,18 @@ sub Result
       @grpids=(qw(-1)) if ($#grpids==-1);
       $q3{businessteamid}=\@grpids;
       $q4{responseteamid}=\@grpids;
-      push(@q,\%q1,\%q2,\%q3,\%q4);
+      $q5{opm2id}=\$userid;
+      $q6{delmgr2id}=\$userid;
+      push(@q,\%q1,\%q2,\%q3,\%q4,\%q5,\%q6);
    }
    if ($dc ne "DEPONLY" && $dc ne "TEAM" && $dc ne "CUSTOMER"){
-      my (%q1,%q2,%q3);
+      my (%q1,%q2,%q3,%q4,%q5);
       $q1{semid}=\$userid;
       $q2{tsmid}=\$userid;
       $q3{databossid}=\$userid;
-      push(@q,\%q1,\%q2,\%q3);
+      $q4{delmgrid}=\$userid;
+      $q5{opmid}=\$userid;
+      push(@q,\%q1,\%q2,\%q3,\%q4,\%q5);
    }
 
    $self->{appl}->ResetFilter();

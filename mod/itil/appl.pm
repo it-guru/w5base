@@ -940,9 +940,10 @@ sub getWfEventNotifyTargets     # calculates the target email addresses
    my @team;
    my %allcustgrp;
    foreach my $rec ($appl->getHashList(qw(semid sem2id tsmid tsm2id delmgrid
-                                          responseteamid customerid
+                                          opmid 
+                                          responseteamid customerid 
                                           businessteamid))){
-      foreach my $v (qw(semid sem2id tsmid tsm2id delmgrid)){
+      foreach my $v (qw(semid sem2id tsmid tsm2id delmgrid opmid)){
          my $fo=$appl->getField($v);
          my $userid=$appl->getField($v)->RawValue($rec);
          push(@byfunc,$userid) if ($userid ne "" && $userid>0);
@@ -1067,9 +1068,10 @@ sub SecureSetFilter
       my $userid=$self->getCurrentUserId();
       push(@flt,[
                  {mandatorid=>\@mandators},
-                 {databossid=>$userid},
-                 {semid=>$userid},       {sem2id=>$userid},
-                 {tsmid=>$userid},       {tsm2id=>$userid},
+                 {databossid=>\$userid},
+                 {semid=>\$userid},       {sem2id=>\$userid},
+                 {tsmid=>\$userid},       {tsm2id=>\$userid},
+                 {opmid=>\$userid},       {opm2id=>\$userid},
                  {businessteamid=>\@grpids},
                  {responseteamid=>\@grpids},
                  {sectargetid=>\$userid,sectarget=>\'base::user',
