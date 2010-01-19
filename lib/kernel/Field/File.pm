@@ -66,7 +66,7 @@ sub FormatedDetail
       return("<a class=filelink href=\"$url\">$d</a>") if (defined($url));
    }
    if (($mode eq "edit" || $mode eq "workflow") && !defined($self->{vjointo})){
-      return("<input type=file name=$name size=50>");
+      return("<input type=file name=$name size=45>");
    }
    return($d);
 }

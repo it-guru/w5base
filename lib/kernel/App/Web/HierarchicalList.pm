@@ -98,13 +98,19 @@ sub ValidatedUpdateRecord
       return($self->SUPER::ValidatedUpdateRecord($oldrec,$newrec,@filter));
    }
    my $subchanges=0;
+   msg(INFO,"data change check for '".effVal($oldrec,$newrec,"fullname")."'");
    foreach my $v (qw(fullname name parent parentid)){
-      if (exists($newrec->{fullname}) && 
-          $oldrec->{fullname} ne $newrec->{fullname}){
+      if (exists($newrec->{$v}) && 
+          $oldrec->{$v} ne $newrec->{$v}){
          $subchanges++;
+         msg(INFO,"data changed in field '".$v."'");
+      }
+      else{
+         msg(INFO,"no data change found in field '".$v."'");
       }
    }
    if (!$subchanges){
+      msg(INFO,"no data changes found");
       return($self->SUPER::ValidatedUpdateRecord($oldrec,$newrec,@filter));
    }
    $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});

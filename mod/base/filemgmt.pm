@@ -71,10 +71,8 @@ sub new
                                    vjoindisp  =>'fullname'),
 
 
-      new kernel::Field::Select(   name       =>'inheritrights',
+      new kernel::Field::Boolean(  name       =>'inheritrights',
                                    label      =>'inherit rights',
-                                   value      =>[qw(1 0)],
-                                   transprefix=>'boolean.',
                                    dataobjattr=>'filemgmt.inheritrights'),
 
       new kernel::Field::Boolean(  name       =>'isprivate',
@@ -213,7 +211,7 @@ sub new
    $self->setWorktable("filemgmt");
    $self->setDefaultView(qw(fullname contentsize parentobj entrytyp editor));
    $self->{PathSeperator}="/";
-   $self->{locktables}="filemgmt write,fileacl write";
+   $self->{locktables}="filemgmt write,fileacl write,contact write";
    return($self);
 }
 
