@@ -168,6 +168,25 @@ sub ValidatedUpdateRecord
    return(undef);
 }
 
+sub isDeleteValid
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my $idobj=$self->IdField();
+   if (!defined($idobj)){
+      return(0);
+   }
+   my $g=$self->Clone();
+   my $grpid=$rec->{$idobj->Name()};
+   $g->SetFilter({"parentid"=>\$grpid});
+   if ($g->CountRecords()>0){
+      return(0);
+   }
+   return(1);
+}
+
+
 
 
 1;

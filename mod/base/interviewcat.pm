@@ -146,6 +146,7 @@ sub Validate
 }
 
 
+
 sub isDeleteValid
 {
    my $self=shift;
@@ -154,11 +155,11 @@ sub isDeleteValid
    my $g=getModuleObject($self->Config,"base::interview");
    my $grpid=$rec->{id};
    $g->SetFilter({"interviewcatid"=>\$grpid});
-   my @l=$g->getHashList(qw(interviewcatid));
-   if ($#l!=-1){
-      return(undef);
+   if ($g->CountRecords()>0){
+      return(0);
    }
-   return($self->isWriteValid($rec));
+   return(0) if (!grep(/^default$/,$self->isWriteValid($rec)));
+   return($self->SUPER::isDeleteValid($rec));
 }
 
 

@@ -486,14 +486,7 @@ sub isDeleteValid
    return(0) if ($rec->{grpid}==-1);
    return(0) if ($rec->{grpid}==-2);
    return(0) if (!grep(/^default$/,$self->isWriteValid($rec)));
-   my $g=getModuleObject($self->Config,"base::grp");
-   my $grpid=$rec->{grpid};
-   $g->SetFilter({"parentid"=>\$grpid});
-   my @l=$g->getHashList(qw(grpid));
-   if ($#l!=-1){
-      return(undef);
-   }
-   return(1);
+   return($self->SUPER::isDeleteValid($rec));
 }
 
 

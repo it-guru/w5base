@@ -152,20 +152,17 @@ sub Validate
 }
 
 
+
 sub isDeleteValid
 {
    my $self=shift;
    my $rec=shift;
 
-   my $g=getModuleObject($self->Config,"faq::category");
-   my $grpid=$rec->{faqcatid};
-   $g->SetFilter({"parentid"=>\$grpid});
-   my @l=$g->getHashList(qw(faqcatid));
-   if ($#l!=-1){
-      return(undef);
-   }
-   return($self->isWriteValid($rec));
+   return(0) if (!grep(/^default$/,$self->isWriteValid($rec)));
+   return($self->SUPER::isDeleteValid($rec));
 }
+
+
 
 
 sub isViewValid

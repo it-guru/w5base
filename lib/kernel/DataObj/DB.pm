@@ -457,8 +457,11 @@ sub getSqlCount
    if ($#cmd>0){
       map({$_="(".$_.")"} @cmd);
    }
+   my $sqlcmd=join(" UNION ",@cmd);
 
-   return(join(" UNION ",@cmd));
+   $self->Log(ERROR,"sqlread",$sqlcmd);
+
+   return($sqlcmd);
 }
 
 
