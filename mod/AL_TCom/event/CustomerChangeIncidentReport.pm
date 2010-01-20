@@ -64,7 +64,7 @@ sub CustomerChangeIncidentReport
      $self->{'onlyApplId'}->{$arec->{id}}=$arec;
    }
    $param{'defaultFilenamePrefix'}="Prozess-Report_";
-   $param{'defaultEventend'}=">now-3M";
+   $param{'defaultEventend'}=">now-3M" if ($param{'defaultEventend'} eq "");
    %param=kernel::XLSReport::StdReportParamHandling($self,%param);
 
    #msg(INFO,"start Report to %s",join(", ",@{$param{'filename'}}));
