@@ -1,5 +1,5 @@
 'base::interanswer'=>{de=>'Interview Antwort',en=>'Interview Answer'},
-'answer'=>{de=>'Anwort'},
+'answer'=>{de=>'Antwort'},
 'question'=>{de=>'Frage'},
 'AnswerID'=>{de=>'AntwortID'},
 'fieldgroup.relation'=>{de=>'Zuordnung',en=>'Relation'},
