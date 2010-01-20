@@ -1421,6 +1421,33 @@ sub findtemplvar
       $d.="&nbsp;</div>" if ($param[0] ne "RAW");
       return($d);
    }
+   elsif ($var eq "GLOBALHELP"){
+      my $tags=$param[0];
+      my $searchtext=$param[1];
+      my $url=$param[2];
+      my $icon=$param[3];
+      if ($icon eq ""){
+         $icon="../../../public/base/load/help.gif";
+      }
+      if ($url eq ""){
+         $url="../../faq/QuickFind/globalHelp";
+      }
+      $tags=~s/ /,/g;
+      my %param;
+      $param{'searchtext'}=$searchtext if ($searchtext ne "");
+      $param{'stags'}=$tags if ($tags ne "");
+      if ($param{'searchtext'} ne ""){
+         $param{'AutoSearch'}=1;
+      }
+      my $qs=kernel::cgi::Hash2QueryString(%param);
+
+      my $onclick="javascript:openwin('$url?$qs','_help',".
+                  "'height=570,width=620,toolbar=no,status=no,".
+                  "resizable=yes,scrollbars=auto')";
+      return("<span class=sublink onclick=$onclick ".
+             "title=\"globalHelp\" alt=\"globalHelp\">".
+             "<img border=0 src=\"$icon\"></span>");
+   }
    elsif ($var eq "StdButtonBar"){
       my $d="<div class=buttonframe>";
       $d.="<table class=buttonframe><tr>";

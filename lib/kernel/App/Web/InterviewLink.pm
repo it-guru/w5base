@@ -251,7 +251,8 @@ EOF
    my $s="<select name=IMODE style=\"width:200px\">";
    $s.="</select>";
 
-
+   my $help=$self->findtemplvar({},"GLOBALHELP","article",
+                                   "W5Base Config-Item-Interview");
    $d.="<div class=header>";
    $d.="<table width=95%><tr><td></td>";
    $d.="<td align=left>".$label."</td>";
@@ -259,7 +260,7 @@ EOF
    $d.="<select name=IMODE style=\"width:200px\">";
    $d.="<option value=\"\">aktueller Fragenkatalog</option>";
    $d.="</select>";
-   $d.="</td></tr></table>";
+   $d.="</td><td>".$help."</tr></table>";
    $d.="</div>";
 
    my $lastquestclust;

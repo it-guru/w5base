@@ -132,6 +132,9 @@ sub globalHelp
    }
 
    my @selstags=Query->Param("stags");
+   if ($#selstags==0 && $selstags[0]=~m/,/){
+      @selstags=split(/,/,$selstags[0]);
+   }
    if ($#selstags==-1){
       @selstags=(qw(forum article));
    }
