@@ -63,6 +63,15 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'interviewcat.comments'),
 
+      new kernel::Field::SubList(
+                name          =>'questions',
+                label         =>'Questions',
+                group         =>'questions',
+                readonly      =>1,
+                vjointo       =>'base::interview',
+                vjoinon       =>['id'=>'interviewcatid'],
+                vjoindisp     =>['name','cistatus']),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'id',
@@ -168,10 +177,20 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    if (defined($rec)){
-      return(qw(header default id history));
+      return(qw(header default id history questions));
    }
    return(qw(header default));
 }
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my $grp=shift;
+   my %param=@_;
+   return(qw(header default questions id));
+}
+
+
 
 sub isWriteValid
 {

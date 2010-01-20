@@ -60,6 +60,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'name',
+                htmlwidth     =>'540px',
                 label         =>'Question',
                 dataobjattr   =>'interview.name'),
 

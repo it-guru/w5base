@@ -2,3 +2,4 @@
 'Fullname'=>{de=>'Kategorie-Bezeichnung'},
 'Parentgroup'=>{de=>'Eltern-Kategorie'},
 'fieldgroup.id'=>{de=>'Identifikation',en=>'Identification'},
+'fieldgroup.questions'=>{de=>'Fragen',en=>'Querstions'},
