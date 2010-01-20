@@ -67,7 +67,7 @@ sub CustomerChangeIncidentReport
    $param{'defaultEventend'}=">now-3M";
    %param=kernel::XLSReport::StdReportParamHandling($self,%param);
 
-   msg(INFO,"start Report to %s",join(", ",@{$param{'filename'}}));
+   #msg(INFO,"start Report to %s",join(", ",@{$param{'filename'}}));
 
    my $out=new kernel::XLSReport($self,$param{'filename'});
    $out->initWorkbook();
@@ -114,8 +114,6 @@ sub CustomerChangeIncidentReport
                            involvedcustomer
                            wffields.changedescription
                            description
-                           THOME_isTop50
-                           THOME_isTop20
                            additional.ServiceCenterCoordinator
                            additional.ServiceCenterReason 
                            additional.ServiceCenterImpact 
@@ -155,8 +153,6 @@ sub CustomerChangeIncidentReport
                            involvedcustomer
                            wffields.incidentdescription
                            description
-                           THOME_isTop50
-                           THOME_isTop20
                            wffields.tcomcodrelevant
                            wffields.tcomcodcause
                            wffields.tcomcodcomments
@@ -179,26 +175,12 @@ sub recPreProcess
    my $found=0;
 
    return(0) if (!ref($rec->{affectedapplicationid}) eq "ARRAY");
-   $rec->{_isTop50}=0;
-   $rec->{_isTop20}=0;
    foreach my $applid (@{$rec->{affectedapplicationid}}){
       if (my @a=grep(/^$applid$/,keys(%{$self->{'onlyApplId'}}))){
          $found++;
-         foreach my $aid (@a){
-            my $arec=$self->{'onlyApplId'}->{$aid};
-            if ($arec->{customerprio}==1){
-               if ($arec->{criticality} eq "CRcritical"){
-                  $rec->{THOME_isTop50}=1 if (!$rec->{THOME_isTop50});
-                  $rec->{THOME_isTop20}=1 if (!$rec->{THOME_isTop20});
-               }
-               if ($arec->{criticality} eq "CRhigh"){
-                  $rec->{THOME_isTop50}=1 if (!$rec->{THOME_isTop50});
-               }
-            }
-         }
       }   
    }
-  # return(0) if (!$found);
+   return(0) if (!$found);
    my @newrecview;
    foreach my $fld (@$recordview){
       my $name=$fld->Name;
@@ -208,85 +190,6 @@ sub recPreProcess
    }
 
    @{$recordview}=@newrecview;
-#   return(0) if ($rec->{eventstatclass}!=1 &&
-#                 $rec->{eventstatclass}!=2 &&
-#                 $rec->{eventstatclass}!=3);
-#   if ($#{$self->{'loopBuffer'}}==-1 &&
-#       exists($rec->{eventinmrelations}->{treelist})){
-#      $self->{'loopBuffer'}=$rec->{eventinmrelations}->{treelist};
-#      delete($rec->{eventinmrelations}->{treelist});
-#      $self->{'loopCount'}=1;
-#   }
-#   $rec->{SCrelationPathNo}=$self->{'loopCount'};
-#   if ($#{$self->{'loopBuffer'}}!=-1){
-#      my $loop=shift(@{$self->{'loopBuffer'}});
-#      $self->{'loopCount'}++;
-#      $rec->{SCrelationIncidentNo}=$loop->[0];
-#      $rec->{SCrelationProblemNo}=$loop->[1];
-#      $rec->{SCrelationChangeNo}=$loop->[2];
-#
-#      # recharge incident detail data
-#      $rec->{SCrelationIncidentState}=undef;
-#      $rec->{SCrelationIncidentDesc}=undef;
-#      if ($rec->{SCrelationIncidentNo} ne ""){
-#         my $sc=getModuleObject($self->Config,"tssc::inm");
-#         $sc->SetFilter({incidentnumber=>\$rec->{SCrelationIncidentNo}});
-#         my ($screc,$msg)=$sc->getOnlyFirst(qw(status name));
-#         if (defined($screc)){
-#            $rec->{SCrelationIncidentState}=$screc->{status};
-#            $rec->{SCrelationIncidentDesc}=$screc->{name};
-#         }
-#      }
-#      # recharge problem detail data
-#      $rec->{SCrelationProblemState}=undef;
-#      $rec->{SCrelationProblemDesc}=undef;
-#      if ($rec->{SCrelationProblemNo} ne ""){
-#         my $sc=getModuleObject($self->Config,"tssc::prm");
-#         $sc->SetFilter({problemnumber=>\$rec->{SCrelationProblemNo}});
-#         my ($screc,$msg)=$sc->getOnlyFirst(qw(status name cause solution
-#                                               closetype solutiontype));
-#         if (defined($screc)){
-#            $rec->{SCrelationProblemState}=$screc->{status};
-#            $rec->{SCrelationProblemDesc}=$screc->{name};
-#            $rec->{SCrelationProblemCause}=$screc->{cause};
-#            if (my ($clust)=$screc->{cause}=~m/^\s*(.*)\s*------------------/){
-#               $rec->{SCrelationProblemRCluster}=$clust;
-#            }
-#            $rec->{SCrelationProblemSolution}=$screc->{solution};
-#            $rec->{SCrelationProblemCloseType}=
-#                         $sc->DataObj_findtemplvar({current=>$screc,
-#                                                    mode=>'XlsV01'},
-#                                                   "closetype","formated");
-#            $rec->{SCrelationProblemSolutionType}=
-#                         $sc->DataObj_findtemplvar({current=>$screc,
-#                                                    mode=>'XlsV01'},
-#                                                   "solutiontype","formated");
-#         }
-#      }
-#      # recharge change detail data
-#      $rec->{SCrelationChangeState}=undef;
-#      $rec->{SCrelationChangeDesc}=undef;
-#      if ($rec->{SCrelationChangeNo} ne ""){
-#         my $sc=getModuleObject($self->Config,"tssc::chm");
-#         $sc->SetFilter({changenumber=>\$rec->{SCrelationChangeNo}});
-#         my ($screc,$msg)=$sc->getOnlyFirst(qw(status name 
-#                                               plannedstart plannedend));
-#         if (defined($screc)){
-#            $rec->{SCrelationChangeState}=$screc->{status};
-#            $rec->{SCrelationChangeDesc}=$screc->{name};
-#            $rec->{SCrelationChangeStart}=$screc->{plannedstart};
-#                  #       $sc->DataObj_findtemplvar({current=>$screc,
-#                  #                                  mode=>'XlsV01'},
-#                  #                                 "plannedstart","formated");
-#            $rec->{SCrelationChangeEnd}=$screc->{plannedend};
-#                  #       $sc->DataObj_findtemplvar({current=>$screc,
-#                  #                                  mode=>'XlsV01'},
-#                  #                                 "plannedend","formated");
-#         }
-#      }
-#
-#      return(2) if ($#{$self->{'loopBuffer'}}!=-1);
-#   }
    return(1);
 }
 
