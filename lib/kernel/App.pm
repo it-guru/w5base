@@ -1107,6 +1107,36 @@ sub PreParseTimeExpression
          $f=sprintf("%04d/%02d",$Y,$M);
       }
    }
+   elsif (my ($q,$Y)=$val=~m/^\(q([1234])\/(\d+)\)$/gi){
+      my ($m1,$m2)=(10,12);
+      if ($q==1){
+         $m1=1;$m2=3;
+      }
+      elsif($q==2){
+         $m1=4;$m2=6;
+      }
+      elsif($q==3){
+         $m1=7;$m2=9;
+      }
+      my $max;
+      eval('$max=Days_in_Month($Y,$m2);');
+      if ($@ eq ""){
+         $val="\">=$Y-$m1-01 00:00:00\" AND \"<=$Y-$m2-$max 23:59:59\"";
+         $f=sprintf("%04d/Q%d",$Y,$q);
+      }
+   }
+   elsif (my ($h,$Y)=$val=~m/^\(h([12])\/(\d+)\)$/gi){
+      my ($m1,$m2)=(7,12);
+      if ($h==1){
+         $m1=1;$m2=6;
+      }
+      my $max;
+      eval('$max=Days_in_Month($Y,$m2);');
+      if ($@ eq ""){
+         $val="\">=$Y-$m1-01 00:00:00\" AND \"<=$Y-$m2-$max 23:59:59\"";
+         $f=sprintf("%04d/H%d",$Y,$h);
+      }
+   }
    elsif (my ($Y,$M)=$val=~m/^\((\d{4})(\d{2})\)$/gi){
       my $max;
       eval('$max=Days_in_Month($Y,$M);');
