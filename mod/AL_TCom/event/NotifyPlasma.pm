@@ -103,9 +103,9 @@ sub NotifyPlasma
    }
 
    if ($res->fault){
-      $self->Log(ERROR,"trigger","Plasma: WF:%d = %s ",$param{id},
-                       $res->fault->{faultstring});
-      return({exitcode=>2,msg=>$res->fault->{faultstring}});
+      my $fstring=$res->fault->{faultstring};
+      $self->Log(ERROR,"trigger","Plasma: WF:%d = %s ",$param{id},$fstring);
+      return({exitcode=>2,msg=>$fstring});
    }
 
 
