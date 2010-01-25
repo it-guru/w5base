@@ -214,7 +214,13 @@ sub SetFilter
    my $userid=$flt->{userid};
    delete($flt->{userid});
    
-   my %grp=$self->getParent->getGroupsOf($userid,"RMember","both");
+   my %grp;
+   if ($dc eq "TEAM"){  
+      %grp=$self->getParent->getGroupsOf($userid,"RMember","both");
+   }
+   else{
+      %grp=$self->getParent->getGroupsOf($userid,"RMember","direct");
+   }
    my @grpids=keys(%grp);
    @grpids=(qw(NONE)) if ($#grpids==-1);
 
