@@ -139,6 +139,10 @@ sub findW5LocID
           ($newrec->{address1}=~m/Memmelsdorfer/i)){
          $loc->SetFilter({name=>"*bamberg*memmelsdorfer*"});
       }
+      if (($newrec->{location}=~m/Heusenstamm/i) &&
+          ($newrec->{address1}=~m/Jahnstr/i)){
+         $loc->SetFilter({name=>"*Heusenstamm*Jahnstr"});
+      }
       if (($newrec->{location}=~m/Weiden/i) &&
           ($newrec->{address1}=~m/Stockerhutweg/i)){
          $loc->SetFilter({name=>"*weiden*Stockerhutweg*"});

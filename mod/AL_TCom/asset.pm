@@ -20,8 +20,8 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Field;
-use itil::asset;
-@ISA=qw(itil::asset);
+use TS::asset;
+@ISA=qw(TS::asset);
 
 sub new
 {
@@ -29,17 +29,6 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
 
-#   $self->AddFields(
-#      new kernel::Field::Select(
-#                name          =>'acsync',
-#                label         =>'AssetManager syncronisation',
-#                htmleditwidth =>'50%',
-#                group         =>'control',
-#                default       =>'w5base2ac',
-#                transprefix   =>'acsync.',
-#                value         =>['w5base2ac','ac2w5base',''],
-#                container     =>'additional'),
-#   );
 
    return($self);
 }

@@ -1,4 +1,4 @@
-package AL_TCom::system;
+package TS::asset;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -20,8 +20,8 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Field;
-use TS::system;
-@ISA=qw(TS::system);
+use itil::asset;
+@ISA=qw(itil::asset);
 
 sub new
 {
@@ -29,6 +29,20 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
 
+   $self->AddFields(
+      new kernel::Field::TextDrop(
+                name          =>'acassingmentgroup',
+                label         =>'AssetManager Assignmentgroup',
+                group         =>'guardian',
+                weblinkto     =>'tsacinv::group',
+                weblinkon     =>['acassingmentgroup'=>'name'],
+                searchable    =>0,
+                readonly      =>1,
+                async         =>'1',
+                vjointo       =>'tsacinv::asset',
+                vjoinon       =>['name'=>'assetid'],
+                vjoindisp     =>'assignmentgroup'),
+   );
    return($self);
 }
 

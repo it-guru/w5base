@@ -399,6 +399,13 @@ sub Normalize
    $rec->{label}=trim($rec->{label});
    $rec->{address1}=trim($rec->{address1});
    $rec->{location}=trim($rec->{location});
+   if ($rec->{zipcode} eq "96050" && ($rec->{address1}=~m/^Ehrlichstr/i) ){
+      $rec->{address1}=~s/Ehrlich/Erlich/;
+   }
+   if ($rec->{zipcode} eq "44791" && 
+       ($rec->{address1}=~m/^Karl.*Lange.*Str/i) ){
+      $rec->{address1}=~s/Karl.*Lange.*Str.*e/Karl-Lange-Str./i;
+   }
    if ($rec->{address1}=~m/Schlo(\xDF|ss)str/){
       $rec->{address1}=~s/Schlo(\xDF|ss)str/Schlo\xDFstr/i;
    }

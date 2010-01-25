@@ -624,12 +624,17 @@ sub extractAffectedApplication
    }
    else{
       my @dev=split(/[,;\s]+/,$dev);
-      my @dev=grep(!/\</,@dev);
-      my @dev=grep(!/\>/,@dev);
-      my @dev=grep(!/!/,@dev);
-      my @dev=grep(!/\*/,@dev);
-      my @dev=grep(!/\?/,@dev);
-      my @dev=grep(!/^\s*$/,@dev);
+      if ($#chksystemid!=-1){
+         push(@dev,@chksystemid);
+      }
+      @dev=grep(!/\</,@dev);
+      @dev=grep(!/\>/,@dev);
+      @dev=grep(!/!/,@dev);
+      @dev=grep(!/\*/,@dev);
+      @dev=grep(!/\?/,@dev);
+      @dev=grep(!/^\s*$/,@dev);
+      msg(DEBUG,"no application entries - try to found '%s'",join(",",@dev));
+    
       if ($#dev!=-1){
          my $sys=$self->getPersistentModuleObject("W5BaseSys",
                                                   "itil::system");
@@ -637,6 +642,7 @@ sub extractAffectedApplication
          my @sl=$sys->getHashList(qw(id name applications)); 
          my %applid=();
          my %applna=();
+         msg(DEBUG,"found %d system entries",scalar($#sl)+1);
          foreach my $s (@sl){
             $system{$s->{name}}=1;
             $systemid{$s->{id}}=1;
