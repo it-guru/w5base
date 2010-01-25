@@ -172,6 +172,16 @@ sub new
                 group         =>'sem',
                 dataobjattr   =>'custcontract.sem2'),
 
+      new kernel::Field::Import( $self,
+                vjointo       =>'itil::costcenter',
+                vjoinon       =>['conumber'=>'name'],
+                dontrename    =>1,
+                group         =>'delmgmt',
+                fields        =>[qw(delmgr   delmgr2
+                                    delmgrid delmgr2id
+                                    delmgrteam
+                                    delmgrteamid)]),
+
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
                 label         =>'Contacts',
@@ -301,7 +311,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default sem contacts control misc attachments));
+          qw(default sem delmgmt contacts control misc attachments));
 }
 
 

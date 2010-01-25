@@ -304,6 +304,7 @@ sub new
                 group         =>'delmgmt',
                 fields        =>[qw(delmgr   delmgr2
                                     delmgrid delmgr2id
+                                    delmgrteam
                                     delmgrteamid)]),
 
       new kernel::Field::TextDrop(
