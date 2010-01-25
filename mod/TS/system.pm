@@ -42,6 +42,20 @@ sub new
                 vjointo       =>'tsacinv::system',
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>'assignmentgroup'),
+
+      new kernel::Field::TextDrop(
+                name          =>'aciassignmentgroup',
+                label         =>'AM Incident-Assignmentgroup',
+                group         =>'admin',
+                weblinkto     =>'tsacinv::group',
+                weblinkon     =>['acassingmentgroup'=>'name'],
+                searchable    =>0,
+                readonly      =>1,
+                async         =>'1',
+                vjointo       =>'tsacinv::system',
+                vjoinon       =>['systemid'=>'systemid'],
+                vjoindisp     =>'iassignmentgroup'),
+
       new kernel::Field::TextDrop(
                 name          =>'accontrolcenter',
                 label         =>'AM System ControlCenter',
