@@ -124,7 +124,7 @@ sub Result
    $p800m="now" if (!defined($p800m) || $p800m eq ""); 
    $mainq1{srcid}="$p800m-*";
    $mainq1{eventstart}=">$p800m-1000h AND <$p800m+1000h";
-   my @valids=grep(/^.*::P800.*$/,keys(%{$self->{DataObj}->{SubDataObj}}));
+   my @valids=grep(/^.*::P800$/,keys(%{$self->{DataObj}->{SubDataObj}}));
    if ($mainq1{class} ne ""){
       my $q=quotemeta($mainq1{class});
       if (!grep(/^$q$/i,@valids)){
@@ -137,7 +137,7 @@ sub Result
 
    $self->{DataObj}->ResetFilter();
    $self->{DataObj}->SecureSetFilter([\%mainq1]);
-   $self->{DataObj}->setDefaultView(qw(linenumber name state id srcid));
+   $self->{DataObj}->setDefaultView(qw(name affectedcontract wffields.p800_reportmonth wffields.p800_app_incidentcount wffields.p800_app_changecount wffields.p800_app_changecount_customer wffields.p800_app_applicationcount wffields.p800_app_interfacecount));
    my %param=(ExternalFilter=>1);
    return($self->{DataObj}->Result(%param));
 }

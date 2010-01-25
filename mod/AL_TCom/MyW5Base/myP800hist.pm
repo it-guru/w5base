@@ -127,7 +127,6 @@ sub FinalDataFilter
                                        wffields.p800_app_changecount_customer
                                        wffields.p800_app_applicationcount
                                        wffields.p800_app_interfacecount
-                                       wffields.p800_app_customerwt
                                    ));
    my %param=(ExternalFilter=>1);
    return($self->{DataObj}->Result(%param));
