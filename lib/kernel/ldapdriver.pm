@@ -77,7 +77,6 @@ sub Connect
    if (!($self->{ldap}=Net::LDAP->new($self->{ldapserv},
                                       timeout=>300,
                                       version=>'3',async=>0))){
-                                     ))){
       return(undef,msg(ERROR,"ldapbind '%s' while connect '%s'",
              $@,$self->{ldapserv}));
    }
