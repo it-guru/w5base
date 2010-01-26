@@ -775,7 +775,7 @@ sub isViewValid
    my $rec=shift;   # if $rec is undefined, general access to app is checked
    my %param=@_;  
 
-   return(undef);   # ALL means all groups - else return list of fieldgroups
+   return();   # ALL means all groups - else return list of fieldgroups
 }
 
 sub isWriteValid
@@ -783,7 +783,7 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;  # if $rec is not defined, insert is validated
 
-   return(undef);  # ALL means all groups - else return list of fieldgroups
+   return();  # ALL means all groups - else return list of fieldgroups
 }
 
 sub isCopyValid

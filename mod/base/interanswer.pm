@@ -256,6 +256,23 @@ sub SecureValidate
    return(1);
 }
 
+sub initSqlWhere
+{
+   my $self=shift;
+   my $mode=shift;
+   return(undef) if ($mode eq "delete");
+   return(undef) if ($mode eq "insert");
+   return(undef) if ($mode eq "update");
+   my $where;
+   if ($self->{secparentobj} ne ""){
+      $where="interanswer.parentobj='$self->{secparentobj}'";
+   }
+   return($where);
+}
+
+
+
+
 sub Validate
 {
    my $self=shift;
