@@ -117,7 +117,8 @@ sub AUTOLOAD {
    }
 
    return(&{$self->{$name}}($self,@param)) if (ref($self->{$name}) eq "CODE");
-   return($self->{$name});
+   return($self->{$name}) if (exists($self->{$name}));
+   return();
 }
 
 sub DESTROY

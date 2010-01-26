@@ -81,6 +81,7 @@ sub getPosibleDirectActions
    return();
 }
 
+
 sub isEffortReadAllowed
 {
    my $self=shift;
@@ -901,7 +902,7 @@ sub isDeleteValid
    my $self=shift;
    my $rec=shift;
    return(1) if ($self->getParent->IsMemberOf("admin"));
-   return(undef);
+   return();
 }
 
 sub getWorkHeight

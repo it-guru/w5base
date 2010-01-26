@@ -21,7 +21,6 @@ use vars qw(@ISA);
 use strict;
 use kernel;
 use kernel::DataObj;
-use Data::Dumper;
 
 @ISA=qw(kernel::DataObj);
 
@@ -69,12 +68,6 @@ sub AddGroup
    $param{translation}=(caller())[0] if (!defined($param{translation}));
    return($parent->AddGroup($name,%param)) if (defined($parent));
 }
-
-#sub GetGroup
-#{
-#   my $self=shift;
-#   return($self->getParent->GetGroup(@_));
-#}
 
 
 

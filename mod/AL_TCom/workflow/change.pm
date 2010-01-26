@@ -178,7 +178,7 @@ sub isWriteValid
    my @edit;
 
    return() if (!defined($rec));
-   return(undef) if ($rec->{stateid}==21);
+   return() if ($rec->{stateid}==21);
    return() if (!($rec->{step}=~m/::postreflection$/));
    if ($self->isPostReflector($rec)){
       push(@edit,"tcomcod","affected");

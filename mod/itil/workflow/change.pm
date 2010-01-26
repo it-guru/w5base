@@ -35,6 +35,7 @@ sub new
 
 
 
+
 sub Init
 {
    my $self=shift;
@@ -211,6 +212,24 @@ sub getPosibleActions
    my $self=shift;
    my $WfRec=shift;
    my @l=qw(wffollowup);
+
+   my $eventend=$WfRec->{eventend};
+   my $age;
+   if ($eventend ne ""){
+      my $d=CalcDateDuration($eventend,NowStamp("en"));
+      $age=$d->{totalminutes};
+   }
+   if (!defined($age) || $age<5000){ # note add allowed 3.5 days after eventend
+      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"write");
+      my $m=$WfRec->{mandatorid};
+      $m=[$m] if (ref($m) ne "ARRAY");
+      foreach my $ms (@$m){
+         if (grep(/^$ms$/,@mandators)){
+            push(@l,"wfaddnote");
+            last;
+         }
+      }
+   }
    return(@l);
 }
 
@@ -353,9 +372,15 @@ sub generateWorkspace
 {
    my $self=shift;
    my $WfRec=shift;
+   my $actions=shift;
+
    my $msg=$self->T("Externel authority");
-   my $templ=<<EOF;
-<br><div class=Question><table border=0><tr><td>$msg</td></tr></table></div>
+   my $templ;
+   if (grep(/^wfaddnote$/,@$actions)){
+      $templ.=$self->getDefaultNoteDiv($WfRec,$actions,'height'=>'50');
+   }
+   $templ.=<<EOF;
+<div class=Question><table border=0><tr><td>$msg</td></tr></table></div>
 EOF
    return($templ);
 }
@@ -364,6 +389,7 @@ sub getPosibleButtons
 {
    my $self=shift;
    my $WfRec=shift;
+   my $actions=shift;
    my %buttons=();
 
    if ($self->getParent->can("isPostReflector") &&
@@ -373,6 +399,9 @@ sub getPosibleButtons
    if ($self->getParent->isChangeManager($WfRec)){
       $buttons{"PublishInfo"}=$self->T('publish change notification');
    }
+   if (grep(/^wfaddnote$/,@$actions)){
+      $buttons{"wfaddnote"}=$self->T('add note');
+   }
    return(%buttons);
 }
 
@@ -381,7 +410,8 @@ sub getWorkHeight
    my $self=shift;
    my $WfRec=shift;
 
-   return(100);
+   return(160) if ($WfRec->{state}<20);
+   return(120);
 }
 
 sub Validate
@@ -419,6 +449,14 @@ sub Process
       }
       return(0);
    }
+   elsif ($action eq "wfaddnote"){
+      my $note=Query->Param("note");
+      my $effort=Query->Param("Formated_effort");
+      my $h={};
+      $h->{note}=$note                     if ($note ne "");
+      $h->{effort}=$effort                 if ($effort ne "");
+      return($self->nativProcess($action,$h,$WfRec,$actions));
+   }
 
    return($self->SUPER::Process($action,$WfRec));
 }
@@ -437,10 +475,19 @@ sub generateWorkspace
 {
    my $self=shift;
    my $WfRec=shift;
+   my $actions=shift;
    my $msg=$self->T("post reflection: please correct the desiered data");
-   my $templ=<<EOF;
-<br><div class=Question><table border=0><tr><td>$msg</td></tr></table></div>
+   my $templ;
+   if (grep(/^wfaddnote$/,@$actions)){
+      $templ.=$self->getDefaultNoteDiv($WfRec,$actions,'height'=>'50');
+   }
+   my @acl=$self->getParent->isWriteValid($WfRec);
+   
+   if ($#acl!=-1){
+      $templ.=<<EOF;
+<div class=Question><table border=0><tr><td>$msg</td></tr></table></div>
 EOF
+   }
    return($templ);
 }
 
@@ -448,6 +495,7 @@ sub getPosibleButtons
 {
    my $self=shift;
    my $WfRec=shift;
+   my $actions=shift;
    my %buttons;
    if ($self->getParent->can("isPostReflector") &&
        $self->getParent->isPostReflector($WfRec)){
@@ -461,6 +509,9 @@ sub getPosibleButtons
    if ($self->getParent->isChangeManager($WfRec)){
       $buttons{"PublishInfo"}=$self->T('publish change notification');
    }
+   if (grep(/^wfaddnote$/,@$actions)){
+      $buttons{"wfaddnote"}=$self->T('add note');
+   }
    return(%buttons);
 }
 
@@ -470,10 +521,8 @@ sub getWorkHeight
    my $self=shift;
    my $WfRec=shift;
 
-   my @acl=$self->getParent->isWriteValid($WfRec);
-   return(0) if ($#acl==-1);
-
-   return(100);
+   return(160) if ($WfRec->{state}<20);
+   return(120);
 }
 
 sub Process
@@ -512,6 +561,14 @@ sub Process
          }
          return(1);
       }
+   }
+   elsif ($action eq "wfaddnote"){
+      my $note=Query->Param("note");
+      my $effort=Query->Param("Formated_effort");
+      my $h={};
+      $h->{note}=$note                     if ($note ne "");
+      $h->{effort}=$effort                 if ($effort ne "");
+      return($self->nativProcess($action,$h,$WfRec,$actions));
    }
    return($self->SUPER::Process($action,$WfRec));
 }
