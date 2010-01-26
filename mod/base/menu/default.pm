@@ -180,6 +180,10 @@ sub Init
                       "base::lnklocationcontact",
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("sysadm.location.lnklocationinteranswer",
+                      "base::lnklocationinteranswer",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("sysadm.location.googlekeys",
                       "base::googlekeys",
                       defaultacl=>['admin']);
