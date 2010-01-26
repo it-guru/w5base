@@ -459,7 +459,7 @@ sub getSqlCount
    }
    my $sqlcmd=join(" UNION ",@cmd);
 
-   $self->Log(ERROR,"sqlread",$sqlcmd);
+   $self->Log(INFO,"sqlread",$sqlcmd);
 
    return($sqlcmd);
 }
