@@ -1288,12 +1288,22 @@ sub ValidateDelete
 {
    my $self=shift;
    my $rec=shift;
+   my $lock=0;
 
-   if ($#{$rec->{systems}}!=-1 ||
+   my $refobj=getModuleObject($self->Config,"itil::lnkapplappl");
+   if (defined($refobj)){
+      my $idname=$self->IdField->Name();
+      my $id=$rec->{$idname};
+      $refobj->SetFilter({'toapplid'=>\$id});
+      $lock++ if ($refobj->CountRecords()>0);
+   }
+   if ($lock>0 ||
+       $#{$rec->{systems}}!=-1 ||
        $#{$rec->{swinstances}}!=-1 ||
        $#{$rec->{custcontracts}}!=-1){
       $self->LastMsg(ERROR,
-          "delete only posible, if there are no system, software instance and contract relations");
+          "delete only posible, if there are no system, ".
+          "software instance and contract relations");
       return(0);
    }
 
