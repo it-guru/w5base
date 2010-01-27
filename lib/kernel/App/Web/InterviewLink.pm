@@ -80,9 +80,9 @@ sub InterviewSubForm
              "<table class=InterviewQuest width=95% 
                border=0 cellspacing=0 cellpadding=0>".
              "<tr><td><div onclick=switchExt($qrec->{id})>$qrec->{name}</div>".
-             "</td><td width=50>".
+             "</td><td width=50 valign=top>".
              "<div id=relevant$qrec->{id}>$qrec->{HTMLrelevant}</div></td>".
-             "<td width=180 nowrap>".
+             "<td width=180 nowrap valign=top>".
              "<div class=InterviewQuestAnswer ".
              "id=answer$qrec->{id}>$qrec->{HTMLanswer}</div></td>".
              "<td width=1% align=center valign=center>".
@@ -96,6 +96,7 @@ sub InterviewSubForm
              "</tr></table></form></div>";
          push(@q,$d);
          $lastquestclust=$qrec->{questclust};
+         $lastquestclust="" if (!defined($lastquestclust));
       }
    }
    print $self->HttpHeader("text/xml");

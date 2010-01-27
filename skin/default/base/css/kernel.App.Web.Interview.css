@@ -40,6 +40,10 @@ table.InterviewQuestHead{
 td.InterviewQuestHead{
    font-size:10px;;
 }
+td.InterviewSubMenu{
+   font-size:10px;;
+   width:1%;
+}
 div.InterviewQuest{
    margin-left:20px;
 }

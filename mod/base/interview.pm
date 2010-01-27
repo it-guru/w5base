@@ -475,27 +475,32 @@ sub getHtmlEditElements
 
    if ($write){
       $HTMLrelevant="<select name=relevant onchange=submitChange(this) >".
-                    "<option value=\"1\">Ja</option>";
+                    "<option value=\"1\">".
+                    $self->T("yes")."</option>";
       if (defined($answer) && !($answer->{relevant})){
-         $HTMLrelevant.="<option selected value=\"0\">Nein</option>";
+         $HTMLrelevant.="<option selected value=\"0\">".
+                    $self->T("no")."</option>";
       }
       else{
-         $HTMLrelevant.="<option value=\"0\">Nein</option>";
+         $HTMLrelevant.="<option value=\"0\">".
+                     $self->T("no")."</option>";
       }
       $HTMLrelevant.="</select>";
    }
    else{
       if (defined($answer) && $answer->{relevant}){
-         $HTMLrelevant="Ja";
+         $HTMLrelevant=$self->T("yes");
       }
       elsif (defined($answer) && !($answer->{relevant})){
-         $HTMLrelevant="Nein";
+         $HTMLrelevant=$self->T("no");
       }
       else{
          $HTMLrelevant="?";
       }
    }
-   $HTMLcomments="<textarea name=comments onchange=submitChange(this) ".
+   $HTMLcomments="<table cellspacing=0 cellpadding=0><tr><td></td><td nowrap class=InterviewSubMenu>Frage an Fragen-Ansprechpartner</td><td nowrap class=InterviewSubMenu>&nbsp;&bull;&nbsp;</td><td nowrap class=InterviewSubMenu>Frage weitergeben</td></tr></table>";
+   $HTMLcomments="";
+   $HTMLcomments.="<textarea name=comments onchange=submitChange(this) ".
                  "rows=5 style=\"width:100%\">$answer->{comments}</textarea>";
    $HTMLanswer=" - ? - ";
    if ($irec->{questtyp} eq "boolean" ||
