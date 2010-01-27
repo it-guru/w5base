@@ -288,7 +288,7 @@ sub ProcessLine
 
 sub ProcessHead
 {
-   my ($self,$fh,$rec,$msg)=@_;
+   my ($self,$fh,$rec,$msg,$param)=@_;
    my @view;
    if (ref($self->{fieldobjects}) eq "ARRAY"){
       @view=@{$self->{fieldobjects}};

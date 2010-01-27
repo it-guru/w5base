@@ -135,10 +135,17 @@ sub ProcessLine
          closedir(DH);
       }
    }
+   my %env=(mode=>'Output');
+   if (exists($self->{currentFrontendFilter})){
+      $env{'currentFrontendFilter'}=$self->{currentFrontendFilter};
+   }
+   if (exists($self->{currentFrontendOrder})){
+      $env{'currentFrontendOrder'}=$self->{currentFrontendOrder};
+   }
    my @operator=();
    foreach my $o ($self->getParent->getParent->getOperator()){
       $o->setParent($self->getParent());
-      if ($o->IsModuleSelectable(mode=>'Output')){
+      if ($o->IsModuleSelectable(%env)){
          my %rec=();
          $rec{download}=0;
          $rec{function}="InitWorkflow";
@@ -154,7 +161,6 @@ sub ProcessLine
    my %workoutput=();
    foreach my $f (keys(%{$self->Cache->{OutputHandlerCache}})){
       my $o=$self->Cache->{OutputHandlerCache}->{$f};
-      my %env=(mode=>'Output');
       $o->setParent($self->getParent());
       if ($o->IsModuleSelectable(%env)){
          my %rec=();

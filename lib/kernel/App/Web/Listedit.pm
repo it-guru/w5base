@@ -2090,17 +2090,22 @@ sub Result
             print $self->queryError();
             return();
          }
+         $param{'currentFrontendFilter'}=\%q;
       }
 
       my $view=Query->Param("CurrentView");
 
       if (defined($param{ForceOrder})){
-         $self->setCurrentOrder(split(/\s*,\s*/,$param{ForceOrder}));
+         my @o=split(/\s*,\s*/,$param{ForceOrder});
+         $self->setCurrentOrder(@o);
+         $param{'currentFrontendOrder'}=\@o;
       }
       else{
          my $order=Query->Param("ForceOrder");
          if ($order ne ""){
-            $self->setCurrentOrder(split(/\s*,\s*/,$order));
+            my @o=split(/\s*,\s*/,$order);
+            $self->setCurrentOrder(@o);
+            $param{'currentFrontendOrder'}=\@o;
          }
       }
 
@@ -2122,6 +2127,7 @@ sub Result
       msg(INFO,"----------------------------- Format: $format ".
                "-----------------------------\n");
       $param{WindowMode}="Result";
+      
       if (!($output->setFormat($format,%param))){
          # can't set format
          return();

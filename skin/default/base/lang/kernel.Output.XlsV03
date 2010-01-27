@@ -1,0 +1,2 @@
+'Outer XLS Report'=>{de=>'Verkn. Report XLS'},
+'Writes the data in Excel/XLS Format with first column as outer criteria.'=>{de=>'Ausgabe in XLS mit Überprüfung der Filter-Kriterien der ersten Spalte.'}
