@@ -37,8 +37,9 @@ sub getTotalActiveQuestions
                   cistatusid=>[3,4]});
    my $pwrite=$i->checkParentWrite($p,$rec);
    my @l;
-   foreach my $irec ($i->getHashList(qw(queryblock qtag id name qname prio
-                                        questtyp questclust restriction))){
+   foreach my $irec ($i->getHashList(qw(queryblock questclust 
+                                        qtag id name qname prio
+                                        questtyp restriction))){
       my $restok=1;
       if ($irec->{restriction} ne ""){
          $restok=0;

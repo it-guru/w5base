@@ -496,7 +496,7 @@ sub getHtmlEditElements
       }
    }
    $HTMLcomments="<textarea name=comments onchange=submitChange(this) ".
-                 "rows=2 style=\"width:100%\">$answer->{comments}</textarea>";
+                 "rows=5 style=\"width:100%\">$answer->{comments}</textarea>";
    $HTMLanswer=" - ? - ";
    if ($irec->{questtyp} eq "boolean" ||
        $irec->{questtyp} eq "booleana"){
