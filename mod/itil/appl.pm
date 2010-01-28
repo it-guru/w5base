@@ -978,7 +978,6 @@ sub getWfEventNotifyTargets     # calculates the target email addresses
    }
    $ia->LoadTargets($emailto,'*::appl *::custappl',\'eventnotify',
                              $applid);
-printf STDERR ("fifi d=%s byfunc=%s\n",Dumper($emailto),Dumper(\@byfunc));
    $ia->LoadTargets($emailto,'base::staticinfoabo',\'eventnotify',
                              '100000002',\@byfunc,default=>1);
 

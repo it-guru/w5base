@@ -767,7 +767,18 @@ sub RawValue
                        join($self->{vjoinconcat},sort(keys(%u)));
             }
             else{
-               $current->{$self->Name()}=[sort(keys(%u))];
+               if (keys(%u)>1){
+                  $current->{$self->Name()}=[sort(keys(%u))];
+               }
+               else{
+                  if (keys(%u)==1){
+                     my @l=keys(%u);
+                     $current->{$self->Name()}=$l[0];
+                  }
+                  else{
+                     $current->{$self->Name()}=undef;
+                  }
+               }
             }
             $d=$current->{$self->Name()};
          }
