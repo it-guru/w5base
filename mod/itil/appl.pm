@@ -836,6 +836,19 @@ sub initSearchQuery
 }
 
 
+sub InterviewPartners
+{
+   my $self=shift;
+   my $rec=shift;
+
+
+   return(''=>$self->T("databoss")) if (!defined($rec));
+   return(''=>[$rec->{'databossid'}]) if (exists($rec->{'databossid'}));
+   return(''=>[]);
+}
+
+
+
 
 sub getTeamBossID
 {
@@ -965,6 +978,7 @@ sub getWfEventNotifyTargets     # calculates the target email addresses
    }
    $ia->LoadTargets($emailto,'*::appl *::custappl',\'eventnotify',
                              $applid);
+printf STDERR ("fifi d=%s byfunc=%s\n",Dumper($emailto),Dumper(\@byfunc));
    $ia->LoadTargets($emailto,'base::staticinfoabo',\'eventnotify',
                              '100000002',\@byfunc,default=>1);
 
