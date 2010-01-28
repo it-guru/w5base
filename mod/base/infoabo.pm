@@ -559,9 +559,14 @@ sub LoadTargets
                $sparent=$$parent if (ref($parent) eq "SCALAR");
                $srefid=$$refid if (ref($refid) eq "SCALAR");
                $smode=$$mode if (ref($mode) eq "SCALAR");
-               my $rec={userid=>$userid,active=>$param{default},
-                        parent=>$sparent,mode=>$smode,refid=>$srefid};
-               $self->ValidatedInsertRecord($rec);
+               if ($userid>0){
+                  my $rec={userid=>$userid,active=>$param{default},
+                           parent=>$sparent,mode=>$smode,refid=>$srefid};
+                  $self->ValidatedInsertRecord($rec);
+               }
+               else{
+                  msg(ERROR,"try to insert infoabo for invalid '$userid'");
+               }
             }
          #}
          $self->ResetFilter();
