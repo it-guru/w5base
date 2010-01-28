@@ -493,24 +493,30 @@ sub preProcessFilter
          }
       }
       my %flt=($searchfield=>$hflt->{$field});
-      $fobj->vjoinobj->SetFilter(\%flt);
-      if (defined($hflt->{$fobj->{vjoinon}->[0]}) &&
-          !defined($self->{dataobjattr})){
-         $fobj->vjoinobj->SetNamedFilter("vjoinadd".$field,
-                      {$fobj->{vjoinon}->[1]=>$hflt->{$fobj->{vjoinon}->[0]}});
-      }
 
-
-      $fobj->vjoinobj->SetCurrentView($fobj->{vjoinon}->[1]);
-      delete($hflt->{$field});
-      my $d=$fobj->vjoinobj->getHashIndexed($fobj->{vjoinon}->[1]);
-      my @keylist=keys(%{$d->{$fobj->{vjoinon}->[1]}});
-      if (($flt{$searchfield}=~m/\[LEER\]/) || 
-          ($flt{$searchfield}=~m/\[EMPTY\]/)){
-         push(@keylist,undef,"");
+      my @keylist=();
+      if ($fobj->vjoinobj->SetFilter(\%flt)){
+         if (defined($hflt->{$fobj->{vjoinon}->[0]}) &&
+             !defined($self->{dataobjattr})){
+            $fobj->vjoinobj->SetNamedFilter("vjoinadd".$field,
+                     {$fobj->{vjoinon}->[1]=>$hflt->{$fobj->{vjoinon}->[0]}});
+         }
+         $fobj->vjoinobj->SetCurrentView($fobj->{vjoinon}->[1]);
+         delete($hflt->{$field});
+         my $d=$fobj->vjoinobj->getHashIndexed($fobj->{vjoinon}->[1]);
+         @keylist=keys(%{$d->{$fobj->{vjoinon}->[1]}});
+         if (($flt{$searchfield}=~m/\[LEER\]/) || 
+             ($flt{$searchfield}=~m/\[EMPTY\]/)){
+            push(@keylist,undef,"");
+         }
+         if ($#keylist==-1){
+            @keylist=(-99);
+         }
       }
-      if ($#keylist==-1){
+      else{
+         delete($hflt->{$field});
          @keylist=(-99);
+         $changed=1;
       }
 
       $hflt->{$fobj->{vjoinon}->[0]}=\@keylist;

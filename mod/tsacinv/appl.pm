@@ -140,6 +140,7 @@ sub new
                 label         =>'Technical Contact',
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['tsmid'=>'lempldeptid'],
+                searchable    =>0,
                 vjoindisp     =>'fullname'),
 
       new kernel::Field::TextDrop(
@@ -167,6 +168,7 @@ sub new
                 label         =>'Deputy Technical Contact',
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['tsm2id'=>'lempldeptid'],
+                searchable    =>0,
                 vjoindisp     =>'fullname'),
 
       new kernel::Field::Link(
@@ -268,21 +270,6 @@ sub new
                 label         =>'Source-Load',
                 dataobjattr   =>'amtsicustappl.dtimport'),
 
-    #  new kernel::Field::Link(
-    #            name          =>'ownerid',
-    #            group         =>'source',
-    #            label         =>'AC OwnerID',
-    #            dataobjattr   =>'amportfolio.luserid'),
-    #
-    #  new kernel::Field::TextDrop(
-    #            name          =>'owner',
-    #            readonly      =>1,
-    #            group         =>'source',
-    #            label         =>'Owner',
-    #            vjointo       =>'tsacinv::user',
-    #            vjointo       =>'tsacinv::user',
-    #            vjoinon       =>['ownerid'=>'lempldeptid'],
-    #            vjoindisp     =>'fullname')
    );
    $self->{use_distinct}=0;
    $self->setDefaultView(qw(name applid usage conumber assignmentgroup));

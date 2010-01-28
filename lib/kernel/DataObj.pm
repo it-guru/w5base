@@ -139,6 +139,12 @@ sub _preProcessFilter
             return(undef);
          } 
          else{
+            if (exists($fobj->{onRawValue})){
+               $self->LastMsg(ERROR,
+                              "filter request on calculated field '%s' \@ '%s'",
+                              $field,$self->Self);
+               return(undef);
+            }
             my ($subchanged,$err)=$fobj->preProcessFilter($hflt);
             if ($err ne ""){
                $self->LastMsg(ERROR,$err);
@@ -160,20 +166,27 @@ sub _SetFilter
    $self->{FilterSet}->{$filtername}=[];
 
    @list={@list} if (!ref($list[0]));
+   my $fail=0;
    do{
       if (ref($list[0]) eq "ARRAY"){
          my @l=@{$list[0]};
          for(my $c=0;$c<=$#l;$c++){
             $l[$c]=$self->_preProcessFilter($l[$c]);
+            $fail++ if (!defined($l[$c]));
          }
          push(@{$self->{FilterSet}->{$filtername}},\@l);
       }
       elsif (ref($list[0]) eq "HASH"){
          my $h=$self->_preProcessFilter($list[0]);
+         $fail++ if (!defined($h));
          push(@{$self->{FilterSet}->{$filtername}},$h);
       }
       shift(@list); 
    } until(!defined($list[0]));
+
+   if ($fail){
+      return(0);
+   }
 
    return(1);
 }
