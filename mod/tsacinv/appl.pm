@@ -113,6 +113,7 @@ sub new
                 label         =>'Customer Business Manager',
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['semid'=>'lempldeptid'],
+                searchable    =>0,
                 vjoindisp     =>'fullname'),
 
       new kernel::Field::TextDrop(
