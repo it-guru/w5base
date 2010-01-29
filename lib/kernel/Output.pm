@@ -282,6 +282,7 @@ sub WriteToScalar    # ToDo: viewgroups implementation
       }until(!defined($rec));
       my $d=$self->Format->ProcessBottom(\$fh,undef,$msg,\%param);
       syswrite(TMP,$d) if (defined($d));
+
       if ($param{HttpHeader}){
          syswrite(TMP,$self->Format->getHttpFooter());
       }

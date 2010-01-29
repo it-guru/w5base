@@ -313,7 +313,8 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   return("ALL");
+   return("ALL") if ($self->IsMemberOf("admin"));
+   return();
 }
 
 sub isWriteValid
@@ -388,14 +389,18 @@ sub Store
                                                         $parentid,$parentobj);
    if ($vname eq "comments" || $vname eq "answer" || $vname eq "relevant"){
       if ($write){
+         my %d=($vname=>$vval);
+         if ($vname eq "relevant" && $vval==0){
+            $d{'answer'}="";
+         }
          if (!defined($oldrec)){
-            $self->ValidatedInsertRecord({$vname=>$vval,
+            $self->ValidatedInsertRecord({%d,
                                           parentobj=>$parentobj,
                                           parentid=>$parentid,
                                           interviewid=>$qid});
          }
          else{
-            $self->ValidatedUpdateRecord($oldrec,{$vname=>$vval},
+            $self->ValidatedUpdateRecord($oldrec,{%d},
                                          {id=>\$oldrec->{id}});
          }
       }

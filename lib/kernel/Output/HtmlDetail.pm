@@ -605,6 +605,23 @@ sub ProcessBottom
            "$label $str $ut - $user</div></div>";
    }
    $d.="</div>";
+
+   if ($#{$self->Context->{jsonchanged}}!=-1){
+      $d.="\n<script language=JavaScript>\n";
+      foreach my $f (@{$self->Context->{jsonchanged}}){
+         $d.="if (typeof($f)!=\"undefined\"){\n   $f('init');\n}\n";
+      }
+      $d.="</script>\n";
+   }
+   $d.="\n<script language=JavaScript>\n";
+   if (Query->Param("CurrentIdToEdit") ne ""){
+      $d.="if (parent.setEditMode){parent.setEditMode(1);}";
+   }
+   else{
+      $d.="if (parent.setEditMode){parent.setEditMode(0);}";
+   }
+   $d.="</script>\n";
+
    return($d);
 }
 
@@ -621,21 +638,6 @@ sub getHttpFooter
           "window.document.body.scrollTop=$scrolly;".# Scroll Position
           "</script>";
    }
-   if ($#{$self->Context->{jsonchanged}}!=-1){
-      $d.="\n<script language=JavaScript>\n";
-      foreach my $f (@{$self->Context->{jsonchanged}}){
-         $d.="if (typeof($f)!=\"undefined\"){\n   $f('init');\n}\n";
-      }
-      $d.="</script>\n";
-   }
-   $d.="\n<script language=JavaScript>\n";
-   if (Query->Param("CurrentIdToEdit") ne ""){
-      $d.="if (parent.setEditMode){parent.setEditMode(1);}";
-   }
-   else{
-      $d.="if (parent.setEditMode){parent.setEditMode(0);}";
-   }
-   $d.="</script>\n";
    return($d);
 }
 

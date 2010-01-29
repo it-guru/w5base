@@ -21,9 +21,12 @@ use vars qw(@ISA);
 use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
+use kernel::App::Web::InterviewLink;
 use kernel::Field;
 use kernel::CIStatusTools;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::CIStatusTools);
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB 
+        kernel::App::Web::InterviewLink
+        kernel::CIStatusTools);
 
 sub new
 {
@@ -942,6 +945,7 @@ sub new
                 noselect      =>'1',
                 dataobjattr   =>'lnkcontact.croles'),
 
+      new kernel::Field::Interview(),
       new kernel::Field::QualityText(),
       new kernel::Field::QualityState(),
       new kernel::Field::QualityOk(),

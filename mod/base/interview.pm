@@ -32,7 +32,9 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
+
 
    $self->AddFields(
       new kernel::Field::Linenumber(
@@ -114,14 +116,75 @@ sub new
       new kernel::Field::Text(
                 name          =>'qtag',
                 group         =>'tech',
+                htmleditwidth =>'100px',
                 label         =>'unique query tag',
                 dataobjattr   =>'interview.qtag'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Select(
                 name          =>'parentobj',
                 group         =>'tech',
                 label         =>'parent Ojbect',
+                htmleditwidth =>'250px',
+                jsonchanged   =>\&getOnChangeParentobjJs,
+                jsoninit      =>\&getOnChangeParentobjJs,
+                getPostibleValues=>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   my @o;
+                   $app->LoadSubObjs("ext/interview","isub");
+                   foreach my $o (values(%{$app->{isub}})){
+                      my %k=$o->getPosibleParentObjects();
+                      foreach my $k (keys(%k)){
+                         push(@o,$k,$k{$k});
+                      }
+                   }
+                   return(""=>'&lt;select a parent object&gt;',@o);
+                },
                 dataobjattr   =>'interview.parentobj'),
+
+      new kernel::Field::Select(
+                name          =>'boundpcontact',
+                group         =>'tech',
+                htmleditwidth =>'250px',
+                allownative   =>1, 
+                allowempty    =>1, 
+                searchable    =>0, 
+                getPostibleValues=>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $newrec=shift;
+                   my $curparent=effVal($current,$newrec,"parentobj"); 
+                   my $app=$self->getParent;
+                   if (defined($current)){
+                      $app->LoadSubObjs("ext/interview","isub");
+                      my %p;
+                      foreach my $oname (keys(%{$app->{isub}})){
+                         my $o=$app->{isub}->{$oname};
+                         my %k=$o->getPosibleParentObjects();
+                         foreach my $k (keys(%k)){
+                            if ($k eq $curparent){
+                               my $o=getModuleObject($app->Config,$k);
+                               my %ip=$o->InterviewPartners();
+                               if (exists($ip{$current->{boundpcontact}})){
+                                  return($current->{boundpcontact}=>,
+                                         $ip{$current->{boundpcontact}});
+                               }
+                            }
+                         }
+                      }
+                   }
+                   return();
+                },
+                label         =>'answer contact from parent',
+                dataobjattr   =>'interview.boundpcontact'),
+
+      new kernel::Field::Text(
+                name          =>'boundpviewgroup',
+                htmleditwidth =>'100px',
+                group         =>'tech',
+                label         =>'bind on parent viewgroup',
+                dataobjattr   =>'interview.boundpviewgroup'),
+
 
       new kernel::Field::Boolean(
                 name          =>'effect_on_mttr',
@@ -159,7 +222,8 @@ sub new
                 name          =>'questtyp',
                 transprefix   =>'QT.', 
                 htmleditwidth =>'250px',
-                value         =>['percent','percenta','text',
+                value         =>['percent','percenta',
+                                 'percent4','text',
                                  'boolean','booleana'],
                 label         =>'Question Typ',
                 dataobjattr   =>'interview.questtyp'),
@@ -246,6 +310,47 @@ sub initSearchQuery
      Query->Param("search_cistatus"=>
                   "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
    }
+}
+
+sub getOnChangeParentobjJs
+{
+   my $self=shift;
+   my $app=$self->getParent;
+
+   $app->LoadSubObjs("ext/interview","isub");
+   my %p;
+   foreach my $o (values(%{$app->{isub}})){
+      my %k=$o->getPosibleParentObjects();
+      foreach my $k (keys(%k)){
+         my $o=getModuleObject($app->Config,$k);
+         my @ip=$o->InterviewPartners();
+         $p{$k}=\@ip;
+      }
+   }
+   my $d=<<EOF;
+var p=document.getElementById('parentobj');
+var s=document.getElementById('boundpcontact');
+var oldval=s.value;
+for (i = 0; i < s.length; i++){
+   s.options[i]=null;
+}
+i=0;
+i++;
+EOF
+foreach my $k (keys(%p)){
+   $d.="if (p.value=='$k'){\n";
+   my @l=@{$p{$k}};
+   while(defined(my $kk=shift(@l))){
+      my $vv=shift(@l);
+      $d.="s.options[i]=new Option('$vv','$kk');\n";
+      $d.="if ('$kk'==oldval){s.selectedIndex=i}\n";
+      $d.="i++;\n";
+   }
+   $d.="}\n";
+}
+$d.="if (mode=='onchange'){s.selectedIndex=0}\n";
+
+   return($d);
 }
 
 
@@ -441,8 +546,18 @@ sub checkParentWrite
 
    my @rw=$pobj->isWriteValid($prec);
    my $rw=0;
-   $rw=1 if (grep(/^interview$/,@rw));
+   $rw=1 if (grep(/^(interview|ALL)$/,@rw));
    return($rw);
+}
+
+sub getParentViewgroups
+{
+   my $self=shift;
+   my $pobj=shift;
+   my $prec=shift;
+
+   my @ro=$pobj->isViewValid($prec);
+   return(@ro);
 }
 
 sub checkAnserWrite
@@ -473,41 +588,37 @@ sub getHtmlEditElements
    my $iid=$irec->{id};
    my ($HTMLanswer,$HTMLrelevant,$HTMLcomments);
 
+   my $opmode="disabled";
    if ($write){
-      $HTMLrelevant="<select name=relevant onchange=submitChange(this) >".
-                    "<option value=\"1\">".
-                    $self->T("yes")."</option>";
-      if (defined($answer) && !($answer->{relevant})){
-         $HTMLrelevant.="<option selected value=\"0\">".
-                    $self->T("no")."</option>";
-      }
-      else{
-         $HTMLrelevant.="<option value=\"0\">".
-                     $self->T("no")."</option>";
-      }
-      $HTMLrelevant.="</select>";
+      $opmode="onchange=submitChange(this)";
+   }
+   
+   $HTMLrelevant="<select name=relevant $opmode >";
+   if (!defined($answer) && !$write){
+      $HTMLrelevant.="<option value=\"\">?</option>";
+   }
+
+   $HTMLrelevant.="<option value=\"1\">".$self->T("yes")."</option>";
+
+   if (defined($answer) && !($answer->{relevant})){
+      $HTMLrelevant.="<option selected value=\"0\">".
+                 $self->T("no")."</option>";
    }
    else{
-      if (defined($answer) && $answer->{relevant}){
-         $HTMLrelevant=$self->T("yes");
-      }
-      elsif (defined($answer) && !($answer->{relevant})){
-         $HTMLrelevant=$self->T("no");
-      }
-      else{
-         $HTMLrelevant="?";
-      }
+      $HTMLrelevant.="<option value=\"0\">".
+                  $self->T("no")."</option>";
    }
+   $HTMLrelevant.="</select>";
    $HTMLcomments="<table cellspacing=0 cellpadding=0><tr><td></td><td nowrap class=InterviewSubMenu>Frage an Fragen-Ansprechpartner</td><td nowrap class=InterviewSubMenu>&nbsp;&bull;&nbsp;</td><td nowrap class=InterviewSubMenu>Frage weitergeben</td></tr></table>";
    $HTMLcomments="";
-   $HTMLcomments.="<textarea name=comments onchange=submitChange(this) ".
-                 "rows=5 style=\"width:100%\">$answer->{comments}</textarea>";
+   $HTMLcomments.="<textarea name=comments $opmode ".
+                  "rows=5 style=\"width:100%\">".
+                  $answer->{comments}."</textarea>";
    $HTMLanswer=" - ? - ";
    if ($irec->{questtyp} eq "boolean" ||
        $irec->{questtyp} eq "booleana"){
       my $a=$answer->{answer};
-      my $sel="<select name=answer onchange=submitChange(this) ".
-              "style=\"width:80px\">";
+      my $sel="<select name=answer $opmode style=\"width:80px\">";
       
       $sel.="<option ";
       $sel.="value=\"\"></option>";
@@ -524,35 +635,48 @@ sub getHtmlEditElements
       my $p="<table class=Panswer><tr><td align=center>$sel</td></tr></table>";
       $HTMLanswer="<div style=\"width:100%;padding:1px;margin:0\">$p</div>";
    }
-   if ($irec->{questtyp} eq "percent" ||
+   if ($irec->{questtyp} eq "percent"  ||
+       $irec->{questtyp} eq "percent4" ||
        $irec->{questtyp} eq "percenta"){
-      my $a=int($answer->{answer}/10);
+      my $steps=10;
+      $steps=4 if ($irec->{questtyp} eq "percent4");
+      my $a=int($answer->{answer}/(100/$steps));
       my $p="";
-      my $sel="<select name=answer onchange=submitChange(this) ".
-              "style=\"width:55px\">";
-      for(my $c=0;$c<11;$c++){
+      my $sel="<select name=answer $opmode style=\"width:55px\">";
+      for(my $c=0;$c<$steps+1;$c++){
          $sel.="<option ";
          $sel.="selected " if ($c==$a);
-         $sel.="value=\"".($c*10)."\">".($c*10)."%</option>";
+         $sel.="value=\"".($c*(100/$steps))."\">".($c*(100/$steps)).
+               "%</option>";
          my $class="class=Pseg1";
          $class="class=Pseg0" if ($c>$a|| $a==0);
-         my $tdclass="class=Panswer";
-         if ($c==0){
-            $tdclass.=" style=\"width:5%\"";
+         my $w;
+         $w="width:9%" if ($steps==10);
+         $w="width:24%" if ($steps==4);
+         if ($c==0 && $steps==10){
+            $w="width:3%";
          }
+         if ($c==0 && $steps==4){
+            $w="width:3%";
+         }
+         my $tdclass="class=Panswer style=\"$w\"";
          
-         $p.="<td $tdclass><div onclick=setA('$iid',".($c*10).
+         $p.="<td $tdclass><div onclick=setA('$iid',".($c*(100/$steps)).
              ") $class></div></td>";
       }
       $sel.="</select>";
-      $p="<table class=Panswer><tr><td>$sel</td>$p</tr></table>";
+      $p="<table cellspacing=0 cellpadding=0 ".
+         "class=Panswer border=0><tr><td>$sel</td>$p</tr></table>";
       $HTMLanswer="<div style=\"width:100%;padding:1px;margin:0\">$p</div>";
    }
    elsif ($irec->{questtyp} eq "text"){
       my $p="<input style=\"width:100%\" ".
-            "type=text onchange=submitChange(this) name=answer ".
+            "type=text $opmode name=answer ".
             "value=\"$answer->{answer}\">";
       $HTMLanswer="<div style=\"width:100%;padding:1px;margin:0\">$p</div>";
+   }
+   if (defined($answer) && !($answer->{relevant})){
+      $HTMLanswer="&nbsp;";
    }
 
    return($HTMLanswer,$HTMLrelevant,$HTMLcomments);

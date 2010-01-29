@@ -63,40 +63,47 @@ sub InterviewSubForm
    my @q;
    foreach my $qrec (@{$state->{TotalActiveQuestions}}){
       my $d;
-      if ($queryblock eq $qrec->{queryblock}){
-         if (!defined($lastquestclust) ||
-             $lastquestclust ne $qrec->{questclust}){
-            $d.="<div class=InterviewQuestClust>$qrec->{questclust}</div>";
-            $d.="\n<div class=InterviewQuestHead>".
-                "<table border=0 class=InterviewQuestHead width=95%>".
-                "<tr><td class=InterviewQuestHead></td>".
-                "<td class=InterviewQuestHead width=50 align=center>".
-                "relevant</td>".
-                "<td class=InterviewQuestHead width=180 ".
-                "align=center>".$self->T("answer","base::interanswer")."</td>".
-                "</tr></table></div>";
+      if ($qrec->{AnswerViewable}){
+         if ($queryblock eq $qrec->{queryblock}){
+            if (!defined($lastquestclust) ||
+                $lastquestclust ne $qrec->{questclust}){
+               $d.="<div class=InterviewQuestClust>$qrec->{questclust}</div>";
+               $d.="\n<div class=InterviewQuestHead>".
+                   "<table border=0 class=InterviewQuestHead width=95%>".
+                   "<tr><td class=InterviewQuestHead></td>".
+                   "<td class=InterviewQuestHead width=50 align=center>".
+                   "relevant</td>".
+                   "<td class=InterviewQuestHead width=180 ".
+                   "align=center valign=top>".
+                   $self->T("answer","base::interanswer").
+                   "</td>".
+                   "</tr></table></div>";
+            }
+            $d.="\n<div class=InterviewQuest><form name=\"F$qrec->{id}\">".
+                "<table class=InterviewQuest width=95% 
+                  border=0 >".
+                "<tr><td><div onclick=switchExt($qrec->{id})>".
+                $qrec->{name}."</div>".
+                "</td><td width=50 nowrap valign=top>".
+                "<div id=relevant$qrec->{id}>$qrec->{HTMLrelevant}</div></td>".
+                "<td width=180 nowrap valign=top>".
+                "<div class=InterviewQuestAnswer ".
+                "id=answer$qrec->{id}>$qrec->{HTMLanswer}</div></td>".
+                "<td width=1% align=center valign=top>".
+                "<div class=qhelp onclick=qhelp($qrec->{id})><img border=0 ".
+                "src=\"../../../public/base/load/questionmark.gif\">".
+                "</div></td>".
+                "</tr>".
+                "<tr><td colspan=4>".
+                "<div id=EXT$qrec->{id} ".
+                "style=\"display:none;visibility:hidden\">".
+                "<div id=comments$qrec->{id}>$qrec->{HTMLcomments}</div>".
+                "</div></td>".
+                "</tr></table></form></div>";
+            push(@q,$d);
+            $lastquestclust=$qrec->{questclust};
+            $lastquestclust="" if (!defined($lastquestclust));
          }
-         $d.="\n<div class=InterviewQuest><form name=\"F$qrec->{id}\">".
-             "<table class=InterviewQuest width=95% 
-               border=0 cellspacing=0 cellpadding=0>".
-             "<tr><td><div onclick=switchExt($qrec->{id})>$qrec->{name}</div>".
-             "</td><td width=50 valign=top>".
-             "<div id=relevant$qrec->{id}>$qrec->{HTMLrelevant}</div></td>".
-             "<td width=180 nowrap valign=top>".
-             "<div class=InterviewQuestAnswer ".
-             "id=answer$qrec->{id}>$qrec->{HTMLanswer}</div></td>".
-             "<td width=1% align=center valign=center>".
-             "<div class=qhelp onclick=qhelp($qrec->{id})><img border=0 ".
-             "src=\"../../../public/base/load/questionmark.gif\"></div></td>".
-             "</tr>".
-             "<tr><td colspan=4>".
-             "<div id=EXT$qrec->{id} style=\"display:none;visibility:hidden\">".
-             "<div id=comments$qrec->{id}>$qrec->{HTMLcomments}</div>".
-             "</div></td>".
-             "</tr></table></form></div>";
-         push(@q,$d);
-         $lastquestclust=$qrec->{questclust};
-         $lastquestclust="" if (!defined($lastquestclust));
       }
    }
    print $self->HttpHeader("text/xml");
@@ -105,6 +112,17 @@ sub InterviewSubForm
    #print STDERR $res;
 }
 
+
+sub InterviewPartners
+{
+   my $self=shift;
+   my $rec=shift;
+
+
+   return(''=>$self->T("Databoss",$self->Self)) if (!defined($rec));
+   return(''=>[$rec->{'databossid'}]) if (exists($rec->{'databossid'}));
+   return(''=>[]);
+}
 
 sub InterviewMainForm
 {

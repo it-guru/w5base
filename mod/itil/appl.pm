@@ -20,6 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::App::Web;
+use kernel::App::Web::InterviewLink;
 use kernel::DataObj::DB;
 use kernel::Field;
 use kernel::CIStatusTools;
@@ -842,7 +843,12 @@ sub InterviewPartners
    my $rec=shift;
 
 
-   return(''=>$self->T("databoss")) if (!defined($rec));
+   return(''=>$self->T("Databoss"),
+          'SystemTechContact'=>'SystemTechContact',
+          'InfraClimaContact'=>'InfraClimaContact',
+          'InfraPowerContact'=>'InfraPowerContact',
+          'InfraIPNetContact'=>'InfraIPNetContact',
+          'InfrastrucContact'=>'InfrastrucContact') if (!defined($rec));
    return(''=>[$rec->{'databossid'}]) if (exists($rec->{'databossid'}));
    return(''=>[]);
 }

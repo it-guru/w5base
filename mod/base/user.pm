@@ -20,12 +20,16 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::App::Web;
+use kernel::App::Web::InterviewLink;
 use kernel::DataObj::DB;
 use kernel::Field;
 use DateTime::TimeZone;
 use base::workflow::mailsend;
 use kernel::CIStatusTools;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::CIStatusTools);
+@ISA=qw(kernel::App::Web::Listedit 
+        kernel::DataObj::DB 
+        kernel::App::Web::InterviewLink
+        kernel::CIStatusTools);
 
 
 
@@ -582,6 +586,7 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'contact.comments'),
 
+      new kernel::Field::Interview(),
       new kernel::Field::QualityText(),
       new kernel::Field::QualityState(),
       new kernel::Field::QualityOk(),
@@ -944,6 +949,27 @@ sub isViewValid
       }
      
    }
+   if ($userid==$rec->{userid}){
+      push(@gl,"personrelated");
+   }
+   else{
+      # check if the user has a direct boss
+      my $g=$self->getField("groups")->RawValue($rec);
+      if (ref($g) eq "ARRAY"){
+         foreach my $grp (@$g){
+            if (ref($grp->{roles}) eq "ARRAY"){
+               foreach my $orole ($self->orgRoles()){
+                  if (grep(/^$orole$/,@{$grp->{roles}})){
+                     if ($self->IsMemberOf($grp->{grpid},["RBoss"],"direct")){
+                        push(@gl,"personrelated","private");
+                        last;
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
  
 
    return(@gl);
@@ -983,13 +1009,14 @@ sub isWriteValid
    return(undef) if (!defined($rec));
    if ($self->IsMemberOf("admin")){
       return(qw(default name office private userparam groups usersubst control
-                comments header picture nativcontact userro));
+                comments header picture nativcontact userro
+                interview));
    }
    my $userid=$self->getCurrentUserId();
    if ($userid eq $rec->{userid} ||
        ($rec->{creator}==$userid && $rec->{cistatusid}<3)){
       return("name","userparam","office","officeacc","private","nativcontact",
-             "usersubst","control","officeacc");
+             "usersubst","control","officeacc","interview");
    }
    return(undef);
 }

@@ -27,6 +27,7 @@ sub new
 {
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
+   $self->{'AllowInput'}=1 if (!exists($self->{'AllowInput'}));
    return($self);
 }
 
@@ -55,10 +56,19 @@ sub FormatedDetail
       my $targeturl=$self->{vjointo};
       $targeturl=~s/::/\//;
       $targeturl="../../$targeturl/Result";
+      my $addparam="";
+      if (defined($self->{vjoineditbase}) &&
+          ref($self->{vjoineditbase}) eq "HASH"){
+         foreach my $k (keys(%{$self->{vjoineditbase}})){
+            $addparam.="search_".$k.": function() { return('".
+                        $self->{vjoineditbase}->{$k}."')},";
+         }
+      }
       my $disp=$self->{vjoindisp};
       $input.=<<EOF;
 <script language=JavaScript>
-\$(document).ready(function(){
+function FlexBox_Init_$name()
+{
    \$("#$name").autocomplete("$targeturl", {
       max:50,
       mustMatch: true,
@@ -68,9 +78,14 @@ sub FormatedDetail
           CurrentView: '($disp)',
           UseLimit: '40',
           UseLimitStart: '0',
+          AllowInput: '$self->{'AllowInput'}',
+          $addparam
           search_$disp: function() { return \$("#$name").val()+"*"; }
       }
    });
+}
+\$(document).ready(function(){
+   FlexBox_Init_$name();
 });
 </script>
 EOF

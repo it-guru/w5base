@@ -30,6 +30,7 @@ sub new
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
    $self->{_permitted}->{jsonchanged}=1;      # On Changed Handling
+   $self->{_permitted}->{jsoninit}=1;      # On Init Handling
    $self->{allownative}=undef if (!exists($self->{allownative}));
    return($self);
 }
@@ -121,15 +122,15 @@ sub FormatedDetail
       my $disabled="";
 
 
-      my $s="<select name=Formated_$name";
+      my $s="<select id=\"$name\" name=\"Formated_$name\"";
       if ($self->{multisize}>0){
          $s.=" multiple";
-         $s.=" size=$self->{multisize}";
+         $s.=" size=\"$self->{multisize}\"";
       }
       if (defined($self->{jsonchanged})){
          $s.=" onchange=\"jsonchanged_$name('onchange');\"";
       }
-      $s.=" class=finput style=\"width:$width\">";
+      $s.=" class=\"finput\" style=\"width:$width\">";
       my @options=$self->getPostibleValues($current,undef,"edit");
       while($#options!=-1){
          my $key=shift(@options);

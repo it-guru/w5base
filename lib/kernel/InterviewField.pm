@@ -36,9 +36,11 @@ sub getTotalActiveQuestions
    $i->SetFilter({parentobj=>\$parentobj,
                   cistatusid=>[3,4]});
    my $pwrite=$i->checkParentWrite($p,$rec);
+   my @viewlist=$i->getParentViewgroups($p,$rec);
    my @l;
    foreach my $irec ($i->getHashList(qw(queryblock questclust 
                                         qtag id name qname prio
+                                        boundpviewgroup
                                         questtyp restriction))){
       my $restok=1;
       if ($irec->{restriction} ne ""){
@@ -54,9 +56,19 @@ sub getTotalActiveQuestions
          my ($HTMLanswer,$HTMLrelevant,$HTMLcomments)=
             $i->getHtmlEditElements($write,$irec,
                          $answered->{interviewid}->{$irec->{id}},$p,$rec);
-         $irec->{HTMLanswer}=$HTMLanswer;
-         $irec->{HTMLrelevant}=$HTMLrelevant;
-         $irec->{HTMLcomments}=$HTMLcomments;
+         $irec->{'HTMLanswer'}=$HTMLanswer;
+         $irec->{'HTMLrelevant'}=$HTMLrelevant;
+         $irec->{'HTMLcomments'}=$HTMLcomments;
+         $irec->{'AnswerViewable'}=1;
+         if ($irec->{boundpviewgroup} ne ""){
+            my $q=quotemeta($irec->{boundpviewgroup});
+            if (!grep(/^$q$/,@viewlist)){
+               $irec->{'AnswerViewable'}=0;
+               $irec->{'HTMLanswer'}="-";
+               $irec->{'HTMLrelevant'}="-";
+               $irec->{'HTMLcomments'}="-";
+            }
+         }
          push(@l,$irec);
       }
    }

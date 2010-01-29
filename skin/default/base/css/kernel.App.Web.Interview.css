@@ -86,12 +86,15 @@ div.header{
 }
 
 div.qhelp{
+   margin-top:5px;
    margin-left:2px;
    cursor: pointer;
 }
 
 div.InterviewQuestAnswer
 {
+   margin:0px;
+   padding:0px;
    margin-left:5px;
 }
 
@@ -102,7 +105,6 @@ table.Panswer {
 td.Panswer {
    margin:0px;
    padding:0px;
-   width:9%;
 }
 div.Pseg1{
    width:100%;height:20px;
