@@ -22,6 +22,15 @@ sub __like
    $v2=~s/\\\*/.*/g;
    $v2=~s/_/./g;
 
+   my $found=0;
+   if (ref($v1) eq "ARRAY"){
+      foreach my $rec (@$v1){
+         my $v1=$rec;
+         if ($v1=~m/^$v2$/i){
+            return(1);
+         }
+      }
+   }
    if ($v1=~m/^$v2$/i){
       return(1);
    }
