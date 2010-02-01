@@ -175,6 +175,11 @@ sub Init
    $self->RegisterObj("itil.system.lnksystemcontact",
                       "itil::lnksystemcontact",
                       defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itil.system.lnksysteminteranswer",
+                      "itil::lnksysteminteranswer",
+                      defaultacl=>['valid_user']);
+
    
    $self->RegisterObj("itil.asset",
                       "itil::asset",

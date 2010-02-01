@@ -25,6 +25,7 @@
 'AL_TCom.system.lnksystemcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
 'AL_TCom.system.software'=>{de=>'Softwarezuordnung',en=>'Softwarerelation'},
 'AL_TCom.system.software.new'=>{de=>'Neueingabe',en=>'New'},
+'AL_TCom.system.lnksysteminteranswer'=>{de=>'Interview',en=>'Interview'},
 'AL_TCom.asset'=>{de=>'Hardware',en=>'Hardware'},
 'AL_TCom.asset.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.asset.lnkassetcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
