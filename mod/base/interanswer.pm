@@ -439,6 +439,33 @@ sub Store
 }
 
 
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if (!$self->IsMemberOf("admin")){
+      my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+                                  [$self->orgRoles()],"direct");
+      my $lnkgrp=getModuleObject($self->Config,"base::lnkgrpuser");
+
+      $lnkgrp->SetFilter({grpid=>[keys(%grps)]});
+      my $d=$lnkgrp->getHashIndexed(qw(userid));
+      my @user;
+      push(@user,keys(%{$d->{userid}})) if (ref($d->{userid}) eq "HASH");
+      my $userid=$self->getCurrentUserId();
+      push(@user,$userid) if ($userid ne "");
+      if ($#user==-1){
+         push(@user,-99);
+      }
+      push(@flt,[ {owner=>\@user}]);   # only answers from me or my team
+   }
+   return($self->SetFilter(@flt));
+}
+
+
+
+
 
 
 

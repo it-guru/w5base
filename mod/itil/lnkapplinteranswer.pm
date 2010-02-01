@@ -79,6 +79,15 @@ sub SecureSetFilter
    return($self->SetFilter(@flt));
 }
 
+sub isViewValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return("ALL"); 
+}
+
+
+
 
 
 sub getSqlFrom

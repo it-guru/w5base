@@ -89,6 +89,8 @@ sub SecureSetFilter
       my $d=$lnkgrp->getHashIndexed(qw(userid));
       my @user;
       push(@user,keys(%{$d->{userid}})) if (ref($d->{userid}) eq "HASH");
+      my $userid=$self->getCurrentUserId();
+      push(@user,$userid) if ($userid ne "");
       if ($#user==-1){
          push(@user,-99);
       }
@@ -97,6 +99,12 @@ sub SecureSetFilter
    return($self->SetFilter(@flt));
 }
 
+sub isViewValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return("ALL");
+}
 
 
 sub getSqlFrom
