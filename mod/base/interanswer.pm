@@ -394,6 +394,7 @@ sub Store
    my $qid=Query->Param("qid");
    my $vname=Query->Param("vname");
    my $vval=Query->Param("vval");
+   $vval=UTF8toLatin1($vval);
 
    my $i=getModuleObject($self->Config,"base::interview");
    printf STDERR ("\n\nAjaxStore: qid=$qid parentid=$parentid ".

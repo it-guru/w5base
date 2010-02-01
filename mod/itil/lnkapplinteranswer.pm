@@ -45,12 +45,38 @@ sub new
                 dataobjattr   =>'appl.name'),
       insertafter=>'id'
    );
+   $self->AddFields(
+      new kernel::Field::Mandator(),
+
+      new kernel::Field::Link(
+                name          =>'mandatorid',
+                dataobjattr   =>'appl.mandator')
+   );
+
+
    $self->getField("parentobj")->{searchable}=0;
    $self->getField("parentid")->{searchable}=0;
    $self->{secparentobj}='itil::appl';
    $self->setDefaultView(qw(parentname name answer mdate editor));
    return($self);
 }
+
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if (!$self->IsMemberOf([qw(admin w5base.itil.appl.read w5base.itil.read)],
+                          "RMember")){
+      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
+      push(@flt,[
+                 {mandatorid=>\@mandators}
+                ]);
+   }
+   return($self->SetFilter(@flt));
+}
+
+
 
 sub getSqlFrom
 {

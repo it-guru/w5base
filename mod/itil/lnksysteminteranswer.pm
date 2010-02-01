@@ -30,6 +30,18 @@ sub new
 
    $self->AddFields(
       new kernel::Field::TextDrop(
+                name          =>'systemidname',
+                htmlwidth     =>'100px',
+                readonly      =>1,
+                label         =>'SystemID',
+                vjointo       =>'itil::system',
+                vjoinon       =>['parentid'=>'id'],
+                vjoindisp     =>'name',
+                dataobjattr   =>'system.systemid'),
+      insertafter=>'id'
+   );
+   $self->AddFields(
+      new kernel::Field::TextDrop(
                 name          =>'parentname',
                 htmlwidth     =>'100px',
                 readonly      =>1,
@@ -41,23 +53,35 @@ sub new
       insertafter=>'id'
    );
    $self->AddFields(
-      new kernel::Field::TextDrop(
-                name          =>'systemidname',
-                htmlwidth     =>'100px',
-                readonly      =>1,
-                label         =>'SystemID',
-                vjointo       =>'itil::system',
-                vjoinon       =>['parentid'=>'id'],
-                vjoindisp     =>'name',
-                dataobjattr   =>'system.systemid'),
-      insertafter=>'id'
+      new kernel::Field::Mandator(),
+
+      new kernel::Field::Link(
+                name          =>'mandatorid',
+                dataobjattr   =>'system.mandator')
    );
+
    $self->getField("parentobj")->{searchable}=0;
    $self->getField("parentid")->{searchable}=0;
    $self->{secparentobj}='itil::system';
    $self->setDefaultView(qw(parentname name answer mdate editor));
    return($self);
 }
+
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+   
+   if (!$self->IsMemberOf([qw(admin w5base.itil.system.read w5base.itil.read)],
+                          "RMember")){
+      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
+      push(@flt,[
+                 {mandatorid=>\@mandators}
+                ]);
+   }
+   return($self->SetFilter(@flt));
+}
+
 
 sub getSqlFrom
 {
