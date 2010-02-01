@@ -112,6 +112,10 @@ sub Init
                       "base::lnkcontact",
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("sysadm.user.lnkuserinteranswer",
+                      "base::lnkuserinteranswer",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("sysadm.useraccount",
                       "base::useraccount",
                       defaultacl=>['admin']);

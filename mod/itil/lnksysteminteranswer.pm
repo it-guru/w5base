@@ -36,6 +36,7 @@ sub new
                 label         =>'SystemID',
                 vjointo       =>'itil::system',
                 vjoinon       =>['parentid'=>'id'],
+                uploadable    =>0,
                 vjoindisp     =>'name',
                 dataobjattr   =>'system.systemid'),
       insertafter=>'id'
@@ -44,7 +45,12 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'parentname',
                 htmlwidth     =>'100px',
-                readonly      =>1,
+                readonly      =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return(1) if (defined($current));
+                   return(0);
+                },
                 label         =>'System',
                 vjointo       =>'itil::system',
                 vjoinon       =>['parentid'=>'id'],
@@ -53,10 +59,13 @@ sub new
       insertafter=>'id'
    );
    $self->AddFields(
-      new kernel::Field::Mandator(),
+      new kernel::Field::Mandator(
+                group         =>'relation'),
 
       new kernel::Field::Link(
                 name          =>'mandatorid',
+                group         =>'relation',
+                readonly      =>1,
                 dataobjattr   =>'system.mandator')
    );
 

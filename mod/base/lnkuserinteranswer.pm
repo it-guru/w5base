@@ -1,4 +1,4 @@
-package itil::lnkapplinteranswer;
+package base::lnkuserinteranswer;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -30,6 +30,19 @@ sub new
 
    $self->AddFields(
       new kernel::Field::TextDrop(
+                name          =>'parentposix',
+                htmlwidth     =>'100px',
+                readonly      =>1,
+                translation   =>'base::user',
+                label         =>'POSIX-Identifier',
+                vjointo       =>'base::user',
+                vjoinon       =>['parentid'=>'userid'],
+                vjoindisp     =>'fullname',
+                dataobjattr   =>'contact.posix_identifier'),
+      insertafter=>'id'
+   );
+   $self->AddFields(
+      new kernel::Field::TextDrop(
                 name          =>'parentname',
                 htmlwidth     =>'100px',
                 readonly      =>sub{
@@ -38,29 +51,27 @@ sub new
                    return(1) if (defined($current));
                    return(0);
                 },
-                label         =>'Application',
-                vjointo       =>'itil::appl',
-                vjoinon       =>['parentid'=>'id'],
-                vjoindisp     =>'name',
-                dataobjattr   =>'appl.name'),
+                label         =>'Contact',
+                vjointo       =>'base::user',
+                vjoinon       =>['parentid'=>'userid'],
+                vjoindisp     =>'fullname',
+                dataobjattr   =>'contact.fullname'),
       insertafter=>'id'
    );
    $self->AddFields(
-      new kernel::Field::Mandator(
-                group         =>'relation'),
-
       new kernel::Field::Link(
-                name          =>'mandatorid',
-                group         =>'relation',
+                name          =>'userid',
                 readonly      =>1,
-                dataobjattr   =>'appl.mandator')
+                label         =>'UserID',
+                dataobjattr   =>'contact.userid'),
+      insertafter=>'id'
    );
 
 
    $self->getField("parentobj")->{searchable}=0;
    $self->getField("parentid")->{searchable}=0;
-   $self->{secparentobj}='itil::appl';
-   $self->setDefaultView(qw(parentname name answer mdate editor));
+   $self->{secparentobj}='base::user';
+   $self->setDefaultView(qw(parentname parentposix name answer mdate editor));
    return($self);
 }
 
@@ -69,12 +80,19 @@ sub SecureSetFilter
    my $self=shift;
    my @flt=@_;
 
-   if (!$self->IsMemberOf([qw(admin w5base.itil.appl.read w5base.itil.read)],
-                          "RMember")){
-      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
-      push(@flt,[
-                 {mandatorid=>\@mandators}
-                ]);
+   if (!$self->IsMemberOf("admin")){
+      my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+                                  [$self->orgRoles()],"direct");
+      my $lnkgrp=getModuleObject($self->Config,"base::lnkgrpuser");
+     
+      $lnkgrp->SetFilter({grpid=>[keys(%grps)]});
+      my $d=$lnkgrp->getHashIndexed(qw(userid));
+      my @user;
+      push(@user,keys(%{$d->{userid}})) if (ref($d->{userid}) eq "HASH");
+      if ($#user==-1){
+         push(@user,-99);
+      }
+      push(@flt,[ {userid=>\@user}]);
    }
    return($self->SetFilter(@flt));
 }
@@ -87,7 +105,7 @@ sub getSqlFrom
    my ($worktable,$workdb)=$self->getWorktable();
    my $j=$self->SUPER::getSqlFrom();
 
-   return("$j join appl on $worktable.parentid=appl.id");
+   return("$j join contact on $worktable.parentid=contact.userid");
 }
 
 
