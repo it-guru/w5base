@@ -299,7 +299,7 @@ sub InitRequest
                    $substuser,$self->Self);
       }
    }
-   $self->Log(INFO,"query","$ENV{REMOTE_USER}:query:%s",Query->QueryString());
+   $self->Log(INFO,"query","$ENV{REMOTE_USER} query:%s",Query->QueryString());
    ######################
    return($self->ValidateCaches());
 }
