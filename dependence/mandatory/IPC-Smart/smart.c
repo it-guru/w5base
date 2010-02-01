@@ -156,7 +156,6 @@ Node *_add_segment(Share *share) {
   if ((node = (Node *) malloc(sizeof(Node))) == NULL) 
     return NULL; 
   node->next = NULL;
-printf("fifi01 shmid=%d\n",node->shmid);
 
   /* Does another shared memory segment already exist? */
   if (share->tail->shmaddr->next_shmid >= 0) { 
@@ -168,12 +167,10 @@ printf("fifi01 shmid=%d\n",node->shmid);
     return node;
   }
 
-printf("fifi02\n");
   flags = share->flags|IPC_CREAT|IPC_EXCL;
 
   /* We need to create a new segment */
   while(1) {
-printf("fifi03\n");
     node->shmid = shmget(IPC_PRIVATE, share->segment_size, flags);
 
     if ((node->shmaddr = (Header *) shmat(node->shmid, (char *) 0, 0)) == (Header *) -1) return NULL;
@@ -185,16 +182,13 @@ printf("fifi03\n");
     if (errno == EEXIST) continue;
 #endif
     return NULL;                            
-printf("fifi04\n");
   } 
 
-printf("fifi05\n");
   share->tail->shmaddr->next_shmid = node->shmid; 
   share->tail->next = node;
   share->tail = node;
   node->shmaddr->next_shmid = -1;
   node->shmaddr->length     = 0;
-printf("fifi06\n");
 
   return node;
 }

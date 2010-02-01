@@ -260,7 +260,7 @@ CREATE TABLE interviewcat (
   id bigint(20) NOT NULL default '0',
   parentid bigint(20),
   fullname varchar(128) NOT NULL default '',
-  name varchar(30) NOT NULL default '',
+  name varchar(40) NOT NULL default '',
    comments blob,
    srcsys varchar(20) default NULL,
    srcid varchar(20) default NULL,

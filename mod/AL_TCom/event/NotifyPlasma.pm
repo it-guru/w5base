@@ -50,6 +50,7 @@ sub NotifyPlasma
    delete($ENV{HTTP_PROXY});
    delete($ENV{http_proxy});
 
+   msg(DEBUG,"NotifyPlasma: start of NotifyPlasma");
    my $wsproxy=$self->Config->Param("WEBSERVICEPROXY");
    $wsproxy=$wsproxy->{plasma} if (ref($wsproxy) eq "HASH");
    return({exitcode=>0,msg=>'ok - no interface defined'}) if ($wsproxy eq "");
@@ -66,7 +67,7 @@ sub NotifyPlasma
    }
 
 
-   msg(DEBUG,"wsproxy='%s'",$wsproxy);
+   msg(DEBUG,"NotifyPlasma: wsproxy='%s'",$wsproxy);
    if ($param{'op'} eq "ins"){
    #   printf STDERR ("fifi param=%s\n",Dumper(\%param));
 
@@ -91,6 +92,7 @@ sub NotifyPlasma
       return({exitcode=>11,
               msg=>'no data specified'});
    }
+   msg(DEBUG,"NotifyPlasma: call ready");
    my $soap=SOAP::Lite->proxy($wsproxy)
             ->on_action(sub{'"urn:PegaRULES:SOAP:DTAGZBBCPLASMADarwinTrigger:'.
                             'DarwinTriggerMain#CreateNewWork"'});
@@ -104,8 +106,10 @@ sub NotifyPlasma
 
    if ($res->fault){
       my $fstring=$res->fault->{faultstring};
+      msg(DEBUG,$fstring);
+      $fstring=~s/\n/  /g;
       $self->Log(ERROR,"trigger","Plasma: WF:%d = %s ",$param{id},$fstring);
-      return({exitcode=>2,msg=>$fstring});
+      return({exitcode=>2,msg=>"unexpected result from Plasma"});
    }
 
 

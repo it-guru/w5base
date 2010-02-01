@@ -436,7 +436,7 @@ sub Validate
    if (!ref($newrec->{$self->Name()}) &&
        $self->Type() ne "File"){
       my $txt=trim($newrec->{$self->Name()});
-      $txt=~s/[^\ta-z0-9,:;\!"#\\\?\-\/<>\._\&\(\)\{\}= цдья\|\*'\$\І\%]//i;
+      $txt=~s/[^\ta-z0-9,:;\!"#\\\?\-\/<>\._\&\(\)\{\}= цдья\|\@\^\*'\$\І\%]//i;
       return({$self->Name()=>$txt});
    }
    return({$self->Name()=>$newrec->{$self->Name()}});

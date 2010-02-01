@@ -1233,7 +1233,7 @@ sub isWriteValid
 
    my @databossedit=qw(default software admin logsys contacts misc opmode 
                        physys ipaddresses phonenumbers sec
-                       attachments control systemclass);
+                       attachments control systemclass interview);
    if (!defined($rec)){
       return("default","physys","admin","misc",
              "opmode","control","systemclass","sec");

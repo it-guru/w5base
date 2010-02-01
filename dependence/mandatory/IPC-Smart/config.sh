@@ -8,9 +8,9 @@
 
 # Package name      : IPC-ShareLite
 # Source directory  : .
-# Configuration time: Wed Aug  6 12:38:35 CEST 2008
-# Configured by     : basedowh
-# Target system     : linux w8n00226 2.6.18-6-686 #1 smp tue jun 17 21:31:27 utc 2008 i686 gnulinux 
+# Configuration time: Fri Jan 22 15:44:39 CET 2010
+# Configured by     : voglerh
+# Target system     : linux e8npnu08 2.6.18-xen #1 smp fri jun 1 15:01:20 bst 2007 i686 gnulinux 
 
 Author=''
 Date=''
@@ -31,8 +31,8 @@ bison=''
 byacc=''
 c=''
 cat='/bin/cat'
-cf_by='basedowh'
-cf_time='Wed Aug  6 12:38:35 CEST 2008'
+cf_by='voglerh'
+cf_time='Fri Jan 22 15:44:39 CET 2010'
 chgrp=''
 chmod=''
 chown=''
@@ -97,7 +97,7 @@ mips_type=''
 mkdir=''
 more=''
 mv=''
-myuname='linux w8n00226 2.6.18-6-686 #1 smp tue jun 17 21:31:27 utc 2008 i686 gnulinux '
+myuname='linux e8npnu08 2.6.18-xen #1 smp fri jun 1 15:01:20 bst 2007 i686 gnulinux '
 n=''
 nm_opt=''
 nm_so_opt='--dynamic'
