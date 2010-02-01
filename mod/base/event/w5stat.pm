@@ -37,7 +37,7 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("w5stat","w5stat",timeout=>3600);
+   $self->RegisterEvent("w5stat","w5stat",timeout=>7200);
    $self->RegisterEvent("w5statsend","w5statsend");
    return(1);
 }
