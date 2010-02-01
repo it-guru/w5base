@@ -1,0 +1,18 @@
+#!/bin/bash
+LOG="/var/log/w5base/w5base.query.log"
+
+ps -eo "%C %p  %c" | egrep ' (acache|apache2)$' | sort -n -r | \
+while read l; do
+   set -- $l
+   PRO=$1
+   PID=$2
+   NAM=$3
+   L=`tail -n 10000 $LOG | grep "\\[$PID\\]" | tail -n 1`
+   set -- $L
+   DAT=$1
+   USR=$4
+   printf "%-10s %-6s %-5s %-15s %s %s\n" $NAM $PID $PRO $DAT $USR
+   
+
+done
+
