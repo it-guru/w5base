@@ -844,11 +844,11 @@ sub InterviewPartners
 
 
    return(''=>$self->T("Databoss"),
-          'SystemTechContact'=>'SystemTechContact',
-          'InfraClimaContact'=>'InfraClimaContact',
-          'InfraPowerContact'=>'InfraPowerContact',
-          'InfraIPNetContact'=>'InfraIPNetContact',
-          'InfrastrucContact'=>'InfrastrucContact') if (!defined($rec));
+          'INTERVSystemTechContact'=>'SystemTechContact',
+          'INTERVInfraClimaContact'=>'InfraClimaContact',
+          'INTERVInfraPowerContact'=>'InfraPowerContact',
+          'INTERVInfraIPNetContact'=>'InfraIPNetContact',
+          'INTERVInfrastrucContact'=>'InfrastrucContact') if (!defined($rec));
    return(''=>[$rec->{'databossid'}]) if (exists($rec->{'databossid'}));
    return(''=>[]);
 }

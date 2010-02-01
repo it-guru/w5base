@@ -611,13 +611,15 @@ sub getHtmlEditElements
    $HTMLrelevant.="</select>";
    $HTMLcomments="<table cellspacing=0 cellpadding=0><tr><td></td><td nowrap class=InterviewSubMenu>Frage an Fragen-Ansprechpartner</td><td nowrap class=InterviewSubMenu>&nbsp;&bull;&nbsp;</td><td nowrap class=InterviewSubMenu>Frage weitergeben</td></tr></table>";
    $HTMLcomments="";
+   my $txt="";
+   $txt=quoteHtml($answer->{comments}) if (defined($answer));
    $HTMLcomments.="<textarea name=comments $opmode ".
-                  "rows=5 style=\"width:100%\">".
-                  $answer->{comments}."</textarea>";
+                  "rows=5 style=\"width:100%\">".$txt."</textarea>";
    $HTMLanswer=" - ? - ";
    if ($irec->{questtyp} eq "boolean" ||
        $irec->{questtyp} eq "booleana"){
-      my $a=$answer->{answer};
+      my $a="";
+      $a=$answer->{answer} if (defined($answer));
       my $sel="<select name=answer $opmode style=\"width:80px\">";
       
       $sel.="<option ";
@@ -640,7 +642,8 @@ sub getHtmlEditElements
        $irec->{questtyp} eq "percenta"){
       my $steps=10;
       $steps=4 if ($irec->{questtyp} eq "percent4");
-      my $a=int($answer->{answer}/(100/$steps));
+      my $a=0;
+      $a=int($answer->{answer}/(100/$steps)) if (defined($answer));
       my $p="";
       my $sel="<select name=answer $opmode style=\"width:55px\">";
       for(my $c=0;$c<$steps+1;$c++){
@@ -670,9 +673,10 @@ sub getHtmlEditElements
       $HTMLanswer="<div style=\"width:100%;padding:1px;margin:0\">$p</div>";
    }
    elsif ($irec->{questtyp} eq "text"){
+      my $txt="";
+      $txt=quoteHtml($answer->{answer}) if (defined($answer));
       my $p="<input style=\"width:100%\" ".
-            "type=text $opmode name=answer ".
-            "value=\"$answer->{answer}\">";
+            "type=text $opmode name=answer value=\"".$txt."\">";
       $HTMLanswer="<div style=\"width:100%;padding:1px;margin:0\">$p</div>";
    }
    if (defined($answer) && !($answer->{relevant})){

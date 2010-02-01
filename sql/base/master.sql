@@ -293,3 +293,5 @@ create table mandatordataacl(
   PRIMARY KEY  (id),KEY m(parentobj,mandator),key (prio)
 );
 alter table mandator add key(grpid);
+alter table interview add boundpviewgroup varchar(40) default NULL;
+alter table interview add boundpcontact   varchar(40) default NULL;

@@ -351,7 +351,13 @@ sub getAnswerWriteState
    my $parentobj=shift;
 
    $i->ResetFilter();
-   $i->SetFilter({id=>\$qid});
+   my $idfield=$i->IdField();
+   if (!defined($idfield)){
+      msg(ERROR,"havy error - no IdField in $i");
+      exit(1);
+   }
+   my $idname=$idfield->Name();
+   $i->SetFilter({$idname=>\$qid});
    my ($irec,$msg)=$i->getOnlyFirst(qw(ALL));
    if ($parentobj eq ""){
       $parentobj=$irec->{parentobj};
@@ -365,7 +371,15 @@ sub getAnswerWriteState
 
    my $p=getModuleObject($self->Config,$parentobj);
    return(0,$irec,$oldrec,undef) if (!defined($p));
-   $p->SetFilter({id=>\$parentid});
+
+   my $idfield=$p->IdField();
+   if (!defined($idfield)){
+      msg(ERROR,"havy error - no IdField in $i");
+      exit(1);
+   }
+   my $idname=$idfield->Name();
+
+   $p->SetFilter({$idname=>\$parentid});
    my ($rec,$msg)=$p->getOnlyFirst(qw(ALL));
 
    my $pwrite=$i->checkParentWrite($p,$rec);

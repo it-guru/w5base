@@ -76,7 +76,7 @@ sub InterviewSubForm
                    "<td class=InterviewQuestHead width=180 ".
                    "align=center valign=top>".
                    $self->T("answer","base::interanswer").
-                   "</td>".
+                   "</td><td width=1%>&nbsp;&nbsp;</td>".
                    "</tr></table></div>";
             }
             $d.="\n<div class=InterviewQuest><form name=\"F$qrec->{id}\">".

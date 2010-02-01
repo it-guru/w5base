@@ -559,6 +559,16 @@ sub new
                 vjoindisp     =>['group','grpweblink','roles'],
                 vjoininhash   =>['group','grpid','roles','cdate']),
 
+      new kernel::Field::Text(
+                name          =>'groupnames',
+                label         =>'Groupnames',
+                group         =>'groups',
+                htmldetail    =>0,
+                readonly      =>1,
+                vjointo       =>'base::lnkgrpuser',
+                vjoinon       =>['userid'=>'userid'],
+                vjoindisp     =>['group']),
+
       new kernel::Field::SubList(
                 name          =>'roles',
                 label         =>'Roles',
@@ -1017,6 +1027,22 @@ sub isWriteValid
        ($rec->{creator}==$userid && $rec->{cistatusid}<3)){
       return("name","userparam","office","officeacc","private","nativcontact",
              "usersubst","control","officeacc","interview");
+   }
+   # check if the user has a direct boss
+   my $g=$self->getField("groups")->RawValue($rec);
+   if (ref($g) eq "ARRAY"){
+      foreach my $grp (@$g){
+         if (ref($grp->{roles}) eq "ARRAY"){
+            foreach my $orole ($self->orgRoles()){
+               if (grep(/^$orole$/,@{$grp->{roles}})){
+                  if ($self->IsMemberOf($grp->{grpid},["RBoss"],"direct")){
+                     return("personrelated","interview");
+                     last;
+                  }
+               }
+            }
+         }
+      }
    }
    return(undef);
 }

@@ -320,6 +320,7 @@ sub new
                 name          =>'sccustapplication',
                 vjointo       =>'itil::appl',
                 vjoindisp     =>'name',
+                vjoineditbase =>{'cistatusid'=>'<6'},
                 label         =>'Application'),
 
       new kernel::Field::FlexBox(
