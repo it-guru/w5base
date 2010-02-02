@@ -54,8 +54,8 @@ CREATE TABLE lnkgrpuserrole (
   editor varchar(100) NOT NULL default '',
   realeditor varchar(100) NOT NULL default '',
   PRIMARY KEY  (lnkgrpuserroleid),
-  UNIQUE (lnkgrpuserid,role),
-  key role(role)
+  UNIQUE (lnkgrpuserid,nativrole),
+  key nativrole(nativrole)
 );
 CREATE TABLE usersubst (
   usersubstid bigint(20) NOT NULL default '0',
@@ -288,3 +288,4 @@ alter table contact add formdata    longtext    default NULL;
 alter table contact add dialermode  varchar(20);
 alter table contact add dialerurl   varchar(128);
 alter table contact add dialeripref varchar(5);
+alter table mandator add key(grpid);
