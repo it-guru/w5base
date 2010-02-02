@@ -167,7 +167,10 @@ sub WriteToStdout
             my $d=$self->Format->ProcessLine(\$fh,\@viewgroups,$rec,
                                              \@recordview,$fieldbase,
                              $self->getParent->Context->{Linenumber},$msg);
-            syswrite($fh,$d) if (defined($d));
+            if (defined($d)){
+               $d=rmNonLatin1($d);
+               syswrite($fh,$d);
+            }
          }
          if ($self->{NewRecord} || (!$self->Format->isRecordHandler())){
             $rec=undef;

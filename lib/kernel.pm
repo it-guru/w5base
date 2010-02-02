@@ -78,7 +78,8 @@ use Encode;
 use Unicode::String qw(utf8 latin1 utf16);
 @ISA = qw(Exporter);
 @EXPORT = qw(&Query &LangTable &globalContext &NowStamp &CalcDateDuration
-             &trim &rtrim &ltrim &hash2xml &effVal &effChanged 
+             &trim &rtrim &ltrim &rmNonLatin1 
+             &hash2xml &effVal &effChanged 
              &Debug &UTF8toLatin1
              &Datafield2Hash &Hash2Datafield &CompressHash
              &unHtml &quoteHtml &quoteSOAP &quoteWap &quoteQueryString &Dumper 
@@ -338,6 +339,14 @@ sub Hash2Datafield
    }
    $data.="\n";
    return($data);
+}
+
+sub rmNonLatin1
+{
+   my $txt=shift;
+   $txt=~s/([^\x00-\xff])/sprintf('&#%d;', ord($1))/ge; 
+   $txt=~s/[^\ta-z0-9,:;\!"#\\\?\-\/<>\._\&\(\)\{\}= öäüß\|\@\^\*'\$\§\%]//i;
+   return($txt);
 }
 
 sub CompressHash
