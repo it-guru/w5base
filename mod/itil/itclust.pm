@@ -1,0 +1,444 @@
+package itil::itclust;
+#  W5Base Framework
+#  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+use strict;
+use vars qw(@ISA);
+use kernel;
+use kernel::App::Web;
+use kernel::DataObj::DB;
+use kernel::Field;
+use kernel::CIStatusTools;
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::CIStatusTools);
+
+sub new
+{
+   my $type=shift;
+   my %param=@_;
+   $param{MainSearchFieldLines}=3;
+
+   my $self=bless($type->SUPER::new(%param),$type);
+
+   $self->AddFields(
+      new kernel::Field::Linenumber(
+                name          =>'linenumber',
+                label         =>'No.'),
+
+      new kernel::Field::Id(
+                name          =>'id',
+                sqlorder      =>'desc',
+                group         =>'source',
+                label         =>'W5BaseID',
+                dataobjattr   =>'itclust.id'),
+                                                  
+      new kernel::Field::Text(
+                name          =>'fullname',
+                readonly      =>1,
+                label         =>'Full Cluster Name',
+                dataobjattr   =>'itclust.fullname'),
+
+      new kernel::Field::Mandator(),
+
+      new kernel::Field::Link(
+                name          =>'mandatorid',
+                dataobjattr   =>'itclust.mandator'),
+
+      new kernel::Field::Text(
+                name          =>'name',
+                label         =>'Cluster Name',
+                dataobjattr   =>'itclust.name'),
+
+      new kernel::Field::Select(
+                name          =>'cistatus',
+                htmleditwidth =>'40%',
+                label         =>'CI-State',
+                vjoineditbase =>{id=>">0"},
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['cistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'cistatusid',
+                label         =>'CI-StateID',
+                dataobjattr   =>'itclust.cistatus'),
+
+      new kernel::Field::Databoss(),
+
+      new kernel::Field::Link(
+                name          =>'databossid',
+                dataobjattr   =>'itclust.databoss'),
+
+      new kernel::Field::ContactLnk(
+                name          =>'contacts',
+                label         =>'Contacts',
+                class         =>'mandator',
+                vjoinbase     =>[{'parentobj'=>\'itil::itclust'}],
+                vjoininhash   =>['targetid','target','roles'],
+                group         =>'contacts'),
+
+      new kernel::Field::Textarea(
+                name          =>'comments',
+                group         =>'misc',
+                label         =>'Comments',
+                dataobjattr   =>'itclust.comments'),
+
+      new kernel::Field::FileList(
+                name          =>'attachments',
+                parentobj     =>'finance::itclust',
+                label         =>'Attachments',
+                group         =>'attachments'),
+
+
+      new kernel::Field::Container(
+                name          =>'additional',
+                label         =>'Additionalinformations',
+                uivisible     =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $rec=$param{current};
+                   if (!defined($rec->{$self->Name()})){
+                      return(0);
+                   }
+                   return(0);
+                   return(1);
+                },
+                dataobjattr   =>'itclust.additional'),
+
+      new kernel::Field::Text(
+                name          =>'srcsys',
+                group         =>'source',
+                label         =>'Source-System',
+                dataobjattr   =>'itclust.srcsys'),
+                                                   
+      new kernel::Field::Text(
+                name          =>'srcid',
+                group         =>'source',
+                label         =>'Source-Id',
+                dataobjattr   =>'itclust.srcid'),
+                                                   
+      new kernel::Field::Date(
+                name          =>'srcload',
+                group         =>'source',
+                history       =>0,
+                label         =>'Source-Load',
+                dataobjattr   =>'itclust.srcload'),
+
+      new kernel::Field::CDate(
+                name          =>'cdate',
+                group         =>'source',
+                sqlorder      =>'desc',
+                label         =>'Creation-Date',
+                dataobjattr   =>'itclust.createdate'),
+                                                  
+      new kernel::Field::MDate(
+                name          =>'mdate',
+                group         =>'source',
+                sqlorder      =>'desc',
+                label         =>'Modification-Date',
+                dataobjattr   =>'itclust.modifydate'),
+
+      new kernel::Field::Creator(
+                name          =>'creator',
+                group         =>'source',
+                label         =>'Creator',
+                dataobjattr   =>'itclust.createuser'),
+
+      new kernel::Field::Owner(
+                name          =>'owner',
+                group         =>'source',
+                label         =>'Owner',
+                dataobjattr   =>'itclust.modifyuser'),
+
+      new kernel::Field::Editor(
+                name          =>'editor',
+                group         =>'source',
+                label         =>'Editor',
+                dataobjattr   =>'itclust.editor'),
+
+      new kernel::Field::RealEditor(
+                name          =>'realeditor',
+                group         =>'source',
+                label         =>'RealEditor',
+                dataobjattr   =>'itclust.realeditor'),
+   
+      new kernel::Field::Link(
+                name          =>'sectarget',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.target'),
+
+      new kernel::Field::Link(
+                name          =>'sectargetid',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.targetid'),
+
+      new kernel::Field::Link(
+                name          =>'secroles',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.croles'),
+
+      new kernel::Field::QualityText(),
+      new kernel::Field::QualityState(),
+      new kernel::Field::QualityOk(),
+      new kernel::Field::QualityLastDate(
+                dataobjattr   =>'itclust.lastqcheck'),
+   );
+   $self->{use_distinct}=1;
+   $self->{history}=[qw(modify delete)];
+   $self->setDefaultView(qw(linenumber fullname cistatus mandator mdate));
+   $self->setWorktable("itclust");
+   return($self);
+}
+
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   return(qw(header default contacts misc attachments source));
+}
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $from="$worktable left outer join lnkcontact ".
+            "on lnkcontact.parentobj in ('itil::itclust') ".
+            "and $worktable.id=lnkcontact.refid";
+
+   return($from);
+}
+
+sub SecureValidate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   return(1);
+}
+
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_cistatus"))){
+     Query->Param("search_cistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
+
+
+
+
+
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+   
+   if (!$self->IsMemberOf("admin")){
+      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
+      my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+                                  [orgRoles(),qw(RCFManager)],"both");
+      my @grpids=keys(%grps);
+      my $userid=$self->getCurrentUserId();
+      push(@flt,[
+                 {mandatorid=>\@mandators},
+                 {databossid=>$userid},
+                 {sectargetid=>\$userid,sectarget=>\'base::user',
+                  secroles=>"*roles=?write?=roles* *roles=?read?=roles*"},
+                 {sectargetid=>\@grpids,sectarget=>\'base::grp',
+                  secroles=>"*roles=?write?=roles* *roles=?read?=roles*"},
+                ]);
+   }
+   return($self->SetFilter(@flt));
+}
+
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+#   my $swnature=trim(effVal($oldrec,$newrec,"swnature"));
+   my $name=trim(effVal($oldrec,$newrec,"name"));
+#   my $addname=trim(effVal($oldrec,$newrec,"addname"));
+#   my $swtype=trim(effVal($oldrec,$newrec,"swtype"));
+#   my $swport=trim(effVal($oldrec,$newrec,"swport"));
+#   my $swinstanceid=trim(effVal($oldrec,$newrec,"swinstanceid"));
+#   if ($swnature=~m/^\s*$/){
+#      $self->LastMsg(ERROR,"invalid swnature");
+#      return(0);
+#   }
+   if (exists($newrec->{name})){
+      $newrec->{name}=$name;
+   }
+   $name=~s/\./_/g;
+   if ($name eq "" || ($name=~m/[^-a-z0-9_]/i)){
+      $self->LastMsg(ERROR,"invalid instance name");
+      return(0);
+   }
+
+   my $fname=$name;
+#   $fname.=($fname ne "" && $swnature ne "" ? "." : "").$swnature;
+#   $fname.=($fname ne "" && $swtype   ne "" ? "." : "").$swtype;
+#   $fname.=($fname ne "" && $swport   ne "" ? "." : "").$swport;
+#   $fname.=($fname ne "" && $addname  ne "" ? "." : "").$addname;
+   $fname=~s/ü/ue/g;
+   $fname=~s/ö/oe/g;
+   $fname=~s/ä/ae/g;
+   $fname=~s/Ü/Ue/g;
+   $fname=~s/Ö/Oe/g;
+   $fname=~s/Ä/Ae/g;
+   $fname=~s/ß/ss/g;
+   $fname=~s/\s/_/g;
+   $newrec->{'fullname'}=$fname;
+
+   my $fname=trim(effVal($oldrec,$newrec,"fullname"));
+
+
+   my $name=trim(effVal($oldrec,$newrec,"name"));
+   if (($name=~m/[\s]/i) || ($name=~m/^\s*$/)){
+      $self->LastMsg(ERROR,"invalid cluster name '%s' specified",$name);
+      return(0);
+   }
+   if (exists($newrec->{name}) && $newrec->{name} ne $name){
+      $newrec->{name}=$name;
+   }
+   ########################################################################
+   # standard security handling
+   #
+   if ($self->isDataInputFromUserFrontend()){
+      my $userid=$self->getCurrentUserId();
+      if (!defined($oldrec)){
+         if (!defined($newrec->{databossid}) ||
+             $newrec->{databossid}==0){
+            $newrec->{databossid}=$userid;
+         }
+      }
+      if (!$self->IsMemberOf("admin")){
+         if (defined($newrec->{databossid}) &&
+             $newrec->{databossid}!=$userid &&
+             $newrec->{databossid}!=$oldrec->{databossid}){
+            $self->LastMsg(ERROR,"you are not authorized to set other persons ".
+                                 "as databoss");
+            return(0);
+         }
+      }
+   }
+   ########################################################################
+
+#   if ($self->isDataInputFromUserFrontend()){
+#      if (!$self->isWriteOnApplValid($applid,"systems")){
+#         $self->LastMsg(ERROR,"no access");
+#         return(undef);
+#      }
+#   }
+
+
+   return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"fullname"));
+   return(1);
+}
+
+
+sub FinishWrite
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
+   $self->NotifyOnCIStatusChange($oldrec,$newrec);
+   return($bak);
+}
+
+#sub getRecordImageUrl
+#{
+#   my $self=shift;
+#   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+#   return("../../../public/itil/load/itclust.jpg?".$cgi->query_string());
+#}
+
+
+
+sub isViewValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return("header","default") if (!defined($rec));
+   return("ALL");
+}
+
+sub isWriteValid
+{
+   my $self=shift;
+   my $rec=shift;
+   my $userid=$self->getCurrentUserId();
+
+   my @databossedit=qw(default contacts attachments);
+   if (!defined($rec)){
+      return(@databossedit);
+   }
+   else{
+      if ($rec->{databossid}==$userid){
+         return(@databossedit);
+      }
+      if ($self->IsMemberOf("admin")){
+         return(@databossedit);
+      }
+      if (defined($rec->{contacts}) && ref($rec->{contacts}) eq "ARRAY"){
+         my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+                                     ["RMember"],"both");
+         my @grpids=keys(%grps);
+         foreach my $contact (@{$rec->{contacts}}){
+            if ($contact->{target} eq "base::user" &&
+                $contact->{targetid} ne $userid){
+               next;
+            }
+            if ($contact->{target} eq "base::grp"){
+               my $grpid=$contact->{targetid};
+               next if (!grep(/^$grpid$/,@grpids));
+            }
+            my @roles=($contact->{roles});
+            @roles=@{$contact->{roles}} if (ref($contact->{roles}) eq "ARRAY");
+            return(@databossedit) if (grep(/^write$/,@roles));
+         }
+      }
+      my @chkgroups;
+      push(@chkgroups,$rec->{mandatorid}) if ($rec->{mandatorid} ne "");
+      if ($#chkgroups!=-1){
+         if ($self->IsMemberOf(\@chkgroups,["RDataAdmin"],"down")){
+            return(@databossedit);
+         }
+      }
+   }
+   return(undef);
+}
+
+sub SelfAsParentObject    # this method is needed because existing derevations
+{
+   return("itil::itclust");
+}
+
+
+
+
+
+
+1;

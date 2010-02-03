@@ -46,6 +46,9 @@ sub FormatedResult
       return("true") if ($d);
       return("false");
    }
+   if ($mode=~m/Html/i){
+      return("?") if ($d eq "" && $self->{'markempty'});
+   }
 
    return($d) if ($mode eq "XMLV01");
    return($self->SUPER::FormatedResult($current,$mode));

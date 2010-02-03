@@ -105,6 +105,15 @@ sub Init
                       "itil::lnkapplinteranswer",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itil.itclust",
+                      "itil::itclust",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itil.itclust.new",
+                      "itil::itclust",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itil.system",
                       "itil::system",
                       defaultacl=>['valid_user']);

@@ -72,6 +72,18 @@ sub getPosibleRoles
                                                      $self->Self),
             );
    }
+   if ($parentobj=~m/^.+::itclust$/ ||
+       (defined($self->getParent) &&
+        defined($self->getParent->getParent) &&
+       $self->getParent->getParent->Self()=~m/^.+::itclust$/)){
+      return("read"            =>$self->getParent->T("read",
+                                                     $self->Self),
+             "privread"        =>$self->getParent->T("privacy read",
+                                                     $self->Self),
+             "write"           =>$self->getParent->T("write",
+                                                     $self->Self),
+            );
+   }
    if ($parentobj=~m/^.+::swinstance$/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
