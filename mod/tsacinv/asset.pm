@@ -419,15 +419,18 @@ sub getSqlFrom
 sub initSqlWhere
 {
    my $self=shift;
+   my $naturerest="";
+   if (!$self->IsMemberOf("admin")){
+      $naturerest="and amnature.name in ('SERVER','VIRTUAL ASSET',".
+                  "'NAS-FILER','SWITCH','CHASSIS','SERVER_COMP')";
+   }
    my $where=
       "assetportfolio.assettag=amasset.assettag ".
       "and assetportfolio.lmodelid=ammodel.lmodelid ".
       "and assetportfolio.llocaid=amlocation.llocaid(+) ".
       "and ammodel.lnatureid=amnature.lnatureid(+) ".
       "and amasset.lsendercostcenterid=amcostcenter.lcostid(+) ".
-      "and assetportfolio.bdelete=0 ".
-      "and amnature.name in ('SERVER','VIRTUAL ASSET',".
-      "'NAS-FILER','SWITCH','CHASSIS')";
+      "and assetportfolio.bdelete=0 ".$naturerest;
    return($where);
 }
 
