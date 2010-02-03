@@ -156,6 +156,14 @@ sub new
                 vjoinbase     =>[{'parentobj'=>\'base::location'}],
                 group         =>'contacts'),
 
+      new kernel::Field::PhoneLnk(
+                name          =>'phonenumbers',
+                searchable    =>0,
+                label         =>'Phonenumbers',
+                group         =>'phonenumbers',
+                vjoinbase     =>[{'parentobj'=>\'base::location'}],
+                subeditmsk    =>'subedit'),
+
       new kernel::Field::Text(
                 name          =>'roomexpr',
                 group         =>'control',
@@ -316,8 +324,8 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","management","contacts","gps","additional","map",
-          "control","source");
+   return("header","default","management","contacts","phonenumbers",
+          "gps","additional","map","control","source");
 }
 
 
@@ -380,6 +388,29 @@ sub Validate
    if (!defined($oldrec) && !defined($newrec->{label})){
       $newrec->{label}="";
    }
+
+   ########################################################################
+   # standard security handling
+   #
+   if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
+      my $userid=$self->getCurrentUserId();
+      if (!defined($oldrec)){
+         if (!defined($newrec->{databossid}) ||
+             $newrec->{databossid}==0){
+            my $userid=$self->getCurrentUserId();
+            $newrec->{databossid}=$userid;
+         }
+      }
+      if (defined($newrec->{databossid}) &&
+          $newrec->{databossid}!=$userid &&
+          $newrec->{databossid}!=$oldrec->{databossid}){
+         $self->LastMsg(ERROR,"you are not authorized to set other persons ".
+                              "as databoss");
+         return(0);
+      }
+   }
+   ########################################################################
+
 
    return(1);
 }
@@ -585,8 +616,49 @@ sub isWriteValid
    if ($self->IsMemberOf("admin")){
       return("default","contacts","management","gps","control");
    }
-   return(undef);
+   my $userid=$self->getCurrentUserId();
+
+   my @databossedit=qw(phonenumbers management contacts gps);
+
+   if (defined($rec) && $rec->{databossid}==$userid){
+      return(@databossedit);
+   }
+   if (defined($rec->{contacts}) && ref($rec->{contacts}) eq "ARRAY"){
+      my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+                                  ["RMember"],"both");
+      my @grpids=keys(%grps);
+      foreach my $contact (@{$rec->{contacts}}){
+         if ($contact->{target} eq "base::user" &&
+             $contact->{targetid} ne $userid){
+            next;
+         }
+         if ($contact->{target} eq "base::grp"){
+            my $grpid=$contact->{targetid};
+            next if (!grep(/^$grpid$/,@grpids));
+         }
+         my @roles=($contact->{roles});
+         @roles=@{$contact->{roles}} if (ref($contact->{roles}) eq "ARRAY");
+         if (grep(/^write$/,@roles)){
+            return($rec->{mandatorid},@databossedit);
+         }
+      }
+   }
+
+   return();
 }
+
+sub isDeleteValid
+{
+   my $self=shift;
+   my $rec=shift;
+
+   if ($self->IsMemberOf("admin")){
+      return(1);
+   }
+
+   return();
+}
+
 
 sub HandleInfoAboSubscribe
 {

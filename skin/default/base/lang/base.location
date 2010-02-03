@@ -10,6 +10,7 @@
 'fieldgroup.default'=>{de=>'Standortdaten',en=>'location informations'},
 'fieldgroup.control'=>{de=>'Steuerinformationen',en=>'Control Informations'},
 'fieldgroup.map'=>{de=>'Karte',en=>'Map'},
+'fieldgroup.phonenumbers'=>{de=>'Rufnummernverzeichnis',en=>'Phonenumbers'},
 'fieldgroup.org'=>{de=>'Organisationszuorndung',en=>'Organisation relation'},
 'fieldgroup.gps'=>{de=>'GPS',en=>'GPS'},
 'fieldgroup.management'=>{de=>'Verwaltung',en=>'Management'},
@@ -22,3 +23,4 @@
 "invalid location"=>{de=>"ungültige Standortdaten"},
 'Organisation link'=>{de=>'Organisations Zuorndung'},
 'organisations location prio'=>{de=>'Organisations Standort Prio'},
+'Phonenumbers'=>{de=>'Rufnummernverzeichnis'},
