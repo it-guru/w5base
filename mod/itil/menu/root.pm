@@ -114,6 +114,15 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itil.itclust.lnkapplitclust",
+                      "itil::lnkapplitclust",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itil.itclust.lnkapplitclust.new",
+                      "itil::lnkapplitclust",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itil.system",
                       "itil::system",
                       defaultacl=>['valid_user']);

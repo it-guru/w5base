@@ -221,6 +221,15 @@ sub new
                 vjoinon       =>['id'=>'applid'],
                 vjoindisp     =>['fullname','swnature']),
 
+      new kernel::Field::SubList(
+                name          =>'services',
+                label         =>'Cluster services',
+                group         =>'services',
+                vjointo       =>'itil::lnkapplitclust',
+                vjoinbase     =>[{itclustcistatusid=>"<=5"}],
+                vjoinon       =>['id'=>'applid'],
+                vjoindisp     =>['fullname']),
+
       new kernel::Field::Text(
                 name          =>'businessteambossid',
                 group         =>'technical',
@@ -1318,6 +1327,7 @@ sub ValidateDelete
    }
    if ($lock>0 ||
        $#{$rec->{systems}}!=-1 ||
+       $#{$rec->{services}}!=-1 ||
        $#{$rec->{swinstances}}!=-1 ||
        $#{$rec->{custcontracts}}!=-1){
       $self->LastMsg(ERROR,
@@ -1338,7 +1348,7 @@ sub getDetailBlockPriority
           qw(header default finance technical opmgmt delmgmt 
              customer custcontracts 
              contacts phonenumbers 
-             interfaces systems swinstances misc attachments control 
+             interfaces systems swinstances services misc attachments control 
              accountnumbers licenses source));
 }
 

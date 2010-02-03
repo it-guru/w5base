@@ -1,0 +1,6 @@
+'itil::lnkapplitclust'=>{de=>'Cluster Service',en=>'Cluster Service'},
+'full qualified Servicename'=>{de=>'vollständiger Servicename'},
+'fieldgroup.applinfo'=>{de=>'Daten der zugeorneten Anwendung',en=>'Application informations'},
+'Application'=>{de=>'Anwendung'},
+'sub Servicename'=>{de=>'Servicename suffix'},
+'Software-Instance'=>{de=>'Software Instanz'},

@@ -4,6 +4,7 @@
 'fieldgroup.interfaces'=>{de=>'Schnittstellen',en=>'Interfaces'},
 'fieldgroup.licenses'=>{de=>'Lizenzen',en=>'Licenses'},
 'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
+'fieldgroup.services'=>{de=>'Cluster Services',en=>'Cluster Services'},
 'fieldgroup.opmgmt'=>{de=>'Operation Management',en=>'Operation Management'},
 'fieldgroup.swinstances'=>{de=>'Software Instanzen',en=>'Software Instances'},
 'fieldgroup.sec'=>{en=>'Security and data privacy',de=>'Sicherheit und Datenschutz'},

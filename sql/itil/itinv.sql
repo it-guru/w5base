@@ -729,11 +729,11 @@ alter table servicesupport add fullname varchar(128) default NULL;
 alter table osrelease add osclass varchar(20) default NULL,add key(osclass);
 create table lnkapplitclust   (
   id           bigint(20) NOT NULL,
-  appl         bigint(20) NOT NULL,
-  itclust      bigint(20) NOT NULL,
+  appl         bigint(20) NOT NULL,itsvcname varchar(40) default NULL,
+  itclust      bigint(20) NOT NULL,swinstance   bigint(20) NOT NULL,
   comments     longtext    default NULL,
   additional   longtext    default NULL,
-  fraction     double(8,2) default '100.00',
+  subitsvcname varchar(5) default NULL,
   createdate   datetime NOT NULL default '0000-00-00 00:00:00',
   modifydate   datetime NOT NULL default '0000-00-00 00:00:00',
   createuser   bigint(20) default NULL,
@@ -744,8 +744,8 @@ create table lnkapplitclust   (
   srcid        varchar(20) default NULL,
   srcload      datetime    default NULL,
   PRIMARY KEY  (id),
-  KEY appl (appl),UNIQUE applcl(appl,itclust),
-  KEY clust(itclust),
+  KEY appl (appl),UNIQUE applcl(itsvcname,subitsvcname,itclust),
+  KEY clust(itclust),key swi(swinstance),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 );
 alter table swinstance add ssl_url varchar(128) default NULL;
@@ -763,11 +763,11 @@ alter table appl add key opm(opm);
 create table itclust (
   id          bigint(20)  NOT NULL,
   name        varchar(40)  NOT NULL,
-  fullname    varchar(128) NOT NULL,
+  fullname    varchar(80) NOT NULL,
   cistatus    int(2)      NOT NULL,
     mandator    bigint(20)  default NULL,
     databoss    bigint(20)  default NULL,
-    clusttyp    int(8)      default NULL,
+    clusttyp    varchar(20) default NULL,
   description longtext     default NULL,
   comments    longtext     default NULL,
   additional  longtext     default NULL,

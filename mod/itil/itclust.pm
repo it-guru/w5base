@@ -57,6 +57,20 @@ sub new
                 name          =>'mandatorid',
                 dataobjattr   =>'itclust.mandator'),
 
+      new kernel::Field::Select(
+                name          =>'clusttyp',
+                htmleditwidth =>'200px',
+                value         =>[
+                                 'Virtual',
+                                 'MC-Service-Guard',
+                                 'Sun-Cluster',
+                                 'Veritas-Cluster',
+                                 'Software',
+                                 'Hardware',
+                                ],
+                label         =>'Cluster Type',
+                dataobjattr   =>'itclust.clusttyp'),
+
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Cluster Name',
@@ -89,6 +103,18 @@ sub new
                 vjoinbase     =>[{'parentobj'=>\'itil::itclust'}],
                 vjoininhash   =>['targetid','target','roles'],
                 group         =>'contacts'),
+
+      new kernel::Field::SubList(
+                name          =>'services',
+                label         =>'Services',
+                group         =>'services',
+                forwardSearch =>1,
+                allowcleanup  =>1,
+                subeditmsk    =>'subedit.services',
+                vjointo       =>'itil::lnkapplitclust',
+                vjoinbase     =>[{applcistatusid=>"<=5"}],
+                vjoinon       =>['id'=>'clustid'],
+                vjoindisp     =>['fullname','appl']),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
@@ -208,7 +234,7 @@ sub new
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default contacts misc attachments source));
+   return(qw(header default contacts services misc attachments source));
 }
 
 
@@ -279,7 +305,7 @@ sub Validate
 
 #   my $swnature=trim(effVal($oldrec,$newrec,"swnature"));
    my $name=trim(effVal($oldrec,$newrec,"name"));
-#   my $addname=trim(effVal($oldrec,$newrec,"addname"));
+   my $clusttyp=trim(effVal($oldrec,$newrec,"clusttyp"));
 #   my $swtype=trim(effVal($oldrec,$newrec,"swtype"));
 #   my $swport=trim(effVal($oldrec,$newrec,"swport"));
 #   my $swinstanceid=trim(effVal($oldrec,$newrec,"swinstanceid"));
@@ -296,8 +322,8 @@ sub Validate
       return(0);
    }
 
-   my $fname=$name;
-#   $fname.=($fname ne "" && $swnature ne "" ? "." : "").$swnature;
+   my $fname=$clusttyp;
+   $fname.=($fname ne "" && $name ne "" ? "." : "").$name;
 #   $fname.=($fname ne "" && $swtype   ne "" ? "." : "").$swtype;
 #   $fname.=($fname ne "" && $swport   ne "" ? "." : "").$swport;
 #   $fname.=($fname ne "" && $addname  ne "" ? "." : "").$addname;
@@ -391,7 +417,7 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default contacts attachments);
+   my @databossedit=qw(default services contacts attachments);
    if (!defined($rec)){
       return(@databossedit);
    }
@@ -435,6 +461,33 @@ sub SelfAsParentObject    # this method is needed because existing derevations
 {
    return("itil::itclust");
 }
+
+
+sub ValidateDelete
+{
+   my $self=shift;
+   my $rec=shift;
+   my $lock=0;
+
+#   my $refobj=getModuleObject($self->Config,"itil::lnkapplitclust");
+#   if (defined($refobj)){
+#      my $idname=$self->IdField->Name();
+#      my $id=$rec->{$idname};
+#      $refobj->SetFilter({'toapplid'=>\$id});
+#      $lock++ if ($refobj->CountRecords()>0);
+#   }
+   if ($lock>0 ||
+       $#{$rec->{services}}!=-1){
+      $self->LastMsg(ERROR,
+          "delete only posible, if there are no services ".
+          "or software instance relations");
+      return(0);
+   }
+
+   return(1);
+}
+
+
 
 
 

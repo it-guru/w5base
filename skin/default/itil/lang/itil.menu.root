@@ -16,6 +16,8 @@
 'itil.appl.lnkapplinteranswer'=>{de=>'Interview',en=>'Interview'},
 'itil.itclust'=>{de=>'Cluster',en=>'Cluster'},
 'itil.itclust.new'=>{de=>'Neueingabe',en=>'New'},
+'itil.itclust.lnkapplitclust'=>{de=>'Service',en=>'Service'},
+'itil.itclust.lnkapplitclust.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.system'=>{de=>'System',en=>'System'},
 'itil.system.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.system.systemnfsnas'=>{de=>'NFS/NAS Freigabe',en=>'NFS/NAS Export'},
