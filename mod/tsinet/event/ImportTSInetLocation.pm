@@ -101,7 +101,8 @@ sub ImportTSInetLocation
                }
                @$roles=grep(!/^\s*$/,@$roles);
                
-               $lnk->ValidatedUpdateRecord($lnkrec,{comments=>'Prio1',
+               $lnk->ValidatedUpdateRecord($lnkrec,{comments=>
+                                                       'Prio'.$rec->{prio},
                                                     srcsys=>'TSINET',
                                                     srcload=>$start,
                                                     roles=>$roles},
