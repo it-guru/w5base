@@ -37,6 +37,7 @@ sub new
                                   label    =>'Info Name'),
       new kernel::Field::Text(    name     =>'fullname',
                                   depend   =>['translation','name'],
+                                  searchable=>0,
                                   onRawValue=>sub{
                                      my $self=shift;
                                      my $current=shift;

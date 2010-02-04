@@ -139,10 +139,12 @@ sub _preProcessFilter
             return(undef);
          } 
          else{
-            if (exists($fobj->{onRawValue})){
+            if (exists($fobj->{onRawValue}) &&
+                $fobj->searchable){
+               my $d=$hflt->{$field};
                $self->LastMsg(ERROR,
-                              "filter request on calculated field '%s' \@ '%s'",
-                              $field,$self->Self);
+                     "filter '%s' request on calculated field '%s(%s)'\@'%s'",
+                        $d,$field,$fobj->Type(),$self->Self);
                return(undef);
             }
             my ($subchanged,$err)=$fobj->preProcessFilter($hflt);
