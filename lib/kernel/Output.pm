@@ -168,7 +168,6 @@ sub WriteToStdout
                                              \@recordview,$fieldbase,
                              $self->getParent->Context->{Linenumber},$msg);
             if (defined($d)){
-               $d=rmNonLatin1($d);
                syswrite($fh,$d);
             }
          }
