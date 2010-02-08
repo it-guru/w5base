@@ -983,11 +983,15 @@ sub isViewValid
                   if (grep(/^$orole$/,@{$grp->{roles}})){
                      if ($self->IsMemberOf($grp->{grpid},["RBoss"],"direct")){
                         push(@gl,"personrelated","private");
-                        last;
                      }
                   }
                }
             }
+         }
+      }
+      if (!grep(/^personrelated$/,@gl)){
+         if ($self->IsMemberOf("admin")){ 
+            push(@gl,"personrelated","private");
          }
       }
    }

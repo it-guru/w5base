@@ -41,7 +41,7 @@ sub getTotalActiveQuestions
    foreach my $irec ($i->getHashList(qw(queryblock questclust 
                                         qtag id name qname prio
                                         boundpviewgroup addquestdata
-                                        interviewcatid
+                                        interviewcatid contactid contact2id
                                         questtyp restriction))){
       my $restok=1;
       if ($irec->{restriction} ne ""){
@@ -63,7 +63,7 @@ sub getTotalActiveQuestions
          $irec->{'AnswerViewable'}=1;
          if ($irec->{boundpviewgroup} ne ""){
             my $q=quotemeta($irec->{boundpviewgroup});
-            if (!grep(/^$q$/,@viewlist)){
+            if (!grep(/^($q|ALL)$/,@viewlist)){
                $irec->{'AnswerViewable'}=0;
                $irec->{'HTMLanswer'}="-";
                $irec->{'HTMLrelevant'}="-";

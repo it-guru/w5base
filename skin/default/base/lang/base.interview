@@ -32,5 +32,6 @@
 'effects on MTTR'=>{de=>'beeinflusst MTTR'},
 'effects on MTBF'=>{de=>'beeinflusst MTBF'},
 'existing answers'=>{de=>'es existieren bereits Anworten für diese Frage'},
-'bind on parent viewgroup'=>{de=>'Anzeigen nur besimmter Viewgroup'},
+'bind on parent viewgroup'=>{de=>'Anzeigen nur bei bestimmter Viewgroup'},
 'answer contact from parent'=>{de=>'Beantwortungskontakt aus Elternobjekt'},
+'additional quest data'=>{de=>'zusätzlich Frage-Daten'},
