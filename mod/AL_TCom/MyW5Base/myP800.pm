@@ -98,14 +98,17 @@ sub Result
    $mainq1{stateid}=['1','21'];
 
    my @appl=("none");
-   if ($dc eq "ADDDEP"){
+  if ($dc eq "ADDDEP"){
       @appl=$self->getRequestedApplicationIds($userid,user=>1,dep=>1);
    }
-   if ($dc eq "DEPONLY"){
+   elsif ($dc eq "DEPONLY"){
       @appl=$self->getRequestedApplicationIds($userid,dep=>1);
    }
-   if ($dc eq "TEAM"){
+   elsif ($dc eq "TEAM"){
       @appl=$self->getRequestedApplicationIds($userid,team=>1);
+   }
+   else{
+      @appl=$self->getRequestedApplicationIds($userid,user=>1);
    }
    $mainq1{affectedapplicationid}=\@appl;
    my $p800m=Query->Param("P800_TimeRange");

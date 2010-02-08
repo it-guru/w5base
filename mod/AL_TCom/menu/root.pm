@@ -52,6 +52,12 @@ sub Init
                       defaultacl=>['DTAG.TSI.ICTO.CSS.AO.DTAG',
                                    'DTAG.TSI.SSM']);
 
+   $self->RegisterObj('base::MyW5Base::P800rawdata$',  # virtureller Eintrag für
+                      'base::MyW5Base::P800rawdata$',  # MyW5Base
+                      func=>'Main',
+                      defaultacl=>['DTAG.TSI.ICTO.CSS.AO.DTAG',
+                                   'DTAG.TSI.ICTO.SD.SDM']);
+
    $self->RegisterObj('AL_TCom::MyW5Base::ChangeFuture$',
                       'AL_TCom::MyW5Base::ChangeFuture$',
                       func=>'Main',

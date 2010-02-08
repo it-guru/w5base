@@ -781,7 +781,7 @@ sub Process
       # check P800 requirements
       # https://darwin.telekom.de/darwin/auth/base/workflow/ById/12391987130002
       #
-      if ($tcomworktime>=1200 && length($tcomcodcomments)<20){
+      if ($tcomworktime>1200 && length($tcomcodcomments)<20){
          my $wth=sprintf("%.2lf",$tcomworktime/60);
          $wth=~s/\./,/g;
          $self->getParent->LastMsg(ERROR,

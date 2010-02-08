@@ -45,16 +45,19 @@ sub getRequestedApplicationIds
    if ($param{user}){
       push(@$flt,{ semid=>\$userid,cistatusid=>"<6" },
                  { tsmid=>\$userid,cistatusid=>"<6" },
+                 { opmid=>\$userid,cistatusid=>"<6" },
                  { delmgrid=>\$userid,cistatusid=>"<6" },
                  { databossid=>\$userid,cistatusid=>"<6" });
    }
    if ($param{dep}){
       push(@$flt,{ sem2id=>\$userid,cistatusid=>"<6" },
                  { tsm2id=>\$userid,cistatusid=>"<6" },
+                 { opm2id=>\$userid,cistatusid=>"<6" },
                  { delmgr2id=>\$userid,cistatusid=>"<6" });
    }
-   if ($param{dep} || $param{team}){
+   if ($param{team}){
       push(@$flt,{ responseteamid=>\@grps,cistatusid=>"<6"},
+                 { delmgrteamid=>\@grps,cistatusid=>"<6"},
                  { businessteamid=>\@grps,cistatusid=>"<6"});
    }
    my @appl=("none");
