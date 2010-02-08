@@ -1401,8 +1401,17 @@ sub getHtmlSelect
 {
    my $self=shift;
    my $name=shift;
-   my $uniquekey=shift;
-   my $fld=shift;
+   my $uniquekey;
+   my $fld;
+   my $static;
+   if (ref($_[0]) eq "ARRAY"){
+      $static=shift;
+   }
+   else{
+      $uniquekey=shift;
+      $fld=shift;
+   }
+
    my %opt=@_;
    my $d;
    my $width="100%";
@@ -1444,15 +1453,27 @@ sub getHtmlSelect
    $d="<select name=$name style=\"$style\"$autosubmit$multiple$size>";
    my @l;
    my @list;
-   my @selectfields=(@{$fld},$uniquekey);
-   if (defined($opt{fields})){
-      push(@selectfields,@{$opt{fields}});
-   }
 
     
    my @data;
    my %data;
-   @data=$self->getHashList(@selectfields);
+   if (!defined($static)){
+      my @selectfields=(@{$fld},$uniquekey);
+      if (defined($opt{fields})){
+         push(@selectfields,@{$opt{fields}});
+      }
+      @data=$self->getHashList(@selectfields);
+   }
+   else{
+      if (ref($static) eq "ARRAY"){
+         $uniquekey="k";
+         $fld=["v"];
+         while(my $k=shift(@$static)){
+            my $v=shift(@$static);
+            push(@l,{k=>$k,v=>$v});
+         }
+      }
+   }
    if (defined($opt{selectindex})){
       $opt{selectindex}=sprintf("%d",$opt{selectindex});
       @data=reverse(@data) if ($opt{selectindex}<0);
@@ -1476,23 +1497,25 @@ sub getHtmlSelect
       }
    }
 
-   foreach my $rec (@data){
-      my %lrec;
-      foreach my $k (keys(%$rec)){
-         $lrec{$k}=$rec->{$k};
-      }
-      push(@list,\%lrec);
-      my %frec;
-      foreach my $k (keys(%$rec)){
-         if (grep(/^$k$/,@{$fld})){
-            my $fo=$self->getField($k,$rec);
-            $frec{$k}=$fo->RawValue($rec);
+   if (!defined($static)){
+      foreach my $rec (@data){
+         my %lrec;
+         foreach my $k (keys(%$rec)){
+            $lrec{$k}=$rec->{$k};
          }
-         else{
-            $frec{$k}=$rec->{$k};
+         push(@list,\%lrec);
+         my %frec;
+         foreach my $k (keys(%$rec)){
+            if (grep(/^$k$/,@{$fld})){
+               my $fo=$self->getField($k,$rec);
+               $frec{$k}=$fo->RawValue($rec);
+            }
+            else{
+               $frec{$k}=$rec->{$k};
+            }
          }
+         push(@l,\%frec);
       }
-      push(@l,\%frec);
    }
 
    my %len=();
@@ -1542,7 +1565,11 @@ sub getHtmlSelect
    }
    for(my $c=0;$c<=$#{$keylist};$c++){
       $d.="<option";
-      $d.=" value=\"$keylist->[$c]\"";
+      my $k=$keylist->[$c];
+      $k=~s/</&lt;/g;
+      $k=~s/>/&gt;/g;
+      $k=~s/"/&quot;/g;
+      $d.=" value=\"$k\"";
       my $qkey=quotemeta($keylist->[$c]);
       if (grep(/^$qkey$/,@selected)){
          $d.=" selected";
