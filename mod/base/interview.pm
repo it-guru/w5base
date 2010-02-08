@@ -247,6 +247,11 @@ sub new
 #  prio undef = ignored by calc of attainment level
 #
 
+      new kernel::Field::Text(
+                name          =>'addquestdata',
+                label         =>'additional quest data',
+                dataobjattr   =>'interview.addquerydata'),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',
@@ -677,6 +682,11 @@ sub getHtmlEditElements
       $txt=quoteHtml($answer->{answer}) if (defined($answer));
       my $p="<input style=\"width:100%\" ".
             "type=text $opmode name=answer value=\"".$txt."\">";
+      if ($irec->{addquestdata} ne ""){
+         $p="<table cellspacing=0 cellpadding=0><tr><td width=1% nowrap>".
+            $irec->{addquestdata}."&nbsp;</td><td>".$p.
+            "</td></tr></table>";
+      }
       $HTMLanswer="<div style=\"width:100%;padding:1px;margin:0\">$p</div>";
    }
    if (defined($answer) && !($answer->{relevant})){

@@ -40,7 +40,7 @@ sub getTotalActiveQuestions
    my @l;
    foreach my $irec ($i->getHashList(qw(queryblock questclust 
                                         qtag id name qname prio
-                                        boundpviewgroup
+                                        boundpviewgroup addquestdata
                                         interviewcatid
                                         questtyp restriction))){
       my $restok=1;
