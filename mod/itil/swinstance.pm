@@ -108,6 +108,7 @@ sub new
                                  'WebSphere Business Monitor',
                                  'WebSphere Message Broker',
                                  'WebSphere Process Server',
+                                 'WebSphere Service Registry/Repository',
                                  'Other'],
                 dataobjattr   =>'swinstance.swnature'),
 
