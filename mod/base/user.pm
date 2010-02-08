@@ -310,43 +310,43 @@ sub new
       new kernel::Field::Text(
                 name          =>'private_street',
                 group         =>'private',
-                label         =>'Street',
+                label         =>'privat Street',
                 dataobjattr   =>'contact.private_street'),
 
       new kernel::Field::Text(
                 name          =>'private_zipcode',
                 group         =>'private',
-                label         =>'ZIP-Code',
+                label         =>'privat ZIP-Code',
                 dataobjattr   =>'contact.private_zipcode'),
 
       new kernel::Field::Text(
                 name          =>'private_location',
                 group         =>'private',
-                label         =>'Location',
+                label         =>'privat Location',
                 dataobjattr   =>'contact.private_location'),
 
       new kernel::Field::Phonenumber(
                 name          =>'private_facsimile',
                 group         =>'private',
-                label         =>'FAX-Number',
+                label         =>'privat FAX-Number',
                 dataobjattr   =>'contact.private_facsimile'),
 
       new kernel::Field::Phonenumber(
                 name          =>'private_elecfacsimile',
                 group         =>'private',
-                label         =>'electronical FAX-Number',
+                label         =>'privat electronical FAX-Number',
                 dataobjattr   =>'contact.private_elecfacsimile'),
 
       new kernel::Field::Phonenumber(
                 name          =>'private_mobile',
                 group         =>'private',
-                label         =>'Mobile-Phonenumber',
+                label         =>'privat Mobile-Phonenumber',
                 dataobjattr   =>'contact.private_mobile'),
 
       new kernel::Field::Phonenumber(
                 name          =>'private_phone',
                 group         =>'private',
-                label         =>'Phonenumber',
+                label         =>'privat Phonenumber',
                 dataobjattr   =>'contact.private_phone'),
 
       new kernel::Field::Select(
@@ -566,6 +566,17 @@ sub new
                 htmldetail    =>0,
                 readonly      =>1,
                 vjointo       =>'base::lnkgrpuser',
+                vjoinon       =>['userid'=>'userid'],
+                vjoindisp     =>['group']),
+
+      new kernel::Field::Text(
+                name          =>'orgunits',
+                label         =>'organisational Units',
+                group         =>'groups',
+                htmldetail    =>0,
+                readonly      =>1,
+                vjointo       =>'base::lnkgrpuser',
+                vjoinbase     =>['lineroles'=>[orgRoles()]],
                 vjoinon       =>['userid'=>'userid'],
                 vjoindisp     =>['group']),
 

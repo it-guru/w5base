@@ -221,7 +221,6 @@ sub Validate
    if ($newval ne ""){
       if (!($newval=~m/^\*/)){
          foreach my $dststruct (@{$self->{dstobj}}){
-printf STDERR ("fifi d=%s\n",join(",",keys(%{$dststruct})));
             next if (defined($selectivetyp) && 
                      $selectivetyp ne $dststruct->{name});
             $dststruct->{obj}->ResetFilter();
