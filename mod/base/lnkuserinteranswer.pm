@@ -82,7 +82,7 @@ sub SecureSetFilter
 
    if (!$self->IsMemberOf("admin")){
       my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
-                                  [$self->orgRoles()],"direct");
+                                  ['RBoss','RBoss2','RBackoffice'],"direct");
       my $lnkgrp=getModuleObject($self->Config,"base::lnkgrpuser");
      
       $lnkgrp->SetFilter({grpid=>[keys(%grps)]});
