@@ -265,7 +265,8 @@ sub initSqlWhere
    return(undef) if ($mode eq "update");
    my $where;
    if ($self->{secparentobj} ne ""){
-      $where="interanswer.parentobj='$self->{secparentobj}'";
+      $where="(interanswer.parentobj='$self->{secparentobj}' or ".
+             "interanswer.parentobj is null)";
    }
    return($where);
 }

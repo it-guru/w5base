@@ -41,6 +41,7 @@ sub getTotalActiveQuestions
    foreach my $irec ($i->getHashList(qw(queryblock questclust 
                                         qtag id name qname prio
                                         boundpviewgroup
+                                        interviewcatid
                                         questtyp restriction))){
       my $restok=1;
       if ($irec->{restriction} ne ""){

@@ -71,7 +71,7 @@ sub new
    $self->getField("parentobj")->{searchable}=0;
    $self->getField("parentid")->{searchable}=0;
    $self->{secparentobj}='base::user';
-   $self->setDefaultView(qw(parentname parentposix name answer mdate editor));
+   $self->setDefaultView(qw(parentname relevant name answer mdate editor));
    return($self);
 }
 
@@ -111,9 +111,13 @@ sub getSqlFrom
 {
    my $self=shift;
    my ($worktable,$workdb)=$self->getWorktable();
-   my $j=$self->SUPER::getSqlFrom();
+   my $secobj=$self->{secparentobj};
 
-   return("$j join contact on $worktable.parentid=contact.userid");
+   return("contact left outer join $worktable ".
+          "on $worktable.parentobj='$secobj' and ".
+          "$worktable.parentid=contact.userid ".
+          "left outer join interview ".
+          "on $worktable.interviewid=interview.id ");
 }
 
 

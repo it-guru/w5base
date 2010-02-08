@@ -25,13 +25,13 @@ sub HtmlInterviewLink
    my ($self)=@_;
    my $idname=$self->IdField()->Name();
    my $id=Query->Param($idname);
-   my $queryblock=Query->Param("queryblock");
+   my $interviewcatid=Query->Param("interviewcatid");
    my $archiv=Query->Param("archiv");
    $self->ResetFilter();
    $self->SetFilter({$idname=>\$id});
    my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
    if (defined($rec)){
-      if ($queryblock eq ""){ 
+      if ($interviewcatid eq ""){ 
          print $self->HttpHeader();
          print $self->HtmlHeader(body=>1,
                                  js=>'toolbox.js',
@@ -47,7 +47,7 @@ sub HtmlInterviewLink
          print $self->HtmlBottom(body=>1);
       }
       else{
-         $self->InterviewSubForm($rec,$queryblock);
+         $self->InterviewSubForm($rec,$interviewcatid);
       }
    }
 }
@@ -56,7 +56,7 @@ sub InterviewSubForm
 {
    my $self=shift;
    my $rec=shift;
-   my $queryblock=shift;
+   my $interviewcatid=shift;
    my $state=$rec->{interviewst};
 
    my $lastquestclust;
@@ -64,7 +64,7 @@ sub InterviewSubForm
    foreach my $qrec (@{$state->{TotalActiveQuestions}}){
       my $d;
       if ($qrec->{AnswerViewable}){
-         if ($queryblock eq $qrec->{queryblock}){
+         if ($interviewcatid eq $qrec->{interviewcatid}){
             if (!defined($lastquestclust) ||
                 $lastquestclust ne $qrec->{questclust}){
                $d.="<div class=InterviewQuestClust>$qrec->{questclust}</div>";
@@ -194,8 +194,7 @@ function switchQueryBlock(o,id)
           e.innerHTML=d;
        }
       }
-      var q="$idname=$id&queryblock="+Url.encode(e.getAttribute("name"));
-      //alert("q= "+q);
+      var q="$idname=$id&interviewcatid="+id;
       xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
       var r=xmlhttp.send(q);
    }
@@ -287,30 +286,33 @@ EOF
    my $blknum=0;
 
    my @blklist;
+   my @blkid;
 
    foreach my $qrec (@{$state->{TotalActiveQuestions}}){
       if ($lastqblock ne $qrec->{queryblock}){
          push(@blklist,$qrec->{queryblock});
+         push(@blkid,$qrec->{interviewcatid});
       }
       $lastqblock=$qrec->{queryblock};
    }
    $d.="</div>" if ($lastqblock ne "");
   # push(@blklist,"open");
    $lastqblock=undef;
-   foreach my $blk (@blklist){
+   for(my $c=0;$c<=$#blklist;$c++){
+      my $blk=$blklist[$c];
+      my $blkid=$blkid[$c];
       $d.="\n</div>\n" if ($lastqblock ne "");
       $d.="<div class=InterviewQuestBlockFancyHead>$blk - $label</div>";
-      $d.="\n<div onclick=\"switchQueryBlock(this,'${blknum}');\" ".
+      $d.="\n<div onclick=\"switchQueryBlock(this,'${blkid}');\" ".
           "class=InterviewQuestBlockHead>".
-          "\n<div id=BLKON${blknum} class=OnOfSwitch ".
+          "\n<div id=BLKON${blkid} class=OnOfSwitch ".
           "style=\"visible:hidden;display:none\">".
           "<img border=0 src=\"../../../public/base/load/minus.gif\"></div>".
-          "<div id=BLKOFF${blknum} class=OnOfSwitch ".
+          "<div id=BLKOFF${blkid} class=OnOfSwitch ".
           "style=\"visible:visible;display:block\">".
           "<img border=0 src=\"../../../public/base/load/plus.gif\"></div>".
           "<div style=\"float:none\">$blk</div></div>";
-      $d.="\n<div id=BLK${blknum} name=\"$blk\" class=InterviewQuestBlock>";
-      $blknum++;
+      $d.="\n<div id=BLK${blkid} name=\"$blk\" class=InterviewQuestBlock>";
       $lastqblock=$blk;
    }
    $d.="</div>" if ($lastqblock ne "");
