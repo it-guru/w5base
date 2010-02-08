@@ -105,6 +105,9 @@ sub new
                                  'Tomcat',
                                  'Visibroker',
                                  'WebSphere Appl Server',
+                                 'WebSphere Business Monitor',
+                                 'WebSphere Message Broker',
+                                 'WebSphere Process Server',
                                  'Other'],
                 dataobjattr   =>'swinstance.swnature'),
 
