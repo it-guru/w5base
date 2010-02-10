@@ -140,16 +140,22 @@ sub ProcessLine
    }
    $id=$id->[0] if (ref($id) eq "ARRAY");
    my $ResultLineClickHandler=$app->{ResultLineClickHandler};
-   $ResultLineClickHandler="Detail" if (!defined($ResultLineClickHandler));
+   $ResultLineClickHandler="ById" if (!defined($ResultLineClickHandler));
    if (grep(/^$ResultLineClickHandler$/,$app->getValidWebFunctions())){
       if ($idfield){
-         my $dest=$app->Self();
-         $dest=~s/::/\//g;
-         my $lq=new kernel::cgi({});
-         $lq->Param($idfieldname=>$id);
-         $lq->Param(AllowClose=>1);
-         my $urlparam=$lq->QueryString();
-         $dest="../../$dest/$ResultLineClickHandler?$urlparam";
+         my $dest;
+         if ($ResultLineClickHandler eq "ById"){
+            $dest="ById/".$id;
+         }
+         else{
+            $dest=$app->Self();
+            $dest=~s/::/\//g;
+            my $lq=new kernel::cgi({});
+            $lq->Param($idfieldname=>$id);
+            $lq->Param(AllowClose=>1);
+            my $urlparam=$lq->QueryString();
+            $dest="../../$dest/$ResultLineClickHandler?$urlparam";
+         }
          my $detailx=$app->DetailX();
          my $detaily=$app->DetailY();
          my $UserCache=$self->getParent->getParent->Cache->{User}->{Cache};
