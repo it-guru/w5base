@@ -1548,6 +1548,24 @@ sub findtemplvar
             $d.=">".$self->T('list records of my organisational area').
                 "</option>";
          }
+         if (grep(/^teamusercontrol$/,@param)){
+            my $userid=$self->getCurrentUserId(); 
+            my %g=$self->getGroupsOf($userid, [orgRoles()], 'direct');
+            my $u=getModuleObject($self->Config,"base::lnkgrpuser");
+            $u->SetFilter({grpid=>[keys(%g)],usertyp=>\'user'});
+            my %u;
+            foreach my $rec ($u->getHashList(qw(user userid))){
+               my $uname=$rec->{user};
+               $uname=~s/\s*\(.*\)$//;
+               $u{$uname}=$rec->{userid};
+            }
+            foreach my $u (sort(keys(%u))){
+               $d.="<option value=\"COLLEGE:$u{$u}\"";
+               $d.=" selected" if ($oldval eq "COLLEGE:$u{$u}");
+               $d.=">".$self->T('College').": ".$u.
+                   "</option>";
+            }
+         }
          $d.="</select>";
       }
       $d.="</td>";
