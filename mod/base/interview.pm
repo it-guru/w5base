@@ -736,7 +736,7 @@ sub Question
    printf("<div style=\"border-width:1px;border-style:solid;".
           "border-color:silver;margin-top:20px;".
           "padding-bottom:10px;margin-right:10px\">");
-   my $c=quoteHtml($rec->{comments});
+   my $c=FancyLinks(quoteHtml($rec->{comments}));
    $c=~s/\n/<br>\n/g;
    printf("<div style=\"margin:5px;margin-top:5px\">".
           "<b>%s:</b><br>%s</div>",$self->T("explanation"),$c);
