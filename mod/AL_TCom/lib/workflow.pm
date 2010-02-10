@@ -189,6 +189,12 @@ sub tcomcodcause
    eta.baseeff.etabusioffs
    eta.baseeff.etabusioffon
    eta.addeff.etabusisencons
+   eta.baseeff.BPQworkingcycle
+   eta.baseeff.BPQinstall
+   eta.baseeff.BPQerrorh
+   eta.baseeff.BPQadmin
+   eta.baseeff.BPQcoordination
+
    ));
 }
 
