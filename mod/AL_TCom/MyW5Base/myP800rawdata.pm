@@ -42,58 +42,75 @@ sub Init
    return(0) if (!defined($self->{DataObj}));
 
 
-   $self->{DataObj}->AddFields(
+   $self->DataObj->AddFields(
 
       new kernel::Field::DynWebIcon(
                 name          =>'p800chk',
                 searchable    =>0,
                 htmlwidth     =>'5px',
                 htmldetail    =>0,
-                weblink       =>sub{
+                onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
                    my $mode=shift;
                    my $app=$self->getParent;
-                   my $headrefo=$app->getField("headref");
-                   if (defined($headrefo)){
-                      my $headref=CompressHash($headrefo->RawValue($current));
-                      if ($headref->{tcomcodrelevant} eq "yes"){
-                         my $tcomcodcause=$headref->{tcomcodcause};
-                         if (defined($tcomcodcause)){
-                            my $ok=1;
-                            my $tcomworktime=$headref->{tcomworktime};
-                            my $tcomcodcomments=$headref->{tcomcodcomments};
+                   my $fobjrelevant=$app->getField("wffields.tcomcodrelevant",
+                                                   $current);
+                   if (defined($fobjrelevant)){
+                      my $tcomcodrelevant=$fobjrelevant->RawValue($current);
+                      my $ok=0;
+                      if ($tcomcodrelevant eq "yes"){
+                         my $fobjcause=$app->getField("wffields.tcomcodcause",
+                                                      $current);
+                         my $fobjtime=$app->getField("wffields.tcomworktime",
+                                                      $current);
+                         my $fobjcomm=$app->getField("wffields.tcomcodcomments",
+                                                      $current);
+                         if (defined($fobjcause) && 
+                             defined($fobjtime) &&
+                             defined($fobjcomm)){
+                            $ok=1;
+                            my $tcomcodcause=$fobjcause->RawValue($current);
+                            my $tcomcodcomments=$fobjcomm->RawValue($current);
+                            my $tcomworktime=$fobjtime->RawValue($current);
+                           
                             $ok=0 if ($tcomcodcause eq "" || 
                                       $tcomcodcause eq "undef");
                             if ($tcomworktime>1200 && 
                                 length($tcomcodcomments)<20){
                                $ok=0;
                             }
-                           
-                           
-                            my $img="<img ";
-                            if ($ok){
-                               $img.="src=\"../../base/load/ok.gif\" ";
-                            }
-                            else{
-                               $img.="src=\"../../base/load/fail.gif\" ";
-                            }
-                            $img.="title=\"\" border=0>";
-                            if ($mode=~m/html/i){
-                               return("$img");
-                            }
-                            else{
-                               if ($ok){
-                                  return("ok");
-                               }
-                               else{
-                                  return("fail");
-                               }
-                            }
                          }
                       }
+                      if ($ok){
+                         return("ok");
+                      }
+                      else{
+                         return("fail");
+                      }
                    }
-                   return();
+                   return("?");
+                },
+                weblink       =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+                   my $d=$self->RawValue($current);
+                   my $app=$self->getParent;
+                           
+                   my $img="<img ";
+                   if ($d=~m/ok/){
+                      $img.="src=\"../../base/load/ok.gif\" ";
+                   }
+                   else{
+                      $img.="src=\"../../base/load/fail.gif\" ";
+                   }
+                   $img.="title=\"\" border=0>";
+                   if ($mode=~m/html/i){
+                      return("$img");
+                   }
+
+                   return($d);
                 })
    );
 
@@ -156,7 +173,7 @@ sub getQueryTemplate
    my ($timedrop)=$self->{DataObj}->getHtmlSelect("P800_TimeRange",$tl,
                                                   selected=>$first);
 
-   printf STDERR ("fifi d=%s\n",$timedrop);
+   my $l1=$self->getParent->T("show all data");;
 
    my $d=<<EOF;
 <div class=searchframe>
@@ -172,10 +189,12 @@ sub getQueryTemplate
 <td class=finput>$timedrop</td>
 <td class=fname>\%affectedapplication(label)\%:</td>
 <td class=finput>\%affectedapplication(search)\%</td>
+</tr><tr>
+<td class=fname colspan=4>$l1:<input type=checkbox name=SHOWALL></td>
 </tr>
 </table>
 </div>
-%StdButtonBar(teamviewcontrol,bookmark,deputycontrol,print,search)%
+%StdButtonBar(teamusercontrol,teamviewcontrol,bookmark,deputycontrol,print,search)%
 EOF
    return($d);
 }
@@ -184,10 +203,11 @@ EOF
 sub Result
 {
    my $self=shift;
-   my %q=$self->{DataObj}->getSearchHash();
+   my %q=$self->DataObj->getSearchHash();
 
    my $userid=$self->getParent->getCurrentUserId();
    $userid=-1 if (!defined($userid) || $userid==0);
+   my $showall=Query->Param("SHOWALL");
    my $dc=Query->Param("EXVIEWCONTROL");
    my @q=();
    my %mainq1=%q;
@@ -201,6 +221,9 @@ sub Result
    }
    elsif ($dc eq "TEAM"){
       @appl=$self->getRequestedApplicationIds($userid,team=>1);
+   }
+   elsif ((my ($uid)=$dc=~m/^COLLEGE:(\d+)$/)){
+      @appl=$self->getRequestedApplicationIds($userid,college=>$uid);
    }
    else{
       @appl=$self->getRequestedApplicationIds($userid,user=>1);
@@ -221,15 +244,26 @@ sub Result
    if ($mainq1{class} eq ""){
       $mainq1{class}=\@valids;
    }
+   $self->DataObj->{'SoftFilter'}=sub{
+       my $self=shift;
+       my $rec=shift;
+       return(1) if ($showall);
+       my $fobj=$self->getField("p800chk",$rec);
+       if (defined($fobj)){
+          my $d=$fobj->RawValue($rec);
+          return(0) if ($d eq "ok");
+       }
+       return(1);
+   };
 
 
-   $self->{DataObj}->ResetFilter();
-   $self->{DataObj}->SecureSetFilter([\%mainq1]);
-   $self->{DataObj}->setDefaultView(qw(linenumber p800chk
+   $self->DataObj->ResetFilter();
+   $self->DataObj->SecureSetFilter([\%mainq1]);
+   $self->DataObj->setDefaultView(qw(linenumber p800chk 
                      name srcid wffields.tcomcodcause 
                      wffields.tcomworktime wffields.tcomcodcomments));
    my %param=(ExternalFilter=>1);
-   return($self->{DataObj}->Result(%param));
+   return($self->DataObj->Result(%param));
 }
 
 

@@ -42,12 +42,21 @@ sub getRequestedApplicationIds
       @grps=("overflow");
    }
    my $flt=[];
-   if ($param{user}){
-      push(@$flt,{ semid=>\$userid,cistatusid=>"<6" },
-                 { tsmid=>\$userid,cistatusid=>"<6" },
-                 { opmid=>\$userid,cistatusid=>"<6" },
-                 { delmgrid=>\$userid,cistatusid=>"<6" },
-                 { databossid=>\$userid,cistatusid=>"<6" });
+   if ($param{databoss}){
+      push(@$flt,{ databossid=>\$userid,cistatusid=>"<6" });
+   }
+   if ($param{user} || $param{college}){
+      my @uids;
+      push(@uids,$userid) if ($param{user});
+      if ($param{college} ne ""){
+         push(@uids,$param{college});  # hier ist noch ein check notwendig!
+      }
+      foreach my $uid (@uids){
+         push(@$flt,{ semid=>\$uid,cistatusid=>"<6" },
+                    { tsmid=>\$uid,cistatusid=>"<6" },
+                    { opmid=>\$uid,cistatusid=>"<6" },
+                    { delmgrid=>\$uid,cistatusid=>"<6" });
+      }
    }
    if ($param{dep}){
       push(@$flt,{ sem2id=>\$userid,cistatusid=>"<6" },
