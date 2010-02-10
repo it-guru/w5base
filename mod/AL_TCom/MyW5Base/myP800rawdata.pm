@@ -59,7 +59,10 @@ sub Init
                    if (defined($fobjrelevant)){
                       my $tcomcodrelevant=$fobjrelevant->RawValue($current);
                       my $ok=0;
-                      if ($tcomcodrelevant eq "yes"){
+                      if ($tcomcodrelevant eq "no"){
+                         $ok=1;
+                      }
+                      else{
                          my $fobjcause=$app->getField("wffields.tcomcodcause",
                                                       $current);
                          my $fobjtime=$app->getField("wffields.tcomworktime",
