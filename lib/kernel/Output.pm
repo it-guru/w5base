@@ -131,7 +131,7 @@ sub WriteToStdout
    else{
       $rec=undef;
       if ($self->{NewRecord}){
-         $self->getParent->SetCurrentView(qw(ALL));
+         $app->SetCurrentView(qw(ALL));
       }
    }
    #my @baseview=$app->getFieldObjsByView([$app->getCurrentView()]);
@@ -147,28 +147,31 @@ sub WriteToStdout
       my $d=$self->Format->Init(\$fh,\@baseview);
       syswrite($fh,$d) if (defined($d));
       do{
-         my @viewgroups=$self->getParent->isViewValid($rec,
-                                           format=>$self->Format->Self());
-         if ($#viewgroups!=-1 && defined($viewgroups[0]) && 
-             $viewgroups[0] ne "0"){
-            $self->getParent->Context->{Linenumber}++;
-            my @recordview=$app->getFieldObjsByView([$app->getCurrentView()],
-                                                    current=>$rec);
-            my $fieldbase={};
-            map({$fieldbase->{$_->Name()}=$_} @recordview);
-            foreach my $fo (@recordview){
-               my $name=$fo->Name();
-               if (!defined($self->Format->{fieldkeys}->{$name})){
-                  push(@{$self->Format->{fieldobjects}},$fo);
-                  $self->Format->{fieldkeys}->{$name}=
-                                      $#{$self->Format->{fieldobjects}};
+         if (!exists($app->{'SoftFilter'}) ||
+              &{$app->{'SoftFilter'}}($app,$rec)){
+            my @viewgroups=$app->isViewValid($rec,
+                                             format=>$self->Format->Self());
+            if ($#viewgroups!=-1 && defined($viewgroups[0]) && 
+                $viewgroups[0] ne "0"){
+               $app->Context->{Linenumber}++;
+               my @recordview=$app->getFieldObjsByView([$app->getCurrentView()],
+                                                       current=>$rec);
+               my $fieldbase={};
+               map({$fieldbase->{$_->Name()}=$_} @recordview);
+               foreach my $fo (@recordview){
+                  my $name=$fo->Name();
+                  if (!defined($self->Format->{fieldkeys}->{$name})){
+                     push(@{$self->Format->{fieldobjects}},$fo);
+                     $self->Format->{fieldkeys}->{$name}=
+                                         $#{$self->Format->{fieldobjects}};
+                  }
                }
-            }
-            my $d=$self->Format->ProcessLine(\$fh,\@viewgroups,$rec,
-                                             \@recordview,$fieldbase,
-                             $self->getParent->Context->{Linenumber},$msg);
-            if (defined($d)){
-               syswrite($fh,$d);
+               my $d=$self->Format->ProcessLine(\$fh,\@viewgroups,$rec,
+                                                \@recordview,$fieldbase,
+                                $self->getParent->Context->{Linenumber},$msg);
+               if (defined($d)){
+                  syswrite($fh,$d);
+               }
             }
          }
          if ($self->{NewRecord} || (!$self->Format->isRecordHandler())){
@@ -187,14 +190,14 @@ sub WriteToStdout
    }
    if ($msg ne ""){
       if ($self->getParent->can("HttpHeader")){
-         print $self->getParent->HttpHeader("text/plain");
+         print $app->HttpHeader("text/plain");
          printf("%s",$msg);
       }
       close(TMP);
       close($fh);
       return(); 
    }
-   if ($self->getParent->Context->{Linenumber}==0){
+   if ($app->Context->{Linenumber}==0){
       print $self->Format->getEmpty(HttpHeader=>$param{HttpHeader});
       close(TMP);
       close($fh);
@@ -253,27 +256,30 @@ sub WriteToScalar    # ToDo: viewgroups implementation
                       $self->Format->getHttpHeader());
       }
       do{
-         my @viewgroups=$self->getParent->isViewValid($rec,
-                                           format=>$self->Format->Self());
-         if ($#viewgroups!=-1 && defined($viewgroups[0]) && 
-             $viewgroups[0] ne "0"){
-            $self->getParent->Context->{Linenumber}++;
-            my @recordview=$app->getFieldObjsByView([$app->getCurrentView()],
-                                                    current=>$rec);
-            my $fieldbase={};
-            map({$fieldbase->{$_->Name()}=$_} @recordview);
-            foreach my $fo (@recordview){
-               my $name=$fo->Name();
-               if (!defined($self->Format->{fieldkeys}->{$name})){
-                  push(@{$self->Format->{fieldobjects}},$fo);
-                  $self->Format->{fieldkeys}->{$name}=
-                                      $#{$self->Format->{fieldobjects}};
+         if (!exists($app->{'SoftFilter'}) ||
+              &{$app->{'SoftFilter'}}($app,$rec)){
+            my @viewgroups=$self->getParent->isViewValid($rec,
+                                              format=>$self->Format->Self());
+            if ($#viewgroups!=-1 && defined($viewgroups[0]) && 
+                $viewgroups[0] ne "0"){
+               $self->getParent->Context->{Linenumber}++;
+               my @recordview=$app->getFieldObjsByView([$app->getCurrentView()],
+                                                       current=>$rec);
+               my $fieldbase={};
+               map({$fieldbase->{$_->Name()}=$_} @recordview);
+               foreach my $fo (@recordview){
+                  my $name=$fo->Name();
+                  if (!defined($self->Format->{fieldkeys}->{$name})){
+                     push(@{$self->Format->{fieldobjects}},$fo);
+                     $self->Format->{fieldkeys}->{$name}=
+                                         $#{$self->Format->{fieldobjects}};
+                  }
                }
+               my $d=$self->Format->ProcessLine(\$fh,\@viewgroups,$rec,
+                            \@recordview,$fieldbase,
+                            $app->Context->{Linenumber},$msg); 
+               syswrite(TMP,$d) if (defined($d));
             }
-            my $d=$self->Format->ProcessLine(\$fh,\@viewgroups,$rec,
-                         \@recordview,$fieldbase,
-                         $self->getParent->Context->{Linenumber},$msg); 
-            syswrite(TMP,$d) if (defined($d));
          }
          if ($self->{NewRecord} || (!$self->Format->isRecordHandler())){
             $rec=undef;
@@ -294,7 +300,7 @@ sub WriteToScalar    # ToDo: viewgroups implementation
       close($fh);
       return($msg); 
    }
-   if ($self->getParent->Context->{Linenumber}==0){
+   if ($app->Context->{Linenumber}==0){
       close(TMP);
       close($fh);
       return("");
