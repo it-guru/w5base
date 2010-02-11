@@ -769,7 +769,7 @@ sub getHashList
          my ($chkrec,$msg)=$o->getOnlyFirst(qw(ALL));
          if (defined($chkrec)){
             if (!exists($o->{'SoftFilter'}) ||
-                 &{$o->{'SoftFilter'}}($o,$rec)){
+                 &{$o->{'SoftFilter'}}($o,$chkrec)){
                my @viewl=$o->isViewValid($chkrec);
                if ($#viewl!=-1 && !($#viewl==0 && !defined($viewl[0]))){
                   $resl[$c]=$l[$c];
