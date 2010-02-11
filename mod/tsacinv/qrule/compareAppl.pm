@@ -12,7 +12,8 @@ updates" is set to "yes".
 =head3 IMPORTS
 
 From AssetManager the fields CO-Number, ApplicationID, Application Number,
-CurrentVersion and Description are imported. SeM and TSM are imported, if
+CurrentVersion, CHM Approvergroup, INM Assignmentgroup and Description 
+are imported. SeM and TSM are imported, if
 it was successfuly to import the relatied contacts.
 #If Mandator is "Extern" and "Allow automatic interface updates" is set to "yes",
 #there will be also the Name of the application, the databoss and the cistatus 
