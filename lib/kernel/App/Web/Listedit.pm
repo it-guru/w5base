@@ -1205,11 +1205,21 @@ sub Detail
       print $self->HtmlBottom(body=>1,form=>1);
       return();
    }
+   my $idobj=$self->IdField();
+   my $parentid;
+   if (defined($idobj) && defined($rec)){
+      $parentid=$idobj->RawValue($rec);
+   }
    print $self->HtmlSubModalDiv();
-   print "<script language=\"JavaScript\" src=\"../../base/load/toolbox.js\">";
-   print "</script>\n";
-   print "<script language=\"JavaScript\" src=\"../../base/load/subModal.js\">";
-   print "</script>\n";
+   print "<script language=\"JavaScript\" ".
+         "src=\"../../public/base/load/toolbox.js\"></script>".
+         "<script language=\"JavaScript\" ".
+         "src=\"../../public/base/load/subModal.js\"></script>\n";
+   my $UserJavaScript=$self->getUserJavaScriptDiv($self->Self,$parentid);
+   if ($UserJavaScript ne ""){
+      print "<script language=\"JavaScript\" ".
+            "src=\"../../public/base/load/jquery.js\"></script>\n";
+   }
 
    print("<script language=\"JavaScript\">");
    print("function setEditMode(m)");
@@ -1236,11 +1246,6 @@ sub Detail
    print "<script language=\"JavaScript\">".$self->getDetailFunctionsCode($rec).
           "</script>";
 
-   my $idobj=$self->IdField();
-   my $parentid;
-   if (defined($idobj) && defined($rec)){
-      $parentid=$idobj->RawValue($rec);
-   }
    print($self->getUserJavaScriptDiv($self->Self,$parentid));
    print $self->HtmlBottom(body=>1,form=>1);
 }
