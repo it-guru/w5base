@@ -807,7 +807,7 @@ sub IsIncidentManager
    my $WfRec=shift;
    my $mandator=$WfRec->{mandatorid};
    $mandator=[$mandator] if (!ref($mandator) eq "ARRAY");
-   return(1) if ($self->getParent->IsMemberOf($mandator,"RINManager","down"));
+   return(1) if ($self->getParent->IsMemberOf($mandator,"RINManager","both"));
    return(1) if ($self->getParent->IsMemberOf("admin"));
    if (defined($WfRec->{affectedapplicationid}) &&
        ref($WfRec->{affectedapplicationid}) eq "ARRAY" &&
@@ -818,7 +818,7 @@ sub IsIncidentManager
       foreach my $ag ($appl->getHashList(qw(businessteamid))){
          if ($ag->{businessteamid}!=0 &&
              $self->getParent->IsMemberOf($ag->{businessteamid},
-                                          "RINManager","down")){
+                                          "RINManager","both")){
             return(1);
          }
       }
