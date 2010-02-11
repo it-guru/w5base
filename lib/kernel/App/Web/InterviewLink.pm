@@ -270,7 +270,8 @@ EOF
    $s.="</select>";
 
    my $help=$self->findtemplvar({},"GLOBALHELP","article",
-                                   "W5Base Config-Item-Interview");
+                 "W5Base ".$self->SelfAsParentObject." Config-Item-Interview|".
+                 "W5Base Config-Item-Interview");
    $d.="<div class=header>";
    $d.="<table width=95%><tr><td></td>";
    $d.="<td align=left>".$label."</td>";
