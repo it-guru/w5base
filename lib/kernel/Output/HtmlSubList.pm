@@ -265,8 +265,8 @@ sub ProcessLine
          $fclick=undef if ($field->Type() eq "SubList");
          $fclick=undef if ($field->Type() eq "DynWebIcon");
          $fclick=undef if ($self->{nodetaillink});
+         my $p=$self->getParent->getParent;
          if (defined($fclick)){
-            my $p=$self->getParent->getParent;
             $weblinkname=sprintf($p->T('klick to view &lt;%s&gt;'),
                          $p->T($weblinkname,$weblinkname));
          }
@@ -275,7 +275,14 @@ sub ProcessLine
          }
       
          if ($self->{SubListEdit}==1){
-            $fclick="SubListEdit('$id')";
+            if ($id ne ""){
+               $fclick="\"SubListEdit('$id')\"";
+            }
+            else{
+               $fclick="\"alert('".$p->T("record not editable at this point!",
+                                         'kernel::Output::HtmlSubList').
+                       "')\"";
+            }
          }
       }
       my $style;
