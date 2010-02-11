@@ -296,23 +296,27 @@ EOF
    if (grep(/^article$/,@stags) && (!defined($tag) || grep(/^$tag$/,qw(faq)))){
       my $tree="foldersTree";
       my $faq=getModuleObject($self->Config,"faq::article");
-    
-      $faq->SecureSetFilter({kwords=>$searchtext});
-      my @l=$faq->getHashList(qw(name faqid));
-      my $loop=0;
-      foreach my $rec (@l){
-         if (!$found){
-            print treeViewHeader($label,1);
-            $found++;
+      my @kwords=split(/\s*\|\s*/,$searchtext);
+      foreach my $kwords (@kwords){
+         $faq->ResetFilter();
+         $faq->SecureSetFilter({kwords=>$kwords});
+         my @l=$faq->getHashList(qw(name faqid));
+         my $loop=0;
+         foreach my $rec (@l){
+            if (!$found){
+               print treeViewHeader($label,1);
+               $found++;
+            }
+            if ($loop==0 && $#stags>0){
+               print insFld($tree,"article","FAQ-Artikel");
+               $tree="article";
+               $loop++;
+            }
+            print insDoc($tree,$rec->{name},
+                         "../../faq/article/ById/".
+                         "$rec->{faqid}");
          }
-         if ($loop==0 && $#stags>0){
-            print insFld($tree,"article","FAQ-Artikel");
-            $tree="article";
-            $loop++;
-         }
-         print insDoc($tree,$rec->{name},
-                      "../../faq/article/ById/".
-                      "$rec->{faqid}");
+         last if ($found);
       }
    }
    if (grep(/^forum$/,@stags) && (!defined($tag) || grep(/^$tag$/,qw(forum)))){
