@@ -103,9 +103,33 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'lincidentagid',
-                label         =>'AC-Incident-AssignmentID',
+                label         =>'AM-Incident-AssignmentID',
                 dataobjattr   =>'amtsicustappl.lincidentagid'),
 
+
+      new kernel::Field::TextDrop(
+                name          =>'capprovergroup',
+                label         =>'CHM Approver Group',
+                vjointo       =>'tsacinv::group',
+                vjoinon       =>['lchhangeapprid'=>'lgroupid'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'lchhangeapprid',
+                label         =>'AM-Change-ApproverID',
+                dataobjattr   =>'amtsicustappl.lchangeapprid'),
+
+      new kernel::Field::TextDrop(
+                name          =>'cimplementorgroup',
+                label         =>'CHM Implementor Group',
+                vjointo       =>'tsacinv::group',
+                vjoinon       =>['lchhangeimplid'=>'lgroupid'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'lchhangeimplid',
+                label         =>'AM-Change-ImplementorID',
+                dataobjattr   =>'amtsicustappl.lchangeimplid'),
 
                                     
       new kernel::Field::TextDrop(

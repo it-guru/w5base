@@ -126,6 +126,20 @@ sub qcheckRecord
                              $forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'native');
+         if ($dataobj->Self eq "AL_TCom::appl"){  # only for AL DTAG
+            $self->IfaceCompare($dataobj,
+                                $rec,"acinmassingmentgroup",
+                                $parrec,"iassignmentgroup",
+                                $forcedupd,$wfrequest,
+                                \@qmsg,\@dataissue,\$errorlevel,
+                                mode=>'native');
+            $self->IfaceCompare($dataobj,
+                                $rec,"scapprgroup",
+                                $parrec,"capprovergroup",
+                                $forcedupd,$wfrequest,
+                                \@qmsg,\@dataissue,\$errorlevel,
+                                mode=>'native');
+         }
       }
       #if ($rec->{allowifupdate}){
       #}

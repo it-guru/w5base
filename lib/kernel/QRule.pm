@@ -119,11 +119,13 @@ sub IfaceCompare
    my $ask=1;
    if ($param{mode} eq "native" ||
        $param{mode} eq "string"){           # like nativ string compares
-      if (exists($comprec->{$compfieldname}) &&
-          defined($comprec->{$compfieldname}) &&
-          (!defined($origrec->{$origfieldname}) ||
-           $comprec->{$compfieldname} ne $origrec->{$origfieldname})){
-         $takeremote++;
+      if (exists($comprec->{$compfieldname})){
+         if (defined($comprec->{$compfieldname})){
+            if (!defined($origrec->{$origfieldname}) ||
+                $comprec->{$compfieldname} ne $origrec->{$origfieldname}){
+               $takeremote++;
+            }
+         }
       }
    }
    elsif ($param{mode} eq "leftouterlinkcreate"){  # like servicesupprt links
