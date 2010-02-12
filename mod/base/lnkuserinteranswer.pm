@@ -138,7 +138,7 @@ sub initSqlWhere
    return(undef) if ($mode eq "delete");
    return(undef) if ($mode eq "insert");
    return(undef) if ($mode eq "update");
-   my $where="contact.cistatus<=5";
+   my $where="(contact.cistatus<=5 and contact.usertyp='user')";
    return($where);
 }
 
