@@ -67,6 +67,17 @@ sub new
       insertafter=>'id'
    );
 
+   $self->AddFields(
+      new kernel::Field::Import( $self,
+                vjointo       =>'base::user',
+                dontrename    =>1,
+                group         =>'relation',
+                fields        =>[qw(orgunits
+                                    )]),
+      insertafter=>'parentname'
+   );
+
+
 
    $self->getField("parentobj")->{searchable}=0;
    $self->getField("parentid")->{searchable}=0;
@@ -119,6 +130,19 @@ sub getSqlFrom
           "left outer join interview ".
           "on $worktable.interviewid=interview.id ");
 }
+
+sub initSqlWhere
+{
+   my $self=shift;
+   my $mode=shift;
+   return(undef) if ($mode eq "delete");
+   return(undef) if ($mode eq "insert");
+   return(undef) if ($mode eq "update");
+   my $where="contact.cistatus<=5";
+   return($where);
+}
+
+
 
 
 1;
