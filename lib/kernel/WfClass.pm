@@ -1030,11 +1030,12 @@ sub isCurrentWorkspace
 
    my $ws=$self->getParent->getPersistentModuleObject("base::workflowws");
    $ws->SetFilter([{fwdtargetid=>\$userid,fwdtarget=>\'base::user',
-                    wfheadid=>$WfRec->{wfheadid}},
+                    wfheadid=>\$WfRec->{id}},
                    {fwdtargetid=>\@grpids,fwdtarget=>\'base::grp',
-                    wfheadid=>$WfRec->{wfheadid}}]);
-   my ($wsrec,$msg)=$ws->getOnlyFirst(qw(wfheadid));
-   return(1) if (defined($wsrec));
+                    wfheadid=>\$WfRec->{id}}]);
+   if ($ws->CountRecords()){
+      return(1);
+   }
    return(0);
 }
 
