@@ -1742,17 +1742,17 @@ sub InitFields
 sub AddFields
 {
    my $self=shift;
-   my @fobjlist=shift;
+   my @fobjlist;
    my %param;
-   if (ref($_[0])){
-      push(@fobjlist,@_);
+
+   while(ref($_[0])){
+      push(@fobjlist,shift);
    }
-   else{
-      %param=@_;
-   }
+   %param=@_;
 
    foreach my $obj ($self->InitFields(@fobjlist)){
       my $name=$obj->Name;
+printf STDERR ("fifi $self=$name\n") if ($self->Self eq "itil::lnkapplinteranswer");
       next if (defined($self->{'Field'}->{$name}));
       $self->{'Field'}->{$name}=$obj;
       my $inserted=0;
@@ -1761,14 +1761,14 @@ sub AddFields
          if (ref($param{'insertafter'}) eq "ARRAY"){
             @match=@{$param{'insertafter'}};
          }
-         for(my $c=0;$c<=$#{$self->{'FieldOrder'}};$c++){
+         fi: for(my $c=0;$c<=$#{$self->{'FieldOrder'}};$c++){
             if (grep(/^$self->{'FieldOrder'}->[$c]$/,@match)){
                splice(@{$self->{'FieldOrder'}},$c+1,
                       $#{$self->{'FieldOrder'}}-$c+1,
                  ($name,
                  @{$self->{'FieldOrder'}}[($c+1)..($#{$self->{'FieldOrder'}})]));
                $inserted++;
-               last;
+               last fi;
             }
          }
       }

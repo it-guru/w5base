@@ -35,10 +35,10 @@ sub new
       msg(ERROR,"can't Import field without vjointo");
       return()
    }
-   if (!defined($param{vjoinon})){
-      msg(ERROR,"can't Import field without vjoinon");
-      return()
-   }
+  # if (!defined($param{vjoinon})){
+  #    msg(ERROR,"can't Import field without vjoinon");
+  #    return()
+  # }
    if (!defined($param{prefix})){
       $param{prefix}=$param{vjointo};
       $param{prefix}=~s/::/_/g;
@@ -57,8 +57,10 @@ sub new
          next;
       }
       my %fo=%{$fo};
-      $fo{vjointo}=$param{vjointo};
-      $fo{vjoinon}=$param{vjoinon};
+      if (defined($param{vjoinon})){   
+         $fo{vjointo}=$param{vjointo};
+         $fo{vjoinon}=$param{vjoinon};
+      }
       if (defined($param{weblinkon})){
          $fo{weblinkto}=$param{weblinkto};
          $fo{weblinkon}=$param{weblinkon};
@@ -81,9 +83,11 @@ sub new
          $fo{translation}=$subroutine;
       }
 
-      $fo{vjoindisp}=$field;
-      delete($fo{dataobjattr});
-      if ($param{dontrename}){
+      if (defined($param{vjoinon})){    # only if a real vjoin dataobjattr del
+         $fo{vjoindisp}=$field;
+         delete($fo{dataobjattr});
+      }
+      if ($param{'dontrename'}){
          $fo{name}=$field;
       }
       else{

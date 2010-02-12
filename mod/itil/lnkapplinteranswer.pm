@@ -26,6 +26,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
@@ -38,29 +39,31 @@ sub new
                    return(1) if (defined($current));
                    return(0);
                 },
-                label         =>'Application',
+                label         =>'Application name',
+                translation   =>'itil::appl',
                 vjointo       =>'itil::appl',
                 vjoinon       =>['parentid'=>'id'],
                 vjoindisp     =>'name',
                 dataobjattr   =>'appl.name'),
       insertafter=>'id'
    );
-   $self->AddFields(
-      new kernel::Field::Mandator(
-                group         =>'relation'),
 
-      new kernel::Field::Link(
-                name          =>'mandatorid',
-                group         =>'relation',
-                readonly      =>1,
-                dataobjattr   =>'appl.mandator')
+   $self->AddFields(
+      new kernel::Field::Import( $self,
+                vjointo       =>'itil::appl',
+                dontrename    =>1,
+                fields        =>[qw(businessteam businessteamid 
+                                    mandator mandatorid
+                                    )]),
+      insertafter=>'parentname'
    );
 
 
    $self->getField("parentobj")->{searchable}=0;
    $self->getField("parentid")->{searchable}=0;
    $self->{secparentobj}='itil::appl';
-   $self->setDefaultView(qw(parentname name answer mdate editor));
+   $self->setDefaultView(qw(parentname mandator relevant name 
+                            answer mdate editor));
    return($self);
 }
 
@@ -71,10 +74,15 @@ sub SecureSetFilter
 
    if (!$self->IsMemberOf([qw(admin w5base.itil.appl.read w5base.itil.read)],
                           "RMember")){
+      my %g=$self->getGroupsOf($ENV{REMOTE_USER},
+                               [qw(RCFManager RAuditor RQManager)],
+                               'down');
       my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
-      push(@flt,[
-                 {mandatorid=>\@mandators}
-                ]);
+      my @secflt=({mandatorid=>\@mandators});
+      if (keys(%g)){
+         push(@secflt,{mandatorid=>[keys(%g)]});
+      }
+      push(@flt,\@secflt);
    }
    return($self->SetFilter(@flt));
 }
@@ -86,18 +94,34 @@ sub isViewValid
    return("ALL"); 
 }
 
-
-
-
-
 sub getSqlFrom
 {
    my $self=shift;
    my ($worktable,$workdb)=$self->getWorktable();
-   my $j=$self->SUPER::getSqlFrom();
+   my $secobj=$self->{secparentobj};
 
-   return("$j join appl on $worktable.parentid=appl.id");
+   return("appl left outer join $worktable ".
+          "on $worktable.parentobj='$secobj' and ".
+          "$worktable.parentid=appl.id ".
+          "left outer join interview ".
+          "on $worktable.interviewid=interview.id ");
 }
+
+sub initSqlWhere
+{
+   my $self=shift;
+   my $mode=shift;
+   return(undef) if ($mode eq "delete");
+   return(undef) if ($mode eq "insert");
+   return(undef) if ($mode eq "update");
+   my $where="(appl.cistatus<=5 and appl.cistatus>=3)";
+   return($where);
+}
+
+
+
+
+
 
 
 1;

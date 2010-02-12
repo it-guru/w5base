@@ -33,6 +33,9 @@ sub new
    $self->{default}="0"            if (!defined($self->{default}));
    $self->{htmleditwidth}="60px"   if (!defined($self->{htmleditwidth}));
    $self->{WSDLfieldType}="xsd:boolean" if (!defined($self->{WSDLfieldType}));
+   if ($self->{markempty}){
+      $self->{default}=undef;
+   }
    return($self);
 }
 

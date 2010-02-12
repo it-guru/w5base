@@ -59,37 +59,46 @@ sub new
       insertafter=>'id'
    );
    $self->AddFields(
-      new kernel::Field::Mandator(
-                group         =>'relation'),
-
-      new kernel::Field::Link(
-                name          =>'mandatorid',
+      new kernel::Field::Import( $self,
+                vjointo       =>'itil::system',
                 group         =>'relation',
-                readonly      =>1,
-                dataobjattr   =>'system.mandator')
+                dontrename    =>1,
+                fields        =>[qw(adminteam businessteamid 
+                                    mandator mandatorid
+                                    )]),
+      insertafter=>'parentname'
    );
 
    $self->getField("parentobj")->{searchable}=0;
    $self->getField("parentid")->{searchable}=0;
    $self->{secparentobj}='itil::system';
-   $self->setDefaultView(qw(parentname name answer mdate editor));
+   $self->setDefaultView(qw(parentname mandator relevant 
+                            name answer mdate editor));
    return($self);
 }
+
 
 sub SecureSetFilter
 {
    my $self=shift;
    my @flt=@_;
-   
+
    if (!$self->IsMemberOf([qw(admin w5base.itil.system.read w5base.itil.read)],
                           "RMember")){
+      my %g=$self->getGroupsOf($ENV{REMOTE_USER},
+                               [qw(RCFManager RAuditor RQManager)],
+                               'down');
       my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
-      push(@flt,[
-                 {mandatorid=>\@mandators}
-                ]);
+      my @secflt=({mandatorid=>\@mandators});
+      if (keys(%g)){
+         push(@secflt,{mandatorid=>[keys(%g)]});
+      }
+      push(@flt,\@secflt);
    }
    return($self->SetFilter(@flt));
 }
+
+
 
 sub isViewValid
 {
@@ -100,15 +109,31 @@ sub isViewValid
 
 
 
-
 sub getSqlFrom
 {
    my $self=shift;
    my ($worktable,$workdb)=$self->getWorktable();
-   my $j=$self->SUPER::getSqlFrom();
+   my $secobj=$self->{secparentobj};
 
-   return("$j join system on $worktable.parentid=system.id");
+   return("system left outer join $worktable ".
+          "on $worktable.parentobj='$secobj' and ".
+          "$worktable.parentid=system.id ".
+          "left outer join interview ".
+          "on $worktable.interviewid=interview.id ");
 }
+
+sub initSqlWhere
+{
+   my $self=shift;
+   my $mode=shift;
+   return(undef) if ($mode eq "delete");
+   return(undef) if ($mode eq "insert");
+   return(undef) if ($mode eq "update");
+   my $where="(system.cistatus<=5 and system.cistatus>=3)";
+   return($where);
+}
+
+
 
 
 1;

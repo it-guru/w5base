@@ -54,6 +54,7 @@ sub new
 
       new kernel::Field::Boolean(
                 name          =>'relevant',
+                markempty     =>1,
                 label         =>'Relevant',
                 dataobjattr   =>'interanswer.relevant'),
 
@@ -80,6 +81,7 @@ sub new
                 name          =>'interviewid',
                 group         =>'relation',
                 uploadable    =>0,
+                searchable    =>0,
                 label         =>'Interview ID',
                 dataobjattr   =>'interanswer.interviewid'),
 
