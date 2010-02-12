@@ -27,6 +27,7 @@ sub new
 {
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
+   $self->{multiple}=1       if (!defined($self->{multiple}));
    $self->{conjunction}="or" if (!defined($self->{conjunction}));
    $self->{vjoinconcat}=", " if (!defined($self->{vjoinconcat}));
    $self->{WSDLfieldType}="ArrayOfStringItems" if (!defined($self->{WSDLfieldType}));
@@ -154,11 +155,23 @@ sub Validate
          $khrec=$currentstate->{$self->{keyhandler}};
       }
       my @d;
-      if (ref($newrec->{$self->Name()}) eq "ARRAY"){
-         @d=@{$newrec->{$self->Name()}};
+      if ($self->{multiple}){
+         if (ref($newrec->{$self->Name()}) eq "ARRAY"){
+            @d=@{$newrec->{$self->Name()}};
+         }
+         else{
+            @d=parse_line('[,;]{0,1}\s+',0,$newrec->{$self->Name()});
+         }
       }
       else{
-         @d=parse_line('[,;]{0,1}\s+',0,$newrec->{$self->Name()});
+         if (ref($newrec->{$self->Name()}) eq "ARRAY"){
+            if (defined($newrec->{$self->Name()}->[0])){
+               @d=$newrec->{$self->Name()}->[0];
+            }
+         }
+         else{
+            @d=($newrec->{$self->Name()});
+         }
       }
       if (defined($self->{vjointo})){   # input handling in workflow init
          my $newval=$newrec->{$name};
@@ -211,16 +224,24 @@ sub Validate
                                                 $self->Label,$newval);
                return(undef);
             }
-            if ($#{$keylist}<0 && ((defined($fromquery) && $fromquery ne "") ||
-                                   (defined($newrec->{$name}) && 
-                                    $newrec->{$name} ne $oldrec->{$name}))){
-               $self->getParent->LastMsg(ERROR,"'%s' value '%s' not found",
-                                         $self->Label,$newval);
-               return(undef);
+            if ($#{$keylist}<0 && $newrec->{$name} eq "" && $fromquery eq ""){
+               $dstkey=undef;
+               $srcval=undef;
             }
-            $dstkey=$self->vjoinobj->getVal($self->vjoinobj->IdField->Name(),
-                       $filter);
-            $srcval=$vallist->[0];
+            else{
+               if ($#{$keylist}<0 && ((defined($fromquery) 
+                                       && $fromquery ne "") ||
+                                      (defined($newrec->{$name}) && 
+                                       $newrec->{$name} ne $oldrec->{$name}))){
+                  $self->getParent->LastMsg(ERROR,"'%s' value '%s' not found",
+                                            $self->Label,$newval);
+                  return(undef);
+               }
+               $dstkey=$self->vjoinobj->getVal($self->vjoinobj->IdField->Name(),
+                          $filter);
+               $srcval=$vallist->[0];
+            }
+            
          }
          else{
             my @dstkey=$self->vjoinobj->getVal($self->vjoinobj->IdField->Name(),
@@ -305,7 +326,12 @@ sub Unformat
    my $rec=shift;
    my $r={};
    if (defined($formated)){
-      $r->{$self->{name}}=[split(/\s+/,$formated->[0])];
+      if ($self->{multiple}){
+         $r->{$self->{name}}=[split(/\s+/,$formated->[0])];
+      }
+      else{
+         $r->{$self->{name}}=[$formated->[0]];
+      }
       if ($#{$r->{$self->{name}}}==0){
          $r->{$self->{name}}=$r->{$self->{name}}->[0];
       }

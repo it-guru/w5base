@@ -148,7 +148,9 @@ sub FinishWrite
          }
       }
       else{
-         $data{lc($newval->{$k})}=$newval->{$k};
+         if (defined($newval->{$k})){
+            $data{lc($newval->{$k})}=$newval->{$k};
+         }
       }
       foreach my $data (keys(%data)){
          $insdata{fval}=$data{$data};

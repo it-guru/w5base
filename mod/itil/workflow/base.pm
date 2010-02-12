@@ -148,6 +148,8 @@ sub Init
                                                   [$self->{vjoindisp}],%param);
                    return($dropbox);
                 },
+                multiple   =>0,
+                AllowEmpty =>1,
                 vjointo    =>'base::projectroom',
                 vjoinon    =>['affectedprojectid'=>'id'],
                 vjoindisp  =>'name',
