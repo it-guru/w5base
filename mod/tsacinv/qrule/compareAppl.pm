@@ -133,13 +133,15 @@ sub qcheckRecord
                                 $parrec,"iassignmentgroup",
                                 $forcedupd,$wfrequest,
                                 \@qmsg,\@dataissue,\$errorlevel,
-                                mode=>'native');
+                                mode=>'native',
+                                AllowEmpty=>0);
             $self->IfaceCompare($dataobj,
                                 $rec,"scapprgroup",
                                 $parrec,"capprovergroup",
                                 $forcedupd,$wfrequest,
                                 \@qmsg,\@dataissue,\$errorlevel,
-                                mode=>'native');
+                                mode=>'native',
+                                AllowEmpty=>0);
          }
       }
       #if ($rec->{allowifupdate}){

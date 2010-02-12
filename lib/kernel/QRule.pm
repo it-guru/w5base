@@ -113,6 +113,7 @@ sub IfaceCompare
    my %param=@_;
 
    $param{mode}="native" if (!defined($param{mode}));
+   $param{AllowEmpty}=1 if (!defined($param{AllowEmpty}));
 
    return if (!defined($obj->getField($origfieldname)));
    my $takeremote=0;
@@ -177,7 +178,9 @@ sub IfaceCompare
       if ((exists($origrec->{allowifupdate}) && $origrec->{allowifupdate}) ||
           !defined($origrec->{$origfieldname}) ||
           $origrec->{$origfieldname}=~m/^\s*$/){
-         $forcedupd->{$origfieldname}=$comprec->{$compfieldname};
+         if (!(!$param{AllowEmpty} && $comprec->{$compfieldname} eq "")){
+            $forcedupd->{$origfieldname}=$comprec->{$compfieldname};
+         }
       }
       else{
          $wfrequest->{$origfieldname}=$comprec->{$compfieldname};
