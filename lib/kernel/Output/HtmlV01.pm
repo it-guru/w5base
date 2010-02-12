@@ -144,35 +144,37 @@ sub ProcessLine
    if (grep(/^$ResultLineClickHandler$/,$app->getValidWebFunctions())){
       if ($idfield){
          my $dest;
-         if ($ResultLineClickHandler eq "ById"){
-            $dest="ById/".$id;
-         }
-         else{
-            $dest=$app->Self();
-            $dest=~s/::/\//g;
-            my $lq=new kernel::cgi({});
-            $lq->Param($idfieldname=>$id);
-            $lq->Param(AllowClose=>1);
-            my $urlparam=$lq->QueryString();
-            $dest="../../$dest/$ResultLineClickHandler?$urlparam";
-         }
-         my $detailx=$app->DetailX();
-         my $detaily=$app->DetailY();
-         my $UserCache=$self->getParent->getParent->Cache->{User}->{Cache};
-         if (defined($UserCache->{$ENV{REMOTE_USER}})){
-            $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
-         }
-         my $winsize="";
-         if (defined($UserCache->{winsize}) && $UserCache->{winsize} ne ""){
-            $winsize=$UserCache->{winsize};
-         }
-         if ($winsize eq ""){
-            $lineonclick="openwin(\"$dest\",\"_blank\",".
-                "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
-                "resizable=yes,scrollbars=auto\")";
-         }
-         else{
-            $lineonclick="custopenwin(\"$dest\",\"$winsize\",$detailx)";
+         if ($id ne ""){
+            if ($ResultLineClickHandler eq "ById"){
+               $dest="ById/".$id;
+            }
+            else{
+               $dest=$app->Self();
+               $dest=~s/::/\//g;
+               my $lq=new kernel::cgi({});
+               $lq->Param($idfieldname=>$id);
+               $lq->Param(AllowClose=>1);
+               my $urlparam=$lq->QueryString();
+               $dest="../../$dest/$ResultLineClickHandler?$urlparam";
+            }
+            my $detailx=$app->DetailX();
+            my $detaily=$app->DetailY();
+            my $UserCache=$self->getParent->getParent->Cache->{User}->{Cache};
+            if (defined($UserCache->{$ENV{REMOTE_USER}})){
+               $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
+            }
+            my $winsize="";
+            if (defined($UserCache->{winsize}) && $UserCache->{winsize} ne ""){
+               $winsize=$UserCache->{winsize};
+            }
+            if ($winsize eq ""){
+               $lineonclick="openwin(\"$dest\",\"_blank\",".
+                   "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
+                   "resizable=yes,scrollbars=auto\")";
+            }
+            else{
+               $lineonclick="custopenwin(\"$dest\",\"$winsize\",$detailx)";
+            }
          }
       }
    }
