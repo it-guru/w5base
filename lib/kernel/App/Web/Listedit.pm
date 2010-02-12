@@ -1212,13 +1212,13 @@ sub Detail
    }
    print $self->HtmlSubModalDiv();
    print "<script language=\"JavaScript\" ".
-         "src=\"../../public/base/load/toolbox.js\"></script>".
+         "src=\"../../../public/base/load/toolbox.js\"></script>".
          "<script language=\"JavaScript\" ".
-         "src=\"../../public/base/load/subModal.js\"></script>\n";
+         "src=\"../../../public/base/load/subModal.js\"></script>\n";
    my $UserJavaScript=$self->getUserJavaScriptDiv($self->Self,$parentid);
    if ($UserJavaScript ne ""){
       print "<script language=\"JavaScript\" ".
-            "src=\"../../public/base/load/jquery.js\"></script>\n";
+            "src=\"../../../public/base/load/jquery.js\"></script>\n";
    }
 
    print("<script language=\"JavaScript\">");
@@ -1246,7 +1246,7 @@ sub Detail
    print "<script language=\"JavaScript\">".$self->getDetailFunctionsCode($rec).
           "</script>";
 
-   print($self->getUserJavaScriptDiv($self->Self,$parentid));
+   print($UserJavaScript);
    print $self->HtmlBottom(body=>1,form=>1);
 }
 
