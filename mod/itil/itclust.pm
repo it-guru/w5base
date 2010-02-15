@@ -116,6 +116,21 @@ sub new
                 vjoinon       =>['id'=>'clustid'],
                 vjoindisp     =>['fullname','appl']),
 
+      new kernel::Field::SubList(
+                name          =>'systems',
+                label         =>'Systems',
+                group         =>'systems',
+                forwardSearch =>1,
+                readonly      =>1,
+                vjointo       =>'itil::system',
+                vjoinbase     =>[{systemcistatusid=>"<=5"}],
+                vjoinon       =>['id'=>'itclustid'],
+                vjoindisp     =>['name','systemid',
+                                 'cistatus',
+                                 'shortdesc'],
+                vjoininhash   =>['system','systemsystemid','systemcistatus',
+                                 'systemid']),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 group         =>'misc',
@@ -234,7 +249,7 @@ sub new
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default contacts services misc attachments source));
+   return(qw(header default contacts services systems misc attachments source));
 }
 
 
@@ -469,14 +484,8 @@ sub ValidateDelete
    my $rec=shift;
    my $lock=0;
 
-#   my $refobj=getModuleObject($self->Config,"itil::lnkapplitclust");
-#   if (defined($refobj)){
-#      my $idname=$self->IdField->Name();
-#      my $id=$rec->{$idname};
-#      $refobj->SetFilter({'toapplid'=>\$id});
-#      $lock++ if ($refobj->CountRecords()>0);
-#   }
    if ($lock>0 ||
+       $#{$rec->{systems}}!=-1 ||
        $#{$rec->{services}}!=-1){
       $self->LastMsg(ERROR,
           "delete only posible, if there are no services ".

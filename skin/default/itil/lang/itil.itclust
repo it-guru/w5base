@@ -2,4 +2,5 @@
 'Full Cluster Name'=>{de=>'vollständiger Cluster Name'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'fieldgroup.services'=>{de=>'Services'},
+'fieldgroup.systems'=>{de=>'Systeme'},
 'delete only posible, if there are no services or software instance relations'=>{de=>'Löschen ist nur dann zulässig, wenn es keine Service oder Software-Instanz Verknüpfungen gibt'},

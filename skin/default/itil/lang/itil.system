@@ -9,6 +9,7 @@
 'fieldgroup.software'=>{de=>'Software',en=>'Software'},
 'fieldgroup.ipaddresses'=>{de=>'IP-Adressen',en=>'IP-Addresses'},
 'fieldgroup.phonenumbers'=>{de=>'Rufnummernverzeichnis',en=>'Phonenumbers'},
+'fieldgroup.cluster'=>{de=>'Cluster',en=>'Cluster'},
 'fieldgroup.sec'=>{en=>'Security and data privacy',de=>'Sicherheit und Datenschutz'},
 'Phonenumbers'=>{de=>'Rufnummernverzeichnis'},
 'CPU-Count'=>{de=>'CPU-Anzahl'},

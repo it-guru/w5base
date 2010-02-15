@@ -12,6 +12,7 @@
 'fieldgroup.ssl'=>{de=>'SSL Prüfsystem',en=>'SSL Verification'},
 'fieldgroup.sec'=>{en=>'Security and data privacy',de=>'Sicherheit und Datenschutz'},
 'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
+'fieldgroup.cluster'=>{de=>'Cluster Service',en=>'Cluster Service'},
 'Database Administrator'=>{de=>'Datenbank Administrator'},
 'Instance guardian team'=>{de=>'Instanz Betreuungsteam'},
 'Instance type'=>{de=>'Instanz Typ'},
@@ -30,3 +31,6 @@
 'SSL State'=>{de=>'SSL Status'},
 'SSL last Certificate check'=>{de=>'SSL letzte Zertifikat Überprüfung'},
 'mangaged by rules of SOX'=>{de=>'Betreuung nach SOX (USA) Regeln'},
+'run on Cluster Service'=>{de=>'ausführen auf Cluster Service'},
+'cluster service application and instance application does not match'=>{
+ de=>'Cluster Service Anwendung passt nicht zur Anwendung in dieser Software Instanz'},

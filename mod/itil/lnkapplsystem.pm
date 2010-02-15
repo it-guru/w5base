@@ -169,6 +169,7 @@ sub new
       new kernel::Field::Percent(
                 name          =>'fraction',
                 label         =>'Fraction',
+                searchable    =>0,
                 htmlwidth     =>'60px',
                 dataobjattr   =>'qlnkapplsystem.fraction'),
 
@@ -201,6 +202,14 @@ sub new
                 group         =>'source',
                 label         =>'Source-Id',
                 dataobjattr   =>'qlnkapplsystem.srcid'),
+                                                   
+      new kernel::Field::Text(
+                name          =>'reltyp',
+                group         =>'source',
+                htmlwidth     =>'20px',
+                readonly      =>1,
+                label         =>'Rel.Typ',
+                dataobjattr   =>'qlnkapplsystem.reltyp'),
                                                    
       new kernel::Field::Date(
                 name          =>'srcload',
@@ -245,7 +254,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'applcistatus',
                 readonly      =>1,
-                htmlwidth     =>'100px',
+                htmlwidth     =>'80px',
                 group         =>'applinfo',
                 label         =>'Application CI-State',
                 vjointo       =>'base::cistatus',
@@ -652,7 +661,91 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="lnkapplsystem qlnkapplsystem left outer join appl ".
+   my $mode=shift;
+   my @filter=@_;
+
+
+   #
+   # creating pre selection for subselect
+   #
+   my $datasourcerest1="1";
+   my $datasourcerest2="system.cistatus<=5 and itclust.cistatus<=5";
+   if ($mode eq "select"){
+      foreach my $f (@filter){
+         if (ref($f) eq "HASH"){
+            if (exists($f->{applid}) && $f->{applid}=~m/^\d+$/){
+               $datasourcerest1.=" and lnkapplsystem.appl='$f->{applid}'";
+               $datasourcerest2.=" and lnkapplitclust.appl='$f->{applid}'";
+            }
+            if (exists($f->{applid}) && ref($f->{applid}) eq "ARRAY"){
+               $datasourcerest1.=" and lnkapplsystem.appl in (".
+                             join(",",map({"'".$_."'"} @{$f->{applid}})).")";
+               $datasourcerest2.=" and lnkapplitclust.appl in (".
+                             join(",",map({"'".$_."'"} @{$f->{applid}})).")";
+            }
+            if (exists($f->{systemid}) && $f->{systemid}=~m/^\d+$/){
+               $datasourcerest1.=" and lnkapplsystem.system='$f->{systemid}'";
+               $datasourcerest2.=" and system.id='$f->{systemid}'";
+            }
+            if (exists($f->{systemid}) && ref($f->{systemid}) eq "ARRAY"){
+               $datasourcerest1.=" and lnkapplsystem.system in (".
+                             join(",",map({"'".$_."'"} @{$f->{systemid}})).")";
+               $datasourcerest2.=" and system.id in (".
+                             join(",",map({"'".$_."'"} @{$f->{systemid}})).")";
+            }
+         }
+      }
+   }
+
+
+   $datasourcerest1=" where $datasourcerest1" if ($datasourcerest1 ne ""); 
+   $datasourcerest2=" where $datasourcerest2" if ($datasourcerest2 ne ""); 
+
+
+   my $datasource=
+     "select ".
+        "lnkapplsystem.id, ".
+        "lnkapplsystem.appl, ".
+        "lnkapplsystem.system, ".
+        "lnkapplsystem.comments, ".
+        "lnkapplsystem.additional, ".
+        "lnkapplsystem.fraction, ".
+        "lnkapplsystem.createdate, ".
+        "lnkapplsystem.modifydate, ".
+        "lnkapplsystem.createuser, ".
+        "lnkapplsystem.modifyuser, ".
+        "lnkapplsystem.editor, ".
+        "lnkapplsystem.realeditor, ".
+        "lnkapplsystem.srcsys, ".
+        "lnkapplsystem.srcid, ".
+        "lnkapplsystem.srcload, ".
+        "'direct' reltyp ".
+     "from lnkapplsystem $datasourcerest1 ".
+     "union ".
+     "select ".
+        "null id, ".
+        "lnkapplitclust.appl, ".
+        "system.id system, ".
+        "concat('relation by cluster service ',".
+               "lnkapplitclust.itsvcname) comments, ".
+        "null additional, ".
+        "100.0 fraction, ".
+        "lnkapplitclust.createdate, ".
+        "lnkapplitclust.modifydate, ".
+        "lnkapplitclust.createuser, ".
+        "lnkapplitclust.modifyuser, ".
+        "lnkapplitclust.editor, ".
+        "lnkapplitclust.realeditor, ".
+        "lnkapplitclust.srcsys, ".
+        "lnkapplitclust.srcid, ".
+        "lnkapplitclust.srcload, ".
+        "'cluster' reltyp ".
+     "from lnkapplitclust ".
+          "join itclust on itclust.id=lnkapplitclust.itclust ".
+          "join system on lnkapplitclust.itclust=system.clusterid ".
+          $datasourcerest2;
+
+   my $from="($datasource) qlnkapplsystem left outer join appl ".
             "on qlnkapplsystem.appl=appl.id ".
             "left outer join system ".
             "on qlnkapplsystem.system=system.id ".
@@ -661,10 +754,6 @@ sub getSqlFrom
    return($from);
 }
 
-# Einbindung von Clustern könnte wie folgt aufgebaut werden:
-# select u1.name,user.userid from (select fullname as name from user 
-# where fullname like 'Vo%' union select fullname as name from grp 
-# where fullname like '%DB') u1 left outer join user on u1.name=user.fullname;
 
 sub SecureSetFilter
 {

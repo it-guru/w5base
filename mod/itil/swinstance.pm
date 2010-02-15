@@ -276,11 +276,30 @@ sub new
                 group         =>'misc',
                 dataobjattr   =>'swinstance.custcostalloc'),
 
+      new kernel::Field::Boolean(
+                name          =>'runonclusts',
+                label         =>'run on Cluster Service',
+                group         =>'misc',
+                dataobjattr   =>'swinstance.runonclusts'),
+
       new kernel::Field::Text(
                 name          =>'autoname',
                 group         =>'misc',
                 label         =>'Automationsname/IP-Address',
                 dataobjattr   =>'swinstance.autompartner'),
+
+      new kernel::Field::TextDrop(
+                name          =>'itclusts',
+                group         =>'cluster',
+                label         =>'Cluster Service',
+                vjointo       =>'itil::lnkapplitclust',
+                vjoineditbase =>{'itclustcistatusid'=>[2,3,4]},
+                vjoinon       =>['itclustsid'=>'id'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'itclustsid',
+                dataobjattr   =>'swinstance.itclusts'),
 
       new kernel::Field::Text(
                 name          =>'sslurl',
@@ -334,16 +353,6 @@ sub new
       new kernel::Field::Container(
                 name          =>'additional',
                 label         =>'Additionalinformations',
-                uivisible     =>sub{
-                   my $self=shift;
-                   my $mode=shift;
-                   my %param=@_;
-                   my $rec=$param{current};
-                   if (!defined($rec->{$self->Name()})){
-                      return(0);
-                   }
-                   return(1);
-                },
                 dataobjattr   =>'swinstance.additional'),
 
       new kernel::Field::ContactLnk(
@@ -627,6 +636,24 @@ sub Validate
       $newrec->{sslstate}=undef;
       $newrec->{sslcheck}=undef;
    }
+   if (!effVal($oldrec,$newrec,"runonclusts")){
+      if (effVal($oldrec,$newrec,"itclustsid") ne ""){
+         $newrec->{itclustsid}=undef;
+      }
+   }
+   else{ # validate service app
+      if ((my $clustsid=effVal($oldrec,$newrec,"itclustsid")) ne ""){ 
+         my $c=getModuleObject($self->Config,"itil::lnkapplitclust");
+         $c->SetFilter({id=>\$clustsid});
+         my ($rec,$msg)=$c->getOnlyFirst(qw(applid));
+         if ($rec->{applid} ne "" &&
+             $rec->{applid} ne effVal($oldrec,$newrec,"applid")){
+            $self->LastMsg(ERROR,"cluster service application and instance ".
+                                 "application does not match");
+            return(undef);
+         }
+      }
+   }
 
 
    return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"fullname"));
@@ -650,7 +677,12 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   return("ALL");
+   my @all=qw(header default adm sec ssl misc cluster 
+             systems contacts source);
+   if (defined($rec) && $rec->{'runonclust'}){
+      push(@all,"cluster");
+   }
+   return(@all);
 }
 
 
@@ -660,7 +692,7 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default adm systems contacts ssl misc sec);
+   my @databossedit=qw(default adm systems contacts ssl misc cluster sec);
    if (!defined($rec)){
       return(@databossedit);
    }
@@ -706,7 +738,8 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default adm systems sec ssl misc contacts source));
+   return(qw(header default adm sec ssl misc cluster 
+             systems contacts source));
 }
 
 

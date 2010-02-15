@@ -100,7 +100,7 @@ sub new
                 vjointo       =>'itil::lnkapplsystem',
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
                 vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>['appl','applcistatus','fraction'],
+                vjoindisp     =>['appl','applcistatus','reltyp','fraction'],
                 vjoininhash   =>['appl','applcistatusid','mandatorid',
                                  'applid']),
 
@@ -755,6 +755,19 @@ sub new
                 label         =>'ClusterNode',
                 dataobjattr   =>'system.is_clusternode'),
 
+      new kernel::Field::TextDrop(
+                name          =>'itclust',
+                group         =>'cluster',
+                label         =>'Cluster',
+                vjointo       =>'itil::itclust',
+                vjoineditbase =>{'cistatusid'=>[2,3,4]},
+                vjoinon       =>['itclustid'=>'id'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'itclustid',
+                dataobjattr   =>'system.clusterid'),
+
       new kernel::Field::SubList(
                 name          =>'ipaddresses',
                 label         =>'IP-Adresses',
@@ -1222,7 +1235,14 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   return("ALL");
+   my @all=qw(header default software admin logsys contacts misc opmode 
+              physys ipaddresses phonenumbers sec applications
+              location source
+              attachments control systemclass interview);
+   if (defined($rec) && $rec->{'isclusternode'}){
+      push(@all,"cluster");
+   }
+   return(@all);
 }
 
 sub isWriteValid
@@ -1232,10 +1252,10 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
 
    my @databossedit=qw(default software admin logsys contacts misc opmode 
-                       physys ipaddresses phonenumbers sec
+                       physys ipaddresses phonenumbers sec cluster
                        attachments control systemclass interview);
    if (!defined($rec)){
-      return("default","physys","admin","misc",
+      return("default","physys","admin","misc","cluster",
              "opmode","control","systemclass","sec");
    }
    else{
@@ -1282,8 +1302,8 @@ sub getDetailBlockPriority
    my $self=shift;
    return(
           qw(header default admin phonenumbers logsys location 
-             physys systemclass sec
-             opmode applications customer software ipaddresses
+             physys systemclass cluster
+             opmode sec applications customer software ipaddresses
              contacts misc attachments control source));
 }
 

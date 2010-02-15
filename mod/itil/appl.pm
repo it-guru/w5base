@@ -123,6 +123,8 @@ sub new
       new kernel::Field::Contact(
                 name          =>'sem',
                 group         =>'finance',
+                vjoineditbase =>{'cistatusid'=>[3,4],
+                                 'usertyp'=>[qw(user extern)]},
                 label         =>'Customer Business Manager',
                 vjoinon       =>'semid'),
 
@@ -469,7 +471,7 @@ sub new
                 vjoinbase     =>[{systemcistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'applid'],
                 vjoindisp     =>['system','systemsystemid',
-                                 'systemcistatus',
+                                 'reltyp','systemcistatus',
                                  'shortdesc'],
                 vjoininhash   =>['system','systemsystemid','systemcistatus',
                                  'systemid']),

@@ -785,3 +785,5 @@ create table itclust (
   UNIQUE KEY name (fullname),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 );
+alter table swinstance add runonclusts int(2) default NULL;
+alter table swinstance add itclusts bigint(20) default NULL,add key(itclusts);

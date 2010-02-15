@@ -58,7 +58,7 @@ sub new
                 vjointo       =>'itil::itclust',
                 vjoinon       =>['clustid'=>'id'],
                 vjoineditbase =>{'cistatusid'=>[1,2,3,4]},
-                vjoindisp     =>'name'),
+                vjoindisp     =>'fullname'),
                                                    
       new kernel::Field::Text(
                 name          =>'name',
@@ -67,6 +67,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'subname',
+                htmldetail    =>0,
                 htmleditwidth =>'50px',
                 label         =>'sub Servicename',
                 dataobjattr   =>'qlnkapplitclust.subitsvcname'),
@@ -80,15 +81,6 @@ sub new
                 vjoinon       =>['applid'=>'id'],
                 vjoindisp     =>'name',
                 dataobjattr   =>'appl.name'),
-
-      new kernel::Field::TextDrop(
-                name          =>'swinstance',
-                htmlwidth     =>'250px',
-                label         =>'Software-Instance',
-                vjointo       =>'itil::swinstance',
-                vjoineditbase =>{'cistatusid'=>[2,3,4]},
-                vjoinon       =>['swinstanceid'=>'id'],
-                vjoindisp     =>'fullname'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
@@ -150,6 +142,23 @@ sub new
                 label         =>'RealEditor',
                 dataobjattr   =>'qlnkapplitclust.realeditor'),
 
+      new kernel::Field::Select(
+                name          =>'clustcistatus',
+                readonly      =>1,
+                htmlwidth     =>'100px',
+                group         =>'clustinfo',
+                label         =>'Cluster CI-State',
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['itclustcistatusid'=>'id'],
+                vjoindisp     =>'name'),
+                                                  
+      new kernel::Field::Link(
+                name          =>'itclustcistatusid',
+                label         =>'Cluster CI-State',
+                readonly      =>1,
+                group         =>'clustinfo',
+                dataobjattr   =>'itclust.cistatus'),
+
       new kernel::Field::Mandator(
                 group         =>'applinfo',
                 readonly      =>1),
@@ -176,13 +185,6 @@ sub new
                 readonly      =>1,
                 group         =>'applinfo',
                 dataobjattr   =>'appl.applid'),
-
-      new kernel::Field::Text(
-                name          =>'swinstanceid',
-                label         =>'SoftwareinstanceID',
-                readonly      =>1,
-                htmldetail    =>0,
-                dataobjattr   =>'qlnkapplitclust.swinstance'),
 
       new kernel::Field::TextDrop(
                 name          =>'applconumber',
@@ -274,6 +276,7 @@ sub new
                 name          =>'businessteam',
                 readonly      =>1,
                 group         =>'applinfo',
+                translation   =>'itil::appl',
                 label         =>'Business Team',
                 vjoinon       =>'businessteamid'),
 
@@ -298,6 +301,7 @@ sub new
                 name          =>'applcustomer',
                 label         =>'Application Customer',
                 readonly      =>1,
+                translation   =>'itil::lnkapplsystem',
                 group         =>'applinfo',
                 vjoinon       =>'customerid'),
 
@@ -363,6 +367,15 @@ sub new
                 label         =>'MandatorID',
                 dataobjattr   =>'appl.mandator'),
 
+      new kernel::Field::SubList(
+                name          =>'swinstances',
+                label         =>'Software instances',
+                group         =>'swinstances',
+                vjointo       =>'itil::swinstance',
+                vjoinbase     =>[{cistatusid=>"<=5"}],
+                vjoinon       =>['id'=>'itclustsid'],
+                vjoindisp     =>['fullname','swnature']),
+
    );
    $self->setDefaultView(qw(fullname appl  cdate));
    $self->setWorktable("lnkapplitclust");
@@ -426,6 +439,23 @@ sub Validate
       $self->LastMsg(ERROR,"invalid application specified");
       return(undef);
    }
+   if (effChanged($oldrec,$newrec,"applid")){
+      my $applid=$newrec->{'applid'};
+      my $id=$newrec->{'id'};
+      my $swi=getModuleObject($self->Config,"itil::swinstance");
+      $swi->SetFilter({itclustsid=>\$id,cistatusid=>"<=5"});
+      foreach my $srec ($swi->getHashList(qw(applid))){
+         if ($srec->{applid} ne $applid){
+            $self->LastMsg(ERROR,"application does not match all ".
+                                 "related software instances");
+            return(undef);
+         }
+      }
+      
+
+
+
+   }
 
 #   if ($self->isDataInputFromUserFrontend()){
 #      if (!$self->isWriteOnApplValid($applid,"systems")){
@@ -470,8 +500,27 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default misc applinfo clusterinfo source));
+   return(qw(header default misc clustinfo applinfo swinstances source));
 }
+
+sub ValidateDelete
+{
+   my $self=shift;
+   my $rec=shift;
+   my $lock=0;
+
+   if ($lock>0 ||
+       $#{$rec->{swinstances}}!=-1){
+      $self->LastMsg(ERROR,
+          "delete only posible, if there are no ".
+          "software instance relations");
+      return(0);
+   }
+
+   return(1);
+}
+
+
 
 
 
