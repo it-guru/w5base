@@ -422,6 +422,13 @@ sub SecureSetFilter
    return($self->SetFilter(@flt));
 }
 
+sub SecureValidate
+{
+   return(kernel::DataObj::SecureValidate(@_));
+}
+
+
+
 
 
 
@@ -434,35 +441,37 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
+printf STDERR ("fifi x00\n");
    if ((!defined($oldrec) && !defined($newrec->{applid})) ||
        (defined($newrec->{applid}) && $newrec->{applid}==0)){
       $self->LastMsg(ERROR,"invalid application specified");
       return(undef);
    }
+printf STDERR ("fifi x01\n");
+   if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
+      my $itclustid=effVal($oldrec,$newrec,"clustid");
+      if (!$self->isWriteOnClusterValid($itclustid)){
+         $self->LastMsg(ERROR,"no write access to specified cluster");
+         return(undef);
+      }
+   }
+printf STDERR ("fifi x02\n");
    if (effChanged($oldrec,$newrec,"applid")){
       my $applid=$newrec->{'applid'};
-      my $id=$newrec->{'id'};
-      my $swi=getModuleObject($self->Config,"itil::swinstance");
-      $swi->SetFilter({itclustsid=>\$id,cistatusid=>"<=5"});
-      foreach my $srec ($swi->getHashList(qw(applid))){
-         if ($srec->{applid} ne $applid){
-            $self->LastMsg(ERROR,"application does not match all ".
-                                 "related software instances");
-            return(undef);
+      my $id=effVal($oldrec,$newrec,'id');
+      if ($id ne ""){
+         my $swi=getModuleObject($self->Config,"itil::swinstance");
+         $swi->SetFilter({itclustsid=>\$id,cistatusid=>"<=5"});
+         foreach my $srec ($swi->getHashList(qw(applid))){
+            if ($srec->{applid} ne $applid){
+               $self->LastMsg(ERROR,"application does not match all ".
+                                    "related software instances");
+               return(undef);
+            }
          }
       }
-      
-
-
-
    }
 
-#   if ($self->isDataInputFromUserFrontend()){
-#      if (!$self->isWriteOnApplValid($applid,"systems")){
-#         $self->LastMsg(ERROR,"no access");
-#         return(undef);
-#      }
-#   }
    return(1);
 }
 
@@ -475,10 +484,6 @@ sub isViewValid
    return("ALL");
 }
 
-sub SecureValidate
-{
-   return(kernel::DataObj::SecureValidate(@_));
-}
 
 
 sub isWriteValid
@@ -486,15 +491,32 @@ sub isWriteValid
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   my $applid=effVal($oldrec,$newrec,"applid");
+   my $itclustid=effVal($oldrec,$newrec,"clustid");
 
    return("default") if (!defined($oldrec) && !defined($newrec));
    return("default") if ($self->IsMemberOf("admin"));
-#   return("default") if ($self->isWriteOnApplValid($applid,"systems"));
-#   return("default") if (!$self->isDataInputFromUserFrontend() &&
-#                         !defined($oldrec));
-
+   return("default") if ($self->isWriteOnClusterValid($itclustid));
    return(undef);
+}
+
+
+sub isWriteOnClusterValid
+{
+   my $self=shift;
+   my $itclustid=shift;
+
+   if ($itclustid ne ""){
+      my $c=getModuleObject($self->Config,"itil::itclust");
+      $c->SetFilter({id=>\$itclustid});
+      my ($cl,$msg)=$c->getOnlyFirst(qw(ALL));
+printf STDERR ("fifi 01\n");
+      my @g=$c->isWriteValid($cl);
+printf STDERR ("fifi 02\n");
+      if (grep(/^(ALL|services)$/,@g)){
+         return(1);
+      }
+   }
+   return(0);
 }
 
 sub getDetailBlockPriority

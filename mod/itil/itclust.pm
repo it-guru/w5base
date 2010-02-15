@@ -123,7 +123,7 @@ sub new
                 forwardSearch =>1,
                 readonly      =>1,
                 vjointo       =>'itil::system',
-                vjoinbase     =>[{systemcistatusid=>"<=5"}],
+                vjoinbase     =>[{cistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'itclustid'],
                 vjoindisp     =>['name','systemid',
                                  'cistatus',
