@@ -18,7 +18,6 @@ package kernel::CIStatusTools;
 #
 use strict;
 use kernel;
-use Data::Dumper;
 
 
 sub ProtectObject
@@ -39,7 +38,8 @@ sub ProtectObject
       $self->LastMsg(ERROR,"you are only authorized to edit this record");
       return(0);
    }
-   if ($effcistatus>2 && !$self->IsMemberOf($admingroups)){
+   if (effChanged($oldrec,$newrec,"cistatusid") && 
+       $effcistatus>2 && !$self->IsMemberOf($admingroups)){
       $self->LastMsg(ERROR,"you are only authorized to add in 'order' ".
                            "or 'reserved' state");
       return(0);

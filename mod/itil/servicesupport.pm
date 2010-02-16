@@ -26,6 +26,8 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=3;
+
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
@@ -39,6 +41,12 @@ sub new
                 searchable    =>1,
                 label         =>'W5BaseID',
                 dataobjattr   =>'servicesupport.id'),
+
+      new kernel::Field::Mandator(),
+
+      new kernel::Field::Link(
+                name          =>'mandatorid',
+                dataobjattr   =>'servicesupport.mandator'),
                                                   
       new kernel::Field::Text(
                 name          =>'name',
@@ -64,8 +72,32 @@ sub new
                 label         =>'CI-StateID',
                 dataobjattr   =>'servicesupport.cistatus'),
 
+      new kernel::Field::Databoss(
+                group         =>'responsibility'),
+
+      new kernel::Field::Link(
+                name          =>'databossid',
+                group         =>'responsibility',
+                dataobjattr   =>'servicesupport.databoss'),
+
+      new kernel::Field::Contact(
+                name          =>'databoss2',
+                group         =>'responsibility',
+                vjoineditbase =>{'cistatusid'=>[3,4],
+                                 'usertyp'=>[qw(user extern)]},
+                label         =>'deputy Databoss',
+                vjoinon       =>'databoss2id'),
+
+
+
+      new kernel::Field::Link(
+                name          =>'databoss2id',
+                group         =>'responsibility',
+                dataobjattr   =>'servicesupport.databoss2'),
+
       new kernel::Field::Select(
                 name          =>'tz',
+                group         =>'characteristic',
                 label         =>'Timezone',
                 value         =>['CET','GMT',DateTime::TimeZone::all_names()],
                 dataobjattr   =>'servicesupport.timezone'),
@@ -80,6 +112,7 @@ sub new
 
       new kernel::Field::Boolean(
                 name          =>'isoncallservice',
+                group         =>'characteristic',
                 label         =>'oncall active',
                 container     =>'additional'),
 
@@ -93,6 +126,7 @@ sub new
 
       new kernel::Field::Boolean(
                 name          =>'issupport',
+                group         =>'characteristic',
                 label         =>'support active',
                 container     =>'additional'),
 
@@ -106,6 +140,7 @@ sub new
 
       new kernel::Field::Boolean(
                 name          =>'isservice',
+                group         =>'characteristic',
                 label         =>'service active',
                 container     =>'additional'),
 
@@ -119,11 +154,13 @@ sub new
 
       new kernel::Field::Boolean(
                 name          =>'iscallcenter',
+                group         =>'characteristic',
                 label         =>'callcenter active',
                 container     =>'additional'),
 
       new kernel::Field::Boolean(
                 name          =>'issaprelation',
+                group         =>'characteristic',
                 label         =>'SAP relation posible',
                 container     =>'additional'),
 
@@ -152,8 +189,16 @@ sub new
                 precision     =>2,
                 unit          =>'h',
                 group         =>'finance',
-                label         =>'Flat hours per month',
+                label         =>'Flat hours per month (external)',
                 dataobjattr   =>'servicesupport.flathourscost'),
+
+      new kernel::Field::Number(
+                name          =>'iflathourscost',
+                precision     =>2,
+                unit          =>'h',
+                group         =>'finance',
+                label         =>'Flat hours per month (internal)',
+                dataobjattr   =>'servicesupport.iflathourscost'),
 
       new kernel::Field::Container(
                 name          =>'additional',
@@ -237,7 +282,8 @@ sub new
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default finance oncallservice support service 
+   return(qw(header default responsibility characteristic 
+             finance oncallservice support service 
              callcenter saprelation source));
 }
 
@@ -248,11 +294,41 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
+   
    if ((!defined($oldrec) || defined($newrec->{name})) &&
        $newrec->{name}=~m/^\s*$/){
       $self->LastMsg(ERROR,"invalid name specified");
       return(0);
    }
+   if (!$self->IsMemberOf("admin")){
+      if (effChanged($oldrec,$newrec,"cistatusid")||
+          effChanged($oldrec,$newrec,"name")){
+         $self->LastMsg(ERROR,"you are not authorized to change ".
+                              "cistatus or name");
+         return(undef);
+      }
+   }
+   ########################################################################
+   # standard security handling
+   #
+   if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
+      my $userid=$self->getCurrentUserId();
+      if (!defined($oldrec)){
+         if (!defined($newrec->{databossid}) ||
+             $newrec->{databossid}==0){
+            my $userid=$self->getCurrentUserId();
+            $newrec->{databossid}=$userid;
+         }
+      }
+      if (defined($newrec->{databossid}) &&
+          $newrec->{databossid}!=$userid &&
+          $newrec->{databossid}!=$oldrec->{databossid}){
+         $self->LastMsg(ERROR,"you are not authorized to set other persons ".
+                              "as databoss");
+         return(0);
+      }
+   }
+
    if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
       return(0);
    }
@@ -288,12 +364,20 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
    my @blklist;
+   my $databoss=0;
 
    my $userid=$self->getCurrentUserId();
-   push(@blklist,"default") if ($self->IsMemberOf("admin"));
-   push(@blklist,"default") if (!defined($rec) ||
-                         ($rec->{cistatusid}<3 && $rec->{creator}==$userid) ||
-                         $self->IsMemberOf($self->{CI_Handling}->{activator}));
+   if (defined($rec) && ($rec->{databossid} eq $userid ||
+                         $rec->{databoss2id} eq $userid)){
+      $databoss++;
+   }
+   push(@blklist,"default","characteristic",
+                 "responsibility") if ($self->IsMemberOf("admin")||$databoss);
+   if (!defined($rec) || ($rec->{cistatusid}<3 && $rec->{creator}==$userid) ||
+       $self->IsMemberOf($self->{CI_Handling}->{activator})){
+      push(@blklist,"default","characteristic","responsibility",
+                    "saprelation");
+   }
    if (grep(/^default$/,@blklist) && defined($rec)){
       foreach my $grp (qw(service oncallservice support callcenter 
                           saprelation)){
@@ -311,12 +395,25 @@ sub isViewValid
    my $rec=shift;
    my @param=@_;
    my @adds=();
-   return("header","default") if (!defined($rec));
+   return("header","default","characteristic") if (!defined($rec));
    foreach my $grp (qw(service oncallservice support callcenter saprelation)){
       push(@adds,$grp) if ($rec->{"is".$grp});
    }
+   my $userid=$self->getCurrentUserId();
+   if ($rec->{databossid} eq $userid ||
+       $rec->{databoss2id} eq $userid ||
+       $self->IsMemberOf("admin")){
+      push(@adds,"finance");
+   }
+   else{
+      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
+      if (grep(/^$rec->{mandatorid}$/,@mandators)){
+         push(@adds,"finance");
+      }
+   }
 
-   return("header","default","finance","source","history",@adds);
+   return("header","default","responsibility","characteristic",
+          "source","history",@adds);
 }
 
 sub getRecordImageUrl

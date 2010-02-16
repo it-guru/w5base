@@ -787,3 +787,6 @@ create table itclust (
 );
 alter table swinstance add runonclusts int(2) default NULL;
 alter table swinstance add itclusts bigint(20) default NULL,add key(itclusts);
+alter table servicesupport add iflathourscost float(5,2) default NULL;
+alter table servicesupport add databoss bigint(20) default NULL;
+alter table servicesupport add databoss2 bigint(20) default NULL;
