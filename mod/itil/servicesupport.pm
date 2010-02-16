@@ -301,8 +301,8 @@ sub Validate
       return(0);
    }
    if (!$self->IsMemberOf("admin")){
-      if (effChanged($oldrec,$newrec,"cistatusid")||
-          effChanged($oldrec,$newrec,"name")){
+      if (defined($oldrec) && $oldrec->{cistatusid}>2 &&
+          (effChanged($oldrec,$newrec,"name"))){
          $self->LastMsg(ERROR,"you are not authorized to change ".
                               "cistatus or name");
          return(undef);
@@ -375,7 +375,7 @@ sub isWriteValid
                  "responsibility") if ($self->IsMemberOf("admin")||$databoss);
    if (!defined($rec) || ($rec->{cistatusid}<3 && $rec->{creator}==$userid) ||
        $self->IsMemberOf($self->{CI_Handling}->{activator})){
-      push(@blklist,"default","characteristic","responsibility",
+      push(@blklist,"default","characteristic","responsibility","finance",
                     "saprelation");
    }
    if (grep(/^default$/,@blklist) && defined($rec)){

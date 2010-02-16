@@ -39,7 +39,10 @@ sub ProtectObject
       return(0);
    }
    if (effChanged($oldrec,$newrec,"cistatusid") && 
-       $effcistatus>2 && !$self->IsMemberOf($admingroups)){
+       $effcistatus>2 && 
+       !($self->IsMemberOf($admingroups) || 
+         effVal($oldrec,$newrec,"databossid") eq $curruserid ||
+         effVal($oldrec,$newrec,"databoss2id") eq $curruserid )){
       $self->LastMsg(ERROR,"you are only authorized to add in 'order' ".
                            "or 'reserved' state");
       return(0);
