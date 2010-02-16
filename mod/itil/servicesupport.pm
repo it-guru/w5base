@@ -46,6 +46,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'mandatorid',
+                selectfix     =>1,
                 dataobjattr   =>'servicesupport.mandator'),
                                                   
       new kernel::Field::Text(
@@ -77,6 +78,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'databossid',
+                selectfix     =>1,
                 group         =>'responsibility',
                 dataobjattr   =>'servicesupport.databoss'),
 
@@ -92,6 +94,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'databoss2id',
+                selectfix     =>1,
                 group         =>'responsibility',
                 dataobjattr   =>'servicesupport.databoss2'),
 
