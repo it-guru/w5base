@@ -21,6 +21,7 @@
 'Initiated by'=>{de=>'Initiert/angefordert durch'},
 'Comments of implementor'=>{de=>'Bemerkungen und Notizen des Auftragnehmers'},
 'implemented to'=>{de=>'voraussichtlich realisiert bis'},
+'implementation effort'=>{de=>'geschätzter Aufwand'},
 'Initiated by group'=>{de=>'Initiiert durch Gruppe/Bereich'},
 'Approve requested by'=>{de=>'Genehmigung angefordert bei'},
 'Alternate approve requested by'=>{de=>'Genehmigung alternativ angefordert bei'},

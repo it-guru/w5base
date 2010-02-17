@@ -126,6 +126,13 @@ sub getDynamicFields
                 label         =>'implemented to',
                 container     =>'headref'),
 
+      new kernel::Field::Text (
+                name          =>'implementationeffort',
+                group         =>'init',
+                label         =>'implementation effort',
+                unit          =>'h',
+                container     =>'headref'),
+
       new kernel::Field::Textarea(
                 name          =>'initiatorcomments',
                 label         =>'Comments of implementor',
@@ -599,6 +606,7 @@ sub nativProcess
       if ($W5V2::OperationContext ne "Kernel"){
          $h->{eventstart}=NowStamp("en");
          $h->{implementedto}="?" if ($h->{implementedto} eq "");
+         $h->{implementationeffort}="?" if ($h->{implementationeffort} eq "");
          $h->{initiatorid}=$self->getParent->getParent->getCurrentUserId();
          my $UserCache=$self->Cache->{User}->{Cache};
          if (defined($UserCache->{$ENV{REMOTE_USER}})){
