@@ -30,22 +30,63 @@ sub new
    $self->{history}=[qw(insert modify delete)];
 
    $self->AddFrontendFields(
-      new kernel::Field::TextDrop(
-                name          =>'approvertask',
-                label         =>'Approve tasked by',
+      new kernel::Field::Select(
+                name          =>'tasktyp',
+                label         =>'Task type',
                 htmldetail    =>0,
                 group         =>'init',
-                vjointo       =>'base::user',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['approvertaskid'=>'userid'],
-                vjoindisp     =>'fullname'),
-
-      new kernel::Field::Link (
-                name          =>'approvertaskid',
-                container     =>'headref'),
+                getPostibleValues=>\&getTaskTypList)
 
     );
    return($self);
+}
+
+sub getTaskTypList
+{
+   my $self=shift;
+   my $app=$self->getParent->getParent;
+
+   my @l;
+   push(@l,"personaltask", $app->T("personal task"));
+   push(@l,"personal:education", $app->T("personal: education"));
+   push(@l,"personal:teammeeting", $app->T("personal: team meeting"));
+
+
+   foreach my $prec ($self->getParent->getAllowedProjects()){
+      push(@l,"projectroom:$prec->{id}",$app->T("Project").": ".$prec->{name});
+   }
+   return(@l);
+}
+
+sub getAllowedProjects
+{
+   my $self=shift;
+   my $app=$self->getParent;
+   my @flt;
+
+   my %grps=$app->getGroupsOf($ENV{REMOTE_USER},
+       [orgRoles()],"both");
+   my @grpids=keys(%grps);
+   my $userid=$app->getCurrentUserId();
+   push(@flt,[
+              {projectbossid=>$userid,cistatusid=>[3,4]},
+              {projectboss2id=>$userid,cistatusid=>[3,4]},
+              {sectargetid=>\$userid,sectarget=>\'base::user',
+               secroles=>"*roles=?PManager?=roles* *roles=?PMember?=roles*",
+               cistatusid=>[3,4],isrestirctiv=>\'0'},
+              {sectargetid=>\@grpids,sectarget=>\'base::grp',
+               secroles=>"*roles=?PManager?=roles* *roles=?PMember?=roles*",
+               cistatusid=>[3,4],isrestirctiv=>\'0'},
+              {sectargetid=>\$userid,sectarget=>\'base::user',
+               secroles=>"*roles=?PManager?=roles*",
+               cistatusid=>[3,4],isrestirctiv=>\'1'},
+              {sectargetid=>\@grpids,sectarget=>\'base::grp',
+               secroles=>"*roles=?PManager?=roles*",
+               cistatusid=>[3,4],isrestirctiv=>\'1'}
+             ]);
+   my $o=getModuleObject($app->Config,"base::projectroom");
+   $o->SetFilter(@flt);
+   return($o->getHashList(qw(name id)));
 }
 
 sub getDynamicFields
@@ -94,6 +135,22 @@ sub getDynamicFields
                 container     =>'headref'),
 
       new kernel::Field::Select(
+                name          =>'tasknature',
+                label         =>'task nature',
+                readonly      =>1,
+                htmlwidth     =>'10px',
+                value         =>['Tpersonal','Tproject'],
+                translation   =>'base::workflow::task',
+                container     =>'headref'),
+
+      new kernel::Field::Text(
+                name          =>'taskclass',
+                label         =>'task class',
+                readonly      =>1,
+                htmlwidth     =>'10px',
+                container     =>'headref'),
+
+      new kernel::Field::Select(
                 name          =>'taskexecstate',
                 label         =>'Execution state',
                 htmleditwidth =>'40px',
@@ -104,6 +161,27 @@ sub getDynamicFields
                 unit          =>'%',
                 container     =>'headref'),
 
+      new kernel::Field::KeyText(
+                name       =>'affectedproject',
+                translation=>'itil::workflow::base',
+                keyhandler =>'kh',
+                multiple   =>0,
+                vjointo    =>'base::projectroom',
+                vjoinon    =>['affectedprojectid'=>'id'],
+                vjoindisp  =>'name',
+                container  =>'headref',
+                group      =>'affectedproject',
+                label      =>'Affected Project'),
+
+      new kernel::Field::KeyText(
+                name       =>'affectedprojectid',
+                htmldetail =>0,
+                translation=>'itil::workflow::base',
+                searchable =>0,
+                keyhandler =>'kh',
+                container  =>'headref',
+                group      =>'affectedproject',
+                label      =>'Affected Project ID'),
 
     ));
 }
@@ -135,7 +213,12 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default","state","flow","header","relations","init","history");
+   my @l=("default","state","flow","header","relations","init","history");
+   if ($rec->{tasknature} eq "Tproject"){
+      push(@l,"affectedproject");
+   }
+
+   return(@l);
 }
 
 sub isWriteValid
@@ -246,37 +329,7 @@ sub getPosibleActions
    push(@l,"iscurrent") if ($iscurrent);
    my $iscurrentapprover=0;
 
-   if ($stateid==6){
-      # load current approvers and check if current user is one of them
-      my $foundapprover=0;
-      if (ref($WfRec->{shortactionlog}) eq "ARRAY"){
-         foreach my $action (reverse(@{$WfRec->{shortactionlog}})){
-            last if ($action->{name} ne "wfapprovereq");
-            if (ref($action->{additional}) ne "HASH"){
-               $action->{additional}={Datafield2Hash($action->{additional})};
-            }
-            if (defined($action->{additional}->{approvereqtarget}) &&
-                defined($action->{additional}->{approvereqtargetid}) &&
-                $action->{additional}->{approvereqtarget}->[0] eq "base::user"){
-               if ($action->{additional}->{approvereqtargetid}->[0]==$userid){
-                  $iscurrentapprover=1;
-                  $foundapprover=1;
-                  last;
-               }
-            }
-         }
-         #printf STDERR ("fifi actions=%s\n",Dumper($WfRec));
-      }
-   }
 
-   if ($iscurrentapprover && $stateid==6){
-      push(@l,"wfapprovok");     # ok
-      push(@l,"wfapprovreject"); # reject
-   }
-
-#   if (!$iscurrent && !$iscurrentapprover){
-#      push(@l,"nop");       # No operation as first entry in Action list
-#   }
    if ((($isadmin && !$iscurrent) || ($userid==$creator && !$iscurrent)) &&
        $stateid<3){
       push(@l,"wfbreak");   # workflow abbrechen      (durch Anforderer o admin)
@@ -285,19 +338,9 @@ sub getPosibleActions
    if ((($stateid==4 || $stateid==3) && ($lastworker==$userid || $isadmin)) ||
        ($iscurrent || $userid==$creator)){
       push(@l,"wfmailsend");   # mail versenden hinzufügen        (jeder)
-      push(@l,"wfaddnote");    # notiz hinzufügen        (jeder)
-    #  push(@l,"wfaddsubtask"); # unteraufgabe erstellen  (jeder)
+      push(@l,"wfaddsnote");   # notiz hinzufügen        (jeder)
       push(@l,"setprioexecs"); # Prio und erledigungsgrad setzen
    }
-#   if (($stateid==2 || $stateid==7 || $stateid==10 || $stateid==5) &&
-#       ((($lastworker!=$userid) && 
-#        (($userid!=$creator) || ) &&  $iscurrent) ||
-#        $iscurrent || $isworkspace)){
-#      push(@l,"wfaccept");  # workflow annehmen              (durch Bearbeiter)
-#      push(@l,"wfacceptp"); # workflow annehmen und bearbeit.(durch Bearbeiter)
-#      push(@l,"wfacceptn"); # workflow annehmen und notiz anf(durch Bearbeiter)
-#      push(@l,"wfreject");  # workflow bearbeitung abgelehnt (durch Bearbeiter)
-#   }
    if (($stateid==4 || $stateid==3) && 
        ($lastworker==$userid || $isadmin) && ($userid!=$creator)){
       push(@l,"wffineproc");# Bearbeiten und zurück an Anf.  (durch Bearbeiter)
@@ -358,6 +401,10 @@ sub generateWorkspace
    my $templ=<<EOF;
 <table border=0 cellspacing=0 cellpadding=0 width=100%>
 <tr>
+<td class=fname width=20%>%tasktyp(label)%:</td>
+<td class=finput>%tasktyp(detail)%</td>
+</tr>
+<tr>
 <td class=fname width=20%>%name(label)%:</td>
 <td class=finput>%name(detail)%</td>
 </tr>
@@ -399,6 +446,46 @@ sub addInitialParameters
    return(1);
 }
 
+sub nativProcess
+{
+   my $self=shift;
+   my $action=shift;
+   my $h=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   if ($action eq "NextStep"){
+printf STDERR ("fifi h=%s\n",Dumper($h));
+      if ($h->{tasknature} ne "Tproject"){
+         delete($h->{affectedprojectid});
+         delete($h->{affectedproject});
+      }
+      else{
+         my $prec;
+         foreach my $r ($self->getParent->getAllowedProjects()){
+            if ($h->{affectedprojectid}==$r->{id}){
+               $prec=$h->{affectedprojectid};
+               $h->{affectedproject}=$r->{name};
+               last;
+            }
+         }
+         if (!defined($prec)){
+            $self->LastMsg(ERROR,"invalid project");
+            return(undef);
+         }
+         
+      }
+      if (my $id=$self->StoreRecord($WfRec,$h)){
+         $h->{id}=$id;
+      }
+      else{
+         return(0);
+      }
+      return(1);
+   }
+   return($self->SUPER::nativProcess($action,$h,$WfRec,$actions));
+}
+
 sub Process
 {
    my $self=shift;
@@ -410,6 +497,20 @@ sub Process
       my $h=$self->getWriteRequestHash("web");
       if ($self->LastMsg()){
          return(undef);
+      }
+      my $tt=Query->Param("Formated_tasktyp");
+      if ($tt eq "personaltask"){
+         $h->{tasknature}="Tpersonal";
+         $h->{taskclass}="non productive";
+      }
+      elsif (my ($t)=$tt=~m/^personal:(.*$)$/){
+         $h->{tasknature}="Tpersonal";
+         $h->{taskclass}=$t;
+      }
+      elsif (my ($pid)=$tt=~m/^projectroom:(.*$)$/){
+         $h->{tasknature}="Tproject";
+         $h->{taskclass}="project work";
+         $h->{affectedprojectid}=$pid;
       }
       $h->{stateid}=4;
       $h->{eventstart}=NowStamp("en");
@@ -439,22 +540,7 @@ sub Process
          }
          return(0);
       }
-      if (my $id=$self->StoreRecord($WfRec,$h)){
-         $h->{id}=$id;
-#         if ($#wsref!=-1){
-#            while(my $target=shift(@wsref)){
-#               my $targetid=shift(@wsref);
-#               last if ($targetid eq "" || $target eq "");
-#               $self->getParent->getParent->AddToWorkspace($id,
-#                                                           $target,$targetid);
-#            }
-#         }
-#         $self->PostProcess($action,$h,$actions);
-      }
-      else{
-         return(0);
-      }
-      return(1);
+      return($self->nativProcess($action,$h,$WfRec,$actions));
    }
    return($self->SUPER::Process($action,$WfRec,$actions));
 }
@@ -584,7 +670,9 @@ sub generateWorkspacePages
                 "</table></div>";
    }
    $self->SUPER::generateWorkspacePages($WfRec,$actions,$divset,$selopt);
-   return("wfaddnote");
+   return("wfaddnote") if (grep(/^wfaddnote$/,@$actions));
+   return("wfaddsnote") if (grep(/^wfaddsnote$/,@$actions));
+   return("nop");
 }
 
 sub Validate
@@ -744,6 +832,7 @@ sub Process
             my $nextstep=$self->getParent->getStepByShortname("finish");
             my $store={stateid=>21,
                        step=>$nextstep,
+                       taskexecstate=>100,
                        fwdtargetid=>undef,
                        fwdtarget=>undef,
                        closedate=>NowStamp("en"),

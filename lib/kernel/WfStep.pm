@@ -925,7 +925,7 @@ sub getDefaultNoteDiv
          }
          $d.="</select>";
       }
-      if (defined($WfRec->{initiatorid})){
+      if (defined($WfRec->{initiatorid}) && $userid ne $WfRec->{initiatorid}){
          $d.="&nbsp;&nbsp;&nbsp;";
          $d.="&nbsp;&nbsp;&nbsp;";
          $d.=$self->getParent->getParent->T("notify intiator",

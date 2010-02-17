@@ -123,6 +123,12 @@ sub new
                 label         =>'allow link of actions',
                 dataobjattr   =>'projectroom.is_allowlnkact'),
 
+      new kernel::Field::Boolean(
+                name          =>'isrestirctiv',
+                group         =>'projectclass',
+                label         =>'restrictive task management',
+                dataobjattr   =>'projectroom.is_isrestirctiv'),
+
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
                 label         =>'Contacts',
@@ -262,7 +268,8 @@ sub new
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default projectclass commercial misc control attachments contacts));
+   return(qw(header default projectclass commercial misc 
+             control attachments contacts));
 }
 
 
@@ -286,7 +293,7 @@ sub SecureSetFilter
    if (!$self->IsMemberOf("admin")){
       my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"direct");
       my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
-          [qw(REmployee RApprentice RFreelancer RBoss)],"both");
+          [$self->orgRoles()],"both");
       my @grpids=keys(%grps);
       my $userid=$self->getCurrentUserId();
       push(@flt,[
