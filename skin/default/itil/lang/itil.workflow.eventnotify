@@ -88,57 +88,57 @@
  'de'=>"Sehr geehrte Damen und Herren,\n\n".
        "im Folgenden erhalten Sie den aktuellen Stand zum Ereignis\n".
        'am Standort %s .',
- 'en'=>"Ladies and Gentlemen,\n\n".
-       "at the following mail, you will get informations about\n".
-       'the event at the location %s .'
+ 'en'=>"Dear Sir or Madam,\n\n".
+       "in the following mail you receive the actual status about \n".
+       'an incident at the location %s .'
 },
 'SALUTATION02.close'=>{
  'de'=>"Sehr geehrte Damen und Herren,\n\n".
        "dies Beeinträchtigungen am Standort\n".
        '%s sind beseitigt.',
- 'en'=>"Ladies and Gentlemen,\n\n".
-       "the derogations in relation to\n".
-       'location %s are eliminated.'
+ 'en'=>"Dear Sir or Madam,\n\n".
+       "the incident in the environment of the\n".
+       'location %s was taken care of.'
 },
 
 'SALUTATION03.open'=>{
  'de'=>"Sehr geehrte Damen und Herren,\n\n".
        "im Folgenden erhalten Sie den aktuellen Stand zum Ereignis\n".
        'der Anwendung %s vom %s.',
- 'en'=>"Ladies and Gentlemen,\n\n".
-       "at the following mail, you will get informations about\n".
-       'the event at the application %s from %s.'
+ 'en'=>"Dear Sir or Madam,\n\n".
+       "in the following mail you receive the actual status about an\n".
+       'incident at the application %s from %s.'
 },
 'SALUTATION03.close'=>{
  'de'=>"Sehr geehrte Damen und Herren,\n\n".
        "dies Beeinträchtigungen im Umfeld der\n".
        'Anwendung %s sind beseitigt.',
- 'en'=>"Ladies and Gentlemen,\n\n".
-       "the derogations in relation to\n".
-       'application %s are eliminated.'
+ 'en'=>"Dear Sir or Madam,\n\n".
+       "the incident in the environment of the\n".
+       'application %s was taken care of.'
 },
 
 'SALUTATION04.open'=>{
  'de'=>"Sehr geehrte Damen und Herren,\n\n".
        "im Folgenden erhalten Sie den aktuellen Stand zum Ereignis\n".
        'im Umfeld des TCP/IP-Netzes.',
- 'en'=>"Ladies and Gentlemen,\n\n".
-       "at the following mail, you will get informations about\n".
-       'the event at the IP-Network.'
+ 'en'=>"Dear Sir or Madam,\n\n".
+       "in the following mail you receive the actual status about an\n".
+       "incident in the IP-Network."
 },
 'SALUTATION04.close'=>{
  'de'=>"Sehr geehrte Damen und Herren,\n\n".
        "dies Beeinträchtigungen im Umfeld der\n".
        'TCP/IP-Netzes sind beseitigt.',
- 'en'=>"Ladies and Gentlemen,\n\n".
-       "the derogations in relation to\n".
-       'the IP-Network are eliminated.'
+ 'en'=>"Dear Sir or Madam,\n\n".
+       "the incident in the environment of the IP-Network was taken care of."
 },
 
 'SALUTATION10'=>{
  'de'=>"Sehr geehrte Damen und Herren,\n\n".
        "wir informieren Sie über das Ergebnis der\n".
        'Ursachenanalyse und über die eingeleiteten Maßnahmen.',
- 'en'=>"Ladies and Gentlemen,\n\n".
-       "we will inform you about the results of the rootcause analyse."
+ 'en'=>"Dear Sir or Madam,\n\n".
+       "we want to inform you about the results of the root\n".
+       "cause analysis and the initiated measures."
 },
