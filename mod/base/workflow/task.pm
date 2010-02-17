@@ -86,7 +86,9 @@ sub getAllowedProjects
              ]);
    my $o=getModuleObject($app->Config,"base::projectroom");
    $o->SetFilter(@flt);
-   return($o->getHashList(qw(name id)));
+   my @l=$o->getHashList(qw(name id mandator mandatorid));
+   Dumper($_) foreach (@l);
+   return(@l);
 }
 
 sub getDynamicFields
@@ -95,6 +97,7 @@ sub getDynamicFields
    my %param=@_;
    my $class;
 
+   $self->AddGroup("affectedproject",translation=>'base::workflow::task');
    return($self->InitFields(
       new kernel::Field::TextDrop(
                 name          =>'initiator',
@@ -235,7 +238,7 @@ sub isWriteValid
 
 sub getDetailBlockPriority            # posibility to change the block order
 {
-   return("init","flow");
+   return("init","affectedproject","flow","relations");
 }
 
 
@@ -455,7 +458,6 @@ sub nativProcess
    my $actions=shift;
 
    if ($action eq "NextStep"){
-printf STDERR ("fifi h=%s\n",Dumper($h));
       if ($h->{tasknature} ne "Tproject"){
          delete($h->{affectedprojectid});
          delete($h->{affectedproject});
@@ -466,6 +468,8 @@ printf STDERR ("fifi h=%s\n",Dumper($h));
             if ($h->{affectedprojectid}==$r->{id}){
                $prec=$h->{affectedprojectid};
                $h->{affectedproject}=$r->{name};
+               $h->{mandatorid}=[$r->{mandatorid}];
+               $h->{mandator}=[$r->{mandator}];
                last;
             }
          }

@@ -258,11 +258,40 @@ sub new
    );
    $self->{workflowlink}={ workflowkey=>[id=>'affectedprojectid']
                          };
+   $self->{workflowlink}->{workflowstart}=\&calcWorkflowStart;
    $self->{history}=[qw(modify delete)];
    $self->setDefaultView(qw(linenumber name cistatus mandator mdate));
    $self->setWorktable("projectroom");
    return($self);
 }
+
+
+
+sub calcWorkflowStart
+{
+   my $self=shift;
+   my $id=shift;
+   my $r={};
+
+   my %env=('frontendnew'=>'1');
+   my $wf=getModuleObject($self->Config,"base::workflow");
+   my @l=$wf->getSelectableModules(%env);
+
+  # if (grep(/^base::workflow::task\$$/,@l)){
+      $r->{'base::workflow::task'}={
+                                      id=>sub{
+                                         my $self=shift;
+                                         my $rec=shift;
+                                         my $q=shift;
+                                         $q->{'Formated_tasktyp'}=
+                                           "projectroom:".$rec->{id};
+                                      }
+                                    };
+  # }
+   return($r);
+}
+
+
 
 
 sub getDetailBlockPriority

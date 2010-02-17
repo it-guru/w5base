@@ -13,3 +13,4 @@
 'task class'=>{de=>'Aufgaben-Klassifizierung'},
 'Tpersonal'=>{de=>'persönlich',en=>'personal'},
 'Tproject'=>{de=>'Projektarbeit',en=>'project work'},
+'fieldgroup.affectedproject'=>{de=>'betroffenes Projekt',en=>'affected project'},
