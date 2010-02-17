@@ -59,6 +59,8 @@ sub getPosibleRoles
              "privread"        =>$self->getParent->T("privacy read",
                                                      $self->Self),
              "PMember"         =>$self->getParent->T("project member",
+                                                     $self->Self),
+             "PManager"        =>$self->getParent->T("project manager",
                                                      $self->Self));
    }
    if ($parentobj eq "base::location" ||
@@ -67,7 +69,8 @@ sub getPosibleRoles
        $self->getParent->getParent->Self() eq "base::location")){
       return("infrastruct"=>$self->getParent->T("infrastruct",$self->Self),
              "itnetwork"=>$self->getParent->T("itnetwork",$self->Self),
-             "staffloc"=>$self->getParent->T("staffloc",$self->Self)
+             "staffloc"=>$self->getParent->T("staffloc",$self->Self),
+             "write"   =>$self->getParent->T("write",$self->Self)
              );
    }
    return();
