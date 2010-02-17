@@ -308,7 +308,7 @@ sub startWorkflow
    if ($id ne "" && $class ne ""){
       my $workflowstart=$self->{workflowlink}->{workflowstart};
       if (ref($workflowstart) eq "CODE"){
-         $workflowstart=&{$self->{workflowlink}->{workflowstart}}($self);
+         $workflowstart=&{$self->{workflowlink}->{workflowstart}}($self,$id);
       }
       if (!defined($workflowstart) || !defined($workflowstart->{$class})){
          print("alert(\"direct start Workflow denyed\");\n");
@@ -321,10 +321,16 @@ sub startWorkflow
       if (defined($rec)){
          my %q=();
          foreach my $v (@fields){
-            $q{$workflowstart->{$class}->{$v}}=
-                $rec->{$v};
+            if (ref($workflowstart->{$class}->{$v}) eq "CODE"){
+               &{$workflowstart->{$class}->{$v}}($self,$rec,\%q);
+            }
+            else{
+               $q{$workflowstart->{$class}->{$v}}=
+                   $rec->{$v};
+            }
          }
          $q{WorkflowClass}=$class;
+printf STDERR ("fifi q=%s\n",Dumper(\%q));
          my $q=kernel::cgi::Hash2QueryString(%q);
          print(<<EOF);
 function openUrl()
