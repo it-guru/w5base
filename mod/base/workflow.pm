@@ -1330,7 +1330,9 @@ sub Validate
    }
    my $name=effVal($oldrec,$newrec,"name");
    if ($name=~m/^\s*$/){
-      $self->LastMsg(ERROR,"invalid workflow short description spezified");
+      if ($self->LastMsg()==0){
+         $self->LastMsg(ERROR,"invalid workflow short description spezified");
+      }
       return(0);
    }
    my $stateid=effVal($oldrec,$newrec,"stateid");
