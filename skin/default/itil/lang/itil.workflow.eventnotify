@@ -35,7 +35,7 @@
 'EVt.human'=>{de=>'Bedienfehler',en=>'Userinput fail'},
 'EVt.hardware-st'=>{de=>'Hardware Storage',en=>'Hardware Storage'},
 'EVt.infrastructure'=>{de=>'Infrastruktur',en=>'Infrastructure'},
-'EVt.inanalyse'=>{de=>'in Analyse',en=>'in analyse'},
+'EVt.inanalyse'=>{de=>'in Analyse',en=>'in analysis'},
 'EVt.other'=>{de=>'Sonstige',en=>'Other'},
 'EVr.application'=>{de=>'Anwendungssoftware',en=>'Application'},
 'EVr.changetsi'=>{de=>'Change IT-Provider',en=>'Change IT-Provider'},
@@ -56,7 +56,7 @@
 'Networkarea'=>{de=>'Netzbereich'},
 'Application'=>{de=>'Applikation'},
 'Location'=>{de=>'Standort'},
-'rootcause analyse'=>{de=>'Ursachenanalyse'},
+'rootcause analysis'=>{de=>'Ursachenanalyse'},
 'Affected Region'=>{de=>'betroffene Region'},
 'EVregion.unknown'=>{de=>'unklares Ausmaß',en=>'unknown area'},
 'EVregion.nord'=>{de=>'nord Deutschland',en=>'north germany'},
@@ -94,7 +94,7 @@
 },
 'SALUTATION02.close'=>{
  'de'=>"Sehr geehrte Damen und Herren,\n\n".
-       "dies Beeinträchtigungen am Standort\n".
+       "die Beeinträchtigungen am Standort\n".
        '%s sind beseitigt.',
  'en'=>"Dear Sir or Madam,\n\n".
        "the incident in the environment of the\n".
@@ -111,7 +111,7 @@
 },
 'SALUTATION03.close'=>{
  'de'=>"Sehr geehrte Damen und Herren,\n\n".
-       "dies Beeinträchtigungen im Umfeld der\n".
+       "die Beeinträchtigungen im Umfeld der\n".
        'Anwendung %s sind beseitigt.',
  'en'=>"Dear Sir or Madam,\n\n".
        "the incident in the environment of the\n".
@@ -128,7 +128,7 @@
 },
 'SALUTATION04.close'=>{
  'de'=>"Sehr geehrte Damen und Herren,\n\n".
-       "dies Beeinträchtigungen im Umfeld der\n".
+       "die Beeinträchtigungen im Umfeld der\n".
        'TCP/IP-Netzes sind beseitigt.',
  'en'=>"Dear Sir or Madam,\n\n".
        "the incident in the environment of the IP-Network was taken care of."

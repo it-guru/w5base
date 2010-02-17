@@ -771,7 +771,7 @@ sub Process
       my $subjectlabel="Ergebnis der Ursachenanalyse";
       my $headtext="Ergebnis der Ursachenanalyse";
       if ($WfRec->{eventlang}=~m/^en/){
-         $subjectlabel="result of root cause analyse";
+         $subjectlabel="result of root cause analysis";
          $headtext="result of root cause analyse";
       }
       my $ag="";
