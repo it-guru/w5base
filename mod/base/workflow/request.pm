@@ -123,6 +123,17 @@ sub getDynamicFields
       new kernel::Field::Text (
                 name          =>'implementedto',
                 group         =>'init',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   if ($current->{stateid}>=16 &&
+                       $current->{implementedto}=~m/^[\s\?]*$/){
+                      return(0);
+                   }
+                   return(1);
+                },
                 label         =>'implemented to',
                 container     =>'headref'),
 
@@ -130,6 +141,17 @@ sub getDynamicFields
                 name          =>'implementationeffort',
                 group         =>'init',
                 label         =>'implementation effort',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   if ($current->{stateid}>=16 &&
+                       $current->{implementationeffort}=~m/^[\s\?]*$/){
+                      return(0);
+                   }
+                   return(1);
+                },
                 unit          =>'h',
                 container     =>'headref'),
 
