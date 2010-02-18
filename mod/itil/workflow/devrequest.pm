@@ -230,6 +230,16 @@ sub Process
          $self->LastMsg(ERROR,"unknown error") if (!$self->LastMsg());
          return(0);
       }
+      if ((my $applid=Query->Param("Formated_affectedapplicationid")) ne ""){
+         my $appl=getModuleObject($self->Config,"itil::appl");
+         $appl->SetFilter({id=>\$applid});
+         my ($arec,$msg)=$appl->getOnlyFirst(qw(mandator mandatorid));
+         if (defined($arec)){
+            Query->Param("Formated_mandator"=>$arec->{mandator});
+            Query->Param("Formated_mandatorid"=>$arec->{mandatorid});
+         }
+        
+      }
    }
    return($self->SUPER::Process($action,$WfRec,$actions));
 }

@@ -2033,14 +2033,25 @@ sub setFieldParam
    my $name=shift;
    my %param=@_;
 
-   my $fobj=$self->getField($name);
-   if (defined($fobj) && ref($fobj)){
-      my $c=0;
-      foreach my $k (keys(%param)){
-         $fobj->{$k}=$param{$k};
-         $c++;
+
+   if (ref($name) eq "Regexp"){
+      foreach my $fo ($self->getFieldObjsByView([qw(ALL)])){
+         printf STDERR ("fifi fo=$fo name=%s\n",$fo->Name());
+         if ($fo->Name()=~$name){
+            printf STDERR ("fifi name=%s match!\n",$fo->Name());
+         }
       }
-      return($c);
+   }
+   else{
+      my $fobj=$self->getField($name);
+      if (defined($fobj) && ref($fobj)){
+         my $c=0;
+         foreach my $k (keys(%param)){
+            $fobj->{$k}=$param{$k};
+            $c++;
+         }
+         return($c);
+      }
    }
 
    return(undef);

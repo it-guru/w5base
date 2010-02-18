@@ -140,7 +140,7 @@ sub ProcessLine
    }
    $id=$id->[0] if (ref($id) eq "ARRAY");
    my $ResultLineClickHandler=$app->{ResultLineClickHandler};
-   $ResultLineClickHandler="ById" if (!defined($ResultLineClickHandler));
+   $ResultLineClickHandler="ById" if (!exists($app->{ResultLineClickHandler}));
    if (grep(/^$ResultLineClickHandler$/,$app->getValidWebFunctions())){
       if ($idfield){
          my $dest;
