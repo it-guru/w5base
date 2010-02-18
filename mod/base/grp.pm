@@ -23,9 +23,9 @@ use kernel::App::Web;
 use kernel::App::Web::HierarchicalList;
 use kernel::DataObj::DB;
 use kernel::Field;
-use Data::Dumper;
 use kernel::CIStatusTools;
-@ISA=qw(kernel::App::Web::HierarchicalList kernel::DataObj::DB kernel::CIStatusTools);
+@ISA=qw(kernel::App::Web::HierarchicalList kernel::DataObj::DB 
+        kernel::CIStatusTools);
 
 sub new
 {

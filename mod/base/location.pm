@@ -23,8 +23,9 @@ use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
 use kernel::App::Web::InterviewLink;
+use kernel::CIStatusTools;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB
-        kernel::App::Web::InterviewLink);
+        kernel::App::Web::InterviewLink kernel::CIStatusTools);
 
 sub new
 {
@@ -329,6 +330,18 @@ sub getDetailBlockPriority
 }
 
 
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_cistatus"))){
+     Query->Param("search_cistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
+
+
+
 sub getRecordImageUrl
 {
    my $self=shift;
@@ -410,6 +423,8 @@ sub Validate
       }
    }
    ########################################################################
+   return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"name"));
+
 
 
    return(1);
