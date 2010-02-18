@@ -110,6 +110,11 @@ sub new
                 dataobjattr   =>'tspanentry.useridref'),
 
       new kernel::Field::Link(
+                name          =>'dataref',
+                label         =>'DataRef',
+                dataobjattr   =>'tspanentry.dataref'),
+
+      new kernel::Field::Link(
                 name          =>'altuseridref',
                 label         =>'Alternate UserID Search field',
                 dataobjattr   =>'tspanentry.useridref'),

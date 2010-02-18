@@ -388,6 +388,12 @@ sub Init
                       param=>'WorkflowClass=base::workflow::diary',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj('base::workflow::task$',
+                      "base::workflow",
+                      func=>'New',
+                      param=>'WorkflowClass=base::workflow::task',
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("Reporting",
                       "base::w5stat",
                       func=>'Presenter/Main',

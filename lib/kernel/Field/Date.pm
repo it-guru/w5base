@@ -221,6 +221,15 @@ sub FormatedDetail
                                                       $usertimezone,
                                                       "GMT");
       }
+      if ($mode eq "JSON"){
+         my $usertimezone=$self->getParent->UserTimezone();
+         $d=$self->getParent->ExpandTimeExpression($d,"ISO8601",
+                                                      $usertimezone,
+                                                      $usertimezone);
+         if (defined($d)){
+            $d="\\Date($d)\\";
+         } 
+      }
       return($d);
    }
    if ($d ne ""){

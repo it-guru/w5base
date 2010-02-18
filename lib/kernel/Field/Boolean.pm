@@ -49,6 +49,11 @@ sub FormatedResult
       return("true") if ($d);
       return("false");
    }
+   if ($mode eq "JSON"){
+      return(undef) if (!defined($d));
+      return(\'1') if ($d);
+      return(\'0');
+   }
    if ($mode=~m/Html/i){
       return("?") if ($d eq "" && $self->{'markempty'});
    }

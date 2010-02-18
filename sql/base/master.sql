@@ -296,3 +296,41 @@ create table mandatordataacl(
 alter table interview add boundpviewgroup varchar(40) default NULL;
 alter table interview add boundpcontact   varchar(40) default NULL;
 alter table interview add addquerydata    varchar(128) default NULL;
+create table checklst (
+  id          bigint(20)   NOT NULL,
+  name        varchar(128) NOT NULL,
+  cistatus    int(2)       NOT NULL,
+    mandator    bigint(20)  default NULL,
+    databoss    bigint(20)  default NULL,
+    isprivat    int(2)      default '0',
+  description longtext     default NULL,
+  comments    longtext     default NULL,
+  additional  longtext     default NULL,
+  createdate  datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate  datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser  bigint(20) NOT NULL default '0',
+  modifyuser  bigint(20) NOT NULL default '0',
+  editor      varchar(100) NOT NULL default '',
+  realeditor  varchar(100) NOT NULL default '',
+  lastqcheck  datetime default NULL,
+  PRIMARY KEY  (id),key(mandator),key(lastqcheck),
+  UNIQUE KEY name (name)
+);
+create table checklstent (
+  id          bigint(20)   NOT NULL,
+  checklst      bigint(20)   NOT NULL,
+  shortdesc     varchar(128) default NULL,
+  description   longtext     default NULL,
+  comments      longtext     default NULL,
+  plannedeffort int(14)      default NULL,
+  additional  longtext     default NULL,
+  createdate  datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate  datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser  bigint(20) NOT NULL default '0',
+  modifyuser  bigint(20) NOT NULL default '0',
+  editor      varchar(100) NOT NULL default '',
+  realeditor  varchar(100) NOT NULL default '',
+  lastqcheck  datetime default NULL,
+  PRIMARY KEY  (id),key(lastqcheck),
+  KEY checklst (checklst)
+);

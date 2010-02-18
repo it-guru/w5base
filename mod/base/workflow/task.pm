@@ -142,7 +142,7 @@ sub getDynamicFields
                 label         =>'task nature',
                 readonly      =>1,
                 htmlwidth     =>'10px',
-                value         =>['Tpersonal','Tproject'],
+                value         =>['Tpersonal','Tproject','Tsubtask'],
                 translation   =>'base::workflow::task',
                 container     =>'headref'),
 
@@ -185,6 +185,14 @@ sub getDynamicFields
                 container  =>'headref',
                 group      =>'affectedproject',
                 label      =>'Affected Project ID'),
+
+      new kernel::Field::Text(
+                name       =>'involvedcostcenter',
+                htmldetail =>1,
+                searchable =>0,
+                container  =>'headref',
+                group      =>'affectedproject',
+                label      =>'Involved CostCenter'),
 
     ));
 }
@@ -341,8 +349,17 @@ sub getPosibleActions
    if ((($stateid==4 || $stateid==3) && ($lastworker==$userid || $isadmin)) ||
        ($iscurrent || $userid==$creator)){
       push(@l,"wfmailsend");   # mail versenden hinzufügen        (jeder)
-      push(@l,"wfaddsnote");   # notiz hinzufügen        (jeder)
+
+      if ($WfRec->{involvedcostcenter} ne ""){ 
+         push(@l,"wfaddnote");   # notiz hinzufügen        (jeder)
+      }
+      else{
+         push(@l,"wfaddsnote");  # notiz hinzufügen        (jeder)
+      }
       push(@l,"setprioexecs"); # Prio und erledigungsgrad setzen
+      if ($WfRec->{tasknature} eq "Tproject"){
+         push(@l,"wfaddsubtask"); # Unteraufgabe erzeugen
+      }
    }
    if (($stateid==4 || $stateid==3) && 
        ($lastworker==$userid || $isadmin) && ($userid!=$creator)){
@@ -477,8 +494,9 @@ sub nativProcess
             $self->LastMsg(ERROR,"invalid project");
             return(undef);
          }
-         
       }
+      # if costcenter is specified - need to check if costcenter is active!
+
       if (my $id=$self->StoreRecord($WfRec,$h)){
          $h->{id}=$id;
       }
@@ -653,8 +671,22 @@ sub generateWorkspacePages
       $$selopt.="<option value=\"wfaddsubtask\">".
                 $self->getParent->T("wfaddsubtask","base::workflow::task").
                 "</option>\n";
-      $$divset.="<div id=OPwfaddsubtask class=\"$class\"><textarea name=note ".
-                "style=\"width:100%;height:110px\"></textarea></div>";
+      my $note=Query->Param("note");
+      my $d;
+      $d.="<tr><td width=1% nowrap>".
+          $self->getParent->T("assign to","base::workflow::task").
+          ":&nbsp;</td>".
+          "<td>\%fwdtargetname(detail)\%".
+          "</td>";
+      $d.="<tr><td width=1% nowrap>".
+          $self->getParent->T("subtask label","base::workflow::task").
+          ":&nbsp;</td>".
+          "<td>\%name(detail)\%".
+          "</td>";
+      $d.="<tr><td colspan=2><textarea name=note ".
+          "style=\"width:100%;height:70px\">".$note."</textarea></td></tr>";
+      $$divset.="<div id=OPwfaddsubtask class=\"$class\">".
+                "<table>$d</table></div>";
    }
    if (grep(/^setprioexecs$/,@$actions)){
       $$selopt.="<option value=\"setprioexecs\">".
@@ -755,6 +787,78 @@ sub Process
          }
          return(0);
       }
+
+
+      if ($op eq "wfaddsubtask"){
+         my $note=Query->Param("note");
+         $note=trim($note);
+         if (length($note)<20){
+            $self->LastMsg(ERROR,"invalid or not details subtask description");
+            return(0);
+         }
+
+         my $fobj=$self->getParent->getField("fwdtargetname");
+         my $h=$self->getWriteRequestHash("web");
+         my $newrec;
+         if ($newrec=$fobj->Validate($WfRec,$h)){
+            if (!defined($newrec->{fwdtarget}) ||
+                !defined($newrec->{fwdtargetid} ||
+                $newrec->{fwdtargetid}==0)){
+               if ($self->LastMsg()==0){
+                  $self->LastMsg(ERROR,"invalid forwarding target");
+               }
+               return(0);
+            }
+            if ($newrec->{fwdtarget} eq "base::user"){
+               # check against distribution contacts
+               my $user=getModuleObject($self->Config,"base::user");
+               $user->SetFilter({userid=>\$newrec->{fwdtargetid}});
+               my ($urec,$msg)=$user->getOnlyFirst(qw(usertyp));
+               if (!defined($urec) ||
+                   ($urec->{usertyp} ne "user" &&
+                    $urec->{usertyp} ne "service")){
+                  $self->LastMsg(ERROR,"selected forward user is not allowed");
+                  return(0);
+               }
+            }
+         }
+         else{
+            return(0);
+         }
+         my $fwdtargetname=Query->Param("Formated_fwdtargetname");
+         my $name=Query->Param("Formated_name");
+         
+         if (my $subid=$self->StoreRecord(undef,{stateid=>2,
+                                       name=>$name,
+                                       tasknature=>"Tsubtask",
+                                       taskclass=>$WfRec->{taskclass},
+                                       mandatorid=>$WfRec->{mandatorid},
+                                       affectedproject=>$WfRec->{affectedproject},
+                                       affectedprojectid=>$WfRec->{affectedprojectid},
+                                       mandator=>$WfRec->{mandator},
+                                       detaildescription=>$note,
+                                       fwdtarget=>$newrec->{fwdtarget},
+                                       fwdtargetid=>$newrec->{fwdtargetid},
+                                       fwddebtarget=>undef,
+                                       fwddebtargetid=>undef })){
+          #  if ($self->getParent->getParent->Action->StoreRecord(
+          #      $WfRec->{id},"wfforward",
+          #      {translation=>'base::workflow::request'},$fwdtargetname."\n".
+          #                                               $note,undef)){
+          #     my $openuserid=$WfRec->{openuser};
+          #     $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
+          #     $self->PostProcess($action.".".$op,$WfRec,$actions,
+          #                        note=>$note,
+          #                        fwdtarget=>$newrec->{fwdtarget},
+          #                        fwdtargetid=>$newrec->{fwdtargetid},
+          #                        fwdtargetname=>$fwdtargetname);
+          #     Query->Delete("OP");
+          #     return(1);
+          #  }
+         }
+         return(0);
+      }
+
      
 
       if ($op eq "setprioexecs"){

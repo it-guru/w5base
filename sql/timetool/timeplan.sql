@@ -46,7 +46,7 @@ create table tspanentry (
   srcid      varchar(20) default NULL,
   srcload    datetime    default NULL,
   PRIMARY KEY  (id),
-  KEY search (tfrom,tto,subsys,timeplanref),key(useridref),
+  KEY s1 (tfrom),key userid (useridref), key s2 (tto),
   UNIQUE KEY tfrom (tfrom,entrytyp,useridref,timeplanref,subsys),
   UNIQUE KEY span  (tfrom,tto,dataref,useridref,timeplanref,subsys),
   UNIQUE KEY `srcsys` (srcsys,srcid),key (useridref)

@@ -745,8 +745,8 @@ sub AddSpan
    my $t2=Date_to_Time("GMT",$rec->{tto});
    $vbar->AddSpan(2,"any",$t1,$t2,color=>'blue',id=>$TSpanID);
 
-   printf STDERR ("fifi d=%s\ntfrom=$t1 tto=$t2\n",Dumper($rec));
-printf STDERR ("Span : from=$rec->{tfrom}($t1) to=$rec->{tto}($t2) rangemin=$vbar->{RangeMin}\n");
+#   printf STDERR ("fifi d=%s\ntfrom=$t1 tto=$t2\n",Dumper($rec));
+#printf STDERR ("Span : from=$rec->{tfrom}($t1) to=$rec->{tto}($t2) rangemin=$vbar->{RangeMin}\n");
 }
 
 sub getAdditionalSearchMask

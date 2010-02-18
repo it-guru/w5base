@@ -55,7 +55,8 @@ sub mkp800
    # ACHTUNG: Die Monatsgrenze für P800 Reports ist GMT und nicht CET!!!
    #
    $ENV{LANG}="de";
-   $param{timezone}="GMT" if (!defined($param{timezone}));
+   $param{customer}="DTAG.T-Home" if (!defined($param{customer}));
+   $param{timezone}="GMT"         if (!defined($param{timezone}));
    if (defined($param{month})){
       if (my ($sM,$sY)=$param{month}=~m/^(\d+)\/(\d+)$/){
          $sM=undef if ($sM<1);
@@ -162,7 +163,8 @@ sub mkp800
      
       my $now=$app->ExpandTimeExpression("now","en","CET");
       my $contr=getModuleObject($self->Config,"itil::custcontract");
-      $contr->SetFilter(cistatusid=>[3,4]);
+      $contr->SetFilter({cistatusid=>[3,4],
+                         customer=>"$param{customer} $param{customer}.*"});
       foreach my $contrrec ($contr->getHashList(qw(id))){
          $p800{$contrrec->{id}}={} if (!defined($p800{$contrrec->{id}}));
       }
