@@ -511,7 +511,7 @@ sub arrangeSearchData
    $newbutton="new," if ($param{allowNewButton});
    my $d=<<EOF;
 <img width=450 border=0 height=1 src="../../../public/base/load/empty.gif"><div class=searchframe><table class=searchframe>$searchframe</table></div>
-%StdButtonBar(search,$newbutton,defaults,reset,bookmark,print,extended,upload)%
+%StdButtonBar(search,analytic,$newbutton,defaults,reset,bookmark,print,extended,upload)%
 <div style="width:100%;
             border-width:0px;
             margin:0px;

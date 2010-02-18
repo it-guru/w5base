@@ -2035,22 +2035,35 @@ sub setFieldParam
 
 
    if (ref($name) eq "Regexp"){
+      $param{NEGMATCH}=0 if (!exists($param{NEGMATCH}));
+      my $n;
       foreach my $fo ($self->getFieldObjsByView([qw(ALL)])){
-         printf STDERR ("fifi fo=$fo name=%s\n",$fo->Name());
-         if ($fo->Name()=~$name){
-            printf STDERR ("fifi name=%s match!\n",$fo->Name());
+         if ($param{NEGMATCH}){
+            if (!($fo->Name()=~$name)){
+               $n+=$self->setFieldParam($fo,%param);
+            }
+         }
+         else{
+            if ($fo->Name()=~$name){
+               $n+=$self->setFieldParam($fo,%param);
+            }
          }
       }
+      return($n);
+   }
+   elsif (ref($name)){
+      my $c=0;
+      foreach my $k (keys(%param)){
+         next if ($k eq "NEGMATCH");
+         $name->{$k}=$param{$k};
+         $c++;
+      }
+      return($c);
    }
    else{
       my $fobj=$self->getField($name);
-      if (defined($fobj) && ref($fobj)){
-         my $c=0;
-         foreach my $k (keys(%param)){
-            $fobj->{$k}=$param{$k};
-            $c++;
-         }
-         return($c);
+      if (defined($fobj)){
+         return($self->setFieldParam($fobj,%param));
       }
    }
 

@@ -1476,6 +1476,15 @@ sub findtemplvar
       if (grep(/^search$/,@param)){
          AddButton(\$d,"DoSearch()","Search");
       }
+      if (grep(/^analytic$/,@param)){
+         if ($self->can("getAnalytics")){
+            my @l=$self->getAnalytics();
+            while(my $f=shift(@l)){
+               my $n=shift(@l);
+               AddButton(\$d,"DoAnalytic('$f')",$n);
+            }
+         }
+      }
       if (grep(/^save$/,@param)){
          AddButton(\$d,"DoSave()","Save");
       }
