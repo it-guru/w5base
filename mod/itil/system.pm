@@ -1237,7 +1237,7 @@ sub isViewValid
    return("header","default") if (!defined($rec));
    my @all=qw(header default software admin logsys contacts misc opmode 
               physys ipaddresses phonenumbers sec applications
-              location source
+              location source customer
               attachments control systemclass interview);
    if (defined($rec) && $rec->{'isclusternode'}){
       push(@all,"cluster");
