@@ -73,12 +73,15 @@ sub MuellerReport201002
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
-                   my $appl=$self->getParent->getPersistentModuleObject(
-                                              "itil::appl");
-                   $appl->SetFilter({name=>\$current->{applicationnames}});
-                   my ($WfRec)=$appl->getOnlyFirst(qw(conumber));
-           
-                   return($WfRec->{conumber});
+                   if ($current->{applicationnames} ne ""){
+                      my $appl=$self->getParent->getPersistentModuleObject(
+                                                 "itil::appl");
+                      $appl->SetFilter({name=>\$current->{applicationnames}});
+                      my ($WfRec)=$appl->getOnlyFirst(qw(conumber));
+                     
+                      return($WfRec->{conumber});
+                   }
+                   return(undef);
                 }),
    );
  
