@@ -121,7 +121,9 @@ sub Process
          $sheetname=$DataObj->T($DataObj->Self(),$DataObj->Self());
       }
       my $line=1;
-      my ($rec,$msg)=$DataObj->getFirst(unbuffered=>1);
+      my $unbuffered=$self->crec('unbuffered');
+      $unbuffered=1 if (!defined($unbuffered));
+      my ($rec,$msg)=$DataObj->getFirst(unbuffered=>$unbuffered);
       if (defined($rec)){
          my $reproccount=0;
          do{
