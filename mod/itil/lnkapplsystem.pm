@@ -673,8 +673,12 @@ sub getSqlFrom
    if ($mode eq "select"){
       foreach my $f (@filter){
          if (ref($f) eq "HASH"){
+printf STDERR ("fifi flt=%s\n",Dumper($f));
             if (exists($f->{assetid}) && $f->{assetid}=~m/^\d+$/){
                $f->{assetid}=[$f->{assetid}];
+            }
+            if (exists($f->{assetid}) && ref($f->{assetid}) eq "SCALAR"){
+               $f->{assetid}=[${$f->{assetid}}];
             }
             if (exists($f->{assetid}) && ref($f->{assetid}) eq "ARRAY"){
                my $sys=getModuleObject($self->Config,"itil::system");
@@ -694,6 +698,9 @@ sub getSqlFrom
                $datasourcerest1.=" and lnkapplsystem.appl='$f->{applid}'";
                $datasourcerest2.=" and lnkapplitclust.appl='$f->{applid}'";
             }
+            if (exists($f->{applid}) && ref($f->{applid}) eq "SCALAR"){
+               $f->{applid}=[${$f->{applid}}];
+            }
             if (exists($f->{applid}) && ref($f->{applid}) eq "ARRAY"){
                $datasourcerest1.=" and lnkapplsystem.appl in (".
                              join(",",map({"'".$_."'"} @{$f->{applid}})).")";
@@ -703,6 +710,9 @@ sub getSqlFrom
             if (exists($f->{systemid}) && $f->{systemid}=~m/^\d+$/){
                $datasourcerest1.=" and lnkapplsystem.system='$f->{systemid}'";
                $datasourcerest2.=" and system.id='$f->{systemid}'";
+            }
+            if (exists($f->{systemid}) && ref($f->{systemid}) eq "SCALAR"){
+               $f->{systemid}=[${$f->{systemid}}];
             }
             if (exists($f->{systemid}) && ref($f->{systemid}) eq "ARRAY"){
                $datasourcerest1.=" and lnkapplsystem.system in (".
@@ -717,6 +727,8 @@ sub getSqlFrom
 
    $datasourcerest1=" where $datasourcerest1" if ($datasourcerest1 ne ""); 
    $datasourcerest2=" where $datasourcerest2" if ($datasourcerest2 ne ""); 
+printf STDERR ("fifi datasourcerest1=$datasourcerest1\n");
+printf STDERR ("fifi datasourcerest2=$datasourcerest2\n");
 
 
    my $datasource=
