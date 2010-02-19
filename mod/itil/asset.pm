@@ -180,7 +180,7 @@ sub new
                 vjoinon       =>['id'=>'assetid'],
                 vjoindisp     =>['appl','applcistatus','applcustomer']),
 
-      new kernel::Field::SubList(
+      new kernel::Field::Text(
                 name          =>'applicationnames',
                 label         =>'Application names',
                 htmlwidth     =>'300px',
@@ -218,6 +218,19 @@ sub new
                                   systemcistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'assetid'],
                 vjoindisp     =>['applcustomer','appl']),
+
+      new kernel::Field::Text(
+                name          =>'customernames',
+                label         =>'Customer names',
+                htmlwidth     =>'200px',
+                group         =>'applications',
+                readonly      =>1,
+                htmldetail    =>0,
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{applcistatusid=>"<=5",
+                                  systemcistatusid=>"<=5"}],
+                vjoinon       =>['id'=>'assetid'],
+                vjoindisp     =>['applcustomer']),
 
       new kernel::Field::Number(
                 name          =>'cpucount',
