@@ -673,6 +673,23 @@ sub getSqlFrom
    if ($mode eq "select"){
       foreach my $f (@filter){
          if (ref($f) eq "HASH"){
+            if (exists($f->{assetid}) && $f->{assetid}=~m/^\d+$/){
+               $f->{assetid}=[$f->{assetid}];
+            }
+            if (exists($f->{assetid}) && ref($f->{assetid}) eq "ARRAY"){
+               my $sys=getModuleObject($self->Config,"itil::system");
+               $sys->SetFilter({assetid=>$f->{assetid}});
+               my @l=$sys->getHashList("id");
+               my @sysid=();
+               foreach my $sysrec ($sys->getHashList("id")){
+                  push(@sysid,$sysrec->{id});
+               }
+               push(@sysid,"-99") if ($#sysid==-1);
+               $datasourcerest1.=" and lnkapplsystem.system in (".
+                             join(",",map({"'".$_."'"} @sysid)).")";
+               $datasourcerest2.=" and system.id in (".
+                             join(",",map({"'".$_."'"} @sysid)).")";
+            }
             if (exists($f->{applid}) && $f->{applid}=~m/^\d+$/){
                $datasourcerest1.=" and lnkapplsystem.appl='$f->{applid}'";
                $datasourcerest2.=" and lnkapplitclust.appl='$f->{applid}'";
