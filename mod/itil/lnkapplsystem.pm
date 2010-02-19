@@ -673,7 +673,6 @@ sub getSqlFrom
    if ($mode eq "select"){
       foreach my $f (@filter){
          if (ref($f) eq "HASH"){
-printf STDERR ("fifi flt=%s\n",Dumper($f));
             if (exists($f->{assetid}) && $f->{assetid}=~m/^\d+$/){
                $f->{assetid}=[$f->{assetid}];
             }
@@ -727,8 +726,6 @@ printf STDERR ("fifi flt=%s\n",Dumper($f));
 
    $datasourcerest1=" where $datasourcerest1" if ($datasourcerest1 ne ""); 
    $datasourcerest2=" where $datasourcerest2" if ($datasourcerest2 ne ""); 
-printf STDERR ("fifi datasourcerest1=$datasourcerest1\n");
-printf STDERR ("fifi datasourcerest2=$datasourcerest2\n");
 
 
    my $datasource=
