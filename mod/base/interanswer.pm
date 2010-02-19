@@ -469,6 +469,53 @@ sub SecureSetFilter
 
 
 
+sub getAnalytics
+{
+   my $self=shift;
+   return('Analytics'=>$self->T('Analytics','kernel::App::Web'));
+}
+
+sub getValidWebFunctions
+{
+   my ($self)=@_;
+   return($self->SUPER::getValidWebFunctions(),qw(Analytics));
+}
+
+sub Analytics
+{
+   my $self=shift;
+   my %param;
+
+   $self->doFrontendInitialize();
+   my $output=new kernel::Output($self);
+   if ($self->validateSearchQuery()){
+      if (!$param{ExternalFilter}){
+         $self->ResetFilter();
+         my %q=$self->getSearchHash();
+         $self->SecureSetFilter(\%q);
+         if ($self->LastMsg()>0){
+            print $self->queryError();
+            return();
+         }
+         $param{'currentFrontendFilter'}=\%q;
+      }
+      if (!($output->setFormat("Analytics",%param))){
+         # can't set format
+         return();
+      }
+      $self->SetCurrentView(qw(parentname cdate mdate qtag answer 
+                               name relevant));
+      $output->WriteToStdout(HttpHeader=>1);
+   }
+   else{
+      if ($self->LastMsg()){
+         print($self->noAccess());
+      }
+   }
+}
+
+
+
 
 
 

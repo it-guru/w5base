@@ -70,7 +70,7 @@ sub getHttpHeader
    my $self=shift;
    my $app=$self->getParent->getParent();
    my $d="";
-   $d.="Content-type:".$self->MimeType()."\n\n";
+   $d.="Content-type:".$self->MimeType().";charset=UTF8\n\n";
    return($d);
 }
 
@@ -119,7 +119,8 @@ sub ProcessLine
    }
    my $d;
    if (defined($self->{JSON})){
-      $d=$self->{JSON}->pretty->encode(\%rec);
+      #$d=$self->{JSON}->pretty->encode(\%rec);
+      $d=$self->{JSON}->encode(\%rec);
    }
    # date hack, to get Date objects in JavaScript!
    $d=~s/"\\\\Date\((\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)\)\\\\"/new Date($1,$2,$3,$4,$5)/g;
@@ -152,10 +153,13 @@ sub ProcessHead
 //
 function createNamespace(ns)
 {
+   ns="document."+ns;
    var splitNs = ns.split(".");
    var builtNs = splitNs[0];
-
-   var i, base = window.document;
+   if (typeof(window)=="undefined"){
+      window={};
+   }
+   var i, base = window;
    for (i = 0; i < splitNs.length; i++){
       if (typeof(base[splitNs[i]])=="undefined"){
          base[splitNs[i]] = {};

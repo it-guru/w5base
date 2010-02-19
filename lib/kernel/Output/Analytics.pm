@@ -67,7 +67,7 @@ sub getHttpHeader
    my $self=shift;
    my $app=$self->getParent->getParent();
    my $d="";
-   $d.="Content-type:".$self->MimeType()."\n\n";
+   $d.="Content-type:".$self->MimeType()."; charset=UTF-8\n\n";
    return($d);
 }
 
@@ -85,6 +85,29 @@ sub ProcessHead
           "firebug-lite-compressed.js'>";
       $d.="</script>";
    }
+   my @load="jquery.js";
+   foreach my $js (@load){
+      my $instdir=$self->getParent->getParent->Config->Param("INSTDIR");
+      my $filename=$instdir."/lib/javascript/".$js;
+      if (open(F,"<$filename")){
+         $d.="<script language=\"JavaScript\">\n";
+         $d.=join("",<F>);;
+         $d.="</script>\n";
+         close(F);
+      }
+   }
+   my @load=("default.css","work.css");
+   foreach my $css (@load){
+      my $filename=$self->getParent->getParent->getSkinFile(
+                   $self->getParent->getParent->Module."/css/".$css);
+      if (open(F,"<$filename")){
+         $d.="<style>\n";
+         $d.=join("",<F>);;
+         $d.="</style>\n";
+         close(F);
+      }
+   }
+
 
    $d.="<script language=\"JavaScript\">".$h;
    return($d); 
