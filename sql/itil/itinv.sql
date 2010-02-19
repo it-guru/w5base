@@ -108,7 +108,7 @@ create table system (
   PRIMARY KEY  (id),
   UNIQUE KEY systemid (systemid),
   KEY adm (adm),KEY adm2 (adm2), KEY admteam (admteam),
-  UNIQUE KEY name (name),KEY(mandator),
+  UNIQUE KEY name (name),KEY(mandator),key assetid(asset),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 );
 create table asset (
