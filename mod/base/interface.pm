@@ -911,6 +911,8 @@ sub Finish
    if (defined($result->{lastmsg}) && ref($result->{lastmsg})){
       for(my $c=0;$c<=$#{$result->{lastmsg}};$c++){
          $result->{lastmsg}->[$c]=~s/\s*$//g;
+         $result->{lastmsg}->[$c]=~s/&amp;/&/g;
+         $result->{lastmsg}->[$c]=~s/&/&amp;/g;
       }
    }
    if (exists($result->{IdentifiedBy})){
