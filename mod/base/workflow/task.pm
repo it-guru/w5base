@@ -86,7 +86,7 @@ sub getAllowedProjects
              ]);
    my $o=getModuleObject($app->Config,"base::projectroom");
    $o->SetFilter(@flt);
-   my @l=$o->getHashList(qw(name id mandator mandatorid));
+   my @l=$o->getHashList(qw(name id mandator mandatorid iscommercial conumber));
    Dumper($_) foreach (@l);
    return(@l);
 }
@@ -188,7 +188,18 @@ sub getDynamicFields
 
       new kernel::Field::Text(
                 name       =>'involvedcostcenter',
-                htmldetail =>1,
+                htmldetail =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   if ($current->{involvedcostcenter}=~m/^[\s\?]*$/){
+                      return(0);
+                   }
+                   return(1);
+
+
+                },
                 searchable =>0,
                 container  =>'headref',
                 group      =>'affectedproject',
@@ -487,6 +498,9 @@ sub nativProcess
                $h->{affectedproject}=$r->{name};
                $h->{mandatorid}=[$r->{mandatorid}];
                $h->{mandator}=[$r->{mandator}];
+               if ($r->{iscommercial}){
+                  $h->{involvedcostcenter}=$r->{conumber};
+               }
                last;
             }
          }

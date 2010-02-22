@@ -177,8 +177,8 @@ sub ListRel
                #print STDERR Dumper($rec->{dstwfheadref});
                #print STDERR Dumper($rec->{srcwfheadref});
                $d.="<td $onclick style=\"border-top:solid;border-width:1px;".
-                   "border-top-color:silver\">$pref<b>".$trlabel.
-                   "</b></td></tr>";
+                   "border-top-color:silver\"><b>".$trlabel.
+                   "</b> $pref</td></tr>";
                if ($partner ne ""){
                   $d.="<tr><td></td><td $onclick>$partner</td></tr>";
                }
