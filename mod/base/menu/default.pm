@@ -35,8 +35,16 @@ sub Init
 {
    my $self=shift;
 
-   $self->RegisterObj("",
-                      "base::start");
+   $self->RegisterObj("MyW5Base",
+                      "base::MyW5Base",
+                      prio=>'1',
+                      func=>'Main',
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("MyW5Base.userenv",
+                      "base::user",
+                      func=>'MyDetail',
+                      defaultacl=>['valid_user']);
 
    $self->RegisterObj("MyW5Base",
                       "base::MyW5Base",
