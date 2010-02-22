@@ -14,6 +14,7 @@
 'QPRIO.2'=>{de=>'2 - mittel',en=>'2 - medium'},
 'QPRIO.3'=>{de=>'3 - niedrig',en=>'2 - low'},
 'QT.boolean'=>{de=>'Ja/Nein',en=>'yes/no'},
+'QT.date'=>{de=>'Datum',en=>'Date'},
 'QT.booleana'=>{de=>'Ja/Nein (Antwort ausreichend)',en=>'yes/no (answer sufficient)'},
 'QT.percent4'=>{de=>'Prozent (25% Schritte)',en=>'percent (25% steps)'},
 'QT.percent'=>{de=>'Prozent (10% Schritte)',en=>'percent (10% steps)'},

@@ -34,11 +34,15 @@ sub HtmlInterviewLink
       if ($interviewcatid eq ""){ 
          print $self->HttpHeader();
          print $self->HtmlHeader(body=>1,
-                                 js=>'toolbox.js',
+                                 js=>['toolbox.js',
+                                      'jquery.js',
+                                      'jquery.ui.js',
+                                      'jquery.locale.js'],
                                  style=>['default.css','work.css',
                                          'Output.HtmlDetail.css',
                                          'kernel.App.Web.css',
-                                         'kernel.App.Web.Interview.css']);
+                                         'kernel.App.Web.Interview.css',
+                                         'jquery.ui.css']);
          printf("<input type=hidden name=$idname value=\"%s\">",$id);
          printf("<input type=hidden id=parentid value=\"%s\">",$id);
          printf("<input type=hidden id=parentobj value=\"%s\">",
@@ -61,13 +65,15 @@ sub InterviewSubForm
 
    my $lastquestclust;
    my @q;
+   my $HTMLjs;
    foreach my $qrec (@{$state->{TotalActiveQuestions}}){
       my $d;
       if ($qrec->{AnswerViewable}){
          if ($interviewcatid eq $qrec->{interviewcatid}){
             if (!defined($lastquestclust) ||
                 $lastquestclust ne $qrec->{questclust}){
-               $d.="<div class=InterviewQuestClust>$qrec->{questclust}</div>";
+               $d.="<div class=\"InterviewQuestClust\">".
+                   $qrec->{questclust}."</div>";
                $d.="\n<div class=InterviewQuestHead>".
                    "<table border=0 class=InterviewQuestHead width=95%>".
                    "<tr><td class=InterviewQuestHead></td>".
@@ -101,15 +107,22 @@ sub InterviewSubForm
                 "</div></td>".
                 "</tr></table></form></div>";
             push(@q,$d);
+            $HTMLjs.=$qrec->{HTMLjs};
             $lastquestclust=$qrec->{questclust};
             $lastquestclust="" if (!defined($lastquestclust));
          }
       }
    }
    print $self->HttpHeader("text/xml");
-   my $res=hash2xml({document=>{result=>'ok',q=>\@q,exitcode=>0}},{header=>1});
+   if ($HTMLjs ne ""){
+      $HTMLjs="function Init$interviewcatid(){$HTMLjs} Init$interviewcatid(0)";
+   }
+   else{
+      $HTMLjs="function Init$interviewcatid(){}";
+   }
+   my $res=hash2xml({document=>{result=>'ok',q=>\@q,js=>$HTMLjs,
+                                exitcode=>0}},{header=>1});
    print $res;
-   #print STDERR $res;
 }
 
 
@@ -192,6 +205,14 @@ function switchQueryBlock(o,id)
               }
           }
           e.innerHTML=d;
+          var jso=xmlobject.getElementsByTagName("js");
+          for (var i = 0; i < jso.length; ++i){
+              var childNode=jso[i].childNodes[0];
+              if (childNode){
+                 eval(childNode.nodeValue);
+              }
+          }
+          
        }
       }
       var q="$idname=$id&interviewcatid="+id;
@@ -211,15 +232,24 @@ function switchQueryBlock(o,id)
 }
 function loadForm(id,xmlobject)
 {
-   var v=new Array('answer','comments','relevant');
+   var v=new Array('answer','comments','relevant','js');
+   var js="";
 
    for (var i = 0; i < v.length; ++i){
       var a=document.getElementById(v[i]+id);
       var result=xmlobject.getElementsByTagName("HTML"+v[i])[0];
       var childNode=result.childNodes[0];
       if (childNode){
-         a.innerHTML=childNode.nodeValue;
+         if (v[i]=="js"){
+            js+=childNode.nodeValue;
+         }
+         else{
+            a.innerHTML=childNode.nodeValue;
+         }
       }
+   }
+   if (js!=""){
+      eval(js);
    }
 }
 function submitChange(o)

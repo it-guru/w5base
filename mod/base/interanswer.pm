@@ -339,12 +339,6 @@ sub isWriteValid
    return("default","relation");
 }
 
-sub getValidWebFunctions
-{
-   my ($self)=@_;
-   return($self->SUPER::getValidWebFunctions(), qw(Store));
-}
-
 sub getAnswerWriteState
 {
    my $self=shift;
@@ -428,15 +422,17 @@ sub Store
                      parentid=>\$parentid});
    my ($newrec,$msg)=$self->getOnlyFirst(qw(answer comments relevant));
 
-   my ($HTMLanswer,$HTMLrelevant,$HTMLcomments)=
+   my ($HTMLanswer,$HTMLrelevant,$HTMLcomments,$HTMLjs)=
          $i->getHtmlEditElements($write,$irec,$newrec);
 
    $newrec->{HTMLanswer}=$HTMLanswer;
    $newrec->{HTMLrelevant}=$HTMLrelevant;
    $newrec->{HTMLcomments}=$HTMLcomments;
+   $newrec->{HTMLjs}=$HTMLjs;
    
    print $self->HttpHeader("text/xml");
-   my $res=hash2xml({document=>{result=>'ok',interanswer=>$newrec,exitcode=>0}},{header=>1});
+   my $res=hash2xml({document=>{result=>'ok',
+                     interanswer=>$newrec,exitcode=>0}},{header=>1});
    print $res;
    #print STDERR $res;
 }
@@ -478,7 +474,7 @@ sub getAnalytics
 sub getValidWebFunctions
 {
    my ($self)=@_;
-   return($self->SUPER::getValidWebFunctions(),qw(Analytics));
+   return($self->SUPER::getValidWebFunctions(),qw(Analytics Store));
 }
 
 sub Analytics

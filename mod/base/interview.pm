@@ -224,7 +224,8 @@ sub new
                 htmleditwidth =>'250px',
                 value         =>['percent','percenta',
                                  'percent4','text',
-                                 'boolean','booleana'],
+                                 'boolean','booleana',
+                                 'date'],
                 label         =>'Question Typ',
                 dataobjattr   =>'interview.questtyp'),
 
@@ -591,7 +592,7 @@ sub getHtmlEditElements
    my $irec=shift;
    my $answer=shift;
    my $iid=$irec->{id};
-   my ($HTMLanswer,$HTMLrelevant,$HTMLcomments);
+   my ($HTMLanswer,$HTMLrelevant,$HTMLcomments,$HTMLjs);
 
    my $opmode="disabled";
    if ($write){
@@ -642,7 +643,7 @@ sub getHtmlEditElements
       my $p="<table class=Panswer><tr><td align=center>$sel</td></tr></table>";
       $HTMLanswer="<div style=\"width:100%;padding:1px;margin:0\">$p</div>";
    }
-   if ($irec->{questtyp} eq "percent"  ||
+   elsif ($irec->{questtyp} eq "percent"  ||
        $irec->{questtyp} eq "percent4" ||
        $irec->{questtyp} eq "percenta"){
       my $steps=10;
@@ -689,11 +690,28 @@ sub getHtmlEditElements
       }
       $HTMLanswer="<div style=\"width:100%;padding:1px;margin:0\">$p</div>";
    }
+   elsif ($irec->{questtyp} eq "date"){
+      my $txt="";
+      $txt=quoteHtml($answer->{answer}) if (defined($answer));
+      my $p="<input id=\"dateinput$irec->{id}\" style=\"width:100%\" ".
+            "type=text $opmode name=answer value=\"".$txt."\">";
+      if ($irec->{addquestdata} ne ""){
+         $p="<table cellspacing=0 cellpadding=0><tr><td width=1% nowrap>".
+            $irec->{addquestdata}."&nbsp;</td><td>".$p.
+            "</td></tr></table>";
+      }
+      $HTMLanswer="<div style=\"width:100%;padding:1px;margin:0\">$p</div>";
+      my $lang=$self->Lang();
+      $HTMLjs.="\$(\"#dateinput$irec->{id}\").datepicker();\n";
+      $HTMLjs.="\$('#dateinput$irec->{id}').datepicker('option', ".
+               "\$.extend({},".
+               "\$.datepicker.regional['$lang']));\n";
+   }
    if (defined($answer) && !($answer->{relevant})){
       $HTMLanswer="&nbsp;";
    }
 
-   return($HTMLanswer,$HTMLrelevant,$HTMLcomments);
+   return($HTMLanswer,$HTMLrelevant,$HTMLcomments,$HTMLjs);
 }
 
 

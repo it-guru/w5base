@@ -54,12 +54,13 @@ sub getTotalActiveQuestions
       }
       if ($restok){
          my $write=$i->checkAnserWrite($pwrite,$irec,$p,$rec);
-         my ($HTMLanswer,$HTMLrelevant,$HTMLcomments)=
+         my ($HTMLanswer,$HTMLrelevant,$HTMLcomments,$HTMLjs)=
             $i->getHtmlEditElements($write,$irec,
                          $answered->{interviewid}->{$irec->{id}},$p,$rec);
          $irec->{'HTMLanswer'}=$HTMLanswer;
          $irec->{'HTMLrelevant'}=$HTMLrelevant;
          $irec->{'HTMLcomments'}=$HTMLcomments;
+         $irec->{'HTMLjs'}=$HTMLjs;
          $irec->{'AnswerViewable'}=1;
          if ($irec->{boundpviewgroup} ne ""){
             my $q=quotemeta($irec->{boundpviewgroup});
@@ -68,6 +69,7 @@ sub getTotalActiveQuestions
                $irec->{'HTMLanswer'}="-";
                $irec->{'HTMLrelevant'}="-";
                $irec->{'HTMLcomments'}="-";
+               $irec->{'HTMLjs'}="";
             }
          }
          push(@l,$irec);
