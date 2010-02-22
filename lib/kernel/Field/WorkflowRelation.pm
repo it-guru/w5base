@@ -71,7 +71,8 @@ sub ListRel
       $fo->SetFilter(\%curflt);
 
       foreach my $rec ($fo->getHashList(qw(mdate id dstwfid srcwfid
-                                           translation
+                                           translation additional
+                                           dstwfheadref srcwfheadref
                                            dstwfname srcwfname name comments))){
          if (defined($rec)){
             if ($mode ne "mail"){
@@ -153,8 +154,31 @@ sub ListRel
                $d.="$baseurl/auth/base/workflow/ById/$lnkid </li>\n";
             }
             else{
+               my $pref="";
+               my @show=();
+               if (ref($rec->{additional}->{show}) eq "ARRAY"){
+                  @show=@{$rec->{additional}->{show}};
+               }
+               if (grep(/^headref.taskexecstate$/,@show)){
+                  my $p="?";
+                  if ($transpref eq "REV."){
+                     $p=$rec->{srcwfheadref}->{taskexecstate};
+                  }
+                  else{
+                     $p=$rec->{dstwfheadref}->{taskexecstate};
+                  }
+                  $p=$p->[0] if (ref($p) eq "ARRAY");
+                  $pref=sprintf("%d \%",$p) if ($p ne "");
+                  $pref="<font color=\"green\">$pref</font>" if ($p==100);
+                  $pref="($pref)" if ($pref ne "");
+                  $pref.=" " if ($pref ne "");
+               }
+               #print STDERR Dumper($rec->{additional});
+               #print STDERR Dumper($rec->{dstwfheadref});
+               #print STDERR Dumper($rec->{srcwfheadref});
                $d.="<td $onclick style=\"border-top:solid;border-width:1px;".
-                   "border-top-color:silver\"><b>".$trlabel."</b></td></tr>";
+                   "border-top-color:silver\">$pref<b>".$trlabel.
+                   "</b></td></tr>";
                if ($partner ne ""){
                   $d.="<tr><td></td><td $onclick>$partner</td></tr>";
                }

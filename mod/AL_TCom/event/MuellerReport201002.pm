@@ -140,8 +140,6 @@ sub recPreProcess
    @{$recordview}=@newrecview;
    ########################################################################
 
-printf STDERR ("fifi applicationnames=%s\n",Dumper($rec->{applicationnames}));
-printf STDERR ("fifi customernames=%s\n",Dumper($rec->{customer}));
    if (!defined($self->{buffer})){
       #####################################################################
       # create buffer   

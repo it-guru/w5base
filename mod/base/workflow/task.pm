@@ -828,33 +828,38 @@ sub Process
          my $fwdtargetname=Query->Param("Formated_fwdtargetname");
          my $name=Query->Param("Formated_name");
          
-         if (my $subid=$self->StoreRecord(undef,{stateid=>2,
-                                       name=>$name,
-                                       tasknature=>"Tsubtask",
-                                       taskclass=>$WfRec->{taskclass},
-                                       mandatorid=>$WfRec->{mandatorid},
-                                       affectedproject=>$WfRec->{affectedproject},
-                                       affectedprojectid=>$WfRec->{affectedprojectid},
-                                       mandator=>$WfRec->{mandator},
-                                       detaildescription=>$note,
-                                       fwdtarget=>$newrec->{fwdtarget},
-                                       fwdtargetid=>$newrec->{fwdtargetid},
-                                       fwddebtarget=>undef,
-                                       fwddebtargetid=>undef })){
-          #  if ($self->getParent->getParent->Action->StoreRecord(
-          #      $WfRec->{id},"wfforward",
-          #      {translation=>'base::workflow::request'},$fwdtargetname."\n".
-          #                                               $note,undef)){
-          #     my $openuserid=$WfRec->{openuser};
-          #     $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
-          #     $self->PostProcess($action.".".$op,$WfRec,$actions,
-          #                        note=>$note,
-          #                        fwdtarget=>$newrec->{fwdtarget},
-          #                        fwdtargetid=>$newrec->{fwdtargetid},
-          #                        fwdtargetname=>$fwdtargetname);
-          #     Query->Delete("OP");
-          #     return(1);
-          #  }
+         if (my $subid=$self->StoreRecord(undef,{
+                stateid=>2,
+                name=>$name,
+                tasknature=>"Tsubtask",
+                taskclass=>$WfRec->{taskclass},
+                mandatorid=>$WfRec->{mandatorid},
+                affectedproject=>$WfRec->{affectedproject},
+                affectedprojectid=>$WfRec->{affectedprojectid},
+                mandator=>$WfRec->{mandator},
+                detaildescription=>$note,
+                fwdtarget=>$newrec->{fwdtarget},
+                fwdtargetid=>$newrec->{fwdtargetid},
+                fwddebtarget=>undef,
+                fwddebtargetid=>undef })){
+            my $wf=$self->getParent->getParent;
+            my $wr=$wf->getPersistentModuleObject("base::workflowrelation");
+            my $srcid=$WfRec->{id};
+            my $dstid=$subid;
+            $wr->ValidatedInsertOrUpdateRecord(
+                                      {srcwfid=>$srcid,
+                                       name=>'subtask',
+                                       translation=>'base::workflow::task',
+                                       additional=>{
+                                          show=>[qw(headref.taskexecstate)],
+                                       },
+                                       dstwfid=>$dstid},
+                                      {srcwfid=>\$srcid,dstwfid=>\$dstid});
+            Query->Delete("note");
+            Query->Delete("Formated_name");
+            Query->Delete("Formated_fwdtargetname");
+            $self->LastMsg(OK,"subtask sucessfuly created");
+            return(1);
          }
          return(0);
       }

@@ -68,7 +68,20 @@ sub new
                 label         =>'Source Workflow name',
                 vjointo       =>'base::workflow',
                 vjoinon       =>['srcwfid'=>'id'],
-                vjoindisp     =>'name'),
+                vjoindisp     =>'name',
+                dataobjattr   =>'srcwfhead.shortdescription'),
+                                  
+      new kernel::Field::Container(
+                name          =>'srcwfadditional',
+                group         =>'src',
+                label         =>'Source Workflow additonal',
+                dataobjattr   =>'srcwfhead.addtional'),
+                                  
+      new kernel::Field::Container(
+                name          =>'srcwfheadref',
+                group         =>'src',
+                label         =>'Source Workflow headref',
+                dataobjattr   =>'srcwfhead.headref'),
                                   
       new kernel::Field::TextDrop(
                 name          =>'srcwfsrcid',
@@ -84,7 +97,20 @@ sub new
                 label         =>'Destination Workflow name',
                 vjointo       =>'base::workflow',
                 vjoinon       =>['dstwfid'=>'id'],
-                vjoindisp     =>'name'),
+                vjoindisp     =>'name',
+                dataobjattr   =>'dstwfhead.shortdescription'),
+                                  
+      new kernel::Field::Container(
+                name          =>'dstwfadditional',
+                group         =>'dst',
+                label         =>'Source Workflow additonal',
+                dataobjattr   =>'dstwfhead.addtional'),
+                                  
+      new kernel::Field::Container(
+                name          =>'dstwfheadref',
+                group         =>'dst',
+                label         =>'Source Workflow headref',
+                dataobjattr   =>'dstwfhead.headref'),
                                   
       new kernel::Field::TextDrop(
                 name          =>'dstwfsrcid',
@@ -230,6 +256,23 @@ sub Validate
    $newrec->{name}=$name;
    return(1);
 }
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @flt=@_;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $selfasparent=$self->SelfAsParentObject();
+   my $from="$worktable left outer join wfhead as srcwfhead ".
+            "on $worktable.srcwfid=srcwfhead.wfheadid ".
+            "left outer join wfhead as dstwfhead ".
+            "on $worktable.dstwfid=dstwfhead.wfheadid ";
+
+   return($from);
+}
+
 
 
 sub isViewValid

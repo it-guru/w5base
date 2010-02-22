@@ -17,3 +17,5 @@
 'fieldgroup.affectedproject'=>{de=>'betroffenes Projekt',en=>'affected project'},
 'assign to'=>{de=>'zuweisen an'},
 'subtask label'=>{de=>'Kurzbezeichnung'},
+'subtask'=>{de=>'Unteraufgabe'},
+'REV.subtask'=>{de=>'Elternaufgabe'},
