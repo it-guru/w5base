@@ -331,14 +331,14 @@ EOF
    $d.="<tr height=1%>";
    $d.="<td width=50%><table width=100%  border=0><tr><td align=left valign=middle>".
        $app->T("MSG004",$self->Self())."</td><td valign=middle align=right>".
-       "<input title=\"".$app->T("filter fields",$self->Self()).
-       "\" size=8 onKeyup=\"ShSearch();\" class=\"inputbox\"".
+       "<input title=\"".$app->T("filter fields in menu tree",$self->Self()).
+       "\" size=8 onKeyup=\"ShSearch();\" ".
        "id=shortsearch value=''/>&nbsp;&nbsp;&nbsp;&nbsp;".
        "<img src=\"../../base/load/expandall.gif\" style=\"cursor:pointer\"".
-       "title=\"".$app->T("Expand All",$self->Self())."\" name=exall ".
+       "title=\"".$app->T("Expand All Fields",$self->Self())."\" name=exall ".
        "OnClick=\"expandTree('tree_route');\">&nbsp;".
        "<img src=\"../../base/load/collapseall.gif\" style=\"cursor:pointer\"".
-       "title=\"".$app->T("Collapse All",$self->Self())."\" name=coall ".
+       "title=\"".$app->T("Collapse All Fields",$self->Self())."\" name=coall ".
        "OnClick=\"collapseTree('tree_route');\">".
        "</td></tr></table>";
    $d.="<td width=1%></td>";
