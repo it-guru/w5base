@@ -38,3 +38,16 @@ verweden.
 ',en=>'
 This is only a filter criterium. 
 '},
+'swdepot'=>{de=>'
+Als Software-Deport Pfad kann der 
+Pfad dokumentiert werden, über den
+für die aktuelle Anwendung die
+Software geladen werden kann/muss.
+Hier kann z.B. ein NFS Server,
+ein HTTP oder HTTPS Server Pfad
+oder ein HPUX Software-Depot 
+angegeben werden. Die Schreibweise
+muss etwa wie folgt aussehen:
+server:/pfada/pfadeb
+http://server/pfada/pfadeb
+https://server:port/pfade'},

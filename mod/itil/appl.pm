@@ -664,6 +664,12 @@ sub new
                 label         =>'Keywords',
                 dataobjattr   =>'appl.kwords'),
 
+      new kernel::Field::Text(
+                name          =>'swdepot',
+                group         =>'misc',
+                label         =>'Software-Depot path',
+                dataobjattr   =>'appl.swdepot'),
+
       new kernel::Field::Textarea(
                 name          =>'maintwindow',
                 group         =>'misc',
@@ -1141,6 +1147,13 @@ sub Validate
    }
    if (exists($newrec->{name}) && $newrec->{name} ne $name){
       $newrec->{name}=$name;
+   }
+   if ((my $swdepot=effVal($oldrec,$newrec,"swdepot")) ne ""){
+      if (!($swdepot=~m#^(https|http)://[a-z0-9A-Z_/.:]/[a-z0-9A-Z_/.]*$#) &&
+          !($swdepot=~m#^[a-z0-9A-Z_/.]+:/[a-z0-9A-Z_/.]*$#)){
+         $self->LastMsg(ERROR,"invalid swdepot path spec");
+         return(0);
+      }
    }
 
    if (defined($newrec->{slacontravail})){

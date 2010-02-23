@@ -790,3 +790,4 @@ alter table swinstance add itclusts bigint(20) default NULL,add key(itclusts);
 alter table servicesupport add iflathourscost float(5,2) default NULL;
 alter table servicesupport add databoss bigint(20) default NULL;
 alter table servicesupport add databoss2 bigint(20) default NULL;
+alter table appl add swdepot varchar(128) default NULL;

@@ -109,5 +109,5 @@
 'ApplInherit.0'=>{de=>'erben aus Anwendung',en=>'inherit from application'},
 'ApplInherit.1'=>{de=>'nein',en=>'no'},
 'SOX state'=>{de=>'SOX (USA) status'},
-
-
+'Software-Depot path'=>{de=>'Software-Depot Pfad'},
+'invalid swdepot path spec'=>{de=>'ungültiger Software-Depot Pfad'},
