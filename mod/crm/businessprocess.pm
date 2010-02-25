@@ -60,8 +60,23 @@ sub new
       new kernel::Field::Text(
                 name          =>'name',
                 htmlwidth     =>'250px',
-                label         =>'Name',
+                label         =>'Shortname',
                 dataobjattr   =>'businessprocess.name'),
+
+      new kernel::Field::Text(
+                name          =>'fullname',
+                htmlwidth     =>'250px',
+                label         =>'Name',
+                dataobjattr   =>'businessprocess.fullname'),
+
+      new kernel::Field::Text(
+                name          =>'selektor',
+                htmlwidth     =>'250px',
+                readonly      =>1,
+                htmldetail    =>0,
+                label         =>'Selektor',
+                dataobjattr   =>'concat(businessprocess.name,"@",'.
+                                'customer.fullname)'),
 
       new kernel::Field::Select(
                 name          =>'cistatus',
@@ -212,7 +227,7 @@ sub new
    $self->{use_distinct}=1;
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","w5base.crm.businessprocess"],
-                         uniquesize=>128};
+                         uniquesize=>40};
    return($self);
 }
 
@@ -313,7 +328,9 @@ sub getSqlFrom
    my $selfasparent=$self->SelfAsParentObject();
    my $from="$worktable left outer join businessprocessacl ".
             "on businessprocessacl.aclparentobj='$selfasparent' ".
-            "and $worktable.id=businessprocessacl.refid";
+            "and $worktable.id=businessprocessacl.refid ".
+            "left outer join grp as customer on ".
+            "customer.grpid=businessprocess.customer";
 
    return($from);
 }  

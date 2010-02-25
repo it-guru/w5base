@@ -2,6 +2,8 @@
 'Description'=>{de=>'Prozessbeschreibung',en=>'Process description'},
 'fieldgroup.procdesc'=>{de=>'Prozessbeschreibung',en=>'Process description'},
 'Customer'=>{de=>'Kunde'},
+'Shortname'=>{de=>'Kurzbezeichnung'},
+'Selektor'=>{de=>'Auswahlbeizeichnung'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'Importance'=>{de=>'Wichtigkeit'},
 'im.0'=>{de=>'undefiniert',en=>'undefined'},

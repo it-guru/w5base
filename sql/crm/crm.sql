@@ -1,7 +1,7 @@
 use w5base;
 create table businessprocess (
   id          bigint(20)  NOT NULL,
-  name        varchar(128) NOT NULL,
+  fullname        varchar(128) NOT NULL,name varchar(40) not null,
   cistatus    int(2)      NOT NULL,
     mandator    bigint(20)  default NULL,
     databoss    bigint(20)  default NULL,
