@@ -175,6 +175,14 @@ sub new
                 vjoindisp     =>'usertyp'),
 
       new kernel::Field::TextDrop(
+                name          =>'posix',
+                readonly      =>1,
+                label         =>'POSIX-Identifier',
+                vjointo       =>'base::user',
+                vjoinon       =>['userid'=>'userid'],
+                vjoindisp     =>'posix'),
+
+      new kernel::Field::TextDrop(
                 name          =>'office_phone',
                 readonly      =>1,
                 htmldetail    =>'0',
