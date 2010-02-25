@@ -1038,20 +1038,20 @@ sub getNotificationSubject
                 $self->getParent->T("Location")." / ";
    }
    if ($action eq "rootcausei" && $WfRec->{eventmode} eq "EVk.appl"){
-      $subject2=" / $ag / ".$self->getParent->T("rootcause analyse").
+      $subject2=" / $ag / ".$self->getParent->T("rootcause analysis").
                 " / $afcust / $prio".$self->getParent->T("Application").
                 " /";
    }
    if ($action eq "rootcausei" && $WfRec->{eventmode} eq "EVk.infraloc"){
       my $loc=$WfRec->{affectedlocation};
       $loc=$WfRec->{affectedlocation}->[0] if (ref($WfRec->{affectedlocation}));
-      $subject2=" / $loc / ".$self->getParent->T("rootcause analyse").
+      $subject2=" / $loc / ".$self->getParent->T("rootcause analysis").
                 " / $prio".$self->getParent->T("Location")." /";
    }
    if ($action eq "rootcausei" && $WfRec->{eventmode} eq "EVk.net"){
       my $net=$WfRec->{affectednetwork};
       $net=$WfRec->{affectednetwork}->[0] if (ref($WfRec->{affectednetwork}));
-      $subject2=" / $net / ".$self->getParent->T("rootcause analyse").
+      $subject2=" / $net / ".$self->getParent->T("rootcause analysis").
                 " / ".$self->getParent->T("Networkarea")." /";
    }
    $subject.=$subject2;
@@ -2298,15 +2298,21 @@ sub Process
       my $subject="Subject";
       my $salutation="Sehr geehte Damen und Herren";
       my $altsalutation=$salutation;
+      my $workflowlabel="Eventnotification";
+      my $altworkflowlabel="Eventnotification";
       for(my $cl=0;$cl<=$#langlist;$cl++){
          $ENV{HTTP_FORCE_LANGUAGE}=$langlist[$cl];
          if ($cl==0){
             $subject=$self->getParent->getNotificationSubject($WfRec,
                                   "sendcustinfo",$subjectlabel,$failclass,$ag);
             $salutation=$self->getParent->getSalutation($WfRec,$action,$ag);
+            $workflowlabel=$self->T("Eventnotification",
+                                    'itil::workflow::eventnotify');
          }
          else{
             $altsalutation=$self->getParent->getSalutation($WfRec,$action,$ag);
+            $altworkflowlabel=$self->T("Eventnotification",
+                                       'itil::workflow::eventnotify');
          }
          my $ht;
          $subjectlabel="first information";
@@ -2354,6 +2360,8 @@ sub Process
                       %headtext,headid=>$id,
                       salutation=>$salutation,
                       altsalutation=>$altsalutation,
+                      workflowlabel=>$workflowlabel,
+                      altworkflowlabel=>$altworkflowlabel,
                       creationtime=>$creationtime);
       $self->getParent->generateMailSet($WfRec,$action,\$eventlang,\%additional,
                        \@emailprefix,\@emailpostfix,\@emailtext,\@emailsep,

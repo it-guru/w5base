@@ -765,15 +765,36 @@ sub Process
 
       my $eventlango=$self->getField("wffields.eventlang",$WfRec);
       $eventlang=$eventlango->RawValue($WfRec) if (defined($eventlango));
+
+      my @langlist=split(/-/,$eventlang);
+      my $workflowlabel="Eventnotification";
+      my $altworkflowlabel="Eventnotification";
+      my $headtext="result of root cause analysis";
+      my $altheadtext;
+      for(my $cl=0;$cl<=$#langlist;$cl++){
+         $ENV{HTTP_FORCE_LANGUAGE}=$langlist[$cl];
+         if ($cl==0){
+            $workflowlabel=$self->T("Eventnotification",
+                                    'itil::workflow::eventnotify');
+            $headtext=$self->T("result of root cause analysis",
+                                  'AL_TCom::workflow::eventnotify');
+         }
+         else{
+            $altworkflowlabel=$self->T("Eventnotification",
+                                       'itil::workflow::eventnotify');
+            $altheadtext=$self->T("result of root cause analysis", 
+                                  'AL_TCom::workflow::eventnotify');
+         }
+      }
+
       $ENV{HTTP_FORCE_LANGUAGE}=$eventlang;
       $ENV{HTTP_FORCE_LANGUAGE}=~s/-.*$//;
 
       my $subjectlabel="Ergebnis der Ursachenanalyse";
-      my $headtext="Ergebnis der Ursachenanalyse";
       if ($WfRec->{eventlang}=~m/^en/){
          $subjectlabel="result of root cause analysis";
-         $headtext="result of root cause analyse";
       }
+
       my $ag="";
       if ($WfRec->{eventmode} eq "EVk.appl"){ 
          foreach my $appl (@{$WfRec->{affectedapplication}}){
@@ -781,6 +802,7 @@ sub Process
             $ag.=$appl;
          }
       }
+
 
       my $failclass=$WfRec->{eventstatclass};
       my $subject=$self->getParent->getNotificationSubject($WfRec,"rootcausei",
@@ -794,6 +816,9 @@ sub Process
                                                                 "de",$utz,$utz);
       my %additional=(headcolor=>$failcolor,eventtype=>'Event',    
                       headtext=>$headtext,headid=>$id,
+                      workflowlabel=>$workflowlabel,
+                      altworkflowlabel=>$altworkflowlabel,
+                      headtextPAGE1=>$altheadtext,
                       salutation=>$salutation,
                       altsalutation=>$salutation,
                       creationtime=>$creationtime);

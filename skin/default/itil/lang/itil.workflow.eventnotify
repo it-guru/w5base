@@ -15,6 +15,7 @@
 'Event notification language'=>{de=>'Ereignismelde-Sprache'},
 'Action for long event elimination'=>{de=>'Langfristige Maßnahmen'},
 'Action for short event elimination'=>{de=>'Kurzfristige Maßnahmen zur Service Wiederherstellung'},
+'Eventnotification'=>{de=>'Ereignismeldung'},
 'Impact for customer'=>{de=>'Auswirkungen für den Kunden'},
 'Event reason'=>{de=>'Beschreibung der Ursache'},
 'Whats happend'=>{de=>'Ereignisbeschreibung - (Was ist passiert)'},

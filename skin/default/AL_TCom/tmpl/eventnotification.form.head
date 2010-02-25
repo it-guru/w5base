@@ -89,8 +89,8 @@ div.timestamp {
 border-width:1px;" bgcolor=white >
 <tr><td valign=top bgcolor=%headcolor%>
 <table width=100% cellspacing=0 cellpadding=0 border=0><tr>
-<td align=left><font face="Adobe Helvetica,Helvetica,Arial"><b>Ereignisinformation</b> - %headtext% </b></td>
-<td align=right><font face="Adobe Helvetica,Helvetica,Arial">Nr.:%headid%</td>
+<td align=left><font face="Adobe Helvetica,Helvetica,Arial"><b>%workflowlabel%</b> - %headtext% </b></td>
+<td align=right><font face="Adobe Helvetica,Helvetica,Arial">ID:%headid%</td>
 </tr>
 </table>
 </td></tr></table>

@@ -34,3 +34,4 @@
 'KPI latency eventend to first info'=>{de=>'KPI Verzögerung von Ereignisende bis Abschlussmeldung'},
 'SC Problem cause'=>{de=>'Ermittelte Ursache'},
 'SC Problem soultion'=>{de=>'Umzusetzende Maßnahmen'},
+'result of root cause analysis'=>{de=>'Ergebnis der Ursachenanalyse'},
