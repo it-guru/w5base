@@ -75,6 +75,7 @@ sub qcheckRecord
    if ($rec->{applid} ne ""){
       my $tswiw=getModuleObject($self->getParent->Config,"tswiw::user");
       my $par=getModuleObject($self->getParent->Config(),"tsacinv::appl");
+      my $sys=getModuleObject($self->getParent->Config(),"itil::system");
       $par->SetFilter({applid=>\$rec->{applid}});
       my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       return(undef,undef) if (!$par->Ping());
@@ -143,9 +144,77 @@ sub qcheckRecord
                                 mode=>'native',
                                 AllowEmpty=>0);
          }
+         if ($rec->{allowifupdate}){
+            #printf STDERR ("fifi d=%s\n",Dumper($rec->{systems}));
+            #printf STDERR ("fifi d=%s\n",Dumper($parrec->{systems}));
+            # keys are in rec= systemsystemid
+            # and in parrec  = systemid
+            my @opList;
+            my $res=OpAnalyse(
+                       sub{  # comperator 
+                          my ($a,$b)=@_;
+                          my $eq;
+                          if ($a->{systemsystemid} eq $b->{systemid}){
+                             $eq=1;
+                          }
+                          return($eq);
+                       },
+                       sub{  # oprec generator
+                          my ($mode,$oldrec,$newrec,%p)=@_;
+                          if ($mode eq "insert" || $mode eq "update"){
+                             my $identifyby=undef;
+                             if ($mode eq "update"){
+                                $identifyby=$oldrec->{id};
+                             }
+                             my $systemid;
+                             if ($newrec->{systemid} ne ""){
+                                $sys->ResetFilter();
+                                $sys->SetFilter({systemid=>
+                                                 \$newrec->{systemid}});
+                                my ($sysrec,$msg)=$sys->getOnlyFirst(qw(id));
+                                if (defined($sysrec)){
+                                   $systemid=$sysrec->{id};
+                                }
+                                else{
+                                   $mode="nop";
+                                   push(@qmsg,"can not create relation to ".
+                                              "not existing system: ".
+                                              $newrec->{systemid});
+                                   $errorlevel=3 if ($errorlevel<3);
+                                }
+                             }
+                             
+                             return({OP=>$mode,
+                                     MSG=>"$mode systemlink ".
+                                          "$newrec->{systemid} ".
+                                          "in W5Base",
+                                     IDENTIFYBY=>$identifyby,
+                                     DATAOBJ=>'itil::lnkapplsystem',
+                                     DATA=>{
+                                        srcsys    =>'AM',
+                                        applid    =>$p{refid},
+                                        systemid  =>$systemid
+                                        }
+                                     });
+                          }
+                          elsif ($mode eq "delete"){
+                             return({OP=>$mode,
+                                     MSG=>"delete system ".
+                                          "$oldrec->{systemsystemid} ".
+                                          "from W5Base",
+                                     DATAOBJ=>'itil::lnkapplsystem',
+                                     IDENTIFYBY=>$oldrec->{id},
+                                     });
+                          }
+                          return(undef);
+                       },
+                       $rec->{systems},$parrec->{systems},\@opList,
+                       refid=>$rec->{id},sys=>$sys);
+             if (!$res){
+                my $opres=ProcessOpList($self->getParent,\@opList);
+             }
+         }
       }
-      #if ($rec->{allowifupdate}){
-      #}
 
       if ($rec->{mandator} eq "Extern" && $rec->{allowifupdate}){
          # forced updates on External Data

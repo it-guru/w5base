@@ -17,12 +17,17 @@ package kernel::QRule;
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 #
-use vars qw(@ISA);
+use vars qw(@ISA @EXPORT);
 use strict;
 use kernel;
 use kernel::Universal;
+use Exporter;
 
-@ISA=qw(kernel::Universal);
+
+@ISA=qw(kernel::Universal Exporter);
+@ISA=qw(Exporter kernel::Universal);
+
+@EXPORT = qw(&ProcessOpList &OpAnalyse);
 
 sub new
 {
@@ -234,6 +239,170 @@ sub getPersistentModuleObject
    }
    $self->{$label}->ResetFilter();
    return($self->{$label});
+}
+
+
+sub OpAnalyse
+{
+   my $fpComperator=shift;
+   my $fpRecGenerator=shift;
+   my $refList=shift;
+   my $cmpList=shift;
+   my $opList=shift;
+   my %param=@_;
+ 
+   if (ref($fpComperator) ne "CODE"){
+      return(1); 
+   }
+   if (ref($fpRecGenerator) ne "CODE"){
+      return(2); 
+   }
+   if (ref($refList) ne "ARRAY"){
+      return(10); 
+   }
+   if (ref($cmpList) ne "ARRAY"){
+      return(11); 
+   }
+   if (ref($opList) ne "ARRAY"){
+      return(12); 
+   }
+
+   my %cmpRes;
+   for(my $refC=0;$refC<=$#{$refList};$refC++){
+      my $found=0;
+      cmpCloop: for(my $cmpC=0;$cmpC<=$#{$cmpList};$cmpC++){
+         if (!exists($cmpRes{$refC."-".$cmpC})){
+            $a=$refList->[$refC];
+            $b=$cmpList->[$cmpC];
+            $cmpRes{$refC."-".$cmpC}=&{$fpComperator}($a,$b);
+            if (defined($cmpRes{$refC."-".$cmpC}) && 
+                !$cmpRes{$refC."-".$cmpC}){
+               # do an update   
+               my $mode="update";
+               foreach my $op (&{$fpRecGenerator}($mode,
+                                                  $refList->[$refC],
+                                                  $cmpList->[$cmpC],
+                                                  %param)){
+                  if (ref($op) eq "HASH"){
+                     $op->{OP}=$mode         if (!exists($op->{OP}));
+                     $op->{IDENTIFYBY}=undef if (!exists($op->{IDENTIFYBY}));
+                     push(@{$opList},$op);
+                  }
+               }
+            }
+         }
+         if (defined($cmpRes{$refC."-".$cmpC})){
+            $found=1;
+            last cmpCloop;
+         }
+      }
+      if (!$found){
+         # do a delete
+         my $mode="delete";
+         foreach my $op (&{$fpRecGenerator}($mode,
+                                            $refList->[$refC],
+                                            undef,
+                                            %param)){
+            if (ref($op) eq "HASH"){
+               $op->{OP}=$mode         if (!exists($op->{OP}));
+               $op->{IDENTIFYBY}=undef if (!exists($op->{IDENTIFYBY}));
+               push(@{$opList},$op);
+            }
+         }
+      }
+   }
+   for(my $cmpC=0;$cmpC<=$#{$cmpList};$cmpC++){
+      my $found=0;
+      refCloop: for(my $refC=0;$refC<=$#{$refList};$refC++){
+         if (!exists($cmpRes{$refC."-".$cmpC})){
+            $a=$refList->[$refC];
+            $b=$cmpList->[$cmpC];
+            $cmpRes{$refC."-".$cmpC}=&{$fpComperator}();
+            if (defined($cmpRes{$refC."-".$cmpC}) && !$cmpRes{$refC."-".$cmpC}){
+               # do an update   
+               my $mode="update";
+               foreach my $op (&{$fpRecGenerator}($mode,
+                                                  $refList->[$refC],
+                                                  $cmpList->[$cmpC],
+                                                  %param)){
+                  if (ref($op) eq "HASH"){
+                     $op->{OP}=$mode         if (!exists($op->{OP}));
+                     $op->{IDENTIFYBY}=undef if (!exists($op->{IDENTIFYBY}));
+                     push(@{$opList},$op);
+                  }
+               }
+            }
+         }
+         if (defined($cmpRes{$refC."-".$cmpC})){
+            $found=1;
+            last refCloop;
+         }
+      }
+      if (!$found){
+         # do an insert
+         my $mode="insert";
+         foreach my $op (&{$fpRecGenerator}($mode,
+                                            undef,
+                                            $cmpList->[$cmpC],
+                                            %param)){
+            if (ref($op) eq "HASH"){
+               $op->{OP}=$mode         if (!exists($op->{OP}));
+               $op->{IDENTIFYBY}=undef if (!exists($op->{IDENTIFYBY}));
+               push(@{$opList},$op);
+            }
+         }
+      }
+   }
+}
+
+sub ProcessOpList
+{
+   my $self=shift;
+   my $opList=shift;
+   my $config=$self->Config;
+   my $objCache={};
+   msg(INFO,"ProcessOpList: Start");
+   foreach my $op (@{$opList}){
+      if (!exists($objCache->{$op->{DATAOBJ}})){
+         $objCache->{$op->{DATAOBJ}}=getModuleObject($config,$op->{DATAOBJ});
+      }
+      my $dataobj=$objCache->{$op->{DATAOBJ}};
+      if (defined($dataobj)){
+         $dataobj->ResetFilter();
+         msg(INFO,sprintf("OP:%s\n",Dumper($op)));
+         if ($op->{OP} eq "nop"){
+            msg(INFO,"skipped operation");
+         }
+         elsif ($op->{OP} eq "insert"){
+            my $id=$dataobj->ValidatedInsertRecord($op->{DATA});
+            $op->{IDENTIFYBY}=$id;
+            msg(INFO,"insert id ok = $id");
+         }
+         elsif ($op->{OP} eq "update"){
+            if ($op->{IDENTIFYBY} ne ""){
+               my $idfield=$dataobj->IdField();
+               my $idname=$idfield->Name();
+               $dataobj->SetFilter({$idname=>\$op->{IDENTIFYBY}});
+               my ($oldrec,$msg)=$dataobj->getOnlyFirst(qw(ALL));
+               my $id=$dataobj->ValidatedUpdateRecord($oldrec,$op->{DATA},
+                                                 {$idname=>\$op->{IDENTIFYBY}});
+               msg(INFO,"update id ok = $id");
+            }
+         }
+         elsif ($op->{OP} eq "delete"){
+            if ($op->{IDENTIFYBY} ne ""){
+               my $idfield=$dataobj->IdField();
+               my $idname=$idfield->Name();
+               $dataobj->SetFilter({$idname=>\$op->{IDENTIFYBY}});
+               my ($oldrec,$msg)=$dataobj->getOnlyFirst(qw(ALL));
+               my $id=$dataobj->ValidatedDeleteRecord($oldrec,
+                                                 {$idname=>\$op->{IDENTIFYBY}});
+               msg(INFO,"delete id ok = $id");
+            }
+         }
+      }
+   }
+   msg(INFO,"ProcessOpList: End");
 }
 
 
