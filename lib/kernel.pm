@@ -580,7 +580,7 @@ sub getModuleObject
    }
    my ($o,$msg);
    $package="${basemod}::${app}"; # MOD neuaufbau - basemod vieleicht verändert
-   #msg(INFO,"kernel::webapp::RunWebApp create of $package");
+   $package=~s/[^a-z0-9:_]//gi;
    if ($config->Param("SAFE") eq "1"){
       my $compartment=new Safe();
       #
