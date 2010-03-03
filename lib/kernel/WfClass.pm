@@ -119,6 +119,7 @@ sub getStepObject
       print STDERR msg(ERROR,"getStepObject:no stepname spezified");
       return(undef);
    }
+   $stepname=~s/[^a-z0-9:_]//gi;
    eval("\$obj=new $stepname(\$self);");
    if (!defined($obj)){
       print STDERR msg(ERROR,"getStepObject($stepname):$@");
