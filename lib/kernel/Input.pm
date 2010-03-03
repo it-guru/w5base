@@ -62,6 +62,7 @@ sub isFormatUseable
          my $f=shift(@formats);
          msg(INFO,"Checking format $f");
          my $o;
+         $f=~s/[^a-z0-9:_]//gi;
          eval("use kernel::Input::$f;".
               "\$o=new kernel::Input::$f(\$self,debug=>\$self->{debug});");
          if ($@ eq ""){

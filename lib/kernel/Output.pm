@@ -62,6 +62,7 @@ sub setFormat
       $self->{NewRecord}=1;
    }
    $format=~s/;.*//;
+   $format=~s/[^a-z0-9:_]//gi;
    eval("use kernel::Output::$format;".
         "\$o=new kernel::Output::$format(\$self,\%opt);");
    if ($@ eq ""){
