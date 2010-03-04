@@ -2494,7 +2494,7 @@ sub new
    my %self=@_;
    $self{WSDLfieldType}="WorkflowActions" if (!defined($self{WSDLfieldType}));
 
-   my $self=bless($type->SUPER::new(\%self),$type);
+   my $self=bless($type->SUPER::new(%self),$type);
    return($self);
 }
 
