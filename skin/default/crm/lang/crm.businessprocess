@@ -5,6 +5,8 @@
 'Shortname'=>{de=>'Kurzbezeichnung'},
 'Selektor'=>{de=>'Auswahlbeizeichnung'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
+'Process Owner'=>{de=>'Prozesseigentümer'},
+'Deputy Process Owner'=>{de=>'Prozesseigentümer Vertreter'},
 'Importance'=>{de=>'Wichtigkeit'},
 'im.0'=>{de=>'undefiniert',en=>'undefined'},
 'im.1'=>{de=>'sehr kritisch',en=>'very critical'},
@@ -14,3 +16,4 @@
 'im.5'=>{de=>'unwichtig',en=>'unimportant'},
 'you are not authorized to set other persons as databoss'=>{de=>'Sie sind nicht berechtigt, andere als Datenverantwortlicher einzutragen'},
 'invalid or no customer specified'=>{de=>'ungültiger oder kein Kunde definiert'},
+'default language for eventinformations'=>{de=>'Standard Spracheinstellung für den Workflow Ereignismeldung'},

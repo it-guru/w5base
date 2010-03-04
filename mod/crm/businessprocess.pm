@@ -105,6 +105,32 @@ sub new
                 name          =>'databossid',
                 dataobjattr   =>'businessprocess.databoss'),
 
+      new kernel::Field::Contact(
+                name          =>'processowner',
+                group         =>'procdesc',
+                AllowEmpty    =>1,
+                vjoineditbase =>{'cistatusid'=>[3,4],
+                                 'usertyp'=>[qw(user extern)]},
+                label         =>'Process Owner',
+                vjoinon       =>'processownerid'),
+
+      new kernel::Field::Link(
+                name          =>'processownerid',
+                dataobjattr   =>'businessprocess.processowner'),
+
+      new kernel::Field::Contact(
+                name          =>'processowner2',
+                group         =>'procdesc',
+                AllowEmpty    =>1,
+                vjoineditbase =>{'cistatusid'=>[3,4],
+                                 'usertyp'=>[qw(user extern)]},
+                label         =>'Deputy Process Owner',
+                vjoinon       =>'processowner2id'),
+
+      new kernel::Field::Link(
+                name          =>'processowner2id',
+                dataobjattr   =>'businessprocess.processowner2'),
+
       new kernel::Field::Select(
                 name          =>'importance',
                 group         =>'procdesc',
@@ -132,6 +158,14 @@ sub new
                 vjoinbase     =>[{'aclparentobj'=>\'crm::businessprocess'}],
                 vjoinon       =>['id'=>'refid'],
                 vjoindisp     =>['acltargetname','aclmode']),
+
+      new kernel::Field::Select(
+                name          =>'eventlang',
+                group         =>'misc',
+                htmleditwidth =>'30%',
+                value         =>['en','de','en-de','de-en'],
+                label         =>'default language for eventinformations',
+                dataobjattr   =>'businessprocess.eventlang'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
