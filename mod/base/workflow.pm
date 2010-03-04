@@ -2491,8 +2491,10 @@ use vars qw(@ISA);
 sub new
 {
    my $type=shift;
-   my $self=bless($type->SUPER::new(@_),$type);
-   $self->{WSDLfieldType}="WorkflowActions" if (!defined($self->{WSDLfieldType}));
+   my %self=@_;
+   $self{WSDLfieldType}="WorkflowActions" if (!defined($self{WSDLfieldType}));
+
+   my $self=bless($type->SUPER::new(\%self),$type);
    return($self);
 }
 
