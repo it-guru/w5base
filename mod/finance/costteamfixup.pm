@@ -201,7 +201,7 @@ sub getRecordImageUrl
 {
    my $self=shift;
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-   return("../../../public/itil/load/costcenter.jpg?".$cgi->query_string());
+   return("../../../public/finance/load/costteamfixup.jpg?".$cgi->query_string());
 }
 
 sub ValidateDelete
