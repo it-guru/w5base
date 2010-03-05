@@ -231,9 +231,17 @@ EOF
       if ($id ne ""){
          if (grep(/^ById$/,
                   $self->getParent->getParent->getValidWebFunctions())){
+            my $targeturl="ById/$id";
+            if ($self->getParent->getParent->can("allowAnonymousByIdAccess")){
+               if ($self->getParent->getParent->allowAnonymousByIdAccess()){
+                  my $s=$self->getParent->getParent->Self();
+                  $s=~s/::/\//g;
+                  $targeturl="../../../public/$s/ById/$id";
+               }
+            }
             $ByIdLinkStart="<a target=_blank title=\"".
             $self->getParent->getParent->T("use this link to reference this ".
-            "record (f.e. in mail)")."\" href=\"ById/$id\">";
+            "record (f.e. in mail)")."\" href=\"$targeturl\">";
             $ByIdLinkEnd="</a>";
          }
       }

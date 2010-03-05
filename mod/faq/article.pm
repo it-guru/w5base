@@ -349,12 +349,39 @@ sub Validate
 }
 
 
+sub allowAnonymousByIdAccess
+{
+   my $self=shift;
+   my $id=shift;
+   return(1);
+}
+
+
+
+
 sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
    return("default","header") if (!defined($rec));
 
+   if ($ENV{REMOTE_USER} eq "anonymous"){
+      my $acl=getModuleObject($self->Config,"faq::acl");
+      $acl->SetFilter({aclparentobj=>\'faq::article',
+                       refid=>\$rec->{faqid}});
+      my $annook=0;
+      foreach my $arec ($acl->getHashList(qw(ALL))){
+         if ($arec->{aclmode} eq "read" &&
+             $arec->{acltarget} eq "base::grp" &&
+             $arec->{acltargetid} eq "-2"){
+            $annook=1;
+            last;
+         }
+      }
+      if (!$annook){
+         return();
+      }
+   }
    return("ALL");
 }
 
@@ -462,14 +489,17 @@ sub getHtmlDetailPages
    return($self->SUPER::getHtmlDetailPages($p,$rec));
 }
 
+
 sub getHtmlDetailPageContent
 {
    my $self=shift;
    my ($p,$rec)=@_;
-   return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "FView");
+
    my $page;
    my $idname=$self->IdField->Name();
    my $idval=$rec->{$idname};
+
+   return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "FView");
 
    if ($p eq "FView"){
       Query->Param("$idname"=>$idval);
@@ -512,6 +542,10 @@ sub FullView
                                          mdate editor realeditor));
 
    if (defined($rec)){
+      if (!$self->isViewValid($rec)){
+         print($self->noAccess());
+         return(undef);
+      }
       #######################################################################
       # häufigkeits Berechnung - erster Versuch
       #
@@ -702,6 +736,30 @@ sub ById
    }
    $val=~s/^\///;
    $val="UNDEF" if ($val eq "");
+
+
+   if ($ENV{REMOTE_USER} eq "anonymous"){
+      my $acl=getModuleObject($self->Config,"faq::acl");
+      $acl->SetFilter({aclparentobj=>\'faq::article',
+                       refid=>\$val});
+      my $needauth=1;
+      foreach my $arec ($acl->getHashList(qw(ALL))){
+         if ($arec->{aclmode} eq "read" &&
+             $arec->{acltarget} eq "base::grp" &&
+             $arec->{acltargetid} eq "-2"){
+            $needauth=0;
+            last;
+         }
+      }
+      if ($needauth){
+         my $s=$self->Self();
+         $s=~s/::/\//g;
+         $self->HtmlGoto("../../../../auth/$s/Detail",
+                         post=>{$idname=>$val,
+                                ModeSelectCurrentMode=>'FView'}); 
+         return();
+      }
+   }
    $self->HtmlGoto("../Detail",post=>{$idname=>$val,
                                       ModeSelectCurrentMode=>'FView'});
    return();

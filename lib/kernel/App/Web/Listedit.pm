@@ -195,6 +195,13 @@ sub ById
    return();
 }
 
+sub allowAnonymousByIdAccess
+{
+   my $self=shift;
+   my $id=shift;
+   return(0);
+}
+
 
 sub isUploadValid  # validates if upload functionality is allowed
 {
