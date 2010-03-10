@@ -2099,7 +2099,7 @@ sub getSubList
    $mode="HtmlSubList" if ($mode=~m/^.{0,1}Html.*$/);
    $mode="SubXMLV01"   if ($mode=~m/XML/);
    $param{parentcurrent}=$current;
-   if ($mode eq "RAW"){
+   if ($mode eq "RAW" || $mode eq "JSON"){
       my @view=$self->GetCurrentView();
       return($self->getHashList(@view));
    }
@@ -2413,6 +2413,7 @@ sub DataObj_findtemplvar
                }
             }
             if (!$viewok && !grep(/^ALL$/,@{$opt->{viewgroups}})){
+               return(undef) if ($mode eq "JSON" || $mode eq "XML");
                return("-");
             }
          }

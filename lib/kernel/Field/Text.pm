@@ -73,6 +73,10 @@ sub FormatedDetail
    if ($FormatAs ne "XMLV01"){
       my $vjoinconcat=$self->{vjoinconcat};
       $vjoinconcat="; " if (!defined($vjoinconcat));
+      if ($self->{preferArray} && ($FormatAs eq "SOAP" ||
+                                   $FormatAs eq "JSON")){
+         return($d); 
+      }
       $d=join($vjoinconcat,@$d);
    }
    

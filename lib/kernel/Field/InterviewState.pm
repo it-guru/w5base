@@ -78,7 +78,8 @@ sub FormatedResult
    if ($mode=~m/^Html/){
       return("Total: $total / Open: $todo");
    }
-   return({total=>$total,todo=>$todo,qStat=>$d->{qStat}});
+   return({total=>$total,todo=>$todo,qStat=>$d->{qStat},
+                                     questStat=>$d->{questStat}});
 }
 
 
@@ -130,7 +131,9 @@ sub dynCalc
    my $s=0.00;
    my $total=$#{$self->{TotalActiveQuestions}}+1;
    my $nsum=0;
+   my %qstat;
    foreach my $q (@{$self->{TotalActiveQuestions}}){
+      $qstat{$q->{id}}=0.0;
       if ($q->{prio} ne ""){
          my $curs=0.0;
          my $a=undef;
@@ -162,6 +165,7 @@ sub dynCalc
             my $n=1;
             $n=5 if ($q->{prio}==1);
             $n=2  if ($q->{prio}==2);
+            $qstat{$q->{id}}=$curs;
             $s=$s+($curs*$n);
             $nsum+=$n;
          }
@@ -173,7 +177,7 @@ sub dynCalc
    else{
       $s=$s/$nsum;
    }
-   my %s=(totalStat=>$s);
+   my %s=(totalStat=>$s,questStat=>\%qstat);
 
    return(\%s);
 }

@@ -95,7 +95,7 @@ sub ProcessLine
    my %xmlfields;
    foreach my $fo (@view){
       my $name=$fo->Name();
-      my $v=$fo->UiVisible("XML",current=>$rec);
+      my $v=$fo->UiVisible("JSON",current=>$rec);
       next if (!$v && ($fo->Type() ne "Interface"));
       if (!defined($self->{fieldkeys}->{$name})){
          push(@{$self->{fieldobjects}},$fo);
@@ -117,10 +117,16 @@ sub ProcessLine
          $rec{$name}=undef;
       }
    }
+   my $idname=$app->IdField();
+   $idname=$idname->Name() if (defined($idname));
    my $d;
    if (defined($self->{JSON})){
       #$d=$self->{JSON}->pretty->encode(\%rec);
       $d=$self->{JSON}->encode(\%rec);
+   }
+   if (defined($idname)){
+      my $k=$rec->{$idname};
+      $d="'$k':$d";
    }
    # date hack, to get Date objects in JavaScript!
    $d=~s/"\\\\Date\((\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)\)\\\\"/new Date($1,$2,$3,$4,$5)/g;
@@ -135,7 +141,7 @@ sub ProcessBottom
    my ($self,$fh,$rec,$msg)=@_;
    my $d;
    my $app=$self->getParent->getParent();
-   $d="];\n";
+   $d="};\n";
    return($d);
 }
 
@@ -173,7 +179,7 @@ function createNamespace(ns)
 }
 //================================================
 EOF
-   $d.="createNamespace('$appname')['Result']=\n[\n";
+   $d.="createNamespace('$appname')['Result']=\n{\n";
    return($d);
 }
 

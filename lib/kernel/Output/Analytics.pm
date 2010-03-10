@@ -74,86 +74,93 @@ sub getHttpHeader
 sub ProcessHead
 {
    my ($self,$fh,$rec,$msg)=@_;
-   my $h=$self->SUPER::ProcessHead($fh,$rec,$msg);
+#   my $h=$self->SUPER::ProcessHead($fh,$rec,$msg);
    my $d;
-   $d.="<html>";
-   $d.="<head>";
-   $d.='<meta http-equiv="content-type" content="text/html; charset=UTF8">';
-   if (1){
-      $d.="<script type='text/javascript' ";
-      $d.="src='http://getfirebug.com/releases/lite/1.2/".
-          "firebug-lite-compressed.js'>";
-      $d.="</script>";
+#   $d.="<html>";
+#   $d.="<head>";
+#   $d.='<meta http-equiv="content-type" content="text/html; charset=UTF8">';
+#   if (1){
+#      $d.="<script type='text/javascript' ";
+#      $d.="src='http://getfirebug.com/releases/lite/1.2/".
+#          "firebug-lite-compressed.js'>";
+#      $d.="</script>";
+#   }
+#   my @load="jquery.js";
+#   foreach my $js (@load){
+#      my $instdir=$self->getParent->getParent->Config->Param("INSTDIR");
+#      my $filename=$instdir."/lib/javascript/".$js;
+#      if (open(F,"<$filename")){
+#         $d.="<script language=\"JavaScript\">\n";
+#         $d.=join("",<F>);;
+#         $d.="</script>\n";
+#         close(F);
+#      }
+#   }
+#   my @load=("default.css","work.css");
+#   foreach my $css (@load){
+#      my $filename=$self->getParent->getParent->getSkinFile(
+#                   $self->getParent->getParent->Module."/css/".$css);
+#      if (open(F,"<$filename")){
+#         $d.="<style>\n";
+#         $d.=join("",<F>);;
+#         $d.="</style>\n";
+#         close(F);
+#      }
+#   }
+#
+#
+   $d.="<script language=\"JavaScript\">\n";
+   my $app=$self->getParent->getParent();
+   my $dataname=$app->Self();
+   if (exists($self->{'AnalyticsDataName'})){
+      $dataname=$self->{'AnalyticsDataName'};
    }
-   my @load="jquery.js";
-   foreach my $js (@load){
-      my $instdir=$self->getParent->getParent->Config->Param("INSTDIR");
-      my $filename=$instdir."/lib/javascript/".$js;
-      if (open(F,"<$filename")){
-         $d.="<script language=\"JavaScript\">\n";
-         $d.=join("",<F>);;
-         $d.="</script>\n";
-         close(F);
-      }
-   }
-   my @load=("default.css","work.css");
-   foreach my $css (@load){
-      my $filename=$self->getParent->getParent->getSkinFile(
-                   $self->getParent->getParent->Module."/css/".$css);
-      if (open(F,"<$filename")){
-         $d.="<style>\n";
-         $d.=join("",<F>);;
-         $d.="</style>\n";
-         close(F);
-      }
-   }
-
-
-   $d.="<script language=\"JavaScript\">".$h;
+   $dataname=~s/::/_/g;
+   $d.="$dataname={\n";
    return($d); 
 }
 
 sub ProcessBottom
 {
    my ($self,$fh,$rec,$msg)=@_;
-   my $d=$self->SUPER::ProcessBottom($fh,$rec,$msg);
-   $d.="</script>";
-   $d.="<script language=\"JavaScript\">";
-   $d.=<<EOF;
-var res=document.W5Base.LastResult();
-
-// Pre Prozessor
-var u=new Array();
-for (i in res){
-  if (typeof(u[res[i].parentname])=="undefined"){
-     u[res[i].parentname]=0;
-  }
-  if (res[i].relevant!=null){
-     u[res[i].parentname]++;
-  }
-}
-
-// Output Prozessor
-var d="";
-d+="<table border=1>";
-for (i in u){
-  var col1="";
-  var col2="";
-  if (u[i]==0){
-     col1="<font color=red>";
-     col2="</font>";
-  }
-  d+="<tr><td>"+i+"</td><td>"+col1+u[i]+" Antworten"+col2+"</tr>";
-}
-d+="</table>";
-document.write(d);
-
-EOF
-   $d.="</script>";
-   $d.="</head>";
-   $d.="<body>";
-   $d.="</body>";
-   $d.="</html>";
+   my $d="\n};\n";
+   $d.="</script>\n";
+#   $d.="<script language=\"JavaScript\">";
+#   $d.=<<EOF;
+#var res=document.W5Base.LastResult();
+#
+#// Pre Prozessor
+#var u=new Array();
+#for (i in res){
+#  if (typeof(u[res[i].parentname])=="undefined"){
+#     u[res[i].parentname]=0;
+#  }
+#  if (res[i].relevant!=null){
+#     u[res[i].parentname]++;
+#  }
+#}
+#
+#// Output Prozessor
+#var d="";
+#d+="<table border=1>";
+#for (i in u){
+#  var col1="";
+#  var col2="";
+#  if (u[i]==0){
+#     col1="<font color=red>";
+#     col2="</font>";
+#  }
+#  d+="<tr><td>"+i+"</td><td>"+col1+u[i]+" Antworten"+col2+"</tr>";
+#}
+#d+="</table>";
+#document.write(d);
+#
+#EOF
+#   $d.="</script>";
+#   $d.="</head>";
+#   $d.="<body>";
+#   $d.="</body>";
+#   $d.="</html>";
    return($d);
 }
 

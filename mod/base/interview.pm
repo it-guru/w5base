@@ -55,7 +55,7 @@ sub new
                 vjoinon       =>['interviewcatid'=>'id'],
                 vjoindisp     =>'fullname'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'interviewcatid',
                 label         =>'Interview categorie id',
                 dataobjattr   =>'interview.interviewcat'),

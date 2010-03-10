@@ -572,6 +572,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'orgunits',
                 label         =>'organisational Units',
+                preferArray   =>1,
                 group         =>'groups',
                 htmldetail    =>0,
                 readonly      =>1,
@@ -933,7 +934,7 @@ sub isViewValid
    #   push(@pic,"picture");
    #}
    if ($self->IsMemberOf("admin")){
-      push(@pic,"picture","roles");
+      push(@pic,"picture","roles","interview");
    }
    if ($rec->{usertyp} eq "extern"){
       @gl=qw(header name default comments groups userro control 
@@ -955,7 +956,7 @@ sub isViewValid
    else{
       @gl=(@pic,
              qw(default name office officeacc private userparam groups 
-                userro control usersubst header qc));
+                userro control usersubst header qc interview));
    }
    my $secstate=$self->getCurrentSecState();
    if ($rec->{userid}!=$userid){
@@ -971,7 +972,7 @@ sub isViewValid
      
    }
    if ($userid==$rec->{userid}){
-      push(@gl,"personrelated");
+      push(@gl,"personrelated","interview");
    }
    else{
       # check if the user has a direct boss
@@ -982,7 +983,7 @@ sub isViewValid
                foreach my $orole ($self->orgRoles()){
                   if (grep(/^$orole$/,@{$grp->{roles}})){
                      if ($self->IsMemberOf($grp->{grpid},["RBoss"],"direct")){
-                        push(@gl,"personrelated","private");
+                        push(@gl,"personrelated","private","interview");
                      }
                   }
                }
@@ -991,7 +992,7 @@ sub isViewValid
       }
       if (!grep(/^personrelated$/,@gl)){
          if ($self->IsMemberOf("admin")){ 
-            push(@gl,"personrelated","private");
+            push(@gl,"personrelated","private","interview");
          }
       }
    }

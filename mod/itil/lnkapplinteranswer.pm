@@ -60,9 +60,11 @@ sub new
    );
 
 
+   $self->getField("parentid")->{dataobjattr}='appl.id';
    $self->getField("parentobj")->{searchable}=0;
    $self->getField("parentid")->{searchable}=0;
    $self->{secparentobj}='itil::appl';
+   $self->{analyticview}=['name','interviewst'];
    $self->setDefaultView(qw(parentname mandator relevant name 
                             answer mdate editor));
    return($self);
@@ -119,6 +121,60 @@ sub initSqlWhere
    return($where);
 }
 
+
+sub collectAnalyticsDataObjects
+{
+   my $self=shift;
+   my $q=shift;
+
+   my $parentobj=getModuleObject($self->Config,$self->{secparentobj});
+   my $pidname=$parentobj->IdField->Name();
+
+   $self->ResetFilter();
+   $self->SecureSetFilter($q);
+   $self->SetCurrentView(qw(parentid));
+   my $i=$self->getHashIndexed("parentid");
+printf STDERR ("fifi i=%s\n",Dumper($i));
+
+   my $interview=getModuleObject($self->Config,"base::interview");
+   $interview->SetFilter({parentobj=>\$self->{secparentobj}});
+   $interview->SetCurrentView(qw(interviewcatid));
+   my $ic=$interview->getHashIndexed("interviewcatid");
+
+   if ($self->LastMsg()>0){
+      return();
+   }
+   my @dataobj=({name=>'ianswers',
+                 dataobj=>$self,
+                 view   =>[qw(parentid cdate mdate interviewcatid
+                              qtag answer relevant)]},
+                {name=>'interview',
+                 dataobj=>$interview,
+                 view=>[qw(name id interviewcatid)]},
+                {name=>'interviewcat',
+                 dataobj=>getModuleObject($self->Config,"base::interviewcat"),
+                 filter=>{id=>[keys(%{$ic->{interviewcatid}})]},
+                 view=>[qw(name id fullname)]},
+                {name=>'iparent',
+                 dataobj=>$parentobj,
+                 filter=>{$pidname=>[keys(%{$i->{parentid}})]},
+                 view=>[$pidname,@{$self->{analyticview}}]
+                }
+                );
+   return(dataobj=>\@dataobj,
+          js=>[qw(jquery.js jquery.layout.js sprintf.js 
+                  analytics.js)],
+          css=>[qw(base/css/default.css 
+                   base/css/work.css 
+                   base/css/jquery.layout.css)],
+          menu=>['m1'=>{label=>'einfache Analyse der Antwortenanzahl',
+                        js=>"AnalyticsQCount({base:'',key:'name'});"},
+                 'm2'=>{label=>'Erreichungsgrad analyse',
+                        js=>"AnalyticsGoal({base:'',key:'name',".
+                            "desc:'Erreichungsgrad in %'});"}]
+         );
+
+}
 
 
 

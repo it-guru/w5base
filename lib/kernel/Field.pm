@@ -116,6 +116,9 @@ sub new
    $self->{searchable}=1 if (!defined($self->{searchable}));
    $self->{selectable}=1 if (!defined($self->{selectable}));
    $self->{htmldetail}=1 if (!defined($self->{htmldetail}));
+   if (!defined($self->{preferArray})){
+      $self->{preferArray}=0;
+   }
    if (!defined($self->{selectfix})){
       $self->{selectfix}=0;
    }
@@ -763,11 +766,12 @@ sub RawValue
             else{
                $self->{VJOINSTATE}="not found";
             }
-            if (defined($self->{vjoinconcat})){
-               $current->{$self->Name()}=
-                       join($self->{vjoinconcat},sort(keys(%u)));
-            }
-            else{
+#            if (defined($self->{vjoinconcat})){  # joinconcat shoul better
+#                                                 # be realized on formated
+#               $current->{$self->Name()}=        # layer
+#                       join($self->{vjoinconcat},sort(keys(%u)));
+#            }
+#            else{
                if (keys(%u)>1){
                   $current->{$self->Name()}=[sort(keys(%u))];
                }
@@ -780,7 +784,7 @@ sub RawValue
                      $current->{$self->Name()}=undef;
                   }
                }
-            }
+#            }
             $d=$current->{$self->Name()};
          }
          else{
@@ -896,12 +900,14 @@ sub FormatedDetailDereferncer
    my $FormatAs=shift;
    my $d=shift;
 
-
-   if (ref($d)){
+   if (ref($d) && $FormatAs ne "JSON"){
       if (ref($self->{dereference}) eq "CODE"){
          return(&{$self->{dereference}}($self,$current,$FormatAs,$d));
       }
       if (ref($d) eq "ARRAY"){
+         if (exists($self->{vjoinconcat}) && $self->{vjoinconcat} ne ""){
+            return(join($self->{vjoinconcat},@$d));
+         }
          return(join("; ",@$d));
       }
       elsif (ref($d) eq "HASH"){
