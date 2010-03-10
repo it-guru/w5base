@@ -70,16 +70,17 @@ sub new
                 dataobjattr   =>'businessprocess.fullname'),
 
       new kernel::Field::Text(
-                name          =>'selektor',
-                htmlwidth     =>'250px',
+                name          =>'selector',
+                htmlwidth     =>'550px',
                 readonly      =>1,
                 htmldetail    =>0,
-                label         =>'Selektor',
+                label         =>'Selector',
                 dataobjattr   =>'concat(businessprocess.name,"@",'.
                                 'customer.fullname)'),
 
       new kernel::Field::Select(
                 name          =>'cistatus',
+                htmlwidth     =>'50px',
                 htmleditwidth =>'40%',
                 label         =>'CI-State',
                 vjoineditbase =>{id=>">0"},
@@ -256,7 +257,7 @@ sub new
                 dataobjattr   =>'businessprocessacl.aclmode'),
 
    );
-   $self->setDefaultView(qw(linenumber name cistatus importance cdate));
+   $self->setDefaultView(qw(linenumber selector cistatus importance));
    $self->setWorktable("businessprocess");
    $self->{use_distinct}=1;
    $self->{CI_Handling}={uniquename=>"name",
@@ -265,19 +266,6 @@ sub new
    return($self);
 }
 
-
-sub SecureValidate
-{
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-   my $wrgroups=shift;
-
-   if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
-      return(0);
-   }
-   return($self->SUPER::SecureValidate($oldrec,$newrec,$wrgroups));
-}
 
 
 sub Validate
@@ -353,6 +341,13 @@ sub SecureSetFilter
    return($self->SetFilter(@flt));
 }
 
+sub SecureValidate
+{
+   return(kernel::DataObj::SecureValidate(@_));
+}
+
+
+
 sub getSqlFrom
 {
    my $self=shift;
@@ -368,6 +363,9 @@ sub getSqlFrom
 
    return($from);
 }  
+
+
+
 
 
 
