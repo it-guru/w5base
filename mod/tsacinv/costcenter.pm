@@ -67,6 +67,12 @@ sub new
                 ignorecase    =>1,
                 dataobjattr=>'amcostcenter.alternatebusinesscenter'),
 
+      new kernel::Field::Text(
+                name       =>'orgunit',
+                label      =>'Org-Unit',
+                ignorecase    =>1,
+                dataobjattr=>'amcostcenter.orgunit'),
+
       new kernel::Field::TextDrop(
                 name          =>'delmgr',
                 label         =>'lead Delivery Manager',
