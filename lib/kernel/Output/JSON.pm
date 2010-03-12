@@ -41,7 +41,7 @@ sub IsModuleSelectable
 }
 sub getRecordImageUrl
 {
-   return("../../../public/base/load/icon_xml.gif");
+   return("../../../public/base/load/icon_json.gif");
 }
 sub Label
 {

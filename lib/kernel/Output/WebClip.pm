@@ -39,7 +39,7 @@ sub getRecordImageUrl
 {
    my $self=shift;
 
-   return("../../../public/base/load/icon_actor.gif");
+   return("../../../public/base/load/icon_WebClip.gif");
 }
 
 sub Label

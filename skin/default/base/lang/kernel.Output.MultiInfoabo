@@ -1,7 +1,2 @@
-'Start'=>{de=>'Informations abo für die markierten Datensätze anfordern',
-          en=>'Subscripe the info abo for the marked records'},
-'Contact'=>{de=>'Kontakt'},
-'please select an information mode'=>{de=>'bitte wählen Sie einen Informationsmodus'},
-"invalid mode '\%s' selected"=>{de=>"ungültiger Info Modus '\%s' angefordert"},
-"contact '\%s' not found"=>{de=>"Kontakt '\%s' nicht gefunden"},
-"selected contact is not unique"=>{de=>"ausgewählter Kontakt ist nicht eindeutig"},
+'Information abo'=>{de=>'InfoAbo abonnieren'},
+'Subscribe Information abos'=>{de=>'Für ausgewählte Datensätze ein InfoAbo abonnieren.'}
