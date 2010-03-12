@@ -124,6 +124,16 @@ sub FETCH
 }
 
 
+sub STORE
+{
+   my $self=shift;
+   my $key=shift;
+   my $value=shift;
+   $self->{s}->{$key}=$value;
+   return($self->{s}->{$key});
+}
+
+
 sub dynCalc
 {
    my $self=shift;
