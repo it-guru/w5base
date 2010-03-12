@@ -534,22 +534,10 @@ sub generateMailSet
       push(@baseset,"affectedapplication");
       push(@baseset,"wffields.affectedcustomer");
    }
-   my @sets=([@baseset,qw(
-                          wffields.eventimpact
-                          wffields.eventreason
-                          wffields.shorteventelimination
-                         )],
-             [@baseset,qw(
-                          wffields.eventaltimpact
-                          wffields.eventaltreason 
-                          wffields.altshorteventelimination
-                         )]);
-   if ($action eq "rootcausei"){
-      @sets=([@baseset,qw(wffields.eventimpact wffields.eventscproblemcause 
+   my @sets=([@baseset,qw(wffields.eventimpact wffields.eventscproblemcause 
                           wffields.eventscproblemsolution)],
-             [@baseset,qw(wffields.eventimpact wffields.eventscproblemcause 
+             [@baseset,qw(wffields.eventaltimpact wffields.eventscproblemcause 
                           wffields.eventscproblemsolution)]);
-   }
    my @eventlanglist=split(/-/,$$eventlang);
    for(my $langno=0;$langno<=$#eventlanglist;$langno++){
       my $lang=$eventlanglist[$langno];
