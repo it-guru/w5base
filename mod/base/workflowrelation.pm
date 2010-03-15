@@ -74,8 +74,8 @@ sub new
       new kernel::Field::Container(
                 name          =>'srcwfadditional',
                 group         =>'src',
-                label         =>'Source Workflow additonal',
-                dataobjattr   =>'srcwfhead.addtional'),
+                label         =>'Source Workflow additional',
+                dataobjattr   =>'srcwfhead.additional'),
                                   
       new kernel::Field::Container(
                 name          =>'srcwfheadref',
@@ -103,8 +103,8 @@ sub new
       new kernel::Field::Container(
                 name          =>'dstwfadditional',
                 group         =>'dst',
-                label         =>'Source Workflow additonal',
-                dataobjattr   =>'dstwfhead.addtional'),
+                label         =>'Source Workflow additional',
+                dataobjattr   =>'dstwfhead.additional'),
                                   
       new kernel::Field::Container(
                 name          =>'dstwfheadref',
