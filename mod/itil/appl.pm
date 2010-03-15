@@ -1251,7 +1251,7 @@ sub isWriteValid
                        systems attachments accountnumbers interview
                        customer control phonenumbers);
    if (!defined($rec)){
-      return("default");
+      return(@databossedit);
    }
    else{
       if ($self->IsMemberOf("admin")){
