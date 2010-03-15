@@ -1048,8 +1048,8 @@ sub HttpHeader
    else{
       $d.=sprintf("Cache-Control: max-age=%d\n",$param{'cache'});
       $d.=sprintf("Expires: %s\n",HTTP::Date::time2str(time + $param{'cache'}));
-   #   $d.=sprintf("Last-Modified: Tue, 03 Nov 2009 14:00:03 GMT\n");
    }
+   $d.=sprintf("Last-Modified: %s\n",HTTP::Date::time2str(time-1));
    my $disp;
    if (defined($param{'attachment'}) && $param{'attachment'}==1){
       $disp="attachment";
@@ -1080,6 +1080,9 @@ sub HttpHeader
                                       $content eq "text/plain");
    $charset=";charset=$param{charset}" if (defined($param{charset}));
    $d.=sprintf("Content-type: %s$charset\n\n",$content);
+   #if ($param{'cache'}){
+   #   msg(INFO,$d);
+   #}
    return($d);
 }
 

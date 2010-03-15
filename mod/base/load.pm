@@ -123,7 +123,8 @@ sub Run
          }
          $filename=[$filename];
       }
-      #msg(INFO,"base::load request=$func result filename=$filename");
+      #msg(INFO,"load=$func");
+
      
       print $self->HttpHeader($content,%param);
       foreach my $file (@$filename){
