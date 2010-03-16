@@ -25,6 +25,7 @@ sub HtmlInterviewLink
    my ($self)=@_;
    my $idname=$self->IdField()->Name();
    my $id=Query->Param($idname);
+   my $imode=Query->Param("IMODE");
    my $interviewcatid=Query->Param("interviewcatid");
    my $archiv=Query->Param("archiv");
    $self->ResetFilter();
@@ -43,15 +44,11 @@ sub HtmlInterviewLink
                                          'kernel.App.Web.css',
                                          'kernel.App.Web.Interview.css',
                                          'jquery.ui.css']);
-         printf("<input type=hidden name=$idname value=\"%s\">",$id);
-         printf("<input type=hidden id=parentid value=\"%s\">",$id);
-         printf("<input type=hidden id=parentobj value=\"%s\">",
-                $self->SelfAsParentObject);
          print $self->InterviewMainForm($rec,$idname,$id);
          print $self->HtmlBottom(body=>1);
       }
       else{
-         $self->InterviewSubForm($rec,$interviewcatid);
+         $self->InterviewSubForm($rec,$interviewcatid,$imode);
       }
    }
 }
@@ -61,6 +58,7 @@ sub InterviewSubForm
    my $self=shift;
    my $rec=shift;
    my $interviewcatid=shift;
+   my $imode=shift;
    my $state=$rec->{interviewst};
 
    my $lastquestclust;
@@ -68,6 +66,14 @@ sub InterviewSubForm
    my $HTMLjs;
    foreach my $qrec (@{$state->{TotalActiveQuestions}}){
       my $d;
+      if ($imode eq "open"){
+         if (exists($state->{AnsweredQuestions}->
+                    {interviewid}->{$qrec->{id}}) &&
+             $state->{AnsweredQuestions}->
+                   {interviewid}->{$qrec->{id}}->{answer} ne ""){
+            next;
+         }
+      }
       if ($qrec->{AnswerViewable}){
          if ($interviewcatid eq $qrec->{interviewcatid}){
             if (!defined($lastquestclust) ||
@@ -175,7 +181,7 @@ function switchExt(id)
       e.style.visibility="hidden";
    }
 }
-function switchQueryBlock(o,id)
+function switchQueryBlock(o,id,imode)
 {
    var e=document.getElementById("BLK"+id);
    if (e.style.display=="none" || e.style.display==""){
@@ -204,18 +210,22 @@ function switchQueryBlock(o,id)
                  d+=childNode.nodeValue;
               }
           }
-          e.innerHTML=d;
-          var jso=xmlobject.getElementsByTagName("js");
-          for (var i = 0; i < jso.length; ++i){
-              var childNode=jso[i].childNodes[0];
-              if (childNode){
-                 eval(childNode.nodeValue);
-              }
+          if (d!=""){
+             e.innerHTML=d;
+             var jso=xmlobject.getElementsByTagName("js");
+             for (var i = 0; i < jso.length; ++i){
+                 var childNode=jso[i].childNodes[0];
+                 if (childNode){
+                    eval(childNode.nodeValue);
+                 }
+             }
           }
-          
+          else{
+             e.innerHTML="Nix meh drin!";
+          }
        }
       }
-      var q="$idname=$id&interviewcatid="+id;
+      var q="$idname=$id&interviewcatid="+id+"&IMODE="+imode;
       xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
       var r=xmlhttp.send(q);
    }
@@ -296,60 +306,85 @@ function setA(formid,val)
 
 </script>
 EOF
-   my $s="<select name=IMODE style=\"width:200px\">";
+   my @sl=('current'=>$self->T("current questions"),
+           'open'=>$self->T("not answered questions"));
+   my $s="<select name=IMODE onchange=\"document.forms['control'].submit();\" ".
+         "style=\"width:200px\">";
+   my $imode=Query->Param("IMODE");
+   $imode="current" if ($imode eq "");
+   while(my $k=shift(@sl)){
+      my $v=shift(@sl);
+      $s.="<option value=\"$k\"";
+      $s.=" selected" if ($imode eq $k);
+      $s.=">$v</option>";
+   }
    $s.="</select>";
 
    my $help=$self->findtemplvar({},"GLOBALHELP","article",
                  "W5Base ".$self->SelfAsParentObject." Config-Item-Interview|".
                  "W5Base Config-Item-Interview");
+   $d.="<form name=\"control\">";
    $d.="<div class=header>";
-   $d.="<table width=95%><tr><td></td>";
+   $d.="<table border=0 width=97%><tr><td width=5>&nbsp;</td>";
    $d.="<td align=left>".$label."</td>";
-   $d.="<td align=right>";
-   $d.="<select name=IMODE style=\"width:200px\">";
-   $d.="<option value=\"\">aktueller Fragenkatalog</option>";
-   $d.="</select>";
-   $d.="</td><td>".$help."</tr></table>";
+   $d.="<td align=right width=1%>".$s."</td><td width=20>".
+       $help."</td></tr></table>";
    $d.="</div>";
+   $d.=sprintf("<input type=hidden name=$idname value=\"%s\">",$id);
+   $d.=sprintf("<input type=hidden id=parentid value=\"%s\">",$id);
+   $d.=sprintf("<input type=hidden id=parentobj value=\"%s\">",
+               $self->SelfAsParentObject);
+   $d.="</form>";
 
-   my $lastquestclust;
-   my $lastqblock;
-   my $blknum=0;
-
-   my @blklist;
-   my @blkid;
-
-   foreach my $qrec (@{$state->{TotalActiveQuestions}}){
-      if ($lastqblock ne $qrec->{queryblock}){
-         push(@blklist,$qrec->{queryblock});
-         push(@blkid,$qrec->{interviewcatid});
+   {
+      my $lastquestclust;
+      my $lastqblock;
+      my $blknum=0;
+    
+      my @blklist;
+      my @blkid;
+    
+      foreach my $qrec (@{$state->{TotalActiveQuestions}}){
+         if ($imode eq "open"){
+            if (exists($state->{AnsweredQuestions}->
+                       {interviewid}->{$qrec->{id}}) &&
+                $state->{AnsweredQuestions}->
+                      {interviewid}->{$qrec->{id}}->{answer} ne ""){
+               next;
+            }
+         }
+         if ($lastqblock ne $qrec->{queryblock}){
+            push(@blklist,$qrec->{queryblock});
+            push(@blkid,$qrec->{interviewcatid});
+         }
+         $lastqblock=$qrec->{queryblock};
       }
-      $lastqblock=$qrec->{queryblock};
+      $d.="</div>" if ($lastqblock ne "");
+     # push(@blklist,"open");
+      $lastqblock=undef;
+      for(my $c=0;$c<=$#blklist;$c++){
+         my $blk=$blklist[$c];
+         my $blkid=$blkid[$c];
+         $d.="\n</div>\n" if ($lastqblock ne "");
+         $d.="<div class=InterviewQuestBlockFancyHead>$blk - $label</div>";
+         $d.="\n<div ".
+             "onclick=\"switchQueryBlock(this,'${blkid}','${imode}');\" ".
+             "class=InterviewQuestBlockHead>".
+             "\n<div id=BLKON${blkid} class=OnOfSwitch ".
+             "style=\"visible:hidden;display:none\">".
+             "<img border=0 src=\"../../../public/base/load/minus.gif\"></div>".
+             "<div id=BLKOFF${blkid} class=OnOfSwitch ".
+             "style=\"visible:visible;display:block\">".
+             "<img border=0 src=\"../../../public/base/load/plus.gif\"></div>".
+             "<div style=\"float:none\">$blk</div></div>";
+         $d.="\n<div id=BLK${blkid} name=\"$blk\" class=InterviewQuestBlock>";
+         $lastqblock=$blk;
+      }
+      $d.="</div>" if ($lastqblock ne "");
+    
+      $d.="</div></div>";
    }
-   $d.="</div>" if ($lastqblock ne "");
-  # push(@blklist,"open");
-   $lastqblock=undef;
-   for(my $c=0;$c<=$#blklist;$c++){
-      my $blk=$blklist[$c];
-      my $blkid=$blkid[$c];
-      $d.="\n</div>\n" if ($lastqblock ne "");
-      $d.="<div class=InterviewQuestBlockFancyHead>$blk - $label</div>";
-      $d.="\n<div onclick=\"switchQueryBlock(this,'${blkid}');\" ".
-          "class=InterviewQuestBlockHead>".
-          "\n<div id=BLKON${blkid} class=OnOfSwitch ".
-          "style=\"visible:hidden;display:none\">".
-          "<img border=0 src=\"../../../public/base/load/minus.gif\"></div>".
-          "<div id=BLKOFF${blkid} class=OnOfSwitch ".
-          "style=\"visible:visible;display:block\">".
-          "<img border=0 src=\"../../../public/base/load/plus.gif\"></div>".
-          "<div style=\"float:none\">$blk</div></div>";
-      $d.="\n<div id=BLK${blkid} name=\"$blk\" class=InterviewQuestBlock>";
-      $lastqblock=$blk;
-   }
-   $d.="</div>" if ($lastqblock ne "");
-
-   $d.="</div></div>";
-
+   return($d);
 }
 
 
