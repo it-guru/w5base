@@ -241,17 +241,19 @@ sub hash2xml {
   return($xml) if (!ref($request));
   if (ref($request) eq "HASH"){
      foreach my $k (keys(%{$request})){
+        my $usek=$k;                         # in XML no pure numeric key are
+        $usek="ID$k" if ($k=~m/^\d+$/);      # allowed! 
         if (ref($request->{$k}) eq "HASH"){
            $xml.=indent($depth).
-                 "<$k>\n".hash2xml($request->{$k},$param,$k,$depth+1).
-                 indent($depth)."</$k>\n";
+                 "<$usek>\n".hash2xml($request->{$k},$param,$k,$depth+1).
+                 indent($depth)."</$usek>\n";
         }
         elsif (ref($request->{$k}) eq "ARRAY"){
            foreach my $subrec (@{$request->{$k}}){
               if (ref($subrec)){
                  $xml.=indent($depth).
-                       "<$k>\n".hash2xml($subrec,$param,$k,$depth+1).
-                       indent($depth)."</$k>\n";
+                       "<$usek>\n".hash2xml($subrec,$param,$k,$depth+1).
+                       indent($depth)."</$usek>\n";
               }
               else{
                  $xml.=indent($depth)."<$k>".XmlQuote($subrec)."</$k>\n";
@@ -267,7 +269,7 @@ sub hash2xml {
               $d="\n".join(">\n",map({indent($depth).$_} split(">\n",$d))).
                       ">\n";
            }
-           $xml.=indent($depth)."<$k>".$d."</$k>\n";
+           $xml.=indent($depth)."<$usek>".$d."</$usek>\n";
         }
      }
   }
