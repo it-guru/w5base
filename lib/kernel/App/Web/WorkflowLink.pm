@@ -239,7 +239,7 @@ sub WorkflowLinkResult
             $h->SetFilter(\%qadd);
             $h->Limit(1502);
             $h->SetCurrentOrder("id");
-            printf STDERR ("fifi qadd=%s\n",Dumper(\%qadd));
+            #printf STDERR ("fifi qadd=%s\n",Dumper(\%qadd));
             my @l=$h->getHashList("id");
             map({$idl{$_->{id}}=1} @l);
          }
@@ -330,7 +330,6 @@ sub startWorkflow
             }
          }
          $q{WorkflowClass}=$class;
-printf STDERR ("fifi q=%s\n",Dumper(\%q));
          my $q=kernel::cgi::Hash2QueryString(%q);
          print(<<EOF);
 function openUrl()
