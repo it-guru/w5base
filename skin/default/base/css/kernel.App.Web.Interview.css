@@ -1,5 +1,7 @@
-div.Interview{
+body{
   background:#eaeaea;
+}
+div.Interview{
   width:100%;
   height:100%;
 }

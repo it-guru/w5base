@@ -27,7 +27,7 @@ sub new
 {
    my $type=shift;
    my $self={@_};
-   $self->{value}=[0,1]            if (!defined($self->{values}));
+   $self->{value}=[0,1]            if (!defined($self->{value}));
    $self->{transprefix}="boolean." if (!defined($self->{transprefix}));
    $self->{master}="1"             if (!defined($self->{master}));
    $self->{default}="0"            if (!defined($self->{default}));

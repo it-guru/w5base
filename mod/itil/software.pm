@@ -74,6 +74,63 @@ sub new
                 label         =>'Release Expression',
                 dataobjattr   =>'software.releaseexp'),
 
+      new kernel::Field::Number(
+                name          =>'lnksystemcount',
+                group         =>'relations',
+                htmldetail    =>0,
+                searchable    =>0,
+                label         =>'System relation count',
+                depend        =>'lnkactivesystems',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $n=0;
+                   my $fo=$self->getParent->getField("lnkactivesystems");
+                   my $d=$fo->RawValue($current);
+                   if (ref($d) eq "ARRAY"){
+                      foreach my $r (@$d){
+                         $n++;
+                      }
+                   }
+                   return($n);
+                }),
+
+      new kernel::Field::JoinUniqMerge(
+                name          =>'lnksystemversions',
+                group         =>'relations',
+                transprefix   =>'',
+                default       =>'',
+                master        =>'',
+                htmldetail    =>0,
+                searchable    =>0,
+                label         =>'active software versions',
+                depend        =>'lnkactivesystems',
+                vjointo       =>'itil::lnksoftwaresystem',
+                vjoinbase     =>['systemcistatusid'=>'4'],
+                vjoinon       =>['id'=>'softwareid'],
+                vjoindisp     =>'version'),
+
+      new kernel::Field::Text(
+                name          =>'lnksystems',
+                group         =>'relations',
+                htmldetail    =>0,
+                searchable    =>0,
+                label         =>'system relations',
+                vjointo       =>'itil::lnksoftwaresystem',
+                vjoinon       =>['id'=>'softwareid'],
+                vjoindisp     =>'system'),
+
+      new kernel::Field::Text(
+                name          =>'lnkactivesystems',
+                group         =>'relations',
+                htmldetail    =>0,
+                searchable    =>0,
+                label         =>'active system relations',
+                vjointo       =>'itil::lnksoftwaresystem',
+                vjoinbase     =>['systemcistatusid'=>'4'],
+                vjoinon       =>['id'=>'softwareid'],
+                vjoindisp     =>'system'),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',

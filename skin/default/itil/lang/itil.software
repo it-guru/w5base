@@ -1,7 +1,13 @@
 'itil::software'=>{de=>'Software',en=>'Software'},
 'fieldgroup.default'=>{de=>'Software-Daten',en=>'Software-Informations'},
+'fieldgroup.relations'=>{de=>'Zurordnungen',en=>'Relations'},
+'System relation count'=>{de=>'Anzahl System Installationen'},
 'fieldgroup.source'=>{de=>'Datenquelle',en=>'Datasource'},
 'you are only authorized to add in \'order\' or \'reserved\' state'=>{de=>'Sie sind nur berechtig, im Status \'angefordert\' oder \'reserviert\' Datensätze zu erzeugen'},
 'invalid producer specified'=>{de=>'ungültiger Hersteller'},
 'Producer'=>{de=>'Hersteller'},
 'Release Expression'=>{de=>'Versionsausdruck'},
+'system relations'=>{de=>'Systemzuorndungen'},
+'active system relations'=>{de=>'aktive Systemzuorndungen'},
+'active software versions'=>{de=>'aktive Softwareversionen'},
+
