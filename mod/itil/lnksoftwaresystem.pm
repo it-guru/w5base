@@ -291,6 +291,19 @@ sub new
 }
 
 
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_systemcistatus"))){
+     Query->Param("search_systemcistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
+
+
+
+
 sub getSqlFrom
 {
    my $self=shift;

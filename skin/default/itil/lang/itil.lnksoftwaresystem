@@ -13,6 +13,6 @@
 'invalid software specified'=>{de=>'keine oder ungültige Software'},
 'System Mandator'=>{de=>'System Mandant'},
 'License Mandator'=>{de=>'Lizenz Mandant'},
-'useable by application'=>{de=>'nutzbar durch Anwedung'},
+'useable by application'=>{de=>'nutzbar durch Anwendung'},
 'useable by customer'=>{de=>'nutzbar durch Kunde'},
 'useable by customer contract'=>{de=>'nutzbar durch Kundenvertrag'},
