@@ -417,7 +417,7 @@ function DoSearch()
    document.forms[0].elements['UseLimitStart'].value='0';
    document.forms[0].elements['UseLimit'].value='$pagelimit';
    DisplayLoading(frames['Result'].document);
-   document.forms[0].submit();
+   window.setTimeout("document.forms[0].submit();",1);
    return;
 }
 function DoUpload()
