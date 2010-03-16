@@ -53,6 +53,7 @@ sub new
                 vjointo       =>'itil::appl',
                 dontrename    =>1,
                 group         =>'relation',
+                uploadable    =>0,
                 fields        =>[qw(businessteam businessteamid 
                                     mandator mandatorid
                                     )]),

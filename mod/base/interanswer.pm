@@ -67,7 +67,7 @@ sub new
                 name          =>'parentobj',
                 group         =>'relation',
                 uploadable    =>0,
-                label         =>'parent Ojbect',
+                label         =>'parent Object',
                 dataobjattr   =>'interanswer.parentobj'),
 
       new kernel::Field::Text(
@@ -77,29 +77,45 @@ sub new
                 label         =>'parent ID',
                 dataobjattr   =>'interanswer.parentid'),
 
-      new kernel::Field::Text(
-                name          =>'interviewid',
-                group         =>'relation',
-                uploadable    =>0,
-                searchable    =>0,
-                label         =>'Interview ID',
-                dataobjattr   =>'interanswer.interviewid'),
-
       new kernel::Field::TextDrop(
                 name          =>'qtag',
                 label         =>'unique query tag',
-                translation   =>'base::interview',
-                group         =>'relation',
+                group         =>'qrelation',
                 vjointo       =>'base::interview',
                 vjoinon       =>['interviewid'=>'id'],
                 vjoindisp     =>'qtag',
                 dataobjattr   =>'interview.qtag'),
 
       new kernel::Field::Interface(
+                name          =>'interviewid',
+                group         =>'relation',
+                uploadable    =>0,
+                searchable    =>0,
+                group         =>'qrelation',
+                label         =>'Interview ID',
+                dataobjattr   =>'interanswer.interviewid'),
+
+      new kernel::Field::Interface(
                 name          =>'interviewcatid',
                 label         =>'Interview category id',
-                group         =>'relation',
+                group         =>'qrelation',
                 dataobjattr   =>'interview.interviewcat'),
+
+      new kernel::Field::TextDrop(
+                name          =>'interviewcat',
+                label         =>'Interview categorie',
+                vjointo       =>'base::interviewcat',
+                group         =>'qrelation',
+                readonly      =>1,
+                uploadable    =>0,
+                vjoinon       =>['interviewcatid'=>'id'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Text(
+                name          =>'questclust',
+                label         =>'Questiongroup',
+                group         =>'qrelation',
+                dataobjattr   =>'interview.questclust'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
@@ -188,6 +204,13 @@ sub prepUploadRecord
 sub SelfAsParentObject    # this method is needed because existing derevations
 {
    return("base::interanswer");
+}
+
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/base/load/interanswer.jpg?".$cgi->query_string());
 }
 
 
@@ -467,6 +490,17 @@ sub SecureSetFilter
    }
    return($self->SetFilter(@flt));
 }
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my $grp=shift;
+   my %param=@_;
+   return("header","default","relation","qrelation","source");
+}
+
+
+
 
 
 

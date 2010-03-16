@@ -202,7 +202,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'queryblock',
-                label         =>'Questiongroup',
+                label         =>'Question categorie',
                 dataobjattr   =>'interviewcat.fullname'),
 
       new kernel::Field::Text(
@@ -357,6 +357,14 @@ foreach my $k (keys(%p)){
 $d.="if (mode=='onchange'){s.selectedIndex=0}\n";
 
    return($d);
+}
+
+
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/base/load/interview.jpg?".$cgi->query_string());
 }
 
 
