@@ -335,7 +335,7 @@ sub recreateStats
    my ($rec,$msg)=$mst->getFirst();
    if (defined($rec)){
       do{
-         print STDERR ("fifi rec=%s\n",Dumper($rec));
+         #print STDERR ("fifi rec=%s\n",Dumper($rec));
          $self->storeStatVar($rec->{sgroup},$rec->{fullname},
                              {maxlevel=>0,method=>'set'},
                              $rec->{dataname},$rec->{dataval});
