@@ -57,7 +57,9 @@ sub ImportAssetManagerCO
    $self->{user}=getModuleObject($self->Config,"base::user");
    $self->{mandator}=getModuleObject($self->Config,"base::mandator");
    my $flt={bc=>['AL T-COM','Notes & Collab. Ser.']};
+   $self->{statefile}="/var/log/w5base/SystemID.noappl.log";
    #$flt->{name}=\'9100007746';
+   open(F,">".$self->{statefile}); close(F);
 
    $co->SetFilter($flt);
    my @l=$co->getHashList(qw(name bc description sememail islocked));
@@ -115,6 +117,9 @@ sub VerifyAssetManagerData
    my $altbc=$corec->{bc};
    my $islocked=$corec->{islocked};
 
+   open(FO,">>".$self->{statefile}); 
+
+
    if ($altbc eq "AL T-COM"){
       my $wf=$self->{wf};
       my $acsys=$self->{acsys};
@@ -141,6 +146,7 @@ sub VerifyAssetManagerData
                    "System aktuell nicht mehr existiert, dann sorgen ".
                    "Sie bitte umgehend für eine entsprechende ".
                    "Datenbereinigung!");
+               printf FO ("%s;%s\n",$sysrec->{systemid},"co-number is locked");
             }
             else{
                if (!defined($sysrec->{applications}) ||
@@ -176,6 +182,8 @@ sub VerifyAssetManagerData
               #            "W5Base/Darwin ein! (bzw. tragen Sie die SystemID ".
               #            "ein, falls Sie diese beim entsprechenden System ".
               #            "vergessen haben)");
+                     printf FO ("%s;%s\n",$sysrec->{systemid},
+                                "systemid not in darwin registered");
                   }
                   else{
                      if (!defined($w5sysrec->{applications}) ||
@@ -195,6 +203,9 @@ sub VerifyAssetManagerData
               #               "Regeln der AL DTAG zwingend. Sorgen Sie dafür, ".
               #               "dass die korrekte Zuorndung zu einer Anwendung ".
               #               "in W5Base/Darwin eingetragen wird.");
+                        printf FO ("%s;%s\n",$sysrec->{systemid},
+                                   "no application relations ".
+                                   "in darwin registered");
                      }
                   }
            
@@ -248,6 +259,7 @@ sub VerifyAssetManagerData
          }
       }
    }
+   close(FO);
 }
 
 sub SendOpMsg()

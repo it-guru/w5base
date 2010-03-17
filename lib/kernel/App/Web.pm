@@ -1049,7 +1049,7 @@ sub HttpHeader
       $d.=sprintf("Cache-Control: max-age=%d\n",$param{'cache'});
       $d.=sprintf("Expires: %s\n",HTTP::Date::time2str(time + $param{'cache'}));
    }
-   $d.=sprintf("Last-Modified: %s\n",HTTP::Date::time2str(time-1));
+   #$d.=sprintf("Last-Modified: %s\n",HTTP::Date::time2str(time-1));
    my $disp;
    if (defined($param{'attachment'}) && $param{'attachment'}==1){
       $disp="attachment";

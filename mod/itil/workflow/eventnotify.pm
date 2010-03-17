@@ -630,7 +630,7 @@ sub isViewValid
       }
    }
 
-   my %inmmgr=$self->getGroupsOf($userid,'RINManager','up');
+   my %inmmgr=$self->getGroupsOf($userid,'RINManager','both');
 
    # if (is in mandator)
    my $mandators=$rec->{mandatorid};
@@ -641,6 +641,7 @@ sub isViewValid
    foreach my $mid (@$mandators){
       if (grep(/^$mid$/,@mymandators)){
          $mandatorok=1;
+         last;
       }
    }
    if ($mandatorok || $rec->{owner}==$userid){

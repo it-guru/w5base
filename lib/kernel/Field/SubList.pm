@@ -28,6 +28,9 @@ sub new
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
    $self->{_permitted}->{forwardSearch}=1;
+   if (!defined($self->{WSDLfieldType})){
+      $self->{WSDLfieldType}="SubListRecordArray";
+   }
    $self->{Sequence}=0;
    return($self);
 }

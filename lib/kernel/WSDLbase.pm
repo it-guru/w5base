@@ -581,6 +581,7 @@ sub WSDLfieldList
          my $label=$fobj->Label();
          $label=~s/&/&amp;/g;
          my $name=$fobj->Name();
+         next if ($name eq "");
          $$XMLtypes.="<xsd:element minOccurs=\"$minOccurs\" ".
                      "maxOccurs=\"1\" name=\"$name\" type=\"$type\">";
          $$XMLtypes.="<xsd:annotation>";
