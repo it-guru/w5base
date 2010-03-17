@@ -3,7 +3,7 @@
 'fieldgroup.procdesc'=>{de=>'Prozessbeschreibung',en=>'Process description'},
 'Customer'=>{de=>'Kunde'},
 'Shortname'=>{de=>'Kurzbezeichnung'},
-'Selektor'=>{de=>'Auswahlbeizeichnung'},
+'Selector'=>{de=>'Auswahlbeizeichnung'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'Process Owner'=>{de=>'Prozesseigentümer'},
 'Deputy Process Owner'=>{de=>'Prozesseigentümer Vertreter'},
@@ -17,3 +17,7 @@
 'you are not authorized to set other persons as databoss'=>{de=>'Sie sind nicht berechtigt, andere als Datenverantwortlicher einzutragen'},
 'invalid or no customer specified'=>{de=>'ungültiger oder kein Kunde definiert'},
 'default language for eventinformations'=>{de=>'Standard Spracheinstellung für den Workflow Ereignismeldung'},
+'Customers Process Prioritiy'=>{de=>'Priorität des Geschäftsprozesses'},
+'fieldgroup.workflowbasedata'=>{de=>'Workflow Basis-Daten',en=>'Workflow Base-Data'},
+'WF:event notification customer info targets'=>{de=>'WF:Ereignismeldung Kundeninformations Zieladressen'},
+

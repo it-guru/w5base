@@ -46,12 +46,15 @@ sub getControlData
                                      'daily_modified_appldiary'=>'itil::appl'
                                  ],
                                 },
-           'base::grp'=>       {target=>'fullname',
-                                mode  =>[
-                                     'eventnotify'=>'itil::appl::alternate',
-                                ],
-                               },
+           'base::grp'=>        {target=>'fullname',
+                                 mode  =>[
+                                      'eventnotify'=>'itil::appl::alternate',
+                                 ],
+                                },
            'base::location'=>   {target=>'name',
+                                 mode  =>['eventnotify'=>'itil::appl'],
+                                },
+           'crm::businessprocess'=>{target=>'selector',
                                  mode  =>['eventnotify'=>'itil::appl'],
                                 },
            'itil::network'=>    {target=>'name',

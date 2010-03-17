@@ -95,7 +95,6 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'databoss',
-                group         =>'procdesc',
                 label         =>'Databoss',
                 vjointo       =>'base::user',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
@@ -131,6 +130,15 @@ sub new
       new kernel::Field::Link(
                 name          =>'processowner2id',
                 dataobjattr   =>'businessprocess.processowner2'),
+
+      new kernel::Field::Select(
+                name          =>'customerprio',
+                group         =>'procdesc',
+                label         =>'Customers Process Prioritiy',
+                value         =>['1','2','3'],
+                default       =>'2',
+                htmleditwidth =>'50px',
+                dataobjattr   =>'businessprocess.customerprio'),
 
       new kernel::Field::Select(
                 name          =>'importance',
@@ -256,15 +264,87 @@ sub new
                 noselect      =>'1',
                 dataobjattr   =>'businessprocessacl.aclmode'),
 
+      new kernel::Field::Email(
+                name          =>'wfdataeventnotifytargets',
+                label         =>'WF:event notification customer info targets',
+                htmldetail    =>0,
+                searchable    =>0,
+                uploadable    =>0,
+                group         =>'workflowbasedata',
+                onRawValue    =>\&getWfEventNotifyTargets),
+ 
    );
    $self->setDefaultView(qw(linenumber selector cistatus importance));
    $self->setWorktable("businessprocess");
+   $self->{workflowlink}={ workflowkey=>[id=>'affectedbusinessprocessid']
+                         };
    $self->{use_distinct}=1;
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","w5base.crm.businessprocess"],
                          uniquesize=>40};
    return($self);
 }
+
+
+sub getWfEventNotifyTargets     # calculates the target email addresses
+{                               # for an customer information in
+   my $self=shift;              # itil::workflow::eventnotify
+   my $current=shift;
+   my $emailto={};
+
+   my $bpid=$current->{id};
+   my $ia=getModuleObject($self->getParent->Config,"base::infoabo");
+   my $bp=getModuleObject($self->getParent->Config,"crm::businessprocess");
+   $bp->SetFilter({id=>\$bpid});
+
+
+   my @byfunc;
+   my @byorg;
+   my @team;
+   my %allcustgrp;
+   foreach my $rec ($bp->getHashList(qw(processownerid processowner2id))){
+      foreach my $v (qw(processownerid processowner2id)){
+         my $fo=$bp->getField($v);
+         my $userid=$bp->getField($v)->RawValue($rec);
+         push(@byfunc,$userid) if ($userid ne "" && $userid>0);
+      }
+      if ($rec->{customerid}!=0){
+         $self->getParent->LoadGroups(\%allcustgrp,"up",
+                                      $rec->{customerid});
+         
+      }
+   }
+   if (keys(%allcustgrp)){
+      $ia->LoadTargets($emailto,'base::grp',\'eventnotify',
+                                [keys(%allcustgrp)]);
+   }
+   $ia->LoadTargets($emailto,'*::businessprocess',\'eventnotify',$bpid);
+   $ia->LoadTargets($emailto,'base::staticinfoabo',\'eventnotify',
+                             '100000002',\@byfunc,default=>1);
+
+   return([sort(keys(%$emailto))]);
+}
+
+sub HandleInfoAboSubscribe
+{
+   my $self=shift;
+   my $id=Query->Param("CurrentIdToEdit");
+   my $ia=$self->getPersistentModuleObject("base::infoabo");
+   if ($id ne ""){
+      $self->ResetFilter();
+      $self->SetFilter({id=>\$id});
+      my ($rec,$msg)=$self->getOnlyFirst(qw(selector));
+      print($ia->WinHandleInfoAboSubscribe({},
+                      $self->SelfAsParentObject(),$id,$rec->{fullname},
+                      "base::staticinfoabo",undef,undef));
+   }
+   else{
+      print($self->noAccess());
+   }
+}
+
+
+
 
 
 

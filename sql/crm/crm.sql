@@ -42,7 +42,8 @@ CREATE TABLE businessprocessacl (
   KEY faqid (refid),
   unique key aclmode (aclparentobj,refid,acltarget,aclmode,acltargetid)
 );
-alter table businessprocess add eventlang  varchar(5) default NULL;
+alter table businessprocess add eventlang  varchar(5) default 'de';
 update businessprocess set eventlang='de';
 alter table businessprocess add processowner bigint(20)  default NULL;
 alter table businessprocess add processowner2 bigint(20)  default NULL;
+alter table businessprocess add customerprio int(2) default '2';

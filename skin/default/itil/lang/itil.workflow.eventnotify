@@ -52,10 +52,12 @@
 'EVr.inanalyse'=>{de=>'in Analyse',en=>'analyses'},
 'EVr.other'=>{de=>'Sonstige',en=>'other'},
 'EVk.appl'=>{de=>'Anwendungsereignis',en=>'Application'},
+'EVk.bprocess'=>{de=>'Geschäftsprozess',en=>'Businessprocess'},
 'EVk.net'=>{de=>'IP-Netzwerk Standort übergreifend',en=>'IP-Network location indipendent'},
 'EVk.infraloc'=>{de=>'Infrastruktur Standort',en=>'Infrastructure location'},
 'Networkarea'=>{de=>'Netzbereich'},
 'Application'=>{de=>'Applikation'},
+'Businessprocess'=>{de=>'Geschäftsprozess'},
 'Location'=>{de=>'Standort'},
 'rootcause analysis'=>{de=>'Ursachenanalyse'},
 'Affected Region'=>{de=>'betroffene Region'},
@@ -133,6 +135,22 @@
        'TCP/IP-Netzes sind beseitigt.',
  'en'=>"Dear Sir or Madam,\n\n".
        "the incident in the environment of the IP-Network was taken care of."
+},
+
+'SALUTATION05.open'=>{
+ 'de'=>"Sehr geehrte Damen und Herren,\n\n".
+       "im Folgenden erhalten Sie den aktuellen Stand zum Ereignis\n".
+       'im Umfeld des Geschäftsprozesses.',
+ 'en'=>"Dear Sir or Madam,\n\n".
+       "in the following mail you receive the actual status about an\n".
+       "incident in the business process."
+},
+'SALUTATION05.close'=>{
+ 'de'=>"Sehr geehrte Damen und Herren,\n\n".
+       "die Beeinträchtigungen im Umfeld des\n".
+       'Geschäftsprozesses sind beseitigt.',
+ 'en'=>"Dear Sir or Madam,\n\n".
+       "the incident in the environment of the business process was taken care of."
 },
 
 'SALUTATION10'=>{

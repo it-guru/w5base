@@ -167,6 +167,12 @@ sub Init
                 group      =>'affected',
                 label      =>'Affected Project ID'),
 
+      new kernel::Field::KeyText(
+                name          =>'affectedbusinessprocessid',
+                container     =>'headref',
+                keyhandler    =>'kh',
+                label         =>'BusinessprocessID'),
+
    );
    $self->AddGroup("affected",translation=>'itil::workflow::base');
 

@@ -186,6 +186,20 @@ sub getDynamicFields
                 container     =>'headref',
                 label         =>'NetworkareaID'),
 
+      new kernel::Field::KeyText(  
+                name          =>'affectedbusinessprocess',
+                vjointo       =>'itil::businessprocess',
+                vjoindisp     =>'selector',
+                keyhandler    =>'kh',
+                container     =>'headref',
+                multiple      =>0,
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['affectedbusinessprocessid'=>'id'],
+                group         =>'eventnotifyshort',
+                uivisible     =>\&calcVisibility,
+                depend        =>['eventmode'],
+                label         =>'Businessprocess'),
+
       new kernel::Field::Text(
                 name          =>'affecteditemprio',
                 container     =>'headref',
@@ -448,6 +462,7 @@ sub getDynamicFields
                 group         =>'state',
                 value         =>['EVk.appl',
                                  'EVk.net',
+                                 'EVk.bprocess',
                                  'EVk.infraloc'],
                 label         =>'Eventnotification Mode',
                 container     =>'headref'),
@@ -540,6 +555,9 @@ sub calcVisibility
    if ($rec->{headref}->{eventmode}->[0] eq "EVk.net"){
       return(1) if ($name eq "affectednetwork");
       return(1) if ($name eq "affectedregion");
+   }
+   if ($rec->{headref}->{eventmode}->[0] eq "EVk.bprocess"){
+      return(1) if ($name eq "affectedbusinessprocess");
    }
    return(0);
 }
@@ -746,6 +764,9 @@ sub getNextStep
       if ($mode eq "EVk.net"){
          return($self->getStepByShortname("asknet",$WfRec)); 
       }
+      if ($mode eq "EVk.bprocess"){
+         return($self->getStepByShortname("askbprocess",$WfRec)); 
+      }
       return(undef);
    }
    elsif($currentstep=~m/^.*::workflow::eventnotify::askloc$/){
@@ -758,6 +779,9 @@ sub getNextStep
       return($self->getStepByShortname("dataload",$WfRec)); 
    }
    elsif($currentstep=~m/^.*::workflow::eventnotify::asknet$/){
+      return($self->getStepByShortname("dataload",$WfRec)); 
+   }
+   elsif($currentstep=~m/^.*::workflow::eventnotify::askbprocess$/){
       return($self->getStepByShortname("dataload",$WfRec)); 
    }
    elsif($currentstep=~m/^.*::workflow::eventnotify::copydata$/){
@@ -959,6 +983,19 @@ sub getNotifyDestinations
          $net->SetFilter({id=>$netid});
          $ia->LoadTargets($emailto,'*::network',\'eventnotify',$netid);
       }
+      elsif ($WfRec->{eventmode} eq "EVk.bprocess"){ 
+         my $bprocid=$WfRec->{affectedbusinessprocessid};
+         $bprocid=[$bprocid] if (ref($bprocid) ne "ARRAY");
+         my $bproc=getModuleObject($self->Config,"itil::businessprocess");
+         $bproc->SetFilter({id=>$bprocid});
+         $ia->LoadTargets($emailto,'*::businessprocess',\'eventnotify',
+                          $bprocid);
+         foreach my $rec ($bproc->getHashList(qw(wfdataeventnotifytargets))){
+            foreach my $email (@{$rec->{wfdataeventnotifytargets}}){
+               $emailto->{$email}++;
+            }
+         }
+      }
       elsif ($WfRec->{eventmode} eq "EVk.infraloc"){ 
          my $locid=$WfRec->{affectedlocationid};
          $locid=[$locid] if (ref($locid) ne "ARRAY");
@@ -1032,6 +1069,12 @@ sub getNotificationSubject
       $subject2=" / IP-Net / $state Incident / DTAG.T-Home / ".
                 $self->getParent->T("Networkarea")." /";
    }
+   if ($WfRec->{eventmode} eq "EVk.bprocess"){ 
+      my $bp=$WfRec->{affectedbusinessprocess};
+      $bp=$WfRec->{affectedbusinessprocess}->[0] if (ref($WfRec->{affectedbusinessprocess}));
+      $subject2=" / Process / $state Incident / $bp / ".
+                $self->getParent->T("Businessprocess")." /";
+   }
    if ($WfRec->{eventmode} eq "EVk.infraloc"){ 
       my $loc=$WfRec->{affectedlocation};
       $loc=$WfRec->{affectedlocation}->[0] if (ref($WfRec->{affectedlocation}));
@@ -1054,6 +1097,12 @@ sub getNotificationSubject
       $net=$WfRec->{affectednetwork}->[0] if (ref($WfRec->{affectednetwork}));
       $subject2=" / $net / ".$self->getParent->T("rootcause analysis").
                 " / ".$self->getParent->T("Networkarea")." /";
+   }
+   if ($action eq "rootcausei" && $WfRec->{eventmode} eq "EVk.bprocess"){
+      my $bp=$WfRec->{affectedbusinessprocess};
+      $bp=$WfRec->{affectedbusinessprocess}->[0] if (ref($WfRec->{affectedbusinessprocess}));
+      $subject2=" / $bp / ".$self->getParent->T("rootcause analysis").
+                " / ".$self->getParent->T("Businessprocess")." /";
    }
    $subject.=$subject2;
    $subject.=" ID:".$WfRec->{id};
@@ -1101,6 +1150,10 @@ sub getSalutation
       $salutation=sprintf($self->T("SALUTATION04.close"));
    }elsif($WfRec->{eventmode} eq "EVk.net"){   
       $salutation=sprintf($self->T("SALUTATION04.open"));
+   }elsif ($WfRec->{eventmode} eq "EVk.bprocess" && $eventstat==17){
+      $salutation=sprintf($self->T("SALUTATION05.close"));
+   }elsif($WfRec->{eventmode} eq "EVk.bprocess"){   
+      $salutation=sprintf($self->T("SALUTATION05.open"));
    }
    if ($action eq "rootcausei"){
       $salutation=sprintf($self->T("SALUTATION10"));
@@ -1147,6 +1200,9 @@ sub generateMailSet
    }
    if ($WfRec->{eventmode} eq "EVk.net"){
       push(@baseset,"wffields.affectednetwork");
+   }
+   if ($WfRec->{eventmode} eq "EVk.bprocess"){
+      push(@baseset,"wffields.affectedbusinessprocess");
    }
 
 
@@ -1201,6 +1257,9 @@ sub generateMailSet
                      $$smstext.="$vv\n";
                   }
                   elsif ($field=~m/(affectednetwork)/){
+                     $$smstext.="$vv\n";
+                  }
+                  elsif ($field=~m/(affectedbusinessprocess)/){
                      $$smstext.="$vv\n";
                   }
                   elsif ($field=~m/(eventstatnature)/){
@@ -1439,6 +1498,84 @@ sub Process
  #  }
    return($self->SUPER::Process($action,$WfRec));
 }
+
+
+sub getWorkHeight
+{
+   my $self=shift;
+   my $WfRec=shift;
+   return(340);
+}
+
+#######################################################################
+package itil::workflow::eventnotify::askbprocess;
+use vars qw(@ISA);
+use kernel;
+use kernel::WfStep;
+use Data::Dumper;
+@ISA=qw(kernel::WfStep);
+
+sub generateStoredWorkspace
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my @steplist=@_;
+   my $d=<<EOF;
+<tr>
+<td class=fname width=20%>%affectedbusinessprocess(label)%:</td>
+<td class=finput>%affectedbusinessprocess(storedworkspace)%</td>
+</tr>
+EOF
+
+   return($self->SUPER::generateStoredWorkspace($WfRec,@steplist).$d);
+}
+
+
+sub generateWorkspace
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   my @steplist=Query->Param("WorkflowStep");
+   pop(@steplist);
+   my $StoredWorkspace=$self->SUPER::generateStoredWorkspace($WfRec,@steplist);
+
+   my $templ=<<EOF;
+<table border=0 cellspacing=0 cellpadding=0 width=100%>
+$StoredWorkspace
+<tr>
+<td class=fname width=20%>%affectedbusinessprocess(label)%:</td>
+<td class=finput>%affectedbusinessprocess(detail)%</td>
+</tr>
+</table>
+EOF
+   return($templ);
+}
+
+sub Process
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   if ($action eq "NextStep"){
+      my $eventmode=Query->Param("Formated_eventmode");
+      my $fo=$self->getField("affectedbusinessprocess");
+      my $foval=Query->Param("Formated_".$fo->Name());
+      if ($foval=~m/^\s*$/){
+         $self->LastMsg(ERROR,"no businessprocess specified"); 
+         return(0);
+      }
+      if (!$fo->Validate($WfRec,{$fo->Name=>$foval})){
+         $self->LastMsg(ERROR,"unknown error") if (!$self->LastMsg()); 
+         return(0);
+      }
+   }
+   return($self->SUPER::Process($action,$WfRec));
+}
+
 
 
 sub getWorkHeight
@@ -1888,6 +2025,64 @@ sub nativProcess
             return(0);
          }
       }
+      elsif ($h->{eventmode} eq "EVk.bprocess"){
+         my $p=$h->{affectedbusinessprocess};
+         $h->{name}=$self->getParent->T("Process-notification:")." ".$p;
+         my $bp=getModuleObject($self->getParent->getParent->Config,
+                                  "itil::businessprocess");
+         if (ref($h->{affectedbusinessprocess})){
+            $p=$h->{affectedbusinessprocess}->[0];
+         }
+         if ($h->{eventstatnature} eq "EVn.info"){
+            $h->{eventstatclass}=4;
+         }
+         $bp->SetFilter({cistatusid=>"<5",id=>$h->{affectedbusinessprocessid}});
+         my ($prec,$msg)=$bp->getOnlyFirst(qw(name customer customerid 
+                                              mandator mandatorid 
+                                              eventlang customerprio
+                                              custcontracts id));
+         if (defined($prec)){
+          #  $app=$arec->{name};
+          #  $h->{affectedapplicationid}=[$arec->{id}];   
+          #  $h->{affectedapplication}=[$arec->{name}];   
+            $h->{mandatorid}=[$prec->{mandatorid}];   
+            $h->{mandator}=[$prec->{mandator}];   
+          #  $h->{involvedbusinessteam}=[$arec->{businessteam}];
+          #  $h->{involvedresponseteam}=[$arec->{businessteam}];
+          #  $h->{involvedcostcenter}=[$arec->{conumber}];
+            $h->{eventlang}=$prec->{eventlang};
+          #  $h->{affecteditemprio}=$arec->{customerprio};
+          #  my @custcontract;
+          #  my @custcontractid;
+            if (!$self->getParent->ValidateCreate($h)){
+               return(0);
+            }
+          #  foreach my $contr (@{$arec->{custcontracts}}){
+          #     push(@custcontract,$contr->{custcontract});
+          #     push(@custcontractid,$contr->{custcontractid});
+          #  }
+          #  if ($#custcontractid!=-1){
+          #     $h->{affectedcontract}=\@custcontract;
+          #     $h->{affectedcontractid}=\@custcontractid;
+          #  }
+          #  else{
+          #     delete($h->{affectedcontract});
+          #     delete($h->{affectedcontractid});
+          #  }
+            if ($prec->{customer} ne ""){
+               $h->{affectedcustomer}=[$prec->{customer}];
+               $h->{affectedcustomerid}=[$prec->{customerid}];
+            }
+            else{
+               delete($h->{affectedcustomer});
+               delete($h->{affectedcustomerid});
+            }
+         }
+         else{
+            $self->getParent->LastMsg(ERROR,"invalid or inactive businessprocess");
+            return(0);
+         }
+      }
       else{
          $self->getParent->LastMsg(ERROR,"invalid eventmode '$h->{eventmode}'");
          return(0);
@@ -1985,7 +2180,7 @@ sub Process
       my ($crec,$msg)=$wf->getOnlyFirst(qw(ALL));
       my $h=$self->getWriteRequestHash("web");
       if (defined($crec)){
-         foreach my $cvar (qw(mandatorid mandator affectedapplication affectedapplicationid affectedlocation affectedlocationid affectedroom affectednetwork affectednetworkid affectedregion affectedcustomer affectedcustomerid eventdesciption eventreason eventimpact shorteventelimination longeventelimination eventaltdesciption eventaltreason eventaltimpact altshorteventelimination altlongeventelimination eventlang eventsla eventstaticmailsubject eventstaticemailgroupid eventinternalslacomments eventinternalcomments eventstatnature eventstattype eventstatreason eventstatclass eventmode)){
+         foreach my $cvar (qw(mandatorid mandator affectedapplication affectedapplicationid affectedlocation affectedlocationid affectedroom affectednetwork affectednetworkid affectedregion affectedcustomer affectedcustomerid eventdesciption eventreason eventimpact shorteventelimination longeventelimination eventaltdesciption eventaltreason eventaltimpact altshorteventelimination altlongeventelimination eventlang eventsla eventstaticmailsubject eventstaticemailgroupid eventinternalslacomments eventinternalcomments eventstatnature eventstattype eventstatreason eventstatclass eventmode affectedbusinessprocess affectedbusinessprocessid)){
             if (defined($crec->{$cvar})){
                $h->{$cvar}=$crec->{$cvar};
             }
