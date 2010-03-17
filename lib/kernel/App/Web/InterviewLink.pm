@@ -95,7 +95,8 @@ sub InterviewSubForm
                 "<table class=InterviewQuest width=95% 
                   border=0 >".
                 "<tr><td><div onclick=switchExt($qrec->{id})>".
-                $qrec->{name}."</div>".
+                "<span class=InterviewQuestion>".
+                $qrec->{name}."</span></div>".
                 "</td><td width=50 nowrap valign=top>".
                 "<div id=relevant$qrec->{id}>$qrec->{HTMLrelevant}</div></td>".
                 "<td width=180 nowrap valign=top>".
@@ -307,7 +308,8 @@ function setA(formid,val)
 </script>
 EOF
    my @sl=('current'=>$self->T("current questions"),
-           'open'=>$self->T("not answered questions"));
+           'open'=>$self->T("not answered questions"),
+           'analyses'=>$self->T("analyses"));
    my $s="<select name=IMODE onchange=\"document.forms['control'].submit();\" ".
          "style=\"width:200px\">";
    my $imode=Query->Param("IMODE");
@@ -336,7 +338,10 @@ EOF
                $self->SelfAsParentObject);
    $d.="</form>";
 
-   {
+   if ($imode eq "analyses"){
+      $d.="Analysen";
+   }
+   else{
       my $lastquestclust;
       my $lastqblock;
       my $blknum=0;

@@ -1,0 +1,52 @@
+<html>
+ <head>
+  <title>Cisco Web-Dialer</title>
+ </head>
+
+<script type='text/javascript' 
+        src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'></script>
+
+<script language="JavaScript"
+        src="http://w8n00378.bmbg01.telekom.de/w5base2/public/base/load/jquery.js">
+</script>
+
+<script language="JavaScript"
+        src="../../lib/javascript/CiscoWebDialer.js">
+</script>
+<script language="JavaScript">
+$(document).ready(function(){
+   $("#dial").click(function(){
+       window.resizeTo=function(){
+          alert("fifi");
+       };
+       window.frames['dialer'].location.href="https://ccm1.ipt.t-systems.com/webdialer/Webdialer";
+   });
+
+
+});
+
+
+</script>
+
+<body>
+ <form method="POST">
+<div style="position:absolute;width:500px;height:500px">
+  <iframe width=500 height=490 id=dialer name=dialer 
+          src="https://ccm1.ipt.t-systems.com/webdialer/WebdialerX"></iframe>
+</div>
+
+<div style="position:absolute;top:520px">
+<hr>
+Hallo Welt
+<hr>
+
+     <input type=button id=dial value="dial">
+<br>
+<br>
+<br>
+<br>
+Fifif
+</div>
+ </form>
+</body>
+</html>

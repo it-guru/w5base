@@ -9,6 +9,10 @@ div.Interview{
 div.OnOfSwitch{
   float:left;
 }
+span.InterviewQuestion{
+   cursor: pointer;
+   cursor: hand;
+}
 div.InterviewQuestBlockHead{
    color:blue;
    margin:4px;
