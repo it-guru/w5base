@@ -142,4 +142,21 @@ sub ProcessHead
    return($d);
 }
 
+sub getEmpty
+{  
+   my $self=shift;
+   my (%param)=@_;
+   my $d="";
+   if ($param{HttpHeader}){ 
+      $d.=$self->getHttpHeader();
+      $d.=$self->ProcessHead();
+   }
+   if ($param{HttpHeader}){
+      $d.=$self->ProcessBottom();
+   }
+   return($d);
+}
+
+
+
 1;
