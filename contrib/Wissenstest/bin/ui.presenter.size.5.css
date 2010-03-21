@@ -1,11 +1,21 @@
-.navButton {
-   width:5em;
-   font-size:16px;
+@media screen {
+   .navButton {
+      width:5em;
+      font-size:16px;
+   }
+   .question{
+      font-size:5.0em;
+   }
+   .comments{
+      font-size:3.9em;
+      padding:0.2em;
+   }
+   ul,ol{
+      padding-left:1.2em;
+   }
+   li{
+     font-size:0.8em;
+     padding-top:0.2em;
+     padding-bottom:0.2em;
+   }
 }
-.question{
-   font-size:5.0em;
-}
-.comments{
-   font-size:3.9em;
-}
-
