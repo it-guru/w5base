@@ -1,0 +1,430 @@
+/*******************************************************************************
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ******************************************************************************/
+
+/*
+ * This is the CSS for the CSS presentation.  
+ */
+ 
+/*
+ * We start by setting the font for this presentation.  CSS fonts provide
+ * a list so the browser can render the first font it available and fail
+ * gracefully.
+ */
+body {
+    font-family:Verdana, "Times New Roman","Bitstream Charter",Times, sans;
+}
+
+/*
+ * Fieldsets are used to highlight external sample files.  They get a little
+ * extra padding.
+ */
+fieldset {
+    padding: 2em;
+}
+
+/*
+ * A slide is the basic building block of the presentation.  A slide is just 
+ * a div tag with this class to position it to cover the entire screen.
+ */
+.slide {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    background: white;
+}
+
+/*
+ * Title slides have a small amount of very large text.  The text is centered 
+ * on the screen.
+ */
+.titleslide {
+    position: relative;
+    top: 33%;
+    font-size: 72px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/*
+ * Content slides have a title and then more content then a title slide.
+ */
+.contentslide {
+    margin: 2em;
+    height: 85%;
+    width: 85%;
+    display: inline;
+    left: 10%;
+    top: 10%;
+}
+
+/*
+ * Code attributes are red, just like parts of the text we want to jump out.
+ */
+.colorjump, .attribute {
+    color: red;
+}
+
+/*
+ * This style highlights part of the DOM for examples.
+ */
+.codecallout {
+    background-color: yellow;
+}
+
+/*
+ * We make JavaScript keywords blue
+ */
+.keyword {
+    color: blue;
+}
+
+/*
+ * Code comments are green
+ */
+.comment {
+    color: green;
+}
+
+/*
+ * We make text extra blue big so it jumps out
+ */
+.jumpout {
+    font-size: 48px;
+}
+
+/*
+ * We make all links big
+ */
+.slide a {
+    font-size: 48px;
+}
+
+/*
+ * Well... not all links
+ */
+.smalllink {
+    font-size: 26px;
+}
+
+/*
+ * We make all fonts 25% larger than the default.
+ */
+p, .codepara {
+    font-size: 1.25em;
+}
+
+/*
+ * Top code blocks are used to show JavaScript code 
+ * above HTML examples.
+ */
+.topcode {
+    font-size: 1.25em;
+    border: 2px solid lightgray;
+    padding: 1em;
+    width: 50em;
+    margin-bottom: 5em;
+}
+
+/*
+ * We needed to space the explanation slide because of the images.
+ */
+#explainslide p {
+    position: relative;
+}
+
+#explainslide img {
+    position: relative;
+    top: 75px;
+}
+
+/*
+ * These styles set the background image for the slide
+ * showing the logos of some of the companies that use
+ * JQuery.
+ */
+#popularslide {
+    background-image: url('images/uses_logos.jpg'); 
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+
+/*
+ * These are the styles for the key in the upper right.  These styles don't
+ * have any impact on the slides.
+ */
+#keysmall {
+    display: none;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    z-index: 15;
+    width: 30px;
+    height: 30px;
+    background:#FFFFCC none repeat scroll 0 0;
+    cursor: pointer;
+    background-image: url('images/edge.gif'); 
+    background-repeat: repeat-none;
+    background-position: bottom left;
+    border-left: thin solid gray;
+    border-bottom: thin solid gray;
+}
+
+#keydiv, #animstartdiv {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 15;
+    width: 23em;
+    padding: 0.5em;
+
+    overflow-x:visible;
+    overflow-y:visible;
+    
+    -moz-background-clip:border;
+    -moz-background-inline-policy:continuous;
+    -moz-background-origin:padding;
+    -moz-border-radius-bottomleft:4px;
+    -moz-border-radius-bottomright:4px;
+    -moz-border-radius-topleft:4px;
+    -moz-border-radius-topright:4px;
+    background: #FFFFCC none repeat scroll 0 0;
+    color: black;
+    cursor: pointer;
+    border: thin solid gray;
+}
+
+.navrow {
+    position: relative;
+    height: 1.5em;
+}
+
+.firstrow {
+    margin-top: 0.5em;
+}
+
+.col0 {
+    position: absolute;
+    left: 0.5em;
+    top: 5px;
+    width: 8em;
+}
+
+.col1 {
+    position: absolute;
+    left: 9em;
+    top: 5px;
+    width: 14em;
+}
+
+/*
+ * This is the close button for the key
+ */
+#keydivclose {
+    width: 19px;
+    height: 19px;
+    background:transparent url(images/close_button.gif);
+    display:block;
+    position:absolute;
+    right: 5px;
+    top: 5px;
+    text-indent:-9999px;
+}
+
+.animateslide > span {
+    position: relative;
+}
+
+.split {
+    position: relative;
+    width: 50em;
+    font-size: 1.5em;
+}
+
+.split li {
+    margin-left: -1.5em;
+}
+
+.leftsplit {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 20em;
+    border-right: thin solid lightgray;
+}
+
+.rightsplit {
+    position: absolute;
+    left: 24em;
+    top: 0px;
+    width: 49.5%;
+}
+
+/*
+ * Styles for the arrow slide controls
+ */
+.navbutton {
+    position: absolute;
+    top: 10px;
+}
+
+.first {
+    width: 20px;
+    height: 14px;
+    left: 15px;
+    background:transparent url(images/arrows.gif) no-repeat scroll -1px -1px;
+    cursor: pointer;
+}
+
+.previous {
+    width: 14px;
+    height: 14px;
+    left: 40px;
+    background:transparent url(images/arrows.gif) no-repeat scroll -25px -1px;
+    cursor: pointer;
+}
+
+.next {
+    width: 14px;
+    height: 14px;
+    left: 70px;
+    background:transparent url(images/arrows.gif) no-repeat scroll -48px -1px;
+    cursor: pointer;
+}
+
+.last {
+    width: 20px;
+    height: 14px;
+    left: 90px;
+    background:transparent url(images/arrows.gif) no-repeat scroll -68px -1px;
+    cursor: pointer;
+}
+
+.firstenabled:hover {
+    background-position: -1px -16px;
+}
+
+.previousenabled:hover {
+    background-position: -25px -16px;
+}
+
+.nextenabled:hover {
+    background-position: -48px -16px;
+}
+
+.lastenabled:hover {
+    background-position: -68px -16px;
+}
+
+.firstdisabled {
+    background-position: -1px -29px;
+}
+
+.previousdisabled {
+    background-position: -25px -29px;
+}
+
+.nextdisabled {
+    background-position: -48px -29px;
+}
+
+.lastdisabled {
+    background-position: -68px -29px;
+}
+
+#grip {
+    background:transparent url(images/grippie.png) no-repeat scroll;
+    width: 27px;
+    height: 10px;
+    margin: -3px auto;
+    cursor: ns-resize;
+}
+
+#slideIndex {
+    width: 1.4em;
+    text-align: center;
+    font-family:"ScalaSansOT-Regular", Verdana, "Times New Roman","Bitstream Charter",Times, sans;
+    font-size: 1.15em;
+    
+}
+
+/*
+ * These styles are for the footer
+ */
+html, body, #wrap {
+    height: 98%;
+}
+
+body > #wrap {
+    height: auto; 
+    min-height: 98%;
+}
+
+#main {
+    padding-bottom: 1em;
+}  /* must be same height as the footer */
+
+#footer {
+    position: fixed;
+	margin-top: -0.5em; /* negative value of footer height */
+	height: 4em;
+	clear:both;
+    z-index: 15;
+    border-top: thin solid lightgray;
+    background: white;
+    width: 100%;
+    left: 0px;
+    background-color: #F9F9F9;
+}
+
+#centerFooter {
+    width: 18em;
+    margin: 0px auto;
+    text-align: center;
+    padding-top: 10px;
+}
+
+#footercontent {
+    position: relative;
+}
+ 
+.footerleft {
+    position: absolute;
+    top: 5px;
+    left: 20px;
+}
+
+.footerright {
+    position: absolute;
+    right: 20px;
+    top: 5px;
+}
+
+/* CLEAR FIX*/
+.clearfix:after {content: ".";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;}
+.clearfix {display: inline-block;}
+/* Hides from IE-mac \*/
+* html .clearfix { height: 1%;}
+.clearfix {display: block;}
+/* End hide from IE-mac */
+
+

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd ">
+
+<!--
+/*******************************************************************************
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ******************************************************************************/
+ -->
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Your Presenation</title>
+    <!-- Reference our CSS file -->
+    <link type="text/css" href="pres.css" rel="stylesheet"></link>
+
+    <!-- The slide presentation uses JQuery and some custom JavaScript -->
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js" />
+    <script type="text/javascript" src="pres.js"></script>
+</head>
+<body>
+
+<div id="wrap">
+    <div id="main" class="clearfix">
+    <!--
+    This is the key that shows people how to navigate the presentation.
+    -->
+    <div id="keysmall" title="Expand the navigation key"> </div>
+    <div id="keydiv">
+        <div id="keydivcontainer" onclick="toggleKey(); return false;">
+            <b>Navigation Keys:</b>
+            
+            <div class="navrow firstrow">
+                <div class="col0">Next Slide</div>
+                <div class="col1">Space Bar and Right Arrow</div>
+            </div>
+            
+            <div class="navrow">
+                <div class="col0">Previous Slide</div>
+                <div class="col1">Left Arrow</div>
+            </div>
+            
+            <div class="navrow">
+                <div class="col0">First Slide</div>
+                <div class="col1">Home</div>
+            </div>
+            
+            <div class="navrow">
+                <div class="col0">Last Slide</div>
+                <div class="col1">End</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 
+    This is where the content of each slide starts.  Each slide is a div tag with 
+    a class of slide.  There are different types of slides:  title slides, content
+    slides, and dynamic slides (with no class).  
+    -->
+
+    <div class="slide">
+        <p class="titleslide">
+            Title Slide
+        </p>
+    </div>
+        
+    <div class="slide contentslide">
+        <h1>Content Slide</h1>
+        
+        <p>
+            Some content
+        </p>
+    </div>
+        
+    <div class="slide">
+        <iframe src="http://jquery.com" frameborder="0" scrolling="no" width="100%" height="99.7%"></iframe>
+    </div>
+</div>    
+</div>
+    <!--
+    This footer is not part of the slides.  It is just a footer for the presentation.
+    -->
+    <div id="footer">
+        <div id="grip" title="Toggle the footer control"> </div>
+        <div id="footercontent">
+            <div class="navbutton first firstenabled" title="Go to the first slide"> </div>
+            <div class="navbutton previous previousenabled" title="Go to the previous slide"> </div>
+            <div class="navbutton next nextenabled" title="Go to the next slide"> </div>
+            <div class="navbutton last lastenabled" title="Go to the last slide"> </div>
+            
+            <div id="centerFooter">
+                Your footer title
+            </div>
+            
+            <div class="footerright">
+                Slide <input type="text" name="slideIndex" id="slideIndex" title="Set the current slide index" /> <span id="xofy"></span>
+            </div>
+        </div>
+    </div>
+
+   
+</body>
+</html>
