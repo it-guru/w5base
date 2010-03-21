@@ -392,6 +392,11 @@ body > #wrap {
 .clearfix {display: block;}
 /* End hide from IE-mac */
 
+@media screen {
+   body{
+      overflow:hidden;
+   }
+}
 @media print {
    body{
       background: #FFFFFF;
@@ -458,4 +463,12 @@ div.help{
 .comments{
    padding-top:15px;
    color:darkblue;
+}
+pre.code{
+   color:darkred;
+   border-left-style:solid;
+   border-left-width:1px;
+   border-left-color:gray;
+   padding-left:0.8em;
+   margin-left:0.8em;
 }

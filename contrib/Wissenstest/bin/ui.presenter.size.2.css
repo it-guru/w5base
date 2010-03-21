@@ -1,12 +1,12 @@
 @media screen {
-.navButton {
-   width:5em;
-   font-size:0.7em;
-}
-.question{
-   font-size:2.5em;
-}
-.comments{
-   font-size:1.5em;
-}
+   .navButton {
+      width:5em;
+      font-size:0.8em;
+   }
+   .question{
+      font-size:2.5em;
+   }
+   .comments{
+      font-size:1.5em;
+   }
 }
