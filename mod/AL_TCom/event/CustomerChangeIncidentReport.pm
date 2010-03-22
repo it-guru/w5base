@@ -111,6 +111,7 @@ sub CustomerChangeIncidentReport
                            eventend
                            mandator
                            affectedapplication
+                           affectedcontract
                            involvedcustomer
                            wffields.changedescription
                            description
@@ -150,6 +151,7 @@ sub CustomerChangeIncidentReport
                            eventend
                            mandator
                            affectedapplication
+                           affectedcontract
                            involvedcustomer
                            wffields.incidentdescription
                            description
