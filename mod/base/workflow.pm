@@ -1906,10 +1906,13 @@ sub externalMailHandler
 
       my $file=Query->Param("file");
       my ($attinfo,$att);
+      my $maxmail=$self->Config->Param("MaxMailAttachment");
+      if ($self->IsMemberOf("admin")){
+         $maxmail=$maxmail*2;
+      }
       if (defined($attinfo=Query->UploadInfo($file))){
          no strict;
          my $f=Query->Param("file");
-         my $maxmail=$self->Config->Param("MaxMailAttachment");
          seek($f,0,SEEK_SET);
          my $buffer;
          my $size=0;
