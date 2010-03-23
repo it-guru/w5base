@@ -67,10 +67,16 @@ sub getPosibleRoles
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
        $self->getParent->getParent->Self() eq "base::location")){
-      return("infrastruct"=>$self->getParent->T("infrastruct",$self->Self),
-             "itnetwork"=>$self->getParent->T("itnetwork",$self->Self),
-             "staffloc"=>$self->getParent->T("staffloc",$self->Self),
-             "write"   =>$self->getParent->T("write",$self->Self)
+      return("infrastruct"     =>$self->getParent->T("infrastruct",
+                                                     $self->Self),
+             "itnetwork"       =>$self->getParent->T("itnetwork",
+                                                     $self->Self),
+             "staffloc"        =>$self->getParent->T("staffloc",
+                                                     $self->Self),
+             "infocontact"     =>$self->getParent->T("Information contact",
+                                                     $self->Self),
+             "write"           =>$self->getParent->T("write",
+                                                     $self->Self)
              );
    }
    return();
