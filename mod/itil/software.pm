@@ -300,7 +300,7 @@ sub isWriteValid
    my $rec=shift;
 
    my $userid=$self->getCurrentUserId();
-   return("default") if (!defined($rec) ||
+   return("default","releasecontrol") if (!defined($rec) ||
                          ($rec->{cistatusid}<3 && $rec->{creator}==$userid) ||
                          $self->IsMemberOf($self->{CI_Handling}->{activator}));
    return(undef);
