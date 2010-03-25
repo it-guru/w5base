@@ -71,6 +71,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'releaseexp',
+                group         =>'releasecontrol',
                 label         =>'Release Expression',
                 dataobjattr   =>'software.releaseexp'),
 
@@ -245,9 +246,9 @@ sub Validate
       $self->LastMsg(ERROR,"invalid producer specified");
       return(0);
    }
-   if (exists($newrec->{'releaseexp'})){
+   if (!defined($oldrec) && !exists($newrec->{'releaseexp'})){
       if ($newrec->{'releaseexp'}=~m/^\s*$/){
-         $newrec->{'releaseexp'}='/^\d{1,2}(\.\d{1,2}){1,1}$/';
+         $newrec->{'releaseexp'}='/^\d{1,2}(\.\d{1,2}){1,3}$/';
       }
       $newrec->{'releaseexp'}.="/" if (!($newrec->{'releaseexp'}=~m/\/$/));
       if (!($newrec->{'releaseexp'}=~m/^\//)){
@@ -272,6 +273,14 @@ sub FinishWrite
    }
    return(1);
 }
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   return(qw(header default releasecontrol source));
+}
+
+
 
 
 sub FinishDelete
