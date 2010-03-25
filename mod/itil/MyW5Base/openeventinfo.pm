@@ -72,6 +72,9 @@ sub Result
    my $self=shift;
    my %q=$self->{DataObj}->getSearchHash();
 
+   if ($ENV{REMOTE_USER} eq "anonymous"){
+      $q{id}=\"-1";
+   }
    my $userid=$self->getParent->getCurrentUserId();
    $userid=-1 if (!defined($userid) || $userid==0);
 
