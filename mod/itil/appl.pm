@@ -426,6 +426,13 @@ sub new
                 name          =>'secstate',
                 group         =>'customer',
                 label         =>'Security state',
+                uivisible     =>sub{
+                   my $self=shift;
+                   if ($self->getParent->IsMemberOf("admin")){
+                      return(1);
+                   }
+                   return(0);
+                },
                 allowempty    =>1,
                 value         =>['','vsnfd'],
                 transprefix   =>'SECST.',
@@ -1060,17 +1067,17 @@ sub getRecordImageUrl
    return("../../../public/itil/load/appl.jpg?".$cgi->query_string());
 }
 
-sub getRecordWatermarkUrl
-{
-   my $self=shift;
-   my $rec=shift;
-   if ($rec->{secstate} eq "vsnfd"){
-      my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-      return("../../../public/itil/load/HtmlDetail.watermark.vsnfd.jpg?".
-             $cgi->query_string());
-   }
-   return(undef);
-}
+#sub getRecordWatermarkUrl
+#{
+#   my $self=shift;
+#   my $rec=shift;
+#   if ($rec->{secstate} eq "vsnfd"){
+#      my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+#      return("../../../public/itil/load/HtmlDetail.watermark.vsnfd.jpg?".
+#             $cgi->query_string());
+#   }
+#   return(undef);
+#}
 
 
 
