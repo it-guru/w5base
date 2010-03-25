@@ -241,7 +241,9 @@ sub Validate
       $self->LastMsg(ERROR,"invalid name specified");
       return(0);
    }
-   $newrec->{name}=~s/\s+/_/g;
+   if (exists($newrec->{name})){
+      $newrec->{name}=~s/\s+/_/g;
+   }
    if (!(trim(effVal($oldrec,$newrec,"producerid"))=~m/^\d+$/)){
       $self->LastMsg(ERROR,"invalid producer specified");
       return(0);
