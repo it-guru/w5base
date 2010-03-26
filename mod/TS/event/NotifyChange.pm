@@ -57,35 +57,36 @@ sub NotifyChange
                                              $scstate ne "released");
          my $srcid=$wfrec->{srcid};
          my $aid=$wfrec->{affectedapplicationid};
-         $aid=[$aid] if ($aid ne "" && !ref($aid));
-         my $appl=getModuleObject($self->Config,"itil::appl");
-         my $user=getModuleObject($self->Config,"base::user");
-         my $grp=getModuleObject($self->Config,"base::grp");
-         $appl->SetFilter({id=>$aid,name=>'SIT*'}); # first test only for sit
-#         $appl->SetFilter({id=>$aid}); # first test only for sit
          my %emailto;
-         $aid=[];
-         foreach my $arec ($appl->getHashList(qw(contacts name id))){
-            msg(INFO,"check application $arec->{name}");
-            push(@$aid,$arec->{id});
-            if (ref($arec->{contacts}) eq "ARRAY"){
-               foreach my $crec (@{$arec->{contacts}}){
-                  my $r=$crec->{roles};
-                  $r=[$r] if (ref($r) ne "ARRAY");
-                  if ($crec->{target} eq "base::user" &&
-                      grep(/^infocontact$/,@$r)){
-                     $user->ResetFilter();
-                     $user->SetFilter({userid=>\$crec->{targetid},
-                                       cistatusid=>\'4'});
-                     my ($urec,$msg)=$user->getOnlyFirst(qw(email));
-                     if (defined($urec)){
-                        $emailto{$urec->{email}}++;
+         if (defined($aid)){
+            $aid=[$aid] if (!ref($aid));
+            my $appl=getModuleObject($self->Config,"itil::appl");
+            my $user=getModuleObject($self->Config,"base::user");
+            my $grp=getModuleObject($self->Config,"base::grp");
+            $appl->SetFilter({id=>$aid,name=>'SIT* W5*'}); # first test only for sit
+            $aid=[];
+            foreach my $arec ($appl->getHashList(qw(contacts name id))){
+               msg(INFO,"check application $arec->{name}");
+               push(@$aid,$arec->{id});
+               if (ref($arec->{contacts}) eq "ARRAY"){
+                  foreach my $crec (@{$arec->{contacts}}){
+                     my $r=$crec->{roles};
+                     $r=[$r] if (ref($r) ne "ARRAY");
+                     if ($crec->{target} eq "base::user" &&
+                         grep(/^infocontact$/,@$r)){
+                        $user->ResetFilter();
+                        $user->SetFilter({userid=>\$crec->{targetid},
+                                          cistatusid=>\'4'});
+                        my ($urec,$msg)=$user->getOnlyFirst(qw(email));
+                        if (defined($urec)){
+                           $emailto{$urec->{email}}++;
+                        }
                      }
                   }
                }
             }
          }
-         return({exitcode=>0,msg=>'ok'}) if ($#{$aid}==-1);
+         return({exitcode=>0,msg=>'ok'}) if (!defined($aid) || $#{$aid}==-1);
          my $ia=getModuleObject($self->Config,"base::infoabo");
          $ia->LoadTargets(\%emailto,'*::appl',\'changenotify',$aid);
         # $ia->LoadTargets($emailto,'base::staticinfoabo',
