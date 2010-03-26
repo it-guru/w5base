@@ -57,6 +57,11 @@ sub new
          next;
       }
       my %fo=%{$fo};
+      foreach my $fkey (qw(uploadable readonly)){
+         if (defined($param{$fkey})){   
+            $fo{$fkey}=$param{$fkey};
+         }
+      }
       if (defined($param{vjoinon})){   
          $fo{vjointo}=$param{vjointo};
          $fo{vjoinon}=$param{vjoinon};
