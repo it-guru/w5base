@@ -68,6 +68,7 @@ div.InterviewQuestBlockFancyHead{
 @media print {
    body{
       overflow:visible;
+      background:white;
    }
    div.qhelp{
       display:none;visibility:hidden;

@@ -121,6 +121,9 @@ sub ProcessLine
    $idname=$idname->Name() if (defined($idname));
    my $d;
    if (defined($self->{JSON})){
+      if ($self->{charset} eq "latin1"){
+         $self->{JSON}->property(latin1 => 1);
+      }
       #$d=$self->{JSON}->pretty->encode(\%rec);
       $d=$self->{JSON}->encode(\%rec);
    }

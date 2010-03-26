@@ -350,7 +350,7 @@ EOF
       $interview->SetFilter({parentobj=>\$parentobj});
 
       my $output=new kernel::Output($interview);
-      if ($output->setFormat("JSON")){
+      if ($output->setFormat("JSON",charset=>"latin1")){
          $interview->SetCurrentView(qw(name id questclust queryblock));
          $d.=$output->WriteToScalar(HttpHeader=>0);
       }
@@ -361,13 +361,17 @@ EOF
       $self->SetFilter({$idname=>\$id});
 
       my $output=new kernel::Output($self);
-      if ($output->setFormat("JSON")){
+      if ($output->setFormat("JSON",charset=>"latin1")){
          $self->SetCurrentView("interviewst");
          $d.=$output->WriteToScalar(HttpHeader=>0);
       }
       $d.="</script>";
       $d.="<script src=\"../../../public/base/load/InterviewLink.js\">";
       $d.="</script>";
+      $d.="<table border=1><tr>";
+      $d.="<td><input type=button id=Cube1 value=\"Category\"></td>";
+      $d.="<td><input type=button id=Cube2 value=\"Questiongroup\"></td>";
+      $d.="</tr></table>";
       $d.="<script language=\"JavaScript\">";
       $d.=<<EOF;
 var Cube;
@@ -384,13 +388,20 @@ var Cube2;
                          value:a});
        Cube1.push(o);
 
-       var o=new Object({label:document.W5Base.base.interview[id].queryblock,
+       var o=new Object({label:document.W5Base.base.interview[id].questclust,
                          value:a});
        Cube2.push(o);
      }
    }
-   Cube=\$("#out").dataCube({value:Cube1,
-                             label:"ThatsIT"});
+   \$("#Cube1").click(function(){
+      \$("#out").dataCube({value:Cube1,
+                                label:\$(this).val()});
+   });
+   \$("#Cube2").click(function(){
+      \$("#out").dataCube({value:Cube2,
+                           label:\$(this).val()});
+   });
+   \$("#Cube1").click();
 });
 EOF
       $d.="</script>";
