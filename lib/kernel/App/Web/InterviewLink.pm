@@ -38,6 +38,7 @@ sub HtmlInterviewLink
                                  js=>['toolbox.js',
                                       'jquery.js',
                                       'jquery.ui.js',
+                                      'firebug-lite.js',
                                       'jquery.locale.js'],
                                  style=>['default.css','work.css',
                                          'Output.HtmlDetail.css',
@@ -336,10 +337,36 @@ EOF
    $d.=sprintf("<input type=hidden id=parentid value=\"%s\">",$id);
    $d.=sprintf("<input type=hidden id=parentobj value=\"%s\">",
                $self->SelfAsParentObject);
+      $d.="<input type=submit>";
    $d.="</form>";
 
    if ($imode eq "analyses"){
-      $d.="Analysen";
+      $d.="<script language=\"JavaScript\">";
+      $self->ResetFilter();
+      $self->SetFilter({$idname=>\$id});
+
+      my $output=new kernel::Output($self);
+      if ($output->setFormat("JSON")){
+         $self->SetCurrentView("interviewst");
+         $d.=$output->WriteToScalar(HttpHeader=>0);
+      }
+      $d.="</script>";
+      $d.="<script language=\"JavaScript\">";
+      $d.=<<EOF;
+//#
+//#for (i in W5Base.AL_TCom.appl.Result){
+//#      d+="<tr>";
+//#      d+="<th width=1% nowrap>"+iparent[i][key]+"</td>";
+//#
+//#
+//#
+//#}
+\$(document).ready(function(){
+   console.log(window.document.W5Base);
+});
+EOF
+      $d.="</script>";
+      $d.="<div id=analyses></div>";
    }
    else{
       my $lastquestclust;

@@ -133,36 +133,52 @@ sub ProcessLine
    if ($lineno>1){
       $d=",\n".$d;
    }
+   else{
+      $d.="\n";
+   }
    return($d);
 }
 
 sub ProcessBottom
 {
    my ($self,$fh,$rec,$msg)=@_;
+   my $appname=$self->JSON_ObjectName();
    my $d;
    my $app=$self->getParent->getParent();
    $d="};\n";
+  # $d="Window.W5Base.Last=Window.$appname;\n";
    return($d);
+}
+
+sub JSON_ObjectName
+{
+   my $self=shift;
+
+   my $app=$self->getParent->getParent();
+   my $appname="W5Base::".$app->Self;
+   $appname=~s/::/\./g;
+   return($appname);
 }
 
 sub ProcessHead
 {
    my ($self,$fh,$rec,$msg)=@_;
    my $d;
-   my $app=$self->getParent->getParent();
-   my $appname="W5Base::".$app->Self;
-   $appname=~s/::/\./g;
-   $d=<<EOF;
+   my $appname=$self->JSON_ObjectName();
+   
+   my $d="";
+   if (!$self->{no_JSON_init}){
+      $d.=<<EOF;
 //================================================
 //
-// target namespace : $appname
+// NameSpace gernerator
 //
 function createNamespace(ns)
 {
    ns="document."+ns;
    var splitNs = ns.split(".");
    var builtNs = splitNs[0];
-   if (typeof(window)=="undefined"){
+   if (typeof(window)==undefined){
       window={};
    }
    var i, base = window;
@@ -172,13 +188,11 @@ function createNamespace(ns)
       }
       base=base[splitNs[i]];
    }
-   window.document.W5Base['LastResult']=function(){
-      return(window.document.$appname.Result);
-   };
    return(base);
 }
 //================================================
 EOF
+   }
    $d.="createNamespace('$appname')['Result']=\n{\n";
    return($d);
 }

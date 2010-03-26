@@ -505,259 +505,259 @@ sub getDetailBlockPriority
 
 
 
-sub getAnalytics
-{
-   my $self=shift;
-   return('Analytics'=>$self->T('Analytics','kernel::App::Web'));
-}
+#sub getAnalytics
+#{
+#   my $self=shift;
+#   return('Analytics'=>$self->T('Analytics','kernel::App::Web'));
+#}
+#
+#sub getValidWebFunctions
+#{
+#   my ($self)=@_;
+#   return($self->SUPER::getValidWebFunctions(),qw(Analytics Store));
+#}
+#
+#
+#sub collectAnalyticsDataObjects
+#{
+#   my $self=shift;
+#   my $q=shift;
+#
+#   my $parentobj=getModuleObject($self->Config,$self->{secparentobj});
+#   my $pidname=$parentobj->IdField->Name();
+#
+#   $self->ResetFilter();
+#   $self->SecureSetFilter($q);
+#   $self->SetCurrentView(qw(parentid));
+#   my $i=$self->getHashIndexed("parentid");
+#
+#   my $interview=getModuleObject($self->Config,"base::interview");
+#   $interview->SetFilter({parentobj=>\$self->{secparentobj}});
+#   $interview->SetCurrentView(qw(interviewcatid));
+#   my $ic=$interview->getHashIndexed("interviewcatid");
+#
+#   if ($self->LastMsg()>0){
+#      return();
+#   }
+#   my @dataobj=({name=>'ianswers',
+#                 dataobj=>$self,
+#                 view   =>[qw(parentid cdate mdate interviewcatid
+#                              qtag answer relevant)]},
+#                {name=>'interview',
+#                 dataobj=>$interview,
+#                 view=>[qw(name id interviewcatid)]},
+#                {name=>'interviewcat',
+#                 dataobj=>getModuleObject($self->Config,"base::interviewcat"),
+#                 filter=>{id=>[keys(%{$ic->{interviewcatid}})]},
+#                 view=>[qw(name id fullname)]},
+#                {name=>'iparent',
+#                 dataobj=>$parentobj,
+#                 filter=>{$pidname=>[keys(%{$i->{parentid}})]},
+#                 view=>[$pidname,@{$self->{analyticview}}]
+#                }
+#                );
+#   return(dataobj=>\@dataobj,
+#          js=>[qw(jquery.js jquery.layout.js sprintf.js 
+#                  analytics.js)],
+#          css=>[qw(base/css/default.css 
+#                   base/css/work.css 
+#                   base/css/jquery.layout.css)],
+#          menu=>['m1'=>{label=>'einfache Analyse der Antwortenanzahl',
+#                        js=>"AnalyticsQCount({base:'',key:'fullname'});"},
+#                 'm2'=>{label=>'Erreichungsgrad analyse',
+#                        js=>"AnalyticsGoal({base:'',key:'fullname'});"}]
+#         );
+#
+#}
+#
+#sub Analytics
+#{
+#   my $self=shift;
+#   my %param;
+#
+#   $self->doFrontendInitialize();
+#   printf("Content-Type: text/html; charset=UTF-8\n\n");
+#
+#   my $d="<html>";
+#   $d.="<head>";
+#
+#
+#   if ($self->validateSearchQuery()){
+#      my %q=$self->getSearchHash();
+#      my %ctl=$self->collectAnalyticsDataObjects(\%q);
+#
+#      $self->AnalyticsSendData({},$ctl{dataobj});
+#
+#      if (0){
+#         $d.="<script type='text/javascript' ";
+#         $d.="src='http://getfirebug.com/releases/lite/1.2/".
+#             "firebug-lite-compressed.js'>";
+#         $d.="</script>";
+#      }
+#      if (ref($ctl{js}) eq "ARRAY"){
+#         foreach my $js (@{$ctl{js}}){
+#            my $instdir=$self->Config->Param("INSTDIR");
+#            my $filename=$instdir."/lib/javascript/".$js;
+#            if (open(F,"<$filename")){
+#               $d.="<script language=\"JavaScript\">\n";
+#               $d.=join("",<F>);;
+#               $d.="</script>\n";
+#               close(F);
+#            }
+#         }
+#      }
+#      if (ref($ctl{css}) eq "ARRAY"){
+#         foreach my $css (@{$ctl{css}}){
+#            my $filename=$self->getSkinFile($css);
+#            if (open(F,"<$filename")){
+#               $d.="<style>\n";
+#               $d.=join("",<F>);;
+#               $d.="</style>\n";
+#               close(F);
+#            }
+#         }
+#      }
+#
+#   $d.=<<EOF;
+#<style type="text/css">
+#   html, body {
+#      width:      100%;
+#      height:     100%;
+#      padding: 0;
+#      margin:     0;
+#      overflow:   hidden;
+#   }
+#   #container{
+#      width:      100%;
+#      height:     100%;
+#      padding: 0;
+#      margin:     0 auto;
+#   }
+#   .ui-layout-pane{
+#       xpadding:3px;
+#       margin:0px;
+#       padding:0px;
+#   }
+#   ul{
+#      margin:0px;
+#      padding:0px;
+#      padding-left:15px;
+#   }
+#   li{
+#      margin-top:5px;
+#   }
+#   .header{
+#      border-bottom-style:solid;
+#      border-width:1px;
+#      border-color:black;
+#      background:gainsboro;
+#      font-weight:bold;
+#      text-align:center;
+#      postion: absoulte;
+#      margin:0;
+#      padding:2px;
+#   }
+#   .sublink{
+#      cursor: pointer;
+#   }
+#   #outpane{
+#      padding:5px;
+#   }
+#   #outheader{
+#      padding-bottom:2px;
+#      font-weight:bold;
+#   }
+#   table.analysedata{
+#      width:100%;border-collapse:collapse;
+#   }
+#   table.analysedata tr th.desc{
+#      text-align:center;
+#      border-bottom-style:solid;
+#      border-bottom-color:black;
+#   }
+#   table.analysedata tr th{
+#      text-align:left;
+#   }
+#   table.analysedata tr{
+#      border-bottom-style:solid;
+#      border-bottom-color:silver;
+#      border-bottom-width:1px;
+#   }
+#</style>
+#EOF
+#
+#
+#
+#      $d.="</head><body>";
+#$d.=<<EOF;
+#<div id="container">
+#   <div id="outpane" class="pane ui-layout-center">
+#      <div id="outheader"></div>
+#      <div id="out">[ select your analyse ]</div>
+#   </div>
+#   <div class="pane ui-layout-west">
+#<div class="header">Analyseverfahren</div>
+#<ul>
+#EOF
+#   my @m=@{$ctl{'menu'}};
+#   while(my $key=shift(@m)){
+#      my $m=shift(@m);
+#      $d.="<li><span id=\"$key\" class=sublink onclick=\"".$m->{js}."\">".
+#          $m->{label}."</span></li>";
+#   }
+#$d.=<<EOF;
+#</ul>
+#</div>
+#</div>
+#
+#   <script type="text/javascript">
+#
+#   \$(document).ready(function () {
+#      var l=\$('#container').layout({
+#      });
+#   });
+#
+#   </script>
+#
+#
+#
+#
+#EOF
+#      print $d;
+#   }
+#   else{
+#      printf("problem\n");
+#   }
+#
+#
+#   print("</body></html>");
+#}
 
-sub getValidWebFunctions
-{
-   my ($self)=@_;
-   return($self->SUPER::getValidWebFunctions(),qw(Analytics Store));
-}
-
-
-sub collectAnalyticsDataObjects
-{
-   my $self=shift;
-   my $q=shift;
-
-   my $parentobj=getModuleObject($self->Config,$self->{secparentobj});
-   my $pidname=$parentobj->IdField->Name();
-
-   $self->ResetFilter();
-   $self->SecureSetFilter($q);
-   $self->SetCurrentView(qw(parentid));
-   my $i=$self->getHashIndexed("parentid");
-
-   my $interview=getModuleObject($self->Config,"base::interview");
-   $interview->SetFilter({parentobj=>\$self->{secparentobj}});
-   $interview->SetCurrentView(qw(interviewcatid));
-   my $ic=$interview->getHashIndexed("interviewcatid");
-
-   if ($self->LastMsg()>0){
-      return();
-   }
-   my @dataobj=({name=>'ianswers',
-                 dataobj=>$self,
-                 view   =>[qw(parentid cdate mdate interviewcatid
-                              qtag answer relevant)]},
-                {name=>'interview',
-                 dataobj=>$interview,
-                 view=>[qw(name id interviewcatid)]},
-                {name=>'interviewcat',
-                 dataobj=>getModuleObject($self->Config,"base::interviewcat"),
-                 filter=>{id=>[keys(%{$ic->{interviewcatid}})]},
-                 view=>[qw(name id fullname)]},
-                {name=>'iparent',
-                 dataobj=>$parentobj,
-                 filter=>{$pidname=>[keys(%{$i->{parentid}})]},
-                 view=>[$pidname,@{$self->{analyticview}}]
-                }
-                );
-   return(dataobj=>\@dataobj,
-          js=>[qw(jquery.js jquery.layout.js sprintf.js 
-                  analytics.js)],
-          css=>[qw(base/css/default.css 
-                   base/css/work.css 
-                   base/css/jquery.layout.css)],
-          menu=>['m1'=>{label=>'einfache Analyse der Antwortenanzahl',
-                        js=>"AnalyticsQCount({base:'',key:'fullname'});"},
-                 'm2'=>{label=>'Erreichungsgrad analyse',
-                        js=>"AnalyticsGoal({base:'',key:'fullname'});"}]
-         );
-
-}
-
-sub Analytics
-{
-   my $self=shift;
-   my %param;
-
-   $self->doFrontendInitialize();
-   printf("Content-Type: text/html; charset=UTF-8\n\n");
-
-   my $d="<html>";
-   $d.="<head>";
-
-
-   if ($self->validateSearchQuery()){
-      my %q=$self->getSearchHash();
-      my %ctl=$self->collectAnalyticsDataObjects(\%q);
-
-      $self->AnalyticsSendData({},$ctl{dataobj});
-
-      if (0){
-         $d.="<script type='text/javascript' ";
-         $d.="src='http://getfirebug.com/releases/lite/1.2/".
-             "firebug-lite-compressed.js'>";
-         $d.="</script>";
-      }
-      if (ref($ctl{js}) eq "ARRAY"){
-         foreach my $js (@{$ctl{js}}){
-            my $instdir=$self->Config->Param("INSTDIR");
-            my $filename=$instdir."/lib/javascript/".$js;
-            if (open(F,"<$filename")){
-               $d.="<script language=\"JavaScript\">\n";
-               $d.=join("",<F>);;
-               $d.="</script>\n";
-               close(F);
-            }
-         }
-      }
-      if (ref($ctl{css}) eq "ARRAY"){
-         foreach my $css (@{$ctl{css}}){
-            my $filename=$self->getSkinFile($css);
-            if (open(F,"<$filename")){
-               $d.="<style>\n";
-               $d.=join("",<F>);;
-               $d.="</style>\n";
-               close(F);
-            }
-         }
-      }
-
-   $d.=<<EOF;
-<style type="text/css">
-   html, body {
-      width:      100%;
-      height:     100%;
-      padding: 0;
-      margin:     0;
-      overflow:   hidden;
-   }
-   #container{
-      width:      100%;
-      height:     100%;
-      padding: 0;
-      margin:     0 auto;
-   }
-   .ui-layout-pane{
-       xpadding:3px;
-       margin:0px;
-       padding:0px;
-   }
-   ul{
-      margin:0px;
-      padding:0px;
-      padding-left:15px;
-   }
-   li{
-      margin-top:5px;
-   }
-   .header{
-      border-bottom-style:solid;
-      border-width:1px;
-      border-color:black;
-      background:gainsboro;
-      font-weight:bold;
-      text-align:center;
-      postion: absoulte;
-      margin:0;
-      padding:2px;
-   }
-   .sublink{
-      cursor: pointer;
-   }
-   #outpane{
-      padding:5px;
-   }
-   #outheader{
-      padding-bottom:2px;
-      font-weight:bold;
-   }
-   table.analysedata{
-      width:100%;border-collapse:collapse;
-   }
-   table.analysedata tr th.desc{
-      text-align:center;
-      border-bottom-style:solid;
-      border-bottom-color:black;
-   }
-   table.analysedata tr th{
-      text-align:left;
-   }
-   table.analysedata tr{
-      border-bottom-style:solid;
-      border-bottom-color:silver;
-      border-bottom-width:1px;
-   }
-</style>
-EOF
-
-
-
-      $d.="</head><body>";
-$d.=<<EOF;
-<div id="container">
-   <div id="outpane" class="pane ui-layout-center">
-      <div id="outheader"></div>
-      <div id="out">[ select your analyse ]</div>
-   </div>
-   <div class="pane ui-layout-west">
-<div class="header">Analyseverfahren</div>
-<ul>
-EOF
-   my @m=@{$ctl{'menu'}};
-   while(my $key=shift(@m)){
-      my $m=shift(@m);
-      $d.="<li><span id=\"$key\" class=sublink onclick=\"".$m->{js}."\">".
-          $m->{label}."</span></li>";
-   }
-$d.=<<EOF;
-</ul>
-</div>
-</div>
-
-   <script type="text/javascript">
-
-   \$(document).ready(function () {
-      var l=\$('#container').layout({
-      });
-   });
-
-   </script>
-
-
-
-
-EOF
-      print $d;
-   }
-   else{
-      printf("problem\n");
-   }
-
-
-   print("</body></html>");
-}
-
-sub AnalyticsSendData
-{
-   my $self=shift;
-   my $param=shift;
-   my $data=shift;
-   my %param=%$param;
-
-   foreach my $d (@$data){
-      my $dataobj=$d->{dataobj};
-      my $output=new kernel::Output($dataobj);
-      if (exists($d->{name})){
-         $param{'AnalyticsDataName'}=$d->{name};
-      }
-      if ($output->setFormat("Analytics",%param)){
-         if (exists($d->{filter})){
-            $dataobj->SecureSetFilter($d->{filter});
-         }
-         if (exists($d->{view})){
-            $dataobj->SetCurrentView(@{$d->{view}});
-         }
-         $dataobj->SetCurrentOrder(qw(NONE));
-         $output->WriteToStdout(HttpHeader=>0);
-      }
-   }
-}
+#sub AnalyticsSendData
+#{
+#   my $self=shift;
+#   my $param=shift;
+#   my $data=shift;
+#   my %param=%$param;
+#
+#   foreach my $d (@$data){
+#      my $dataobj=$d->{dataobj};
+#      my $output=new kernel::Output($dataobj);
+#      if (exists($d->{name})){
+#         $param{'AnalyticsDataName'}=$d->{name};
+#      }
+#      if ($output->setFormat("Analytics",%param)){
+#         if (exists($d->{filter})){
+#            $dataobj->SecureSetFilter($d->{filter});
+#         }
+#         if (exists($d->{view})){
+#            $dataobj->SetCurrentView(@{$d->{view}});
+#         }
+#         $dataobj->SetCurrentOrder(qw(NONE));
+#         $output->WriteToStdout(HttpHeader=>0);
+#      }
+#   }
+#}
 
 
 

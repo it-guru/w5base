@@ -13,6 +13,7 @@ body {
    font-family:Arial,Adobe Helvetica,Helvetica;
    font-size:12px;
    text-decoration:none;
+   background: white;
 }
 
 /*
@@ -29,7 +30,6 @@ fieldset {
  */
 .slide {
     display: none;
-    background: white;
 }
 
 /*

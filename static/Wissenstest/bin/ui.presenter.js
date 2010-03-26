@@ -261,7 +261,6 @@ function initNavigator()
    $("#reload").click(addReloadMethod);
 
    positionSlide(currentSlide);  
-   document.body.style.zoom = document.height/600;
 }
 
 

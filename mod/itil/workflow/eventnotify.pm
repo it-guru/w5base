@@ -1071,8 +1071,10 @@ sub getNotificationSubject
    }
    if ($WfRec->{eventmode} eq "EVk.bprocess"){ 
       my $bp=$WfRec->{affectedbusinessprocess};
-      $bp=$WfRec->{affectedbusinessprocess}->[0] if (ref($WfRec->{affectedbusinessprocess}));
-      $subject2=" / Process / $state Incident / $bp / ".
+      if (ref($WfRec->{affectedbusinessprocess})){
+         $bp=$WfRec->{affectedbusinessprocess}->[0];
+      }
+      $subject2=" / $state Incident / $bp / ".
                 $self->getParent->T("Businessprocess")." /";
    }
    if ($WfRec->{eventmode} eq "EVk.infraloc"){ 
@@ -1100,7 +1102,9 @@ sub getNotificationSubject
    }
    if ($action eq "rootcausei" && $WfRec->{eventmode} eq "EVk.bprocess"){
       my $bp=$WfRec->{affectedbusinessprocess};
-      $bp=$WfRec->{affectedbusinessprocess}->[0] if (ref($WfRec->{affectedbusinessprocess}));
+      if (ref($WfRec->{affectedbusinessprocess})){
+         $bp=$WfRec->{affectedbusinessprocess}->[0];
+      }
       $subject2=" / $bp / ".$self->getParent->T("rootcause analysis").
                 " / ".$self->getParent->T("Businessprocess")." /";
    }
