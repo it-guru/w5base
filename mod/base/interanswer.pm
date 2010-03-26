@@ -114,6 +114,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'questclust',
                 label         =>'Questiongroup',
+                readonly      =>1,
                 group         =>'qrelation',
                 dataobjattr   =>'interview.questclust'),
 

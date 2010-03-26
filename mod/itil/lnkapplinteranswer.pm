@@ -52,6 +52,7 @@ sub new
       new kernel::Field::Import( $self,
                 vjointo       =>'itil::appl',
                 dontrename    =>1,
+                readonly      =>1,
                 group         =>'relation',
                 uploadable    =>0,
                 fields        =>[qw(businessteam businessteamid 
