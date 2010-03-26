@@ -62,9 +62,7 @@ sub new
    );
 
 
-   $self->getField("parentid")->{dataobjattr}='appl.id';
    $self->getField("parentobj")->{searchable}=0;
-   $self->getField("parentid")->{searchable}=0;
    $self->{secparentobj}='itil::appl';
    $self->{analyticview}=['name','interviewst'];
    $self->setDefaultView(qw(parentname mandator relevant name 

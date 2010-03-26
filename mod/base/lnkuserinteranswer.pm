@@ -79,7 +79,6 @@ sub new
 
 
 
-   $self->getField("parentid")->{dataobjattr}='contact.userid';
    $self->getField("parentobj")->{searchable}=0;
    $self->getField("parentid")->{searchable}=0;
    $self->{secparentobj}='base::user';

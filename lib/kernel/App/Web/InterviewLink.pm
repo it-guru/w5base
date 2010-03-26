@@ -38,7 +38,9 @@ sub HtmlInterviewLink
                                  js=>['toolbox.js',
                                       'jquery.js',
                                       'jquery.ui.js',
-                                      'firebug-lite.js',
+                                      'jquery.ui.widget.js',
+                                      'jquery.ui.dataCube.js',
+                                     # 'firebug-lite.js',
                                       'jquery.locale.js'],
                                  style=>['default.css','work.css',
                                          'Output.HtmlDetail.css',
@@ -331,17 +333,30 @@ EOF
    $d.="<table border=0 width=97%><tr><td width=5>&nbsp;</td>";
    $d.="<td align=left>".$label."</td>";
    $d.="<td align=right width=1%>".$s."</td><td width=20>".
-       $help."</td></tr></table>";
+       $help."</td>".
+       "<td width=20 nowrap><input type=submit value=\"R\"></td>".
+       "</tr></table>";
    $d.="</div>";
    $d.=sprintf("<input type=hidden name=$idname value=\"%s\">",$id);
    $d.=sprintf("<input type=hidden id=parentid value=\"%s\">",$id);
    $d.=sprintf("<input type=hidden id=parentobj value=\"%s\">",
                $self->SelfAsParentObject);
-      $d.="<input type=submit>";
    $d.="</form>";
 
    if ($imode eq "analyses"){
       $d.="<script language=\"JavaScript\">";
+      my $parentobj=$self->SelfAsParentObject();
+      my $interview=getModuleObject($self->Config,"base::interview");
+      $interview->SetFilter({parentobj=>\$parentobj});
+
+      my $output=new kernel::Output($interview);
+      if ($output->setFormat("JSON")){
+         $interview->SetCurrentView(qw(name id questclust queryblock));
+         $d.=$output->WriteToScalar(HttpHeader=>0);
+      }
+      #
+      # send Interview State
+      #
       $self->ResetFilter();
       $self->SetFilter({$idname=>\$id});
 
@@ -351,22 +366,35 @@ EOF
          $d.=$output->WriteToScalar(HttpHeader=>0);
       }
       $d.="</script>";
+      $d.="<script src=\"../../../public/base/load/InterviewLink.js\">";
+      $d.="</script>";
       $d.="<script language=\"JavaScript\">";
       $d.=<<EOF;
-//#
-//#for (i in W5Base.AL_TCom.appl.Result){
-//#      d+="<tr>";
-//#      d+="<th width=1% nowrap>"+iparent[i][key]+"</td>";
-//#
-//#
-//#
-//#}
-\$(document).ready(function(){
-   console.log(window.document.W5Base);
+var Cube;
+var Cube1;
+var Cube2;
+
+\$(document).ready(function (parentid){
+   Cube1=new Array();
+   Cube2=new Array();
+   for (id in document.W5Base.base.interview){
+     var a=document.W5Base.last['$id'].interviewst.qStat.questStat[id];
+     if (a!=undefined){
+       var o=new Object({label:document.W5Base.base.interview[id].queryblock,
+                         value:a});
+       Cube1.push(o);
+
+       var o=new Object({label:document.W5Base.base.interview[id].queryblock,
+                         value:a});
+       Cube2.push(o);
+     }
+   }
+   Cube=\$("#out").dataCube({value:Cube1,
+                             label:"ThatsIT"});
 });
 EOF
       $d.="</script>";
-      $d.="<div id=analyses></div>";
+      $d.="<div id=\"out\"></div>";
    }
    else{
       my $lastquestclust;

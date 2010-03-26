@@ -181,7 +181,10 @@ sub prepUploadRecord
    my $self=shift;
    my $newrec=shift;
 
-   if (!exists($newrec->{id}) || $newrec->{id} eq ""){
+   my $idfield=$self->IdField();
+   my $idname=$idfield->Name();
+   
+   if (!exists($newrec->{$idname}) || $newrec->{$idname} eq ""){
       if (exists($newrec->{qtag}) && $newrec->{qtag} ne "" &&
           exists($newrec->{parentname}) && $newrec->{parentname} ne ""){
          my $fobj=$self->getField("parentname");
@@ -189,9 +192,9 @@ sub prepUploadRecord
             my $i=$self->Clone();
             $i->SetFilter({qtag=>\$newrec->{qtag},
                            parentname=>\$newrec->{parentname}});
-            my ($rec,$msg)=$i->getOnlyFirst(qw(id));
+            my ($rec,$msg)=$i->getOnlyFirst($idname);
             if (defined($rec)){
-               $newrec->{id}=$rec->{id};
+               $newrec->{$idname}=$rec->{$idname};
                delete($newrec->{qtag});
                delete($newrec->{parentname});
             }

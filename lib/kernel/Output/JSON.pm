@@ -142,11 +142,11 @@ sub ProcessLine
 sub ProcessBottom
 {
    my ($self,$fh,$rec,$msg)=@_;
-   my $appname=$self->JSON_ObjectName();
+   my ($objectname,$propname)=$self->JSON_ObjectName();
    my $d;
    my $app=$self->getParent->getParent();
-   $d="};\n";
-  # $d="Window.W5Base.Last=Window.$appname;\n";
+   $d="};\n\n";
+   $d.="window.document.W5Base['last']=window.document.$objectname.$propname;\n";
    return($d);
 }
 
@@ -157,14 +157,15 @@ sub JSON_ObjectName
    my $app=$self->getParent->getParent();
    my $appname="W5Base::".$app->Self;
    $appname=~s/::/\./g;
-   return($appname);
+   my ($objectname,$propname)=$appname=~/^(.*)\.([^\.]+)$/;
+   return($objectname,$propname);
 }
 
 sub ProcessHead
 {
    my ($self,$fh,$rec,$msg)=@_;
    my $d;
-   my $appname=$self->JSON_ObjectName();
+   my ($objectname,$propname)=$self->JSON_ObjectName();
    
    my $d="";
    if (!$self->{no_JSON_init}){
@@ -193,7 +194,7 @@ function createNamespace(ns)
 //================================================
 EOF
    }
-   $d.="createNamespace('$appname')['Result']=\n{\n";
+   $d.="createNamespace('$objectname')['$propname']=\n{\n";
    return($d);
 }
 

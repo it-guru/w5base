@@ -200,7 +200,7 @@ sub new
                 group         =>'tech',
                 dataobjattr   =>'effectonmtbf'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'queryblock',
                 label         =>'Question categorie',
                 dataobjattr   =>'interviewcat.fullname'),
