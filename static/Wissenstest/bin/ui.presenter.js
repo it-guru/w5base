@@ -205,8 +205,16 @@ function addReloadMethod()
 function addIndexMethod()
 {
    var d="";
+   var oldc;
    for(i=1;i<slideArray.length;i++){
-      d+="Slide:"+i+"<br>";
+      var t=slideArray[i].attr("title");
+      var c=slideArray[i].attr("category");
+      if (c!=oldc){
+         d+="<b>"+c+"</b><br>";
+      }
+      oldc=c;
+      d+="<span style=\"cursor:pointer;color:darkblue\" "+
+         "onclick=\"positionSlide("+i+");\">Slide "+i+"</span>: "+t+"<br>";
    }
    if (slideArray.length>10){
       d="<div style='height:150px;overflow:auto'>"+d+"</div>";

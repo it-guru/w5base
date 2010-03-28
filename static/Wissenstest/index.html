@@ -19,7 +19,8 @@
 <body>
 
 
-<div class="slide" category="System und Administration">
+<div class="slide" category="System und Administration"
+                   title="Useradministration">
  <div class="question">
   Systemadministration: Useradministration
  </div>
@@ -50,7 +51,7 @@
 
 
 <div class="slide" category="System und Administration"
-                   title="SQL Frage 2">
+                   title="SQL Datensatzanzahl">
  <div class="question">
   SQL: MySQL
  </div>
@@ -64,8 +65,8 @@
 
 
 
-<div class="slide" category="System und Administration"
-                   title="SQL Frage 2">
+<div class="slide" category="Programmierung"
+                   title="Perl5 Code Analyse">
  <div class="question">
   Programmierung: Perl5
  </div>
@@ -85,7 +86,52 @@ print $v."\n";
 
 
 
-<div class="slide" category="System und Administration">
+<div class="slide" category="Programmierung"
+                   title="Perl5 Code Analyse">
+ <div class="question">
+  Programmierung: Perl5
+ </div>
+ <div class="comments">
+  Was ist an dem folgenden Code falsch oder f&uuml;hrt zu einem
+  Ausf&uuml;hrungsfehler?
+<pre class=code>
+#!/usr/bin/env perl
+my @v=qw(Hallo dies ist ein Test);
+my $v=[qw(Hallo Welt)];
+if (!grep(/^Welt$/,@v)){
+   push(@v,"!")
+}
+printf("Out1:%s\n",join(" ",@$v));
+printf("Out2:%s\n",join(" ",@v));
+</pre>
+ </div>
+</div>
+
+
+
+<div class="slide" category="Programmierung"
+                   title="JavaScript - jQuery">
+ <div class="question">
+  Programmierung: jQuery
+ </div>
+ <div class="comments">
+  Was bewiken die folgenden Programmcode Zeilen?
+<pre class=code>
+&lt;script language="JavaScript"&gt;
+   $("div").css({'border-width':'2px',
+            'border-color':'red',
+            'border-style':'solid'});
+   $("#div").val("Inhalt");
+   $(".div").height("10px");
+&lt;/script"&gt;
+</pre>
+ </div>
+</div>
+
+
+
+<div class="slide" category="System und Administration"
+                   title="Unix Grundwissen">
  <div class="question">Systemadministration: Grundwissen</div>
  <div class="comments">
   Starten Sie eine Texteditor (vorzugsweise VI):
