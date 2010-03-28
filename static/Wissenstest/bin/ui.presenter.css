@@ -464,8 +464,10 @@ div.help{
    padding-top:15px;
    color:darkblue;
 }
-pre.code{
+pre{
    color:darkred;
+}
+pre.code{
    border-left-style:solid;
    border-left-width:1px;
    border-left-color:gray;
