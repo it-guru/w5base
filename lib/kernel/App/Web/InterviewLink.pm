@@ -40,7 +40,7 @@ sub HtmlInterviewLink
                                       'jquery.ui.js',
                                       'jquery.ui.widget.js',
                                       'jquery.ui.dataCube.js',
-                                     # 'firebug-lite.js',
+                                    #  'firebug-lite.js',
                                       'jquery.locale.js'],
                                  style=>['default.css','work.css',
                                          'Output.HtmlDetail.css',
@@ -332,9 +332,9 @@ EOF
    $d.="<div class=header>";
    $d.="<table border=0 width=97%><tr><td width=5>&nbsp;</td>";
    $d.="<td align=left>".$label."</td>";
-   $d.="<td align=right width=1%>".$s."</td><td width=20>".
+   $d.="<td align=right width=1%>".$s."</td><td width=10>".
        $help."</td>".
-       "<td width=20 nowrap><input type=submit value=\"R\"></td>".
+       "<td width=10 nowrap><img style=\"cursor:pointer\" onclick=\"document.forms[0].submit();\" src=\"../../../public/base/load/reload.gif\"></td>".
        "</tr></table>";
    $d.="</div>";
    $d.=sprintf("<input type=hidden name=$idname value=\"%s\">",$id);
@@ -366,42 +366,45 @@ EOF
          $d.=$output->WriteToScalar(HttpHeader=>0);
       }
       $d.="</script>";
-      $d.="<script src=\"../../../public/base/load/InterviewLink.js\">";
-      $d.="</script>";
-      $d.="<table border=1><tr>";
-      $d.="<td><input type=button id=Cube1 value=\"Category\"></td>";
-      $d.="<td><input type=button id=Cube2 value=\"Questiongroup\"></td>";
-      $d.="</tr></table>";
       $d.="<script language=\"JavaScript\">";
       $d.=<<EOF;
 var Cube;
-var Cube1;
-var Cube2;
-
 \$(document).ready(function (parentid){
-   Cube1=new Array();
-   Cube2=new Array();
+   Cube=new Array();
    for (id in document.W5Base.base.interview){
      var a=document.W5Base.last['$id'].interviewst.qStat.questStat[id];
      if (a!=undefined){
-       var o=new Object({label:document.W5Base.base.interview[id].queryblock,
+       var o=new Object({qb:document.W5Base.base.interview[id].queryblock,
+                         qg:document.W5Base.base.interview[id].questclust,
+                         weight:1,
                          value:a});
-       Cube1.push(o);
-
-       var o=new Object({label:document.W5Base.base.interview[id].questclust,
-                         value:a});
-       Cube2.push(o);
+       Cube.push(o);
      }
    }
-   \$("#Cube1").click(function(){
-      \$("#out").dataCube({value:Cube1,
-                                label:\$(this).val()});
-   });
-   \$("#Cube2").click(function(){
-      \$("#out").dataCube({value:Cube2,
-                           label:\$(this).val()});
-   });
-   \$("#Cube1").click();
+   var c={value:Cube,
+          currentFilter:0,
+          unit:'%',
+          filter:[{key:'qb',
+                   label:'Kategorie',
+                   levelSeperator:'.',
+                   dyncss:[{range:[0,30],  cssclass:'interview-analyse-red'},
+                           {range:[90,100],cssclass:'interview-analyse-green'}],
+                   currentKey:''
+                  },
+                  {key:'qg',
+                   label:'Fragegruppe',
+                   dyncss:[{range:[0,30],  cssclass:'interview-analyse-red'},
+                           {range:[90,100],cssclass:'interview-analyse-green'}],
+                   currentKey:''}
+                 ]
+   };
+
+
+
+
+
+   \$("#out").dataCube(c);
+
 });
 EOF
       $d.="</script>";

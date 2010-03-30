@@ -124,3 +124,67 @@ div.Pseg0{
    cursor:crosshair;
 }
 
+.ui-dataCube{
+   padding:5px;
+}
+
+.ui-dataCube-dataline{
+   border-bottom-style:solid;
+   border-bottom-width:1px;
+   border-bottom-color:black;
+   border-top-style:solid;
+   border-top-width:1px;
+   border-top-color:black;
+}
+
+.ui-dataCube-dataline-label{
+
+}
+
+.ui-dataCube-value{
+   border: 1px solid #e78f08; 
+   background: #f6a828 url(images/ui-bg_gloss-wave_35_f6a828_500x100.png) 50% 50% repeat-x; 
+   color: #ffffff; 
+   font-weight: bold;
+   -moz-border-radius-topleft: 4px; 
+   -webkit-border-top-left-radius: 4px; 
+   -moz-border-radius-bottomleft: 4px; 
+   -webkit-border-bottom-left-radius: 4px;
+}
+
+.ui-dataCube-dataline-value{
+
+}
+
+.ui-dataCube-filter{
+   border-style:solid;
+   border-width:2px;
+   border-color:black;
+   padding:2px;
+   margin-bottom:15px;
+}
+
+.ui-dataCube-filterline{
+   border-bottom-style:solid;
+   border-bottom-width:1px;
+   border-bottom-color:gray;
+}
+
+.ui-dataCube-filterline-label{
+
+}
+
+.ui-dataCube-filterline-value{
+
+}
+
+.interview-analyse-red{
+   background-color:red;
+   background: red; 
+}
+
+.interview-analyse-green{
+   background: green; 
+   border-color:green;
+}
+

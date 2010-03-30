@@ -56,9 +56,13 @@
 <div class="navItem"><a target=_top href="http://q4dee1sy121.ffm.t-systems.com/sc-prod/index.do?lang=en" title="ServiceCenter Web-Interface">ServiceCenter</a>
 </div>
 
+
+<div class="navItem" style="width:50px"><a target=work href="http://sioux.t-systems.com" title="Skill Management">SIUOX</a>
+</div>
+
 <div class="navItem"><a target=work href="http://youandme.telekom.de" title="YOU and ME - auch wenns eigentlich keiner braucht">YOU and ME</a>
 </div>
-%rootpath%
+
 <div align=right>
 %GLOBALHELP()%
 </div>
