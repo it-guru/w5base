@@ -125,6 +125,12 @@ iframe.popupFrame {
 	position: relative;
 	z-index: 203;
 }
+#LoggedInAs{
+        cursor: pointer;
+}
+#ModuleObjectInfo{
+        cursor: pointer;
+}
 #popupTitle {
 	float:left;
 	font-size: 1.1em;

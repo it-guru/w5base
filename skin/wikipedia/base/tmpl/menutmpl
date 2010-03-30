@@ -1,5 +1,5 @@
 <img id=ecklogo style="top:0px;left:1px;position:absolute" src="%rootpath%../../../public/base/load/ecklogobottom.jpg">
-<div id=mstart style="background:#ffffff;top:114px;width:170px;overflow:hidden;position:absolute;border-style:solid;border-width:1px;border-color:silver;border-left-style:none">
+<div id=mstart style="background:#ffffff;top:114px;width:180px;overflow:hidden;position:absolute;border-style:solid;border-width:1px;border-color:silver;border-left-style:none">
 %menutab%
 </div>
 <script language="JavaScript">
