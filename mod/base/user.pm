@@ -934,24 +934,24 @@ sub isViewValid
    #   push(@pic,"picture");
    #}
    if ($self->IsMemberOf("admin")){
-      push(@pic,"picture","roles","interview","qc");
+      push(@pic,"picture","roles","interview");
    }
    if ($rec->{usertyp} eq "extern"){
       @gl=qw(header name default comments groups userro control 
-                office private);
+                office private qc);
    }  
    elsif ($rec->{usertyp} eq "function"){
       if ($self->IsMemberOf("admin")){
          @gl=qw(header name default nativcontact comments 
-                   control userro);
+                   control userro qc);
       }
       else{
-         @gl=qw(header name default nativcontact comments userro);
+         @gl=qw(header name default nativcontact comments userro qc);
       }
    }  
    elsif ($rec->{usertyp} eq "service"){
       @gl=qw(header name default comments groups usersubst userro 
-                control userparam);
+                control userparam qc);
    }  
    else{
       @gl=(@pic,
