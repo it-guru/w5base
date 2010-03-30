@@ -934,7 +934,7 @@ sub isViewValid
    #   push(@pic,"picture");
    #}
    if ($self->IsMemberOf("admin")){
-      push(@pic,"picture","roles","interview");
+      push(@pic,"picture","roles","interview","qc");
    }
    if ($rec->{usertyp} eq "extern"){
       @gl=qw(header name default comments groups userro control 
@@ -969,7 +969,6 @@ sub isViewValid
       elsif ($secstate<4){
          @gl=grep(/^(name|header|office|officeacc|private|default|groups|comments|nativcontact|qc)$/,@gl);
       }
-     
    }
    if ($userid==$rec->{userid}){
       push(@gl,"personrelated","interview");
