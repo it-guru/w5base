@@ -191,11 +191,9 @@ iframe.popupFrame {
 }
 #LoggedInAs{
 	cursor: pointer;
-	cursor: hand;
 }
 #ModuleObjectInfo{
 	cursor: pointer;
-	cursor: hand;
 }
 #popupTitle {
 	float:left;
