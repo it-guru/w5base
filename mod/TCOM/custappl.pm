@@ -410,6 +410,15 @@ sub new
                 dataobjattr   =>'appl.additional'),
 
    );
+   $self->{workflowlink}={ workflowkey=>[id=>'affectedapplicationid']
+                         };
+   $self->{workflowlink}->{workflowtyp}=[qw(itil::workflow::devrequest
+                                            AL_TCom::workflow::businesreq
+                                            THOMEZMD::workflow::businesreq
+                                            AL_TCom::workflow::change
+                                            AL_TCom::workflow::eventnotify
+                                            AL_TCom::workflow::incident)];
+
    $self->{history}=[qw(insert modify delete)];
 
    $self->setDefaultView(qw(name custname cistatus));
