@@ -58,6 +58,7 @@
 'Networkarea'=>{de=>'Netzbereich'},
 'Application'=>{de=>'Applikation'},
 'Businessprocess'=>{de=>'Geschäftsprozess'},
+'Businessprocess label'=>{de=>'Geschäftsprozess- Bezeichnung'},
 'Location'=>{de=>'Standort'},
 'rootcause analysis'=>{de=>'Ursachenanalyse'},
 'Affected Region'=>{de=>'betroffene Region'},
@@ -139,18 +140,21 @@
 
 'SALUTATION05.open'=>{
  'de'=>"Sehr geehrte Damen und Herren,\n\n".
-       "im Folgenden erhalten Sie den aktuellen Stand zum Ereignis\n".
-       'im Umfeld des Geschäftsprozesses.',
+       "im Folgenden erhalten Sie den aktuellen Stand zum Ereignis im Umfeld\n".
+       'des Geschäftsprozesses "%s".',
  'en'=>"Dear Sir or Madam,\n\n".
        "in the following mail you receive the actual status about an\n".
-       "incident in the business process."
+       'incident in the business process "%s".'
 },
 'SALUTATION05.close'=>{
  'de'=>"Sehr geehrte Damen und Herren,\n\n".
-       "die Beeinträchtigungen im Umfeld des\n".
-       'Geschäftsprozesses sind beseitigt.',
+       "die Beeinträchtigungen im Umfeld des Geschäftsprozesses\n".
+       '"%s" sind '.
+       "\nbeseitigt.",
  'en'=>"Dear Sir or Madam,\n\n".
-       "the incident in the environment of the business process was taken care of."
+       "the incident in the environment of the \n".
+       "business process '%s' ".
+       "was taken care of."
 },
 
 'SALUTATION10'=>{

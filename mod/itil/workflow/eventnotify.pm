@@ -200,6 +200,16 @@ sub getDynamicFields
                 depend        =>['eventmode'],
                 label         =>'Businessprocess'),
 
+      new kernel::Field::Text(  
+                name          =>'affectedbusinessprocessname',
+                container     =>'headref',
+                multiple      =>0,
+                group         =>'eventnotifyshort',
+                uivisible     =>\&calcVisibility,
+                htmldetail    =>0,
+                depend        =>['eventmode'],
+                label         =>'Businessprocess label'),
+
       new kernel::Field::Text(
                 name          =>'affecteditemprio',
                 container     =>'headref',
@@ -1074,6 +1084,7 @@ sub getNotificationSubject
       if (ref($WfRec->{affectedbusinessprocess})){
          $bp=$WfRec->{affectedbusinessprocess}->[0];
       }
+      $bp=~s/\@/ \/ /g;
       $subject2=" / $state Incident / $bp / ".
                 $self->getParent->T("Businessprocess")." /";
    }
@@ -1105,6 +1116,7 @@ sub getNotificationSubject
       if (ref($WfRec->{affectedbusinessprocess})){
          $bp=$WfRec->{affectedbusinessprocess}->[0];
       }
+      $bp=~s/\@/ \/ /g;
       $subject2=" / $bp / ".$self->getParent->T("rootcause analysis").
                 " / ".$self->getParent->T("Businessprocess")." /";
    }
@@ -1155,9 +1167,11 @@ sub getSalutation
    }elsif($WfRec->{eventmode} eq "EVk.net"){   
       $salutation=sprintf($self->T("SALUTATION04.open"));
    }elsif ($WfRec->{eventmode} eq "EVk.bprocess" && $eventstat==17){
-      $salutation=sprintf($self->T("SALUTATION05.close"));
+      my $bp=$WfRec->{affectedbusinessprocessname};
+      $salutation=sprintf($self->T("SALUTATION05.close"),$bp);
    }elsif($WfRec->{eventmode} eq "EVk.bprocess"){   
-      $salutation=sprintf($self->T("SALUTATION05.open"));
+      my $bp=$WfRec->{affectedbusinessprocessname};
+      $salutation=sprintf($self->T("SALUTATION05.open"),$bp);
    }
    if ($action eq "rootcausei"){
       $salutation=sprintf($self->T("SALUTATION10"));
@@ -1207,6 +1221,8 @@ sub generateMailSet
    }
    if ($WfRec->{eventmode} eq "EVk.bprocess"){
       push(@baseset,"wffields.affectedbusinessprocess");
+      push(@baseset,"wffields.affectedbusinessprocessname");
+      push(@baseset,"wffields.affectedcustomer");
    }
 
 
@@ -2042,37 +2058,18 @@ sub nativProcess
          }
          $bp->SetFilter({cistatusid=>"<5",id=>$h->{affectedbusinessprocessid}});
          my ($prec,$msg)=$bp->getOnlyFirst(qw(name customer customerid 
-                                              mandator mandatorid 
+                                              mandator mandatorid fullname
                                               eventlang customerprio
                                               custcontracts id));
          if (defined($prec)){
           #  $app=$arec->{name};
-          #  $h->{affectedapplicationid}=[$arec->{id}];   
-          #  $h->{affectedapplication}=[$arec->{name}];   
+            $h->{affectedbusinessprocessname}=$prec->{fullname};   
             $h->{mandatorid}=[$prec->{mandatorid}];   
             $h->{mandator}=[$prec->{mandator}];   
-          #  $h->{involvedbusinessteam}=[$arec->{businessteam}];
-          #  $h->{involvedresponseteam}=[$arec->{businessteam}];
-          #  $h->{involvedcostcenter}=[$arec->{conumber}];
             $h->{eventlang}=$prec->{eventlang};
-          #  $h->{affecteditemprio}=$arec->{customerprio};
-          #  my @custcontract;
-          #  my @custcontractid;
             if (!$self->getParent->ValidateCreate($h)){
                return(0);
             }
-          #  foreach my $contr (@{$arec->{custcontracts}}){
-          #     push(@custcontract,$contr->{custcontract});
-          #     push(@custcontractid,$contr->{custcontractid});
-          #  }
-          #  if ($#custcontractid!=-1){
-          #     $h->{affectedcontract}=\@custcontract;
-          #     $h->{affectedcontractid}=\@custcontractid;
-          #  }
-          #  else{
-          #     delete($h->{affectedcontract});
-          #     delete($h->{affectedcontractid});
-          #  }
             if ($prec->{customer} ne ""){
                $h->{affectedcustomer}=[$prec->{customer}];
                $h->{affectedcustomerid}=[$prec->{customerid}];
@@ -2083,7 +2080,8 @@ sub nativProcess
             }
          }
          else{
-            $self->getParent->LastMsg(ERROR,"invalid or inactive businessprocess");
+            $self->getParent->LastMsg(ERROR,
+                      "invalid or inactive businessprocess");
             return(0);
          }
       }
