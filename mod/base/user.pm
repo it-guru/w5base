@@ -194,6 +194,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'secstate',
+                uploadable    =>0,
                 label         =>'security state',
                 value         =>['1','2','3','4'],
                 transprefix   =>'SECSTATE.',
@@ -268,11 +269,13 @@ sub new
                 name          =>'office_persnum',
                 group         =>'officeacc',
                 label         =>'Personal-Number',
+                uploadable    =>0,
                 dataobjattr   =>'contact.office_persnum'),
 
       new kernel::Field::Number(
                 name          =>'office_costcenter',
                 group         =>'officeacc',
+                uploadable    =>0,
                 weblinkto     =>'finance::costcenter',
                 weblinkon     =>['costcenterid'=>'id'],
                 label         =>'CostCenter',
@@ -281,6 +284,7 @@ sub new
       new kernel::Field::Number(
                 name          =>'office_accarea',
                 group         =>'officeacc',
+                uploadable    =>0,
                 label         =>'Accounting Area',
                 dataobjattr   =>'contact.office_accarea'),
 
@@ -352,6 +356,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'tz',
                 label         =>'Timezone',
+                uploadable    =>0,
                 group         =>'userparam',
                 value         =>['CET','GMT',DateTime::TimeZone::all_names()],
                 dataobjattr   =>'contact.timezone'),
@@ -368,6 +373,7 @@ sub new
                 name          =>'pagelimit',
                 label         =>'Pagelimit',
                 unit          =>'Entrys',
+                uploadable    =>0,
                 htmleditwidth =>'50px',
                 group         =>'userparam',
                 value         =>[qw(10 15 20 30 40 50 100)],
@@ -376,6 +382,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'dialermode',
+                uploadable    =>0,
                 label         =>'PC Phone Dialer Mode',
                 htmleditwidth =>'50%',
                 group         =>'userparam',
@@ -384,6 +391,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'dialeripref',
+                uploadable    =>0,
                 group         =>'userparam',
                 label         =>'PC Phone own country code',
                 dataobjattr   =>'contact.dialeripref'),
@@ -391,6 +399,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'dialerurl',
                 group         =>'userparam',
+                uploadable    =>0,
                 label         =>'PC Phone Dialer URL',
                 dataobjattr   =>'contact.dialerurl'),
 
@@ -422,6 +431,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'winsize',
+                uploadable    =>0,
                 label         =>'Window-Size',
                 htmleditwidth =>'50%',
                 htmldetail    =>0,           # die Sache ist noch nicht opti
@@ -472,6 +482,7 @@ sub new
       new kernel::Field::Textarea(
                 name          =>'similarcontacts',
                 htmldetail    =>0,
+                uploadable    =>0,
                 label         =>'simialr contacts',
                 depend        =>['userid','email','surname','givenname'],
                 searchable    =>0,
@@ -490,6 +501,7 @@ sub new
                 name          =>'picture',
                 label         =>'picture',
                 searchable    =>0,
+                uploadable    =>0,
                 group         =>'picture',
                 dataobjattr   =>'contact.picture'),
 
