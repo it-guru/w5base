@@ -37,9 +37,9 @@ sub getControlData
    my $app=$self->getParent();
 
 
-   return({                                     # Vogler:
-           'AL_TCom::appl'=>   {target=>'name', # ich denke, dass dieser
-                                mode  =>[       # block nicht mehr notwendig ist
+   return({                                     
+           'AL_TCom::appl'=>   {target=>'name',
+                                mode  =>[    
                                      'changenotify'=>'itil::appl',
                                      'eventnotify'=>'itil::appl',
                                      'rootcauseinfo'=>'AL_TCom::appl',

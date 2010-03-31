@@ -1,2 +1,7 @@
 'Information abo'=>{de=>'InfoAbo abonnieren'},
-'Subscribe Information abos'=>{de=>'Für ausgewählte Datensätze ein InfoAbo abonnieren.'}
+'Subscribe Information abos'=>{de=>'Für ausgewählte Datensätze ein InfoAbo abonnieren.'},
+'Contact'=>{de=>'Kontakt'},
+'please select an information mode'=>{de=>'bitte wählen Sie einen Informationsmodus aus'},
+'selected contact is not unique'=>{de=>'der ausgewählte Kontakt ist nicht eindeutig'},
+'unknown or recurring problem'=>{de=>'unbekanntes oder wiederkehrendes Problem'},
+"invalid mode '%s' selected"=>{de=>"ungültiger InfoAbo-Modus '%s' ausgewählt"}

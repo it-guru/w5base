@@ -39,6 +39,11 @@ sub getControlData
    my $app=$self->getParent();
 
    return({
+           'crm::businessprocess'=>{target=>'selector',
+                                 mode  =>[
+                                     'eventnotify'=>'itil::businessprocess',
+                                 ],
+                                },
            'itil::appl'    =>   {target=>'name',
                                  mode  =>[
                                      'changenotify'=>'itil::appl',

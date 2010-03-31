@@ -287,6 +287,7 @@ sub getModesFor
 {
    my $self=shift;
    my $parentobj=shift;
+   my $parentobj2=shift;
 
 
    my @res=();
@@ -301,7 +302,8 @@ sub getModesFor
    foreach my $obj (values(%{$self->{infoabo}})){
       my ($ctrl)=$obj->getControlData($self);
       foreach my $obj (keys(%$ctrl)){
-         if ($parentobj eq $obj || $parentobj eq ""){
+         if ($parentobj eq $obj ||
+             $parentobj2 eq $obj || $parentobj eq ""){
             my @l=@{$ctrl->{$obj}->{mode}};
             while(my $m=shift(@l)){
                my $t=shift(@l);
@@ -622,6 +624,7 @@ sub WinHandleInfoAboSubscribe
    if (defined($curobj) && defined($curmode) && defined($curid) &&
        $curobj ne "" && $curmode ne "" && $curid ne ""){
       $self->ResetFilter();
+printf STDERR ("fifi d=%s\n",Dumper([$curid,$curobj,$curmode,$userid]));
       $self->SetFilter({refid=>\$curid,parentobj=>\$curobj,
                         mode=>\$curmode,userid=>\$userid});
       my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));

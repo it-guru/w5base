@@ -19,8 +19,9 @@ package crm::businessprocess;
 use strict;
 use vars qw(@ISA);
 use kernel;
+use kernel::MandatorDataACL;
 use crm::lib::Listedit;
-@ISA=qw(crm::lib::Listedit);
+@ISA=qw(crm::lib::Listedit kernel::MandatorDataACL);
 
 sub new
 {
@@ -276,6 +277,7 @@ sub new
    );
    $self->setDefaultView(qw(linenumber selector cistatus importance));
    $self->setWorktable("businessprocess");
+   $self->{history}=[qw(insert modify delete)];
    $self->{workflowlink}={ workflowkey=>[id=>'affectedbusinessprocessid']
                          };
    $self->{use_distinct}=1;
@@ -468,10 +470,35 @@ sub isWriteValid
    return("default","procdesc","misc","acl") if (!defined($rec) ||
                          ($rec->{cistatusid}<3 && $rec->{creator}==$userid) ||
                          $self->IsMemberOf($self->{CI_Handling}->{activator}));
-   return("procdesc","misc","acl") if (defined($rec) &&
-                         ($rec->{databossid}==$userid) ||
-                         $self->IsMemberOf($self->{CI_Handling}->{activator}));
-   return(undef);
+
+   my @databossedit=qw(default procdesc misc acl);
+
+   if ($rec->{databossid}==$userid ||
+       $self->IsMemberOf($self->{CI_Handling}->{activator})){
+      return($self->expandByDataACL($rec->{mandatorid},@databossedit));
+   }
+
+   if (defined($rec->{contacts}) && ref($rec->{contacts}) eq "ARRAY"){
+      my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+                                  ["RMember"],"both");
+      my @grpids=keys(%grps);
+      foreach my $contact (@{$rec->{contacts}}){
+         if ($contact->{target} eq "base::user" &&
+             $contact->{targetid} ne $userid){
+            next;
+         }
+         if ($contact->{target} eq "base::grp"){
+            my $grpid=$contact->{targetid};
+            next if (!grep(/^$grpid$/,@grpids));
+         }
+         my @roles=($contact->{roles});
+         @roles=@{$contact->{roles}} if (ref($contact->{roles}) eq "ARRAY");
+         if (grep(/^write$/,@roles)){
+            return($self->expandByDataACL($rec->{mandatorid},@databossedit));
+         }
+      }
+   }
+   return($self->expandByDataACL($rec->{mandatorid}));
 }
 
 

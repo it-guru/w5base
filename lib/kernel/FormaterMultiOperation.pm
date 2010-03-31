@@ -187,13 +187,15 @@ sub ProcessLine
             }
          }
       }
-      Query->Delete($idtag);
       if ($app->LastMsg()){
          $lastmsg=join("<br>\n",$app->LastMsg());
+         $app->LastMsg("");
          $self->{FAIL}++;
          $fail++;
+         $marker="<input class=ACT checked type=checkbox name=$idtag>";
       }
       if (!$fail){
+         Query->Delete($idtag);
          $class="lineok";
          $marker="&nbsp;";
       }
@@ -201,14 +203,24 @@ sub ProcessLine
          $class="linefail";
       }
    }
-   $lastmsg="ERROR: unknown problem" if ($fail==1 && $lastmsg eq "");
+   if ($fail==1 && $lastmsg eq ""){
+      $lastmsg="ERROR: ".
+               $self->getParent->getParent->T("unknown or recurring problem",
+                                              'kernel::Output::MultiInfoabo');
+      $marker="<input class=ACT checked type=checkbox name=$idtag>";
+   }
    my $rowspan=1;
    $rowspan=2 if ($fail>0);
    $d.="<tr class=$class>".
        "<td align=center valign=top rowspan=$rowspan>$marker</td>";
    for(my $cc;$cc<=$#view;$cc++){
       my $fo=$view[$cc];
-      my $fulldata=$fo->RawValue($rec);
+      my $fieldname=$fo->Name();
+      my $fulldata=$app->findtemplvar({viewgroups=>$viewgroups,
+                                      current=>$rec,
+                                      WindowMode=>"HtmlResult"
+                                     },$fieldname,
+                                        "formated");
       $fulldata=join("\n",map({
                                 my $bk=$_;
                                 if (ref($_) eq "HASH"){
@@ -218,15 +230,13 @@ sub ProcessLine
                               }@$fulldata)) if (ref($fulldata) eq "ARRAY");
       $fulldata="&nbsp;" if ($fulldata eq "");
       $fulldata=~s/\n/<br>/g;
-      $d.="<td>$fulldata</td>";
+      $d.="<td>".$fulldata."</td>";
    }
    $d.="</tr>";
    if ($rowspan==2){
-      $d.=sprintf("<tr><td colspan=%d>$lastmsg</td></tr>",$#view+1);
+      $d.=sprintf("<tr><td colspan=%d><b>".
+                  "<font color=darkred>$lastmsg</font></b></td></tr>",$#view+1);
    }
-  # if ($self->{VALID}){
-      $app->LastMsg("");
-  # }
    return($d);
 }
 

@@ -54,8 +54,9 @@ sub Validate
       }
       if ($#{$keylist}>0){
          $self->Context->{LastDrop}=$dropbox;
-         $self->getParent->getParent->LastMsg(ERROR,
-                            "selected contact is not unique");
+         my $msg=$self->getParent->getParent->T(
+               "selected contact is not unique",'kernel::Output::MultiInfoabo');
+         $self->getParent->getParent->LastMsg(ERROR,$msg);
          return(undef);
       }
       elsif ($#{$keylist}<0){
@@ -91,7 +92,8 @@ sub IsModuleSelectable
    foreach my $obj (values(%{$self->{opobj}->{infoabo}})){
       my ($ctrl)=$obj->getControlData($self);
       foreach my $obj (keys(%$ctrl)){
-         return(1) if ($app->Self eq $obj);
+         return(1) if ($app->SelfAsParentObject() eq $obj ||
+                       $app->Self eq $obj);
       }
    }
    return(0);
@@ -145,9 +147,10 @@ sub MultiOperationHeader
    $d.=sprintf("<tr><td>");
    $d.=sprintf("<select name=mode style=\"width:100%%\">");
    if ($oldval eq ""){
-      $d.="<option value=\"\">&lt;".$self->getParent->getParent->T("please select an information mode")."&gt;</option>";
+      $d.="<option value=\"\">&lt;".$self->getParent->getParent->T("please select an information mode",'kernel::Output::MultiInfoabo')."&gt;</option>";
    }
-   my @modes=$self->{opobj}->getModesFor($app->Self());
+   my @modes=$self->{opobj}->getModesFor($app->Self(),
+                                         $app->SelfAsParentObject());
    while(my $k=shift(@modes)){
       my $v=shift(@modes);
       $d.="<option";
@@ -158,7 +161,8 @@ sub MultiOperationHeader
    $d.=sprintf("</td>");
    if ($self->{opobj}->isInfoAboAdmin()){
       $d.=sprintf("<td width=5%% nowrap>%s:</td>",
-                  $self->getParent->getParent->T("Contact"));
+          $self->getParent->getParent->T("Contact",
+                                         'kernel::Output::MultiInfoabo'));
       my $in=$self->Context->{LastDrop};
       $d.=<<EOF;
 <td width=300>
@@ -194,7 +198,9 @@ sub MultiOperationActionOn
    my $idfield=$app->IdField();
    my $mode=Query->Param("mode");
    if ($mode eq ""){
-      $app->LastMsg(ERROR,sprintf($self->getParent->getParent->T("invalid mode '%s' selected",$self->Self),$mode));
+      $app->LastMsg(ERROR,
+                    sprintf($self->getParent->getParent->T(
+                          "invalid mode '%s' selected",$self->Self),$mode));
       return(0);
    }
 
