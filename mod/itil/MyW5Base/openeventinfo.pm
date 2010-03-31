@@ -80,11 +80,14 @@ sub Result
 
    my %q1=%q;
    my %q2=%q;
+   my %q3=%q;
+   $self->{DataObj}->ResetFilter();
    if (Query->Param("SHOWALL")){
       $q1{stateid}='<20';
       $q1{isdeleted}=\'0';
       $q1{class}=[grep(/^.*::eventnotify$/,
                   keys(%{$self->{DataObj}->{SubDataObj}}))];
+      $self->{DataObj}->SecureSetFilter([\%q1]);
    }
    else{
       $q1{stateid}='<20';
@@ -97,11 +100,16 @@ sub Result
       $q2{eventend}=">now";
       $q2{class}=[grep(/^.*::eventnotify$/,
                        keys(%{$self->{DataObj}->{SubDataObj}}))];
+
+      $q3{stateid}='<20';
+      $q3{isdeleted}=\'0';
+      $q3{eventend}="<now AND >now-60m";
+      $q3{class}=[grep(/^.*::eventnotify$/,
+                       keys(%{$self->{DataObj}->{SubDataObj}}))];
+      $self->{DataObj}->SecureSetFilter([\%q1,\%q2,\%q3]);
    }
 
 
-   $self->{DataObj}->ResetFilter();
-   $self->{DataObj}->SecureSetFilter([\%q1,\%q2]);
    $self->{DataObj}->setDefaultView(qw(linenumber eventstart name  
                                        eventduration state));
    my %param=(ExternalFilter=>1,
