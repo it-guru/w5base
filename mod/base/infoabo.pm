@@ -624,7 +624,6 @@ sub WinHandleInfoAboSubscribe
    if (defined($curobj) && defined($curmode) && defined($curid) &&
        $curobj ne "" && $curmode ne "" && $curid ne ""){
       $self->ResetFilter();
-printf STDERR ("fifi d=%s\n",Dumper([$curid,$curobj,$curmode,$userid]));
       $self->SetFilter({refid=>\$curid,parentobj=>\$curobj,
                         mode=>\$curmode,userid=>\$userid});
       my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
