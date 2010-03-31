@@ -111,7 +111,6 @@ sub ProcessLine
                                    current=>$rec,
                                    mode=>'XMLV01',
                                   },$name,"formated");
-printf STDERR ("fifi d=%s\n",Dumper($data));
       if (defined($data)){
          $rec{$self->getRecordTag()}->{$name}=$data;
       }

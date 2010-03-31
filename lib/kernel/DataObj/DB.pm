@@ -665,9 +665,7 @@ sub InsertRecord
    else{
       $id=$newdata->{$idfield};
    }
-printf STDERR ("fifi d=%s\n",Dumper($newdata));
    my %raw=$self->QuoteHashData($workdb,oldrec=>undef,current=>$newdata);
-printf STDERR ("fifi d=%s\n",Dumper(\%raw));
    my $cmd;
    if ($self->{UseSqlReplace}==1){
 

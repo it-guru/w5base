@@ -72,10 +72,6 @@ sub qcheckRecord
                my $m="SSL certificate is nearly exiration";
                return(3,{qmsg=>[$m],dataissue=>[$m]});
             }
-           # printf STDERR ("fifi d=%s\n",Dumper($d));
-           
-           # printf STDERR ("fifi now=$now d=%s\n",Dumper($rec));
-           
          }
          else{
             return(3,{qmsg=>["SSL check:".$rec->{sslstate}],

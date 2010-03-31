@@ -145,8 +145,6 @@ sub qcheckRecord
                                 AllowEmpty=>0);
          }
          if ($rec->{allowifupdate}){
-            #printf STDERR ("fifi d=%s\n",Dumper($rec->{systems}));
-            #printf STDERR ("fifi d=%s\n",Dumper($parrec->{systems}));
             # keys are in rec= systemsystemid
             # and in parrec  = systemid
             my @opList;
