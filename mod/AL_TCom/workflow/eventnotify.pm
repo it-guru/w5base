@@ -472,8 +472,8 @@ sub ValidateCreate
   #
    if (!defined($newrec->{mandator}) ||    
        ref($newrec->{mandator}) ne "ARRAY" ||
-       !grep(/^(Extern|AL DTAG|DSS)$/,@{$newrec->{mandator}})){
-      $self->LastMsg(ERROR,"no AL DTAG, Extern or DSS mandator included");
+       !grep(/^(Extern|AL DTAG|DSS|TSS)$/,@{$newrec->{mandator}})){
+      $self->LastMsg(ERROR,"no AL DTAG,TSS Extern or DSS mandator included");
       return(0);
    }
         
