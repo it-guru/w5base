@@ -1042,7 +1042,7 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default","name") if (!defined($rec));
+   return("default","name","office","comments") if (!defined($rec));
    return(undef) if (!defined($rec));
    if ($self->IsMemberOf("admin")){
       return(qw(default name office private userparam groups usersubst control
