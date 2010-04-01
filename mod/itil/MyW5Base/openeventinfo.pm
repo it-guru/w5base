@@ -101,12 +101,18 @@ sub Result
       $q2{class}=[grep(/^.*::eventnotify$/,
                        keys(%{$self->{DataObj}->{SubDataObj}}))];
 
-      $q3{stateid}='<20';
-      $q3{isdeleted}=\'0';
-      $q3{eventend}="<now AND >now-60m";
-      $q3{class}=[grep(/^.*::eventnotify$/,
-                       keys(%{$self->{DataObj}->{SubDataObj}}))];
-      $self->{DataObj}->SecureSetFilter([\%q1,\%q2,\%q3]);
+      if (Query->Param("ONLYWITHNOEND") ne "1"){  # for DINA Interface!
+         $q3{stateid}='<20';
+         $q3{isdeleted}=\'0';
+         $q3{eventend}="<now AND >now-60m";
+         $q3{class}=[grep(/^.*::eventnotify$/,
+                          keys(%{$self->{DataObj}->{SubDataObj}}))];
+         $self->{DataObj}->SecureSetFilter([\%q1,\%q2,\%q3]);
+      }
+      else{
+         $self->{DataObj}->SecureSetFilter([\%q1,\%q2]);
+      }
+
    }
 
 
