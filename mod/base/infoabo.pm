@@ -48,31 +48,29 @@ sub new
                 name          =>'parentobj',
                 label         =>'Info Source',
                 htmleditwidth =>'100%',
-                readonly      =>1,
+                readonly      =>sub{
+                      my $self=shift;
+                      my $rec=shift;
+                      return(0) if (!defined($rec));
+                      return(1);
+                },
                 getPostibleValues=>\&getPostibleParentObjs,
                 jsonchanged   =>\&getOnChangedScript,
                 dataobjattr   =>'infoabo.parentobj'),
-
-      new kernel::Field::Link(
-                name          =>'parent',
-                searchable    =>0,
-                label         =>'parent',
-                dataobjattr   =>'infoabo.parentobj'),
-
-      new kernel::Field::Link(
-                name          =>'refid',
-                searchable    =>0,
-                depend        =>['parentobj'],
-                label         =>'refid',
-                dataobjattr   =>'infoabo.refid'),
 
       new kernel::Field::MultiDst (
                 name          =>'targetname',
                 htmlwidth     =>'200',
                 htmleditwidth =>'400',
                 label         =>'Target-Name',
+                uploadable    =>0,
                 dst           =>[],
-                readonly      =>1,
+                readonly      =>sub{
+                      my $self=shift;
+                      my $rec=shift;
+                      return(0) if (!defined($rec));
+                      return(1);
+                },
                 dsttypfield   =>'parentobj',
                 dstidfield    =>'refid'),
 
@@ -85,23 +83,16 @@ sub new
                 getPostibleValues=>\&getPostibleModes,
                 dataobjattr   =>'infoabo.mode'),
 
-      new kernel::Field::Text(
-                name          =>'rawmode',
-                label         =>'raw Info Mode',
-                group         =>'source',
-                readonly      =>1,
-                dataobjattr   =>'infoabo.mode'),
-
-      new kernel::Field::Link(
-                name          =>'rawmode',
-                label         =>'Raw Info Mode',
-                readonly      =>1,
-                dataobjattr   =>'infoabo.mode'),
-
       new kernel::Field::TextDrop(
                 name          =>'user',
                 label         =>'User',
-                readonly      =>1,
+                group         =>'relation',
+                readonly      =>sub{
+                      my $self=shift;
+                      my $rec=shift;
+                      return(0) if (!defined($rec));
+                      return(1);
+                },
                 vjointo       =>'base::user',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['userid'=>'userid'],
@@ -120,6 +111,46 @@ sub new
                 value         =>[1,0],
                 htmleditwidth =>'80px',
                 dataobjattr   =>'infoabo.active'),
+
+      new kernel::Field::Text(
+                name          =>'parent',
+                searchable    =>0,
+                group         =>'relation',
+                readonly      =>sub{
+                      my $self=shift;
+                      my $rec=shift;
+                      return(0) if (!defined($rec));
+                      return(1);
+                },
+                label         =>'parent object',
+                dataobjattr   =>'infoabo.parentobj'),
+
+      new kernel::Field::Text(
+                name          =>'refid',
+                searchable    =>0,
+                group         =>'relation',
+                readonly      =>sub{
+                      my $self=shift;
+                      my $rec=shift;
+                      return(0) if (!defined($rec));
+                      return(1);
+                },
+                depend        =>['parentobj'],
+                label         =>'refid',
+                dataobjattr   =>'infoabo.refid'),
+
+      new kernel::Field::Text(
+                name          =>'rawmode',
+                label         =>'raw Info Mode',
+                group         =>'relation',
+                readonly      =>sub{
+                      my $self=shift;
+                      my $rec=shift;
+                      return(0) if (!defined($rec));
+                      return(1);
+                },
+                dataobjattr   =>'infoabo.mode'),
+
 
       new kernel::Field::Text(
                 name          =>'userid',
@@ -367,7 +398,7 @@ sub Validate
    my $origrec=shift;
 
    my $mode=effVal($oldrec,$newrec,"mode");
-   if ($mode eq ""){
+   if ($mode eq "" && !defined($oldrec) && $newrec->{rawmode} eq ""){
       $self->LastMsg(ERROR,"invalid mode specified");
       return(0);
    }
@@ -482,7 +513,7 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("header","default") if (!defined($rec));
+   return("header","default","relation") if (!defined($rec));
    return("ALL");
 }
 
@@ -492,7 +523,7 @@ sub isWriteValid
    my $rec=shift;
    return("default") if (ref($rec) eq "HASH" &&
                          $self->getCurrentUserId() eq $rec->{userid});
-   return("default") if ($self->isInfoAboAdmin());
+   return("default","relation") if ($self->isInfoAboAdmin());
    return(undef);
 }
 
@@ -814,6 +845,15 @@ sub expandDynamicDistibutionList
           [sort(keys(%{$email{'cc'}}))],
           [sort(keys(%{$email{'bcc'}}))]);
 }
+
+sub isUploadValid  # validates if upload functionality is allowed
+{
+   my $self=shift;
+   return(0) if (!$self->IsMemberOf("admin"));
+   return(1);
+}
+
+
 
 
 

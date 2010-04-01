@@ -457,7 +457,7 @@ sub getDynamicFields
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'eventnotifystat',
                 label         =>'Event class',
-                delfault      =>'1',
+                default       =>'1',
                 htmleditwidth =>'100px',
                 value         =>['1',
                                  '2',
