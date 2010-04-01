@@ -555,15 +555,18 @@ sub calcVisibility
    return(1) if (!defined($rec));
    if ($rec->{headref}->{eventmode}->[0] eq "EVk.infraloc"){
       return(1) if ($name eq "affectedlocation");
+      return(1) if ($name eq "affectedlocationid");
       return(1) if ($name eq "affectedroom");
    }
    if ($rec->{headref}->{eventmode}->[0] eq "EVk.appl"){
       return(1) if ($name eq "affectedapplication");
+      return(1) if ($name eq "affectedapplicationid");
       return(1) if ($name eq "affectedcustomer");
       return(1) if ($name eq "affectedcustomerid");
    }
    if ($rec->{headref}->{eventmode}->[0] eq "EVk.net"){
       return(1) if ($name eq "affectednetwork");
+      return(1) if ($name eq "affectednetworkid");
       return(1) if ($name eq "affectedregion");
    }
    if ($rec->{headref}->{eventmode}->[0] eq "EVk.bprocess"){

@@ -169,6 +169,7 @@ sub Init
 
       new kernel::Field::KeyText(
                 name          =>'affectedbusinessprocessid',
+                htmldetail =>0,
                 container     =>'headref',
                 keyhandler    =>'kh',
                 label         =>'BusinessprocessID'),
