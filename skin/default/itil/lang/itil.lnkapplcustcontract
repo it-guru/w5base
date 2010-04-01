@@ -2,8 +2,11 @@
                               en=>'Application-CustomerContract Link'},
 'fieldgroup.default'=>{de=>'Verknüfpungsinformation',
                        en=>'Linkinformations'},
+'fieldgroup.relation'=>{de=>'Zuordnung',
+                       en=>'Relation'},
 'Fraction'=>{de=>'Anteil der Anwendung am Vertrag'},
 'Application'=>{de=>'Anwendung'},
 'Customer Contract'=>{de=>'Kundenvertrag'},
 'Customer ContractId'=>{de=>'Kundenvertrags ID'},
+'Customer Contract CI-State'=>{de=>'Kundenvertrag CI-Status'},
 

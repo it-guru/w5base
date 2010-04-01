@@ -55,7 +55,8 @@ sub new
       new kernel::Field::Select(
                 name          =>'custcontractcistatus',
                 htmleditwidth =>'40%',
-                label         =>'CI-State',
+                group         =>'relation',
+                label         =>'Customer Contract CI-State',
                 vjoineditbase =>{id=>">0"},
                 vjointo       =>'base::cistatus',
                 vjoinon       =>['custcontractcistatusid'=>'id'],
@@ -219,6 +220,7 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
+   return("header","default") if (!defined($rec));
    return("ALL");
 }
 
