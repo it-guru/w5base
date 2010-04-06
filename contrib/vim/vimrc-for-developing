@@ -1,0 +1,28 @@
+set dir=/tmp
+
+" syntax highlithing for gray terinal background
+syntax enable
+highlight Statement  ctermfg=Blue 
+highlight Identifier ctermfg=Black
+highlight Type       ctermfg=Black
+
+" enable storeing of courser position
+au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal g'\"" | endif
+
+" set tab width to 3 spaces
+set noautoindent
+set nocindent
+set nosmartindent
+set expandtab smarttab shiftwidth=3 tabstop=3 
+filetype indent off
+filetype plugin indent off
+
+set showmatch sm
+abbreviate ### ######################################################################
+
+" set compatible mode f.e. in windows enviroment
+"set compatible
+
+
+" disable mouse courser postioning
+set mouse=c

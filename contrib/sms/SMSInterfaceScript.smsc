@@ -1,0 +1,148 @@
+#!/usr/bin/env perl
+BEGIN{
+   $ENV{LANG}="C";
+}
+use strict;
+use Getopt::Long;
+use Net::UCP;
+use FindBin ;
+$W5V2::INSTDIR="/opt/w5base" if (!defined($W5V2::INSTDIR));
+if (defined(&{FindBin::again})){
+   FindBin::again();
+   $W5V2::INSTDIR="$FindBin::Bin/../..";
+}
+foreach my $instdir ("/opt/w5base","/opt/w5base2",$W5V2::INSTDIR){
+   foreach my $path ("$instdir/mod","$instdir/lib"){
+      my $qpath=quotemeta($path);
+      unshift(@INC,$path) if (!grep(/^$qpath$/,@INC));
+   }
+}
+eval ('use kernel; use kernel::config;');
+if ($@ ne ""){
+   die($@);
+}
+
+use vars qw($opt_v $opt_l $opt_h $opt_s $opt_m $opt_c $configname);
+$0="W5Event ".join(" ",@ARGV);
+exit(1) if (!GetOptions('verbose'=>\$opt_v,
+                        'debug'=>\$opt_v,
+                        'single'=>\$opt_s,
+                        'label=s'=>\$opt_l,
+                        'multi'=>\$opt_m,
+                        'help'=>\$opt_h,
+                        'config=s'=>\$opt_c));
+
+exit(0) if ($opt_m);
+
+if ($opt_v){
+   $W5V2::Debug=1;
+}
+else{
+   $W5V2::Debug=0;
+}
+
+
+if ($opt_c eq ""){
+   $opt_c="w5smsgate";
+}
+$configname=$opt_c;
+
+my $curconfig=new kernel::config();
+
+if (!$curconfig->readconfig("$FindBin::Bin/..",$configname)){
+   msg(ERROR(),"can't read configfile '%s'",$configname);
+   exit(1);
+}
+
+my $number=shift;
+if ($number eq ""){
+   msg(ERROR(),"no target mobile number specified");
+   exit(1);
+}
+
+my $conn=$curconfig->Param("DATAOBJCONNECT");
+my $user=$curconfig->Param("DATAOBJUSER");
+my $pass=$curconfig->Param("DATAOBJPASS");
+my $sitename=$curconfig->Param("SITENAME");
+
+$sitename="W5Base" if ($sitename eq "");
+if (defined($opt_l)){
+   $sitename=$opt_l;
+}
+$pass=$pass->{smsc} if (ref($pass) eq "HASH");
+$user=$user->{smsc} if (ref($user) eq "HASH");
+$conn=$conn->{smsc} if (ref($conn) eq "HASH");
+
+my $text="";
+while(my $l=<STDIN>){
+   $text.=$l;
+}
+
+my $ok=0;
+foreach my $connect (split(/\s+/,$conn)){
+   msg(DEBUG(),"try '%s'",$connect);
+   my ($host,$port)=$connect=~m/^(\S+):(\S+)$/;
+   if ($host ne "" && $port ne ""){
+      my $emi;
+      eval('use Net::UCP;');
+      eval('$emi=new Net::UCP(
+               SMSC_HOST   => $host, 
+               SMSC_PORT   => $port, 
+               SENDER_TEXT => $sitename,
+               SHORT_CODE=>$user,
+               WARN=>1
+            );');
+      if (defined($emi)){
+         msg(DEBUG(),"try open SMSC link '%s'",$emi);
+         if ($emi->open_link()){
+            msg(DEBUG(),"link to SMSC is online");
+            my ($ack,$errnu,$errtxt)=$emi->login(
+               SMSC_ID=>$user,
+               SMSC_PW=>$pass,
+               OTON       =>'6',
+               ONPI       =>'5',
+               VERS       =>'0100',
+            );
+            if ($ack){
+               msg(DEBUG(),"trying to send sms with %d chars",length($text));
+               my ($ack,$errnu,$errtxt)=$emi->send_sms_multipart(
+                  RECIPIENT      => $number,
+                  MESSAGE_TEXT   => $text,
+                  SENDER_TEXT    => $sitename
+               );
+               if ($ack){
+                  $ok++;
+                  last;
+               }
+               else{
+                  msg(WARN(),"SMS message '%s'",$errtxt);
+               }
+            }
+            else{
+               msg(WARN(),"SMS message '%s'",$errtxt);
+            }
+           
+         } 
+         else{
+            msg(WARN(),"fail to open link  '%s'",$emi);
+         }
+      }
+      else{
+         msg(ERROR(),"Net::UCP object to host '%s:%s' can not be created",
+                     $host,$port);
+      }
+   }
+   else{
+      msg(ERROR(),"invalid host or port - host='%s' port='%s'",$host,$port);
+   }
+}
+if (!$ok){
+   msg(ERROR(),"fail to send sms");
+   exit(1);
+}
+
+
+
+
+
+

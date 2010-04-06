@@ -1,0 +1,3 @@
+#!/bin/sh
+export LANG="C"
+exec /opt/w5base2/contrib/sms/SMSInterfaceScript.smsc -l Darwin $*

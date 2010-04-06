@@ -1,9 +1,23 @@
 #!/bin/bash
 PATH=/sbin:/usr/sbin:/usr/lib/:/usr/lib/sbin:$PATH
-SMSMODE=$1
-SMSNUM=$2
+
+SMSMODE=""
+LABEL="W5Base"
+while getopts "l:dhsm" "o";do 
+   case "$o" in
+      d) ;;
+      s) SMSMODE="s";;
+      l) LABEL=$OPTARG;;
+      m) SMSMODE="m";;
+      [?])  print >&2 "Usage: $0 [-h] [-m] [-s] [-d] number"
+         exit 1;;
+   esac
+done
+shift $(( OPTIND - 1 ))
+
+SMSNUM=$1
 SMSTEXT=`cat` 
-if [ "$SMSMODE" = "-s" ]; then
+if [ "$SMSMODE" = "s" ]; then
    SMSNUM=`echo "$SMSNUM" | sed -e 's/^\+49/0/g'`
    echo "=========================================================================" >> /tmp/smslog
    echo "date: `date`" >> /tmp/smslog

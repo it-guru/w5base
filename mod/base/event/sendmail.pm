@@ -468,7 +468,7 @@ sub Sendmail
                   $number=~s/[\s-\/]//g;
                   msg(DEBUG,"sending sms to $smsrec->{fullname}");
                   push(@numlist,$number);
-                  if (open(F,"|".$smsscript." \"-s\" \"$number\"")){
+                  if (open(F,"|".$smsscript." \"-s\" -- \"$number\"")){
                      print F $smstext;
                      close(F);
                   }
@@ -478,7 +478,7 @@ sub Sendmail
                }
             }
             if ($#numlist!=-1){
-               if (open(F,"|".$smsscript." \"-m\" ".
+               if (open(F,"|".$smsscript." \"-m\" -- ".
                           join(" ",map({'"'.$_.'"'} @numlist)))){
                   print F $smstext;
                   close(F);
