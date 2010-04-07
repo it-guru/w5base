@@ -29,6 +29,7 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
 
+
    return($self);
 }
 

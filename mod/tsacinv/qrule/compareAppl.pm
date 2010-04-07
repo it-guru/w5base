@@ -152,7 +152,7 @@ sub qcheckRecord
                        sub{  # comperator 
                           my ($a,$b)=@_;
                           my $eq;
-                          if ($a->{systemsystemid} eq $b->{systemid}){
+                          if (uc($a->{systemsystemid}) eq uc($b->{systemid})){
                              $eq=1;
                           }
                           return($eq);

@@ -108,6 +108,18 @@ sub new
    return($self);
 }
 
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   if (exists($newrec->{systemid})){
+      $newrec->{systemid}=uc($newrec->{systemid}); # T-Systems Standard laut AM
+   }
+   return($self->SUPER::Validate($oldrec,$newrec));
+}
+
 
 
 
