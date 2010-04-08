@@ -41,7 +41,12 @@ sub new
                 label         =>'LinkID',
                 dataobjattr   =>'mandatordataacl.id'),
 
-      new kernel::Field::Mandator(),
+      new kernel::Field::Select(
+                name          =>'mandator',
+                label         =>'Mandator',
+                vjointo       =>'base::mandator',
+                vjoinon       =>['mid'=>'id'],
+                vjoindisp     =>'name'),
 
       new kernel::Field::Link(
                 name          =>'mid',
@@ -149,7 +154,7 @@ sub new
                 label         =>'RealEditor',
                 dataobjattr   =>'mandatordataacl.realeditor')
    );
-   $self->setDefaultView(qw(parentobj dataname prio targetname));
+   $self->setDefaultView(qw(parentobj mandator dataname prio targetname));
    $self->setWorktable("mandatordataacl");
    return($self);
 }
