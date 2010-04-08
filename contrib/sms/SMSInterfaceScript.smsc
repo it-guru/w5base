@@ -1,10 +1,8 @@
 #!/usr/bin/env perl
-BEGIN{
-   $ENV{LANG}="C";
-}
 use strict;
 use Getopt::Long;
 use Net::UCP;
+use Encode;
 use FindBin ;
 $W5V2::INSTDIR="/opt/w5base" if (!defined($W5V2::INSTDIR));
 if (defined(&{FindBin::again})){
@@ -77,7 +75,8 @@ my $text="";
 while(my $l=<STDIN>){
    $text.=$l;
 }
-$text=~s/\x5F/\x11/g;         # damit die Unterstreichungszeichen funktionieren
+#$text=~s/\x5F/\x11/g;         # damit die Unterstreichungszeichen funktionieren
+$text=encode('gsm0338',$text);
 
 my $ok=0;
 foreach my $connect (split(/\s+/,$conn)){
