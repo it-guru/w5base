@@ -42,17 +42,24 @@ sub expandByDataACL
       $pref="!" if ($acl->{aclmode} eq "deny");
       if (!exists($chkdataname{$dataname})){
          if ($acl->{target} eq "base::grp"){
+            if ($acl->{targetid}<0){
+               push(@fieldgroups,$pref.$acl->{dataname});
+               $chkdataname{$dataname}++;
+               next;
+            }
             if (!defined($grps)){
-               $grps={$self->getGroupsOf($userid,"RMember","down")};
+               $grps={$self->getGroupsOf($userid,"RMember","up")};
             }
             if (exists($grps->{$acl->{targetid}})){
                push(@fieldgroups,$pref.$acl->{dataname});
+               $chkdataname{$dataname}++;
                next;
             }
          }
          if ($acl->{target} eq "base::user" &&
              $acl->{targetid}==$userid){
             push(@fieldgroups,$pref.$acl->{dataname});
+            $chkdataname{$dataname}++;
             next;
          }
       }
