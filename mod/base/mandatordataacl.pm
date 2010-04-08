@@ -149,7 +149,7 @@ sub new
                 label         =>'RealEditor',
                 dataobjattr   =>'mandatordataacl.realeditor')
    );
-   $self->setDefaultView(qw(parentobj dataname targetname));
+   $self->setDefaultView(qw(parentobj dataname prio targetname));
    $self->setWorktable("mandatordataacl");
    return($self);
 }
