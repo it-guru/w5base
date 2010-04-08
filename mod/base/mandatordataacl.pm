@@ -222,6 +222,16 @@ sub isWriteValid
    return;
 }
 
+sub isCopyValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0) if (!defined($rec));
+   return(1);
+}
+
+
+
 
 
 1;
