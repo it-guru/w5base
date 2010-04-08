@@ -77,6 +77,7 @@ my $text="";
 while(my $l=<STDIN>){
    $text.=$l;
 }
+$text=~s/\x5F/\x11/g;         # damit die Unterstreichungszeichen funktionieren
 
 my $ok=0;
 foreach my $connect (split(/\s+/,$conn)){
