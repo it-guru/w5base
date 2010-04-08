@@ -334,3 +334,4 @@ create table checklstent (
   PRIMARY KEY  (id),key(lastqcheck),
   KEY checklst (checklst)
 );
+alter table mandatordataacl add unique(prio,parentobj,dataname,mandator);
