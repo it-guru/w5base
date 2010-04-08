@@ -41,8 +41,7 @@ sub new
                 label         =>'LinkID',
                 dataobjattr   =>'mandatordataacl.id'),
 
-      new kernel::Field::Mandator(
-                readonly      =>1),
+      new kernel::Field::Mandator(),
 
       new kernel::Field::Link(
                 name          =>'mid',
