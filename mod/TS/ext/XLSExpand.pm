@@ -59,7 +59,7 @@ sub ProcessLine
  
    # output
    if (!exists($in->{'itil::appl::id'})){
-      return(0);
+      return(1);
    }
    if (defined($in->{'itil::appl::id'}) && 
        exists($out->{'TS::appl::acapplname'})){

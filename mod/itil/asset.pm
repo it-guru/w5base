@@ -178,6 +178,7 @@ sub new
                 vjoinbase     =>[{applcistatusid=>"<=5",
                                   systemcistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'assetid'],
+                vjoininhash   =>['appl','applcistatus','applcustomer','applid'],
                 vjoindisp     =>['appl','applcistatus','applcustomer']),
 
       new kernel::Field::Text(

@@ -176,6 +176,48 @@ sub ProcessLine
          $in->{'itil::system::id'}->{$sysrec->{id}}++;
       }
    } 
+   if (defined($in->{'itil::asset::name'})){
+      printf STDERR ("process in by assetid\n");
+      my $ass=$self->getParent->getPersistentModuleObject('itil::asset');
+      my @flt=();
+      if (defined($in->{'itil::asset::name'})){
+         push(@flt,{name=>$in->{'itil::asset::name'}});
+      }
+      map({$_->{cistatusid}=\'4'} @flt);
+      $ass->SetFilter(\@flt);
+      if (grep(/^.*::appl::.*$/,keys(%{$out}))||
+          grep(/^.*::system::.*$/,keys(%{$out}))){
+         $in->{'itil::appl::id'}=undef if (!exists($in->{'itil::appl::id'}));
+         foreach my $rec ($ass->getHashList(qw(id systems applications))){
+            $in->{'itil::asset::id'}->{$rec->{'id'}}++;
+
+            if (grep(/^.*::appl::.*$/,keys(%{$out}))){
+               if (ref($rec->{applications}) eq "ARRAY"){
+                  foreach my $app (@{$rec->{applications}}){
+                     if (exists($out->{'itil::appl::name'})){
+                        $out->{'itil::appl::name'}->{$app->{'appl'}}++;
+                     }
+                     $in->{'itil::appl::id'}->{$app->{'applid'}}++;
+                  }
+               }
+            }
+
+            if (grep(/^.*::system::.*$/,keys(%{$out}))){
+               if (ref($rec->{systems}) eq "ARRAY"){
+                  foreach my $sys (@{$rec->{systems}}){
+                     if (exists($out->{'itil::system::name'})){
+                        $out->{'itil::system::name'}->{$sys->{'name'}}++;
+                     }
+                     $in->{'itil::system::id'}->{$sys->{'id'}}++;
+                  }
+               }
+            }
+
+         }
+      }
+
+
+   }
    if (defined($in->{'itil::system::name'}) || 
        defined($in->{'itil::system::id'})){
       printf STDERR ("process in by systemname\n");
