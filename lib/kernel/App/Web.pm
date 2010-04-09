@@ -444,7 +444,7 @@ sub ValidateCaches
             return(0);
          }
          else{
-            print("Content-type:text/plain\n\n");
+            print("Content-type:text/plain;charset=ISO-8895-1\n\n");
             printf(msg(ERROR,$self->T("access for user '\%s' to W5Base ".
                              "Framework rejected")),$ENV{REMOTE_USER});
             printf(msg(INFO,$self->T("posible resons are a locked account ".
