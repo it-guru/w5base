@@ -360,6 +360,7 @@ sub new
                 name          =>'attainment',
                 label         =>'attainment level',
                 group         =>'state',
+                align         =>'right',
                 htmldetail    =>0,
                 searchable    =>0,
                 precision     =>2,
