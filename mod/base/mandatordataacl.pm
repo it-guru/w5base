@@ -154,7 +154,7 @@ sub new
                 label         =>'RealEditor',
                 dataobjattr   =>'mandatordataacl.realeditor')
    );
-   $self->setDefaultView(qw(parentobj mandator dataname prio targetname));
+   $self->setDefaultView(qw(parentobj mandator dataname prio targetname aclmode));
    $self->setWorktable("mandatordataacl");
    return($self);
 }

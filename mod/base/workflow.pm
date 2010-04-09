@@ -363,7 +363,7 @@ sub new
                 align         =>'right',
                 htmldetail    =>0,
                 searchable    =>0,
-                precision     =>2,
+                precision     =>0,
                 depend        =>['stateid','headref','shortactionlog'],
                 onRawValue    =>sub{
                    my $self=shift;
