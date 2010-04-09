@@ -26,6 +26,7 @@
 'sum documented efforts'=>{de=>'Summe dokumentierter Aufwände (intern)'},
 'marked as delete'=>{de=>'gelöscht markiert'},
 'sum efforts in hours'=>{de=>'Summe Aufwände in Stunden (intern)'},
+'attainment level'=>{de=>'Erreichungsgrad'},
 'Forward to'=>{de=>'Weiterleitung an/ Vorlage bei'},
 'Close-Date'=>{de=>'Beendigungszeitpunkt'},
 'Creator Name'=>{de=>'Erstellername'},

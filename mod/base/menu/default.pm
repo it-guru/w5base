@@ -180,6 +180,11 @@ sub Init
    $self->RegisterObj("sysadm.mandator.dataacl",
                       "base::mandatordataacl");
 
+   $self->RegisterObj("sysadm.mandator.dataacl.new",
+                      "base::mandatordataacl",
+                      func=>'New',
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("sysadm.location",
                       "base::location");
    

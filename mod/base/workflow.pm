@@ -355,6 +355,65 @@ sub new
                 },
                 label         =>'sum efforts in hours',
                 depend        =>['shortactionlog','class','mandatorid']),
+
+      new kernel::Field::Percent(
+                name          =>'attainment',
+                label         =>'attainment level',
+                group         =>'state',
+                htmldetail    =>0,
+                searchable    =>0,
+                precision     =>2,
+                depend        =>['stateid','headref','shortactionlog'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $headref=$self->getParent->
+                                      getField("headref")->RawValue($current);
+                   my $p=0;
+                   if ($current->{stateid}>1){
+                      $p=1;
+                   }
+                   if ($current->{stateid}>3){
+                      $p=10;
+                   }
+                   if (exists($headref->{implementationeffort})){
+                      my $ie=$headref->{implementationeffort};
+                      $ie=$ie->[0] if (ref($ie) eq "ARRAY");
+                      my $target; 
+                      if (my ($a)=$ie=~
+                          m/^[\<\>]{0,1}(\d+([,\.]\d{1,2}){0,1})$/){
+                         $a=~s/,/./g;
+                         $target=$a;
+                      }
+                      elsif (my ($a,$b)=$ie=~
+                        m/^(\d+([,\.]\d{1,2}){0,1})-(\d+([,\.]\d{1,2}){0,1})$/){
+                         $a=~s/,/./g;
+                         $b=~s/,/./g;
+                         $target=($a+$b)/2;
+                      }
+                      if (defined($target) && $target>0){
+                         my $fobj=$self->getParent->getField("shortactionlog");
+                         my $d=$fobj->RawValue($current);
+                         my $dsum=0;
+                         if (defined($d) && ref($d) eq "ARRAY"){
+                            foreach my $arec (@{$d}){
+                               if (defined($arec->{effort}) &&
+                                   $arec->{effort}!=0){
+                                  $dsum+=$arec->{effort};
+                               }
+                            }
+                         }
+                         if ($dsum>0){
+                            $dsum=$dsum/60.0;
+                            $p=$dsum*100.0/$target;
+                         }
+                      }
+                   }
+                   if ($current->{stateid}>15){
+                      $p=100;
+                   }
+                   return($p);
+                }),
                                    
       new kernel::Field::Duration(
                 name          =>'eventdurationmin',

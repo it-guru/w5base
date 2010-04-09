@@ -2,4 +2,5 @@
                           en=>'Mandator data ACL'},
 'Parent-Object'=>{de=>'Elternobjekt'},
 'Target-Name'=>{de=>'Kontakt'},
+'Prio'=>{de=>'Rang'},
 'no contact specified'=>{de=>'kein Kontakt angegeben'},

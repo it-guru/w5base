@@ -1,0 +1,7 @@
+'prio'=>{de=>'
+Die Ränge werden von der kleinsten
+zur größten Nummer hin durchsucht.
+Sobald eine Matched, wird nicht
+weiter gesucht.
+',en=>'
+'},
