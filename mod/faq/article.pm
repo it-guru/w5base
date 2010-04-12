@@ -659,8 +659,15 @@ sub FullView
    print("<div class=authorline>");
 
    my $fldobj=$self->getField("owner",$rec);
+   my $downer=$fldobj->FormatedResult($rec,"HtmlDetail");
+
+   my $fldobj=$self->getField("creator",$rec);
    my $d=$fldobj->FormatedResult($rec,"HtmlDetail");
-   print(" by ".$d) if ($d ne "");
+   if ($d ne "NONE" && $downer ne $d){
+      print(" created by ".$d) if ($d ne "");
+   }
+
+   print(" modified by ".$downer) if ($downer ne "" && $downer ne "NONE");
 
    my $fldobj=$self->getField("mdate",$rec);
    my $d=$fldobj->FormatedResult($rec,"HtmlV01");

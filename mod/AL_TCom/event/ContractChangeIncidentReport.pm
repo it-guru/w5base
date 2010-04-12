@@ -95,7 +95,7 @@ sub ContractChangeIncidentReport
                                   )],
                           isdeleted=>'0'
                          },
-                 #order=>'eventendrev',
+                 order=>'eventendrev',
                  lang=>'de',
                  recPreProcess=>\&recPreProcess,
                  view=>[qw(id 

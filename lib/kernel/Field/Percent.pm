@@ -19,7 +19,6 @@ package kernel::Field::Percent;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use Data::Dumper;
 @ISA    = qw(kernel::Field);
 
 
@@ -27,6 +26,8 @@ sub new
 {
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
+   $self->{_permitted}->{precision}=1;
+
    return($self);
 }
 
@@ -83,6 +84,16 @@ sub Unformat
    }
    return($self->SUPER::Unformat($formated,$rec));
 }
+
+sub getXLSformatname
+{
+   my $self=shift;
+   my $data=shift;
+   return("number.".$self->precision());
+}
+
+
+
 
 
 
