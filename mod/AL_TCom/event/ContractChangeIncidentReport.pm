@@ -79,6 +79,21 @@ sub ContractChangeIncidentReport
                 name          =>'DESC',
                 label         =>'Workflow Beschreibung',
                 htmldetail    =>0),
+      new kernel::Field::Text(
+                name          =>'MONTH',
+                label         =>'Monat',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   if ($current->{eventend} ne ""){
+                      my ($Y,$M,$D,$h,$m,$s)=
+                            $self->getParent->ExpandTimeExpression(
+                            $current->{eventend},"stamp","GMT","GMT");
+                      return(sprintf("%04d/%02d",$Y,$M));
+                   }      
+                   return("");
+                },
+                htmldetail    =>0),
    );
  
    
@@ -103,6 +118,7 @@ sub ContractChangeIncidentReport
                            class
                            eventstart 
                            eventend
+                           MONTH
                            name
                            affectedapplication
                            affectedcontract
