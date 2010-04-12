@@ -69,12 +69,14 @@ sub new
                 vjoinon       =>['id'=>'id'],
                 dontrename    =>1,
                 group         =>'appldata',
+                readonly      =>1,
                 fields        =>[qw(mandator mandatorid
                                     cistatus cistatusid
                                     databoss databossid 
                                     sem semid 
                                     tsm tsmid 
                                     delmgr delmgrid
+                                    businessteam businessteamid
                                     customer customerid 
                                     customerprio criticality)])
    );
@@ -138,8 +140,8 @@ sub isWriteValid
       return("default");
    }
    else{
-      if ($self->IsMemberOf($rec->{chmgrteamid},
-                            ["RCHManager"],"down")){
+      if ($self->IsMemberOf($rec->{mandatorid},
+                            ["RCHManager"],"up")){
          return("default");
       }
       if ($self->IsMemberOf($rec->{chmgrteamid},

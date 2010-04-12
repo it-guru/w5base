@@ -38,7 +38,6 @@ sub new
                 dataobjattr   =>'appl.cabrelevant'),
       insertafter=>'chmgrteam'
    );
-   $self->setDefaultView(qw(name cistatus chmgrteam cabrelevant));
  
    return($self);
 }
