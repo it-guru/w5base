@@ -1,0 +1,170 @@
+<html>
+<head>
+<title>Check Software Installation Status</title>
+<script type='text/javascript'    
+   src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'>
+</script>
+
+
+<script language="JavaScript" 
+   src="http://w8n00378.bmbg01.telekom.de/w5base2/auth/base/load/J5Base.js">
+</script>
+
+<script language="JavaScript">
+var W5Base=createConfig({ useUTF8:false, mode:'auth',transfer:'JSON' },
+                        "http://w8n00378.bmbg01.telekom.de/w5base2");
+
+var app=new Array();
+var sys=new Array();
+var currentApplId="";
+var currentSys=undefined;
+var totalInst=0;
+
+
+function checkSystems()
+{
+   if (currentSys!=undefined && currentSys<sys.length){
+      $('#result').text("check"+currentSys);
+      var o=getModuleObject(W5Base,"itil::lnksoftwaresystem");
+      o.SetFilter({systemid:sys[currentSys].systemid});  
+      o.findRecord("id",function(data){ 
+         for(c=0;c<data.length;c++){
+            totalInst++
+         }
+      });
+      currentSys++;
+      window.setTimeout(checkSystems,1);
+   }
+   else{
+      $('#state').html("<font color=darkgreen>totalInst="+totalInst+"</font>");
+   }
+}
+
+
+
+
+function displaySystems(res)
+{
+
+   $('#state').html("<font color=darkgreen>Systems Loaded</font>");
+   var d="";
+  // for(c=0;c<res.length;c++){
+  //    console.log(res[c]);
+  // }
+   sys=res;
+   $('#state').html("<font color=darkred>Step2 - "+res.length+
+                    " systems loaded</font>");
+   currentSys=0;
+   window.setTimeout(checkSystems,10);
+}
+
+
+function loadSystems()
+{
+   $('#state').html("<font color=darkred>loading systems ...</font>");
+   if (console) console.log("loadSystems():");
+
+   var o=getModuleObject(W5Base,"itil::lnkapplsystem");
+   o.SetFilter({applcistatusid:"4",applid:currentApplId});  
+   $('#result').text("load id="+currentApplId);
+   o.findRecord("id,systemid",displaySystems);
+}
+
+
+function displayApplications(res)
+{
+   var d="";
+
+   currentApplId="";
+   for(c=0;c<res.length;c++){
+      d+=res[c].name;
+      currentApplId+=" "+res[c].id;
+   }
+   app=res;
+   //$('#result').text(d);
+   $('#state').html("<font color=darkred>Step1 - "+res.length+
+                    " applications loaded</font>");
+   window.setTimeout(loadSystems,1500);
+}
+
+
+function loadApplications()
+{
+   $('#state').html("<font color=darkred>loading applications ...</font>");
+   if (console) console.log("loadApplications():");
+   var o=getModuleObject(W5Base,"itil::appl");
+
+   o.SetFilter({cistatusid:"4",businessteam:$('#businessteam').val()});  
+   o.findRecord("name,id",displayApplications);
+}
+
+function addSoftwareNames(res)
+{
+   for(c=0;c<res.length;c++){
+      $('#software').append($('<option></option>').
+               val(res[c].id).html(res[c].name));
+   }
+   $('#state').html("<font color=darkgreen>Ready</font>");
+   $('#loadData').click(loadApplications);
+}
+
+
+function loadSoftwareNames()
+{
+   $('#state').html("<font color=darkred>loading software ...</font>");
+   if (console) console.log("loadSoftwareNames():");
+   var o=getModuleObject(W5Base,"itil::software");
+   o.SetFilter({cistatusid:"4",name:'ms* ora*'});  
+   o.findRecord("name,id",addSoftwareNames);
+}
+
+
+$(document).ready(function (){
+   $('#state').html("<font color=red>loading ...</font>");
+   window.setTimeout(loadSoftwareNames,1500);
+});
+
+
+
+</script>
+
+</head>
+<body>
+<!-- CONTROL -->
+<table border=0 width=100%>
+   <tr>
+      <td width=1% nowrap>Software:</td>
+      <td>
+         <select style="width:100%" id=software ></select>
+      </td>
+      <td width=1% colspan=1 align=right>
+      </td>
+   </tr>
+   <tr>
+      <td width=1% nowrap>Betriebsbereich:</td>
+      <td>
+         <input style="width:100%" type=text id=businessteam 
+          value="DTAG.TSI.ICTO.CSS.AO.DTAG.TH3 DTAG.TSI.ICTO.CSS.AO.DTAG.TH2.*DBOS*">
+      </td>
+      <td width=1% colspan=1 align=right>
+         <input type=button id=loadData value="Load Data">
+      </td>
+   </tr>
+   <tr>
+      <td width=1% nowrap>Status:</td>
+      <td><div id=state></div>
+      </td>
+      <td width=1% colspan=1 align=right>&nbsp;
+      </td>
+   </tr>
+</table>
+
+<!-- RESULT -->
+
+<div id=result>
+</div>
+
+
+</body>
+</html>
+

@@ -127,10 +127,7 @@ sub ProcessLine
       #$d=$self->{JSON}->pretty->encode(\%rec);
       $d=$self->{JSON}->encode(\%rec);
    }
-   if (defined($idname)){
-      my $k=$rec->{$idname};
-      $d="'$k':$d";
-   }
+   $d=$self->FormatRecordStruct($d,$rec,$idname);
    # date hack, to get Date objects in JavaScript!
    $d=~s/"\\\\Date\((\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)\)\\\\"/new Date($1,$2,$3,$4,$5)/g;
    if ($lineno>1){
@@ -138,6 +135,17 @@ sub ProcessLine
    }
    else{
       $d.="\n";
+   }
+   return($d);
+}
+
+sub FormatRecordStruct
+{
+   my $self=shift;
+   my ($d,$rec,$idname)=@_;
+   if (defined($idname)){
+      my $k=$rec->{$idname};
+      $d="'$k':$d";
    }
    return($d);
 }
@@ -200,5 +208,22 @@ EOF
    $d.="createNamespace('$objectname')['$propname']=\n{\n";
    return($d);
 }
+
+sub getEmpty
+{
+   my $self=shift;
+   my (%param)=@_;
+   my $d="";
+   if ($param{HttpHeader}){
+      $d.=$self->getHttpHeader();
+      $d.=$self->ProcessHead();
+   }
+   if ($param{HttpHeader}){
+      $d.=$self->ProcessBottom();
+   }
+   return($d);
+}
+
+
 
 1;
