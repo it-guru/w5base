@@ -979,7 +979,7 @@ sub isViewValid
          @gl=grep(/^(name|header|office|default|groups|comments|nativcontact|qc)$/,@gl);
       }
       elsif ($secstate<4){
-         @gl=grep(/^(name|header|office|officeacc|private|default|groups|comments|nativcontact|qc)$/,@gl);
+         @gl=grep(/^(name|header|office|officeacc|private|default|groups|comments|nativcontact|control|qc)$/,@gl);
       }
    }
    if ($userid==$rec->{userid}){
