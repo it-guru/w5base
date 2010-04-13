@@ -225,7 +225,7 @@ sub new
                 label         =>'LicencenseID',
                 dataobjattr   =>'lnksoftwaresystem.liccontract'),
                                                    
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'systemid',
                 label         =>'SystemId',
                 dataobjattr   =>'lnksoftwaresystem.system'),

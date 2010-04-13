@@ -2,7 +2,7 @@
 <head>
 <title>Check Software Installation Status</title>
 <script type='text/javascript'    
-   src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'>
+   xsrc='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'>
 </script>
 
 
@@ -16,27 +16,76 @@ var W5Base=createConfig({ useUTF8:false, mode:'auth',transfer:'JSON' },
 
 var app=new Array();
 var sys=new Array();
+var sysbyid=new Object();
 var currentApplId="";
-var currentSys=undefined;
 var totalInst=0;
 
-
-function checkSystems()
+function showResult()
 {
-   if (currentSys!=undefined && currentSys<sys.length){
-      $('#result').text("check"+currentSys);
+   var d="<table border=1 width=100%>";
+   var isinst=new Array();
+   var notinst=new Array();
+
+   for(var c=0;c<sys.length;c++){
+      if (sys[c].version==undefined){
+         notinst.push(sys[c].system);
+      }
+      else{
+         isinst.push(sys[c].system);
+      }
+   }
+
+   d+="<tr><td nowrap valign=top>"+
+      "<font color=darkgreen>installed on</font></td><td>"+
+      "<div style=\"height:100px;overflow:auto\">"+
+      isinst.join(", ")+"</div></td></tr>";
+   d+="<tr><td nowrap valign=top>"+
+      "<font color=darkred>not installed</font></td><td>"+
+      "<div style=\"height:100px;overflow:auto\">"+
+      notinst.join(", ")+"</div></td></tr>";
+
+   d+="</table>";
+   $('#result').html(d);
+
+}
+
+
+function checkSystems(sysid)
+{
+   if (sysid<sys.length){
+      $('#state').text("check"+sysid);
+
       var o=getModuleObject(W5Base,"itil::lnksoftwaresystem");
-      o.SetFilter({systemid:sys[currentSys].systemid});  
-      o.findRecord("id",function(data){ 
+
+      var fltsystemid="";
+      for(sysid;sysid<sys.length && fltsystemid.length<1000;sysid++){
+         fltsystemid+=" "+sys[sysid].systemid;
+         sysbyid[sys[sysid].systemid]=sys[sysid];
+      }
+      o.SetFilter({systemid:fltsystemid,softwareid:$('#software').val()});  
+      o.findRecord("id,systemid,version,quantity",function(data){ 
          for(c=0;c<data.length;c++){
             totalInst++
+            if (data[c].version==undefined){ 
+               data[c].version="?";
+            }
+            sysbyid[data[c].systemid].version=data[c].version;
          }
+         window.setTimeout(function(){checkSystems(sysid+1)},1);
       });
-      currentSys++;
-      window.setTimeout(checkSystems,1);
    }
    else{
-      $('#state').html("<font color=darkgreen>totalInst="+totalInst+"</font>");
+      window.setTimeout(function(){showResult()},1);
+      var total=sys.length;
+      var instp=totalInst*100/total;
+
+      $('#state').html(
+                  sprintf("Anzahl Systeme=%d - Software installiert "+
+                          "auf <font color=darkgreen>%d</font>/"+
+                          "<font color=darkred>%d</font>"+
+                          " = Installationsquote = %0.2f %%",
+                          total,totalInst,total-totalInst,instp)
+                  );
    }
 }
 
@@ -47,27 +96,21 @@ function displaySystems(res)
 {
 
    $('#state').html("<font color=darkgreen>Systems Loaded</font>");
-   var d="";
-  // for(c=0;c<res.length;c++){
-  //    console.log(res[c]);
-  // }
    sys=res;
    $('#state').html("<font color=darkred>Step2 - "+res.length+
                     " systems loaded</font>");
-   currentSys=0;
-   window.setTimeout(checkSystems,10);
+   totalInst=0;
+   window.setTimeout(function(){checkSystems(0)},10);
 }
 
 
 function loadSystems()
 {
    $('#state').html("<font color=darkred>loading systems ...</font>");
-   if (console) console.log("loadSystems():");
 
    var o=getModuleObject(W5Base,"itil::lnkapplsystem");
-   o.SetFilter({applcistatusid:"4",applid:currentApplId});  
-   $('#result').text("load id="+currentApplId);
-   o.findRecord("id,systemid",displaySystems);
+   o.SetFilter({applcistatusid:"4",systemcistatusid:"4",applid:currentApplId});
+   o.findRecord("id,systemid,system",displaySystems);
 }
 
 
@@ -91,7 +134,6 @@ function displayApplications(res)
 function loadApplications()
 {
    $('#state').html("<font color=darkred>loading applications ...</font>");
-   if (console) console.log("loadApplications():");
    var o=getModuleObject(W5Base,"itil::appl");
 
    o.SetFilter({cistatusid:"4",businessteam:$('#businessteam').val()});  
@@ -112,9 +154,8 @@ function addSoftwareNames(res)
 function loadSoftwareNames()
 {
    $('#state').html("<font color=darkred>loading software ...</font>");
-   if (console) console.log("loadSoftwareNames():");
    var o=getModuleObject(W5Base,"itil::software");
-   o.SetFilter({cistatusid:"4",name:'ms* ora*'});  
+   o.SetFilter({cistatusid:"4"});  
    o.findRecord("name,id",addSoftwareNames);
 }
 
@@ -144,7 +185,7 @@ $(document).ready(function (){
       <td width=1% nowrap>Betriebsbereich:</td>
       <td>
          <input style="width:100%" type=text id=businessteam 
-          value="DTAG.TSI.ICTO.CSS.AO.DTAG.TH3 DTAG.TSI.ICTO.CSS.AO.DTAG.TH2.*DBOS*">
+          value="DTAG.TSI.ICTO.CSS.AO.DTAG.TH2.*">
       </td>
       <td width=1% colspan=1 align=right>
          <input type=button id=loadData value="Load Data">

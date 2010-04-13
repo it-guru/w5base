@@ -59,6 +59,7 @@ sub ProcessHead
    
    my $d="";
    my $JSONP=Query->Param("_JSONP");
+   $JSONP="_JSONP" if ($JSONP eq "");
    $d.="$JSONP([\n";
    return($d);
 }
