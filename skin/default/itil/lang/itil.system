@@ -28,7 +28,7 @@
 'Deputy Administrator'=>{de=>'Administrator Vertreter'},
 'Administrationteam'=>{de=>'Administrationsteam'},
 'Applications'=>{de=>'Anwendungen'},
-'Applicationnames'=>{de=>'Anwendungsname'},
+'Applicationnames'=>{de=>'Anwendungsnamen'},
 'Applicationnames line'=>{de=>'Anwendungsname (Zeile)'},
 'Application business teams'=>{de=>'Anwendungs-Betriebsteams'},
 'Short Description'=>{de=>'Kurzbeschreibung'},

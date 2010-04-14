@@ -82,7 +82,7 @@ sub new
                 label         =>'useable by application',
                 vjointo       =>'itil::system',
                 vjoinon       =>['systemid'=>'id'],
-                vjoindisp     =>'applicationnamesline'),
+                vjoindisp     =>'applicationnames'),
 
       new kernel::Field::Text(
                 name          =>'custcontract',

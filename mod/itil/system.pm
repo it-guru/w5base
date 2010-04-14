@@ -104,7 +104,7 @@ sub new
                 vjoininhash   =>['appl','applcistatusid','mandatorid',
                                  'applid']),
 
-      new kernel::Field::SubList(
+      new kernel::Field::Text(
                 name          =>'applicationnames',
                 label         =>'Applicationnames',
                 group         =>'applications',
@@ -116,15 +116,27 @@ sub new
                 vjoindisp     =>['appl']),
 
       new kernel::Field::Text(
-                name          =>'applicationnamesline',
-                label         =>'Applicationnames line',
+                name          =>'tsmemails',
+                label         =>'Technical Solution Manager E-Mails',
                 group         =>'applications',
                 htmldetail    =>0,
                 searchable    =>0,
                 vjointo       =>'itil::lnkapplsystem',
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
                 vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>['appl']),
+                vjoindisp     =>['tsmemail']),
+
+
+#      new kernel::Field::Text(
+#                name          =>'applicationnamesline',
+#                label         =>'Applicationnames line',
+#                group         =>'applications',
+#                htmldetail    =>0,
+#                searchable    =>0,
+#                vjointo       =>'itil::lnkapplsystem',
+#                vjoinbase     =>[{applcistatusid=>"<=4"}],
+#                vjoinon       =>['id'=>'systemid'],
+#                vjoindisp     =>['appl']),
 
       new kernel::Field::Text(
                 name          =>'customer',

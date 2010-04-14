@@ -195,6 +195,17 @@ sub new
                 vjoinon       =>['id'=>'assetid'],
                 vjoindisp     =>['appl']),
 
+      new kernel::Field::Text(
+                name          =>'tsmemails',
+                label         =>'Technical Solution Manager E-Mails',
+                group         =>'applications',
+                htmldetail    =>0,
+                searchable    =>0,
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{applcistatusid=>"<=4"}],
+                vjoinon       =>['id'=>'assetid'],
+                vjoindisp     =>['tsmemail']),
+
       new kernel::Field::SubList(
                 name          =>'applicationteams',
                 label         =>'Application business teams',
