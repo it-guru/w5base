@@ -66,6 +66,11 @@ EOF
    return($d);
 }
 
+#
+# Interface Description in W5Base/Darwin Intranet Telekom at
+# https://darwin.telekom.de/darwin/public/faq/article/ById/12712339970002
+#
+
 
 sub Result
 {
