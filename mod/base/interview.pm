@@ -218,6 +218,11 @@ sub new
                 label         =>'Question prio',
                 dataobjattr   =>'interview.prio'),
 
+      new kernel::Field::Interface(
+                name          =>'rawprio',
+                label         =>'Question prio',
+                dataobjattr   =>'interview.prio'),
+
       new kernel::Field::Select(
                 name          =>'questtyp',
                 transprefix   =>'QT.', 

@@ -40,7 +40,7 @@ sub HtmlInterviewLink
                                       'jquery.ui.js',
                                       'jquery.ui.widget.js',
                                       'jquery.ui.dataCube.js',
-                                    #  'firebug-lite.js',
+                                      #'firebug-lite.js',
                                       'jquery.locale.js'],
                                  style=>['default.css','work.css',
                                          'Output.HtmlDetail.css',
@@ -334,7 +334,9 @@ EOF
    $d.="<td align=left>".$label."</td>";
    $d.="<td align=right width=1%>".$s."</td><td width=10>".
        $help."</td>".
-       "<td width=10 nowrap><img style=\"cursor:pointer\" onclick=\"document.forms[0].submit();\" src=\"../../../public/base/load/reload.gif\"></td>".
+       "<td width=10 nowrap>".
+       "<img style=\"cursor:pointer\" onclick=\"document.forms[0].submit();\" ".
+       "src=\"../../../public/base/load/reload.gif\"></td>".
        "</tr></table>";
    $d.="</div>";
    $d.=sprintf("<input type=hidden name=$idname value=\"%s\">",$id);
@@ -351,7 +353,7 @@ EOF
 
       my $output=new kernel::Output($interview);
       if ($output->setFormat("JSON",charset=>"latin1")){
-         $interview->SetCurrentView(qw(name id questclust queryblock));
+         $interview->SetCurrentView(qw(name id questclust queryblock rawprio));
          $d.=$output->WriteToScalar(HttpHeader=>0);
       }
       #
@@ -374,9 +376,13 @@ var Cube;
    for (id in document.W5Base.base.interview){
      var a=document.W5Base.last['$id'].interviewst.qStat.questStat[id];
      if (a!=undefined){
+       w=3-document.W5Base.base.interview[id].rawprio;
+       if (w<1){
+          w=1;
+       }
        var o=new Object({qb:document.W5Base.base.interview[id].queryblock,
                          qg:document.W5Base.base.interview[id].questclust,
-                         weight:1,
+                         weight:w,
                          value:a});
        Cube.push(o);
      }
