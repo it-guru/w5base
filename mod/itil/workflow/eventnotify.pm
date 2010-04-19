@@ -1088,8 +1088,8 @@ sub getNotificationSubject
          $bp=$WfRec->{affectedbusinessprocess}->[0];
       }
       $bp=~s/\@/ \/ /g;
-      $subject2=" / $state Incident / $bp / ".
-                $self->getParent->T("Businessprocess")." /";
+      $subject2=" / ".$self->getParent->T("Businessprocess").
+                " / $state Incident / $bp / ";
    }
    if ($WfRec->{eventmode} eq "EVk.infraloc"){ 
       my $loc=$WfRec->{affectedlocation};

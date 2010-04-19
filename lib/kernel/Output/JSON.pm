@@ -70,7 +70,12 @@ sub getHttpHeader
    my $self=shift;
    my $app=$self->getParent->getParent();
    my $d="";
-   $d.="Content-type:".$self->MimeType().";charset=UTF8\n\n";
+   if ($self->{charset} ne "latin1"){
+      $d.="Content-type:".$self->MimeType().";charset=UTF8\n\n";
+   }
+   else{
+      $d.="Content-type:".$self->MimeType()."\n\n";
+   }
    return($d);
 }
 
@@ -121,11 +126,14 @@ sub ProcessLine
    $idname=$idname->Name() if (defined($idname));
    my $d;
    if (defined($self->{JSON})){
+printf STDERR ("fifi charset=$self->{charset}\n");
       if ($self->{charset} eq "latin1"){
          $self->{JSON}->property(latin1 => 1);
+         $self->{JSON}->property(utf8 => 0);
       }
       #$d=$self->{JSON}->pretty->encode(\%rec);
       $d=$self->{JSON}->encode(\%rec);
+printf STDERR ("fifi d=%s\n",Dumper($d));
    }
    $d=$self->FormatRecordStruct($d,$rec,$idname);
    # date hack, to get Date objects in JavaScript!

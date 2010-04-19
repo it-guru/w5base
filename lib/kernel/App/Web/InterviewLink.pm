@@ -40,7 +40,7 @@ sub HtmlInterviewLink
                                       'jquery.ui.js',
                                       'jquery.ui.widget.js',
                                       'jquery.ui.dataCube.js',
-                                      'firebug-lite.js',
+                                     # 'firebug-lite.js',
                                       'jquery.locale.js'],
                                  style=>['default.css','work.css',
                                          'Output.HtmlDetail.css',
