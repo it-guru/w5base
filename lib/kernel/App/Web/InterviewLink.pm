@@ -40,7 +40,7 @@ sub HtmlInterviewLink
                                       'jquery.ui.js',
                                       'jquery.ui.widget.js',
                                       'jquery.ui.dataCube.js',
-                                      #'firebug-lite.js',
+                                      'firebug-lite.js',
                                       'jquery.locale.js'],
                                  style=>['default.css','work.css',
                                          'Output.HtmlDetail.css',
@@ -380,7 +380,11 @@ var Cube;
        if (w<1){
           w=1;
        }
-       var o=new Object({qb:document.W5Base.base.interview[id].queryblock,
+       var qn=document.W5Base.base.interview[id].name;
+       qn=qn.replace(".","_");
+
+       var qc=document.W5Base.base.interview[id].queryblock+"."+qn;
+       var o=new Object({qb:qc,
                          qg:document.W5Base.base.interview[id].questclust,
                          weight:w,
                          value:a});

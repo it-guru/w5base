@@ -142,6 +142,7 @@ function loadApplications()
 
 function addSoftwareNames(res)
 {
+   alert("add");
    for(c=0;c<res.length;c++){
       $('#software').append($('<option></option>').
                val(res[c].id).html(res[c].name));
@@ -156,6 +157,7 @@ function loadSoftwareNames()
    $('#state').html("<font color=darkred>loading software ...</font>");
    var o=getModuleObject(W5Base,"itil::software");
    o.SetFilter({cistatusid:"4"});  
+   alert("load");
    o.findRecord("name,id",addSoftwareNames);
 }
 
