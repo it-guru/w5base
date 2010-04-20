@@ -5,19 +5,26 @@
    xsrc='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'>
 </script>
 
+<link rel="stylesheet" 
+      href="../../../auth/base/load/jquery.ui.css">
+</link>
+
 
 <script language="JavaScript" 
-   src="http://w8n00378.bmbg01.telekom.de/w5base2/auth/base/load/J5Base.js">
+   src="../../../auth/base/load/J5Base.js">
+</script>
+
+<script language="JavaScript" 
+   src="../../../auth/base/load/jquery.ui.js">
 </script>
 
 <script language="JavaScript">
-var W5Base=createConfig({ useUTF8:false, mode:'auth',transfer:'JSON' },
-                        "http://w8n00378.bmbg01.telekom.de/w5base2");
+var W5Base=createConfig({ useUTF8:false, mode:'auth',transfer:'JSON' });
 
 var app=new Array();
 var sys=new Array();
 var sysbyid=new Object();
-var currentApplId="";
+var currentAppl;
 var totalInst=0;
 
 function showResult()
@@ -46,6 +53,7 @@ function showResult()
 
    d+="</table>";
    $('#result').html(d);
+   $("#processbar").progressbar("option","value",100.0);
 
 }
 
@@ -53,12 +61,15 @@ function showResult()
 function checkSystems(sysid)
 {
    if (sysid<sys.length){
-      $('#state').text("check"+sysid);
+      $('#state').html("<font color=darkred>checking software installation on "+
+                       sys.length+" systems");
+      $("#processbar").progressbar("option","value",
+                       sysid*100.0/sys.length);
 
       var o=getModuleObject(W5Base,"itil::lnksoftwaresystem");
 
       var fltsystemid="";
-      for(sysid;sysid<sys.length && fltsystemid.length<1000;sysid++){
+      for(sysid;sysid<sys.length && fltsystemid.length<100;sysid++){
          fltsystemid+=" "+sys[sysid].systemid;
          sysbyid[sys[sysid].systemid]=sys[sysid];
       }
@@ -95,22 +106,34 @@ function checkSystems(sysid)
 function displaySystems(res)
 {
 
-   $('#state').html("<font color=darkgreen>Systems Loaded</font>");
-   sys=res;
-   $('#state').html("<font color=darkred>Step2 - "+res.length+
-                    " systems loaded</font>");
-   totalInst=0;
-   window.setTimeout(function(){checkSystems(0)},10);
+   for(var c=0;c<res.length;c++){
+      sys.push(res[c]);
+   }
+   if (currentAppl.length>0){
+      window.setTimeout(loadSystems,100);
+   }
+   else{
+      $('#state').html("<font color=darkred>Step2 - "+res.length+
+                       " systems loaded</font>");
+      totalInst=0;
+      window.setTimeout(function(){checkSystems(0)},10);
+   }
 }
 
 
 function loadSystems()
 {
-   $('#state').html("<font color=darkred>loading systems ...</font>");
-
-   var o=getModuleObject(W5Base,"itil::lnkapplsystem");
-   o.SetFilter({applcistatusid:"4",systemcistatusid:"4",applid:currentApplId});
-   o.findRecord("id,systemid,system",displaySystems);
+   $('#state').html("<font color=darkred>loading systems for "+
+                    app.length+" applications</font>");
+   
+   $("#processbar").progressbar("option","value",
+                    100.0*(app.length-currentAppl.length)/app.length);
+   if (currentAppl.length>0){
+      var o=getModuleObject(W5Base,"itil::lnkapplsystem");
+      o.SetFilter({applcistatusid:"4",systemcistatusid:"4",
+                   applid:currentAppl.shift()});
+      o.findRecord("id,systemid,system",displaySystems);
+   }
 }
 
 
@@ -118,12 +141,14 @@ function displayApplications(res)
 {
    var d="";
 
-   currentApplId="";
+   app=new Array();
+   currentAppl=new Array();
+   sys=new Array();
    for(c=0;c<res.length;c++){
       d+=res[c].name;
-      currentApplId+=" "+res[c].id;
+      currentAppl.push(res[c].id); 
+      app.push(res[c]);
    }
-   app=res;
    //$('#result').text(d);
    $('#state').html("<font color=darkred>Step1 - "+res.length+
                     " applications loaded</font>");
@@ -142,11 +167,12 @@ function loadApplications()
 
 function addSoftwareNames(res)
 {
-   alert("add");
    for(c=0;c<res.length;c++){
       $('#software').append($('<option></option>').
                val(res[c].id).html(res[c].name));
+      $("#processbar").progressbar("option","value",100.0*c/res.length);
    }
+   $("#processbar").progressbar("option","value",100);
    $('#state').html("<font color=darkgreen>Ready</font>");
    $('#loadData').click(loadApplications);
 }
@@ -154,16 +180,17 @@ function addSoftwareNames(res)
 
 function loadSoftwareNames()
 {
+   $("#processbar").progressbar({value:1});  // init progressbar
    $('#state').html("<font color=darkred>loading software ...</font>");
    var o=getModuleObject(W5Base,"itil::software");
-   o.SetFilter({cistatusid:"4"});  
-   alert("load");
+   o.SetFilter({cistatusid:"4",name:"*"});  
    o.findRecord("name,id",addSoftwareNames);
+
 }
 
 
 $(document).ready(function (){
-   $('#state').html("<font color=red>loading ...</font>");
+   $('#state').html("<font color=darkred>loading software list...</font>");
    window.setTimeout(loadSoftwareNames,1500);
 });
 
@@ -196,6 +223,13 @@ $(document).ready(function (){
    <tr>
       <td width=1% nowrap>Status:</td>
       <td><div id=state></div>
+      </td>
+      <td width=1% colspan=1 align=right>&nbsp;
+      </td>
+   </tr>
+   <tr>
+      <td width=1% nowrap></td>
+      <td><div id=processbar></div>
       </td>
       <td width=1% colspan=1 align=right>&nbsp;
       </td>

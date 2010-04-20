@@ -35,10 +35,6 @@ sub IsModuleSelectable
 {
    return(0);
 }
-sub MimeType
-{
-   return("application/javascript");
-}
 
 
 sub getHttpHeader
@@ -46,7 +42,9 @@ sub getHttpHeader
    my $self=shift;
    my $app=$self->getParent->getParent();
    my $d="";
-   $d.="Content-type:".$self->MimeType().";charset=UTF8\n\n";
+   #$d.="Content-type:".$self->MimeType().
+   #    "; charset=UTF8\n\n";#dont work in IE6!
+   $d.="Content-type:".$self->MimeType()."\n\n";
    return($d);
 }
 
@@ -58,11 +56,13 @@ sub ProcessHead
    my ($objectname,$propname)=$self->JSON_ObjectName();
    
    my $d="";
-   my $JSONP=Query->Param("_JSONP");
+   my $JSONP=Query->Param("callback");
    $JSONP="_JSONP" if ($JSONP eq "");
-   $d.="$JSONP([\n";
+   $d.="$JSONP([";
    return($d);
 }
+
+
 
 sub ProcessBottom
 {

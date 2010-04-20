@@ -126,23 +126,18 @@ sub ProcessLine
    $idname=$idname->Name() if (defined($idname));
    my $d;
    if (defined($self->{JSON})){
-printf STDERR ("fifi charset=$self->{charset}\n");
       if ($self->{charset} eq "latin1"){
          $self->{JSON}->property(latin1 => 1);
          $self->{JSON}->property(utf8 => 0);
       }
       #$d=$self->{JSON}->pretty->encode(\%rec);
       $d=$self->{JSON}->encode(\%rec);
-printf STDERR ("fifi d=%s\n",Dumper($d));
    }
    $d=$self->FormatRecordStruct($d,$rec,$idname);
    # date hack, to get Date objects in JavaScript!
    $d=~s/"\\\\Date\((\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)\)\\\\"/new Date($1,$2,$3,$4,$5)/g;
    if ($lineno>1){
-      $d=",\n".$d;
-   }
-   else{
-      $d.="\n";
+      $d="\n,".$d;
    }
    return($d);
 }
