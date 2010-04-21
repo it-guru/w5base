@@ -374,21 +374,27 @@ var Cube;
 \$(document).ready(function (parentid){
    Cube=new Array();
    for (id in document.W5Base.base.interview){
+     var notrelevant=document.W5Base.last['$id'].interviewst.qStat.notrelevant;
      var a=document.W5Base.last['$id'].interviewst.qStat.questStat[id];
-     if (a!=undefined){
-       w=3-document.W5Base.base.interview[id].rawprio;
-       if (w<1){
-          w=1;
-       }
-       var qn=document.W5Base.base.interview[id].name;
-       qn=qn.replace(".","_");
-
-       var qc=document.W5Base.base.interview[id].queryblock+"."+qn;
-       var o=new Object({qb:qc,
-                         qg:document.W5Base.base.interview[id].questclust,
-                         weight:w,
-                         value:a});
-       Cube.push(o);
+     var w=3-document.W5Base.base.interview[id].rawprio;
+     if (w<1){
+        w=1;
+     }
+     if (a!=undefined){  
+       if (jQuery.inArray(id,notrelevant)<0){
+          var qn=document.W5Base.base.interview[id].name;
+          qn=qn.replace(".","_");
+         
+          var qc=document.W5Base.base.interview[id].queryblock+".- "+qn;
+          var o=new Object({qb:qc,
+                            qg:document.W5Base.base.interview[id].questclust,
+                            weight:w,
+                            value:a});
+          Cube.push(o);
+        }
+      //  else{
+      //    alert("id "+id+" not relevant");
+      //  }
      }
    }
    var c={value:Cube,

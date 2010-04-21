@@ -142,6 +142,8 @@ sub dynCalc
    my $total=$#{$self->{TotalActiveQuestions}}+1;
    my $nsum=0;
    my %qstat;
+   my @notrelevant;
+
    foreach my $q (@{$self->{TotalActiveQuestions}}){
       $qstat{$q->{id}}=0.0;
       if ($q->{prio} ne ""){
@@ -182,6 +184,7 @@ sub dynCalc
          }
          if (defined($a) && !$a->{relevant}){
             $qstat{$q->{id}}=100;
+            push(@notrelevant,$q->{id});
          }
       }
    }
@@ -191,7 +194,7 @@ sub dynCalc
    else{
       $s=$s/$nsum;
    }
-   my %s=(totalStat=>$s,questStat=>\%qstat);
+   my %s=(totalStat=>$s,questStat=>\%qstat,notrelevant=>\@notrelevant);
 
    return(\%s);
 }
