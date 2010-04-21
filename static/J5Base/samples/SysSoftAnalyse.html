@@ -23,6 +23,8 @@ var W5Base=createConfig({ useUTF8:false, mode:'auth',transfer:'JSON' });
 
 var app=new Array();
 var sys=new Array();
+var relk=new Object();
+var rel=new Array();
 var sysbyid=new Object();
 var currentAppl;
 var totalInst=0;
@@ -31,21 +33,40 @@ function showResult()
 {
    var d="<table border=1 width=100%>";
    var isinst=new Array();
+   var releases=new Array();
    var notinst=new Array();
+   var appname=new Array();
+
+   for(var c=0;c<app.length;c++){
+      appname.push(app[c].name);
+   }
+
 
    for(var c=0;c<sys.length;c++){
       if (sys[c].version==undefined){
-         notinst.push(sys[c].system);
+         notinst.push(sys[c].system+" ("+sys[c].version+")");
       }
       else{
          isinst.push(sys[c].system);
+         relk[sys[c].version]++;
       }
    }
+   for(var k in relk){
+      rel.push(k);
+   }
 
+   d+="<tr><td nowrap valign=top>checked applications"+
+      "</td><td>"+
+      "<div style=\"height:100px;overflow:auto\">"+
+      appname.join(", ")+"</div></td></tr>";
    d+="<tr><td nowrap valign=top>"+
       "<font color=darkgreen>installed on</font></td><td>"+
       "<div style=\"height:100px;overflow:auto\">"+
       isinst.join(", ")+"</div></td></tr>";
+   d+="<tr><td nowrap valign=top>"+
+      "<font color=darkgreen>installed releases</font></td><td>"+
+      "<div style=\"height:30px;overflow:auto\">"+
+      rel.join(", ")+"</div></td></tr>";
    d+="<tr><td nowrap valign=top>"+
       "<font color=darkred>not installed</font></td><td>"+
       "<div style=\"height:100px;overflow:auto\">"+
@@ -69,9 +90,10 @@ function checkSystems(sysid)
       var o=getModuleObject(W5Base,"itil::lnksoftwaresystem");
 
       var fltsystemid="";
-      for(sysid;sysid<sys.length && fltsystemid.length<100;sysid++){
+      for(;sysid<sys.length;sysid++){
          fltsystemid+=" "+sys[sysid].systemid;
          sysbyid[sys[sysid].systemid]=sys[sysid];
+         if (fltsystemid.length>1000) break;
       }
       o.SetFilter({systemid:fltsystemid,softwareid:$('#software').val()});  
       o.findRecord("id,systemid,version,quantity",function(data){ 
