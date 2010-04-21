@@ -180,6 +180,9 @@ sub dynCalc
             $s=$s+($curs*$n);
             $nsum+=$n;
          }
+         if (defined($a) && !$a->{relevant}){
+            $qstat{$q->{id}}=100;
+         }
       }
    }
    if ($nsum==0){
