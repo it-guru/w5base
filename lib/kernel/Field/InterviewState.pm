@@ -156,7 +156,8 @@ sub dynCalc
                   $curs=100.0;
                }
             }
-            elsif ($q->{questtyp} eq "percent"){
+            elsif ($q->{questtyp} eq "percent" ||
+                   $q->{questtyp} eq "percent4"){
                if (defined($a) && $a->{answer} ne ""){
                   $curs=$a->{answer};
                }
