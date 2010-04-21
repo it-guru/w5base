@@ -86,6 +86,7 @@ sub Result
    my %q1=%q;
    my %q2=%q;
    my %q3=%q;
+   delete($self->{DataObj}->{SoftFilter});
    $self->{DataObj}->ResetFilter();
    if (Query->Param("SHOWALL")){
       $q1{stateid}='<20';
@@ -95,29 +96,54 @@ sub Result
       $self->{DataObj}->SecureSetFilter([\%q1]);
    }
    else{
-      $q1{stateid}='<20';
-      $q1{isdeleted}=\'0';
-      $q1{eventend}="[EMPTY]";
-      $q1{class}=[grep(/^.*::eventnotify$/,
-                       keys(%{$self->{DataObj}->{SubDataObj}}))];
-      $q2{stateid}='<20';
-      $q2{isdeleted}=\'0';
-      $q2{eventend}=">now";
-      $q2{class}=[grep(/^.*::eventnotify$/,
-                       keys(%{$self->{DataObj}->{SubDataObj}}))];
+      if (Query->Param("MIRRORDAYS") ne ""){  # for RWH Interface!
+         my $md=Query->Param("MIRRORDAYS");
+         my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
+         $md=1 if ($md<=0);
+         $md=7 if ($md>=7);
 
-      if (Query->Param("ONLYWITHNOEND") ne "1"){  # for DINA Interface!
-         $q3{stateid}='<20';
-         $q3{isdeleted}=\'0';
-         $q3{eventend}="<now AND >now-60m";
-         $q3{class}=[grep(/^.*::eventnotify$/,
+         $q1{mdate}=">now-${md}d";
+         $q1{class}=[grep(/^.*::eventnotify$/,
                           keys(%{$self->{DataObj}->{SubDataObj}}))];
-         $self->{DataObj}->SecureSetFilter([\%q1,\%q2,\%q3]);
+         $self->{DataObj}->SecureSetFilter([\%q1]);
+         $self->{DataObj}->{SoftFilter}=sub {  # ensure only accessable
+            my $self=shift;                    # mandators can be mirrored
+            my $rec=shift;
+            my $fo=$self->getField("mandatorid");
+            return(0) if (!defined($fo));
+            my $m=$fo->RawValue($rec);
+            return(0) if (ref($m) ne "ARRAY");
+            foreach my $mandator (@mandators){
+               return(1) if (grep(/^$mandator$/,@{$m}));
+            }
+            return(0);
+         }; 
+
       }
       else{
-         $self->{DataObj}->SecureSetFilter([\%q1,\%q2]);
+         $q1{stateid}='<20';
+         $q1{isdeleted}=\'0';
+         $q1{eventend}="[EMPTY]";
+         $q1{class}=[grep(/^.*::eventnotify$/,
+                          keys(%{$self->{DataObj}->{SubDataObj}}))];
+         $q2{stateid}='<20';
+         $q2{isdeleted}=\'0';
+         $q2{eventend}=">now";
+         $q2{class}=[grep(/^.*::eventnotify$/,
+                          keys(%{$self->{DataObj}->{SubDataObj}}))];
+       
+         if (Query->Param("ONLYWITHNOEND") ne "1"){  # for DINA Interface!
+            $q3{stateid}='<20';
+            $q3{isdeleted}=\'0';
+            $q3{eventend}="<now AND >now-60m";
+            $q3{class}=[grep(/^.*::eventnotify$/,
+                             keys(%{$self->{DataObj}->{SubDataObj}}))];
+            $self->{DataObj}->SecureSetFilter([\%q1,\%q2,\%q3]);
+         }
+         else{
+            $self->{DataObj}->SecureSetFilter([\%q1,\%q2]);
+         }
       }
-
    }
 
 
