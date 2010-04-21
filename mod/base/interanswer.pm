@@ -504,6 +504,12 @@ sub getDetailBlockPriority
 }
 
 
+sub getValidWebFunctions
+{
+   my ($self)=@_;
+   return($self->SUPER::getValidWebFunctions(),qw(Store));
+}
+
 
 
 
@@ -515,11 +521,6 @@ sub getDetailBlockPriority
 #   return('Analytics'=>$self->T('Analytics','kernel::App::Web'));
 #}
 #
-#sub getValidWebFunctions
-#{
-#   my ($self)=@_;
-#   return($self->SUPER::getValidWebFunctions(),qw(Analytics Store));
-#}
 #
 #
 #sub collectAnalyticsDataObjects
