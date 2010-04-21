@@ -153,7 +153,20 @@ sub dynCalc
             $a=$self->{AnsweredQuestions}->{interviewid}->{$q->{id}};
          }
          if (!defined($a) || $a->{relevant}){
-            if ($q->{questtyp} eq "percenta"){
+            if ($q->{questtyp} eq "booleana"){
+               if (defined($a)){
+                  $curs=100.0;
+               }
+            }
+            elsif ($q->{questtyp} eq "boolean"){
+               if (defined($a) &&  $a->{answer} eq "1"){
+                  $curs=100.0;
+               }
+               else{
+                  $curs=0.0;
+               }
+            }
+            elsif ($q->{questtyp} eq "percenta"){
                if (defined($a)){
                   $curs=100.0;
                }
