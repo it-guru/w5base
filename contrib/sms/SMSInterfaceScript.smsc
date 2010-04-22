@@ -115,7 +115,8 @@ foreach my $connect (split(/\s+/,$conn)){
                   last;
                }
                else{
-                  msg(WARN(),"SMS message '%s'",$errtxt);
+                  msg(WARN(),"SMS message '%s' while sending to '%s'",
+                             $errtxt,$number);
                }
             }
             else{
