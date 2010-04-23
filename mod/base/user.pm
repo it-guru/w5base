@@ -962,7 +962,7 @@ sub isViewValid
       }
    }  
    elsif ($rec->{usertyp} eq "service"){
-      @gl=qw(header name default comments groups usersubst userro 
+      @gl=qw(header name default comments groups nativcontact usersubst userro 
                 control userparam qc);
    }  
    else{
@@ -987,23 +987,26 @@ sub isViewValid
    }
    else{
       # check if the user has a direct boss
-      my $g=$self->getField("groups")->RawValue($rec);
-      if (ref($g) eq "ARRAY"){
-         foreach my $grp (@$g){
-            if (ref($grp->{roles}) eq "ARRAY"){
-               foreach my $orole ($self->orgRoles()){
-                  if (grep(/^$orole$/,@{$grp->{roles}})){
-                     if ($self->IsMemberOf($grp->{grpid},["RBoss"],"direct")){
-                        push(@gl,"personrelated","private","interview");
+      if ($rec->{usertyp} eq "user"){
+         my $g=$self->getField("groups")->RawValue($rec);
+         if (ref($g) eq "ARRAY"){
+            foreach my $grp (@$g){
+               if (ref($grp->{roles}) eq "ARRAY"){
+                  foreach my $orole ($self->orgRoles()){
+                     if (grep(/^$orole$/,@{$grp->{roles}})){
+                        if ($self->IsMemberOf($grp->{grpid},
+                                              ["RBoss"],"direct")){
+                           push(@gl,"personrelated","private","interview");
+                        }
                      }
                   }
                }
             }
          }
-      }
-      if (!grep(/^personrelated$/,@gl)){
-         if ($self->IsMemberOf("admin")){ 
-            push(@gl,"personrelated","private","interview");
+         if (!grep(/^personrelated$/,@gl)){
+            if ($self->IsMemberOf("admin")){ 
+               push(@gl,"personrelated","private","interview");
+            }
          }
       }
    }

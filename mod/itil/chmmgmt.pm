@@ -141,7 +141,7 @@ sub isWriteValid
    }
    else{
       if ($self->IsMemberOf($rec->{mandatorid},
-                            ["RCHManager"],"up")){
+                            ["RCHManager","RCFManager"],"up")){
          return("default");
       }
       if ($self->IsMemberOf($rec->{chmgrteamid},
