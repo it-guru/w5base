@@ -236,7 +236,7 @@ sub Result
    $p800m="now" if (!defined($p800m) || $p800m eq ""); 
    $mainq1{eventend}="$p800m";
 
-   my @valids=grep(/^.*::(diary|change|incident)$/,
+   my @valids=grep(/^.*::(diary|change|incident|businesreq)$/,
                     keys(%{$self->{DataObj}->{SubDataObj}}));
    if ($mainq1{class} ne ""){
       my $q=quotemeta($mainq1{class});
