@@ -90,6 +90,7 @@
 'primary operation mode'=>{de=>'Vorwiegende Betriebsart'},
 'opmode.'=>{de=>'',en=>''},
 'opmode.prod'=>{de=>'Produktion',en=>'Production'},
+'opmode.pilot'=>{de=>'Pilotbetrieb',en=>'Pilot'},
 'opmode.test'=>{de=>'Test',en=>'Test'},
 'opmode.devel'=>{de=>'Entwicklung',en=>'Development'},
 'opmode.education'=>{de=>'Schulung',en=>'Education'},
