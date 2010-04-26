@@ -47,30 +47,6 @@ sub new
                 container     =>'additional'),
       insertafter=>['applid'] 
    );
-   sub isConfigManager
-   {
-      my $self=shift;
-      my $current=shift;
-      my $app=$self->getParent;
-      return(0) if ($app->IsMemberOf("admin"));
-   
-      if (!defined($current)){
-         my %g=$app->getGroupsOf($app->getCurrentUserId(),"RCFManager");
-         if (keys(%g)){
-            return(0);
-         }
-         return(1);
-      }
-      my $mandatorid=$current->{mandatorid};
-      return(1) if (!defined($mandatorid));
-      if ($mandatorid!=0 &&
-         $app->IsMemberOf($mandatorid,"RCFManager","down")){
-         return(0);
-      }
-      return(1);
-   }
-   $self->setFieldParam("customerprio",readonly=>\&isConfigManager);
-   $self->setFieldParam("criticality",readonly=>\&isConfigManager);
    return($self);
 }
 
