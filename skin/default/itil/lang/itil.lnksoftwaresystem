@@ -8,6 +8,7 @@
 'Software CI-State'=>{de=>'Software CI-Status'},
 'System CI-State'=>{de=>'System CI-Status'},
 'License CI-State'=>{de=>'Lizenz CI-Status'},
+'Installation date'=>{de=>'Installationsdatum'},
 'invalid software version specified'=>{
                de=>'ungültiger Software-Versionsausdruck'},
 'invalid software specified'=>{de=>'keine oder ungültige Software'},

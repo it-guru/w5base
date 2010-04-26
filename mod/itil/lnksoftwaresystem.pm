@@ -117,6 +117,12 @@ sub new
                 vjoinon       =>['liccontractid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::Date(
+                name          =>'instdate',
+                group         =>'misc',
+                label         =>'Installation date',
+                dataobjattr   =>'lnksoftwaresystem.instdate'),
+                                                   
       new kernel::Field::Textarea(
                 name          =>'comments',
                 searchable    =>0,
@@ -331,6 +337,9 @@ sub Validate
    if ($softwareid==0){
       $self->LastMsg(ERROR,"invalid software specified");
       return(undef);
+   }
+   if (!defined($oldrec) && $newrec->{instdate} eq ""){
+      $newrec->{instdate}=NowStamp("en");
    }
    my $version=effVal($oldrec,$newrec,"version");
    my $sw=getModuleObject($self->Config,"itil::software");

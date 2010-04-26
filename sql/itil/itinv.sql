@@ -791,3 +791,5 @@ alter table servicesupport add iflathourscost float(5,2) default NULL;
 alter table servicesupport add databoss bigint(20) default NULL;
 alter table servicesupport add databoss2 bigint(20) default NULL;
 alter table appl add swdepot varchar(128) default NULL;
+alter table lnksoftwaresystem  add instdate datetime default NULL;
+update lnksoftwaresystem set instdate=createdate;
