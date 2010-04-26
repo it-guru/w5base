@@ -435,7 +435,7 @@ sub ValidateCaches
    if ($ENV{REMOTE_USER} ne "anonymous" && #locked account check
        defined($UserCache->{$ENV{REMOTE_USER}}) &&
        defined($UserCache->{$ENV{REMOTE_USER}}->{rec}->{cistatusid})){ 
-      if ($UserCache->{$ENV{REMOTE_USER}}->{rec}->{cistatusid}>4){
+      if ($UserCache->{$ENV{REMOTE_USER}}->{rec}->{cistatusid}!=4){
          if (Query->Param("MOD") eq "base::interface"){
             printf("Status: 403 Forbitten - ".
                    "account needs to be activate with web browser\n");
@@ -444,6 +444,10 @@ sub ValidateCaches
             return(0);
          }
          else{
+            if ($UserCache->{$ENV{REMOTE_USER}}->{rec}->{cistatusid}==3){
+               $self->GTCverification();
+               return(0);
+            }
             print("Content-type:text/plain;charset=ISO-8895-1\n\n");
             printf(msg(ERROR,$self->T("access for user '\%s' to W5Base ".
                              "Framework rejected")),$ENV{REMOTE_USER});
@@ -457,6 +461,42 @@ sub ValidateCaches
    }
 
    return(1);
+}
+
+sub GTCverification
+{
+   my $self=shift;
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css'],
+                           body=>1,form=>1,
+                           title=>'W5Base - GTC verification');
+   my $sitename=$self->Config->Param("SITENAME");
+   my $gtc=$self->getParsedTemplate("tmpl/gtc",{skinbase=>'base'});
+   print(<<EOF);
+<script language="JavaScript">
+function GTC_accept()
+{
+ confirm("You are sure, you will accept the completly GTC's\\n"+
+         " and have understand all consequences?");
+
+}
+function GTC_decline()
+{
+  alert("Without accepted GTC's, there could no access be granted!");
+}
+
+</script>
+EOF
+   print $self->getParsedTemplate("tmpl/gtcform",{
+                          static=>{
+                                gtc=>$gtc,
+                                SITENAME=>$sitename
+                          },
+                          translation=>'base::gtcform',
+                          skinbase=>'base'
+                           });
+
+   print $self->HtmlBottom(body=>1,form=>1);
 }
 
 
