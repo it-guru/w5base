@@ -201,6 +201,22 @@ sub new
                 group         =>'userro',
                 dataobjattr   =>'contact.secstate'),
 
+      new kernel::Field::Date(
+                name          =>'gtcack',
+                label         =>'GTC acknowledge date',
+                readonly      =>1,
+                group         =>'userro',
+                dataobjattr   =>'contact.gtcack'),
+                                  
+      new kernel::Field::Textarea(
+                name          =>'gtctxt',
+                label         =>'GTC text',
+                readonly      =>1,
+                htmldetail    =>0,
+                group         =>'userro',
+                dataobjattr   =>'contact.gtctxt'),
+                                  
+
       new kernel::Field::Link(
                 name          =>'secstateid',
                 label         =>'Sec-StateID',

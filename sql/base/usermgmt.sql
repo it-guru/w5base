@@ -289,3 +289,5 @@ alter table contact add dialermode  varchar(20);
 alter table contact add dialerurl   varchar(128);
 alter table contact add dialeripref varchar(5);
 alter table mandator add key(grpid);
+alter table contact add gtctxt longtext default NULL;
+alter table contact add gtcack datetime default NULL;

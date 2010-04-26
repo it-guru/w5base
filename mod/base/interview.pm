@@ -220,7 +220,7 @@ sub new
 
       new kernel::Field::Interface(
                 name          =>'rawprio',
-                label         =>'Question prio',
+                label         =>'raw Question prio',
                 dataobjattr   =>'interview.prio'),
 
       new kernel::Field::Select(
