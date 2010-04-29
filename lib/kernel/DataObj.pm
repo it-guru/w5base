@@ -616,8 +616,11 @@ sub getWriteRequestHash
                   my $rawWrRequest=$fobj->doUnformat(\@val,$rec);
                   #msg(INFO,"getWriteRequestHash: var=$field $rawWrRequest");
                   if (!defined($rawWrRequest)){
-                     return(undef) if ($self->LastMsg()!=0);
-           
+                     msg(WARN,"can not unformat $field");
+                     if ($self->LastMsg()!=0){
+                        msg(ERROR,"break getWriteRequestHash() doe LastMsgs");
+                        return(undef);
+                     }
                      next;
                   }
                   #msg(INFO,"Unformated $field:%s",Dumper($rawWrRequest));

@@ -502,7 +502,8 @@ sub generateMailSet
 {
    my $self=shift;
    my $WfRec=shift;
-   my ($action,$eventlang,$additional,$emailprefix,$emailpostfix,
+   my ($action,$sendcustinfocount,
+       $eventlang,$additional,$emailprefix,$emailpostfix,
        $emailtext,$emailsep,$emailsubheader,$emailsubtitle,
        $subject,$allowsms,$smstext)=@_;
    my @emailprefix=();
@@ -783,19 +784,22 @@ sub Process
          $subjectlabel="result of root cause analysis";
       }
 
-      my $ag="";
-      if ($WfRec->{eventmode} eq "EVk.appl"){ 
-         foreach my $appl (@{$WfRec->{affectedapplication}}){
-            $ag.="; " if ($ag ne "");
-            $ag.=$appl;
-         }
+
+      my $id=$WfRec->{id};
+      $self->getParent->Action->ResetFilter();
+      $self->getParent->Action->SetFilter({wfheadid=>\$id});
+      my @l=$self->getParent->Action->getHashList(qw(cdate name));
+      my $sendcustinfocount=0;
+      foreach my $arec (@l){
+         $sendcustinfocount++ if ($arec->{name} eq "sendcustinfo");
       }
+
 
 
       my $failclass=$WfRec->{eventstatclass};
       my $subject=$self->getParent->getNotificationSubject($WfRec,"rootcausei",
-                                    $subjectlabel,$failclass,$ag);
-      my $salutation=$self->getParent->getSalutation($WfRec,"rootcausei",$ag);
+                                 $sendcustinfocount,$subjectlabel,$failclass);
+      my $salutation=$self->getParent->getSalutation($WfRec,"rootcausei");
 
       my $eventstat=$WfRec->{stateid};
       my $failcolor="#6699FF";
@@ -810,7 +814,7 @@ sub Process
                       salutation=>$salutation,
                       altsalutation=>$salutation,
                       creationtime=>$creationtime);
-      $self->getParent->generateMailSet($WfRec,"rootcausei",
+      $self->getParent->generateMailSet($WfRec,"rootcausei",$sendcustinfocount,
                        \$eventlang,\%additional,
                        \@emailprefix,\@emailpostfix,\@emailtext,\@emailsep,
                        \@emailsubheader,\@emailsubtitle,\$subject,

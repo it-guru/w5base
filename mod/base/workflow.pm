@@ -2312,6 +2312,7 @@ sub getWriteRequestHash
 {
    my $self=shift;
    my $h=$self->SUPER::getWriteRequestHash(@_);
+   return(undef) if (!defined($h));
    if (defined($h->{mandatorid})){
       my @curval=($h->{mandatorid});
       @curval=@{$h->{mandatorid}} if (ref($h->{mandatorid}) eq "ARRAY");

@@ -108,6 +108,7 @@ foreach my $connect (split(/\s+/,$conn)){
                my ($ack,$errnu,$errtxt)=$emi->send_sms_multipart(
                   RECIPIENT      => $number,
                   MESSAGE_TEXT   => $text,
+                  FLASH          => 1,
                   SENDER_TEXT    => $sitename
                );
                if ($ack){
