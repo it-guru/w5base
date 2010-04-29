@@ -286,6 +286,20 @@ sub new
                 vjoinon       =>['tsm2id'=>'userid'],
                 vjoindisp     =>'fullname'),
 
+      new kernel::Field::Link(                # delmgr location
+                name          =>'conumber',
+                label         =>'CO-Number',
+                weblinkto     =>'itil::costcenter',
+                weblinkon     =>['conumber'=>'name'],
+                dataobjattr   =>'appl.conumber'),
+
+      new kernel::Field::Import( $self,
+                vjointo       =>'itil::costcenter',
+                vjoinon       =>['conumber'=>'name'],
+                group         =>'tscontact',
+                dontrename    =>1,
+                fields        =>[qw(delmgr)]),
+
       new kernel::Field::Text(
                 name          =>'businessteambossid',
                 searchable    =>0,
