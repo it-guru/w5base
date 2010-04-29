@@ -53,6 +53,24 @@ sub new
    return($self);
 }
 
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $origrec=shift;
+
+   if (!defined($oldrec) && length($newrec->{detaildescription})<10){
+      $self->LastMsg(ERROR,"invalid request description");
+      return(0); 
+   }
+   return($self->SUPER::Validate($oldrec,$newrec,$origrec));
+}
+
+
+
+
 sub IsModuleSelectable
 {
    my $self=shift;
