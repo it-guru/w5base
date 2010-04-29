@@ -342,7 +342,8 @@ if (defined($m)){
          $mailtext->head->replace("Subject","REJECT: ".
                                             $mailhead->get("Subject"));
          if (my $io=$mailtext->bodyhandle->open("w")){
-            $io->print("ERROR: you are not known as contact in W5Base");
+            $io->print("ERROR: you ($useremail) are not known ".
+                       "as contact in W5Base");
             $io->close();
          }
          msg(INFO,NowStamp()." reject mail $useremail as unknown user");
