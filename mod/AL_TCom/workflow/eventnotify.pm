@@ -80,6 +80,28 @@ sub getDynamicFields
                 delend        =>['eventstart','shortactionlog'],
                 onRawValue    =>\&calcKPIs),
 
+      new kernel::Field::Date(
+                name          =>'eventkpifirstinfo',
+                translation   =>'AL_TCom::workflow::eventnotify',
+                group         =>'eventnotifyinternal',
+                label         =>'KPI first info',
+                htmldetail    =>0,
+                searchable    =>0,
+                readonly      =>1,
+                delend        =>['shortactionlog','stateid'],
+                onRawValue    =>\&calcKPIs),
+
+      new kernel::Field::Date(
+                name          =>'eventkpilastinfo',
+                translation   =>'AL_TCom::workflow::eventnotify',
+                group         =>'eventnotifyinternal',
+                label         =>'KPI last info',
+                htmldetail    =>0,
+                searchable    =>0,
+                readonly      =>1,
+                delend        =>['shortactionlog','stateid'],
+                onRawValue    =>\&calcKPIs),
+
       new kernel::Field::Number(
                 name          =>'eventkpimintimefollowup',
                 translation   =>'AL_TCom::workflow::eventnotify',
@@ -191,6 +213,7 @@ sub calcKPIs
    
    my $al=$self->getParent->getField("shortactionlog")->RawValue($current);
 
+
    my @tl;
    if (ref($al) eq "ARRAY"){
       foreach my $act (@$al){
@@ -198,6 +221,19 @@ sub calcKPIs
             push(@tl,$act->{cdate});
          }
       }
+   }
+   my $first;
+   my $last;
+   for(my $fn=0;$fn<=$#tl;$fn++){
+      my $t1=$tl[$fn];
+      $first=$t1 if (!defined($first));
+      $last=$t1  if ($current->{stateid}>=17);
+   }
+   if ($self->Name() eq "eventkpifirstinfo"){
+      return($first);
+   }
+   if ($self->Name() eq "eventkpilastinfo"){
+      return($last);
    }
    if ($self->Name() eq "eventkpistart2firstinfo" && $#tl>=0){
       my $start=$self->getParent->getField("eventstart")->RawValue($current);
