@@ -58,6 +58,7 @@ if ($number eq ""){
    exit(1);
 }
 
+my $logfile=$curconfig->Param("SMSLogfile");
 my $conn=$curconfig->Param("DATAOBJCONNECT");
 my $user=$curconfig->Param("DATAOBJUSER");
 my $pass=$curconfig->Param("DATAOBJPASS");
@@ -113,6 +114,11 @@ foreach my $connect (split(/\s+/,$conn)){
                );
                if ($ack){
                   $ok++;
+                  if ($logfile ne "" && open(L,">>".$logfile)){
+                     printf L ("%s:%d:%s:send to %s \n",
+                            NowStamp(),length($text),$connect,$number);
+                     close(L);
+                  }
                   last;
                }
                else{
