@@ -727,7 +727,7 @@ sub generateWorkspace
    my $eventlango=$self->getField("wffields.eventlang",$WfRec);
    $eventlang=$eventlango->RawValue($WfRec) if (defined($eventlango));
 
-   $self->getParent->generateMailSet($WfRec,"rootcausei",
+   $self->getParent->generateMailSet($WfRec,"rootcausei",0,
                     \$eventlang,\%additional,
                     \@emailprefix,\@emailpostfix,\@emailtext,\@emailsep,
                     \@emailsubheader,\@emailsubtitle,
@@ -822,9 +822,10 @@ sub Process
 
 
       my $id=$WfRec->{id};
-      $self->getParent->Action->ResetFilter();
-      $self->getParent->Action->SetFilter({wfheadid=>\$id});
-      my @l=$self->getParent->Action->getHashList(qw(cdate name));
+      my $app=$self->getParent->getParent();
+      $app->Action->ResetFilter();
+      $app->Action->SetFilter({wfheadid=>\$id});
+      my @l=$app->Action->getHashList(qw(cdate name));
       my $sendcustinfocount=0;
       foreach my $arec (@l){
          $sendcustinfocount++ if ($arec->{name} eq "sendcustinfo");
