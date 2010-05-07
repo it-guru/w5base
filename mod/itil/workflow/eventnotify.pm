@@ -1305,10 +1305,17 @@ sub generateMailSet
                      $$smstext.=$self->T("End").":  ".$v."\n";
                   }
                   elsif ($field=~m/(eventimpact)/){
-                     my @a=split(/\n/,$v);
+                   #  zweizeilen Verfahren auf Anweisung von Hr. Pavez entf.
+                   #  my @a=split(/\n/,$v);
+                   #  $v=join("\n",splice(@a,0,2));
+                   #  $v=~s/^\s*//;
+                   #  $v=~s/\s*$//;
+                     my @a=map({$_=~s/^\s*//s;$_=~s/\s*$//s;$_;}
+                     grep(!/^\s*$/,split(/(\[\d+\.\d+\.\d+\s+\d+:\d+\])/,$v)));
+                     if ($#a<=1){
+                        @a=($v);
+                     } 
                      $v=join("\n",splice(@a,0,2));
-                     $v=~s/^\s*//;
-                     $v=~s/\s*$//;
                      $$smstext.=$v."\n";
                   }
                   else{
