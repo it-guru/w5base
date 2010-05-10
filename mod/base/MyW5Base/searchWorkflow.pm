@@ -70,7 +70,7 @@ sub Result
    my %q1=%q;
    return($self->getParent->Empty()) if ($q1{id}=~m/^\s*$/);
    $q1{id}=[split(/[,\s;]/,$q1{id})] if (ref($q1{id}) ne "ARRAY");
-   $q1{id}}=[-1] if ($#{$q1{id}}>1000);
+   $q1{id}=[-1] if ($#{$q1{id}}>1000);
 
    $self->{DataObj}->ResetFilter();
    $self->{DataObj}->SecureSetFilter([\%q1]);
