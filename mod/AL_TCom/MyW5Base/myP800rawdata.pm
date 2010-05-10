@@ -56,41 +56,42 @@ sub Init
                    my $app=$self->getParent;
                    my $fobjrelevant=$app->getField("wffields.tcomcodrelevant",
                                                    $current);
+                   my $tcomcodrelevant="yes";
                    if (defined($fobjrelevant)){
-                      my $tcomcodrelevant=$fobjrelevant->RawValue($current);
-                      my $ok=0;
-                      if ($tcomcodrelevant eq "no"){
+                      $tcomcodrelevant=$fobjrelevant->RawValue($current);
+                   }
+                   my $ok=0;
+                   if ($tcomcodrelevant eq "no"){
+                      $ok=1;
+                   }
+                   else{
+                      my $fobjcause=$app->getField("wffields.tcomcodcause",
+                                                   $current);
+                      my $fobjtime=$app->getField("wffields.tcomworktime",
+                                                   $current);
+                      my $fobjcomm=$app->getField("wffields.tcomcodcomments",
+                                                   $current);
+                      if (defined($fobjcause) && 
+                          defined($fobjtime) &&
+                          defined($fobjcomm)){
                          $ok=1;
-                      }
-                      else{
-                         my $fobjcause=$app->getField("wffields.tcomcodcause",
-                                                      $current);
-                         my $fobjtime=$app->getField("wffields.tcomworktime",
-                                                      $current);
-                         my $fobjcomm=$app->getField("wffields.tcomcodcomments",
-                                                      $current);
-                         if (defined($fobjcause) && 
-                             defined($fobjtime) &&
-                             defined($fobjcomm)){
-                            $ok=1;
-                            my $tcomcodcause=$fobjcause->RawValue($current);
-                            my $tcomcodcomments=$fobjcomm->RawValue($current);
-                            my $tcomworktime=$fobjtime->RawValue($current);
-                           
-                            $ok=0 if ($tcomcodcause eq "" || 
-                                      $tcomcodcause eq "undef");
-                            if ($tcomworktime>1200 && 
-                                length($tcomcodcomments)<20){
-                               $ok=0;
-                            }
+                         my $tcomcodcause=$fobjcause->RawValue($current);
+                         my $tcomcodcomments=$fobjcomm->RawValue($current);
+                         my $tcomworktime=$fobjtime->RawValue($current);
+                        
+                         $ok=0 if ($tcomcodcause eq "" || 
+                                   $tcomcodcause eq "undef");
+                         if ($tcomworktime>1200 && 
+                             length($tcomcodcomments)<20){
+                            $ok=0;
                          }
                       }
-                      if ($ok){
-                         return("ok");
-                      }
-                      else{
-                         return("fail");
-                      }
+                   }
+                   if ($ok){
+                      return("ok");
+                   }
+                   else{
+                      return("fail");
                    }
                    return("?");
                 },
