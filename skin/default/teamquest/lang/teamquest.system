@@ -1,0 +1,7 @@
+'teamquest::system'=>{de=>'TeamQuest: logisches System',
+                      en=>'TeamQuest: logical system'},
+'fieldgroup.itil'=>{de=>'Systemdaten Config-Management',
+                    en=>'systemdata IT-Inventar'},
+'fieldgroup.collect'=>{de=>'gesammelte Daten',
+                    en=>'harvested data'},
+
