@@ -117,6 +117,34 @@ sub getRequestNatureOptions
 }
 
 
+sub isWorkflowManager
+{
+   my $self=shift;
+   my $WfRec=shift;
+
+   if ($WfRec->{stateid}<16){
+      my $userid=$self->getParent->getCurrentUserId();
+     
+      my @devcon=$self->getDefaultContractor($WfRec);
+     
+      my $msg=shift(@devcon);
+     
+      while(my $target=shift(@devcon)){
+         my $targetid=shift(@devcon);
+         if ($target eq "base::user" && $targetid eq $userid){
+            return(1);
+         }
+         if ($target eq "base::grp"){
+            if ($self->getParent->IsMemberOf($targetid,"RMember","direct")){
+               return(1);
+            }
+         }
+      }
+   }
+   return(0);
+}
+
+
 sub getDefaultContractor
 {
    my $self=shift;

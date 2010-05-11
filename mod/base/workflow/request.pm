@@ -221,6 +221,13 @@ sub getDefaultContractor
    return('');
 }
 
+sub isWorkflowManager
+{
+   my $self=shift;
+   my $WfRec=shift;
+   return(0);
+}
+
 sub isViewValid
 {
    my $self=shift;
@@ -470,6 +477,15 @@ sub getPosibleActions
    if (($stateid==3 || $stateid==4) && ($lastworker==$userid || $isadmin)){
       push(@l,"wfdefer");    # Zurückstellen    (durch Anforderer o. Bearbeiter)
    }
+   if ($#l==0 && $l[0] eq "nop"){
+      @l=();
+   }
+   if ($#l==-1){
+      my $mgr=$self->isWorkflowManager($WfRec); # Workflow Manager can
+      if ($mgr){                                # always takeover an active
+         push(@l,"nop","wfhardtake");           # workflow !!
+      }
+   }
    if (1){
       printf STDERR ("WFSTATE:\n".
                      "========\n");
@@ -484,9 +500,7 @@ sub getPosibleActions
       printf STDERR (" - actions              : %s\n",join(", ",@l));
       #printf STDERR (" - WfRec :\n%s\n",Dumper($WfRec));
    }
-   if ($#l==0 && $l[0] eq "nop"){
-      @l=();
-   }
+
    return(@l);
 }
 

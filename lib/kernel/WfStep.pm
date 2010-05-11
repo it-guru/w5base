@@ -22,7 +22,6 @@ use strict;
 use kernel;
 use kernel::Operator;
 use kernel::Wf;
-use Data::Dumper;
 
 @ISA=qw(kernel::Operator kernel::Wf);
 
@@ -229,7 +228,6 @@ sub nativProcess
       my $autocopymode=$h->{autocopymode};
       my $oprec={autocopymode=>$autocopymode,
                  fwdtarget=>undef,
-                 fwdtarget=>undef,
                  fwdtargetid=>undef,
                  fwddebtarget=>undef,
                  fwddebtargetid=>undef};
@@ -237,6 +235,33 @@ sub nativProcess
          $oprec->{autocopydate}=undef;
       }
       $self->StoreRecord($WfRec,$oprec);
+      return(0);
+   }
+   elsif ($op eq "wfhardtake"){
+      my $userid=$self->getParent->getParent->getCurrentUserId();
+      if ($WfRec->{fwdtarget} eq "base::user"){
+         my %newparam=(mode=>'TAKEOVER:',
+                       workflowname=>$WfRec->{name},
+                       sendercc=>1);
+         my $msg=$self->T("TakeOverMailMsg");
+         $self->getParent->getParent->Action->NotifyForward($WfRec->{id},
+                              $WfRec->{fwdtarget},
+                              $WfRec->{fwdtargetid},
+                              "",$msg,%newparam);
+      }
+      if ($self->getParent->getParent->Action->StoreRecord(
+          $WfRec->{id},"wftakeover",
+          {translation=>'kernel::WfStep'},undef,undef)){
+         my $oprec={fwdtarget=>'base::user',
+                    fwdtargetid=>$userid,
+                    stateid=>4,
+                    owner=>$userid,
+                    fwddebtarget=>undef,
+                    fwddebtargetid=>undef};
+         if ($self->StoreRecord($WfRec,$oprec)){
+            $self->PostProcess("SaveStep.".$op,$WfRec,$actions);
+         }
+      }
       return(0);
    }
    elsif ($op eq "wfaddnote" || $op eq "wfaddsnote"){
@@ -780,6 +805,16 @@ sub generateWorkspacePages
          "</textarea></td></tr>";
       $d.="</table>";
       $$divset.="<div id=OPwfmailsend class=\"$class\">$d</div>";
+   }
+   if (grep(/^wfhardtake$/,@$actions)){
+      $$selopt.="<option value=\"wfhardtake\">".
+                $self->getParent->T("wfhardtake",$tr).
+                "</option>\n";
+      $$divset.="<div id=OPwfhardtake class=\"$class\">".
+                "<div style=\"padding:10px\">".
+                $self->getParent->T("wftakemessage",$tr).
+                "</div>".
+                "</div>";
    }
    if (grep(/^wfaddnote$/,@$actions)){
       $$selopt.="<option value=\"wfaddnote\">".

@@ -13,6 +13,7 @@
 'wfforward'=>{de=>'Anforderung weiterleiten an Gruppe oder Person',en=>'forward request to person or group'},
 'wfapprove'=>{de=>'Anforderung genehmigen/freigeben',en=>'approve these request'},
 'wfapprovalreq'=>{de=>'Genehmigung anfordern',en=>'request an approval'},
+'wfhardtake'=>{de=>'Workflow übernehmen und dem aktuellen Bearbeiter entziehen',en=>'Workflow take over'},
 'wfapprovalcan'=>{de=>'Genehmigungsprozess abbrechen',en=>'cancel a request to approval'},
 'wfapprovreject'=>{de=>'Anforderung ablehnen',en=>'reject the request'},
 'wfapprovok'=>{de=>'Ich genehmige diese Anforderung - die Anforderung kann realisiert werden',en=>'yes, i approve this request and it can be realized from now on'},
@@ -24,5 +25,7 @@
 'wfactivate'=>{de=>'Workflow an den Auftragnehmer zuweisen',en=>'assign workflow to contractor'},
 'procinfo'=>{de=>'Prozessinfo',en=>'process info'},
 'wfschedule'=>{de=>'zyklische Aktivierung einstellen',en=>'scheduled activation preferences'},
+'wftakemessage'=>{en=>'Take the Workflow - no matter in witch process state the worklow curently is',de=>'Mit dieser Aktion können Sie den aktuellen Workflow übernehmen - egal wem er gerade zugewiesen ist bzw. in welchem Bearbeitungsstatus der Workflow ist. Sie müssen selbst sicherstellen, dass der aktuelle Bearbeiter von Ihrer Übernahme informiert wird, damit keine etwaigen Doppeltarbeiten durchgeführt werden! Diese Aktion sollte nur dann angewendet werden, wenn ein Workflow z.B. an eine nicht existierende bzw. mitgliederlose Gruppe zugewiesen wurde.'},
+
 
 

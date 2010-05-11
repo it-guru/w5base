@@ -32,6 +32,8 @@
 'KPI max time between followup infos'=>{de=>'KPI maximale Zeitspanne zu einer Folgemeldung'},
 'KPI avg time between followup infos'=>{de=>'KPI durchschnittliche Zeitspanne zu einer Folgemeldung'},
 'KPI latency eventend to first info'=>{de=>'KPI Verzögerung von Ereignisende bis Abschlussmeldung'},
+'KPI first info'=>{de=>'KPI Erstmeldungszeitpunkt'},
+'KPI last info'=>{de=>'KPI Abschlussmeldungszeitpunkt'},
 'SC Problem cause'=>{de=>'Ermittelte Ursache'},
 'SC Problem soultion'=>{de=>'Umzusetzende Maßnahmen'},
 'result of root cause analysis'=>{de=>'Ergebnis der Ursachenanalyse'},

@@ -23,3 +23,5 @@
 'to current forward'=>{de=>'an aktuelle Weiterleitung'},
 'to all related'=>{de=>'an alle Beteiligten'},
 'selected forward user is not allowed'=>{de=>'der gewählte Kontakt kann keine Weiterleitungen empfangen'},
+'wftakeover'=>{de=>'Übernahme',en=>'Take over'},
+'TakeOverMailMsg'=>{en=>'This workflow has been revoked from you. For further informations feel free to contact me',de=>'Dieser Workflow wurde Ihnen entzogen. Falls Sie weitere Informationen dazu benötigen, kontaktieren Sie mich bitte.'},
