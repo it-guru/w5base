@@ -750,6 +750,9 @@ sub getHashList
       return(interface::SOAP::kernel::Finish({exitcode=>128,
              lastmsg=>[msg(ERROR,'no access to dataobject')]}));
    }
+   $self->Log(INFO,"soap",
+              "setFilter: [$objectname] %s",Dumper($filter));
+
    $o->SecureSetFilter($filter); 
    if (defined($limit) && $limit>0 && $limit=~m/^\d+$/){
       $o->Limit($limit,$limitstart);
