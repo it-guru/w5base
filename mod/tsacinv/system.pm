@@ -38,20 +38,21 @@ sub new
                 name          =>'linenumber',
                 label         =>'No.'),
 
-      new kernel::Field::Id(
-                name          =>'systemid',
-                label         =>'SystemId',
-                size          =>'13',
-                uppersearch   =>1,
-                align         =>'left',
-                dataobjattr   =>'amportfolio.assettag'),
-
       new kernel::Field::Text(
                 name          =>'systemname',
                 label         =>'Systemname',
                 uppersearch   =>1,
                 size          =>'16',
                 dataobjattr   =>'amportfolio.name'),
+
+      new kernel::Field::Id(
+                name          =>'systemid',
+                label         =>'SystemId',
+                size          =>'13',
+                searchable    =>1,
+                uppersearch   =>1,
+                align         =>'left',
+                dataobjattr   =>'amportfolio.assettag'),
 
       new kernel::Field::Text(
                 name          =>'conumber',
