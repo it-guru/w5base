@@ -63,6 +63,8 @@ sub qcheckRecord
           if (ref($wiwdata->{$fld}) eq "ARRAY"){
              $wiwdata->{$fld}=$wiwdata->{$fld}->[0];
           }
+          $wiwdata->{$fld}=~s/^\s*unknown\s*$//i;
+          
           $self->IfaceCompare($dataobj,
                      $rec,$fld,
                      $wiwdata,$fld,

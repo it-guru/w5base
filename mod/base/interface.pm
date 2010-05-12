@@ -736,9 +736,9 @@ sub getHashList
              lastmsg=>[msg(ERROR,'base::workflow allows only '.
                                  'SOAP filter to id or srcid')]}));
       }
-      my %f=%$filter;
-      $filter=\%f;  # ensure to get an hash;
    }
+   my %f=%$filter;
+   $filter=\%f;  # ensure to get an hash (instead of a tied object);
    my $o=getModuleObject($self->Config,$objectname);
    if (!defined($o)){
       return(interface::SOAP::kernel::Finish({exitcode=>128,
@@ -750,9 +750,6 @@ sub getHashList
       return(interface::SOAP::kernel::Finish({exitcode=>128,
              lastmsg=>[msg(ERROR,'no access to dataobject')]}));
    }
-   $self->Log(INFO,"soap",
-              "setFilter: [$objectname] %s",Dumper($filter));
-
    $o->SecureSetFilter($filter); 
    if (defined($limit) && $limit>0 && $limit=~m/^\d+$/){
       $o->Limit($limit,$limitstart);

@@ -100,7 +100,8 @@ sub Result
          my $md=Query->Param("MIRRORDAYS");
          my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
          $md=1 if ($md<=0);
-         $md=7 if ($md>=7);
+         #$md=7 if ($md>=7);
+         $md=180 if ($md>=180); # vorrübergehend bis 01.05. für Hr. Hinkers
 
          $q1{mdate}=">now-${md}d";
          $q1{class}=[grep(/^.*::eventnotify$/,

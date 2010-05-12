@@ -122,7 +122,8 @@ sub isWorkflowManager
    my $self=shift;
    my $WfRec=shift;
 
-   if ($WfRec->{stateid}<16){
+   if (defined($WfRec->{id}) &&   # only if a workflow exists, a workflow
+       $WfRec->{stateid}<16){     # manager can be calculated
       my $userid=$self->getParent->getCurrentUserId();
      
       my @devcon=$self->getDefaultContractor($WfRec);

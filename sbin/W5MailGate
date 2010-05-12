@@ -18,7 +18,6 @@ sub FindMimePart
    my $part=shift;
    my $type=shift;
 
-   printf STDERR ("fifi 0 $part\n");
    if ($part->mime_type() eq $type){
       return($part);
    }
@@ -120,6 +119,12 @@ if (defined($m)){
    $mailhead->unfold();
    my $mailtext=FindMimePart($m,"text/plain");
    if (defined($mailtext)){
+      my $requestfrom=$mailhead->get("From");
+      my $useremail=$requestfrom;
+      if (my ($e)=$useremail=~m/<(\S+\@\S+)>$/){
+         $useremail=$e;
+      }
+      $useremail=lc($useremail);
       if (my (undef,$dlname)=$mailmode=~m/^(vl|dl)\.(.*)$/i){
          msg(INFO,"distributionlist mailmode = $mailmode  dlname=$dlname");
          my $i=getModuleObject($curconfig,"base::infoabo");
@@ -142,7 +147,8 @@ if (defined($m)){
          $mailtext->smtpsend();
          exit(0);
       }
-      elsif ($mailmode eq "postmaster"){
+      elsif ($mailmode eq "postmaster"||
+             ($requestfrom=~m/mailer-daemon/i)){
          my $isdelerror=0;
          my $email;
          my $textdata;

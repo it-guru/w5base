@@ -54,7 +54,7 @@ sub new
                 label         =>'confine to data object',
                 dataobjattr   =>'lnkqrulemandator.dataobj'),
                                                  
-      new kernel::Field::TextDrop(
+      new kernel::Field::Select(
                 name          =>'qrule',
                 label         =>'Quality Rule',
                 vjointo       =>'base::qrule',

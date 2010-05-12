@@ -54,6 +54,13 @@ sub WSDLcommon
    $$XMLtypes.="</xsd:complexType>";
    $$XMLtypes.="\n";
 
+   $$XMLtypes.="<xsd:complexType name=\"SubListRecordArray\">"; # dummy type
+   $$XMLtypes.="<xsd:sequence>";
+   $$XMLtypes.="</xsd:sequence>";
+   $$XMLtypes.="</xsd:complexType>";
+   $$XMLtypes.="\n";
+
+
    $$XMLtypes.="<xsd:complexType name=\"CItem\">";
    $$XMLtypes.="<xsd:sequence>";
    $$XMLtypes.="<xsd:element name=\"name\" type=\"xsd:string\" />";
@@ -575,6 +582,10 @@ sub WSDLfieldList
          my $type=$fobj->WSDLfieldType($ns,$mode);
          next if (!defined($type));
          next if ($fobj->Type() ne "Id" && $fobj->readonly && $mode eq "store");
+         next if ($fobj->Type() eq "Linenumber" && 
+                  ($mode eq "store" || $mode eq "filter"));
+         next if ($mode eq "filter" && !($fobj->searchable()) &&
+                  $fobj->Type() ne "Interface");
         # next if ($fobj->Type() eq "Link" && 
         #          ($mode eq "result" || $mode eq "store"));
          my $minOccurs="0";
