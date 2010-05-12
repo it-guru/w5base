@@ -1875,10 +1875,16 @@ sub getFieldObjsByView
    my @subl=();
    my @view;
 
+   my $onlysync=0;
    if ($view->[0] eq "ALL" && $#{$view}==0){
       @view=@{$self->{'FieldOrder'}} if (defined($self->{'FieldOrder'}));
       @view=grep(!/^(qctext|qcstate|qcok|interview|interviewst)$/,@view); # remove qc data
    }
+   #elsif ($view->[0] eq "MAINSET" && $#{$view}==0){  # u.U. for further aliases
+   #   @view=@{$self->{'FieldOrder'}} if (defined($self->{'FieldOrder'}));
+   #   @view=grep(!/^(qctext|qcstate|qcok|interview|interviewst)$/,@view); # remove qc data
+   #   $onlysync=1;
+   #}
    else{
       @view=@{$view};
    }

@@ -46,10 +46,13 @@ sub getPosibleRoles
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
        $self->getParent->getParent->Self()=~m/^.+::appl$/)){
-      return("developer"       =>$self->getParent->T("Developer",
-                                                     $self->Self),
+      return(
+             "developercoord"  =>$self->getParent->T("Development coordination",
+                                                 $self->Self),
              "developerboss"   =>$self->getParent->T("Chief Developer",
                                                  $self->Self),
+             "developer"       =>$self->getParent->T("Developer",
+                                                     $self->Self),
              "businessemployee"=>$self->getParent->T("Business Employee",
                                                  $self->Self),
              "orderin1"        =>$self->getParent->T("Order acceptation",

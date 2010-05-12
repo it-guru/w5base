@@ -7,6 +7,7 @@
 'Business Employee'=>{de=>'Betriebsmitarbeiter'},
 'Customer Contact'=>{de=>'Kundenkontakt'},
 'Developer'=>{de=>'Entwickler'},
+'Development coordination'=>{de=>'Entwicklungskoordination'},
 'Chief Developer'=>{de=>'Entwicklungsleiter'},
 'Order acceptation'=>{de=>'Auftragsannahme'},
 'Order acceptation deputy'=>{de=>'Auftragsannahme Vertretung'},
