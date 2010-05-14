@@ -78,6 +78,39 @@ sub getDynamicFields
     ),$self->SUPER::getDynamicFields(%param));
 }
 
+sub isWorkflowManager
+{
+   my $self=shift;
+   my $WfRec=shift;
+
+   if (defined($WfRec->{id}) &&   # only if a workflow exists, a workflow
+       $WfRec->{stateid}<16){     # manager can be calculated
+      my $userid=$self->getParent->getCurrentUserId();
+      my $applid=$WfRec->{affectedapplicationid};
+      my $appl=getModuleObject($self->getParent->Config,"itil::appl");
+      $appl->SetFilter({id=>$applid});
+      my ($cur,$msg)=$appl->getOnlyFirst(qw(contacts));
+      if (defined($cur) && defined($cur->{contacts})){
+         my $c=$cur->{contacts};
+         if (ref($c) eq "ARRAY"){
+            foreach my $con (@$c){
+               my $roles=$con->{roles};
+               $roles=[$roles] if (ref($roles) ne "ARRAY");
+               if (grep(/^developercoord$/,@$roles)){
+                  if ($con->{target} eq "base::user" &&
+                      $con->{targetid} eq $userid){
+                     return(1);
+                  }
+               }
+            }
+         }
+      }
+   }
+   return(0);
+}
+
+
+
 
 sub getDefaultContractor
 {
@@ -96,25 +129,44 @@ sub getDefaultContractor
       $appl->SetFilter({id=>\$applid});
       my ($cur,$msg)=$appl->getOnlyFirst(qw(allowdevrequest contacts));
       if (defined($cur) && defined($cur->{contacts})){
+         if (!$cur->{allowdevrequest}){
+            $self->LastMsg(ERROR,"developer requests are disabled ".
+                                 "for the desired application");
+            return(undef);
+         }
+         my %p0;
+         my %p1;
+         my %p2;
          my $c=$cur->{contacts};
          if (ref($c) eq "ARRAY"){
             foreach my $con (@$c){
                my $roles=$con->{roles};
                $roles=[$roles] if (ref($roles) ne "ARRAY");
+               if (grep(/^developercoord$/,@$roles)){
+                  $p0{$con->{target}.'::'.$con->{targetid}}=
+                                  {target=>$con->{target},
+                                   targetid=>$con->{targetid}};
+               }
                if (grep(/^developerboss$/,@$roles)){
-                  unshift(@devcon,{target=>$con->{target},
-                                   targetid=>$con->{targetid}});
+                  $p1{$con->{target}.'::'.$con->{targetid}}=
+                                  {target=>$con->{target},
+                                   targetid=>$con->{targetid}};
                }
                if (grep(/^developer$/,@$roles)){
-                  push(@devcon,{target=>$con->{target},
-                                targetid=>$con->{targetid}});
+                  $p2{$con->{target}.'::'.$con->{targetid}}=
+                                  {target=>$con->{target},
+                                   targetid=>$con->{targetid}};
                } 
             }
          }
-         if (!$cur->{allowdevrequest}){
-            $self->LastMsg(ERROR,"developer requests are disabled ".
-                                 "for the desired application");
-            return(undef);
+         foreach my $dev (values(%p2)){
+            unshift(@devcon,$dev->{target},$dev->{targetid});
+         }
+         foreach my $dev (values(%p1)){
+            unshift(@devcon,$dev->{target},$dev->{targetid});
+         }
+         foreach my $dev (values(%p0)){
+            unshift(@devcon,$dev->{target},$dev->{targetid});
          }
       }
    }
@@ -122,8 +174,7 @@ sub getDefaultContractor
       $self->LastMsg(ERROR,"no developer found");
       return(undef);
    }
-   return(undef,$devcon[0]->{target},$devcon[0]->{targetid},
-                $devcon[1]->{target},$devcon[1]->{targetid});
+   return(undef,@devcon);
 }
 
 

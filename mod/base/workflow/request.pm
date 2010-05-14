@@ -263,6 +263,14 @@ sub isWriteValid
         $self->getParent->IsMemberOf("admin"))){
       push(@l,"init");
    }
+   if (!grep(/^init$/,@l) && defined($rec)){
+      if ($self->isWorkflowManager($rec)){
+         push(@l,"default");
+         if ($self->isCurrentForward($rec)){
+            push(@l,"init");
+         }
+      }
+   }
    return(@l);
 }
 

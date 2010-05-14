@@ -47,39 +47,41 @@ sub getPosibleRoles
         defined($self->getParent->getParent) &&
        $self->getParent->getParent->Self()=~m/^.+::appl$/)){
       return(
-             "developercoord"  =>$self->getParent->T("Development coordination",
+         "developercoord"  =>$self->getParent->T("Development coordination",
+                                             $self->Self),
+         "developerboss"   =>$self->getParent->T("Chief Developer",
+                                             $self->Self),
+         "developer"       =>$self->getParent->T("Developer",
                                                  $self->Self),
-             "developerboss"   =>$self->getParent->T("Chief Developer",
+         "businessemployee"=>$self->getParent->T("Business Employee",
+                                             $self->Self),
+         "orderin1"        =>$self->getParent->T("Order acceptation",
                                                  $self->Self),
-             "developer"       =>$self->getParent->T("Developer",
-                                                     $self->Self),
-             "businessemployee"=>$self->getParent->T("Business Employee",
+         "orderin2"        =>$self->getParent->T("Order acceptation deputy",
                                                  $self->Self),
-             "orderin1"        =>$self->getParent->T("Order acceptation",
-                                                     $self->Self),
-             "orderin2"        =>$self->getParent->T("Order acceptation deputy",
-                                                     $self->Self),
-             "customer"        =>$self->getParent->T("Customer Contact",
-                                                     $self->Self),
-             "techcontact"     =>$self->getParent->T("Technical Contact",
-                                                     $self->Self),
-             "infocontact"     =>$self->getParent->T("Information contact",
-                                                     $self->Self),
-             "supervisor"      =>$self->getParent->T("Supervisor",
-                                                     $self->Self),
-             "projectmanager"  =>$self->getParent->T("Projectmanager",
-                                                     $self->Self),
-             "support"         =>$self->getParent->T("Support",
-                                                     $self->Self),
-             "support3d"       =>$self->getParent->T("3rd level Support",
-                                                     $self->Self),
-             "read"            =>$self->getParent->T("read application",
-                                                     $self->Self),
-             "privread"        =>$self->getParent->T("privacy read",
-                                                     $self->Self),
-             "write"           =>$self->getParent->T("write application",
-                                                     $self->Self),
-            );
+         "customer"        =>$self->getParent->T("Customer Contact",
+                                                 $self->Self),
+         "techcontact"     =>$self->getParent->T("Technical Contact",
+                                                 $self->Self),
+         "infocontact"     =>$self->getParent->T("Information contact",
+                                                 $self->Self),
+         "evinfocontact"   =>$self->getParent->T("Event information contact",
+                                                 $self->Self),
+         "supervisor"      =>$self->getParent->T("Supervisor",
+                                                 $self->Self),
+         "projectmanager"  =>$self->getParent->T("Projectmanager",
+                                                 $self->Self),
+         "support"         =>$self->getParent->T("Support",
+                                                 $self->Self),
+         "support3d"       =>$self->getParent->T("3rd level Support",
+                                                 $self->Self),
+         "read"            =>$self->getParent->T("read application",
+                                                 $self->Self),
+         "privread"        =>$self->getParent->T("privacy read",
+                                                 $self->Self),
+         "write"           =>$self->getParent->T("write application",
+                                                 $self->Self),
+      );
    }
    if ($parentobj=~m/^.+::itclust$/ ||
        (defined($self->getParent) &&
@@ -161,12 +163,13 @@ sub Validate
       my $roles=$newrec->{roles};
       $roles=[$roles] if (ref($roles) ne "ARRAY");
       if (grep(/^developerboss$/,@$roles) ||
+          grep(/^developercoord$/,@$roles) ||
           grep(/^orderin1$/,@$roles)){
-         if ($app->isRoleMultiUsed({developerboss=>
-                                     $self->getParent->T("Chief Developer"),
-                                    orderin1=>
-                                     $self->getParent->T("Order acceptation")
-                                   },$roles,$oldrec,$newrec,$parentobj,$refid)){
+         if ($app->isRoleMultiUsed({
+               developerboss =>$self->getParent->T("Chief Developer"),
+               orderin1      =>$self->getParent->T("Order acceptation"),
+               developercoord=>$self->getParent->T("Development coordination")
+               },$roles,$oldrec,$newrec,$parentobj,$refid)){
             return(0);
          }
       }

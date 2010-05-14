@@ -13,6 +13,7 @@
 'Order acceptation deputy'=>{de=>'Auftragsannahme Vertretung'},
 'Technical Contact'=>{de=>'technischer-Ansprechpartner'},
 'Information contact'=>{de=>'Informationspartner'},
+'Event information contact'=>{de=>'Ereignis-Informationspartner'},
 'Projectmanager'=>{de=>'Projektmanager'},
 'read contract'=>{de=>'lesen'},
 'write contract'=>{de=>'write'},

@@ -71,12 +71,12 @@ sub FormatedDetail
       $d=[map({quoteHtml($_)} @{$d})];
    }
    if ($FormatAs ne "XMLV01"){
-      my $vjoinconcat=$self->{vjoinconcat};
-      $vjoinconcat="; " if (!defined($vjoinconcat));
       if ($self->{preferArray} && ($FormatAs eq "SOAP" ||
                                    $FormatAs eq "JSON")){
          return($d); 
       }
+      my $vjoinconcat=$self->{vjoinconcat};
+      $vjoinconcat="; " if (!defined($vjoinconcat));
       $d=join($vjoinconcat,@$d);
    }
    
