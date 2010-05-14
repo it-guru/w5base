@@ -254,6 +254,11 @@ EOF
       }
       return("<input class=finput type=text name=Formated_$name value=\"$d\">");
    }
+   if (ref($d) eq "ARRAY"){
+      my $vjoinconcat=$self->{vjoinconcat};
+      $vjoinconcat="; " if (!defined($vjoinconcat));
+      $d=join($vjoinconcat,@$d);
+   }
    if (!($d=~m/\[\?\]$/)){
       $d=$self->addWebLinkToFacility($d,$current) if ($mode eq "Html");
       $d=$self->addWebLinkToFacility($d,$current) if ($mode eq "HtmlDetail");
