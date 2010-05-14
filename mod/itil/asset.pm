@@ -344,25 +344,21 @@ sub new
                 label         =>'Attachments',
                 group         =>'attachments'),
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Contact(
                 name          =>'guardian',
                 group         =>'guardian',
                 label         =>'Guardian',
-                vjointo       =>'base::user',
-                vjoinon       =>['guardianid'=>'userid'],
-                vjoindisp     =>'fullname'),
+                vjoinon       =>['guardianid'=>'userid']),
 
       new kernel::Field::Link(
                 name          =>'guardianid',
                 dataobjattr   =>'asset.guardian'),
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Contact(
                 name          =>'guardian2',
                 group         =>'guardian',
                 label         =>'Deputy Guardian',
-                vjointo       =>'base::user',
-                vjoinon       =>['guardian2id'=>'userid'],
-                vjoindisp     =>'fullname'),
+                vjoinon       =>['guardian2id'=>'userid']),
 
       new kernel::Field::Link(
                 name          =>'guardian2id',

@@ -246,14 +246,11 @@ sub new
                 label         =>'Short Description',
                 dataobjattr   =>'system.shortdesc'),
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Contact(
                 name          =>'adm',
                 group         =>'admin',
                 label         =>'Administrator',
-                vjointo       =>'base::user',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['admid'=>'userid'],
-                vjoindisp     =>'fullname'),
+                vjoinon       =>['admid'=>'userid']),
 
       new kernel::Field::Link(
                 name          =>'admid',
@@ -331,15 +328,12 @@ sub new
                 vjoinon       =>['assetid'=>'id'],
                 vjoindisp     =>'rack'),
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Contact(
                 name          =>'adm2',
                 AllowEmpty    =>1,
                 group         =>'admin',
                 label         =>'Deputy Administrator',
-                vjointo       =>'base::user',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['adm2id'=>'userid'],
-                vjoindisp     =>'fullname'),
+                vjoinon       =>['adm2id'=>'userid']),
 
       new kernel::Field::Link(
                 name          =>'adm2id',

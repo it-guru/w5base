@@ -35,7 +35,7 @@ sub new
       $param{vjoindisp}=['fullname','email','office_phone','office_mobile'];
    }
    if (!defined($param{vjoineditbase})){
-      $param{vjoineditbase}={'cistatusid'=>[3,4]};
+      $param{vjoineditbase}={'cistatusid'=>[3,4,5]};
    }
    my $self=bless($type->SUPER::new(%param),$type);
    return($self);
