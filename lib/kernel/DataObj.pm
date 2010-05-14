@@ -1418,7 +1418,7 @@ sub getHtmlSelect
    my %opt=@_;
    my $d;
    my $width="100%";
-   my $autosubmit="";
+   my $onchange="";
    my $multiple="";
    my $size="";
    my $keylist=[];
@@ -1438,7 +1438,10 @@ sub getHtmlSelect
       }
    }
    if (exists($opt{autosubmit}) && $opt{autosubmit}==1){
-      $autosubmit=" onchange=window.document.forms[0].submit()";
+      $onchange=" onchange=window.document.forms[0].submit()";
+   }
+   if (exists($opt{onchange}) && $opt{onchange} ne ""){
+      $onchange=" onchange=\"$opt{onchange}\" ";
    }
    if (exists($opt{selected}) && ref($opt{selected}) eq "ARRAY"){
       push(@selected,@{$opt{selected}});
@@ -1453,7 +1456,7 @@ sub getHtmlSelect
    }
    push(@style,"width:$width");
    my $style=join(";",@style);
-   $d="<select name=$name style=\"$style\"$autosubmit$multiple$size>";
+   $d="<select name=$name style=\"$style\"$onchange$multiple$size>";
    my @l;
    my @list;
 

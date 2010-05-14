@@ -3,3 +3,4 @@
 "${instdir}/lib/javascript/url.COMPRESSED.js"
 "${instdir}/lib/javascript/base64.COMPRESSED.js"
 "${instdir}/lib/javascript/sprintf.COMPRESSED.js"
+"${instdir}/lib/javascript/transformElement.js"

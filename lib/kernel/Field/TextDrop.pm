@@ -67,7 +67,12 @@ sub Validate
    my %param=(AllowEmpty=>$self->AllowEmpty);
    my $fromquery=trim(Query->Param("Formated_$name"));
    if (defined($fromquery)){
-      $param{Add}=[{key=>$fromquery,val=>$fromquery}];
+      $param{Add}=[{key=>$fromquery,val=>$fromquery},
+                   {key=>"",val=>""}];
+      $param{onchange}=
+         "if (this.value==''){".
+         "transformElement(this,{type:'text',className:'finput'});".
+         "}";
       $param{selected}=$fromquery;
    }
    my ($dropbox,$keylist,$vallist)=$self->vjoinobj->getHtmlSelect(
