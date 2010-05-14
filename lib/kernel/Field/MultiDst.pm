@@ -286,7 +286,11 @@ sub Validate
          my $width="100%";
          $width=$self->{htmleditwidth} if (defined($self->{htmleditwidth})); 
          $self->FieldCache->{LastDrop}="<select name=Formated_$name ".
-                                       "style=\"width:$width\">";
+                                       "style=\"width:$width\" ".
+                "onchange=\"if (this.value==''){".
+                "transformElement(this,{type:'text',className:'finput'});".
+                "}\" ".
+                 ">";
          foreach my $valrec (@select){
             my $val=$valrec->{disp};
             $self->FieldCache->{LastDrop}.="<option value=\"$val\"";
