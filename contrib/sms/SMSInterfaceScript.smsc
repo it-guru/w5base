@@ -128,7 +128,8 @@ foreach my $connect (split(/\s+/,$conn)){
                }
             }
             else{
-               msg(WARN(),"SMS message '%s'",$errtxt);
+               msg(WARN(),"SMS message '%s' from gateway '%s'",
+                          $errtxt,$connect);
             }
            
          } 
