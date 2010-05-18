@@ -914,6 +914,9 @@ sub HandleNewUser
                if ($sitename ne ""){
                   $subject=$sitename.": ".$subject;
                }
+               my $currenturl=$ENV{SCRIPT_URI};
+               $currenturl=~
+                  s/\/(auth|public)\/.*/\/auth\/base\/menu\/msel\/MyW5Base/;
                if ($id=$wf->Store(undef,{
                       id       =>$id,
                       class    =>'base::workflow::mailsend',
@@ -926,7 +929,7 @@ sub HandleNewUser
                                    { static=>{ email=>$em,
                                                id=>$id,
                                                initialsite=>$ENV{SERVER_NAME},
-                                               currenturl=>$ENV{SCRIPT_URI},
+                                               currenturl=>$currenturl,
                                                account=>$ENV{REMOTE_USER}
                                              },
                                      translation=>'base::accountverification',
