@@ -65,13 +65,13 @@ sub getPosibleRoles
                                                  $self->Self),
          "infocontact"     =>$self->getParent->T("Information contact",
                                                  $self->Self),
-         "evinfocontact"   =>$self->getParent->T("Event information contact",
-                                                 $self->Self),
          "supervisor"      =>$self->getParent->T("Supervisor",
                                                  $self->Self),
          "projectmanager"  =>$self->getParent->T("Projectmanager",
                                                  $self->Self),
-         "support"         =>$self->getParent->T("Support",
+         "support"         =>$self->getParent->T("1st level Support",
+                                                 $self->Self),
+         "support2d"       =>$self->getParent->T("2nd level Support",
                                                  $self->Self),
          "support3d"       =>$self->getParent->T("3rd level Support",
                                                  $self->Self),
@@ -81,7 +81,7 @@ sub getPosibleRoles
                                                  $self->Self),
          "write"           =>$self->getParent->T("write application",
                                                  $self->Self),
-      );
+        );
    }
    if ($parentobj=~m/^.+::itclust$/ ||
        (defined($self->getParent) &&
