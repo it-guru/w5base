@@ -13,6 +13,7 @@ use MIME::Entity;
 use MIME::Parser;
 use vars qw($opt_v $opt_h $opt_c $configname);
 
+
 sub FindMimePart
 {
    my $part=shift;
@@ -58,6 +59,7 @@ if ($ENV{REMOTE_USER} eq ""){
 }
 
 my $mailmode="adminmail";
+$ENV{HTTP_ACCEPT_LANGUAGE}="en" if ($ENV{HTTP_ACCEPT_LANGUAGE} eq "");
 
 if ($ARGV[0] ne ""){
    $mailmode=$ARGV[0];
@@ -158,43 +160,46 @@ if (defined($m)){
                if ($l=~m/Delivery to the following recipients failed./){
                   $isdelerror++;
                }
+               if ($l=~m/Unknown Mailaddress/){
+                  $isdelerror++;
+               }
                if ($isdelerror){
                   if (my ($e)=$l=~m/(\S+\@\S+)/){
                      $email=lc($e);
+                     $email=~s/://g;
                   }
                }
             }
             $io->close();
+            my $fromemail=$useremail;
+            my $name=$mailhead->get("Subject");
             if ($isdelerror && defined($email)){ # check on delivery error
+               $name="Bounce";
+               $fromemail=$email;
+            }
+            if (1){
                $ENV{REMOTE_USER}="anonymous";
                my $ms=getModuleObject($curconfig,"base::mailreqspool");
-               my $useremail=$mailhead->get("From");
                my $reqid=$ms->ValidatedInsertRecord({
-                                           fromemail=>$useremail,
+                                           fromemail=>$fromemail,
                                            state=>'6',
                                            account=>$ENV{REMOTE_USER},
-                                           name=>$mailhead->get("Subject"),
+                                           name=>$name,
                                            textdata=>$textdata,
                                            mailmode=>$mailmode});
-               if ($reqid ne ""){
-                  $ms->SetFilter({id=>\$reqid});
-                  my ($rrec,$msg)=$ms->getOnlyFirst(qw(md5sechash));
-                  if (defined($rrec)){
-                     if (my $io=$mailtext->bodyhandle->open("w")){
-                        $io->print("RequestSec: #".$rrec->{md5sechash}."#\n");
-                        $io->close();
-                        $requestsafe++;
-                     }
-                  }
-               }
-               printf STDERR ("delerror on $email\n");
-            }
-            else{
-               $mailtext->head->replace("To","admin");
-               $mailtext->head->replace("Subject","POSTMASTER: ".
-                                                  $mailhead->get("Subject"));
-               $mailtext->head->replace("From",$mailhead->get("From"));
-               $mailtext->smtpsend();
+               #if ($reqid ne ""){
+               #   $ms->SetFilter({id=>\$reqid});
+               #   my ($rrec,$msg)=$ms->getOnlyFirst(qw(md5sechash));
+               #   if (defined($rrec)){
+               #      if (my $io=$mailtext->bodyhandle->open("w")){
+               #         $io->print("RequestSec: #".$rrec->{md5sechash}."#\n");
+               #         $io->close();
+               #         $requestsafe++;
+               #      }
+               #   }
+               #}
+               #printf STDERR ("delerror on $email\n");
+               exit(0);
             }
          }
       }
@@ -306,6 +311,9 @@ if (defined($m)){
                $mailtext->smtpsend();
                exit(0);
             }
+         }
+         if ($useremail=~m/<.+>/){
+            $useremail=~s/<(.+)>/$1/;
          }
          my $reqid=$ms->ValidatedInsertRecord({fromemail=>$useremail,
                                                state=>'6',
