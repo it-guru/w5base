@@ -173,7 +173,9 @@ EOF
             if ($b->{srclink}=~m/^javascript:/i){
                $link="<a class=bookmark target=_self href=$b->{srclink}>";
             }
-            $bmdiv.="<li class=bookmark>$link".$b->{name}."</a></li>";
+            my $name=quoteHtml($b->{name});
+            
+            $bmdiv.="<li class=bookmark>$link".$name."</a></li>";
          }
          $bmdiv.="</ul>";
 
