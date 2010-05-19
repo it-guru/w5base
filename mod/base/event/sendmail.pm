@@ -487,7 +487,9 @@ sub Sendmail
          }
          ####################################################################
          msg(DEBUG,"deliver maildata to $sendmail");
-         if (open(F,"|".$sendmail." -t")){
+         my $bouncehandler=$self->Config->Param("MAILBOUNCEHANDLER");
+         $bouncehandler='bounce@w5base.net' if ($bouncehandler eq "");
+         if (open(F,"|".$sendmail." -f $bouncehandler -t")){
             print F $mail;
             close(F);
             push(@processed,$rec->{id});
