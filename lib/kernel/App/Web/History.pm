@@ -137,6 +137,10 @@ sub HistoryResult
                return($h->Result(ExternalFilter=>1));
             }
          }
+         else{
+            print $self->noAccess("no access to 'history' fieldgroup");
+            return;
+         }
       }
    }
    print $self->noAccess();
