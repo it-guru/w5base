@@ -253,9 +253,9 @@ min number of cores               : 1
  Step6: add special packages from w5base repository
  ======
    cd $W5BASEINSTDIR/dependence/mandatory/IPC-Smart
-   (umask 022; perl Makefile.PL && make && sudo make install)
+   (umask 022;make clean; perl Makefile.PL && make && sudo make install)
    cd $W5BASEINSTDIR/dependence/mandatory/RPC-Smart
-   (umask 022; perl Makefile.PL && make && sudo make install)
+   (umask 022;make clean; perl Makefile.PL && make && sudo make install)
    cd $W5BASEINSTDIR/dependence/mandatory
    (umask 022; tar -xzvf DateTime-Set-*.tar.gz && \
                cd DateTime-Set-*[!.tar.gz] && \
