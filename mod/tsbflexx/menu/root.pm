@@ -73,6 +73,10 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("bflexx.wfreview",
+                      "tsbflexx::wfreview",
+                      defaultacl=>['admin']);
+   
    return($self);
 }
 

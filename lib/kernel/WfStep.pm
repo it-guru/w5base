@@ -926,25 +926,6 @@ sub getDefaultNoteDiv
          "style=\"width:100%;height:${noteheight}px\">".
          $note."</textarea></td></tr>";
    if ($mode eq "addnote" || $mode eq "simple"){
-      my @t=(''=>'',
-             '10'=>'10 min',
-             '20'=>'20 min',
-             '30'=>'30 min',
-             '40'=>'40 min',
-             '50'=>'50 min',
-             '60'=>'1 h',
-             '90'=>'1,5 h',
-             '120'=>'2 h',
-             '150'=>'2,5 h',
-             '180'=>'3 h',
-             '210'=>'3,5 h',
-             '240'=>'4 h',
-             '300'=>'5 h',
-             '360'=>'6 h',
-             '420'=>'7 h',
-             '480'=>'1 day',
-             '720'=>'1,5 days',
-             '960'=>'2 days');
       if ($mode eq "simple"){
          $d.="<tr><td width=1% nowrap valign=bottom>&nbsp;";
       }
@@ -954,15 +935,8 @@ sub getDefaultNoteDiv
                                             "base::workflowaction").
              ":&nbsp;</td>".
              "<td nowrap valign=bottom>".
-             "<select name=Formated_effort style=\"width:80px\">";
-         my $oldval=Query->Param("Formated_effort");
-         while(defined(my $min=shift(@t))){
-            my $l=shift(@t);
-            $d.="<option value=\"$min\"";
-            $d.=" selected" if ($min==$oldval);
-            $d.=">$l</option>";
-         }
-         $d.="</select>";
+             $self->getParent->getParent->Action->
+                    getEffortSelect("Formated_effort");
       }
       if (defined($WfRec->{initiatorid}) && $userid ne $WfRec->{initiatorid}){
          $d.="&nbsp;&nbsp;&nbsp;";

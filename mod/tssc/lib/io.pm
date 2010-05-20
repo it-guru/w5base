@@ -40,9 +40,10 @@ sub ProcessServiceCenterRecord
    my $wf=$self->{wf};
 
    #msg(DEBUG,"chm=%s",Dumper($rec));
-   my ($wfstorerec,$updateto);
+   my ($wfstorerec,$updateto,$relations);
    if (defined($rec->{changenumber})){
-      ($wfstorerec,$updateto)=$self->mkChangeStoreRec($rec,$wf,$selfname);
+      ($wfstorerec,$updateto,$relations)=
+         $self->mkChangeStoreRec($rec,$wf,$selfname);
    }
    if (defined($rec->{problemnumber})){
       ($wfstorerec,$updateto)=$self->mkProblemStoreRec($rec,$wf,$selfname);
@@ -56,6 +57,7 @@ sub ProcessServiceCenterRecord
          msg(DEBUG,"PROCESS: try to create new workflow entry");
          if (my $id=$wf->Store(undef,$wfstorerec)){
             msg(DEBUG,"workflow id=%s created",$id);
+            $self->CreateOrUpdateRelations($id,$relations);
          }
          else{
             msg(ERROR,"failed to create workflow");
@@ -69,11 +71,95 @@ sub ProcessServiceCenterRecord
             msg(DEBUG,"PROCESS: du update to '$updateto'");
             my $oldrec=$_;
             $wf->ValidatedUpdateRecord($oldrec,$wfstorerec,{id=>\$updateto});
+            $self->CreateOrUpdateRelations($updateto,$relations);
          });
       }
    }
    else{
       msg(DEBUG,"no wfstorerec created");
+   }
+}
+
+sub CreateOrUpdateRelations
+{
+   my $self=shift;
+   my $srcid=shift;
+   my $relations=shift;
+
+
+   if (ref($relations) eq "ARRAY" && $#{$relations}>-1){
+      my %types;
+      foreach my $relrec (@$relations){
+         $types{$relrec->{name}}++;
+      }
+      my @types=keys(%types);
+
+      my $wr=$self->getParent->getPersistentModuleObject(
+                                "base::workflowrelation");
+      $wr->SetFilter({srcwfid=>\$srcid,name=>\@types});
+      my @currelations=$wr->getHashList(qw(ALL));
+
+      my @add;
+      my @del;
+      my @compfields=qw(name dstwfid);
+      my $compfunc=sub{
+         my $ok=1;
+         foreach my $fld (@compfields){
+            $ok=0 if ($_[0]->{$fld} ne $_[1]->{$fld}); 
+         }
+         return(1) if ($ok);
+         return(0);
+      };
+
+      foreach my $rec (@currelations){
+         my $found=0;
+         CHK1: foreach my $chkrec (@$relations){
+            if (&{$compfunc}($rec,$chkrec)){
+               $found++;
+               last CHK1;
+            }
+         }
+         if (!$found){
+            push(@del,$rec);
+         }
+      }
+      foreach my $chkrec (@$relations){
+         my $found=0;
+         CHK2: foreach my $rec (@currelations){
+            if (&{$compfunc}($rec,$chkrec)){
+               $found++;
+               last CHK2;
+            }
+         }
+         if (!$found){
+            push(@add,$chkrec);
+         }
+      }
+      #msg(DEBUG,"currelations=%s",Dumper(\@currelations));
+      #msg(DEBUG,"relations=%s",Dumper($relations));
+      #msg(DEBUG,"compfields=%s",Dumper(\@compfields));
+      #msg(DEBUG,"add=%s",Dumper(\@add));
+      #msg(DEBUG,"del=%s",Dumper(\@del));
+      foreach my $rec (@add){
+         my $chkwfid=$rec->{dstwfid};
+         my $wf=$self->getParent->getPersistentModuleObject(
+                                   "base::workflow");
+         $wf->SetFilter({id=>\$chkwfid});
+         my ($WfRec,$msg)=$wf->getOnlyFirst(qw(id));
+         if (defined($WfRec)){
+            $wr->ValidatedInsertRecord({comments=>'link by SC Change',
+                                        srcwfid=>$srcid,%$rec});
+         }
+         else{
+            if ($self->Config->Param("W5BaseOperationMode") ne "dev"){
+               msg(ERROR,"invalid relation request ".
+                         "'$srcid' to '$rec->{dstwfid}'");
+            }
+         }
+      }
+      foreach my $rec (@del){
+         $wr->ValidatedDeleteRecord($rec);
+      }
    }
 }
 
@@ -238,9 +324,32 @@ sub mkChangeStoreRec
       ServiceCenterWorkEnd=>$rec->{workend},
       ServiceCenterWorkDuration=>$rec->{workduration}
    };
+   msg(DEBUG,"===========================:");
+   my $relations;
+   my $relationupd=0;
+   my $relationupd=1;
    if ($rec->{srcid} ne ""){
       $wfrec{additional}->{ServiceCenterExternChangeID}=$rec->{srcid};
+      msg(DEBUG,"ServiceCenter ExternChangeID:".$rec->{srcid});
    }
+   if ($#oldrec==0){
+      if ($oldrec[0]->{additional}->{ServiceCenterExternChangeID}->[0] ne
+          $rec->{srcid}){
+         $relationupd++;
+      }
+   }
+   else{
+      $relationupd++;
+   }
+   if ($relationupd){
+      if (my ($dstwfid)=$rec->{srcid}=~m/W5B:(\d{10,18})/){
+         $relations=[{dstwfid=>$dstwfid,
+                      name=>'commission',
+                      translation=>'itil::workflow::change'}];
+      }
+   }
+
+
    if ($wfrec{additional}->{ServiceCenterClosedBy} ne
        $rec->{closedby}){
       $wfrec{additional}->{ServiceCenterClosedBy}=$rec->{closedby};
@@ -450,7 +559,7 @@ sub mkChangeStoreRec
        }
    }
    $wfrec{srcload}=$app->ExpandTimeExpression($rec->{sysmodtime},"en","CET");
-   return(\%wfrec,$updateto);
+   return(\%wfrec,$updateto,$relations);
 }
 
 sub extractAffectedApplication

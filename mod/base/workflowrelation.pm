@@ -254,6 +254,16 @@ sub Validate
       $newrec->{owner}=$owner;
    }
    $newrec->{name}=$name;
+   my $srcwfid=trim(effVal($oldrec,$newrec,"srcwfid"));
+   if ($srcwfid eq ""){
+      $self->LastMsg(ERROR,"invalid srcwfid '%s' specified",$srcwfid);
+      return(0);
+   }
+   my $dstwfid=trim(effVal($oldrec,$newrec,"dstwfid"));
+   if ($dstwfid eq ""){
+      $self->LastMsg(ERROR,"invalid dstwfid '%s' specified",$dstwfid);
+      return(0);
+   }
    return(1);
 }
 

@@ -26,6 +26,8 @@
 'procinfo'=>{de=>'Prozessinfo',en=>'process info'},
 'wfschedule'=>{de=>'zyklische Aktivierung einstellen',en=>'scheduled activation preferences'},
 'wftakemessage'=>{en=>'Take the Workflow - no matter in witch process state the worklow curently is',de=>'Mit dieser Aktion können Sie den aktuellen Workflow übernehmen - egal wem er gerade zugewiesen ist bzw. in welchem Bearbeitungsstatus der Workflow ist. Sie müssen selbst sicherstellen, dass der aktuelle Bearbeiter von Ihrer Übernahme informiert wird, damit keine etwaigen Doppeltarbeiten durchgeführt werden! Diese Aktion sollte nur dann angewendet werden, wenn ein Workflow z.B. an eine nicht existierende bzw. mitgliederlose Gruppe zugewiesen wurde.'},
-
+'BCC to sender'=>{de=>'BCC an Versender'},
+'Attachment'=>{de=>'Anlage'},
+'add refernce'=>{de=>'Referenz hinzufügen'},
 
 

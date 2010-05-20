@@ -54,6 +54,12 @@ sub new
                 label         =>'Short-Description',
                 dataobjattr   =>'tbl_p800sleist.shortdescription'),
 
+      new kernel::Field::Text(    
+                name          =>'class',
+                sqlorder      =>'NONE',
+                label         =>'Class',
+                dataobjattr   =>'tbl_p800sleist.wfclass'),
+
       new kernel::Field::Textarea(    
                 name          =>'description',
                 sqlorder      =>'NONE',

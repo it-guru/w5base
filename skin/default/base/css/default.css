@@ -21,10 +21,12 @@
       font-family:Arial,Adobe Helvetica,Helvetica;
       font-size:12px;
       text-decoration:none;
+
    }
    input,select{
       font-size:11px;
       background-color:#ffffff;
+      vertical-align:middle;
    }
    input.checkbox{
       background: transparent;

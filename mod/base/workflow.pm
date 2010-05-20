@@ -1961,6 +1961,13 @@ sub externalMailHandler
       }
       $notiy{emailto}=\@t;
       $notiy{emailcc}=\@c;
+      if (Query->Param("senderbcc") ne ""){
+         my $userid=$self->getCurrentUserId();
+         my $UserCache=$self->Cache->{User}->{Cache};
+         if ($UserCache->{$userid}->{rec}->{email} ne ""){
+            $notiy{emailbcc}=$UserCache->{$userid}->{rec}->{email};
+         }
+      }
       $notiy{class}='base::workflow::mailsend';
       $notiy{step}='base::workflow::mailsend::dataload';
 
@@ -2048,11 +2055,12 @@ EOF
       if ($parent eq "base::workflow" && $id ne "" && $s eq ""){
          $self->ResetFilter();
          $self->SetFilter({id=>\$id});
-         my ($rec,$msg)=$self->getOnlyFirst(qw(name));
+         my ($rec,$msg)=$self->getOnlyFirst(qw(name wffields.conumber));
          $s=$rec->{name};
       }
       $addref="checked";
    }
+
 
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','work.css'],
@@ -2063,6 +2071,9 @@ EOF
    my $to=$self->T("To","base::workflow::mailsend");
    my $subject=$self->T("Subject","base::workflow::mailsend");
    my $send=$self->T("Send message","base::workflow::mailsend");
+   my $bccmsg=$self->T("BCC to sender","base::workflow::mailsend");
+   my $attmsg=$self->T("Attachment","base::workflow::mailsend");
+   my $refmsg=$self->T("add refernce","base::workflow::mailsend");
    my $lastmsg=$self->findtemplvar({},"LASTMSG");
    $s=~s/"//g;
    $t=~s/"//g;
@@ -2093,10 +2104,10 @@ EOF
  </td></tr>
  <tr height=1%><td height=1%>
   <table width=100%><tr>
-  <td width=50>Anlage:</td>
-  <td><input name=file size=35 type=file></td>
-  <td width=120>Referenz hinzufügen:</td>
-  <td><input name=addref $addref type=checkbox></td>
+  <td width=50>$attmsg:</td>
+  <td><input name=file size=32 type=file></td>
+  <td width=140 nowrap align=right><div style="vertical-align:middle"><label for="addref">$refmsg:</label>
+  <input id="addref" name=addref $addref type=checkbox></div></td>
   </tr></table>
  </td></tr>
  <tr><td>
@@ -2111,8 +2122,18 @@ EOF
  <input type=hidden name=mode value="$mode">
  <input type=hidden name=id value="$id">
  <input type=hidden name=ACTION value="send">
+ <table cellspacing=0 cellpadding=0>
+ <tr>
+ <td nowrap>
+ <label for="senderbcc">$bccmsg</label>
+ <input id="senderbcc" name=senderbcc type=checkbox>
+ </td>
+ <td nowrap width=30>&nbsp;</td>
+ <td>
  <input type=button onclick=doSend() name=send 
         value="$send">
+ </td>
+ </tr></table>
  </td></tr>
 </table>
 <script language="JavaScript">

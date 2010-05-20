@@ -97,6 +97,19 @@ sub qcheckRecord
          $errorlevel=3 if ($errorlevel<3);
       }
       else{
+         if ($parrec->{systemos} eq ""){
+            $parrec->{systemos}="other";
+         }
+         
+         $parrec->{systemos}=~s/[\*\?]/_/g;
+         my $os=getModuleObject($self->getParent->Config(),"itil::osrelease");
+         $os->SetFilter({name=>'"'.$parrec->{systemos}."'"});
+         my ($osrec,$msg)=$os->getOnlyFirst(qw(id name));
+         if (!defined($osrec)){
+            delete($parrec->{systemos});
+         }
+
+
          $self->IfaceCompare($dataobj,
                              $rec,"servicesupport",
                              $parrec,"systemola",
@@ -127,6 +140,12 @@ sub qcheckRecord
          $self->IfaceCompare($dataobj,
                              $rec,"conumber",
                              $parrec,"conumber",
+                             $forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'string');
+         $self->IfaceCompare($dataobj,
+                             $rec,"osrelease",
+                             $parrec,"systemos",
                              $forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'string');

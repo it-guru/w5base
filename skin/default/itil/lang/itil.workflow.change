@@ -10,4 +10,6 @@
 'Change-Planed-End'=>{de=>'geplantes Ende'},
 'Changenumber'=>{de=>'Changenummer'},
 'sendchangeinfo'=>{de=>'Changebenachrichtigung',en=>'Changenotification'},
+'commission'=>{de=>'Beauftragung',en=>'Commission'},
+'REV.commission'=>{de=>'beauftragt',en=>'Commission to'},
 

@@ -46,12 +46,6 @@ sub Init
                       func=>'MyDetail',
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("MyW5Base",
-                      "base::MyW5Base",
-                      prio=>'1',
-                      func=>'Main',
-                      defaultacl=>['valid_user']);
-   
    $self->RegisterObj("sysadm",
                       "tmpl/sysadm.welcome",
                       defaultacl=>['valid_user']);
