@@ -217,6 +217,15 @@ sub isWriteValid
    return(undef);
 }
 
+sub isCopyValid
+{
+   my $self=shift;
+
+   return(1) if ($self->IsMemberOf("admin"));
+   return(0);
+}
+
+
 
 sub isViewValid
 {
