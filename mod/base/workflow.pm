@@ -1729,6 +1729,8 @@ sub Adressbook
 <script language="JavaScript">
 
 var W5Base=createConfig({ useUTF8:false, mode:'auth',transfer:'JSON' });
+// non jsonp call should be implemented in future
+//var W5Base=createConfig({ useUTF8:false, mode:'auth' });
 var sepExp=new RegExp("[ ]*[;,]+[ ]*", "i");
 $books;
 
