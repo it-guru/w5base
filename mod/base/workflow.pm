@@ -1588,6 +1588,7 @@ sub getValidWebFunctions
    my $self=shift;
    return("Process","DirectAct","ShowState","FullView",
           "externalMailHandler",
+          "Adressbook",
           "DetailMarkDelete",
           "DetailUnMarkDelete",
           $self->SUPER::getValidWebFunctions());
@@ -1688,6 +1689,190 @@ sub getSelectableModules
       push(@l,$wfclass);
    }
    return(@l);
+}
+
+
+sub Adressbook
+{
+   my $self=shift;
+   my $field=Query->Param("field");
+   my $label=Query->Param("label");
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','work.css',
+                                   'kernel.App.Web.css','workflow.css'],
+                           js=>['toolbox.js','subModal.js','J5Base.js'],
+                           body=>1,form=>1,
+                           title=>$self->T('Adressbook')." [".$label."]");
+   delete($self->{Adressbook});
+   $self->LoadSubObjs("ext/Adressbook","Adressbook");
+   my @books;
+   foreach my $aobj (values(%{$self->{Adressbook}})){
+      push(@books,$aobj->getAdressbooks());
+   }
+   my @bn;
+   my @bnhtml;
+   while(my $label=shift(@books)){
+      my $obj=shift(@books);
+      push(@bn,"'$label':'$obj'");
+      my $checked="";
+      if ($obj eq "base::user"){
+         $checked=" checked ";
+      }
+      push(@bnhtml,"<input type=radio $checked name=\"book\" value=\"$obj\">".
+                   "$label");
+   }
+   my $books="var books={".join(",",@bn)."}";
+   my $bookshtml=join("<br>",@bnhtml);
+
+
+   print <<EOF;
+<script language="JavaScript">
+
+var W5Base=createConfig({ useUTF8:false, mode:'auth',transfer:'JSON' });
+var sepExp=new RegExp("[ ]*[;,]+[ ]*", "i");
+$books;
+
+var phoneBook;
+
+function changeValue(o,id)
+{
+   var curStr=parent.\$("#$field").val();
+   var curl=curStr.split(sepExp); 
+   if (o.checked){
+      if (jQuery.inArray(phoneBook[id].email,curl)){
+         curl.push(phoneBook[id].email);
+      }
+   }
+   else{
+      curl=jQuery.grep(curl, function(value) {
+         return(!(value == phoneBook[id].email));
+      });
+   }
+   curl=jQuery.grep(curl, function(value) {
+      return(value !="");
+   });
+   parent.\$("#$field").val(curl.join("; "));
+}
+
+function displayResult(res)
+{
+   var d="<table>";
+   var curStr;
+   if ("$field"!=""){
+       curStr=parent.\$("#$field").val();
+   }
+   var curl=curStr.split(sepExp); 
+
+   for(var c=0;c<res.length;c++){
+      d+="<tr>";
+      if ("$field"!=""){
+         d+="<td valign=top><input type=checkbox";
+         if (!jQuery.inArray(res[c].email,curl)){
+            d+=" checked";
+         }
+         d+=" onclick=\\"changeValue(this,"+c+");\\"></td>";
+      }
+      d+="<td valign=top><b>"+res[c].fullname+"</b>";
+      var subline="";
+      if (res[c]['office_location']!="" &&
+          res[c]['office_location']!=undefined){
+         subline+=res[c]['office_location'];
+      }
+      if (res[c]['office_phone']!="" &&
+          res[c]['office_phone']!=undefined){
+         if (subline!="") subline+=", ";
+         subline+=res[c]['office_phone'];
+      }
+      if (res[c]['office_mobile']!="" &&
+          res[c]['office_mobile']!=undefined){
+         if (subline!="") subline+=", ";
+         subline+=res[c]['office_mobile'];
+      }
+      if (subline!=""){
+         d+="<br>"+subline;
+      }
+      d+="</td>";
+      d+="</tr>";
+   }
+   phoneBook=res;
+
+   d+="</table>";
+
+   \$("#result").height(\$("#mainTab").height()-\$("#searchTab").height()-5);
+   \$("#result").html(d);
+}
+
+function doSearch()
+{
+   \$("#result").html("<br><br>"+
+                      "<table width=100% border=0><tr><td align=center>"+
+                      "<img src=\\"../../base/load/ajaxloader.gif\\">"+
+                      "</td></tr></table>");
+   var surname=\$("#surname").val();
+   var givenname=\$("#givenname").val();
+   var location=\$("#location").val();
+   var flt=new Object();
+   if (surname!=""){
+      flt.surname=surname;
+   }
+   if (givenname!=""){
+      flt.givenname=givenname;
+   }
+   if (location!=""){
+      flt['office_location']=location;
+   }
+   var objname=\$("input[name='book']:checked").val();
+   var o=getModuleObject(W5Base,objname);
+   o.SetFilter(flt);
+   o.findRecord("id,fullname,office_location,"+
+                "office_phone,office_mobile,email",displayResult);
+}
+setEnterSubmit(document.forms[0],doSearch);
+setFocus("");
+
+</script>
+<style>
+.borderright{
+   border-right-style:solid;
+   border-right-color:black;
+   border-right-width:1px;
+}
+.bordertop{
+   border-top-style:solid;
+   border-top-color:black;
+   border-top-width:1px;
+}
+
+</style>
+<table id=mainTab 
+       width=100% height=100% style="border-collapse:collapse" border=0>
+<tr height=1%>
+<td valign=bottom width=100 class=borderright><u>Adressbücher:</u></td>
+<td valign=top>
+<table border=0 width=100% id=searchTab>
+<tr>
+<td width=1%>Nachname:</td><td nowrap width=30%><input size=6 style="width:100%" type=text id=surname value="">&nbsp;</td>
+<td width=1%>Vorname:</td><td nowrap width=30%><input size=6 style="width:100%" type=text id=givenname>&nbsp;</td>
+<td width=1%>Ort:</td><td nowrap width=30%><input size=6 style="width:100%" type=text id=location>&nbsp;</td>
+<td width=10><span style="cursor:pointer" onclick="doSearch();"><img src="../../base/load/search.gif" height=30></span></td>
+</tr>
+</table>
+</td>
+</tr>
+
+<tr>
+<td valign=top class=borderright>
+$bookshtml
+</td>
+<td valign=top class=bordertop>
+<div id=result style="overflow:auto;height:100%">
+</div>
+</td>
+</tr>
+
+</table>
+EOF
+   print $self->HtmlBottom(body=>1,form=>1);
 }
 
 
@@ -2065,7 +2250,8 @@ EOF
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','work.css'],
                            body=>1,form=>1,target=>'action',multipart=>1,
-                           js=>['TextTranslation.js','toolbox.js','subModal.js'],
+                           js=>['TextTranslation.js',
+                                'jquery.js','toolbox.js','subModal.js'],
                            title=>'W5Base Mail Client');
    print $self->HtmlSubModalDiv();
    my $to=$self->T("To","base::workflow::mailsend");
@@ -2085,15 +2271,29 @@ EOF
  <tr height=1%><td height=1%>
   <table width=100%><tr>
   <td width=50 valign=top>
-  <img src=\"../../base/load/addrbook.gif\">&nbsp;$to:</td>
-  <td><textarea name=to style="width:100%;height:40px">$t</textarea></td>
+  <table border=0 cellspacing=0 cellpadding=0><tr>
+  <td><span class=sublink onclick=\"openAdressbook('to','$to');\">
+      <img id=\"addrto\" src=\"../../base/load/addrbook.gif\"></span></td>
+  <td>&nbsp;</td>
+  <td><span class=sublink onclick=\"openAdressbook('to','$to');\">
+      $to:</span></td>
+  </tr></table>
+  </td>
+  <td><textarea id=to name=to style="width:100%;height:40px">$t</textarea></td>
   </tr></table>
  </td></tr>
  <tr height=1%><td height=1%>
   <table width=100%><tr>
   <td width=50 valign=top>
-  <img src=\"../../base/load/addrbook.gif\">&nbsp;CC:</td>
-  <td><textarea name=cc style="width:100%;height:30px">$c</textarea></td>
+  <table border=0 cellspacing=0 cellpadding=0><tr>
+  <td><span class=sublink onclick=\"openAdressbook('cc','CC');\">
+      <img src=\"../../base/load/addrbook.gif\"></span></td>
+  <td>&nbsp;</td>
+  <td><span class=sublink onclick=\"openAdressbook('cc','CC');\">
+      CC:</span></td>
+  </tr></table>
+  </td>
+  <td><textarea id=cc name=cc style="width:100%;height:30px">$c</textarea></td>
   </tr></table>
  </td></tr>
  <tr height=1%><td height=1%>
@@ -2144,6 +2344,17 @@ function refreshParent()
    }
 
 }
+
+function onAdressbookClose()
+{
+}
+
+function openAdressbook(field,label)
+{
+   showPopWin('Adressbook?field='+field+"&label="+label,540,200,onAdressbookClose);
+}
+
+
 function doSend()
 {
    if (document.forms[0].elements['subject'].value==""){

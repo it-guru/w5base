@@ -16,4 +16,7 @@
 'To'=>{de=>'An'},
 'Subject'=>{de=>'Betreff'},
 'Send message'=>{de=>'Nachricht versenden'},
+'BCC to sender'=>{de=>'BCC an Versender'},
+'Attachment'=>{de=>'Anlage'},
+'add refernce'=>{de=>'Referenz hinzufügen'},
 

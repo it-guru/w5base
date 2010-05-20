@@ -80,6 +80,18 @@ sub new
                 dataobjattr   =>'amempldept.firstname'),
 
       new kernel::Field::Text(
+                name          =>'surname',
+                label         =>'Surname',
+                ignorecase    =>1,
+                dataobjattr   =>'amempldept.name'),
+
+      new kernel::Field::Text(
+                name          =>'givenname',
+                label         =>'Givenname',
+                ignorecase    =>1,
+                dataobjattr   =>'amempldept.firstname'),
+
+      new kernel::Field::Text(
                 name          =>'email',
                 label         =>'E-Mail',
                 ignorecase    =>1,
