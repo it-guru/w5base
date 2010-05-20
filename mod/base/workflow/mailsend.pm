@@ -144,6 +144,12 @@ sub getDynamicFields
                                   group       =>'mailsend',
                                   container   =>'headref'),
 
+      new kernel::Field::Boolean( name        =>'noautobounce',
+                                  label       =>'no automatic bounce handling',
+                                  uivisible   =>0,
+                                  group       =>'mailsend',
+                                  container   =>'headref'),
+
       new kernel::Field::Boolean( name        =>'allowsms',
                                   label       =>'allow SMS send',
                                   uivisible   =>0,
