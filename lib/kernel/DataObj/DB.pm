@@ -378,6 +378,7 @@ sub addLimit
    my $limitnum=shift;
 
    if (!$self->{_UseSoftLimit}){
+printf STDERR ("fifi addLimit\n");
       if (defined($self->{DB}->{db}) &&
           lc($self->{DB}->{db}->{Driver}->{Name}) eq "mysql"){
          $$limit="$limitnum";

@@ -2150,11 +2150,16 @@ sub Result
       if (defined($param{Limit})){
          $uselimit=$param{Limit};
       }
-      if (!defined($uselimit) || $uselimit==0 || $format ne "HtmlV01"){
-         $self->Limit(0);
+      if ($format eq "JSONP"){
+         $self->Limit($uselimit,$uselimitstart,0);
       }
       else{
-         $self->Limit($uselimit,$uselimitstart,$self->{UseSoftLimit});
+         if (!defined($uselimit) || $uselimit==0 || $format ne "HtmlV01"){
+            $self->Limit(0);
+         }
+         else{
+            $self->Limit($uselimit,$uselimitstart,$self->{UseSoftLimit});
+         }
       }
       if (defined($param{CurrentView})){
          $self->SetCurrentView(@{$param{CurrentView}});

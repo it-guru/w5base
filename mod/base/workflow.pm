@@ -1765,7 +1765,7 @@ function displayResult(res)
    }
    var curl=curStr.split(sepExp); 
 
-   for(var c=0;c<res.length;c++){
+   for(var c=0;c<res.length && c<50;c++){
       d+="<tr>";
       if ("$field"!=""){
          d+="<td valign=top><input type=checkbox";
@@ -1799,6 +1799,9 @@ function displayResult(res)
    phoneBook=res;
 
    d+="</table>";
+   if (res.length>=50){
+      d+="<center><br><b>...</b></center>";
+   }
 
    \$("#result").height(\$("#mainTab").height()-\$("#searchTab").height()-5);
    \$("#result").html(d);
@@ -1826,6 +1829,7 @@ function doSearch()
    var objname=\$("input[name='book']:checked").val();
    var o=getModuleObject(W5Base,objname);
    o.SetFilter(flt);
+   o.Limit(51);
    o.findRecord("id,fullname,office_location,"+
                 "office_phone,office_mobile,email",displayResult);
 }
