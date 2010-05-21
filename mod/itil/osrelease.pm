@@ -41,7 +41,7 @@ sub new
                                                   
       new kernel::Field::Text(
                 name          =>'name',
-                htmlwidth     =>'150px',
+                htmlwidth     =>'190px',
                 label         =>'Name',
                 dataobjattr   =>'osrelease.name'),
 

@@ -25,6 +25,7 @@
 'Producer'=>{de=>'Hersteller'},
 'fieldgroup.admin'=>{de=>'Administration',en=>'Administration'},
 'Administrator'=>{de=>'Administrator'},
+'all Customers'=>{de=>'alle Kunden'},
 'Deputy Administrator'=>{de=>'Administrator Vertreter'},
 'Administrationteam'=>{de=>'Administrationsteam'},
 'Applications'=>{de=>'Anwendungen'},

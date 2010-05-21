@@ -308,6 +308,8 @@ if (defined($m)){
                }
                msg(INFO,NowStamp().
                         " reject mail $useremail by invalid RequestSec");
+               msg(INFO,NowStamp().
+                        " mailmode = $mailmode");
                $mailtext->smtpsend();
                exit(0);
             }
