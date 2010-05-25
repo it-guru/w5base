@@ -73,8 +73,8 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("bflexx.wfreview",
-                      "tsbflexx::wfreview",
+   $self->RegisterObj("bflexx.ifworkflow",
+                      "tsbflexx::ifworkflow",
                       defaultacl=>['admin']);
    
    return($self);

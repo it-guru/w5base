@@ -7,3 +7,4 @@
 'bflexx.p800iface.new'=>{de=>'Neueingabe',en=>'New'},
 'bflexx.p800sonder'=>{de=>'P800 Sonderleistungen',en=>'P800 Special'},
 'bflexx.p800sonder.new'=>{de=>'Neueingabe',en=>'New'},
+'bflexx.ifworkflow'=>{de=>'ICTO Workflows',en=>'ICTO Workflows'},
