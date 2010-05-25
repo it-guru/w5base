@@ -53,7 +53,7 @@ sub new
                 label         =>'TS Applicationname',
                 altdataobjattr=>'appl.name',
                 dataobjattr   =>'TCOM_appl.origname'),
-e
+
       new kernel::Field::Link(
                 name          =>'origname',
                 readonly      =>1,
