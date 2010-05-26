@@ -558,6 +558,13 @@ sub new
                 dataobjattr   =>'appl.allowifupdate'),
 
       new kernel::Field::Boolean(
+                name          =>'sodefinition',
+                group         =>'control',
+                htmleditwidth =>'30%',
+                label         =>'Application switch-over behaviour defined',
+                dataobjattr   =>'appl.sodefinition'),
+
+      new kernel::Field::Boolean(
                 name          =>'isnosysappl',
                 group         =>'control',
                 htmleditwidth =>'30%',
@@ -689,6 +696,67 @@ sub new
                 label         =>'Comments',
                 searchable    =>0, 
                 dataobjattr   =>'appl.comments'),
+
+      new kernel::Field::Textarea(
+                name          =>'socomments',
+                group         =>'socomments',
+                label         =>'comments to switch-over behaviour',
+                searchable    =>0, 
+                dataobjattr   =>'appl.socomments'),
+
+      new kernel::Field::Number(
+                name          =>'soslanumdrtests',
+                label         =>'SLA number Desaster-Recovery tests per year',
+                group         =>'sodrgroup',
+                htmleditwidth =>'120',
+                searchable    =>0,
+                dataobjattr   =>'appl.soslanumdrtests'),
+
+      new kernel::Field::Number(
+                name          =>'sosladrduration',
+                label         =>'SLA planned Desaster-Recovery duration',
+                group         =>'sodrgroup',
+                unit          =>'min',
+                searchable    =>0,
+                dataobjattr   =>'appl.sosladrduration'),
+
+      new kernel::Field::Number(
+                name          =>'olastdrtestwf',
+                label         =>'last Desaster-Recovery test (WorkflowID)',
+                group         =>'sodrgroup',
+                htmleditwidth =>'120',
+                searchable    =>0,
+                dataobjattr   =>'appl.solastdrtestwf'),
+
+      new kernel::Field::Date(
+                name          =>'solastdrdate',
+                label         =>'last Desaster-Recovery date',
+                group         =>'sodrgroup',
+                searchable    =>0,
+                dataobjattr   =>'appl.solastdrdate'),
+
+      new kernel::Field::Number(
+                name          =>'soslaclustduration',
+                label         =>'SLA maximum cluster service take over duration',
+                group         =>'soclustgroup',
+                searchable    =>0,
+                unit          =>'min',
+                dataobjattr   =>'appl.soslaclustduration'),
+
+      new kernel::Field::Number(
+                name          =>'solastclusttestwf',
+                htmleditwidth =>'120',
+                label         =>'last Cluster-Service switch test (WorkflowID)',
+                group         =>'soclustgroup',
+                searchable    =>0,
+                dataobjattr   =>'appl.solastclusttestwf'),
+
+      new kernel::Field::Date(
+                name          =>'solastclustswdate',
+                label         =>'last Cluster-Service switch date',
+                group         =>'soclustgroup',
+                searchable    =>0,
+                dataobjattr   =>'appl.solastclustswdate'),
 
       new kernel::Field::FileList(
                 name          =>'attachments',
@@ -1243,7 +1311,16 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   return("ALL");
+   my @all=qw(accountnumbers history default applapplgroup applgroup
+              attachments contacts control custcontracts customer delmgmt
+              finance interfaces licenses misc opmgmt phonenumbers services
+              soclustgroup socomments sodrgroup source swinstances systems
+              technical workflowbasedata header);
+   if (!$rec->{sodefinition}){
+      @all=grep(!/^(socomments|soclustgroup|sodrgroup)$/,@all);
+   }
+
+   return(@all);
 }
 
 
@@ -1255,7 +1332,8 @@ sub isWriteValid
 
    my @databossedit=qw(default interfaces finance opmgmt technical contacts misc
                        systems attachments accountnumbers interview
-                       customer control phonenumbers);
+                       customer control phonenumbers
+                       sodrgroup soclustgroup socomments);
    if (!defined($rec)){
       return(@databossedit);
    }
@@ -1370,7 +1448,7 @@ sub getDetailBlockPriority
              customer custcontracts 
              contacts phonenumbers 
              interfaces systems swinstances services misc attachments control 
-             accountnumbers licenses source));
+             sodrgroup soclustgroup socomments accountnumbers licenses source));
 }
 
 sub HandleInfoAboSubscribe
