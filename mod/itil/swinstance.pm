@@ -544,20 +544,22 @@ sub Validate
    my $newrec=shift;
 
 
-   my $autoname=trim(effVal($oldrec,$newrec,"autoname"));
-   if ($autoname ne ""){
-      if ($autoname=~m/\s/ ||
-          !($autoname=~m/^[a-z,A-Z,0-9,_,\-,\.]+$/) ||
-          !($autoname=~m/\./) ||
-           ($autoname=~m/^\./) ||
-           ($autoname=~m/\.$/)){
-         $self->LastMsg(ERROR,"invalid Automationsname");
-         return(0);
+   if (exists($newrec->{autoname})){
+      my $autoname=trim(effVal($oldrec,$newrec,"autoname"));
+      if ($autoname ne ""){
+         if ($autoname=~m/\s/ ||
+             !($autoname=~m/^[a-z,A-Z,0-9,_,\-,\.]+$/) ||
+             !($autoname=~m/\./) ||
+              ($autoname=~m/^\./) ||
+              ($autoname=~m/\.$/)){
+            $self->LastMsg(ERROR,"invalid Automationsname");
+            return(0);
+         }
+         $newrec->{autoname}=lc($autoname);
       }
-      $newrec->{autoname}=lc($autoname);
-   }
-   else{
-      $newrec->{autoname}=undef;
+      else{
+         $newrec->{autoname}=undef;
+      }
    }
 
    my $swnature=trim(effVal($oldrec,$newrec,"swnature"));
@@ -579,27 +581,34 @@ sub Validate
       return(0);
    }
 
-   my $fname=$name;
-   $fname.=($fname ne "" && $swnature ne "" ? "." : "").$swnature;
-   $fname.=($fname ne "" && $swtype   ne "" ? "." : "").$swtype;
-   $fname.=($fname ne "" && $swport   ne "" ? "." : "").$swport;
-   $fname.=($fname ne "" && $addname  ne "" ? "." : "").$addname;
-   $fname=~s/ü/ue/g;
-   $fname=~s/ö/oe/g;
-   $fname=~s/ä/ae/g;
-   $fname=~s/Ü/Ue/g;
-   $fname=~s/Ö/Oe/g;
-   $fname=~s/Ä/Ae/g;
-   $fname=~s/ß/ss/g;
-   $fname=~s/\s/_/g;
-   $newrec->{'fullname'}=$fname;
-
-   my $fname=trim(effVal($oldrec,$newrec,"fullname"));
-   
-   if ($fname eq "" || $fname=~m/[;,\s\&\\]/){
-      $self->LastMsg(ERROR,
-           sprintf($self->T("invalid swinstance name '%s' specified"),$fname));
-      return(0);
+   if (exists($newrec->{swnature}) ||
+       exists($newrec->{name}) || 
+       exists($newrec->{addname}) ||
+       exists($newrec->{swtype}) ||
+       exists($newrec->{swport}) ){
+      my $fname=$name;
+      $fname.=($fname ne "" && $swnature ne "" ? "." : "").$swnature;
+      $fname.=($fname ne "" && $swtype   ne "" ? "." : "").$swtype;
+      $fname.=($fname ne "" && $swport   ne "" ? "." : "").$swport;
+      $fname.=($fname ne "" && $addname  ne "" ? "." : "").$addname;
+      $fname=~s/ü/ue/g;
+      $fname=~s/ö/oe/g;
+      $fname=~s/ä/ae/g;
+      $fname=~s/Ü/Ue/g;
+      $fname=~s/Ö/Oe/g;
+      $fname=~s/Ä/Ae/g;
+      $fname=~s/ß/ss/g;
+      $fname=~s/\s/_/g;
+      $newrec->{'fullname'}=$fname;
+     
+      my $fname=trim(effVal($oldrec,$newrec,"fullname"));
+      
+      if ($fname eq "" || $fname=~m/[;,\s\&\\]/){
+         $self->LastMsg(ERROR,
+              sprintf($self->T("invalid swinstance name '%s' specified"),
+                      $fname));
+         return(0);
+      }
    }
 
    ########################################################################
@@ -622,12 +631,16 @@ sub Validate
          return(0);
       }
    }
-   if ($swinstanceid eq ""){
-      $newrec->{swinstanceid}=undef;
+   if (exists($newrec->{swinstanceid})){
+      if ($swinstanceid eq ""){
+         $newrec->{swinstanceid}=undef;
+      }
    }
    ########################################################################
-   if (effVal($oldrec,$newrec,"swport")=~m/^\s*$/){
-      $newrec->{swport}=undef;
+   if (exists($newrec->{swport})){
+      if (effVal($oldrec,$newrec,"swport")=~m/^\s*$/){
+         $newrec->{swport}=undef;
+      }
    }
    ########################################################################
    if (effChanged($oldrec,$newrec,"sslurl")){
