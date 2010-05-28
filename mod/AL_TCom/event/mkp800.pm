@@ -94,6 +94,7 @@ sub mkp800
                   sprintf("%02d/%04d",$month,$year));
    }
    my $bflexxp800=getModuleObject($self->Config,"tsbflexx::p800sonder");
+   my $bflexxwf=getModuleObject($self->Config,"tsbflexx::ifworkflow");
    if (!defined($bflexxp800)){
       msg(ERROR,"can not connect to b:flexx inteface database");
       return({exicode=>1});
@@ -150,7 +151,8 @@ sub mkp800
                    $rec->{class} eq "AL_TCom::workflow::businesreq"))){
                $self->processRec($start,\%p800,$rec);
                $self->processRecSpecial($start,\%p800special,$rec,
-                                        $xlsexp,$bflexxp800,$monthlist[1]);
+                                        $xlsexp,$bflexxp800,
+                                        $bflexxwf,$monthlist[1]);
             }
             else{
                if (defined($rec->{srcid})){
@@ -332,6 +334,7 @@ sub mkp800
          });
          $self->xlsFinish($xlsexp,$month);  # stores the xls export in webfs
          $self->bflexxFinish($bflexxp800,$startnow,$month); 
+         $self->bflexxRawFinish($bflexxwf,$startnow,$starttime); 
       }
    }
    return({exitcode=>0});
@@ -343,6 +346,7 @@ sub processRec
    my $start=shift;
    my $p800=shift;
    my $rec=shift;
+   my $bflexxwf=shift;
 
 
    msg(DEBUG,"process %s srcid=%s",$rec->{id},$rec->{srcid});
@@ -405,6 +409,7 @@ sub processRecSpecial
    my $rec=shift;
    my $xlsexp=shift;
    my $bflexxp800=shift;
+   my $bflexxwf=shift;
    my $specialmon=shift;
 
    msg(DEBUG,"special process %s:%s end=%s",
@@ -417,7 +422,6 @@ sub processRecSpecial
       eval('($wY,$wM,$wD)=Add_Delta_YMD("GMT",$wY,$wM,$wD,0,1,-19);');
       if ($@ eq ""){
          my $mon=sprintf("%02d/%04d",$wM,$wY);
-         return(undef) if ($mon ne $specialmon);
          msg(DEBUG,"special process %s: report month =%s",$rec->{id},$mon);
          if ($rec->{tcomcodcause} ne "db.base.base" &&
              $rec->{tcomcodcause} ne "appl.base.base"){
@@ -429,29 +433,32 @@ sub processRecSpecial
             $rec->{headref}->{specialt}+=$rec->{headref}->{tcomworktime};
             $rec->{headref}->{specialt}+=$rec->{headref}->{tcomworktimespecial};
             
-            $self->xlsExport($xlsexp,$rec,$mon,$eY,$eM,$eD);
-            $self->bflexxExport($bflexxp800,$rec,$mon,$eY,$eM,$eD);
-            for(my $c=0;$c<=$#{$rec->{affectedcontractid}};$c++){
-               my $cid=$rec->{affectedcontractid}->[$c];
-               my $wt=$rec->{headref}->{specialt};
-               msg(DEBUG,"special process %s: for contractid=%s wt=%d",
-                         $rec->{id},$cid,$wt);
-               if ($wt>0){
-                  $p800->{$mon}={} if (!defined($p800->{$mon}));
-                  $p800->{$mon}->{$cid}={} if (!defined($p800->{$mon}->{$cid}));
-                  msg(DEBUG,"report special process $cid");
-                  $p800->{$mon}->{$cid}->{p800_app_speicalwt}+=$wt;
-                  if (!defined($p800->{$mon}->{$cid}->{additional})){
-                     $p800->{$mon}->{$cid}->{additional}={wfheadid=>[],
-                                                          srcid=>[]};
+            if ($mon eq $specialmon){
+               $self->xlsExport($xlsexp,$rec,$mon,$eY,$eM,$eD);
+               $self->bflexxExport($bflexxp800,$rec,$mon,$eY,$eM,$eD);
+               for(my $c=0;$c<=$#{$rec->{affectedcontractid}};$c++){
+                  my $cid=$rec->{affectedcontractid}->[$c];
+                  my $wt=$rec->{headref}->{specialt};
+                  msg(DEBUG,"special process %s: for contractid=%s wt=%d",
+                            $rec->{id},$cid,$wt);
+                  if ($wt>0){
+                     $p800->{$mon}={} if (!defined($p800->{$mon}));
+                     $p800->{$mon}->{$cid}={} if (!defined($p800->{$mon}->{$cid}));
+                     msg(DEBUG,"report special process $cid");
+                     $p800->{$mon}->{$cid}->{p800_app_speicalwt}+=$wt;
+                     if (!defined($p800->{$mon}->{$cid}->{additional})){
+                        $p800->{$mon}->{$cid}->{additional}={wfheadid=>[],
+                                                             srcid=>[]};
+                     }
+                     push(@{$p800->{$mon}->{$cid}->{additional}->{wfheadid}},
+                          $rec->{id});
+                     push(@{$p800->{$mon}->{$cid}->{additional}->{srcid}},
+                          $rec->{srcid}) if ($rec->{srcid} ne "");
                   }
-                  push(@{$p800->{$mon}->{$cid}->{additional}->{wfheadid}},
-                       $rec->{id});
-                  push(@{$p800->{$mon}->{$cid}->{additional}->{srcid}},
-                       $rec->{srcid}) if ($rec->{srcid} ne "");
                }
             }
          }
+         $self->bflexxRawExport($bflexxwf,$rec,$mon,$eY,$eM,$eD);
       }
    }
 }
@@ -475,6 +482,77 @@ sub bflexxFinish
    });
 
 }
+
+sub bflexxRawFinish
+{
+   my $self=shift;
+   my $bflexxwf=shift;
+   my $now=shift;
+   my $starttime=shift;
+
+   my $opobj=$bflexxwf->Clone();
+   $bflexxwf->ResetFilter(); 
+   $bflexxwf->SetFilter(srcload=>"\"<$now\"",eventend=>"\">$starttime\"");
+   $bflexxwf->ForeachFilteredRecord(sub{
+       $opobj->ValidatedDeleteRecord($_);
+   });
+
+}
+
+sub bflexxRawExport
+{
+   my $self=shift;
+   my $bflexxwf=shift;
+   my $rec=shift;
+   my $repmon=shift;
+   my ($wY,$wM,$wD)=@_;
+
+
+   if (defined($bflexxwf)){
+      my $ag=$rec->{affectedapplication};
+      $ag=[$ag] if (!ref($ag) eq "ARRAY");
+      my $vert=$rec->{affectedcontract};
+      $vert=[$vert] if (!ref($vert) eq "ARRAY");
+
+      my $cause=$rec->{tcomcodcause};
+      $cause=join(", ",@$cause) if (ref($cause) eq "ARRAY");
+
+      my $comments=$rec->{tcomcodcomments};
+      $comments=join("\n",@$comments) if (ref($comments) eq "ARRAY");
+
+      my $extid=$rec->{tcomexternalid};
+      $extid=join("\n",@$extid) if (ref($extid) eq "ARRAY");
+
+      my $specialt=$rec->{headref}->{specialt};
+      $specialt=join(", ",@$specialt) if (ref($specialt) eq "ARRAY");
+
+      if (my ($m,$y)=$repmon=~m/^(\d+)\/(\d{4})/){
+         $repmon=sprintf("%04d%02d",$y,$m);
+      }
+      foreach my $vertno (@$vert){
+         if ($vertno ne ""){
+            my $newrec={name=>$rec->{name},
+                        eventend=>$rec->{eventend},
+                        w5baseid=>$rec->{id},
+                        class=>$rec->{class},
+                        tcomworktime=>$specialt,
+                        tcomcodcause=>$cause,
+                        tcomcodcomments=>$comments,
+                        tcomexternalid=>$extid,
+                        appl=>join(", ",@$ag),
+                        custcontract=>$vertno,
+                        srcload=>NowStamp("en"),
+                        srcid=>$rec->{srcid},
+                        month=>$repmon,
+                        srcsys=>$rec->{srcsys}};
+            $bflexxwf->ValidatedInsertOrUpdateRecord($newrec,
+                        {w5baseid=>\$newrec->{w5baseid},
+                         custcontract=>\$vertno});
+         }   
+      }   
+   }
+}
+
 
 sub bflexxExport
 {
