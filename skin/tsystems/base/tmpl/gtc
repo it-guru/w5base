@@ -1,0 +1,67 @@
+Common policy for the usage of the W5Base/Darwin database system
+================================================================
+ 
+  
+  §1  blocking of identifications/ contacts
+      -------------------------------------
+      The administration of W5Base/Darwin is authorized, in cases of careless 
+      behaviour of users or by violation against the common policy to ban 
+      the identifications. That means especially the efforts to affect the stability 
+      system in a negative way or flooding the database with senseless information.
+
+     
+  §2  handling with the system
+      ------------------------
+      The W5Base/Darwin database system has to be used by the users only in the designated 
+      way. The user is committed to take care of its access data, they have to be 
+      reachable only for his personal usage. 
+      Service identifications are only allowed to be used for designated application 
+      interfaces. The usage of service identifier for regular, 
+      none interface functionality is NOT allowed.
+
+     
+  §3  responsibility for data elements
+      --------------------------------
+      If a user creates data sets in the W5Base/Darwin database system, which are under 
+      the assignment to a person in charge for data, so the user is responsible for 
+      the data for an unlimited period of time. The handover of data to other users 
+      (successors) is only in the authority of the person in charge for data.
+
+     
+  §4  data contents
+      -------------
+      Every User has the full responsibility for his created/modified data. 
+      The saving of illegal, pornographic or racist contents is strictly prohibited.
+
+
+  §5  export/ extraction of data
+      --------------------------
+      In the W5Base/Darwin Data bank system there are fort he user several methods to export 
+      data. The usage of this function should be limited to the minimum for the official
+      business. Forwarding of extracted data without the permission of W5Base/Darwin 
+      administrators is strictly prohibited. Permission is only granted by using an 
+      "Admin-Request".     
+ 
+
+  §6  adjustment of rights
+      --------------------
+      Adjustment of rights, changes to groups, the assignment of contacts to certain 
+      groups, requests for data rectifications or general questions to W5Base/Darwin/ Darwin 
+      have to be formulated generally as "Admin-Requests". This can be found under 
+      MyW5Base/Darwin ? "start new Workflow".  
+   
+     
+  §7  adjustment of central data elements
+      -----------------------------------
+      The adjustment of central data elements e.g. location data, group labels, 
+      mandates or the like, must be documented reasonably and clearly. Demands for 
+      this will be processed only as "Admin-Request".
+
+     
+  §8  program adjustments and failure corrections in the W5Base/Darwin system
+      -----------------------------------------------------------------------
+      Program technical adjustments, error messages, expansion requests or ideas for 
+      new functions can be submitted with the workflow "ITIL request to the application 
+      development". (application: W5Base/Darwin). For a continuous improvement process EVERY 
+      user should report recognised bugs in the Web-Surface over the mentioned workflow.
+ 
