@@ -1802,6 +1802,10 @@ function displayResult(res)
    if (res.length>=50){
       d+="<center><br><b>...</b></center>";
    }
+   if (res.length==0){
+      d+="<center><img height=180 border=0 "+
+         "src=\\"../../base/load/notfound.jpg\\"></center>";
+   }
 
    \$("#result").height(\$("#mainTab").height()-\$("#searchTab").height()-5);
    \$("#result").html(d);
@@ -1832,6 +1836,7 @@ function doSearch()
    o.Limit(51);
    o.findRecord("id,fullname,office_location,"+
                 "office_phone,office_mobile,email",displayResult);
+   return(false);
 }
 setEnterSubmit(document.forms[0],doSearch);
 setFocus("");
@@ -1853,7 +1858,9 @@ setFocus("");
 <table id=mainTab 
        width=100% height=100% style="border-collapse:collapse" border=0>
 <tr height=1%>
-<td valign=bottom width=100 class=borderright><u>Adressbücher:</u></td>
+<td valign=bottom align=center width=100 class=borderright>
+<img src="../../base/load/addrbook_logo.gif" height=30>
+</td>
 <td valign=top>
 <table border=0 width=100% id=searchTab>
 <tr>
@@ -2357,7 +2364,7 @@ function onAdressbookClose()
 
 function openAdressbook(field,label)
 {
-   showPopWin('Adressbook?field='+field+"&label="+label,540,200,onAdressbookClose);
+   showPopWin('Adressbook?field='+field+"&label="+label,540,240,onAdressbookClose);
 }
 
 
