@@ -1960,6 +1960,8 @@ sub nativProcess
 
    if ($action eq "NextStep"){
       $h->{closedate}=undef;
+      $h->{eventstatreason}="EVr.inanalyse";
+      $h->{eventstatrespo}="EVre.analyse";
       if ($h->{eventdesciption} eq "test"){
          # test mode autofill all nessasary data to send messages
          $h->{eventdesciption}="Dies ist eine Test Ergeinismeldung (Lang1)\n".
