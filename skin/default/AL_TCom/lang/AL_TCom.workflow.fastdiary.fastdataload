@@ -9,4 +9,6 @@ EOF
 'invalid effort'=>{de=>'ungültiger Arbeitsaufwand'},
 'invalid or to short description'=>{de=>'ungültige oder zu kurze Beschreibung'},
 'invalid activity selected'=>{de=>'ungültige Tätigkeit ausgewählt'},
+"can't create workflow - can not find active application"=>{de=>
+"Workflow konnte nicht erzeugt werden - angegebene Anwendung ist nicht aktiv"},
 

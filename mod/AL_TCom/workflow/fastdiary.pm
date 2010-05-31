@@ -364,7 +364,7 @@ sub ProcessNext
          }
       }
       else{
-         $self->LastMsg(ERROR,"can't create workflow");
+         $self->LastMsg(ERROR,"can't create workflow - can not find active application");
          return(0);
       }
    }
