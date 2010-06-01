@@ -1925,10 +1925,10 @@ sub New                   # Workflow starten
       my $tiptag=$wfclass."::tip";
       my $tip=$self->T($tiptag,$wfclass);
       if ($tiptag ne $tip){
-         $tip="<b>Tip:</b> $tip";
+         $tip="<b>".$self->T("Tip","base::workflow").":</b> $tip";
       }
       else{
-         $tip="<b>no Tip for $wfclass</b>";
+         $tip="<b>".$self->T("no Tip for","base::workflow")." $wfclass</b>";
       }
       $tip.="<br><br>";
       my $atitle=$self->T("New","kernel::DataObj").": ".

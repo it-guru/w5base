@@ -1,6 +1,8 @@
 'base::workflow'=>{de=>'Workflow System',en=>'Workflow Engine'},
 'current state of workflow'=>{de=>'aktueller Status des Workflows'},
 'Please select the workflow to start:'=>{de=>'Bitte wählen Sie den Workflow, der gestartet werden soll:'},
+'Tip'=>{de=>'Tipp'},
+'no Tip for'=>{de=>'Kein Tipp für'},
 'Adressbook'=>{de=>'Adressbuch'},
 'Adressbooks'=>{de=>'Adressbücher'},
 'Workflow nature'=>{de=>'Workflow Art'},

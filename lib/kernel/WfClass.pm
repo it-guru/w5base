@@ -516,17 +516,10 @@ EOF
       my $subtip=$StepObj->CreateSubTip();
       $template.=<<EOF;
 <div align=left class=newworkflowtip id=tip>
-<div>
-<div style="height:100px;margin:5px;margin-top:10px">
+<div><div style="height:100px;margin:5px;margin-top:10px">
 <img style="border-color:black;border-style:solid;border-width:1px;margin:5px;margin-top:2px;margin-right:8px;float:left" src="$imgurl">
 $tip
-</div>
-</div>
-<div style="float:none">
-$subtip
-</div>
-</div>
-<div id=ProcessHandler style="border-top-style:outset;border-width:4px;visibility:hidden">
+</div></div></div><div id=subtip style="text-align:left;float:none;margin:0;padding:0">$subtip</div><div id=ProcessHandler style="border-top-style:outset;border-width:4px;visibility:hidden">
 <div class=WorkBorder>
 $LastMsg
 <div id=ProcessWindow class=ProcessHandler style="visibility:hidden"><table width=100% border=0 height=100% cellspacing=0 cellpadding=0><tr><td colspan=3 valign=top><div id=WorkArea class=WorkArea style="height:${workareah}">$workarea</div>&nbsp;</td></tr>
@@ -546,10 +539,12 @@ function ProcessResize()
    var h=getViewportHeight();
    var ModeSelect=document.getElementById("ModeSelect");
    var Tip=document.getElementById("tip");
+   var SubTip=document.getElementById("subtip");
    var ProcessHandler=document.getElementById("ProcessHandler");
    var ProcessWindow=document.getElementById("ProcessWindow");
    var LastMsg=document.getElementById("LastMsg");
 
+   Tip.style.height="1px";
    if ("$workheight" == "100%"){
       var h1=ModeSelect.offsetHeight;
       var h4=0;
@@ -558,7 +553,8 @@ function ProcessResize()
       }
       ProcessWindow.style.height=h-h1-h4-180;
       var h2=ProcessHandler.offsetHeight;
-      Tip.style.height=h-h2-h1-5;
+      var h3=SubTip.offsetHeight;
+      Tip.style.height=h-(h2+h3+h1)-5;
       var WorkArea=document.getElementById("WorkArea");
       WorkArea.style.height=(ProcessWindow.offsetHeight-40)+"px";
    }
@@ -566,7 +562,8 @@ function ProcessResize()
       ProcessWindow.style.height=($workheight+30)+"px";
       var h1=ModeSelect.offsetHeight;
       var h2=ProcessHandler.offsetHeight;
-      Tip.style.height=h-h1-h2-1;
+      var h3=SubTip.offsetHeight;
+      Tip.style.height=h-(h1+h2+h3)-1+"px";
    }
    ProcessHandler.style.visibility="visible";
    ProcessWindow.style.visibility="visible";

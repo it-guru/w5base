@@ -12,6 +12,8 @@ div.newworkflowtip{
    width:99%;
    height:200px;
    overflow:auto;
+   margin:0px;
+   padding:0px;
 }
 
 input.workflowbutton{

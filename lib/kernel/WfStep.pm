@@ -1005,16 +1005,17 @@ sub CreateSubTip
    $url.="?".$queryobj->QueryString();
    $url=~s/\%/\\\%/g;
    if (length($url)<2048){ # a limitation by Microsoft
-      $subtip.="<hr>";
+      $subtip.="<div style=\"border-style:solid;border-width:1px;".
+               "border-color:gray\">";
       my $a="<a href=\"$url\" ".
             "target=_blank title=\"Workflow link included current query\">".
             "<img src=\"../../base/load/anker.gif\" ".
             "height=10 border=0></a>";
-      $subtip.=sprintf($self->getParent->T(
+      $subtip.="&nbsp;".sprintf($self->getParent->T(
                     "You can add a shortcut of this anker %s to ".
                     "your bookmarks, to access faster to this workflow.",
                     'base::workflow'),$a);
-      $subtip.="<hr>";
+      $subtip.="</div>";
    }
    return($subtip);
 }
