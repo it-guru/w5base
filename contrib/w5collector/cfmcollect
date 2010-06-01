@@ -1,0 +1,166 @@
+#!/usr/bin/env sh
+
+TARGETPROT="http"
+TARGETHOST="localhost"
+TARGETPATH="/w5base/public/base/textcollect"
+
+
+if [ -r "/etc/cfmcollect.conf" ]; then
+   . /etc/cfmcollect.conf
+fi
+if [ -r "$HOME/.cfmcollect" ]; then
+   . $HOME/.cfmcollect
+fi
+
+#
+# Parameter der Operation: [-d] [targetname] [label] [datei]
+#
+
+########################################################################
+#
+# tmp file location
+#
+if [ "$TEMP" = "" ]; then
+   TEMP="/tmp"
+fi
+
+if [ "$DEBUG" = "" ]; then
+   if [ "$1" = "-d" ]; then
+      DEBUG="1"
+      shift
+   fi
+fi
+
+LABEL="$1"
+shift
+
+if [ "$1" = "" ]; then
+   TRANSPORTFILE="$LABEL"
+else
+   TRANSPORTFILE="$1"
+fi
+
+
+
+#
+# local username for transfer source
+#
+if [ "$USER" = "" ]; then
+   USER="localuser"
+fi
+
+# 
+# local hostname for transfer source
+#
+if [ "$HOSTNAME" = "" ]; then
+   HOSTNAME="`uname -n`"
+fi
+HOSTNAME=`echo $HOSTNAME | tr '[A-Z]' '[a-z]'`
+
+#
+# filenames for public and privat key
+#
+if [ "$COLLECTKEYFILE" = "" ]; then
+   COLLECTKEYFILE="$HOME/.cfmcollect-$USER-$HOSTNAME.key"
+fi
+if [ "$COLLECTPUBFILE" = "" ]; then
+   COLLECTPUBFILE="$HOME/.cfmcollect-$USER-$HOSTNAME.pem"
+fi
+if [ "$RANDFILE" = "" ]; then
+   RANDFILE="$TEMP/.rnd-$USER-$HOSTNAME"
+   touch $RANDFILE
+   export RANDFILE
+fi
+
+#
+# commands
+#
+if [ "$OPENSSL" = "" ]; then
+   OPENSSL="openssl"
+fi
+if [ "$NETCAT" = "" ]; then
+   NETCAT="netcat"
+fi
+if [ "$STAT" = "" ]; then
+   STAT="stat"
+fi
+
+
+########################################################################
+#
+# check if local keys are exists
+#
+if [ ! -f "$COLLECTKEYFILE" ]; then
+   OPENSSLCONF="$TEMP/.openssl.conf.$$"
+   echo "#opensslconf by cfmcollect : `date`"> $OPENSSLCONF
+   echo "[ req ]"                                               >> $OPENSSLCONF
+   echo "default_bits=1024"                                     >> $OPENSSLCONF
+   echo "default_md=md5"                                        >> $OPENSSLCONF
+   echo "string_mask=nombstr"                                   >> $OPENSSLCONF
+   echo "distinguished_name=req_distinguished_name"             >> $OPENSSLCONF
+   echo ""                                                      >> $OPENSSLCONF
+   echo "[ req_distinguished_name ]"                            >> $OPENSSLCONF
+   echo "0.organizationName = Organization Name (company)"      >> $OPENSSLCONF
+   echo "emailAddress=$USER@$HOSTNAME"                          >> $OPENSSLCONF
+   echo "localityName = Locality Name (city, district)"         >> $OPENSSLCONF
+   echo "countryName = Country Name (2 letter code)"            >> $OPENSSLCONF
+   echo "commonName = Common Name (hostname, IP, or your name)" >> $OPENSSLCONF
+   echo "countryName_default = DE"                              >> $OPENSSLCONF
+   echo "0.organizationName_default = DTAG"                     >> $OPENSSLCONF
+   echo "commonName_default =$USER@$HOSTNAME"                   >> $OPENSSLCONF
+   echo ""                                                      >> $OPENSSLCONF
+   echo "[ v3_ca ]"                                             >> $OPENSSLCONF
+   echo "basicConstraints = CA:TRUE"                            >> $OPENSSLCONF
+   echo "subjectKeyIdentifier = hash"                           >> $OPENSSLCONF
+   echo "authorityKeyIdentifier = keyid:always,issuer:always"   >> $OPENSSLCONF
+   if $OPENSSL req -x509 \
+               -config $OPENSSLCONF \
+               -nodes \
+               -days 365 \
+               -newkey rsa:1024 \
+               -batch \
+               -keyout $COLLECTKEYFILE -out $COLLECTPUBFILE ; then
+      echo "Key generated sucessfully"
+   else
+      echo "ERROR: unable to create privat key" >&2
+      exit 255
+   fi
+
+   #rm -f $OPENSSLCONF >/dev/null 2>&1
+
+fi
+
+if [ "$DEBUG" = "1" ]; then
+   echo "LABEL        =$LABEL"
+   echo "TRANSPORTFILE=$TRANSPORTFILE"
+fi
+
+if [ ! -r "$TRANSPORTFILE" ]; then
+   echo "ERROR: unable to read file '$TRANSPORTFILE'" >&2
+   exit 255
+fi
+
+#######################################################################
+# TRANSPORT over netcat
+#######################################################################
+BUFFER="$TEMP/cfmcollect.$$"
+( 
+echo "CFMCOLLECT1.0@@@itil::system@@@$HOSTNAME@@@$LABEL"
+cat $TRANSPORTFILE
+) | openssl enc -base64 | $OPENSSL smime -sign \
+    -signer $COLLECTPUBFILE -inkey $COLLECTKEYFILE \
+    -subject "(itil::system) $USER@$HOSTNAME:$LABEL"> $BUFFER
+LENGTH=`stat -c %s $BUFFER`
+
+(
+echo "PUT http://localhost/w5base2/public/base/collect/store HTTP/1.0"
+echo "Content-type: text/plain"
+echo "Content-length: $LENGTH"
+echo ""
+cat $BUFFER
+
+)  | netcat localhost 80
+rm $BUFFER
+
+
+
