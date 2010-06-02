@@ -159,7 +159,24 @@ echo "Content-length: $LENGTH"
 echo ""
 cat $BUFFER
 
-)  | netcat localhost 80
+)  | netcat localhost 80 | awk '
+BEGIN{
+  out=0
+}
+{
+   if (out){
+      print $0;
+   }
+   if ($0=="RESPONSE:"){
+      out=1;
+   }
+}
+END{
+   if (!out){
+      print("ERROR: unexpected protocol structure problem - contact admin!");
+   }
+}
+'
 rm $BUFFER
 
 

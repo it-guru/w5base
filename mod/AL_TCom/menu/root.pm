@@ -189,6 +189,10 @@ sub Init
                       "itil::lnksysteminteranswer",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.system.signedfile",
+                      "AL_TCom::signedfilesystem",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.asset",
                       "AL_TCom::asset",
                       defaultacl=>['valid_user']);

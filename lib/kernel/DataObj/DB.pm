@@ -707,7 +707,13 @@ sub InsertRecord
          if (defined($idobj->{dataobjattr}) &&          # id is automatic gen
              ref($idobj->{dataobjattr}) ne "ARRAY"){    # by the database 
             if (keys(%q)==0){     # SCOPE_IDENTIY should work on ODBC databases
-               my @l=$workdb->getArrayList("select SCOPE_IDENTITY()");
+               my @l;
+               if (lc($self->{DB}->{db}->{Driver}->{Name}) eq "mysql"){
+                  @l=$workdb->getArrayList("select LAST_INSERT_ID()");
+               }
+               else{
+                  @l=$workdb->getArrayList("select SCOPE_IDENTITY()");
+               }
                my $rec=pop(@l);
                if (defined($rec)){
                   $id=$rec->[0];

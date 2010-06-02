@@ -198,6 +198,9 @@ sub Init
                       "itil::lnksysteminteranswer",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itil.system.signedfilesystem",
+                      "itil::signedfilesystem",
+                      defaultacl=>['valid_user']);
    
    $self->RegisterObj("itil.asset",
                       "itil::asset",

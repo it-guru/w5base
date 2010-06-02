@@ -35,6 +35,7 @@
 'itil.system.jobs.lnkjobs.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.system.lnksystemcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
 'itil.system.lnksysteminteranswer'=>{de=>'Interview',en=>'Interview'},
+'itil.system.signedfilesystem'=>{de=>'signierte Datei',en=>'signed file'},
 'itil.asset'=>{de=>'Hardware',en=>'Hardware'},
 'itil.asset.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.asset.lnkassetcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},

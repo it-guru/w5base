@@ -53,6 +53,11 @@ sub new
                 label         =>'Name',
                 dataobjattr   =>'system.name'),
 
+      new kernel::Field::Link(
+                name          =>'signedfiletransfername',
+                label         =>'sigend file transfer name',
+                dataobjattr   =>'system.name'),
+
       new kernel::Field::Mandator(),
 
       new kernel::Field::Link(

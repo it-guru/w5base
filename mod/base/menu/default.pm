@@ -204,6 +204,14 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("sysadm.filesig",
+                      "base::filesig",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("sysadm.filesig.signedfile",
+                      "base::signedfile",
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("Tools",
                       "tmpl/welcome",
                       param=>'MSG=Hallo%20dies%20ist%20die%20Nachricht',
@@ -409,6 +417,8 @@ sub Init
    
    return(1);
 }
+
+
 
 
 

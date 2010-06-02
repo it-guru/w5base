@@ -1,0 +1,7 @@
+'base::signedfile'=>{de=>"signierte Datei",
+                     en=>"signed file"},
+'Path'=>{de=>'Dateiname'},
+'latest file revision'=>{de=>'aktuellster Stand'},
+'Parentobj'=>{de=>'Elternobjekt'},
+'signation id'=>{de=>'SignaturID'},
+'fieldgroup.sig'=>{de=>'Signaturdaten',en=>'signdata'},

@@ -50,32 +50,36 @@ alter table filemgmt add viewcount int(20) not null;
 alter table filemgmt add viewlast  datetime default NULL, add key(viewlast);
 alter table filemgmt add viewfreq  int(20)  default NULL;
 alter table filemgmt add isprivate int(2)   default '0';
-CREATE TABLE signkeyfile (
+CREATE TABLE filesig (
   keyid bigint(20) NOT NULL default '0',
   cistatus    int(2)  NOT NULL,
   parentobj   varchar(40),
-  parentrefid varchar(20),
+  parentid    varchar(20),
   username    varchar(80) NOT NULL default '',
   name        varchar(80) NOT NULL default '',
+  labelpath   varchar(255) default NULL,
   comments    blob,
   pemkey      longtext,
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   modifydate datetime NOT NULL default '0000-00-00 00:00:00',
-  owner bigint(20) NOT NULL default '0',
+  modifyuser bigint(20) NOT NULL default '0',
   editor varchar(100) NOT NULL default '',
   realeditor varchar(100) NOT NULL default '',
   PRIMARY KEY  (keyid),
-  UNIQUE KEY fullname (parentobj,parentrefid,cistatus,username,name)
+  UNIQUE KEY fullname (parentobj,cistatus,username,name,labelpath)
 );
 CREATE TABLE signedfile (
-  fid         bigint(20) NOT NULL,
+  fid         bigint(20) NOT NULL AUTO_INCREMENT,
   keyid       bigint(20) NOT NULL,
   parentobj   varchar(40),
-  parentrefid varchar(20),
+  parentid    varchar(20),
+  mandator    bigint(20),
   label       varchar(255) NOT NULL default '',
-  datafile    longtext,
+  datafile    longtext,isnewest int(1) default '1',
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   PRIMARY KEY  (fid),
-  UNIQUE KEY fullname (parentobj,parentrefid,label),
-  KEY label (label), key keyid (keyid)
+  UNIQUE KEY fullname (parentobj,parentid,label,isnewest),
+  KEY label (parentobj,parentid,isnewest), 
+  key keyid (keyid), key(createdate),key(mandator),
+  key(isnewest,createdate,label)
 );
