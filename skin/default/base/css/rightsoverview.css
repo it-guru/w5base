@@ -1,0 +1,14 @@
+body{
+  background:#eaeaea;
+  padding-left:10px;
+  padding-right:10px;
+  padding-top:5px;
+}
+
+@media print {
+   body{
+      overflow:visible;
+      background:#ffffff;
+   }
+}
+

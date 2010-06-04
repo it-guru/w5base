@@ -35,17 +35,37 @@ sub getControlRecord
 {
    my $self=shift;
    my $d=[ 
+           menuentry=>{
+             replaceoptype=>'base::grp',
+             dataobj      =>'base::menuacl',
+             target       =>'acltargetname',
+             idfield      =>'acltargetid',
+             targetlabel  =>'fullname',
+             baseflt      =>{acltarget=>\'base::grp'}
+           },
+           fileacl=>{
+             replaceoptype=>'base::grp',
+             dataobj      =>'base::fileacl',
+             target       =>'acltargetname',
+             idfield      =>'acltargetid',
+             targetlabel  =>'fullname',
+             baseflt      =>{acltarget=>\'base::grp'}
+           },
            teamcontact=>{
              replaceoptype=>'base::grp',
              dataobj      =>'base::lnkcontact',
              target       =>'targetname',
-             idfield      =>'targetid'
+             idfield      =>'targetid',
+             targetlabel  =>'fullname',
+             baseflt      =>{target=>\'base::grp'}
            },
            usercontact=>{
              replaceoptype=>'base::user',
              dataobj      =>'base::lnkcontact',
              target       =>'targetname',
-             idfield      =>'targetid'
+             idfield      =>'targetid',
+             targetlabel  =>'fullname',
+             baseflt      =>{target=>\'base::grp'}
            },
          ];
    return($d);
@@ -63,7 +83,11 @@ sub doReplaceOperation
    my $opdataobj=getModuleObject($self->getParent->Config,$data->{dataobj});
    if (defined($dataobj)){
       my $idname=$dataobj->IdField->Name();
-      my %flt=($data->{idfield}=>\$searchid);
+      my %flt;
+      if (exists($data->{baseflt}) && ref($data->{baseflt}) eq "HASH"){
+         %flt=%{$data->{baseflt}};
+      }
+      $flt{$data->{idfield}}=\$searchid;
       $dataobj->SetFilter(\%flt);
       $dataobj->SetCurrentView(qw(ALL));
       my ($rec,$msg)=$dataobj->getFirst(unbuffered=>1);

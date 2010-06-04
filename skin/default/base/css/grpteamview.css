@@ -1,4 +1,6 @@
-
+body{
+  background:#eaeaea;
+}
 div.usericon{
    width:110px;
    border-style:none;
@@ -60,3 +62,11 @@ div.userframe{
    border-bottom-style:solid;
    border-width:2px;
 }
+
+@media print {
+   body{
+      overflow:visible;
+      background:#ffffff;
+   }
+}  
+

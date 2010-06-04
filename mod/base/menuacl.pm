@@ -33,7 +33,39 @@ sub new
 
    $param{acltable}="menuacl";
    my $self=bless($type->SUPER::new(%param),$type);
+
+   $self->AddFields(
+      new kernel::Field::Link(
+                name          =>'fullname',
+                readonly      =>1,
+                depend        =>['refid','aclmode'],
+                label         =>'Fullname',
+                onRawValue    =>\&getFullname),
+      insertafter=>'id'
+   );
+
    return($self);
+}
+
+sub getFullname
+{
+   my $self=shift;
+   my $current=shift;
+   my $refid=$self->getParent->getField("refid",$current)->RawValue($current);
+
+   my $obj=getModuleObject($self->getParent->Config,"base::menu");
+
+   $obj->SetFilter({menuid=>\$refid});
+   my ($mrec,$msg)=$obj->getOnlyFirst(qw(fullname translation));
+   if (defined($mrec)){
+      my $d=$mrec->{fullname}." (".
+             $self->getParent->T($mrec->{fullname},$mrec->{translation}).")";
+      $d.=" - ".$current->{aclmode} if ($current->{aclmode} ne "");
+
+
+      return($d);
+   }
+   return("invalid menu reference");
 }
 
 sub FinishWrite

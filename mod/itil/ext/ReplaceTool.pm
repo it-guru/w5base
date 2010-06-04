@@ -39,79 +39,92 @@ sub getControlRecord
              replaceoptype=>'base::user',
              dataobj      =>'itil::appl',
              target       =>'databoss',
-             idfield      =>'databossid'
+             idfield      =>'databossid',
+             targetlabel  =>'name'
            },
            tsm=>{
              replaceoptype=>'base::user',
              dataobj      =>'itil::appl',
              target       =>'tsm',
-             idfield      =>'tsmid'
+             idfield      =>'tsmid',
+             targetlabel  =>'name'
            },
            tsm2=>{
              replaceoptype=>'base::user',
              dataobj      =>'itil::appl',
              target       =>'tsm2',
-             idfield      =>'tsm2id'
+             idfield      =>'tsm2id',
+             targetlabel  =>'name'
            },
            sem=>{
              replaceoptype=>'base::user',
              dataobj      =>'itil::appl',
              target       =>'sem',
-             idfield      =>'semid'
+             idfield      =>'semid',
+             targetlabel  =>'name'
            },
            guardianteam=>{
              replaceoptype=>'base::grp',
              dataobj      =>'itil::asset',
              target       =>'guardianteam',
-             idfield      =>'guardianteamid'
+             idfield      =>'guardianteamid',
+             targetlabel  =>'name'
            },
            adminteam=>{
              replaceoptype=>'base::grp',
              dataobj      =>'itil::system',
              target       =>'adminteam',
-             idfield      =>'adminteamid'
+             idfield      =>'adminteamid',
+             targetlabel  =>'name'
            },
            businessteam=>{
              replaceoptype=>'base::grp',
              dataobj      =>'itil::appl',
              target       =>'businessteam',
-             idfield      =>'businessteamid'
+             idfield      =>'businessteamid',
+             targetlabel  =>'name'
            },
            responseteam=>{
              replaceoptype=>'base::grp',
              dataobj      =>'itil::appl',
              target       =>'responseteam',
-             idfield      =>'responseteamid'
+             idfield      =>'responseteamid',
+             targetlabel  =>'name'
            },
            sem2=>{
              replaceoptype=>'base::user',
              dataobj      =>'itil::appl',
              target       =>'sem2',
-             idfield      =>'sem2id'
+             idfield      =>'sem2id',
+             targetlabel  =>'name'
            },
            systemdataboss=>{
              replaceoptype=>'base::user',
              dataobj      =>'itil::system',
              target       =>'databoss',
-             idfield      =>'databossid'
+             idfield      =>'databossid',
+             targetlabel  =>'name'
            },
            assetdataboss=>{
              replaceoptype=>'base::user',
              dataobj      =>'itil::asset',
              target       =>'databoss',
-             idfield      =>'databossid'
+             idfield      =>'databossid',
+             targetlabel  =>'name'
            },
            swinstancedataboss=>{
              replaceoptype=>'base::user',
              dataobj      =>'itil::swinstance',
              target       =>'databoss',
-             idfield      =>'databossid'
+             idfield      =>'databossid',
+             targetlabel  =>'fullname'
            },
            lnkapplappl=>{
              replaceoptype=>'itil::appl',
              dataobj      =>'itil::lnkapplappl',
              target       =>'toappl',
-             idfield      =>'toapplid'
+             idfield      =>'toapplid',
+             targetlabel  =>'name'
            },
          ];
    return($d);

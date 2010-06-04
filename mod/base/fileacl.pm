@@ -34,8 +34,36 @@ sub new
    $param{acltable}="fileacl";
    $param{param}={modes=>[qw(read write admin)]};
    my $self=bless($type->SUPER::new(%param),$type);
+   $self->AddFields(
+      new kernel::Field::Link(
+                name          =>'fullname',
+                readonly      =>1,
+                depend        =>['refid','aclmode'],
+                label         =>'Fullname',
+                onRawValue    =>\&getFullname),
+      insertafter=>'id'
+   );
    return($self);
 }
+
+sub getFullname
+{
+   my $self=shift;
+   my $current=shift;
+   my $refid=$self->getParent->getField("refid",$current)->RawValue($current);
+
+   my $obj=getModuleObject($self->getParent->Config,"base::filemgmt");
+
+   $obj->SetFilter({fid=>\$refid});
+   my ($mrec,$msg)=$obj->getOnlyFirst(qw(fullname));
+   if (defined($mrec)){
+      my $d="WebFS://".$mrec->{fullname};
+      $d.=" - ".$current->{aclmode} if ($current->{aclmode} ne "");
+      return($d);
+   }
+   return("invalid menu reference");
+}
+
 
 
 

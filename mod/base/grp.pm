@@ -283,12 +283,6 @@ sub initSearchQuery
 
 
 
-sub getValidWebFunctions
-{
-   my ($self)=@_;
-   return($self->SUPER::getValidWebFunctions(),qw(TreeCreate));
-}
-
 sub SecureValidate
 {
    my $self=shift;
@@ -345,7 +339,8 @@ sub getValidWebFunctions
 {
    my $self=shift;
 
-   return($self->SUPER::getValidWebFunctions(@_),"TeamView");
+   return($self->SUPER::getValidWebFunctions(@_),"TeamView","TreeCreate",
+         "RightsOverview","RightsOverviewLoader");
 }
 
 sub getHtmlDetailPages
@@ -354,14 +349,16 @@ sub getHtmlDetailPages
    my ($p,$rec)=@_;
 
    return($self->SUPER::getHtmlDetailPages($p,$rec),
-          "TView"=>$self->T("Team View"));
+          "TView"=>$self->T("Team View"),
+          "RView"=>$self->T("Rights overview"));
 }
 
 sub getHtmlDetailPageContent
 {
    my $self=shift;
    my ($p,$rec)=@_;
-   return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "TView");
+   return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "TView"&&
+                                                               $p ne "RView");
    my $page;
    my $idname=$self->IdField->Name();
    my $idval=$rec->{$idname};
@@ -380,6 +377,21 @@ sub getHtmlDetailPageContent
       $page.="<iframe style=\"width:100%;height:100%;border-width:0;".
             "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
             "src=\"TeamView?$urlparam\"></iframe>";
+   }
+   if ($p eq "RView"){
+      Query->Param("$idname"=>$idval);
+      $idval="NONE" if ($idval eq "");
+
+      my $q=new kernel::cgi({});
+      $q->Param("$idname"=>$idval);
+      my $urlparam=$q->QueryString();
+      $page="<link rel=\"stylesheet\" ".
+            "href=\"../../../static/lytebox/lytebox.css\" ".
+            "type=\"text/css\" media=\"screen\" />";
+
+      $page.="<iframe style=\"width:100%;height:100%;border-width:0;".
+            "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
+            "src=\"RightsOverview?$urlparam\"></iframe>";
    }
    $page.=$self->HtmlPersistentVariables($idname);
    return($page);
@@ -425,6 +437,155 @@ sub getUserDiv
    $d.=$name."</div>";
    return($d);
 }
+
+sub RightsOverviewLoader
+{
+   my $self=shift;
+   my $idfieldname=$self->IdField()->Name();
+   my $token=Query->Param("token");;
+   my $id=Query->Param($idfieldname);
+
+   print $self->HttpHeader();
+
+   my $found;
+   my $d="";
+   my $topline="unknown check object!";
+   foreach my $chk ($self->getCheckObjects()){
+      if ($chk->{token} eq $token){
+         $topline=sprintf("<b>%s</b> : %s",
+                  $self->T($chk->{dataobj},$chk->{dataobj}),$chk->{label});
+         my $obj=getModuleObject($self->Config,$chk->{dataobj});
+         my %flt;
+         if (exists($chk->{ctrlrec}->{baseflt}) && 
+             ref($chk->{ctrlrec}->{baseflt}) eq "HASH"){
+            %flt=%{$chk->{ctrlrec}->{baseflt}};
+         }
+
+         $flt{$chk->{ctrlrec}->{idfield}}=\$id;
+         if (defined($obj->getField("cistatusid"))){
+            if (!exists($flt{cistatusid})){
+               $flt{cistatusid}="<6";   
+            }
+         }
+         $obj->SetFilter(\%flt);
+         my $targetlabel=$chk->{ctrlrec}->{targetlabel};
+         $targetlabel="fullname" if ($targetlabel eq ""); 
+         foreach my $rec ($obj->getHashList($targetlabel)){
+            if ($rec->{fullname} ne ""){
+               $d.="<li>$rec->{fullname}<br>";
+            }
+            elsif ($rec->{fullname} ne ""){
+               $d.="<li>$rec->{fullname}<br>";
+            }
+            elsif ($rec->{name} ne ""){
+               $d.="<li>$rec->{name}<br>";
+            }
+            else{
+               $d.="<li>???<br>";
+            }
+            $found++;
+         }
+         $d.="</ul><br>" if ($found>0);
+      }
+   }
+   if ($found>0){
+      $d=$topline." (<font color=darkred>$found ".
+                  $self->T("references")."</font>)<br><ul>".$d; 
+   }
+   else{
+      $d=$topline."<br><ul><li><font color=darkgreen>".
+                  $self->T("no references found")."</li></ul>";
+   }
+   $d=latin1($d)->utf8();
+   print $d;
+}
+
+sub RightsOverview   # erster Versuch der Berechtigungsübersicht
+{
+   my $self=shift;
+
+   my %flt=$self->getSearchHash();
+   $self->ResetFilter();
+   $self->SecureSetFilter(\%flt);
+   my $idfieldname=$self->IdField()->Name();
+   my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
+
+
+   print $self->HttpHeader();
+   print $self->HtmlHeader(
+                           title=>"TeamView",
+                           js=>['toolbox.js','jquery.js'],
+                           style=>['default.css','work.css',
+                                   'kernel.App.Web.css',
+                                   'public/base/load/rightsoverview.css']);
+   print($self->getParsedTemplate("tmpl/base.grp.rightsoverview",
+            {static=>{target=>$rec->{fullname}}}));
+   my @checkop=$self->getCheckObjects();
+   my $js=""; 
+   for(my $c=0;$c<=$#checkop;$c++){
+      my $chk=$checkop[$c];
+      $js.="\n   ,function(){" if ($js ne "");
+      $js.="\$('#$chk->{token}').load('".
+           "RightsOverviewLoader?$idfieldname=$rec->{$idfieldname}&".
+           "token=$chk->{token}".
+           "'";
+      print("<div class=checkframe id=\"$chk->{token}\">");
+      print("<table width=100% cellspacing=0 cellpadding=0>");
+      print("<tr><td>");
+      printf("checking '%s' in '%s' ($chk->{module} [$chk->{k}])...<br>",
+             $chk->{label},
+             $self->T($chk->{dataobj},$chk->{dataobj}));
+      print("</td></tr>");
+      print("<tr><td align=center>");
+      print("<img src=\"../../base/load/ajaxloader.gif\"></td></tr>");
+      print("</table>");
+      print("</div>");
+   }
+   $js.=")";
+   for(my $c=1;$c<=$#checkop;$c++){
+      $js.="})";
+   }
+   $js.=";";
+   print("<script language=\"JavaScript\">\n".
+         "\$(document).ready(function(){\n$js\n});\n</script>");
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+sub getCheckObjects()
+{
+   my $self=shift;
+
+   $self->LoadSubObjs("ext/ReplaceTool","ReplaceTool");
+   my @checkop;
+   foreach my $module (sort(keys(%{$self->{ReplaceTool}}))){
+      my $crec=$self->{ReplaceTool}->{$module}->getControlRecord();
+      while(my $k=shift(@$crec)){
+         my $data=shift(@$crec);
+         if ($data->{replaceoptype} eq "base::grp"){
+            my $dataobj=getModuleObject($self->Config,$data->{dataobj});
+            my $label;
+            if ($data->{label} ne ""){
+               $label=$self->T($data->{label},$data->{dataobj});
+            }
+            if (!defined($label) && defined($dataobj)){
+               my $fldobj=$dataobj->getField($data->{target});
+               if (defined($fldobj)){
+                  $label=$fldobj->Label();
+               }
+            }
+            my $token="_${module}___${k}_";
+            $token=~s/:/_/g;
+            push(@checkop,{module=>$module,k=>$k,label=>$label,
+                           token=>$token,
+                           dataobj=>$data->{dataobj},
+                           ctrlrec=>$data});
+         }
+      }
+   }
+   return(@checkop)
+}
+
+
 
 sub TeamView   # erster Versuch der Teamview
 {

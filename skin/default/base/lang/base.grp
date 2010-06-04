@@ -2,6 +2,7 @@
 'Fullname'                     =>{ de=>'Vollständiger Name'},
 'Description'                  =>{ de=>'Beschreibung/Adresse'},
 'Name'                         =>{ de=>'Name'},
+'Rights overview'              =>{ de=>'Referenz-Übersicht'},
 'group has members!'           =>{ de=>'Die Gruppe hat noch Mitglieder!'},
 'group has references in menu acl!'=>{ de=>'Die Gruppe hat Refrenzen in Menüzugriffssteuerung!'},
 'group has references in contact links!'=>{ de=>'Die Gruppe hat Refrenzen Kontaktverknüpfungen!'},
@@ -26,3 +27,5 @@
 'organisational Resort'=>{de=>'organisatorische Abteilung'},
 'organisational Team'=>{de=>'organisatorisches Team'},
 'organisational Subunit'=>{de=>'organisatorische Untereinheit'},
+'references'=>{de=>'Verweise'},
+'no references found'=>{de=>'keine Verweise gefunden'},

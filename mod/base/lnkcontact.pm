@@ -161,6 +161,13 @@ sub new
                 container     =>'croles',
                 getPostibleValues=>\&getPostibleRoleValues),
                                                  
+      new kernel::Field::Link(
+                name          =>'fullname',
+                readonly      =>1,
+                label         =>'Fullname',
+                depend        =>['parentobj','refid','roles'],
+                onRawValue    =>\&getFullname),
+                                                 
       new kernel::Field::Text(
                 name          =>'parentobj',
                 frontreadonly =>1,
@@ -264,6 +271,56 @@ sub new
    $self->{history}=[qw(insert modify delete)];
 
    return($self);
+}
+
+sub getFullname
+{
+   my $self=shift;
+   my $current=shift;
+   my $fld=$self->getParent->getField("parentobj",$current);
+   my $parentobj=$fld->RawValue($current);
+   my $fld=$self->getParent->getField("refid",$current);
+   my $refid=$fld->RawValue($current);
+   my $obj=getModuleObject($self->getParent->Config,$parentobj);
+   if (defined($obj)){
+      $parentobj=$self->getParent->T($parentobj,$parentobj);
+      my $fld=$obj->IdField();
+      if (defined($fld)){
+         my $idfieldname=$fld->Name();
+         if ($idfieldname ne ""){
+            my $flt={$idfieldname=>\$refid};
+            if (defined($obj->getField("cistatusid"))){
+               $flt->{cistatusid}="<6";
+            }
+            $obj->SetFilter($flt);
+            my ($refrec,$msg)=$obj->getOnlyFirst(qw(fullname name));
+            if (defined($refrec)){
+               if ($refrec->{fullname} ne ""){
+                  $parentobj.=" ($refrec->{fullname})";
+               }
+               elsif ($refrec->{name} ne ""){
+                  $parentobj.=" ($refrec->{name})";
+               }
+               else{
+                  $parentobj.=" ($refid)";
+               }
+            }
+            else{
+               $parentobj.=" (deleted object with refid $refid)";
+            }
+         }
+      }
+      my $fld=$self->getParent->getField("roles",$current);
+      my $roles=$fld->RawValue($current);
+      if (defined($roles)){
+         $roles=[$roles] if (ref($roles) ne "ARRAY");
+         $parentobj.=" ".join(",",@$roles);
+      }
+   }
+  
+
+   return($parentobj); 
+
 }
 
 sub SecureSetFilter
