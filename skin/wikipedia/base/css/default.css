@@ -64,6 +64,32 @@ div.context_menu td.active {
 	cursor: default;
 }
 
+div#UserJavaScript{
+   position: absolute;
+   left:0px;
+   top:15px;
+   width:400px;
+   border-style:solid;
+   border-color:black;
+   border-width:1px;
+   height:50px;
+   overflow:auto;
+   background:#EAEBE9;
+   display:none;
+   padding:5px;
+}
+
+div#UserJavaScriptActivator{
+   position: absolute;
+   left:0px;
+   top:0px;
+   width:50px;
+   height:5px;
+   border-width:0px;
+   overflow:hidden;
+}
+
+
 
 
 #popupMask {
