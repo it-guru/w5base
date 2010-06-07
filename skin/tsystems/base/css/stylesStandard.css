@@ -90,16 +90,6 @@ a.glossaryLink:hover
   font-weight:bold;
 }
 
-.iconArea
-{
-  float:right;
-}
-
-.iconArea a
-{
-  text-decoration:none;
-  padding-left:10px;
-}
 
 .separator
 {
@@ -277,9 +267,6 @@ table.tableformat--invisiblePadding tr td
 }
 
 
-/* ------------------------------------------------------
-   Schriftgrößen der Area   ------------------------------------------------------ */
-
 #logoArea, #topArea, #navigationArea, #leftArea
 {
   font-size:12px;
@@ -299,7 +286,6 @@ table.tableformat--invisiblePadding tr td
 
 #logoArea
 {
-  position:absolute;
   top:0px;
   left:0px;
   width:200px;
@@ -308,7 +294,6 @@ table.tableformat--invisiblePadding tr td
 
 #topArea
 {
-  position:absolute;
   top:0px;
   left:200px;
   width:823px;
@@ -316,9 +301,8 @@ table.tableformat--invisiblePadding tr td
   height:78px;
 }
 
-#navigationArea
+.navigationArea
 {
-  position:absolute;
   top:78px;
   left:0px;
   width:100%;
@@ -328,7 +312,6 @@ table.tableformat--invisiblePadding tr td
 
 #leftArea
 {
-  position:absolute;
   top:100px;
   left:0px;
   width:200px;
@@ -341,7 +324,6 @@ table.tableformat--invisiblePadding tr td
 
 #rightArea
 {
-  position:absolute;
   top:100px;
   left:773px;
   width:192px;
@@ -1643,12 +1625,17 @@ table.tableformat--invisiblePadding tr td
   height:60px;
 }
 
-.conTop .globalLinks
+.globalLinks
 {
   height:18px;
-  text-align:right;
+  text-align:left;
   background-color:#7c7c7c;
-  padding-right:6px;
+  padding-top:1px;
+  color:white;
+  font-weight:bold;
+  font-size:10px;
+  width:100%;
+  text-align:right;
 }
 
 .conTop .globalLinks .link
@@ -1679,14 +1666,11 @@ table.tableformat--invisiblePadding tr td
   padding:0px;
   margin:0px;
   padding-top:4px;
-  width:200px;
+  width:100%;
   float:left;
   font-weight:bold;
 }
 
-.conNavigationHorizontal .navLevel1
-{
-}
 
 .conNavigationHorizontal .navLevel1 .navItem,
 .conNavigationHorizontal .navLevel1 .navItemSelected,
@@ -2094,7 +2078,6 @@ table.tableformat--invisiblePadding tr td
 
 .dayEvents
 {
-  position:absolute;
   width:250;
   border:1px solid black;
   background-color:#EEEEEE;
@@ -2391,60 +2374,7 @@ table.tableformat--invisiblePadding tr td
   width:590px;
 }
 
-.searchResults .selectInterface
-{
-  padding:3px 5px 0px 5px;
-}
 
-.searchResults .selectInterface a
-{
-  margin-left:3px;
-}
-
-.searchResults .resultItemArea .itemNumber
-{
-  padding-left:5px;
-  width:27px;
-  float:left;
-  font-weight:bold;
-}
-
-.searchResults .drillDown input
-{
-  border:1px solid #000000;
-  background-color:#b5b5b5;
-}
-
-.searchResults .resultItemArea .resultItem .headline
-{
-  margin-top:0px;
-  margin-left:24px;
-  font-weight:normal;
-  font-size:120%;
-}
-
-.searchResults .resultItemArea .resultItem .headline .date,
-.searchResults .resultItemArea .resultItem .headline .extension
-{
-	font-size:75%;
-	text-decoration: none;
-}
-
-.searchResults .resultItemArea .resultItem .text
-{
-  margin-top:5px;
-  margin-left:27px;
-  color:#000000;
-}
-
-.searchResults .resultItemArea .resultItem .path
-{
-  padding-top:3px;
-  padding-left:33px;
-  font-size:90%;
-  color:#7c7c7c;
-  font-weight:bold;
-}
 
 
 /* ------------------------------------------------------
@@ -2627,26 +2557,8 @@ form .multiSelectHor190pixel .label
   float:left; 
 }
 
-form .buttonHor190pixel .label,
-form .inputHor190pixel .label,
-form .radioHor190pixel .label
-{
-  width:195px;
-  vertical-align:center;
-  float:left;
-}
 
-form .checkBoxHor190pixel .label
-{
-  width:195px;
-  vertical-align:top;
-}
 
-form .checkBoxHor190pixel .checkBoxArea
-{
-  width:190px;
-  display:inline;
-}
 
 form .buttonHor190pixel input,
 form .inputHor190pixel input, 
@@ -2667,114 +2579,6 @@ form .checkBoxHor190pixel .checkBox
 }
 
 
-/* 
-  Layoutstyle 'Hor390pixel' bedeutet:
-   - Label und Formularelement nebeneinander
-   - Label 190px breit
-   - Formularelement 390px breit
-*/
-
-form .radioHor390pixel
-{
-  width:390px;
-}
-
-form .textareaHor390pixel .label,
-form .selectHor390pixel .label,
-form .multiSelectHor390pixel .label
-{
-  width:195px;
-  vertical-align:top;
-  float:left; 
-}
-
-form .buttonHor390pixel .label,
-form .inputHor390pixel .label,
-form .radioHor390pixel .label
-{
-  width:195px;
-  vertical-align:center;
-  float:left;
-}
-
-form .checkBoxHor390pixel .label
-{
-  width:195px;
-  vertical-align:top;
-}
-
-form .checkBoxHor390pixel .checkBoxArea
-{
-  width:390px;
-  display:inline;
-}
-
-form .buttonHor390pixel input,
-form .inputHor390pixel input,
-form .textareaHor390pixel textarea,
-form .selectHor390pixel select,
-form .multiSelectHor390pixel select
-{
-  width:390px;
-  vertical-align:center;
-}
-
-form .radioHor390pixel .radioButton,
-form .checkBoxHor390pixel .checkBox
-{
-  clear:right;
-  width:390px;
-  float:right;
-}
-
-
-/* 
-  Layoutstyle 'HorAuto' bedeutet: 
-   - Label und Formularelement nebeneinander
-   - Label 190px breit
-   - Formularelement so breit, wie der browser es rendert
-*/
-
-form .textareaHorAuto .label,
-form .selectHorAuto .label,
-form .multiSelectHorAuto .label
-{
-  width:195px;
-  vertical-align:top;
-  float:left; 
-}
-
-form .buttonHorAuto .label,
-form .inputHorAuto .label,
-form .radioHorAuto .label
-{
-  width:195px;
-  vertical-align:center;
-  float:left;
-}
-
-form .checkBoxHorAuto .label
-{
-  width:195px;
-  vertical-align:top;
-}
-
-
-form .checkBoxHorAuto .checkBoxArea
-{
-  width:190px;
-  display:inline;
-}
-
-form .buttonHorAuto input,
-form .inputHorAuto input, 
-form .textareaHorAuto textarea,
-form .selectHorAuto select,
-form .multiSelectHorAuto select
-{
-  vertical-align:center;
-}
-
 
 /* ------------------------------------------------------
    Control-Center
@@ -2782,7 +2586,6 @@ form .multiSelectHorAuto select
 
 #controlCenter
 {
-  position:fixed;
   right:50px;
   bottom:50px; 
   z-index:2;
@@ -2796,7 +2599,6 @@ form .multiSelectHorAuto select
 
 * html #controlCenter
 {
-  position:absolute;
 }
 
 #controlCenter .centerTitle

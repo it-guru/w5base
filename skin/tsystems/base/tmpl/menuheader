@@ -1,41 +1,38 @@
 <head>
+<style>
+body{overflow:hidden}
+</style>
   <link type="text/css" href="../load/stylesStandard.css"
  rel="stylesheet">
 </head>
 <body>
-<div id="logoArea">
-<div class="conContentEmptyMagWhiteVertSingle" id="conContent1352">
-<div id="content1350" class="content">
-<div class="empty">
+<table width=100% border=0 cellspacing=0 cellpadding=0>
+<tr>
+<td width=1% style="height:50px;overflow:hidden">
  <a target=_top href="../menu/root" title="Darwin Home">
  <img src="../load/id1274.gif" alt="Startseite"
- name="img1274_151714" border="0" height="78"></a>
-</div>
-</div>
-</div>
-</div>
-<div id="topArea">
-<div class="conTop" id="conTop1284">
-<div class="globalLinks">
-<!--
-<div class="link">
-<a
- href="http://systemsnet.telekom.de/cms/tsi-d/de/help/templateId=renderInternalPage/id=16938.html"
- title="Hilfe">Hilfe</a>
-</div>
--->
-</div>
-<div class="background">
-<img src="../load/id1276.jpg" alt="" name="img1276_12" border="0"
- ></div>
-</div>
-</div>
-<div id="navigationArea">
-<div class="conNavigationHorizontal" id="conNavigation1346">
+ name="img1274_151714" border="0" height=75 width=200></a>
+</td>
+<td valign=top>
+<table width=100% height=100% cellspacing=0 cellpadding=0>
+<tr height=1%><td><div class=globalLinks>
+Support: <a href="mailto:W5Base.Darwin@t-systems.com" style="color:white">W5Base.Darwin@t-systems.com</a>  Phone: <u>+49 951 13364330</u>&nbsp;&nbsp;
+</div></td></tr>
+<tr><td height=59 style="background:url(../load/id1276.jpg)"></td></tr>
+</table>
+</td>
+</tr>
 
-<div class="navLevel1">
+<tr>
+<td valign=top style="height:20px;overflow:hidden">
+<div class="navigationArea">
 <div class=OpMode>&nbsp;&nbsp;%opmode%
 </div>
+</td>
+<td valign=top style="height:20px;overflow:hidden">
+
+<div class="navigationArea">
+<div class="conNavigationHorizontal" id="conNavigation1346">
 
 <div class="navLevel1">
 <div class="navItem"><a target=_top href="../menu/root" title="W5Base/Darwin Startseite">Startseite</a>
@@ -69,8 +66,11 @@
 
 </div>
 </div>
-</div>
 
-<br>
+</td>
+</tr>
+</table>
+
+
 </body>
 </html>
