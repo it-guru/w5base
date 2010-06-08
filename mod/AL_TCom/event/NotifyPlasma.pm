@@ -58,7 +58,7 @@ sub NotifyPlasma
 
    my $wf=getModuleObject($self->getParent->Config(),"base::workflow"); 
    $wf->SetFilter({id=>\$param{'id'}});
-   my ($WfRec)=$wf->getOnlyFirst(qw(involvedcustomer));
+   my ($WfRec)=$wf->getOnlyFirst(qw(involvedcustomer affectedapplication));
    my $involvedcustomer=$WfRec->{involvedcustomer};
    $involvedcustomer=[$involvedcustomer] if (ref($involvedcustomer) ne "ARRAY");
    if (!grep(/^DTAG\.ACTIVEBILLING.*/,@$involvedcustomer)){
@@ -66,6 +66,18 @@ sub NotifyPlasma
               msg=>'no trigger needed'});
    }
 
+   #######################################################################
+   #
+   # temp verify, if application SDM_TEST is affected - only this
+   # events should be transfered
+   #
+   my $affectedapplication=$WfRec->{affectedapplication};
+   $affectedapplication=[$affectedapplication] if (ref($affectedapplication) ne "ARRAY");
+   if (!grep(/^SDM_TEST$/,@$affectedapplication)){
+      return({exitcode=>0,
+              msg=>'no trigger needed - no SDM_TEST'});
+   }
+   #######################################################################
 
    msg(DEBUG,"NotifyPlasma: wsproxy='%s'",$wsproxy);
    if ($param{'op'} eq "ins"){
