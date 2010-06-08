@@ -40,6 +40,7 @@ sub new
                 name          =>'account',
                 label         =>'User-Account',
                 readonly      =>0,
+                searchable    =>1,
                 align         =>'left',
                 htmlwidth     =>'250',
                 dataobjattr   =>'useraccount.account'),
