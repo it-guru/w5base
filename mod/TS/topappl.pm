@@ -246,6 +246,18 @@ sub isWriteValid
    return(undef);
 }
 
+sub isViewValid
+{
+   my $self=shift;
+   my $rec=shift;
+   if (defined($rec)){
+      my @g=$self->SUPER::isViewValid($rec);
+      push(@g,"topagaddinfos") if (grep(/^(default|ALL)$/,@g));
+      return(@g);
+   }
+   return(undef);
+}
+
 sub getCustomerControlRecords
 {
    my $self=shift;
