@@ -65,6 +65,7 @@ sub new
                                  'MC-Service-Guard',
                                  'Sun-Cluster',
                                  'Veritas-Cluster',
+                                 'Loadbalancer',
                                  'Software',
                                  'Hardware',
                                 ],
