@@ -242,8 +242,8 @@ min number of cores               : 1
    echo 'INCLUDE /etc/w5base/databases.conf'>>/etc/w5base/w5server.conf
    echo 'INCLUDE /etc/w5base/databases.conf'>>/etc/w5base/w5base.conf
    echo 'DATAOBJCONNECT[w5base]="dbi:mysql:w5base"'>>/etc/w5base/databases.conf
-   echo 'DATAOBJUSER[w5base]="w5base"' >> /etc/w5base/database.conf
-   echo 'DATAOBJPASS[w5base]="MyW5BaseDBPass"' >> /etc/w5base/database.conf
+   echo 'DATAOBJUSER[w5base]="w5base"' >> /etc/w5base/databases.conf
+   echo 'DATAOBJPASS[w5base]="MyW5BaseDBPass"' >> /etc/w5base/databases.conf
    install -m 2770 -o $W5BASEDEVUSER -g $W5BASEDEVGROUP -d $W5BASEINSTDIR
    su - $W5BASEDEVUSER
    cd $W5BASEINSTDIR/..
