@@ -217,6 +217,9 @@ sub ValidateDelete
          return(1);
       }
    }
+   if ($self->IsMemberOf("admin")){
+      return(1);
+   }
    $self->LastMsg(ERROR,"delete only allowed for the team boss");
    
    return(0);
