@@ -1315,7 +1315,7 @@ sub isViewValid
               attachments contacts control custcontracts customer delmgmt
               finance interfaces licenses misc opmgmt phonenumbers services
               soclustgroup socomments sodrgroup source swinstances systems
-              technical workflowbasedata header inmchm interview);
+              technical workflowbasedata header inmchm interview efforts);
    if (!$rec->{sodefinition}){
       @all=grep(!/^(socomments|soclustgroup|sodrgroup)$/,@all);
    }
