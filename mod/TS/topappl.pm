@@ -255,7 +255,7 @@ sub isViewValid
       push(@g,"topagaddinfos") if (grep(/^(default|ALL)$/,@g));
       return(@g);
    }
-   return(undef);
+   return($self->SUPER::isViewValid($rec));
 }
 
 sub getCustomerControlRecords
