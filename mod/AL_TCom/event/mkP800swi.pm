@@ -139,7 +139,7 @@ sub mkP800swi
          ($rec,$msg)=$sw->getNext();
       } until(!defined($rec));
    }
-
+   return({exitcode=>0});
 }
 
 

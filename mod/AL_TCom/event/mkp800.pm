@@ -37,7 +37,7 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("mkp800","mkp800");
+   $self->RegisterEvent("mkp800","mkp800",timeout=>9000);
    $self->RegisterEvent("mkp800specialxls","mkp800specialxls");
    return(1);
 }
