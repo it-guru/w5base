@@ -28,6 +28,8 @@ sub new
 {
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
+   $self{WSDLfieldType}="WorkflowActions" if (!defined($self{WSDLfieldType}));
+
    return($self);
 }
 
@@ -507,7 +509,7 @@ sub FormatedDetail
 EOF
 
    }
-   return("unknown mode '$mode'");
+   return($self->SUPER::FormatedDetail($current,$mode));
 }
 
 sub FormatedResult
@@ -516,14 +518,63 @@ sub FormatedResult
    my $current=shift;
    my $FormatAs=shift;
 
-   return("FieldHandler-Formated");
+   my $fo=$self->getRelationObj();
+   my $d=$self->RawValue($current);
+   $d=[$d] if (ref($d) ne "ARRAY");
+
+   if ($FormatAs eq "SOAP"){
+      my $out="";
+      foreach my $rel (@$d){
+         $out.="<record>";
+         foreach my $fieldname (keys(%$rel)){
+            my $fobj=$fo->getField($fieldname,$current);
+            $out.="<$fieldname>".$fobj->FormatedResult($rel,$FormatAs).
+                  "</$fieldname>";
+         }
+         $out.="</record>";
+      }
+      return($out);
+   }
+   else{
+      my @out;
+      my $out;
+      my $idfld=$self->getParent->IdField();
+      my $refid=$idfld->RawValue($current);
+      foreach my $rel (@$d){
+         if ($refid eq $rel->{srcwfid}){
+            push(@out,$rel->{name}."->".$rel->{dstwfid}.
+                      "(".$rel->{dstwfclass}.")");
+         }
+         elsif ($refid eq $rel->{dstwfid}){
+            push(@out,"REV.".$rel->{name}."<-".$rel->{srcwfid}.
+                      "(".$rel->{srcwfclass}.")");
+         }
+      }
+      $out=join("\n",@out);
+      return($out);
+   }
+   return("-error-");
 }
 
 sub RawValue
 {
    my $self=shift;
    my $current=shift;
-   return("no RawValue");
+   my $idfld=$self->getParent->IdField();
+   my $refid=$idfld->RawValue($current);
+   my $fo=$self->getRelationObj();
+
+   my @flt=({srcwfid=>\$refid},{dstwfid=>\$refid});
+   $fo->SetFilter(\@flt);
+   my @lst;
+
+   foreach my $rec ($fo->getHashList(qw(mdate id dstwfid srcwfid
+                                        dstwfclass srcwfclass
+                                        dstwfname srcwfname name comments))){
+      my %drec=(%$rec);
+      push(@lst,\%drec);
+   }
+   return(\@lst);
 }
 
 
