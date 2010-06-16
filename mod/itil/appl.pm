@@ -85,6 +85,7 @@ sub new
                 label         =>'Databoss E-Mail',
                 searchable    =>0,
                 htmldetail    =>0,
+                uploadable    =>0,
                 vjointo       =>'base::user',
                 vjoinon       =>['databossid'=>'userid'],
                 vjoindisp     =>'email'),
@@ -132,6 +133,7 @@ sub new
                 label         =>'Customer Business Manager E-Mail',
                 searchable    =>0,
                 htmldetail    =>0,
+                uploadable    =>0,
                 vjointo       =>'base::user',
                 vjoinon       =>['semid'=>'userid'],
                 vjoindisp     =>'email'),
@@ -142,6 +144,7 @@ sub new
                 label         =>'Deputy Customer Business Manager E-Mail',
                 searchable    =>0,
                 htmldetail    =>0,
+                uploadable    =>0,
                 vjointo       =>'base::user',
                 vjoinon       =>['sem2id'=>'userid'],
                 vjoindisp     =>'email'),
@@ -311,6 +314,7 @@ sub new
                 vjointo       =>'itil::costcenter',
                 vjoinon       =>['conumber'=>'name'],
                 dontrename    =>1,
+                uploadable    =>0,
                 group         =>'delmgmt',
                 fields        =>[qw(delmgr   delmgr2
                                     delmgrid delmgr2id
