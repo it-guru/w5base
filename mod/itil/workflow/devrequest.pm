@@ -101,6 +101,16 @@ sub isWorkflowManager
                       $con->{targetid} eq $userid){
                      return(1);
                   }
+                  if ($con->{target} eq "base::grp" &&
+                      $con->{targetid} ne ""){
+                     if ($self->getParent->IsMemberOf($con->{targetid},
+                         "RMember","direct")){
+                        return(1);
+                     }
+
+ 
+                     return(1);
+                  }
                }
             }
          }

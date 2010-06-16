@@ -135,7 +135,7 @@ sub isWorkflowManager
          if ($target eq "base::user" && $targetid eq $userid){
             return(1);
          }
-         if ($target eq "base::grp"){
+         if ($target eq "base::grp" && $targetid ne ""){
             if ($self->getParent->IsMemberOf($targetid,"RMember","direct")){
                return(1);
             }
