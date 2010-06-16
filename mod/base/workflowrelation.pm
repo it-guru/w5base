@@ -77,6 +77,12 @@ sub new
                 label         =>'Source Workflow additional',
                 dataobjattr   =>'srcwfhead.additional'),
                                   
+      new kernel::Field::Text(
+                name          =>'srcwfclass',
+                group         =>'src',
+                label         =>'Source Workflow class',
+                dataobjattr   =>'srcwfhead.wfclass'),
+                                  
       new kernel::Field::Container(
                 name          =>'srcwfheadref',
                 group         =>'src',
@@ -105,6 +111,12 @@ sub new
                 group         =>'dst',
                 label         =>'Source Workflow additional',
                 dataobjattr   =>'dstwfhead.additional'),
+                                  
+      new kernel::Field::Text(
+                name          =>'dstwfclass',
+                group         =>'dst',
+                label         =>'Source Workflow class',
+                dataobjattr   =>'dstwfhead.wfclass'),
                                   
       new kernel::Field::Container(
                 name          =>'dstwfheadref',

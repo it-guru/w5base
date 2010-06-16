@@ -52,7 +52,6 @@ use kernel::Field::Contact;
 use kernel::Field::ContactLnk;
 use kernel::Field::PhoneLnk;
 use kernel::Field::FileList;
-use kernel::Field::WorkflowRelation;
 use kernel::Field::TimeSpans;
 use kernel::Field::Date;
 use kernel::Field::MDate;

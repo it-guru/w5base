@@ -268,8 +268,7 @@ sub getPosibleRelations
 {
    my $self=shift;
    my $WfRec=shift;
-   return("itil::workflow::businesreq"=>'relchange',
-          ); 
+   return("itil::workflow::businesreq"=>'relchange'); 
 }
 
 sub WSDLaddNativFieldList

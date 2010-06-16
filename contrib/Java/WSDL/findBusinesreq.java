@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 import java.math.BigInteger;
 
 
-
 public class findBusinesreq {
   public static void main(String [] args) throws Exception {
 
@@ -32,7 +31,8 @@ public class findBusinesreq {
     // prepare the query parameters
     Flt.setId(new BigInteger(args[0]));
     FindRecordInput.setFilter(Flt);
-    FindRecordInput.setView("id,srcid,name,shortactionlog,additional,affectedapplication");
+    FindRecordInput.setView("id,srcid,name,shortactionlog,additional,"+
+                            "affectedapplication,relations");
 
     // do the Query
     Result=W5Port.findRecord(FindRecordInput);
@@ -46,12 +46,19 @@ public class findBusinesreq {
                             itguru.join(rec.getAffectedapplication(),", "));
           System.out.printf("Businesreqname:   \"%s\"\n",
                             itguru.limitTo(rec.getName(),60));
-          System.out.printf("\n");
 
+          System.out.printf("\nposible Actions:\n");
           for (net.w5base.mod.AL_TCom.workflow.businesreq.WorkflowAction C:
                rec.getShortactionlog()){
              System.out.printf(" - %-28s(%d) : %s\n",
-                               C.getName(),C.getEffort(),itguru.limitTo(C.getComments(),45));
+                               C.getName(),C.getEffort(),
+                               itguru.limitTo(C.getComments(),45));
+          }
+          System.out.printf("\nactive Relations:\n");
+          for (net.w5base.mod.AL_TCom.workflow.businesreq.WorkflowRelation R:
+               rec.getRelations()){
+             System.out.printf(" - %-28s : %s -> %s\n",
+                               R.getName(),R.getSrcwfid(),R.getDstwfid());
           }
           System.out.printf("\n");
        }
