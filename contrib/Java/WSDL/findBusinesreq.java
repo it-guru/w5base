@@ -32,7 +32,8 @@ public class findBusinesreq {
     Flt.setId(new BigInteger(args[0]));
     FindRecordInput.setFilter(Flt);
     FindRecordInput.setView("id,srcid,name,shortactionlog,additional,"+
-                            "affectedapplication,relations");
+                            "affectedapplication,wffields.tcomworktime,"+
+                            "relations");
 
     // do the Query
     Result=W5Port.findRecord(FindRecordInput);

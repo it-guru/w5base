@@ -1069,7 +1069,7 @@ sub WSDLWorkflowFieldTypes
    $$XMLtypes.="<xsd:complexType name=\"WorkflowRelations\">";
    $$XMLtypes.="<xsd:sequence>";
    $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"unbounded\" ".
-               "name=\"record\" type=\"$ns:WorkflowRelation\" />";
+               "name=\"subrecord\" type=\"$ns:WorkflowRelation\" />";
    $$XMLtypes.="</xsd:sequence>";
    $$XMLtypes.="</xsd:complexType>";
    $$XMLtypes.="\n";
@@ -3326,13 +3326,13 @@ sub FormatedResult
    if ($FormatAs eq "SOAP"){
       my $out="";
       foreach my $rel (@$d){
-         $out.="<record>";
+         $out.="<subrecord>";
          foreach my $fieldname (keys(%$rel)){
             my $fobj=$fo->getField($fieldname,$current);
             $out.="<$fieldname>".$fobj->FormatedResult($rel,$FormatAs).
                   "</$fieldname>";
          }
-         $out.="</record>";
+         $out.="</subrecord>";
       }
       return($out);
    }
