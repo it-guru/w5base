@@ -437,8 +437,8 @@ sub ValidateCaches
        defined($UserCache->{$ENV{REMOTE_USER}}->{rec}->{cistatusid})){ 
       if ($UserCache->{$ENV{REMOTE_USER}}->{rec}->{cistatusid}!=4){
          if (Query->Param("MOD") eq "base::interface"){
-            printf("Status: 403 Forbitten - ".
-                   "account needs to be activate with web browser\n");
+            printf("Status: 403 Forbidden - ".
+                   "account needs to be activated with web browser\n");
             printf("Content-type: text/xml\n\n".
                    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
             return(0);
@@ -451,8 +451,8 @@ sub ValidateCaches
             print("Content-type:text/plain;charset=ISO-8895-1\n\n");
             printf(msg(ERROR,$self->T("access for user '\%s' to W5Base ".
                              "Framework rejected")),$ENV{REMOTE_USER});
-            printf(msg(INFO,$self->T("posible resons are a locked account ".
-                            "or an incorect contact definition")));
+            printf(msg(INFO,$self->T("possible reasons are a locked account ".
+                            "or an incorrect contact definition")));
             printf(msg(INFO,$self->T("please contact the admins if you think,".
                             " this isn't purposed")));
             return(0);
@@ -477,12 +477,12 @@ sub GTCverification
 function GTC_accept()
 {
  confirm("You are sure, you will accept the completly GTC's\\n"+
-         " and have understand all consequences?");
+         " and have understood all consequences?");
 
 }
 function GTC_decline()
 {
-  alert("Without accepted GTC's, there could no access be granted!");
+  alert("Without accepted GTC's, no access could be granted!");
 }
 
 </script>
@@ -784,15 +784,15 @@ sub HandleNewUser
    my $self=shift;
 
    if (Query->Param("MOD") eq "base::interface"){
-      printf("Status: 403 Forbitten - ".
-             "account needs to be activate with web browser\n");
+      printf("Status: 403 Forbidden - ".
+             "account needs to be activated with web browser\n");
       printf("Content-type: text/xml\n\n".
              "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
       return(0);
    }
    if ($self->Config->Param("W5BaseOperationMode") eq "readonly" ||
        $self->Config->Param("W5BaseOperationMode") eq "slave"){
-      my $msg="account needs to be activate in master system";
+      my $msg="account needs to be activated in master system";
      # printf("Status: 403 Forbitten - $msg");
       printf("Content-type: text/html\n\n");
       printf("<html><body><h1>$msg</h1></body></html>");
@@ -1265,12 +1265,12 @@ EOF
    $d.="\n<script language=\"JavaScript\">\n";
    $d.="function DataLoseWarn(){\n";
    $d.="return(confirm(\"".
-        $self->T("With this action, it is posible to lose data!").
+        $self->T("With this action, it is possible to lose data!").
        "\"));\n";
    $d.="}\n";
    $d.="function DataLoseQuestion(){\n";
    $d.="return(\"".
-        $self->T("With this action, it is posible to lose data!").
+        $self->T("With this action, it is possible to lose data!").
        "\");\n";
    $d.="}\n";
    $d.="</script>\n\n";
@@ -1617,7 +1617,7 @@ sub findtemplvar
             foreach my $u (sort(keys(%u))){
                $d.="<option value=\"COLLEGE:$u{$u}\"";
                $d.=" selected" if ($oldval eq "COLLEGE:$u{$u}");
-               $d.=">".$self->T('College').": ".$u.
+               $d.=">".$self->T('Colleague').": ".$u.
                    "</option>";
             }
          }
