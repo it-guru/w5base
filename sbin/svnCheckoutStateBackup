@@ -34,6 +34,7 @@ use Date::Calc(qw(Day_of_Week_to_Text Week_of_Year Today_and_Now
 
 my $svndir=$ARGV[0];
 my $recovscript=$ARGV[1];
+my $htmlstatus=$ARGV[2];
 
 if (!defined($recovscript)){
    $recovscript="svn.recovery.%Y%M%D-%hh.sh";
@@ -103,6 +104,74 @@ if (open(OUT,">".$recovscript)){
 else{
    printf STDERR ("ERROR: fail to open output file '$recovscript'\n");
    exit(1);
+}
+
+if ($htmlstatus ne ""){
+   my @pending;
+   my @revinfo;
+   my $targetrev;
+   if (open(SVN,"svn status -u $svndir|")){
+      while(my $l=<SVN>){
+         $l=~s/\s*$//;
+         if (my ($tr)=$l=~m/Status against revision:\s*(\d+).*/i){
+            $targetrev=$tr;
+         }
+         else{
+            if (!($l=~m/^\s*\?/)){
+               $l=~s/^.[\s\*\d]*//g;
+               push(@pending,$l); 
+            }
+         }
+      }
+      close(SVN); 
+   }
+   printf("Pass3: writing html status page\n");
+   if (open(F,">$htmlstatus")){
+      printf("       target revision %s\n",$targetrev);
+      for(my $r=$maxrev;$r<$targetrev;$r++){
+         printf("       - loading info for %s\n",$r);
+         if (open(SVN,"svn log -r $r $svndir|")){
+            my $revinfo=join("",<SVN>);
+            if ($revinfo=~m/^\s*$/){
+               printf STDERR ("unexpected result from svn log\n");
+               exit(1);
+            }
+            $revinfo=~s/\n/<br>/g;
+            push(@revinfo,"<tr><td><font face=\"Courier\">".$revinfo.
+                          "</font></td></tr>");
+            close(SVN);
+         }
+      }
+      print F ("<html>");
+      print F ("<head>");
+      print F ("</head>");
+      print F ("<body>");
+      my $date=`date`;
+      print F ("Status: $date<br>");
+      printf F ("Current full installed revision: <b>%s</b><br>",$maxrev);
+      if (keys(%rev)>1){
+         print F ("<ul>");
+         foreach my $r (keys(%rev)){
+            next if ($r eq $maxrev);
+            printf F ("<li>Partial revision %s with %d files<br>",$r,$rev{$r});
+         }
+         print F ("</ul>");
+      }
+      if ($#revinfo!=-1){
+         printf F ("Current pending update informations:<br>".
+                   "<table width=1%>%s</table>",
+                   join("\n",@revinfo));
+      }
+      if ($#pending!=-1){
+         printf F ("Current pending file updates:<br><xmp>%s</xmp>",
+                   join("\n",@pending));
+      }
+      
+
+
+      print F ("</body>");
+      print F ("</html>");
+   }
 }
 
 
