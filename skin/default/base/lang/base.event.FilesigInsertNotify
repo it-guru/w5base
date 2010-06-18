@@ -1,0 +1,6 @@
+'request for signed file transfer'=>{de=>'Anforderung zur Freigabe eines signierten Filetransfers'},
+'MSG001'=>{de=>'Sehr geerter Datenverantwortlicher,
+
+es wurde ein signierter Filetransfer angefordert. Sie müssen vor einem solchen Transfer den unten aufgeführten Schlüssel genehmigen.
+Falls Sie dem Tranfer nicht zustimmen möchten, können Sie diese Mail einfach ignorieren. Ansonsten verwenden Sie bitten den beigefüten Link, um den Schlüssel für Transfers zuzulassen.',
+en=>'Singed filetransfer has been requested. Please allow or deny the key by using the attached link'},

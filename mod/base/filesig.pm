@@ -75,7 +75,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'username',
                 group         =>'sig',
-                label         =>'user',
+                label         =>'used identity',
                 dataobjattr   =>'filesig.username'),
 
       new kernel::Field::Textarea(
@@ -136,6 +136,17 @@ sub new
 #   return(1) if (defined($self->{DB}));
 #   return(0);
 #}
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my $grp=shift;
+   my %param=@_;
+   return("header","default","sig","soure");
+}
+
+
+
 
 
 

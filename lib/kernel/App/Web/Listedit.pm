@@ -156,6 +156,41 @@ sub addAttach
 }
 
 
+sub recordWriteOperators
+{
+   my $self=shift;
+   my $databoss=$self->getField("databossid");
+   my $idobj=$self->IdField();
+   my $prim=[];
+   my $sec=[];
+
+   foreach my $oprec ($self->getHashList($idobj->Name(),"databossid")){
+      if ($oprec->{databossid} ne ""){
+         push(@$prim,$oprec->{databossid});
+      }
+      if (ref($oprec->{contacts}) eq "ARRAY"){
+         foreach my $crec (@{$oprec->{contacts}}){
+            my $r=$crec->{roles};
+            $r=[$r] if (ref($r) ne "ARRAY");
+            if (grep(/^write$/,@$r)){
+               if ($crec->{target} eq "base::user"){
+                  push(@$sec,$crec->{targetid});
+               }
+               if ($crec->{target} eq "base::grp"){
+                  foreach my $uid ($self->getMembersOf($crec->{targetid},
+                                   "RMember","down")){
+                     push(@$sec,$uid);
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   return($prim,$sec);
+}
+
+
 
 sub getValidWebFunctions
 {  

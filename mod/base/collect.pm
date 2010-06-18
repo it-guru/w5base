@@ -115,7 +115,41 @@ sub store
          if ($errormsg eq "" && !($targetobj=~m/^\S+::\S+.*$/)){
             $errormsg="no target object specified";
          }
-
+      }
+      if ($errormsg eq ""){
+         if ($errormsg eq "" && ($targetname=~m/^\s*$/)){
+            $errormsg="no target name specified";
+         }
+      }
+      my $to;
+      if ($errormsg eq ""){
+         $to=getModuleObject($self->Config,$targetobj);
+         if (!defined($to)){
+            $errormsg="invalid target object specifed";
+         }
+      }
+      
+      if ($errormsg eq ""){
+         my $fo=$to->getField("signedfiletransfername");
+         if (!defined($fo)){
+            $errormsg="target object could not recive signed file";
+         }
+      }
+      my ($parentid,$mandatorid);
+      if ($errormsg eq ""){
+         my $id=$to->IdField()->Name();
+         my $flt={signedfiletransfername=>\$targetname};
+         if (defined($to->getField("cistatusid"))){
+            $flt->{cistatusid}="<6";
+         }
+         $to->SetFilter($flt);
+         $to->SetCurrentOrder(qw(NONE));
+         my ($trec,$msg)=$to->getOnlyFirst($id,"mandatorid"); 
+         if ($trec->{$id} eq ""){
+            $errormsg="could not detect id in parent object";
+         }
+         $parentid=$trec->{$id};
+         $mandatorid=$trec->{mandatorid};
       }
 
       #
@@ -132,10 +166,12 @@ sub store
                               name=>\$targetname,
                               username=>\$user});
          my $msg;
+         $filesig->SetCurrentOrder(qw(NONE));
          ($sigrec,$msg)=$filesig->getOnlyFirst(qw(ALL)); 
          if (!defined($sigrec)){
             $sigrec={
                      parentobj=>$targetobj,
+                     parentid=>$parentid,
                      name=>$targetname,
                      cistatusid=>'2',
                      username=>$user,
@@ -187,28 +223,6 @@ sub store
                #
                # Store file at label
                #
-               my $to=getModuleObject($self->Config,$targetobj);
-               if (!defined($to)){
-                  $errormsg="invalid target object specifed";
-               }
-            
-               if ($errormsg eq ""){
-                  my $fo=$to->getField("signedfiletransfername");
-                  if (!defined($fo)){
-                     $errormsg="target object could not recive signed file";
-                  }
-               }
-               my ($parentid,$mandatorid);
-               if ($errormsg eq ""){
-                  my $id=$to->IdField()->Name();
-                  $to->SetFilter({signedfiletransfername=>\$targetname});
-                  my ($trec,$msg)=$to->getOnlyFirst($id,"mandatorid"); 
-                  if ($trec->{$id} eq ""){
-                     $errormsg="could not detect id in parent object";
-                  }
-                  $parentid=$trec->{$id};
-                  $mandatorid=$trec->{mandatorid};
-               }
                if ($errormsg eq ""){
                   my $sf=getModuleObject($self->Config,"base::signedfile");
                   #

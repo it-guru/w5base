@@ -1,2 +1,3 @@
 'base::filesig'=>{de=>'Dateisignatur',en=>'Filesignatur'},
+'fieldgroup.sig'=>{de=>'Signatur',en=>'Signature'},
 
