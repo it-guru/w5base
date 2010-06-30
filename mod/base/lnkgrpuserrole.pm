@@ -90,6 +90,7 @@ sub new
                                  'RQManager',
                                  'RReportReceive',
                                  'RAuditor',
+                                 'RMonitor',
                                  'RINManager',
                                  'RCHManager',
                                  'RCFManager',

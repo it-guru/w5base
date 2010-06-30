@@ -19,6 +19,7 @@
 'RControlling'=>{ de=>'Controlling', en=>'Controlling'},
 'RBackoffice'=>{ de=>'Backoffice', en=>'Backoffice'},
 'RAuditor'=>{ de=>'Auditor', en=>'Auditor'},
+'RMonitor'=>{ de=>'Monitor/Lesen', en=>'Monitor/Read'},
 'W5BaseSupport'=>{ de=>'W5Base Support', en=>'W5Base Support'},
 'RTimeManager'=>{ de=>'Zeit-Manager', en=>'Time-Manager'},
 'base::lnkgrpuserrole'=>{ de=>'Rollenzuordnung',en=>'Rolerelation'},

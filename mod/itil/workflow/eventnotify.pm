@@ -693,7 +693,11 @@ sub isViewValid
          last;
       }
    }
-   if ($mandatorok || $rec->{owner}==$userid){
+   if ($self->getParent->IsMemberOf($mandators,[qw(RMonitor)],"up")){
+      $mandatorok=1;
+   }
+   if ($mandatorok || $rec->{owner}==$userid || 
+       $self->getParent->IsMemberOf("admin")){
       push(@grps,"eventnotifyinternal","affected");
       push(@grps,"history"); # maybe
       push(@grps,"relations"); # maybe
