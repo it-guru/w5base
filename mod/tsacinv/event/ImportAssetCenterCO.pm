@@ -128,7 +128,8 @@ sub VerifyAssetManagerData
       $acsys->SetFilter({conumber=>\$conumber});
       my @syslist=$acsys->getHashList(qw(systemid systemname applications
                                          assignmentgroup systemola
-                                         assignmentgroupsupervisoremail));
+                                         assignmentgroupsupervisoremail
+                                         type usage priority));
       if ($#syslist!=-1){
          foreach my $sysrec (@syslist){
             if ($islocked){
@@ -146,8 +147,12 @@ sub VerifyAssetManagerData
                    "System aktuell nicht mehr existiert, dann sorgen ".
                    "Sie bitte umgehend für eine entsprechende ".
                    "Datenbereinigung!");
-               printf FO ("%s;%s;%s;%s\n",
+               printf FO ("%s;%s;%s;%s;%s;%s;%s;%s\n",
                           $sysrec->{systemid},
+                          $sysrec->{type},
+                          $sysrec->{usage},
+                          $sysrec->{priority},
+                          $sysrec->{assignmentgroup},
                           $sysrec->{systemola},
                           $conumber,
                           "co-number is locked");
@@ -186,8 +191,12 @@ sub VerifyAssetManagerData
               #            "W5Base/Darwin ein! (bzw. tragen Sie die SystemID ".
               #            "ein, falls Sie diese beim entsprechenden System ".
               #            "vergessen haben)");
-                     printf FO ("%s;%s;%s;%s\n",
+                     printf FO ("%s;%s;%s;%s;%s;%s;%s;%s\n",
                                 $sysrec->{systemid},
+                                $sysrec->{type},
+                                $sysrec->{usage},
+                                $sysrec->{priority},
+                                $sysrec->{assignmentgroup},
                                 $sysrec->{systemola},
                                 $conumber,
                                 "systemid not in W5Base/Darwin registered");
@@ -210,8 +219,12 @@ sub VerifyAssetManagerData
               #               "Regeln der AL DTAG zwingend. Sorgen Sie dafür, ".
               #               "dass die korrekte Zuorndung zu einer Anwendung ".
               #               "in W5Base/Darwin eingetragen wird.");
-                        printf FO ("%s;%s;%s;%s\n",
+                        printf FO ("%s;%s;%s;%s;%s;%s;%s;%s\n",
                                    $sysrec->{systemid},
+                                   $sysrec->{type},
+                                   $sysrec->{usage},
+                                   $sysrec->{priority},
+                                   $sysrec->{assignmentgroup},
                                    $sysrec->{systemola},
                                    $conumber,
                                    "no application relations in W5Base/Darwin");
