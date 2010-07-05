@@ -128,7 +128,7 @@ if ($htmlstatus ne ""){
    printf("Pass3: writing html status page\n");
    if (open(F,">$htmlstatus")){
       printf("       target revision %s\n",$targetrev);
-      for(my $r=$maxrev;$r<$targetrev;$r++){
+      for(my $r=$maxrev+1;$r<=$targetrev;$r++){
          printf("       - loading info for %s\n",$r);
          if (open(SVN,"svn log -r $r $svndir|")){
             my $revinfo=join("",<SVN>);
