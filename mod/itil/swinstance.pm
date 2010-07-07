@@ -88,6 +88,7 @@ sub new
                                  'BEA Tuxedo',
                                  'CICS',
                                  'DB2',
+                                 'HP-NSK Pathway',
                                  'IIS',
                                  'Informix',
                                  'JacORB',
