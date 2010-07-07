@@ -90,7 +90,7 @@ sub NotifyPlasma
 
    my $method = SOAP::Data->name('CreateNewWork');
 
-   my %tr=('id'     =>'WF_ID');
+   my %tr=('id'     =>'WF_ID','sclass'=>'WF_CLASS');
    my @SOAPparam;
    my $FoundData;
    foreach my $k (keys(%tr)){
