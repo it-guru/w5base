@@ -1,96 +1,161 @@
 (function($) {
    $.widget("ui.barGrid", {
-      _init: function(){
-         this.element.css('background-color',"gray");
-         this._createTableGrid();
+      options: {
+         mainTableBorder: 1
       },
+      _create: function() {
+         this.element.css('background-color',"gray");
+         this.element.css('margin',"0");
+         this.element.css('padding',"0");
+         this.element.css('border-width',"0");
+         this._createTableGrid();
+         var o=this;
+         $(window).resize(function(){o.resize()});
+      },
+
       _createBaseLayout: function(){
-         this.mainTable=$("<table border=0 class='barGridMain' width=100% height=100%>"+
+         this.mainTable=$("<table border='"+this.options.mainTableBorder+"' "+
+                          "cellspacing=0 cellpadding=0 "+
+                          "class='barGridMain' width=100% height=100%>"+
                           "</table>");
          this.mainTable.css('border-collapse','collapse');
          this.mainTable.appendTo(this.element);
 
+         var row0=$("<tr height=1%></tr>");
+         row0.appendTo(this.mainTable); 
          var row1=$("<tr height=1%></tr>");
          row1.appendTo(this.mainTable); 
          var row2=$("<tr></tr>");
          row2.appendTo(this.mainTable); 
 
-         this.colHeadLabel=$("<td width=1% nowrap>&nbsp;</td>");
-         this.colHeadLabel.appendTo(row1);
+         this.colHeadLabel=$("<td nowrap rowspan=2 width=1%></td>");
+         this.colHeadLabel.appendTo(row0);
+         var dummy=$("<td nowrap align=center>Tag</td>");
+         dummy.appendTo(row0);
 
 
-         this.colTable=$("<table border=1 class='barGridColumns'></table>");
+         this.colTable=$("<table cellspacing=0 cellpadding=0 border=0 class='barGridColumns'></table>");
          this.colTable.css('table-layout','fixed');
          this.colTable.css('border-collapse','collapse');
          this.colHeadRow=$("<tr></tr>");
          this.colHeadRow.appendTo(this.colTable);
 
          this.colHead=$("<div></div>");
-         this.colHead.css('overflow','auto');
+         this.colHead.css('overflow','hidden');
+         this.colHead.css('background-color','yellow');
          this.colHeadTd=$("<td></td>");
          this.colHead.appendTo(this.colHeadTd);
          this.colTable.appendTo(this.colHead);
          this.colHeadTd.appendTo(row1);
 
-         this.rowTable=$("<table border=1 class='barGridRows'></table>");
-         this.rowTable.css('table-layout','fixed');
-         this.rowTable.css('border-collapse','collapse');
+         this.rowTable=$("<table cellspacing=0 cellpadding=0 border=0 class='barGridRows'></table>");
+         //this.rowTable.css('border-collapse','collapse');
          var row=$("<tr></tr>");
          row.appendTo(this.rowTable);
 
          this.rowHead=$("<div></div>");
-         this.rowHead.css('overflow','auto');
+         this.rowHead.css('overflow','hidden');
+         this.rowHead.css('background-color','blue');
          this.rowTable.appendTo(this.rowHead);
          this.rowHeadTd=$("<td valign=top></td>");
          this.rowHead.appendTo(this.rowHeadTd);
          this.rowHeadTd.appendTo(row2);
+         this.dataTable=$("<table cellspacing=0 cellpadding=0 border=0>"+
+                         "</table>");
+         this.dataArea=$("<div></div>");
+         this.dataArea.css('background-color','silver');
+         this.dataScrollArea=$("<div></div>");
+         this.dataArea.appendTo(this.dataScrollArea);
+         var o=this;
+         this.dataScrollArea.scroll(function(){
+            var tPos=o.dataScrollArea.scrollTop();
+            var lPos=o.dataScrollArea.scrollLeft();
+            o.colHead.scrollLeft(lPos);
+            o.rowHead.scrollTop(tPos);
+         });
+         this.dataTable.appendTo(this.dataArea);
+         this.dataScrollArea.css('overflow','auto');
+         this.dataScrollArea.css('background-color','orange');
+         this.dataAreaTd=$("<td valign=top></td>");
+         this.dataScrollArea.appendTo(this.dataAreaTd);
+         this.dataAreaTd.appendTo(row2);
          this.resize();
        //  this.colHead.width(50); 
        //  this.rowHead.height(50); 
       },
       _initHeaders: function(){
-         for(var c=0;c<this.options.colModel.length;c++){
-            this.addCol(this.options.colModel[c]);
-         }
          for(var c=0;c<this.options.rowModel.length;c++){
             this.addRow(this.options.rowModel[c]);
          }
+         for(var c=0;c<this.options.colModel.length;c++){
+            this.addCol(this.options.colModel[c]);
+         }
+      },
+      _resizeOptimizerLevel2: function(){
+         console.log("this.colHeadLabel.width",this.colHeadLabel.width());
+         this.rowHead.height(this.totalHeight-this.colHeadLabel.height()-
+                             3*this.options.mainTableBorder);
+         this.colHead.width(this.totalWidth-this.colHeadLabel.width()-
+                             3*this.options.mainTableBorder);
+         this.dataArea.width(this.dataTable.width()+40);
+         this.dataArea.height(this.dataTable.height()+40);
+         this.dataScrollArea.width(this.colHead.width());
+         this.dataScrollArea.height(this.rowHead.height());
       },
       // interface:
       resize: function(){
-         this.colHead.css('display','none');
-         this.rowHead.css('display','none');
+         this.colHead.width(1);
+         this.rowHead.height(1);
+         this.dataScrollArea.width(1);
+         this.dataScrollArea.height(1);
+         this.totalWidth=this.element.width();
+         this.totalHeight=this.element.height();
 
-         this.rowHead.css('display','block');
-         var rowHeadWidth=this.rowHeadTd.width();
-         var rowHeadHeight=this.rowHead.height();
-         this.rowHead.css('display','none');
-
-         this.colHead.css('display','block');
-         var colHeadHeight=this.colHeadTd.height();
-         var colHeadWidth=this.colHead.width();
-         this.colHead.css('display','none');
-
-         var totalWidth=this.element.width();
-         var totalHeight=this.element.height();
-
-         this.colHead.css('width',(totalWidth-rowHeadWidth)+"px");
-         this.rowHead.css('height',(totalHeight-18)+"px"); // 18 oben + 3* rahmen
-         this.rowHead.css('width',(200)+"px");
-
- //        this.colHead.css('display','block');
-         this.rowHead.css('display','block');
+         console.log("totalWidth",this.totalWidth);
+         console.log("totalHeight",this.totalHeight);
+         var o=this;
+         setTimeout(function(){o._resizeOptimizerLevel2();},1);
       },
       addCol: function(col){
             var label=col.name;
             if (col.label!=undefined){
                label=col.label;
             }
-            col.e=$("<td id='"+col.name+"'>"+label+"</td>");
+            col.d=$("<div>"+label+"</div>");
+            if (col.width){
+               col.d.css('width',col.width+'px');
+            }
+            col.d.css('text-align',"center");
+            col.d.css('border-right-width',"1px");
+            col.d.css('border-right-style',"solid");
+            col.d.css('border-right-color',"black");
+            col.e=$("<td nowrap id='"+col.name+"'></td>");
             if (col.width){
                col.e.css('width',col.width+'px');
             }
+            col.d.appendTo(col.e);
             col.e.appendTo(this.colHeadRow);
+            console.log("addCol ",col.name);
+            $('tbody tr', this.dataTable).each(function (i){
+               var div=$("<div>X</div>");
+               var td=$("<td></td>");
+               if (col.width){
+                  div.width(col.width);
+                  td.width(col.width);
+               }
+            div.css('text-align',"center");
+            div.css('border-right-width',"1px");
+            div.css('border-right-style',"solid");
+            div.css('border-right-color',"black");
+            div.css('border-bottom-width',"1px");
+            div.css('border-bottom-style',"solid");
+            div.css('border-bottom-color',"black");
+               div.appendTo(td);
+               td.appendTo(this);
+            });
+            
+ 
+
       },
       addRow: function(row){
             var label=row.name;
@@ -98,9 +163,18 @@
                label=row.label;
             }
             var tr=$("<tr id='"+row.name+"'></tr>");
-            row.e=$("<td>"+label+"</td>");
+            row.d=$("<div>"+label+"</div>");
+            row.d.css('border-bottom-width',"1px");
+            row.d.css('border-bottom-style',"solid");
+            row.d.css('border-bottom-color',"black");
+            row.e=$("<td></td>");
+            row.d.appendTo(row.e);
             row.e.appendTo(tr);
             tr.appendTo(this.rowTable);
+
+            var dataRow=$("<tr></tr>");
+            dataRow.appendTo(this.dataTable);
+            console.log("addRow ",row.name);
       },
 //      _createColHead: function(pe){
 //         this.colTable=$("<table border=1 class='barGridColumns'></table>");
