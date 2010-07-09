@@ -425,7 +425,7 @@ sub Sendmail
             }
          }
          $mail.="--\n";
-         if (1){
+         if (0){
             $mail.="\n--$bound\n";
             $mail.="Content-Type: text/calendar\n";
             $mail.="\n";
