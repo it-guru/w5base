@@ -121,39 +121,39 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'timeplan.comments'),
 
-      new kernel::Field::Select(
-                name          =>'vbarheight',
-                group         =>'misc',
-                htmleditwidth =>'50%',
-                label         =>'VBar Height',
-                default       =>'auto',
-                value         =>[qw(auto)],
-                dataobjattr   =>'timeplan.lineheight'),
+#      new kernel::Field::Select(
+#                name          =>'vbarheight',
+#                group         =>'misc',
+#                htmleditwidth =>'50%',
+#                label         =>'VBar Height',
+#                default       =>'auto',
+#                value         =>[qw(auto)],
+#                dataobjattr   =>'timeplan.lineheight'),
 
-      new kernel::Field::Select(
-                name          =>'vbarcolor',
-                group         =>'misc',
-                htmleditwidth =>'50%',
-                label         =>'VBar Color',
-                default       =>'blue',
-                value         =>[qw(blue red green)],
-                dataobjattr   =>'timeplan.vbarcolor'),
+#      new kernel::Field::Select(
+#                name          =>'vbarcolor',
+#                group         =>'misc',
+#                htmleditwidth =>'50%',
+#                label         =>'VBar Color',
+#                default       =>'blue',
+#                value         =>[qw(blue red green)],
+#                dataobjattr   =>'timeplan.vbarcolor'),
 
-      new kernel::Field::Select(
-                name          =>'defstarthour',
-                group         =>'misc',
-                htmleditwidth =>'20%',
-                label         =>'Default Start hour',
-                default       =>'0',
-                value         =>[qw(0 1 2 3 4 5 6 7 8 9 10 11 12 
-                                    13 14 15 16 17 18 19 20 21 22 23)],
-                dataobjattr   =>'timeplan.defstarthour'),
+#      new kernel::Field::Select(
+#                name          =>'defstarthour',
+#                group         =>'misc',
+#                htmleditwidth =>'20%',
+#                label         =>'Default Start hour',
+#                default       =>'0',
+#                value         =>[qw(0 1 2 3 4 5 6 7 8 9 10 11 12 
+#                                    13 14 15 16 17 18 19 20 21 22 23)],
+#                dataobjattr   =>'timeplan.defstarthour'),
 
-      new kernel::Field::Text(
-                name          =>'prnapprovedline',
-                group         =>'misc',
-                label         =>'Print Approved fields',
-                dataobjattr   =>'timeplan.prnapprovedline'),
+#      new kernel::Field::Text(
+#                name          =>'prnapprovedline',
+#                group         =>'misc',
+#                label         =>'Print Approved fields',
+#                dataobjattr   =>'timeplan.prnapprovedline'),
 
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
@@ -165,16 +165,6 @@ sub new
       new kernel::Field::Container(
                 name          =>'additional',
                 label         =>'Additionalinformations',
-                uivisible     =>sub{
-                   my $self=shift;
-                   my $mode=shift;
-                   my %param=@_;
-                   my $rec=$param{current};
-                   if (!defined($rec->{$self->Name()})){
-                      return(0);
-                   }
-                   return(1);
-                },
                 dataobjattr   =>'timeplan.additional'),
 
       new kernel::Field::Text(
@@ -485,5 +475,15 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/timetool/load/timeplan.jpg?".$cgi->query_string());
 }
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my $grp=shift;
+   my %param=@_;
+   return(qw(header default admin contacts misc source));
+}
+
+
 
 1;

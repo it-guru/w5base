@@ -55,7 +55,7 @@
 'sysadm.qmgmt.interview.new'=>{de=>'Neueingabe',en=>'New'},
 'sysadm.qmgmt.qrule.lnkmandator'=>{de=>'Verkn. Mandant',en=>'Mandator Link'},
 'sysadm.qmgmt.qrule.lnkmandator.new'=>{de=>'Neueingabe',en=>'New'},
-'sysadm.filesig'=>{de=>'Dateisignatur',en=>'Filesignatur'},
+'sysadm.filesig'=>{de=>'Transfersignatur',en=>'Transfersig'},
 'sysadm.filesig.signedfile'=>{de=>'signierte Datei',en=>'signed file'},
 'Tools.filemgmt'=>{de=>'Dateiverwaltung',en=>'Filemanagement'},
 'Tools.teamtools'=>{de=>'Team-Tools',en=>'Team-Tools'},

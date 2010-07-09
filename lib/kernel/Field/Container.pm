@@ -96,6 +96,9 @@ sub FormatedDetail
       }
       return(undef);
    }
+   if ($mode=~m/edit/i){
+      return(undef);
+   }
    return($d);
 }
 

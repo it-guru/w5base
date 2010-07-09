@@ -1,3 +1,6 @@
-'base::filesig'=>{de=>'Dateisignatur',en=>'Filesignatur'},
+'base::filesig'=>{de=>'Transfer-Signatur',en=>'Transfer-Signature'},
 'fieldgroup.sig'=>{de=>'Signatur',en=>'Signature'},
+'given used identity'=>{de=>'angegebene User Identität'},
+'systemname'=>{de=>'Sytemname'},
+'path/usage'=>{de=>'Pfad/Verwendung'},
 

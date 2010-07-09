@@ -2,7 +2,7 @@
 
 TARGETPROT="http"
 TARGETHOST="localhost"
-TARGETPATH="/w5base/public/base/textcollect"
+TARGETPATH="/w5base2/public/base/filesig/store"
 
 
 if [ -r "/etc/cfmcollect.conf" ]; then
@@ -32,6 +32,10 @@ if [ "$DEBUG" = "" ]; then
 fi
 
 LABEL="$1"
+if [ "$LABEL" = "" ]; then
+   echo "ERROR: check call syntax - no parameters specified"
+   exit 1
+fi
 shift
 
 if [ "$1" = "" ]; then
@@ -152,31 +156,32 @@ cat $TRANSPORTFILE
     -subject "(itil::system) $USER@$HOSTNAME:$LABEL"> $BUFFER
 LENGTH=`stat -c %s $BUFFER`
 
-(
-echo "PUT http://localhost/w5base2/public/base/collect/store HTTP/1.0"
-echo "Content-type: text/plain"
-echo "Content-length: $LENGTH"
-echo ""
-cat $BUFFER
-
-)  | netcat localhost 80 | awk '
-BEGIN{
-  out=0
-}
-{
-   if (out){
-      print $0;
+if [ "$TARGETPROT" = "http" ]; then
+   (
+   echo "PUT http://$TARGETHOST$TARGETPATH HTTP/1.0"
+   echo "Content-type: text/plain"
+   echo "Content-length: $LENGTH"
+   echo ""
+   cat $BUFFER
+   )  | netcat $TARGETHOST 80 | awk '
+   BEGIN{
+     out=0
    }
-   if ($0=="RESPONSE:"){
-      out=1;
+   {
+      if (out){
+         print $0;
+      }
+      if ($0=="RESPONSE:"){
+         out=1;
+      }
    }
-}
-END{
-   if (!out){
-      print("ERROR: unexpected protocol structure problem - contact admin!");
+   END{
+      if (!out){
+         print("ERROR: unexpected protocol structure problem - contact admin!");
+      }
    }
-}
-'
+   '
+fi
 rm $BUFFER
 
 

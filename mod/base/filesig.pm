@@ -22,6 +22,9 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use File::Temp qw(tempfile);
+use Fcntl qw(SEEK_SET);
+use MIME::Base64;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -55,6 +58,12 @@ sub new
                 dataobjattr   =>'filesig.cistatus'),
 
       new kernel::Field::Text(
+                name          =>'labelpath',
+                group         =>'sig',
+                label         =>'path/usage',
+                dataobjattr   =>'filesig.labelpath'),
+
+      new kernel::Field::Text(
                 name          =>'parentobj',
                 group         =>'sig',
                 label         =>'Parentobj',
@@ -69,13 +78,13 @@ sub new
       new kernel::Field::Text(
                 name          =>'name',
                 group         =>'sig',
-                label         =>'name',
+                label         =>'systemname',
                 dataobjattr   =>'filesig.name'),
 
       new kernel::Field::Text(
                 name          =>'username',
                 group         =>'sig',
-                label         =>'used identity',
+                label         =>'given used identity',
                 dataobjattr   =>'filesig.username'),
 
       new kernel::Field::Textarea(
@@ -122,7 +131,8 @@ sub new
                 dataobjattr   =>'filesig.realeditor')
 
    );
-   $self->setDefaultView(qw(linenumber parentobj username name cistatus cdate mdate));
+   $self->setDefaultView(qw(linenumber parentobj username name 
+                            labelpath cistatus cdate mdate));
    $self->setWorktable("filesig");
    return($self);
 }
@@ -161,7 +171,7 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("ALL") if ($self->IsMemberOf("admin"));
+   return("default") if ($self->IsMemberOf("admin"));
    return();
 }
 
@@ -178,6 +188,7 @@ sub store
       my $targetname;
       my $user;
       my $label;
+      my $labelpath;
       my $errormsg;
       while(my $n=read(STDIN, $data, 1024)){
          print $fh $data;
@@ -189,14 +200,22 @@ sub store
             ($targetobj,$user,$targetname,$label)=
                          $v=~m/^\s*\((.+)\)\s*(\S+)\@(\S+):(.+)\s*$/;
             $label=~s/\\/\//g;
-            if (!($label=~m/\/[a-z0-9\/\._-]+$/i)){
+            if (!($label=~m/\/[a-z0-9\/\._-]+$/i) &&
+                $label ne "CFMACCMGR"){
                $errormsg="invalid label specified";
+            }
+            else{
+               $labelpath=$label;
+               if ($label=~m/^\//){
+                  $labelpath=~s/[^\/]*$//;
+               }
             }
          }
          if ($line=~m/^\s*$/){
             last;
          }
       }
+      print $self->HttpHeader("text/plain");
       #printf STDERR ("Signed PUT to '%s' identified by '%s' from '%s'\n",
       #               $targetobj,$targetname,$user);
       #printf STDERR ("Signed PUT label '%s'\n",
@@ -282,12 +301,14 @@ sub store
          $filesig=getModuleObject($self->Config,"base::filesig");
          $filesig->SetFilter({parentobj=>\$targetobj,
                               name=>\$targetname,
+                              labelpath=>\$labelpath,
                               username=>\$user});
          my $msg;
          $filesig->SetCurrentOrder(qw(NONE));
          ($sigrec,$msg)=$filesig->getOnlyFirst(qw(ALL)); 
          if (!defined($sigrec)){
             $sigrec={
+                     labelpath=>$labelpath,
                      parentobj=>$targetobj,
                      parentid=>$parentid,
                      name=>$targetname,
@@ -342,32 +363,73 @@ sub store
                # Store file at label
                #
                if ($errormsg eq ""){
-                  my $sf=getModuleObject($self->Config,"base::signedfile");
-                  #
-                  # check if a file with the requested label already exists
-                  #
-                  $sf->SetFilter({label=>\$label,
-                                  isnewest=>\'1',
-                                  parentid=>\$parentid,
-                                  parentobj=>\$targetobj});
-                  my ($oldrec,$msg)=$sf->getOnlyFirst("id"); 
-                  if (defined($oldrec)){
+
+                  if ($labelpath eq "CFMACCMGR"){
                      #
-                     # if a file already exists, mark it as "old"
+                     # process singed data query for account management
                      #
-                     $sf->ValidatedUpdateRecord($oldrec,{isnewest=>undef},
-                                                {id=>\$oldrec->{id}});
+                     my $u=getModuleObject($self->Config,"base::user");
+                     printf STDERR ("CFMACCMGR request=%s\n",$nativfile);
+                     my @flt=$u->StringToFilter($nativfile);
+                     printf STDERR ("CFMACCMGR filter=%s\n",Dumper(\@flt));
+                     foreach my $f (@flt){
+                        $f->{cistatusid}="4";
+                        if (!exists($f->{usertyp})){
+                           $f->{usertyp}="user";
+                        }
+                     }
+                     if ($u->LastMsg()==0){
+                        $u->SetFilter(\@flt);
+                        foreach my $urec ($u->getHashList(qw(userid posix 
+                                          email ssh1publickey ssh2publickey))){
+                           my $ssh1publickey=$urec->{ssh1publickey};
+                           my $ssh2publickey=$urec->{ssh2publickey};
+                           $ssh1publickey=~s/[\n:]//g;
+                           $ssh2publickey=~s/[\n:]//g;
+                           if ($urec->{posix} ne ""){ 
+                              printf("ACC:%s:%s:%s:%s:%s\n",
+                                     $urec->{posix},$urec->{userid},
+                                     $urec->{email},
+                                     $urec->{ssh1publickey},
+                                     $urec->{ssh2publickey});
+                           }
+                        }
+                     }
+                     else{
+                        $errormsg=join("\n",$self->LastMsg());
+                     }
                   }
-                  $sf->ValidatedInsertRecord({label=>$label,
-                                              filesig=>$sigrec->{id},
-                                              parentid=>$parentid,
-                                              mandatorid=>$mandatorid,
-                                              parentobj=>$targetobj,
-                                              datafile=>$nativfile});
-                  if ($self->LastMsg()!=0){
-                     $errormsg=join(";",$self->LastMsg()); 
-                     $errormsg=~s/\n/ /g;
-                     $self->LastMsg("");
+                  else{
+                     #
+                     # process singed file transfer to datastore
+                     #
+                     my $sf=getModuleObject($self->Config,"base::signedfile");
+                     #
+                     # check if a file with the requested label already exists
+                     #
+                     $sf->SetFilter({label=>\$label,
+                                     isnewest=>\'1',
+                                     parentid=>\$parentid,
+                                     parentobj=>\$targetobj});
+                     my ($oldrec,$msg)=$sf->getOnlyFirst("id"); 
+                     if (defined($oldrec)){
+                        #
+                        # if a file already exists, mark it as "old"
+                        #
+                        $sf->ValidatedUpdateRecord($oldrec,{isnewest=>undef},
+                                                   {id=>\$oldrec->{id}});
+                     }
+                     $sf->ValidatedInsertRecord({label=>$label,
+                                                 filesig=>$sigrec->{id},
+                                                 parentid=>$parentid,
+                                                 mandatorid=>$mandatorid,
+                                                 parentobj=>$targetobj,
+                                                 datafile=>$nativfile});
+                     if ($self->LastMsg()!=0){
+                        $errormsg=join(";",$self->LastMsg()); 
+                        $errormsg=~s/\n/ /g;
+                        $self->LastMsg("");
+                     }
                   }
                }
             }
@@ -382,33 +444,18 @@ sub store
       # Step 5: send result of operation to client.
       #
 
-
-
-      my $cert="";
-      seek($fh,0,0) || die ("error");
-      open(F,"openssl smime -pk7out -in $filename| ".
-             "openssl pkcs7 -print_certs -noout|");
-      my $cert="";
-      while(<F>){
-         $cert.=$_;
-      }
-
-      close(F);
-      close($fh);
-      unlink($filename);
       
   
       if ($errormsg eq ""){
-         print $self->HttpHeader("text/plain");
-         print "RESPONSE:\nOK\n";
+         print "RESPONSE:OK\n";
       }
       else{
-         print $self->HttpHeader("text/plain");
          if (!($errormsg=~m/ERROR/)){
-            $errormsg="ERROR: $errormsg";
+            $errormsg="ERROR: $errormsg\n";
          }
-         print "RESPONSE:\n$errormsg\n";
+         print "RESPONSE:$errormsg\n";
       }
+      unlink($filename);
 
    }
    return;

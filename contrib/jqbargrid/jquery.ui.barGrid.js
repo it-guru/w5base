@@ -40,11 +40,16 @@
          this.colHeadRow=$("<tr></tr>");
          this.colHeadRow.appendTo(this.colTable);
 
+         this.colScrollHead=$("<div></div>");
+         this.colScrollHead.css('overflow','hidden');
+         this.colScrollHead.css('background-color','yellow');
          this.colHead=$("<div></div>");
-         this.colHead.css('overflow','hidden');
-         this.colHead.css('background-color','yellow');
+          
+         this.colHead.appendTo(this.colScrollHead);
+
+
          this.colHeadTd=$("<td></td>");
-         this.colHead.appendTo(this.colHeadTd);
+         this.colScrollHead.appendTo(this.colHeadTd);
          this.colTable.appendTo(this.colHead);
          this.colHeadTd.appendTo(row1);
 
@@ -53,16 +58,26 @@
          var row=$("<tr></tr>");
          row.appendTo(this.rowTable);
 
+         this.rowScrollHead=$("<div></div>");
+         this.rowScrollHead.css('overflow','hidden');
+         this.rowScrollHead.css('background-color','blue');
          this.rowHead=$("<div></div>");
-         this.rowHead.css('overflow','hidden');
-         this.rowHead.css('background-color','blue');
+         this.rowHead.appendTo(this.rowScrollHead);
+
          this.rowTable.appendTo(this.rowHead);
          this.rowHeadTd=$("<td valign=top></td>");
-         this.rowHead.appendTo(this.rowHeadTd);
+         this.rowScrollHead.appendTo(this.rowHeadTd);
          this.rowHeadTd.appendTo(row2);
          this.dataTable=$("<table cellspacing=0 cellpadding=0 border=0>"+
                          "</table>");
          this.dataArea=$("<div></div>");
+         this.barArea=$("<div style='position:absolute;margin:0;padding:0;width:0;height:0'></div>");
+         this.barArea.appendTo(this.dataArea);
+
+         var x=$("<div style='position:relative;top:20px;left:400px;width:50px;height:15px;background-color:red'>"+
+                 "</div>");
+         x.appendTo(this.barArea);
+
          this.dataArea.css('background-color','silver');
          this.dataScrollArea=$("<div></div>");
          this.dataArea.appendTo(this.dataScrollArea);
@@ -70,8 +85,8 @@
          this.dataScrollArea.scroll(function(){
             var tPos=o.dataScrollArea.scrollTop();
             var lPos=o.dataScrollArea.scrollLeft();
-            o.colHead.scrollLeft(lPos);
-            o.rowHead.scrollTop(tPos);
+            o.colScrollHead.scrollLeft(lPos);
+            o.rowScrollHead.scrollTop(tPos);
          });
          this.dataTable.appendTo(this.dataArea);
          this.dataScrollArea.css('overflow','auto');
@@ -82,6 +97,7 @@
          this.resize();
        //  this.colHead.width(50); 
        //  this.rowHead.height(50); 
+
       },
       _initHeaders: function(){
          for(var c=0;c<this.options.rowModel.length;c++){
@@ -93,26 +109,27 @@
       },
       _resizeOptimizerLevel2: function(){
          console.log("this.colHeadLabel.width",this.colHeadLabel.width());
-         this.rowHead.height(this.totalHeight-this.colHeadLabel.height()-
+         this.rowScrollHead.height(this.totalHeight-this.colHeadLabel.height()-
                              3*this.options.mainTableBorder);
-         this.colHead.width(this.totalWidth-this.colHeadLabel.width()-
+         this.colScrollHead.width(this.totalWidth-this.colHeadLabel.width()-
                              3*this.options.mainTableBorder);
-         this.dataArea.width(this.dataTable.width()+40);
-         this.dataArea.height(this.dataTable.height()+40);
-         this.dataScrollArea.width(this.colHead.width());
-         this.dataScrollArea.height(this.rowHead.height());
+
+         this.colHead.width(this.colTable.width()+30);
+         this.rowHead.height(this.rowTable.height()+30);
+
+         this.dataArea.width(this.dataTable.width()+10);
+         this.dataArea.height(this.dataTable.height()+10);
+         this.dataScrollArea.width(this.colScrollHead.width());
+         this.dataScrollArea.height(this.rowScrollHead.height());
       },
       // interface:
       resize: function(){
-         this.colHead.width(1);
-         this.rowHead.height(1);
+         this.colScrollHead.width(1);
+         this.rowScrollHead.height(1);
          this.dataScrollArea.width(1);
          this.dataScrollArea.height(1);
          this.totalWidth=this.element.width();
          this.totalHeight=this.element.height();
-
-         console.log("totalWidth",this.totalWidth);
-         console.log("totalHeight",this.totalHeight);
          var o=this;
          setTimeout(function(){o._resizeOptimizerLevel2();},1);
       },
@@ -137,7 +154,7 @@
             col.e.appendTo(this.colHeadRow);
             console.log("addCol ",col.name);
             $('tbody tr', this.dataTable).each(function (i){
-               var div=$("<div>X</div>");
+               var div=$("<div>&nbsp;</div>");
                var td=$("<td></td>");
                if (col.width){
                   div.width(col.width);

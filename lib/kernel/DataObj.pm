@@ -208,9 +208,9 @@ sub StringToFilter
    my $inrawmode=0;
    my $closerawmode=0;
    my $lastrawmodefield;
-   msg(INFO,"StringToFilter words=%s\n",Dumper(\@words));
+   #msg(INFO,"StringToFilter words=%s\n",Dumper(\@words));
    for(my $c=0;$c<=$#words;$c++){
-      msg(INFO,"parse word '\%s'",$words[$c]);
+      #msg(INFO,"parse word '\%s' andopen=$andopen",$words[$c]);
       while ($words[$c]=~m/^([a-z,0-9]+)=\[/){
          if ($inrawmode){
             $self->LastMsg(ERROR,"structure error in []");
@@ -235,6 +235,14 @@ sub StringToFilter
          }
          $andopen++;
       }
+      while($words[$c]=~m/\)$/){
+         $words[$c]=~s/\)$//;
+         if ($andopen<1){
+            $self->LastMsg(ERROR,"structure error in ()");
+            return;
+         }
+         $andopen--;
+      }
       while ($words[$c]=~m/\]$/){
          $words[$c]=~s/\]$//;
          if (!$inrawmode){
@@ -243,13 +251,12 @@ sub StringToFilter
          }
          $closerawmode++;
       }
-      if ($words[$c]=~m/\)$/){
-         $words[$c]=~s/\)$//;
-         $andclose++;
-      }
       #msg(INFO,"parse inrawmode=$inrawmode closerawmode=$closerawmode");
       if (lc($words[$c]) eq "and"){
-         return if ($andopen!=1);
+         if ($andopen!=1){
+            $self->LastMsg(ERROR,"and only allowed in ()");
+            return;
+         }
       }
       elsif (lc($words[$c]) eq "or"){
          if ($andopen!=0){

@@ -53,7 +53,8 @@ sub getCalendarModes
    my $self=shift;
    my $s=$self->Self;
 
-   return($s.";room"=>'Raumbelegungsplan');
+   return($s.";room"=>'Raumbelegungsplan',
+          $s.";telko"=>"Telefonkonferenz");
 }
 
 sub LoadTimeplanRec

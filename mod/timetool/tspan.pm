@@ -235,5 +235,16 @@ sub getRecordImageUrl
    return("../../../public/timetool/load/time_entry.jpg?".$cgi->query_string());
 }
 
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my $grp=shift;
+   my %param=@_;
+   return(qw(header default moduledata misc source));
+}
+
+
+
+
 ##########################################################################
 1;

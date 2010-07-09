@@ -38,6 +38,10 @@ sub new
       new kernel::Field::Linenumber(name     =>'linenumber',
                                     label      =>'No.'),
 
+      new kernel::Field::Text(     name       =>'cn',
+                                   label      =>'CommonName',
+                                   dataobjattr=>'cn'),
+
       new kernel::Field::Id(       name       =>'id',
                                    label      =>'PersonalID',
                                    htmlwidth  =>'130',
@@ -128,6 +132,17 @@ sub new
                                    group      =>'id',
                                    label      =>'OrgeID',
                                    dataobjattr=>'collectiveDtagOrgeOZ'),
+
+#
+# dtaghrportaluniqueID
+# dtagDatenQuelle
+# dtagsaphirReferenzID
+# Department-Number
+# dtagResourtDescription
+# collectivedtagPillar
+# dtagSex
+#
+
 
    );
    $self->setDefaultView(qw(id uid surname givenname email));
