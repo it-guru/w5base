@@ -233,6 +233,8 @@ sub Sendmail
                $smstext=$plaintext;
             }
          }
+
+
          $mail.="\n--$bound";
          $mail.="\n";
          my $relbound="Rel.$bound";
@@ -423,6 +425,56 @@ sub Sendmail
             }
          }
          $mail.="--\n";
+         if (1){
+            $mail.="\n--$bound\n";
+            $mail.="Content-Type: text/calendar\n";
+            $mail.="\n";
+            $mail.="BEGIN:VCALENDAR\n";
+            $mail.="METHOD:PUBLISH\n";
+            $mail.="PRODID:http://$rec->{initialsite}\n";
+            $mail.="VERSION:2.0\n";
+
+            $mail.="BEGIN:VTIMEZONE\n";
+            $mail.="TZID:GMT\n";
+            $mail.="BEGIN:STANDARD\n";
+            $mail.="TZOFFSETTO:+0000\n";
+            $mail.="END:STANDARD\n";
+            $mail.="END:VTIMEZONE\n";
+
+            $mail.="BEGIN:VEVENT\n";
+            $mail.="SUMMARY:$rec->{name}\n";
+            # aus absender
+            $mail.="ORGANIZER;CN=Hartmut Vogler:MAILTO:Hartmut.Vogler\@t-systems.com\n";
+            # aus to
+            $mail.="ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=:MAILTO:vogler.hartmut\@googlemail.com\n";
+            # aus cc
+            $mail.="ATTENDEE;ROLE=OPT-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=:MAILTO:it\@guru.de\n";
+            $mail.="DTSTART;TZID=GMT:20110708T110000Z\n";  # aus meetingstart
+            $mail.="DTEND;TZID=GMT:20110708T113000Z\n";    # aus meetingend
+            my $uid;
+            if ($rec->{directlnkid} ne ""){
+               $uid=$rec->{directlnkid};
+               $uid.='@'.$rec->{directlnkmode}.'@'.$rec->{directlnktype};
+            }
+            else{
+               $uid=$rec->{id};
+            }
+            $mail.="UID:$uid\@$rec->{initialsite}\n";  
+            $mail.="CLASS:PUBLIC\n";
+            $mail.="DTSTAMP:20100701T102353Z\n";  # aus cdate
+            $mail.="STATUS:CONFIRMED\n";
+            $mail.="LOCATION:Im Netz\n";                  # aus meetinglocation
+
+            $mail.="BEGIN:VALARM\n";
+            $mail.="ACTION:DISPLAY\n";
+            $mail.="DESCRIPTION:REMINDER\n";
+            $mail.="TRIGGER;RELATED=START:-PT15M\n";
+            $mail.="END:VALARM\n";
+
+            $mail.="END:VEVENT\n";
+            $mail.="END:VCALENDAR\n";
+         }
+
          $mail.="\n--$bound--\n";
          {
             my $wfa=getModuleObject($self->Config,"base::wfattach");
