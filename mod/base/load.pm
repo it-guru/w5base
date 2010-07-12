@@ -62,6 +62,30 @@ sub Run
                                             static=>$static});
       print $self->HtmlBottom(body=>1,form=>1);
    }
+   elsif ($func=~m/^scriptpool\//){
+      my ($script)=$func=~m/^scriptpool\/(.*)$/;
+      my $instdir=$self->Config->Param("INSTDIR");
+      $script=~s/[^a-z,0-9]//g;
+      if ( -f "$instdir/static/scriptpool/$script"){
+         print $self->HttpHeader("text/plain",filename=>$script);
+         if (open(F,"<$instdir/static/scriptpool/$script")){
+            my $prot=lc($ENV{SERVER_PROTOCOL});
+            $prot=~s/\/.*$//;
+            my $cfg=$self->Config->getCurrentConfigName();
+            while(my $l=<F>){
+               $l=~s/%%%HOST%%%/$ENV{SERVER_NAME}/g;
+               $l=~s/%%%PROT%%%/$prot/g;
+               $l=~s/%%%CONFIG%%%/$cfg/g;
+               print $l;
+            }
+            close(F);
+         }
+      }
+      else{
+         printf("Status: 404 Not Found\n");
+         printf("Content-Type: text/plain\n\n");
+      }
+   }
    else{
       if (my ($ext)=$func=~m/\.([a-z]{2,3})$/){
          my $virtualfile=$self->getSkinFile($self->Module."/virtual/".$func);
