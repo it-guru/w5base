@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 #
 #  revision = '$Rev:$'
-#  date     = '$Date:$'
+#  date     = '$Date$'
 
 TARGETPROT="$Prot:$"
 TARGETHOST="$Host:$"
