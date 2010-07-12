@@ -1,0 +1,314 @@
+#!/usr/bin/env sh
+#
+#  revision = '$Rev:$'
+#  date     = '$Date:$'
+
+TARGETPROT="$Prot:$"
+TARGETHOST="$Host:$"
+TARGETPATH="/$Config:$/public/base/filesig/store"
+
+GROUP="w5usrmgr"
+
+
+
+if [ -r "/etc/cfmaccmgr.conf" ]; then
+   . /etc/cfmaccmgr.conf
+fi
+if [ -r "$HOME/.cfmaccmgr" ]; then
+   . $HOME/.cfmaccmgr
+fi
+PATH="/usr/bin:/usr/sbin:/bin:/usr/sbin:%PATH%"
+
+#
+# Parameters: [-d] [-g group] [-f] FILTER
+#
+
+########################################################################
+#
+# tmp file location
+#
+if [ "$TEMP" = "" ]; then
+   TEMP="/tmp"
+fi
+
+INOPT=0;
+while [ $INOPT != 1 ];  do
+   case "$1" in 
+      "-d" ) 
+         if [ "$DEBUG" = "" ]; then
+            DEBUG="1"
+         fi
+         shift
+      ;;
+
+      "-g" ) 
+         shift
+         GROUP=$1
+         shift
+      ;;
+
+      "-b" ) 
+         shift
+         BATCHMODE="1"
+         shift
+      ;;
+
+      "-f" )
+         if [ "$FORCE" = "" ]; then
+            FORCE="1"
+         fi 
+         shift
+      ;;
+
+      *) 
+         INOPT=1
+      ;;
+   esac
+done
+
+LABEL="$1"
+if [ "$LABEL" = "" ]; then
+   echo "ERROR: check call syntax - no parameters specified"
+   exit 1
+fi
+shift
+
+if [ "$1" = "" ]; then
+   QUERY="$LABEL"
+else
+   QUERY="$1"
+fi
+
+
+
+#
+# local username for transfer source
+#
+if [ "$USER" = "" ]; then
+   USER="localuser"
+fi
+
+# 
+# local hostname for transfer source
+#
+if [ "$HOSTNAME" = "" ]; then
+   HOSTNAME="`uname -n`"
+fi
+HOSTNAME=`echo $HOSTNAME | tr '[A-Z]' '[a-z]'`
+
+#
+# filenames for public and privat key
+#
+if [ "$COLLECTKEYFILE" = "" ]; then
+   COLLECTKEYFILE="$HOME/.cfmaccmgr-$USER-$HOSTNAME.key"
+fi
+if [ "$COLLECTPUBFILE" = "" ]; then
+   COLLECTPUBFILE="$HOME/.cfmaccmgr-$USER-$HOSTNAME.pem"
+fi
+if [ "$RANDFILE" = "" ]; then
+   RANDFILE="$TEMP/.rnd-$USER-$HOSTNAME"
+   touch $RANDFILE
+   export RANDFILE
+fi
+
+#
+# commands
+#
+if [ "$OPENSSL" = "" ]; then
+   OPENSSL="openssl"
+fi
+if [ "$NETCAT" = "" ]; then
+   NETCAT="netcat"
+fi
+if [ "$STAT" = "" ]; then
+   STAT="stat"
+fi
+
+
+########################################################################
+#
+# check if local keys are exists
+#
+if [ ! -f "$COLLECTKEYFILE" ]; then
+   OPENSSLCONF="$TEMP/.openssl.conf.$$"
+   echo "#opensslconf by cfmaccmgr : `date`"> $OPENSSLCONF
+   echo "[ req ]"                                               >> $OPENSSLCONF
+   echo "default_bits=1024"                                     >> $OPENSSLCONF
+   echo "default_md=md5"                                        >> $OPENSSLCONF
+   echo "string_mask=nombstr"                                   >> $OPENSSLCONF
+   echo "distinguished_name=req_distinguished_name"             >> $OPENSSLCONF
+   echo ""                                                      >> $OPENSSLCONF
+   echo "[ req_distinguished_name ]"                            >> $OPENSSLCONF
+   echo "0.organizationName = Organization Name (company)"      >> $OPENSSLCONF
+   echo "emailAddress=$USER@$HOSTNAME"                          >> $OPENSSLCONF
+   echo "localityName = Locality Name (city, district)"         >> $OPENSSLCONF
+   echo "countryName = Country Name (2 letter code)"            >> $OPENSSLCONF
+   echo "commonName = Common Name (hostname, IP, or your name)" >> $OPENSSLCONF
+   echo "countryName_default = DE"                              >> $OPENSSLCONF
+   echo "0.organizationName_default = DTAG"                     >> $OPENSSLCONF
+   echo "commonName_default =$USER@$HOSTNAME"                   >> $OPENSSLCONF
+   echo ""                                                      >> $OPENSSLCONF
+   echo "[ v3_ca ]"                                             >> $OPENSSLCONF
+   echo "basicConstraints = CA:TRUE"                            >> $OPENSSLCONF
+   echo "subjectKeyIdentifier = hash"                           >> $OPENSSLCONF
+   echo "authorityKeyIdentifier = keyid:always,issuer:always"   >> $OPENSSLCONF
+   if $OPENSSL req -x509 \
+               -config $OPENSSLCONF \
+               -nodes \
+               -days 365 \
+               -newkey rsa:1024 \
+               -batch \
+               -keyout $COLLECTKEYFILE -out $COLLECTPUBFILE ; then
+      echo "Key generated sucessfully"
+   else
+      echo "ERROR: unable to create privat key" >&2
+      exit 255
+   fi
+
+   #rm -f $OPENSSLCONF >/dev/null 2>&1
+
+fi
+
+if [ "$DEBUG" = "1" ]; then
+   echo "LABEL        =$LABEL"
+fi
+
+
+#######################################################################
+# TRANSPORT over netcat
+#######################################################################
+umask 077
+BUFFER="$TEMP/cfmaccmgr.$$"
+( 
+echo "CFMACCMGR1.0@@@itil::system@@@$HOSTNAME@@@CFMACCMGR"
+echo "$QUERY"
+) | openssl enc -base64 | $OPENSSL smime -sign \
+    -signer $COLLECTPUBFILE -inkey $COLLECTKEYFILE \
+    -subject "(itil::system) $USER@$HOSTNAME:CFMACCMGR"> $BUFFER
+LENGTH=`stat -c %s $BUFFER`
+
+
+if [ "$TARGETPROT" = "http" ]; then
+   TRANSFERCMD="netcat -w 5 $TARGETHOST 80"
+fi
+if [ "$TARGETPROT" = "https" ]; then
+   if [ "$DEBUG" = "1" ]; then
+      TRANSFERCMD="openssl s_client -prexit -quiet -connect $TARGETHOST:443"
+   else
+      TRANSFERCMD="openssl s_client -prexit \
+                   -quiet -connect $TARGETHOST:443 2>&1"
+   fi
+fi
+if [ "$TRANSFERCMD" != "" ]; then
+   D=`(
+   echo "PUT $TARGETPROT://$TARGETHOST$TARGETPATH HTTP/1.0"
+   echo "Content-type: text/plain"
+   echo "Content-length: $LENGTH"
+   echo ""
+   cat $BUFFER
+   ) | eval $TRANSFERCMD `
+
+
+   echo "$D" |awk '
+   BEGIN{
+     FS=":";
+     out=0;
+     indata=0;
+   }
+   {
+      if (!indata){
+         if (match($0,/^[  \r\n]*$/)!=0){
+            indata=1;
+         }
+      }
+      else{
+         if ($1=="RESPONSE"){
+            out=1;
+            if ($2!="OK"){
+               printf("%s ",$0) > "/dev/stderr";
+            }
+         }
+         else{
+            print $0;
+         }
+      }
+   }
+   END{
+      if (!out){
+         print("ERROR: unexpected protocol structure problem - contact admin!");
+      }
+   }
+   ' |sort| ( cat /dev/null > $BUFFER ; while read a; do
+      IFS=":"
+      set -- $a
+      if [ "$1" = "ACC" -a "$2" != "" ]; then
+         USER=$2
+         if [ "$DEBUG" = "1" ]; then
+            echo "check account '$USER'" >&2
+         fi
+         echo "$2" >> $BUFFER
+         if [ -n $user ] && ! id $2 >/dev/null 2>&1 ; then
+            if [ "$FORCE" ]; then
+               if ! egrep "^$GROUP:" /etc/group >/dev/null 2>&1; then
+                  groupadd $GROUP
+               fi
+               printf "Try to add user account $2 ..."
+               if useradd -g $GROUP -m "$2"; then
+                  echo "OK" 
+               else
+                  echo ""
+                  echo "useradd $USER failed" 
+               fi
+            else
+               echo "W5Base requested add of $2 user account." 
+            fi
+         fi
+         USERHOME=`eval echo ~$USER`
+         if [ -d $USERHOME ]; then
+            if [ ! -d $USERHOME/.ssh ]; then
+               mkdir $USERHOME/.ssh
+               chown $USER $USERHOME/.ssh
+               chmod 700 $USERHOME/.ssh
+            fi
+            if [ -d $USERHOME/.ssh ]; then
+               echo "$6" > $USERHOME/.ssh/authorized_keys2
+               chown $USER  $USERHOME/.ssh/authorized_keys2
+               chmod 600 $USERHOME/.ssh/authorized_keys2
+            fi
+         else
+            echo "homedir of $USER can not be found"
+         fi
+      fi
+   done )
+
+   if [ ! -s $BUFFER ]; then
+      echo "WARNING: no accounts in query!" >&2
+   else
+      GROUPID=`cat /etc/group | egrep '^w5base' | cut -f 3 -d:`
+      if [ -n "$GROUPID" ]; then
+         for USER in `cat /etc/passwd | cut -f1 -d:`; do
+            if [ "`id -gn $USER`" = "$GROUP" ]; then
+               if ! egrep -q "^$USER$" $BUFFER; then
+                  if [ "$FORCE" ]; then
+                     printf  "Try to remove account $USER ..." 
+                     if userdel -f -r $USER ; then
+                        echo "OK" 
+                     else
+                        echo ""
+                        echo "userdel $USER failed" 
+                     fi
+                  else
+                     echo "W5Base requested to remove account $USER !"
+                  fi
+               fi
+            fi
+         done
+      fi
+   fi
+
+   
+fi
+rm $BUFFER
+
+
+
