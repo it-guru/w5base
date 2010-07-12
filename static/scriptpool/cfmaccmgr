@@ -311,11 +311,12 @@ if [ "$QUERY" != "CLEAR" ]; then
                   chmod 700 $USERHOME/.ssh
                fi
                if [ -d $USERHOME/.ssh ]; then
-                  if [ ! -f $USERHOME/.ssh/authorized_keys2 -a \
-                       "$6" != "" ]; then
-                     echo "$6" > $USERHOME/.ssh/authorized_keys2
-                     chown $USER  $USERHOME/.ssh/authorized_keys2
-                     chmod 600 $USERHOME/.ssh/authorized_keys2
+                  if [ ! -f $USERHOME/.ssh/authorized_keys2 ]; then
+                     if [ "$6" != "" ]; then
+                        echo "$6" > $USERHOME/.ssh/authorized_keys2
+                        chown $USER  $USERHOME/.ssh/authorized_keys2
+                        chmod 600 $USERHOME/.ssh/authorized_keys2
+                     fi
                   else
                      if [ -f $USERHOME/.ssh/authorized_keys2 ]; then
                         echo "$6" > $USERHOME/.ssh/authorized_keys2.req
@@ -327,7 +328,7 @@ if [ "$QUERY" != "CLEAR" ]; then
                            if [ "$KEYAUTOCHANGE" = "1" ]; then
                               mv $USERHOME/.ssh/authorized_keys2.req \
                                  $USERHOME/.ssh/authorized_keys2 && \
-                              echo "SSH2 Key for user $USER has been changes." >&2
+                              echo "SSH2 Key for user $USER has been changed." >&2
                            else
                               echo "SSH2 key for user $USER change requested." >&2
                               echo "use -k switch, to allow automatic key changes." >&2
