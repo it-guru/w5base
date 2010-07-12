@@ -69,8 +69,8 @@ sub Run
       if ( -f "$instdir/static/scriptpool/$script"){
          print $self->HttpHeader("text/plain",filename=>$script);
          if (open(F,"<$instdir/static/scriptpool/$script")){
-            my $prot=lc($ENV{SERVER_PROTOCOL});
-            $prot=~s/\/.*$//;
+            my $prot=lc($ENV{SCRIPT_URI});
+            $prot=~s/:.*$//;
             my $cfg=$self->Config->getCurrentConfigName();
             while(my $l=<F>){
                $l=~s/%%%HOST%%%/$ENV{SERVER_NAME}/g;
