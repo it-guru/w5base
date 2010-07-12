@@ -54,7 +54,20 @@ while [ $INOPT != 1 ];  do
          shift
       ;;
 
+      "-k" ) 
+         shift
+         KEYAUTOCHANGE="1"
+      ;;
+
+      "-v" ) 
+         shift
+         VERBOSE="1"
+      ;;
+
       "-f" )
+         if [ "$FORCE" = "1" ]; then
+            FORCE="2"
+         fi
          if [ "$FORCE" = "" ]; then
             FORCE="1"
          fi 
@@ -87,6 +100,9 @@ fi
 #
 if [ "$USER" = "" ]; then
    USER="`id -un`"
+fi
+if [ "$HOME" = "" ]; then
+   HOME=`eval echo ~$USER`
 fi
 
 # 
@@ -192,137 +208,202 @@ fi
 #######################################################################
 # TRANSPORT over netcat
 #######################################################################
-umask 077
 BUFFER="$TEMP/cfmaccmgr.$$"
-( 
-echo "CFMACCMGR1.0@@@itil::system@@@$HOSTNAME@@@CFMACCMGR"
-echo "$QUERY"
-) | openssl enc -base64 | $OPENSSL smime -sign \
-    -signer $COLLECTPUBFILE -inkey $COLLECTKEYFILE \
-    -subject "(itil::system) $USER@$HOSTNAME:CFMACCMGR"> $BUFFER
-LENGTH=`stat -c %s $BUFFER`
+touch $BUFFER
+if [ "$QUERY" != "CLEAR" ]; then
+   umask 077
+   ( 
+   echo "CFMACCMGR1.0@@@itil::system@@@$HOSTNAME@@@CFMACCMGR"
+   echo "$QUERY"
+   ) | openssl enc -base64 | $OPENSSL smime -sign \
+       -signer $COLLECTPUBFILE -inkey $COLLECTKEYFILE \
+       -subject "(itil::system) $USER@$HOSTNAME:CFMACCMGR"> $BUFFER
+   LENGTH=`stat -c %s $BUFFER`
 
 
-if [ "$TARGETPROT" = "http" ]; then
-   TRANSFERCMD="netcat -w 5 $TARGETHOST 80"
-fi
-if [ "$TARGETPROT" = "https" ]; then
-   if [ "$DEBUG" = "1" ]; then
-      TRANSFERCMD="openssl s_client -prexit -quiet -connect $TARGETHOST:443"
-   else
-      TRANSFERCMD="openssl s_client -prexit \
-                   -quiet -connect $TARGETHOST:443 2>&1"
+   if [ "$TARGETPROT" = "http" ]; then
+      TRANSFERCMD="netcat -w 5 $TARGETHOST 80"
    fi
-fi
-if [ "$TRANSFERCMD" != "" ]; then
-   D=`(
-   echo "PUT $TARGETPROT://$TARGETHOST$TARGETPATH HTTP/1.0"
-   echo "Content-type: text/plain"
-   echo "Content-length: $LENGTH"
-   echo ""
-   cat $BUFFER
-   ) | eval $TRANSFERCMD `
+   if [ "$TARGETPROT" = "https" ]; then
+      if [ "$DEBUG" = "1" ]; then
+         TRANSFERCMD="openssl s_client -prexit -quiet -connect $TARGETHOST:443"
+      else
+         TRANSFERCMD="openssl s_client -prexit \
+                      -quiet -connect $TARGETHOST:443 2>&1"
+      fi
+   fi
+   if [ "$TRANSFERCMD" != "" ]; then
+      D=`(
+      echo "PUT $TARGETPROT://$TARGETHOST$TARGETPATH HTTP/1.0"
+      echo "Content-type: text/plain"
+      echo "Content-length: $LENGTH"
+      echo ""
+      cat $BUFFER
+      ) | eval $TRANSFERCMD `
 
 
-   echo "$D" |awk '
-   BEGIN{
-     FS=":";
-     out=0;
-     indata=0;
-   }
-   {
-      if (!indata){
-         if (match($0,/^[  \r\n]*$/)!=0){
-            indata=1;
-         }
+      echo "$D" |awk '
+      BEGIN{
+        FS=":";
+        out=0;
+        indata=0;
       }
-      else{
-         if ($1=="RESPONSE"){
-            out=1;
-            if ($2!="OK"){
-               printf("%s ",$0) > "/dev/stderr";
+      {
+         if (!indata){
+            if (match($0,/^[  \r\n]*$/)!=0){
+               indata=1;
             }
          }
          else{
-            print $0;
+            if ($1=="RESPONSE"){
+               out=1;
+               if ($2!="OK"){
+                  printf("%s ",$0) > "/dev/stderr";
+               }
+            }
+            else{
+               print $0;
+            }
          }
       }
-   }
-   END{
-      if (!out){
-         print("ERROR: unexpected protocol structure problem - contact admin!");
+      END{
+         if (!out){
+            print("ERROR: unexpected protocol structure problem - contact admin!");
+         }
       }
-   }
-   ' |sort| ( cat /dev/null > $BUFFER ; while read a; do
-      IFS=":"
-      set -- $a
-      if [ "$1" = "ACC" -a "$2" != "" ]; then
-         USER=$2
-         if [ "$DEBUG" = "1" ]; then
-            echo "check account '$USER'" >&2
-         fi
-         echo "$2" >> $BUFFER
-         if [ -n $user ] && ! id $2 >/dev/null 2>&1 ; then
-            if [ "$FORCE" ]; then
-               if ! egrep "^$GROUP:" /etc/group >/dev/null 2>&1; then
-                  groupadd $GROUP
-               fi
-               printf "Try to add user account $2 ..."
-               if useradd -g $GROUP -m "$2"; then
-                  echo "OK" 
-               else
-                  echo ""
-                  echo "useradd $USER failed" 
-               fi
-            else
-               echo "W5Base requested add of $2 user account." 
+      ' |sort| ( cat /dev/null > $BUFFER ; while read a; do
+         IFS=":"
+         set -- $a
+         if [ "$1" = "ACC" -a "$2" != "" ]; then
+            USER=$2
+            SSH2KEYOK="not stored"
+            if [ "$6" != "" ]; then
+               SSH2KEYOK="OK"
             fi
-         fi
-         USERHOME=`eval echo ~$USER`
-         if [ -d $USERHOME ]; then
-            if [ ! -d $USERHOME/.ssh ]; then
-               mkdir $USERHOME/.ssh
-               chown $USER $USERHOME/.ssh
-               chmod 700 $USERHOME/.ssh
+            if [ "$VERBOSE" = "1" ]; then
+               printf "process account %-10s - SSH2 Key $SSH2KEYOK\n" "'$USER'"
             fi
-            if [ -d $USERHOME/.ssh ]; then
-               echo "$6" > $USERHOME/.ssh/authorized_keys2
-               chown $USER  $USERHOME/.ssh/authorized_keys2
-               chmod 600 $USERHOME/.ssh/authorized_keys2
+            if [ "$DEBUG" = "1" ]; then
+               echo "check account '$USER'" >&2
             fi
-         else
-            echo "homedir of $USER can not be found"
-         fi
-      fi
-   done )
-
-   if [ ! -s $BUFFER ]; then
-      echo "WARNING: no accounts in query!" >&2
-   else
-      GROUPID=`cat /etc/group | egrep '^w5base' | cut -f 3 -d:`
-      if [ -n "$GROUPID" ]; then
-         for USER in `cat /etc/passwd | cut -f1 -d:`; do
-            if [ "`id -gn $USER`" = "$GROUP" ]; then
-               if ! egrep -q "^$USER$" $BUFFER; then
-                  if [ "$FORCE" ]; then
-                     printf  "Try to remove account $USER ..." 
-                     if userdel -f -r $USER ; then
-                        echo "OK" 
-                     else
-                        echo ""
-                        echo "userdel $USER failed" 
-                     fi
+            echo "$2" >> $BUFFER
+            if [ -n $user ] && ! id $2 >/dev/null 2>&1 ; then
+               if [ "$FORCE" ]; then
+                  if ! egrep "^$GROUP:" /etc/group >/dev/null 2>&1; then
+                     groupadd $GROUP
+                  fi
+                  printf "Try to add user account $2 ..."
+                  if useradd -g $GROUP -m "$2"; then
+                     echo "OK" 
                   else
-                     echo "W5Base requested to remove account $USER !"
+                     echo ""
+                     echo "useradd $USER failed" 
+                  fi
+               else
+                  echo "W5Base requested add of $2 user account." 
+               fi
+            fi
+            USERHOME=`eval echo ~$USER`
+            if [ -d $USERHOME ]; then
+               if [ ! -d $USERHOME/.ssh ]; then
+                  mkdir $USERHOME/.ssh
+                  chown $USER $USERHOME/.ssh
+                  chmod 700 $USERHOME/.ssh
+               fi
+               if [ -d $USERHOME/.ssh ]; then
+                  if [ ! -f $USERHOME/.ssh/authorized_keys2 -a \
+                       "$6" != "" ]; then
+                     echo "$6" > $USERHOME/.ssh/authorized_keys2
+                     chown $USER  $USERHOME/.ssh/authorized_keys2
+                     chmod 600 $USERHOME/.ssh/authorized_keys2
+                  else
+                     if [ -f $USERHOME/.ssh/authorized_keys2 ]; then
+                        echo "$6" > $USERHOME/.ssh/authorized_keys2.req
+                        chown $USER  $USERHOME/.ssh/authorized_keys2.req
+                        chmod 600 $USERHOME/.ssh/authorized_keys2.req
+                        if ! diff $USERHOME/.ssh/authorized_keys2.req \
+                                  $USERHOME/.ssh/authorized_keys2 > /dev/null; then
+                           FOUNDKEYDIFF=1
+                           if [ "$KEYAUTOCHANGE" = "1" ]; then
+                              mv $USERHOME/.ssh/authorized_keys2.req \
+                                 $USERHOME/.ssh/authorized_keys2 && \
+                              echo "SSH2 Key for user $USER has been changes." >&2
+                           else
+                              echo "SSH2 key for user $USER change requested." >&2
+                              echo "use -k switch, to allow automatic key changes." >&2
+                           fi
+                        fi
+                        rm $USERHOME/.ssh/authorized_keys2.req 2>/dev/null
+                     fi
                   fi
                fi
+            else
+               echo "homedir of $USER can not be found"
             fi
-         done
-      fi
+         fi
+      done )
+
    fi
+   if [ ! -s $BUFFER ]; then
+      echo "" >&2
+      echo "WARNING: there is maybee a query problem!" >&2
+   fi
+fi
+
+
+GROUPID=`cat /etc/group | egrep "^$GROUP" | cut -f 3 -d:`
+CLEANUPFILE=$HOME/.cfmaccmgr.cleanupstate.$GROUP
+touch $CLEANUPFILE
+if [ -n "$GROUPID" ]; then
+   for USER in `cat /etc/passwd | cut -f1 -d:`; do
+      if [ "`id -gn $USER`" = "$GROUP" ]; then
+         if ! egrep -q "^$USER$" $BUFFER; then
+            if ! egrep -q "^$USER:" $CLEANUPFILE; then
+               echo "$USER:1" >> $CLEANUPFILE
+            else
+               OLD=`cat $CLEANUPFILE | egrep "^$USER:" | \
+                    cut -f 2 -d:` 
+               NEW=`expr $OLD + 1`
+               mv $CLEANUPFILE $CLEANUPFILE.bak
+               cat $CLEANUPFILE.bak | \
+                   egrep -v "^$USER:" > $CLEANUPFILE
+               echo "$USER:$NEW" >> $CLEANUPFILE
+               rm $CLEANUPFILE.bak
+            fi
+            CLEANUPCOUNT=`cat $CLEANUPFILE | egrep "^$USER:" | \
+                          cut -f 2 -d:`
+
+            if [ \( "$FORCE" = "1" -a "$CLEANUPCOUNT" -gt 6 \) -o \
+                   "$FORCE" = "2" ]; then
+               printf  "Try to remove account $USER ..." 
+               if userdel -f -r $USER ; then
+                  echo "OK" 
+                  CLEANUPCOUNT=0
+               else
+                  echo ""
+                  echo "userdel $USER failed" 
+               fi
+            fi
+            if [  "$CLEANUPCOUNT" -gt 2 ]; then
+               printf "W5Base requested %d times to remove account $USER!" \
+                      $CLEANUPCOUNT
+               if [ "$FORCE" = "1" ]; then
+                  printf " Remove will be done at 7st!"
+               fi
+               printf "\n"
+            fi
+         else
+            mv $CLEANUPFILE $CLEANUPFILE.bak
+            cat $CLEANUPFILE.bak | \
+                egrep -v "^$USER:" > $CLEANUPFILE
+            rm $CLEANUPFILE.bak
+         fi
+      fi
+   done
+fi
+
 
    
-fi
 rm $BUFFER
 
 
