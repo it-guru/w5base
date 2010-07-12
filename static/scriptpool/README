@@ -1,0 +1,7 @@
+In this directory, preconfigiured scripts will be placed. Scripts can
+be downloaded via http://HOST/CONFIG/public/base/load/scriptpool/SCRIPTNAME
+
+All Scripts are tagt with:
+svn propset svn:keywords "Rev" SCRIPTNAME 
+svn propset svn:keywords "Date" SCRIPTNAME 
+

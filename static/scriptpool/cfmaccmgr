@@ -1,11 +1,12 @@
 #!/usr/bin/env sh
 #
-#  revision = '$Rev$'
-#  date     = '$Date: 2010-07-12 11:05:13 +0200 (Mon, 12 Jul 2010) $'
+#  '$Rev$'
+#  '$Date: 2010-07-12 11:05:13 +0200 (Mon, 12 Jul 2010) $'
+#
 
-TARGETPROT="$Prot:$"
-TARGETHOST="$Host:$"
-TARGETPATH="/$Config:$/public/base/filesig/store"
+TARGETPROT="%%%PROT%%%"
+TARGETHOST="%%%HOST%%%"
+TARGETPATH="/%%%CONFIG%%%/public/base/filesig/store"
 
 GROUP="w5usrmgr"
 
