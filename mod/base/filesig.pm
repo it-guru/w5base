@@ -370,7 +370,29 @@ sub store
                      #
                      my $u=getModuleObject($self->Config,"base::user");
                      printf STDERR ("CFMACCMGR request=%s\n",$nativfile);
-                     my @flt=$u->StringToFilter($nativfile);
+                     my @flt=$u->StringToFilter($nativfile,nofieldcheck=>1);
+                     if ($#flt==0 && exists($flt[0]->{appl})){
+                        my $appl=getModuleObject($self->Config,"itil::appl");
+                        if (defined($appl)){
+                           $appl->SetFilter({cistatusid=>'<=5',
+                                             name=>$flt[0]->{appl}});
+                           foreach my $ar ($appl->getHashList("businessteam")){
+                              if (!exists($flt[0]->{groups})){
+                                 $flt[0]->{groups}="";
+                              }
+                              if ($ar->{businessteam} ne ""){
+                                 if ($flt[0]->{groups} ne ""){
+                                    $flt[0]->{groups}.=" ";
+                                 }
+                                 $flt[0]->{groups}.=$ar->{businessteam};
+                              }
+                           }
+                        }
+                        else{
+                           $flt[0]->{userid}=\'-1';
+                        }
+                        delete($flt[0]->{appl});
+                     }
                      printf STDERR ("CFMACCMGR filter=%s\n",Dumper(\@flt));
                      foreach my $f (@flt){
                         $f->{cistatusid}="4";
@@ -380,18 +402,24 @@ sub store
                      }
                      if ($u->LastMsg()==0){
                         $u->SetFilter(\@flt);
-                        foreach my $urec ($u->getHashList(qw(userid posix 
-                                          email ssh1publickey ssh2publickey))){
-                           my $ssh1publickey=$urec->{ssh1publickey};
-                           my $ssh2publickey=$urec->{ssh2publickey};
-                           $ssh1publickey=~s/[\n:]//g;
-                           $ssh2publickey=~s/[\n:]//g;
-                           if ($urec->{posix} ne ""){ 
-                              printf("ACC:%s:%s:%s:%s:%s\n",
-                                     $urec->{posix},$urec->{userid},
-                                     $urec->{email},
-                                     $urec->{ssh1publickey},
-                                     $urec->{ssh2publickey});
+                        my @l=$u->getHashList(qw(userid posix 
+                                          email ssh1publickey ssh2publickey));
+                        if ($#l>100){
+                           $errormsg="to many accounts selected";
+                        }
+                        else{
+                           foreach my $urec (@l){
+                              my $ssh1publickey=$urec->{ssh1publickey};
+                              my $ssh2publickey=$urec->{ssh2publickey};
+                              $ssh1publickey=~s/[\n:]//g;
+                              $ssh2publickey=~s/[\n:]//g;
+                              if ($urec->{posix} ne ""){ 
+                                 printf("ACC:%s:%s:%s:%s:%s\n",
+                                        $urec->{posix},$urec->{userid},
+                                        $urec->{email},
+                                        $urec->{ssh1publickey},
+                                        $urec->{ssh2publickey});
+                              }
                            }
                         }
                      }
