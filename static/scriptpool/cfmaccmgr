@@ -125,6 +125,20 @@ if [ "$STAT" = "" ]; then
    STAT="stat"
 fi
 
+OPENSSLOK=0
+if $OPENSSL version 2>&1| egrep -q '0\.9\.7' ; then
+   OPENSSLOK=1
+fi
+if $OPENSSL version 2>&1 | egrep -q '0\.9\.8' ; then
+   OPENSSLOK=1
+fi
+
+if [ $OPENSSLOK = 0 ]; then
+   echo "openssl not found in required version (min. 0.9.7)" >&2
+   exit 1
+fi
+
+
 
 ########################################################################
 #
