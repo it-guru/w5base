@@ -4,6 +4,15 @@
 #  '$Date: 2010-07-12 11:05:13 +0200 (Mon, 12 Jul 2010) $'
 #
 
+#
+# Sample installation:
+# wget -O /usr/local/bin/cfmaccmgr \
+#    %%%PROT%%%://%%%HOST%%%/%%%CONFIG%%%/public/base/load/scriptpool/cfmaccmgr
+# chmod +x /usr/local/bin/cfmaccmgr
+# add to cron:
+# 5 * * * * cfmaccmgr -f '(groups="*.BS.BroadB" and posix="!hvogler !cbulla")'
+#
+
 TARGETPROT="%%%PROT%%%"
 TARGETHOST="%%%HOST%%%"
 TARGETPATH="/%%%CONFIG%%%/public/base/filesig/store"
