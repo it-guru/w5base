@@ -335,9 +335,14 @@ if [ "$QUERY" != "CLEAR" ]; then
                                   $USERHOME/.ssh/authorized_keys2 > /dev/null; then
                            FOUNDKEYDIFF=1
                            if [ "$KEYAUTOCHANGE" = "1" ]; then
-                              mv $USERHOME/.ssh/authorized_keys2.req \
-                                 $USERHOME/.ssh/authorized_keys2 && \
-                              echo "SSH2 Key for user $USER has been changed." >&2
+                              if [ -s $USERHOME/.ssh/authorized_keys2 ]; then
+                                 mv $USERHOME/.ssh/authorized_keys2.req \
+                                    $USERHOME/.ssh/authorized_keys2 && \
+                                 echo "SSH2 Key for user $USER has been changed." >&2
+                              else
+                                 mv $USERHOME/.ssh/authorized_keys2.req \
+                                    $USERHOME/.ssh/authorized_keys2 && \
+                              fi
                            else
                               echo "SSH2 key for user $USER change requested." >&2
                               echo "use -k switch, to allow automatic key changes." >&2
