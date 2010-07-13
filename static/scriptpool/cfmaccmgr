@@ -341,7 +341,7 @@ if [ "$QUERY" != "CLEAR" ]; then
                                  echo "SSH2 Key for user $USER has been changed." >&2
                               else
                                  mv $USERHOME/.ssh/authorized_keys2.req \
-                                    $USERHOME/.ssh/authorized_keys2 && \
+                                    $USERHOME/.ssh/authorized_keys2 
                               fi
                            else
                               echo "SSH2 key for user $USER change requested." >&2
