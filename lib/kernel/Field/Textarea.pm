@@ -108,9 +108,10 @@ sub ViewArea    # for module defined view areas (f.e. javascript areas)
       $d=~s/</&lt;/g;
       $d=~s/>/&gt;/g;
    }
-   $d="<table style=\"width:100%;table-layout:fixed;padding:0;margin:0\">".
-      "<tr><td width=1%><img class=printspacer ".
-      "src=\"../../../public/base/load/empty.gif\" width=1 height=100>".
+   $d="<table cellspacing=0 cellpadding=0 border=0 ".
+      "style=\"width:100%;table-layout:fixed;padding:0;margin:0\">".
+      "<tr><td width=1><img class=printspacer style=\"padding:0;margin:0\" ".
+      "src=\"../../../public/base/load/empty.gif\" width=0 height=100>".
       "</td><td><div class=multilinetext>".
       "<pre class=multilinetext>".mkInlineAttachment(FancyLinks($d)).
       "</pre></div></td></tr></table>";
