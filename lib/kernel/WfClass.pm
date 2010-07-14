@@ -514,6 +514,7 @@ EOF
       }
       my $imgurl=$self->getRecordImageUrl();
       my $subtip=$StepObj->CreateSubTip();
+      $subtip="&nbsp;" if ($subtip eq "");
       $template.=<<EOF;
 <div align=left class=newworkflowtip id=tip>
 <div><div style="height:100px;margin:5px;margin-top:10px">
@@ -563,7 +564,7 @@ function ProcessResize()
       var h1=ModeSelect.offsetHeight;
       var h2=ProcessHandler.offsetHeight;
       var h3=SubTip.offsetHeight;
-      Tip.style.height=h-(h1+h2+h3)-1+"px";
+      Tip.style.height=(h-(h1+h2+h3))+"px";
    }
    ProcessHandler.style.visibility="visible";
    ProcessWindow.style.visibility="visible";
