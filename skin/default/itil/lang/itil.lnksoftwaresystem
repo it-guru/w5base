@@ -1,7 +1,7 @@
 'itil::lnksoftwaresystem'=>{de=>'Softwareinstallation',
                             en=>'Softwareinstallation'},
 'fieldgroup.default'=>{de=>'Softwareinstallation',en=>'Softwareinstallation'},
-'fieldgroup.link'=>{de=>'CI-Status',en=>'CI-Status'},
+'fieldgroup.link'=>{de=>'CI-Relationen',en=>'CI-Relations'},
 'fieldgroup.useableby'=>{de=>'nutzbar durch',en=>'usable by'},
 'Quantity'=>{de=>'Einheiten'},
 'License contract'=>{de=>'Lizenzvertrag'},
