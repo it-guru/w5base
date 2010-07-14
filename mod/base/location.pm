@@ -173,6 +173,7 @@ sub new
 
       new kernel::Field::GoogleMap(
                 name          =>'googlemap',
+                uploadable    =>0,
                 group         =>'map',
                 htmlwidth     =>'500px',
                 label         =>'GoogleMap',
@@ -210,6 +211,7 @@ sub new
       new kernel::Field::GoogleAddrChk(
                 name          =>'googlechk',
                 group         =>'map',
+                uploadable    =>0,
                 htmldetail    =>0,
                 htmlwidth     =>'200px',
                 label         =>'Google Address Check',
