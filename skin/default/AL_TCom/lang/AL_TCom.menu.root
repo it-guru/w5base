@@ -25,7 +25,7 @@
 'AL_TCom.system.systemnfsnas.clients'=>{de=>'System-Clients',en=>'System-Clients'},
 'AL_TCom.system.systemnfsnas.ipclients'=>{de=>'IP-Clients',en=>'IP-Clients'},
 'AL_TCom.system.lnksystemcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
-'AL_TCom.system.software'=>{de=>'Softwarezuordnung',en=>'Softwarerelation'},
+'AL_TCom.system.software'=>{de=>'Softwareinstallation',en=>'Softwareinstallation'},
 'AL_TCom.system.software.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.system.lnksysteminteranswer'=>{de=>'Interview',en=>'Interview'},
 'AL_TCom.system.signedfile'=>{de=>'signierte Datei',en=>'signed file'},

@@ -26,7 +26,7 @@
 'itil.system.systemnfsnas.ipclients'=>{de=>'IP-Clients',en=>'IP-Clients'},
 'itil.system.ipaddress'=>{de=>'IP-Adresse',en=>'IP-Address'},
 'itil.system.ipaddress.new'=>{de=>'Neueingabe',en=>'New'},
-'itil.system.software'=>{de=>'Softwarezuordnung',en=>'Softwarerelation'},
+'itil.system.software'=>{de=>'Softwareinstallation',en=>'Softwareinstallation'},
 'itil.system.software.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.system.jobs'=>{de=>'SystemJob',en=>'SystemJob'},
 'itil.system.jobs.new'=>{de=>'Neueingabe',en=>'New'},
