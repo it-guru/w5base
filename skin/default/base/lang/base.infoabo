@@ -5,6 +5,7 @@
 'fieldgroup.relation'=>{de=>'Zuorndung',
                        en=>'Relation'},
 'Active'=>{de=>'Aktiv'},
+'User CI-State'=>{de=>'Kontakt CI-Status'},
 'User'=>{de=>'Kontakt',en=>'Contact'},
 'Info Source'=>{de=>'Daten-Quellobjekt'},
 'raw Info Mode'=>{de=>'interner Info Mode'},

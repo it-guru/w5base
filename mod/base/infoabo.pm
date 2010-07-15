@@ -18,7 +18,6 @@ package base::infoabo;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
@@ -98,6 +97,22 @@ sub new
                 vjoinon       =>['userid'=>'userid'],
                 vjoindisp     =>'fullname'),
 
+      new kernel::Field::Select(
+                name          =>'usercistatus',
+                htmleditwidth =>'40%',
+                group         =>'relation',
+                readonly      =>'1',
+                label         =>'User CI-State',
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['usercistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'usercistatusid',
+                group         =>'relation',
+                label         =>'User CI-StateID',
+                dataobjattr   =>'contact.cistatus'),
+
       new kernel::Field::Email(
                 name          =>'email',
                 label         =>'E-Mail',
@@ -173,18 +188,21 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'srcsys',
+                htmldetail    =>'0',
                 group         =>'source',
                 label         =>'Source-System',
                 dataobjattr   =>'infoabo.srcsys'),
                                                  
       new kernel::Field::Text(
                 name          =>'srcid',
+                htmldetail    =>'0',
                 group         =>'source',
                 label         =>'Source-Id',
                 dataobjattr   =>'infoabo.srcid'),
                                                  
       new kernel::Field::Date(
                 name          =>'srcload',
+                htmldetail    =>'0',
                 group         =>'source',
                 label         =>'Source-Load',
                 dataobjattr   =>'infoabo.srcload'),
@@ -238,6 +256,17 @@ sub new
 
    return($self);
 }
+
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my $grp=shift;
+   my %param=@_;
+   return(qw(header default relation source));
+}
+
+
 
 
 sub getSqlFrom
@@ -552,9 +581,12 @@ sub LoadTargets
    if (!defined($userlist)){
       $self->ResetFilter();
       $self->SetFilter({refid=>$refid,rawmode=>$mode,
-                         parent=>$parent,
-                         active=>\'1'});
+                        usercistatusid=>"<=5",
+                        parent=>$parent,
+                        active=>\'1'});
       foreach my $rec ($self->getHashList(qw(email))){
+         next if ($rec->{email} eq ""); # ensure entries are filtered, if the
+                                        # contact entry has been deleted
          if (!defined($desthash->{lc($rec->{email})})){
             $desthash->{lc($rec->{email})}=[];
          }
@@ -568,8 +600,11 @@ sub LoadTargets
       $param{default}=0 if (!exists($param{default}));
       $self->ResetFilter();
       $self->SetFilter({refid=>$refid,mode=>$mode,
+                        usercistatusid=>"<=5",
                         parent=>$parent,userid=>$userlist});
       foreach my $rec ($self->getHashList(qw(userid email id active))){
+         next if ($rec->{email} eq ""); # ensure entries are filtered, if the
+                                        # contact entry has been deleted
          @{$userlist}=grep(!/^$rec->{userid}$/,@{$userlist}); 
          if ($rec->{active}){
             if (!defined($desthash->{lc($rec->{email})})){
