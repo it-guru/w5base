@@ -473,7 +473,7 @@ sub getDynamicFields
                 name          =>'eventstatclass',
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'eventnotifystat',
-                label         =>'Event class',
+                label         =>'Priority of Event',
                 default       =>'1',
                 htmleditwidth =>'100px',
                 value         =>['1',
@@ -1097,7 +1097,7 @@ sub getNotificationSubject
    my $state=$self->getNotifyCountLabel($WfRec,$sendcustinfocount);
 
    my $afcust=$WfRec->{affectedcustomer}->[0]; # only first customer 
-   my $subject="EK ".$WfRec->{eventstatclass};
+   my $subject="Prio".$WfRec->{eventstatclass};
    my $prio="";
    if ($WfRec->{affecteditemprio} ne ""){
       if ($WfRec->{affecteditemprio}==1){   # Aussage von Hr. Weidner
@@ -1317,7 +1317,7 @@ sub generateMailSet
                my $v=$fo->FormatedResult($WfRec,"ShortMsg");
                if ($v ne ""){
                   if ($field=~m/(eventstatclass)/){
-                     $$smstext.="$state: EK$v - ";
+                     $$smstext.="$state: Prio$v - ";
                   }
                   elsif ($field=~m/(eventstartofevent)/){
                      $$smstext.=$self->T("Start").": ".$v."\n";
