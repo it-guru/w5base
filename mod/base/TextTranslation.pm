@@ -20,6 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::App::Web;
+use Safe;
 @ISA=qw(kernel::App::Web);
 
 sub new
@@ -81,6 +82,7 @@ $html=new HTML::Parser();
      # my $googleurl01="http://www.google.de/language_tools";
       my $googleurl02="http://translate.google.com/translate_a/t?".
                       "sl=$cursrclang&tl=$curdstlang";  
+      msg(INFO,"request: $googleurl02");
      # my $response=$ua->request(GET($googleurl01));
      # if ($response->code ne "200"){
      #    msg(ERROR,"fail to init '$googleurl01' response code=".
@@ -90,7 +92,10 @@ $html=new HTML::Parser();
      # open(F,">/tmp/googletrans01.html");
      # print F ($response->content());
      # close(F);
-
+      my $sendcursrc=Unicode::String::latin1($cursrc)->utf8();
+      if (Query->Param("mode") eq "xml"){
+         $sendcursrc=$cursrc;
+      }
 
       my $response=$ua->request(POST($googleurl02,
                        'Referer'=>'http://translate.google.com/translate_t',
@@ -100,8 +105,8 @@ $html=new HTML::Parser();
                        'Accept'=>'text/xml,application/xml,application/xhtml'.
                                  '+xml,text/html;q=0.9,text/plain;q=0.8',
                        'Content'=>['hl'=>'en',
-     #                            'ie'=>'UTF8',
-                                 'text'=>$cursrc,
+                                 'ie'=>'UTF8',
+                                 'text'=>$sendcursrc,
                                  'sl'=>"$cursrclang",
                                  'otf'=>"2",
                                  'pc'=>"0",
@@ -117,22 +122,20 @@ $html=new HTML::Parser();
       if ($res ne ""){
          $res=UTF8toLatin1($res);
          msg(INFO,"GoogleResponse=%s\n",$res);
-         my $ps;
-         eval('use JSON;
-         my $json=new JSON();
-         $ps=$json->decode($res);');
-         msg(INFO,"GoogleResponse=%s\n",Dumper($ps));
-         if (ref($ps->{sentences}) eq "ARRAY"){
+         my $eenv=new Safe();
+         my $res=$eenv->reval($res.";");
+         if (ref($res) eq "ARRAY" &&
+             ref($res->[0]) eq "ARRAY"){
             $curdst="";
-            foreach my $r (@{$ps->{sentences}}){
-               $curdst.=$r->{trans};
+            foreach my $resp (@{$res->[0]}){
+               $curdst.=$resp->[0];
             }
          }
       }
-      open(F,">/tmp/googletrans02.html");
-      print F ($response->content());
-      close(F);
-      eval('$html->parse($response->content);');
+      #open(F,">/tmp/googletrans02.html");
+      #print F ($response->content());
+      #close(F);
+      #eval('$html->parse($response->content);');
 
    }
    if (Query->Param("mode") eq "plain"){
@@ -142,7 +145,8 @@ $html=new HTML::Parser();
    }
    if (Query->Param("mode") eq "xml"){
       print $self->HttpHeader("text/xml");
-      my $res=hash2xml({document=>{result=>$curdst,exitcode=>0}},{header=>1});
+      my $res=hash2xml({document=>{result=>latin1($curdst)->utf8(),
+                        exitcode=>0}},{header=>1});
       print $res;
       return();
    }
