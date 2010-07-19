@@ -338,8 +338,8 @@ sub Validate
       return(0);
    }
 
-   my $fname=$clusttyp;
-   $fname.=($fname ne "" && $name ne "" ? "." : "").$name;
+   my $fname=$name;
+   $fname.=($fname ne "" && $clusttyp ne "" ? "." : "").$clusttyp;
 #   $fname.=($fname ne "" && $swtype   ne "" ? "." : "").$swtype;
 #   $fname.=($fname ne "" && $swport   ne "" ? "." : "").$swport;
 #   $fname.=($fname ne "" && $addname  ne "" ? "." : "").$addname;
