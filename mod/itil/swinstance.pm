@@ -281,6 +281,7 @@ sub new
 
       new kernel::Field::Boolean(
                 name          =>'runonclusts',
+                selectfix     =>1,
                 label         =>'run on Cluster Service',
                 group         =>'misc',
                 dataobjattr   =>'swinstance.runonclusts'),
@@ -693,9 +694,9 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   my @all=qw(header default adm sec ssl misc cluster 
+   my @all=qw(header default adm sec ssl misc 
              systems contacts source);
-   if (defined($rec) && $rec->{'runonclust'}){
+   if (defined($rec) && $rec->{'runonclusts'}){
       push(@all,"cluster");
    }
    return(@all);
