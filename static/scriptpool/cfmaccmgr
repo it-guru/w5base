@@ -83,6 +83,24 @@ while [ $INOPT != 1 ];  do
          shift
       ;;
 
+      "-h" ) 
+         shift
+         echo "Usage: cfmaccmgr [-k] [-f] [-v] QUERY" >&2
+         echo "" >&2
+         echo "  -k allows SSH2 key changes automaticly" >&2
+         echo "  -f allows useradd and userdel operations" >&2
+         echo "  -f -f  processes userdel operations directly without waits" >&2
+         echo "  -v verbose execution" >&2
+         echo "  -h disyplay this help" >&2
+         echo "" >&2
+         echo "  Sample Querys:" >&2
+         echo "  ==============" >&2
+         echo "  * All business team users of the application W5Base/Darwin:">&2
+         echo "    '(appl=\"W5Base/Darwin\")'" >&2
+         echo "" >&2
+         exit 1
+      ;;
+
       *) 
          INOPT=1
       ;;
