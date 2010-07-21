@@ -336,6 +336,31 @@ sub createGrp
          return(undef);
       }
    }
+   elsif ($wiwrec->{parentid} eq "DE039607"){  # T-Deutschland
+      my @view=qw(id name);
+      $grp->SetFilter({fullname=>\"DTAG.TDE"});
+      $grp->SetCurrentView(@view);
+      my ($rec,$msg)=$grp->getFirst();
+      if (!defined($rec)){
+         $grp->SetFilter({fullname=>\"DTAG"});
+         $grp->SetCurrentView(@view);
+         my ($rec,$msg)=$grp->getFirst();
+         my $parentoftsi;
+         if (!defined($rec)){
+            my %newgrp=(name=>"DTAG",cistatusid=>4);
+            my $back=$grp->ValidatedInsertRecord(\%newgrp);
+            $parentoftsi=$back; 
+         }
+         else{
+            $parentoftsi=$rec->{grpid};
+         }
+         my %newgrp=(name=>"TDE",parent=>'DTAG',cistatusid=>4);
+         $parentid=$grp->ValidatedInsertRecord(\%newgrp);
+      }
+      else{
+         $parentid=$rec->{grpid}; 
+      }
+   }
    else{
       # wenn keine parentid im WIW, dann mit DTAG.TSI "verbinden"
       my @view=qw(id name);
@@ -349,12 +374,6 @@ sub createGrp
          my $parentoftsi;
          if (!defined($rec)){
             my %newgrp=(name=>"DTAG",cistatusid=>4);
-      #      $v1->SetFilter({fullname=>\"DTAG"});
-      #      $v1->SetCurrentView(@view);
-      #      my ($rec,$msg)=$v1->getFirst();
-      #      if (defined($rec)){
-      #         $newgrp{grpid}=$rec->{id};
-      #      }
             my $back=$grp->ValidatedInsertRecord(\%newgrp);
             $parentoftsi=$back; 
          }
