@@ -144,6 +144,31 @@ sub getDynamicFields
                                   group       =>'mailsend',
                                   container   =>'headref'),
 
+      new kernel::Field::Date(    name        =>'terminstart',
+                                  label       =>'Mail termin request start',
+                                  uivisible   =>0,
+                                  group       =>'mailsend',
+                                  container   =>'headref'),
+
+      new kernel::Field::Date(    name        =>'terminend',
+                                  label       =>'Mail termin request end',
+                                  uivisible   =>0,
+                                  group       =>'mailsend',
+                                  container   =>'headref'),
+
+      new kernel::Field::Text(    name        =>'terminlocation',
+                                  label       =>'Mail termin location',
+                                  uivisible   =>0,
+                                  group       =>'mailsend',
+                                  container   =>'headref'),
+
+      new kernel::Field::Number(  name        =>'terminnotify',
+                                  label       =>'Mail termin notify',
+                                  unit        =>'min',
+                                  uivisible   =>0,
+                                  group       =>'mailsend',
+                                  container   =>'headref'),
+
       new kernel::Field::Boolean( name        =>'noautobounce',
                                   label       =>'no automatic bounce handling',
                                   uivisible   =>0,

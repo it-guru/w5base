@@ -1,0 +1,21 @@
+<!------------------------------------------------------------------------>
+<table id=tabelle width="754" border="0" cellspacing="2" cellpadding="2">
+  <tr> 
+    <td width=200 nowrap>
+    <div class=desc><b><br>&nbsp;
+    %emailtstamp%
+    %emailprefix%
+    </b></div>
+    </td>
+    <td class="zelleWeiss" width=530>
+       <div style="width:525px;overflow:hidden">
+          <font face="Arial,Adobe Helvetica,Helvetica">
+          <b>%emailhead%</b>
+          </font>
+       </div>
+       <div style="width:525px;overflow:hidden"><pre class="text">%emailtext%</pre></div>
+    </td>
+  </tr>
+</table>
+<!------------------------------------------------------------------------>
+

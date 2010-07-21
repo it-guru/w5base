@@ -129,11 +129,11 @@ sub NotifyChange
                }
                my $url=$self->Config->Param("EventJobBaseUrl");
                if ($url ne ""){
-                  push(@emailprefix,"<center>".
+                  push(@emailprefix,
                        "<a title=\"click to get current ".
                                   "informations of change\" ".
                        "href=\"$url/auth/tssc/chm/ById/$srcid\">".
-                       "$srcid</a></center>");
+                       "$srcid</a>");
                }
                else{
                   push(@emailprefix,$srcid);
@@ -176,7 +176,7 @@ sub NotifyChange
             
            
             $notiy{emailto}=$emailto;
-            $notiy{name}="change:".$curscstate.": ".$wfrec->{name};
+            $notiy{name}="Change: ".$curscstate.": ".$wfrec->{name};
             $notiy{emailprefix}=\@emailprefix;
             $notiy{emailtext}=\@emailtext;
             $notiy{emailsep}=\@emailsep;
@@ -185,6 +185,15 @@ sub NotifyChange
             $notiy{emailcc}=['hartmut.vogler@t-systems.com'];
             $notiy{class}='base::workflow::mailsend';
             $notiy{step}='base::workflow::mailsend::dataload';
+            $notiy{directlnktype}='base::workflow';
+            $notiy{directlnkmode}='WorkflowNotify';
+            $notiy{directlnkid}=$wfrec->{id};
+            $notiy{emailtemplate}="terminnotify";
+            $notiy{terminstart}=$wfrec->{eventstart};
+            $notiy{terminend}=$wfrec->{eventend};
+            $notiy{terminnotify}=1440;
+            $notiy{prio}=5;
+            $notiy{terminlocation}="T-Systems RZ";
             if (my $wid=$wf->Store(undef,\%notiy)){
                my %d=(step=>'base::workflow::mailsend::waitforspool');
                my $r=$wf->Store($wid,%d);

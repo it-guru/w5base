@@ -132,10 +132,16 @@ sub Sendmail
          my $bound="d6f5".time()."af".time()."jhdfjasd";
          my $mixbound="d345".time()."af".time()."j34fjasd";
          my $from=$rec->{emailfrom};
+         my $terminfrom=$rec->{emailfrom};
          if ($from eq ""){
             my $sitename=$self->Config->Param("SiteName");
             $sitename="W5Base" if ($sitename eq "");
             $from="\"$sitename\" <no_reply\@".$rec->{initialsite}.">";
+            $terminfrom="CN=\"$sitename\":MAILTO:no_reply\@".
+                        $rec->{initialsite}
+         }
+         else{
+            $terminfrom="CN=\"Notifier\":MAILTO:$rec->{emailfrom}";
          }
          my $template=$rec->{emailtemplate};
          $template="sendmail" if ($template eq "");
@@ -425,7 +431,9 @@ sub Sendmail
             }
          }
          $mail.="--\n";
-         if (0){
+         my $tstart=$rec->{terminstart};
+         my $tend=$rec->{terminend};
+         if ($tend ne "" && $tstart ne ""){
             $mail.="\n--$bound\n";
             $mail.="Content-Type: text/calendar\n";
             $mail.="\n";
@@ -444,13 +452,24 @@ sub Sendmail
             $mail.="BEGIN:VEVENT\n";
             $mail.="SUMMARY:$rec->{name}\n";
             # aus absender
-            $mail.="ORGANIZER;CN=Hartmut Vogler:MAILTO:Hartmut.Vogler\@t-systems.com\n";
+            $mail.="ORGANIZER;".$terminfrom."\n";
             # aus to
-            $mail.="ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=:MAILTO:vogler.hartmut\@googlemail.com\n";
+            foreach my $e (@emailto){
+               $mail.="ATTENDEE;ROLE=REQ-PARTICIPANT;".
+                      "PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=:".
+                      "MAILTO:$e\n";
+            }
             # aus cc
-            $mail.="ATTENDEE;ROLE=OPT-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=:MAILTO:it\@guru.de\n";
-            $mail.="DTSTART;TZID=GMT:20110708T110000Z\n";  # aus meetingstart
-            $mail.="DTEND;TZID=GMT:20110708T113000Z\n";    # aus meetingend
+            foreach my $e (@emailcc){
+               $mail.="ATTENDEE;ROLE=OPT-PARTICIPANT;".
+                      "PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=:".
+                      "MAILTO:$e\n";
+            }
+            
+            $mail.="DTSTART;TZID=GMT:".
+                   $app->ExpandTimeExpression($tstart,"ICS")."\n";
+            $mail.="DTEND;TZID=GMT:".
+                   $app->ExpandTimeExpression($tend,"ICS")."\n";
             my $uid;
             if ($rec->{directlnkid} ne ""){
                $uid=$rec->{directlnkid};
@@ -461,15 +480,20 @@ sub Sendmail
             }
             $mail.="UID:$uid\@$rec->{initialsite}\n";  
             $mail.="CLASS:PUBLIC\n";
-            $mail.="DTSTAMP:20100701T102353Z\n";  # aus cdate
-            $mail.="STATUS:CONFIRMED\n";
-            $mail.="LOCATION:Im Netz\n";                  # aus meetinglocation
-
-            $mail.="BEGIN:VALARM\n";
-            $mail.="ACTION:DISPLAY\n";
-            $mail.="DESCRIPTION:REMINDER\n";
-            $mail.="TRIGGER;RELATED=START:-PT15M\n";
-            $mail.="END:VALARM\n";
+            $mail.="DTSTAMP:".
+                   $app->ExpandTimeExpression($rec->{createdate},"ICS")."\n";
+            $mail.="STATUS:REQUEST\n";
+            if ($rec->{terminlocation} ne ""){
+               $mail.="LOCATION:".$rec->{terminlocation}."\n";
+            }
+            $mail."PRIORITY:".$rec->{prio}."\n";
+            if ($rec->{terminnotify}>0){
+               $mail.="BEGIN:VALARM\n";
+               $mail.="ACTION:DISPLAY\n";
+               $mail.="DESCRIPTION:REMINDER\n";
+               $mail.="TRIGGER;RELATED=START:-PT".$rec->{terminnotify}."M\n";
+               $mail.="END:VALARM\n";
+            }
 
             $mail.="END:VEVENT\n";
             $mail.="END:VCALENDAR\n";
@@ -545,7 +569,7 @@ sub Sendmail
             print F $mail;
             close(F);
             push(@processed,$rec->{id});
-            if (open(D,">/tmp/mail.".$rec->{id}.".dump.tmp")){
+            if (open(D,">/tmp/mail.dump.tmp")){
                print D $mail;
                $wf->Store($rec,{state=>21,
                                 eventend=>NowStamp("en"),

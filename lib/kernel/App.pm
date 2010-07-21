@@ -682,6 +682,20 @@ sub getDataObj
    return($o);
 }
 
+sub getInstalledDataObjNames
+{
+   my $self=shift;
+   my @names;
+
+   my $instdir=$self->Config->Param("INSTDIR");
+   @names=(glob($instdir."/mod/*/*.pm"),glob($instdir."/mod/*/workflow/*.pm"));
+   map({$_=~s/^.*\/mod\///;
+        $_=~s/\.pm$//;
+        $_=~s/\//::/g;
+        $_;} @names);
+
+}
+
 sub CloseOpenTransations
 {
    my $self=shift;
