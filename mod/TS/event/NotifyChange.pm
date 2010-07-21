@@ -52,9 +52,12 @@ sub NotifyChange
          my $fo=$wf->getField("additional");
          my $additional=$fo->RawValue($wfrec);
          my $scstate=lc($additional->{ServiceCenterState}->[0]);
-         return({exitcode=>0,msg=>'ok'}) if ($scstate ne "resolved" &&
-                                             $scstate ne "planning" &&
-                                             $scstate ne "released");
+         if ($scstate ne "resolved" &&
+             $scstate ne "planning" &&
+             $scstate ne "confirmed" &&
+             $scstate ne "released"){
+            return({exitcode=>0,msg=>'nothing to send in state '.$scstate});
+         }
          my $srcid=$wfrec->{srcid};
          my $aid=$wfrec->{affectedapplicationid};
          my %emailto;
@@ -176,7 +179,7 @@ sub NotifyChange
             
            
             $notiy{emailto}=$emailto;
-            $notiy{name}="Change: ".$curscstate.": ".$wfrec->{name};
+            $notiy{name}="$srcid: ".$curscstate.": ".$wfrec->{name};
             $notiy{emailprefix}=\@emailprefix;
             $notiy{emailtext}=\@emailtext;
             $notiy{emailsep}=\@emailsep;
