@@ -49,8 +49,7 @@ sub new
                 dst           =>['base::grp' =>'fullname',
                                  'base::user'=>'fullname'],
                 vjoineditbase =>[{'cistatusid'=>[3,4]},
-                                 {'cistatusid'=>[3,4,5],
-                                  'usertyp'=>['user','extern','function']},
+                                 {'cistatusid'=>[3,4,5]}
                                 ],
                 dsttypfield   =>'target',
                 dstidfield    =>'targetid'),
