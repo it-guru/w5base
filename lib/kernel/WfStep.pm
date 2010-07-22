@@ -794,15 +794,16 @@ sub generateWorkspacePages
 
       $d.="<tr>".
          "<td colspan=2>".
-         "<table width=100% cellspacing=0 cellpadding=0><tr>".
-         "<td nowrap width=1%>".
-         $self->getParent->T("to").": &nbsp;</td><td>".
-         "<input type=text name=emailto style=\"width:100%\">".
-         "</td></tr></table></td></tr>".
-         "<tr>".
-         "<td colspan=2><textarea name=emailmsg ".
-         "style=\"width:100%;height:50px\">".
-         "</textarea></td></tr>";
+      #   "<table width=100% cellspacing=0 cellpadding=0><tr>".
+      #   "<td nowrap width=1%>".
+      #   $self->getParent->T("to").": &nbsp;</td><td>".
+      #   "<input type=text name=emailto style=\"width:100%\">".
+      #   "</td></tr></table></td></tr>".
+      #   "<tr>".
+      #   "<td colspan=2><textarea name=emailmsg ".
+      #   "style=\"width:100%;height:50px\">".
+      #   "</textarea>";
+         "</td></tr>";
       $d.="</table>";
       $$divset.="<div id=OPwfmailsend class=\"$class\">$d</div>";
    }

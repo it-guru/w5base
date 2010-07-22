@@ -179,9 +179,12 @@ sub new
                 vjoinon       =>['systemcistatusid'=>'id'],
                 vjoindisp     =>'name'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Text(
                 name          =>'systemsystemid',
-                label         =>'SystemID',
+                group         =>'link',
+                readonly      =>'1',
+                htmldetail    =>0,
+                label         =>'System SystemID',
                 dataobjattr   =>'system.systemid'),
                                                    
       new kernel::Field::Link(
