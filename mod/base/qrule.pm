@@ -89,11 +89,26 @@ sub new
    );
    $self->LoadSubObjs("qrule","qrule");
    $self->{'data'}=[];
+   my @dl=$self->getInstalledDataObjNames();
+  
    foreach my $obj (values(%{$self->{qrule}})){
       my $ctrl=$obj->getPosibleTargets();
       my $name=$obj->Self();
-      my $r={id=>$obj->Self,
-             target=>$obj->getPosibleTargets()};
+      $ctrl=[$ctrl] if (ref($ctrl) ne "ARRAY");
+      my %t;
+      foreach my $ct (@$ctrl){
+         if ($ct=~m/[\.\^\*]/){
+            foreach my $m (@dl){
+               if ($m=~m/$ct/){
+                  $t{$m}++;
+               }
+            }
+         }
+         else{
+            $t{$ct}++;
+         }
+      }
+      my $r={id=>$obj->Self,target=>[keys(%t)]};
       push(@{$self->{'data'}},$r);
    }
    $self->setDefaultView(qw(linenumber id name target));
