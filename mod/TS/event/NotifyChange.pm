@@ -54,7 +54,6 @@ sub NotifyChange
          my $scstate=lc($additional->{ServiceCenterState}->[0]);
          if ($scstate ne "resolved" &&
              $scstate ne "planning" &&
-             $scstate ne "confirmed" &&
              $scstate ne "released"){
             return({exitcode=>0,msg=>'nothing to send in state '.$scstate});
          }
