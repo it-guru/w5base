@@ -165,6 +165,12 @@ sub new
                 vjoinbase     =>[{'parentobj'=>\'base::location'}],
                 subeditmsk    =>'subedit'),
 
+      new kernel::Field::Textarea(
+                name          =>'comments',
+                group         =>'comments',
+                label         =>'Comments',
+                dataobjattr   =>'location.comments'),
+
       new kernel::Field::Text(
                 name          =>'roomexpr',
                 group         =>'control',
@@ -222,14 +228,16 @@ sub new
                                  'zipcode','location'],
                 address=>\&AddressBuild),
 
-      new kernel::Field::Text(
+      new kernel::Field::Number(
                 name          =>'gpslongitude',
+                precission    =>8,
                 group         =>'gps',
                 label         =>'longitude',
                 dataobjattr   =>'location.gpslongitude'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Number(
                 name          =>'gpslatitude',
+                precission    =>8,
                 group         =>'gps',
                 label         =>'latitude',
                 dataobjattr   =>'location.gpslatitude'),
@@ -328,7 +336,7 @@ sub getDetailBlockPriority
    my $grp=shift;
    my %param=@_;
    return("header","default","management","contacts","phonenumbers",
-          "gps","additional","map","control","source");
+          "comments","additional","map","gps","control","source");
 }
 
 
@@ -635,7 +643,7 @@ sub isWriteValid
    }
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(phonenumbers management contacts gps);
+   my @databossedit=qw(phonenumbers management contacts comments gps);
 
    if (defined($rec) && $rec->{databossid}==$userid){
       return(@databossedit);
