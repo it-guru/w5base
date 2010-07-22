@@ -321,12 +321,49 @@ sub new
                 group         =>'additional',
                 dataobjattr   =>'location.additional'),
 
+      new kernel::Field::Text(
+                name          =>'similarcheck',
+                group         =>'control',
+                uploadable    =>0,
+                htmldetail    =>0,
+                htmlwidth     =>'500px',
+                label         =>'similar check',
+                depend        =>['country','address1',
+                                 'zipcode','location'],
+                onRawValue    =>\&SimilarCheck),
+
       new kernel::Field::Interview(),
 
    );
    $self->setDefaultView(qw(location address1 name cistatus));
    $self->setWorktable("location");
    return($self);
+}
+
+sub SimilarCheck
+{
+   my $self=shift;
+   my $current=shift;
+
+   my $loc=$self->getParent->Clone();
+
+   my @flt;
+
+   my $address1=$current->{address1};
+   $address1=~s/\s/*/g;
+   my $location=$current->{location};
+   $location=~s/\s/*/g;
+   push(@flt,{location=>$location,
+              address1=>$address1});
+
+   $loc->SetFilter(\@flt);
+   my %res;
+   foreach my $rec ($loc->getHashList(qw(id name))){
+      if ($rec->{id}!=$current->{id}){
+         $res{$rec->{id}}=$rec->{name}." ( ".$rec->{id}." )";
+      }
+   }
+   return(join("\n",sort(values(%res))));
 }
 
 
