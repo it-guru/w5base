@@ -16,6 +16,7 @@
 'fieldgroup.management'=>{de=>'Verwaltung',en=>'Management'},
 'fieldgroup.comments'=>{de=>'Bemerkungen',en=>'Comments'},
 'Room Expression'=>{de=>'Raum Reg.Exp.'},
+'similar check'=>{de=>'Ähnlichkeitsprüfung'},
 'latitude'=>{de=>'Breitengrad (dezimal)'},
 'longitude'=>{de=>'Längengrad (dezimal)'},
 'Location responsible'=>{de=>'Standortverantwortlicher'},
