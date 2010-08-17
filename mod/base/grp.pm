@@ -232,6 +232,7 @@ sub new
                 subeditmsk    =>'subedit.group',
                 label         =>'Subunits',
                 group         =>'subunits',
+                forwardSearch =>1,
                 vjointo       =>'base::grp',
                 vjoinbase     =>{'cistatusid'=>"<6"},
                 vjoinon       =>['grpid'=>'parentid'],
@@ -307,7 +308,7 @@ sub Validate
    my $cistatus=effVal($oldrec,$newrec,"cistatusid");
    if (defined($newrec->{name}) || !defined($oldrec)){
       trim(\$newrec->{name});
-      $newrec->{name}=~s/[\.\s]/_/g;
+      $newrec->{name}=~s/[\.\s\*]/_/g;
       my $chkname=$newrec->{name};
       if ($cistatus==6 || $oldrec->{cistatusid}==6){
          $chkname=~s/\[.*?\]$//g;

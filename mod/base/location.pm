@@ -627,6 +627,8 @@ sub Normalize
    $rec->{label}=~s/\.//;
    $rec->{address1}=~s/\.//;
    $rec->{location}=~s/\.//;
+   $rec->{address1}=~s/\(.*\)//;  # keine Klammerzusätze
+   $rec->{location}=~s/\(.*\)//;  # keine Klammerzusätze
 }
 
 sub getLocationByHash
@@ -676,7 +678,7 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
    if ($self->IsMemberOf("admin")){
-      return("default","contacts","management","gps","control");
+      return("default","contacts","management","gps","control","comments");
    }
    my $userid=$self->getCurrentUserId();
 

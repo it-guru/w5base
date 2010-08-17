@@ -541,7 +541,7 @@ sub Sendmail
                   $number=$smsrec->{home_mobile};
                }
                if (defined($number)){
-                  $number=~s/[\s-\/]//g;
+                  $number=~s/[\s-\/\(\)]//g;
                   msg(DEBUG,"sending sms to $smsrec->{fullname}");
                   push(@numlist,$number);
                   if (open(F,"|".$smsscript." \"-s\" -- \"$number\"")){
