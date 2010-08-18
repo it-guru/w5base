@@ -1,0 +1,5 @@
+'base::isocountry'=>{de=>'Land',en=>'Country'},
+'Country token'=>{de=>'Kürzel'},
+'Location label'=>{de=>'Adresse name'},
+'full country name'=>{de=>'Land'},
+'Countryname'=>{de=>'Ländername (englisch)'},

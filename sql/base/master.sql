@@ -335,3 +335,18 @@ create table checklstent (
   KEY checklst (checklst)
 );
 alter table mandatordataacl add unique(prio,parentobj,dataname,mandator);
+create table isocountry (
+  id          bigint(20)   NOT NULL,
+  cistatus    int(2)       default '4',
+  token       char(2)      NOT NULL,
+  fullname    varchar(40)  NOT NULL,name varchar(38) NOT NULL,
+  comments    longtext     default NULL,
+  createdate  datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate  datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser  bigint(20) NOT NULL default '0',
+  modifyuser  bigint(20) NOT NULL default '0',
+  editor      varchar(100) NOT NULL default '',
+  realeditor  varchar(100) NOT NULL default '',
+  PRIMARY KEY (id),unique(token),unique(fullname)
+);
+insert into isocountry(token,name,fullname) values('DE','Germany','DE-Germany');

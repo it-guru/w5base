@@ -25,6 +25,8 @@
 'sysadm.mandator.dataacl.new'=>{de=>'Neueingabe',en=>'New'},
 'sysadm.location'=>{de=>'Standortverwaltung',en=>'Location-Administration'},
 'sysadm.location.new'=>{de=>'Neueingabe',en=>'New'},
+'sysadm.location.country'=>{de=>'Land',en=>'Country'},
+'sysadm.location.country.new'=>{de=>'Neueingabe',en=>'New'},
 'sysadm.location.googlekeys'=>{de=>'GoogleMaps',en=>'GoogleMaps'},
 'sysadm.location.googlekeys.new'=>{de=>'Neu',en=>'New'},
 'sysadm.location.lnklocationcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},

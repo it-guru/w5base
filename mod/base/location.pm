@@ -86,15 +86,13 @@ sub new
       # country codes based on ISO-3166-Alpha2
       # http://de.wikipedia.org/wiki/ISO-3166-1-Kodierliste
       #
-      new kernel::Field::Select(
+      new kernel::Field::Text(
                 name          =>'country', 
                 htmleditwidth =>'50px',
-                value         =>['DE','US','GB','UK',
-                                 'FR','IT','DK','CZ',
-                                 'TR','ES','CN','RC',
-                                 'BE','MY','SK','JP',
-                                 'CH','AT','SG','PT'],
                 label         =>'Country',
+                vjointo       =>'base::isocountry',
+                vjoinon       =>['country'=>'token'],
+                vjoindisp     =>'token',
                 dataobjattr   =>'location.country'),
 
       new kernel::Field::Text(
