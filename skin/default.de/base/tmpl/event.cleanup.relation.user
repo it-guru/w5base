@@ -1,8 +1,11 @@
 Ihre Zuordnung zur Gruppe "<b>%group%</b>" mit den aktuell eingetragenen Rollen "<b>%roles(formated)%</b>" ist verfallen. Wenn Sie nicht die Admins kontaktieren (z.B. via Admin-Request) wird diese Zuorndung in 4 Wochen entgültig gelöscht. 
-Das Entfernen dieser Zuorndung kann dazu führen, dass Sie danach bestimmte Funktionalitäten nicht mehr nutzen können bzw. dass für Sie Datensätze nicht mehr sichtbar sind.
+Das Entfernen dieser Zuorndung kann dazu führen, dass Sie danach bestimmte Funktionalitäten nicht mehr nutzen können bzw. dass für Sie Datensätze nicht mehr sichtbar sind. Es bedeutet NICHT, dass sie ohne diese Zuordnung keinen Zugang zu System mehr erhalten. Es ist möglich, dass bereits neue Gruppenzuordnungen in Ihren Benutzereinstellungen eingetragen wurden, die alle notwendigen Funktionalitäten für Sie bzw. für Ihren Bereich weiterhin sicherstellen.
 
 Falls Ihre organisatorische Zugehörigkeit geändert wurde, so stellen Sie bitte sicher, dass allen notwendigen Einträge im Config-Management durch die betreffenden Datenverantwortlichen angepasst werden.
 Diese Mail kann auch durch Umorganisationen in Ihrem Bereich ausgelößt worden sein. In diesem Fall klären Sie über Ihre Vorgesetzte, dass Ihrem Bereich auch in der neuen Organisationsstrutkur die notwendigen Berechtigungen zugewiesen wurden bzw. werden.
+
+Bevor Sie die Admins kontaktieren, prüfen Sie bitte ob Ihre Gruppenzuorndung unter "MyW5Base-&gt;Benutzereinstellungen" nicht doch plausiebel ist. Erst wenn Ihnen die aktuell vorhanden Zuorndungen nicht plausiebel erscheinen, macht es Sinn die Admins zu kontaktieren.
+Beachten Sie, dass die Admins nur tätig werden können, wenn Sie Ihre Anfrage über "MyW5Base:neuen Workflow starten" als <b>"W5Base Admin oder Support Anforderung/Admin Anfrage"</b> stellen!
 
 Dies ist die einzige Benachrichtiung, die an Sie gesandt wird. Es werden über diesen Sachverhalt keine weiteren Nachrichten an Sie erzeugt.
 
