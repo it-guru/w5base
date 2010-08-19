@@ -47,7 +47,7 @@ function sendListGroups(){
    var filter=$('#groupfilter').val();
    if (filter!=""){
       var o=getModuleObject(W5Base,"base::grp");
-      o.SetFilter({cistatusid:"4",name:filter});  
+      o.SetFilter({cistatusid:"4",fullname:filter});  
       o.findRecord("fullname,grpid",listGroups);
    }
    else{
