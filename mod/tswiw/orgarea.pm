@@ -156,7 +156,9 @@ sub isWriteValid
 sub getValidWebFunctions
 {
    my ($self)=@_;
-   return($self->SUPER::getValidWebFunctions(),qw(ImportOrgarea));
+   return($self->SUPER::getValidWebFunctions(),qw(ImportOrgarea 
+                                                  doParentFix
+                                                  ParentGroupFix));
 }
 
 
@@ -183,6 +185,97 @@ sub ImportOrgarea
    print $self->getParsedTemplate("tmpl/minitool.orgarea.import",{});
    print $self->HtmlBottom(body=>1,form=>1);
 }
+
+#########################################################################
+# minitool ParentGroupFix based on ajax technic to reconnect parent group
+#
+sub ParentGroupFix
+{
+   my $self=shift;
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','work.css',
+                                   'kernel.App.Web.css'],
+                           js=>['J5Base.js'],body=>1,
+                           title=>"WhoIsWho ParentGroupFix");
+   print $self->getParsedTemplate("tmpl/minitool.orgarea.parentfix",{});
+   print $self->HtmlBottom(body=>1);
+}
+
+sub doParentFix
+{
+   my $self=shift;
+
+   print $self->HttpHeader("text/html");
+   my $grpid=$self->Query->Param("grpid");
+   if ($grpid eq ""){
+      print("ERROR: no grpid sumited");
+      return();
+   }
+   my $wiw=getModuleObject($self->Config,"tswiw::orgarea");
+   my $grp=getModuleObject($self->Config,"base::grp");
+
+   #
+   # load current grprec vom w5base
+   #
+   $grp->ResetFilter();
+   $grp->SecureSetFilter({grpid=>\$grpid});
+   my ($grprec)=$grp->getOnlyFirst(qw(ALL));
+   if (!$grprec){
+      print("ERROR: grp not found");
+      return();
+   }
+   if ($grprec->{srcid} eq ""){
+      print("ERROR: no touid in srcid of grp");
+      return();
+   }
+   #
+   # load current parent from wiw
+   #
+   $wiw->SecureSetFilter({touid=>\$grprec->{srcid}});
+   my ($wiwrec)=$wiw->getOnlyFirst(qw(parentid));
+
+   if ($wiwrec->{parentid} eq ""){
+      print("ERROR: no parentid found in wiw");
+      return();
+   }
+
+   #
+   # find new parent fullname
+   #
+   $grp->ResetFilter();
+   $grp->SecureSetFilter({srcid=>\$wiwrec->{parentid},srcsys=>\'WhoIsWho'});
+   my ($pgrprec)=$grp->getOnlyFirst(qw(fullname));
+   if (!defined($pgrprec)){
+      $self->Import({importname=>$wiwrec->{parentid}});
+      $grp->ResetFilter();
+      $grp->SecureSetFilter({srcid=>\$wiwrec->{parentid},srcsys=>\'WhoIsWho'});
+      my ($pgrprec)=$grp->getOnlyFirst(qw(fullname));
+      if (!defined($pgrprec)){
+         print("ERROR: can not create new parent rec");
+         return();
+      }
+   }
+   
+   #
+   # write new parent
+   #
+
+   if ($grp->SecureValidatedUpdateRecord($grprec,{parent=>$pgrprec->{fullname}},
+                                         {grpid=>\$grprec->{grpid}})){
+
+      $grp->ResetFilter();
+      $grp->SecureSetFilter({grpid=>\$grpid});
+      my ($grprec)=$grp->getOnlyFirst(qw(ALL));
+      my $qcokobj=$grp->getField("qcok");
+      my $qcok=$qcokobj->RawValue($grprec);
+      print("QualityCheck=$qcok");
+      return();
+   }
+   print(join(";".$self->LastMsg()));
+}
+
+#########################################################################
 
 sub Import
 {
@@ -224,7 +317,6 @@ sub Import
          return(undef);
       }
    }
-printf STDERR ("fifi try to import %s\n",Dumper(\@idimp));
    foreach my $wiwid (reverse(@idimp)){
       $wiw->ResetFilter();
       $wiw->SetFilter({touid=>\$wiwid});
@@ -262,6 +354,13 @@ printf STDERR ("fifi try to import %s\n",Dumper(\@idimp));
             if (my $back=$grp->ValidatedInsertRecord(\%newgrp)){
                $ok++;    
                msg(DEBUG,"ValidatedInsertRecord returned=$back");
+               $grp->ResetFilter();
+               $grp->SetFilter({grpid=>\$back});
+               my ($grprec)=$grp->getOnlyFirst(qw(ALL));
+               if ($grprec){
+                  $self->LastMsg(INFO,"$grprec->{srcid} = $grprec->{fullname}");
+               }
+           
             }
            # printf STDERR ("wiwrec=%s\n",Dumper($wiwrec));
            # printf STDERR ("grprec=%s\n",Dumper($grprec));

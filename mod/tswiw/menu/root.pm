@@ -57,6 +57,11 @@ sub Init
                       func=>'ImportOrgarea',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("sysadm.grp.wiwpfix",
+                      "tswiw::orgarea",
+                      func=>'ParentGroupFix',
+                      defaultacl=>['admin']);
+
    $self->RegisterObj('tswiw::QuickFind::user$',
                       "tswiw::QuickFind::user",
                       defaultacl=>['DTAG.TSI']);
