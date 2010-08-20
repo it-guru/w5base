@@ -385,16 +385,16 @@ sub rpcGetUniqueId
 {
    my $self=shift;
 
+   my $t=time();
    msg(DEBUG,"rpcGetUniqueId: UniqueId=%d/%d time=%d",
              $self->{'UniqueId'}->{'counter'},
              $self->{'UniqueId'}->{'timer'},
-             time());
-   if (time() > ($self->{'UniqueId'}->{'timer'})){
+             $t);
+   if ($t > ($self->{'UniqueId'}->{'timer'})){
       $self->{'UniqueId'}->{'counter'}=0;
-      $self->{'UniqueId'}->{'timer'}=time();
+      $self->{'UniqueId'}->{'timer'}=$t;
    }
-   $self->{'UniqueId'}->{'counter'}++;
-   return({id=>sprintf('%d%04d',time(),$self->{'UniqueId'}->{'counter'}),
+   return({id=>sprintf('%d%04d',$t,$self->{'UniqueId'}->{'counter'}++),
            exitcode=>0});
 }
 
