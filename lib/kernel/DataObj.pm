@@ -842,13 +842,21 @@ sub isDirectFilter
   my $idfieldname=$self->IdField->Name();
   if ($#flt==0){
      if (ref($flt[0]) eq "HASH"){
-        if (defined($flt[0]->{$idfieldname}) &&
-            ref($flt[0]->{$idfieldname}) eq "ARRAY" &&
-            $#{$flt[0]->{$idfieldname}}==0){
-           if ($flt[0]->{$idfieldname}->[0]=~m/[\*\?]/){
-              return(0);
+        if (defined($flt[0]->{$idfieldname})){
+           if (ref($flt[0]->{$idfieldname}) eq "ARRAY"){
+              if ($#{$flt[0]->{$idfieldname}}==0){
+                 if ($flt[0]->{$idfieldname}->[0]=~m/[\*\?]/){
+                    return(0);
+                 }
+                 return(1);
+              }
            }
-           return(1);
+           if (ref($flt[0]->{$idfieldname}) eq "SCALAR"){
+              if (${$flt[0]->{$idfieldname}}=~m/[\*\?]/){
+                 return(0);
+              }
+              return(1);
+           }
         }
      }
   }
