@@ -86,7 +86,7 @@ sub new
       # country codes based on ISO-3166-Alpha2
       # http://de.wikipedia.org/wiki/ISO-3166-1-Kodierliste
       #
-      new kernel::Field::Text(
+      new kernel::Field::Select(
                 name          =>'country', 
                 htmleditwidth =>'50px',
                 label         =>'Country',
