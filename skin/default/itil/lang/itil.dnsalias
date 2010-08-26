@@ -1,4 +1,4 @@
-'itil::dnsalias'=>{de=>'DNS-Alias',en=>'DNS-Alias'},
+'itil::dnsalias'=>{de=>'DNS-Alias - CNAME Record',en=>'DNS-Alias - CNAME Record'},
 'dns-alias'=>{de=>'DNS-Alias',en=>'DNS-Alias'},
 'invalid dns-alias'=>{de=>'Ungültiger DNS-Alias'},
 'no IP-DNS-Name specified or no such entry found'=>{de=>'Kein oder ungültiger IP-DNS-Name angegeben'},
