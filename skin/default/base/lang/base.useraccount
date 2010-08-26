@@ -3,7 +3,7 @@
 'fieldgroup.default'=>{ de=>'Benutzerkennung',en=>'Useraccount'},
 'fieldgroup.control'=>{ de=>'Statusinformationen',en=>'State-Informations'},
 'Givenname'=>{ de=>'Vorname'},
-'Password'=>{ de=>'Passwort'},
+'Password'=>{ de=>'Passwort (MySQL Hash)',en=>'Password (MySQL Hash)},
 'base::useraccount'=>{ de=>'Benutzerkennung',en=>'Useraccount'},
 "invalid account name '%s' specified"=>{de=>"ungültiger Anmeldename/Benutzerkennung '%s'"},
 'DetailChangePassword'=>{de=>'Passwort ändern',en=>'change password'},
