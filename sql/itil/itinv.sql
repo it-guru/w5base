@@ -802,3 +802,26 @@ alter table appl add solastdrdate       datetime default NULL;
 alter table appl add soslaclustduration int(5) default NULL;
 alter table appl add solastclusttestwf  bigint(20) default NULL;
 alter table appl add solastclustswdate  datetime default NULL;
+create table dnsalias (
+  id         bigint(20) NOT NULL,
+  cistatus   int(2)      NOT NULL,
+    dnsalias       varchar(40) default NULL,
+    dnsname        varchar(40) default NULL,
+    is_foundindns  bool default '0',
+    network        bigint(20)  default NULL,
+    comments       longtext     default NULL,
+    additional     longtext     default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) NOT NULL default '0',
+  modifyuser bigint(20) NOT NULL default '0',
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  srcsys     varchar(10) default 'w5base',
+  srcid      varchar(20) default NULL,
+  srcload    datetime    default NULL,
+  PRIMARY KEY  (id),
+  key dnsname(dnsname),
+  UNIQUE KEY `srcsys` (srcsys,srcid), UNIQUE KEY (dnsalias)
+);
+alter table appl  add applbasemoni varchar(20) default NULL;

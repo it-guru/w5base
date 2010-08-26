@@ -617,7 +617,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'servicesupport',
                 label         =>'Service&Support Class',
-                group         =>'misc',
+                group         =>'monisla',
                 vjointo       =>'itil::servicesupport',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['servicesupportid'=>'id'],
@@ -641,12 +641,27 @@ sub new
                 dataobjattr   =>'appl.opmode'),
 
       new kernel::Field::Select(
+                name          =>'applbasemoni',
+                group         =>'monisla',
+                label         =>'Application base monitoring',
+                value         =>['',
+                                 'BigBrother',
+                                 'Tivoli 5',
+                                 'Tivoli 6',
+                                 'TV-CC',
+                                 'SAP-Reporter',
+                                 'no monitoring'],
+                htmleditwidth =>'200px',
+                dataobjattr   =>'appl.applbasemoni'),
+
+      new kernel::Field::Select(
                 name          =>'slacontroltool',
-                group         =>'misc',
+                group         =>'monisla',
                 label         =>'SLA control tool type',
                 value         =>['',
                                  'BigBrother',
-                                 'Tivoli',
+                                 'Tivoli 5',
+                                 'Tivoli 6',
                                  'TV-CC',
                                  'SAP-Reporter',
                                  'no SLA control'],
@@ -655,7 +670,7 @@ sub new
 
       new kernel::Field::Number(
                 name          =>'slacontravail',
-                group         =>'misc',
+                group         =>'monisla',
                 htmlwidth     =>'100px',
                 precision     =>5,
                 unit          =>'%',
@@ -665,7 +680,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'slacontrbase',
-                group         =>'misc',
+                group         =>'monisla',
                 label         =>'SLA availibility calculation base',
                 transprefix   =>'slabase.',
                 searchable    =>0,
@@ -1317,7 +1332,8 @@ sub isViewValid
    return("header","default") if (!defined($rec));
    my @all=qw(accountnumbers history default applapplgroup applgroup
               attachments contacts control custcontracts customer delmgmt
-              finance interfaces licenses misc opmgmt phonenumbers services
+              finance interfaces licenses monisla 
+              misc opmgmt phonenumbers services
               soclustgroup socomments sodrgroup source swinstances systems
               technical workflowbasedata header inmchm interview efforts);
    if (!$rec->{sodefinition}){
@@ -1336,7 +1352,7 @@ sub isWriteValid
 
    my @databossedit=qw(default interfaces finance opmgmt technical contacts misc
                        systems attachments accountnumbers interview
-                       customer control phonenumbers
+                       customer control phonenumbers monisla
                        sodrgroup soclustgroup socomments);
    if (!defined($rec)){
       return(@databossedit);
@@ -1451,7 +1467,8 @@ sub getDetailBlockPriority
           qw(header default finance technical opmgmt delmgmt 
              customer custcontracts 
              contacts phonenumbers 
-             interfaces systems swinstances services misc attachments control 
+             interfaces systems swinstances services monisla
+             misc attachments control 
              sodrgroup soclustgroup socomments accountnumbers licenses source));
 }
 
