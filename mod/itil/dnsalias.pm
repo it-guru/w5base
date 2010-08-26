@@ -199,9 +199,8 @@ sub Validate
    }
 
    my $dnsalias=effVal($oldrec,$newrec,"fullname");
-   if($dnsalias=~m/^(\w+\.)+[a-zA-Z]{2,5}$/ && !($dnsalias=~m/\s/)){
-   }
-   else{
+   if(!($dnsalias=~m/^(\w+\.)+[a-zA-Z]{2,5}(\[\d\]){0,1}$/ && 
+        !($dnsalias=~m/\s/))){
       $self->LastMsg(ERROR,"invalid dns-alias");
       return(0);
    }
@@ -220,6 +219,7 @@ sub Validate
          return(0);
       }
    }
+   return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"fullname"));
 
    return(1);
 }
