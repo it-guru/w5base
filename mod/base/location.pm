@@ -543,6 +543,16 @@ sub Normalize
    if ($rec->{location}=~m/^berlin$/i){
       $rec->{location}="Berlin";
    }
+   if ( $rec->{zipcode} eq "70771"){
+      $rec->{location}="Leinfelden-Echterdingen";
+   }
+   if ($rec->{location}=~m/^leinfelden.*echterd.*$/i){
+      $rec->{location}="Leinfelden-Echterdingen";
+   }
+   if ($rec->{location} eq "Leinfelden-Echterdingen" &&
+       $rec->{address1}=~m/Fasanen.*we.*/){
+      $rec->{zipcode}="70771";
+   }
    if ($rec->{location}=~m/^Kempten.*\(.*Al.*\).*$/i){
       $rec->{location}="Kempten";
    }

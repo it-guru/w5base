@@ -74,6 +74,14 @@ sub new
                 vjoinon       =>['networkid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::SubList(
+                name          =>'dnsaliases',
+                label         =>'DNS-Aliases',
+                group         =>'dnsaliases',
+                vjointo       =>'itil::dnsalias',
+                vjoinon       =>['dnsname'=>'dnsname'],
+                vjoindisp     =>['fullname']),
+
       new kernel::Field::Link(
                 name          =>'networkid',
                 label         =>'NetworkID',
@@ -193,16 +201,6 @@ sub new
       new kernel::Field::Container(
                 name          =>'additional',
                 label         =>'Additionalinformations',
-                uivisible     =>sub{
-                   my $self=shift;
-                   my $mode=shift;
-                   my %param=@_;
-                   my $rec=$param{current};
-                   if (!defined($rec->{$self->Name()})){
-                      return(0);
-                   }
-                   return(1);
-                },
                 dataobjattr   =>'ipaddress.additional'),
 
       new kernel::Field::TextDrop(
@@ -510,6 +508,15 @@ sub isWriteValid
 
 sub getRecordHtmlIndex
 { return(); }
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   return(
+          qw(header default dnsaliases source));
+}
+
+
 
 
 

@@ -231,6 +231,7 @@ sub new
                 group         =>'software',
                 subeditmsk    =>'subedit.system',
                 allowcleanup  =>1,
+                forwardSearch =>1,
                 vjointo       =>'itil::lnksoftwaresystem',
                 vjoinbase     =>[{softwarecistatusid=>"<=4"}],
                 vjoinon       =>['id'=>'systemid'],

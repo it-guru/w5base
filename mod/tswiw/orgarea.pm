@@ -256,6 +256,10 @@ sub doParentFix
          return();
       }
    }
+   if ($pgrprec->{fullname} eq ""){
+      print("ERROR: can not find valid parent groupname");
+      return();
+   }
    
    #
    # write new parent

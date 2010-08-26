@@ -199,10 +199,17 @@ sub Validate
    }
 
    my $dnsalias=effVal($oldrec,$newrec,"fullname");
-   if(!($dnsalias=~m/^(\w+\.)+[a-zA-Z]{2,5}(\[\d\]){0,1}$/ && 
+   if(!($dnsalias=~m/^([\w,-]+\.)+[a-zA-Z]{2,5}(\[\d\]){0,1}$/ && 
         !($dnsalias=~m/\s/))){
       $self->LastMsg(ERROR,"invalid dns-alias");
       return(0);
+   }
+   if (lc($dnsalias) ne $dnsalias){
+      $newrec->{fullname}=lc($dnsalias);
+      $dnsalias=$newrec->{fullname};
+   }
+   if (exists($newrec->{dnsname})){
+      $newrec->{dnsname}=lc($newrec->{dnsname});
    }
    
    my $dnsname=effVal($oldrec,$newrec,"dnsname");
