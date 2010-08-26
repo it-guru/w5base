@@ -59,13 +59,11 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'system',
-                htmlwidth     =>'100px',
+                htmlwidth     =>'150px',
                 label         =>'assigned to System',
                 vjointo       =>'itil::system',
                 vjoinon       =>['systemid'=>'id'],
                 vjoindisp     =>'name'),
-
-
 
       new kernel::Field::Select(
                 name          =>'network',

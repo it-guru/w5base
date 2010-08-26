@@ -160,6 +160,11 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("AL_TCom.system.dnsalias",
+                      "itil::dnsalias",
+                      func=>'MainWithNew',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.system.systemnfsnas",
                       "itil::systemnfsnas",
                       defaultacl=>['valid_user']);

@@ -20,6 +20,7 @@
 'AL_TCom.system.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.system.ipaddress'=>{de=>'IP-Adresse',en=>'IP-Address'},
 'AL_TCom.system.ipaddress.new'=>{de=>'Neueingabe',en=>'New'},
+'AL_TCom.system.dnsalias'=>{de=>'DNS-Alias',en=>'DNS-Alias'},
 'AL_TCom.system.systemnfsnas'=>{de=>'NFS/NAS Freigabe',en=>'NFS/NAS Export'},
 'AL_TCom.system.systemnfsnas.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.system.systemnfsnas.clients'=>{de=>'System-Clients',en=>'System-Clients'},
