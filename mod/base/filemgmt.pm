@@ -1128,7 +1128,7 @@ sub browser
                   $select.=">";
                }
                $select.="</div>";
-               my $t=$self->ExpandTimeExpression($fl->{cdate},$self->Lang()).
+               my $t=$self->ExpandTimeExpression($fl->{mdate},$self->Lang()).
                      " GMT by $fl->{editor}";
                $list.=sprintf("<div class=fileline>$select<a class=filelink ".
                               "href=\"$prefix%s$post\" ".
