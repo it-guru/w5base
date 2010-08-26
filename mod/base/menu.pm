@@ -121,8 +121,9 @@ sub DatabaseLowInit
        $self->Config->Param("W5BaseOperationMode") ne "slave"){
       if ($func eq "root"){
          if (!$self->TableVersionValidate()){
-            $self->TableVersionChecker();
-            return(0);
+            if (!($self->TableVersionChecker())){
+               return(0);
+            }
          }
       }
    }
@@ -459,11 +460,9 @@ sub TableVersionModifications
    if ((Query->Param("do") || $automodify) && $errorcount==0){
       $buttons="<input type=submit value=\" OK \">";
    }
-   return(undef) if ($errorcount==0 && $automodify);
+   return(1) if ($errorcount==0 && $automodify);
    print $self->HttpHeader("text/html");
-   print $self->HtmlHeader(style=>['default.css','work.css',
-                                   'TableVersion.css'],
-                           form=>1,body=>1);
+   print $self->HtmlHeader(form=>1,body=>1);
    print $self->getParsedTemplate("tmpl/TableVersionModifications",{
                                    static=>{
                                        BUTTONS=>$buttons,
@@ -473,6 +472,7 @@ sub TableVersionModifications
                                       LOGSTYLE=>""}
                                   });
    print $self->HtmlBottom(form=>1,body=>1);
+   return(undef);
 }
 
 sub TableVersionCreate

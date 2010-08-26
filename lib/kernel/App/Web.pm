@@ -1199,6 +1199,7 @@ sub HtmlHeader
   my $altlang="en";
   $altlang="de" if ($lang eq "en");
 
+
   $d.=<<EOF;
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
@@ -1207,6 +1208,7 @@ var CURLANG="$lang";
 var ALTLANG="$altlang";
 </script>
 EOF
+
    #my $RootPath=Query->Param("RootPath");
    #if (defined($RootPath) && !defined($param{base})){
    #   $param{base}=$RootPath;
