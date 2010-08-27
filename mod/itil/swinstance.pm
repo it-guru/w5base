@@ -453,6 +453,8 @@ sub new
    );
    $self->{history}=[qw(insert modify delete)];
    $self->{use_distinct}=1;
+   $self->{workflowlink}={ workflowkey=>[id=>'id']
+                         };
    $self->setDefaultView(qw(fullname mandator cistatus mdate));
    $self->setWorktable("swinstance");
    return($self);
@@ -647,6 +649,13 @@ sub Validate
       }
    }
    ########################################################################
+   my $chksslurl=effVal($oldrec,$newrec,"sslurl");
+   if (!($chksslurl=~m/^(ldaps|https|http):\/\/(\S)+$/) &&
+       !($chksslurl=~m/^(\S+):(\d)+$/)){
+      $self->LastMsg(ERROR,"url did not looks like a ssl url");
+      return(undef);
+   }
+
    if (effChanged($oldrec,$newrec,"sslurl")){
       $newrec->{sslbegin}=undef;
       $newrec->{sslend}=undef;
@@ -694,7 +703,7 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   my @all=qw(header default adm sec ssl misc 
+   my @all=qw(header default adm sec ssl misc history
              systems contacts source);
    if (defined($rec) && $rec->{'runonclusts'}){
       push(@all,"cluster");
