@@ -150,7 +150,7 @@ sub qcheckRecord
       my ($msg,$begin,$end);
       if (defined($sslhost) && defined($sslport)){
          msg(DEBUG,"check %s",$rec->{fullname});
-         eval('use Net::SSLeay;use Net::SSL;
+         eval('use Net::SSLeay;
                use IO::Socket::SSL;use Date::Parse;use Carp;
                ($msg,$begin,$end)=$self->checkSSL($sslhost,$sslport);'); 
          if ($@ ne ""){
@@ -256,7 +256,6 @@ sub checkSSL
    }
    ### $begin_date_str
 
-   $sock->stop_SSL();
    $sock->close(SSL_fast_shutdown=>1);
 
 
