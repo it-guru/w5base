@@ -147,12 +147,12 @@ sub qcheckRecord
          $sslhost=$host;
          $sslport=$port;
       }
-      my ($msg,$begin,$end);
+      my ($msg);
       if (defined($sslhost) && defined($sslport)){
          msg(DEBUG,"check %s",$rec->{fullname});
          eval('use Net::SSLeay;
                use IO::Socket::SSL;use Date::Parse;use Carp;
-               ($msg,$begin,$end)=$self->checkSSL($sslhost,$sslport);'); 
+               ($msg,$sslbegin,$sslend)=$self->checkSSL($sslhost,$sslport);'); 
          if ($@ ne ""){
             msg(INFO,"message from eval in checkSSL $@");
             $sslstate=$@;
@@ -167,14 +167,14 @@ sub qcheckRecord
       if ($sslstate ne ""){
          my $now=NowStamp("en");
          my $newrec={sslcheck=>$now,sslstate=>$sslstate};
-         if (defined($end)){
-            $newrec->{sslend}=$end;
+         if (defined($sslend)){
+            $newrec->{sslend}=sprintf("%s",$sslend);
          }
          else{
             $newrec->{sslend}=undef;
          }
-         if (defined($begin)){
-            $newrec->{sslbegin}=$begin;
+         if (defined($sslbegin)){
+            $newrec->{sslbegin}=sprintf("%s",$sslbegin);
          }
          else{
             $newrec->{sslbegin}=undef;
@@ -183,20 +183,18 @@ sub qcheckRecord
          $newrec->{editor}=$rec->{editor};
          my $swop=$dataobj->Clone();
          $swop->ValidatedUpdateRecord($rec,$newrec,{id=>\$rec->{id}});
-         $sslend=$rec->{'sslend'};
-         $sslbegin=$rec->{'sslbegin'};
       }
-
 
       if ($sslstate ne ""){
          if ($sslstate=~m/OK/){
-            if ($sslend eq ""){
-               my $m="SSL check: invalid sslend - contact w5base admin";
+            if (!defined($sslend)){
+               my $m="SSL check: invalid or undefined sslend returend";
                return(3,{qmsg=>[$m],dataissue=>[$m]});
             }
             my $now=NowStamp("en");
-            my $d=CalcDateDuration($now,$rec->{sslend},"GMT");
+            my $d=CalcDateDuration($now,$sslend,"GMT");
             my $max=7*6;
+printf STDERR ("Dumperd=%s\n",Dumper($d));
             if ($d->{days}<$max){
                my $m="SSL certificate is nearly exiration";
                return(3,{qmsg=>[$m],dataissue=>[$m]});
