@@ -194,7 +194,6 @@ sub qcheckRecord
             my $now=NowStamp("en");
             my $d=CalcDateDuration($now,$sslend,"GMT");
             my $max=7*6;
-printf STDERR ("Dumperd=%s\n",Dumper($d));
             if ($d->{days}<$max){
                my $m="SSL certificate is nearly exiration";
                return(3,{qmsg=>[$m],dataissue=>[$m]});

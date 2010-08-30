@@ -644,10 +644,12 @@ sub Validate
    }
    ########################################################################
    my $chksslurl=effVal($oldrec,$newrec,"sslurl");
-   if (!($chksslurl=~m/^(ldaps|https|http):\/\/(\S)+$/) &&
-       !($chksslurl=~m/^(\S+):(\d)+$/)){
-      $self->LastMsg(ERROR,"url did not looks like a ssl url");
-      return(undef);
+   if ($chksslurl ne ""){
+      if (!($chksslurl=~m/^(ldaps|https|http):\/\/(\S)+$/) &&
+          !($chksslurl=~m/^(\S+):(\d)+$/)){
+         $self->LastMsg(ERROR,"url did not looks like a ssl url");
+         return(undef);
+      }
    }
 
    if (effChanged($oldrec,$newrec,"sslurl")){
