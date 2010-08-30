@@ -291,3 +291,4 @@ alter table contact add dialeripref varchar(5);
 alter table mandator add key(grpid);
 alter table contact add gtctxt longtext default NULL;
 alter table contact add gtcack datetime default NULL;
+alter table contact add dateofbirth datetime default NULL;
