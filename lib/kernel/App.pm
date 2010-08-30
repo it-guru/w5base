@@ -1198,12 +1198,22 @@ sub ExpandTimeExpression
    my $format=shift;    # undef=stamp|de|en|DateTime
    my $srctimezone=shift;
    my $dsttimezone=shift;
+   my %param=@_;
    my $result="";
    my ($Y,$M,$D,$h,$m,$s);
    my $found=0;
    my $fail=1;
    my $time;
    my $orgval=trim($val);
+   if ($param{defhour} eq ""){
+      $param{defhour}=0;
+   }
+   if ($param{defmin} eq ""){
+      $param{defmin}=0;
+   }
+   if ($param{defsec} eq ""){
+      $param{defsec}=0;
+   }
    $dsttimezone="GMT" if (!defined($dsttimezone));
    $format="en" if (!defined($format));
    if (!defined($srctimezone)){
@@ -1224,9 +1234,9 @@ sub ExpandTimeExpression
    elsif ($val=~m/^$todaylabel/gi){
       $val=~s/^$todaylabel//;
       ($Y,$M,$D,undef,undef,undef)=Today_and_Now($srctimezone); 
-      $h=0;
-      $m=0;
-      $s=0;
+      $h=$param{defhour};
+      $m=$param{defmin};
+      $s=$param{defsec};
       eval('$time=Mktime($srctimezone,$Y,$M,$D,$h,$m,$s);');
       ($Y,$M,$D,$h,$m,$s)=Localtime($dsttimezone,$time);
       $found=1;
@@ -1241,9 +1251,9 @@ sub ExpandTimeExpression
    elsif ($val=~m/^today/gi){
       $val=~s/^today//;
       ($Y,$M,$D,undef,undef,undef)=Today_and_Now($srctimezone); 
-      $h=0;
-      $m=0;
-      $s=0;
+      $h=$param{defhour};
+      $m=$param{defmin};
+      $s=$param{defsec};
       eval('$time=Mktime($srctimezone,$Y,$M,$D,$h,$m,$s);');
       ($Y,$M,$D,$h,$m,$s)=Localtime($dsttimezone,$time);
       $found=1;
@@ -1252,9 +1262,9 @@ sub ExpandTimeExpression
    elsif ($val=~m/^monthbase/gi){
       $val=~s/^monthbase//;
       ($Y,$M,undef,undef,undef,undef)=Today_and_Now($srctimezone); 
-      $h=0;
-      $m=0;
-      $s=0;
+      $h=$param{defhour};
+      $m=$param{defmin};
+      $s=$param{defsec};
       $D=1;
       eval('$time=Mktime($srctimezone,$Y,$M,$D,$h,$m,$s);');
       ($Y,$M,$D,$h,$m,$s)=Localtime($dsttimezone,$time);
@@ -1351,9 +1361,9 @@ sub ExpandTimeExpression
    }
    elsif (($D,$M,$Y)=$val=~m/^(\d+)\.(\d+)\.(\d+)/){
       $val=~s/^(\d+)\.(\d+)\.(\d+)//;
-      $h=0;
-      $m=0;
-      $s=0;
+      $h=$param{defhour};
+      $m=$param{defmin};
+      $s=$param{defsec};
       $Y+=2000 if ($Y<50);
       $Y+=1900 if ($Y>=50 && $Y<=99);
       $Y=1971 if ($Y<1971);
@@ -1371,9 +1381,9 @@ sub ExpandTimeExpression
    }
    elsif (($Y,$M,$D)=$val=~m/^(\d+)-(\d+)-(\d+)/){
       $val=~s/^(\d+)-(\d+)-(\d+)//;
-      $h=0;
-      $m=0;
-      $s=0;
+      $h=$param{defhour};
+      $m=$param{defmin};
+      $s=$param{defsec};
       $Y+=2000 if ($Y<50);
       $Y+=1900 if ($Y>=50 && $Y<=99);
       $Y=1971 if ($Y<1971);

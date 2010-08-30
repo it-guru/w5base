@@ -39,6 +39,7 @@ sub new
    my %param=@_;
    $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
+   $self->{history}=[qw(insert modify delete)];
    
    $self->AddFields(
       new kernel::Field::Linenumber(
@@ -368,6 +369,13 @@ sub new
                 group         =>'private',
                 label         =>'privat Phonenumber',
                 dataobjattr   =>'contact.private_phone'),
+
+      new kernel::Field::Date(
+                name          =>'dateofbirth',
+                dayonly       =>1,
+                group         =>'personrelated',
+                label         =>'date of birth',
+                dataobjattr   =>'contact.dateofbirth'),
 
       new kernel::Field::Select(
                 name          =>'tz',
@@ -999,7 +1007,7 @@ sub isViewValid
       }
    }
    if ($userid==$rec->{userid}){
-      push(@gl,"personrelated","interview");
+      push(@gl,"personrelated","history","interview");
    }
    else{
       # check if the user has a direct boss
@@ -1011,8 +1019,9 @@ sub isViewValid
                   foreach my $orole ($self->orgRoles()){
                      if (grep(/^$orole$/,@{$grp->{roles}})){
                         if ($self->IsMemberOf($grp->{grpid},
-                                              ["RBoss"],"direct")){
-                           push(@gl,"personrelated","private","interview");
+                                              ["RBoss","RBoss2"],"direct")){
+                           push(@gl,"personrelated","private","history",
+                                    "officeacc","interview");
                         }
                      }
                   }
@@ -1065,14 +1074,15 @@ sub isWriteValid
    return(undef) if (!defined($rec));
    if ($self->IsMemberOf("admin")){
       return(qw(default name office private userparam groups usersubst control
-                comments header picture nativcontact userro
-                interview));
+                comments header picture nativcontact userro personrelated
+                interview officeacc));
    }
    my $userid=$self->getCurrentUserId();
    if ($userid eq $rec->{userid} ||
        ($rec->{creator}==$userid && $rec->{cistatusid}<3)){
       return("name","userparam","office","officeacc","private","nativcontact",
-             "usersubst","control","officeacc","interview");
+             "usersubst","control","officeacc","personrelated",
+             "officeacc","interview");
    }
    # check if the user has a direct boss
    my $g=$self->getField("groups")->RawValue($rec);
@@ -1081,8 +1091,10 @@ sub isWriteValid
          if (ref($grp->{roles}) eq "ARRAY"){
             foreach my $orole ($self->orgRoles()){
                if (grep(/^$orole$/,@{$grp->{roles}})){
-                  if ($self->IsMemberOf($grp->{grpid},["RBoss"],"direct")){
-                     return("personrelated","interview");
+                  if ($self->IsMemberOf($grp->{grpid},["RBoss","RBoss2"],
+                                        "direct")){
+                     return("personrelated","private",
+                            "officeacc","interview","office");
                      last;
                   }
                }
@@ -1220,7 +1232,8 @@ sub getDetailBlockPriority
    my $grp=shift;
    my %param=@_;
    return(qw(header name picture default comments nativcontact office 
-             officeacc private userparam control groups usersubst));
+             officeacc private personrelated 
+             userparam control groups usersubst));
 }
 
 sub getDetailFunctions

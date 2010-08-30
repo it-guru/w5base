@@ -138,7 +138,7 @@ sub HistoryResult
             }
          }
          else{
-            print $self->noAccess("no access to 'history' fieldgroup");
+            print $self->noAccess($self->T("no access to 'history' fieldgroup"));
             return;
          }
       }

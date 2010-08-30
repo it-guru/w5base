@@ -28,6 +28,7 @@ sub new
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
    $self->{_permitted}->{timezone}=1;           # Zeitzone des feldes in DB
+   $self->{dayonly}=0                    if (!defined($self->{dayonly}));
    $self->{timezone}="GMT"               if (!defined($self->{timezone}));
    $self->{htmlwidth}="150"              if (!defined($self->{htmlwidth}));
    $self->{xlswidth}="20"                if (!defined($self->{xlswidth}));
@@ -60,6 +61,9 @@ sub FormatedDetail
       if (defined($fromquery)){
          $d=$fromquery;
       }
+      if ($self->{dayonly}){
+         $d=~s/\s*\d+:\d+:\d+.*$//;
+      }
       return($self->getSimpleInputField($d,$self->{readonly}));
    }
    if ($d ne ""){
@@ -73,7 +77,10 @@ sub FormatedDetail
       if ($mode eq "ShortMsg"){         # SMS Modus
          $d=~s/^(.*\d+:\d+):\d+\s*$/$1/;   # cut seconds
       }
-      if ($mode eq "HtmlDetail"){
+      if ($mode eq "HtmlDetail" && $self->{dayonly}){
+         $d=~s/\d+:\d+:\d+.*$//;
+      }
+      if ($mode eq "HtmlDetail" && !$self->{dayonly}){
          if (defined($delta) && $delta!=0){
             my $lang=$self->getParent->Lang();
             my $absdelta=abs($delta);
@@ -351,13 +358,21 @@ sub Unformat
       $formated=trim($formated->[0]) if (ref($formated) eq "ARRAY");
       return({$self->Name()=>undef}) if ($formated=~m/^\s*$/);
       $formated=trim($formated);
+      my %dateparam=();
+      if ($self->{dayonly}){  # fix format als 12:00 GMT
+         $dateparam{defhour}=12;
+      }
       my $d=$self->getParent->ExpandTimeExpression($formated,"en",
                                                    undef,
-                                                   $self->{timezone});
+                                                   $self->{timezone},
+                                                   %dateparam);
       if ($formated ne "" && $d eq ""){
          return(undef);
       }
-
+      if ($self->{dayonly}){  # fix format als 12:00 GMT
+         $d=~s/\s.*$//;
+         $d.=" 12:00:00";
+      }
       return({$self->Name()=>$d});
    }
    return({});

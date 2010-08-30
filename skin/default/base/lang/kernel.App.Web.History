@@ -5,3 +5,4 @@
 'last 180 days'=>{de=>'letzten 180 Tage'},
 'last 365 days'=>{de=>'letzten 365 Tage'},
 'all'=>{de=>'alles'},
+"no access to 'history' fieldgroup"=>{de=>"kein Zugriff auf die Feldgruppe 'Verlauf'"},
