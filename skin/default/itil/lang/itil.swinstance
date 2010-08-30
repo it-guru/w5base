@@ -34,3 +34,4 @@
 'run on Cluster Service'=>{de=>'ausführen auf Cluster Service'},
 'cluster service application and instance application does not match'=>{
  de=>'Cluster Service Anwendung passt nicht zur Anwendung in dieser Software Instanz'},
+'url did not looks like a ssl url'=>{de=>'URL entspricht nicht den SSL vorgaben'},
