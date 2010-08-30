@@ -292,3 +292,7 @@ alter table mandator add key(grpid);
 alter table contact add gtctxt longtext default NULL;
 alter table contact add gtcack datetime default NULL;
 alter table contact add dateofbirth datetime default NULL;
+alter table contact add persidentno varchar(50) default NULL;
+alter table contact add driverlicno varchar(50) default NULL;
+alter table contact add eurocarno   varchar(20) default NULL;
+alter table contact add sixtcarno   varchar(20) default NULL;

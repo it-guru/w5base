@@ -84,3 +84,7 @@
 'security state'=>{de=>'Sicherheitsstatus'},
 'GTC acknowledge date'=>{de=>'AGB Bestätigungsdatum'},
 'Groupnames'=>{de=>'Gruppennamen'},
+'personal identifier number'=>{de=>'Personalausweisnummer'},
+'driver license number'=>{de=>'Führerscheinnummer'},
+'EURO Car-rent driver number'=>{de=>'EURO Car-Vermietung Driver ID'},
+'SIXT Car-rent driver number'=>{de=>'SIXT Car-Vermietung Driver ID'},

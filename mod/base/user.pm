@@ -370,12 +370,36 @@ sub new
                 label         =>'privat Phonenumber',
                 dataobjattr   =>'contact.private_phone'),
 
+      new kernel::Field::Text(
+                name          =>'persidentno',
+                group         =>'personrelated',
+                label         =>'personal identifier number',
+                dataobjattr   =>'contact.persidentno'),
+
       new kernel::Field::Date(
                 name          =>'dateofbirth',
                 dayonly       =>1,
                 group         =>'personrelated',
                 label         =>'date of birth',
                 dataobjattr   =>'contact.dateofbirth'),
+
+      new kernel::Field::Text(
+                name          =>'driverlicno',
+                group         =>'personrelated',
+                label         =>'driver license number',
+                dataobjattr   =>'contact.persidentno'),
+
+      new kernel::Field::Text(
+                name          =>'eurocarno',
+                group         =>'personrelated',
+                label         =>'EURO Car-rent driver number',
+                dataobjattr   =>'contact.eurocarno'),
+
+      new kernel::Field::Text(
+                name          =>'sixtcarno',
+                group         =>'personrelated',
+                label         =>'SIXT Car-rent driver number',
+                dataobjattr   =>'contact.sixtcarno'),
 
       new kernel::Field::Select(
                 name          =>'tz',
