@@ -340,6 +340,13 @@ sub SetFilter
                    $rec->{fwdtargetid}!=$userid){
                   next;
                }
+               if (($rec->{stateid}==2)  && 
+                   $rec->{fwdtarget} eq "base::grp" &&
+                   $rec->{owner}==$userid &&
+                   !($self->getParent->IsMemberOf($rec->{fwdtargetid}))){
+                  next;
+               }
+
             }
             $id{$rec->{id}}++;
          }
