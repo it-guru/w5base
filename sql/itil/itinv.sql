@@ -37,7 +37,7 @@ create table appl (
   UNIQUE KEY applid (applid),
   UNIQUE KEY name (name),KEY(mandator),key(conumber),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=INNODB;
 create table lnkapplcustcontract (
   id           bigint(20) NOT NULL,
   appl         bigint(20) NOT NULL,
@@ -110,7 +110,7 @@ create table system (
   KEY adm (adm),KEY adm2 (adm2), KEY admteam (admteam),
   UNIQUE KEY name (name),KEY(mandator),key assetid(asset),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=INNODB;
 create table asset (
   id         bigint(20) NOT NULL,
   name       varchar(40) default NULL,
@@ -358,7 +358,7 @@ create table hwmodel (
   PRIMARY KEY  (id),
   UNIQUE KEY name (name),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=INNODB;
 create table lnkapplsystem (
   id           bigint(20) NOT NULL,
   appl         bigint(20) NOT NULL,
@@ -375,11 +375,11 @@ create table lnkapplsystem (
   srcsys       varchar(10) default 'w5base',
   srcid        varchar(20) default NULL,
   srcload      datetime    default NULL,
-  PRIMARY KEY  (id),
+  PRIMARY KEY  (id), FOREIGN KEY fk_system (system) REFERENCES system (id) ON DELETE CASCADE,
   KEY appl (appl),UNIQUE applsys(appl,system),
   KEY system (system),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=INNODB;
 create table lnksoftwaresystem (
   id           bigint(20) NOT NULL,
   software     bigint(20) NOT NULL,
