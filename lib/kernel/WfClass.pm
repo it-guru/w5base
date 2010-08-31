@@ -564,7 +564,15 @@ function ProcessResize()
       var h1=ModeSelect.offsetHeight;
       var h2=ProcessHandler.offsetHeight;
       var h3=SubTip.offsetHeight;
-      Tip.style.height=(h-(h1+h2+h3))+"px";
+      var newtiph=(h-(h1+h2+h3));
+      if (newtiph<0){
+         newtiph=0;
+         document.body.style.overflow='auto';
+      }
+      else{
+         document.body.style.overflow='hidden';
+      }
+      Tip.style.height=newtiph+"px";
    }
    ProcessHandler.style.visibility="visible";
    ProcessWindow.style.visibility="visible";
