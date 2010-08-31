@@ -165,10 +165,30 @@ sub getDynamicFields
                 container     =>'headref',
                 group         =>'eventnotifyshort',
                 getPostibleValues=>\&calcRooms,
-                multisize     =>10,
+                multisize     =>4,
                 uivisible     =>\&calcVisibility,
                 depend        =>['eventmode'],
                 label         =>'Affected Room'),
+
+      new kernel::Field::Select(
+                name          =>'affectedlocationcomp',
+                translation   =>'itil::workflow::base',
+                container     =>'headref',
+                group         =>'eventnotifyshort',
+                value         =>[qw( 
+                                     EVloccomp.unknown
+                                     EVloccomp.ipnetwork
+                                     EVloccomp.voip
+                                     EVloccomp.power
+                                     EVloccomp.clima
+                                     EVloccomp.access
+                                     EVloccomp.other
+                                 )],
+                multisize     =>3,
+                translation   =>'itil::workflow::eventnotify',
+                uivisible     =>\&calcVisibility,
+                depend        =>['eventmode'],
+                label         =>'Affected location component'),
 
       new kernel::Field::Select(  
                 name          =>'affectednetwork',
@@ -575,6 +595,7 @@ sub calcVisibility
       return(1) if ($name eq "affectedlocation");
       return(1) if ($name eq "affectedlocationid");
       return(1) if ($name eq "affectedroom");
+      return(1) if ($name eq "affectedlocationcomp");
    }
    if ($rec->{headref}->{eventmode}->[0] eq "EVk.appl"){
       return(1) if ($name eq "affectedapplication");
@@ -1274,6 +1295,7 @@ sub generateMailSet
    if ($WfRec->{eventmode} eq "EVk.infraloc"){
       push(@baseset,"wffields.affectedlocation");
       push(@baseset,"wffields.affectedroom");
+      push(@baseset,"wffields.affectedlocationcomp");
       push(@smsfields,"wffields.affectedlocation");
    }
    if ($WfRec->{eventmode} eq "EVk.net"){
@@ -1861,6 +1883,10 @@ sub generateStoredWorkspace
 <td class=fname valign=to width=20%>%affectedroom(label)%:</td>
 <td class=finput>%affectedroom(storedworkspace)%</td>
 </tr>
+<tr>
+<td class=fname valign=to width=20%>%affectedlocationcomp(label)%:</td>
+<td class=finput>%affectedlocationcomp(storedworkspace)%</td>
+</tr>
 EOF
 
    return($self->SUPER::generateStoredWorkspace($WfRec,@steplist).$d);
@@ -1884,6 +1910,10 @@ $StoredWorkspace
 <td class=fname valign=top width=20%>%affectedroom(label)%:</td>
 <td class=finput>%affectedroom(detail)%</td>
 </tr>
+<tr>
+<td class=fname valign=top width=20%>%affectedlocationcomp(label)%:</td>
+<td class=finput>%affectedlocationcomp(detail)%</td>
+</tr>
 </table>
 EOF
    return($templ);
@@ -1902,9 +1932,10 @@ sub Process
          $self->LastMsg(ERROR,"no room selected");
          return(0);
       }
-#      if ($eventmode ne "EVk.appl"){
-#         return(0);
-#      }
+      my $affectedlocationcomp=Query->Param("Formated_affectedlocationcomp");
+      if ($affectedlocationcomp=~m/^\s*$/){
+         Query->Param("Formated_affectedlocationcomp"=>'EVloccomp.other');
+      }
    }
    return($self->SUPER::Process($action,$WfRec));
 }
@@ -2290,7 +2321,7 @@ sub Process
       my ($crec,$msg)=$wf->getOnlyFirst(qw(ALL));
       my $h=$self->getWriteRequestHash("web");
       if (defined($crec)){
-         foreach my $cvar (qw(mandatorid mandator affectedapplication affectedapplicationid affectedlocation affectedlocationid affectedroom affectednetwork affectednetworkid affectedregion affectedcustomer affectedcustomerid eventdesciption eventreason eventimpact shorteventelimination longeventelimination eventaltdesciption eventaltreason eventaltimpact altshorteventelimination altlongeventelimination eventlang eventsla eventstaticmailsubject eventstaticemailgroupid eventinternalslacomments eventinternalcomments eventstatnature eventstattype eventstatreason eventstatclass eventmode affectedbusinessprocess affectedbusinessprocessid)){
+         foreach my $cvar (qw(mandatorid mandator affectedapplication affectedapplicationid affectedlocation affectedlocationid affectedroom affectedlocationcomp affectednetwork affectednetworkid affectedregion affectedcustomer affectedcustomerid eventdesciption eventreason eventimpact shorteventelimination longeventelimination eventaltdesciption eventaltreason eventaltimpact altshorteventelimination altlongeventelimination eventlang eventsla eventstaticmailsubject eventstaticemailgroupid eventinternalslacomments eventinternalcomments eventstatnature eventstattype eventstatreason eventstatclass eventmode affectedbusinessprocess affectedbusinessprocessid)){
             if (defined($crec->{$cvar})){
                $h->{$cvar}=$crec->{$cvar};
             }
