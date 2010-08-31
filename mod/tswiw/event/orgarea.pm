@@ -72,7 +72,7 @@ sub UpdateOrgareaStructure
    if ($account ne ""){
       $mainuser->SetFilter({accounts=>$account});
    }
-   $mainuser->SetCurrentView(qw(email usertyp groups posix));
+   $mainuser->SetCurrentView(qw(email surname givenname usertyp groups posix));
    my ($urec,$msg)=$mainuser->getFirst();
    if (!defined($urec)){
       msg(ERROR,"can't load any user accounts to verifiy");
