@@ -2829,8 +2829,10 @@ sub new
 {
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
-   $self->{WSDLfieldType}="WorkflowRelations" if (!defined($self->{WSDLfieldType}));
 
+   if (!defined($self->{WSDLfieldType})){
+      $self->{WSDLfieldType}="WorkflowRelations";
+   }
    return($self);
 }
 
@@ -2861,6 +2863,7 @@ sub ListRel
 
 
    my $linecolor=1;
+   my $relcount=0;
    while(my $flt=shift(@oplist)){
       my $ico=shift(@oplist);
       my $transpref=shift(@oplist);
@@ -2950,6 +2953,7 @@ sub ListRel
             else{
                $trlabel.=" $iid";
             }
+            $relcount++;
             if ($mode eq "mail"){
                $d.="---\n" if ($d ne "");
                $d.="<li class=workflowrelations><b>".$trlabel."</b>\n";
@@ -2995,6 +2999,9 @@ sub ListRel
             }
          }
       }
+   }
+   if (!$relcount){
+      return("");
    }
    if ($mode ne "mail"){
       $d.="</table>" if ($headadd);

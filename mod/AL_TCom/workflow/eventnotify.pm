@@ -631,6 +631,26 @@ sub generateMailSet
    @$emailsubtitle=@emailsubtitle;
 }
 
+sub generateMailSetAddOptFields
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my ($emailprefix,$emailtext,$emailsubheader,$emailsep,$emailpostfix)=@_;
+
+   my $fo=$self->getField("eventinmticket",$WfRec);
+   my $v=$fo->FormatedResult($WfRec,"HtmlMail");
+   if ($v ne ""){
+      push(@$emailprefix,$fo->Label().":");
+      push(@$emailtext,$v);
+      push(@$emailsubheader,0);
+      push(@$emailsep,0);
+      push(@$emailpostfix,"");
+   }
+}
+
+
+
 sub getPosibleRelations
 {
    my $self=shift;

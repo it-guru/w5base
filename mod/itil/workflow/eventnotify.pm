@@ -1383,13 +1383,12 @@ sub generateMailSet
             }
          }
       }
-      my $rel=$self->getField("relations",$WfRec);
-      my $reldata=$rel->ListRel($WfRec->{id},"mail",{name=>\'consequenceof'});
-      push(@emailprefix,$rel->Label().":");
-      push(@emailtext,$reldata);
-      push(@emailsubheader,0);
-      push(@emailsep,0);
-      push(@emailpostfix,"");
+      $self->generateMailSetAddOptFields($action,$WfRec,
+                                         \@emailprefix,
+                                         \@emailtext,
+                                         \@emailsubheader,
+                                         \@emailsep,
+                                         \@emailpostfix);
    }
    my $wf=$self->getParent();
    my $ssfld=$wf->getField("wffields.eventstaticmailsubject",$WfRec);
@@ -1408,6 +1407,25 @@ sub generateMailSet
    @$emailsep=@emailsep;
    @$emailsubheader=@emailsubheader;
    @$emailsubtitle=@emailsubtitle;
+}
+
+
+sub generateMailSetAddOptFields
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my ($emailprefix,$emailtext,$emailsubheader,$emailsep,$emailpostfix)=@_;
+
+   my $rel=$self->getField("relations",$WfRec);
+   my $reldata=$rel->ListRel($WfRec->{id},"mail",{name=>\'consequenceof'});
+   if ($reldata ne ""){
+      push(@$emailprefix,$rel->Label().":");
+      push(@$emailtext,$reldata);
+      push(@$emailsubheader,0);
+      push(@$emailsep,0);
+      push(@$emailpostfix,"");
+   }
 }
 
 
