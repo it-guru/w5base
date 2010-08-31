@@ -994,7 +994,7 @@ sub isViewValid
    #   push(@pic,"picture");
    #}
    if ($self->IsMemberOf("admin")){
-      push(@pic,"picture","roles","interview");
+      push(@pic,"picture","roles","interview","history");
    }
    if ($rec->{usertyp} eq "extern"){
       @gl=qw(header name default comments groups userro control 
