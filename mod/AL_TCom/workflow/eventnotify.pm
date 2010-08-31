@@ -647,6 +647,8 @@ sub generateMailSetAddOptFields
       push(@$emailsep,0);
       push(@$emailpostfix,"");
    }
+   $self->SUPER::generateMailSetAddOptFields($action,$WfRec,
+           $emailprefix,$emailtext,$emailsubheader,$emailsep,$emailpostfix);
 }
 
 
