@@ -28,3 +28,8 @@
 'Assignment Group Supervisor E-Mail'=>{de=>'Assignment Group Leiter E-Mail'},
 'Asset complete deprecation start'=>{de=>'Asset total Abschreibungsbeginn'},
 'Asset complete deprecation end'=>{de=>'Asset total Abschreibungsende'},
+'SYSCLASS.0'=>{de=>'UNDEFINED',en=>'UNDEFINED'},
+'SYSCLASS.10'=>{de=>'CLASSIC',en=>'CLASSIC'},
+'SYSCLASS.20'=>{de=>'STANDARDIZED',en=>'STANDARDIZED'},
+'SYSCLASS.25'=>{de=>'STANDARDIZED SLICE',en=>'STANDARDIZED SLICE'},
+'SYSCLASS.30'=>{de=>'APPCOM',en=>'APPCOM'},

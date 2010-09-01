@@ -234,6 +234,13 @@ sub new
                 label         =>'System OLA',
                 dataobjattr   =>'amcomputer.olaclasssystem'),
 
+      new kernel::Field::Select(
+                name          =>'systemolaclass',
+                label         =>'System OLA Service Class',
+                value         =>['0','10','20','25','30'], 
+                transprefix   =>'SYSCLASS.',
+                dataobjattr   =>'amcomputer.seappcom'),
+
       new kernel::Field::Text(
                 name          =>'priority',
                 label         =>'Priority of system',
