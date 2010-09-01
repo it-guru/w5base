@@ -188,6 +188,7 @@ sub Validate
       $self->LastMsg(ERROR,"dataobj not functional");
       return(undef);  
    }
+   my $dataobjparent=$do->SelfAsParentObject();
    my $qr=getModuleObject($self->Config(),"base::qrule");
    my $found=0;
    foreach my $qrulerec (@{$qr->{'data'}}){
@@ -196,6 +197,10 @@ sub Validate
          $target=[$target] if (ref($target) ne "ARRAY");
          foreach my $t (@$target){
             if ($dataobj=~m/^$t$/){
+               $found++;
+               last;
+            }
+            if ($dataobjparent=~m/^$t$/){
                $found++;
                last;
             }

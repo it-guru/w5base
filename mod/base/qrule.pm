@@ -370,16 +370,16 @@ sub WinHandleQualityCheck
       my $res=hash2xml({},{header=>1});
       print $res."<document>";
       my $checkresult=$self->nativQualityCheck($objlist,$rec);
-      print STDERR Dumper($checkresult);
+      #print STDERR Dumper($checkresult);
       foreach my $ruleres (@{$checkresult->{rule}}){
          my $res=hash2xml({rule=>$ruleres},{});
          print $res;
-         printf STDERR ($res."\n");
+         #printf STDERR ($res."\n");
       }
       if ($checkresult->{wfheadid} ne ""){
          my $res=hash2xml({wfheadid=>$checkresult->{wfheadid}},{});
          print $res;
-         printf STDERR ($res."\n");
+         #printf STDERR ($res."\n");
       }
       print "</document>";
       return();

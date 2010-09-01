@@ -1,0 +1,2 @@
+'itil::qrule::SystemOS'=>{de=>'Prüfung des der eingetragenen Betriebsystemversion',en=>'check the defined operation system release'},
+'invalid or none operation system release defined'=>{de=>'keine oder ungültige Betriebssystemversion eingetragen'},

@@ -1,0 +1,2 @@
+'TS::qrule::ApplChangeAGroup'=>{de=>'Prüfung ob AC Change Assignmentgroup eingetragen',en=>'check if there is an change assignmentgroup defined'},
+'there is no change assignmentgroup defined'=>{de=>'es wurde keine Change-Assignmentgroup eingetragen'},
