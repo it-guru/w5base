@@ -57,7 +57,7 @@ sub qcheckRecord
    my $dataobj=shift;
    my $rec=shift;
 
-   return(0,undef) if ($rec->{cistatusid}>5);
+   return(0,undef) if (!exists($rec->{cistatusid}) || $rec->{cistatusid}>5);
    my $fo=$dataobj->getField("contacts");
    return(0,undef) if (!defined($fo));
    my $l=$fo->RawValue($rec);

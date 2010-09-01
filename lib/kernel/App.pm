@@ -76,8 +76,7 @@ sub getPersistentModuleObject
 
    $module=$label if (!defined($module) || $module eq "");
    if (!defined($self->{$label})){
-      my $config=$self->Config();
-      my $m=getModuleObject($config,$module);
+      my $m=$self->ModuleObject($module);
       $self->{$label}=$m
    }
    if (defined($self->{$label})){
@@ -85,6 +84,19 @@ sub getPersistentModuleObject
    }
    return($self->{$label});
 }
+
+sub ModuleObject
+{
+   my $self=shift;
+   my $name=shift;
+   my $config=$self->Config;
+   my $o=getModuleObject($config,$name);
+   if (defined($o)){
+      $o->setParent($self);
+   }
+   return($o);
+}
+
 
 sub W5ServerCall
 {
@@ -324,7 +336,7 @@ sub _LoadUserInUserCache
    return(0) if ($AccountOrUserID eq "");
    my $o=$self->Cache->{User}->{DataObj};
    if (!defined($o)){     # DataObj also filled in App/Web.pm !
-      $o=getModuleObject($self->Config,"base::user");
+      $o=$self->ModuleObject("base::user");
       $self->Cache->{User}={DataObj=>$o,Cache=>{}};
    }
    my $UserCache=$self->Cache->{User}->{Cache};
@@ -492,7 +504,7 @@ sub ValidateGroupCache
       }
    }
    if (!defined($self->Cache->{Group}->{Cache})){
-      my $grp=getModuleObject($self->Config,"base::grp");
+      my $grp=$self->ModuleObject("base::grp");
       $grp->SetCurrentView(qw(grpid fullname parentid subid));
       $self->Cache->{Group}->{Cache}=$grp->getHashIndexed(qw(grpid fullname));
       foreach my $grp (values(%{$self->Cache->{Group}->{Cache}->{grpid}})){
@@ -627,7 +639,7 @@ sub LoadSubObjs
       my $p;
       $p=$self->getParent->Self if (defined($self->getParent()));
       foreach my $modname (@sublist){
-         my $o=getModuleObject($self->Config,$modname);
+         my $o=$self->ModuleObject($modname);
          if (defined($o)){
             if (!$o->can("setParent")){
                msg(ERROR,"cant call setParent on $o");

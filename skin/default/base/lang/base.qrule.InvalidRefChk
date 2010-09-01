@@ -1,0 +1,3 @@
+'base::qrule::InvalidRefChk'=>{de=>'Prüfung auf ungültige oder veraltete Kontakt Referenzen',en=>'check on invalid or deprecated contact references'},
+'There are invalid contact references!'=>{de=>'Es existieren ungültige Kontakt Referenzen!'},
+'is invalid'=>{de=>'ist ungültig'},
