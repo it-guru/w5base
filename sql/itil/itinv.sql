@@ -822,6 +822,6 @@ create table dnsalias (
   srcload    datetime    default NULL,
   PRIMARY KEY  (id),
   key dnsname(dnsname),
-  UNIQUE KEY `srcsys` (srcsys,srcid), UNIQUE KEY (dnsalias)
+  UNIQUE KEY `srcsys` (srcsys,srcid), unique KEY (dnsalias,dnsname)
 );
 alter table appl  add applbasemoni varchar(20) default NULL;

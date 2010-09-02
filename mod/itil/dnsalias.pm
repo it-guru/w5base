@@ -99,7 +99,8 @@ sub new
                 forwardSearch =>1,
                 vjointo       =>'itil::ipaddress',
                 vjoinon       =>['dnsname'=>'dnsname'],
-                vjoindisp     =>['system','name']),
+                vjoindisp     =>['system','name'],
+                vjoininhash   =>['system','name','systemid']),
 
       new kernel::Field::SubList(
                 name          =>'ipaddresses',

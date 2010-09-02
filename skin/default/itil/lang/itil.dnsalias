@@ -8,3 +8,4 @@
 'Short Comments'=>{de=>'Kurzbemerkungen'},
 'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
 'fieldgroup.ipaddresses'=>{de=>'IP-Adressen',en=>'IP-Addresses'},
+'Systems'=>{de=>'Systeme'},

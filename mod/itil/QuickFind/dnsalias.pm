@@ -67,7 +67,7 @@ sub QuickFindDetail
 
    my $dataobj=getModuleObject($self->getParent->Config,"itil::dnsalias");
    $dataobj->SetFilter({id=>\$id});
-   my ($rec,$msg)=$dataobj->getOnlyFirst(qw(fullname dnsname));
+   my ($rec,$msg)=$dataobj->getOnlyFirst(qw(fullname dnsname systems));
 
    $dataobj->ResetFilter();
    $dataobj->SecureSetFilter([{id=>\$id}]);
@@ -89,6 +89,31 @@ sub QuickFindDetail
                          "<td valign=top>$data</td></tr>";
          }
       }
+      my $systemslabel=$dataobj->getField("systems")->Label();
+      $htmlresult.="<tr><td nowrap valign=top width=1%>$systemslabel".
+                   "</td><td><table cellpadding='0' cellspacing='0'>";
+      foreach my $sysrec (@{$rec->{systems}}){
+         my $sysobj=getModuleObject($self->getParent->Config,"itil::system");
+         $sysobj->SecureSetFilter([{id=>\$sysrec->{systemid}}]);
+         my ($secsysrec,$msg)=$sysobj->getOnlyFirst(qw(id));
+         if (defined($secsysrec)){
+            my $dest="../../itil/system/ById/".$sysrec->{systemid};
+            my $detailx=$sysobj->DetailX();
+            my $detaily=$sysobj->DetailY();
+            my $lineonclick="openwin(\"$dest\",\"_blank\",".
+                     "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
+                     "resizeable=yes,scrollbars=auto\")";
+            $htmlresult.="<tr><td nowrap valign=top width=1%>".
+                         "<span class=\"sublink\" onClick=$lineonclick".
+                         " >".$sysrec->{system}."</span></td></tr>";
+         }
+         else{
+            $htmlresult.="<tr><td nowrap valign=top width=1%>".
+                         $sysrec->{system}."</td></tr>";
+         }
+      }
+      $htmlresult.="</table></td></tr>";
+ 
       $htmlresult.="</table>";
    }
    return($htmlresult);
