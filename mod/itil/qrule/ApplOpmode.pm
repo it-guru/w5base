@@ -56,7 +56,7 @@ sub qcheckRecord
    my $dataobj=shift;
    my $rec=shift;
 
-   return(undef,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
+   return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
    if ($rec->{opmode} eq ""){
       return(3,{qmsg=>['no primary operation mode selected'],
                 dataissue=>['no primary operation mode selected']});
