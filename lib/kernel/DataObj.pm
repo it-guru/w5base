@@ -2365,6 +2365,16 @@ sub getRecordHeader
    return($headerval);
 }
 
+sub getRecordSubHeader
+{
+   my $self=shift;
+   my $current=shift;
+   if (my $fld=$self->getField("dataissuestate")){
+      return($fld->FormatedDetail($current,"HtmlDetail"));
+   }
+   return("Nix");
+}
+
 
 #
 # setting the limit on selects -

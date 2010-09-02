@@ -215,6 +215,7 @@ EOF
       my $s=$self->getParent->getParent->T($self->getParent->getParent->Self,
                                            $self->getParent->getParent->Self);
       my $recordimg=$self->getParent->getParent->getRecordImageUrl($rec);
+      my $subheader="-";
 
       if ($self->getParent->getParent->can("getRecordHtmlDetailHeader")){
          $H=$self->getParent->getParent->getRecordHtmlDetailHeader($rec);
@@ -222,6 +223,8 @@ EOF
       else{ 
          $H="<p class=detailtoplineobj>$s:</p>".
             "<p class=detailtoplinename>$headerval</p>";
+         $recordimg=$self->getParent->getParent->getRecordImageUrl($rec);
+         $subheader=$self->getParent->getParent->getRecordSubHeader($rec);
       }
       if ($recordimg ne ""){
          $recordimg="<img class=toplineimage src=\"$recordimg\">";
@@ -276,7 +279,7 @@ EOF
 </td></tr></table>
 </td>
       </tr><tr>
-      <td class=detailtopline align=right></td>
+      <td class=detailtopline align=right>$subheader</td>
       </tr>
    </table>
 </div>

@@ -73,6 +73,7 @@ use kernel::Field::QualityState;
 use kernel::Field::QualityOk;
 use kernel::Field::QualityLastDate;
 use kernel::Field::QualityResponseArea;
+use kernel::Field::IssueState;
 use kernel::Field::Fulltext;
 use kernel::Field::Interview;
 use kernel::Field::InterviewState;
