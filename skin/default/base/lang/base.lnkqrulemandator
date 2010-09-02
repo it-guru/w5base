@@ -2,6 +2,7 @@
                            en=>'Mandator-Quality-Rule link'},
 'confine to data object'=>{de=>'beschränkt auf Datenobjekt'},
 'Quality Rule'=>{de=>'Quality Regel'},
+'data object label'=>{de=>'Datenobjektbezeichnung'},
 'Quality Rule Code'=>{de=>'Quality Regel Programmcode'},
 'Quality Rule Description'=>{de=>'Quality Regel Beschreibung'},
 'Expiration-Date'=>{de=>'Verfallsdatum'},

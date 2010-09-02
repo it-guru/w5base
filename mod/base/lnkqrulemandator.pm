@@ -54,6 +54,19 @@ sub new
                 label         =>'confine to data object',
                 dataobjattr   =>'lnkqrulemandator.dataobj'),
                                                  
+      new kernel::Field::Text(
+                name          =>'dataobjlabel',
+                label         =>'data object label',
+                depend        =>['dataobj'],
+                searchable    =>0,
+                onRawValue    =>sub (){
+                   my $self=shift;
+                   my $current=shift;
+                   my $dataobj=$self->getParent->getField("dataobj",$current)
+                                    ->RawValue($current);
+                   return($self->getParent->T($dataobj,$dataobj));
+                }),
+                                                 
       new kernel::Field::Select(
                 name          =>'qrule',
                 label         =>'Quality Rule',

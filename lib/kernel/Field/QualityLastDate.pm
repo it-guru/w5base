@@ -30,7 +30,7 @@ sub new
    $self->{group}='qc'                      if (!defined($self->{qc}));
    $self->{name}='lastqcheck'               if (!defined($self->{name}));
    $self->{label}='Quality Check last date' if (!defined($self->{label}));
-   $self->{searchable}=0                    if (!defined($self->{searchable}));
+   $self->{searchable}=1                    if (!defined($self->{searchable}));
    $self->{history}=0;
    $self->{readonly}=1;
    $self->{htmldetail}=0;
