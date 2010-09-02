@@ -2372,7 +2372,7 @@ sub getRecordSubHeader
    if (my $fld=$self->getField("dataissuestate")){
       return($fld->FormatedDetail($current,"HtmlDetail"));
    }
-   return("Nix");
+   return("");
 }
 
 
