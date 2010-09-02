@@ -1,0 +1,5 @@
+'base::qrule::CIStatusTime'=>{de=>'Aktualität der Config-Items',en=>'up to date of config-items'},
+"config item in ci-state 'on order' and no changes have been done for 8 weeks"=>{de=>"Das Config-Item im Status 'angefordert' wurde mehr als 8 Wochen nicht aktualisert"},
+"config item in ci-state 'reserved' and no changes have been done for 8 weeks"=>{de=>"Das Config-Item im Status 'reserviert' wurde mehr als 8 Wochen nicht aktualisert"},
+"config item in ci-state 'available/in project' and no changes have been done for 4 weeks"=>{de=>"Das Config-Item im Status 'verfügbar/in Projektierung' wurde mehr als 4 Wochen nicht aktualisert"},
+"config item in ci-state 'inactiv/stored' and no changes have been done for 12 weeks"=>{de=>"Das Config-Item im Status 'zeitweise inaktiv' wurde mehr als 12 Wochen nicht aktualisert"},
