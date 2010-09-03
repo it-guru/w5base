@@ -184,7 +184,7 @@ sub NotifyChange
             $notiy{emailsep}=\@emailsep;
             #$notiy{emailtemplate}='changenotification';
             $notiy{emailsubheader}=\@emailsubheader;
-            $notiy{emailcc}=['hartmut.vogler@t-systems.com'];
+            #$notiy{emailcc}=['hartmut.vogler@t-systems.com'];
             $notiy{class}='base::workflow::mailsend';
             $notiy{step}='base::workflow::mailsend::dataload';
             $notiy{directlnktype}='base::workflow';
