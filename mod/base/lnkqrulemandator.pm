@@ -59,6 +59,8 @@ sub new
                 label         =>'data object label',
                 depend        =>['dataobj'],
                 searchable    =>0,
+                readonly      =>1,
+                htmldetail    =>0,
                 onRawValue    =>sub (){
                    my $self=shift;
                    my $current=shift;
