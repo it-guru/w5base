@@ -119,6 +119,7 @@ sub HistoryResult
                                            grep(/^ALL$/,@view));
             }
             my $h=$self->getPersistentModuleObject("History","base::history");
+            $h->setParent(); # reset parent link
             if (!$h->{IsFrontendInitialized}){
                $h->{IsFrontendInitialized}=$h->FrontendInitialize();
             }

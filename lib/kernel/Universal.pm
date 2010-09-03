@@ -61,6 +61,10 @@ sub getParent
 
 sub setParent
 {
+   if (!defined($_[1])){
+      delete($_[0]->{Parent});
+      return();
+   }
    $_[0]->{Parent}=$_[1];
    weaken($_[0]->{Parent});   
    return($_[0]->{Parent});

@@ -65,6 +65,7 @@ addEvent(window, "load", setTitle);
 EOF
 
    my $h=$self->getPersistentModuleObject("WorkflowLink","base::workflow");
+   $h->setParent(undef); # reset parent link
 
    my $wftype=$self->T("Workflow nature",'base::workflow');
    my @wt=();
@@ -169,6 +170,7 @@ sub WorkflowLinkResult
    my %param=@_;
 
    my $h=$self->getPersistentModuleObject("WorkflowLink","base::workflow");
+   $h->setParent(undef); # reset parent link
    if (!$h->{IsFrontendInitialized}){
       $h->{IsFrontendInitialized}=$h->FrontendInitialize();
    }
