@@ -82,7 +82,7 @@ sub qcheckRecord
    }
 
    if ($#failmsg!=-1){
-      printf STDERR ("check fail:%s\n",Dumper(\@failmsg));
+      #printf STDERR ("check fail:%s\n",Dumper(\@failmsg));
       return(3,{qmsg=>[@failmsg],
                 dataissue=>[@failmsg]});
    }
