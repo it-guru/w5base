@@ -1065,7 +1065,7 @@ sub HandleSave
    my $idname=$idobj->Name();
    my $flt=undef;
    #msg(INFO,"id=$id");
-   if (defined($id)){
+   if (defined($id) && $id ne ""){
       $id=~s/&quote;/"/g;
       $flt={$idname=>\$id};
       $self->SecureSetFilter($flt);
