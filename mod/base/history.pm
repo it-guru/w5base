@@ -31,55 +31,106 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
-      new kernel::Field::Id(        name        =>'id',
-                                    sqlorder    =>'desc',
-                                    label       =>'W5BaseID',
-                                    dataobjattr =>'history.id'),
+      new kernel::Field::Id(
+                name          =>'id',
+                sqlorder      =>'desc',
+                label         =>'W5BaseID',
+                dataobjattr   =>'history.id'),
                                   
-      new kernel::Field::Text(      name        =>'name',
-                                    label       =>'Fieldname',
-                                    dataobjattr =>'history.name'),
+      new kernel::Field::Text(
+                name          =>'name',
+                label         =>'Fieldname',
+                dataobjattr   =>'history.name'),
 
-      new kernel::Field::Text(      name        =>'dataobject',
-                                    label       =>'Dataobject',
-                                    dataobjattr =>'history.dataobject'),
+      new kernel::Field::Text(
+                name          =>'dataobject',
+                label         =>'Dataobject',
+                dataobjattr   =>'history.dataobject'),
 
-      new kernel::Field::Text(      name        =>'dataobjectid',
-                                    label       =>'DataobjectID',
-                                    dataobjattr =>'history.dataobjectid'),
+      new kernel::Field::Text(
+                name          =>'dataobjectid',
+                label         =>'DataobjectID',
+                dataobjattr   =>'history.dataobjectid'),
 
-      new kernel::Field::Text(      name        =>'operation',
-                                    label       =>'Operation',
-                                    dataobjattr =>'history.operation'),
+      new kernel::Field::Text(
+                name          =>'operation',
+                label         =>'Operation',
+                dataobjattr   =>'history.operation'),
 
-      new kernel::Field::Textarea(  name        =>'oldstate',
-                                    label       =>'Old State',
-                                    dataobjattr =>'history.oldstate'),
+      new kernel::Field::Text(
+                name          =>'dataname',
+                label         =>'source data record name',
+                searchable    =>0,
+                htmldetail    =>0,
+                depend        =>['dataobject','dataobjectid'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $app=$self->getParent;
+                   my $dataobj=$current->{dataobject};
+                   my $dataobjid=$current->{dataobjectid};
+                   my $o=$app->getPersistentModuleObject($dataobj);
+                   if (defined($o)){
+                      my @fields=();
+                      my $idobj=$o->IdField();
+                      if (defined($idobj)){
+                         if ($o->getField("fullname")){
+                            push(@fields,"fullname");
+                         }
+                         elsif ($o->getField("name")){
+                            push(@fields,"name");
+                         }
+                         else{
+                            return("-can not idefinify record name field-");
+                         }
+                         $o->SetFilter({$idobj->Name()=>\$dataobjid});
+                         my ($rec)=$o->getOnlyFirst(@fields);
+                         if (defined($rec)){
+                            return($rec->{$fields[0]});
+                         }
+                         else{
+                            return("-record already deleted-");
+                         }
+                      }
+                   }
+                   return(undef);
+                }),
 
-      new kernel::Field::Textarea(  name        =>'newstate',
-                                    label       =>'New State',
-                                    dataobjattr =>'history.newstate'),
+      new kernel::Field::Textarea(
+                name          =>'oldstate',
+                label         =>'Old State',
+                dataobjattr   =>'history.oldstate'),
 
-      new kernel::Field::Textarea(  name        =>'comments',
-                                    label       =>'Comments',
-                                    dataobjattr =>'history.comments'),
+      new kernel::Field::Textarea(
+                name          =>'newstate',
+                label         =>'New State',
+                dataobjattr   =>'history.newstate'),
 
-      new kernel::Field::Creator(   name        =>'creator',
-                                    label       =>'Creator',
-                                    dataobjattr =>'history.createuser'),
+      new kernel::Field::Textarea(
+                name          =>'comments',
+                label         =>'Comments',
+                dataobjattr   =>'history.comments'),
 
-      new kernel::Field::CDate(     name        =>'cdate',
-                                    sqlorder    =>'desc',
-                                    label       =>'Inscription-Date',
-                                    dataobjattr =>'history.createdate'),
+      new kernel::Field::Creator(
+                name          =>'creator',
+                label         =>'Creator',
+                dataobjattr   =>'history.createuser'),
 
-      new kernel::Field::Editor(    name        =>'editor',
-                                    label       =>'Editor',
-                                    dataobjattr =>'history.editor'),
+      new kernel::Field::CDate(
+                name          =>'cdate',
+                sqlorder      =>'desc',
+                label         =>'Inscription-Date',
+                dataobjattr   =>'history.createdate'),
 
-      new kernel::Field::RealEditor(name        =>'realeditor',
-                                    label       =>'RealEditor',
-                                    dataobjattr =>'history.realeditor'),
+      new kernel::Field::Editor(
+                name          =>'editor',
+                label         =>'Editor',
+                dataobjattr   =>'history.editor'),
+
+      new kernel::Field::RealEditor(
+                name          =>'realeditor',
+                label         =>'RealEditor',
+                dataobjattr   =>'history.realeditor'),
 
    );
    $self->{dontSendRemoteEvent}=1;

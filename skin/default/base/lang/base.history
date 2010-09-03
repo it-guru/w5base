@@ -6,3 +6,4 @@
 'Old State'=>{de=>'alter Zustand'},
 'New State'=>{de=>'neuer Zustand'},
 'Inscription-Date'=>{de=>'Eintragungszeit'},
+'source data record name'=>{de=>'Quell Datensatz name'},
