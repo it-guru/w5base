@@ -765,8 +765,9 @@ sub getHashList
    my @resl;
    if (defined($idfield)){
       for(my $c=0;$c<=$#l;$c++){
-         $o->SetFilter({$idname=>$l[$c]->{$idname}});
-         my ($chkrec,$msg)=$o->getOnlyFirst(qw(ALL));
+        # $o->SetFilter({$idname=>$l[$c]->{$idname}});
+        # my ($chkrec,$msg)=$o->getOnlyFirst(qw(ALL));
+         my $chkrec=$l[$c];
          if (defined($chkrec)){
             if (!exists($o->{'SoftFilter'}) ||
                  &{$o->{'SoftFilter'}}($o,$chkrec)){

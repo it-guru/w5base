@@ -115,6 +115,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'usertyp',
                 label         =>'Usertyp',
+                selectfix     =>1,
                 htmleditwidth =>'100px',
                 default       =>'extern',
                 value         =>[qw(extern service user function)],
