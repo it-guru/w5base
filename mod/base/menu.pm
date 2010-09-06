@@ -18,7 +18,6 @@ package base::menu;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel::MenuTree;
 use kernel;
 use kernel::App::Web;
