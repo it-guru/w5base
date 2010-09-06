@@ -48,7 +48,7 @@ sub new
 
 sub getPosibleTargets
 {
-   return(["itil::appl"]);
+   return(["TS::appl"]);
 }
 
 sub qcheckRecord
