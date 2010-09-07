@@ -173,7 +173,7 @@ sub extendPageHeader
    my $curPageHeadRef=shift;
 
    if ($mode eq "Detail" || ($mode=~m/^html/i)){
-      if (!($$curPageHeadRef=~m/^<script id=TextTranslation /)){
+      if (!($$curPageHeadRef=~m/<script id=TextTranslation /)){
          $$curPageHeadRef.=
               "<script id=TextTranslation language=\"JavaScript\" ".
               "src=\"../../base/load/TextTranslation.js\"></script>\n";

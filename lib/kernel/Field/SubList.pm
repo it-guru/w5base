@@ -336,7 +336,7 @@ sub extendPageHeader
    my $current=shift;
    my $curPageHeadRef=shift;
    if ($mode eq "Detail" || ($mode=~m/^html/i)){
-      if (!($$curPageHeadRef=~m/^<script id=sortabletable /)){
+      if (!($$curPageHeadRef=~m/<script id=sortabletable /)){
          $$curPageHeadRef.=
               "<script id=sortabletable language=\"JavaScript\" ".
               "src=\"../../base/load/sortabletable.js\"></script>\n";
