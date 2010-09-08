@@ -801,7 +801,8 @@ sub isViewValid
    my $rec=shift;   # if $rec is undefined, general access to app is checked
    my %param=@_;  
 
-   return();   # ALL means all groups - else return list of fieldgroups
+   return("header","default") if (!defined($rec));
+   return("ALL");
 }
 
 sub isWriteValid

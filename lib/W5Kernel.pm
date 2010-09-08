@@ -3,7 +3,7 @@ use Exporter;
 use Encode;
 @ISA = qw(Exporter);
 @EXPORT = qw(
-             &trim &rtrim &ltrim
+             &trim &rtrim &ltrim &in_array
              &msg &ERROR &WARN &DEBUG &INFO &OK &UTF8toLatin1
              );
 
@@ -87,6 +87,19 @@ sub UTF8toLatin1
       $dd=encode("iso-8859-1", $dd);
    }
    return($dd);
+}
+
+sub in_array
+{
+   my ($arr,$search_for) = @_;
+   my %items = map {$_ => 1} @$arr; # create a hash out of the array values
+   if (ref($search_for) eq "ARRAY"){
+      foreach my $search_for_loop (@$search_for){
+         return(1) if (exists($items{$search_for_loop}));
+      }
+      return(0);
+   }
+   return (exists($items{$search_for}))?1:0;
 }
 
 

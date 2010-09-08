@@ -101,5 +101,17 @@ sub isViewValid
    return("ALL");
 }
 
+sub isWriteValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(undef) if (!defined($rec));
+   return("mapping") if ($self->IsMemberOf("admin"));
+   return(undef);
+}
+
+
+
+
 
 1;

@@ -97,17 +97,34 @@ sub qcheckRecord
          $errorlevel=3 if ($errorlevel<3);
       }
       else{
-         if ($parrec->{systemos} eq ""){
-            $parrec->{systemos}="other";
+         #
+         # osrelease mapping
+         #
+         my $mapos=$dataobj->ModuleObject("tsacinv::lnkw5bosrelease");
+         $mapos->SetFilter({extosrelease=>\$parrec->{systemos}});
+         my ($maposrec,$msg)=$mapos->getOnlyFirst(qw(id w5bosrelease));
+         if (defined($maposrec)){
+            if ($maposrec->{w5bosrelease} ne ""){
+               $parrec->{systemos}=$maposrec->{w5bosrelease};
+            }
+            else{
+               delete($parrec->{systemos});
+            }
          }
-         
-         $parrec->{systemos}=~s/[\*\?]/_/g;
-         my $os=getModuleObject($self->getParent->Config(),"itil::osrelease");
-         $os->SetFilter({name=>'"'.$parrec->{systemos}."'"});
-         my ($osrec,$msg)=$os->getOnlyFirst(qw(id name));
-         if (!defined($osrec)){
+         else{
+            $mapos->ValidatedInsertRecord({extosrelease=>$parrec->{systemos},
+                                           direction=>1});
             delete($parrec->{systemos});
          }
+         #################################################################### 
+         
+   #      $parrec->{systemos}=~s/[\*\?]/_/g;
+   #      my $os=getModuleObject($self->getParent->Config(),"itil::osrelease");
+   #      $os->SetFilter({name=>'"'.$parrec->{systemos}."'"});
+   #      my ($osrec,$msg)=$os->getOnlyFirst(qw(id name));
+   #      if (!defined($osrec)){
+   #         delete($parrec->{systemos});
+   #      }
 
 
          $self->IfaceCompare($dataobj,
@@ -148,7 +165,7 @@ sub qcheckRecord
                              $parrec,"systemos",
                              $forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'string');
+                             mode=>'leftouterlink');
          if ($rec->{allowifupdate}){
    #printf STDERR ("ac=%s\n",Dumper($parrec->{ipaddresses}));
    #printf STDERR ("w5=%s\n",Dumper($rec->{ipaddresses}));

@@ -98,6 +98,11 @@ sub Init
    $self->RegisterObj("ac.krn.osrelease",
                       "tsacinv::osrelease",
                       defaultacl=>['valid_user']);
+
+   $self->RegisterObj("ac.krn.osrelease.lnkw5b",
+                      "tsacinv::lnkw5bosrelease",
+                      func=>'MainWithNew',
+                      defaultacl=>['admin']);
    
    $self->RegisterObj("ac.krn.service",
                       "tsacinv::service",

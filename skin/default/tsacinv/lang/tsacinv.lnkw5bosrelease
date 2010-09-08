@@ -1,0 +1,3 @@
+'tsacinv::lnkw5bosrelease'=>{de=>'Betriebssystem Mapping',en=>'OS Release mapping'},
+'DIR.1'=>{de=>'primär',en=>'primary'},
+'DIR.'=>{de=>'alernativ',en=>'alternate'},

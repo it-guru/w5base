@@ -15,6 +15,7 @@
 'ac.krn.costcenter'=>{de=>'Kostenstelle',en=>'CostCenter'},
 'ac.krn.customer'=>{de=>'Kunden',en=>'Customer'},
 'ac.krn.osrelease'=>{de=>'Betriebssystem',en=>'Operationsystem'},
+'ac.krn.osrelease.lnkw5b'=>{de=>'W5B Mapping',en=>'W5B Mapping'},
 'ac.krn.dictonary'=>{de=>'DBDictonary',en=>'DBDictonary'},
 'ac.group'=>{de=>'Gruppe',en=>'Group'},
 'ac.user'=>{de=>'Benutzer',en=>'User'},

@@ -134,7 +134,8 @@ sub IfaceCompare
          }
       }
    }
-   elsif ($param{mode} eq "leftouterlinkcreate"){  # like servicesupprt links
+   elsif ($param{mode} eq "leftouterlinkcreate" ||
+          $param{mode} eq "leftouterlink"){  # like servicesupprt links
       if (exists($comprec->{$compfieldname}) &&
           defined($comprec->{$compfieldname}) &&
           (!defined($origrec->{$origfieldname}) ||
@@ -147,16 +148,24 @@ sub IfaceCompare
                                "\"".$comprec->{$compfieldname}."\"");
             my ($chkrec,$msg)=$chkobj->getOnlyFirst($lnkfield->{vjoinon}->[1]);
             if (!defined($chkrec)){
-               my $newrec={};
-               if (ref($param{onCreate}) eq "HASH"){
-                  foreach my $k (keys(%{$param{onCreate}})){
-                     $newrec->{$k}=$param{onCreate}->{$k};
+               if ($param{mode} eq "leftouterlinkcreate"){
+                  my $newrec={};
+                  if (ref($param{onCreate}) eq "HASH"){
+                     foreach my $k (keys(%{$param{onCreate}})){
+                        $newrec->{$k}=$param{onCreate}->{$k};
+                     }
                   }
+                  $chkobj->ValidatedInsertRecord($newrec);
+                  $takeremote++;
                }
-               $chkobj->ValidatedInsertRecord($newrec);
+               else{
+                  msg(ERROR,"invalid value '$comprec->{$compfieldname}'");
+               }
+            }
+            else{
+               $takeremote++;
             }
          }
-         $takeremote++;
       }
    }
    elsif ($param{mode} eq "integer"){  # like amounth of memory

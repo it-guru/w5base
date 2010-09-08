@@ -966,6 +966,7 @@ sub new
 
       new kernel::Field::Interview(),
       new kernel::Field::QualityText(),
+      new kernel::Field::IssueState(),
       new kernel::Field::QualityState(),
       new kernel::Field::QualityOk(),
       new kernel::Field::QualityLastDate(
@@ -1247,6 +1248,9 @@ sub isViewValid
               attachments control systemclass interview);
    if (defined($rec) && $rec->{'isclusternode'}){
       push(@all,"cluster");
+   }
+   if ($self->IsMemberOf("admin")){
+      push(@all,"qc");
    }
    return(@all);
 }

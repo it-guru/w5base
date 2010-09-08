@@ -492,6 +492,7 @@ sub new
                 dataobjattr   =>'lnkcontact.croles'),
 
       new kernel::Field::QualityText(),
+      new kernel::Field::IssueState(),
       new kernel::Field::QualityState(),
       new kernel::Field::QualityOk(),
       new kernel::Field::QualityLastDate(

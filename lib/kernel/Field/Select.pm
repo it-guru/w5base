@@ -19,7 +19,6 @@ package kernel::Field::Select;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use Data::Dumper;
 use Text::ParseWords;
 
 @ISA    = qw(kernel::Field);
@@ -280,10 +279,13 @@ sub Validate
       }
       else{
          my @options=$self->getPostibleValues($oldrec,$newrec,"edit");
-         my @nativ;
+         my @nativ=@options;
+               printf STDERR ("options=%s\n",Dumper(\@options));
+         my %backmap=();
          while($#options!=-1){
             my $key=shift(@options);
-            push(@nativ,$key);
+            my $val=shift(@options);
+            $backmap{$val}=$key;
          }
          my $failfound=0;
          my $chkval=$val;
@@ -301,9 +303,25 @@ sub Validate
          if ($self->{allownative} eq "1"){
             $failfound=0;
          }
-         return({$self->Name()=>$val}) if (!$failfound);
-         $self->getParent->LastMsg(ERROR,"invalid native value ".
-                                         "'$val' in $name");
+         if (!$failfound){
+            if (defined($self->{dataobjattr})){
+               return({$self->Name()=>$val});
+            }
+            else{
+               if (defined($self->{vjointo}) &&
+                   defined($self->{vjoinon}) &&
+                   ref($self->{vjoinon}) eq "ARRAY"){
+                  return({$self->{vjoinon}->[0]=>$backmap{$val}});
+               }
+               $self->getParent->LastMsg(ERROR,"invalid write request ".
+                                               "to Select field '$name'");
+               return(undef); 
+            }
+         }
+         else{
+            $self->getParent->LastMsg(ERROR,"invalid native value ".
+                                            "'$val' in $name");
+         }
          return(undef);
       }
    }
@@ -316,7 +334,14 @@ sub FormatedResult
    my $current=shift;
    my $FormatAs=shift;
    my $d=$self->RawValue($current);
-   $d=[]   if (!defined($d));
+   if (!defined($d)){
+      if (defined($self->{value}) && in_array($self->{value},undef)){
+         $d=[undef];
+      }
+      else{
+         $d=[];
+      }
+   }
    $d=[$d] if (ref($d) ne "ARRAY");
   
    if (defined($self->{getPostibleValues}) &&
