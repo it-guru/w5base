@@ -747,7 +747,7 @@ create table lnkapplitclust   (
   KEY appl (appl),UNIQUE applcl(itsvcname,subitsvcname,itclust),
   KEY clust(itclust),key swi(swinstance),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table swinstance add ssl_url varchar(128) default NULL;
 alter table swinstance add ssl_cert_check datetime default NULL;
 alter table swinstance add ssl_cert_end datetime default NULL;
@@ -825,3 +825,33 @@ create table dnsalias (
   UNIQUE KEY `srcsys` (srcsys,srcid), unique KEY (dnsalias,dnsname)
 );
 alter table appl  add applbasemoni varchar(20) default NULL;
+create table storageclass (
+  id         bigint(20) NOT NULL,
+  name       varchar(40) NOT NULL,
+  cistatus   int(2)      NOT NULL,
+  comments   longtext    default NULL,
+  slaavail   double(8,2) default NULL,
+  nbratio    double(8,2) default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) NOT NULL default '0',
+  modifyuser bigint(20) NOT NULL default '0',
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  PRIMARY KEY  (id),
+  UNIQUE KEY name (name)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+create table storagetype (
+  id         bigint(20) NOT NULL,
+  name       varchar(20) NOT NULL,
+  cistatus   int(2)      NOT NULL,
+  comments   longtext    default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) NOT NULL default '0',
+  modifyuser bigint(20) NOT NULL default '0',
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  PRIMARY KEY  (id),
+  UNIQUE KEY name (name)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
