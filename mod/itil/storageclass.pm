@@ -41,7 +41,7 @@ sub new
                                                   
       new kernel::Field::Text(
                 name          =>'name',
-                htmlwidth     =>'180px',
+                htmlwidth     =>'250px',
                 label         =>'Name',
                 dataobjattr   =>'storageclass.name'),
 
@@ -122,7 +122,7 @@ sub new
    
 
    );
-   $self->setDefaultView(qw(name producer cistatus cdate mdate));
+   $self->setDefaultView(qw(name nettobruttoratio slaavail cistatus cdate mdate));
    $self->setWorktable("storageclass");
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","admin.itil.storageclass"],
