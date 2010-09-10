@@ -357,12 +357,39 @@ sub Init
                       "itil::costcenter",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itil.kern.storagetype",
+                      "itil::storagetype",
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("itil.kern.storagetype.new",
+                      "itil::storagetype",
+                      func=>'New',
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itil.kern.storageclass",
+                      "itil::storageclass",
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("itil.kern.storageclass.new",
+                      "itil::storageclass",
+                      func=>'New',
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("itil.proc",
                       "tmpl/welcome",
                       prio=>20000);
    
    $self->RegisterObj("itil.proc.ChangeManagement",
                       "itil::chmmgmt",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("invoice.lnkapplinvoicestor",
+                      "itil::lnkapplinvoicestor",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("invoice.lnkapplinvoicestor.new",
+                      "itil::lnkapplinvoicestor",
+                      func=>'New',
                       defaultacl=>['admin']);
 
    $self->RegisterObj('itil::workflow::businesreq$',

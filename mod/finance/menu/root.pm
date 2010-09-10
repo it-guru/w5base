@@ -18,7 +18,6 @@ package finance::menu::root;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::MenuRegistry;
 @ISA=qw(kernel::MenuRegistry);
@@ -57,6 +56,10 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("invoice",
+                      "tmpl/welcome",
+                      defaultacl=>['admin']);
+   
    $self->RegisterObj("Tools.teamtools.costteamfixup",
                       "finance::costteamfixup",
                       defaultacl=>['valid_user']);

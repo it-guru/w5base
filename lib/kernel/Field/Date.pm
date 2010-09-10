@@ -31,6 +31,7 @@ sub new
    $self->{dayonly}=0                    if (!defined($self->{dayonly}));
    $self->{timezone}="GMT"               if (!defined($self->{timezone}));
    $self->{htmlwidth}="150"              if (!defined($self->{htmlwidth}));
+   $self->{htmleditwidth}="200"          if (!defined($self->{htmleditwidth}));
    $self->{xlswidth}="20"                if (!defined($self->{xlswidth}));
    $self->{WSDLfieldType}="xsd:dateTime" if (!defined($self->{WSDLfieldType}));
    return($self);
