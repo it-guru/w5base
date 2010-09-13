@@ -445,8 +445,11 @@ sub ValidateCaches
          }
          else{
             if ($UserCache->{$ENV{REMOTE_USER}}->{rec}->{cistatusid}==3){
-               $self->GTCverification();
-               return(0);
+               if (!$self->GTCverification()){
+                  return(0);
+               }
+               $self->ValidateUserCache($res->{User});
+               return(1);
             }
             print("Content-type:text/plain;charset=ISO-8895-1\n\n");
             printf(msg(ERROR,$self->T("access for user '\%s' to W5Base ".
@@ -466,23 +469,60 @@ sub ValidateCaches
 sub GTCverification
 {
    my $self=shift;
+   my $gtc=$self->getParsedTemplate("tmpl/gtc",{skinbase=>'base'});
+   if (Query->Param("GTCSURE") eq "OK"){
+      my $txt=Query->Param("GTCTEXT");
+      $txt=~s/\r\n/\n/g;
+      if ($txt eq $gtc){
+         my $userid=$self->getCurrentUserId();
+         my $user=getModuleObject($self->Config(),"base::user");
+         $user->SetFilter({userid=>\$userid,cistatusid=>\'3'});
+         my ($urec)=$user->getOnlyFirst(qw(ALL));
+         if (defined($urec)){
+            my $gtcdate=NowStamp("en");
+            if ($user->ValidatedUpdateRecord($urec,{cistatusid=>'4',
+                                                    gtcack=>$gtcdate,
+                                                    gtctext=>$txt},
+                                             {userid=>\$userid})){
+               msg(INFO,"activation of user account $userid ok");
+               my $currenturl=$ENV{SCRIPT_URI};
+               $currenturl=~
+                  s/\/(auth|public)\/.*/\/auth\/base\/menu\/msel\/MyW5Base/;
+               $self->HtmlGoto($currenturl);
+               return(0);
+            }
+                                                    
+         }
+      }
+      else{
+         $self->LastMsg(ERROR,"gtc text has been accepted unmodified");
+      }
+   }
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css'],
                            body=>1,form=>1,
                            title=>'W5Base - GTC verification');
+   print ("<input type=hidden name=GTCSURE value=''>");
    my $sitename=$self->Config->Param("SITENAME");
-   my $gtc=$self->getParsedTemplate("tmpl/gtc",{skinbase=>'base'});
+   my $suremsg=$self->T("You are sure, you will accept the completly GTC's\n".
+                        "and have understood all consequences?");
+   my $nomsg=$self->T("Without accepted GTC's, no access could be granted!");
    print(<<EOF);
 <script language="JavaScript">
 function GTC_accept()
 {
- confirm("You are sure, you will accept the completly GTC's\\n"+
-         " and have understood all consequences?");
-
+   if (confirm("$suremsg")){
+      document.forms[0].elements['GTCSURE'].value="OK";
+      document.forms[0].submit();
+   }
 }
 function GTC_decline()
 {
-  alert("Without accepted GTC's, no access could be granted!");
+  alert("$nomsg");
+}
+// framebreaker
+if (top.location != self.location) {
+    top.location = self.location.href
 }
 
 </script>
@@ -497,6 +537,7 @@ EOF
                            });
 
    print $self->HtmlBottom(body=>1,form=>1);
+   return(0);
 }
 
 
@@ -833,7 +874,7 @@ sub HandleNewUser
                # it already exists as an external user
                #
                my $updrec={usertyp=>'user',creator=>$urec->{userid}};
-               $updrec->{cistatusid}=4 if ($urec->{cistatusid}<4);
+               $updrec->{cistatusid}=3 if ($urec->{cistatusid}<4);
                $user->ValidatedUpdateRecord($urec,$updrec,
                                    {userid=>\$urec->{userid}});
             }
@@ -851,9 +892,9 @@ sub HandleNewUser
                                      userid=>$userid,
                                      owner=>$userid,
                                      creator=>$userid,
-                                     cistatusid=>4});
+                                     cistatusid=>3});
                }
-               if (defined($id)){
+               if (!defined($id)){
                   printf("Content-type:text/plain\n\n".
                          "ERROR: can't insert User\n");
                   return(0);
@@ -881,7 +922,7 @@ sub HandleNewUser
                                    $ENV{REMOTE_USER});
                $self->W5ServerCall("rpcCacheInvalidate","User",
                                    $ENV{REMOTE_USER});
-               return(0);
+               return(1);
             }
             else{
                $self->LastMsg(ERROR,"verification failed - unknown error");
@@ -984,6 +1025,11 @@ sub HandleNewUser
                                      skinbase=>'base'
                                       });
       }
+      print("\n<script language=\"JavaScript\">".
+            "if (top.location != self.location){".
+            "top.location=self.location.href;".
+            "}</script>\n");
+
       print $self->HtmlBottom(body=>1,form=>1);
       return(0);
    }
