@@ -108,7 +108,7 @@ sub CleanupHistory
    my $self=shift;
    my $hist=getModuleObject($self->getParent->Config,"base::history");
    my $CleanupHistory=$self->getParent->Config->Param("CleanupHistory");
-   $CleanupHistory="<now-365d" if ($CleanupHistory eq "");
+   $CleanupHistory="<now-730d" if ($CleanupHistory eq "");
 
    $hist->SetFilter({cdate=>$CleanupHistory});
    $hist->SetCurrentView(qw(ALL));

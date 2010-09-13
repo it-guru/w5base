@@ -280,6 +280,7 @@ sub Validate
       else{
          my @options=$self->getPostibleValues($oldrec,$newrec,"edit");
          my @nativ=@options;
+               printf STDERR ("options=%s\n",Dumper(\@options));
          my %backmap=();
          while($#options!=-1){
             my $key=shift(@options);
@@ -303,7 +304,7 @@ sub Validate
             $failfound=0;
          }
          if (!$failfound){
-            if (defined($self->{dataobjattr})){
+            if (defined($self->{dataobjattr}) || defined($self->{container})){
                return({$self->Name()=>$val});
             }
             else{

@@ -20,6 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::App::Web;
+use kernel::App::Web::Listedit;
 use kernel::DataObj::DB;
 use kernel::Field;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);

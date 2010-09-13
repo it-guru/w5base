@@ -137,15 +137,20 @@ sub new
    return($self);
 }
 
-#sub Initialize
-#{
-#   my $self=shift;
-#
-#   my @result=$self->AddDatabase(DB=>new kernel::database($self,"sigfilestore"));
-#   return(@result) if (defined($result[0]) eq "InitERROR");
-#   return(1) if (defined($self->{DB}));
-#   return(0);
-#}
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   my $parentobj=trim(effVal($oldrec,$newrec,"parentobj"));
+   if ($parentobj ne "itil::system"){
+      $self->LastMsg(ERROR,"used parentobject is not suppored");
+      return(undef);
+   }
+   return(1);
+}
+
 
 sub getDetailBlockPriority
 {
@@ -154,10 +159,6 @@ sub getDetailBlockPriority
    my %param=@_;
    return("header","default","sig","soure");
 }
-
-
-
-
 
 
 sub isViewValid

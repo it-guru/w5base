@@ -15,7 +15,7 @@ if [ -r "$HOME/.cfmaccmgr" ]; then
 fi
 
 #
-# Parameter der Operation: [-d] [targetname] [label] [datei]
+# Parameters: [-d] [-g group] [-f] FILTER
 #
 
 ########################################################################
@@ -195,13 +195,16 @@ if [ "$TARGETPROT" = "https" ]; then
    fi
 fi
 if [ "$TRANSFERCMD" != "" ]; then
-   (
+   D=`(
    echo "PUT $TARGETPROT://$TARGETHOST$TARGETPATH HTTP/1.0"
    echo "Content-type: text/plain"
    echo "Content-length: $LENGTH"
    echo ""
    cat $BUFFER
-   )  |tee /tmp/opt | eval $TRANSFERCMD | awk '
+   ) | eval $TRANSFERCMD `
+
+
+   echo "$D" |awk '
    BEGIN{
      FS=":";
      out=0;
