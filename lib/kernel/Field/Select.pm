@@ -280,7 +280,6 @@ sub Validate
       else{
          my @options=$self->getPostibleValues($oldrec,$newrec,"edit");
          my @nativ=@options;
-               printf STDERR ("options=%s\n",Dumper(\@options));
          my %backmap=();
          while($#options!=-1){
             my $key=shift(@options);
