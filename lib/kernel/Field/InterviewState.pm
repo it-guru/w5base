@@ -75,7 +75,7 @@ sub FormatedResult
          }
       }
    }
-   if ($mode=~m/^Html/){
+   if (($mode=~m/^Html/) || ($mode=~m/^Xls/)){
       return("Total: $total / Open: $todo");
    }
    return({total=>$total,todo=>$todo,qStat=>$d->{qStat},
