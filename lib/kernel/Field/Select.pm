@@ -303,7 +303,8 @@ sub Validate
             $failfound=0;
          }
          if (!$failfound){
-            if (defined($self->{dataobjattr}) || defined($self->{container})){
+            if (defined($self->{dataobjattr}) || defined($self->{container}) ||
+                defined($self->{onFinishWrite})){
                return({$self->Name()=>$val});
             }
             else{
