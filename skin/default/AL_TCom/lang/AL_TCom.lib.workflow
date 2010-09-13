@@ -277,4 +277,4 @@
 '.BPQadmin'=>           {en=>'BPQ-Administrative Tätigkeiten',
                          de=>'BPQ-Administrative Tätigkeiten'},
 '.BPQcoordination'=>    {en=>'BPQ-Koordination Abstimmung',
-                         de=>'BPQ-Analyse Fehlerbehebung'},
+                         de=>'BPQ-Koordination Abstimmung'},
