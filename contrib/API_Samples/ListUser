@@ -66,14 +66,14 @@ my $blk=50;
 my @l;
 do{
    $user->Limit($st+$blk,$st);
-   if (@l=$user->getHashList(qw(fullname surname accounts))){
+   if (@l=$user->getHashList(qw(fullname surname accounts userid))){
       if ($#l==-1){
          msg(INFO,"no data found in $objectname matching fullname=$flt");
          exit(2);
       }
       else{
          foreach my $rec (@l){
-             printf("%s\n",UTF8toLatin1($rec->{fullname}));
+             printf("%s  (%s)\n",UTF8toLatin1($rec->{fullname}),$rec->{userid});
              if (ref($rec->{accounts}) eq "ARRAY"){
                 foreach my $arec (@{$rec->{accounts}}){
                    printf(" - $arec->{account}\n");
