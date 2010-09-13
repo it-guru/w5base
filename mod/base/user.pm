@@ -156,7 +156,7 @@ sub new
                 name          =>'userid',
                 label         =>'W5BaseID',
                 size          =>'10',
-                group         =>'userro',
+                group         =>'userid',
                 dataobjattr   =>'contact.userid'),
                                   
       new kernel::Field::Text(
@@ -998,26 +998,26 @@ sub isViewValid
       push(@pic,"picture","roles","interview","history");
    }
    if ($rec->{usertyp} eq "extern"){
-      @gl=qw(header name default comments groups userro control 
+      @gl=qw(header name default comments groups userid userro control 
                 office private qc);
    }  
    elsif ($rec->{usertyp} eq "function"){
       if ($self->IsMemberOf("admin")){
          @gl=qw(header name default nativcontact comments 
-                   control userro qc);
+                   control userid userro qc);
       }
       else{
-         @gl=qw(header name default nativcontact comments userro qc);
+         @gl=qw(header name default nativcontact comments userid userro qc);
       }
    }  
    elsif ($rec->{usertyp} eq "service"){
-      @gl=qw(header name default comments groups nativcontact usersubst userro 
-                control userparam qc);
+      @gl=qw(header name default comments groups nativcontact usersubst 
+             userid userro control userparam qc);
    }  
    else{
       @gl=(@pic,
              qw(default name office officeacc private userparam groups 
-                userro control usersubst header qc interview));
+                userid userro control usersubst header qc interview));
    }
    my $secstate=$self->getCurrentSecState();
    if ($rec->{userid}!=$userid){
@@ -1025,10 +1025,10 @@ sub isViewValid
          @gl=grep(/^(name|header)$/,@gl);
       }
       elsif ($secstate<3){
-         @gl=grep(/^(name|header|office|default|groups|comments|nativcontact|qc)$/,@gl);
+         @gl=grep(/^(name|header|office|default|groups|comments|nativcontact|userid|qc)$/,@gl);
       }
       elsif ($secstate<4){
-         @gl=grep(/^(name|header|office|officeacc|private|default|groups|comments|nativcontact|control|qc)$/,@gl);
+         @gl=grep(/^(name|header|office|officeacc|private|default|groups|comments|nativcontact|userid|control|qc)$/,@gl);
       }
    }
    if ($userid==$rec->{userid}){
@@ -1258,7 +1258,7 @@ sub getDetailBlockPriority
    my %param=@_;
    return(qw(header name picture default comments nativcontact office 
              officeacc private personrelated 
-             userparam control groups usersubst));
+             userparam control groups usersubst userid userro ));
 }
 
 sub getDetailFunctions
