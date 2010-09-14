@@ -91,6 +91,13 @@ sub new
                 group         =>'systeminfo',
                 dataobjattr   =>'system.shortdesc'),
 
+      new kernel::Field::Text(
+                name          =>'assetassetname',
+                readonly      =>1,
+                group         =>'assetinfo',
+                label         =>'Asset-Name',
+                dataobjattr   =>'asset.name'),
+
       new kernel::Field::TextDrop(
                 name          =>'assetlocation',
                 group         =>'assetinfo',
@@ -427,7 +434,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'assetid',
-                label         =>'AssetID',
+                label         =>'AssetID W5BaseID',
                 dataobjattr   =>'system.asset'),
 
       new kernel::Field::Link(
