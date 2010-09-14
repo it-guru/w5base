@@ -215,7 +215,7 @@ sub new
                 vjointo       =>'itil::lnkapplsystem',
                 vjoinbase     =>[{applcistatusid=>"<=4",
                                   systemcistatusid=>"<=5"}],
-                vjoinon       =>['id'=>'systemid'],
+                vjoinon       =>['id'=>'assetid'],
                 vjoindisp     =>['businessteam']),
 
       new kernel::Field::SubList(
