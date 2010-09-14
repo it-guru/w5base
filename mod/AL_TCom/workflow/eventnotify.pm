@@ -506,12 +506,12 @@ sub ValidateCreate
   #
   # laut Tino soll nun auch Extern und DSS zugelassen werden
   #
-   if (!defined($newrec->{mandator}) ||    
-       ref($newrec->{mandator}) ne "ARRAY" ||
-       !grep(/^(Extern|AL DTAG|DSS|TSS)$/,@{$newrec->{mandator}})){
-      $self->LastMsg(ERROR,"no AL DTAG,TSS Extern or DSS mandator included");
-      return(0);
-   }
+#   if (!defined($newrec->{mandator}) ||    
+#       ref($newrec->{mandator}) ne "ARRAY" ||
+#       !grep(/^(Extern|AL DTAG|DSS|TSS)$/,@{$newrec->{mandator}})){
+#      $self->LastMsg(ERROR,"no AL DTAG,TSS Extern or DSS mandator included");
+#      return(0);
+#   }
         
    return(1);
 }

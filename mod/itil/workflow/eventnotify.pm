@@ -2226,10 +2226,28 @@ sub nativProcess
          $self->getParent->LastMsg(ERROR,"invalid event start");
          return(0);
       }
-      $h->{step}=$self->getNextStep() if ($h->{step} eq "");
-      if (!$self->StoreRecord($WfRec,$h)){
+      my @inm=$self->getParent->getMembersOf($h->{mandatorid},
+                                             ['RINManager'],'up');
+      if ($#inm==-1){
+         $self->getParent->LastMsg(ERROR,"no incident managers found for ".
+                                         "selected config-item");
          return(0);
       }
+      $h->{step}=$self->getNextStep() if ($h->{step} eq "");
+      my $newid;
+      if (!($newid=$self->StoreRecord($WfRec,$h))){
+         return(0);
+      }
+      my $userid=$self->getParent->getParent->getCurrentUserId();
+      if (!in_array(\@inm,$userid)){
+         # notify incident manager in selected mandator area
+         $self->getParent->getParent->Action->NotifyForward(
+            $newid,undef,undef,undef,
+            $self->getParent->T("A new event information has been registered by a non incident manager. Please ensure that all neassasary actions be done, to handle this workflow correctly!"),
+            addtarget=>\@inm,sendercc=>1,mode=>'INFO:');
+
+      }
+
       return(1);
    }
    return(0);

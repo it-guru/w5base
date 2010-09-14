@@ -1,1 +1,3 @@
 'invalid event start'=>{de=>'ungültiges Ereignisbeginn'},
+'A new event information has been registered by a non incident manager. Please ensure that all neassasary actions be done, to handle this workflow correctly!'=>{de=>'Eine neue Ereignisinformation wurde von einem NICHT-Incident-Manager erfasst. Bitte stellen Sie sicher, dass für diese Ereignisinfo alle notwendigen Prozessschritte durchgeführt werden!'},
+'no incident managers found for selected config-item'=>{de=>'Es existieren keine Incident-Manager für das gewählte Config-Item'},
