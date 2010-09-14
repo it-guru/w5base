@@ -455,15 +455,19 @@ sub Sendmail
             $mail.="ORGANIZER;".$terminfrom."\n";
             # aus to
             foreach my $e (@emailto){
-               $mail.="ATTENDEE;ROLE=REQ-PARTICIPANT;".
-                      "PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=:".
-                      "MAILTO:$e\n";
+               if ($e ne ""){
+                  $mail.="ATTENDEE;ROLE=REQ-PARTICIPANT;".
+                         "PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=:".
+                         "MAILTO:$e\n";
+               }
             }
             # aus cc
             foreach my $e (@emailcc){
-               $mail.="ATTENDEE;ROLE=OPT-PARTICIPANT;".
-                      "PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=:".
-                      "MAILTO:$e\n";
+               if ($e ne ""){
+                  $mail.="ATTENDEE;ROLE=OPT-PARTICIPANT;".
+                         "PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=:".
+                         "MAILTO:$e\n";
+               }
             }
             
             $mail.="DTSTART;TZID=GMT:".
