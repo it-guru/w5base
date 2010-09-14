@@ -169,6 +169,7 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
+   return(qw(header default)) if (!defined($rec));
    return(qw(header default id acl));
 }
 
@@ -176,7 +177,7 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default") if (!defined($rec));  # new record is ok
+  # return("default") if (!defined($rec));  # new record is ok
    return(qw(default acl)) if ($self->IsMemberOf("admin"));
    return(undef);
 }
