@@ -176,7 +176,7 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-  # return("default") if (!defined($rec));  # new record is ok
+   return("default") if (!defined($rec));  # new record is ok
    return(qw(default acl)) if ($self->IsMemberOf("admin"));
    return(undef);
 }
