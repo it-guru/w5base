@@ -4,8 +4,19 @@ Fall können Sie folgenden Ausdrücke verwenden:<br>
 <table width=100%>
 
 <tr>
+<td colspan=2>
+<b>Zeitpunkt angaben:</b>
+</td>
+</tr>
+
+<tr>
 <td nowrap valign=top><b>12:30:00</b></td>
 <td>...dies verwendet das aktuelle Datum und die angegebene Zeit zur Suche</td>
+</tr>
+
+<tr>
+<td nowrap valign=top><b>01.01.2010</b></td>
+<td>...dies verwendet die Zeit 00:00:00 am 01.01.2010. Wenn Sie eine andere Zeit verwenden möchten, geben Sie diese einfach mit einem Leerzeichen getrennt hinter dem Datum an. (z.B.&nbsp;01.01.2010&nbsp;14:22)</td>
 </tr>
 
 <tr>
@@ -18,6 +29,28 @@ Fall können Sie folgenden Ausdrücke verwenden:<br>
 <td>... dies verwendet aktuelle Datum aber als Zeit 00:00:00 zur Suche</td>
 </tr>
 
+<tr>
+<td nowrap valign=top><b><a href=JavaScript:SendData("heute+1d")>heute+1d</a></b></td>
+<td>... mit diesem Ausdruck können Sie alle Datensätze suchen, die morgen 00:00:00 als Zeitpunkt eingetragen haben.</td>
+</tr>
+
+<tr>
+<td nowrap valign=top><b><a href=JavaScript:SendData("now-5h")>now-5h</a></b></td>
+<td>... mit diesem Ausdruck können Sie alle Datensätze suchen, die in dem jeweiligen Feld den Zeitpunkt vor 5 Stunden eingetragen haben.</td>
+</tr>
+
+<tr>
+<td nowrap valign=top><b>01.02.2010-2Y</b></td>
+<td>...dies verwendet die Zeit 00:00:00 am 01.02.2008.</td>
+</tr>
+
+<tr>
+<td colspan=2><br><br>
+<b>Zeitbereichsangaben (nicht bei allen Zeit-Feldern möglich):</b>
+</td>
+</tr>
+
+</tr>
 <tr>
 <td nowrap valign=top><b><a href=JavaScript:SendData("lastmonth")>lastmonth</a></b></td>
 <td>... es werden alle Datensätze aufgelistet, bei denen der geweilige Zeitstempel innerhalb des letzten (Kalendermonats) Monats lagen.</td>
@@ -34,16 +67,6 @@ Fall können Sie folgenden Ausdrücke verwenden:<br>
 </tr>
 
 <tr>
-<td nowrap valign=top><b><a href=JavaScript:SendData("heute+1d")>heute+1d</a></b></td>
-<td>... mit diesem Ausdruck können Sie alle Datensätze suchen, die morgen 00:00:00 als Zeitpunkt eingetragen haben.</td>
-</tr>
-
-<tr>
-<td nowrap valign=top><b><a href=JavaScript:SendData("now-5h")>now-5h</a></b></td>
-<td>... mit diesem Ausdruck können Sie alle Datensätze suchen, die in dem jeweiligen Feld den Zeitpunkt vor 5 Stunden eingetragen haben.</td>
-</tr>
-
-<tr>
 <td nowrap valign=top><b><a href=JavaScript:SendData("(11/2008)")>(11/2008)</a></b></td>
 <td>... mit diesem Ausdruck können Sie alle Datensätze suchen, die in dem jeweiligen Feld einen Zeitpunkt innerhalb des Monats 11 des Jahres 2008 eingetragen haben.</td>
 </tr>
@@ -55,7 +78,7 @@ Fall können Sie folgenden Ausdrücke verwenden:<br>
 
 <tr>
 <td valign=top colspan=2><br>
-<b>Komplexe Ausdücke:</b><br>
+<b>Komplexe Ausdücke bei Zeitstempel Feldern:</b><br>
 Sie können auch komplexe Ausdücke in Form von logischen Verkettungen eingeben. Es sind damit Abfragen über wahlfreihe Zeitbereiche machbar.<br><br>
 <u><b>Beispiel:</b></u><br><br>
 <b><a href='JavaScript:SendData("&gt;jetzt-1M AND &lt;jetzt+1M")'>&gt;jetzt-1M AND &lt;jetzt+1M</a></b><br>
