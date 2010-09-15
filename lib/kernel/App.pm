@@ -279,7 +279,8 @@ sub getMembersOf
    my $self=shift;
    my $group=shift;
    my $roles=shift;
-   my $direction="down";
+   my $direction=shift;
+   $direction="down" if (!defined($direction));
    $group=[$group]      if (ref($group) ne "ARRAY");
    $roles=["RMember"]   if (!defined($roles));
    my %allgrp;
