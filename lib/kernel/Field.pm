@@ -949,8 +949,11 @@ sub FormatedSearch
           "src=\"../../../public/base/load/questionmark.gif\" ".
           "border=0>";
       $d.="</td>";
-      my $q=kernel::cgi::Hash2QueryString(field=>"search_$name",
-                                          label=>$label);
+      my $q=kernel::cgi::Hash2QueryString(
+            field=>"search_$name",
+            TITLE=>$self->getParent->T("field search help"),
+            label=>$label);
+      $q=~s/%/\\%/g;
       $d.=<<EOF;
 <script langauge="JavaScript">
 function FieldHelp_On_$name()

@@ -53,6 +53,20 @@ Fall können Sie folgenden Ausdrücke verwenden:<br>
 <td>... mit diesem Ausdruck können Sie alle Datensätze suchen, die in dem jeweiligen Feld einen Zeitpunkt innerhalb der Kalenderwoche 11 des Jahres 2008 eingetragen haben. Per Definition fängt eine Woche immer am Montag um 00:00:00 an.</td>
 </tr>
 
+<tr>
+<td valign=top colspan=2><br>
+<b>Komplexe Ausdücke:</b><br>
+Sie können auch komplexe Ausdücke in Form von logischen Verkettungen eingeben. Es sind damit Abfragen über wahlfreihe Zeitbereiche machbar.<br><br>
+<u><b>Beispiel:</b></u><br><br>
+<b><a href='JavaScript:SendData("&gt;jetzt-1M AND &lt;jetzt+1M")'>&gt;jetzt-1M AND &lt;jetzt+1M</a></b><br>
+... dieser Ausdruck liefert alle Datensätze, in denen das betreffende Datumsfeld im Bereich von "vor einem Monat" bis "in einem Monat" liegt.<br>
+<br>
+<b><a href='JavaScript:SendData("&gt;jetzt")'>&gt;jetzt</a></b><br>
+... alle Datensätze, deren Zeitausdruck in der Zukunft liegt.<br>
+<br>
+</td>
+</tr>
+
 </table>
 <script language="JavaScript">
 function SendData(t)
