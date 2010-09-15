@@ -147,13 +147,13 @@ sub getQueryTemplate
 <tr>
 <td class=fname width=10%>\%affectedapplication(label)\%:</td>
 <td class=finput width=40%>\%affectedapplication(search)\%</td>
-<td class=fname width=10%>\%involvedbusinessteam(label)\%(Test):</td>
+<td class=fname width=10%>\%involvedbusinessteam(label)\%:</td>
 <td class=finput width=40%>\%involvedbusinessteam(search)\%</td>
 </tr>
 <tr>
-<td class=fname width=10%>\%mandator(label)\%(Test):</td>
+<td class=fname width=10%>\%mandator(label)\%:</td>
 <td class=finput width=40%>\%mandator(search)\%</td>
-<td class=fname width=10%>\%involvedcustomer(label)\%(Test):</td>
+<td class=fname width=10%>\%involvedcustomer(label)\%:</td>
 <td class=finput width=40%>\%involvedcustomer(search)\%</td>
 </tr>
 <tr>
