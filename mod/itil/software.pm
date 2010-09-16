@@ -107,6 +107,8 @@ sub new
 
       new kernel::Field::Boolean(
                 name          =>'releasesam0',
+                readonly      =>1,
+                htmldetail    =>0,
                 group         =>'doccontrol',
                 depend        =>['releaseexp'],
                 label         =>'release control: emty release allowed',
@@ -116,6 +118,8 @@ sub new
 
       new kernel::Field::Boolean(
                 name          =>'releasesam1',
+                readonly      =>1,
+                htmldetail    =>0,
                 group         =>'doccontrol',
                 depend        =>['releaseexp'],
                 label         =>'release control: sample 5 allowed',
@@ -125,6 +129,8 @@ sub new
 
       new kernel::Field::Boolean(
                 name          =>'releasesam2',
+                readonly      =>1,
+                htmldetail    =>0,
                 group         =>'doccontrol',
                 depend        =>['releaseexp'],
                 label         =>'release control: sample 2.1 allowed',
@@ -134,6 +140,8 @@ sub new
 
       new kernel::Field::Boolean(
                 name          =>'releasesam3',
+                readonly      =>1,
+                htmldetail    =>0,
                 group         =>'doccontrol',
                 depend        =>['releaseexp'],
                 label         =>'release control: sample 3.4.1 allowed',
@@ -143,6 +151,8 @@ sub new
 
       new kernel::Field::Boolean(
                 name          =>'releasesam4',
+                readonly      =>1,
+                htmldetail    =>0,
                 group         =>'doccontrol',
                 depend        =>['releaseexp'],
                 label         =>'release control: sample 3.5.1p1 allowed',
@@ -152,6 +162,8 @@ sub new
 
       new kernel::Field::Boolean(
                 name          =>'releasesam5',
+                readonly      =>1,
+                htmldetail    =>0,
                 group         =>'doccontrol',
                 depend        =>['releaseexp'],
                 label         =>'release control: sample 6.7.1.3 allowed',
@@ -161,6 +173,8 @@ sub new
 
       new kernel::Field::Boolean(
                 name          =>'releasesam6',
+                readonly      =>1,
+                htmldetail    =>0,
                 group         =>'doccontrol',
                 depend        =>['releaseexp'],
                 label         =>'release control: sample 14.7.1.3.9 allowed',
@@ -170,6 +184,8 @@ sub new
 
       new kernel::Field::Boolean(
                 name          =>'releasesam7',
+                readonly      =>1,
+                htmldetail    =>0,
                 group         =>'doccontrol',
                 depend        =>['releaseexp'],
                 label         =>'release control: sample 4a allowed',
