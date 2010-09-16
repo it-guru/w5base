@@ -739,11 +739,16 @@ sub new
                 searchable    =>0,
                 dataobjattr   =>'appl.sosladrduration'),
 
-      new kernel::Field::Number(
+      new kernel::Field::WorkflowLink(
                 name          =>'olastdrtestwf',
                 label         =>'last Desaster-Recovery test (WorkflowID)',
                 group         =>'sodrgroup',
-                htmleditwidth =>'120',
+                vjoinon       =>'olastdrtestwfid'),
+
+      new kernel::Field::Link(
+                name          =>'olastdrtestwfid',
+                label         =>'last Desaster-Recovery test (WorkflowID)',
+                group         =>'sodrgroup',
                 searchable    =>0,
                 dataobjattr   =>'appl.solastdrtestwf'),
 
