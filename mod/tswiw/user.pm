@@ -50,6 +50,7 @@ sub new
                                    size       =>'10',
                                    htmlwidth  =>'130',
                                    align      =>'left',
+                                   sortvalue  =>'asc',
                                    dataobjattr=>'uid'),
 
       new kernel::Field::Text(     name       =>'fullname',
@@ -270,15 +271,18 @@ sub Import
          $param->{userid}=$param->{importname};
       }
    }
+   my $q="";
    if ($param->{userid} ne ""){
       my $id=$param->{userid};
       $id=~s/[\s\*\?]//g;
       $flt={uid=>\$id};
+      $q="userid=$id";
    } 
    if ($param->{email} ne ""){
       my $email=$param->{email};
       $email=~s/[\s\*\?]//g;
       $flt=[{email=>\$email},{email2=>\$email}];
+      $q="email=$email";
    } 
    if (!defined($flt)){
       $self->LastMsg(ERROR,"no acceptable filter");
@@ -288,7 +292,7 @@ sub Import
    $self->SetFilter($flt);
    my @l=$self->getHashList(qw(uid surname givenname email));
    if ($#l==-1){
-      $self->LastMsg(ERROR,"contact not found in WhoIsWho");
+      $self->LastMsg(ERROR,"contact '$q' not found in WhoIsWho while Import");
       return(undef);
    }
    if ($#l>0){
