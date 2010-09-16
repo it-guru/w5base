@@ -71,6 +71,7 @@ sub new
 
       new kernel::Field::Contact(
                 name          =>'compcontact',
+                AllowEmpty    =>1,
                 group         =>'doccontrol',
                 label         =>'competent contact',
                 vjoinon       =>'compcontactid'),
@@ -83,6 +84,7 @@ sub new
 
       new kernel::Field::Contact(
                 name          =>'depcompcontact',
+                AllowEmpty    =>1,
                 group         =>'doccontrol',
                 label         =>'deputy competent contact',
                 vjoinon       =>'depcompcontactid'),
