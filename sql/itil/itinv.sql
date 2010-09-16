@@ -855,3 +855,6 @@ create table storagetype (
   PRIMARY KEY  (id),
   UNIQUE KEY name (name)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+alter table software add docsig tinyint(1) default '0';
+alter table software add compcontact bigint(20) default NULL;
+alter table software add depcompcontact bigint(20) default NULL;

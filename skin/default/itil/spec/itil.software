@@ -1,0 +1,13 @@
+#######################################################################
+'docsig'=>{de=>'
+Eine Software ist Dokumentations signifikant,
+wenn die Erfassung der Software-Installation
+sehr wichtig ist (z.B. weil Lizenen darüber
+zentral ermittelt werden).
+Grundsätzlich sollte aber jegliche Software
+dokumentiert werden!
+',en=>'
+A Software is documentation significant, if
+the documentation of an software installation
+is extremly important!
+'},

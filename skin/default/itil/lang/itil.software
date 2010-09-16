@@ -1,7 +1,7 @@
 'itil::software'=>{de=>'Software',en=>'Software'},
 'fieldgroup.default'=>{de=>'Software-Daten',en=>'Software-Informations'},
 'fieldgroup.relations'=>{de=>'Zurordnungen',en=>'Relations'},
-'fieldgroup.releasecontrol'=>{de=>'Versionskontrolle',en=>'Release Control'},
+'fieldgroup.doccontrol'=>{de=>'Dokumentationskontrolle',en=>'Documentation Control'},
 'System relation count'=>{de=>'Anzahl System Installationen'},
 'fieldgroup.source'=>{de=>'Datenquelle',en=>'Datasource'},
 'you are only authorized to add in \'order\' or \'reserved\' state'=>{de=>'Sie sind nur berechtig, im Status \'angefordert\' oder \'reserviert\' Datensätze zu erzeugen'},
@@ -11,4 +11,6 @@
 'system relations'=>{de=>'Systemzuorndungen'},
 'active system relations'=>{de=>'aktive Systemzuorndungen'},
 'active software versions'=>{de=>'aktive Softwareversionen'},
-
+'Documentation significant'=>{de=>'Dokumentations signifikant'},
+'competent contact'=>{de=>'kompetenter Ansprechpartner'},
+'deputy competent contact'=>{de=>'alternativer Ansprechpartner'},

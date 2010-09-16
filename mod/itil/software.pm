@@ -69,11 +69,113 @@ sub new
                 name          =>'producerid',
                 dataobjattr   =>'software.producer'),
 
+      new kernel::Field::Contact(
+                name          =>'compcontact',
+                group         =>'doccontrol',
+                label         =>'competent contact',
+                vjoinon       =>'compcontactid'),
+
+      new kernel::Field::Link(
+                name          =>'compcontactid',
+                group         =>'doccontrol',
+                label         =>'competent contact id',
+                dataobjattr   =>'software.compcontact'),
+
+      new kernel::Field::Contact(
+                name          =>'depcompcontact',
+                group         =>'doccontrol',
+                label         =>'deputy competent contact',
+                vjoinon       =>'depcompcontactid'),
+
+      new kernel::Field::Link(
+                name          =>'depcompcontactid',
+                group         =>'doccontrol',
+                label         =>'deputy competent contact id',
+                dataobjattr   =>'software.depcompcontact'),
+
       new kernel::Field::Text(
                 name          =>'releaseexp',
-                group         =>'releasecontrol',
+                group         =>'doccontrol',
                 label         =>'Release Expression',
                 dataobjattr   =>'software.releaseexp'),
+
+      new kernel::Field::Boolean(
+                name          =>'docsig',
+                group         =>'doccontrol',
+                label         =>'Documentation significant',
+                dataobjattr   =>'software.docsig'),
+
+      new kernel::Field::Boolean(
+                name          =>'releasesam0',
+                group         =>'doccontrol',
+                depend        =>['releaseexp'],
+                label         =>'release control: emty release allowed',
+                onRawValue    =>sub{
+                   return(releaseSample($_[0],$_[1],""));
+                }),
+
+      new kernel::Field::Boolean(
+                name          =>'releasesam1',
+                group         =>'doccontrol',
+                depend        =>['releaseexp'],
+                label         =>'release control: sample 5 allowed',
+                onRawValue    =>sub{
+                   return(releaseSample($_[0],$_[1],"5"));
+                }),
+
+      new kernel::Field::Boolean(
+                name          =>'releasesam2',
+                group         =>'doccontrol',
+                depend        =>['releaseexp'],
+                label         =>'release control: sample 2.1 allowed',
+                onRawValue    =>sub{
+                   return(releaseSample($_[0],$_[1],"2.1"));
+                }),
+
+      new kernel::Field::Boolean(
+                name          =>'releasesam3',
+                group         =>'doccontrol',
+                depend        =>['releaseexp'],
+                label         =>'release control: sample 3.4.1 allowed',
+                onRawValue    =>sub{
+                   return(releaseSample($_[0],$_[1],"3.4.1"));
+                }),
+
+      new kernel::Field::Boolean(
+                name          =>'releasesam4',
+                group         =>'doccontrol',
+                depend        =>['releaseexp'],
+                label         =>'release control: sample 3.5.1p1 allowed',
+                onRawValue    =>sub{
+                   return(releaseSample($_[0],$_[1],"3.5.1p1"));
+                }),
+
+      new kernel::Field::Boolean(
+                name          =>'releasesam5',
+                group         =>'doccontrol',
+                depend        =>['releaseexp'],
+                label         =>'release control: sample 6.7.1.3 allowed',
+                onRawValue    =>sub{
+                   return(releaseSample($_[0],$_[1],"6.17.1.3"));
+                }),
+
+      new kernel::Field::Boolean(
+                name          =>'releasesam6',
+                group         =>'doccontrol',
+                depend        =>['releaseexp'],
+                label         =>'release control: sample 14.7.1.3.9 allowed',
+                onRawValue    =>sub{
+                   return(releaseSample($_[0],$_[1],"14.7.1.3.9"));
+                }),
+
+      new kernel::Field::Boolean(
+                name          =>'releasesam7',
+                group         =>'doccontrol',
+                depend        =>['releaseexp'],
+                label         =>'release control: sample 4a allowed',
+                onRawValue    =>sub{
+                   return(releaseSample($_[0],$_[1],"4a"));
+                }),
 
       new kernel::Field::Number(
                 name          =>'lnksystemcount',
@@ -222,6 +324,27 @@ sub new
 }
 
 
+sub releaseSample
+{
+   my $self=shift;
+   my $current=shift;
+   my $version=shift;
+
+   my $fo=$self->getParent->getField("releaseexp");
+   my $releaseexp=$fo->RawValue($current);
+
+   if (!($releaseexp=~m/^\s*$/)){
+      my $chk;
+      eval("\$chk=\$version=~m$releaseexp;");
+      if ($@ ne "" || !($chk)){
+         return(0);
+      }
+   }
+   return(1);
+
+}
+
+
 sub getRecordImageUrl
 {
    my $self=shift;
@@ -290,7 +413,7 @@ sub initSearchQuery
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default releasecontrol source));
+   return(qw(header default doccontrol source));
 }
 
 
@@ -313,7 +436,7 @@ sub isWriteValid
    my $rec=shift;
 
    my $userid=$self->getCurrentUserId();
-   return("default","releasecontrol") if (!defined($rec) ||
+   return("default","doccontrol") if (!defined($rec) ||
                          ($rec->{cistatusid}<3 && $rec->{creator}==$userid) ||
                          $self->IsMemberOf($self->{CI_Handling}->{activator}));
    return(undef);
