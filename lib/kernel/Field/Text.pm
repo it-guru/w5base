@@ -38,7 +38,6 @@ sub FormatedDetail
    my $FormatAs=shift;
    my $d=$self->RawValue($current);
    my $name=$self->Name();
-   $d=$self->FormatedDetailDereferncer($current,$FormatAs,$d);
 
    if ($FormatAs ne "edit" && defined($self->{expandvar})){
       $d=~s/\%([a-zA-Z][^\%]+?)\%/&{$self->{expandvar}}($self,$1,$current)/ge;
@@ -46,7 +45,7 @@ sub FormatedDetail
 
    if (($FormatAs eq "edit" || $FormatAs eq "workflow") && 
        !defined($self->{vjointo})){
-      $d=join($self->{vjoinconcat},@$d) if (ref($d) eq "ARRAY");
+      $d=$self->FormatedDetailDereferncer($current,$FormatAs,$d);
       my $readonly=0;
       if ($self->readonly($current)){
          $readonly=1;
@@ -77,7 +76,17 @@ sub FormatedDetail
       }
       my $vjoinconcat=$self->{vjoinconcat};
       $vjoinconcat="; " if (!defined($vjoinconcat));
-      $d=join($vjoinconcat,@$d);
+      if (defined($self->{sortvalue})){
+         if (lc($self->{sortvalue}) eq "asc"){
+            $d=join($vjoinconcat,sort(@$d));
+         }
+         else{
+            $d=join($vjoinconcat,reverse(sort(@$d)));
+         }
+      }
+      else{
+         $d=join($vjoinconcat,@$d);
+      }
    }
    
    if ($FormatAs eq "HtmlV01"){

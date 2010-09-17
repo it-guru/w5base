@@ -767,8 +767,14 @@ sub new
                 unit          =>'min',
                 dataobjattr   =>'appl.soslaclustduration'),
 
-      new kernel::Field::Number(
+      new kernel::Field::WorkflowLink(
                 name          =>'solastclusttestwf',
+                label         =>'last Cluster-Service switch test (WorkflowID)',
+                group         =>'soclustgroup',
+                vjoinon       =>'solastclusttestwfid'),
+
+      new kernel::Field::Link(
+                name          =>'solastclusttestwfid',
                 htmleditwidth =>'120',
                 label         =>'last Cluster-Service switch test (WorkflowID)',
                 group         =>'soclustgroup',

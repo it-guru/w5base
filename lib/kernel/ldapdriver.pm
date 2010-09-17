@@ -185,7 +185,6 @@ sub fetchrow
          for(my $c=0;$c<=$#val;$c++){
             $val[$c]=utf8($val[$c])->latin1();
          }
-         my $val=join(", ",@val);
          if ($#val>0){
             $rec{$attr}=\@val;
          }
@@ -193,7 +192,6 @@ sub fetchrow
             $rec{$attr}=$val[0];
          }
       }
-#   printf STDERR ("fifi data=%s\n",Dumper(\%rec));
       return(\%rec);
    }
 
