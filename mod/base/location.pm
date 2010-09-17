@@ -61,6 +61,16 @@ sub new
       new kernel::Field::Select(
                 name          =>'cistatus',
                 htmleditwidth =>'40%',
+                default       =>'2',
+                readonly      =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+                   return(0) if ($self->getParent->IsMemberOf("admin"));
+                   return(1) if (defined($rec) &&
+                                 $rec->{cistatusid}>2 &&
+                                 !$self->getParent->IsMemberOf("admin"));
+                   return(0);
+                },
                 label         =>'CI-State',
                 vjointo       =>'base::cistatus',
                 vjoinon       =>['cistatusid'=>'id'],
@@ -333,6 +343,8 @@ sub new
       new kernel::Field::Interview(),
 
    );
+   $self->{CI_Handling}={uniquename=>"name",
+                         uniquesize=>255};
    $self->setDefaultView(qw(location address1 name cistatus));
    $self->setWorktable("location");
    return($self);
@@ -393,6 +405,26 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/base/load/location.jpg?".$cgi->query_string());
 }
+
+sub SecureValidate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $wrgroups=shift;
+
+   my $userid=$self->getCurrentUserId();
+   if (defined($oldrec) && $oldrec->{userid}==$userid){
+      delete($newrec->{cistatusid});
+   }
+   else{
+      if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
+         return(0);
+      }
+   }
+   return($self->SUPER::SecureValidate($oldrec,$newrec,$wrgroups));
+}
+
          
 
 sub Validate
@@ -677,7 +709,7 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("header","default") if (!defined($rec) && $self->IsMemberOf("admin"));
+   return("header","default") if (!defined($rec));
    return("ALL");
 }
 
@@ -685,6 +717,7 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
+   return("default") if (!defined($rec));
    if ($self->IsMemberOf("admin")){
       return("default","contacts","management","gps","control","comments");
    }
@@ -719,18 +752,30 @@ sub isWriteValid
    return();
 }
 
+sub FinishWrite
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
+      return(0);
+   }
+
+   return(1);
+}
+
+
 sub isDeleteValid
 {
    my $self=shift;
    my $rec=shift;
+   my $userid=$self->getCurrentUserId();
 
-   if ($self->IsMemberOf("admin")){
-      return(1);
-   }
+   return(1) if ($rec->{creator}==$userid && $rec->{cistatusid}<3);
 
-   return();
+   return(1) if ($self->IsMemberOf("admin"));
+   return(0);
 }
-
 
 sub HandleInfoAboSubscribe
 {
