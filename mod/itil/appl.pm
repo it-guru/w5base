@@ -753,11 +753,23 @@ sub new
                 dataobjattr   =>'appl.solastdrtestwf'),
 
       new kernel::Field::Date(
-                name          =>'solastdrdate',
+                name          =>'temp_solastdrdate',
                 label         =>'last Desaster-Recovery date',
                 group         =>'sodrgroup',
                 searchable    =>0,
+                dayonly       =>1,
                 dataobjattr   =>'appl.solastdrdate'),
+
+      new kernel::Field::Date(
+                name          =>'solastdrdate',
+                label         =>'last Desaster-Recovery (WorkflowEnd)',
+                readonly      =>1,
+                dayonly       =>1,
+                group         =>'sodrgroup',
+                vjointo       =>'base::workflow',
+                vjoinon       =>['olastdrtestwfid'=>'id'],
+                vjoindisp     =>'eventend',
+                searchable    =>0),
 
       new kernel::Field::Number(
                 name          =>'soslaclustduration',
@@ -782,11 +794,23 @@ sub new
                 dataobjattr   =>'appl.solastclusttestwf'),
 
       new kernel::Field::Date(
-                name          =>'solastclustswdate',
+                name          =>'temp_solastclustswdate',
                 label         =>'last Cluster-Service switch date',
                 group         =>'soclustgroup',
                 searchable    =>0,
+                dayonly       =>1,
                 dataobjattr   =>'appl.solastclustswdate'),
+
+      new kernel::Field::Date(
+                name          =>'solastclustswdate',
+                label         =>'last Cluster-Service switch (WorkflowEnd)',
+                group         =>'soclustgroup',
+                vjointo       =>'base::workflow',
+                vjoinon       =>['solastclusttestwfid'=>'id'],
+                vjoindisp     =>'eventend',
+                dayonly       =>1,
+                readonly      =>1,
+                searchable    =>0),
 
       new kernel::Field::FileList(
                 name          =>'attachments',
