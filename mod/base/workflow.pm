@@ -2168,6 +2168,9 @@ sub externalMailHandler
       my %notiy;
       $notiy{name}=$s;
       $notiy{emailtext}=$m;
+      $notiy{directlnkmode}="extMail";
+      $notiy{directlnkid}=$id;
+      $notiy{directlnktype}=$parent;
       if ($addref ne ""){
          if ($ENV{SCRIPT_URI} ne ""){
             $notiy{emailtext}.="\n\nDirectLink:\n";

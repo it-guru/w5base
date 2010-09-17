@@ -425,6 +425,7 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
+
    foreach my $v (qw(name emailtext)){
       if ((!defined($oldrec) || exists($newrec->{$v})) && $newrec->{$v} eq ""){
          $self->LastMsg(ERROR,"field '%s' is empty",
