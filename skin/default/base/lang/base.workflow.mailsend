@@ -1,5 +1,5 @@
-'base::workflow::mailsend'=>{de=>'Nachricht versenden',
-                             en=>'sending a message'},
+'base::workflow::mailsend'=>{de=>'W5Base Nachricht Versandt',
+                             en=>'W5Base message sending'},
 'base::workflow::mailsend::dataload::tip'=>{ de=>'dies ist der Tip',
                                              en=>'tip in english'},
 'base::workflow::mailsend::tip'=>{

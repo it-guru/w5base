@@ -95,6 +95,7 @@ sub new
                                             AL_TCom::workflow::businesreq
                                             THOMEZMD::workflow::businesreq
                                             base::workflow::DataIssue
+                                            base::workflow::mailsend
                                             AL_TCom::workflow::change
                                             AL_TCom::workflow::problem
                                             AL_TCom::workflow::eventnotify

@@ -2168,7 +2168,7 @@ sub externalMailHandler
       my %notiy;
       $notiy{name}=$s;
       $notiy{emailtext}=$m;
-      $notiy{directlnkmode}="extMail";
+      $notiy{directlnkmode}="W5BaseMail";
       $notiy{directlnkid}=$id;
       $notiy{directlnktype}=$parent;
       if ($addref ne ""){

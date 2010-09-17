@@ -228,20 +228,35 @@ sub WorkflowLinkResult
                                "kernel::App::Web::WorkflowLink")));
          return();
       }
-      if ($q{class} eq "" || $q{class}=~m/::DataIssue$/ ||
-          (ref($q{class}) eq "ARRAY" && grep(/::DataIssue$/,@{$q{class}}))){
+      if ($q{class} eq "" || $q{class}=~m/::(DataIssue|mailsend)$/ ||
+          (ref($q{class}) eq "ARRAY" && 
+           grep(/::(DataIssue|mailsend)$/,@{$q{class}}))){
          my $fo=$h->getField("directlnktype");
          if (defined($fo)){
+            my $mode="*";
+            if ($q{class} eq ""){
+               $mode=['DataIssue','W5BaseMail'];
+            }
+            if ($q{class}=~m/::(DataIssue)$/ ||
+                (ref($q{class}) eq "ARRAY" && 
+                 grep(/::(DataIssue)$/,@{$q{class}}))){
+               $mode=\'DataIssue';
+            }
+            if ($q{class}=~m/::(mailsend)$/ ||
+                (ref($q{class}) eq "ARRAY" && 
+                 grep(/::(mailsend)$/,@{$q{class}}))){
+               $mode=\'W5BaseMail';
+            }
+           
             my %qadd=%qorg; # now add the DataIssue Workflows to 
                             # DataSelection idl
             $qadd{directlnktype}=[$self->Self,$self->SelfAsParentObject()];
             $qadd{directlnkid}=\$dataobjectid;
-            $qadd{directlnkmode}=\"DataIssue";
+            $qadd{directlnkmode}=$mode;
             $h->ResetFilter();
             $h->SetFilter(\%qadd);
             $h->Limit(1502);
             $h->SetCurrentOrder("id");
-            #printf STDERR ("fifi qadd=%s\n",Dumper(\%qadd));
             my @l=$h->getHashList("id");
             map({$idl{$_->{id}}=1} @l);
          }
