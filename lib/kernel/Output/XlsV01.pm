@@ -69,7 +69,8 @@ sub getHttpHeader
    my $self=shift;
    my $app=$self->getDataObj();
    my $d="";
-   $d.="Content-type:".$self->MimeType()."\n\n";
+   $d.="Content-type:".$self->MimeType()."\n";
+   $d.="Cache-Control: max-age=10\n\n";  # for Excel direct access
    return($d);
 }
 
