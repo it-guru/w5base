@@ -109,6 +109,7 @@ sub ProcessHead
 
    foreach my $v (keys(%$q)){
       delete($q->{$v}) if (!defined($q->{$v}) || $q->{$v} eq "");
+      delete($q->{$v}) if ($v eq "UseLimit" || $v eq "UseLimitStart");
    }
    delete($q->{CurrentView}) if ($q->{CurrentView} eq "default");
    $q->{FormatAs}=~s/^.*;//;
