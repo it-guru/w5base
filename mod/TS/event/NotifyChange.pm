@@ -141,7 +141,7 @@ sub NotifyChange
                   push(@emailprefix,$srcid);
                }
                if ($lang eq "en"){
-                  push(@emailtext,"Ladies and Gentelman,\n\n".
+                  push(@emailtext,"Ladies and Gentleman,\n\n".
                                   "the Change <b>$srcid</b> state has been ".
                                   "switched to <b>$curscstate</b>\n".
                                   "This is only an information for you. ".
