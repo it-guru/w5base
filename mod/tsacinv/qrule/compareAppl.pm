@@ -98,6 +98,9 @@ sub qcheckRecord
                                    $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
                                    mode=>'native');
             }
+            else{
+               msg(ERROR,"sem for application '".$rec->{name}."' not found");
+            }
          }
          if ($parrec->{tsmemail} ne ""){
             my $tsmid=$tswiw->GetW5BaseUserID($parrec->{tsmemail});
@@ -108,6 +111,9 @@ sub qcheckRecord
                                    $forcedupd,$wfrequest,
                                    \@qmsg,\@dataissue,\$errorlevel,
                                    mode=>'native');
+            }
+            else{
+               msg(ERROR,"tsm for application '".$rec->{name}."' not found");
             }
          }
          $self->IfaceCompare($dataobj,
