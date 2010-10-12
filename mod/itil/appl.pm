@@ -636,7 +636,8 @@ sub new
                                  'education',
                                  'approvtest',
                                  'reference',
-                                 'license'],  # see also opmode at system
+                                 'license',
+                                 'cbreakdown'],  # see also opmode at system
                 htmleditwidth =>'200px',
                 dataobjattr   =>'appl.opmode'),
 

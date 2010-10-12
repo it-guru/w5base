@@ -263,6 +263,7 @@ sub ApplicationModified
               5 =>'CUSTOMER RESPONSIBILITY',
               10=>'APPLICATION LICENSE',
               20=>'TEST',
+              25=>'DISASTER',
               30=>'TRAINING',
               40=>'REFERENCE',
               50=>'ACCEPTANCE',
@@ -461,6 +462,7 @@ sub ApplicationModified
                   $ApplU=50 if ($rec->{opmode} eq "approvtest");
                   $ApplU=40 if ($rec->{opmode} eq "reference");
                   $ApplU=30 if ($rec->{opmode} eq "education");
+                  $ApplU=25 if ($rec->{opmode} eq "cbreakdown");
                   $ApplU=20 if ($rec->{opmode} eq "test");
                   $ApplU=5  if ($rec->{opmode} eq "license");
                }
