@@ -234,23 +234,40 @@ sub HandleCIStatus
                                                $param{altname}));
    }
    if ($param{mode} eq "FinishWrite"){
-      if (!defined($oldrec)){
-         if ($newrec->{cistatusid}==2){
-            $self->NotifyAdmin("request",$oldrec,$newrec,%param);
-            # notify admin about the request (owner in cc)
-         }
-         if ($newrec->{cistatusid}==1){
-            $self->NotifyAdmin("reservation",$oldrec,$newrec,%param);
-            # notify notify owner about the reservation and
-            # about the unuseable state of this entry
+      if ($self->Config->Param("W5BaseOperationMode") eq "test"){
+         printf STDERR ("fifi oldrec=%s\n",Dumper($oldrec));
+         printf STDERR ("fifi newrec=%s\n",Dumper($newrec));
+         my $idname=$self->IdField->Name();
+         my $id=effVal($oldrec,$newrec,$idname);
+         if ($id ne ""){
+            my $dataobj=$self->Clone();
+            $dataobj->SetFilter({$idname=>\$id});
+            my ($oldrec,$msg)=$dataobj->getOnlyFirst(qw(ALL));
+            if ($oldrec->{cistatusid}<4){
+               $dataobj->ValidatedUpdateRecord($oldrec,{cistatusid=>4},
+                                               {$idname=>\$id});
+            }
          }
       }
       else{
-         if ($oldrec->{cistatusid}<2 && $newrec->{cistatusid}==2){
-            $self->NotifyAdmin("request",$oldrec,$newrec,%param);
+         if (!defined($oldrec)){
+            if ($newrec->{cistatusid}==2){
+               $self->NotifyAdmin("request",$oldrec,$newrec,%param);
+               # notify admin about the request (owner in cc)
+            }
+            if ($newrec->{cistatusid}==1){
+               $self->NotifyAdmin("reservation",$oldrec,$newrec,%param);
+               # notify notify owner about the reservation and
+               # about the unuseable state of this entry
+            }
          }
-         if ($newrec->{cistatusid}==4 && $oldrec->{cistatusid}<3){
-            $self->NotifyAdmin("activate",$oldrec,$newrec,%param);
+         else{
+            if ($oldrec->{cistatusid}<2 && $newrec->{cistatusid}==2){
+               $self->NotifyAdmin("request",$oldrec,$newrec,%param);
+            }
+            if ($newrec->{cistatusid}==4 && $oldrec->{cistatusid}<3){
+               $self->NotifyAdmin("activate",$oldrec,$newrec,%param);
+            }
          }
       }
    }
