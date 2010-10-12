@@ -80,7 +80,7 @@ fi
 # local username for transfer source
 #
 if [ "$USER" = "" ]; then
-   USER="localuser"
+   USER="`id -un`"
 fi
 
 # 

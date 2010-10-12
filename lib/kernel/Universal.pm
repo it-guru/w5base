@@ -55,7 +55,7 @@ sub UserEnv
 sub FullContextReset
 {
    my $self=shift;
-   $W5V2::Cache={};
+   Query->Reset();
    $W5V2::Context={};
 }
 

@@ -101,6 +101,15 @@ sub Delete
    return($self->{'cgi'}->delete(@_));
 }
 
+sub Reset
+{
+   my $self=shift;
+   foreach my $v ($self->{'cgi'}->param()){
+      $self->Delete($v);
+   }
+}
+
+
 sub UrlParam
 {
    my $self=shift;

@@ -4,7 +4,6 @@ use vars qw(@ISA);
 use strict;
 use kernel;
 use kernel::Universal;
-use Data::Dumper;
 use Fcntl 'SEEK_SET';
 use File::Temp(qw(tempfile));
 

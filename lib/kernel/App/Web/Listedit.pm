@@ -1799,7 +1799,9 @@ sub ProcessUploadRecord
       if ($self->LastMsg()){
          print join("\n",$self->LastMsg());
       }
-      print msg(ERROR,$self->T("record data mismatch"));
+      else{
+         print msg(ERROR,$self->T("record data mismatch"));
+      }
       ${$param{countfail}}++ if (ref($param{countfail}) eq "SCALAR");
       return(1);
    }
@@ -1890,6 +1892,7 @@ sub Upload
                            $lang,$p);
             if ($self->preUpload($inp)){
                $inp->SetCallback(sub{
+                                   $self->FullContextReset();
                                    my $prec=shift;
                                    my $ptyp=shift;
                                    $ptyp=$p if (!defined($ptyp));
@@ -1933,7 +1936,6 @@ sub Upload
                                       $countfail++;
                                       return(undef);
                                    }
-                                   $self->FullContextReset();
                                    return(1); 
                                  });
                $inp->Process();
