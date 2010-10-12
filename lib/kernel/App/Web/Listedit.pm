@@ -1925,7 +1925,6 @@ sub Upload
                                       else{
                                          $countfail++;
                                          print join("",$self->LastMsg());
-                                         $self->LastMsg("");
                                       }
                                    }
                                    else{
@@ -1934,6 +1933,7 @@ sub Upload
                                       $countfail++;
                                       return(undef);
                                    }
+                                   $self->FullContextReset();
                                    return(1); 
                                  });
                $inp->Process();
