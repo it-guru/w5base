@@ -22,7 +22,6 @@ use UNIVERSAL;
 use kernel;
 use Carp;
 use Scalar::Util qw(weaken);
-use Data::Dumper;
 use vars qw($AUTOLOAD);
 @ISA    = qw(UNIVERSAL);
 #our $AUTOLOAD;
@@ -35,14 +34,6 @@ sub Context
    return($W5V2::Context->{$s});
 }
 
-sub UserEnv
-{
-   my $self=shift;
-   my $UserCache=$self->Cache->{User}->{Cache};
-   return($UserCache->{$ENV{REMOTE_USER}});
-}
-
-
 sub Cache
 {
    my $self=shift;
@@ -53,6 +44,22 @@ sub Cache
    $W5V2::Cache->{$s}={} if (!exists($W5V2::Cache->{$s}));
    return($W5V2::Cache->{$s});
 }
+
+sub UserEnv
+{
+   my $self=shift;
+   my $UserCache=$self->Cache->{User}->{Cache};
+   return($UserCache->{$ENV{REMOTE_USER}});
+}
+
+sub FullContextReset
+{
+   my $self=shift;
+   $W5V2::Cache={};
+   $W5V2::Context={};
+}
+
+
 
 sub getParent
 {

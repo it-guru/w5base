@@ -48,8 +48,8 @@ sub process
                  $self->Self,$year,$month,$day,$h,$m,0);
       my $sleep=$nextrun-$current;
       msg(DEBUG,"(%s) sleeping %d seconds",$self->Self,$sleep);
+      $self->FullContextReset();
       sleep($sleep);
-      
    }
 }
 
