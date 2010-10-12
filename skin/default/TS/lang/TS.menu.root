@@ -14,6 +14,7 @@
 'itts.appl.lnkapplcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
 'itts.system'=>{de=>'System',en=>'System'},
 'itts.system.new'=>{de=>'Neueingabe',en=>'New'},
+'itts.system.software'=>{de=>'Softwareinstallation',en=>'Softwareinstallation'},
 'itts.system.ipaddress'=>{de=>'IP-Adresse',en=>'IP-Address'},
 'itts.system.ipaddress.new'=>{de=>'Neueingabe',en=>'New'},
 'itts.system.dnsalias'=>{de=>'DNS-Alias',en=>'DNS-Alias'},

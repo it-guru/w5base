@@ -92,6 +92,10 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itts.system.software",
+                      "itil::lnksoftwaresystem",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itts.system.ipaddress",
                       "itil::ipaddress",
                       defaultacl=>['valid_user']);
