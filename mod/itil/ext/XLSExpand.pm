@@ -53,7 +53,7 @@ sub GetKeyCriterion
                                                        itil::asset::name
                                                        itil::system::ipaddress::name
                                                        itil::system::name)]},
-                'itil::appl::sememail'      =>{label=>'IT-Inventar: Application: SeM E-Mail',
+                'itil::appl::sememail'      =>{label=>'IT-Inventar: Application: CBM E-Mail',
                                                in=>[qw(itil::appl::name
                                                        itil::system::systemid
                                                        itil::asset::name
@@ -65,13 +65,25 @@ sub GetKeyCriterion
                                                        itil::asset::name
                                                        itil::system::ipaddress::name
                                                        itil::system::name)]},
-                'itil::appl::sem'           =>{label=>'IT-Inventar: Application: SeM',
+                'itil::appl::tsm2email'     =>{label=>'IT-Inventar: Application: Vetreter TSM E-Mail',
+                                               in=>[qw(itil::appl::name
+                                                       itil::system::systemid
+                                                       itil::asset::name
+                                                       itil::system::ipaddress::name
+                                                       itil::system::name)]},
+                'itil::appl::sem'           =>{label=>'IT-Inventar: Application: CBM',
                                                in=>[qw(itil::appl::name
                                                        itil::system::systemid
                                                        itil::asset::name
                                                        itil::system::ipaddress::name
                                                        itil::system::name)]},
                 'itil::appl::tsm'           =>{label=>'IT-Inventar: Application: TSM',
+                                               in=>[qw(itil::appl::name
+                                                       itil::system::systemid
+                                                       itil::asset::name
+                                                       itil::system::ipaddress::name
+                                                       itil::system::name)]},
+                'itil::appl::tsm2'          =>{label=>'IT-Inventar: Application: Vetreter TSM',
                                                in=>[qw(itil::appl::name
                                                        itil::system::systemid
                                                        itil::asset::name
@@ -252,7 +264,8 @@ sub ProcessLine
 
  
    # output
-   foreach my $appsekvar (qw(sem tsm sememail tsmemail businessteam applid
+   foreach my $appsekvar (qw(sem tsm tsm2 tsm2email 
+                             sememail tsmemail businessteam applid
                              customerprio criticality customer)){
       if (defined($in->{'itil::appl::id'}) && 
           exists($out->{'itil::appl::'.$appsekvar})){
