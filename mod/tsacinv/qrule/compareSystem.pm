@@ -100,21 +100,23 @@ sub qcheckRecord
          #
          # osrelease mapping
          #
-         my $mapos=$dataobj->ModuleObject("tsacinv::lnkw5bosrelease");
-         $mapos->SetFilter({extosrelease=>\$parrec->{systemos}});
-         my ($maposrec,$msg)=$mapos->getOnlyFirst(qw(id w5bosrelease));
-         if (defined($maposrec)){
-            if ($maposrec->{w5bosrelease} ne ""){
-               $parrec->{systemos}=$maposrec->{w5bosrelease};
+         if ($parrec->{systemos} ne ""){
+            my $mapos=$dataobj->ModuleObject("tsacinv::lnkw5bosrelease");
+            $mapos->SetFilter({extosrelease=>\$parrec->{systemos}});
+            my ($maposrec,$msg)=$mapos->getOnlyFirst(qw(id w5bosrelease));
+            if (defined($maposrec)){
+               if ($maposrec->{w5bosrelease} ne ""){
+                  $parrec->{systemos}=$maposrec->{w5bosrelease};
+               }
+               else{
+                  delete($parrec->{systemos});
+               }
             }
             else{
+               $mapos->ValidatedInsertRecord({extosrelease=>$parrec->{systemos},
+                                              direction=>1});
                delete($parrec->{systemos});
             }
-         }
-         else{
-            $mapos->ValidatedInsertRecord({extosrelease=>$parrec->{systemos},
-                                           direction=>1});
-            delete($parrec->{systemos});
          }
          #################################################################### 
          

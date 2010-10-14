@@ -159,6 +159,17 @@ sub Validate
    return(1);
 }
 
+sub isViewValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return("header","default") if (!defined($rec) && $self->IsMemberOf("admin"));
+   return("ALL") if ($self->IsMemberOf("admin"));
+   return();
+}
+
+
+
 
 
 
