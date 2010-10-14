@@ -534,7 +534,7 @@ create table swinstance (
   srcsys     varchar(10) default 'w5base',
   srcid      varchar(20) default NULL,
   srcload    datetime    default NULL,
-  PRIMARY KEY  (id),
+  PRIMARY KEY  (id),key(appl),
   UNIQUE KEY fullname (fullname),key(system),key(databoss),
   UNIQUE KEY name (fullname),KEY(mandator),key(name),key(servicesupport),
   UNIQUE KEY `srcsys` (srcsys,srcid),key(swteam),key(adm),key(adm2)
@@ -858,3 +858,4 @@ create table storagetype (
 alter table software add docsig tinyint(1) default '0';
 alter table software add compcontact bigint(20) default NULL;
 alter table software add depcompcontact bigint(20) default NULL;
+alter table ipaddress add key(system);

@@ -137,7 +137,7 @@ CREATE TABLE wfworkspace (
   additional  longtext NOT NULL,
   createuser  bigint(20) NOT NULL default '0',
   createdate  datetime NOT NULL default '0000-00-00 00:00:00',
-  PRIMARY KEY (id),key fwd(fwdtarget,fwdtargetid)
+  PRIMARY KEY (id),key fwd(fwdtarget,fwdtargetid),key(wfheadid)
 );
 alter table wfhead add directlnktype varchar(40) default NULL, add directlnkid bigint(20) default NULL,add directlnkmode varchar(20) default NULL,add key directlnk(directlnktype,directlnkid,wfstate,directlnkmode),add key directlnkev(directlnktype,directlnkid,eventend);
 CREATE TABLE wfrepjob (
