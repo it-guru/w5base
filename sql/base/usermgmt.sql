@@ -223,7 +223,7 @@ CREATE TABLE infoabo (
   srcload     datetime    default NULL,expiration datetime,
   PRIMARY KEY  (id),
   KEY findnotiy (parentobj,refid,mode),
-  UNIQUE KEY `srcsys` (srcsys,srcid),
+  UNIQUE KEY `srcsys` (srcsys,srcid),key(mode),
   unique key pk (userid,parentobj,refid,mode)
 );
 alter table lnkgrpuser add alertstate varchar(10);
