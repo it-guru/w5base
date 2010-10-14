@@ -37,3 +37,5 @@ create table lnkapplinvoicestorage (
   UNIQUE KEY `srcsys` (srcsys,srcid)
 )  ENGINE=InnoDB DEFAULT CHARSET=latin1;
 set FOREIGN_KEY_CHECKS=1;
+alter table lnkapplinvoicestorage add  use_as_fs  bool default '0';
+alter table lnkapplinvoicestorage add  use_as_db  bool default '0';

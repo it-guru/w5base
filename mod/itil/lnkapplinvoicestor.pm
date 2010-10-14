@@ -99,7 +99,17 @@ sub new
                                                    
       new kernel::Field::Number(
                 name          =>'capacity',
-                unit          =>'MB',
+                unit          =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my $d=shift;
+                   my $current=shift;
+                   return("MB") if ($mode ne "HtmlDetail");
+                   $d=sprintf("MB &nbsp;&nbsp;(%.1lf GB - tech: %.1lf GB)",
+                              $d/1000.0,$d/1024.0);
+                   $d=~s/\./,/g;
+                   return($d);
+                },
                 precision     =>0,
                 label         =>'Capacity',
                 dataobjattr   =>'lnkapplinvoicestorage.capacity'),
@@ -118,6 +128,20 @@ sub new
                 name          =>'ordernumber',
                 label         =>'Ordernumber',
                 dataobjattr   =>'lnkapplinvoicestorage.ordernumber'),
+
+      new kernel::Field::Boolean(
+                name          =>'use_as_fs',
+                group         =>'logicalusage',
+                htmlhalfwidth =>1,
+                label         =>'normal filesystem',
+                dataobjattr   =>'lnkapplinvoicestorage.use_as_fs'),
+
+      new kernel::Field::Boolean(
+                name          =>'use_as_db',
+                group         =>'logicalusage',
+                htmlhalfwidth =>1,
+                label         =>'database',
+                dataobjattr   =>'lnkapplinvoicestorage.use_as_db'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
@@ -387,12 +411,12 @@ sub Validate
    if (effVal($oldrec,$newrec,"durationstart") eq ""){
       $newrec->{durationstart}=NowStamp("en");
    }
-   if (effVal($oldrec,$newrec,"capacity")<=0){
+   if (effVal($oldrec,$newrec,"capacity")==0){
       $self->LastMsg(ERROR,"capacitiy to less");
       return(undef);
    }
    my $ordernumber=effVal($oldrec,$newrec,"ordernumber");
-   if ($ordernumber ne "" && !($ordernumber=~m/^\d+$/)){
+   if ($ordernumber ne "" && !($ordernumber=~m/^[A-Z\d]+$/)){
       $self->LastMsg(ERROR,"invalid ordernumber");
       return(undef);
    }
@@ -434,7 +458,7 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("header","default") if (!defined($rec));
+   return("header","default","logicalusage") if (!defined($rec));
    return("ALL");
 }
 
@@ -442,7 +466,14 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default") if (!defined($rec));
+   return("default","logicalusage") if (!defined($rec) ||
+                                        $self->IsMemberOf("admin"));
+   if (defined($rec) && $rec->{cdate} ne ""){
+      my $d=CalcDateDuration($rec->{cdate},NowStamp("en"));
+      if ($d->{totalminutes}>10080){ # modify only allowed for 7 days
+          return();
+      }
+   }
    my $applid=$rec->{applid};
    if ($applid ne ""){
       if ($self->isWriteOnApplValid($applid,"systems")){
@@ -461,7 +492,7 @@ sub SecureValidate
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default applinfo systeminfo source));
+   return(qw(header default logicalusage applinfo systeminfo source));
 }
 
 sub initSearchQuery

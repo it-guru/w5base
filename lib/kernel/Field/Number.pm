@@ -28,6 +28,7 @@ sub new
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
    $self->{_permitted}->{precision}=1;
+
    return($self);
 }
 
@@ -68,7 +69,11 @@ sub FormatedDetail
             $vjoinconcat="; " if (!defined($vjoinconcat));
             $d=join($vjoinconcat,@$d);
          }
-         $d.=" ".$self->{unit} if ($d ne "" && $mode eq "HtmlDetail");
+         if (defined($self->{unit})){
+            if ($d ne "" && $mode eq "HtmlDetail"){
+               $d.=" ".$self->unit($mode,$d,$current);
+            }
+         }
       }
 
       return($d);
@@ -105,7 +110,7 @@ sub Unformat
       my $d=$formated;
       my $precision=$self->precision;
       $precision=0 if (!defined($precision));
-      if (!($d=~s/(\d+)[,\.]{0,1}([0-9]{0,$precision})[0-9]*$/$1\.$2/)){
+      if (!($d=~s/(-?)(\d+)[,\.]{0,1}([0-9]{0,$precision})[0-9]*$/$1$2\.$3/)){
          $self->getParent->LastMsg(ERROR,
              sprintf(
                 $self->getParent->T("invalid number format '%s' in field '%s'",

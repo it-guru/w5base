@@ -101,7 +101,7 @@ sub ProcessHead
             $displayname=$field->Label();
          }
          if (defined($field->{unit})){
-            $displayname.="<br>($field->{unit})";
+            $displayname.="<br>(".$field->unit("HtmlV01").")";
          }
          my $style="";
          if (defined($field->{htmlwidth})){
