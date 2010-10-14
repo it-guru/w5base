@@ -353,12 +353,14 @@ sub new
       new kernel::Field::Text(
                 name          =>'applid',
                 htmldetail    =>0,
+                uploadable    =>0,
                 label         =>'W5Base Application ID',
                 dataobjattr   =>'qlnkapplitclust.appl'),
                                                    
       new kernel::Field::Text(
                 name          =>'clustid',
                 htmldetail    =>0,
+                uploadable    =>0,
                 label         =>'W5Base Cluster ID',
                 dataobjattr   =>'qlnkapplitclust.itclust'),
                                                    

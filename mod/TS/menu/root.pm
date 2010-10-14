@@ -140,6 +140,24 @@ sub Init
                       "itil::lnkassetcontact",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itts.itclust",
+                      "itil::itclust",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itts.itclust.new",
+                      "itil::itclust",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itts.itclust.lnkapplitclust",
+                      "itil::lnkapplitclust",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itts.itclust.lnkapplitclust.new",
+                      "itil::lnkapplitclust",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itts.swinstance",
                       "itil::swinstance",
                       defaultacl=>['valid_user']);
