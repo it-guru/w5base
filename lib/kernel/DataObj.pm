@@ -2934,8 +2934,10 @@ sub FilterPart2SQLexp
          }
          if (lc($sqlparam{sqldbh}->DriverName()) eq "oracle" &&
              $sqlparam{ignorecase}==1){
-            $sqlfieldname="lower($sqlfieldname)";
-            $val="lower($val)";
+            if ($val ne "NULL"){
+               $sqlfieldname="lower($sqlfieldname)";
+               $val="lower($val)";
+            }
          }
          if (defined($sqlparam{containermode})){
             $sqlfieldname=$sqlparam{containermode};
