@@ -507,6 +507,7 @@ sub ValidateGroupCache
    if (!defined($self->Cache->{Group}->{Cache})){
       my $grp=$self->ModuleObject("base::grp");
       $grp->SetCurrentView(qw(grpid fullname parentid subid));
+      $grp->SetCurrentOrder("NONE");
       $self->Cache->{Group}->{Cache}=$grp->getHashIndexed(qw(grpid fullname));
       foreach my $grp (values(%{$self->Cache->{Group}->{Cache}->{grpid}})){
          if (!defined($grp->{subid})){
