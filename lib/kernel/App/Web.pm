@@ -614,6 +614,7 @@ sub ValidateMandatorCache
       printf STDERR ("-------------- Mandators loaded --------------\n");
       my $mandator=getModuleObject($self->Config,"base::mandator");
       $mandator->SetCurrentView(qw(grpid name cistatusid contacts additional));
+      $mandator->SetCurrentOrder("NONE");
       $self->Cache->{Mandator}->{Cache}=$mandator->getHashIndexed("id","grpid");
       $self->Cache->{Mandator}->{DataObj}=$mandator;
       my $ca=$self->Cache->{Mandator}->{Cache};
