@@ -719,7 +719,8 @@ sub isWriteValid
    my $rec=shift;
    return("default") if (!defined($rec));
    if ($self->IsMemberOf("admin")){
-      return("default","contacts","management","gps","control","comments");
+      return("default","contacts","phonenumbers",
+             "management","gps","control","comments");
    }
    my $userid=$self->getCurrentUserId();
 
