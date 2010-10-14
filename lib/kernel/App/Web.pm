@@ -613,6 +613,7 @@ sub ValidateMandatorCache
    if (!defined($self->Cache->{Mandator}->{Cache})){
       printf STDERR ("-------------- Mandators loaded --------------\n");
       my $mandator=getModuleObject($self->Config,"base::mandator");
+      $mandator->SetFilter({id=>'>-999999999'}); # prefend slow query entry
       $mandator->SetCurrentView(qw(grpid name cistatusid contacts additional));
       $mandator->SetCurrentOrder("NONE");
       $self->Cache->{Mandator}->{Cache}=$mandator->getHashIndexed("id","grpid");

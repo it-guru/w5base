@@ -506,6 +506,7 @@ sub ValidateGroupCache
    }
    if (!defined($self->Cache->{Group}->{Cache})){
       my $grp=$self->ModuleObject("base::grp");
+      $grp->SetFilter({grpid=>'>-999999999'}); # prefend slow query entry
       $grp->SetCurrentView(qw(grpid fullname parentid subid));
       $grp->SetCurrentOrder("NONE");
       $self->Cache->{Group}->{Cache}=$grp->getHashIndexed(qw(grpid fullname));
