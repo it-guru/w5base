@@ -346,7 +346,7 @@ sub TableVersionLoadSqlFileData
         $_=~s/\/sql\///; $_=~s/\.pm$//;
         $c{$_}={filename=>$_};
        } @sublist);
-   my @tv=$db->getHashList("select * from tableversion");
+   my @tv=$db->getHashList("select * from tableversion where id>0");
 
    foreach my $rec (values(%c)){
       $rec->{tventry}="no";
