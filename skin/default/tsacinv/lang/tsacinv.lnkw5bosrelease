@@ -1,3 +1,8 @@
 'tsacinv::lnkw5bosrelease'=>{de=>'Betriebssystem Mapping',en=>'OS Release mapping'},
 'DIR.1'=>{de=>'primär',en=>'primary'},
 'DIR.'=>{de=>'alernativ',en=>'alternate'},
+'WELCOME'=>{de=>'
+Eine Verbingung ist als "primär" anzusehen, wenn es 
+eine 1:1 Kopplung gibt. Besetzen alternative Darstellungen
+für die gleiche Information in AssetManager, dann sind 
+diese Alternativen als "sekundär" zu kennzeichnen.',en=>'Welcome'},
