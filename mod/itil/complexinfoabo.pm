@@ -1,0 +1,231 @@
+package itil::complexinfoabo;
+#  W5Base Framework
+#  Copyright (C) 2010  Hartmut Vogler (it@guru.de)
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+use strict;
+use vars qw(@ISA);
+use kernel;
+use kernel::App::Web;
+use kernel::App::Web::Listedit;
+use kernel::DataObj::DB;
+use kernel::Field;
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
+
+sub new
+{
+   my $type=shift;
+   my %param=@_;
+   my $self=bless($type->SUPER::new(%param),$type);
+
+   $self->AddFields(
+      new kernel::Field::Linenumber(
+                name          =>'linenumber',
+                label         =>'No.'),
+
+      new kernel::Field::Id(
+                name          =>'id',
+                uivisible     =>0,
+                sqlorder      =>'desc',
+                label         =>'W5BaseID',
+                dataobjattr   =>'itil_infoabo.id'),
+                                                  
+      new kernel::Field::Text(
+                readonly      =>1,
+                htmldetail    =>0,
+                name          =>'name',
+                label         =>'InfoAbo Name',
+                dataobjattr   =>'concat(contact.fullname," - ",'.
+                                'itil_infoabo.infoabomode)'),
+
+      new kernel::Field::Text(
+                readonly      =>1,
+                htmldetail    =>0,
+                name          =>'email',
+                label         =>'Contact Email',
+                dataobjattr   =>'contact.email'),
+
+      new kernel::Field::Contact(
+                name          =>'contact',
+                label         =>'Contact',
+                vjoinon       =>'contactid'),
+
+      new kernel::Field::Link(
+                name          =>'contactid',
+                label         =>'Contact ID',
+                dataobjattr   =>'itil_infoabo.contact'),
+
+      new kernel::Field::Select(
+                name          =>'cistatus',
+                readonly      =>1,
+                htmldetail    =>0,
+                label         =>'Contact CI-State',
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['cistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'cistatusid',
+                group         =>'name',
+                label         =>'Contact CI-StateID',
+                dataobjattr   =>'contact.cistatus'),
+
+
+      new kernel::Field::Select(
+                name          =>'mode',
+                label         =>'Mode',
+                value         =>['eventinfo'],
+                dataobjattr   =>'itil_infoabo.infoabomode'),
+
+      new kernel::Field::Select(
+                name          =>'eventstatclass',
+                label         =>'Prio of event',
+                value         =>[undef,'1','2','3','4'],
+                dataobjattr   =>'itil_infoabo.prio'),
+
+      new kernel::Field::Link(
+                name          =>'nativeventstatclass',
+                label         =>'nativ prio of event',
+                dataobjattr   =>'itil_infoabo.prio'),
+
+#      new kernel::Field::Group(
+#                name          =>'orgarea',
+#                label         =>'Orgarea',
+#                vjoinon       =>'orgareaid'),
+#
+#      new kernel::Field::Link(
+#                name          =>'orgareaid',
+#                label         =>'Orgarea ID',
+#                dataobjattr   =>'itil_infoabo.orgarea'),
+#
+#      new kernel::Field::Group(
+#                name          =>'customer',
+#                label         =>'Customer',
+#                vjoinon       =>'customerid'),
+#
+#      new kernel::Field::Link(
+#                name          =>'customerid',
+#                label         =>'Orgarea ID',
+#                dataobjattr   =>'itil_infoabo.customer'),
+
+      new kernel::Field::CDate(
+                name          =>'cdate',
+                group         =>'source',
+                sqlorder      =>'desc',
+                label         =>'Creation-Date',
+                dataobjattr   =>'itil_infoabo.createdate'),
+                                                  
+      new kernel::Field::MDate(
+                name          =>'mdate',
+                group         =>'source',
+                sqlorder      =>'desc',
+                label         =>'Modification-Date',
+                dataobjattr   =>'itil_infoabo.modifydate'),
+
+      new kernel::Field::Creator(
+                name          =>'creator',
+                group         =>'source',
+                label         =>'Creator',
+                dataobjattr   =>'itil_infoabo.createuser'),
+
+      new kernel::Field::Owner(
+                name          =>'owner',
+                group         =>'source',
+                label         =>'Owner',
+                dataobjattr   =>'itil_infoabo.modifyuser'),
+
+      new kernel::Field::Editor(
+                name          =>'editor',
+                group         =>'source',
+                label         =>'Editor',
+                dataobjattr   =>'itil_infoabo.editor'),
+
+      new kernel::Field::RealEditor(
+                name          =>'realeditor',
+                group         =>'source',
+                label         =>'RealEditor',
+                dataobjattr   =>'itil_infoabo.realeditor'),
+
+   );
+   $self->setDefaultView(qw(linenumber name cistatus eventstatclass mdate));
+   $self->{history}=[qw(insert modify delete)];
+
+   $self->setWorktable("itil_infoabo");
+   return($self);
+}
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my ($worktable,$workdb)=$self->getWorktable();
+   return("$worktable left outer join contact ".
+          "on $worktable.contact=contact.userid ");
+}
+
+
+
+
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+#   my $name=trim(effVal($oldrec,$newrec,"name"));
+#   if ($name=~m/\s/i){
+#      $self->LastMsg(ERROR,"invalid sitename '%s' specified",$name); 
+#      return(undef);
+#   }
+#   $newrec->{'name'}=$name;
+   return(1);
+}
+
+
+sub isViewValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return("header","default") if (!defined($rec) && $self->IsMemberOf("admin"));
+   my $o=getModuleObject($self->Config,"base::infoabo");
+   return("ALL") if ($o->isInfoAboAdmin());
+   return();
+}
+
+sub isWriteValid
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my $o=getModuleObject($self->Config,"base::infoabo");
+   return("default") if ($o->isInfoAboAdmin());
+   return(undef);
+}
+
+
+sub isWriteValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return("default") if ($self->IsMemberOf("admin"));
+   return(undef);
+}
+
+
+
+
+
+1;

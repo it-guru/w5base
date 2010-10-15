@@ -76,6 +76,7 @@
 'itil.kern.bp.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.kern.bp.lnksys'=>{de=>'Verkn. System',en=>'Link System'},
 'itil.kern.bp.lnkappl'=>{de=>'Verkn. Anw.',en=>'Link Appl.'},
+'itil.kern.complexinfoabo'=>{de=>'KomplexInfoabo',en=>'ComplexInfoabo'},
 'Tools.analytics.itilfault'=>{de=>'ITIL Ausfallsanalyse',en=>'ITIL fault analytics'},
 'itil.proc'=>{de=>'Prozesssteuerung',en=>'Processcontrol'},
 'itil.proc.ChangeManagement'=>{de=>'Change Management',en=>'Change Management'},

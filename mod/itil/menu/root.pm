@@ -375,6 +375,11 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("itil.kern.complexinfoabo",
+                      "itil::complexinfoabo",
+                      func=>'MainWithNew',
+                      defaultacl=>['admin']);
+   
    $self->RegisterObj("itil.proc",
                       "tmpl/welcome",
                       prio=>20000);

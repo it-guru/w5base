@@ -1010,6 +1010,25 @@ sub InitCopy
 }
 
 
+sub addComplexAbos
+{
+   my $self=shift;
+   my $emailto=shift;
+   my $WfRec=shift;
+
+   my $complexabo=getModuleObject($self->Config,"itil::complexinfoabo");
+
+   my @flt=();
+
+   push(@flt,{mode=>\'eventinfo',cistatusid=>\'4',
+              nativeventstatclass=>[$WfRec->{eventstatclass},undef]});
+   $complexabo->SetFilter(\@flt);
+   foreach my $rec ($complexabo->getHashList(qw(email))){
+      $emailto->{$rec->{email}}++;
+   }
+}
+
+
 sub getNotifyDestinations
 {
    my $self=shift;
@@ -1031,6 +1050,7 @@ sub getNotifyDestinations
                $emailto->{$email}++;
             }
          }
+         $self->addComplexAbos($emailto,$WfRec);
       }
       elsif ($WfRec->{eventmode} eq "EVk.net"){ 
          my $netid=$WfRec->{affectednetworkid};
