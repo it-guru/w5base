@@ -1,6 +1,6 @@
 use w5base;
 set FOREIGN_KEY_CHECKS=0;
-create table tsacinv_zlnkw5bosrelease (
+create table tsacinv_lnkw5bosrelease (
   id           bigint(20) NOT NULL,
   tsacid       bigint(20) NOT NULL,
   w5bid        bigint(20),
