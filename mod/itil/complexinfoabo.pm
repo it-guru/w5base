@@ -238,7 +238,7 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default") if ($self->IsMemberOf("admin"));
+   return("default") if ($o->isInfoAboAdmin());
    return(undef);
 }
 
