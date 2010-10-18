@@ -3,6 +3,7 @@
 'DIR.'=>{de=>'alernativ',en=>'alternate'},
 'WELCOME'=>{de=>'
 Eine Verbingung ist als "primär" anzusehen, wenn es 
-eine 1:1 Kopplung gibt. Besetzen alternative Darstellungen
+eine 1:1 Kopplung gibt. Bestehen alternative Darstellungen
 für die gleiche Information in AssetManager, dann sind 
-diese Alternativen als "sekundär" zu kennzeichnen.',en=>'Welcome'},
+diese Alternativen als "alternativ" zu kennzeichnen, wobei 
+eine von diesen dann als "primär" zu definieren ist.',en=>'Welcome'},
