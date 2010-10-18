@@ -8,7 +8,6 @@
 'Customer Contact'=>{de=>'Kundenkontakt'},
 'Developer'=>{de=>'Entwickler'},
 'Vendor Contact'=>{de=>'Herstellerkontakt'},
-'Customer Technical Contact'=>{de=>'Kunden tech. Ansprechpartner'},
 'Development coordination'=>{de=>'Entwicklungskoordination'},
 'Chief Developer'=>{de=>'Entwicklungsleiter'},
 'Order acceptation'=>{de=>'Auftragsannahme'},

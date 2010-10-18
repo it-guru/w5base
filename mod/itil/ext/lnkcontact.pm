@@ -61,7 +61,7 @@ sub getPosibleRoles
                                                  $self->Self),
          "customer"        =>$self->getParent->T("Customer Contact",
                                                  $self->Self),
-         "ctm"             =>$self->getParent->T("Customer Technical Contact",
+         "ctm"             =>$self->getParent->T("Customer Technical Manager",
                                                  $self->Self),
          "techcontact"     =>$self->getParent->T("Technical Contact",
                                                  $self->Self),
