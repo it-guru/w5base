@@ -238,6 +238,7 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
+   my $o=getModuleObject($self->Config,"base::infoabo");
    return("default") if ($o->isInfoAboAdmin());
    return(undef);
 }
