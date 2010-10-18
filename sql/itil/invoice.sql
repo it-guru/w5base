@@ -20,7 +20,7 @@ create table lnkapplinvoicestorage (
   modifyuser   bigint(20) default NULL,
   editor       varchar(100) NOT NULL default '',
   realeditor   varchar(100) NOT NULL default '',
-  srcsys       varchar(10) default 'w5base',
+  srcsys       varchar(100) default 'w5base',
   srcid        varchar(20) default NULL,
   srcload      datetime    default NULL,
   PRIMARY KEY  (id), 

@@ -17,7 +17,7 @@ create table businessprocess (
   modifyuser  bigint(20) NOT NULL default '0',
   editor      varchar(100) NOT NULL default '',
   realeditor  varchar(100) NOT NULL default '',
-  srcsys      varchar(10) default 'w5base',
+  srcsys      varchar(100) default 'w5base',
   srcid       varchar(20) default NULL,
   srcload     datetime    default NULL,
   PRIMARY KEY  (id),key(mandator),key(indexno),
