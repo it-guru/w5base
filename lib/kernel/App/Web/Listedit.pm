@@ -1698,8 +1698,28 @@ sub prepUploadRecord                       # pre processing interface
    my $self=shift;
    my $newrec=shift;
 
+   my $idobj=$self->IdField();
+   my $idname;
+
+   if (defined($idobj)){
+      $idname=$idobj->Name();
+      if (!exists($newrec->{$idname}) || $newrec->{$idname} eq ""){
+         if (exists($newrec->{srcid}) && $newrec->{srcid} ne ""){
+            my $i=$self->Clone();
+            $i->SetFilter({srcid=>\$newrec->{srcid},
+                           srcsys=>'upload:'.$ENV{REMOTE_USER}});
+            my ($rec,$msg)=$i->getOnlyFirst($idname);
+            if (defined($rec)){
+               $newrec->{$idname}=$rec->{$idname};
+               delete($newrec->{srcid});
+            }
+         }
+      }
+   }
    return(1);
 }
+
+
 
 sub translateUploadFieldnames              # translation interface
 {
@@ -1854,6 +1874,8 @@ sub ProcessUploadRecord
    return(1);
 }
 
+
+
 sub Upload
 {
    my $self=shift;
@@ -1909,13 +1931,15 @@ sub Upload
                                             if (defined($fobj)){
                                                $label=$fobj->Label();
                                             }
-                                            $self->LastMsg(ERROR,
-                                                           'field "%s" is not '.
-                                                           'allowed to be '.
-                                                           'uploaded',
-                                                           $label);
-                                            $fldchk=0;
-                                            last;
+                                            if ($fobj->Name() ne "srcid"){
+                                               $self->LastMsg(ERROR,
+                                                  'field "%s" is not '.
+                                                  'allowed to be '.
+                                                  'uploaded',
+                                                  $label);
+                                               $fldchk=0;
+                                               last;
+                                            }
                                          }
                                       }
                                       if ($fldchk &&

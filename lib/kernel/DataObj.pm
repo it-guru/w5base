@@ -745,9 +745,19 @@ sub SecureValidate
              @fieldgrouplist=("default");
           }
           my $writeok=0;
-          foreach my $group (@fieldgrouplist){
-             if (grep(/^$group$/,@$wrgroups)){
-                $writeok=1;last;
+          if ($fo->Name() eq "srcid" && !defined($oldrec)){
+             if (defined($newrec->{srcid}) &&
+                 $newrec->{srcid} ne ""){
+                $writeok=1;
+                my $sys="upload:".$ENV{REMOTE_USER};
+                $newrec->{srcsys}=$sys;
+             }
+          }
+          else{
+             foreach my $group (@fieldgrouplist){
+                if (grep(/^$group$/,@$wrgroups)){
+                   $writeok=1;last;
+                }
              }
           }
           if ($fo->Type() eq "SubList" ||
