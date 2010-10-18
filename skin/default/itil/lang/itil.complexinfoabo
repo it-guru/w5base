@@ -1,3 +1,9 @@
 'itil::complexinfoabo'=>{de=>'IT Workflow Complex Infoabo',
                          en=>'IT Workflow Complex Infoabo'},
+'Contact'=>{de=>'Kontakt'},
+'Mode'=>{de=>'Modus'},
+'Prio of eventinfo'=>{de=>'Prio der Ereignisinfo'},
+'Prio of affected config item'=>{de=>'Prio des betroffenen Config-Items'},
+'affected orgarea'=>{de=>'betroffener Organisationsbereich'},
+'affected customer'=>{de=>'betroffener Kunde'},
 

@@ -335,6 +335,11 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("AL_TCom.kern.complexinfoabo",
+                      "itil::complexinfoabo",
+                      func=>'MainWithNew',
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("AL_TCom.proc",
                       "tmpl/welcome",
                       prio=>20000);

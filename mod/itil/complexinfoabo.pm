@@ -92,34 +92,51 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'eventstatclass',
-                label         =>'Prio of event',
-                value         =>[undef,'1','2','3','4'],
-                dataobjattr   =>'itil_infoabo.prio'),
+                allowempty    =>1,
+                useNullEmpty  =>1,
+                label         =>'Prio of eventinfo',
+                value         =>['1','2','3','4','5'],
+                dataobjattr   =>'itil_infoabo.eventstatclass'),
 
       new kernel::Field::Link(
                 name          =>'nativeventstatclass',
                 label         =>'nativ prio of event',
-                dataobjattr   =>'itil_infoabo.prio'),
+                dataobjattr   =>'itil_infoabo.eventstatclass'),
 
-#      new kernel::Field::Group(
-#                name          =>'orgarea',
-#                label         =>'Orgarea',
-#                vjoinon       =>'orgareaid'),
-#
-#      new kernel::Field::Link(
-#                name          =>'orgareaid',
-#                label         =>'Orgarea ID',
-#                dataobjattr   =>'itil_infoabo.orgarea'),
-#
-#      new kernel::Field::Group(
-#                name          =>'customer',
-#                label         =>'Customer',
-#                vjoinon       =>'customerid'),
-#
-#      new kernel::Field::Link(
-#                name          =>'customerid',
-#                label         =>'Orgarea ID',
-#                dataobjattr   =>'itil_infoabo.customer'),
+      new kernel::Field::Select(
+                name          =>'affecteditemprio',
+                label         =>'Prio of affected config item',
+                allowempty    =>1,
+                useNullEmpty  =>1,
+                value         =>['1','2','3'],
+                dataobjattr   =>'itil_infoabo.affecteditemprio'),
+
+      new kernel::Field::Link(
+                name          =>'nativaffecteditemprio',
+                label         =>'nativ prio of event',
+                dataobjattr   =>'itil_infoabo.affecteditemprio'),
+
+      new kernel::Field::Group(
+                name          =>'affectedorgarea',
+                AllowEmpty    =>1,
+                label         =>'affected orgarea',
+                vjoinon       =>'affectedorgareaid'),
+
+      new kernel::Field::Link(
+                name          =>'affectedorgareaid',
+                label         =>'Orgarea ID',
+                dataobjattr   =>'itil_infoabo.affectedorgarea'),
+
+      new kernel::Field::Group(
+                name          =>'affectedcustomer',
+                AllowEmpty    =>1,
+                label         =>'affected customer',
+                vjoinon       =>'affectedcustomerid'),
+
+      new kernel::Field::Link(
+                name          =>'affectedcustomerid',
+                label         =>'Orgarea ID',
+                dataobjattr   =>'itil_infoabo.affectedcustomer'),
 
       new kernel::Field::CDate(
                 name          =>'cdate',
@@ -160,7 +177,8 @@ sub new
                 dataobjattr   =>'itil_infoabo.realeditor'),
 
    );
-   $self->setDefaultView(qw(linenumber name cistatus eventstatclass mdate));
+   $self->setDefaultView(qw(name cistatus eventstatclass 
+                            affectedcustomer affectedorgarea ));
    $self->{history}=[qw(insert modify delete)];
 
    $self->setWorktable("itil_infoabo");

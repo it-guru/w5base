@@ -2823,12 +2823,14 @@ sub FilterPart2SQLexp
    my @workfilter=(@$filter);
 #   if (!defined($sqlparam{containermode})){
       my $conjunction=$sqlparam{conjunction};
-      if ($sqlparam{allow_sql_in}){
-         if ($#workfilter>10){
+      if ($sqlparam{allow_sql_in}){  # NULL check not works with "in" statement!
+         if ($#workfilter>10 && !in_array(\@workfilter,undef)){
             my @subexp=();
             while(my @subflt=splice(@workfilter,0,999)){
                push(@subexp,"$sqlfieldname in (".
-                 join(",",map({"'".$_."'";} @subflt)).")");
+                 join(",",map({my $qv="'".$_."'";
+                               $qv="NULL" if (!defined($_)); 
+                               $qv;} @subflt)).")");
             }
             $exp="(".join(" or ",@subexp).")";
 

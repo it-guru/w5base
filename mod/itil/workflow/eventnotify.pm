@@ -1017,11 +1017,57 @@ sub addComplexAbos
    my $WfRec=shift;
 
    my $complexabo=getModuleObject($self->Config,"itil::complexinfoabo");
-
+   my %allcustomer=();
+   my %allorgarea=();
    my @flt=();
+   if ($WfRec->{eventmode} eq "EVk.appl"){
+      my $applid=$WfRec->{affectedapplicationid};
+      $applid=[$applid] if (ref($applid) ne "ARRAY");
+      my $appl=getModuleObject($self->Config,"itil::appl");
+      $appl->SetFilter({id=>$applid});
+      foreach my $rec ($appl->getHashList(qw(customerid responseteamid
+                                             businessteamid delmgrteamid))){
+         if ($rec->{customerid} ne ""){
+            $self->LoadGroups(\%allcustomer,"up",$rec->{customerid});
+         }
+         if ($rec->{responseteamid} ne ""){
+            $self->LoadGroups(\%allorgarea,"up",$rec->{responseteamid});
+         }
+         if ($rec->{businessteamid} ne ""){
+            $self->LoadGroups(\%allorgarea,"up",$rec->{businessteamid});
+         }
+         if ($rec->{businessteamid} ne ""){
+            $self->LoadGroups(\%allorgarea,"up",$rec->{delmgrteamid});
+         }
+      }
+      push(@flt,{mode=>\'eventinfo',cistatusid=>[3,4],
+                 nativeventstatclass=>[$WfRec->{eventstatclass},undef],
+                 affecteditemprio=>[$WfRec->{affecteditemprio},undef],
+                 affectedcustomerid=>[keys(%allcustomer)],
+                 affectedorgareaid=>[keys(%allorgarea)],
+                 });
+      push(@flt,{mode=>\'eventinfo',cistatusid=>[3,4],
+                 nativeventstatclass=>[$WfRec->{eventstatclass},undef],
+                 affecteditemprio=>[$WfRec->{affecteditemprio},undef],
+                 affectedcustomerid=>[keys(%allcustomer)],
+                 affectedorgareaid=>[undef],
+                 });
+      push(@flt,{mode=>\'eventinfo',cistatusid=>[3,4],
+                 nativeventstatclass=>[$WfRec->{eventstatclass},undef],
+                 affecteditemprio=>[$WfRec->{affecteditemprio},undef],
+                 affectedcustomerid=>[undef],
+                 affectedorgareaid=>[keys(%allorgarea)],
+                 });
+   }
+   else{
+      push(@flt,{mode=>\'eventinfo',cistatusid=>[3,4],
+                 nativeventstatclass=>[$WfRec->{eventstatclass},undef],
+                 affecteditemprio=>[$WfRec->{affecteditemprio},undef],
+                 affectedcustomerid=>[undef],
+                 affectedorgareaid=>[undef],
+                 });
+   }
 
-   push(@flt,{mode=>\'eventinfo',cistatusid=>\'4',
-              nativeventstatclass=>[$WfRec->{eventstatclass},undef]});
    $complexabo->SetFilter(\@flt);
    foreach my $rec ($complexabo->getHashList(qw(email))){
       $emailto->{$rec->{email}}++;

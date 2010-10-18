@@ -31,6 +31,7 @@ sub new
    $self->{_permitted}->{jsonchanged}=1;      # On Changed Handling
    $self->{_permitted}->{jsoninit}=1;      # On Init Handling
    $self->{allownative}=undef if (!exists($self->{allownative}));
+   $self->{useNullEmpty}=0    if (!exists($self->{allownative}));
    return($self);
 }
 
@@ -275,7 +276,11 @@ sub Validate
       my $val=$newrec->{$name};
       if (($val eq "" || (ref($val) eq "ARRAY" && $#{$val}==-1)) 
           && $self->{allowempty}==1){
+         if ($self->{useNullEmpty}){
+            return({$self->Name()=>undef});
+         }
          return({$self->Name()=>$val});
+     
       }
       else{
          my @options=$self->getPostibleValues($oldrec,$newrec,"edit");
