@@ -123,6 +123,12 @@ sub new
                 label         =>'Installation date',
                 dataobjattr   =>'lnksoftwaresystem.instdate'),
                                                    
+      new kernel::Field::Text(
+                name          =>'instpath',
+                group         =>'misc',
+                label         =>'Installation path',
+                dataobjattr   =>'lnksoftwaresystem.instpath'),
+                                                   
       new kernel::Field::Textarea(
                 name          =>'comments',
                 searchable    =>0,
@@ -336,6 +342,14 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
+
+   my $instpath=effVal($oldrec,$newrec,"instpath");
+   if ($instpath ne ""){
+      if (!($instpath=~m/^[a-z1-9\.\\_\/:-]+$/i)){
+         $self->LastMsg(ERROR,"invalid installation path");
+         return(undef);
+      }
+   }
    my $softwareid=effVal($oldrec,$newrec,"softwareid");
    if ($softwareid==0){
       $self->LastMsg(ERROR,"invalid software specified");

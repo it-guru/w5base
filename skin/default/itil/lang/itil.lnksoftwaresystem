@@ -9,9 +9,11 @@
 'System CI-State'=>{de=>'System CI-Status'},
 'License CI-State'=>{de=>'Lizenz CI-Status'},
 'Installation date'=>{de=>'Installationsdatum'},
+'Installation path'=>{de=>'Installationsverzeichnis'},
 'invalid software version specified'=>{
                de=>'ungültiger Software-Versionsausdruck'},
 'invalid software specified'=>{de=>'keine oder ungültige Software'},
+'invalid installation path'=>{de=>'ungültiges Installationsverzeichnis'},
 'System Mandator'=>{de=>'System Mandant'},
 'License Mandator'=>{de=>'Lizenz Mandant'},
 'useable by application'=>{de=>'nutzbar durch Anwendung'},

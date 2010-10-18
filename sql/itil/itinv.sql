@@ -859,3 +859,4 @@ alter table software add docsig tinyint(1) default '0';
 alter table software add compcontact bigint(20) default NULL;
 alter table software add depcompcontact bigint(20) default NULL;
 alter table ipaddress add key(system);
+alter table lnksoftwaresystem  add instpath varchar(255) default NULL;
