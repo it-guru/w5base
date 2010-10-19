@@ -148,6 +148,27 @@ sub new
 #                vjoindisp     =>['name','comments'],
 #                vjoininhash   =>['name']),
 
+      new kernel::Field::Text(
+                name          =>'releasekey',
+                readonly      =>1,
+                group         =>'releaseinfos',
+                label         =>'Releasekey (Beta)',
+                dataobjattr   =>'lnksoftwaresystem.releasekey'),
+                                                   
+      new kernel::Field::Text(
+                name          =>'majorminorkey',
+                readonly      =>1,
+                group         =>'releaseinfos',
+                label         =>'majorminorkey (Beta)',
+                dataobjattr   =>'lnksoftwaresystem.majorminorkey'),
+                                                   
+      new kernel::Field::Text(
+                name          =>'patchkey',
+                readonly      =>1,
+                group         =>'releaseinfos',
+                label         =>'patchkey (Beta)',
+                dataobjattr   =>'lnksoftwaresystem.patchkey'),
+                                                   
       new kernel::Field::Select(
                 name          =>'softwarecistatus',
                 group         =>'link',
@@ -300,6 +321,7 @@ sub new
                 dataobjattr   =>'lnksoftwaresystem.realeditor'),
                                                    
    );
+   $self->{history}=[qw(insert modify delete)];
    $self->setDefaultView(qw(software version quantity system cdate));
    $self->setWorktable("lnksoftwaresystem");
    return($self);
@@ -376,6 +398,40 @@ sub Validate
             return(undef);
          }
       }
+   }
+   if ($version ne "" && exists($newrec->{version})){  #release details gen
+      my @v=split(/\./,$version);
+      my @relkey=();
+      for(my $relpos=0;$relpos<5;$relpos++){
+         if ($v[$relpos]=~m/^\d+$/){
+            $relkey[$relpos]=sprintf("%04d",$v[$relpos]);
+         }
+         else{
+            $relkey[$relpos]="9999";
+         }
+      }
+      $newrec->{releasekey}=join("",@relkey);
+      if (my ($rel,$patch)=$version=~m/^(.*\d)(p\d.*)$/){
+         $newrec->{patchkey}=$patch;
+         $newrec->{majorminorkey}=$rel;
+      }
+      elsif (my ($rel,$patch)=$version=~m/^(.*\d)(SP\d.*)$/){
+         $newrec->{patchkey}=$patch;
+         $newrec->{majorminorkey}=$rel;
+      }
+      elsif (my ($rel,$patch)=$version=~m/^(.*\d) (build.*)$/){
+         $newrec->{patchkey}=$patch;
+         $newrec->{majorminorkey}=$rel;
+      }
+      elsif (my ($rel,$patch)=$version=~m/^(\d+\.\d+)\.(.*)$/){
+         $newrec->{patchkey}=$patch;
+         $newrec->{majorminorkey}=$rel;
+      }
+      else{
+         $newrec->{patchkey}="?";
+         $newrec->{majorminorkey}="?";
+      }
+      
    }
    my $systemid=effVal($oldrec,$newrec,"systemid");
    if ($systemid==0){
