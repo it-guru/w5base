@@ -1,5 +1,4 @@
 alter table TCOM_appl change srcsys srcsys varchar(100) default 'w5base';
-alter table appl change srcsys srcsys varchar(100) default 'w5base';
 alter table article change srcsys srcsys varchar(100) default 'w5base';
 alter table articlegroup change srcsys srcsys varchar(100) default 'w5base';
 alter table articletag change srcsys srcsys varchar(100) default 'w5base';
@@ -47,7 +46,6 @@ alter table projectroom change srcsys srcsys varchar(100) default 'w5base';
 alter table servicesupport change srcsys srcsys varchar(100) default 'w5base';
 alter table software change srcsys srcsys varchar(100) default 'w5base';
 alter table swinstance change srcsys srcsys varchar(100) default 'w5base';
-alter table system change srcsys srcsys varchar(100) default 'w5base';
 alter table systemnfsnas change srcsys srcsys varchar(100) default 'w5base';
 alter table timeplan change srcsys srcsys varchar(100) default 'w5base';
 alter table timeplanworkgroup change srcsys srcsys varchar(100) default 'w5base';
