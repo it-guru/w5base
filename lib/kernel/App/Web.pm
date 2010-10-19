@@ -482,7 +482,7 @@ sub GTCverification
             my $gtcdate=NowStamp("en");
             if ($user->ValidatedUpdateRecord($urec,{cistatusid=>'4',
                                                     gtcack=>$gtcdate,
-                                                    gtctext=>$txt},
+                                                    gtctxt=>$txt},
                                              {userid=>\$userid})){
                msg(INFO,"activation of user account $userid ok");
                my $currenturl=$ENV{SCRIPT_URI};
@@ -504,7 +504,7 @@ sub GTCverification
                            title=>'W5Base - GTC verification');
    print ("<input type=hidden name=GTCSURE value=''>");
    my $sitename=$self->Config->Param("SITENAME");
-   my $suremsg=$self->T("You are sure, you will accept the completly GTC's\n".
+   my $suremsg=$self->T("You are sure, you will accept the completly GTC's ".
                         "and have understood all consequences?");
    my $nomsg=$self->T("Without accepted GTC's, no access could be granted!");
    print(<<EOF);

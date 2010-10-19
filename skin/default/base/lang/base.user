@@ -84,6 +84,7 @@
 	       en=>'4 - access to person related informations with report access'},
 'security state'=>{de=>'Sicherheitsstatus'},
 'GTC acknowledge date'=>{de=>'AGB Bestätigungsdatum'},
+'GTC text'=>{de=>'bestätigter AGB Wortlaut'},
 'Groupnames'=>{de=>'Gruppennamen'},
 'personal identifier number'=>{de=>'Personalausweisnummer'},
 'driver license number'=>{de=>'Führerscheinnummer'},
