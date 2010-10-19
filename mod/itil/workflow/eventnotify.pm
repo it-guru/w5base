@@ -293,6 +293,7 @@ sub getDynamicFields
       new kernel::Field::Textarea(
                 name          =>'eventdesciption',
                 translation   =>'itil::workflow::eventnotify',
+                dlabelpref    =>\&LangPrefix,
                 group         =>'eventnotify',
                 label         =>'Whats happend',
                 alias         =>'detaildescription'),
@@ -300,6 +301,7 @@ sub getDynamicFields
       new kernel::Field::Textarea(
                 name          =>'eventreason',
                 translation   =>'itil::workflow::eventnotify',
+                dlabelpref    =>\&LangPrefix,
                 group         =>'eventnotify',
                 label         =>'Event reason',
                 container     =>'headref'),
@@ -307,6 +309,7 @@ sub getDynamicFields
       new kernel::Field::Textarea(
                 name          =>'eventimpact',
                 translation   =>'itil::workflow::eventnotify',
+                dlabelpref    =>\&LangPrefix,
                 group         =>'eventnotify',
                 label         =>'Impact for customer',
                 container     =>'headref'),
@@ -314,6 +317,7 @@ sub getDynamicFields
       new kernel::Field::Textarea(
                 name          =>'shorteventelimination',
                 xlswidth      =>'45',
+                dlabelpref    =>\&LangPrefix,
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'eventnotify',
                 label         =>'Action for short event elimination',
@@ -322,6 +326,7 @@ sub getDynamicFields
       new kernel::Field::Textarea(
                 name          =>'longeventelimination',
                 xlswidth      =>'45',
+                dlabelpref    =>\&LangPrefix,
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'eventnotify',
                 label         =>'Action for long event elimination',
@@ -329,7 +334,7 @@ sub getDynamicFields
 
       new kernel::Field::Textarea(
                 name          =>'eventaltdesciption',
-                dlabelpref    =>\&LangPrefix,
+                dlabelpref    =>\&AltLangPrefix,
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'alteventnotify',
                 label         =>'Whats happend',
@@ -337,7 +342,7 @@ sub getDynamicFields
 
       new kernel::Field::Textarea(
                 name          =>'eventaltreason',
-                dlabelpref    =>\&LangPrefix,
+                dlabelpref    =>\&AltLangPrefix,
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'alteventnotify',
                 label         =>'Event reason',
@@ -345,7 +350,7 @@ sub getDynamicFields
 
       new kernel::Field::Textarea(
                 name          =>'eventaltimpact',
-                dlabelpref    =>\&LangPrefix,
+                dlabelpref    =>\&AltLangPrefix,
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'alteventnotify',
                 label         =>'Impact for customer',
@@ -353,7 +358,7 @@ sub getDynamicFields
 
       new kernel::Field::Textarea(
                 name          =>'altshorteventelimination',
-                dlabelpref    =>\&LangPrefix,
+                dlabelpref    =>\&AltLangPrefix,
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'alteventnotify',
                 label         =>'Action for short event elimination',
@@ -361,7 +366,7 @@ sub getDynamicFields
 
       new kernel::Field::Textarea(
                 name          =>'altlongeventelimination',
-                dlabelpref    =>\&LangPrefix,
+                dlabelpref    =>\&AltLangPrefix,
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'alteventnotify',
                 label         =>'Action for long event elimination',
@@ -566,6 +571,22 @@ sub FgetPosibleEventStatType
 }
 
 sub LangPrefix
+{
+   my $self=shift;
+   my %param=@_;
+   my $pref="";
+   if (defined($param{current})){
+      if (defined($param{current}->{eventlang})){
+         my $lang=$param{current}->{eventlang};
+         $lang=~s/-.*$//;
+         return($lang.": ");
+      }
+   }
+
+   return($pref);
+}
+
+sub AltLangPrefix
 {
    my $self=shift;
    my %param=@_;
