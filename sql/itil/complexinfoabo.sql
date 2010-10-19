@@ -1,4 +1,5 @@
 use w5base;
+set FOREIGN_KEY_CHECKS=0;
 create table itil_infoabo (
   id           bigint(20)   NOT NULL,
   contact      bigint(20)   NOT NULL,
@@ -13,7 +14,10 @@ create table itil_infoabo (
   modifydate   datetime     NOT NULL default '0000-00-00 00:00:00',
   modifyuser   bigint(20)   NOT NULL default '0',
   createdate   datetime     NOT NULL default '0000-00-00 00:00:00',
-  createuser   bigint(20)   NOT NULL default '0',
+  createuser   bigint(20)   NOT NULL default '0', expiration datetime,
   PRIMARY KEY  (id),key (contact), key(infoabomode),
+  FOREIGN KEY fk_itil_infoabo_u (contact) 
+          REFERENCES contacts (userid) ON DELETE CASCADE,
   key(affectedorgarea),key(affectedcustomer)
 );
+set FOREIGN_KEY_CHECKS=1;
