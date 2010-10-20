@@ -42,11 +42,14 @@ min number of cores               : 1
        libole-storage-lite-perl libnetaddr-ip-perl libarchive-zip-perl \
        libgd-gd2-perl libapache-dbi-perl libsoap-lite-perl \
        libnet-ldap-perl libnet-ssleay-perl libio-socket-ssl-perl \
-       libapache2-mod-perl2 libapache2-mod-perl2-dev libapache2-mod-perl2-doc \
+       libapache2-mod-perl2 libapache2-mod-perl2-dev libapache2-mod-perl2-doc 
 
 
  Step3: setup webserver/basic auth for webserv and database enviroment 
  ======
+   If you did not have already a /etc/profile.local file, this point is
+   a good time to create it (f.e. with 0 bytes).
+
    Modifing apache envvars
    -----------------------
    # change /etc/apache2/envvars to
@@ -55,7 +58,7 @@ min number of cores               : 1
 
    Adding basic auth module to apache
    ----------------------------------
-   W5Base only needs a apache module, witch provides ...
+   W5Base only needs a apache module, which provides ...
 
        "HTTP Basic Authentication"
 
@@ -80,13 +83,11 @@ min number of cores               : 1
  
      cd /usr/src
      #
-     # checkout from repository
+     # checkout from repository and build the auth cache-server
+     # programmcode (as root!)
      #
      svn co https://apache-mod-ae.svn.sourceforge.net/svnroot/apache-mod-ae\
             apache-mod-ae
-     #
-     # build acache process server
-     #
      cd apache-mod-ae/src && make clean && make
      sudo install -m 750 -g root -o root acache /usr/sbin/acache
      sudo install -m 750 -g root -o root client /usr/sbin/acache-client
@@ -105,7 +106,7 @@ min number of cores               : 1
      # add a default auth script
      #
      sudo install -m 0700 -o root -g root -d /usr/share/lib/acache
-     sudo install -m 0500 -o root -g root contrib/authscripts/dummy.sh \
+     sudo install -m 0500 -o root -g root authscripts/dummy.sh \
                                           /usr/share/lib/acache/dummy.sh
      #
      # build apache modul
@@ -172,10 +173,10 @@ min number of cores               : 1
  ======
    In /etc/profile.local there should be NOT terminal relevant commands, soo
    you should set only enviroment variables!
-   Set W5BASEINSTDIR to directory, in witch you checked
+   Set W5BASEINSTDIR to directory, in which you checked
    out the repository.
-   Set W5BASEDEVUSER to your account as witch you want
-   to develop or edit in the w5base source. Set W5BASEDEVGROUP in witch
+   Set W5BASEDEVUSER to your account as which you want
+   to develop or edit in the w5base source. Set W5BASEDEVGROUP in which
    other developers are. 
 
    # f.e. /etc/profile.local additional variables
@@ -211,7 +212,7 @@ min number of cores               : 1
  
  Step5: checkout w5base from sourceforge and setup w5base /etc/w5base
  ======
-   # as development user or user in witch the webserver should run
+   # as development user or user in which the webserver should run
 
    # setup your svn env
    # add to ~/.subversion/servers (if necessary)
@@ -244,7 +245,13 @@ min number of cores               : 1
    echo 'DATAOBJCONNECT[w5base]="dbi:mysql:w5base"'>>/etc/w5base/databases.conf
    echo 'DATAOBJUSER[w5base]="w5base"' >> /etc/w5base/databases.conf
    echo 'DATAOBJPASS[w5base]="MyW5BaseDBPass"' >> /etc/w5base/databases.conf
-   install -m 2770 -o $W5BASEDEVUSER -g $W5BASEDEVGROUP -d $W5BASEINSTDIR
+   install -m 2775 -o $W5BASEDEVUSER -g $W5BASEDEVGROUP -d $W5BASEINSTDIR
+   #
+   # in production enviroments, you should set W5BASEDEVGROUP to group
+   # of which apache is running. In this case, you can use rights
+   # 2770 for W5BASEINSTDIR . In development enviroments, 2775 rights
+   # are ok.
+   #
    su - $W5BASEDEVUSER
    cd $W5BASEINSTDIR/..
    svn co https://w5base.svn.sourceforge.net/svnroot/w5base/HEAD w5base
@@ -287,9 +294,11 @@ min number of cores               : 1
     http://www.oracle.com/technology/software/tech/oci/instantclient/
 
    ... as rpm. You should use "Instant Client for Linux x86" in the
-   rpm "oracle-instantclient-basic-10.2.0.4-1.i386.rpm". In Debian, you
-   couldn't install rpms, soo you have to convert the rpm to an dep
-   package.
+   rpm "oracle-instantclient-basic-10.2.0.4-1.i386.rpm". 
+   If you are using Debian Lenny of newer, you should use the oracle 11
+   client!
+   In Debian, you couldn't install rpms, soo you have to convert the rpm 
+   to an dep package.
 
     sudo alien oracle-instantclient-basic-10.2.0.4-1.i386.rpm
 
@@ -303,10 +312,10 @@ min number of cores               : 1
     . /etc/profile.local
 
    ... to set ORACLE_HOME in current state. Ensure that only one oracle
-   Version is installed on your system. In not, you maybee have to modify
+   Version is installed on your system. In not, you maybe have to modify
    /etc/profile.local!
 
-   Installing DBD::Oracle have to posibilities:
+   Installing DBD::Oracle have two posibilities:
 
        Variant 1 (recommened):
        -----------------------
@@ -320,7 +329,7 @@ min number of cores               : 1
 
    Now ...
 
-    perl -MDBD::Oracle 
+    perl -MDBD::Oracle -e 'print "OK\n";'
 
    ... should produce no errors. To complete the installation, create
    /etc/oracle and the needed oracle connection files:
@@ -427,7 +436,7 @@ min number of cores               : 1
  In $W5BASEINSTDIR/sbin you will find a small tool called 
  W5InstallCheck. By calling $W5BASEINSTDIR/sbin/W5InstallCheck you can
  verify the integrity of your installation. With this tool most of
- mitakes can be checked.
+ mistakes can be checked.
 
   
 
