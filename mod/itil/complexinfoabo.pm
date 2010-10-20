@@ -83,6 +83,10 @@ sub new
                 label         =>'Contact CI-StateID',
                 dataobjattr   =>'contact.cistatus'),
 
+      new kernel::Field::Date(
+                name          =>'expiration',
+                label         =>'Expiration-Date',
+                dataobjattr   =>'itil_infoabo.expiration'),
 
       new kernel::Field::Select(
                 name          =>'mode',

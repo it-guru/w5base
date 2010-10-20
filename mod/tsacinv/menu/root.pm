@@ -59,6 +59,10 @@ sub Init
                       "tsacinv::ipaddress",
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("ac.itclust",
+                      "tsacinv::itclust",
+                      defaultacl=>['admin']);
+   
    $self->RegisterObj("ac.asset",
                       "tsacinv::asset",
                       defaultacl=>['admin']);

@@ -1,0 +1,4 @@
+'tsacinv::itclust'=>{de=>'Cluster',en=>'Cluster'},
+'Cluster fullname'=>{de=>'vollständiger Clustername'},
+'Usage'=>{de=>'Verwendung'},
+'Type'=>{de=>'Typ'},
