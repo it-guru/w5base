@@ -1,4 +1,4 @@
-package tsacinv::itclust;
+package tsacinv::itclustservice;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -40,25 +40,30 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'fullname',
-                label         =>'Cluster fullname',
+                label         =>'Clusterservice fullname',
                 searchable    =>1,
                 uppersearch   =>1,
                 htmldetail    =>0,
-                htmlwidth     =>'100px',
+                htmlwidth     =>'190px',
                 align         =>'left',
                 dataobjattr   =>"concat(amportfolio.name,concat(' ('".
                                 ",concat(amportfolio.assettag,')')))"),
 
       new kernel::Field::Text(
                 name          =>'name',
-                label         =>'Clustername',
+                label         =>'Clusterservice name',
                 uppersearch   =>1,
                 size          =>'16',
                 dataobjattr   =>'amportfolio.name'),
 
+      new kernel::Field::Text(
+                name          =>'description',
+                label         =>'Description',
+                dataobjattr   =>'amtsiparentchild.description'),
+
       new kernel::Field::Id(
-                name          =>'clusterid',
-                label         =>'ClusterID',
+                name          =>'serviceid',
+                label         =>'ClusterserviceID',
                 size          =>'13',
                 searchable    =>1,
                 uppersearch   =>1,
@@ -115,65 +120,15 @@ sub new
                 label         =>'Usage',
                 dataobjattr   =>'amportfolio.usage'),
 
-#      new kernel::Field::Text(
-#                name          =>'type',
-#                label         =>'Type',
-#                dataobjattr   =>'amcomputer.computertype'),
-
       new kernel::Field::Boolean(
                 name          =>'soxrelevant',
                 label         =>'SOX relevant',
                 dataobjattr   =>"decode(amportfolio.soxrelevant,'YES',1,0)"),
 
       new kernel::Field::Link(
-                name          =>'lclusterid',
-                label         =>'AC-ClusterID',
-                dataobjattr   =>'amcomputer.lcomputerid'),
-
-      new kernel::Field::Link(
                 name          =>'lportfolio',
                 label         =>'AC-PortfolioID',
-                dataobjattr   =>'amportfolio.lportfolioitemid'),
-
-      new kernel::Field::SubList(
-                name          =>'systems',
-                label         =>'Systems',
-                group         =>'systems',
-                vjointo       =>'tsacinv::system',
-                vjoinon       =>['lclusterid'=>'lclusterid'],
-                vjoindisp     =>[qw(systemname systemid status)]),
-
-      new kernel::Field::SubList(
-                name          =>'services',
-                label         =>'Services',
-                group         =>'services',
-                vjointo       =>'tsacinv::itclustservice',
-                vjoinon       =>['lportfolio'=>'lportfolio'],
-                vjoindisp     =>[qw(fullname description)]),
-
-
-      new kernel::Field::Link(
-                name          =>'lportfolioitemid',
-                label         =>'PortfolioID',
-                dataobjattr   =>'amportfolio.lportfolioitemid'),
-
-#      new kernel::Field::Import( $self,
-#                weblinkto     =>'tsacinv::location',
-#                weblinkon     =>['locationid'=>'locationid'],
-#                vjointo       =>'tsacinv::location',
-#                vjoinon       =>['locationid'=>'locationid'],
-#                group         =>'location',
-#                fields        =>['fullname','location']),
-
-      new kernel::Field::Link(
-                name          =>'locationid',
-                label         =>'LocationID',
-                dataobjattr   =>'amportfolio.llocaid'),
-
-
-
-
-
+                dataobjattr   =>'amtsiparentchild.lparentid'),
 
 #      new kernel::Field::SubList(
 #                name          =>'applications',
@@ -260,7 +215,7 @@ sub getSqlFrom
 {
    my $self=shift;
    my $from=
-      "amcomputer, ".
+      "amcomputer,amtsiparentchild, ".
       "(select amportfolio.* from amportfolio ".
       " where amportfolio.bdelete=0) amportfolio,ammodel,".
       "(select amcostcenter.* from amcostcenter ".
@@ -276,8 +231,9 @@ sub initSqlWhere
       "amportfolio.lportfolioitemid=amcomputer.litemid ".
       "and amportfolio.lmodelid=ammodel.lmodelid ".
       "and amportfolio.lcostid=amcostcenter.lcostid(+) ".
+      "and amportfolio.lportfolioitemid=amtsiparentchild.lchildid(+) ".
       "and ammodel.name='CLUSTER' ".
-      "and amcomputer.clustertype='Cluster' ".
+      "and amcomputer.clustertype='Cluster-Service' ".
       "and amcomputer.status<>'out of operation'";
    return($where);
 }
@@ -309,7 +265,7 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default services systems source));
+   return(qw(header default systems source));
 }  
 
 

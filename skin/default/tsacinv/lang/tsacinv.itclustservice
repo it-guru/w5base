@@ -1,0 +1,6 @@
+'tsacinv::itclustservice'=>{de=>'Clusterservice',en=>'Clusterservice'},
+'Clusterservice fullname'=>{de=>'vollständiger Service'},
+'Usage'=>{de=>'Verwendung'},
+'Description'=>{de=>'Beschreibung'},
+'fieldgroup.applications'=>{de=>'Anwendungen',
+                       en=>'Applications'},

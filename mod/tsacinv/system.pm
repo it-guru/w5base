@@ -299,6 +299,11 @@ sub new
                 dataobjattr   =>'amportfolio.lparentid'),
 
       new kernel::Field::Link(
+                name          =>'lclusterid',
+                label         =>'AC-ClusterID',
+                dataobjattr   =>'amcomputer.lparentid'),
+
+      new kernel::Field::Link(
                 name          =>'lportfolioitemid',
                 label         =>'PortfolioID',
                 dataobjattr   =>'amportfolio.lportfolioitemid'),
