@@ -192,6 +192,7 @@ sub getPosibleActions
          if (my ($y,$m)=$WfRec->{eventend}=~m/^(\d{4})-(\d{2})-.*$/){
             foreach my $contractid (@{$WfRec->{affectedcontractid}}){
                push(@p800ids,"$m/$y-$contractid");
+               push(@p800ids,"$m/$y-$contractid-special");
             }
             if ($#p800ids!=-1){
                my $wf=$self->getPersistentModuleObject("p800repcheck",
