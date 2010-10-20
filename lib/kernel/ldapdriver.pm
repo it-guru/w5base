@@ -137,13 +137,15 @@ sub execute
           return(undef,msg(ERROR,"problem while LDAP search"));
        }
        if ($c->{$self->{ldapname}}->{sth}->code()){
-          return(undef,msg(ERROR,"ldap-search:%s",
-                           $c->{$self->{ldapname}}->{sth}->error));
+          return(undef,msg(ERROR,"ldap-search:%s (%s)",
+                           $c->{$self->{ldapname}}->{sth}->error,
+                           Dumper(\@param)));
        }
                       
        $c->{$self->{ldapname}}->{sthdata}=
-                   [$c->{$self->{ldapname}}->{sth}->all_entries()];
-       $c->{$self->{ldapname}}->{sthcount}=$#{$c->{$self->{ldapname}}->{sthdata}}+1;
+           [$c->{$self->{ldapname}}->{sth}->all_entries()];
+       $c->{$self->{ldapname}}->{sthcount}=
+           $#{$c->{$self->{ldapname}}->{sthdata}}+1;
        #printf STDERR ("fifi kernel::ldapdriver found %d entries\n",
        #               $#{$c->{$self->{ldapname}}->{sthdata}}+1);
        return($c->{$self->{ldapname}}->{sth});
