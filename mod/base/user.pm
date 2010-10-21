@@ -388,7 +388,7 @@ sub new
                 name          =>'driverlicno',
                 group         =>'personrelated',
                 label         =>'driver license number',
-                dataobjattr   =>'contact.persidentno'),
+                dataobjattr   =>'contact.driverlicno'),
 
       new kernel::Field::Text(
                 name          =>'eurocarno',
