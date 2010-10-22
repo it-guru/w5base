@@ -48,6 +48,11 @@ sub new
                 dataobjattr   =>'tsacinv_lnkw5bosrelease.id'),
 
 
+      new kernel::Field::Link(
+                name          =>'fullname',
+                label         =>'Fullname',
+                dataobjattr   =>'tsacinv_lnkw5bosrelease.tsacname'),
+
       new kernel::Field::TextDrop(
                 name          =>'w5bosrelease',
                 label         =>'W5Base OS',
@@ -72,6 +77,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'extosrelease',
+                group         =>'acentry',
                 label         =>'AssetManager OS',
                 dataobjattr   =>'tsacinv_lnkw5bosrelease.tsacname'),
 
@@ -177,7 +183,7 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default misc source));
+   return(qw(header acentry default source));
 }
 
 

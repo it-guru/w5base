@@ -111,7 +111,7 @@ min number of cores               : 1
      #
      # build apache modul
      #
-     cd ../apache2
+     cd apache2
      sudo make clean
      sudo make
      #
