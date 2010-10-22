@@ -101,32 +101,28 @@ sub qcheckRecord
          # osrelease mapping
          #
          if ($parrec->{systemos} ne ""){
-            my $acos=$dataobj->ModuleObject("tsacinv::osrelease");
-            $acos->SetFilter({name=>\$parrec->{systemos}});
-            my ($acosrec,$msg)=$acos->getOnlyFirst(qw(id));
-            if (defined($acosrec)){
-               my $mapos=$dataobj->ModuleObject("tsacinv::lnkw5bosrelease");
-               $mapos->SetFilter({extosrelease=>\$parrec->{systemos}});
-               my ($maposrec,$msg)=$mapos->getOnlyFirst(qw(id w5bosrelease));
-               if (defined($maposrec)){
-                  if ($maposrec->{w5bosrelease} ne ""){
-                     $parrec->{systemos}=$maposrec->{w5bosrelease};
-                  }
-                  else{
-                     delete($parrec->{systemos});
-                  }
+            my $mapos=$dataobj->ModuleObject("tsacinv::lnkw5bosrelease");
+            $mapos->SetFilter({extosrelease=>\$parrec->{systemos}});
+            my ($maposrec,$msg)=$mapos->getOnlyFirst(qw(id w5bosrelease));
+            if (defined($maposrec)){
+               if ($maposrec->{w5bosrelease} ne ""){
+                  $parrec->{systemos}=$maposrec->{w5bosrelease};
                }
                else{
-                  $mapos->ValidatedInsertRecord({
-                     extosrelease=>$parrec->{systemos},
-                     direction=>1});
                   delete($parrec->{systemos});
                }
             }
             else{
-               msg(ERROR,"invalid OS entry '%s' from system '%s'(%s) in ".
-                         "AssetManager\n",$parrec->{systemos},
-                         $parrec->{systemname},$parrec->{systemid});
+               my %new=(extosrelease=>$parrec->{systemos},direction=>1);
+               # try to find an already existing name in W5Base
+               my $os=$dataobj->ModuleObject("itil::osrelease");
+               $os->SetFilter({name=>\$parrec->{systemos}});
+               my ($w5osrec,$msg)=$mapos->getOnlyFirst(qw(name));
+               if (defined($w5osrec)){
+                  $new{w5bosrelease}=$w5osrec->{name};
+               }
+               $mapos->ValidatedInsertRecord(\%new);
+               delete($parrec->{systemos});
             }
          }
          #################################################################### 

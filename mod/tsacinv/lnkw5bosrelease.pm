@@ -70,19 +70,10 @@ sub new
                                  ''],
                 dataobjattr   =>'tsacinv_lnkw5bosrelease.outgoing'),
 
-
-      new kernel::Field::TextDrop(
+      new kernel::Field::Text(
                 name          =>'extosrelease',
                 label         =>'AssetManager OS',
-                vjointo       =>'tsacinv::osrelease',
-                vjoinon       =>['extosreleaseid'=>'id'],
-                vjoindisp     =>'name'),
-                                                   
-      new kernel::Field::Link(
-                name          =>'extosreleaseid',
-                label         =>'external os relasse id',
-                dataobjattr   =>'tsacinv_lnkw5bosrelease.tsacid'),
-
+                dataobjattr   =>'tsacinv_lnkw5bosrelease.tsacname'),
 
       new kernel::Field::Creator(
                 name          =>'creator',
