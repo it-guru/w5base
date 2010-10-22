@@ -312,7 +312,7 @@ min number of cores               : 1
     . /etc/profile.local
 
    ... to set ORACLE_HOME in current state. Ensure that only one oracle
-   Version is installed on your system. In not, you maybe have to modify
+   Version is installed on your system. If not, you maybe have to modify
    /etc/profile.local!
 
    Installing DBD::Oracle have two posibilities:
