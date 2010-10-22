@@ -57,6 +57,7 @@ sub Validate
             $m=lc($m);
          }
          $m=~s/^(smtp:)//i;
+         $m=~s/[^a-z0-9_\.\@-]//gi;
          $_=$m;
       } @{$newvallist})];
    if (ref($newvalreq) eq "ARRAY"){
