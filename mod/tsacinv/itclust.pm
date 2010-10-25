@@ -76,6 +76,7 @@ sub new
                 name          =>'assignmentgroupsupervisor',
                 label         =>'Assignment Group Supervisor',
                 htmldetail    =>0,
+                searchable    =>0,
                 vjointo       =>'tsacinv::group',
                 vjoinon       =>['lassignmentid'=>'lgroupid'],
                 vjoindisp     =>'supervisor'),

@@ -233,7 +233,8 @@ sub initSqlWhere
       "and amportfolio.lcostid=amcostcenter.lcostid(+) ".
       "and amportfolio.lportfolioitemid=amtsiparentchild.lchildid(+) ".
       "and ammodel.name='CLUSTER' ".
-      "and amcomputer.clustertype='Cluster-Service' ".
+      "and (amcomputer.clustertype='Cluster-Service' or ".
+      "     amcomputer.clustertype='Cluster-Package') ".
       "and amcomputer.status<>'out of operation'";
    return($where);
 }
