@@ -83,6 +83,8 @@ sub UTF8toLatin1
    if (utf8::is_utf8($dd)){
       utf8::downgrade($dd,1);
       $dd=~s/\x{201e}/"/g;
+      $dd=~s/\x{2022}/*/g;
+      $dd=~s/\x{2013}/|/g;
       decode_utf8($dd,0);
       $dd=encode("iso-8859-1", $dd);
    }

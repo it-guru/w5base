@@ -171,6 +171,10 @@ sub WriteToStdout
                                                 \@recordview,$fieldbase,
                                 $self->getParent->Context->{Linenumber},$msg);
                if (defined($d)){
+                  if (utf8::is_utf8($d)){
+                  #   $d=~s/[\x{2013}\x{2022}]/?/g;
+                     $d=UTF8toLatin1($d);
+                  }
                   syswrite($fh,$d);
                }
             }
