@@ -382,15 +382,20 @@ sub getDynamicFields
                 label         =>'Event notification language',
                 container     =>'headref'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Boolean(
                 name          =>'eventsla',
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'eventnotifyinternal',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'150px',
                 default       =>'0',
-                value         =>['0','1'],
                 label         =>'Event is in SLA online time',
+                container     =>'headref'),
+
+      new kernel::Field::Boolean(
+                name          =>'eventignoreforkpi',
+                translation   =>'itil::workflow::eventnotify',
+                group         =>'eventnotifyinternal',
+                default       =>'0',
+                label         =>'ignore Event while KPI calculation',
                 container     =>'headref'),
 
       new kernel::Field::Text(

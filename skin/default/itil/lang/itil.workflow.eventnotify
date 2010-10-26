@@ -9,6 +9,7 @@
 'fieldgroup.eventnotifyshort'=>{de=>'Ereigniskurzinformation',
                                    en=>'Eventshortnotification'},
 'Event is in SLA online time'=>{de=>'Ereignis liegt innerhalb der SLA Onlinezeit'},
+'ignore Event while KPI calculation'=>{de=>'Ereignis bei KPI Berechnung ignorieren'},
 'Arguments, if not SLA relevant'=>{de=>'Begründung warum das Ereignis nicht SLA relevant ist'},
 'Internal comments'=>{de=>'Interne Bemerkungen'},
 'Affected location component'=>{de=>'betroffene Standort Komponente'},
