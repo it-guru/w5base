@@ -189,20 +189,10 @@ sub getPosibleActions
           ref($WfRec->{affectedcontractid}) eq "ARRAY" &&
           $#{$WfRec->{affectedcontractid}}!=-1){
          my @p800ids;
-         if (my ($y,$m)=$WfRec->{eventend}=~m/^(\d{4})-(\d{2})-.*$/){
-            foreach my $contractid (@{$WfRec->{affectedcontractid}}){
-               push(@p800ids,"$m/$y-$contractid");
-               push(@p800ids,"$m/$y-$contractid-special");
-            }
-            if ($#p800ids!=-1){
-               my $wf=$self->getPersistentModuleObject("p800repcheck",
-                                                       "base::workflow");
-               $wf->SetFilter({srcid=>\@p800ids,
-                               stateid=>\'21',
-                               srcsys=>\"AL_TCom::event::mkp800"});
-               my @l=$wf->getHashList(qw(id));
-               return() if ($#l!=-1);
-            }
+
+         my $d=CalcDateDuration($WfRec->{eventend},NowStamp("en"));
+         if ($d->{totalminutes}>5000){ # modify only allowed for 3 days
+            return();
          }
       }
    }
