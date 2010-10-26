@@ -1,0 +1,17 @@
+'conmode'=>{de=><<EOF,
+Bei der Definition des Modus ist vorwiegend
+das Zeitverhalten der Schnittstelle zu
+betrachten:
+(online):
+es können zu beliebigen Zeitpunkten Daten ausgetauscht werden
+
+(batch):
+es werden Daten zu festgelegten Zeitpunkten (z.B. 3x tgl) ausgetauscht
+
+(manuel):
+nur durch z.B. Eingriff der Admins oder des Betriebsteams werden Daten ausgetauscht
+EOF
+en=><<EOF},
+
+EOF
+
