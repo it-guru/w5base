@@ -1,0 +1,97 @@
+body{
+}
+p{
+   color:black;
+}
+h1{
+   text-align:center;
+   margin-bottom:20px;
+   font-size:18px;
+}
+div.disclaimer{
+   border-style:solid;
+   border-width:1px;
+   border-color:gray;
+   margin-top:5px;
+   margin-bottom:2px;
+   padding:4px;
+}
+div.lnkdocument{
+   margin-top:5px;
+   max-width:600px;
+   padding:5px;
+   margin:5px;
+   margin-right:0px;
+   border-style:solid;
+   border-width:1px;
+   border-color:gray;
+}
+ol.appl{
+   margin-top:20px;
+   margin-bottom:20px;
+   padding-left:25px;
+}
+ol.appl li{
+   font-size:15px;
+   font-weight:bold;
+}
+ol.lnkapplappl{
+   margin-top:5px;
+   margin-bottom:20px;
+   padding-left:20px;
+}
+ol.lnkapplappl li{
+   font-size:15px;
+   font-weight:bold;
+   color:darkblue;
+}
+div.comments{
+   margin-top:1px;
+   margin-bottom:2px;
+   font-weight:normal;
+   color:black;
+   font-size:11px;
+}
+table.subscriber{
+   border-style:solid;
+   border-width:1px;
+   border-color:gray;
+   border-style:collapse;
+   border-spacing:0px;
+}
+table.subscriber td{
+   border-style:solid;
+   border-width:1px;
+   border-color:gray;
+}
+div.htmldescription{
+   border-left-style:solid;
+   border-left-width:1px;
+   border-left-color:gray;
+   margin-top:2px;
+   margin-bottom:2px;
+   padding:4px;
+}
+img.logo{
+   margin-left:5px;
+   border-style:solid;
+   border-width:1px;
+   border-color:gray;
+}
+div.subscriber{
+   display:none;
+   visibility:hidden;
+}
+@media print{
+   body{
+      overflow:visible;
+      background:#ffffff;
+   }
+   div.doc{
+      min-height:600px;
+   }
+   div.subscriber{
+      display:block;
+      visibility:visible;
+   }
+}

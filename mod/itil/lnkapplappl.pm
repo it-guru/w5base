@@ -18,7 +18,6 @@ package itil::lnkapplappl;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use itil::lib::Listedit;
 @ISA=qw(itil::lib::Listedit);
@@ -82,6 +81,14 @@ sub new
                 htmlwidth     =>'50px',
                 htmleditwidth =>'150px',
                 dataobjattr   =>'lnkapplappl.conprotocol'),
+
+
+      new kernel::Field::Htmlarea(
+                name          =>'htmldescription',
+                searchable    =>0,
+                group         =>'desc',
+                label         =>'Interface description',
+                dataobjattr   =>'lnkapplappl.description'),
 
       new kernel::Field::SubList(
                 name          =>'interfacescomp',
@@ -173,6 +180,7 @@ sub new
                 dataobjattr   =>'toappl.cistatus'),
 
    );
+   $self->{history}=[qw(insert modify delete)];
    $self->setDefaultView(qw(id fromappl toappl cdate editor));
    $self->setWorktable("lnkapplappl");
    return($self);
@@ -238,6 +246,14 @@ sub Validate
 }
 
 
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   return(qw(header default desc interfacescomp source));
+}
+
+
+
 sub isViewValid
 {
    my $self=shift;
@@ -258,7 +274,7 @@ sub isWriteValid
    my $oldrec=shift;
    my $newrec=shift;
    my $applid=effVal($oldrec,$newrec,"fromapplid");
-   my @editgroup=("default","interfacescomp");
+   my @editgroup=("default","interfacescomp","desc");
 
    return(@editgroup) if (!defined($oldrec) && !defined($newrec));
    return(@editgroup) if ($self->IsMemberOf("admin"));
@@ -267,6 +283,181 @@ sub isWriteValid
 
    return(undef);
 }
+
+sub getRecordHtmlIndex
+{
+   my $self=shift;
+   my $rec=shift;
+   my $id=shift;
+   my $viewgroups=shift;
+   my $grouplist=shift;
+   my $grouplabel=shift;
+   my @indexlist=$self->SUPER::getRecordHtmlIndex($rec,$id,$viewgroups,
+                                                  $grouplist,$grouplabel);
+   push(@indexlist,{label=>$self->T('Interface agreement'),
+           href=>"InterfaceAgreement?id=$id",
+           target=>"_blank"
+          });
+
+   return(@indexlist);
+}
+
+sub InterfaceAgreement
+{
+   my $self=shift;
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css',
+                                   'public/itil/load/lnkapplappl.css'],
+                           body=>1,form=>1,
+                           title=>$self->T("Interface agreement"));
+   print("<div class=lnkdocument>");
+   my $id=Query->Param("id");
+   $self->ResetFilter();
+   $self->SetFilter({id=>\$id});
+   my ($masterrec,$msg)=$self->getOnlyFirst(qw(fromapplid toapplid));
+   if (defined($masterrec)){
+      my $appl=getModuleObject($self->Config,"itil::appl");
+      $appl->ResetFilter();
+      $appl->SetFilter({id=>\$masterrec->{fromapplid}});
+      my ($ag1,$msg)=$appl->getOnlyFirst(qw(name id tsm));
+      $appl->ResetFilter();
+      $appl->SetFilter({id=>\$masterrec->{toapplid}});
+      my ($ag2,$msg)=$appl->getOnlyFirst(qw(name id tsm));
+      my @l=($ag1,$ag2);
+      @l=sort({$a->{name} cmp $b->{cmp}} @l);
+      my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+      my $n="../../../public/itil/load/lnkapplappl.jpg?".$cgi->query_string();
+
+      print("<table width=100% border=0 cellspacing=0 cellpadding=0><tr>");
+      print("<td width=20% align=left><img class=logo src='$n'></td>");
+      print("<td>");
+      print ("<h1>Schnittstellenvereinbarungen zwischenden Anwendungen<br> ".
+             $l[0]->{name}." und ".$l[1]->{name}."</h1>");
+      print("</td>");
+      print("<td width=20% align=right>&nbsp;</td>");
+      print("</tr></table>");
+      print("<div class=doc>");
+      print("<div class=disclaimer>");
+      print("Dieses Dokument beschreibt die im Config-Management hinterlegten ".
+            "Kommunikationsbeziehnungen zwischen den o.g. Anwendungen. ".
+            "Das Modul zur automatischen Generierung einer ".
+            "Schnittstellenvereinbarung ist akuell nur in deutscher ".
+            "Sprache vorhanden. Sollte die Notwendigkeit für ein ".
+            "englischsprachiges Schnittstellendokument vorliegen, ".
+            "so muß dies als Entwicklerrequest angefordert werden.");
+      print("</div>");
+      $l[0]->{targetid}=$l[1]->{id};
+      $l[1]->{targetid}=$l[0]->{id};
+      $l[0]->{targetname}=$l[1]->{name};
+      $l[1]->{targetname}=$l[0]->{name};
+      $self->ResetFilter();
+      $self->SetFilter([{fromapplid=>\$l[0]->{id},
+                         toapplid=>\$l[0]->{targetid}},
+                        {fromapplid=>\$l[1]->{id},
+                         toapplid=>\$l[1]->{targetid}}]);
+      my @iflist=$self->getHashList(qw(cdate mdate 
+                                       fromapplid toapplid contype 
+                                       conmode conproto
+                                       htmldescription comments));
+      my %com=();
+      foreach my $ifrec (@iflist){
+         $ifrec->{key}=$ifrec->{fromapplid}."_".$ifrec->{toapplid}.
+                       "_".$ifrec->{conmode}."_".$ifrec->{conproto};
+         $ifrec->{revkey}=$ifrec->{toapplid}."_".$ifrec->{fromapplid}.
+                       "_".$ifrec->{conmode}."_".$ifrec->{conproto};
+         $com{$ifrec->{key}}++;
+      }
+      foreach my $ifrec (@iflist){
+         $ifrec->{partnerok}=0;
+         if (exists($com{$ifrec->{revkey}})){
+            $ifrec->{partnerok}=1;
+         }
+      }
+      foreach my $ctrl (@l){
+         $ctrl->{interface}=[];
+         foreach my $ifrec (@iflist){
+            if ($ifrec->{fromapplid} eq $ctrl->{id}){
+               push(@{$ctrl->{interface}},$ifrec);
+            }
+         }
+      }
+      print("<ol type='I' class=appl>");
+      foreach my $ctrl (@l){
+         printf("<li><b>Definition der Schnittstelle aus Sicht '%s'</b><br>",
+                 $ctrl->{name});
+         printf("<p class=applheader>".
+                "Für die Anwendung '%s' ist der Technical Solution Manager ".
+                "'%s' für die Vereinbarungen der Kommunikationsbeziehungen ".
+                "verantwortlich. In den folgenden Absätzen wird die ".
+                "die Sichtweise der Schnittstellen und die Rahmenbedinungen ".
+                "für dessen Funktion aus Sicht des Betreibers der Anwendung ".
+                "xxx beschrieben.<br><br></p>",$ctrl->{name},$ctrl->{tsm});
+         printf("<p>Die Verbindungen in Richtung '%s' im Einzelnen:</p>",
+               $ctrl->{targetname});
+        # print "<xmp>".Dumper($ctrl)."</xmp>";
+         if ($#{$ctrl->{interface}}!=-1){
+            print("<ol class=lnkapplappl type='a'>");
+            foreach my $ifrec (@{$ctrl->{interface}}){
+               printf("<li><b>%s-Kommunikation mittels <u>%s</u> zur ".
+                     "Anwendung '%s'</b><br>",
+                     $ifrec->{conmode},$ifrec->{conproto},$ctrl->{targetname});
+               if ($ifrec->{comments} ne ""){
+                  printf("<div class=comments>%s</div>",$ifrec->{comments});
+               }
+               if ($ifrec->{htmldescription} ne ""){
+                  printf("<div class=htmldescription>%s</div>",
+                         $ifrec->{htmldescription});
+               }
+               if (!($ifrec->{partnerok})){
+                  print("<p class=attention>"); 
+                  printf("<font color=red><b>ACHTUNG:</b> Für diese ".
+                         "Kommunikationsbeziehung ".
+                         "liegen auf Seiten der Anwendung '%s' keine ".
+                         "Dokumentationen vor!</font>",
+                         $ctrl->{targetname});
+                  print("</p>"); 
+               }
+            }
+            print("</ol>");
+         }
+         else{
+            printf("Es liegen keine Schnittstellendefinitionen bei der ".
+                   "Anwendung '%s' für die Kommunikation mit der ".
+                   "Anwendung '%s' vor.",$ctrl->{name},$ctrl->{targetname});
+         }
+         print("</li>");
+      }
+      print("</ol>");
+      print("</div>");
+      print("<div class=disclaimer>");
+      printf("Alle Informationen dieses Dokumentes entsprechen dem Stand %s ".
+             "im ITIL-Configuration-Management.",NowStamp("en")); 
+      print("</div>");
+      print("<div class=subscriber>");
+      print("<table class=subscriber width=100%>");
+      print("<tr height=50>");
+      print("<td width=50%>&nbsp;</td>");
+      print("<td width=50%>&nbsp;</td>");
+      print("</tr>");
+      print("<tr>");
+      printf("<td width=50% align=center>Datum, Unterschrift TSM '%s'</td>",$l[0]->{name});
+      printf("<td width=50% align=center>Datum, Unterschrift TSM '%s'</td>",$l[1]->{name});
+      print("</tr>");
+      print("</table>");
+      print("</div>");
+   }
+   print("</div>");
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+sub getValidWebFunctions
+{
+   my ($self)=@_;
+   return($self->SUPER::getValidWebFunctions(), qw(InterfaceAgreement));
+}
+
+
 
 
 

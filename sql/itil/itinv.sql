@@ -863,3 +863,4 @@ alter table lnksoftwaresystem  add instpath varchar(255) default NULL;
 alter table lnksoftwaresystem  add releasekey char(20) default '00000000000000000000',add key(releasekey);
 alter table lnksoftwaresystem  add patchkey varchar(30) default '';
 alter table lnksoftwaresystem  add majorminorkey varchar(30) default '';
+alter table lnkapplappl add description longtext default NULL;

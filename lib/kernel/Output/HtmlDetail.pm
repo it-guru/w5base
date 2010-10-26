@@ -503,9 +503,13 @@ EOF
       for(my $c=0;$c<=$#indexdata;$c++){
          $setno++ if ($setno==0 && $c>($#indexdata/2));
          if (defined($indexdata[$c])){
-            $set[$setno].="<li><a class=HtmlDetailIndex ".
-                          "href=\"$indexdata[$c]->{href}\">".
-                          "$indexdata[$c]->{label}</a></li>";
+            my $link="<a class=HtmlDetailIndex ".
+                     "href=\"$indexdata[$c]->{href}\"";
+            if (exists($indexdata[$c]->{target})){
+               $link.=" target='$indexdata[$c]->{target}'";
+            }
+            $link.=">";
+            $set[$setno].="<li>$link$indexdata[$c]->{label}</a></li>";
          }
       }
       $template{"header"}.=<<EOF;
