@@ -553,7 +553,6 @@ package base::workflow::request::dataload;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfStep;
-use Data::Dumper;
 @ISA=qw(kernel::WfStep);
 
 sub generateWorkspace
@@ -1035,6 +1034,27 @@ sub nativProcess
       }
       return(0);
    }
+   elsif($op eq "wffineproc"){
+      if ($self->getParent->getParent->Action->StoreRecord(
+          $WfRec->{id},"wfaddnote",
+          {translation=>'base::workflow::request'},$h->{note},$h->{effort})){
+         my $openuserid=$WfRec->{openuser};
+         $self->StoreRecord($WfRec,{stateid=>16,
+                                    fwdtargetid=>$openuserid,
+                                    fwdtarget=>'base::user',
+                                    eventend=>NowStamp("en"),
+                                    fwddebtarget=>undef,
+                                    fwddebtargetid=>undef});
+         $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
+         $self->PostProcess("SaveStep.".$op,$WfRec,$actions,
+                            note=>$h->{note},
+                            fwdtarget=>'base::user',
+                            fwdtargetid=>$openuserid,
+                            fwdtargetname=>'Requestor');
+         return(1);
+      }
+      return(0);
+   }
    elsif ($op eq "wfactivate"){
       my ($target,$fwdtarget,$fwdtargetid,$fwddebtarget,
           $fwddebtargetid,@wsref)=
@@ -1201,25 +1221,13 @@ sub Process
          }
          $note=trim($note);
          my $effort=Query->Param("Formated_effort");
-         if ($self->getParent->getParent->Action->StoreRecord(
-             $WfRec->{id},"wfaddnote",
-             {translation=>'base::workflow::request'},$note,$effort)){
-            my $openuserid=$WfRec->{openuser};
-            $self->StoreRecord($WfRec,{stateid=>16,
-                                       fwdtargetid=>$openuserid,
-                                       fwdtarget=>'base::user',
-                                       eventend=>NowStamp("en"),
-                                       fwddebtarget=>undef,
-                                       fwddebtargetid=>undef});
-            $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
-            $self->PostProcess($action.".".$op,$WfRec,$actions,
-                               note=>$note,
-                               fwdtarget=>'base::user',
-                               fwdtargetid=>$openuserid,
-                               fwdtargetname=>'Requestor');
-            return(1);
-         }
-         return(0);
+
+         my $h=$self->getWriteRequestHash("web");
+         $h->{note}=$note if ($note ne "");
+         $h->{effort}=$effort if ($effort ne "");
+         return($self->nativProcess("wffineproc",$h,$WfRec,$actions));
+
+
       }
       elsif ($op eq "wfreject"){
          my $note=Query->Param("note");

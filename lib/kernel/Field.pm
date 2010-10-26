@@ -901,7 +901,7 @@ sub FormatedDetailDereferncer
    my $FormatAs=shift;
    my $d=shift;
 
-   if (ref($d) && $FormatAs ne "JSON"){
+   if (ref($d) && ($FormatAs ne "JSON" && $FormatAs ne "SOAP")){
       if (ref($self->{dereference}) eq "CODE"){
          return(&{$self->{dereference}}($self,$current,$FormatAs,$d));
       }
