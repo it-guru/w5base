@@ -109,6 +109,10 @@ sub Validate
       my $app=$self->getParent();
       if ($app->isDataInputFromUserFrontend()){
          my $userid=$app->getCurrentUserId();
+         if ($self->{allowany} &&
+             $newrec->{$mandatoridname}==0){
+            return(1);
+         }
          my @mandators=$app->getMandatorsOf($ENV{REMOTE_USER},"write");
          if (!defined($oldrec)){
             if (!defined($newrec->{$mandatoridname}) ||
