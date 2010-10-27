@@ -111,7 +111,7 @@ sub Validate
          my $userid=$app->getCurrentUserId();
          if ($self->{allowany} &&
              $newrec->{$mandatoridname}==0){
-            return(1);
+            return($self->SUPER::Validate($oldrec,$newrec,$currentstate));
          }
          my @mandators=$app->getMandatorsOf($ENV{REMOTE_USER},"write");
          if (!defined($oldrec)){
