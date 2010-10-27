@@ -179,6 +179,11 @@ sub new
                 label         =>'to Appl CI-Status',
                 dataobjattr   =>'toappl.cistatus'),
 
+      new kernel::Field::Link(
+                name          =>'fromapplcistatus',
+                label         =>'from Appl CI-Status',
+                dataobjattr   =>'fromappl.cistatus'),
+
    );
    $self->{history}=[qw(insert modify delete)];
    $self->setDefaultView(qw(id fromappl toappl cdate editor));
