@@ -25,7 +25,7 @@ create table location (
   PRIMARY KEY  (id),
   UNIQUE KEY name (name), UNIQUE KEY loc (label,location,address1,country),
   UNIQUE KEY `srcsys` (srcsys,srcid),key (refcode1),key(refcode2),key (refcode3)
-);
+)  ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table history (
   id         bigint(20)   NOT NULL,
   name       varchar(128) NOT NULL,
@@ -350,3 +350,25 @@ create table isocountry (
   PRIMARY KEY (id),unique(token),unique(fullname)
 );
 insert into isocountry(token,name,fullname) values('DE','Germany','DE-Germany');
+set FOREIGN_KEY_CHECKS=0;
+create table lnklocationgrp (
+  id          bigint(20)   NOT NULL,
+    location    bigint(20)  not NULL,
+    grp         bigint(20)  not NULL,
+    relmode     char(20),
+  comments    longtext     default NULL,
+  createdate  datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate  datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser  bigint(20) NOT NULL default '0',
+  modifyuser  bigint(20) NOT NULL default '0',
+  editor      varchar(100) NOT NULL default '',
+  realeditor  varchar(100) NOT NULL default '',
+  srcsys      varchar(100) default 'w5base', 
+  srcid       varchar(20) default NULL,
+  srcload     datetime    default NULL,
+  FOREIGN KEY (grp) REFERENCES grp (grpid) ON DELETE RESTRICT,
+  FOREIGN KEY (location) REFERENCES location (id) ON DELETE RESTRICT,
+  PRIMARY KEY (id),key(location,relmode),unique(grp,location,relmode),
+  UNIQUE KEY `srcsys` (srcsys,srcid),key srcload(srcload)
+)  ENGINE=InnoDB DEFAULT CHARSET=latin1;
+set FOREIGN_KEY_CHECKS=1;

@@ -115,6 +115,13 @@ sub new
                 label         =>'Location',
                 dataobjattr   =>'location.location'),
 
+      new kernel::Field::Number(
+                name          =>'prio',
+                label         =>'Location prio',
+                readonly      =>1,
+                depend        =>['id'],
+                onRawValue    =>\&calcLocationPrio),
+
       new kernel::Field::Databoss(
                 group         =>'management'),
 
@@ -158,6 +165,16 @@ sub new
                 name          =>'buildingservgrpid',
                 group         =>'management',
                 dataobjattr   =>'location.buildingservgrp'),
+
+      new kernel::Field::SubList(
+                name          =>'grprelations',
+                label         =>'Organisation Relations',
+                allowcleanup  =>1,
+                group         =>'grprelations',
+                vjointo       =>'base::lnklocationgrp',
+                vjoinon       =>['id'=>'locationid'],
+                vjoindisp     =>['grp','relmode'],
+                vjoininhash   =>['grpid','relmode','comments']),
 
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
@@ -350,6 +367,26 @@ sub new
    return($self);
 }
 
+sub calcLocationPrio
+{
+   my $self=shift;
+   my $current=shift;
+
+   my $prio=3;
+
+   my $lnklocationgrp=getModuleObject($self->getParent->Config,
+                                      "base::lnklocationgrp");
+   $lnklocationgrp->SetFilter({locationid=>\$current->{id}});
+   foreach my $relrec ($lnklocationgrp->getHashList(qw(relmode))){
+      if (my ($lprio)=$relrec->{relmode}=~m/^RMbusinesrel(\d)$/){
+         if ($lprio<$prio){
+            $prio=$lprio;
+         }
+      }
+   }
+   return($prio);
+}
+
 sub SimilarCheck
 {
    my $self=shift;
@@ -382,7 +419,8 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","management","contacts","phonenumbers",
+   return("header","default","management","grprelations",
+          "contacts","phonenumbers",
           "comments","additional","map","gps","control","source");
 }
 
@@ -719,12 +757,13 @@ sub isWriteValid
    my $rec=shift;
    return("default") if (!defined($rec));
    if ($self->IsMemberOf("admin")){
-      return("default","contacts","phonenumbers",
+      return("default","contacts","grprelations","phonenumbers",
              "management","gps","control","comments");
    }
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(phonenumbers management contacts comments gps);
+   my @databossedit=qw(phonenumbers management grprelations 
+                       contacts comments gps);
 
    if (defined($rec) && $rec->{databossid}==$userid){
       return(@databossedit);

@@ -195,6 +195,11 @@ sub Init
                       "base::lnklocationinteranswer",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("sysadm.location.lnklocationgrp",
+                      "base::lnklocationgrp",
+                      func=>'MainWithNew',
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("sysadm.location.country",
                       "base::isocountry",
                       defaultacl=>['admin']);

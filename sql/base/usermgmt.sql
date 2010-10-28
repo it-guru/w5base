@@ -21,7 +21,7 @@ CREATE TABLE grp (
   UNIQUE KEY fullname (fullname),
   KEY parentid (parentid),
   KEY name (name,cistatus),key(cistatus)
-);
+)  ENGINE=InnoDB DEFAULT CHARSET=latin1;
 insert into grp (grpid,fullname,name,cistatus) values(2,'support','support',4);
 insert into grp (grpid,fullname,name,cistatus) values(1,'admin','admin',4);
 insert into grp (grpid,fullname,name,cistatus) values(-1,'valid_user','valid_user',4);

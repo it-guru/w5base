@@ -14,6 +14,7 @@
 'fieldgroup.org'=>{de=>'Organisationszuorndung',en=>'Organisation relation'},
 'fieldgroup.gps'=>{de=>'GPS',en=>'GPS'},
 'fieldgroup.management'=>{de=>'Verwaltung',en=>'Management'},
+'fieldgroup.grprelations'=>{de=>'Organisations-Verknüpfungen (BETA)',en=>'Organisation-Relations (BETA)'},
 'fieldgroup.comments'=>{de=>'Bemerkungen',en=>'Comments'},
 'Room Expression'=>{de=>'Raum Reg.Exp.'},
 'similar check'=>{de=>'Ähnlichkeitsprüfung'},
@@ -26,3 +27,4 @@
 'Organisation link'=>{de=>'Organisations Zuorndung'},
 'organisations location prio'=>{de=>'Organisations Standort Prio'},
 'Phonenumbers'=>{de=>'Rufnummernverzeichnis'},
+'Location prio'=>{de=>'Standort Prio (BETA)',en=>'Location prio (BETA)'},
