@@ -367,7 +367,8 @@ sub Validate
 
    my $instpath=effVal($oldrec,$newrec,"instpath");
    if ($instpath ne ""){
-      if (!($instpath=~m/^[a-z1-9\.\\_\/:-]+$/i)){
+      if (!($instpath=~m/^\/[a-z0-9\.\\_\/:-]+$/i) &&
+          !($instpath=~m/^[A-Za-z]:\\[a-zA-Z0-9\.\\_-]+$/)){
          $self->LastMsg(ERROR,"invalid installation path");
          return(undef);
       }

@@ -197,7 +197,9 @@ sub getSqlFrom
    my $self=shift;
    my $from="lnkapplappl ".
             "left outer join appl as toappl ".
-            "on lnkapplappl.toappl=toappl.id";
+            "on lnkapplappl.toappl=toappl.id ".
+            "left outer join appl as fromappl ".
+            "on lnkapplappl.fromappl=fromappl.id";
    return($from);
 }
 

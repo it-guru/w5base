@@ -100,7 +100,7 @@ sub qcheckRecord
          #
          # osrelease mapping
          #
-         if ($parrec->{systemos} ne ""){
+         if (!($parrec->{systemos}=~/^\s*$/)){
             my $mapos=$dataobj->ModuleObject("tsacinv::lnkw5bosrelease");
             $mapos->SetFilter({extosrelease=>\$parrec->{systemos}});
             my ($maposrec,$msg)=$mapos->getOnlyFirst(qw(id w5bosrelease));
@@ -116,7 +116,7 @@ sub qcheckRecord
                my %new=(extosrelease=>$parrec->{systemos},direction=>1);
                # try to find an already existing name in W5Base
                my $os=$dataobj->ModuleObject("itil::osrelease");
-               $os->SetFilter({name=>\$parrec->{systemos}});
+               $os->SetFilter({name=>'"'.$parrec->{systemos}.'"'});
                my ($w5osrec,$msg)=$mapos->getOnlyFirst(qw(name));
                if (defined($w5osrec)){
                   $new{w5bosrelease}=$w5osrec->{name};
