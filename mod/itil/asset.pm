@@ -269,6 +269,7 @@ sub new
                 group         =>'location',
                 label         =>'Location',
                 vjointo       =>'base::location',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['locationid'=>'id'],
                 vjoindisp     =>'name'),
 
