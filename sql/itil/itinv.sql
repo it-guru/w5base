@@ -733,7 +733,7 @@ create table lnkapplitclust   (
   itclust      bigint(20) NOT NULL,swinstance   bigint(20) NOT NULL,
   comments     longtext    default NULL,
   additional   longtext    default NULL,
-  subitsvcname varchar(5) default NULL,
+  subitsvcname varchar(5) default '',
   createdate   datetime NOT NULL default '0000-00-00 00:00:00',
   modifydate   datetime NOT NULL default '0000-00-00 00:00:00',
   createuser   bigint(20) default NULL,
@@ -744,7 +744,7 @@ create table lnkapplitclust   (
   srcid        varchar(20) default NULL,
   srcload      datetime    default NULL,
   PRIMARY KEY  (id),
-  KEY appl (appl),UNIQUE applcl(itsvcname,subitsvcname,itclust),
+  KEY appl (appl),UNIQUE applcl(itsvcname,itclust,subitsvcname),
   KEY clust(itclust),key swi(swinstance),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
