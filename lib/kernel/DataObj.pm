@@ -1123,7 +1123,8 @@ sub SecureValidatedInsertRecord
    my $newrec=shift;
 
    $self->isDataInputFromUserFrontend(1);
-   if (my @groups=$self->isWriteValid(undef)){
+   my @groups=$self->isWriteValid($oldrec);
+   if ($#groups>-1 && defined($groups[0])){
       if ($self->SecureValidate(undef,$newrec,\@groups)){
          return($self->ValidatedInsertRecord($newrec));
       }
@@ -1193,7 +1194,8 @@ sub SecureValidatedUpdateRecord
    my @filter=@_;
 
    $self->isDataInputFromUserFrontend(1);
-   if (my @groups=$self->isWriteValid($oldrec)){
+   my @groups=$self->isWriteValid($oldrec);
+   if ($#groups>-1 && defined($groups[0])){
       if ($self->SecureValidate($oldrec,$newrec,\@groups)){
          return($self->ValidatedUpdateRecord($oldrec,$newrec,@filter));
       }

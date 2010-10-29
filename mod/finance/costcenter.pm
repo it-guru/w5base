@@ -362,7 +362,7 @@ sub isWriteValid
          return(@databossedit) if (grep(/^write$/,@roles));
       }
    }
-   return(undef);
+   return();
 }
 
 
