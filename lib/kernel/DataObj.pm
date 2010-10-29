@@ -2760,6 +2760,7 @@ sub Data2SQLwhere
             $f=$self->PreParseTimeExpression($f,$sqlparam{timezone});
          }
          $f=~s/\\\*/[|*|]/g;
+         $f=~s/\\/\\\\/g;
          my @words=parse_line('[,;]{0,1}\s+',0,$f);
          #my @words=parse_line('[,;]{0,1}\s+',"delimiters",$f);
          if (!($f=~m/^\s*$/) && $#words==-1){  # maybe an invalid " struct
