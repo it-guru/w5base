@@ -159,7 +159,9 @@ sub IfaceCompare
                   $takeremote++;
                }
                else{
-                  msg(ERROR,"invalid value '$comprec->{$compfieldname}'");
+                  msg(ERROR,"invalid value '$comprec->{$compfieldname}' ".
+                            "while qrule compare '$origfieldname' and ".
+                            "'$compfieldname'");
                }
             }
             else{
@@ -300,7 +302,8 @@ sub OpAnalyse
                }
             }
          }
-         if (defined($cmpRes{$refC."-".$cmpC})){
+         if (exists($cmpRes{$refC."-".$cmpC}) &&
+             defined($cmpRes{$refC."-".$cmpC})){
             $found=1;
             last cmpCloop;
          }
@@ -326,7 +329,7 @@ sub OpAnalyse
          if (!exists($cmpRes{$refC."-".$cmpC})){
             $a=$refList->[$refC];
             $b=$cmpList->[$cmpC];
-            $cmpRes{$refC."-".$cmpC}=&{$fpComperator}();
+            $cmpRes{$refC."-".$cmpC}=&{$fpComperator}($a,$b);
             if (defined($cmpRes{$refC."-".$cmpC}) && !$cmpRes{$refC."-".$cmpC}){
                # do an update   
                my $mode="update";
@@ -344,7 +347,7 @@ sub OpAnalyse
          }
          if (defined($cmpRes{$refC."-".$cmpC})){
             $found=1;
-            last refCloop;
+            last refCloop; 
          }
       }
       if (!$found){

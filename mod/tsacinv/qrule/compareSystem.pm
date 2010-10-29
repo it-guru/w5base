@@ -176,12 +176,9 @@ sub qcheckRecord
                              \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'leftouterlink');
          if ($rec->{allowifupdate}){
-   #printf STDERR ("ac=%s\n",Dumper($parrec->{ipaddresses}));
-   #printf STDERR ("w5=%s\n",Dumper($rec->{ipaddresses}));
             my $net=getModuleObject($self->getParent->Config(),"itil::network");
             $net->SetCurrentView(qw(id name));
             my $netarea=$net->getHashIndexed("name");
-   #printf STDERR ("netarea=%s\n",Dumper($netarea));
             my @opList;
             my $res=OpAnalyse(
                        sub{  # comperator 
@@ -231,6 +228,8 @@ sub qcheckRecord
                        },
                        $rec->{ipaddresses},$parrec->{ipaddresses},\@opList,
                        refid=>$rec->{id},netarea=>$netarea);
+printf STDERR ("fifi parrec=%s\n",Dumper($parrec->{ipaddresses}));
+printf STDERR ("fifi OPL=%s\n",Dumper(\@opList));
             if (!$res){
                my $opres=ProcessOpList($self->getParent,\@opList);
             }
