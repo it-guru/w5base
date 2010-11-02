@@ -228,8 +228,6 @@ sub qcheckRecord
                        },
                        $rec->{ipaddresses},$parrec->{ipaddresses},\@opList,
                        refid=>$rec->{id},netarea=>$netarea);
-printf STDERR ("fifi parrec=%s\n",Dumper($parrec->{ipaddresses}));
-printf STDERR ("fifi OPL=%s\n",Dumper(\@opList));
             if (!$res){
                my $opres=ProcessOpList($self->getParent,\@opList);
             }
