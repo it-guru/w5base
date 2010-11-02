@@ -243,7 +243,7 @@ sub HandleCIStatus
             my $dataobj=$self->Clone();
             $dataobj->SetFilter({$idname=>\$id});
             my ($oldrec,$msg)=$dataobj->getOnlyFirst(qw(ALL));
-            if ($oldrec->{cistatusid}<4){
+            if ($oldrec->{cistatusid}==2){
                $dataobj->ValidatedUpdateRecord($oldrec,{cistatusid=>4},
                                                {$idname=>\$id});
             }
