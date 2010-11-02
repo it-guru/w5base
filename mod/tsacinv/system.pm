@@ -719,7 +719,12 @@ sub Import
          $self->LastMsg(ERROR,"Can't find mandator extern");
          return(undef);
       }
+      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"write","direct");
       my $mandatorid=$mandrec->{grpid};
+      if (in_array(\@mandators,200)){
+         $mandatorid=200;
+      }
+
       # final: do the insert operation
       my $newrec={name=>$sysrec->{systemname},
                   systemid=>$sysrec->{systemid},

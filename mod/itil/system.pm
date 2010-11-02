@@ -574,6 +574,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'hwproducer',
                 readonly      =>1,
+                searchable    =>0,
                 weblinkto     =>'none',
                 group         =>'physys',
                 label         =>'Producer',

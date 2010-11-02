@@ -126,15 +126,26 @@ sub qcheckRecord
             }
          }
          #################################################################### 
-         
-   #      $parrec->{systemos}=~s/[\*\?]/_/g;
-   #      my $os=getModuleObject($self->getParent->Config(),"itil::osrelease");
-   #      $os->SetFilter({name=>'"'.$parrec->{systemos}."'"});
-   #      my ($osrec,$msg)=$os->getOnlyFirst(qw(id name));
-   #      if (!defined($osrec)){
-   #         delete($parrec->{systemos});
-   #      }
+         # assetid compare 
+         if ($parrec->{assetassetid} ne ""){
+            $self->IfaceCompare($dataobj,
+                                $rec,"asset",
+                                $parrec,"assetassetid",
+                                $forcedupd,$wfrequest,
+                                \@qmsg,\@dataissue,\$errorlevel,
+                                mode=>'leftouterlinkcreate',
+                                onCreate=>{
+                                  comments=>
+                                         "automaticly create by QualityCheck",
+                                  cistatusid=>4,
+                                  allowifupdate=>1,
+                                  mandatorid=>$rec->{mandatorid},
+                                  name=>$parrec->{assetassetid},
+                                  databossid=>$rec->{databossid}}
+                                );
+         }
 
+         #################################################################### 
 
          $self->IfaceCompare($dataobj,
                              $rec,"servicesupport",
@@ -291,7 +302,7 @@ sub qcheckRecord
       else{
          push(@qmsg,'no assetid specified');
          push(@dataissue,'no assetid specified');
-         $errorlevel=1 if ($errorlevel<1);
+         $errorlevel=3 if ($errorlevel<3);
       }
    }
    else{

@@ -85,10 +85,24 @@ sub new
                 vjoinon       =>['hwmodelid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::SubList(
+                name          =>'systems',
+                label         =>'Systems',
+                htmlwidth     =>'200px',
+                group         =>'systems',
+                subeditmsk    =>'stodu',
+                vjointo       =>'itil::system',
+                vjoinbase     =>[{cistatusid=>"<=4"}],
+                vjoinon       =>['id'=>'assetid'],
+                vjoininhash   =>['name','systemid','cistatusid','id'],
+                vjoindisp     =>['name','systemid','cistatus','shortdesc']),
+
       new kernel::Field::TextDrop(
                 name          =>'hwproducer',
                 htmlwidth     =>'130px',
                 readonly      =>1,
+                htmldetail    =>0,
+                searchable    =>0,
                 group         =>'physasset',
                 label         =>'Hardwareproducer',
                 vjointo       =>'itil::hwmodel',
@@ -126,18 +140,6 @@ sub new
       new kernel::Field::Link(
                 name          =>'servicesupportid',
                 dataobjattr   =>'asset.prodmaintlevel'),
-
-      new kernel::Field::SubList(
-                name          =>'systems',
-                label         =>'Systems',
-                htmlwidth     =>'200px',
-                group         =>'systems',
-                subeditmsk    =>'stodu',
-                vjointo       =>'itil::system',
-                vjoinbase     =>[{cistatusid=>"<=4"}],
-                vjoinon       =>['id'=>'assetid'],
-                vjoininhash   =>['name','systemid','cistatusid','id'],
-                vjoindisp     =>['name','systemid','cistatus','shortdesc']),
 
       new kernel::Field::SubList(
                 name          =>'systemnames',
