@@ -382,6 +382,9 @@ sub isWriteValid
    my $databoss=0;
 
    my $userid=$self->getCurrentUserId();
+   if (!defined($rec)){
+      push(@blklist,"default","characteristic","responsibility");
+   }
    if (defined($rec) && ($rec->{databossid} eq $userid ||
                          $rec->{databoss2id} eq $userid)){
       $databoss++;
@@ -410,7 +413,7 @@ sub isViewValid
    my $rec=shift;
    my @param=@_;
    my @adds=();
-   return("header","default","characteristic") if (!defined($rec));
+   return("header","default","responsibility","characteristic") if (!defined($rec));
    foreach my $grp (qw(service oncallservice support callcenter saprelation)){
       push(@adds,$grp) if ($rec->{"is".$grp});
    }

@@ -634,7 +634,9 @@ sub InitNew    # Initialize Web New Form
 sub New
 {
    my ($self)=@_;
-   if (!$self->isWriteValid()){
+
+   my @groups=$self->isWriteValid();
+   if ($#groups==-1 || !defined($groups[0])){
       print($self->noAccess());
       return(undef);
    }
