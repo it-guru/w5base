@@ -68,6 +68,7 @@ sub new
                                  'Loadbalancer',
                                  'Software',
                                  'Hardware',
+                                 'OS',
                                 ],
                 label         =>'Cluster Type',
                 dataobjattr   =>'itclust.clusttyp'),
@@ -76,6 +77,12 @@ sub new
                 name          =>'name',
                 label         =>'Cluster Name',
                 dataobjattr   =>'itclust.name'),
+
+      new kernel::Field::Text(
+                name          =>'clusterid',
+                htmleditwidth =>'100px',
+                label         =>'ClusterID',
+                dataobjattr   =>'itclust.itclustid'),
 
       new kernel::Field::Select(
                 name          =>'cistatus',
@@ -115,7 +122,7 @@ sub new
                 vjointo       =>'itil::lnkapplitclust',
                 vjoinbase     =>[{applcistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'clustid'],
-                vjoindisp     =>['fullname','appl']),
+                vjoindisp     =>['fullname','itservid','appl']),
 
       new kernel::Field::SubList(
                 name          =>'systems',
@@ -320,8 +327,12 @@ sub Validate
    my $newrec=shift;
 
 #   my $swnature=trim(effVal($oldrec,$newrec,"swnature"));
-   my $name=trim(effVal($oldrec,$newrec,"name"));
-   my $clusttyp=trim(effVal($oldrec,$newrec,"clusttyp"));
+   my $name=effVal($oldrec,$newrec,"name");
+   my $clusttyp=effVal($oldrec,$newrec,"clusttyp");
+   if ($clusttyp eq ""){
+      $self->LastMsg(ERROR,"invalid cluster typ");
+      return(0);
+   }
 #   my $swtype=trim(effVal($oldrec,$newrec,"swtype"));
 #   my $swport=trim(effVal($oldrec,$newrec,"swport"));
 #   my $swinstanceid=trim(effVal($oldrec,$newrec,"swinstanceid"));

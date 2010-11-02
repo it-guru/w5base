@@ -150,6 +150,11 @@ sub Init
                       func=>'ImportAppl',
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("AL_TCom.itclust.acimport",
+                      "tsacinv::itclust",
+                      func=>'ImportCluster',
+                      defaultacl=>['valid_user']);
+   
    return(1);
 }
 

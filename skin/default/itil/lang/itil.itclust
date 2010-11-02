@@ -4,3 +4,4 @@
 'fieldgroup.services'=>{de=>'Services'},
 'fieldgroup.systems'=>{de=>'Systeme'},
 'delete only posible, if there are no services or software instance relations'=>{de=>'Löschen ist nur dann zulässig, wenn es keine Service oder Software-Instanz Verknüpfungen gibt'},
+'invalid cluster typ'=>{de=>'ungültiger Cluster Typ'},

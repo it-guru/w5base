@@ -72,6 +72,12 @@ sub new
                 label         =>'sub Servicename',
                 dataobjattr   =>'qlnkapplitclust.subitsvcname'),
 
+      new kernel::Field::Text(
+                name          =>'itservid',
+                htmleditwidth =>'100px',
+                label         =>'ClusterserviceID',
+                dataobjattr   =>'qlnkapplitclust.itservid'),
+
       new kernel::Field::TextDrop(
                 name          =>'appl',
                 htmlwidth     =>'250px',

@@ -864,3 +864,5 @@ alter table lnksoftwaresystem  add releasekey char(20) default '0000000000000000
 alter table lnksoftwaresystem  add patchkey varchar(30) default '';
 alter table lnksoftwaresystem  add majorminorkey varchar(30) default '';
 alter table lnkapplappl add description longtext default NULL;
+alter table itclust add itclustid char(20) default NULL, add unique(itclustid);
+alter table lnkapplitclust add itservid char(20) default NULL, add unique(itservid);
