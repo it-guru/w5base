@@ -85,8 +85,10 @@ sub UTF8toLatin1
       $dd=~s/\x{201e}/"/g;
       $dd=~s/\x{2022}/*/g;
       $dd=~s/\x{2013}/|/g;
-      decode_utf8($dd,0);
-      $dd=encode("iso-8859-1", $dd);
+      eval('decode_utf8($dd,0);$dd=encode("iso-8859-1", $dd);');
+      if ($@ ne ""){ # now i need to be harder!
+         $dd=~s/[^[:ascii:]äöüßÄÖÜ]/?/g;
+      }
    }
    return($dd);
 }
