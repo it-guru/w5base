@@ -1134,6 +1134,11 @@ sub Validate
    if (defined($newrec->{asset}) && $newrec->{asset} eq ""){
       $newrec->{asset}=undef;
    }
+   if (exists($newrec->{isclusternode})){
+      if (effVal($oldrec,$newrec,"isclusternode")!=1){
+         $newrec->{itclustid}=undef;
+      }
+   }
 
    ########################################################################
    # standard security handling
