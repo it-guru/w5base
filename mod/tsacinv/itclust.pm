@@ -317,10 +317,10 @@ sub getDetailBlockPriority
 sub getValidWebFunctions
 {
    my ($self)=@_;
-   return($self->SUPER::getValidWebFunctions(),qw(ImportSystem));
+   return($self->SUPER::getValidWebFunctions(),qw(ImportCluster));
 }  
 
-sub ImportSystem
+sub ImportCluster
 {
    my $self=shift;
 
@@ -328,7 +328,7 @@ sub ImportSystem
    if (Query->Param("DOIT")){
       if ($self->Import({importname=>$importname})){
          Query->Delete("importname");
-         $self->LastMsg(OK,"system has been successfuly imported");
+         $self->LastMsg(OK,"cluster has been successfuly imported");
       }
       Query->Delete("DOIT");
    }
@@ -339,8 +339,8 @@ sub ImportSystem
                                    'kernel.App.Web.css'],
                            static=>{importname=>$importname},
                            body=>1,form=>1,
-                           title=>"AssetManager System Import");
-   print $self->getParsedTemplate("tmpl/minitool.system.import",{});
+                           title=>"AssetManager Cluster Import");
+   print $self->getParsedTemplate("tmpl/minitool.cluster.import",{});
    print $self->HtmlBottom(body=>1,form=>1);
 }
 
@@ -361,7 +361,7 @@ sub Import
    }
    $self->ResetFilter();
    $self->SetFilter($flt);
-   my @l=$self->getHashList(qw(clusterid name lassignmentid assetid));
+   my @l=$self->getHashList(qw(ALL));
    if ($#l==-1){
       $self->LastMsg(ERROR,"ClusterID not found in AssetManager");
       return(undef);
@@ -371,50 +371,54 @@ sub Import
       return(undef);
    }
 
-   my $sysrec=$l[0];
-   my $sys=getModuleObject($self->Config,"itil::system");
-   $sys->SetFilter($flt);
-   my ($w5sysrec,$msg)=$sys->getOnlyFirst(qw(ALL));
+   my $clustrec=$l[0];
+
+printf STDERR ("AssetManager ClusterRec=%s\n",Dumper($clustrec));
+   my $itclust=getModuleObject($self->Config,"itil::itclust");
+   $itclust->SetFilter($flt);
+   my ($w5clustrec,$msg)=$itclust->getOnlyFirst(qw(ALL));
    my $identifyby;
-   if (defined($w5sysrec)){
-      if ($w5sysrec->{cistatusid}==4){
+   if (defined($w5clustrec)){
+      if ($w5clustrec->{cistatusid}==4){
          $self->LastMsg(ERROR,"ClusterID already exists in W5Base");
          return(undef);
       }
-      $identifyby=$sys->ValidatedUpdateRecord($w5sysrec,{cistatusid=>4},
-                                              {id=>\$w5sysrec->{id}});
+      $identifyby=$itclust->ValidatedUpdateRecord($w5clustrec,{cistatusid=>4},
+                                              {id=>\$w5clustrec->{id}});
    }
    else{
-      # check 1: Assigmenen Group registered
-      if ($sysrec->{lassignmentid} eq ""){
-         $self->LastMsg(ERROR,"ClusterID has no Assignment Group");
-         return(undef);
-      }
-      printf STDERR Dumper($sysrec);
-      # check 2: Assingment Group active
-      my $acgroup=getModuleObject($self->Config,"tsacinv::group");
-      $acgroup->SetFilter({lgroupid=>\$sysrec->{lassignmentid}});
-      my ($acgrouprec,$msg)=$acgroup->getOnlyFirst(qw(supervisorldapid));
-      if (!defined($acgrouprec)){
-         $self->LastMsg(ERROR,"Can't find Assignment Group of system");
-         return(undef);
-      }
-      # check 3: Supervisor registered
-      if ($acgrouprec->{supervisorldapid} eq "" &&
-          $acgrouprec->{supervisoremail} eq ""){
-         $self->LastMsg(ERROR,"incomplet Supervisor at Assignment Group");
-         return(undef);
-      }
-      my $importname=$acgrouprec->{supervisorldapid};
-      $importname=$acgrouprec->{supervisoremail} if ($importname eq "");
-      # check 4: load Supervisor ID in W5Base
-      my $tswiw=getModuleObject($self->Config,"tswiw::user");
-      my $databossid=$tswiw->GetW5BaseUserID($importname);
-      if (!defined($databossid)){
-         $self->LastMsg(ERROR,"Can't import Supervisor as Databoss");
-         return(undef);
-      }
+#      # check 1: Assigmenen Group registered
+#      if ($clustrec->{lassignmentid} eq ""){
+#         $self->LastMsg(ERROR,"ClusterID has no Assignment Group");
+#         return(undef);
+#      }
+#      printf STDERR Dumper($clustrec);
+#      # check 2: Assingment Group active
+#      my $acgroup=getModuleObject($self->Config,"tsacinv::group");
+#      $acgroup->SetFilter({lgroupid=>\$clustrec->{lassignmentid}});
+#      my ($acgrouprec,$msg)=$acgroup->getOnlyFirst(qw(supervisorldapid));
+#      if (!defined($acgrouprec)){
+#         $self->LastMsg(ERROR,"Can't find Assignment Group of system");
+#         return(undef);
+#      }
+#      # check 3: Supervisor registered
+#      if ($acgrouprec->{supervisorldapid} eq "" &&
+#          $acgrouprec->{supervisoremail} eq ""){
+#         $self->LastMsg(ERROR,"incomplet Supervisor at Assignment Group");
+#         return(undef);
+#      }
+#      my $importname=$acgrouprec->{supervisorldapid};
+#      $importname=$acgrouprec->{supervisoremail} if ($importname eq "");
+#      # check 4: load Supervisor ID in W5Base
+#      my $tswiw=getModuleObject($self->Config,"tswiw::user");
+#      my $databossid=$tswiw->GetW5BaseUserID($importname);
+#      if (!defined($databossid)){
+#         $self->LastMsg(ERROR,"Can't import Supervisor as Databoss");
+#         return(undef);
+#      }
       # check 5: find id of mandator "extern"
+
+
       my $mand=getModuleObject($self->Config,"base::mandator");
       $mand->SetFilter({name=>"extern"});
       my ($mandrec,$msg)=$mand->getOnlyFirst(qw(grpid));
@@ -422,24 +426,27 @@ sub Import
          $self->LastMsg(ERROR,"Can't find mandator extern");
          return(undef);
       }
+      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"write","direct");
       my $mandatorid=$mandrec->{grpid};
-      # final: do the insert operation
-      my $newrec={name=>$sysrec->{clustername},
-                  clusterid=>$sysrec->{clusterid},
-                  admid=>$databossid,
-                  allowifupdate=>1,
+      if ($#mandators!=-1){
+         $mandatorid=$mandators[0];
+      }
+      my $newrec={name=>$clustrec->{name},
+                  clusterid=>$clustrec->{clusterid},
+                  clusttyp=>"OS",
+                  comments=>$clustrec->{usage},
                   mandatorid=>$mandatorid,
                   cistatusid=>4};
-      $identifyby=$sys->ValidatedInsertRecord($newrec);
+      $identifyby=$itclust->ValidatedInsertRecord($newrec);
    }
    if (defined($identifyby) && $identifyby!=0){
-      $sys->ResetFilter();
-      $sys->SetFilter({'id'=>\$identifyby});
-      my ($rec,$msg)=$sys->getOnlyFirst(qw(ALL));
+      $itclust->ResetFilter();
+      $itclust->SetFilter({'id'=>\$identifyby});
+      my ($rec,$msg)=$itclust->getOnlyFirst(qw(ALL));
       if (defined($rec)){
          my $qc=getModuleObject($self->Config,"base::qrule");
-         $qc->setParent($sys);
-         $qc->nativQualityCheck($sys->getQualityCheckCompat($rec),$rec);
+         $qc->setParent($itclust);
+         $qc->nativQualityCheck($itclust->getQualityCheckCompat($rec),$rec);
       }
    }
    return($identifyby);
