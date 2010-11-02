@@ -1300,13 +1300,4 @@ EOF
 
 
 
-#sub isQualityCheckValid
-#{
-#   return(1);
-#}
-
-
-
-
-
 1;
