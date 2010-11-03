@@ -19,7 +19,6 @@ package kernel::Field::Email;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use Data::Dumper;
 @ISA    = qw(kernel::Field::Text);
 
 
@@ -57,7 +56,9 @@ sub Validate
             $m=lc($m);
          }
          $m=~s/^(smtp:)//i;
-         $m=~s/[^a-z0-9_\.\@-]//gi;
+         if (!($m=~m/^".*" <\S+\@\S+\.\S+>$/)){
+            $m=~s/[^a-z0-9_\.\@-]//gi;
+         }
          $_=$m;
       } @{$newvallist})];
    if (ref($newvalreq) eq "ARRAY"){
