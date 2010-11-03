@@ -12,7 +12,7 @@
 'fieldgroup.characteristic'=>{de=>'Ausprägung',en=>'Characteristic'},
 'fieldgroup.support'=>{de=>'Support-Zeiten',en=>'support'},
 'fieldgroup.finance'=>{de=>'Finanzdaten',en=>'Finance'},
-'fieldgroup.saprelation'=>{de=>'SAP Zuorndung',en=>'SAP relation'},
+'fieldgroup.saprelation'=>{de=>'SAP Zuordnung',en=>'SAP relation'},
 'service active'=>{de=>'Service-Zeiten definiert'},
 'oncall active'=>{de=>'Rufbereitschaftszeiten definiert'},
 'Service description'=>{de=>'Leistungsbeschreibung'},

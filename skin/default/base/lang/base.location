@@ -24,7 +24,7 @@
 'Deputy location responsible'=>{de=>'Standortverantwortlicher Vetreter'},
 "invalid zipcode '\%s'"=>{de=>"ungültige Postleitzahl '\%s'"},
 "invalid location"=>{de=>"ungültige Standortdaten"},
-'Organisation link'=>{de=>'Organisations Zuorndung'},
+'Organisation link'=>{de=>'Organisations Zuordnung'},
 'organisations location prio'=>{de=>'Organisations Standort Prio'},
 'Phonenumbers'=>{de=>'Rufnummernverzeichnis'},
 'Location prio'=>{de=>'Standort Prio (BETA)',en=>'Location prio (BETA)'},

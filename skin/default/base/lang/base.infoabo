@@ -2,7 +2,7 @@
                   en=>'Info Abo'},
 'fieldgroup.default'=>{de=>'Informationsquellenbeschreibung',
                        en=>'Infoabo description'},
-'fieldgroup.relation'=>{de=>'Zuorndung',
+'fieldgroup.relation'=>{de=>'Zuordnung',
                        en=>'Relation'},
 'Active'=>{de=>'Aktiv'},
 'User CI-State'=>{de=>'Kontakt CI-Status'},

@@ -24,7 +24,7 @@
   §3  Verantwortung für Datenelemente
       -------------------------------
       Erzeugt ein User im W5Base/Darwin Datenbanksystem Datensätze, die der
-      Zuorndung zu einem Datenverantwortlichen unterliegen, so ist der
+      Zuordnung zu einem Datenverantwortlichen unterliegen, so ist der
       User für diese Daten zeitlich unbegrenzt verantwortlich. Die Übergabe
       der Daten an andere User (Nachfolger) liegt allein in der Zuständigkeit
       des Datenverantwortlichen.
