@@ -41,24 +41,23 @@ else{
 my $id="12887964850001";
 
 # Step 1: accept
-my $WfRec=reloadWf($wf,$id);
-if ($WfRec->{stateid}!=3 && grep(/^wfaccept$/,@{$WfRec->{posibleactions}})){
+if ($WfRec->{stateid}!=3 && 
+    grep(/^wfaccept$/,@{$WfRec->{posibleactions}})){
    $wf->storeRecord({action=>'wfaccept'},$id);
    $wf->dieOnERROR();
 }
 
-## Step 2: add P800 Parameters
-$wf->storeRecord({tcomworktime=>'245',
-                  step=>'xxx',
-                  tcomcodcomments=>'tcomcodcomments: testtext',
-                  tcomcodcause=>'appl.add.rollout'},$id);
+# Step 2: add P800 Parameters
+$wf->storeRecord({
+      tcomworktime=>'245',
+      tcomcodcomments=>'tcomcodcomments: testtext',
+      tcomcodcause=>'appl.add.rollout'},$id);
 $wf->dieOnERROR();
-#
-#
-## Step 3: wffineproc
-#my $WfRec=reloadWf($wf,$id);
-#$wf->storeRecord({action=>'wffineproc',note=>'Ende'},$id);
-#$wf->dieOnERROR();
+
+# Step 3: wffineproc
+my $WfRec=reloadWf($wf,$id);
+$wf->storeRecord({action=>'wffineproc',note=>'Ende'},$id);
+$wf->dieOnERROR();
 
 # Step 4: check end state
 my $WfRec=reloadWf($wf,$id);
