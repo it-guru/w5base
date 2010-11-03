@@ -548,7 +548,7 @@ sub storeRecord
          $newrec->{$k}=UTF8toLatin1($newrec->{$k});
       }
    }
-   if ($objectname eq "base::workflow"){
+   if ($objectname eq "base::workflow" && exists($newrec->{action})){
       my $action=$newrec->{action};
       delete($newrec->{action});
       if ($o->nativProcess($action,$newrec,$id)){

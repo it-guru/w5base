@@ -37,57 +37,46 @@ else{
    msg(DEBUG,"create of ModuleObject $wf ok");
 }
 
-my $WfRec={ class=>'AL_TCom::workflow::businesreq',
-            name=>'Hallo Welt 1',
-            step=>'itil::workflow::businesreq::dataload',
-            action=>'NextStep',
-            detaildescription=>"Dies ist der lange Text\n".
-                               "mit mehreren Zeilen",
-            affectedapplication=>'W5Base/Darwin'
-          };
 
-#######################################################################
-#
-msg(INFO,"create Workflow");
+my $id="12887964850001";
 
-my $id="12880873840001";
-   $wf->SetFilter({id=>[$id]});
-   foreach my $WfRec ($wf->getHashList(qw(name shortactionlog posibleactions
-                                          step class))){
-      printf("WfRec=%s\n",Dumper($WfRec));
-   }
-   exit(0);
-
-   my $id=$wf->storeRecord({action=>'wfaccept'},$id);
+# Step 1: accept
+my $WfRec=reloadWf($wf,$id);
+if ($WfRec->{stateid}!=3 && grep(/^wfaccept$/,@{$WfRec->{posibleactions}})){
+   $wf->storeRecord({action=>'wfaccept'},$id);
    $wf->dieOnERROR();
-   msg(INFO,"accept done");
-   my $id=$wf->storeRecord({note=>'Hallo',effort=>123,
-                            action=>'wffineproc'},$id);
-   $wf->dieOnERROR();
-   msg(INFO,"fineproc done");
-   $wf->SetFilter({id=>[$id]});
-   foreach my $WfRec ($wf->getHashList(qw(name shortactionlog posibleactions
-                                          step class))){
-      printf("WfRec=%s\n",Dumper($WfRec));
-   }
-   exit(0);
-
-#######################################################################
-sub Help
-{
-   print(<<EOF);
-$RealScript [options] FullnameFilter
-
-   --verbose display more details of operation process
-   --quiet   only errors would be displayed
-   --base    base url of filemgmt (default: $DefaultBase)
-
-   --webuser username
-   --webpass password
-   --store   stores the parameters (not help,verbose and store)
-   --help    show this help
-
-EOF
 }
-#######################################################################
-exit(255);
+
+## Step 2: add P800 Parameters
+$wf->storeRecord({tcomworktime=>'245',
+                  step=>'xxx',
+                  tcomcodcomments=>'tcomcodcomments: testtext',
+                  tcomcodcause=>'appl.add.rollout'},$id);
+$wf->dieOnERROR();
+#
+#
+## Step 3: wffineproc
+#my $WfRec=reloadWf($wf,$id);
+#$wf->storeRecord({action=>'wffineproc',note=>'Ende'},$id);
+#$wf->dieOnERROR();
+
+# Step 4: check end state
+my $WfRec=reloadWf($wf,$id);
+print Dumper($WfRec);
+
+
+sub reloadWf
+{
+   my $wf=shift;
+   my $id=shift;
+
+   $wf->SetFilter({id=>[$id]});
+   my @l=$wf->getHashList(qw(name posibleactions stateid step class wffields));
+   if ($#l!=0){
+      printf STDERR ("ERROR: while loading $id\n");
+      exit(255);
+   }
+   return($l[0]);
+}
+
+
