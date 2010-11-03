@@ -429,7 +429,8 @@ sub Validate
    my $currentstate=shift;   # current state of write record
 
    if (!exists($newrec->{$self->Name()})){
-      if (!defined($oldrec)){
+      if (!defined($oldrec) && (defined($self->{dataobjattr}) ||
+                                defined($self->{container}))){
          my $def=$self->DefaultValue($newrec);
          if (defined($def)){
             return({$self->Name()=>$def});
