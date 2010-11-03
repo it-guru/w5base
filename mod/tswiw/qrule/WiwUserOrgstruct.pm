@@ -1,6 +1,6 @@
-package tswiw::event::orgarea;
+package tswiw::qrule::WiwUserOrgstruct;
 #  W5Base Framework
-#  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2010  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@ package tswiw::event::orgarea;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use kernel::Event;
-@ISA=qw(kernel::Event);
+use kernel::QRule;
+@ISA=qw(kernel::QRule);
 
 sub new
 {
@@ -31,32 +31,27 @@ sub new
    return($self);
 }
 
-sub Init
+sub getPosibleTargets
 {
-   my $self=shift;
-
-   $self->RegisterEvent("UserVerified",\&UpdateOrgareaStructure,timeout=>300);
-   $self->RegisterEvent("WiWOrgareaRefresh",\&UpdateOrgareaStructure,
-                         timeout=>14400);
-   return(1);
+   return(["base::user"]);
 }
 
-sub UpdateOrgareaStructure
+sub qcheckRecord
 {
    my $self=shift;
-   my $app=$self->getParent();
+   my $dataobj=shift;
+   my $rec=shift;
+   my $errorlevel=0;
+
+   my $Config=$self->getParent->Config;
    $self->{SRCSYS}="WhoIsWho";
-   my $account=shift;
-   msg(DEBUG,"Verify orgarea structure of account '%s'",$account);
 
-   return() if ($account eq "anonymous");
-
-   my $user=getModuleObject($self->Config,"base::user");
-   my $mainuser=getModuleObject($self->Config,"base::user");
-   my $grp=getModuleObject($self->Config,"base::grp");
-   my $grpuser=getModuleObject($self->Config,"base::lnkgrpuser");
-   my $wiwusr=getModuleObject($self->Config,"tswiw::user");
-   my $wiworg=getModuleObject($self->Config,"tswiw::orgarea");
+   my $user=getModuleObject($Config,"base::user");
+   my $mainuser=getModuleObject($Config,"base::user");
+   my $grp=getModuleObject($Config,"base::grp");
+   my $grpuser=getModuleObject($Config,"base::lnkgrpuser");
+   my $wiwusr=getModuleObject($Config,"tswiw::user");
+   my $wiworg=getModuleObject($Config,"tswiw::orgarea");
 
    if (!defined($wiwusr) ||
        !defined($wiworg) ||
@@ -64,36 +59,25 @@ sub UpdateOrgareaStructure
        !defined($user)   ||
        !defined($mainuser)   ||
        !defined($grp)){
-      msg(ERROR,"can't connect nesassary information objects");
-      return({msg=>'shit'});
+      msg(ERROR,"WiwUserOrgstruct can't connect nesassary information objects");
+      return($errorlevel,undef);
    }
-   #goto CLEANUP;
+
+
    $mainuser->ResetFilter();
-   if ($account ne ""){
-      $mainuser->SetFilter({accounts=>$account});
-   }
-   $mainuser->SetCurrentView(qw(email surname givenname usertyp groups posix));
-   my ($urec,$msg)=$mainuser->getFirst();
-   if (!defined($urec)){
-      msg(ERROR,"can't load any user accounts to verifiy");
-      return({msg=>$msg,exitcode=>1});
-   }
-   msg(DEBUG,"ok, first record loaded");
-   do{
+   $mainuser->SetFilter({userid=>\$rec->{userid}});
+   my ($urec)=$mainuser->getOnlyFirst(qw(email surname givenname usertyp 
+                                         groups posix));
+   if (defined($urec)){ # found correct urec record for user
+      print STDERR Dumper($urec);
       if (defined($urec) && $urec->{email} ne "" &&
           $urec->{email} ne 'null@null.com' &&
-          $urec->{usertyp} eq "user"){
-         my @curgrpid=();
-         msg(DEBUG,"processing email addr '%s'",$urec->{email});
-         if (defined($urec->{groups}) && ref($urec->{groups}) eq "ARRAY"){
-            foreach my $grp (@{$urec->{groups}}){
-               $grp->{roles}=[] if (!defined($grp->{roles}));
-               if (grep(/^REmployee$/,@{$grp->{roles}})){
-                  push(@curgrpid,$grp->{grpid});
-               }
-            }
-         }
-         msg(DEBUG,"validateing userid=$urec->{userid} request $account");
+          $urec->{usertyp} eq "user"){     # it seems to be a correct email
+         msg(INFO,"processing email addr '%s'",$urec->{email});
+         my @curgrpid=$self->extractCurrentGrpIds($urec);
+         msg(INFO,"grpids='%s'",join(",",@curgrpid));
+         msg(INFO,"validateing userid=$urec->{userid} requested");
+
          #
          # load srcid's from base::grp
          #
@@ -108,15 +92,17 @@ sub UpdateOrgareaStructure
          $wiwusr->SetFilter([{email=>$urec->{email}},
                              {email2=>$urec->{email}},
                              {email3=>$urec->{email}}]);
-         $wiwusr->SetCurrentView(qw(ALL));
-         my ($wiwrec,$msg)=$wiwusr->getFirst();
+         my ($wiwrec,$msg)=$wiwusr->getOnlyFirst(qw(ALL));
          if (!defined($wiwrec)){
             if (defined($msg)){
                msg(ERROR,"LDAP problem:%s",$msg);
             }
-            msg(DEBUG,"User '%s' couldn't be found in LDAP",$urec->{email});
-            goto NEXT;
+            msg(ERROR,"User '%s' couldn't be found in LDAP",$urec->{email});
+            return($errorlevel,undef);
          }
+         print STDERR Dumper($wiwrec);
+
+
          my $wiwid=$wiwrec->{id};
          my $touid=$wiwrec->{touid};
          my $surname=$wiwrec->{surname};
@@ -126,19 +112,31 @@ sub UpdateOrgareaStructure
          my @posix=grep(!/^[A-Z]{1,3}\d+$/,@{$uidlist});
          my $posix=$posix[0];
 
-#printf STDERR ("fifi=wiwuser=posix=$posix=%s\n",Dumper($wiwrec));
+         my $wiwstate=$wiwrec->{office_state};
+         my $level1role="RFreelancer";
+         if ($wiwstate eq "Intern" ||
+             $wiwstate eq "Manager" ||
+             $wiwstate eq "Employee"){
+            $level1role="REmployee";
+         }
+         if ($wiwstate eq "Auszubildender"){
+            $level1role="RApprentice";
+         }
+         msg(INFO,"organizationalstatus=$wiwstate --- w5base role=$level1role");
+         
+
          #
          # hinzufügen der Userrollen
          #
          if ($touid ne ""){
             $wiworg->SetFilter({touid=>\$touid});
-            $wiworg->SetCurrentView(qw(touid name parentid parent shortname));
-            my ($wiwrec,$msg)=$wiworg->getFirst();
+            my ($wiwrec,$msg)=$wiworg->getOnlyFirst(qw(touid name parentid 
+                                                       parent shortname));
             if (defined($wiwrec)){
                my $bk=$self->addGrpLinkToUser($grp,$wiworg,$grpuser,
                                               $wiwrec,$urec,
-                                              ['REmployee','RMember']);
-               return($bk) if (defined($bk));
+                                              [$level1role,'RMember']);
+               return($errorlevel,undef) if (defined($bk));
             }
             else{
                if (defined($msg)){
@@ -152,12 +150,15 @@ sub UpdateOrgareaStructure
             msg(DEBUG,"user '%s' has no orgarea",$urec->{email});
          }
 
+
+
+
          #
          # hinzufügen der Leiter rollen
          #
          if (!defined($wiwid) || $wiwid eq ""){
             msg(ERROR,"can't find wiwid of user '%s'",$urec->{email});
-            goto NEXT;
+            return($errorlevel,undef);
          }
          $wiworg->SetFilter({mgrwiwid=>\$wiwid});
          foreach my $wiwrec ($wiworg->getHashList(
@@ -165,7 +166,7 @@ sub UpdateOrgareaStructure
             my $bk=$self->addGrpLinkToUser($grp,$wiworg,$grpuser,
                                            $wiwrec,$urec,
                                            ['RBoss']);
-            return($bk) if (defined($bk));
+            return($errorlevel,undef) if (defined($bk));
          }
 
 
@@ -183,57 +184,26 @@ sub UpdateOrgareaStructure
                       "userid='$urec->{userid}'");
          }
       }
-      NEXT:
-      ($urec,$msg)=$mainuser->getNext();
-   }until(!defined($urec));
- 
-   CLEANUP:
+   }
+   return($errorlevel,undef);
+}
 
-   if (!defined($account) || $account eq ""){
-      $grpuser->SetFilter(srcsys=>\$self->{SRCSYS},       # (8 Wochen)
-                          srcload=>"<now-7d");           # übergang = 7 Tage
-      $grpuser->SetCurrentView(qw(ALL));
-      my ($rec,$msg)=$grpuser->getFirst();
-      if (defined($rec)){
-         do{
-            if ($rec->{expiration} eq ""){
-               my $exp="now+7d";
-               $exp=$app->ExpandTimeExpression($exp,"en","GMT","GMT");
-               $grpuser->ValidatedUpdateRecord($rec,{expiration=>$exp,
-                                                     roles=>$rec->{roles}},
-                 {userid=>\$rec->{userid},lnkgrpuserid=>\$rec->{lnkgrpuserid}});
-            }
-            ($rec,$msg)=$grpuser->getNext();
-         }until(!defined($rec));
-      }
-      else{
-         if (defined($msg)){
-            msg(ERROR,"LDAP cleanup problem:%s",$msg);
-         }
-      }
+sub extractCurrentGrpIds
+{
+   my $self=shift;
+   my $urec=shift;
 
-
-
-      $grpuser->SetFilter(srcsys=>\$self->{SRCSYS},       # (8 Wochen)
-                          srcload=>"<now-56d");           # übergang = 56 Tage
-      $grpuser->SetCurrentView(qw(ALL));
-      my ($rec,$msg)=$grpuser->getFirst();
-      if (defined($rec)){
-         do{
-            $grpuser->ValidatedDeleteRecord($rec);
-            ($rec,$msg)=$grpuser->getNext();
-         }until(!defined($rec));
-      }
-      else{
-         if (defined($msg)){
-            msg(ERROR,"LDAP cleanup problem:%s",$msg);
+   my @curgrpid=();
+   msg(DEBUG,"processing email addr '%s'",$urec->{email});
+   if (defined($urec->{groups}) && ref($urec->{groups}) eq "ARRAY"){
+      foreach my $grp (@{$urec->{groups}}){
+         $grp->{roles}=[] if (!defined($grp->{roles}));
+         if (grep(/^REmployee$/,@{$grp->{roles}})){
+            push(@curgrpid,$grp->{grpid});
          }
       }
    }
-
-
-
-   return({msg=>'fine',exitcode=>0});
+   return(@curgrpid);
 }
 
 
@@ -256,26 +226,45 @@ sub addGrpLinkToUser
       $grpuser->SetCurrentView(qw(grpid userid lnkgrpuserid roles 
                                   srcsys srcid srcload));
       my ($lnkrec,$msg)=$grpuser->getFirst();
+      my $oldrolestring="";
+      my $newrolestring="";
       if (defined($lnkrec)){
-         my @newroles;
-         foreach my $role (@{$roles}){
+         my %newroles;
+         my @oldroles;
+         my @origroles;
+         if (!in_array($roles,"RBoss")){
+            my @orgRoles=grep(!/^RBoss$/,orgRoles()); # RBoss muss bleiben!
             if (defined($lnkrec->{roles})){
-               if (!grep(/^$role$/,@{$lnkrec->{roles}})){
-                  push(@newroles,$role);
+               $oldrolestring=join(",",sort(@{$lnkrec->{roles}}));
+               @origroles=@{$lnkrec->{roles}};
+               foreach my $r (@{$lnkrec->{roles}}){
+                  push(@oldroles,$r) if (!in_array(\@orgRoles,$r));
                }
             }
          }
-         my %newlnk=(roles=>[@newroles,@{$lnkrec->{roles}}],
+         else{
+            @oldroles=@{$lnkrec->{roles}};
+         }
+         foreach my $r (@$roles,@oldroles){
+            $newroles{$r}++;
+         }
+         $newrolestring=join(",",sort(keys(%newroles)));
+         my %newlnk=(roles=>[keys(%newroles)],
                      expiration=>undef,
                      alertstate=>undef,
                      srcsys=>$self->{SRCSYS},
                      srcid=>"none",
                      srcload=>$nowstamp);
-         my $back=$grpuser->ValidatedUpdateRecord($lnkrec,\%newlnk,
+         my $bk=$grpuser->ValidatedUpdateRecord($lnkrec,\%newlnk,
                             {lnkgrpuserid=>$lnkrec->{lnkgrpuserid}});
-         #printf STDERR ("fifi insert=back=$back\n");
+         if (!in_array(\@origroles,$roles->[0])){
+            $self->NotifyNewTeamRelation($lnkrec->{lnkgrpuserid},
+                                         $urec->{userid},$grpid2add,"Rchange",
+                                         $roles);
+         }
       }
       else{
+         $newrolestring=join(",",sort(@$roles));
          my %newlnk=(userid=>$urec->{userid},
                      roles=>$roles,
                      srcsys=>$self->{SRCSYS},
@@ -284,8 +273,11 @@ sub addGrpLinkToUser
                      alertstate=>undef,
                      grpid=>$grpid2add);
          #printf STDERR ("fifi try to create lnk %s\n",Dumper(\%newlnk));
-         my $back=$grpuser->ValidatedInsertRecord(\%newlnk);
-         #printf STDERR ("fifi insert=back=$back\n");
+         my $bk=$grpuser->ValidatedInsertRecord(\%newlnk);
+         if ($bk){
+            $self->NotifyNewTeamRelation($bk,$urec->{userid},$grpid2add,"Rnew",
+                                         $roles)
+         }
       }
    }
    else{
@@ -312,8 +304,9 @@ sub getGrpIdOf
       return($rec->{grpid});
    }
    return($self->createGrp($grp,$wiworg,$wiwrec));
-   
+
 }
+
 
 sub createGrp
 {
@@ -322,8 +315,7 @@ sub createGrp
    my $wiworg=shift;
    my $wiwrec=shift;
 
-#   my $v1=getModuleObject($self->Config,"w5v1inv::orgarea");
-   msg(DEBUG,"try to create touid=$wiwrec->{touid} in base::grp");
+   msg(INFO,"try to create touid=$wiwrec->{touid} in base::grp");
    my $parentid;
    if (defined($wiwrec->{parentid})){
       $wiworg->SetFilter({touid=>[$wiwrec->{parentid}]});
@@ -381,12 +373,6 @@ sub createGrp
             $parentoftsi=$rec->{grpid};
          }
          my %newgrp=(name=>"TSI",parent=>'DTAG',cistatusid=>4);
-      #   $v1->SetFilter({fullname=>\"DTAG.TSI"});
-      #   $v1->SetCurrentView(@view);
-      #   my ($rec,$msg)=$v1->getFirst();
-      #   if (defined($rec)){
-      #      $newgrp{grpid}=$rec->{id};
-      #   }
          $parentid=$grp->ValidatedInsertRecord(\%newgrp);
       }
       else{
@@ -416,6 +402,115 @@ sub createGrp
 
    return($back);
 }
+
+sub NotifyNewTeamRelation
+{
+   my $self=shift;
+   my $relid=shift;
+   my $userid=shift;
+   my $grpid=shift;
+   my $op=shift;
+   my $roles=shift;
+   my $Config=$self->getParent->Config();
+   msg(INFO,"NotifyNewTeamRelation: userid=$userid grpid=$grpid op=$op");
+
+   my $user=getModuleObject($Config,"base::user");
+   $user->SetFilter({userid=>\$userid,cistatusid=>"<6"});
+   my ($urec)=$user->getOnlyFirst(qw(email lang));
+
+   my $grp=getModuleObject($Config,"base::grp");
+   $grp->SetFilter({grpid=>\$grpid,cistatusid=>"<6"});
+   my ($grec)=$grp->getOnlyFirst(qw(fullname));
+   msg(INFO,"--------------");
+
+   if (defined($urec) && defined($grec)){
+      $ENV{HTTP_FORCE_LANGUAGE}=$urec->{lang};
+      my @emailcc=();
+      my @emailbcc=();
+      my $wf=getModuleObject($Config,"base::workflow");
+   
+      my $grpuser=getModuleObject($Config,"base::lnkgrpuser");
+      $grpuser->SetFilter({grpid=>\$grpid});
+      foreach my $lnkrec ($grpuser->getHashList(qw(userid roles))){
+         if (ref($lnkrec->{roles}) eq "ARRAY"){
+            if (grep(/^(RBoss|RBoss2)$/,@{$lnkrec->{roles}})){
+               $user->SetFilter({userid=>\$lnkrec->{userid}});
+               my ($urec)=$user->getOnlyFirst(qw(email));
+               push(@emailcc,$urec->{email}) if ($urec->{email} ne "");
+            }
+         }
+      }
+     
+      my $grpuser=getModuleObject($Config,"base::lnkgrpuser");
+      $grpuser->SetFilter({grpid=>\'1'});
+      foreach my $lnkrec ($grpuser->getHashList(qw(userid roles))){
+         if (ref($lnkrec->{roles}) eq "ARRAY"){
+            if (grep(/^(RMember)$/,@{$lnkrec->{roles}})){
+               $user->SetFilter({userid=>\$lnkrec->{userid}});
+               my ($urec)=$user->getOnlyFirst(qw(email lang));
+               push(@emailbcc,$urec->{email}) if ($urec->{email} ne "");
+            }
+         }
+      }
+     
+
+      my %adr=(emailto=>$urec->{email},
+               emailfrom=>'"WhoIsWho to W5BaseDarwin" <no_reply@w5base.net>',
+               emailcc=>\@emailcc,
+               emailbcc=>\@emailbcc);
+
+      my $subject;
+      my $mailtext;
+
+      my $sitename=$Config->Param("SiteName");
+      $sitename="W5Base" if ($sitename eq "");
+
+    
+      if ($op eq "Rnew"){
+         $subject="$sitename: ".
+                  $self->T("new org relation to")." ".$grec->{fullname}; 
+         $mailtext=sprintf($self->T("MAILTEXT.NEW"),$grec->{fullname});
+      }
+      else{
+         $subject="$sitename: ".
+                  $self->T("role update to")." ".$grec->{fullname}; 
+         $mailtext=sprintf($self->T("MAILTEXT.UPDATE"),$grec->{fullname});
+      }
+      my $baseurl=$Config->Param("EventJobBaseUrl");
+      $baseurl.="/" if (!($baseurl=~m/\/$/));
+      my $url=$baseurl;
+      $url.="auth/base/lnkgrpuser/ById/".$relid;
+
+      $mailtext.="\n\n   <b>Org-Unit:</b>\n".
+                 "   ".$grec->{fullname};
+      $mailtext.="\n\n   <b>".$self->T("added roles").":</b>\n";
+      foreach my $r (@$roles){
+         $mailtext.="   ".$self->T($r,"base::lnkgrpuserrole")."\n";
+      }
+     
+      $mailtext.="\n\nDirectLink:\n".$url;
+      my $label=$self->T("WhoIsWho to W5Base/Darwin automatic ".
+                         "organisation relation administration:");
+     
+      if (my $id=$wf->Store(undef,{
+              class    =>'base::workflow::mailsend',
+              step     =>'base::workflow::mailsend::dataload',
+              directlnktype =>'base::user',
+              directlnkid   =>$userid,
+              directlnkmode =>"mail.$op",
+              name     =>$subject,
+              %adr,
+              emailhead=>$label,
+              emailtext=>$mailtext
+             })){
+         my %d=(step=>'base::workflow::mailsend::waitforspool');
+         my $r=$wf->Store($id,%d);
+      }
+      delete($ENV{HTTP_FORCE_LANGUAGE});
+   }
+}
+
+
 
 
 1;

@@ -1,2 +1,2 @@
-'tswiw::qrule::WiwUser'=>{de=>'WhoIsWho Anbindung der Kontaktdaten',en=>'WhoIsWho Interface of contact data'},
+'tswiw::qrule::WiwUser'=>{de=>'WhoIsWho Aktualisierung der Kontaktdaten',en=>'WhoIsWho Interface of contact data'},
 'some fields has been updated'=>{de=>'einige Felder wurden aktualisiert'},
