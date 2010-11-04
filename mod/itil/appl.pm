@@ -742,28 +742,20 @@ sub new
 
       new kernel::Field::WorkflowLink(
                 name          =>'olastdrtestwf',
-                label         =>'last Desaster-Recovery test (WorkflowID)',
+                label         =>'last Desaster-Recovery test (CHM-WorkflowID)',
                 group         =>'sodrgroup',
                 vjoinon       =>'olastdrtestwfid'),
 
       new kernel::Field::Link(
                 name          =>'olastdrtestwfid',
-                label         =>'last Desaster-Recovery test (WorkflowID)',
+                label         =>'last Desaster-Recovery test (CHM-WorkflowID)',
                 group         =>'sodrgroup',
                 searchable    =>0,
                 dataobjattr   =>'appl.solastdrtestwf'),
 
       new kernel::Field::Date(
-                name          =>'temp_solastdrdate',
-                label         =>'last Desaster-Recovery date',
-                group         =>'sodrgroup',
-                searchable    =>0,
-                dayonly       =>1,
-                dataobjattr   =>'appl.solastdrdate'),
-
-      new kernel::Field::Date(
                 name          =>'solastdrdate',
-                label         =>'last Desaster-Recovery (WorkflowEnd)',
+                label         =>'last Desaster-Recovery test (WorkflowEnd)',
                 readonly      =>1,
                 dayonly       =>1,
                 group         =>'sodrgroup',
@@ -771,6 +763,14 @@ sub new
                 vjoinon       =>['olastdrtestwfid'=>'id'],
                 vjoindisp     =>'eventend',
                 searchable    =>0),
+
+      new kernel::Field::Date(
+                name          =>'temp_solastdrdate',
+                label         =>'last Desaster-Recovery test date (temp)',
+                group         =>'sodrgroup',
+                searchable    =>0,
+                dayonly       =>1,
+                dataobjattr   =>'appl.solastdrdate'),
 
       new kernel::Field::Number(
                 name          =>'soslaclustduration',
@@ -782,7 +782,7 @@ sub new
 
       new kernel::Field::WorkflowLink(
                 name          =>'solastclusttestwf',
-                label         =>'last Cluster-Service switch test (WorkflowID)',
+                label         =>'last Cluster-Service switch test (CHM-WorkflowID)',
                 group         =>'soclustgroup',
                 vjoinon       =>'solastclusttestwfid'),
 
@@ -795,16 +795,8 @@ sub new
                 dataobjattr   =>'appl.solastclusttestwf'),
 
       new kernel::Field::Date(
-                name          =>'temp_solastclustswdate',
-                label         =>'last Cluster-Service switch date',
-                group         =>'soclustgroup',
-                searchable    =>0,
-                dayonly       =>1,
-                dataobjattr   =>'appl.solastclustswdate'),
-
-      new kernel::Field::Date(
                 name          =>'solastclustswdate',
-                label         =>'last Cluster-Service switch (WorkflowEnd)',
+                label         =>'last Cluster-Service switch test (WorkflowEnd)',
                 group         =>'soclustgroup',
                 vjointo       =>'base::workflow',
                 vjoinon       =>['solastclusttestwfid'=>'id'],
@@ -812,6 +804,14 @@ sub new
                 dayonly       =>1,
                 readonly      =>1,
                 searchable    =>0),
+
+      new kernel::Field::Date(
+                name          =>'temp_solastclustswdate',
+                label         =>'last Cluster-Service switch date (temp)',
+                group         =>'soclustgroup',
+                searchable    =>0,
+                dayonly       =>1,
+                dataobjattr   =>'appl.solastclustswdate'),
 
       new kernel::Field::FileList(
                 name          =>'attachments',
