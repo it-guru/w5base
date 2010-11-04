@@ -72,6 +72,11 @@ sub new
                 dataobjattr   =>'prio'),
 
       new kernel::Field::Text(
+                name          =>'customer',
+                label         =>'Customer',
+                dataobjattr   =>'kunde'),
+
+      new kernel::Field::Text(
                 name          =>'w5locid',
                 label         =>'W5Base Location ID',
                 group         =>'w5baselocation',
@@ -95,8 +100,8 @@ sub new
                 dataobjattr   =>'service_option'),
 
    );
-   $self->setDefaultView(qw(country zipcode location address1 prio w5location));
-   $self->setWorktable("TSIIMP.V_DARWIN_STANDORT_PRIO");
+   $self->setDefaultView(qw(country zipcode location address1 prio customer w5location));
+   $self->setWorktable("TSIIMP.V_DARWIN_STANDORT_PRIO_KUNDEN");
    return($self);
 }
 
