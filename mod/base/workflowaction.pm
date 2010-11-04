@@ -512,6 +512,98 @@ sub NotifyForward
    }
 }
 
+sub Notify
+{
+   my $self=shift;
+   my $mode=shift;   # INFO | WARN | ERROR
+   my $subject=shift;
+   my $text=shift;
+   my %param=@_;
+
+   my $sitename=$self->Config->Param("SiteName");
+   $sitename="W5Base" if ($sitename eq "");
+
+
+   my $wf=getModuleObject($self->Config,"base::workflow");
+   my %mailset=(class    =>'base::workflow::mailsend',
+                step     =>'base::workflow::mailsend::dataload',
+                name     =>$sitename.": ".$mode.": ".$subject,
+                emailtext=>$text);
+
+   foreach my $target (qw(emailto emailcc emailbcc)){
+      if (exists($param{$target})){
+         if (ref($param{$target}) ne "ARRAY"){
+            $param{$target}=[split(/[;,]/,$param{$target})];
+         }
+      }
+   }
+   if ($param{adminbcc}){
+      $param{emailbcc}=[] if (!defined($param{emailbcc}));
+      my $grpuser=getModuleObject($self->Config,"base::lnkgrpuser");
+      $grpuser->SetFilter({grpid=>\'1'});
+      foreach my $lnkrec ($grpuser->getHashList(qw(userid roles))){
+         if (ref($lnkrec->{roles}) eq "ARRAY"){
+            if (grep(/^(RMember)$/,@{$lnkrec->{roles}})){
+               push(@{$param{emailbcc}},$lnkrec->{userid});
+            }
+         }
+      }
+
+   }
+   my $user=getModuleObject($self->Config,"base::user");
+   foreach my $target (qw(emailto emailcc emailbcc)){
+      if (exists($param{$target})){
+         for(my $c=0;$c<=$#{$param{$target}};$c++){
+            if ($param{$target}->[$c]=~m/^\d{10,20}$/){  # target is a userid
+               $user->ResetFilter();
+               $user->SetFilter({userid=>\$param{$target}->[$c],
+                                 cistatusid=>"<6"});
+               my ($urec)=$user->getOnlyFirst(qw(email));
+               if (defined($urec)){
+                  $param{$target}->[$c]=$urec->{email};
+               }
+               else{
+                  $param{$target}->[$c]='"invalid ref($param{$target}->[$c])" '.
+                                        '<null\@network>';
+               }
+            }
+            elsif ($param{$target}->[$c]=~m/^[a-z0-9]{2,8}$/){ # target posixid
+               $user->ResetFilter();
+               $user->SetFilter({posix=>\$param{$target}->[$c],
+                                 cistatusid=>"<6"});
+               my ($urec)=$user->getOnlyFirst(qw(email));
+               if (defined($urec)){
+                  $param{$target}->[$c]=$urec->{email};
+               }
+               else{
+                  $param{$target}->[$c]='"invalid ref($param{$target}->[$c])" '.
+                                        '<null\@network>';
+               }
+            }
+            else{  # target is already a email address
+               my $x;
+            }
+         }
+      }
+   }
+   foreach my $target (qw(emailto emailcc emailbcc)){
+      if (exists($param{$target})){
+         $mailset{$target}=$param{$target};
+      }
+   }
+   if (!exists($param{emailfrom})){
+      $mailset{emailfrom}="\"W5Base-Notify\" <none\@null.com>";
+   }
+   else{
+      $mailset{emailfrom}=$param{emailfrom};
+   }
+
+   if (my $id=$wf->Store(undef,\%mailset)){
+      my %d=(step=>'base::workflow::mailsend::waitforspool');
+      my $r=$wf->Store($id,%d);
+   }
+}
+
 
 sub getEffortSelect
 {
@@ -606,9 +698,6 @@ sub FormatedDetail
    return(undef) if ($FormatAs ne "HtmlWfActionlog"); # security !!!
    return($self->SUPER::FormatedDetail($current,$FormatAs));
 }
-
-
-
 
 
 

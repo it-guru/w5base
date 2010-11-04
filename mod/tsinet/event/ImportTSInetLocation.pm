@@ -46,69 +46,87 @@ sub ImportTSInetLocation
 
    my $tsiloc=getModuleObject($self->Config,"tsinet::location");
    my $loc=getModuleObject($self->Config,"base::location");
-   my $lnk=getModuleObject($self->Config,"base::lnkcontact");
    my $grp=getModuleObject($self->Config,"base::grp");
-   my $org="DTAG.T-HOME";
+   my $rel=getModuleObject($self->Config,"base::lnklocationgrp");
    my $start=NowStamp("en");
 
-   $grp->SetFilter({fullname=>\$org});
-   my ($grprec,$msg)=$grp->getOnlyFirst(qw(id fullname name));
-   if (!defined($grprec)){
-      return({exitcode=>2,msg=>"can not find organisation $org"});
-   }
+   my @problems;
+
 
    my %thloc;
 
    $tsiloc->SetCurrentView(qw(ALL));
    #$tsiloc->SetFilter({location=>"Bamberg"});
+   #$tsiloc->SetFilter({location=>"Berlin"});
    my ($rec,$msg)=$tsiloc->getFirst(unbuffered=>1);
    if (defined($rec)){
       do{
-         msg(DEBUG,"process streetser $rec->{id}:$rec->{location};".
-                   " $rec->{address1}");
-         foreach my $w5id (@{$rec->{w5locid}}){
-            msg(DEBUG,"w5locid=%s",$w5id);
-            $loc->SetFilter({id=>\$w5id});
-            my ($w5loc)=$loc->getOnlyFirst(qw(ALL));
-            #printf STDERR ("d=%s\n",Dumper($w5loc));
-            my $found;
-            foreach my $crec (@{$w5loc->{contacts}}){
-                my $roles=$crec->{roles};
-                $roles=[$roles] if (ref($roles) ne "ARRAY");
-                if ($crec->{target} eq "base::grp" &&
-                    $crec->{targetid} eq $grprec->{grpid}){
-                   $found=$crec->{id};
-                }
-            }
-            if (!defined($found)){
-               my $lnkid=$lnk->ValidatedInsertRecord({
-                  target=>'base::grp',
-                  targetid=>$grprec->{grpid},
-                  srcsys=>"TSINET",
-                  srcload=>NowStamp("en"),
-                  parentobj=>"base::location",
-                  refid=>$w5loc->{id}
-               });
-               $found=$lnkid if ($lnkid);
-            }
-            if ($found){
-               $lnk->SetFilter({id=>\$found});
-               my ($lnkrec)=$lnk->getOnlyFirst(qw(ALL));
-               my $roles=$lnkrec->{roles};
-               $roles=[$roles] if (ref($roles) ne "ARRAY");
-               if (!grep(/^staffloc$/,@$roles)){
-                  push(@$roles,"staffloc");
+         msg(DEBUG,"process streetser $rec->{id}:$rec->{location}");
+         msg(DEBUG," - address1: $rec->{address1}");
+         msg(DEBUG," - customer: $rec->{customer}");
+         msg(DEBUG," - prio    : $rec->{prio}");
+         my $org=$rec->{customer};
+         $grp->ResetFilter();
+         $grp->SetFilter({fullname=>\$org});
+         my ($grprec,$msg)=$grp->getOnlyFirst(qw(id fullname name));
+         if (!defined($grprec)){
+            return({exitcode=>2,msg=>"can not find organisation $org"});
+         }
+         if ($#{$rec->{w5locid}}==-1){
+            push(@problems," - no w5bloc for ".
+                           "streetser $rec->{id} ".
+                           "($rec->{location};$rec->{address1})");
+         }
+         else{
+            foreach my $w5id (@{$rec->{w5locid}}){
+               msg(DEBUG,"w5locid=%s",$w5id);
+               $loc->SetFilter({id=>\$w5id});
+               my ($w5loc)=$loc->getOnlyFirst(qw(name grprelations));
+               printf STDERR ("d=%s\n",Dumper($w5loc));
+               my $found;
+               foreach my $crec (@{$w5loc->{grprelations}}){
+                   if ($grprec->{grpid} eq $crec->{grpid}){
+                      $found=$crec->{id};
+                   }
                }
-               @$roles=grep(!/^\s*$/,@$roles);
-               
-               $lnk->ValidatedUpdateRecord($lnkrec,{comments=>
-                                                       'Prio'.$rec->{prio},
-                                                    srcsys=>'TSINET',
-                                                    srcload=>$start,
-                                                    roles=>$roles},
-                                           {id=>\$found});
+               if (!defined($found)){
+                  my $lnkid=$rel->ValidatedInsertRecord({
+                     grpid=>$grprec->{grpid},
+                     srcsys=>"TSINET",
+                     srcload=>NowStamp("en"),
+                     locationid=>$w5loc->{id},
+                     relmode=>'RMbusinesrel3'
+                  });
+                  $found=$lnkid if ($lnkid);
+               }
+               if ($found){
+                  $rel->ResetFilter();
+                  $rel->SetFilter({id=>\$found});
+                  my ($lnkrec)=$rel->getOnlyFirst(qw(ALL));
+                  my $relmode;
+                  my $newrec={srcsys=>'TSINET',srcload=>$start};
+                  if ($rec->{prio}==1){
+                     $relmode="RMbusinesrel1";
+                  }
+                  elsif ($rec->{prio}==2){
+                     $relmode="RMbusinesrel2";
+                  }
+                  elsif ($rec->{prio}==3){
+                     $relmode="RMbusinesrel3";
+                  }
+                  else{
+                     push(@problems," - unknown prio $rec->{prio} for ".
+                                    "streetser $rec->{id} ".
+                                    "($rec->{location};$rec->{address1})");
+                  }
+                  if (defined($relmode)){
+                     $newrec->{relmode}=$relmode;
+                     $rel->ValidatedUpdateRecord($lnkrec,$newrec,{id=>\$found,
+                                                 srcsys=>\'TSINET'});
+                  }
+               }
+               $thloc{$w5loc->{id}}++;
             }
-            $thloc{$w5loc->{id}}++;
          }
 
          ($rec,$msg)=$tsiloc->getNext();
@@ -118,10 +136,28 @@ sub ImportTSInetLocation
       return({msg=>'ping failed to dataobject '.$tsiloc->Self(),exitcode=>1});
    }
 
-
+   # cleanup contact links -> old style
+   my $lnk=getModuleObject($self->Config,"base::lnkcontact");
    $lnk->ResetFilter();
-   $lnk->SetFilter({srcsys=>\'TSINET',srcload=>"\"<$start\""});
+   $lnk->SetFilter({srcsys=>\'TSINET',srcload=>"\"<$start-2d\""});
    $lnk->DeleteAllFilteredRecords("ValidatedDeleteRecord");
+
+   $rel->ResetFilter();
+   $rel->SetFilter({srcsys=>\'TSINET',srcload=>"\"<$start-2d\""});
+   $rel->DeleteAllFilteredRecords("ValidatedDeleteRecord");
+
+   my $act=getModuleObject($self->Config,"base::workflowaction");
+
+   if ($#problems!=-1){
+      $act->Notify(ERROR,"problems while tsinet to W5BaseDarwin sync",
+                   "Found <b>".(($#problems)+1)." problems</b> ".
+                   "while TSINET->W5Base locations syncronisation!\n\n".
+                   join("\n",@problems),
+                   emailfrom=>'"TSINET to W5BaseDarwin" <no_reply@w5base.net>',
+                   emailto=>['11634957010001'], # Tino
+                   emailcc=>['12009918660002'], # Ebersb.
+                   adminbcc=>1);
+   }
 
    return({exitcode=>0}); 
 }

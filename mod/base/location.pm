@@ -174,7 +174,7 @@ sub new
                 vjointo       =>'base::lnklocationgrp',
                 vjoinon       =>['id'=>'locationid'],
                 vjoindisp     =>['grp','relmode'],
-                vjoininhash   =>['grpid','relmode','comments']),
+                vjoininhash   =>['grpid','grp','relmode','comments','id']),
 
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
@@ -205,6 +205,7 @@ sub new
       new kernel::Field::GoogleMap(
                 name          =>'googlemap',
                 uploadable    =>0,
+                searchable    =>0,
                 group         =>'map',
                 htmlwidth     =>'500px',
                 label         =>'GoogleMap',
@@ -244,6 +245,7 @@ sub new
                 group         =>'map',
                 uploadable    =>0,
                 htmldetail    =>0,
+                searchable    =>0,
                 htmlwidth     =>'200px',
                 label         =>'Google Address Check',
                 depend        =>['country','address1',
@@ -351,6 +353,7 @@ sub new
                 group         =>'control',
                 uploadable    =>0,
                 htmldetail    =>0,
+                searchable    =>0,
                 htmlwidth     =>'500px',
                 label         =>'similar check',
                 depend        =>['country','address1',
@@ -358,7 +361,11 @@ sub new
                 onRawValue    =>\&SimilarCheck),
 
       new kernel::Field::Interview(),
-
+      new kernel::Field::QualityText(),
+      new kernel::Field::QualityState(),
+      new kernel::Field::QualityOk(),
+      new kernel::Field::QualityLastDate(
+                dataobjattr   =>'location.lastqcheck'),
    );
    $self->{CI_Handling}={uniquename=>"name",
                          uniquesize=>255};

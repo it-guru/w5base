@@ -1148,6 +1148,21 @@ sub getNotifyDestinations
          my $locid=$WfRec->{affectedlocationid};
          $locid=[$locid] if (ref($locid) ne "ARRAY");
          $ia->LoadTargets($emailto,'*::location',\'eventnotify',$locid);
+         my %allcustgrp;
+         my $app=$self->getParent;
+         my $l=getModuleObject($app->Config,"base::location");
+         $l->SetFilter({id=>$locid});
+         foreach my $lrec ($l->getHashList(qw(grprelations))){
+            foreach my $rel (@{$lrec->{grprelations}}){
+               if ($rel->{relmode}=~m/^RMbusinesrel/){
+                  $app->LoadGroups(\%allcustgrp,"up",$rel->{grpid});
+               }
+            }
+         }
+         if (keys(%allcustgrp)){
+            $ia->LoadTargets($emailto,'base::grp',\'eventnotify',
+                                      [keys(%allcustgrp)]);
+         }
       }
       else{
          return(undef);
@@ -2163,25 +2178,18 @@ sub nativProcess
             my $l=getModuleObject($self->getParent->getParent->Config,
                                      "base::location");
             $l->SetFilter({id=>$h->{affectedlocationid},cistatusid=>"<=4"});
-            foreach my $lrec ($l->getHashList(qw(contacts cistatus id name))){
+            foreach my $lrec ($l->getHashList(qw(prio cistatus id name
+                                                 grprelations))){
                $affectedlocationid{$lrec->{id}}++; 
                $affectedlocation{$lrec->{name}}++; 
-               if (ref($lrec->{contacts}) eq "ARRAY"){
-                  foreach my $crec (@{$lrec->{contacts}}){
-                     my $roles=$crec->{roles};
-                     $roles=[$roles] if (ref($roles) ne "ARRAY");
-                     if ($crec->{target} eq "base::grp"){
-                        if (grep(/^staffloc$/,@$roles)){
-                           $affectedcustomer{$crec->{targetname}}++;
-                           $affectedcustomerid{$crec->{targetid}}++;
-                           if (my ($prio)=$crec->{comments}=~m/Prio(\d+)/){
-                              if (!defined($affecteditemprio) ||
-                                  $affecteditemprio>$prio){
-                                 $affecteditemprio=$prio;
-                              }
-                           }
-                        }
-                     }
+               my ($prio)=$lrec->{prio};
+               if (!defined($affecteditemprio) || $affecteditemprio>$prio){
+                  $affecteditemprio=$prio;
+               }
+               foreach my $rel (@{$lrec->{grprelations}}){
+                  if ($rel->{relmode}=~m/^RMbusinesrel/){
+                     $affectedcustomer{$rel->{grp}}++;
+                     $affectedcustomerid{$rel->{grpid}}++;
                   }
                }
             }

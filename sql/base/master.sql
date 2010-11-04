@@ -372,3 +372,4 @@ create table lnklocationgrp (
   UNIQUE KEY `srcsys` (srcsys,srcid),key srcload(srcload)
 )  ENGINE=InnoDB DEFAULT CHARSET=latin1;
 set FOREIGN_KEY_CHECKS=1;
+alter table location   add lastqcheck datetime default NULL,add key(lastqcheck);
