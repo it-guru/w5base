@@ -47,6 +47,10 @@ sub getPosibleRoles
         defined($self->getParent->getParent) &&
        $self->getParent->getParent->Self()=~m/^.+::appl$/)){
       return(
+         "applowner"       =>$self->getParent->T("Application owner",
+                                             $self->Self),
+         "applmgr"         =>$self->getParent->T("Application manager",
+                                             $self->Self),
          "developercoord"  =>$self->getParent->T("Development coordination",
                                              $self->Self),
          "developerboss"   =>$self->getParent->T("Chief Developer",
@@ -55,10 +59,6 @@ sub getPosibleRoles
                                                  $self->Self),
          "businessemployee"=>$self->getParent->T("Business Employee",
                                              $self->Self),
-         "orderin1"        =>$self->getParent->T("Order acceptation",
-                                                 $self->Self),
-         "orderin2"        =>$self->getParent->T("Order acceptation deputy",
-                                                 $self->Self),
          "customer"        =>$self->getParent->T("Customer Contact",
                                                  $self->Self),
          "ctm"             =>$self->getParent->T("Customer Technical Manager",
@@ -78,6 +78,10 @@ sub getPosibleRoles
          "support2d"       =>$self->getParent->T("2nd level Support",
                                                  $self->Self),
          "support3d"       =>$self->getParent->T("3rd level Support",
+                                                 $self->Self),
+         "orderin1"        =>$self->getParent->T("Order acceptation",
+                                                 $self->Self),
+         "orderin2"        =>$self->getParent->T("Order acceptation deputy",
                                                  $self->Self),
          "read"            =>$self->getParent->T("read application",
                                                  $self->Self),

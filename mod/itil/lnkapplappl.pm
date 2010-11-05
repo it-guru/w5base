@@ -76,7 +76,7 @@ sub new
                                      jdbc ldap Netegrity NFS ODBC papier
                                      RMI rsh rcp rfc sldap ssh sftp smtp
                                      snmp tuxedo xml X.31 openFT pkix-cmp
-                                     utm DB-Link BCV MQSeries)],
+                                     utm UCP/SMS DB-Link BCV MQSeries)],
                 default       =>'online',
                 htmlwidth     =>'50px',
                 htmleditwidth =>'150px',

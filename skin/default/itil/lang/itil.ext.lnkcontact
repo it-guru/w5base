@@ -10,6 +10,8 @@
 'Vendor Contact'=>{de=>'Herstellerkontakt'},
 'Development coordination'=>{de=>'Entwicklungskoordination'},
 'Chief Developer'=>{de=>'Entwicklungsleiter'},
+'Application owner'=>{de=>'Anwendungs Owner'},
+'Application manager'=>{de=>'Anwendungs Manager'},
 'Order acceptation'=>{de=>'Auftragsannahme'},
 'Order acceptation deputy'=>{de=>'Auftragsannahme Vertretung'},
 'Technical Contact'=>{de=>'technischer-Ansprechpartner'},
