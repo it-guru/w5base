@@ -1,0 +1,3 @@
+'tsacinv::qrule::compareCluster'=>{de=>'AssetManager Abgleich Cluster',
+                                  en=>'AssetManager compare of cluster'},
+'given clusterid not found as active in AssetManager'=>{de=>'angegebene ClusterID ist im AssetManager nich aktiv'},
