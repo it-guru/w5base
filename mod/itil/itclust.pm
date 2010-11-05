@@ -240,13 +240,17 @@ sub new
                 noselect      =>'1',
                 dataobjattr   =>'lnkcontact.croles'),
 
+      new kernel::Field::IssueState(),
       new kernel::Field::QualityText(),
       new kernel::Field::QualityState(),
       new kernel::Field::QualityOk(),
       new kernel::Field::QualityLastDate(
                 dataobjattr   =>'itclust.lastqcheck'),
+      new kernel::Field::QualityResponseArea()
    );
    $self->{use_distinct}=1;
+   $self->{workflowlink}={ workflowkey=>[id=>'directlinkid']
+                         };
    $self->{history}=[qw(modify delete)];
    $self->setDefaultView(qw(linenumber fullname cistatus mandator mdate));
    $self->setWorktable("itclust");
