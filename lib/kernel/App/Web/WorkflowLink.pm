@@ -240,12 +240,12 @@ sub WorkflowLinkResult
             if ($q{class}=~m/::(DataIssue)$/ ||
                 (ref($q{class}) eq "ARRAY" && 
                  grep(/::(DataIssue)$/,@{$q{class}}))){
-               $mode=\'DataIssue';
+               push(@$mode,'DataIssue') if (ref($mode) eq "ARRAY");
             }
             if ($q{class}=~m/::(mailsend)$/ ||
                 (ref($q{class}) eq "ARRAY" && 
                  grep(/::(mailsend)$/,@{$q{class}}))){
-               $mode=\'W5BaseMail';
+               push(@$mode,'W5BaseMail') if (ref($mode) eq "ARRAY");
             }
            
             my %qadd=%qorg; # now add the DataIssue Workflows to 

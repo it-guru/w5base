@@ -60,6 +60,11 @@ sub getControlRecord
              target    =>'fullname',
              targetid  =>'id'
            },
+           {
+             dataobj   =>'itil::itclust',
+             target    =>'fullname',
+             targetid  =>'id'
+           },
          ];
 
 
@@ -78,6 +83,7 @@ sub DataIssueCompleteWriteRequest
    if (($affectedobject=~m/::appl$/)   ||
        ($affectedobject=~m/::custcontract$/) ||
        ($affectedobject=~m/::swinstance$/) ||
+       ($affectedobject=~m/::itclust$/) ||
        ($affectedobject=~m/::asset$/) ||
        ($affectedobject=~m/::system$/)){
       if (defined($newrec->{affectedobject}) &&

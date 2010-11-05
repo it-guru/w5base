@@ -249,8 +249,11 @@ sub new
       new kernel::Field::QualityResponseArea()
    );
    $self->{use_distinct}=1;
-   $self->{workflowlink}={ workflowkey=>[id=>'directlinkid']
-                         };
+   $self->{workflowlink}={ };
+
+   $self->{workflowlink}->{workflowtyp}=[qw(base::workflow::DataIssue
+                                            base::workflow::mailsend)];
+
    $self->{history}=[qw(modify delete)];
    $self->setDefaultView(qw(linenumber fullname cistatus mandator mdate));
    $self->setWorktable("itclust");
