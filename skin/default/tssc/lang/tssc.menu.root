@@ -17,3 +17,4 @@
 'sc.krn.group.lnkuser'=>{de=>'Verkn. User',en=>'Link User'},
 'sc.krn.user'=>{de=>'User',en=>'User'},
 'sc.krn.user.lnkgroup'=>{de=>'Verkn. Gruppe',en=>'Link Group'},
+'sc.krn.location'=>{de=>'Standort',en=>'Location'},
