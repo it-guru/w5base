@@ -82,7 +82,6 @@ sub ImportTSInetLocation
                msg(DEBUG,"w5locid=%s",$w5id);
                $loc->SetFilter({id=>\$w5id});
                my ($w5loc)=$loc->getOnlyFirst(qw(name grprelations));
-               printf STDERR ("d=%s\n",Dumper($w5loc));
                my $found;
                foreach my $crec (@{$w5loc->{grprelations}}){
                    if ($grprec->{grpid} eq $crec->{grpid}){
