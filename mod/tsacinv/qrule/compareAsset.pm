@@ -75,6 +75,7 @@ sub qcheckRecord
    my $errorlevel=0;
 
    return(0,undef) if ($rec->{cistatusid}!=4);
+   return(0,undef) if ($rec->{name}=~m/^ServiceID:/); 
    if ($rec->{name} ne ""){
       my $par=getModuleObject($self->getParent->Config(),"tsacinv::asset");
       $par->SetFilter({assetid=>\$rec->{name}});

@@ -418,10 +418,10 @@ sub InterfaceAgreement
                }
                if (!($ifrec->{partnerok})){
                   print("<p class=attention>"); 
-                  printf("<font color=red><b>ACHTUNG:</b> Für diese ".
+                  printf("<b>ACHTUNG:</b> Für diese ".
                          "Kommunikationsbeziehung ".
                          "liegen auf Seiten der Anwendung '%s' keine ".
-                         "Dokumentationen vor!</font>",
+                         "Dokumentationen vor!",
                          $ctrl->{targetname});
                   print("</p>"); 
                }
@@ -429,9 +429,10 @@ sub InterfaceAgreement
             print("</ol>");
          }
          else{
-            printf("Es liegen keine Schnittstellendefinitionen bei der ".
+            printf("<p class=attention>".
+                   "Es liegen keine Schnittstellendefinitionen bei der ".
                    "Anwendung '%s' für die Kommunikation mit der ".
-                   "Anwendung '%s' vor.",$ctrl->{name},$ctrl->{targetname});
+                   "Anwendung '%s' vor.</p>",$ctrl->{name},$ctrl->{targetname});
          }
          print("</li>");
       }
