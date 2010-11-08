@@ -111,7 +111,7 @@ sub new
       new kernel::Field::Interface(
                 name          =>'posibleactions',
                 label         =>'Posible actions',
-                WSDLfieldType =>'ArrayOfString',
+                WSDLfieldType =>'ArrayOfStringItems',
                 onRawValue    =>\&getPosibleActions,
                 depend        =>['id']),
                                    

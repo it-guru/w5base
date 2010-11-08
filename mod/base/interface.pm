@@ -403,7 +403,8 @@ sub _SOAPaction2param
       }
       if ($mod=~m/\/workflow\//){
          $mod=~s/\//::/g;
-         if (exists($param->{data}) && ref($param->{data})){
+         if (exists($param->{data}) && ref($param->{data}) &&
+             exists($param->{data}->{action})){
             $param->{data}->{class}=$mod;
          }
          $param->{class}=$mod;
@@ -820,6 +821,7 @@ sub getHashList
    }
    my $reccount=$#resl+1;
    $self->Log(INFO,"soap","findRecord: return $reccount records - exitcode:0");
+
 
    return(interface::SOAP::kernel::Finish({exitcode=>0,
           lastmsg=>[],
