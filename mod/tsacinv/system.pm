@@ -214,7 +214,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'systemos',
                 label         =>'System OS',
-                dataobjattr   =>'amcomputer.operatingsystem'),
+                dataobjattr   =>'trim(amcomputer.operatingsystem)'),
 
       new kernel::Field::Float(
                 name          =>'partofasset',
