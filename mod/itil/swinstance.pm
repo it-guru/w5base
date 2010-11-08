@@ -93,6 +93,7 @@ sub new
                                  'MSSQL',
                                  'MySQL',
                                  'Oracle',
+                                 'Oracle ASM',
                                  'Oracle DB Server',
                                  'Oracle Appl Server',
                                  'PostgeSQL',
