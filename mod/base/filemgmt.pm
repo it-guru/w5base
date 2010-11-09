@@ -124,10 +124,10 @@ sub new
                                    dataobjattr=>'filemgmt.comments'),
 
       new kernel::Field::SubList(   name       =>'acls',
-                                    xsearchable=>0,
                                     label      =>'Accesscontrol',
                                     subeditmsk =>'subedit.file',
                                     allowcleanup=>1,
+                                    forwardSearch=>1,
                                     group      =>'acl',
                                     vjoininhash=>[qw(acltarget 
                                                      acltargetid 
