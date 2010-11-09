@@ -740,7 +740,7 @@ sub isViewValid
          last;
       }
    }
-   if ($self->getParent->IsMemberOf($mandators,[qw(RMonitor)],"up")){
+   if ($self->getParent->IsMemberOf($mandators,[qw(RMonitor)],"both")){
       $mandatorok=1;
    }
    if ($mandatorok || $rec->{owner}==$userid || 
@@ -750,9 +750,6 @@ sub isViewValid
       push(@grps,"relations"); # maybe
       push(@grps,"flow"); # maybe
    }
-
-#printf STDERR ("fifi mandators=%s\n",Dumper($rec->{mandatorid}));
-#printf STDERR ("fifi mymandators=%s\n",Dumper(\@mymandators));
 
    return(@grps);
 }
