@@ -69,7 +69,6 @@ sub new
                                  'MSSQL-Cluster',
                                  'Loadbalancer',
                                  'Software',
-                                 'Hardware',
                                  'OS',
                                 ],
                 label         =>'Cluster Type',
