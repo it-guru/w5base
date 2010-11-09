@@ -150,6 +150,11 @@ sub new
                        dbname=>'tssc',
                        joinon=>['changenumber'=>'numberprgn'] 
                    },
+                   'approvallogm1'=>{
+                       dbname=>'tssc',
+                       where=>"file_name='cm3r'",
+                       joinon=>['changenumber'=>'unique_key'] 
+                   },
                 ],
                 onRawValue    =>\&DataDumpSQL),
    );

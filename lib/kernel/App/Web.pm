@@ -1102,6 +1102,7 @@ sub IsMemberOf
    }
    my %grps=$self->getGroupsOf($ENV{REMOTE_USER},$roles,$direction);
 
+
    foreach my $grp (values(%grps)){
       foreach my $chkgrp (@$group){
          return(1) if ($chkgrp=~m/^\d+$/ && $chkgrp==$grp->{grpid});
