@@ -232,6 +232,27 @@ textarea.multilinetext{
    background:#ffffff;
 }
 
+
+table.subtable {
+   width: 100%;
+   padding: 0px;
+   border: none;
+   border: 1px solid #789DB3;
+}
+table.subtable td {
+   font-size: 10px;
+   border: none;
+   padding: 0px;
+}
+table.subtable td.hl {
+   font-size: 10px;
+   border: none;
+   background-color: #F4F4F4;
+   padding: 0px;
+   font-weight: bold;
+}
+
+
 img.toplineimage{
    margin:5px;
    border-color:black;

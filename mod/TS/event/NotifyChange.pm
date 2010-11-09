@@ -49,13 +49,34 @@ sub NotifyChange
       $wf->SetFilter({id=>\$param{id}});
       my ($wfrec,$msg)=$wf->getOnlyFirst(qw(ALL));
       if (defined($wfrec)){
+         my $fo=$wf->getField("headref");
+         my $headref=$fo->RawValue($wfrec);
+         my $essentialdatahash=$headref->{essentialdatahash}->[0];
+         my $actions=$wfrec->{shortactionlog};
+         my $sendfound=0;
+         if (ref($actions) eq "ARRAY"){
+            for(my $ac=$#{$actions};$ac>=0;$ac--){
+               my $act=$actions->[$ac];
+               if (ref($act->{actionref}) eq "HASH"){
+                  if (exists($act->{actionref}->{'autonotify.essential'})){
+                     my $es=$act->{actionref}->{'autonotify.essential'};
+                     if (ref($es) eq "ARRAY" &&
+                         $es->[0] eq $essentialdatahash){
+                        $sendfound++;
+                     }
+                     last;
+                  }
+               }
+            }
+         }
+
          my $fo=$wf->getField("additional");
          my $additional=$fo->RawValue($wfrec);
          my $scstate=lc($additional->{ServiceCenterState}->[0]);
-         if ($scstate ne "resolved" &&
-             $scstate ne "planning" &&
-             $scstate ne "released"){
-            return({exitcode=>0,msg=>'nothing to send in state '.$scstate});
+
+
+         if ($sendfound){
+            return({exitcode=>0,msg=>'no essentials changed'});
          }
          my $srcid=$wfrec->{srcid};
          my $aid=$wfrec->{affectedapplicationid};
@@ -105,9 +126,12 @@ sub NotifyChange
          $desc=trim($desc);
 
 
-         my @dispfields=qw(affectedapplication 
+         my @dispfields=qw(
                            wffields.changestart
-                           wffields.changeend);
+                           wffields.changeend
+                           wffields.changedescription
+                           affectedapplication 
+                          );
 
          my @eventlist=($scstate);
 
@@ -166,11 +190,11 @@ sub NotifyChange
                   push(@emailsubheader,0);
                }
                
-               push(@emailsep,0);
-               my $fo=$wf->getField("wffields.changedescription",$wfrec);
-               push(@emailprefix,$fo->Label());
-               push(@emailtext,$desc);
-               push(@emailsubheader,0);
+             #  push(@emailsep,0);
+             #  my $fo=$wf->getField("wffields.changedescription",$wfrec);
+             #  push(@emailprefix,$fo->Label());
+             #  push(@emailtext,$desc);
+             #  push(@emailsubheader,0);
               
                delete($ENV{HTTP_FORCE_LANGUAGE});
                delete($ENV{HTTP_FORCE_TZ});
@@ -178,8 +202,13 @@ sub NotifyChange
             
            
             $notiy{emailto}=$emailto;
-            $notiy{name}="$srcid: ".$curscstate.": ".$wfrec->{name};
+            $notiy{name}="$srcid: ".$wfrec->{name};
             $notiy{emailprefix}=\@emailprefix;
+            my $defaultfrom=$self->Config->Param("DEFAULTFROM");
+            my $sitename=$self->Config->Param("SITENAME");
+            $notiy{emailfrom}='"Change Notification: '.$sitename.'" '.
+                              '<'.$defaultfrom.'>';
+
             $notiy{emailtext}=\@emailtext;
             $notiy{emailsep}=\@emailsep;
             #$notiy{emailtemplate}='changenotification';
@@ -200,10 +229,14 @@ sub NotifyChange
                my %d=(step=>'base::workflow::mailsend::waitforspool');
                my $r=$wf->Store($wid,%d);
                $wf->Action->ValidatedInsertRecord({
-                             wfheadid=>$wfrec->{id},
-                             name=>'note',
-                             comments=>"auto notify $curscstate",
-                             actionref=>{"autonotify.$curscstate"=>'send'}});
+                  wfheadid=>$wfrec->{id},
+                  name=>'note',
+                  comments=>'NotifyChange Event: sending automatic '.
+                            'change notification '.
+                            'to all information partners in application '.
+                            'contacts',
+                  actionref=>{"autonotify.$curscstate"=>'send',
+                              "autonotify.essential"=>$essentialdatahash}});
             }
          }
          return({exitcode=>0,msg=>'ok'});

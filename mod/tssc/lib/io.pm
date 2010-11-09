@@ -19,6 +19,8 @@ package tssc::lib::io;
 use strict;
 use kernel;
 use kernel::date;
+use Digest::MD5 qw(md5_base64);
+
 
 
 sub InitScImportEnviroment
@@ -481,7 +483,25 @@ sub mkChangeStoreRec
    $wfrec{mandatorid}=$mandatorid;
    $wfrec{truecustomerprio}=$truecustomerprio;
    $wfrec{class}=$oldclass;
-   msg(DEBUG,"rec=%s",Dumper(\%wfrec));
+
+   { # essential build name;stateid;applications;start;end
+     my $essentialdata=$wfrec{name}."|";
+     my $applnames=$wfrec{affectedapplication};
+     $applnames=[$applnames] if (!ref($applnames));
+     $essentialdata.="[".$wfrec{stateid}."]";
+     $essentialdata.="[".join(";",@$applnames)."]";
+     $essentialdata.="[".$rec->{plannedstart}."]";
+     $essentialdata.="[".$rec->{plannedend}."]";
+     $wfrec{essentialdatahash}=md5_base64($essentialdata);
+   }
+
+
+   #msg(DEBUG,"rec=%s",Dumper(\%wfrec));
+   #exit(0);
+
+
+
+
    if (defined($updateto) && $#{$aids}!=-1 && 
        $oldclass eq "itil::workflow::change"){
       $wf->UpdateRecord({class=>'AL_TCom::workflow::change'},

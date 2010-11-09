@@ -143,6 +143,28 @@ tr.linehighlight{
    cursor:pointer;
 }
 
+table.subtable { 
+   width: 100%; 
+   padding: 0px; 
+   border: none; 
+   border: 1px solid #789DB3;
+   border-collapse:collapse;
+}
+table.subtable td { 
+   font-size: 10px; 
+   border: 1px solid darkgray;
+   padding: 0px; 
+}
+table.subtable td.hl { 
+   font-size: 10px; 
+   border: none; 
+   background-color: #F4F4F4; 
+   padding: 0px; 
+   font-weight: bold;
+}
+
+
+
 a:link.pageswitch,a:visited.pageswitch,a:active.pageswitch    {
             font-family:Arial,Adobe Helvetica,Helvetica;
             text-decoration:none;

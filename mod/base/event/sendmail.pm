@@ -141,7 +141,12 @@ sub Sendmail
                         $rec->{initialsite}
          }
          else{
-            $terminfrom="CN=\"Notifier\":MAILTO:$rec->{emailfrom}";
+            if (my ($label,$email)=$rec->{emailfrom}=~m/^"(.*)" <(.*)>$/){
+               $terminfrom="CN=\"$label\":MAILTO:$email";
+            }
+            else{
+               $terminfrom="CN=\"Notifier\":MAILTO:$rec->{emailfrom}";
+            }
          }
          my $template=$rec->{emailtemplate};
          $template="sendmail" if ($template eq "");

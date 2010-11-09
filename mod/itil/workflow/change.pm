@@ -80,6 +80,11 @@ sub getDynamicFields
                                   label      =>'Change Fallback',
                                   group      =>'itilchange',
                                   container  =>'headref'),
+
+      new kernel::Field::Link(    name       =>'essentialdatahash',
+                                  history    =>0,
+                                  label      =>'hashed essential change data',
+                                  container  =>'headref'),
    ));
 }
 
