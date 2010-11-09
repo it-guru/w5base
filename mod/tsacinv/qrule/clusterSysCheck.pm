@@ -87,9 +87,9 @@ sub qcheckRecord
                if (defined($w5clust)){
                   $parrec{isclusternode}=1;
                   $parrec{itclust}=$w5clust->{'fullname'};
-                  printf STDERR ("found\n");
-                  printf STDERR ("amclust=%s\n",Dumper($amclust));
-                  printf STDERR ("w5clust=%s\n",Dumper($w5clust));
+                 # printf STDERR ("found\n");
+                 # printf STDERR ("amclust=%s\n",Dumper($amclust));
+                 # printf STDERR ("w5clust=%s\n",Dumper($w5clust));
                }
             }
          }
