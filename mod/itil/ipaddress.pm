@@ -515,7 +515,7 @@ sub isWriteValid
 
    if (defined($rec)){
       return("default") if ($self->IsMemberOf("admin"));
-      return(undef) if (!$self->isParenteSpecified($rec)));
+      return(undef) if (!$self->isParenteSpecified($rec));
    }
 
    return("default");
