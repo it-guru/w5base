@@ -514,11 +514,11 @@ sub isWriteValid
    my $rec=shift;
 
    if (defined($rec)){
-      return("default") if ($self->IsMemberOf("admin"));
+      return("default","relatedto") if ($self->IsMemberOf("admin"));
       return(undef) if (!$self->isParenteSpecified($rec));
    }
 
-   return("default");
+   return("default","relatedto");
 }
 
 sub getRecordHtmlIndex
