@@ -95,6 +95,18 @@ sub new
                 vjoinon       =>['id'=>'itclustsvcid'],
                 vjoindisp     =>['appl','applcistatus','applapplid']),
 
+      new kernel::Field::Text(
+                name          =>'applicationnames',
+                label         =>'Applicationnames',
+                group         =>'applications',
+                htmldetail    =>0,
+                searchable    =>0,
+                readonly      =>1,
+                vjointo       =>'itil::lnkitclustsvcappl',
+                vjoinbase     =>[{applcistatusid=>"<=5"}],
+                vjoinon       =>['id'=>'itclustsvcid'],
+                vjoindisp     =>['appl']),
+
       new kernel::Field::SubList(
                 name          =>'systems',
                 label         =>'Systems',

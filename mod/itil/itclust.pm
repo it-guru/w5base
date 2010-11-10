@@ -123,7 +123,7 @@ sub new
                 vjointo       =>'itil::lnkitclustsvc',
                 vjoinbase     =>[{applcistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'clustid'],
-                vjoindisp     =>['fullname','itservid','appl']),
+                vjoindisp     =>['fullname','itservid','applicationnames']),
 
       new kernel::Field::SubList(
                 name          =>'systems',
@@ -139,6 +139,12 @@ sub new
                                  'shortdesc'],
                 vjoininhash   =>['system','systemsystemid','systemcistatus',
                                  'systemid']),
+
+      new kernel::Field::Boolean(
+                name          =>'allowifupdate',
+                group         =>'control',
+                label         =>'allow automatic updates by interfaces',
+                dataobjattr   =>'itclust.allowifupdate'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
@@ -265,7 +271,8 @@ sub new
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default contacts services systems misc attachments source));
+   return(qw(header default services systems contacts misc control
+             attachments source));
 }
 
 
@@ -334,20 +341,17 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
-#   my $swnature=trim(effVal($oldrec,$newrec,"swnature"));
    my $name=effVal($oldrec,$newrec,"name");
    my $clusttyp=effVal($oldrec,$newrec,"clusttyp");
    if ($clusttyp eq ""){
       $self->LastMsg(ERROR,"invalid cluster typ");
       return(0);
    }
-#   my $swtype=trim(effVal($oldrec,$newrec,"swtype"));
-#   my $swport=trim(effVal($oldrec,$newrec,"swport"));
-#   my $swinstanceid=trim(effVal($oldrec,$newrec,"swinstanceid"));
-#   if ($swnature=~m/^\s*$/){
-#      $self->LastMsg(ERROR,"invalid swnature");
-#      return(0);
-#   }
+
+   my $clusterid=effVal($oldrec,$newrec,"clusterid");
+   if (exists($newrec->{clusterid}) && $clusterid eq ""){
+      $newrec->{clusterid}=undef;
+   }
    if (exists($newrec->{name})){
       $newrec->{name}=$name;
    }
@@ -359,9 +363,6 @@ sub Validate
 
    my $fname=$name;
    $fname.=($fname ne "" && $clusttyp ne "" ? "." : "").$clusttyp;
-#   $fname.=($fname ne "" && $swtype   ne "" ? "." : "").$swtype;
-#   $fname.=($fname ne "" && $swport   ne "" ? "." : "").$swport;
-#   $fname.=($fname ne "" && $addname  ne "" ? "." : "").$addname;
    $fname=~s/ü/ue/g;
    $fname=~s/ö/oe/g;
    $fname=~s/ä/ae/g;
@@ -452,7 +453,7 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default services contacts attachments);
+   my @databossedit=qw(default services contacts attachments control);
    if (!defined($rec)){
       return(@databossedit);
    }

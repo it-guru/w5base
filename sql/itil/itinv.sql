@@ -898,3 +898,4 @@ alter table ipaddress  add FOREIGN KEY fk_itclustsvcip (lnkitclustsvc)
 set FOREIGN_KEY_CHECKS=1;
 alter table system add is_loadbalacer bool default '0', add key(is_loadbalacer);
 alter table system add is_housing bool default '0', add key(is_housing);
+alter table itclust add allowifupdate int(2) default 0;

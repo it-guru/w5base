@@ -763,10 +763,15 @@ sub new
                 label         =>'Loadbalancer',
                 dataobjattr   =>'system.is_loadbalacer'),
 
+#      new kernel::Field::Boolean(           # vorerst nicht, da die Information
+#                name          =>'ishousing',# nicht "absolut" wäre!
+#                group         =>'systemclass',
+#                label         =>'Housing',
+#                dataobjattr   =>'system.is_housing'),
+
       new kernel::Field::Boolean(
                 name          =>'isclusternode',
                 group         =>'systemclass',
-                htmlhalfwidth =>1,
                 label         =>'ClusterNode',
                 dataobjattr   =>'system.is_clusternode'),
 
