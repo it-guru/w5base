@@ -253,6 +253,7 @@ sub WorkflowLinkResult
             $qadd{directlnktype}=[$self->Self,$self->SelfAsParentObject()];
             $qadd{directlnkid}=\$dataobjectid;
             $qadd{directlnkmode}=$mode;
+            $qadd{isdeleted}=\'0';
             $h->ResetFilter();
             $h->SetFilter(\%qadd);
             $h->Limit(1502);
@@ -267,7 +268,7 @@ sub WorkflowLinkResult
                                "kernel::App::Web::WorkflowLink")));
          return();
       }
-      %q=(id=>[keys(%idl)]);
+      %q=(id=>[keys(%idl)],isdeleted=>\'0');
 
 
       if (!$fulltext=~m/^\s*$/){
@@ -298,7 +299,7 @@ sub WorkflowLinkResult
             }
             map({$idl3{$_}=1} keys(%idl2));
             map({$idl3{$_}=1} keys(%idl1));
-            %q=(id=>[keys(%idl3)]);
+            %q=(id=>[keys(%idl3)],isdeleted=>\'0');
          }
          else{
             %q=(id=>[-1]);
