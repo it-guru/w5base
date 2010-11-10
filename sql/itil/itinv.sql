@@ -896,3 +896,4 @@ alter table ipaddress  add lnkitclustsvc bigint(20) default NULL;
 alter table ipaddress  add FOREIGN KEY fk_itclustsvcip (lnkitclustsvc)
           REFERENCES lnkitclustsvc (id) ON DELETE CASCADE;
 set FOREIGN_KEY_CHECKS=1;
+alter table system add is_loadbalacer bool default '0', add key(is_loadbalacer);

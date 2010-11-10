@@ -757,8 +757,16 @@ sub new
                 dataobjattr   =>'system.is_nas'),
 
       new kernel::Field::Boolean(
+                name          =>'isloadbalacer',
+                group         =>'systemclass',
+                htmlhalfwidth =>1,
+                label         =>'Loadbalancer',
+                dataobjattr   =>'system.is_loadbalacer'),
+
+      new kernel::Field::Boolean(
                 name          =>'isclusternode',
                 group         =>'systemclass',
+                htmlhalfwidth =>1,
                 label         =>'ClusterNode',
                 dataobjattr   =>'system.is_clusternode'),
 
