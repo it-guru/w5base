@@ -450,7 +450,7 @@ sub Validate
                             !exists($newrec->{'addresstyp'})){
       $newrec->{'addresstyp'}=1;
    }
-   return(0) if (!($self->isParenteSpecified($oldrec,$newrec)));
+   return(0) if (!($self->isParentSpecified($oldrec,$newrec)));
    #return(1) if ($self->IsMemberOf("admin"));
    return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"name","dnsname"));
 
