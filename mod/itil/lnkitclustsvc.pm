@@ -131,6 +131,7 @@ sub new
                 label         =>'IP-Adresses list',
                 group         =>'ipaddresses',
                 htmldetail    =>0,
+                searchable    =>0,
                 subeditmsk    =>'subedit.system',
                 vjoinbase     =>[{cistatusid=>\"4"}],
                 vjointo       =>'itil::ipaddress',

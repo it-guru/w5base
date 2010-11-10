@@ -5,7 +5,7 @@
 'fieldgroup.systems'=>{de=>'Cluster Nodes',en=>'Cluster Nodes'},
 'fieldgroup.clustinfo'=>{de=>'Daten des zugeorneten Clusters',en=>'Cluster informations'},
 'fieldgroup.swinstances'=>{de=>'Software Instanzen',en=>'Software Instances'},
-'Application'=>{de=>'Anwendung'},
+'Applications'=>{de=>'Anwendungen'},
 'sub Servicename'=>{de=>'Servicename suffix'},
 'Software-Instance'=>{de=>'Software Instanz'},
 'Cluster CI-State'=>{de=>'Cluster CI-Status'},
