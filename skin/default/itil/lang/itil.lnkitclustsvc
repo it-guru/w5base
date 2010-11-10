@@ -1,6 +1,8 @@
 'itil::lnkitclustsvc'=>{de=>'Cluster Service',en=>'Cluster Service'},
 'full qualified Servicename'=>{de=>'vollständiger Servicename'},
 'fieldgroup.applications'=>{de=>'Anwendungen',en=>'Applications'},
+'fieldgroup.ipaddresses'=>{de=>'IP-Adressen',en=>'IP-Addresses'},
+'fieldgroup.systems'=>{de=>'Cluster Nodes',en=>'Cluster Nodes'},
 'fieldgroup.clustinfo'=>{de=>'Daten des zugeorneten Clusters',en=>'Cluster informations'},
 'fieldgroup.swinstances'=>{de=>'Software Instanzen',en=>'Software Instances'},
 'Application'=>{de=>'Anwendung'},

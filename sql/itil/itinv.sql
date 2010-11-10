@@ -272,7 +272,7 @@ create table ipaddress (
   PRIMARY KEY  (id),
   key name(network,name),key dnsname(dnsname),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table liccontract (
   id          bigint(20)  NOT NULL,
   name        varchar(40) NOT NULL,
@@ -889,3 +889,10 @@ create table lnkitclustsvcappl   (
   KEY itclustsvc(itclustsvc),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+set FOREIGN_KEY_CHECKS=0;
+alter table ipaddress  add FOREIGN KEY fk_sysip (system)
+          REFERENCES system (id) ON DELETE CASCADE;
+alter table ipaddress  add lnkitclustsvc bigint(20) default NULL;
+alter table ipaddress  add FOREIGN KEY fk_itclustsvcip (lnkitclustsvc)
+          REFERENCES lnkitclustsvc (id) ON DELETE CASCADE;
+set FOREIGN_KEY_CHECKS=1;

@@ -62,6 +62,15 @@ sub new
                 htmlwidth     =>'150px',
                 group         =>'relatedto',
                 label         =>'assigned to System',
+                uivisible     =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+
+                   return(0) if ($current->{systemid} eq "");
+                   return(1);
+                },
                 vjointo       =>'itil::system',
                 vjoinon       =>['systemid'=>'id'],
                 vjoindisp     =>'name'),
@@ -73,13 +82,44 @@ sub new
                 dataobjattr   =>'ipaddress.system'),
                                                   
       new kernel::Field::TextDrop(
+                name          =>'itclustsvc',
+                htmlwidth     =>'150px',
+                group         =>'relatedto',
+                label         =>'assigned to Cluster Service',
+                uivisible     =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+
+                   return(0) if ($current->{itclustsvcid} eq "");
+                   return(1);
+                },
+                vjointo       =>'itil::lnkitclustsvc',
+                vjoinon       =>['itclustsvcid'=>'id'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'itclustsvcid',
+                label         =>'ClusterserviceID',
+                group         =>'relatedto',
+                dataobjattr   =>'ipaddress.lnkitclustsvc'),
+                                                  
+      new kernel::Field::Link(
+                name          =>'furthersystemid',
+                label         =>'SystemID for further informations',
+                group         =>'further',
+                dataobjattr   =>'ipaddress.system'
+                ),
+                                                  
+      new kernel::Field::TextDrop(
                 name          =>'systemlocation',
                 htmlwidth     =>'280px',
                 group         =>'further',
                 htmldetail    =>0,
                 label         =>'Systems location',
                 vjointo       =>'itil::system',
-                vjoinon       =>['systemid'=>'id'],
+                vjoinon       =>['furthersystemid'=>'id'],
                 vjoindisp     =>'location'),
 
       new kernel::Field::TextDrop(
@@ -90,7 +130,7 @@ sub new
                 readonly      =>1,
                 label         =>'Systems SystemID',
                 vjointo       =>'itil::system',
-                vjoinon       =>['systemid'=>'id'],
+                vjoinon       =>['furthersystemid'=>'id'],
                 vjoindisp     =>'systemid'),
 
       new kernel::Field::TextDrop(
@@ -101,7 +141,7 @@ sub new
                 readonly      =>1,
                 label         =>'Systems CI-Status',
                 vjointo       =>'itil::system',
-                vjoinon       =>['systemid'=>'id'],
+                vjoinon       =>['furthersystemid'=>'id'],
                 vjoindisp     =>'cistatus'),
 
       new kernel::Field::Text(
@@ -112,7 +152,7 @@ sub new
                 htmldetail    =>0,
                 vjointo       =>'itil::lnkapplsystem',
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
-                vjoinon       =>['systemid'=>'systemid'],
+                vjoinon       =>['furthersystemid'=>'systemid'],
                 vjoindisp     =>['appl']),
 
       new kernel::Field::Text(
@@ -123,7 +163,7 @@ sub new
                 group         =>'further',
                 vjointo       =>'itil::lnkapplsystem',
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
-                vjoinon       =>['systemid'=>'systemid'],
+                vjoinon       =>['furthersystemid'=>'systemid'],
                 vjoindisp     =>'applcustomer'),
 
       new kernel::Field::Text(
@@ -134,7 +174,7 @@ sub new
                 htmldetail    =>0,
                 vjointo       =>'itil::lnkapplsystem',
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
-                vjoinon       =>['systemid'=>'systemid'],
+                vjoinon       =>['furthersystemid'=>'systemid'],
                 vjoindisp     =>['tsmemail']),
 
       new kernel::Field::Text(
@@ -145,7 +185,7 @@ sub new
                 htmldetail    =>0,
                 vjointo       =>'itil::lnkapplsystem',
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
-                vjoinon       =>['systemid'=>'systemid'],
+                vjoinon       =>['furthersystemid'=>'systemid'],
                 vjoindisp     =>['tsm2email']),
 
       new kernel::Field::Select(
@@ -463,12 +503,13 @@ sub isParentSpecified
    my $oldrec=shift;
    my $newrec=shift;
 
+   my $itclustsvcid=effVal($oldrec,$newrec,"itclustsvcid");
    my $systemid=effVal($oldrec,$newrec,"systemid");
-   if ($systemid<=0){
-      $self->LastMsg(ERROR,"invalid system specified");
+   if ($systemid<=0 && $itclustsvcid <=0){
+      $self->LastMsg(ERROR,"invalid parent object reference specified");
       return(0);
    } 
-   return(0) if (!($self->isParentWriteable($systemid)));
+   return(0) if (!($self->isParentWriteable($systemid,$itclustsvcid)));
    return(1);
 
 }
@@ -477,21 +518,43 @@ sub isParentWriteable
 {
    my $self=shift;
    my $systemid=shift;
+   my $itclustsvcid=shift;
 
-   my $p=$self->getPersistentModuleObject($self->Config,"itil::system");
-   my $idname=$p->IdField->Name();
-   my %flt=($idname=>\$systemid);
-   $p->SetFilter(\%flt);
-   my @l=$p->getHashList(qw(ALL));
-   if ($#l!=0){
-      $self->LastMsg(ERROR,"invalid system reference");
-      return(0);
-   }
-   my @write=$p->isWriteValid($l[0]);
-   if (isDataInputFromUserFrontend()){
-      if (!grep(/^ALL$/,@write) && !grep(/^ipaddresses$/,@write)){
-         $self->LastMsg(ERROR,"no access");
+   if ($systemid ne ""){
+      my $p=$self->getPersistentModuleObject($self->Config,"itil::system");
+      my $idname=$p->IdField->Name();
+      my %flt=($idname=>\$systemid);
+      $p->SetFilter(\%flt);
+      my @l=$p->getHashList(qw(ALL));
+      if ($#l!=0){
+         $self->LastMsg(ERROR,"invalid system reference");
          return(0);
+      }
+      my @write=$p->isWriteValid($l[0]);
+      if (isDataInputFromUserFrontend()){
+         if (!grep(/^ALL$/,@write) && !grep(/^ipaddresses$/,@write)){
+            $self->LastMsg(ERROR,"no access");
+            return(0);
+         }
+      }
+   }
+   if ($itclustsvcid ne ""){
+      my $p=$self->getPersistentModuleObject($self->Config,
+                                             "itil::lnkitclustsvc");
+      my $idname=$p->IdField->Name();
+      my %flt=($idname=>\$itclustsvcid);
+      $p->SetFilter(\%flt);
+      my @l=$p->getHashList(qw(ALL));
+      if ($#l!=0){
+         $self->LastMsg(ERROR,"invalid itclust reference");
+         return(0);
+      }
+      my @write=$p->isWriteValid($l[0]);
+      if (isDataInputFromUserFrontend()){
+         if (!grep(/^ALL$/,@write) && !grep(/^ipaddresses$/,@write)){
+            $self->LastMsg(ERROR,"no access");
+            return(0);
+         }
       }
    }
    return(1);
@@ -504,8 +567,8 @@ sub isViewValid
    my $rec=shift;
    my @def=("header","default");
    return(@def) if (!defined($rec));
-   return(@def,"source","dnsaliases","relatedto") if ($rec->{dnsname} ne "");
-   return(@def,"source","relatedto");
+   return(@def,"source","dnsaliases","relatedto","further") if ($rec->{dnsname} ne "");
+   return(@def,"source","relatedto","further");
 }
 
 sub isWriteValid

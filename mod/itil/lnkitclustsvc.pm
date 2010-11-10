@@ -78,16 +78,6 @@ sub new
                 label         =>'ClusterserviceID',
                 dataobjattr   =>'qlnkitclustsvc.itservid'),
 
-#      new kernel::Field::TextDrop(
-#                name          =>'appl',
-#                htmlwidth     =>'250px',
-#                label         =>'Application',
-#                vjointo       =>'itil::appl',
-#                vjoineditbase =>{'cistatusid'=>[2,3,4]},
-#                vjoinon       =>['applid'=>'id'],
-#                vjoindisp     =>'name',
-#                dataobjattr   =>'appl.name'),
-
       new kernel::Field::Textarea(
                 name          =>'comments',
                 searchable    =>0,
@@ -101,9 +91,63 @@ sub new
                 forwardSearch =>1,
                 subeditmsk    =>'subedit.appl',
                 vjointo       =>'itil::lnkitclustsvcappl',
-              #  vjoinbase     =>[{applcistatusid=>"<=5"}],
+                vjoinbase     =>[{applcistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'itclustsvcid'],
                 vjoindisp     =>['appl','applcistatus','applapplid']),
+
+      new kernel::Field::SubList(
+                name          =>'systems',
+                label         =>'Systems',
+                group         =>'systems',
+                forwardSearch =>1,
+                readonly      =>1,
+                vjointo       =>'itil::system',
+                vjoinbase     =>[{cistatusid=>"<=5"}],
+                vjoinon       =>['clustid'=>'itclustid'],
+                vjoindisp     =>['name','systemid',
+                                 'cistatus',
+                                 'shortdesc'],
+                vjoininhash   =>['system','systemsystemid','systemcistatus',
+                                 'systemid']),
+
+      new kernel::Field::SubList(
+                name          =>'ipaddresses',
+                label         =>'IP-Adresses',
+                group         =>'ipaddresses',
+                allowcleanup  =>1,
+                forwardSearch =>1,
+                subeditmsk    =>'subedit.system',
+                vjoinbase     =>[{cistatusid=>"<=5"}],
+                vjointo       =>'itil::ipaddress',
+                vjoinon       =>['id'=>'itclustsvcid'],
+                vjoindisp     =>['webaddresstyp','name','cistatus',
+                                 'dnsname','shortcomments'],
+                vjoininhash   =>['id','name','addresstyp',
+                                 'cistatusid',
+                                 'dnsname','comments']),
+
+      new kernel::Field::SubList(
+                name          =>'ipaddresseslist',
+                label         =>'IP-Adresses list',
+                group         =>'ipaddresses',
+                htmldetail    =>0,
+                subeditmsk    =>'subedit.system',
+                vjoinbase     =>[{cistatusid=>\"4"}],
+                vjointo       =>'itil::ipaddress',
+                vjoinon       =>['id'=>'itclustsvcid'],
+                vjoindisp     =>['name']),
+
+      new kernel::Field::SubList(
+                name          =>'dnsnamelist',
+                label         =>'DNS-Name list',
+                group         =>'ipaddresses',
+                htmldetail    =>0,
+                subeditmsk    =>'subedit.system',
+                vjoinbase     =>[{cistatusid=>\"4"}],
+                vjointo       =>'itil::ipaddress',
+                vjoinon       =>['id'=>'itclustsvcid'],
+                vjoindisp     =>['dnsname']),
+
 
       new kernel::Field::Creator(
                 name          =>'creator',
@@ -279,8 +323,8 @@ sub isWriteValid
    my $itclustid=effVal($oldrec,$newrec,"clustid");
 
    return("default") if (!defined($oldrec) && !defined($newrec));
-   return("default","applications") if ($self->IsMemberOf("admin"));
-   return("default","applications") if ($self->isWriteOnClusterValid($itclustid));
+   return("default","applications","ipaddresses") if ($self->IsMemberOf("admin"));
+   return("default","applications","ipaddresses") if ($self->isWriteOnClusterValid($itclustid));
    return(undef);
 }
 
@@ -305,7 +349,9 @@ sub isWriteOnClusterValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default applications misc clustinfo swinstances source));
+   return(qw(header default applications 
+             ipaddresses systems
+             misc clustinfo swinstances source));
 }
 
 sub ValidateDelete
