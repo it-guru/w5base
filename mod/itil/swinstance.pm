@@ -293,7 +293,7 @@ sub new
                 name          =>'itclusts',
                 group         =>'cluster',
                 label         =>'Cluster Service',
-                vjointo       =>'itil::lnkapplitclust',
+                vjointo       =>'itil::lnkitclustsvc',
                 vjoineditbase =>{'itclustcistatusid'=>[2,3,4]},
                 vjoinon       =>['itclustsid'=>'id'],
                 vjoindisp     =>'fullname'),
@@ -668,11 +668,11 @@ sub Validate
    }
    else{ # validate service app
       if ((my $clustsid=effVal($oldrec,$newrec,"itclustsid")) ne ""){ 
-         my $c=getModuleObject($self->Config,"itil::lnkapplitclust");
-         $c->SetFilter({id=>\$clustsid});
+         my $c=getModuleObject($self->Config,"itil::lnkitclustsvcappl");
+         my $applid=effVal($oldrec,$newrec,"applid");
+         $c->SetFilter({itclustsvcid=>\$clustsid,applid=>\$applid});
          my ($rec,$msg)=$c->getOnlyFirst(qw(applid));
-         if ($rec->{applid} ne "" &&
-             $rec->{applid} ne effVal($oldrec,$newrec,"applid")){
+         if (!defined($rec)){
             $self->LastMsg(ERROR,"cluster service application and instance ".
                                  "application does not match");
             return(undef);
