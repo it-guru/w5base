@@ -1,6 +1,7 @@
 'itil::ipaddress'=>{de=>'IP-Adresse',en=>'IP-Adresse'},
 'fieldgroup.default'=>{de=>'IP-Adresse-Daten',en=>'IP-Adresse-Informations'},
 'fieldgroup.source'=>{de=>'Datenquelle',en=>'Datasource'},
+'fieldgroup.relatedto'=>{de=>'Zuordnung',en=>'Relation'},
 'fieldgroup.dnsaliases'=>{de=>'DNS-Aliases',en=>'DNS-Aliases'},
 'you are only authorized to add in \'order\' or \'reserved\' state'=>{de=>'Sie sind nur berechtig, im Status \'angefordert\' oder \'reserviert\' Datensätze zu erzeugen'},
 'assigned to System'=>{de=>'zugeordnetes System'},

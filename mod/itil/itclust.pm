@@ -120,7 +120,7 @@ sub new
                 forwardSearch =>1,
                 allowcleanup  =>1,
                 subeditmsk    =>'subedit.services',
-                vjointo       =>'itil::lnkapplitclust',
+                vjointo       =>'itil::lnkitclustsvc',
                 vjoinbase     =>[{applcistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'clustid'],
                 vjoindisp     =>['fullname','itservid','appl']),

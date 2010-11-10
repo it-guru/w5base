@@ -1,0 +1,6 @@
+'itil::lnkitclustsvcappl'=>{de=>'Verknüpfung Anwendung Cluster-Service',en=>'Relation Application Cluster-Service'},
+'Application'=>{de=>'Anwendung'},
+'fieldgroup.applinfo'=>{de=>'Anwendungsdaten',en=>'Application data'},
+'fieldgroup.itclustsvcinfo'=>{de=>'Servicedaten',en=>'Service data'},
+'fieldgroup.itclustinfo'=>{de=>'Clusterdaten',en=>'Cluster data'},
+

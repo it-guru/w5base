@@ -228,10 +228,10 @@ sub new
                 name          =>'services',
                 label         =>'Cluster services',
                 group         =>'services',
-                vjointo       =>'itil::lnkapplitclust',
+                vjointo       =>'itil::lnkitclustsvcappl',
                 vjoinbase     =>[{itclustcistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'applid'],
-                vjoindisp     =>['fullname']),
+                vjoindisp     =>['itclustsvc']),
 
       new kernel::Field::Text(
                 name          =>'businessteambossid',

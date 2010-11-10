@@ -702,7 +702,7 @@ sub getSqlFrom
             }
             if (exists($f->{applid}) && $f->{applid}=~m/^\d+$/){
                $datasourcerest1.=" and lnkapplsystem.appl='$f->{applid}'";
-               $datasourcerest2.=" and lnkapplitclust.appl='$f->{applid}'";
+               $datasourcerest2.=" and lnkitclustsvcappl.appl='$f->{applid}'";
             }
             if (exists($f->{applid}) && ref($f->{applid}) eq "SCALAR"){
                $f->{applid}=[${$f->{applid}}];
@@ -710,7 +710,7 @@ sub getSqlFrom
             if (exists($f->{applid}) && ref($f->{applid}) eq "ARRAY"){
                $datasourcerest1.=" and lnkapplsystem.appl in (".
                              join(",",map({"'".$_."'"} @{$f->{applid}})).")";
-               $datasourcerest2.=" and lnkapplitclust.appl in (".
+               $datasourcerest2.=" and lnkitclustsvcappl.appl in (".
                              join(",",map({"'".$_."'"} @{$f->{applid}})).")";
             }
             if (exists($f->{systemid}) && $f->{systemid}=~m/^\d+$/){
@@ -757,26 +757,27 @@ sub getSqlFrom
      "union ".
      "select ".
         "null id, ".
-        "lnkapplitclust.appl, ".
+        "lnkitclustsvcappl.appl, ".
         "system.id system, ".
         "concat('relation by cluster service ',".
-               "lnkapplitclust.itsvcname) comments, ".
+               "lnkitclustsvc.itsvcname) comments, ".
         "null additional, ".
         "100.0 fraction, ".
-        "lnkapplitclust.createdate, ".
-        "lnkapplitclust.modifydate, ".
-        "lnkapplitclust.createuser, ".
-        "lnkapplitclust.modifyuser, ".
-        "lnkapplitclust.editor, ".
-        "lnkapplitclust.realeditor, ".
-        "lnkapplitclust.srcsys, ".
-        "lnkapplitclust.srcid, ".
-        "lnkapplitclust.srcload, ".
+        "lnkitclustsvcappl.createdate, ".
+        "lnkitclustsvcappl.modifydate, ".
+        "lnkitclustsvcappl.createuser, ".
+        "lnkitclustsvcappl.modifyuser, ".
+        "lnkitclustsvcappl.editor, ".
+        "lnkitclustsvcappl.realeditor, ".
+        "lnkitclustsvcappl.srcsys, ".
+        "lnkitclustsvcappl.srcid, ".
+        "lnkitclustsvcappl.srcload, ".
         "'cluster' reltyp ".
-     "from lnkapplitclust ".
-          "join itclust on itclust.id=lnkapplitclust.itclust ".
-          "join system on lnkapplitclust.itclust=system.clusterid ".
-          $datasourcerest2;
+     "from lnkitclustsvcappl ".
+        "join lnkitclustsvc on lnkitclustsvc.id=lnkitclustsvcappl.itclustsvc ".
+        "join itclust on itclust.id=lnkitclustsvc.itclust ".
+        "join system on lnkitclustsvc.itclust=system.clusterid ".
+        $datasourcerest2;
 
    my $from="($datasource) qlnkapplsystem left outer join appl ".
             "on qlnkapplsystem.appl=appl.id ".

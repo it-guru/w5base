@@ -727,9 +727,9 @@ alter table system add is_infrastruct bool default '0', add key(is_infrastruct);
 alter table appl   add secstate  varchar(20) default NULL;
 alter table servicesupport add fullname varchar(128) default NULL;
 alter table osrelease add osclass varchar(20) default NULL,add key(osclass);
-create table lnkapplitclust   (
+create table lnkitclustsvc   (
   id           bigint(20) NOT NULL,
-  appl         bigint(20) NOT NULL,itsvcname varchar(40) default NULL,
+  itsvcname    varchar(40) default NULL,
   itclust      bigint(20) NOT NULL,swinstance   bigint(20) NOT NULL,
   comments     longtext    default NULL,
   additional   longtext    default NULL,
@@ -744,7 +744,7 @@ create table lnkapplitclust   (
   srcid        varchar(20) default NULL,
   srcload      datetime    default NULL,
   PRIMARY KEY  (id),
-  KEY appl (appl),UNIQUE applcl(itsvcname,itclust,subitsvcname),
+  UNIQUE applcl(itsvcname,itclust,subitsvcname),
   KEY clust(itclust),key swi(swinstance),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -865,4 +865,27 @@ alter table lnksoftwaresystem  add patchkey varchar(30) default '';
 alter table lnksoftwaresystem  add majorminorkey varchar(30) default '';
 alter table lnkapplappl add description longtext default NULL;
 alter table itclust add itclustid char(20) default NULL, add unique(itclustid);
-alter table lnkapplitclust add itservid char(20) default NULL, add unique(itservid);
+alter table lnkitclustsvc add itservid char(20) default NULL, add unique(itservid);
+create table lnkitclustsvcappl   (
+  id           bigint(20) NOT NULL,
+  itclust      bigint(20) NOT NULL,
+  itclustsvc   bigint(20) NOT NULL,
+  appl         bigint(20) NOT NULL,
+  comments     longtext    default NULL,
+  createdate   datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate   datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser   bigint(20) default NULL,
+  modifyuser   bigint(20) default NULL,
+  editor       varchar(100) NOT NULL default '',
+  realeditor   varchar(100) NOT NULL default '',
+  srcsys       varchar(100) default 'w5base',
+  srcid        varchar(20) default NULL,
+  srcload      datetime    default NULL,
+  PRIMARY KEY  (id),
+  UNIQUE applcl(itclust,itclustsvc,appl),
+  FOREIGN KEY fk_applclustsvc (appl) REFERENCES appl (id) ON DELETE CASCADE,
+  FOREIGN KEY fk_itclustsvc (itclustsvc) 
+          REFERENCES lnkitclustsvc (id) ON DELETE CASCADE,
+  KEY itclustsvc(itclustsvc),
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

@@ -60,149 +60,18 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'system',
                 htmlwidth     =>'150px',
+                group         =>'relatedto',
                 label         =>'assigned to System',
                 vjointo       =>'itil::system',
                 vjoinon       =>['systemid'=>'id'],
                 vjoindisp     =>'name'),
 
-      new kernel::Field::Select(
-                name          =>'network',
-                htmleditwidth =>'190px',
-                label         =>'Network',
-                vjointo       =>'itil::network',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['networkid'=>'id'],
-                vjoindisp     =>'name'),
-
-      new kernel::Field::SubList(
-                name          =>'dnsaliases',
-                label         =>'DNS-Aliases',
-                group         =>'dnsaliases',
-                vjointo       =>'itil::dnsalias',
-                vjoinon       =>['dnsname'=>'dnsname'],
-                vjoindisp     =>['fullname']),
-
-      new kernel::Field::Link(
-                name          =>'networkid',
-                label         =>'NetworkID',
-                dataobjattr   =>'ipaddress.network'),
-
       new kernel::Field::Link(
                 name          =>'systemid',
                 label         =>'SystemID',
+                group         =>'relatedto',
                 dataobjattr   =>'ipaddress.system'),
                                                   
-      new kernel::Field::Link(
-                name          =>'uniqueflag',
-                label         =>'UniqueFlag',
-                dataobjattr   =>'ipaddress.uniqueflag'),
-                                                  
-      new kernel::Field::Text(
-                name          =>'dnsname',
-                label         =>'DNS-Name',
-                dataobjattr   =>'ipaddress.dnsname'),
-
-      new kernel::Field::Select(
-                name          =>'type',
-                htmleditwidth =>'190px',
-                label         =>'Typ',
-                transprefix   =>'iptyp.',
-                value         =>[qw(0 1 2 3 4 5 8 9 6 7)],
-                dataobjattr   =>'ipaddress.addresstyp'),
-
-      new kernel::Field::Text(
-                name          =>'ifname',
-                htmlwidth     =>'130px',
-                label         =>'Interface name',
-                dataobjattr   =>'ipaddress.ifname'),
-
-      new kernel::Field::Text(
-                name          =>'accountno',
-                htmlwidth     =>'130px',
-                label         =>'Account Number',
-                dataobjattr   =>'ipaddress.accountno'),
-
-      new kernel::Field::Link(
-                name          =>'addresstyp',
-                htmlwidth     =>'5px',
-                dataobjattr   =>'ipaddress.addresstyp'),
-
-      new kernel::Field::DynWebIcon(
-                name          =>'webaddresstyp',
-                searchable    =>0,
-                depend        =>['type','name','dnsname'],
-                htmlwidth     =>'5px',
-                htmldetail    =>0,
-                weblink       =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my $mode=shift;
-                   my $typeo=$self->getParent->getField("type");
-                   my $d=$typeo->FormatedDetail($current,"AscV01");
-
-                   my $ipo=$self->getParent->getField("dnsname");
-                   my $ipname=$ipo->RawValue($current);
-                   if ($ipname eq ""){
-                      $ipo=$self->getParent->getField("name");
-                      $ipname=$ipo->RawValue($current);
-                   }
-                   $ipname=~s/"//g;
-
-                   my $e=$self->RawValue($current);
-                   my $name=$self->Name();
-                   my $app=$self->getParent();
-                   if ($mode=~m/html/i){
-                      return("<a href=\"ssh://$ipname\"><img ".
-                         "src=\"../../itil/load/iptyp${e}.gif\" ".
-                         "title=\"$d\" border=0></a>");
-                   }
-                   return($d);
-                },
-                dataobjattr   =>'ipaddress.addresstyp'),
-
-      new kernel::Field::Select(
-                name          =>'isjobserverpartner',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
-                label         =>'JobServer Partner',
-                value         =>[0,1],
-                dataobjattr   =>'ipaddress.is_controllpartner'),
-
-      new kernel::Field::Link(
-                name          =>'cistatusid',
-                label         =>'CI-StateID',
-                dataobjattr   =>'ipaddress.cistatus'),
-
-      new kernel::Field::Textarea(
-                name          =>'comments',
-                label         =>'Comments',
-                dataobjattr   =>'ipaddress.comments'),
-
-      new kernel::Field::Text(
-                name          =>'shortcomments',
-                label         =>'Short Comments',
-                readonly      =>1,
-                htmldetail    =>0,
-                htmlwidth     =>'190px',
-                onRawValue    =>sub{
-                                   my $self=shift;
-                                   my $current=shift;
-                                   my $d=$current->{comments};
-                                   $d=~s/\n/ /g;
-                                   $d=substr($d,0,24);
-                                   if (length($current->{comments})>
-                                       length($d)){
-                                      $d.="...";
-                                   }
-                                   return($d);
-                                },
-                depend        =>['comments']),
-
-      new kernel::Field::Container(
-                name          =>'additional',
-                label         =>'Additionalinformations',
-                dataobjattr   =>'ipaddress.additional'),
-
       new kernel::Field::TextDrop(
                 name          =>'systemlocation',
                 htmlwidth     =>'280px',
@@ -278,6 +147,139 @@ sub new
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>['tsm2email']),
+
+      new kernel::Field::Select(
+                name          =>'network',
+                htmleditwidth =>'280px',
+                label         =>'Network',
+                vjointo       =>'itil::network',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['networkid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::SubList(
+                name          =>'dnsaliases',
+                label         =>'DNS-Aliases',
+                group         =>'dnsaliases',
+                vjointo       =>'itil::dnsalias',
+                vjoinon       =>['dnsname'=>'dnsname'],
+                vjoindisp     =>['fullname']),
+
+      new kernel::Field::Link(
+                name          =>'networkid',
+                label         =>'NetworkID',
+                dataobjattr   =>'ipaddress.network'),
+
+      new kernel::Field::Link(
+                name          =>'uniqueflag',
+                label         =>'UniqueFlag',
+                dataobjattr   =>'ipaddress.uniqueflag'),
+                                                  
+      new kernel::Field::Text(
+                name          =>'dnsname',
+                label         =>'DNS-Name',
+                dataobjattr   =>'ipaddress.dnsname'),
+
+      new kernel::Field::Select(
+                name          =>'type',
+                htmleditwidth =>'190px',
+                label         =>'Typ',
+                transprefix   =>'iptyp.',
+                value         =>[qw(0 1 2 3 4 5 8 9 6 7)],
+                dataobjattr   =>'ipaddress.addresstyp'),
+
+      new kernel::Field::Text(
+                name          =>'ifname',
+                htmlwidth     =>'130px',
+                label         =>'Interface name',
+                dataobjattr   =>'ipaddress.ifname'),
+
+      new kernel::Field::Text(
+                name          =>'accountno',
+                htmlwidth     =>'130px',
+                label         =>'Account Number',
+                dataobjattr   =>'ipaddress.accountno'),
+
+      new kernel::Field::Link(
+                name          =>'addresstyp',
+                htmlwidth     =>'5px',
+                dataobjattr   =>'ipaddress.addresstyp'),
+
+      new kernel::Field::DynWebIcon(
+                name          =>'webaddresstyp',
+                searchable    =>0,
+                depend        =>['type','name','dnsname'],
+                htmlwidth     =>'5px',
+                htmldetail    =>0,
+                weblink       =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+                   my $typeo=$self->getParent->getField("type");
+                   my $d=$typeo->FormatedDetail($current,"AscV01");
+
+                   my $ipo=$self->getParent->getField("dnsname");
+                   my $ipname=$ipo->RawValue($current);
+                   if ($ipname eq ""){
+                      $ipo=$self->getParent->getField("name");
+                      $ipname=$ipo->RawValue($current);
+                   }
+                   $ipname=~s/"//g;
+
+                   my $e=$self->RawValue($current);
+                   my $name=$self->Name();
+                   my $app=$self->getParent();
+                   if ($mode=~m/html/i){
+                      return("<a href=\"ssh://$ipname\"><img ".
+                         "src=\"../../itil/load/iptyp${e}.gif\" ".
+                         "title=\"$d\" border=0></a>");
+                   }
+                   return($d);
+                },
+                dataobjattr   =>'ipaddress.addresstyp'),
+
+#      new kernel::Field::Select(
+#                name          =>'isjobserverpartner',
+#                transprefix   =>'boolean.',
+#                htmleditwidth =>'30%',
+#                label         =>'JobServer Partner',
+#                value         =>[0,1],
+#                dataobjattr   =>'ipaddress.is_controllpartner'),
+
+      new kernel::Field::Link(
+                name          =>'cistatusid',
+                label         =>'CI-StateID',
+                dataobjattr   =>'ipaddress.cistatus'),
+
+      new kernel::Field::Textarea(
+                name          =>'comments',
+                label         =>'Comments',
+                dataobjattr   =>'ipaddress.comments'),
+
+      new kernel::Field::Text(
+                name          =>'shortcomments',
+                label         =>'Short Comments',
+                readonly      =>1,
+                htmldetail    =>0,
+                htmlwidth     =>'190px',
+                onRawValue    =>sub{
+                                   my $self=shift;
+                                   my $current=shift;
+                                   my $d=$current->{comments};
+                                   $d=~s/\n/ /g;
+                                   $d=substr($d,0,24);
+                                   if (length($current->{comments})>
+                                       length($d)){
+                                      $d.="...";
+                                   }
+                                   return($d);
+                                },
+                depend        =>['comments']),
+
+      new kernel::Field::Container(
+                name          =>'additional',
+                label         =>'Additionalinformations',
+                dataobjattr   =>'ipaddress.additional'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
@@ -442,22 +444,33 @@ sub Validate
       return(0);
    }
 
-   msg(INFO,sprintf("iprec=%s\n",Dumper($newrec)));
+#   msg(INFO,sprintf("iprec=%s\n",Dumper($newrec)));
+
+   if (!defined($oldrec) && !exists($newrec->{'type'}) &&
+                            !exists($newrec->{'addresstyp'})){
+      $newrec->{'addresstyp'}=1;
+   }
+   return(0) if (!($self->isParenteSpecified($oldrec,$newrec)));
+   #return(1) if ($self->IsMemberOf("admin"));
+   return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"name","dnsname"));
+
+   return(1);
+}
+
+sub isParentSpecified
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
 
    my $systemid=effVal($oldrec,$newrec,"systemid");
    if ($systemid<=0){
       $self->LastMsg(ERROR,"invalid system specified");
       return(0);
    } 
-   if (!defined($oldrec) && !exists($newrec->{'type'}) &&
-                            !exists($newrec->{'addresstyp'})){
-      $newrec->{'addresstyp'}=1;
-   }
    return(0) if (!($self->isParentWriteable($systemid)));
-   #return(1) if ($self->IsMemberOf("admin"));
-   return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"name","dnsname"));
-
    return(1);
+
 }
 
 sub isParentWriteable
@@ -489,8 +502,10 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("header","default") if (!defined($rec));
-   return("ALL");
+   my @def=("header","default");
+   return(@def) if (!defined($rec));
+   return(@def,"source","dnsaliases","relatedto") if ($rec->{dnsname} ne "");
+   return(@def,"source","relatedto");
 }
 
 sub isWriteValid
@@ -500,20 +515,23 @@ sub isWriteValid
 
    if (defined($rec)){
       return("default") if ($self->IsMemberOf("admin"));
-      return(undef) if (!$self->isParentWriteable($rec->{systemid}));
+      return(undef) if (!$self->isParenteSpecified($rec)));
    }
 
    return("default");
 }
 
 sub getRecordHtmlIndex
-{ return(); }
+{ 
+   my $self=shift;
+
+   return; 
+}
 
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(
-          qw(header default dnsaliases source));
+   return(qw(header default relatedto dnsaliases source));
 }
 
 
