@@ -5,10 +5,6 @@
          <td class=finput colspan=3>%name(sublistedit)%</td>
       </tr>
       <tr>
-         <td class=fname width=10%>%appl(label)%:</td>
-         <td class=finput colspan=3>%appl(sublistedit)%</td>
-      </tr>
-      <tr>
          <td class=fname width=10% valign=top>%comments(label)%:</td>
          <td class=finput colspan=3>%comments(sublistedit)%</td>
       </tr>
