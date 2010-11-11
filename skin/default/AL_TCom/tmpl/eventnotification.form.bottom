@@ -5,6 +5,11 @@
        Gelb hinterlegte Kopfzeile=&gt;Ereignisklasse 3,4 oder 5; 
        Grün hinterlegte Kopfzeile=&gt;Ereignis abgeschlosse (Gutmeldung);
        Blau hinterlegte Kopfzeile=&gt;Ergebnis der Ursachenanalyse</td></tr>
+  <tr><td valign=top><p style="font-size:10px">
+       Red topline =&gt;event priority 1 or 2; 
+       yellow topline =&gt;event priority 3, 4 or 5; 
+       green topline =&gt;event closed; 
+       blue topline=&gt;result of root cause analysis</td></tr>
   <tr><td bgcolor=silver valign=top align=center><b>Kontakt</b></td></tr>
 </table>
 </td></tr>
