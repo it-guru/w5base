@@ -150,7 +150,8 @@ sub new
                 group         =>'services',
                 vjointo       =>'tsacinv::itclustservice',
                 vjoinon       =>['lportfolio'=>'lportfolio'],
-                vjoindisp     =>[qw(fullname description)]),
+                vjoindisp     =>[qw(fullname description)],
+                vjoininhash   =>[qw(serviceid status name description)]),
 
 
       new kernel::Field::Link(
