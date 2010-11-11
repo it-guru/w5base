@@ -121,13 +121,15 @@ sub qcheckRecord
                                });
                     }
                     elsif ($mode eq "delete"){
-                       return({OP=>$mode,
-                               OPLABEL=>$oldrec->{fullname},
-                               MSG=>"delete ClustService $oldrec->{name} ".
-                                    "from W5Base",
-                               DATAOBJ=>'itil::lnkitclustsvc',
-                               IDENTIFYBY=>$oldrec->{id},
-                               });
+                       if ($oldrec->{itservid} ne ""){
+                          return({OP=>$mode,
+                                  OPLABEL=>$oldrec->{fullname},
+                                  MSG=>"delete ClustService $oldrec->{name} ".
+                                       "from W5Base",
+                                  DATAOBJ=>'itil::lnkitclustsvc',
+                                  IDENTIFYBY=>$oldrec->{id},
+                                  });
+                       }
                     }
                     return(undef);
                  },
