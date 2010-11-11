@@ -733,7 +733,7 @@ create table lnkitclustsvc   (
   itclust      bigint(20) NOT NULL,swinstance   bigint(20) NOT NULL,
   comments     longtext    default NULL,
   additional   longtext    default NULL,
-  subitsvcname varchar(5) default '',
+  subitsvcname varchar(5) default '' not null,
   createdate   datetime NOT NULL default '0000-00-00 00:00:00',
   modifydate   datetime NOT NULL default '0000-00-00 00:00:00',
   createuser   bigint(20) default NULL,
