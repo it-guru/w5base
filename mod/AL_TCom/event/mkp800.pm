@@ -522,6 +522,19 @@ sub bflexxRawExport
 
       my $extid=$rec->{tcomexternalid};
       $extid=join("\n",@$extid) if (ref($extid) eq "ARRAY");
+      if ($extid eq ""){
+         $extid=$rec->{customerrefno};
+      }
+      $extid=join("\n",@$extid) if (ref($extid) eq "ARRAY");
+      if (!$extid=~m/W5B:/){
+         if ($extid ne ""){
+            $extid="W5B:".$rec->{id}." ".$extid;
+         }
+         else{
+            $extid="W5B:".$rec->{id};
+         }
+      }
+      printf STDERR ("bflexxRawExport $rec->{id} extid=$extid\n");
 
       my $specialt=$rec->{headref}->{specialt};
       $specialt=join(", ",@$specialt) if (ref($specialt) eq "ARRAY");
