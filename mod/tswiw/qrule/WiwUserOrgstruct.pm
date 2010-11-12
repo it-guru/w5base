@@ -69,7 +69,7 @@ sub qcheckRecord
    my ($urec)=$mainuser->getOnlyFirst(qw(email surname givenname usertyp 
                                          groups posix));
    if (defined($urec)){ # found correct urec record for user
-      print STDERR Dumper($urec);
+     # print STDERR Dumper($urec);
       if (defined($urec) && $urec->{email} ne "" &&
           $urec->{email} ne 'null@null.com' &&
           $urec->{usertyp} eq "user"){     # it seems to be a correct email
@@ -100,7 +100,7 @@ sub qcheckRecord
             msg(ERROR,"User '%s' couldn't be found in LDAP",$urec->{email});
             return($errorlevel,undef);
          }
-         print STDERR Dumper($wiwrec);
+        # print STDERR Dumper($wiwrec);
 
 
          my $wiwid=$wiwrec->{id};
