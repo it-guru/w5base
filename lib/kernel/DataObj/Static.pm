@@ -208,6 +208,7 @@ sub CheckFilter
                         }
                      }
                      else{
+                        $chk=~s/\./\\./g;
                         $chk=~s/\?/\./g;
                         $chk=~s/\*/\.*/g;
                         if (!($dataval=~m/^$chk$/i)){
