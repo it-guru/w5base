@@ -149,7 +149,7 @@ sub new
                 label         =>'Services',
                 group         =>'services',
                 vjointo       =>'tsacinv::itclustservice',
-                vjoinon       =>['lportfolio'=>'lportfolio'],
+                vjoinon       =>['lclusterid'=>'lclusterid'],
                 vjoindisp     =>[qw(fullname description)],
                 vjoininhash   =>[qw(serviceid status name description)]),
 

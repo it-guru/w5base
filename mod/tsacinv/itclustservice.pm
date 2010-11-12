@@ -44,7 +44,7 @@ sub new
                 searchable    =>1,
                 uppersearch   =>1,
                 htmldetail    =>0,
-                htmlwidth     =>'190px',
+                htmlwidth     =>'250px',
                 align         =>'left',
                 dataobjattr   =>"concat(amportfolio.name,concat(' ('".
                                 ",concat(amportfolio.assettag,')')))"),
@@ -57,9 +57,16 @@ sub new
                 dataobjattr   =>'amportfolio.name'),
 
       new kernel::Field::Text(
+                name          =>'type',
+                label         =>'Clusterservice type',
+                uppersearch   =>1,
+                size          =>'16',
+                dataobjattr   =>'amcomputer.clustertype'),
+
+      new kernel::Field::Text(
                 name          =>'description',
                 label         =>'Description',
-                dataobjattr   =>'amtsiparentchild.description'),
+                dataobjattr   =>"'Cluster-Service'"),
 
       new kernel::Field::Id(
                 name          =>'serviceid',
@@ -126,9 +133,9 @@ sub new
                 dataobjattr   =>"decode(amportfolio.soxrelevant,'YES',1,0)"),
 
       new kernel::Field::Link(
-                name          =>'lportfolio',
+                name          =>'lclusterid',
                 label         =>'AC-PortfolioID',
-                dataobjattr   =>'amtsiparentchild.lparentid'),
+                dataobjattr   =>'amcomputer.lparentid'),
 
 #      new kernel::Field::SubList(
 #                name          =>'applications',
@@ -215,7 +222,7 @@ sub getSqlFrom
 {
    my $self=shift;
    my $from=
-      "amcomputer,amtsiparentchild, ".
+      "amcomputer, ".
       "(select amportfolio.* from amportfolio ".
       " where amportfolio.bdelete=0) amportfolio,ammodel,".
       "(select amcostcenter.* from amcostcenter ".
@@ -231,10 +238,10 @@ sub initSqlWhere
       "amportfolio.lportfolioitemid=amcomputer.litemid ".
       "and amportfolio.lmodelid=ammodel.lmodelid ".
       "and amportfolio.lcostid=amcostcenter.lcostid(+) ".
-      "and amportfolio.lportfolioitemid=amtsiparentchild.lchildid(+) ".
       "and ammodel.name='CLUSTER' ".
       "and (amcomputer.clustertype='Cluster-Service' or ".
-      "     amcomputer.clustertype='Cluster-Package') ".
+      "     amcomputer.clustertype='Cluster-Package' or ".
+      "     amcomputer.clustertype='Cluster-Packages') ".
       "and amcomputer.status<>'out of operation'";
    return($where);
 }
