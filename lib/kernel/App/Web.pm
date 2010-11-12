@@ -877,6 +877,10 @@ sub HandleNewUser
                #
                my $updrec={usertyp=>'user',creator=>$urec->{userid}};
                $updrec->{cistatusid}=3 if ($urec->{cistatusid}<4);
+               if ($urec->{gtctxt} eq ""){ # if no gtc act - we request it
+                  $updrec->{cistatusid}=3;
+               }
+               
                $user->ValidatedUpdateRecord($urec,$updrec,
                                    {userid=>\$urec->{userid}});
             }
