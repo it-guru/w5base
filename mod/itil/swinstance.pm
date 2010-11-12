@@ -345,11 +345,11 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'swinstance.comments'),
 
-#      new kernel::Field::FileList(
-#                name          =>'attachments',
-#                label         =>'Attachments',
-#                parentobj     =>'itil::swinstance',
-#                group         =>'attachments'),
+      new kernel::Field::FileList(
+                name          =>'attachments',
+                label         =>'Attachments',
+                parentobj     =>'itil::swinstance',
+                group         =>'attachments'),
 
       new kernel::Field::Container(
                 name          =>'additional',
@@ -703,7 +703,7 @@ sub isViewValid
    my $rec=shift;
    return("header","default") if (!defined($rec));
    my @all=qw(header default adm sec ssl misc history
-             systems contacts source);
+             systems contacts attachments source);
    if (defined($rec) && $rec->{'runonclusts'}){
       push(@all,"cluster");
    }
@@ -717,7 +717,8 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default adm systems contacts ssl misc cluster sec);
+   my @databossedit=qw(default adm systems contacts ssl misc 
+                       attachments cluster sec);
    if (!defined($rec)){
       return(@databossedit);
    }
@@ -764,7 +765,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header default adm sec ssl misc cluster 
-             systems contacts source));
+             systems contacts attachments source));
 }
 
 

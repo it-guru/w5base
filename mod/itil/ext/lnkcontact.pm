@@ -108,9 +108,11 @@ sub getPosibleRoles
         defined($self->getParent->getParent) &&
        $self->getParent->getParent->Self()=~m/^.+::swinstance$/)){
       return(
-             "read"            =>$self->getParent->T("read instance",
+             "read"            =>$self->getParent->T("read",
                                                      $self->Self),
-             "write"           =>$self->getParent->T("write instance",
+             "privread"        =>$self->getParent->T("privacy read",
+                                                     $self->Self),
+             "write"           =>$self->getParent->T("write",
                                                      $self->Self));
    }
    if ($parentobj=~m/^.+::liccontract$/ ||
