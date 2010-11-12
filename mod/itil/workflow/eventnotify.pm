@@ -179,6 +179,7 @@ sub getDynamicFields
                                      EVloccomp.unknown
                                      EVloccomp.ipnetwork
                                      EVloccomp.voip
+                                     EVloccomp.voipcc
                                      EVloccomp.power
                                      EVloccomp.clima
                                      EVloccomp.access
