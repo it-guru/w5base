@@ -374,7 +374,6 @@ sub Import
 
    my $clustrec=$l[0];
 
-printf STDERR ("AssetManager ClusterRec=%s\n",Dumper($clustrec));
    my $itclust=getModuleObject($self->Config,"itil::itclust");
    $itclust->SetFilter($flt);
    my ($w5clustrec,$msg)=$itclust->getOnlyFirst(qw(ALL));
@@ -388,36 +387,6 @@ printf STDERR ("AssetManager ClusterRec=%s\n",Dumper($clustrec));
                                               {id=>\$w5clustrec->{id}});
    }
    else{
-#      # check 1: Assigmenen Group registered
-#      if ($clustrec->{lassignmentid} eq ""){
-#         $self->LastMsg(ERROR,"ClusterID has no Assignment Group");
-#         return(undef);
-#      }
-#      printf STDERR Dumper($clustrec);
-#      # check 2: Assingment Group active
-#      my $acgroup=getModuleObject($self->Config,"tsacinv::group");
-#      $acgroup->SetFilter({lgroupid=>\$clustrec->{lassignmentid}});
-#      my ($acgrouprec,$msg)=$acgroup->getOnlyFirst(qw(supervisorldapid));
-#      if (!defined($acgrouprec)){
-#         $self->LastMsg(ERROR,"Can't find Assignment Group of system");
-#         return(undef);
-#      }
-#      # check 3: Supervisor registered
-#      if ($acgrouprec->{supervisorldapid} eq "" &&
-#          $acgrouprec->{supervisoremail} eq ""){
-#         $self->LastMsg(ERROR,"incomplet Supervisor at Assignment Group");
-#         return(undef);
-#      }
-#      my $importname=$acgrouprec->{supervisorldapid};
-#      $importname=$acgrouprec->{supervisoremail} if ($importname eq "");
-#      # check 4: load Supervisor ID in W5Base
-#      my $tswiw=getModuleObject($self->Config,"tswiw::user");
-#      my $databossid=$tswiw->GetW5BaseUserID($importname);
-#      if (!defined($databossid)){
-#         $self->LastMsg(ERROR,"Can't import Supervisor as Databoss");
-#         return(undef);
-#      }
-      # check 5: find id of mandator "extern"
 
 
       my $mand=getModuleObject($self->Config,"base::mandator");
@@ -436,6 +405,7 @@ printf STDERR ("AssetManager ClusterRec=%s\n",Dumper($clustrec));
                   clusterid=>$clustrec->{clusterid},
                   clusttyp=>"OS",
                   comments=>$clustrec->{usage},
+                  allowifupdate=>1,
                   mandatorid=>$mandatorid,
                   cistatusid=>4};
       $identifyby=$itclust->ValidatedInsertRecord($newrec);
