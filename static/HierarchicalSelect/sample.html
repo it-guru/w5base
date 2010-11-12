@@ -1,0 +1,71 @@
+<html>
+<head>
+<title>HierarchicalSelect</title>
+</head>
+<body>
+
+<style>
+.select_pulldown { 
+   padding:2px; 
+   border: 1px solid #000000; 
+   background: #EEEEEE; 
+   color: #000000; 
+   font-family: Verdana;
+   font-size: 12px;
+}
+
+A.select_pulldown { 
+   text-decoration:none; 
+}
+
+A.select_inner { 
+   text-decoration: none; color: #000000; 
+}
+A.select_inner:hover { 
+   text-decoration: none; color:#FFFFFF; 
+}
+
+.select_inner_div { 
+   padding: 1px; 
+   color: #000000; 
+   cursor:hand; 
+   text-align:right;
+}
+.select_inner_active { 
+   border:1px solid #6666CC; 
+   background:#000066; 
+   color: #FFFFFF; 
+   cursor:hand; 
+   text-align:right;
+}
+</style>
+<script type="text/javascript"
+        src="../../public/base/load/HierarchicalSelect.js"></script>
+<form>
+Hierachical Select Box:
+<a class="select_pulldown" id="pulldown" href="javascript:void(0);" 
+         onclick="openSelect(this);" onMouseover="selectMouseOver();" 
+         onMouseout="selectMouseOut();"></a>
+
+<input type="hidden" id="pulldown_field" value="">
+<script>
+   selectMenus['pulldown'] = 0;
+   selectOptions[selectOptions.length] = '0||Pick One||';
+   selectOptions[selectOptions.length] = '0||Menu1||@@0.0';
+   selectOptions[selectOptions.length] = '0.0||Option1||o1';
+   selectOptions[selectOptions.length] = '0.0||Option2||o2';
+   selectOptions[selectOptions.length] = '0||Menu2||@@0.4';
+   selectOptions[selectOptions.length] = '0.4||Option3||o3';
+   selectOptions[selectOptions.length] = '0.4||Menu3||@@0.4.6';
+   selectOptions[selectOptions.length] = '0.4.6||Option4||o4';
+   selectOptions[selectOptions.length] = '0.4.6||Option5||o5';
+   selectOptions[selectOptions.length] = '0.4.6||Menu4||@@0.4.6.9';
+   selectOptions[selectOptions.length] = '0.4.6.9||Option7||o7';
+   selectOptions[selectOptions.length] = '0.4||Option6||o6';
+   selectRelateMenu('pulldown');
+</script>
+
+</form>
+
+</body>
+</html>
