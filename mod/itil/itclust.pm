@@ -99,6 +99,11 @@ sub new
                 label         =>'CI-StateID',
                 dataobjattr   =>'itclust.cistatus'),
 
+      new kernel::Field::Link(
+                name          =>'itclustcistatusid',
+                label         =>'CI-StateID',
+                dataobjattr   =>'itclust.cistatus'),
+
       new kernel::Field::Databoss(),
 
       new kernel::Field::Link(
