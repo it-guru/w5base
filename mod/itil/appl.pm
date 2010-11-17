@@ -741,6 +741,7 @@ sub new
 
       new kernel::Field::WorkflowLink(
                 name          =>'olastdrtestwf',
+                AllowEmpty    =>1,
                 label         =>'last Desaster-Recovery test (CHM-WorkflowID)',
                 group         =>'sodrgroup',
                 vjoinon       =>'olastdrtestwfid'),
@@ -782,6 +783,7 @@ sub new
       new kernel::Field::WorkflowLink(
                 name          =>'solastclusttestwf',
                 label         =>'last Cluster-Service switch test (CHM-WorkflowID)',
+                AllowEmpty    =>1,
                 group         =>'soclustgroup',
                 vjoinon       =>'solastclusttestwfid'),
 
