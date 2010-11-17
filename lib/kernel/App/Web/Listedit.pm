@@ -1230,16 +1230,18 @@ sub Detail
    $self->SetCurrentOrder("NONE");
    my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
 
-   my $cookievar="HtmlDetailPage_".$self->Self;
-   $cookievar=~s/[:]+/_/g;
+#   my $cookievar="HtmlDetailPage_".$self->Self;
+#   $cookievar=~s/[:]+/_/g;
+   my $cookievar;
 
    my $p=Query->Param("ModeSelectCurrentMode");
    $p=$self->getDefaultHtmlDetailPage($cookievar) if ($p eq "");
 
-   print $self->HttpHeader("text/html",
-                           cookies=>Query->Cookie(-name=>$cookievar,
-                                                  -path=>"/",
-                                                  -value=>$p));
+#   print $self->HttpHeader("text/html",
+#                           cookies=>Query->Cookie(-name=>$cookievar,
+#                                                  -path=>"/",
+#                                                  -value=>$p));
+   print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','mainwork.css',
                                    'kernel.TabSelector.css',
                                    '../../../static/lytebox/lytebox.css'],

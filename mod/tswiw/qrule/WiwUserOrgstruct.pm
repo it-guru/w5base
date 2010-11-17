@@ -97,7 +97,10 @@ sub qcheckRecord
             if (defined($msg)){
                msg(ERROR,"LDAP problem:%s",$msg);
             }
-            msg(ERROR,"User '%s' couldn't be found in LDAP",$urec->{email});
+            if ($urec->{posix} ne ""){
+               msg(ERROR,"E-Mail '%s' not found in LDAP but with POSIX entry",
+                          $urec->{email});
+            }
             return($errorlevel,undef);
          }
         # print STDERR Dumper($wiwrec);
@@ -232,14 +235,14 @@ sub addGrpLinkToUser
          my %newroles;
          my @oldroles;
          my @origroles;
+         if (defined($lnkrec->{roles})){
+            @origroles=@{$lnkrec->{roles}};
+         }
          if (!in_array($roles,"RBoss")){
             my @orgRoles=grep(!/^RBoss$/,orgRoles()); # RBoss muss bleiben!
-            if (defined($lnkrec->{roles})){
-               $oldrolestring=join(",",sort(@{$lnkrec->{roles}}));
-               @origroles=@{$lnkrec->{roles}};
-               foreach my $r (@{$lnkrec->{roles}}){
-                  push(@oldroles,$r) if (!in_array(\@orgRoles,$r));
-               }
+            $oldrolestring=join(",",sort(@{$lnkrec->{roles}}));
+            foreach my $r (@{$lnkrec->{roles}}){
+               push(@oldroles,$r) if (!in_array(\@orgRoles,$r));
             }
          }
          else{
@@ -416,7 +419,7 @@ sub NotifyNewTeamRelation
 
    my $user=getModuleObject($Config,"base::user");
    $user->SetFilter({userid=>\$userid,cistatusid=>"<6"});
-   my ($urec)=$user->getOnlyFirst(qw(email lang));
+   my ($urec)=$user->getOnlyFirst(qw(email lastlang));
 
    my $grp=getModuleObject($Config,"base::grp");
    $grp->SetFilter({grpid=>\$grpid,cistatusid=>"<6"});
@@ -424,7 +427,12 @@ sub NotifyNewTeamRelation
    msg(INFO,"--------------");
 
    if (defined($urec) && defined($grec)){
-      $ENV{HTTP_FORCE_LANGUAGE}=$urec->{lang};
+      if ($urec->{lastlang} ne ""){
+         $ENV{HTTP_FORCE_LANGUAGE}=$urec->{lastlang};
+      }
+      else{
+         $ENV{HTTP_FORCE_LANGUAGE}="de";
+      }
       my @emailcc=();
       my @emailbcc=();
       my $wf=getModuleObject($Config,"base::workflow");
