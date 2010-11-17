@@ -229,7 +229,6 @@ sub new
                 label         =>'Cluster services',
                 group         =>'services',
                 vjointo       =>'itil::lnkitclustsvcappl',
-                vjoinbase     =>[{itclustcistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'applid'],
                 vjoindisp     =>['itclustsvc']),
 
