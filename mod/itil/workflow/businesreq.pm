@@ -245,11 +245,7 @@ sub isViewValid
 sub isWriteValid
 {
    my $self=shift;
-   my $rec=shift;
-   my @l=$self->SUPER::isWriteValid($rec,@_);
-   if (!defined($rec)){
-      push(@l,"affected");
-   }
+   my @l=$self->SUPER::isWriteValid(@_);
    if (grep(/^default$/,@l)){
       push(@l,"customerdata");
    }
