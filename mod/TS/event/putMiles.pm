@@ -78,9 +78,9 @@ sub putMiles
                      effort=>$rec->{effort},
                      createdate=>$rec->{cdate},
                      modifydate=>$rec->{mdate});
-            if (!exists($ucache{$put{w5baseuserid}})){
+            if (!exists($ucache{$put{office_w5baseuserid}})){
                $user->ResetFilter();
-               $user->SetFilter({userid=>\$put{w5baseuserid}});
+               $user->SetFilter({userid=>\$put{office_w5baseuserid}});
                my ($urec,$msg)=$user->getOnlyFirst(qw(posix 
                                                       office_persnum 
                                                       office_costcenter 
@@ -90,13 +90,15 @@ sub putMiles
                          office_persnum=>$urec->{office_persnum},
                          office_costcenter=>$urec->{office_costcenter},
                          office_accarea=>$urec->{office_accarea});
-                  $ucache{$put{w5baseuserid}}=\%u;
+                  $ucache{$put{office_w5baseuserid}}=\%u;
                }
             }
-            foreach my $k (keys(%{$ucache{$put{w5baseuserid}}})){
-               $put{$k}=$ucache{$put{w5baseuserid}}->{$k};
+            foreach my $k (keys(%{$ucache{$put{office_w5baseuserid}}})){
+               $put{$k}=$ucache{$put{office_w5baseuserid}}->{$k};
             }
-            print F hash2xml({entry=>\%put},{header=>0});
+            if ($put{office_wiwuserid} eq "hvogler"){
+               print F hash2xml({entry=>\%put},{header=>0});
+            }
            
    #         printf STDERR ("put=%s\n",Dumper(\%put));
          }

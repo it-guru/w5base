@@ -526,7 +526,7 @@ sub bflexxRawExport
          $extid=$rec->{customerrefno};
       }
       $extid=join("\n",@$extid) if (ref($extid) eq "ARRAY");
-      if (!$extid=~m/W5B:/){
+      if (!($extid=~m/W5B:/)){
          if ($extid ne ""){
             $extid="W5B:".$rec->{id}." ".$extid;
          }

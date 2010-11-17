@@ -86,7 +86,13 @@ sub NotifyChange
             my $appl=getModuleObject($self->Config,"itil::appl");
             my $user=getModuleObject($self->Config,"base::user");
             my $grp=getModuleObject($self->Config,"base::grp");
-            $appl->SetFilter({id=>$aid,name=>'SIT* W5*'}); # first test only for sit
+            my $sigiapps="BL-T(P)   DoCoMue(P)  Messsystem_90_Wirk(P)".
+                         "QMDB  RM_Archivierung   RM_Archivierung_T/A  ".
+                         "RM_Datensicherung    RM_Datensicherung_T/A ".
+                         "SchaKaL_(P/S)  SchaKaL_(T/A)  SIT4_BL-T   ".
+                         "SKS_ES   SKS_ES_R    T-STORE";
+
+            $appl->SetFilter({id=>$aid,name=>'SIT* W5* '.$sigiapps}); # first test only for sit
             $aid=[];
             foreach my $arec ($appl->getHashList(qw(contacts name id))){
                msg(INFO,"check application $arec->{name}");

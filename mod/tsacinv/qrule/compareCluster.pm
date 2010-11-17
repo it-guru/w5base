@@ -86,7 +86,7 @@ sub qcheckRecord
                  sub{  # comperator 
                     my ($a,$b)=@_;
                     my $eq;
-                    printf STDERR ("compare $a->{itservid} = $b->{serviceid}\n"); 
+                 # printf STDERR ("compare $a->{itservid} = $b->{serviceid}\n"); 
                     if ($a->{itservid} eq $b->{serviceid}){
                        $eq=0;
                    #    $eq=1 if ($a->{comments} eq $b->{description});
