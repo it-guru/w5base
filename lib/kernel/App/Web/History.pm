@@ -64,6 +64,9 @@ EOF
    push(@tt,">now-84d",$self->T("last 12 Weeks"));
    push(@tt,">now-180d",$self->T("last 180 days"));
    push(@tt,">now-365d",$self->T("last 365 days"));
+   if ($self->IsMemberOf("admin")){
+      push(@tt,"<now-365d AND >now-1000d",$self->T("older then 1 year"));
+   }
    push(@tt,"",$self->T("all"));
    my $tt="<select name=ListTime style=\"width:150px\">";
    while(my $k=shift(@tt)){

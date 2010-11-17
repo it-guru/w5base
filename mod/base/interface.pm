@@ -404,7 +404,8 @@ sub _SOAPaction2param
       if ($mod=~m/\/workflow\//){
          $mod=~s/\//::/g;
          if (exists($param->{data}) && ref($param->{data}) &&
-             exists($param->{data}->{action})){
+             (exists($param->{data}->{action}) || 
+              $param->{IdentifiedBy} eq "")){
             $param->{data}->{class}=$mod;
          }
          $param->{class}=$mod;
