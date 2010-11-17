@@ -48,7 +48,33 @@ sub qcheckRecord
       $wiw->SetFilter({email=>\$rec->{email}});
       my ($wiwrec,$msg)=$wiw->getOnlyFirst(qw(ALL));
       if (!defined($wiwrec)){
-         return(0,{qmsg=>['user not found']});
+         if ($rec->{posix} ne ""){  # email adress change of existing WIW-Acc
+            $wiw->ResetFilter();
+            $wiw->SetFilter({uid=>\$rec->{posix}});
+            ($wiwrec,$msg)=$wiw->getOnlyFirst(qw(ALL));
+            if (defined($wiwrec)){
+               my $newemail=lc($wiwrec->{email});
+               printf STDERR ("WiwUser: email address change detected!\n".
+                              "         from '%s' to '%s' for userid '%s'\n",
+                              $rec->{email},$newemail,$rec->{posix});
+               my $user=getModuleObject($self->getParent->Config(),
+                                        "base::user");
+               $user->SetFilter({email=>\$newemail});
+               my ($alturec,$msg)=$user->getOnlyFirst(qw(ALL));
+               if (defined($alturec)){
+                  return(0,
+                     {qmsg=>['unrepairable email address change detected']});
+               }
+               if ($user->ValidatedUpdateRecord($rec,{email=>$newemail},
+                                                     {userid=>\$rec->{userid},
+                                                      posix=>\$rec->{posix}})){
+                  printf STDERR ("WiwUser: address change done sucessfuly.\n");
+               }
+            }
+         }
+         if (!defined($wiwrec)){
+            return(0,{qmsg=>['user not found']});
+         }
       }
       my $forcedupd={};
       my $wfrequest={};
@@ -64,6 +90,7 @@ sub qcheckRecord
              $wiwdata->{$fld}=$wiwdata->{$fld}->[0];
           }
           $wiwdata->{$fld}=~s/^\s*unknown\s*$//i;
+          $wiwdata->{$fld}=rmNonLatin1($wiwdata->{$fld});
           
           $self->IfaceCompare($dataobj,
                      $rec,$fld,
