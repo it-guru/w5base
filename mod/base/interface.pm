@@ -549,11 +549,12 @@ sub storeRecord
          $newrec->{$k}=UTF8toLatin1($newrec->{$k});
       }
    }
-   if ($objectname eq "base::workflow" && 
-       (exists($newrec->{action}) || $IdentifiedBy eq "")){
-      my $action=$newrec->{action};
-      delete($newrec->{action});
-      if ($o->nativProcess($action,$newrec,$id)){
+   if ($objectname eq "base::workflow" &&          # operations on 
+       (exists($newrec->{action}) || $id eq "")){  # existing workflows always 
+      my $action=$newrec->{action};                # always need to be spec.
+      delete($newrec->{action});                   # an id AND a action. 
+                                                   # On new create of
+      if ($o->nativProcess($action,$newrec,$id)){  # workflows no id is specif.
          
          my $IdentifiedBy=$id;
          if ($IdentifiedBy eq ""){
