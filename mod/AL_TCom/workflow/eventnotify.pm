@@ -668,8 +668,7 @@ sub getAdditionalMainButtons
    my $actions=shift;
    my $d="";
 
-   my @buttons=('rootcausei'=>$self->T("Send Root-Cause Info"),
-                'startwarum'=>$self->T("Start a WARUM analaysis"));
+   my @buttons=('rootcausei'=>$self->T("Send Root-Cause Info"));
 
    while(my $name=shift(@buttons)){
       my $label=shift(@buttons);

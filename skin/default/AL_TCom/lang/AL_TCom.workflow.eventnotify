@@ -19,7 +19,6 @@
 'EVt.unknown'=>{de=>'nicht ermittelbar',en=>'not investigatable'},
 'relprobtick'=>{de=>'Der Workflow "%s" ist das verknüpfte Problem-Ticket',en=>'the workflow "%s" is the linked Problme-Ticket'},
 'REV.relprobtick'=>{de=>'der aktuelle Workflow ist das Problem-Ticket für den Workflow "%s" ',en=>'the current workflow is the Problem-Ticket for "%s"'},
-'Start a WARUM analaysis'=>{de=>'WARUM Analyse durchführen'},
 'Send Root-Cause Info'=>{de=>'Ursachenanalyse versenden'},
 'rootcausi'=>{de=>'Ursachenanalyse versandt',en=>'root cause analysis send'},
 'invalid problemticket registered'=>{de=>'ungültiges Problem Ticket eingetragen'},

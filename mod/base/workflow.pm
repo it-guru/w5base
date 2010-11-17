@@ -1242,7 +1242,7 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return(1) if (!defined($rec));
+   return("ALL") if (!defined($rec));
    return("default") if (!defined($rec) || 
                          !defined($self->{SubDataObj}->{$rec->{class}}));
    return($self->{SubDataObj}->{$rec->{class}}->isWriteValid($rec));
