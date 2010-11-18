@@ -77,7 +77,7 @@ sub UserVerified
             my $d=CalcDateDuration($urec->{lastqcheck},$now);
             $since=$d->{totalminutes};
          }
-         if (!defined($since) || $since>2){
+         if (!defined($since) || $since>5){
             if ($urec->{qcok}){
                msg(INFO,"Quality check of useraccount '$account' OK");
             }
@@ -88,7 +88,7 @@ sub UserVerified
          }
          else{
             msg(INFO,"Quality for useraccount '$account' already run in ".
-                     "the last 2m");
+                     "the last 5m");
             return({msg=>"fast recall '$account'",exitcode=>0});
          }
       }
