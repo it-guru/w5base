@@ -1000,6 +1000,9 @@ sub isViewValid
    if ($rec->{usertyp} eq "extern"){
       @gl=qw(header name default comments groups userid userro control 
                 office private qc);
+      if ($self->IsMemberOf("admin")){
+         push(@gl,"history");
+      }
    }  
    elsif ($rec->{usertyp} eq "function"){
       if ($self->IsMemberOf("admin")){
