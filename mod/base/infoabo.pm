@@ -600,13 +600,14 @@ sub LoadTargets
       $param{default}=0 if (!exists($param{default}));
       $self->ResetFilter();
       $self->SetFilter({refid=>$refid,mode=>$mode,
-                        usercistatusid=>"<=5",
                         parent=>$parent,userid=>$userlist});
-      foreach my $rec ($self->getHashList(qw(userid email id active))){
+      foreach my $rec ($self->getHashList(qw(userid email id 
+                                             usercistatusid
+                                             active))){
          next if ($rec->{email} eq ""); # ensure entries are filtered, if the
                                         # contact entry has been deleted
          @{$userlist}=grep(!/^$rec->{userid}$/,@{$userlist}); 
-         if ($rec->{active}){
+         if ($rec->{active} && $rec->{usercistatusid}<=5){
             if (!defined($desthash->{lc($rec->{email})})){
                $desthash->{lc($rec->{email})}=[];
             }
