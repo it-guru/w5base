@@ -52,7 +52,8 @@ sub qcheckRecord
          printf STDERR ("WiwUser: ununique email = '%s'\n",$rec->{email});
          return(3,{qmsg=>['ununique email in WhoIsWho '.$rec->{email}]});
       }
-      $wiwrec=$l[0];
+      my $msg;
+      my $wiwrec=$l[0];
       if (!defined($wiwrec)){
          if ($rec->{posix} ne ""){  # email adress change of existing WIW-Acc
             $wiw->ResetFilter();
