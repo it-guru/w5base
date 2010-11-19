@@ -45,14 +45,22 @@ sub qcheckRecord
 
    if ($rec->{email} ne ""){
       my $wiw=getModuleObject($self->getParent->Config(),"tswiw::user");
-      $wiw->SetFilter({email=>\$rec->{email}});
-      my ($wiwrec,$msg)=$wiw->getOnlyFirst(qw(ALL));
+      $wiw->SetFilter([{email=>\$rec->{email}},{email2=>\$rec->{email}},
+                       {email3=>\$rec->{email}}]);
+      my @l=$wiw->getHashList(qw(ALL));
+      if ($#l>0){
+         printf STDERR ("WiwUser: ununique email = '%s'\n",$rec->{email});
+         return(3,{qmsg=>['ununique email in WhoIsWho '.$rec->{email}]});
+      }
+      $wiwrec=$l[0];
       if (!defined($wiwrec)){
          if ($rec->{posix} ne ""){  # email adress change of existing WIW-Acc
             $wiw->ResetFilter();
             $wiw->SetFilter({uid=>\$rec->{posix}});
             ($wiwrec,$msg)=$wiw->getOnlyFirst(qw(ALL));
-            if (defined($wiwrec)){
+            if (defined($wiwrec) && 
+                lc($wiwrec->{email}) ne "unknown" && 
+                lc($wiwrec->{email}) ne "unregistered"){
                my $newemail=lc($wiwrec->{email});
                printf STDERR ("WiwUser: email address change detected!\n".
                               "         from '%s' to '%s' for userid '%s'\n",
