@@ -78,6 +78,8 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'applapplid',
+                uploadable    =>0,
+                readony       =>1,
                 group         =>'applinfo',
                 label         =>'ApplicationID',
                 dataobjattr   =>'appl.applid'),
@@ -90,6 +92,8 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'applcistatus',
+                uploadable    =>0,
+                readony       =>1,
                 group         =>'applinfo',
                 label         =>'CI-State',
                 vjointo       =>'base::cistatus',
@@ -99,6 +103,8 @@ sub new
       new kernel::Field::Link(
                 name          =>'applcistatusid',
                 group         =>'applinfo',
+                uploadable    =>0,
+                readony       =>1,
                 label         =>'Application CI-StatusID',
                 dataobjattr   =>'appl.cistatus'),
 
@@ -185,6 +191,21 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
+   my $itclustsvcid=effVal($oldrec,$newrec,"itclustsvcid");
+   my $o=getModuleObject($self->Config,"itil::lnkitclustsvc");
+   $o->SetFilter({id=>\$itclustsvcid});
+   my ($rec,$msg)=$o->getOnlyFirst(qw(ALL));
+   if (!defined($rec)){
+      $self->LastMsg(ERROR,"invalid cluster service");
+      return(undef);
+   }
+   my @l=$o->isWriteValid($rec);
+   if (!in_array(\@l,"applications")){
+      $self->LastMsg(ERROR,"no write access to cluster service");
+      return(undef);
+   }
+
+
    return(1);
 }
 
@@ -204,7 +225,19 @@ sub isWriteValid
    my $newrec=shift;
 
    return("default","misc") if ($self->IsMemberOf("admin"));
-   return(undef);
+
+   if (defined($oldrec)){
+      my $itclustsvcid=$oldrec->{itclustsvcid};
+      my $o=getModuleObject($self->Config,"itil::lnkitclustsvc");
+      $o->SetFilter({id=>\$itclustsvcid});
+      my ($rec,$msg)=$o->getOnlyFirst(qw(ALL));
+      return(undef) if (!defined($rec));
+      my @l=$o->isWriteValid($rec);
+      return() if (!in_array(\@l,"applications"));
+   }
+
+
+   return("default");
 }
 
 sub getDetailBlockPriority
