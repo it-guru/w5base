@@ -82,7 +82,7 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'sememail',
-                label         =>'Databoss E-Mail',
+                label         =>'Customer Business Manager E-Mail',
                 searchable    =>0,
                 group         =>'finance',
                 htmldetail    =>0,
