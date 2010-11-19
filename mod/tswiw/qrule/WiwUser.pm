@@ -65,10 +65,13 @@ sub qcheckRecord
                   return(0,
                      {qmsg=>['unrepairable email address change detected']});
                }
-               if ($user->ValidatedUpdateRecord($rec,{email=>$newemail},
-                                                     {userid=>\$rec->{userid},
-                                                      posix=>\$rec->{posix}})){
-                  printf STDERR ("WiwUser: address change done sucessfuly.\n");
+               if ($rec->{usertyp} eq "extern" || $rec->{usertyp} eq "user"){
+                  if ($user->ValidatedUpdateRecord($rec,
+                      {email=>$newemail},
+                      {userid=>\$rec->{userid},posix=>\$rec->{posix}})){
+                     printf STDERR ("WiwUser: ".
+                                    "address change done sucessfuly.\n");
+                  }
                }
             }
          }
