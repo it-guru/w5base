@@ -290,7 +290,7 @@ sub new
                 uploadable    =>0,
                 dataobjattr   =>'contact.office_persnum'),
 
-      new kernel::Field::Number(
+      new kernel::Field::Text(
                 name          =>'office_costcenter',
                 group         =>'officeacc',
                 uploadable    =>0,
