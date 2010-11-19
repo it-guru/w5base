@@ -84,6 +84,7 @@ sub new
                 name          =>'sememail',
                 label         =>'Databoss E-Mail',
                 searchable    =>0,
+                group         =>'finance',
                 htmldetail    =>0,
                 uploadable    =>0,
                 vjointo       =>'base::user',
