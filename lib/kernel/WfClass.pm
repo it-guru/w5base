@@ -642,9 +642,18 @@ return(true);
 }
 function disableButtons()
 {
-   document.btnWhich.disabled=true;
+   document.btnWhich.oldonclick=document.btnWhich.onclick;
+   document.btnWhich.onclick=function(){  // prevent double click
+      return(false);
+   };
    document.btnWhich.oldvalue=document.btnWhich.value;
    document.btnWhich.value="Working ...";
+}
+
+function enableButtons()
+{
+   document.btnWhich.onclick=document.btnWhich.oldonclick;
+   document.btnWhich.value=document.btnWhich.oldvalue;
 }
 
 var submitCount=0;
@@ -662,7 +671,8 @@ function ValidateSubmit(f)
    if (!document.btnWhich){
       return(true);
    }
-   window.setTimeout("disableButtons();",10);
+   disableButtons();
+  // window.setTimeout("disableButtons();",10);
    if (window.doValidateSubmit && typeof(window.doValidateSubmit)=='function'){
       return(doValidateSubmit(f,document.btnWhich));
    }
@@ -1056,9 +1066,14 @@ sub ValidActionCheck
       return(1) if ($a ne "" && grep(/^$a$/,@{$actions}));
    }
    if ($lastmsg){
-      my $app=$self->getParent->getParent();
-      $app->LastMsg(ERROR,$app->T("ileagal action '%s' requested"),
-                    join(",",@reqaction));
+      my $app=$self->getParent();   # seltsam, dass das so lange fehlerhaft war
+      if (!defined($app)){
+         msg(ERROR,"invalid request from '%s'",join("\n",caller())); 
+      }
+      else{
+         $app->LastMsg(ERROR,$app->T("ileagal action '%s' requested"),
+                       join(",",@reqaction));
+      }
    }
    return(0);
 }

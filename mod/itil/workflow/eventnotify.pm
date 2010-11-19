@@ -557,7 +557,19 @@ sub getAdditionalMainButtons
 {
    my $self=shift;
    my $WfRec=shift;
-   return("");
+   my $actions=shift;
+   my $d="";
+
+   my @buttons=('imgmtinfo'=>$self->T("initiate Managment call"));
+
+   while(my $name=shift(@buttons)){
+      my $label=shift(@buttons);
+      my $dis="";
+      $dis="disabled" if (!$self->ValidActionCheck(0,$actions,$name));
+      $d.="<input type=submit $dis ".
+          "class=workflowbutton name=$name value=\"$label\"><br>";
+   }
+   return($d);
 }
 
 sub AdditionalMainProcess
@@ -982,7 +994,7 @@ sub getPosibleActions
          push(@l,"reactivate");
       }
    }
-   push(@l,"sendcustinfo") if ($self->IsIncidentManager($WfRec));
+   push(@l,"sendcustinfo","imgmtinfo") if ($self->IsIncidentManager($WfRec));
    msg(INFO,"valid operations=%s",join(",",@l));
 
    return(@l);
@@ -1167,7 +1179,19 @@ sub getNotifyDestinations
       }
    }
    if ($mode eq "mgmtinfo"){
+      $emailto->{'hartmut.vogler@t-systems.com'}++;
+      if ($WfRec->{eventmode} eq "EVk.appl"){ 
+         my $applid=$WfRec->{affectedapplicationid};
+         $applid=[$applid] if (ref($applid) ne "ARRAY");
+         my $appl=getModuleObject($self->Config,"itil::appl");
+         $appl->SetFilter({id=>$applid});
 
+         # new target calculation code from itil::appl
+         foreach my $rec ($appl->getHashList(qw(tsmemail))){
+            $emailto->{$rec->{tsmemail}}++ if ($rec->{tsmemail} ne "");
+         }
+      }
+      return(undef);
    }
    if ($WfRec->{eventstaticemailgroupid} ne ""){
       my @mem=$self->getParent->getMembersOf($WfRec->{eventstaticemailgroupid},
@@ -2591,6 +2615,13 @@ sub Process
       Query->Param("WorkflowStep"=>\@WorkflowStep);
       return(0);
    }
+   if (!defined($action) && Query->Param("imgmtinfo")){
+      return(undef) if (!$self->ValidActionCheck(1,$actions,"imgmtinfo"));
+      my @WorkflowStep=Query->Param("WorkflowStep");
+      push(@WorkflowStep,"itil::workflow::eventnotify::imgmtinfo");
+      Query->Param("WorkflowStep"=>\@WorkflowStep);
+      return(0);
+   }
    if (!defined($action) && Query->Param("timemod")){
       return(undef) if (!$self->ValidActionCheck(1,$actions,"timemod"));
       my @WorkflowStep=Query->Param("WorkflowStep");
@@ -2631,11 +2662,229 @@ sub getPosibleButtons
 }
 
 #######################################################################
+package itil::workflow::eventnotify::imgmtinfo;
+use vars qw(@ISA);
+use kernel;
+use kernel::WfStep;
+@ISA=qw(kernel::WfStep);
+
+sub generateWorkspace
+{
+   my $self=shift;
+   my $WfRec=shift;
+
+   my %em=();
+   $self->getParent->getNotifyDestinations("mgmtinfo",$WfRec,\%em);
+
+   my $emailto=join(", ",sort(keys(%em)));
+   if (Query->Param("emailto")){
+      $emailto=Query->Param("emailto");
+   }
+
+   my $emailtext="Sehr geehte Damen und Herren,\n\n".
+                 "hiermit laden wir Sie zum MoD-Call ein. In dieser Telko ".
+                 "sollen Details zu der unten aufgeführten Ereignismeldung ".
+                 "diskutiert werden.\n\n".
+                 "Mit freundlichen Gruessen";
+
+   if (Query->Param("emailtext")){
+      $emailtext=Query->Param("emailtext");
+   }
+   my $tstart="now+60m";
+   if (Query->Param("terminstart")){
+      $tstart=Query->Param("terminstart");
+   }
+   my $tend="now+90m";
+   if (Query->Param("terminend")){
+      $tend=Query->Param("terminend");
+   }
+
+   my $d="<table width=100% border=0>";
+   $d.="<tr>";
+   $d.="<td width=1% valign=top>An:</td>";
+   $d.="<td>".
+       "<textarea name=emailto style=\"width:100%;height:70px\">".
+       $emailto.
+       "</textarea></td>";
+   $d.="</tr>";
+   $d.="<tr>";
+   $d.="<td width=1%>Zeit:</td>";
+   $d.="<td>";
+
+   $d.="<table border=0 cellspacing=0 cellpadding=0 width=80%>";
+   $d.="<tr>";
+   $d.="<td width=1%>&nbsp;von:</td>";
+   $d.="<td><input name=terminstart type=text style=\"width:100%\" ".
+       "value=\"$tstart\"></td>";
+   $d.="<td width=1%>bis:</td>";
+   $d.="<td><input name=terminend type=text style=\"width:100%\" ".
+       "value=\"$tend\"></td>";
+   $d.="</tr>";
+   $d.="</table>";
+
+   $d.="</td>";
+   $d.="</tr>";
+
+   $d.="<tr>";
+   $d.="<td colspan=2>";
+   $d.="<textarea name=emailtext style=\"width:100%;height:120px\">".
+       $emailtext.
+       "</textarea></td>";
+   $d.="</tr>";
+
+
+   $d.="</table>";
+
+   $d.=<<EOF;
+<script language="JavaScript">
+function doValidateSubmit(f,b){
+   if (b.name=='NextStep'){
+      if (confirm("Sind Sie sicher, dass Sie diese Machbarkeitsstudie nutzen wollen?")){
+         return(true);
+      }
+      else{
+         enableButtons();
+         submitCount=0;
+         return(false);
+      }
+   }
+   return(defaultValidateSubmit(f,b));
+}
+</script>
+EOF
+
+#   $self->getParent->generateMailSet($WfRec,"imgmtinfo",0,
+#                    \$emaillang,\%additional,
+#                    \@emailprefix,\@emailpostfix,\@emailtext,\@emailsep,
+#                    \@emailsubheader,\@emailsubtitle,
+#                    \$subject,\$smsallow,\$smstext);
+
+
+
+#   return($self->generateNotificationPreview(emailtext=>\@emailtext,
+#                                             emailprefix=>\@emailprefix,
+#                                             emailsep=>\@emailsep,
+#                                             subject=>$subject,
+#                                             emailsubheader=>\@emailsubheader,
+#                                             emailsubtitle=>\@emailsubtitle,
+#                                             to=>\@email));
+   return($d);
+}
+
+sub getPosibleButtons
+{  
+   my $self=shift;
+   my $WfRec=shift;
+   my %b=$self->SUPER::getPosibleButtons($WfRec);
+  # my %em=();
+  # $self->getParent->getNotifyDestinations("custinfo",$WfRec,\%em);
+  # my @email=sort(keys(%em));
+  # $self->Context->{CurrentTarget}=\@email;
+  # delete($b{NextStep}) if ($#email==-1);
+   delete($b{BreakWorkflow});
+
+   return(%b);
+}
+
+sub Process
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   if ($action eq "NextStep"){
+      return(undef) if (!$self->ValidActionCheck(1,$actions,"sendcustinfo"));
+      my $emailto=Query->Param("emailto");
+      my $emailtext=Query->Param("emailtext");
+      my $rawterminstart=Query->Param("terminstart");
+      my $rawterminend=Query->Param("terminend");
+
+      my $tstart=$self->getParent->ExpandTimeExpression($rawterminstart,"en");
+      if (!defined($tstart)){
+         return(undef);
+      }
+      my $tend=$self->getParent->ExpandTimeExpression($rawterminend,"en");
+      if (!defined($tend)){
+         return(undef);
+      }
+
+      my $dur=CalcDateDuration($tstart,$tend);
+      if ($dur->{totalseconds}<=0){
+         $self->LastMsg(ERROR,"invalid termin end event end"); 
+         return(undef);
+      }
+      if ($emailto eq ""){
+         $self->LastMsg(ERROR,"no termin target address"); 
+         return(undef);
+      }
+      if ($emailtext eq ""){
+         $self->LastMsg(ERROR,"no termin text"); 
+         return(undef);
+      }
+
+printf STDERR ("fifi emailto=%s\n",Dumper(\$emailto));
+printf STDERR ("fifi emailtext=%s\n",Dumper(\$emailtext));
+printf STDERR ("fifi rawterminstart=%s\n",Dumper(\$rawterminstart));
+printf STDERR ("fifi rawterminend=%s\n",Dumper(\$rawterminend));
+printf STDERR ("fifi tstart=%s\n",Dumper(\$tstart));
+printf STDERR ("fifi tend=%s\n",Dumper(\$tend));
+
+      my $wf=getModuleObject($self->Config,"base::workflow");
+      my %notiy;
+      $notiy{emailto}=[split(/[;,]\s*/,$emailto)];
+      $notiy{name}="Management Call: ".$WfRec->{name};
+      my $defaultfrom=$self->Config->Param("DEFAULTFROM");
+      my $sitename=$self->Config->Param("SITENAME");
+      $notiy{emailfrom}='"Management Call: '.$sitename.'" '.
+                        '<'.$defaultfrom.'>';
+
+      $notiy{emailprefix}="Management Call";
+      $notiy{emailtext}=$emailtext;
+      $notiy{class}='base::workflow::mailsend';
+      $notiy{step}='base::workflow::mailsend::dataload';
+    #  $notiy{directlnktype}='base::workflow';
+    #  $notiy{directlnkmode}='WorkflowNotify';
+    #  $notiy{directlnkid}=$wfrec->{id};
+      $notiy{emailtemplate}="terminnotify";
+      $notiy{terminstart}=$tstart;
+      $notiy{terminend}=$tend;
+      $notiy{terminnotify}=1440;
+      $notiy{allowsms}=1;
+      $notiy{prio}=5;
+      $notiy{terminlocation}="Telko";
+      if (my $wid=$wf->Store(undef,\%notiy)){
+         my %d=(step=>'base::workflow::mailsend::waitforspool');
+         my $r=$wf->Store($wid,%d);
+       #  $wf->Action->ValidatedInsertRecord({
+       #     wfheadid=>$wfrec->{id},
+       #     name=>'note',
+       #     comments=>'NotifyChange Event: sending automatic '.
+       #               'change notification '.
+       #               'to all information partners in application '.
+       #               'contacts',
+       #     actionref=>{"autonotify.$curscstate"=>'send',
+       #                 "autonotify.essential"=>$essentialdatahash}});
+         return(1);
+      }
+      return(undef);
+   }
+   return($self->SUPER::Process($action,$WfRec));
+}
+
+sub getWorkHeight
+{
+   my $self=shift;
+   my $WfRec=shift;
+
+   return(300);
+}
+
+#######################################################################
 package itil::workflow::eventnotify::sendcustinfo;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfStep;
-use Data::Dumper;
 @ISA=qw(kernel::WfStep);
 
 sub generateWorkspace

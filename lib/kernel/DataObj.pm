@@ -995,7 +995,8 @@ sub StoreUpdateDelta
       foreach my $fobj (@fieldlist){
          if ($fobj->history){
             my $field=$fobj->Name;
-            next if ($field eq "srcload" || $field eq "mdate");
+            next if ($field eq "srcload" || $field eq "mdate" ||
+                     $fobj->Type() eq "File");
             if (exists($newrec->{$field})){
                next if (ref($oldrec->{$field}) eq "HASH" ||
                         ref($newrec->{$field}) eq "HASH");

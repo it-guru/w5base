@@ -666,7 +666,7 @@ sub getAdditionalMainButtons
    my $self=shift;
    my $WfRec=shift;
    my $actions=shift;
-   my $d="";
+   my $d=$self->SUPER::getAdditionalMainButtons($WfRec,$actions);
 
    my @buttons=('rootcausei'=>$self->T("Send Root-Cause Info"));
 

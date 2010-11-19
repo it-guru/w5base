@@ -94,6 +94,8 @@
 'EVloccomp.other'=>{de=>'Sonstiges',en=>'other'},
 'sendcustinfo'=>{de=>'Kundeninfo versandt'},
 'wfmodeventtime'=>{de=>'Ereigniszeitraum angepasst',en=>'event timespan modified'},
+'initiate Managment call'=>{de=>'Management Konferenz (BETA)',
+                            en=>'initiate Managment call (BETA)'},
 'note'=>{de=>'Notiz',en=>'note'},
 'wfclose'=>{de=>'Abgeschlossen',en=>'closed'},
 'reactivate'=>{de=>'Reaktiviert',en=>'reactivate'},
