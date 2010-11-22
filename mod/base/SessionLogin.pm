@@ -21,6 +21,12 @@ use vars qw(@ISA);
 use kernel;
 use kernel::App::Web;
 use kernel::TemplateParsing;
+use Net::OpenID::Consumer;
+use LWP::UserAgent;
+use CGI;
+use CGI::Carp 'fatalsToBrowser';
+
+
 @ISA=qw(kernel::App::Web kernel::TemplateParsing);
 
 sub new
@@ -31,18 +37,32 @@ sub new
    return($self);
 }
 
-sub Run
+
+sub getValidWebFunctions
+{
+   my ($self)=@_;
+   return(qw(Handler Response));
+}
+
+
+sub Handler
 {
    my $self=shift;
-   my $func=Query->Param("FUNC");
-   my $instdir=$self->Config->Param("INSTDIR");
-   my %param=();
 
-   my $content="text/html";
-   print $self->HttpHeader($content,%param);
-   print("Login");
-   return(0);
+   print $self->HttpHeader("text/html"); 
+   print $self->getParsedTemplate("tmpl/base.session.login",{});
+
 }
+
+
+sub Response
+{
+   my $self=shift;
+
+
+
+}
+
 
 
 
