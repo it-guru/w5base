@@ -38,7 +38,7 @@ sub Run
    my $instdir=$self->Config->Param("INSTDIR");
    my %param=();
 
-   my $content="text/html"){
+   my $content="text/html";
    print $self->HttpHeader($content,%param);
    print("Login");
    return(0);
