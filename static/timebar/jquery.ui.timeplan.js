@@ -68,7 +68,11 @@
       //*
       _refreshValue: function() {
          var currentWidget=this;
-         this.valueDiv.html("<div class=labelarea>X</div>");
+         var d="";
+         for(c=0;c<10;c++){
+            d+="<div style='position:relative;background-color:blue;width:100%;border:0px;height:40px'><div style='position:absolute;top:0;left:0;border:0;width:100%'><div style='border-style:solid;border-width:1px'></div></div></div>";
+         }
+         this.valueDiv.html("<div class=labelarea>"+d+"</div>");
       }
    });
    $.extend( $.ui.timeplan, {
