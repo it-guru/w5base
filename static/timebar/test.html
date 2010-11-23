@@ -1,0 +1,47 @@
+<html>
+<script type='text/javascript'    
+   src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'>
+</script>
+
+<script src="../../public/base/load/jquery.js"></script>
+<script src="../../public/base/load/jquery.ui.js"></script>
+<script src="../../public/base/load/jquery.ui.widget.js"></script>
+<script src="jquery.ui.timeplan.js"></script>
+
+<style>
+div.work{
+   border-style:solid;
+   border-color:black;
+   border-width:1px;
+}
+div.labelarea{
+   padding:0;
+   margin:0;
+   border-right-style:solid;
+   border-right-color:black;
+   border-right-width:1px;
+   width:100px;
+   height:100%;
+   overflow:auto;
+}
+</style>
+
+<script>
+$(document).ready(function (){
+  $("#work").timeplan(); 
+});
+
+
+
+
+
+</script>
+
+<body>
+This is a timebar test
+
+<div id=work class=work style="width:400px;height:200px"></div>
+
+
+</body>
+</html>
