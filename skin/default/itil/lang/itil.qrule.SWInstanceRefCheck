@@ -1,0 +1,3 @@
+'itil::qrule::SWInstanceRefCheck'=>{de=>'Software-Instanz Prüfung der zugeordneten Elemente',en=>'Software-Instance check relation elements'},
+'referenced application application is not active'=>{de=>'Die zugeordnete Anwendung ist nicht aktiv'},
+'invalid application reference'=>{de=>'Es wurde keine oder eine ungültige Anwendung zugeordnet'},
