@@ -59,8 +59,8 @@ sub new
                                    onRawValue =>sub{
                                       my $self=shift;
                                       my $current=shift;
-                                      my $d=$current->{givenname};
-                                      my $v=$current->{surname};
+                                      my $d=$current->{surname};
+                                      my $v=$current->{givenname};
                                       $d.=", " if ($d ne "" && $v ne "");
                                       $d.=$v;
                                       $d.=" " if ($d ne "");
