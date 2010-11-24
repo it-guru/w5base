@@ -2812,10 +2812,16 @@ sub dbQuote
    my $str=shift;
    my %sqlparam=@_;
    return("NULL") if (!defined($str));
+   my $dbtyp;
+   if (defined($sqlparam{sqldbh})){
+      $dbtyp=$sqlparam{sqldbh}->DriverName();
+   }
    if ($sqlparam{wildcards}){ 
       $str=~s/\\/\\\\/g;
       $str=~s/%/\\%/g;
-      $str=~s/_/\\_/g;
+      if ($dbtyp ne "odbc"){
+         $str=~s/_/\\_/g;
+      }
       $str=~s/\*/%/g;
       $str=~s/\?/_/g;
       $str=~s/\[\|%\|\]/*/g;  # to allow \* searchs (see parse_line above)
