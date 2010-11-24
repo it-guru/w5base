@@ -1,1 +1,2 @@
-'There is an unprocessed DataIssue for %s! - Not all data seems to be correct!'=>{de=>'Es existiert ein unbearbeitetes DataIssue für %s! - Es sind nicht alle Daten auf dieser Seite korrekt!'}
+'There is an unprocessed DataIssue for %s! - Not all data seems to be correct!'=>{de=>'Es existiert ein unbearbeitetes DataIssue für %s! - Es sind nicht alle Daten auf dieser Seite korrekt!'},
+'since'=>{de=>'seit'},

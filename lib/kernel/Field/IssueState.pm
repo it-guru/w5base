@@ -36,6 +36,23 @@ sub new
    return($self);
 }
 
+
+sub getWorkflowRec
+{
+   my $self=shift;
+   my $obj=shift;
+   my $refid=shift;
+
+
+   my $wf=$self->getParent->ModuleObject("base::workflow");
+   $wf->SetFilter({directlnktype=>\$obj,
+                   stateid=>"<17",
+                   directlnkid=>\$refid,
+                   directlnkmode=>\'DataIssue'});
+   my ($issuerec)=$wf->getOnlyFirst(qw(id eventstart name fwdtargetname));
+   return($issuerec);
+}
+
 sub ViewProcessor
 {
    my $self=shift;
@@ -44,12 +61,8 @@ sub ViewProcessor
    if ($mode eq "XML" && $refid ne ""){
       my $response={document=>{value=>'ok',HtmlDetail=>'',HtmlV01=>'OK'}};
       my $obj=$self->getParent()->SelfAsParentObject();
-      my $wf=$self->getParent->ModuleObject("base::workflow");
-      $wf->SetFilter({directlnktype=>\$obj,
-                      stateid=>"<17",
-                      directlnkid=>\$refid,
-                      directlnkmode=>\'DataIssue'});
-      my ($issuerec)=$wf->getOnlyFirst(qw(id name fwdtargetname));
+      my $issuerec=$self->getWorkflowRec($obj,$refid);
+
       my $title="OK";
       if (defined($issuerec)){
          $response->{document}->{value}="DataIssue \@ ".
@@ -91,8 +104,8 @@ sub FormatedDetail
    my $self=shift;
    my $current=shift;
    my $mode=shift;
+   my $idfield=$self->getParent->IdField();
    if ($mode eq "HtmlDetail" || $mode eq "HtmlV01"){
-      my $idfield=$self->getParent->IdField();
       if (defined($idfield)){
          my $id=$idfield->RawValue($current);
          my $divid="ViewProcessor_$self->{name}_$id";
@@ -148,50 +161,7 @@ EOF
       return("- ERROR - no idfield - ");
    }
 
-   return("-only in HTML View -");
-   my $d=$self->RawValue($current);
-   my $name=$self->Name();
-   my $app=$self->getParent();
-
-   if (!defined($current)){
-      # init from Query
-      $d=Query->Param("Formated_".$name);
-   }
-   if ($mode eq "storedworkspace"){
-      return($self->FormatedStoredWorkspace());
-   }
-   my $readonly=0;
-   if ($self->readonly($current)){
-      $readonly=1;
-   }
-   if ($self->frontreadonly($current)){
-      $readonly=1;
-   }
-
-   if (($mode eq "edit" || $mode eq "workflow") && !$readonly){
-      my $fromquery=Query->Param("Formated_$name");
-      if (defined($fromquery)){
-         $d=$fromquery;
-      }
-      if ($self->FieldCache->{LastDrop}){
-         return($self->FieldCache->{LastDrop});
-      }
-      return("<input class=finput type=text name=Formated_$name value=\"$d\">");
-   }
-   if (ref($d) eq "ARRAY"){
-      my $vjoinconcat=$self->{vjoinconcat};
-      $vjoinconcat="; " if (!defined($vjoinconcat));
-      $d=join($vjoinconcat,@$d);
-   }
-   if (!($d=~m/\[\?\]$/)){
-      $d=$self->addWebLinkToFacility($d,$current) if ($mode eq "Html");
-      $d=$self->addWebLinkToFacility($d,$current) if ($mode eq "HtmlDetail");
-      $d.=$self->getHtmlContextMenu($current) if ($mode eq "HtmlDetail");
-   }
-   if ($mode eq "SOAP"){
-      $d=~s/&/&amp;/g;;
-   }
-   return($d);
+   return($self->SUPER::FormatedDetail($current,$mode));
 }
 
 sub RawValue
@@ -199,20 +169,20 @@ sub RawValue
    my $self=shift;
    my $d=$self->SUPER::RawValue(@_);
    my $current=shift;
-
-   if ($self->{VJOINSTATE} eq "not found"){
-      if (defined($self->{altnamestore})){
-         my $alt=$self->getParent->getField($self->{altnamestore});
-         if (!defined($alt)){
-            $d="ERROR - no alt field $self->{altnamestore}";
-         }
-         else{
-            $d=$alt->RawValue($current);
-            $d.="[?]";
-         }
+   my $idfield=$self->getParent->IdField();
+   if (defined($idfield)){
+      my $refid=$idfield->RawValue($current);
+      my $obj=$self->getParent()->SelfAsParentObject();
+      my $issuerec=$self->getWorkflowRec($obj,$refid);
+      if (defined($issuerec)){
+         return("DataIssue ".
+                $self->getParent->T("since","kernel::Field::IssueState")." ".
+                $issuerec->{eventstart}." GMT");
       }
+      return("OK");
    }
-   return($d);
+
+   return("?");
 }
 
 
