@@ -88,7 +88,7 @@ sub new
                 htmldetail    =>0,
                 uploadable    =>0,
                 vjointo       =>'base::user',
-                vjoinon       =>['databossid'=>'userid'],
+                vjoinon       =>['semid'=>'userid'],
                 vjoindisp     =>'email'),
 
       new kernel::Field::Link(

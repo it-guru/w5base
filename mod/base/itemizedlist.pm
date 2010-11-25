@@ -146,7 +146,7 @@ sub new
                 dataobjattr   =>'itemizedlist.realeditor'),
 
    );
-   $self->setDefaultView(qw(linenumber selectlabel fullname cistatus cdate mdate));
+   $self->setDefaultView(qw(linenumber selectlabel fullname cistatus mdate));
    $self->setWorktable("itemizedlist");
    return($self);
 }
