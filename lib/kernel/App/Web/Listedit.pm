@@ -1285,9 +1285,11 @@ sub Detail
    my %param=(functions   =>\@WfFunctions,
               pages       =>[$self->getHtmlDetailPages($p,$rec)],
               activpage  =>$p,
-              tabwidth    =>"20%",
               page        =>$page,
              );
+   if (($#{$param{pages}})/2<4){  # if there less then 5 pages, expand them
+      $param{tabwidth}="20%"; # as mutch as it looks good
+   }
    print TabSelectorTool("ModeSelect",%param);
    print "<script language=\"JavaScript\">".$self->getDetailFunctionsCode($rec).
           "</script>";

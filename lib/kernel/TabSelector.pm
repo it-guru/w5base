@@ -63,9 +63,11 @@ EOF
          $state="Activ" if ($CurMode eq $f);
          my $flink="<span class=${name}$state ".
                    "onclick=${name}Set(\"$f\")>".
-                   "$pages{${f}}</span>";
-         my $width="";
-         $width=" width=$param{tabwidth}" if (defined($param{tabwidth}));
+                   "$pages{${f}}&nbsp;&nbsp;&nbsp;</span>";
+         my $width=" width=1% nowrap";
+         if (defined($param{tabwidth})){
+            $width=" width=$param{tabwidth}";
+         }
          push(@ml,"<td class=${name}$state$width>$flink</td>");
       }
    }

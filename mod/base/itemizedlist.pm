@@ -47,6 +47,16 @@ sub new
                 dataobjattr   =>'itemizedlist.id'),
                                                   
       new kernel::Field::Text(
+                name          =>'selectlabel',
+                label         =>'Select label',
+                dataobjattr   =>'itemizedlist.selectlabel'),
+
+      new kernel::Field::Text(
+                name          =>'name',
+                label         =>'internal name',
+                dataobjattr   =>'itemizedlist.name'),
+
+      new kernel::Field::Text(
                 name          =>'fullname',
                 htmldetail    =>sub{
                    my ($self,$mode,%param)=@_;
@@ -64,16 +74,6 @@ sub new
                    return($current->{'en_fullname'});
                 },
                 label         =>'full name'),
-
-      new kernel::Field::Text(
-                name          =>'name',
-                label         =>'internal name',
-                dataobjattr   =>'itemizedlist.name'),
-
-      new kernel::Field::Text(
-                name          =>'selectlabel',
-                label         =>'Select label',
-                dataobjattr   =>'itemizedlist.selectlabel'),
 
       new kernel::Field::Select(
                 name          =>'cistatus',
