@@ -1530,6 +1530,72 @@ sub HandleInfoAboSubscribe
 }
 
 
+sub getHtmlDetailPages
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+
+   my @l=$self->SUPER::getHtmlDetailPages($p,$rec);
+   if (defined($rec)){
+      push(@l,"OPInfo"=>$self->T("OperatorInfo"));
+   }
+   return(@l);
+}
+
+
+sub getHtmlDetailPageContent
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+
+   my $page;
+   my $idname=$self->IdField->Name();
+   my $idval=$rec->{$idname};
+
+   return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "OPInfo");
+
+   if ($p eq "OPInfo"){
+      Query->Param("$idname"=>$idval);
+      $idval="NONE" if ($idval eq "");
+
+      my $q=new kernel::cgi({});
+      $q->Param("$idname"=>$idval);
+      my $urlparam=$q->QueryString();
+      $page.="<iframe class=HtmlDetailPage name=HtmlDetailPage ".
+            "src=\"OPInfo?$urlparam\"></iframe>";
+   }
+   $page.=$self->HtmlPersistentVariables($idname);
+   return($page);
+}
+
+sub getValidWebFunctions
+{
+   my $self=shift;
+
+   return($self->SUPER::getValidWebFunctions(@_),"OPInfo");
+}
+
+
+sub OPInfo
+{
+   my $self=shift;
+   print $self->HttpHeader();
+   print $self->HtmlHeader(
+                           title=>"OP Info comming sone!",
+                           js=>['toolbox.js'],
+                           style=>['default.css',
+                                'work.css',
+                                'Output.HtmlDetail.css',
+                                'kernel.App.Web.css']);
+
+   print ("This is IT!");
+
+
+}
+
+
+
+
 
 
 
