@@ -66,7 +66,7 @@ sub new
                 label         =>'full name'),
 
       new kernel::Field::Text(
-                name          =>'internalname',
+                name          =>'name',
                 label         =>'internal name',
                 dataobjattr   =>'itemizedlist.name'),
 
@@ -167,6 +167,19 @@ sub Validate
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
+
+   if ((my $v=effVal($oldrec,$newrec,"name"))=~m/^\S*$/){
+      $self->LastMsg(ERROR,"invalid internal name");
+      return(undef);
+   }
+   if ((my $v=effVal($oldrec,$newrec,"en_fullname"))=~m/^\S*$/){
+      $self->LastMsg(ERROR,"invalid english name");
+      return(undef);
+   }
+   if ((my $v=effVal($oldrec,$newrec,"de_fullname"))=~m/^\S*$/){
+      $self->LastMsg(ERROR,"invalid german name");
+      return(undef);
+   }
 
 
 

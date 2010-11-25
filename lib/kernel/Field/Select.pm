@@ -81,7 +81,12 @@ sub getPostibleValues
       #$self->vjoinobj->SetFilter({$self->{vjoinon}->[1]=>
       #                           [$joinonval]});
      # my $joinidfield=$self->vjoinobj->IdField->Name();
-      my $joinidfield=$self->vjoinobj->getField($self->{vjoinon}->[1])->Name();
+      my $joinidfieldobj=$self->vjoinobj->getField($self->{vjoinon}->[1]);
+      if (!defined($joinidfieldobj)){
+         msg(ERROR,"program bug - can not find field ".$self->{vjoinon}->[1]);
+         exit(1);
+      }
+      my $joinidfield=$joinidfieldobj->Name();
       my @view=($self->{vjoindisp},$joinidfield);
       my @l=$self->vjoinobj->getHashList(@view); 
       my @res=(); 

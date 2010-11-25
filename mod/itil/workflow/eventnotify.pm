@@ -463,27 +463,25 @@ sub getDynamicFields
                 container     =>'headref'),
 
       new kernel::Field::Select(
-                name          =>'eventstatreason',
+                name          =>'eventstatreasonFrontendText',
+                label         =>'Event reason',
+                weblinkto     =>"none",
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'eventnotifystat',
-                value         =>['',
-                                 'EVr.application',
-                                 'EVr.human',
-                                 'EVr.thirdparty',
-                                 'EVr.room',
-                                 'EVr.power',
-                                 'EVr.overload',
-                                 'EVr.hardwaredef',
-                                 'EVr.inanalyse',
-                                 'EVr.swext',
-                                 'EVr.swtsi',
-                                 'EVr.other',
-                                 'EVr.infrastruct',
-                                 'EVr.swbug',
-                                 'EVr.swold',
-                                 'EVr.technically'
-                                 ],
-                label         =>'Event reason',
+                vjointo       =>'base::itemizedlist',
+                vjoinbase     =>{
+                   selectlabel=>\'itil::workflow::eventnotify::eventstatreason',
+                },
+                vjoineditbase =>{
+                   selectlabel=>\'itil::workflow::eventnotify::eventstatreason',
+                   cistatusid=>\'4'
+                },
+                vjoinon       =>['eventstatreason'=>'name'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'eventstatreason',
+                label         =>'Event reason internal',
                 container     =>'headref'),
 
       new kernel::Field::Select(
