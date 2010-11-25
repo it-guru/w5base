@@ -1,0 +1,8 @@
+'base::itemizedlist'=>{de=>'konfigurierbare Auswahlliste',
+                       en=>'configurable itemized list'},
+'full name'=>{de=>'vollständiger Anzeigename'},
+'internal name'=>{de=>'interner Name'},
+'en fullname'=>{de=>'englischer Anzeigename'},
+'de fullname'=>{de=>'deutscher Anzeigename'},
+'Select label'=>{de=>'SelectBox Bezeichnung'},
+'order prio'=>{de=>'sortier Position'},

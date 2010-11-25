@@ -233,6 +233,19 @@ sub Init
 
    $self->RegisterObj("Tools.workflow",
                       "base::workflow",
+                      prio=>1,
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("Tools.workflownew",
+                      "base::workflow",
+                      func=>'New',
+                      prio=>2,
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("sysadm.itemizedlist",
+                      "base::itemizedlist",
+                      func=>'MainWithNew',
+                      prio=>4000,
                       defaultacl=>['admin']);
    
    $self->RegisterObj("Tools.workflow.action",
@@ -274,11 +287,6 @@ sub Init
                       "base::workflowws",
                       func=>'New',
                       defaultacl=>['admin']);
-   
-   $self->RegisterObj("Tools.workflownew",
-                      "base::workflow",
-                      func=>'New',
-                      defaultacl=>['valid_user']);
    
    $self->RegisterObj("Tools.teamtools",
                       "tmpl/welcome",
