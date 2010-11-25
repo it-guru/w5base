@@ -43,7 +43,7 @@ sub qcheckRecord
    my $rec=shift;
    my $errorlevel=0;
 
-   if ($rec->{email} ne ""){
+   if ($rec->{email} ne "" && $rec->{cistatusid}<=5){
       my $wiw=getModuleObject($self->getParent->Config(),"tswiw::user");
       $wiw->SetFilter([{email=>\$rec->{email}},{email2=>\$rec->{email}},
                        {email3=>\$rec->{email}}]);
