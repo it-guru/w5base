@@ -218,6 +218,7 @@ sub new
                    my $self=shift;
                    my $current=shift;
                    my $m="";
+                   my $q="";
                    $m=$current->{label};
                    $m="<b>$m</b>" if ($m ne "");
                    $m.="<br>" if ($m ne "");
@@ -236,23 +237,14 @@ sub new
                    if ($o ne ""){
                       $m.="<br>$o";
                    }
+                   $q=" $current->{country} $current->{zipcode} ".
+                      "$current->{location} ; $current->{address1}";
+                   my $queryobj=new kernel::cgi({q=>$q});
+                   $q=$queryobj->QueryString();
+                   $m="<a href='http://maps.google.de?$q' target=_blank>".
+                      $m."</a>";
                    return($m);
                 },
-                address=>\&AddressBuild),
-
-      new kernel::Field::GoogleAddrChk(
-                name          =>'googlechk',
-                group         =>'map',
-                uploadable    =>0,
-                htmldetail    =>0,
-                searchable    =>0,
-                htmlwidth     =>'200px',
-                label         =>'Google Address Check',
-                depend        =>['country','address1',
-                                 'label',
-                                 'gpslongitude',
-                                 'gpslatitude',
-                                 'zipcode','location'],
                 address=>\&AddressBuild),
 
       new kernel::Field::Number(
@@ -405,8 +397,11 @@ sub SimilarCheck
 
    my $address1=$current->{address1};
    $address1=~s/\s/*/g;
+   $address1=~s/[\d-]/*/g;
+   $address1=~s/[a-z]$/*/i;
    my $location=$current->{location};
    $location=~s/\s/*/g;
+   $location=~s/\d/*/g;
    push(@flt,{location=>$location,
               address1=>$address1});
 
