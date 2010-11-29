@@ -502,6 +502,7 @@ sub Validate
    }
 
    my $name="";
+   $location=~s/\./_/g;
    $name.=($name ne "" && $country  ne "" ? "." : "").$country;
    $name.=($name ne "" && $location ne "" ? "." : "").$location;
    $name.=($name ne "" && $address1 ne "" ? "." : "").$address1;
@@ -513,7 +514,8 @@ sub Validate
    $name=~s/\xD6/Oe/g;
    $name=~s/\xC4/Ae/g;
    $name=~s/\xDF/ss/g;
-   $name=~s/[\s\/,]+/_/g;
+   $name=~s/[\s\/,\/]+/_/g;
+   $name=~s/_+/_/g;
    $newrec->{'name'}=$name;
    if (!defined($oldrec) && !defined($newrec->{label})){
       $newrec->{label}="";
@@ -703,10 +705,9 @@ sub Normalize
    if ($rec->{zipcode} eq "0"){
       $rec->{zipcode}="";
    }
-   $rec->{country}=~s/\.//;
+   $rec->{location}=~s/^St\.{0,1}\s/Sankt /;  # Sankt Abkürzung
    $rec->{label}=~s/\.//;
    $rec->{address1}=~s/\.//;
-   $rec->{location}=~s/\.//;
    $rec->{address1}=~s/\(.*\)//;  # keine Klammerzusätze
    $rec->{location}=~s/\(.*\)//;  # keine Klammerzusätze
 }

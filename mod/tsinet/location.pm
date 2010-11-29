@@ -71,6 +71,11 @@ sub new
                 label         =>'Location prio',
                 dataobjattr   =>'prio'),
 
+#      new kernel::Field::Text(
+#                name          =>'validto',
+#                label         =>'Valid to',
+#                dataobjattr   =>'validto'),
+
       new kernel::Field::Text(
                 name          =>'customer',
                 label         =>'Customer',
