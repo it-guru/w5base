@@ -224,10 +224,10 @@ sub new
                 prepRawValue  =>\&SystemPartOfCorrection,
                 dataobjattr   =>'amcomputer.psystempartofasset'),
 
-      new kernel::Field::Text(
-                name          =>'costallocactive',
-                label         =>'Cost allocation active',
-                dataobjattr   =>'amcomputer.bcostallocactive'),
+#      new kernel::Field::Text(
+#                name          =>'costallocactive',
+#                label         =>'Cost allocation active',
+#                dataobjattr   =>'amcomputer.bcostallocactive'),
 
       new kernel::Field::Text(
                 name          =>'systemola',

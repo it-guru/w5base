@@ -111,9 +111,9 @@ sub initSqlWhere
    my $where="amtsiservice.lservicetypeid=amtsiservicetype.ltsiservicetypeid ".
        "and amportfolio.lportfolioitemid=amcomputer.litemid ".
        "and amportfolio.lportfolioitemid=amtsiservice.lportfolioid ".
-       "and amtsiservice.bdelete=0 ".
-       "and ((amtsiservice.dstart<=sysdate or amtsiservice.dstart is null) ".
-       "and (amtsiservice.dend>=sysdate or amtsiservice.dend is null)) ";
+       "and amtsiservice.bdelete=0 ";
+   #    "and (amtsiservice.dstart<=sysdate or amtsiservice.dstart is null) ";
+   #    "and (amtsiservice.dend>=sysdate or amtsiservice.dend is null)) ";
    return($where);
 }
 
