@@ -80,7 +80,8 @@ sub new
       new kernel::Field::Date(
                 name          =>'validto',
                 label         =>'Valid to',
-                dataobjattr   =>'validto'),
+                sqlorder      =>'NONE',
+                dataobjattr   =>"decode(to_char(validto,'YYYY-MM-DD'),'2100-01-01',to_date(null,'YYYY-MM-DD HH24:MI:SS'),validto)"),
 
       new kernel::Field::Text(
                 name          =>'customer',
