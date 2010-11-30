@@ -115,7 +115,7 @@ sub ImportTSInetLocation
                   }
                   else{
                      push(@problems," - unknown prio $rec->{prio} for ".
-                                    "streetser $rec->{id} ".
+                                    "streetser $rec->{streetser} ".
                                     "($rec->{location};$rec->{address1})");
                   }
                   if (defined($relmode)){

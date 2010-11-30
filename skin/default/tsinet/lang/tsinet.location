@@ -1,4 +1,5 @@
 'tsinet::location'=>{de=>'TSINET Standort',en=>'TSINET Location'},
 'Location prio'=>{de=>'Standort Priorität'},
 'Valid to'=>{de=>'Gültig bis'},
+'Customer'=>{de=>'Kunde'},
 'fieldgroup.w5baselocation'=>{de=>'W5Base Standort',en=>'W5Base Location'},

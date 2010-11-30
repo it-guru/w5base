@@ -36,12 +36,12 @@ sub new
                 name          =>'id',
                 sqlorder      =>'desc',
                 label         =>'TSINETid',
-                dataobjattr   =>'concat(streetser,kunde)'),
+                dataobjattr   =>"concat(concat(streetser,'-'),kunde)"),
 
       new kernel::Field::Text(
                 name          =>'streetser',
                 sqlorder      =>'desc',
-                label         =>'TSINETid',
+                label         =>'StreetSer',
                 dataobjattr   =>'streetser'),
 
       new kernel::Field::Text(
@@ -77,7 +77,7 @@ sub new
                 label         =>'Location prio',
                 dataobjattr   =>'prio'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Date(
                 name          =>'validto',
                 label         =>'Valid to',
                 dataobjattr   =>'validto'),
