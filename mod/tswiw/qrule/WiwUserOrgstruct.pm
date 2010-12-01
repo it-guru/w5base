@@ -333,7 +333,7 @@ sub createGrp
    }
    elsif ($wiwrec->{parentid} eq "DE039607"){  # T-Deutschland
       my @view=qw(id name);
-      $grp->SetFilter({fullname=>\"DTAG.TDE"});
+      $grp->SetFilter({fullname=>\"DTAG.TDG"});
       $grp->SetCurrentView(@view);
       my ($rec,$msg)=$grp->getFirst();
       if (!defined($rec)){
@@ -349,7 +349,7 @@ sub createGrp
          else{
             $parentoftsi=$rec->{grpid};
          }
-         my %newgrp=(name=>"TDE",parent=>'DTAG',cistatusid=>4);
+         my %newgrp=(name=>"TDG",parent=>'DTAG',cistatusid=>4);
          $parentid=$grp->ValidatedInsertRecord(\%newgrp);
       }
       else{
