@@ -621,7 +621,7 @@ sub ImportSystem
 {
    my $self=shift;
 
-   my $importname=Query->Param("importname");
+   my $importname=trim(Query->Param("importname"));
    if (Query->Param("DOIT")){
       if ($self->Import({importname=>$importname})){
          Query->Delete("importname");
