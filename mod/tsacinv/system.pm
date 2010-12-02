@@ -724,6 +724,13 @@ sub Import
       if (in_array(\@mandators,200)){
          $mandatorid=200;
       }
+      else{
+         $mandatorid=$mandators[0];
+      }
+      if ($mandatorid eq ""){
+         $self->LastMsg(ERROR,"Can't find any mandator");
+         return(undef);
+      }
 
       # final: do the insert operation
       my $newrec={name=>$sysrec->{systemname},
