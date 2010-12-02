@@ -97,7 +97,7 @@ sub qcheckRecord
             if (defined($msg)){
                msg(ERROR,"LDAP problem:%s",$msg);
             }
-            if ($urec->{posix} ne ""){
+            if ($urec->{posix} ne "" && $urec->{cistatusid}<6){
                msg(ERROR,"E-Mail '%s' not found in LDAP but with POSIX entry",
                           $urec->{email});
             }
