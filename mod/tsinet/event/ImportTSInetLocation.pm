@@ -56,6 +56,7 @@ sub ImportTSInetLocation
    my %thloc;
 
    $tsiloc->SetCurrentView(qw(ALL));
+   #$tsiloc->SetCurrentOrder("NONE");
    #$tsiloc->SetFilter({location=>"Bamberg"});
    #$tsiloc->SetFilter({location=>"Berlin"});
    my ($rec,$msg)=$tsiloc->getFirst(unbuffered=>1);
@@ -75,6 +76,7 @@ sub ImportTSInetLocation
          }
          if ($locvalid){ 
             my $org=$rec->{customer};
+            $org=~s/^DTAG\.TDE/DTAG.TDG/;
             $grp->ResetFilter();
             $grp->SetFilter({fullname=>\$org});
             my ($grprec,$msg)=$grp->getOnlyFirst(qw(id fullname name));
