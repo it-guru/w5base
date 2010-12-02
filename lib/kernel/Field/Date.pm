@@ -326,6 +326,7 @@ sub getSelectField
       }
    }
    if ($mode eq "order"){
+      return(undef) if (lc($self->{sqlorder}) eq "none");
       $_=$db->DriverName();
       case: {   # did not works on tsinet Oracle database
          /^oracle$/i and do {

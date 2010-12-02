@@ -215,6 +215,19 @@ sub new
                 name          =>'adm2id',
                 dataobjattr   =>'swinstance.adm2'),
 
+      new kernel::Field::TextDrop(
+                name          =>'system',
+                label         =>'System',
+                group         =>'systems',
+                vjointo       =>'itil::system',
+                vjoineditbase =>{'cistatusid'=>[2,3,4]},
+                vjoinon       =>['systemid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'systemid',
+                dataobjattr   =>'swinstance.system'),
+
       new kernel::Field::SubList(
                 name          =>'systems',
                 label         =>'Systems',
@@ -443,6 +456,7 @@ sub new
                 dataobjattr   =>'lnkcontact.croles'),
 
       new kernel::Field::QualityText(),
+      new kernel::Field::IssueState(),
       new kernel::Field::QualityState(),
       new kernel::Field::QualityOk(),
       new kernel::Field::QualityLastDate(
@@ -706,6 +720,9 @@ sub isViewValid
              systems contacts attachments source);
    if (defined($rec) && $rec->{'runonclusts'}){
       push(@all,"cluster");
+   }
+   if ($self->IsMemberOf("admin")){
+      push(@all,"qc");
    }
    return(@all);
 }

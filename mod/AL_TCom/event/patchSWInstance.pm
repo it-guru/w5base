@@ -48,6 +48,7 @@ sub patchSWInstance
    my %n;
    my $n=0;
    my $swi=getModuleObject($self->Config,"itil::swinstance");
+   my $swiop=$swi->Clone();
    $swi->SetFilter({cistatusid=>"<=5"});
    $swi->SetCurrentOrder("NONE");
    $swi->SetCurrentView(qw(ALL));
@@ -55,6 +56,11 @@ sub patchSWInstance
    if (defined($rec)){
       do{
          printf("fifi fullname=%s n=%s\n",$rec->{fullname},$#{$rec->{systems}}+1);
+         if ($#{$rec->{systems}}!=-1){
+            $swiop->ValidatedUpdateRecord($rec,{systemid=>$rec->{systems}->[0]->{systemid}},{id=>\$rec->{id}});
+             
+         }
+print Dumper($rec->{systems});
         
  
          ($rec,$msg)=$swi->getNext();
