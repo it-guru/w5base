@@ -228,19 +228,19 @@ sub new
                 name          =>'systemid',
                 dataobjattr   =>'swinstance.system'),
 
-      new kernel::Field::SubList(
-                name          =>'systems',
-                label         =>'Systems',
-                group         =>'systems',
-                allowcleanup  =>1,
-                subeditmsk    =>'subedit.swinstance',
-                vjointo       =>'itil::lnkswinstancesystem',
-                vjoinbase     =>[{systemcistatusid=>"<=5"}],
-                vjoinon       =>['id'=>'swinstanceid'],
-                vjoindisp     =>['system','systemsystemid','systemcistatus',
-                                 'shortdesc'],
-                vjoininhash   =>['system','systemsystemid','systemcistatus',
-                                 'systemid']),
+  #    new kernel::Field::SubList(
+  #              name          =>'systems',
+  #              label         =>'Systems',
+  #              group         =>'systems',
+  #              allowcleanup  =>1,
+  #              subeditmsk    =>'subedit.swinstance',
+  #              vjointo       =>'itil::lnkswinstancesystem',
+  #              vjoinbase     =>[{systemcistatusid=>"<=5"}],
+  #              vjoinon       =>['id'=>'swinstanceid'],
+  #              vjoindisp     =>['system','systemsystemid','systemcistatus',
+  #                               'shortdesc'],
+  #              vjoininhash   =>['system','systemsystemid','systemcistatus',
+  #                               'systemid']),
 
       new kernel::Field::TextDrop(
                 name          =>'servicesupport',

@@ -67,7 +67,7 @@ sub qcheckRecord
    $mainuser->ResetFilter();
    $mainuser->SetFilter({userid=>\$rec->{userid}});
    my ($urec)=$mainuser->getOnlyFirst(qw(email surname givenname usertyp 
-                                         groups posix));
+                                         groups posix cistatusid));
    if (defined($urec)){ # found correct urec record for user
      # print STDERR Dumper($urec);
       if (defined($urec) && $urec->{email} ne "" &&

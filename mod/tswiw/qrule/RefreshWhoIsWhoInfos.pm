@@ -61,10 +61,35 @@ sub qcheckRecord
       $errorlevel=0;
       my $wiw=getModuleObject($self->getParent->Config(),"tswiw::orgarea");
       $wiw->SetFilter({touid=>\$rec->{srcid}});
-      my ($wiwrec,$msg)=$wiw->getOnlyFirst(qw(name));
+      my ($wiwrec,$msg)=$wiw->getOnlyFirst(qw(name shortname));
       if (defined($wiwrec)){
          if ($wiwrec->{name} ne $rec->{description}){
             $forcedupd->{description}=$wiwrec->{name};
+         }
+      }
+      {
+         #######################################################
+         my $c=$rec->{comments};
+         my $infopref="WhoIsWho tOuSD:";
+         my $infoline=$infopref.$wiwrec->{shortname};
+         #######################################################
+        
+        
+         my $qinfoline=quotemeta($infoline);
+          
+        
+         if (!($c=~m/(^|\n)$qinfoline(\n|$)/s)){
+            if (($c=~m/$infopref/)){
+               $c=~s/(^|\n)$infopref.*?(\n|$)//gs;
+            }
+            if ($c ne "" && !($c=~m/\n$/s)){
+               $c.="\n";
+            }
+            $c.=$infoline;
+         }
+         #######################################################
+         if (trim($c) ne trim($rec->{comments})){
+            $forcedupd->{comments}=$c;
          }
       }
    }

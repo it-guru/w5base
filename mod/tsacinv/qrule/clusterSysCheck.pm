@@ -116,7 +116,7 @@ sub qcheckRecord
                           \@qmsg,\@dataissue,\$errorlevel,
                           mode=>'leftouterlink');
       if (keys(%$forcedupd)){
-         printf STDERR ("found DataIssue cluster on system $rec->{name}\n");
+       #  printf STDERR ("found DataIssue cluster on system $rec->{name}\n");
          if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,
              {id=>\$rec->{id}})){
             push(@qmsg,"all desired fields has been updated: ".
