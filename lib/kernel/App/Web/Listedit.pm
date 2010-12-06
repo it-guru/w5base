@@ -1937,6 +1937,15 @@ sub Upload
                                             if (defined($fobj)){
                                                $label=$fobj->Label();
                                             }
+                                            if (!defined($fobj)){
+                                               $self->LastMsg(ERROR,
+                                                  'field "%s" is not '.
+                                                  'allowed to be '.
+                                                  'uploaded',
+                                                  $label);
+                                               $fldchk=0;
+                                               last;
+                                            }
                                             if ($fobj->Name() ne "srcid"){
                                                $self->LastMsg(ERROR,
                                                   'field "%s" is not '.

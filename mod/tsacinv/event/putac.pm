@@ -647,13 +647,11 @@ sub ApplicationModified
                foreach my $irec ($swinstance->getHashList(qw(ALL))){
                   $CurrentEventId="Instance '$irec->{fullname}'";
                   my $systemid;
-                  foreach my $system (sort({$a->{systemsystemid} cmp 
-                                            $b->{systemsystemid}} 
-                                             @{$irec->{systems}})){
-                     if ($system->{systemsystemid} ne ""){
-                        $systemid=$system->{systemsystemid};
-                        last;
-                     }
+                  if ($irec->{system} ne ""){
+                     my $sys=getModuleObject($self->Config,"itil::system");
+                     $sys->SetFilter({id=>\$irec->{systemid}});
+                     my ($sysrec,$msg)=$sys->getOnlyFirst(qw(systemid));
+                     $systemid=$sys->{systemid};
                   }
                   if ($systemid ne ""){
                      my $assignment=$rec->{swteam};
