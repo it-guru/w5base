@@ -1942,7 +1942,7 @@ sub Upload
                                                   'field "%s" is not '.
                                                   'allowed to be '.
                                                   'uploaded',
-                                                  $label);
+                                                  $fieldname);
                                                $fldchk=0;
                                                last;
                                             }

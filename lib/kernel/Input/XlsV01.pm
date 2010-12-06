@@ -138,9 +138,20 @@ sub Process
             if ($cell->{Type} eq "Date" && $v ne ""){
                $v=ExcelFmt("dd.mm.yyyy hh:mm:ss",$cell->{Val});
             }
-            print msg(INFO,"cell (c=$col/r=$row)=%s",$v) if ($self->{debug});
             $isempty=0 if (!($v=~m/^\s*$/));
-            $rec{$self->{Fields}->[$col]}=$v;
+            print msg(INFO,"cell (c=$col/r=$row)='%s'",$v) if ($self->{debug});
+            if (!defined($self->{Fields}->[$col]) ||
+                 $self->{Fields}->[$col] eq ""){
+               if ($v ne ""){
+                  print(msg(ERROR,"data without header colum in col '%d'",$col));
+               }
+               else{
+                  print(msg(WARN,"data without header colum in col '%d'",$col));
+               }
+            }
+            else{
+               $rec{$self->{Fields}->[$col]}=$v;
+            }
          }
       }
       next if ($isempty);
