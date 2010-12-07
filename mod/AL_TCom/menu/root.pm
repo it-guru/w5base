@@ -152,6 +152,10 @@ sub Init
                       func=>'MainWithNew',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.itclust.lnkitclustsvc.sw",
+                      "itil::lnksoftwareitclustsvc",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.system",
                       "AL_TCom::system",
                       defaultacl=>['valid_user']);

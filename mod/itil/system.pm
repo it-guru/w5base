@@ -240,6 +240,15 @@ sub new
                                  'liccontractid',
                                  'software','version','quantity']),
 
+      new kernel::Field::SubList(
+                name          =>'swinstances',
+                label         =>'Software instances',
+                group         =>'swinstances',
+                vjointo       =>'itil::swinstance',
+                vjoinbase     =>[{cistatusid=>"<=5"}],
+                vjoinon       =>['id'=>'systemid'],
+                vjoindisp     =>['fullname','swnature']),
+
       new kernel::Field::Text(
                 name          =>'shortdesc',
                 group         =>'misc',
@@ -1261,7 +1270,8 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   my @all=qw(header default software admin logsys contacts misc opmode 
+   my @all=qw(header default swinstances 
+              software admin logsys contacts misc opmode 
               physys ipaddresses phonenumbers sec applications
               location source customer history
               attachments control systemclass interview);
@@ -1332,7 +1342,8 @@ sub getDetailBlockPriority
    return(
           qw(header default admin phonenumbers logsys location 
              physys systemclass cluster
-             opmode sec applications customer software ipaddresses
+             opmode sec applications customer software 
+             swinstances ipaddresses
              contacts misc attachments control source));
 }
 

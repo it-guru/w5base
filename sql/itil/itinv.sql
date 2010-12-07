@@ -383,7 +383,7 @@ create table lnkapplsystem (
 create table lnksoftwaresystem (
   id           bigint(20) NOT NULL,
   software     bigint(20) NOT NULL,
-  system       bigint(20) NOT NULL,
+  system       bigint(20) default NULL,
   liccontract  bigint(20),
   comments     longtext    default NULL,
   additional   longtext    default NULL,
@@ -899,3 +899,11 @@ set FOREIGN_KEY_CHECKS=1;
 alter table system add is_loadbalacer bool default '0', add key(is_loadbalacer);
 alter table system add is_housing bool default '0', add key(is_housing);
 alter table itclust add allowifupdate int(2) default 0;
+set FOREIGN_KEY_CHECKS=0;
+alter table lnksoftwaresystem  add FOREIGN KEY fk_sysswi (system)
+          REFERENCES system (id) ON DELETE CASCADE;
+alter table lnksoftwaresystem  add lnkitclustsvc bigint(20) default NULL;
+alter table lnksoftwaresystem  add FOREIGN KEY fk_itclustsvcsw (lnkitclustsvc)
+          REFERENCES lnkitclustsvc (id) ON DELETE CASCADE;
+set FOREIGN_KEY_CHECKS=1;
+alter table swinstance   add lnksoftwaresystem bigint(20) default NULL;

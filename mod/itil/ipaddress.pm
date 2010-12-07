@@ -77,6 +77,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'systemid',
+                selectfix     =>1,
                 label         =>'SystemID',
                 group         =>'relatedto',
                 dataobjattr   =>'ipaddress.system'),
@@ -101,6 +102,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'itclustsvcid',
+                selectfix     =>1,
                 label         =>'ClusterserviceID',
                 group         =>'relatedto',
                 dataobjattr   =>'ipaddress.lnkitclustsvc'),
@@ -117,6 +119,15 @@ sub new
                 htmlwidth     =>'280px',
                 group         =>'further',
                 htmldetail    =>0,
+                uivisible     =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+
+                   return(0) if ($current->{systemid} eq "");
+                   return(1);
+                },
                 label         =>'Systems location',
                 vjointo       =>'itil::system',
                 vjoinon       =>['furthersystemid'=>'id'],
@@ -128,6 +139,15 @@ sub new
                 group         =>'further',
                 htmldetail    =>0,
                 readonly      =>1,
+                uivisible     =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+
+                   return(0) if ($current->{systemid} eq "");
+                   return(1);
+                },
                 label         =>'Systems SystemID',
                 vjointo       =>'itil::system',
                 vjoinon       =>['furthersystemid'=>'id'],
@@ -139,6 +159,15 @@ sub new
                 group         =>'further',
                 htmldetail    =>0,
                 readonly      =>1,
+                uivisible     =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+
+                   return(0) if ($current->{systemid} eq "");
+                   return(1);
+                },
                 label         =>'Systems CI-Status',
                 vjointo       =>'itil::system',
                 vjoinon       =>['furthersystemid'=>'id'],
@@ -146,10 +175,19 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'applicationnames',
-                label         =>'Applicationnames',
+                label         =>'Systems Applicationnames',
                 group         =>'further',
                 readonly      =>1,
                 htmldetail    =>0,
+                uivisible     =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+
+                   return(0) if ($current->{systemid} eq "");
+                   return(1);
+                },
                 vjointo       =>'itil::lnkapplsystem',
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
                 vjoinon       =>['furthersystemid'=>'systemid'],
@@ -157,9 +195,18 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'applcustomer',
-                label         =>'Application Customer',
+                label         =>'Systems Application Customer',
                 readonly      =>1,
                 htmldetail    =>0,
+                uivisible     =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+
+                   return(0) if ($current->{systemid} eq "");
+                   return(1);
+                },
                 group         =>'further',
                 vjointo       =>'itil::lnkapplsystem',
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
@@ -168,10 +215,20 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'tsmemail',
-                label         =>'TSM E-Mail',
+                label         =>'Systems TSM E-Mail',
                 group         =>'further',
                 readonly      =>1,
                 htmldetail    =>0,
+                searchable    =>0,
+                uivisible     =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+
+                   return(0) if ($current->{systemid} eq "");
+                   return(1);
+                },
                 vjointo       =>'itil::lnkapplsystem',
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
                 vjoinon       =>['furthersystemid'=>'systemid'],
@@ -179,10 +236,20 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'tsm2email',
-                label         =>'deputy TSM E-Mail',
+                label         =>'Systems deputy TSM E-Mail',
                 group         =>'further',
                 readonly      =>1,
                 htmldetail    =>0,
+                searchable    =>0,
+                uivisible     =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+
+                   return(0) if ($current->{systemid} eq "");
+                   return(1);
+                },
                 vjointo       =>'itil::lnkapplsystem',
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
                 vjoinon       =>['furthersystemid'=>'systemid'],

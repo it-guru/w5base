@@ -226,7 +226,35 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'systemid',
+                selectfix     =>1,
                 dataobjattr   =>'swinstance.system'),
+
+      new kernel::Field::Select(
+                name          =>'lnksoftwaresystem',
+                htmleditwidth =>'80%',
+                label         =>'Software-Installation',
+                group         =>'softwareinst',
+                allowempty    =>1,
+                vjoinbase     =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   if ($current->{systemid} ne ""){
+                      return({systemid=>\$current->{systemid}});
+                   }
+                   if ($current->{itclustsid} ne ""){
+                      return({itclustsvcid=>\$current->{itclustsid}});
+                   }
+                   return({id=>\'NONE'});
+                },
+                vjointo       =>'itil::lnksoftware',
+                vjoinon       =>['lnksoftwaresystemid'=>'id'],
+                vjoindisp     =>'fullname'),
+
+
+      new kernel::Field::Link(
+                name          =>'lnksoftwaresystemid',
+                group         =>'softwareinst',
+                dataobjattr   =>'swinstance.lnksoftwaresystem'),
 
   #    new kernel::Field::SubList(
   #              name          =>'systems',
@@ -654,6 +682,12 @@ sub Validate
       }
    }
    ########################################################################
+   if (effChanged($oldrec,$newrec,"runonclusts")){
+      $newrec->{lnksoftwaresystemid}=undef;
+      $newrec->{systemid}=undef;
+      $newrec->{itclustsid}=undef;
+   }
+   ########################################################################
    if (exists($newrec->{swport})){
       if (effVal($oldrec,$newrec,"swport")=~m/^\s*$/){
          $newrec->{swport}=undef;
@@ -674,6 +708,10 @@ sub Validate
       $newrec->{sslend}=undef;
       $newrec->{sslstate}=undef;
       $newrec->{sslcheck}=undef;
+   }
+   if (effChanged($oldrec,$newrec,"systemid") &&  # reset software inst
+       !exists($newrec->{lnksoftwaresystemid})){
+      $newrec->{lnksoftwaresystemid}=undef;
    }
    if (!effVal($oldrec,$newrec,"runonclusts")){
       if (effVal($oldrec,$newrec,"itclustsid") ne ""){
@@ -717,9 +755,12 @@ sub isViewValid
    my $rec=shift;
    return("header","default") if (!defined($rec));
    my @all=qw(header default adm sec ssl misc history
-             systems contacts attachments source);
+              softwareinst contacts attachments source);
    if (defined($rec) && $rec->{'runonclusts'}){
       push(@all,"cluster");
+   }
+   else{
+      push(@all,"systems");
    }
    if ($self->IsMemberOf("admin")){
       push(@all,"qc");
@@ -735,6 +776,7 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
 
    my @databossedit=qw(default adm systems contacts ssl misc 
+                       softwareinst
                        attachments cluster sec);
    if (!defined($rec)){
       return(@databossedit);
@@ -782,7 +824,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header default adm sec ssl misc cluster 
-             systems contacts attachments source));
+             systems softwareinst contacts attachments source));
 }
 
 

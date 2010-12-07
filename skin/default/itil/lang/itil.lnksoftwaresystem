@@ -1,5 +1,5 @@
-'itil::lnksoftwaresystem'=>{de=>'Softwareinstallation',
-                            en=>'Softwareinstallation'},
+'itil::lnksoftwaresystem'=>{de=>'log. System Softwareinstallation',
+                            en=>'log. System Softwareinstallation'},
 'fieldgroup.default'=>{de=>'Softwareinstallation',en=>'Softwareinstallation'},
 'fieldgroup.link'=>{de=>'CI-Relationen',en=>'CI-Relations'},
 'fieldgroup.useableby'=>{de=>'nutzbar durch',en=>'usable by'},

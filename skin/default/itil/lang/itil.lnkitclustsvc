@@ -3,6 +3,7 @@
 'fieldgroup.applications'=>{de=>'Anwendungen',en=>'Applications'},
 'fieldgroup.ipaddresses'=>{de=>'IP-Adressen',en=>'IP-Addresses'},
 'fieldgroup.systems'=>{de=>'Cluster Nodes',en=>'Cluster Nodes'},
+'fieldgroup.software'=>{de=>'Direkt auf Cluster-Service installierte Software',en=>'direct on cluster service installed software'},
 'fieldgroup.clustinfo'=>{de=>'Daten des zugeorneten Clusters',en=>'Cluster informations'},
 'fieldgroup.swinstances'=>{de=>'Software Instanzen',en=>'Software Instances'},
 'Applications'=>{de=>'Anwendungen'},

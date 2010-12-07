@@ -240,6 +240,21 @@ sub new
                 uploadable    =>0,
                 label         =>'W5Base Cluster ID',
                 dataobjattr   =>'qlnkitclustsvc.itclust'),
+
+      new kernel::Field::SubList(
+                name          =>'software',
+                label         =>'Software',
+                group         =>'software',
+                subeditmsk    =>'subedit.system',
+                allowcleanup  =>1,
+                forwardSearch =>1,
+                vjointo       =>'itil::lnksoftwaresystem',
+                vjoinbase     =>[{softwarecistatusid=>"<=4"}],
+                vjoinon       =>['id'=>'itclustsvcid'],
+                vjoindisp     =>['software','version','quantity','comments'],
+                vjoininhash   =>['softwarecistatusid','liccontractcistatusid',
+                                 'liccontractid',
+                                 'software','version','quantity']),
                                                    
       new kernel::Field::SubList(
                 name          =>'swinstances',
@@ -336,8 +351,8 @@ sub isWriteValid
    my $itclustid=effVal($oldrec,$newrec,"clustid");
 
    return("default") if (!defined($oldrec) && !defined($newrec));
-   return("default","applications","ipaddresses") if ($self->IsMemberOf("admin"));
-   return("default","applications","ipaddresses") if ($self->isWriteOnClusterValid($itclustid));
+   return("default","applications","ipaddresses","software") if ($self->IsMemberOf("admin"));
+   return("default","applications","ipaddresses","software") if ($self->isWriteOnClusterValid($itclustid));
    return(undef);
 }
 
@@ -364,7 +379,7 @@ sub getDetailBlockPriority
    my $self=shift;
    return(qw(header default applications 
              ipaddresses systems
-             misc clustinfo swinstances source));
+             misc clustinfo software swinstances source));
 }
 
 sub ValidateDelete

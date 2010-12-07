@@ -73,6 +73,19 @@ sub getPostibleValues
    }
    if (defined($self->{vjointo})){
       $self->vjoinobj->ResetFilter();
+
+      if (defined($self->{vjoinbase})){
+         my $base=$self->{vjoinbase};
+         if (ref($base) eq "CODE"){
+            $base=&{$base}($self,$current);
+         }
+         if (defined($base)){
+            if (ref($base) eq "HASH"){
+               $base=[$base];
+            }
+            $self->vjoinobj->SetNamedFilter("BASE",@{$base});
+         }
+      }
       if ($mode eq "edit"){
          if (defined($self->{vjoineditbase})){
             $self->vjoinobj->SetNamedFilter("editbase",$self->{vjoineditbase});
