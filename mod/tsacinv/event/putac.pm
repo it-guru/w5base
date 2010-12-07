@@ -321,15 +321,6 @@ sub ApplicationModified
         # msg(INFO,"dump=%s",Dumper($rec));
         # msg(INFO,"id=$rec->{id}");
          my $jobname="W5Base.$self->{jobstart}.".NowStamp().'.Appl_'.$rec->{id};
-         my @okaglist=qw( IPS4CONGSTER_BPO_WIRK 
-                          WC4CONGSTER_BPO_WIRK WS4CONGSTER_FK_WIRK 
-                          SAP4IM_WIRK VGNV_WIRK);
-        # my @okaglist=qw(
-        #    VGNV_WIRK BPO4CONGSTER_WIRK IPS4CONGSTER_BPO_WIRK 
-        #    SAP4CONGSTER_FK_WIRK WS4CONGSTER_WIRK WC4CONGSTER_WIRK 
-        #    SV4CONGSTER_WIRK DKK_NEU_WIRK REO_WIRK DWH_AW_WIRK 
-        #    BACKUP_SERVER DMZ_SERVER
-        # );
          if ($rec->{mandatorid} ne $exclmand ){
             msg(INFO,"process application=$rec->{name} jobname=$jobname");
             my $CurrentEventId;
