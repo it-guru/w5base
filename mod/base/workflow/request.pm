@@ -488,7 +488,8 @@ sub getPosibleActions
    if ($#l==0 && $l[0] eq "nop"){
       @l=();
    }
-   if ($#l==-1 && defined($WfRec->{id})){
+   if (!in_array(\@l,"wfaddnote") &&
+       !in_array(\@l,"wfforward") && defined($WfRec->{id})){
       my $mgr=$self->isWorkflowManager($WfRec); # Workflow Manager can
       if ($mgr){                                # always takeover an active
          push(@l,"nop","wfhardtake");           # workflow !!
