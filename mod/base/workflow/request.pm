@@ -489,6 +489,7 @@ sub getPosibleActions
       @l=();
    }
    if (!in_array(\@l,"wfaddnote") &&
+       !in_array(\@l,"wfaccept")  &&
        !in_array(\@l,"wfforward") && defined($WfRec->{id})){
       my $mgr=$self->isWorkflowManager($WfRec); # Workflow Manager can
       if ($mgr){                                # always takeover an active
