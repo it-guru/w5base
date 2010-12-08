@@ -115,6 +115,7 @@ sub qcheckRecord
          my @posix=grep(!/^[A-Z]{1,3}\d+$/,@{$uidlist});
          my $posix=$posix[0];
 
+         my $wrs=$wiwrec->{office_wrs};
          my $wiwstate=$wiwrec->{office_state};
          my $level1role="RFreelancer";
          if ($wiwstate eq "Intern" ||
@@ -122,7 +123,7 @@ sub qcheckRecord
              $wiwstate eq "Employee"){
             $level1role="REmployee";
          }
-         if ($wiwstate eq "Auszubildender"){
+         if ($wrs eq "Auszubildender"){
             $level1role="RApprentice";
          }
          msg(INFO,"organizationalstatus=$wiwstate --- w5base role=$level1role");
