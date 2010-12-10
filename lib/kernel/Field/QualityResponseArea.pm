@@ -35,6 +35,18 @@ sub new
    $self->{readonly}=1;
    $self->{htmldetail}=0;
    $self->{searchable}=0;
+   $self->{uivisible}=sub {
+      my $self=shift;
+      if ($self->getParent->can("IsMemberOf")){
+         return(1) if ($self->getParent->IsMemberOf("admin"));
+      }
+      if ($self->getParent->can("getParent") &&
+          defined($self->getParent->getParent())){
+         return(1) if ($self->getParent->getParent->IsMemberOf("admin"));
+      }
+      return(0);
+   } if (!defined($self->{uivisible}));
+
    $self->{onRawValue}=\&onRawValue;
    my $o=bless($type->SUPER::new(%$self),$type);
    delete($o->{default});
