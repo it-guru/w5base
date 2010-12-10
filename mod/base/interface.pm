@@ -23,6 +23,7 @@ use kernel::App::Web;
 #use SOAP::Lite +trace => 'all';
 use SOAP::Lite;
 use SOAP::Transport::HTTP;
+use Time::HiRes qw(gettimeofday tv_interval);
 use File::Temp(qw(tempfile));
 use File::Find;
 use CGI;
@@ -375,7 +376,7 @@ EOF
 sub SOAP
 {
    my $self=shift;
-
+   my $t0=[gettimeofday()];
    $ENV{CONTENT_TYPE}=~s/application\/x-www-form-urlencoded,\s*//; # for IE JS
    $self->Log(INFO,"soap",
               "request: user='$ENV{REMOTE_USER}' ip='$ENV{REMOTE_ADDR}'");
@@ -384,7 +385,9 @@ sub SOAP
     -> dispatch_with($self->{NS})
     -> dispatch_to('interface::SOAP');
    $self->{SOAP} -> handle;
-   $self->Log(INFO,"soap","done");
+   my $t=tv_interval($t0,[gettimeofday()]);
+   my $s=sprintf("%0.4fsec",$t);
+   $self->Log(INFO,"soap","request: user='$ENV{REMOTE_USER}' done in $s");
 }
 
 sub _SOAPaction2param
@@ -451,6 +454,7 @@ use kernel;
 use strict;
 use vars qw(@ISA);
 @ISA = qw(SOAP::Server::Parameters);
+
 
 sub showFields
 {
@@ -706,10 +710,11 @@ sub getHashList
    my $filter=$param->{filter};
    $filter={} if ($filter eq "");
 
-   $self->Log(INFO,"soap",
-              "findRecord: [$objectname] ($view)\n%s",Dumper($filter));
-
    $view=[split(/\s*[,;]\s*/,$view)] if (ref($view) ne "ARRAY");
+   $self->Log(INFO,"soap",
+              "findRecord: [$objectname] (%s)\n%s",
+              join(",",@$view),Dumper($filter));
+
    $ENV{HTTP_FORCE_LANGUAGE}=$param->{lang} if (defined($param->{lang}));
    if (!($objectname=~m/^.+::.+$/)){
       return(interface::SOAP::kernel::Finish({exitcode=>128,
