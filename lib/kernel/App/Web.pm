@@ -925,8 +925,16 @@ sub HandleNewUser
                                       translation=>'base::accountverification',
                                       skinbase=>'base'
                                        });
-               $self->W5ServerCall("rpcCallEvent","UserVerified",
-                                   $ENV{REMOTE_USER});
+               my %p=(eventname=>'UserVerified',
+                      spooltag=>'UserVerified-'.$ENV{REMOTE_USER},
+                      redefine=>'1',
+                      retryinterval=>600,
+                      firstcalldelay=>30,
+                      eventparam=>$ENV{REMOTE_USER},
+                      userid=>11634953080001);
+               $self->W5ServerCall("rpcCallSpooledEvent",%p);
+             #  $self->W5ServerCall("rpcCallEvent","UserVerified",
+             #                      $ENV{REMOTE_USER});
                $self->W5ServerCall("rpcCacheInvalidate","User",
                                    $ENV{REMOTE_USER});
                return(1);
