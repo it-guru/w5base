@@ -60,21 +60,22 @@ sub qcheckRecord
             $wiw->SetFilter({uid=>\$rec->{posix}});
             ($wiwrec,$msg)=$wiw->getOnlyFirst(qw(ALL));
             if (defined($wiwrec) && 
+                lc($wiwrec->{email}) ne "" && 
                 lc($wiwrec->{email}) ne "unknown" && 
                 lc($wiwrec->{email}) ne "unregistered"){
                my $newemail=lc($wiwrec->{email});
-               printf STDERR ("WiwUser: email address change detected!\n".
-                              "         from '%s' to '%s' for userid '%s'\n",
-                              $rec->{email},$newemail,$rec->{posix});
-               my $user=getModuleObject($self->getParent->Config(),
-                                        "base::user");
-               $user->SetFilter({email=>\$newemail});
-               my ($alturec,$msg)=$user->getOnlyFirst(qw(ALL));
-               if (defined($alturec)){
-                  return(0,
-                     {qmsg=>['unrepairable email address change detected']});
-               }
                if ($rec->{usertyp} eq "extern" || $rec->{usertyp} eq "user"){
+                  printf STDERR ("WiwUser: email address change detected!\n".
+                                 "         from '%s' to '%s' for userid '%s'\n",
+                                 $rec->{email},$newemail,$rec->{posix});
+                  my $user=getModuleObject($self->getParent->Config(),
+                                           "base::user");
+                  $user->SetFilter({email=>\$newemail});
+                  my ($alturec,$msg)=$user->getOnlyFirst(qw(ALL));
+                  if (defined($alturec)){
+                     return(0,
+                        {qmsg=>['unrepairable email address change detected']});
+                  }
                   if ($user->ValidatedUpdateRecord($rec,
                       {email=>$newemail},
                       {userid=>\$rec->{userid},posix=>\$rec->{posix}})){
