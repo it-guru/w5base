@@ -1,0 +1,81 @@
+#!/usr/bin/env perl 
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/../mod";
+use RPC::Smart::Client;
+use Data::Dumper;
+use strict;
+use kernel;
+use kernel::config;
+use kernel::EventController;
+use Getopt::Long;
+use kernel::cgi;
+use vars qw($opt_v $opt_h $opt_c $configname);
+$0="W5Event ".join(" ",@ARGV);
+exit(1) if (!GetOptions('verbose'=>\$opt_v,
+                        'debug'=>\$opt_v,
+                        'help'=>\$opt_h,
+                        'config=s'=>\$opt_c));
+
+if ($opt_v){
+   $W5V2::Debug=1;
+}
+else{
+   $W5V2::Debug=0;
+}
+
+
+if ($opt_c eq ""){
+   $opt_c="w5server";
+}
+$configname=$opt_c;
+
+my %ClientParam=();
+
+my $curconfig=new kernel::config();
+
+if (!$curconfig->readconfig("$FindBin::Bin/..",$configname)){
+   msg(ERROR,"can't read configfile '%s'",$configname);
+   exit(1);
+}
+{
+   my $port=$curconfig->Param("W5SERVERPORT");
+   $port=4711 if ($port eq "");
+   msg(DEBUG,"W5ServerPort=%s",$port);
+   $ClientParam{'PeerPort'}=$port;
+}
+
+my $MyClient=new RPC::Smart::Client(%ClientParam);
+
+if (! defined($MyClient->Connect())){
+   msg(ERROR,"can't connect to server");
+   exit(1);
+}
+#my $res=$MyClient->Call($method,@ARGV);
+#printf("%s",Dumper($res));
+if (!defined($W5V2::W5Server)){
+   my %ClientParam;
+   $ClientParam{'PeerAddr'}=$curconfig->Param("W5SERVERHOST");
+   $ClientParam{'PeerPort'}=$curconfig->Param("W5SERVERPORT");
+   $W5V2::W5Server=new RPC::Smart::Client(%ClientParam);
+   $W5V2::W5Server->Connect();
+}
+
+my $pid=`ps -eo pid,comm | grep apache | cut -f 1 -d\\ `;
+my @apid=split(/\s/,$pid);
+
+my %stat;
+
+foreach my $apid (@apid){
+   my $cpu=`ps -p $apid -o pcpu | grep -v CPU`;
+   $cpu=~s/\s//g;
+   $stat{$apid}->{cpu}=$cpu;
+
+}
+
+print Dumper(\%stat);
+
+printf("fifi pidlist=%s\n",join(",",@apid));
+
+
+

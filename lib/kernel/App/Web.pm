@@ -28,6 +28,7 @@ use kernel::App::Web::Listedit;
 use RPC::Smart::Client;
 use Crypt::DES;
 use HTTP::Date;
+use Fcntl qw(O_CREAT O_TRUNC O_RDWR);
 use Safe;
 use Exporter;
 @EXPORT = qw(&RunWebApp &W5Server);
@@ -56,6 +57,20 @@ sub RunWebApp
       }
       $W5V2::ObjCache{$objectkey}=$o;
    }
+   my $statedir=$W5V2::ObjCache{$objectkey}->Config->Param("LogState");
+   my $havestate=undef;
+   if ($statedir ne "" && -d $statedir ){
+      my $f;
+      $havestate="$statedir/$$.pid";
+      if (sysopen($f,$havestate,O_RDWR|O_CREAT|O_TRUNC)){
+         my $s="$ENV['REMOTE_USER'];$MOD;".time().";\n";
+         syswrite($f,$s,length($s));
+         close($f);
+      }
+      else{
+         $havestate=undef;
+      }
+   }
    my $opmode=$W5V2::ObjCache{$objectkey}->Config->Param("W5BaseOperationMode");
    if (($opmode=~m/^offline/) || ($opmode=~m/^maintenance/)){
       return($W5V2::ObjCache{$objectkey}->DisplayMaintenanceWindow());
@@ -64,6 +79,9 @@ sub RunWebApp
 
    my $bk=$W5V2::ObjCache{$objectkey}->Run();
    $W5V2::ObjCache{$objectkey}->CloseOpenTransations();
+   if ($havestate ne ""){
+      unlink($havestate);
+   }
    return($bk);
 }
 
