@@ -46,9 +46,20 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'amitemlistval.value'),
 
+      new kernel::Field::Date(
+                name          =>'mdate',
+                sqlorder      =>'NONE',
+                label         =>'Modification-Date',
+                dataobjattr   =>'amitemlistval.dtlastmodif'),
 
+      new kernel::Field::Date(
+                name          =>'mdaterev',
+                sqlorder      =>'desc',
+                uivisible     =>0,
+                label         =>'Modification-Date reverse',
+                dataobjattr   =>'amitemlistval.dtlastmodif')
    );
-   $self->setDefaultView(qw(linenumber name id));
+   $self->setDefaultView(qw(linenumber name id mdate mdaterev));
    return($self);
 }
 

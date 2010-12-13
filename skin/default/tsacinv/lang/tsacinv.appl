@@ -1,6 +1,8 @@
 'tsacinv::appl'=>{de=>'AssetManager Anwendung',
                   en=>'AssetManager Application'},
 'fieldgroup.default'=>{de=>'Anwendungsdaten',en=>'Applicationdata'},
+'fieldgroup.interfaces'=>{de=>'Schnittstellen',en=>'Interfaces'},
+'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
 'CFM Assignment Group'=>{de=>'CFM Assignment Group'},
 'INM Assignment Group'=>{de=>'INM Assignment Group'},
 'CO-Number'=>{de=>'CO-Nummer/Kostenstelle'},

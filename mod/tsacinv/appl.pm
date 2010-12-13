@@ -44,7 +44,14 @@ sub new
                 uppersearch   =>1,
                 align         =>'left',
                 dataobjattr   =>'amtsicustappl.code'),
-                                    
+
+      new kernel::Field::Text(
+                name          =>'fullname',
+                label         =>'Name',
+                uivisible     =>0,
+                dataobjattr   =>"concat(concat(concat(amtsicustappl.name,' ('".
+                                "),amtsicustappl.code),')')"),
+
       new kernel::Field::Link(
                 name          =>'id',
                 label         =>'ApplicationID',
@@ -264,16 +271,44 @@ sub new
       new kernel::Field::SubList(
                 name          =>'interfaces',
                 label         =>'Interfaces',
+                group         =>'interfaces',
                 vjointo       =>'tsacinv::lnkapplappl',
                 vjoinon       =>['id'=>'lparentid'],
                 vjoindisp     =>['child']),
 
       new kernel::Field::SubList(
                 name          =>'systems',
+                group         =>'systems',
                 label         =>'Systems',
                 vjointo       =>'tsacinv::lnkapplsystem',
                 vjoinon       =>['id'=>'lparentid'],
                 vjoindisp     =>['child','systemweblink','systemid','comments']),
+
+      new kernel::Field::Date(
+                name          =>'cdate',
+                group         =>'source',
+                label         =>'Creation-Date',
+                dataobjattr   =>'amtsicustappl.dtcreation'),
+
+      new kernel::Field::Date(
+                name          =>'mdate',
+                group         =>'source',
+                label         =>'Modification-Date',
+                dataobjattr   =>'amtsicustappl.dtlastmodif'),
+
+#      new kernel::Field::Date(
+#                name          =>'lastqcheck',
+#                group         =>'source',
+#                label         =>'Quality Check last date',
+#                dataobjattr   =>'amtsicustappl.dqualitycheck'),
+
+      new kernel::Field::Date(
+                name          =>'mdaterev',
+                group         =>'source',
+                uivisible     =>0,
+                sqlorder      =>'desc',
+                label         =>'Modification-Date reverse',
+                dataobjattr   =>'amtsicustappl.dtlastmodif'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
@@ -540,6 +575,16 @@ sub Import
    }
    return($identifyby);
 }
+
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   return(qw(header default interfaces systems 
+             control
+             w5basedata source));
+}
+
 
 
 

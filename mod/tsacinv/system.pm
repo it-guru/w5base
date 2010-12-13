@@ -39,6 +39,13 @@ sub new
                 label         =>'No.'),
 
       new kernel::Field::Text(
+                name          =>'fullname',
+                label         =>'Name',
+                uivisible     =>0,
+                dataobjattr   =>"concat(concat(concat(amportfolio.name,' ('".
+                                "),amportfolio.assettag),')')"),
+
+      new kernel::Field::Text(
                 name          =>'systemname',
                 label         =>'Systemname',
                 uppersearch   =>1,
@@ -404,6 +411,32 @@ sub new
                 onRawValue    =>\&AddW5BaseData,
                 depend        =>'systemid'),
 
+      new kernel::Field::Date(
+                name          =>'cdate',
+                group         =>'source',
+                label         =>'Creation-Date',
+                dataobjattr   =>'amportfolio.dtcreation'),
+
+      new kernel::Field::Date(
+                name          =>'mdate',
+                group         =>'source',
+                label         =>'Modification-Date',
+                dataobjattr   =>'amportfolio.dtlastmodif'),
+
+#      new kernel::Field::Date(
+#                name          =>'lastqcheck',
+#                group         =>'source',
+#                label         =>'Quality Check last date',
+#                dataobjattr   =>'amportfolio.dqualitycheck'),
+
+      new kernel::Field::Date(
+                name          =>'mdaterev',
+                group         =>'source',
+                uivisible     =>0,
+                sqlorder      =>'desc',
+                label         =>'Modification-Date reverse',
+                dataobjattr   =>'amportfolio.dtlastmodif'),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
@@ -416,6 +449,12 @@ sub new
                 label         =>'Source-Id',
                 dataobjattr   =>'amportfolio.externalid'),
 
+#      new kernel::Field::Date(                # does not exists on amPortfolio
+#                name          =>'srcload',
+#                timezone      =>'CET',
+#                group         =>'source',
+#                label         =>'Source-Load',
+#                dataobjattr   =>'amportfolio.dtimport'),
 
    );
    $self->setDefaultView(qw(systemname bc tsacinv_locationfullname 
@@ -604,10 +643,9 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default form applications location ipaddresses software 
-             assetdata assetfinanz 
-             services w5basedata source));
+   return(qw(header default location form applications ipaddresses software 
+             services assetdata assetfinanz 
+             w5basedata source));
 }  
 
 
