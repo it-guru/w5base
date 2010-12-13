@@ -61,21 +61,59 @@ if (!defined($W5V2::W5Server)){
    $W5V2::W5Server->Connect();
 }
 
-my $pid=`ps -eo pid,comm | grep apache | cut -f 1 -d\\ `;
-my @apid=split(/\s/,$pid);
+my $pid=`ps -eo pid,comm | grep apache | awk '{print \$1}'`;
+my @apid=split(/[\s\n]/,$pid);
 
 my %stat;
-
+my $statedir=$curconfig->Param("LogState");
 foreach my $apid (@apid){
-   my $cpu=`ps -p $apid -o pcpu | grep -v CPU`;
+   #print("check pid $apid\n");
+   my $cpu=`ps -p $apid -o pcpu | grep -v 'CPU'`;
    $cpu=~s/\s//g;
    $stat{$apid}->{cpu}=$cpu;
-
+   my $statefile="$statedir/$apid.pid";
+   my $t0=time();
+   if (open(F,"<$statefile")){
+      $stat{$apid}->{state}=1;
+      my $l=<F>;
+      $l=~s/\s*$//;
+      my @d=split(/;/,$l);
+      if ($d[0] ne ""){
+         $stat{$apid}->{user}=$d[0];
+      }
+      else{
+         $stat{$apid}->{user}="anonymous";
+      }
+      $stat{$apid}->{mod}=$d[1];
+      $stat{$apid}->{start}=$d[2];
+      $stat{$apid}->{duration}=$t0-$d[2];
+      close(F);
+   }
 }
 
-print Dumper(\%stat);
+my @order=keys(%stat);
 
-printf("fifi pidlist=%s\n",join(",",@apid));
+@order=sort({my $bk=$stat{$b}->{duration} <=> $stat{$a}->{duration};
+             if ($stat{$b}->{duration}==$stat{$a}->{duration}){
+                $stat{$b}->{user}==$stat{$a}->{user};
+             }
+             $bk;} @order);
+my $form="%-6s |%6s |%6s | %-25s | %s\n";
+
+printf($form,"PID","CPU","rsec","User","Modul");
+printf("%s\n",'-' x 79);
+foreach my $pid (@order){
+   printf($form,$pid,$stat{$pid}->{cpu},
+                 $stat{$pid}->{duration},
+                 $stat{$pid}->{user},
+                 $stat{$pid}->{mod});
+}
+
+
+
+#print Dumper(\%stat);
+
+#printf("fifi pidlist=%s\n",join(",",@apid));
 
 
 
