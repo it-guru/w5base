@@ -59,7 +59,7 @@ sub new
                 label         =>'Modification-Date reverse',
                 dataobjattr   =>'amitemlistval.dtlastmodif')
    );
-   $self->setDefaultView(qw(linenumber name id mdate mdaterev));
+   $self->setDefaultView(qw(linenumber name id mdate));
    return($self);
 }
 
