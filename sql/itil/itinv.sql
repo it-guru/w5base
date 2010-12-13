@@ -907,3 +907,4 @@ alter table lnksoftwaresystem  add FOREIGN KEY fk_itclustsvcsw (lnkitclustsvc)
           REFERENCES lnkitclustsvc (id) ON DELETE CASCADE;
 set FOREIGN_KEY_CHECKS=1;
 alter table swinstance   add lnksoftwaresystem bigint(20) default NULL;
+alter table osrelease add comments longtext default NULL;

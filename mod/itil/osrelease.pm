@@ -64,6 +64,12 @@ sub new
                 readonly      =>1,
                 label         =>'Operationsystem class',
                 dataobjattr   =>'osrelease.osclass'),
+
+      new kernel::Field::Textarea(
+                name          =>'comments',
+                label         =>'Comments',
+                searchable    =>0,
+                dataobjattr   =>'osrelease.comments'),
                                                    
       new kernel::Field::Text(
                 name          =>'srcsys',
@@ -130,6 +136,16 @@ sub new
                          activator=>["admin","admin.itil.osrelease"],
                          uniquesize=>255};
    return($self);
+}
+
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_cistatus"))){
+     Query->Param("search_cistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
 }
 
 
