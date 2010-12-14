@@ -29,9 +29,11 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
   
    my $dst           =['itil::system' =>'name',
-                       'itil::network'=>'name'];
+                       'itil::network'=>'name',
+                       'base::user'=>'fullname'];
 
    my $vjoineditbase =[{'cistatusid'=>"<5"},
+                       {'cistatusid'=>"<5"},
                        {'cistatusid'=>"<5"}];
 
    $self->AddFields(
