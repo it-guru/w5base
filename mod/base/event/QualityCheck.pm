@@ -91,36 +91,53 @@ sub doQualityCheck
    if (defined($idfieldobj)){
       push(@view,$idfieldobj->Name());
    }
-   msg(DEBUG,"check SetFilterForQualityCheck");
-   if (!($dataobj->SetFilterForQualityCheck(@view))){
-      return({exitcode=>0,msg=>'ok'});
-   }
-
-   msg(DEBUG,"check run sql");
-   my ($rec,$msg)=$dataobj->getFirst(unbuffered=>1);
-   msg(DEBUG,"check run sql:OK");
+   my $qualitycheckduration=$self->Config->Param("QualityCheckDuration");
+   $qualitycheckduration="600" if ($qualitycheckduration ne "");
    my $time=time();
+   my $total=0;
    my $c=0;
-   if (defined($rec)){
-      do{
-         msg(DEBUG,"check record start");
-         my $qcokobj=$dataobj->getField("qcok");
-         if (defined($qcokobj)){
-            my $qcok=$qcokobj->RawValue($rec); 
-            msg(DEBUG,"qcok=$rec->{qcok}");
-         }
-         else{
-            msg(DEBUG,"no qcok field");
-         }
-         $c++;
-         msg(DEBUG,"check record end");
-         ($rec,$msg)=$dataobj->getNext();
-         if (time()-$time>10000){ # 1 hours quality check
-            return({exitcode=>0,msg=>'ok '.$c.' records checked'});
-            last;
-         }
-      }until(!defined($rec));
-   }
+   my $loopmax=10;
+   my $firstid;
+   do{
+      $dataobj->ResetFilter();
+      if (!($dataobj->SetFilterForQualityCheck(@view))){
+         return({exitcode=>0,msg=>'ok'});
+      }
+      $dataobj->Limit($loopmax,0,0);
+      my ($rec,$msg)=$dataobj->getFirst(unbuffered=>1);
+      $c=0;
+      if (defined($rec)){
+         do{
+            msg(DEBUG,"check record start");
+            my $qcokobj=$dataobj->getField("qcok");
+            if (defined($qcokobj)){
+               my $qcok=$qcokobj->RawValue($rec); 
+               msg(DEBUG,"qcok=$rec->{qcok}");
+            }
+            else{
+               return({exitcode=>1,msg=>'no qcok field'});
+            }
+            $total++;
+            $c++;
+            my $curid=$idfieldobj->RawValue($rec);
+            msg(DEBUG,"check record end");
+            if (time()-$time>$qualitycheckduration ||  
+                $curid eq $firstid){ 
+               return({exitcode=>0,msg=>'ok '.$total.' records checked'});
+               last;
+            }
+            if (!defined($firstid)){
+               $firstid=$curid;
+            }
+            ($rec,$msg)=$dataobj->getNext();
+         }until(!defined($rec) || $c<$loopmax);
+      }
+      if (!defined($rec)){
+         msg(DEBUG,"rec not defined - end of loop check");
+         last;
+      }
+      sleep(1);
+   }until(0);
 
 
    return({exitcode=>0,msg=>'ok'});
