@@ -414,20 +414,20 @@ sub mkChangeStoreRec
    # ... für diesen Code Teil immer Markus Zeiss fragen
    #
    $wfrec{additional}->{Type4INetwork}=$rec->{type};
-   if ($rec->{name}=~m/[^a-z]regel-ipl/i){
-      $wfrec{additional}->{Type4INetwork}="trivial";
-   }
-   if (time()>1197242364){  # ca Mo. der 10.12.2007 aktiv
-      if ($rec->{type}=~m/^standard$/i){
-         $wfrec{additional}->{Type4INetwork}="trivial";
-      }
-      if ($rec->{type}=~m/^significant$/i){
-         $wfrec{additional}->{Type4INetwork}="minor";
-      }
-      if ($rec->{urgency}=~m/^emergency$/i){
-         $wfrec{additional}->{Type4INetwork}="emergency";
-      }
-   }
+#   if ($rec->{name}=~m/[^a-z]regel-ipl/i){
+#      $wfrec{additional}->{Type4INetwork}="trivial";
+#   }
+#   if (time()>1197242364){  # ca Mo. der 10.12.2007 aktiv
+#      if ($rec->{type}=~m/^standard$/i){
+#         $wfrec{additional}->{Type4INetwork}="trivial";
+#      }
+#      if ($rec->{type}=~m/^significant$/i){
+#         $wfrec{additional}->{Type4INetwork}="minor";
+#      }
+#      if ($rec->{urgency}=~m/^emergency$/i){
+#         $wfrec{additional}->{Type4INetwork}="emergency";
+#      }
+#   }
 
 
    # approval check for I-Network (TSM hat zugestimmt)
