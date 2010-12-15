@@ -209,8 +209,11 @@ sub getPosibleActions
    }
    if ($WfRec->{state}>17){
       my @acl=$self->getFinishUseridList($WfRec);
-      if (grep(/^$userid$/,@acl)){
-         if (!$self->getParent->IsMemberOf("admin")){
+      if ($self->getParent->IsMemberOf("admin")){
+         push(@l,"reactivate");
+      }
+      else{
+         if (grep(/^$userid$/,@acl)){
             if ($WfRec->{eventend} ne ""){
                my $now=NowStamp("en");
                my $d=CalcDateDuration($WfRec->{eventend},$now);
@@ -218,9 +221,6 @@ sub getPosibleActions
                   push(@l,"reactivate");
                }
             }
-         }
-         else{
-            push(@l,"reactivate");
          }
       }
    }
