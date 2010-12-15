@@ -19,7 +19,7 @@ package kernel::Output::HtmlSubList;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use Data::Dumper;
+use kernel::cgi;
 use base::load;
 @ISA    = qw(kernel::Formater);
 
@@ -192,6 +192,7 @@ sub ProcessLine
          my $urlparam=$lq->QueryString();
          $dest=~s/::/\//g;
          $dest="../../$dest/Detail?$urlparam";
+         $dest=~s/"/ /g;
          my $detailx=$app->DetailX();
          my $detaily=$app->DetailY();
          $lineonclick="openwin(\"$dest\",\"_blank\",".
@@ -234,6 +235,7 @@ sub ProcessLine
                my $target=$weblinkto;
                $target=~s/::/\//g;
                $target="../../$target/Detail";
+               $target=~s/"/ /g;
                my $targetid=$weblinkon->[1];
                my $targetval;
                if (!defined($targetid)){
@@ -254,9 +256,13 @@ sub ProcessLine
                   my $detailx=$self->getParent->getParent->DetailX();
                   my $detaily=$self->getParent->getParent->DetailY();
                   $targetval=$targetval->[0] if (ref($targetval) eq "ARRAY");
+                  my %q=('AllowClose'=>1,
+                         "search_$targetid"=>$targetval);
+                         
+printf STDERR ("fifi $targetid=$targetval\n");
                   $fclick="openwin(\"$target?".
-                      "AllowClose=1&search_$targetid=$targetval\",".
-                      "\"_blank\",".
+                           kernel::cgi::Hash2QueryString(%q).
+                      "\","."\"_blank\",".
                       "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
                       "resizable=yes,scrollbars=no\")";
                }
