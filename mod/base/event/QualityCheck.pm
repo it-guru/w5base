@@ -60,14 +60,14 @@ sub QualityCheck
    else{
       my $obj=getModuleObject($self->Config,$dataobj);
       if (defined($obj)){
+         my $basefilter;
          if (!grep(/^0$/,keys(%{$dataobjtocheck{$dataobj}})) &&
              $dataobj ne "base::workflow"){
-            msg(INFO,"set mandatorid filter='%s'",
+            msg(INFO,"set (basefilter) mandatorid filter='%s'",
                      join(",",keys(%{$dataobjtocheck{$dataobj}})));
-            $obj->SetNamedFilter("MANDATORID",
-                        {mandatorid=>[keys(%{$dataobjtocheck{$dataobj}})]});
+            $basefilter={mandatorid=>[keys(%{$dataobjtocheck{$dataobj}})]};
          }
-         return($self->doQualityCheck($obj));
+         return($self->doQualityCheck($basefilter,$obj));
       }
       else{
          return({exitcode=>1,msg=>"invalid dataobject '$dataobj' specified"});
@@ -80,9 +80,11 @@ sub QualityCheck
 sub doQualityCheck
 {
    my $self=shift;
+   my $basefilter=shift;
    my $dataobj=shift;
  
    msg(INFO,"doQualityCheck in Object $dataobj");
+
    my @view=("qcok");
    if (my $lastqcheck=$dataobj->getField("lastqcheck")){
       unshift(@view,"lastqcheck");
@@ -100,6 +102,9 @@ sub doQualityCheck
    my $firstid;
    do{
       $dataobj->ResetFilter();
+      if (defined($basefilter)){
+         $dataobj->SetNamedFilter("MANDATORID",$basefilter);
+      }
       if (!($dataobj->SetFilterForQualityCheck(@view))){
          return({exitcode=>0,msg=>'ok'});
       }
