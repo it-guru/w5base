@@ -202,7 +202,8 @@ sub ProcessLine
    }
    $d.="<tr class=$lineclass ";
    if (!($self->{nodetaillink})){
-      $d.="onMouseOver=\"this.oldclassName=this.className;this.className='linehighlight';\" ".
+      $d.="onMouseOver=\"this.oldclassName=this.className;".
+                        "this.className='linehighlight';\" ".
           "onMouseOut=\"this.className=this.oldclassName\">\n";
    }
    for(my $c=0;$c<=$#view;$c++){
@@ -212,10 +213,11 @@ sub ProcessLine
       my $fclick=$lineonclick;
       my $weblinkname=$app->Self();
       if (defined($field)){
-         $data=$app->findtemplvar({viewgroups=>$viewgroups,
+         $data=$app->findtemplvar({
+                                   viewgroups=>$viewgroups,
                                    mode=>'HtmlSubList',
-                                      current=>$rec
-                                     },$fieldname,
+                                   current=>$rec
+                                  },$fieldname,
                                      "formated");
         # my $data=$field->FormatedResult("html");
          if (ref($field->{onClick}) eq "CODE"){
@@ -238,9 +240,10 @@ sub ProcessLine
                $target=~s/"/ /g;
                my $targetid=$weblinkon->[1];
                my $targetval;
+
                if (!defined($targetid)){
                   $targetid=$weblinkon->[0];
-                  $targetval=$d;
+                  $targetval="-INVALID-TARGEDID-";
                }
                else{
                   my $linkfield=$self->getParent->getParent->
@@ -252,14 +255,14 @@ sub ProcessLine
                   }
                   $targetval=$linkfield->RawValue($rec);
                }
+               printf STDERR ("fifi link8=%s=%s\n",$targetid,$targetval);
                if (defined($targetval) && $targetval ne ""){
                   my $detailx=$self->getParent->getParent->DetailX();
                   my $detaily=$self->getParent->getParent->DetailY();
                   $targetval=$targetval->[0] if (ref($targetval) eq "ARRAY");
                   my %q=('AllowClose'=>1,
                          "search_$targetid"=>$targetval);
-                         
-printf STDERR ("fifi $targetid=$targetval\n");
+                  printf STDERR ("fifi link9=%s=%s\n",$targetid,$targetval);
                   $fclick="openwin(\"$target?".
                            kernel::cgi::Hash2QueryString(%q).
                       "\","."\"_blank\",".
@@ -286,8 +289,7 @@ printf STDERR ("fifi $targetid=$targetval\n");
             }
             else{
                $fclick="\"alert('".$p->T("record not editable at this point!",
-                                         'kernel::Output::HtmlSubList').
-                       "')\"";
+                                         'kernel::Output::HtmlSubList')."')\"";
             }
          }
       }
