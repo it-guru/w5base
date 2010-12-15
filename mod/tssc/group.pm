@@ -169,7 +169,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","grouptype","users");
+   return("header","default","control","users");
 }
 
 

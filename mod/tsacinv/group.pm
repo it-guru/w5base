@@ -108,6 +108,12 @@ sub new
                 dataobjattr   =>'amemplgroup.lsupervid'),
                                                 
       new kernel::Field::Text(
+                name          =>'scgoupid',
+                group         =>'control',
+                label         =>'ServiceCenter-GroupID',
+                dataobjattr   =>'amemplgroup.lscgroupid'),
+                                                
+      new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',

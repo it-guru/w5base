@@ -478,22 +478,20 @@ sub isWriteValid
       return($self->expandByDataACL($rec->{mandatorid},@databossedit));
    }
 
-   if (defined($rec->{contacts}) && ref($rec->{contacts}) eq "ARRAY"){
+   if (defined($rec->{acls}) && ref($rec->{acls}) eq "ARRAY"){
       my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
                                   ["RMember"],"both");
       my @grpids=keys(%grps);
-      foreach my $contact (@{$rec->{contacts}}){
-         if ($contact->{target} eq "base::user" &&
-             $contact->{targetid} ne $userid){
+      foreach my $contact (@{$rec->{acls}}){
+         if ($contact->{acltarget} eq "base::user" &&
+             $contact->{acltargetid} ne $userid){
             next;
          }
-         if ($contact->{target} eq "base::grp"){
-            my $grpid=$contact->{targetid};
+         if ($contact->{acltarget} eq "base::grp"){
+            my $grpid=$contact->{acltargetid};
             next if (!grep(/^$grpid$/,@grpids));
          }
-         my @roles=($contact->{roles});
-         @roles=@{$contact->{roles}} if (ref($contact->{roles}) eq "ARRAY");
-         if (grep(/^write$/,@roles)){
+         if ($contact->{aclmode} eq "write"){
             return($self->expandByDataACL($rec->{mandatorid},@databossedit));
          }
       }

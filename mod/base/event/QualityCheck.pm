@@ -94,7 +94,7 @@ sub doQualityCheck
       push(@view,$idfieldobj->Name());
    }
    my $qualitycheckduration=$self->Config->Param("QualityCheckDuration");
-   $qualitycheckduration="600" if ($qualitycheckduration ne "");
+   $qualitycheckduration="600" if ($qualitycheckduration eq "");
    my $time=time();
    my $total=0;
    my $c=0;
@@ -126,9 +126,15 @@ sub doQualityCheck
             $c++;
             my $curid=$idfieldobj->RawValue($rec);
             msg(DEBUG,"check record end");
-            if (time()-$time>$qualitycheckduration ||  
-                $curid eq $firstid){ 
-               return({exitcode=>0,msg=>'ok '.$total.' records checked'});
+            if ( $curid eq $firstid){ 
+               return({exitcode=>0,
+                       msg=>'ok '.$total.' records checked = all'});
+            }
+            if (time()-$time>$qualitycheckduration){ 
+               msg(DEBUG,"Quality check end by ".
+                         "QualityCheckDuration=$qualitycheckduration");
+               return({exitcode=>0,
+                       msg=>'ok '.$total.' records checked = partial'});
                last;
             }
             if (!defined($firstid)){
