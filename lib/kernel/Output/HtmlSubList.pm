@@ -243,7 +243,7 @@ sub ProcessLine
 
                if (!defined($targetid)){
                   $targetid=$weblinkon->[0];
-                  $targetval="-INVALID-TARGEDID-";
+                  $targetval=undef;
                }
                else{
                   my $linkfield=$self->getParent->getParent->
@@ -255,14 +255,12 @@ sub ProcessLine
                   }
                   $targetval=$linkfield->RawValue($rec);
                }
-               printf STDERR ("fifi link8=%s=%s\n",$targetid,$targetval);
                if (defined($targetval) && $targetval ne ""){
                   my $detailx=$self->getParent->getParent->DetailX();
                   my $detaily=$self->getParent->getParent->DetailY();
                   $targetval=$targetval->[0] if (ref($targetval) eq "ARRAY");
                   my %q=('AllowClose'=>1,
                          "search_$targetid"=>$targetval);
-                  printf STDERR ("fifi link9=%s=%s\n",$targetid,$targetval);
                   $fclick="openwin(\"$target?".
                            kernel::cgi::Hash2QueryString(%q).
                       "\","."\"_blank\",".
