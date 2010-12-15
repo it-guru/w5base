@@ -190,9 +190,14 @@ sub getPosibleActions
           $#{$WfRec->{affectedcontractid}}!=-1){
          my @p800ids;
 
-         my $d=CalcDateDuration($WfRec->{eventend},NowStamp("en"));
-         if ($d->{totalminutes}>5000){ # modify only allowed for 3 days
-            return();
+         if ($self->getParent->IsMemberOf("admin")){
+            push(@l,"reactivate");
+         }
+         else{
+            my $d=CalcDateDuration($WfRec->{eventend},NowStamp("en"));
+            if ($d->{totalminutes}>5000){ # modify only allowed for 3 days
+               return();
+            }
          }
       }
    }
