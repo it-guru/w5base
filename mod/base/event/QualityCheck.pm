@@ -35,8 +35,14 @@ sub Init
 {
    my $self=shift;
 
+   my $qualitycheckduration=$self->Config->Param("QualityCheckDuration");
+   $qualitycheckduration="600" if ($qualitycheckduration eq "");
+   $self->{qualitycheckduration}=$qualitycheckduration;
 
-   $self->RegisterEvent("QualityCheck","QualityCheck",timeout=>10800); #3h
+
+
+   $self->RegisterEvent("QualityCheck","QualityCheck",
+                        timeout=>$self->{qualitycheckduration}+120); 
    return(1);
 }
 
@@ -93,8 +99,7 @@ sub doQualityCheck
    if (defined($idfieldobj)){
       push(@view,$idfieldobj->Name());
    }
-   my $qualitycheckduration=$self->Config->Param("QualityCheckDuration");
-   $qualitycheckduration="600" if ($qualitycheckduration eq "");
+   my $qualitycheckduration=$self->{qualitycheckduration};
    my $time=time();
    my $total=0;
    my $c=0;
