@@ -274,6 +274,19 @@ sub getMandatorsOf
    return(keys(%m));
 }
 
+sub isMandatorReadable
+{
+   my $self=shift;
+   my $mandatorid=shift;
+   return(0) if ($mandatorid==0);
+   my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
+   if (!in_array(\@mandators,[$mandatorid])){
+      return(0);
+   }
+   return(1);
+}
+
+
 sub getMembersOf
 {
    my $self=shift;
