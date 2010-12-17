@@ -280,6 +280,20 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("sysadm.qmgmt.tsinterview",
+                      "TS::interview",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("sysadm.qmgmt.tsinterview.new",
+                      "TS::interview",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("sysadm.qmgmt.tsinterview.cat",
+                      "base::interviewcat",
+                      func=>'MainWithNew',
+                      defaultacl=>['valid_user']);
+
    return($self);
 }
 

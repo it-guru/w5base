@@ -30,8 +30,6 @@
 'invalid name of parentobj'=>{de=>'ungültiger Elternobjekt name'},
 'parentobj not found'=>{de=>'kein passendes Elternobjekt gefunden'},
 'parentobj not prepaired for interview handling'=>{de=>'angegebenens Elternobjekt ist nicht für Interview-Handling vorbereitet'},
-'effects on MTTR'=>{de=>'beeinflusst MTTR'},
-'effects on MTBF'=>{de=>'beeinflusst MTBF'},
 'existing answers'=>{de=>'es existieren bereits Anworten für diese Frage'},
 'bind on parent viewgroup'=>{de=>'Anzeigen nur bei bestimmter Viewgroup'},
 'answer contact from parent'=>{de=>'Beantwortungskontakt aus Elternobjekt'},

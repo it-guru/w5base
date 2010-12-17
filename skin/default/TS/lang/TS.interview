@@ -1,0 +1,8 @@
+'TS::interview'=>{de=>'T-Systems Config-Item-Interview',
+                  en=>'T-Systems Config-Item-Interview'},
+'fieldgroup.attr'=>{de=>'Frage-Attribute',
+                    en=>'Question-Attributes'},
+'effects on MTTR'=>{de=>'beeinflusst MTTR'},
+'effects on MTBF'=>{de=>'beeinflusst MTBF'},
+
+                  

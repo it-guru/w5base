@@ -185,21 +185,6 @@ sub new
                 label         =>'bind on parent viewgroup',
                 dataobjattr   =>'interview.boundpviewgroup'),
 
-
-      new kernel::Field::Boolean(
-                name          =>'effect_on_mttr',
-                label         =>'effects on MTTR',
-                group         =>'tech',
-                htmlhalfwidth =>1,
-                dataobjattr   =>'effectonmttr'),
-
-      new kernel::Field::Boolean(
-                name          =>'effect_on_mtbf',
-                label         =>'effects on MTBF',
-                htmlhalfwidth =>1,
-                group         =>'tech',
-                dataobjattr   =>'effectonmtbf'),
-
       new kernel::Field::Interface(
                 name          =>'queryblock',
                 label         =>'Question categorie',
@@ -268,6 +253,11 @@ sub new
                 group         =>'tech',
                 label         =>'restriction',
                 dataobjattr   =>'interview.restriction'),
+
+      new kernel::Field::Container(
+                name          =>'additional',
+                label         =>'Additionalinformations',
+                dataobjattr   =>'interview.additional'),
 
       new kernel::Field::CDate(
                 name          =>'cdate',
@@ -487,6 +477,12 @@ sub prepUploadRecord
 
    return(1);
 }
+
+sub SelfAsParentObject    # this method is needed because existing derevations
+{
+   return("base::interview");
+}
+
 
 
 sub isViewValid

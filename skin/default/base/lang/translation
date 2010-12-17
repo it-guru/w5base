@@ -1,5 +1,6 @@
 'Linenumber'             =>{de=>'Zeile',en=>'Line'                          },
 'Modification-Date'      =>{de=>'Bearbeitungszeitpunkt'                     },
+'Modification-Date reverse'=>{de=>'Bearbeitungszeitpunkt absteigend sortiert'},
 'Creation-Date'          =>{de=>'Erstellungszeitpunkt'                      },
 'Fulltext'               =>{de=>'Volltext suche',en=>'Fulltext search'      },
 'Attachments'            =>{de=>'Dateianlagen'                              },
