@@ -37,44 +37,73 @@ sub new
                 label      =>'No.'),
 
       new kernel::Field::Id(
-                name       =>'id',
-                label      =>'CostCenterID',
-                dataobjattr=>'amcostcenter.lcostid'),
+                name          =>'id',
+                label         =>'CostCenterID',
+                dataobjattr   =>'amcostcenter.lcostid'),
 
       new kernel::Field::Text(
-                name       =>'name',
-                label      =>'CostCenter-No.',
-                dataobjattr=>'amcostcenter.trimmedtitle'),
+                name          =>'name',
+                label         =>'CostCenter-No.',
+                dataobjattr   =>'amcostcenter.trimmedtitle'),
 
       new kernel::Field::Boolean(
-                name       =>'islocked',
-                label      =>'is locked',
-                dataobjattr=>"decode(amcostcenter.flag9,'X',1,0)"),
+                name          =>'islocked',
+                label         =>'is locked',
+                dataobjattr   =>"decode(amcostcenter.flag9,'X',1,0)"),
 
       new kernel::Field::Text(
-                name       =>'code',
-                label      =>'CostCenter-Code',
-                dataobjattr=>'amcostcenter.code'),
+                name          =>'code',
+                label         =>'CostCenter-Code',
+                dataobjattr   =>'amcostcenter.code'),
 
       new kernel::Field::Text(
-                name       =>'description',
-                label      =>'Description',
-                dataobjattr=>'amcostcenter.field1'),
+                name          =>'description',
+                label         =>'Description',
+                dataobjattr   =>'amcostcenter.field1'),
 
       new kernel::Field::Text(
-                name       =>'bc',
-                label      =>'Business Center',
+                name          =>'bc',
+                label         =>'Business Center',
                 ignorecase    =>1,
-                dataobjattr=>'amcostcenter.alternatebusinesscenter'),
+                dataobjattr   =>'amcostcenter.alternatebusinesscenter'),
 
       new kernel::Field::Text(
-                name       =>'orgunit',
-                label      =>'Org-Unit',
+                name          =>'orgunit',
+                label         =>'Org-Unit',
                 ignorecase    =>1,
-                dataobjattr=>'amcostcenter.orgunit'),
+                dataobjattr   =>'amcostcenter.orgunit'),
+
+      new kernel::Field::Text(
+                name          =>'ictonr',
+                label         =>'ICTO-No',
+                group         =>'nor',
+                ignorecase    =>1,
+                dataobjattr   =>'amcostcenter.ictonr'),
+
+      new kernel::Field::Text(
+                name          =>'norsolutionmodel',
+                label         =>'Solution-Model',
+                group         =>'nor',
+                ignorecase    =>1,
+                dataobjattr   =>'amcostcenter.norsolutionmodel'),
+
+      new kernel::Field::Text(
+                name          =>'norinstructiontyp',
+                label         =>'Instruction-Typ',
+                group         =>'nor',
+                ignorecase    =>1,
+                dataobjattr   =>'amcostcenter.norinstructiontyp'),
+
+      new kernel::Field::Text(
+                name          =>'bnorcountryexcl',
+                label         =>'Country-Excl',
+                group         =>'nor',
+                ignorecase    =>1,
+                dataobjattr   =>'amcostcenter.bnorcountryexcl'),
 
       new kernel::Field::TextDrop(
                 name          =>'delmgr',
+                group         =>'contact',
                 label         =>'lead Delivery Manager',
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['delmgrid'=>'lempldeptid'],
@@ -82,11 +111,13 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'delmgrid',
+                group         =>'contact',
                 dataobjattr   =>'amcostcenter.lleadingdeliverymanagerid'),
                                     
      new kernel::Field::TextDrop(
                 name          =>'sem',
                 label         =>'Customer Business Manager',
+                group         =>'contact',
                 searchable    =>0,
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['semid'=>'lempldeptid'],
@@ -94,6 +125,7 @@ sub new
 
      new kernel::Field::TextDrop(
                 name          =>'sememail',
+                group         =>'contact',
                 htmldetail    =>0,
                 label         =>'Customer Business Manager E-Mail',
                 vjointo       =>'tsacinv::user',
@@ -102,7 +134,26 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'semid',
+                group         =>'contact',
                 dataobjattr   =>'amcostcenter.lservicemanagerid'),
+
+
+
+      new kernel::Field::SubList(
+                name          =>'applications',
+                label         =>'Applications',
+                group         =>'applications',
+                vjointo       =>'tsacinv::appl',
+                vjoinon       =>['name'=>'conumber'],
+                vjoindisp     =>[qw(fullname)]),
+
+      new kernel::Field::SubList(
+                name          =>'systems',
+                label         =>'Systems',
+                group         =>'systems',
+                vjointo       =>'tsacinv::system',
+                vjoinon       =>['name'=>'conumber'],
+                vjoindisp     =>[qw(fullname)]),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
@@ -122,6 +173,12 @@ sub new
                 group         =>'source',
                 label         =>'Source-Load',
                 dataobjattr   =>'amcostcenter.dtimport'),
+
+      new kernel::Field::Date(
+                name          =>'mdate',
+                group         =>'source',
+                label         =>'Modification-Date',
+                dataobjattr   =>'amcostcenter.dtlastmodif')
    );
    $self->setDefaultView(qw(linenumber id name code description));
    return($self);
@@ -133,6 +190,12 @@ sub initSearchQuery
    if (!defined(Query->Param("search_islocked"))){
      Query->Param("search_islocked"=>$self->T("no"));
    }
+}
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   return(qw(header default contact nor applications systems source));
 }
 
 
