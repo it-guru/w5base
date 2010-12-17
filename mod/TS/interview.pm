@@ -30,6 +30,22 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
+      new kernel::Field::Select(
+                name          =>'resonsegroup',
+                label         =>'response group',
+                group         =>'attr',
+                value         =>[qw( 
+                                     RGROUP.itservice
+                                     RGROUP.customer
+                                 )],
+                container     =>'additional'),
+
+      new kernel::Field::Text(
+                name          =>'questcluster',
+                label         =>'question cluster',
+                group         =>'attr',
+                container     =>'additional'),
+
       new kernel::Field::Boolean(
                 name          =>'effect_on_mttr',
                 label         =>'effects on MTTR',
@@ -53,6 +69,15 @@ sub getDetailBlockPriority
    my $grp=shift;
    my %param=@_;
    return("header","default","attr","tech","source");
+}
+
+
+sub isWriteValid
+{
+   my $self=shift;
+   my @l=$self->SUPER::isWriteValid(@_);
+   push(@l,"attr") if (in_array(\@l,['default','ALL']));
+   return(@l);
 }
 
 
