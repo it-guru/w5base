@@ -623,7 +623,7 @@ sub FullView
    }
    foreach my $frec (@fl){
       next if ($frec->{faqid}==$rec->{faqid});
-      my $dest="Detail?faqid=$frec->{faqid}";
+      my $dest="Detail?faqid=$frec->{faqid}&ModeSelectCurrentMode=FView";
       my $detailx=$self->DetailX();
       my $detaily=$self->DetailY();
       my $onclick="openwin(\"$dest\",\"_blank\",".
@@ -775,9 +775,8 @@ sub ById
 sub getDefaultHtmlDetailPage
 {
    my $self=shift;
-   my $cookievar=shift;
 
-   my $d=Query->Cookie($cookievar);
+   my $d="";
    $d="StandardDetail" if ($d eq "" || $self->extractFunctionPath() eq "New");
    return($d);
 }
