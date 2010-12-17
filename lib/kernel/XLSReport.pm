@@ -206,7 +206,9 @@ sub Process
                   while(my $r=sysread(IN,$blk,$sblk)){
                      my $w=syswrite(OUT,$blk);
                      if ($r!=$w){
-                        msg(ERROR,"fail to write output to '%s'",$FinalFilename);
+                        msg(ERROR,"fail to write output to '%s'",
+                                  $FinalFilename);
+                        delete($ENV{HTTP_ACCEPT_LANGUAGE});
                         return(undef);
                      }
                   }
@@ -219,6 +221,7 @@ sub Process
          }
       }
       unlink($filename);
+      delete($ENV{HTTP_ACCEPT_LANGUAGE});
    }
    return(1);
 }
