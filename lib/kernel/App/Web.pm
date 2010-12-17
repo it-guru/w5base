@@ -492,7 +492,7 @@ sub GTCverification
    if (Query->Param("GTCSURE") eq "OK"){
       my $txt=Query->Param("GTCTEXT");
       $txt=~s/\r\n/\n/g;
-      if ($txt eq $gtc){
+      if (trim($txt) eq trim($gtc)){
          my $userid=$self->getCurrentUserId();
          my $user=getModuleObject($self->Config(),"base::user");
          $user->SetFilter({userid=>\$userid,cistatusid=>\'3'});
@@ -514,7 +514,7 @@ sub GTCverification
          }
       }
       else{
-         $self->LastMsg(ERROR,"gtc text has been accepted unmodified");
+         $self->LastMsg(ERROR,"gtc text has not been accepted unmodified");
       }
    }
    print $self->HttpHeader("text/html");
