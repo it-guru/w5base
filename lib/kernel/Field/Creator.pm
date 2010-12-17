@@ -54,6 +54,31 @@ sub Validate
    return({});
 }
 
+sub preProcessFilter
+{
+   my $self=shift;
+   my $hflt=shift;
+   my $fobj=$self;
+   my $field=$self->Name();
+   my $changed=0;
+   my $err;
+
+   if ($hflt->{$field} eq "*"){
+      delete($hflt->{$field});
+   }
+
+   if (!ref($hflt->{$field}) && $hflt->{$field} ne ""){
+      if (!($hflt->{$field}=~m/^\d+$/)){
+         my $u=getModuleObject($self->getParent->Config,"base::user");
+         $u->SetFilter({fullname=>$hflt->{$field}});
+         $hflt->{$field}=[map({$_->{userid}} $u->getHashList(qw(userid)))];
+         $changed++;
+      }
+   }
+
+   return($changed,$err);
+}
+
 
 
 sub getDefaultValue
