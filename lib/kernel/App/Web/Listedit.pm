@@ -203,9 +203,6 @@ sub getValidWebFunctions
             DeleteRec InitWorkflow AsyncSubListView 
             EditProcessor ViewProcessor HandleQualityCheck
             ViewEditor ById ModuleObjectInfo);
-   if ($self->can("AutoFormat")){
-      push(@l,qw(AutoFormat));
-   }
    if ($self->can("HtmlHistory")){
       push(@l,qw(HtmlHistory HistoryResult));
    }
