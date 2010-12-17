@@ -203,6 +203,9 @@ sub getValidWebFunctions
             DeleteRec InitWorkflow AsyncSubListView 
             EditProcessor ViewProcessor HandleQualityCheck
             ViewEditor ById ModuleObjectInfo);
+   if ($self->can("AutoFormat")){
+      push(@l,qw(AutoFormat));
+   }
    if ($self->can("HtmlHistory")){
       push(@l,qw(HtmlHistory HistoryResult));
    }
@@ -1230,12 +1233,10 @@ sub Detail
    $self->SetCurrentOrder("NONE");
    my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
 
-#   my $cookievar="HtmlDetailPage_".$self->Self;
-#   $cookievar=~s/[:]+/_/g;
-   my $cookievar;
-
    my $p=Query->Param("ModeSelectCurrentMode");
-   $p=$self->getDefaultHtmlDetailPage($cookievar) if ($p eq "");
+   $p=$self->getDefaultHtmlDetailPage() if ($p eq "");
+
+
 
 #   print $self->HttpHeader("text/html",
 #                           cookies=>Query->Cookie(-name=>$cookievar,
@@ -1278,6 +1279,7 @@ sub Detail
    print("return(true);");
    print("}");
    print("</script>");
+   $p="StandardDetail" if ($p eq "");
 
    my $page=$self->getHtmlDetailPageContent($p,$rec);
 
