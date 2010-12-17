@@ -392,3 +392,4 @@ create table itemizedlist (
   srcload     datetime    default NULL,
   PRIMARY KEY (id),unique(selectlabel,name)
 );
+alter table interview add additional  longtext default NULL;
