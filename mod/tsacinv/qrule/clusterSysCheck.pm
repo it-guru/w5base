@@ -69,8 +69,10 @@ sub qcheckRecord
    return(0,undef) if ($rec->{cistatusid}!=4);
    if ($rec->{systemid} ne ""){
       my %parrec=(); 
+      $parrec{isclusternode}=0;
       my $sys=getModuleObject($self->getParent->Config(),"tsacinv::system");
       $sys->SetFilter({systemid=>\$rec->{systemid}});
+      #$sys->SetFilter({systemid=>'xx'});
       my ($amsysrec,$msg)=$sys->getOnlyFirst(qw(lclusterid));
       return(undef,undef) if (!$sys->Ping());
       if (defined($amsysrec)){
@@ -107,7 +109,7 @@ sub qcheckRecord
                           \%parrec,"isclusternode",
                           $forcedupd,$wfrequest,
                           \@qmsg,\@dataissue,\$errorlevel,
-                          mode=>'integer');
+                          mode=>'boolean');
 
       $self->IfaceCompare($dataobj,
                           $rec,"itclust",

@@ -192,16 +192,37 @@ sub IfaceCompare
          }
       }
    }
+   elsif ($param{mode} eq "boolean"){  # like true/false 1|0
+      if (exists($comprec->{$compfieldname}) &&
+          defined($comprec->{$compfieldname}) &&
+          (!defined($origrec->{$origfieldname}) ||
+           $comprec->{$compfieldname} != $origrec->{$origfieldname})){
+         
+         $takeremote++;
+      }
+   }
    if ($takeremote){
+      my $compval;
+      if (exists($comprec->{$compfieldname})){
+         $compval=$comprec->{$compfieldname};
+         if ($param{mode} eq "boolean"){ 
+            if ($compval){ # some data cleanup in boolean mode 
+               $compval=1;
+            }
+            else{
+               $compval=0;
+            }
+         }
+      }
       if ((exists($origrec->{allowifupdate}) && $origrec->{allowifupdate}) ||
           !defined($origrec->{$origfieldname}) ||
           $origrec->{$origfieldname}=~m/^\s*$/){
          if (!(!$param{AllowEmpty} && $comprec->{$compfieldname} eq "")){
-            $forcedupd->{$origfieldname}=$comprec->{$compfieldname};
+            $forcedupd->{$origfieldname}=$compval;
          }
       }
       else{
-         $wfrequest->{$origfieldname}=$comprec->{$compfieldname};
+         $wfrequest->{$origfieldname}=$compval;
       }
    }
 }
