@@ -81,136 +81,170 @@ sub FormatedDetail
       if ($mode eq "HtmlDetail" && $self->{dayonly}){
          $d=~s/\d+:\d+:\d+.*$//;
       }
-      if ($mode eq "HtmlDetail" && !$self->{dayonly}){
+      if ($mode eq "HtmlDetail" && (!$self->{dayonly} || $self->{dayonly}==2)){
          if (defined($delta) && $delta!=0){
             my $lang=$self->getParent->Lang();
             my $absdelta=abs($delta);
             my $baseabsdelta=abs($delta);
             my @blks=();
             if ($dayoffset==0){
-               if ($lang eq "de"){
-                  push(@blks,"heute um $timeonly");
+               if (!$self->{dayonly}){
+                  if ($lang eq "de"){
+                     push(@blks,"heute um $timeonly");
+                  }
+                  else{
+                    push(@blks,"today at $timeonly");
+                  }
                }
-               else{
-                 push(@blks,"today at $timeonly");
+               elsif ($self->{dayonly}==2){
+                  if ($lang eq "de"){
+                     push(@blks,"heute");
+                  }
+                  else{
+                    push(@blks,"today");
+                  }
                }
             }
             elsif ($dayoffset==1){
-               if ($lang eq "de"){
-                  push(@blks,"gestern um $timeonly");
+               if (!$self->{dayonly}){
+                  if ($lang eq "de"){
+                     push(@blks,"gestern um $timeonly");
+                  }
+                  else{
+                    push(@blks,"yesterday at $timeonly");
+                  }
                }
-               else{
-                 push(@blks,"yesterday at $timeonly");
+               elsif ($self->{dayonly}==2){
+                  if ($lang eq "de"){
+                     push(@blks,"gestern");
+                  }
+                  else{
+                    push(@blks,"yesterday");
+                  }
                }
             }
             elsif ($dayoffset==-1){
-               if ($lang eq "de"){
-                  push(@blks,"morgen um $timeonly");
+               if (!$self->{dayonly}){
+                  if ($lang eq "de"){
+                     push(@blks,"morgen um $timeonly");
+                  }
+                  else{
+                    push(@blks,"tomorrow at $timeonly");
+                  }
                }
-               else{
-                 push(@blks,"tomorrow at $timeonly");
+               elsif ($self->{dayonly}==2){
+                  if ($lang eq "de"){
+                     push(@blks,"morgen");
+                  }
+                  else{
+                    push(@blks,"tomorrow");
+                  }
                }
             }
             else{
-               if ($absdelta>2635200){
-                  my $months=int($absdelta/2635200);
-                  $absdelta=$absdelta-($months*2635200);
-                  if ($lang eq "de"){
-                     if ($months==1){
-                        push(@blks,"einem Monat");
+               if (!$self->{dayonly} || $self->{dayonly}==2){
+                  if ($absdelta>2635200){
+                     my $months=int($absdelta/2635200);
+                     $absdelta=$absdelta-($months*2635200);
+                     if ($lang eq "de"){
+                        if ($months==1){
+                           push(@blks,"einem Monat");
+                        }
+                        else{
+                           push(@blks,"$months Monaten");
+                        }
                      }
                      else{
-                        push(@blks,"$months Monaten");
+                        if ($months==1){
+                           push(@blks,"one month");
+                        }
+                        else{
+                           push(@blks,"$months months");
+                        }
+                     }
+                  }
+                  if ($absdelta>86400){
+                     my $days=int($absdelta/86400);
+                     $absdelta=$absdelta-($days*86400);
+                     if ($lang eq "de"){
+                        if ($days==1){
+                           push(@blks,"einem Tag");
+                        }
+                        else{
+                           push(@blks,"$days Tagen");
+                        }
+                     }
+                     else{
+                        if ($days==1){
+                           push(@blks,"one day");
+                        }
+                        else{
+                           push(@blks,"$days days");
+                        }
+                     }
+                  } 
+                  if (!$self->{dayonly}){
+                     if ($absdelta>3600 && $baseabsdelta<2635200){
+                        my $hours=int($absdelta/3600);
+                        $absdelta=$absdelta-($hours*3600);
+                        if ($lang eq "de"){
+                           if ($hours==1){
+                              push(@blks,"einer Stunde");
+                           }
+                           else{
+                              push(@blks,"$hours Stunden");
+                           }
+                        }
+                        else{
+                           if ($hours==1){
+                              push(@blks,"one hour");
+                           }
+                           else{
+                              push(@blks,"$hours hours");
+                           }
+                        }
+                     }
+                     if ($absdelta>60 && $baseabsdelta<2635200){
+                        my $hours=int($absdelta/60);
+                        $absdelta=$absdelta-($hours*60);
+                        if ($lang eq "de"){
+                           if ($hours==1){
+                              push(@blks,"einer Minute");
+                           }
+                           else{
+                              push(@blks,"$hours Minuten");
+                           }
+                        }
+                        else{
+                           if ($hours==1){
+                              push(@blks,"one minute");
+                           }
+                           else{
+                              push(@blks,"$hours minutes");
+                           }
+                        }
+                     }
+                  }
+                  if ($#blks>0){
+                     push(@blks,$blks[$#blks]);
+                     if ($lang eq "de"){
+                        $blks[$#blks-1]="und";
+                     }
+                     else{
+                        $blks[$#blks-1]="and";
+                     }
+                  }
+                  if ($delta<0){
+                     if ($lang eq "de"){
+                        unshift(@blks,"vor");
+                     }
+                     else{
+                        push(@blks,"ago");
                      }
                   }
                   else{
-                     if ($months==1){
-                        push(@blks,"one month");
-                     }
-                     else{
-                        push(@blks,"$months months");
-                     }
+                     unshift(@blks,"in");
                   }
-               }
-               if ($absdelta>86400){
-                  my $days=int($absdelta/86400);
-                  $absdelta=$absdelta-($days*86400);
-                  if ($lang eq "de"){
-                     if ($days==1){
-                        push(@blks,"einem Tag");
-                     }
-                     else{
-                        push(@blks,"$days Tagen");
-                     }
-                  }
-                  else{
-                     if ($days==1){
-                        push(@blks,"one day");
-                     }
-                     else{
-                        push(@blks,"$days days");
-                     }
-                  }
-               }
-               if ($absdelta>3600 && $baseabsdelta<2635200){
-                  my $hours=int($absdelta/3600);
-                  $absdelta=$absdelta-($hours*3600);
-                  if ($lang eq "de"){
-                     if ($hours==1){
-                        push(@blks,"einer Stunde");
-                     }
-                     else{
-                        push(@blks,"$hours Stunden");
-                     }
-                  }
-                  else{
-                     if ($hours==1){
-                        push(@blks,"one hour");
-                     }
-                     else{
-                        push(@blks,"$hours hours");
-                     }
-                  }
-               }
-               if ($absdelta>60 && $baseabsdelta<2635200){
-                  my $hours=int($absdelta/60);
-                  $absdelta=$absdelta-($hours*60);
-                  if ($lang eq "de"){
-                     if ($hours==1){
-                        push(@blks,"einer Minute");
-                     }
-                     else{
-                        push(@blks,"$hours Minuten");
-                     }
-                  }
-                  else{
-                     if ($hours==1){
-                        push(@blks,"one minute");
-                     }
-                     else{
-                        push(@blks,"$hours minutes");
-                     }
-                  }
-               }
-               if ($#blks>0){
-                  push(@blks,$blks[$#blks]);
-                  if ($lang eq "de"){
-                     $blks[$#blks-1]="und";
-                  }
-                  else{
-                     $blks[$#blks-1]="and";
-                  }
-               }
-               if ($delta<0){
-                  if ($lang eq "de"){
-                     unshift(@blks,"vor");
-                  }
-                  else{
-                     push(@blks,"ago");
-                  }
-               }
-               else{
-                  unshift(@blks,"in");
                }
             }
             my $deltastr=join(" ",@blks);

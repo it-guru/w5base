@@ -649,6 +649,7 @@ sub new
       new kernel::Field::Date(
                 name          =>'postponeduntil',
                 searchable    =>0,
+                dayonly       =>2,
                 depend        =>['stateid'],
                 htmldetail    =>sub {
                    my $self=shift;

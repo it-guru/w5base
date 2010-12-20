@@ -648,8 +648,7 @@ sub FinishWrite
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   if ($newrec->{name} eq "forwardto"){
-      printf STDERR ("workflow action forward\n");
+   if ($newrec->{name} eq "forwardto" || $newrec->{name} eq "reactivate"){
       my %add=Datafield2Hash($newrec->{additional});
       my $fwdtarget=$add{ForwardTarget}->[0];
       my $fwdtargetid=$add{ForwardTargetId}->[0];
@@ -660,6 +659,7 @@ sub FinishWrite
          $self->NotifyForward($wfid,$fwdtarget,$fwdtargetid,$fwdname,$comments);
       }
    }
+
    return($self->SUPER::FinishWrite($oldrec,$newrec));
 }
 
