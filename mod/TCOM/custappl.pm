@@ -107,7 +107,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'wbv',
                 group         =>'tcomcontact',
-                label         =>'WBV Wirkbetriebsverantwortlicher',
+                label         =>'Systems Manager',
                 vjointo       =>'base::user',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['wbvid'=>'userid'],

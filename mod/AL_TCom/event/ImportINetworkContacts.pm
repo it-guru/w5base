@@ -63,16 +63,19 @@ sub ImportINetworkContacts
 
 
 
+
+   my $appl=getModuleObject($self->getParent->Config(),"itil::appl");
+   $appl->SetNamedFilter("DBASE",{name=>"Flex* EKI* IT-Base*"});
+   $appl->SetFilter({customer=>"DTAG DTAG.*",cistatusid=>"<=5"});
+   my @idl=$appl->getHashList(qw(id name));
+
+
    sub SOAP::Transport::HTTP::Client::get_basic_credentials { 
        return $wsuser => $wspass;
    }
 
+   my @msglist;
 
-
-   my $appl=getModuleObject($self->getParent->Config(),"itil::appl");
-   $appl->SetNamedFilter("DBASE",{name=>"EKI* IT-Base*"});
-   $appl->SetFilter({customer=>"DTAG DTAG.*",cistatusid=>"<=5"});
-   my @idl=$appl->getHashList(qw(id name));
 
    my $n=0;
    foreach my $arec (@idl){
@@ -98,6 +101,7 @@ sub ImportINetworkContacts
       my $res;
       eval('$res=$soap->call($method=>@SOAPparam);'); 
       if (!defined($res) || ($@=~m/Connection refused/)){
+         msg(ERROR,"can not connect to ".$wsproxy);
          return({exitcode=>10,
                  msg=>'can not connect to INetwork - Connection refused'});
       }
@@ -108,7 +112,11 @@ sub ImportINetworkContacts
       }
       my $indata=$res->result();
       if (ref($indata) eq "HASH" && exists($indata->{SMAppData})){
-printf STDERR ("fifi %s\n",Dumper($indata));
+         my ($errorcode,$msg)=$self->processRecord($indata->{SMAppData});
+         if ($errorcode){
+            push(@msglist,$msg);
+         }
+        
       }
       else{
          push(@{$state{notfound}},
@@ -118,9 +126,62 @@ printf STDERR ("fifi %s\n",Dumper($indata));
    }
    printf("Applications not found in I-Network:\n%s\n",
           join("\n",@{$state{notfound}}));
+
+   printf("Messages:\n%s",join("\n",@msglist));
    return({exitcode=>0,msg=>"ok - checked $n records"});
 }
 
+sub processRecord
+{
+   my $self=shift;
+   my $d=shift;
+
+   if (!($d->{'smEmail'}=~m/^\S+\@\S+$/)){
+      return(1,"invalid smEmail '$d->{'smEmail'}'");
+   }
+
+   my $user=getModuleObject($self->Config,"base::user");
+   $user->SetFilter({email=>$d->{'smEmail'}});
+   my ($urec,$msg)=$user->getOnlyFirst(qw(userid));
+   if (!defined($urec)){
+      return(2,"user '$d->{'smEmail'}' does not exists");
+   }
+
+   my $userid=$urec->{userid};
+   my $w5baseid=$d->{'w5baseId'};
+   my $w5basename=$d->{'w5baseAppname'};
+   my $inname=$d->{'inetworkAppname'};
+   my $inid=$d->{'inetworkId'};
+
+   print Dumper($d);
+
+#
+   my $appl=getModuleObject($self->Config,"TCOM::custappl");
+
+   $appl->SetFilter({id=>\$w5baseid});
+   my ($arec,$msg)=$appl->getOnlyFirst(qw(id name wbvid 
+                                          custname custnameid));
+
+   if (!defined($arec)){
+      return(3,"application '$w5basename' ($w5baseid) not found in w5base");
+   }
+
+   if (lc($arec->{name}) ne lc($w5basename)){
+      return(4,"W5base appname I-Network ($w5basename) does not ".
+               "match $arec->{name}");
+   }
+
+   if (!$appl->ValidatedUpdateRecord($arec,{
+          wbvid=>$userid,
+          custname=>$inname,
+          custnameid=>"IN:$inid"
+      },{id=>\$w5baseid})){
+      return(5,"fail to update");
+   }
+
+
+   return(0,"OK");
+}
 
 
 
