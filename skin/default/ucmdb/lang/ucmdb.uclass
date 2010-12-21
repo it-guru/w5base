@@ -1,0 +1,4 @@
+'ucmdb::uclass'=>{de=>'uCMDB Klasse',en=>'uCMDB Class'},
+'display name'=>{de=>'Anzeigename'},
+'parent class'=>{de=>'Elternklasse'},
+'class name'=>{de=>'Klassenname'},

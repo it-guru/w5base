@@ -1,0 +1,3 @@
+'ucmdb'=>{de=>'uCMDB',en=>'uCMDB'},
+'ucmdb.kern'=>{de=>'Kern',en=>'Kernel'},
+'ucmdb.kern.uclass'=>{de=>'Klasse',en=>'Class'},
