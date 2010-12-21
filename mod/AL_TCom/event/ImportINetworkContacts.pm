@@ -1,4 +1,4 @@
-package AL_TCom::event::INetworkLoadWBV;
+package AL_TCom::event::ImportINetworkContacts;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -38,11 +38,12 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("INetworkLoadWBV","INetworkLoadWBV",timeout=>30);
+   $self->RegisterEvent("ImportINetworkContacts",
+                        "ImportINetworkContacts",timeout=>30);
    return(1);
 }
 
-sub INetworkLoadWBV
+sub ImportINetworkContacts
 {
    my $self=shift;
    my %param=@_;
