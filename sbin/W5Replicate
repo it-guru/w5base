@@ -1,0 +1,403 @@
+#!/usr/bin/env perl 
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/../mod";
+use RPC::Smart::Client;
+use strict;
+use kernel;
+use kernel::config;
+use kernel::EventController;
+use Getopt::Long;
+use kernel::cgi;
+use DBI;
+use vars qw($opt_v $opt_h $opt_c $configname);
+$0="W5Event ".join(" ",@ARGV);
+exit(1) if (!GetOptions('verbose'=>\$opt_v,
+                        'debug'=>\$opt_v,
+                        'help'=>\$opt_h,
+                        'config=s'=>\$opt_c));
+
+if ($opt_v){
+   $W5V2::Debug=1;
+}
+else{
+   $W5V2::Debug=0;
+}
+
+if ($ENV{REMOTE_USER} eq ""){
+   if ($ENV{USER} ne ""){
+      $ENV{REMOTE_USER}="system/$ENV{USER}";
+   }
+   else{
+      $ENV{REMOTE_USER}="system/unknown";
+   }
+   $ENV{REAL_REMOTE_USER}="system/W5Replicate";
+}
+$W5V2::OperationContext="W5Server";
+
+
+
+if ($opt_c eq ""){
+   $opt_c="replicate";
+}
+$configname=$opt_c;
+
+my %ClientParam=();
+
+my $config=new kernel::config();
+
+if (!$config->readconfig("$FindBin::Bin/..",$configname)){
+   msg(ERROR,"can't read configfile '%s'",$configname);
+   exit(1);
+}
+{
+   my $port=$config->Param("W5SERVERPORT");
+   $port=4711 if ($port eq "");
+   msg(DEBUG,"W5ServerPort=%s",$port);
+   $ClientParam{'PeerPort'}=$port;
+}
+
+my $MyClient=new RPC::Smart::Client(%ClientParam);
+my $self=new kernel::App(Config=>$config);
+if (!defined($W5V2::Translation{$self})){
+   $W5V2::Translation{$self}={self=>$self,tab=>{}};
+}
+$W5V2::Translation=$W5V2::Translation{$self};
+
+if (! defined($MyClient->Connect())){
+   msg(ERROR,"can't connect to server");
+   exit(1);
+}
+if (!defined($W5V2::W5Server)){
+   my %ClientParam;
+   $ClientParam{'PeerAddr'}=$self->Config->Param("W5SERVERHOST");
+   $ClientParam{'PeerPort'}=$self->Config->Param("W5SERVERPORT");
+   $W5V2::W5Server=new RPC::Smart::Client(%ClientParam);
+   $W5V2::W5Server->Connect();
+}
+$W5V2::Query=new kernel::cgi({});
+
+#
+#                      Init finished
+#==================================================================
+#
+
+
+#
+# Connect to replication target oracle DB via DBI
+#
+sub getOracleDBIConnectionHandle
+{
+   my $dbconnect=$config->Param("ORACONNECT");
+   my $dbuser=$config->Param("ORAUSER");
+   my $dbpass=$config->Param("ORAPASS");
+   msg(INFO,"try ora connect='$dbconnect' user='$dbuser'");
+
+   if ($dbconnect eq "" || $dbuser eq "" || $dbpass eq ""){
+      msg(ERROR,"fatal error - not enough connection informations");
+      exit(255);
+   }
+   my $dst=DBI->connect($dbconnect,$dbuser,$dbpass,{AutoCommit=>0});
+   if (!defined($dst)){
+      msg(ERROR,$DBI::errstr);
+      exit(100);
+   }
+   msg(INFO,"connect to replication target '$dbconnect' successfull");
+   return($dst,uc($dbuser));
+}
+
+
+#
+# scans replication target by requested objects and attributes
+#
+sub getRequestedReplicationObjects
+{
+   my $Config=shift;
+   my @replicationOjects;
+   my ($dbi,$schema)=getOracleDBIConnectionHandle();
+
+   #
+   # loading table list from oracle schema and check tables with :: in it
+   # tables with a two douplepoints will be used as sync objects
+   #
+   my $sth=$dbi->table_info(undef,$schema,'%');
+   foreach my $tab ($sth->getHashList()){
+      if ($tab->{'TABLE_NAME'}=~m/::/){ # objects are recognizable by :: 
+         my %ctrl=('name'=>$tab->{'TABLE_NAME'},'prio'=>'0','valid'=>'0');
+         push(@replicationOjects,\%ctrl);
+      }
+   }
+
+   #
+   # the fields in the tables with :: are automaticly the view to 
+   # w5base. If the fieldname begins with w5, it will be ignored in view.
+   #
+   foreach my $ctrl (@replicationOjects){
+      my $replsync_found=0;
+      $ctrl->{'view'}=[];
+      $ctrl->{'columns'}=[];
+      $ctrl->{'col'}={};
+      my $sth=$dbi->column_info(undef,$schema,$ctrl->{'name'},'%');
+      foreach my $col ($sth->getHashList()){
+         $ctrl->{'col'}->{lc($col->{'COLUMN_NAME'})}={
+                               'name'=>$col->{'COLUMN_NAME'},
+                               'type'=>$col->{'TYPE_NAME'},
+                               'size'=>$col->{'COLUMN_SIZE'}
+         };
+         push(@{$ctrl->{'columns'}},
+              $ctrl->{'col'}->{lc($col->{'COLUMN_NAME'})});
+         if (!(lc($col->{COLUMN_NAME})=~m/^w5/)){
+            push(@{$ctrl->{'view'}},lc($col->{'COLUMN_NAME'}));
+         }
+         if (lc($col->{COLUMN_NAME}) eq "w5replsync"){
+            $replsync_found++;
+         }
+      }
+
+      #
+      # validating object names against the connected w5base system
+      #
+      if ($replsync_found){
+         my $obj=getModuleObject($Config,$ctrl->{'name'});
+         if (defined($obj)){
+            my $idobj=$obj->IdField();
+            if (defined($idobj)){
+               my $idname=$idobj->Name();
+               $ctrl->{'idname'}=$idname;
+               if (exists($ctrl->{'col'}->{lc($idname)})){ # check on id col
+                  $ctrl->{'valid'}=1;
+               }
+            }
+         }
+      }
+   }
+
+   $dbi->commit();
+   $dbi->disconnect();
+   return(@replicationOjects);
+}
+
+#
+# Main replication process for a specified object
+#
+sub objectReplicationMain
+{
+   my $Config=shift;
+   my $ctrl=shift;
+   msg(INFO,"============================================");
+   msg(INFO,"start: process replication for $ctrl->{name}");
+   my ($dbi,$schema)=getOracleDBIConnectionHandle();
+   my $obj=getModuleObject($Config,$ctrl->{'name'});
+   if (!defined($obj)){
+      msg(ERROR,"can not connect to $ctrl->{name}");
+      return(undef);
+   }
+   my $syncstart;
+   my $cmd="select max(w5replsync) SSTART from \"$ctrl->{name}\"";
+   foreach my $rec ($dbi->getHashList($cmd)){
+      $syncstart=$rec->{'SSTART'};
+   }
+   if (defined($syncstart)){ # restart sync process at last known position
+      my $cmd="select w5replsynckey K from \"$ctrl->{name}\" ".
+              "where w5replsync=?";
+      my $synckey;
+      foreach my $rec ($dbi->getHashList($cmd,$syncstart)){
+         $synckey=trim($rec->{'K'});
+      }
+      if (defined($synckey)){
+         $obj->SetFilter({synckey=>">\"".$synckey."\""});
+      }
+   }
+   my @syncfields=("synckey","synckey1");
+   $obj->Limit(3,0,0);
+   $obj->SetCurrentOrder(@syncfields);
+
+   foreach my $srcrec ($obj->getHashList(@syncfields,@{$ctrl->{view}})){
+      $srcrec->{'w5replsync'}=sprintf("%35s%35s",$srcrec->{'synckey'},
+                                                 $srcrec->{'synckey1'});
+      $srcrec->{'w5replsync'}=~s/ /0/g;
+      $srcrec->{'w5replsynckey'}=$srcrec->{'synckey'};
+      $srcrec->{'w5replsynckey1'}=$srcrec->{'synckey1'};
+      foreach my $k (@syncfields){
+         delete($srcrec->{$k});
+      }
+      $dbi->InsertOrUpdate($ctrl->{'name'},$ctrl->{'idname'},
+                           $srcrec,$ctrl->{'col'});
+   }
+
+   $dbi->commit();
+   $dbi->disconnect();
+   msg(INFO,"end:   process replication for $ctrl->{name}");
+}
+
+
+
+#                                    
+#==================================================================
+#                       MAIN         
+
+my @ReplicationObjects=getRequestedReplicationObjects($config);
+
+foreach my $replControl (@ReplicationObjects){
+   # this will be a good time, to do a fork!
+   if ($replControl->{'valid'}){
+      objectReplicationMain($config,$replControl);
+   }
+   else{
+      msg(ERROR,"ignoring invalid replication object '$replControl->{name}'");
+   }
+}
+
+#print Dumper(\@ReplicationObjects);
+
+
+
+exit(0);
+
+#
+# synckey design for mysql
+#
+#my $intera=getModuleObject($curconfig,"base::interanswer");
+#$intera->SetFilter({synckey=>'>"2010-09-22 08:00:00"'});
+#$intera->Limit(10,0,0);
+#$intera->SetCurrentOrder("synckey","synckey1");
+#foreach my $rec ($intera->getHashList(qw(synckey synckey1 mdate id name))){
+#   print Dumper($rec);
+#}
+
+#
+# synckey design for oracle
+#
+#my $sys=getModuleObject($config,"tsacinv::system");
+#$sys->SetFilter({synckey=>'>"11079639887171"'});
+#$sys->Limit(100,0,0);
+#$sys->SetCurrentOrder("synckey","synckey1");
+#foreach my $rec ($sys->getHashList(qw(synckey synckey1 systemid))){
+#   print Dumper($rec);
+#}
+
+
+package DBI::st;
+
+sub getHashList
+{
+   my $self=shift;
+   my @bind=@_;
+   my @l;
+
+   if ($self->execute(@bind)){
+      while(my $dbrec=$self->fetchrow_hashref()){
+         push(@l,$dbrec);
+      }
+      return(@l);
+   }
+   return(undef);
+}
+
+package DBI::db;
+use W5Kernel;
+use Data::Dumper;
+
+sub getHashList
+{
+   my $self=shift;
+   my $cmd=shift;
+   if (my $sth=$self->prepare($cmd)){
+      return($sth->getHashList(@_));
+   }
+   return(undef);
+}
+
+sub InsertOrUpdate
+{
+   my $self=shift;
+   my $dbtable=shift;
+   my $idname=shift;
+   my $rec=shift;
+   my $col=shift;
+
+   my $cmd="select * from \"$dbtable\" where $idname=?";
+   my $idval=$rec->{$idname};
+   my @curlist=$self->getHashList($cmd,$idval);
+   my @view=keys(%$rec);
+   if ($#curlist==0){     # do an update
+      my (@v,@values);
+      foreach my $fieldname (@view){
+         if (scalar($rec->{$fieldname}) =~ m/^Container=HASH/) {
+            push(@values,$self->Hash2DataField($rec->{$fieldname}));
+         }
+         else {
+            push(@values,$rec->{$fieldname});
+         }
+         if ($col->{$fieldname}->{type} =~ m/^[timestamp|date]/i) {
+            push(@v,"$fieldname=to_date(?,'YYYY-MM-DD HH24:MI:SS')");
+         }
+         else {
+            push(@v,"$fieldname=?");
+         }
+      }
+      push(@v,"w5repllastsucc=sysdate");
+      my $v=join(",",@v);
+      my $updcmd="update \"$dbtable\" set $v where $idname=?";
+      msg(INFO,"upd: $updcmd");
+      return($self->doCmd($updcmd,@values,$idval));
+   }
+   elsif ($#curlist==-1){ # do an insert
+      my @values;
+      my @place;
+      foreach my $fieldname (@view) {
+         if (scalar($rec->{$fieldname}) =~ m/^Container=HASH/) {
+            push(@values,$self->Hash2DataField($rec->{$fieldname}));
+         }
+         else {
+            push(@values,$rec->{$fieldname});
+         }
+         if ($col->{$fieldname}->{type} =~ m/^[timestamp|date]/i) {
+            push(@place,"to_date(?,'YYYY-MM-DD HH24:MI:SS')");
+         }
+         else {
+            push(@place,"?");
+         }
+      }
+      #my @values=map({$rec->{$_}} @view);
+      #my @place=map({'?'} @view);
+      my $inscmd="insert into \"$dbtable\" (".join(",",@view,"w5repllastsucc").") ".
+                 "values(".join(",",@place,'sysdate').")";
+      msg(INFO,"ins: $inscmd");
+      return($self->doCmd($inscmd,@values));
+   }
+   else{
+      msg(ERROR,"ganz scheisse!");
+      exit(-12356);
+   }
+   return(undef);
+}
+
+
+
+sub Hash2DataField
+{
+   my $self=shift;
+   my $container=shift;
+   my $element;
+   if (exists($container->{'item'}) && scalar($container->{'item'}) =~ m/^ARRAY/) {
+      foreach my $item (@{$container->{'item'}}) {
+         $element.=$item->{'name'} . "='" . $item->{'value'} . "'=" . $item->{'name'} . "\n";
+      }
+   }
+   return($element);
+}
+
+sub doCmd
+{
+   my $self=shift;
+   my $cmd=shift;
+   if (my $sth=$self->prepare($cmd)){
+      return($sth->execute(@_));
+   }
+   return(undef);
+}
+
+
+
+
