@@ -187,6 +187,18 @@ sub new
                 label         =>'Modification-Date',
                 dataobjattr   =>'grp.modifydate'),
 
+      new kernel::Field::Interface(
+                name          =>'synckey',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"grp.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'synckey1',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(grp.grpid,35,0)"),
+
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',

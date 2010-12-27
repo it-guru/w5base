@@ -369,26 +369,6 @@ sub getSqlWhere
    return($where);
 }
 
-sub addLimit
-{
-   my $self=shift;
-   my $where=shift;
-   my $order=shift;
-   my $limit=shift;
-   my $limitnum=shift;
-
-   if (!$self->{_UseSoftLimit}){
-      if (defined($self->{DB}->{db}) &&
-          lc($self->{DB}->{db}->{Driver}->{Name}) eq "mysql"){
-         $$limit="$limitnum";
-      }
-      if (defined($self->{DB}->{db}) &&
-          lc($self->{DB}->{db}->{Driver}->{Name}) eq "oracle"){
-         $$where="(".$$where.") and ROWNUM<=$limitnum";
-      }
-   }
-}
-
 sub getSqlGroup
 {
    my $self=shift;
@@ -405,18 +385,28 @@ sub getSqlSelect
    my @from=$self->getSqlFrom("select",@filter);
    my $group=$self->getSqlGroup("select",@filter);
    my $order=$self->getSqlOrder("select",@filter);
-   my $limit;
    my $limitnum=$self->{_Limit};
-   if ($limitnum){
-      $self->addLimit(\$where,\$order,\$limit,$limitnum);
-   }
    my @cmd;
    foreach my $from (@from){
       my $cmd="select ".$distinct.join(",",@fields)." from $from";
       $cmd.=" where ".$where if ($where ne "");
       $cmd.=" group by ".$group if ($group ne "");
       $cmd.=" order by ".$order if ($order ne "");
-      $cmd.=" limit ".$limit if ($limit ne "");
+      #
+      # Limit Handling
+      #
+#printf STDERR ("fifi limitnum=$limitnum in cmd=$cmd\n");
+      if ($limitnum>0 && !$self->{_UseSoftLimit}){
+
+         if (defined($self->{DB}->{db}) &&
+             lc($self->{DB}->{db}->{Driver}->{Name}) eq "mysql"){
+            $cmd.=" limit $limitnum";
+         }
+         if (defined($self->{DB}->{db}) &&
+             lc($self->{DB}->{db}->{Driver}->{Name}) eq "oracle"){
+            $cmd="select * from ($cmd) where ROWNUM<=$limitnum";
+         }
+      }
       my $disp=$cmd;
       $disp=~tr/\n/ /;
       if (!defined($where)){
@@ -442,10 +432,26 @@ sub getSqlCount
    my @from=$self->getSqlFrom("select",@filter);
    my $group=$self->getSqlGroup("select",@filter);
    my @cmd;
+   my $limitnum=$self->{_Limit};
    foreach my $from (@from){
       my $cmd="select  count(*) from $from";
       $cmd.=" where ".$where if ($where ne "");
       $cmd.=" group by ".$group if ($group ne "");
+
+      #
+      # Limit Handling
+      #
+      if ($limitnum>0 && !$self->{_UseSoftLimit}){
+         if (defined($self->{DB}->{db}) &&
+             lc($self->{DB}->{db}->{Driver}->{Name}) eq "mysql"){
+            $cmd.=" limit $limitnum";
+         }
+         if (defined($self->{DB}->{db}) &&
+             lc($self->{DB}->{db}->{Driver}->{Name}) eq "oracle"){
+            $cmd="select * from ($cmd) where ROWNUM<=$limitnum";
+         }
+      }
+
       my $disp=$cmd;
       $disp=~tr/\n/ /;
       if (!defined($where)){

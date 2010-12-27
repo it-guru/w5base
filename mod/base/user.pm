@@ -590,6 +590,18 @@ sub new
                 group         =>'userro',
                 dataobjattr   =>'contact.modifydate'),
 
+      new kernel::Field::Interface(
+                name          =>'synckey',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"contact.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'synckey1',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(contact.userid,35,'0')"),
+
       new kernel::Field::Date(
                 name          =>'lastlogon',
                 readonly      =>1,

@@ -448,6 +448,18 @@ sub new
                 group         =>'source',
                 label         =>'Source-Id',
                 dataobjattr   =>'amportfolio.externalid'),
+ 
+      new kernel::Field::Interface(
+                name          =>'synckey',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>'amcomputer.ORA_ROWSCN'),
+
+      new kernel::Field::Interface(
+                name          =>'synckey1',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(amportfolio.assettag,35,'0')"),
 
 #      new kernel::Field::Date(                # does not exists on amPortfolio
 #                name          =>'srcload',
@@ -595,9 +607,7 @@ sub getSqlFrom
 {
    my $self=shift;
    my $from=
-      "amcomputer, ".
-      "(select amportfolio.* from amportfolio ".
-      " where amportfolio.bdelete=0) amportfolio,ammodel,".
+      "amcomputer,amportfolio,ammodel,".
       "(select amcostcenter.* from amcostcenter ".
       " where amcostcenter.bdelete=0) amcostcenter";
 
@@ -608,7 +618,8 @@ sub initSqlWhere
 {
    my $self=shift;
    my $where=
-      "amportfolio.lportfolioitemid=amcomputer.litemid ".
+      "amportfolio.bdelete=0 ".
+      "and amportfolio.lportfolioitemid=amcomputer.litemid ".
       "and amportfolio.lmodelid=ammodel.lmodelid ".
       "and amportfolio.lcostid=amcostcenter.lcostid(+) ".
       "and ammodel.name='LOGICAL SYSTEM' ".
