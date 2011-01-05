@@ -141,9 +141,30 @@ sub new
       new kernel::Field::MDate(
                 name          =>'mdate',
                 group         =>'source',
-                sqlorder      =>'desc',
                 label         =>'Modification-Date',
                 dataobjattr   =>'interanswer.modifydate'),
+
+#      new kernel::Field::Interface(
+#                name          =>'synckey',
+#                group         =>'source',
+#                uivisible     =>0, 
+#                label         =>'Sync key',
+#                dataobjattr   =>"concat(interanswer.modifydate,".
+#                                "'-',lpad(interanswer.id,20,'0'))"),
+
+      new kernel::Field::Interface(
+                name          =>'synckey',
+                group         =>'source',
+                uivisible     =>0, 
+                label         =>'primary sync key',
+                dataobjattr   =>"interanswer.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'synckey1',
+                group         =>'source',
+                uivisible     =>0, 
+                label         =>'secondary sync key',
+                dataobjattr   =>"interanswer.id"),
 
       new kernel::Field::Creator(
                 name          =>'creator',
@@ -170,6 +191,7 @@ sub new
                 dataobjattr   =>'interanswer.realeditor'),
 
    );
+   $self->{use_distinct}=0;
    $self->{history}=[qw(insert modify delete)];
    $self->setDefaultView(qw(mdate parentobj parentid name relevant answer));
    $self->setWorktable("interanswer");
@@ -295,10 +317,10 @@ sub initSqlWhere
 {
    my $self=shift;
    my $mode=shift;
-   return(undef) if ($mode eq "delete");
-   return(undef) if ($mode eq "insert");
-   return(undef) if ($mode eq "update");
-   my $where;
+   return("") if ($mode eq "delete");
+   return("") if ($mode eq "insert");
+   return("") if ($mode eq "update");
+   my $where="";
    if ($self->{secparentobj} ne ""){
       $where="(interanswer.parentobj='$self->{secparentobj}' or ".
              "interanswer.parentobj is null)";
