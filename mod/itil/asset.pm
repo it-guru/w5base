@@ -92,7 +92,7 @@ sub new
                 group         =>'systems',
                 subeditmsk    =>'stodu',
                 vjointo       =>'itil::system',
-                vjoinbase     =>[{cistatusid=>"<=4"}],
+                vjoinbase     =>[{cistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'assetid'],
                 vjoininhash   =>['name','systemid','cistatusid','id'],
                 vjoindisp     =>['name','systemid','cistatus','shortdesc']),
@@ -149,7 +149,7 @@ sub new
                 searchable    =>0,
                 group         =>'systems',
                 vjointo       =>'itil::system',
-                vjoinbase     =>[{cistatusid=>"<=4"}],
+                vjoinbase     =>[{cistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'assetid'],
                 vjoindisp     =>['name']),
 
@@ -160,7 +160,7 @@ sub new
                 group         =>'systems',
                 htmldetail    =>0,
                 vjointo       =>'itil::system',
-                vjoinbase     =>[{cistatusid=>"<=4"}],
+                vjoinbase     =>[{cistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'assetid'],
                 vjoindisp     =>['systemid']),
 

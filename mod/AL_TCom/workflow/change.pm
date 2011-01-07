@@ -135,7 +135,7 @@ sub getDynamicFields
                                          container   =>'headref'),
 
            new kernel::Field::Text(      name        =>'tcomexternalid',
-                                         label       =>'ExternalID (I-Network)',
+                                         label       =>'ExternalID',
                                          group       =>'tcomcod',
                                          container   =>'headref'),
 

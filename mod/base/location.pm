@@ -674,6 +674,10 @@ sub Normalize
    if ($rec->{address1}=~m/\s+\d+\s*-\s*\d+\s*$/){
       $rec->{address1}=~s/^(.*)\s+(\d+)\s*-\s*(\d+)\s*$/$1 $2-$3/;
    }
+   if (($rec->{location}=~m/^M\xFC[h]{0,1}lheim$/i) &&
+       ($rec->{zipcode}=~m/^454/)){
+      $rec->{location}="M\xFChlheim an der Ruhr";
+   }
    if (($rec->{location}=~m/^M\xFC[h]{0,1}lheim$/i)){
       $rec->{location}="M\xFChlheim an der Donau";
    }
@@ -688,6 +692,15 @@ sub Normalize
    }
    if (($rec->{location}=~m/^Saarbr.*cken$/i) ){
       $rec->{location}="Saarbr\xFCcken";
+   }
+   if (($rec->{location}=~m/^Esslingen$/i) ){
+      $rec->{location}="Esslingen am Neckar";
+   }
+   if (($rec->{location}=~m/^Brandenburg$/i) ){
+      $rec->{location}="Brandenburg an der Havel";
+   }
+   if (($rec->{location}=~m/^Ludwigshafen$/i) ){
+      $rec->{location}="Ludwigshafen am Rhein";
    }
    if (($rec->{location}=~m/^frankfurt.*main.*$/i) ||
        ($rec->{location}=~m/^frankfurt a\.m\.$/i) ||
@@ -705,11 +718,15 @@ sub Normalize
    if ($rec->{zipcode} eq "0"){
       $rec->{zipcode}="";
    }
+   $rec->{address1}=~s/^St\./Sankt/;  # Sankt Abkürzung
    $rec->{location}=~s/^St\.{0,1}\s/Sankt /;  # Sankt Abkürzung
    $rec->{label}=~s/\.//;
    $rec->{address1}=~s/\.//;
    $rec->{address1}=~s/\(.*\)//;  # keine Klammerzusätze
    $rec->{location}=~s/\(.*\)//;  # keine Klammerzusätze
+   if (($rec->{location}=~m/^Naumburg.*/i) ){
+      $rec->{location}="Naumburg (Saale)";
+   }
 }
 
 sub getLocationByHash

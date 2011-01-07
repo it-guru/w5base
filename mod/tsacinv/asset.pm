@@ -420,12 +420,7 @@ sub initSqlWhere
 {
    my $self=shift;
    my $naturerest="";
-#  die Eingrenzung macht keinen Sinn mehr, da div. neue Models angelegt wurden
-#   if (!$self->IsMemberOf("admin")){
-#      $naturerest="and amnature.name in ('SERVER','VIRTUAL ASSET',".
-#                  "'NAS-FILER','SWITCH','CHASSIS','SERVER_COMP',".
-#                  "'F5 NETWORKS BIG-IP 6400 TRAFFIC MANAGEMENT')";
-#   }
+   $naturerest="and ammodel.fullname like '/HARDWARE/%'";
    my $where=
       "assetportfolio.assettag=amasset.assettag ".
       "and assetportfolio.lmodelid=ammodel.lmodelid ".
