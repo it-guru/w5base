@@ -187,11 +187,13 @@ sub getSqlFields
          if (!defined($joinonfield)){
             die("vjoinon not corret in field $field->{name}");
          }
-         my $selectfield=$joinonfield->getSelectField("select",$self->{DB});
-         if (defined($selectfield)){
-            $selectfield.=" ".$joinon;
-            if (!grep(/^$selectfield$/,@flist)){
-               push(@flist,$selectfield);
+         if (!grep(/^$joinon$/,@view)){
+            my $selectfield=$joinonfield->getSelectField("select",$self->{DB});
+            if (defined($selectfield)){
+               $selectfield.=" ".$joinon;
+               if (!grep(/^$selectfield$/,@flist)){
+                  push(@flist,$selectfield);
+               }
             }
          }
       }
