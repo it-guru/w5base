@@ -343,8 +343,15 @@ sub getPostibleRoleValues
    my $newrec=shift;
    my $app=$self->getParent();
    my @opt;
+   my $parentobj;
+   if (defined($current)){
+      $parentobj=$current->{parentobj};
+   }
+   else{
+      $parentobj=$newrec->{parentobj};
+   }
    foreach my $obj (values(%{$app->{lnkcontact}})){
-      push(@opt,$obj->getPosibleRoles($self,$current,$newrec));
+      push(@opt,$obj->getPosibleRoles($self,$parentobj,$current,$newrec));
    }
    return(@opt);
 }
