@@ -36,9 +36,10 @@ sub getPosibleRoles
 {
    my $self=shift;
    my $field=shift;
+   my $parentobj=shift;
    my $current=shift;
 
-   if ($current->{parentobj}=~m/^.+::custcontract/ ||
+   if ($parentobj=~m/^.+::custcontract/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
        $self->getParent->getParent->Self()=~m/^.+::custcontract$/)){
@@ -50,7 +51,7 @@ sub getPosibleRoles
              "customer"        =>$self->getParent->T("Customer Contact",
                                                      $self->Self));
    }
-   if ($current->{parentobj}=~m/^.+::costcenter/ ||
+   if ($parentobj=~m/^.+::costcenter/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
        $self->getParent->getParent->Self()=~m/^.+::costcenter$/)){

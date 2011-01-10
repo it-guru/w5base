@@ -36,9 +36,10 @@ sub getPosibleRoles
 {
    my $self=shift;
    my $field=shift;
+   my $parentobj=shift;
    my $current=shift;
 
-   if ($current->{parentobj}=~m/^.+::timeplan/ ||
+   if ($parentobj=~m/^.+::timeplan/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
        $self->getParent->getParent->Self()=~m/^.+::timeplan$/)){

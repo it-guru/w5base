@@ -36,10 +36,9 @@ sub getPosibleRoles
 {
    my $self=shift;
    my $field=shift;
+   my $parentobj=shift;
    my $current=shift;
    my $newrec=shift;
-
-   my $parentobj=effVal($current,$newrec,"parentobj");
 
 
    if ($parentobj=~m/^.+::appl$/ ||
