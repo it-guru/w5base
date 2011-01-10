@@ -402,6 +402,71 @@ sub new
                 label         =>'SIXT Car-rent driver number',
                 dataobjattr   =>'contact.sixtcarno'),
 
+      new kernel::Field::Date(
+                name          =>'dateofworksafty',
+                dayonly       =>1,
+                group         =>'introdution',
+                label         =>'date of "Work Safty" introdution',
+                dataobjattr   =>'contact.dateofworksafty'),
+
+      new kernel::Field::Link(
+                name          =>'dateofworksafty_edt',
+                group         =>'introdution',
+                label         =>'date of "Work Safty" introdution EDT',
+                dataobjattr   =>'contact.dateofworksafty_edt'),
+
+      new kernel::Field::Date(
+                name          =>'dateofdatapriv',
+                dayonly       =>1,
+                group         =>'introdution',
+                label         =>'date of "Data Privacy" introdution',
+                dataobjattr   =>'contact.dateofdatapriv'),
+
+      new kernel::Field::Link(
+                name          =>'dateofdatapriv_edt',
+                group         =>'introdution',
+                label         =>'date of "Data Privacy" introdution EDT',
+                dataobjattr   =>'contact.dateofdatapriv_edt'),
+
+      new kernel::Field::Date(
+                name          =>'dateofcorruprot',
+                dayonly       =>1,
+                group         =>'introdution',
+                label         =>'date of "Corruption Protection" introdution',
+                dataobjattr   =>'contact.dateofcorruprot'),
+
+      new kernel::Field::Link(
+                name          =>'dateofcorruprot_edt',
+                group         =>'introdution',
+                label         =>'date of "Corruption Protection" introdution EDT',
+                dataobjattr   =>'contact.dateofcorruprot_edt'),
+
+      new kernel::Field::Date(
+                name          =>'dateofvsnfd',
+                dayonly       =>1,
+                group         =>'introdution',
+                label         =>'date of "VSnfD" introdution',
+                dataobjattr   =>'contact.dateofvsnfd'),
+
+      new kernel::Field::Link(
+                name          =>'dateofvsnfd_edt',
+                group         =>'introdution',
+                label         =>'date of "VSnfD" introdution EDT',
+                dataobjattr   =>'contact.dateofvsnfd_edt'),
+
+      new kernel::Field::Date(
+                name          =>'dateofsecretpro',
+                dayonly       =>1,
+                group         =>'introdution',
+                label         =>'date of "Secret Protection" introdution',
+                dataobjattr   =>'contact.dateofsecretpro'),
+
+      new kernel::Field::Link(
+                name          =>'dateofvsnfd_edt',
+                group         =>'introdution',
+                label         =>'date of "VSnfD" introdution EDT',
+                dataobjattr   =>'contact.dateofvsnfd_edt'),
+
       new kernel::Field::Select(
                 name          =>'tz',
                 label         =>'Timezone',
@@ -934,6 +999,12 @@ sub Validate
          }
       }
    }
+   foreach my $dateof (qw(dateofdatapriv dateofworksafty dateofcorruprot 
+                          dateofvsnfd dateofsecretpro)){
+      if (effChanged($oldrec,$newrec,$dateof)){
+         $newrec->{"${dateof}_edt"}=$ENV{REMOTE_USER}.";".NowStamp("en");
+      } 
+   }
    if (defined($newrec->{email})){
       $newrec->{email}=undef if ($newrec->{email} eq "");
    }
@@ -1047,7 +1118,7 @@ sub isViewValid
       }
    }
    if ($userid==$rec->{userid}){
-      push(@gl,"personrelated","history","interview");
+      push(@gl,"personrelated","introdution","history","interview");
    }
    else{
       # check if the user has a direct boss
@@ -1060,7 +1131,7 @@ sub isViewValid
                      if (grep(/^$orole$/,@{$grp->{roles}})){
                         if ($self->IsMemberOf($grp->{grpid},
                                               ["RBoss","RBoss2"],"direct")){
-                           push(@gl,"personrelated","private","history",
+                           push(@gl,"personrelated","introdution","private","history",
                                     "officeacc","interview");
                         }
                      }
@@ -1070,7 +1141,7 @@ sub isViewValid
          }
          if (!grep(/^personrelated$/,@gl)){
             if ($self->IsMemberOf("admin")){ 
-               push(@gl,"personrelated","private","interview");
+               push(@gl,"personrelated","introdution","private","interview");
             }
          }
       }
@@ -1114,14 +1185,14 @@ sub isWriteValid
    return(undef) if (!defined($rec));
    if ($self->IsMemberOf("admin")){
       return(qw(default name office private userparam groups usersubst control
-                comments header picture nativcontact userro personrelated
+                comments header picture nativcontact userro personrelated introdution
                 interview officeacc));
    }
    my $userid=$self->getCurrentUserId();
    if ($userid eq $rec->{userid} ||
        ($rec->{creator}==$userid && $rec->{cistatusid}<3)){
       return("name","userparam","office","officeacc","private","nativcontact",
-             "usersubst","control","officeacc","personrelated",
+             "usersubst","control","officeacc","personrelated","introdution",
              "officeacc","interview");
    }
    # check if the user has a direct boss
@@ -1133,7 +1204,7 @@ sub isWriteValid
                if (grep(/^$orole$/,@{$grp->{roles}})){
                   if ($self->IsMemberOf($grp->{grpid},["RBoss","RBoss2"],
                                         "direct")){
-                     return("personrelated","private",
+                     return("personrelated","introdution","private",
                             "officeacc","interview","office");
                      last;
                   }
@@ -1272,7 +1343,7 @@ sub getDetailBlockPriority
    my $grp=shift;
    my %param=@_;
    return(qw(header name picture default comments nativcontact office 
-             officeacc private personrelated 
+             officeacc private personrelated introdution
              userparam control groups usersubst userid userro ));
 }
 

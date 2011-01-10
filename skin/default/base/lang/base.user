@@ -41,6 +41,7 @@
 'fieldgroup.name'=>{ de=>'Name',en=>'Name'},
 'fieldgroup.office'=>{ de=>'Geschäfts-Kontakt',en=>'Office-ContactProfile'},
 'fieldgroup.personrelated'=>{ de=>'Personenbezogene Daten',en=>'Person related'},
+'fieldgroup.introdution'=>{ de=>'Unterweisungen',en=>'Introdutions'},
 'fieldgroup.officeacc'=>{ de=>'Geschäftliche-Buchungsinformation',en=>'Office-Accounting informations'},
 'fieldgroup.nativcontact'=>{ de=>'minimale Kontaktdaten',en=>'minimal Contactdata'},
 'fieldgroup.private'=>{ de=>'Privat-Kontakt',en=>'Private-ContactProfile'},
@@ -90,3 +91,28 @@
 'driver license number'=>{de=>'Führerscheinnummer'},
 'EURO Car-rent driver number'=>{de=>'EURO Car-Vermietung Driver ID'},
 'SIXT Car-rent driver number'=>{de=>'SIXT Car-Vermietung Driver ID'},
+
+'date of "Work Safty" introdution'=>{
+   de=>'Datum der letzten "Arbeitsschutz" Unterweisung'},
+'date of "Work Safty" introdution EDT'=>{
+   de=>'Datum der letzten "Arbeitsschutz" Unterweisung EDT'},
+
+'date of "Data Privacy" introdution'=>{
+   de=>'Datum der letzten "Datenschutz" Unterweisung'},
+'date of "Data Privacy" introdution EDT'=>{
+   de=>'Datum der letzten "Datenschutz" Unterweisung EDT'},
+
+'date of "Corruption Protection" introdution'=>{
+   de=>'Datum der letzten "Korruptionsvermeidung" Unterweisung'},
+'date of "Corruption Protection" introdution EDT'=>{
+   de=>'Datum der letzten "Korruptionsvermeidung" Unterweisung EDT'},
+
+'date of "VSnfD" introdution'=>{
+   de=>'Datum der letzten "VSnfD" Unterweisung'},
+'date of "VSnfD" introdution EDT'=>{
+   de=>'Datum der letzten "VSnfD" Unterweisung EDT'},
+
+'date of "Secret Protection" introdution'=>{
+   de=>'Datum der letzten "Geheimschutz" Unterweisung'},
+'date of "Secret Protection" introdution EDT'=>{
+   de=>'Datum der letzten "Geheimschutz" Unterweisung EDT'},
