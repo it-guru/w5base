@@ -144,23 +144,15 @@ sub new
                 label         =>'Modification-Date',
                 dataobjattr   =>'interanswer.modifydate'),
 
-#      new kernel::Field::Interface(
-#                name          =>'synckey',
-#                group         =>'source',
-#                uivisible     =>0, 
-#                label         =>'Sync key',
-#                dataobjattr   =>"concat(interanswer.modifydate,".
-#                                "'-',lpad(interanswer.id,20,'0'))"),
-
       new kernel::Field::Interface(
-                name          =>'synckey',
+                name          =>'replkeypri',
                 group         =>'source',
                 uivisible     =>0, 
                 label         =>'primary sync key',
                 dataobjattr   =>"interanswer.modifydate"),
 
       new kernel::Field::Interface(
-                name          =>'synckey1',
+                name          =>'replkeysec',
                 group         =>'source',
                 uivisible     =>0, 
                 label         =>'secondary sync key',

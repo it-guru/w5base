@@ -591,13 +591,13 @@ sub new
                 dataobjattr   =>'contact.modifydate'),
 
       new kernel::Field::Interface(
-                name          =>'synckey',
+                name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
                 dataobjattr   =>"contact.modifydate"),
 
       new kernel::Field::Interface(
-                name          =>'synckey1',
+                name          =>'replkeysec',
                 group         =>'source',
                 label         =>'secondary sync key',
                 dataobjattr   =>"lpad(contact.userid,35,'0')"),

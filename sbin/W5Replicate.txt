@@ -39,6 +39,7 @@ CREATE TABLE "base::user" (
    W5REPLLASTSUCC DATE     not null,
    W5REPLLASTTRY  DATE     not null,
    W5REPLMDATE    DATE     not null,
+   W5REPLCDATE    DATE     not null,
    W5REPLFAILCNT  NUMBER(22,0) default 0 not null,
    constraint "base::user_pk" primary key (USERID)
 );
@@ -62,6 +63,7 @@ CREATE TABLE "base::grp" (
    W5REPLLASTSUCC DATE     not null,
    W5REPLLASTTRY  DATE     not null,
    W5REPLMDATE    DATE     not null,
+   W5REPLCDATE    DATE     not null,
    W5REPLFAILCNT  NUMBER(22,0) default 0 not null,
    constraint "base::grp_pk" primary key (GRPID)
 );
@@ -70,7 +72,7 @@ CREATE INDEX "base::grp_si2" ON "base::grp"(W5REPLLASTSUCC);
 CREATE INDEX "base::grp_di1" ON "base::grp"(FULLNAME);
 -------------------------------------------------------------------------
 Sample replication table for object "tsacinv::system":
-=================================================
+======================================================
 
 CREATE TABLE "tsacinv::system" (
    SYSTEMID       VARCHAR2(20) not null,
@@ -84,12 +86,35 @@ CREATE TABLE "tsacinv::system" (
    W5REPLLASTSUCC DATE     not null,
    W5REPLLASTTRY  DATE     not null,
    W5REPLMDATE    DATE     not null,
+   W5REPLCDATE    DATE     not null,
    W5REPLFAILCNT  NUMBER(22,0) default 0 not null,
    constraint "tsacinv::system_pk" primary key (SYSTEMID)
 );
 CREATE INDEX "tsacinv::system_si1" ON "tsacinv::system"(W5REPLSYNC);
 CREATE INDEX "tsacinv::system_si2" ON "tsacinv::system"(W5REPLLASTSUCC);
 CREATE INDEX "tsacinv::system_di1" ON "tsacinv::system"(SYSTEMNAME);
+-------------------------------------------------------------------------
+Sample replication table for object "base::interview":
+======================================================
+
+CREATE TABLE "base::interview" (
+   ID             NUMBER(22,0) not null,
+   NAME           VARCHAR2(128),
+   INTERVIEWCATID VARCHAR2(40),
+   CISTATUSID     NUMBER(1,0),
+   MDATE          DATE,
+   W5REPLSYNC     CHAR(70) not null,
+   W5REPLSYNCKEY  CHAR(35) not null,
+   W5REPLSYNCKEY1 CHAR(35),
+   W5REPLLASTSUCC DATE     not null,
+   W5REPLLASTTRY  DATE     not null,
+   W5REPLMDATE    DATE     not null,
+   W5REPLCDATE    DATE     not null,
+   W5REPLFAILCNT  NUMBER(22,0) default 0 not null,
+   constraint "base::interview_pk" primary key (ID)
+);
+CREATE INDEX "base::interview_si1" ON "base::interview"(W5REPLSYNC);
+CREATE INDEX "base::interview_si2" ON "base::interview"(W5REPLLASTSUCC);
 -------------------------------------------------------------------------
 
 

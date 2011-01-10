@@ -24,7 +24,12 @@ sub msg
    foreach my $linemsg (split(/\n/,$msg)){
       $d.=sprintf("%-6s %s\n",$type.":",$linemsg);
    }
-   print STDERR $d;
+   if ($W5V2::OperationContext eq "W5Server" && $type eq "INFO"){
+      print $d;
+   }
+   else{
+      print STDERR $d;
+   }
    return($d);
 }
 

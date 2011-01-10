@@ -1,4 +1,21 @@
 #!/usr/bin/env perl 
+#  W5Base Framework W5Replicate - object mirroring tool
+#  Copyright (C) 2011  Hartmut Vogler (it@guru.de)
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use lib "$FindBin::Bin/../mod";
@@ -11,15 +28,21 @@ use Getopt::Long;
 use kernel::cgi;
 use DBI;
 use POSIX;
-use vars qw($opt_v $opt_h $opt_c $opt_t $opt_s $opt_l $configname);
-$0="W5Event ".join(" ",@ARGV);
+use vars qw($opt_v $opt_h $opt_c $opt_t $opt_s $opt_q $opt_l $configname);
 exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'smallpack=i'=>\$opt_s,
                         'tasks=i'=>\$opt_t,
+                        'quietmode'=>\$opt_q,
                         'limittime=i'=>\$opt_l,
                         'debug'=>\$opt_v,
                         'help'=>\$opt_h,
                         'config=s'=>\$opt_c));
+my @ObjectFilter=@ARGV;
+
+if ($opt_q){
+   open STDOUT, '>>/dev/null' or die "Can't write to /dev/null: $!";
+}
+
 my $ReplicationStart=time();
 if ($opt_h){
    Help();exit(255);
@@ -30,6 +53,8 @@ if ($opt_v){
 else{
    $W5V2::Debug=0;
 }
+
+
 
 if ($ENV{REMOTE_USER} eq ""){
    if ($ENV{USER} ne ""){
@@ -139,6 +164,51 @@ $W5V2::Query=new kernel::cgi({});
 #==================================================================
 #
 
+#
+# filtering requested objects
+#
+sub filterMatch
+{
+  #({obj=>$ctrl->{'name'}},\@ObjectFilter)
+  my $arg=shift;
+  my $flt=shift;
+  my $match=0;
+
+  if (exists($arg->{id})){   # is record-filter request
+
+  }
+  else{                      # is object filtering
+     foreach my $frec (@$flt){
+        my $neg=0;
+        my $o=$frec->{obj};
+        if ($o=~m/^\!/){
+           $o=~s/^\!//;
+           $neg=1;
+        }
+        my $qo=quotemeta($o);
+        $qo=~s/\\\*/.*/g;
+        if ($arg->{'obj'}=~m/^$qo$/){
+           if (!$neg){
+              $match=1;
+           }
+           else{
+              return(0);
+           }
+        }
+        else{
+           if ($neg){
+              $match=1;
+           }
+           else{
+              return(0);
+           }
+        }
+     }
+  }
+  return($match);
+}
+
+
 
 #
 # Connect to replication target oracle DB via DBI
@@ -185,7 +255,8 @@ sub getRequestedReplicationObjects
       if ($tab->{'table_name'}=~m/::/){ # objects are recognizable by :: 
          my %ctrl=('name'=>$tab->{'table_name'},
                    'prio'=>'0',
-                   'valid'=>'0');
+                   'valid'=>'0',
+                   'requested'=>'1');
          push(@replicationOjects,\%ctrl);
       }
    }
@@ -195,7 +266,7 @@ sub getRequestedReplicationObjects
    # w5base. If the fieldname begins with w5, it will be ignored in view.
    #
    foreach my $ctrl (@replicationOjects){
-      my $replsync_found=0;
+      my $replkey_found=0;
       $ctrl->{'view'}=[];
       $ctrl->{'columns'}=[];
       $ctrl->{'col'}={};
@@ -211,15 +282,15 @@ sub getRequestedReplicationObjects
          if (!(lc($col->{'column_name'})=~m/^w5/)){
             push(@{$ctrl->{'view'}},lc($col->{'column_name'}));
          }
-         if (lc($col->{'column_name'}) eq "w5replsync"){
-            $replsync_found++;
+         if (lc($col->{'column_name'}) eq "w5replkey"){
+            $replkey_found++;
          }
       }
 
       #
       # validating object names against the connected w5base system
       #
-      if ($replsync_found){
+      if ($replkey_found){
          my $obj=getModuleObject($Config,$ctrl->{'name'});
          if (defined($obj)){
             my $idobj=$obj->IdField();
@@ -228,21 +299,58 @@ sub getRequestedReplicationObjects
                $ctrl->{'idname'}=$idname;
                if (exists($ctrl->{'col'}->{lc($idname)})){ # check on id col
                   $ctrl->{'valid'}=1;
-                  $ctrl->{'syncfields'}=['synckey','synckey1'];
+                  $ctrl->{'replkeyfields'}=['replkeypri','replkeysec'];
                }
             }
-            my $syncobj=$obj->getField("synckey");
+            my $syncobj=$obj->getField("replkeypri");
             if (!defined($syncobj)){
-               msg(ERROR,"requested object '$ctrl->{'name'}' ".
+               msg(ERROR,"remote object '$ctrl->{'name'}' ".
                          "is not replication compatible");
                $ctrl->{'valid'}=0;
             }
          }
       }
+      else{
+         msg(ERROR,"missing essential target fields in ora ".
+                   "object '$ctrl->{'name'}'");
+         $ctrl->{'valid'}=0;
+      }
    }
-
    $dbi->commit();
    $dbi->disconnect();
+
+   if ($#ObjectFilter!=-1){
+      my @objflt;
+      foreach my $k (@ObjectFilter){
+         if (my ($obj,$id)=$k
+             =~m/^(!{0,1}[a-z0-9*_]+::[a-z0-9*_]+)(\[.*\]){0,1}$/i){
+            my %f=(obj=>$obj);
+            if (defined($id)){
+               $f{'id'}=$id;
+            }
+            push(@objflt,\%f);
+         }
+         else{
+            msg(ERROR,"invalid object/element filter '$k'");
+            exit(255);
+         }
+      }
+
+      @ObjectFilter=@objflt;
+      foreach my $ctrl (@replicationOjects){ 
+         $ctrl->{'requested'}=0;
+         if (filterMatch({obj=>$ctrl->{'name'}},\@ObjectFilter)){
+            $ctrl->{'requested'}=1;
+            msg(INFO,"object '$ctrl->{name}' requested by filter");
+         }
+         else{
+            msg(INFO,"object '$ctrl->{name}' NOT requested");
+         }
+      }
+   }
+
+
+
    return(@replicationOjects);
 }
 
@@ -264,39 +372,40 @@ sub objectReplicationPhase1
       msg(ERROR,"can not connect to $ctrl->{name}");
       return(undef);
    }
-   my $oldsynckey;
+   my $oldreplkey;
    while($ReplicationStart+$MaximumReplicationTime-10>time() &&
          $start+$phaselimit>time()){
       my $syncstart;
-      my $synckey1;
-      my $cmd="select max(w5replsync) sstart from \"$ctrl->{name}\"";
+      my $replkeysec;
+      my $cmd="select max(w5replkey) sstart from \"$ctrl->{name}\"";
       foreach my $rec ($dbi->getHashList($cmd)){
          $syncstart=$rec->{'sstart'};
       }
       $obj->ResetFilter();
       $obj->Limit($smallpack,0,0);
-      if (defined($syncstart)){ # restart sync process at last known position
-         my $cmd="select w5replsynckey k,w5replsynckey1 s ".
+      if (defined($syncstart)){ # restart sync process at 
+                                # last known position
+         my $cmd="select w5replkeypri p,w5replkeysec s ".
                  "from \"$ctrl->{name}\" ".
-                 "where w5replsync=?";
-         my $synckey;
+                 "where w5replkey=?";
+         my $replkey;
          foreach my $rec ($dbi->getHashList($cmd,$syncstart)){
-            $synckey=trim($rec->{'k'});
-            $synckey1=trim($rec->{'s'});
+            $replkey=trim($rec->{'p'});
+            $replkeysec=trim($rec->{'s'});
          }
-         if (defined($synckey)){
-            if ($synckey ne $oldsynckey){  # do small steps
-               $obj->SetFilter({'synckey'=>">=\"".$synckey."\""});
+         if (defined($replkey)){
+            if ($replkey ne $oldreplkey){  # do small steps
+               $obj->SetFilter({'replkeypri'=>">=\"".$replkey."\""});
                $obj->Limit($smallpack,0,0);
             }
             else{
-               $obj->SetFilter({'synckey'=>\$synckey});
+               $obj->SetFilter({'replkeypri'=>\$replkey});
                my $n=$obj->CountRecords();
                $obj->ResetFilter();
-               $obj->SetFilter({'synckey'=>">=\"".$synckey."\""});
+               $obj->SetFilter({'replkeypri'=>">=\"".$replkey."\""});
                if ($n>$smallpack-1){
-                  msg(WARN,"found $n records with the same synckey '%s'",
-                      $synckey);
+                  msg(WARN,"found $n records with the same replkey '%s'",
+                      $replkey);
                   $obj->Limit($n+$smallpack,0,0);
                }
                else{
@@ -306,7 +415,7 @@ sub objectReplicationPhase1
          }
       }
 #msg(WARN,"pack %d",time());
-      my @syncfields=@{$ctrl->{'syncfields'}};
+      my @syncfields=@{$ctrl->{'replkeyfields'}};
       $obj->SetCurrentView(@syncfields,@{$ctrl->{'view'}});
       $obj->SetCurrentOrder(@syncfields);
 
@@ -314,11 +423,11 @@ sub objectReplicationPhase1
       my $processed=0;
       if (defined($srcrec)){
          do{
-            $oldsynckey=$srcrec->{'synckey'};
-            if (defined($synckey1) && $srcrec->{'synckey'} ge $synckey1){
-               $synckey1=undef;
+            $oldreplkey=$srcrec->{'replkeypri'};
+            if (defined($replkeysec) && $srcrec->{'replkeysec'} ge $replkeysec){
+               $replkeysec=undef;
             }
-            if (!defined($synckey1)){   # seek to synkey1 position in stream
+            if (!defined($replkeysec)){   # seek to synkey1 position in stream
                if (!$dbi->InsertOrUpdate($ctrl,$srcrec)){
                   msg(ERROR,"REPLICATION BREAK: fail to write in ".
                             "object '$ctrl->{'name'}'");
@@ -373,11 +482,13 @@ sub objectReplicationPhase2
       $n=$rec->{'n'};
       if ($n>100){
          $n=int($n/14);
-         my $cmd="select max(w5repllasttry) w5repllasttry from ".
-                 "(select w5repllasttry from \"$ctrl->{name}\" ".
-                 "order by w5repllasttry) where ROWNUM<$n ";
+         my $cmd="select (m1.max-m2.min)/4+m2.min avg ".
+                 "from ".
+                 "(select max(w5repllasttry) max from \"$ctrl->{name}\") m1,".
+                 "(select min(w5repllasttry) min from \"$ctrl->{name}\") m2";
          if (my $drec=$dbi->getHash($cmd)){
-            $basewhere="where w5repllasttry<'$drec->{w5repllasttry}' ";
+            $basewhere="where w5repllasttry<'$drec->{avg}' ".
+                       "and w5repllasttry<SYSDATE-(1/24) and ROWNUM<$n ";
          }
       }
    }
@@ -400,7 +511,7 @@ sub objectReplicationPhase2
                      "where $ctrl->{idname}=?",$id);
          $obj->ResetFilter();
          $obj->SetFilter({$ctrl->{idname}=>\$id});
-         my ($rrec,$msg)=$obj->getOnlyFirst(@{$ctrl->{'syncfields'}},
+         my ($rrec,$msg)=$obj->getOnlyFirst(@{$ctrl->{'replkeyfields'}},
                                             @{$ctrl->{'view'}});
          if (defined($rrec)){
             if (!$dbi->InsertOrUpdate($ctrl,$rrec)){
@@ -422,6 +533,32 @@ sub objectReplicationPhase2
    $dbi->commit();
    $dbi->disconnect();
    msg(INFO,"end:   phase 2 replication for $ctrl->{name}");
+}
+
+
+#
+# Phase3 replication process for a specified object - in this phase, the
+# old/aged elements will be deleted
+# Per default, all records with a failcount>2 and last success older then
+# 7 days, will be deleted
+#
+sub objectReplicationPhase3
+{
+   my $Config=shift;
+   my $phaselimit=shift;
+   my $ctrl=shift;
+   my $start=time();
+   msg(INFO,"============================================");
+   msg(INFO,"start: phase 3 replication for $ctrl->{name} - refresh");
+   my ($dbi,$schema)=getOracleDBIConnectionHandle();
+
+   my $cmd="delete from \"$ctrl->{name}\" ".
+           "where w5repllastsucc<sysdate-7 and w5replfailcnt>2";
+   msg(INFO,"oracmd=$cmd");
+   $dbi->doCmd($cmd);
+   $dbi->commit();
+   $dbi->disconnect();
+   msg(INFO,"end:   phase 3 replication for $ctrl->{name}");
 }
 
 
@@ -455,44 +592,45 @@ my @ReplicationObjects=getRequestedReplicationObjects($config);
 my @joblist;
 
 foreach my $replControl (@ReplicationObjects){
-   if ($replControl->{'name'} eq "tsacinv::system"){
-      if ($replControl->{'valid'}){
-         unshift(@joblist,{phase=>1,replControl=>$replControl});
-         push(@joblist,{phase=>2,replControl=>$replControl});
-      }
-      else{
-         msg(ERROR,"ignoring invalid replication ".
-                   "object '$replControl->{name}'");
-      }
+   if ($replControl->{'valid'} && $replControl->{'requested'}){
+      unshift(@joblist,{phase=>1,replControl=>$replControl});
+      push(@joblist,{phase=>2,replControl=>$replControl});
+      push(@joblist,{phase=>3,replControl=>$replControl});
    }
 }
 
 my @slot;
-my $phaselimit=int($MaximumReplicationTime/2*3)-10;
+my $phaselimit=int($MaximumReplicationTime/2*3)-15;
 my $currentStartPhase;
 while(my $nextjob=shift(@joblist)){
    for(my $slotno=0;$slotno<$maxslots;$slotno++){
       if (!defined($slot[$slotno])){
          my $replControl=$nextjob->{'replControl'};
-         if ($replControl->{'valid'}){
+         if ($replControl->{'valid'} && $replControl->{'requested'}){
             if ($nextjob->{'phase'}==1){
                $currentStartPhase=1;
                $slot[$slotno]=createSlot("Phase1",1,$replControl,sub{
                   objectReplicationPhase1($config,$phaselimit,$replControl);
                });
             }
-            elsif ($nextjob->{'phase'}==2){
-               if ($currentStartPhase!=2){ # change phase limit on switch lev2
+            elsif ($nextjob->{'phase'}==2){ 
+               if ($currentStartPhase<2){ # change phase limit on sw lev2
                   $phaselimit=$MaximumReplicationTime-
                               (time()-$ReplicationStart);
                   if ($#joblist!=-1){
-                     $phaselimit=int($phaselimit/($#joblist+1));
+                     $phaselimit=int($phaselimit/($#joblist+1))-5;
                      $phaselimit=10 if ($phaselimit<10);
                   }
                }
                $currentStartPhase=2;
                $slot[$slotno]=createSlot("Phase2",10,$replControl,sub{
                   objectReplicationPhase2($config,$phaselimit,$replControl);
+               });
+            }
+            elsif ($nextjob->{'phase'}==3){  # cleanup
+               $currentStartPhase=3;
+               $slot[$slotno]=createSlot("Phase3",2,$replControl,sub{
+                  objectReplicationPhase3($config,10,$replControl);
                });
             }
          }
@@ -539,17 +677,27 @@ sub Help
 {
    printf("Usage: W5Replicate [OPTIONS] [OBJECTS]\n");
    printf("\n");
+   my $form=" %-60s %17s\n";
    printf("OPTIONS:\n");
-   printf(" --config      = configuration file             [replicate.conf]\n");
-   printf(" --limittime   = limit time for replication process in sec  [60]\n");
-   printf(" --tasks       = limit the count of parallel processes       [3]\n");
+   printf($form,"--config     configuration file",
+          "[replicate.conf]");
+   printf($form,"--debug      enable debug messages",
+          "[false]");
+   printf($form,"--quietmode  disable all INFO messages to STDOUT",
+          "[false]");
+   printf($form,"--limittime  limit t for replication process in sec",
+          "[60]");
+   printf($form,"--phase      process the specified phases",
+          "[1,2,3]");
+   printf($form,"--tasks      limit the count of parallel processes",
+          "[3]");
    printf("\n");
    printf("OBJECTS:\n");
    printf("None, one or more object names (in W5Base interal notation), ".
           "witch\nare should be replicated. If the Notation object(id) is ".
           "used,\nonly the specified record id will be replicated.\n".
           "f.e.:\n".
-          "base::user base::grp itil::system ...\n".
+          "base::user base::grp itil::system !base::workflow ...\n".
           "base::location(12711643270034)\n\n");
 }
 #==================================================================
@@ -621,11 +769,11 @@ sub preprocessRecord
    my ($ctrl,$reqrec,$col)=@_;
    my %rec=(%$reqrec);
 
-   $rec{'w5replsync'}=sprintf("%35s%35s",$rec{'synckey'},$rec{'synckey1'});
-   $rec{'w5replsync'}=~s/ /0/g;
-   $rec{'w5replsynckey'}=$rec{'synckey'};
-   $rec{'w5replsynckey1'}=$rec{'synckey1'};
-   foreach my $k (@{$ctrl->{'syncfields'}}){
+   $rec{'w5replkey'}=sprintf("%35s%35s",$rec{'replkeypri'},$rec{'replkeysec'});
+   $rec{'w5replkey'}=~s/ /0/g;
+   $rec{'w5replkeypri'}=$rec{'replkeypri'};
+   $rec{'w5replkeysec'}=$rec{'replkeysec'};
+   foreach my $k (@{$ctrl->{'replkeyfields'}}){
       delete($rec{$k});
    }
    foreach my $fieldname (keys(%rec)){
@@ -724,9 +872,18 @@ sub InsertOrUpdate
       }
       #my @values=map({$rec->{$_}} @view);
       #my @place=map({'?'} @view);
+      if (exists($ctrl->{'col'}->{'w5replmdate'})){
+         push(@view,'w5replmdate');
+         push(@place,'sysdate');
+      }
+      if (exists($ctrl->{'col'}->{'w5replcdate'})){
+         push(@view,'w5replcdate');
+         push(@place,'sysdate');
+      }
+      
       my $inscmd="insert into \"$dbtable\" ".
-        "(".join(",",@view,"w5repllastsucc","w5repllasttry","w5replmdate").") ".
-        "values(".join(",",@place,'sysdate','sysdate','sysdate').")";
+        "(".join(",",@view,"w5repllastsucc","w5repllasttry").") ".
+        "values(".join(",",@place,'sysdate','sysdate').")";
       msg(INFO,"ins: $inscmd");
       return($self->doCmd($inscmd,@values));
    }

@@ -450,13 +450,13 @@ sub new
                 dataobjattr   =>'amportfolio.externalid'),
  
       new kernel::Field::Interface(
-                name          =>'synckey',
+                name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
                 dataobjattr   =>'amcomputer.ORA_ROWSCN'),
 
       new kernel::Field::Interface(
-                name          =>'synckey1',
+                name          =>'replkeysec',
                 group         =>'source',
                 label         =>'secondary sync key',
                 dataobjattr   =>"lpad(amportfolio.assettag,35,'0')"),
