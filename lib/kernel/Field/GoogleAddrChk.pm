@@ -150,7 +150,7 @@ $parser=new XML::Parser(Style=>"Stream");
                      push(@msg,"Correct Street to: $gstreet");
                   }
                   my $gloca=$gloc->{address_component}->{localitypolitical}->{long_name};
-                  if ($gloca ne $location){
+                  if (trim($gloca) ne trim($location)){
                      push(@msg,"Correct Location to: $gloca");
                   }
  
