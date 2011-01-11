@@ -403,27 +403,32 @@ sub SimilarCheck
       my $location=$current->{location};
       $location=~s/\s/*/g;
       $location=~s/\d/*/g;
-   #   push(@flt,{location=>$location,
-   #              address1=>$address1});
+      push(@flt,{location=>$location,
+                 address1=>$address1});
    }
    {
       my $location=$current->{location};
       $location=~s/^(\S{0,5}).*/$1/;
-      push(@flt,{location=>$location});
+      $location=~s/[^a-z]/*/i;
+      my $address1=$current->{address1};
+      $address1=~s/^(\S{0,5}).*/$1/;
+      $address1=~s/[^a-z]/*/i;
+      push(@flt,{location=>$location,
+                 address1=>$address1});
    }
    
 
+   my %res;
    foreach my $f (@flt){
       $loc->ResetFilter();
       $loc->SetFilter($f);
-#      $loc->Limit(20,0,0);
-      my %res;
+      $loc->Limit(20,0,0);
       foreach my $rec ($loc->getHashList(qw(id name))){
          if ($rec->{id}!=$current->{id}){
             $res{$rec->{id}}=$rec->{name}." ( ".$rec->{id}." )";
          }
       }
-    #  last if (keys(%res)>60);
+      last if (keys(%res)>60);
    }
    return(join("\n",sort(values(%res))));
 }
