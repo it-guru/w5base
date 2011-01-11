@@ -247,6 +247,21 @@ sub new
                 },
                 address=>\&AddressBuild),
 
+      new kernel::Field::GoogleAddrChk(
+                name          =>'googlechk',
+                group         =>'map',
+                uploadable    =>0,
+                htmldetail    =>0,
+                htmlwidth     =>'200px',
+                label         =>'Google Address Check',
+                depend        =>['country','address1',
+                                 'label',
+                                 'gpslongitude',
+                                 'gpslatitude',
+                                 'zipcode','location'],
+                address=>\&AddressBuild),
+
+
       new kernel::Field::Number(
                 name          =>'gpslongitude',
                 precission    =>8,
