@@ -81,7 +81,7 @@ $parser=new XML::Parser(Style=>"Stream");
          $addr.=$address1;
       }
       printf STDERR ("addr=%s\n",$addr);
-      my $q=kernel::cgi::Hash2QueryString({'address'=>,$addr,
+      my $q=kernel::cgi::Hash2QueryString({'address'=>,latin1($addr)->utf8(),
                                            'sensor'=>'false'});
       sleep(1); 
       my $url="http://maps.google.com/maps/api/geocode/xml?$q";
