@@ -64,7 +64,21 @@ sub new
                 name          =>'name',
                 htmlwidth     =>'540px',
                 label         =>'Question',
+                depend        =>['name_de','name_en'],
+                readonly      =>1,
+                onRawValue    =>\&getQuestionText),
+
+      new kernel::Field::Text(
+                name          =>'name_en',
+                htmlwidth     =>'540px',
+                label         =>'Question (en-default)',
                 dataobjattr   =>'interview.name'),
+
+      new kernel::Field::Text(
+                name          =>'name_de',
+                htmlwidth     =>'540px',
+                label         =>'Question (de)',
+                dataobjattr   =>'interview.name_de'),
 
       new kernel::Field::Select(
                 name          =>'cistatus',
@@ -365,6 +379,22 @@ $d.="if (mode=='onchange'){s.selectedIndex=0}\n";
 
    return($d);
 }
+
+
+sub getQuestionText
+{
+   my $self=shift;
+   my $current=shift;
+   my $lang=$self->getParent->Lang();
+   if ($lang eq "de" && $current->{'name_de'} ne ""){
+      return($current->{'name_de'});
+   }
+   if ($current->{'name_en'} eq ""){
+      return($current->{'name_de'});
+   }
+   return($current->{'name_en'});
+}
+
 
 
 sub getRecordImageUrl

@@ -72,6 +72,9 @@ sub getTotalActiveQuestions
                $irec->{'HTMLjs'}="";
             }
          }
+         if ($irec->{name} eq ""){
+            $irec->{name}="no question text";
+         }
          push(@l,$irec);
       }
    }

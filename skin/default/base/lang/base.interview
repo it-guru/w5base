@@ -1,5 +1,7 @@
 'base::interview'=>{de=>'Config-Item Interview',en=>'Config-Item Interview'},
 'Question'=>{de=>'Frage'},
+'Question (de)'=>{de=>'Frage (de)'},
+'Question (en-default)'=>{de=>'Frage (en-default)'},
 'fieldgroup.tech'=>{de=>'W5Base Verknüpfung',en=>'W5Base Relation'},
 'Questiongroup'=>{de=>'Fragegruppe'},
 'parent Ojbect'=>{de=>'Elternobjekt'},
