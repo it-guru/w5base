@@ -307,9 +307,8 @@ sub Init
                       "itil::costcenter",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("AL_TCom.kern.costcenter.new",
+   $self->RegisterObj("AL_TCom.kern.costcenter",
                       "itil::costcenter",
-                      func=>'New',
                       defaultacl=>['valid_user']);
    
    $self->RegisterObj("AL_TCom.kern.hwmodel.new",
@@ -349,6 +348,11 @@ sub Init
                       func=>'MainWithNew',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("AL_TCom.kern.interview",
+                      "TS::interview",
+                      func=>'MainWithNew',
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("AL_TCom.proc",
                       "tmpl/welcome",
                       prio=>20000);

@@ -375,6 +375,29 @@ sub getRecordImageUrl
 }
 
 
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if (!$self->isDirectFilter(@flt) &&
+       !$self->IsMemberOf([qw(admin)],
+                          "RMember")){
+      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
+      my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+                                  [orgRoles(),qw(RCFManager)],"both");
+      my @grpids=keys(%grps);
+      my $userid=$self->getCurrentUserId();
+      push(@flt,[
+                 {contact=>\$userid},       {contact2=>\$userid}
+                ]);
+   }
+   return($self->SetFilter(@flt));
+}
+
+
+
+
 
 
 sub SecureValidate

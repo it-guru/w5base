@@ -68,7 +68,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","attr","tech","source");
+   return("header","default","tech","attr","source");
 }
 
 
