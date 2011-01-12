@@ -65,6 +65,7 @@ sub new
                 htmlwidth     =>'540px',
                 label         =>'Question',
                 depend        =>['name_de','name_en'],
+                searchable    =>0,
                 readonly      =>1,
                 onRawValue    =>\&getQuestionText),
 
