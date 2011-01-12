@@ -83,13 +83,15 @@ $parser=new XML::Parser(Style=>"Stream");
       printf STDERR ("addr=%s\n",$addr);
       my $q=kernel::cgi::Hash2QueryString({'address'=>,latin1($addr)->utf8(),
                                            'sensor'=>'false'});
+    #  my $q=kernel::cgi::Hash2QueryString({'address'=>,$addr,
+    #                                       'sensor'=>'false'});
+      
       sleep(1); 
       my $url="http://maps.google.com/maps/api/geocode/xml?$q";
       msg(INFO,"Google geocode request $url");
       my $response=$ua->request(GET($url,
-                       'Content_Type'=>'text/html',
-                       'Accept-Charset'=>'ISO-8859-15,utf-8;q=0.7,*;q=0.7',
-                       'Accept-Language'=>'en,en-jm;q=0.7,en;q=0.3',
+                       'Content_Type'=>'text/html; charset=utf-8',
+                       'Accept-Charset'=>'utf-8',
                        'Accept'=>'text/xml,application/xml,application/xhtml'.
                                  '+xml,text/html;q=0.9,text/plain;q=0.8'));
       if ($response->code ne "200"){
@@ -132,6 +134,9 @@ $parser=new XML::Parser(Style=>"Stream");
                    $gloc->{join(".",@{$p->{xmlpath}})}.=UTF8toLatin1($data);
                 }
                 if (defined($acomp) && $element ne 'address_component'){
+                   if ($element eq "type" && $data eq "political"){
+                      $data="";
+                   }
                    $acomp->{$element}.=UTF8toLatin1($data);
                 }
                 
@@ -139,8 +144,8 @@ $parser=new XML::Parser(Style=>"Stream");
             });
 
             eval('$parser->parsestring($xmlcontent);');
-    #        print STDERR Dumper($gloc);
-    #     printf STDERR ("d=%s\n",UTF8toLatin1($xmlcontent));
+           # print STDERR Dumper($gloc);
+           # printf STDERR ("d=%s\n",UTF8toLatin1($xmlcontent));
             if (defined($gloc)){
                if ($gloc->{'GeocodeResponse.status'} eq "OK"){
                   my @msg;
@@ -149,7 +154,7 @@ $parser=new XML::Parser(Style=>"Stream");
                   if ($gstreet ne substr($address1,0,length($gstreet))){
                      push(@msg,"Correct Street to: $gstreet");
                   }
-                  my $gloca=$gloc->{address_component}->{localitypolitical}->{long_name};
+                  my $gloca=$gloc->{address_component}->{sublocality}->{long_name};
                   if (trim($gloca) ne trim($location)){
                      push(@msg,"Correct Location to: $gloca");
                   }
