@@ -1,26 +1,26 @@
-Schablone:
-
-CREATE TABLE "object" (
-   ID             NUMBER(22,0) not null,
-   ...            VARCHAR2(80),
-   MDATE          DATE,
-   W5REPLSYNC     CHAR(70) not null,
-   W5REPLSYNCKEY  CHAR(35) not null,
-   W5REPLSYNCKEY1 CHAR(35),
-   W5REPLLASTSUCC DATE     not null,
-   W5REPLLASTTRY  DATE     not null,
-   W5REPLMDATE    DATE     not null,
-   W5REPLFAILCNT  NUMBER(22,0) default 0 not null,
-   constraint "object_pk" primary key (ID)
-);
-CREATE INDEX "object_si1" ON "base::user"(W5REPLSYNC);
-CREATE INDEX "object_si2" ON "base::user"(W5REPLLASTSUCC);
-
-
--------------------------------------------------------------------------
-Sample replication table for object "base::user":
-=================================================
-
+# Schablone:
+# ==========
+#CREATE TABLE "object" (
+#   ID             NUMBER(22,0) not null,
+#   ...            VARCHAR2(80),
+#   MDATE          DATE,
+#   W5REPLKEY      CHAR(70) not null,
+#   W5REPLKEYPRI   CHAR(35) not null,
+#   W5REPLKEYSEC   CHAR(35),
+#   W5REPLLASTSUCC DATE     not null,
+#   W5REPLLASTTRY  DATE     not null,
+#   W5REPLMDATE    DATE     not null,
+#   W5REPLFAILCNT  NUMBER(22,0) default 0 not null,
+#   constraint "object_pk" primary key (ID)
+#);
+#CREATE INDEX "object_si1" ON "base::user"(W5REPLKEY);
+#CREATE INDEX "object_si2" ON "base::user"(W5REPLLASTSUCC);
+#
+#
+#-------------------------------------------------------------------------
+#Sample replication table for object "base::user":
+#=================================================
+#
 CREATE TABLE "base::user" (
    USERID         NUMBER(22,0) not null,
    FULLNAME       VARCHAR2(128),
@@ -33,9 +33,9 @@ CREATE TABLE "base::user" (
    OFFICE_MOBILE  VARCHAR2(80),
    POSIX          VARCHAR2(8),
    MDATE          DATE,
-   W5REPLSYNC     CHAR(70) not null,
-   W5REPLSYNCKEY  CHAR(35) not null,
-   W5REPLSYNCKEY1 CHAR(35),
+   W5REPLKEY      CHAR(70) not null,
+   W5REPLKEYPRI   CHAR(35) not null,
+   W5REPLKEYSEC   CHAR(35),
    W5REPLLASTSUCC DATE     not null,
    W5REPLLASTTRY  DATE     not null,
    W5REPLMDATE    DATE     not null,
@@ -43,23 +43,23 @@ CREATE TABLE "base::user" (
    W5REPLFAILCNT  NUMBER(22,0) default 0 not null,
    constraint "base::user_pk" primary key (USERID)
 );
-CREATE INDEX "base::user_si1" ON "base::user"(W5REPLSYNC);
+CREATE INDEX "base::user_si1" ON "base::user"(W5REPLKEY);
 CREATE INDEX "base::user_si2" ON "base::user"(W5REPLLASTSUCC);
 CREATE INDEX "base::user_di1" ON "base::user"(EMAIL);
 CREATE INDEX "base::user_di2" ON "base::user"(POSIX);
 CREATE INDEX "base::user_di3" ON "base::user"(FULLNAME);
--------------------------------------------------------------------------
-Sample replication table for object "base::grp":
-=================================================
-
+#-------------------------------------------------------------------------
+#Sample replication table for object "base::grp":
+#=================================================
+#
 CREATE TABLE "base::grp" (
    GRPID          NUMBER(22,0) not null,
    FULLNAME       VARCHAR2(128),
    CISTATUSID     NUMBER(1,0),
    MDATE          DATE,
-   W5REPLSYNC     CHAR(70) not null,
-   W5REPLSYNCKEY  CHAR(35) not null,
-   W5REPLSYNCKEY1 CHAR(35),
+   W5REPLKEY      CHAR(70) not null,
+   W5REPLKEYPRI   CHAR(35) not null,
+   W5REPLKEYSEC   CHAR(35),
    W5REPLLASTSUCC DATE     not null,
    W5REPLLASTTRY  DATE     not null,
    W5REPLMDATE    DATE     not null,
@@ -67,22 +67,22 @@ CREATE TABLE "base::grp" (
    W5REPLFAILCNT  NUMBER(22,0) default 0 not null,
    constraint "base::grp_pk" primary key (GRPID)
 );
-CREATE INDEX "base::grp_si1" ON "base::grp"(W5REPLSYNC);
+CREATE INDEX "base::grp_si1" ON "base::grp"(W5REPLKEY);
 CREATE INDEX "base::grp_si2" ON "base::grp"(W5REPLLASTSUCC);
 CREATE INDEX "base::grp_di1" ON "base::grp"(FULLNAME);
--------------------------------------------------------------------------
-Sample replication table for object "tsacinv::system":
-======================================================
-
+#-------------------------------------------------------------------------
+#Sample replication table for object "tsacinv::system":
+#======================================================
+#
 CREATE TABLE "tsacinv::system" (
    SYSTEMID       VARCHAR2(20) not null,
    SYSTEMNAME     VARCHAR2(40),
    CONUMBER       VARCHAR2(40),
    USAGE          VARCHAR2(40),
    MDATE          DATE,
-   W5REPLSYNC     CHAR(70) not null,
-   W5REPLSYNCKEY  CHAR(35) not null,
-   W5REPLSYNCKEY1 CHAR(35),
+   W5REPLKEY      CHAR(70) not null,
+   W5REPLKEYPRI   CHAR(35) not null,
+   W5REPLKEYSEC   CHAR(35),
    W5REPLLASTSUCC DATE     not null,
    W5REPLLASTTRY  DATE     not null,
    W5REPLMDATE    DATE     not null,
@@ -93,30 +93,46 @@ CREATE TABLE "tsacinv::system" (
 CREATE INDEX "tsacinv::system_si1" ON "tsacinv::system"(W5REPLSYNC);
 CREATE INDEX "tsacinv::system_si2" ON "tsacinv::system"(W5REPLLASTSUCC);
 CREATE INDEX "tsacinv::system_di1" ON "tsacinv::system"(SYSTEMNAME);
--------------------------------------------------------------------------
-Sample replication table for object "base::interview":
+#-------------------------------------------------------------------------
+Sample replication table for object "TS::interview":
 ======================================================
-
-CREATE TABLE "base::interview" (
-   ID             NUMBER(22,0) not null,
-   NAME           VARCHAR2(128),
-   INTERVIEWCATID VARCHAR2(40),
-   CISTATUSID     NUMBER(1,0),
-   MDATE          DATE,
-   W5REPLSYNC     CHAR(70) not null,
-   W5REPLSYNCKEY  CHAR(35) not null,
-   W5REPLSYNCKEY1 CHAR(35),
-   W5REPLLASTSUCC DATE     not null,
-   W5REPLLASTTRY  DATE     not null,
-   W5REPLMDATE    DATE     not null,
-   W5REPLCDATE    DATE     not null,
-   W5REPLFAILCNT  NUMBER(22,0) default 0 not null,
-   constraint "base::interview_pk" primary key (ID)
+create table "TS::interview" (
+ id                   Number(22,0) not null,
+ interviewcatid       Number(22,0),
+ name_en              VARCHAR2(40),
+ name_de              VARCHAR2(40),
+ cistatusid           VARCHAR2(40),
+ contactid            VARCHAR2(40),
+ contact2id           VARCHAR2(40),
+ qtag                 VARCHAR2(40),
+ parentobj            VARCHAR2(40),
+ queryblock           VARCHAR2(40),
+ questclust           VARCHAR2(40),
+ prio                 VARCHAR2(40),
+ questtyp             VARCHAR2(40),
+ comments             VARCHAR2(40),
+ restriction          VARCHAR2(40),
+ mdate                DATE,
+ questcluster         VARCHAR2(40),
+ effect_on_mttr       Number(1,0),
+ effect_on_mtbf       Number(1,0),
+ W5REPLKEY            CHAR(70) not null,
+ W5REPLKEYPRI         CHAR(35) not null,
+ W5REPLKEYSEC         CHAR(35) not null,
+ W5REPLLASTSUCC       DATE not null,
+ W5REPLLASTTRY        DATE not null,
+ W5REPLMDATE          DATE not null,
+ W5REPLCDATE          DATE not null,
+ W5REPLFAILCNT        NUMBER(22,0) default 0 not null,
+ constraint "TS::interview_pk" primary key (id)
 );
-CREATE INDEX "base::interview_si1" ON "base::interview"(W5REPLSYNC);
-CREATE INDEX "base::interview_si2" ON "base::interview"(W5REPLLASTSUCC);
--------------------------------------------------------------------------
-
+CREATE INDEX "TS::interview_si1"
+       ON "TS::interview"(W5REPLKEY);
+CREATE INDEX "TS::interview_si2"
+       ON "TS::interview"(W5REPLLASTSUCC);
+#
+#-------------------------------------------------------------------------
+#
 
 
 
