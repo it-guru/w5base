@@ -322,6 +322,18 @@ sub new
                 label         =>'Modification-Date',
                 dataobjattr   =>'software.modifydate'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"software.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(software.id,35,'0')"),
+
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
