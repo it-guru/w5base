@@ -602,7 +602,7 @@ sub getSqlFrom
    my $from="$worktable";
 
    $from.=" left outer join lnkcontact ".
-          "on lnkcontact.parentobj='itil::system' ".
+          "on lnkcontact.parentobj='itil::asset' ".
           "and $worktable.id=lnkcontact.refid";
 
    return($from);
