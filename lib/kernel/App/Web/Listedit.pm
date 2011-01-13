@@ -93,7 +93,8 @@ sub ModuleObjectInfo
    foreach my $fo ($self->getFieldObjsByView([qw(ALL)])){
       my $typ=$fo->Type();
       my $name=$fo->Name();
-      if ($typ ne "SubList" && $typ ne "Linenumber"){
+      if ($typ ne "SubList" && $typ ne "Linenumber" &&
+          $name ne "replkeypri" && $name ne "replkeysec"){
          if ($name eq "id"){
             printf($form,$fo->Name,"Number(22,0) not null");
          }
