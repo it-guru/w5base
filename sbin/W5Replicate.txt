@@ -134,6 +134,23 @@ CREATE INDEX "TS::interview_si2"
 #-------------------------------------------------------------------------
 #
 
+# TSI_HCO Zugriff auf die Interviewdaten
+
+create or replace view ":TSI_HCO:interview" as
+   select "TS::interview".id,
+          "TS::interview".qtag,
+          "TS::interview".name_en,
+          "TS::interview".name_de,
+          "TS::interview".cistatusid,
+          "contact".fullname   contact_fullname,
+          "contact2".fullname  contact2_fullname,
+          "TS::interview".mdate
+   from "TS::interview"
+        left outer join "base::user" "contact"
+             on "TS::interview".contactid="contact".userid
+        left outer join "base::user" "contact2"
+             on "TS::interview".contact2id="contact2".userid;
+create synonym TSI_HCO.w5base_interview for W5BASE.":TSI_HCO:interview";
 
 
 
