@@ -23,7 +23,6 @@ use strict;
 use kernel;
 use Scalar::Util qw(weaken);
 use kernel::Universal;
-use Data::Dumper;
 
 @ISA=qw(kernel::Universal);
 
@@ -49,7 +48,6 @@ sub new
 sub Connect
 {
    my $self=shift;
-   my $dbname=$self->{dbname};
    my %p=();
   
    if ($self->{isConnected}){
@@ -59,6 +57,16 @@ sub Connect
    $p{dbuser}=$self->getParent->Config->Param('DATAOBJUSER');
    $p{dbpass}=$self->getParent->Config->Param('DATAOBJPASS');
    $p{dbschema}=$self->getParent->Config->Param('DATAOBJBASE');
+
+   if (my $parent=$self->getParent()){
+      # check if DATAOBJCONNECT is "overwrited" defined for current object
+      # witch allows to make some speical objects writealbe on readonly envs
+      my $s=$parent->Self;
+      if (ref($p{dbconnect}) eq "HASH" && exists($p{dbconnect}->{$s})){
+         $self->{dbname}=$s; # using parent object name as dbname
+      }
+   }
+   my $dbname=$self->{dbname};
    
    foreach my $v (qw(dbconnect dbuser dbpass dbschema)){
       if ((ref($p{$v}) ne "HASH" || !defined($p{$v}->{$dbname})) && 
@@ -265,6 +273,18 @@ sub DriverName
    my $self=shift;
 
    return(lc($self->{db}->{Driver}->{Name}));
+}
+
+sub dbname
+{
+   my $self=shift;
+   return($self->{dbname});
+}
+   
+sub isConnected
+{
+   my $self=shift;
+   return($self->{isConnected});
 }
    
 sub fetchrow

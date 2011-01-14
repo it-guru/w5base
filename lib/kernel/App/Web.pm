@@ -328,8 +328,20 @@ sub DatabaseLowInit
    my $self=shift;
 
    if (!defined($self->Cache->{W5Base})){
-      $self->Cache->{W5Base}=new kernel::database($self,"w5base");
-      $self->Cache->{W5Base}->Connect();
+      my $db=new kernel::database($self,"w5base");
+      if (!defined($db)){
+         printf("Content-type: text/plain\n\n%s","Database object error");
+      }
+      else{
+         my ($dbh,$msg)=$db->Connect();
+         if ($db->dbname() eq "w5base"){
+            $self->Cache->{W5Base}=$db;
+         }
+         if (!defined($dbh) || !$db->isConnected()){
+            printf("Content-type: text/plain\n\n%s","DB Connect: ".$msg);
+            return(0);
+         }
+      }
    }
    return(1);
 }
