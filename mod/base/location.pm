@@ -786,13 +786,25 @@ sub getLocationByHash
 #
 #
 #   }
+   $self->ResetFilter();
+   $self->SetFilter({label=>\$req{label},
+                     country=>\$req{country},
+                     address1=>\$req{address1},
+                     location=>\$req{location}});
+   my ($locrec,$msg)=$self->getOnlyFirst(qw(id));
+   if (!defined($locrec)){
+      msg(ERROR,"fail request id of location $req{location} ; $req{address1}");
+      return(undef);
+   }
+   return($locrec->{id});
 
-   my @id=$self->ValidatedInsertOrUpdateRecord(\%req,
-                                               {label=>\$req{label},
-                                                country=>\$req{country},
-                                                address1=>\$req{address1},
-                                                location=>\$req{location}});
-   return($id[0]);
+#  no autocreate mehr!
+#   my @id=$self->ValidatedInsertOrUpdateRecord(\%req,
+#                                               {label=>\$req{label},
+#                                                country=>\$req{country},
+#                                                address1=>\$req{address1},
+#                                                location=>\$req{location}});
+#   return($id[0]);
 }
 
 
