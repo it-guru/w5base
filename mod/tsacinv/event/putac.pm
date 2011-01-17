@@ -345,11 +345,15 @@ sub ApplicationModified
                   $ApplU=$SysU if ($ApplU<$SysU);
                   next if ($lnk->{systemsystemid}=~m/^\s*$/);
                   $CurrentEventId="Add System '$lnk->{system}' to $CurrentAppl";
+                  my $externalid=$lnk->{id};
+                  if ($externalid eq ""){
+                     $externalid="C-".$rec->{id}."-".$lnk->{systemid};
+                  }
                   my $acftprec={
                                    CI_APPL_REL=>{
                                       EventID=>$CurrentEventId,
                                       ExternalSystem=>'W5Base',
-                                      ExternalID=>$lnk->{id},
+                                      ExternalID=>$externalid,
                                       Appl_ExternalSystem=>'W5Base',
                                       Appl_ExternalID=>$rec->{id},
                                       Port_ExternalSystem=>'W5Base',
