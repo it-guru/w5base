@@ -62,7 +62,7 @@ sub invalidateDataboss
       $obj->SetFilter({databoss=>\$contact,cistatusid=>"<6"});
       $obj->SetCurrentView(qw(name id contacts applications));
       #$sys->SetNamedFilter("X",{name=>'!ab1*'});
-      $obj->Limit(5,0,0);
+      #$obj->Limit(5,0,0);
       my ($rec,$msg)=$obj->getFirst();
       if (defined($rec)){
          do{
@@ -75,7 +75,7 @@ sub invalidateDataboss
                if (!defined($notify{$a}->{$dataobj})){
                   $notify{$a}->{$dataobj}=[];
                }
-               push(@{$notify{$a}->{$dataobj}},$rec->{name});
+               push(@{$notify{$a}->{$dataobj}},$rec);
             }
             ($rec,$msg)=$obj->getNext();
          } until(!defined($rec));
@@ -94,6 +94,12 @@ sub doNotify
    my $notify=shift;
    my $appl=getModuleObject($self->Config,"itil::appl");
    my $wfa=getModuleObject($self->Config,"base::workflowaction");
+
+   my $user=getModuleObject($self->Config,"base::user");
+
+   $user->SetFilter({fullname=>\$contact});
+   my ($urec,$msg)=$user->getOnlyFirst(qw(userid));
+   my $EventJobBaseUrl=$self->Config->Param("EventJobBaseUrl");
 
    foreach my $applid (keys(%$notify)){
       $appl->SetFilter({id=>\$applid,cistatusid=>'<6'});
@@ -123,18 +129,24 @@ sub doNotify
       "und Assets neu erfasst werden müßten.\n";
       if (exists($notify->{$applid}->{'itil::system'})){
          $msg.="\n<b>Betroffene Systeme:</b>\n".
-               join("\n",@{$notify->{$applid}->{'itil::system'}});
+               join("\n",
+               map({$_->{name}." ".
+                    $EventJobBaseUrl."/auth/itil/system/ById/".$_->{id}
+                   } @{$notify->{$applid}->{'itil::system'}}));
       }
       if (exists($notify->{$applid}->{'itil::asset'})){
          $msg.="\n<b>Betroffene Assets:</b>\n".
-               join("\n",@{$notify->{$applid}->{'itil::asset'}});
+               join("\n",
+               map({$_->{name}." ".
+                    $EventJobBaseUrl."/auth/itil/asset/ById/".$_->{id}
+                   } @{$notify->{$applid}->{'itil::asset'}}));
       }
       $msg.="\n\nDie betreffenden TSMs und OPMs wurden bereits bei ".
             "den aufgeführten Config-Items als Kontakt mit der Rolle ".
             "\"schreiben\" eingetragen. Es ist also nur noch notwendig, ".
             "das sich einer der beiden als Datenverantwortlicher einträgt.\n".
             "\nsiehe dazu auch (Änderung eines Datenverantwortlichen):\n".
-      "https://darwin.telekom.de/darwin/auth/faq/article/ById/12229485550002\n".
+            "$EventJobBaseUrl/auth/faq/article/ById/12229485550002\n".
             "\nDiese Maßnahme ist mit dem Config-Manager abgestimmt. ".
             "Sollten Sie noch offene Fragen haben, so wenden Sie sich bitte ".
             "an den Config-Manager.";
@@ -150,6 +162,9 @@ sub doNotify
       {
          my @l=$appl->getMembersOf("1","RMember","direct");
          push(@cc,@l);
+      }
+      if (defined($urec)){
+         push(@cc,$urec->{userid});
       }
 
 
