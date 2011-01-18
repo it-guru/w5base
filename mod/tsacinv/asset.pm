@@ -431,7 +431,7 @@ sub initSqlWhere
 {
    my $self=shift;
    my $naturerest="";
-   $naturerest="and ammodel.fullname like '/HARDWARE/%'";
+   $naturerest="and ammodel.name NOT IN ('LOGICAL SYSTEM','CLUSTER')";
    my $where=
       "assetportfolio.assettag=amasset.assettag ".
       "and assetportfolio.lmodelid=ammodel.lmodelid ".
