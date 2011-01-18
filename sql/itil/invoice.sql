@@ -9,7 +9,7 @@ create table lnkapplinvoicestorage (
   storagetype    bigint(20) NOT NULL,
   storageclass   bigint(20) NOT NULL,
   comments       longtext    default NULL,
-  capacity       double(8,2) default '0.00',
+  capacity       double(22,2) default '0.00',
   durationstart  datetime NOT NULL default '0000-00-00 00:00:00',
   durationend    datetime    default NULL,
   ordernumber    varchar(20) default NULL,
