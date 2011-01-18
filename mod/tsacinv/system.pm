@@ -468,7 +468,7 @@ sub new
 #                dataobjattr   =>'amportfolio.dtimport'),
 
    );
-   $self->setDefaultView(qw(systemname bc tsacinv_locationfullname 
+   $self->setDefaultView(qw(systemname status tsacinv_locationfullname 
                             systemid assetassetid));
    return($self);
 }
@@ -559,6 +559,18 @@ sub Initialize
    return(0);
 }
 
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_status"))){
+     Query->Param("search_status"=>"\"!out of operation\"");
+   }
+}
+
+
+
+
 sub getRecordImageUrl
 {
    my $self=shift;
@@ -621,8 +633,7 @@ sub initSqlWhere
       "and amportfolio.lportfolioitemid=amcomputer.litemid ".
       "and amportfolio.lmodelid=ammodel.lmodelid ".
       "and amportfolio.lcostid=amcostcenter.lcostid(+) ".
-      "and ammodel.name='LOGICAL SYSTEM' ".
-      "and amcomputer.status<>'out of operation'";
+      "and ammodel.name='LOGICAL SYSTEM' ";
    return($where);
 }
 

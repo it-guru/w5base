@@ -304,8 +304,8 @@ sub new
                 dataobjattr   =>'assetportfolio.externalid'),
 
    );
-   $self->setDefaultView(qw(assetid tsacinv_locationfullname 
-                            systemname conumber serialno));
+   $self->setDefaultView(qw(assetid status tsacinv_locationfullname 
+                            systemname serialno));
    return($self);
 }
 
@@ -415,6 +415,17 @@ sub getSqlFrom
 
    return($from);
 }
+
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_status"))){
+     Query->Param("search_status"=>"\"!wasted\"");
+   }
+}
+
+
 
 sub initSqlWhere
 {

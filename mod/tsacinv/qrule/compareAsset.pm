@@ -79,7 +79,8 @@ sub qcheckRecord
    return(0,undef) if ($rec->{name} eq $rec->{id}); 
    if ($rec->{name} ne ""){
       my $par=getModuleObject($self->getParent->Config(),"tsacinv::asset");
-      $par->SetFilter({assetid=>\$rec->{name}});
+      $par->SetFilter({assetid=>\$rec->{name},
+                       status=>'"!wasted"'});
       my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       return(undef,undef) if (!$par->Ping());
       if (!defined($parrec)){

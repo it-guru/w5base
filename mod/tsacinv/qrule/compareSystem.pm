@@ -89,7 +89,8 @@ sub qcheckRecord
    return(0,undef) if ($rec->{systemid} eq $rec->{id});
    if ($rec->{systemid} ne ""){
       my $par=getModuleObject($self->getParent->Config(),"tsacinv::system");
-      $par->SetFilter({systemid=>\$rec->{systemid}});
+      $par->SetFilter({systemid=>\$rec->{systemid},
+                       status=>'"!out of operation"'});
       my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       return(undef,undef) if (!$par->Ping());
       if (!defined($parrec)){

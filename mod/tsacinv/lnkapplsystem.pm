@@ -260,6 +260,11 @@ sub new
                 label         =>'System OLA',
                 dataobjattr   =>'amcomputer.olaclasssystem'),
 
+      new kernel::Field::Text(
+                name          =>'systemstatus',
+                label         =>'System Status',
+                dataobjattr   =>'amcomputer.status'),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 searchable    =>0,

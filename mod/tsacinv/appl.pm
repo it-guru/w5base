@@ -281,6 +281,7 @@ sub new
                 group         =>'systems',
                 label         =>'Systems',
                 vjointo       =>'tsacinv::lnkapplsystem',
+                vjoinbase     =>{systemstatus=>"\"!out of operation\""},
                 vjoinon       =>['id'=>'lparentid'],
                 vjoindisp     =>['child','systemweblink','systemid','comments']),
 
