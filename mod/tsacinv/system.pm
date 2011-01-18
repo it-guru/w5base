@@ -62,6 +62,11 @@ sub new
                 dataobjattr   =>'amportfolio.assettag'),
 
       new kernel::Field::Text(
+                name          =>'status',
+                label         =>'Status',
+                dataobjattr   =>'amcomputer.status'),
+
+      new kernel::Field::Text(
                 name          =>'conumber',
                 label         =>'CO-Number',
                 size          =>'15',
@@ -154,12 +159,6 @@ sub new
                 weblinkon     =>['controlcenter2'=>'name'],
                 label         =>'Application ControlCenter',
                 dataobjattr   =>'amportfolio.controlcenter2'),
-
-      new kernel::Field::Text(
-                name          =>'status',
-                group         =>'form',
-                label         =>'Status',
-                dataobjattr   =>'amcomputer.status'),
 
       new kernel::Field::Text(
                 name          =>'usage',
