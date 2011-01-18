@@ -46,13 +46,17 @@ sub getDynamicFields
    my $class;
 
    return($self->InitFields(
-#      new kernel::Field::Select(  name       =>'reqnature',
-#                                  label      =>'Request nature',
-#                                  group      =>'customerdata',
-#                                  htmleditwidth=>'60%',
-#                                  getPostibleValues=>\&XgetRequestNatureOptions,
-#                                  container  =>'headref'),
-#
+      new kernel::Field::Select(  name       =>'reqnature',
+                                  label      =>'Request nature',
+                                  translateion=>'itil::workflow::itquotation',
+                                  value      =>['RUser',
+                                                'RGroup',
+                                                'RApp.developer',
+                                                'RApp.businessteam',
+                                                'RApp.opm',
+                                                'RApp.tsm'],
+                                  container  =>'headref'),
+
 #      new kernel::Field::Text(    name       =>'customerrefno',
 #                                  htmleditwidth=>'150px',
 #                                  group      =>'customerdata',
@@ -291,8 +295,6 @@ sub generateWorkspace
    }
    $d.="</select>";
 
-   my $nextstart=$self->getParent->getParent->T("NEXTSTART","base::workflow");
-   my $l1=$self->T("do NOT automaticly process this workflow");
    my $templ=<<EOF;
 <table border=0 cellspacing=0 cellpadding=0 width=100%>
 <tr>
@@ -304,27 +306,66 @@ sub generateWorkspace
 <td colspan=3 class=finput>%detaildescription(detail)%</td>
 </tr>
 <tr>
-<td class=fname>%affectedapplication(label)%:</td>
-<td colspan=3 class=finput>%affectedapplication(detail)%</td>
+<td class=fname>%reqnature(label)%:</td>
+<td colspan=3 class=finput>%reqnature(detail)%</td>
 </tr>
-<script language="JavaScript">
-setFocus("Formated_name");
-setEnterSubmit(document.forms[0],"NextStep");
-</script>
 <tr>
-<td class=fname width=20%>%prio(label)%:</td>
-<td width=80 class=finput>$d</td>
-<td class=fname width=20%>$l1</td>
-<td class=finput>&nbsp;</td>
+<td colspan=4>
+
+<div id=app style="height:60px;padding:5px;margin:15px;border-style:solid;border-width:2px;border-color:black">
+<table width=100% border=1>
+<tr>
+<td class=fname>%affectedapplication(label)%:</td>
+<td class=finput>%affectedapplication(detail)%</td>
+</tr>
+</table>
+</div>
+
+<div id=fwd style="height:60px;padding:5px;margin:15px;border-style:solid;border-width:2px;border-color:black">
+<table width=100% border=1>
+<tr>
+<td class=fname width=1% nowrap>%fwdtargetname(label)%:</td>
+<td class=finput>%fwdtargetname(detail)%</td>
+</tr>
+</table>
+</div>
+
+
+
+
+</td>
 </tr>
 <tr>
 <td class=fname>%forceinitiatorgroupid(label)%:</td>
 <td colspan=3 class=finput>%forceinitiatorgroupid(detail)%</td>
 </tr>
-<tr>
-<td colspan=4 align=center><br>$nextstart</td>
-</tr>
 </table>
+<script language="JavaScript">
+setFocus("Formated_name");
+setEnterSubmit(document.forms[0],"NextStep");
+function setInitFormLayout(reqnature){
+  var fdiv=document.getElementById("fwd");
+  var adiv=document.getElementById("app");
+  if (reqnature.match(/^RApp\\./)){
+     adiv.style.visibility='visible';
+     adiv.style.display='block';
+     fdiv.style.visibility='hidden';
+     fdiv.style.display='none';
+  } 
+  else{
+     fdiv.style.visibility='visible';
+     fdiv.style.display='block';
+     adiv.style.visibility='hidden';
+     adiv.style.display='none';
+  }
+}
+window.onload = function() {
+    document.forms[0].elements['Formated_reqnature'].onchange=function(){
+      setInitFormLayout(document.forms[0].elements['Formated_reqnature'].value);
+    };
+    setInitFormLayout(document.forms[0].elements['Formated_reqnature'].value);
+}
+</script>
 EOF
    return($templ);
 }
