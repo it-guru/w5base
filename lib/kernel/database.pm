@@ -89,7 +89,9 @@ sub Connect
    else{
       $self->{'db'}=DBI->connect_cached($self->{dbconnect},
                                         $self->{dbuser},
-                                        $self->{dbpass},{mysql_enable_utf8 => 0});
+                                        $self->{dbpass},
+                                       {mysql_enable_utf8 => 0,
+                                        private_foo_cachekey=>$dbname."-".$$});
    }
 
    if (!$self->{'db'}){

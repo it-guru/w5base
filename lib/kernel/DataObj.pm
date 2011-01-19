@@ -853,7 +853,9 @@ sub isDirectFilter
 {
   my $self=shift;
   my @flt=@_;
-  my $idfieldname=$self->IdField->Name();
+  my $idfieldobj=$self->IdField();
+  return(0) if (!defined($idfieldobj));
+  my $idfieldname=$idfieldobj->Name();
   if ($#flt==0){
      if (ref($flt[0]) eq "HASH"){
         if (defined($flt[0]->{$idfieldname})){

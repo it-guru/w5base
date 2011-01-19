@@ -401,6 +401,9 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("invoice.lnkapplinvoicestor.cum",
+                      "itil::lnkapplinvoicestorcum");
+
    $self->RegisterObj('itil::workflow::businesreq$',
                       "base::workflow",
                       func=>'New',

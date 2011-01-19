@@ -82,4 +82,5 @@
 'itil.proc'=>{de=>'Prozesssteuerung',en=>'Processcontrol'},
 'itil.proc.ChangeManagement'=>{de=>'Change Management',en=>'Change Management'},
 'invoice.lnkapplinvoicestor'=>{de=>'bereitgest. Storage',en=>'provided Storage'},
+'invoice.lnkapplinvoicestor.cum'=>{de=>'kumuliert',en=>'cumulated'},
 'invoice.lnkapplinvoicestor.new'=>{de=>'Neueingabe',en=>'New'},
