@@ -252,7 +252,10 @@ sub doParentFix
       $grp->SecureSetFilter({srcid=>\$wiwrec->{parentid},srcsys=>\'WhoIsWho'});
       my ($pgrprec)=$grp->getOnlyFirst(qw(fullname));
       if (!defined($pgrprec)){
-         print("ERROR: can not create new parent rec");
+         if (!$self->LastMsg()){
+            $self->LastMsg(ERROR,"can not create new parent group");
+         }
+         print(join("<hr>",grep(/ERROR/,$self->LastMsg())));
          return();
       }
    }
@@ -273,7 +276,12 @@ sub doParentFix
       my ($grprec)=$grp->getOnlyFirst(qw(ALL));
       my $qcokobj=$grp->getField("qcok");
       my $qcok=$qcokobj->RawValue($grprec);
-      print("QualityCheck=$qcok");
+      if ($qcok){
+         print("QCheck now OK");
+      }
+      else{
+         print("QCheck still failed");
+      }
       return();
    }
    print(join(";".$self->LastMsg()));
