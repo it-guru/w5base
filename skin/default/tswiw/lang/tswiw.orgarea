@@ -7,3 +7,4 @@
 'fieldgroup.default'=>{ de=>'Personalien',en=>'Person-Informations'},
 'fieldgroup.office'=>{ de=>'Büro-Kontakt',en=>'Office-ContactProfile'},
 'fieldgroup.userro'=>{ de=>'Mitarbeiter',en=>'Employees'},
+'one or more operations failed'=>{de=>'eine oder mehere Operationen sind fehlgeschlagen'},

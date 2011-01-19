@@ -17,7 +17,9 @@ var W5Base=createConfig({ useUTF8:false,mode:'auth'},'../../../');
 function process(){
 
   $('.selector:checked').each(function(i,e){
-     $('#opres'+this.id).html("<img src='../../base/load/ajaxloader.gif'>");
+     $('#opres'+this.id).html("<center>"+
+                              "<img src='../../base/load/ajaxloader.gif'>"+
+                              "</center>");
      $('#opres'+this.id).load("doParentFix?grpid="+this.id);
   });
 }
@@ -25,21 +27,29 @@ function process(){
 function listGroups(res){
    var d="<table width=100% border=1>";
    d+="<tr><th>Groupname</th>"+
-      "<th width=1%><input type=checkbox></th>"+
-      "<th width=200 nowrap>Operation state</th></tr>";
+      "<th width=1% valign=top><input id=allcheck type=checkbox></th>"+
+      "<th width=250 nowrap>Operation state</th></tr>";
    for(c=0;c<res.length;c++){
       var resid="opres"+res[c].grpid;
       d+="<tr><td valign=top>"+res[c].fullname+"</td>"+
-         "<td width=1%>"+
+         "<td width=1% valign=top>"+
          "<input class=selector id="+res[c].grpid+" type=checkbox>"+
          "</td>"+
-         "<td width=200><div id="+resid+">&nbsp;</div></td></tr>";
+         "<td width=250><div id="+resid+">&nbsp;</div></td></tr>";
    }
    d+="<tr><td colspan=2>&nbsp;</td>"+
       "<td><input type=button value='process' style='width:100%' "+
       "onclick=process()></td></tr>";
    d+="</table>";
    $('#op').html(d);
+   $('#allcheck').click(function(){
+      if ($('#allcheck').attr('checked') ? 1:0){
+         $('.selector').attr('checked',true);
+      }
+      else{
+         $('.selector').attr('checked',false);
+      }
+   });
 }
 
 
