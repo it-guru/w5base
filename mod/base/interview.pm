@@ -420,7 +420,7 @@ sub SecureSetFilter
       my @grpids=keys(%grps);
       my $userid=$self->getCurrentUserId();
       push(@flt,[
-                 {contact=>\$userid},       {contact2=>\$userid}
+                 {contactid=>\$userid},       {contact2id=>\$userid}
                 ]);
    }
    return($self->SetFilter(@flt));
