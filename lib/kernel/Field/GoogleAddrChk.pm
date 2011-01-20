@@ -38,6 +38,8 @@ sub RawValue
    my $self=shift;
    my $current=shift;
 
+   return("only for admins!") if (!$self->getParent->IsMemberOf("admin"));
+
    my $ua;
    my $html;
    my $parser;
@@ -169,6 +171,7 @@ $parser=new XML::Parser(Style=>"Stream");
                   return(join("\n",@msg));
                }
                else{
+                  return($gloc->{'GeocodeResponse.status'});
                   return("invalid location address");
                }
             }

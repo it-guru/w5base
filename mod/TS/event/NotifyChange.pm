@@ -231,18 +231,30 @@ sub NotifyChange
             $notiy{terminnotify}=1440;
             $notiy{prio}=5;
             $notiy{terminlocation}="T-Systems RZ";
-            if (my $wid=$wf->Store(undef,\%notiy)){
-               my %d=(step=>'base::workflow::mailsend::waitforspool');
-               my $r=$wf->Store($wid,%d);
+
+            if ($curscstate eq "confirmed"){
                $wf->Action->ValidatedInsertRecord({
                   wfheadid=>$wfrec->{id},
                   name=>'note',
-                  comments=>'NotifyChange Event: sending automatic '.
-                            'change notification '.
-                            'to all information partners in application '.
-                            'contacts',
-                  actionref=>{"autonotify.$curscstate"=>'send',
+                  comments=>'NotifyChange Event: not sending '.
+                            'information about change state '.$curscstate,
+                  actionref=>{"autonotify.$curscstate"=>'ignored',
                               "autonotify.essential"=>$essentialdatahash}});
+            }
+            else{
+               if (my $wid=$wf->Store(undef,\%notiy)){
+                  my %d=(step=>'base::workflow::mailsend::waitforspool');
+                  my $r=$wf->Store($wid,%d);
+                  $wf->Action->ValidatedInsertRecord({
+                     wfheadid=>$wfrec->{id},
+                     name=>'note',
+                     comments=>'NotifyChange Event: sending automatic '.
+                               'change state '.$curscstate.' notification '.
+                               'to all information partners in application '.
+                               'contacts',
+                     actionref=>{"autonotify.$curscstate"=>'send',
+                                 "autonotify.essential"=>$essentialdatahash}});
+               }
             }
          }
          return({exitcode=>0,msg=>'ok'});
