@@ -300,7 +300,7 @@ EOF
       foreach my $kwords (@kwords){
          $faq->ResetFilter();
          $faq->SecureSetFilter({kwords=>$kwords});
-         my @l=$faq->getHashList(qw(name faqid));
+         my @l=$faq->getHashList(qw(mdate name faqid));
          my $loop=0;
          foreach my $rec (@l){
             if (!$found){

@@ -608,18 +608,30 @@ sub extractAffectedApplication
 
 
    msg(DEBUG,"createtime = %s",$rec->{createtime});
-   my $tchm;
-   my $breaktime="2009-10-05 00:00:00";
+   my $tbreaktime1;   # modified handling since breaktime1
+   my $breaktime1="2009-10-05 00:00:00";
    if (exists($rec->{changenumber}) && $rec->{createtime} ne ""){
-      my $d=CalcDateDuration($breaktime,$rec->{createtime});
-      $tchm=$d->{totalminutes};
+      my $d=CalcDateDuration($breaktime1,$rec->{createtime});
+      $tbreaktime1=$d->{totalminutes};
+   }
+   my $tbreaktime2;  
+   my $breaktime2="2011-01-01 00:00:00";
+   if (exists($rec->{changenumber}) && $rec->{createtime} ne ""){
+      my $d=CalcDateDuration($breaktime2,$rec->{createtime});
+      $tbreaktime2=$d->{totalminutes};
    }
    my @chksystemid;
    my @chkapplid;
    #  pass 1 : softwareid
    my @l1;
    if (defined($rec->{softwareid})){
-      @l1=split(/[,\s;]+/,$rec->{softwareid});
+      if (defined($tbreaktime2) && $tbreaktime2>0){
+         msg(INFO,"MODIFIED CHANGE Handling since $breaktime2 !!! ".
+                  "ignoreing softwareid");
+      }
+      else{
+         @l1=split(/[,\s;]+/,$rec->{softwareid});
+      }
    }
 
    if (defined($rec->{custapplication})){
@@ -632,8 +644,8 @@ sub extractAffectedApplication
    my @l2;
    if (defined($rec->{device}) && ref($rec->{device}) eq "ARRAY"){
       foreach my $r (@{$rec->{device}}){
-         if (defined($tchm) && $tchm>0){
-            msg(INFO,"MODIFIED CHANGE Handling since $breaktime !!! ".
+         if (defined($tbreaktime1) && $tbreaktime1>0){
+            msg(INFO,"MODIFIED CHANGE Handling since $breaktime1 !!! ".
                      "ignoreing device entries");
          }
          else{
@@ -726,9 +738,9 @@ sub extractAffectedApplication
    msg(DEBUG,"pass5 validate aglist=%s",join(",",@applid));
    msg(DEBUG,"pre deviceid chkapplid=%s",join(",",@chkapplid));
    my $dev=$rec->{deviceid};
-   if (defined($tchm) && $tchm>0){
+   if (defined($tbreaktime1) && $tbreaktime1>0){
       $dev=undef;
-      msg(INFO,"MODIFIED CHANGE Handling since $breaktime !!! locical_name");
+      msg(INFO,"MODIFIED CHANGE Handling since $breaktime1 !!! locical_name");
    }
    if (my ($applid)=$dev=~m/^.*\(((APPLGER|APPL|GER)\d+)\)$/){
       msg(DEBUG,"ApplicationID=%s",$applid);
