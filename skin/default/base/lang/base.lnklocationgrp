@@ -6,6 +6,8 @@
                   en=>'business relevant prio 2'},
 'RMbusinesrel3'=>{de=>'Betriebsrelevant Prio3',
                   en=>'business relevant prio 3'},
+'fieldgroup.locinfos'=>{de=>'Infos zum Standort',en=>'informations to related location'},
 'Location'=>{de=>'Standort'},
 'relation mode'=>{de=>'Verknüpfungsart'},
 'no group selected with marked as oranisation'=>{de=>'keine Gruppe mit Organisationsmarkierung ausgewählt'},
+'Databoss'=>{de=>'Datenverantwortlicher'},

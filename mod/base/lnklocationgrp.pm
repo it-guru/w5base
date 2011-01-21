@@ -80,6 +80,13 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'lnklocationgrp.comments'),
 
+      new kernel::Field::Databoss(
+                group         =>'locinfos'),
+
+      new kernel::Field::Link(
+                name          =>'databossid',
+                dataobjattr   =>'location.databoss'),
+
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
@@ -150,8 +157,7 @@ sub new
 sub getDetailBlockPriority
 {  
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default source));
+   return(qw(header default locinfos source));
 }
 
 
@@ -211,6 +217,17 @@ sub isViewValid
    return("default","header") if (!defined($rec));
    return("ALL");
 }
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my ($worktable,$workdb)=$self->getWorktable();
+   return("$worktable left outer join location ".
+          "on $worktable.location=location.id ");
+}
+
+
 
 
 
