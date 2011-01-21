@@ -264,8 +264,9 @@ sub getCustomerControlRecords
    my @customer=(
                  {
                   name=>'tcom',
-                  label=>'T-Com/T-Home',
-                  customer=>'DTAG.T-Home DTAG.T-Home.*'
+                  label=>'TDG (THO und TMO)',
+                  customer=>'DTAG.T-Home DTAG.T-Home.* DTAG.TDG DTAG.TDG.* '.
+                            'DTAG.TMO DTAG.TMO.*'
                  },
                  {
                   name=>'activebilling',
@@ -274,18 +275,18 @@ sub getCustomerControlRecords
                  },
                  {
                   name=>'rci',
-                  label=>'RCI',
-                  customer=>'DTAG.GHS.RCI DTAG.GHS.RCI.*'
-                 },
-                 {
-                  name=>'tpg',
-                  label=>'TSG & others',
-                  customer=>'DTAG.TSG DTAG.TSG.* DTAG.GHS DTAG.GHS.*'
+                  label=>'GHS (incl. CIT)',
+                  customer=>'DTAG.GHS DTAG.GHS.*'
                  },
                  {
                   name=>'tsi',
                   label=>'T-Systems',
                   customer=>'DTAG.TSI DTAG.TSI.*'
+                 },
+                 {
+                  name=>'tpg',
+                  label=>'TSG',
+                  customer=>'DTAG.TSG DTAG.TSG.*'
                  },
                 );
    return(@customer);
