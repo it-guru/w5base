@@ -411,10 +411,11 @@ sub Validate
    if (effVal($oldrec,$newrec,"durationstart") eq ""){
       $newrec->{durationstart}=NowStamp("en");
    }
-   if (effVal($oldrec,$newrec,"capacity")==0){
-      $self->LastMsg(ERROR,"capacitiy to less");
-      return(undef);
-   }
+#  wegen Altfaellen notwendig 21.01.2011 (HV)
+#   if (effVal($oldrec,$newrec,"capacity")==0){
+#      $self->LastMsg(ERROR,"capacitiy to less");
+#      return(undef);
+#   }
    my $ordernumber=effVal($oldrec,$newrec,"ordernumber");
    if ($ordernumber ne "" && !($ordernumber=~m/^[A-Z\d]+$/)){
       $self->LastMsg(ERROR,"invalid ordernumber");
