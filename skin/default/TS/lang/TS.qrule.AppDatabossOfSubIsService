@@ -1,0 +1,4 @@
+'TS::qrule::AppDatabossOfSubIsService'=>{de=>'Analyse ob Anwendung Systeme oder Assets mit Service-Datenverantwortlichen aufweist',
+en=>'analyse, if there are systems or assets with service-databoss'},
+'inaccepatable databoss at system'=>{de=>'unzulässiger Datenverantwortlicher in System'},
+'inaccepatable databoss at asset'=>{de=>'unzulässiger Datenverantwortlicher in Asset'},
