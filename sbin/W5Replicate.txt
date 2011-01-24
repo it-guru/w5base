@@ -94,8 +94,8 @@ CREATE INDEX "tsacinv::system_si1" ON "tsacinv::system"(W5REPLSYNC);
 CREATE INDEX "tsacinv::system_si2" ON "tsacinv::system"(W5REPLLASTSUCC);
 CREATE INDEX "tsacinv::system_di1" ON "tsacinv::system"(SYSTEMNAME);
 #-------------------------------------------------------------------------
-Sample replication table for object "TS::interview":
-======================================================
+# Sample replication table for object "TS::interview":
+# ======================================================
 create table "TS::interview" (
  id                   Number(22,0) not null,
  interviewcatid       Number(22,0),
@@ -130,6 +130,38 @@ CREATE INDEX "TS::interview_si1"
        ON "TS::interview"(W5REPLKEY);
 CREATE INDEX "TS::interview_si2"
        ON "TS::interview"(W5REPLLASTSUCC);
+
+
+#-------------------------------------------------------------------------
+# Sample replication table for object "itil::software":
+# ======================================================
+create table "itil::software" (
+ id                   Number(22,0) not null,
+ name                 VARCHAR2(128),
+ cistatusid           VARCHAR2(40),
+ producerid           VARCHAR2(40),
+ compcontactid        VARCHAR2(40),
+ depcompcontactid     VARCHAR2(40),
+ releaseexp           VARCHAR2(128),
+ comments             VARCHAR2(40),
+ mdate                DATE,
+ W5REPLKEY            CHAR(70) not null,
+ W5REPLKEYPRI         CHAR(35) not null,
+ W5REPLKEYSEC         CHAR(35) not null,
+ W5REPLLASTSUCC       DATE not null,
+ W5REPLLASTTRY        DATE not null,
+ W5REPLMDATE          DATE not null,
+ W5REPLCDATE          DATE not null,
+ W5REPLFAILCNT        NUMBER(22,0) default 0 not null,
+ constraint "itil::software_pk" primary key (id)
+);
+CREATE INDEX "itil::software_si1"
+       ON "itil::software"(W5REPLKEY);
+CREATE INDEX "itil::software_si2"
+       ON "itil::software"(W5REPLLASTSUCC);
+CREATE INDEX "itil::software_di1"
+       ON "itil::software"(NAME);
+
 #
 #-------------------------------------------------------------------------
 #

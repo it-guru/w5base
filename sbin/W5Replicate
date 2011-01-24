@@ -158,6 +158,9 @@ if (!defined($W5V2::W5Server)){
    $W5V2::W5Server->Connect();
 }
 $W5V2::Query=new kernel::cgi({});
+my $EventController=new kernel::EventController(Config=>$config);
+$EventController->Cache->{W5Server}=$W5V2::W5Server;
+
 
 #
 #                      Init finished
@@ -233,7 +236,67 @@ sub getOracleDBIConnectionHandle
    }
    $dst->doCmd("alter session set NLS_DATE_FORMAT='YYYY-MM-DD HH24:MI:SS'");
    msg(INFO,"connect to replication target '$dbconnect' successfull");
-   return($dst,uc($dbuser));
+   return($dst,uc($dbuser),lc($dbuser).'@'.lc($dbconnect));
+}
+
+
+sub getReplicateObjectRec
+{
+   my $Config=shift;
+   my $rprec=shift;
+   my $objectname=shift;
+
+   my $ro=getModuleObject($Config,"replicate::obj");
+   if (!defined($ro)){
+      die("ERROR: can not access replicate::obj");
+   }
+   $ro->SetFilter({name=>\$objectname,partnerid=>\$rprec->{id}});
+   my ($rorec,$msg)=$ro->getOnlyFirst(qw(ALL));
+   if (!defined($rorec)){
+      my $newid=$ro->ValidatedInsertRecord({name=>$objectname,
+                                            partnerid=>$rprec->{id}});
+      if (!defined($newid)){
+         msg(ERROR,"can not initialize replication object record");
+         exit(101);
+      }
+      else{
+         $ro->SetFilter({id=>\$newid});
+         ($rorec,$msg)=$ro->getOnlyFirst(qw(ALL));
+      }
+   }
+   if (!defined($rorec)){
+      die("ERROR: can not load object record");
+   }
+   return($rorec);
+}
+
+
+sub getReplicatePartnerRec
+{
+   my $Config=shift;
+   my $partner=shift;
+
+   my $rp=getModuleObject($Config,"replicate::partner");
+   if (!defined($rp)){
+      die("ERROR: can not access replicate::partner");
+   }
+   $rp->SetFilter({name=>\$partner});
+   my ($rprec,$msg)=$rp->getOnlyFirst(qw(ALL));
+   if (!defined($rprec)){
+      my $newid=$rp->ValidatedInsertRecord({name=>$partner,cistatusid=>'4'});
+      if (!defined($newid)){
+         msg(ERROR,"can not initialize replication partner record");
+         exit(101);
+      }
+      else{
+         $rp->SetFilter({id=>\$newid});
+         ($rprec,$msg)=$rp->getOnlyFirst(qw(ALL));
+      }
+   }
+   if (!defined($rprec)){
+      die("ERROR: can not load partner record");
+   }
+   return($rprec);
 }
 
 
@@ -244,7 +307,12 @@ sub getRequestedReplicationObjects
 {
    my $Config=shift;
    my @replicationOjects;
-   my ($dbi,$schema)=getOracleDBIConnectionHandle();
+   my ($dbi,$schema,$partner)=getOracleDBIConnectionHandle();
+
+   my $rprec=getReplicatePartnerRec($Config,$partner);
+
+
+
 
    #
    # loading table list from oracle schema and check tables with :: in it
@@ -364,14 +432,30 @@ sub objectReplicationPhase1
    my $phaselimit=shift;
    my $ctrl=shift;
    my $start=time();
+
+
+
    msg(INFO,"============================================");
    msg(INFO,"start: phase 1 replication for $ctrl->{name} - new records");
-   my ($dbi,$schema)=getOracleDBIConnectionHandle();
+   my ($dbi,$schema,$partner)=getOracleDBIConnectionHandle();
+
+
+
    my $obj=getModuleObject($Config,$ctrl->{'name'});
    if (!defined($obj)){
       msg(ERROR,"can not connect to $ctrl->{name}");
       return(undef);
    }
+
+   my $rprec=getReplicatePartnerRec($Config,$partner);
+   my $rorec=getReplicateObjectRec($Config,$rprec,$ctrl->{'name'});
+
+   my $rstatobj=getModuleObject($Config,"replicate::stat");
+   my $rstatid=$rstatobj->ValidatedInsertRecord({
+                                                   phase=>1,
+                                                   objectid=>$rorec->{id},
+                                                   startdate=>NowStamp("en")
+                                                });
    my $oldreplkey;
    while($ReplicationStart+$MaximumReplicationTime-10>time() &&
          $start+$phaselimit>time()){
@@ -450,6 +534,11 @@ sub objectReplicationPhase1
    $dbi->commit();
    $dbi->disconnect();
    msg(INFO,"end:   phase 1 replication for $ctrl->{name}");
+   my $rstatid=$rstatobj->ValidatedUpdateRecord({},
+                                                {
+                                                   enddate=>NowStamp("en")
+                                                },
+                                                {id=>\$rstatid});
 }
 
 
@@ -466,12 +555,24 @@ sub objectReplicationPhase2
    my $start=time();
    msg(INFO,"============================================");
    msg(INFO,"start: phase 2 replication for $ctrl->{name} - refresh");
-   my ($dbi,$schema)=getOracleDBIConnectionHandle();
+   my ($dbi,$schema,$partner)=getOracleDBIConnectionHandle();
    my $obj=getModuleObject($Config,$ctrl->{'name'});
    if (!defined($obj)){
       msg(ERROR,"can not connect to $ctrl->{name}");
       return(undef);
    }
+
+   my $rprec=getReplicatePartnerRec($Config,$partner);
+   my $rorec=getReplicateObjectRec($Config,$rprec,$ctrl->{'name'});
+
+   my $rstatobj=getModuleObject($Config,"replicate::stat");
+   my $rstatid=$rstatobj->ValidatedInsertRecord({
+                                                   phase=>2,
+                                                   objectid=>$rorec->{id},
+                                                   startdate=>NowStamp("en")
+                                                });
+
+
    my $cmd="select count(*) n ".
            "from \"$ctrl->{name}\" ";
    my $n=0;
@@ -533,6 +634,11 @@ sub objectReplicationPhase2
    $dbi->commit();
    $dbi->disconnect();
    msg(INFO,"end:   phase 2 replication for $ctrl->{name}");
+   my $rstatid=$rstatobj->ValidatedUpdateRecord({},
+                                                {
+                                                   enddate=>NowStamp("en")
+                                                },
+                                                {id=>\$rstatid});
 }
 
 
@@ -550,7 +656,18 @@ sub objectReplicationPhase3
    my $start=time();
    msg(INFO,"============================================");
    msg(INFO,"start: phase 3 replication for $ctrl->{name} - refresh");
-   my ($dbi,$schema)=getOracleDBIConnectionHandle();
+   my ($dbi,$schema,$partner)=getOracleDBIConnectionHandle();
+
+   my $rprec=getReplicatePartnerRec($Config,$partner);
+   my $rorec=getReplicateObjectRec($Config,$rprec,$ctrl->{'name'});
+
+   my $rstatobj=getModuleObject($Config,"replicate::stat");
+   my $rstatid=$rstatobj->ValidatedInsertRecord({
+                                                   phase=>3,
+                                                   objectid=>$rorec->{id},
+                                                   startdate=>NowStamp("en")
+                                                });
+
 
    my $cmd="delete from \"$ctrl->{name}\" ".
            "where w5repllastsucc<sysdate-7 and w5replfailcnt>2";
@@ -559,6 +676,11 @@ sub objectReplicationPhase3
    $dbi->commit();
    $dbi->disconnect();
    msg(INFO,"end:   phase 3 replication for $ctrl->{name}");
+   my $rstatid=$rstatobj->ValidatedUpdateRecord({},
+                                                {
+                                                   enddate=>NowStamp("en")
+                                                },
+                                                {id=>\$rstatid});
 }
 
 
@@ -901,20 +1023,32 @@ sub Hash2DataField
    my $self=shift;
    my $container=shift;
    my $element;
-   if (exists($container->{'item'}) && scalar($container->{'item'}) =~ m/^ARRAY/) {
+   if (exists($container->{'item'}) && 
+       scalar($container->{'item'}) =~ m/^ARRAY/) {
       foreach my $item (@{$container->{'item'}}) {
-         $element.=$item->{'name'} . "='" . $item->{'value'} . "'=" . $item->{'name'} . "\n";
+         $element.=$item->{'name'}.
+                   "='".$item->{'value'}."'=".
+                   $item->{'name'}."\n";
       }
    }
    return($element);
+}
+
+sub effectedRows
+{
+   my $self=shift;
+   return($self->{effectedRows});
 }
 
 sub doCmd
 {
    my $self=shift;
    my $cmd=shift;
+   $self->{effectedRows}=undef;
    if (my $sth=$self->prepare($cmd)){
-      return($sth->execute(@_));
+      my $bk=$sth->execute(@_);
+      $self->{effectedRows}=$sth->rows();
+      return($bk);
    }
    return(undef);
 }
