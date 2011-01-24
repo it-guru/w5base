@@ -1,2 +1,3 @@
 'base::MyW5Base::myeffortsraw'=>{de=>'Tool: Arbeitszeitanalyse - (AER - meine Rohdaten)',en=>'Tool: Worktimeanalyse - my raw data'},
 'effort relation'=>{de=>'Zeitaufwand Zuordnung'},
+'Timerange'=>{de=>'Zeitbereich'},

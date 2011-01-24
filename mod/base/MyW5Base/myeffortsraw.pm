@@ -167,8 +167,6 @@ sub getQueryTemplate
 <tr>
 <td class=fname width=10%>$Month:</td>
 <td class=finput width=40% >$msel</td>
-<td class=fname width=10%>&nbsp;</td>
-<td class=finput width=40% >&nbsp;</td>
 </tr>
 EOF
    $d.=<<EOF;
