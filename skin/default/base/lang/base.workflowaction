@@ -29,6 +29,8 @@
      de=>'Eine Genehmigungsanforderung für den Workflow %s wurde an Sie gerichtet'},
 'Edit'=>{de=>'Bearbeiten'},
 'Effort'=>{de=>'Zeitaufwand'},
+'effort description'=>{de=>'Zeitaufwand-Beschreibungstext'},
+'effort label'=>{de=>'Zeitaufwand-Überschrift'},
 'personal Effort'=>{de=>'persönlicher Zeitaufwand'},
 'notify intiator'=>{de=>'Initiator informieren'},
 'Private State'=>{de=>'Sichtbarkeit'},
@@ -44,4 +46,5 @@
 'w5base2extern'=>{de=>'W5Base Datentransfer zum externen System',en=>'W5Base data transfer to the external system'},
 'extern2w5base'=>{de=>'Datentransfer vom externen System zur W5Base',en=>'Data transfer from the external system to W5Base'},
 'Sync state'=>{de=>'Syncronisationsstatus'},
+'creator posix'=>{de=>'Ersteller POSIX'},
 

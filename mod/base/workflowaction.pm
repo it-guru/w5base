@@ -116,6 +116,45 @@ sub new
                 dataobjattr   =>'wfaction.effort'),
 
       new kernel::Field::Textarea(
+                name          =>'effortcomments',            # label for effort lists
+                group         =>'actiondata',
+                depend        =>['comments','effortlabel'],
+                htmldetail    =>0,
+                searchable    =>0,
+                label         =>'effort description',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return("$current->{effortlabel}:\n".$current->{comments});
+                }),
+
+      new kernel::Field::Text(
+                name          =>'effortlabel',            # label for effort lists
+                depend        =>['comments','wfheadid'],
+                htmldetail    =>0,
+                searchable    =>0,
+                label         =>'effort label',
+                dataobjattr   =>'wfhead.shortdescription'),
+
+      new kernel::Field::Text(
+                name          =>'creatorposix',            # posix id of creator contact
+                depend        =>['creatorid'],
+                htmldetail    =>0,
+                searchable    =>0,
+                group         =>'source',
+                label         =>'creator posix',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+
+                   my $user=getModuleObject($self->getParent->Config,"base::user");
+                   $user->SetFilter({userid=>\$current->{creatorid}});
+                   my ($urec,$msg)=$user->getOnlyFirst(qw(posix));
+
+                   return($urec->{posix});
+                }),
+
+      new kernel::Field::Textarea(
                 name          =>'comments',
                 sqlorder      =>'none',
                 group         =>'actiondata',
@@ -153,63 +192,64 @@ sub new
                 dataobjattr =>'wfaction.actionref'),
 
       new kernel::Field::Text(
-                name        =>'srcsys',
-                group       =>'source',
-                label       =>'Source-System',
-                dataobjattr =>'wfaction.srcsys'),
+                name          =>'srcsys',
+                group         =>'source',
+                label         =>'Source-System',
+                dataobjattr   =>'wfaction.srcsys'),
                                   
       new kernel::Field::Text(
-                name        =>'srcid',
-                group       =>'source',
-                label       =>'Source-Id',
-                dataobjattr =>'wfaction.srcid'),
+                name          =>'srcid',
+                group         =>'source',
+                label         =>'Source-Id',
+                dataobjattr   =>'wfaction.srcid'),
                                   
       new kernel::Field::Date(
-                name        =>'srcload',
-                group       =>'source',
-                label       =>'Last-Load',
-                dataobjattr =>'wfaction.srcload'),
+                name          =>'srcload',
+                group         =>'source',
+                label         =>'Last-Load',
+                dataobjattr   =>'wfaction.srcload'),
 
       new kernel::Field::Creator(
-                name        =>'creator',
-                group       =>'source',
-                label       =>'Creator',
-                dataobjattr =>'wfaction.createuser'),
+                name          =>'creator',
+                group         =>'source',
+                label         =>'Creator',
+                dataobjattr   =>'wfaction.createuser'),
 
       new kernel::Field::Link(
                 name          =>'creatorid',
+                selectfix     =>1,
                 label         =>'CreatorID',
                 dataobjattr   =>'wfaction.createuser'),
 
       new kernel::Field::Owner(
-                name        =>'owner',
-                group       =>'source',
-                label       =>'Owner',
-                dataobjattr =>'wfaction.modifyuser'),
+                name          =>'owner',
+                group         =>'source',
+                label         =>'Owner',
+                dataobjattr   =>'wfaction.modifyuser'),
 
       new kernel::Field::MDate( 
-                name        =>'mdate',
-                group       =>'source',
-                label       =>'Modification-Date',
-                dataobjattr =>'wfaction.modifydate'),
+                name          =>'mdate',
+                group         =>'source',
+                label         =>'Modification-Date',
+                dataobjattr   =>'wfaction.modifydate'),
                                   
       new kernel::Field::CDate(
-                name        =>'cdate',
-                group       =>'source',
-                label       =>'Creation-Date',
-                dataobjattr =>'wfaction.createdate'),
+                name          =>'cdate',
+                group         =>'source',
+                label         =>'Creation-Date',
+                dataobjattr   =>'wfaction.createdate'),
                                   
       new kernel::Field::Editor(
-                name        =>'editor',
-                group       =>'source',
-                label       =>'Editor',
-                dataobjattr =>'wfaction.editor'),
+                name          =>'editor',
+                group         =>'source',
+                label         =>'Editor',
+                dataobjattr   =>'wfaction.editor'),
 
       new kernel::Field::RealEditor(
-                name        =>'realeditor',
-                group       =>'source',
-                label       =>'RealEditor',
-                dataobjattr =>'wfaction.realeditor'),
+                name          =>'realeditor',
+                group         =>'source',
+                label         =>'RealEditor',
+                dataobjattr   =>'wfaction.realeditor'),
    );
    $self->{history}=[qw(insert modify delete)];
 
@@ -217,6 +257,23 @@ sub new
    $self->setWorktable("wfaction");
    return($self);
 }
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @flt=@_;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $from="$worktable left outer join wfhead ".
+            "on $worktable.wfheadid=wfhead.wfheadid ";
+
+   return($from);
+}
+
+
+
+
 
 
 sub Validate
@@ -702,7 +759,9 @@ sub FormatedDetail
    if ($FormatAs eq "HtmlDetail" || $FormatAs eq "edit"){
       return($self->SUPER::FormatedDetail($current,$FormatAs));
    } 
-   return(undef) if ($FormatAs ne "HtmlWfActionlog"); # security !!!
+   my $userid=$self->getParent->getCurrentUserId();
+   return(undef) if ($FormatAs ne "HtmlWfActionlog" && 
+                     $userid ne $current->{creatorid}); # security !!!
    return($self->SUPER::FormatedDetail($current,$FormatAs));
 }
 
