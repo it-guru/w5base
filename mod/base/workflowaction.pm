@@ -525,9 +525,16 @@ sub Notify
 
 
    my $wf=getModuleObject($self->Config,"base::workflow");
+   my $name;
+   if ($mode ne ""){
+      $name=$sitename.": ".$mode.": ".$subject;
+   }
+   else{
+      $name=$subject;
+   }
    my %mailset=(class    =>'base::workflow::mailsend',
                 step     =>'base::workflow::mailsend::dataload',
-                name     =>$sitename.": ".$mode.": ".$subject,
+                name     =>$name,
                 emailtext=>$text);
 
    foreach my $target (qw(emailto emailcc emailbcc)){
