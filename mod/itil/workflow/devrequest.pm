@@ -305,8 +305,28 @@ sub Process
    return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
+sub addInitialParameters
+{
+   my $self=shift;
+   my $h=shift;
 
+   my $applid=$h->{affectedapplicationid};
 
+   if ($applid ne ""){
+      my $appl=getModuleObject($self->Config,"itil::appl");
+      $appl->SetFilter({id=>\$applid});
+      my ($arec,$msg)=$appl->getOnlyFirst(qw(conumber customer));
+      if (defined($arec)){
+         if ($arec->{conumber} ne ""){
+            $h->{involvedcostcenter}=[$arec->{conumber}];
+         }
+         if ($arec->{customer} ne ""){
+            $h->{involvedcustomer}=[$arec->{customer}];
+         }
+      }
+   }
+   return(1);
+}
 
 
 

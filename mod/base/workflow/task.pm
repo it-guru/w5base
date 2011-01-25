@@ -360,13 +360,14 @@ sub getPosibleActions
    if ((($stateid==4 || $stateid==3) && ($lastworker==$userid || $isadmin)) ||
        ($iscurrent || $userid==$creator)){
       push(@l,"wfmailsend");   # mail versenden hinzufügen        (jeder)
+      push(@l,"wfaddnote");    # allow effort notation, even if there is
+                               # no costcenter involved
 
-      if ($WfRec->{involvedcostcenter} ne ""){ 
-         push(@l,"wfaddnote");   # notiz hinzufügen        (jeder)
-      }
-      else{
-         push(@l,"wfaddsnote");  # notiz hinzufügen        (jeder)
-      }
+     # if ($WfRec->{involvedcostcenter} ne ""){  
+     # }
+     # else{
+     #    push(@l,"wfaddsnote");  # notiz hinzufügen        (jeder)
+     # }
       push(@l,"setprioexecs"); # Prio und erledigungsgrad setzen
       if ($WfRec->{tasknature} eq "Tproject"){
          push(@l,"wfaddsubtask"); # Unteraufgabe erzeugen

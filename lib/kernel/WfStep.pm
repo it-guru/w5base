@@ -928,14 +928,14 @@ sub getDefaultNoteDiv
          $note."</textarea></td></tr>";
    if ($mode eq "addnote" || $mode eq "simple"){
       if ($mode eq "simple"){
-         $d.="<tr><td width=1% nowrap valign=bottom>&nbsp;";
+         $d.="<tr><td width=1% nowrap valign=center>&nbsp;";
       }
       else{
-         $d.="<tr><td width=1% nowrap valign=bottom>&nbsp;".
+         $d.="<tr><td width=1% nowrap valign=center>&nbsp;".
              $self->getParent->getParent->T("personal Effort",
                                             "base::workflowaction").
              ":&nbsp;</td>".
-             "<td nowrap valign=bottom>".
+             "<td nowrap valign=center>".
              $self->getParent->getParent->Action->
                     getEffortSelect("Formated_effort");
       }
@@ -954,6 +954,13 @@ sub getDefaultNoteDiv
 
       $d.="</td>";
       $d.="</tr>";
+    #  this must be added, if it is sure that costcenter are always recorded
+    #  if ($WfRec->{involvedcostcenter} eq "" && $mode eq "addnote"){
+    #      $d.="<tr><td colspan=2>";
+    #      $d.="&nbsp; <b>".$self->getParent->getParent->T(
+    #          "NOTE: no costcenter allocation posible!")."</b>";
+    #      $d.="</td></tr>";
+    #  }
    }
    if ($mode eq "defer"){
       my $app=$self->getParent->getParent;
