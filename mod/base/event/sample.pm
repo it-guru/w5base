@@ -130,11 +130,12 @@ sub TestMail2
           class    =>'base::workflow::mailsend',
           step     =>'base::workflow::mailsend::dataload',
           name     =>'eine Mail vom Testevent1 mit äöüß',
-          emailto  =>'hartmut.vogler@xxxxxx.com',
+          emailto  =>'vogler.hartmut@xxxxxxxxxxxxxm',
+          emailfrom=>'"Vogler, Hartmut" <>',
           emailtext=>["Dies ist der\n 1. Text",'dies der 2.','und der d 100 Zeichen: 12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890ritte'],
           emailhead=>['Head1','Head2 mal ein gaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaanz langer Text1234567345624354357246357832','Head3'],
           emailtstamp=>['01.01.2000 14:14:00',undef,'02.02.2000 01:01:01'],
-          emailprefix=>['sued/vogler.hartmut',undef,'nobody'],
+          emailprefix=>['sued/xxxxxx.hartmut',undef,'nobody'],
          })){
       my $r=$wf->Store($id,step=>'base::workflow::mailsend::waitforspool');
       return({msg=>'versandt'});
