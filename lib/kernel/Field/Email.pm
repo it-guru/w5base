@@ -43,20 +43,21 @@ sub Validate
          my $m=trim($_);
          if ($m ne ""){
             if (!($m=~m/^\S+\@\S+\.\S+$/) &&
-                !($m=~m/^".*" <\S+\@\S+\.\S+>$/)){
+                !($m=~m/^".+" <\S+\@\S+\.\S+>$/) &&
+                !($m=~m/^".+" <>$/) ){
                $self->getParent->LastMsg(ERROR,
                             "invalid E-Mail address format '%s'",$m);
                return(undef);
             }
          }
-         if (my ($name,$mail)=$m=~m/^"(.*)" <(\S+\@\S+\.\S+)>$/){
+         if (my ($name,$mail)=$m=~m/^"(.+)" <(.*)>$/){
             $m='"'.$name.'" <'.lc($mail).'>';
          }
          else{
             $m=lc($m);
          }
          $m=~s/^(smtp:)//i;
-         if (!($m=~m/^".*" <\S+\@\S+\.\S+>$/)){
+         if (!($m=~m/^".*" <.*>$/)){
             $m=~s/[^a-z0-9_\.\@-]//gi;
          }
          $_=$m;

@@ -136,7 +136,7 @@ sub Sendmail
          if ($from eq ""){
             my $sitename=$self->Config->Param("SiteName");
             $sitename="W5Base" if ($sitename eq "");
-            $from="\"$sitename\" <no_reply\@".$rec->{initialsite}.">";
+            $from="\"$sitename\" <>";
             $terminfrom="CN=\"$sitename\":MAILTO:no_reply\@".
                         $rec->{initialsite}
          }
