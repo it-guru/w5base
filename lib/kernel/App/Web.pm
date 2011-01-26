@@ -1206,7 +1206,7 @@ sub HttpHeader
       my $f=$param{'filename'};
       $f=~s/^.*\\//g;
       $disp.="; " if ($disp ne "");
-      $disp.="filename=$f";
+      $disp.="filename=\"$f\"";
       $d.="Content-Name: $f\n";
    }
    $d.="Content-Disposition: $disp\n";
