@@ -1590,6 +1590,7 @@ sub FETCH
    my $self=shift;
    if (!exists($self->{obj})){
       $self->{obj}=$self->{parent}->ModuleObject($self->{name});
+      return(undef) if (!defined($self->{obj}));
       if (defined($self->{obj})){
          if ($self->{obj}->can("setParent")){
             $self->{obj}->setParent($self->{parent});

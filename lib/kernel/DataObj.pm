@@ -511,7 +511,15 @@ sub getHashIndexed
          foreach my $key (@key){
             my $v=$rec->{$key};
             next if (!defined($v));
-            $res->{$key}->{$v}=$rec;
+            if (exists($res->{$key}->{$v})){
+               if (ref($res->{$key}->{$v}) ne "ARRAY"){
+                  $res->{$key}->{$v}=[$res->{$key}->{$v}];
+               }
+               push(@{$res->{$key}->{$v}},$rec);
+            }
+            else{
+               $res->{$key}->{$v}=$rec;
+            }
          }
          ($rec,$msg)=$self->getNext();
       } until(!defined($rec));
