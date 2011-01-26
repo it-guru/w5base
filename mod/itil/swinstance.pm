@@ -549,6 +549,11 @@ sub initSearchQuery
 }
 
 
+sub SelfAsParentObject    # this method is needed because existing derevations
+{
+   return("itil::swinstance");
+}
+
 
 
 sub SecureSetFilter

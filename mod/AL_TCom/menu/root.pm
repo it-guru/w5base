@@ -235,7 +235,7 @@ sub Init
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("AL_TCom.swinstance",
-                      "itil::swinstance",
+                      "TS::swinstance",
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("AL_TCom.swinstance.new",
@@ -301,10 +301,6 @@ sub Init
 
    $self->RegisterObj("AL_TCom.kern.hwmodel",
                       "itil::hwmodel",
-                      defaultacl=>['valid_user']);
-   
-   $self->RegisterObj("AL_TCom.kern.costcenter",
-                      "itil::costcenter",
                       defaultacl=>['valid_user']);
    
    $self->RegisterObj("AL_TCom.kern.costcenter",

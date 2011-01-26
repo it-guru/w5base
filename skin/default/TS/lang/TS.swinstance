@@ -1,0 +1,3 @@
+'TS::swinstance'=>{de=>'T-Systems Software-Instanz',
+                  en=>'T-Systems Software-Instance'},
+'fieldgroup.inmchm'=>{de=>'Incident und Change-Management',en=>'Incident and Change-Management'},
