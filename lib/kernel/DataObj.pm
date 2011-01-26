@@ -1792,7 +1792,6 @@ sub AddFields
 
    foreach my $obj ($self->InitFields(@fobjlist)){
       my $name=$obj->Name;
-printf STDERR ("fifi $self=$name\n") if ($self->Self eq "itil::lnkapplinteranswer");
       next if (defined($self->{'Field'}->{$name}));
       $self->{'Field'}->{$name}=$obj;
       my $inserted=0;
@@ -1894,7 +1893,9 @@ sub getFieldList
    if (defined($self->{SubDataObj})){
       my %subfld=();
       foreach my $SubDataObj (sort(keys(%{$self->{SubDataObj}}))){
-         foreach my $f ($self->{SubDataObj}->{$SubDataObj}->getFieldList()){
+         my $o=$self->{SubDataObj}->{$SubDataObj};
+         next if (!defined($o));
+         foreach my $f ($o->getFieldList()){
             push(@fl,$f) if (!defined($subfld{$f}));
             $subfld{$f}=1;
          }
@@ -1984,7 +1985,7 @@ sub getSubDataObjFieldObjsByView
 
    foreach my $SubDataObj (sort(keys(%{$self->{SubDataObj}}))){
       my $sobj=$self->{SubDataObj}->{$SubDataObj};
-      if ($sobj->can("getFieldObjsByView")){
+      if (defined($sobj) && $sobj->can("getFieldObjsByView")){
          push(@fobjs,$sobj->getFieldObjsByView($view,%param));
       }
    }
@@ -2007,8 +2008,10 @@ sub getFieldHash
    if (defined($self->{SubDataObj})){
       foreach my $SubDataObj (sort(keys(%{$self->{SubDataObj}}))){
          my $so=$self->{SubDataObj}->{$SubDataObj};
-         foreach my $fieldname (sort(keys(%{$so->{Field}}))){
-            $fh{$fieldname}=$so->{Field}->{$fieldname};
+         if (defined($so)){
+            foreach my $fieldname (sort(keys(%{$so->{Field}}))){
+               $fh{$fieldname}=$so->{Field}->{$fieldname};
+            }
          }
       }
    }
@@ -2051,8 +2054,11 @@ sub getField
    } 
    if (defined($self->{SubDataObj})){
       foreach my $SubDataObj (sort(keys(%{$self->{SubDataObj}}))){
-         if (exists($self->{SubDataObj}->{$SubDataObj}->{'Field'}->{$name})){ 
-            return($self->{SubDataObj}->{$SubDataObj}->{'Field'}->{$name});
+         my $so=$self->{SubDataObj}->{$SubDataObj};
+         if (defined($so)){
+            if (exists($so->{'Field'}->{$name})){ 
+               return($so->{'Field'}->{$name});
+            }
          }
       }
    }

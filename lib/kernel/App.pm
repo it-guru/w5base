@@ -601,97 +601,6 @@ sub getParsedTemplate
    return($mask);
 }
 
-sub LoadSubObjs
-{
-   my $self=shift;
-   my $extender=shift;
-   my $hashkey=shift;
-   $hashkey="SubDataObj" if (!defined($hashkey));
-   if (!defined($self->{$hashkey})){
-      my $instdir=$self->Config->Param("INSTDIR");
-      my @path=($instdir);
-      my @pat;
-      my $modpath=$self->Config->Param("MODPATH");
-      if ($modpath ne ""){
-         foreach my $path (split(/:/,$modpath)){
-            my $qpath=quotemeta($path);
-            unshift(@path,$path) if (!grep(/^$qpath$/,@path));
-         }
-      }
-      my @sublist;
-      my @disabled;
-
-      foreach my $path (@path){
-         my $pat="$path/mod/*/$extender/*.pm";
-         if ($extender=~m/\//){
-            $pat="$path/mod/*/$extender.pm";
-         }
-         unshift(@sublist,glob($pat)); 
-         unshift(@disabled,glob($pat.".DISABLED")); 
-      }
-
-      @sublist=map({my $qi=quotemeta($instdir);
-                    $_=~s/^$qi//;
-                    $_=~s/\/mod\///; 
-                    $_;
-                   } @sublist);
-
-      @disabled=map({my $qi=quotemeta($instdir);
-                    $_=~s/^$qi//;
-                    $_=~s/\/mod\///; 
-                    $_=~s/\.DISABLED//; 
-                    $_."/" if (!($_=~m/\.pm$/));
-                    $_;
-                   } @disabled);
-
-      foreach my $dis (@disabled){
-         @sublist=grep(!/^$dis/,@sublist);
-      }
-    
-      @sublist=map({$_=~s/\.pm$//;
-                    $_=~s/\//::/g;
-                    $_;
-                   } @sublist);
-      my $p;
-      $p=$self->getParent->Self if (defined($self->getParent()));
-      foreach my $modname (@sublist){
-         my $o=$self->ModuleObject($modname);
-         if (defined($o)){
-            if (!$o->can("setParent")){
-               msg(ERROR,"cant call setParent on $o");
-            }
-            $o->setParent($self);
-            $self->{$hashkey}->{$modname}=$o;
-            if ($o->can("Init")){
-               if (!$o->Init()){
-                  delete($self->{$hashkey}->{$modname});
-                  $self->{"Inactiv".$hashkey}->{$modname}=$modname;
-               }
-            }
-         }
-         else{
-            msg(ERROR,"can't load $hashkey '%s' in '%s'",$modname,$self);
-            printf STDERR ("%s\n",$@);
-         }
-      }
-      my $inactiv="";
-      my $activ="";
-      if (keys(%{$self->{$hashkey}})){
-         $activ=sprintf(" activ=%s",join(", ",keys(%{$self->{$hashkey}}))); 
-      }
-      if (keys(%{$self->{"Inactiv".$hashkey}})){
-         $activ=sprintf(" inactiv=%s",
-                        join(", ",keys(%{$self->{"Inactiv".$hashkey}}))); 
-      }
-      if ($activ ne "" || $inactiv ne ""){
-         #msg(INFO,"LoadSubObjs($self - $hashkey): $activ$inactiv");
-      }
-   }
-   return(keys(%{$self->{$hashkey}}));
-}
-
-
-
 sub getDataObj
 {
    my $self=shift;
@@ -1501,6 +1410,202 @@ sub ExpandTimeExpression
    }
    return(Date_to_String($format,$Y,$M,$D,$h,$m,$s,$dsttimezone));
 }
+
+
+sub LoadSubObjs
+{
+   my $self=shift;
+   my $extender=shift;
+   my $hashkey=shift;
+   $hashkey="SubDataObj" if (!defined($hashkey));
+   if (!defined($self->{$hashkey})){
+      my $instdir=$self->Config->Param("INSTDIR");
+      my @path=($instdir);
+      my @pat;
+      my $modpath=$self->Config->Param("MODPATH");
+      if ($modpath ne ""){
+         foreach my $path (split(/:/,$modpath)){
+            my $qpath=quotemeta($path);
+            unshift(@path,$path) if (!grep(/^$qpath$/,@path));
+         }
+      }
+      my @sublist;
+      my @disabled;
+
+      foreach my $path (@path){
+         my $pat="$path/mod/*/$extender/*.pm";
+         if ($extender=~m/\//){
+            $pat="$path/mod/*/$extender.pm";
+         }
+         unshift(@sublist,glob($pat)); 
+         unshift(@disabled,glob($pat.".DISABLED")); 
+      }
+
+      @sublist=map({my $qi=quotemeta($instdir);
+                    $_=~s/^$qi//;
+                    $_=~s/\/mod\///; 
+                    $_;
+                   } @sublist);
+
+      @disabled=map({my $qi=quotemeta($instdir);
+                    $_=~s/^$qi//;
+                    $_=~s/\/mod\///; 
+                    $_=~s/\.DISABLED//; 
+                    $_."/" if (!($_=~m/\.pm$/));
+                    $_;
+                   } @disabled);
+
+      foreach my $dis (@disabled){
+         @sublist=grep(!/^$dis/,@sublist);
+      }
+    
+      @sublist=map({$_=~s/\.pm$//;
+                    $_=~s/\//::/g;
+                    $_;
+                   } @sublist);
+      my $p;
+      $p=$self->getParent->Self if (defined($self->getParent()));
+      foreach my $modname (@sublist){
+         my $o=$self->ModuleObject($modname);
+         if (defined($o)){
+            if (!$o->can("setParent")){
+               msg(ERROR,"cant call setParent on $o");
+            }
+            $o->setParent($self);
+            $self->{$hashkey}->{$modname}=$o;
+            if ($o->can("Init")){
+               if (!$o->Init()){
+                  delete($self->{$hashkey}->{$modname});
+                  $self->{"Inactiv".$hashkey}->{$modname}=$modname;
+               }
+            }
+         }
+         else{
+            msg(ERROR,"can't load $hashkey '%s' in '%s'",$modname,$self);
+            printf STDERR ("%s\n",$@);
+         }
+      }
+      my $inactiv="";
+      my $activ="";
+      if (keys(%{$self->{$hashkey}})){
+         $activ=sprintf(" activ=%s",join(", ",keys(%{$self->{$hashkey}}))); 
+      }
+      if (keys(%{$self->{"Inactiv".$hashkey}})){
+         $activ=sprintf(" inactiv=%s",
+                        join(", ",keys(%{$self->{"Inactiv".$hashkey}}))); 
+      }
+      if ($activ ne "" || $inactiv ne ""){
+         #msg(INFO,"LoadSubObjs($self - $hashkey): $activ$inactiv");
+      }
+   }
+   return(keys(%{$self->{$hashkey}}));
+}
+
+
+sub LoadSubObjsOnDemand
+{
+   my $self=shift;
+   my $extender=shift;
+   my $hashkey=shift;
+   $hashkey="SubDataObj" if (!defined($hashkey));
+   if (!defined($self->{$hashkey})){
+      my $instdir=$self->Config->Param("INSTDIR");
+      my @path=($instdir);
+      my @pat;
+      my $modpath=$self->Config->Param("MODPATH");
+      if ($modpath ne ""){
+         foreach my $path (split(/:/,$modpath)){
+            my $qpath=quotemeta($path);
+            unshift(@path,$path) if (!grep(/^$qpath$/,@path));
+         }
+      }
+      my @sublist;
+      my @disabled;
+
+      foreach my $path (@path){
+         my $pat="$path/mod/*/$extender/*.pm";
+         if ($extender=~m/\//){
+            $pat="$path/mod/*/$extender.pm";
+         }
+         unshift(@sublist,glob($pat)); 
+         unshift(@disabled,glob($pat.".DISABLED")); 
+      }
+
+      @sublist=map({my $qi=quotemeta($instdir);
+                    $_=~s/^$qi//;
+                    $_=~s/\/mod\///; 
+                    $_;
+                   } @sublist);
+
+      @disabled=map({my $qi=quotemeta($instdir);
+                    $_=~s/^$qi//;
+                    $_=~s/\/mod\///; 
+                    $_=~s/\.DISABLED//; 
+                    $_."/" if (!($_=~m/\.pm$/));
+                    $_;
+                   } @disabled);
+
+      foreach my $dis (@disabled){
+         @sublist=grep(!/^$dis/,@sublist);
+      }
+    
+      @sublist=map({$_=~s/\.pm$//;
+                    $_=~s/\//::/g;
+                    $_;
+                   } @sublist);
+      my $p;
+      $p=$self->getParent->Self if (defined($self->getParent()));
+      foreach my $modname (@sublist){
+          my $o;
+          tie($o,'SubModulHandler',$modname,$self);
+          $self->{$hashkey}->{$modname}=$o;
+      }
+   }
+   return(keys(%{$self->{$hashkey}}));
+}
+
+
+
+
+package SubModulHandler;
+require Tie::Scalar;
+use strict;
+use vars qw(@ISA);
+
+@ISA = qw(Tie::Scalar);
+
+sub TIESCALAR
+{
+   my $type=shift;
+   my $name=shift;
+   my $parent=shift;
+   my $self=bless({parent=>$parent,name=>$name},$type);
+   return($self);
+}
+
+
+
+sub FETCH
+{
+   my $self=shift;
+   if (!exists($self->{obj})){
+      $self->{obj}=$self->{parent}->ModuleObject($self->{name});
+      if (defined($self->{obj})){
+         if ($self->{obj}->can("setParent")){
+            $self->{obj}->setParent($self->{parent});
+         }
+         if ($self->{obj}->can("Init")){
+            if (!$self->{obj}->Init()){
+               $self->{obj}=undef;
+            }
+         }
+      }
+   }
+   return($self->{obj});
+}
+
+
+
 
 
 

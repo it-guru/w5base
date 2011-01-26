@@ -716,7 +716,7 @@ sub new
       new kernel::Field::QualityState(),
       new kernel::Field::QualityOk()
    );
-   $self->LoadSubObjs("workflow");
+   $self->LoadSubObjsOnDemand("workflow");
    $self->setDefaultView(qw(id class state name editor));
    $self->{ResultLineClickHandler}="Process";
    $self->{history}=[qw(insert modify delete)];
@@ -1691,7 +1691,8 @@ sub ShowState
    my $filename=$self->getSkinFile("base/img/wfstate$wfstate.gif");
    my %param;
 
-   msg(INFO,"base::worflow ShowState func=$func id=$wfheadid wfstate=$wfstate filename=$filename");
+   msg(INFO,"base::worflow ShowState ".
+            "func=$func id=$wfheadid wfstate=$wfstate filename=$filename");
 
    print $self->HttpHeader("image/gif",%param);
    if (open(MYF,"<$filename")){
@@ -1709,7 +1710,14 @@ sub getSelectableModules
    my $self=shift;
    my %env=@_;
    my @l=();
+
    foreach my $wfclass (keys(%{$self->{SubDataObj}})){
+      my $o=$self->{SubDataObj}->{$wfclass};
+      if (!defined($o)){
+         msg(ERROR,"Workflow Object '$wfclass' ist not useable due programm".
+                   "error");
+         next;
+      }
       next if (!$self->{SubDataObj}->{$wfclass}->IsModuleSelectable(\%env));
       push(@l,$wfclass);
    }
