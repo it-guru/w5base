@@ -390,7 +390,12 @@ sub Unformat
          return($self->SUPER::Unformat($formated,$rec));
       }
       elsif (defined($self->{vjoinon})){
-         $r->{$self->{vjoinon}->[0]}=$formated->[0];
+         if ($self->{multisize}>0){
+            $r->{$self->{vjoinon}->[0]}=$formated;
+         }
+         else{
+            $r->{$self->{vjoinon}->[0]}=$formated->[0];
+         }
       }
       else{
          $r->{$self->Name()}=$formated;
