@@ -49,7 +49,7 @@ sub Init
    $self->RegisterEvent("putacasset","AssetModified",timeout=>40000);
    $self->RegisterEvent("putacappl","ApplicationModified",timeout=>40000);
 #   $self->RegisterEvent("putac","SWInstallModified");
-   $self->RegisterEvent("SWInstallModified","SWInstallModified");
+#   $self->RegisterEvent("SWInstallModified","SWInstallModified");
    $self->RegisterEvent("ApplicationModified","ApplicationModified");
    $self->RegisterEvent("send2ac","sendFileToAssetManagerOnlineInterface");
    return(1);
@@ -646,7 +646,7 @@ sub ApplicationModified
                      my $sys=getModuleObject($self->Config,"itil::system");
                      $sys->SetFilter({id=>\$irec->{systemid}});
                      my ($sysrec,$msg)=$sys->getOnlyFirst(qw(systemid));
-                     $systemid=$sys->{systemid};
+                     $systemid=$sysrec->{systemid};
                   }
                   if ($systemid ne ""){
                      my $assignment=$rec->{swteam};
