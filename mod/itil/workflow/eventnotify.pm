@@ -457,6 +457,7 @@ sub getDynamicFields
       new kernel::Field::Select(
                 name          =>'eventstattype',
                 translation   =>'itil::workflow::eventnotify',
+                multisize     =>3,
                 group         =>'eventnotifystat',
                 getPostibleValues=>\&FgetPosibleEventStatType,
                 label         =>'Event type',
