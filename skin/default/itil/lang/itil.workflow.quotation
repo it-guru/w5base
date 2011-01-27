@@ -1,0 +1,9 @@
+'itil::workflow::itquotation'=>{de=>'ITIL Angebotsanfrage IT-Dienstleistung',
+                                en=>'ITIL IT-Service quotation'},
+'RUserGroup'=>{de=>'Angebotsanfrage direkt an eine Person oder Gruppe'},
+'RAppl.developer'=>{de=>'Angebotsanfrage an die Entwickler einer Anwendung'},
+'RAppl.businessteam'=>{
+         de=>'Angebotsanfrage an das Betriebsteam einer Anwendung'},
+'RAppl.opm'=>{de=>'Angebotsanfrage an den OPM einer Anwendung'},
+'RAppl.tsm'=>{de=>'Angebotsanfrage an den TSM einer Anwendung'},
+'Request nature'=>{de=>'Adressierung der Anfrage'},
