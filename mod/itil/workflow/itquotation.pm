@@ -19,9 +19,9 @@ package itil::workflow::itquotation;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use base::workflow::request;
+use base::workflow::quotation;
 use itil::workflow::base;
-@ISA=qw(base::workflow::request itil::workflow::base);
+@ISA=qw(base::workflow::quotation itil::workflow::base);
 
 sub new
 {
@@ -46,30 +46,26 @@ sub getDynamicFields
    my $class;
 
    return($self->InitFields(
-      new kernel::Field::Select(  name       =>'reqnature',
-                                  label      =>'Request nature',
-                                  translateion=>'itil::workflow::itquotation',
-                                  value      =>['RUser',
-                                                'RGroup',
-                                                'RApp.developer',
-                                                'RApp.businessteam',
-                                                'RApp.opm',
-                                                'RApp.tsm'],
-                                  container  =>'headref'),
+      new kernel::Field::Select(
+                name          =>'reqnature',
+                label         =>'Request nature',
+                translateion  =>'itil::workflow::itquotation',
+                value         =>['RUserGroup',
+                                 'RAppl.developer',
+                                 'RAppl.businessteam',
+                                 'RAppl.opm',
+                                 'RAppl.tsm'],
+                container     =>'headref'),
 
-#      new kernel::Field::Text(    name       =>'customerrefno',
-#                                  htmleditwidth=>'150px',
-#                                  group      =>'customerdata',
-#                                  translation=>'itil::workflow::itquotation',
-#                                  searchable =>0,
-#                                  expandvar  =>\&expandVar,
-#                                  container  =>'headref',
-#                                  label      =>'Reference'),
-#
-#      new kernel::Field::Text(    name       =>'reqdesdate',
-#                                  label      =>'desired date',
-#                                  group      =>'default',
-#                                  container  =>'headref'),
+      new kernel::Field::Link(
+                name          =>'originalfwdtarget1',
+                label         =>'original forward',
+                container     =>'headref'),
+
+      new kernel::Field::Link(
+                name          =>'originalfwdtarget2',
+                label         =>'original forward',
+                container     =>'headref'),
 
     ),$self->SUPER::getDynamicFields(%param));
 
@@ -91,21 +87,6 @@ sub expandVar
 }
 
 
-sub XgetRequestNatureOptions
-{
-   my $self=shift;
-   return($self->getParent->getRequestNatureOptions());
-}
-sub getRequestNatureOptions
-{
-   my $self=shift;
-   my $vv=['operation','project','modification','inquiry','other'];
-   my @l;
-   foreach my $v (@$vv){
-      push(@l,$v,$v);
-   }
-   return(@l);
-}
 
 
 sub isWorkflowManager
@@ -113,107 +94,54 @@ sub isWorkflowManager
    my $self=shift;
    my $WfRec=shift;
 
-   if (defined($WfRec->{id}) &&   # only if a workflow exists, a workflow
-       $WfRec->{stateid}<16){     # manager can be calculated
-      my $userid=$self->getParent->getCurrentUserId();
-     
-      my @devcon=$self->getDefaultContractor($WfRec);
-     
-      my $msg=shift(@devcon);
-     
-      while(my $target=shift(@devcon)){
-         my $targetid=shift(@devcon);
-         if ($target eq "base::user" && $targetid eq $userid){
-            return(1);
-         }
-         if ($target eq "base::grp" && $targetid ne ""){
-            if ($self->getParent->IsMemberOf($targetid,"RMember","direct")){
-               return(1);
-            }
-         }
-      }
-   }
+#   if (defined($WfRec->{id}) &&   # only if a workflow exists, a workflow
+#       $WfRec->{stateid}<16){     # manager can be calculated
+#      my $userid=$self->getParent->getCurrentUserId();
+#     
+#      my @devcon=$self->getDefaultContractor($WfRec);
+#     
+#      my $msg=shift(@devcon);
+#     
+#      while(my $target=shift(@devcon)){
+#         my $targetid=shift(@devcon);
+#         if ($target eq "base::user" && $targetid eq $userid){
+#            return(1);
+#         }
+#         if ($target eq "base::grp" && $targetid ne ""){
+#            if ($self->getParent->IsMemberOf($targetid,"RMember","direct")){
+#               return(1);
+#            }
+#         }
+#      }
+#   }
    return(0);
 }
 
 
-sub getDefaultContractor
+sub getDefaultProvider
 {
    my $self=shift;
    my $WfRec=shift;
    my $actions=shift;
-   my $target;
-   my $flt;
 
-   if (defined($WfRec->{affectedapplication})){
-      my $applname=$WfRec->{affectedapplication};
-      if (ref($applname) eq "ARRAY"){
-         $flt={name=>\$applname->[0]};
-      } 
-      else{
-         $flt={name=>\$applname};
-      }
-   }
-   if (defined($WfRec->{affectedapplicationid})){
-      my $applid=$WfRec->{affectedapplicationid};
-      if (ref($applid) eq "ARRAY"){
-         $flt={id=>\$applid->[0]};
-      } 
-      else{
-         $flt={id=>\$applid};
-      }
-   }
-   my @devcon;
-   if (defined($flt)){
-      my $appl=getModuleObject($self->getParent->Config,"itil::appl");
-      $appl->SetFilter($flt);
-      my ($cur,$msg)=$appl->getOnlyFirst(qw(allowitquotation sem semid 
-                                            contacts id name));
-      if (defined($cur) && defined($cur->{contacts})){
-         if (!defined($WfRec->{affectedapplicationid})){
-            $WfRec->{affectedapplicationid}=$cur->{id};
-         }
-         if (!defined($WfRec->{affectedapplication})){
-            $WfRec->{affectedapplication}=$cur->{name};
-         }
-         my $c=$cur->{contacts};
-         if (ref($c) eq "ARRAY"){
-            foreach my $con (@$c){
-               my $roles=$con->{roles};
-               $roles=[$roles] if (ref($roles) ne "ARRAY");
-               if (grep(/^orderin1$/,@$roles)){
-                  unshift(@devcon,{target=>$con->{target},
-                                   targetid=>$con->{targetid}});
-               } 
-               if (grep(/^orderin2$/,@$roles)){
-                  push(@devcon,{target=>$con->{target},
-                                targetid=>$con->{targetid}});
-               } 
-            }
-         }
-         if ($#devcon==-1){
-            if ($cur->{sem} ne "" && $cur->{semid} ne ""){
-               push(@devcon,{target=>"base::user",targetid=>$cur->{semid}});
-            }
-         }
-         if (!$cur->{allowitquotation}){
-            $self->LastMsg(ERROR,"business requests are disabled ".
-                                 "for the desired application");
-            return(undef);
-         }
-      }
-   }
-   else{
-      $self->LastMsg(ERROR,"no reference to related application specified");
-      return(undef);
-   }
-   if ($#devcon==-1){
-      $self->LastMsg(ERROR,"no orderin found");
-      return(undef);
-   }
-   return(undef,map({$_->{target},$_->{targetid}} @devcon));
+   return();
 }
 
+
+sub getNextStep
+{
+   my $self=shift;
+   my $currentstep=shift;
+   my $WfRec=shift;
+
+   if($currentstep eq ""){
+      return($self->getStepByShortname("dataload",$WfRec));
+   }
+   if($currentstep=~m/::dataload$/){
+      return($self->getStepByShortname("main",$WfRec));
+   }
+   return(undef);
+}
 
 sub getStepByShortname
 {
@@ -227,10 +155,20 @@ sub getStepByShortname
    return($self->SUPER::getStepByShortname($shortname,$WfRec));
 }
 
+
+
+
 sub isViewValid
 {
    my $self=shift;
-   return($self->SUPER::isViewValid(@_),"affected","customerdata");
+   my $rec=$_[0];
+   my $fo=$self->getField("reqnature");
+   my $d=$fo->RawValue($rec);
+printf STDERR ("fifi d=$d rec=%s\n",Dumper($rec));
+   if ($d=~m/^RAppl\..*/){
+      return($self->SUPER::isViewValid(@_),"affected");
+   }
+   return($self->SUPER::isViewValid(@_),"customerdata");
 }
 
 sub isWriteValid
@@ -243,17 +181,6 @@ sub isWriteValid
    return(@l);
 }
 
-sub getDetailBlockPriority            # posibility to change the block order
-{
-   return("header","default","affected","customerdata","init","flow");
-}
-
-#sub getRecordImageUrl
-#{
-#   my $self=shift;
-#   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-#   return("../../../public/itil/load/workflow_appl.jpg?".$cgi->query_string());
-#}
 
 sub getPosibleRelations
 {
@@ -275,7 +202,7 @@ sub getPosibleRelations
 package itil::workflow::itquotation::dataload;
 use vars qw(@ISA);
 use kernel;
-@ISA=qw(base::workflow::request::dataload);
+@ISA=qw(base::workflow::quotation::dataload);
 
 sub generateWorkspace
 {
@@ -315,7 +242,7 @@ sub generateWorkspace
 <div id=app style="height:60px;padding:5px;margin:15px;border-style:solid;border-width:2px;border-color:black">
 <table width=100% border=1>
 <tr>
-<td class=fname>%affectedapplication(label)%:</td>
+<td class=fname width=1% nowrap>%affectedapplication(label)%:</td>
 <td class=finput>%affectedapplication(detail)%</td>
 </tr>
 </table>
@@ -346,7 +273,7 @@ setEnterSubmit(document.forms[0],"NextStep");
 function setInitFormLayout(reqnature){
   var fdiv=document.getElementById("fwd");
   var adiv=document.getElementById("app");
-  if (reqnature.match(/^RApp\\./)){
+  if (reqnature.match(/^RAppl\\./)){
      adiv.style.visibility='visible';
      adiv.style.display='block';
      fdiv.style.visibility='hidden';
@@ -378,55 +305,45 @@ sub nativProcess
    my $WfRec=shift;
    my $actions=shift;
 
-   if ($action eq "NextStep"){
-      if ($h->{reqdesdate} eq ""){
-         $h->{reqdesdate}="as soon as posible / baldmöglichst";
-      }
-      my $flt;
-      if ($h->{affectedapplication} ne ""){
-         $flt={name=>\$h->{affectedapplication}}; 
-      }
-      if ($h->{affectedapplicationid} ne ""){
-         $flt={id=>\$h->{affectedapplicationid}}; 
-      }
-      if (defined($flt)){
-         my $appl=getModuleObject($self->getParent->Config,"itil::appl");
-         $appl->SetFilter($flt);
-         my ($arec)=$appl->getOnlyFirst(qw(mandator mandatorid conumber
-                                           custcontracts
-                                           customer customerid));
-         if (defined($arec)){
-            $h->{mandatorid}=[$arec->{mandatorid}];
-            $h->{mandator}=[$arec->{mandator}];
-            $h->{involvedcustomer}=[$arec->{customer}];
-            $h->{involvedcostcenter}=[$arec->{conumber}];
-            if (ref($arec->{custcontracts}) eq "ARRAY"){
-               my %custcontractid;
-               my %custcontract;
-               foreach my $rec (@{$arec->{custcontracts}}){
-                  if (defined($rec->{custcontractid})){
-                     $custcontractid{$rec->{custcontractid}}=1;
-                  }
-                  if (defined($rec->{custcontract})){
-                     $custcontract{$rec->{custcontract}}=1;
-                  }
-               }
-               if (keys(%custcontractid)){
-                  $h->{affectedcontractid}=[keys(%custcontractid)];
-               }
-               if (keys(%custcontract)){
-                  $h->{affectedcontract}=[keys(%custcontract)];
-               }
-            }
-
-         }
-         else{
-            $self->LastMsg(ERROR,"can not find a related mandator");
+   if ($action eq "NextStep" || $action eq "create"){
+      $action="NextStep";
+      my $reqnature=$h->{reqnature};
+      if ($reqnature eq "RUserGroup"){
+         if ($h->{fwdtargetname} eq ""){
+            $self->LastMsg(ERROR,"invalid quotation target specified");
             return(0);
          }
+         $h->{originalfwdtarget1}=$h->{fwdtargetname};
+      }
+      elsif ($reqnature=~m/^RAppl\./){
+         my $appl=getModuleObject($self->getParent->Config,"itil::appl");
+         if ($h->{affectedapplication} ne ""){
+            $appl->SetFilter({name=>\$h->{affectedapplication}});
+         }
+         elsif ($h->{affectedapplicationid} ne ""){
+            $appl->SetFilter({id=>\$h->{affectedapplicationid}});
+         }
+         else{
+            $self->LastMsg(ERROR,"invalid application request");
+            return(0);
+         }
+         my ($arec,$msg)=$appl->getOnlyFirst(qw(id conumber name));
+         if (defined($arec)){
+            $h->{affectedapplicationid}=$arec->{id};
+            $h->{affectedapplication}=$arec->{name};
+            if ($arec->{conumber} ne ""){
+               $h->{involvedcostcenter}=$arec->{conumber};
+            }
+         }
+         if ($h->{affectedapplicationid} eq ""){
+            $self->LastMsg(ERROR,"invalid application specified");
+            return(0);
+         }
+         
+         print STDERR Dumper($h);
       }
       else{
-         $self->LastMsg(ERROR,"no applicationid findable");
+         $self->LastMsg(ERROR,"invalid request nature");
          return(0);
       }
    }
@@ -445,97 +362,49 @@ sub Process
    my $actions=shift;
 
    if ($action eq "NextStep"){
-      my $fo=$self->getField("affectedapplication");
-      my $foval=Query->Param("Formated_".$fo->Name());
-      if ($foval=~m/^\s*$/){
-         $self->LastMsg(ERROR,"no application specified");
-         return(0);
+      my $rfo=$self->getField("reqnature");
+      my $reqnature=Query->Param("Formated_".$rfo->Name());
+      printf STDERR ("fifi requestnature=%s\n",$reqnature); 
+      if ($reqnature eq "RUserGroup"){
+         my $fo=$self->getField("fwdtargetname");
+         my $foval=Query->Param("Formated_".$fo->Name());
+         if ($foval=~m/^\s*$/){
+            $self->LastMsg(ERROR,"no target specified");
+            return(0);
+         }
+         if (!$fo->Validate($WfRec,{$fo->Name=>$foval})){
+            $self->LastMsg(ERROR,"unknown error") if (!$self->LastMsg());
+            return(0);
+         }
       }
-      if (!$fo->Validate($WfRec,{$fo->Name=>$foval})){
-         $self->LastMsg(ERROR,"unknown error") if (!$self->LastMsg());
-         return(0);
+      elsif ($reqnature=~m/^RAppl\./){
+         my $fo=$self->getField("affectedapplication");
+         my $foval=Query->Param("Formated_".$fo->Name());
+         if ($foval=~m/^\s*$/){
+            $self->LastMsg(ERROR,"no application specified");
+            return(0);
+         }
+         if (!$fo->Validate($WfRec,{$fo->Name=>$foval})){
+            $self->LastMsg(ERROR,"unknown error") if (!$self->LastMsg());
+            return(0);
+         }
       }
       
    }
    return($self->SUPER::Process($action,$WfRec));
 }
 
-sub Validate
+sub addInitialParameters
 {
    my $self=shift;
-   my $oldrec=$_[0];
-   my $newrec=$_[1];
-   my $found=0;
+   my $newrec=shift;
 
-   my $aid=effVal($oldrec,$newrec,"affectedapplicationid");
-   if ($aid ne ""){
-      $aid=[$aid] if (ref($aid) ne "ARRAY");
-      my $co=getModuleObject($self->getParent->Config,"itil::costcenter");
-      my $app=getModuleObject($self->getParent->Config,"itil::appl");
-
-      $app->SetFilter({id=>$aid});
-      my @l=$app->getHashList(qw(custcontracts mandator 
-                                 conumber mandatorid));
-
-
-      my %custcontract;
-      my %custcontractid;
-      my %mandator;
-      my %mandatorid;
-      my %conumber;
-      foreach my $apprec (@l){
-         if (defined($apprec->{mandator})){
-            $mandator{$apprec->{mandator}}=1;
-         }
-         if (defined($apprec->{mandatorid})){
-            $mandatorid{$apprec->{mandatorid}}=1;
-         }
-         if (defined($apprec->{conumber}) && $apprec->{conumber} ne ""){
-            $co->ResetFilter();
-            $co->SetFilter({name=>\$apprec->{conumber},cistatusid=>"<=4"});
-            my ($corec)=$co->getOnlyFirst("id");
-            if (!defined($corec)){
-               $self->LastMsg(ERROR,"invalid or inactive costcenter ".
-                                    "used in application configuration");
-               return(0);
-            }
-            $conumber{$apprec->{conumber}}=1;
-         }
-         next if (!defined($apprec->{custcontracts}));
-         foreach my $rec (@{$apprec->{custcontracts}}){
-            if (defined($rec->{custcontractid})){
-               $custcontractid{$rec->{custcontractid}}=1;
-            }
-            if (defined($rec->{custcontract})){
-               $custcontract{$rec->{custcontract}}=1;
-            }
-         }
-      }
-      if (keys(%custcontractid)){
-         $newrec->{affectedcontractid}=[keys(%custcontractid)];
-      }
-      if (keys(%custcontract)){
-         $newrec->{affectedcontract}=[keys(%custcontract)];
-      }
-      if (keys(%mandator)){
-         $newrec->{mandator}=[keys(%mandator)];
-      }
-      if (keys(%mandatorid)){
-         $newrec->{mandatorid}=[keys(%mandatorid)];
-      }
-      if (keys(%conumber)){
-         $found++;
-         $newrec->{involvedcostcenter}=[keys(%conumber)];
-      }
-   }
-   if ($found!=1){
-      $self->LastMsg(ERROR,"no valid application found in request");
-      return(0);
-   }
-   
-   return($self->SUPER::Validate(@_));
-
+   return(1);
 }
+
+
+
+
 
 
 

@@ -457,7 +457,6 @@ sub getDynamicFields
       new kernel::Field::Select(
                 name          =>'eventstattype',
                 translation   =>'itil::workflow::eventnotify',
-                multisize     =>3,
                 group         =>'eventnotifystat',
                 getPostibleValues=>\&FgetPosibleEventStatType,
                 label         =>'Event type',
@@ -467,6 +466,7 @@ sub getDynamicFields
                 name          =>'eventstatreasonFrontendText',
                 label         =>'Event reason',
                 weblinkto     =>"none",
+                multisize     =>3,
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'eventnotifystat',
                 vjointo       =>'base::itemizedlist',
