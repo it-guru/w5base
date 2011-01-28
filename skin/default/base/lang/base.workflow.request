@@ -19,6 +19,7 @@
 'wfcallback'=>{de=>'Zurückgerufen',en=>'Calledback'},
 'fieldgroup.init'=>{de=>'Anforderungszuordnung',en=>'Initiator infos'},
 'Initiated by'=>{de=>'Initiert/angefordert durch'},
+'Initiatorgroup'=>{de=>'Initiierende Gruppe'},
 'Comments of implementor'=>{de=>'Bemerkungen und Notizen des Auftragnehmers'},
 'implemented to'=>{de=>'voraussichtlich realisiert bis'},
 'implementation effort'=>{de=>'geschätzter Aufwand'},
@@ -29,4 +30,3 @@
 'transform'=>{de=>'Umwandlung'},
 'Your request has been processed. For further informations use the attached link'=>{de=>'Ihre Anforderung wurde bearbeitet. Für weitere Informationen nutzen Sie bitte den beigefügten Link.'},
 'original request text'=>{de=>'Orginal Anforderungstext'},
-'Initiatorgroup'=>{de=>'Initiierende Gruppe'},

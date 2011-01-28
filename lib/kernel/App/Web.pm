@@ -693,9 +693,14 @@ sub ValidateMenuCache
    }
    if (!defined($self->Cache->{Menu}->{Cache})){
       printf STDERR ("-------------- Menus loaded --------------\n");
+      my $menuacl=getModuleObject($self->Config,"base::menuacl");
+      $menuacl->SetFilter({aclparentobj=>\'base::menu'});
+      $menuacl->SetCurrentView(qw(refid acltarget acltargetid aclmode));
+      $menuacl->SetCurrentOrder(qw(NONE));
+      my $acls=$menuacl->getHashIndexed("refid");
       my $menu=getModuleObject($self->Config,"base::menu");
       my $configname=$self->Config->getCurrentConfigName();
-      $menu->SetCurrentView(qw(prio menuid fullname config target acls
+      $menu->SetCurrentView(qw(prio menuid fullname config target 
                                parent param func translation subid));
       $menu->SetFilter({config=>\$configname});
       $self->Cache->{Menu}->{Cache}=$menu->getHashIndexed(qw(menuid fullname));
@@ -707,6 +712,16 @@ sub ValidateMenuCache
          }
          next if ($menu->{fullname} eq "");
          my ($p)=$menu->{fullname}=~m/^(\S+)\..+?/;
+         my $macls=$acls->{refid}->{$menu->{menuid}};
+         if (ref($macls) ne "ARRAY"){
+            if (defined($macls)){
+               $macls=[$macls];
+            }
+            else{
+               $macls=[];
+            }
+         }
+         $menu->{acls2}=$macls;
          next if ($p eq "");
          $menu->{parent}=$p;
          if (defined($ca->{fullname}->{$p})){

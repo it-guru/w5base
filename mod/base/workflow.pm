@@ -2005,8 +2005,8 @@ sub New                   # Workflow starten
       <input type=submit value="$start" class=workflowbutton>&nbsp; 
    </td>
 </tr>
-<tr>
-<td height=1% align=center valign=center>
+<tr height=1%>
+<td align=center valign=center>
 <div class=newworkflowtip align=left id=tip>
 </div>
 </td>

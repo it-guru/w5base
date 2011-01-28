@@ -194,6 +194,8 @@ sub nativProcess
    my $h=shift;
    my $WfRec=shift;
    my $actions=shift;
+   my $userid=$self->getParent->getParent->getCurrentUserId();
+
 
    if ($op eq "wffollowup"){
       my $note=$h->{note};
@@ -260,6 +262,22 @@ sub nativProcess
                     fwddebtargetid=>undef};
          if ($self->StoreRecord($WfRec,$oprec)){
             $self->PostProcess("SaveStep.".$op,$WfRec,$actions);
+         }
+      }
+      return(0);
+   }
+   elsif($op eq "wfaccept"){
+      if ($self->StoreRecord($WfRec,{stateid=>3,
+                                     fwdtarget=>'base::user',
+                                     fwdtargetid=>$userid,
+                                     fwddebtarget=>undef,
+                                     fwddebtargetid=>undef})){
+         if ($self->getParent->getParent->Action->StoreRecord(
+             $WfRec->{id},"wfaccept",
+             {translation=>'kernel::WfStep'},"",undef)){
+            $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
+            $self->PostProcess("SaveStep.".$op,$WfRec,$actions);
+            return(1);
          }
       }
       return(0);

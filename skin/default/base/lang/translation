@@ -11,6 +11,7 @@
 'cancel'                 =>{de=>'abbrechen'                                 },
 'yes'                    =>{de=>'ja'                                        },
 'no'                     =>{de=>'nein'                                      },
+'boolean.'               =>{de=>'?', en=>'?'},
 'boolean.0'              =>{de=>'nein',    en=>'no'                         },
 'boolean.1'              =>{de=>'ja',      en=>'yes'                        },
 'read'                   =>{de=>'lesen'                                     },

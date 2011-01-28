@@ -1,4 +1,4 @@
-package itil::workflow::itquotation;
+package itil::workflow::quotation;
 #  W5Base Framework
 #  Copyright (C) 2011  Hartmut Vogler (it@guru.de)
 #
@@ -34,7 +34,7 @@ sub new
 sub Init
 {
    my $self=shift;
-   $self->AddGroup("customerdata",translation=>'itil::workflow::itquotation');
+   $self->AddGroup("customerdata",translation=>'itil::workflow::quotation');
    $self->itil::workflow::base::Init();
    return($self->SUPER::Init(@_));
 }
@@ -49,7 +49,7 @@ sub getDynamicFields
       new kernel::Field::Select(
                 name          =>'reqnature',
                 label         =>'Request nature',
-                translateion  =>'itil::workflow::itquotation',
+                translateion  =>'itil::workflow::quotation',
                 value         =>['RUserGroup',
                                  'RAppl.developer',
                                  'RAppl.businessteam',
@@ -57,15 +57,6 @@ sub getDynamicFields
                                  'RAppl.tsm'],
                 container     =>'headref'),
 
-      new kernel::Field::Link(
-                name          =>'originalfwdtarget1',
-                label         =>'original forward',
-                container     =>'headref'),
-
-      new kernel::Field::Link(
-                name          =>'originalfwdtarget2',
-                label         =>'original forward',
-                container     =>'headref'),
 
     ),$self->SUPER::getDynamicFields(%param));
 
@@ -118,13 +109,96 @@ sub isWorkflowManager
 }
 
 
-sub getDefaultProvider
+sub getQuotationProvider
 {
    my $self=shift;
    my $WfRec=shift;
    my $actions=shift;
+   my $action=shift;
+   my @l;
 
-   return();
+   if ($action eq "dataload"){
+      my $fo=$self->getField("reqnature");
+      my $d=$fo->RawValue($WfRec);
+      if ($d eq "RUserGroup"){
+         if ($WfRec->{quotationfwdtarget} ne ""){
+            push(@l,undef,$WfRec->{quotationfwdtarget},
+                           $WfRec->{quotationfwdtargetid});
+         }
+         if ($WfRec->{quotationfwd2target} ne ""){
+            push(@l,$WfRec->{quotationfwd2target},
+                    $WfRec->{quotationfwd2targetid});
+         }
+      }
+      elsif ($d eq "RAppl.developer"){
+         my $appl=getModuleObject($self->Config,"itil::appl");
+         my $applid=$WfRec->{affectedapplicationid};
+         $appl->SetFilter({id=>\$applid,cistatusid=>"<6"});
+         my ($arec,$msg)=$appl->getOnlyFirst(qw(contacts));
+         if (defined($arec)){
+            foreach my $crec (@{$arec->{contacts}}){
+               my $r=$crec->{roles};
+               $r=[$r] if (!ref($r));
+               if (grep(/^developerboss$/,@$r)){
+                  push(@l,$crec->{target},$crec->{targetid});
+               }
+            }
+            foreach my $crec (@{$arec->{contacts}}){
+               my $r=$crec->{roles};
+               $r=[$r] if (!ref($r));
+               if (grep(/^developer$/,@$r)){
+                  push(@l,$crec->{target},$crec->{targetid});
+               }
+            }
+            unshift(@l,undef) if ($#l!=-1);
+            printf STDERR ("developer list=%s\n",Dumper(\@l));
+         }
+      }
+      elsif ($d eq "RAppl.businessteam"){
+         my $appl=getModuleObject($self->Config,"itil::appl");
+         my $applid=$WfRec->{affectedapplicationid};
+         $appl->SetFilter({id=>\$applid,cistatusid=>"<6"});
+         my ($arec,$msg)=$appl->getOnlyFirst(qw(businessteam businessteamid));
+         if (defined($arec) && $arec->{businessteam} ne ""){
+            push(@l,$arec->{businessteam},'base::grp',$arec->{businessteamid});
+         }
+      }
+      elsif ($d eq "RAppl.tsm"){
+         my $appl=getModuleObject($self->Config,"itil::appl");
+         my $applid=$WfRec->{affectedapplicationid};
+         $appl->SetFilter({id=>\$applid,cistatusid=>"<6"});
+         my ($arec,$msg)=$appl->getOnlyFirst(qw(tsmid tsm2id));
+         if (defined($arec)){
+            if ($arec->{tsmid} ne ""){
+               push(@l,'base::user',$arec->{tsmid});
+            }
+            if ($arec->{tsm2id} ne ""){
+               push(@l,'base::user',$arec->{tsm2id});
+            }
+            unshift(@l,undef) if ($#l!=-1);
+         }
+      }
+      elsif ($d eq "RAppl.opm"){
+         my $appl=getModuleObject($self->Config,"itil::appl");
+         my $applid=$WfRec->{affectedapplicationid};
+         $appl->SetFilter({id=>\$applid,cistatusid=>"<6"});
+         my ($arec,$msg)=$appl->getOnlyFirst(qw(opmid opm2id));
+         if (defined($arec)){
+            if ($arec->{opmid} ne ""){
+               push(@l,'base::user',$arec->{opmid});
+            }
+            if ($arec->{opm2id} ne ""){
+               push(@l,'base::user',$arec->{opm2id});
+            }
+            unshift(@l,undef) if ($#l!=-1);
+         }
+      }
+   }
+   if ($#l==-1){
+      $self->LastMsg(ERROR,"can not detect quotation provider");
+   }
+
+   return(@l);
 }
 
 
@@ -150,7 +224,7 @@ sub getStepByShortname
    my $WfRec=shift;
 
    if ($shortname eq "dataload"){
-      return("itil::workflow::itquotation::".$shortname);
+      return("itil::workflow::quotation::".$shortname);
    }
    return($self->SUPER::getStepByShortname($shortname,$WfRec));
 }
@@ -164,7 +238,6 @@ sub isViewValid
    my $rec=$_[0];
    my $fo=$self->getField("reqnature");
    my $d=$fo->RawValue($rec);
-printf STDERR ("fifi d=$d rec=%s\n",Dumper($rec));
    if ($d=~m/^RAppl\..*/){
       return($self->SUPER::isViewValid(@_),"affected");
    }
@@ -186,8 +259,8 @@ sub getPosibleRelations
 {
    my $self=shift;
    my $WfRec=shift;
-   return("itil::workflow::itquotation"=>'relbuisreq',
-          "itil::workflow::itquotation"=>'reldevreq'); 
+   return("itil::workflow::quotation"=>'relbuisreq',
+          "itil::workflow::quotation"=>'reldevreq'); 
 }
 
 
@@ -199,7 +272,7 @@ sub getPosibleRelations
 
 
 #######################################################################
-package itil::workflow::itquotation::dataload;
+package itil::workflow::quotation::dataload;
 use vars qw(@ISA);
 use kernel;
 @ISA=qw(base::workflow::quotation::dataload);
@@ -239,20 +312,24 @@ sub generateWorkspace
 <tr>
 <td colspan=4>
 
-<div id=app style="height:60px;padding:5px;margin:15px;border-style:solid;border-width:2px;border-color:black">
-<table width=100% border=1>
+<div id=app style="height:60px;padding:0px;margin:0px;margin-top:2px;;border-style:solid;border-width:0px;border-color:black">
+<table width=100% border=0>
 <tr>
-<td class=fname width=1% nowrap>%affectedapplication(label)%:</td>
+<td class=fname width=20% nowrap>%affectedapplication(label)%:</td>
 <td class=finput>%affectedapplication(detail)%</td>
 </tr>
 </table>
 </div>
 
-<div id=fwd style="height:60px;padding:5px;margin:15px;border-style:solid;border-width:2px;border-color:black">
-<table width=100% border=1>
+<div id=fwd style="height:60px;padding:0px;margin:0px;;margin-top:2px;border-style:solid;border-width:0px;border-color:black">
+<table width=100% border=0>
 <tr>
-<td class=fname width=1% nowrap>%fwdtargetname(label)%:</td>
-<td class=finput>%fwdtargetname(detail)%</td>
+<td class=fname width=20% nowrap>%quotationfwdtargetname(label)%:</td>
+<td class=finput>%quotationfwdtargetname(detail)%</td>
+</tr>
+<tr>
+<td class=fname width=20% nowrap>%quotationfwd2targetname(label)%:</td>
+<td class=finput>%quotationfwd2targetname(detail)%</td>
 </tr>
 </table>
 </div>
@@ -309,11 +386,11 @@ sub nativProcess
       $action="NextStep";
       my $reqnature=$h->{reqnature};
       if ($reqnature eq "RUserGroup"){
-         if ($h->{fwdtargetname} eq ""){
+         if ($h->{quotationfwdtarget} eq "" ||
+             $h->{quotationfwdtargetid} eq ""){
             $self->LastMsg(ERROR,"invalid quotation target specified");
             return(0);
          }
-         $h->{originalfwdtarget1}=$h->{fwdtargetname};
       }
       elsif ($reqnature=~m/^RAppl\./){
          my $appl=getModuleObject($self->getParent->Config,"itil::appl");
@@ -327,12 +404,19 @@ sub nativProcess
             $self->LastMsg(ERROR,"invalid application request");
             return(0);
          }
-         my ($arec,$msg)=$appl->getOnlyFirst(qw(id conumber name));
+         my ($arec,$msg)=$appl->getOnlyFirst(qw(id conumber name 
+                                                mandator mandatorid));
          if (defined($arec)){
             $h->{affectedapplicationid}=$arec->{id};
             $h->{affectedapplication}=$arec->{name};
             if ($arec->{conumber} ne ""){
                $h->{involvedcostcenter}=$arec->{conumber};
+            }
+            if ($arec->{mandator} ne ""){
+               $h->{mandator}=[$arec->{mandator}];
+            }
+            if ($arec->{mandatorid} ne ""){
+               $h->{mandatorid}=[$arec->{mandatorid}];
             }
          }
          if ($h->{affectedapplicationid} eq ""){
@@ -340,7 +424,6 @@ sub nativProcess
             return(0);
          }
          
-         print STDERR Dumper($h);
       }
       else{
          $self->LastMsg(ERROR,"invalid request nature");
@@ -364,17 +447,18 @@ sub Process
    if ($action eq "NextStep"){
       my $rfo=$self->getField("reqnature");
       my $reqnature=Query->Param("Formated_".$rfo->Name());
-      printf STDERR ("fifi requestnature=%s\n",$reqnature); 
       if ($reqnature eq "RUserGroup"){
-         my $fo=$self->getField("fwdtargetname");
-         my $foval=Query->Param("Formated_".$fo->Name());
-         if ($foval=~m/^\s*$/){
-            $self->LastMsg(ERROR,"no target specified");
-            return(0);
-         }
-         if (!$fo->Validate($WfRec,{$fo->Name=>$foval})){
-            $self->LastMsg(ERROR,"unknown error") if (!$self->LastMsg());
-            return(0);
+         foreach my $v (qw(quotationfwdtargetname quotationfwd2targetname)){
+            my $fo=$self->getField($v);
+            my $foval=Query->Param("Formated_".$fo->Name());
+            my $res;
+            if (!($res=$fo->Validate($WfRec,{$fo->Name=>$foval}))){
+               $self->LastMsg(ERROR,"unknown error") if (!$self->LastMsg());
+               return(0);
+            }
+            foreach my $k (keys(%$res)){
+               Query->Param("Formated_".$k=>$res->{$k});
+            }
          }
       }
       elsif ($reqnature=~m/^RAppl\./){

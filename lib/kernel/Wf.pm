@@ -21,7 +21,6 @@ use vars qw(@ISA @EXPORT);
 use strict;
 use kernel;
 use kernel::App;
-use Data::Dumper;
 use Exporter;
 @EXPORT=qw(&addWorkflow2Mail);
 @ISA=qw(Exporter kernel::App);

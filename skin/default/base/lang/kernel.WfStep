@@ -10,6 +10,7 @@
 'postponed until'=>{de=>'zurückstellen bis'},
 'This action sends a E-Mail with automaticly dokumentation in the workflow log'=>{de=>'Diese Aktion ermöglicht es eine E-Mail zu versenden mit automatischer Dokumentation im Workflow log'},
 'wfmailsend'=>{de=>'E-Mail gesandt',en=>'mail send'},
+'wfaccept'=>{de=>'Angenommen',en=>'Accepted'},
 'invalid postponeduntil specifed'=>{de=>'ungültiger Zeitpunkt für die Zurückstellung angegeben'},
 'empty or not descriptive messages are not allowed'=>{de=>'leere oder nicht sprechende Nachrichten sind nicht erlaubt'},
 'empty or to short notes are not allowed'=>{de=>'leere oder zu kurze Notizen sind nicht erlaubt'},

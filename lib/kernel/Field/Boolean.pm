@@ -28,7 +28,7 @@ sub new
 {
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
-   $self->{value}=[0,1]            if (!defined($self->{values}));
+   $self->{value}=[0,1]            if (!defined($self->{value}));
    $self->{transprefix}="boolean." if (!defined($self->{transprefix}));
    $self->{default}="0"            if (!defined($self->{default}));
    $self->{htmleditwidth}="60px"   if (!defined($self->{htmleditwidth}));
