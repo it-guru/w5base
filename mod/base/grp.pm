@@ -90,7 +90,8 @@ sub new
                 vjointo       =>'base::lnkgrpuser',
                 vjoinon       =>['grpid'=>'grpid'],
                 vjoindisp     =>['user','userweblink','roles'],
-                vjoininhash   =>['userid','email','user','usertyp','roles']),
+                vjoininhash   =>['userid','email','user',
+                                 'posix','usertyp','roles']),
 
       new kernel::Field::TextDrop(
                 name          =>'parent',
