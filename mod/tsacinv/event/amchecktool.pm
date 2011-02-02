@@ -118,7 +118,8 @@ sub amVerifyGroupParents
          } 
          if ($#setam!=-1){
             push(@erram,
-                 join("\n",$loc->{fullname}." (".($#erram+2)."):",@setam));
+                 join("\n","LOCATION:".$loc->{fullname}." (".($#erram+2)."):",
+                 @setam));
          }
       }
    }
@@ -185,7 +186,8 @@ sub amVerifyGroupParents
                }
                if ($#setam!=-1){
                   push(@erram,
-                       join("\n",$rec->{name}." (".($#erram+2)."):",@setam));
+                       join("\n","GROUP:".$rec->{name}." (".($#erram+2)."):",
+                            @setam));
                }
             }
             ($rec,$msg)=$agrp->getNext();
