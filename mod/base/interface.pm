@@ -789,6 +789,8 @@ sub getHashList
                   $objns="W5Kernel" if ($ns eq "");
                   fldloop: foreach my $fobj (@fobjs){
                      my $k=$fobj->Name();
+                     my $v=$fobj->UiVisible("XML",current=>$chkrec);
+                     next if (!$v && ($fobj->Type() ne "Interface"));
                      my $grp=$fobj->{group};
                      $grp=[$grp] if (!ref($grp));
                      my $found=0;

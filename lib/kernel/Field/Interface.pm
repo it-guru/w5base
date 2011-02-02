@@ -16,6 +16,12 @@ package kernel::Field::Interface;
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+
+#
+# This field is for internal references. In diffrent to "Link" the field
+# is accessable by W5API and XML download.
+#
+
 use strict;
 use vars qw(@ISA);
 @ISA    = qw(kernel::Field);

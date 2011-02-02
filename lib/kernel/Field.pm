@@ -897,7 +897,16 @@ sub FormatedDetail
    my $current=shift;
    my $FormatAs=shift;
    my $d=$self->RawValue($current);
-   return($self->FormatedDetailDereferncer($current,$FormatAs,$d));
+   $d=$self->FormatedDetailDereferncer($current,$FormatAs,$d);
+   if ($FormatAs eq "SOAP"){
+      if (!ref($d)){
+         $d=quoteSOAP($d);
+      }
+      elsif (ref($d) eq "ARRAY"){
+         $d=[map({quoteSOAP($_)} @{$d})];
+      }
+   }
+   return($d);
 }
 
 sub FormatedDetailDereferncer

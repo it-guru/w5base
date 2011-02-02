@@ -16,6 +16,12 @@ package kernel::Field::Link;
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+
+#
+# This field type is only for internal link operations. The field is
+# not accessable by the user frontend (and W5API too)
+#
+
 use strict;
 use vars qw(@ISA);
 @ISA    = qw(kernel::Field);
