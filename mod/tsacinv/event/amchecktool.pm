@@ -181,8 +181,8 @@ sub amVerifyGroupParents
                    emailfrom=>'"AssetManager group verification'.
                              #  " ".$self->Self.
                               '" <>',
-                   emailcc=>['11756437640004'], # Moebius
-                   emailto=>['11634955470001'], # Merx
+                   emailto=>['11756437640004'], # Moebius
+                   emailcc=>['11634955470001'], # Merx
                    adminbcc=>1);
       print $d;
    }
