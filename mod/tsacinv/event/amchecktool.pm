@@ -79,76 +79,125 @@ sub amVerifyGroupParents
    my $self=shift;
    my $app=$self->getParent;
 
-   my $grp=getModuleObject($self->Config,"base::grp");
-   my $agrp=getModuleObject($self->Config,"tsacinv::group");
-   $agrp->SetCurrentView(qw(name supervisorldapid parent));
-   $agrp->SetFilter({name=>"CSS.AO.DTAG CSS.AO.DTAG.*"});
 
    my $checked=0;
    my @erram;
    my @errlo;
 
-   my ($rec,$msg)=$agrp->getFirst();
-   if (defined($rec)){
-      do{
-         msg(INFO,"check group '%s'",$rec->{name});
-         msg(INFO," - supervisor posix : %s",$rec->{supervisorldapid});
-         msg(INFO," - parent           : %s",$rec->{parent});
-         $checked++;
 
-         my $chkname="DTAG.TSI.ICTO.".uc($rec->{name});
-         $grp->ResetFilter();
-         $grp->SetFilter({fullname=>\$chkname});
-         my ($w5rec)=$grp->getOnlyFirst(qw(fullname));
+   if (1){ # location check
+      my $location=getModuleObject($self->Config,"tsacinv::location");
+      my %sould=(zipcode=>'60528',
+                 country=>'de',
+                 location=>'Frankfurt am Main',
+                 address1=>'Hahnstrasse 43'); 
+      $location->SetFilter({fullname=>"*frankfurt*hahnstr*43*"});
+      foreach my $loc ($location->getHashList(
+                qw(fullname country address1 zipcode location  
+                   locationtype locationid))){
+         $checked++;
          my @setam;
-         my @setlo;
-         {
-            if (!defined($w5rec)){
-               push(@setlo,"- MISSW5GROUP: the assetmanager group ".
-                         "'".$rec->{name}."' could not be found or exists ".
-                         " by an other name in W5Base group list!");
-            }
-            else{
-               my @boss;
-               foreach my $u (@{$w5rec->{users}}){
-                  if (grep(/^(RBoss2|RBoss)$/,@{$u->{roles}})){
-                     push(@boss,$u->{posix});
+         if ($loc->{zipcode} ne $sould{zipcode}){
+            push(@setam,"- ZIPCODE: the zipcode of the location must be ".
+                      "'$sould{zipcode}'. The current value '$loc->{zipcode}' ".
+                      "is wrong.");
+         } 
+         if ($loc->{address1} ne $sould{address1}){
+            push(@setam,"- ADDRESS: the address must be ".
+                      "'$sould{address1}'. The current ".
+                      "address '$loc->{address1}' is wrong.");
+         } 
+         if ($loc->{location} ne $sould{location}){
+            push(@setam,"- LOCATION: the name of the location ".
+                      "'$sould{location}'. The current ".
+                      "location name '$loc->{location}' is wrong.");
+         } 
+         if ($#setam!=-1 && lc($loc->{country}) ne lc($sould{country})){
+            push(@setam,"- COUNTRY: the country of the location ".
+                      "sould be set to '$sould{country}.");
+         } 
+         if ($#setam!=-1){
+            push(@erram,
+                 join("\n",$loc->{fullname}." (".($#erram+2)."):",@setam));
+         }
+      }
+   }
+
+
+
+
+
+
+   if (1){ # group strucutre check
+      my $grp=getModuleObject($self->Config,"base::grp");
+      my $agrp=getModuleObject($self->Config,"tsacinv::group");
+      $agrp->SetCurrentView(qw(name supervisorldapid parent));
+      $agrp->SetFilter({name=>"CSS.AO.DTAG CSS.AO.DTAG.*"});
+      my ($rec,$msg)=$agrp->getFirst();
+      if (defined($rec)){
+         do{
+            msg(INFO,"check group '%s'",$rec->{name});
+            msg(INFO," - supervisor posix : %s",$rec->{supervisorldapid});
+            msg(INFO," - parent           : %s",$rec->{parent});
+            $checked++;
+    
+            my $chkname="DTAG.TSI.ICTO.".uc($rec->{name});
+            $grp->ResetFilter();
+            $grp->SetFilter({fullname=>\$chkname});
+            my ($w5rec)=$grp->getOnlyFirst(qw(fullname));
+            my @setam;
+            my @setlo;
+            {
+               if (!defined($w5rec)){
+                  push(@setlo,"- MISSW5GROUP: the assetmanager group ".
+                            "'".$rec->{name}."' could not be found or exists ".
+                            " by an other name in W5Base group list!");
+               }
+               else{
+                  my @boss;
+                  foreach my $u (@{$w5rec->{users}}){
+                     if (grep(/^(RBoss2|RBoss)$/,@{$u->{roles}})){
+                        push(@boss,$u->{posix});
+                     }
+                  }
+                  if ($#boss!=-1){
+                     if (!in_array(\@boss,[$rec->{supervisorldapid}])){
+                       # push(@setam,"- WRONGSUPERV: the supervisor of group ".
+                       #           "'".$rec->{name}."' is not '".
+                       #           $rec->{supervisorldapid}."'! Candidates are ".
+                       #           join(", ",map({"'".$_."'"} @boss)).".");
+                     }
                   }
                }
-               if ($#boss!=-1){
-                  if (!in_array(\@boss,[$rec->{supervisorldapid}])){
-                    # push(@setam,"- WRONGSUPERV: the supervisor of group ".
-                    #           "'".$rec->{name}."' is not '".
-                    #           $rec->{supervisorldapid}."'! Candidates are ".
-                    #           join(", ",map({"'".$_."'"} @boss)).".");
-                  }
+               if ($#setlo!=-1){
+                  push(@errlo,
+                       join("\n",$rec->{name}." (".($#errlo+2)."):",@setlo));
                }
             }
-            if ($#setlo!=-1){
-               push(@errlo,
-                    join("\n",$rec->{name}." (".($#errlo+2)."):",@setlo));
+            {
+               my $shouldparent=$rec->{name};
+               $shouldparent=~s/\.[^\.]+$//;
+               if ($shouldparent ne $rec->{parent}){
+                  push(@setam,"- AMPARENTGRP: parent group of '".$rec->{name}.
+                            "' must be changed to '".
+                            $shouldparent."'! The current entry '".
+                            $rec->{parent}."' is wrong.");
+               }
+               if ($#setam!=-1){
+                  push(@erram,
+                       join("\n",$rec->{name}." (".($#erram+2)."):",@setam));
+               }
             }
-         }
-         {
-            my $shouldparent=$rec->{name};
-            $shouldparent=~s/\.[^\.]+$//;
-            if ($shouldparent ne $rec->{parent}){
-               push(@setam,"- AMPARENTGRP: parent group of '".$rec->{name}.
-                         "' must be changed to '".
-                         $shouldparent."'! The current entry '".
-                         $rec->{parent}."' is wrong.");
-            }
-            if ($#setam!=-1){
-               push(@erram,
-                    join("\n",$rec->{name}." (".($#erram+2)."):",@setam));
-            }
-         }
-         ($rec,$msg)=$agrp->getNext();
-      } until(!defined($rec));
+            ($rec,$msg)=$agrp->getNext();
+         } until(!defined($rec));
+      }
    }
    my $d="";
    @errlo=();
    if ($#erram!=-1){
+      $d.="Hello dear Config-Manager,\n\n".
+          "there are some problems found in AssetManager data structures. ".
+          "Feal free to press ahead the solution of this issues.\n\n\n";
       $d.=sprintf("AssetManager problems:\n");
       $d.=sprintf("======================\n");
       $d.=sprintf("%s",join("\n\n",@erram));
@@ -165,22 +214,20 @@ sub amVerifyGroupParents
    }
    if ($#errlo!=-1 || $#erram!=-1){
       $d.=sprintf("\n\n");
-      $d.=sprintf("* %d of %d ".
-                  "groups found with errors in AssetManager.\n",
+      $d.=sprintf("* %d of %d checks ".
+                  "found issues in AssetManager.\n",
                   $#erram+1,$checked);
       if ($#errlo!=-1){
          $d.=sprintf("* %d of %d ".
-                     "checked groups seems to have problems in W5Base.\n",
+                     "checks found posible issues in W5Base.\n",
                      $#errlo+1,$checked);
       }
    }
    if ($d ne ""){
       my $act=getModuleObject($self->Config,"base::workflowaction");
     
-      $act->Notify(ERROR,"problems in AssetManager group structure",$d,
-                   emailfrom=>'"AssetManager group verification'.
-                             #  " ".$self->Self.
-                              '" <>',
+      $act->Notify("","Problem Report AssetManager (".($#erram+1)." issues)",$d,
+                   emailfrom=>'"AssetManager verification" <>',
                    emailto=>['11756437640004'], # Moebius
                    emailcc=>['11634955470001'], # Merx
                    adminbcc=>1);
