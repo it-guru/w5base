@@ -465,31 +465,6 @@ sub getDefaultHtmlDetailPage
    return($d);
 }
 
-sub TryToHandleTransactionSafe
-{
-   my $self=shift;  
-   if ($self->Config->Param("W5BaseTransactionSave") eq "yes"){
-      return(1);
-   }
-   return(0);
-}
-
-
-sub TransactionStart                  # hook to handle commits 
-{
-   my $self=shift;
-   msg(INFO,"=====> TransactionStart");
-   return(1);
-}
-
-sub TransactionEnd                    # hook to handle commits in 
-{                                     # transaction save database engines
-   my $self=shift;
-   my $docommit=shift;
-   msg(INFO,"=====> DBTransactionEnd docommit=$docommit");
-   return(1);
-}
-
 sub doInitialize
 {
    my $self=shift;
@@ -1151,13 +1126,53 @@ sub SecureValidatedInsertRecord
    return(undef);
 }
 
+sub StartTransaction
+{
+   my ($self,$operation,$oldrec,$newrec)=@_;
+
+   return(1);
+}
+
+sub RoolbackTransaction
+{
+   my ($self,$operation,$oldrec,$newrec)=@_;
+
+   return(1);
+}
+
+sub FinishTransaction
+{
+   my ($self,$operation,$oldrec,$newrec)=@_;
+
+   return(1);
+}
+
+
 sub ValidatedInsertRecord
 {
    my $self=shift;
    my $newrec=shift;
 
+   my $bk;
+   if ($self->StartTransaction("insert",undef,$newrec)){
+      $bk=$self->ValidatedInsertRecordTransactionless($newrec);
+   }
+   else{
+      $self->LastMsg(ERROR,"can not start insert transaction");
+   }
+   if ($self->LastMsg()){
+      $self->RoolbackTransaction("insert",undef,$newrec);
+   }
+   $self->FinishTransaction("insert",undef,$newrec);
+
+   return($bk);
+}
+sub ValidatedInsertRecordTransactionless
+{
+   my $self=shift;
+   my $newrec=shift;
+
    $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
-   $self->TransactionStart();
    if (!$self->preValidate(undef,$newrec)){
       if ($self->LastMsg()==0){
          $self->LastMsg(ERROR,"ValidatedInsertRecord: ".
@@ -1189,6 +1204,8 @@ sub ValidatedInsertRecord
    }
    return(undef);
 }
+
+
 sub InsertRecord
 {
    my $self=shift;
@@ -1221,7 +1238,30 @@ sub SecureValidatedUpdateRecord
    }
    return(undef);
 }
+
 sub ValidatedUpdateRecord
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my @filter=@_;
+
+   my $bk;
+   if ($self->StartTransaction("update",$oldrec,$newrec)){
+      $bk=$self->ValidatedUpdateRecordTransactionless($oldrec,$newrec,@filter);
+   }
+   else{
+      $self->LastMsg(ERROR,"can not start update transaction");
+   }
+   if ($self->LastMsg()){
+      $self->RoolbackTransaction("update",$oldrec,$newrec);
+   }
+   $self->FinishTransaction("update",$oldrec,$newrec);
+
+   return($bk);
+}
+
+sub ValidatedUpdateRecordTransactionless
 {
    my $self=shift;
    my $oldrec=shift;
@@ -1230,7 +1270,6 @@ sub ValidatedUpdateRecord
 
    $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
    my %comprec=%{$newrec};
-   $self->TransactionStart();
    if (!$self->preValidate($oldrec,$newrec,\%comprec)){
       if ($self->LastMsg()==0){
          $self->LastMsg(ERROR,"ValidatedUpdateRecord: ".
@@ -1372,6 +1411,26 @@ sub SecureValidatedDeleteRecord
 }
 
 sub ValidatedDeleteRecord
+{
+   my $self=shift;
+   my $oldrec=shift;
+
+   my $bk;
+   if ($self->StartTransaction("delete",$oldrec,undef)){
+      $bk=$self->ValidatedDeleteRecordTransactionless($oldrec);
+   }
+   else{
+      $self->LastMsg(ERROR,"can not start delete transaction");
+   }
+   if ($self->LastMsg()){
+      $self->RoolbackTransaction("delete",$oldrec,undef);
+   }
+   $self->FinishTransaction("delete",$oldrec,undef);
+
+   return($bk);
+}
+
+sub ValidatedDeleteRecordTransactionless
 {
    my $self=shift;
    my $oldrec=shift;

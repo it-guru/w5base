@@ -78,7 +78,6 @@ sub RunWebApp
    return if (!$W5V2::ObjCache{$objectkey}->InitRequest(cgi=>$cgi));
 
    my $bk=$W5V2::ObjCache{$objectkey}->Run();
-   $W5V2::ObjCache{$objectkey}->CloseOpenTransations();
    if ($havestate ne ""){
       unlink($havestate);
    }
