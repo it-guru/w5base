@@ -18,7 +18,6 @@ package kernel::Field::Interface;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 @ISA    = qw(kernel::Field);
 
 
