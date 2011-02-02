@@ -117,10 +117,10 @@ sub amVerifyGroupParents
                }
                if ($#boss!=-1){
                   if (!in_array(\@boss,[$rec->{supervisorldapid}])){
-                     push(@setam,"- WRONGSUPERV: the supervisor of group ".
-                               "'".$rec->{name}."' is not '".
-                               $rec->{supervisorldapid}."'! Candidates are ".
-                               join(", ",map({"'".$_."'"} @boss)).".");
+                    # push(@setam,"- WRONGSUPERV: the supervisor of group ".
+                    #           "'".$rec->{name}."' is not '".
+                    #           $rec->{supervisorldapid}."'! Candidates are ".
+                    #           join(", ",map({"'".$_."'"} @boss)).".");
                   }
                }
             }
@@ -134,7 +134,7 @@ sub amVerifyGroupParents
             $shouldparent=~s/\.[^\.]+$//;
             if ($shouldparent ne $rec->{parent}){
                push(@setam,"- AMPARENTGRP: parent group of '".$rec->{name}.
-                         "' should be '".
+                         "' must be changed to '".
                          $shouldparent."'! The current entry '".
                          $rec->{parent}."' is wrong.");
             }
@@ -180,8 +180,9 @@ sub amVerifyGroupParents
       $act->Notify(ERROR,"problems in AssetManager group structure",$d,
                    emailfrom=>'"AssetManager group verification'.
                              #  " ".$self->Self.
-                              '" <null@null.com>',
-                   emailto=>['hartmut.vogler@t-systems.com','11634955470001'], # Merx
+                              '" <>',
+                   emailcc=>['11756437640004'], # Moebius
+                   emailto=>['11634955470001'], # Merx
                    adminbcc=>1);
       print $d;
    }
