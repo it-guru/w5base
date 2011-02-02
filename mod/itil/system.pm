@@ -780,6 +780,7 @@ sub new
 
       new kernel::Field::Boolean(
                 name          =>'isclusternode',
+                selectfix     =>1,
                 group         =>'systemclass',
                 label         =>'ClusterNode',
                 dataobjattr   =>'system.is_clusternode'),
