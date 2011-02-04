@@ -69,10 +69,11 @@ sub ImportINetworkContacts
    $appl->SetFilter({customer=>"DTAG DTAG.*",cistatusid=>"<=5"});
    my @idl=$appl->getHashList(qw(id name));
 
-
+   eval('
    sub SOAP::Transport::HTTP::Client::get_basic_credentials { 
        return $wsuser => $wspass;
    }
+   ');
 
    my @msglist;
 
