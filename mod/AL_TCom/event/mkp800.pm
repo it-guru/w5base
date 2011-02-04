@@ -95,7 +95,7 @@ sub mkp800
    }
    my $bflexxp800=getModuleObject($self->Config,"tsbflexx::p800sonder");
    my $bflexxwf=getModuleObject($self->Config,"tsbflexx::ifworkflow");
-   if (!defined($bflexxp800)){
+   if (!defined($bflexxp800) || !$bflexxp800->Ping()){
       msg(ERROR,"can not connect to b:flexx inteface database");
       return({exicode=>1});
    }
