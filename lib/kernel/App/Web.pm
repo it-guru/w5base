@@ -720,7 +720,7 @@ sub ValidateMenuCache
                $macls=[];
             }
          }
-         $menu->{acls2}=$macls;
+         $menu->{acls}=$macls;
          next if ($p eq "");
          $menu->{parent}=$p;
          if (defined($ca->{fullname}->{$p})){
