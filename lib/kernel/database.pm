@@ -93,6 +93,7 @@ sub Connect
                                        {mysql_enable_utf8 => 0,
                                         private_foo_cachekey=>$dbname."-".$$});
    }
+   $self->{parentlabel}=$self->getParent->Self()."-".$dbname;
 
    if (!$self->{'db'}){
       if ($self->{dbconnect}=~m/oracle/i){
@@ -187,7 +188,7 @@ sub execute
    my($statement, $attr, @bind_values) = @_;
 
    if ($ENV{REMOTE_USER} ne ""){
-      $statement.=" /* W5BaseUser: $ENV{REMOTE_USER}($$) */";
+      $statement.=" /* W5BaseUser: $ENV{REMOTE_USER}($$) $self->{parentlabel} */";
    }
    if (lc($self->DriverName()) eq "mysql"){
       if ($attr->{unbuffered}){

@@ -470,6 +470,12 @@ sub initSearchQuery
 }
 
 
+sub isCopyValid
+{
+   my $self=shift;
+
+   return(1);
+}
 
 
 sub getRecordImageUrl
