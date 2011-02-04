@@ -87,19 +87,21 @@ sub new
                                  'REmployee',                  # orgrole
                                  'RApprentice','RFreelancer',  # orgrole
                                  'RBackoffice',                # orgrole
-                                 'RQManager',
+                                 'RQManager',                  
                                  'RReportReceive',
                                  'RAuditor',
                                  'RMonitor',
-                                 'RINManager',
-                                 'RCHManager',
-                                 'RCFManager',
-                                 'RPRManager',
                                  'RControlling',
                                  'RTimeManager',
-                                 'RAdmin',
-                                 'RDataAdmin',
-                                 'W5BaseSupport',              
+                                 'RINManager',                 # ITIL role
+                                 'RCHManager',                 # ITIL role
+                                 'RCFManager',                 # ITIL role
+                                 'RPRManager',                 # ITIL role
+                                 'RITSoDManager',              # IT role
+                                 'RITDemandMgr',               # IT role
+                                 'RAdmin',                     # W5Base role
+                                 'RDataAdmin',                 # W5Base role
+                                 'W5BaseSupport',              # W5Base role 
                                 ],
                 dataobjattr   =>'lnkgrpuserrole.nativrole'),
 

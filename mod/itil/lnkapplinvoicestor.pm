@@ -225,7 +225,8 @@ sub new
 
       new kernel::Field::Interface(
                 name          =>'applcistatusid',
-                label         =>'ApplCiStatusID',
+                group         =>'applinfo',
+                label         =>'Interface: Application CI-State ID',
                 dataobjattr   =>'appl.cistatus'),
 
       new kernel::Field::Text(
@@ -286,9 +287,10 @@ sub new
                 label         =>'SystemJobID',
                 dataobjattr   =>'lnkapplinvoicestorage.appl'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'applname',
-                label         =>'Application name',
+                label         =>'Interface: Application name',
+                group         =>'applinfo',
                 dataobjattr   =>'appl.name'),
 
       new kernel::Field::Link(
@@ -424,7 +426,7 @@ sub Validate
 
    my $applid=effVal($oldrec,$newrec,"applid");
    if ($self->isDataInputFromUserFrontend()){
-      if (!$self->isWriteOnApplValid($applid,"systems")){
+      if (!$self->isWriteOnInvoiceDataValid($applid)){
          $self->LastMsg(ERROR,"no write access to requested application");
          return(undef);
       }
@@ -446,14 +448,6 @@ sub Validate
 
    return(1);
 }
-
-sub isApplWriteValid
-{
-   my $self=shift;
-   my $applid=shift;
-
-}
-
 
 sub isViewValid
 {
@@ -477,12 +471,33 @@ sub isWriteValid
    }
    my $applid=$rec->{applid};
    if ($applid ne ""){
-      if ($self->isWriteOnApplValid($applid,"systems")){
+      if ($self->isWriteOnInvoiceDataValid($applid)){
          return("ALL");
       }
    }
    return;
 }
+
+sub isWriteOnInvoiceDataValid
+{
+   my $self=shift;
+   my $applid=shift;
+   if ($self->isWriteOnApplValid($applid,"systems")){
+      return(1);
+   }
+   my $appl=getModuleObject($self->Config,"itil::appl");
+   $appl->SetFilter({id=>\$applid});
+   my ($arec,$msg)=$appl->getOnlyFirst(qw(businessteamid));
+   if (defined($arec) && $arec->{businessteamid} ne ""){
+      if ($self->IsMemberOf($arec->{businessteamid},"RITSoDManager","down")){
+         return(1);
+      }
+   }
+   return(0);
+
+}
+
+
 
 sub SecureValidate
 {
