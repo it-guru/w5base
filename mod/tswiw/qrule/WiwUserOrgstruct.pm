@@ -67,7 +67,7 @@ sub qcheckRecord
    $mainuser->ResetFilter();
    $mainuser->SetFilter({userid=>\$rec->{userid}});
    my ($urec)=$mainuser->getOnlyFirst(qw(email surname givenname usertyp 
-                                         groups posix cistatusid));
+                                         groups posix cistatusid lastlogon));
    if (defined($urec)){ # found correct urec record for user
      # print STDERR Dumper($urec);
       if (defined($urec) && $urec->{email} ne "" &&
@@ -98,8 +98,20 @@ sub qcheckRecord
                msg(ERROR,"LDAP problem:%s",$msg);
             }
             if ($urec->{posix} ne "" && $urec->{cistatusid}<6){
-               msg(ERROR,"E-Mail '%s' not found in LDAP but with POSIX entry",
-                          $urec->{email});
+               my $old=0;
+               if ($urec->{lastlogon} eq ""){
+                  $old=1;
+               }
+               else{
+                  my $d=CalcDateDuration($urec->{lastlogon},NowStamp("en"));
+                  if (!defined($d) || $d->{totalminutes}>80640){ # 8 weeks
+                      $old=1;
+                  }
+               }
+               if ($old){
+                  msg(ERROR,"E-Mail '%s' not found in LDAP ".
+                            "but with POSIX entry",$urec->{email});
+               }
             }
             return($errorlevel,undef);
          }
