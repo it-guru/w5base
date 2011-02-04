@@ -177,8 +177,15 @@ sub Init
    );
    $self->AddGroup("affected",translation=>'itil::workflow::base');
 
+   return(1);
+}
+
+sub IsModuleSelectable
+{
+   my $self=shift;
    return(0);
 }
+
 
 sub DataIssueCompleteWriteRequest
 {

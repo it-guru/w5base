@@ -1714,7 +1714,7 @@ sub getSelectableModules
    foreach my $wfclass (keys(%{$self->{SubDataObj}})){
       my $o=$self->{SubDataObj}->{$wfclass};
       if (!defined($o)){
-         msg(ERROR,"Workflow Object '$wfclass' ist not useable due programm".
+         msg(ERROR,"Workflow Object '$wfclass' is not useable due programm".
                    "error");
          next;
       }
@@ -1997,8 +1997,8 @@ sub New                   # Workflow starten
    my $start=$self->T("start workflow");
    print <<EOF;
 <table width=100% height=100% border=0>
-<tr height=1%><td>$appheader</td></tr>
-<tr height=1%><td>$msg</td></tr>
+<tr height=1%><td valign=top>$appheader</td></tr>
+<tr height=1%><td valign=top>$msg</td></tr>
 <tr><td align=center valign=center>$selbox</td></tr>
 <tr height=1%>
    <td align=right nowrap>
