@@ -98,7 +98,7 @@ sub ReportDataIssuesXLS
                  filter=>\%flt,
                  view=>[qw(name fwdtargetname 
                                 wffields.dataissueobjectname 
-                                wffields.dataissueobject
+                                wffields.affectedobject
                            detaildescription createdate id)]},
                 );
    $out->Process(@control);
