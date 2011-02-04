@@ -65,20 +65,6 @@ sub ReportDataIssuesXLS
    }
 
 
-#   my @keys=qw(name id conumber customer);
-#   my $appl=getModuleObject($self->Config,"itil::appl");
-#   $appl->SetFilter(\%flt);
-#   $appl->SetCurrentView(@keys);
-#   my $eventend=">now";
-#   if ($param{year} ne ""){
-#      $eventend="($param{year})";
-#   }
-#   if ($param{eventend} ne ""){
-#      $eventend="$param{eventend}";
-#   }
-#   my $t=$appl->getHashIndexed(@keys);
-
-
    if ($param{'filename'} eq ""){
       $param{'filename'}="/tmp/ReportDataIssues.xls";
    }
