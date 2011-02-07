@@ -734,23 +734,26 @@ sub Process
       if (!($note=~m/^\s*$/) && $WfRec->{detaildescription}=~m/^\s*$/){
          $fwd{detaildescription}=$note;
       }
+      my %p800mod=();
       my $newstep=$self->getParent->getStepByShortname('wfclose',$WfRec);
       my $tcomcodcomments;
       my $tcomworktime;
-      my %p800mod=();
-
-      if ($WfRec->{tcomcodcause} eq "" ||
-          $WfRec->{tcomcodcause} eq "undef"){
-         $self->getParent->LastMsg(ERROR,"no correct P800 cause selection");
-         return(0);
-      }
-      if ($WfRec->{tcomcodcomments} eq "" && $note ne ""){
-         $p800mod{tcomcodcomments}=$note;
-         $tcomcodcomments=$p800mod{tcomcodcomments};
-      }
-      else{
-         $tcomcodcomments=$WfRec->{tcomcodcomments}; 
-      }
+      if ($WfRec->{tcomcodrelevant} eq "" ||
+          $WfRec->{tcomcodrelevant} eq "yes"){
+       
+         if ($WfRec->{tcomcodcause} eq "" ||
+             $WfRec->{tcomcodcause} eq "undef"){
+            $self->getParent->LastMsg(ERROR,"no correct P800 cause selection");
+            return(0);
+         }
+         if ($WfRec->{tcomcodcomments} eq "" && $note ne ""){
+            $p800mod{tcomcodcomments}=$note;
+            $tcomcodcomments=$p800mod{tcomcodcomments};
+         }
+         else{
+            $tcomcodcomments=$WfRec->{tcomcodcomments}; 
+         }
+     }
 
 
       if ($WfRec->{tcomworktime}<10){
@@ -777,12 +780,15 @@ sub Process
       # check P800 requirements
       # https://darwin.telekom.de/darwin/auth/base/workflow/ById/12391987130002
       #
-      if ($tcomworktime>1200 && length($tcomcodcomments)<20){
-         my $wth=sprintf("%.2lf",$tcomworktime/60);
-         $wth=~s/\./,/g;
-         $self->getParent->LastMsg(ERROR,
-                   'P800 worktime %sh needs detailed description',$wth);
-         return(0);
+      if ($WfRec->{tcomcodrelevant} eq "" ||
+          $WfRec->{tcomcodrelevant} eq "yes"){
+         if ($tcomworktime>1200 && length($tcomcodcomments)<20){
+            my $wth=sprintf("%.2lf",$tcomworktime/60);
+            $wth=~s/\./,/g;
+            $self->getParent->LastMsg(ERROR,
+                      'P800 worktime %sh needs detailed description',$wth);
+            return(0);
+         }
       }
 
       if ($self->getParent->StoreRecord($WfRec,$newstep,{
