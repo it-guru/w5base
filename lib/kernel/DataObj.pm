@@ -2436,19 +2436,30 @@ sub getRecordWatermarkUrl
    return("../../../public/base/load/world.jpg?".$cgi->query_string());
 }
 
+sub getRecordHeaderField
+{
+   my $self=shift;
+   my $rec=shift;
+
+   if (my $f=$self->getField("fullname")){
+      return($f);
+   }
+   elsif (my $f=$self->getField("name")){
+      return($f);
+   }
+   elsif (my $f=$self->getField("id")){
+      return($f);
+   }
+   return(undef);
+}
+
 sub getRecordHeader
 {
    my $self=shift;
    my $rec=shift;
    my $headerval;
 
-   if (my $f=$self->getField("fullname")){
-      $headerval=quoteHtml($f->RawValue($rec));
-   }
-   elsif (my $f=$self->getField("name")){
-      $headerval=quoteHtml($f->RawValue($rec));
-   }
-   elsif (my $f=$self->getField("id")){
+   if (my $f=$self->getRecordHeaderField($rec)){
       $headerval=quoteHtml($f->RawValue($rec));
    }
    else{
