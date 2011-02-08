@@ -93,6 +93,8 @@ sub EditArea    # for module defined edit areas (f.e. javascript areas)
 #   $d.="   if (e.preventDefault){";
 #   $d.="      e.preventDefault();";
 #   $d.="   }";
+#   $d.="   alert(this.name);";
+#   $d.="   this.value+=\"\\n\"+e.dataTransfer.getData('Text')+\"\\n\";";
 #   $d.="   return(false);";
 #   $d.=" }";
    $d.=" addEvent(element_$name,'dragover',DragCancel_$name);";
