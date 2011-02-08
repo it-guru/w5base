@@ -81,6 +81,24 @@ sub EditArea    # for module defined edit areas (f.e. javascript areas)
       "textareaKeyHandler(this,event);}\" ".
       "cols=$self->{cols} name=Formated_$name ".
       "class=multilinetext>".quoteHtml($d)."</textarea></div>";
+   $d.="<script language=JavaScript>";
+   $d.=" var element_$name=document.forms[0].elements['Formated_$name'];";
+   $d.=" function DragCancel_$name(e){";
+   $d.="   if (e.preventDefault){";
+   $d.="      e.preventDefault();";
+   $d.="   }";
+   $d.="   return(false);";
+   $d.=" }";
+#   $d.=" function HandleDrop_$name(e){";
+#   $d.="   if (e.preventDefault){";
+#   $d.="      e.preventDefault();";
+#   $d.="   }";
+#   $d.="   return(false);";
+#   $d.=" }";
+   $d.=" addEvent(element_$name,'dragover',DragCancel_$name);";
+   $d.=" addEvent(element_$name,'dragenter',DragCancel_$name);";
+#   $d.=" addEvent(element_$name,'drop',HandleDrop_$name);";
+   $d.="</script>";
 
    return($d);
 }
@@ -113,7 +131,10 @@ sub ViewArea    # for module defined view areas (f.e. javascript areas)
       "<tr><td width=1><img class=printspacer style=\"padding:0;margin:0\" ".
       "src=\"../../../public/base/load/empty.gif\" width=0 height=100>".
       "</td><td><div class=multilinetext>".
-      "<pre class=multilinetext>".mkInlineAttachment(FancyLinks($d)).
+      "<pre class=multilinetext>".
+      mkInlineAttachment(
+         ExpandW5BaseDataLinks($self->getParent,"HtmlDetail",
+            FancyLinks($d))).
       "</pre></div></td></tr></table>";
    return($d);
 }
@@ -135,6 +156,8 @@ sub FormatedResult
    if ($FormatAs eq "SOAP"){
       return(quoteSOAP($d));
    }
+   $d=ExpandW5BaseDataLinks($self->getParent,$FormatAs,$d);
+   
    #printf STDERR ("fifi FormatAs=$FormatAs\n");
    return($d);
 }

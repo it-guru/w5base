@@ -248,8 +248,13 @@ EOF
             "record (f.e. in mail)")."\" href=\"$targeturl\">";
             $ByIdLinkEnd="</a>";
          }
-         $dragname=$self->getParent->getParent->Self;
-         $dragname="w5base://".$dragname."/Show/".$id."/fullname"; 
+         if ($self->getParent->getParent->can("getRecordHeaderField")){
+            my $fobj=$self->getParent->getParent->getRecordHeaderField($rec);
+            if (defined($fobj)){
+               $dragname=$self->getParent->getParent->Self;
+               $dragname="w5base://".$dragname."/Show/".$id."/".$fobj->Name(); 
+            }
+         }
       }
       my $sfocus;
       if ($currentfieldgroup ne ""){
@@ -292,11 +297,12 @@ function setTitle()
 {
    var t=window.document.getElementById("WindowTitle");
    parent.document.title=t.innerHTML;
-
-   var toplineimage=document.getElementById("toplineimage");
-   addEvent(toplineimage, 'dragstart', function (event) {
-      event.dataTransfer.setData('Text', "$dragname");
-   });
+   if ("$dragname"!=""){
+      var toplineimage=document.getElementById("toplineimage");
+      addEvent(toplineimage, 'dragstart', function (event) {
+         event.dataTransfer.setData('Text', "$dragname");
+      });
+   }
 
    return(true);
 }

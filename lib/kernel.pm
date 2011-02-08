@@ -83,7 +83,8 @@ use Unicode::String qw(utf8 latin1 utf16);
              &Debug &UTF8toLatin1
              &Datafield2Hash &Hash2Datafield &CompressHash
              &unHtml &quoteHtml &quoteSOAP &quoteWap &quoteQueryString &Dumper 
-             &FancyLinks &mkInlineAttachment &FormatJsDialCall
+             &FancyLinks &ExpandW5BaseDataLinks &mkInlineAttachment 
+             &FormatJsDialCall
              &mkMailInlineAttachment &haveSpecialChar
              &getModuleObject &getConfigObject &generateToken
              &isDataInputFromUserFrontend &orgRoles
@@ -654,14 +655,60 @@ sub FancyLinks
    $data=~s#(http|https|telnet|news)(://\S+?)(\?\S+){0,1}(["']{0,1}\s)#_FancyLinks("$1$2$3",$4)#ge;
    $data=~s#(http|https|telnet|news)(://\S+?)(\?\S+){0,1}$#_FancyLinks("$1$2$3",$4)#ge;
 
-#   foreach my $color (qw(RED GREEN BLUE)){
-#      $data=~s/&lt;w5${color}&gt;/<font color=$color>/ig;
-#      $data=~s/&lt;\/w5${color}&gt;/<\/font>/ig;
-#   }
-#   $data=~s/&lt;w5BOLD&gt;/<b>/ig;
-#   $data=~s/&lt;\/w5BOLD&gt;/<\/b>/ig;
-#   $data=~s/&lt;w5ITALIC&gt;/<i>/ig;
-#   $data=~s/&lt;\/w5ITALIC&gt;/<\/i>/ig;
+   return($data);
+}
+
+
+sub _ExpandW5BaseDataLinks
+{
+   my $self=shift;
+   my $FormatAs=shift;
+   my $raw=shift;
+   my $targetobj=shift;
+   my $mode=shift;
+   my $id=shift;
+   my $view=shift;
+
+   if (lc($mode) eq "show" && $id ne ""){
+      my $obj=getModuleObject($self->Config,$targetobj);
+      if (defined($obj)){
+         my $idobj=$obj->IdField();
+         if (defined($idobj)){
+            $obj->SetFilter({$idobj->Name=>\$id});
+            my @view=split(/,/,$view);
+            my ($trec,$msg)=$obj->getOnlyFirst(@view);
+            if (defined($trec)){
+               my @d;
+               foreach my $k (@view){
+                  push(@d,$trec->{$k}) if ($trec->{$k} ne "");
+               }
+               if ($#d==-1){
+                  @d=("[EMPTY LINK]");
+               }
+               my $d=join(", ",@d);
+               if ($FormatAs eq "HtmlDetail"){
+                  my $url=$targetobj;
+                  $url=~s/::/\//g;
+                  $url="../../$url/ById/$id";
+                  $d="<a href='$url' target=_blank>".$d."</a>";
+               }
+               return($d);
+            }
+         }
+      }
+   }
+
+   $raw=~s/w5base:/w5base?:/;
+   return($raw);
+}
+
+sub ExpandW5BaseDataLinks
+{
+   my $self=shift;
+   my $FormatAs=shift;
+   my $data=shift;
+
+   $data=~s#(w5base://([^\/]+)/([^\/]+)/([^\/]+)/(\S+))#_ExpandW5BaseDataLinks($self,$FormatAs,$1,$2,$3,$4,$5)#ge;
 
    return($data);
 }
