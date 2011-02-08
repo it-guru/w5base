@@ -231,6 +231,7 @@ EOF
       }
       my $ByIdLinkStart="";
       my $ByIdLinkEnd="";
+      my $dragname="";
       if ($id ne ""){
          if (grep(/^ById$/,
                   $self->getParent->getParent->getValidWebFunctions())){
@@ -242,11 +243,13 @@ EOF
                   $targeturl="../../../public/$s/ById/$id";
                }
             }
-            $ByIdLinkStart="<a target=_blank title=\"".
+            $ByIdLinkStart="<a id=toplineimage target=_blank title=\"".
             $self->getParent->getParent->T("use this link to reference this ".
             "record (f.e. in mail)")."\" href=\"$targeturl\">";
             $ByIdLinkEnd="</a>";
          }
+         $dragname=$self->getParent->getParent->Self;
+         $dragname="w5base://".$dragname."/Show/".$id."/fullname"; 
       }
       my $sfocus;
       if ($currentfieldgroup ne ""){
@@ -290,9 +293,15 @@ function setTitle()
    var t=window.document.getElementById("WindowTitle");
    parent.document.title=t.innerHTML;
 
+   var toplineimage=document.getElementById("toplineimage");
+   addEvent(toplineimage, 'dragstart', function (event) {
+      event.dataTransfer.setData('Text', "$dragname");
+   });
+
    return(true);
 }
 addEvent(window, "load", setTitle);
+
 $sfocus
 </script>
 EOF
