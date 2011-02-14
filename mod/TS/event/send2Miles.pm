@@ -85,7 +85,7 @@ sub send2Miles
       my $act=$eff->getDataObj();
      
       $act->SetFilter({creatorid=>\$urec->{userid},
-                       cdate=>"(01/2011)"});
+                       cdate=>"(02/2011)"});
       $act->SetCurrentView(qw(cdate creatorposix effortrelation 
                               effortcomments effort wfheadid));
      
@@ -97,7 +97,7 @@ sub send2Miles
             if (my ($y,$m,$d)=$rec->{cdate}=~m/^(\d{4})-(\d{2})-(\d{2}) .*/){
                my $day="$d.$m.$y";
                my $label=$rec->{effortrelation};
-               if ($label ne ""){
+               if ($label ne "" && $rec->{effort}!=0){
                   if (!exists($milesd{$day}->{$label})){
                      $milesd{$day}->{$label}={effort=>0,wfheadid=>[]};
                   }
@@ -174,16 +174,18 @@ sub send2Miles
          }
          else{
             msg(ERROR,"found invalid label '$label'");
+            msg(ERROR,"wfheadid: ".
+                    join(", ",@{$milesd{$day}->{$label}->{wfheadid}}));
             exit(1);
          }
       }
       push(@booksets,[$day,
                       '00:01',
                       '23:59',
-                      @localbooks]);
+                      \@localbooks]);
    }
    foreach my $book (@booksets){
-      msg(INFO,"do book $book[0]");
+      msg(INFO,"do book $book->[0]");
       $self->setEntries(@$book);
    }
 #   $self->setEntries("13.01.2011","00:01","23:59",[
