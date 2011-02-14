@@ -50,14 +50,16 @@ sub isSelectable
 sub Init
 {
    my $self=shift;
-   $self->{DataObj}=getModuleObject($self->getParent->Config,"base::workflowaction");
+   $self->{DataObj}=getModuleObject($self->getParent->Config,
+                                    "base::workflowaction");
    return(0) if (!defined($self->{DataObj}));
-   $self->{DataObj}->setDefaultView(qw(cdate creatorposix effortrelation effortcomments effort));
+   $self->{DataObj}->setDefaultView(qw(cdate creatorposix effortrelation 
+                                       effortcomments effort));
 
    $self->{DataObj}->AddFields(
 
      new kernel::Field::Text(
-                name          =>'effortrelation',            # label for effort lists
+                name          =>'effortrelation',      # label for effort lists
                 depend        =>['comments','wfheadid'],
                 htmldetail    =>0,
                 searchable    =>0,
@@ -67,67 +69,44 @@ sub Init
                    my $self=shift;
                    my $current=shift;
 
-                   my $wf=getModuleObject($self->getParent->Config,"base::workflow");
+                   my $wf=getModuleObject($self->getParent->Config,
+                                          "base::workflow");
                    $wf->SetFilter({id=>\$current->{wfheadid}});
                    my ($wfrec,$msg)=$wf->getOnlyFirst(qw(ALL));
+                   my $personaltag;
 
                    if ($wfrec->{class} eq "base::workflow::adminrequest"){
-                      return("W5Base Admin-Request");
+                      $personaltag="W5BaseAdminRequest";
                    }
-                   elsif (exists($wfrec->{affectedproject}) && 
-                       $wfrec->{affectedproject} ne ""){
-                      return($wfrec->{affectedproject});
+                   elsif (exists($wfrec->{involvedcostcenter}) && 
+                       $wfrec->{involvedcostcenter} ne ""){
+                      $personaltag="CO:".$wfrec->{involvedcostcenter};
                    }
-                   elsif (exists($wfrec->{affectedapplication}) && 
+                 #  elsif (exists($wfrec->{affectedproject}) && 
+                 #      $wfrec->{affectedproject} ne ""){
+                 #     $personaltag=$wfrec->{affectedproject};
+                 #  }
+                   elsif (exists($wfrec->{affectedapplicationid}) && 
+                       $wfrec->{affectedapplicationid} ne ""){
+                      my $app=getModuleObject($self->getParent->Config,
+                                              "itil::appl");
+                      $app->SetFilter({id=>$wfrec->{affectedapplicationid}});
+                      my ($arec,$msg)=$app->getOnlyFirst(qw(id conumber));
+                      if (defined($arec)){
+                         $personaltag="CO:".$arec->{conumber};
+                      }
+                   }
+                   if (!defined($personaltag) &&
+                       exists($wfrec->{affectedapplication}) && 
                        $wfrec->{affectedapplication} ne ""){
-                      return($wfrec->{affectedapplication});
+                      $personaltag="APPL:".$wfrec->{affectedapplication};
                    }
 
-                   return("???");
+
+                   return($personaltag);
                 })
 
    );
-#      new kernel::Field::Number(
-#                name          =>'efforts_treal',
-#                label         =>'Effort real',
-#                searchable    =>0,
-#                group         =>'efforts',
-#                unit          =>'min',
-#                depend        =>['id'],
-#                onRawValue    =>sub {
-#                   my $fieldself=shift;
-#                   my $current=shift;
-#                   my $id=$current->{id};
-#
-#                   return($self->Context->{treal}->{$id});
-#                }),
-#   #   new kernel::Field::Number(
-#   #             name          =>'efforts_tprojection',
-#   #             label         =>'Effort projection',
-#   #             searchable    =>0,
-#   #             depend        =>['id'],
-#   #             onRawValue    =>sub {
-#   #                my $fieldself=shift;
-#   #                my $current=shift;
-#   #                my $id=$current->{id};
-#   #
-#   #                   return($self->{treal}->{$id}+2);
-#   #                }),
-#
-#      new kernel::Field::Number(
-#                name          =>'efforts_employecount',
-#                label         =>'Effort employecount',
-#                searchable    =>0,
-#                group         =>'efforts',
-#                depend        =>['id'],
-#                onRawValue    =>sub {
-#                   my $fieldself=shift;
-#                   my $current=shift;
-#                   return($self->{usercount});
-#                })
-#   );
-#   $self->{DataObj}->AddGroup("efforts",translation=>'itil::MyW5Base::efforts');
-
 
    return(1);
 }
@@ -259,52 +238,6 @@ sub Result
    return($self->{DataObj}->Result(%param));
 }
 
-sub calculateEfforts
-{
-   my $self=shift;
-   my ($year,$mon,$invoiceday,$Y1,$M1,$invoiceday1,$user,$grpid,$fineQuery)=@_;
-
-   $self->{DataObj}->setDefaultView(qw(linenumber name customer conumber
-                                       efforts_treal
-                                       efforts_employecount
-                                       efforts_tprojection
-                                       ));
-
-   my $wfact=getModuleObject($self->getParent->Config,"base::workflowaction");
-   $wfact->SetFilter({creatorid=>[keys(%{$user})],
-                      cdate=>">$year-$mon-${invoiceday} AND ".
-                             "<=$Y1-$M1-${invoiceday1}"
-                     }
-                    );
-   my %wfheadid=();
-   foreach my $rec ($wfact->getHashList(qw(wfheadid effort creator))){
-      if (defined($rec->{effort}) && $rec->{effort}!=0){
-         $wfheadid{$rec->{wfheadid}}+=$rec->{effort};
-      }
-   }
-   return(undef) if ($wfact->LastMsg());
-   #print STDERR Dumper(\%wfheadid);
-
-   #
-   # find affectedapplicationid
-   #
-#   if (keys(%wfheadid)){
-#      my $wfkey=getModuleObject($self->getParent->Config,"base::workflowkey");
-#      $wfkey->SetFilter({wfheadid=>[keys(%wfheadid)],
-#                         name=>\'affectedapplicationid'});
-#      foreach my $rec ($wfkey->getHashList(qw(wfheadid value))){
-#         my $applid=$rec->{value};
-#         my $wfheadid=$rec->{wfheadid};
-#         my $effort=$wfheadid{$wfheadid};
-#         $self->Context->{treal}->{$applid}+=$effort;
-#      }
-#      $fineQuery->{id}=[keys(%{$self->Context->{treal}})];
-#   }
-#   else{
-#      $fineQuery->{id}=["NONE"];
-#   }
-   return(1);
-}
 
 
 
