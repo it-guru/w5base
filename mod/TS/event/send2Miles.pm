@@ -55,6 +55,7 @@ sub send2Miles
    $self->{base}=$param{url};
    if ($self->{base} eq ""){
       $self->{base}="https://milesplus-ref.t-systems.com/mpt5";
+      $self->{base}="https://milesplus.t-systems.com/prod";
    }
    if (!($self->{base}=~m/\/$/)){
       $self->{base}.="/";
@@ -65,20 +66,72 @@ sub send2Miles
    if ($pass eq ""){
       $pass="a";
    }
+
+   my $contact=getModuleObject($self->Config,"base::user");
+   $contact->SetFilter({posix=>\$user});
+   my ($urec,$msg)=$contact->getOnlyFirst(qw(userid));
+   if (!defined($urec)){
+      return({exitcode=>100,msg=>'invalid user'});
+   }
+
+
+   #######################################################################
+   # collect data
+   my %milesd;
+   if (1){
+      my $eff=getModuleObject($self->Config,"base::MyW5Base::myeffortsraw");
+      $eff->setParent($self);
+      $eff->Init();
+      my $act=$eff->getDataObj();
+     
+      $act->SetFilter({creatorid=>\$urec->{userid},
+                       cdate=>"(01/2011)"});
+      $act->SetCurrentView(qw(cdate creatorposix effortrelation 
+                              effortcomments effort wfheadid));
+     
+     
+      my ($rec,$msg)=$act->getFirst(unbuffered=>1);
+      if (defined($rec)){
+         do{
+            #print Dumper($rec);
+            if (my ($y,$m,$d)=$rec->{cdate}=~m/^(\d{4})-(\d{2})-(\d{2}) .*/){
+               my $day="$d.$m.$y";
+               my $label=$rec->{effortrelation};
+               if ($label ne ""){
+                  if (!exists($milesd{$day}->{$label})){
+                     $milesd{$day}->{$label}={effort=>0,wfheadid=>[]};
+                  }
+                  $milesd{$day}->{$label}->{effort}+=$rec->{effort};
+                  push(@{$milesd{$day}->{$label}->{wfheadid}},$rec->{wfheadid});
+               }
+            }
+            ($rec,$msg)=$act->getNext();
+         } until(!defined($rec));
+      }
+   }
+
+   #######################################################################
+
+
+
+   #######################################################################
+   # init miles plus connection
+
+
    $self->{htmlparser}=new HTML::Parser();
    $self->{htmlparser}->handler(start=>sub {
       my ($pself,$tag,$attr)=@_;
       if (lc($tag) eq "input"){
-         if (exists($self->{CurrentForm}->{$attr->{name}}) &&
-             !ref($self->{CurrentForm}->{$attr->{name}})){
-            $self->{CurrentForm}->{$attr->{name}}=
-             [$self->{CurrentForm}->{$attr->{name}}];
+         if (exists($self->{CurrentForm}->{"$attr->{name}"}) &&
+             !ref($self->{CurrentForm}->{"$attr->{name}"})){
+            $self->{CurrentForm}->{"$attr->{name}"}=
+             [$self->{CurrentForm}->{"$attr->{name}"}];
          }
-         if (ref($self->{CurrentForm}->{$attr->{name}})){
-            push(@{$self->{CurrentForm}->{$attr->{name}}},$attr->{value});
+         if (ref($self->{CurrentForm}->{"$attr->{name}"})){
+            push(@{$self->{CurrentForm}->{"$attr->{name}"}},"$attr->{value}");
          }
          else{
-            $self->{CurrentForm}->{$attr->{name}}=$attr->{value};
+            $self->{CurrentForm}->{"$attr->{name}"}="$attr->{value}";
          }
       }
    },'self, tagname, attr');
@@ -96,19 +149,54 @@ sub send2Miles
    $self->doLogin($user,$pass);
    my $ws=$self->getWorkspace();
 
-#   return({exitcode=>0,msg=>'transfer ok'});
+   #######################################################################
 
-   $self->setEntries("13.01.2011","00:01","23:59",[
-                     {'wsid'=>$ws->{bylabel}->{'APPL:W5Base/Darwin'}->{id},
-                      'effort'=>'7:00',
-                      'comments'=>'Hallo Welt'},
-                     {'wsid'=>$ws->{bylabel}->{'Henry Arbeitszeit 2'}->{id},
-                      'effort'=>'0:50',
-                      'comments'=>'Ene2'}
+   msg(INFO,"found MilesPlus labels:");
+   foreach my $label (sort(keys(%{$ws->{bylabel}}))){
+      msg(INFO,"personal label: ".$label);
+   }
+
+   my @booksets;
+
+   foreach my $day (sort(keys(%milesd))){
+      msg(INFO,"processing day $day");
+      my @localbooks;
+      foreach my $label (keys(%{$milesd{$day}})){
+         if (exists($ws->{bylabel}->{$label})){
+            my $e=$milesd{$day}->{$label}->{effort};
+            my $eh=int($e/60);
+            my $em=$e-($eh*60);
+            my $h=sprintf("%02d:%02d",$eh,$em);
+            push(@localbooks,{wsid=>$ws->{bylabel}->{$label}->{id},
+                              effort=>$h,
+                              comments=>join(", ",
+                                 @{$milesd{$day}->{$label}->{wfheadid}})});
+         }
+         else{
+            msg(ERROR,"found invalid label '$label'");
+            exit(1);
+         }
+      }
+      push(@booksets,[$day,
+                      '00:01',
+                      '23:59',
+                      @localbooks]);
+   }
+   foreach my $book (@booksets){
+      msg(INFO,"do book $book[0]");
+      $self->setEntries(@$book);
+   }
+#   $self->setEntries("13.01.2011","00:01","23:59",[
+#                     {'wsid'=>$ws->{bylabel}->{'9100004464'}->{id},
+#                      'effort'=>'7:00',
+#                      'comments'=>'Hallo Welt'},
+#                     {'wsid'=>$ws->{bylabel}->{'70111192'}->{id},
+#                      'effort'=>'0:50',
+#                      'comments'=>'Ene2'}
 #                     {'project'=>'W5Base',
 #                      'effort'=>'1:00',
 #                      'comments'=>'Entrie2'},
-                     ]);
+#                     ]);
 
    $self->doLogout();
 
@@ -140,7 +228,7 @@ sub getWorkspace
       printf STDERR ("ERROR: fail to get loginurl $url\n");
       return(0);
    }
-   print $response->content;
+   #print $response->content;
    my $d=$response->content;
 
    my %ws=();
@@ -148,11 +236,11 @@ sub getWorkspace
 
    pos($d) = 0;
    while ($d=~m#\G.*?\<td class="tdi">&nbsp;\</td\>.*?own_def_edit.*?\<td\>(.+?)\</td>.*?showusertasks\?i_ts_id_arr=([\d-]+)&i_rt_id_arr=([\d-]+)&i_la_id_arr=(.+?)&i_action=DELETE.*?\</TR\>#gcs){
-       printf("Set:%d\n",$c++);
-       print "Found name $1 .\n";
-       print "Found i_ts_id_arr $2 .\n";
-       print "Found i_rt_id_arr $3 .\n";
-       print "Found i_la_id_arr $4 .\n";
+     #  printf("Set:%d\n",$c++);
+     #  print "Found name $1 .\n";
+     #  print "Found i_ts_id_arr $2 .\n";
+     #  print "Found i_rt_id_arr $3 .\n";
+     #  print "Found i_la_id_arr $4 .\n";
        my %rec=(label=>$1,
                 i_ts_id_arr=>$2,
                 i_rt_id_arr=>$3,
@@ -165,7 +253,7 @@ sub getWorkspace
        $ws{bylabel}->{$rec{label}}=\%rec;
   
    }
-   print Dumper(\%ws);
+   #print Dumper(\%ws);
    return(\%ws);
 }
 
@@ -238,7 +326,6 @@ sub setEntries
    delete($self->{CurrentForm}->{'i_col_sum'});  # these fields ar set ro
    delete($self->{CurrentForm}->{'i_row_sum'});  # these fields ar set ro
 
-   print Dumper($self->{CurrentForm});
    printf ("keys=%s\n",join(",",sort(keys(%{$self->{CurrentForm}}))));
    my $sendurl=$self->{base}."plsql/pweektime_gc.createpage_week";
    msg(DEBUG,"sendurl=$sendurl");
@@ -248,7 +335,6 @@ sub setEntries
                     'Accept-Charset'=>'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
                     'Accept-Language'=>'de,en;q=0.5',
                     Content=>[%{$self->{CurrentForm}}]);
-   print Dumper($request);
    my $response=$self->{ua}->request($request);
    if ($response->is_redirect){
       print "Result:\n".Dumper($response);
@@ -302,20 +388,19 @@ sub doLogin
    msg(DEBUG,"get login page OK");
    #print $response->content;
 
-   $self->{CurrentForm}->{i_passwd}=$pass;
-   $self->{CurrentForm}->{i_user}=$user;
-   delete($self->{CurrentForm}->{''});
-   #print Dumper($self->{CurrentForm});
+   $self->{'CurrentForm'}->{i_passwd}="$pass";
+   $self->{'CurrentForm'}->{i_user}="$user";
+   delete($self->{'CurrentForm'}->{''});
 
    my $url=$self->{base}."plsql/plogin.login";
    my $request=POST($url,Content_Type=>'application/x-www-form-urlencoded',
                          Content=>[%{$self->{CurrentForm}}]);
    my $response=$self->{ua}->request($request);
-   #print $response->content;
    if ($response->code ne "302"){   # 302 signals login OK
+      print $response->content;
       printf STDERR ("ERROR: fail to post loginurl $url code=%s\n",
                      $response->code);
-      return(0);
+      exit(101);
    }
    msg(DEBUG,"auth login cookie OK");
    return(1);
