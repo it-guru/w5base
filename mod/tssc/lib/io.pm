@@ -625,7 +625,8 @@ sub extractAffectedApplication
    #  pass 1 : softwareid
    my @l1;
    if (defined($rec->{softwareid})){
-      if (defined($tbreaktime2) && $tbreaktime2>0){
+      if (defined($tbreaktime2) && $tbreaktime2>0 && 
+          defined($rec->{changenumber})){
          msg(INFO,"MODIFIED CHANGE Handling since $breaktime2 !!! ".
                   "ignoreing softwareid");
       }
