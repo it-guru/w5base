@@ -557,9 +557,22 @@ sub bflexxRawExport
                         srcid=>$rec->{srcid},
                         month=>$repmon,
                         srcsys=>$rec->{srcsys}};
-            $bflexxwf->ValidatedInsertOrUpdateRecord($newrec,
-                        {w5baseid=>\$newrec->{w5baseid},
-                         custcontract=>\$vertno});
+            $bflexxwf->SetFilter({w5baseid=>\$newrec->{w5baseid},
+                                  custcontract=>\$vertno});
+            my ($oldrec,$msg)=$bflexxwf->getOnlyFirst(qw(ALL));
+            if (!defined($oldrec)){
+               $bflexxwf->ValidatedUpdateRecord($oldrec,$newrec,
+                                                {w5baseid=>\$newrec->{w5baseid},
+                                                 custcontract=>\$vertno} );
+            }
+            else{
+               $bflexxwf->ValidatedInsertRecord($newrec);
+            }
+
+            # fifi
+            #$bflexxwf->ValidatedInsertOrUpdateRecord($newrec,
+            #            {w5baseid=>\$newrec->{w5baseid},
+            #             custcontract=>\$vertno});
          }   
       }   
    }
