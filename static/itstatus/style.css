@@ -1,0 +1,74 @@
+html,body {
+   width: 100%;
+   height: 100%;
+   padding:0px;
+   margin:0px;
+   overflow:hidden;
+   font-family:Arial,Adobe Helvetica,Helvetica;
+   font-size:10px;
+   text-decoration:none;
+   background-color:silver;
+}
+
+
+div.itmainframe{
+   border:1px solid black;
+   margin:15px;
+   padding:5px;
+   width:750px;
+   background-color:white;
+} 
+
+table.mainlights{
+   width:auto;
+   border-collapse:collapse;
+
+}
+td{
+   font-size:12px;
+   padding:4px;
+}
+
+td.label{
+   font-weight:bold;
+   padding-left:5px;
+   padding-right:5px;
+}
+ 
+td.toplabel{
+   font-weight:bold;
+   font-size:14px;
+}
+
+
+ul.item{
+   padding:0px;
+   padding-left:14px;
+   margin:0px;
+}
+ul.item li{
+}
+ 
+ 
+ul.date{
+   padding:0px;
+   padding-left:14px;
+   margin:0px;
+}
+ul.date li{
+}
+li{
+   margin:0px;
+   margin-bootom:0px;
+   padding:0px;
+}
+
+.locked { 
+   background: #666666 url(ui-bg_diagonals-thick_20_666666_40x40.png) 50% 50% repeat; 
+   opacity: .50;
+   filter:Alpha(Opacity=50); 
+}
+ 
+ 
+ 
+
