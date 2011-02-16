@@ -87,11 +87,17 @@ sub Connect
                                  $self->{dbpass},{mysql_enable_utf8 => 0});
    }
    else{
-      $self->{'db'}=DBI->connect_cached($self->{dbconnect},
-                                        $self->{dbuser},
-                                        $self->{dbpass},
-                                       {mysql_enable_utf8 => 0,
-                                        private_foo_cachekey=>$dbname."-".$$});
+      if ($self->{dbconnect}=~m/^dbi:odbc:/i){  # cached funktioniert nicht
+         $self->{'db'}=DBI->connect(            # mit ODBC verbindungen
+            $self->{dbconnect},$self->{dbuser},$self->{dbpass},{});
+      }
+      else{
+         $self->{'db'}=DBI->connect_cached(
+            $self->{dbconnect},$self->{dbuser},$self->{dbpass},{
+               mysql_enable_utf8 => 0,
+               private_foo_cachekey=>$dbname."-".$$
+            });
+      }
    }
    $self->{parentlabel}=$self->getParent->Self()."-".$dbname;
 
@@ -133,9 +139,9 @@ sub Connect
    #  setting the DBI parameters for the created
    #  child session
    #
-   $self->{'db'}->{FetchHashKeyName}="NAME_lc";
-   $self->{'db'}->{LongTruncOk} = 1;
-   $self->{'db'}->{LongReadLen} = 128000;
+   $self->{'db'}->{'FetchHashKeyName'}="NAME_lc";
+   $self->{'db'}->{'LongTruncOk'} = 1;
+   $self->{'db'}->{'LongReadLen'} = 128000;
 
    return($self->{'db'});
 }
