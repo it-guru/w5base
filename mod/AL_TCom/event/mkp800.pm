@@ -95,7 +95,7 @@ sub mkp800
    }
    my $bflexxp800=getModuleObject($self->Config,"tsbflexx::p800sonder");
    my $bflexxwf=getModuleObject($self->Config,"tsbflexx::ifworkflow");
-   if (!defined($bflexxp800) || !$bflexxp800->Ping()){
+   if (!defined($bflexxwf) || !$bflexxwf->Ping()){
       msg(ERROR,"can not connect to b:flexx inteface database");
       return({exicode=>1});
    }
@@ -550,29 +550,30 @@ sub bflexxRawExport
                         tcomworktime=>$specialt,
                         tcomcodcause=>$cause,
                         tcomcodcomments=>$comments,
-                        tcomexternalid=>$extid,
+                        tcomexternalid=>limitlen($extid,40,1),
                         appl=>join(", ",@$ag),
                         custcontract=>$vertno,
                         srcload=>NowStamp("en"),
                         srcid=>$rec->{srcid},
                         month=>$repmon,
                         srcsys=>$rec->{srcsys}};
-            $bflexxwf->SetFilter({w5baseid=>\$newrec->{w5baseid},
-                                  custcontract=>\$vertno});
-            my ($oldrec,$msg)=$bflexxwf->getOnlyFirst(qw(ALL));
-            if (!defined($oldrec)){
-               $bflexxwf->ValidatedUpdateRecord($oldrec,$newrec,
-                                                {w5baseid=>\$newrec->{w5baseid},
-                                                 custcontract=>\$vertno} );
-            }
-            else{
-               $bflexxwf->ValidatedInsertRecord($newrec);
-            }
+            #my $bflexxwf=getModuleObject($self->Config,"tsbflexx::ifworkflow");
+            #$bflexxwf->SetFilter({w5baseid=>\$newrec->{w5baseid},
+            #                      custcontract=>\$vertno});
+            #my ($oldrec,$msg)=$bflexxwf->getOnlyFirst(qw(ALL));
+            #if (!defined($oldrec)){
+            #   $bflexxwf->ValidatedUpdateRecord($oldrec,$newrec,
+            #                                    {w5baseid=>\$newrec->{w5baseid},
+            #                                     custcontract=>\$vertno} );
+            #}
+            #else{
+            #   $bflexxwf->ValidatedInsertRecord($newrec);
+            #}
 
             # fifi
-            #$bflexxwf->ValidatedInsertOrUpdateRecord($newrec,
-            #            {w5baseid=>\$newrec->{w5baseid},
-            #             custcontract=>\$vertno});
+            $bflexxwf->ValidatedInsertOrUpdateRecord($newrec,
+                        {w5baseid=>\$newrec->{w5baseid},
+                         custcontract=>\$vertno});
          }   
       }   
    }
