@@ -59,7 +59,7 @@ sub new
                 label         =>'Question (en-default)',
                 translation   =>'base::interview',
                 readonly      =>1,
-                htmldetail    =>1,
+                htmldetail    =>0,
                 dataobjattr   =>'interview.name'),
 
       new kernel::Field::TextDrop(
@@ -67,7 +67,7 @@ sub new
                 label         =>'Question (de)',
                 translation   =>'base::interview',
                 readonly      =>1,
-                htmldetail    =>1,
+                htmldetail    =>0,
                 dataobjattr   =>'interview.name_de'),
 
       new kernel::Field::Boolean(
