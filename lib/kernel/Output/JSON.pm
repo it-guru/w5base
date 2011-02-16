@@ -135,7 +135,7 @@ sub ProcessLine
    }
    $d=$self->FormatRecordStruct($d,$rec,$idname);
    # date hack, to get Date objects in JavaScript!
-   $d=~s/"\\\\Date\((\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)\)\\\\"/new Date($1,$2-1,$3,$4,$5)/g;
+   $d=~s/"\\\\Date\((\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)\)\\\\"/new Date("$2\/$3\/$1 $4:$5:$6 UTC")/g;
    if ($lineno>1){
       $d="\n,".$d;
    }
