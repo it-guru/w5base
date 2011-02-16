@@ -50,7 +50,25 @@ sub new
                 vjointo       =>'base::interview',
                 vjoinon       =>['interviewid'=>'id'],
                 vjoindisp     =>'name',
+                depend        =>['name_de','name_en'],
+                searchable    =>0,
+                onRawValue    =>\&getQuestionText),
+
+      new kernel::Field::TextDrop(
+                name          =>'name_en',
+                label         =>'Question (en-default)',
+                translation   =>'base::interview',
+                readonly      =>1,
+                htmldetail    =>1,
                 dataobjattr   =>'interview.name'),
+
+      new kernel::Field::TextDrop(
+                name          =>'name_de',
+                label         =>'Question (de)',
+                translation   =>'base::interview',
+                readonly      =>1,
+                htmldetail    =>1,
+                dataobjattr   =>'interview.name_de'),
 
       new kernel::Field::Boolean(
                 name          =>'relevant',
@@ -218,6 +236,23 @@ sub prepUploadRecord
 
    return(1);
 }
+
+
+sub getQuestionText
+{
+   my $self=shift;
+   my $current=shift;
+   my $lang=$self->getParent->Lang();
+   if ($lang eq "de" && $current->{'name_de'} ne ""){
+      return($current->{'name_de'});
+   }
+   if ($current->{'name_en'} eq ""){
+      return($current->{'name_de'});
+   }
+   return($current->{'name_en'});
+}
+
+
 
 sub SelfAsParentObject    # this method is needed because existing derevations
 {
