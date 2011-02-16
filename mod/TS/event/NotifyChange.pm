@@ -210,7 +210,7 @@ sub NotifyChange
             $notiy{emailto}=$emailto;
             $notiy{name}="$srcid: ".$wfrec->{name};
             $notiy{emailprefix}=\@emailprefix;
-            my $defaultfrom=$self->Config->Param("DEFAULTFROM");
+            my $defaultfrom=$self->Config->Param("WORKFLOWTERMINFROM");
             my $sitename=$self->Config->Param("SITENAME");
             $notiy{emailfrom}='"Change Notification: '.$sitename.'" '.
                               '<'.$defaultfrom.'>';
@@ -232,7 +232,7 @@ sub NotifyChange
             $notiy{prio}=5;
             $notiy{terminlocation}="T-Systems RZ";
 
-            if ($curscstate eq "confirmed"){
+            if ($curscstate eq "xxxxxxxxx"){
                $wf->Action->ValidatedInsertRecord({
                   wfheadid=>$wfrec->{id},
                   name=>'note',
