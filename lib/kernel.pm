@@ -78,7 +78,7 @@ use Encode;
 use Unicode::String qw(utf8 latin1 utf16);
 @ISA = qw(Exporter);
 @EXPORT = qw(&Query &LangTable &globalContext &NowStamp &CalcDateDuration
-             &trim &rtrim &ltrim &rmNonLatin1 &in_array
+             &trim &rtrim &ltrim &limitlen &rmNonLatin1 &in_array
              &hash2xml &effVal &effChanged 
              &Debug &UTF8toLatin1
              &Datafield2Hash &Hash2Datafield &CompressHash

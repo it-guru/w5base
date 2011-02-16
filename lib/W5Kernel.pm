@@ -3,7 +3,7 @@ use Exporter;
 use Encode;
 @ISA = qw(Exporter);
 @EXPORT = qw(
-             &trim &rtrim &ltrim &in_array
+             &trim &rtrim &ltrim &limitlen &in_array 
              &msg &ERROR &WARN &DEBUG &INFO &OK &UTF8toLatin1
              );
 
@@ -77,6 +77,32 @@ sub trim
      return(${$_[0]});
   }
   return($_[0]);
+}
+
+sub limitlen
+{
+   my $d=shift;
+   my $maxlen=shift;
+   my $usesoftbreak=shift;
+   if (!defined($maxlen)){
+      printf STDERR ("ERROR: invalid call to W5Kernel::limitlen\n");
+      exit(-1);
+   }
+   $usesoftbreak=0 if (!defined($usesoftbreak));
+
+   if (length($d)>$maxl){
+      if ($usesoftbreak){
+         my $m=$maxlen-3;
+         $m=0 if ($m<0);
+         $d=substr($d,0,$m)."...";
+         $d=substr($d,0,$maxlen);
+      }
+      else{
+         $d=substr($d,0,$maxlen);
+      }
+   }
+   return($d);
+
 }
 
 sub UTF8toLatin1
