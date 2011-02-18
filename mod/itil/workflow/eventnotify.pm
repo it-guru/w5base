@@ -634,6 +634,8 @@ sub calcVisibility
       return(1) if ($name eq "affectedlocationid");
       return(1) if ($name eq "affectedroom");
       return(1) if ($name eq "affectedlocationcomp");
+      return(1) if ($name eq "affectedcustomer");
+      return(1) if ($name eq "affectedcustomerid");
    }
    if ($rec->{headref}->{eventmode}->[0] eq "EVk.appl"){
       return(1) if ($name eq "affectedapplication");
