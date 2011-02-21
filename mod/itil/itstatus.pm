@@ -111,6 +111,13 @@ sub RSS
       }
 
       foreach my $WfRec ($wf->getHashList(qw(ALL))){
+         my $item="item";
+         if ($WfRec->{eventmode} eq "EVk.appl"){
+            $item=$WfRec->{affectedapplication};
+         }
+         if ($WfRec->{eventmode} eq "EVk.infraloc"){
+            $item=$WfRec->{affectedlocation};
+         }
          if ($WfRec->{eventmode} eq "EVk.appl"){
             if (!in_array(['*'],\@mandator)){  # user dont want to see all
                next if (!in_array(\@mandator,$WfRec->{mandator}));
@@ -135,7 +142,7 @@ sub RSS
                next;
             }
          }
-         my $title=$WfRec->{name};
+         my $title=$item."\n Prio".$WfRec->{eventstatclass};
          my $desc=$WfRec->{eventdesciption};
          my $link="https://darwin.telekom.de/darwin/auth/base/workflow/ById/".
                   $WfRec->{id};
