@@ -82,7 +82,8 @@ use Unicode::String qw(utf8 latin1 utf16);
              &hash2xml &effVal &effChanged 
              &Debug &UTF8toLatin1
              &Datafield2Hash &Hash2Datafield &CompressHash
-             &unHtml &quoteHtml &quoteSOAP &quoteWap &quoteQueryString &Dumper 
+             &unHtml &quoteHtml &quoteSOAP &quoteWap &quoteQueryString &XmlQuote
+             &Dumper 
              &FancyLinks &ExpandW5BaseDataLinks &mkInlineAttachment 
              &FormatJsDialCall
              &mkMailInlineAttachment &haveSpecialChar
@@ -214,22 +215,23 @@ sub orgRoles
 }
 
 
+sub XmlQuote
+{
+   my $org=shift;
+   $org=unHtml($org);
+   $org=~s/&/&amp;/g;
+   $org=~s/</&lt;/g;
+   $org=~s/>/&gt;/g;
+   utf8::encode($org);
+   return($org);
+}
+
 sub hash2xml {
   my ($request,$param,$parentKey,$depth) = @_;
   my $xml="";
   $param={} if (!defined($param) || ref($param) ne "HASH");
   $depth=0 if (!defined($depth));
 
-  sub XmlQuote
-  {
-     my $org=shift;
-     $org=unHtml($org);
-     $org=~s/&/&amp;/g;
-     $org=~s/</&lt;/g;
-     $org=~s/>/&gt;/g;
-     utf8::encode($org);
-     return($org);
-  }
   sub indent
   {
      my $n=shift;

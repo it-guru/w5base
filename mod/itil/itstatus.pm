@@ -47,9 +47,44 @@ sub asJSONP
    return($self->Display());
 }
 
-sub Display
+sub RSS
 {
    my $self=shift;
+   my $wf=$self->getFilteredWfModuleObject();
+   my ($func,$p)=$self->extractFunctionPath();
+   my $sitename=$self->Config->Param("SITENAME");
+   print($self->HttpHeader("text/xml",charset=>'UTF-8'));
+   printf("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
+   printf("<rss version=\"2.0\">\n");
+   printf("<channel>\n");
+   printf("<title>%s: %s</title>",$sitename,"eventnotification");
+   printf("<link>%s</link>","https://darwin.telekom.de");
+   printf("<description>%s</description>",
+          "Information channel about current active events\n".
+          "path=$p");
+   $wf->SetCurrentOrder("eventstartrev");
+   foreach my $WfRec ($wf->getHashList(qw(ALL))){
+      my $title=$WfRec->{name};
+      my $desc=$WfRec->{eventdesciption};
+      my $link="https://darwin.telekom.de/darwin/auth/base/workflow/ById/".
+               $WfRec->{id};
+      printf("<item>");
+      printf("<title>%s</title>",XmlQuote($title));
+      printf("<link>%s</link>",XmlQuote($link));
+      printf("<desciption>%s</desciption>",XmlQuote($desc));
+      printf("</item>");
+   }
+
+
+   printf("</channel>\n");
+   printf("</rss>\n");
+   return();
+}
+
+sub getFilteredWfModuleObject
+{
+   my $self=shift;
+
    my $wf=getModuleObject($self->Config,"base::workflow");
 
    $wf->AddFields(
@@ -74,6 +109,13 @@ sub Display
    $wf->SetFilter([{eventend=>"<now AND >now-60m"},
                    {eventend=>"[EMPTY]"}]);
 
+   return($wf);
+}
+
+sub Display
+{
+   my $self=shift;
+   my $wf=$self->getFilteredWfModuleObject();
    my %param=(ExternalFilter=>1,CurrentView=>[qw(id name eventstart eventend
 
                                                  wffields.eventdesciption
@@ -94,5 +136,5 @@ sub getValidWebFunctions
    my ($self)=@_;
 
 
-   return(qw(asXML asJSONP));
+   return(qw(asXML RSS asJSONP));
 }
