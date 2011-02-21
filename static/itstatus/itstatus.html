@@ -26,7 +26,7 @@
           </span>
       </td>
       <td align=center class="toplabel">
-        SDM DTAG current top management information
+        SDM DTAG current top management information (Prio 1/2 events)
       </td>
       <td width=10% valign=center align=center>
           <span style="cursor:pointer" onclick="reloadStatus();">
@@ -48,12 +48,18 @@
     
      <tr>
       <td id="TDG" class="customer" align="center"
-          filter="DTAG.TDG DTAG.T-Home DTAG.TMO" rowspan="2">TDG</td>
+          filter="DTAG.TDG DTAG.T-Home DTAG.TMO" rowspan="3">TDG</td>
       <td id="TDG_app" height=38 valign="top">application</td>
       <td id="TDG_appitem" align="left" valign="top">?</td>
       <td id="TDG_appdate" align="left" nowrap valign="top">?</td>
      </tr>
    
+     <tr>
+      <td id="TDG_off" height=38 valign="top">office&amp;comm</td>
+      <td id="TDG_offitem" align="left" valign="top">?</td>
+      <td id="TDG_offdate" align="left" nowrap valign="top">?</td>
+     </tr>
+
      <tr>
       <td id="TDG_loc" height=38 valign="top">location</td>
       <td id="TDG_locitem" align="left" valign="top">?</td>
@@ -63,11 +69,17 @@
     
      <tr>
       <td id="GHS" class="customer" align="center"
-          filter="DTAG.GHS" rowspan="1">GHS</td>
+          filter="DTAG.GHS" rowspan="2">GHS</td>
       <td id="GHS_app" height=38 valign="top">application</td>
       <td id="GHS_appitem" align="left" valign="top">?</td>
       <td id="GHS_appdate" align="left" nowrap valign="top">?</td>
      </tr>
+     <tr>
+      <td id="GHS_off" height=38 valign="top">office&amp;comm</td>
+      <td id="GHS_offitem" align="left" valign="top">?</td>
+      <td id="GHS_offdate" align="left" nowrap valign="top">?</td>
+     </tr>
+
 <!--
    
      <tr>
@@ -97,10 +109,16 @@
 
      <tr>
       <td id="TSG" class="customer" align="center"
-          filter="DTAG.TSG" rowspan="1">TSG</td>
+          filter="DTAG.TSG" rowspan="2">TSG</td>
       <td id="TSG_app" height=38 valign="top">application</td>
       <td id="TSG_appitem" align="left" valign="top">?</td>
       <td id="TSG_appdate" align="left" nowrap valign="top">?</td>
+     </tr>
+
+     <tr>
+      <td id="TSG_off" height=38 valign="top">office&amp;comm</td>
+      <td id="TSG_offitem" align="left" valign="top">?</td>
+      <td id="TSG_offdate" align="left" nowrap valign="top">?</td>
      </tr>
 
 <!--   
@@ -134,7 +152,7 @@
 // ------------------------------------------------------------------------
 
 function storeEvent(currento,rec){
-   if (rec.eventstatclass<6){  // only prio 1 and prio 2 events
+   if (rec.eventstatclass<3){  // only prio 1 and prio 2 events
       if (rec.eventstatclass==1){
          if (currento.state<30) currento.state=30;
       }
@@ -145,8 +163,14 @@ function storeEvent(currento,rec){
          if (currento.state<10) currento.state=10;
       }
       if (rec.raweventmode=="EVk.appl"){
-         rec.itemname=rec.affectedapplication;
-         currento.app[rec.eventstatclass].push(rec);
+         if (rec.mandator=="DSS" || rec.mandator=="TSS"){
+            rec.itemname=rec.affectedapplication;
+            currento.off[rec.eventstatclass].push(rec);
+         }
+         else{
+            rec.itemname=rec.affectedapplication;
+            currento.app[rec.eventstatclass].push(rec);
+         }
       }
       if (rec.raweventmode=="EVk.infraloc"){
          rec.itemname=rec.affectedlocation;
@@ -169,6 +193,8 @@ function anaylseData(data){
       o[id].app=new Array(new Array(),new Array(),new Array(),
                           new Array(),new Array(),new Array());
       o[id].loc=new Array(new Array(),new Array(),new Array(),
+                          new Array(),new Array(),new Array());
+      o[id].off=new Array(new Array(),new Array(),new Array(),
                           new Array(),new Array(),new Array());
    });
    // analyse data
@@ -213,7 +239,7 @@ function displayStatus(data){
       if (s.state==30) cuscolor=COLOR_level3;
       $("#"+cusi).css("background-color",cuscolor);
       // --- 
-      var setlist=new Array('app','loc');
+      var setlist=new Array('app','loc','off');
       for(var seti in setlist){
          var cuscolor=COLOR_level0;
          var setname=setlist[seti];
