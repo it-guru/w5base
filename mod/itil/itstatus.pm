@@ -144,7 +144,8 @@ sub RSS
          printf("<link>%s</link>",XmlQuote($link));
          printf("<subject>%s</subject>",XmlQuote("This is the subject"));
          printf("<description>%s</description>",XmlQuote($desc));
-         printf("<pubDate>%s</pubDate>",XmlQuote("Test author"));
+         printf("<pubDate>%s</pubDate>",
+             scalar($self->ExpandTimeExpression($WfRec->{eventstart},"en")));
          printf("</item>");
       }
    }
