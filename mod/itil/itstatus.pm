@@ -69,8 +69,8 @@ sub RSS
 
    my ($customer,$mandator,$prio,$itemprio,$lang)=split(/\//,$p);
 
-   printf STDERR ("fifi0 ($p)\n");
-   printf STDERR ("fifi1 ($customer,$mandator,$prio,$lang)\n");
+#   printf STDERR ("fifi0 ($p)\n");
+#   printf STDERR ("fifi1 ($customer,$mandator,$prio,$lang)\n");
 
    if ($lang ne "en" && $lang ne "de"){
       $lang="en";
@@ -111,12 +111,18 @@ sub RSS
       }
 
       foreach my $WfRec ($wf->getHashList(qw(ALL))){
-         my $item="item";
+         my $item="???";
          if ($WfRec->{eventmode} eq "EVk.appl"){
             $item=$WfRec->{affectedapplication};
+            $item=join(", ",@$item) if (ref($item));
          }
          if ($WfRec->{eventmode} eq "EVk.infraloc"){
             $item=$WfRec->{affectedlocation};
+            $item=join(", ",@$item) if (ref($item));
+         }
+         if ($WfRec->{eventmode} eq "EVk.bprocess"){
+            $item=$WfRec->{affectedbusinessprocess};
+            $item=join(", ",@$item) if (ref($item));
          }
          if ($WfRec->{eventmode} eq "EVk.appl"){
             if (!in_array(['*'],\@mandator)){  # user dont want to see all
@@ -142,7 +148,7 @@ sub RSS
                next;
             }
          }
-         my $title=$item."\n Prio".$WfRec->{eventstatclass};
+         my $title=$item."\n (Prio".$WfRec->{eventstatclass}.")";
          my $desc=$WfRec->{eventdesciption};
          my $link="https://darwin.telekom.de/darwin/auth/base/workflow/ById/".
                   $WfRec->{id};
