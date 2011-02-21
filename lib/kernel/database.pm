@@ -89,7 +89,9 @@ sub Connect
    else{
       if ($self->{dbconnect}=~m/^dbi:odbc:/i){  # cached funktioniert nicht
          $self->{'db'}=DBI->connect(            # mit ODBC verbindungen
-            $self->{dbconnect},$self->{dbuser},$self->{dbpass},{});
+            $self->{dbconnect},$self->{dbuser},$self->{dbpass},{
+                         private_foo_cachekey=>$self.time()});
+         msg(INFO,"use NOT cached datbase connection on ODBC");
       }
       else{
          $self->{'db'}=DBI->connect_cached(
