@@ -52,32 +52,110 @@ sub RSS
    my $self=shift;
    my $wf=$self->getFilteredWfModuleObject();
    my ($func,$p)=$self->extractFunctionPath();
+
+   # sample set: /RSS/DTAG/TSS,DSS/1,2/*/en
+   #                  |    |       |   | |
+   #                  |    |       |   | +--- lang (default: en)
+   #                  |    |       |   |
+   #                  |    |       |   +----- item prio (default: *)
+   #                  |    |       |
+   #                  |    |       +--- event prio (default: *)
+   #                  |    |
+   #                  |    +--- mandator (default: *)
+   #                  |
+   #                  +--- customer (needed)
+   #
+   $p=~s/^\///;
+
+   my ($customer,$mandator,$prio,$itemprio,$lang)=split(/\//,$p);
+
+   printf STDERR ("fifi0 ($p)\n");
+   printf STDERR ("fifi1 ($customer,$mandator,$prio,$lang)\n");
+
+   if ($lang ne "en" && $lang ne "de"){
+      $lang="en";
+   }
+   if ($itemprio eq ""){
+      $itemprio="*";
+   }
+   $ENV{HTTP_ACCEPT_LANGUAGE}=$lang;
+
    my $sitename=$self->Config->Param("SITENAME");
+
    print($self->HttpHeader("text/xml",charset=>'UTF-8'));
    printf("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
    printf("<rss version=\"2.0\">\n");
    printf("<channel>\n");
-   printf("<title>%s: %s</title>",$sitename,"eventnotification");
-   printf("<link>%s</link>","https://darwin.telekom.de");
-   printf("<description>%s</description>",
-          "Information channel about current active events\n".
-          "path=$p");
-   $wf->SetCurrentOrder("eventstartrev");
-   foreach my $WfRec ($wf->getHashList(qw(ALL))){
-      my $title=$WfRec->{name};
-      my $desc=$WfRec->{eventdesciption};
-      my $link="https://darwin.telekom.de/darwin/auth/base/workflow/ById/".
-               $WfRec->{id};
-      printf("<item>");
-      printf("<title>%s</title>",XmlQuote($title));
-      printf("<link>%s</link>",XmlQuote($link));
-      printf("<desciption>%s</desciption>",XmlQuote($desc));
-      printf("</item>");
+   if ($customer ne ""){
+      printf("<title>%s: %s</title>",$self->T("IT Event-Notification"));
+      printf("<link>%s</link>","https://darwin.telekom.de");
+      printf("<language>%s</language>",$ENV{HTTP_ACCEPT_LANGUAGE});
+      printf("<description>%s</description>",
+             "Information channel about current active events\n".
+             "parameters:\n".
+             "customer: $customer ;\n".
+             "mandator: $mandator ;\n".
+             "event prio: $prio ;\n".
+             "item prio: $itemprio ;");
+      $wf->SetCurrentOrder("eventstartrev");
+
+
+      my @customer=split(/[,;]/,$customer);
+      my @mandator=split(/[,;]/,$mandator);
+      my @prio=split(/[,;]/,$prio);
+      if ($#prio==-1 || ($prio[0] eq "" && $#prio==0)){
+         $prio[0]="*";
+      }
+      if ($#mandator==-1 || ($mandator[0] eq "" && $#mandator==0)){
+         $mandator[0]="*";
+      }
+
+      foreach my $WfRec ($wf->getHashList(qw(ALL))){
+         if ($WfRec->{eventmode} eq "EVk.appl"){
+            if (!in_array(['*'],\@mandator)){  # user dont want to see all
+               next if (!in_array(\@mandator,$WfRec->{mandator}));
+            }
+         }
+         if (!in_array(['*'],\@customer)){  # user dont want to see all
+            my $found=0;
+            chk: foreach my $chkcus (@customer){
+               my $qcust=quotemeta($chkcus);
+               my $re="^($qcust|$qcust\\..*)\$";
+               my $evcust=$WfRec->{affectedcustomer};
+               $evcust=[$evcust] if (!ref($evcust));
+               if (grep(/$re/,@$evcust)){
+                  $found=1;
+                  last chk;
+               }
+            }
+            next if (!$found);
+         }
+         if (!in_array(['*'],\@prio)){  # user dont want to see all
+            if (!in_array([$WfRec->{eventstatclass}],\@prio)){
+               next;
+            }
+         }
+         my $title=$WfRec->{name};
+         my $desc=$WfRec->{eventdesciption};
+         my $link="https://darwin.telekom.de/darwin/auth/base/workflow/ById/".
+                  $WfRec->{id};
+         printf("<item>");
+         printf("<title>%s</title>",XmlQuote($title));
+         printf("<link>%s</link>",XmlQuote($link));
+         printf("<subject>%s</subject>",XmlQuote("This is the subject"));
+         printf("<description>%s</description>",XmlQuote($desc));
+         printf("<pubDate>%s</pubDate>",XmlQuote("Test author"));
+         printf("</item>");
+      }
    }
-
-
+   else{
+      printf("<title>W5Base: eventnotification channel: ".
+             "invalid customer specified</title>");
+   }
    printf("</channel>\n");
    printf("</rss>\n");
+
+   delete($ENV{HTTP_ACCEPT_LANGUAGE});
    return();
 }
 
