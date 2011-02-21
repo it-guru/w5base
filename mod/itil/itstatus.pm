@@ -77,6 +77,7 @@ sub Display
    my %param=(ExternalFilter=>1,CurrentView=>[qw(id name eventstart eventend
 
                                                  wffields.eventdesciption
+                                                 mandator
 
                                                  raweventmode
                                                  wffields.eventmode
