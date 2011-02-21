@@ -36,4 +36,5 @@ then these applications-system links are not listed.
 'System costcenter'=>{de=>'System CO-Nummer'},
 'Application costcenter'=>{de=>'Anwendungs CO-Nummer'},
 'log. CPU count'=>{de=>'log. CPU Anzahl'},
+'log. Memory'=>{de=>'log. Arbeitsspeicher'},
 'relative phys. CPU count'=>{de=>'relative phys. CPU Anzahl'},

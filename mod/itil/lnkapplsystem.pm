@@ -138,6 +138,13 @@ sub new
                 vjoinon       =>['systemid'=>'id'],
                 vjoindisp     =>'relphysicalcpucount'),
 
+      new kernel::Field::Number(
+                name          =>'logicalmemory',
+                group         =>'systeminfo',
+                label         =>'log. Memory',
+                unit          =>'MB',
+                dataobjattr   =>'system.memory'),
+
       new kernel::Field::Select(
                 name          =>'osclass',
                 group         =>'systeminfo',
