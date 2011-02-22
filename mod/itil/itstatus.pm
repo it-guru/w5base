@@ -149,7 +149,7 @@ sub RSS
             }
          }
          my $title=$item."\n (Prio".$WfRec->{eventstatclass}.")";
-         my $desc=$WfRec->{eventdesciption};
+         my $desc=$WfRec->{eventshortsummary};
          my $link="https://darwin.telekom.de/darwin/auth/base/workflow/ById/".
                   $WfRec->{id};
          printf("<item>");
@@ -210,7 +210,7 @@ sub Display
    my $wf=$self->getFilteredWfModuleObject();
    my %param=(ExternalFilter=>1,CurrentView=>[qw(id name eventstart eventend
 
-                                                 wffields.eventdesciption
+                                                 wffields.eventshortsummary
                                                  mandator
 
                                                  raweventmode

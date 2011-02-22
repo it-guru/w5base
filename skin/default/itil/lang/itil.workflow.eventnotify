@@ -58,6 +58,7 @@
 'Businessprocess label'=>{de=>'Geschäftsprozess- Bezeichnung'},
 'Location'=>{de=>'Standort'},
 'rootcause analysis'=>{de=>'Ursachenanalyse'},
+'short summary'=>{de=>'Kurzzusammenfassung'},
 'Affected Region'=>{de=>'betroffene Region'},
 'EVregion.unknown'=>{de=>'unklares Ausmaß',en=>'unknown area'},
 'EVregion.nord'=>{de=>'nord Deutschland',en=>'north germany'},

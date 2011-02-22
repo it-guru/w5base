@@ -70,6 +70,12 @@ sub Validate
       return(0);
    }
 
+   if (effVal($oldrec,$newrec,"eventshortsummary")=~m/^\s*$/){
+      $newrec->{eventshortsummary}="No short summary for this event.\n".
+                          "[de:]\n".
+                          "keine Kurzzusammenfassung für dieses Ereignis.\n";
+   }
+
 
    return($self->SUPER::Validate($oldrec,$newrec));
 }
@@ -290,6 +296,14 @@ sub getDynamicFields
                 group         =>'affected',
                 uivisible     =>\&calcVisibility,
                 label         =>'Affected Customer ID'),
+
+      new kernel::Field::Textarea(
+                name          =>'eventshortsummary',
+                translation   =>'itil::workflow::eventnotify',
+                group         =>'eventnotify',
+                htmlheight    =>50,
+                label         =>'short summary',
+                container     =>'headref'),
 
       new kernel::Field::Textarea(
                 name          =>'eventdesciption',

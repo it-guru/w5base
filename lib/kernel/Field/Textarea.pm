@@ -30,7 +30,7 @@ sub new
    $self->{_permitted}->{htmlheight}=1;
    $self->{_permitted}->{viewarea}=1;
    $self->{_permitted}->{editarea}=1;
-   $self->{htmlheight}="300" if (!defined($self->{htmlheight}));
+   $self->{htmlheight}=""    if (!defined($self->{htmlheight}));
    $self->{valign}="top"     if (!defined($self->{valign}));
    $self->{cols}="80"        if (!defined($self->{cols}));
    return($self);
@@ -76,11 +76,17 @@ sub EditArea    # for module defined edit areas (f.e. javascript areas)
    my $mode=shift;
    my $d=shift;
    my $name=$self->Name();
-   $d="<div class=multilinetext>".
+   my $style1="";
+   my $style2="";
+   if ($self->{htmlheight} ne ""){
+      $style1=" style='height:".($self->{htmlheight}+4)."px'";
+      $style2=" style='height:".($self->{htmlheight}-4)."px'";
+   }
+   $d="<div class=multilinetext$style1>".
       "<textarea onkeydown=\"if (window.textareaKeyHandler){".
       "textareaKeyHandler(this,event);}\" ".
       "cols=$self->{cols} name=Formated_$name ".
-      "class=multilinetext>".quoteHtml($d)."</textarea></div>";
+      "class=multilinetext$style2>".quoteHtml($d)."</textarea></div>";
    $d.="<script language=JavaScript>";
    $d.=" var element_$name=document.forms[0].elements['Formated_$name'];";
    $d.=" function DragCancel_$name(e){";
@@ -128,12 +134,18 @@ sub ViewArea    # for module defined view areas (f.e. javascript areas)
       $d=~s/</&lt;/g;
       $d=~s/>/&gt;/g;
    }
+   my $style1="";
+   my $style2="";
+   if ($self->{htmlheight} ne ""){
+      $style1=" style='height:".($self->{htmlheight}+4)."px'";
+      $style2=" style='height:".($self->{htmlheight}-4)."px'";
+   }
    $d="<table cellspacing=0 cellpadding=0 border=0 ".
       "style=\"width:100%;table-layout:fixed;padding:0;margin:0\">".
       "<tr><td width=1><img class=printspacer style=\"padding:0;margin:0\" ".
       "src=\"../../../public/base/load/empty.gif\" width=0 height=100>".
-      "</td><td><div class=multilinetext>".
-      "<pre class=multilinetext>".
+      "</td><td><div class=multilinetext$style1>".
+      "<pre class=multilinetext$style2>".
       mkInlineAttachment(
          ExpandW5BaseDataLinks($self->getParent,"HtmlDetail",
             FancyLinks($d))).
