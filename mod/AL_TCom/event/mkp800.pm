@@ -37,7 +37,7 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("mkp800","mkp800",timeout=>10000);
+   $self->RegisterEvent("mkp800","mkp800",timeout=>12000);
    $self->RegisterEvent("mkp800specialxls","mkp800specialxls");
    return(1);
 }
@@ -93,7 +93,6 @@ sub mkp800
       @monthlist=(sprintf("%02d/%04d",$sM,$sY),
                   sprintf("%02d/%04d",$month,$year));
    }
-   my $bflexxp800=getModuleObject($self->Config,"tsbflexx::p800sonder");
    my $bflexxwf=getModuleObject($self->Config,"tsbflexx::ifworkflow");
    if (!defined($bflexxwf) || !$bflexxwf->Ping()){
       msg(ERROR,"can not connect to b:flexx inteface database");
@@ -120,28 +119,18 @@ sub mkp800
       msg(DEBUG,"Report : $start\n");
       msg(DEBUG,"Report start ($start): >=$starttime\n");
       msg(DEBUG,"Report end   ($end): <=$endtime\n");
-      
+     
+      my @id=(); 
       my $wf=getModuleObject($self->Config,"base::workflow");
+      $wf->ResetFilter();
       $wf->SetCurrentOrder("NONE");
-      $wf->SetCurrentView(qw(id name affectedcontractid 
-                                     affectedcontract
-                                     affectedapplicationid
-                                     wffields.tcomcodrelevant
-                                     wffields.tcomcodcause
-                                     wffields.tcomexternalid
-                                     wffields.tcomcodcomments
-                                     tcomworktimespecial
-                                     tcomworktime
-                                     affectedapplication
-                             headref class step stateid eventend
-                             srcid srcsys));
+      $wf->ResetFilter();
+      $wf->SetCurrentOrder("NONE");
+      $wf->SetCurrentView(qw(id affectedcontractid 
+                             wffields.tcomcodrelevant
+                             class stateid eventend ));
       $wf->SetFilter(eventend=>"\">=$starttime\" AND \"<=$endtime\"",
                      class=>[grep(/^AL_TCom::.*$/,keys(%{$wf->{SubDataObj}}))]);
-      #$wf->SetFilter({srcid=>"INM02876055"});
-      ## DEBUG
-      #$wf->SetFilter({id=>[qw(12272520340002)]});
-      my %nocontract=();
-      my %p800=();
       my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
       if (defined($rec)){
          do{
@@ -149,18 +138,29 @@ sub mkp800
                 ( ($rec->{stateid}>=17 && $rec->{tcomcodrelevant} eq "yes") ||
                   ($rec->{stateid}>=16 && 
                    $rec->{class} eq "AL_TCom::workflow::businesreq"))){
-               $self->processRec($start,\%p800,$rec);
-               $self->processRecSpecial($start,\%p800special,$rec,
-                                        $xlsexp,$bflexxp800,
-                                        $bflexxwf,$monthlist[1]);
-            }
-            else{
-               if (defined($rec->{srcid})){
-                  $nocontract{$rec->{srcid}}=1;
+               push(@id,$rec->{id});
+               if (int($#id/1000.0)==$#id/1000.0){
+                  msg(INFO,"loaded ".($#id));
                }
             }
             ($rec,$msg)=$wf->getNext();
          } until(!defined($rec));
+      }
+      my %p800=();
+      while (my $id=shift(@id)){
+         $wf->ResetFilter();
+         $wf->SetFilter({id=>\$id});
+         my ($rec,$msg)=$wf->getOnlyFirst(qw(ALL));
+         if (defined($rec)){
+            if (ref($rec->{affectedcontractid}) eq "ARRAY" &&
+                ( ($rec->{stateid}>=17 && $rec->{tcomcodrelevant} eq "yes") ||
+                  ($rec->{stateid}>=16 && 
+                   $rec->{class} eq "AL_TCom::workflow::businesreq"))){
+               $self->processRec($start,\%p800,$rec);
+               $self->processRecSpecial($start,\%p800special,$rec,
+                                        $xlsexp,$bflexxwf,$monthlist[1]);
+            }
+         }
       }
      
       my $now=$app->ExpandTimeExpression("now","en","CET");
@@ -333,7 +333,6 @@ sub mkp800
              $wf->ValidatedDeleteRecord($_);
          });
          $self->xlsFinish($xlsexp,$month);  # stores the xls export in webfs
-         $self->bflexxFinish($bflexxp800,$startnow,$month); 
          $self->bflexxRawFinish($bflexxwf,$startnow,$starttime); 
       }
    }
@@ -408,7 +407,6 @@ sub processRecSpecial
    my $p800=shift;
    my $rec=shift;
    my $xlsexp=shift;
-   my $bflexxp800=shift;
    my $bflexxwf=shift;
    my $specialmon=shift;
 
@@ -435,7 +433,6 @@ sub processRecSpecial
             
             if ($mon eq $specialmon){
                $self->xlsExport($xlsexp,$rec,$mon,$eY,$eM,$eD);
-               $self->bflexxExport($bflexxp800,$rec,$mon,$eY,$eM,$eD);
                for(my $c=0;$c<=$#{$rec->{affectedcontractid}};$c++){
                   my $cid=$rec->{affectedcontractid}->[$c];
                   my $wt=$rec->{headref}->{specialt};
@@ -464,24 +461,6 @@ sub processRecSpecial
 }
 
 
-sub bflexxFinish
-{
-   my $self=shift;
-   my $bflexxp800=shift;
-   my $now=shift;
-   my $repmon=shift;
-
-   my $opobj=$bflexxp800->Clone();
-   if (my ($m,$y)=$repmon=~m/^(\d+)\/(\d{4})/){
-      $repmon=sprintf("%04d%02d",$y,$m);
-   }
-   $bflexxp800->ResetFilter(); 
-   $bflexxp800->SetFilter(srcload=>"\"<$now\"",month=>\$repmon);
-   $bflexxp800->ForeachFilteredRecord(sub{
-       $opobj->ValidatedDeleteRecord($_);
-   });
-
-}
 
 sub bflexxRawFinish
 {
@@ -490,13 +469,15 @@ sub bflexxRawFinish
    my $now=shift;
    my $starttime=shift;
 
-   my $opobj=$bflexxwf->Clone();
-   $bflexxwf->ResetFilter(); 
-   $bflexxwf->SetFilter(srcload=>"\"<$now\"",eventend=>"\">$starttime\"");
-   $bflexxwf->ForeachFilteredRecord(sub{
-       $opobj->ValidatedDeleteRecord($_);
-   });
-
+   my $rec;
+   do{      # seltsamer cleanup - aber nur so funktionierts mit ODBC und MSSQL
+      $bflexxwf->ResetFilter(); 
+      $bflexxwf->SetFilter(srcload=>"\"<$now\"",eventend=>"\">$starttime\"");
+      ($rec)=$bflexxwf->getOnlyFirst(qw(ALL));
+      if (defined($rec)){
+         $bflexxwf->ValidatedDeleteRecord($rec);
+      }
+   }until(!defined($rec));
 }
 
 sub bflexxRawExport
@@ -508,6 +489,7 @@ sub bflexxRawExport
    my ($wY,$wM,$wD)=@_;
 
 
+   my $bflexxwf=getModuleObject($self->Config,"tsbflexx::ifworkflow");
    if (defined($bflexxwf)){
       my $ag=$rec->{affectedapplication};
       $ag=[$ag] if (!ref($ag) eq "ARRAY");
@@ -557,23 +539,23 @@ sub bflexxRawExport
                         srcid=>$rec->{srcid},
                         month=>$repmon,
                         srcsys=>$rec->{srcsys}};
-            #my $bflexxwf=getModuleObject($self->Config,"tsbflexx::ifworkflow");
-            #$bflexxwf->SetFilter({w5baseid=>\$newrec->{w5baseid},
-            #                      custcontract=>\$vertno});
-            #my ($oldrec,$msg)=$bflexxwf->getOnlyFirst(qw(ALL));
-            #if (!defined($oldrec)){
-            #   $bflexxwf->ValidatedUpdateRecord($oldrec,$newrec,
-            #                                    {w5baseid=>\$newrec->{w5baseid},
-            #                                     custcontract=>\$vertno} );
-            #}
-            #else{
-            #   $bflexxwf->ValidatedInsertRecord($newrec);
-            #}
+            my $bflexxwf=getModuleObject($self->Config,"tsbflexx::ifworkflow");
+            $bflexxwf->SetFilter({w5baseid=>\$newrec->{w5baseid},
+                                  custcontract=>\$vertno});
+            my ($oldrec,$msg)=$bflexxwf->getOnlyFirst(qw(ALL));
+            if (!defined($oldrec)){
+               $bflexxwf->ValidatedUpdateRecord($oldrec,$newrec,
+                                                {w5baseid=>\$newrec->{w5baseid},
+                                                 custcontract=>\$vertno} );
+            }
+            else{
+               $bflexxwf->ValidatedInsertRecord($newrec);
+            }
 
             # fifi
-            $bflexxwf->ValidatedInsertOrUpdateRecord($newrec,
-                        {w5baseid=>\$newrec->{w5baseid},
-                         custcontract=>\$vertno});
+            #$bflexxwf->ValidatedInsertOrUpdateRecord($newrec,
+            #            {w5baseid=>\$newrec->{w5baseid},
+            #             custcontract=>\$vertno});
          }   
       }   
    }
