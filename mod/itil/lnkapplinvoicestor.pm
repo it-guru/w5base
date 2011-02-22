@@ -39,7 +39,7 @@ sub new
 
       new kernel::Field::Id(
                 name          =>'id',
-                label         =>'LinkID',
+                label         =>'W5BaseID',
                 group         =>'source',
                 searchable    =>0,
                 dataobjattr   =>'lnkapplinvoicestorage.id'),
@@ -116,11 +116,26 @@ sub new
 
       new kernel::Field::Date(
                 name          =>'durationstart',
+                group         =>'duration',
+                readonly      =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   if (defined($current) && $current->{durationstart} ne ""){
+                      my $d=CalcDateDuration($current->{durationstart},
+                                             NowStamp("en"));
+                      if ($d->{totalminutes}>20160){ # modify only allowed 
+                                                     # for 14 days
+                         return(1);
+                      }
+                   }
+                   return(0);
+                },
                 label         =>'Duration Start',
                 dataobjattr   =>'lnkapplinvoicestorage.durationstart'),
 
       new kernel::Field::Date(
                 name          =>'durationend',
+                group         =>'duration',
                 label         =>'Duration End',
                 dataobjattr   =>'lnkapplinvoicestorage.durationend'),
 
@@ -453,7 +468,7 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("header","default","logicalusage") if (!defined($rec));
+   return("header","default","duration","logicalusage") if (!defined($rec));
    return("ALL");
 }
 
@@ -461,18 +476,19 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default","logicalusage") if (!defined($rec) ||
+   return("default","duration","logicalusage") if (!defined($rec) ||
                                         $self->IsMemberOf("admin"));
+   my @grp=qw(ALL);
    if (defined($rec) && $rec->{cdate} ne ""){
       my $d=CalcDateDuration($rec->{cdate},NowStamp("en"));
       if ($d->{totalminutes}>10080){ # modify only allowed for 7 days
-          return();
+         @grp=qw(duration);
       }
    }
    my $applid=$rec->{applid};
    if ($applid ne ""){
       if ($self->isWriteOnInvoiceDataValid($applid)){
-         return("ALL");
+         return(@grp);
       }
    }
    return;
@@ -508,7 +524,7 @@ sub SecureValidate
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default logicalusage applinfo systeminfo source));
+   return(qw(header default duration logicalusage applinfo systeminfo source));
 }
 
 sub initSearchQuery

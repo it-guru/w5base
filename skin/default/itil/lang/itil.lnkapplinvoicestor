@@ -9,6 +9,7 @@
 'fieldgroup.applinfo'=>{de=>'Anwendungsinformationen',en=>'Applicationinformations'},
 'fieldgroup.logicalusage'=>{de=>'logische Verwendung',en=>'logical usage'},
 'fieldgroup.systeminfo'=>{de=>'Systeminformationen',en=>'Systeminformations'},
+'fieldgroup.duration'=>{de=>'Bereitstellugnsdauer',en=>'Duration'},
 'fieldgroup.hidden'=>{de=>'logisch nicht darstellbar',
                       en=>'logical not viewable'},
 'Application costcenter'=>{de=>'Anwendungs Kostenstelle/CO'},

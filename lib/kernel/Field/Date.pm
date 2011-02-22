@@ -65,7 +65,7 @@ sub FormatedDetail
       if ($self->{dayonly}){
          $d=~s/\s*\d+:\d+:\d+.*$//;
       }
-      return($self->getSimpleInputField($d,$self->{readonly}));
+      return($self->getSimpleInputField($d,$self->readonly($current)));
    }
    if ($d ne ""){
       if (length($usertimezone)<=3 && $mode=~m/html/i){
