@@ -452,12 +452,15 @@ sub Validate
       return(undef);
    }
    else{
-      my $o=getModuleObject($self->Config,"itil::lnkapplsystem");
-      $o->SetFilter({applid=>\$applid,systemid=>\$systemid});
-      my ($lnkrec,$msg)=$o->getOnlyFirst(qw(id));
-      if (!defined($lnkrec)){
-         $self->LastMsg(ERROR,"system not related to selected application"); 
-         return(0);
+      if (effChanged($oldrec,$newrec,"systemid") ||
+          effChanged($oldrec,$newrec,"applid")){
+         my $o=getModuleObject($self->Config,"itil::lnkapplsystem");
+         $o->SetFilter({applid=>\$applid,systemid=>\$systemid});
+         my ($lnkrec,$msg)=$o->getOnlyFirst(qw(id));
+         if (!defined($lnkrec)){
+            $self->LastMsg(ERROR,"system not related to selected application"); 
+            return(0);
+         }
       }
    }
 
