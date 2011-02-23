@@ -116,8 +116,15 @@ sub Date_to_String
    elsif ($lang eq "unixtime"){
       eval('$d=Mktime($timezone,$Y,$M,$D,$h,$m,$s);');
    }
-   elsif ($lang eq "ISO8601"){
+   elsif ($lang eq "ISO8601"){ # eigentlich muss da noch "+00:00" ran?!
       $d=sprintf("%04d-%02d-%02dT%02d:%02d:%02d",$Y,$M,$D,$h,$m,$s);
+   }
+   elsif ($lang eq "RFC822"){ 
+      my $uxt;
+      eval('$uxt=Mktime($timezone,$Y,$M,$D,$h,$m,$s);');
+      my $oldtz=_tzset($timezone);
+      $d=POSIX::strftime("%a, %d %b %Y %H:%M:%S %z",localtime($uxt));
+      _tzset($oldtz);
    }
    elsif ($lang eq "SOAP"){
       $d=sprintf("%04d-%02d-%02dT%02d:%02d:%02dZ",$Y,$M,$D,$h,$m,$s);

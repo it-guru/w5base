@@ -150,15 +150,24 @@ sub RSS
          }
          my $title=$item."\n (Prio".$WfRec->{eventstatclass}.")";
          my $desc=$WfRec->{eventshortsummary};
-         my $link="https://darwin.telekom.de/darwin/auth/base/workflow/ById/".
-                  $WfRec->{id};
+         my $baseurl=$self->Config->Param("EventJobBaseUrl");
+         if ($ENV{'SERVER_NAME'} ne ""){
+            my ($proto)=$ENV{SCRIPT_URI}=~m/^(\S+):.*/;
+            $baseurl=$proto."://".
+                     $ENV{'SERVER_NAME'}.
+                     "/".
+                     $self->Config->getCurrentConfigName();
+         }
+         $desc=extractLanguageBlock($desc,$lang);
+         my $link=$baseurl."/auth/base/workflow/ById/".$WfRec->{id};
          printf("<item>");
          printf("<title>%s</title>",XmlQuote($title));
          printf("<link>%s</link>",XmlQuote($link));
          printf("<subject>%s</subject>",XmlQuote("This is the subject"));
          printf("<description>%s</description>",XmlQuote($desc));
          printf("<pubDate>%s</pubDate>",
-             scalar($self->ExpandTimeExpression($WfRec->{eventstart},"en")));
+           scalar($self->ExpandTimeExpression($WfRec->{eventstart},
+                                              "RFC822","UTC","CET")));
          printf("</item>");
       }
    }

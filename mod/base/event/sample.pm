@@ -146,12 +146,27 @@ sub TestMail2
 sub SampleEvent1
 {
    my $self=shift;
+   my $p=$self;
 
    msg(DEBUG,"Start(Event1): ... sleep no");
-#   my $user=getModuleObject($self->Config,"base::user");
-#   $user->SetFilter({fullname=>'vog* wiescho*'});
-#   my @l=$user->getHashList(qw(fullname owner accounts));
-#   msg(INFO,"fifi l=%s\n",Dumper(\@l));
+   my $now=NowStamp("en");
+   msg(DEBUG,"DATE now=".$now);
+   msg(DEBUG,"DATE ExpandTimeExpression (default)=".
+             $p->ExpandTimeExpression($now));
+   msg(DEBUG,"DATE ExpandTimeExpression (CET)=".
+             $p->ExpandTimeExpression($now,undef,"GMT","CET"));
+   msg(DEBUG,"DATE ExpandTimeExpression (CET,de)=".
+             $p->ExpandTimeExpression($now,"de","GMT","CET"));
+   msg(DEBUG,"DATE ExpandTimeExpression (CET,RFC822)=".
+             $p->ExpandTimeExpression($now,"RFC822","GMT","CET"));
+   msg(DEBUG,"DATE ExpandTimeExpression (UTC,RFC822)=".
+             $p->ExpandTimeExpression($now,"RFC822","GMT","UTC"));
+   msg(DEBUG,"DATE ExpandTimeExpression (CET,stamp)=".
+             $p->ExpandTimeExpression($now,"stamp","GMT","CET"));
+
+
+
+
    msg(DEBUG,"End  (Event1):");
    return({msg=>'heinz',exitcode=>0});
 }

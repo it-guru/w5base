@@ -4,6 +4,7 @@ use Encode;
 @ISA = qw(Exporter);
 @EXPORT = qw(
              &trim &rtrim &ltrim &limitlen &in_array 
+             &extractLanguageBlock
              &msg &ERROR &WARN &DEBUG &INFO &OK &UTF8toLatin1
              );
 
@@ -77,6 +78,32 @@ sub trim
      return(${$_[0]});
   }
   return($_[0]);
+}
+
+sub extractLanguageBlock
+{
+   my $d=shift;
+   my $lang=shift;
+
+   my %sets=();
+   my $curlang="";
+   foreach my $blk (split(/(\[[a-z]{1,3}:\]\s*\n)/,$d)){
+      $blk=trim($blk);
+      if (my ($newlang)=$blk=~m/^\[([a-z]+):\]$/){
+         $curlang=$newlang;
+      } 
+      else{
+         $sets{$curlang}.="\n" if ($sets{$curlang} ne "");
+         $sets{$curlang}.=trim($blk);
+      }
+   }
+   if (exists($sets{$lang})){
+      return($sets{$lang});
+   }
+   elsif (exists($sets{''})){
+      return($sets{''});
+   }
+   return($sets{'en'});
 }
 
 sub limitlen
