@@ -112,8 +112,7 @@ foreach my $apid (@apid){
       $stat{$apid}->{duration}=$t0-$d[2];
       close(F);
       if ($opt_autokill){
-         if ($stat{$apid}->{duration}>1){
-         #if ($stat{$apid}->{duration}>3600){
+         if ($stat{$apid}->{duration}>$killtimeout){
             my $user=getModuleObject($curconfig,"base::user");
             my $msg=$user->T($stat{$apid}->{mod},$stat{$apid}->{mod});
             printf STDERR ("WARN: found long (%dsec) running request at ".
