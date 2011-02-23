@@ -63,7 +63,7 @@ sub qcheckRecord
       my @msg;
       my $appl=getModuleObject($self->getParent->Config,"itil::appl");
       $appl->SetFilter({id=>\$rec->{applid}});
-      my ($arec,$msg)=$appl->getOnlyFirst(qw(cistatusid));
+      my ($arec,$msg)=$appl->getOnlyFirst(qw(cistatusid id));
       if (!defined($arec)){
          push(@msg,"invalid application reference");
       }
@@ -72,6 +72,48 @@ sub qcheckRecord
             push(@msg,"referenced application application is not active");
          }
       }
+      if (defined($arec)){ # further checks are only needed, if appl found
+         if ($rec->{runonclusts}){   # now do cluster checks
+            if ($rec->{itclusts} eq ""){
+               push(@msg,"no cluster service specified");
+            }
+            else{
+               my $c=getModuleObject($self->getParent->Config,
+                                     "itil::lnkitclustsvcappl");
+               my $clustsid=$rec->{itclustsid};
+               my $applid=$arec->{id};
+               $c->SetFilter({itclustsvcid=>\$clustsid,applid=>\$applid});
+               my ($chkrec,$msg)=$c->getOnlyFirst(qw(id));
+
+               if (!defined($chkrec)){
+                  push(@msg,"application does not match application ".
+                            "in cluster service");
+               }
+            }
+         }
+         else{                       # now do system checks
+            if ($rec->{system} eq ""){
+               push(@msg,"no system specified");
+            }
+            else{
+               my $c=getModuleObject($self->getParent->Config,
+                                     "itil::lnkapplsystem");
+               my $systemid=$rec->{systemid};
+               my $applid=$arec->{id};
+               $c->SetFilter({systemid=>\$systemid,applid=>\$applid});
+               my ($chkrec,$msg)=$c->getOnlyFirst(qw(id));
+
+               if (!defined($chkrec)){
+                  push(@msg,"application does not match application ".
+                            "in system");
+               }
+            }
+         }
+      }
+
+
+
+
       if ($#msg!=-1){
          return(3,{qmsg=>[@msg],dataissue=>[@msg]});
       }

@@ -1,3 +1,7 @@
 'itil::qrule::SWInstanceRefCheck'=>{de=>'Software-Instanz Prüfung der zugeordneten Elemente',en=>'Software-Instance check relation elements'},
 'referenced application application is not active'=>{de=>'Die zugeordnete Anwendung ist nicht aktiv'},
 'invalid application reference'=>{de=>'Es wurde keine oder eine ungültige Anwendung zugeordnet'},
+'no system specified'=>{de=>'kein logisches System angegeben'},
+'no cluster service specified'=>{de=>'kein Cluster Service angegeben'},
+'application does not match application in cluster service'=>{de=>'Anwendung entspricht nicht der Anwendung im zugeordneten Cluster-Service'},
+'application does not match application in system'=>{de=>'Anwendung entspricht nicht der Anwendung im zugeordneten System'},
