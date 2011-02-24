@@ -212,7 +212,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'prio',
-                value         =>['', qw(1 2 3)],   # 1-3 are need to answer
+                value         =>['', qw(1 2 3 4 5 6 7 8 9 10)],   # 1-10 are need to answer
                 transprefix   =>'QPRIO.',
                 htmleditwidth =>'130px',
                 label         =>'Question prio',
