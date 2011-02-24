@@ -116,3 +116,5 @@
    de=>'Datum der letzten "Geheimschutz" Unterweisung'},
 'date of "Secret Protection" introdution EDT'=>{
    de=>'Datum der letzten "Geheimschutz" Unterweisung EDT'},
+
+'limit query duration'=>{de=>'Begrenzung der Abfragedauer'},

@@ -203,6 +203,14 @@ sub new
                 group         =>'userro',
                 dataobjattr   =>'contact.secstate'),
 
+      new kernel::Field::Number(
+                name          =>'killtimeout',
+                label         =>'limit query duration',
+                precision     =>0,
+                unit          =>'sec',
+                group         =>'userro',
+                dataobjattr   =>'contact.killtimeout'),
+
       new kernel::Field::Date(
                 name          =>'gtcack',
                 label         =>'GTC acknowledge date',
@@ -1038,6 +1046,14 @@ sub Validate
       }
    }
 
+   if (effVal($oldrec,$newrec,"killtimeout")<600){
+      $newrec->{killtimeout}=600;
+   }
+   if (effVal($oldrec,$newrec,"killtimeout")>10800){
+      $newrec->{killtimeout}=10800;
+   }
+ 
+
 
    return(1);
 }
@@ -1150,8 +1166,6 @@ sub isViewValid
          }
       }
    }
- 
-
    return(@gl);
 }
 
