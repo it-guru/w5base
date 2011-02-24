@@ -73,9 +73,9 @@ sub NotifyPlasma
    #
    my $affectedapplication=$WfRec->{affectedapplication};
    $affectedapplication=[$affectedapplication] if (ref($affectedapplication) ne "ARRAY");
-   if (!grep(/^SDM_TEST$/,@$affectedapplication)){
+   if (!grep(/^(SDM_TEST|FAKT_WIRK|SPRING_WIRK)$/,@$affectedapplication)){
       return({exitcode=>0,
-              msg=>'no trigger needed - no SDM_TEST'});
+              msg=>'no trigger needed - no SDM_TEST|FAKT_WIRK|SPRING_WIRK'});
    }
    #######################################################################
 

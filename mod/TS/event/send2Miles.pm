@@ -339,7 +339,7 @@ sub setEntries
                     Content=>[%{$self->{CurrentForm}}]);
    my $response=$self->{ua}->request($request);
    if ($response->is_redirect){
-      print "Result:\n".Dumper($response);
+   #   print "Result:\n".Dumper($response);
 
       my $response=$self->{ua}->request(GET($response->header('Location')));
    }

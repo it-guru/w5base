@@ -15,7 +15,7 @@ $0="W5Event ".join(" ",@ARGV);
 exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'debug'=>\$opt_v,
                         'autokill'=>\$opt_autokill,
-                        'killtimeout'=>\$killtimeout,
+                        'killtimeout=s'=>\$killtimeout,
                         'help'=>\$opt_h,
                         'config=s'=>\$opt_c));
 
@@ -165,7 +165,6 @@ foreach my $apid (@apid){
                               apid=>$apid
                            }
                         });
-                  
                   if ($exitcode==0){
                      my $subject=sprintf($act->T(
                         'Kill of query request on module "%s" (PID=%s)',
