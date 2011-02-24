@@ -112,26 +112,28 @@ foreach my $apid (@apid){
       $stat{$apid}->{duration}=$t0-$d[2];
       close(F);
       if ($opt_autokill){
+         my $consolemsg="";
          if ($stat{$apid}->{duration}>$killtimeout){
             my $user=getModuleObject($curconfig,"base::user");
-            my $msg=$user->T($stat{$apid}->{mod},$stat{$apid}->{mod});
-            printf STDERR ("WARN: found long (%dsec) running request at ".
-                           "PID '%s'\n".
-                           "      by user '%s' at ModuleObject %s with\n".
-                           "      label '%s'\n",
-                           $stat{$apid}->{duration},
-                           $apid,$stat{$apid}->{user},
-                           $stat{$apid}->{mod},$msg);
+            my $modlong=$user->T($stat{$apid}->{mod},$stat{$apid}->{mod});
+            $consolemsg.=sprintf("WARN: found long (%dsec) running request at ".
+                                 "PID '%s'\n".
+                                 "      by user '%s' at ModuleObject %s with\n".
+                                 "      label '%s'\n",
+                                 $stat{$apid}->{duration},
+                                 $apid,$stat{$apid}->{user},
+                                 $stat{$apid}->{mod},$modlong);
             $user->SetFilter({accounts=>\$stat{$apid}->{user}});
 
-            my ($urec,$msg)=$user->getOnlyFirst(qw(groups userid));
+            my ($urec,$msg)=$user->getOnlyFirst(qw(groups email 
+                                                   userid lastlang));
             my $isok=0;
             if (defined($urec)){
                foreach my $grprec (@{$urec->{groups}}){
                   if ($grprec->{group} eq "admin" &&
                       in_array($grprec->{roles},"RMember")){
                      $isok=1;
-                     printf STDERR ("\n   -> user at PID %s is admin, ".
+                     $consolemsg.=sprintf("\n   -> user at PID %s is admin, ".
                                     "so it seems to be ok!\n",$apid);   
                   }
                }
@@ -144,26 +146,44 @@ foreach my $apid (@apid){
                   my $exitcode=$? >> 8;
                   my $act=getModuleObject($curconfig,"base::workflowaction");
                   $act->Cache->{W5Server}=$W5V2::W5Server;
-                  my %param=(adminbcc=>1);
+                  my %param=(adminbcc=>1,
+                             emailfrom=>'"W5Base Process-Controller" <>');
                   if (defined($urec)){
-                     $param{emailto}=$urec->{userid};
+                     $param{emailto}=$urec->{email};
+                     if ($urec->{lastlang} ne ""){
+                        $ENV{HTTP_FORCE_LANGUAGE}=$urec->{lastlang};
+                     }
                   }
-                  my $d="Your process $apid on W5Base (Module $msg) system ".
-                        "runs over ".$stat{$apid}->{duration}." seconds. ".
-                        "The process controller has been killed the ".
-                        "process by timeout.";
+                  my $sitename=$curconfig->Param("SITENAME");
+                  my $d=$act->getParsedTemplate(
+                        "tmpl/w5top.killmessage",{
+                           static=>{
+                              sitename=>$sitename,
+                              modlong=>$modlong,
+                              killtimeout=>$killtimeout,
+                              duration=>$stat{$apid}->{duration},
+                              apid=>$apid
+                           }
+                        });
                   
                   if ($exitcode==0){
-                     $act->Notify("","killed W5Base process $apid",$d,
-                                  emailfrom=>'"W5Base process supervisor" <>',
-                                  adminbcc=>1);
+                     my $subject=sprintf($act->T(
+                        'Kill of query request on module "%s" (PID=%s)',
+                        'kernel::w5top'), $modlong,$apid);
+                     $act->Notify("INFO",$subject,$d,%param);
                   }
                   else{
+                     printf STDERR ("%s\n",$consolemsg);
                      printf STDERR ("ERROR: exitcode of call was not zero!\n");
+                  }
+                  if (defined($urec)){
+                     delete($ENV{HTTP_FORCE_LANGUAGE});
                   }
                }
             }
-            printf STDERR ("\n");
+            else{
+               printf STDERR ("%s\n",$consolemsg);
+            }
          }
       }
    }
