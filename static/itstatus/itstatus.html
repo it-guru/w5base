@@ -26,7 +26,7 @@
           </span>
       </td>
       <td align=center class="toplabel">
-        SDM DTAG current top management information (Prio 1/2 events)
+        SDM DTAG current top management information<br>(Prio 1/2 events of prio 1 config items)
       </td>
       <td width=10% valign=center align=center>
           <span style="cursor:pointer" onclick="reloadStatus();">
@@ -39,7 +39,7 @@
     
    
      <tr>
-      <td class="label" width=10%>Customer</td>
+      <td class="label" width=15% align=center>Customer</td>
       <td class="label" width=10%>top item</td>
       <td class="label">affected item</td>
       <td class="label" nowrap width=10%>begin major incident</td>
@@ -47,8 +47,8 @@
     
     
      <tr>
-      <td id="TDG" class="customer" align="center"
-          filter="DTAG.TDG DTAG.T-Home DTAG.TMO" rowspan="3">TDG</td>
+      <td id="TDG" class="customer" align="center" nowrap
+          filter="DTAG.TDG DTAG.TDG.* DTAG.T-Home DTAG.T-Home.* DTAG.TMO DTAG.TMO.*" rowspan="3"><b>TDG</b><br>TMO+T-Home</td>
       <td id="TDG_app" height=38 valign="top">application</td>
       <td id="TDG_appitem" align="left" valign="top">?</td>
       <td id="TDG_appdate" align="left" nowrap valign="top">?</td>
@@ -69,7 +69,7 @@
     
      <tr>
       <td id="GHS" class="customer" align="center"
-          filter="DTAG.GHS" rowspan="2">GHS</td>
+          filter="DTAG.GHS DTAG.GHS.*" rowspan="2"><b>GHS</b></td>
       <td id="GHS_app" height=38 valign="top">application</td>
       <td id="GHS_appitem" align="left" valign="top">?</td>
       <td id="GHS_appdate" align="left" nowrap valign="top">?</td>
@@ -109,7 +109,7 @@
 
      <tr>
       <td id="TSG" class="customer" align="center"
-          filter="DTAG.TSG" rowspan="2">TSG</td>
+          filter="DTAG.TSG DTAG.TSG.*" rowspan="2"><b>TSG</b></td>
       <td id="TSG_app" height=38 valign="top">application</td>
       <td id="TSG_appitem" align="left" valign="top">?</td>
       <td id="TSG_appdate" align="left" nowrap valign="top">?</td>
@@ -121,13 +121,25 @@
       <td id="TSG_offdate" align="left" nowrap valign="top">?</td>
      </tr>
 
+     <tr>
+      <td id="DTAG" class="customer" align="center"
+          filter="DTAG" rowspan="2"><b>DTAG</b><br>konzernweit</td>
+      <td id="DTAG_app" height=38 valign="top">application</td>
+      <td id="DTAG_appitem" align="left" valign="top">?</td>
+      <td id="DTAG_appdate" align="left" nowrap valign="top">?</td>
+     </tr>
+     <tr>
+      <td id="DTAG_off" height=38 valign="top">office&amp;comm</td>
+      <td id="DTAG_offitem" align="left" valign="top">?</td>
+      <td id="DTAG_offdate" align="left" nowrap valign="top">?</td>
+     </tr>
+
 <!--   
      <tr>
       <td id="TSG_loc" height=38 valign="top">location</td>
       <td id="TSG_locitem" align="left" valign="top">?</td>
       <td id="TSG_locdate" align="left" nowrap valign="top">?</td>
      </tr>
--->
 
 
      <tr>
@@ -143,6 +155,7 @@
       <td id="global_locitem" align="left" valign="top">?</td>
       <td id="global_locdate" align="left" nowrap valign="top">?</td>
      </tr>
+-->
 
     </table>
   </div>
@@ -212,8 +225,15 @@ function anaylseData(data){
          for(var oi in o){
             for(var filteri in o[oi].filter){
                var f=o[oi].filter[filteri];
-               if (f==cus[cusi] ||
-                   cus[cusi].substr(0,f.length+1)==(f+".")){
+//console.log(f);
+               var ok=false;
+               if (f==cus[cusi]){
+                  ok=true;
+               }
+               if (cus[cusi].substr(0,f.length+1)==(f+".")){
+                  ok=true;
+               }
+               if (ok){
                   storeEvent(o[oi],rec);
                }
             }
