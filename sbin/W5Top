@@ -141,8 +141,14 @@ foreach my $apid (@apid){
             if (!$isok){
                my $cmd="sudo -u '$stat{$apid}->{sysuser}' kill $apid";
                printf STDERR ("\n   -> initiate \"%s\"\n",$cmd);
-               system($cmd);
-               if (!($? == -1)){
+               if ($stat{$apid}->{sysuser} eq ""){
+                  $consolemsg.=sprintf("   -> ERROR no sysuser for PID %s!\n",
+                                       $apid);
+               }
+               else{
+                  system($cmd);
+               }
+               if ((!($? == -1)) && $stat{$apid}->{sysuser} ne ""){
                   my $exitcode=$? >> 8;
                   my $act=getModuleObject($curconfig,"base::workflowaction");
                   $act->Cache->{W5Server}=$W5V2::W5Server;

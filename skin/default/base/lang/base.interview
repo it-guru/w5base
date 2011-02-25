@@ -9,6 +9,7 @@
 'Interview categorie'=>{de=>'Interview Kategorie'},
 'Query block'=>{de=>'Abfrageblock'},
 'Question prio'=>{de=>'Priorität der Frage'},
+'weighting'=>{de=>'Gewichtung'},
 'Question Typ'=>{de=>'Frageart'},
 'QuestionID'=>{de=>'FrageID'},
 'QPRIO.'=>{de=>'undefiniert',en=>'unknown'},

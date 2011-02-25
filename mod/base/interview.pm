@@ -218,6 +218,13 @@ sub new
                 label         =>'Question prio',
                 dataobjattr   =>'interview.prio'),
 
+      new kernel::Field::Number(
+                name          =>'weighting',
+                readonly      =>1,
+                htmldetail    =>0,
+                label         =>'weighting',
+                dataobjattr   =>'11-interview.prio'),
+
       new kernel::Field::Interface(
                 name          =>'rawprio',
                 label         =>'raw Question prio',
