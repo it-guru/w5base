@@ -129,7 +129,13 @@ sub doQualityCheck
             }
             $total++;
             $c++;
+            my $curidname=$idfieldobj->Name();
             my $curid=$idfieldobj->RawValue($rec);
+            if ($self->LastMsg()>0){
+               msg(ERROR,"error messages while check of ".
+                         $curidname."='".$curid."' in ".
+                         $dataobj->Self());
+            }
             msg(DEBUG,"check record end");
             if ( $curid eq $firstid){ 
                return({exitcode=>0,
