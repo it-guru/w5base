@@ -24,6 +24,10 @@ table.mainlights{
    border-collapse:collapse;
 
 }
+span.customer{
+   font-size:18px;
+   font-weight:bold;
+}
 td{
    font-size:12px;
    padding:2px;
