@@ -26,11 +26,17 @@ table.mainlights{
 }
 td{
    font-size:12px;
-   padding:4px;
+   padding:2px;
 }
 
 td.label{
    font-weight:bold;
+   padding-left:5px;
+   padding-right:5px;
+}
+ 
+td.item{
+   vertical-align:middle;
    padding-left:5px;
    padding-right:5px;
 }
@@ -41,14 +47,6 @@ td.toplabel{
 }
 
 
-ul.item{
-   padding:0px;
-   padding-left:14px;
-   margin:0px;
-}
-ul.item li{
-}
- 
  
 ul.date{
    padding:0px;

@@ -42,43 +42,41 @@
       <td class="label" width=15% align=center>Customer</td>
       <td class="label" width=10%>top item</td>
       <td class="label">affected item</td>
-      <td class="label" nowrap width=10%>begin major incident</td>
+      <td class="label" nowrap width=23% align=center>begin major incident (CET)</td>
      </tr>
     
     
      <tr>
-      <td id="TDG" class="customer" align="center" nowrap
-          filter="DTAG.TDG DTAG.TDG.* DTAG.T-Home DTAG.T-Home.* DTAG.TMO DTAG.TMO.*" rowspan="3"><b>TDG</b><br>TMO+T-Home</td>
-      <td id="TDG_app" height=38 valign="top">application</td>
-      <td id="TDG_appitem" align="left" valign="top">?</td>
-      <td id="TDG_appdate" align="left" nowrap valign="top">?</td>
+      <td id="TDG" height=80 class="customer" align="center" nowrap
+          filter="DTAG.TDG DTAG.TDG.* DTAG.T-Home DTAG.T-Home.* DTAG.TMO DTAG.TMO.*" rowspan="2"><b>TDG</b><br>TMO+T-Home</td>
+      <td class="item" id="TDG_app" height=40 valign="top">application</td>
+      <td id="TDG_appitem" align="left" colspan=2 valign="top">?</td>
      </tr>
-   
+<!-- 
      <tr>
       <td id="TDG_off" height=38 valign="top">office&amp;comm</td>
-      <td id="TDG_offitem" align="left" valign="top">?</td>
-      <td id="TDG_offdate" align="left" nowrap valign="top">?</td>
+      <td id="TDG_offitem" align="left" colspan=2 valign="top">?</td>
+     </tr>
+-->
+     <tr>
+      <td class="item" id="TDG_loc" height=40 valign="top">location</td>
+      <td id="TDG_locitem" align="left" colspan=2 valign="top">?</td>
      </tr>
 
-     <tr>
-      <td id="TDG_loc" height=38 valign="top">location</td>
-      <td id="TDG_locitem" align="left" valign="top">?</td>
-      <td id="TDG_locdate" align="left" nowrap valign="top">?</td>
-     </tr>
     
     
      <tr>
-      <td id="GHS" class="customer" align="center"
-          filter="DTAG.GHS DTAG.GHS.*" rowspan="2"><b>GHS</b></td>
-      <td id="GHS_app" height=38 valign="top">application</td>
-      <td id="GHS_appitem" align="left" valign="top">?</td>
-      <td id="GHS_appdate" align="left" nowrap valign="top">?</td>
+      <td id="GHS" height=80 class="customer" align="center"
+          filter="DTAG.GHS DTAG.GHS.*" rowspan="1"><b>GHS</b></td>
+      <td class="item" id="GHS_app" height=38 valign="top">application</td>
+      <td id="GHS_appitem" align="left" colspan=2 valign="top">?</td>
      </tr>
+<!--
      <tr>
       <td id="GHS_off" height=38 valign="top">office&amp;comm</td>
-      <td id="GHS_offitem" align="left" valign="top">?</td>
-      <td id="GHS_offdate" align="left" nowrap valign="top">?</td>
+      <td id="GHS_offitem" align="left" colspan=2 valign="top">?</td>
      </tr>
+-->
 
 <!--
    
@@ -108,30 +106,23 @@
 
 
      <tr>
-      <td id="TSG" class="customer" align="center"
-          filter="DTAG.TSG DTAG.TSG.*" rowspan="2"><b>TSG</b></td>
-      <td id="TSG_app" height=38 valign="top">application</td>
-      <td id="TSG_appitem" align="left" valign="top">?</td>
-      <td id="TSG_appdate" align="left" nowrap valign="top">?</td>
+      <td id="TSG" height=80 class="customer" align="center"
+          filter="DTAG.TSG DTAG.TSG.*" rowspan="1"><b>TSG</b></td>
+      <td class="item" id="TSG_app" height=38 valign="top">application</td>
+      <td id="TSG_appitem" align="left" colspan=2 valign="top">?</td>
      </tr>
-
+<!--
      <tr>
       <td id="TSG_off" height=38 valign="top">office&amp;comm</td>
-      <td id="TSG_offitem" align="left" valign="top">?</td>
-      <td id="TSG_offdate" align="left" nowrap valign="top">?</td>
+      <td id="TSG_offitem" align="left" colspan=2 valign="top">?</td>
      </tr>
+-->
 
      <tr>
-      <td id="DTAG" class="customer" align="center"
-          filter="DTAG" rowspan="2"><b>DTAG</b><br>konzernweit</td>
-      <td id="DTAG_app" height=38 valign="top">application</td>
-      <td id="DTAG_appitem" align="left" valign="top">?</td>
-      <td id="DTAG_appdate" align="left" nowrap valign="top">?</td>
-     </tr>
-     <tr>
-      <td id="DTAG_off" height=38 valign="top">office&amp;comm</td>
-      <td id="DTAG_offitem" align="left" valign="top">?</td>
-      <td id="DTAG_offdate" align="left" nowrap valign="top">?</td>
+      <td id="DTAG" height=80 class="customer" align="center"
+          filter="DTAG" rowspan="1"><b>DTAG</b><br>konzernweit</td>
+      <td class="item" id="DTAG_off" height=38 valign="top">office&amp;comm</td>
+      <td id="DTAG_offitem" align="left" colspan=2 valign="top">?</td>
      </tr>
 
 <!--   
@@ -273,11 +264,23 @@ function displayStatus(data){
          var detail=new Array();
          for(var prio in eventset){
             for(var i in eventset[prio]){
-               detail.push("<li>"+eventset[prio][i].itemname+"</li>"); 
+               detail.push(
+                  "<tr><td><b>"+eventset[prio][i].itemname+"</b></td>"+
+                  "<td width=140>"+
+                  eventset[prio][i].eventstart.format("dd.mm.yyyy HH:MM")+
+                  "</td>"+
+                  "</tr>"+
+                  "<tr><td><i>"+
+                    eventset[prio][i].eneventshortsummary+
+                  "</i></td>"+
+                  "<td>&nbsp;</td>"+
+                  "</tr>"); 
             }
          }
          var str=detail.join("");
-         $("#"+cusi+"_"+setname+"item").html("<ul class='item'>"+str+"</ul>");
+         $("#"+cusi+"_"+setname+"item").html(
+                "<table border=0 cellspacing=0 cellpadding=0 width=100%>"+
+                str+"</table>");
 
          var detail=new Array();
          for(var prio in eventset){
@@ -308,7 +311,8 @@ function reloadStatus(){
    $("#TSG_locdate").addClass("locked");
    $("#loading").show();
    $.ajax({
-      url: 'http://darwin.telekom.de/darwin/public/itil/itstatus/asJSONP',
+   //   url: 'http://darwin.telekom.de/darwin/public/itil/itstatus/asJSONP',
+      url: '../../public/itil/itstatus/asJSONP',
       dataType: 'jsonp',
       success: displayStatus
    });

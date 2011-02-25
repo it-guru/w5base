@@ -87,6 +87,9 @@ sub extractLanguageBlock
 
    my %sets=();
    my $curlang="";
+   if (ref($d) eq "ARRAY"){
+      $d=join("\n",@$d);
+   }
    foreach my $blk (split(/(\[[a-z]{1,3}:\]\s*\n)/,$d)){
       $blk=trim($blk);
       if (my ($newlang)=$blk=~m/^\[([a-z]+):\]$/){

@@ -196,6 +196,24 @@ sub getFilteredWfModuleObject
                    my $self=shift;
                    my $current=shift;
                    return($current->{headref}->{eventmode});
+                }),
+      new kernel::Field::Text(
+                name          =>'eneventshortsummary',
+                label         =>'Raw eventmode as API key',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return(quoteHtml(extractLanguageBlock(
+                          $current->{headref}->{eventshortsummary},"en")));
+                }),
+      new kernel::Field::Text(
+                name          =>'deeventshortsummary',
+                label         =>'Raw eventmode as API key',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return(quoteHtml(extractLanguageBlock(
+                          $current->{headref}->{eventshortsummary},"de")));
                 })
    );
 
@@ -223,6 +241,8 @@ sub Display
                                                  mandator
 
                                                  raweventmode
+                                                 deeventshortsummary
+                                                 eneventshortsummary
                                                  wffields.eventmode
                                                  wffields.affecteditemprio
                                                  wffields.eventstatclass
