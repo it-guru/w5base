@@ -87,7 +87,7 @@ sub RSS
    printf("<rss version=\"2.0\">\n");
    printf("<channel>\n");
    if ($customer ne ""){
-      printf("<title>%s: %s</title>",$self->T("IT Event-Notification"));
+      printf("<title>%s: %s</title>",$self->T("IT Status"));
       printf("<link>%s</link>","https://darwin.telekom.de");
       printf("<language>%s</language>",$ENV{HTTP_ACCEPT_LANGUAGE});
       printf("<description>%s</description>",
@@ -148,6 +148,7 @@ sub RSS
                next;
             }
          }
+         $item=~s/_/ /g;
          my $title=$item."\n (Prio".$WfRec->{eventstatclass}.")";
          my $desc=$WfRec->{eventshortsummary};
          my $baseurl=$self->Config->Param("EventJobBaseUrl");
@@ -162,7 +163,7 @@ sub RSS
          my $link=$baseurl."/auth/base/workflow/ById/".$WfRec->{id};
          printf("<item>");
          printf("<title>%s</title>",XmlQuote($title));
-         printf("<link>%s</link>",XmlQuote($link));
+         #printf("<link>%s</link>",XmlQuote($link));
          printf("<subject>%s</subject>",XmlQuote("This is the subject"));
          printf("<description>%s</description>",XmlQuote($desc));
          printf("<pubDate>%s</pubDate>",

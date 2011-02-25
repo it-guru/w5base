@@ -301,7 +301,7 @@ sub getDynamicFields
                 name          =>'eventshortsummary',
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'eventnotify',
-                htmlheight    =>50,
+                htmlheight    =>80,
                 label         =>'short summary',
                 container     =>'headref'),
 
