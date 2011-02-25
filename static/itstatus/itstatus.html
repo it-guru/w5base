@@ -49,7 +49,7 @@
      <tr>
       <td id="TDG" height=80 class="customer" align="center" nowrap
           filter="DTAG.TDG DTAG.TDG.* DTAG.T-Home DTAG.T-Home.* DTAG.TMO DTAG.TMO.*" rowspan="2">
-         <span class="customer">TDG</span><br>TMO+T-Home</td>
+         <span class="custlabel">TDG</span><br>TMO+T-Home</td>
       <td class="item" id="TDG_app" height=40 valign="top">application</td>
       <td id="TDG_appitem" align="left" colspan=2 valign="top">?</td>
      </tr>
@@ -69,7 +69,7 @@
      <tr>
       <td id="GHS" height=80 class="customer" align="center"
           filter="DTAG.GHS DTAG.GHS.*" rowspan="1">
-        <span class="customer">GHS</span></td>
+        <span class="custlabel">GHS</span></td>
       <td class="item" id="GHS_app" height=38 valign="top">application</td>
       <td id="GHS_appitem" align="left" colspan=2 valign="top">?</td>
      </tr>
@@ -107,10 +107,11 @@
 -->
 
 
+
      <tr>
       <td id="TSG" height=80 class="customer" align="center"
           filter="DTAG.TSG DTAG.TSG.*" rowspan="1">
-         <span class="customer">TSG</span></td>
+         <span class="custlabel">TSG</span></td>
       <td class="item" id="TSG_app" height=38 valign="top">application</td>
       <td id="TSG_appitem" align="left" colspan=2 valign="top">?</td>
      </tr>
@@ -120,12 +121,20 @@
       <td id="TSG_offitem" align="left" colspan=2 valign="top">?</td>
      </tr>
 -->
+     <tr>
+      <td id="TSI" height=80 class="customer" align="center"
+          filter="DTAG.TSI DTAG.TSI.*" rowspan="1">
+         <span class="custlabel">TSI</span></td>
+      <td class="item" id="TSI_app" height=38 valign="top">application</td>
+      <td id="TSI_appitem" align="left" colspan=2 valign="top">?</td>
+     </tr>
+
 
      <tr>
       <td id="DTAG" height=80 class="customer" align="center"
           filter="DTAG" rowspan="1">
-         <span class="customer">DTAG</span><br>konzernweit</td>
-      <td class="item" id="DTAG_off" height=38 valign="top">office&amp;comm</td>
+         <span class="custlabel">DTAG</span><br>konzernweit</td>
+      <td class="item" id="DTAG_off" height=38 valign="top" align=center nowrap>office comm<br>&amp;<br>central serv.</td>
       <td id="DTAG_offitem" align="left" colspan=2 valign="top">?</td>
      </tr>
 
@@ -225,8 +234,11 @@ function anaylseData(data){
                if (f==cus[cusi]){
                   ok=true;
                }
-               if (cus[cusi].substr(0,f.length+1)==(f+".")){
-                  ok=true;
+               if (f.match(/\.\*$/)){
+                  var chkf=f.replace(/\.\*$/,".");
+                  if (cus[cusi].substr(0,chkf.length)==chkf){
+                     ok=true;
+                  }
                }
                if (ok){
                   storeEvent(o[oi],rec);
