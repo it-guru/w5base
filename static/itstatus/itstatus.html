@@ -180,28 +180,30 @@
 
 function storeEvent(currento,rec){
    if (rec.eventstatclass<3){  // only prio 1 and prio 2 events
-      if (rec.eventstatclass==1){
-         if (currento.state<30) currento.state=30;
-      }
-      else if (rec.eventstatclass==2){
-         if (currento.state<20) currento.state=20;
-      }
-      else{
-         if (currento.state<10) currento.state=10;
-      }
-      if (rec.raweventmode=="EVk.appl"){
-         if (rec.mandator=="DSS" || rec.mandator=="TSS"){
-            rec.itemname=rec.affectedapplication;
-            currento.off[rec.eventstatclass].push(rec);
+      if (rec.affecteditemprio==1){
+         if (rec.eventstatclass==1){
+            if (currento.state<30) currento.state=30;
+         }
+         else if (rec.eventstatclass==2){
+            if (currento.state<20) currento.state=20;
          }
          else{
-            rec.itemname=rec.affectedapplication;
-            currento.app[rec.eventstatclass].push(rec);
+            if (currento.state<10) currento.state=10;
          }
-      }
-      if (rec.raweventmode=="EVk.infraloc"){
-         rec.itemname=rec.affectedlocation;
-         currento.loc[rec.eventstatclass].push(rec);
+         if (rec.raweventmode=="EVk.appl"){
+            if (rec.mandator=="DSS" || rec.mandator=="TSS"){
+               rec.itemname=rec.affectedapplication;
+               currento.off[rec.eventstatclass].push(rec);
+            }
+            else{
+               rec.itemname=rec.affectedapplication;
+               currento.app[rec.eventstatclass].push(rec);
+            }
+         }
+         if (rec.raweventmode=="EVk.infraloc"){
+            rec.itemname=rec.affectedlocation;
+            currento.loc[rec.eventstatclass].push(rec);
+         }
       }
    }
 }
