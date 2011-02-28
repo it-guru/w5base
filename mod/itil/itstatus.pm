@@ -109,7 +109,7 @@ sub RSS
       if ($#mandator==-1 || ($mandator[0] eq "" && $#mandator==0)){
          $mandator[0]="*";
       }
-
+      my $c=0;
       foreach my $WfRec ($wf->getHashList(qw(ALL))){
          my $item="???";
          if ($WfRec->{eventmode} eq "EVk.appl"){
@@ -163,6 +163,7 @@ sub RSS
          $desc=extractLanguageBlock($desc,$lang);
          my $link=$baseurl."/auth/base/workflow/ById/".$WfRec->{id};
          printf("<item>");
+         $c++;
          printf("<title>%s</title>",XmlQuote($title));
          #printf("<link>%s</link>",XmlQuote($link));
          printf("<subject>%s</subject>",XmlQuote("This is the subject"));
@@ -170,6 +171,12 @@ sub RSS
          printf("<pubDate>%s</pubDate>",
            scalar($self->ExpandTimeExpression($WfRec->{eventstart},
                                               "RFC822","UTC","CET")));
+         printf("</item>");
+      }
+      if ($c==0){
+         printf("<item>");
+         printf("<description>%s</description>",
+                XmlQuote($self->T("There are no current messages")));
          printf("</item>");
       }
    }
