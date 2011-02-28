@@ -135,6 +135,7 @@ sub doQualityCheck
                msg(ERROR,"error messages while check of ".
                          $curidname."='".$curid."' in ".
                          $dataobj->Self());
+               $self->LastMsg("");
             }
             msg(DEBUG,"check record end");
             if ( $curid eq $firstid){ 
