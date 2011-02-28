@@ -149,7 +149,8 @@ sub RSS
             }
          }
          $item=~s/_/ /g;
-         my $title=$item."\n (Prio".$WfRec->{eventstatclass}.")";
+         my $title=$item;
+        # my $title=$item."\n (Prio".$WfRec->{eventstatclass}.")";
          my $desc=$WfRec->{eventshortsummary};
          my $baseurl=$self->Config->Param("EventJobBaseUrl");
          if ($ENV{'SERVER_NAME'} ne ""){
