@@ -140,12 +140,12 @@ foreach my $apid (@apid){
             }
             if (!$isok){
                my $cmd="sudo -u '$stat{$apid}->{sysuser}' kill $apid";
-               printf STDERR ("\n   -> initiate \"%s\"\n",$cmd);
                if ($stat{$apid}->{sysuser} eq ""){
                   $consolemsg.=sprintf("   -> ERROR no sysuser for PID %s!\n",
                                        $apid);
                }
                else{
+                  $consolemsg.=sprintf("\n   -> initiate \"%s\"\n",$cmd);
                   system($cmd);
                }
                if ((!($? == -1)) && $stat{$apid}->{sysuser} ne ""){
