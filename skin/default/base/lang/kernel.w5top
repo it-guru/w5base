@@ -1,1 +1,2 @@
-'Kill of query request on module "%s" (PID=%s)'=>{de=>'Abbruch der Abfrage im Modul "%s" (PID=%s)'}
+'Kill of query request on module "%s" (PID=%s)'=>{de=>'Abbruch der Abfrage im Modul "%s" (PID=%s)'},
+'while paralel multiple requests'=>{de=>'wegen paralleler Mehrfachabfrage'},
