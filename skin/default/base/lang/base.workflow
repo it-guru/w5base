@@ -41,7 +41,7 @@
 'State'=>{de=>'Status'},
 'Workflow state ID'=>{de=>'Workflow Status ID'},
 'Workflow-State'=>{de=>'Workflow Status'},
-'wfstate.0'=>{de=>'0-undefiniert',      en=>'0-undefined'},
+'wfstate.0'=>{de=>'0-angehalten',       en=>'0-hold'},
 'wfstate.1'=>{de=>'1-erzeugt',          en=>'1-created'},
 'wfstate.2'=>{de=>'2-zugewiesen',       en=>'2-assigned'},
 'wfstate.3'=>{de=>'3-akzeptiert',       en=>'3-accepted'},
