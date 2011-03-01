@@ -10,12 +10,11 @@ use kernel::config;
 use kernel::EventController;
 use Getopt::Long;
 use kernel::cgi;
-use vars qw($opt_v $opt_h $opt_autokill $killtimeout $opt_c $configname);
+use vars qw($opt_v $opt_h $opt_autokill $opt_c $configname);
 $0="W5Event ".join(" ",@ARGV);
 exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'debug'=>\$opt_v,
                         'autokill'=>\$opt_autokill,
-                        'killtimeout=s'=>\$killtimeout,
                         'help'=>\$opt_h,
                         'config=s'=>\$opt_c));
 
@@ -40,9 +39,6 @@ if ($ENV{REMOTE_USER} eq ""){
 }
 
 
-if ($killtimeout==0){
-   $killtimeout=1800;
-}
 if ($opt_c eq ""){
    $opt_c="w5base";
 }
@@ -76,7 +72,6 @@ if (!defined($W5V2::W5Server)){
    $W5V2::W5Server=new RPC::Smart::Client(%ClientParam);
    $W5V2::W5Server->Connect();
 
-#printf STDERR ("fifi $ClientParam{PeerAddr} $ClientParam{PeerPort}\n");
 }
 $W5V2::OperationContext="W5Server";
 $W5V2::Query=new kernel::cgi({});
@@ -87,6 +82,7 @@ my $pid=`ps -eo pid,comm | grep apache | awk '{print \$1}'`;
 my @apid=split(/[\s\n]/,$pid);
 
 my %stat;
+my %userpcount;
 my $statedir=$curconfig->Param("LogState");
 foreach my $apid (@apid){
    #print("check pid $apid\n");
@@ -107,60 +103,93 @@ foreach my $apid (@apid){
       else{
          $stat{$apid}->{user}="anonymous";
       }
+      $userpcount{$stat{$apid}->{user}}++;
       $stat{$apid}->{mod}=$d[1];
       $stat{$apid}->{start}=$d[2];
       $stat{$apid}->{duration}=$t0-$d[2];
       close(F);
-      if ($opt_autokill){
-         my $consolemsg="";
-         if ($stat{$apid}->{duration}>$killtimeout){
-            my $user=getModuleObject($curconfig,"base::user");
-            my $modlong=$user->T($stat{$apid}->{mod},$stat{$apid}->{mod});
-            $consolemsg.=sprintf("WARN: found long (%dsec) running request at ".
-                                 "PID '%s'\n".
-                                 "      by user '%s' at ModuleObject %s with\n".
-                                 "      label '%s'\n",
-                                 $stat{$apid}->{duration},
-                                 $apid,$stat{$apid}->{user},
-                                 $stat{$apid}->{mod},$modlong);
-            $user->SetFilter({accounts=>\$stat{$apid}->{user}});
+   }
+}
 
-            my ($urec,$msg)=$user->getOnlyFirst(qw(groups email 
-                                                   userid lastlang));
-            my $isok=0;
-            if (defined($urec)){
-               foreach my $grprec (@{$urec->{groups}}){
-                  if ($grprec->{group} eq "admin" &&
-                      in_array($grprec->{roles},"RMember")){
-                     $isok=1;
-                     $consolemsg.=sprintf("\n   -> user at PID %s is admin, ".
-                                    "so it seems to be ok!\n",$apid);   
+
+foreach my $apid (@apid){
+   if ($opt_autokill){
+      my $consolemsg="";
+      if ($stat{$apid}->{duration}>600 || $userpcount{$stat{$apid}->{user}}>1){
+         my $user=getModuleObject($curconfig,"base::user");
+         my $modlong=$user->T($stat{$apid}->{mod},$stat{$apid}->{mod});
+         $consolemsg.=sprintf("WARN: found long (%dsec) running request at ".
+                              "PID '%s'\n".
+                              "      by user '%s' at ModuleObject %s with\n".
+                              "      label '%s'\n",
+                              $stat{$apid}->{duration},
+                              $apid,$stat{$apid}->{user},
+                              $stat{$apid}->{mod},$modlong);
+         $user->SetFilter({accounts=>\$stat{$apid}->{user}});
+
+         my ($urec,$msg)=$user->getOnlyFirst(qw(email killtimeout
+                                                userid lastlang));
+         if (defined($urec)){
+            if ($urec->{lastlang} ne ""){
+               $ENV{HTTP_FORCE_LANGUAGE}=$urec->{lastlang};
+            }
+         }
+         my $killtimeout=$urec->{killtimeout};
+         if ($killtimeout<600){
+            $killtimeout=1000;
+         }
+         my $forcekill=0;
+         if ($userpcount{$stat{$apid}->{user}}>1){
+            $forcekill=1;
+            $killtimeout=180;  # multi query timeout level 1
+         }
+         if ($userpcount{$stat{$apid}->{user}}>2){
+            $forcekill=1;
+            $killtimeout=60;  # multi query timeout  level 2
+         }
+         if ($userpcount{$stat{$apid}->{user}}>3){
+            $forcekill=1;
+            $killtimeout=30;  # multi query timeout  level 3
+         }
+         if ($stat{$apid}->{duration}>10800 || 
+             $stat{$apid}->{duration}>$killtimeout){
+            msg(INFO,"initiate KILL process for $apid");
+            if ($forcekill){
+               $killtimeout.=" (".
+                $user->T("while paralel multiple requests",'kernel::w5top').")";
+            }
+            if ($stat{$apid}->{sysuser} eq ""){
+               $consolemsg.=sprintf("   -> ERROR no sysuser for PID %s!\n",
+                                    $apid);
+            }
+            else{
+               my $cmdresult;
+               my $cmd="sudo -u '$stat{$apid}->{sysuser}' kill $apid";
+               $consolemsg.=sprintf("\n   -> initiate \"%s\"\n",$cmd);
+               msg(INFO,"run command '$cmd'");
+               system($cmd);
+               $cmdresult=$?;
+               # check if kill was successfuly
+               if (($? >> 8)==0){  # exit code=0? = kill ging eigentlich
+                  sleep(1);
+                  my $cmd="sudo -u '$stat{$apid}->{sysuser}' ".
+                          "kill -0 $apid >/dev/null";
+                  system($cmd);  # ceck if process runs still
+                  if (($? >> 8)==0){  # exit code=0?
+                     $consolemsg.=sprintf("\n   -> soft kill failed\n");
+                     my $cmd="sudo -u ".
+                             "'$stat{$apid}->{sysuser}' kill -9 $apid";
+                     system($cmd);
                   }
                }
-            }
-            if (!$isok){
-               msg(INFO,"process $apid not OK - check if it is to kill");
-               if ($stat{$apid}->{sysuser} eq ""){
-                  $consolemsg.=sprintf("   -> ERROR no sysuser for PID %s!\n",
-                                       $apid);
-               }
-               else{
-                  my $cmd="sudo -u '$stat{$apid}->{sysuser}' kill $apid";
-                  $consolemsg.=sprintf("\n   -> initiate \"%s\"\n",$cmd);
-                  msg(INFO,"run command '$cmd'");
-                  system($cmd);
-               }
-               if ((!($? == -1)) && $stat{$apid}->{sysuser} ne ""){
-                  my $exitcode=$? >> 8;
+               if ((!($cmdresult == -1)) && $stat{$apid}->{sysuser} ne ""){
+                  my $exitcode=$cmdresult >> 8;
                   my $act=getModuleObject($curconfig,"base::workflowaction");
                   $act->Cache->{W5Server}=$W5V2::W5Server;
                   my %param=(adminbcc=>1,
                              emailfrom=>'"W5Base Process-Controller" <>');
                   if (defined($urec)){
                      $param{emailto}=$urec->{email};
-                     if ($urec->{lastlang} ne ""){
-                        $ENV{HTTP_FORCE_LANGUAGE}=$urec->{lastlang};
-                     }
                   }
                   my $sitename=$curconfig->Param("SITENAME");
                   my $d=$act->getParsedTemplate(
@@ -183,13 +212,13 @@ foreach my $apid (@apid){
                      printf STDERR ("%s\n",$consolemsg);
                      printf STDERR ("ERROR: exitcode of call was not zero!\n");
                   }
-                  if (defined($urec)){
-                     delete($ENV{HTTP_FORCE_LANGUAGE});
-                  }
+               }
+               else{
+                  printf STDERR ("%s\n",$consolemsg);
                }
             }
-            else{
-               printf STDERR ("%s\n",$consolemsg);
+            if (defined($urec)){
+               delete($ENV{HTTP_FORCE_LANGUAGE});
             }
          }
       }
