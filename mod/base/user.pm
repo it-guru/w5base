@@ -1045,15 +1045,14 @@ sub Validate
          $newrec->{picture}=undef;
       }
    }
-
-   if (effVal($oldrec,$newrec,"killtimeout")<600){
-      $newrec->{killtimeout}=600;
+   if (exists($newrec->{killtimeout})){
+      if (effVal($oldrec,$newrec,"killtimeout")<600){
+         $newrec->{killtimeout}=600;
+      }
+      if (effVal($oldrec,$newrec,"killtimeout")>10800){
+         $newrec->{killtimeout}=10800;
+      }
    }
-   if (effVal($oldrec,$newrec,"killtimeout")>10800){
-      $newrec->{killtimeout}=10800;
-   }
- 
-
 
    return(1);
 }
@@ -1119,6 +1118,9 @@ sub isViewValid
    elsif ($rec->{usertyp} eq "service"){
       @gl=qw(header name default comments groups nativcontact usersubst 
              userid userro control userparam qc);
+      if ($self->IsMemberOf("admin")){
+         push(@gl,"history");
+      }
    }  
    else{
       @gl=(@pic,
