@@ -108,7 +108,7 @@ sub qcheckRecord
                       $old=1;
                   }
                }
-               if (defined($old) && !($urec->{email}=~m/^telekom\.de$/i)){
+               if (defined($old) && !($urec->{email}=~m/\@telekom\.de$/i)){
                   msg(ERROR,"E-Mail '%s' not found in LDAP ".
                             "but with POSIX entry",$urec->{email});
                }
