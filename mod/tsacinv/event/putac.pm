@@ -649,7 +649,7 @@ sub ApplicationModified
                      $systemid=$sysrec->{systemid};
                   }
                   if ($systemid ne ""){
-                     my $assignment=$rec->{swteam};
+                     my $assignment=$irec->{swteam};
                      $assignment=~s/^.*\.CSS\.AO\.DTAG/CSS.AO.DTAG/i;
                      if ($assignment ne ""){
                         $acgrp->ResetFilter(); 
