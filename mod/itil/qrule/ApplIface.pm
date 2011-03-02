@@ -7,6 +7,7 @@ package itil::qrule::ApplIface;
 Every Application in in CI-Status "installed/active" or "available", needs
 at least 1 interface, if the flag "application has no intefaces" is not 
 true.
+Loop interfaces from the current to the current application are not allowed.
 
 =head3 IMPORTS
 
@@ -63,6 +64,14 @@ sub qcheckRecord
          return(3,{qmsg=>['no interfaces defined'],
                    dataissue=>['no interfaces defined']});
       }
+      foreach my $ifrec (@{$rec->{interfaces}}){
+         if ($ifrec->{toapplid} eq $rec->{id}){
+            my @msg=("loop interfaces to the current ".
+                     "application are not allowed");
+            return(3,{qmsg=>\@msg,dataissue=>\@msg});
+         }
+      }
+      
    }
    else{
       if (ref($rec->{interfaces}) eq "ARRAY" && $#{$rec->{interfaces}}!=-1){
