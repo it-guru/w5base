@@ -900,9 +900,11 @@ sub Validate
       my $givenname=effVal($oldrec,$newrec,"givenname");
       my $surname=effVal($oldrec,$newrec,"surname");
       my $email=effVal($oldrec,$newrec,"email");
-      if ($email eq "" || ($email=~m/^"/)){
-         $self->LastMsg(ERROR,"invalid email address");
-         return(0);
+      if ($usertyp ne "service"){
+         if ($email eq "" || ($email=~m/^"/)){
+            $self->LastMsg(ERROR,"invalid email address");
+            return(0);
+         }
       }
       $fullname.=$surname;
       $fullname.=", " if ($fullname ne "" && $givenname ne "");
