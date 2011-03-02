@@ -54,7 +54,7 @@ sub NotifyPlasma
    my $wsproxy=$self->Config->Param("WEBSERVICEPROXY");
    $wsproxy=$wsproxy->{plasma} if (ref($wsproxy) eq "HASH");
    return({exitcode=>0,msg=>'ok - no interface defined'}) if ($wsproxy eq "");
-   #return({exitcode=>0,msg=>'ok - upd not send'}) if ($param{'op'} eq "upd");
+   return({exitcode=>1,msg=>'fail - no id'}) if ($param{'id'} eq "");
 
    my $wf=getModuleObject($self->getParent->Config(),"base::workflow"); 
    $wf->SetFilter({id=>\$param{'id'}});
@@ -71,12 +71,16 @@ sub NotifyPlasma
    # temp verify, if application SDM_TEST is affected - only this
    # events should be transfered
    #
-   my $affectedapplication=$WfRec->{affectedapplication};
-   $affectedapplication=[$affectedapplication] if (ref($affectedapplication) ne "ARRAY");
-   if (!grep(/^(SDM_TEST|FAKT_WIRK|SPRING_WIRK)$/,@$affectedapplication)){
-      return({exitcode=>0,
-              msg=>'no trigger needed - no SDM_TEST|FAKT_WIRK|SPRING_WIRK'});
-   }
+#   my $affectedapplication=$WfRec->{affectedapplication};
+#   $affectedapplication=[$affectedapplication] if (ref($affectedapplication) ne "ARRAY");
+#   if (!grep(/^(SDM_TEST|FAKT_WIRK|SPRING_WIRK)$/,@$affectedapplication)){
+#      return({exitcode=>0,
+#              msg=>'no trigger needed - no SDM_TEST|FAKT_WIRK|SPRING_WIRK'});
+#   }
+#   laut Anforderung ...
+#   https://darwin.telekom.de/darwin/auth/base/workflow/ById/12990592790001
+#   ... soll die Schnittstelle nun für alle ActiveBilling Anwendungen
+#   aktiviert werden.
    #######################################################################
 
    msg(DEBUG,"NotifyPlasma: wsproxy='%s'",$wsproxy);
