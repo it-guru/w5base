@@ -90,7 +90,7 @@ sub NotifyChange
                          "QMDB  RM_Archivierung   RM_Archivierung_T/A  ".
                          "RM_Datensicherung    RM_Datensicherung_T/A ".
                          "SchaKaL_(P/S)  SchaKaL_(T/A)  SIT4_BL-T   ".
-                         "SKS_ES   SKS_ES_R    T-STORE";
+                         "SKS_ES   SKS_ES_R  uCMDB  T-STORE";
 
             $appl->SetFilter({id=>$aid,name=>'SIT* W5* '.$sigiapps}); # first test only for sit
             $aid=[];

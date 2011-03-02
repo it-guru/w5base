@@ -240,8 +240,8 @@ if (!$opt_autokill){
    foreach my $pid (@order){
       printf($form,$pid,$stat{$pid}->{cpu},
                     $stat{$pid}->{duration},
-                    $stat{$pid}->{user},
-                    $stat{$pid}->{mod});
+                    limitlen($stat{$pid}->{user},25,1),
+                    limitlen($stat{$pid}->{mod},25,1));
    }
 }
 
