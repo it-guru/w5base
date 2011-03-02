@@ -149,6 +149,9 @@ sub RSS
             }
          }
          $item=~s/_/ /g;
+         if ($WfRec->{eventmode} eq "EVk.infraloc"){
+            $item=~s/\./; /g;
+         }
          my $title=$item;
         # my $title=$item."\n (Prio".$WfRec->{eventstatclass}.")";
          my $desc=$WfRec->{eventshortsummary};
