@@ -1,6 +1,8 @@
 package W5Kernel;
 use Exporter;
 use Encode;
+use strict;
+use vars qw(@EXPORT @ISA);
 @ISA = qw(Exporter);
 @EXPORT = qw(
              &trim &rtrim &ltrim &limitlen &in_array 
@@ -120,7 +122,7 @@ sub limitlen
    }
    $usesoftbreak=0 if (!defined($usesoftbreak));
 
-   if (length($d)>$maxl){
+   if (length($d)>$maxlen){
       if ($usesoftbreak){
          my $m=$maxlen-3;
          $m=0 if ($m<0);
