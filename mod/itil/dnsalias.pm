@@ -76,6 +76,7 @@ sub new
                 name          =>'shortcomments',
                 label         =>'Short Comments',
                 readonly      =>1,
+                searchable    =>0,
                 htmldetail    =>0,
                 htmlwidth     =>'190px',
                 onRawValue    =>sub{
