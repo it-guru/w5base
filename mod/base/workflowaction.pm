@@ -110,10 +110,16 @@ sub new
       new kernel::Field::EffortNumber(
                 name          =>'effort',
                 sqlorder      =>'none',
-                group         =>'actiondata',
+                group         =>'booking',
                 unit          =>'min',
                 label         =>'Effort',
                 dataobjattr   =>'wfaction.effort'),
+
+      new kernel::Field::Date(
+                name          =>'bookingdate',
+                group         =>'booking',
+                label         =>'Booking date',
+                dataobjattr   =>'wfaction.bookingdate'),
 
       new kernel::Field::Textarea(
                 name          =>'effortcomments',            # label for effort lists
@@ -335,7 +341,7 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
    my %param=@_;
-   return("default","actiondata") if ($self->IsMemberOf(["admin",
+   return("default","actiondata","booking") if ($self->IsMemberOf(["admin",
                                         "workflow.admin"]));
    if (defined($rec) && $rec->{wfheadid}>0){
       my $wf=$self->getPersistentModuleObject("wf","base::workflow");
@@ -350,13 +356,13 @@ sub isWriteValid
              $rec->{cdate} ne ""){
             my $d=CalcDateDuration($rec->{cdate},NowStamp("en"));
             if ($d->{totalminutes}<5000){ # modify only allowed for 3 days
-               return("actiondata");
+               return("actiondata","booking");
             }
          }
          my @grps=$wf->isWriteValid($WfRec,%param);
          return("actiondata") if (grep(/^ALL$/,@grps) ||
-                           grep(/^actions$/,@grps) ||
-                           grep(/^flow$/,@grps));
+                                  grep(/^actions$/,@grps) ||
+                                  grep(/^flow$/,@grps));
       }
    }
    return(undef);
@@ -732,7 +738,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","actiondata","additional","source");
+   return("header","default","booking","actiondata","additional","source");
 }
 
 
