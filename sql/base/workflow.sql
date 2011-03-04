@@ -35,7 +35,7 @@ CREATE TABLE wfkey (
 CREATE TABLE wfaction (
   wfactionid bigint(20) NOT NULL default '0',
   wfheadid bigint(20) NOT NULL default '0',
-  name        varchar(30) NOT NULL,
+  name        varchar(30) NOT NULL,bookingdate datetime default NULL,
   translation varchar(40) NOT NULL,
   actionref   longtext NOT NULL,
   additional  longtext NOT NULL,
@@ -49,14 +49,14 @@ CREATE TABLE wfaction (
   srcload datetime default NULL,
   editor varchar(100) NOT NULL default '',
   realeditor varchar(100) NOT NULL default '',
-  PRIMARY KEY  (wfactionid),
+  PRIMARY KEY  (wfactionid),key(bookingdate),
   KEY action (wfheadid,name),key(createuser,createdate),
   KEY modifydate (modifydate),key srcsys(srcid,srcsys),
   KEY wfheadid (wfheadid)
 );
 CREATE TABLE wfhead (
   wfheadid bigint(20) NOT NULL default '0',
-  shortdescription varchar(128) NOT NULL default '',
+  shortdescription varchar(250) NOT NULL default '',
   description text NOT NULL,
   wfstate tinyint(3) unsigned default NULL,prio int(1) default '5',
   wfclass varchar(30) NOT NULL default '',
@@ -73,7 +73,7 @@ CREATE TABLE wfhead (
   closeuser bigint(20) default NULL,
   modifyuser bigint(20) default NULL,
   eventstart datetime default NULL,
-  eventend datetime default NULL,
+  eventend datetime default NULL,invoicedate datetime default NULL,
   headref longtext NOT NULL,
   initiallang   varchar(5) NOT NULL,
   initialsite   varchar(128) NOT NULL,
@@ -85,7 +85,7 @@ CREATE TABLE wfhead (
   additional longtext default NULL,
   editor varchar(100) NOT NULL default '',
   realeditor varchar(100) NOT NULL default '',
-  PRIMARY KEY  (wfheadid),
+  PRIMARY KEY  (wfheadid),key(invoicedate),
   KEY openuser (openuser,wfstate),KEY modifyuser (modifyuser,wfstate),
   unique srcsys(srcsys,srcid),key srcid(srcid),
   key srcload(srcsys,srcload),key modifydate(modifydate,wfstate),
