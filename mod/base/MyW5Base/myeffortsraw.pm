@@ -53,7 +53,7 @@ sub Init
    $self->{DataObj}=getModuleObject($self->getParent->Config,
                                     "base::workflowaction");
    return(0) if (!defined($self->{DataObj}));
-   $self->{DataObj}->setDefaultView(qw(cdate creatorposix effortrelation 
+   $self->{DataObj}->setDefaultView(qw(bookingdate creatorposix effortrelation 
                                        effortcomments effort));
 
    $self->{DataObj}->AddFields(
@@ -219,7 +219,7 @@ sub Result
 
    $fineQuery{creatorid}=\$userid;
    $fineQuery{effort}=">0";
-   $fineQuery{cdate}=">$year-$mon-01 AND <=$Y1-$M1-01";
+   $fineQuery{bookingdate}=">$year-$mon-01 AND <=$Y1-$M1-01";
 
    printf STDERR ("fineQuery=%s\n",Dumper(\%fineQuery));
 

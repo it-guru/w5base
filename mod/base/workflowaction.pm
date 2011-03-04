@@ -302,6 +302,14 @@ sub Validate
       $newrec->{owner}=$owner;
    }
    $newrec->{name}=$name;
+
+   if (!defined($oldrec) && $newrec->{bookingdate} eq ""){
+      $newrec->{bookingdate}=NowStamp("en");
+   }
+   if (effVal($oldrec,$newrec,"bookingdate") eq ""){
+      $newrec->{bookingdate}=NowStamp("en");
+   }
+
    return(1);
 }
 

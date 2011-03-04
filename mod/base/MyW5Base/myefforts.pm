@@ -79,7 +79,7 @@ sub Result
    $userid=-1 if (!defined($userid) || $userid==0);
 
    my $wa=getModuleObject($self->getParent->Config,"base::workflowaction");
-   $wa->SetFilter({cdate=>">today-14d AND <now",
+   $wa->SetFilter({bookingdate=>">today-14d AND <now",
                    creatorid=>\$userid});
    $wa->SetCurrentOrder(qw(NONE));
    my %wfheadid;
@@ -87,12 +87,12 @@ sub Result
    my $sumeff;
    my $sumtoday;
    my @now=Today_and_Now($tz);
-   $wa->SetCurrentView(qw(wfheadid cdate effort));
+   $wa->SetCurrentView(qw(wfheadid bookingdate effort));
    my ($rec,$msg)=$wa->getFirst();
    if (defined($rec)){
       do{
          $wfheadid{$rec->{wfheadid}}++;
-         my $utime=Date_to_Time("GMT",$rec->{cdate});
+         my $utime=Date_to_Time("GMT",$rec->{bookingdate});
          my @ldate=Time_to_Date($tz,$utime);
          my $day=sprintf("%04d-%02d-%02d",$ldate[0],$ldate[1],$ldate[2]);
          $day{$day}+=($rec->{effort}+0);
