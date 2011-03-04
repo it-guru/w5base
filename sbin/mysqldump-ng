@@ -146,7 +146,12 @@ sub msg
    foreach my $linemsg (split(/\n/,$msg)){
       $d.=sprintf("%-6s %s\n",$type.":",$linemsg);
    }
-   print STDERR $d;
+   if (defined($d)){
+      print STDERR $d;
+   }
+   else{
+      print STDERR "ERROR: print of undefined message `date`";
+   }
    return($d);
 }
 
