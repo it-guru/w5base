@@ -1,4 +1,4 @@
 'Start'=>{de=>'alle markierten Datensätze löschen',
           en=>'delete all marked records'},
 'With this module it is able to delete multiple records at one step'=>{de=>'Ermöglicht es mehrere Datensätze unter Berücksichtung der Rechte auf einmal zu löschen.'},
-'some operations failed'=>{de=>'einige Operationen sind fehlgeschlagen'},
+'some operations failed'=>{de=>'Eine oder mehrere Operationen sind fehlgeschlagen'},
