@@ -136,7 +136,7 @@ sub MultiOperationActionOn
 
    my $fail=1;
 
-   my $chkfld=$opobj->getField($OPFIELD."x");
+   my $chkfld=$opobj->getField($OPFIELD);
    if (!defined($chkfld)){
       $app->LastMsg(ERROR,"unknown field selected for MultiEdit");
       return(0);
