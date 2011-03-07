@@ -58,6 +58,13 @@ sub new
                 label         =>'Location name',
                 dataobjattr   =>'location.name'),
 
+      new kernel::Field::Mandator(
+                allowany      =>1),
+
+      new kernel::Field::Link(
+                name          =>'mandatorid',
+                dataobjattr   =>'location.mandator'),
+
       new kernel::Field::Select(
                 name          =>'cistatus',
                 htmleditwidth =>'40%',

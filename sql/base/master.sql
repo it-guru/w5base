@@ -393,3 +393,4 @@ create table itemizedlist (
   PRIMARY KEY (id),unique(selectlabel,name)
 );
 alter table interview add additional  longtext default NULL;
+alter table location add mandator bigint(20) default NULL;
