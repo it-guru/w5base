@@ -327,21 +327,11 @@ sub isViewValid
    return("ALL") if ($rec->{creator}==$userid);
    return(undef) if ($param{resultname} eq "HistoryResult" &&
                      $rec->{privatestate}>=1);
-   return("header","default","actiondata","source");
-   # eine Analyse der Action wäre zu aufwendig
-#   if (defined($rec) && $rec->{wfheadid}>0){
-#      my $wf=$self->getPersistentModuleObject("wf","base::workflow");
-#      $wf->ResetFilter();
-#      $wf->SetFilter({id=>\$rec->{wfheadid}});
-#      my ($WfRec,$msg)=$wf->getOnlyFirst(qw(ALL));
-#      if (defined($WfRec)){
-#         my @grps=$wf->isViewValid($WfRec,%param);
-#         return("ALL") if (grep(/^ALL$/,@grps) ||
-#                           grep(/^actions$/,@grps) ||
-#                           grep(/^flow$/,@grps));
-#      }
-#   }
-#   return("ALL");
+   return("header","default","booking","actiondata","source");
+   # eine Analyse des betreffenden Workflows, ob "booking" sichtbar gemacht
+   # werden darf, wäre an dieser Stelle zu aufwendig. Es existiert also ein
+   # gap, dass man nativ die Workflow-Action-Efforts aller User auflisten 
+   # könnte (per deeplink)
 }
 
 sub isWriteValid
