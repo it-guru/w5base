@@ -2359,6 +2359,9 @@ sub nativProcess
          $self->getParent->LastMsg(ERROR,"invalid eventmode '$h->{eventmode}'");
          return(0);
       }
+      if ($h->{eventstatclass} eq ""){
+         $h->{eventstatclass}="3";
+      }
       if ($h->{eventstart} eq ""){
          $self->getParent->LastMsg(ERROR,"invalid event start");
          return(0);
@@ -2375,14 +2378,16 @@ sub nativProcess
       if (!($newid=$self->StoreRecord($WfRec,$h))){
          return(0);
       }
-      my $userid=$self->getParent->getParent->getCurrentUserId();
-      if (!in_array(\@inm,$userid)){
-         # notify incident manager in selected mandator area
-         $self->getParent->getParent->Action->NotifyForward(
-            $newid,undef,undef,undef,
-            $self->getParent->T("A new event information has been registered by a non incident manager. Please ensure that all neassasary actions be done, to handle this workflow correctly!"),
-            addtarget=>\@inm,sendercc=>1,mode=>'INFO:');
+      if (!$self->getParent->IsMemberOf("admin")){
+         my $userid=$self->getParent->getParent->getCurrentUserId();
+         if (!in_array(\@inm,$userid)){
+            # notify incident manager in selected mandator area
+            $self->getParent->getParent->Action->NotifyForward(
+               $newid,undef,undef,undef,
+               $self->getParent->T("A new event information has been registered by a non incident manager. Please ensure that all neassasary actions be done, to handle this workflow correctly!"),
+               addtarget=>\@inm,sendercc=>1,mode=>'INFO:');
 
+         }
       }
 
       return(1);
