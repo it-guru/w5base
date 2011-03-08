@@ -35,6 +35,8 @@ use Cwd;
 use File::Path;
 use POSIX;
 
+umask(0006);
+
 my $starttime=sprintf("%04d-%02d-%02d %02d:%02d:%02d",Today_and_Now);
 $Data::Dumper::Terse = 1;          
 $Data::Dumper::Indent = 1;  
@@ -139,6 +141,12 @@ sub msg
 {
    my $type=shift;
    my $msg=shift;
+
+   if (!defined($msg) || !defined($type)){
+      $type="ERROR";
+      my ($package, $filename, $line)=caller();
+      $msg="call of msg with undefined message from ($package,$filename,$line)";
+   }
    $msg=~s/%/%%/g if ($#_==-1);
    $msg=sprintf($msg,@_);
    return("") if (!$verbose and $type ne "ERROR");
@@ -146,12 +154,7 @@ sub msg
    foreach my $linemsg (split(/\n/,$msg)){
       $d.=sprintf("%-6s %s\n",$type.":",$linemsg);
    }
-   if (defined($d)){
-      print STDERR $d;
-   }
-   else{
-      print STDERR "ERROR: print of undefined message `date`";
-   }
+   print STDERR $d;
    return($d);
 }
 
