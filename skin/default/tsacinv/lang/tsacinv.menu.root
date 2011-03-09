@@ -21,6 +21,7 @@
 'ac.group'=>{de=>'Gruppe',en=>'Group'},
 'ac.user'=>{de=>'Benutzer',en=>'User'},
 'ac.user.groups'=>{de=>'Gruppenzuorndung',en=>'Grouprelation'},
+'ac.swinstance'=>{de=>'Softwareinstanz',en=>'Softwareinstance'},
 'ac.krn.accountno'=>{de=>'Account-Nummer',en=>'Account-Number'},
 'ac.quality'=>{de=>'Qualitätsanalysen',en=>'Quality-Analysys'},
 'ac.quality.appl'=>{de=>'Anwendung',en=>'Application'},
