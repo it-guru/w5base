@@ -1,4 +1,0 @@
-'tsbflexx::invoice'=>{de=>'Faktura',en=>'Invoice'},
-'Cost'=>{de=>'Preis'},
-'Amount'=>{de=>'Menge'},
-'Product description'=>{de=>'Artikel Beschreibung'},

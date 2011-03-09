@@ -39,40 +39,6 @@ sub Init
                       "tmpl/welcome",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("bflexx.bill",
-                      "tsbflexx::custbill",
-                      defaultacl=>['admin']);
-   
-   $self->RegisterObj("bflexx.bill.mod",
-                      "tsbflexx::orderedmod",
-                      defaultacl=>['admin']);
-   
-   $self->RegisterObj("bflexx.bill.invoice",
-                      "tsbflexx::invoice",
-                      defaultacl=>['admin']);
-   
-   $self->RegisterObj("bflexx.crudedata",
-                      "tsbflexx::crudedata",
-                      defaultacl=>['admin']);
-   
-   $self->RegisterObj("bflexx.p800iface",
-                      "tsbflexx::p800iface",
-                      defaultacl=>['admin']);
-   
-   $self->RegisterObj("bflexx.p800iface.new",
-                      "tsbflexx::p800iface",
-                      func=>'New',
-                      defaultacl=>['admin']);
-   
-   $self->RegisterObj("bflexx.p800sonder",
-                      "tsbflexx::p800sonder",
-                      defaultacl=>['admin']);
-   
-   $self->RegisterObj("bflexx.p800sonder.new",
-                      "tsbflexx::p800sonder",
-                      func=>'New',
-                      defaultacl=>['admin']);
-   
    $self->RegisterObj("bflexx.ifworkflow",
                       "tsbflexx::ifworkflow",
                       defaultacl=>['admin']);

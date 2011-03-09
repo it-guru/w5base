@@ -562,56 +562,6 @@ sub bflexxRawExport
 }
 
 
-sub bflexxExport
-{
-   my $self=shift;
-   my $bflexxp800=shift;
-   my $rec=shift;
-   my $repmon=shift;
-   my ($wY,$wM,$wD)=@_;
-
-
-   if (defined($bflexxp800)){
-      my $ag=$rec->{affectedapplication};
-      $ag=[$ag] if (!ref($ag) eq "ARRAY");
-      my $vert=$rec->{affectedcontract};
-      $vert=[$vert] if (!ref($vert) eq "ARRAY");
-
-      my $cause=$rec->{tcomcodcause};
-      $cause=join(", ",@$cause) if (ref($cause) eq "ARRAY");
-
-      my $comments=$rec->{tcomcodcomments};
-      $comments=join("\n",@$comments) if (ref($comments) eq "ARRAY");
-
-      my $extid=$rec->{tcomexternalid};
-      $extid=join("\n",@$extid) if (ref($extid) eq "ARRAY");
-
-      my $specialt=$rec->{headref}->{specialt};
-      $specialt=join(", ",@$specialt) if (ref($specialt) eq "ARRAY");
-
-      if (my ($m,$y)=$repmon=~m/^(\d+)\/(\d{4})/){
-         $repmon=sprintf("%04d%02d",$y,$m);
-      }
-
-      my $newrec={name=>$rec->{name},
-                  eventend=>$rec->{eventend},
-                  w5baseid=>$rec->{id},
-                  tcomworktime=>$specialt,
-                  tcomcodcause=>$cause,
-                  tcomcodcomments=>$comments,
-                  tcomexternalid=>$extid,
-                  appl=>join(", ",@$ag),
-                  custcontract=>join(", ",@$vert),
-                  srcload=>NowStamp("en"),
-                  srcid=>$rec->{srcid},
-                  month=>$repmon,
-                  srcsys=>$rec->{srcsys}};
-      $bflexxp800->ValidatedInsertOrUpdateRecord($newrec,
-                                              {w5baseid=>\$newrec->{w5baseid}});
-   }
-}
-
-
 sub xlsExport
 {
    my $self=shift;

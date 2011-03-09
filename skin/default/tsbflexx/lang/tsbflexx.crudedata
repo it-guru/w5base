@@ -1,7 +1,0 @@
-'tsbflexx::crudedata'=>{de=>'Rohdaten',en=>'Crude Data'},
-'fieldgroup.default'=>{de=>'Rohdaten',en=>'Crude Data'},
-'Billing Month'=>{de=>'Rechnugs-Monat'},
-'Contract number'=>{de=>'Vertragsnummer'},
-'Contract description'=>{de=>'Vertragsbezeichnung'},
-'Amount'=>{de=>'Menge'},
-'Product description'=>{de=>'Artikel Beschreibung'},
