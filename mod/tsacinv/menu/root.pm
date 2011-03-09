@@ -87,6 +87,10 @@ sub Init
                       "tsacinv::group",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("ac.swinstance",
+                      "tsacinv::swinstance",
+                      defaultacl=>['admin']);
+   
    $self->RegisterObj("ac.krn",
                       "tmpl/welcome",
                       defaultacl=>['admin']);
