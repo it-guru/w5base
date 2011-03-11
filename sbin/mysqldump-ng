@@ -29,7 +29,6 @@ use Date::Calc qw( Today_and_Now
 use IPC::Open3;
 use IO::Handle;
 use IO::Select;
-use Compress::Zlib;
 use Getopt::Long;
 use Cwd;
 use File::Path;
@@ -40,7 +39,7 @@ umask(0006);
 my $starttime=sprintf("%04d-%02d-%02d %02d:%02d:%02d",Today_and_Now);
 $Data::Dumper::Terse = 1;          
 $Data::Dumper::Indent = 1;  
-my @prog=qw(mysql mysqldump gunzip);
+my @prog=qw(mysql mysqldump gunzip gzip);
 my($db,$prog,$err,$help,$exclude,$tasks,$convert,$file,$verbose,
    $format,$mode,$targetdb,$dir,%inputinclude,%inputexclude);
 my $force=0;
@@ -441,19 +440,43 @@ sub process_engine
                  }
               }
 
+           #   bugy version of zip - this can only handle <2GB results
+           #   foreach my $d (@$dir){
+           #       my $gz=gzopen("$d/$first.sql.gz", "w9")
+           #             or die "Cannot open file $d/$first.sql.gz: $gzerrno\n";
+           #       push(@gz,$gz);
+           #   }
+           #   while(my $line=<$mydrdr>){
+           #      foreach my $gz (@gz){
+           #         $gz->gzwrite("$line");
+           #      }
+           #   }
+           #   foreach my $gz (@gz){
+           #      $gz->gzclose();
+           #   }
+
               foreach my $d (@$dir){
-                  my $gz=gzopen("$d/$first.sql.gz", "w9")
-                        or die "Cannot open file $d/$first.sql.gz: $gzerrno\n";
-                  push(@gz,$gz);
+                 my $gzfile="$d/$first.sql.gz";
+                 open(local *GZSTR, '|gzip >'.$gzfile)
+                     or die "Cannot open file $gzfile: $$!\n";
+                 push(@gz,*GZSTR);
               }
               while(my $line=<$mydrdr>){
                  foreach my $gz (@gz){
-                    $gz->gzwrite("$line");
+                    my $bk=syswrite($gz,$line);
+                    if ($bk!=length($line)){
+                       printf STDERR ("ERROR: fatal write problem in ".
+                                      "gzip stream\n");
+                       printf STDERR ("err=$!\n");
+                       exit(1);
+                    }
                  }
               }
               foreach my $gz (@gz){
-                 $gz->gzclose();
+                 close($gz);
               }
+
+
               close($mydrdr);
               $wp=waitpid($mysqldump_pid,0);
               $save=$?;
