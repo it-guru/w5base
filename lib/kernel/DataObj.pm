@@ -141,8 +141,9 @@ sub _preProcessFilter
          } 
          else{
             if (exists($fobj->{onRawValue}) &&
-                $fobj->searchable){
-               my $d=$hflt->{$field};
+                !$self->isa('kernel::DataObj::Static') &&  # only Static can
+                $fobj->searchable){                        # handle calculated
+               my $d=$hflt->{$field};                      # searches
                $self->LastMsg(ERROR,
                      "filter '%s' request on calculated field '%s(%s)'\@'%s'",
                         $d,$field,$fobj->Type(),$self->Self);
@@ -1071,28 +1072,28 @@ sub ValidatedInsertOrUpdateRecord
    my $found=0;
    my @idlist=();
    $self->ForeachFilteredRecord(sub{
-         my $rec=$_;
-         my $changed=0;
-         foreach my $k (keys(%$newrec)){
-            if ($k ne $idfname){
-               if ($newrec->{$k} ne $rec->{$k}){
-                  $changed=1;
-                  last;
-               }
-            }
-            else{
-               if (exists($newrec->{$k})){
-                  delete($newrec->{$k});
-               }
+      my $rec=$_;
+      my $changed=0;
+      foreach my $k (keys(%$newrec)){
+         if ($k ne $idfname){
+            if ($newrec->{$k} ne $rec->{$k}){
+               $changed=1;
+               last;
             }
          }
-         if ($changed){
-            my $opobj=$self->Clone();
-            $opobj->ValidatedUpdateRecord($rec,$newrec,
-                                         {$idfname=>$rec->{$idfname}});
+         else{
+            if (exists($newrec->{$k})){
+               delete($newrec->{$k});
+            }
          }
-         push(@idlist,$rec->{$idfname});
-         $found++;
+      }
+      if ($changed){
+         my $opobj=$self->Clone();
+         $opobj->ValidatedUpdateRecord($rec,$newrec,
+                                      {$idfname=>$rec->{$idfname}});
+      }
+      push(@idlist,$rec->{$idfname});
+      $found++;
    });
    if (!$found){
       my $id=$self->ValidatedInsertRecord($newrec);
@@ -2439,7 +2440,7 @@ sub getRecordWatermarkUrl
 sub getRecordHeaderField
 {
    my $self=shift;
-   my $rec=shift;
+   my $rec=shift; 
 
    if (my $f=$self->getField("fullname")){
       return($f);
