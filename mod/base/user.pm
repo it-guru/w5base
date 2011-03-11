@@ -25,11 +25,13 @@ use kernel::DataObj::DB;
 use kernel::Field;
 use DateTime::TimeZone;
 use base::workflow::mailsend;
+use base::lib::RightsOverview;
 use kernel::CIStatusTools;
 @ISA=qw(kernel::App::Web::Listedit 
         kernel::DataObj::DB 
         kernel::App::Web::InterviewLink
-        kernel::CIStatusTools);
+        kernel::CIStatusTools
+        base::lib::RightsOverview);
 
 
 
@@ -1173,6 +1175,45 @@ sub isViewValid
    return(@gl);
 }
 
+sub getHtmlDetailPages
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+
+   return($self->SUPER::getHtmlDetailPages($p,$rec),
+          "RView"=>$self->T("Rights overview"));
+}
+
+
+sub getHtmlDetailPageContent
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+   return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "RView");
+   my $page;
+   my $idname=$self->IdField->Name();
+   my $idval=$rec->{$idname};
+
+   if ($p eq "RView"){
+      Query->Param("$idname"=>$idval);
+      $idval="NONE" if ($idval eq "");
+
+      my $q=new kernel::cgi({});
+      $q->Param("$idname"=>$idval);
+      my $urlparam=$q->QueryString();
+      $page="<link rel=\"stylesheet\" ".
+            "href=\"../../../static/lytebox/lytebox.css\" ".
+            "type=\"text/css\" media=\"screen\" />";
+
+      $page.="<iframe style=\"width:100%;height:100%;border-width:0;".
+            "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
+            "src=\"RightsOverview?$urlparam\"></iframe>";
+   }
+   $page.=$self->HtmlPersistentVariables($idname);
+   return($page);
+}
+
+
 sub allowHtmlFullList
 {
    my $self=shift;
@@ -1289,8 +1330,17 @@ sub getValidWebFunctions
 {  
    my ($self)=@_;
    return($self->SUPER::getValidWebFunctions(), qw(MyDetail SSHPublicKey 
-          AddrBook)); 
+          AddrBook RightsOverview RightsOverviewLoader)); 
 }
+
+sub SelfAsParentObject    # this method is needed because existing derevations
+{
+   return("base::user");
+}
+
+
+
+
 
 sub AddrBook
 {
