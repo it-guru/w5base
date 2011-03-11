@@ -1,0 +1,39 @@
+Generell handling, debuging, configuring and using of the W5Server
+==================================================================
+
+The W5Server is essentialy needed to process all asyncron and atomic
+operation. The communication from the apache spare process and the
+W5ServerClient commandline tool will be done over TCP. 
+
+Security
+========
+The W5Server can invoke potentially security relevant jobs/events. This
+fact needs to protect the W5Server to get connections from other hosts
+besides the needed. This can be done by using the configuration option
+"W5ServerAllow".
+
+
+Act as secondary W5Server (experimental)
+========================================
+If there are the config options ...
+
+ W5PrimaryServerHost
+ W5PrimaryServerPort
+
+... are set, the W5Server will try to connect at startup to 
+the master (primary) W5Server. This configuration can be needed to
+scale the process capability to handle a huge count of events on
+multiple logical servers.
+
+
+Commands
+========
+sbin/W5Server       =  The W5Server program
+
+sbin/W5ServerClient =  Commandline interface to initiate operations in
+                       the process space of the W5Server
+
+sbin/W5Event        =  Debugging tool, to run events in the 
+                       process space of calling user
+
+                     

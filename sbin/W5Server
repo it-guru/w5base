@@ -407,8 +407,57 @@ sub rpcResetEvents
 sub rpcGetUniqueId
 {
    my $self=shift;
+   my $n=shift;
 
+   if (defined($self->{'PW5Server'})){
+      if (exists($self->{'UniqueIdPool'}) && $#{$self->{'UniqueIdPool'}}!=-1){
+         my $id=shift(@{$self->{'UniqueIdPool'}});
+         return({id=>$id,exitcode=>0});
+      }
+      my $p=50;  # pool size
+      my $res=$self->{'PW5Server'}->Call("rpcGetUniqueId",$p);
+      my $id;
+      if (!defined($res)){
+         my $retry=15;
+         while(!defined($res=$self->{'PW5Server'}->Call("rpcGetUniqueId",$p))){
+            if (!defined($res)){
+               sleep(1);
+               last if ($retry--<=0);
+            }
+         }
+      }
+      if (defined($res) && $res->{exitcode}==0 &&
+          ref($res->{id}) eq "ARRAY"){
+         @{$self->{'UniqueIdPool'}}=@{$res->{id}};
+         $id=shift(@{$self->{'UniqueIdPool'}});
+      }
+      if (defined($id) && $id ne ""){
+         return({id=>$id,exitcode=>0});
+      }
+      return({exitcode=>9999,exitmsg=>"no primary server response"});
+   }
    my $t=time();
+   if (defined($n) && $n>1){     # at this point, the cached sequence technique
+                                 # will be implemented
+      my @id=();
+      my $blk=0;
+      $n=2000 if ($n>2000);
+      msg(DEBUG,"rpcGetUniqueId: pool request %d",$n);
+      for(my $c=0;$c<$n;$c++){
+         if ($blk++>900){
+            $blk=0;
+            sleep(1);
+            $t=time();
+         }
+         if ($t > ($self->{'UniqueId'}->{'timer'})){
+            $self->{'UniqueId'}->{'counter'}=0;
+            $self->{'UniqueId'}->{'timer'}=$t;
+         }
+         push(@id,sprintf('%d%04d',$t,$self->{'UniqueId'}->{'counter'}++));
+      }
+      return({id=>\@id,exitcode=>0});
+   }
+
    msg(DEBUG,"rpcGetUniqueId: UniqueId=%d/%d time=%d",
              $self->{'UniqueId'}->{'counter'},
              $self->{'UniqueId'}->{'timer'},
@@ -762,6 +811,18 @@ sub configure_hook
 
    msg(DEBUG,"debug=%s",$self->{'debug'});
    @ARGV[0]="W5Server";
+
+
+   my $primh=$self->{Config}->Param("W5PRIMARYSERVERHOST");
+   my $primp=$self->{Config}->Param("W5PRIMARYSERVERPORT");
+   if ($primh ne "" && $primp ne ""){
+      my %ClientParam;
+      $ClientParam{'PeerAddr'}=$primh;
+      $ClientParam{'PeerPort'}=$primp;
+      $self->{PW5Server}=new RPC::Smart::Client(%ClientParam);
+      $self->{PW5Server}->Connect();
+   }
+
    $self->resetEventController();
    return(1);
 }
