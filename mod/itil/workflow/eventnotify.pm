@@ -2378,7 +2378,7 @@ sub nativProcess
       if (!($newid=$self->StoreRecord($WfRec,$h))){
          return(0);
       }
-      if (!$self->getParent->IsMemberOf("admin")){
+      if (!$self->getParent->getParent->IsMemberOf("admin")){
          my $userid=$self->getParent->getParent->getCurrentUserId();
          if (!in_array(\@inm,$userid)){
             # notify incident manager in selected mandator area
