@@ -118,5 +118,4 @@
    de=>'Datum der letzten "Geheimschutz" Unterweisung EDT'},
 
 'limit query duration'=>{de=>'Begrenzung der Abfragedauer'},
-
-'Rights overview'              =>{ de=>'Referenz-Übersicht'},
+'Rights overview' =>{ de=>'Referenz-Übersicht'},
