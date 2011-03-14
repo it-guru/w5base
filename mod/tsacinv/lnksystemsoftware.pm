@@ -45,6 +45,7 @@ sub new
 
       new kernel::Field::Id(
                 name          =>'id',
+                htmlwidth     =>'60px',
                 label         =>'SW-Install-ID',
                 dataobjattr   =>"amportfolio.assettag"),
 
@@ -64,6 +65,30 @@ sub new
                 vjoindisp     =>'systemname'),
 
       new kernel::Field::TextDrop(
+                name          =>'systemid',
+                label         =>'SystemID',
+                uppersearch   =>1,
+                vjointo       =>'tsacinv::system',
+                vjoinon       =>['lparentid'=>'lportfolioitemid'],
+                vjoindisp     =>'systemid'),
+
+      new kernel::Field::Number(
+                name          =>'quantity',
+                htmlwidth     =>'40px',
+                label         =>'Quantity',
+                dataobjattr   =>'amsoftinstall.lusecount'),
+
+      new kernel::Field::Text(
+                name          =>'version',
+                label         =>'Version',
+                dataobjattr   =>'amsoftinstall.versionlevel'),
+
+      new kernel::Field::Text(
+                name          =>'instpath',
+                label         =>'Folder',
+                dataobjattr   =>'amsoftinstall.folder'),
+
+      new kernel::Field::TextDrop(
                 name          =>'license',
                 label         =>'License',
                 uppersearch   =>1,
@@ -76,12 +101,24 @@ sub new
                 label         =>'ParentID',
                 dataobjattr   =>'amportfolio.lparentid'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Text(
                 name          =>'llicense',
                 label         =>'LicenseID',
                 dataobjattr   =>'amsoftinstall.llicenseid'),
+
+      new kernel::Field::Date(
+                name          =>'cdate',
+                group         =>'source',
+                label         =>'Creation-Date',
+                dataobjattr   =>'amportfolio.dtcreation'),
+
+      new kernel::Field::Date(
+                name          =>'mdate',
+                group         =>'source',
+                label         =>'Modification-Date',
+                dataobjattr   =>'amsoftinstall.dtlastmodif'),
    );
-   $self->setDefaultView(qw(id model system license));
+   $self->setDefaultView(qw(id model system license quantity));
    return($self);
 }
 

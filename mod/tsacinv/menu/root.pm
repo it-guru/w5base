@@ -58,6 +58,10 @@ sub Init
    $self->RegisterObj("ac.system.ipaddress",
                       "tsacinv::ipaddress",
                       defaultacl=>['admin']);
+
+   $self->RegisterObj("ac.system.swinstall",
+                      "tsacinv::lnksystemsoftware",
+                      defaultacl=>['valid_user']);
    
    $self->RegisterObj("ac.itclust",
                       "tsacinv::itclust",
