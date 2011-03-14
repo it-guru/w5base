@@ -113,6 +113,17 @@ sub new
                 label         =>'Creation-Date',
                 dataobjattr   =>'amportfolio.dtcreation'),
 
+      new kernel::Field::Text(
+                name          =>'applications',
+                htmlwidth     =>'100px',
+                weblinkto     =>'NONE',
+                group         =>'useableby',
+                htmldetail    =>0,
+                label         =>'useable by application',
+                vjointo       =>'tsacinv::system',
+                vjoinon       =>['lparentid'=>'lportfolioitemid'],
+                vjoindisp     =>'applicationnames'),
+
       new kernel::Field::Date(
                 name          =>'mdate',
                 group         =>'source',

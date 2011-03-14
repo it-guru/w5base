@@ -351,7 +351,7 @@ sub new
                 vjoinon       =>['lportfolioitemid'=>'lchildid'],
                 vjoindisp     =>[qw(parent applid)]),
 
-      new kernel::Field::SubList(
+      new kernel::Field::Text(
                 name          =>'applicationnames',
                 label         =>'Applicationnames',
                 group         =>'applications',
