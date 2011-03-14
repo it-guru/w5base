@@ -142,7 +142,7 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="amportfolio,ammodel,amsoftinstall";
+   my $from="amportfolio,ammodel,amnature,amsoftinstall";
    return($from);
 }  
 
@@ -152,6 +152,8 @@ sub initSqlWhere
    my $where=
       "amportfolio.lportfolioitemid=amsoftinstall.litemid ".
       "and amportfolio.lmodelid=ammodel.lmodelid ".
+      "and ammodel.lnatureid=amnature.lnatureid(+) ".
+      "and amnature.name='SW-INSTALLATION' ".
       "and amportfolio.bdelete=0 ";
    return($where);
 }
