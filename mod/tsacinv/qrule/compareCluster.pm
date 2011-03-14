@@ -122,13 +122,29 @@ sub qcheckRecord
                     }
                     elsif ($mode eq "delete"){
                        if ($oldrec->{itservid} ne ""){
-                          return({OP=>$mode,
+                          my $itclustsvc=getModuleObject(
+                             $self->getParent->Config(),
+                             "itil::lnkitclustsvc");
+                          $itclustsvc->SetFilter({id=>\$oldrec->{id}});
+                          my ($svc,$msg)=$itclustsvc->getOnlyFirst(qw(ALL));
+                          if (defined($svc)){
+                             if ($#{$svc->{swinstances}}!=-1){
+                                push(@qmsg,"cluster services invalid but ".
+                                           "automatic delete not posible ".
+                                           "(manual cleanup nessesary)");
+                                return();
+                             }
+                          }
+                          my @dropop=({OP=>$mode,
                                   OPLABEL=>$oldrec->{fullname},
                                   MSG=>"delete ClustService $oldrec->{name} ".
                                        "from W5Base",
                                   DATAOBJ=>'itil::lnkitclustsvc',
                                   IDENTIFYBY=>$oldrec->{id},
                                   });
+
+
+                          return(@dropop);
                        }
                     }
                     return(undef);
