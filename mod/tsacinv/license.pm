@@ -228,10 +228,15 @@ sub new
                 label         =>'AC-AssetID',
                 dataobjattr   =>'amportfolio.lparentid'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Text(
                 name          =>'lportfolioitemid',
                 label         =>'PortfolioID',
                 dataobjattr   =>'amportfolio.lportfolioitemid'),
+
+      new kernel::Field::Text(
+                name          =>'lastid',
+                label         =>'lastid',
+                dataobjattr   =>'amportfolio.lastid'),
 #
 #      new kernel::Field::Link(
 #                name          =>'locationid',
@@ -366,6 +371,7 @@ sub initSqlWhere
 {
    my $self=shift;
    my $where=
+  #    "amcontract.lcntrid=amportfolio.lportfolioitemid and ".
       "amasset.assettag=amportfolio.assettag and ".
       "amportfolio.lmodelid=ammodel.lmodelid ".
       "and ammodel.lnatureid=amnature.lnatureid ".

@@ -45,6 +45,7 @@ sub new
 
       new kernel::Field::Id(
                 name          =>'id',
+                searchable    =>1,
                 htmlwidth     =>'60px',
                 label         =>'SW-Install-ID',
                 dataobjattr   =>"amportfolio.assettag"),
@@ -93,8 +94,8 @@ sub new
                 label         =>'License',
                 uppersearch   =>1,
                 vjointo       =>'tsacinv::license',
-                vjoinon       =>['llicense'=>'lportfolioitemid'],
-                vjoindisp     =>'name'),
+                vjoinon       =>['llicense'=>'lastid'],
+                vjoindisp     =>'licenseid'),
 
       new kernel::Field::Link(
                 name          =>'lparentid',
@@ -118,7 +119,7 @@ sub new
                 label         =>'Modification-Date',
                 dataobjattr   =>'amsoftinstall.dtlastmodif'),
    );
-   $self->setDefaultView(qw(id model system license quantity));
+   $self->setDefaultView(qw(id name system license quantity));
    return($self);
 }
 
