@@ -89,10 +89,10 @@ sub dailywfreport
    }
    msg(INFO,"information routing finished");
 
-   my (@emailtstamp,@emailpostfix,@emailsubheader,@emailhead,@emailtext,
-       @emailbottom,@emailprefix);
-
    foreach my $userid (keys(%user)){
+      my (@emailtstamp,@emailpostfix,@emailsubheader,@emailhead,@emailtext,
+          @emailbottom,@emailprefix);
+
       $user->ResetFilter();
       $user->SetFilter({userid=>\$userid});
       my ($urec,$msg)=$user->getOnlyFirst(qw(email cistatusid tz lastlang));
@@ -142,7 +142,7 @@ sub dailywfreport
          delete($ENV{HTTP_FORCE_LANGUAGE});
       }
    }
-   msg(DEBUG,"d=%s",Dumper(\%user));
+   #msg(DEBUG,"d=%s",Dumper(\%user));
    return({exitcode=>'0'});
 }
 
