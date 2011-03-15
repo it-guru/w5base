@@ -47,10 +47,12 @@ sub addWorkflow2Mail
    $wf->ResetFilter();
    $wf->SetFilter({id=>\$wfheadid});
    my ($wfrec,$msg)=$wf->getOnlyFirst(qw(name openusername 
-                                         shortactionlog initialsite));
-   msg(DEBUG,"wfrec=%s",Dumper($wfrec));
+                                         shortactionlog initialsite
+                                         mdate));
+   #msg(DEBUG,"wfrec=%s",Dumper($wfrec));
 
    my $nr=0;
+   my $outoffscope=0;
    if (ref($wfrec->{shortactionlog}) eq "ARRAY"){
       foreach my $wfact (@{$wfrec->{shortactionlog}}){
          my $username="";
@@ -72,27 +74,52 @@ sub addWorkflow2Mail
          my ($str,$ut,$dayoffset)=$date->getFrontendTimeString( 
                                   "HtmlMail",$wfact->{cdate},$tz);
 
-         push(@$emailtstamp,$str);
-         my $data=$wfact->{comments};
-         $data=~s/&/&amp;/g;
-         $data=~s/</&lt;/g;
-         $data=~s/>/&gt;/g;
-         push(@$emailtext,$data);
-         push(@$emailpostfix,$username);
-         if ($nr==0){
-            push(@$emailsubheader,FormatSubHeader($self,$wfrec));
-            push(@$emailhead,$wfrec->{name});
+         my $isinscope=1;          
+         if (my $duration=CalcDateDuration($wfact->{cdate},
+                                           $wfrec->{mdate},"GMT")){
+            if ($duration->{totalminutes}>($param->{hours}+24)*60){  
+               $outoffscope++;
+               $isinscope=0;
+            }
          }
-         else{ 
-            push(@$emailsubheader,undef);
-            push(@$emailhead,undef);
+
+ 
+ 
+
+         if ($isinscope==1 &&!($wfact->{comments}=~m/^\s*$/)){
+            push(@$emailtstamp,$str);
+            my $data=$wfact->{comments};
+            $data=~s/&/&amp;/g;
+            $data=~s/</&lt;/g;
+            $data=~s/>/&gt;/g;
+            push(@$emailtext,$data);
+            push(@$emailpostfix,$username);
+            if ($nr==0){
+               push(@$emailsubheader,FormatSubHeader($self,$wfrec));
+               push(@$emailhead,$wfrec->{name});
+               if ($outoffscope>0){
+                  push(@$emailhead,undef);
+                  push(@$emailsubheader,undef);
+                  push(@$emailtext,"...");
+                  push(@$emailpostfix,undef);
+               }
+            }
+            else{ 
+               push(@$emailsubheader,undef);
+               push(@$emailhead,undef);
+            }
+            $nr++;
          }
-         $nr++;
       }
    }
    if ($nr==0){
       push(@$emailtstamp,undef);
-      push(@$emailtext,undef);
+      if ($outoffscope>0){
+         push(@$emailtext,"...");
+      }
+      else{
+         push(@$emailtext,undef);
+      }
       push(@$emailpostfix,undef);
       push(@$emailsubheader,FormatSubHeader($self,$wfrec));
       push(@$emailhead,$wfrec->{name});

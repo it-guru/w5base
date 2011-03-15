@@ -104,7 +104,8 @@ sub dailywfreport
          foreach my $wfheadid (@{$user{$userid}}){
             addWorkflow2Mail($self->getParent,
                          $wf,$user,$wfheadid,
-                         {mode=>"dailywfreport",tz=>$urec->{tz}},
+                         {mode=>"dailywfreport",tz=>$urec->{tz},
+                          hours=>$param{hours}},
                          \@emailhead,\@emailsubheader,
                          \@emailprefix,\@emailtstamp,\@emailtext,\@emailpostfix,
                          \@emailbottom);
@@ -121,7 +122,7 @@ sub dailywfreport
          }
          my $from=$self->Config->Param("DEFAULTFROM");
          $sitename="W5Base" if ($sitename eq "");
-         my $fromemail='"'.$sitename.'" <'.$from.'>';
+         my $fromemail='"'.$sitename.'" <>';
          ###################################################
          if (my $id=$wf->Store(undef,{
                                class =>'base::workflow::mailsend',
