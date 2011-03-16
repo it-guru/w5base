@@ -141,11 +141,11 @@ foreach my $apid (@apid){
          my $forcekill=0;
          if ($userpcount{$stat{$apid}->{user}}>1){
             $forcekill=1;
-            $killtimeout=180;  # multi query timeout level 1
+            $killtimeout=300;  # multi query timeout level 1
          }
          if ($userpcount{$stat{$apid}->{user}}>2){
             $forcekill=1;
-            $killtimeout=60;  # multi query timeout  level 2
+            $killtimeout=180;  # multi query timeout  level 2
          }
          if ($userpcount{$stat{$apid}->{user}}>3){
             $forcekill=1;
