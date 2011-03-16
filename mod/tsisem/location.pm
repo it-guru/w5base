@@ -157,6 +157,7 @@ sub isViewValid
    my $rec=shift;
    
    return("ALL") if ($self->IsMemberOf("admin"));
+   return("ALL");
    return("default","source","header");
 }
 
