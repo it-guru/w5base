@@ -85,7 +85,7 @@ sub send2Miles
       my $act=$eff->getDataObj();
      
       $act->SetFilter({creatorid=>\$urec->{userid},
-                       cdate=>"(02/2011)"});
+                       cdate=>"(03/2011)"});
       $act->SetCurrentView(qw(cdate creatorposix effortrelation 
                               effortcomments effort wfheadid));
      

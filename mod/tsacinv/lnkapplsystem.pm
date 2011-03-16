@@ -45,6 +45,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'parent',
                 label         =>'Parent Application',
+                htmlwidth     =>'300px',
                 uppersearch   =>1,
                 vjointo       =>'tsacinv::appl',
                 vjoinon       =>['lparentid'=>'id'],

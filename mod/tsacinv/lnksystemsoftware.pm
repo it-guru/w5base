@@ -54,6 +54,7 @@ sub new
                 name          =>'name',
                 label         =>'Software',
                 uppersearch   =>1,
+                htmlwidth     =>'380px',
                 size          =>'16',
                 dataobjattr   =>'ammodel.name'),
 
@@ -75,7 +76,7 @@ sub new
 
       new kernel::Field::Number(
                 name          =>'quantity',
-                htmlwidth     =>'40px',
+                xhtmlwidth     =>'40px',
                 label         =>'Quantity',
                 dataobjattr   =>'amsoftinstall.lusecount'),
 
