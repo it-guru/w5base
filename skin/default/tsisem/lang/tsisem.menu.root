@@ -1,0 +1,3 @@
+'isem'=>{de=>'PMA-ISEM',en=>'PMA-ISEM'},
+'isem.user'=>{de=>'Kontakt',en=>'Contact'},
+'isem.location'=>{de=>'Standort',en=>'Location'},
