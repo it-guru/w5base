@@ -9,14 +9,15 @@ system and updates on demand nessasary fields.
 Unattended Imports are only done, if the field "Allow automatic interface
 updates" is set to "yes".
 If a logical system is a workstation, no DataIssue Workflow is started on
-a missing systemid.
+a missing systemid. If the SystemID is equal to the W5BaseID, no error
+will be reported, because the system is hadeled as "local only documented".
 Only logical systems in W5Base with state "installed/active" will be synced!
 
 
 =head3 IMPORTS
 
 From AssetManager the fields Memory, CPU-Count, CO-Number,
-Description are imported.
+Description, Systemname (since 04/2011) are imported.
 IP-Addresses can only be synced, if the field "Allow automatic interface
 updates" is set to "yes".
 If Mandator is set to "Extern" and "Allow automatic interface updates"
@@ -148,6 +149,19 @@ sub qcheckRecord
          }
 
          #################################################################### 
+
+         if (defined($parrec->{systemname})){
+            $parrec->{systemname}=lc($parrec->{systemname});
+         }
+         my $now=NowStamp();
+         if ($now gt "20110401080000"){
+            $self->IfaceCompare($dataobj,
+                                $rec,"name",
+                                $parrec,"systemname",
+                                $forcedupd,$wfrequest,
+                                \@qmsg,\@dataissue,\$errorlevel,
+                                mode=>'string');
+         }
 
          $self->IfaceCompare($dataobj,
                              $rec,"servicesupport",
