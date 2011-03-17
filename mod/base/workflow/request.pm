@@ -439,9 +439,10 @@ sub getPosibleActions
    }
    if ((($stateid==4 || $stateid==3) && ($lastworker==$userid || $isadmin)) ||
        ($iscurrent && $userid==$creator)){
-      push(@l,"wfmailsend");   # notiz hinzufügen        (jeder)
+      push(@l,"wfmailsend");   # mail versenden
       push(@l,"wfaddnote");    # notiz hinzufügen        (jeder)
-      push(@l,"wfdefer");      # notiz hinzufügen        (jeder)
+      push(@l,"wfdefer");      # workflow ablehnen
+      push(@l,"wfstartnew");   # neuen Workflow ableiten
    }
    if (($stateid==2 || $stateid==7 || $stateid==10 || $stateid==5) &&
        ((($lastworker!=$userid) && 
@@ -1036,6 +1037,27 @@ sub nativProcess
       }
       return(0);
    }
+   elsif($op eq "wffine"){
+      if ($self->getParent->getParent->Action->StoreRecord(
+          $WfRec->{id},"wffine",
+          {translation=>'base::workflow::request'},"",undef)){
+         my $nextstep=$self->getParent->getStepByShortname("finish");
+         my $store={stateid=>21,
+                    step=>$nextstep,
+                    fwdtargetid=>undef,
+                    fwdtarget=>undef,
+                    closedate=>NowStamp("en"),
+                    fwddebtarget=>undef,
+                    fwddebtargetid=>undef};
+         if ($WfRec->{eventend} eq ""){
+            $store->{eventend}=NowStamp("en");
+         }
+         $self->StoreRecord($WfRec,$store);
+         $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
+         $self->PostProcess("SaveStep.".$op,$WfRec,$actions);
+         return(1);
+      }
+   }
    elsif($op eq "wffineproc"){
       if ($self->getParent->getParent->Action->StoreRecord(
           $WfRec->{id},"wfaddnote",
@@ -1194,26 +1216,8 @@ sub Process
          return(0);
       }
       elsif ($op eq "wffine"){
-         if ($self->getParent->getParent->Action->StoreRecord(
-             $WfRec->{id},"wffine",
-             {translation=>'base::workflow::request'},"",undef)){
-            my $nextstep=$self->getParent->getStepByShortname("finish");
-            my $store={stateid=>21,
-                       step=>$nextstep,
-                       fwdtargetid=>undef,
-                       fwdtarget=>undef,
-                       closedate=>NowStamp("en"),
-                       fwddebtarget=>undef,
-                       fwddebtargetid=>undef};
-            if ($WfRec->{eventend} eq ""){
-               $store->{eventend}=NowStamp("en");
-            }
-            $self->StoreRecord($WfRec,$store);
-            $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
-            $self->PostProcess($action.".".$op,$WfRec,$actions);
-            return(1);
-         }
-         return(0);
+         my $h=$self->getWriteRequestHash("web");
+         return($self->nativProcess("wffine",$h,$WfRec,$actions));
       }
       elsif ($op eq "wffineproc"){
          my $note=Query->Param("note");
