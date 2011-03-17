@@ -77,7 +77,7 @@ sub addWorkflow2Mail
          my $isinscope=1;          
          if (my $duration=CalcDateDuration($wfact->{cdate},
                                            $wfrec->{mdate},"GMT")){
-            if ($duration->{totalminutes}>($param->{hours}+24)*60){  
+            if ($duration->{totalminutes}>($param->{hours}+2)*60){  
                $outoffscope++;
                $isinscope=0;
             }
