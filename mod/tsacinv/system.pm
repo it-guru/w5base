@@ -410,6 +410,20 @@ sub new
                 onRawValue    =>\&AddW5BaseData,
                 depend        =>'systemid'),
 
+      new kernel::Field::Text(
+                name          =>'w5base_businessteam',
+                searchable    =>0,
+                group         =>'w5basedata',
+                label         =>'W5Base Businessteam',
+                onRawValue    =>\&AddW5BaseData,
+                depend        =>'systemid'),
+
+      new kernel::Field::Date(
+                name          =>'instdate',
+                group         =>'source',
+                label         =>'Installation date',
+                dataobjattr   =>'amportfolio.dtinvent'),
+
       new kernel::Field::Date(
                 name          =>'cdate',
                 group         =>'source',
@@ -486,28 +500,32 @@ sub AddW5BaseData
       my $w5appl=$app->getPersistentModuleObject("W5BaseAppl","itil::appl");
       $w5sys->ResetFilter();
       $w5sys->SetFilter({systemid=>\$systemid});
-      my ($rec,$msg)=$w5sys->getOnlyFirst(qw(applications sem tsm));
+      my ($rec,$msg)=$w5sys->getOnlyFirst(qw(applications));
       my %l=();
       if (defined($rec)){
          my %appl=();
          my %sem=();
          my %tsm=();
+         my %businessteam=();
          if (defined($rec->{applications}) && 
              ref($rec->{applications}) eq "ARRAY"){
             foreach my $app (@{$rec->{applications}}){
                $appl{$app->{applid}}=$app->{appl};
                $w5appl->ResetFilter();
                $w5appl->SetFilter({id=>\$app->{applid}});
-               my ($arec,$msg)=$w5appl->getOnlyFirst(qw(sem semid tsm tsmid));
+               my ($arec,$msg)=$w5appl->getOnlyFirst(qw(sem businessteam 
+                                                        semid tsm tsmid));
                if (defined($arec)){
                   $sem{$arec->{semid}}=$arec->{sem};
                   $tsm{$arec->{tsmid}}=$arec->{tsm};
+                  $businessteam{$arec->{businessteam}}=$arec->{businessteam};
                }
             }
          }
          $l{w5base_appl}=[sort(values(%appl))];
          $l{w5base_sem}=[sort(values(%sem))];
          $l{w5base_tsm}=[sort(values(%tsm))];
+         $l{w5base_businessteam}=[sort(values(%businessteam))];
       }
       $c->{W5BaseSys}->{$systemid}=\%l;
    }
