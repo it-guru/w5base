@@ -110,6 +110,7 @@ sub RSS
          $mandator[0]="*";
       }
       my $c=0;
+      my $baseurl=$self->Config->Param("EventJobBaseUrl");
       foreach my $WfRec ($wf->getHashList(qw(ALL))){
          my $item="???";
          if ($WfRec->{eventmode} eq "EVk.appl"){
@@ -155,7 +156,6 @@ sub RSS
          my $title=$item;
         # my $title=$item."\n (Prio".$WfRec->{eventstatclass}.")";
          my $desc=$WfRec->{eventshortsummary};
-         my $baseurl=$self->Config->Param("EventJobBaseUrl");
          if ($ENV{'SERVER_NAME'} ne ""){
             my ($proto)=$ENV{SCRIPT_URI}=~m/^(\S+):.*/;
             $baseurl=$proto."://".
@@ -177,9 +177,14 @@ sub RSS
          printf("</item>");
       }
       if ($c==0){
+         my $okimg=$baseurl."/static/rssfeed/ok.gif";
          printf("<item>");
          printf("<description>%s</description>",
                 XmlQuote($self->T("There are no current messages")));
+#         printf("<im:enclosure url=\"$okimg\" ".
+#                "size=\"small\" alt_text=\"%s\" ".
+#                "size_x=\"190\" size_y=\"99\" />",
+#                XmlQuote($self->T("There are no current messages")));
          printf("</item>");
       }
    }
