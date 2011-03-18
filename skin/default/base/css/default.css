@@ -188,12 +188,6 @@ iframe.popupFrame {
 	background-color: #30579f;
 	color: #ffffff;
 	font-weight: bold;
-   text-decoration:none;
-}
-tr.TitleBar {
-	background-color: #30579f;
-	color: #ffffff;
-	font-weight: bold;
 	height: 19px;
         overflow:hidden;
 	padding: 0px;
@@ -206,6 +200,12 @@ tr.TitleBar {
 	position: relative;
         white-space: nowrap;
 	z-index: 203;
+}
+a:link.TitleBarLink, a:visited.TitleBarLink, a:active.TitleBarLink {
+	background-color: #30579f;
+	color: #ffffff;
+	font-weight: bold;
+   text-decoration:none;
 }
 #LoggedInAs{
 	cursor: pointer;

@@ -346,6 +346,14 @@ sub DatabaseLowInit
 }
 
 
+sub getAppDirectLink
+{
+   my $self=shift;
+
+   return('Main');
+}
+
+
 sub getAppTitleBar
 {
    my $self=shift;
@@ -367,13 +375,15 @@ sub getAppTitleBar
    $param{title}=$self->T($self->Self,$self->Self) if (!defined($param{title}));
    my $titleonclick="";
    if ($self->can("ModuleObjectInfo")){
-      $titleonclick="onclick=\"ModuleObjectInfo();\" id=ModuleObjectInfo";
+      $titleonclick="onclick=\"ModuleObjectInfo();return(false);\" ".
+                    "id=ModuleObjectInfo";
    }
    my $titlebar=sprintf("<tr class=TitleBar><td nowrap align=left>".
                  "<div $titleonclick ".
                  "style=\"margin:0;padding:0;padding-left:5px;".
                  "overflow:hidden\">".
-                 "%s&nbsp;</div></td>".
+                 "<a class=TitleBarLink target=_top ".
+                 "href='".$self->getAppDirectLink()."'>%s</a>&nbsp;</div></td>".
                  "<td align=right nowrap><div $onclick ".
                  "style=\"margin:0;padding:0;padding-right:5px;".
                  "margin-left:10px;\">%s</div>".

@@ -38,6 +38,14 @@ sub getValidWebFunctions
    return(qw(Main Welcome Result ViewEditor Bookmark));
 }
 
+sub getAppDirectLink
+{
+   my $self=shift;
+   my $oldval=Query->Param("MyW5BaseSUBMOD");
+
+   return('Main?MyW5BaseSUBMOD='.$oldval);
+}
+
 sub Main
 {
    my $self=shift;
