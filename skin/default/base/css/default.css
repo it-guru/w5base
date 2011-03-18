@@ -183,7 +183,14 @@ iframe.popupFrame {
 	position: relative;
 	z-index: 202;
 }
+
 .TitleBar {
+	background-color: #30579f;
+	color: #ffffff;
+	font-weight: bold;
+   text-decoration:none;
+}
+tr.TitleBar {
 	background-color: #30579f;
 	color: #ffffff;
 	font-weight: bold;
