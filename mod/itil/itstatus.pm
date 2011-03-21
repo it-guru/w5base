@@ -84,7 +84,12 @@ sub RSS
 
    print($self->HttpHeader("text/xml",charset=>'UTF-8'));
    printf("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
-   printf("<rss version=\"2.0\">\n");
+   printf("<rss version=\"2.0\" ".
+          "xmlns:content=\"http://purl.org/rss/1.0/modules/content/\" ".
+          "xmlns:im=\"http://www.infomantis.de/download/namespace/gorss.xml\" ".
+          "xmlns:taxo=\"http://purl.org/rss/1.0/modules/taxonomy/\" ".
+          "xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" ".
+          "xmlns:dc=\"http://purl.org/dc/elements/1.1/\">\n");
    printf("<channel>\n");
    if ($customer ne ""){
       printf("<title>%s: %s</title>",$self->T("IT Status"));
@@ -179,12 +184,12 @@ sub RSS
       if ($c==0){
          my $okimg=$baseurl."/static/rssfeed/ok.gif";
          printf("<item>");
-         printf("<description>%s</description>",
+        # printf("<description>%s</description>",
+        #        XmlQuote($self->T("There are no current messages")));
+         printf("<im:enclosure url=\"$okimg\" ".
+                "size=\"small\" alt_text=\"%s\" ".
+                "size_x=\"190\" size_y=\"60" />",
                 XmlQuote($self->T("There are no current messages")));
-#         printf("<im:enclosure url=\"$okimg\" ".
-#                "size=\"small\" alt_text=\"%s\" ".
-#                "size_x=\"190\" size_y=\"99\" />",
-#                XmlQuote($self->T("There are no current messages")));
          printf("</item>");
       }
    }
