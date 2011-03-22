@@ -29,6 +29,7 @@ sub new
    #$param{MainSearchFieldLines}=5;
    my $self=bless($type->SUPER::new(%param),$type);
    $self->{use_distinct}=0;
+   $self->{noHtmlTableSort}=1;
 
 
 

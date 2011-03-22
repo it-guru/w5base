@@ -121,6 +121,10 @@ sub ProcessHead
       $d.="<table width=100% style=\"table-layout:fixed\">".
           "<tr><td><div style=\"overflow:hidden\">\n";
    }
+   my $activeateSort="addEvent(window,\"load\",InitTab$tableid);";
+   if ($app->{noHtmlTableSort}==1){
+      $activeateSort="";
+   }
    $d.=<<EOF if ($param->{ParentMode} eq "HtmlDetail");
 <script language="JavaScript">
 var SortTable$tableid;
@@ -131,7 +135,7 @@ var rows = SortTable$tableid.tBody.rows;
 var l = rows.length;
 for (var i = 0; i < l; i++) { SortableTableremoveClassName(rows[i]); SortableTableaddClassName(rows[i], i % 2 ? "subline2":"subline1"); } }; SortTable$tableid.sort(0,false);
 }
-addEvent(window,"load",InitTab$tableid);
+$activeateSort
 </script>
 EOF
    if ($param->{ParentMode} eq "HtmlNative"){
