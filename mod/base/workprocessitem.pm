@@ -55,6 +55,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'itemno',
+                htmlwidth     =>'20px',
                 label         =>'Item No.',
                 dataobjattr   =>'workprocessitem.orderpos'),
 
@@ -67,6 +68,30 @@ sub new
                 name          =>'comments',
                 label         =>'Comments',
                 dataobjattr   =>'workprocessitem.comments'),
+
+      new kernel::Field::Htmlarea(
+                name          =>'visualname',
+                depend        =>['name','comments'],
+                label         =>'Prozessschritt',
+                htmldetail    =>0,
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   if ($current->{comments} eq ""){
+                      return("<b>".$current->{name}."</b>");
+                   }
+                   my $c=$current->{comments};
+                   sub mod{
+                       my $l=shift;
+                       return("<xmp style='padding:0;margin:0'>".
+                               trim($l)."</xmp>");
+                   }
+                   $c=~s/^\s(.*)$/mod($1)/gme;
+                   $c=~s/<\/xmp>\n/<\/xmp>/gs;
+                   $c=~s/\n/<br>\n/g;
+       
+                   return("<i><b>".$current->{name}."</b></i><br>".$c);
+                }),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
