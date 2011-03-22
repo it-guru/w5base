@@ -235,3 +235,4 @@ create table workprocessitem (
   UNIQUE KEY name (workprocess,orderkey),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 );
+alter table workprocessitem add is_milestone int(1) default '0';
