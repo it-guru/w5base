@@ -91,7 +91,9 @@ sub new
                 subeditmsk    =>'subedit.workprocess',
                 vjointo       =>'base::workprocessitem',
                 vjoinon       =>['id'=>'workprocessid'],
-                vjoindisp     =>['itemno','name']),
+                vjoindisp     =>['itemno','visualname'],
+                vjoininhash   =>['orderkey','id','name','comments'],
+                ),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
