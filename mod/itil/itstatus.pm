@@ -188,7 +188,7 @@ sub RSS
         #        XmlQuote($self->T("There are no current messages")));
          printf("<im:enclosure url=\"$okimg\" ".
                 "size=\"small\" alt_text=\"%s\" ".
-                "size_x=\"190\" size_y=\"60" />",
+                "size_x=\"190\" size_y=\"60\" />",
                 XmlQuote($self->T("There are no current messages")));
          printf("</item>");
       }
