@@ -14,6 +14,9 @@
 'Tools.workflow.repjob'=>{de=>'Report Job',en=>'Report Job'},
 'Tools.workflow.repjob.new'=>{de=>'Neueingabe',en=>'New'},
 'Tools.workflownew'=>{de=>'Neuen Workflow starten',en=>'start workflow'},
+'Tools.workproc'=>{de=>'Arbeitsprozess',en=>'Workprocess'},
+'Tools.workproc.new'=>{de=>'Neueingabe',en=>'New'},
+'Tools.workproc.item'=>{de=>'Porzess-Schritt',en=>'Workprocessitem'},
 'sysadm'=>{de=>'Systemverwaltung',en=>'Systemadministration'},
 'sysadm:Desc'=>{de=>"In diesem Modul können ".
                     "Sie das System verwalten",

@@ -1,0 +1,5 @@
+'base::workprocess'=>{de=>'Arbeitsprozess/Checkliste',en=>'Workprocess/Checklist'},
+'Databoss'=>{de=>'Datenverantwortlicher'},
+'Prozess label'=>{de=>'Prozessbezeichnung'},
+'target of the workprocess'=>{de=>'Ziel des Arbeitsprozesses'},
+'fieldgroup.items'=>{de=>'Prozessschritte',en=>'Prozessitems'},

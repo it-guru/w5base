@@ -288,6 +288,19 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("Tools.workproc",
+                      "base::workprocess",
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("Tools.workproc.new",
+                      "base::workprocess",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("Tools.workproc.item",
+                      "base::workprocessitem",
+                      defaultacl=>['admin']);
+   
    $self->RegisterObj("Tools.teamtools",
                       "tmpl/welcome",
                       defaultacl=>['valid_user']);

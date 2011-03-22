@@ -192,3 +192,46 @@ alter table wfhead add md5sechash char(22) default NULL, add key(md5sechash), ad
 alter table wfattach add filename varchar(254) not NULL;
 alter table wfattach add mimetype varchar(128) not NULL;
 alter table joblog add msg varchar(254) default '';
+create table workprocess (
+  id         bigint(20) NOT NULL,
+  name       varchar(80) NOT NULL,
+  cistatus   int(2)      NOT NULL,
+    databoss       bigint(20)  default NULL,
+    mandator       bigint(20)  default NULL,
+    targetdesc     longtext    default NULL,
+    additional     longtext    default NULL,
+  comments    longtext     default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) default NULL,
+  modifyuser bigint(20) default NULL,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  srcsys     varchar(100) default 'w5base',
+  srcid      varchar(20) default NULL,
+  srcload    datetime    default NULL,
+  PRIMARY KEY  (id),KEY  (mandator),
+  UNIQUE KEY name (name,mandator),
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+);
+create table workprocessitem (
+  id          bigint(20) NOT NULL,
+  workprocess bigint(20) NOT NULL,
+  orderkey    char(20)   default '00000000000000000001',
+  orderpos    varchar(25)  default '1',
+  name        varchar(128) NOT NULL,
+  establishedtime  int(20)  default NULL,
+  comments         longtext default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) default NULL,
+  modifyuser bigint(20) default NULL,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  srcsys     varchar(100) default 'w5base',
+  srcid      varchar(20) default NULL,
+  srcload    datetime    default NULL,
+  PRIMARY KEY  (id),key (orderkey),
+  UNIQUE KEY name (workprocess,orderkey),
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+);
