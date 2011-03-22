@@ -64,6 +64,26 @@ sub new
                 label         =>'Item label',
                 dataobjattr   =>'workprocessitem.name'),
 
+      new kernel::Field::TextDrop(
+                name          =>'workprocess',
+                group         =>'wp',
+                label         =>'Workprocess',
+                vjointo       =>'base::workprocess',
+                vjoinon       =>['workprocessid'=>'id'],
+                vjoindisp     =>'name'),
+                                                   
+      new kernel::Field::Boolean(
+                name          =>'is_milestone',
+                label         =>'process step is milestone',
+                dataobjattr   =>'workprocessitem.is_milestone'),
+
+      new kernel::Field::Number(
+                name          =>'establishedtime',
+                unit          =>'min',
+                precision     =>'0',
+                label         =>'established time',
+                dataobjattr   =>'workprocessitem.establishedtime'),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',
@@ -71,14 +91,20 @@ sub new
 
       new kernel::Field::Htmlarea(
                 name          =>'visualname',
-                depend        =>['name','comments'],
+                depend        =>['name','comments','is_milestone'],
                 label         =>'Prozessschritt',
                 htmldetail    =>0,
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
+                   my $name=$current->{name};
+                   $name="<span style='color:darkblue'>".
+                          $name."</span>";
+                   if ($current->{is_milestone}){
+                      $name="<b>".$name."</b>";
+                   }
                    if ($current->{comments} eq ""){
-                      return("<b>".$current->{name}."</b>");
+                      return($name);
                    }
                    my $c=$current->{comments};
                    sub mod{
@@ -90,8 +116,9 @@ sub new
                    $c=~s/<\/xmp>\n/<\/xmp>/gs;
                    $c=~s/\n/<br>\n/g;
        
-                   return("<i><b>".$current->{name}."</b></i><br>".$c);
+                   return($name."<br>".$c);
                 }),
+
 
       new kernel::Field::Text(
                 name          =>'srcsys',
@@ -163,8 +190,7 @@ sub new
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default misc source));
+   return(qw(header default wp source));
 }
 
 
@@ -252,7 +278,6 @@ sub Validate
    if (exists($newrec->{itemno})){
       $newrec->{orderkey}=$orderkey;
    }
-   
 
 
    return(1);
