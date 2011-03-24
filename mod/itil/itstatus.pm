@@ -184,8 +184,8 @@ sub RSS
       if ($c==0){
          my $okimg=$baseurl."/static/rssfeed/ok.gif";
          printf("<item>");
-        # printf("<description>%s</description>",
-        #        XmlQuote($self->T("There are no current messages")));
+         printf("<description>%s</description>",
+                XmlQuote($self->T("There are no current messages")));
          printf("<im:enclosure url=\"$okimg\" ".
                 "size=\"small\" alt_text=\"%s\" ".
                 "size_x=\"190\" size_y=\"60\" />",
