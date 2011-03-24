@@ -875,6 +875,16 @@ sub Validate
    return(1);
 }
 
+sub getDetailBlockPriority
+{
+   my $self=shift;
+
+   return("header","default","acl","source");
+}
+
+
+
+
 
 
 sub isWriteValid
@@ -889,7 +899,8 @@ sub isWriteValid
 
    return(@fieldgroup) if ($userid==$rec->{modifyuser});
 
-   my @acl=$self->getCurrentAclModes($ENV{REMOTE_USER},$rec->{acls});
+   my @acl=$self->getCurrentAclModes($ENV{REMOTE_USER},$rec->{acls},
+                                     undef,"direct");
    return(@fieldgroup) if ($rec->{owner}==$userid ||
                            $self->IsMemberOf("admin") ||
                            grep(/^write$/,@acl));
