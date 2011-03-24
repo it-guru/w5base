@@ -61,7 +61,9 @@ sub NotifyPlasma
    my ($WfRec)=$wf->getOnlyFirst(qw(involvedcustomer affectedapplication));
    my $involvedcustomer=$WfRec->{involvedcustomer};
    $involvedcustomer=[$involvedcustomer] if (ref($involvedcustomer) ne "ARRAY");
-   if (!grep(/^DTAG\.ACTIVEBILLING.*/,@$involvedcustomer)){
+   if (
+       !grep(/^DTAG\.ACTIVEBILLING.*/,@$involvedcustomer) &&
+       !grep(/^DTAG\.TDG\.ACTIVEBILLING.*/,@$involvedcustomer)){
       return({exitcode=>0,
               msg=>'no trigger needed'});
    }
