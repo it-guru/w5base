@@ -223,7 +223,8 @@ sub GetDestPublicKeys
    if (ref($erec->{acls}) eq "ARRAY"){
       foreach my $arec (@{$erec->{acls}}){
          if ($arec->{acltarget} eq "base::grp"){
-            map({$destu{$_}=$_} $self->getMembersOf($arec->{acltargetid}));
+            map({$destu{$_}=$_} $self->getMembersOf($arec->{acltargetid},
+                                                    "RMember","direct"));
          } 
          if ($arec->{acltarget} eq "base::user"){
             $destu{$arec->{acltargetid}}=$arec->{acltargetid};
