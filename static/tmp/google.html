@@ -7,6 +7,9 @@
 //
 // Google Contacts API at 
 // http://code.google.com/intl/de/apis/gdata/jsdoc/2.2/index.html
+//
+// auch interessant:
+// http://www.google.com/support/forum/p/Google+Apps/thread?tid=05918ff30d6c28d6&hl=en
 
 var contactsObj;
 
@@ -21,33 +24,60 @@ function getMyContacts() {
   var query = new google.gdata.contacts.ContactQuery(contactsFeedUri);
   
   // Set the maximum of the result set to be 5
-  query.setMaxResults(5);
+  query.setMaxResults(25);
   
   contactsObj.getContactFeed(query, handleContactsFeed, handleError);
 }
 
 var handleContactsFeed = function(result) {
   var entries = result.feed.entry;
-  var d="";
+  var d="<table border=1>";
   for (var i = 0; i < entries.length; i++) {
+    d+="<tr>";
     var contactEntry = entries[i];
     var emailAddresses = contactEntry.getEmailAddresses();
 
     var n = contactEntry.getName();
-    var disp=n.getFamilyName().getValue();
+    var surname;
+    if (n!=undefined && n.getFamilyName()!=undefined){
+       surname=n.getFamilyName().getValue();
+    }
+    d+="<td>"+surname+"</td>";
+
+    var n = contactEntry.getName();
+    var givenname;
+    if (n!=undefined && n.getGivenName()!=undefined){
+       givenname=n.getGivenName().getValue();
+    }
+    d+="<td>"+givenname+"</td>";
+
+    var n = contactEntry.getName();
+    var fullname;
+    if (n){
+       fullname=n.getFullName().getValue();
+    }
+    d+="<td>"+fullname+"</td>";
+
 
     var p = contactEntry.getPhoneNumbers();
 
-    var phone;
-    if (p && p[0]){
-       phone=p[0].getLabel()+"="+p[0].getValue();
+    console.log(p);
+
+    if (p){
+       for (var j=0;j<p.length;j++){
+           var relSplit=p[j].getRel().split("#");
+           phone=relSplit[1]+"="+p[j].getValue();
+           d+="<td>"+phone+"</td>";
+       }
     }
-    
-    for (var j = 0; j < emailAddresses.length; j++) {
-      var emailAddress = emailAddresses[j].getAddress();
-      d+=disp+' email = ' + emailAddress+";"+phone+"<br>";
-    }    
+//    
+//    for (var j = 0; j < emailAddresses.length; j++) {
+//      var emailAddress = emailAddresses[j].getAddress();
+//     d+=disp+' email = ' + emailAddress+";"+phone+"<br>";
+//    }    
+    d+="</tr>";
   }
+  d+="</table>";
   $('#out').html(d);
 }
 
