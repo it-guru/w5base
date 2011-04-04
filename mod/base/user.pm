@@ -750,6 +750,23 @@ sub new
                 vjoinon       =>['userid'=>'userid'],
                 vjoindisp     =>['dstaccount','active','cdate']),
 
+      new kernel::Field::Text(
+                name          =>'allphones',
+                label         =>'all nativ phone numbers',
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                group         =>'userro',
+                htmldetail    =>0,
+                readonly      =>1,
+                dataobjattr   =>formPhoneSql(qw(contact.office_phone
+                                                contact.office_mobile
+                                                contact.private_phone
+                                                contact.private_mobile ))),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 group         =>'comments', 
@@ -771,6 +788,31 @@ sub new
    $self->setDefaultView(qw(fullname cistatus usertyp));
    return($self);
 }
+
+
+sub formPhoneSql
+{
+   my $s="";
+   
+
+   while(my $v=shift){
+      $s.=",' '," if ($s ne "");
+      $s.="if ($v<>'',".
+          "replace(replace(replace($v,'/',''),'-',''),' ',''),'')";
+   }
+   if ($s ne ""){
+      $s="concat($s)";
+      $s="replace($s,'  ',' ')";
+      $s="replace($s,'  ',' ')";
+      $s="trim($s)";
+      $s="replace($s,' ','; ')";
+   }
+   else{
+      $s="'-'";
+   }
+   return($s);
+}
+      
 
 sub getLastLogon
 {
@@ -1238,6 +1280,24 @@ sub initSearchQuery
                   "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
    }
 }
+
+sub validateSearchQuery
+{
+   my $self=shift;
+
+   my $allphones=Query->Param("search_allphones");
+   if (defined($allphones) && $allphones ne ""){
+      if ($allphones=~m/^[0-9 \+]+$/){
+         $allphones=~s/\+\d\d/*/g; 
+         my @w=split(/\s+/,$allphones);
+         $allphones=join(" ",map({'*'.$_.'*'} @w));
+         Query->Param("search_allphones"=>$allphones);
+      }
+   }
+
+   return($self->SUPER::validateSearchQuery());
+}
+
 
 
 sub isWriteValid

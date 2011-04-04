@@ -23,6 +23,7 @@
 'Mobile-Phonenumber'=>{ de=>'Handy-Nummer'},
 'privat Mobile-Phonenumber'=>{ de=>'priv. Handy-Nummer'},
 'Accounts'=>{ de=>'Kennungen'},
+'all nativ phone numbers'=>{ de=>'alle generischen Telefonnummern'},
 'Groups'=>{ de=>'Gruppen'},
 'Pagelimit'=>{ de=>'Seitenbegrenzung'},
 'simialr contacts'=>{ de=>'ähnliche Kontakte'},
