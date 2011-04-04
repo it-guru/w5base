@@ -209,6 +209,12 @@ sub new
                 name          =>'killtimeout',
                 label         =>'limit query duration',
                 precision     =>0,
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
                 unit          =>'sec',
                 group         =>'userro',
                 dataobjattr   =>'contact.killtimeout'),
@@ -217,6 +223,12 @@ sub new
                 name          =>'gtcack',
                 label         =>'GTC acknowledge date',
                 readonly      =>1,
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
                 group         =>'userro',
                 dataobjattr   =>'contact.gtcack'),
                                   
@@ -224,6 +236,12 @@ sub new
                 name          =>'gtctxt',
                 label         =>'GTC text',
                 readonly      =>1,
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
                 htmldetail    =>0,
                 group         =>'userro',
                 dataobjattr   =>'contact.gtctxt'),
@@ -711,6 +729,7 @@ sub new
                 name          =>'groupnames',
                 label         =>'Groupnames',
                 group         =>'groups',
+                searchable    =>0,
                 htmldetail    =>0,
                 readonly      =>1,
                 vjointo       =>'base::lnkgrpuser',
