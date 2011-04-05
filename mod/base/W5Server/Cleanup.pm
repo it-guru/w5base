@@ -63,7 +63,7 @@ sub doCleanup
 
    msg(DEBUG,"(%s) Processing doCleanup",$self->Self);
    my $j=$self->getParent->getPersistentModuleObject("base::joblog");
-   my $jop=$self->getParent->getPersistentModuleObject("base::joblog");
+   my $jop=$j->Clone();
    if (defined($j)){
       $j->SetFilter({'mdate'=>$CleanupJobLog});
       $j->SetCurrentView(qw(ALL));
