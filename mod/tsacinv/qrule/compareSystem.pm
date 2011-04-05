@@ -153,8 +153,33 @@ sub qcheckRecord
          if (defined($parrec->{systemname})){
             $parrec->{systemname}=lc($parrec->{systemname});
          }
-         my $now=NowStamp();
-         if ($now gt "20110401080000"){
+         my $nameok=1;
+         if ($parrec->{systemname} ne $rec->{name} &&
+             ($parrec->{systemname}=~m/\s/)){
+            $nameok=0;
+            push(@qmsg,'systemname with whitespace in AssetManager - '.
+                       'contact oss to fix this!');
+            $errorlevel=3 if ($errorlevel<3);
+         }
+#         if ($parrec->{systemname}=~m/^\s*$/){  # könnte notwendig werden!
+#            $nameok=0;
+#         }
+         if ($nameok){
+            $dataobj->ResetFilter();
+            $dataobj->SetFilter({name=>\$parrec->{systemname},
+                                 id=>"!".$rec->{id}});
+            my ($chkrec,$msg)=$dataobj->getOnlyFirst(qw(id name));
+            if (defined($chkrec)){
+               $nameok=0;
+               push(@qmsg,'systemname from AssetManager is already in use '.
+                          'by an other system - '.
+                          'contact OSS make the systemname unique!');
+               $errorlevel=3 if ($errorlevel<3);
+            }
+         }
+
+
+         if ($nameok){
             $self->IfaceCompare($dataobj,
                                 $rec,"name",
                                 $parrec,"systemname",
