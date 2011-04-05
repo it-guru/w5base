@@ -67,6 +67,7 @@ sub doCleanup
    if (defined($j)){
       $j->SetFilter({'mdate'=>$CleanupJobLog});
       $j->SetCurrentView(qw(ALL));
+      $j->SetCurrentOrder(qw(NONE));
 
       my ($rec,$msg)=$j->getFirst(unbuffered=>1);
       if (defined($rec)){
