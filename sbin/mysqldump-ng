@@ -29,20 +29,34 @@ use Date::Calc qw( Today_and_Now
 use IPC::Open3;
 use IO::Handle;
 use IO::Select;
+use Compress::Zlib;
 use Getopt::Long;
 use Cwd;
 use File::Path;
 use POSIX;
 
-umask(0006);
-
 my $starttime=sprintf("%04d-%02d-%02d %02d:%02d:%02d",Today_and_Now);
 $Data::Dumper::Terse = 1;          
 $Data::Dumper::Indent = 1;  
-my @prog=qw(mysql mysqldump gunzip gzip);
+my @prog=qw(mysql mysqldump gunzip);
 my($db,$prog,$err,$help,$exclude,$tasks,$convert,$file,$verbose,
-   $format,$mode,$targetdb,$dir,%inputinclude,%inputexclude);
+   $format,$mode,$targetdb,$dir,%inputinclude,%inputexclude,$mydefaultsfile);
 my $force=0;
+
+# posible options
+my $optresult = GetOptions ("help"            => \$help,
+                            "exclude=s"       => \$exclude,
+                            "dir=s"           => \$dir,
+                            "file=s"          => \$file,
+                            "tasks=i"         => \$tasks,
+                            "mode=s"          => \$mode,
+                            "targetdb=s"      => \$targetdb,
+                            "force"           => \$force,
+                            "verbose"         => \$verbose,
+                            "format=s"        => \$format,
+                            "convert=s"       => \$convert,
+                            "defaults-file=s" => \$mydefaultsfile);
+
 # find progamms
 foreach my $p (@prog){
    my $found=0;
@@ -56,19 +70,19 @@ foreach my $p (@prog){
    die("programm $p not found") if (!$found);
 }
 
+if (defined($mydefaultsfile) && $mydefaultsfile ne ""){
+   if ( -r $mydefaultsfile ){
+      $prog->{"mysql"}=$prog->{mysql}.
+                       " --defaults-file=$mydefaultsfile";
+      $prog->{"mysqldump"}=$prog->{mysqldump}.
+                           " --defaults-file=$mydefaultsfile";
+   }
+   else{
+      msg("ERROR","invalid defaults file '$mydefaultsfile' specified");
+      exit(1);
+   }
+}
 
-# posible options
-my $optresult = GetOptions ("help"        => \$help,
-                            "exclude=s"   => \$exclude,
-                            "dir=s"       => \$dir,
-                            "file=s"      => \$file,
-                            "tasks=i"     => \$tasks,
-                            "mode=s"      => \$mode,
-                            "targetdb=s"  => \$targetdb,
-                            "force"       => \$force,
-                            "verbose"     => \$verbose,
-                            "format=s"    => \$format,
-                            "convert=s"   => \$convert);
 
 # print help message
 help() if ($help); 
@@ -78,32 +92,46 @@ sub help
       print <<EOF;
    Usage: mysqldump-ng [options] database [tables]
   
-        --help         show this help
-        --dir          directory to save dumps or import dumps,
-                       (default current directory)
-                       if you want to save one dump in more than one
-                       directory you can seperate the directory names
-                       with comma
-        --file         file or files for import (seperat files by comma)
-        --mode         export, import or transfer [default:export]
-        --targetdb     is needed in transfermode transfer
-        --tasks        number of tasks are be able running simultaneous [default:4]
-        --exclude      tables excluded for dump (seperat tables by comma)
-        --convert      save dump in spezial database format (InnoDB|MyISAM)
-        --force        ignore warnings for example overwritting tables
-        --verbose      write more output
-        --format       defines the format of the dump folder (default: '\%db-\%Y-\%M-\%D-\%h:\%m')
-                       if you save the dump in more than one folder, you can give various
-                       formats seperat by comma
-                       \%Y   Year
-                       \%M   Month
-                       \%D   Day
-                       \%d   day of the week
-                       \%h   hour
-                       \%m   minute
-                       \%s   second
-                       \%w   week  (is like shell command 'date +%V')
-                       \%db  database
+        --help          show this help
+
+        --dir           directory to save dumps or import dumps,
+                        (default current directory)
+                        if you want to save one dump in more than one
+                        directory you can seperate the directory names
+                        with comma
+
+        --file          file or files for import (seperat files by comma)
+
+        --mode          export, import or transfer [default:export]
+
+        --targetdb      is needed in transfermode transfer
+
+        --tasks         number of tasks are be able running 
+                        simultaneous [default:4]
+
+        --exclude       tables excluded for dump (seperat tables by comma)
+
+        --convert       save dump in spezial database format (InnoDB|MyISAM)
+
+        --defaults-file configfile for mysql and mysqladmin
+
+        --force         ignore warnings for example overwritting tables
+
+        --verbose       write more output
+
+        --format        defines the format of the dump 
+                        folder (default: '\%db-\%Y-\%M-\%D-\%h:\%m')
+                        if you save the dump in more than one folder, 
+                        you can give various formats seperat by comma
+                        \%Y   Year
+                        \%M   Month
+                        \%D   Day
+                        \%d   day of the week
+                        \%h   hour
+                        \%m   minute
+                        \%s   second
+                        \%w   week  (is like shell command 'date +%V')
+                        \%db  database
 EOF
       exit(1);                    
    }                              
@@ -120,7 +148,8 @@ sub dirformat
    ($format{Y},$format{M},$format{D},
     $format{h},$format{m},$format{s})=Today_and_Now();
    ($format{w})=Week_of_Year($format{Y},$format{M},$format{D});
-   ($format{d})=Day_of_Week_to_Text(Day_of_Week($format{Y},$format{M},$format{D}));
+   ($format{d})=Day_of_Week_to_Text(Day_of_Week(
+                                $format{Y},$format{M},$format{D}));
    foreach my $v (qw(h m s M D w)){
       $format{$v}=sprintf("%02d",$format{$v});
    }
@@ -140,12 +169,6 @@ sub msg
 {
    my $type=shift;
    my $msg=shift;
-
-   if (!defined($msg) || !defined($type)){
-      $type="ERROR";
-      my ($package, $filename, $line)=caller();
-      $msg="call of msg with undefined message from ($package,$filename,$line)";
-   }
    $msg=~s/%/%%/g if ($#_==-1);
    $msg=sprintf($msg,@_);
    return("") if (!$verbose and $type ne "ERROR");
@@ -173,7 +196,8 @@ sub check_db
       open3(undef,*R,*E,"$prog->{mysql} $db");
       wait();
       if ($? != 0){
-         msg("ERROR","source database $db not useable or not found, rc=".$?>>8);
+         msg("ERROR","source database $db not useable or not found, rc=".
+                     ($?>>8));
          exit(1);
       }
       close(R);
@@ -196,9 +220,9 @@ sub check_targetdb
    close(R);
    if ($? == 0){
       if ($force != 1){
-         msg("ERROR","the target database=$tdb exists,
-the database will be drop!!
-Do you want continue? [y/N]: ");
+         msg("ERROR","the target database=$tdb exists,\n".
+                     "the database will be drop!!\n".
+                     "Do you want continue? [y/N]: ");
          chomp(my $decision=<STDIN>);
          if (!(lc($decision) eq "yes" or lc($decision) eq "y")){
             msg("ERROR","abort by user");
@@ -440,43 +464,19 @@ sub process_engine
                  }
               }
 
-           #   bugy version of zip - this can only handle <2GB results
-           #   foreach my $d (@$dir){
-           #       my $gz=gzopen("$d/$first.sql.gz", "w9")
-           #             or die "Cannot open file $d/$first.sql.gz: $gzerrno\n";
-           #       push(@gz,$gz);
-           #   }
-           #   while(my $line=<$mydrdr>){
-           #      foreach my $gz (@gz){
-           #         $gz->gzwrite("$line");
-           #      }
-           #   }
-           #   foreach my $gz (@gz){
-           #      $gz->gzclose();
-           #   }
-
               foreach my $d (@$dir){
-                 my $gzfile="$d/$first.sql.gz";
-                 open(local *GZSTR, '|gzip >'.$gzfile)
-                     or die "Cannot open file $gzfile: $$!\n";
-                 push(@gz,*GZSTR);
+                  my $gz=gzopen("$d/$first.sql.gz", "w9")
+                        or die "Cannot open file $d/$first.sql.gz: $gzerrno\n";
+                  push(@gz,$gz);
               }
               while(my $line=<$mydrdr>){
                  foreach my $gz (@gz){
-                    my $bk=syswrite($gz,$line);
-                    if ($bk!=length($line)){
-                       printf STDERR ("ERROR: fatal write problem in ".
-                                      "gzip stream\n");
-                       printf STDERR ("err=$!\n");
-                       exit(1);
-                    }
+                    $gz->gzwrite("$line");
                  }
               }
               foreach my $gz (@gz){
-                 close($gz);
+                 $gz->gzclose();
               }
-
-
               close($mydrdr);
               $wp=waitpid($mysqldump_pid,0);
               $save=$?;
@@ -800,8 +800,8 @@ if (lc($mode) eq "export"){
                  die("create folder $dir/$dirformat failed!\n");
          }else{
             if ($force != 1){
-               msg("ERROR","the folder $dir/$dirformat exists,
-You really want to overite the folder? [y/N]: ");
+               msg("ERROR","the folder $dir/$dirformat exists,\n".
+                   "You really want to overite the folder? [y/N]: ");
             chomp(my $decision=<STDIN>);
                if (!(lc($decision) eq "yes" or lc($decision) eq "y")){
                   msg("ERROR","abort by user");
@@ -825,8 +825,8 @@ You really want to overite the folder? [y/N]: ");
                  die("create folder $dir/$dirformat failed!\n");
          }else{
             if ($force != 1){
-               msg("ERROR","the folder $dir/$dirformat exists,
-You really want to overite the folder? [y/N]: ");
+               msg("ERROR","the folder $dir/$dirformat exists,\n".
+                   "You really want to overite the folder? [y/N]: ");
             chomp(my $decision=<STDIN>);
                if (!(lc($decision) eq "yes" or lc($decision) eq "y")){
                   msg("ERROR","abort by user");
