@@ -156,6 +156,10 @@ sub Init
                       "itil::lnksoftwareitclustsvc",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.itclust.lnkitclustcontact",
+                      "itil::lnkitclustcontact",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.system",
                       "AL_TCom::system",
                       defaultacl=>['valid_user']);
