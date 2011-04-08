@@ -53,6 +53,8 @@ sub Init
                    translation=>'itil::workflow::eventnotify');
    $self->AddGroup("eventnotifyshort",
                    translation=>'itil::workflow::eventnotify');
+   $self->AddGroup("eventnotifystatic",
+                   translation=>'itil::workflow::eventnotify');
 
    return(1);
 }
@@ -417,7 +419,7 @@ sub getDynamicFields
                 name          =>'eventstaticmailsubject',
                 xlswidth      =>'15',
                 translation   =>'itil::workflow::eventnotify',
-                group         =>'eventnotifyinternal',
+                group         =>'eventnotifystatic',
                 label         =>'static mail subject',
                 container     =>'headref'),
 
@@ -425,7 +427,7 @@ sub getDynamicFields
                 name          =>'eventstaticemailgroup',
                 label         =>'static additional notify distribution list',
                 AllowEmpty    =>1,
-                group         =>'eventnotifyinternal',
+                group         =>'eventnotifystatic',
                 vjointo       =>'base::grp',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['eventstaticemailgroupid'=>'grpid'],
@@ -531,10 +533,14 @@ sub getDynamicFields
                 name          =>'eventmode',
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'state',
-                value         =>['EVk.appl',
-                                 'EVk.net',
-                                 'EVk.bprocess',
-                                 'EVk.infraloc'],
+                getPostibleValues=>sub{
+                   my $self=shift;
+                   my @d;
+                   foreach my $k ($self->getParent->getAllowedEventModes()){
+                      push(@d,$k,$self->getParent->T($k,$self->{translation}));
+                   }
+                   return(@d);
+                },
                 label         =>'Eventnotification Mode',
                 container     =>'headref'),
 
@@ -549,6 +555,15 @@ sub getDynamicFields
                 container     =>'headref'),
    ));
 }
+
+sub getAllowedEventModes
+{
+   my $self=shift;
+   return('EVk.appl','EVk.net','EVk.bprocess','EVk.infraloc','EVk.free');
+}
+
+
+
 
 sub getPosibleEventStatType
 {
@@ -745,7 +760,7 @@ sub isViewValid
    my $rec=shift;
    my $userid=$self->getParent->getCurrentUserId();
    my @grps=qw(state header eventnotifystat eventnotify 
-               eventnotifyshort);
+               eventnotifyshort eventnotifystatic);
    my $fo=$self->getField("wffields.eventlang",$rec);
    if (defined($fo)){
       my $lang=$fo->RawValue($rec);
@@ -778,6 +793,9 @@ sub isViewValid
       push(@grps,"relations"); # maybe
       push(@grps,"flow"); # maybe
    }
+   if ($rec->{eventmode} eq "EVk.free"){
+      @grps=grep(!/^(relations|affected)$/,@grps);
+   }
 
    return(@grps);
 }
@@ -786,7 +804,8 @@ sub getDetailBlockPriority                # posibility to change the block order
 {  
    my $self=shift;
    return("eventnotifyshort","eventnotify","alteventnotify","eventnotifystat",
-          "eventnotifyinternal","flow","affected","relations","state");
+          "eventnotifyinternal","eventnotifystatic",
+          "flow","affected","relations","state");
 }
 
 
@@ -797,6 +816,9 @@ sub isWriteValid
    return(1) if (!defined($WfRec));
    my @grplist=("eventnotify","alteventnotify","eventnotifystat",
              "eventnotifyinternal","relations");
+   if ($WfRec->{eventmode} ne "EVk.free"){ # in freetext, static parameters
+      push(@grplist,"eventnotifystatic");  # are not editable!
+   }
 
    my $teammember=0;
    if (defined($WfRec->{initiatorgroupid})){
@@ -874,6 +896,9 @@ sub getNextStep
       if ($mode eq "EVk.bprocess"){
          return($self->getStepByShortname("askbprocess",$WfRec)); 
       }
+      if ($mode eq "EVk.free"){
+         return($self->getStepByShortname("askfree",$WfRec)); 
+      }
       return(undef);
    }
    elsif($currentstep=~m/^.*::workflow::eventnotify::askloc$/){
@@ -886,6 +911,9 @@ sub getNextStep
       return($self->getStepByShortname("dataload",$WfRec)); 
    }
    elsif($currentstep=~m/^.*::workflow::eventnotify::asknet$/){
+      return($self->getStepByShortname("dataload",$WfRec)); 
+   }
+   elsif($currentstep=~m/^.*::workflow::eventnotify::askfree$/){
       return($self->getStepByShortname("dataload",$WfRec)); 
    }
    elsif($currentstep=~m/^.*::workflow::eventnotify::askbprocess$/){
@@ -1188,6 +1216,8 @@ sub getNotifyDestinations
             $ia->LoadTargets($emailto,'base::grp',\'eventnotify',
                                       [keys(%allcustgrp)]);
          }
+      }
+      elsif ($WfRec->{eventmode} eq "EVk.free"){ 
       }
       else{
          return(undef);
@@ -1682,7 +1712,6 @@ package itil::workflow::eventnotify::asknet;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfStep;
-use Data::Dumper;
 @ISA=qw(kernel::WfStep);
 
 sub generateStoredWorkspace
@@ -1733,6 +1762,94 @@ $StoredWorkspace
 <tr>
 <td class=fname width=20%>%affectedregion(label)%:</td>
 <td class=finput>%affectedregion(detail)%</td>
+</tr>
+</table>
+EOF
+   return($templ);
+}
+
+sub Process
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+ #  if ($action eq "NextStep"){
+ #     my $eventmode=Query->Param("Formated_eventmode");
+ #     my $fo=$self->getField("affectedapplication");
+ #     my $foval=Query->Param("Formated_".$fo->Name());
+ #     if (!$fo->Validate($WfRec,{$fo->Name=>$foval})){
+ #        $self->LastMsg(ERROR,"unknown error") if (!$self->LastMsg()); 
+ #        return(0);
+ #     }
+ #  }
+   return($self->SUPER::Process($action,$WfRec));
+}
+
+
+sub getWorkHeight
+{
+   my $self=shift;
+   my $WfRec=shift;
+   return(340);
+}
+
+#######################################################################
+package itil::workflow::eventnotify::askfree;
+use vars qw(@ISA);
+use kernel;
+use kernel::WfStep;
+@ISA=qw(kernel::WfStep);
+
+sub generateStoredWorkspace
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my @steplist=@_;
+   my $d=<<EOF;
+<tr>
+<td class=fname width=20%>%mandator(label)%:</td>
+<td class=finput>%mandatorid(storedworkspace)%</td>
+</tr>
+<tr>
+<td class=fname width=20%>%eventstaticmailsubject(label)%:</td>
+<td class=finput>%eventstaticmailsubject(storedworkspace)%</td>
+</tr>
+<tr>
+<td class=fname width=20%>%eventstaticemailgroup(label)%:</td>
+<td class=finput>%eventstaticemailgroup(storedworkspace)%</td>
+</tr>
+EOF
+
+   return($self->SUPER::generateStoredWorkspace($WfRec,@steplist).$d);
+}
+
+
+sub generateWorkspace
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   my @steplist=Query->Param("WorkflowStep");
+   pop(@steplist);
+   my $StoredWorkspace=$self->SUPER::generateStoredWorkspace($WfRec,@steplist);
+
+   my $templ=<<EOF;
+<table border=0 cellspacing=0 cellpadding=0 width=100%>
+$StoredWorkspace
+<tr>
+<td class=fname width=20%>%mandator(label)%:</td>
+<td class=finput>%mandatorid(detail,mode1)%</td>
+</tr>
+<tr>
+<td class=fname width=20%>%eventstaticmailsubject(label)%:</td>
+<td class=finput>%eventstaticmailsubject(detail)%</td>
+</tr>
+<tr>
+<td class=fname width=20%>%eventstaticemailgroup(label)%:</td>
+<td class=finput>%eventstaticemailgroup(detail)%</td>
 </tr>
 </table>
 EOF
@@ -2353,6 +2470,14 @@ sub nativProcess
             $self->getParent->LastMsg(ERROR,
                       "invalid or inactive businessprocess");
             return(0);
+         }
+      }
+      elsif ($h->{eventmode} eq "EVk.free"){
+         $h->{name}=$self->getParent->T("Event-notification: free");
+         if ($h->{eventstatclass} eq ""){
+            if ($h->{eventstatnature} eq "EVn.info"){
+               $h->{eventstatclass}=4;
+            }
          }
       }
       else{

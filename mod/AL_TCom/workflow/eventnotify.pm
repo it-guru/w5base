@@ -181,6 +181,11 @@ sub getDynamicFields
 
 }
 
+sub getAllowedEventModes
+{
+   my $self=shift;
+   return('EVk.appl','EVk.net','EVk.bprocess','EVk.infraloc');
+}
 
 
 

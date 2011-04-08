@@ -1,6 +1,7 @@
 'itil::workflow::eventnotify'=>{de=>'ITIL IT-Ereignismeldung',
                                 en=>'ITIL IT-Eventnotification'},
 'fieldgroup.eventnotify'=>{de=>'Ereignismeldung',en=>'Eventnotification'},
+'fieldgroup.eventnotifystatic'=>{de=>'statische Ereignisparameter',en=>'static event parameters'},
 'fieldgroup.alteventnotify'=>{de=>'Ereignismeldung - 2.Sprache',en=>'Eventnotification alternate language'},
 'fieldgroup.eventnotifyinternal'=>{de=>'Interne Informationen',
                                    en=>'Internal Informations'},
@@ -51,6 +52,7 @@
 'EVk.appl'=>{de=>'Anwendungsereignis',en=>'Application'},
 'EVk.bprocess'=>{de=>'Geschäftsprozess',en=>'Businessprocess'},
 'EVk.net'=>{de=>'IP-Netzwerk Standort übergreifend',en=>'IP-Network location indipendent'},
+'EVk.free'=>{de=>'Config-Item unabhängige Freitextmeldung',en=>'Config-Item indipendent freetext message'},
 'EVk.infraloc'=>{de=>'Infrastruktur Standort',en=>'Infrastructure location'},
 'Networkarea'=>{de=>'Netzbereich'},
 'Application'=>{de=>'Applikation'},
@@ -92,7 +94,7 @@
 "can't clear eventstatnature from defined state"=>{de=>"Ereignisart kann nicht auf 'leer' gesetzt werden"},
 'expected event end'=>{de=>'voraussichtliches Ende'},
 'static mail subject'=>{de=>'statischer Benachrichtigungs-Betreff'},
-'static additional notify distribution list'=>{de=>'statische zusätzliche Verteilerliste'},
+'static additional notify distribution list'=>{de=>'statische (zusätzliche) Verteilerliste'},
 'Affected Item Prio'=>{de=>'Prio des betroffenen Elementes'},
 
 
