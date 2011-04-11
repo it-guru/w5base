@@ -256,6 +256,13 @@ sub new
                 group         =>'softwareinst',
                 dataobjattr   =>'swinstance.lnksoftwaresystem'),
 
+      new kernel::Field::Textarea(
+                name          =>'techrelstring',
+                group         =>'softwareinst',
+                htmldetail    =>0,
+                label         =>'technical release string from instance',
+                dataobjattr   =>'swinstance.techrelstring'),
+
   #    new kernel::Field::SubList(
   #              name          =>'systems',
   #              label         =>'Systems',

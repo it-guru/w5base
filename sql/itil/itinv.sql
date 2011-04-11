@@ -908,3 +908,4 @@ alter table lnksoftwaresystem  add FOREIGN KEY fk_itclustsvcsw (lnkitclustsvc)
 set FOREIGN_KEY_CHECKS=1;
 alter table swinstance   add lnksoftwaresystem bigint(20) default NULL;
 alter table osrelease add comments longtext default NULL;
+alter table swinstance add techrelstring longtext default NULL;
