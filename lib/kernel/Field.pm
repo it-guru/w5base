@@ -761,6 +761,9 @@ sub RawValue
             map({
                    my %current=%{$_};
                    my $dispobj=$self->vjoinobj->getField($disp,\%current);
+                   if (!defined($dispobj)){
+                      die("fail to find $disp in $self");
+                   }
                    my $bk=$dispobj->RawValue(\%current);
                    $bk=join(", ",@$bk) if (ref($bk) eq "ARRAY");
                    $u{$bk}=1;

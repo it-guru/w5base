@@ -28,6 +28,7 @@ sub new
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
    $self->{AllowEmpty}=0 if (!defined($self->{AllowEmpty}));
+   $self->{SoftValidate}=0 if (!defined($self->{SoftValidate}));
    $self->{_permitted}->{AllowEmpty}=1;
    if (!defined($self->{depend}) && defined($self->{vjoinon})){
       $self->{depend}=[$self->{vjoinon}->[0]]; # if there is a vjoin, we must
@@ -53,17 +54,19 @@ sub Validate
 
    $self->FieldCache->{LastDrop}=undef;
 
+   my $vjoinobj=$self->vjoinobj->Clone();
+
    if (defined($self->{vjoinbase})){
-      $self->vjoinobj->SetNamedFilter("BASE",$self->{vjoinbase});
+      $vjoinobj->SetNamedFilter("BASE",$self->{vjoinbase});
    }
    if (defined($self->{vjoineditbase})){
-      $self->vjoinobj->SetNamedFilter("EDITBASE",$self->{vjoineditbase});
+      $vjoinobj->SetNamedFilter("EDITBASE",$self->{vjoineditbase});
    }
    if (defined($newrec->{$self->{vjoinon}->[0]}) &&  # just test !!
        $newrec->{$self->{vjoinon}->[0]} ne ""){  # if id is already specified
       $filter={$self->{vjoinon}->[1]=>\$newrec->{$self->{vjoinon}->[0]}};
    }
-   $self->vjoinobj->SetFilter($filter);
+   $vjoinobj->SetFilter($filter);
    my %param=(AllowEmpty=>$self->AllowEmpty);
    my $fromquery=trim(Query->Param("Formated_$name"));
    if (defined($fromquery)){
@@ -75,18 +78,18 @@ sub Validate
          "}";
       $param{selected}=$fromquery;
    }
-   my ($dropbox,$keylist,$vallist)=$self->vjoinobj->getHtmlSelect(
+   my ($dropbox,$keylist,$vallist)=$vjoinobj->getHtmlSelect(
                                                   "Formated_$name",
                                                   $disp,
                                                   [$disp],%param);
    if ($#{$keylist}<0 && $fromquery ne ""){
       $filter={$disp=>'"*'.$newval.'*"'};
-      $self->vjoinobj->ResetFilter();
+      $vjoinobj->ResetFilter();
       if (defined($self->{vjoineditbase})){
-         $self->vjoinobj->SetNamedFilter("EDITBASE",$self->{vjoineditbase});
+         $vjoinobj->SetNamedFilter("EDITBASE",$self->{vjoineditbase});
       }
-      $self->vjoinobj->SetFilter($filter);
-      ($dropbox,$keylist,$vallist)=$self->vjoinobj->getHtmlSelect(
+      $vjoinobj->SetFilter($filter);
+      ($dropbox,$keylist,$vallist)=$vjoinobj->getHtmlSelect(
                                                   "Formated_$name",
                                                   $disp,
                                                   [$disp],%param);
@@ -97,6 +100,13 @@ sub Validate
                                       $self->Label,$newval);
       return(undef);
    }
+   if ($self->{'SoftValidate'}){
+      if ($fromquery eq $oldrec->{$name} &&
+          $newrec->{$name} eq $oldrec->{$name}){  # no change needs no validate
+         return({});                              # (problem EDITBASE!)
+      }
+   }
+
    if ($#{$keylist}<0 && ((defined($fromquery) && $fromquery ne "") ||
                           (defined($newrec->{$name}) && 
                            $newrec->{$name} ne $oldrec->{$name}))){
@@ -116,7 +126,7 @@ sub Validate
       $comprec->{$name}=$vallist->[0];
    }
    my $result={$self->{vjoinon}->[0]=>
-           $self->vjoinobj->getVal($self->vjoinobj->IdField->Name(),$filter)};
+           $vjoinobj->getVal($vjoinobj->IdField->Name(),$filter)};
    if (defined($self->{altnamestore})){
       $result->{$self->{altnamestore}}=$vallist->[0];      
    }

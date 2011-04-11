@@ -324,6 +324,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'customer',
                 group         =>'customer',
+                SoftValidate  =>1,
                 label         =>'Customer',
                 vjointo       =>'base::grp',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
