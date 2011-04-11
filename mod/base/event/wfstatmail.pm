@@ -49,7 +49,7 @@ sub SendMyJobs
    my $ia=getModuleObject($self->Config,"base::infoabo");
    my $user=getModuleObject($self->Config,"base::user");
    my @flt;
-   $flt[0]={usertyp=>\'user',cistatusid=>\'4'};
+   $flt[0]={usertyp=>['user','service'],cistatusid=>\'4'};
    #$flt->{fullname}="vogl* bichler* *hanno.ernst*";
    #$flt->{fullname}="ladegast* ernst*";
    if ($#target==-1){
