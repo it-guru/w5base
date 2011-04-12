@@ -1,3 +1,5 @@
 'qmdb'=>{de=>'QMDB SSM',en=>'QMDB SSM'},
 'qmdb.custcontract'=>{de=>'Kundenvertrag',en=>'CustomerContract'},
 'qmdb.custcontract.orderticket'=>{de=>'Bestellschein',en=>'Order Ticket'},
+'qmdb.krn'=>{de=>'Stammdaten',en=>'Kernel'},
+'qmdb.krn.dictonary'=>{de=>'DBDictonary',en=>'DBDictonary'},

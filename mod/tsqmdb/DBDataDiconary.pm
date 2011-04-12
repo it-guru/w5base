@@ -1,6 +1,6 @@
-package tsqmdb::menu::root;
+package tsqmdb::DBDataDiconary;
 #  W5Base Framework
-#  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2011  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,44 +19,41 @@ package tsqmdb::menu::root;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use kernel::MenuRegistry;
-@ISA=qw(kernel::MenuRegistry);
+use kernel::App::Web::DBDataDiconary;
+use kernel::DataObj::DB;
+@ISA    = qw(kernel::App::Web::DBDataDiconary);
 
 sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{DiconaryMode}="Oracle";
+   $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
+
    return($self);
 }
 
-sub Init
+sub Initialize
 {
    my $self=shift;
 
-   $self->RegisterObj("qmdb",
-                      "tmpl/welcome",
-                      defaultacl=>['admin']);
-   
-   $self->RegisterObj("qmdb.custcontract",
-                      "tsqmdb::custcontract",
-                      defaultacl=>['valid_user']);
-   
-   $self->RegisterObj("qmdb.custcontract.orderticket",
-                      "tsqmdb::orderticket",
-                      defaultacl=>['valid_user']);
+   my @result=$self->AddDatabase(DB=>new kernel::database($self,"tsqmdb"));
+   return(@result) if (defined($result[0]) eq "InitERROR");
+   $self->{use_distinct}=1;
 
-   $self->RegisterObj("qmdb.krn",
-                      "tmpl/welcome",
-                      defaultacl=>['admin']);
+   return(1) if (defined($self->{DB}));
+   return(0);
+}
 
-   $self->RegisterObj("qmdb.krn.dictonary",
-                      "tsqmdb::DBDataDiconary",
-                      defaultacl=>['admin']);
-   
-   return($self);
+sub initSearchQuery
+{  
+   my $self=shift;
+   if (!defined(Query->Param("search_schemaname"))){
+      Query->Param("search_schemaname"=>'QMDB');
+   }
 }
 
 
 
-1;
+
