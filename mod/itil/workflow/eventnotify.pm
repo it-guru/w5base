@@ -1807,17 +1807,19 @@ sub generateStoredWorkspace
    my $self=shift;
    my $WfRec=shift;
    my @steplist=@_;
+   my $subject=$self->T("subject");
+   my $dlgroup=$self->T("distribution group");
    my $d=<<EOF;
 <tr>
 <td class=fname width=20%>%mandator(label)%:</td>
 <td class=finput>%mandatorid(storedworkspace)%</td>
 </tr>
 <tr>
-<td class=fname width=20%>%eventstaticmailsubject(label)%:</td>
+<td class=fname width=20%>$subject:</td>
 <td class=finput>%eventstaticmailsubject(storedworkspace)%</td>
 </tr>
 <tr>
-<td class=fname width=20%>%eventstaticemailgroup(label)%:</td>
+<td class=fname width=20%>$dlgroup:</td>
 <td class=finput>%eventstaticemailgroup(storedworkspace)%</td>
 </tr>
 EOF
@@ -1831,6 +1833,8 @@ sub generateWorkspace
    my $self=shift;
    my $WfRec=shift;
    my $actions=shift;
+   my $subject=$self->T("subject");
+   my $dlgroup=$self->T("distribution group");
 
    my @steplist=Query->Param("WorkflowStep");
    pop(@steplist);
@@ -1844,11 +1848,11 @@ $StoredWorkspace
 <td class=finput>%mandatorid(detail,mode1)%</td>
 </tr>
 <tr>
-<td class=fname width=20%>%eventstaticmailsubject(label)%:</td>
+<td class=fname width=20%>$subject:</td>
 <td class=finput>%eventstaticmailsubject(detail)%</td>
 </tr>
 <tr>
-<td class=fname width=20%>%eventstaticemailgroup(label)%:</td>
+<td class=fname width=20%>$dlgroup:</td>
 <td class=finput>%eventstaticemailgroup(detail)%</td>
 </tr>
 </table>
@@ -1863,15 +1867,22 @@ sub Process
    my $WfRec=shift;
    my $actions=shift;
 
- #  if ($action eq "NextStep"){
- #     my $eventmode=Query->Param("Formated_eventmode");
- #     my $fo=$self->getField("affectedapplication");
- #     my $foval=Query->Param("Formated_".$fo->Name());
- #     if (!$fo->Validate($WfRec,{$fo->Name=>$foval})){
- #        $self->LastMsg(ERROR,"unknown error") if (!$self->LastMsg()); 
- #        return(0);
- #     }
- #  }
+   if ($action eq "NextStep"){
+      my $subject=Query->Param("Formated_eventstaticmailsubject");
+      my $dlgroup=Query->Param("Formated_eventstaticemailgroup");
+      if (($subject=~m/^\s*$/) || ($dlgroup=~m/^\s*$/)){
+         $self->LastMsg(ERROR,"incomplete input data"); 
+         return(0);
+      }
+
+      my $fo=$self->getField("eventstaticemailgroup");
+      my $foval=Query->Param("Formated_".$fo->Name());
+      if (!$fo->Validate($WfRec,{$fo->Name=>$foval})){
+         $self->LastMsg(ERROR,"unknown error") if (!$self->LastMsg());
+         return(0);
+      }
+
+   }
    return($self->SUPER::Process($action,$WfRec));
 }
 
@@ -1880,7 +1891,7 @@ sub getWorkHeight
 {
    my $self=shift;
    my $WfRec=shift;
-   return(340);
+   return(240);
 }
 
 #######################################################################
@@ -2473,7 +2484,8 @@ sub nativProcess
          }
       }
       elsif ($h->{eventmode} eq "EVk.free"){
-         $h->{name}=$self->getParent->T("Event-notification: free");
+         my $subject=$h->{eventstaticmailsubject};
+         $h->{name}=$self->getParent->T("Event-notification: ".$subject);
          if ($h->{eventstatclass} eq ""){
             if ($h->{eventstatnature} eq "EVn.info"){
                $h->{eventstatclass}=4;
@@ -2551,7 +2563,7 @@ sub getWorkHeight
    my $self=shift;
    my $WfRec=shift;
 
-   return(340);
+   return(360);
 }
 
 #######################################################################
