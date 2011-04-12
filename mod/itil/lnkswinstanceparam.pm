@@ -169,7 +169,7 @@ sub isWriteValid
    $rw=1 if (!defined($rec));
    $rw=1 if (defined($rec) && $self->isParentWriteable($rec->{systemid}));
    $rw=1 if ((!$rw) && ($self->IsMemberOf("admin")));
-   return("default","misc") if ($rw);
+   return("default","link") if ($rw);
    return(undef);
 }
 

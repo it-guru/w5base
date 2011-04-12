@@ -48,7 +48,7 @@ sub isSelectable
    if (defined($acl)){
       return(1) if (grep(/^read$/,@$acl));
    }
-   return(1);
+   return(0);
 }
 
 sub getQueryTemplate
@@ -213,7 +213,7 @@ sub loadBookingData
    
    $act->SetFilter({creatorid=>\$urec->{userid},
                     bookingdate=>"(".$month.")"});
-   $act->SetCurrentView(qw(cdate creatorposix effortrelation 
+   $act->SetCurrentView(qw(bookingdate creatorposix effortrelation 
                            effortcomments effort wfheadid));
    
    my $c=0; 
@@ -221,7 +221,7 @@ sub loadBookingData
    if (defined($rec)){
       do{
          #print Dumper($rec);
-         if (my ($y,$m,$d)=$rec->{cdate}=~m/^(\d{4})-(\d{2})-(\d{2}) .*/){
+         if (my ($y,$m,$d)=$rec->{bookingdate}=~m/^(\d{4})-(\d{2})-(\d{2}) .*/){
             my $day="$d.$m.$y";
             my $label=$rec->{effortrelation};
             if ($label ne "" && $rec->{effort}!=0){

@@ -294,6 +294,10 @@ sub Init
                       func=>'MainWithNew',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj('TS::MyW5Base::send2Miles$',
+                      'TS::MyW5Base::send2Miles$',
+                      func=>'Main',
+                      defaultacl=>['admin']);
    return($self);
 }
 

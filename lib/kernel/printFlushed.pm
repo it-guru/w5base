@@ -24,6 +24,7 @@ sub printFlushedStart
    if (!exists($self->{Apache2RequestUtilrequest})){
       $self->{Apache2RequestUtilrequest}=Apache2::RequestUtil->request;
       my $r=$self->{Apache2RequestUtilrequest};
+      $r->no_cache(1);
       $r->content_type("text/html");
       $r->print("<html>");
       $r->print("<style>");
