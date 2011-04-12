@@ -5,7 +5,7 @@ package TS::qrule::ApplChangeAGroup;
 =head3 PURPOSE
 
 Checks if there is on a "installed/active" or "available" application
-a incident assignmentgroup for assetcenter definied.
+a change assignmentgroup for assetcenter definied.
 If there is no valid assignmentgroup defined, an error will be procceded.
 
 =head3 IMPORTS
@@ -48,7 +48,7 @@ sub new
 
 sub getPosibleTargets
 {
-   return(["TS::appl"]);
+   return(["TS::appl","AL_TCom::appl"]);
 }
 
 sub qcheckRecord
