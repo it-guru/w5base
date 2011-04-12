@@ -59,6 +59,27 @@ sub IsModuleSelectable
 }
 
 
+sub activateMailSend
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $wf=shift;
+   my $id=shift;
+   my $newmailrec=shift;
+   my $action=shift;
+
+   my %d=(step=>'base::workflow::mailsend::waitforspool',
+          emailsignatur=>'EventNotification: SDM PHILIPS');
+   $self->linkMail($WfRec->{id},$id);
+   if (my $r=$wf->Store($id,%d)){
+      return(1);
+   }
+   return(0);
+}
+
+
+
+
 
 
 
