@@ -43,6 +43,7 @@
 'AL_TCom.swinstance.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.swinstance.lnksystem'=>{de=>'Verkn. System',en=>'Link System'},
 'AL_TCom.swinstance.lnkswinstancecontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
+'AL_TCom.swinstance.param'=>{de=>'Life Parameter',en=>'Life Parameter'},
 'AL_TCom.kern'=>{de=>'Stammdaten',en=>'Basedata'},
 'AL_TCom.kern.network'=>{de=>'Netzbereich',en=>'Networkarea'},
 'AL_TCom.kern.network.new'=>{de=>'Neueingabe',en=>'New'},
