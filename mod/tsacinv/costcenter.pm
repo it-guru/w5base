@@ -156,6 +156,76 @@ sub new
                 vjoindisp     =>[qw(fullname)]),
 
       new kernel::Field::Text(
+                name          =>'saphier0id',
+                label         =>'SAP hierarchy 0',
+                group         =>'saphier',
+                ignorecase    =>1,
+                dataobjattr   =>'amcostcenter.hier0id'),
+
+      new kernel::Field::Text(
+                name          =>'saphier1id',
+                label         =>'SAP hierarchy 1',
+                group         =>'saphier',
+                ignorecase    =>1,
+                dataobjattr   =>'amcostcenter.hier1id'),
+
+      new kernel::Field::Text(
+                name          =>'saphier2id',
+                label         =>'SAP hierarchy 2',
+                group         =>'saphier',
+                ignorecase    =>1,
+                dataobjattr   =>'amcostcenter.hier2id'),
+
+      new kernel::Field::Text(
+                name          =>'saphier3id',
+                label         =>'SAP hierarchy 3',
+                group         =>'saphier',
+                ignorecase    =>1,
+                dataobjattr   =>'amcostcenter.hier3id'),
+
+      new kernel::Field::Text(
+                name          =>'saphier4id',
+                label         =>'SAP hierarchy 4',
+                group         =>'saphier',
+                ignorecase    =>1,
+                dataobjattr   =>'amcostcenter.hier4id'),
+
+      new kernel::Field::Text(
+                name          =>'saphier5id',
+                label         =>'SAP hierarchy 5',
+                group         =>'saphier',
+                ignorecase    =>1,
+                dataobjattr   =>'amcostcenter.hier5id'),
+
+      new kernel::Field::Text(
+                name          =>'saphier6id',
+                label         =>'SAP hierarchy 6',
+                group         =>'saphier',
+                ignorecase    =>1,
+                dataobjattr   =>'amcostcenter.hier6id'),
+
+      new kernel::Field::Text(
+                name          =>'saphier7id',
+                label         =>'SAP hierarchy 7',
+                group         =>'saphier',
+                ignorecase    =>1,
+                dataobjattr   =>'amcostcenter.hier7id'),
+
+      new kernel::Field::Text(
+                name          =>'saphier8id',
+                label         =>'SAP hierarchy 8',
+                group         =>'saphier',
+                ignorecase    =>1,
+                dataobjattr   =>'amcostcenter.hier8id'),
+
+      new kernel::Field::Text(
+                name          =>'saphier9id',
+                label         =>'SAP hierarchy 9',
+                group         =>'saphier',
+                ignorecase    =>1,
+                dataobjattr   =>'amcostcenter.hier9id'),
+
+      new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',

@@ -390,7 +390,7 @@ sub new
                 name          =>'w5base_appl',
                 group         =>'w5basedata',
                 searchable    =>0,
-                label         =>'W5Base Anwendung',
+                label         =>'W5Base Application',
                 onRawValue    =>\&AddW5BaseData,
                 depend        =>'systemid'),
 

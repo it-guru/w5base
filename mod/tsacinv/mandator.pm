@@ -44,6 +44,22 @@ sub new
    return($self);
 }
 
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   return(qw(header default acrelation source));
+}
+
+
+sub isViewValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return("header","default","acrelation","source");
+}
+
+
 sub isWriteValid
 {
    my $self=shift;
