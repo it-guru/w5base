@@ -11,6 +11,7 @@
 'fieldgroup.adm'=>{de=>'Administration/DBA',en=>'Administration/DBA'},
 'fieldgroup.ssl'=>{de=>'SSL Prüfsystem',en=>'SSL Verification'},
 'fieldgroup.sec'=>{en=>'Security and data privacy',de=>'Sicherheit und Datenschutz'},
+'fieldgroup.swinstanceparam'=>{en=>'Life Parameters',de=>'Life Parameter'},
 'fieldgroup.softwareinst'=>{en=>'related Software-Installation',de=>'zugeordnete Software-Installation'},
 'fieldgroup.systems'=>{de=>'System',en=>'System'},
 'fieldgroup.cluster'=>{de=>'Cluster Service',en=>'Cluster Service'},

@@ -418,6 +418,17 @@ sub new
 #                vjoinbase     =>[{'parentobj'=>\'itil::swinstance'}],
 #                subeditmsk    =>'subedit'),
 
+      new kernel::Field::SubList(
+                name          =>'lnkswinstanceparam',
+                htmleditwidth =>'80%',
+                label         =>'Life Parameters',
+                group         =>'swinstanceparam',
+                vjoinbase     =>{'islatest'=>'1'},
+                vjointo       =>'itil::lnkswinstanceparam',
+                vjoinon       =>['id'=>'swinstanceid'],
+                vjoindisp     =>['name','val']),
+
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
@@ -767,7 +778,7 @@ sub isViewValid
    my $rec=shift;
    return("header","default") if (!defined($rec));
    my @all=qw(header default adm sec ssl misc history
-              softwareinst contacts attachments source);
+              softwareinst contacts attachments source swinstanceparam);
    if (defined($rec) && $rec->{'runonclusts'}){
       push(@all,"cluster");
    }
@@ -836,7 +847,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header default adm sec ssl misc cluster 
-             systems softwareinst contacts attachments source));
+             systems softwareinst contacts swinstanceparam attachments source));
 }
 
 

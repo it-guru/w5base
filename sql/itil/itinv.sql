@@ -909,3 +909,18 @@ set FOREIGN_KEY_CHECKS=1;
 alter table swinstance   add lnksoftwaresystem bigint(20) default NULL;
 alter table osrelease add comments longtext default NULL;
 alter table swinstance add techrelstring longtext default NULL;
+create table lnkswinstanceparam (
+  id           bigint(20) NOT NULL,
+  swinstance   bigint(20) NOT NULL,
+  name         varchar(100) NOT NULL,
+  val          varchar(254) NOT NULL,
+  mdate        datetime NOT NULL default '0000-00-00 00:00:00',
+  islatest     int(1) default NULL,
+  srcsys       varchar(100) default 'w5base',
+  srcid        varchar(20) default NULL,
+  srcload      datetime    default NULL,
+  PRIMARY KEY  (id),
+  KEY swinstance(swinstance),
+  UNIQUE KEY `srcsys` (srcsys,srcid,islatest),
+  UNIQUE KEY `latest` (swinstance,name,islatest)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

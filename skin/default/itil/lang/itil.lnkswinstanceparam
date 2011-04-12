@@ -1,0 +1,7 @@
+'itil::lnkswinstanceparam'=>{de=>'Software-Instanz Life Parameter',
+                             en=>'Software-Instance Life Parameters'},
+'fieldgroup.link'=>{de=>'Software-Instanz Verknüpfung',
+                    en=>'Relation'},
+'parameter name'=>{de=>'Parameter Name'},
+'parameter value'=>{de=>'Parameter Inhalt'},
+'is latest'=>{de=>'aktuellster Stand'},
