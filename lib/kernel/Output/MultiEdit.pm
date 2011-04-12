@@ -89,7 +89,8 @@ sub MultiOperationHeader
    }
    my @fieldlist=$app->getFieldObjsByView([qw(ALL)],
                                            opmode=>'MultiEdit');
-   my @oktypes=qw(TextDrop Databoss Mandator Contact Group Number Text Select);
+   my @oktypes=qw(TextDrop Databoss Mandator Contact Group Number 
+                  Text Select Boolean);
    foreach my $fo (@fieldlist){
       my $t=$fo->Type();
       if (in_array(\@oktypes,$t)){
@@ -146,12 +147,22 @@ sub MultiOperationActionOn
    $opobj->SetFilter({$idfield->Name()=>\$id});
    my ($oprec,$msg)=$opobj->getOnlyFirst(qw(ALL));
    if (defined($oprec)){
-      if (!($opobj->SecureValidatedUpdateRecord($oprec,{$OPFIELD=>$OPVALUE},
-                                                {$idfield->Name()=>\$id}))){
-         $fail=1;
+      my %rec=($OPFIELD=>$OPVALUE);
+      my $newrec=$opobj->getWriteRequestHash("upload",$oprec,\%rec);
+      if (defined($newrec)){
+         if (!($opobj->SecureValidatedUpdateRecord($oprec,$newrec,
+                                                   {$idfield->Name()=>\$id}))){
+            $fail=1;
+         }
+         else{
+            $fail=0;
+         }
       }
       else{
-         $fail=0;
+         if ($opobj->LastMsg()==0){
+            $opobj->LastMsg(ERROR,"invalid value for requested field");
+         }
+         $fail=1;
       }
    }
    return(1) if (!$fail);

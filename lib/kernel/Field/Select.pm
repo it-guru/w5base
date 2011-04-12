@@ -342,8 +342,9 @@ sub Validate
             }
          }
          else{
-            $self->getParent->LastMsg(ERROR,"invalid native value ".
-                                            "'$val' in $name");
+            $self->getParent->LastMsg(ERROR,
+             sprintf($self->getParent->T("invalid native value ".
+                                         "'%s' in %s"),$val,$name));
          }
          return(undef);
       }

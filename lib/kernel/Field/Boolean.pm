@@ -39,6 +39,7 @@ sub new
    return($self);
 }
 
+
 sub FormatedResult
 {
    my $self=shift;
