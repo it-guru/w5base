@@ -420,6 +420,7 @@ sub new
 
       new kernel::Field::SubList(
                 name          =>'lnkswinstanceparam',
+                searchable    =>0,
                 htmleditwidth =>'80%',
                 label         =>'Life Parameters',
                 group         =>'swinstanceparam',

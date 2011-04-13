@@ -28,7 +28,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{MainSearchFieldLines}=4 if (!defined($param{MainSearchFieldLines}));
+   $param{MainSearchFieldLines}=5 if (!defined($param{MainSearchFieldLines}));
    my $self=bless($type->SUPER::new(%param),$type);
    
 
@@ -52,6 +52,66 @@ sub new
                 vjoinon       =>['swinstanceid'=>'id'],
                 vjoindisp     =>'fullname'),
 
+      new kernel::Field::TextDrop(
+                name          =>'swnature',
+                htmlwidth     =>'150px',
+                htmldetail    =>0,
+                group         =>'link',
+                label         =>'Instance type',
+                vjointo       =>'itil::swinstance',
+                vjoinon       =>['swinstanceid'=>'id'],
+                vjoindisp     =>'swnature'),
+
+      new kernel::Field::Select(
+                name          =>'cistatus',
+                htmleditwidth =>'40%',
+                htmldetail    =>0,
+                group         =>'link',
+                label         =>'Instance CI-State',
+                vjoineditbase =>{id=>">0"},
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['cistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+
+      new kernel::Field::Link(
+                name          =>'cistatusid',
+                group         =>'link',
+                label         =>'Instance CI-StateID',
+                vjointo       =>'itil::swinstance',
+                vjoinon       =>['swinstanceid'=>'id'],
+                vjoindisp     =>'cistatusid'),
+
+      new kernel::Field::TextDrop(
+                name          =>'application',
+                htmlwidth     =>'150px',
+                htmldetail    =>0,
+                group         =>'link',
+                label         =>'Application',
+                vjointo       =>'itil::swinstance',
+                vjoinon       =>['swinstanceid'=>'id'],
+                vjoindisp     =>'appl'),
+
+      new kernel::Field::TextDrop(
+                name          =>'instanceid',
+                htmldetail    =>0,
+                group         =>'link',
+                translation   =>'itil::swinstance',
+                label         =>'Instance ID',
+                vjointo       =>'itil::swinstance',
+                vjoinon       =>['swinstanceid'=>'id'],
+                vjoindisp     =>'swinstanceid'),
+
+      new kernel::Field::TextDrop(
+                name          =>'swteam',
+                htmldetail    =>0,
+                group         =>'link',
+                translation   =>'itil::swinstance',
+                label         =>'Instance guardian team',
+                vjointo       =>'itil::swinstance',
+                vjoinon       =>['swinstanceid'=>'id'],
+                vjoindisp     =>'swteam'),
+
       new kernel::Field::Text(
                 name          =>'name',
                 htmlwidth     =>'120px',
@@ -63,29 +123,6 @@ sub new
                 label         =>'parameter value',
                 dataobjattr   =>'lnkswinstanceparam.val'),
                                                    
-      new kernel::Field::Interface(
-                name          =>'swinstanceid',
-                label         =>'swinstanceID',
-                dataobjattr   =>'lnkswinstanceparam.swinstance'),
-                                                   
-      new kernel::Field::Text(
-                name          =>'srcsys',
-                group         =>'source',
-                label         =>'Source-System',
-                dataobjattr   =>'lnkswinstanceparam.srcsys'),
-                                                   
-      new kernel::Field::Text(
-                name          =>'srcid',
-                group         =>'source',
-                label         =>'Source-Id',
-                dataobjattr   =>'lnkswinstanceparam.srcid'),
-                                                   
-      new kernel::Field::Date(
-                name          =>'srcload',
-                group         =>'source',
-                label         =>'Last-Load',
-                dataobjattr   =>'lnkswinstanceparam.srcload'),
-                                                   
       new kernel::Field::MDate(
                 name          =>'mdate',
                 group         =>'source',
@@ -94,9 +131,36 @@ sub new
 
       new kernel::Field::Boolean(
                 name          =>'islatest',
+                sqlorder      =>'NONE',
                 group         =>'source',
                 label         =>'is latest',
                 dataobjattr   =>'lnkswinstanceparam.islatest'),
+                                                   
+      new kernel::Field::Interface(
+                name          =>'swinstanceid',
+                sqlorder      =>'NONE',
+                label         =>'swinstanceID',
+                dataobjattr   =>'lnkswinstanceparam.swinstance'),
+                                                   
+      new kernel::Field::Text(
+                name          =>'srcsys',
+                group         =>'source',
+                sqlorder      =>'NONE',
+                label         =>'Source-System',
+                dataobjattr   =>'lnkswinstanceparam.srcsys'),
+                                                   
+      new kernel::Field::Text(
+                name          =>'srcid',
+                group         =>'source',
+                sqlorder      =>'NONE',
+                label         =>'Source-Id',
+                dataobjattr   =>'lnkswinstanceparam.srcid'),
+                                                   
+      new kernel::Field::Date(
+                name          =>'srcload',
+                group         =>'source',
+                label         =>'Last-Load',
+                dataobjattr   =>'lnkswinstanceparam.srcload')
                                                    
    );
    $self->setDefaultView(qw(swinstance name val swinstance mdate));
@@ -205,6 +269,11 @@ sub initSearchQuery
    if (!defined(Query->Param("search_mdate"))){
      Query->Param("search_mdate"=>'>now-28d');
    }
+   if (!defined(Query->Param("search_cistatus"))){
+     Query->Param("search_cistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+
 }
 
 
