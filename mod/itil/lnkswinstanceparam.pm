@@ -196,6 +196,19 @@ sub getDetailBlockPriority
 }
 
 
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_islatest"))){
+     Query->Param("search_islatest"=>$self->T("yes"));
+   }
+   if (!defined(Query->Param("search_mdate"))){
+     Query->Param("search_mdate"=>'>now-28d');
+   }
+}
+
+
+
 
 
 
