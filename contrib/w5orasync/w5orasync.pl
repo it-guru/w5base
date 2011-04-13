@@ -85,6 +85,7 @@ foreach my $syncobj (@argv){
          }
       }
    }
+   print Dumper(\@fields);
 
    # create oracle database tablename
    my $dbtable=$syncobj;

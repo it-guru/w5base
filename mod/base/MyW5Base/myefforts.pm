@@ -69,6 +69,7 @@ sub Result
    print $app->HtmlHeader(style=>['default.css','work.css',
                                    'kernel.App.Web.css','myw5base.css'],
                       js=>['toolbox.js',
+                           'jquery.js',
                            '../../../static/open-flash-chart/js/swfobject.js'],
                       body=>1,form=>1,
                       title=>'my effort state');
@@ -156,7 +157,7 @@ sub Result
    my $condition=$self->T("condition");
    my $cond=Date_to_String("de",@now);
    print(<<EOF);
-<table width=100% border=1>
+<table width=100% border=1 style="border-collapse:collapse">
 <tr>
 <td width=45% nowrap>$l1</td><td align=right width=40><b>$mwteff</b></td>
 <td width=45% nowrap>$l2</td><td width=40 align=right>$wtcount&nbsp;</td></tr>
@@ -168,7 +169,7 @@ sub Result
 </table>
 <input type=hidden name=MyW5BaseSUBMOD value="base::MyW5Base::myefforts">
 <script language="JavaScript">
-window.setTimeout(function(){document.forms[0].submit()},60000);
+window.setTimeout(function(){document.forms[0].submit()},600000);
 </script>
 EOF
    print("</td></tr>");

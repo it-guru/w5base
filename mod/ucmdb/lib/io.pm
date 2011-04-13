@@ -17,6 +17,7 @@ package ucmdb::lib::io;
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 use SOAP::Lite;
+use kernel;
 
 #   my ($result,$fault)=$self->getAllClassesHierarchy();
 
@@ -80,12 +81,14 @@ sub ucmdbSoapOperation
    my $method = SOAP::Data->name($SOAPmethod)->prefix('clas');
 
    eval('sub SOAP::Transport::HTTP::Client::get_basic_credentials { 
+       printf STDERR ("login $wsuser => $wspass\n");
        return $wsuser => $wspass;
    }');
 
    my $res;
    eval('$res=$soap->call($method=>@$SOAPparam);'); 
    if (!defined($res) || ($@=~m/Connection refused/)){
+      msg(ERROR,"$@");
       die("can not connect to ".$wsproxy);
    }
    return($res);

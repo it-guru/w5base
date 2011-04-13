@@ -73,6 +73,7 @@ sub getPosibleActions
    return();
 }
 
+
 sub getPosibleDirectActions
 {
    my $self=shift;
@@ -105,6 +106,17 @@ sub isEffortReadAllowed
       return(1);
    }
    return(0);
+}
+
+sub getPosibleWorkflowDerivations
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my @l;
+
+
+   return(@l);
 }
 
 
@@ -625,6 +637,8 @@ EOF
    print("<script language=\"JavaScript\">");
    print($self->getDetailFunctionsCode($WfRec));
    my $breakmsg=$self->T("Break the current workflow - are you sure?");
+   my $detailx=$self->DetailX();
+   my $detaily=$self->DetailY()+100;
    print(<<EOF);
 function setEditMode(m)
 {
@@ -678,16 +692,34 @@ function ValidateSubmit(f)
    }
    return(defaultValidateSubmit(f,document.btnWhich));
 }
+function derivateWorkflow(){
+   var v=document.getElementById('doDerivateWorkflow');
+   if (v.value!="" && v.value!=undefined){
+      openwin("DerivateFrom?id=$id&doDerivateWorkflow="+v.value,"_blank",
+              "height=$detaily,width=$detailx,toolbar=no,status=no,"+
+              "resizable=yes,scrollbars=auto");
+   }
+}
 function defaultValidateSubmit(f,b)
 {
+   if (b.name=="SaveStep"){
+      var s=document.getElementById("OP");
+      if (s){
+         if (s.value=="wfstartnew"){
+            derivateWorkflow();
+            enableButtons();
+            submitCount=0;
+            return(false);
+         }
+      }
+   }
    if (b.name=="BreakWorkflow"){
       if (confirm("$breakmsg")){
          b.disabled=false;
          return(true);
       }
       else{
-         b.value=b.oldvalue;
-         b.disabled=false;
+         enableButtons();
          submitCount=0;
          return(false);
       }

@@ -1,0 +1,3 @@
+'Save'=>{de=>'Aktion speichern/ausführen',en=>'action save/run'},
+'send the current qoutation back to inquirer'=>{de=>'Mit diesem Schritt werden die ausgefüllten Angebotsdaten zurück an den Anfragenden gesandt. Gleichzeitig wird der Status "gelöst" gesetzt. Verwenden Sie NICHT "Anforderung weiterleiten an Gruppe oder Person" um das Angebot an den Anfragenden zu übergeben! Dies würde zu einem unnötigen Arbeitsschritt beim Anfordernden führen.'},
+

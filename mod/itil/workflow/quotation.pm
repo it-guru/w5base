@@ -302,8 +302,8 @@ sub generateWorkspace
 <td colspan=3 class=finput>%name(detail)%</td>
 </tr>
 <tr>
-<td class=fname valign=top width=20%>%detaildescription(label)%:</td>
-<td colspan=3 class=finput>%detaildescription(detail)%</td>
+<td class=fname valign=top style='white-space:normal;' width=20%>%quotationdetaildescription(label)%:</td>
+<td colspan=3 class=finput>%quotationdetaildescription(detail)%</td>
 </tr>
 <tr>
 <td class=fname>%reqnature(label)%:</td>
@@ -384,6 +384,7 @@ sub nativProcess
 
    if ($action eq "NextStep" || $action eq "create"){
       $action="NextStep";
+      $h->{detaildescription}=$h->{quotationdetaildescription};
       my $reqnature=$h->{reqnature};
       if ($reqnature eq "RUserGroup"){
          if ($h->{quotationfwdtarget} eq "" ||

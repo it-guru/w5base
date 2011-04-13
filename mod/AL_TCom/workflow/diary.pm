@@ -107,17 +107,6 @@ sub isWriteValid
       }
    }
 
-   # ab dem 15.04.2009 eingeführt - vereinbart war, dass das temp ist!
-  # if ($rec->{state}==21){ # temporäres erlauben der P800 Nachbearbeitung
-  #    my @acl=$self->getFinishUseridList($rec);
-  #    my $userid=$self->getParent->getCurrentUserId();
-  #    if (grep(/^$userid$/,@acl) || $self->getParent->IsMemberOf("admin")){
-  #       return("tcomcod");
-  #    }
-  # }
-  # temp Lösung wieder entfernt ...
-  # https://darwin.telekom.de/darwin/auth/base/workflow/ById/12391987130002
-
    return(undef);
 }
 

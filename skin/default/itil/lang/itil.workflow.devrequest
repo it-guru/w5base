@@ -8,3 +8,4 @@
 'other'=>{de=>'Sonstiges'},
 'fieldgroup.default'=>{de=>'test'},
 'developer requests are disabled for the desired application'=>{de=>'Entwickleranforderungen sind für die ausgewählte Anwendung (im CFM) nicht zugelassen'},
+'Initiate quotation request to developer'=>{de=>'Angebotsanfrage beim Entwickler initieren'},

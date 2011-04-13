@@ -25,7 +25,7 @@ use Exporter 'import';
 sub RunCronApp($)
 {
    my $MOD=shift;
-   printf STDERR ("fifi RunWebApp MOD=$MOD\n");
+ #  printf STDERR ("fifi RunWebApp MOD=$MOD\n");
 }
 
 

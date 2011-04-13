@@ -25,6 +25,14 @@ else{
 msg(DEBUG,"verbose=$verbose");
 
 
+my $flt=$ARGV[0];
+if ($flt eq ""){
+   msg(ERROR,"no filter specified");exit(3);
+}
+msg(INFO,"flt='$flt'");
+
+
+
 #######################################################################
 # load ModuleObject
 #
@@ -37,13 +45,6 @@ else{
    msg(DEBUG,"create of ModuleObject $appl ok");
 }
 
-my $flt=$ARGV[0];
-if ($flt eq ""){
-   msg(ERROR,"no filter specified");exit(3);
-}
-
-
-
 
 #######################################################################
 # do search
@@ -54,7 +55,7 @@ my $blk=5;
 my @l;
 do{
    $appl->Limit($st+$blk,$st);
-   if (@l=$appl->getHashList(qw(name tsm sem))){
+   if (@l=$appl->getHashList(qw(name tsm sem applname))){
       if ($#l==-1){
          msg(INFO,"no data found in $objectname matching fullname=$flt");
          exit(2);

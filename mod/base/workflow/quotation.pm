@@ -93,8 +93,20 @@ sub getDynamicFields
                 container     =>'headref'),
 
       new kernel::Field::Textarea(
+                name          =>'quotationdetaildescription',
+                label         =>'detailed description of quotation',
+                alias         =>'detaildescription'),
+
+      new kernel::Field::Textarea(
                 name          =>'quotationtext',
                 label         =>'quotation elucidations and detail',
+                group         =>'quotation',
+                container     =>'headref'),
+
+      new kernel::Field::Date(
+                name          =>'quotationvalidto',
+                label         =>'quotation is valid to date',
+                dayonly       =>1,
                 group         =>'quotation',
                 container     =>'headref'),
 
@@ -200,6 +212,21 @@ sub Validate
       my @l=$self->getParent->getInitiatorGroupsOf($initiatorid);
       $newrec->{initiatorgroupid}=$l[0] if ($l[0] ne "");
    }
+   if (effVal($oldrec,$newrec,"quotationposible") eq "0"){
+      if (effVal($oldrec,$newrec,"quotationestimatedeffort") ne ""){
+         $self->LastMsg(ERROR,"senseless effort specification");
+         return(0);
+      }
+      if (effVal($oldrec,$newrec,"quotationposiblefinish") ne ""){
+         $self->LastMsg(ERROR,"senseless finish date specified");
+         return(0);
+      }
+   }
+   else{
+      if (exists($newrec->{quotationposible})){
+         $newrec->{stateid}=4;
+      }
+   }
    return(1);
 }
 
@@ -280,22 +307,22 @@ sub isWriteValid
          }
       }
    }
-   push(@l,"default","quotation") if ($rec->{state}<10 && $rec->{state}>1 &&
-                         ($self->isCurrentForward($rec) ||
+   push(@l,"quotation") if (($rec->{state}==3 || $rec->{state}==4) &&
+                            ($self->isCurrentForward($rec) ||
                           $self->getParent->IsMemberOf("admin")));
-   if (grep(/^default$/,@l) &&
-       ($self->getParent->getCurrentUserId() != $rec->{initiatorid} ||
-        $self->getParent->IsMemberOf("admin"))){
-      push(@l,"init","quotation");
-   }
-   if (!grep(/^init$/,@l) && defined($rec)){
-      if ($self->isWorkflowManager($rec)){
-         push(@l,"default","quotation");
-         if ($self->isCurrentForward($rec)){
-            push(@l,"init","quotation");
-         }
-      }
-   }
+#   if (grep(/^default$/,@l) &&
+#       ($self->getParent->getCurrentUserId() != $rec->{initiatorid} ||
+#        $self->getParent->IsMemberOf("admin"))){
+#      push(@l,"init","quotation");
+#   }
+#   if (!grep(/^init$/,@l) && defined($rec)){
+#      if ($self->isWorkflowManager($rec)){
+#         push(@l,"default","quotation");
+#         if ($self->isCurrentForward($rec)){
+#            push(@l,"init","quotation");
+#         }
+#      }
+#   }
    return(@l);
 }
 
@@ -341,10 +368,10 @@ sub isOptionalFieldVisible
    my $name=$param{field}->Name();
 
    return(1) if ($name eq "relations");
-   return(1) if ($name eq "prio");
+   return(0) if ($name eq "prio");
    return(1) if ($name eq "name");
    return(1) if ($name eq "shortactionlog");
-   return(1) if ($name eq "detaildescription");
+   return(0) if ($name eq "detaildescription");
    return(0);
 }
 
@@ -425,18 +452,8 @@ sub getPosibleActions
       }
    }
 
-   if ($iscurrentapprover && $stateid==6){
-      push(@l,"wfapprovok");     # ok
-      push(@l,"wfapprovreject"); # reject
-   }
-
    if ($iscurrent){
       push(@l,"iscurrent"); # Merker, dass der Workflow aktuell ansteht
-   }
-   if ($stateid==1 && ($userid==$creator || $isininitiatorgroup ||
-                       $W5V2::OperationContext eq "W5Server")){ # for scheduler
-      push(@l,"wfactivate");
-      push(@l,"wfschedule");
    }
    if ((!$iscurrent && !$iscurrentapprover) && $stateid>1){
       push(@l,"nop");       # No operation as first entry in Action list
@@ -448,23 +465,14 @@ sub getPosibleActions
    if ((($isadmin && !$iscurrent) || ($userid==$creator && !$iscurrent)) &&
        $stateid<3 && $stateid>1){
       push(@l,"wfbreak");   # workflow abbrechen      (durch Anforderer o admin)
-      if (!$iscurrent){
-         push(@l,"wfcallback");# workflow zurueckholen(durch Anforderer o admin)
-      }
-   }
-   if ($stateid==2 && $lastworker==$userid){
-      if (!$iscurrent){
-         push(@l,"wfcallback"); # if last editor has an mismatched forward done
-      }
    }
    if (($userid==$creator || $isininitiatorgroup || $isadmin) && $stateid==1){
       push(@l,"wfbreak");   # workflow abbrechen      (durch Anforderer o admin)
    }
-   if ((($stateid==4 || $stateid==3) && ($lastworker==$userid || $isadmin)) ||
-       ($iscurrent && $userid==$creator)){
-      push(@l,"wfmailsend");   # notiz hinzufügen        (jeder)
-      push(@l,"wfaddnote");    # notiz hinzufügen        (jeder)
-      push(@l,"wfdefer");      # notiz hinzufügen        (jeder)
+   if (($stateid==4 || $stateid==3) && ($iscurrent)){
+      push(@l,"wfmailsend"); 
+      push(@l,"wfaddnote");  
+      push(@l,"wfdefer");    
    }
    if (($stateid==2 || $stateid==7 || $stateid==10 || $stateid==5) &&
        ((($lastworker!=$userid) && 
@@ -480,22 +488,24 @@ sub getPosibleActions
        ($iscurrent || ($isadmin && !$lastworker==$userid))){
       push(@l,"wfforward"); # workflow weiterleiten   (neuen Bearbeiter setzen)
    }
-   if ($isadmin){
+   if ($isadmin && $stateid<16){
       push(@l,"wfforward"); # workflow weiterleiten   (neuen Bearbeiter setzen)
    }
-   if (($stateid==4 || $stateid==3) && 
-       ($lastworker==$userid || $isadmin) && ($userid!=$creator)){
-      push(@l,"wffineproc");# Bearbeiten und zurück an Anf.  (durch Bearbeiter)
+   if (($stateid==4 || $stateid==3 ) && $iscurrent){
+      push(@l,"wfsendquot");
+   }
+   if (($stateid==3 || $stateid==2) &&   # zugewiesen oder in Bearbeitung
+       !grep(/^wffine$/,@l)){ # allow all bosses of initiator to finish the wf
+      if ($iscurrent && $isininitiatorgroup){
+         push(@l,"wffine");
+      }
    }
 
    #push(@l,"wfapprove");    # workflow genehmigen            (durch Aprover)
    #push(@l,"wfdisapprove"); # workflow genehmigung ablehnen  (durch Aprover)
    #push(@l,"wfreqapprove"); # genehmigung anfordern bei      (durch Bearbeiter)
    if (($stateid==16 && ($userid==$creator || $isadmin))||
-       ($iscurrent && $userid==$creator)){
-      if (!grep(/^wfforward$/,@l)){
-         push(@l,"wfreprocess");# Nachbesserung notwendig     (durch Anforderer)
-      }
+       ($stateid>10 && $iscurrent && $userid==$creator)){
       push(@l,"wffine");     # Workflow erfolgreich beenden   (durch Anforderer)
    }
    if (($stateid==3 || $stateid==2) &&   # zugewiesen oder in Bearbeitung
@@ -790,7 +800,6 @@ package base::workflow::quotation::main;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfStep;
-use Data::Dumper;
 @ISA=qw(kernel::WfStep);
 
 
@@ -804,12 +813,22 @@ sub generateWorkspacePages
    my $tr="base::workflow::actions";
    my $class="display:none;visibility:hidden";
 
+printf STDERR ("action=%s\n",Dumper($actions));
+
    my $defop;
    if (grep(/^wfaccept$/,@$actions)){
       $$selopt.="<option value=\"wfaccept\">".
                 $self->getParent->T("wfaccept",$tr).
                 "</option>\n";
       $$divset.="<div id=OPwfaccept class=\"$class\"></div>";
+   }
+   if (grep(/^wfsendquot$/,@$actions)){
+      $$selopt.="<option value=\"wfsendquot\">".
+                $self->getParent->T("wfsendquot",$tr).
+                "</option>\n";
+      $$divset.="<div id=OPwfsendquot style=\"$class;margin:15px\"><br>".
+                $self->getParent->T("send the current ".
+                "qoutation back to inquirer")."</div>";
    }
    if (grep(/^wffine$/,@$actions)){
       $$selopt.="<option value=\"wffine\">".
@@ -948,9 +967,9 @@ sub nativProcess
       }
       return(0);
    }
-   elsif($op eq "wffineproc"){
+   elsif($op eq "wfsendquot"){
       if ($self->getParent->getParent->Action->StoreRecord(
-          $WfRec->{id},"wfaddnote",
+          $WfRec->{id},"wfsendquot",
           {translation=>'base::workflow::quotation'},$h->{note},$h->{effort})){
          my $openuserid=$WfRec->{openuser};
          $self->StoreRecord($WfRec,{stateid=>16,
@@ -1127,22 +1146,6 @@ sub Process
          }
          return(0);
       }
-      elsif ($op eq "wffineproc"){
-         my $note=Query->Param("note");
-         if ($note=~m/^\s*$/  || length($note)<10){
-            $self->LastMsg(ERROR,"empty or to short notes are not allowed");
-            return(0);
-         }
-         $note=trim($note);
-         my $effort=Query->Param("Formated_effort");
-
-         my $h=$self->getWriteRequestHash("web");
-         $h->{note}=$note if ($note ne "");
-         $h->{effort}=$effort if ($effort ne "");
-         return($self->nativProcess("wffineproc",$h,$WfRec,$actions));
-
-
-      }
       elsif ($op eq "wfreject"){
          my $note=Query->Param("note");
          if ($note=~m/^\s*$/ || length($note)<10){
@@ -1154,11 +1157,16 @@ sub Process
              $WfRec->{id},"wfreject",
              {translation=>'base::workflow::quotation'},$note,undef)){
             my $openuserid=$WfRec->{openuser};
-            $self->StoreRecord($WfRec,{stateid=>24,fwdtargetid=>$openuserid,
-                                                   fwdtarget=>'base::user',
-                                                   eventend=>NowStamp("en"),
-                                                   fwddebtarget=>undef,
-                                                   fwddebtargetid=>undef});
+            $self->StoreRecord($WfRec,{stateid=>24,
+                                       quotationposible=>0,
+                                       quotationtext=>$note,
+                                       quotationposiblefinish=>undef,
+                                       quotationestimatedeffort=>undef,
+                                       fwdtargetid=>$openuserid,
+                                       fwdtarget=>'base::user',
+                                       eventend=>NowStamp("en"),
+                                       fwddebtarget=>undef,
+                                       fwddebtargetid=>undef});
 
             $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
             $self->PostProcess($action.".".$op,$WfRec,$actions,
@@ -1375,7 +1383,6 @@ sub PostProcess
                            sendercc=>1);
    }
    if ($action eq "SaveStep.wfreject" ||
-       $action eq "SaveStep.wffineproc" ||
        $action eq "SaveStep.wfacceptp" ||
        $action eq "BreakWorkflow" ){
       $aobj->NotifyForward($WfRec->{id},
@@ -1387,8 +1394,7 @@ sub PostProcess
    }
 
    if ($action eq "SaveStep.wfacceptp" ||
-       $action eq "SaveStep.wffine" ||
-       $action eq "SaveStep.wffineproc"){
+       $action eq "SaveStep.wffine" ){
       if ($WfRec->{initiatorid} ne "" &&
           $WfRec->{initiatorid} ne $WfRec->{openuser}){
          my $n=$param{note};
@@ -1468,7 +1474,8 @@ sub getPosibleButtons
    }
    if (defined($WfRec->{id})){
       if (grep(/^wfbreak$/,@$actions)){
-         $b{BreakWorkflow}=$self->T('abbort quotation');
+         $b{BreakWorkflow}=$self->T('abbort quotation',
+                                    'base::workflow::quotation');
       }
    }
    return(%b);

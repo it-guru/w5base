@@ -106,6 +106,18 @@ div.WorkBorder{
    border-width:0
 }
 
+div.DerivateWorkflowActiv{
+   border:1px solid darkgreen;
+   padding:5px;cursor:pointer;overflow:hidden;
+   margin-bottom:15px;
+   background-color:#DDDDDD;
+}
+div.DerivateWorkflowInActiv{
+   border:1px solid gray;
+   padding:5px;cursor:pointer;overflow:hidden;
+   margin-bottom:15px;
+}
+
 iframe.ProcessWindow{
    width:100%;
    border-width:0px;

@@ -119,6 +119,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'serialno',
                 group         =>'physasset',
+                xlswidth      =>15,
                 label         =>'Serialnumber',
                 dataobjattr   =>'asset.serialnumber'),
 
@@ -243,12 +244,14 @@ sub new
 
       new kernel::Field::Number(
                 name          =>'cpucount',
+                xlswidth      =>10,
                 group         =>'physasset',
                 label         =>'CPU-Count',
                 dataobjattr   =>'asset.cpucount'),
 
       new kernel::Field::Number(
                 name          =>'cpuspeed',
+                xlswidth      =>10,
                 group         =>'physasset',
                 unit          =>'MHz',
                 label         =>'CPU-Speed',
@@ -256,6 +259,7 @@ sub new
 
       new kernel::Field::Number(
                 name          =>'corecount',
+                xlswidth      =>10,
                 group         =>'physasset',
                 label         =>'Core-Count',
                 dataobjattr   =>'asset.corecount'),
@@ -263,6 +267,7 @@ sub new
       new kernel::Field::Number(
                 name          =>'memory',
                 group         =>'physasset',
+                xlswidth      =>10,
                 label         =>'Memory',
                 unit          =>'MB',
                 dataobjattr   =>'asset.memory'),

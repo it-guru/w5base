@@ -18,7 +18,6 @@ package itil::ext::infoabo;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::Universal;
 @ISA=qw(kernel::Universal);
@@ -81,6 +80,8 @@ sub dailywfreportCompare
       if (ref($wfrec->{affectedapplicationid}) eq "ARRAY"){
          if ($wfrec->{class}=~m/^.*::diary$/ &&
              grep(/^$irec->{refid}$/,@{$wfrec->{affectedapplicationid}})){
+print STDERR ("wfrec=%s\n",Dumper($wfrec));
+print STDERR ("iarec=%s\n",Dumper($irec));
             return(1);
          }
       }

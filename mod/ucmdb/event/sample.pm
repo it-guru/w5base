@@ -20,8 +20,8 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Event;
-#use SOAP::Lite +trace=>'all';
-use SOAP::Lite;
+use SOAP::Lite +trace=>'all';
+#use SOAP::Lite;
 @ISA=qw(kernel::Event);
 
 sub new
@@ -48,56 +48,6 @@ sub ucmdbSample
    my $self=shift;
    my %param=@_;
 
-#   my $wsuser=$self->Config->Param("WEBSERVICEUSER");
-#   my $wspass=$self->Config->Param("WEBSERVICEPASS");
-#   my $wsproxy=$self->Config->Param("WEBSERVICEPROXY");
-#   $wsuser=$wsuser->{ucmdb} if (ref($wsuser) eq "HASH");
-#   $wspass=$wspass->{ucmdb} if (ref($wspass) eq "HASH");
-#   $wsproxy=$wsproxy->{ucmdb} if (ref($wsproxy) eq "HASH");
-#
-#   if ($wsuser eq ""){
-#      return({exitcode=>0,msg=>'ok - no web service account data'});
-#   }
-#   eval('
-#   sub SOAP::Transport::HTTP::Client::get_basic_credentials { 
-#       return $wsuser => $wspass;
-#   }
-#   ');
-#
-#   my $inetwxmltyp="http://schemas.hp.com/ucmdb/1/types";
-#   my $inetwxmlclas="http://schemas.hp.com/ucmdb/1/params/classmodel";
-#
-#   my $method = SOAP::Data->name('getCmdbClassDefinition')->prefix('clas');
-#
-#   my @appl;
-#   push(@appl,SOAP::Data->name("callerApplication")
-#        ->type("")->prefix('typ')->value("w5base"));
-#   my @SOAPparam;
-#   push(@SOAPparam,SOAP::Data->name("cmdbContext")
-#        ->type("")->prefix('clas')->value(\@appl));
-#   push(@SOAPparam,SOAP::Data->name("className")
-#        ->type("")->prefix('clas')->value("nt"));
-#
-#   my ($result,$fault)=$this->getAllClassesHierarchy();
-#
-#   my $soap=SOAP::Lite->uri($inetwxmlclas)->proxy($wsproxy)
-#                      ->on_action(sub{$_[1]});
-#   $soap->serializer->register_ns($inetwxmltyp,'typ');
-#   $soap->serializer->register_ns($inetwxmlclas,'clas');
-#
-#   my $res;
-#   eval('$res=$soap->call($method=>@SOAPparam);'); 
-#   if (!defined($res) || ($@=~m/Connection refused/)){
-#      msg(ERROR,"can not connect to ".$wsproxy);
-#      return({exitcode=>10,
-#              msg=>'can not connect to uCMDB - Connection refused'});
-#   }
-#
-#   if ($res->fault){
-#      $self->Log(ERROR,"trigger","uCMDB: ".$res->fault->{faultstring});
-#      return({exitcode=>2,msg=>$res->fault->{faultstring}});
-#   }
-#   my $indata=$res->result();
 
    my ($result,$fault)=$self->getAllClassesHierarchy();
 
@@ -112,15 +62,23 @@ sub getAllClassesHierarchy
 {
    my $self=shift;
 
-   my @appl;
-   push(@appl,SOAP::Data->name("callerApplication")
+   my @cA;
+   push(@cA,SOAP::Data->name("callerApplication")
         ->type("")->prefix('typ')->value("w5base"));
    my @SOAPparam;
-   push(@SOAPparam,SOAP::Data->name("cmdbContext")
-        ->type("")->prefix('clas')->value(\@appl));
+   push(@SOAPparam,
+        SOAP::Data->name("cmdbContext")->type("")->prefix('query')->value(\@cA),
+        SOAP::Data->name("type")->type("")->prefix('query')->value("Node"),
+        SOAP::Data->name("conditions")->type("")->prefix('query')->value("Description like CMDB"),
+        SOAP::Data->name("conditionsLogicalOperator")->type("")->prefix('query')->value("AND")
+       );
 
-   my $soapresult=$self->ucmdbSoapOperation("getAllClassesHierarchy",\@SOAPparam);
+   my $soapresult=$self->ucmdbSoapOperation("getFilteredCIsByType",\@SOAPparam);
+   #my $soapresult=$self->ucmdbSoapOperation("getAllClassesHierarchy",\@SOAPparam);
 
+print STDERR ("fifi".Dumper($soapresult->result())."\n");
+print STDERR ("fault:".$soapresult->faultstring()."\n");
+exit(0);
    if (defined($soapresult)){
       my @l;
       foreach my $rec (@{$soapresult->result()->{classHierarchyNode}}){
@@ -145,6 +103,7 @@ sub ucmdbSoapOperation
 
    my $inetwxmltyp="http://schemas.hp.com/ucmdb/1/types";
    my $inetwxmlclas="http://schemas.hp.com/ucmdb/1/params/classmodel";
+   my $inetwxmlquery="http://schemas.hp.com/ucmdb/1/params/query";
 
    my $wsuser=$self->Config->Param("WEBSERVICEUSER");
    my $wspass=$self->Config->Param("WEBSERVICEPASS");
@@ -157,8 +116,9 @@ sub ucmdbSoapOperation
                       ->on_action(sub{$_[1]});
    $soap->serializer->register_ns($inetwxmltyp,'typ');
    $soap->serializer->register_ns($inetwxmlclas,'clas');
+   $soap->serializer->register_ns($inetwxmlquery,'query');
 
-   my $method = SOAP::Data->name($SOAPmethod)->prefix('clas');
+   my $method = SOAP::Data->name($SOAPmethod)->prefix('query');
 
    eval('sub SOAP::Transport::HTTP::Client::get_basic_credentials { 
        return $wsuser => $wspass;

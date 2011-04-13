@@ -932,6 +932,18 @@ EOF
    return($H);
 }
 
+sub getPosibleWorkflowDerivations
+{
+   my $self=shift;
+   my $rec=shift;
+
+   return() if (!defined($rec) || 
+                 !defined($self->{SubDataObj}->{$rec->{class}}));
+   return(
+     $self->{SubDataObj}->{$rec->{class}}->getPosibleWorkflowDerivations($rec));
+
+}
+
 sub getPosibleActions
 {
    my $self=shift;
@@ -1611,7 +1623,7 @@ sub getDetailBlockPriority
 sub getValidWebFunctions
 {
    my $self=shift;
-   return("Process","DirectAct","ShowState","FullView",
+   return("Process","DirectAct","ShowState","FullView","DerivateFrom",
           "externalMailHandler",
           "Adressbook",
           "DetailMarkDelete",
@@ -1919,6 +1931,73 @@ $bookshtml
 </table>
 EOF
    print $self->HtmlBottom(body=>1,form=>1);
+}
+
+
+sub DerivateFrom # Workflow ableiten
+{
+   my $self=shift;
+   my $id=Query->Param("id");
+   my $doDerivateWorkflow=Query->Param("doDerivateWorkflow");
+
+   $id=~s/^0+//;
+   if ($id ne ""){
+      $self->ResetFilter();
+      $self->SetFilter({id=>\$id});
+      my ($wfrec,$msg)=$self->getOnlyFirst(qw(ALL));
+      if (defined($wfrec)){
+         my @l=$self->getPosibleWorkflowDerivations($wfrec);
+         foreach my $derivationrec (@l){
+            if ($derivationrec->{name} eq $doDerivateWorkflow &&
+                ref($derivationrec->{actor}) eq "CODE"){
+               my $bk=&{$derivationrec->{actor}}($self,$wfrec);
+               if (ref($bk) eq "HASH"){
+                  print $self->HttpHeader("text/html");
+                  if ($bk->{'targeturl'} ne ""){
+                     print("<html>");
+                     eval("use JSON;");
+                     if ($@ eq ""){
+                        $bk->{'targetparam'}->{'DerivateFrom'}=
+                             $wfrec->{'class'}."::".$wfrec->{'id'};
+                        my $json;
+                        eval('$json='.
+                             'to_json($bk->{targetparam}, {ascii => 1});');
+                        print("<script language=\"JavaScript\">");
+                        print("function DerivateFrom(){");
+                        print("  var o=$json;");
+                        print("  for(var k in o){");
+                        print("     var x=document.createElement(\"input\");");
+                        print("     x.type='hidden';");
+                        print("     x.name=k;");
+                        print("     x.value=o[k];");
+                        print("     document.forms[0].appendChild(x);");
+                        print("  }");
+                        print("  window.setTimeout('".
+                                 "document.forms[0].submit();',3000);");
+                        print("}");
+                        print("</script>");
+                        print("<body onload='DerivateFrom(this);'>");
+                        print("<form action='$bk->{targeturl}' method=POST>");
+                        print("</form>");
+                        print("derivation of new workflow from ".
+                              $bk->{'targetparam'}->{'DerivateFrom'}."<br>");
+                        print("loading ...");
+                        #print("<xmp>".$json."</xmp>");
+                        print("</body>");
+                     }
+                     print("</html>");
+                  }
+                  return;
+               }
+               if ($bk){
+                  return;
+               }
+            }
+         }
+      }
+   }
+   print $self->HttpHeader("text/html");
+   print("Invalid derivation request to Workflow id=$id (mode=$doDerivateWorkflow)");
 }
 
 

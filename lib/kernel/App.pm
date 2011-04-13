@@ -959,7 +959,7 @@ sub T
    else{
       @trtab=@module;
    }
-   #printf STDERR ("TRANSLATE: $txt with $trtab\n");
+   #printf STDERR ("TRANSLATE: $txt with %s lang=$lang\n",join(",",@trtab));
    foreach my $trtab (@trtab){
       if ($trtab ne ""){
          if (!defined($W5V2::Translation->{tab}->{$trtab})){

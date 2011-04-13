@@ -84,10 +84,10 @@ $parser=new XML::Parser(Style=>"Stream");
       }
       #printf STDERR ("addr=%s\n",$addr);
       # offenes Problem UTF8 !!!!
-      my $q=kernel::cgi::Hash2QueryString({'address'=>,latin1($addr)->utf8(),
-                                           'sensor'=>'false'});
-    #  my $q=kernel::cgi::Hash2QueryString({'address'=>,$addr,
+    #  my $q=kernel::cgi::Hash2QueryString({'address'=>,latin1($addr)->utf8(),
     #                                       'sensor'=>'false'});
+      my $q=kernel::cgi::Hash2QueryString({'address'=>,$addr,
+                                           'sensor'=>'false'});
       
       sleep(1); 
       my $url="http://maps.google.com/maps/api/geocode/xml?$q";
