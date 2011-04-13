@@ -216,6 +216,43 @@ sub Validate
 }
 
 
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if (!$self->isDirectFilter(@flt) &&
+       !$self->IsMemberOf([qw(admin w5base.itil.swinstance.read 
+                              w5base.itil.read)],
+                          "RMember")){
+       my $base={};
+       if ($#flt==0 && ref($flt[0]) eq "HASH"){
+          if (exists($flt[0]->{swinstance})){
+             $base->{'fullname'}=$flt[0]->{'swinstance'};
+          }
+          if (exists($flt[0]->{cistatus})){
+             $base->{'cistatus'}=$flt[0]->{'cistatus'};
+          }
+          if (exists($flt[0]->{application})){
+             $base->{'appl'}=$flt[0]->{'application'};
+          }
+       } 
+       my $swi=$self->getPersistentModuleObject("W5swi","itil::swinstance");
+       $swi->SecureSetFilter($base);
+       my @swiid=();
+       foreach my $s ($swi->getHashList(qw(id))){
+          push(@swiid,$s->{id});
+       }
+       push(@flt,[{swinstanceid=>\@swiid}]);
+       
+   }
+   return($self->SetFilter(@flt));
+}
+
+
+
+
+
 sub isViewValid
 {
    my $self=shift;
