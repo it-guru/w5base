@@ -236,6 +236,9 @@ sub SecureSetFilter
           if (exists($flt[0]->{application})){
              $base->{'appl'}=$flt[0]->{'application'};
           }
+          if (exists($flt[0]->{swteam})){
+             $base->{'swteam'}=$flt[0]->{'swteam'};
+          }
        } 
        my $swi=$self->getPersistentModuleObject("W5swi","itil::swinstance");
        $swi->SecureSetFilter($base);
