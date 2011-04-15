@@ -65,7 +65,7 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'isindexed',
                 label         =>'Index',
-                dataobjattr   =>"decode(i.fieldname,null,'0','1')"),
+                dataobjattr   =>"f.isindexed"),
 
       new kernel::Field::Text(
                 name          =>'schemaname',
@@ -87,25 +87,20 @@ sub getSqlFrom
    my $self=shift;
    my $wt=$self->{Worktable};
    my $from=<<EOF;
-(select concat(concat(concat(t.owner,'.'),
-        concat(t.table_name,'.')),c.column_name) fieldname,
-        data_type,data_length,t.owner owner
- from all_TABLES t, all_TAB_COLUMNS c
- where t.TABLE_NAME = c.TABLE_NAME
-       and   t.owner = c.OWNER) f,
-(select concat(concat(concat(table_owner,'.'),concat(table_name,'.')),column_name) fieldname from all_ind_columns) i
+(select distinct t.owner schemaname,
+       lower(t.owner||'.'||t.table_name||'.'||t.column_name) fieldname,
+       t.data_type,
+       t.owner,
+       t.data_length,
+       decode(i.index_name,null,0,1) isindexed,
+       t.owner||'.'||t.table_name||'.'||t.column_name id
+from all_tab_columns t, all_ind_columns i 
+where t.table_name=i.table_name(+) 
+      and t.owner=i.table_owner(+) 
+      and t.column_name=i.column_name(+)) f
 EOF
    return($from);
 }
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where="f.fieldname=i.fieldname(+)";
-   return($where);
-}
-
-
 
 
 sub isViewValid
