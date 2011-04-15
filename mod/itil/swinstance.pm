@@ -88,6 +88,7 @@ sub new
                                  'Informix',
                                  'JacORB',
                                  'JBoss',
+                                 'LDAP-Server',
                                  'MuleSource',
                                  'MQSeries',
                                  'MSSQL',

@@ -321,6 +321,12 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
+   if (exists($newrec->{itservid})){
+      if ($newrec->{itservid} eq ""){
+         $newrec->{itservid}=undef;
+      }
+   }
+
    if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
       my $itclustid=effVal($oldrec,$newrec,"clustid");
       if (!$self->isWriteOnClusterValid($itclustid)){
