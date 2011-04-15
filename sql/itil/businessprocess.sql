@@ -41,3 +41,5 @@ create table lnkbprocesssystem (
   KEY system (system),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 );
+alter table lnkbprocessappl add appfailinfo longtext default NULL;
+alter table lnkbprocessappl add autobpnotify int(1) default '0';

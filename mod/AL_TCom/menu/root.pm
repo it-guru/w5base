@@ -348,6 +348,14 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("AL_TCom.kern.bp.lnksys",
+                      "itil::lnkbprocesssystem",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("AL_TCom.kern.bp.lnkappl",
+                      "itil::lnkbprocessappl",
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("AL_TCom.kern.complexinfoabo",
                       "itil::complexinfoabo",
                       func=>'MainWithNew',

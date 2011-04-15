@@ -65,6 +65,8 @@
 'AL_TCom.kern.costcenter.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.kern.bp'=>{de=>'Geschäftsprozess',en=>'Business process'},
 'AL_TCom.kern.bp.new'=>{de=>'Neueingabe',en=>'New'},
+'AL_TCom.kern.bp.lnksys'=>{de=>'Verkn. System',en=>'Link System'},
+'AL_TCom.kern.bp.lnkappl'=>{de=>'Verkn. Anw.',en=>'Link Appl.'},
 'AL_TCom.kern.complexinfoabo'=>{de=>'KomplexInfoabo',en=>'ComplexInfoabo'},
 'AL_TCom.kern.interview'=>{de=>'CI-Interview',en=>'CI-Interview'},
 'AL_TCom.proc'=>{de=>'Prozesssteuerung',en=>'Processcontrol'},

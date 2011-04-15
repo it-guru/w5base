@@ -74,6 +74,20 @@ sub new
                 group         =>'applinfo',
                 dataobjattr   =>'appl.applid'),
 
+      new kernel::Field::Boolean(
+                name          =>'autobpnotify',
+                group         =>'eventnotification',
+                label         =>
+                'automatic notification of businessprocess impact',
+                dataobjattr   =>'lnkbprocessappl.autobpnotify'),
+
+      new kernel::Field::Textarea(
+                name          =>'applfailinfo',
+                group         =>'eventnotification',
+                label         =>
+                'impact to businessproces on application impairment',
+                dataobjattr   =>'lnkbprocessappl.appfailinfo'),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 searchable    =>0,
@@ -286,22 +300,22 @@ sub isWriteValid
    my $oldrec=shift;
    my $newrec=shift;
    my $bprocessid=effVal($oldrec,$newrec,"bprocessid");
+   my @rw=qw(default eventnotification);
 
-   return("default") if (!defined($oldrec) && !defined($newrec));
-   return("default") if ($self->IsMemberOf("admin"));
-   return("default") if ($self->isWriteOnBProcessValid($bprocessid,
+   return(@rw) if (!defined($oldrec) && !defined($newrec));
+   return(@rw) if ($self->IsMemberOf("admin"));
+   return(@rw) if ($self->isWriteOnBProcessValid($bprocessid,
                                                        "applications"));
-   return("default") if (!$self->isDataInputFromUserFrontend() &&
+   return(@rw) if (!$self->isDataInputFromUserFrontend() &&
                          !defined($oldrec));
 
-   return(undef);
+   return();
 }
 
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default misc bprocessinfo applinfo ));
+   return(qw(header default eventnotification misc bprocessinfo applinfo ));
 }
 
 
