@@ -1,4 +1,4 @@
-'TCOM::custsystem'=>{de=>'T-Com Kundensicht System',en=>'T-Com Customerview System'},
+'itcrm::custsystem'=>{de=>'Kundensicht System',en=>'Customerview System'},
 'OS-Release'=>{de=>'Betriebssystemversion'},
 'fieldgroup.applications'=>{de=>'Anwendungen',en=>'Applications'},
 'fieldgroup.software'=>{de=>'Software',en=>'Software'}
