@@ -99,6 +99,10 @@ sub new
                                  'RPRManager',                 # ITIL role
                                  'RITSoDManager',              # IT role
                                  'RITDemandMgr',               # IT role
+                                 'RINOperator',                # ITIL role
+                                 'RCHOperator',                # ITIL role
+                                 'RCFOperator',                # ITIL role
+                                 'RPROperator',                # ITIL role
                                  'RAdmin',                     # W5Base role
                                  'RDataAdmin',                 # W5Base role
                                  'W5BaseSupport',              # W5Base role 

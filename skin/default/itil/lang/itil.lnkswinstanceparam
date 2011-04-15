@@ -5,3 +5,7 @@
 'parameter name'=>{de=>'Parameter Name'},
 'parameter value'=>{de=>'Parameter Inhalt'},
 'is latest'=>{de=>'aktuellster Stand'},
+'Instance type'=>{de=>'Instanz Typ'},
+'Instance CI-State'=>{de=>'Instanz CI-Status'},
+'Software-Instance'=>{de=>'Software-Instanz'},
+'Application'=>{de=>'Anwendung'},
