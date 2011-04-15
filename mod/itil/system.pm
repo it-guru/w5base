@@ -281,7 +281,7 @@ sub new
                 label         =>'Asset-Name',
                 AllowEmpty    =>1,
                 vjointo       =>'itil::asset',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoineditbase =>{'cistatusid'=>"<=5"},
                 vjoinon       =>['assetid'=>'id'],
                 vjoindisp     =>'name'),
 
