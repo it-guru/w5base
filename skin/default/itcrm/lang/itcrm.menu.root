@@ -1,0 +1,4 @@
+'customerportal.cfm'=>{de=>'IT-Inventar',en=>'IT-Invetory'},
+'customerportal.cfm.appl'=>{de=>'Anwendung',en=>'Application'},
+'customerportal.cfm.system'=>{de=>'System',en=>'System'},
+'customerportal.tcomconnect'=>{de=>'TSI-Connect',en=>'TSI-Connect'},

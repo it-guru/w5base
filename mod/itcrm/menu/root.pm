@@ -1,4 +1,4 @@
-package TCOM::menu::root;
+package itcrm::menu::root;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -18,7 +18,6 @@ package TCOM::menu::root;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::MenuRegistry;
 @ISA=qw(kernel::MenuRegistry);
@@ -36,18 +35,23 @@ sub Init
 {
    my $self=shift;
 
-   $self->RegisterObj("customerportal.cfmtcom",
+   $self->RegisterObj("customerportal.cfm",
                       "tmpl/welcome",
-                      prio=>200,
-                      defaultacl=>['admin']);
-
-   $self->RegisterObj("customerportal.cfmtcom.appl",
-                      "TCOM::custappl",
+                      prio=>100,
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("customerportal.cfmtcom.system",
-                      "TCOM::custsystem",
+   $self->RegisterObj("customerportal.cfm.appl",
+                      "itcrm::custappl",
                       defaultacl=>['valid_user']);
+
+   $self->RegisterObj("customerportal.cfm.system",
+                      "itcrm::custsystem",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("customerportal.tcomconnect",
+                      "base::filemgmt",
+                      prio=>9999,
+                      func=>'browser/TSI-Connect/index.html');
    return(1);
 }
 
