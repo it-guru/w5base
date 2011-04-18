@@ -50,12 +50,24 @@ sub Init
                       "tsarsom::location",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("itu.arsom.user",
+   $self->RegisterObj("itu.arsom.kern",
+                      "tmpl/welcome",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itu.arsom.kern.db",
+                      "tsarsom::DBDataDiconary",
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("itu.arsom.kern.user",
                       "tsarsom::user",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("itu.arsom.group",
+   $self->RegisterObj("itu.arsom.kern.group",
                       "tsarsom::group",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itu.arsom.kern.costcenter",
+                      "tsarsom::costcenter",
                       defaultacl=>['valid_user']);
    
    return(1);
