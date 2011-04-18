@@ -368,7 +368,7 @@ sub NotifyAdmin
    my $imgtitle=$self->T("current state of the requested CI");
 
 
-   $notiy{emailfrom}=$creatorrec->{email};
+#   $notiy{emailfrom}=$creatorrec->{email};  # testweise entfernt
    $notiy{name}=$subject;
    if ($mode ne "drop"){
       $notiy{emailpostfix}=<<EOF;
