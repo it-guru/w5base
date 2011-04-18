@@ -1,0 +1,6 @@
+'itu.arsom'=>{de=>'ARS-OM',en=>'ARS-OM'},
+'itu.arsom.asset'=>{de=>'Hardware',en=>'Hardware'},
+'itu.arsom.system'=>{de=>'System',en=>'System'},
+'itu.arsom.user'=>{de=>'Kontakt',en=>'Contact'},
+'itu.arsom.group'=>{de=>'Gruppe',en=>'Group'},
+'itu.arsom.location'=>{de=>'Standort',en=>'Location'},

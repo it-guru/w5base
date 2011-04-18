@@ -1,2 +1,2 @@
-'tsinet'=>{de=>'TSINET',en=>'TSINET'},
-'tsinet.location'=>{de=>'Standort',en=>'Location'},
+'itu.tsinet'=>{de=>'TSINET',en=>'TSINET'},
+'itu.tsinet.location'=>{de=>'Standort',en=>'Location'},

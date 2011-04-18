@@ -1,3 +1,3 @@
-'ucmdb'=>{de=>'uCMDB',en=>'uCMDB'},
-'ucmdb.kern'=>{de=>'Kern',en=>'Kernel'},
-'ucmdb.kern.uclass'=>{de=>'Klasse',en=>'Class'},
+'itu.ucmdb'=>{de=>'uCMDB',en=>'uCMDB'},
+'itu.ucmdb.kern'=>{de=>'Kern',en=>'Kernel'},
+'itu.ucmdb.kern.uclass'=>{de=>'Klasse',en=>'Class'},

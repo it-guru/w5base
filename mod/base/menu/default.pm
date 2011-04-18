@@ -48,6 +48,7 @@ sub Init
 
    $self->RegisterObj("sysadm",
                       "tmpl/sysadm.welcome",
+                      prio=>2,
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("sysadm.userenv",
@@ -228,6 +229,7 @@ sub Init
 
    $self->RegisterObj("Tools",
                       "tmpl/welcome",
+                      prio=>10,
                       param=>'MSG=Hallo%20dies%20ist%20die%20Nachricht',
                       defaultacl=>['valid_user']);
 

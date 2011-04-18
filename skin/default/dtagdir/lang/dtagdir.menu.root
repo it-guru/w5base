@@ -1,2 +1,2 @@
-'dtagdir'=>{de=>'DTAG Konzernverzeichnis',en=>'DTAG Directory'},
-'dtagdir.user'=>{de=>'Mitarbeiter',en=>'Employee'},
+'itu.dtagdir'=>{de=>'DTAG Konzernverzeichnis',en=>'DTAG Directory'},
+'itu.dtagdir.user'=>{de=>'Mitarbeiter',en=>'Employee'},

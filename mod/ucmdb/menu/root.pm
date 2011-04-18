@@ -34,15 +34,16 @@ sub Init
 {
    my $self=shift;
 
-   $self->RegisterObj("ucmdb",
+   $self->RegisterObj("itu.ucmdb",
+                      "tmpl/welcome",
+                      prio=>100,
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("itu.ucmdb.kern",
                       "tmpl/welcome",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("ucmdb.kern",
-                      "tmpl/welcome",
-                      defaultacl=>['admin']);
-   
-   $self->RegisterObj("ucmdb.kern.uclass",
+   $self->RegisterObj("itu.ucmdb.kern.uclass",
                       "ucmdb::uclass",
                       defaultacl=>['admin']);
    

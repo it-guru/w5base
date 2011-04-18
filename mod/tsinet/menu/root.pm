@@ -34,11 +34,11 @@ sub Init
 {
    my $self=shift;
 
-   $self->RegisterObj("tsinet",
+   $self->RegisterObj("itu.tsinet",
                       "tmpl/welcome",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("tsinet.location",
+   $self->RegisterObj("itu.tsinet.location",
                       "tsinet::location",
                       defaultacl=>['valid_user']);
    

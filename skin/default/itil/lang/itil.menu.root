@@ -86,3 +86,4 @@
 'invoice.lnkapplinvoicestor'=>{de=>'bereitgest. Storage',en=>'provided Storage'},
 'invoice.lnkapplinvoicestor.cum'=>{de=>'kumuliert',en=>'cumulated'},
 'invoice.lnkapplinvoicestor.new'=>{de=>'Neueingabe',en=>'New'},
+'itu'=>{de=>'IT-Universe',en=>'IT-Universe'},

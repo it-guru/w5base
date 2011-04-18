@@ -18,7 +18,6 @@ package dtagdir::menu::root;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::MenuRegistry;
 @ISA=qw(kernel::MenuRegistry);
@@ -35,11 +34,12 @@ sub Init
 {
    my $self=shift;
 
-   $self->RegisterObj("dtagdir",
+   $self->RegisterObj("itu.dtagdir",
                       "tmpl/welcome",
+                      prio=>200,
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("dtagdir.user",
+   $self->RegisterObj("itu.dtagdir.user",
                       "dtagdir::user",
                       defaultacl=>['admin']);
    

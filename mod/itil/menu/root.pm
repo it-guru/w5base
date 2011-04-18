@@ -18,7 +18,6 @@ package itil::menu::root;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::MenuRegistry;
 @ISA=qw(kernel::MenuRegistry);
@@ -37,6 +36,7 @@ sub Init
 
    $self->RegisterObj("itil",
                       "tmpl/welcome",
+                      prio=>100,
                       defaultacl=>['admin']);
    
    $self->RegisterObj("itil.custcontract",
@@ -447,6 +447,11 @@ sub Init
 
    $self->RegisterObj("Tools.analytics.itilfault",
                       "itil::FaultAnalytics",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itu",
+                      "tmpl/welcome.itu",
+                      prio=>1000,
                       defaultacl=>['admin']);
 
    return($self);

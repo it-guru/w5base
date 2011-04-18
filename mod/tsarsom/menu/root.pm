@@ -1,4 +1,4 @@
-package tsisem::menu::root;
+package tsarsom::menu::root;
 #  W5Base Framework
 #  Copyright (C) 2011  Hartmut Vogler (it@guru.de)
 #
@@ -34,17 +34,29 @@ sub Init
 {
    my $self=shift;
 
-   $self->RegisterObj("itu.isem",
+   $self->RegisterObj("itu.arsom",
                       "tmpl/welcome",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("itu.isem.user",
-                      "tsisem::user",
-                      defaultacl=>['admin']);
+   $self->RegisterObj("itu.arsom.system",
+                      "tsarsom::system",
+                      defaultacl=>['valid_user']);
    
-   $self->RegisterObj("itu.isem.location",
-                      "tsisem::location",
-                      defaultacl=>['admin']);
+   $self->RegisterObj("itu.arsom.asset",
+                      "tsarsom::asset",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itu.arsom.location",
+                      "tsarsom::location",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itu.arsom.user",
+                      "tsarsom::user",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itu.arsom.group",
+                      "tsarsom::group",
+                      defaultacl=>['valid_user']);
    
    return(1);
 }
