@@ -72,3 +72,4 @@
 'AL_TCom.proc'=>{de=>'Prozesssteuerung',en=>'Processcontrol'},
 'AL_TCom.proc.ChangeManagement'=>{de=>'Change Management',
                                   en=>'Change Management'},
+'Reporting.amore'=>{de=>'@more',en=>'@more'},
