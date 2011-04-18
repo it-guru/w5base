@@ -20,6 +20,6 @@ create table itcrmappl (
   srcload    datetime    default NULL,
   PRIMARY KEY  (id),
   key(customer),
-  UNIQUE KEY name (name,customer),
+  KEY name (name),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 );
