@@ -1,3 +1,3 @@
-'tsarsom::system'=>{de=>'ARS-OM Hardware',
+'tsarsom::asset'=>{de=>'ARS-OM Hardware',
                         en=>'ARS-OM Hardware'},
 'CostCenter-No.'=>{de=>'Kostenstellennummer'},
