@@ -722,13 +722,13 @@ sub Normalize
    }
    if (($rec->{location}=~m/^M\xFC[h]{0,1}lheim$/i) &&
        ($rec->{zipcode}=~m/^454/)){
-      $rec->{location}="M\xFChlheim an der Ruhr";
+      $rec->{location}="M\xFClheim an der Ruhr";
    }
    if (($rec->{location}=~m/^M\xFC[h]{0,1}lheim$/i)){
       $rec->{location}="M\xFChlheim an der Donau";
    }
    if (($rec->{location}=~m/^M\xFC[h]{0,1}lheim .*Ruhr$/i) ){
-      $rec->{location}="M\xFChlheim an der Ruhr";
+      $rec->{location}="M\xFClheim an der Ruhr";
    }
    if (($rec->{location}=~m/^M\xFC[h]{0,1}lheim .*Donau$/i) ){
       $rec->{location}="M\xFChlheim an der Donau";
