@@ -549,7 +549,6 @@ sub SecureSetFilter
                                     RCFManager RCFOperator)],"both");
       my @grpids=keys(%grp);
       @grpids=(qw(NONE)) if ($#grpids==-1);
-      $self->SetNamedFilter("Customer",{customerid=>\@grpids});
 
       my $userid=$self->getCurrentUserId();
       push(@flt,[
