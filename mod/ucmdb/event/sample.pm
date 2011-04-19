@@ -20,8 +20,8 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Event;
-use SOAP::Lite +trace=>'all';
-#use SOAP::Lite;
+#use SOAP::Lite +trace=>'all';
+use SOAP::Lite;
 @ISA=qw(kernel::Event);
 
 sub new
