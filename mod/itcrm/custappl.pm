@@ -109,6 +109,11 @@ sub new
                 group         =>'tscontact',
                 dataobjattr   =>'appl.sem'),
 
+      new kernel::Field::Interface(      
+                name          =>'sem2id',
+                group         =>'tscontact',
+                dataobjattr   =>'appl.sem2'),
+
       new kernel::Field::Interface(
                 name          =>'sememail',
                 group         =>'tscontact',
@@ -549,8 +554,8 @@ sub SecureSetFilter
       my $userid=$self->getCurrentUserId();
       push(@flt,[
                  {customerid=>\@grpids},
-                 {semid=>\$userid}
-                 #,       {sem2id=>\$userid}
+                 {semid=>\$userid},
+                 {sem2id=>\$userid}
                 ]);
    }
 
