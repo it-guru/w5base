@@ -309,7 +309,8 @@ sub isWriteValid
    if (defined($rec)){
       return("default") if ($self->IsMemberOf("admin"));
       if (!$self->isParentWriteable($rec,$rec->{dnsname})){
-         $self->LastMsg(ERROR,"no system found or no permission to access system");
+         $self->LastMsg(ERROR,
+                        "no system found or no permission to access system");
          return(undef);
       }
    }
@@ -322,7 +323,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(
-          qw(header default ipaddresses itclustsvc systems source));
+          qw(header default ipaddresses systems itclustsvc source));
 }
 
 
