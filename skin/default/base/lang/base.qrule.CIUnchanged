@@ -1,0 +1,2 @@
+'base::qrule::CIUnchanged'=>{de=>'Prüfung ob Config-Item innerhalb der letzten 3 Jahre bearbeitet wurde',en=>'Check if Config-Item is modified since the last 3 years'},
+'config item longer then 3 years unchanged - please check actuality of the config data'=>{de=>'Das Config-Item wurde länger als 3 Jahre nicht bearbeitet - überprüfen Sie, ob die Config-Daten noch aktuell sind'},
