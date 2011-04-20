@@ -7,5 +7,6 @@
 'no write access on respective system'=>{de=>'keine Schreibrechte auf zugehörigen System'},
 'Short Comments'=>{de=>'Kurzbemerkungen'},
 'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
+'fieldgroup.itclustsvc'=>{de=>'Cluster-Services',en=>'Cluster-Services'},
 'fieldgroup.ipaddresses'=>{de=>'IP-Adressen',en=>'IP-Addresses'},
 'Systems'=>{de=>'Systeme'},

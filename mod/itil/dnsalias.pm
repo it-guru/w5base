@@ -98,10 +98,20 @@ sub new
                 label         =>'Systems',
                 group         =>'systems',
                 forwardSearch =>1,
-                vjointo       =>'itil::ipaddress',
-                vjoinon       =>['dnsname'=>'dnsname'],
-                vjoindisp     =>['system','name'],
-                vjoininhash   =>['system','name','systemid']),
+                vjointo       =>'itil::system',
+                vjoinon       =>['dnsname'=>'dnsnamelist'],
+                vjoindisp     =>['name'],
+                vjoininhash   =>['name','systemid']),
+
+      new kernel::Field::SubList(
+                name          =>'itclustsvc',
+                label         =>'Cluster Services',
+                group         =>'itclustsvc',
+                forwardSearch =>1,
+                vjointo       =>'itil::lnkitclustsvc',
+                vjoinon       =>['dnsname'=>'dnsnamelist'],
+                vjoindisp     =>['fullname','name'],
+                vjoininhash   =>['fullname','name','id']),
 
       new kernel::Field::SubList(
                 name          =>'ipaddresses',
@@ -312,7 +322,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(
-          qw(header default ipaddresses systems source));
+          qw(header default ipaddresses itclustsvc systems source));
 }
 
 
