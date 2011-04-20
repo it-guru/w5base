@@ -242,25 +242,42 @@ sub isParentWriteable
    my $ipaddr=getModuleObject($self->Config,"itil::ipaddress");
    my %flt=("dnsname"=>\$dnsname);
    $ipaddr->SetFilter(\%flt);
-   my @ipaddrlist=$ipaddr->getHashList(qw(systemid));
+   my @ipaddrlist=$ipaddr->getHashList(qw(systemid itclustsvcid));
    
    my $sys=getModuleObject($self->Config,"itil::system");
+   my $isv=getModuleObject($self->Config,"itil::lnkitclustsvc");
    my $idname=$sys->IdField->Name();
    my $sysfound=0;
+   my $isvfound=0;
    foreach my $iprec (@ipaddrlist){
-      $sys->SetFilter({$idname=>\$iprec->{systemid}});
-      my ($sysrec)=$sys->getOnlyFirst(qw(ALL));
-      if (defined($sysrec)){
-         $sysfound++;
-         my @write=$sys->isWriteValid($sysrec);
-         if (isDataInputFromUserFrontend()){
-            if (grep(/^ALL$/,@write) || grep(/^ipaddresses$/,@write)){
-               return(1);
+      if ($iprec->{systemid} ne "" && $iprec->{itclustsvcid} eq ""){
+         $sys->SetFilter({$idname=>\$iprec->{systemid}});
+         my ($sysrec)=$sys->getOnlyFirst(qw(ALL));
+         if (defined($sysrec)){
+            $sysfound++;
+            my @write=$sys->isWriteValid($sysrec);
+            if (isDataInputFromUserFrontend()){
+               if (grep(/^ALL$/,@write) || grep(/^ipaddresses$/,@write)){
+                  return(1);
+               }
+            }
+         }
+      }
+      if ($iprec->{systemid} eq "" && $iprec->{itclustsvcid} ne ""){
+         $isv->SetFilter({id=>\$iprec->{itclustsvcid}});
+         my ($isvrec)=$isv->getOnlyFirst(qw(ALL));
+         if (defined($isvrec)){
+            $isvfound++;
+            my @write=$isv->isWriteValid($isvrec);
+            if (isDataInputFromUserFrontend()){
+               if (grep(/^ALL$/,@write) || grep(/^ipaddresses$/,@write)){
+                  return(1);
+               }
             }
          }
       }
    }
-   if(defined($rec) && !$sysfound){
+   if(defined($rec) && !$sysfound && !$isvfound){
       return(1) if ($rec->{owner}==$self->getCurrentUserId());
    }
    return(0);
