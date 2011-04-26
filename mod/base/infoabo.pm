@@ -604,15 +604,18 @@ sub LoadTargets
       foreach my $rec ($self->getHashList(qw(userid email id 
                                              usercistatusid
                                              active))){
-         next if ($rec->{email} eq ""); # ensure entries are filtered, if the
-                                        # contact entry has been deleted
+         next if ($rec->{usercistatusid} eq ""); # ensure entries 
+                                        # are filtered, if the
+                                        # contact entry has NOT been deleted
          @{$userlist}=grep(!/^$rec->{userid}$/,@{$userlist}); 
-         if ($rec->{active} && $rec->{usercistatusid}<=5){
-            if (!defined($desthash->{lc($rec->{email})})){
-               $desthash->{lc($rec->{email})}=[];
+         if ($rec->{email} ne ""){
+            if ($rec->{active} && $rec->{usercistatusid}<=5){
+               if (!defined($desthash->{lc($rec->{email})})){
+                  $desthash->{lc($rec->{email})}=[];
+               }
+               push(@{$desthash->{lc($rec->{email})}},$rec->{id});
+               $c++;
             }
-            push(@{$desthash->{lc($rec->{email})}},$rec->{id});
-            $c++;
          }
       }
       my %u=();
