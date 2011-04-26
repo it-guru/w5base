@@ -48,7 +48,7 @@ sub new
                 label         =>'AM Incident-Assignmentgroup',
                 group         =>'admin',
                 weblinkto     =>'tsacinv::group',
-                weblinkon     =>['acassingmentgroup'=>'name'],
+                weblinkon     =>['aciassignmentgroup'=>'name'],
                 searchable    =>0,
                 readonly      =>1,
                 async         =>'1',
