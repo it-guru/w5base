@@ -228,12 +228,12 @@ sub new
                 weblinkon     =>['conumber'=>'name'],
                 dataobjattr   =>'appl.conumber'),
 
-#      new kernel::Field::Import( $self,
-#                vjointo       =>'itil::costcenter',
-#                vjoinon       =>['conumber'=>'name'],
-#                group         =>'tscontact',
-#                dontrename    =>1,
-#                fields        =>[qw(delmgr)]),
+      new kernel::Field::Import( $self,
+                vjointo       =>'itil::costcenter',
+                vjoinon       =>['conumber'=>'name'],
+                group         =>'tscontact',
+                dontrename    =>1,
+                fields        =>[qw(delmgr)]),
 
       new kernel::Field::Text(
                 name          =>'businessteambossid',
