@@ -108,6 +108,10 @@ sub RSS
       my @customer=split(/[,;]/,$customer);
       my @mandator=split(/[,;]/,$mandator);
       my @prio=split(/[,;]/,$prio);
+      my @itemprio=split(/[,;]/,$itemprio);
+      if ($#itemprio==-1 || ($itemprio[0] eq "" && $#itemprio==0)){
+         $itemprio[0]="*";
+      }
       if ($#prio==-1 || ($prio[0] eq "" && $#prio==0)){
          $prio[0]="*";
       }
@@ -151,6 +155,11 @@ sub RSS
          }
          if (!in_array(['*'],\@prio)){  # user dont want to see all
             if (!in_array([$WfRec->{eventstatclass}],\@prio)){
+               next;
+            }
+         }
+         if (!in_array(['*'],\@itemprio)){  # user dont want to see all
+            if (!in_array([$WfRec->{affecteditemprio}],\@itemprio)){
                next;
             }
          }
