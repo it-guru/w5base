@@ -24,6 +24,8 @@
 'RBackoffice'=>{ de=>'Backoffice', en=>'Backoffice'},
 'RAuditor'=>{ de=>'Auditor', en=>'Auditor'},
 'RMonitor'=>{ de=>'Monitor/Lesen', en=>'Monitor/Read'},
+'RContactAdmin'=>{ de=>'W5Base Kontakte-Administrator', 
+                   en=>'W5Base Contact-Administrator'},
 'W5BaseSupport'=>{ de=>'W5Base Support', en=>'W5Base Support'},
 'RTimeManager'=>{ de=>'Zeit-Manager', en=>'Time-Manager'},
 'RITSoDManager'=>{ de=>'IT StorageOnDemand Manager', 

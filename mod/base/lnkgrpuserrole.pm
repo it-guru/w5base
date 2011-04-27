@@ -105,6 +105,7 @@ sub new
                                  'RPROperator',                # ITIL role
                                  'RAdmin',                     # W5Base role
                                  'RDataAdmin',                 # W5Base role
+                                 'RContactAdmin',              # W5Base role
                                  'W5BaseSupport',              # W5Base role 
                                 ],
                 dataobjattr   =>'lnkgrpuserrole.nativrole'),

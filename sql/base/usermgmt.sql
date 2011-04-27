@@ -307,3 +307,4 @@ alter table contact add dateofvsnfd_edt     varchar(128) default NULL;
 alter table contact add dateofsecretpro     datetime     default NULL;
 alter table contact add dateofsecretpro_edt varchar(128) default NULL;
 alter table contact add killtimeout int(22) default '1000';
+alter table contact add managedbygrp bigint(20) default '1';

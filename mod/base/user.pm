@@ -159,6 +159,7 @@ sub new
                 label         =>'W5BaseID',
                 size          =>'10',
                 group         =>'userid',
+                readonly      =>1,
                 dataobjattr   =>'contact.userid'),
                                   
       new kernel::Field::Text(
@@ -246,7 +247,6 @@ sub new
                 group         =>'userro',
                 dataobjattr   =>'contact.gtctxt'),
                                   
-
       new kernel::Field::Link(
                 name          =>'secstateid',
                 label         =>'Sec-StateID',
@@ -683,6 +683,18 @@ sub new
                 group         =>'userro',
                 dataobjattr   =>'contact.modifydate'),
 
+      new kernel::Field::Group(
+                name          =>'managedby',
+                label         =>'managed by group',
+                vjoinon       =>'managedbyid',
+                group         =>'userid'),
+
+      new kernel::Field::Link(
+                name          =>'managedbyid',
+                group         =>'default',   # to allow write on create
+                selectfix     =>1,
+                dataobjattr   =>'contact.managedbygrp'),
+
       new kernel::Field::Interface(
                 name          =>'replkeypri',
                 group         =>'source',
@@ -900,6 +912,7 @@ sub SecureValidate
    my $newrec=shift;
    my $wrgroups=shift;
 
+   my $userid=$self->getCurrentUserId();
    my $usertyp=effVal($oldrec,$newrec,"usertyp");
    if (!$self->IsMemberOf("admin")){
       if (!defined($oldrec)){
@@ -910,8 +923,14 @@ sub SecureValidate
          }
       }
       delete($newrec->{secstate});
+      if (!defined($oldrec)){
+         my %a=$self->getGroupsOf($userid, [qw(RContactAdmin)], 'direct');
+         my @idl=keys(%a);
+         if ($#idl!=-1 && $idl[0] ne ""){
+            $newrec->{managedbyid}=$idl[0];
+         }
+      }
    }
-   my $userid=$self->getCurrentUserId();
    if (defined($oldrec) && $oldrec->{userid}==$userid){
       delete($newrec->{cistatusid});
    }
@@ -1326,9 +1345,11 @@ sub isWriteValid
    return("default","name","office","comments") if (!defined($rec));
    return(undef) if (!defined($rec));
    if ($self->IsMemberOf("admin")){
-      return(qw(default name office private userparam groups usersubst control
-                comments header picture nativcontact userro personrelated introdution
-                interview officeacc));
+      return(qw(default name office private userparam 
+                groups usersubst control
+                comments header picture nativcontact userro 
+                personrelated introdution
+                interview officeacc userid));
    }
    my $userid=$self->getCurrentUserId();
    if ($userid eq $rec->{userid} ||
@@ -1353,6 +1374,12 @@ sub isWriteValid
                }
             }
          }
+      }
+   }
+   if ($rec->{managedbyid}!=1 && $rec->{managedbyid}!=0){
+      if ($self->IsMemberOf($rec->{managedbyid},["RContactAdmin"],"up")){
+         return("introdution","private","officeacc","office",
+                "comments","control");
       }
    }
    return(undef);
