@@ -63,20 +63,7 @@ sub doCleanup
 
    msg(DEBUG,"(%s) Processing doCleanup",$self->Self);
    my $j=$self->getParent->getPersistentModuleObject("base::joblog");
-   my $jop=$j->Clone();
-   if (defined($j)){
-      $j->SetFilter({'mdate'=>$CleanupJobLog});
-      $j->SetCurrentView(qw(ALL));
-      $j->SetCurrentOrder(qw(NONE));
-
-      my ($rec,$msg)=$j->getFirst(unbuffered=>1);
-      if (defined($rec)){
-         do{
-            $jop->ValidatedDeleteRecord($rec);
-            ($rec,$msg)=$j->getNext();
-         } until(!defined($rec));
-      }
-   }
+   $j->BulkDeleteRecord({'mdate'=>$CleanupJobLog});
 }
 
 

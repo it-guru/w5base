@@ -582,6 +582,33 @@ sub Ping
    return($workdb->Ping());
 }
 
+sub BulkDeleteRecord
+{
+   my $self=shift;
+   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+   my @delfilter=@_;   # delete filter
+   my $where=$self->getSqlWhere("delete",@delfilter);
+
+   my ($worktable,$workdb)=$self->getWorktable();
+   $workdb=$self->{DB} if (!defined($workdb));
+
+   if (!defined($worktable) || $worktable eq ""){
+      $self->LastMsg(ERROR,"can't updateRecord in $self - no Worktable");
+      return(undef);
+   }
+   my $cmd="delete from $worktable";
+   $cmd.=" where ".$where if ($where ne "");
+   #my $cmd="delete from ta_application_data where ta_application_data.id=13";
+   msg(INFO,"delcmd=%s",$cmd);
+   if ($workdb->do($cmd)){
+      msg(INFO,"delete seems to be ok");
+      return(1);
+   }
+   $self->LastMsg(ERROR,$self->preProcessDBmsg($workdb->getErrorMsg()));
+
+   return(undef);
+}
+
 sub InsertRecord
 {
    my $self=shift;

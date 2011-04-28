@@ -1496,7 +1496,15 @@ sub DeleteRecord
    my $self=shift;
    my $oldrec=shift;
    $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
-   msg(ERROR,"deleteRecord not implemented in DataObj '$self'");
+   msg(ERROR,"DeleteRecord not implemented in DataObj '$self'");
+   return(0);
+}
+sub BulkDeleteRecord    # this function should be only used, if the
+{                       # developer exactly knows the consequeses!!!
+   my $self=shift;
+   my @filter=@_;
+   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+   msg(ERROR,"BulkDeleteRecord not implemented in DataObj '$self'");
    return(0);
 }
 ########################################################################
