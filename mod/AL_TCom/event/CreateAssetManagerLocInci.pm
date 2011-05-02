@@ -88,23 +88,28 @@ sub ProcessLocationCompare
    foreach my $f (@fieldset){
       my $accmp=$acrec->{$f};
       my $w5cmp=$w5rec->{$f};
+      my $fname=$f;
       if ($f eq "zipcode"){
          $accmp=~s/D-//;
          $w5cmp=~s/D-//;
       }
-      msg(INFO,"cmp $accmp && $w5cmp");
-      if ($w5cmp ne $accmp && $w5cmp ne ""){
-         push(@entxt,"- Change the value of the field '$f' from\n".
+      $fname=~s/address1/Address/;
+      $fname=~s/zipcode/ZIP/;
+      $fname=~s/location/City/;
+      #msg(INFO,"cmp $accmp && $w5cmp");
+      if (lc($w5cmp) ne lc($accmp) && $w5cmp ne ""){
+         push(@entxt,"- Change the value of the field '$fname' from\n".
                      "  '$acrec->{$f}' to '$w5cmp'\n");
       }
    }
    if ($#entxt!=-1){
-      my $itxt="The postal address information on masterdata of location ".
-               "(Code:$acrec->{code})\n".
-               "$acrec->{fullname}\n".
-               "is incorrect.\n".
+      my $itxt="The postal address information on ".
+               "masterdata of location ...\n\n".
+               "    Location code: $acrec->{code}\n".
+               "    Location name: $acrec->{fullname}\n\n".
+               " ... is incorrect.\n\n\n".
                "Please correct the following field values on data ".
-               "block 'postal address':\n".
+               "block 'postal address':\n\n".
                join("\n",@entxt)."\n".
                "If you have any questions in relation to this correction, ".
                "feel free to contact me by phone!\n";
