@@ -282,7 +282,6 @@ sub nativQualityCheck
       my $oldcontext=$W5V2::OperationContext;
       $W5V2::OperationContext="QualityCheck";
       msg(INFO,"QualityRule Level5");
-     # msg(INFO,sprintf("check old wfrec=%s",Dumper($WfRec)));
       if (!defined($WfRec)){
          msg(INFO,"QualtiyCheck: ".
                   "an old record does not exists - so i create a new one");

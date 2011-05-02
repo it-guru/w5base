@@ -35,11 +35,11 @@ sub Init
 {
    my $self=shift;
 
-   $self->RegisterObj("bflexx",
+   $self->RegisterObj("itu.bflexx",
                       "tmpl/welcome",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("bflexx.ifworkflow",
+   $self->RegisterObj("itu.bflexx.ifworkflow",
                       "tsbflexx::ifworkflow",
                       defaultacl=>['admin']);
    

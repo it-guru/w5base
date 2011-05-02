@@ -86,6 +86,14 @@ sub new
                 name          =>'customerid',
                 dataobjattr   =>'appl.customer'),
 
+      new kernel::Field::Link(       
+                name          =>'semid',
+                dataobjattr   =>'appl.sem'),
+
+      new kernel::Field::Link(       
+                name          =>'sem2id',
+                dataobjattr   =>'appl.sem2'),
+
       new kernel::Field::SubList(
                 name          =>'applications',
                 label         =>'Applications',
@@ -150,13 +158,12 @@ sub SecureSetFilter
                                     RCFManager RCFOperator)],"both");
       my @grpids=keys(%grp);
       @grpids=(qw(NONE)) if ($#grpids==-1);
-      $self->SetNamedFilter("Customer",{customerid=>\@grpids});
 
       my $userid=$self->getCurrentUserId();
       push(@flt,[
                  {customerid=>\@grpids},
-                 {semid=>\$userid}
-                 #,       {sem2id=>\$userid}
+                 {semid=>\$userid},
+                 {sem2id=>\$userid}
                 ]);
    }
 

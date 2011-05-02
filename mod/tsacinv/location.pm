@@ -48,6 +48,10 @@ sub new
                                   label      =>'No.'),
 
 
+      new kernel::Field::Id(      name       =>'code',
+                                  label      =>'Code',
+                                  dataobjattr  =>'amlocation.barcode'),
+
       new kernel::Field::Id(      name       =>'locationid',
                                   label      =>'LocationID',
                                   dataobjattr  =>'amlocation.llocaid'),
@@ -134,7 +138,7 @@ sub new
                                      address=>\&AddressBuild),
 
    );
-   $self->setDefaultView(qw(linenumber locationid fullname zipcode location address1));
+   $self->setDefaultView(qw(linenumber code locationid fullname zipcode location address1));
    $self->{MainSearchFieldLines}=4;
    return($self);
 }

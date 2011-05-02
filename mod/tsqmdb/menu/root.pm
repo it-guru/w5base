@@ -34,23 +34,23 @@ sub Init
 {
    my $self=shift;
 
-   $self->RegisterObj("qmdb",
+   $self->RegisterObj("itu.qmdb",
                       "tmpl/welcome",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("qmdb.custcontract",
+   $self->RegisterObj("itu.qmdb.custcontract",
                       "tsqmdb::custcontract",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("qmdb.custcontract.orderticket",
+   $self->RegisterObj("itu.qmdb.custcontract.orderticket",
                       "tsqmdb::orderticket",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("qmdb.krn",
+   $self->RegisterObj("itu.qmdb.krn",
                       "tmpl/welcome",
                       defaultacl=>['admin']);
 
-   $self->RegisterObj("qmdb.krn.dictonary",
+   $self->RegisterObj("itu.qmdb.krn.dictonary",
                       "tsqmdb::DBDataDiconary",
                       defaultacl=>['admin']);
    

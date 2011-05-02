@@ -75,7 +75,6 @@ sub rangetest
                                                   "unixtime","GMT","GMT");
          my $eventend=$wf->ExpandTimeExpression($rec->{eventend},
                                                   "unixtime","GMT","GMT");
-         printf STDERR ("fifi wfrec=%s\neventstart=$eventstart eventend=$eventend\n",Dumper($rec));
          $wfrange->ValidatedInsertOrUpdateRecord(
                    {wfheadid=>$rec->{id},
                     range=>[$eventstart,0,$eventend,0]},

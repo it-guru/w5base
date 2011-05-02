@@ -80,8 +80,6 @@ sub dailywfreportCompare
       if (ref($wfrec->{affectedapplicationid}) eq "ARRAY"){
          if ($wfrec->{class}=~m/^.*::diary$/ &&
              grep(/^$irec->{refid}$/,@{$wfrec->{affectedapplicationid}})){
-print STDERR ("wfrec=%s\n",Dumper($wfrec));
-print STDERR ("iarec=%s\n",Dumper($irec));
             return(1);
          }
       }
