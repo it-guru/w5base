@@ -23,3 +23,5 @@ create table itcrmappl (
   KEY name (name),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 );
+alter table itcrmappl add custmgmttool varchar(20) default NULL;
+alter table itcrmappl add key(custmgmttool);

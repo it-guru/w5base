@@ -46,9 +46,11 @@ sub ImportINetworkContacts
 {
    my $self=shift;
    my %param=@_;
-#   if (in_array(\@_,"nonotify")){
-#      $param{nonotify}=1;
-#   }
+   if (in_array(\@_,"nonotify")){
+      $param{nonotify}=1;
+   }
+   $self->{custmgmttool}='I-Network';
+   $self->{custselection}='DTAG DTAG.TDG DTAG.TDG.* DTAG.T-Home.* DTAG.T-Home';
 
    my $wsuser=$self->Config->Param("WEBSERVICEUSER");
    my $wspass=$self->Config->Param("WEBSERVICEPASS");
@@ -65,13 +67,13 @@ sub ImportINetworkContacts
 
 
 
-   #use SOAP::Lite +trace=>'all';
-   eval('use SOAP::Lite;');
+   #eval("use SOAP::Lite +trace=>'all';");
+   eval("use SOAP::Lite;");
 
 
    my $appl=getModuleObject($self->getParent->Config(),"itil::appl");
- #  $appl->SetNamedFilter("DBASE",{name=>"Flex* EKI* IT-Base*"});
-   $appl->SetFilter({customer=>"DTAG DTAG.TDG DTAG.TDG.*",cistatusid=>"<=5"});
+  # $appl->SetNamedFilter("DBASE",{name=>"Flex* EKI* xIT-Base*"});
+   $appl->SetFilter({customer=>$self->{custselection},cistatusid=>"<=5"});
    my @idl=$appl->getHashList(qw(id name opmode));
 
    eval('
@@ -81,6 +83,7 @@ sub ImportINetworkContacts
    ');
 
    my @msglist;
+   my %foundids;
 
 
    my $n=0;
@@ -120,8 +123,8 @@ sub ImportINetworkContacts
       }
       my $indata=$res->result();
       if (ref($indata) eq "HASH" && exists($indata->{SMAppData})){
-printf STDERR ("fifi ref=%s\n",ref($indata->{SMAppData}));
          if (ref($indata->{SMAppData}) eq "HASH"){
+            $foundids{$arec->{id}}++;
             $self->processRecord($indata->{SMAppData});
          }
          else{
@@ -137,17 +140,37 @@ printf STDERR ("fifi ref=%s\n",ref($indata->{SMAppData}));
          }
       }
    }
-   if ($param{nonotify} ne "1" && keys(%{$self->{problems}})){
+
+   my @foundids=keys(%foundids);
+   my $custappl=getModuleObject($self->getParent->Config(),"itcrm::custappl");
+   $custappl->SetFilter({customer=>$self->{custselection},
+                         custmgmttool=>\$self->{custmgmttool},
+                         cistatusid=>"<=4"});
+   foreach my $missrec ($custappl->getHashList(qw(id name))){
+      if (!in_array(\@foundids,$missrec->{id})){
+         $self->{problems}->{"999".NowStamp()}=
+         "Aktive application '$missrec->{name}' ($missrec->{id}) has ".
+         "leave $self->{custmgmttool}";
+      }
+   }
+
+
+   if (keys(%{$self->{problems}})){
       my $msg=join("\n",map({"* ".$self->{problems}->{$_}}
                             sort(keys(%{$self->{problems}}))));
-      my $act=getModuleObject($self->Config,"base::workflowaction");
-      $act->Notify(ERROR,"Problems while I-Network import",
-                   "Found  problems ".
-                   "while import I-Network informations!\n\n".$msg,
-                   emailfrom=>'"I-Network to Darwin" <>',
-                   emailto=>['11697377440001'], # I-Network service user
-                   adminbcc=>1,
-                  );
+      if ($param{nonotify} ne "1" && keys(%{$self->{problems}})){
+         my $act=getModuleObject($self->Config,"base::workflowaction");
+         $act->Notify(ERROR,"Problems while I-Network import",
+                      "Found  problems ".
+                      "while import I-Network informations!\n\n".$msg,
+                      emailfrom=>'"I-Network to Darwin" <>',
+                      emailto=>['11634955120001'], # Zeis
+                      adminbcc=>1,
+                     );
+      }
+      else{
+         msg(DEBUG,$msg);
+      }
    }
    return({exitcode=>0,msg=>"ok - checked $n records"});
 }
@@ -179,7 +202,7 @@ sub processRecord
    my $appl=getModuleObject($self->Config,"TCOM::custappl");
 
    $appl->SetFilter({id=>\$w5baseid});
-   my ($arec,$msg)=$appl->getOnlyFirst(qw(id name wbvid 
+   my ($arec,$msg)=$appl->getOnlyFirst(qw(id name wbvid custmgmttool
                                           custname custnameid));
    if (!defined($arec)){
       $self->{problems}->{"900".NowStamp()}=
@@ -195,9 +218,11 @@ sub processRecord
 
    if ($arec->{wbvid} ne $userid ||
        $arec->{custname} ne $inname ||
+       $arec->{custmgmttool} ne $self->{custmgmttool} ||
        $arec->{custnameid} ne "IN:$inid"){
       if (!$appl->ValidatedUpdateRecord($arec,{
              wbvid=>$userid,
+             custmgmttool=>$self->{custmgmttool},
              custname=>$inname,
              custnameid=>"IN:$inid"
          },{id=>\$w5baseid})){
@@ -227,7 +252,6 @@ sub getContactEntryId
    if (!defined($urec)){
       my $chk=$d->{'email'};
       $chk=~s/\@.*/\@*/;
-printf STDERR ("fifi check=$chk\n");exit(1);
       $user->ResetFilter();
       $user->SetFilter({email=>$chk});
       my ($urec,$msg)=$user->getOnlyFirst(qw(userid));

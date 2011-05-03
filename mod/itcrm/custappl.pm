@@ -315,11 +315,13 @@ sub new
                 label         =>'Customer Application ID',
                 dataobjattr   =>'itcrmappl.custapplid'),
 
-     # new kernel::Field::Interface(  # kommt hinzu, sobald iwr die IDs von
-     #           name          =>'custnameid',  # IT-BaseCMDB
-     #           htmlwidth     =>'200px',
-     #           label         =>'TCOM Applicationname ID',
-     #           dataobjattr   =>'itcrmappl.name'),
+      new kernel::Field::Text(
+                name          =>'custmgmttool',
+                htmlwidth     =>'200px',
+                htmldetail    =>0,
+                group         =>'custapplnameing',
+                label         =>'Customer IT Management Tool',
+                dataobjattr   =>'itcrmappl.custmgmttool'),
 
       new kernel::Field::SubList(
                 name          =>'custcontracts',
@@ -630,6 +632,9 @@ sub isWriteValid
             push(@l,@wrgroups);
          }
       }
+   }
+   if ($self->IsMemberOf("admin")){
+      push(@l,@wrgroups);
    }
 
    return(@l);
