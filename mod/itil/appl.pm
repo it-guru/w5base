@@ -1233,7 +1233,7 @@ sub SecureSetFilter
                           "RMember")){
       my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
       my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
-                                  [orgRoles(),qw(RCFManager)],"both");
+                          [orgRoles(),qw(RCFManager RAuditor RMonitor)],"both");
       my @grpids=keys(%grps);
       my $userid=$self->getCurrentUserId();
       push(@flt,[
