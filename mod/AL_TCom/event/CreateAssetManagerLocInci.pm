@@ -119,7 +119,7 @@ sub ProcessLocationCompare
                " - Location code:".$acrec->{code};
       msg(INFO,"open new connection for incident handling ...");
       sleep(4);
-      if (0){
+      if (1){
          print "-----------------------------------------".
                "-------------------------------\n".
                $itxt.
