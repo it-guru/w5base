@@ -322,23 +322,29 @@ sub LoadGroups
    my @grpids=@_;
    my $GroupCache=$self->Cache->{Group}->{Cache};
 
+   my @up;
+   my @down;
+
    foreach my $grp (@grpids){
       next if (!defined($grp));
-      if (!defined($allgrp->{$grp})){
-         $allgrp->{$grp}={
+      if (!defined($allgrp->{$grp}) || 
+          ($allgrp->{$grp}->{direction} eq "up" || # if a group has been loaded
+           $direction eq "both")){ # in up mode and a additional "both" mode
+         $allgrp->{$grp}={         # is requested - a force load is needed!
                fullname=>$GroupCache->{grpid}->{$grp}->{fullname},
                grpid=>$grp,
+               direction=>$direction
          };
          if ($direction eq "down" || $direction eq "both"){
-            $self->LoadGroups($allgrp,$direction,
-                       @{$GroupCache->{grpid}->{$grp}->{subid}});
+            push(@down,@{$GroupCache->{grpid}->{$grp}->{subid}});
          }
          if ($direction eq "up" || $direction eq "both"){
-            $self->LoadGroups($allgrp,"up",
-                       $GroupCache->{grpid}->{$grp}->{parentid});
+            push(@up,$GroupCache->{grpid}->{$grp}->{parentid});
          }
       }
    }
+   $self->LoadGroups($allgrp,"down",@down) if ($#down!=-1);
+   $self->LoadGroups($allgrp,"up",@up) if ($#up!=-1);
 }
 
 sub _LoadUserInUserCache

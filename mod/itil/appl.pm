@@ -1235,6 +1235,7 @@ sub SecureSetFilter
       my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
                           [orgRoles(),qw(RCFManager RAuditor RMonitor)],"both");
       my @grpids=keys(%grps);
+
       my $userid=$self->getCurrentUserId();
       push(@flt,[
                  {mandatorid=>\@mandators},
