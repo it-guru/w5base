@@ -1,5 +1,5 @@
-Summary: W5Base start stop and config of apache web server
-Name: W5Base-apache-RH55
+Summary: W5Base start stop procedures for W5Server only
+Name: W5Base-init-RH55
 Version: 1.0
 Release: 1
 License: GPL
@@ -9,4 +9,9 @@ Vendor: T-Systems
 Packager: Vogler Hartmut <hartmut.vogler@t-systems.com>
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Autoreq: 0
+
+%description
+In this package are only the start/stop procedures
+for the W5Server. The W5Server self will be deployed
+via svn.
 
