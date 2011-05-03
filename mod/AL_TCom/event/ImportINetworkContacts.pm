@@ -38,7 +38,7 @@ sub Init
 
 
    $self->RegisterEvent("ImportINetworkContacts",
-                        "ImportINetworkContacts",timeout=>1600);
+                        "ImportINetworkContacts",timeout=>2500);
    return(1);
 }
 
