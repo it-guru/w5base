@@ -14,7 +14,8 @@ BuildRequires:  perl >= 1:5.6.1
 Autoreq: 0
 
 %description
-Perl Module Module::Build installed at /apps/perlmod
+Perl Module Module::Build installed at /perlmod
+This installation can be used in AppCom enviroments with rpm -r /apps
 
 %prep
 rm -rf $RPM_BUILD_DIR/Module-Build-0.30
@@ -22,7 +23,7 @@ zcat $RPM_SOURCE_DIR/Module-Build-0.30.tar.gz | tar -xvf -
 
 %build
 cd $RPM_BUILD_DIR/Module-Build-0.30
-%{__perl} Makefile.PL PREFIX=/apps/perlmod
+%{__perl} Makefile.PL PREFIX=/perlmod
 make
 
 %install
@@ -45,8 +46,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-/apps/perlmod/bin/*
-/apps/perlmod/lib/perl5/site_perl/5.8.8/Module/Build.pm
-/apps/perlmod/lib/perl5/site_perl/5.8.8/Module/Build/*
-/apps/perlmod/share/man/man*/*
+/perlmod/bin/*
+/perlmod/lib/perl5/site_perl/5.8.8/Module/Build.pm
+/perlmod/lib/perl5/site_perl/5.8.8/Module/Build/*
+/perlmod/share/man/man*/*
 
