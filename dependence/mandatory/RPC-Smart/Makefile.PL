@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 WriteMakefile(
 	NAME		=> "RPC::Smart",
-	VERSION_FROM	=> 'lib/RPC/Smart/Server.pm',
+	VERSION_FROM	=> 'lib/RPC/Smart.pm',
 	'dist'		=> {
 			     COMPRESS	=> 'gzip -9f',
 	      		     SUFFIX	=> 'gz',

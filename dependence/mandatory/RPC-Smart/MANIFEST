@@ -2,6 +2,7 @@ Changes
 MANIFEST
 Makefile.PL
 Todo
+lib/RPC/Smart.pm
 lib/RPC/Smart/Client.pm
 lib/RPC/Smart/Server.pm
 samples/server.pl
