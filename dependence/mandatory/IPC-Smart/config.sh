@@ -8,9 +8,9 @@
 
 # Package name      : IPC-ShareLite
 # Source directory  : .
-# Configuration time: Fri Jan 22 15:44:39 CET 2010
-# Configured by     : voglerh
-# Target system     : linux e8npnu08 2.6.18-xen #1 smp fri jun 1 15:01:20 bst 2007 i686 gnulinux 
+# Configuration time: Tue May 10 12:06:32 CEST 2011
+# Configured by     : hvogler
+# Target system     : linux ak1ld168 2.6.18-194.17.4.el5 #1 smp wed oct 20 13:03:08 edt 2010 x86_64 x86_64 x86_64 gnulinux 
 
 Author=''
 Date=''
@@ -25,14 +25,14 @@ Source=''
 State=''
 ar=''
 archobjs=''
-awk='/usr/bin/awk'
+awk='/bin/awk'
 bash=''
 bison=''
 byacc=''
 c=''
 cat='/bin/cat'
-cf_by='voglerh'
-cf_time='Fri Jan 22 15:44:39 CET 2010'
+cf_by='hvogler'
+cf_time='Tue May 10 12:06:32 CEST 2011'
 chgrp=''
 chmod=''
 chown=''
@@ -97,7 +97,7 @@ mips_type=''
 mkdir=''
 more=''
 mv=''
-myuname='linux e8npnu08 2.6.18-xen #1 smp fri jun 1 15:01:20 bst 2007 i686 gnulinux '
+myuname='linux ak1ld168 2.6.18-194.17.4.el5 #1 smp wed oct 20 13:03:08 edt 2010 x86_64 x86_64 x86_64 gnulinux '
 n=''
 nm_opt=''
 nm_so_opt='--dynamic'
@@ -132,7 +132,7 @@ tail=''
 tar=''
 tbl=''
 test='test'
-touch='/usr/bin/touch'
+touch='/bin/touch'
 tr='/usr/bin/tr'
 troff=''
 uname='/bin/uname'

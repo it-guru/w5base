@@ -13,9 +13,9 @@
 /*
  * Package name      : IPC-ShareLite
  * Source directory  : .
- * Configuration time: Fri Jan 22 15:44:39 CET 2010
- * Configured by     : voglerh
- * Target system     : linux e8npnu08 2.6.18-xen #1 smp fri jun 1 15:01:20 bst 2007 i686 gnulinux 
+ * Configuration time: Tue May 10 12:06:32 CEST 2011
+ * Configured by     : hvogler
+ * Target system     : linux ak1ld168 2.6.18-194.17.4.el5 #1 smp wed oct 20 13:03:08 edt 2010 x86_64 x86_64 x86_64 gnulinux 
  */
 
 #ifndef _config_h_
