@@ -1,5 +1,10 @@
 Installations-Empfehlung für AppCom Umgebungen (RedHat 5)
 
+Generell ist zu empfehlen, dass die Standard LANG Umgebung für ALLE
+User auf en_GB.iso885915 eingestellt wird. Dies gilt auch (und 
+insbesondere) für den root!
+
+
 Als root müssen folgende Aktionen vorbereitet werden:
 =====================================================
 
@@ -7,7 +12,10 @@ Als root müssen folgende Aktionen vorbereitet werden:
 # Als Application User wird "w5base" angenommen!
 
 # Einrichtung der Service-Kennungen
-useradd -m w5base -g daemon -G daemon
+groupadd w5base
+useradd -m w5base -g w5base -G w5base,daemon
+groupadd apache
+useradd -m apache -g apache -G w5base,daemon
 
 # Erstellung der /etc/profile.local
 touch /etc/profile.local
@@ -34,6 +42,44 @@ install -d /apps/w5base/opt/w5base -o w5base -g daemon -m 2770
 install -d /cAppCom/init.d/`uname -n` -o root -g w5usrmgr -m 2775
 touch /cAppCom/init.d/`uname -n`.sh
 chgrp w5usrmgr /cAppCom/init.d/`uname -n`.sh
+
+# Sicherstellen das folgende sudo Einträge (ALL=AppCom Systeme) vorhanden sind:
+%w5usrmgr       ALL=NOPASSWD:/bin/cat *
+%w5usrmgr       ALL=NOPASSWD:/bin/ls *
+%w5usrmgr       ALL=NOPASSWD:/usr/bin/test *
+%w5usrmgr       ALL=NOPASSWD:/usr/bin/tail *
+%w5usrmgr       ALL=NOPASSWD:/bin/rpm --dbpath /apps/rpm *
+%w5usrmgr       ALL=(mysql)  NOPASSWD:ALL
+%w5usrmgr       ALL=(w5base) NOPASSWD:ALL
+w5base          ALL=NOPASSWD:/etc/init.d/w5base *
+w5base          ALL=NOPASSWD:/etc/init.d/apache2 *
+w5base          ALL=NOPASSWD:/etc/init.d/acache *
+w5base          ALL=NOPASSWD:/usr/bin/killall -9 apache2
+w5base          ALL=NOPASSWD:/usr/bin/killall -HUP apache2
+w5base          ALL=NOPASSWD:/usr/bin/killall -USR1 apache2
+
+------
+
+Nach diesen Einrichtungen kann nun mit "normalen" Userrechten die 
+komplette Anwendung eingerichtet, aktualisiert, betreut und betrieben
+werden.
+
+Step 1: Anmelden als Application-User (d.h. als w5base oder falls es sich
+um eine Entwicklungsumgebung handelt, eben als User, der die Entwicklung
+durchführen soll)
+
+# init der rpm Datenbank
+sudo rpm --dbpath /apps/rpm --initdb
+
+# Checkout der Applikation
+cd /apps/w5base/opt
+svn co https://w5base.svn.sourceforge.net/svnroot/w5base/HEAD w5base
+
+# Ab diesem Zeitpunkt stehen unter /apps/w5base/opt/w5base/contrib/RPM/SPECS
+# die notwendigen *.spec Dateien zur Verfügung, die als zusätzliche 
+# Binaries mittels "sudo rpm --dbpath /apps/rpm ..." auf dem System 
+# eingespielt werden müssen.
+
 
 
 
