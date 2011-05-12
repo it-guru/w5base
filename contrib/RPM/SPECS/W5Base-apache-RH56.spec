@@ -1,5 +1,5 @@
 Summary: W5Base start stop and config of apache web server
-Name: W5Base-apache-RH56
+Name: W5Base-apache-RH56-64Bit
 Version: 1.0
 Release: 1
 License: GPL
