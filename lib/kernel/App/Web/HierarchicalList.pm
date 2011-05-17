@@ -118,7 +118,8 @@ sub ValidatedUpdateRecord
    $workdb=$self->{DB} if (!defined($workdb));
    my $locktables=$self->{locktables};
    $locktables=$worktable." write" if (!defined($locktables));
-   if ($workdb->do("lock tables $locktables")){
+   $workdb->do("lock tables $locktables");
+   if ($workdb->getErrorMsg() eq ""){
       msg(DEBUG,"lock $locktables");
       my @dep=(\%{$oldrec});
       my @loadlist=($oldrec->{$idfield});
@@ -164,7 +165,7 @@ sub ValidatedUpdateRecord
      
       return($bak);
    }
-   $self->LastMsg(ERROR,"can't lock tables");
+   $self->LastMsg(ERROR,"can't lock tables: ".$workdb->getErrorMsg);
    return(undef);
 }
 

@@ -334,7 +334,7 @@ sub do
          return($rows); # return of "0E0" means not lines effedted (see DBI)
       }
       else{
-         msg(ERROR,"do('%s')",$cmd);
+         msg(ERROR,"do('%s') rows='$rows' result $DBI::errstr",$cmd);
       }
    }
    return(undef);
