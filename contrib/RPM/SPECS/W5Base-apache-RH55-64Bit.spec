@@ -33,6 +33,7 @@ In detail, this package handels:
 
 
 %prep
+# this download is to keep the SRPM small!
 test -f $RPM_SOURCE_DIR/samba-3.0.37.tar.gz || \
    wget -O $RPM_SOURCE_DIR/samba-3.0.37.tar.gz \
         http://ftp.samba.org/pub/samba/samba-3.0.37.tar.gz
