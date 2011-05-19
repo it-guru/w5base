@@ -457,10 +457,22 @@ sub ImportAppl
    if (Query->Param("DOIT")){
       if ($self->Import({importname=>$importname})){
          Query->Delete("importname");
-         $self->LastMsg(OK,"system has been successfuly imported");
+         $self->LastMsg(OK,"application has been successfuly imported");
       }
       Query->Delete("DOIT");
    }
+
+   # mandator select box createion
+   my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"write","direct");
+   my $m=getModuleObject($self->Config,"base::mandator");
+   if ($self->IsMemberOf("admin")){
+      $m->SetFilter({cistatusid=>\'4'});
+   }
+   else{
+      $m->SetFilter({cistatusid=>\'4',grpid=>\@mandators});
+   }
+   my ($mandatorlist)=$m->getHtmlSelect("mandatorid","grpid",["name"]);
+   ######################################################################
 
 
    print $self->HttpHeader("text/html");
@@ -468,8 +480,12 @@ sub ImportAppl
                                    'kernel.App.Web.css'],
                            body=>1,form=>1,
                            title=>"AssetManager Application Import");
+
    print $self->getParsedTemplate("tmpl/minitool.appl.import",{
-                                  static=>{importname=>$importname},
+                                     static=>{
+                                        importname=>$importname,
+                                        mandatorlist=>$mandatorlist
+                                     },
                                   });
    print $self->HtmlBottom(body=>1,form=>1);
 }
@@ -545,6 +561,8 @@ sub Import
          return(undef);
       }
       # check 5: find id of mandator "extern"
+      my $mandatorid=Query->Param("mandatorid");
+      my $allowifupdate=0;
       my $mand=getModuleObject($self->Config,"base::mandator");
       $mand->SetFilter({name=>"extern"});
       my ($mandrec,$msg)=$mand->getOnlyFirst(qw(grpid));
@@ -552,16 +570,21 @@ sub Import
          $self->LastMsg(ERROR,"Can't find mandator extern");
          return(undef);
       }
-      my $mandatorid=$mandrec->{grpid};
+      if ($mandatorid eq $mandrec->{grpid} || $mandatorid eq ""){
+         $mandatorid=$mandrec->{grpid};   # extern is the default and with
+         $allowifupdate=1;                # allow ifupdate by def
+      }
       # final: do the insert operation
       my $appname=$applrec->{name};
       $appname=~s/ /_/g;
       my $newrec={name=>$appname,
                   applid=>$applrec->{applid},
-                  databossid=>$databossid,
-                  allowifupdate=>1,
+                  allowifupdate=>$allowifupdate,
                   mandatorid=>$mandatorid,
                   cistatusid=>4};
+      if ($self->IsMemberOf("admin")){
+         $newrec->{databossid}=$databossid;
+      }
       $identifyby=$appl->ValidatedInsertRecord($newrec);
    }
    if (defined($identifyby) && $identifyby!=0){

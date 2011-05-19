@@ -9,6 +9,8 @@ from T-Systems AssetManager into the W5base 'IT-Invantar'.
 You have to specify the ApplicationID of the application, you
 want to import.
 </td></tr>
+<tr><td width=1% nowrap>Mandator:</td>
+<td>%mandatorlist%</td></tr>
 <tr><td width=1% nowrap>ApplicationID:</td>
 <td><input type=text class=finput name=importname value="%importname%"></td></tr>
 <tr>
