@@ -1,7 +1,7 @@
 Summary: Module::Build AppCom perl Modules at /apps
 Name: apps-perlmod-Module-Build-RH55
 Version: 1.001
-Release: 1
+Release: 2
 License: GPL
 Group: Applications/Web
 URL:     http://search.cpan.org/CPAN/authors/id/K/KW/KWILLIAMS
@@ -30,11 +30,10 @@ make
 rm -rf $RPM_BUILD_ROOT
 cd $RPM_BUILD_DIR/Module-Build-0.30
 pwd
-make pure_install PERL_INSTALL_ROOT=$RPM_BUILD_ROOT
+make pure_install PERL_INSTALL_ROOT=$RPM_BUILD_ROOT/apps
 find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} ';'
 find $RPM_BUILD_ROOT -type f -name '*.bs' -a -size 0 -exec rm -f {} ';'
 find $RPM_BUILD_ROOT -type d -depth -exec rmdir {} 2>/dev/null ';'
-chmod -R u+w $RPM_BUILD_ROOT/*
 
 
 %check || :
@@ -46,8 +45,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-/perlmod/bin/*
-/perlmod/lib/perl5/site_perl/5.8.8/Module/Build.pm
-/perlmod/lib/perl5/site_perl/5.8.8/Module/Build/*
-/perlmod/share/man/man*/*
+/apps/perlmod/bin/*
+/apps/perlmod/lib/perl5/site_perl/5.8.8/Module/Build.pm
+/apps/perlmod/lib/perl5/site_perl/5.8.8/Module/Build/*
+/apps/perlmod/share/man/man*/*
 
