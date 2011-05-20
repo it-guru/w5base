@@ -1,7 +1,7 @@
 Summary: DTP AppCom perl Modules at /apps
 Name: apps-perlmod-DTP-RH55-64Bit
-Version: 1.00
-Release: 2
+Version: 0.0.1
+Release: 3
 License: GPL
 Group: Applications/Web
 Source:  perl-dtp-0.0.1.tgz
