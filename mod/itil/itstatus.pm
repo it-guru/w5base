@@ -199,6 +199,9 @@ sub RSS
                 "size=\"small\" alt_text=\"%s\" ".
                 "size_x=\"190\" size_y=\"60\" />",
                 XmlQuote($self->T("There are no current messages")));
+         printf("<pubDate>%s</pubDate>",
+           scalar($self->ExpandTimeExpression(NowStamp("en"),
+                                              "RFC822","UTC","CET")));
          printf("</item>");
       }
    }
