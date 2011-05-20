@@ -191,7 +191,7 @@ sub RSS
          printf("</item>");
       }
       if ($c==0){
-         my $okimg=$baseurl."/static/rssfeed/ok.gif?".NowStamp();
+         my $okimg=$baseurl."/static/rssfeed/ok.gif?".substr(NowStamp(),0,8);
          printf("<item>");
          printf("<description>%s</description>",
                 XmlQuote($self->T("There are no current messages")));
