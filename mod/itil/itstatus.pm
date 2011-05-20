@@ -191,7 +191,7 @@ sub RSS
          printf("</item>");
       }
       if ($c==0){
-         my $okimg=$baseurl."/static/rssfeed/ok.gif";
+         my $okimg=$baseurl."/static/rssfeed/ok.gif?".NowStamp();
          printf("<item>");
          printf("<description>%s</description>",
                 XmlQuote($self->T("There are no current messages")));
@@ -199,9 +199,9 @@ sub RSS
                 "size=\"small\" alt_text=\"%s\" ".
                 "size_x=\"190\" size_y=\"60\" />",
                 XmlQuote($self->T("There are no current messages")));
-         printf("<pubDate>%s</pubDate>",
-           scalar($self->ExpandTimeExpression(NowStamp("en"),
-                                              "RFC822","UTC","CET")));
+      #   printf("<pubDate>%s</pubDate>",
+      #     scalar($self->ExpandTimeExpression(NowStamp("en"),
+      #                                        "RFC822","UTC","CET")));
          printf("</item>");
       }
    }
