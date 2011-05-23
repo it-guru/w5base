@@ -642,6 +642,15 @@ sub Normalize
       $rec->{location}="Frankfurt am Main";
       $rec->{zipcode}="60528";
    }
+   if (($rec->{location}=~m/donauw/i) &&
+       ($rec->{address1}=~m/^Reichs.*$/i) &&
+       !($rec->{address1}=~m/(old|alt)/i)){
+      $rec->{address1}=~s/Reichs\S+/Reichsstra\xDFe/i;
+   }
+   if (($rec->{location}=~m/bietigheim/i) &&
+       $rec->{zipcode} eq "74321"){
+      $rec->{location}="Bietigheim-Bissingen";
+   }
    if (defined($rec->{address1})){
       $rec->{address1}=~s/Memmelsdorferstr.*e/Memmelsdorfer Stra\xDFe/g;
       $rec->{address1}=~s/Luebecker\s+/L\xFCbecker /g;
