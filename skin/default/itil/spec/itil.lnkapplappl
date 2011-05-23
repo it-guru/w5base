@@ -15,3 +15,83 @@ en=><<EOF},
 
 EOF
 
+'implproject'=>{de=><<EOF,
+Optional kann der Projektname 
+angegeben werden, durch den die
+Schnittstelle implementiert wurde.
+EOF
+en=><<EOF},
+Optional you can specify the
+project name, which implements
+this interface.
+EOF
+
+'implapplversion'=>{de=><<EOF,
+Optional kann die Version der Anwendung
+(von Anwendung) angegben werden, mit
+der die Schnittstelle implementiert
+wurde.
+EOF
+en=><<EOF},
+Optional you can specify the
+version number of the from application,
+in which these interface has been
+implemented.
+EOF
+
+'fromurl'=>{de=><<EOF,
+Hier kann die URL angegeben werden, von der 
+aus die Kommunikation unter der
+"von Anwendung" stattfindet.<br>
+<br>
+<u>URL Notationen:</u><br>
+oracle://USER/PASSWORD\@HOST:PORT/SID
+mysql://USER:PASWORD\@HOST:PORT/DB
+informix://USER\@HOST:PORT/DB
+oracle://USER\@HOST:PORT/
+ldap://USER/PASWORD\@HOST/DN?ATTRIBUTES?SCOPE?FILTER?EXT
+http://USER:PASSWORD\@HOST/PATH
+https://USER:PASSWORD\@HOST/PATH
+EOF
+en=><<EOF},
+You can specify the URL of the communication
+endpoint at the "from application":<br>
+<br>
+<u>URL Notationen:</u><br>
+oracle://USER/PASSWORD\@HOST:PORT/SID
+mysql://USER:PASWORD\@HOST:PORT/DB
+informix://USER\@HOST:PORT/DB
+oracle://USER\@HOST:PORT/
+ldap://USER/PASWORD\@HOST/DN?ATTRIBUTES?SCOPE?FILTER?EXT
+http://USER:PASSWORD\@HOST/PATH
+https://USER:PASSWORD\@HOST/PATH
+EOF
+
+'tourl'=>{de=><<EOF,
+Hier kann die URL angegeben werden, von der 
+aus die Kommunikation unter der
+"nach Anwendung" stattfindet.<br>
+<br>
+<u>URL Notationen:</u><br>
+oracle://USER/PASSWORD\@HOST:PORT/SID
+mysql://USER:PASWORD\@HOST:PORT/DB
+informix://USER\@HOST:PORT/DB
+oracle://USER\@HOST:PORT/
+ldap://USER/PASWORD\@HOST/DN?ATTRIBUTES?SCOPE?FILTER?EXT
+http://USER:PASSWORD\@HOST/PATH
+https://USER:PASSWORD\@HOST/PATH
+EOF
+en=><<EOF},
+You can specify the URL of the communication
+endpoint at the "to application":<br>
+<br>
+<u>URL Notationen:</u><br>
+oracle://USER/PASSWORD\@HOST:PORT/SID
+mysql://USER:PASWORD\@HOST:PORT/DB
+informix://USER\@HOST:PORT/DB
+oracle://USER\@HOST:PORT/
+ldap://USER/PASWORD\@HOST/DN?ATTRIBUTES?SCOPE?FILTER?EXT
+http://USER:PASSWORD\@HOST/PATH
+https://USER:PASSWORD\@HOST/PATH
+EOF
+

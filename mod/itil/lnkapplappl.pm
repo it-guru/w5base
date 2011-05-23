@@ -105,6 +105,42 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'lnkapplappl.comments'),
 
+      new kernel::Field::Text(
+                name          =>'fromurl',
+                group         =>'comdetails',
+                label         =>'from URL',
+                dataobjattr   =>'lnkapplappl.fromurl'),
+
+      new kernel::Field::Text(
+                name          =>'fromservice',
+                group         =>'comdetails',
+                label         =>'from Servicename',
+                dataobjattr   =>'lnkapplappl.fromservice'),
+
+      new kernel::Field::Text(
+                name          =>'tourl',
+                group         =>'comdetails',
+                label         =>'to URL',
+                dataobjattr   =>'lnkapplappl.tourl'),
+
+      new kernel::Field::Text(
+                name          =>'toservice',
+                group         =>'comdetails',
+                label         =>'to Servicename',
+                dataobjattr   =>'lnkapplappl.toservice'),
+
+      new kernel::Field::Text(
+                name          =>'implapplversion',
+                group         =>'impl',
+                label         =>'implemented since "from"-application release',
+                dataobjattr   =>'lnkapplappl.implapplversion'),
+
+      new kernel::Field::Text(
+                name          =>'implproject',
+                group         =>'impl',
+                label         =>'implementation project name',
+                dataobjattr   =>'lnkapplappl.implproject'),
+
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
@@ -229,6 +265,36 @@ sub Validate
       $self->LastMsg(ERROR,"invalid to application");
       return(0);
    }
+   my $fromservice=effVal($oldrec,$newrec,"fromservice");
+   if ($fromservice ne "" &&
+       ($fromservice=~m/[^a-z0-9_]/i)){
+      $self->LastMsg(ERROR,"invalid characters in from service name");
+      return(0);
+   }
+
+   my $toservice=effVal($oldrec,$newrec,"toservice");
+   if ($toservice ne "" &&
+       ($toservice=~m/[^a-z0-9_]/i)){
+      $self->LastMsg(ERROR,"invalid characters in to service name");
+      return(0);
+   }
+   my $fromurl=effVal($oldrec,$newrec,"fromurl");
+   if ($fromurl ne "" &&
+       !(($fromurl=~m/^[a-z]+:\/\/\S+?\/.*$/) &&
+         ($fromurl=~m/^[a-z]+:\/\/\S+\/\S+\@\S+\/.*$/))){
+      $self->LastMsg(ERROR,"invalid notation of the from URL");
+      return(0);
+   }
+   my $tourl=effVal($oldrec,$newrec,"tourl");
+   if ($tourl ne "" &&
+       !($tourl=~m/^[a-z]+:\/\/\S+\/.*$/) &&
+       !($tourl=~m/^[a-z]+:\/\/\S+\/\S+\@\S+\/.*$/)){
+      $self->LastMsg(ERROR,"invalid notation of the to URL");
+      return(0);
+   }
+
+
+
    if (exists($newrec->{toapplid}) && 
        (!defined($oldrec) || $oldrec->{toapplid}!=$toapplid)){
       my $applobj=getModuleObject($self->Config,"itil::appl");
@@ -256,7 +322,7 @@ sub Validate
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default desc interfacescomp source));
+   return(qw(header default desc comdetails impl interfacescomp source));
 }
 
 
@@ -281,7 +347,7 @@ sub isWriteValid
    my $oldrec=shift;
    my $newrec=shift;
    my $applid=effVal($oldrec,$newrec,"fromapplid");
-   my @editgroup=("default","interfacescomp","desc");
+   my @editgroup=("default","interfacescomp","desc","comdetails","impl");
 
    return(@editgroup) if (!defined($oldrec) && !defined($newrec));
    return(@editgroup) if ($self->IsMemberOf("admin"));
