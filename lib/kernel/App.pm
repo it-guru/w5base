@@ -336,7 +336,9 @@ sub LoadGroups
                direction=>$direction
          };
          if ($direction eq "down" || $direction eq "both"){
-            push(@down,@{$GroupCache->{grpid}->{$grp}->{subid}});
+            if (ref($GroupCache->{grpid}->{$grp}->{subid}) eq "ARRAY"){
+               push(@down,@{$GroupCache->{grpid}->{$grp}->{subid}});
+            }
          }
          if ($direction eq "up" || $direction eq "both"){
             push(@up,$GroupCache->{grpid}->{$grp}->{parentid});
