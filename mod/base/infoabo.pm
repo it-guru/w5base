@@ -218,6 +218,11 @@ sub new
                 group         =>'source',
                 label         =>'Modification-Date',
                 dataobjattr   =>'infoabo.modifydate'),
+
+      new kernel::Field::Date(
+                name          =>'expiration',
+                label         =>'Expiration-Date',
+                dataobjattr   =>'infoabo.expiration'),
                                                  
       new kernel::Field::Editor(
                 name          =>'editor',
@@ -885,12 +890,12 @@ sub expandDynamicDistibutionList
           [sort(keys(%{$email{'bcc'}}))]);
 }
 
-sub isUploadValid  # validates if upload functionality is allowed
-{
-   my $self=shift;
-   return(0) if (!$self->IsMemberOf("admin"));
-   return(1);
-}
+#sub isUploadValid  # validates if upload functionality is allowed
+#{
+#   my $self=shift;
+#   return(0) if (!$self->IsMemberOf("admin"));
+#   return(1);
+#}
 
 
 
