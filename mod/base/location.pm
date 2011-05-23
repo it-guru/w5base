@@ -629,6 +629,19 @@ sub Normalize
    if ($rec->{address1}=~m/Karl-Marx-Stra\xDFe109-113/i){
       $rec->{address1}="Karl-Marx-Stra\xDFe 109-113";
    }
+   if ($rec->{address1}=~m/^bonnerstr/i){
+      $rec->{address1}=~s/^bonnerstr\S+/Bonner Stra\xDFe/i;
+   }
+   if ($rec->{address1}=~m/^wolbeckerstr/i){
+      $rec->{address1}=~s/^wolbeckerstr\S+/Wolbecker Stra\xDFe/i;
+   }
+   if (($rec->{location}=~m/frankfurt/i) &&
+       ($rec->{address1}=~m/^Hahnstr.*43.*$/i) &&
+       !($rec->{address1}=~m/(old|alt)/i)){
+      $rec->{address1}="Hahnstra\xDFe 43";
+      $rec->{location}="Frankfurt am Main";
+      $rec->{zipcode}="60528";
+   }
    if (defined($rec->{address1})){
       $rec->{address1}=~s/Memmelsdorferstr.*e/Memmelsdorfer Stra\xDFe/g;
       $rec->{address1}=~s/Luebecker\s+/L\xFCbecker /g;
