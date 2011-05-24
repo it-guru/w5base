@@ -204,9 +204,9 @@ sub printResult
    my $res=shift;
    my $module=shift;
    if ($res eq ""){
-      my $v=eval("\$${module}::VERSION");
-      $v=sprintf(" %10s",$v) if ($v ne "");
-      printf("\b\b\b\b    ok$v\n");
+      my $v;
+      eval("\$v=\$${module}::VERSION;\$v=' '.\$v if (\$v ne '');");
+      print("\b\b\b\b    ok$v\n");
       $count++;
    }
    else{
