@@ -96,7 +96,7 @@ sub qcheckRecord
                }
                else{
                   push(@qmsg,"ClusterID: '".$amclust->{clusterid}.
-                       "' not found in W5Base/Darwin")
+                       "' not found in W5Base/Darwin");
                   $errorlevel=3 if ($errorlevel<3);
                }
             }
