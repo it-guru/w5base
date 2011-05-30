@@ -167,6 +167,9 @@ sub rpcCallSpooledEvent
    if ($userid==0){
       return({exitcode=>1,msg=>'ERROR: no userid given'});
    }
+   if ($self->Config->Param("W5BaseOperationMode") eq "readonly"){
+      return({exitcode=>0,msg=>'readonly mode'});
+   }
    $redefine=0          if (!defined($redefine));
    $interval=10         if ($interval<10);
    $retrycount=3        if (!defined($retrycount));
@@ -649,6 +652,9 @@ sub initAsyncEnv
          }
          $self->NotifyAdmin("ERROR: messages while processing $evname messages",
                             join("",@e));
+      }
+      if ($self->Config->Param("W5BaseOperationMode") eq "readonly"){
+         POSIX::_exit(0);
       }
       my $joblog=getModuleObject($self->Config,"base::joblog");
       if (defined($ipcresult->{handlerresult}) &&

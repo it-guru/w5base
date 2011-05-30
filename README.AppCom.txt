@@ -36,27 +36,44 @@ chmod 2775 /etc/oracle
 install -d /apps/pkg -o root -g w5usrmgr -m 2775
 install -d /apps/rpm -o root -g root -m 755
 install -d /apps/bin -o root -g root -m 755
+install -d /apps/etc -o root -g w5usrmgr -m 2775
+install -d /apps/tmp -o root -g root -m 4777
 install -d /apps/w5base/opt/w5base -o w5base -g daemon -m 2770
+
+# Entfernen der default motd und link nach /apps/etc/motd
+rm /etc/motd
+cp /etc/ssh/sshd_banner /apps/etc/motd
+ln -sf /apps/etc/motd /etc/motd
+
+# Entfernen der sshd Banner Option
+sed 's/^Banner/#Banner/g' -i /etc/ssh/sshd_config
+/etc/init.d/sshd restart
 
 # Basis Einrichtung der init.d Prozeduren
 install -d /cAppCom/init.d/`uname -n` -o root -g w5usrmgr -m 2775
 touch /cAppCom/init.d/`uname -n`.sh
 chgrp w5usrmgr /cAppCom/init.d/`uname -n`.sh
 
-# Sicherstellen das folgende sudo Einträge (ALL=AppCom Systeme) vorhanden sind:
+# Sicherstellen das folgende sudo Einträge (ALL=AppCom Systeme) 
+# vorhanden sind:
 %w5usrmgr       ALL=NOPASSWD:/bin/cat *
 %w5usrmgr       ALL=NOPASSWD:/bin/ls *
 %w5usrmgr       ALL=NOPASSWD:/usr/bin/test *
 %w5usrmgr       ALL=NOPASSWD:/usr/bin/tail *
 %w5usrmgr       ALL=NOPASSWD:/bin/rpm --dbpath /apps/rpm *
+%w5usrmgr       ALL=NOPASSWD:/cAppCom/init.d/*.sh *
 %w5usrmgr       ALL=(mysql)  NOPASSWD:ALL
 %w5usrmgr       ALL=(w5base) NOPASSWD:ALL
-w5base          ALL=NOPASSWD:/etc/init.d/w5base *
-w5base          ALL=NOPASSWD:/etc/init.d/apache2 *
-w5base          ALL=NOPASSWD:/etc/init.d/acache *
-w5base          ALL=NOPASSWD:/usr/bin/killall -9 apache2
-w5base          ALL=NOPASSWD:/usr/bin/killall -HUP apache2
-w5base          ALL=NOPASSWD:/usr/bin/killall -USR1 apache2
+%w5base         ALL=NOPASSWD:/etc/init.d/w5base *
+%w5base         ALL=NOPASSWD:/etc/init.d/apache2 *
+%w5base         ALL=NOPASSWD:/etc/init.d/httpd *
+%w5base         ALL=NOPASSWD:/etc/init.d/acache *
+%w5base         ALL=NOPASSWD:/usr/bin/killall -9 apache2
+%w5base         ALL=NOPASSWD:/usr/bin/killall -HUP apache2
+%w5base         ALL=NOPASSWD:/usr/bin/killall -USR1 apache2
+%w5base         ALL=NOPASSWD:/usr/bin/killall -9 httpd
+%w5base         ALL=NOPASSWD:/usr/bin/killall -HUP httpd
+%w5base         ALL=NOPASSWD:/usr/bin/killall -USR1 httpd
 
 ------
 
