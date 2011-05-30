@@ -29,12 +29,20 @@ sub process
 
    my $nextrun;
 
+   my $ro=0;
+   if ($self->getParent->Config->Param("W5BaseOperationMode") eq "readonly"){
+      $ro=1;
+   }
+
+
    while(1){
       if ((defined($nextrun) && $nextrun<=time()) || $self->{doForceCleanup}){
          $self->{doForceCleanup}=0;
-         $self->doCleanup();
-         $self->CleanupWorkflows();
-         $self->CleanupHistory();
+         if (!$ro){
+            $self->doCleanup();
+            $self->CleanupWorkflows();
+            $self->CleanupHistory();
+         }
        #  $self->CleanupInlineAttachments(); tests are needed !!!
          sleep(1);
       }
