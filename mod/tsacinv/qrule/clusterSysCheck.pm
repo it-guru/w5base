@@ -66,6 +66,7 @@ sub qcheckRecord
    my @dataissue;
    my $errorlevel=0;
 
+
    return(0,undef) if ($rec->{cistatusid}!=4);
    if ($rec->{systemid} ne ""){
       my %parrec=(); 
@@ -82,27 +83,26 @@ sub qcheckRecord
             $cl->SetFilter({lclusterid=>\$amsysrec->{lclusterid}});
             my ($amclust,$msg)=$cl->getOnlyFirst(qw(clusterid));
             if (defined($amclust)){
+               $parrec{isclusternode}=1;
                my $cl=getModuleObject($self->getParent->Config(),
                                       "itil::itclust");
                $cl->SetFilter({clusterid=>\$amclust->{clusterid}});
                my ($w5clust,$msg)=$cl->getOnlyFirst(qw(id fullname cistatusid));
                if (defined($w5clust)){
-                  $parrec{isclusternode}=1;
                   $parrec{itclust}=$w5clust->{'fullname'};
                  # printf STDERR ("found\n");
                  # printf STDERR ("amclust=%s\n",Dumper($amclust));
                  # printf STDERR ("w5clust=%s\n",Dumper($w5clust));
                }
+               else{
+                  push(@qmsg,"ClusterID: '".$amclust->{clusterid}.
+                       "' not found in W5Base/Darwin")
+                  $errorlevel=3 if ($errorlevel<3);
+               }
             }
          }
       }
 
-
-      my $wfrequest={};
-      my $forcedupd={};
-      my @qmsg;
-      my @dataissue;
-      my $errorlevel=0;
 
       $self->IfaceCompare($dataobj,
                           $rec,"isclusternode",
