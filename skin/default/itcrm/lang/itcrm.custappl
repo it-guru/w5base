@@ -16,6 +16,7 @@
 'Business Team Boss EMail'=>{de=>'Betriebsteamleiter E-Mail'},
 'Customer Applicationname'=>{de=>'Kunden-Anwendungsbezeichnung'},
 'Customer Application ID'=>{de=>'Kunden-Anwendungs ID'},
+'Customer IT Management Tool'=>{de=>'Kunden IT Management Tool'},
 'Customer Contracts'=>{de=>'Verträge'},
 'IT Applicationname'=>{de=>'IT Anwendungsbezeichnung'},
 'primary Order in'=>{de=>'Auftragseingang'},
