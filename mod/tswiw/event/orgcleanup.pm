@@ -55,7 +55,7 @@ sub UpdateOrgareaStructure
    if (defined($rec)){
       do{
          if ($rec->{expiration} eq ""){
-            my $exp="now+7d";
+            my $exp="now+28d";  # damit sinnvolle Beanchrichtigungen raus gehen
             $exp=$app->ExpandTimeExpression($exp,"en","GMT","GMT");
             $grpuser->ValidatedUpdateRecord($rec,{expiration=>$exp,
                                                   roles=>$rec->{roles}},
@@ -73,7 +73,7 @@ sub UpdateOrgareaStructure
 
 
    $grpuser->SetFilter(srcsys=>\$self->{SRCSYS},       # (4 Wochen)
-                       srcload=>"<now-28d");           # übergang = 28 Tage
+                       srcload=>"<now-42d");           # übergang = 42 Tage
    $grpuser->SetCurrentView(qw(ALL));
    my ($rec,$msg)=$grpuser->getFirst();
    if (defined($rec)){
@@ -88,6 +88,6 @@ sub UpdateOrgareaStructure
       }
    }
 
-   return({msg=>'fine',exitcode=>0});
+   return({msg=>'OK',exitcode=>0});
 }
 1;

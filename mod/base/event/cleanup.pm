@@ -157,18 +157,20 @@ sub LnkGrpUser
    my $self=shift;
 
    my $lnk=getModuleObject($self->Config,"base::lnkgrpuser");
+   my $lnkop=$lnk->Clone();
    my $nowstamp=NowStamp("en");
-   $lnk->SetFilter({expiration=>"<\"$nowstamp\""});
+   $lnk->SetFilter({expiration=>"<\"$nowstamp+28d\""});
    my $oldcontext=$W5V2::OperationContext;
    $W5V2::OperationContext="Kernel";
 
    foreach my $lrec ($lnk->getHashList(qw(ALL))){
       my $dur=CalcDateDuration($lrec->{expiration},$nowstamp);
       my $days=$dur->{totalseconds}/86400;
-      if ($days>56){           # das muss irgenwann mal rein
+      if ($days>28){     
          # sofort löschen
+         $lnkop->ValidatedDeleteRecord($lrec);
       }
-      elsif($days>30){
+      elsif($days>0){
          if ($lrec->{alertstate} ne "red"){
             $lnk->ValidatedUpdateRecord($lrec,{alertstate=>'red',
                                                editor=>$lrec->{editor},
@@ -179,7 +181,7 @@ sub LnkGrpUser
          }
          # red setzen
       }
-      elsif($days>14){
+      elsif($days>-21){
          if ($lrec->{alertstate} ne "orange"){
             if ($lnk->ValidatedUpdateRecord($lrec,
                                             {alertstate=>'orange',
@@ -223,7 +225,7 @@ sub LnkGrpUser
 #      my $r=$wf->Store($id,step=>'base::workflow::mailsend::waitforspool');
 #      return({msg=>'versandt'});
 #   }
-   return({msg=>'shit'});
+   return({exitcode=>0,msg=>'OK'});
 }
 
 
