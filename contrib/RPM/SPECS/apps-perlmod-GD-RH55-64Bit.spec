@@ -53,7 +53,7 @@ cp /usr/lib64/libpng*.so* .
 
 %build
 cd $RPM_BUILD_DIR/GD-2.46
-export PATH=$RPM_BUILD_DIR/gd-devel-2.0.33/bin:$PATH
+export PATH=$RPM_BUILD_DIR/devel/usr/bin:$PATH
 export C_INCLUDE_PATH=$RPM_BUILD_DIR/devel/usr/include
 export LIBRARY_PATH=/usr/lib64:$RPM_BUILD_DIR/devel/usr/lib64
 #export LD_LIBRARY_PATH=$LIBRARY_PATH
