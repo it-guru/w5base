@@ -1,12 +1,11 @@
-Summary: W5Base start stop procedures for W5Server only
+Summary: W5Base basic initialisation
 Name: W5Base-init-RH55
 Version: 1.0
-Release: 13
+Release: 20
 License: GPL
 Group: Applications/Web
 Distribution: RedHat 5.5 AppCom Linux
 Vendor: T-Systems
-Source0: AppComStartup-1.0.tgz
 Packager: Vogler Hartmut <hartmut.vogler@t-systems.com>
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Autoreq: 0
@@ -14,60 +13,48 @@ Provides: /bin/sh
 
 
 %description
-In this package are only the start/stop procedures
-for the W5Server. The W5Server self will be deployed
-via svn.
+This is a base initialisation, which creates all
+neassesary directories.
 
 In detail, this package handels:
 - fix rights and ownership of /apps/etc/w5base
 - fix rights and ownership of /apps/etc/default
 - create a default init config file at /apps/etc/default/init
-- fix rights and ownership of /apps/etc/default/init
-- create /cAppCom/init.d/W5BaseDefaultStartup_Sample.sh
 - create neassary directories for W5Base System
 
 
 %prep
-rm -rf $RPM_BUILD_DIR/AppComStartup-1.0
-zcat $RPM_SOURCE_DIR/AppComStartup-1.0.tgz | tar -xvf -
 
 %build
 install -d $RPM_BUILD_ROOT
 
 %install
-cd $RPM_BUILD_DIR/AppComStartup-1.0 && tar -cf - * | (cd $RPM_BUILD_ROOT && tar -xvf -)
 
 %files
-/cAppCom/init.d/W5BaseDefaultStartup_Sample.sh
 
-%config(noreplace) /apps/etc/default/init
 
 %post
 
-chown w5base:daemon apps/etc/w5base 2>/dev/null
-chmod g+srx apps/etc/w5base 2>/dev/null
-chgrp w5base apps/etc/default 2>/dev/null
-chmod g+srw apps/etc/default 2>/dev/null
-chgrp w5base apps/etc/default/init 2>/dev/null
-chmod g+rw apps/etc/default/init 2>/dev/null
+install -d  apps/pkg               -o w5base -g daemon -m 2755
+install -d  apps/etc/w5base        -o w5base -g daemon -m 2750
+install -d  apps/w5base/opt
+install -d  apps/w5base/opt/w5base -o w5base -g daemon -m 2750
 
-#
-# W5Base directories
-#
-install -d apps/pkg/_default/var/opt/w5base/state -o w5base -g daemon -m 700
+if [ ! -f etc/profile.local ]; then
+   echo "# default profile.local " > etc/profile.local
+   echo "# needs to be modified by w5usrmgr" >> etc/profile.local
+fi
+chown root:w5usrmgr etc/profile.local
+chmod 775           etc/profile.local
+if [ ! -h opt/w5base ]; then
+   ln -s ../apps/w5base/opt/w5base opt/w5base
+fi
+if ! grep -q 'profile.local' etc/profile; then
+   echo 'test -s /etc/profile.local && . /etc/profile.local' >>etc/profile
+fi
 
-cat <<EOF
 
-   *************************************************************************
-   INFO:  After Installation of this package, you have to rename/copy the 
-          sample file /cAppCom/init.d/W5BaseDefaultStartup_Sample.sh to
-          /cAppCom/init.d/HOSTNAME.sh and create the needed links at
-          /cAppCom/init.d/HOSTNAME !
-          At /cAppCom/etc/default/init you have to configure your individual
-          module list for start or stop.
-   *************************************************************************
 
-EOF
 
 
 
