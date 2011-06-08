@@ -65,6 +65,7 @@ sub new
                                  'MC-Service-Guard',
                                  'Sun-Cluster',
                                  'Veritas-Cluster',
+                                 'Microsoft-Cluster',
                                  'Oracle-RAC-Cluster',
                                  'MSSQL-Cluster',
                                  'Loadbalancer',
