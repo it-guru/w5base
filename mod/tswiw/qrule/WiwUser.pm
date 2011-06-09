@@ -115,7 +115,7 @@ sub qcheckRecord
 
       if (keys(%$forcedupd)){
          if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,
-                     {id=>\$rec->{id}})){
+                     {userid=>\$rec->{userid}})){
             push(@qmsg,"all desired fields has been updated: ".
                        join(", ",keys(%$forcedupd)));
          }
