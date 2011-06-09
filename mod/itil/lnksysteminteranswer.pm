@@ -63,7 +63,7 @@ sub new
                 vjointo       =>'itil::system',
                 group         =>'relation',
                 dontrename    =>1,
-                fields        =>[qw(adminteam businessteamid 
+                fields        =>[qw(adminteam adminteamid 
                                     mandator mandatorid
                                     )]),
       insertafter=>'parentname'
