@@ -73,6 +73,7 @@
 'Tools.analytics.w5stat.master'=>{de=>'Master',en=>'Master'},
 'Tools.analytics.w5stat.master.new'=>{de=>'Neueingabe',en=>'New'},
 'Tools.analytics.fields'=>{de=>'Feldliste',en=>'Fields'},
+'Tools.analytics.dataobj'=>{de=>'Datenobjektliste',en=>'DataObjList'},
 'Tools.analytics.translation'=>{de=>'Translation Tabelle',en=>'Translation table'},
 'Tools.translation'=>{de=>'Übersetzung',en=>'Translation'},
 'Tools.translation.acronym'=>{de=>'Acronym Creator',en=>'Acronym Creator'},

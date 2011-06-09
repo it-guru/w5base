@@ -1,6 +1,6 @@
-package base::reflexion_fields;
+package base::reflexion_dataobj;
 #  W5Base Framework
-#  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2011  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,12 +17,27 @@ package base::reflexion_fields;
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 use strict;
-use vars qw(@ISA);
+use vars qw(@ISA $VERSION $DESCRIPTION);
 use kernel;
 use kernel::Field;
 use kernel::DataObj::Static;
 use kernel::App::Web::Listedit;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::Static);
+
+$VERSION="1.0";
+$DESCRIPTION=<<EOF;
+Represend all existing dataobject in current
+running W5Base application.
+
+To see VERSION and DESCRIPTION, there are need to be the
+variables \$VERSION and \$DESCRIPTION in the programmcode.
+If not, VERSION=UNKNOWN and DESCRIPTION="??? Beta Module ???".
+
+In the description can be also informations about access
+rules and other security informations as documention from
+the developer.
+EOF
+
 
 sub new
 {
@@ -38,42 +53,26 @@ sub new
       new kernel::Field::Id(
                 name          =>'fullname',
                 align         =>'left',
-                label         =>'fullqualified fieldname'),
-
-      new kernel::Field::Text(
-                name          =>'internalname',
-                label         =>'internal name'),
-
-      new kernel::Field::Text(
-                name          =>'label',
-                label         =>'Label'),
-
-      new kernel::Field::Text(
-                name          =>'modname',
-                label         =>'Dataobject'),
+                label         =>'fullqualified object'),
 
       new kernel::Field::Text(
                 name          =>'modnamelabel',
                 label         =>'Dataobject Label'),
 
       new kernel::Field::Text(
-                name          =>'dataobjattr',
-                label         =>'Dataobject Attribute'),
+                name          =>'version',
+                label         =>'Version'),
 
-      new kernel::Field::Text(
-                name          =>'type',
-                label         =>'Fieldtype'),
-
-      new kernel::Field::Htmlarea(
-                name          =>'spec',
-                label         =>'Specification'),
+      new kernel::Field::Textarea(
+                name          =>'description',
+                label         =>'Description'),
 
    );
    $self->{'data'}=\&getData;
 
 
 
-   $self->setDefaultView(qw(linenumber fullname  type label));
+   $self->setDefaultView(qw(linenumber fullname  modnamelabel));
    return($self);
 }
 
@@ -96,24 +95,21 @@ sub getData
       foreach my $modname (@sublist){
          my $o=getModuleObject($self->Config,$modname);
          if (defined($o)){
-            if ($o->can("getFieldObjsByView")){
-               my $spec={};
-               if ($o->can("LoadSpec")){
-                  $spec=$o->LoadSpec(undef);
-               }
-               foreach my $fo ($o->getFieldObjsByView([qw(ALL)])){
-                  my %rec=();
-                  $rec{fullname}=$modname."::".$fo->Name;
-                  $rec{internalname}=$fo->Name;
-                  $rec{label}=$fo->Label;
-                  $rec{type}=$fo->Self;
-                  $rec{modname}=$modname;
-                  $rec{dataobjattr}=$fo->{dataobjattr};
-                  $rec{spec}=$spec->{$fo->Name};
-                  $rec{modnamelabel}=$o->T($modname,$modname);
-                  push(@data,\%rec);
-               }
+            my %rec=();
+            $rec{fullname}=$modname;
+            $rec{modnamelabel}=$o->T($modname,$modname);
+            if ($modname->can("VERSION")){
+               $rec{version}=$modname->VERSION;
             }
+            $rec{description}="\$${modname}::DESCRIPTION";
+            $rec{description}=eval($rec{description});
+            if ($rec{version} eq ""){
+               $rec{version}="UNKNOWN";
+            }
+            if ($rec{description} eq ""){
+               $rec{description}="??? Beta Module ???";
+            }
+            push(@data,\%rec);
          }
       }
       $c->{data}=\@data;
