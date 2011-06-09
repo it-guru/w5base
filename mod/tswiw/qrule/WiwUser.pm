@@ -104,7 +104,7 @@ sub qcheckRecord
           }
           $wiwdata->{$fld}=~s/^\s*unknown\s*$//i;
           $wiwdata->{$fld}=rmNonLatin1($wiwdata->{$fld});
-          
+
           $self->IfaceCompare($dataobj,
                      $rec,$fld,
                      $wiwdata,$fld,
@@ -112,17 +112,26 @@ sub qcheckRecord
                      \@qmsg,\@dataissue,\$errorlevel,
                      mode=>'string');
       }
+
       if (keys(%$forcedupd)){
          if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,
-                                             {userid=>\$rec->{userid}})){
-            push(@qmsg,"some fields has been updated");
+                     {id=>\$rec->{id}})){
+            push(@qmsg,"all desired fields has been updated: ".
+                       join(", ",keys(%$forcedupd)));
          }
          else{
             push(@qmsg,$self->getParent->LastMsg());
-            return(3,{qmsg=>\@qmsg});
+            $errorlevel=3 if ($errorlevel<3);
          }
       }
-      return($errorlevel,{qmsg=>\@qmsg});
+      if (keys(%$wfrequest)){
+         my $msg="different values stored in WhoIsWho: ";
+         push(@qmsg,$msg);
+         push(@dataissue,$msg);
+         $errorlevel=3 if ($errorlevel<3);
+      }
+      return($self->HandleWfRequest($dataobj,$rec,
+                                 \@qmsg,\@dataissue,\$errorlevel,$wfrequest));
    }
    return($errorlevel,undef);
 }
