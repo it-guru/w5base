@@ -18,7 +18,6 @@ package base::menu::default;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::MenuRegistry;
 @ISA=qw(kernel::MenuRegistry);
@@ -388,6 +387,10 @@ sub Init
    
    $self->RegisterObj("Tools.analytics.fields",
                       "base::reflexion_fields",
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("Tools.analytics.dataobj",
+                      "base::reflexion_dataobj",
                       defaultacl=>['admin']);
    
    $self->RegisterObj("Tools.analytics.translation",
