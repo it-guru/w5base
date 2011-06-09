@@ -269,6 +269,10 @@ sub nativQualityCheck
       my $oldforce=$ENV{HTTP_FORCE_LANGUAGE};
       $ENV{HTTP_FORCE_LANGUAGE}="en";
       my $objectname=$dataobj->getRecordHeader($rec);
+      if (my $headerfield=$dataobj->getRecordHeaderField($rec)){
+         $objectname=$headerfield->RawValue($rec);
+      }
+
       my $name="DataIssue: ".$dataobj->T($affectedobject,$affectedobject).": ".
                $objectname;
       $ENV{HTTP_FORCE_LANGUAGE}=$oldforce;

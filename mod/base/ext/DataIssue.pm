@@ -67,12 +67,17 @@ sub DataIssueCompleteWriteRequest
    my $affectedobject=effVal($oldrec,$newrec,"affectedobject");
 
    if ($affectedobject=~m/^base::grp$/){
-      if ($newrec->{affectedobject}=~m/^base::grp$/){
-         # create link to config Management
-         $newrec->{directlnktype}=$newrec->{affectedobject};
-         $newrec->{directlnkid}=$newrec->{affectedobjectid};
-         $newrec->{directlnkmode}="DataIssue";
-      }
+      # create link to config Management
+      $newrec->{directlnktype}=$newrec->{affectedobject};
+      $newrec->{directlnkid}=$newrec->{affectedobjectid};
+      $newrec->{directlnkmode}="DataIssue";
+   }
+   if ($affectedobject=~m/^base::user$/){
+      $newrec->{directlnktype}=$newrec->{affectedobject};
+      $newrec->{directlnkid}=$newrec->{affectedobjectid};
+      $newrec->{directlnkmode}="DataIssue";
+      $newrec->{fwdtarget}="base::user";
+      $newrec->{fwdtargetid}=effVal($oldrec,$newrec,"affectedobjectid");
    }
    if ($affectedobject=~m/^base::workflow$/){
       $newrec->{directlnktype}=effVal($oldrec,$newrec,"affectedobject");
