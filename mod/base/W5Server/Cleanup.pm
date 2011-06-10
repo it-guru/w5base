@@ -29,11 +29,11 @@ sub process
 
    my $nextrun;
 
+   my $opmode=$self->getParent->Config->Param("W5BaseOperationMode");
    my $ro=0;
-   if ($self->getParent->Config->Param("W5BaseOperationMode") eq "readonly"){
+   if ($opmode eq "readonly"){
       $ro=1;
    }
-
 
    while(1){
       if ((defined($nextrun) && $nextrun<=time()) || $self->{doForceCleanup}){
