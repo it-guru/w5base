@@ -17,13 +17,25 @@ package itcrm::custappl;
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 use strict;
-use vars qw(@ISA);
+use vars qw(@ISA $VERSION $DESCRIPTION);
 use kernel;
 use kernel::Field;
 use kernel::DataObj::DB;
 use kernel::App::Web::Listedit;
 use kernel::CIStatusTools;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::CIStatusTools);
+
+$VERSION="1.0";
+$DESCRIPTION=<<EOF;
+This module hadels the customer specific informations
+for applications.
+
+The change of data is allowed to CBM of the application
+and users with the role "Config Manager" oder "Config Operator"
+at the area, to which the customer field of application points.
+EOF
+
+
 
 sub new
 {

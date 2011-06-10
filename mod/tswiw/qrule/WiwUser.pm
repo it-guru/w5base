@@ -1,4 +1,21 @@
 package tswiw::qrule::WiwUser;
+#######################################################################
+=pod
+
+=head3 PURPOSE
+
+This quality rule syncs to WhoIsWho user contacts.
+
+
+=head3 IMPORTS
+
+Synced fields ...
+office_phone office_street office_zipcode office_location office_mobile 
+office_costcenter office_accarea office_facsimile givenname surname
+
+
+=cut
+
 #  W5Base Framework
 #  Copyright (C) 2007  Hartmut Vogler (it@guru.de)
 #
