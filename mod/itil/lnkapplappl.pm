@@ -72,12 +72,13 @@ sub new
       new kernel::Field::Select(
                 name          =>'conproto',
                 label         =>'Interfaceprotocol',
-                value         =>[qw( unknown CAPI Corba dce DSO ftp html http
-                                     jdbc ldap Netegrity NFS ODBC papier
-                                     RMI rsh rcp rfc sldap ssh sftp smtp
-                                     snmp tuxedo xml X.31 openFT pkix-cmp
-                                     utm UCP/SMS DB-Link DB-Connection 
-                                     BCV MFT MQSeries OTHER)],
+                value         =>[qw( unknown 
+                     BCV CAPI Corba DB-Connection DB-Link dce DCOM DSO 
+                     ftp html http https IMAP IMAPS IMAP4 
+                     jdbc ldap LDIF MFT MQSeries Netegrity NFS ODBC OSI openFT
+                     papier pkix-cmp rcp rfc RMI rsh sftp sldap smtp snmp
+                     ssh tuxedo TCP UC4 UCP/SMS utm X.31 XAPI xml
+                     OTHER)],
                 default       =>'online',
                 htmlwidth     =>'50px',
                 htmleditwidth =>'150px',
