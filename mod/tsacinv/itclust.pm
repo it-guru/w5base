@@ -126,7 +126,7 @@ sub new
                 label         =>'SOX relevant',
                 dataobjattr   =>"decode(amportfolio.soxrelevant,'YES',1,0)"),
 
-      new kernel::Field::Link(
+      new kernel::Field::Text(
                 name          =>'lclusterid',
                 label         =>'AC-ClusterID',
                 dataobjattr   =>'amcomputer.lcomputerid'),

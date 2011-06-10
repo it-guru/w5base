@@ -304,9 +304,9 @@ sub new
                 label         =>'AC-AssetID',
                 dataobjattr   =>'amportfolio.lparentid'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'lclusterid',
-                label         =>'AC-ClusterID',
+                label         =>'AC-lClusterID',
                 dataobjattr   =>'amcomputer.lparentid'),
 
       new kernel::Field::Link(
