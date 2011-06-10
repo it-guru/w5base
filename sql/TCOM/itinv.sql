@@ -36,3 +36,4 @@ create table TCOM_appl (
   UNIQUE KEY `srcsys` (srcsys,srcid)
 );
 alter table TCOM_appl add custapplid varchar(20);
+drop table TCOM_appl;
