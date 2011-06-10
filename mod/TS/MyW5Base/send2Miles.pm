@@ -305,8 +305,8 @@ sub calculateBookingSets
                                  @{$milesd{$day}->{$label}->{wfheadid}})});
          }
          else{
-            printf("%s\n",msg(ERROR,"found invalid label '$label'"));
-            printf("%s\n",msg(ERROR,"wfheadid: ".
+            printf("%s<br>\n",msg(ERROR,"found invalid label '$label'"));
+            printf("%s<br>\n",msg(ERROR,"wfheadid: ".
                     join(", ",@{$milesd{$day}->{$label}->{wfheadid}})));
             exit(1);
          }
