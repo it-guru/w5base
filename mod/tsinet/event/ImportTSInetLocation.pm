@@ -131,7 +131,8 @@ sub ImportTSInetLocation
                      }
                      if (defined($relmode)){
                         $newrec->{relmode}=$relmode;
-                        $rel->ValidatedUpdateRecord($lnkrec,$newrec,{id=>\$found,
+                        $rel->ValidatedUpdateRecord($lnkrec,$newrec,
+                                                    {id=>\$found,
                                                     srcsys=>\'TSINET'});
                      }
                   }
@@ -157,9 +158,9 @@ sub ImportTSInetLocation
    $rel->SetFilter({srcsys=>\'TSINET',srcload=>"\"<$start-2d\""});
    $rel->DeleteAllFilteredRecords("ValidatedDeleteRecord");
 
-   my $act=getModuleObject($self->Config,"base::workflowaction");
 
    if ($#problems!=-1){
+      my $act=getModuleObject($self->Config,"base::workflowaction");
       $act->Notify(ERROR,"problems while tsinet to W5BaseDarwin sync",
                    "Found <b>".(($#problems)+1)." problems</b> ".
                    "while TSINET->W5Base locations syncronisation!\n\n".
