@@ -18,10 +18,10 @@
 </table>
 <script langauge="JavaScript">
 function openProd(){
-   openwin('http://q4dee1sy121.ffm.t-systems.com/sc-prod/index.do?lang=en','_blank','height=600,width=900,toolbar=no,status=no,resizable=yes,scrollbars=auto');
+   openwin('http://q4dee1sy121.ffm.t-systems.com/sc-prod/index.do?lang=en','_blank','height=750,width=900,toolbar=no,status=no,resizable=yes,scrollbars=auto');
 }
 function openTest(){
-   openwin('http://q4dee1sy121.ffm.t-systems.com/sc-test/index.do?lang=en','_blank','height=600,width=900,toolbar=no,status=no,resizable=yes,scrollbars=auto');
+   openwin('http://q4dee1sy121.ffm.t-systems.com/sc-test/index.do?lang=en','_blank','height=750,width=900,toolbar=no,status=no,resizable=yes,scrollbars=auto');
 }
 
 </script>
