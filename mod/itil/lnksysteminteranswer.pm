@@ -17,10 +17,12 @@ package itil::lnksysteminteranswer;
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 use strict;
-use vars qw(@ISA);
+use vars qw(@ISA $VERSION $DESCRIPTION);
 use kernel;
 use base::interanswer;
 @ISA=qw(base::interanswer);
+
+           
 
 sub new
 {
