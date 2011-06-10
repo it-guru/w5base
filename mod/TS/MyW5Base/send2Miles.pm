@@ -71,9 +71,10 @@ sub getQueryTemplate
 <td class=fname width=10%>Monat:</td>
 <td class=finput>
 <select name=month style='width:100%'>
-<option value="03/2011">03/2011</option>
-<option value="04/2011">04/2011</option>
+<option value="06/2011">06/2011</option>
 <option value="05/2011">05/2011</option>
+<option value="04/2011">04/2011</option>
+<option value="03/2011">03/2011</option>
 </select>
 </td>
 <td class=fname width=20%>MilesPlus Enviroment:</td>
