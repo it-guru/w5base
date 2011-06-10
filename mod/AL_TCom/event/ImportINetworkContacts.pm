@@ -180,6 +180,16 @@ sub processRecord
    my $self=shift;
    my $d=shift;
 
+   my $w5baseid=$d->{'w5baseId'};
+   my $w5basename=$d->{'w5baseAppname'};
+   my $inname=$d->{'inetworkAppname'};
+   my $inid=$d->{'inetworkId'};
+
+   if ($d->{'smEmail'} eq ""){
+      $self->{problems}->{"100".NowStamp()}=
+          "Empty sm-E-Mail at Application '$w5basename' ($w5baseid)";
+      return(undef);
+   }
    my $userid=$self->getContactEntryId({
           email=>UTF8toLatin1($d->{'smEmail'}),
           surname=>UTF8toLatin1($d->{'smSurname'}),
@@ -191,14 +201,6 @@ sub processRecord
           allowifupdate=>'1',
           cistatusid=>'4'});
 
-   my $w5baseid=$d->{'w5baseId'};
-   my $w5basename=$d->{'w5baseAppname'};
-   my $inname=$d->{'inetworkAppname'};
-   my $inid=$d->{'inetworkId'};
-
-   print Dumper($d);
-
-#
    my $appl=getModuleObject($self->Config,"TCOM::custappl");
 
    $appl->SetFilter({id=>\$w5baseid});
