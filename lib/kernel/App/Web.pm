@@ -951,6 +951,7 @@ sub HandleNewUser
                   $id=$user->ValidatedInsertRecord(
                                     {email=>$uarec->{requestemail},
                                      userid=>$userid,
+                                     allowifupdate=>1,
                                      owner=>$userid,
                                      creator=>$userid,
                                      cistatusid=>3});
