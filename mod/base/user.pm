@@ -1053,7 +1053,7 @@ sub Validate
             if (!($sshkey=~m/^\s*$/)){
                $sshkey=~s/^\s*//;
                $sshkey=~s/\s*$//;
-               if ($sshkey=~m/^ssh-dss\s+\S{100,600}/){
+               if ($sshkey=~m/^ssh-(dss|rsa)\s+\S{100,600}/){
                   $k{$sshkey}=1;
                }
                else{
