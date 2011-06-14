@@ -739,9 +739,11 @@ sub sendFile
          $viewfreq=int($viewfreq);
       }
       #######################################################################
-      $self->UpdateRecord({viewcount=>$rec->{viewcount}+1,
-                           viewlast=>$now,
-                           viewfreq=>$viewfreq},{fid=>$id});
+      if ($self->Config->Param("W5BaseOperationMode") ne "readonly"){
+         $self->UpdateRecord({viewcount=>$rec->{viewcount}+1,
+                              viewlast=>$now,
+                              viewfreq=>$viewfreq},{fid=>$id});
+      }
       my $realfile="$w5root/$config/$rec->{realfile}";
       eval("use GD;");
       if ($@ eq "" && $thumbnail){
