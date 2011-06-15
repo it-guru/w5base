@@ -529,6 +529,16 @@ sub Validate
       if ($curuserid ne $userid){
          if (!$self->IsMemberOf($self->{admwrite},"RMember")){
             # now check, if $userid is managed by $curuserid
+            my $u=getModuleObject($self->Config,"base::user");
+            $u->SetFilter({userid=>\$userid});
+            my ($urec,$msg)=$u->getOnlyFirst(qw(managedbyid));
+            return(0) if (!defined($urec));
+            if (!$self->IsMemberOf($urec->{managedbyid},
+                                   ["RContactAdmin"],"up")){
+               $self->LastMsg(ERROR,"you are not manager of this contact");
+     
+               return(0);
+            }
 
          }
       }

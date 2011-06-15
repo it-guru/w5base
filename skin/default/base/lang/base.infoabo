@@ -31,3 +31,4 @@
 'managed by group' =>{ de=>'Kontakt verwaltet durch Gruppe'},
 'missing correct refid'=>{de=>'fehlerhafte Referenzid oder falsche schreibweise'},
 'refid does not identify exactly one record'=>{de=>'ReferenzID identifiziert nicht EINEN Datensatz'},
+'you are not manager of this contact'=>{de=>'Sie sind NICHT Kontakt Admins dieses Kontaktes'},
