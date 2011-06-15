@@ -160,6 +160,11 @@ sub ProcessLine
       $currentfieldgroup="default";
    #   $currentid="[new]";
    }
+   if ($currentfieldgroup eq "default" && !in_array($viewgroups,"default")){
+      my @candidats=sort(grep(!/^header$/,@$viewgroups));
+      $currentfieldgroup=$candidats[0];
+   }
+   
    my $d="";
    $currentfieldgroup=undef if ($currentfieldgroup eq "");
    my $field=$app->IdField();
@@ -347,7 +352,6 @@ EOF
          }
       }
       my $spec=$self->getParent->getParent->LoadSpec($rec);
- 
       foreach my $group (@grouplist){
          my $subfunctions="topedit,editend";
          my $subblock="";

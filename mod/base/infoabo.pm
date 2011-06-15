@@ -43,9 +43,26 @@ sub new
                 searchable    =>0,
                 dataobjattr   =>'infoabo.id'),
 
+      new kernel::Field::TextDrop(
+                name          =>'user',
+                label         =>'User',
+                group         =>['relation','newin'],
+                readonly      =>sub{
+                      my $self=shift;
+                      my $rec=shift;
+                      return(0) if (!defined($rec));
+                      return(1);
+                },
+                vjointo       =>'base::user',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['userid'=>'userid'],
+                vjoindisp     =>'fullname'),
+
       new kernel::Field::Select(
                 name          =>'parentobj',
                 label         =>'Info Source',
+                group         =>['default','newin'],
+                uploadable    =>0,
                 htmleditwidth =>'100%',
                 readonly      =>sub{
                       my $self=shift;
@@ -61,6 +78,7 @@ sub new
                 name          =>'targetname',
                 htmlwidth     =>'200',
                 htmleditwidth =>'400',
+                uploadable    =>0,
                 label         =>'Target-Name',
                 uploadable    =>0,
                 dst           =>[],
@@ -75,6 +93,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'mode',
+                uploadable    =>0,
                 searchable    =>0,
                 label         =>'Info Mode',
                 readonly      =>1,
@@ -82,26 +101,12 @@ sub new
                 getPostibleValues=>\&getPostibleModes,
                 dataobjattr   =>'infoabo.mode'),
 
-      new kernel::Field::TextDrop(
-                name          =>'user',
-                label         =>'User',
-                group         =>'relation',
-                readonly      =>sub{
-                      my $self=shift;
-                      my $rec=shift;
-                      return(0) if (!defined($rec));
-                      return(1);
-                },
-                vjointo       =>'base::user',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['userid'=>'userid'],
-                vjoindisp     =>'fullname'),
-
       new kernel::Field::Select(
                 name          =>'usercistatus',
                 htmleditwidth =>'40%',
                 group         =>'relation',
                 readonly      =>'1',
+                uploadable    =>0,
                 label         =>'User CI-State',
                 vjointo       =>'base::cistatus',
                 vjoinon       =>['usercistatusid'=>'id'],
@@ -116,6 +121,7 @@ sub new
       new kernel::Field::Email(
                 name          =>'email',
                 label         =>'E-Mail',
+                uploadable    =>0,
                 readonly      =>1,
                 dataobjattr   =>'contact.email'),
 
@@ -137,13 +143,13 @@ sub new
                       return(0) if (!defined($rec));
                       return(1);
                 },
-                label         =>'parent object',
+                label         =>'internal parent object name',
                 dataobjattr   =>'infoabo.parentobj'),
 
       new kernel::Field::Text(
                 name          =>'refid',
                 searchable    =>0,
-                group         =>'relation',
+                group         =>['relation','newin'],
                 readonly      =>sub{
                       my $self=shift;
                       my $rec=shift;
@@ -157,7 +163,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'rawmode',
                 label         =>'raw Info Mode',
-                group         =>'relation',
+                group         =>['relation','newin'],
                 readonly      =>sub{
                       my $self=shift;
                       my $rec=shift;
@@ -166,13 +172,30 @@ sub new
                 },
                 dataobjattr   =>'infoabo.mode'),
 
+      new kernel::Field::Group(
+                name          =>'managedby',
+                label         =>'managed by group',
+                vjoinon       =>'managedbyid',
+                htmldetail    =>0,
+                readonly      =>1),
 
       new kernel::Field::Text(
                 name          =>'userid',
                 label         =>'W5Base UserID',
                 htmldetail    =>0,
+                uploadable    =>0,
                 readonly      =>1,
+                selectfix     =>1,
                 dataobjattr   =>'infoabo.userid'),
+
+      new kernel::Field::Text(
+                name          =>'managedbyid',
+                label         =>'Managed by Group ID',
+                selectfix     =>1,
+                htmldetail    =>0,
+                uploadable    =>0,
+                readonly      =>1,
+                dataobjattr   =>'contact.managedbygrp'),
 
       new kernel::Field::Creator(
                 name          =>'creator',
@@ -292,9 +315,18 @@ sub SecureSetFilter
    
    if (!$self->IsMemberOf($self->{admread},"RMember")){
       my $userid=$self->getCurrentUserId();
-      push(@flt,[
-                 {userid=>\$userid},
-                ]);
+      my @useridlist=($userid);
+
+      my %a=$self->getGroupsOf($userid, [qw(RContactAdmin)], 'direct');
+      my @idl=keys(%a);
+      if ($#idl!=-1 && $idl[0] ne ""){
+         my $u=getModuleObject($self->Config,"base::user");
+         $u->SetFilter({managedbyid=>\@idl});
+         foreach my $urec ($u->getHashList("userid")){
+            push(@useridlist,$urec->{userid});
+         }
+      }
+      push(@flt,[ {userid=>\@useridlist}, ]);
    }
    return($self->SetFilter(@flt));
 }
@@ -362,6 +394,7 @@ sub getModesFor
          push(@res,$rec->{name});
          push(@res,$rec->{fullname});
       }
+printf STDERR ("fifi res=%s\n",Dumper(\@res));
       return(@res) if ($parentobj eq "base::staticinfoabo");
    }
    foreach my $obj (values(%{$self->{infoabo}})){
@@ -412,11 +445,15 @@ sub getPostibleParentObjs
    my @opt;
    push(@opt,"","");
 
+   my %opt;
    foreach my $obj (values(%{$app->{infoabo}})){
       my ($ctrl)=$obj->getControlData($self);
       foreach my $obj (keys(%$ctrl)){
-         push(@opt,$obj,$app->T($obj,$obj));
+         $opt{$app->T($obj,$obj)." ($obj) "}=$obj;
       }
+   }
+   foreach my $k (sort(keys(%opt))){
+      push(@opt,$opt{$k},$k);
    }
    push(@opt,"base::staticinfoabo",
         $app->T("base::staticinfoabo","base::staticinfoabo"));
@@ -431,7 +468,15 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
+   my $refid=effVal($oldrec,$newrec,"refid");
+   if (!($refid=~m/^[a-z,0-9,_-]+$/)){
+      $self->LastMsg(ERROR,"missing correct refid");
+      return(0);
+   }
    my $mode=effVal($oldrec,$newrec,"mode");
+   if ($mode eq ""){
+      $mode=effVal($oldrec,$newrec,"rawmode");
+   }
    if ($mode eq "" && !defined($oldrec) && $newrec->{rawmode} eq ""){
       $self->LastMsg(ERROR,"invalid mode specified");
       return(0);
@@ -439,16 +484,53 @@ sub Validate
    my $parentobj=effVal($oldrec,$newrec,"parentobj");
    my $parent=effVal($oldrec,$newrec,"parent");
    if ($parentobj eq "" && $parent eq ""){
+      $self->LastMsg(ERROR,"no parentobj specified");
+      return(0);
+   }
+   if ($parentobj eq ""){
+      $parentobj=$parent;
+   }
+   my $pobj=getModuleObject($self->Config,$parentobj);
+   if (!defined($pobj)){
       $self->LastMsg(ERROR,"invalid parentobj specified");
       return(0);
    }
-   
-   if (!$self->IsMemberOf($self->{admwrite},"RMember")){
-      my $curuserid=$self->getCurrentUserId();
-      my $userid=effVal($oldrec,$newrec,"userid");
-      if ($userid eq ""){
-         $self->LastMsg(ERROR,"invalid userid specified");
-         return(0);
+   my $pobjidobj=$pobj->IdField();
+   if (!defined($pobjidobj)){
+      $self->LastMsg(ERROR,"can not identify id field in parentobj");
+      return(0);
+   }
+   $pobj->SetFilter({$pobjidobj->Name()=>\$refid});
+   my @l=$pobj->getHashList($pobjidobj->Name());
+   if ($#l!=0){
+      $self->LastMsg(ERROR,"refid does not identify exactly one record");
+      return(0);
+   }
+
+   my %modelist=$self->getModesFor($parentobj);
+
+   my @modelist=keys(%modelist);
+
+   if (!in_array(\@modelist,$mode)){
+      printf STDERR ("fifi mode=$mode parentobj=$parentobj\n");
+      $self->LastMsg(ERROR,"invalid interal infomode");
+      return(0);
+   }
+
+   my $curuserid=$self->getCurrentUserId();
+   my $userid=effVal($oldrec,$newrec,"userid");
+   if ($userid eq ""){
+      $self->LastMsg(ERROR,"invalid userid specified");
+      return(0);
+   }
+
+   if (!$self->IsMemberOf("admin")){ 
+      # sec check
+      if ($curuserid ne $userid){
+         if (!$self->IsMemberOf($self->{admwrite},"RMember")){
+            # now check, if $userid is managed by $curuserid
+
+         }
       }
    }
 
@@ -510,7 +592,8 @@ EOF
          }
          $d.="</table>";
          $d.="<br>";
-         $d.=$self->T("Are you sure, you want to inactivate the shown InfoAbos?");
+         $d.=$self->T("Are you sure, ".
+                      "you want to inactivate the shown InfoAbos?");
          $d.="<input type=submit name=yes style=\"width:80px\" ".
              "value=\" ".$self->T("yes")." \">";
          $d.="<input type=submit name=no style=\"width:80px\" ".
@@ -547,17 +630,31 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("header","default","relation") if (!defined($rec));
-   return("ALL");
+   return("header","newin") if (!defined($rec));
+   return("header","default","relation","history","source");
 }
 
 sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default") if (ref($rec) eq "HASH" &&
-                         $self->getCurrentUserId() eq $rec->{userid});
-   return("default","relation") if ($self->isInfoAboAdmin());
+   if (!defined($rec)){
+      return("default","relation","newin");
+   }
+   my $userid=$rec->{userid};
+   return("default","newin") if (ref($rec) eq "HASH" &&
+                                 $self->getCurrentUserId() eq $userid);
+   if ($self->isInfoAboAdmin() || $self->IsMemberOf("admin")){
+      return("default");
+   }
+
+   my %a=$self->getGroupsOf($self->getCurrentUserId(),
+                            [qw(RContactAdmin)],'direct');
+   my @idl=keys(%a);
+   if (in_array([keys(%a)],$rec->{managedbyid})){
+      return("default");
+   }
+
    return(undef);
 }
 
