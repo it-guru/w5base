@@ -206,3 +206,11 @@ a:active.limitreached  {
             text-decoration:none;
             color:#006666;
           }
+
+a:link.TitleBarLink, a:visited.TitleBarLink, a:active.TitleBarLink {
+   background-color: #30579f;
+   color: #ffffff;
+   font-weight: bold;
+   text-decoration:none;
+}
+
