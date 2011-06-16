@@ -79,13 +79,6 @@ sub qcheckRecord
          msg(INFO,"validateing userid=$urec->{userid} requested");
 
          #
-         # load srcid's from base::grp
-         #
-         $grp->SetFilter({grpid=>\@curgrpid,srcsys=>\$self->{SRCSYS}});
-         $grp->SetCurrentView(qw(grpid srcid srcsys srcload));
-         my $curgrps=$grp->getHashIndexed(qw(grpid srcid));
-
-         #
          # loading the "should" sitiuation from wiw
          #
          msg(DEBUG,"trying to load userinformations from wiw");
@@ -168,6 +161,18 @@ sub qcheckRecord
 
 
 
+         my @curbossgroups=$self->extractCurrentGrpIds($urec,["RBoss"]);
+         #
+         # load current boss srcids from groups
+         #
+         $grp->SetFilter({grpid=>\@curbossgroups,srcsys=>\$self->{SRCSYS}});
+         $grp->SetCurrentView(qw(grpid srcid srcsys srcload));
+         my $curbossgrps=$grp->getHashIndexed(qw(grpid srcid));
+         my @bossgrpsrcid=();
+         if (ref($curbossgrps->{srcid}) eq "HASH"){
+            @bossgrpsrcid=keys(%{$curbossgrps->{srcid}});
+         }
+
 
          #
          # hinzufügen der Leiter rollen
@@ -179,10 +184,19 @@ sub qcheckRecord
          $wiworg->SetFilter({mgrwiwid=>\$wiwid});
          foreach my $wiwrec ($wiworg->getHashList(
                               qw(touid name parentid parent shortname))){
+            if ($wiwrec->{touid}=~m/^\S+$/){
+               @bossgrpsrcid=grep(!/^$wiwrec->{touid}$/,@bossgrpsrcid);
+            }
             my $bk=$self->addGrpLinkToUser($grp,$wiworg,$grpuser,
                                            $wiwrec,$urec,
                                            ['RBoss']);
             return($errorlevel,undef) if (defined($bk));
+         }
+         if ($#bossgrpsrcid!=-1){
+            printf STDERR ("WARN: (fifi) ".
+                           "need to remove RBoss from User '%s' ".
+                           "on group touid='%s'\n",
+                           $urec->{email},join(",",@bossgrpsrcid));
          }
 
 
@@ -208,13 +222,16 @@ sub extractCurrentGrpIds
 {
    my $self=shift;
    my $urec=shift;
+   my $chkroles=shift;
+
+   $chkroles=[orgRoles()] if (!defined($chkroles));
 
    my @curgrpid=();
    msg(DEBUG,"processing email addr '%s'",$urec->{email});
    if (defined($urec->{groups}) && ref($urec->{groups}) eq "ARRAY"){
       foreach my $grp (@{$urec->{groups}}){
          $grp->{roles}=[] if (!defined($grp->{roles}));
-         if (grep(/^REmployee$/,@{$grp->{roles}})){
+         if (in_array($grp->{roles},$chkroles)){
             push(@curgrpid,$grp->{grpid});
          }
       }

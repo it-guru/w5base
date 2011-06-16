@@ -45,7 +45,8 @@ sub Validate
    my $newvallist=[map({
          my $m=trim($_);
          if ($m ne ""){
-            if (!($m=~m/^\s*[0-9\+\/)(-\s]*$/)){
+            if (!($m=~m/^\s*[0-9\+\/)(-\s]*$/) ||
+                 ($m=~m/\+.*\+/)){                # allow +xxx only once!
                $self->getParent->LastMsg(ERROR,
                             "invalid phonenumber format '%s'",$m);
                return(undef);
