@@ -53,8 +53,8 @@ sub FormatedDetail
       $usertimezone=$self->getParent->UserTimezone();
    }
    if (defined($d)){
-      ($d,undef,$dayoffset,$timeonly,$delta)=$self->getFrontendTimeString(
-                                             $mode,$d,$usertimezone);
+      ($d,$usertimezone,$dayoffset,$timeonly,$delta)=
+                 $self->getFrontendTimeString($mode,$d,$usertimezone);
    }
    if (($mode eq "edit" || $mode eq "workflow")){
       my $name=$self->Name();
@@ -68,7 +68,7 @@ sub FormatedDetail
       return($self->getSimpleInputField($d,$self->readonly($current)));
    }
    if ($d ne ""){
-      if (length($usertimezone)<=3 && $mode=~m/html/i){
+      if (length($usertimezone)<=4 && $mode=~m/html/i){
          $d.="&nbsp;"; 
          $d.="$usertimezone";
          if ($mode eq "HtmlSubList"){ 
@@ -314,7 +314,11 @@ sub getFrontendTimeString
                $usertimezone=$UserCache->{tz};
             }
          }
-         ($Y,$M,$D,$h,$m,$s)=Localtime($usertimezone,$time);
+         my ($doy, $dow, $dst);
+         ($Y,$M,$D,$h,$m,$s, $doy, $dow, $dst)=Localtime($usertimezone,$time);
+         if ($dst){
+            $usertimezone=~s/^CET$/CEST/;
+         }
          {
             # calc dayoffset
             my ($Y1,$M1,$D1)=Localtime($usertimezone,$time);
