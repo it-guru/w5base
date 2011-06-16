@@ -78,14 +78,6 @@ sub Init
                    if ($wfrec->{class} eq "base::workflow::adminrequest"){
                       $personaltag="W5BaseAdminRequest";
                    }
-                   elsif (exists($wfrec->{involvedcostcenter}) && 
-                       $wfrec->{involvedcostcenter} ne ""){
-                      $personaltag="CO:".$wfrec->{involvedcostcenter};
-                   }
-                 #  elsif (exists($wfrec->{affectedproject}) && 
-                 #      $wfrec->{affectedproject} ne ""){
-                 #     $personaltag=$wfrec->{affectedproject};
-                 #  }
                    elsif (exists($wfrec->{affectedapplicationid}) && 
                        $wfrec->{affectedapplicationid} ne ""){
                       my $app=getModuleObject($self->getParent->Config,
@@ -96,6 +88,14 @@ sub Init
                          $personaltag="CO:".$arec->{conumber};
                       }
                    }
+                   elsif (exists($wfrec->{involvedcostcenter}) && 
+                       $wfrec->{involvedcostcenter} ne ""){
+                      $personaltag="CO:".$wfrec->{involvedcostcenter};
+                   }
+                 #  elsif (exists($wfrec->{affectedproject}) && 
+                 #      $wfrec->{affectedproject} ne ""){
+                 #     $personaltag=$wfrec->{affectedproject};
+                 #  }
                    if (!defined($personaltag) &&
                        exists($wfrec->{affectedapplication}) && 
                        $wfrec->{affectedapplication} ne ""){
