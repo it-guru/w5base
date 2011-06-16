@@ -160,7 +160,8 @@ sub ProcessLine
       $currentfieldgroup="default";
    #   $currentid="[new]";
    }
-   if ($currentfieldgroup eq "default" && !in_array($viewgroups,"default")){
+   if ($currentfieldgroup eq "default" && 
+       !in_array($viewgroups,["default","ALL"])){
       my @candidats=sort(grep(!/^header$/,@$viewgroups));
       $currentfieldgroup=$candidats[0];
    }
