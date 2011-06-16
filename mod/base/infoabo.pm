@@ -562,7 +562,7 @@ sub FinishWrite
       my $id=effVal($oldrec,$newrec,"id");
       $ia->SetFilter({id=>\$id});
       my ($iarec,$msg)=$ia->getOnlyFirst(qw(ALL));
-      if (defined($iarec)){
+      if (defined($iarec) && $iarec->{parent} ne "base::staticinfoabo"){
          my $modeobj=$ia->getField("mode");
          my $mode=$modeobj->FormatedDetail($iarec,"HtmlMail"); 
          my $msg="";
