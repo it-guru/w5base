@@ -528,6 +528,8 @@ sub Validate
    if (!$self->IsMemberOf("admin")){ 
       # sec check
       if ($curuserid ne $userid){
+         if (effVal($oldrec,$newrec,"parent") eq "base::staticinfoabo"){
+         }
          if (!$self->IsMemberOf($self->{admwrite},"RMember")){
             # now check, if $userid is managed by $curuserid
             my $u=getModuleObject($self->Config,"base::user");
@@ -857,7 +859,7 @@ sub LoadTargets
                if ($userid>0){
                   my $rec={userid=>$userid,active=>$param{default},
                            parent=>$sparent,mode=>$smode,refid=>$srefid};
-                  $self->ValidatedInsertRecord($rec);
+                  $self->InsertRecord($rec);
                }
                else{
                   msg(ERROR,"try to insert infoabo for invalid '$userid'");
