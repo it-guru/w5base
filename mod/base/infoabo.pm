@@ -492,21 +492,30 @@ sub Validate
    if ($parentobj eq ""){
       $parentobj=$parent;
    }
-   my $pobj=getModuleObject($self->Config,$parentobj);
-   if (!defined($pobj)){
-      $self->LastMsg(ERROR,"invalid parentobj specified");
-      return(0);
+   if (!defined($oldrec)){
+      my $pobj=getModuleObject($self->Config,$parentobj);
+      if (!defined($pobj)){
+         $self->LastMsg(ERROR,"invalid parentobj specified");
+         return(0);
+      }
+      my $pobjidobj=$pobj->IdField();
+      if (!defined($pobjidobj)){
+         $self->LastMsg(ERROR,"can not identify id field in parentobj");
+         return(0);
+      }
+      $pobj->SetFilter({$pobjidobj->Name()=>\$refid});
+      my @l=$pobj->getHashList($pobjidobj->Name());
+      if ($#l!=0){
+         $self->LastMsg(ERROR,"refid does not identify exactly one record");
+         return(0);
+      }
    }
-   my $pobjidobj=$pobj->IdField();
-   if (!defined($pobjidobj)){
-      $self->LastMsg(ERROR,"can not identify id field in parentobj");
-      return(0);
-   }
-   $pobj->SetFilter({$pobjidobj->Name()=>\$refid});
-   my @l=$pobj->getHashList($pobjidobj->Name());
-   if ($#l!=0){
-      $self->LastMsg(ERROR,"refid does not identify exactly one record");
-      return(0);
+   else{
+      delete($newrec->{refid}); 
+      delete($newrec->{mode}); 
+      delete($newrec->{rawmode}); 
+      delete($newrec->{parent}); 
+      delete($newrec->{parentobj}); 
    }
 
    my %modelist=$self->getModesFor($parentobj);
