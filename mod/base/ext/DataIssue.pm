@@ -68,13 +68,13 @@ sub DataIssueCompleteWriteRequest
 
    if ($affectedobject=~m/^base::grp$/){
       # create link to config Management
-      $newrec->{directlnktype}=$newrec->{affectedobject};
-      $newrec->{directlnkid}=$newrec->{affectedobjectid};
+      $newrec->{directlnktype}=effVal($oldrec,$newrec,"affectedobject");
+      $newrec->{directlnkid}=effVal($oldrec,$newrec,"affectedobjectid");
       $newrec->{directlnkmode}="DataIssue";
    }
    if ($affectedobject=~m/^base::user$/){
-      $newrec->{directlnktype}=$newrec->{affectedobject};
-      $newrec->{directlnkid}=$newrec->{affectedobjectid};
+      $newrec->{directlnktype}=effVal($oldrec,$newrec,"affectedobject");
+      $newrec->{directlnkid}=effVal($oldrec,$newrec,"affectedobjectid");
       $newrec->{directlnkmode}="DataIssue";
       $newrec->{fwdtarget}="base::user";
       $newrec->{fwdtargetid}=effVal($oldrec,$newrec,"affectedobjectid");
