@@ -87,22 +87,29 @@ sub FormatedDetail
 
    if ($mode=~m/^HtmlDetail/){
       if ($d ne ""){
-         my $dform=$d;
-         my $UserCache=$self->getParent-> 
-                    Cache->{User}->{Cache}->{$ENV{REMOTE_USER}};
-         if (ref($UserCache) eq "HASH"){
-            my $jsdialcall=FormatJsDialCall($UserCache->{rec}->{dialermode},
-                                $UserCache->{rec}->{dialeripref},
-                                $UserCache->{rec}->{dialerurl},
-                                $d);
-            if (defined($jsdialcall)){
-               my $t="click to dial with ".$UserCache->{rec}->{dialermode};
-               $dform="<span title=\"$t\" ".
-                      "onclick=\"$jsdialcall\" class=sublink>".
-                      $dform."</span>";
+         my $dformfine="";
+         my $dlist=$d;
+         $dlist=[$d] if (ref($d) ne "ARRAY");
+         foreach my $d (@$dlist){
+            my $dform=$d;
+            my $UserCache=$self->getParent-> 
+                       Cache->{User}->{Cache}->{$ENV{REMOTE_USER}};
+            if (ref($UserCache) eq "HASH"){
+               my $jsdialcall=FormatJsDialCall($UserCache->{rec}->{dialermode},
+                                   $UserCache->{rec}->{dialeripref},
+                                   $UserCache->{rec}->{dialerurl},
+                                   $d);
+               if (defined($jsdialcall)){
+                  my $t="click to dial with ".$UserCache->{rec}->{dialermode};
+                  $dform="<span title=\"$t\" ".
+                         "onclick=\"$jsdialcall\" class=sublink>".
+                         $dform."</span>";
+               }
             }
+            $dformfine.="; " if ($dformfine ne "");
+            $dformfine.=$dform;
          }
-         return($dform);
+         return($dformfine);
       } 
       return($d);
    }
