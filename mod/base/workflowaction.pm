@@ -62,7 +62,6 @@ sub new
                 vjoinon       =>['wfheadid'=>'id'],
                 vjoindisp     =>'name',
                 sqlorder      =>'none',
-                htmldetail    =>'0',
                 searchable    =>'0',
                 label         =>'Workflow Name'),
 
@@ -736,7 +735,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","booking","actiondata","additional","source");
+   return("header","actiondata","booking","default","additional","source");
 }
 
 
