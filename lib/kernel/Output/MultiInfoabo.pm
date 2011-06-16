@@ -147,7 +147,10 @@ sub MultiOperationHeader
    $d.=sprintf("<tr><td>");
    $d.=sprintf("<select name=mode style=\"width:100%%\">");
    if ($oldval eq ""){
-      $d.="<option value=\"\">&lt;".$self->getParent->getParent->T("please select an information mode",'kernel::Output::MultiInfoabo')."&gt;</option>";
+      $d.="<option value=\"\">&lt;".
+          $self->getParent->getParent->T("please select an information mode",
+                                         'kernel::Output::MultiInfoabo').
+          "&gt;</option>";
    }
    my @modes=$self->{opobj}->getModesFor($app->Self(),
                                          $app->SelfAsParentObject());
@@ -159,7 +162,8 @@ sub MultiOperationHeader
    }
    $d.=sprintf("</select>");
    $d.=sprintf("</td>");
-   if ($self->{opobj}->isInfoAboAdmin()){
+   if ($self->{opobj}->isInfoAboAdmin() ||
+       $self->{opobj}->isContactAdmin()){
       $d.=sprintf("<td width=5%% nowrap>%s:</td>",
           $self->getParent->getParent->T("Contact",
                                          'kernel::Output::MultiInfoabo'));
@@ -186,13 +190,13 @@ sub MultiOperationActionOn
    $self->LoadOpObj();
 
    if (defined($self->Context->{LastID})){
-      if ($self->{opobj}->isInfoAboAdmin()){
+    #  if ($self->{opobj}->isInfoAboAdmin()){
          $curruserid=$self->Context->{LastID};
-      }
-      else{
-         $app->LastMsg(ERROR,"you are no admin");
-         return(0);
-      }
+    #  }
+    #  else{
+    #     $app->LastMsg(ERROR,"you are no admin");
+    #     return(0);
+    #  }
    }
    my $opobj=$self->{opobj};
    my $idfield=$app->IdField();

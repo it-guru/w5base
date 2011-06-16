@@ -597,7 +597,7 @@ sub Notify
                 name     =>$name,
                 emailtext=>$text);
 
-   foreach my $target (qw(emailto emailcc emailbcc)){
+   foreach my $target (qw(emailfrom emailto emailcc emailbcc)){
       if (exists($param{$target})){
          if (ref($param{$target}) ne "ARRAY"){
             $param{$target}=[split(/[;,]/,$param{$target})];
@@ -618,7 +618,7 @@ sub Notify
 
    }
    my $user=getModuleObject($self->Config,"base::user");
-   foreach my $target (qw(emailto emailcc emailbcc)){
+   foreach my $target (qw(emailfrom emailto emailcc emailbcc)){
       if (exists($param{$target})){
          for(my $c=0;$c<=$#{$param{$target}};$c++){
             if ($param{$target}->[$c]=~m/^\d{10,20}$/){  # target is a userid

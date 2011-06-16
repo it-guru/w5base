@@ -101,6 +101,20 @@ sub new
                 getPostibleValues=>\&getPostibleModes,
                 dataobjattr   =>'infoabo.mode'),
 
+      new kernel::Field::Link(
+                name          =>'usercistatusid',
+                group         =>'relation',
+                label         =>'User CI-StateID',
+                dataobjattr   =>'contact.cistatus'),
+
+      new kernel::Field::Email(
+                name          =>'email',
+                group         =>'relation',
+                label         =>'Contact E-Mail',
+                uploadable    =>0,
+                readonly      =>1,
+                dataobjattr   =>'contact.email'),
+
       new kernel::Field::Select(
                 name          =>'usercistatus',
                 htmleditwidth =>'40%',
@@ -111,19 +125,6 @@ sub new
                 vjointo       =>'base::cistatus',
                 vjoinon       =>['usercistatusid'=>'id'],
                 vjoindisp     =>'name'),
-
-      new kernel::Field::Link(
-                name          =>'usercistatusid',
-                group         =>'relation',
-                label         =>'User CI-StateID',
-                dataobjattr   =>'contact.cistatus'),
-
-      new kernel::Field::Email(
-                name          =>'email',
-                label         =>'E-Mail',
-                uploadable    =>0,
-                readonly      =>1,
-                dataobjattr   =>'contact.email'),
 
       new kernel::Field::Select(
                 name          =>'active',
@@ -312,21 +313,23 @@ sub SecureSetFilter
 {
    my $self=shift;
    my @flt=@_;
-   
-   if (!$self->IsMemberOf($self->{admread},"RMember")){
-      my $userid=$self->getCurrentUserId();
-      my @useridlist=($userid);
-
-      my %a=$self->getGroupsOf($userid, [qw(RContactAdmin)], 'direct');
-      my @idl=keys(%a);
-      if ($#idl!=-1 && $idl[0] ne ""){
-         my $u=getModuleObject($self->Config,"base::user");
-         $u->SetFilter({managedbyid=>\@idl});
-         foreach my $urec ($u->getHashList("userid")){
-            push(@useridlist,$urec->{userid});
+  
+   if (!$self->isDirectFilter(@flt)){
+      if (!$self->IsMemberOf($self->{admread},"RMember")){
+         my $userid=$self->getCurrentUserId();
+         my @useridlist=($userid);
+     
+         my %a=$self->getGroupsOf($userid, [qw(RContactAdmin)], 'direct');
+         my @idl=keys(%a);
+         if ($#idl!=-1 && $idl[0] ne ""){
+            my $u=getModuleObject($self->Config,"base::user");
+            $u->SetFilter({managedbyid=>\@idl});
+            foreach my $urec ($u->getHashList("userid")){
+               push(@useridlist,$urec->{userid});
+            }
          }
+         push(@flt,[ {userid=>\@useridlist}, ]);
       }
-      push(@flt,[ {userid=>\@useridlist}, ]);
    }
    return($self->SetFilter(@flt));
 }
@@ -394,7 +397,6 @@ sub getModesFor
          push(@res,$rec->{name});
          push(@res,$rec->{fullname});
       }
-printf STDERR ("fifi res=%s\n",Dumper(\@res));
       return(@res) if ($parentobj eq "base::staticinfoabo");
    }
    foreach my $obj (values(%{$self->{infoabo}})){
@@ -512,7 +514,6 @@ sub Validate
    my @modelist=keys(%modelist);
 
    if (!in_array(\@modelist,$mode)){
-      printf STDERR ("fifi mode=$mode parentobj=$parentobj\n");
       $self->LastMsg(ERROR,"invalid interal infomode");
       return(0);
    }
@@ -546,6 +547,113 @@ sub Validate
 
    return(1);
 }
+
+sub FinishWrite
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   my $userid=$self->getCurrentUserId();
+   my $requserid=effVal($oldrec,$newrec,"userid");
+   if ($userid ne $requserid &&
+       !($self->IsMemberOf("admin"))){
+      my $ia=getModuleObject($self->Config,"base::infoabo");
+      my $id=effVal($oldrec,$newrec,"id");
+      $ia->SetFilter({id=>\$id});
+      my ($iarec,$msg)=$ia->getOnlyFirst(qw(ALL));
+      if (defined($iarec)){
+         my $modeobj=$ia->getField("mode");
+         my $mode=$modeobj->FormatedDetail($iarec,"HtmlMail"); 
+         my $msg="";
+         if (!defined($oldrec) &&
+             (exists($newrec->{active}) && $newrec->{active}==1)){
+            # InfoAbo neu eingetragen im Status Aktiv (u.U. mit Verfallsdatum)
+            $msg.=$self->T("I have assigned a new InfoAbo to you.");
+            $msg.="\n\n";
+            $msg.=$self->T("The InfoAbo")." '".
+                  $mode.
+                  "'".$self->T(" for ")."'".
+                  $iarec->{targetname}.
+                  "' ".$self->T("is now <b>active</b> for you!");
+            if ((my $expiration=effVal($oldrec,$newrec,"expiration"))){
+               $msg.="\n\n";
+               $msg.=$self->T("The InfoAbo has an expiration date of")." ".
+                     $expiration." UTC";
+            }
+         }
+         if (defined($oldrec) &&
+             $oldrec->{active}==1 &&
+             exists($newrec->{active}) &&
+             $newrec->{active}==0){
+            # InfoAbo wurde deaktiviert
+            $msg.="\n\n" if ($msg ne "");
+            $msg.=$self->T("I have deactive a InfoAbo of you.");
+            $msg.="\n\n";
+            $msg.="The InfoAbo"." '".
+                  $mode.
+                  "'".$self->T(" for ")."'".
+                  $iarec->{targetname}.
+                  "' ".$self->T("is now <b>inactive</b> for you!");
+         }
+         if (defined($oldrec) &&
+             $oldrec->{active}==0 &&
+             exists($newrec->{active}) &&
+             $newrec->{active}==1){
+            # InfoAbo wurde aktiviert
+            $msg.="\n\n" if ($msg ne "");
+            $msg.=$self->T("I have activate a InfoAbo of you.");
+            $msg.="\n";
+            $msg.=$self->T("The InfoAbo")." '".
+                  $mode.
+                  "'".$self->T(" for ")."'".
+                  $iarec->{targetname}.
+                  "' ".$self->T("is now <b>active</b> for you!");
+            if ((my $expiration=effVal($oldrec,$newrec,"expiration"))){
+               $msg.="\n\n";
+               $msg.=$self->T("The InfoAbo has an expiration date of")." ".
+                     $expiration." UTC";
+            }
+         }
+         if ($msg eq "" &&
+             defined($oldrec) &&
+             exists($newrec->{expiration}) &&
+             $newrec->{expiration} ne $oldrec->{expiration} &&
+             $newrec->{expiration} ne ""){
+            # InfoAbo Verfallsdatum wurde eingetragen
+            $msg.="\n\n" if ($msg ne "");
+            my $expiration=effVal($oldrec,$newrec,"expiration");
+            $msg.=$self->T("I have assign a new expiration date ".
+                           "to your InfoAbo.");
+            $msg.="\n\n";
+            $msg.=$self->T("The InfoAbo")." '".
+                  $mode.
+                  "'".$self->T(" for ")."'".
+                  $iarec->{targetname}.
+                  "' ".$self->T("expires at")." ".$expiration." UTC !";
+         }
+         $msg="unkown change of InfoAbo" if ($msg eq "");
+         if ($ENV{SCRIPT_URI} ne ""){
+            $msg.="\n\nDirectLink:\n";
+            my $baseurl=$ENV{SCRIPT_URI};
+            $baseurl=~s/\/(auth|public)\/.*$//;
+            my $url=$baseurl;
+            $url.="/public/base/infoabo/ById/".effVal($oldrec,$newrec,"id");
+            $msg.=$url;
+            $msg.="\n\n";
+         }
+         my $wfa=getModuleObject($self->Config,"base::workflowaction");
+         $wfa->Notify("INFO",
+                      $self->T("change of your infoabo set"),
+                      ,$msg,
+                      emailfrom=>$userid,
+                      emailto=>$requserid,
+                      emailbcc=>$userid);
+      }
+   }
+   return($self->SUPER::FinishWrite($oldrec,$newrec));
+}
+
 
 sub Main
 {
@@ -641,6 +749,9 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","newin") if (!defined($rec));
+   if ($ENV{REMOTE_USER} eq "anonymous"){
+      return("header","default");
+   }
    return("header","default","relation","history","source");
 }
 
@@ -838,11 +949,9 @@ sub WinHandleInfoAboSubscribe
       }
       push(@flt,$localflt);
    }
-   #printf STDERR ("fifi flt=%s\n",Dumper(\@flt));
    $self->ResetFilter();
    $self->SetFilter(\@flt);
    my @cur=$self->getHashList(qw(parentobj refid active mode));
-   #printf STDERR ("fifi cur=%s\n",Dumper(\@cur));
 
    my $statusmsg="";
    my $statusbtn;
@@ -955,8 +1064,18 @@ sub isInfoAboAdmin
    my $self=shift;
 
    return($self->IsMemberOf($self->{admwrite}));
-
 }
+
+sub isContactAdmin
+{
+   my $self=shift;
+
+   my $userid=$self->getCurrentUserId();
+   my %a=$self->getGroupsOf($userid, [qw(RContactAdmin)], 'direct');
+   return(1) if (keys(%a)>0);
+   return(0);
+}
+
 
 
 sub expandDynamicDistibutionList
