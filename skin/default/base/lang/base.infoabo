@@ -46,3 +46,4 @@
 'I have assign a new expiration date to your InfoAbo.'=>{de=>'Ich habe ein Verfallsdatum bei einem Ihrer InfoAbos eingetragen.'},
 'Expiration-Date'=>{de=>'Verfallsdatum'},
 'expires at'=>{de=>'verfällt am'},
+'expiration to long in the past'=>{de=>'Verfallsdatum liegt zu weit in der Vergangenheit'},

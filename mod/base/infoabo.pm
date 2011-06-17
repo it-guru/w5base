@@ -470,6 +470,20 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
+
+   if (exists($newrec->{expiration}) &&
+       $newrec->{expiration} ne $oldrec->{expiration} &&
+       $newrec->{expiration} ne ""){
+      my $nowstamp=NowStamp("en");
+      my $expiration=effVal($oldrec,$newrec,"expiration");
+      my $duration=CalcDateDuration($nowstamp,$expiration);
+      if (!defined($duration) || $duration->{days}<0){
+         $self->LastMsg(ERROR,"expiration to long in the past");
+         return(undef);
+      }
+   }
+
+
    my $refid=effVal($oldrec,$newrec,"refid");
    if (!($refid=~m/^[a-z,0-9,_-]+$/)){
       $self->LastMsg(ERROR,"missing correct refid");
