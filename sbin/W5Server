@@ -19,45 +19,10 @@ use POSIX;
 
 @ISA=qw(RPC::Smart::Server kernel::App);
 
-
-sub rpcGetSSHkey
-{
-   my $self=shift;
-   if (! -d $ENV{HOME}){
-      return({exitcode=>1,msg=>"can't access home $ENV{HOME}"});
-   }
-   if (! -d $ENV{HOME}."/.ssh"){
-      return({exitcode=>1,msg=>"can't access home $ENV{HOME}/.ssh"});
-   }
-   if (! -r $ENV{HOME}."/.ssh/id_dsa.pub"){
-   }
-   if (!open(F,"<".$ENV{HOME}."/.ssh/id_dsa.pub")){
-      return({exitcode=>1,msg=>"can't access home $ENV{HOME}/.ssh/id_dsa.pub"});
-   }
-   my $key=join("",<F>);
-   $key=~s/\s*$//;
-   close(F);
-
-   return({exitcode=>0,key=>$key});
-}
-
-sub rpcReloadW5Server
-{
-   my $self=shift;
-   my $name=shift;
-
-   msg(DEBUG,"reload request for '$name' - active Servers:\n==>%s",
-             join("\n==>",keys(%{$self->{W5ServerProcess}})));
-   if (exists($self->{W5ServerProcess}->{$name})){
-      my $pid=$self->{W5ServerProcess}->{$name}->{AsyncID};
-      if (kill(1,$pid)){
-         return({exitcode=>0});
-      }
-      return({exitcode=>2,msg=>"fail to send reconfigure signal"});
-   }
-   return({exitcode=>1,msg=>"unknown or inactive server $name"});
-}
-
+#
+# This is the primary call to the W5Server. With this method all
+# event procedures can be initiated.
+#
 sub rpcCallEvent
 {
    my $self=shift;
@@ -107,6 +72,58 @@ sub rpcCallSerialEvent
    }
    return({exitcode=>1,nohandler=>1});
 }
+
+
+#
+# The call rpcGetSSHkey is designed to get access to the W5Server
+# SSH2 Public key from Web-Frontend. This is needed, to show this
+# information for users, which will allow the W5Server to access
+# to here servers.
+#
+sub rpcGetSSHkey
+{
+   my $self=shift;
+   if (! -d $ENV{HOME}){
+      return({exitcode=>1,msg=>"can't access home $ENV{HOME}"});
+   }
+   if (! -d $ENV{HOME}."/.ssh"){
+      return({exitcode=>1,msg=>"can't access home $ENV{HOME}/.ssh"});
+   }
+   if (! -r $ENV{HOME}."/.ssh/id_dsa.pub"){
+   }
+   if (!open(F,"<".$ENV{HOME}."/.ssh/id_dsa.pub")){
+      return({exitcode=>1,msg=>"can't access home $ENV{HOME}/.ssh/id_dsa.pub"});
+   }
+   my $key=join("",<F>);
+   $key=~s/\s*$//;
+   close(F);
+
+   return({exitcode=>0,key=>$key});
+}
+
+
+#
+# The call rpcReloadW5Server allows a reload of the W5Server to
+# ensure a new load of all modules. This function is not perfectly
+# tested!
+#
+sub rpcReloadW5Server
+{
+   my $self=shift;
+   my $name=shift;
+
+   msg(DEBUG,"reload request for '$name' - active Servers:\n==>%s",
+             join("\n==>",keys(%{$self->{W5ServerProcess}})));
+   if (exists($self->{W5ServerProcess}->{$name})){
+      my $pid=$self->{W5ServerProcess}->{$name}->{AsyncID};
+      if (kill(1,$pid)){
+         return({exitcode=>0});
+      }
+      return({exitcode=>2,msg=>"fail to send reconfigure signal"});
+   }
+   return({exitcode=>1,msg=>"unknown or inactive server $name"});
+}
+
 
 sub rpcProcessState
 {
@@ -730,7 +747,9 @@ sub run_dequeue
 {
    my $self = shift;
    my $bk=$self->{EventController}->ProcessTimer();
-   $self->CheckW5ServerProcess();
+   if (time() % 120 == 0){ # check only ever 120s
+      $self->CheckW5ServerProcess();
+   }
    if (defined($self->{EventSpool}) && keys(%{$self->{EventSpool}})){
       msg(DEBUG,"EventSpool: %s",join(",",keys(%{$self->{EventSpool}})));
       foreach my $control (values(%{$self->{EventSpool}})){
@@ -858,8 +877,6 @@ sub pre_loop_hook
    my $home=$ent[7];
    $ENV{HOME}=$home if (-d $home);
 
-#printf("fifi:%s\n",join(",",@{$self->commandline}));
-#exit(0);
    $self->RunScheduler();
    return(1);
 }
@@ -881,31 +898,38 @@ sub StartW5ServerProcess
    my $server=shift;
 
    my $srv=$self->{W5Server}->{$server};
-   my $srvcode;
-   eval('$srvcode=sub {
-                               $0="W5Sserver-".$server;
-                               sub start{
-                                   $srv->start();
-                               }
-                               sub process{
-                                   $srv->process();
-                               }
-                               sub hup{
-                                   $srv->reload();
-                               }
-                               sub shutdown{
-                                   msg(DEBUG,"Server $srv normal shutdown");
-                                   $srv->end();
-                               }
-                               $SIG{HUP}=\&hup;
-                               $SIG{INT}=\&shutdown;
-                               msg(DEBUG,"srvobj=$srv");
-                               $self->W5ServerConnect();
-                               start(); 
-                               process(); 
-                               return({exitcode=>0});
-                            }');
-   my $sched=$self->async($srvcode);
+   my $srvsub;
+   my $srvcode=<<EOF;
+      \$0="W5Sserver-".\$server;
+      sub start{
+          \$srv->start();
+      }
+      sub process{
+          \$srv->process();
+      }
+      sub hup{
+          \$srv->reload();
+      }
+      sub shutdown{
+          msg(DEBUG,"Server \$srv normal shutdown");
+          \$srv->end();
+      }
+      \$SIG{HUP}=\\&hup;
+      \$SIG{INT}=\\&shutdown;
+      msg(DEBUG,"srvobj=\$srv");
+      eval('
+         \$self->W5ServerConnect();
+         start(); 
+         process(); 
+      ');
+      if (\$@ ne ""){
+         \$self->NotifyAdmin("$server crash",
+                            "\$@");
+      }
+EOF
+   eval("\$srvsub=sub { $srvcode return({exitcode=>0}); }");
+
+   my $sched=$self->async($srvsub);
    $self->{W5ServerProcess}->{$server}=$sched;
 }
 
@@ -918,8 +942,9 @@ sub CheckW5ServerProcess
          msg(ERROR,"W5Server $server was crashed - now restarting");
          $self->NotifyAdmin("W5Server $server unexpected termination",
                             "The W5Server $server has been terminated ".
-                            "unexpected. Now trying to restart. ".
-                            "Sorry, but no further informations available");
+                            "unexpected. Now trying to restart.\n\n".
+                            "Sorry, but no further informations available ".
+                            "from this point of view.");
          $self->StartW5ServerProcess($server);
       }
    }

@@ -66,12 +66,17 @@ sub doCleanup
    my $self=shift;
 
    my $CleanupJobLog=$self->getParent->Config->Param("CleanupJobLog");
-
    $CleanupJobLog="<now-84d" if ($CleanupJobLog eq "");
-
-   msg(DEBUG,"(%s) Processing doCleanup",$self->Self);
-   my $j=$self->getParent->getPersistentModuleObject("base::joblog");
+   msg(DEBUG,"(%s) Processing doCleanup base::joblog",$self->Self);
+   my $j=getModuleObject($self->Config,"base::joblog");
    $j->BulkDeleteRecord({'mdate'=>$CleanupJobLog});
+
+   my $CleanupInfoAbo=$self->getParent->Config->Param("CleanupInfoAbo");
+   $CleanupInfoAbo="<now-56d" if ($CleanupInfoAbo eq "");
+   msg(DEBUG,"(%s) Processing doCleanup base::infoabo",$self->Self);
+   my $ia=getModuleObject($self->Config,"base::infoabo");
+   $ia->BulkDeleteRecord({'expiration'=>$CleanupInfoAbo});
+
 }
 
 
