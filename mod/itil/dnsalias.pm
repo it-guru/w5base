@@ -19,7 +19,6 @@ package itil::dnsalias;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use Data::Dumper;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
