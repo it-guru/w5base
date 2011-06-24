@@ -1,7 +1,7 @@
 Summary: W5Base start stop and config of apache web server
 Name: W5Base-apache-RH55-64Bit
 Version: 1.0
-Release: 14
+Release: 15
 License: GPL
 Group: Applications/Web
 Distribution: RedHat 5.5 AppCom Linux
@@ -14,6 +14,7 @@ Source1: httpd-devel-2.2.3-nativ.tgz
 Source2: apr-devel-1.2.7-nativ.tgz
 Source3: apr-util-devel-1.2.7-nativ.tgz
 Source3: mkcert.tgz
+Source4: wiwauth.tgz
 Provides: /bin/sh
 BuildPreReq: wget, unzip, tar
 
@@ -28,6 +29,7 @@ In detail, this package handels:
 - create a default conf /etc/acache.conf
 - create a default apps/etc/aetools.conf and ensure rights/ownership
 - install some default auth-handlers for mod_auth_ae at /apps/apache/auth
+- install wiw.pl auth handler at /apps/apache/auth
 - install a self signed cert handling script at /apps/etc/ssl
 - install snakeoil certifiactes at /apps/etc/ssl
 
@@ -90,6 +92,9 @@ install $RPM_BUILD_DIR/samba-3.0.37/examples/smb3passchk/smb3passchk $RPM_BUILD_
 install -d $RPM_BUILD_ROOT/apps/etc/ssl -g daemon -o w5base -m 2750
 cd $RPM_BUILD_ROOT/apps/etc/ssl
 zcat $RPM_SOURCE_DIR/mkcert.tgz | tar -xvf -
+cd $RPM_BUILD_ROOT
+zcat $RPM_SOURCE_DIR/wiwauth.tgz | tar -xvf -
+
 
 
 %files
@@ -100,6 +105,7 @@ zcat $RPM_SOURCE_DIR/mkcert.tgz | tar -xvf -
 /apps/etc/ssl/*
 /apps/apache/lib/ae_module.la
 /apps/apache/auth/httpforward.sh
+/apps/apache/auth/wiw.pl
 /apps/apache/auth/smb3passchk
 
 %config(noreplace) /etc/acache.conf
