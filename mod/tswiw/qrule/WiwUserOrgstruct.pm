@@ -193,10 +193,21 @@ sub qcheckRecord
             return($errorlevel,undef) if (defined($bk));
          }
          if ($#bossgrpsrcid!=-1){
-            printf STDERR ("WARN: (fifi) ".
-                           "need to remove RBoss from User '%s' ".
-                           "on group touid='%s'\n",
-                           $urec->{email},join(",",@bossgrpsrcid));
+            msg(WARN,"removing RBoss from User '%s' on group touid='%s'",
+                     $urec->{email},join(",",@bossgrpsrcid));
+            my $lnkgrpuserrole=getModuleObject($Config,"base::lnkgrpuserrole");
+            my $lnkgrpuserroleop=$lnkgrpuserrole->Clone();
+            $grp->SetFilter({srcid=>\@bossgrpsrcid,
+                             srcsys=>\$self->{SRCSYS}});
+            foreach my $rgrprec ($grp->getHashList("grpid")){
+               $lnkgrpuserrole->ResetFilter();
+               $lnkgrpuserrole->SetFilter({userid=>\$urec->{userid},
+                                           grpid=>\$rgrprec->{grpid},
+                                           nativrole=>\'RBoss'});
+               foreach my $lnkrec ($lnkgrpuserrole->getHashList("ALL")){
+                  $lnkgrpuserroleop->ValidatedDeleteRecord($lnkrec);
+               }
+            }
          }
 
 
