@@ -359,6 +359,16 @@ sub isChangeManager
    $mandator=[$mandator] if (!ref($mandator) eq "ARRAY");
    return(1) if ($self->getParent->IsMemberOf($mandator,"RCHManager","down"));
    return(1) if ($self->getParent->IsMemberOf("admin"));
+   my $aid=$WfRec->{affectedapplicationid};
+   $aid=[$aid] if (ref($aid) ne "ARRAY");
+   my $chmmgmt=getModuleObject($self->getParent->Config,"itil::chmmgmt");
+   $chmmgmt->SetFilter({id=>$aid});
+   foreach my $arec ($chmmgmt->getHashList(qw(chmgrteamid))){
+      if ($arec->{chmgrteamid} ne ""){
+         return(1) if ($self->getParent->IsMemberOf($arec->{chmgrteamid}));
+      }
+   }
+   
 
    return(0);
 }
