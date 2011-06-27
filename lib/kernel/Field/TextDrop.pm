@@ -18,7 +18,6 @@ package kernel::Field::TextDrop;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 @ISA    = qw(kernel::Field);
 
