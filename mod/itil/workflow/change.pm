@@ -257,7 +257,6 @@ sub getFollowupTargetUserids
          my $chm=getModuleObject($self->Config,"itil::chmmgmt"); 
          $chm->SetFilter({id=>$WfRec->{affectedapplicationid}});
          foreach my $chmrec ($chm->getHashList(qw(chmgrteamid))){
-            msg(INFO,"found changemanager team '$chmrec->{chmgrteamid}'");
             if ($chmrec->{chmgrteamid} ne ""){
                $usrgrp->ResetFilter();
                $usrgrp->SetFilter({grpid=>\$chmrec->{chmgrteamid},
@@ -270,10 +269,9 @@ sub getFollowupTargetUserids
                }
             }
          }
-         push(@{$param->{addcctarget}},"11634953080001");
+         push(@{$param->{addcctarget}},"11634953080001"); # in test phase add hv
       }
    }
-   printf STDERR ("fifi param=%s\n",Dumper($param));
 }
 
 
