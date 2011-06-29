@@ -20,7 +20,6 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfClass;
-use Data::Dumper;
 use itil::workflow::change;
 use AL_TCom::lib::workflow;
 @ISA=qw(itil::workflow::change AL_TCom::lib::workflow);
