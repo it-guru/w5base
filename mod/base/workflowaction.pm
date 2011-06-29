@@ -547,6 +547,20 @@ sub NotifyForward
       $adr{emailcc}=[] if (!defined($adr{emailcc}));
       push(@{$adr{emailcc}},@{$param{sendcc}});
    }
+
+   if (defined($param{addcctarget}) && ref($param{addcctarget}) eq "ARRAY"){
+      my $u=getModuleObject($self->Config,"base::user");
+      foreach my $uid (@{$param{addcctarget}}){
+         $u->ResetFilter();
+         $u->SetFilter(userid=>\$uid);
+         my ($rec,$msg)=$u->getOnlyFirst(qw(email));
+         if (defined($rec) && $rec->{email} ne ""){
+            $adr{emailcc}=[] if (!defined($adr{emailcc}));
+            push(@{$adr{emailcc}},$rec->{email});
+         }
+      }
+   }
+
    my $emailpostfix="";
    if ($baseurl ne ""){
       my $lang=$self->Lang();
