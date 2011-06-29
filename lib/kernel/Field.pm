@@ -63,6 +63,7 @@ use kernel::Field::RealEditor;
 use kernel::Field::Import;
 use kernel::Field::Dynamic;
 use kernel::Field::Container;
+use kernel::Field::ContainerList;
 use kernel::Field::KeyHandler;
 use kernel::Field::KeyText;
 use kernel::Field::Mandator;
@@ -1028,6 +1029,7 @@ sub FormatedStoredWorkspace
       $disp.=$self->FormatedResult({$var=>$curval[0]},"HtmlDetail");
    }
    foreach my $var (@curval){
+      $var=~s/"/&quote;/g;
       $d.="<input type=hidden name=Formated_$name value=\"$var\">";
    }
    $d=$disp.$d;
