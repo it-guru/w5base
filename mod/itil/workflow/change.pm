@@ -252,7 +252,28 @@ sub getFollowupTargetUserids
       foreach my $arec ($appl->getHashList(qw(tsmid))){
          push(@{$param->{addtarget}},$arec->{tsmid}) if ($arec->{tsmid} ne "");
       }
+      if ($param->{note}=~m/\[chm\.\S+\]/){
+         my $usrgrp=getModuleObject($self->Config,"base::lnkgrpuserrole"); 
+         my $chm=getModuleObject($self->Config,"itil::chmmgmt"); 
+         $chm->SetFilter({id=>$WfRec->{affectedapplicationid}});
+         foreach my $chmrec ($chm->getHashList(qw(chmgrteamid))){
+            msg(INFO,"found changemanager team '$chmrec->{chmgrteamid}'");
+            if ($chmrec->{chmgrteamid} ne ""){
+               $usrgrp->ResetFilter();
+               $usrgrp->SetFilter({grpid=>\$chmrec->{chmgrteamid},
+                                   cistatusid=>[4,5],
+                                   grpcistatusid=>[4],
+                                   nativrole=>[orgRoles()]});
+               foreach my $lnkrec ($usrgrp->getHashList(qw(userid))){
+                  msg(INFO,"add userid '$lnkrec->{userid}'");
+                  push(@{$param->{addcctarget}},$lnkrec->{userid});
+               }
+            }
+         }
+         push(@{$param->{addcctarget}},"11634953080001");
+      }
    }
+   printf STDERR ("fifi param=%s\n",Dumper($param));
 }
 
 
