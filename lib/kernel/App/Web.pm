@@ -1524,7 +1524,7 @@ sub HtmlPersistentVariables
       my @val=Query->Param($var);
       @val=("") if ($#val==-1);
       foreach my $val (@val){
-         $val=~s/"/&quote;/g;
+         $val=~s/"/&quot;/g;
          $d.="<input type=hidden name=$var id=$var value=\"$val\">\n";
       }
    }
