@@ -57,6 +57,7 @@ sub NotifyByScriptToSVNHost
       my $pr=getModuleObject($self->Config,"base::projectroom");
      
       $pr->SetFilter({id=>\$param{id}});
+      my %grplist;
       foreach my $prrec ($pr->getHashList(qw(id name contacts))){
          my %acl;
          foreach my $c (@{$prrec->{contacts}}){
@@ -71,9 +72,11 @@ sub NotifyByScriptToSVNHost
             if ($c->{target} eq "base::grp"){
                if (in_array($c->{roles},"SVNread")){
                   $acl{grprd}->{$c->{targetid}}++;
+                  $grplist{$c->{targetid}}=[];
                }
                if (in_array($c->{roles},"SVNwrite")){
                   $acl{grpwr}->{$c->{targetid}}++;
+                  $grplist{$c->{targetid}}=[];
                }
             }
          }
@@ -83,6 +86,14 @@ sub NotifyByScriptToSVNHost
          printf CMD ("[%s:/]\n",$prrec->{name});
          printf CMD ("%s\n",$self->aclToSVNRule(\%acl));
          printf CMD ("END: projectroom\n");
+      }
+      if (keys(%grplist)){ 
+         printf CMD ("\nBEGIN: groups\n");
+         foreach my $grpid (keys(%grplist)){
+            printf CMD ("GRP$grpid = %s\n",
+                        join(", ",$self->getGroupMemberAccounts($grpid)));
+         }
+         printf CMD ("END: groups\n");
       }
       close(CMD);
    }
@@ -100,12 +111,12 @@ sub aclToSVNRule
    foreach my $k (keys(%$acl)){
       if ($k eq "grpwr"){
          foreach my $grpid (keys(%{$acl->{$k}})){
-            $d.="\@".$self->getGroupnameByGroupid($grpid)." = wr\n";
+            $d.="\@GRP$grpid = wr\n";
          }
       }
       if ($k eq "grprd"){
          foreach my $grpid (keys(%{$acl->{$k}})){
-            $d.="\@".$self->getGroupnameByGroupid($grpid)." = rd\n";
+            $d.="\@GRP$grpid = rd\n";
          }
       }
       if ($k eq "usrwr"){
@@ -142,18 +153,22 @@ sub getAccountsByUserid
    return(@acc);
 }
 
-sub getGroupnameByGroupid
+sub getGroupMemberAccounts
 {
    my $self=shift;
    my $grpid=shift;
-   my $grp=$self->getPersistentModuleObject("base::grp");
-   $grp->SetFilter({grpid=>\$grpid});
-   my ($grprec)=$grp->getOnlyFirst(qw(fullname));
+   my $lgrp=$self->getPersistentModuleObject("base::lnkgrpuserrole");
+   $lgrp->SetFilter({grpid=>\$grpid,cistatusid=>[4],grpcistatusid=>[4]});
 
-   my $grpname=$grprec->{fullname};
-   $grpname=~s/\.\.//g;
-   $grpname=~s/\///g;
-   return($grpname);
+   my @userids=();
+   foreach my $lnkrec ($lgrp->getHashList(qw(userid))){
+      push(@userids,$lnkrec->{userid});
+   }
+   my $ua=$self->getPersistentModuleObject("base::useraccount");
+   $ua->SetFilter({userid=>\@userids});
+   @userids=$ua->getVal("account");
+   
+   return(@userids);
 }
 
 
