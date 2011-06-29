@@ -36,7 +36,7 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("NotifyByScriptToSVNHost","NotifyByScriptToSVNHost",timeout=>120);
+   $self->RegisterEvent("NotifyByScriptToSVNHost","NotifyByScriptToSVNHost",timeout=>300);
    return(1);
 }
 
