@@ -159,6 +159,7 @@ sub UTF8toLatin1
 sub in_array
 {
    my ($arr,$search_for) = @_;
+   $arr=[$arr] if (ref($arr) ne "ARRAY");
    my %items = map {$_ => 1} @$arr; # create a hash out of the array values
    if (ref($search_for) eq "ARRAY"){
       foreach my $search_for_loop (@$search_for){
