@@ -69,6 +69,10 @@ sub new
                 dataobjattr   =>'grp.grpid'),
 
       new kernel::Field::Link(
+                name          =>'grpcistatusid',
+                dataobjattr   =>'grp.cistatus'),
+
+      new kernel::Field::Link(
                 name          =>'email',
                 dataobjattr   =>'contact.email'),
 
