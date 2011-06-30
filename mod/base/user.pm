@@ -1212,7 +1212,10 @@ sub isViewValid
                 userid userro control usersubst header qc interview));
    }
    my $secstate=$self->getCurrentSecState();
-   if ($rec->{userid}!=$userid){
+
+   if ($rec->{userid}!=$userid && 
+       !(($rec->{managedbyid}!=1 && $rec->{managedbyid}!=0) &&
+         $self->IsMemberOf($rec->{managedbyid},["RContactAdmin"],"up"))){
       if ($secstate<2){
          @gl=grep(/^(name|header)$/,@gl);
       }
