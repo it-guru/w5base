@@ -667,7 +667,7 @@ sub Notify
          }
       }
    }
-   foreach my $target (qw(emailto emailcc emailbcc)){
+   foreach my $target (qw(emailto emailcc emailbcc emailtemplate)){
       if (exists($param{$target})){
          $mailset{$target}=$param{$target};
       }
