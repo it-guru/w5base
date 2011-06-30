@@ -75,10 +75,10 @@ sub doNotify
       "Mit freundlichen Grüssen\n\n".
       $urec->{surname}." ".$urec->{givenname};
    my $wfa=getModuleObject($self->Config,"base::workflowaction");
-   $wfa->Notify("","Gewinnspiel Motorola Xoom",$msg,
-                emailfrom=>$urec->{email},
-                emailtemplate=>'sendmailnativ',
-                emailto=>'online.redaktion@telekom.de',
-                emailbcc=>[11634953080001,$urec->{userid}]);
+#   $wfa->Notify("","Gewinnspiel Motorola Xoom",$msg,
+#                emailfrom=>$urec->{email},
+#                emailtemplate=>'sendmailnativ',
+#                emailto=>'online.redaktion@telekom.de',
+#                emailbcc=>[11634953080001,$urec->{userid}]);
 }
 1;
