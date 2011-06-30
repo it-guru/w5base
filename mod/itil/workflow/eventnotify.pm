@@ -77,6 +77,47 @@ sub Validate
                           "[de:]\n".
                           "keine Kurzzusammenfassung für dieses Ereignis.\n";
    }
+   my $eventstatrespo=effVal($oldrec,$newrec,"eventstatrespo");
+   if ($eventstatrespo ne "" && $eventstatrespo ne "EVre.analyse"){
+printf STDERR ("fifi newrec=%s\n",Dumper($newrec));
+      if ($eventstatrespo eq "EVre.itprov"){
+         if (effVal($oldrec,$newrec,"eventspecrespocustomerid") ne ""){
+            $self->LastMsg(ERROR,
+                           "if IT-Provider is responsible, ".
+                           "it is not allowed to set a specific customer");
+            return(0);
+         }
+printf STDERR ("fifi eventspecrespoitprovid=%s\n",effVal($oldrec,$newrec,"eventspecrespoitprovid"));
+         if (effVal($oldrec,$newrec,"eventspecrespoitprovid") eq ""){
+            $self->LastMsg(ERROR,
+                           "if IT-Provider is responsible, ".
+                           "you need to set a specific IT-Provider");
+            return(0);
+         }
+      }
+
+      if ($eventstatrespo eq "EVre.customer"){
+         if (effVal($oldrec,$newrec,"eventspecrespocustomerid") eq ""){
+            $self->LastMsg(ERROR,
+                           "if customer is responsible, ".
+                           "you need to set a specific customer");
+            return(0);
+         }
+         if (effVal($oldrec,$newrec,"eventspecrespoitprovid") ne ""){
+            $self->LastMsg(ERROR,
+                           "if customer is responsible, ".
+                           "it is not allowed to set a specific IT-Provider");
+            return(0);
+         }
+      }
+      if ($eventstatrespo eq "EVre.both"){
+         if (effVal($oldrec,$newrec,"eventspecrespocustomerid") eq "" ||
+             effVal($oldrec,$newrec,"eventspecrespoitprovid") eq ""){
+            $self->LastMsg(ERROR,"missing specific responsible");
+            return(0);
+         }
+      }
+   }
 
 
    return($self->SUPER::Validate($oldrec,$newrec));
@@ -512,6 +553,32 @@ sub getDynamicFields
                                  'EVre.analyse'
                                  ],
                 label         =>'Event responsibility',
+                container     =>'headref'),
+
+      new kernel::Field::Group(
+                name          =>'eventspecrespocustomer',
+                AllowEmpty    =>1,
+                group         =>'eventnotifystat',
+                label         =>'specifice responsible at customer',
+                vjoinon       =>'eventspecrespocustomerid'),
+
+      new kernel::Field::Link(
+                name          =>'eventspecrespocustomerid',
+                group         =>'eventnotifystat',
+                label         =>'specifice responsible at customer ID',
+                container     =>'headref'),
+
+      new kernel::Field::Group(
+                name          =>'eventspecrespoitprov',
+                AllowEmpty    =>1,
+                group         =>'eventnotifystat',
+                label         =>'specifice responsible at IT-Provider',
+                vjoinon       =>'eventspecrespoitprovid'),
+
+      new kernel::Field::Link(
+                name          =>'eventspecrespoitprovid',
+                group         =>'eventnotifystat',
+                label         =>'specifice responsible at IT-Provider ID',
                 container     =>'headref'),
 
 
