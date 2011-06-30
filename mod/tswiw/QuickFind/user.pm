@@ -50,6 +50,7 @@ sub CISearchResult
    if (grep(/^citswiwuser$/,@$stag) &&
        (!defined($tag) || grep(/^$tag$/,qw(wiw)))){
       my $flt=[{surname=>"*$searchtext*"},
+               {uid=>\$searchtext},
                {email=>\"*$searchtext*"}];
       my $wiwuser=getModuleObject($self->getParent->Config,"tswiw::user");
       $wiwuser->SetFilter($flt);
