@@ -85,6 +85,28 @@ sub new
                 vjoinconcat   =>"\n\n",
                 label         =>'Businessteam TL',
                 onRawValue    =>\&calcCleanBSTL),
+                
+	  new kernel::Field::Text(
+                name          =>'headofdepartmentclearname',
+                readonly      =>1,
+                depend        =>'businessteamid',
+                group         =>'topagaddinfos',
+                htmlwidth     =>'200px',
+                htmlnowrap    =>1,
+                vjoinconcat   =>"\n\n",
+                label         =>'Head of Department',
+                onRawValue    =>\&calcCleanHeadOfDept),
+                                
+	  new kernel::Field::Text(
+                name          =>'headofresortclearname',
+                readonly      =>1,
+                depend        =>'businessteamid',
+                group         =>'topagaddinfos',
+                htmlwidth     =>'200px',
+                htmlnowrap    =>1,
+                vjoinconcat   =>"\n\n",
+                label         =>'Head of Resort',
+                onRawValue    =>\&calcCleanHeadOfRes),                
    );
 
    $self->setDefaultView(qw(name customerapplname 
@@ -183,8 +205,69 @@ sub calcCleanBSTL
    foreach my $urec ($u->getHashList(qw(phonename))){
       $u{$urec->{phonename}}++;
    }
+   
    return([sort(keys(%u))]);
 }
+
+
+sub calcCleanHeadOfDept
+{
+   my $self=shift;
+   my $current=shift;
+   my $id=$current->{id};
+   my $app=$self->getParent();
+   my $targetfld=$app->getField("businessteamid",$current);
+   my $targetid=$targetfld->RawValue($current);
+   $targetid=[$targetid] if (ref($targetid) ne "ARRAY");
+   
+   my $grp=$app->getPersistentModuleObject("base::grp");
+   my $businessdepartid=$grp->getParentGroupIdByType($targetid->[0],"depart");
+   
+   my %u=();
+   if ($businessdepartid ne ""){
+      my $lgur=$app->getPersistentModuleObject("base::lnkgrpuserrole");
+      $lgur->SetFilter({grpid=>$businessdepartid, nativrole=>'RBoss'});
+      foreach my $lgurrec ($lgur->getHashList(qw(userid))){
+      		my $u=$app->getPersistentModuleObject("base::user");
+      		$u->SetFilter({userid=>$lgurrec->{userid}});
+      		foreach my $urec ($u->getHashList(qw(phonename))){
+         		$u{$urec->{phonename}}++;
+      		}
+      }
+   }
+   
+   return([sort(keys(%u))]);
+}
+
+
+sub calcCleanHeadOfRes
+{
+   my $self=shift;
+   my $current=shift;
+   my $id=$current->{id};
+   my $app=$self->getParent();
+   my $targetfld=$app->getField("businessteamid",$current);
+   my $targetid=$targetfld->RawValue($current);
+   $targetid=[$targetid] if (ref($targetid) ne "ARRAY");
+   
+   my $grp=$app->getPersistentModuleObject("base::grp");
+   my $businessdepartid=$grp->getParentGroupIdByType($targetid->[0],"resort");
+   
+   my %u=();
+   if ($businessdepartid ne ""){
+      my $lgur=$app->getPersistentModuleObject("base::lnkgrpuserrole");
+      $lgur->SetFilter({grpid=>$businessdepartid, nativrole=>'RBoss'});
+      foreach my $lgurrec ($lgur->getHashList(qw(userid))){
+      		my $u=$app->getPersistentModuleObject("base::user");
+      		$u->SetFilter({userid=>$lgurrec->{userid}});
+      		foreach my $urec ($u->getHashList(qw(phonename))){
+         		$u{$urec->{phonename}}++;
+      		}
+      }
+   }
+   
+   return([sort(keys(%u))]);
+}	
 
 sub calcSystemLocations
 {

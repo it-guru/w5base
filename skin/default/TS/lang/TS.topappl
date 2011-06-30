@@ -5,3 +5,5 @@
 'Businessteam TL'=>{de=>'Betriebsteamleiter'},
 'Operationsystem class'=>{de=>'Betriebsystemklasse'},
 'Customer Application name'=>{de=>'Kundenanwendungsbezeichnung'},
+'Head of Department'=>{de=>'Fachbereichsleiter'},
+'Head of Resort'=>{de=>'Abteilungsleiter'},
