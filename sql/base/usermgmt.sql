@@ -87,7 +87,7 @@ CREATE TABLE contact (
   modifyuser bigint(20) NOT NULL default '0',
   editor varchar(100) NOT NULL default '',
   realeditor varchar(100) NOT NULL default '',
-  email varchar(128),
+  email varchar(128),managedbygrp bigint(20) default '1',
   options text NOT NULL,comments blob,
   timezone varchar(40) NOT NULL default 'CET',
   lang varchar(10),usertyp varchar(10) default 'user',
@@ -113,7 +113,7 @@ CREATE TABLE contact (
   UNIQUE email(email),
   UNIQUE fullname (fullname),
   UNIQUE posix_identifier (posix_identifier),
-  KEY surname (surname),
+  KEY surname (surname),KEY managedbygrp(managedbygrp),
   KEY givenname (givenname),key(cistatus),
   KEY office_location (office_location),
   KEY private_location (private_location)
@@ -307,4 +307,4 @@ alter table contact add dateofvsnfd_edt     varchar(128) default NULL;
 alter table contact add dateofsecretpro     datetime     default NULL;
 alter table contact add dateofsecretpro_edt varchar(128) default NULL;
 alter table contact add killtimeout int(22) default '1000';
-alter table contact add managedbygrp bigint(20) default '1';
+alter table contact add is_vsnfdsafe int(1) default '0';
