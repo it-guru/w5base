@@ -289,6 +289,22 @@ sub new
                 label         =>'Event-End day',
                 depend        =>['eventend']),
                                   
+      new kernel::Field::Date(
+                name          =>'invoicedate',
+                htmlwidth     =>'80px',
+                htmldetail    =>sub {
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(1) if ($current->{stateid}>15);
+                   return(0);
+                },
+                xlswidth      =>'18',
+                group         =>'state',
+                label         =>'invoice date',
+                dataobjattr   =>'wfhead.invoicedate'),
+                                   
       new kernel::Field::Duration(
                 name          =>'eventduration',
                 htmlwidth     =>'110px',
@@ -1425,6 +1441,12 @@ sub Validate
          return(0);
       }
    }
+   # handling of invoice reprocessing
+   if ($eventend ne "" && effVal($oldrec,$newrec,"invoicedate") eq "" &&
+       !exists($newrec->{invoicedate})){
+      $newrec->{invoicedate}=$eventend;
+   }
+   ######################################################################
    my $name=effVal($oldrec,$newrec,"name");
    if ($name=~m/^\s*$/){
       if ($self->LastMsg()==0){

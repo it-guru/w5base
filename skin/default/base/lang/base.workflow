@@ -23,6 +23,7 @@
 'postponed until'=>{de=>'Zurückgestellt bis'},
 'Event-Start'=>{de=>'Ereignis Beginn'},
 'Event-End'=>{de=>'Ereignis Ende'},
+'invoice date'=>{de=>'Faktura-Referenzzeitpunkt'},
 'Event-Start day'=>{de=>'Ereignis Beginn Tag'},
 'Event-End day'=>{de=>'Ereignis Ende Tag'},
 'Event-Duration Minutes'=>{de=>'Ereignis Dauer in Minuten'},
