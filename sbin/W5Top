@@ -61,17 +61,16 @@ if (!$curconfig->readconfig("$FindBin::Bin/..",$configname)){
 
 my $MyClient=new RPC::Smart::Client(%ClientParam);
 
-if (! defined($MyClient->Connect())){
-   msg(ERROR,"can't connect to server");
-   exit(1);
-}
 if (!defined($W5V2::W5Server)){
-   my %ClientParam;
    $ClientParam{'PeerAddr'}=$curconfig->Param("W5SERVERHOST");
    $ClientParam{'PeerPort'}=$curconfig->Param("W5SERVERPORT");
    $W5V2::W5Server=new RPC::Smart::Client(%ClientParam);
    $W5V2::W5Server->Connect();
 
+}
+if (! defined($MyClient->Connect())){
+   msg(ERROR,"can't connect to server");
+   exit(1);
 }
 $W5V2::OperationContext="W5Server";
 $W5V2::Query=new kernel::cgi({});
