@@ -1,10 +1,10 @@
 Summary: SOAP::Lite AppCom perl Modules at /apps
 Name: apps-perlmod-SOAP-Lite-RH55
-Version: 0.710.10
+Version: 0.710.08
 Release: 1
 License: GPL
 Group: Applications/Web
-Source0: http://search.cpan.org/CPAN/authors/id/M/MK/MKUTTER/SOAP-Lite-0.710.10.tar.gz
+Source0: http://search.cpan.org/CPAN/authors/id/M/MK/MKUTTER/SOAP-Lite-0.710.08.tar.gz
 Distribution: RedHat 5.5 AppCom Linux
 Vendor: T-Systems
 Packager: Vogler Hartmut <hartmut.vogler@t-systems.com>
@@ -18,17 +18,17 @@ This installation can be used in AppCom enviroments
 (or similar cluster enviroments) with rpm --dbpath /apps/rpm
 
 %prep
-rm -rf $RPM_BUILD_DIR/SOAP-Lite-0.710.10
-zcat $RPM_SOURCE_DIR/SOAP-Lite-0.710.10.tar.gz | tar -xvf -
+rm -rf $RPM_BUILD_DIR/SOAP-Lite-0.710.08
+zcat $RPM_SOURCE_DIR/SOAP-Lite-0.710.08.tar.gz | tar -xvf -
 
 %build
-cd $RPM_BUILD_DIR/SOAP-Lite-0.710.10
+cd $RPM_BUILD_DIR/SOAP-Lite-0.710.08
 %{__perl} Makefile.PL PREFIX=/apps/perlmod
 make
 
 %install
 rm -rf $RPM_BUILD_ROOT
-cd $RPM_BUILD_DIR/SOAP-Lite-0.710.10
+cd $RPM_BUILD_DIR/SOAP-Lite-0.710.08
 pwd
 make pure_install PERL_INSTALL_ROOT=$RPM_BUILD_ROOT
 find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} ';'
@@ -38,7 +38,7 @@ chmod -R u+w $RPM_BUILD_ROOT/*
 
 
 %check || :
-cd $RPM_BUILD_DIR/SOAP-Lite-0.710.10
+cd $RPM_BUILD_DIR/SOAP-Lite-0.710.08
 #make test
 
 %clean
@@ -56,4 +56,5 @@ rm -rf $RPM_BUILD_ROOT
 /apps/perlmod/lib/perl5/site_perl/5.8.8/Apache/XMLRPC/Lite.pm
 /apps/perlmod/lib/perl5/site_perl/5.8.8/IO/*
 /apps/perlmod/lib/perl5/site_perl/5.8.8/UDDI/*
+/apps/perlmod/lib/perl5/site_perl/5.8.8/OldDocs/*
 /apps/perlmod/share/man/man*/*
