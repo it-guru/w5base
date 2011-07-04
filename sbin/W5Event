@@ -57,27 +57,24 @@ if (!$curconfig->readconfig("$FindBin::Bin/..",$configname)){
    $ClientParam{'PeerPort'}=$port;
 }
 
-my $MyClient=new RPC::Smart::Client(%ClientParam);
-my $self=new kernel::App(Config=>$curconfig);
-if (!defined($W5V2::Translation{$self})){
-   $W5V2::Translation{$self}={self=>$self,tab=>{}};
-}
-$W5V2::Translation=$W5V2::Translation{$self};
 
 
-if (! defined($MyClient->Connect())){
-   msg(ERROR,"can't connect to server");
-   exit(1);
-}
-#my $res=$MyClient->Call($method,@ARGV);
-#printf("%s",Dumper($res));
 if (!defined($W5V2::W5Server)){
-   my %ClientParam;
    $ClientParam{'PeerAddr'}=$self->Config->Param("W5SERVERHOST");
    $ClientParam{'PeerPort'}=$self->Config->Param("W5SERVERPORT");
    $W5V2::W5Server=new RPC::Smart::Client(%ClientParam);
    $W5V2::W5Server->Connect();
 }
+my $MyClient=new RPC::Smart::Client(%ClientParam);
+if (! defined($MyClient->Connect())){
+   msg(ERROR,"can't connect to server");
+   exit(1);
+}
+my $self=new kernel::App(Config=>$curconfig);
+if (!defined($W5V2::Translation{$self})){
+   $W5V2::Translation{$self}={self=>$self,tab=>{}};
+}
+$W5V2::Translation=$W5V2::Translation{$self};
 $W5V2::Query=new kernel::cgi({});
 
 my $EventController=new kernel::EventController(Config=>$curconfig);
