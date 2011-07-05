@@ -648,8 +648,7 @@ sub Normalize
        !($rec->{address1}=~m/(old|alt)/i)){
       $rec->{address1}=~s/Reichs\S+/Reichsstra\xDFe/i;
    }
-   if (($rec->{location}=~m/bietigheim/i) &&
-       $rec->{zipcode} eq "74321"){
+   if ($rec->{location}=~m/Bietigheim/i){
       $rec->{location}="Bietigheim-Bissingen";
    }
    if (defined($rec->{address1})){

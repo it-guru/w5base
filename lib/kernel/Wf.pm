@@ -97,12 +97,13 @@ sub addWorkflow2Mail
             if ($nr==0){
                push(@$emailsubheader,FormatSubHeader($self,$wfrec));
                push(@$emailhead,$wfrec->{name});
-               if ($outoffscope>0){
-                  push(@$emailhead,undef);
-                  push(@$emailsubheader,undef);
-                  push(@$emailtext,"...");
-                  push(@$emailpostfix,undef);
-               }
+            #   if ($outoffscope>0){
+            #      push(@$emailtstamp,undef);
+            #      push(@$emailhead,undef);
+            #      push(@$emailsubheader,undef);
+            #      push(@$emailtext,"...");
+            #      push(@$emailpostfix,undef);
+            #   }
             }
             else{ 
                push(@$emailsubheader,undef);
@@ -114,12 +115,12 @@ sub addWorkflow2Mail
    }
    if ($nr==0){
       push(@$emailtstamp,undef);
-      if ($outoffscope>0){
-         push(@$emailtext,"...");
-      }
-      else{
+    #  if ($outoffscope>0){
+    #     push(@$emailtext,"...");
+    #  }
+    #  else{
          push(@$emailtext,undef);
-      }
+    #  }
       push(@$emailpostfix,undef);
       push(@$emailsubheader,FormatSubHeader($self,$wfrec));
       push(@$emailhead,$wfrec->{name});
