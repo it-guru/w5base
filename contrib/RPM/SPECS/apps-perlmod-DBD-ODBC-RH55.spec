@@ -1,10 +1,10 @@
 Summary: DBD_ODBC AppCom perl Modules at /apps
 Name: apps-perlmod-DBD-ODBC-RH55
-Version: 1.31
-Release: 1
+Version: 1.13
+Release: 2
 License: GPL
 Group: Applications/Web
-Source0: http://search.cpan.org/CPAN/authors/id/M/MJ/MJEVANS/DBD-ODBC-1.31.tar.gz
+Source0: http://search.cpan.org/CPAN/authors/id/J/JU/JURL/DBD-ODBC-1.13.tar.gz
 Distribution: RedHat 5.5 AppCom Linux
 Vendor: T-Systems
 Packager: Vogler Hartmut <hartmut.vogler@t-systems.com>
@@ -18,17 +18,18 @@ This installation can be used in AppCom enviroments
 (or similar cluster enviroments) with rpm --dbpath /apps/rpm
 
 %prep
-rm -rf $RPM_BUILD_DIR/DBD-ODBC-1.31
-zcat $RPM_SOURCE_DIR/DBD-ODBC-1.31.tar.gz | tar -xvf -
+rm -rf $RPM_BUILD_DIR/DBD-ODBC-1.13
+zcat $RPM_SOURCE_DIR/DBD-ODBC-1.13.tar.gz | tar -xvf -
 
 %build
-cd $RPM_BUILD_DIR/DBD-ODBC-1.31
-%{__perl} Makefile.PL PREFIX=/apps/perlmod
+cd $RPM_BUILD_DIR/DBD-ODBC-1.13
+export ODBCHOME=/usr
+%{__perl} Makefile.PL -o /usr PREFIX=/apps/perlmod 
 make
 
 %install
 rm -rf $RPM_BUILD_ROOT
-cd $RPM_BUILD_DIR/DBD-ODBC-1.31
+cd $RPM_BUILD_DIR/DBD-ODBC-1.13
 pwd
 make pure_install PERL_INSTALL_ROOT=$RPM_BUILD_ROOT
 find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} ';'
@@ -38,7 +39,7 @@ chmod -R u+w $RPM_BUILD_ROOT/*
 
 
 %check || :
-cd $RPM_BUILD_DIR/DBD-ODBC-1.31
+cd $RPM_BUILD_DIR/DBD-ODBC-1.13
 #make test
 
 %clean
