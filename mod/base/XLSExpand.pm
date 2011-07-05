@@ -311,6 +311,17 @@ sub ProcessFile
       return(undef);
    }
    #
+   # Check if summary Sheet already exists. If it is, this would produce
+   # an exception on trying to add the summary sheet.
+   #
+   foreach my $sheet (@{$oBook->{Worksheet}}) {
+      if ($sheet->{Name} eq "Summary"){
+         $self->LastMsg(ERROR,"invalid XLS file - Summary sheet exists");
+         return();
+      }
+   }
+
+   #
    # Pass 2: Process Lines
    #
    for(my $iSheet=$oBook->{'SheetCount'};$iSheet>=0;$iSheet--){
