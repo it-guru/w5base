@@ -136,6 +136,11 @@ sub new
       #          dataobjattr   =>'cm3rm1.dsc_service'),
 
       new kernel::Field::Text(
+                name          =>'modelid',
+                label         =>'Model ID',
+                dataobjattr   =>'cm3rm1.model_ref'),
+
+      new kernel::Field::Text(
                 name          =>'srcid',
                 label         =>'Extern Change ID',
                 dataobjattr   =>'cm3rm1.ex_number'),
