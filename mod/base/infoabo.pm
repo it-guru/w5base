@@ -591,6 +591,9 @@ sub FinishWrite
          my $modeobj=$ia->getField("mode");
          my $mode=$modeobj->FormatedDetail($iarec,"HtmlMail"); 
          my $msg="";
+         if (!defined($oldrec) && !exists($newrec->{active})){
+            $newrec->{active}=1;
+         }
          if (!defined($oldrec) &&
              (exists($newrec->{active}) && $newrec->{active}==1)){
             # InfoAbo neu eingetragen im Status Aktiv (u.U. mit Verfallsdatum)
@@ -657,7 +660,7 @@ sub FinishWrite
                   $iarec->{targetname}.
                   "' ".$self->T("expires at")." ".$expiration." UTC !";
          }
-         $msg="unkown change of InfoAbo" if ($msg eq "");
+         $msg="unknown change of InfoAbo" if ($msg eq "");
          if ($ENV{SCRIPT_URI} ne ""){
             $msg.="\n\nDirectLink:\n";
             my $baseurl=$ENV{SCRIPT_URI};
