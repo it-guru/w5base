@@ -653,12 +653,12 @@ sub InsertRecord   # fake write request to SC
       $criticality="critical";
       $urgency="Critical";
    }
-   if ($newrec->{scimpact}=~m/^some\.customer\.*/){
+   elsif ($newrec->{scimpact}=~m/^some\.customer\.*/){
       $priority=2;
       $criticality="high";
       $urgency="Medium";
    }
-   if ($newrec->{scimpact}=~m/.*\.interfaces\.*/){
+   elsif ($newrec->{scimpact}=~m/.*\.interfaces\.*/){
       $priority=2;
       $criticality="medium";
       $urgency="Medium";
