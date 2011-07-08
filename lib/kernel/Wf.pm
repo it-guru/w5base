@@ -87,27 +87,30 @@ sub addWorkflow2Mail
  
 
          if ($isinscope==1 &&!($wfact->{comments}=~m/^\s*$/)){
-            push(@$emailtstamp,$str);
             my $data=$wfact->{comments};
             $data=~s/&/&amp;/g;
             $data=~s/</&lt;/g;
             $data=~s/>/&gt;/g;
-            push(@$emailtext,$data);
-            push(@$emailpostfix,$username);
             if ($nr==0){
                push(@$emailsubheader,FormatSubHeader($self,$wfrec));
                push(@$emailhead,$wfrec->{name});
-            #   if ($outoffscope>0){
-            #      push(@$emailtstamp,undef);
-            #      push(@$emailhead,undef);
-            #      push(@$emailsubheader,undef);
-            #      push(@$emailtext,"...");
-            #      push(@$emailpostfix,undef);
-            #   }
+               if ($outoffscope>0){
+                  push(@$emailhead,undef);
+                  push(@$emailsubheader,undef);
+                  push(@$emailtext,"...");
+                  push(@$emailpostfix,undef);
+                  push(@$emailtstamp,undef);
+               }
+               push(@$emailtext,$data);
+               push(@$emailpostfix,$username);
+               push(@$emailtstamp,$str);
             }
             else{ 
                push(@$emailsubheader,undef);
                push(@$emailhead,undef);
+               push(@$emailtext,$data);
+               push(@$emailpostfix,$username);
+               push(@$emailtstamp,$str);
             }
             $nr++;
          }
@@ -115,12 +118,12 @@ sub addWorkflow2Mail
    }
    if ($nr==0){
       push(@$emailtstamp,undef);
-    #  if ($outoffscope>0){
-    #     push(@$emailtext,"...");
-    #  }
-    #  else{
+      if ($outoffscope>0){
+         push(@$emailtext,"...");
+      }
+      else{
          push(@$emailtext,undef);
-    #  }
+      }
       push(@$emailpostfix,undef);
       push(@$emailsubheader,FormatSubHeader($self,$wfrec));
       push(@$emailhead,$wfrec->{name});
