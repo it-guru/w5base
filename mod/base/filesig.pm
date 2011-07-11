@@ -345,6 +345,11 @@ sub store
             if ($_=~m/Verification successful/){
                $fileok=1;
             }
+            elsif ($_=~m/certificate has expired/){
+               $errormsg="ERROR: your client certificate has expired";
+               $fileok=0;
+               last;
+            }
             else{
                $fb64.=$_;
             }
@@ -464,7 +469,7 @@ sub store
             }
          }
          else{
-            $errormsg="signature not correct";
+            $errormsg="signature not correct" if ($errormsg eq "");
          }
          unlink($certfile); 
       }
