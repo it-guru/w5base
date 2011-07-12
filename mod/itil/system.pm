@@ -1143,7 +1143,8 @@ sub Validate
    my $newrec=shift;
 
    my $name=trim(effVal($oldrec,$newrec,"name"));
-   if (length($name)<3 || haveSpecialChar($name)){
+   if (length($name)<3 || haveSpecialChar($name) ||
+       ($name=~m/^\d+$/)){  # only a number as system name ist not ok
       $self->LastMsg(ERROR,"invalid system name '%s' specified",$name);
       return(0);
    }

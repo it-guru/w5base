@@ -1274,7 +1274,8 @@ sub Validate
 
    my $name=trim(effVal($oldrec,$newrec,"name"));
    
-   if (length($name)<3 || haveSpecialChar($name)){
+   if (length($name)<3 || haveSpecialChar($name) ||
+       ($name=~m/^\d+$/)){   # only numbers as application name is not ok!
       $self->LastMsg(ERROR,
            sprintf($self->T("invalid application name '%s' specified"),$name));
       return(0);

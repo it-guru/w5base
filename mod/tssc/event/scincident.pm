@@ -38,7 +38,7 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("scincident","scincident",timeout=>600);
+   $self->RegisterEvent("scincident","scincident",timeout=>1200);
 }
 
 sub scincident
@@ -66,7 +66,7 @@ sub scincident
       my ($wfrec,$msg)=$self->{wf}->getOnlyFirst(qw(srcload));
       if (defined($wfrec)){
          $focus=$wfrec->{srcload};
-         %flt=(closetime=>"\">$focus-10m\"");
+         %flt=(closetime=>"\">$focus-4m\"");
       }
    }
    else{
@@ -84,9 +84,11 @@ sub scincident
    $chm->SetFilter(\%flt);
    my ($rec,$msg)=$chm->getFirst();
    if (defined($rec)){
-      do{
+      READLOOP: do{
+         if ($self->ServerGoesDown()){
+            last READLOOP;
+         }
          $self->ProcessServiceCenterRecord($selfname,$rec);
-         #printf STDERR ("fifi %s\n",Dumper($rec));
          ($rec,$msg)=$chm->getNext();
          if (defined($msg)){
             msg(ERROR,"db record problem: %s",$msg);

@@ -125,6 +125,13 @@ sub Config()
    return($self->getParent->Config);
 }
 
+sub ServerGoesDown()
+{
+   my $self=shift;
+   return(1) if (exists($self->{ServerGoesDown}));
+   return(0);
+}
+
 sub ipcStore
 {
    my $self=shift;

@@ -47,6 +47,10 @@ sub Init
                       "tssc::chm",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("sc.change.task",
+                      "tssc::chmtask",
+                      defaultacl=>['admin']);
+   
    $self->RegisterObj("sc.change.relations",
                       "tssc::lnk",
                       defaultacl=>['valid_user']);

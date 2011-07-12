@@ -96,7 +96,7 @@ sub new
                 name          =>'softwareid',
                 htmlwidth     =>'100px',
                 ignorecase    =>1,
-                #htmldetail    =>0,      # fällt demnächst raus - siehe relations
+                htmldetail    =>0,
                 label         =>'SoftwareID (deprecated)',
                 dataobjattr   =>'cm3rm1.program_name'),
 
@@ -104,7 +104,7 @@ sub new
                 name          =>'deviceid',
                 htmlwidth     =>'100px',
                 ignorecase    =>1,
-                #htmldetail    =>0,      # fällt demnächst raus - siehe relations
+                htmldetail    =>0,
                 label         =>'DeviceID (deprecated)',
                 dataobjattr   =>'cm3rm1.logical_name'),
 
@@ -113,7 +113,7 @@ sub new
                 label         =>'Software (deprecated)',
                 group         =>'software',
                 htmlwidth     =>'300px',
-                htmldetail    =>1,      # fällt demnächst raus - siehe relations
+                htmldetail    =>0,
                 vjointo       =>'tssc::chm_software',
                 vjoinon       =>['changenumber'=>'changenumber'],
                 vjoindisp     =>[qw(name)]),
@@ -124,7 +124,7 @@ sub new
                 group         =>'device',
                 htmlwidth     =>'300px',
                 nodetaillink  =>1,
-                htmldetail    =>1,      # fällt demnächst raus - siehe relations
+                htmldetail    =>0,
                 vjointo       =>'tssc::chm_device',
                 vjoinon       =>['changenumber'=>'changenumber'],
                 vjoindisp     =>[qw(name)]),
@@ -162,6 +162,18 @@ sub new
                 vjointo       =>'tssc::chm_approvedgrp',
                 vjoinon       =>['changenumber'=>'changenumber'],
                 vjoindisp     =>[qw(name)]),
+
+      new kernel::Field::SubList(
+                name          =>'tasks',
+                label         =>'Tasks',
+                htmlwidth     =>'200px',
+                group         =>'tasks',
+                vjointo       =>'tssc::chmtask',
+                vjoinon       =>['changenumber'=>'changenumber'],
+                vjoininhash   =>['planned_start','planned_end',
+                                 'tasknumber','name',
+                                 'down_start','down_end','status'],
+                vjoindisp     =>[qw(tasknumber name)]),
 
       new kernel::Field::Textarea(
                 name          =>'description',
@@ -498,7 +510,7 @@ sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
    return($self->SUPER::getDetailBlockPriority(@_),
-          qw(status relations approvals contact));
+          qw(status relations approvals tasks contact));
 }
 
 sub getRecordImageUrl
@@ -533,7 +545,7 @@ sub isViewValid
    }
    if ($st ne "closed" && $st ne "rejected" && $st ne "resolved"){
       return(qw(contact default relations 
-                status header software device approvals));
+                status header software device tasks approvals));
    }
    return("ALL");
 }

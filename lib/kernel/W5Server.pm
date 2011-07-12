@@ -23,6 +23,13 @@ sub Init
    return(1);
 }
 
+sub ServerGoesDown
+{
+   my $self=shift;
+   return(1) if ($self->{ServerGoesDown});
+   return(0);
+}
+
 sub start
 {
    my $self=shift;

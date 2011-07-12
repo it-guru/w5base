@@ -3,6 +3,7 @@
 'fieldgroup.status'=>{de=>'Change-Statusdaten',en=>'Change-Status'},
 'fieldgroup.default'=>{de=>'Change-Daten',en=>'Change-Data'},
 'fieldgroup.approvals'=>{de=>'Zustimmungen',en=>'Approvals'},
+'fieldgroup.tasks'=>{de=>'Tasks',en=>'Tasks'},
 'fieldgroup.software'=>{de=>'betroffene Software/Anwendungen (deprecated)',en=>'affected Software/Applications (deprecated)'},
 'fieldgroup.relations'=>{de=>'Verknüpfungen',en=>'Relations'},
 

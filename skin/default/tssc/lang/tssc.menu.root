@@ -2,6 +2,7 @@
 'sc.change'=>{de=>'ChangeManagement',en=>'ChangeManagement'},
 'sc.change.software'=>{de=>'Software',en=>'Software'},
 'sc.change.relations'=>{de=>'Verknüpfungen',en=>'Relations'},
+'sc.change.task'=>{de=>'Task',en=>'Task'},
 'sc.change.device'=>{de=>'Device',en=>'Device'},
 'sc.change.timing'=>{de=>'Interface timing',en=>'Interface timing'},
 'sc.incident'=>{de=>'IncidentManagement',en=>'IncidentManagement'},

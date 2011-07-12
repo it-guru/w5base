@@ -636,6 +636,11 @@ sub InsertRecord
          while(!defined($res=$self->W5ServerCall("rpcGetUniqueId"))){
             sleep(1);
             last if ($retry--<=0);
+            # next lines are a test, to handle break of W5Server better
+            if (getppid()==1){  # parent (W5Server) killed in event context
+               msg(ERROR,"Parent Process is killed - not good in DB.pm !");
+               return();
+            }
             msg(WARN,"W5Server problem for user $ENV{REMOTE_USER} ($retry)");
          }
          if (defined($res) && $res->{exitcode}==0){

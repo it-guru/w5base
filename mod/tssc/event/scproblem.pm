@@ -38,7 +38,7 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("scproblem","scproblem",timeout=>600);
+   $self->RegisterEvent("scproblem","scproblem",timeout=>1200);
 }
 
 sub scproblem
@@ -67,7 +67,7 @@ sub scproblem
       my ($wfrec,$msg)=$self->{wf}->getOnlyFirst(qw(srcload));
       if (defined($wfrec)){
          $focus=$wfrec->{srcload};
-         %flt=(sysmodtime=>"\">$focus-10m\"");
+         %flt=(sysmodtime=>"\">$focus-4m\"");
       }
    }
    else{
@@ -86,7 +86,10 @@ sub scproblem
    $prm->SetFilter(\%flt);
    my ($rec,$msg)=$prm->getFirst();
    if (defined($rec)){
-      do{
+      READLOOP: do{
+         if ($self->ServerGoesDown()){
+            last READLOOP;
+         }
          $self->ProcessServiceCenterRecord($selfname,$rec);
          ($rec,$msg)=$prm->getNext();
          if (defined($msg)){

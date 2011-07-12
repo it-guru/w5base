@@ -39,6 +39,9 @@ sub rpcCallSerialEvent
    if ($self->Config->Param("W5BaseOperationMode") eq "readonly"){
       return({exitcode=>0,msg=>'readonly mode'});
    }
+   if ($self->{ServerGoesDown}){
+      return({exitcode=>1,msg=>'server goes down'});
+   }
    my $eventlabel=$event." ".join(" ",map({"'".$_."'"} @p));
    if ($self->{EventController}->isEvent($event)){
       my $timeout=$self->{EventController}->getMaxEventTimeout($event);
@@ -46,6 +49,7 @@ sub rpcCallSerialEvent
          $0="W5Server '$event'";
          $self->initAsyncEnv($event,{param=>[@p]},'any');
          $SIG{CHLD}='DEFAULT';
+         $SIG{ALRM}='DEFAULT';
          $self->{EventController}->setParent($self);
          my @methods=$self->{EventController}->getEventMethods($event);
          msg(DEBUG,"rpcCallSerialEvent: name=$event timeout=$timeout ".
@@ -68,7 +72,7 @@ sub rpcCallSerialEvent
          my $exitcode=0;
          $exitcode=1 if ($#bk==-1);
          return({exitcode=>$exitcode,handlerresult=>\@bk});
-      },timeout=>$timeout));
+      },timeout=>$timeout,name=>$event));
    }
    return({exitcode=>1,nohandler=>1});
 }
@@ -632,6 +636,8 @@ sub initAsyncEnv
       $SIG{HUP}='DEFAULT';
       $SIG{CHLD}='DEFAULT';
       $SIG{ALRM}='DEFAULT';
+      $SIG{USR1}='DEFAULT';
+      $SIG{TERM}='DEFAULT';
       $SIG{PIPE}='DEFAULT';
       $SIG{WARN}='DEFAULT';
       my %taskenv=%{$self->{taskenv}};
@@ -730,7 +736,7 @@ sub ProcessSpoolEvent
    my $self = shift;
    my $control = shift;
    my $tasks=$self->getTasksHash();
-   return() if (keys(%$tasks)>30);
+   return() if (keys(%$tasks)>40);
 
    msg(DEBUG,"Run spooled event: %s",$control->{spooltag});
    if (defined($control->{run})){
@@ -746,6 +752,18 @@ sub ProcessSpoolEvent
 sub run_dequeue
 {
    my $self = shift;
+   if (exists($self->{'ServerGoesDown'})){
+      if ($self->{'ServerGoesDown'}<=0 || $self->runningTasks()==0){
+         if (exists($self->{'ServerHalt'})){
+            $self->server_close();
+         }
+         else{
+            $self->sig_hup();
+         }
+      }
+      $self->{ServerGoesDown}--;
+      msg(INFO,"$self->{ServerGoesDown} seconds to shutdown");
+   }
    my $bk=$self->{EventController}->ProcessTimer();
    if (time() % 120 == 0){ # check only ever 120s
       $self->CheckW5ServerProcess();
@@ -820,7 +838,7 @@ sub configure_hook
 {
    my $self=shift;
 
-   $self->max_async(300);
+   $self->max_async(200);
    $self->{'UniqueId'}={'counter'=>0,timer=>time()};
    $self->{'CacheState'}={};
    if ($W5V2::Debug==1){
@@ -869,6 +887,7 @@ sub post_configure_hook
    }
 }
 
+
 sub pre_loop_hook
 {
    my $self=shift;
@@ -877,6 +896,18 @@ sub pre_loop_hook
    my $home=$ent[7];
    $ENV{HOME}=$home if (-d $home);
 
+   $SIG{USR1}=sub{          # soft restart
+      delete($self->{ServerHalt});
+      $self->{ServerGoesDown}=15;
+      $self->sendSignalToAllRunningProcesses(10);
+      msg(INFO,"Soft Shutdown handler initiated");
+   };
+   $SIG{USR2}=sub{          # soft shutdown
+      $self->{ServerHalt}=1;
+      $self->{ServerGoesDown}=15;
+      $self->sendSignalToAllRunningProcesses(10);
+      msg(INFO,"Soft Shutdown handler initiated");
+   };
    $self->RunScheduler();
    return(1);
 }
@@ -916,6 +947,10 @@ sub StartW5ServerProcess
       }
       \$SIG{HUP}=\\&hup;
       \$SIG{INT}=\\&shutdown;
+      \$SIG{USR2}='DEFAULT';
+      \$SIG{USR1}=sub{
+         \$srv->{ServerGoesDown}=1;
+      };
       msg(DEBUG,"srvobj=\$srv");
       eval('
          \$self->W5ServerConnect();
@@ -959,6 +994,48 @@ sub getOfflineStateFile
    return($statefile);
 }
 
+sub sendSignalToAllRunningProcesses
+{
+   my $self=shift;
+   my $signal=shift;
+   my $n=0;
+
+   foreach my $server (keys(%{$self->{W5Server}})){  # sending INT to current
+      my $pid=$self->{W5ServerProcess}->{$server}->{AsyncID}; # spare w5servers
+      msg(DEBUG,"send Signal($signal) from %s to %s at %s",
+                getpid(),$server,$pid);
+      if (kill($signal,$pid)){
+         $n++;
+      }
+   }
+   sleep(1);
+   foreach my $pid ($self->runningTasks()){
+      msg(DEBUG,"send Signal($signal) to event at pid %s",$pid);
+      if (kill($signal,$pid)){
+         $n++;
+      }
+   }
+   return($n);
+}
+
+
+sub runningTasks
+{
+   my $self=shift;
+   my @l;
+
+   my $tasks=$self->getTasksHash();
+   foreach my $pid (keys(%{$tasks})){  # sending alarm to current tasks
+      if (!exists($tasks->{$pid}->{exitcode})){
+         push(@l,$pid);
+      }
+   }
+   if (wantarray()){
+      return(@l);
+   }
+   return($#l+1);
+}
+
 sub pre_server_close_hook
 {
    my $self=shift;
@@ -966,11 +1043,7 @@ sub pre_server_close_hook
    #$self->DumpJobSpool();
    my $statefile=$self->getOfflineStateFile();
    msg(DEBUG,"server shutdown initiated");
-   foreach my $server (keys(%{$self->{W5Server}})){
-      my $pid=$self->{W5ServerProcess}->{$server}->{AsyncID};
-      msg(DEBUG,"send ALRM to %s",$server);
-      kill(2,$pid);
-   }
+   $self->sendSignalToAllRunningProcesses(2);
    if (defined($self->{EventSpool}) && keys(%{$self->{EventSpool}}) &&
        $statefile ne ""){
       msg(DEBUG,"try to dump eventspool to %s",$statefile);
@@ -982,6 +1055,7 @@ sub pre_server_close_hook
       }
    }
    closeall();
+   msg(DEBUG,"server is down");
    return($self->SUPER::pre_server_close_hook());
 }
 

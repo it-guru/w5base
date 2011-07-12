@@ -96,6 +96,10 @@ sub ProcessEvent
       }
       msg(DEBUG,"in event '$name'%s",$subindexstr);
       foreach my $ev (@{$self->{Events}->{$name}}){
+         $SIG{'USR1'}=sub{
+          #  msg(WARN,"recive USR1 Signal at $name");
+            $ev->{obj}->{ServerGoesDown}++;
+         };
          if (!defined($requestedmethod) || $ev->{method} eq $requestedmethod){
             msg(DEBUG,"try to call '$ev->{method}'");
             my $res;

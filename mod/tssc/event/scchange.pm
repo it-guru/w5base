@@ -38,7 +38,7 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("scchange","scchange",timeout=>840);
+   $self->RegisterEvent("scchange","scchange",timeout=>1200);
 }
 
 sub scchange
@@ -59,7 +59,7 @@ sub scchange
                            createtime type resources closecode approved addgrp
                            impact priority reason urgency category risk
                            closecode resolvetime
-                           coordinator));
+                           coordinator tasks));
    $chm->SetCurrentOrder("sysmodtime");
    msg(DEBUG,"view is set");
    my $focus="now";
@@ -78,7 +78,7 @@ sub scchange
      #    printf STDERR ("focus=$focus nowstamp=$nowstamp\n");
      #    exit(1);
 
-         %flt=(sysmodtime=>"\">$focus-8m\"");
+         %flt=(sysmodtime=>"\">$focus-4m\"");
       }
    }
    else{
@@ -96,7 +96,10 @@ sub scchange
    $chm->SetFilter(\%flt);
    my ($rec,$msg)=$chm->getFirst();
    if (defined($rec)){
-      do{
+      READLOOP: do{
+         if ($self->ServerGoesDown()){
+            last READLOOP;
+         }
          $self->ProcessServiceCenterRecord($selfname,$rec);
          ($rec,$msg)=$chm->getNext();
          if (defined($msg)){
@@ -111,6 +114,7 @@ sub scchange
          return({exitcode=>1});
       }
    }
+   
    return({exitcode=>0,msg=>'OK'}); 
 }
 

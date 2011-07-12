@@ -285,6 +285,7 @@ sub mkChangeStoreRec
       $updateto=$oldrec[0]->{id};
       $oldclass=$oldrec[0]->{class};
    }
+   msg(DEBUG,"tasks=%s",Dumper($rec->{tasks}));
 
    $wfrec{srcid}=$rec->{changenumber};
    $wfrec{name}=$rec->{name};
