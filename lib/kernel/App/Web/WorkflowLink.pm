@@ -364,7 +364,7 @@ EOF
    }
    print("\n</script>");
 
-   print STDERR ("fifi startWorkflow class=$class id=$id\n");
+   #print STDERR ("fifi startWorkflow class=$class id=$id\n");
 
    print $self->HtmlBottom(body=>1,form=>1);
 }
