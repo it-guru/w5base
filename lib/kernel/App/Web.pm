@@ -373,6 +373,7 @@ sub getAppTitleBar
       $onclick=" ";
    }
    $param{title}=$self->T($self->Self,$self->Self) if (!defined($param{title}));
+
    my $titleonclick="";
    if ($self->can("ModuleObjectInfo")){
       $titleonclick="onclick=\"ModuleObjectInfo();return(false);\" ".
@@ -381,9 +382,10 @@ sub getAppTitleBar
    my $titlebar=sprintf("<tr class=TitleBar><td nowrap align=left>".
                  "<div $titleonclick ".
                  "style=\"margin:0;padding:0;padding-left:5px;".
-                 "overflow:hidden\">".
+                 "text-overflow:ellipsis;overflow:hidden;width:380px\">".
                  "<a class=TitleBarLink target=_top ".
-                 "href='".$self->getAppDirectLink()."'>%s</a>&nbsp;</div></td>".
+                 "href='".$self->getAppDirectLink()."'>".
+                 "%s</a>&nbsp;</div></td>".
                  "<td align=right nowrap><div $onclick ".
                  "style=\"margin:0;padding:0;padding-right:5px;".
                  "margin-left:10px;\">%s</div>".
@@ -1178,10 +1180,6 @@ sub IsMemberOf
          return(1) if ($chkgrp eq $grp->{fullname});
       }
    }
-
-   #printf STDERR ("fifi IsMemberOf([%s],[%s],%s)\n",join(",",@$group),
-   #                                                 join(",",@$roles),
-   #                                                 $direction);
    return(undef);
 }
 
