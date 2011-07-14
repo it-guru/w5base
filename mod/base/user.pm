@@ -924,7 +924,7 @@ sub SecureValidate
       }
       delete($newrec->{secstate});
       if (!defined($oldrec)){
-         my %a=$self->getGroupsOf($userid, [qw(RContactAdmin)], 'direct');
+         my %a=$self->getGroupsOf($userid, [qw(RContactAdmin)], 'up');
          my @idl=keys(%a);
          if ($#idl!=-1 && $idl[0] ne ""){
             $newrec->{managedbyid}=$idl[0];
@@ -1215,7 +1215,7 @@ sub isViewValid
 
    if ($rec->{userid}!=$userid && 
        !(($rec->{managedbyid}!=1 && $rec->{managedbyid}!=0) &&
-         $self->IsMemberOf($rec->{managedbyid},["RContactAdmin"],"up"))){
+         $self->IsMemberOf($rec->{managedbyid},["RContactAdmin"],"down"))){
       if ($secstate<2){
          @gl=grep(/^(name|header)$/,@gl);
       }
@@ -1380,7 +1380,7 @@ sub isWriteValid
       }
    }
    if ($rec->{managedbyid}!=1 && $rec->{managedbyid}!=0){
-      if ($self->IsMemberOf($rec->{managedbyid},["RContactAdmin"],"up")){
+      if ($self->IsMemberOf($rec->{managedbyid},["RContactAdmin"],"down")){
          return("introdution","private","officeacc","office",
                 "comments","control");
       }
