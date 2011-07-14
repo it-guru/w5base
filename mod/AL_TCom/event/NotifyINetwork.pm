@@ -54,6 +54,7 @@ sub NotifyINetwork
    $wspass=$wspass->{inetwork} if (ref($wspass) eq "HASH");
    $wsproxy=$wsproxy->{inetwork} if (ref($wsproxy) eq "HASH");
 
+
    return({exitcode=>0,msg=>'ok - trigger not needed'}) if ($wsuser eq "");
 
 

@@ -1,6 +1,6 @@
 package base::MyW5Base;
 #  W5Base Framework
-#  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2011  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,121 +19,47 @@ package base::MyW5Base;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use kernel::config;
-use kernel::App::Web;
-use kernel::Output;
-@ISA    = qw(kernel::App::Web);
+use kernel::PlugableController;
+@ISA    = qw(kernel::PlugableController);
 
 sub new
 {
    my $type=shift;
-   my $self=bless($type->SUPER::new(@_),$type);
-   $self->LoadSubObjs("MyW5Base");
+   my %param=@_;
+   $param{'PlugableClass'}='MyW5Base';
+   my $self=bless($type->SUPER::new(%param),$type);
    return($self);
 }  
 
-sub getValidWebFunctions
-{  
-   my ($self)=@_;
-   return(qw(Main Welcome Result ViewEditor Bookmark));
-}
-
-sub getAppDirectLink
+sub getWelcomeQueryTemplate
 {
    my $self=shift;
-   my $oldval=Query->Param("MyW5BaseSUBMOD");
 
-   return('Main?MyW5BaseSUBMOD='.$oldval);
-}
 
-sub Main
-{
-   my $self=shift;
-   my $oldval=Query->Param("MyW5BaseSUBMOD");
-   my $title=$self->T($self->Self);
-
-   my %l=();
-   my $DefaultFormat="HtmlV01";
-   my $doAutoSearch=0;
-   foreach my $m (values(%{$self->{SubDataObj}})){
-      $l{$m->getLabel()}=$m;
-      $title.=" &rArr; ".$m->getLabel() if ($oldval eq $m->Self()); 
-   }
-   print $self->HttpHeader("text/html");
-   print $self->HtmlHeader(style=>['default.css','mainwork.css',
-                                   'kernel.App.Web.css','myw5base.css',
-                                   'frames.css'],
-                           title=>$title,
-                           js=>['toolbox.js','subModal.js'],
-                           body=>1,form=>1);
-   print $self->HtmlSubModalDiv();
-
-   print("<table width=100% height=100% border=0 cellspacing=0 cellpadding=0>");
-   printf("<tr><td height=1%% valign=top>%s</td></tr>",
-          $self->getAppTitleBar(title=>$title));
-   print("<tr><td height=1% valign=top>");
-   print("<div class=searchframe><table class=searchframe>");
-
-   my $s="<select name=MyW5BaseSUBMOD style=\"width:100%\" ".
-         "OnChange=\"SelectionChanged();\">";
-   $s.="<option value=\"\">&lt;".$self->T("please select a query").
-       "&gt;</option>";
-
-   my $UserCache=$self->Cache->{User}->{Cache};
-   $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
-   my %selectCache;
-   foreach my $label (sort(grep(/^\[/,keys(%l))),
-                      sort(grep(!/^\[/,keys(%l)))){
-      if (defined($l{$label}) &&
-          $l{$label}->can("isSelectable") && 
-          $l{$label}->isSelectable(user=>$UserCache,cache=>\%selectCache)){
-         $s.="<option ";
-         $s.="selected " if ($l{$label}->Self() eq $oldval);
-         $s.="value=\"".$l{$label}->Self()."\">$label</option>";
-      }
-   }
-   $s.="</select>";
-   printf("<tr><td valign=top height=1%%>%s</td></tr>",$s);
-   print("</table></div>");
-   if (defined($oldval) && exists($self->{SubDataObj}->{$oldval})){
-      my $curquery=$self->{SubDataObj}->{$oldval};
-      my $o=$curquery->getDataObj();
-      my $templ=$curquery->getQueryTemplate();
-      $DefaultFormat=$curquery->getDefaultFormat();
-      $doAutoSearch=$curquery->doAutoSearch();
-      if (defined($o)){
-         $o->ParseTemplateVars(\$templ);
-      }
-      printf("<tr><td valign=top height=1%%>%s</td></tr>",$templ);
-      my $if="<iframe src=\"../../base/load/loading\" ".
-             "name=Result style=\"width:100%;height:100%\">".
-             "</iframe>";
-      printf("<tr><td>%s</td></tr>",$if);
-   }
-   else{
-      my $userid=$self->getCurrentUserId();
-      my $bm=$self->getPersistentModuleObject("BookMark","base::userbookmark");
-      $bm->ResetFilter();
-      $bm->SetFilter({userid=>\$userid});
-      my @bm=$bm->getHashList(qw(name srclink target));
-      my $l1=$self->T("monitor my workflows");
-      my $l2=$self->T("my current jobs");
-      my $l3=$self->T("start a new workflow");
-      my $mywf  ="<a href=\"../MyW5Base/Main?".
-                 "MyW5BaseSUBMOD=base::MyW5Base::mywf\">".
-                 "<img border=0 src=\"../../base/load/MyW5Base-MyWf.jpg\">".
-                 "</a>";
-      my $myjobs="<a href=\"../MyW5Base/Main?".
-                 "MyW5BaseSUBMOD=base::MyW5Base::wfmyjobs\">".
-                 "<img border=0 src=\"../../base/load/MyW5Base-MyJobs.jpg\">".
-                 "</a>";
-      my $newwf ="<a href=\"../workflow/New\">".
-                 "<img border=0 src=\"../../base/load/MyW5Base-NewWf.jpg\">".
-                 "</a>";
-      my $newstext=$self->getNews();
-      $newstext=$self->addNewsFrame($newstext) if ($newstext ne "");
-      if ($#bm==-1){
-         print <<EOF;
+   my $userid=$self->getCurrentUserId();
+   my $bm=$self->getPersistentModuleObject("BookMark","base::userbookmark");
+   $bm->ResetFilter();
+   $bm->SetFilter({userid=>\$userid});
+   my @bm=$bm->getHashList(qw(name srclink target));
+   my $l1=$self->T("monitor my workflows");
+   my $l2=$self->T("my current jobs");
+   my $l3=$self->T("start a new workflow");
+   my $mywf  ="<a href=\"../MyW5Base/Main?".
+              "MyW5BaseSUBMOD=base::MyW5Base::mywf\">".
+              "<img border=0 src=\"../../base/load/MyW5Base-MyWf.jpg\">".
+              "</a>";
+   my $myjobs="<a href=\"../MyW5Base/Main?".
+              "MyW5BaseSUBMOD=base::MyW5Base::wfmyjobs\">".
+              "<img border=0 src=\"../../base/load/MyW5Base-MyJobs.jpg\">".
+              "</a>";
+   my $newwf ="<a href=\"../workflow/New\">".
+              "<img border=0 src=\"../../base/load/MyW5Base-NewWf.jpg\">".
+              "</a>";
+   my $newstext=$self->getNews();
+   $newstext=$self->addNewsFrame($newstext) if ($newstext ne "");
+   my $d;
+   if ($#bm==-1){
+      $d=<<EOF;
 <tr><td valign=top align=center><br><br>
 <table width=80% border=0>
 <tr>
@@ -151,49 +77,49 @@ sub Main
 $newstext
 </td></tr>
 EOF
+   }
+   else{
+      my $userpropetitle=$self->T("modify user properties");
+      my $userbookmarktitle=$self->T("bookmarks");
+      my $bmdiv="<div class=winframe>";
+      $bmdiv.="<div class=winframehead>".
+              "<table width=100% cellspacing=0 cellpadding=0 border=0>".
+              "<tr><td valign=center>".
+              "<a target=msel class=winframehead ".
+              "href=\"../../base/menu/msel/sysadm.userenv.bookmarks\">".
+              "Bookmarks:</a></td><td align=right valign=top>".
+              "<a target=msel class=winframehead ".
+              "title=\"$userbookmarktitle\" ".
+              "href=\"../../base/menu/msel/sysadm.userenv.bookmarks\">".
+              "<img width=14 height=14 border=0 ".
+              "src=\"../../base/load/bookmark.gif\"></a>".
+              "</td></tr></table>";
+      $bmdiv.="</div><div class=winframebody id=bm><ul class=bookmarks>";
+      foreach my $b (@bm){
+         my $link="<a href=\"$b->{srclink}\" class=bookmark ".
+                  "target=\"$b->{target}\">";
+         if ($b->{target} eq "smallwin"){
+            my $onclick="openwin(\"$b->{srclink}\",\"_blank\",".
+                    "\"height=480,width=640,toolbar=no,status=no,".
+                    "resizable=yes,scrollbars=no\")";
+            $link="<a class=bookmark href=javascript:$onclick>";
+         }
+         if ($b->{srclink}=~m/^javascript:/i){
+            $link="<a class=bookmark target=_self href=$b->{srclink}>";
+         }
+         my $name=quoteHtml($b->{name});
+         
+         $bmdiv.="<li class=bookmark>$link".$name."</a></li>";
       }
-      else{
-         my $userpropetitle=$self->T("modify user properties");
-         my $userbookmarktitle=$self->T("bookmarks");
-         my $bmdiv="<div class=winframe>";
-         $bmdiv.="<div class=winframehead>".
-                 "<table width=100% cellspacing=0 cellpadding=0 border=0>".
-                 "<tr><td valign=center>".
-                 "<a target=msel class=winframehead ".
-                 "href=\"../../base/menu/msel/sysadm.userenv.bookmarks\">".
-                 "Bookmarks:</a></td><td align=right valign=top>".
-                 "<a target=msel class=winframehead ".
-                 "title=\"$userbookmarktitle\" ".
-                 "href=\"../../base/menu/msel/sysadm.userenv.bookmarks\">".
-                 "<img width=14 height=14 border=0 ".
-                 "src=\"../../base/load/bookmark.gif\"></a>".
-                 "</td></tr></table>";
-         $bmdiv.="</div><div class=winframebody id=bm><ul class=bookmarks>";
-         foreach my $b (@bm){
-            my $link="<a href=\"$b->{srclink}\" class=bookmark ".
-                     "target=\"$b->{target}\">";
-            if ($b->{target} eq "smallwin"){
-               my $onclick="openwin(\"$b->{srclink}\",\"_blank\",".
-                       "\"height=480,width=640,toolbar=no,status=no,".
-                       "resizable=yes,scrollbars=no\")";
-               $link="<a class=bookmark href=javascript:$onclick>";
-            }
-            if ($b->{srclink}=~m/^javascript:/i){
-               $link="<a class=bookmark target=_self href=$b->{srclink}>";
-            }
-            my $name=quoteHtml($b->{name});
-            
-            $bmdiv.="<li class=bookmark>$link".$name."</a></li>";
-         }
-         $bmdiv.="</ul>";
+      $bmdiv.="</ul>";
 
-         $bmdiv.="</div></div>";
-         my $qf=getModuleObject($self->Config,"faq::QuickFind");
-         my $quickfind;
-         if (defined($qf)){
-            $quickfind=$self->addQuickFind($qf);
-         }
-         print <<EOF;
+      $bmdiv.="</div></div>";
+      my $qf=getModuleObject($self->Config,"faq::QuickFind");
+      my $quickfind;
+      if (defined($qf)){
+         $quickfind=$self->addQuickFind($qf);
+      }
+      $d=<<EOF;
 <tr><td valign=top align=center>
 <table width=100% border=0>
 <td valign=top>$bmdiv
@@ -224,67 +150,14 @@ $quickfind
 </table>
 </td></tr>
 EOF
-      }
    }
-   print("</td></tr></table>");
-   print <<EOF;
-<input type=hidden name=CurrentView>
-<input type=hidden name=UseLimit>
-<input type=hidden name=UseLimitStart>
-<input type=hidden name=FormatAs value="$DefaultFormat">
-<style>body{overflow:hidden}</style>
+
+
+
+   # add resising methods as javascript for news page
+   $d.=<<EOF;
+
 <script language="JavaScript">
-function keyhandler(ev)
-{
-   if (ev && ev.keyCode==13){
-      if (document.forms[0].elements['MyW5BaseSUBMOD'].value!=""){
-         DoSearch();
-      }
-      return false;
-   }
-}
-document.onkeypress=keyhandler;
-function inputkeyhandler()
-{
-   if (window.event && window.event.keyCode==13){
-      if (document.forms[0].elements['MyW5BaseSUBMOD'].value!=""){
-         DoSearch();
-      }
-      return false;
-   }
-   return(true);
-}
-
-function DoPrint()
-{
-   window.frames['Result'].focus();
-   window.frames['Result'].print();
-}
-
-document.onsubmit=OnSubmit;
-
-function OnSubmit()
-{
-   if (document.forms[0].elements['MyW5BaseSUBMOD'].value!=""){
-      DoSearch();
-   }
-   return(0);
-}
-
-function DoSearch()
-{
-   document.forms[0].target="Result";
-   document.forms[0].action="Result";
-   document.forms[0].elements['FormatAs'].value="$DefaultFormat";
-   document.forms[0].submit();
-}
-
-function SelectionChanged()
-{
-   document.forms[0].target="_self";
-   document.forms[0].action="Main";
-   document.forms[0].submit();
-}
 function RecalcNews()
 {
    var newsall=document.getElementById("newsall");
@@ -327,16 +200,18 @@ addEvent(window, "load", RecalcNews);
 addEvent(window, "resize", RecalcNews);
 
 </script>
+
+
+
+
+
+
 EOF
-   if ($doAutoSearch){
-      print(<<EOF);
-<script language="JavaScript">
-addEvent(window, "load", DoSearch);
-</script>
-EOF
-   }
-   print $self->HtmlBottom(body=>1,form=>1);
+
+   return($d);
+
 }
+
 
 sub addQuickFind
 {
@@ -382,6 +257,8 @@ setEnterSubmit(document.forms['QuickFind'],doQuickFind);
 EOF
    return($d);
 }
+
+
 
 sub addNewsFrame
 {
@@ -505,92 +382,7 @@ sub ViewEditor
    print $self->HtmlBottom(body=>1,form=>1);
 }
 
-sub Bookmark
-{
-   my $self=shift;
-   print $self->HttpHeader("text/html");
-   print $self->HtmlHeader(style=>['default.css','work.css'],
-                           title=>$self->T("... add a bookmark"),
-                           body=>1,form=>1);
-   my $autosearch=Query->Param("AutoSearch");
-   my $replace=Query->Param("ReplaceBookmark");
-   Query->Delete("ReplaceBookmark");
-   my $bookmarkname=Query->Param("BookmarkName");
-   if ($bookmarkname eq ""){
-      $bookmarkname=$self->T($self->Self,$self->Self());
-      $bookmarkname.=": ".$self->T("my search");
-   }
-   my $closewin="";
-   my $dosave=0;
-
-   if (Query->Param("SAVE")){
-      Query->Delete("SAVE");
-      $dosave=1;
-   }
-
-   Query->Delete("AutoSearch");
-   my %qu=Query->MultiVars();
-   foreach my $sv (keys(%qu)){
-      next if ($qu{$sv} ne "");
-      delete($qu{$sv});
-   }
-   my $querystring=kernel::cgi::Hash2QueryString(%qu);
-   $querystring="?".$querystring;
-   my $srclink=$self->Self();
-   $srclink=~s/::/\//g;
-   my $bmsrclink="../../".$srclink."/Main$querystring&AutoSearch=$autosearch";
-   my $clipsrclink=$ENV{SCRIPT_URI}."/../../../".$srclink."/Main$querystring";
-
-   if ($dosave){
-      my $bm=getModuleObject($self->Config,"base::userbookmark");
-      my $target="_self";
-      if ($replace){
-         my $userid=$self->getCurrentUserId();
-         $bm->SetFilter({name=>\$bookmarkname,userid=>\$userid});
-         $bm->SetCurrentView(qw(ALL));
-         $bm->ForeachFilteredRecord(sub{
-                            $bm->ValidatedDeleteRecord($_);
-                         });
-      }
-      if ($bm->SecureValidatedInsertRecord({name=>$bookmarkname,
-                                            srclink=>$bmsrclink,
-                                            target=>$target})){
-         $closewin="parent.hidePopWin();";
-      }
-   }
 
 
-   my $quest=$self->T("please copy this URL to your clipboard:");
-   print(<<EOF);
-<script language="JavaScript">
-$closewin
-function showUrl()
-{
-   var x;
-   x=prompt("$quest:","$clipsrclink");
-   if (x){
-      parent.hidePopWin();
-   }
-}
-</script>
-EOF
-   my $repl="<select name=ReplaceBookmark>";
-   $repl.="<option value=\"0\">".$self->T("no")."</option>";
-   $repl.="<option value=\"1\"";
-   $repl.=" selected" if ($replace);
-   $repl.=">".$self->T("yes")."</option>";
-   $repl.="</select>";
-   my $BOOKM="<input type=text style=\"width:100%\" name=BookmarkName ".
-             "value=\"$bookmarkname\">";
-
-   print $self->getParsedTemplate("tmpl/MyW5Base.bookmarkform",{skinbase=>'base',
-                                    static=>{BOOKM=>$BOOKM,
-                                             REPL=>$repl}});
-   #printf("Bookmark Handler");
-   print("<input type=hidden name=SAVE value=\"1\">");
-   print $self->HtmlPersistentVariables(qw(ALL));
-   print $self->HtmlBottom(body=>1,form=>1);
-   return(0);
-}
 
 1;

@@ -306,6 +306,10 @@ sub Init
                       "tmpl/welcome",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("Tools.webnotify",
+                      "base::WebNotify",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("Tools.teamtools.forms",
                       "base::pdfform",
                       defaultacl=>['valid_user']);

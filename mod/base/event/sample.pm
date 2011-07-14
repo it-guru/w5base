@@ -64,6 +64,7 @@ sub LongRunner
 
    for(my $c=0;$c<20;$c++){
       msg(DEBUG,"LonRunner Loop $c");
+      last if ($self->ServerGoesDown());
       sleep(1);
    }
    return({exitcode=>0,msg=>'ok'});

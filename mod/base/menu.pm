@@ -591,7 +591,7 @@ sub root
          next if ($v=~m/^DIRECT_/);
          next if ($v=~m/^search_/);
          next if ($v=~m/^AutoSearch$/);
-         next if ($v=~m/^MyW5BaseSUBMOD$/);
+         next if ($v=~m/^\S+[a-z]SUBMOD$/);
          next if ($v=~m/^OpenURL$/);
          Query->Delete($v);
       }
@@ -740,6 +740,7 @@ sub msel
    my $mt=$self->Cache->{Menu}->{Cache};
    #printf STDERR ("fifi mtab=%s\n",Dumper($mt));
    my $fp=Query->Param("FunctionPath"); 
+   my $originalMenuSelection=$fp;
    $fp=~s/^\///;
    my @fp=split(/[\/\.]/,$fp);
    my $rootpath=Query->Param("RootPath");
@@ -782,7 +783,7 @@ sub msel
       next if ($sv=~m/^DIRECT_/);
       next if ($sv=~m/^search_/);
       next if ($sv=~m/^AutoSearch$/);
-      next if ($sv=~m/^MyW5BaseSUBMOD$/);
+      next if ($sv=~m/^\S+[a-z]SUBMOD$/);
       next if ($sv=~m/^OpenURL$/);
       delete($qu{$sv});
    }
@@ -849,7 +850,7 @@ EOF
             }
             my %forwardquery;
             foreach my $q (Query->Param()){
-               next if (!($q=~m/^(OpenURL|search_|Auto|MyW5Base|DIRECT_)/));
+               next if (!($q=~m/^(OpenURL|search_|Auto|\S+[a-z]SUBMOD|DIRECT_)/));
                $forwardquery{$q}=[Query->Param($q)];
             }
             if (keys(%forwardquery)){
@@ -858,6 +859,10 @@ EOF
             }
          }
       }
+      $currenturl.="?" if (!($currenturl=~m/\?/));
+      $currenturl.="&".kernel::cgi::Hash2QueryString(         
+         originalMenuSelection=>$originalMenuSelection 
+      );
       print ("<frame marginwidth=0 class=work marginheight=0 scrolling=auto ".
              "name=work src=\"$currenturl\"></frame>\n");
    }

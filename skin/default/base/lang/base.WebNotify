@@ -1,0 +1,3 @@
+'base::WebNotify'=>{de=>'Benachrichtigung',
+                    en=>'notification'},
+'please select a query'=>{de=>'bitte wählen Sie ein Benachrichtigungsverfahren'},
