@@ -292,12 +292,15 @@ sub new
       new kernel::Field::Text(
                 name          =>'grpid',
                 readonly      =>1,
+                htmldetail    =>0,
                 label         =>'GrpID',
                 dataobjattr   =>'lnkgrpuser.grpid'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Text(
                 name          =>'userid',
-                label         =>'UserId',
+                readonly      =>1,
+                htmldetail    =>0,
+                label         =>'UserID',
                 dataobjattr   =>'lnkgrpuser.userid'),
 
       new kernel::Field::DynWebIcon(

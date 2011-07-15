@@ -16,6 +16,7 @@
 'Office Phone'=>{de=>'Büro Telefonnummer'},
 'some role changes are not done - you are only Org-Admin'=>{de=>'einige Rollenänderungen wurden nicht übernommen - Sie sind nur Org-Admin'},
 'GrpID'=>{de=>'W5Base Gruppen ID'},
+'UserID'=>{de=>'W5Base Kontakt ID'},
 'Expiration-Date'=>{de=>'Verfallsdatum'},
 'expiration to long in the past'=>{de=>'Verfallsdatum zu weit in der Vergangenheit'},
 'role relation with your security state not allowed'=>{de=>'Rollenzuorndung mit Ihrem Sicherheitsstatus für diese Gruppe nicht erlaubt'},
