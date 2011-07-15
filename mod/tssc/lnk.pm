@@ -123,6 +123,13 @@ sub new
                 label         =>'Destination-obj',
                 dataobjattr   =>getObjDecode("screlationm1.depend_filename")),
 
+      new kernel::Field::Text(
+                name          =>'dstmodel',
+                group         =>'dst',
+                selectfix     =>1,
+                label         =>'Destination-Model',
+                dataobjattr   =>'dstdev.model'),
+
       new kernel::Field::Date(
                 name          =>'sysmodtime',
                 group         =>'status',
@@ -150,11 +157,14 @@ sub getObjDecode
                   "'cm3r','tssc::chm',".
                   "'problem','tssc::inm',".
                   "'rootcause','tssc::prm',".
-                  "'device',decode(substr(depend,0,4),'APPL','tsacinv::appl',".
-                           "decode(substr(depend,0,3),'GER','tsacinv::appl',".
-                           "decode(substr(depend,0,1),'A','tsacinv::asset',".
-                           "decode(substr(depend,0,1),'S','tsacinv::system',".
-                           "NULL)))))");
+                  "'device',".
+                   "decode(dstdev.model,'APPLICATION','tsacinv::appl',".
+                   "decode(dstdev.model,'LOGICAL SYSTEM','tsacinv::system',".
+                   "decode(substr(depend,0,4),'APPL','tsacinv::appl',".
+                   "decode(substr(depend,0,3),'GER','tsacinv::appl',".
+                   "decode(substr(depend,0,1),'A','tsacinv::asset',".
+                   "decode(substr(depend,0,1),'S','tsacinv::system',".
+                           "NULL)))))))");
 }
 
 
@@ -188,5 +198,21 @@ sub isWriteValid
    my $rec=shift;
    return(undef);
 }
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $from="screlationm1,devicem1 dstdev";
+   return($from);
+}
+
+sub initSqlWhere
+{
+   my $self=shift;
+   my $where="screlationm1.depend=dstdev.id(+)";
+   return($where);
+}
+
 
 1;
