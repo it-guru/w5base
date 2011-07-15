@@ -500,7 +500,8 @@ sub ApplicationModified
                # laut Peter soll die Sache am 13.01. auch für Billing gelten
                $acftprec->{Appl}->{Usage}=$w52ac{$ApplU};
             
-               if (defined($acapplrec) && $acapplrec->{applid} ne ""){
+               if (defined($acapplrec) && $acapplrec->{applid} ne "" &&
+                   ($acapplrec->{applid}=~m/^(APPL|GER)/)){
                   $acftprec->{Appl}->{Code}=$acapplrec->{applid};
                   $acftprec->{Appl}->{ExternalID}=$rec->{id};
                   $acftprec->{Appl}->{ExternalSystem}="W5Base";
@@ -511,7 +512,8 @@ sub ApplicationModified
                }
                if ((!exists($acftprec->{Appl}->{Code}) || 
                      $acftprec->{Appl}->{Code} eq "") &&
-                   $rec->{applid} ne ""){
+                   $rec->{applid} ne "" &&
+                   ($rec->{applid}=~m/^(APPL|GER)/)){
                   $acftprec->{Appl}->{Code}=$rec->{applid};
                }
                     
@@ -528,7 +530,8 @@ sub ApplicationModified
                my @l=$applappl->getHashList(qw(id toappl lnktoapplid conproto
                                                toapplid conmode comments));
                foreach my $lnk (@l){
-                  $CurrentEventId="Add Interface '$lnk->{toappl}' to $CurrentAppl";
+                  $CurrentEventId="Add Interface '$lnk->{toappl}' ".
+                                  "to $CurrentAppl";
                   my $acftprec={
                                    APPL_APPL_REL=>{
                                       EventID=>$CurrentEventId,
