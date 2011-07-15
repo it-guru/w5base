@@ -667,7 +667,8 @@ sub Notify
          }
       }
    }
-   foreach my $target (qw(emailto emailcc emailbcc emailtemplate)){
+   foreach my $target (qw(emailto emailcc emailbcc emailtemplate 
+                          allowsms smstext)){
       if (exists($param{$target})){
          $mailset{$target}=$param{$target};
       }
