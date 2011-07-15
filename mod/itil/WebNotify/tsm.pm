@@ -43,7 +43,7 @@ sub getQueryForm
         ":</td></tr>";
    $bb.="<tr height=1%><td><textarea rows=3 name=sendBaseDataAppl ".
         "style='width:100%'>".
-        $data->{sendBaseData}."</textarea></td></tr>";
+        $data->{sendBaseDataAppl}."</textarea></td></tr>";
 
    $bb.="<tr height=1%><td>".
         "<table width=100%><tr><td width=1% nowrap><b>".
@@ -103,7 +103,7 @@ sub ExpandApplications
          $self->LastMsg(INFO,"error in base data request");
          return(0);
       }
-      $data->{sendBaseData}=join("; ",sort(@l));
+      $data->{sendBaseDataAppl}=join("; ",sort(@l));
       $self->LastMsg(OK,"data has been automaticly expanded");
       return(0);
    }

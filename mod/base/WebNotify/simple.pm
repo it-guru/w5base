@@ -94,7 +94,7 @@ sub ExpandContacts
    my $resbuf=shift;
 
    my $req=$data->{sendBaseData};
-   my @req=split(/[;]+/,$req);
+   my @req=split(/[;]+\s*/,$req);
    if (!($req=~m/^\s*$/) && $#req!=-1){
       my @sreq=sort(@req);
       my $cio=getModuleObject($self->Config,"base::user");
