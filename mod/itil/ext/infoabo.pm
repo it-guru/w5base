@@ -47,7 +47,9 @@ sub getControlData
                                  mode  =>[
                                      'changenotify'=>'itil::appl',
                                      'eventnotify'=>'itil::appl',
-                                     'daily_modified_appldiary'=>'itil::appl'
+                                     'daily_modified_appldiary'=>'itil::appl',
+                                     'daily_modified_appldevreq'=>'itil::appl',
+                                     'daily_modified_applbuisreq'=>'itil::appl'
                                  ],
                                 },
            'base::grp'=>        {target=>'fullname',
@@ -79,6 +81,24 @@ sub dailywfreportCompare
        $irec->{mode} eq "daily_modified_appldiary"){
       if (ref($wfrec->{affectedapplicationid}) eq "ARRAY"){
          if ($wfrec->{class}=~m/^.*::diary$/ &&
+             grep(/^$irec->{refid}$/,@{$wfrec->{affectedapplicationid}})){
+            return(1);
+         }
+      }
+   }
+   if ($irec->{parentobj}=~m/::appl$/ &&
+       $irec->{mode} eq "daily_modified_appldevreq"){
+      if (ref($wfrec->{affectedapplicationid}) eq "ARRAY"){
+         if ($wfrec->{class}=~m/^.*::devrequest$/ &&
+             grep(/^$irec->{refid}$/,@{$wfrec->{affectedapplicationid}})){
+            return(1);
+         }
+      }
+   }
+   if ($irec->{parentobj}=~m/::appl$/ &&
+       $irec->{mode} eq "daily_modified_applbuisreq"){
+      if (ref($wfrec->{affectedapplicationid}) eq "ARRAY"){
+         if ($wfrec->{class}=~m/^.*::businesreq$/ &&
              grep(/^$irec->{refid}$/,@{$wfrec->{affectedapplicationid}})){
             return(1);
          }
