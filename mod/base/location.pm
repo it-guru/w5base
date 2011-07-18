@@ -749,6 +749,12 @@ sub Normalize
    if (($rec->{location}=~m/^M\xFC[h]{0,1}lheim$/i)){
       $rec->{location}="M\xFChlheim an der Donau";
    }
+   if (($rec->{location}=~m/^Biberach$/i) ){
+      $rec->{location}="Biberach an der Ri\xDF";
+   }
+   if (($rec->{location}=~m/^Auerbach(\s*\/Vog.*){0,1}$/i) ){
+      $rec->{location}="Auerbach/Vogtland";
+   }
    if (($rec->{location}=~m/^M\xFC[h]{0,1}lheim .*Ruhr$/i) ){
       $rec->{location}="M\xFClheim an der Ruhr";
    }
