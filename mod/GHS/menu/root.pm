@@ -1,4 +1,4 @@
-package TCOM::custsystem;
+package GHS::menu::root;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -18,24 +18,37 @@ package TCOM::custsystem;
 #
 use strict;
 use vars qw(@ISA);
-use itcrm::custsystem;
-@ISA=qw(itcrm::custsystem);
+use kernel;
+use kernel::MenuRegistry;
+@ISA=qw(kernel::MenuRegistry);
 
 sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
+
    return($self);
 }
 
+sub Init
+{
+   my $self=shift;
 
+   $self->RegisterObj("customerportal.cfmghs",
+                      "tmpl/welcome",
+                      prio=>200,
+                      defaultacl=>['admin']);
 
+   $self->RegisterObj("customerportal.cfmghs.appl",
+                      "GHS::custappl",
+                      defaultacl=>['valid_user']);
 
-
-
-
+   $self->RegisterObj("customerportal.cfmghs.system",
+                      "GHS::custsystem",
+                      defaultacl=>['valid_user']);
+   return(1);
+}
 
 
 
