@@ -189,6 +189,7 @@ sub Result
          foreach my $book (@booksets){
             $self->printFlushed(" do booking transfer of $book->[0]");
             $self->setEntries(@$book);
+        #    last;
          }
       }
       else{
@@ -197,8 +198,89 @@ sub Result
       $self->printFlushed(" ");
       $self->printFlushed("... transfer request finshed");
    }
+   $self->signMonth($month);
+   $self->reportStatus($month);
 
    $self->printFlushedFinish();
+}
+
+sub signMonth
+{
+   my $self=shift;
+   my $month=shift;
+
+   $self->printFlushed("\nstart trying to sign month $month");
+
+   my ($m,$y)=$month=~m/^(\d+)\/(\d+)$/;
+
+   my $bumoid=sprintf("%04d%02d",$y,$m);
+   $self->printFlushed("- using bumoid (YYYYMM) = $bumoid");
+  
+   my $param="?i_bumo_id=$bumoid";
+   my $url=$self->{base}."plsql/timesheet_gc.createtimesheet";
+   $url.=$param;
+
+
+   my $response=$self->{ua}->request(GET($url));
+   if ($response->code ne "200"){
+      $self->printFlushed("ERROR: fail to get signMonth report $url\n");
+      printf STDERR ("ERROR: fail to get createweek $url\n");
+      return(0);
+   }
+   #print $response->content;
+   $self->{CurrentForm}={};
+   eval('$self->{htmlparser}->parse($response->content);');
+   if ($@ ne ""){
+      printf STDERR ("%s\n",$@);
+      printf STDERR ("ERROR: parsing createweek=$url\n");
+      return(0);
+   }
+   $self->{CurrentForm}->{'form_aktion'}='INSERT';
+   delete($self->{CurrentForm}->{''});
+   msg(DEBUG,"month Report loaded $month OK");
+   my $sendurl=$self->{base}."plsql/timesheet_gc.createtimesheet";
+   my $request=POST($sendurl,
+                    Content_Type=>'application/x-www-form-urlencoded',
+                    'Accept-Charset'=>'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
+                    'Accept-Language'=>'de,en;q=0.5',
+                    Content=>[%{$self->{CurrentForm}}]);
+   #printf("as_string=%s\n",$request->as_string());
+   my $response=$self->{ua}->request($request);
+   my $res=$response->content;
+   if (($res=~m/Unterschrift Mitarbeiter/) &&
+       !($res=~m/error/i)){
+      $self->printFlushed("... sign of month report seems to be OK");
+   }
+   else{
+      $self->printFlushed($response->content);
+   }
+}
+
+sub reportStatus
+{
+   my $self=shift;
+   my $month=shift;
+
+   $self->printFlushed("\nstart to load month status $month");
+
+   my ($m,$y)=$month=~m/^(\d+)\/(\d+)$/;
+
+   my $bumoid=sprintf("%04d%02d",$y,$m);
+   $self->printFlushed("- using bumoid (YYYYMM) = $bumoid");
+  
+   my $param="?i_bumo_id=$bumoid&".
+             "i_prj_id=-99999&i_activity=j&i_leistungsart=j&i_ratetype=j";
+   my $url=$self->{base}."plsql/report_gc.rptmonth";
+   $url.=$param;
+
+
+   my $response=$self->{ua}->request(GET($url));
+   if ($response->code ne "200"){
+      $self->printFlushed("ERROR: fail to get signMonth report $url\n");
+      printf STDERR ("ERROR: fail to get createweek $url\n");
+      return(0);
+   }
+   print $response->content;
 }
 
 sub loadBookingData
@@ -412,17 +494,18 @@ sub setEntries
 
    my $tasks=$#{$entries}+1;
 
-   my $param="?i_user_tasks=$tasks&i_datum=$date&i_sel_day=1";
-   my $url=$self->{base}."plsql/pweektime_gc.createpage_startweek";
+   my $param="?i_user_tasks=$tasks&i_datum=$date&i_sel=j";
+   my $url=$self->{base}."plsql/pweektime_gc.createpage_week";
    $url.=$param;
 
 
    my $response=$self->{ua}->request(GET($url));
    if ($response->code ne "200"){
+      $self->printFlushed("ERROR: fail to get createweek $url\n");
       printf STDERR ("ERROR: fail to get createweek $url\n");
       return(0);
    }
-#   print $response->content;
+ #  print $response->content;
    $self->{CurrentForm}={};
    eval('$self->{htmlparser}->parse($response->content);');
    if ($@ ne ""){
@@ -435,24 +518,40 @@ sub setEntries
 
    $self->{CurrentForm}->{'i_kommt'}=[$from,''];
    $self->{CurrentForm}->{'i_geht'}=[$to,''];
-   $self->{CurrentForm}->{'i_kw'}="";
+   delete($self->{CurrentForm}->{'i_kw'});
    $self->{CurrentForm}->{'i_action'}='Speichern';
-   $self->{CurrentForm}->{'i_dummy_az'}="";
+   delete($self->{CurrentForm}->{'i_dummy_az'});
+   $self->{CurrentForm}->{'i_redirectmodus'}="";
+   $self->{CurrentForm}->{'i_redirectto'}="";
+   $self->{CurrentForm}->{'i_sel'}="j";
+   $self->{CurrentForm}->{'i_anzahl_tage'}="1";
+   $self->{CurrentForm}->{'i_user_tasks'}=$tasks;
+   $self->{CurrentForm}->{'i_datum'}=$date;
+   $self->{CurrentForm}->{'i_bis'}=$date;
+   $self->{CurrentForm}->{''}='';
+   delete($self->{CurrentForm}->{''});
+   delete($self->{CurrentForm}->{'i_rows'});
+   delete($self->{CurrentForm}->{'i_cols'});
 
    foreach my $tag (qw(i_az i_ts_lock_az_arr i_ts_lock_arr i_ts_rt_la_id
-                       i_dummy_az i_kommentar)){
+                       i_kommentar)){
+      $self->{CurrentForm}->{$tag}="";
+   }
+   foreach my $tag (qw(i_az i_ts_lock_az_arr i_ts_lock_arr i_ts_rt_la_id
+                       i_kommentar)){
       if (ref($self->{CurrentForm}->{$tag}) ne "ARRAY"){
          $self->{CurrentForm}->{$tag}=[];
       }
    }
+   delete($self->{CurrentForm}->{'i_dummy_az'});
 
    for(my $c=0;$c<$tasks;$c++){
-     # if (!defined($self->{CurrentForm}->{'i_az'}->[$c])){
+      if (!defined($self->{CurrentForm}->{'i_az'}->[$c])){
        $self->{CurrentForm}->{'i_az'}->[$c]=$entries->[$c]->{'effort'};
-     # }
-     # if (!defined($self->{CurrentForm}->{'i_ts_rt_la_id'}->[$c])){
+      }
+      if (!defined($self->{CurrentForm}->{'i_ts_rt_la_id'}->[$c])){
        $self->{CurrentForm}->{'i_ts_rt_la_id'}->[$c]=$entries->[$c]->{'wsid'};
-     # }
+      }
       if (!defined($self->{CurrentForm}->{'i_ts_lock_arr'}->[$c])){
          $self->{CurrentForm}->{'i_ts_lock_arr'}->[$c]='0';
       }
@@ -471,18 +570,20 @@ sub setEntries
    delete($self->{CurrentForm}->{'i_col_sum'});  # these fields ar set ro
    delete($self->{CurrentForm}->{'i_row_sum'});  # these fields ar set ro
 
-   #printf ("keys=%s\n",join(",",sort(keys(%{$self->{CurrentForm}}))));
+  # printf ("<xmp>keys=%s</xmp>\n",
+  #         join(",",sort(keys(%{$self->{CurrentForm}}))));
+  # printf ("<xmp>%s</xml>",Dumper(\%{$self->{CurrentForm}}));
    my $sendurl=$self->{base}."plsql/pweektime_gc.createpage_week";
-   msg(DEBUG,"sendurl=$sendurl");
    my $request=POST($sendurl,
                     Content_Type=>'application/x-www-form-urlencoded',
-                    Referer=>'https://milesplus-ref.t-systems.com/mpt5/plsql/pweektime_gc.createpage_startweek?i_datum=14.01.2011&i_wkdatum=',
                     'Accept-Charset'=>'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
                     'Accept-Language'=>'de,en;q=0.5',
                     Content=>[%{$self->{CurrentForm}}]);
+  # printf("as_string=%s\n",$request->as_string());
    my $response=$self->{ua}->request($request);
+   $self->printFlushed($response->content);
    if ($response->is_redirect){
-   #   print "Result:\n".Dumper($response);
+      #printf("redirect:%s\n",$response->content);
 
       my $response=$self->{ua}->request(GET($response->header('Location')));
    }
@@ -492,6 +593,11 @@ sub setEntries
       my $emsg;
       if (my ($msg)=$d=~m/FEHLER!.*?\<BR\>(.*?)\<BR\>/s){
          $emsg=$msg;
+         $emsg=~s/\<br\>/\n/g;
+         print $emsg;
+      }
+      if (my ($msg)=$d=~m/Error .* calling procedure/s){
+         $emsg=$d;
          $emsg=~s/\<br\>/\n/g;
          print $emsg;
       }
