@@ -39,19 +39,20 @@ sub ProcessServiceCenterRecord
    my $self=shift;
    my $selfname=shift;
    my $rec=shift;
+   my $obj=shift;
    my $wf=$self->{wf};
 
    #msg(DEBUG,"chm=%s",Dumper($rec));
    my ($wfstorerec,$updateto,$relations);
    if (defined($rec->{changenumber})){
       ($wfstorerec,$updateto,$relations)=
-         $self->mkChangeStoreRec($rec,$wf,$selfname);
+         $self->mkChangeStoreRec($rec,$wf,$selfname,$obj);
    }
    if (defined($rec->{problemnumber})){
-      ($wfstorerec,$updateto)=$self->mkProblemStoreRec($rec,$wf,$selfname);
+      ($wfstorerec,$updateto)=$self->mkProblemStoreRec($rec,$wf,$selfname,$obj);
    }
    if (defined($rec->{incidentnumber})){
-      ($wfstorerec,$updateto)=$self->mkIncidentStoreRec($rec,$wf,$selfname);
+      ($wfstorerec,$updateto)=$self->mkIncidentStoreRec($rec,$wf,$selfname,$obj);
    }
    if (defined($wfstorerec)){
       if (!defined($updateto) || $updateto eq ""){
@@ -171,6 +172,7 @@ sub mkProblemStoreRec
    my $rec=shift;
    my $wf=shift;
    my $selfname=shift;
+   my $obj=shift;
    my $updateto;
    my $oldclass;
    my %wfrec=(srcsys=>$selfname);
@@ -273,6 +275,7 @@ sub mkChangeStoreRec
    my $rec=shift;
    my $wf=shift;
    my $selfname=shift;
+   my $obj=shift;
    my $updateto;
    my $oldclass;
    my %wfrec=(srcsys=>$selfname);
@@ -885,6 +888,7 @@ sub mkIncidentStoreRec
    my $rec=shift;
    my $wf=shift;
    my $selfname=shift;
+   my $obj=shift;
    my $updateto;
    my $oldclass;
    my %wfrec=(srcsys=>$selfname);

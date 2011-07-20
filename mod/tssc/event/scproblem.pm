@@ -18,7 +18,6 @@ package tssc::event::scproblem;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::Event;
 use tssc::lib::io;
@@ -90,7 +89,7 @@ sub scproblem
          if ($self->ServerGoesDown()){
             last READLOOP;
          }
-         $self->ProcessServiceCenterRecord($selfname,$rec);
+         $self->ProcessServiceCenterRecord($selfname,$rec,$prm);
          ($rec,$msg)=$prm->getNext();
          if (defined($msg)){
             msg(ERROR,"db record problem: %s",$msg);

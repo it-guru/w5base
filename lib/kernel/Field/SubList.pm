@@ -19,7 +19,6 @@ package kernel::Field::SubList;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use Data::Dumper;
 @ISA    = qw(kernel::Field);
 
 
@@ -263,6 +262,9 @@ sub RawValue
       my $srcval=$srcfield->RawValue($current);
       my $loadfield=$self->{vjoinon}->[1];
       $self->vjoinobjInit();
+
+
+
       if (defined($self->{vjoinbase})){
          my $base=$self->{vjoinbase};
          if (ref($base) eq "HASH"){
@@ -271,6 +273,8 @@ sub RawValue
          $self->vjoinobj->SetNamedFilter("BASE",@{$base});
       }
       $self->vjoinobj->SetFilter({$self->{vjoinon}->[1]=>$srcval});
+
+
       my @view=($self->{vjoindisp});
       @view=@{$self->{vjoindisp}} if (ref($self->{vjoindisp}) eq "ARRAY");
       if (defined($self->{vjoininhash})){

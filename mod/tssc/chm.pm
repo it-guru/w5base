@@ -170,9 +170,9 @@ sub new
                 group         =>'tasks',
                 vjointo       =>'tssc::chmtask',
                 vjoinon       =>['changenumber'=>'changenumber'],
-                vjoininhash   =>['planned_start','planned_end',
+                vjoininhash   =>['plannedstart','plannedend',
                                  'tasknumber','name',
-                                 'down_start','down_end','status'],
+                                 'downstart','downend','status','relations'],
                 vjoindisp     =>[qw(tasknumber name)]),
 
       new kernel::Field::Textarea(
@@ -187,6 +187,7 @@ sub new
       new kernel::Field::Number(
                 name          =>'descriptionlength',
                 label         =>'Description length',
+                htmldetail    =>0,
                 searchable    =>0,
                 depend        =>['description'],
                 onRawValue    =>sub{

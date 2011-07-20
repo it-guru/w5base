@@ -9,7 +9,7 @@
 
 'fieldgroup.close'=>{de=>'Abschluss Informationen',en=>'Closing Informations'},
 'fieldgroup.device'=>{de=>'betroffene Geräte/Systeme (deprecated)',en=>'affected Devices/Systems (deprecated)'},
-'Brief Description'=>{de=>'Kurzbeschreibung (Brief Description)'},
+'Brief Description'=>{de=>'Kurzbeschreibung'},
 'Description'=>{de=>'Beschreibung (Description)'},
 'Description length'=>{de=>'Beschreibungslänge'},
 'Requested By'=>{de=>'Angefordert von (Requested By)'},

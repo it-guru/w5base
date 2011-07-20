@@ -59,6 +59,12 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'dsccentralassignmentm1.name'),
 
+      new kernel::Field::Email(
+                name          =>'groupmailbox',
+                label         =>'group mailbox',
+                ignorecase    =>1,
+                dataobjattr   =>'dsccentralassignmentm1.email_address'),
+
       new kernel::Field::SubList(
                 name          =>'users',
                 label         =>'Users',

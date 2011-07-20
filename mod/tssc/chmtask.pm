@@ -85,12 +85,14 @@ sub new
       new kernel::Field::Date(
                 name          =>'downstart',
                 timezone      =>'CET',
+                group         =>'downtime',
                 label         =>'Down Start',
                 dataobjattr   =>'cm3tm1.down_start'),
 
       new kernel::Field::Date(
                 name          =>'downend',
                 timezone      =>'CET',
+                group         =>'downtime',
                 label         =>'Down End',
                 dataobjattr   =>'cm3tm1.down_end'),
 
@@ -100,6 +102,27 @@ sub new
                 searchable    =>0,
                 htmlwidth     =>300,
                 dataobjattr   =>'cm3tm1.description'),
+
+      new kernel::Field::SubList(
+                name          =>'relations',
+                label         =>'Relations',
+                group         =>'relations',
+                vjointo       =>'tssc::lnk',
+                vjoinon       =>['tasknumber'=>'src'],
+                vjoininhash   =>['dst','dstobj'],
+                vjoindisp     =>[qw(dst dstname)]),
+
+      new kernel::Field::Date(
+                name          =>'workstart',
+                timezone      =>'CET',
+                label         =>'Work Start',
+                dataobjattr   =>'cm3tm1.down_start'),
+
+      new kernel::Field::Date(
+                name          =>'workend',
+                timezone      =>'CET',
+                label         =>'Work End',
+                dataobjattr   =>'cm3tm1.down_end'),
 
       new kernel::Field::Text(
                 name          =>'assingedto',
@@ -177,6 +200,14 @@ sub isWriteValid
    my $rec=shift;
    return(undef);
 }
+
+sub getDetailBlockPriority                # posibility to change the block order
+{
+   my $self=shift;
+   return(qw(header default downtime relations contact status));
+}
+
+
 
 
 1;

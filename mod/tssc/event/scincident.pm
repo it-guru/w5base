@@ -48,9 +48,9 @@ sub scincident
 
    $self->InitScImportEnviroment();
    my $selfname=$self->Self();
-   my $chm=getModuleObject($self->Config,"tssc::inm");
+   my $inm=getModuleObject($self->Config,"tssc::inm");
    msg(DEBUG,"ServiceCenter inm is connected");
-   $chm->SetCurrentView(qw(closetime incidentnumber name description status 
+   $inm->SetCurrentView(qw(closetime incidentnumber name description status 
                            hassignment iassignment priority causecode reason
                            downtimestart downtimeend opentime 
                            workstart workend resolution custapplication
@@ -81,15 +81,15 @@ sub scincident
       }
    }
    msg(DEBUG,"filter=%s",Dumper(\%flt));
-   $chm->SetFilter(\%flt);
-   my ($rec,$msg)=$chm->getFirst();
+   $inm->SetFilter(\%flt);
+   my ($rec,$msg)=$inm->getFirst();
    if (defined($rec)){
       READLOOP: do{
          if ($self->ServerGoesDown()){
             last READLOOP;
          }
-         $self->ProcessServiceCenterRecord($selfname,$rec);
-         ($rec,$msg)=$chm->getNext();
+         $self->ProcessServiceCenterRecord($selfname,$rec,$inm);
+         ($rec,$msg)=$inm->getNext();
          if (defined($msg)){
             msg(ERROR,"db record problem: %s",$msg);
             return({exitcode=>1});

@@ -30,6 +30,8 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
 
+   $self->{timeout}=1200;
+
    return($self);
 }
 
@@ -38,7 +40,7 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("scchange","scchange",timeout=>1200);
+   $self->RegisterEvent("scchange","scchange",timeout=>$self->{timeout});
 }
 
 sub scchange
@@ -97,10 +99,10 @@ sub scchange
    my ($rec,$msg)=$chm->getFirst();
    if (defined($rec)){
       READLOOP: do{
-         if ($self->ServerGoesDown()){
-            last READLOOP;
+         if ($self->ServerGoesDown()){  # this is needed, because this is a
+            last READLOOP;              # long running event!
          }
-         $self->ProcessServiceCenterRecord($selfname,$rec);
+         $self->ProcessServiceCenterRecord($selfname,$rec,$chm);
          ($rec,$msg)=$chm->getNext();
          if (defined($msg)){
             msg(ERROR,"db record problem: %s",$msg);
