@@ -2404,11 +2404,15 @@ EOF
                                                 surname givenname orgunits));
             if (defined($urec) && $urec->{w5mailsig} ne ""){
                my $tmpl=$urec->{'w5mailsig'};
+               my $orgunits=$urec->{orgunits};
+               if (ref($orgunits) eq "ARRAY"){
+                  $orgunits=join(", ",@$orgunits);
+               }
                $tmpl=~s/\%S/$urec->{surname}/g;
                $tmpl=~s/\%G/$urec->{givenname}/g;
                $tmpl=~s/\%P/$urec->{office_phone}/g;
                $tmpl=~s/\%M/$urec->{office_mobile}/g;
-               $tmpl=~s/\%O/$urec->{orgunits}/g;
+               $tmpl=~s/\%O/$orgunits/g;
                $m.="\n\n\n\n--\n".$tmpl;
             }
          }
