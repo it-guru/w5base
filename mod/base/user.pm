@@ -581,6 +581,14 @@ sub new
                 value         =>['','normal','large'],
                 container     =>'options'),
 
+      new kernel::Field::Textarea(
+                name          =>'w5mailsig',
+                uploadable    =>0,
+                searchable    =>0,
+                group         =>'userparam',
+                label         =>'W5Base Mail Signatur',
+                dataobjattr   =>'contact.w5mailsig'),
+
       new kernel::Field::Select(
                 name          =>'sms',
                 label         =>'SMS Notification',
@@ -755,10 +763,10 @@ sub new
                 group         =>'groups',
                 htmldetail    =>0,
                 readonly      =>1,
-                vjointo       =>'base::lnkgrpuser',
-                vjoinbase     =>['lineroles'=>[orgRoles()]],
+                vjointo       =>'base::lnkgrpuserrole',
+                vjoinbase     =>['nativrole'=>[orgRoles()]],
                 vjoinon       =>['userid'=>'userid'],
-                vjoindisp     =>['group']),
+                vjoindisp     =>['grpfullname']),
 
       new kernel::Field::SubList(
                 name          =>'roles',

@@ -2394,6 +2394,25 @@ EOF
          $s=$rec->{name};
       }
       $addref="checked";
+      if (!($m=~m/^--$/m)){      
+         my $u=getModuleObject($self->Config,"base::user");
+         if (defined($u)){
+            my $userid=$self->getCurrentUserId();
+            $u->SetFilter({userid=>\$userid});
+            my ($urec,$msg)=$u->getOnlyFirst(qw(w5mailsig 
+                                                office_phone office_mobile
+                                                surname givenname orgunits));
+            if (defined($urec) && $urec->{w5mailsig} ne ""){
+               my $tmpl=$urec->{'w5mailsig'};
+               $tmpl=~s/\%S/$urec->{surname}/g;
+               $tmpl=~s/\%G/$urec->{givenname}/g;
+               $tmpl=~s/\%P/$urec->{office_phone}/g;
+               $tmpl=~s/\%M/$urec->{office_mobile}/g;
+               $tmpl=~s/\%O/$urec->{orgunits}/g;
+               $m.="\n\n\n\n--\n".$tmpl;
+            }
+         }
+      }
    }
 
 
