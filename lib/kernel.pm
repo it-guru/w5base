@@ -112,7 +112,7 @@ sub haveSpecialChar
    my $str=shift;
    my %param=@_;
 
-   if ($str=~m/[\~§\s,äöüß\\,;\*\?\r\n\t]/i){
+   if ($str=~m/[\~§\s,ÖÜÄäöüß\\,;\*\?\r\n\t]/i){
       return(1);
    }
    return(0);
