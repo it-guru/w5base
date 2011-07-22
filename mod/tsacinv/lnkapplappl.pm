@@ -55,14 +55,25 @@ sub new
                 dataobjattr   =>'amtsicustappl.name'),
 
       new kernel::Field::Text(
+                name          =>'type',
+                label         =>'type',
+                dataobjattr   =>'amtsirelappl.type'),
+
+      new kernel::Field::Interface(
                 name          =>'lparentid',
                 label         =>'lparentid',
                 dataobjattr   =>'amtsirelappl.lparentid'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Interface(
                 name          =>'lchildid',
                 label         =>'lchildid',
                 dataobjattr   =>'amtsirelappl.lchildid'),
+
+      new kernel::Field::Date(
+                name          =>'mdate',
+                group         =>'source',
+                label         =>'Modification-Date',
+                dataobjattr   =>'amtsirelappl.dtlastmodif'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',

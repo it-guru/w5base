@@ -1,4 +1,5 @@
 'tsacinv::lnkapplappl'=>{de=>'Schnittstelle'},
 'Child Application'=>{de=>'Schnittstellen Anwendung'},
 'Parent Application'=>{de=>'Anwendung'},
+'type'=>{de=>'Typ'},
 'fieldgroup.default'=>{de=>'Schnittstellendaten'},

@@ -217,7 +217,6 @@ sub AssetModified
                if (defined($acftprec)){
                   my $fh=$fh{asset};
                   print $fh hash2xml($acftprec,{header=>0});
-               printf STDERR ("acftprec=%s\n",Dumper($acftprec));
                   $acnew++;
                }
             }
@@ -386,9 +385,54 @@ sub ApplicationModified
                   $elements++;
                }
             }
+            { # fill up missing system links by SAP application relations in AM
+               if ($rec->{applid} ne ""){
+                  $acappl->ResetFilter();
+                  $acappl->SetFilter({applid=>\$rec->{applid}});
+                  my ($acapplrec,$msg)=$acappl->getOnlyFirst(qw(applid id));
+                  if (defined($acapplrec)){
+                     my $lnks=getModuleObject($self->Config,
+                                              "tsacinv::lnkapplsystem");
+                     my $acla=getModuleObject($self->Config,
+                                              "tsacinv::lnkapplappl");
+                     $acla->SetFilter({lparentid=>\$acapplrec->{id},
+                                       type=>\'SAP'});
+                     foreach my $lnkrec ($acla->getHashList(qw(ALL))){
+                        $lnks->ResetFilter();
+                        $lnks->SetFilter({lparentid=>\$lnkrec->{lchildid}});
+                        foreach my $srec ($lnks->getHashList(qw(systemid))){
+                           my $externalid=$srec->{systemid}."-".
+                                          $acapplrec->{applid}."-SAP";
+                           my $acftprec={
+                                          CI_APPL_REL=>{
+                                             EventID=>'fillup link by SAP'.
+                                                      'application relation '.
+                                                      $externalid,
+                                             Application=>$acapplrec->{applid},
+                                             Portfolio=>$srec->{systemid},
+                                             ExternalSystem=>'W5Base',
+                                             ExternalID=>$externalid,
+                                             Security_Unit=>"TS.DE",
+                                             Description=>
+                                                  'fillup link by SAP'.
+                                                  'application relation',
+                                             bDelete=>'0',
+                                             bActive=>'1',
+                                          }
+                                        };
+
+                           my $fh=$fh{ci_appl_rel};
+                           print $fh hash2xml($acftprec,{header=>0});
+                           print $onlinefh hash2xml($acftprec,{header=>0});
+                        }
+                     }
+                  }
+               }
+            }
             my $acapplrec;
             { # Application
                if ($rec->{applid} ne ""){
+                  $acappl->ResetFilter();
                   $acappl->SetFilter({applid=>\$rec->{applid}});
                   ($acapplrec,$msg)=$acappl->getOnlyFirst(qw(applid));
            
@@ -942,8 +986,8 @@ sub TransferFile
          if (!$ftp->Put($filename,$jobfile)){
             msg(ERROR,"File $filename to $jobfile could not be transfered");
          }
+         unlink($filename);
       }
-      unlink($filename);
       $ftp->Disconnect();
    }
    else{
