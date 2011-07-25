@@ -234,6 +234,13 @@ sub new
                 group         =>'clustinfo',
                 dataobjattr   =>'itclust.cistatus'),
 
+      new kernel::Field::Link(
+                name          =>'mandatorid',
+                label         =>'Mandator ID of Cluster',
+                readonly      =>1,
+                group         =>'clustinfo',
+                dataobjattr   =>'itclust.mandator'),
+
       new kernel::Field::Text(
                 name          =>'clustid',
                 htmldetail    =>0,

@@ -19,7 +19,6 @@ package itil::ipaddress;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use Data::Dumper;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
@@ -68,6 +67,7 @@ sub new
                    my %param=@_;
                    my $current=$param{current};
 
+                   return(1) if (!defined($current));
                    return(0) if ($current->{systemid} eq "");
                    return(1);
                 },
@@ -93,6 +93,7 @@ sub new
                    my %param=@_;
                    my $current=$param{current};
 
+                   return(1) if (!defined($current));
                    return(0) if ($current->{itclustsvcid} eq "");
                    return(1);
                 },
@@ -175,43 +176,25 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'applicationnames',
-                label         =>'Systems Applicationnames',
+                label         =>'Applicationnames',
                 group         =>'further',
                 readonly      =>1,
-                htmldetail    =>0,
-                uivisible     =>sub{
-                   my $self=shift;
-                   my $mode=shift;
-                   my %param=@_;
-                   my $current=$param{current};
-
-                   return(0) if ($current->{systemid} eq "");
-                   return(1);
-                },
-                vjointo       =>'itil::lnkapplsystem',
+                weblinkto     =>'NONE',
+                vjointo       =>'itil::lnkapplip',
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
-                vjoinon       =>['furthersystemid'=>'systemid'],
+                vjoinon       =>['id'=>'ipaddressid'],
                 vjoindisp     =>['appl']),
 
       new kernel::Field::Text(
                 name          =>'applcustomer',
-                label         =>'Systems Application Customer',
+                label         =>'Application Customer',
                 readonly      =>1,
-                htmldetail    =>0,
-                uivisible     =>sub{
-                   my $self=shift;
-                   my $mode=shift;
-                   my %param=@_;
-                   my $current=$param{current};
-
-                   return(0) if ($current->{systemid} eq "");
-                   return(1);
-                },
+                weblinkto     =>'NONE',
                 group         =>'further',
-                vjointo       =>'itil::lnkapplsystem',
+                vjointo       =>'itil::lnkapplip',
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
-                vjoinon       =>['furthersystemid'=>'systemid'],
-                vjoindisp     =>'applcustomer'),
+                vjoinon       =>['id'=>'ipaddressid'],
+                vjoindisp     =>'customer'),
 
       new kernel::Field::Text(
                 name          =>'tsmemail',
@@ -581,45 +564,83 @@ sub isParentSpecified
 
 }
 
+
+
+
+
 sub isParentWriteable
 {
    my $self=shift;
    my $systemid=shift;
    my $itclustsvcid=shift;
 
+   return($self->isParentOPvalid("write",$systemid,$itclustsvcid));
+
+}
+
+sub isParentReadable
+{
+   my $self=shift;
+   my $systemid=shift;
+   my $itclustsvcid=shift;
+
+   return($self->isParentOPvalid("read",$systemid,$itclustsvcid));
+
+}
+
+sub isParentOPvalid
+{
+   my $self=shift;
+   my $mode=shift;
+   my $systemid=shift;
+   my $itclustsvcid=shift;
+
    if ($systemid ne ""){
-      my $p=$self->getPersistentModuleObject($self->Config,"itil::system");
+      my $p=$self->getPersistentModuleObject("itil::system");
       my $idname=$p->IdField->Name();
       my %flt=($idname=>\$systemid);
-      $p->SetFilter(\%flt);
+      $p->ResetFilter();
+      $p->SecureSetFilter(\%flt,\%flt);  # verhindert idDirectFilter true
       my @l=$p->getHashList(qw(ALL));
       if ($#l!=0){
-         $self->LastMsg(ERROR,"invalid system reference");
+         $self->LastMsg(ERROR,"invalid system reference") if ($mode eq "write");
          return(0);
       }
-      my @write=$p->isWriteValid($l[0]);
+      my @blkl;
+      if ($mode eq "write"){ 
+         @blkl=$p->isWriteValid($l[0]);
+      }
+      if ($mode eq "read"){ 
+         @blkl=$p->isViewValid($l[0]);
+      }
       if (isDataInputFromUserFrontend()){
-         if (!grep(/^ALL$/,@write) && !grep(/^ipaddresses$/,@write)){
-            $self->LastMsg(ERROR,"no access");
+         if (!grep(/^ALL$/,@blkl) && !grep(/^ipaddresses$/,@blkl)){
+            $self->LastMsg(ERROR,"no access") if ($mode eq "write");
             return(0);
          }
       }
    }
    if ($itclustsvcid ne ""){
-      my $p=$self->getPersistentModuleObject($self->Config,
-                                             "itil::lnkitclustsvc");
+      my $p=$self->getPersistentModuleObject("itil::lnkitclustsvc");
       my $idname=$p->IdField->Name();
       my %flt=($idname=>\$itclustsvcid);
-      $p->SetFilter(\%flt);
+      $p->ResetFilter();
+      $p->SecureSetFilter(\%flt,\%flt);
       my @l=$p->getHashList(qw(ALL));
       if ($#l!=0){
-         $self->LastMsg(ERROR,"invalid itclust reference");
+         $self->LastMsg(ERROR,"invalid itclust reference") if ($mode eq "write");
          return(0);
       }
-      my @write=$p->isWriteValid($l[0]);
+      my @blkl;
+      if ($mode eq "write"){ 
+         @blkl=$p->isWriteValid($l[0]);
+      }
+      if ($mode eq "read"){ 
+         @blkl=$p->isViewValid($l[0]);
+      }
       if (isDataInputFromUserFrontend()){
-         if (!grep(/^ALL$/,@write) && !grep(/^ipaddresses$/,@write)){
-            $self->LastMsg(ERROR,"no access");
+         if (!grep(/^ALL$/,@blkl) && !grep(/^ipaddresses$/,@blkl)){
+            $self->LastMsg(ERROR,"no access") if ($mode eq "write");
             return(0);
          }
       }
@@ -634,8 +655,15 @@ sub isViewValid
    my $rec=shift;
    my @def=("header","default");
    return(@def) if (!defined($rec));
-   return(@def,"source","dnsaliases","relatedto","further") if ($rec->{dnsname} ne "");
-   return(@def,"source","relatedto","further");
+   push(@def,"source");
+   if ($self->isParentReadable($rec->{systemid},$rec->{itclustsvcid})){
+      push(@def,"relatedto","further");
+      push(@def,"dnsaliases",) if ($rec->{dnsname} ne "");
+   }
+   else{
+      return();
+   }
+   return(@def);
 }
 
 sub isWriteValid
@@ -661,7 +689,7 @@ sub getRecordHtmlIndex
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default relatedto dnsaliases source));
+   return(qw(header default relatedto dnsaliases further source));
 }
 
 

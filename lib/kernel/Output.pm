@@ -178,6 +178,9 @@ sub WriteToStdout
                   syswrite($fh,$d);
                }
             }
+            else{
+               $self->Context->{CurrentLimit}++; # fix to handel isViewValid
+            }                                    # denied of a record
          }
          if ($self->{NewRecord} || (!$self->Format->isRecordHandler())){
             $rec=undef;
