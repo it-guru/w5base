@@ -89,11 +89,16 @@ sub scproblem
          if ($self->ServerGoesDown()){
             last READLOOP;
          }
+         if ((!$prm->Ping()) || (!$self->{wf}->Ping())){
+            my $msg="database connection aborted";
+            msg(ERROR,"db record problem: %s",$msg);
+            return({exitcode=>2,msg=>$msg});
+         }
          $self->ProcessServiceCenterRecord($selfname,$rec,$prm);
          ($rec,$msg)=$prm->getNext();
          if (defined($msg)){
             msg(ERROR,"db record problem: %s",$msg);
-            return({exitcode=>1});
+            return({exitcode=>1,msg=>$msg});
          }
       }until(!defined($rec));
    }

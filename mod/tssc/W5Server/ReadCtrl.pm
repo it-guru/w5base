@@ -30,51 +30,58 @@ sub process
               'scchange'=>{
                            laststart=>undef,
                            lastend=>undef,
+#                           suspend=>30, # dont start in first 15 minutes
                            AsyncID=>undef,
                           },
               'scincident'=>{
                            laststart=>undef,
                            lastend=>undef,
+#                           suspend=>30, # dont start in first 15 minutes
                            AsyncID=>undef,
                           },
               'scproblem'=>{
                            laststart=>undef,
                            lastend=>undef,
+#                           suspend=>30,   # dont start in first 15 minutes
                            AsyncID=>undef,
                           }
              );
    my $evrt=getModuleObject($self->Config,"base::eventrouter");
-   my $bk=$evrt->W5ServerCall("rpcCallEvent","LongRunner");
+   #my $bk=$evrt->W5ServerCall("rpcCallEvent","LongRunner");
 
-
+   my $looptimer=30;
    while(!$self->ServerGoesDown()){
       my $evrt=getModuleObject($self->Config,"base::eventrouter");
       #
       # Job Starter
       #
       if (1){
-         printf STDERR ("fifi from %s now i check to start new events\n",
+         msg(DEBUG,"from %s now i check to start new events\n",
                         $self->Self());
          EVST: foreach my $eventname (keys(%ctrl)){
+            if ($ctrl{$eventname}->{'suspend'}>0){
+               $ctrl{$eventname}->{'suspend'}--;
+            }
             if (currentRunnings(\%ctrl)<3){
                if (!defined($ctrl{$eventname}->{'AsyncID'}) &&
+                   $ctrl{$eventname}->{'suspend'}<=0 &&
                    ((defined($ctrl{$eventname}->{'lastend'}) &&
                      $ctrl{$eventname}->{'lastend'}<(time()-180)) ||
                     (!defined($ctrl{$eventname}->{'laststart'})) ||
                     ($ctrl{$eventname}->{'laststart'}<(time()-1200)))){
                   my $bk=$evrt->W5ServerCall("rpcCallEvent",$eventname);
-                  if (ref($bk) eq "HASH" && 
-                      $bk->{'exitcode'}==0 &&
-                      $bk->{'AsyncID'}!=0){
-                     $ctrl{$eventname}->{'laststart'}=time();
-                     $ctrl{$eventname}->{'lastend'}=undef;
-                     $ctrl{$eventname}->{'AsyncID'}= $bk->{'AsyncID'};
-                     last EVST;       
+                  if (ref($bk) eq "HASH"){
+                     if ($bk->{'exitcode'}==0 &&
+                         $bk->{'AsyncID'}!=0){
+                        $ctrl{$eventname}->{'laststart'}=time();
+                        $ctrl{$eventname}->{'lastend'}=undef;
+                        $ctrl{$eventname}->{'AsyncID'}= $bk->{'AsyncID'};
+                        last EVST;       
+                     }
                   }
                   else{
-                     die('ERROR: ganz schlecht - can not call event');
+                     die('ERROR: ganz schlecht - bad result from rpcCallEvent');
                   }
-                  printf STDERR ("fifi bk=%s\n",Dumper($bk));
                }
             }
          }
@@ -87,10 +94,21 @@ sub process
             my $bk=$evrt->W5ServerCall("rpcAsyncState",
                                    $ctrl{$eventname}->{'AsyncID'});
             if (ref($bk) eq "HASH" && $bk->{'exitcode'}==0){
-               printf STDERR ("fifi loop=%s\n",Dumper($bk));
+              # printf STDERR ("fifi loop=%s\n",Dumper($bk));
                if (exists($bk->{'process'}->{'exitcode'})){
-                  $ctrl{$eventname}->{'lastend'}=time();
-                  $ctrl{$eventname}->{'AsyncID'}=undef; # erst mal egal ob gut
+                  if ($bk->{'process'}->{'exitcode'}==0){
+                     $ctrl{$eventname}->{'lastend'}=time();
+                  }
+                  else{
+                     # if a exitcode!=0 came from the event, the event
+                     # will be suspend for 1 hour.
+                     $ctrl{$eventname}->{'suspend'}=int(3600/$looptimer);
+                     msg(ERROR,"exitcode error:".Dumper($bk));
+                     msg(ERROR,"now i set $eventname to suspend ".
+                               ($ctrl{$eventname}->{'suspend'}*$looptimer).
+                               "sec");
+                  }
+                  $ctrl{$eventname}->{'AsyncID'}=undef; 
                }
             }
             else{
@@ -99,10 +117,10 @@ sub process
             
          }
       }
-      printf STDERR ("fifi from %s at %d\n",$self->Self(),time());
-      printf STDERR ("fifi data=%s\n",Dumper(\%ctrl));
+      #printf STDERR ("fifi from %s at %d\n",$self->Self(),time());
+     # printf STDERR ("fifi data=%s\n",Dumper(\%ctrl));
       $self->FullContextReset();
-      sleep(30);
+      sleep($looptimer);
    }
 }
 

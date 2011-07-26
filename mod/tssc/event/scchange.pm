@@ -18,7 +18,6 @@ package tssc::event::scchange;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::Event;
 use tssc::lib::io;
@@ -102,11 +101,16 @@ sub scchange
          if ($self->ServerGoesDown()){  # this is needed, because this is a
             last READLOOP;              # long running event!
          }
+         if ((!$chm->Ping()) || (!$self->{wf}->Ping())){
+            my $msg="database connection aborted";
+            msg(ERROR,"db record problem: %s",$msg);
+            return({exitcode=>2,msg=>$msg});
+         }
          $self->ProcessServiceCenterRecord($selfname,$rec,$chm);
          ($rec,$msg)=$chm->getNext();
          if (defined($msg)){
             msg(ERROR,"db record problem: %s",$msg);
-            return({exitcode=>1});
+            return({exitcode=>1,msg=>$msg});
          }
       }until(!defined($rec));
    }

@@ -57,6 +57,7 @@ sub rpcCallSerialEvent
          my @bk;
          my $joblog=getModuleObject($self->Config,"base::joblog");
          msg(DEBUG,"joblog=$joblog");
+         my $exitcode=0;
          foreach my $method (@methods){
             my %jobrec=(name=>$method,event=>$eventlabel,pid=>$$);
             my $jobid=$joblog->ValidatedInsertRecord(\%jobrec);
@@ -65,11 +66,19 @@ sub rpcCallSerialEvent
                                                              {param=>[@p]},
                                                              $method);
             for(my $c=0;$c<=$#subbk;$c++){
-               $subbk[$c]->{jobid}=$jobid if (ref($subbk[$c]) eq "HASH");
+               if (ref($subbk[$c]) eq "HASH"){
+                  $subbk[$c]->{jobid}=$jobid;
+                  if (!exists($subbk[$c]->{exitcode}) ||
+                      $subbk[$c]->{exitcode}!=0){
+                     $exitcode=$subbk[$c]->{exitcode};
+                  }
+               }
+               else{
+                  $exitcode="1000";
+               }
             }
             push(@bk,@subbk);
          }
-         my $exitcode=0;
          $exitcode=1 if ($#bk==-1);
          return({exitcode=>$exitcode,handlerresult=>\@bk});
       },timeout=>$timeout,name=>$event));
