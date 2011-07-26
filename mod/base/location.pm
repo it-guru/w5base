@@ -651,6 +651,9 @@ sub Normalize
    if ($rec->{location}=~m/Bietigheim/i){
       $rec->{location}="Bietigheim-Bissingen";
    }
+   if ($rec->{location}=~m/^Bingen$/i){
+      $rec->{location}="Bingen am Rhein";
+   }
    if (defined($rec->{address1})){
       $rec->{address1}=~s/Memmelsdorferstr.*e/Memmelsdorfer Stra\xDFe/g;
       $rec->{address1}=~s/Luebecker\s+/L\xFCbecker /g;
