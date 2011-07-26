@@ -134,7 +134,7 @@ sub new
                 name          =>'sysmodtime',
                 group         =>'status',
                 timezone      =>'CET',
-                label         =>'SysModTime',
+                label         =>'Modification-Date',
                 dataobjattr   =>'screlationm1.sysmodtime'),
 
       new kernel::Field::Textarea(
