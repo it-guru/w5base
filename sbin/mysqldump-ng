@@ -937,5 +937,5 @@ sub CalcDateDuration
 
 my $endtime=sprintf("%04d-%02d-%02d %02d:%02d:%02d",Today_and_Now);
 my $take=CalcDateDuration($starttime,$endtime);
-printf("INFO: the mysqldump-ng operation takes: %s\n",$take->{'string'});                         
+printf("INFO:  the mysqldump-ng operation takes: %s\n",$take->{'string'});                         
                                
