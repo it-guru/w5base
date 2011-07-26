@@ -254,11 +254,7 @@ sub getNextStep
 
    if ($currentstep eq "base::workflow::mailsend::dataload"){
       return("base::workflow::mailsend::verify"); 
-      return("base::workflow::attachment::edit");
    }
-#   elsif($currentstep eq "base::workflow::attachment::edit"){
-#      return("base::workflow::mailsend::verify"); 
-#   }
    elsif($currentstep eq "base::workflow::mailsend::verify"){
       return("base::workflow::mailsend::waitforspool"); 
    }
