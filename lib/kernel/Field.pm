@@ -499,6 +499,13 @@ sub preProcessFilter
             }
          }
       }
+      if (defined($fobj->{vjoinbase})){
+         my $base=$fobj->{vjoinbase};
+         if (ref($base) eq "HASH"){
+            $base=[$base];
+         }
+         $fobj->vjoinobj->SetNamedFilter("BASE",@{$base});
+      }
       my %flt=($searchfield=>$hflt->{$field});
 
       my @keylist=();

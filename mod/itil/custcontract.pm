@@ -104,7 +104,7 @@ sub getRecordImageUrl
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default sem delmgmt 
+   return(qw(header default sem delmgmt modules
              applications contacts control misc attachments source));
 }
 

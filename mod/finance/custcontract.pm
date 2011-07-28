@@ -185,7 +185,7 @@ sub new
 
       new kernel::Field::SubList(
                 name          =>'modules',
-                label         =>'contract standard modules',
+                label         =>'active modules',
                 group         =>'modules',
                 ignViewValid  =>1,
                 allowcleanup  =>1,

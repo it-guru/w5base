@@ -141,6 +141,7 @@ sub _preProcessFilter
          } 
          else{
             if (exists($fobj->{onRawValue}) &&
+                !defined($fobj->{onPreProcessFilter}) &&
                 !$self->isa('kernel::DataObj::Static') &&  # only Static can
                 $fobj->searchable){                        # handle calculated
                my $d=$hflt->{$field};                      # searches

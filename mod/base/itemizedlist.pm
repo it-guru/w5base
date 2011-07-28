@@ -64,8 +64,19 @@ sub new
                 },
                 readonly      =>1,
                 group         =>'icontrol',
-                searchable    =>0,
                 depend        =>['labeldata'],
+                onPreProcessFilter=>sub {
+                   my $self=shift;
+                   my $hflt=shift;
+                   my $changed=0;
+                   my $err;
+                   if (exists($hflt->{$self->Name})){
+                      $hflt->{labeldata}=$hflt->{$self->Name};
+                      delete($hflt->{$self->Name});
+                      $changed++;
+                   }
+                   return($changed,$err);
+                },
                 onRawValue    =>sub{
                    my ($self,$current)=@_;
                    my $lang=$self->getParent->Lang();
