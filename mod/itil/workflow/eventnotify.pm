@@ -535,7 +535,7 @@ sub getDynamicFields
                    cistatusid=>\'4'
                 },
                 vjoinon       =>['eventstatreason'=>'name'],
-                vjoindisp     =>'fullname'),
+                vjoindisp     =>'displaylabel'),
 
       new kernel::Field::Link(
                 name          =>'eventstatreason',

@@ -57,23 +57,30 @@ sub new
                 dataobjattr   =>'itemizedlist.name'),
 
       new kernel::Field::Text(
-                name          =>'fullname',
+                name          =>'displaylabel',
                 htmldetail    =>sub{
                    my ($self,$mode,%param)=@_;
                    return(defined($param{current}) ? 1 : 0);
                 },
                 readonly      =>1,
+                group         =>'icontrol',
                 searchable    =>0,
-                depend        =>['en_fullname','de_fullname'],
+                depend        =>['labeldata'],
                 onRawValue    =>sub{
                    my ($self,$current)=@_;
                    my $lang=$self->getParent->Lang();
-                   if ($lang eq "de"){
-                      return($current->{'de_fullname'});
-                   }
-                   return($current->{'en_fullname'});
+                   return(extractLangEntry($current->{labeldata},$lang));
                 },
                 label         =>'full name'),
+
+      new kernel::Field::Text(
+                name          =>'fullname',
+                searchable    =>0,
+                htmldetail    =>1,
+                group         =>'icontrol',
+                label         =>'item entry fullname',
+                dataobjattr   =>"concat(itemizedlist.selectlabel,".
+                                "'-',itemizedlist.name)"),
 
       new kernel::Field::Select(
                 name          =>'cistatus',
@@ -91,15 +98,34 @@ sub new
                 dataobjattr   =>'itemizedlist.cistatus'),
 
 
+      new kernel::Field::Textarea(
+                name          =>'labeldata',
+                selectfix     =>1,
+                label         =>'label data',
+                dataobjattr   =>'itemizedlist.labeldata'),
+
       new kernel::Field::Text(
                 name          =>'en_fullname',
+                searchable    =>0,
+                group         =>'icontrol',
+                depend        =>['labeldata'], 
                 label         =>'en fullname',
-                dataobjattr   =>'itemizedlist.en_fullname'),
+                onRawValue    =>sub{
+                   my ($self,$current)=@_;
+                   my $lang=$self->getParent->Lang();
+                   return(extractLangEntry($current->{labeldata},"en"));
+                }),
 
       new kernel::Field::Text(
                 name          =>'de_fullname',
+                searchable    =>0,
+                group         =>'icontrol',
                 label         =>'de fullname',
-                dataobjattr   =>'itemizedlist.de_fullname'),
+                depend        =>['labeldata'], 
+                onRawValue    =>sub{
+                   my ($self,$current)=@_;
+                   return(extractLangEntry($current->{labeldata},"de"));
+                }),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
@@ -146,7 +172,7 @@ sub new
                 dataobjattr   =>'itemizedlist.realeditor'),
 
    );
-   $self->setDefaultView(qw(linenumber selectlabel fullname cistatus mdate));
+   $self->setDefaultView(qw(linenumber selectlabel displaylabel cistatus mdate));
    $self->setWorktable("itemizedlist");
    return($self);
 }
@@ -160,6 +186,11 @@ sub initSearchQuery
    }
 }
 
+sub getDetailBlockPriority                # posibility to change the block order
+{
+   my $self=shift;
+   return(qw(header default icontrol source));
+}
 
 
 sub Validate
@@ -172,12 +203,8 @@ sub Validate
       $self->LastMsg(ERROR,"invalid internal name");
       return(undef);
    }
-   if ((my $v=effVal($oldrec,$newrec,"en_fullname"))=~m/^\s*$/){
+   if ((my $v=effVal($oldrec,$newrec,"labeldata"))=~m/^\s*$/){
       $self->LastMsg(ERROR,"invalid english name");
-      return(undef);
-   }
-   if ((my $v=effVal($oldrec,$newrec,"de_fullname"))=~m/^\s*$/){
-      $self->LastMsg(ERROR,"invalid german name");
       return(undef);
    }
 
