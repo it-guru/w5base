@@ -89,7 +89,7 @@ use Unicode::String qw(utf8 latin1 utf16);
              &FormatJsDialCall
              &mkMailInlineAttachment &haveSpecialChar
              &getModuleObject &getConfigObject &generateToken
-             &isDataInputFromUserFrontend &orgRoles
+             &isDataInputFromUserFrontend &orgRoles &extractLangEntry
              &msg &ERROR &WARN &DEBUG &INFO &OK &utf8 &latin1 &utf16);
 
 sub utf8{return(&Unicode::String::utf8);}
@@ -103,6 +103,41 @@ sub LangTable
 sub Dumper
 {
    return(Data::Dumper::Dumper(@_));
+}
+
+
+sub extractLangEntry       # extracts a specific lang entry from a multiline
+{                          # textarea field like :
+   my $labeldata=shift;    #
+   my $lang=shift;         # hello
+   my $maxlen=shift;       # [de:]
+   my $multiline=shift;    # Hallo
+
+   $multiline=0 if (!defined($multiline)); # >1 means max lines 0 = join all
+   $maxlen=0    if (!defined($maxlen));    # 0 means no limits
+
+   my $curlang="";
+   my %ltxt;
+   foreach my $line (split('\r{0,1}\n',$labeldata)){
+      if (my ($newlang)=$line=~m/^\s*\[([a-z]{1,3}):\]$/){
+         $curlang=$newlang;
+      }
+      else{
+         push(@{$ltxt{$curlang}},$line);
+      }
+   }
+   if (exists($ltxt{$lang})){
+      $ltxt{""}=$ltxt{$lang};
+   }
+   my $d;
+   if ($multiline>0){
+      $d=join("\n",@{$ltxt{""}});
+   }
+   else{
+      $d=join(" ",@{$ltxt{""}});
+   }
+  
+   return(trim($d));
 }
 
 
