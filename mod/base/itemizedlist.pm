@@ -66,9 +66,9 @@ sub new
                 group         =>'icontrol',
                 depend        =>['labeldata'],
                 onPreProcessFilter=>sub {
-                   my $self=shift;
-                   my $hflt=shift;
-                   my $changed=0;
+                   my $self=shift;   # if there is a need, to implement a
+                   my $hflt=shift;   # language specific search, this must
+                   my $changed=0;    # be implemented at this point
                    my $err;
                    if (exists($hflt->{$self->Name})){
                       $hflt->{labeldata}=$hflt->{$self->Name};
