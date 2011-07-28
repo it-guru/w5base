@@ -210,6 +210,9 @@ sub ProcessLine
                         "this.className='linehighlight';\" ".
           "onMouseOut=\"this.className=this.oldclassName\">\n";
    }
+   else{
+      $d.=">";
+   }
    for(my $c=0;$c<=$#view;$c++){
       my $fieldname=$view[$c];
       my $field=$app->getField($fieldname);
