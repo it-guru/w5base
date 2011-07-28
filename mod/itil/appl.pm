@@ -455,6 +455,7 @@ sub new
                 vjoindisp     =>['custcontract','fraction'],
                 vjoinbase     =>[{custcontractcistatusid=>'<=5'}],
                 vjoininhash   =>['custcontractid','custcontractcistatusid',
+                                 'modules',
                                  'custcontract','custcontractname']),
 
       new kernel::Field::SubList(

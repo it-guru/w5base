@@ -66,9 +66,9 @@ sub process
                if (!defined($ctrl{$eventname}->{'AsyncID'}) &&
                    $ctrl{$eventname}->{'suspend'}<=0 &&
                    ((defined($ctrl{$eventname}->{'lastend'}) &&
-                     $ctrl{$eventname}->{'lastend'}<(time()-180)) ||
+                     $ctrl{$eventname}->{'lastend'}<(time()-300)) ||
                     (!defined($ctrl{$eventname}->{'laststart'})) ||
-                    ($ctrl{$eventname}->{'laststart'}<(time()-1200)))){
+                    ($ctrl{$eventname}->{'laststart'}<(time()-1500)))){
                   my $bk=$evrt->W5ServerCall("rpcCallEvent",$eventname);
                   if (ref($bk) eq "HASH"){
                      if ($bk->{'exitcode'}==0 &&

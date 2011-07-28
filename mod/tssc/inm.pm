@@ -102,7 +102,7 @@ sub new
                 searchable    =>0,
                 dataobjattr   =>'probsummarya5.update_action'),
 
-      new kernel::Field::Textarea(
+      new kernel::Field::Textarea(        # gibt es in scadm1 nicht mehr!
                 name          =>'resolution',
                 label         =>'Resolution',
                 searchable    =>0,

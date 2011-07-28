@@ -378,7 +378,7 @@ create table itemizedlist (
   cistatus    int(2)       default '4',prio  int(2) default '1000',
   selectlabel char(60) NOT NULL,
   name        char(20) NOT NULL,
-  de_fullname varchar(40),
+  de_fullname varchar(40),labeldata longtext,
   en_fullname varchar(40),
   comments    longtext     default NULL,
   createdate  datetime NOT NULL default '0000-00-00 00:00:00',

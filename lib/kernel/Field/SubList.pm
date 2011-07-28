@@ -27,6 +27,7 @@ sub new
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
    $self->{_permitted}->{forwardSearch}=1;
+   $self->{_permitted}->{ignViewValid}=1;
    if (!defined($self->{WSDLfieldType})){
       $self->{WSDLfieldType}="SubListRecordArray";
    }
@@ -106,6 +107,7 @@ EOF
    }
    if ($mode eq "HtmlDetail" || ($mode eq "edit" && $readonly)){
       $param{nodetaillink}=1 if ($self->{nodetaillink});
+      $param{ignViewValid}=1 if ($self->{ignViewValid});
       return(<<EOF) if ($self->{async}==1 && $app->can('AsyncSubListView'));
 <div id=div.sublist.$name.$self->{Sequence}.$id class=sublist>
 <p style="height:50px">Loading asyncron data from $self->{joinobj}...</p>

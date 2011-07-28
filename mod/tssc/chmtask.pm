@@ -82,6 +82,12 @@ sub new
                 label         =>'Planed End',
                 dataobjattr   =>'cm3tm1.planned_end'),
 
+      #new kernel::Field::Boolean(          # das feld ist nicht in scadm!
+      #          name          =>'cidown',
+      #          timezone      =>'CET',
+      #          label         =>'CI-Offline (PSO)',
+      #          dataobjattr   =>"decode(downtab.ci_down,'t','1','0')"),
+
       new kernel::Field::Date(
                 name          =>'downstart',
                 timezone      =>'CET',
@@ -101,6 +107,7 @@ sub new
                 label         =>'Description',
                 searchable    =>0,
                 htmlwidth     =>300,
+                sqlorder      =>'NONE',
                 dataobjattr   =>'cm3tm1.description'),
 
       new kernel::Field::SubList(
@@ -173,6 +180,7 @@ sub Initialize
 sub getSqlFrom
 {
    my $self=shift;
+   my $from="cm3tm1,scadm1.cm3tm1 downtab";
    my $from="cm3tm1";
    return($from);
 }
@@ -180,7 +188,7 @@ sub getSqlFrom
 #sub initSqlWhere
 #{
 #   my $self=shift;
-#   my $where="not cm3ra25.affected_device is null";
+#   my $where="cm3tm1.numberprgn=downtab.numberprgn";
 #   return($where);
 #}
 
@@ -191,7 +199,13 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("ALL");
+
+   my @l=qw(header default relations contact status);
+   if ($rec->{cidown}){
+      push(@l,"downtime");
+   }
+   
+   return(@l);
 }
 
 sub isWriteValid

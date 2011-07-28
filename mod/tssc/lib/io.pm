@@ -221,7 +221,7 @@ sub mkProblemStoreRec
       $wfrec{openuser}=$userid if (defined($userid));
    }
    my ($system,$systemid,
-       $anames,$aids,$contrnames,$contrids,$mandator,$mandatorid,
+       $anames,$aids,$contrnames,$contrids,$contrmods,$mandator,$mandatorid,
        $costcenter,$customername,$responseteam,$businessteam,
        $truecustomerprio)=
                $self->extractAffectedApplication($rec);
@@ -230,6 +230,7 @@ sub mkProblemStoreRec
    $wfrec{affectedapplicationid}=$aids;
    $wfrec{affectedapplication}=$anames;
    $wfrec{affectedcontractid}=$contrids;
+   $wfrec{customercontractmod}=$contrmods;
    $wfrec{affectedcontract}=$contrnames;
    $wfrec{involvedresponseteam}=$responseteam;
    $wfrec{involvedbusinessteam}=$businessteam;
@@ -469,7 +470,7 @@ sub mkChangeStoreRec
 
    $wfrec{changefallback}=$rec->{fallback};
    my ($system,$systemid,
-       $anames,$aids,$contrnames,$contrids,$mandator,$mandatorid,
+       $anames,$aids,$contrnames,$contrids,$contrmods,$mandator,$mandatorid,
        $costcenter,$customername,$responseteam,$businessteam,
        $truecustomerprio)=
                $self->extractAffectedApplication($rec);
@@ -478,6 +479,7 @@ sub mkChangeStoreRec
    $wfrec{affectedapplicationid}=$aids;
    $wfrec{affectedapplication}=$anames;
    $wfrec{affectedcontractid}=$contrids;
+   $wfrec{customercontractmod}=$contrmods;
    $wfrec{affectedcontract}=$contrnames;
    $wfrec{involvedresponseteam}=$responseteam;
    $wfrec{involvedbusinessteam}=$businessteam;
@@ -598,6 +600,7 @@ sub extractAffectedApplication
    my %systemid=();
    my @custcontract=();
    my @custcontractid=();
+   my @custcontractmod=();
    my @applna=();
    my @applid=();
    my @costcenter=();
@@ -832,6 +835,7 @@ sub extractAffectedApplication
    my %mandator=();
    my %mandatorid=();
    my %custcontractid=();
+   my %custcontractmod=();
    my %custcontract=();
    foreach my $rec (@l){
       if (ref($rec->{custcontracts}) eq "ARRAY"){
@@ -851,8 +855,18 @@ sub extractAffectedApplication
       $responseteam{$rec->{responseteam}}=1;
       $businessteam{$rec->{businessteam}}=1;
    }
+   if (keys(%custcontractid)){
+      my $cmod=$self->getPersistentModuleObject("W5BaseCustMod",
+                                               "finance::custcontractmod");
+      $cmod->SetFilter({contractid=>[keys(%custcontractid)]});
+      my @sl=$cmod->getHashList(qw(rawname)); 
+      foreach my $s (@sl){
+         $custcontractmod{$s->{rawname}}=1;
+      }
+   }
    @custcontract=sort(keys(%custcontract));
    @custcontractid=sort(keys(%custcontractid));
+   @custcontractmod=sort(keys(%custcontractmod));
    @mandator=sort(keys(%mandator));
    @mandatorid=sort(keys(%mandatorid));
    @costcenter=grep(!/^\s*$/,sort(keys(%costcenter)));
@@ -876,7 +890,7 @@ sub extractAffectedApplication
 
 
    return(\@system,\@systemid,\@applna,\@applid,
-          \@custcontract,\@custcontractid,
+          \@custcontract,\@custcontractid,\@custcontractmod,
           \@mandator,\@mandatorid,\@costcenter,\@customername,
           \@responseteam,\@businessteam,$truecustomerprio);
 }
@@ -952,7 +966,7 @@ sub mkIncidentStoreRec
    }
 
    my ($system,$systemid,
-       $anames,$aids,$contrnames,$contrids,$mandator,$mandatorid,
+       $anames,$aids,$contrnames,$contrids,$contrmods,$mandator,$mandatorid,
        $costcenter,$customername,$responseteam,$businessteam)=
                         $self->extractAffectedApplication($rec);
    $wfrec{affectedsystemid}=$systemid;
@@ -960,6 +974,7 @@ sub mkIncidentStoreRec
    $wfrec{affectedapplicationid}=$aids;
    $wfrec{affectedapplication}=$anames;
    $wfrec{affectedcontractid}=$contrids;
+   $wfrec{customercontractmod}=$contrmods;
    $wfrec{affectedcontract}=$contrnames;
    $wfrec{involvedresponseteam}=$responseteam;
    $wfrec{involvedbusinessteam}=$businessteam;

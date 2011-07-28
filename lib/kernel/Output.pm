@@ -61,6 +61,12 @@ sub setFormat
    if ($opt{NewRecord}==1){
       $self->{NewRecord}=1;
    }
+   if ($opt{ignViewValid}==1){
+      $self->{ignViewValid}=1;
+   }
+   else{
+      $self->{ignViewValid}=0;
+   }
    $format=~s/;.*//;
    $format=~s/[^a-z0-9:_]//gi;
    eval("use kernel::Output::$format;".
@@ -150,8 +156,11 @@ sub WriteToStdout
       do{
          if (!exists($app->{'SoftFilter'}) ||
               &{$app->{'SoftFilter'}}($app,$rec)){
-            my @viewgroups=$app->isViewValid($rec,
+            my @viewgroups=qw(ALL);
+            if (!$self->{ignViewValid}){
+               @viewgroups=$app->isViewValid($rec,
                                              format=>$self->Format->Self());
+            }
             if ($#viewgroups!=-1 && defined($viewgroups[0]) && 
                 $viewgroups[0] ne "0"){
                $app->Context->{Linenumber}++;
@@ -266,8 +275,11 @@ sub WriteToScalar    # ToDo: viewgroups implementation
       do{
          if (!exists($app->{'SoftFilter'}) ||
               &{$app->{'SoftFilter'}}($app,$rec)){
-            my @viewgroups=$self->getParent->isViewValid($rec,
-                                              format=>$self->Format->Self());
+            my @viewgroups=qw(ALL);
+            if (!$self->{ignViewValid}){
+               @viewgroups=$app->isViewValid($rec,
+                                             format=>$self->Format->Self());
+            }
             if ($#viewgroups!=-1 && defined($viewgroups[0]) && 
                 $viewgroups[0] ne "0"){
                $self->getParent->Context->{Linenumber}++;

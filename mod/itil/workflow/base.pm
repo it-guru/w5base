@@ -82,6 +82,14 @@ sub Init
                 group      =>'affected',
                 label      =>'Affected Customer Contract ID'),
 
+      new kernel::Field::Text( 
+                name       =>'customercontractmod',
+                htmldetail =>0,
+                searchable =>0,
+                container  =>'headref',
+                group      =>'affected',
+                label      =>'active customer contract modules'),
+
       new kernel::Field::KeyText( 
                 name       =>'affectedapplication',
                 translation=>'itil::workflow::base',

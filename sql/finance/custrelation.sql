@@ -37,3 +37,22 @@ create table custcontract (
 alter table custcontract add conumber varchar(20) default NULL;
 alter table custcontract add lastqcheck datetime default NULL,add key(lastqcheck);
 alter table custcontract add databoss2 bigint(20)  default NULL;
+create table custcontractmod (
+  id         bigint(20) NOT NULL,
+  contractid bigint(20) NOT NULL,
+  name       varchar(20) NOT NULL,
+  comments    longtext     default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) default NULL,
+  modifyuser bigint(20) default NULL,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  srcsys     varchar(100) default 'w5base',
+  srcid      varchar(20) default NULL,
+  srcload    datetime    default NULL,
+  PRIMARY KEY  (id),
+  UNIQUE KEY contractid (contractid,name),
+  UNIQUE KEY `srcsys` (srcsys,srcid),
+  FOREIGN KEY fk_custcontract (contractid) REFERENCES custcontract (id) ON DELETE CASCADE
+);

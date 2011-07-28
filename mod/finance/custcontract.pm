@@ -183,6 +183,17 @@ sub new
                                     delmgrteam
                                     delmgrteamid)]),
 
+      new kernel::Field::SubList(
+                name          =>'modules',
+                label         =>'contract standard modules',
+                group         =>'modules',
+                ignViewValid  =>1,
+                allowcleanup  =>1,
+                vjointo       =>'finance::custcontractmod',
+                vjoinon       =>['id'=>'contractid'],
+                vjoininhash   =>['rawname'],
+                vjoindisp     =>['name']),
+
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
                 label         =>'Contacts',
@@ -311,8 +322,8 @@ sub new
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default sem delmgmt contacts control misc attachments));
+   return(qw(header default sem delmgmt modules 
+             contacts control misc attachments));
 }
 
 
@@ -465,7 +476,7 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default contacts sem misc control attachments);
+   my @databossedit=qw(default contacts sem misc control modules attachments);
    if (!defined($rec)){
       return(@databossedit);
    }
