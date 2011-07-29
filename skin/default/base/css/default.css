@@ -1,6 +1,7 @@
 @media print {
    body{
       background: #FFFFFF;
+      background-color: #FFFFFF;
    }
 }
 iframe.HtmlDetailPage{

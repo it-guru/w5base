@@ -1,6 +1,9 @@
 .attachments{
    margin-top:15px;
 }
+.fullview{
+   width:640px;
+}
 .authorline{
    font-size:11px;
    margin-top:4px; 
@@ -52,6 +55,13 @@ a:link.attlink, a:visited.attlink, a:active.attlink  {
    .further{
       display:none;
       visibility:hidden;
+   }
+   .fullview{
+      width:655px;
+      background-color:#ffffff;
+   }
+   body{
+      background-color:#ffffff;
    }
 }
 
