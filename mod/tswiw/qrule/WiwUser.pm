@@ -122,6 +122,7 @@ sub qcheckRecord
           $wiwdata->{$fld}=~s/^\s*unknown\s*$//i;
           if ($fld eq "office_accarea"){
              $wiwdata->{$fld}=~s/^0+//;
+             $rec->{$fld}=~s/^0+//;
           }
           $wiwdata->{$fld}=rmNonLatin1($wiwdata->{$fld});
 
