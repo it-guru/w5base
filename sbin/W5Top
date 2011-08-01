@@ -82,6 +82,29 @@ my @apid=split(/[\s\n]/,$pid);
 my %stat;
 my %userpcount;
 my $statedir=$curconfig->Param("LogState");
+
+
+msg(DEBUG,"start cleanup of statedir='$statedir'");
+if (opendir(D,$statedir)){
+   while(my$de=readdir(D)){
+      next if (!($de=~m/\.pid$/));
+      my $pidfile=$statedir."/".$de;
+      my $mtime=(stat($pidfile))[9];
+      if (defined($mtime) && $mtime>0){
+         my $age=time()-$mtime;
+         if ($age>(3600*6)){
+            msg(WARN,sprintf("rm stale pid '%s' older then 6h\n",$de));
+            unlink($pidfile);
+         }
+      }
+   }
+   closedir(D);
+}
+else{
+   msg(ERROR,"fail to open statedir='$statedir'");
+   exit(1);
+}
+
 foreach my $apid (@apid){
    #print("check pid $apid\n");
    my $cpu=trim(`ps -p $apid -o pcpu,user | grep -v 'CPU'`);
