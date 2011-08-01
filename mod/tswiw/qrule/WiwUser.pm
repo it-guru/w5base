@@ -120,6 +120,9 @@ sub qcheckRecord
              $wiwdata->{$fld}=$wiwdata->{$fld}->[0];
           }
           $wiwdata->{$fld}=~s/^\s*unknown\s*$//i;
+          if ($fld eq "office_accarea"){
+             $wiwdata->{$fld}=~s/^0+//;
+          }
           $wiwdata->{$fld}=rmNonLatin1($wiwdata->{$fld});
 
           $self->IfaceCompare($dataobj,
