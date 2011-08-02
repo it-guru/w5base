@@ -1,10 +1,10 @@
 Summary: Spreadsheet::ParseExcel AppCom perl Modules at /apps
 Name: apps-perlmod-Spreadsheet-ParseExcel-RH56
-Version: 0.59
+Version: 0.32
 Release: 1
 License: GPL
 Group: Applications/Web
-Source0: http://search.cpan.org/CPAN/authors/id/J/JM/JMCNAMARA/Spreadsheet-ParseExcel-0.59.tar.gz
+Source0: libspreadsheet-parseexcel-perl_0.3200.tar.gz
 Distribution: RedHat 5.6 AppCom Linux
 Vendor: T-Systems
 Packager: Vogler Hartmut <hartmut.vogler@t-systems.com>
@@ -18,17 +18,17 @@ This installation can be used in AppCom enviroments
 (or similar cluster enviroments) with rpm --dbpath /apps/rpm
 
 %prep
-rm -rf $RPM_BUILD_DIR/Spreadsheet-ParseExcel-0.59
-zcat $RPM_SOURCE_DIR/Spreadsheet-ParseExcel-0.59.tar.gz | tar -xvf -
+rm -rf $RPM_BUILD_DIR/Spreadsheet-ParseExcel-0.32
+zcat $RPM_SOURCE_DIR/libspreadsheet-parseexcel-perl_0.3200.tar.gz | tar -xvf -
 
 %build
-cd $RPM_BUILD_DIR/Spreadsheet-ParseExcel-0.59
+cd $RPM_BUILD_DIR/Spreadsheet-ParseExcel-0.32
 %{__perl} Makefile.PL PREFIX=/apps/perlmod
 make
 
 %install
 rm -rf $RPM_BUILD_ROOT
-cd $RPM_BUILD_DIR/Spreadsheet-ParseExcel-0.59
+cd $RPM_BUILD_DIR/Spreadsheet-ParseExcel-0.32
 pwd
 make pure_install PERL_INSTALL_ROOT=$RPM_BUILD_ROOT
 find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} ';'
@@ -38,7 +38,7 @@ chmod -R u+w $RPM_BUILD_ROOT/*
 
 
 %check || :
-cd $RPM_BUILD_DIR/Spreadsheet-ParseExcel-0.59
+cd $RPM_BUILD_DIR/Spreadsheet-ParseExcel-0.32
 #make test
 
 %clean
@@ -47,18 +47,11 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 /apps/perlmod/lib/perl5/site_perl/5.8.8/Spreadsheet/ParseExcel.pm
-/apps/perlmod/lib/perl5/site_perl/5.8.8/Spreadsheet/ParseExcel/Cell.pm
 /apps/perlmod/lib/perl5/site_perl/5.8.8/Spreadsheet/ParseExcel/Dump.pm
 /apps/perlmod/lib/perl5/site_perl/5.8.8/Spreadsheet/ParseExcel/FmtDefault.pm
 /apps/perlmod/lib/perl5/site_perl/5.8.8/Spreadsheet/ParseExcel/FmtJapan.pm
 /apps/perlmod/lib/perl5/site_perl/5.8.8/Spreadsheet/ParseExcel/FmtJapan2.pm
 /apps/perlmod/lib/perl5/site_perl/5.8.8/Spreadsheet/ParseExcel/FmtUnicode.pm
-/apps/perlmod/lib/perl5/site_perl/5.8.8/Spreadsheet/ParseExcel/Font.pm
-/apps/perlmod/lib/perl5/site_perl/5.8.8/Spreadsheet/ParseExcel/Format.pm
 /apps/perlmod/lib/perl5/site_perl/5.8.8/Spreadsheet/ParseExcel/SaveParser.pm
-/apps/perlmod/lib/perl5/site_perl/5.8.8/Spreadsheet/ParseExcel/SaveParser/Workbook.pm
-/apps/perlmod/lib/perl5/site_perl/5.8.8/Spreadsheet/ParseExcel/SaveParser/Worksheet.pm
 /apps/perlmod/lib/perl5/site_perl/5.8.8/Spreadsheet/ParseExcel/Utility.pm
-/apps/perlmod/lib/perl5/site_perl/5.8.8/Spreadsheet/ParseExcel/Workbook.pm
-/apps/perlmod/lib/perl5/site_perl/5.8.8/Spreadsheet/ParseExcel/Worksheet.pm
 /apps/perlmod/share/man/man*/*

@@ -65,7 +65,7 @@ apps-perlmod-Unicode-Map8
 apps-perlmod-Unicode-String
 apps-perlmod-constant"
 # apps-perlmod-DBD-Oracle
-LIST="W5Base-apache"
+LIST="apps-perlmod-Spreadsheet-ParseExcel"
 
 for MOD in $LIST
 do
