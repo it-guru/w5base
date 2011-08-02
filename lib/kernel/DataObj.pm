@@ -993,6 +993,8 @@ sub StoreUpdateDelta
                $new=[$new] if (ref($new) ne "ARRAY");
                $old=join(", ",sort(@{$old}));
                $new=join(", ",sort(@{$new}));
+               $new=~s/\r\n/\n/gs;
+               $old=~s/\r\n/\n/gs;
                if (trim($new) ne trim($old)){
                   $delta{$field}={'old'=>$old,'new'=>$new};
                }
@@ -1767,9 +1769,6 @@ sub getHtmlTextDrop
                                                   "Formated_$name",
                                                   $key,$disp,%param);
    }
-#printf STDERR ("fifi keylist=%s filter=%s\n",Dumper($keylist),Dumper($filter));
-#printf STDERR ("fifi disp=%s\n",Dumper($disp));
-#printf STDERR ("fifi vallist=%s\n",Dumper($vallist));
    if ($#{$keylist}>0){
       $self->LastMsg(ERROR,"value '%s' is not unique",$newval);
       return($#{$keylist}+1,$newval,$dropbox,$keylist,$vallist,$list);
@@ -1827,7 +1826,6 @@ sub InitFields
    foreach my $obj (@_){
       next if (!defined($obj));
       my $name=$obj->Name;
-      #msg(INFO,"fifi AddField:%s",$obj->name);
       $obj->{group}="default" if (!exists($obj->{group}));
       $obj->setParent($self);
       if (exists($self->{'Field'}->{$name})){
