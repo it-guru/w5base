@@ -96,6 +96,41 @@ sub new
                    return(undef);
                 }),
 
+      new kernel::Field::Htmlarea(
+                name          =>'delta',
+                label         =>'Delta',
+                searchable    =>0,
+                depend        =>['oldstate','newstate'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $oldstate=quoteSOAP($current->{oldstate});
+                   my $newstate=quoteSOAP($current->{newstate});
+                   my $diff;
+                   my %diffopt=(remove_open => "<font color=darkred>",
+                                remove_close => "</font>",
+                                append_open => "<font color=darkgreen>",
+                                append_close => "</font>");
+
+                   eval(' 
+                      use String::Diff;
+                      $diff=String::Diff::diff($oldstate,$newstate,%diffopt);
+                   ');
+                   my $a=$diff->[0];
+                   my $b=$diff->[1];
+                   $a=~s/\n/<br>/g;
+                   $b=~s/\n/<br>/g;
+
+
+                  
+                   return("<table>".
+                          "<tr><th align=left>old:</th>".
+                          "<th align=left>new:</th></tr>".
+                          "<tr><td>$a</td><td>$b</td></tr>".
+                          "</table>");
+
+                }),
+
       new kernel::Field::Textarea(
                 name          =>'oldstate',
                 label         =>'Old State',
