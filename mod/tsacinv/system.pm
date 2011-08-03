@@ -327,10 +327,21 @@ sub new
                 dataobjattr   =>'amcostcenter.alternatebusinesscenter'),
 
       new kernel::Field::SubList(
+                name          =>'orderedservices',
+                label         =>'ordered Services',
+                group         =>'orderedservices',
+                vjointo       =>'tsacinv::service',
+                vjoinbase     =>[{'isdelivered'=>\'0'}],
+                vjoinon       =>['systemid'=>'systemid'],
+                vjoindisp     =>[qw(name type ammount unit)],
+                vjoininhash   =>['name','type','ammount']),
+
+      new kernel::Field::SubList(
                 name          =>'services',
-                label         =>'Services',
+                label         =>'delivered Services',
                 group         =>'services',
                 vjointo       =>'tsacinv::service',
+                vjoinbase     =>[{'isdelivered'=>\'1'}],
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>[qw(name type ammount unit)],
                 vjoininhash   =>['name','type','ammount']),
@@ -683,7 +694,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header default location form applications ipaddresses software 
-             services assetdata assetfinanz 
+             orderedservices services assetdata assetfinanz 
              w5basedata source));
 }  
 

@@ -68,6 +68,14 @@ sub new
                                     label      =>'Service Description',
                                     dataobjattr=>'amtsiservice.description'),
 
+      new kernel::Field::Boolean(   name       =>'isordered',
+                                    label      =>'is ordered',
+                                    dataobjattr=>'decode(amtsiservice.btechnical,0,1,1,0)'),
+
+      new kernel::Field::Boolean(   name       =>'isdelivered',
+                                    label      =>'is delivered',
+                                    dataobjattr=>'amtsiservice.btechnical'),
+
       new kernel::Field::Float(     name       =>'ammount',
                                     label      =>'Ammount',
                                     htmlwidth  =>50,
@@ -111,7 +119,8 @@ sub initSqlWhere
    my $where="amtsiservice.lservicetypeid=amtsiservicetype.ltsiservicetypeid ".
        "and amportfolio.lportfolioitemid=amcomputer.litemid ".
        "and amportfolio.lportfolioitemid=amtsiservice.lportfolioid ".
-       "and amtsiservice.bdelete=0 ";
+       "and amtsiservice.bdelete=0 ".
+       "and amportfolio.bdelete=0 ";
    #    "and (amtsiservice.dstart<=sysdate or amtsiservice.dstart is null) ";
    #    "and (amtsiservice.dend>=sysdate or amtsiservice.dend is null)) ";
    return($where);
