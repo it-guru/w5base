@@ -142,7 +142,7 @@ sub amVerifyGroupParents
             msg(INFO," - parent           : %s",$rec->{parent});
             $checked++;
     
-            my $chkname="DTAG.TSI.ICTO.".uc($rec->{name});
+            my $chkname="DTAG.TSI.Prod.".uc($rec->{name});
             $grp->ResetFilter();
             $grp->SetFilter({fullname=>\$chkname});
             my ($w5rec)=$grp->getOnlyFirst(qw(fullname));
