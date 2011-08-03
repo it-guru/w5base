@@ -99,8 +99,8 @@ sub initSearchQuery
    }
    if (!defined(Query->Param("search_businessteam"))){
      Query->Param("search_businessteam"=>
-                  "DTAG.TSI.ICTO.CSS.AO.DTAG.TH2 ".
-                  "DTAG.TSI.ICTO.CSS.AO.DTAG.TH2.*");
+                  "DTAG.TSI.Prod.CSS.AO.DTAG.TH2 ".
+                  "DTAG.TSI.Prod.CSS.AO.DTAG.TH2.*");
    }
    if (!defined(Query->Param("search_isnosysappl"))){
      Query->Param("search_isnosysappl"=>$self->T("no"));
