@@ -1359,7 +1359,7 @@ sub getNotificationSubject
    my $state=$self->getNotifyCountLabel($WfRec,$sendcustinfocount);
 
    my $afcust=$WfRec->{affectedcustomer}->[0]; # only first customer 
-   my $subject="Prio".$WfRec->{eventstatclass};
+   my $subject="P".$WfRec->{eventstatclass};
    my $prio="";
    if ($WfRec->{affecteditemprio} ne ""){
       if ($WfRec->{affecteditemprio}==1){   # Aussage von Hr. Weidner
@@ -1580,7 +1580,7 @@ sub generateMailSet
                my $v=$fo->FormatedResult($WfRec,"ShortMsg");
                if ($v ne ""){
                   if ($field=~m/(eventstatclass)/){
-                     $$smstext.="$state: Prio$v - ";
+                     $$smstext.="$state: P$v - ";
                   }
                   elsif ($field=~m/(eventstartofevent)/){
                      $$smstext.=$self->T("Start").": ".$v."\n";
