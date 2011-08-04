@@ -154,7 +154,9 @@ sub CreateOrUpdateRelations
                                         srcwfid=>$srcid,%$rec});
          }
          else{
-            if ($self->Config->Param("W5BaseOperationMode") ne "dev"){
+            my $opmode=$self->Config->Param("W5BaseOperationMode");
+            if ($opmode ne "dev" &&
+                $opmode ne "test"){
                msg(ERROR,"invalid relation request ".
                          "'$srcid' to '$rec->{dstwfid}'");
             }
