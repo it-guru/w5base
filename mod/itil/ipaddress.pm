@@ -600,7 +600,12 @@ sub isParentOPvalid
       my $idname=$p->IdField->Name();
       my %flt=($idname=>\$systemid);
       $p->ResetFilter();
-      $p->SecureSetFilter(\%flt,\%flt);  # verhindert idDirectFilter true
+      if (isDataInputFromUserFrontend()){
+         $p->SecureSetFilter(\%flt,\%flt);  # verhindert isDirectFilter true
+      }
+      else{
+         $p->SetFilter(\%flt,\%flt);        # verhindert isDirectFilter true
+      }
       my @l=$p->getHashList(qw(ALL));
       if ($#l!=0){
          $self->LastMsg(ERROR,"invalid system reference") if ($mode eq "write");
