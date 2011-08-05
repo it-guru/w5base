@@ -730,13 +730,17 @@ sub getHtmlEditElements
        $irec->{questtyp} eq "percenta"){
       my $steps=10;
       $steps=4 if ($irec->{questtyp} eq "percent4");
-      my $a=0;
+      my $a;
       $a=int($answer->{answer}/(100/$steps)) if (defined($answer));
       my $p="";
       my $sel="<select name=answer $opmode style=\"width:55px\">";
+      if (!defined($a)){
+         $sel.="<option ";
+         $sel.="value=\"0\">?</option>";
+      }
       for(my $c=0;$c<$steps+1;$c++){
          $sel.="<option ";
-         $sel.="selected " if ($c==$a);
+         $sel.="selected " if (defined($a) && $c==$a);
          $sel.="value=\"".($c*(100/$steps))."\">".($c*(100/$steps)).
                "%</option>";
          my $class="class=Pseg1";
