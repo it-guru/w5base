@@ -539,6 +539,25 @@ sub getPosibleEventStatType
    return(@l);
 }
 
+sub prepairFValueForSend
+{
+   my $self=shift;
+   my $fieldname=shift;
+   my $fieldvalue=shift;
+   my $mode=shift;
+
+   if ($mode eq "HtmlMail"){
+      $fieldvalue=~s/</&lt;/g;
+      $fieldvalue=~s/>/&gt;/g;
+   }
+   if ($fieldname eq "wffields.eventstatclass"){
+      $fieldvalue="P".$fieldvalue;
+   }
+
+   return($fieldvalue);
+}
+
+
 sub generateMailSet
 {
    my $self=shift;
@@ -597,6 +616,10 @@ sub generateMailSet
                      $field eq "wffields.eventdesciption");
          if (defined($fo)){
             my $v=$fo->FormatedResult($WfRec,"HtmlMail");
+            $v=$field.$v; # bullshit manamgent idea
+            if ($field eq "wffields.eventstatclass"){
+               $v="P".$v; # bullshit manamgent idea
+            }
             if($field eq "wffields.eventendexpected" && $v eq ""){
                $v=" ";
             }

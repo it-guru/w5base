@@ -1497,6 +1497,22 @@ sub getSalutation
    }
    return($salutation);
 }
+
+
+sub prepairFValueForSend
+{
+   my $self=shift;
+   my $filename=shift;
+   my $fieldvalue=shift;
+   my $mode=shift;
+
+   if ($mode eq "HtmlMail"){
+      $fieldvalue=~s/</&lt;/g;
+      $fieldvalue=~s/>/&gt;/g;
+   }
+
+   return($fieldvalue);
+}
  
 
 sub generateMailSet
@@ -1578,9 +1594,10 @@ sub generateMailSet
             my $fo=$self->getField($field,$WfRec);
             if (defined($fo)){
                my $v=$fo->FormatedResult($WfRec,"ShortMsg");
+               $v=$self->prepairFValueForSend($field,$v,"ShortMsg");
                if ($v ne ""){
                   if ($field=~m/(eventstatclass)/){
-                     $$smstext.="$state: P$v - ";
+                     $$smstext.="$state: $v - ";
                   }
                   elsif ($field=~m/(eventstartofevent)/){
                      $$smstext.=$self->T("Start").": ".$v."\n";
@@ -1635,9 +1652,7 @@ sub generateMailSet
                   push(@emailpostfix,"");
               # }
                push(@emailprefix,$fo->Label().":");
-               my $data=$v;
-               $data=~s/</&lt;/g;
-               $data=~s/>/&gt;/g;
+               my $data=$self->prepairFValueForSend($field,$v,"HtmlMail");
                push(@emailtext,$data);
                push(@emailsubheader,$sh);
                push(@emailsep,$mailsep);
