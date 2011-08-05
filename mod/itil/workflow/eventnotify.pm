@@ -1597,7 +1597,7 @@ sub generateMailSet
                $v=$self->prepairFValueForSend($field,$v,"ShortMsg");
                if ($v ne ""){
                   if ($field=~m/(eventstatclass)/){
-                     $$smstext.="$state: $v - ";
+                     $$smstext.="$state: Prio$v - ";
                   }
                   elsif ($field=~m/(eventstartofevent)/){
                      $$smstext.=$self->T("Start").": ".$v."\n";
