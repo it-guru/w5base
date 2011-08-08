@@ -649,6 +649,8 @@ sub new
                 label         =>'Application base monitoring',
                 value         =>['',
                                  'BigBrother',
+                                 'OpenNMS',
+                                 'Nagios',
                                  'Tivoli 5',
                                  'Tivoli 6',
                                  'TV-CC',
