@@ -665,6 +665,8 @@ sub new
                 label         =>'SLA control tool type',
                 value         =>['',
                                  'BigBrother',
+                                 'OpenNMS',
+                                 'Nagios',
                                  'Tivoli 5',
                                  'Tivoli 6',
                                  'TV-CC',
