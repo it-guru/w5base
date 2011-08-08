@@ -93,7 +93,7 @@ if (opendir(D,$statedir)){
       if (defined($mtime) && $mtime>0){
          my $age=time()-$mtime;
          if ($age>(3600*6)){
-            msg(WARN,sprintf("rm stale pid '%s' older then 6h\n",$de));
+            msg(DEBUG,sprintf("rm stale pid '%s' older then 6h\n",$de));
             unlink($pidfile);
          }
       }
