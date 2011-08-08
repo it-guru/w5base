@@ -8,7 +8,7 @@ Checks if Config-Itmes with CI-Status field. A record will be viewed as
 invalid, if a item in status ...
  - reserved             (cistatusid=1) longer then 8 weeks
  - on order             (cistatusid=2) longer then 8 weeks
- - available/in project (cistatusid=3) longer then 4 weeks
+ - available/in project (cistatusid=3) longer then 12 weeks
  - inactiv/stored       (cistatusid=5) longer then 12 weeks
 ... no be modified (the modification date will be the check referenz).
 
@@ -74,10 +74,10 @@ sub qcheckRecord
    if ($d->{days}>56 && $rec->{cistatusid}==2){
       push(@failmsg,"config item in ci-state 'on order' and no changes have been done for 8 weeks");
    }
-   if ($d->{days}>28 && $rec->{cistatusid}==3){
-      push(@failmsg,"config item in ci-state 'available/in project' and no changes have been done for 4 weeks");
+   if ($d->{days}>84 && $rec->{cistatusid}==3){
+      push(@failmsg,"config item in ci-state 'available/in project' and no changes have been done for 12 weeks");
    }
-   if ($d->{days}>28 && $rec->{cistatusid}==5){
+   if ($d->{days}>84 && $rec->{cistatusid}==5){
       push(@failmsg,"config item in ci-state 'inactiv/stored' and no changes have been done for 12 weeks");
    }
 
