@@ -248,7 +248,7 @@ sub ApplicationModified
    my $user=getModuleObject($self->Config,"base::user");
    my $mand=getModuleObject($self->Config,"base::mandator");
    my $acuser=getModuleObject($self->Config,"tsacinv::user");
-   my %filter=(cistatusid=>\'4');
+   my %filter=(cistatusid=>['3','4']);
    $self->{DebugMode}=0;
    if ($#appid!=-1){
       if (grep(/^debug$/i,@appid)){
@@ -315,6 +315,7 @@ sub ApplicationModified
    my ($rec,$msg)=$app->getFirst();
    $self->{jobstart}=NowStamp();
    my %grpnotfound;
+   my %ciapplrel=();
    if (defined($rec)){
       do{
         # msg(INFO,"dump=%s",Dumper($rec));
@@ -328,7 +329,7 @@ sub ApplicationModified
             my $SysCount=0;
             {  # systems
                $applsys->SetFilter({applid=>\$rec->{id},
-                                    systemcistatusid=>\"4"});
+                                    systemcistatusid=>['3','4']});
                my @l=$applsys->getHashList(qw(id systemsystemid system
                                               istest iseducation isref 
                                               isapprovtest isdevel isprod
@@ -366,6 +367,7 @@ sub ApplicationModified
                   if ($lnk->{systemsystemid} ne ""){
                      $acftprec->{CI_APPL_REL}->{Portfolio}=
                             uc($lnk->{systemsystemid});
+                     $ciapplrel{$acftprec->{CI_APPL_REL}->{Portfolio}}++;
                   }
                   if ($rec->{applid} ne ""){
                      $acftprec->{CI_APPL_REL}->{Application}=uc($rec->{applid});
@@ -401,29 +403,31 @@ sub ApplicationModified
                         $lnks->ResetFilter();
                         $lnks->SetFilter({lparentid=>\$lnkrec->{lchildid}});
                         foreach my $srec ($lnks->getHashList(qw(systemid))){
-                           my $externalid=$srec->{systemid}."-".
-                                          $acapplrec->{applid}."-SAP";
-                           my $acftprec={
-                                          CI_APPL_REL=>{
-                                             EventID=>'fillup link by SAP'.
-                                                      'application relation '.
-                                                      $externalid,
-                                             Application=>$acapplrec->{applid},
-                                             Portfolio=>$srec->{systemid},
-                                             ExternalSystem=>'W5Base',
-                                             ExternalID=>$externalid,
-                                             Security_Unit=>"TS.DE",
-                                             Description=>
-                                                  'fillup link by SAP'.
-                                                  'application relation',
-                                             bDelete=>'0',
-                                             bActive=>'1',
-                                          }
-                                        };
-
-                           my $fh=$fh{ci_appl_rel};
-                           print $fh hash2xml($acftprec,{header=>0});
-                           print $onlinefh hash2xml($acftprec,{header=>0});
+                           if (!exists($ciapplrel{$srec->{systemid}})){
+                              my $externalid="SAPLNK-".$srec->{systemid}."-".
+                                             $acapplrec->{applid};
+                              my $acftprec={
+                                   CI_APPL_REL=>{
+                                      EventID=>'link by SAP'.
+                                               'appl relation '.
+                                               $externalid,
+                                      Application=>$acapplrec->{applid},
+                                      Portfolio=>$srec->{systemid},
+                                      ExternalSystem=>'W5Base',
+                                      ExternalID=>$externalid,
+                                      Security_Unit=>"TS.DE",
+                                      Description=>
+                                           'fillup link by SAP'.
+                                           'application relation',
+                                      bDelete=>'0',
+                                      bActive=>'1',
+                                   }
+                                 };
+                             
+                              my $fh=$fh{ci_appl_rel};
+                              print $fh hash2xml($acftprec,{header=>0});
+                              print $onlinefh hash2xml($acftprec,{header=>0});
+                           }
                         }
                      }
                   }
@@ -504,6 +508,10 @@ sub ApplicationModified
                   $ApplU=25 if ($rec->{opmode} eq "cbreakdown");
                   $ApplU=20 if ($rec->{opmode} eq "test");
                   $ApplU=5  if ($rec->{opmode} eq "license");
+               }
+               my $acstatus="IN OPERATION";
+               if ($rec->{cistatusid}==3){
+                  $acstatus="PROJECT";
                }
                my $acftprec={
                                 Appl=>{
@@ -685,7 +693,7 @@ sub ApplicationModified
             if ($rec->{applid} ne ""){ # prepare instances
                $swinstance->ResetFilter();
                $swinstance->SetFilter({applid=>\$rec->{id},
-                                       cistatusid=>\"4"});
+                                       cistatusid=>['3','4']});
                foreach my $irec ($swinstance->getHashList(qw(ALL))){
                   $CurrentEventId="Instance '$irec->{fullname}'";
                   my $systemid;
@@ -1061,56 +1069,6 @@ sub SWInstallModified
    return($self->TransferFile($fh,$filename,$ftp,"swinstall"));
 
 
-}
-
-
-sub Template
-{
-   my $self=shift;
-   my @appid=@_;
-   my ($fh, $filename);
-   $self->{jobstart}=NowStamp();
-
-   my $app=getModuleObject($self->Config,"w5v1inv::appl");
-   my $user=getModuleObject($self->Config,"base::user");
-   my %filter=(cistatusid=>\'4');
-   if ($#appid!=-1){
-      $filter{id}=\@appid;
-   }
-   $app->SetFilter(\%filter);
-   $app->SetCurrentView(qw(id name sem tsm tsm2 conumber 
-                           description release));
-   my $ftp=new kernel::FTP($self,"tsacftp");
-   if (defined($ftp)){
-      if (!($ftp->Connect())){
-         return({exitcode=>1,msg=>msg(ERROR,"can't connect to ftp server ".
-                "- login fails")});
-      }
-      $self->{ftp}=$ftp;
-   }
-   else{
-      return({exitcode=>1,msg=>msg(ERROR,"can't create ftp object")});
-   }
-   my ($fh,$filename)=$self->InitTransfer();
-   return($ftp) if (ref($ftp) eq "HASH" || !defined($ftp)); # on errors
-
-   my ($rec,$msg)=$app->getFirst();
-   if (defined($rec)){
-      do{
-         #msg(DEBUG,"dump=%s",Dumper($rec));
-         my $acftprec={
-                          Appl=>{
-                             ExternalSystem=>'W5Base',
-                             ExternalID=>$rec->{id},
-                             Customer=>"TS.DE",
-                          }
-                      };
-         $acftprec->{Appl}->{Version}=~s/[\n\r]/ /g;
-         print $fh hash2xml($acftprec,{header=>0});
-         ($rec,$msg)=$app->getNext();
-      } until(!defined($rec));
-   }
-   return($self->TransferFile($fh,$filename,$ftp,"appl"));
 }
 
 
