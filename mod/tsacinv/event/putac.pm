@@ -516,7 +516,7 @@ sub ApplicationModified
                my $acftprec={
                                 Appl=>{
                                    Security_Unit=>"TS.DE",
-                                   Status=>"IN OPERATION",
+                                   Status=>$acstatus,
                                    Priority=>$rec->{customerprio},
                                    EventID=>$CurrentEventId,
                                    AssignmentGroup=>$assignment,
