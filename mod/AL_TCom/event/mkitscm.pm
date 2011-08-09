@@ -48,7 +48,7 @@ sub mkitscm
    my $filename="handbook.pdf";
    my $wf=getModuleObject($self->Config,"itil::appl");
    $wf->ResetFilter();
-   $wf->SetFilter(businessteam=>'DTAG.TSI.ICTO.CSS.AO.DTAG*',
+   $wf->SetFilter(businessteam=>'DTAG.TSI.Prod.CSS.AO.DTAG*',
                   cistatusid=>'4',customerprio=>'1');
    $wf->SetCurrentView(qw(name conumber cistatus sem tsmphone 
                           tsmmobile ldelmgr delmgr customer 
