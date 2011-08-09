@@ -616,7 +616,6 @@ sub generateMailSet
                      $field eq "wffields.eventdesciption");
          if (defined($fo)){
             my $v=$fo->FormatedResult($WfRec,"HtmlMail");
-            $v=$field.$v; # bullshit manamgent idea
             if ($field eq "wffields.eventstatclass"){
                $v="P".$v; # bullshit manamgent idea
             }
