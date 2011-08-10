@@ -167,7 +167,7 @@ sub ImportTSInetLocation
                    join("\n",@problems),
                    emailfrom=>'"TSINET to W5BaseDarwin" <no_reply@w5base.net>',
                    emailto=>['11634957010001'], # Tino
-                   emailcc=>['12480761360002'], # Steiger.
+                   emailcc=>['12480761360002','11634953080001','12023045810001'], # Steiger., Vogler, Fritscher
                   );
    }
 
