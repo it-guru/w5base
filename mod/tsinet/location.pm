@@ -319,6 +319,14 @@ sub Initialize
    return(0);
 }
 
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_validto"))){
+     Query->Param("search_validto"=>
+                  ">now OR [EMPTY]");
+   }
+}
 
 
 sub getDetailBlockPriority
