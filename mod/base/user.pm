@@ -932,10 +932,18 @@ sub SecureValidate
       }
       delete($newrec->{secstate});
       if (!defined($oldrec)){
-         my %a=$self->getGroupsOf($userid, [qw(RContactAdmin)], 'up');
+         my %a=$self->getGroupsOf($userid, [qw(RContactAdmin)], 'direct');
          my @idl=keys(%a);
-         if ($#idl!=-1 && $idl[0] ne ""){
-            $newrec->{managedbyid}=$idl[0];
+         if ($#idl!=-1){
+            if ($idl[0] ne ""){
+               $newrec->{managedbyid}=$idl[0];
+            }
+         }
+         else{
+           my @igrpid=$self->getInitiatorGroupsOf($userid);
+           if ($igrpid[0] ne ""){
+               $newrec->{managedbyid}=$igrpid[0];
+           }
          }
       }
    }
