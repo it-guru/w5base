@@ -465,22 +465,11 @@ sub ApplicationModified
                   }
                   $posix{$userent}="[NULL]" if (!defined($posix{$userent}));
                }
-               my $assignment=$rec->{businessteam};
-               $assignment=~s/^.*\.CSS\.AO\.DTAG/CSS.AO.DTAG/i;
-               if ($assignment ne ""){
-                  $acgrp->ResetFilter(); 
-                  $acgrp->SetFilter({name=>$assignment}); 
-                  my ($acgrprec,$msg)=$acgrp->getOnlyFirst(qw(name));
-                  if (defined($acgrprec)){
-                     $assignment=$acgrprec->{name};
-                  }
-                  else{
-                     $grpnotfound{$assignment}=1;
-                     $assignment="CSS.AO.DTAG";
-                  }
-               }
-               else{
-                  $assignment="CSS.AO.DTAG";
+               my $chkassignment=$rec->{businessteam};
+               my $assignment=$self->getAcGroupByW5BaseGroup($chkassignment);
+               if (!defined($assignment)){
+                  $grpnotfound{$chkassignment}=1;
+                  $assignment="CSS.AO.DTAG" 
                }
                my $criticality=$rec->{criticality};
                $criticality=~s/^CR//;
