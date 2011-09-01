@@ -165,7 +165,7 @@ sub ImportINetworkContacts
                       "while import I-Network informations!\n\n".$msg,
                       emailfrom=>'"I-Network to Darwin" <>',
                       emailto=>['11634955120001'], # Zeis
-                      adminbcc=>1,
+            #          adminbcc=>1,
                      );
       }
       else{
