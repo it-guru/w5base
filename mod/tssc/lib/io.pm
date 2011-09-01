@@ -443,30 +443,46 @@ sub mkChangeStoreRec
       my $g=trim($agrp);
       $approver{$g}=1 if ($g ne "");
    }
-   my @tcom=();
-   push(@tcom,grep(/^CSS\.AO\.DTAG$/,keys(%approver)));
-   push(@tcom,grep(/^CSS\.AO\.DTAG\..*$/,keys(%approver)));
-   @tcom=grep(!/^CSS\.AO\.DTAG\.APPROVE$/,@tcom);
-   @tcom=grep(!/^CSS\.AO\.DTAG\.CAB\.APPROVE$/,@tcom);
-   if ($#tcom!=-1){
+   my $masterapprove="SDM.DTAG.FE.APPROVE";
+   if (in_array([keys(%approver)],$masterapprove)){
+      msg(DEBUG,"AlApproveCompletly4INetwork $masterapprove handling");
       my $AlApproveCompletly=0;
-      my %approved=();
-      my $done=0;
       if (ref($rec->{approved}) eq "ARRAY"){
          foreach my $a (@{$rec->{approved}}){
             foreach my $agrp (split(/\s/,$a->{name})){
-               my $g=trim($agrp);
-               $approved{$g}=1 if ($g ne "");
-               my $qg=quotemeta($g);
-               $done++ if (grep(/^$qg$/,@tcom)); 
+               $AlApproveCompletly=1 if ($agrp eq $masterapprove);
             }
          }
       }
-      $AlApproveCompletly=1 if ($#tcom+1==$done);
-      msg(DEBUG,"approver=%s",Dumper(\%approver));
-      msg(DEBUG,"approved=%s",Dumper(\%approved));
-      msg(DEBUG,"tcom=%s",Dumper(\@tcom));
       $wfrec{additional}->{AlApproveCompletly4INetwork}=$AlApproveCompletly;
+      msg(DEBUG,"AlApproveCompletly4INetwork=$AlApproveCompletly");
+   }
+   else{
+      my @tcom=();
+      push(@tcom,grep(/^CSS\.AO\.DTAG$/,keys(%approver)));
+      push(@tcom,grep(/^CSS\.AO\.DTAG\..*$/,keys(%approver)));
+      @tcom=grep(!/^CSS\.AO\.DTAG\.APPROVE$/,@tcom);
+      @tcom=grep(!/^CSS\.AO\.DTAG\.CAB\.APPROVE$/,@tcom);
+      if ($#tcom!=-1){
+         my $AlApproveCompletly=0;
+         my %approved=();
+         my $done=0;
+         if (ref($rec->{approved}) eq "ARRAY"){
+            foreach my $a (@{$rec->{approved}}){
+               foreach my $agrp (split(/\s/,$a->{name})){
+                  my $g=trim($agrp);
+                  $approved{$g}=1 if ($g ne "");
+                  my $qg=quotemeta($g);
+                  $done++ if (grep(/^$qg$/,@tcom)); 
+               }
+            }
+         }
+         $AlApproveCompletly=1 if ($#tcom+1==$done);
+         msg(DEBUG,"approver=%s",Dumper(\%approver));
+         msg(DEBUG,"approved=%s",Dumper(\%approved));
+         msg(DEBUG,"tcom=%s",Dumper(\@tcom));
+         $wfrec{additional}->{AlApproveCompletly4INetwork}=$AlApproveCompletly;
+      }
    }
 
 
