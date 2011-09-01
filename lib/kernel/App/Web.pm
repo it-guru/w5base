@@ -68,9 +68,8 @@ sub RunWebApp
          if (syswrite($f,$s,$nb)!=$nb){
             close($f);
             unlink($havestate);
-            $havestate=undef;
             sysmsg(ERROR,"error while write to statefile $havestate");
-            sysmsg(ERROR,"result: $^E");
+            $havestate=undef;
          }
          else{
             close($f);
