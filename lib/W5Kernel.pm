@@ -7,7 +7,7 @@ use vars qw(@EXPORT @ISA);
 @EXPORT = qw(
              &trim &rtrim &ltrim &limitlen &in_array 
              &extractLanguageBlock
-             &msg &ERROR &WARN &DEBUG &INFO &OK &UTF8toLatin1
+             &msg &sysmsg &ERROR &WARN &DEBUG &INFO &OK &UTF8toLatin1
              );
 
 sub ERROR() {return("ERROR")}
@@ -34,6 +34,27 @@ sub msg
       print STDERR $d;
    }
    return($d);
+}
+
+sub sysmsg
+{
+   my $type=shift;
+   my $msg=shift;
+   $msg=~s/%/%%/g if ($#_==-1);
+   $msg=sprintf($msg,@_);
+   return("") if ($type eq "DEBUG" && $W5V2::Debug==0);
+
+   my $priority;
+   $priority="info"    if ($type eq "INFO");
+   $priority="err"     if ($type eq "ERROR");
+   $priority="warning" if ($type eq "WARN");
+   $priority="debug"   if ($type eq "DEBUG");
+   if (defined($priority)){
+      eval('use Sys::Syslog(qw(openlog syslog closelog));
+            openlog("W5Base","pid,cons,nowait","user");
+            syslog($priority,$msg);
+            closelog();');
+   }
 }
 
 

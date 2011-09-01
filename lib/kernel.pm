@@ -90,7 +90,7 @@ use Unicode::String qw(utf8 latin1 utf16);
              &mkMailInlineAttachment &haveSpecialChar
              &getModuleObject &getConfigObject &generateToken
              &isDataInputFromUserFrontend &orgRoles &extractLangEntry
-             &msg &ERROR &WARN &DEBUG &INFO &OK &utf8 &latin1 &utf16);
+             &msg &sysmsg &ERROR &WARN &DEBUG &INFO &OK &utf8 &latin1 &utf16);
 
 sub utf8{return(&Unicode::String::utf8);}
 sub utf16{return(&Unicode::String::utf16);}

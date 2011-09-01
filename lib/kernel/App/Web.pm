@@ -64,8 +64,17 @@ sub RunWebApp
       $havestate="$statedir/$$.pid";
       if (sysopen($f,$havestate,O_RDWR|O_CREAT|O_TRUNC)){
          my $s="$ENV{'REMOTE_USER'};$MOD;".time().";\n";
-         syswrite($f,$s,length($s));
-         close($f);
+         my $nb=length($s);
+         if (syswrite($f,$s,$nb)!=$nb){
+            close($f);
+            unlink($havestate);
+            $havestate=undef;
+            sysmsg(ERROR,"error while write to statefile $havestate");
+            sysmsg(ERROR,"result: $^E");
+         }
+         else{
+            close($f);
+         }
       }
       else{
          $havestate=undef;
