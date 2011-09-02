@@ -174,6 +174,24 @@ sub PostProcess
                            $param{fwdtargetname},
                            $param{note},%newparam);
    }
+   if ($action eq "SaveStep.wfdefer"){
+      my $userid=$WfRec->{initiatorid};
+      if ($userid eq ""){
+         $userid=$WfRec->{openuser};
+      }
+      if ($userid ne ""){
+         my %newparam=(mode=>'DEFER:',
+                       workflowname=>$WfRec->{name},
+                       sendercc=>1);
+         my $note=$param{note};
+         if ($note=~m/^\s*$/){
+            $note.=$self->T("The workflow started by you, has been defered ".
+                            "with no comments.");
+         }
+         $aobj->NotifyForward($WfRec->{id},"base::user",$userid,"WF-Initiator",
+                              $note,%newparam);
+      }
+   }
 
    if ($action=~m/^SaveStep\..*$/){
       Query->Delete("WorkflowStep");

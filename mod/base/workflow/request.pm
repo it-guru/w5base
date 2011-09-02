@@ -441,8 +441,8 @@ sub getPosibleActions
        ($iscurrent && $userid==$creator)){
       push(@l,"wfmailsend");   # mail versenden
       push(@l,"wfaddnote");    # notiz hinzufügen        (jeder)
-      push(@l,"wfdefer");      # workflow ablehnen
       push(@l,"wfstartnew");   # neuen Workflow ableiten
+      push(@l,"wfdefer");      # workflow zurückstellen
    }
    if (($stateid==2 || $stateid==7 || $stateid==10 || $stateid==5) &&
        ((($lastworker!=$userid) && 
@@ -453,6 +453,7 @@ sub getPosibleActions
       push(@l,"wfacceptp"); # workflow annehmen und bearbeit.(durch Bearbeiter)
       push(@l,"wfacceptn"); # workflow annehmen und notiz anf(durch Bearbeiter)
       push(@l,"wfreject");  # workflow bearbeitung abgelehnt (durch Bearbeiter)
+      push(@l,"wfdefer");      # workflow zurückstellen
    }
    if (($stateid==2 || $stateid==3 || $stateid==4 || $stateid==10) && 
        ($iscurrent || ($isadmin && !$lastworker==$userid))){
