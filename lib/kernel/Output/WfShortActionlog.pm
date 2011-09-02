@@ -133,11 +133,9 @@ sub ProcessLine
    my $id=$idfield->RawValue($rec);
    my $isadmin=0;
    $isadmin=1 if ($app->IsMemberOf("admin"));
-   $isadmin=0;
-
    my $showeffort=$self->{ShowEffort};
 
-   if ($showeffort){
+   if ($showeffort || $rec->{creatorid} eq $userid || $isadmin){
       if (grep(/^Detail$/,$app->getValidWebFunctions())){
          if ($idfield){
             my $dest=$app->Self();
@@ -177,12 +175,12 @@ sub ProcessLine
       }
       my $fieldname="effort";
       if (exists($self->{fieldkeys}->{$fieldname})){
-         my $fobj=$self->{fieldobjects}->[$self->{fieldkeys}->{$fieldname}];
-         my $data=$app->findtemplvar({viewgroups=>$viewgroups,
-                                      mode=>'HtmlWfActionlog',
-                                      current=>$rec
-                                     },$fieldname,"formated");
-        if ($showeffort){
+         if ($showeffort || $rec->{creatorid} eq $userid ){
+           my $fobj=$self->{fieldobjects}->[$self->{fieldkeys}->{$fieldname}];
+           my $data=$app->findtemplvar({viewgroups=>$viewgroups,
+                                        mode=>'HtmlWfActionlog',
+                                        current=>$rec
+                                       },$fieldname,"formated");
            $d.="<br>($data min)" if ($data ne "");
         }
       }
