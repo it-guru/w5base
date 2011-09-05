@@ -1,5 +1,5 @@
-'AL_TCom::MyW5Base::ChangeFuture'=>{de=>'AL DTAG: Change Zukunftsreport (was passiert demnächst in der AL DTAG)',
-                                    en=>'AL DTAG: Change future report (whats happen in AL TCom in the near future)'},
+'AL_TCom::MyW5Base::ChangeFuture'=>{de=>'GCU Telco: Change Zukunftsreport (was passiert demnächst in der GCU Telco)',
+                                    en=>'GCU Telco: Change future report (whats happen in AL TCom in the near future)'},
 'only multi TSM responsibility'=>{de=>'nur multi TSM Verantwortung'},
 'only multi application changes'=>{de=>'nur multi Anwendungs-Changes'},
 'only applications with customer prio 1'=>{de=>'nur Anwendungen mit Kunden-Prio1'},

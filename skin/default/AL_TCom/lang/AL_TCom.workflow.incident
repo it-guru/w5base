@@ -1,5 +1,5 @@
-'AL_TCom::workflow::incident'=>{de=>'AL DTAG: ITIL Incident individualisiert',
-                                en=>'AL DTAG: ITIL Incident spezicalized'},
+'AL_TCom::workflow::incident'=>{de=>'GCU Telco: ITIL Incident individualisiert',
+                                en=>'GCU Telco: ITIL Incident spezicalized'},
 'fieldgroup.tcomcod'=>{de=>'T-Com Capacity on Demand - P800',en=>'T-Com Capacity on Demand - P800'},
 'RootCause Analyses'=>{de=>'Problemanalyse'},
 'Worktime Problem-Mgmt'=>{de=>'Arbeitsaufwand Problem-Mgmt'},

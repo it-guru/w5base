@@ -1,5 +1,5 @@
-'AL_TCom::workflow::change'=>{de=>'AL DTAG: ITIL Change individualisiert',
-                              en=>'AL DTAG: ITIL Change spezicalized'},
+'AL_TCom::workflow::change'=>{de=>'GCU Telco: ITIL Change individualisiert',
+                              en=>'GCU Telco: ITIL Change spezicalized'},
 'fieldgroup.tcomcod'=>{de=>'T-Com Capacity on Demand - P800',en=>'T-Com Capacity on Demand - P800'},
 'manual checked'=>{de=>'manuell überprüft'},
 'Customer Contract'=>{de=>'Kundenvertrag'},

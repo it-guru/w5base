@@ -1,3 +1,3 @@
-'AL_TCom::qrule::P800tcomcodcause'=>{de=>'AL DTAG P800 Prüfung',
-                                     en=>'AL DTAG P800 verification'},
+'AL_TCom::qrule::P800tcomcodcause'=>{de=>'GCU Telco P800 Prüfung',
+                                     en=>'GCU Telco P800 verification'},
 'insufficient cause description'=>{de=>'Tätigkeitsklassifizierung nicht zulässig'},

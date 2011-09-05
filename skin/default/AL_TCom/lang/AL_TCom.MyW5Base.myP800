@@ -1,3 +1,3 @@
-'AL_TCom::MyW5Base::myP800'=>{de=>'AL DTAG: P800 Hauptansicht - Reports',
-                              en=>'AL DTAG: P800 Mainview - Reports'},
+'AL_TCom::MyW5Base::myP800'=>{de=>'GCU Telco: P800 Hauptansicht - Reports',
+                              en=>'GCU Telco: P800 Mainview - Reports'},
 'P800 reporting month'=>{de=>'P800 Reporting Monat'},

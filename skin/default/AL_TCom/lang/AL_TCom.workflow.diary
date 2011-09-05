@@ -1,5 +1,5 @@
-'AL_TCom::workflow::diary'=>{de=>'AL DTAG: Betriebstagebuch',
-                             en=>'AL DTAG: Diary'},
+'AL_TCom::workflow::diary'=>{de=>'GCU Telco: Betriebstagebuch',
+                             en=>'GCU Telco: Diary'},
 'AL_TCom::workflow::diary::tip'=>{
               de=>'Das Betriebstagebuch dient zur Dokumentation von '.
                   'Projektarbeiten oder allgemeinen Veränderungen '.

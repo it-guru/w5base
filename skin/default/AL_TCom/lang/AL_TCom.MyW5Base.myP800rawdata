@@ -1,4 +1,4 @@
-'AL_TCom::MyW5Base::myP800rawdata'=>{de=>'AL DTAG: P800 Hauptansicht - Rohdaten',
-                              en=>'AL DTAG: P800 Mainview - rawdata'},
+'AL_TCom::MyW5Base::myP800rawdata'=>{de=>'GCU Telco: P800 Hauptansicht - Rohdaten',
+                              en=>'GCU Telco: P800 Mainview - rawdata'},
 'P800 reporting month'=>{de=>'P800 Reporting Zeitraum'},
 'show all data'=>{de=>'zeige alle Datensätze (nicht nur offensichtlich fehlerhafte)'},

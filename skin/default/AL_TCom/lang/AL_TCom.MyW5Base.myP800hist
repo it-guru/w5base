@@ -1,3 +1,3 @@
-'AL_TCom::MyW5Base::myP800hist'=>{de=>'AL DTAG: P800 History-Monatssicht',
-                              en=>'AL DTAG: P800 History-Monthview'},
+'AL_TCom::MyW5Base::myP800hist'=>{de=>'GCU Telco: P800 History-Monatssicht',
+                              en=>'GCU Telco: P800 History-Monthview'},
 'no contract specified'=>{de=>'kein Vertrag ausgewählt'},
