@@ -50,7 +50,7 @@ sub ImportINetworkContacts
       $param{nonotify}=1;
    }
    $self->{custmgmttool}='I-Network';
-   $self->{custselection}='DTAG DTAG.TDG DTAG.TDG.* DTAG.T-Home.* DTAG.T-Home';
+   $self->{custselection}='DTAG.TDG DTAG.TDG.* DTAG.T-Home.* DTAG.T-Home';
 
    my $wsuser=$self->Config->Param("WEBSERVICEUSER");
    my $wspass=$self->Config->Param("WEBSERVICEPASS");
