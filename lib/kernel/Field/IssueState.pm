@@ -44,7 +44,7 @@ sub getWorkflowRec
    my $refid=shift;
 
 
-   my $wf=$self->getParent->ModuleObject("base::workflow");
+   my $wf=$self->getParent->getPersistentModuleObject("base::workflow");
    $wf->SetFilter({directlnktype=>\$obj,
                    stateid=>"<17",
                    directlnkid=>\$refid,
@@ -61,35 +61,42 @@ sub ViewProcessor
    if ($mode eq "XML" && $refid ne ""){
       my $response={document=>{value=>'ok',HtmlDetail=>'',HtmlV01=>'OK'}};
       my $obj=$self->getParent()->SelfAsParentObject();
-      my $issuerec=$self->getWorkflowRec($obj,$refid);
-
-      my $title="OK";
-      if (defined($issuerec)){
-         $response->{document}->{value}="DataIssue \@ ".
-                                        $issuerec->{fwdtargetname};
-         $title=$self->getParent->T('There is an unprocessed DataIssue for %s!'.
-                                    ' - Not all data seems to be correct!');
-         $title=sprintf($title,$issuerec->{fwdtargetname});
-         my $url="../../base/workflow/ById/$issuerec->{id}";
-     #    my $link="<span onclick=alert(\"onclick=openwin('$url','_blank',".
-     #             "'height=480,width=640,toolbar=no,status=no,".
-     #             "resizable=yes,scrollbars=auto');\")>";
-         my $link="<a href=\"$url\" target=_blank>";
-         $response->{document}->{HtmlDetail}="<div ".
-                  "style=\"left:-40px;top:-45px;position:relative\">".
-                  $link."<img border=0 ".
-               "title=\"$title\" ".
-               "style=\"position:absolute;width:40px;height:40px;".
-               "padding-right:5px\" src=\"../../base/load/attention.gif\">".
-               "</a></div>";
-         $response->{document}->{HtmlV01}="$link<img border=0 ".
-               "title=\"$title\" ".
-               "src=\"../../base/load/fail.gif\"></a>";
+      if ($obj ne "base::workflow"){
+         my $issuerec=$self->getWorkflowRec($obj,$refid);
+         my $title="OK";
+         if (defined($issuerec)){
+            $response->{document}->{value}="DataIssue \@ ".
+                                         $issuerec->{fwdtargetname};
+            $title=$self->getParent->T(
+                       'There is an unprocessed DataIssue for %s!'.
+                       ' - Not all data seems to be correct!');
+            $title=sprintf($title,$issuerec->{fwdtargetname});
+            my $url="../../base/workflow/ById/$issuerec->{id}";
+        #    my $link="<span onclick=alert(\"onclick=openwin('$url','_blank',".
+        #             "'height=480,width=640,toolbar=no,status=no,".
+        #             "resizable=yes,scrollbars=auto');\")>";
+            my $link="<a href=\"$url\" target=_blank>";
+            $response->{document}->{HtmlDetail}="<div ".
+                     "style=\"left:-40px;top:-45px;position:relative\">".
+                     $link."<img border=0 ".
+                  "title=\"$title\" ".
+                  "style=\"position:absolute;width:40px;height:40px;".
+                  "padding-right:5px\" src=\"../../base/load/attention.gif\">".
+                  "</a></div>";
+            $response->{document}->{HtmlV01}="$link<img border=0 ".
+                  "title=\"$title\" ".
+                  "src=\"../../base/load/fail.gif\"></a>";
+         }
+         else{
+            $response->{document}->{HtmlV01}="<img title=\"$title\" ".
+                                             "src=\"../../base/load/ok.gif\">";
+         }
       }
       else{
-         $response->{document}->{HtmlV01}="<img title=\"$title\" ".
-                                          "src=\"../../base/load/ok.gif\">";
+         sleep(3);
+         $response->{document}->{HtmlDetail}="QualtiyState for workflows currently in development";
       }
+
       print $self->getParent->HttpHeader("text/xml");
       print hash2xml($response,{header=>1});
       #msg(INFO,hash2xml($response,{header=>1})); # only for debug
@@ -185,23 +192,6 @@ sub RawValue
    return("?");
 }
 
-
-sub FormatedStoredWorkspace
-{
-   my $self=shift;
-   my $name=$self->{name};
-   my $d="";
-
-   my @curval=Query->Param("Formated_".$name);
-   my $disp="";
-   $d="<!-- FormatedStoredWorkspace from textdrop -->";
-   foreach my $var (@curval){
-      $disp.=$var;
-      $d.="<input type=hidden name=Formated_$name value=\"$var\">";
-   }
-   $d=$disp.$d;
-   return($d);
-}
 
 
 

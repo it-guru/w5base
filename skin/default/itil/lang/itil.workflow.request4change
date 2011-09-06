@@ -1,0 +1,13 @@
+'itil::workflow::request4change'=>{de=>'ITIL Anforderung einer Change-Maßnahme (RFC)',en=>'ITIL request for change (RFC)'},
+'itil::workflow::request4change::tip'=>{de=>'Mit diesem Workflow kann die Anforderung zu einer offiziellen Changemaßnamen eingereicht werden.'},
+'soonest start'=>{de=>'frühester Begin'},
+'latest end'=>{de=>'spätestes Ende'},
+'Request nature'=>{de=>'Auftragsart'},
+'Urgency'=>{de=>'Dringlichkeit'},
+'Reference'=>{de=>'Referenz'},
+'Preparation'=>{de=>'vorbereitende Maßnahmen'},
+'Dependencies'=>{de=>'Abhängigkeiten'},
+'Fallback'=>{de=>'Fallback Beschreibung'},
+'fieldgroup.customerdata'=>{de=>'Zusatzinformationen des Auftraggebers',
+                            en=>'Additional informations from the orderer'},
+

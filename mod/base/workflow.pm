@@ -728,9 +728,10 @@ sub new
                 searchable    =>0,
                 label         =>'Workflow specific fields',
                 fields        =>\&getDynamicFields),
+      new kernel::Field::IssueState(),
       new kernel::Field::QualityText(),
       new kernel::Field::QualityState(),
-      new kernel::Field::QualityOk()
+      new kernel::Field::QualityOk(),
    );
    $self->LoadSubObjsOnDemand("workflow");
    $self->setDefaultView(qw(id class state name editor));
@@ -907,18 +908,18 @@ sub getSpecPaths
 sub getRecordHtmlDetailHeader
 {
    my $self=shift;
-   my $rec=shift;
+   my $current=shift;
    my $H;
 
-   my $class=effVal(undef,$rec,"class");
+   my $class=effVal(undef,$current,"class");
    if (!defined($class)){
       $class=Query->Param("WorkflowClass");
    }
    my $stateobj=$self->getField("state");
-   my $state=$stateobj->FormatedDetail($rec);
+   my $state=$stateobj->FormatedDetail($current);
 
    my $nameobj=$self->getField("name");
-   my $name=$nameobj->FormatedDetail($rec);
+   my $name=$nameobj->FormatedDetail($current);
    #if ($self->Config->Param("UseUTF8")){
    #   $name=utf8($name);
    #   $name=$name->latin1();
@@ -927,15 +928,20 @@ sub getRecordHtmlDetailHeader
    my $statename=$self->T("State");
 
    my $wfname=$self->T($class,$class);
-   $H=<<EOF;
+   my $statedisplay="";
+   if (my $fld=$self->getField("dataissuestate")){
+      $statedisplay=$fld->FormatedDetail($current,"HtmlDetail");
+   }
+   $H.=<<EOF;
 <table width=100% height=100% border=0>
 <tr><td align=left>
 <p class=detailtoplineobj>$wfname:</p>
 </td>
-<td align=right width=1%><p class=detailtoplinename>$rec->{id}</p>
+<td align=right width=1%><p class=detailtoplinename>$current->{id}</p>
 </td></tr>
 <tr><td align=left valign=top>
 <p class=detailtoplinename>$name</p>
+$statedisplay
 </td>
 <td colspan=2 align=left valign=top nowrap>
 <p class=detailtoplinename>$statename: $state</p>
@@ -944,7 +950,6 @@ sub getRecordHtmlDetailHeader
 </table>
 EOF
 
-  
    return($H);
 }
 
@@ -1198,6 +1203,7 @@ sub isViewValid
                          !defined($self->{SubDataObj}->{$rec->{class}}));
    my @grplist=(@addgroups,
                 $self->{SubDataObj}->{$rec->{class}}->isViewValid($rec));
+   push(@grplist,"qc");
    return(@grplist);
 }
 
