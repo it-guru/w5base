@@ -74,7 +74,7 @@ sub ImportINetworkContacts
    my $appl=getModuleObject($self->getParent->Config(),"itil::appl");
   # $appl->SetNamedFilter("DBASE",{name=>"Flex* EKI* xIT-Base*"});
    $appl->SetFilter({customer=>$self->{custselection},cistatusid=>"<=5"});
-   my @idl=$appl->getHashList(qw(id name opmode));
+   my @idl=$appl->getHashList(qw(id name opmode mandator));
 
    eval('
    sub SOAP::Transport::HTTP::Client::get_basic_credentials { 
@@ -88,6 +88,7 @@ sub ImportINetworkContacts
 
    my $n=0;
    foreach my $arec (@idl){
+      next if ($arec->{mandator} eq "Extern");
       usleep(200000);
       $n++;
       msg(DEBUG,"check applid $arec->{name}");
