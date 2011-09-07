@@ -119,16 +119,21 @@ foreach my $apid (@apid){
       my $l=<F>;
       $l=~s/\s*$//;
       my @d=split(/;/,$l);
-      if ($d[0] ne ""){
-         $stat{$apid}->{user}=$d[0];
+      if ($d[2] ne ""){ 
+         if ($d[0] ne ""){
+            $stat{$apid}->{user}=$d[0];
+         }
+         else{
+            $stat{$apid}->{user}="anonymous";
+         }
+         $userpcount{$stat{$apid}->{user}}++;
+         $stat{$apid}->{mod}=$d[1];
+         $stat{$apid}->{start}=$d[2];
+         $stat{$apid}->{duration}=$t0-$d[2];
       }
       else{
-         $stat{$apid}->{user}="anonymous";
+         printf STDERR ("ERROR: inconsistend pid file at '$statefile'\n");
       }
-      $userpcount{$stat{$apid}->{user}}++;
-      $stat{$apid}->{mod}=$d[1];
-      $stat{$apid}->{start}=$d[2];
-      $stat{$apid}->{duration}=$t0-$d[2];
       close(F);
    }
 }
@@ -186,7 +191,9 @@ foreach my $apid (@apid){
             }
             else{
                my $cmdresult;
-               my $cmd="sudo -u '$stat{$apid}->{sysuser}' kill $apid";
+               my $sudopref="sudo -u '$stat{$apid}->{sysuser}'";
+               my $cmd="$sudopref  kill -0 $apid 2>/dev/null && ".
+                       "$sudopref  kill $apid";
                $consolemsg.=sprintf("\n   -> initiate \"%s\"\n",$cmd);
                msg(INFO,"run command '$cmd'");
                system($cmd);
@@ -269,7 +276,7 @@ if (!$opt_autokill){
 
 sub help
 {
-   printf STDERR ("Usage: W5Top -c {config} [-v]\n");
+   printf STDERR ("Usage: W5Top -c {config} [-v] [--autokill]\n");
 }
 
 
