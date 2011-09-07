@@ -76,13 +76,26 @@ sub ViewProcessor
         #             "'height=480,width=640,toolbar=no,status=no,".
         #             "resizable=yes,scrollbars=auto');\")>";
             my $link="<a href=\"$url\" target=_blank>";
-            $response->{document}->{HtmlDetail}="<div ".
-                     "style=\"left:-40px;top:-45px;position:relative\">".
+
+
+#            $response->{document}->{HtmlDetail}="<div ".
+#                     "style=\"left:-40px;top:-45px;position:relative\">".
+#                     $link."<img border=0 ".
+#                  "title=\"$title\" ".
+#                  "style=\"position:absolute;width:40px;height:40px;".
+#                  "padding-right:5px\" src=\"../../base/load/attention.gif\">".
+#                  "</a></div>";
+
+            $response->{document}->{HtmlDetail}="<div id=fixedload ".
+                     "style=\"display:none;visible:hidden\">".
                      $link."<img border=0 ".
                   "title=\"$title\" ".
-                  "style=\"position:absolute;width:40px;height:40px;".
+                  "style=\"width:30px;height:30px;".
                   "padding-right:5px\" src=\"../../base/load/attention.gif\">".
                   "</a></div>";
+
+
+
             $response->{document}->{HtmlV01}="$link<img border=0 ".
                   "title=\"$title\" ".
                   "src=\"../../base/load/fail.gif\"></a>";
@@ -94,7 +107,12 @@ sub ViewProcessor
       }
       else{
          sleep(3);
-         $response->{document}->{HtmlDetail}="QualtiyState for workflows currently in development";
+         $response->{document}->{HtmlV01}="ERROR: State only in Detail view";
+         $response->{document}->{HtmlDetail}="
+<div id=fixedload style='display:none;visible:hidden'>
+<img border=0 style='position:absolute;width:30px;height:30px;
+     padding-right:5px' src='../../base/load/attention.gif'>
+</div>";
       }
 
       print $self->getParent->HttpHeader("text/xml");

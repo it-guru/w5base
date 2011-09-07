@@ -60,8 +60,11 @@ div.detailtopline{
    font-weight:bold;
 }
 td.detailtopline{
-   padding-right:4px;
-   padding-left:4px;
+   padding-right:5px;
+   padding-left:2px;
+   vertical-align: top;
+   text-align:left;
+   padding-top:5px;
 }
 h1{
    font-weight:bold;

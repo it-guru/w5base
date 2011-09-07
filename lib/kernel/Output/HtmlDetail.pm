@@ -221,7 +221,7 @@ EOF
       my $s=$self->getParent->getParent->T($self->getParent->getParent->Self,
                                            $self->getParent->getParent->Self);
       my $recordimg=$self->getParent->getParent->getRecordImageUrl($rec);
-      my $subheader="-";
+      my $subheader="&nbsp;";
 
       if ($self->getParent->getParent->can("getRecordHtmlDetailHeader")){
          $H=$self->getParent->getParent->getRecordHtmlDetailHeader($rec);
@@ -280,14 +280,36 @@ EOF
 
  </table>
 </div>
+
+<!-- position:fixed fix for IE6 implementations (CSS no works! -->
+<div id="fixedbox" 
+     style="position:absolute;width:50px;height:50px;right:0px;top:80px"></div>
+<script language=JavaScript>
+window.setInterval(function(){
+   var element = document.getElementById('fixedbox');  
+   if (element){
+      if (element.innerHTML!=""){
+         element.style.top=(document.body.scrollTop+80)+'px';
+      }
+   }
+   var el=document.getElementById('fixedload');
+   if (el){
+      if (el.innerHTML!=""){
+         element.innerHTML=el.innerHTML;
+         el.innerHTML="";
+      }
+   }
+},1000);
+</script>
+
 <a name="index"></a>
 <div style="height:4px;border-width:0;overflow:hidden">&nbsp;</div>
 <div id=detailtopline class=detailtopline>
    <table width=100% cellspacing=0 cellpadding=0>
       <tr>
 <td rowspan=2 width=1%>$ByIdLinkStart$recordimg$ByIdLinkEnd</a></td>
-      <td class=detailtopline align=left>
-<table border=0 width=100% style="table-layout:fixed;overflow:hidden"><tr>
+      <td class=detailtopline>
+<table border=0 cellspacing=0 width=100% style="table-layout:fixed;overflow:hidden"><tr>
 <td class=detailtopline align=left>$H
 <div style="display:none;visibility:hidden;" id=WindowTitle>$s: $headerval</div>
 </td></tr></table>
