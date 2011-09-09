@@ -367,14 +367,16 @@ sub ApplicationModified
                                       bActive=>'1',
                                    }
                                };
-                  if ($lnk->{systemsystemid} ne ""){
-                     $acftprec->{CI_APPL_REL}->{Portfolio}=
-                            uc($lnk->{systemsystemid});
-                     $ciapplrel{$acftprec->{CI_APPL_REL}->{Portfolio}}++;
-                  }
                   if ($rec->{applid} ne ""){
                      $acftprec->{CI_APPL_REL}->{Application}=uc($rec->{applid});
                   }    
+                  if ($lnk->{systemsystemid} ne ""){
+                     $acftprec->{CI_APPL_REL}->{Portfolio}=
+                            uc($lnk->{systemsystemid});
+                     $ciapplrel{"$acftprec->{CI_APPL_REL}->{Portfolio}".
+                                "-".
+                                $acftprec->{CI_APPL_REL}->{Application}}++;
+                  }
 
                   #
                   # Workaround für AktiveBilling (Fachbereich Billing)
@@ -406,7 +408,8 @@ sub ApplicationModified
                         $lnks->ResetFilter();
                         $lnks->SetFilter({lparentid=>\$lnkrec->{lchildid}});
                         foreach my $srec ($lnks->getHashList(qw(systemid))){
-                           if (!exists($ciapplrel{$srec->{systemid}})){
+                           if (!exists($ciapplrel{$srec->{systemid}."-".
+                                                  $acapplrec->{applid}})){
                               my $externalid="SAPLNK-".$srec->{systemid}."-".
                                              $acapplrec->{applid};
                               my $acftprec={
