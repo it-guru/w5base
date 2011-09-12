@@ -495,7 +495,7 @@ sub activateMailSend
    my $action=shift;
 
    my %d=(step=>'base::workflow::mailsend::waitforspool',
-          emailsignatur=>'EventNotification: AL DTAG');
+          emailsignatur=>'EventNotification: GCU Telco');
    $self->linkMail($WfRec->{id},$id);
    if (my $r=$wf->Store($id,%d)){
       return(1);
