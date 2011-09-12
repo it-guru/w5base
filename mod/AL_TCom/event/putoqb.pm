@@ -51,7 +51,7 @@ sub PutOQB
 
    my $elements=0;
    my $wf=getModuleObject($self->Config,"base::workflow");
-   my $mandators=['AL DTAG'];
+   my $mandators=['GCU Telco'];
    $wf->SetFilter({mdate=>">now-2d AND <now",
                    class=>'*::workflow::problem'});
    $wf->SetCurrentView(qw(name mandator eventstart eventend srcid id
