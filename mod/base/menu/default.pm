@@ -332,6 +332,10 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("Tools.filemgmt.acl",
+                      "base::fileacl",
+                      defaultacl=>['admin']);
+   
    $self->RegisterObj("Tools.filebrowser",
                       "base::filemgmt",
                       func=>'browser');

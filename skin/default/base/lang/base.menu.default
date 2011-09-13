@@ -66,6 +66,7 @@
 'sysadm.filesig'=>{de=>'Transfersignatur',en=>'Transfersig'},
 'sysadm.filesig.signedfile'=>{de=>'signierte Datei',en=>'signed file'},
 'Tools.filemgmt'=>{de=>'Dateiverwaltung',en=>'Filemanagement'},
+'Tools.filemgmt.acl'=>{de=>'Dateirechte',en=>'Filerights'},
 'Tools.teamtools'=>{de=>'Team-Tools',en=>'Team-Tools'},
 'Tools.teamtools.forms'=>{de=>'Formulare',en=>'Forms'},
 'Tools.filemgmt.new'=>{de=>'Neuer Upload',en=>'New'},
