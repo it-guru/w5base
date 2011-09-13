@@ -112,6 +112,13 @@ sub getControlRecord
              idfield      =>'databossid',
              targetlabel  =>'name'
            },
+           itclustdataboss=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'itil::itclust',
+             target       =>'databoss',
+             idfield      =>'databossid',
+             targetlabel  =>'name'
+           },
            swinstancedataboss=>{
              replaceoptype=>'base::user',
              dataobj      =>'itil::swinstance',
@@ -125,6 +132,20 @@ sub getControlRecord
              target       =>'toappl',
              idfield      =>'toapplid',
              targetlabel  =>'name'
+           },
+           servicesupportdataboss=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'itil::servicesupport',
+             target       =>'databoss',
+             idfield      =>'databossid',
+             targetlabel  =>'fullname'
+           },
+           servicesupportdataboss2=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'itil::servicesupport',
+             target       =>'databoss2',
+             idfield      =>'databoss2id',
+             targetlabel  =>'fullname'
            },
          ];
    return($d);
