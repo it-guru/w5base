@@ -49,7 +49,7 @@ sub getOptionalModules
 
    return qw(Spreadsheet::WriteExcel::Big 
              Spreadsheet::ParseExcel Spreadsheet::ParseExcel::Utility
-             DTP JSON
+             DTP JSON PDF::Reuse
              Digest::SHA1
              pdflib_pl DTP::pdf Archive::Zip
              GD DTP::jpg DTP::png);
