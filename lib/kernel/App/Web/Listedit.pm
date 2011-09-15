@@ -1618,20 +1618,17 @@ sub isQualityCheckValid
    my @idl=map({$_->{id}} @reclist);
    if ($#idl!=-1){
       my $qc=$self->getPersistentModuleObject("base::lnkqrulemandator");
-      $qc->SetFilter({mandatorid=>$mandator,qruleid=>\@idl});
-      my @reclist=$qc->getHashList(qw(id dataobj));
-      return(1) if ($#reclist!=-1 && $self->Self() ne "base::workflow");
-      my $found=0;
-      foreach my $qrec (@reclist){
-         if ($self->Self() eq "base::workflow"){
-            if ($rec->{class} eq $qrec->{dataobj}){
-               $found++;
-               last;
-            }
-         }
+      if ($self->Self() eq "base::workflow"){
+         $qc->SetFilter({mandatorid=>$mandator,
+                         dataobj=>\$rec->{class},
+                         qruleid=>\@idl});
       }
-      
-      return($found);
+      else{
+         $qc->SetFilter({mandatorid=>$mandator,qruleid=>\@idl});
+      }
+      my @reclist=$qc->getHashList(qw(id dataobj));
+      return(1) if ($#reclist!=-1);
+      return(0);
    }
 
    return(0);
