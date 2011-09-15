@@ -1,0 +1,2 @@
+'TS::qrule::wfChangeTasks'=>{de=>'Prüfung auf Tasks in SC zum aktuellen Workflow',en=>'check on exiting tasks in SC'},
+'there is are no change tasks in ServiceCenter'=>{de=>'es existieren keine Change-Tasks in ServiceCenter'},

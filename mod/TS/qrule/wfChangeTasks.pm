@@ -1,10 +1,11 @@
-package base::qrule::WorkflowUntouched3;
+package TS::qrule::wfChangeTasks;
 #######################################################################
 =pod
 
 =head3 PURPOSE
 
-Checks if a workflow is longer the 3 months unmodified.
+Checks if there are tasks in ServiceCenter for the current
+change workflow.
 
 =head3 IMPORTS
 
@@ -13,7 +14,7 @@ NONE
 =cut
 #######################################################################
 #  W5Base Framework
-#  Copyright (C) 2010  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2007  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -46,7 +47,7 @@ sub new
 
 sub getPosibleTargets
 {
-   return([".*::workflow::.*"]);
+   return(["AL_TCom::workflow::change"]);
 }
 
 sub qcheckRecord
@@ -55,27 +56,24 @@ sub qcheckRecord
    my $dataobj=shift;
    my $rec=shift;
 
-   my @failmsg;
+   my $exitcode=0;
+   my $desc={qmsg=>[],solvtip=>[]};
 
-   return(0,undef) if (!exists($rec->{mdate}));
-
-   if ($rec->{mdate} eq ""){
-      push(@failmsg,"invalid modification date in in workflow - ".
-                    "contact the w5base admin");
+   if ($rec->{srcid}=~m/^CHM.*$/){
+      my $chmtask=getModuleObject($self->getParent->Config,"tssc::chmtask");
+      if (defined($chmtask)){
+         $chmtask->SetFilter({changenumber=>\$rec->{srcid}});
+         if ($chmtask->CountRecords()==0){
+            $exitcode=3 if ($exitcode<3);
+            push(@{$desc->{qmsg}},
+                 'there is are no change tasks in ServiceCenter');
+         }
+      }
    }
 
-   my $now=NowStamp("en");
-   my $d=CalcDateDuration($rec->{mdate},$now,"GMT");
-   my @failmsg;
-   if ($d->{days}>90 && $rec->{state}<20){
-      push(@failmsg,"workflow is longer then 3 months untouched");
-   }
-   if ($#failmsg!=-1){
-      return(3,{qmsg=>[@failmsg]});
-   }
-
-   return(0,undef);
+   return($exitcode,$desc);
 }
+
 
 
 
