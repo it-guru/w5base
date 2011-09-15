@@ -282,14 +282,13 @@ EOF
 </div>
 
 <!-- position:fixed fix for IE6 implementations (CSS no works! -->
-<div id="fixedbox" 
-     style="position:absolute;width:50px;height:50px;right:0px;top:80px"></div>
+<div id="fixedbox" style="position:absolute;left;width:97%;top:0px"></div>
 <script language=JavaScript>
 window.setInterval(function(){
    var element = document.getElementById('fixedbox');  
    if (element){
       if (element.innerHTML!=""){
-         element.style.top=(document.body.scrollTop+80)+'px';
+         element.style.top=(document.body.scrollTop+0)+'px';
       }
    }
    var el=document.getElementById('fixedload');

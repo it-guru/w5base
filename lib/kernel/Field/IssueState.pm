@@ -72,29 +72,14 @@ sub ViewProcessor
                        ' - Not all data seems to be correct!');
             $title=sprintf($title,$issuerec->{fwdtargetname});
             my $url="../../base/workflow/ById/$issuerec->{id}";
-        #    my $link="<span onclick=alert(\"onclick=openwin('$url','_blank',".
-        #             "'height=480,width=640,toolbar=no,status=no,".
-        #             "resizable=yes,scrollbars=auto');\")>";
             my $link="<a href=\"$url\" target=_blank>";
-
-
-#            $response->{document}->{HtmlDetail}="<div ".
-#                     "style=\"left:-40px;top:-45px;position:relative\">".
-#                     $link."<img border=0 ".
-#                  "title=\"$title\" ".
-#                  "style=\"position:absolute;width:40px;height:40px;".
-#                  "padding-right:5px\" src=\"../../base/load/attention.gif\">".
-#                  "</a></div>";
-
             $response->{document}->{HtmlDetail}="<div id=fixedload ".
                      "style=\"display:none;visible:hidden\">".
-                     $link."<img border=0 ".
-                  "title=\"$title\" ".
+                     $link."<div align=right style='padding-top:70px'>".
+                     "<img border=0 title=\"$title\" ".
                   "style=\"width:30px;height:30px;".
                   "padding-right:5px\" src=\"../../base/load/attention.gif\">".
-                  "</a></div>";
-
-
+                  "</a></div></div>";
 
             $response->{document}->{HtmlV01}="$link<img border=0 ".
                   "title=\"$title\" ".
@@ -106,13 +91,59 @@ sub ViewProcessor
          }
       }
       else{
-         sleep(3);
-         $response->{document}->{HtmlV01}="ERROR: State only in Detail view";
-         $response->{document}->{HtmlDetail}="
+         my $pobj=$self->getParent();
+         $pobj->ResetFilter();
+         $pobj->SetFilter({id=>\$refid});
+         my ($wfrec)=$pobj->getOnlyFirst(qw(ALL));
+         if (defined($wfrec)){
+            my $qr=getModuleObject($pobj->Config,"base::qrule");
+            $qr->setParent($pobj);
+            my $res=$qr->nativQualityCheck($wfrec->{class},$wfrec);
+            if (defined($res) && ref($res) eq "HASH"){
+               $res->{exitcode}=0;
+               my $dispmsg="";
+               if (ref($res->{rule}) eq "ARRAY"){
+                  foreach my $r (@{$res->{rule}}){
+                     if ($r->{exitcode}>$res->{exitcode}){
+                        $res->{exitcode}=$r->{exitcode};
+                     }
+                     if (ref($r->{qmsg}) eq "ARRAY"){
+                        $dispmsg.="<ul>".
+                            join("",map({"<li>".$_."</li>"} @{$r->{qmsg}})).
+                            "</ul>";
+                     }
+                  }
+               }
+               #$dispmsg=Dumper($res);
+               if ($dispmsg ne ""){
+                  $dispmsg="<div id=qmsg style='background-color:yellow;height:100px;overflow:auto;width:380px;border-style:solid;border-color:black;border-width:1px;text-align:left;visibility:hidden;display:none'>".
+                           $dispmsg."</div>";
+               }
+               #print STDERR "qcheckresupt=".Dumper($res);
+               if ($res->{exitcode}>0){
+                  $response->{document}->{HtmlV01}="FAIL";
+                  $response->{document}->{HtmlDetail}="
 <div id=fixedload style='display:none;visible:hidden'>
-<img border=0 style='position:absolute;width:30px;height:30px;
-     padding-right:5px' src='../../base/load/attention.gif'>
+<div style='height:70px'>&nbsp;</div>
+<div align=right style='width:100%'>
+<div align=right onmouseout='var e=document.getElementById(\"qmsg\");e.style.visibility=\"hidden\";e.style.display=\"none\";' >
+<img onmouseover='var e=document.getElementById(\"qmsg\");e.style.visibility=\"visible\";e.style.display=\"block\";' style='margin-bottom:2px;width:30px;height:30px;
+     padding-right:5px;cursor:pointer' src='../../base/load/attention.gif'>
+$dispmsg
+</div></div>
 </div>";
+               }
+               else{
+                  $response->{document}->{HtmlV01}="OK";
+                  $response->{document}->{HtmlDetail}="";
+               }
+            }
+            else{
+               $response->{document}->{HtmlV01}="";
+               $response->{document}->{HtmlDetail}="";
+            }
+
+         }
       }
 
       print $self->getParent->HttpHeader("text/xml");
@@ -138,6 +169,13 @@ sub FormatedDetail
          $XMLUrl.="/../ViewProcessor/XML/$self->{name}/$id";
          my $d="<div id=\"$divid\"></div>";
          $d=$self->addWebLinkToFacility($d,$current);
+         my $activator='addEvent(window,"load",onLoadViewProcessor_'.
+                       $self->{name}.'_'.$id.');';
+         if ($self->getParent->Self eq "base::workflow"){ # wf check with 2 sec
+            $activator='addEvent(window,"load",'.         # latency
+                       'function (){ window.setTimeout("onLoadViewProcessor_'.
+                       $self->{name}.'_'.$id.'();",2000);});';
+         }
          return(<<EOF);
 $d
 <script language="JavaScript">
@@ -179,7 +217,7 @@ function onLoadViewProcessor_$self->{name}_$id(timedout)
    xmlhttp.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
    var r=xmlhttp.send('Mode=XML');
 }
-addEvent(window,"load",onLoadViewProcessor_$self->{name}_$id);
+$activator
 </script>
 EOF
       }

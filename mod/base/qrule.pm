@@ -157,7 +157,13 @@ sub nativQualityCheck
    push(@$mandator,0);  # for rules on any mandator
    $objlist=[$objlist] if (ref($objlist) ne "ARRAY");
    my $lnkr=getModuleObject($self->Config,"base::lnkqrulemandator");
-   $lnkr->SetFilter({mandatorid=>$mandator});
+   if ($self->getParent->Self() eq "base::workflow"){
+      $lnkr->SetFilter({mandatorid=>$mandator,
+                        dataobj=>\$rec->{class}});
+   }
+   else{
+      $lnkr->SetFilter({mandatorid=>$mandator});
+   }
    my %qruledone;
    foreach my $lnkrec ($lnkr->getHashList(qw(mdate qruleid dataobj))){
       my $qrulename=$lnkrec->{qruleid};
@@ -242,116 +248,118 @@ sub nativQualityCheck
          }
       }
    }
-   my $wf=getModuleObject($parent->Config,"base::workflow");
-   my $dataobj=$self->getParent();
-   my $affectedobject=$dataobj->SelfAsParentObject();
-   my $idfield=$dataobj->IdField();
-   my $affectedobjectid=$idfield->RawValue($rec);
-   msg(INFO,"QualityRule Level1");
-   if (keys(%alldataissuemsg)){
-      msg(INFO,"QualityRule Level2");
-      my $directlnkmode="DataIssueMsg";
-      my $detaildescription;
-      foreach my $qrule (keys(%alldataissuemsg)){
-         $detaildescription.="\n" if ($detaildescription ne "");
-         $detaildescription.="[W5TRANSLATIONBASE=$qrule]\n";
-         $detaildescription.=$qrule."\n";
-         foreach my $msg (@{$alldataissuemsg{$qrule}}){
-            if ($msg=~m/^\[\S+::\S+\]$/){
-               $detaildescription.=$msg."\n";
-            }
-            else{
-               $detaildescription.=" - ".$msg."\n";
+   if ($parent->Self() ne "base::workflow"){ # only DataIssues for nonworkflows!
+      my $wf=getModuleObject($parent->Config,"base::workflow");
+      my $dataobj=$self->getParent();
+      my $affectedobject=$dataobj->SelfAsParentObject();
+      my $idfield=$dataobj->IdField();
+      my $affectedobjectid=$idfield->RawValue($rec);
+      msg(INFO,"QualityRule Level1");
+      if (keys(%alldataissuemsg)){
+         msg(INFO,"QualityRule Level2");
+         my $directlnkmode="DataIssueMsg";
+         my $detaildescription;
+         foreach my $qrule (keys(%alldataissuemsg)){
+            $detaildescription.="\n" if ($detaildescription ne "");
+            $detaildescription.="[W5TRANSLATIONBASE=$qrule]\n";
+            $detaildescription.=$qrule."\n";
+            foreach my $msg (@{$alldataissuemsg{$qrule}}){
+               if ($msg=~m/^\[\S+::\S+\]$/){
+                  $detaildescription.=$msg."\n";
+               }
+               else{
+                  $detaildescription.=" - ".$msg."\n";
+               }
             }
          }
+         msg(INFO,"QualityRule Level3");
+         my $oldforce=$ENV{HTTP_FORCE_LANGUAGE};
+         $ENV{HTTP_FORCE_LANGUAGE}="en";
+         my $objectname=$dataobj->getRecordHeader($rec);
+         if (my $headerfield=$dataobj->getRecordHeaderField($rec)){
+            $objectname=$headerfield->RawValue($rec);
+         }
+     
+         my $name="DataIssue: ".$dataobj->T($affectedobject,$affectedobject).": ".
+                  $objectname;
+         $ENV{HTTP_FORCE_LANGUAGE}=$oldforce;
+         delete($ENV{HTTP_FORCE_LANGUAGE}) if ($ENV{HTTP_FORCE_LANGUAGE} eq "");
+         $wf->ResetFilter();
+         $wf->SetFilter({stateid=>"<20",class=>\"base::workflow::DataIssue",
+                         directlnktype=>\$affectedobject,
+                         directlnkid=>\$affectedobjectid});
+         msg(INFO,"QualityRule Level4");
+         my ($WfRec,$msg)=$wf->getOnlyFirst(qw(ALL));
+         my $oldcontext=$W5V2::OperationContext;
+         $W5V2::OperationContext="QualityCheck";
+         msg(INFO,"QualityRule Level5");
+         if (!defined($WfRec)){
+            msg(INFO,"QualtiyCheck: ".
+                     "an old record does not exists - so i create a new one");
+            my $newrec={name=>$name,
+                        detaildescription=>$detaildescription,
+                        class=>"base::workflow::DataIssue",
+                        step=>"base::workflow::DataIssue::dataload",
+                        affectedobject=>$affectedobject,
+                        affectedobjectid=>$affectedobjectid,
+                        altaffectedobjectname=>$objectname,
+                        directlnkmode=>$directlnkmode,
+                        eventend=>undef,
+                        eventstart=>NowStamp("en"),
+                        srcload=>NowStamp("en"),
+                        srcsys=>$affectedobject,
+                        dataissuemetric=>[sort(keys(%alldataissuemsg))],
+                        DATAISSUEOPERATIONSRC=>$directlnkmode};
+            my $bk=$wf->Store(undef,$newrec);
+            $result->{wfheadid}=$bk;
+         }
+         else{
+            msg(INFO,"QualtiyCheck: ".
+                     "an old record exists - so i update the record");
+            my $newrec={name=>$name,
+                        mdate=>$WfRec->{mdate},
+                        owner=>$WfRec->{owner},
+                        editor=>$WfRec->{editor},
+                        realeditor=>$WfRec->{realeditor},
+                        srcload=>NowStamp("en"),
+                        dataissuemetric=>[sort(keys(%alldataissuemsg))],
+                        detaildescription=>$detaildescription};
+            my $bk=$wf->Store($WfRec,$newrec);
+            $result->{wfheadid}=$WfRec->{id};
+         }
+     
+         $W5V2::OperationContext=$oldcontext;
       }
-      msg(INFO,"QualityRule Level3");
-      my $oldforce=$ENV{HTTP_FORCE_LANGUAGE};
-      $ENV{HTTP_FORCE_LANGUAGE}="en";
-      my $objectname=$dataobj->getRecordHeader($rec);
-      if (my $headerfield=$dataobj->getRecordHeaderField($rec)){
-         $objectname=$headerfield->RawValue($rec);
-      }
-
-      my $name="DataIssue: ".$dataobj->T($affectedobject,$affectedobject).": ".
-               $objectname;
-      $ENV{HTTP_FORCE_LANGUAGE}=$oldforce;
-      delete($ENV{HTTP_FORCE_LANGUAGE}) if ($ENV{HTTP_FORCE_LANGUAGE} eq "");
-      $wf->ResetFilter();
-      $wf->SetFilter({stateid=>"<20",class=>\"base::workflow::DataIssue",
-                      directlnktype=>\$affectedobject,
-                      directlnkid=>\$affectedobjectid});
-      msg(INFO,"QualityRule Level4");
-      my ($WfRec,$msg)=$wf->getOnlyFirst(qw(ALL));
       my $oldcontext=$W5V2::OperationContext;
       $W5V2::OperationContext="QualityCheck";
-      msg(INFO,"QualityRule Level5");
-      if (!defined($WfRec)){
-         msg(INFO,"QualtiyCheck: ".
-                  "an old record does not exists - so i create a new one");
-         my $newrec={name=>$name,
-                     detaildescription=>$detaildescription,
-                     class=>"base::workflow::DataIssue",
-                     step=>"base::workflow::DataIssue::dataload",
-                     affectedobject=>$affectedobject,
-                     affectedobjectid=>$affectedobjectid,
-                     altaffectedobjectname=>$objectname,
-                     directlnkmode=>$directlnkmode,
-                     eventend=>undef,
-                     eventstart=>NowStamp("en"),
-                     srcload=>NowStamp("en"),
-                     srcsys=>$affectedobject,
-                     dataissuemetric=>[sort(keys(%alldataissuemsg))],
-                     DATAISSUEOPERATIONSRC=>$directlnkmode};
-         my $bk=$wf->Store(undef,$newrec);
-         $result->{wfheadid}=$bk;
-      }
-      else{
-         msg(INFO,"QualtiyCheck: ".
-                  "an old record exists - so i update the record");
-         my $newrec={name=>$name,
-                     mdate=>$WfRec->{mdate},
-                     owner=>$WfRec->{owner},
-                     editor=>$WfRec->{editor},
-                     realeditor=>$WfRec->{realeditor},
-                     srcload=>NowStamp("en"),
-                     dataissuemetric=>[sort(keys(%alldataissuemsg))],
-                     detaildescription=>$detaildescription};
-         my $bk=$wf->Store($WfRec,$newrec);
-         $result->{wfheadid}=$WfRec->{id};
-      }
-
-      $W5V2::OperationContext=$oldcontext;
-   }
-   my $oldcontext=$W5V2::OperationContext;
-   $W5V2::OperationContext="QualityCheck";
-   #
-   # cleanup deprecated DataIssues for current object
-   #
-   $wf->ResetFilter();
-   $wf->SetFilter({stateid=>"<20",class=>\"base::workflow::DataIssue",
-                   srcload=>"<\"$checkStart GMT\"",
-                   directlnktype=>\$affectedobject,
-                   directlnkid=>\$affectedobjectid});
-   $wf->SetCurrentView(qw(ALL));
-   $wf->ForeachFilteredRecord(sub{
-                      $wf->Store($_,{stateid=>'21',
-                                     fwddebtarget=>undef,
-                                     fwddebtargetid=>undef,
-                                     fwdtarget=>undef,
-                                     fwdtarget=>undef});
-                   });
-   if (my $qclast=$parent->getField("lastqcheck")){
-      my $idfield=$parent->IdField();
-      if (defined($idfield)){
-         my $id=$idfield->RawValue($rec);
-         if ($id ne ""){
-            $parent->ValidatedUpdateRecord($rec,{lastqcheck=>NowStamp("en")},
-                                           {$idfield->Name()=>\$id});
+      #
+      # cleanup deprecated DataIssues for current object
+      #
+      $wf->ResetFilter();
+      $wf->SetFilter({stateid=>"<20",class=>\"base::workflow::DataIssue",
+                      srcload=>"<\"$checkStart GMT\"",
+                      directlnktype=>\$affectedobject,
+                      directlnkid=>\$affectedobjectid});
+      $wf->SetCurrentView(qw(ALL));
+      $wf->ForeachFilteredRecord(sub{
+                         $wf->Store($_,{stateid=>'21',
+                                        fwddebtarget=>undef,
+                                        fwddebtargetid=>undef,
+                                        fwdtarget=>undef,
+                                        fwdtarget=>undef});
+                      });
+      if (my $qclast=$parent->getField("lastqcheck")){
+         my $idfield=$parent->IdField();
+         if (defined($idfield)){
+            my $id=$idfield->RawValue($rec);
+            if ($id ne ""){
+               $parent->ValidatedUpdateRecord($rec,{lastqcheck=>NowStamp("en")},
+                                              {$idfield->Name()=>\$id});
+            }
          }
       }
+      $W5V2::OperationContext=$oldcontext;
    }
-   $W5V2::OperationContext=$oldcontext;
 
    return($result);
 
