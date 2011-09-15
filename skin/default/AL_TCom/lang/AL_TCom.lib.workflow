@@ -169,6 +169,8 @@
                                      de=>'ETA/basic svcs/BPQ-administrativ operations'},
 'eta.baseeff.BPQcoordination'=>     {en=>'ETA/BL/BPQ-Koordination Abstimmung',
                                      de=>'ETA/basic svcs/BPQ-coordination adjustment'},
+'eta.baseeff.BPQsyscheck'=>         {en=>'ETA/BL/BPQ-Systemcheck',
+                                     de=>'ETA/basic svcs/BPQ-Systemcheck'},
 
 
 'eta.baseeff.etabusinear'=>         {en=>'ETA/basic svcs/ETA-business nearshore',
