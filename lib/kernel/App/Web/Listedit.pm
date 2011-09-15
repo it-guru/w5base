@@ -1627,8 +1627,23 @@ sub isQualityCheckValid
          $qc->SetFilter({mandatorid=>$mandator,qruleid=>\@idl});
       }
       my @reclist=$qc->getHashList(qw(id dataobj));
-      return(1) if ($#reclist!=-1);
-      return(0);
+      my $found=0;
+      foreach my $qrec (@reclist){
+         if ($self->Self() eq "base::workflow"){
+            if ($rec->{class} eq $qrec->{dataobj}){
+               $found++;
+               last;
+            }
+         }
+         else{
+            if (in_array($compatible,$qrec->{dataobj})){
+               $found++;
+               last;
+            }
+         }
+      }
+
+      return($found);
    }
 
    return(0);
