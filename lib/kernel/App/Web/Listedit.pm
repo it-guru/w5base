@@ -1620,8 +1620,6 @@ sub isQualityCheckValid
       my $qc=$self->getPersistentModuleObject("base::lnkqrulemandator");
       $qc->SetFilter({mandatorid=>$mandator,qruleid=>\@idl});
       my @reclist=$qc->getHashList(qw(id dataobj));
-printf STDERR ("fifi compatible=%s\n",Dumper($compatible));
-printf STDERR ("fifi reclist=%s\n",Dumper(\@reclist));
       return(1) if ($#reclist!=-1 && $self->Self() ne "base::workflow");
       my $found=0;
       foreach my $qrec (@reclist){
