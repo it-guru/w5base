@@ -73,13 +73,15 @@ sub ViewProcessor
             $title=sprintf($title,$issuerec->{fwdtargetname});
             my $url="../../base/workflow/ById/$issuerec->{id}";
             my $link="<a href=\"$url\" target=_blank>";
-            $response->{document}->{HtmlDetail}="<div id=fixedload ".
-                     "style=\"display:none;visible:hidden\">".
-                     $link."<div align=right style='padding-top:70px'>".
-                     "<img border=0 title=\"$title\" ".
+            $response->{document}->{HtmlDetail}=
+                  "<div id=fixedload ".
+                  "style='display:none;visible:hidden'>".
+                  $link."<div align=right style='padding-top:70px'>".
+                  "<img border=0 title=\"$title\" ".
                   "style=\"width:30px;height:30px;".
-                  "padding-right:5px\" src=\"../../base/load/attention.gif\">".
-                  "</a></div></div>";
+                  "padding-right:5px\" ".
+                  "src=\"../../base/load/attention.gif\"></img>".
+                  "</div></a></div>";
 
             $response->{document}->{HtmlV01}="$link<img border=0 ".
                   "title=\"$title\" ".
