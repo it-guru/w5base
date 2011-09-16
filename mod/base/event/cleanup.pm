@@ -215,16 +215,6 @@ sub LnkGrpUser
    }
    $W5V2::OperationContext=$oldcontext;
 
-#   my $wf=getModuleObject($self->Config,"base::workflow");
-#   if (my $id=$wf->Store(undef,{
-#          class    =>'base::workflow::mailsend',
-#          step     =>'base::workflow::mailsend::dataload',
-#          name     =>'eine Mail vom Testevent1 mit äöüß',
-#          emailtext=>'Hallo Welt'
-#         })){
-#      my $r=$wf->Store($id,step=>'base::workflow::mailsend::waitforspool');
-#      return({msg=>'versandt'});
-#   }
    return({exitcode=>0,msg=>'OK'});
 }
 

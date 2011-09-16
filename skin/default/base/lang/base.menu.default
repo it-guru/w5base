@@ -25,6 +25,7 @@
 'sysadm.grp'=>{de=>'Gruppenverwaltung',en=>'Group-Administration'},
 'sysadm.mandator'=>{de=>'Mandantenverwaltung',en=>'Mandator-Administration'},
 'sysadm.mandator.new'=>{de=>'Neueingabe',en=>'New'},
+'sysadm.mandator.lnkmandatorcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
 'sysadm.mandator.dataacl'=>{de=>'DatenACLs',en=>'dataACLs'},
 'sysadm.mandator.dataacl.new'=>{de=>'Neueingabe',en=>'New'},
 'sysadm.location'=>{de=>'Standortverwaltung',en=>'Location-Administration'},
