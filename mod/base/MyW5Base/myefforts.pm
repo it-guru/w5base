@@ -107,13 +107,19 @@ sub Result
             my $dayeffort=$rec->{effort}+0;
             $sumtoday+=$dayeffort;
             my $utimestart=$utime-($dayeffort*60);
-            #my $utimestart=$utime-($dayeffort*60);
-            if (!defined($daystart)){
+
+            if (!defined($daystart) || $utimestart<$daystart){
                $daystart=$utimestart;
             }
-            else{
-               $daystart-=($dayeffort*60);
-            }
+
+#            if (!defined($daystart)){
+#               $daystart=$utimestart;
+#            }
+#            else{
+#               $daystart-=($dayeffort*60);
+#            }
+
+
          }
          #printf ("<pre>@ldate=%s</pre>\n",Dumper($rec));
          ($rec,$msg)=$wa->getNext();
@@ -167,7 +173,7 @@ sub Result
    }
    my $mwteff=sprintf("%.2f&nbsp;h&nbsp;",$sumeff/$wtcount/60);
    my $miteff=sprintf("%.2f&nbsp;h&nbsp;",$sumeff/14.0/60);
-   $sumeff=sprintf("%.2fh&nbsp;(%dh&nbsp;%dmin)",$sumeff/60);
+   $sumeff=sprintf("%.2fh&nbsp;",$sumeff/60);
    
    my $sumnoweff=sprintf("%.2fh&nbsp;(=%dh&nbsp;%dmin)",$sumtoday/60,
                    (int($sumtoday/60)),($sumtoday-(int($sumtoday/60)*60)));
