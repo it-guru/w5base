@@ -87,6 +87,8 @@ sub Result
    my %day;
    my $sumeff;
    my $sumtoday;
+   my $daystart;
+   my $daystate="?";
    my @now=Today_and_Now($tz);
    $wa->SetCurrentView(qw(wfheadid bookingdate effort));
    my ($rec,$msg)=$wa->getFirst();
@@ -94,17 +96,54 @@ sub Result
       do{
          $wfheadid{$rec->{wfheadid}}++;
          my $utime=Date_to_Time("GMT",$rec->{bookingdate});
+        # my $utime1=Date_to_Time("CET",$rec->{bookingdate});
          my @ldate=Time_to_Date($tz,$utime);
          my $day=sprintf("%04d-%02d-%02d",$ldate[0],$ldate[1],$ldate[2]);
          $day{$day}+=($rec->{effort}+0);
          $sumeff+=($rec->{effort}+0);
-         if ($ldate[0]==$now[0] && $ldate[1]==$now[1] && $ldate[2]==$now[2]){
-            $sumtoday+=($rec->{effort}+0);
+         if ($ldate[0]==$now[0] && 
+             $ldate[1]==$now[1] && 
+             $ldate[2]==$now[2]){
+            my $dayeffort=$rec->{effort}+0;
+            $sumtoday+=$dayeffort;
+            my $utimestart=$utime-($dayeffort*60);
+            #my $utimestart=$utime-($dayeffort*60);
+            if (!defined($daystart)){
+               $daystart=$utimestart;
+            }
+            else{
+               $daystart-=($dayeffort*60);
+            }
          }
          #printf ("<pre>@ldate=%s</pre>\n",Dumper($rec));
          ($rec,$msg)=$wa->getNext();
       } until(!defined($rec));
    }
+   if (defined($daystart)){
+      my @ldate=Time_to_Date($tz,$daystart); 
+      my $nowsec=Date_to_Time("GMT",NowStamp("en"));
+      my $secgone=$nowsec-$daystart;
+      my @nowstamp=Today_and_Now($tz);
+      $daystate=sprintf("%d&nbsp;min",(($sumtoday*60)-$secgone)/60);
+      if ($nowstamp[3]>=12){
+         if ($nowstamp[3]>=13){
+            $secgone-=60*60; # nachmittag
+         }
+         else{
+            $secgone-=60*$nowstamp[4]; # at mittag
+         }
+         $daystate.=sprintf("(%d&nbsp;min)",(($sumtoday*60)-$secgone)/60);
+      }
+      else{
+         $daystate.="(-)";
+      }
+      $daystart=sprintf("%02d:%02d",$ldate[3],$ldate[4]);
+      if (!($daystate=~m/^-/)){
+         $daystate="+".$daystate;
+      }
+   }
+
+   $daystate="~&nbsp;".$daystate;
    my $wfcount=keys(%wfheadid);
    my $now=sprintf("%04d-%02d-%02d",$now[0],$now[1],$now[2]);
    my $data=[];
@@ -128,8 +167,10 @@ sub Result
    }
    my $mwteff=sprintf("%.2f&nbsp;h&nbsp;",$sumeff/$wtcount/60);
    my $miteff=sprintf("%.2f&nbsp;h&nbsp;",$sumeff/14.0/60);
-   $sumeff=sprintf("%.2f&nbsp;h&nbsp;",$sumeff/60);
-   my $sumnoweff=sprintf("%.2f&nbsp;h&nbsp;",$sumtoday/60);
+   $sumeff=sprintf("%.2fh&nbsp;(%dh&nbsp;%dmin)",$sumeff/60);
+   
+   my $sumnoweff=sprintf("%.2fh&nbsp;(=%dh&nbsp;%dmin)",$sumtoday/60,
+                   (int($sumtoday/60)),($sumtoday-(int($sumtoday/60)*60)));
 
    my $user=getModuleObject($self->getParent->Config,"base::user");
    $user->SetFilter({userid=>\$userid});
@@ -154,6 +195,8 @@ sub Result
    my $l4=$self->T("count workflows");
    my $l5=$self->T("sum efforts in the last 14 days");
    my $l6=$self->T("sum efforts today");
+   my $l7=$self->T("estimated work start today");
+   my $l8=$self->T("effort documentation gap");
    my $condition=$self->T("condition");
    my $cond=Date_to_String("de",@now);
    print(<<EOF);
@@ -166,6 +209,8 @@ sub Result
 <td nowrap>$l4</td><td width=40 align=right>$wfcount&nbsp;</td></tr>
 <tr><td nowrap>$l5</td><td align=right width=40 >$sumeff</td>
 <td nowrap>$l6</td><td align=right width=40 >$sumnoweff</td></tr>
+<tr><td nowrap>$l7</td><td align=right width=40 >$daystart</td>
+<td nowrap>$l8</td><td align=right width=40 >$daystate</td></tr>
 </table>
 <input type=hidden name=MyW5BaseSUBMOD value="base::MyW5Base::myefforts">
 <script language="JavaScript">

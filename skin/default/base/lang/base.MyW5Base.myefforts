@@ -7,3 +7,5 @@
 'count workflows'=>{de=>'Anzahl Workflows'},
 'sum efforts in the last 14 days'=>{de=>'Summe Aufwände der letzten 14 Tage'},
 'sum efforts today'=>{de=>'Heute erfassten Aufwände'},
+'estimated work start today'=>{de=>'geschätzter heutiger Arbeitsbegin'},
+'effort documentation gap'=>{de=>'Lücke (Mittag berücksichtig)'},
