@@ -85,6 +85,7 @@ sub new
                                  'DB2',
                                  'HP-NSK Pathway',
                                  'IIS',
+                                 'IMS',  # IBM Information Management System
                                  'Informix',
                                  'JacORB',
                                  'JBoss',
