@@ -77,30 +77,34 @@ sub Validate
    my $origrec=shift;
    if (defined($oldrec) && defined($newrec) &&
        $oldrec->{stateid}!=16 && $newrec->{stateid}==16){
-      if (($oldrec->{tcomcodcause} eq "undef" || 
-           $oldrec->{tcomcodcause} eq "") &&
-          $newrec->{tcomcodcause} eq ""){
-         $newrec->{tcomcodcause}=$oldrec->{reqnature};
-      }
-      if (($oldrec->{tcomworktime} eq "") &&
-          $newrec->{tcomworktime} eq ""){
-         if (ref($oldrec->{shortactionlog}) eq "ARRAY"){
-            foreach my $arec (@{$oldrec->{shortactionlog}}){
-               if ($arec->{effort}>0){
-                  $newrec->{tcomworktime}+=$arec->{effort};
+      if (ref($oldrec->{affectedcontractid}) eq "ARRAY" &&
+          $#{$oldrec->{affectedcontractid}}!=-1){ 
+         if (($oldrec->{tcomcodcause} eq "undef" || 
+              $oldrec->{tcomcodcause} eq "") &&
+             $newrec->{tcomcodcause} eq ""){
+            $newrec->{tcomcodcause}=$oldrec->{reqnature};
+         }
+         if (($oldrec->{tcomworktime} eq "") &&
+             $newrec->{tcomworktime} eq ""){
+            if (ref($oldrec->{shortactionlog}) eq "ARRAY"){
+               foreach my $arec (@{$oldrec->{shortactionlog}}){
+                  if ($arec->{effort}>0){
+                     $newrec->{tcomworktime}+=$arec->{effort};
+                  }
                }
             }
+            if ($newrec->{tcomworktime} eq ""){
+               $self->LastMsg(ERROR,"no P800 effort derivable");
+               return(undef);
+            }
          }
-         if ($newrec->{tcomworktime} eq ""){
-            $self->LastMsg(ERROR,"no P800 effort derivable");
+         my $tcomworktime=effVal($oldrec,$newrec,"tcomworktime");
+         my $tcomcodcomments=effVal($oldrec,$newrec,"tcomcodcomments");
+         if (length($tcomcodcomments)<20 && $tcomworktime>1200){
+            $self->LastMsg(ERROR,
+                           "P800 effort more than 20h needs detail comments");
             return(undef);
          }
-      }
-      my $tcomworktime=effVal($oldrec,$newrec,"tcomworktime");
-      my $tcomcodcomments=effVal($oldrec,$newrec,"tcomcodcomments");
-      if (length($tcomcodcomments)<20 && $tcomworktime>1200){
-         $self->LastMsg(ERROR,"P800 effort more than 20h needs detail comments");
-         return(undef);
       }
    }
    return($self->SUPER::Validate($oldrec,$newrec,$origrec));
@@ -132,8 +136,13 @@ sub getRequestNatureOptions
 
 sub isViewValid
 {
-   my $self=shift;
-   return($self->SUPER::isViewValid(@_),"tcomcod");
+   my $self=shift;  
+   my $rec=$_[0];  
+   if (ref($rec->{affectedcontractid}) eq "ARRAY" &&
+       $#{$rec->{affectedcontractid}}!=-1){ 
+      return($self->SUPER::isViewValid(@_),"tcomcod");
+   }
+   return($self->SUPER::isViewValid(@_));
 }
 
 sub isWriteValid

@@ -86,7 +86,11 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   my @l=("affected","tcomcod","history");
+   my @l=("affected","history");
+   if (ref($rec->{affectedcontractid}) eq "ARRAY" &&
+       $#{$rec->{affectedcontractid}}!=-1){
+      push(@l,"tcomcod");
+   }
    push(@l,"source") if ($self->getParent->IsMemberOf("admin"));
    return($self->SUPER::isViewValid($rec),@l);
 }
@@ -725,58 +729,62 @@ sub Process
       }
       my %p800mod=();
       my $newstep=$self->getParent->getStepByShortname('wfclose',$WfRec);
-      my $tcomcodcomments;
-      my $tcomworktime;
-      if ($WfRec->{tcomcodrelevant} eq "" ||
-          $WfRec->{tcomcodrelevant} eq "yes"){
-       
-         if ($WfRec->{tcomcodcause} eq "" ||
-             $WfRec->{tcomcodcause} eq "undef"){
-            $self->getParent->LastMsg(ERROR,"no correct P800 cause selection");
-            return(0);
-         }
-         if ($WfRec->{tcomcodcomments} eq "" && $note ne ""){
-            $p800mod{tcomcodcomments}=$note;
-            $tcomcodcomments=$p800mod{tcomcodcomments};
-         }
-         else{
-            $tcomcodcomments=$WfRec->{tcomcodcomments}; 
-         }
-     }
-
-
-      if ($WfRec->{tcomworktime}<10){
-         my $fa=$self->getParent->getField("shortactionlog");
-         my $al=$fa->RawValue($WfRec);
-         my $def=0;
-         if (defined($al) && ref($al) eq "ARRAY"){
-            foreach my $action (@$al){ 
-               if (ref($action) eq "HASH"){
-                  $def+=$action->{effort};
-               }
+      if (ref($WfRec->{affectedcontractid}) eq "ARRAY" &&
+          $#{$WfRec->{affectedcontractid}}!=-1){  # P800 Check only needed, if
+         my $tcomcodcomments;                   # there are existing contracts
+         my $tcomworktime;
+         if ($WfRec->{tcomcodrelevant} eq "" ||
+             $WfRec->{tcomcodrelevant} eq "yes"){
+          
+            if ($WfRec->{tcomcodcause} eq "" ||
+                $WfRec->{tcomcodcause} eq "undef"){
+               $self->getParent->LastMsg(ERROR,
+                                         "no correct P800 cause selection");
+               return(0);
+            }
+            if ($WfRec->{tcomcodcomments} eq "" && $note ne ""){
+               $p800mod{tcomcodcomments}=$note;
+               $tcomcodcomments=$p800mod{tcomcodcomments};
+            }
+            else{
+               $tcomcodcomments=$WfRec->{tcomcodcomments}; 
             }
          }
-         $def=10 if ($def<10);
-         $p800mod{tcomworktime}=$def if ($WfRec->{tcomworktime}<10);
-         $tcomworktime=$p800mod{tcomworktime};
-      }
-      else{
-         $tcomworktime=$WfRec->{tcomworktime};
-      }
-      $p800mod{tcomcodrelevant}="yes" if ($WfRec->{tcomcodrelevant} eq "");
-
-      #
-      # check P800 requirements
-      # https://darwin.telekom.de/darwin/auth/base/workflow/ById/12391987130002
-      #
-      if ($WfRec->{tcomcodrelevant} eq "" ||
-          $WfRec->{tcomcodrelevant} eq "yes"){
-         if ($tcomworktime>1200 && length($tcomcodcomments)<20){
-            my $wth=sprintf("%.2lf",$tcomworktime/60);
-            $wth=~s/\./,/g;
-            $self->getParent->LastMsg(ERROR,
-                      'P800 worktime %sh needs detailed description',$wth);
-            return(0);
+        
+        
+         if ($WfRec->{tcomworktime}<10){
+            my $fa=$self->getParent->getField("shortactionlog");
+            my $al=$fa->RawValue($WfRec);
+            my $def=0;
+            if (defined($al) && ref($al) eq "ARRAY"){
+               foreach my $action (@$al){ 
+                  if (ref($action) eq "HASH"){
+                     $def+=$action->{effort};
+                  }
+               }
+            }
+            $def=10 if ($def<10);
+            $p800mod{tcomworktime}=$def if ($WfRec->{tcomworktime}<10);
+            $tcomworktime=$p800mod{tcomworktime};
+         }
+         else{
+            $tcomworktime=$WfRec->{tcomworktime};
+         }
+         $p800mod{tcomcodrelevant}="yes" if ($WfRec->{tcomcodrelevant} eq "");
+        
+         #
+         # check P800 requirements
+         # https://darwin.telekom.de/darwin/auth/base/workflow/ById/12391987130002
+         #
+         if ($WfRec->{tcomcodrelevant} eq "" ||
+             $WfRec->{tcomcodrelevant} eq "yes"){
+            if ($tcomworktime>1200 && length($tcomcodcomments)<20){
+               my $wth=sprintf("%.2lf",$tcomworktime/60);
+               $wth=~s/\./,/g;
+               $self->getParent->LastMsg(ERROR,
+                         'P800 worktime %sh needs detailed description',$wth);
+               return(0);
+            }
          }
       }
 
