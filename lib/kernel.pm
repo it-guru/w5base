@@ -281,6 +281,7 @@ sub hash2xml {
   if (ref($request) eq "HASH"){
      foreach my $k (keys(%{$request})){
         my $usek=$k;                         # in XML no pure numeric key are
+        $usek=~s/\s/_/g;
         $usek="ID$k" if ($k=~m/^\d+$/);      # allowed! 
         if (ref($request->{$k}) eq "HASH"){
            $xml.=indent($depth).
@@ -295,7 +296,7 @@ sub hash2xml {
                        indent($depth)."</$usek>\n";
               }
               else{
-                 $xml.=indent($depth)."<$k>".XmlQuote($subrec)."</$k>\n";
+                 $xml.=indent($depth)."<$usek>".XmlQuote($subrec)."</$usek>\n";
               }
            }
         }

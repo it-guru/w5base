@@ -2334,6 +2334,9 @@ sub Result
          my $currentview=Query->Param("CurrentView");
          $self->SetCurrentView($self->getFieldListFromUserview($currentview));
       }
+      my @view=$self->GetCurrentView();
+      $self->Log(INFO,"viewreq","$ENV{REMOTE_USER};".
+                                $self->Self.";".join(",",@view)); 
       $output->WriteToStdout(HttpHeader=>1);
    }
    else{

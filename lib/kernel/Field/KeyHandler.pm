@@ -59,7 +59,7 @@ sub RawValue
       my $id=$current->{$self->getParent->IdField->Name()};
       return($res) if (!defined($id));
       my $cmd="select name,fval from $keytab where id='$id'";
-      msg(INFO,"KeyHandler command=%s",$cmd);
+      $self->getParent->Log(INFO,"sqlread",$cmd);
       my @l=$self->{db}->getHashList($cmd);
       foreach my $rec (@l){
          $res->{$rec->{name}}=[] if (!defined($res->{$rec->{name}}));
@@ -162,12 +162,14 @@ sub FinishWrite
    if ($#cleanuprest!=-1){
       $cleanupcmd.=join(" or ",@cleanuprest);
       $self->{db}->do($cleanupcmd);
-      msg(INFO,"KeyHandler:cleanupd %s",$cleanupcmd);
+      #msg(INFO,"KeyHandler:cleanupd %s",$cleanupcmd);
+      $self->getParent->Log(INFO,"sqlwrite",$cleanupcmd);
    }
    if ($#insertvalue!=-1){
       $insertcmd.=join(",",@insertvalue);
       $self->{db}->do($insertcmd);
-      msg(INFO,"KeyHandler:insertcmd %s",$insertcmd);
+      #msg(INFO,"KeyHandler:insertcmd %s",$insertcmd);
+      $self->getParent->Log(INFO,"sqlwrite",$insertcmd);
    }
    if ($updneed){
       my @vars=grep(!/^id$/,keys(%upddata));
@@ -175,7 +177,8 @@ sub FinishWrite
               join(",",map({$_."=".$self->{db}->quotemeta($upddata{$_})} @vars)).
               " where id='".$upddata{id}."'";
       $self->{db}->do($cmd);
-      msg(INFO,"KeyHandler:updatecmd %s",$cmd);
+      #msg(INFO,"KeyHandler:updatecmd %s",$cmd);
+      $self->getParent->Log(INFO,"sqlread",$cmd);
    }
    #msg(INFO,"KeyHandler:FinishWrite %s",Dumper($newval));
    # preparing the hash - > todo

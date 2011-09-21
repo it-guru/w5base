@@ -134,7 +134,7 @@ sub Connect
       }
       else{
          my $parent=$self->getParent->Self();
-         msg(INFO,"schema on $dbname set: $schemacmd; for $parent");
+         #msg(INFO,"schema on $dbname set: $schemacmd; for $parent");
       }
    }
    #

@@ -19,7 +19,6 @@ package kernel::Output::SubXMLV01;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use Data::Dumper;
 use kernel::Output::XMLV01;
 @ISA    = qw(kernel::Output::XMLV01);
 

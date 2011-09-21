@@ -661,7 +661,7 @@ sub ValidateMandatorCache
       }
    }
    if (!defined($self->Cache->{Mandator}->{Cache})){
-      printf STDERR ("-------------- Mandators loaded --------------\n");
+      #printf STDERR ("-------------- Mandators loaded --------------\n");
       my $mandator=getModuleObject($self->Config,"base::mandator");
       $mandator->SetFilter({id=>'>-999999999'}); # prefend slow query entry
       $mandator->SetCurrentView(qw(grpid name cistatusid contacts additional));
@@ -711,7 +711,7 @@ sub ValidateMenuCache
       }
    }
    if (!defined($self->Cache->{Menu}->{Cache})){
-      printf STDERR ("-------------- Menus loaded --------------\n");
+      #printf STDERR ("-------------- Menus loaded --------------\n");
       my $menuacl=getModuleObject($self->Config,"base::menuacl");
       $menuacl->SetFilter({aclparentobj=>\'base::menu'});
       $menuacl->SetCurrentView(qw(refid acltarget acltargetid aclmode));
@@ -819,9 +819,9 @@ sub RefreshMenuTable
       $self->{CompareMenu}=$self->Cache->{Menu}->{Cache};
    }
    
-   printf STDERR ("----------= Start register Modules -----\n");
+   #printf STDERR ("----------= Start register Modules -----\n");
    $self->LoadSubObjs("menu","SubMenuObj");
-   printf STDERR ("----------= Ende  register Modules -----\n");
+   #printf STDERR ("----------= Ende  register Modules -----\n");
    if ($self->{MenuIsChanged}){
       $self->InvalidateMenuCache();
       $self->ValidateMenuCache();
