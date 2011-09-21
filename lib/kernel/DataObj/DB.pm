@@ -421,7 +421,6 @@ sub getSqlCount
    }
    my $sqlcmd=join(" UNION ",@cmd);
 
-   $self->Log(INFO,"sqlread",$sqlcmd);
 
    return($sqlcmd);
 }
@@ -529,7 +528,7 @@ sub UpdateRecord
       my $p=$self->Self();
       my $msg=sprintf("%s:time=%0.4fsec;mod=$p",NowStamp(),$t);
       $msg.=";user=$ENV{REMOTE_USER}" if ($ENV{REMOTE_USER} ne "");
-      msg(INFO,"updcmd=%s (%s)",$logcmd,$msg);
+      $self->Log(INFO,"sqlwrite",$logcmd." ($msg)");
 
 
       return(1);
@@ -562,9 +561,8 @@ sub DeleteRecord
    my $cmd="delete from $worktable";
    $cmd.=" where ".$where if ($where ne "");
    #my $cmd="delete from ta_application_data where ta_application_data.id=13";
-   msg(INFO,"delcmd=%s",$cmd);
    if ($workdb->do($cmd)){
-      msg(INFO,"delete seems to be ok");
+      $self->Log(INFO,"sqlwrite",$cmd);
       return(1);
    }
    $self->LastMsg(ERROR,$self->preProcessDBmsg($workdb->getErrorMsg()));
@@ -672,10 +670,10 @@ sub InsertRecord
    }
    #msg(INFO,"fifi InsertRecord data=%s into '$worktable'\n",Dumper($newdata));
    if (length($cmd)<65535){
-      msg(INFO,"insert=%s",$cmd);
+      $self->Log(INFO,"sqlwrite",$cmd);
    }
    else{
-      msg(INFO,"insert=(long insert >64k)");
+      $self->Log(INFO,"sqlwrite","(long insert >64k)");
    }
    if ($workdb->do($cmd)){
       $workdb->finish();
@@ -798,7 +796,8 @@ sub getFirst
       my $p=$self->Self();
       my $msg=sprintf("%s:time=%0.4fsec;mod=$p",NowStamp(),$t);
       $msg.=";user=$ENV{REMOTE_USER}" if ($ENV{REMOTE_USER} ne "");
-      msg(INFO,"sqlcmd=%s (%s) limitstart=$self->{_LimitStart}",$sqlcmd[0],$msg);
+     # msg(INFO,"sqlcmd=%s (%s) limitstart=$self->{_LimitStart}",$sqlcmd[0],$msg);
+      $self->Log(INFO,"sqlread",$sqlcmd[0]." ($msg)");
       if ($self->{_LimitStart}>1){
          for(my $c=0;$c<$self->{_LimitStart};$c++){
             my ($temprec,$error)=$self->{DB}->fetchrow();
@@ -840,6 +839,7 @@ sub CountRecords
       $n=0 if (!defined($n));
       $n+=$rec->[0];
    }
+   $self->Log(INFO,"sqlread",$sqlcmd[0]);
    return($n);
 }
 
