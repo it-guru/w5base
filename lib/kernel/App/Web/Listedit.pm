@@ -1270,16 +1270,22 @@ sub HtmlDetail
    $self->ProcessDataModificationOP();
    my %flt=$self->getSearchHash();
    $self->ResetFilter();
-   $self->SecureSetFilter(\%flt);
-   my $output=new kernel::Output($self);
-   $self->SetCurrentView(qw(ALL));
-   $param{WindowMode}="Detail";
-   $self->SetCurrentOrder("NONE");
-   if (!($output->setFormat("HtmlDetail",%param))){
-      msg(ERROR,"can't set output format 'HtmlDetail'");
-      return();
+   if ($self->SecureSetFilter(\%flt)){
+      my $output=new kernel::Output($self);
+      $self->SetCurrentView(qw(ALL));
+      $param{WindowMode}="Detail";
+      $self->SetCurrentOrder("NONE");
+      if (!($output->setFormat("HtmlDetail",%param))){
+         msg(ERROR,"can't set output format 'HtmlDetail'");
+         return();
+      }
+      $output->WriteToStdout(HttpHeader=>1);
    }
-   $output->WriteToStdout(HttpHeader=>1);
+   else{
+      print($self->noAccess());
+      return(undef);
+   }
+
 }
 
 
@@ -1290,75 +1296,80 @@ sub Detail
 
    my %flt=$self->getSearchHash();
    $self->ResetFilter();
-   $self->SecureSetFilter(\%flt);
-   $self->SetCurrentOrder("NONE");
-   my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
+   if ($self->SecureSetFilter(\%flt)){
+      $self->SetCurrentOrder("NONE");
+      my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
 
-   my $p=Query->Param("ModeSelectCurrentMode");
-   $p=$self->getDefaultHtmlDetailPage() if ($p eq "");
+      my $p=Query->Param("ModeSelectCurrentMode");
+      $p=$self->getDefaultHtmlDetailPage() if ($p eq "");
 
 
 
-#   print $self->HttpHeader("text/html",
-#                           cookies=>Query->Cookie(-name=>$cookievar,
-#                                                  -path=>"/",
-#                                                  -value=>$p));
-   print $self->HttpHeader("text/html");
-   print $self->HtmlHeader(style=>['default.css','mainwork.css',
-                                   'kernel.TabSelector.css',
-                                   '../../../static/lytebox/lytebox.css'],
-                           body=>1,form=>1);
-   if (!defined($rec)){
-      print $self->getParsedTemplate("tmpl/kernel.notfound",{skinbase=>'base'});
-      print $self->HtmlBottom(body=>1,form=>1);
-      return();
-   }
-   my $idobj=$self->IdField();
-   my $parentid;
-   if (defined($idobj) && defined($rec)){
-      $parentid=$idobj->RawValue($rec);
-   }
-   print $self->HtmlSubModalDiv();
-   print "<script language=\"JavaScript\" ".
-         "src=\"../../../public/base/load/toolbox.js\"></script>".
-         "<script language=\"JavaScript\" ".
-         "src=\"../../../public/base/load/subModal.js\"></script>\n";
-   my $UserJavaScript=$self->getUserJavaScriptDiv($self->Self,$parentid);
-   if ($UserJavaScript ne ""){
+   #   print $self->HttpHeader("text/html",
+   #                           cookies=>Query->Cookie(-name=>$cookievar,
+   #                                                  -path=>"/",
+   #                                                  -value=>$p));
+      print $self->HttpHeader("text/html");
+      print $self->HtmlHeader(style=>['default.css','mainwork.css',
+                                      'kernel.TabSelector.css',
+                                      '../../../static/lytebox/lytebox.css'],
+                              body=>1,form=>1);
+      if (!defined($rec)){
+         print $self->getParsedTemplate("tmpl/kernel.notfound",{skinbase=>'base'});
+         print $self->HtmlBottom(body=>1,form=>1);
+         return();
+      }
+      my $idobj=$self->IdField();
+      my $parentid;
+      if (defined($idobj) && defined($rec)){
+         $parentid=$idobj->RawValue($rec);
+      }
+      print $self->HtmlSubModalDiv();
       print "<script language=\"JavaScript\" ".
-            "src=\"../../../public/base/load/jquery.js\"></script>\n";
+            "src=\"../../../public/base/load/toolbox.js\"></script>".
+            "<script language=\"JavaScript\" ".
+            "src=\"../../../public/base/load/subModal.js\"></script>\n";
+      my $UserJavaScript=$self->getUserJavaScriptDiv($self->Self,$parentid);
+      if ($UserJavaScript ne ""){
+         print "<script language=\"JavaScript\" ".
+               "src=\"../../../public/base/load/jquery.js\"></script>\n";
+      }
+
+      print("<script language=\"JavaScript\">");
+      print("function setEditMode(m)");
+      print("{");
+      print("   this.SubFrameEditMode=m;");
+      print("}");
+      print("function TabChangeCheck()");
+      print("{");
+      print("if (this.SubFrameEditMode==1){return(DataLoseWarn());}");
+      print("return(true);");
+      print("}");
+      print("</script>");
+      $p="StandardDetail" if ($p eq "");
+
+      my $page=$self->getHtmlDetailPageContent($p,$rec);
+
+      my @WfFunctions=$self->getDetailFunctions($rec);
+      my %param=(functions   =>\@WfFunctions,
+                 pages       =>[$self->getHtmlDetailPages($p,$rec)],
+                 activpage  =>$p,
+                 page        =>$page,
+                );
+      if (($#{$param{pages}})/2<4){  # if there less then 5 pages, expand them
+         $param{tabwidth}="20%"; # as mutch as it looks good
+      }
+      print TabSelectorTool("ModeSelect",%param);
+      print "<script language=\"JavaScript\">".$self->getDetailFunctionsCode($rec).
+             "</script>";
+
+      print($UserJavaScript);
+      print $self->HtmlBottom(body=>1,form=>1);
    }
-
-   print("<script language=\"JavaScript\">");
-   print("function setEditMode(m)");
-   print("{");
-   print("   this.SubFrameEditMode=m;");
-   print("}");
-   print("function TabChangeCheck()");
-   print("{");
-   print("if (this.SubFrameEditMode==1){return(DataLoseWarn());}");
-   print("return(true);");
-   print("}");
-   print("</script>");
-   $p="StandardDetail" if ($p eq "");
-
-   my $page=$self->getHtmlDetailPageContent($p,$rec);
-
-   my @WfFunctions=$self->getDetailFunctions($rec);
-   my %param=(functions   =>\@WfFunctions,
-              pages       =>[$self->getHtmlDetailPages($p,$rec)],
-              activpage  =>$p,
-              page        =>$page,
-             );
-   if (($#{$param{pages}})/2<4){  # if there less then 5 pages, expand them
-      $param{tabwidth}="20%"; # as mutch as it looks good
+   else{
+      print($self->noAccess());
+      return(undef);
    }
-   print TabSelectorTool("ModeSelect",%param);
-   print "<script language=\"JavaScript\">".$self->getDetailFunctionsCode($rec).
-          "</script>";
-
-   print($UserJavaScript);
-   print $self->HtmlBottom(body=>1,form=>1);
 }
 
 sub getUserJavaScript
@@ -2274,7 +2285,7 @@ sub Result
 
 
       my $format=Query->Param("FormatAs");
-      msg(INFO,"FormatAs from query: $format");
+      #msg(INFO,"FormatAs from query: $format");
       if (defined($param{FormatAs})){
          Query->Param("FormatAs"=>$param{FormatAs});
          $format=$param{FormatAs};
@@ -2287,8 +2298,8 @@ sub Result
          $self->Limit(1);
       }
       my $format=Query->Param("FormatAs");
-      msg(INFO,"----------------------------- Format: $format ".
-               "-----------------------------\n");
+      #msg(INFO,"----------------------------- Format: $format ".
+      #         "-----------------------------\n");
       $param{WindowMode}="Result";
       
       if (!($output->setFormat($format,%param))){

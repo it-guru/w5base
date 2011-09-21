@@ -117,25 +117,31 @@ sub QuickFindDetail
       my @l=qw(changenumber name);
       my ($rec,$msg)=$tschm->getOnlyFirst(@l);
       $tschm->ResetFilter();
-      $tschm->SecureSetFilter([{changenumber=>\$id}]);
-      my ($secrec,$msg)=$tschm->getOnlyFirst(qw(changenumber));
+      if ($tschm->SecureSetFilter([{changenumber=>\$id}])){
+         my ($secrec,$msg)=$tschm->getOnlyFirst(qw(changenumber));
      
-      if (defined($rec)){
-         $htmlresult="";
-         if (defined($secrec)){
-            $htmlresult.=$self->addDirectLink($tschm,search_changenumber=>$id);
-         }
-         $htmlresult.="<table>\n";
-         foreach my $v (@l){
-            if ($rec->{$v} ne ""){
-               my $name=$tschm->getField($v)->Label();
-               my $data=$tschm->findtemplvar({current=>$rec,
-                                                  mode=>"HtmlDetail"},
-                                            $v,"formated");
-               $htmlresult.="<tr><td nowrap valign=top width=1%>$name:</td>".
-                            "<td valign=top>$data</td></tr>\n";
+         if (defined($rec)){
+            $htmlresult="";
+            if (defined($secrec)){
+               $htmlresult.=$self->addDirectLink($tschm,
+                                                 search_changenumber=>$id);
+            }
+            $htmlresult.="<table>\n";
+            foreach my $v (@l){
+               if ($rec->{$v} ne ""){
+                  my $name=$tschm->getField($v)->Label();
+                  my $data=$tschm->findtemplvar({current=>$rec,
+                                                     mode=>"HtmlDetail"},
+                                               $v,"formated");
+                  $htmlresult.="<tr><td nowrap valign=top width=1%>$name:</td>".
+                               "<td valign=top>$data</td></tr>\n";
+               }
             }
          }
+      }
+      else{
+         my $msg=$tschm->findtemplvar({},"LASTMSG","formated");
+         $htmlresult=$msg;
       }
    }
    return($htmlresult);
