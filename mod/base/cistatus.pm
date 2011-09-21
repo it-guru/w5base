@@ -67,7 +67,7 @@ sub show                 # is used, to make the cistatus visible for emails
 
    my ($pack,$mod,$id)=$func=~m#^show/(.*)/(.*)/(.*)$#;
    my $cistatus=0;
-   msg(INFO,"base::cistatus pack=$pack mod=$mod id=$id");
+   #msg(INFO,"base::cistatus pack=$pack mod=$mod id=$id");
    if (defined($pack) && defined($mod) && defined($id) &&
        $pack ne "" && $mod ne "" && $id ne ""){
       my $m=getModuleObject($self->Config,$pack."::".$mod);
@@ -88,7 +88,7 @@ sub show                 # is used, to make the cistatus visible for emails
    my $filename=$self->getSkinFile("base/img/cistatus$cistatus.gif");
    my %param;
 
-   msg(INFO,"base::cistatus request=$func result filename=$filename");
+   #msg(INFO,"base::cistatus request=$func result filename=$filename");
 
    print $self->HttpHeader("image/gif",%param);
    if (open(MYF,"<$filename")){
