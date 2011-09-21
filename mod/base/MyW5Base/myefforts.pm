@@ -132,11 +132,17 @@ sub Result
       my @nowstamp=Today_and_Now($tz);
       $daystate=sprintf("%d&nbsp;min",(($sumtoday*60)-$secgone)/60);
       if ($nowstamp[3]>=12){
+         my $mittag=30;
          if ($nowstamp[3]>=13){
-            $secgone-=60*60; # nachmittag
+            $secgone-=$mittag*60; # nachmittag
          }
          else{
-            $secgone-=60*$nowstamp[4]; # at mittag
+            if ($nowstamp[4]<$mittag){
+               $secgone-=$mittag*$nowstamp[4]; # at mittag
+            }
+            else{
+               $secgone-=$mittag*60;
+            }
          }
          $daystate.=sprintf("(%d&nbsp;min)",(($sumtoday*60)-$secgone)/60);
       }
