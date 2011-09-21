@@ -63,7 +63,7 @@ sub qcheckRecord
       printf STDERR ("d=%s\n",Dumper($rec));
       my $type="";
       if (ref($rec->{additional}) eq "HASH" &&
-          ref($rec->{additional}->{ServiceCenterType} eq "ARRAY"){
+          ref($rec->{additional}->{ServiceCenterType}) eq "ARRAY"){
          $type=$rec->{additional}->{ServiceCenterType}->[0];
       }
       if ($type ne "standard"){    
