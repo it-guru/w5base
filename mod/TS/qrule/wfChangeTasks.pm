@@ -5,7 +5,8 @@ package TS::qrule::wfChangeTasks;
 =head3 PURPOSE
 
 Checks if there are tasks in ServiceCenter for the current
-change workflow.
+change workflow. If the type of the Change is "standard", there are
+no tasks needed.
 
 =head3 IMPORTS
 
