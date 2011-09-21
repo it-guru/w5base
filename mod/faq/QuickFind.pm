@@ -217,7 +217,7 @@ sub doSearch
    $searchtext=trim($searchtext);
 
    my $found=0;
-   msg(INFO,"QuickFind at :%s",join(",",@stags));
+   msg(DEBUG,"QuickFind at: '%s'",join(",",@stags));
    if (grep(/^ci/,@stags)){
       my $tree="foldersTree";
       $self->LoadSubObjs("QuickFind","QuickFind");
@@ -228,7 +228,7 @@ sub doSearch
          if (defined($acl)){
             next if (!grep(/^read$/,@$acl));
          }
-         msg(INFO,"mod=%s acl=%s",$sobj->Self(),Dumper($acl));
+         #msg(INFO,"mod=%s acl=%s",$sobj->Self(),Dumper($acl));
          if ($sobj->can("CISearchResult")){
             push(@s,$sobj->CISearchResult(\@stags,$tag,$searchtext));
          }

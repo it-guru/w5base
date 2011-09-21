@@ -171,8 +171,8 @@ sub new
                 vjointo       =>'tssc::chmtask',
                 vjoinon       =>['changenumber'=>'changenumber'],
                 vjoininhash   =>['plannedstart','plannedend',
-                                 'tasknumber','name',
-                                 'downstart','downend','status','relations'],
+                                 'tasknumber','name','cidown',
+                                 'status','relations'],
                 vjoindisp     =>[qw(tasknumber name)]),
 
       new kernel::Field::Textarea(

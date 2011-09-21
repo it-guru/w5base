@@ -781,6 +781,10 @@ sub Log
    my $mode=shift;
    my $facility=lc(shift);
    return(undef) if ($facility eq "" || length($facility)>20);
+   $facility=~s/\.//g;
+   if ($W5V2::OperationContext eq "W5Server"){
+      $facility="w5server_".$facility;
+   }
    my $Cache=$self->Cache;
    if (!exists($Cache->{LogCache})){
       $Cache->{LogCache}={}; 
@@ -796,7 +800,7 @@ sub Log
             my $oldumask=umask(0000);
             my $fh=new IO::File();
             if (! -f $target){
-               msg(INFO,"try to create logfile '$target'");
+               msg(INFO,"try to create logfile '$target' at PID $$");
                if ($fh->open(">$target")){
                   $fh->autoflush();
                   $LogCache->{$facility}->{file}=$target; 
@@ -805,7 +809,7 @@ sub Log
                }
             }
             else{
-               msg(INFO,"reopen logfile '$target'");
+               msg(INFO,"reopen logfile '$target' at PID $$");
                if ($fh->open(">>$target")){
                   $fh->autoflush();
                   $LogCache->{$facility}->{file}=$target; 

@@ -82,25 +82,25 @@ sub new
                 label         =>'Planed End',
                 dataobjattr   =>'cm3tm1.planned_end'),
 
-      #new kernel::Field::Boolean(          # das feld ist nicht in scadm!
-      #          name          =>'cidown',
-      #          timezone      =>'CET',
-      #          label         =>'CI-Offline (PSO)',
-      #          dataobjattr   =>"decode(downtab.ci_down,'t','1','0')"),
+      new kernel::Field::Boolean(          # the field ci_down does not exists
+                name          =>'cidown',  # in scadm schema - but in scadm1.
+                timezone      =>'CET',     # => soo i build a hack to allow 
+                label         =>'CI-Offline (PSO)',  # the access on this field
+                dataobjattr   =>"decode(downtab.ci_down,'t','1','0')"),
 
-      new kernel::Field::Date(
-                name          =>'downstart',
-                timezone      =>'CET',
-                group         =>'downtime',
-                label         =>'Down Start',
-                dataobjattr   =>'cm3tm1.down_start'),
-
-      new kernel::Field::Date(
-                name          =>'downend',
-                timezone      =>'CET',
-                group         =>'downtime',
-                label         =>'Down End',
-                dataobjattr   =>'cm3tm1.down_end'),
+#      new kernel::Field::Date(
+#                name          =>'downstart',
+#                timezone      =>'CET',
+#                group         =>'downtime',
+#                label         =>'Down Start',
+#                dataobjattr   =>'cm3tm1.down_start'),
+#
+#      new kernel::Field::Date(
+#                name          =>'downend',
+#                timezone      =>'CET',
+#                group         =>'downtime',
+#                label         =>'Down End',
+#                dataobjattr   =>'cm3tm1.down_end'),
 
       new kernel::Field::Textarea(
                 name          =>'description',
@@ -159,7 +159,7 @@ sub new
                 dataobjattr   =>'cm3tm1.orig_date_entered'),
 
    );
-   $self->{use_distinct}=1;
+   $self->{use_distinct}=0;
 
 
    $self->setDefaultView(qw(linenumber changenumber name));
@@ -181,16 +181,16 @@ sub getSqlFrom
 {
    my $self=shift;
    my $from="cm3tm1,scadm1.cm3tm1 downtab";
-   my $from="cm3tm1";
+  # my $from="cm3tm1";
    return($from);
 }
 
-#sub initSqlWhere
-#{
-#   my $self=shift;
-#   my $where="cm3tm1.numberprgn=downtab.numberprgn";
-#   return($where);
-#}
+sub initSqlWhere
+{
+   my $self=shift;
+   my $where="cm3tm1.numberprgn=downtab.numberprgn";
+   return($where);
+}
 
 
 
