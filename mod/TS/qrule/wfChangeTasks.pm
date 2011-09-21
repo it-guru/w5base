@@ -61,7 +61,6 @@ sub qcheckRecord
    my $desc={qmsg=>[],solvtip=>[]};
 
    if ($rec->{srcid}=~m/^CHM.*$/){
-      printf STDERR ("d=%s\n",Dumper($rec));
       my $type="";
       if (ref($rec->{additional}) eq "HASH" &&
           ref($rec->{additional}->{ServiceCenterType}) eq "ARRAY"){
