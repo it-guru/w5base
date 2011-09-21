@@ -19,7 +19,6 @@ package kernel::Output::XMLV01;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use Data::Dumper;
 use base::load;
 use kernel::Output::HtmlSubList;
 @ISA    = qw(kernel::Formater);
