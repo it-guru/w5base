@@ -29,7 +29,7 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
 
-   $self->{timeout}=1200;
+   $self->{timeout}=1800;
 
    return($self);
 }

@@ -38,7 +38,7 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("scincident","scincident",timeout=>1200);
+   $self->RegisterEvent("scincident","scincident",timeout=>1800);
 }
 
 sub scincident

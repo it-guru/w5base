@@ -130,6 +130,12 @@ sub new
                 label         =>'Destination-Model',
                 dataobjattr   =>'dstdev.model'),
 
+      new kernel::Field::Boolean(
+                name          =>'primary',
+                label         =>'Primary',
+                markempty     =>1,
+                dataobjattr   =>"decode(screlationm1.primary_ci,'true',1,'false',0,NULL)"),
+
       new kernel::Field::Date(
                 name          =>'sysmodtime',
                 group         =>'status',
@@ -203,7 +209,7 @@ sub isWriteValid
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="screlationm1,devicem1 dstdev";
+   my $from="scadm1.screlationm1,devicem1 dstdev";
    return($from);
 }
 

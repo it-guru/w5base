@@ -223,7 +223,8 @@ sub mkProblemStoreRec
       $wfrec{openuser}=$userid if (defined($userid));
    }
    my ($system,$systemid,
-       $anames,$aids,$contrnames,$contrids,$contrmods,$mandator,$mandatorid,
+       $anames,$aids,$primanames,$primaids,
+       $contrnames,$contrids,$contrmods,$mandator,$mandatorid,
        $costcenter,$customername,$responseteam,$businessteam,
        $truecustomerprio)=
                $self->extractAffectedApplication($rec);
@@ -488,7 +489,8 @@ sub mkChangeStoreRec
 
    $wfrec{changefallback}=$rec->{fallback};
    my ($system,$systemid,
-       $anames,$aids,$contrnames,$contrids,$contrmods,$mandator,$mandatorid,
+       $anames,$aids,$primanames,$primaids,
+       $contrnames,$contrids,$contrmods,$mandator,$mandatorid,
        $costcenter,$customername,$responseteam,$businessteam,
        $truecustomerprio)=
                $self->extractAffectedApplication($rec);
@@ -496,6 +498,8 @@ sub mkChangeStoreRec
    $wfrec{affectedsystem}=$system;
    $wfrec{affectedapplicationid}=$aids;
    $wfrec{affectedapplication}=$anames;
+   $wfrec{primaffectedapplicationid}=$primaids;
+   $wfrec{primaffectedapplication}=$primanames;
    $wfrec{affectedcontractid}=$contrids;
    $wfrec{customercontractmod}=$contrmods;
    $wfrec{affectedcontract}=$contrnames;
@@ -518,12 +522,6 @@ sub mkChangeStoreRec
      $essentialdata.="[".$rec->{plannedend}."]";
      $wfrec{essentialdatahash}=md5_base64($essentialdata);
    }
-
-
-   #msg(DEBUG,"rec=%s",Dumper(\%wfrec));
-   #exit(0);
-
-
 
 
    if (defined($updateto) && $#{$aids}!=-1 && 
@@ -621,6 +619,8 @@ sub extractAffectedApplication
    my @custcontractmod=();
    my @applna=();
    my @applid=();
+   my @primapplna=();
+   my @primapplid=();
    my @costcenter=();
    my @responseteam=();
    my @businessteam=();
@@ -647,6 +647,7 @@ sub extractAffectedApplication
    }
    my @chksystemid;
    my @chkapplid;
+   my @chkprimapplid;
    #  pass 1 : softwareid
    my @l1;
    if (defined($rec->{softwareid})){
@@ -688,35 +689,15 @@ sub extractAffectedApplication
          if ($r->{dstobj} eq "tsacinv::appl"){
             push(@chkapplid,$r->{dst});
             msg(DEBUG,"add %s by entry in relations table",$r->{dst});
+            if ($r->{primary}=='1' || $#chkprimapplid==-1){
+               push(@chkprimapplid,$r->{dst});
+            }
          }
          if ($r->{dstobj} eq "tsacinv::system"){
             push(@chksystemid,$r->{dst});
          }
       }
    }
-
-   # entfernung des Parsings auf Basis des Requests ...
-   # https://darwin.telekom.de/darwin/auth/base/workflow/ById/12428113140002
-   #
-   #if (defined($rec->{description})){
-   #   my ($workdescription)=$rec->{description};
-   #   while(my ($line)=$workdescription=~m/^(.*?)[\n]/){
-   #      $workdescription=~s/^(.*?)[\n]//;
-   #      last if (!($line=~m/^AG[: ]+/) && $#l2==-1);
-   #      $line=~s/^AG[: ]+//;
-   #      last if ($line=~m/^\s*$/);
-   #      push(@l2,split(/[,\s;]+/,$line));
-   #      last if (!($line=~m/[,;]\s*$/));
-   #   }
-   #   if (my ($aglist)=$rec->{description}=~
-   #          m/^.*\[AGLIST_START\](.*)\[AGLIST_END\].*$/sm){
-   #      $aglist=~s/[\n\r]/ /g;
-   #      $aglist=~s/^\s*//g;
-   #      $aglist=~s/\s*$//g;
-   #      msg(DEBUG,"add AGLIST='%s' by Interface descrition",$aglist);
-   #      push(@l2,split(/[,\s;]+/,$aglist));
-   #   }
-   #}
 
    #   pass 3 : affacted Softare
    my @l3;
@@ -776,16 +757,22 @@ sub extractAffectedApplication
    if ($#chkapplid!=-1){
       $appl->ResetFilter();
       $appl->SetFilter({applid=>\@chkapplid});
-      my @l1=$appl->getHashList(qw(id name custcontracts 
+      my @l1=$appl->getHashList(qw(id applid name custcontracts 
                                mandator mandatorid customer 
                                businessteam responseteam conumber));
       if ($#l1!=-1){
          push(@l,@l1);
          foreach my $arec (@l1){
-            push(@applid,$arec->{id}) if (!grep(/^$arec->{id}$/,@applid));
-            my $qn=quotemeta($arec->{name});
-            push(@applna,$arec->{name}) if (!grep(/^$qn$/,@applna));
-       
+            push(@applid,$arec->{id})   if (in_array(\@applid,$arec->{id}));
+            push(@applna,$arec->{name}) if (in_array(\@applna,$arec->{name}));
+            if (in_array(\@chkprimapplid,$arec->{applid})){
+               if (!in_array(\@primapplna,$arec->{name})){
+                  push(@primapplna,$arec->{name});
+               }
+               if (!in_array(\@primapplid,$arec->{id})){
+                  push(@primapplid,$arec->{id});
+               }
+            }
          }
       }
    }
@@ -907,7 +894,9 @@ sub extractAffectedApplication
    # $rec->{description} 
 
 
-   return(\@system,\@systemid,\@applna,\@applid,
+   return(\@system,\@systemid,
+          \@applna,\@applid,
+          \@primapplna,\@primapplid,
           \@custcontract,\@custcontractid,\@custcontractmod,
           \@mandator,\@mandatorid,\@costcenter,\@customername,
           \@responseteam,\@businessteam,$truecustomerprio);
@@ -984,7 +973,8 @@ sub mkIncidentStoreRec
    }
 
    my ($system,$systemid,
-       $anames,$aids,$contrnames,$contrids,$contrmods,$mandator,$mandatorid,
+       $anames,$aids,$primanames,$primaids,
+       $contrnames,$contrids,$contrmods,$mandator,$mandatorid,
        $costcenter,$customername,$responseteam,$businessteam)=
                         $self->extractAffectedApplication($rec);
    $wfrec{affectedsystemid}=$systemid;

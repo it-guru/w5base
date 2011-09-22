@@ -412,8 +412,8 @@ sub new
                 group         =>'relations',
                 vjointo       =>'tssc::lnk',
                 vjoinon       =>['changenumber'=>'src'],
-                vjoininhash   =>['dst','dstobj'],
-                vjoindisp     =>[qw(dst dstname)]),
+                vjoininhash   =>['dst','dstobj','primary'],
+                vjoindisp     =>[qw(dst dstname primary)]),
 
       new kernel::Field::Text(
                 name          =>'editor',

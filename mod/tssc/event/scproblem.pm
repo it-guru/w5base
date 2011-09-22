@@ -37,7 +37,7 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("scproblem","scproblem",timeout=>1200);
+   $self->RegisterEvent("scproblem","scproblem",timeout=>1800);
 }
 
 sub scproblem

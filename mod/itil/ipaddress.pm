@@ -661,7 +661,9 @@ sub isViewValid
    my @def=("header","default");
    return(@def) if (!defined($rec));
    push(@def,"source");
-   if ($self->isParentReadable($rec->{systemid},$rec->{itclustsvcid})){
+   if ($self->IsMemberOf("admin") ||
+       $self->IsMemberOf("w5base.itil.ipaddress.read") ||
+       $self->isParentReadable($rec->{systemid},$rec->{itclustsvcid})){
       push(@def,"relatedto","further");
       push(@def,"dnsaliases",) if ($rec->{dnsname} ne "");
    }

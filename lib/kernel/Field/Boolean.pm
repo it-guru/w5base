@@ -46,6 +46,7 @@ sub FormatedResult
    my $current=shift;
    my $mode=shift;
    my $d=$self->RawValue($current);
+   
    if ($mode eq "SOAP"){
       return("true") if ($d);
       return("false");

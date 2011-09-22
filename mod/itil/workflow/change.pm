@@ -53,38 +53,70 @@ sub getDynamicFields
    my $class;
 
    return($self->InitFields(
-      new kernel::Field::Date(    name       =>'changestart',
-                                  translation=>'itil::workflow::change',
-                                  group      =>'itilchange',
-                                  label      =>'Change-Planed-Start',
-                                  alias      =>'eventstart'),
+      new kernel::Field::Date(    
+                name       =>'changestart',
+                translation=>'itil::workflow::change',
+                group      =>'itilchange',
+                label      =>'Change-Planed-Start',
+                alias      =>'eventstart'),
 
-      new kernel::Field::Date(    name       =>'changeend',
-                                  translation=>'itil::workflow::change',
-                                  group      =>'itilchange',
-                                  label      =>'Change-Planed-End',
-                                  alias      =>'eventend'),
+      new kernel::Field::Date(    
+                name       =>'changeend',
+                translation=>'itil::workflow::change',
+                group      =>'itilchange',
+                label      =>'Change-Planed-End',
+                alias      =>'eventend'),
 
-      new kernel::Field::Textarea(name       =>'changedescription',
-                                  translation=>'itil::workflow::change',
-                                  htmlwidth  =>'350px',
-                                  searchable =>0,
-                                  label      =>'Change Description',
-                                  group      =>'itilchange',
-                                  container  =>'headref'),
+      new kernel::Field::Textarea(
+                name       =>'changedescription',
+                translation=>'itil::workflow::change',
+                htmlwidth  =>'350px',
+                searchable =>0,
+                label      =>'Change Description',
+                group      =>'itilchange',
+                container  =>'headref'),
 
-      new kernel::Field::Textarea(name       =>'changefallback',
-                                  htmlwidth  =>'350px',
-                                  translation=>'itil::workflow::change',
-                                  searchable =>0,
-                                  label      =>'Change Fallback',
-                                  group      =>'itilchange',
-                                  container  =>'headref'),
+      new kernel::Field::Textarea(
+                name       =>'changefallback',
+                htmlwidth  =>'350px',
+                translation=>'itil::workflow::change',
+                searchable =>0,
+                label      =>'Change Fallback',
+                group      =>'itilchange',
+                container  =>'headref'),
 
-      new kernel::Field::Link(    name       =>'essentialdatahash',
-                                  history    =>0,
-                                  label      =>'hashed essential change data',
-                                  container  =>'headref'),
+      new kernel::Field::Link(  
+                name       =>'essentialdatahash',
+                history    =>0,
+                label      =>'hashed essential change data',
+                container  =>'headref'),
+
+      new kernel::Field::KeyText(
+                name       =>'primaffectedapplication',
+                translation=>'itil::workflow::change',
+                xlswidth   =>'30',
+                keyhandler =>'kh',
+                readonly   =>1,
+                htmldetail =>0,
+                vjointo    =>'itil::appl',
+                vjoinon    =>['primaffectedapplicationid'=>'id'],
+                vjoindisp  =>'name',
+                container  =>'headref',
+                group      =>'affected',
+                label      =>'prim affected Application'),
+
+      new kernel::Field::KeyText(
+                name       =>'primaffectedapplicationid',
+                htmldetail =>0,
+                translation=>'itil::workflow::change',
+                searchable =>0,
+                readonly   =>1,
+                keyhandler =>'kh',
+                container  =>'headref',
+                group      =>'affected',
+                label      =>'prim affected Application ID'),
+
+
    ));
 }
 
