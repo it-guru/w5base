@@ -39,10 +39,6 @@ sub Init
                       "tmpl/welcome",
                       defaultacl=>['admin',"support"]);
    
-   $self->RegisterObj("sc.mgr",
-                      "tssc::mgr",
-                      defaultacl=>['admin']);
-   
    $self->RegisterObj("sc.change",
                       "tssc::chm",
                       defaultacl=>['valid_user']);
