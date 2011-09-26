@@ -60,7 +60,7 @@ sub mkitscm
       msg(ERROR,"Posible incomplete result while filter businessarea $area");
       msg(ERROR,"less then 100 records is not realistically");
       msg(ERROR,"please check area filter!");
-      return({exitcode=>0,msg=>'filter error - not enough records'});
+      return({exitcode=>1,msg=>'filter error - not enough records'});
    }
    my $output=new kernel::Output($obj);
    $output->setFormat("PdfV01");
@@ -88,6 +88,7 @@ sub mkitscm
    }
    unlink("$tmpfile");
    msg(DEBUG,"remove $tmpfile");
+   return({exitcode=>0,msg=>'OK'});
 }
 
 1;
