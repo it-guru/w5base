@@ -46,16 +46,23 @@ sub mkitscm
    my %param=@_;
    my $tmpfile="/tmp/appl-handbook.$$.pdf";
    my $filename="handbook.pdf";
-   my $wf=getModuleObject($self->Config,"itil::appl");
-   $wf->ResetFilter();
-   $wf->SetFilter(businessteam=>'DTAG.TSI.Prod.CSS.AO.DTAG*',
+   my $area="DTAG.TSI.Prod.CS.Telco";
+   my $obj=getModuleObject($self->Config,"itil::appl");
+   $obj->ResetFilter();
+   $obj->SetFilter(businessteam=>"$area $area.*",
                   cistatusid=>'4',customerprio=>'1');
-   $wf->SetCurrentView(qw(name conumber cistatus sem tsmphone 
+   $obj->SetCurrentView(qw(name conumber cistatus sem tsmphone 
                           tsmmobile ldelmgr delmgr customer 
                           customerprio criticality oncallphones 
                           interfaces systems systemnames systemids));
-   $wf->SetCurrentOrder("NONE");
-   my $output=new kernel::Output($wf);
+   $obj->SetCurrentOrder("name");
+   if ($obj->CountRecords<100){
+      msg(ERROR,"Posible incomplete result while filter businessarea $area");
+      msg(ERROR,"less then 100 records is not realistically");
+      msg(ERROR,"please check area filter!");
+      return({exitcode=>0,msg=>'filter error - not enough records'});
+   }
+   my $output=new kernel::Output($obj);
    $output->setFormat("PdfV01");
    my $page=$output->WriteToScalar(HttpHeader=>0);
    msg(INFO,"page ready");
