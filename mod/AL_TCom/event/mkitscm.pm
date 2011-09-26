@@ -71,7 +71,7 @@ sub mkitscm
       close(F);
       if (open(F,"<$tmpfile")){
          msg(INFO,"tempfile is open for read");
-         my $dir="ITSCM/Daten/auto_create";
+         my $dir="ITSCM/data20/auto_create";
          my $file=getModuleObject($self->Config,"base::filemgmt");
          $file->ValidatedInsertOrUpdateRecord({name=>$filename,
                                                parent=>$dir,
