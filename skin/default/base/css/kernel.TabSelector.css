@@ -4,6 +4,11 @@ div.ModeSelect{
    margin:0;
    width:100%;
 }
+div.TabActionBox{
+   height:21px;
+   margin:0px;
+   padding:0px;
+}
 
 table.ModeSelect{
    border-width:0;

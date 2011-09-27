@@ -1329,11 +1329,11 @@ sub Detail
             "src=\"../../../public/base/load/toolbox.js\"></script>".
             "<script language=\"JavaScript\" ".
             "src=\"../../../public/base/load/subModal.js\"></script>\n";
-      my $UserJavaScript=$self->getUserJavaScriptDiv($self->Self,$parentid);
-      if ($UserJavaScript ne ""){
-         print "<script language=\"JavaScript\" ".
-               "src=\"../../../public/base/load/jquery.js\"></script>\n";
-      }
+#      my $UserJavaScript=$self->getUserJavaScriptDiv($self->Self,$parentid);
+#      if ($UserJavaScript ne ""){
+#         print "<script language=\"JavaScript\" ".
+#               "src=\"../../../public/base/load/jquery.js\"></script>\n";
+#      }
 
       print("<script language=\"JavaScript\">");
       print("function setEditMode(m)");
@@ -1355,6 +1355,7 @@ sub Detail
                  pages       =>[$self->getHtmlDetailPages($p,$rec)],
                  activpage  =>$p,
                  page        =>$page,
+                 actionbox   =>'<div id=IssueState>&nbsp;</div>'
                 );
       if (($#{$param{pages}})/2<4){  # if there less then 5 pages, expand them
          $param{tabwidth}="20%"; # as mutch as it looks good
@@ -1363,7 +1364,7 @@ sub Detail
       print "<script language=\"JavaScript\">".$self->getDetailFunctionsCode($rec).
              "</script>";
 
-      print($UserJavaScript);
+    #  print($UserJavaScript);
       print $self->HtmlBottom(body=>1,form=>1);
    }
    else{
@@ -1372,102 +1373,102 @@ sub Detail
    }
 }
 
-sub getUserJavaScript
-{
-   my $self=shift;
-   my $parentobj=shift;
-   my $parentid=shift;
+#sub getUserJavaScript
+#{
+#   my $self=shift;
+#   my $parentobj=shift;
+#   my $parentid=shift;
+#
+#   my $userid=$self->getCurrentUserId();
+#   my $precode="";
+#   my @flt;
+#   my $code;
+#   if ($parentobj ne ""){
+#      $precode.="var ParentObj=\"$parentobj\";\n";
+#      push(@flt,{creatorid=>\$userid,
+#                 parentobj=>[$parentobj,''],
+#                 name=>'UserJavaScript*'});
+#   }
+#   if ($parentobj ne "" && $parentid ne ""){
+#      $precode.="var ParentId=\"$parentid\";\n";
+#      push(@flt,{creatorid=>\$userid,
+#                 parentobj=>\$parentobj,
+#                 parentid=>\$parentid,
+#                 name=>'UserJavaScript*'});
+#   }
+#
+#   my $code="";
+#   if ($#flt!=-1){
+#      my $note=getModuleObject($self->Config,"base::note");
+#      $note->ResetFilter();
+#      $note->SetFilter(\@flt);
+#      foreach my $rec ($note->getHashList(qw( name comments))){
+#         $code.=$rec->{comments};
+#      }
+#      $code=trim($code);
+#   }
+#   my $v=<<EOF;
+#
+#function myFAQ(){
+#   \$("textarea[name=note]").val("Ich habe Sie der Gruppe \\"uploader\\" hinzugefügt. Bitte befolgen Sie in jedem Fall die Hinweise im FAQ Artikel ...\\n http://xxxx/xxxxxxxxxxxxxxx/xxx.\\n\\n\\n I have add you to the group \\"uploader\\". Please read the instructions at ...\\nhttp://xfjhdsfas/xxxxxxx");
+#
+#}
+#
+#addToMenu({label:"- default FAQ für Upload guppen",func:myFAQ});
+#addToMenu({label:"- xxxxxxxxxxxxxxxxxxload guppen",func:myFAQ});
+#addToMenu({label:"- default Fxxxxxxxxxxxxxxxxxxen",func:myFAQ});
+#addToMenu({label:"- defxxxxxxxxxxxxxxxxxxd guppen",func:myFAQ});
+#
+#EOF
+##   $code.=$v;
+#   return($code);
+#}
 
-   my $userid=$self->getCurrentUserId();
-   my $precode="";
-   my @flt;
-   my $code;
-   if ($parentobj ne ""){
-      $precode.="var ParentObj=\"$parentobj\";\n";
-      push(@flt,{creatorid=>\$userid,
-                 parentobj=>[$parentobj,''],
-                 name=>'UserJavaScript*'});
-   }
-   if ($parentobj ne "" && $parentid ne ""){
-      $precode.="var ParentId=\"$parentid\";\n";
-      push(@flt,{creatorid=>\$userid,
-                 parentobj=>\$parentobj,
-                 parentid=>\$parentid,
-                 name=>'UserJavaScript*'});
-   }
-
-   my $code="";
-   if ($#flt!=-1){
-      my $note=getModuleObject($self->Config,"base::note");
-      $note->ResetFilter();
-      $note->SetFilter(\@flt);
-      foreach my $rec ($note->getHashList(qw( name comments))){
-         $code.=$rec->{comments};
-      }
-      $code=trim($code);
-   }
-   my $v=<<EOF;
-
-function myFAQ(){
-   \$("textarea[name=note]").val("Ich habe Sie der Gruppe \\"uploader\\" hinzugefügt. Bitte befolgen Sie in jedem Fall die Hinweise im FAQ Artikel ...\\n http://xxxx/xxxxxxxxxxxxxxx/xxx.\\n\\n\\n I have add you to the group \\"uploader\\". Please read the instructions at ...\\nhttp://xfjhdsfas/xxxxxxx");
-
-}
-
-addToMenu({label:"- default FAQ für Upload guppen",func:myFAQ});
-addToMenu({label:"- xxxxxxxxxxxxxxxxxxload guppen",func:myFAQ});
-addToMenu({label:"- default Fxxxxxxxxxxxxxxxxxxen",func:myFAQ});
-addToMenu({label:"- defxxxxxxxxxxxxxxxxxxd guppen",func:myFAQ});
-
-EOF
-#   $code.=$v;
-   return($code);
-}
-
-sub getUserJavaScriptDiv
-{
-   my $self=shift;
-   my $parentobj=shift;
-   my $parentid=shift;
-
-   my $d;
-   my $code=$self->getUserJavaScript($parentobj,$parentid);
-   if ($code ne ""){
-      $d=<<EOF;
-<div id=UserJavaScriptActivator>
-</div>
-<div id=UserJavaScript>
-</div>
-<script>
-function addToMenu(m){
-   var h=20;
-   var o=document.createElement("span");
-   \$(o).addClass("sublink");
-   \$(o).html(m.label);
-   \$(o).height(h);
-   if (m.func){
-      \$(o).click(m.func)
-   }
-   \$("#UserJavaScript").append(\$(o));
-   \$("#UserJavaScript").height(\$("#UserJavaScript").height()+h);
-   \$("#UserJavaScript").append(\$(document.createElement("br")));
-}
-
-\$(document).ready(function (){$code});
-\$("#UserJavaScriptActivator").mouseover(function (){
-   \$("#UserJavaScript").show("slow");
-   \$("#UserJavaScript").mouseout(function (){
-     setTimeout(function (){
-        \$("#UserJavaScript").hide("slow");
-        \$("#UserJavaScript").unbind("mouseout");
-     },2000);
-   });
-});
-</script>
-
-EOF
-   }
-   return($d);
-}
+#sub getUserJavaScriptDiv
+#{
+#   my $self=shift;
+#   my $parentobj=shift;
+#   my $parentid=shift;
+#
+#   my $d;
+#   my $code=$self->getUserJavaScript($parentobj,$parentid);
+#   if ($code ne ""){
+#      $d=<<EOF;
+#<div id=UserJavaScriptActivator>
+#</div>
+#<div id=UserJavaScript>
+#</div>
+#<script>
+#function addToMenu(m){
+#   var h=20;
+#   var o=document.createElement("span");
+#   \$(o).addClass("sublink");
+#   \$(o).html(m.label);
+#   \$(o).height(h);
+#   if (m.func){
+#      \$(o).click(m.func)
+#   }
+#   \$("#UserJavaScript").append(\$(o));
+#   \$("#UserJavaScript").height(\$("#UserJavaScript").height()+h);
+#   \$("#UserJavaScript").append(\$(document.createElement("br")));
+#}
+#
+#\$(document).ready(function (){$code});
+#\$("#UserJavaScriptActivator").mouseover(function (){
+#   \$("#UserJavaScript").show("slow");
+#   \$("#UserJavaScript").mouseout(function (){
+#     setTimeout(function (){
+#        \$("#UserJavaScript").hide("slow");
+#        \$("#UserJavaScript").unbind("mouseout");
+#     },2000);
+#   });
+#});
+#</script>
+#
+#EOF
+#   }
+#   return($d);
+#}
 
 
 sub getDetailFunctionsCode

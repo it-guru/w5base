@@ -157,7 +157,14 @@ body{
 div.detailfunctions{
    margin:0px;
    padding:0px;
+   z-index:99;
 }
+div.issuestate{
+   background-color:red;
+   width:40px;
+   height:40px;
+}
+
 div.mceExternalToolbar{
    right:15px;
 }

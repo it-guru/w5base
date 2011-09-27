@@ -281,26 +281,6 @@ EOF
  </table>
 </div>
 
-<!-- position:fixed fix for IE6 implementations (CSS no works! -->
-<div id="fixedbox" style="position:absolute;left;width:97%;top:0px"></div>
-<script language=JavaScript>
-window.setInterval(function(){
-   var element = document.getElementById('fixedbox');  
-   if (element){
-      if (element.innerHTML!=""){
-         element.style.top=(document.body.scrollTop+0)+'px';
-      }
-   }
-   var el=document.getElementById('fixedload');
-   if (el){
-      if (el.innerHTML!=""){
-         element.innerHTML=el.innerHTML;
-         el.innerHTML="";
-      }
-   }
-},1000);
-</script>
-
 <a name="index"></a>
 <div style="height:4px;border-width:0;overflow:hidden">&nbsp;</div>
 <div id=detailtopline class=detailtopline>

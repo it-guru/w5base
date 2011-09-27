@@ -80,6 +80,10 @@ EOF
    if (defined($param{topline})){
       $ht.=sprintf("<tr><td height=1%%>%s</td></tr>",$param{topline});
    }
+   my $actionbox="";
+   if (defined($param{actionbox})){
+      $actionbox=$param{actionbox};
+   }
    if (defined($param{functions})){
       my %functions={};
       my @labels=();
@@ -95,10 +99,13 @@ EOF
                $_."</a>";
          $f;
       } @labels));
-      $ht.=sprintf("<tr><td height=1%% align=right>%s &nbsp;</td></tr>",$fl);
+      $ht.=sprintf("<tr><td align=left valign=top>".
+                   "<div class=TabActionBox>%s</div>".
+                   "</td><td height=1%% valign=top align=right>".
+                   "%s &nbsp;</td></tr>",$actionbox,$fl);
    }
 
-   $ht.="<tr><td height=1%%>".$ml."</td></tr>";
+   $ht.="<tr><td colspan=2 height=1%%>".$ml."</td></tr>";
    $ht.="</table>"; 
    $d.="<tr><td height=1%%>".$ht."</td></tr>";
    $d.="<tr><td align=center valign=top class=${name}PageArea>".$param{page}.

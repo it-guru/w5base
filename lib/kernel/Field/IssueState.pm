@@ -73,16 +73,18 @@ sub ViewProcessor
             $title=sprintf($title,$issuerec->{fwdtargetname});
             my $url="../../base/workflow/ById/$issuerec->{id}";
             my $link="<a href=\"$url\" target=_blank>";
-            $response->{document}->{HtmlDetail}=
-                  "<div id=fixedload ".
-                  "style='display:none;visible:hidden'>".
-                  $link."<div align=right style='padding-top:70px'>".
-                  "<img border=0 title=\"$title\" ".
-                  "style=\"width:30px;height:30px;".
-                  "padding-right:5px\" ".
-                  "src=\"../../base/load/attention.gif\"></img>".
-                  "</div></a></div>";
+            my $dispmsg="<div id=qmsg style='position:absolute;left:15px;top:20px;background-color:yellow;height:100px;overflow:auto;width:450px;border-style:solid;border-color:black;border-width:1px;text-align:left;visibility:hidden;display:none'>".$title."</div>";
+            $response->{document}->{HtmlDetail}="
+<div onclick='openwin(\"$url\",\"_blank\",\"height=480,width=640,toolbar=no,status=no,resizeable=yes,scrollbars=no\");' onmouseout='var e=document.getElementById(\"qmsg\");e.style.visibility=\"hidden\";e.style.display=\"none\";' onmouseover='var e=document.getElementById(\"qmsg\");e.style.visibility=\"visible\";e.style.display=\"block\";' style='cursor:pointer' >
+<table cellspacing=0 cellpadding=0 border=0>
+<tr>
+<td>
+<img style=\"margin:2px\" src=\"../../base/load/attention.gif\"></td>
+<td valign=center><font color=red><b>DataIssue</b></font></td>
+</tr></table>
 
+$dispmsg
+</div>";
             $response->{document}->{HtmlV01}="$link<img border=0 ".
                   "title=\"$title\" ".
                   "src=\"../../base/load/fail.gif\"></a>";
@@ -118,21 +120,22 @@ sub ViewProcessor
                }
                #$dispmsg=Dumper($res);
                if ($dispmsg ne ""){
-                  $dispmsg="<div id=qmsg style='background-color:yellow;height:100px;overflow:auto;width:380px;border-style:solid;border-color:black;border-width:1px;text-align:left;visibility:hidden;display:none'>".
+                  $dispmsg="<div id=qmsg style='position:absolute;left:15px;top:20px;background-color:yellow;height:100px;overflow:auto;width:450px;border-style:solid;border-color:black;border-width:1px;text-align:left;visibility:hidden;display:none'>".
                            $dispmsg."</div>";
                }
                #print STDERR "qcheckresupt=".Dumper($res);
                if ($res->{exitcode}>0){
                   $response->{document}->{HtmlV01}="FAIL";
                   $response->{document}->{HtmlDetail}="
-<div id=fixedload style='display:none;visible:hidden'>
-<div style='height:70px'>&nbsp;</div>
-<div align=right style='width:100%'>
-<div align=right onmouseout='var e=document.getElementById(\"qmsg\");e.style.visibility=\"hidden\";e.style.display=\"none\";' >
-<img onmouseover='var e=document.getElementById(\"qmsg\");e.style.visibility=\"visible\";e.style.display=\"block\";' style='margin-bottom:2px;width:30px;height:30px;
-     padding-right:5px;cursor:pointer' src='../../base/load/attention.gif'>
+<div onmouseout='var e=document.getElementById(\"qmsg\");e.style.visibility=\"hidden\";e.style.display=\"none\";' onmouseover='var e=document.getElementById(\"qmsg\");e.style.visibility=\"visible\";e.style.display=\"block\";' style='cursor:pointer' >
+<table cellspacing=0 cellpadding=0 border=0>
+<tr>
+<td>
+<img style=\"margin:2px\" src=\"../../base/load/attention.gif\"></td>
+<td valign=center><font color=red><b>DataIssue</b></font></td>
+</tr></table>
+
 $dispmsg
-</div></div>
 </div>";
                }
                else{
@@ -188,36 +191,47 @@ function onLoadViewProcessor_$self->{name}_$id(timedout)
       ResContainer.innerHTML="ERROR: XML request timed out";
       return;
    }
-   // window.setTimeout("onLoadViewProcessor_$self->{name}(1);",10000);
-   // timeout handling ist noch bugy!
-   var xmlhttp=getXMLHttpRequest();
-   xmlhttp.open("POST","$XMLUrl",true);
-   xmlhttp.onreadystatechange=function() {
-      var r=document.getElementById("$divid");
-      if (r){
-         if (xmlhttp.readyState==4 && 
-             (xmlhttp.status==200||xmlhttp.status==304)){
-            var xmlobject = xmlhttp.responseXML;
-            var result=xmlobject.getElementsByTagName("$mode");
-            if (result){
-               r.innerHTML="";
-               for(rid=0;rid<result.length;rid++){
-                  if (r.innerHTML!=""){
-                     r.innerHTML+=", ";
-                  }
-                  if (result[rid].childNodes[0]){
-                     r.innerHTML+=result[rid].childNodes[0].nodeValue;
+   if (window.parent){
+      var IssueBox=window.parent.document.getElementById("IssueState");
+      if (IssueBox){
+         IssueBox.innerHTML="Checking DataIssue ...";
+      }
+      else{
+         return;
+      }
+       
+      // window.setTimeout("onLoadViewProcessor_$self->{name}(1);",10000);
+      // timeout handling ist noch bugy!
+      var xmlhttp=getXMLHttpRequest();
+      xmlhttp.open("POST","$XMLUrl",true);
+      xmlhttp.onreadystatechange=function() {
+         var r=document.getElementById("$divid");
+         var r=IssueBox;
+         if (r){
+            if (xmlhttp.readyState==4 && 
+                (xmlhttp.status==200||xmlhttp.status==304)){
+               var xmlobject = xmlhttp.responseXML;
+               var result=xmlobject.getElementsByTagName("$mode");
+               if (result){
+                  r.innerHTML="";
+                  for(rid=0;rid<result.length;rid++){
+                     if (r.innerHTML!=""){
+                        r.innerHTML+=", ";
+                     }
+                     if (result[rid].childNodes[0]){
+                        r.innerHTML+=result[rid].childNodes[0].nodeValue;
+                     }
                   }
                }
-            }
-            else{
-               r.innerHTML="ERROR: XML error";
+               else{
+                  r.innerHTML="ERROR: XML error";
+               }
             }
          }
-      }
-   };
-   xmlhttp.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
-   var r=xmlhttp.send('Mode=XML');
+      };
+      xmlhttp.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+      var r=xmlhttp.send('Mode=XML');
+   }
 }
 $activator
 </script>

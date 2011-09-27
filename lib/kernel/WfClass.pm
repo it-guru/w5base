@@ -631,6 +631,7 @@ EOF
               pages       =>[$self->getHtmlDetailPages($p,$WfRec)],
               activpage   =>$p,
               tabwidth    =>"20%",
+              actionbox   =>'<div id=IssueState></div>',
               page        =>$template,
              );
    print(TabSelectorTool("ModeSelect",%param));
@@ -728,7 +729,6 @@ function defaultValidateSubmit(f,b)
 }
 </script>
 EOF
-   print($self->getParent->getUserJavaScriptDiv($self->Self,$id));
    print $app->HtmlBottom(body=>1,form=>1);
 
 }
