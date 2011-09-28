@@ -30,19 +30,19 @@ sub process
               'scchange'=>{
                            laststart=>undef,
                            lastend=>undef,
-#                           suspend=>30, # dont start in first 15 minutes
+                           suspend=>30, # dont start in first 15 minutes
                            AsyncID=>undef,
                           },
               'scincident'=>{
                            laststart=>undef,
                            lastend=>undef,
-#                           suspend=>30, # dont start in first 15 minutes
+                           suspend=>30, # dont start in first 15 minutes
                            AsyncID=>undef,
                           },
               'scproblem'=>{
                            laststart=>undef,
                            lastend=>undef,
-#                           suspend=>30,   # dont start in first 15 minutes
+                           suspend=>30,   # dont start in first 15 minutes
                            AsyncID=>undef,
                           }
              );

@@ -550,15 +550,23 @@ sub NotifyAdmin
    }
 
    my $user=$self->Config->Param("W5SERVERSERVICE");
+   my $sitename=$self->Config->Param("SITENAME");
    if ($user eq ""){
       $user=$self->Config->Param("W5SERVERUSER");
    }
+   if ($sitename ne ""){
+      $sitename="W5Server: $sitename";
+   }
+   else{
+      $sitename="W5Server";
+   }
+   $sitename=~s/["']//g;
    $user="root" if ($user eq "");
    my ($fh,$filename)=tempfile();
    if (defined($fh)){ 
       printf $fh ("cat << EOF | $sendmail -t\n");
       printf $fh ("To: %s\n",$user);
-      printf $fh ("From: %s\n","W5Server");
+      printf $fh ("From: %s\n","\"$sitename\" <W5Server>");
       printf $fh ("Subject: %s\n",$subject);
       printf $fh ("Content-Type: text/plain; charset=\"iso-8859-1\"\n\n");
       print $fh ($text);
