@@ -412,7 +412,7 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   my @grps=qw(header default contacts projectclass
+   my @grps=qw(header default contacts projectclass history
                misc control attachments source);
    if ($rec->{iscommercial}){
       push(@grps,"commercial");
