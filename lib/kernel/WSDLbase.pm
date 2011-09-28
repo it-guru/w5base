@@ -351,9 +351,12 @@ sub WSDLshowFields
    $$XMLtypes.="<xsd:element name=\"type\" type=\"xsd:string\" />";
    $$XMLtypes.="<xsd:element name=\"longtype\" type=\"xsd:string\" />";
    $$XMLtypes.="<xsd:element name=\"name\" type=\"xsd:string\" />";
+   $$XMLtypes.="<xsd:element name=\"is_vjoin\" type=\"xsd:string\" />";
    $$XMLtypes.="<xsd:element name=\"group\" type=\"${ns}:ArrayOfString\" />";
    $$XMLtypes.="<xsd:element name=\"primarykey\" ".
                "minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:int\"  />";
+   $$XMLtypes.="<xsd:element name=\"sourceobj\" ".
+               "minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"  />";
    $$XMLtypes.="</xsd:sequence>";
    $$XMLtypes.="</xsd:complexType>";
 
