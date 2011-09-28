@@ -597,9 +597,11 @@ sub SecureSetFilter
                  {admid=>$userid},       {adm2id=>$userid},
                  {swteamid=>\@grpids},
                  {sectargetid=>\$userid,sectarget=>\'base::user',
-                  secroles=>"*roles=?write?=roles* *roles=?read?=roles*"},
+                  secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
+                            "*roles=?read?=roles*"},
                  {sectargetid=>\@grpids,sectarget=>\'base::grp',
-                  secroles=>"*roles=?write?=roles* *roles=?read?=roles*"}
+                  secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
+                            "*roles=?read?=roles*"}
                 ]);
    }
    return($self->SetFilter(@flt));
