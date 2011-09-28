@@ -509,7 +509,7 @@ sub showFields
          else{
             $fielddesc->{is_vjoin}="no";
          }
-         if (defined($fo->{onRawValue}){
+         if (defined($fo->{onRawValue})){
             $fielddesc->{is_vjoin}="maybee";
             $fielddesc->{sourceobj}="CALCULATED";
          }
