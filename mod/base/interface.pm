@@ -502,12 +502,16 @@ sub showFields
          else{
             $fielddesc->{dataobjattr}="[NULL]";
          }
-         if ($fo->{vjoin} ne ""){
-            $fielddesc->{is_vjoin}="1";
-            $fielddesc->{vjointarget}=$fo->{vjoin};
+         if (defined($fo->{vjointo}) && $fo->{vjointo} ne ""){
+            $fielddesc->{is_vjoin}="yes";
+            $fielddesc->{sourceobj}=$fo->{vjointo};
          }
          else{
-            $fielddesc->{is_vjoin}="0";
+            $fielddesc->{is_vjoin}="no";
+         }
+         if (defined($fo->{onRawValue}){
+            $fielddesc->{is_vjoin}="maybee";
+            $fielddesc->{sourceobj}="CALCULATED";
          }
       }
       push(@l,$fielddesc);
