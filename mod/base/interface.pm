@@ -502,6 +502,13 @@ sub showFields
          else{
             $fielddesc->{dataobjattr}="[NULL]";
          }
+         if ($fo->{vjoin} ne ""){
+            $fielddesc->{is_vjoin}="1";
+            $fielddesc->{vjointarget}=$fo->{vjoin};
+         }
+         else{
+            $fielddesc->{is_vjoin}="0";
+         }
       }
       push(@l,$fielddesc);
    }
