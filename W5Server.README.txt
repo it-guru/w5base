@@ -45,6 +45,28 @@ will be initiated. This kind of restart should be avoided and is NOT
 supported by the developer! Some strange effects can be created by
 this operation.
 
+ERROR messages
+==============
+If there are problems with events, the W5Server can not be sure,
+to can mail handling by the internal W5Base-Workflow system. For
+that reason, he needs to do sending of mails nativ by the sendmail
+command of the operation system.
+The sendmail command will be searched at the directories ...
+ /usr/local/sbin:/sbin:/usr/sbin:/usr/lib:/usr/lib/sbin
+The admin of the OS must be ensure, to find a useable sendmail
+in one of this directories. In other way, the W5Server 
+can not inform about havy event errors!
+
+The destination for the error messages will be calculated
+by three steps:
+a) If there is a W5SERVERSERVICE in the config, this
+   will be the "To" parameter for sending mails.
+b) If no W5SERVERSERVICE specified and W5SERVERUSER
+   is set, the W5SERVERUSER user will be the target
+   for the error mails.
+c) If case a) and b) fails, the "root" will be the
+   target for the error mails.
+
 
 Act as secondary W5Server (experimental)
 ========================================
