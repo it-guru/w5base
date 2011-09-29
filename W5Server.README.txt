@@ -12,6 +12,39 @@ fact needs to protect the W5Server to get connections from other hosts
 besides the needed. This can be done by using the configuration option
 "W5ServerAllow".
 
+Signal handling
+===============
+
+soft restart
+------------
+To reload every module code, you have to send a USR1 signal to
+the main W5Server process. A soft restart takes up to 15 seconds
+and have in this time a very short listener interupt. Running
+events have time, to do a "clean" finish.
+
+soft shutdown
+-------------
+The W5Server main process supports "soft shutdown". To initiate a 
+soft shutdown, you have to send a USR2 signal to the main process.
+In this case, all running events will also get this signal and this
+results in a ServerGoesDown=true flag. The running events should
+check this flag circular and if it is true, they can do a "clean"
+finish. A "soft shutdown" takes up to 15 seconds! If a event 
+didn't finished in this time, it will be "hard" killed.
+
+hard shutdown
+-------------
+If you send a INT to the main W5Server, all running events an W5Server
+process servers will be also killed by a INT signal. This kind of 
+shutdown should be avoided!
+
+hard restart
+------------
+If you send a HUP signal to the main W5Server, a restart of the W5Server
+will be initiated. This kind of restart should be avoided and is NOT
+supported by the developer! Some strange effects can be created by
+this operation.
+
 
 Act as secondary W5Server (experimental)
 ========================================
