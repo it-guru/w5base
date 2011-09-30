@@ -77,10 +77,11 @@ sub getAcGroupByW5BaseGroup
 
    my $acgrp=$app->getPersistentModuleObject("tsacgroup","tsacinv::group");
 
-   $grpname=~s/^.*\.CSS\.AO\.DTAG/CSS.AO.DTAG/i;
-   $grpname=~s/^DTAG\.TSI\.Prod\.CSS\.SDMSS\.PSS\.IMS\.IM2$/CSS.SDM.PSS.CIAM/i;
-   $grpname=~s/^DTAG\.TSI\.Prod\.CSS\.SDMSS\.PSS\.IMS\.IM3$/CSS.SDM.PSS.CIAM/i;
-   $grpname=~s/^DTAG\.TSI\.Prod\.CSS\.SDMSS\.PSS/CSS.SDM.PSS/i;
+   $grpname=~s/^.*\.CS\.AO\.DTAG/CSS.AO.DTAG/i;
+   $grpname=~s/^.*\.Prod\.CS\.Telco/CSS.AO.DTAG/i;
+   $grpname=~s/^DTAG\.TSI\.Prod\.CS\.SDMSS\.PSS\.IMS\.IM2$/CSS.SDM.PSS.CIAM/i;
+   $grpname=~s/^DTAG\.TSI\.Prod\.CS\.SDMSS\.PSS\.IMS\.IM3$/CSS.SDM.PSS.CIAM/i;
+   $grpname=~s/^DTAG\.TSI\.Prod\.CS\.SDMSS\.PSS/CSS.SDM.PSS/i;
    if ($grpname ne ""){
       $acgrp->SetFilter({name=>$grpname}); 
       my ($acgrprec,$msg)=$acgrp->getOnlyFirst(qw(name));
