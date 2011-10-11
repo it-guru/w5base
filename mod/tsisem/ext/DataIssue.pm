@@ -96,7 +96,7 @@ sub DataIssueCompleteWriteRequest
 #         }
 #      }
    }
-   printf STDERR ("itil:DataIssueCompleteWriteRequest=%s\n",Dumper($newrec));
+#   printf STDERR ("itil:DataIssueCompleteWriteRequest=%s\n",Dumper($newrec));
    return(1);
 }
 
