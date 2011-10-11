@@ -171,7 +171,10 @@ sub FormatedDetail
          my $id=$idfield->RawValue($current);
          my $divid="ViewProcessor_$self->{name}_$id";
          my $XMLUrl="$ENV{SCRIPT_URI}";
-         $XMLUrl.="/../ViewProcessor/XML/$self->{name}/$id";
+         my $parent=$self->getParent->Self;
+         $parent=~s/::/\//g;
+ 
+         $XMLUrl.="/../../../$parent/ViewProcessor/XML/$self->{name}/$id";
          my $d="<div id=\"$divid\"></div>";
          $d=$self->addWebLinkToFacility($d,$current);
          my $activator='addEvent(window,"load",onLoadViewProcessor_'.
@@ -181,6 +184,15 @@ sub FormatedDetail
                        'function (){ window.setTimeout("onLoadViewProcessor_'.
                        $self->{name}.'_'.$id.'();",2000);});';
          }
+         my $issueboxpath="if (window.parent){".
+                          "IssueBox=window.parent.document.".
+                          "getElementById(\"IssueState\");}";
+         if ($mode eq "HtmlV01"){
+            $issueboxpath="IssueBox=document.".
+                          "getElementById(\"$divid\");";
+            
+         }
+ 
          return(<<EOF);
 $d
 <script language="JavaScript">
@@ -191,15 +203,10 @@ function onLoadViewProcessor_$self->{name}_$id(timedout)
       ResContainer.innerHTML="ERROR: XML request timed out";
       return;
    }
-   if (window.parent){
-      var IssueBox=window.parent.document.getElementById("IssueState");
-      if (IssueBox){
-         IssueBox.innerHTML="Checking DataIssue ...";
-      }
-      else{
-         return;
-      }
-       
+   var IssueBox;
+   $issueboxpath;
+   if (IssueBox){
+      IssueBox.innerHTML="Checking DataIssue ...";
       // window.setTimeout("onLoadViewProcessor_$self->{name}(1);",10000);
       // timeout handling ist noch bugy!
       var xmlhttp=getXMLHttpRequest();

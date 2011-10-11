@@ -40,7 +40,7 @@ sub new
                 name          =>'id',
                 group         =>'source',
                 label         =>'ObjectID',
-                dataobjattr   =>'cms_person.objectid'),
+                dataobjattr   =>'v_darwin_person.objectid'),
 
       new kernel::Field::Text(
                 name          =>'fullname',
@@ -54,76 +54,84 @@ sub new
                 name          =>'distname',
                 label         =>'distinguished name',
                 searchable    =>0,
-                dataobjattr   =>'cms_person.distinguished_name'),
+                dataobjattr   =>'v_darwin_person.distinguished_name'),
 
       new kernel::Field::Text(
                 name          =>'title',
                 label         =>'Title',
-                dataobjattr   =>'cms_person.title'),
+                dataobjattr   =>'v_darwin_person.title'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
                 ignorecase    =>1,
-                dataobjattr   =>'cms_person.name'),
+                dataobjattr   =>'v_darwin_person.name'),
 
       new kernel::Field::Text(
                 name          =>'givenname',
                 label         =>'Givenname',
                 ignorecase    =>1,
-                dataobjattr   =>'cms_person.givenname'),
+                dataobjattr   =>'v_darwin_person.givenname'),
 
       new kernel::Field::Text(
                 name          =>'surname',
                 label         =>'Surname',
                 ignorecase    =>1,
-                dataobjattr   =>'cms_person.surname'),
+                dataobjattr   =>'v_darwin_person.surname'),
 
       new kernel::Field::Text(
                 name          =>'preferredmedium',
                 group         =>'contact',
                 label         =>'Preferred contact medium',
                 searchable    =>0,
-                dataobjattr   =>'cms_person.preferredmedium'),
+                dataobjattr   =>'v_darwin_person.preferredmedium'),
 
       new kernel::Field::Text(
                 name          =>'email',
                 group         =>'contact',
                 label         =>'E-Mail',
                 ignorecase    =>1,
-                dataobjattr   =>'cms_person.primaryemail'),
+                dataobjattr   =>'v_darwin_person.primaryemail'),
 
       new kernel::Field::Phonenumber(
                 name          =>'office_phone',
                 group         =>'contact',
                 label         =>'Phonenumber',
-                dataobjattr   =>'cms_person.officephonenumber'),
+                dataobjattr   =>'v_darwin_person.officephonenumber'),
 
       new kernel::Field::Phonenumber(
                 name          =>'office_mobile',
                 group         =>'contact',
                 label         =>'Mobile-Phonenumber',
-                dataobjattr   =>'cms_person.mobilephonenumber'),
+                dataobjattr   =>'v_darwin_person.mobilephonenumber'),
 
       new kernel::Field::Phonenumber(
                 name          =>'office_facsimile',
                 group         =>'contact',
                 label         =>'FAX-Number',
-                dataobjattr   =>'cms_person.faxnumber'),
+                dataobjattr   =>'v_darwin_person.faxnumber'),
 
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
                 label         =>'Creation-Date',
-                dataobjattr   =>'cms_person.createtime'),
+                dataobjattr   =>'v_darwin_person.createtime'),
 
       new kernel::Field::MDate(
                 name          =>'mdate',
                 group         =>'source',
                 label         =>'Modification-Date',
-                dataobjattr   =>'cms_person.lastmodifiedtime'),
+                dataobjattr   =>'v_darwin_person.lastmodifiedtime'),
+
+      new kernel::Field::QualityState(),
+      new kernel::Field::QualityOk(),
+      new kernel::Field::QualityLastDate(
+                htmldetail    =>1,
+                dataobjattr   =>'v_darwin_person.lastcheckdate'),
+
    );
    $self->setDefaultView(qw(fullname surname givenname email));
+   $self->setWorktable("v_darwin_person");
    return($self);
 }
 
@@ -184,7 +192,7 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="cms_person";
+   my $from="v_darwin_person";
    return($from);
 }
 

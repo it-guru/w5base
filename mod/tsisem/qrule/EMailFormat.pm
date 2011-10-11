@@ -1,6 +1,20 @@
-package kernel::Field::QualityLastDate;
+package tsisem::qrule::EMailFormat;
+#######################################################################
+=pod
+
+=head3 PURPOSE
+
+Checks if the used email spelling in a user (contact) record looks
+like a correct SMTP mail address.
+
+=head3 IMPORTS
+
+NONE
+
+=cut
+#######################################################################
 #  W5Base Framework
-#  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2011  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,38 +33,39 @@ package kernel::Field::QualityLastDate;
 use strict;
 use vars qw(@ISA);
 use kernel;
-@ISA    = qw(kernel::Field::Date);
-
+use kernel::QRule;
+@ISA=qw(kernel::QRule);
 
 sub new
 {
    my $type=shift;
-   my $self={@_};
-
-   $self->{group}='qc'                      if (!defined($self->{qc}));
-   $self->{name}='lastqcheck'               if (!defined($self->{name}));
-   $self->{label}='Quality Check last date' if (!defined($self->{label}));
-   $self->{searchable}=1                    if (!defined($self->{searchable}));
-   $self->{history}=0;
-   $self->{readonly}=1;
-   $self->{htmldetail}=0 if (!exists($self->{htmldetail}));
-
-   my $self=bless($type->SUPER::new(%$self),$type);
+   my %param=@_;
+   my $self=bless($type->SUPER::new(%param),$type);
 
    return($self);
 }
 
-
-sub Uploadable
+sub getPosibleTargets
 {
-   my $self=shift;
-
-   return(0);
+   return(["tsisem::user"]);
 }
 
+sub qcheckRecord
+{
+   my $self=shift;
+   my $dataobj=shift;
+   my $rec=shift;
+   my @failmsg;
 
+   if (!($rec->{email}=~m/^\S+\@\S+\.\S+$/)){
+      push(@failmsg,"invalid email notation");
+   }
+   if ($#failmsg!=-1){
+      return(3,{qmsg=>\@failmsg,dataissue=>\@failmsg});
+   }
 
-
+   return(0,undef);
+}
 
 
 
