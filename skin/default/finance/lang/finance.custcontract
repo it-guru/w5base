@@ -42,3 +42,4 @@
 'CO-Number'=>{de=>'CO-Nummer'},
 "invalid contract number '\%s' specified"=>{de=>"ungültige Vertragsnummer '\%s'"},
 'no duration start defined'=>{de=>'kein Laufzeitbegin definiert'},
+'active modules'=>{de=>'aktive Module'},

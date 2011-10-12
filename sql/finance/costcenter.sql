@@ -1,7 +1,7 @@
 use w5base;
 create table costcenter (
   id         bigint(20) NOT NULL,
-  name       varchar(20) NOT NULL,
+  name       varchar(40) NOT NULL,
   cistatus   int(2)      NOT NULL,
     mandator       bigint(20)  default NULL,
     fullname       varchar(40) default NULL,

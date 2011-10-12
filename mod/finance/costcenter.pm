@@ -292,9 +292,11 @@ sub Validate
          return(undef);
       }
    }
-   my $conummer=effVal($oldrec,$newrec,"name");
-   if ($conummer=~m/^\s*$/ || !($conummer=~m/^[0-9]+$/)){
-      $self->LastMsg(ERROR,"invalid CO-Numer '\%s' specified",$conummer);
+   my $conummer=uc(effVal($oldrec,$newrec,"name"));
+   if ($conummer=~m/^\s*$/ || 
+       (!($conummer=~m/^[0-9]+$/) &&
+        !($conummer=~m/^[A-Z]-[0-9]+-[A-Z,0-9]+$/) )){
+      $self->LastMsg(ERROR,"invalid number format '\%s' specified",$conummer);
       return(0);
    }
    $conummer=~s/^0+//g;
