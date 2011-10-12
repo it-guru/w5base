@@ -40,7 +40,7 @@ sub new
                 name          =>'id',
                 group         =>'source',
                 label         =>'ObjectID',
-                dataobjattr   =>'v_darwin_person.objectid'),
+                dataobjattr   =>'t_darwin_map.objectid'),
 
       new kernel::Field::Text(
                 name          =>'fullname',
@@ -127,11 +127,11 @@ sub new
       new kernel::Field::QualityOk(),
       new kernel::Field::QualityLastDate(
                 htmldetail    =>1,
-                dataobjattr   =>'v_darwin_person.lastcheckdate'),
+                dataobjattr   =>'t_darwin_map.checkdate'),
 
    );
    $self->setDefaultView(qw(fullname surname givenname email));
-   $self->setWorktable("v_darwin_person");
+   $self->setWorktable("t_darwin_map");
    return($self);
 }
 
@@ -192,7 +192,9 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="v_darwin_person";
+   my $from="v_darwin_person  ".
+            "join t_darwin_map ".
+            "on v_darwin_person.objectid=t_darwin_map.objectid";
    return($from);
 }
 
