@@ -405,12 +405,12 @@ sub new
 #                label         =>'personal identifier number',
 #                dataobjattr   =>'contact.persidentno'),
 
-      new kernel::Field::Date(
-                name          =>'dateofbirth',
-                dayonly       =>1,
-                group         =>'private',
-                label         =>'date of birth',
-                dataobjattr   =>'contact.dateofbirth'),
+#      new kernel::Field::Date(
+#                name          =>'dateofbirth',
+#                dayonly       =>1,
+#                group         =>'private',
+#                label         =>'date of birth',
+#                dataobjattr   =>'contact.dateofbirth'),
 
 #      new kernel::Field::Text(
 #                name          =>'driverlicno',

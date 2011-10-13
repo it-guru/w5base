@@ -491,6 +491,8 @@ EOF
 <div class=detailframe>
 EOF
          if ($grouplabel{$group}){
+            $grouplabel{$group}=$grouplabel;
+            $grouplabel=~s/#//g;
             $template{$group}.=<<EOF;
  <div class=detailheadline>
  <table width=100% cellspacing=0 cellpadding=0>
@@ -502,7 +504,7 @@ EOF
  </div>
  $groupspec
 EOF
-            $grouplabel{$group}=$grouplabel;
+            $grouplabel{$group}=~s/#.*//g;
          }
          $template{$group}.=<<EOF;
  <table class=detailframe border=1>$subblock
