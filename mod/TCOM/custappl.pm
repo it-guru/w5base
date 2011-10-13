@@ -62,11 +62,6 @@ sub new
       new kernel::Field::Link(      
                 name          =>'wbvid',
                 group         =>'tcomcontact',
-                container     =>'custadditional'),
-
-      new kernel::Field::Link(      
-                name          =>'new_wbvid',
-                group         =>'tcomcontact',
                 dataobjattr   =>'itcrmappl.itmanager'),
 
       new kernel::Field::TextDrop(

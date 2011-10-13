@@ -41,13 +41,8 @@ sub new
                 vjoinon       =>['itmgrid'=>'userid'],
                 vjoindisp     =>'fullname'),
 
-      new kernel::Field::Link(      
-                name          =>'itmgrid',
-                group         =>'ghscontact',
-                container     =>'custadditional'),
-
       new kernel::Field::Link(
-                name          =>'new_itmgrid',
+                name          =>'itmgrid',
                 group         =>'ghscontact',
                 dataobjattr   =>'itcrmappl.itmanager'),
 
