@@ -1404,20 +1404,20 @@ EOF
    if (defined($param{'refresh'})){
       $d.="<meta http-equiv=\"refresh\" content=\"$param{'refresh'}\">";
    }
-   $d.="</head>\n";
-   if ($param{body} || defined($param{onunload})){
-      $d.="<body";
-      if (defined($param{onunload})){
-         $d.=" onUnload=\"$param{onunload}\"";
-      }
-      $d.=">";
-   }
    if (defined($param{target}) || defined($param{base}) ||
        defined($param{onload})){
       $d.="<base";
       $d.=" target=\"$param{target}\"" if ($param{target});
       $d.=" href=\"$param{base}\"" if ($param{base} && $param{base} ne "");
       $d.=" OnLoad=\"$param{onload}\"" if ($param{onload} && $param{onload} ne "");
+      $d.=">";
+   }
+   $d.="</head>\n";
+   if ($param{body} || defined($param{onunload})){
+      $d.="<body";
+      if (defined($param{onunload})){
+         $d.=" onUnload=\"$param{onunload}\"";
+      }
       $d.=">";
    }
    if ($param{submodal}){
