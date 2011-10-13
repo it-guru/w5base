@@ -72,6 +72,10 @@
                                  en=>'New'},
 'sysadm.qmgmt.tsinterview.cat'=>{de=>'Kategorie',
                                  en=>'Categorie'},
+'customerportal.cfmts'=>{de=>'IT-Inventar TS',en=>'IT-Inventory TS'},
+'customerportal.cfmts.appl'=>{de=>'Anwendung',en=>'Application'},
+'customerportal.cfmts.system'=>{de=>'System',en=>'System'},
+
 
 
 

@@ -10,6 +10,8 @@
                        en=>'Systems'},
 'fieldgroup.custapplnameing'=>{de=>'Anwendungsbenennung durch den Kunden',
                                en=>'Applicationnaming at customer'},
+'fieldgroup.custapplcontact'=>{de=>'IT-Anwendungskunden Kontakte',
+                               en=>'IT-Application customer contacts'},
 'fieldgroup.custcontracts'=>{de=>'Vertragszuordnung',
                              en=>'Contracts'},
 'Business Team Boss'=>{de=>'Betriebsteamleiter'},

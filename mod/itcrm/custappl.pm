@@ -245,7 +245,7 @@ sub new
                 vjoinon       =>['conumber'=>'name'],
                 group         =>'tscontact',
                 dontrename    =>1,
-                fields        =>[qw(delmgr)]),
+                fields        =>[qw(delmgr delmgrid)]),
 
       new kernel::Field::Text(
                 name          =>'businessteambossid',
@@ -319,6 +319,34 @@ sub new
                 label         =>'secondary Order in ID',
                 group         =>'tscontact',
                 onRawValue    =>\&getOrderIn),
+
+      new kernel::Field::TextDrop(
+                name          =>'businessowner',
+                group         =>'custapplcontact',
+                label         =>'Business Owner',
+                vjointo       =>'base::user',
+                vjoinon       =>['businessownerid'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'businessownerid',
+                group         =>'custapplnameing',
+                label         =>'Business Owner ID',
+                dataobjattr   =>'itcrmappl.businessowner'),
+
+      new kernel::Field::TextDrop(
+                name          =>'itmanager',
+                group         =>'custapplcontact',
+                label         =>'IT-Manager',
+                vjointo       =>'base::user',
+                vjoinon       =>['itmanagerid'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'itmanagerid',
+                group         =>'custapplnameing',
+                label         =>'IT-Manager ID',
+                dataobjattr   =>'itcrmappl.itmanager'),
 
       new kernel::Field::Text(
                 name          =>'custnameid',
@@ -556,7 +584,7 @@ sub SecureSetFilter
    my $self=shift;
    my @flt=@_;
 
-   if (!$self->IsMemberOf("admin")){
+   if (!$self->IsMemberOf(["admin","w5base.itcrm.custappl.read"])){
       my $userid=$self->getCurrentUserId();
       my %grp=$self->getGroupsOf($ENV{REMOTE_USER},
                                 [qw(RMember RBoss RBoss2 RQManager
@@ -629,7 +657,7 @@ sub isWriteValid
    my $rec=shift;
 
    my @l;
-   my @wrgroups=("custapplnameing");
+   my @wrgroups=("custapplnameing","custapplcontact");
    my $userid=$self->getCurrentUserId();
    if ($rec->{semid} eq $userid){
       push(@l,@wrgroups);

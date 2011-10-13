@@ -64,6 +64,11 @@ sub new
                 group         =>'tcomcontact',
                 container     =>'custadditional'),
 
+      new kernel::Field::Link(      
+                name          =>'new_wbvid',
+                group         =>'tcomcontact',
+                dataobjattr   =>'itcrmappl.itmanager'),
+
       new kernel::Field::TextDrop(
                 name          =>'ev',
                 searchable    =>0,
@@ -125,6 +130,11 @@ sub new
                 container     =>'custadditional'),
 
    );
+   $self->getField("itmanager")->{htmldetail}=0;
+   $self->getField("itmanager")->{searchable}=0;
+   $self->getField("businessowner")->{htmldetail}=0;
+   $self->getField("businessowner")->{searchable}=0;
+
    return($self);
 }
 

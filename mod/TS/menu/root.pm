@@ -298,6 +298,20 @@ sub Init
                       'TS::MyW5Base::send2Miles$',
                       func=>'Main',
                       defaultacl=>['admin']);
+
+   $self->RegisterObj("customerportal.cfmts",
+                      "tmpl/welcome",
+                      prio=>200,
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("customerportal.cfmts.appl",
+                      "TS::custappl",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("customerportal.cfmts.system",
+                      "itcrm::custsystem",
+                      defaultacl=>['valid_user']);
+
    return($self);
 }
 

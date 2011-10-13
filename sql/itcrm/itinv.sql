@@ -25,3 +25,5 @@ create table itcrmappl (
 );
 alter table itcrmappl add custmgmttool varchar(20) default NULL;
 alter table itcrmappl add key(custmgmttool);
+alter table itcrmappl add businessowner bigint(20) default NULL;
+alter table itcrmappl add itmanager bigint(20) default NULL;

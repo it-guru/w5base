@@ -1,0 +1,6 @@
+'TS::custappl'=>{de=>'TS Kundensicht Anwendung - T-Systems Kunde einer Anwendung',
+               en=>'TS Customerview Application'},
+'fieldgroup.custtscontact'=>{de=>'T-Systems Kontakte (aus Kundensicht)',
+                         en=>'T-Systems Contacts T-Systems is customer'},
+'fieldgroup.default'=>{de=>'allgemeine Anwendungsdaten',
+                       en=>'Application data'},

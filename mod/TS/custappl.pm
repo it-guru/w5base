@@ -1,4 +1,4 @@
-package GHS::custappl;
+package TS::custappl;
 #  W5Base Framework
 #  Copyright (C) 2011  Hartmut Vogler (it@guru.de)
 #
@@ -32,30 +32,41 @@ sub new
 
    $self->AddFields(
       new kernel::Field::TextDrop(
-                name          =>'itmgr',
-                searchable    =>0,
-                group         =>'ghscontact',
-                label         =>'IT-Manager',
+                name          =>'applicationmgr',
+                group         =>'custtscontact',
+                label         =>'Application Manager',
                 vjointo       =>'base::user',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['itmgrid'=>'userid'],
+                vjoinon       =>['applicationmgrid'=>'userid'],
                 vjoindisp     =>'fullname'),
 
-      new kernel::Field::Link(      
-                name          =>'itmgrid',
-                group         =>'ghscontact',
-                container     =>'custadditional'),
+      new kernel::Field::Link(
+                name          =>'applicationmgrid',
+                group         =>'custapplnameing',
+                label         =>'Application Manager ID',
+                dataobjattr   =>'itcrmappl.itmanager'),
+
+      new kernel::Field::TextDrop(
+                name          =>'applicationowner',
+                group         =>'custtscontact',
+                label         =>'Application Owner',
+                vjointo       =>'base::user',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['applicationownerid'=>'userid'],
+                vjoindisp     =>'fullname'),
 
       new kernel::Field::Link(
-                name          =>'new_itmgrid',
-                group         =>'ghscontact',
-                dataobjattr   =>'itcrmappl.itmanager'),
+                name          =>'applicationownerid',
+                group         =>'custapplnameing',
+                label         =>'Application Owner ID',
+                dataobjattr   =>'itcrmappl.businessowner'),
 
    );
    $self->getField("itmanager")->{htmldetail}=0;
    $self->getField("itmanager")->{searchable}=0;
    $self->getField("businessowner")->{htmldetail}=0;
    $self->getField("businessowner")->{searchable}=0;
+
    $self->setDefaultView(qw(name custname cistatus itmgr));
    return($self);
 }
@@ -66,7 +77,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header default custapplnameing 
-          ghscontact tscontact custcontracts));
+          custtscontact tscontact custcontracts));
 }
 
 
@@ -76,7 +87,7 @@ sub isWriteValid
    my $rec=shift;
    my @l=$self->SUPER::isWriteValid($rec);
    if (grep(/^custapplnameing$/,@l)){
-      push(@l,"ghscontact");
+      push(@l,"custtscontact");
    }
    return(@l);
 }

@@ -1,0 +1,4 @@
+'itmanager'=>{de=>'IT-Manager ist der Ansprechpartner für die Realisation von Funktionalitäten einer Anwendung und für die Sicherstellung der Funktion (fachlich) der Anwendung. Es handelt sich dabei NICHT um den Administration der Anwendung.',
+en=>'IT Manager, who is responsible for the realization of the functionalities and for the operation of the application. This is not the administrator of the application, who solves technical issues with the application.'},
+'businessowner'=>{de=>'Der Business Onwer ist der ursprüngliche Anforderer der Anwendung (oder der Funktionalität der Anwendung). Er ist Budget Eigner und Ansprechpartner für die Verwendung der Anwendung und die Datenherschaft.',
+en=>'Business responsible for the Application - This is the boss of the unit that originally required the applications functionality. (budget owner or demanding person/unit) and that is responsible for the usage and dataonwership of the application.'},

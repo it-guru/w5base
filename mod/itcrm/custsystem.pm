@@ -151,7 +151,7 @@ sub SecureSetFilter
    my $self=shift;
    my @flt=@_;
 
-   if (!$self->IsMemberOf("admin")){
+   if (!$self->IsMemberOf(["admin","w5base.itcrm.custsystem.read"])){
       my $userid=$self->getCurrentUserId();
       my %grp=$self->getGroupsOf($ENV{REMOTE_USER},
                                 [qw(RMember RBoss RBoss2 RQManager
