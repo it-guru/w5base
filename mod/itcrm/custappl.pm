@@ -334,6 +334,14 @@ sub new
                 label         =>'Business Owner ID',
                 dataobjattr   =>'itcrmappl.businessowner'),
 
+     new kernel::Field::Interface(
+                name          =>'businessowneremail',
+                group         =>'custapplcontact',
+                label         =>'Business Owner E-Mail',
+                vjointo       =>'base::user',
+                vjoinon       =>['businessownerid'=>'userid'],
+                vjoindisp     =>'email'),
+
       new kernel::Field::TextDrop(
                 name          =>'itmanager',
                 group         =>'custapplcontact',
@@ -344,9 +352,17 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'itmanagerid',
-                group         =>'custapplnameing',
+                group         =>'custapplcontact',
                 label         =>'IT-Manager ID',
                 dataobjattr   =>'itcrmappl.itmanager'),
+
+     new kernel::Field::Interface(
+                name          =>'itmanageremail',
+                group         =>'custapplcontact',
+                label         =>'IT-Manager E-Mail',
+                vjointo       =>'base::user',
+                vjoinon       =>['itmanagerid'=>'userid'],
+                vjoindisp     =>'email'),
 
       new kernel::Field::Text(
                 name          =>'custnameid',
