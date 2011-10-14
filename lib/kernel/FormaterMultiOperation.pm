@@ -216,11 +216,17 @@ sub ProcessLine
    for(my $cc;$cc<=$#view;$cc++){
       my $fo=$view[$cc];
       my $fieldname=$fo->Name();
-      my $fulldata=$app->findtemplvar({viewgroups=>$viewgroups,
+      my $fulldata;
+ #     if ($fo->Type() ne "SubList"){ 
+         $fulldata=$app->findtemplvar({viewgroups=>$viewgroups,
                                       current=>$rec,
                                       WindowMode=>"HtmlResult"
                                      },$fieldname,
                                         "formated");
+ #     }
+ #     else{
+ #        $fulldata="...";
+ #     }
       $fulldata=join("\n",map({
                                 my $bk=$_;
                                 if (ref($_) eq "HASH"){
@@ -230,7 +236,7 @@ sub ProcessLine
                               }@$fulldata)) if (ref($fulldata) eq "ARRAY");
       $fulldata="&nbsp;" if ($fulldata eq "");
       $fulldata=~s/\n/<br>/g;
-      $d.="<td>".$fulldata."</td>";
+      $d.="<td valign=top>".$fulldata."</td>";
    }
    $d.="</tr>";
    if ($rowspan==2){
