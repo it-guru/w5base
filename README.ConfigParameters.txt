@@ -19,4 +19,72 @@ specialy by the base::filemgmt module.
 
 
 
+Draft (German):
+===============
+Die Konfigurationsdatei, die W5Base/Darwin verwendet, wird bei Web-Requests aus der URL abgeleitet.
+
+Wird z.B. auf W5Base/Darwin über die URL https://darwin.telekom.de/*configname*/auth/base/menu/root zugegriffen, so wird im Verzeichnis /etc/w5base nach einer Konfigurationsdatei "configname.conf" gesucht. Der Name der Konfig-Datei ist also immer die erste Ebene oberhalb der Web-Name-Space "auth" oder "public".
+
+In der Konfigurationsdatei können dann INCLUDE Anweisungen verwendet werden. Dies macht es dann relativ einfach, teilweise unterschiedliche Site-Konfigurationen auf einem Web-Server effizient zu verwalten.
+
+Bei Serverkomandos (z.B. W5Event, W5Server, W5Replicate ...) wird die Konfigurationsdatei mit der Option -c and die Kommandos übergeben.
+
+*  DATAOBJCONNECT
+  DBI Connect String
+
+* DATAOBJUSER
+  Username, mit dem sich auf das Datenbackend verbunden werden soll
+
+* DATAOBJPASS
+  Passwort, mit dem sich auf das Datenbackend verbunden werden soll.
+
+* MASTERADMIN
+  REMOTE_USER Name des Admins, falls die User-Verwaltung noch nicht initialisiert ist.
+
+* MIMETYPES
+  Pfad zur Mimetypes Tabelle
+
+* SITENAME
+  Klartext-Name der Applikation (NICHT der DNS Name!)
+
+* SKIN
+  Oberflächen Skin name
+
+* WEBSERVICEPROXY
+  Bei Webservice Verbindungen wird in dieser Variabel die PROXY (nicht Web-Proxy!) URL abgespeichert.
+
+* WEBSERVICEUSER
+  Bei Webservice Verbindungen der Username, mit dem der Web-Service authentifiziert werden soll.
+
+* WEBSERVICEPASS
+  Bei Webservice Verbindungen das Passwort, mit dem der Web-Service authentifiziert werden soll.
+
+* W5BaseOperationMode
+  Der Betriebsmodus der Anwendung
+
+* W5ServerHost
+  Der W5Server Host (IP-Adresse), auf den sich verbunden werden soll
+
+* EventJobBaseUrl
+  Die URL, die beim Versand von Mails über Event-Scripts als Basis-Adresse verwendet werden muß.
+
+* QualityCheckDuration
+  Die Dauer (in Sekdunden), wie lange in den tgl. Nachläufen der QualityCheck laufen darf.
+
+* MAILBOUNCEHANDLER
+  Mailadresse, an die die Bouce-Mails adressiert werden sollen.
+
+* SMSInterfaceScript
+  Pfad zum Interface-Script, dass das versenden der SMS Nachrichten übernimmt.
+
+* W5BaseMailAllow
+  An diese Mailadressen darf (im Test und Entwicklungsmodus) eine Mail versandt werden. Allen anderen Mailadressen werden hinter dem @ mit null.com ersetzt.
+
+* W5ServerPort
+  Option für den W5Server. Auf diesem Port wird der Listener des W5Server gestartet.
+
+* W5ServerState
+  Option für den W5Server. Status Verzeichnis des W5Servers.
+
+
 
