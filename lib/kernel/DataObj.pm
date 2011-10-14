@@ -2223,6 +2223,7 @@ sub getSubList
       $pmode=$param{ParentMode};
    }
    $opt{SubListEdit}=1 if ($mode eq "HtmlSubListEdit");
+   return("...")       if ($mode=~m/^Multi.*/);   # on FormaterMultiOperation s
    $mode="HtmlSubList" if ($mode=~m/^.{0,1}Html.*$/);
    $mode="SubXMLV01"   if ($mode=~m/XML/);
    $param{parentcurrent}=$current;
