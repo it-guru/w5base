@@ -55,6 +55,10 @@ sub getQueryTemplate
 {
    my $self=shift;
 
+   my $tt=$self->kernel::MyW5Base::getTimeRangeDrop("month",
+                                                    $self,
+                                                    qw( fixmonth));
+
 
    my $d=<<EOF;
 <div class=searchframe>
@@ -68,18 +72,7 @@ sub getQueryTemplate
 </td>
 </tr>
 <tr>
-<td class=fname width=10%>Monat:</td>
-<td class=finput>
-<select name=month style='width:100%'>
-<option value="09/2011">09/2011</option>
-<option value="08/2011">08/2011</option>
-<option value="07/2011">07/2011</option>
-<option value="06/2011">06/2011</option>
-<option value="05/2011">05/2011</option>
-<option value="04/2011">04/2011</option>
-<option value="03/2011">03/2011</option>
-</select>
-</td>
+<td class=fname width=10%>Monat:</td><td class=finput>$tt</td>
 <td class=fname width=20%>MilesPlus Enviroment:</td>
 <td class=finput width=30% nowrap>
 <select name=base>
