@@ -76,15 +76,17 @@ sub Sendmail
    if (defined($id)){
       msg(DEBUG,"Event($self):Sendmail wfheadid=$id");
       $wf->SetFilter({class=>'base::workflow::mailsend',state=>\'6',id=>\$id});
+      $wf->SetCurrentView(qw(ALL));
+      $wf->Limit(1);
    }
    else{
       msg(DEBUG,"Event($self):Sendmail cleanup");
       $wf->SetFilter({class=>'base::workflow::mailsend',
                       state=>\'6',
                       mdate=>"<now-1h"});
+      $wf->SetCurrentView(qw(ALL));
+      $wf->Limit(100);
    }
-   $wf->SetCurrentView(qw(ALL));
-   $wf->Limit(1);
    my ($rec,$msg)=$wf->getFirst();
    if (defined($rec)){
       msg(DEBUG,"found record");
