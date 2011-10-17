@@ -3,6 +3,8 @@ Config-Parameters of W5Base
 
 Alle config parameter names are handled case insensiv, soo you can write
 them in the config files in a case whoever you want.
+Most of the config parameters have default values. You can find these
+default values at $W5BASEINSTDIR/etc/w5base/default.conf .
 
 
 HTTP_PROXY                 f.e.: "http://F4DE8PSA010.blf.telekom.de:8080"
@@ -16,6 +18,27 @@ MimeTypes                  f.e.: "/etc/mime.types"
 ---------
 Defines the path to the mime.types table. This parameter is needed 
 specialy by the base::filemgmt module.
+
+Logging                    f.e.: "sqlwrite,-sqlread"
+-------
+You can specified the logging in different contextes. If you set a "-" in
+front of the metric, this logging will be deactivated. If you not specified
+a metric, the default handling for this metric will be used. In W5Server
+operations is this logging to STDERR and in Apache operations, this is
+writing to the apache error.log file.
+Posible values are:
+
+ soap               requests handled by SOAP operations
+ sqlwrite           nativ sql write operations
+ w5server_sqlwrite  nativ sql write operatons from w5server
+ w5server_sqlread   nativ sql read operations from w5server
+ sqlread            nativ sql read operations
+ viewreq            field constellation of user view requests
+ query              informations about the query parameters
+ trigger            informations from trigger event handlers
+
+If you put a w5server_ in front of a metric, you can sepcify a special
+handling in w5server context for this metric.
 
 
 
