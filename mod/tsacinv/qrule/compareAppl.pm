@@ -187,6 +187,16 @@ sub qcheckRecord
                                    $errorlevel=3 if ($errorlevel<3);
                                 }
                              }
+                             my $srcsys="AM";
+                             if ($newrec->{srcsys} eq "W5Base"){
+                                if (!($newrec->{srcid}=~m/^SAPLNK-.*/)){
+                                   # prevent loop imports
+                                   return(undef);
+                                }
+                                else{
+                                   $srcsys="AM-SAPLNK";
+                                }
+                             }
                              
                              return({OP=>$mode,
                                      MSG=>"$mode systemlink ".
@@ -195,7 +205,7 @@ sub qcheckRecord
                                      IDENTIFYBY=>$identifyby,
                                      DATAOBJ=>'itil::lnkapplsystem',
                                      DATA=>{
-                                        srcsys    =>'AM',
+                                        srcsys    =>$srcsys,
                                         applid    =>$p{refid},
                                         systemid  =>$systemid
                                         }

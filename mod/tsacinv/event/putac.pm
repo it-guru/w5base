@@ -337,7 +337,8 @@ sub ApplicationModified
                my @l=$applsys->getHashList(qw(id systemsystemid system
                                               istest iseducation isref 
                                               isapprovtest isdevel isprod
-                                              shortdesc systemid));
+                                              shortdesc systemid
+                                              srcsys srcid));
                foreach my $lnk (@l){
                   my $SysU=0;
                   $SysU=20 if ($SysU<20 && $lnk->{istest}); 
@@ -348,6 +349,7 @@ sub ApplicationModified
                   $SysU=70 if ($SysU<70 && $lnk->{isprod}); 
                   $ApplU=$SysU if ($ApplU<$SysU);
                   next if ($lnk->{systemsystemid}=~m/^\s*$/);
+                  next if ($lnk->{srcsys} eq "AM-SAPLNK");
                   $CurrentEventId="Add System '$lnk->{system}' to $CurrentAppl";
                   my $externalid=$lnk->{id};
                   if ($externalid eq ""){

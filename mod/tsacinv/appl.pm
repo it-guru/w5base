@@ -283,7 +283,9 @@ sub new
                 vjointo       =>'tsacinv::lnkapplsystem',
                 vjoinbase     =>{systemstatus=>"\"!out of operation\""},
                 vjoinon       =>['id'=>'lparentid'],
-                vjoindisp     =>['child','systemweblink','systemid','comments']),
+                vjoindisp     =>['child','systemweblink','systemid','comments'],
+                vjoininhash   =>['child','systemweblink','systemid','comments',
+                                 'srcsys','srcid']),
 
       new kernel::Field::Date(
                 name          =>'cdate',
