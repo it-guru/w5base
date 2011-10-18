@@ -50,6 +50,19 @@ sub new
                 group         =>'appldata',
                 dataobjattr   =>'appl.name'),
 
+      new kernel::Field::Contact(
+                name          =>'chmgrfmb',
+                AllowEmpty    =>1,
+                label         =>'Change Management Function Contact',
+                vjoineditbase =>{'cistatusid'=>[3,4],
+                                 'usertyp'=>\'function'},
+                vjoinon       =>['chmgrfmbid'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'chmgrfmbid',
+                dataobjattr   =>'appl.chmgrfmb'),
+                                                  
       new kernel::Field::TextDrop(
                 name          =>'chmgrteam',
                 htmlwidth     =>'300px',

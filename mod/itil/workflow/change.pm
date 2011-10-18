@@ -288,8 +288,11 @@ sub getFollowupTargetUserids
          my $usrgrp=getModuleObject($self->Config,"base::lnkgrpuserrole"); 
          my $chm=getModuleObject($self->Config,"itil::chmmgmt"); 
          $chm->SetFilter({id=>$WfRec->{affectedapplicationid}});
-         foreach my $chmrec ($chm->getHashList(qw(chmgrteamid))){
-            if ($chmrec->{chmgrteamid} ne ""){
+         foreach my $chmrec ($chm->getHashList(qw(chmgrteamid chmgrfmbid))){
+            if ($chmrec->{chmgrfmbid} ne ""){
+               push(@{$param->{addcctarget}},$chmrec->{chmgrfmbid});
+            }
+            elsif ($chmrec->{chmgrteamid} ne ""){
                $usrgrp->ResetFilter();
                $usrgrp->SetFilter({grpid=>\$chmrec->{chmgrteamid},
                                    cistatusid=>[4,5],
