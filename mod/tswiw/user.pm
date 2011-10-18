@@ -240,17 +240,35 @@ sub GetW5BaseUserID
    my $importname=shift;
 
    return(undef) if ($importname eq "");
+   if (ref($importname)){
+      return(undef);
+   }
    my $flt={posix=>\$importname};
    if ($importname=~m/\@/){
       $flt={email=>\$importname};
    }
    my $user=getModuleObject($self->Config,"base::user");
    $user->SetFilter($flt);
-   my ($userrec,$msg)=$user->getOnlyFirst(qw(userid));
+   my ($userrec,$msg)=$user->getOnlyFirst(qw(fullname posix userid));
    if (defined($userrec)){
       return($userrec->{userid});
    }
    else{
+      if ($importname=~m/\@/){
+         $self->ResetFilter();
+         $self->SetFilter([{email=>$importname},
+                           {email2=>$importname},
+                           {email3=>$importname}]);
+         my ($wiwrec,$msg)=$self->getOnlyFirst(qw(uid));
+         if (defined($wiwrec) && $wiwrec->{uid} ne ""){
+            my $uid=$wiwrec->{uid};
+            if (ref($uid) eq "ARRAY"){
+               @$uid=grep(!/[A-Z]/,@$uid);
+               $uid=$uid->[0];
+            }
+            return($self->GetW5BaseUserID($uid));
+         }
+      }
       return($self->Import({importname=>$importname}));
    }
    return(undef);
