@@ -269,6 +269,7 @@ sub getContactEntryId
           ($d->{'givenname'}=~m/\S{2}/) &&
           ($d->{'office_location'}=~m/\S{2}/) &&
           ($d->{'office_phone'}=~m/\S{2}/)){
+         $d->{managedby}="DTAG.TDG";  # schon mal vorab - carina stellt einen r.
          my $userid=$user->ValidatedInsertRecord($d);
          if ($userid ne ""){
            $self->{problems}->{"102".lc($d->{'email'})}=
