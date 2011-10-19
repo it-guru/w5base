@@ -155,8 +155,8 @@ sub IfaceCompare
                         $newrec->{$k}=$param{onCreate}->{$k};
                      }
                   }
-                  printf STDERR ("MSG: auto create element in '%s'\n%s\n",
-                                 $chkobj->Self(),Dumper($newrec));
+                  #printf STDERR ("MSG: auto create element in '%s'\n%s\n",
+                  #               $chkobj->Self(),Dumper($newrec));
                   $chkobj->ValidatedInsertRecord($newrec);
                   $takeremote++;
                }
