@@ -73,24 +73,26 @@ sub LongRunner
 sub test
 {
    my $self=shift;
-   my $wf=getModuleObject($self->Config,"base::workflow");
+   my $l=getModuleObject($self->Config,"base::location");
 
-
-
-
-
-
-
-
-#   msg(INFO,"WfRec=%s",Dumper($WfRec->{additional}));
-#   my %newadd=%{$WfRec->{additional}};
-#   delete($newadd{xxo});
-#   $newadd{ServiceCenterState}="released";
-#   $newadd{ServiceCenterState}="confirmed";
-#   $newadd{ServiceCenterState}="closed";
-#   $wf->Store($WfRec,{additional=>\%newadd});
-
-
+   my $debug="";
+   my $id=$l->getIdByHashIOMapped(
+              "tsinet::location",
+              {name=>'Bamberg'},
+              DEBUG=>\$debug);
+   printf("\nDEBUGLOG:\n%s\n---------\n",$debug);
+   my $debug="";
+   my $id=$l->getIdByHashIOMapped(
+              "tsinet::location",
+              {name=>'Vogler'},
+              DEBUG=>\$debug);
+   printf("\nDEBUGLOG:\n%s\n---------\n",$debug);
+   my $debug="";
+   my $id=$l->getIdByHashIOMapped(
+              "tsinet::location",
+              {name=>'DE.Bamberg.Gutenbergstrasse_13.T-Systems_SCZ_Sued'},
+              DEBUG=>\$debug);
+   printf("\nDEBUGLOG:\n%s\n---------\n",$debug);
 
    return({exitcode=>0,msg=>'ok'});
 }

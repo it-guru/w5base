@@ -380,6 +380,15 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("sysadm.qmgmt.iomap",
+                      "base::iomap",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("sysadm.qmgmt.iomap.new",
+                      "base::iomap",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("Tools.analytics",
                       "tmpl/welcome",
                       defaultacl=>['valid_user']);

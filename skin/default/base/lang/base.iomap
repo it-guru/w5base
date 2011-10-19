@@ -1,0 +1,4 @@
+'base::iomap'=>{de=>'IO-Map',en=>'IO-Map'},
+'queryed from'=>{de=>'angefragt von'},
+'fieldgroup.criterion'=>{de=>'Kriterien',en=>'Criterion'},
+'fieldgroup.operation'=>{de=>'Operationen',en=>'Operation'},

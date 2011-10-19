@@ -1018,6 +1018,148 @@ sub StoreUpdateDelta
    return(1);
 }
 
+sub NormalizeByIOMap
+{
+   my $self=shift;
+   my $queryfrom=shift;
+   my $flt=shift;
+   my %param=@_;
+   my $debug;
+
+   if (defined($param{DEBUG}) &&
+       ref($param{DEBUG}) eq "SCALAR"){
+      $debug=$param{DEBUG};
+   }
+
+   my $map=$self->getIOMap($queryfrom);
+   if ($#{$map}!=-1){
+      $$debug.="\nStart mapping:\n" if ($debug);
+      foreach my $mrec (@$map){
+         my $match=0;
+         my $check=0;
+         if ($debug){
+            my $cmt=$mrec->{comments};
+            $cmt=~s/\n/ /g;
+            $cmt=limitlen($cmt,40,1);
+            $$debug.="RULE($mrec->{id}) $cmt\n";
+         }
+         CHK: for(my $fnum=1;$fnum<=5;$fnum++){
+            my $fname=$mrec->{'on'.$fnum.'field'};
+            if ($fname ne ""){
+               my $mexp=$mrec->{'on'.$fnum.'exp'};
+               if ($mexp ne ""){
+                  $check++;
+                  my $cmd="\$flt->{\$fname}=~m$mexp ? \$match++ : last CHK;";
+                  eval($cmd);
+               #   printf STDERR ("fifi cmd=$cmd $@ $?\n");
+               }
+            }
+         }
+         if ($match==$check && $check>0){     # do modifications
+            $$debug.=" -> matched\n" if ($debug);
+            for(my $fnum=1;$fnum<=5;$fnum++){
+               my $fname=$mrec->{'op'.$fnum.'field'};
+               if ($fname ne ""){
+                  my $mexp=$mrec->{'op'.$fnum.'exp'};
+                  if ($mexp ne ""){
+                     my $cmd="\$flt->{\$fname}=~$mexp;";
+               #      printf STDERR ("fifi cmd=$cmd\n");
+                     eval($cmd);
+                  }
+               }
+            }
+         }
+         else{
+            $$debug.=" -> failed\n" if ($debug);
+         }
+      }
+   }
+}
+
+sub getIdByHashIOMapped
+{
+   my $self=shift;
+   my $queryfrom=shift;
+   my $q=shift;
+   my %param=@_;
+   my $id;
+   my $debug;
+   if (defined($param{DEBUG}) &&
+       ref($param{DEBUG}) eq "SCALAR"){
+      $debug=$param{DEBUG};
+   }
+
+   my %flt;
+   $$debug.=$self->Self."::getIdByHashIOMapped from $queryfrom\n\n" if ($debug);
+
+
+   $$debug.="Request:\n" if ($debug);
+   foreach my $k (keys(%$q)){
+      $flt{$k}=$q->{$k};
+      $$debug.=sprintf("%-10s => %s\n","'".$k."'","'".$q->{$k}."'") if ($debug);
+   }
+
+   $self->NormalizeByIOMap($queryfrom,\%flt,%param);
+
+   $$debug.="\nRequest after mappings:\n" if ($debug);
+   foreach my $k (keys(%flt)){  # fix search (no like)
+      my $v=$flt{$k};
+      $$debug.=sprintf("%-10s => %s\n","'".$k."'","'".$v."'") if ($debug);
+      $flt{$k}=\$v;
+   }
+
+   $self->ResetFilter();
+   $self->SetFilter(\%flt);
+   my $idfield=$self->IdField();
+   my @l=$self->getVal($idfield->Name());
+   $$debug.="\nResult ".$idfield->Name()." = ".join(", ",@l) if ($debug);
+
+   return() if ($#l==-1);
+
+   if (wantarray()){
+      return(@l);
+   }
+   return($l[0]);
+}
+
+sub getIOMap
+{
+   my $self=shift;
+   my $queryfrom=shift;
+
+   my $c=$self->Cache;
+   $c->{'IOMap'}={} if (!exists($c->{'IOMap'}));
+   $c=$c->{'IOMap'};
+   
+   if (!exists($c->{$queryfrom}) ||
+       $c->{$queryfrom}->{t}<time()-10){
+      my $iomap=$self->getPersistentModuleObject("IOMap","base::iomap");
+      my $flt={dataobj=>[$self->Self]};
+      if (defined($queryfrom)){
+         $flt->{queryfrom}=\$queryfrom;
+      }
+      $iomap->SetFilter($flt);
+    
+      my @data=$iomap->getHashList(qw(cdate queryfrom comments
+                                     on1field on1exp
+                                     on2field on2exp
+                                     on3field on3exp
+                                     on4field on4exp
+                                     on5field on5exp
+                                     on5field on5exp
+                                     op1field op1exp
+                                     op2field op2exp
+                                     op3field op3exp
+                                     op4field op4exp
+                                     op5field op5exp
+                                     op5field op5exp
+                                     ));
+      $c->{$queryfrom}->{e}=\@data;
+      $c->{$queryfrom}->{t}=time();
+   }
+   return($c->{$queryfrom}->{e});
+}
+
 sub HandleHistory
 {
    my $self=shift;

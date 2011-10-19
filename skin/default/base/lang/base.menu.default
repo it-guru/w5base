@@ -56,6 +56,8 @@
 'sysadm.menu.new'=>{de=>'Neueingabe',en=>'New'},
 'sysadm.menu.acl'=>{de=>'Zugriffssteuerung',en=>'Access-Control'},
 'sysadm.qmgmt'=>{de=>'Qualitätsmanagement',en=>'Qualitymanagement'},
+'sysadm.qmgmt.iomap'=>{de=>'IO-Map',en=>'IO-Map'},
+'sysadm.qmgmt.iomap.new'=>{de=>'Neueingabe',en=>'New'},
 'sysadm.qmgmt.qrule'=>{de=>'Q-Regel',en=>'Q-Rule'},
 'sysadm.qmgmt.interview'=>{de=>'CI-Interview',en=>'CI-Interview'},
 'sysadm.qmgmt.interview.cat'=>{de=>'Kategorien',en=>'Categorie'},
