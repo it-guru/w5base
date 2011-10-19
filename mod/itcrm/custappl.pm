@@ -106,6 +106,14 @@ sub new
                 label         =>'allow business request workflows',
                 container     =>'additional'),
 
+      new kernel::Field::Select(
+                name          =>'opmode',
+                translation   =>'itil::appl',
+                label         =>'primary operation mode',
+                transprefix   =>'opmode.',
+                dataobjattr   =>'appl.opmode'),
+
+
       new kernel::Field::Interface(
                 name          =>'cistatusid',   # function is needed to 
                 label         =>'CI-StatusID',  # show undefined state
