@@ -6,7 +6,7 @@
 'fieldgroup.location'=>{de=>'Standort',en=>'Location'},
 'fieldgroup.systemclass'=>{de=>'Systemklassifizierung',en=>'Systemclass'},
 'fieldgroup.applications'=>{de=>'Anwendungen',en=>'Applications'},
-'fieldgroup.software'=>{de=>'Software',en=>'Software'},
+'fieldgroup.software'=>{de=>'Softwareinstallationen',en=>'Software installations'},
 'fieldgroup.swinstances'=>{de=>'Software Instanzen',en=>'Software Instances'},
 'fieldgroup.ipaddresses'=>{de=>'IP-Adressen',en=>'IP-Addresses'},
 'fieldgroup.phonenumbers'=>{de=>'Rufnummernverzeichnis',en=>'Phonenumbers'},
