@@ -698,7 +698,6 @@ sub extractAffectedApplication
          }
       }
    }
-
    #   pass 3 : affacted Softare
    my @l3;
    if (defined($rec->{software})){
@@ -744,6 +743,8 @@ sub extractAffectedApplication
    $novalidappl=1 if ($#applid==-1);
    msg(DEBUG,"pass5 validate aglist=%s",join(",",@applid));
    msg(DEBUG,"pre deviceid chkapplid=%s",join(",",@chkapplid));
+   msg(DEBUG,"pre deviceid chkprimapplid=%s",join(",",@chkprimapplid));
+
    my $dev=$rec->{deviceid};
    if (defined($tbreaktime1) && $tbreaktime1>0){
       $dev=undef;
@@ -763,8 +764,8 @@ sub extractAffectedApplication
       if ($#l1!=-1){
          push(@l,@l1);
          foreach my $arec (@l1){
-            push(@applid,$arec->{id})   if (in_array(\@applid,$arec->{id}));
-            push(@applna,$arec->{name}) if (in_array(\@applna,$arec->{name}));
+            push(@applid,$arec->{id})   if (!in_array(\@applid,$arec->{id}));
+            push(@applna,$arec->{name}) if (!in_array(\@applna,$arec->{name}));
             if (in_array(\@chkprimapplid,$arec->{applid})){
                if (!in_array(\@primapplna,$arec->{name})){
                   push(@primapplna,$arec->{name});
@@ -892,6 +893,7 @@ sub extractAffectedApplication
    # $rec->{softwareid}
    # $rec->{software} =>array
    # $rec->{description} 
+
 
 
    return(\@system,\@systemid,
