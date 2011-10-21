@@ -494,6 +494,7 @@ sub mkChangeStoreRec
        $costcenter,$customername,$responseteam,$businessteam,
        $truecustomerprio)=
                $self->extractAffectedApplication($rec);
+
    $wfrec{affectedsystemid}=$systemid;
    $wfrec{affectedsystem}=$system;
    $wfrec{affectedapplicationid}=$aids;
@@ -894,7 +895,8 @@ sub extractAffectedApplication
    # $rec->{software} =>array
    # $rec->{description} 
 
-
+#print STDERR ("applid=@applid\n");
+#print STDERR ("applna=@applna\n");
 
    return(\@system,\@systemid,
           \@applna,\@applid,
