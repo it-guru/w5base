@@ -8,6 +8,7 @@
 'License contract'=>{de=>'Lizenzvertrag'},
 'Software CI-State'=>{de=>'Software CI-Status'},
 'License CI-State'=>{de=>'Lizenz CI-Status'},
+'Installationtyp'=>{de=>'Installations Typ'},
 'Installation date'=>{de=>'Installationsdatum'},
 'Installation path'=>{de=>'Installationsverzeichnis'},
 'invalid software version specified'=>{

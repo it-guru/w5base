@@ -350,6 +350,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'itclustsid',
+                selectfix     =>1,
                 dataobjattr   =>'swinstance.itclusts'),
 
       new kernel::Field::Text(

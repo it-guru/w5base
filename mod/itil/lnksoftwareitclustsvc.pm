@@ -95,6 +95,7 @@ sub new
                 dataobjattr   =>'lnksoftwareitclustsvc.software')
                                                    
    );
+   $self->getField("itclustsvc")->{searchable}=1;
    $self->{history}=[qw(insert modify delete)];
    $self->setDefaultView(qw(software version quantity itclustsvc cdate));
    return($self);

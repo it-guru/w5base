@@ -123,6 +123,7 @@ sub new
                 dataobjattr   =>'lnksoftwaresystem.software')
                                                    
    );
+   $self->getField("system")->{searchable}=1;
    $self->{history}=[qw(insert modify delete)];
    $self->setDefaultView(qw(software version quantity system cdate));
    return($self);

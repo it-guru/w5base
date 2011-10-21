@@ -81,9 +81,37 @@ sub new
                 name          =>'system',
                 htmlwidth     =>'100px',
                 label         =>'System',
+                searchable    =>0,
                 vjointo       =>'itil::system',
                 vjoinon       =>['systemid'=>'id'],
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(0) if (defined($current) &&
+                                 $current->{insttyp} ne "System");
+                   return(1);
+                },
                 vjoindisp     =>'name'),
+
+      new kernel::Field::TextDrop(
+                name          =>'itclustsvc',
+                htmlwidth     =>'100px',
+                searchable    =>0,
+                label         =>'ClusterService',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(0) if (defined($current) &&
+                                 $current->{insttyp} ne "ClusterService");
+                   return(1);
+                },
+                vjointo       =>'itil::lnkitclustsvc',
+                vjoinon       =>['itclustsvcid'=>'id'],
+                vjoindisp     =>'fullname'),
 
       new kernel::Field::Date(
                 name          =>'instdate',
@@ -125,6 +153,16 @@ sub new
                 label         =>'patchkey (Beta)',
                 dataobjattr   =>'lnksoftwaresystem.patchkey'),
                                                    
+      new kernel::Field::Text(
+                name          =>'insttyp',
+                label         =>'Installationtyp',
+                selectfix     =>1,
+                group         =>'releaseinfos',
+                dataobjattr   =>
+                   "if (lnksoftwaresystem.system is not null,".
+                   "'System',".
+                   "'ClusterService')"),
+                                                 
       new kernel::Field::Select(
                 name          =>'softwarecistatus',
                 group         =>'link',
