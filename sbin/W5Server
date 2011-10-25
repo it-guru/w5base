@@ -1196,7 +1196,12 @@ W5Server->run(%ServerParam);
 
 sub help
 {
-   printf STDERR ("Usage: W5Server -c {config} [-v]\n");
+   printf STDERR ("Usage: W5Server [-d] -c {config} [-v]\n");
+   printf STDERR ("\n");
+   printf STDERR (" -c sets the name of the config (default:w5server.conf)\n");
+   printf STDERR (" -v aktivates verbose mode\n");
+   printf STDERR (" -d starts the W5Server in debug mode (not as background!)\n");
+   printf STDERR ("\n");
 }
 
 
