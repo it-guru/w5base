@@ -690,7 +690,7 @@ sub extractAffectedApplication
          if ($r->{dstobj} eq "tsacinv::appl"){
             push(@chkapplid,$r->{dst});
             msg(DEBUG,"add %s by entry in relations table",$r->{dst});
-            if ($r->{primary}=='1' || $#chkprimapplid==-1){
+            if ($r->{primary}=='1'){
                push(@chkprimapplid,$r->{dst});
             }
          }
@@ -698,6 +698,9 @@ sub extractAffectedApplication
             push(@chksystemid,$r->{dst});
          }
       }
+   }
+   if ($#chkprimapplid==-1){
+      @chkprimapplid=@chkapplid;
    }
    #   pass 3 : affacted Softare
    my @l3;
