@@ -266,6 +266,10 @@ sub rpcMultiCacheQuery
    if (defined($r) && $r->{exitcode}==0){
       $res{Mandator}=$r->{state};
    }
+   $r=$self->QueryCache("IOMapper");
+   if (defined($r) && $r->{exitcode}==0){
+      $res{IOMapper}=$r->{state};
+   }
 
    return({exitcode=>0,%res});
 }
@@ -293,6 +297,10 @@ $self->{EventRouterTable}=[$er->getHashList(qw(srceventtype srcmoduleobject srcs
 ');
    if ($@ ne ""){
       msg(ERROR,"loadEventRouterTable=$@");
+   }
+   else{
+      msg(DEBUG,"loadEventRouterTable new loaded");
+      msg(DEBUG,Dumper($self->{EventRouterTable}));
    }
 }
 
