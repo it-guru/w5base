@@ -312,6 +312,11 @@ sub NotifyAdmin
 
    my $url=$ENV{SCRIPT_URI};
    $url=~s#/(auth|public).*$##g;
+   if ($url eq ""){
+      my $baseurl=$self->Config->Param("EventJobBaseUrl");
+      $url=$baseurl;
+   }
+
    my $spath=$self->Self();
    $spath=~s/::/\//g;
    my $publicurl=$url."/public/".$spath."/";
@@ -447,9 +452,19 @@ sub NotifyAddOrRemoveObject
          $fullname=$UserCache->{$ENV{REMOTE_USER}}->{rec}->{fullname};
       }
    }
+   else{
+      $fullname=$W5V2::OperationContext;
+      if ($W5V2::EventContext ne ""){
+         $fullname.=" (".$W5V2::EventContext.")";
+      }
+   }
 
    my $url=$ENV{SCRIPT_URI};
    $url=~s#/(auth|public).*$##g;
+   if ($url eq ""){
+      my $baseurl=$self->Config->Param("EventJobBaseUrl");
+      $url=$baseurl;
+   }
    my $spath=$self->Self();
    $spath=~s/::/\//g;
    my $publicurl=$url."/public/".$spath."/";

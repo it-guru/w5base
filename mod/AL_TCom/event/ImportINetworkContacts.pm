@@ -72,7 +72,7 @@ sub ImportINetworkContacts
 
 
    my $appl=getModuleObject($self->getParent->Config(),"itil::appl");
-  # $appl->SetNamedFilter("DBASE",{name=>"Flex* EKI* xIT-Base*"});
+   $appl->SetNamedFilter("DBASE",{name=>"REBELL_IRONMAN_Wirk(P)"});
    $appl->SetFilter({customer=>$self->{custselection},cistatusid=>"<=5"});
    my @idl=$appl->getHashList(qw(id name opmode mandator));
 

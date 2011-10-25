@@ -90,6 +90,7 @@ sub ProcessEvent
 
    if ($self->isEvent($name)){
       msg(DEBUG,"start ProcessEvent '$name'(%s)",join(@{$param->{param}}));
+      $W5V2::EventContext=$name if (!defined($W5V2::EventContext));
       my $subindexstr="";
       if (defined($requestedmethod)){
          $subindexstr=" requested $requestedmethod";
@@ -117,6 +118,7 @@ sub ProcessEvent
       msg(DEBUG,"ProcessEvent '$name' - this is no event");
    }
    msg(DEBUG,"end   ProcessEvent '$name'");
+   $W5V2::EventContext=undef;
    return(@res);
 }
 
