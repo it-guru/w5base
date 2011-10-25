@@ -823,7 +823,8 @@ sub Log
          }
       }
       else{
-         if (!grep(/^-{0,1}$facility$/,@logfac)){
+         if (!grep(/^-{0,1}$facility$/,@logfac) &&
+             !grep(/^$facility$/,@logfac)){
             $LogCache->{$facility}->{usemsg}=1; 
          }
       }
@@ -851,7 +852,6 @@ sub Log
                print $fout (sprintf("%s [%d] %-6s %s\n",
                                     NowStamp(),$$,$mode,$l));
             }
-#msg(DEBUG,"log done pid=$$ for $facility errno=$? $! fout=$fout");
             return(1);
          }
       }
