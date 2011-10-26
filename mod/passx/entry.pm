@@ -83,6 +83,7 @@ sub new
                 name        =>'sshloginname',
                 label       =>'SSH Loginname',
                 htmldetail  =>0,
+                readonly    =>1,
                 dataobjattr =>"concat(passxentry.username,'\@',".
                               "passxentry.systemname)"),
 
