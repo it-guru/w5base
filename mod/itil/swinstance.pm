@@ -122,7 +122,7 @@ sub new
                 vjoinon    =>['applid'=>'id'],
                 vjoindisp  =>'name'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'applid',
                 label         =>'ApplicationID',
                 dataobjattr   =>'swinstance.appl'),
@@ -226,7 +226,7 @@ sub new
                 vjoinon       =>['systemid'=>'id'],
                 vjoindisp     =>'name'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'systemid',
                 selectfix     =>1,
                 dataobjattr   =>'swinstance.system'),
