@@ -394,3 +394,19 @@ create table itemizedlist (
 );
 alter table interview add additional  longtext default NULL;
 alter table location add mandator bigint(20) default NULL;
+create table iomap (
+  id          bigint(20)   NOT NULL,
+  cistatus    int(2)       default '4', mapprio int(2) default '10000',
+  dataobject  varchar(128) NOT NULL,
+  queryfrom   varchar(128) default NULL,
+  criterion   longtext     default NULL,
+  operation   longtext     default NULL,
+  comments    longtext     default NULL,
+  createdate  datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate  datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser  bigint(20) NOT NULL default '0',
+  modifyuser  bigint(20) NOT NULL default '0',
+  editor      varchar(100) NOT NULL default '',
+  realeditor  varchar(100) NOT NULL default '',
+  PRIMARY KEY (id),key(dataobject),key(createdate),key(cistatus,createdate)
+);

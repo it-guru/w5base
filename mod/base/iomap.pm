@@ -64,6 +64,14 @@ sub new
                 vjoinon       =>['cistatusid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::Number(
+                name          =>'mapprio',
+                htmleditwidth =>'40%',
+                default       =>'10000',
+                label         =>'Map-Prio',
+                sqlorder      =>'asc',
+                dataobjattr   =>'iomap.mapprio'),
+
       new kernel::Field::Link(
                 name          =>'cistatusid',
                 label         =>'CI-StateID',
@@ -245,7 +253,7 @@ sub new
    
 
    );
-   $self->setDefaultView(qw(cdate id dataobj queryfrom comments));
+   $self->setDefaultView(qw(mapprio cdate id dataobj queryfrom comments));
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","admin.itil.iomap"],
                          uniquesize=>255};
@@ -316,7 +324,7 @@ sub getValidWebFunctions
 {
    my $self=shift;
 
-   return($self->SUPER::getValidWebFunctions(@_),"IOMap");
+   return($self->SUPER::getValidWebFunctions(@_),"IOMap","MapTester");
 }
 
 sub getHtmlDetailPageContent
@@ -401,7 +409,187 @@ sub IOMap
                            js=>['toolbox.js'],
                            style=>['default.css','work.css',
                                    'kernel.App.Web.css']);
-   printf("OK");
+   printf("OK - comming sone");
 
 }
+
+sub Welcome
+{
+   my $self=shift;
+
+   return($self->MapTester());
+}
+
+sub MapTester   
+{
+   my $self=shift;
+   my $debug;
+
+   print $self->HttpHeader();
+   print $self->HtmlHeader(
+                           title=>"IO Map Tester",
+                           js=>['toolbox.js'],
+                           body=>1,form=>1,
+                           style=>['default.css','work.css',
+                                   'kernel.App.Web.css']);
+
+   my %q=$self->getSearchHash();
+   my $d="";
+   $d.="\n<table width=95%>";
+
+   # line a
+   $d.="<tr><td nowrap width=1%>".
+       $self->getField("dataobj")->Label().
+       "</td>";
+   if ($q{databoj} eq ""){
+      $self->ResetFilter();
+      $self->SetFilter({cistatusid=>\'4'});
+      my ($sd,$keylist,$vallist,$list)=
+           $self->getHtmlSelect("search_dataobj","dataobj",["dataobj"],
+                                autosubmit=>1,AllowEmpty=>1);     
+      $d.="<td>".$sd."</td>";
+   }
+   else{
+      $d.="<td>".$q{databoj}.$self->HtmlPersistentVariables("dataobj")."</td>";
+   }
+  # $d.="</tr>";
+
+   # line b
+   if ($q{dataobj} ne ""){
+      $d.="<td nowrap width=1%>".
+          $self->getField("queryfrom")->Label().
+          "</td>";
+      $self->ResetFilter();
+      $self->SetFilter({dataobj=>\$q{dataobj}});
+      my ($sd,$keylist,$vallist,$list)=
+           $self->getHtmlSelect("search_queryfrom","queryfrom",["queryfrom"],
+                                autosubmit=>1,AllowEmpty=>1);     
+      $d.="<td>".$sd."</td>";
+      $d.="</tr>\n";
+   }
+   $d.="</table>\n";
+
+   if ($q{dataobj} ne "" && $q{queryfrom} ne ""){
+      my $o=getModuleObject($self->Config,$q{dataobj});
+      if (defined($o)){
+         my @l=$o->getFieldList();
+       #  $d.="<xmp>".Dumper(\@l)."</xmp>";
+         $d.="\n<center>\n<table cellspacing=0 cellpadding=0 border=1 width=95%>";
+         $d.="<tr>".
+             "<th>Fieldname</th>".
+             "<th>Query Value</th>".
+             "<th>Mapped result</th>".
+             "</tr>\n";
+         my @outval;
+         my %qrec;
+         for(my $fno=1;$fno<=5;$fno++){
+            my $fieldname=Query->Param("field".$fno);;
+            if ($fieldname ne ""){
+               my $inval="val$fno";
+               $qrec{$fieldname}=Query->Param($inval);
+            }
+         }
+         my %mrec;
+         if (keys(%qrec)){
+            $debug.="DEBUG Start Log\n";
+            %mrec=%qrec;
+            my $projectmode=0;
+            if (Query->Param("ProjectMode")){
+               $projectmode=1;
+               $debug.="process start in PROJECT mode\n";
+            }
+            else{
+               $debug.="process start in normal mode\n";
+            }
+            $o->getIOMap($q{queryfrom},1,$projectmode);  # bypass cache
+            $o->NormalizeByIOMap($q{queryfrom},\%mrec,DEBUG=>\$debug);
+            $debug.="DEBUG End Log\n";
+         }
+
+         for(my $fno=1;$fno<=5;$fno++){
+            my @in;
+            foreach my $fname (@l){
+               push(@in,$fname,$fname);
+            }
+
+            my ($sd,$keylist,$vallist,$list)=
+                 $self->getHtmlSelect("field".$fno,\@in,
+                                      AllowEmpty=>1);     
+            $d.="<tr>\n";
+            $d.="<td width=200>".$sd."</td>";
+            my $inval="val$fno";
+            my $v=quoteHtml(Query->Param($inval));
+            my $fieldname=Query->Param("field".$fno);
+            my $mval=quoteHtml($mrec{$fieldname});
+         
+            $d.="<td><input size=20 type=text ".
+                "style='width:100%' name=$inval value=\"$v\"></td>";
+            $d.="<td><input size=20 disabled type=text ".
+                "style='width:100%' value=\"$mval\"></td>";
+            $d.="</tr>\n";
+         }
+         $d.="<tr>\n<td colspan=3><input type=submit ".
+             "value='process --&gt;' style=\"width:100%\"></td></tr>\n";
+         $d.="</table>\n";
+      }
+   }
+
+   my $p="<input type=checkbox name=ProjectMode";
+   if (Query->Param("ProjectMode")){
+      $p.=" checked";
+   }
+   $p.=">";
+
+   
+   print("<table height=100% width=100% border=0>");
+   print("\n<tr height=1%><td valign=top nowrap align=center>".
+         sprintf("<div style='text-align:center;cursor:pointer' ".
+                "onclick=\"openwin('MapTester','_blank',".
+                "'height=480,width=640,toolbar=no,status=no,".
+                "resizeable=yes,scrollbars=no')\">".
+                "<b>Map Tester</b></div> (project mode $p)").
+         "</td></tr>\n");
+   printf("<tr height=1%><td valign=top>%s</td></tr>",$d);
+
+
+   if (defined($debug)){
+      my $out="";
+      $out.="<div id=debug style=\"width:95%;text-align:left;margin-top:3px;".
+          "background-color:lightgray;".
+          "border-style:solid;border-color:gray;border-width:1px;".
+          "height:1px;overflow:auto\">";
+      $out.="<xmp>".$debug."</xmp>";
+      $out.="</div>";
+      printf("<tr id=l><td align=center valign=top>%s</td></tr>",$out);
+   }
+   else{
+      printf("<tr><td valign=top>&nbsp;</td></tr>");
+   }
+   printf("</table>");
+   print(<<EOF);
+<style>
+body{
+   overflow:hidden;
+}
+</style>
+<script language="JavaScript">
+addEvent(window, "resize", DebugResize);
+addEvent(window, "load", DebugResize);
+
+function DebugResize(){
+   var d=document.getElementById("debug");
+   d.style.height="1";
+   var l=document.getElementById("l");
+   d.style.height=l.offsetHeight;
+}
+
+
+</script>
+EOF
+
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+
+
 1;

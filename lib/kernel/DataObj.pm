@@ -1049,25 +1049,42 @@ sub NormalizeByIOMap
                my $mexp=$mrec->{'on'.$fnum.'exp'};
                if ($mexp ne ""){
                   $check++;
-                  my $cmd="\$flt->{\$fname}=~m$mexp ? \$match++ : last CHK;";
+                  my $cmd;
+                  if ($mexp=~m/^!/){
+                     $mexp=~s/^!//;
+                     $cmd="\$flt->{\$fname}!=~m$mexp ? \$match++ : last CHK;";
+                  }
+                  else{
+                     $cmd="\$flt->{\$fname}=~m$mexp ? \$match++ : last CHK;";
+                  }
                   eval($cmd);
                #   printf STDERR ("fifi cmd=$cmd $@ $?\n");
                }
             }
          }
          if ($match==$check && $check>0){     # do modifications
-            $$debug.=" -> matched\n" if ($debug);
+            $$debug.=" -> matched:" if ($debug);
             for(my $fnum=1;$fnum<=5;$fnum++){
                my $fname=$mrec->{'op'.$fnum.'field'};
                if ($fname ne ""){
                   my $mexp=$mrec->{'op'.$fnum.'exp'};
                   if ($mexp ne ""){
-                     my $cmd="\$flt->{\$fname}=~$mexp;";
+                     my $n;
+                     my $cmd="\$n=\$flt->{\$fname}=~$mexp;";
                #      printf STDERR ("fifi cmd=$cmd\n");
                      eval($cmd);
+                     if ($@ ne ""){
+                        $$debug.=" $fname(ERROR)" if ($debug);
+                     }
+                     else{
+                        if ($n){
+                           $$debug.=" $fname($n)" if ($debug);
+                        }
+                     }
                   }
                }
             }
+            $$debug.="\n" if ($debug);
          }
          else{
             $$debug.=" -> failed\n" if ($debug);
@@ -1126,21 +1143,36 @@ sub getIOMap
 {
    my $self=shift;
    my $queryfrom=shift;
+   my $force=shift;
+   my $project=shift;
+
+   if (!defined($project)){
+      $project=0;
+   }
 
    my $c=$self->Cache;
+
+   if ($force){
+      delete($c->{'IOMap'});
+   }
    $c->{'IOMap'}={} if (!exists($c->{'IOMap'}));
    $c=$c->{'IOMap'};
    
    if (!exists($c->{$queryfrom}) ||
-       $c->{$queryfrom}->{t}<time()-10){
+       $c->{$queryfrom}->{t}<time()-120){
       my $iomap=$self->getPersistentModuleObject("IOMap","base::iomap");
       my $flt={dataobj=>[$self->Self]};
       if (defined($queryfrom)){
-         $flt->{queryfrom}=\$queryfrom;
+         $flt->{queryfrom}=[$queryfrom,""];
+         $flt->{cistatusid}=[4];
       }
+      if ($project){
+         $flt->{cistatusid}=[3,4];
+      }
+      
       $iomap->SetFilter($flt);
     
-      my @data=$iomap->getHashList(qw(cdate queryfrom comments
+      my @data=$iomap->getHashList(qw(mapprio cdate queryfrom comments
                                      on1field on1exp
                                      on2field on2exp
                                      on3field on3exp
