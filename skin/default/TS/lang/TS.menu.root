@@ -66,6 +66,7 @@
 'itts.proc.ChangeManagement'=>{de=>'Change Management',
                                en=>'Change Management'},
 'itts.appl.prio'=>{de=>'Prio Anwendungen',en=>'prio applications'},
+'itts.appl.prio.groups'=>{de=>'Gruppen',en=>'Groups'},
 'sysadm.qmgmt.tsinterview'=>{de=>'T-Systems CI-Interview',
                              en=>'T-Systems CI-Interview'},
 'sysadm.qmgmt.tsinterview.new'=>{de=>'Neueingabe',

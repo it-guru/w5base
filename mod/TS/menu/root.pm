@@ -70,6 +70,10 @@ sub Init
                       "TS::topappl",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itts.appl.prio.groups",
+                      "TS::topapplgroups",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itts.appl.lnksystem",
                       "itil::lnkapplsystem",
                       defaultacl=>['admin']);

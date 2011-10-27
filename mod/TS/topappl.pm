@@ -72,7 +72,7 @@ sub new
                 htmlwidth     =>'200px',
                 htmlnowrap    =>1,
                 vjoinconcat   =>"\n\n",
-                label         =>'WBV',
+                label         =>'IT-Manager (WBV/Application Manager)',
                 onRawValue    =>\&calcClearWBV),
 
       new kernel::Field::Text(
@@ -146,9 +146,6 @@ sub calcClearWBV
    my $current=shift;
    my $id=$current->{id};
    my $app=$self->getParent();
-   my $targetfld=$app->getField("tsmid",$current);
-   my $targetid=$targetfld->RawValue($current);
-   $targetid=[$targetid] if (ref($targetid) ne "ARRAY");
 
    my $contacts=$app->getField("contacts")->RawValue($current);
    my @wbv;
@@ -161,6 +158,13 @@ sub calcClearWBV
          }
       }
    }
+   my $custappl=$app->getPersistentModuleObject("itcrm::custappl");
+   $custappl->SetFilter({id=>\$id});
+   my ($custrec,$msg)=$custappl->getOnlyFirst(qw(itmanagerid));
+   if (defined($custrec) && $custrec->{itmanagerid} ne ""){
+      push(@wbv,$custrec->{itmanagerid} );
+   }
+
    if ($#wbv!=-1){
       my $u=$app->getPersistentModuleObject("base::user");
       $u->SetFilter({userid=>\@wbv});
@@ -170,6 +174,7 @@ sub calcClearWBV
       }
       return([sort(keys(%u))]);
    }
+   
    return(undef);
 }
 
@@ -344,34 +349,8 @@ sub isViewValid
 sub getCustomerControlRecords
 {
    my $self=shift;
-   my @customer=(
-                 {
-                  name=>'tcom',
-                  label=>'TDG (THO und TMO)',
-                  customer=>'DTAG.T-Home DTAG.T-Home.* DTAG.TDG DTAG.TDG.* '.
-                            'DTAG.TMO DTAG.TMO.*'
-                 },
-                 {
-                  name=>'activebilling',
-                  label=>'ActiveBilling',
-                  customer=>'DTAG.ACTIVEBILLING DTAG.ACTIVEBILLING.*'
-                 },
-                 {
-                  name=>'rci',
-                  label=>'GHS (incl. CIT)',
-                  customer=>'DTAG.GHS DTAG.GHS.*'
-                 },
-                 {
-                  name=>'tsi',
-                  label=>'T-Systems',
-                  customer=>'DTAG.TSI DTAG.TSI.*'
-                 },
-                 {
-                  name=>'tpg',
-                  label=>'TSG',
-                  customer=>'DTAG.TSG DTAG.TSG.*'
-                 },
-                );
+   my $topapplgroups=getModuleObject($self->Config,"TS::topapplgroups");
+   my @customer=$topapplgroups->getHashList(qw(ALL));
    return(@customer);
 }
 
@@ -385,10 +364,10 @@ sub arrangeSearchData
    my $d;
    my @customer=$self->getCustomerControlRecords();
    $d.="<input type=hidden name=search_customer value=\"NONE\">";
-   $d.="<input type=hidden name=search_cistatusid value=\"4\">";
+   $d.="<input type=hidden name=search_cistatusid value=\"NONE\">";
+   $d.="<input type=hidden name=search_customerprio value=\"NONE\">";
    # Anwendungen im Mandaten DSS sind laut Hr. Weidner keine Top-Anwendungen
    $d.="<input type=hidden name=search_mandator value=\"!DSS\">";
-   $d.="<input type=hidden name=search_customerprio value=\"1\">";
    $d.="<table width=100%><tr><td align=center>";
    foreach my $rec (@customer){
       $d.="<input style=\"margin-right:2px;margin-left:2px;width:120px\" ".
@@ -407,10 +386,14 @@ sub arrangeSearchData
 function topSearch(l)
 {
    var customer=document.forms[0].elements['search_customer'];
+   var customerprio=document.forms[0].elements['search_customerprio'];
+   var cistatusid=document.forms[0].elements['search_cistatusid'];
    document.forms[0].elements['UseLimit'].value='1000';
 EOF
    foreach my $rec (@customer){
       $d.="if (l==\"$rec->{name}\"){customer.value=\"$rec->{customer}\";}\n";
+      $d.="if (l==\"$rec->{name}\"){cistatusid.value=\"$rec->{cistatusid}\";}\n";
+      $d.="if (l==\"$rec->{name}\"){customerprio.value=\"$rec->{customerprio}\";}\n";
    }
 
 
