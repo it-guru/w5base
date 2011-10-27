@@ -77,6 +77,12 @@ sub doCleanup
    my $ia=getModuleObject($self->Config,"base::infoabo");
    $ia->BulkDeleteRecord({'expiration'=>$CleanupInfoAbo});
 
+   my $CleanupUserLogon=$self->getParent->Config->Param("CleanupUserLogon");
+   $CleanupUserLogon="<now-365d" if ($CleanupUserLogon eq "");
+   msg(DEBUG,"(%s) Processing doCleanup base::userlogon",$self->Self);
+   my $ul=getModuleObject($self->Config,"base::userlogon");
+   $ul->BulkDeleteRecord({'logondate'=>$CleanupUserLogon});
+
 }
 
 

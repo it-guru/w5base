@@ -40,6 +40,15 @@ Posible values are:
 If you put a w5server_ in front of a metric, you can sepcify a special
 handling in w5server context for this metric.
 
+CleanupJobLog     (Default = "<now-84d")  based on 'mdate'
+CleanupInfoAbo    (Default = "<now-56d")  based on 'expiration'
+CleanupInline     (Default = "<now-84d")  based on 'viewlast'
+CleanupUserLogon  (Default = "<now-365d") based on 'logondate'
+CleanupHistory    (Default = "<now-730d") based on 'cdate'
+---------------------------------------------------------------
+These parameters modifies the cleanup handling. The daily cleanup job
+deletes all records with the specified timing parameters.
+
 
 
 Draft (German):
