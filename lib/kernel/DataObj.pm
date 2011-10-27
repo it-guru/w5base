@@ -1358,6 +1358,7 @@ sub ValidatedInsertRecordTransactionless
       }
    }
    else{
+      $self->NormalizeByIOMap("preWrite",$newrec);
       if ($newrec=$self->validateFields(undef,$newrec)){
          if ($self->Validate(undef,$newrec)){
             $self->finishWriteRequestHash(undef,$newrec);
@@ -1455,6 +1456,7 @@ sub ValidatedUpdateRecordTransactionless
       }
    }
    else{
+      $self->NormalizeByIOMap("preWrite",$newrec);
       if (my $validatednewrec=$self->validateFields($oldrec,$newrec,\%comprec)){
          if ($self->Validate($oldrec,$validatednewrec,\%comprec)){
             $self->finishWriteRequestHash($oldrec,$validatednewrec);
