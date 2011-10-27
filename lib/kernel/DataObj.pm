@@ -1563,6 +1563,12 @@ sub DeleteAllFilteredRecords
 sub CountRecords
 {
    my $self=shift;
+   return($self->SoftCountRecords());
+}
+
+sub SoftCountRecords
+{
+   my $self=shift;
    my $n=0;
    my ($rec,$msg)=$self->getFirst();
    if (defined($rec)){
