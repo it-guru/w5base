@@ -55,7 +55,7 @@ sub mkp800
    # ACHTUNG: Die Monatsgrenze für P800 Reports ist GMT und nicht CET!!!
    #
    $ENV{LANG}="de";
-   $param{customer}="DTAG.T-Home" if (!defined($param{customer}));
+   $param{customer}="DTAG.TDG"    if (!defined($param{customer}));
    $param{timezone}="GMT"         if (!defined($param{timezone}));
    if (defined($param{month})){
       if (my ($sM,$sY)=$param{month}=~m/^(\d+)\/(\d+)$/){
