@@ -166,6 +166,20 @@ sub ProcessLine
          $in->{'itil::system::id'}->{$iprec->{systemid}}=1;
       }
    }
+   if (defined($in->{'finance::costcenter::name'})){
+      my $o=$self->getParent->getPersistentModuleObject('itil::appl');
+      if (ref($in->{'finance::costcenter::name'}) eq "HASH"){
+         $o->SetFilter({conumber=>[keys(%{$in->{'finance::costcenter::name'}})],
+                        cistatusid=>'4'});
+      }
+      else{
+         $o->SetFilter({conumber=>\$in->{'finance::costcenter::name'},cistatusid=>'4'});
+      }
+      foreach my $orec ($o->getHashList(qw(id))){
+         $in->{'itil::appl::id'}->{$orec->{id}}++;
+      }
+   }
+
    if (defined($in->{'itil::appl::name'})){
       my $appl=$self->getParent->getPersistentModuleObject('itil::appl');
       if (ref($in->{'itil::appl::name'}) eq "HASH"){
@@ -175,8 +189,14 @@ sub ProcessLine
       else{
          $appl->SetFilter({name=>\$in->{'itil::appl::name'},cistatusid=>'4'});
       }
-      foreach my $applrec ($appl->getHashList(qw(id systems))){
+      foreach my $applrec ($appl->getHashList(qw(id conumber systems))){
          $in->{'itil::appl::id'}->{$applrec->{id}}++;
+         if ($applrec->{conumber} ne ""){
+            if (!exists($in->{'finance::costcenter::name'}) ||
+                ref($in->{'finance::costcenter::name'}) eq "HASH"){
+               $in->{'finance::costcenter::name'}->{$applrec->{conumber}}++;
+            }
+         }
          if (grep(/^itil::system::.*$/,keys(%{$out}))){
             if (defined($applrec->{systems}) && 
                 ref($applrec->{systems}) eq "ARRAY"){
@@ -270,7 +290,7 @@ sub ProcessLine
 
  
    # output
-   foreach my $appsekvar (qw(sem tsm tsm2 tsm2email 
+   foreach my $appsekvar (qw(sem tsm tsm2 tsm2email name
                              sememail tsmemail businessteam businessteamboss applid
                              customerprio criticality customer)){
       if (defined($in->{'itil::appl::id'}) && 
