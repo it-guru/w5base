@@ -95,6 +95,12 @@ sub GetKeyCriterion
                                                        itil::asset::name
                                                        itil::system::ipaddress::name
                                                        itil::system::name)]},
+                'itil::appl::businessteamboss'=>{label=>'IT-Inventar: Application: Betriebsteamleiter',
+                                               in=>[qw(itil::appl::name
+                                                       itil::system::systemid
+                                                       itil::asset::name
+                                                       itil::system::ipaddress::name
+                                                       itil::system::name)]},
                 'itil::appl::applid'        =>{label=>'IT-Inventar: Application: ApplicationID',
                                                in=>[qw(itil::appl::name
                                                        itil::system::systemid
@@ -265,7 +271,7 @@ sub ProcessLine
  
    # output
    foreach my $appsekvar (qw(sem tsm tsm2 tsm2email 
-                             sememail tsmemail businessteam applid
+                             sememail tsmemail businessteam businessteamboss applid
                              customerprio criticality customer)){
       if (defined($in->{'itil::appl::id'}) && 
           exists($out->{'itil::appl::'.$appsekvar})){
@@ -273,8 +279,15 @@ sub ProcessLine
          my $id=[keys(%{$in->{'itil::appl::id'}})];
          $appl->SetFilter({id=>$id});
          foreach my $rec ($appl->getHashList($appsekvar)){
-            if ($rec->{$appsekvar} ne ""){
-                $out->{'itil::appl::'.$appsekvar}->{$rec->{$appsekvar}}++;
+            if (defined($rec->{$appsekvar})){
+               if (ref($rec->{$appsekvar}) ne "ARRAY"){
+                  $rec->{$appsekvar}=[$rec->{$appsekvar}]; 
+               }
+               foreach my $v (@{$rec->{$appsekvar}}){
+                   if ($v ne ""){
+                      $out->{'itil::appl::'.$appsekvar}->{$v}++;
+                   }
+               }
             } 
          }
       }
