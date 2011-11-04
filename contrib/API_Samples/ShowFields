@@ -46,11 +46,15 @@ else{
 # show fields
 #
 if (my @fields=$obj->showFields()){
+   if ($#fields!=-1){
+      printf("%-22s:%-16s:%-7s: %s\n",
+             "FIELDNAME","GROUP","ISVJOIN","LONGTYPE");
+   }
    foreach my $field (@fields){
       my $group=$field->{group};
       $group=join(", ",@$group) if (ref($group) eq "ARRAY");
-      printf("%-25s: %-20s: %s\n",
-             $field->{name},$group,$field->{longtype});
+      printf("%-22s:%-16s:%-7s: %s\n",
+             $field->{name},$group,$field->{is_vjoin},$field->{longtype});
    }
    print("\n");
 }
