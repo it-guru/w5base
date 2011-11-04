@@ -1,3 +1,0 @@
-#! /bin/sh
-echo "configure is obsolete. Use 'make' or 'make install'"
-exit 0
