@@ -1197,18 +1197,18 @@ sub isViewValid
    #if ($userid eq $rec->{userid} || $self->IsMemberOf("admin")){
    #   push(@pic,"picture");
    #}
-   if ($self->IsMemberOf("admin")){
+   if ($self->IsMemberOf(["admin","support"])){
       push(@pic,"picture","roles","interview","history");
    }
    if ($rec->{usertyp} eq "extern"){
       @gl=qw(header name default comments groups userid userro control 
                 office private qc);
-      if ($self->IsMemberOf("admin")){
+      if ($self->IsMemberOf(["admin","support"])){
          push(@gl,"history");
       }
    }  
    elsif ($rec->{usertyp} eq "function"){
-      if ($self->IsMemberOf("admin")){
+      if ($self->IsMemberOf(["admin","support"])){
          @gl=qw(header name default nativcontact comments 
                    control userid userro qc);
       }
@@ -1219,7 +1219,7 @@ sub isViewValid
    elsif ($rec->{usertyp} eq "service"){
       @gl=qw(header name default comments groups nativcontact usersubst 
              userid userro control userparam qc);
-      if ($self->IsMemberOf("admin")){
+      if ($self->IsMemberOf(["admin","support"])){
          push(@gl,"history");
       }
    }  
@@ -1240,7 +1240,7 @@ sub isViewValid
          @gl=grep(/^(name|header|office|default|groups|comments|nativcontact|userid|qc)$/,@gl);
       }
       elsif ($secstate<4){
-         @gl=grep(/^(name|header|office|officeacc|private|default|groups|comments|nativcontact|userid|control|qc)$/,@gl);
+         @gl=grep(/^(name|header|office|officeacc|private|default|groups|comments|nativcontact|userid|control|qc|userro|history)$/,@gl);
       }
    }
    if ($userid==$rec->{userid}){

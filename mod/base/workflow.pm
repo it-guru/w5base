@@ -1179,7 +1179,7 @@ sub Main
 {
    my $self=shift;
 
-   if (!$self->IsMemberOf("admin")){
+   if (!$self->IsMemberOf(["admin","support"])){
       print($self->noAccess());
       return(undef);
    }
