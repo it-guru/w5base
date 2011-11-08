@@ -1055,23 +1055,26 @@ sub NormalizeByIOMap
                   if ($mexp=~m/^!/){
                      $mexp=~s/^!//;
                      if ($mexp=~m/^\/.*\/[i]*$/){
-                        $cmd="\$fltval!=~m$mexp ? \$match++ : last CHK;";
+                        $cmd="\$fltval!=~m$mexp ? \$match++ : \$fail++;";
                      }
                      else{
                         $mexp=~s/'/\\'/g;
-                        $cmd="(\$fltval ne '$mexp') ? \$match++ : last CHK;";
+                        $cmd="(\$fltval ne '$mexp') ? \$match++ : \$fail++;";
                      }
                   }
                   else{
                      if ($mexp=~m/^\/.*\/[i]*$/){
-                        $cmd="\$fltval=~m$mexp ? \$match++ : last CHK;";
+                        $cmd="\$fltval=~m$mexp ? \$match++ : \$fail++;";
                      }
                      else{
                         $mexp=~s/'/\\'/g;
-                        $cmd="(\$fltval eq '$mexp') ? \$match++ : last CHK;";
+                        $cmd="(\$fltval eq '$mexp') ? \$match++ : \$fail++;";
                      }
                   }
+                  my $fail=0;
                   eval($cmd);
+                  last if ($fail);
+                  
                }
             }
          }
@@ -1209,7 +1212,10 @@ sub getIOMap
                                      id ));
       my @ndata;
       foreach my $rec (@data){  # ensure, that all data has been expanded
-         my %n=(%$rec);
+         my %n;
+         foreach my $k (keys(%$rec)){
+            $n{$k}=$rec->{$k};
+         }
          push(@ndata,\%n);
       }
       $c->{$queryfrom}->{e}=\@ndata;
