@@ -55,6 +55,13 @@ sub new
                 label         =>'queryed from',
                 dataobjattr   =>'iomap.queryfrom'),
 
+      new kernel::Field::Text(
+                name          =>'fullname',
+                label         =>'Rule label',
+                readonly      =>1,
+                htmldetail    =>0,
+                dataobjattr   =>'iomap.fullname'),
+
       new kernel::Field::Select(
                 name          =>'cistatus',
                 htmleditwidth =>'40%',
@@ -253,7 +260,7 @@ sub new
    
 
    );
-   $self->setDefaultView(qw(mapprio cdate id dataobj queryfrom comments));
+   $self->setDefaultView(qw(mapprio queryfrom dataobj fullname comments));
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","admin.itil.iomap"],
                          uniquesize=>255};
@@ -289,6 +296,28 @@ sub Validate
          }
       }
    }
+   my $oldfullname=$oldrec->{fullname};
+   my $fullname="";
+   for(my $fno=1;$fno<=5;$fno++){
+      my $n=effVal($oldrec,$newrec,"on".$fno."field");
+      my $v=effVal($oldrec,$newrec,"on".$fno."exp");
+      if ($n ne "" && $v ne ""){
+         $fullname.=" " if ($fullname ne "");
+         $v=~s/ /_/g;
+         $fullname.="$n=$v";
+      }
+   }
+   $fullname=~s/[^a-z,0-9,\/,= ]/_/ig;
+   $fullname=~s/__/_/g;
+   $fullname=~s/__/_/g;
+   $fullname=~s/__/_/g;
+   $fullname=~s/\/_/\//g;
+   $fullname=~s/_\//\//g;
+   $fullname=limitlen($fullname,60,1);
+   if ($oldfullname ne $fullname){
+      $newrec->{fullname}=$fullname;
+   }
+   
 
 
    return(1);

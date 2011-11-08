@@ -128,179 +128,28 @@ sub findW5LocID
    my $location=$self->getParent->getField("location")->RawValue($current);
    my $zipcode=$self->getParent->getField("zipcode")->RawValue($current);
    my $country=$self->getParent->getField("country")->RawValue($current);
-   $address1=~s/\sSCZ$//;
    my $newrec;
    $newrec->{country}=$country;
    $newrec->{location}=$location;
    $newrec->{address1}=$address1;
    $newrec->{zipcode}=$zipcode;
+   $newrec->{cistatusid}="4";
 
    $loc->Normalize($newrec);
 
-   $loc->SetFilter({country=>\$newrec->{country},
-                    location=>\$newrec->{location},
-                    address1=>\$newrec->{address1},
-                    zipcode=>\$newrec->{zipcode},
-                    cistatusid=>\'4'}); 
-   my @loclist;
-   @loclist=$loc->getHashList(qw(id));
-   if ($#loclist==-1){
-      $loc->ResetFilter();
-      $loc->SetFilter({country=>\$newrec->{country},
-                       location=>\$newrec->{location},
-                       address1=>\$newrec->{address1},
-                       cistatusid=>\'4'}); 
-      @loclist=$loc->getHashList(qw(id));
+   foreach my $k (keys(%$newrec)){
+      delete($newrec->{$k}) if (!defined($newrec->{$k}));
    }
-   if ($#loclist==-1){
-      $loc->ResetFilter();
-      $loc->SetFilter({name=>"NONE"});
-      if (($newrec->{location}=~m/Bamberg/i) &&
-          ($newrec->{address1}=~m/Memmelsdorfer/i)){
-         $loc->SetFilter({name=>"*bamberg*memmelsdorfer*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Heusenstamm/i) &&
-          ($newrec->{address1}=~m/Jahnstr/i)){
-         $loc->SetFilter({name=>"*Heusenstamm*Jahnstr",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Weiden/i) &&
-          ($newrec->{address1}=~m/Stockerhutweg/i)){
-         $loc->SetFilter({name=>"*weiden*Stockerhutweg*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Weiden/i) &&
-          ($newrec->{address1}=~m/Bauscher/i)){
-         $loc->SetFilter({name=>"*weiden*Bauscher*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Nürnberg/i) &&
-          ($newrec->{address1}=~m/Allersberger/i)){
-         $loc->SetFilter({name=>"*Nuernberg*Allersberger*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Traunstein/i) &&
-          ($newrec->{address1}=~m/Rosenheimer/i)){
-         $loc->SetFilter({name=>"*Traunstein*Rosenheimer*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Offenburg/i) &&
-          ($newrec->{address1}=~m/Okenstr/i)){
-         $loc->SetFilter({name=>"*Offenburg*Okenstr*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Göppingen/i) &&
-          ($newrec->{address1}=~m/Salamander/i)){
-         $loc->SetFilter({name=>"*Goeppingen*Salamander*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Neustadt/i) &&
-          ($newrec->{address1}=~m/Chemnitzer.*2/i)){
-         $loc->SetFilter({name=>"*Neustadt*Chemnitzer*2*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Hanau/i) &&
-          ($newrec->{address1}=~m/Rückinger/i)){
-         $loc->SetFilter({name=>"*Hanau*Ruckinger*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Heusenstamm/i) &&
-          ($newrec->{address1}=~m/Jahnstr/i)){
-         $loc->SetFilter({name=>"*Heusenstamm*Jahnstr*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Duisburg/i) &&
-          ($newrec->{address1}=~m/Saarstr/i)){
-         $loc->SetFilter({name=>"*Duisburg*Saarstr*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Bochum/i) &&
-          ($newrec->{address1}=~m/Karl-Lange.*29/i)){
-         $loc->SetFilter({name=>"*Bochum*Karl_Lange*29*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Magdeburg/i) &&
-          ($newrec->{address1}=~m/Lübecker.*13/i)){
-         $loc->SetFilter({name=>"*Magdeburg*Luebecker*13*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Detmold/i) &&
-          (my ($no)=$newrec->{address1}=~m/Braunen.*(\d+)/i)){
-         $loc->SetFilter({name=>"*Detmold*Braun*$no*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Hannover/i) &&
-          (my ($no)=$newrec->{address1}=~m/TÜV.*(\d+)/i)){
-         $loc->SetFilter({name=>"*Hannover*TUEV*$no*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Bremen/i) &&
-          (my ($no)=$newrec->{address1}=~m/Stresemann.*(\d+)/i)){
-         $loc->SetFilter({name=>"*Bremen*esemann*$no*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Heide/i) &&
-          (my ($no)=$newrec->{address1}=~m/Kleinbahnhof.*(\d+)/i)){
-         $loc->SetFilter({name=>"*Heide*Kleinbahnhof*$no*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Flensburg/i) &&
-          (my ($no)=$newrec->{address1}=~m/Eckernf.*(\d+)/i)){
-         $loc->SetFilter({name=>"*Flensburg*Eckernf*$no*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Kronshagen/i) &&
-          (my ($no)=$newrec->{address1}=~m/Posthorn.*3/i)){
-         $loc->SetFilter({name=>"*Kronshagen*Posthorn*3*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Rostock/i) &&
-          (my ($no)=$newrec->{address1}=~m/Deutsche.*(\d+)/i)){
-         $loc->SetFilter({name=>"*Rostock*Deutsche*$no*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Stahnsdorf/i) &&
-          (my ($no)=$newrec->{address1}=~m/Güterfelder.*(\d+)/i)){
-         $loc->SetFilter({name=>"*Stahnsdorf*Gueterfelder*$no*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Berlin/i) &&
-          (my ($no)=$newrec->{address1}=~m/Dernburgstr.*(\d+)/i)){
-         $loc->SetFilter({name=>"*Berlin*Dernburgerstr*$no*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Berlin/i) &&
-          (my ($no)=$newrec->{address1}=~m/Lankwitzer/i)){
-         $loc->SetFilter({name=>"*Berlin*Lankwitzer*13-17*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Berlin/i) &&
-          (my ($no)=$newrec->{address1}=~m/Winterfeld.*21/i)){
-         $loc->SetFilter({name=>"*Berlin*Winterfeld*21*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Leipzig/i) &&
-          (my ($no)=$newrec->{address1}=~m/Gutenberg/i)){
-         $loc->SetFilter({name=>"*Leipzig*Gutenberg*1*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Cottbus/i) &&
-          (my ($no)=$newrec->{address1}=~m/Heinrich.*(\d+)/i)){
-         $loc->SetFilter({name=>"*Cottbus*Heinrich*$no*",
-                          cistatusid=>\'4'});
-      }
-      if (($newrec->{location}=~m/Radebeul/i) &&
-          (my ($no)=$newrec->{address1}=~m/Dresdner.*(\d+)/i)){
-         $loc->SetFilter({name=>"*Radebeul*Dresdner*$no*",
-                          cistatusid=>\'4'});
-      }
-      @loclist=$loc->getHashList(qw(id));
-   }
-
-   my @locid;
-   foreach my $locrec (@loclist){
-      push(@locid,$locrec->{id});
+   #printf STDERR ("fifi newrec=%s\n",Dumper($newrec));
+   my $d;
+   my @locid=$loc->getIdByHashIOMapped("tsinet::location",$newrec,DEBUG=>\$d);
+   #printf STDERR ("debug=%s\n",$d);
+   $d="";
+   if ($newrec->{zipcode} ne "" && $#locid==-1){ # try without zipcode
+   #   printf STDERR ("try without zipcode\n");
+      delete($newrec->{zipcode});
+      @locid=$loc->getIdByHashIOMapped("tsinet::location",$newrec,DEBUG=>\$d);
+   #   printf STDERR ("debug=%s\n",$d);
    }
   
    if ($#locid!=-1){

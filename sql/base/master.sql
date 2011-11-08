@@ -410,3 +410,4 @@ create table iomap (
   realeditor  varchar(100) NOT NULL default '',
   PRIMARY KEY (id),key(dataobject),key(createdate),key(cistatus,createdate)
 );
+alter table iomap add fullname varchar(65), add key(fullname);

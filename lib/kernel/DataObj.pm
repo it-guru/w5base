@@ -1050,18 +1050,32 @@ sub NormalizeByIOMap
                if ($mexp ne ""){
                   $check++;
                   my $cmd;
+                  my $fltval=$flt->{$fname};
+
                   if ($mexp=~m/^!/){
                      $mexp=~s/^!//;
-                     $cmd="\$flt->{\$fname}!=~m$mexp ? \$match++ : last CHK;";
+                     if ($mexp=~m/^\/.*\/[i]*$/){
+                        $cmd="\$fltval!=~m$mexp ? \$match++ : last CHK;";
+                     }
+                     else{
+                        $mexp=~s/'/\\'/g;
+                        $cmd="(\$fltval ne '$mexp') ? \$match++ : last CHK;";
+                     }
                   }
                   else{
-                     $cmd="\$flt->{\$fname}=~m$mexp ? \$match++ : last CHK;";
+                     if ($mexp=~m/^\/.*\/[i]*$/){
+                        $cmd="\$fltval=~m$mexp ? \$match++ : last CHK;";
+                     }
+                     else{
+                        $mexp=~s/'/\\'/g;
+                        $cmd="(\$fltval eq '$mexp') ? \$match++ : last CHK;";
+                     }
                   }
                   eval($cmd);
-               #   printf STDERR ("fifi cmd=$cmd $@ $?\n");
                }
             }
          }
+       #  printf STDERR ("fifi end rules\n");
          if ($match==$check && $check>0){     # do modifications
             $$debug.=" -> matched:" if ($debug);
             for(my $fnum=1;$fnum<=5;$fnum++){
@@ -1122,7 +1136,14 @@ sub getIdByHashIOMapped
    foreach my $k (keys(%flt)){  # fix search (no like)
       my $v=$flt{$k};
       $$debug.=sprintf("%-10s => %s\n","'".$k."'","'".$v."'") if ($debug);
-      $flt{$k}=\$v;
+      if ($v ne ""){
+         if ($v=~m/^".*"/){
+            $flt{$k}=$v;
+         }
+         else{
+            $flt{$k}=\$v;
+         }
+      }
    }
 
    $self->ResetFilter();
@@ -1185,8 +1206,13 @@ sub getIOMap
                                      op4field op4exp
                                      op5field op5exp
                                      op5field op5exp
-                                     ));
-      $c->{$queryfrom}->{e}=\@data;
+                                     id ));
+      my @ndata;
+      foreach my $rec (@data){  # ensure, that all data has been expanded
+         my %n=(%$rec);
+         push(@ndata,\%n);
+      }
+      $c->{$queryfrom}->{e}=\@ndata;
       $c->{$queryfrom}->{t}=time();
    }
    return($c->{$queryfrom}->{e});
