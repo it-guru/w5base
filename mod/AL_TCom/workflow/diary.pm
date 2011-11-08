@@ -667,6 +667,7 @@ sub preValidate                 # das muß in preValidate behandelt werden,
          }
          if (keys(%conumber)){
             $newrec->{conumber}=[keys(%conumber)];
+            $newrec->{involvedcostcenter}=[keys(%conumber)];
          }
       }
       else{
