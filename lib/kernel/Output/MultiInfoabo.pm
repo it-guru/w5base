@@ -211,6 +211,7 @@ sub MultiOperationActionOn
    my %rec=(refid=>$id,
             parentobj=>$app->SelfAsParentObject(),
             userid=>$curruserid,
+            active=>1,
             mode=>$mode);
    my %flt=(refid=>\$rec{refid},
             parentobj=>\$rec{parentobj},
