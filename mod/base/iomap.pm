@@ -152,61 +152,61 @@ sub new
       new kernel::Field::Text(
                 name          =>'op1field',
                 group         =>'operation',
-                label         =>'Field 1 name',
+                label         =>'operation Field 1 name',
                 container     =>'operation'),
 
       new kernel::Field::Text(
                 name          =>'op1exp',
                 group         =>'operation',
-                label         =>'Field 1 expresion',
+                label         =>'operation Field 1 expresion',
                 container     =>'operation'),
 
       new kernel::Field::Text(
                 name          =>'op2field',
                 group         =>'operation',
-                label         =>'Field 2 name',
+                label         =>'operation Field 2 name',
                 container     =>'operation'),
 
       new kernel::Field::Text(
                 name          =>'op2exp',
                 group         =>'operation',
-                label         =>'Field 2 expresion',
+                label         =>'operation Field 2 expresion',
                 container     =>'operation'),
 
       new kernel::Field::Text(
                 name          =>'op3field',
                 group         =>'operation',
-                label         =>'Field 3 name',
+                label         =>'operation Field 3 name',
                 container     =>'operation'),
 
       new kernel::Field::Text(
                 name          =>'op3exp',
                 group         =>'operation',
-                label         =>'Field 3 expresion',
+                label         =>'operation Field 3 expresion',
                 container     =>'operation'),
 
       new kernel::Field::Text(
                 name          =>'op4field',
                 group         =>'operation',
-                label         =>'Field 4 name',
+                label         =>'operation Field 4 name',
                 container     =>'operation'),
 
       new kernel::Field::Text(
                 name          =>'op4exp',
                 group         =>'operation',
-                label         =>'Field 4 expresion',
+                label         =>'operation Field 4 expresion',
                 container     =>'operation'),
 
       new kernel::Field::Text(
                 name          =>'op5field',
                 group         =>'operation',
-                label         =>'Field 5 name',
+                label         =>'operation Field 5 name',
                 container     =>'operation'),
 
       new kernel::Field::Text(
                 name          =>'op5exp',
                 group         =>'operation',
-                label         =>'Field 5 expresion',
+                label         =>'operation Field 5 expresion',
                 container     =>'operation'),
 
 
