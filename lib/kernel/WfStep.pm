@@ -683,9 +683,11 @@ sub generateWorkspacePages
       $$selopt.="<option value=\"wfforward\">".
                 $self->getParent->T("wfforward",$tr).
                 "</option>\n";
+      my $note=Query->Param("note");
+
       my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
          "<td colspan=2><textarea name=note style=\"width:100%;height:100px\">".
-         "</textarea></td></tr>";
+         quoteHtml($note)."</textarea></td></tr>";
       $d.="<tr><td width=1% nowrap>".
           $self->getParent->T("forward to","base::workflow::request").
           ":&nbsp;</td>".
@@ -1015,7 +1017,7 @@ sub getDefaultNoteDiv
          "<td colspan=2><textarea name=note ".
          "onkeydown=\"textareaKeyHandler(this,event);\" ".
          "style=\"width:100%;height:${noteheight}px\">".
-         $note."</textarea></td></tr>";
+         quoteHtml($note)."</textarea></td></tr>";
    if ($mode eq "addnote" || $mode eq "simple"){
       if ($mode eq "simple"){
          $d.="<tr><td width=1% nowrap valign=center>&nbsp;";
