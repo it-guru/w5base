@@ -131,7 +131,8 @@ sub qcheckRecord
                              $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
                              mode=>'integer');
 
-         my $w5aclocation=$self->getW5ACLocationname($parrec->{locationid});
+         my $w5aclocation=$self->getW5ACLocationname($parrec->{locationid},
+                          "QualityCheck of $rec->{name}");
          msg(INFO,"rec location=$rec->{location}");
          msg(INFO,"ac  location=$w5aclocation");
          if (defined($w5aclocation)){ # only if a valid W5Base Location found
@@ -188,6 +189,7 @@ sub getW5ACLocationname
 {
    my $self=shift;
    my $aclocationid=shift;
+   my $hint=shift;
 
    msg(INFO,"start getW5ACLocationname");
    return(undef) if ($aclocationid eq "" || $aclocationid==0);
@@ -220,10 +222,24 @@ sub getW5ACLocationname
          $lrec{country}="DE";
       }
    }
-   msg(INFO,"requestrec=%s",Dumper(\%lrec));
+#   msg(INFO,"requestrec=%s",Dumper(\%lrec));
    
 
-   my $w5locid=$w5loc->getLocationByHash(%lrec);
+#   my $w5locid=$w5loc->getLocationByHash(%lrec);
+
+   my $debug;
+   my $w5locid=$w5loc->getIdByHashIOMapped("tsacinv::location",\%lrec,
+                                           DEBUG=>\$debug);
+   if (!defined($w5locid)){
+      $w5loc->Log(ERROR,"basedata",
+           "Fail to request base::location\n".
+           "queried by tsacinv::location\n".
+           "for AC location $aclocrec->{fullname}\n".
+           "while $hint. Contact Admin to add\n".
+           "Location:\n".
+           join("\n",map({sprintf(" - %-10s='%s'",$_,$lrec{$_})} keys(%lrec))));
+   }
+
    return(undef) if (!defined($w5locid));
    $w5loc->SetFilter({id=>\$w5locid}); 
    my ($w5locrec,$msg)=$w5loc->getOnlyFirst(qw(name));
