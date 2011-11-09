@@ -55,6 +55,8 @@ By default, nobody gets mails from the application in test and development
 operation mode. If you specify a list auf mail adresses (semicolon seperated)
 in this config variable, these persons will get mails.
 All other mail adresses will be redirected to @null.com domain.
+If you do changes in this config-var, you have to restart the W5Server 
+process.
 
 
 
