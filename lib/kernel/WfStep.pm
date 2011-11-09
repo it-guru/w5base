@@ -302,6 +302,36 @@ sub nativProcess
       }
       return(0);
    }
+   elsif($op eq "wfreject"){
+      my $note=$h->{note};
+      my $effort=$h->{effort};
+      if ($note=~m/^\s*$/ || length($note)<10){
+         $self->LastMsg(ERROR,"empty or to short notes are not allowed");
+         return(0);
+      }
+      $note=trim($note);
+      $effort=undef if (!($effort=~m/^\d+$/));
+
+      if ($self->getParent->getParent->Action->StoreRecord(
+          $WfRec->{id},"wfreject",
+          {translation=>'base::workflow::request'},$note,$effort)){
+         my $openuserid=$WfRec->{openuser};
+         $self->StoreRecord($WfRec,{stateid=>24,fwdtargetid=>$openuserid,
+                                                fwdtarget=>'base::user',
+                                                eventend=>NowStamp("en"),
+                                                fwddebtarget=>undef,
+                                                fwddebtargetid=>undef});
+
+         $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
+         $self->PostProcess("SaveStep".".".$op,$WfRec,$actions,
+                            note=>$note,
+                            fwdtarget=>'base::user',
+                            fwdtargetid=>$openuserid,
+                            fwdtargetname=>"Requestor");
+         return(1);
+      }
+      return(0);
+   }
    elsif ($op eq "wfaddnote" || $op eq "wfaddsnote"){
       my $note=$h->{note};
       if ($note=~m/^\s*$/  || length($note)<10){
@@ -737,6 +767,15 @@ sub generateWorkspacePages
          $$divset="<div id=OPnop style=\"margin:15px\"></div>".
                    $$divset;
       }
+   }
+   if (grep(/^wfreject$/,@$actions)){
+      my $note=Query->Param("note");
+      $$selopt.="<option value=\"wfreject\">".
+                $self->getParent->T("wfreject",$tr).
+                "</option>\n";
+      $$divset.="<div id=OPwfreject class=\"$class\"><textarea name=note ".
+                "style=\"width:100%;height:110px\">".
+                unHtml($note)."</textarea></div>";
    }
    if (grep(/^wfmailsend$/,@$actions)){
       my $wfheadid=$WfRec->{id};

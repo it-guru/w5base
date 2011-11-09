@@ -189,7 +189,6 @@ sub HandleCIStatus
       $subroutine=~s/^.*:://;
       $param{mode}=$subroutine;
    }
-   #printf STDERR ("fifi HandleCIStatus mode=$param{mode}\n");
    if ($param{mode} eq "SecureValidate"){
       if (!defined($oldrec)){
          if ($newrec->{cistatusid}>2 || $newrec->{cistatusid}==0){
@@ -235,8 +234,8 @@ sub HandleCIStatus
    }
    if ($param{mode} eq "FinishWrite"){
       if ($self->Config->Param("W5BaseOperationMode") eq "test"){
-         printf STDERR ("fifi oldrec=%s\n",Dumper($oldrec));
-         printf STDERR ("fifi newrec=%s\n",Dumper($newrec));
+        # printf STDERR ("fifi oldrec=%s\n",Dumper($oldrec));
+        # printf STDERR ("fifi newrec=%s\n",Dumper($newrec));
          my $idname=$self->IdField->Name();
          my $id=effVal($oldrec,$newrec,$idname);
          if ($id ne ""){

@@ -887,13 +887,6 @@ sub generateWorkspacePages
                 " to call the request back. This can be usefull, if the ".
                 "request needs to be corrected.")."</div>";
    }
-   if (grep(/^wfreject$/,@$actions)){
-      $$selopt.="<option value=\"wfreject\">".
-                $self->getParent->T("wfreject",$tr).
-                "</option>\n";
-      $$divset.="<div id=OPwfreject class=\"$class\"><textarea name=note ".
-                "style=\"width:100%;height:110px\"></textarea></div>";
-   }
    if (grep(/^wfapprovalreq$/,@$actions)){
       $$selopt.="<option value=\"wfapprovalreq\">".
                 $self->getParent->T("wfapprovalreq",$tr).
@@ -1238,30 +1231,12 @@ sub Process
       }
       elsif ($op eq "wfreject"){
          my $note=Query->Param("note");
-         if ($note=~m/^\s*$/ || length($note)<10){
-            $self->LastMsg(ERROR,"empty or to short notes are not allowed");
-            return(0);
-         }
+         my $effort=Query->Param("effort");
          $note=trim($note);
-         if ($self->getParent->getParent->Action->StoreRecord(
-             $WfRec->{id},"wfreject",
-             {translation=>'base::workflow::request'},$note,undef)){
-            my $openuserid=$WfRec->{openuser};
-            $self->StoreRecord($WfRec,{stateid=>24,fwdtargetid=>$openuserid,
-                                                   fwdtarget=>'base::user',
-                                                   eventend=>NowStamp("en"),
-                                                   fwddebtarget=>undef,
-                                                   fwddebtargetid=>undef});
-
-            $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
-            $self->PostProcess($action.".".$op,$WfRec,$actions,
-                               note=>$note,
-                               fwdtarget=>'base::user',
-                               fwdtargetid=>$openuserid,
-                               fwdtargetname=>"Requestor");
-            return(1);
-         }
-         return(0);
+         my $h=$self->getWriteRequestHash("web");
+         $h->{note}=$note if ($note ne "");
+         $h->{effort}=$effort if ($effort ne "");
+         return($self->nativProcess("wfreject",$h,$WfRec,$actions));
       }
       elsif ($op eq "wfapprovok"){
          my $note=Query->Param("note");
