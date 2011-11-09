@@ -49,6 +49,13 @@ CleanupHistory    (Default = "<now-730d") based on 'cdate'
 These parameters modifies the cleanup handling. The daily cleanup job
 deletes all records with the specified timing parameters.
 
+W5BaseMailAllow
+---------------
+By default, nobody gets mails from the application in test and development
+operation mode. If you specify a list auf mail adresses (semicolon seperated)
+in this config variable, these persons will get mails.
+All other mail adresses will be redirected to @null.com domain.
+
 
 
 Draft (German):

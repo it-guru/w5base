@@ -63,7 +63,6 @@ use kernel::Field::RealEditor;
 use kernel::Field::Import;
 use kernel::Field::Dynamic;
 use kernel::Field::Container;
-use kernel::Field::ContainerList;
 use kernel::Field::KeyHandler;
 use kernel::Field::KeyText;
 use kernel::Field::Mandator;
@@ -502,6 +501,9 @@ sub preProcessFilter
       if (defined($fobj->{vjoinbase})){
          my $base=$fobj->{vjoinbase};
          if (ref($base) eq "HASH"){
+            $base=[$base];
+         }
+         if (ref($base) ne "ARRAY"){
             $base=[$base];
          }
          $fobj->vjoinobj->SetNamedFilter("BASE",@{$base});
