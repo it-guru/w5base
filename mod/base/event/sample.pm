@@ -151,7 +151,7 @@ sub SampleEvent1
    my $self=shift;
    my $p=$self;
 
-   msg(DEBUG,"Start(Event1): ... sleep no");
+   msg(INFO,"Start(Event1): ... sleep no");
    my $now=NowStamp("en");
    msg(DEBUG,"DATE now=".$now);
    msg(DEBUG,"DATE ExpandTimeExpression (default)=".
