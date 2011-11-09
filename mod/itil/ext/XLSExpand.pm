@@ -47,105 +47,60 @@ sub GetKeyCriterion
                'itil::system::ipaddress::name'  =>{label=>'IP-Address',
                                              out=>['itil::appl::name']}
               },
-          out=>{'itil::appl::name'          =>{label=>'IT-Inventar: Application',
-                                               in=>[qw(itil::appl::name
-                                                       itil::system::systemid
-                                                       itil::asset::name
-                                                       itil::system::ipaddress::name
-                                                       itil::system::name)]},
-                'itil::appl::sememail'      =>{label=>'IT-Inventar: Application: CBM E-Mail',
-                                               in=>[qw(itil::appl::name
-                                                       itil::system::systemid
-                                                       itil::asset::name
-                                                       itil::system::ipaddress::name
-                                                       itil::system::name)]},
-                'itil::appl::tsmemail'      =>{label=>'IT-Inventar: Application: TSM E-Mail',
-                                               in=>[qw(itil::appl::name
-                                                       itil::system::systemid
-                                                       itil::asset::name
-                                                       itil::system::ipaddress::name
-                                                       itil::system::name)]},
-                'itil::appl::tsm2email'     =>{label=>'IT-Inventar: Application: Vetreter TSM E-Mail',
-                                               in=>[qw(itil::appl::name
-                                                       itil::system::systemid
-                                                       itil::asset::name
-                                                       itil::system::ipaddress::name
-                                                       itil::system::name)]},
-                'itil::appl::sem'           =>{label=>'IT-Inventar: Application: CBM',
-                                               in=>[qw(itil::appl::name
-                                                       itil::system::systemid
-                                                       itil::asset::name
-                                                       itil::system::ipaddress::name
-                                                       itil::system::name)]},
-                'itil::appl::tsm'           =>{label=>'IT-Inventar: Application: TSM',
-                                               in=>[qw(itil::appl::name
-                                                       itil::system::systemid
-                                                       itil::asset::name
-                                                       itil::system::ipaddress::name
-                                                       itil::system::name)]},
-                'itil::appl::tsm2'          =>{label=>'IT-Inventar: Application: Vetreter TSM',
-                                               in=>[qw(itil::appl::name
-                                                       itil::system::systemid
-                                                       itil::asset::name
-                                                       itil::system::ipaddress::name
-                                                       itil::system::name)]},
-                'itil::appl::businessteam'  =>{label=>'IT-Inventar: Application: Betriebsteam',
-                                               in=>[qw(itil::appl::name
-                                                       itil::system::systemid
-                                                       itil::asset::name
-                                                       itil::system::ipaddress::name
-                                                       itil::system::name)]},
-                'itil::appl::businessteamboss'=>{label=>'IT-Inventar: Application: Betriebsteamleiter',
-                                               in=>[qw(itil::appl::name
-                                                       itil::system::systemid
-                                                       itil::asset::name
-                                                       itil::system::ipaddress::name
-                                                       itil::system::name)]},
-                'itil::appl::applid'        =>{label=>'IT-Inventar: Application: ApplicationID',
-                                               in=>[qw(itil::appl::name
-                                                       itil::system::systemid
-                                                       itil::asset::name
-                                                       itil::system::ipaddress::name
-                                                       itil::system::name)]},
-                'itil::appl::customer'      =>{label=>'IT-Inventar: Application: Kunde',
-                                               in=>[qw(itil::appl::name
-                                                       itil::system::systemid
-                                                       itil::asset::name
-                                                       itil::system::ipaddress::name
-                                                       itil::system::name)]},
-                'itil::appl::customerprio'  =>{label=>'IT-Inventar: Application: Kundenprio',
-                                               in=>[qw(itil::appl::name
-                                                       itil::system::systemid
-                                                       itil::asset::name
-                                                       itil::system::ipaddress::name
-                                                       itil::system::name)]},
-                'itil::appl::criticality'  =>{label=>'IT-Inventar: Application: Kritikalität',
-                                               in=>[qw(itil::appl::name
-                                                       itil::system::systemid
-                                                       itil::asset::name
-                                                       itil::system::ipaddress::name
-                                                       itil::system::name)]},
-                'itil::system::ipaddress::name'   =>{label=>'IT-Inventar: System: IP-Address',
-                                               in=>[qw(itil::appl::name
-                                                       itil::system::systemid
-                                                       itil::asset::name
-                                                       itil::system::ipaddress::name
-                                                       itil::system::name)]},
-                'itil::system::name'        =>{label=>'IT-Inventar: System: Systemname',
-                                               in=>[qw(itil::appl::name
-                                                       itil::system::systemid
-                                                       itil::asset::name
-                                                       itil::system::ipaddress::name
-                                                       itil::system::name)]},
-                'itil::system::osrelease'   =>{label=>'IT-Inventar: System: OS-Release',
-                                               in=>[qw(itil::appl::name
-                                                       itil::system::systemid
-                                                       itil::asset::name
-                                                       itil::system::ipaddress::name
-                                                       itil::system::name)]},
+          out=>{'itil::appl::name'          =>{
+                    label=>'IT-Inventar: Application'
+               },
+                'itil::appl::sememail'      =>{
+                    label=>'IT-Inventar: Application: CBM E-Mail'
+               },
+                'itil::appl::tsmemail'      =>{
+                    label=>'IT-Inventar: Application: TSM E-Mail'
+               },
+                'itil::appl::tsm2email'     =>{
+                    label=>'IT-Inventar: Application: Vetreter TSM E-Mail'
+               },
+                'itil::appl::sem'           =>{
+                    label=>'IT-Inventar: Application: CBM'
+               },
+                'itil::appl::tsm'           =>{
+                    label=>'IT-Inventar: Application: TSM'
+               },
+                'itil::appl::tsm2'          =>{
+                    label=>'IT-Inventar: Application: Vetreter TSM'
+               },
+                'itil::appl::businessteam'  =>{
+                    label=>'IT-Inventar: Application: Betriebsteam'
+               },
+                'itil::appl::businessteamboss'=>{
+                    label=>'IT-Inventar: Application: Betriebsteamleiter'
+               },
+                'itil::appl::applid'        =>{
+                    label=>'IT-Inventar: Application: ApplicationID'
+               },
+                'itil::appl::customer'      =>{
+                    label=>'IT-Inventar: Application: Kunde'
+               },
+                'itil::appl::customerprio'  =>{
+                    label=>'IT-Inventar: Application: Kundenprio'
+               },
+                'itil::appl::criticality'  =>{
+                    label=>'IT-Inventar: Application: Kritikalität'
+               },
+                'itil::system::ipaddress::name'   =>{
+                    label=>'IT-Inventar: System: IP-Address'
+               },
+                'itil::system::name'        =>{
+                    label=>'IT-Inventar: System: Systemname'
+               },
+                'itil::system::systemid'   =>{
+                   label=>'IT-Inventar: System: SystemID'
+               },
+                'itil::system::osrelease'   =>{
+                    label=>'IT-Inventar: System: OS-Release'
+               },
                 'itil::system::location'   =>{
                    label=>'IT-Inventar: System: Location'
-                }
+               }
               }
          };
    return($d);
@@ -312,7 +267,7 @@ sub ProcessLine
          }
       }
    }
-   foreach my $syssekvar (qw(osrelease name location)){
+   foreach my $syssekvar (qw(osrelease name location systemid)){
       if (exists($out->{'itil::system::'.$syssekvar}) &&
           defined($in->{'itil::system::id'})){
          my $sys=$self->getParent->getPersistentModuleObject('itil::system');
@@ -322,7 +277,7 @@ sub ProcessLine
             if ($rec->{$syssekvar} ne ""){
                 $out->{'itil::system::'.$syssekvar}->{$rec->{$syssekvar}}++;
             } 
-        }
+         }
       }
    }
 
@@ -333,6 +288,23 @@ sub ProcessLine
       foreach my $rec ($ipa->getHashList('name')){
          $out->{'itil::system::ipaddress::name'}->{$rec->{'name'}}++;
      }
+   }
+   if (exists($out->{'finance::costcenter::name'}) &&
+       defined($in->{'itil::system::id'})){
+      my $o=$self->getParent->getPersistentModuleObject('itil::lnkapplsystem');
+      my $id=[keys(%{$in->{'itil::system::id'}})];
+      $o->SetFilter({systemid=>$id,
+                     systemcistatusid=>[3,4],
+                     applcistatusid=>[3,4]});
+      foreach my $rec ($o->getHashList(qw(systemconumber applconumber))){
+         if ($rec->{'systemconumber'} ne ""){
+             $out->{'finance::costcenter::name'}->{$rec->{'systemconumber'}}++;
+         } 
+         if ($rec->{'applconumber'} ne ""){
+             $out->{'finance::costcenter::name'}->{$rec->{'applconumber'}}++;
+         } 
+      }
+
    }
 
    return(1);
