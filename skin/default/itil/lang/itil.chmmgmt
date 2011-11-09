@@ -2,3 +2,4 @@
                   en=>'Application - ChangeManagment Data'},
 'fieldgroup.appldata'=>{de=>'Anwendungsdaten',en=>'Applicationdata'},
 'write rejected - please first set chmgmt team'=>{de=>'Schreibzugriff nicht zulässig - bitte erst Changemanager Team eintragen'},
+'Change Management Function Contact'=>{de=>'Changemanagement Funktionskontakt'},
