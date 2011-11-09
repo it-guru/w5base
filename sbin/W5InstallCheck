@@ -152,7 +152,7 @@ foreach my $smod (keys(%{$testapp->{InstallCheck}})){
       foreach my $module ($mod->getMandatoryModules()){
          printf("INFO:  mandatory %-45s...","'$module' for '$smodname'");
          eval("use $module;");
-         ysleep;printResult($@);
+         ysleep;printResult($@,$module);
       }
    }
 }
