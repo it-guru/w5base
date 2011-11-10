@@ -498,7 +498,7 @@ sub getPosibleActions
          push(@l,"nop","wfhardtake");           # workflow !!
       }
    }
-   if (1){
+   if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
       printf STDERR ("WFSTATE:\n".
                      "========\n");
       printf STDERR (" - isininitiatorgroup   : %d\n",$isininitiatorgroup);

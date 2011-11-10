@@ -495,7 +495,8 @@ sub Process
                 {translation=>'base::workflow::request'},$note)){
                $self->StoreRecord($WfRec,$oprec);
                $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
-               $self->PostProcess($action.".".$op,$WfRec,$actions);
+               $self->PostProcess($action.".".$op,$WfRec,$actions,
+                                  note=>$note);
                Query->Delete("note");
                return(1);
             }

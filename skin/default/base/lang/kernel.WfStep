@@ -27,3 +27,4 @@
 'wftakeover'=>{de=>'Übernahme',en=>'Take over'},
 'TakeOverMailMsg'=>{en=>'This workflow has been revoked from you. For further informations feel free to contact me',de=>'Dieser Workflow wurde Ihnen entzogen. Falls Sie weitere Informationen dazu benötigen, kontaktieren Sie mich bitte.'},
 'NOTE: no costcenter allocation posible!'=>{de=>'NOTIZ: keine Zuorndung zu Kostenstelle/CO-Nummer möglich!'},
+'The workflow started by you, has been defered with no comments.'=>{de=>'Der Workflow wurde ohne Komentare zurückgestellt.'},

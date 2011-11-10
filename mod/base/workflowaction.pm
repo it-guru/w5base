@@ -480,12 +480,13 @@ sub NotifyForward
          $subject.=$wfrec->{name};
       }
    }
-
-   msg(INFO,"forward subject: %s",$subject);
-   msg(INFO,"forward    wfid: %s",$wfheadid);
-   msg(INFO,"forward    from: %s",$from);
-   msg(INFO,"forward      to: %s",join(", ",@to));
-   msg(INFO,"forward comment: %s",$comments);
+   if ($self->Config->Param("W5BaseOperationMode") eq "dev"){ 
+      msg(INFO,"forward subject: %s",$subject);
+      msg(INFO,"forward    wfid: %s",$wfheadid);
+      msg(INFO,"forward    from: %s",$from);
+      msg(INFO,"forward      to: %s",join(", ",@to));
+      msg(INFO,"forward comment: %s",$comments);
+   }
    if ($#to==-1){
       msg(ERROR,"no mail send, because there is no target found");
       return;
@@ -735,6 +736,18 @@ sub FinishWrite
       my $fwdtarget=$add{ForwardTarget}->[0];
       my $fwdtargetid=$add{ForwardTargetId}->[0];
       my $fwdname=$add{ForwardToName}->[0];
+      if ($newrec->{name} eq "reactivate"){
+         my $wfheadid=effVal($oldrec,$newrec,"wfheadid");
+         my $wf=getModuleObject($self->Config,"base::workflow");
+         $wf->SetFilter({id=>\$wfheadid});
+         my ($wfrec,$msg)=$wf->getOnlyFirst(qw(fwdtarget fwdtargetid 
+                                               fwdtargetname)); 
+         if (defined($wfrec)){
+            $fwdtarget=$wfrec->{fwdtarget};
+            $fwdtargetid=$wfrec->{fwdtargetid};
+            $fwdname=$wfrec->{fwdtargetname};
+         }
+      }
       my $comments=$newrec->{comments};
       my $wfid=$newrec->{wfheadid};
       if ($fwdtarget ne "" && $fwdtargetid ne ""){
