@@ -1731,8 +1731,8 @@ sub ShowState
    my $filename=$self->getSkinFile("base/img/wfstate$wfstate.gif");
    my %param;
 
-   msg(INFO,"base::worflow ShowState ".
-            "func=$func id=$wfheadid wfstate=$wfstate filename=$filename");
+  # msg(INFO,"base::worflow ShowState ".
+  #          "func=$func id=$wfheadid wfstate=$wfstate filename=$filename");
 
    print $self->HttpHeader("image/gif",%param);
    if (open(MYF,"<$filename")){
