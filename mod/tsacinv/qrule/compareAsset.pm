@@ -222,7 +222,7 @@ sub getW5ACLocationname
          $lrec{country}="DE";
       }
    }
-   $w5loc->Normalize($lrec);
+   $w5loc->Normalize(\%rec);
 #   msg(INFO,"requestrec=%s",Dumper(\%lrec));
    
 
