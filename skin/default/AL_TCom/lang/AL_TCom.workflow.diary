@@ -10,3 +10,5 @@
 
 'Application'=>{de=>'Anwendung'},
 'Worktime'=>{de=>'Arbeitszeit'},
+'Workflow invoice'=>{de=>'Workflow fakturieren'},
+

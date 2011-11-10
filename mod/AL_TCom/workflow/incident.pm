@@ -81,7 +81,7 @@ EOF
    return($self->SUPER::getDynamicFields(%param),
           $self->InitFields(
            new kernel::Field::Select(    name       =>'tcomcodrelevant',
-                                         label      =>'Relevant',
+                                         label      =>'Workflow invoice',
                                          htmleditwidth=>'20%',
                                          value      =>['',qw(yes no)],
                                          group      =>'tcomcod',
@@ -97,7 +97,7 @@ EOF
                                          container  =>'headref'),
 
            new kernel::Field::Textarea(  name        =>'tcomcodcomments',
-                                         label       =>'Comments',
+                                         label       =>'work details',
                                          group       =>'tcomcod',
                                          container   =>'headref'),
 

@@ -263,7 +263,7 @@ sub Result
 
    $self->DataObj->ResetFilter();
    $self->DataObj->SecureSetFilter([\%mainq1]);
-   $self->DataObj->setDefaultView(qw(linenumber p800chk 
+   $self->DataObj->setDefaultView(qw(linenumber p800chk dataissuestate
                      name srcid wffields.tcomcodcause 
                      wffields.tcomworktime wffields.tcomcodcomments));
    my %param=(ExternalFilter=>1);

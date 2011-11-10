@@ -237,7 +237,7 @@ sub getDynamicFields
    return($self->SUPER::getDynamicFields(%param),
           $self->InitFields(
            new kernel::Field::Select(    name       =>'tcomcodrelevant',
-                                         label      =>'Relevant',
+                                         label      =>'Workflow invoice',
                                          htmleditwidth=>'20%',
                                          value      =>['',qw(yes no)],
                                          default    =>'yes',

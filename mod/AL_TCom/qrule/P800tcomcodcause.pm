@@ -54,6 +54,7 @@ sub getPosibleTargets
 {
    return(["AL_TCom::workflow::change",
            "AL_TCom::workflow::incident",
+           "AL_TCom::workflow::businesreq",
            "AL_TCom::workflow::diary"]);
 }
 
@@ -65,6 +66,7 @@ sub qcheckRecord
 
    my $exitcode=0;
    my $desc={qmsg=>[],solvtip=>[]};
+   my @msg;
 
    if ($rec->{stateid}>=17){  # check only closed records
       if ($rec->{affectedcontractid} ne ""){
@@ -88,16 +90,84 @@ sub qcheckRecord
                if ($rec->{tcomcodrelevant} eq "yes"){
                   if ($rec->{tcomcodcause} eq "" || 
                       $rec->{tcomcodcause} eq "undef"){
-                     push(@{$desc->{qmsg}},
-                          'insufficient cause description');
-                     push(@{$desc->{dataissue}},
-                          'insufficient cause description');
+                     push(@msg,'insufficient cause description');
                      $exitcode=3;
+                  }
+                  my $cmt=$rec->{tcomcodcomments};
+                  { # min 15 Zeichen mit 0-9 und a-z Zeichen
+                     my $cmt1=$cmt;
+                     $cmt1=~s/\s//g;
+                     if (!($cmt1=~m/[a-z,0-9]{15,}/i)){
+                        push(@msg,'description of work to short');
+                        $exitcode=3;
+                     }
+                     if ($exitcode<3){
+                        if (!(($cmt1=~m/[0-9]/)&&($cmt1=~m/[a-z]/i))){ 
+                           push(@msg,
+                                'description of work not detailed enougth');
+                           $exitcode=3;
+                        }
+                     }
+                  }
+                  { # max. 1024 Zeichen
+                    if (length($cmt)>1024){
+                        push(@msg,"description of work to long ".
+                                  "(bFlexx can handle max. 1024 char)");
+                        $exitcode=3;
+                    }
+                  }
+                  my $f='\d\d\.\d\d.\d\d\d\d von \d\d:\d\d bis \d\d:\d\d(\n|$)';
+                  if ($rec->{tcomcodcause} eq "appl.add.baseext"){
+                     if (!($cmt=~m/$f/)){
+                        push(@msg,"invalid delivery timerange");
+                        $exitcode=3;
+                     }
+                     $cmt=~s/$f\s*//s;
+                     if (!($rec->{tcomexternalid}=~m/(^|\s)IN:\d{5,8}(\s|$)/)){
+                        push(@msg,"invalid I-Network reference - ExternalID");
+                        $exitcode=3;
+                     }
+                     my $sum=0;
+                     my $z=0;
+                     foreach my $l (split(/[\r\n]+/,$cmt)){
+                        $z++;
+                        $l=~s/\s*$//;
+                        if (length($l)>80){
+                           push(@msg,"detail description line to long: $z");
+                        }
+                        if ($l ne ""){
+                           my $n=1;
+                           my $h=undef;
+                           if (my (undef,$anz)=$l=~
+                               m/(^|\s)(\d+)MA(\s|$)/){
+                              $n=$anz;
+                           }
+                           if (my ($a,$anz,$b)=$l=~
+                               m/(^|\s)(\d+(,\d+){0,1})h(\s|$)/){
+                              $anz=~s/,/./g;
+                              $h=$anz;
+                           }
+                           my $t=$n*($h*60);
+                           $sum+=$t;
+                        }
+                     }
+                     if ($sum!=$rec->{tcomworktime}){
+                        push(@msg,"worktime did not match sum of details");
+                        push(@msg,"worktime:$rec->{tcomworktime} ".
+                                  "!= detail:$sum");
+                        $exitcode=3;
+                     }
                   }
                }
             }
          }
       }
+   }
+   if ($#msg!=-1){
+      push(@msg,"please contact Mr. Grewing Burkhard, ".
+                "if you got questions to this messages");
+      push(@{$desc->{qmsg}},@msg);
+      push(@{$desc->{dataissue}},@msg);
    }
 
    return($exitcode,$desc);
