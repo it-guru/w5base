@@ -156,6 +156,27 @@ sub overviewDataIssue
    }
    push(@l,[$app->T('unprocessed DataIssue Workflows'),
             $dataissues,$color,$delta]);
+
+   my $keyname='base.Workflow.sleep56';
+   my $wfcount=0;
+   if (defined($primrec->{stats}->{$keyname})){
+      $wfcount=$primrec->{stats}->{$keyname}->[0];
+   }
+   if ($wfcount>0){
+      push(@l,[$app->T('workflows untreaded longer then 8 weeks'),
+               $wfcount,"red",undef]);
+   }
+
+   my $keyname='base.Workflow.dead';
+   my $wfcount=0;
+   if (defined($primrec->{stats}->{$keyname})){
+      $wfcount=$primrec->{stats}->{$keyname}->[0];
+   }
+   if ($wfcount>0){
+      push(@l,[$app->T('count of consequent ignored workflow'),
+               $wfcount,"red",undef]);
+   }
+
    return(@l);
 }
 
@@ -349,7 +370,7 @@ sub processData
 
    if (my ($year,$month)=$dstrange=~m/^(\d{4})(\d{2})$/){
       my @wfstat=qw(id eventstart class step eventend stateid
-                             fwdtarget fwdtargetid responsiblegrp);
+                             fwdtarget fwdtargetid responsiblegrp mdate);
      
      
       my $wf=getModuleObject($self->getParent->Config,"base::workflow");
@@ -484,10 +505,8 @@ sub processRecord
                                      "Base.Total.Group.Count",1);
    }
    elsif ($module eq "base::workflow::notfinished"){
-      if ($rec->{class} eq "base::workflow::DataIssue" &&
-          $rec->{stateid}!=5 &&
-          defined($rec->{responsiblegrp})){
-      #   if (ref($rec->{responsiblegrp}) eq "ARRAY"){
+      if ($rec->{class} eq "base::workflow::DataIssue"){
+         if ($rec->{stateid}!=5 && defined($rec->{responsiblegrp})){
             foreach my $resp (@{$rec->{responsiblegrp}}){
                $self->getParent->storeStatVar("Group",$resp,{},
                                               "base.DataIssue.open",1);
@@ -495,8 +514,54 @@ sub processRecord
                                  {maxlevel=>1,method=>'concat'},
                                  "base.DataIssue.IdList.open",$rec->{id});
             }
-      #   }
-         #msg(DEBUG,"response %s\n",Dumper($rec->{responsiblegrp}));
+         }
+      }
+      if ($rec->{stateid}!=5){
+         my @responsiblegrp;
+         if (ref($rec->{responsiblegrp}) eq "ARRAY"){
+            @responsiblegrp=@{$rec->{responsiblegrp}};
+         }
+         elsif ($rec->{fwdtarget} eq "base::grp"){
+            @responsiblegrp=($rec->{fwdtargetname});
+         }
+         elsif ($rec->{fwdtarget} eq "base::user"){
+            @responsiblegrp=("user");
+         }
+         else{
+            @responsiblegrp=("admin");
+         }
+         my $mdate=$rec->{mdate};
+         my $age=0;
+         if ($mdate ne ""){
+            my $d=CalcDateDuration($mdate,NowStamp("en"));
+            $age=$d->{totalminutes};
+         }
+         
+
+         foreach my $resp (@responsiblegrp){
+            $self->getParent->storeStatVar("Group",$resp,{},
+                                           "base.Workflow.open",1);
+            if ($age>259200){ # 1/2 Jahr
+               $self->getParent->storeStatVar("Group",$resp,{},
+                                              "base.Workflow.dead",1);
+            }
+            if ($age>80640){ # 8 Wochen
+               $self->getParent->storeStatVar("Group",$resp,{},
+                                              "base.Workflow.sleep56",1);
+            }
+            if ($age>40320){ # 4 Wochen
+               $self->getParent->storeStatVar("Group",$resp,{},
+                                              "base.Workflow.sleep28",1);
+            }
+            if ($age>20160){ # 2 Wochen
+               $self->getParent->storeStatVar("Group",$resp,{},
+                                              "base.Workflow.sleep14",1);
+            }
+            $self->getParent->storeStatVar("Group",$resp,
+                              {maxlevel=>1,method=>'concat'},
+                              "base.Workflow.IdList.open",$rec->{id});
+            
+         }
       }
       $self->getParent->storeStatVar("Group",["admin"],{},
                                      "Base.Total.Workflow.Active.Count",1);

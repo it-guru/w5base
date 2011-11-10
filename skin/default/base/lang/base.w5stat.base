@@ -8,4 +8,6 @@
 'SubGroups'=>{de=>'Untergruppen'},
 'total Users'=>{de=>'Gesamtanzahl Mitarbeiter'},
 'direct Users'=>{de=>'Mitarbeiter'},
+'workflows untreaded longer then 8 weeks'=>{de=>'Workflows die länger als 8 Wochen unbearbeitet sind'},
+'count of consequent ignored workflow'=>{de=>'konsequent ignorierte Workflows'},
 
