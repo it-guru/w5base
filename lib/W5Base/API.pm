@@ -327,7 +327,7 @@ use Getopt::Long;
 use FindBin qw($RealScript);
 use Config;
 
-$VERSION = "0.5";
+$VERSION = "0.6";
 @ISA = qw(Exporter);
 @EXPORT = qw(&msg &ERROR &WARN &DEBUG &INFO $RealScript
              &XGetOptions
@@ -567,7 +567,7 @@ sub createConfig
       msg(ERROR,$@);
       exit(128);
    }
-   my $SOAP=SOAP::Lite->uri($uri)->proxy($proxy);
+   my $SOAP=SOAP::Lite->uri($uri)->proxy($proxy)->xmlschema("2001");
 
 
 #   my @r=$SOAP->Ping({lang=>\$lang})->result;
