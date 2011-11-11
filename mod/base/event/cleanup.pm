@@ -308,7 +308,7 @@ sub NotifyUser
          $user->SetFilter({userid=>\$userid});
          my ($urec,$msg)=$user->getOnlyFirst(qw(fullname lastlang email
                                                 cistatusid));
-         if (defined($urec) && $urec->{cistatusid}==4){
+         if (defined($urec) && $urec->{cistatusid}==4 && $lrec->{roles} ne ""){
             if ($urec->{lastlang} ne ""){
                $ENV{HTTP_FORCE_LANGUAGE}=$urec->{lastlang};
             }
