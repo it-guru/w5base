@@ -67,7 +67,8 @@ sub qcheckRecord
    $mainuser->ResetFilter();
    $mainuser->SetFilter({userid=>\$rec->{userid}});
    my ($urec)=$mainuser->getOnlyFirst(qw(email surname givenname usertyp 
-                                         groups posix cistatusid lastlogon));
+                                         groups posix cistatusid lastlogon
+                                         fullname));
    if (defined($urec)){ # found correct urec record for user
      # print STDERR Dumper($urec);
       if (defined($urec) && $urec->{email} ne "" &&
@@ -92,18 +93,35 @@ sub qcheckRecord
             }
             if ($urec->{posix} ne "" && $urec->{cistatusid}<6){
                my $old=0;
+               my $age;
                if ($urec->{lastlogon} eq ""){
                   $old=1;
                }
                else{
                   my $d=CalcDateDuration($urec->{lastlogon},NowStamp("en"));
-                  if (!defined($d) || $d->{totalminutes}>80640){ # 8 weeks
+                  if (defined($d)){
+                     $age=$d->{totalminutes};
+                  }
+                  if (!defined($d) || $age>80640){ # 8 weeks
                       $old=1;
                   }
                }
-               if (defined($old) && !($urec->{email}=~m/\@telekom\.de$/i)){
-                  msg(ERROR,"E-Mail '%s' not found in LDAP ".
-                            "but with POSIX entry",$urec->{email});
+               if ($old){
+                  if (!($urec->{email}=~m/\@telekom\.de$/i)){
+                     $wiwusr->Log(ERROR,"basedata",
+                                  "E-Mail '%s' not found in LDAP (WhoIsWho) ".
+                                  "but with POSIX entry",$urec->{email});
+                  }
+                  else{
+                     if (!defined($age) || $age>259200){ # half year
+                        $wiwusr->Log(ERROR,"basedata",
+                            "Contact '%s'\nseems to be an telekom ".
+                            "contact, which have\nleave the organisation.".
+                            "\nPlease check the existence. If he not\n".
+                            "leave the organisation, remove the posix entry.",
+                            $urec->{fullname});
+                     }
+                  }
                }
             }
             return($errorlevel,undef);
