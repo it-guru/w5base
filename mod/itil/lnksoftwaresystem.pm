@@ -116,6 +116,7 @@ sub new
                 name          =>'osrelease',
                 group         =>'link',
                 readonly      =>1,
+                searchable    =>0,
                 htmldetail    =>0,
                 label         =>'OS-Release of logical system',
                 weblinkto     =>'NONE',
@@ -127,6 +128,7 @@ sub new
                 name          =>'osclass',
                 group         =>'link',
                 readonly      =>1,
+                searchable    =>0,
                 htmldetail    =>0,
                 label         =>'OS-Class of logical system',
                 vjointo       =>'itil::osrelease',
@@ -141,12 +143,18 @@ sub new
 
       new kernel::Field::Number(
                 name          =>'syscpucount',
+                readonly      =>1,
+                searchable    =>0,
+                htmldetail    =>0,
                 group         =>'link',
                 label         =>'CPU-Count of logical system',
                 dataobjattr   =>'system.cpucount'),
                                                    
       new kernel::Field::Number(
                 name          =>'asscpucount',
+                readonly      =>1,
+                searchable    =>0,
+                htmldetail    =>0,
                 group         =>'link',
                 label         =>'CPU-Count of asset',
                 dataobjattr   =>'asset.cpucount'),
