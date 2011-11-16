@@ -404,6 +404,11 @@ sub new
                 vjoinon       =>['osreleaseid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::Link(
+                name          =>'osreleaseid',
+                label         =>'OSReleaseID',
+                dataobjattr   =>'system.osrelease'),
+
       new kernel::Field::Select(
                 name          =>'osclass',
                 group         =>'logsys',
@@ -434,11 +439,6 @@ sub new
                                  'lpar',                 # z/os
                                  ],
                 dataobjattr   =>'system.systemtype'),,
-
-      new kernel::Field::Link(
-                name          =>'osreleaseid',
-                label         =>'OSReleaseID',
-                dataobjattr   =>'system.osrelease'),
 
       new kernel::Field::Number(
                 name          =>'cpucount',

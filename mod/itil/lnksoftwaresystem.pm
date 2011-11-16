@@ -111,6 +111,45 @@ sub new
                 name          =>'systemcistatusid',
                 label         =>'SystemCiStatusID',
                 dataobjattr   =>'system.cistatus'),
+
+      new kernel::Field::Text(
+                name          =>'osrelease',
+                group         =>'link',
+                readonly      =>1,
+                htmldetail    =>0,
+                label         =>'OS-Release of logical system',
+                weblinkto     =>'NONE',
+                vjointo       =>'itil::osrelease',
+                vjoinon       =>['osreleaseid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Text(
+                name          =>'osclass',
+                group         =>'link',
+                readonly      =>1,
+                htmldetail    =>0,
+                label         =>'OS-Class of logical system',
+                vjointo       =>'itil::osrelease',
+                weblinkto     =>'NONE',
+                vjoinon       =>['osreleaseid'=>'id'],
+                vjoindisp     =>'osclass'),
+
+      new kernel::Field::Link(
+                name          =>'osreleaseid',
+                label         =>'OSReleaseID',
+                dataobjattr   =>'system.osrelease'),
+
+      new kernel::Field::Number(
+                name          =>'syscpucount',
+                group         =>'link',
+                label         =>'CPU-Count of logical system',
+                dataobjattr   =>'system.cpucount'),
+                                                   
+      new kernel::Field::Number(
+                name          =>'asscpucount',
+                group         =>'link',
+                label         =>'CPU-Count of asset',
+                dataobjattr   =>'asset.cpucount'),
                                                    
       new kernel::Field::Link(
                 name          =>'assetid',
@@ -154,7 +193,9 @@ sub getSqlFrom
             "left outer join system ".
             "on lnksoftwaresystem.system=system.id ".
             "left outer join liccontract ".
-            "on lnksoftwaresystem.liccontract=liccontract.id";
+            "on lnksoftwaresystem.liccontract=liccontract.id ".
+            "left outer join asset ".
+            "on system.asset=asset.id";
    return($from);
 }
 
