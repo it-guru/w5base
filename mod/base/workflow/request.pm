@@ -242,7 +242,7 @@ sub isWriteValid
    my $userid=$self->getParent->getCurrentUserId();
    return(1) if (!defined($rec));
    my @l;
-   if ($rec->{state}==1){
+   if ($rec->{state}==1 || $rec->{state}==4){
       if ($rec->{initiatorid}==$userid){
          push(@l,"default");
       }
@@ -255,9 +255,11 @@ sub isWriteValid
          }
       }
    }
+#   push(@l,"default") if ($rec->{state}<10 && $rec->{state}>1 &&
+#                         ($self->isCurrentForward($rec) ||
+#                          $self->getParent->IsMemberOf("admin")));
    push(@l,"default") if ($rec->{state}<10 && $rec->{state}>1 &&
-                         ($self->isCurrentForward($rec) ||
-                          $self->getParent->IsMemberOf("admin")));
+                          $self->getParent->IsMemberOf("admin"));
    if (grep(/^default$/,@l) &&
        ($self->getParent->getCurrentUserId() != $rec->{initiatorid} ||
         $self->getParent->IsMemberOf("admin"))){
@@ -265,7 +267,7 @@ sub isWriteValid
    }
    if (!grep(/^init$/,@l) && defined($rec)){
       if ($self->isWorkflowManager($rec)){
-         push(@l,"default");
+    #     push(@l,"default");   # wird ab 11/2011 nicht mehr zugelassen!
          if ($self->isCurrentForward($rec)){
             push(@l,"init");
          }
@@ -441,8 +443,10 @@ sub getPosibleActions
        ($iscurrent && $userid==$creator)){
       push(@l,"wfmailsend");   # mail versenden
       push(@l,"wfaddnote");    # notiz hinzufügen        (jeder)
-      push(@l,"wfstartnew");   # neuen Workflow ableiten
-      push(@l,"wfdefer");      # workflow zurückstellen
+      if ($stateid<17){
+         push(@l,"wfstartnew");   # neuen Workflow ableiten
+         push(@l,"wfdefer");      # workflow zurückstellen
+      }
    }
    if (($stateid==2 || $stateid==7 || $stateid==10 || $stateid==5) &&
        ((($lastworker!=$userid) && 
@@ -457,7 +461,9 @@ sub getPosibleActions
    }
    if (($stateid==2 || $stateid==3 || $stateid==4 || $stateid==10) && 
        ($iscurrent || ($isadmin && !$lastworker==$userid))){
-      push(@l,"wfforward"); # workflow weiterleiten   (neuen Bearbeiter setzen)
+      if ($userid!=$creator){
+         push(@l,"wfforward"); # workflow beliebig weiterleiten 
+      }
    }
    if ($isadmin){
       push(@l,"wfforward"); # workflow weiterleiten   (neuen Bearbeiter setzen)
@@ -845,18 +851,26 @@ sub generateWorkspacePages
       $$selopt.="<option value=\"wfreprocess\">".
                 $self->getParent->T("wfreprocess",$tr).
                 "</option>\n";
+      my $note=Query->Param("note");
       my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
          "<td colspan=2><textarea name=note style=\"width:100%;height:100px\">".
-         "</textarea></td></tr>";
+         unHtml($note)."</textarea></td></tr>";
       $d.="<tr><td width=1% nowrap>Weiterleiten an:&nbsp;</td>".
           "<td>\%fwdtargetname(detail)\%".
           "</td>";
       $d.="</tr></table>";
       my $devpartner;
       my $userid=$self->getParent->getParent->getCurrentUserId();
-      if ($userid ne $WfRec->{owner} && $WfRec->{owner} ne ""){
-         my $oo=$self->getParent->getParent->getField("owner");
-         $devpartner=$oo->FormatedDetail($WfRec,"AscV01");
+      CHK: foreach my $arec (reverse(@{$WfRec->{shortactionlog}})){
+          if ($arec->{owner}!=$userid){
+             my $u=getModuleObject($self->Config,"base::user");
+             $u->SetFilter({userid=>\$arec->{owner}});
+             my ($urec,$msg)=$u->getOnlyFirst(qw(fullname)); 
+             if (defined($urec)){
+                $devpartner=$urec->{fullname};
+                last CHK;
+             }
+          }
       }
       if ($devpartner eq ""){
          ($devpartner)=$self->getParent->getDefaultContractor($WfRec,$actions,
@@ -909,7 +923,7 @@ sub generateWorkspacePages
       my $note=Query->Param("note");
       my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
          "<td colspan=2><textarea name=note style=\"width:100%;height:70px\">".
-         $note."</textarea></td></tr>";
+         unHtml($note)."</textarea></td></tr>";
       $d.="<tr><td colspan=2>Ja, ich bin sicher, dass ich diese Anforderung ".
           "genehmigen möchte <input name=VERIFY type=checkbox></td></tr>";
       $d.="</table>";
@@ -1073,11 +1087,10 @@ sub nativProcess
       }
       return(0);
    }
-   elsif ($op eq "wfactivate"){
+   elsif ($op eq "wfactivate" || $op eq "wfreprocess"){
       my ($target,$fwdtarget,$fwdtargetid,$fwddebtarget,
           $fwddebtargetid,@wsref)=
-          $self->getParent->getDefaultContractor($WfRec,$actions,
-                                                 "wfactivate");
+          $self->getParent->getDefaultContractor($WfRec,$actions,$op);
       if (!defined($fwdtargetid)){
          return(0);
       }
@@ -1286,6 +1299,7 @@ sub Process
          if ($self->getParent->getParent->Action->StoreRecord(
              $WfRec->{id},"wfcallback",
              {translation=>'base::workflow::request'},undef,undef)){
+            $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
             $self->StoreRecord($WfRec,{stateid=>4,
                                        fwdtargetid=>$userid,
                                        fwdtarget=>'base::user',

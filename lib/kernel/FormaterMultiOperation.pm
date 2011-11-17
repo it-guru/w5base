@@ -274,6 +274,7 @@ sub ProcessBottom
    my $app=$self->getParent->getParent();
 
    $d.="</table>";
+   $d.="<input type=hidden name=MultiActOperation value=\":doPROCESS:\">";
    $self->Context->{MultiActor}=$self->MultiOperationActor($app);
    $d.=$self->Context->{MultiActor};
    $d.=$app->HtmlBottom(form=>1,body=>1);

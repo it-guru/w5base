@@ -4,12 +4,13 @@ use strict;
 use W5Base::API;
 use Data::Dumper;
 
+my $DefaultInitfileName=".W5Base.Interface";
 my $DefaultBase="https://w5base.net/w5base/auth/";
-my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang);
+my ($help,$verbose,$store,$loginuser,$loginpass,$quiet,$base,$lang,$initfile);
 my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
        "webuser=s"=>\$loginuser,"webpass=s"=> \$loginpass,
        "verbose+"=>\$verbose);
-my $optresult=XGetOptions(\%P,\&Help,undef,undef,".W5Base.Interface");
+my $optresult=XGetOptions(\%P,\&Help,undef,undef,$DefaultInitfileName);
 
 #######################################################################
 # create connection config
@@ -43,7 +44,10 @@ my $WfRec={ class=>'AL_TCom::workflow::businesreq',
             detaildescription=>"Dies ist der lange Text\n".
                                "mit mehreren Zeilen",
             affectedapplication=>'W5Base/Darwin',
+            affectedapplication=>'ADS_WIRK',
             reqdesdate=>'in 2 weeks',
+            extdesc_desstart=>'2003-01-01 14:00:00',
+            extdesc_desend=>'2004-01-01 14:00:00',
             customerrefno=>'11223344'
           };
 
@@ -53,9 +57,13 @@ msg(INFO,"create Workflow");
 if (my $id=$wf->storeRecord($WfRec)){
    msg(INFO,"ok newid=$id");
    $wf->SetFilter({id=>[$id]});
-   foreach my $WfRec ($wf->getHashList(qw(name posibleactions shortactionlog
+   foreach my $WfRec ($wf->getHashList(qw(id name posibleactions shortactionlog
                                           step class))){
       printf("WfRec=%s\n",Dumper($WfRec));
+      my $id=$wf->storeRecord({note=>'Hallo Welt',
+                               extdesc_dependencies=>"Dies ist Z1\nDies ist2\n",                               
+                               action=>'wffollowup'},$WfRec->{id});
+
    }
    $wf->dieOnERROR();
    exit(0);
@@ -71,14 +79,15 @@ sub Help
    print(<<EOF);
 $RealScript [options] FullnameFilter
 
-   --verbose display more details of operation process
-   --quiet   only errors would be displayed
-   --base    base url of filemgmt (default: $DefaultBase)
+   --verbose  display more details of operation process
+   --quiet    only errors would be displayed
+   --base     base url of filemgmt (default: $DefaultBase)
 
-   --webuser username
-   --webpass password
-   --store   stores the parameters (not help,verbose and store)
-   --help    show this help
+   --webuser  username
+   --webpass  password
+   --store    stores the parameters (not help,verbose and store)
+   --initfile use a specific initfile (default: $DefaultInitfileName)
+   --help     show this help
 
 EOF
 }

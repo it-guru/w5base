@@ -174,6 +174,20 @@ sub WorkflowLinkResult
    if (!$h->{IsFrontendInitialized}){
       $h->{IsFrontendInitialized}=$h->FrontendInitialize();
    }
+   if (Query->Param("MultiActOperation") eq ':doPROCESS:'){
+      my $q=Query->MultiVars();
+      my @idl;
+      foreach my $k (keys(%$q)){
+         if (my ($id)=$k=~m/^ACT:(\d+)$/){
+            if ($q->{$k} eq "1" || $q->{$k} eq "on"){
+               push(@idl,$id);
+            }
+         }
+      }
+      $h->ResetFilter();
+      $h->SecureSetFilter({id=>\@idl});
+      return($h->Result(ExternalFilter=>1));
+   }
    if ($h->validateSearchQuery()){
       my %q=$h->getSearchHash();
       my $tt=Query->Param("Search_ListTime");

@@ -379,9 +379,10 @@ sub XGetOptions
    my %param=@_;
    my $optresult;
 
-   $storefile=XGetFQStoreFilename($storefile);
    my $store;
-   $param->{store}=\$store;
+   $param->{store}=\$store if (!defined($param->{store}));
+   my $if;
+   $param->{'initfile=s'}=\$if if (!defined($param->{'initfile=s'}));
 
    if (!($optresult=GetOptions(%$param))){
       if (defined($help)){
@@ -389,6 +390,19 @@ sub XGetOptions
       }
       exit(1);
    }
+   if (${$param->{'initfile=s'}} ne ""){
+      if (! (-r ${$param->{'initfile=s'}})){
+         printf STDERR ("ERROR: can't read initfile '%s'\n",
+                        ${$param->{'initfile=s'}});
+         exit(255);
+      }
+      else{
+         $storefile=${$param->{'initfile=s'}};
+      }
+   }
+
+   $storefile=XGetFQStoreFilename($storefile);
+
    if (defined(${$param->{help}})){
       &$help();
       exit(0);

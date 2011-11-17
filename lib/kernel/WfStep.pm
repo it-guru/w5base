@@ -230,16 +230,19 @@ sub nativProcess
 
       $self->getParent->getFollowupTargetUserids($WfRec,\%param);
 
-     # printf STDERR ("to=%s\n",Dumper($to));
-     # printf STDERR ("cc=%s\n",Dumper($cc));
-
-      if ($self->getParent->getParent->Action->StoreRecord(
-          $WfRec->{id},"wffollowup",
-          {translation=>'base::workflow::request'},$param{note})){
-         $self->PostProcess("SaveStep.".$op,$WfRec,$actions,%param);
-         return(1);
+      if ($self->getParent->handleFollowupExtended($WfRec,$h,\%param)){
+         if ($self->getParent->getParent->Action->StoreRecord(
+             $WfRec->{id},"wffollowup",
+             {translation=>'base::workflow::request'},$param{note})){
+            $self->PostProcess("SaveStep.".$op,$WfRec,$actions,%param);
+            return(1);
+         }
       }
-
+      else{
+         if (!$self->LastMsg()){
+            $self->LastMsg(ERROR,"unknown error in handleFollowupExtended");
+         }
+      }
       return(0);
    }
    elsif ($op eq "wfschedule"){

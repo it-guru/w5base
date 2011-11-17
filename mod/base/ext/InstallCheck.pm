@@ -37,7 +37,7 @@ sub getMandatoryModules
 
 
    return qw(RPC::Smart::Server RPC::Smart::Client 
-             DBI CGI String::Diff
+             DBI CGI String::Diff DBD::mysql
              Fcntl Socket File::Temp IO::Select
              Env::C Safe);
 }

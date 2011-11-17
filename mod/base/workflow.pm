@@ -1491,43 +1491,17 @@ sub Validate
        $mdate eq "" ||
        $duration->{totalseconds}>3600*6){ # recalc group max every 6h
       # no the last responsegroup has to be posible changed
-      my $fwdtargetid=effVal($oldrec,$newrec,"fwdtargetid");
-      my $fwdtarget=effVal($oldrec,$newrec,"fwdtarget");
-      if ($fwdtarget eq "base::grp"){
-         my $grp=getModuleObject($self->Config,"base::grp");
-         $grp->SetFilter({grpid=>\$fwdtargetid});
-         my ($grprec)=$grp->getOnlyFirst(qw(fullname));
-         if (defined($grprec)){
-            $newrec->{responsiblegrp}=[$grprec->{fullname}];
-            $newrec->{responsiblegrpid}=[$fwdtargetid];
-         }
-      }
-      if ($fwdtarget eq "base::user"){
-         my $user=getModuleObject($self->Config,"base::user");
-         $user->SetFilter({userid=>\$fwdtargetid});
-         my ($usrrec)=$user->getOnlyFirst(qw(groups));
-         if (defined($usrrec) && ref($usrrec->{groups}) eq "ARRAY"){
-            my %grp;
-            my %grpid;
-            foreach my $grec (@{$usrrec->{groups}}){
-               if (ref($grec->{roles}) eq "ARRAY"){
-                  if (grep(/^(REmployee|RBoss|RBoss2)$/,@{$grec->{roles}})){
-                     $grp{$grec->{group}}++;
-                     $grpid{$grec->{grpid}}++;
-                  }
-               }
-            }
-            if (keys(%grp)){
-               $newrec->{responsiblegrp}=[keys(%grp)];
-               $newrec->{responsiblegrpid}=[keys(%grpid)];
-            }
-         }
+      my $class=defined($oldrec) && defined($oldrec->{class}) ? 
+                $oldrec->{class} : $newrec->{class};
+      if (defined($self->{SubDataObj}->{$class})){
+         $self->{SubDataObj}->{$class}->recalcResponsiblegrp($oldrec,$newrec);
       }
    }
 #printf STDERR ("fifi Validate %s\n",Dumper($newrec->{kh}));
    #######################################################################
    return($bk);
 }
+
 
 sub FinishWrite
 {

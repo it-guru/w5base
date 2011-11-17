@@ -116,7 +116,8 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("affected","customerdata","tcomcod","init","flow","relations");
+   return("header","default","extdesc","affected",
+          "customerdata","tcomcod","init","flow","relations");
 }
 
 sub getRequestNatureOptions

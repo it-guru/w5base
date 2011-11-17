@@ -123,9 +123,9 @@ sub new
 
 
                   
-                   return("<table>".
-                          "<tr><th align=left>old:</th>".
-                          "<th align=left>new:</th></tr>".
+                   return("<table width=100%>".
+                          "<tr><th align=left width=50%>old:</th>".
+                          "<th align=left width=50%>new:</th></tr>".
                           "<tr><td>$a</td><td>$b</td></tr>".
                           "</table>");
 

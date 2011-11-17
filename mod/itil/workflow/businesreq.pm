@@ -35,6 +35,7 @@ sub Init
 {
    my $self=shift;
    $self->AddGroup("customerdata",translation=>'itil::workflow::businesreq');
+   $self->AddGroup("extdesc",translation=>'itil::workflow::businesreq');
    $self->itil::workflow::base::Init();
    return($self->SUPER::Init(@_));
 }
@@ -46,31 +47,173 @@ sub getDynamicFields
    my $class;
 
    return($self->InitFields(
-      new kernel::Field::Select(  name       =>'reqnature',
-                                  label      =>'Request nature',
-                                  group      =>'customerdata',
-                                  htmleditwidth=>'60%',
+      new kernel::Field::Select(  name          =>'reqnature',
+                                  label         =>'Request nature',
+                                  group         =>'customerdata',
+                                  htmleditwidth =>'60%',
                                   getPostibleValues=>\&XgetRequestNatureOptions,
-                                  container  =>'headref'),
+                                  container     =>'headref'),
 
-      new kernel::Field::Text(    name       =>'customerrefno',
-                                  htmleditwidth=>'150px',
-                                  group      =>'customerdata',
-                                  translation=>'itil::workflow::businesreq',
-                                  searchable =>0,
-                                  expandvar  =>\&expandVar,
-                                  container  =>'headref',
-                                  label      =>'Reference'),
+      new kernel::Field::Text(    name          =>'customerrefno',
+                                  htmleditwidth =>'150px',
+                                  group         =>'customerdata',
+                                  translation   =>'itil::workflow::businesreq',
+                                  searchable    =>0,
+                                  expandvar     =>\&expandVar,
+                                  container     =>'headref',
+                                  label         =>'Reference'),
 
-      new kernel::Field::Text(    name       =>'reqdesdate',
-                                  label      =>'desired date',
-                                  group      =>'default',
-                                  container  =>'headref'),
+      new kernel::Field::Text(    name          =>'reqdesdate',
+                                  label         =>'desired date',
+                                  htmldetail    =>\&showIfFilled,
+                                  group         =>'default',
+                                  container     =>'headref'),
+
+      new kernel::Field::Date(    name          =>'extdescdesstart',
+                                  label         =>'soonest start',
+                                  htmldetail    =>\&showIfFilled,
+                                  group         =>'extdesc',
+                                  container     =>'headref'),
+
+      new kernel::Field::Date(    name          =>'extdescdesend',
+                                  label         =>'latest end',
+                                  htmldetail    =>\&showIfFilled,
+                                  group         =>'extdesc',
+                                  container     =>'headref'),
+
+      new kernel::Field::Select(  name          =>'extdescurgency',
+                                  label         =>'Urgency',
+                                  htmldetail    =>\&showIfFilled,
+                                  group         =>'extdesc',
+                                  value         =>['normal',
+                                                   'emergency'],
+                                  htmleditwidth =>'60%',
+                                  container     =>'headref'),
+
+      new kernel::Field::Textarea(name          =>'extdescdependencies',
+                                  htmleditwidth =>'150px',
+                                  htmldetail    =>\&showIfFilled,
+                                  group         =>'extdesc',
+                                  searchable    =>0,
+                                  container     =>'headref',
+                                  label         =>'Dependencies'),
+
+      new kernel::Field::Textarea(name          =>'extdescpreparation',
+                                  htmleditwidth =>'150px',
+                                  htmldetail    =>\&showIfFilled,
+                                  group         =>'extdesc',
+                                  searchable    =>0,
+                                  container     =>'headref',
+                                  label         =>'Preparation'),
+
+      new kernel::Field::Textarea(name          =>'extdescfallback',
+                                  htmleditwidth =>'150px',
+                                  htmldetail    =>\&showIfFilled,
+                                  group         =>'extdesc',
+                                  searchable    =>0,
+                                  container     =>'headref',
+                                  label         =>'Fallback'),
 
     ),$self->SUPER::getDynamicFields(%param));
 
 
 
+}
+
+sub  recalcResponsiblegrp
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   $self->SUPER::recalcResponsiblegrp($oldrec,$newrec);
+   if (!defined($newrec->{responsiblegrp}) ||
+       $#{$newrec->{responsiblegrp}}==-1){
+      my $applid=effVal($oldrec,$newrec,"affectedapplicationid");
+      my $appl=getModuleObject($self->Config,"itil::appl");
+      $appl->SetFilter({id=>$applid});
+      my ($arec,$msg)=$appl->getOnlyFirst(qw(businessteam businessteamid));
+      if (defined($arec) && $arec->{businessteam} ne ""){
+         $newrec->{responsiblegrp}=[$arec->{businessteam}];
+         $newrec->{responsiblegrpid}=[$arec->{businessteamid}];
+      }
+   }
+}
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $origrec=shift;
+
+   if (exists($newrec->{rfcstart})){
+      $newrec->{reqdesdate}=$newrec->{rfcstart}." GMT";
+   }
+   return($self->SUPER::Validate($oldrec,$newrec,$origrec));
+}
+
+sub validateExtDesc
+{
+   my $self=shift;
+   my $h=shift;
+
+   foreach my $k (keys(%$h)){
+      if ($k=~m/^extdesc/){
+         my $fo=$self->getField("$k");
+         if (!defined($fo)){
+            $self->LastMsg(ERROR,"invalid write in validateExtDesc field $k");
+            return(0);
+         }
+         my $unh=$fo->Unformat([$h->{$k}],$h);
+         if (!defined($unh)){
+            $self->LastMsg(ERROR,"unknown error") if (!$self->LastMsg());
+            return(0);
+         }
+         else{
+            foreach my $k (keys(%$unh)){
+               $h->{$k}=$unh->{$k};
+            } 
+         } 
+         if (!$fo->Validate($h,{$k=>$h->{$k}})){
+            $self->LastMsg(ERROR,"unknown error") if (!$self->LastMsg());
+            return(0);
+         }
+      }
+   }
+   return(1);
+}
+
+sub handleFollowupExtended  # hock to handel additional parameters in followup
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $h=shift;
+   my $param=shift;
+
+   return(0) if (!$self->validateExtDesc($h));
+   my %wr;
+   foreach my $k (%$h){
+      $wr{$k}=$h->{$k} if ($k=~m/^extdesc/);
+   }
+   return(1) if ($self->StoreRecord($WfRec,$WfRec->{step},\%wr));
+   return(0);
+}
+
+
+
+
+
+sub showIfFilled
+{
+   my $self=shift;
+   my $mode=shift;
+   my %param=@_;
+   if (defined($param{current})){
+      my $d=$param{current}->{$self->{name}};
+      return(1) if ($d ne "");
+   }
+   return(0);
 }
 
 sub expandVar
@@ -239,22 +382,25 @@ sub getStepByShortname
 sub isViewValid
 {
    my $self=shift;
-   return($self->SUPER::isViewValid(@_),"affected","customerdata");
+   return($self->SUPER::isViewValid(@_),
+          "affected","customerdata","extdesc");
 }
 
 sub isWriteValid
 {
    my $self=shift;
    my @l=$self->SUPER::isWriteValid(@_);
+   push(@l,"extdesc") if (!defined($_[0]));
    if (grep(/^default$/,@l)){
       push(@l,"customerdata");
+      push(@l,"extdesc");
    }
    return(@l);
 }
 
 sub getDetailBlockPriority            # posibility to change the block order
 {
-   return("header","default","affected","customerdata","init","flow");
+   return("header","default","extdesc","affected","customerdata","init","flow");
 }
 
 sub getRecordImageUrl
@@ -288,6 +434,18 @@ sub WSDLaddNativFieldList
    if ($mode eq "store"){
       $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
                   "name=\"affectedapplication\" type=\"xsd:string\" />";
+      $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
+                  "name=\"extdescdesstart\" type=\"xsd:date\" />";
+      $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
+                  "name=\"extdescdesend\" type=\"xsd:date\" />";
+      $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
+                  "name=\"extdescurgency\" type=\"xsd:string\" />";
+      $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
+                  "name=\"extdescdependencies\" type=\"xsd:string\" />";
+      $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
+                  "name=\"extdescpreparation\" type=\"xsd:string\" />";
+      $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
+                  "name=\"extdescfallback\" type=\"xsd:string\" />";
    }
 
 
@@ -393,6 +551,9 @@ sub nativProcess
       }
       if ($h->{affectedapplicationid} ne ""){
          $flt={id=>\$h->{affectedapplicationid}}; 
+      }
+      if (!$self->getParent->validateExtDesc($h)){
+         return(0);
       }
       if (defined($flt)){
          my $appl=getModuleObject($self->getParent->Config,"itil::appl");
