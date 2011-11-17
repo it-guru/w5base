@@ -544,18 +544,30 @@ sub processRecord
             if ($age>259200){ # 1/2 Jahr
                $self->getParent->storeStatVar("Group",$resp,{},
                                               "base.Workflow.dead",1);
+               $self->getParent->storeStatVar("Group",$resp,
+                                 {maxlevel=>1,method=>'concat'},
+                                 "base.Workflow.dead.id",$rec->{id});
             }
-            if ($age>80640){ # 8 Wochen
+            elsif ($age>80640){ # 8 Wochen
                $self->getParent->storeStatVar("Group",$resp,{},
                                               "base.Workflow.sleep56",1);
+               $self->getParent->storeStatVar("Group",$resp,
+                                 {maxlevel=>1,method=>'concat'},
+                                 "base.Workflow.sleep56.id",$rec->{id});
             }
-            if ($age>40320){ # 4 Wochen
+            elsif ($age>40320){ # 4 Wochen
                $self->getParent->storeStatVar("Group",$resp,{},
                                               "base.Workflow.sleep28",1);
+               $self->getParent->storeStatVar("Group",$resp,
+                                 {maxlevel=>1,method=>'concat'},
+                                 "base.Workflow.sleep28.id",$rec->{id});
             }
-            if ($age>20160){ # 2 Wochen
+            elsif ($age>20160){ # 2 Wochen
                $self->getParent->storeStatVar("Group",$resp,{},
                                               "base.Workflow.sleep14",1);
+               $self->getParent->storeStatVar("Group",$resp,
+                                 {maxlevel=>1,method=>'concat'},
+                                 "base.Workflow.sleep14.id",$rec->{id});
             }
             $self->getParent->storeStatVar("Group",$resp,
                               {maxlevel=>1,method=>'concat'},
