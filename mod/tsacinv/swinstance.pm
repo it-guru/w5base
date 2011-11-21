@@ -120,6 +120,11 @@ sub new
                 label         =>'CostCenterID',
                 dataobjattr   =>'amcostcenter.lcostid'),
 
+      new kernel::Field::Link(
+                name          =>'altbc',
+                label         =>'Alternate BC',
+                dataobjattr   =>'amcostcenter.alternatebusinesscenter'),
+
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
