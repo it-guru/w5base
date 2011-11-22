@@ -65,15 +65,6 @@ sub new
 #                vjoinon       =>['itclustsvcid'=>'id'],
 #                vjoindisp     =>'customer'),
 
-      new kernel::Field::TextDrop(
-                name          =>'liccontract',
-                htmlwidth     =>'100px',
-                AllowEmpty    =>1,
-                label         =>'License contract',
-                vjointo       =>'itil::liccontract',
-                vjoinon       =>['liccontractid'=>'id'],
-                vjoindisp     =>'name'),
-
       new kernel::Field::Select(
                 name          =>'itclustcistatus',
                 readonly      =>1,
@@ -96,6 +87,9 @@ sub new
                                                    
    );
    $self->getField("itclustsvc")->{searchable}=1;
+   $self->getField("cicistatusid")->{dataobjattr}='itclust.cistatus';
+   $self->getField("mandatorid")->{dataobjattr}='itclust.mandator';
+   $self->getField("databossid")->{dataobjattr}='itclust.databoss';
    $self->{history}=[qw(insert modify delete)];
    $self->setDefaultView(qw(software version quantity itclustsvc cdate));
    return($self);
@@ -109,6 +103,7 @@ sub initSearchQuery
      Query->Param("search_itclustcistatus"=>
                   "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
    }
+   $self->SUPER::initSearchQuery();
 }
 
 

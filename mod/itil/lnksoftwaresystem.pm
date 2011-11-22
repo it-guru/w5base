@@ -171,6 +171,9 @@ sub new
                                                    
    );
    $self->getField("system")->{searchable}=1;
+   $self->getField("cicistatusid")->{dataobjattr}='system.cistatus';
+   $self->getField("mandatorid")->{dataobjattr}='system.mandator';
+   $self->getField("databossid")->{dataobjattr}='system.databoss';
    $self->{history}=[qw(insert modify delete)];
    $self->setDefaultView(qw(software version quantity system cdate));
    return($self);
@@ -184,6 +187,7 @@ sub initSearchQuery
      Query->Param("search_systemcistatus"=>
                   "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
    }
+   $self->SUPER::initSearchQuery();
 }
 
 

@@ -926,3 +926,4 @@ create table lnkswinstanceparam (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table lnkapplappl add fromurl varchar(128),add tourl varchar(128),add fromservice varchar(80),add toservice varchar(80),add implapplversion varchar(20),add implproject varchar(40);
 alter table appl   add chmgrfmb     bigint(20) default NULL;
+alter table software add rightsmgmt char(10) default 'OPTIONAL';

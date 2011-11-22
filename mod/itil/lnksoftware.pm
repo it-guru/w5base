@@ -42,7 +42,7 @@ sub new
                 label         =>'LinkID',
                 searchable    =>0,
                 dataobjattr   =>'lnksoftwaresystem.id'),
-                                                 
+
       new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'Fullname',
@@ -60,6 +60,7 @@ sub new
                 name          =>'software',
                 htmlwidth     =>'200px',
                 label         =>'Software',
+                vjoineditbase =>{cistatusid=>[3,4]},
                 vjointo       =>'itil::software',
                 vjoinon       =>['softwareid'=>'id'],
                 vjoindisp     =>'name'),
@@ -156,13 +157,81 @@ sub new
       new kernel::Field::Text(
                 name          =>'insttyp',
                 label         =>'Installationtyp',
+                readonly      =>1,
                 selectfix     =>1,
-                group         =>'releaseinfos',
                 dataobjattr   =>
                    "if (lnksoftwaresystem.system is not null,".
                    "'System',".
                    "'ClusterService')"),
+
+      new kernel::Field::TextDrop(
+                name          =>'liccontract',
+                htmlwidth     =>'100px',
+                AllowEmpty    =>1,
+                label         =>'License contract',
+                vjointo       =>'itil::liccontract',
+                vjoinon       =>['liccontractid'=>'id'],
+                vjoindisp     =>'name'),
+
                                                  
+      new kernel::Field::Mandator(
+                htmldetail    =>0,
+                group         =>'link',
+                readonly      =>1,
+                label         =>'Mandator of relevant Config-Item'),
+
+      new kernel::Field::Link(
+                name          =>'mandatorid',
+                dataobjattr   =>
+                   "if (lnksoftwaresystem.system is not null,".
+                   "system.mandator,".
+                   "itclust.mandator)"),
+
+      new kernel::Field::Select(
+                name          =>'cicistatus',
+                htmldetail    =>0,
+                group         =>'link',
+                readonly      =>1,
+                htmleditwidth =>'40%',
+                label         =>'CI-State of relevant Config-Item',
+                vjoineditbase =>{id=>">0"},
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['cicistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                htmldetail    =>0,
+                name          =>'cicistatusid',
+                dataobjattr   =>
+                   "if (lnksoftwaresystem.system is not null,".
+                   "system.cistatus,".
+                   "itclust.cistatus)"),
+
+      new kernel::Field::Databoss(
+                htmldetail    =>0,
+                group         =>'link',
+                readonly      =>1),
+
+      new kernel::Field::Link(
+                name          =>'databossid',
+                group         =>'link',
+                dataobjattr   =>
+                   "if (lnksoftwaresystem.system is not null,".
+                   "system.databoss,".
+                   "itclust.databoss)"),
+
+      new kernel::Field::TextDrop(
+                name          =>'softwareproducer',
+                label         =>'Software Producer',
+                htmldetail    =>0,
+                vjointo       =>'itil::producer',
+                vjoinon       =>['softwareproducerid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'softwareproducerid',
+                dataobjattr   =>'software.producer'),
+
       new kernel::Field::Select(
                 name          =>'softwarecistatus',
                 group         =>'link',
@@ -178,6 +247,26 @@ sub new
                 name          =>'softwarecistatusid',
                 label         =>'SoftwareCiStatusID',
                 dataobjattr   =>'software.cistatus'),
+
+      new kernel::Field::Select(
+                name          =>'rightsmgmt',
+                label         =>'rights managed',
+                readonly      =>1,
+                htmldetail    =>0,
+                selectfix     =>1,
+                group         =>'link',
+                transprefix   =>'right.',
+                value         =>['OPTIONAL','YES','NO'],
+                translation   =>'itil::software',
+                htmleditwidth =>'100px',
+                dataobjattr   =>'software.rightsmgmt'),
+      
+      new kernel::Field::Textarea(
+                name          =>'rightsmgmtstatus',
+                searchable    =>0,
+                group         =>'link',
+                label         =>'rights management status (BETA!)',
+                onRawValue    =>\&calcRightsMgmtState),
 
       new kernel::Field::Mandator(
                 label         =>'License Mandator',
@@ -205,6 +294,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'liccontractcistatusid',
+                selectfix     =>1,
                 label         =>'LiccontractCiStatusID',
                 dataobjattr   =>'liccontract.cistatus'),
                                                    
@@ -220,12 +310,14 @@ sub new
                                                    
       new kernel::Field::Interface(
                 name          =>'systemid',
+                selectfix     =>1,
                 label         =>'SystemId',
                 dataobjattr   =>'lnksoftwaresystem.system'),
 
       new kernel::Field::Interface(
                 name          =>'itclustsvcid',
                 label         =>'ClusterServiceID',
+                selectfix     =>1,
                 dataobjattr   =>'lnksoftwaresystem.lnkitclustsvc'),
 
       new kernel::Field::Creator(
@@ -284,7 +376,7 @@ sub new
                                                    
    );
    $self->{history}=[qw(insert modify delete)];
-   $self->setDefaultView(qw(software version quantity system cdate));
+   $self->setDefaultView(qw(software softwareproducer version quantity insttyp cdate));
    $self->setWorktable("lnksoftwaresystem");
    return($self);
 }
@@ -299,12 +391,57 @@ sub getSqlFrom
 
    my $from="lnksoftwaresystem left outer join software ".
             "on lnksoftwaresystem.software=software.id ".
+            "left outer join lnkitclustsvc ".
+            "on lnksoftwaresystem.lnkitclustsvc=lnkitclustsvc.id ".
+            "left outer join itclust ".
+            "on lnkitclustsvc.itclust=itclust.id ".
             "left outer join system ".
             "on lnksoftwaresystem.system=system.id ".
             "left outer join liccontract ".
-            "on lnksoftwaresystem.liccontract=liccontract.id";
+            "on lnksoftwaresystem.liccontract=liccontract.id ";
+
    return($from);
 }
+
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_cicistatus"))){
+     Query->Param("search_cicistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
+
+sub calcRightsMgmtState
+{
+   my $self=shift;
+   my $current=shift;
+   my @msg;
+
+   if ($current->{rightsmgmt} eq "YES"){
+      if ($current->{liccontractid} eq ""){
+         push(@msg,"ERROR: ". 
+              $self->getParent->T("missing required license contract"));
+      }
+   }
+   if ($current->{liccontractid} ne ""){
+      if ($current->{cicistatusid}==4){
+         if ($current->{liccontractcistatusid}!=4){
+            push(@msg,"ERROR: ". 
+                 $self->getParent->T("license contract is installed/active"));
+         }
+      }
+   }
+
+   if ($#msg==-1){
+      push(@msg,"OK");
+   }
+   return(join("\n",@msg));
+}
+
+
 
 
 sub Validate
@@ -333,7 +470,7 @@ sub Validate
    }
    my $version=effVal($oldrec,$newrec,"version");
    my $sw=getModuleObject($self->Config,"itil::software");
-   $sw->SetFilter({id=>\$softwareid,cistatusid=>[3,4]});
+   $sw->SetFilter({id=>\$softwareid});
    my ($rec,$msg)=$sw->getOnlyFirst(qw(releaseexp));
    if (!defined($rec)){
       $self->LastMsg(ERROR,"invalid software specified");

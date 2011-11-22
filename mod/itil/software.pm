@@ -108,6 +108,16 @@ sub new
                 label         =>'Documentation significant',
                 dataobjattr   =>'software.docsig'),
 
+      new kernel::Field::Select(
+                name          =>'rightsmgmt',
+                label         =>'rights managed',
+                group         =>'doccontrol',
+                transprefix   =>'right.',              
+                value         =>['OPTIONAL','YES','NO'],
+                translation   =>'itil::software',
+                htmleditwidth =>'100px',
+                dataobjattr   =>'software.rightsmgmt'),
+
       new kernel::Field::Boolean(
                 name          =>'releasesam0',
                 readonly      =>1,
