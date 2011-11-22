@@ -1,0 +1,2 @@
+'itil::qrule::SystemInstalledSoftware'=>{de=>'Überprüfung der Installierten Software am System',en=>'check of installed software at logical system'},
+'an installed software is no longer valid'=>{de=>'Das installierte Software-Produkt ist nicht mehr zulässig'},
