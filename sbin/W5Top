@@ -235,7 +235,10 @@ foreach my $apid (@apid){
                      my $subject=sprintf($act->T(
                         'Kill of query request on module "%s" (PID=%s)',
                         'kernel::w5top'), $modlong,$apid);
-                     $act->Notify("INFO",$subject,$d,%param);
+                     if ($curconfig->Param("W5BaseOperationMode") ne 
+                         "readonly"){
+                        $act->Notify("INFO",$subject,$d,%param);
+                     }
                   }
                   else{
                      printf STDERR ("%s\n",$consolemsg);
