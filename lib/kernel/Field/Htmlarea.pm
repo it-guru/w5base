@@ -38,6 +38,7 @@ sub FormatedDetail
    my $name=$self->Name();
    my $d=$self->RawValue($current);
    $d=$self->FormatedDetailDereferncer($current,$FormatAs,$d);
+   $d=ExpandW5BaseDataLinks($self->getParent,$FormatAs,$d);
    my $lang=$self->getParent->Lang();
    if ($FormatAs eq "HtmlDetail"){
       $d="<table border=0 ".

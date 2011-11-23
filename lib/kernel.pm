@@ -713,7 +713,7 @@ sub _ExpandW5BaseDataLinks
       if (defined($obj)){
          my $idobj=$obj->IdField();
          if (defined($idobj)){
-            $obj->SetFilter({$idobj->Name=>\$id});
+            $obj->SecureSetFilter({$idobj->Name=>\$id});
             my @view=split(/,/,$view);
             my ($trec,$msg)=$obj->getOnlyFirst(@view);
             if (defined($trec)){
@@ -746,8 +746,9 @@ sub ExpandW5BaseDataLinks
    my $self=shift;
    my $FormatAs=shift;
    my $data=shift;
+   return($data) if ($FormatAs ne "HtmlDetail");
 
-   $data=~s#(w5base://([^\/]+)/([^\/]+)/([^\/]+)/(\S+))#_ExpandW5BaseDataLinks($self,$FormatAs,$1,$2,$3,$4,$5)#ge;
+   $data=~s#(w5base://([^\/]+)/([^\/]+)/([^\/]+)/([,0-9,a-z,A-Z_]+))#_ExpandW5BaseDataLinks($self,$FormatAs,$1,$2,$3,$4,$5)#ge;
 
    return($data);
 }
