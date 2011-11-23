@@ -210,6 +210,10 @@ sub Init
                       "itil::lnksoftwaresystem",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.system.software.matrix",
+                      "itil::systemsoftwarematrix",
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("AL_TCom.system.lnksysteminteranswer",
                       "itil::lnksysteminteranswer",
                       defaultacl=>['valid_user']);

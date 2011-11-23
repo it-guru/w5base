@@ -31,6 +31,7 @@
 'itil.system.dnsalias'=>{de=>'DNS-Alias',en=>'DNS-Alias'},
 'itil.system.software'=>{de=>'Softwareinstallation',en=>'Softwareinstallation'},
 'itil.system.software.new'=>{de=>'Neueingabe',en=>'New'},
+'itil.system.software.matrix'=>{de=>'Matrix',en=>'Matrix'},
 'itil.system.jobs'=>{de=>'SystemJob',en=>'SystemJob'},
 'itil.system.jobs.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.system.jobs.lnkjobs'=>{de=>'System Verkn.',en=>'job system link'},

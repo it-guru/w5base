@@ -33,6 +33,7 @@
 'AL_TCom.system.lnksystemcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
 'AL_TCom.system.software'=>{de=>'Softwareinstallation',en=>'Softwareinstallation'},
 'AL_TCom.system.software.new'=>{de=>'Neueingabe',en=>'New'},
+'AL_TCom.system.software.matrix'=>{de=>'Matrix',en=>'Matrix'},
 'AL_TCom.system.lnksysteminteranswer'=>{de=>'Interview',en=>'Interview'},
 'AL_TCom.system.signedfile'=>{de=>'signierte Datei',en=>'signed file'},
 'AL_TCom.asset'=>{de=>'Hardware',en=>'Hardware'},

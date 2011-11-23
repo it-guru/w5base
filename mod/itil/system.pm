@@ -237,7 +237,7 @@ sub new
                 vjoindisp     =>['software','version','quantity','comments'],
                 vjoininhash   =>['softwarecistatusid','liccontractcistatusid',
                                  'liccontractid',
-                                 'software','version','quantity']),
+                                 'software','version','quantity','softwareid']),
 
       new kernel::Field::SubList(
                 name          =>'swinstances',

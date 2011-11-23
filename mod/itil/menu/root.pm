@@ -179,7 +179,11 @@ sub Init
                       "itil::lnksoftwaresystem",
                       func=>'New',
                       defaultacl=>['valid_user']);
-   
+
+   $self->RegisterObj("itil.system.software.matrix",
+                      "itil::systemsoftwarematrix",
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("itil.system.jobs",
                       "itil::systemjob",
                       defaultacl=>['valid_user']);
