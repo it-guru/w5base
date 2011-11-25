@@ -142,6 +142,9 @@ foreach my $apid (@apid){
 foreach my $apid (@apid){
    if ($opt_autokill){
       my $consolemsg="";
+      # fifi
+      #$stat{$apid}->{duration}=99999 if ($stat{$apid}->{user} ne "");
+       
       if ($stat{$apid}->{duration}>600 || $userpcount{$stat{$apid}->{user}}>1){
          my $user=getModuleObject($curconfig,"base::user");
          my $modlong=$user->T($stat{$apid}->{mod},$stat{$apid}->{mod});
@@ -191,24 +194,29 @@ foreach my $apid (@apid){
             }
             else{
                my $cmdresult;
-               my $sudopref="sudo -u '$stat{$apid}->{sysuser}'";
-               my $cmd="$sudopref  kill -0 $apid 2>/dev/null && ".
-                       "$sudopref  kill $apid";
-               $consolemsg.=sprintf("\n   -> initiate \"%s\"\n",$cmd);
-               msg(INFO,"run command '$cmd'");
-               system($cmd);
-               $cmdresult=$?;
-               # check if kill was successfuly
-               if (($? >> 8)==0){  # exit code=0? = kill ging eigentlich
-                  sleep(1);
-                  my $cmd="sudo -u '$stat{$apid}->{sysuser}' ".
-                          "kill -0 $apid >/dev/null";
-                  system($cmd);  # ceck if process runs still
-                  if (($? >> 8)==0){  # exit code=0?
-                     $consolemsg.=sprintf("\n   -> soft kill failed\n");
-                     my $cmd="sudo -u ".
-                             "'$stat{$apid}->{sysuser}' kill -9 $apid";
-                     system($cmd);
+               my $sudopref="sudo -u '$stat{$apid}->{sysuser}' --";
+
+               my $cmd="sudo -u '$stat{$apid}->{sysuser}' ".
+                       "kill -0 $apid >/dev/null 2>&1";
+               system($cmd);  # ceck if process runs still
+               if (($? >> 8)==0){  # exit code=0?
+                  my $cmd="$sudopref kill $apid >/dev/null 2>&1";
+                  $consolemsg.=sprintf("\n   -> initiate \"%s\"\n",$cmd);
+                  msg(INFO,"run command '$cmd'");
+                  system($cmd);
+                  $cmdresult=$?;
+                  # check if kill was successfuly
+                  if (($? >> 8)==0){  # exit code=0? = kill ging eigentlich
+                     sleep(1);
+                     my $cmd="sudo -u '$stat{$apid}->{sysuser}' ".
+                             "kill -0 $apid >/dev/null 2>&1";
+                     system($cmd);  # ceck if process runs still
+                     if (($? >> 8)==0){  # exit code=0?
+                        $consolemsg.=sprintf("\n   -> soft kill failed\n");
+                        my $cmd="sudo -u ".
+                                "'$stat{$apid}->{sysuser}' kill -9 $apid";
+                        system($cmd);
+                     }
                   }
                }
                if ((!($cmdresult == -1)) && $stat{$apid}->{sysuser} ne ""){

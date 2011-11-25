@@ -70,6 +70,8 @@ Support: <a href="mailto:W5Base.Darwin@t-systems.com" style="color:white">W5Base
 </td>
 </tr>
 </table>
+<!-- cache loading img -->
+<img style="width:0;height:0" src="../../../static/base/img/loading.gif">
 
 
 </body>
