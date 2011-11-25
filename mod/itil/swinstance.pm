@@ -670,7 +670,7 @@ sub Validate
       if (exists($newrec->{$v})){
          my $autoname=trim(effVal($oldrec,$newrec,$v));
          my $exp="[a-z,A-Z,0-9,_,\-,\.]+";
-         $exp="[a-z,A-Z,0-9,_,\\\\,\/,\-,\.]+" if ($v eq "configdirpath");
+         $exp="[a-z,A-Z,0-9,_,\\,\/,\-,\.]+" if ($v eq "configdirpath");
          if ($autoname ne ""){
             if (!($autoname=~m/^$exp$/)){
                $self->LastMsg(ERROR,"invalid value in ".$v);
