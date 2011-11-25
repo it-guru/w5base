@@ -237,13 +237,34 @@ sub new
                 label         =>'Software-Installation',
                 group         =>'softwareinst',
                 allowempty    =>1,
-                vjoinbase     =>sub{
+                vjoineditbase     =>sub{
                    my $self=shift;
                    my $current=shift;
                    if ($current->{systemid} ne ""){
                       return({systemid=>\$current->{systemid}});
                    }
                    if ($current->{itclustsid} ne ""){
+                      my $p=$self->getParent();
+                      my $o=getModuleObject($p->Config,"itil::lnkitclustsvc");
+                      $o->SetFilter({id=>\$current->{itclustsid}});
+                      my ($itclrec)=$o->getOnlyFirst(qw(clustid)); 
+                      if (defined($itclrec) && $itclrec->{clustid} ne ""){
+                         my $o=getModuleObject($p->Config,"itil::system");
+                         $o->SetFilter({itclustid=>\$itclrec->{clustid},
+                                        cistatusid=>"<6"});
+                         my @sysid=$o->getVal("id");
+                         if ($#sysid!=-1){
+                            my $o=getModuleObject($p->Config,
+                                  "itil::lnksoftware");
+                            $o->SetFilter([
+                                  {itclustsvcid=>\$current->{itclustsid}},
+                                  {systemid=>\@sysid}]);
+                            my @swinstid=$o->getVal("id");
+                            if ($#swinstid!=-1){
+                               return({id=>\@swinstid});
+                            }
+                         }
+                      }
                       return({itclustsvcid=>\$current->{itclustsid}});
                    }
                    return({id=>\'NONE'});
@@ -330,14 +351,40 @@ sub new
                 name          =>'runonclusts',
                 selectfix     =>1,
                 label         =>'run on Cluster Service',
-                group         =>'misc',
+                group         =>'env',
                 dataobjattr   =>'swinstance.runonclusts'),
 
       new kernel::Field::Text(
                 name          =>'autoname',
-                group         =>'misc',
+                group         =>'env',
                 label         =>'Automationsname/IP-Address',
                 dataobjattr   =>'swinstance.autompartner'),
+
+      new kernel::Field::Select(
+                name          =>'issslinstance',
+                label         =>'Instance uses SSL technologie',
+                transprefix   =>'SSL.',
+                group         =>'env',
+                value         =>['UNKNOWN','YES','NO'],
+                dataobjattr   =>'swinstance.issslinstance'),
+
+      new kernel::Field::Text(
+                name          =>'runtimeusername',
+                label         =>'runtime username',
+                group         =>'env',
+                dataobjattr   =>'swinstance.runtimeusername'),
+
+      new kernel::Field::Text(
+                name          =>'intallusername',
+                label         =>'install username',
+                group         =>'env',
+                dataobjattr   =>'swinstance.installusername'),
+
+      new kernel::Field::Text(
+                name          =>'configdirpath',
+                label         =>'config directory path',
+                group         =>'env',
+                dataobjattr   =>'swinstance.configdirpath'),
 
       new kernel::Field::TextDrop(
                 name          =>'itclusts',
@@ -618,21 +665,23 @@ sub Validate
    my $newrec=shift;
 
 
-   if (exists($newrec->{autoname})){
-      my $autoname=trim(effVal($oldrec,$newrec,"autoname"));
-      if ($autoname ne ""){
-         if ($autoname=~m/\s/ ||
-             !($autoname=~m/^[a-z,A-Z,0-9,_,\-,\.]+$/) ||
-             !($autoname=~m/\./) ||
-              ($autoname=~m/^\./) ||
-              ($autoname=~m/\.$/)){
-            $self->LastMsg(ERROR,"invalid Automationsname");
-            return(0);
+   foreach my $v (qw(autoname runtimeusername intallusername configdirpath)){ 
+      
+      if (exists($newrec->{$v})){
+         my $autoname=trim(effVal($oldrec,$newrec,$v));
+         my $exp="[a-z,A-Z,0-9,_,\-,\.]+";
+         $exp="[a-z,A-Z,0-9,_,\\\\,\/,\-,\.]+" if ($v eq "configdirpath");
+         if ($autoname ne ""){
+            if (!($autoname=~m/^$exp$/)){
+               $self->LastMsg(ERROR,"invalid value in ".$v);
+               return(0);
+            }
+            $newrec->{$v}=lc($autoname) if ($v eq "autoname" &&
+                                            $newrec->{$v} ne $autoname)
          }
-         $newrec->{autoname}=lc($autoname);
-      }
-      else{
-         $newrec->{autoname}=undef;
+         else{
+            $newrec->{$v}=undef;
+         }
       }
    }
 
@@ -783,7 +832,7 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   my @all=qw(header default adm sec ssl misc history
+   my @all=qw(header default adm sec ssl misc env history
               softwareinst contacts attachments source swinstanceparam);
    if (defined($rec) && $rec->{'runonclusts'}){
       push(@all,"cluster");
@@ -804,7 +853,7 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default adm systems contacts ssl misc 
+   my @databossedit=qw(default adm systems contacts ssl env misc 
                        softwareinst
                        attachments cluster sec);
    if (!defined($rec)){
@@ -852,8 +901,8 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default adm sec ssl misc cluster 
-             systems softwareinst contacts swinstanceparam attachments source));
+   return(qw(header default adm sec env misc cluster 
+             systems softwareinst contacts swinstanceparam ssl attachments source));
 }
 
 

@@ -6,4 +6,36 @@ Von der W5Base wird dieser Name nicht
 verwendet. Er dient als Datenbasis
 für externe Automation.
 '},
+'runtimeusername'=>{de=>'
+Ist der User-Account, unter dem die
+Anwendung auf dem Server/System
+ausgeführt wird (runtime user).
+z.B. "oracle" bei Oracle Datenbanken
+',
+en=>'
+is the system username, in witch
+security context the application
+will be executed.
+'},
+'installusername'=>{de=>'
+Ist der User-Account, unter dem die
+Anwendung auf dem Server/System
+installiert wird (install user).
+z.B. "orainst" bei Oracle Datenbanken
+',
+en=>'
+is the system username, in witch
+security context the application
+has been installed.
+'},
+'configdirpath'=>{de=>'
+Verzeichnisname/Pfad, in dem die
+Instanz ihre Config-Dateien bzw.
+Umgebungsdaten hinterlegt hat.
+',
+en=>'
+directory in which the instance
+has stored her config and 
+enviroment informations.
+'},
 

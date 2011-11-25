@@ -88,7 +88,11 @@ sub getPostibleValues
       }
       if ($mode eq "edit"){
          if (defined($self->{vjoineditbase})){
-            $self->vjoinobj->SetNamedFilter("editbase",$self->{vjoineditbase});
+            my $base=$self->{vjoineditbase};
+            if (ref($base) eq "CODE"){
+               $base=&{$base}($self,$current);
+            }
+            $self->vjoinobj->SetNamedFilter("editbase",$base);
          }
       }
       #$self->vjoinobj->SetFilter({$self->{vjoinon}->[1]=>

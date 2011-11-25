@@ -53,7 +53,8 @@ sub new
                    "if (lnksoftwaresystem.version<>'',".
                    "concat('-',lnksoftwaresystem.version),''),".
                    "if (lnksoftwaresystem.system is not null,".
-                   "' (system installed)',".
+                   "concat(' (system installed\@',system.name,')'),".
+ 
                    "' (cluster service installed)'))"),
                                                  
       new kernel::Field::TextDrop(
@@ -264,6 +265,7 @@ sub new
       new kernel::Field::Textarea(
                 name          =>'rightsmgmtstatus',
                 searchable    =>0,
+                htmldetail    =>0,
                 group         =>'link',
                 label         =>'rights management status (BETA!)',
                 onRawValue    =>\&calcRightsMgmtState),
