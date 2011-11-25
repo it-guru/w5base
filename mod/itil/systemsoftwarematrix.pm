@@ -94,6 +94,7 @@ sub calcFieldListInMatrix
          $f{name}=$hflt->{swinstmatrix};
          delete($hflt->{swinstmatrix});
       }
+      $f{cistatusid}=[3,4,5];
       my $p=$self->getParent();
       my $sw=getModuleObject($p->Config,"itil::software");
       $sw->SecureSetFilter(\%f);
