@@ -373,6 +373,10 @@ sub getSqlSelect
    }
    if ($#cmd>0){
       map({$_="(".$_.")"} @cmd);
+      if (defined($self->{DB}->{db}) &&
+          lc($self->{DB}->{db}->{Driver}->{Name}) eq "mysql"){
+         return(join(" union ",@cmd)." limit $limitnum");
+      }
    }
 
    return(join(" UNION ",@cmd));
