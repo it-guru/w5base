@@ -47,6 +47,43 @@ sub vjoinobjInit
    return($self->SUPER::vjoinobjInit());
 }
 
+sub FormatForHtmlPublicDetail
+{
+   my $self=shift;
+   my $rec=shift;
+   my $ntypes=shift;
+   my $app=$self->getParent();
+
+   my $k=$self->{name};
+   my $d="";
+
+   if (exists($rec->{$k}) && ref($rec->{$k}) eq "ARRAY"){
+      foreach my $prec (@{$rec->{$k}}){
+         if (grep(/^$prec->{name}$/,@$ntypes)){
+            my $phonelabel=$prec->{shortedcomments};
+            if ($phonelabel=~m/^\s*$/){
+               $phonelabel=$app->T($prec->{name},
+                              $app->Self,"base::phonelnk");
+            }
+            if (ref($app->{PhoneLnkUsage}) eq "CODE"){
+               my %tr=&{$app->{PhoneLnkUsage}}($app);
+               if (exists($tr{$phonelabel})){
+                  $phonelabel=$tr{$phonelabel};
+               }
+            }
+            $d.="<tr><td valign=top>$phonelabel</td>";
+            $d.="<td valign=top>$prec->{phonenumber}</td></tr>";
+         }
+      }
+   }
+   if ($d ne ""){
+      $d="<tr height=1><td height=1><img src=\"../../base/load/empty.gif\" ".
+          "width=180 height=1></td><td height=1></td></tr>".$d;
+   }
+   return($d);
+}
+
+
 
 
 

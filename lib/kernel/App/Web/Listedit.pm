@@ -1262,6 +1262,18 @@ sub ProcessDataModificationOP
    return($op);
 }
 
+#sub HtmlPublicDetail   # for display record in QuickFinder or with no access
+#{
+#   my $self=shift;
+#   my $rec=shift;
+#   my $header=shift;   # create a header with fullname or name
+#
+#   return("No Public view of record available");
+#
+#}
+
+
+
 sub HtmlDetail
 {
    my $self=shift;
@@ -1294,6 +1306,7 @@ sub Detail
    my $self=shift;
    my %param=@_;
 
+
    my %flt=$self->getSearchHash();
    $self->ResetFilter();
    if ($self->SecureSetFilter(\%flt)){
@@ -1313,11 +1326,31 @@ sub Detail
       print $self->HtmlHeader(style=>['default.css','mainwork.css',
                                       'kernel.TabSelector.css',
                                       '../../../static/lytebox/lytebox.css'],
+                              js=>['toolbox.js','kernel.App.Web.js'],
                               body=>1,form=>1);
       if (!defined($rec)){
-         print $self->getParsedTemplate("tmpl/kernel.notfound",{skinbase=>'base'});
-         print $self->HtmlBottom(body=>1,form=>1);
-         return();
+         $self->ResetFilter();
+         if ($self->SetFilter(\%flt)){
+            $self->SetCurrentOrder("NONE");
+            my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
+            if (!defined($rec)){
+               print $self->getParsedTemplate(
+                         "tmpl/kernel.notfound",{skinbase=>'base'});
+               print $self->HtmlBottom(body=>1,form=>1);
+               return();
+            }
+            else{
+               if ($self->can("HtmlPublicDetail")){
+                  print($self->HtmlPublicDetail($rec,1));
+               }
+               else{
+                  print "<center>ERROR: Record exists, ".
+                        "but you have not rights to view it!</center>";
+               }
+               print $self->HtmlBottom(body=>1,form=>1);
+               return();
+            }
+         }
       }
       my $idobj=$self->IdField();
       my $parentid;

@@ -86,30 +86,7 @@ sub QuickFindDetail
       if (defined($secrec)){
          $htmlresult.=$self->addDirectLink($appl,search_id=>$id);
       }
-      $htmlresult.="<table>\n";
-      my @l=qw(sem sem2 delmgr delmgr2 tsm tsm2 databoss businessteam);
-      foreach my $v (@l){
-         if ($rec->{$v} ne ""){
-            my $name=$appl->getField($v)->Label();
-            my $data=$appl->findtemplvar({current=>$rec,mode=>"Html"},
-                                         $v,"formated");
-            $htmlresult.="<tr><td nowrap valign=top width=1%>$name:</td>".
-                         "<td valign=top>$data</td></tr>\n";
-         }
-      }
-      $htmlresult.=$self->addPhoneNumbers($appl,$rec,"phonenumbers",
-                                          ["phoneRB"]);
-      $htmlresult.="</table>\n";
-      if ($rec->{description} ne ""){
-         my $desclabel=$appl->getField("description")->Label();
-         my $desc=$rec->{description};
-         $desc=~s/\n/<br>\n/g;
-        
-         $htmlresult.="<table><tr><td>".
-                      "<div style=\"height:60px;overflow:auto;color:gray\">".
-                      "\n<font color=black>$desclabel:</font><div>\n$desc".
-                      "</div></div>\n</td></tr></table>";
-      }
+      $htmlresult.=$appl->HtmlPublicDetail($rec,0);
    }
    return($htmlresult);
 }
