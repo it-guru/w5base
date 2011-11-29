@@ -1328,8 +1328,8 @@ sub Detail
                                       '../../../static/lytebox/lytebox.css'],
                               js=>['toolbox.js','kernel.App.Web.js'],
                               body=>1,form=>1);
-      if (!defined($rec)){
-         $self->ResetFilter();
+      if (!defined($rec)){       # fix to check, if record exists
+         $self->ResetFilter();   # but current user have not sufficient rights
          if ($self->SetFilter(\%flt)){
             $self->SetCurrentOrder("NONE");
             my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
