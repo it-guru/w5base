@@ -1089,8 +1089,32 @@ sub nativProcess
    }
    elsif ($op eq "wfactivate" || $op eq "wfreprocess"){
       my ($target,$fwdtarget,$fwdtargetid,$fwddebtarget,
-          $fwddebtargetid,@wsref)=
-          $self->getParent->getDefaultContractor($WfRec,$actions,$op);
+          $fwddebtargetid,@wsref);
+      if (exists($h->{fwdtargetname}) && lc($h->{fwdtargetname}) eq "default"){
+         delete($h->{fwdtargetname});
+      }
+      if ($op eq "wfreprocess" && exists($h->{fwdtargetname})){
+         my $fobj=$self->getParent->getField("fwdtargetname");
+         my $newrec;
+         if ($newrec=$fobj->Validate($WfRec,$h)){
+            if (!defined($newrec->{fwdtarget}) ||
+                !defined($newrec->{fwdtargetid} ||
+                $newrec->{fwdtargetid}==0)){
+               if ($self->LastMsg()==0){
+                  $self->LastMsg(ERROR,
+                        $self->T("invalid forwarding target","kernel::WfStep"));
+               }
+               return(0);
+            }
+            $fwdtarget=$newrec->{fwdtarget};
+            $fwdtargetid=$newrec->{fwdtargetid};
+         }
+      }
+      if (!defined($fwdtarget)){
+         ($target,$fwdtarget,$fwdtargetid,$fwddebtarget,
+             $fwddebtargetid,@wsref)=
+             $self->getParent->getDefaultContractor($WfRec,$actions,$op);
+      }
       if (!defined($fwdtargetid)){
          return(0);
       }
@@ -1101,6 +1125,7 @@ sub nativProcess
                                     fwddebtarget=>$fwddebtarget,
                                     fwddebtargetid=>$fwddebtargetid,
                                     eventstart=>NowStamp("en"),
+                                    eventend=>undef,
                                     closedate=>undef})){
          if ($self->getParent->getParent->Action->StoreRecord(
              $WfRec->{id},"wfactivate",
@@ -1311,12 +1336,12 @@ sub Process
          }
          return(0);
       }
-      elsif ($op eq "wfactivate"){
+      elsif ($op eq "wfactivate" || $op eq "wfreprocess"){
          my $note=Query->Param("note");
          $note=trim($note);
          my $h=$self->getWriteRequestHash("web");
          $h->{note}=$note if ($note ne "");
-         return($self->nativProcess("wfactivate",$h,$WfRec,$actions));
+         return($self->nativProcess($op,$h,$WfRec,$actions));
       }
       elsif ($op eq "wfapprovalreq"){
          my $note=Query->Param("note");
