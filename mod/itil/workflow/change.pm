@@ -304,7 +304,7 @@ sub getFollowupTargetUserids
                }
             }
          }
-         push(@{$param->{addcctarget}},"11634953080001"); # in test phase add hv
+         push(@{$param->{addcctarget}});
       }
    }
 }
