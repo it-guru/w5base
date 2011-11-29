@@ -106,13 +106,11 @@ sub new
                 label         =>'allow business request workflows',
                 container     =>'additional'),
 
-      new kernel::Field::Select(
-                name          =>'opmode',
-                translation   =>'itil::appl',
-                label         =>'primary operation mode',
-                transprefix   =>'opmode.',
-                dataobjattr   =>'appl.opmode'),
-
+      new kernel::Field::Import( $self,
+                vjointo       =>'itil::appl',
+                group         =>'default',
+                dontrename    =>1,
+                fields        =>[qw(opmode)]),
 
       new kernel::Field::Interface(
                 name          =>'cistatusid',   # function is needed to 
