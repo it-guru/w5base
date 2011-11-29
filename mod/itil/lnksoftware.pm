@@ -72,13 +72,6 @@ sub new
                 label         =>'Version',
                 dataobjattr   =>'lnksoftwaresystem.version'),
                                                    
-      new kernel::Field::Number(
-                name          =>'quantity',
-                htmlwidth     =>'40px',
-                precision     =>2,
-                label         =>'Quantity',
-                dataobjattr   =>'lnksoftwaresystem.quantity'),
-                                                   
       new kernel::Field::TextDrop(
                 name          =>'system',
                 htmlwidth     =>'100px',
@@ -168,12 +161,21 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'liccontract',
                 htmlwidth     =>'100px',
+                group         =>'lic',
                 AllowEmpty    =>1,
                 label         =>'License contract',
                 vjointo       =>'itil::liccontract',
                 vjoinon       =>['liccontractid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::Number(
+                name          =>'quantity',
+                htmlwidth     =>'40px',
+                group         =>'lic',
+                precision     =>2,
+                label         =>'Quantity',
+                dataobjattr   =>'lnksoftwaresystem.quantity'),
+                                                   
                                                  
       new kernel::Field::Mandator(
                 htmldetail    =>0,
@@ -561,7 +563,9 @@ sub isWriteValid
    $rw=1 if (defined($rec) && $self->isParentWriteable($rec->{systemid},
                                                        $rec->{itclustsvcid}));
    $rw=1 if ((!$rw) && ($self->IsMemberOf("admin")));
-   return("default","misc") if ($rw);
+   if ($rw){
+      return("default","lic","misc");
+   }
    return(undef);
 }
 
@@ -597,7 +601,7 @@ sub isParentWriteable  # Eltern Object Schreibzugriff prüfen
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default useableby misc link releaseinfos source));
+   return(qw(header default lic useableby misc link releaseinfos source));
 }
 
 
