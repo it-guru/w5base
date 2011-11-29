@@ -1262,15 +1262,39 @@ sub ProcessDataModificationOP
    return($op);
 }
 
-#sub HtmlPublicDetail   # for display record in QuickFinder or with no access
-#{
-#   my $self=shift;
-#   my $rec=shift;
-#   my $header=shift;   # create a header with fullname or name
-#
-#   return("No Public view of record available");
-#
-#}
+sub HtmlPublicDetail   # for display record in QuickFinder or with no access
+{
+   my $self=shift;
+   my $rec=shift;
+   my $header=shift;   # create a header with fullname or name
+   my $htmlresult="";
+
+   if ($header){
+      $htmlresult.="<table width=100% style='margin:5px'>\n";
+    
+      my $fo=$self->getRecordHeaderField();
+    
+      if (defined($fo)){
+         $htmlresult.="<tr><td colspan=2 align=center><h2>";
+         $htmlresult.=$self->findtemplvar({current=>$rec,mode=>"Html"},
+                                         $fo->Name(),"formated");
+         $htmlresult.="</h2></td></tr>";
+      }
+   }
+   else{
+      $htmlresult.="<table width=100%>\n";
+   }
+   $htmlresult.="<tr><td colspan=2 align=center>";
+   $htmlresult.="ERROR: ".
+                $self->T("you have not the nessary rights to view this record");
+   $htmlresult.="</td></tr>";
+   $htmlresult.="</table>";
+
+   return($htmlresult);
+
+
+
+}
 
 
 
