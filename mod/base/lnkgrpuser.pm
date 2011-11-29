@@ -18,7 +18,6 @@ package base::lnkgrpuser;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
@@ -71,6 +70,7 @@ sub new
             my $oldrec=shift;
             my $newrec=shift;
             my $myname=$self->Name();
+            return(undef) if (!defined($newrec) || !exists($newrec->{$myname}));
             my $oldval=$oldrec->{$myname} if (defined($oldrec) && 
                                               exists($oldrec->{$myname}));
             my $newval=$newrec->{$myname} if (defined($newrec) && 
@@ -247,7 +247,6 @@ sub new
 
       new kernel::Field::Textarea(
                 name          =>'comments',
-                searchable    =>0,
                 label         =>'Comments',
                 dataobjattr   =>'lnkgrpuser.comments'),
 
