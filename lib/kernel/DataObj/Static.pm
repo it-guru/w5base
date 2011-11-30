@@ -93,6 +93,34 @@ sub getFirst
 {
    my $self=shift;
    $self->{'Pointer'}=0;
+
+#
+#   ## hier muss bei Gelegenheit mal ein Order Verfahren rein!
+#
+#   my @l=0..$#{$self->data};
+#
+#   printf STDERR ("fifi l=%s\n",Dumper(\@l));
+#
+#   my @o=$self->GetCurrentOrder();
+#   if (!($#o==0 && uc($o[0]) eq "NONE")){
+#      if ($#o==-1 || ($#o==0 && $o[0] eq "")){
+#         @o=$self->getCurrentView();
+#      }
+#   }
+#   @o=grep(!/^linenumber$/,@o);
+#   my @orderbuf;
+##   for(my $c=0;$c<=$#{$self->data};$c++){
+#      push(@orderbuf,{
+#         id=>$c,
+#         ostring=>join(";",map({
+#            my $d=$self->data->[$c]->{$_};
+#            $d=join("|",sort(@$d)) if (ref($d) eq "ARRAY");
+#            $d;
+#         } @o)),
+#      });
+#   }
+
+
    while(!($self->CheckFilter()) && 
          defined($self->data->[$self->{'Pointer'}])){ 
       $self->{'Pointer'}++;
