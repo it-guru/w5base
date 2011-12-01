@@ -456,7 +456,9 @@ sub getPosibleActions
       push(@l,"wfaccept");  # workflow annehmen              (durch Bearbeiter)
       push(@l,"wfacceptp"); # workflow annehmen und bearbeit.(durch Bearbeiter)
       push(@l,"wfacceptn"); # workflow annehmen und notiz anf(durch Bearbeiter)
-      push(@l,"wfreject");  # workflow bearbeitung abgelehnt (durch Bearbeiter)
+      if ($userid!=$creator){
+         push(@l,"wfreject"); #workflow bearbeitung abgelehnt (durch Bearbeiter)
+      }
       push(@l,"wfdefer");      # workflow zurückstellen
    }
    if (($stateid==2 || $stateid==3 || $stateid==4 || $stateid==10) && 
@@ -478,9 +480,40 @@ sub getPosibleActions
    #push(@l,"wfdisapprove"); # workflow genehmigung ablehnen  (durch Aprover)
    #push(@l,"wfreqapprove"); # genehmigung anfordern bei      (durch Bearbeiter)
    if (($stateid==16 && ($userid==$creator || $isadmin))||
-       ($iscurrent && $userid==$creator)){
+       ($iscurrent && ($userid==$creator|| $isininitiatorgroup))){
       if (!grep(/^wfforward$/,@l)){
-         push(@l,"wfreprocess");# Nachbesserung notwendig     (durch Anforderer)
+         # check if others then initiator are involved
+         my $foundothers=0;
+         my $reprocount=0;
+         foreach my $action (@{$WfRec->{shortactionlog}}){
+            if ($action->{creator}!=$creator){
+               $foundothers=1;
+            }
+            if ($action->{name} eq "wfactivate"){
+               $reprocount++;
+            }
+         }
+         if ($reprocount<5){
+            if ($foundothers){ 
+               # check against invoicedate
+               my $reprook=1;
+               if ($WfRec->{invoicedate} ne ""){
+                  my $duration=CalcDateDuration($WfRec->{invoicedate},
+                                                NowStamp("en"));
+                  if (defined($duration) && 
+                      $duration->{totaldays}>14){
+                     $reprook=0;
+                  }
+               }
+               if ($reprook){
+                  push(@l,"wffollowup"); # Nachtrag 
+                  push(@l,"wfreprocess");# Zuweisen zur Nachbesserung 
+               }
+            }                            # notwendig (durch Anforderer)
+            else{                        # aber nur max 5mal und nicht laenger
+               push(@l,"wfactivate");    # als 14 Tage nach Faktura Referenz
+            }                            # Zeitpunkt
+         }
       }
       push(@l,"wffine");     # Workflow erfolgreich beenden   (durch Anforderer)
    }
@@ -1109,6 +1142,9 @@ sub nativProcess
             $fwdtarget=$newrec->{fwdtarget};
             $fwdtargetid=$newrec->{fwdtargetid};
          }
+         else{
+            return(0);
+         }
       }
       if (!defined($fwdtarget)){
          ($target,$fwdtarget,$fwdtargetid,$fwddebtarget,
@@ -1139,7 +1175,7 @@ sub nativProcess
                                                        $target,$targetid);
                }
             }
-            $self->PostProcess($op,$WfRec,$actions,
+            $self->PostProcess("SaveStep.".$op,$WfRec,$actions,
                                note=>$h->{note},
                                fwdtarget=>$fwdtarget,
                                fwdtargetid=>$fwdtargetid,
@@ -1341,7 +1377,7 @@ sub Process
          $note=trim($note);
          my $h=$self->getWriteRequestHash("web");
          $h->{note}=$note if ($note ne "");
-         return($self->nativProcess($op,$h,$WfRec,$actions));
+         return($self->nativProcess("SaveStep.".$op,$h,$WfRec,$actions));
       }
       elsif ($op eq "wfapprovalreq"){
          my $note=Query->Param("note");
@@ -1441,6 +1477,7 @@ sub PostProcess
    my $aobj=$self->getParent->getParent->Action();
    my $workflowname=$self->getParent->getWorkflowMailName();
 
+printf STDERR ("fifi PostProcess for action=$action\n");
    if ($action eq "SaveStep.wfapprovalreq"){
       $aobj->NotifyForward($WfRec->{id},
                            $param{fwdtarget},

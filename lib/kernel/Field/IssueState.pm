@@ -119,20 +119,36 @@ $dispmsg
                   }
                }
                #$dispmsg=Dumper($res);
-               if ($dispmsg ne ""){
-                  $dispmsg="<div id=qmsg style='position:absolute;left:15px;top:20px;background-color:yellow;height:100px;overflow:auto;width:450px;border-style:solid;border-color:black;border-width:1px;text-align:left;visibility:hidden;display:none'>".
-                           $dispmsg."</div>";
-               }
                #print STDERR "qcheckresupt=".Dumper($res);
                if ($res->{exitcode}>0){
-                  $response->{document}->{HtmlV01}="FAIL";
+                  my $color="green";
+                  my $bgcolor="white";
+                  if ($res->{exitcode}==1){
+                     $response->{document}->{HtmlV01}="INFO";
+                     $color="black";
+                  }
+                  elsif ($res->{exitcode}==2){
+                     $response->{document}->{HtmlV01}="WARN";
+                     $color="orange";
+                     $bgcolor="#F6FACE";
+                  }
+                  else{
+                     $response->{document}->{HtmlV01}="FAIL";
+                     $color="red";
+                     $bgcolor="#F6E7DC";
+                  }
+                  if ($dispmsg ne ""){
+                     $dispmsg="<div id=qmsg style='position:absolute;left:15px;top:20px;background-color:$bgcolor;height:100px;overflow:auto;width:450px;border-style:solid;border-color:black;border-width:1px;text-align:left;visibility:hidden;display:none'>".
+                     $dispmsg."</div>";
+                  }
+                  
                   $response->{document}->{HtmlDetail}="
 <div onmouseout='var e=document.getElementById(\"qmsg\");e.style.visibility=\"hidden\";e.style.display=\"none\";' onmouseover='var e=document.getElementById(\"qmsg\");e.style.visibility=\"visible\";e.style.display=\"block\";' style='cursor:pointer' >
 <table cellspacing=0 cellpadding=0 border=0>
 <tr>
 <td>
 <img style=\"margin:2px\" src=\"../../base/load/attention.gif\"></td>
-<td valign=center><font color=red><b>DataIssue</b></font></td>
+<td valign=center><font color=\"$color\"><b>DataIssue</b></font></td>
 </tr></table>
 
 $dispmsg

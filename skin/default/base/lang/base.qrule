@@ -2,3 +2,4 @@
 'fail'=>{de=>'fehlgeschlagen'},
 'messy'=>{de=>'unschön'},
 'posible Target'=>{de=>'mögliche Datenobjekte'},
+'full QRule Name'=>{de=>'vollqualifizierter Name'},

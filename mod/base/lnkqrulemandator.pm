@@ -74,7 +74,7 @@ sub new
                 label         =>'Quality Rule',
                 vjointo       =>'base::qrule',
                 vjoinon       =>['qruleid'=>'id'],
-                vjoindisp     =>'name'),
+                vjoindisp     =>'fullname'),
 
       new kernel::Field::Htmlarea(
                 name          =>'qruledesc',

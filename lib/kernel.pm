@@ -505,6 +505,7 @@ sub CalcDateDuration
       my $duration={days=>$dd,hours=>$dh,minutes=>$dm, seconds=>$ds};
       $duration->{totalminutes}=($dd*24*60)+($dh*60)+$dm+(1/60*$ds);
       $duration->{totalseconds}=($dd*24*60*60)+($dh*60*60)+($dm*60)+$ds;
+      $duration->{totaldays}=$duration->{totalminutes}/1440.0;
       my $d="";
       $d.="${dd}d" if ($dd!=0);
       $d.=" "      if ($dh!=0 && $d ne "");

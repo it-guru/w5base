@@ -73,6 +73,7 @@ sub getDynamicFields
                                   label         =>'soonest start',
                                   htmldetail    =>\&showIfFilled,
                                   group         =>'extdesc',
+                                  detailadd     =>\&checkextdescdesstart,
                                   container     =>'headref'),
 
       new kernel::Field::Date(    name          =>'extdescdesend',
@@ -120,6 +121,17 @@ sub getDynamicFields
 
 }
 
+sub checkextdescdesstart
+{
+   my $self=shift;
+   my $current=shift;
+   my %FOpt=@_;
+
+
+   return("<img border=1 src=\"../../base/load/attention.gif\">");
+
+}
+
 sub  recalcResponsiblegrp
 {
    my $self=shift;
@@ -140,18 +152,18 @@ sub  recalcResponsiblegrp
    }
 }
 
-sub Validate
-{
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-   my $origrec=shift;
-
-   if (exists($newrec->{rfcstart})){
-      $newrec->{reqdesdate}=$newrec->{rfcstart}." GMT";
-   }
-   return($self->SUPER::Validate($oldrec,$newrec,$origrec));
-}
+#sub Validate
+#{
+#   my $self=shift;
+#   my $oldrec=shift;
+#   my $newrec=shift;
+#   my $origrec=shift;
+#
+#   if (exists($newrec->{extdescdesstart})){
+#      $newrec->{extdescdesstart}=$newrec->{extdescdesstart}." GMT";
+#   }
+#   return($self->SUPER::Validate($oldrec,$newrec,$origrec));
+#}
 
 sub validateExtDesc
 {
@@ -181,6 +193,31 @@ sub validateExtDesc
          }
       }
    }
+   if (exists($h->{extdescdesend})){
+      my $d=CalcDateDuration(NowStamp("en"),$h->{extdescdesstart});
+      if ($d->{totalminutes}<60){
+         $self->LastMsg(ERROR,"invalid precarriage time in desired end");
+         return(0);
+      }
+   }
+   if (exists($h->{extdescdesstart})){
+      my $d=CalcDateDuration(NowStamp("en"),$h->{extdescdesstart});
+      if ($d->{totalminutes}<60){
+         $self->LastMsg(ERROR,"invalid precarriage time in desired start");
+         return(0);
+      }
+   }
+   if (exists($h->{extdescdesstart}) &&
+       exists($h->{extdescdesend})){
+      my $d=CalcDateDuration($h->{extdescdesstart},$h->{extdescdesend});
+      if ($d->{totalminutes}<60){
+         $self->LastMsg(ERROR,"start and end window not large enough");
+         return(0);
+      }
+   }
+
+
+
    return(1);
 }
 
@@ -193,10 +230,17 @@ sub handleFollowupExtended  # hock to handel additional parameters in followup
 
    return(0) if (!$self->validateExtDesc($h));
    my %wr;
+   my %w;
    foreach my $k (%$h){
-      $wr{$k}=$h->{$k} if ($k=~m/^extdesc/);
+      if ($k=~m/^extdesc/){
+         $wr{$k}=$h->{$k};
+         $w{$k}=$h->{$k};
+      }
    }
-   return(1) if ($self->StoreRecord($WfRec,$WfRec->{step},\%wr));
+   if ($self->StoreRecord($WfRec,$WfRec->{step},\%wr)){
+      $param->{additional}->{followupparam}=join(",",sort(keys(%w)));
+      return(1);
+   }
    return(0);
 }
 

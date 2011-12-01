@@ -41,6 +41,17 @@ sub new
                 label         =>'QRule ID'),
 
       new kernel::Field::Text(
+                name          =>'fullname',
+                label         =>'full QRule Name',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $id=$current->{id};
+                   return("(".$id.") ".
+                          $self->getParent->{qrule}->{$id}->getName());
+                }),
+
+      new kernel::Field::Text(
                 name          =>'name',
                 label         =>'QRule Name',
                 onRawValue    =>sub{

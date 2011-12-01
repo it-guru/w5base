@@ -1,0 +1,2 @@
+'AL_TCom::qrule::DTAGleadtime'=>{de=>'Prüfung der Vorlaufzeiten eines Auftrages',en=>'Check of precarriage timings of a request'},
+'precarriage time is not sufficient'=>{de=>'ungenügende Vorlaufzeiten'},

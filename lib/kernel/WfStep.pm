@@ -168,11 +168,18 @@ sub PostProcess
                     addtarget=>$param{addtarget},
                     addcctarget=>$param{addcctarget},
                     sendercc=>1);
-      $aobj->NotifyForward($WfRec->{id},
-                           $param{fwdtarget},
-                           $param{fwdtargetid},
-                           $param{fwdtargetname},
-                           $param{note},%newparam);
+      my $userid=$self->getParent->getParent->getCurrentUserId();
+      if (!($param{fwdtarget} eq "base::user" &&
+            $param{fwdtargetid} eq $userid)){
+         $aobj->NotifyForward($WfRec->{id},
+                              $param{fwdtarget},
+                              $param{fwdtargetid},
+                              $param{fwdtargetname},
+                              $param{note},%newparam);
+      }
+      else{
+         printf STDERR ("fifi no SaveStep.wffollowup message - user is sender\n");
+      }
    }
    if ($action eq "SaveStep.wfdefer"){
       my $userid=$WfRec->{initiatorid};
@@ -225,6 +232,7 @@ sub nativProcess
       my %param=(note=>$note,
                  addtarget=>[],
                  addcctarget=>[],
+                 additional=>{},
                  fwdtarget=>$WfRec->{fwdtarget},
                  fwdtargetid=>$WfRec->{fwdtargetid});
 
@@ -233,7 +241,8 @@ sub nativProcess
       if ($self->getParent->handleFollowupExtended($WfRec,$h,\%param)){
          if ($self->getParent->getParent->Action->StoreRecord(
              $WfRec->{id},"wffollowup",
-             {translation=>'base::workflow::request'},$param{note})){
+             {translation=>'base::workflow::request',
+              additional=>$param{additional}},$param{note})){
             $self->PostProcess("SaveStep.".$op,$WfRec,$actions,%param);
             return(1);
          }
