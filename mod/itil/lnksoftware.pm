@@ -175,7 +175,39 @@ sub new
                 precision     =>2,
                 label         =>'Quantity',
                 dataobjattr   =>'lnksoftwaresystem.quantity'),
-                                                   
+
+      new kernel::Field::Number(
+                name          =>'licrelevantcpucount',
+                group         =>'lic',
+                precision     =>0,
+                searchable    =>0,
+                htmldetail    =>0,
+                label         =>'license relevant logical cpu count',
+                onRawValue    =>\&calcLicMetrics),
+                                                 
+      new kernel::Field::Text(
+                name          =>'licrelevantosrelease',
+                group         =>'lic',
+                searchable    =>0,
+                htmldetail    =>0,
+                label         =>'license relevant os release',
+                onRawValue    =>\&calcLicMetrics),
+                                                 
+      new kernel::Field::Text(
+                name          =>'licrelevantsystemclass',
+                group         =>'lic',
+                searchable    =>0,
+                htmldetail    =>0,
+                label         =>'license relevant system class',
+                onRawValue    =>\&calcLicMetrics),
+                                                 
+      new kernel::Field::Text(
+                name          =>'licrelevantopmode',
+                group         =>'lic',
+                searchable    =>0,
+                htmldetail    =>0,
+                label         =>'license relevant operation mode',
+                onRawValue    =>\&calcLicMetrics),
                                                  
       new kernel::Field::Mandator(
                 htmldetail    =>0,
@@ -380,9 +412,87 @@ sub new
                                                    
    );
    $self->{history}=[qw(insert modify delete)];
-   $self->setDefaultView(qw(software softwareproducer version quantity insttyp cdate));
+   $self->setDefaultView(qw(software softwareproducer 
+                            version quantity insttyp cdate));
    $self->setWorktable("lnksoftwaresystem");
    return($self);
+}
+
+
+sub calcLicMetrics   # licrelevantopmode licrelevantosrelease 
+{                    # licrelevantcpucount
+   my $self=shift;
+   my $current=shift;
+   my @sysid;
+   my $sysobj=getModuleObject($self->getParent->Config,"itil::system");
+   my $appobj=getModuleObject($self->getParent->Config,"itil::appl");
+   if ($current->{systemid} ne ""){  # is system installed
+      $sysobj->SetFilter({id=>\$current->{systemid}});
+   }
+   else{
+      my $itclustsvcid=$current->{itclustsvcid};
+      if ($itclustsvcid ne ""){
+         my $o=getModuleObject($self->getParent->Config,"itil::lnkitclustsvc");
+         $o->SetFilter({id=>\$itclustsvcid});
+         my ($svcrec)=$o->getOnlyFirst(qw(clustid applications));
+         if (defined($svcrec)){
+            if ($self->{name} eq "licrelevantopmode"){
+               my @l;
+               foreach my $apprec (@{$svcrec->{applications}}){
+                  push(@l,$apprec->{applid});
+               }
+               if ($#l==-1){  # dieser Sonderfall muß noch behandelt werden
+                  $appobj->SetFilter({id=>\@l,cistatusid=>"<6"});
+               }
+               else{
+                  $appobj->SetFilter({id=>\@l,cistatusid=>"<6"});
+               }
+            }
+            else{
+               if ($svcrec->{clustid} ne ""){
+                  $sysobj->SetFilter({cistatusid=>'<6',
+                                      itclustid=>\$svcrec->{clustid}});
+               }
+            }
+         }
+         else{
+            return("?");
+         }
+      } 
+   }
+   if ($self->{name} eq "licrelevantopmode"){
+      if ($current->{systemid} ne ""){  # is system installed
+         my $o=getModuleObject($self->getParent->Config,"itil::lnkapplsystem");
+         $o->SetFilter({systemid=>\$current->{systemid}});
+         my @applid=$o->getVal("applid");
+         $appobj->ResetFilter();
+         $appobj->SetFilter({id=>\@applid,cistatusid=>"<6"});
+      }
+      my %o;
+      foreach my $apprec ($appobj->getHashList("opmode")){
+        $o{$apprec->{opmode}}++;
+      }
+      return([sort(
+                 map({$self->getParent->T('opmode.'.$_,"itil::appl")} keys(%o))
+              )]);
+   }
+   my @res;
+   if ($self->{name} eq "licrelevantcpucount" ||
+       $self->{name} eq "licrelevantsystemclass" ||
+       $self->{name} eq "licrelevantosrelease"){
+      my %r;
+      my %c;
+      my $cpucount=0;
+      foreach my $sysrec ($sysobj->getHashList(qw(cpucount osrelease osclass))){
+         $r{$sysrec->{'osrelease'}}++;
+         $c{$sysrec->{'osclass'}}++;
+         $cpucount=$sysrec->{'cpucount'} if ($cpucount<$sysrec->{'cpucount'});
+      }
+      return([sort(keys(%r))]) if ($self->{name} eq "licrelevantosrelease");
+      return([sort(keys(%c))]) if ($self->{name} eq "licrelevantsystemclass");
+      return($cpucount) if ($self->{name} eq "licrelevantcpucount");
+   }
+   return(\@res);
 }
 
 

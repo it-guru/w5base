@@ -93,7 +93,9 @@ sub new
                 vjointo       =>'itil::lnkitclustsvcappl',
                 vjoinbase     =>[{applcistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'itclustsvcid'],
-                vjoindisp     =>['appl','applcistatus','applapplid']),
+                vjoindisp     =>['appl','applcistatus','applapplid'],
+                vjoininhash   =>['appl','applcistatusid',
+                                 'applapplid','applid']),
 
       new kernel::Field::Text(
                 name          =>'applicationnames',

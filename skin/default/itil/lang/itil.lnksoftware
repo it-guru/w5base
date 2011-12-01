@@ -22,3 +22,7 @@
 'Software Producer'=>{de=>'Software Hersteller'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'rights management status (BETA!)'=>{de=>'Lizenzierungsstatus (BETA!)'},
+'license relevant logical cpu count'=>{de=>'Lizenzrelevante logische CPU Anzahl'},
+'license relevant os release'=>{de=>'Lizenzrelevante Betriebssystemversion'},
+'license relevant system class'=>{de=>'Lizenzrelevante Systemklasse'},
+'license relevant operation mode'=>{de=>'Lizenzrelevante vorrangige Betriebsart'},
