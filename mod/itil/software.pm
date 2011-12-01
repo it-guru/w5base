@@ -234,6 +234,11 @@ sub new
                          $n++;
                       }
                    }
+                   else{
+                      if ($d ne ""){
+                         $n++;
+                      }
+                   }
                    return($n);
                 }),
 
