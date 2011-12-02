@@ -39,7 +39,7 @@
 'Business Impact'=>{de=>'Geschäftsprozess Beeinflussung'},
 'Resources'=>{de=>'Resourcen (Resources)'},
 'Close Code'=>{de=>'Abschluß Code (Close Code)'},
-'Coordinator'=>{de=>'Koordinator (Coordinator)'},
+'Coordinator group'=>{de=>'Koordinator Gruppe (Coordinator)'},
 'Implementor'=>{de=>'Ausführender (Implementor)'},
 'Extern Change ID'=>{de=>'externe Change ID (Extern Change ID)'},
 'Customer'=>{de=>'Kunde (Customer)'},

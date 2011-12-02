@@ -403,8 +403,23 @@ sub new
                 name          =>'coordinator',
                 uppersearch   =>1,
                 group         =>'contact',
-                label         =>'Coordinator',
+                label         =>'Coordinator group',
                 dataobjattr   =>'cm3rm1.coordinator'),
+
+      new kernel::Field::Text(
+                name          =>'coordinatorposix',
+                uppersearch   =>1,
+                group         =>'contact',
+                label         =>'Change-Manager (Coordinator)',
+                dataobjattr   =>'cm3rm1.coord_firstname'),
+
+      new kernel::Field::Text(
+                name          =>'coordinatorname',
+                uppersearch   =>1,
+                htmldetail    =>0,
+                group         =>'contact',
+                label         =>'Change-Manager fullname',
+                dataobjattr   =>'cm3rm1.coord_shortname'),
 
       new kernel::Field::SubList(
                 name          =>'relations',
