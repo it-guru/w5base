@@ -53,6 +53,22 @@ sub getDynamicFields
    my $class;
 
    return($self->InitFields(
+      new kernel::Field::Interface(    
+                name       =>'changemanagerid',
+                translation=>'itil::workflow::change',
+                group      =>'state',
+                label      =>'Change-Manager ID',
+                container  =>'headref'),
+
+      new kernel::Field::Text(    
+                name       =>'changemanager',
+                weblinkon  =>['changemanagerid'=>'userid'],
+                weblinkto  =>'base::user',
+                translation=>'itil::workflow::change',
+                group      =>'state',
+                label      =>'Change-Manager',
+                container  =>'headref'),
+
       new kernel::Field::Date(    
                 name       =>'changestart',
                 translation=>'itil::workflow::change',

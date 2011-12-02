@@ -60,7 +60,7 @@ sub scchange
                            createtime type resources closecode approved addgrp
                            impact priority reason urgency category risk
                            closecode resolvetime
-                           coordinator tasks));
+                           coordinator coordinatorposix coordinatorname tasks));
    $chm->SetCurrentOrder("sysmodtime");
    msg(DEBUG,"view is set");
    my $focus="now";

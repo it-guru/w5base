@@ -388,6 +388,22 @@ sub mkChangeStoreRec
          $wfrec{owner}=$userid;
       }
    }
+   if (!($rec->{coordinatorposix}=~m/^\s*$/)){
+      my $chmmgr=lc($rec->{coordinatorposix});
+      $self->{user}->ResetFilter();
+      $self->{user}->SetFilter({posix=>\$chmmgr});
+      my ($urec,$msg)=$self->{user}->getOnlyFirst(qw(userid fullname));
+      if (defined($urec)){
+         $wfrec{changemanager}=$urec->{fullname};
+         $wfrec{changemanagerid}=$urec->{userid};
+      }
+      else{
+         $wfrec{changemanagerid}=undef;
+         $wfrec{changemanager}=$rec->{coordinatorname};
+      }
+   }
+
+
    if (!($rec->{coordinator}=~m/^\s*$/)){
       $wfrec{additional}->{ServiceCenterCoordinator}=$rec->{coordinator};
    }
