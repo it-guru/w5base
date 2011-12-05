@@ -236,7 +236,9 @@ sub qcheckRecord
       if ($rec->{mandator} eq "Extern" && $rec->{allowifupdate}){
          # forced updates on External Data
          if (!defined($parrec)){
-            $forcedupd->{cistatusid}=5;
+            if ($par->Ping()){
+               $forcedupd->{cistatusid}=5;
+            }
          }
          else{
             $forcedupd->{cistatusid}=4;
