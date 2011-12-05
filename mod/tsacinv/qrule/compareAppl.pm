@@ -71,7 +71,10 @@ sub qcheckRecord
    my @dataissue;
    my $errorlevel=0;
 
-   return(0,undef) if ($rec->{cistatusid}!=4);
+   return(0,undef) if ($rec->{cistatusid}!=4 &&
+                       $rec->{cistatusid}!=5); # ist notwendig, damit CIs
+                                               # auch wieder aktiviert
+                                               # werden.
    if ($rec->{applid} ne ""){
       my $tswiw=getModuleObject($self->getParent->Config,"tswiw::user");
       my $par=getModuleObject($self->getParent->Config(),"tsacinv::appl");
