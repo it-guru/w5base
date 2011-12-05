@@ -239,6 +239,7 @@ sub qcheckRecord
             $forcedupd->{cistatusid}=5;
          }
          else{
+            $forcedupd->{cistatusid}=4;
             my $databossid;
             my $acgroup=getModuleObject($self->getParent->Config,
                                         "tsacinv::group");
