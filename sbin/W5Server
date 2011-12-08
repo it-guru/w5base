@@ -789,6 +789,13 @@ sub run_dequeue
       $self->{ServerGoesDown}--;
       msg(INFO,"$self->{ServerGoesDown} seconds to shutdown");
    }
+   if ($self->{debug}){   # if terminal is closed, process goes down
+      if (! -t STDOUT){
+         sleep(1);
+         $self->server_close(); 
+      }
+   }
+   
    my $bk=$self->{EventController}->ProcessTimer();
    if (time() % 120 == 0){ # check only ever 120s
       $self->CheckW5ServerProcess();
