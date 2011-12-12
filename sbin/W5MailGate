@@ -109,6 +109,8 @@ if (! defined($MyClient->Connect())){
 }
 
 $W5V2::Query=new kernel::cgi({});
+$self->Cache->{W5Server}=$W5V2::W5Server;
+
 
 
 chdir("/tmp");
