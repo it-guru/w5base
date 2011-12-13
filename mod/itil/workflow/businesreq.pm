@@ -478,18 +478,18 @@ sub WSDLaddNativFieldList
    if ($mode eq "store"){
       $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
                   "name=\"affectedapplication\" type=\"xsd:string\" />";
-      $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
-                  "name=\"extdescdesstart\" type=\"xsd:date\" />";
-      $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
-                  "name=\"extdescdesend\" type=\"xsd:date\" />";
-      $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
-                  "name=\"extdescurgency\" type=\"xsd:string\" />";
-      $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
-                  "name=\"extdescdependencies\" type=\"xsd:string\" />";
-      $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
-                  "name=\"extdescpreparation\" type=\"xsd:string\" />";
-      $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
-                  "name=\"extdescfallback\" type=\"xsd:string\" />";
+#      $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
+#                  "name=\"extdescdesstart\" type=\"xsd:date\" />";
+#      $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
+#                  "name=\"extdescdesend\" type=\"xsd:date\" />";
+#      $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
+#                  "name=\"extdescurgency\" type=\"xsd:string\" />";
+#      $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
+#                  "name=\"extdescdependencies\" type=\"xsd:string\" />";
+#      $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
+#                  "name=\"extdescpreparation\" type=\"xsd:string\" />";
+#      $$XMLtypes.="<xsd:element minOccurs=\"0\" maxOccurs=\"1\" ".
+#                  "name=\"extdescfallback\" type=\"xsd:string\" />";
    }
 
 
