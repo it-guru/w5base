@@ -185,6 +185,14 @@ sub new
                 precision     =>0,
                 dataobjattr   =>'amcomputer.itotalnumberofcores'),
 
+      new kernel::Field::Float(  # temp. da es keine phys. cpu anzahl beim
+                name          =>'systeminvoicecpucount',  # logischen system
+                label         =>'invoice relevant cpu count', # geben kann
+                unit          =>'CPU',                   # grund: TMO 
+                htmldetail    =>0,                       # abrechnungsprozess
+                precision     =>1,
+                dataobjattr   =>'amcomputer.fcpunumber'),
+
       new kernel::Field::Float(
                 name          =>'systemcpuspeed',
                 label         =>'System CPU speed',
