@@ -931,3 +931,4 @@ alter table swinstance add runtimeusername varchar(40) default NULL;
 alter table swinstance add installusername varchar(40) default NULL;
 alter table swinstance add configdirpath varchar(80) default NULL;
 alter table swinstance add issslinstance varchar(10) default 'UNKNOWN';
+alter table swinstance add admcomments longtext default NULL;

@@ -40,7 +40,6 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 sqlorder      =>'desc',
-                searchable    =>0,
                 label         =>'W5BaseID',
                 dataobjattr   =>'swinstance.id'),
                                                   
@@ -202,6 +201,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'admid',
+                group         =>'adm',
                 dataobjattr   =>'swinstance.adm'),
 
       new kernel::Field::TextDrop(
@@ -215,7 +215,14 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'adm2id',
+                group         =>'adm',
                 dataobjattr   =>'swinstance.adm2'),
+
+      new kernel::Field::Textarea(
+                name          =>'admcomments',
+                group         =>'adm',
+                label         =>'comments for admin and connect',
+                dataobjattr   =>'swinstance.admcomments'),
 
       new kernel::Field::TextDrop(
                 name          =>'system',

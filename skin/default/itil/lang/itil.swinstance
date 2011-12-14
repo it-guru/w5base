@@ -46,3 +46,4 @@
 'runtime username'=>{de=>'Laufzeit Username'},
 'install username'=>{de=>'Installations Username'},
 'config directory path'=>{de=>'Konfigurationsverzeichnispfad'},
+'comments for admin and connect'=>{de=>'Bemerkungen zur Administration und zum Instanzzugang'},
