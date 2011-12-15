@@ -2570,7 +2570,7 @@ sub getRecordImageUrl
    my $current=shift;
    if (defined($current) && defined($current->{class}) &&
        defined($self->{SubDataObj}->{$current->{class}})){
-      msg(INFO,"call getRecordImageUrl for $current->{class}");
+     # msg(INFO,"call getRecordImageUrl for $current->{class}");
       return($self->{SubDataObj}->{$current->{class}}->getRecordImageUrl(
              $current));
    }
