@@ -100,7 +100,7 @@ sub Validate
       return(undef);
    }
    if ($self->{'SoftValidate'}){
-      if ($fromquery eq $oldrec->{$name} &&
+      if ((!defined($fromquery) || $fromquery eq $oldrec->{$name}) &&
           $newrec->{$name} eq $oldrec->{$name}){  # no change needs no validate
          return({});                              # (problem EDITBASE!)
       }
