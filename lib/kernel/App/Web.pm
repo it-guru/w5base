@@ -1242,7 +1242,11 @@ sub HttpHeader
       $disp.="filename=\"$f\"";
       $d.="Content-Name: $f\n";
    }
-   $d.="Content-Disposition: $disp\n";
+   else{
+      if ($disp ne "inline"){
+         $d.="Content-Disposition: $disp\n";
+      }
+   }
    my $charset="";
    $charset=";charset=ISO-8895-1" if ($content eq "text/html" || 
                                       $content eq "text/plain");
