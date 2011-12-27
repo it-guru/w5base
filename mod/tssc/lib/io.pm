@@ -607,7 +607,7 @@ sub mkChangeStoreRec
           $wfrec{tcomcodchmrisk}=undef;
        }
        if ($wfrec{tcomcodchmrisk} eq "" || $wfrec{tcomcodchmrisk} eq "0"){
-          msg(ERROR,"no tcomcodchmrisk in Changenumber '$rec->{changenumber}'");
+          $wfrec{tcomcodchmrisk}="low";
        }
        $wfrec{tcomcoddownstart}=$ws;
        $wfrec{tcomcoddownend}=$we;
