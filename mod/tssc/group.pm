@@ -84,6 +84,16 @@ sub new
                 vjoinon       =>['groupid'=>'lgroup'],
                 vjoindisp     =>['luser']),
 
+      new kernel::Field::SubList(
+                name          =>'memberemails',
+                label         =>'member email addresses',
+                group         =>'users',
+                searchable    =>0,
+                htmldetail    =>0,
+                vjointo       =>'tssc::lnkusergroup',
+                vjoinon       =>['groupid'=>'lgroup'],
+                vjoindisp     =>['useremail']),
+
       new kernel::Field::Textarea(
                 name          =>'description',
                 label         =>'Description',
