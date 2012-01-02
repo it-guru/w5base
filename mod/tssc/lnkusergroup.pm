@@ -53,6 +53,15 @@ sub new
                                    vjoinon    =>['luser'=>'userid'],
                                    vjoindisp  =>'fullname'),
 
+      new kernel::Field::TextDrop( name       =>'useremail',
+                                   label      =>'User-EMail',
+                                   htmlwidth  =>'200px',
+                                   searchable =>0,
+                                   htmldetail =>0,
+                                   vjointo    =>'tssc::user',
+                                   vjoinon    =>['luser'=>'userid'],
+                                   vjoindisp  =>'email'),
+
       new kernel::Field::Text(     name       =>'luser',
                                    uppersearch=>1,
                                    htmlwidth  =>'80px',
