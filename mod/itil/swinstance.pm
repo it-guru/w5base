@@ -281,8 +281,33 @@ sub new
                 vjoindisp     =>'fullname'),
 
 
-      new kernel::Field::Link(
+      new kernel::Field::Text(
+                name          =>'softwareinstproducer',
+                htmldetail    =>0,
+                readonly      =>1,
+                label         =>'Producer of installed software',
+                group         =>'softwareinst',
+                dataobjattr   =>'producer.name'),
+
+      new kernel::Field::Text(
+                name          =>'softwareinstname',
+                htmldetail    =>0,
+                readonly      =>1,
+                label         =>'Name of installed software',
+                group         =>'softwareinst',
+                dataobjattr   =>'software.name'),
+
+      new kernel::Field::Text(
+                name          =>'softwareinstversion',
+                htmldetail    =>0,
+                readonly      =>1,
+                label         =>'Version of installed software',
+                group         =>'softwareinst',
+                dataobjattr   =>'lnksoftwaresystem.version'),
+
+      new kernel::Field::Interface(
                 name          =>'lnksoftwaresystemid',
+                label         =>'W5BaseID of software installation',
                 group         =>'softwareinst',
                 dataobjattr   =>'swinstance.lnksoftwaresystem'),
 
@@ -610,7 +635,13 @@ sub getSqlFrom
    $from.=" left outer join lnkcontact ".
           "on lnkcontact.parentobj='itil::swinstance' ".
           "and $worktable.id=lnkcontact.refid ".
-          "left outer join appl on $worktable.appl=appl.id";
+          "left outer join appl on $worktable.appl=appl.id ".
+          "left outer join lnksoftwaresystem ".
+          "on swinstance.lnksoftwaresystem=lnksoftwaresystem.id ".
+          "left outer join software ".
+          "on lnksoftwaresystem.software=software.id ".
+          "left outer join producer ".
+          "on software.producer=producer.id";
 
    return($from);
 }

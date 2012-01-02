@@ -47,3 +47,7 @@
 'install username'=>{de=>'Installations Username'},
 'config directory path'=>{de=>'Konfigurationsverzeichnispfad'},
 'comments for admin and connect'=>{de=>'Bemerkungen zur Administration und zum Instanzzugang'},
+'Producer of installed software'=>{de=>'Hersteller der Software-Installation'},
+'Name of installed software'=>{de=>'Bezeichnung der Software-Installation'},
+'Version of installed software'=>{de=>'Bezeichnung der Software-Installation'},
+'W5BaseID of software installation'=>{de=>'W5BaseID der Software-Installation'},
