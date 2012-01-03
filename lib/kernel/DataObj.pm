@@ -1140,8 +1140,9 @@ sub getIdByHashIOMapped
       my $v=$flt{$k};
       $$debug.=sprintf("%-10s => %s\n","'".$k."'","'".$v."'") if ($debug);
       if ($v ne ""){
-         if ($v=~m/^".*"/){  # $ nicht am Ende, damit mehrfach Suchen
-            $flt{$k}=$v;     # möglich werden!
+         if ($param{ForceLikeSearch} eq "1" || 
+             ($v=~m/^".*"/)){  # $ nicht am Ende, damit mehrfach Suchen
+            $flt{$k}=$v;       # möglich werden!
          }
          else{
             $flt{$k}=\$v;

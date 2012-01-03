@@ -230,7 +230,8 @@ sub getW5ACLocationname
 
    my $debug;
    my $w5locid=$w5loc->getIdByHashIOMapped("tsacinv::location",\%lrec,
-                                           DEBUG=>\$debug);
+                                           DEBUG=>\$debug,
+                                           ForceLikeSearch=>1);
    if (!defined($w5locid)){
       $w5loc->Log(ERROR,"basedata",
            "Fail to request base::location\n".
