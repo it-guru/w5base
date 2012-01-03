@@ -115,10 +115,10 @@ sub qcheckRecord
                   else{
                      if (!defined($age) || $age>259200){ # half year
                         $wiwusr->Log(ERROR,"basedata",
-                            "Contact '%s'\nseems to be an telekom ".
+                            "Contact '%s'\nseems to be a telekom ".
                             "contact, which have\nleave the organisation.".
                             "\nPlease check the existence. If he not\n".
-                            "leave the organisation, remove the posix entry.",
+                            "leave the organisation, clear the posix entry.",
                             $urec->{fullname});
                      }
                   }
@@ -211,8 +211,9 @@ sub qcheckRecord
             return($errorlevel,undef) if (defined($bk));
          }
          if ($#bossgrpsrcid!=-1){
-            msg(WARN,"removing RBoss from User '%s' on group touid='%s'",
-                     $urec->{email},join(",",@bossgrpsrcid));
+            $wiwusr->Log(WARN,"basedata",
+                         "removing RBoss from User '%s' on group touid='%s'",
+                         $urec->{email},join(",",@bossgrpsrcid));
             my $lnkgrpuserrole=getModuleObject($Config,"base::lnkgrpuserrole");
             my $lnkgrpuserroleop=$lnkgrpuserrole->Clone();
             $grp->SetFilter({srcid=>\@bossgrpsrcid,
