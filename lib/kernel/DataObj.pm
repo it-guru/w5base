@@ -1142,6 +1142,9 @@ sub getIdByHashIOMapped
       if ($v ne ""){
          if ($param{ForceLikeSearch} eq "1" || 
              ($v=~m/^".*"/)){  # $ nicht am Ende, damit mehrfach Suchen
+            if (!($v=~m/^".*/)){
+               $v="\"$v\"";
+            }
             $flt{$k}=$v;       # möglich werden!
          }
          else{
