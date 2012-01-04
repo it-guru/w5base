@@ -139,7 +139,8 @@ sub new
                 vjoinon       =>['id'=>'wfheadid'],
                 vjoindisp     =>[qw(ascid cdate id name actionref
                                   translation owner additional
-                                  effort comments creator)]),
+                                  effort comments creator
+                                  intiatornotify)]),
                                    
       new base::workflow::WorkflowRelation(
                 name          =>'relations',
@@ -1094,6 +1095,8 @@ sub WSDLWorkflowFieldTypes
                "name=\"additional\" type=\"$ns:Container\" />";
    $$XMLtypes.="<xsd:element name=\"id\" type=\"xsd:integer\" />";
    $$XMLtypes.="<xsd:element name=\"translation\" type=\"xsd:string\" />";
+   $$XMLtypes.="<xsd:element name=\"intiatornotify\" ".
+               "minOccurs=\"0\" type=\"xsd:integer\" />";
    $$XMLtypes.="<xsd:element name=\"actionref\" ".
                "minOccurs=\"0\" type=\"$ns:Container\" />";
    $$XMLtypes.="</xsd:sequence>";

@@ -183,6 +183,11 @@ sub new
                 },
                 dataobjattr =>'wfaction.additional'),
 
+      new kernel::Field::Interface(
+                name       =>'intiatornotify',
+                container  =>'actionref',
+                label      =>'send note to initiator'),
+
       new kernel::Field::Container(
                 name        =>'actionref',   # secure
                 group       =>'additional',
@@ -307,6 +312,11 @@ sub Validate
    }
    if (effVal($oldrec,$newrec,"bookingdate") eq ""){
       $newrec->{bookingdate}=NowStamp("en");
+   }
+   if (exists($newrec->{intiatornotify}) &&
+       ($newrec->{intiatornotify} eq "" ||
+        $newrec->{intiatornotify} eq "0")){
+      $newrec->{intiatornotify}=0;
    }
 
    return(1);
