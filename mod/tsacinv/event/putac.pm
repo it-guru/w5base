@@ -350,6 +350,7 @@ sub ApplicationModified
                   $ApplU=$SysU if ($ApplU<$SysU);
                   next if ($lnk->{systemsystemid}=~m/^\s*$/);
                   next if ($lnk->{srcsys} eq "AM-SAPLNK");
+                  next if ($lnk->{srcsys} eq "AM");
                   $CurrentEventId="Add System '$lnk->{system}' to $CurrentAppl";
                   my $externalid=$lnk->{id};
                   if ($externalid eq ""){
