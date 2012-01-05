@@ -130,7 +130,7 @@ sub qcheckRecord
                              $parrec,"description",
                              $forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'native');
+                             mode=>'text');
          $self->IfaceCompare($dataobj,
                              $rec,"currentvers",
                              $parrec,"version",

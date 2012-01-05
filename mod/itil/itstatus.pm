@@ -121,74 +121,76 @@ sub RSS
       my $c=0;
       my $baseurl=$self->Config->Param("EventJobBaseUrl");
       foreach my $WfRec ($wf->getHashList(qw(ALL))){
-         my $item="???";
-         if ($WfRec->{eventmode} eq "EVk.appl"){
-            $item=$WfRec->{affectedapplication};
-            $item=join(", ",@$item) if (ref($item));
-         }
-         if ($WfRec->{eventmode} eq "EVk.infraloc"){
-            $item=$WfRec->{affectedlocation};
-            $item=join(", ",@$item) if (ref($item));
-         }
-         if ($WfRec->{eventmode} eq "EVk.bprocess"){
-            $item=$WfRec->{affectedbusinessprocess};
-            $item=join(", ",@$item) if (ref($item));
-         }
-         if ($WfRec->{eventmode} eq "EVk.appl"){
-            if (!in_array(['*'],\@mandator)){  # user dont want to see all
-               next if (!in_array(\@mandator,$WfRec->{mandator}));
+         if ($self->FilterRSS($WfRec)){
+            my $item="???";
+            if ($WfRec->{eventmode} eq "EVk.appl"){
+               $item=$WfRec->{affectedapplication};
+               $item=join(", ",@$item) if (ref($item));
             }
-         }
-         if (!in_array(['*'],\@customer)){  # user dont want to see all
-            my $found=0;
-            chk: foreach my $chkcus (@customer){
-               my $qcust=quotemeta($chkcus);
-               my $re="^($qcust|$qcust\\..*)\$";
-               my $evcust=$WfRec->{affectedcustomer};
-               $evcust=[$evcust] if (!ref($evcust));
-               if (grep(/$re/,@$evcust)){
-                  $found=1;
-                  last chk;
+            if ($WfRec->{eventmode} eq "EVk.infraloc"){
+               $item=$WfRec->{affectedlocation};
+               $item=join(", ",@$item) if (ref($item));
+            }
+            if ($WfRec->{eventmode} eq "EVk.bprocess"){
+               $item=$WfRec->{affectedbusinessprocess};
+               $item=join(", ",@$item) if (ref($item));
+            }
+            if ($WfRec->{eventmode} eq "EVk.appl"){
+               if (!in_array(['*'],\@mandator)){  # user dont want to see all
+                  next if (!in_array(\@mandator,$WfRec->{mandator}));
                }
             }
-            next if (!$found);
-         }
-         if (!in_array(['*'],\@prio)){  # user dont want to see all
-            if (!in_array([$WfRec->{eventstatclass}],\@prio)){
-               next;
+            if (!in_array(['*'],\@customer)){  # user dont want to see all
+               my $found=0;
+               chk: foreach my $chkcus (@customer){
+                  my $qcust=quotemeta($chkcus);
+                  my $re="^($qcust|$qcust\\..*)\$";
+                  my $evcust=$WfRec->{affectedcustomer};
+                  $evcust=[$evcust] if (!ref($evcust));
+                  if (grep(/$re/,@$evcust)){
+                     $found=1;
+                     last chk;
+                  }
+               }
+               next if (!$found);
             }
-         }
-         if (!in_array(['*'],\@itemprio)){  # user dont want to see all
-            if (!in_array([$WfRec->{affecteditemprio}],\@itemprio)){
-               next;
+            if (!in_array(['*'],\@prio)){  # user dont want to see all
+               if (!in_array([$WfRec->{eventstatclass}],\@prio)){
+                  next;
+               }
             }
+            if (!in_array(['*'],\@itemprio)){  # user dont want to see all
+               if (!in_array([$WfRec->{affecteditemprio}],\@itemprio)){
+                  next;
+               }
+            }
+            $item=~s/_/ /g;
+            if ($WfRec->{eventmode} eq "EVk.infraloc"){
+               $item=~s/\./; /g;
+            }
+            my $title=$item;
+           # my $title=$item."\n (Prio".$WfRec->{eventstatclass}.")";
+            my $desc=$WfRec->{eventshortsummary};
+            if ($ENV{'SERVER_NAME'} ne ""){
+               my ($proto)=$ENV{SCRIPT_URI}=~m/^(\S+):.*/;
+               $baseurl=$proto."://".
+                        $ENV{'SERVER_NAME'}.
+                        "/".
+                        $self->Config->getCurrentConfigName();
+            }
+            $desc=extractLanguageBlock($desc,$lang);
+            my $link=$baseurl."/auth/base/workflow/ById/".$WfRec->{id};
+            printf("<item>");
+            $c++;
+            printf("<title>%s</title>",XmlQuote($title));
+            #printf("<link>%s</link>",XmlQuote($link));
+            printf("<subject>%s</subject>",XmlQuote("This is the subject"));
+            printf("<description>%s</description>",XmlQuote($desc));
+            printf("<pubDate>%s</pubDate>",
+              scalar($self->ExpandTimeExpression($WfRec->{eventstart},
+                                                 "RFC822","UTC","CET")));
+            printf("</item>");
          }
-         $item=~s/_/ /g;
-         if ($WfRec->{eventmode} eq "EVk.infraloc"){
-            $item=~s/\./; /g;
-         }
-         my $title=$item;
-        # my $title=$item."\n (Prio".$WfRec->{eventstatclass}.")";
-         my $desc=$WfRec->{eventshortsummary};
-         if ($ENV{'SERVER_NAME'} ne ""){
-            my ($proto)=$ENV{SCRIPT_URI}=~m/^(\S+):.*/;
-            $baseurl=$proto."://".
-                     $ENV{'SERVER_NAME'}.
-                     "/".
-                     $self->Config->getCurrentConfigName();
-         }
-         $desc=extractLanguageBlock($desc,$lang);
-         my $link=$baseurl."/auth/base/workflow/ById/".$WfRec->{id};
-         printf("<item>");
-         $c++;
-         printf("<title>%s</title>",XmlQuote($title));
-         #printf("<link>%s</link>",XmlQuote($link));
-         printf("<subject>%s</subject>",XmlQuote("This is the subject"));
-         printf("<description>%s</description>",XmlQuote($desc));
-         printf("<pubDate>%s</pubDate>",
-           scalar($self->ExpandTimeExpression($WfRec->{eventstart},
-                                              "RFC822","UTC","CET")));
-         printf("</item>");
       }
       if ($c==0){
          my $okimg=$baseurl."/static/rssfeed/ok.gif?".substr(NowStamp(),0,8);
@@ -214,6 +216,13 @@ sub RSS
 
    delete($ENV{HTTP_ACCEPT_LANGUAGE});
    return();
+}
+
+sub FilterRSS
+{
+   my $self=shift;
+   my $WfRec=shift;
+   return(1);
 }
 
 sub getFilteredWfModuleObject

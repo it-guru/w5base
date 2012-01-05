@@ -36,7 +36,7 @@ sub getMandatoryModules
    my $self=shift;
 
 
-   return qw(Net::LDAP);
+   return qw(Net::LDAP Unicode::Map8);
 }
 
 

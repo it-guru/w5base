@@ -134,6 +134,19 @@ sub IfaceCompare
          }
       }
    }
+   elsif ($param{mode} eq "text"){          # for multiline text fields
+      if (exists($comprec->{$compfieldname})){
+         if (defined($comprec->{$compfieldname})){
+            my $t1=$origrec->{$origfieldname};
+            my $t2=$comprec->{$compfieldname};
+            $t1=~s/\r\n/\n/gs;
+            $t2=~s/\r\n/\n/gs;
+            if (!defined($origrec->{$origfieldname}) || $t1 ne $t2){
+               $takeremote++;
+            }
+         }
+      }
+   }
    elsif ($param{mode} eq "leftouterlinkcreate" ||
           $param{mode} eq "leftouterlink"){  # like servicesupprt links
       if (exists($comprec->{$compfieldname}) &&
@@ -396,7 +409,7 @@ sub ProcessOpList
    my $opList=shift;
    my $config=$self->Config;
    my $objCache={};
-   msg(INFO,"ProcessOpList: Start");
+   #msg(INFO,"ProcessOpList: Start");
    foreach my $op (@{$opList}){
       if (!exists($objCache->{$op->{DATAOBJ}})){
          $objCache->{$op->{DATAOBJ}}=getModuleObject($config,$op->{DATAOBJ});
@@ -404,9 +417,9 @@ sub ProcessOpList
       my $dataobj=$objCache->{$op->{DATAOBJ}};
       if (defined($dataobj)){
          $dataobj->ResetFilter();
-         msg(INFO,sprintf("OP:%s\n",Dumper($op)));
+         #msg(INFO,sprintf("OP:%s\n",Dumper($op)));
          if ($op->{OP} eq "nop"){
-            msg(INFO,"skipped operation");
+            msg(DEBUG,"skipped operation");
          }
          elsif ($op->{OP} eq "insert"){
             my $id=$dataobj->ValidatedInsertRecord($op->{DATA});
@@ -437,7 +450,7 @@ sub ProcessOpList
          }
       }
    }
-   msg(INFO,"ProcessOpList: End");
+   #msg(INFO,"ProcessOpList: End");
 }
 
 
