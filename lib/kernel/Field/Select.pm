@@ -260,7 +260,12 @@ sub preProcessFilter
             }
             else{
                if ($neg){
-                  push(@newsearch,grep(!/$chk$/i,keys(%tr),keys(%raw)));
+                  if (grep(/^$chk$/i,keys(%tr))){ # check if neg is translated
+                     push(@newsearch,grep(!/^$chk$/i,keys(%tr)));
+                  }
+                  elsif (grep(/^$chk$/i,keys(%raw))){ # check if neg is on raw
+                     push(@newsearch,grep(!/^$chk$/i,keys(%raw)));
+                  }
                }
                else{
                   foreach my $v (keys(%tr)){
