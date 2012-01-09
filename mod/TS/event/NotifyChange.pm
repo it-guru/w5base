@@ -46,26 +46,27 @@ sub NotifyChange
    my %param=@_;
    if ($param{id}=~m/^\d{10,20}$/){
       my $wf=getModuleObject($self->Config,"base::workflow");
+      my $wfa=getModuleObject($self->Config,"base::workflowaction");
       $wf->SetFilter({id=>\$param{id}});
       my ($wfrec,$msg)=$wf->getOnlyFirst(qw(ALL));
       if (defined($wfrec)){
          my $fo=$wf->getField("headref");
          my $headref=$fo->RawValue($wfrec);
          my $essentialdatahash=$headref->{essentialdatahash}->[0];
+         $wfa->ResetFilter();
+         $wfa->SetFilter({wfheadid=>\$wfrec->{id}});
+         
          my $actions=$wfrec->{shortactionlog};
          my $sendfound=0;
-         if (ref($actions) eq "ARRAY"){
-            for(my $ac=$#{$actions};$ac>=0;$ac--){
-               my $act=$actions->[$ac];
-               if (ref($act->{actionref}) eq "HASH"){
-                  if (exists($act->{actionref}->{'autonotify.essential'})){
-                     my $es=$act->{actionref}->{'autonotify.essential'};
-                     if (ref($es) eq "ARRAY" &&
-                         $es->[0] eq $essentialdatahash){
-                        $sendfound++;
-                     }
-                     last;
+         foreach my $act ($wfa->getHashList(qw(ascid cdate id actionref))){
+            if (ref($act->{actionref}) eq "HASH"){
+               if (exists($act->{actionref}->{'autonotify.essential'})){
+                  my $es=$act->{actionref}->{'autonotify.essential'};
+                  if (ref($es) eq "ARRAY" &&
+                      $es->[0] eq $essentialdatahash){
+                     $sendfound++;
                   }
+                  last;
                }
             }
          }
