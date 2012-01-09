@@ -58,7 +58,7 @@ sub NotifyChange
          
          my $actions=$wfrec->{shortactionlog};
          my $sendfound=0;
-         foreach my $act ($wfa->getHashList(qw(ascid cdate id actionref))){
+         foreach my $act ($wfa->getHashList(qw(id cdate id actionref))){
             if (ref($act->{actionref}) eq "HASH"){
                if (exists($act->{actionref}->{'autonotify.essential'})){
                   my $es=$act->{actionref}->{'autonotify.essential'};
