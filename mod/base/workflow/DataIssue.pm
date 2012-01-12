@@ -108,8 +108,10 @@ sub getDynamicFields
                              altnamestore       =>'altaffectedobjectname',
                              dsttypfield        =>'affectedobject',
                              dstidfield         =>'affectedobjectid'),
-                   new kernel::Field::Link(  
+                   new kernel::Field::Text(  
                              name               =>'affectedobjectid',
+                             htmldetail         =>0,
+                             readonly           =>1,
                              translation        =>'base::workflow::DataIssue',
                              label              =>'affected Dataelement ID',
                              container          =>'additional'),

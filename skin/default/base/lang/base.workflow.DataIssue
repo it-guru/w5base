@@ -3,6 +3,7 @@
    en=>'W5Base DataIssue - Dataproblem or Datasyncronisation problem handling'},
 'affected Dataobject'=>{de=>'betroffenes Datenobjekt'},
 'affected Dataelement'=>{de=>'betroffenes Datenelement'},
+'affected Dataelement ID'=>{de=>'betroffene Datenelement ID'},
 'affected Dataobject Type'=>{de=>'Typ des betroffenen Datenobjektes'},
 'wfobsolete'=>{de=>'hinfällig',en=>'obsolete'},
 'wffine'=>{de=>'abgeschlossen',en=>'closed'},
