@@ -12,7 +12,8 @@
 'workflows untreaded longer then 8 weeks'=>{de=>'Workflows die länger als 8 Wochen unbearbeitet sind'},
 'count of consequent ignored workflow'=>{de=>'konsequent ignorierte Workflows'},
 
-'count of open Workflows'=>{de=>'Anzahl Workflows'},
+'count of open Workflows'=>{de=>'Anzahl offener Workflows'},
+'count of Workflows'=>{de=>'Anzahl Workflows'},
 'Workflows untreaded longer then 4 weeks'=>{de=>'Workflows länger als 4 Wochen unbearbeitet'},
 'Workflows untreaded longer then 8 weeks'=>{de=>'Workflows länger als 8 Wochen unbearbeitet'},
 'Workflows untreaded longer then a half year'=>{de=>'Workflows länger als ein halbes Jahr unbearbeitet'},
