@@ -47,6 +47,10 @@ sub getPresenter
                          opcode=>\&displayDataIssue,
                          prio=>2,
                       },
+          'wfact'=>{
+                         opcode=>\&displayWorkflowActivity,
+                         prio=>3,
+                      },
           'org'=>{
                          opcode=>\&displayOrg,
                          prio=>99999,
@@ -179,6 +183,134 @@ sub overviewDataIssue
 
    return(@l);
 }
+
+sub displayWorkflowActivity
+{
+   my $self=shift;
+   my ($primrec,$hist)=@_;
+   my $app=$self->getParent();
+   return() if ($primrec->{dstrange}=~m/KW/);
+   my $showall=Query->Param("FullWorkflowList");
+   #my $data=$app->extractYear($primrec,$hist,"base.DataIssue.IdList.open");
+   my $data1=$app->extractYear($primrec,$hist,"base.Workflow.open",
+                              setUndefZero=>1);
+   my $data2=$app->extractYear($primrec,$hist,"base.Workflow.sleep28",
+                              setUndefZero=>1);
+   my $data3=$app->extractYear($primrec,$hist,"base.Workflow.sleep56",
+                              setUndefZero=>1);
+   my $data4=$app->extractYear($primrec,$hist,"base.Workflow.dead",
+                              setUndefZero=>1);
+   my $user=$app->extractYear($primrec,$hist,"User",
+                              setUndefZero=>1);
+   return(undef) if (!defined($data1));
+   my $chart1=$app->buildChart("ofcOpenWorkflows",$data1,
+                   employees=>$user, 
+                   label=>$app->T('open Workflows'),
+                   legend=>$app->T('count of open Workflows'));
+
+   my $chart2=$app->buildChart("ofcSleep28Workflows",$data2,
+                   width=>400,height=>200,
+                   label=>$app->T('Workflows untreaded longer then 4 weeks'),
+                   legend=>$app->T('count of Workflows'));
+
+   my $chart3=$app->buildChart("ofcSleep56Workflows",$data3,
+                   width=>400,height=>200,
+                   label=>$app->T('Workflows untreaded longer then 8 weeks'),
+                   legend=>$app->T('count of Workflows'));
+
+   my $chart4=$app->buildChart("ofcDeadWorkflows",$data4,
+                   width=>400,height=>200,
+                   label=>$app->T('Workflows untreaded longer then a half year'),
+                   legend=>$app->T('count of Workflows'));
+
+   my $wf_or=$primrec->{stats}->{'base.Workflow.sleep56.id'}->[0];
+   my $wf_rd=$primrec->{stats}->{'base.Workflow.dead.id'}->[0];
+
+   my @wfid=sort({$a<=>$b} grep(!/^\s*$/,split(/\s*,\s*/,$wf_rd.",".$wf_or)));
+
+
+   my $wfidtmpl;
+   if ($#wfid!=-1){
+      my @usewfid=@wfid[0..20];
+      if ($showall eq "1"){
+         @usewfid=@wfid;
+      }
+      my $wf=getModuleObject($app->Config,"base::workflow");
+      if (defined($wf)){
+         $wf->SetFilter({id=>\@usewfid});
+         my @wfl=$wf->getHashList(qw(name id state stateid fwdtargetname));
+         if ($#wfl!=-1){
+            $wfidtmpl.="<table border=0 cellspacing=2 cellpadding=0>";
+            $wfidtmpl.="<tr>"; 
+            $wfidtmpl.="<td colspan=2><b>".
+                        $app->T("The related Worflow list").":</td>"; 
+            $wfidtmpl.="</tr>"; 
+            foreach my $WfRec (@wfl){
+               my $statename=$wf->findtemplvar({current=>$WfRec},
+                                               "state","formated");
+
+               my $dest="../../base/workflow/ById/$WfRec->{id}";
+               my $detailx=$wf->DetailX();
+               my $detaily=$wf->DetailY();
+               my $onclick="openwin(\"$dest\",\"_blank\",".
+                   "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
+                   "resizable=yes,scrollbars=no\")";
+
+               $wfidtmpl.="<tr>"; 
+               $wfidtmpl.="<td valign=top><a class=exlink ".
+                          "href=JavaScript:$onclick>".
+                          $WfRec->{name}."</a>";
+               if ($showall eq "1"){
+                  $wfidtmpl.="<br>".$WfRec->{fwdtargetname};
+               }
+               $wfidtmpl.="</td>"; 
+               $wfidtmpl.="<td width=10% valign=top nowrap>".
+                          $statename."</td>"; 
+               $wfidtmpl.="</tr>"; 
+            }
+            if ($#wfid>$#wfl){
+               my $num=$#wfid-$#usewfid;
+               $wfidtmpl.="<tr>"; 
+               $wfidtmpl.="<td colspan=2><br><br>".
+                          "<a class=exlink ".
+                          "href=javascript:showFullDataIssue(this) ".
+                          "title=\"".
+                  $self->getParent->T("click to see full list","base::w5stat").
+                          "\">... ($num ".
+                          $self->getParent->T("more","base::w5stat").
+                          ")</a></td>"; 
+               $wfidtmpl.="</tr>"; 
+            }
+            $wfidtmpl.="</table>";
+         }
+      }
+   }
+
+   my $d=$app->getParsedTemplate("tmpl/ext.w5stat.WorkflowActivity",
+                                 {current=>$primrec,
+                                  static=>{
+                                       statname=>$primrec->{fullname},
+                                       chart1=>$chart1,
+                                       chart2=>$chart2,
+                                       chart3=>$chart3,
+                                       chart4=>$chart4,
+                                       detaillist=>$wfidtmpl
+                                          },
+                                  skinbase=>"base"});
+
+   $d.=<<EOF;
+<input type=hidden name=FullWorkflowList value="$showall">
+<script language="JavaScript">
+function showFullDataIssue()
+{
+   document.forms[0].elements['FullWorkflowList'].value='1'; 
+   document.forms[0].submit();
+}
+</script>
+EOF
+   return($d);
+}
+
 
 sub displayDataIssue
 {

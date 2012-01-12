@@ -1,0 +1,58 @@
+
+ %chart1%
+
+This chart shows the open workflows per month. Reference day is always the last day in the month. As an "open" workflow will be tread a workflow with a Workflow-State id less then 20 .
+<br>
+<br>
+<hr>
+
+
+
+<!-- -------------------------------------------------- -->
+<table width=100%>
+<tr>
+
+<td valign=top><br>
+This chart shows, which have longer then 4 weeks no activity.
+</td>
+
+<td>
+%chart2%
+</td>
+</tr>
+</table>
+
+<!-- -------------------------------------------------- -->
+<table width=100%>
+<tr>
+
+<td valign=top><br>
+This chart shows, which have longer then 8 weeks no activity.
+</td>
+
+<td>
+%chart3%
+</td>
+</tr>
+</table>
+
+<!-- -------------------------------------------------- -->
+<table width=100%>
+<tr>
+
+<td valign=top><br>
+This chart shows, which have longer then a half year. Theses workflow are termed in the overview as consequent ingored.
+</td>
+
+<td>
+%chart4%
+</td>
+</tr>
+</table>
+
+<br>
+
+<hr>
+
+%detaillist%
+
