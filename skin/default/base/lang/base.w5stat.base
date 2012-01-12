@@ -3,7 +3,7 @@
 'base::w5stat::base::wfact'=>{de=>'Workflow Aktivitäten',en=>'Workflow activity'},
 'base::w5stat::base::org'=>{de=>'Info;Organisation',en=>'Info;Organisational'},
 'unprocessed DataIssue Workflows'=>{de=>'unbearbeitete DataIssue Workflows'},
-'The related Worflow list'=>{de=>'Detailierte Problem Liste'},
+'The related Worflow list'=>{de=>'Die relevanten Workflows'},
 'count of DataIssue Workflows'=>{de=>'Anzahl unbearbeiteter DataIssue Workflows'},
 'automaticly detected Data-Problems'=>{de=>'automatisch erkannte Datenprobleme'},
 'SubGroups'=>{de=>'Untergruppen'},
