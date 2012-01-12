@@ -118,6 +118,14 @@ sub new
                 htmleditwidth =>'100px',
                 dataobjattr   =>'software.rightsmgmt'),
 
+      new kernel::Field::PhoneLnk(
+                name          =>'phonenumbers',
+                searchable    =>0,
+                label         =>'Phonenumbers',
+                group         =>'phonenumbers',
+                vjoinbase     =>[{'parentobj'=>\'itil::software'}],
+                subeditmsk    =>'subedit'),
+
       new kernel::Field::Boolean(
                 name          =>'releasesam0',
                 readonly      =>1,
@@ -380,9 +388,23 @@ sub new
                          activator=>["admin","admin.itil.software"],
                          uniquesize=>255};
    $self->{history}=[qw(insert modify delete)];
+   $self->{PhoneLnkUsage}=\&PhoneUsage;
 
    $self->setWorktable("software");
    return($self);
+}
+
+sub PhoneUsage
+{
+   my $self=shift;
+   my $current=shift;
+   my @codes=qw(phoneHot);
+   my @l;
+   foreach my $code (@codes){
+      push(@l,$code,$self->T($code));
+   }
+   return(@l);
+
 }
 
 
@@ -490,7 +512,7 @@ sub initSearchQuery
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default doccontrol source));
+   return(qw(header default doccontrol phonenumbers source));
 }
 
 
@@ -513,7 +535,7 @@ sub isWriteValid
    my $rec=shift;
 
    my $userid=$self->getCurrentUserId();
-   return("default","doccontrol") if (!defined($rec) ||
+   return("default","doccontrol","phonenumbers") if (!defined($rec) ||
                          ($rec->{cistatusid}<3 && $rec->{creator}==$userid) ||
                          $self->IsMemberOf($self->{CI_Handling}->{activator}));
    return(undef);

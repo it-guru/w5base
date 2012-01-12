@@ -18,3 +18,5 @@
 'Documentation significant'=>{de=>'Dokumentations signifikant'},
 'competent contact'=>{de=>'kompetenter Ansprechpartner'},
 'deputy competent contact'=>{de=>'alternativer Ansprechpartner'},
+'fieldgroup.phonenumbers'=>{de=>'Rufnummernverzeichnis',en=>'Phonenumbers'},
+'phoneHot'=>{de=>'Hotline',en=>'Hotline'},
