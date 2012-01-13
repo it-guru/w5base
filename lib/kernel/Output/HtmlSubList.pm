@@ -189,19 +189,23 @@ sub ProcessLine
    if (grep(/^Detail$/,$app->getValidWebFunctions())){
       if ($idfield){
          my $dest=$app->Self();
-
-         my $lq=new kernel::cgi({});
-         $lq->Param($idfieldname=>$id);
-         $lq->Param(AllowClose=>1);
-         my $urlparam=$lq->QueryString();
-         $dest=~s/::/\//g;
-         $dest="../../$dest/Detail?$urlparam";
-         $dest=~s/"/ /g;
-         my $detailx=$app->DetailX();
-         my $detaily=$app->DetailY();
-         $lineonclick="openwin(\"$dest\",\"_blank\",".
-             "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
-             "resizable=yes,scrollbars=no\")";
+         if (defined($id)){
+            my $lq=new kernel::cgi({});
+            $lq->Param($idfieldname=>$id);
+            $lq->Param(AllowClose=>1);
+            my $urlparam=$lq->QueryString();
+            $dest=~s/::/\//g;
+            $dest="../../$dest/Detail?$urlparam";
+            $dest=~s/"/ /g;
+            my $detailx=$app->DetailX();
+            my $detaily=$app->DetailY();
+            $lineonclick="openwin(\"$dest\",\"_blank\",".
+                "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
+                "resizable=yes,scrollbars=no\")";
+         }
+         else{
+           $lineonclick=undef;
+         }
       }
    }
    $d.="<tr class=$lineclass ";
