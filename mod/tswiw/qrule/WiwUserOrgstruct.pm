@@ -119,7 +119,7 @@ sub qcheckRecord
                             "contact, which have\nleave the organisation.".
                             "\nPlease check the existence. If he not\n".
                             "leave the organisation, clear the posix entry.",
-                            $urec->{fullname});
+                            $urec->{fullname}."\n-");
                      }
                   }
                }
