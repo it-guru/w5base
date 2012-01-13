@@ -102,7 +102,12 @@ sub qcheckRecord
                                    mode=>'native');
             }
             else{
-               msg(ERROR,"sem for application '".$rec->{name}."' not found");
+               $tswiw->Log(ERROR,"basedata",
+                         "CBM '$parrec->{sememail}' ".
+                         "for application '".$rec->{name}."' ".
+                         "can not be located in W5Base and WhoIsWho ".
+                         "while import(qrule) of application ".
+                         "from AssetManager\n-");
             }
          }
          if ($parrec->{tsmemail} ne ""){
@@ -116,7 +121,12 @@ sub qcheckRecord
                                    mode=>'native');
             }
             else{
-               msg(ERROR,"tsm for application '".$rec->{name}."' not found");
+               $tswiw->Log(ERROR,"basedata",
+                         "TSM '$parrec->{tsmemail}' ".
+                         "for application '".$rec->{name}."' ".
+                         "can not be located in W5Base and WhoIsWho ".
+                         "while import(qrule) of application ".
+                         "from AssetManager\n-");
             }
          }
          $self->IfaceCompare($dataobj,

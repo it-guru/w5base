@@ -848,11 +848,17 @@ sub Log
                $txt=sprintf($txt,@_);
             }
             $!=undef;
+            my $logd;
             foreach my $l (split(/[\r\n]+/,$txt)){
-               print $fout (sprintf("%s [%d] %-6s %s\n",
-                                    NowStamp(),$$,$mode,$l));
+               if ($l ne "" && $l ne "-"){
+                  $logd.=sprintf("%s [%d] %-6s %s\n",NowStamp(),$$,$mode,$l));
+               }
+               else{
+                  $logd.="\n";
+               }
             }
-            return(1);
+            print $fout ($logd); # print atomic to make it better readable
+            return(1);           # in the log for the admins
          }
       }
    }
