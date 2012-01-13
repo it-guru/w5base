@@ -239,7 +239,8 @@ sub getW5ACLocationname
            "for AC location $aclocrec->{fullname}\n".
            "while $hint. Contact Admin to add\n".
            "Location:\n".
-           join("\n",map({sprintf(" - %-10s='%s'",$_,$lrec{$_})} keys(%lrec))));
+           join("\n",map({sprintf(" * %-10s='%s'",$_,$lrec{$_})} keys(%lrec))).
+           "\n-");
    }
 
    return(undef) if (!defined($w5locid));
