@@ -851,7 +851,7 @@ sub Log
             my $logd;
             foreach my $l (split(/[\r\n]+/,$txt)){
                if ($l ne "" && $l ne "-"){
-                  $logd.=sprintf("%s [%d] %-6s %s\n",NowStamp(),$$,$mode,$l));
+                  $logd.=sprintf("%s [%d] %-6s %s\n",NowStamp(),$$,$mode,$l);
                }
                else{
                   $logd.="\n";
