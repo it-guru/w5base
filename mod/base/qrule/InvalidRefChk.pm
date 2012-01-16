@@ -113,7 +113,8 @@ sub qcheckRecord
             $grp->SetFilter({grpid=>\$targetid});
             my ($chkrec)=$grp->getOnlyFirst(qw(cistatusid fullname));
             if (!defined($chkrec)){
-               push(@failmsg,$label." points to non existing record");
+               push(@failmsg,"'".$label."' ".
+                             $self->T("points to non existing record"));
             }
             else{
                if ($chkrec->{cistatusid}>5 || $chkrec->{cistatusid}<3){
@@ -128,7 +129,8 @@ sub qcheckRecord
             $user->SetFilter({userid=>\$targetid});
             my ($chkrec)=$user->getOnlyFirst(qw(cistatusid fullname));
             if (!defined($chkrec)){
-               push(@failmsg,$label." points to non existing record");
+               push(@failmsg,"'".$label."' ".
+                             $self->T("points to non existing record"));
             }
             else{
                if ($chkrec->{cistatusid}>5 || $chkrec->{cistatusid}<3){
