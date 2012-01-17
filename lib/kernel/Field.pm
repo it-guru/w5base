@@ -737,7 +737,6 @@ sub RawValue
             }
          }
       }
-
       my $joinkey=join(";",map({ my $k=$flt{$_};
                                  $k=$$k if (ref($k) eq "SCALAR");
                                  $k=join(";",@$k) if (ref($k) eq "ARRAY");

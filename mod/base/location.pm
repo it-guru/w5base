@@ -24,6 +24,8 @@ use kernel::DataObj::DB;
 use kernel::Field;
 use kernel::App::Web::InterviewLink;
 use kernel::CIStatusTools;
+use kernel::Field::OSMap;
+use kernel::Field::OSMAdrChk;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB
         kernel::App::Web::InterviewLink kernel::CIStatusTools);
 
@@ -33,6 +35,7 @@ sub new
    my %param=@_;
    $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
+
 
    sub AddressBuild{
       my $self=shift;
@@ -209,11 +212,69 @@ sub new
                 label         =>'Room Expression',
                 dataobjattr   =>'location.roomexpr'),
 
+      new kernel::Field::OSMap(
+                name          =>'osmap',
+                uploadable    =>0,
+                searchable    =>0,
+                group         =>'map',
+                htmlwidth     =>'500px',
+                label         =>'OpenStreetMap',
+                depend        =>['country','address1',
+                                 'label',
+                                 'gpslongitude',
+                                 'gpslatitude',
+                                 'zipcode','location'],
+                marker        =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $m="";
+                   my $q="";
+                   $m=$current->{label};
+                   $m="<b>$m</b>" if ($m ne "");
+                   $m.="<br>" if ($m ne "");
+                   if ($current->{address1} ne ""){
+                      $m.="<br>".$current->{address1};
+                   }
+                   my $o=$current->{country};
+                   if ($current->{zipcode} ne ""){
+                      $o.="-" if ($o ne "");
+                      $o.=$current->{zipcode};
+                   }
+                   if ($current->{location} ne ""){
+                      $o.=" " if ($o ne "");
+                      $o.=$current->{location};
+                   }
+                   if ($o ne ""){
+                      $m.="<br>$o";
+                   }
+                   $q=" $current->{country} $current->{zipcode} ".
+                      "$current->{location} ; $current->{address1}";
+                   my $queryobj=new kernel::cgi({q=>$q});
+                   $q=$queryobj->QueryString();
+                   $m="<a href='http://maps.google.de?$q' target=_blank>".
+                      $m."</a>";
+                   return($m);
+                },
+                address=>\&AddressBuild),
+
+      new kernel::Field::OSMAdrChk(
+                name          =>'osmadrchk',
+                group         =>'map',
+                uploadable    =>0,
+                htmldetail    =>0,
+                htmlwidth     =>'200px',
+                label         =>'OSM Address Check',
+                depend        =>['country','address1',
+                                 'label',
+                                 'gpslongitude',
+                                 'gpslatitude',
+                                 'zipcode','location']),
+
       new kernel::Field::GoogleMap(
                 name          =>'googlemap',
                 uploadable    =>0,
                 searchable    =>0,
-                group         =>'map',
+                group         =>'gmap',
                 htmlwidth     =>'500px',
                 label         =>'GoogleMap',
                 depend        =>['country','address1',
@@ -256,7 +317,7 @@ sub new
 
       new kernel::Field::GoogleAddrChk(
                 name          =>'googlechk',
-                group         =>'map',
+                group         =>'gmap',
                 uploadable    =>0,
                 htmldetail    =>0,
                 htmlwidth     =>'200px',
@@ -270,18 +331,20 @@ sub new
 
 
       new kernel::Field::Number(
-                name          =>'gpslongitude',
-                precission    =>8,
-                group         =>'gps',
-                label         =>'longitude',
-                dataobjattr   =>'location.gpslongitude'),
-
-      new kernel::Field::Number(
                 name          =>'gpslatitude',
-                precission    =>8,
+                precision     =>8,
+                decimaldot    =>'.',
                 group         =>'gps',
                 label         =>'latitude',
                 dataobjattr   =>'location.gpslatitude'),
+
+      new kernel::Field::Number(
+                name          =>'gpslongitude',
+                precision     =>8,
+                decimaldot    =>'.',
+                group         =>'gps',
+                label         =>'longitude',
+                dataobjattr   =>'location.gpslongitude'),
 
       new kernel::Field::Text(
                 name          =>'refcode1',
@@ -463,7 +526,7 @@ sub getDetailBlockPriority
    my %param=@_;
    return("header","default","management","grprelations",
           "contacts","phonenumbers",
-          "comments","additional","map","gps","control","source");
+          "comments","additional","map","gmap","gps","control","source");
 }
 
 

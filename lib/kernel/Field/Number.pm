@@ -28,6 +28,8 @@ sub new
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
    $self->{_permitted}->{precision}=1;
+   $self->{_permitted}->{decimaldot}=1;
+   $self->{decimaldot}="," if (!defined($self->{decimaldot}));
 
    return($self);
 }
@@ -55,7 +57,7 @@ sub FormatedDetail
       if (defined($d) && $d ne ""){
          my $format=sprintf("%%.%df",$self->{precision});
          $d=sprintf($format,$d);
-         $d=~s/\./,/g;
+         $d=~s/\./$self->{decimaldot}/g;
          $d=[$d] if (ref($d) ne "ARRAY");
          if ($mode eq "HtmlDetail"){
             $d=[map({$self->addWebLinkToFacility(quoteHtml($_),$current)} 

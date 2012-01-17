@@ -422,6 +422,7 @@ EOF
 
                }
                elsif ($fieldlist[$c]->Type() eq "Message" ||
+                      $fieldlist[$c]->Type() eq "OSMap" ||
                       $fieldlist[$c]->Type() eq "GoogleMap"){
                   my $datacolspan=2;
                   $datacolspan=4 if ($grouphavehalfwidth{$group});
