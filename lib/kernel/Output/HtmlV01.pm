@@ -19,7 +19,6 @@ package kernel::Output::HtmlV01;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use Data::Dumper;
 use base::load;
 use kernel::Output::HtmlSubList;
 @ISA    = qw(kernel::Formater);
@@ -33,6 +32,16 @@ sub new
    return($self);
 }
 
+sub getDownloadFilename
+{
+   my $self=shift;
+
+   return($self->SUPER::getDownloadFilename().".html");
+}
+
+
+
+
 
 sub getHttpHeader
 {  
@@ -41,9 +50,7 @@ sub getHttpHeader
    my $d="";
    $d.=$app->HttpHeader("text/html");
    $d.=$app->HtmlHeader();
-#   $d.="Content-type:text/html\n\n";
-#   $d.="<html>";
-#   $d.="<body>";
+
    return($d);
 }
 

@@ -10,6 +10,7 @@
 'fieldgroup.default'=>{de=>'Standortdaten',en=>'location informations'},
 'fieldgroup.control'=>{de=>'Steuerinformationen',en=>'Control Informations'},
 'fieldgroup.map'=>{de=>'Karte',en=>'Map'},
+'fieldgroup.gmap'=>{de=>'Google Karte (wird demnächst entfernt)',en=>'Google Map'},
 'fieldgroup.phonenumbers'=>{de=>'Rufnummernverzeichnis',en=>'Phonenumbers'},
 'fieldgroup.org'=>{de=>'Organisationszuorndung',en=>'Organisation relation'},
 'fieldgroup.gps'=>{de=>'GPS',en=>'GPS'},
