@@ -162,7 +162,7 @@ function OSMapSearch$id(){
     }
   }
 
-  var sphpos=wgspos.transform(
+  var sphpos=wgspos.clone().transform(
        new OpenLayers.Projection("EPSG:4326"),    // WGS84
        new OpenLayers.Projection("EPSG:900913")); // Sph. Mercator
   OSMMap$id.setCenter(sphpos,8);
@@ -227,7 +227,7 @@ function OSMapInit$id() {
   OSMMap$id.addLayer(OSMmarkers);
 
 
-   var sphpos=wgspos.transform(
+   var sphpos=wgspos.clone().transform(
                new OpenLayers.Projection("EPSG:4326"),    // WGS84
                new OpenLayers.Projection("EPSG:900913")); // Sph. Mercator
 
@@ -296,7 +296,7 @@ function addPositionMarker(wgspos,markerText){
 
    markerText+="&nbsp;&nbsp;</center>";
 
-   var sphpos=wgspos.transform(
+   var sphpos=wgspos.clone().transform(
                new OpenLayers.Projection("EPSG:4326"),    // WGS84
                new OpenLayers.Projection("EPSG:900913")); // Sph. Mercator
 
