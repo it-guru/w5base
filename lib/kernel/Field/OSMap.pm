@@ -194,14 +194,14 @@ function OSMapInit$id() {
   if (mode=="HtmlDetail"){
 
      OSMMap$id = new OpenLayers.Map("OSMapLayer$id",{
-     //       controls:[
-     //          new OpenLayers.Control.Navigation({
-     //             'zoomWheelEnabled':false
-     //          }),
-     //          new OpenLayers.Control.PanZoomBar(),
-     //          new OpenLayers.Control.LayerSwitcher(),
-     //          new OpenLayers.Control.Attribution(),
-     //          ],
+            controls:[
+               new OpenLayers.Control.Navigation({
+                  'zoomWheelEnabled':false
+               }),
+               new OpenLayers.Control.PanZoomBar(),
+               new OpenLayers.Control.LayerSwitcher(),
+               new OpenLayers.Control.Attribution()
+               ],
             units: 'm'
      });
 
