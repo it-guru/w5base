@@ -223,39 +223,7 @@ sub new
                                  'label',
                                  'gpslongitude',
                                  'gpslatitude',
-                                 'zipcode','location'],
-                marker        =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my $m="";
-                   my $q="";
-                   $m=$current->{label};
-                   $m="<b>$m</b>" if ($m ne "");
-                   $m.="<br>" if ($m ne "");
-                   if ($current->{address1} ne ""){
-                      $m.="<br>".$current->{address1};
-                   }
-                   my $o=$current->{country};
-                   if ($current->{zipcode} ne ""){
-                      $o.="-" if ($o ne "");
-                      $o.=$current->{zipcode};
-                   }
-                   if ($current->{location} ne ""){
-                      $o.=" " if ($o ne "");
-                      $o.=$current->{location};
-                   }
-                   if ($o ne ""){
-                      $m.="<br>$o";
-                   }
-                   $q=" $current->{country} $current->{zipcode} ".
-                      "$current->{location} ; $current->{address1}";
-                   my $queryobj=new kernel::cgi({q=>$q});
-                   $q=$queryobj->QueryString();
-                   $m="<a href='http://maps.google.de?$q' target=_blank>".
-                      $m."</a>";
-                   return($m);
-                },
-                address=>\&AddressBuild),
+                                 'zipcode','location']),
 
       new kernel::Field::OSMAdrChk(
                 name          =>'osmadrchk',
@@ -269,66 +237,6 @@ sub new
                                  'gpslongitude',
                                  'gpslatitude',
                                  'zipcode','location']),
-
-      new kernel::Field::GoogleMap(
-                name          =>'googlemap',
-                uploadable    =>0,
-                searchable    =>0,
-                group         =>'gmap',
-                htmlwidth     =>'500px',
-                label         =>'GoogleMap',
-                depend        =>['country','address1',
-                                 'label',
-                                 'gpslongitude',
-                                 'gpslatitude',
-                                 'zipcode','location'],
-                marker        =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my $m="";
-                   my $q="";
-                   $m=$current->{label};
-                   $m="<b>$m</b>" if ($m ne "");
-                   $m.="<br>" if ($m ne "");
-                   if ($current->{address1} ne ""){
-                      $m.="<br>".$current->{address1};
-                   }
-                   my $o=$current->{country};
-                   if ($current->{zipcode} ne ""){
-                      $o.="-" if ($o ne "");
-                      $o.=$current->{zipcode};
-                   }
-                   if ($current->{location} ne ""){
-                      $o.=" " if ($o ne "");
-                      $o.=$current->{location};
-                   }
-                   if ($o ne ""){
-                      $m.="<br>$o";
-                   }
-                   $q=" $current->{country} $current->{zipcode} ".
-                      "$current->{location} ; $current->{address1}";
-                   my $queryobj=new kernel::cgi({q=>$q});
-                   $q=$queryobj->QueryString();
-                   $m="<a href='http://maps.google.de?$q' target=_blank>".
-                      $m."</a>";
-                   return($m);
-                },
-                address=>\&AddressBuild),
-
-      new kernel::Field::GoogleAddrChk(
-                name          =>'googlechk',
-                group         =>'gmap',
-                uploadable    =>0,
-                htmldetail    =>0,
-                htmlwidth     =>'200px',
-                label         =>'Google Address Check',
-                depend        =>['country','address1',
-                                 'label',
-                                 'gpslongitude',
-                                 'gpslatitude',
-                                 'zipcode','location'],
-                address=>\&AddressBuild),
-
 
       new kernel::Field::Number(
                 name          =>'gpslatitude',
@@ -524,9 +432,9 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","management","grprelations",
+   return("header","default","map","management","grprelations",
           "contacts","phonenumbers",
-          "comments","additional","map","gmap","gps","control","source");
+          "comments","additional","gps","control","source");
 }
 
 

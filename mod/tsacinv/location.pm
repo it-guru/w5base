@@ -22,7 +22,7 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
-use Data::Dumper;
+use kernel::Field::OSMap;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -90,52 +90,67 @@ sub new
                                   ignorecase =>1,
                                   dataobjattr=>'amlocation.name'),
 
-      new kernel::Field::GoogleMap(  name          =>'googlemap',
-                                     group         =>'map',
-                                     htmlwidth     =>'500px',
-                                     label         =>'GoogleMap',
-                                     depend        =>['country','address1',
-                                                      'fullname',
-                                                      'gpslongitude',
-                                                      'gpslatitude',
-                                                      'zipcode','location'],
-                                     marker=>sub{
-                                        my $self=shift;
-                                        my $current=shift;
-                                        my $m="";
-                                        $m=$current->{fullname};
-                                        $m="<b>$m</b>" if ($m ne "");
-                                        $m.="<br>" if ($m ne "");
-                                        if ($current->{address1} ne ""){
-                                           $m.="<br>".$current->{address1};
-                                        }
-                                        my $o=$current->{country};
-                                        if ($current->{zipcode} ne ""){
-                                           $o.="-" if ($o ne "");
-                                           $o.=$current->{zipcode};
-                                        }
-                                        if ($current->{location} ne ""){
-                                           $o.=" " if ($o ne "");
-                                           $o.=$current->{location};
-                                        }
-                                        if ($o ne ""){
-                                           $m.="<br>$o";
-                                        }
-                                        return($m);
-                                     },
-                                     address=>\&AddressBuild),
+      new kernel::Field::OSMap(
+                name          =>'osmap',
+                uploadable    =>0,
+                searchable    =>0,
+                group         =>'map',
+                htmlwidth     =>'500px',
+                label         =>'OpenStreetMap',
+                depend        =>['country','address1',
+                                 'label',
+                                 'gpslongitude',
+                                 'gpslatitude',
+                                 'zipcode','location']),
 
-      new kernel::Field::GoogleAddrChk(name        =>'googlechk',
-                                     group         =>'map',
-                                     htmldetail    =>0,
-                                     htmlwidth     =>'200px',
-                                     label         =>'Google Address Check',
-                                     depend        =>['country','address1',
-                                                      'label',
-                                                      'gpslongitude',
-                                                      'gpslatitude',
-                                                      'zipcode','location'],
-                                     address=>\&AddressBuild),
+
+
+#      new kernel::Field::GoogleMap(  name          =>'googlemap',
+#                                     group         =>'map',
+#                                     htmlwidth     =>'500px',
+#                                     label         =>'GoogleMap',
+#                                     depend        =>['country','address1',
+#                                                      'fullname',
+#                                                      'gpslongitude',
+##                                                      'gpslatitude',
+#                                                      'zipcode','location'],
+#                                     marker=>sub{
+#                                        my $self=shift;
+#                                        my $current=shift;
+#                                        my $m="";
+#                                        $m=$current->{fullname};
+#                                        $m="<b>$m</b>" if ($m ne "");
+#                                        $m.="<br>" if ($m ne "");
+#                                        if ($current->{address1} ne ""){
+#                                           $m.="<br>".$current->{address1};
+#                                        }
+#                                        my $o=$current->{country};
+#                                        if ($current->{zipcode} ne ""){
+#                                           $o.="-" if ($o ne "");
+#                                           $o.=$current->{zipcode};
+#                                        }
+#                                        if ($current->{location} ne ""){
+#                                           $o.=" " if ($o ne "");
+#                                           $o.=$current->{location};
+#                                        }
+#                                        if ($o ne ""){
+#                                           $m.="<br>$o";
+#                                        }
+#                                        return($m);
+#                                     },
+#                                     address=>\&AddressBuild),
+
+#      new kernel::Field::GoogleAddrChk(name        =>'googlechk',
+#                                     group         =>'map',
+#                                     htmldetail    =>0,
+#                                     htmlwidth     =>'200px',
+#                                     label         =>'Google Address Check',
+#                                     depend        =>['country','address1',
+#                                                      'label',
+#                                                      'gpslongitude',
+#                                                      'gpslatitude',
+#                                                      'zipcode','location'],
+#                                     address=>\&AddressBuild),
 
    );
    $self->setDefaultView(qw(linenumber code locationid fullname zipcode location address1));
