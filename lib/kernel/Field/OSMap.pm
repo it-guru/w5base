@@ -238,7 +238,7 @@ function OSMapInit$id() {
   }
 
   if (zoom>2){
-     addPositionMarker(sphpos,"$marker");
+     addPositionMarker(wgspos,"$marker");
   }
   OSMMessage=new OpenLayers.Popup("OSMMessage", 
                                   new OpenLayers.LonLat(10,10),
