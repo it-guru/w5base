@@ -94,12 +94,12 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'amcostcenter.norinstructiontyp'),
 
-      new kernel::Field::Text(
-                name          =>'bnorcountryexcl',
-                label         =>'Country-Excl',
-                group         =>'nor',
-                ignorecase    =>1,
-                dataobjattr   =>'amcostcenter.bnorcountryexcl'),
+#      new kernel::Field::Text(             # Aufgrund einer Info von Hr.
+#                name          =>'bnorcountryexcl',  # Schmied Rainer entfernt.
+#                label         =>'Country-Excl',     # (Wir aus AM demnächst
+#                group         =>'nor',              # entfernt).
+#                ignorecase    =>1,
+#                dataobjattr   =>'amcostcenter.bnorcountryexcl'),
 
       new kernel::Field::TextDrop(
                 name          =>'delmgr',
