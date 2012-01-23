@@ -1,7 +1,7 @@
 'tsacinv::location'=>{de=>'AssetManager Standort',en=>'AssetManager Location'},
 'Fullname'=>{de=>'Standortname',en=>'Locationname'},
 'fieldgroup.default'=>{de=>'Standortdaten',en=>'Location data'},
-'fieldgroup.location'=>{de=>'Standort', en=>'Location'},
+'fieldgroup.map'=>{de=>'Karte', en=>'Karte'},
 'fieldgroup.location'=>{de=>'Standort', en=>'Location'},
 'fieldgroup.w5baselocation'=>{de=>'W5Base Standort', en=>'W5Base Location'},
 'Location'=>{de=>'Ort'},
