@@ -152,7 +152,7 @@ sub findW5LocID
    }
    #printf STDERR ("fifi newrec=%s\n",Dumper($newrec));
    my $d;
-   my @locid=$loc->getIdByHashIOMapped($self->Self,$newrec,
+   my @locid=$loc->getIdByHashIOMapped($self->getParent->Self,$newrec,
                                        DEBUG=>\$d,
                                        ForceLikeSearch=>1);
 
