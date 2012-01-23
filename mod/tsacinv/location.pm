@@ -155,17 +155,12 @@ sub findW5LocID
    my @locid=$loc->getIdByHashIOMapped($self->Self,$newrec,
                                        DEBUG=>\$d,
                                        ForceLikeSearch=>1);
-   #printf STDERR ("debug=%s\n",$d);
-   $d="";
-   if ($newrec->{zipcode} ne "" && $#locid==-1){ # try without zipcode
-      delete($newrec->{zipcode});
-      @locid=$loc->getIdByHashIOMapped($self->Self,$newrec,
-                                       DEBUG=>\$d,
-                                       ForceLikeSearch=>1);
-   }
 
    if ($#locid!=-1){
       return(\@locid);
+   }
+   else{
+      return($d);
    }
    return(undef);
 }
