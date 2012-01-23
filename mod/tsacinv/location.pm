@@ -156,6 +156,13 @@ sub findW5LocID
                                        DEBUG=>\$d,
                                        ForceLikeSearch=>1);
 
+   if ($newrec->{zipcode} ne "" && $#locid==-1){ # try without zipcode
+      delete($newrec->{zipcode});
+      @locid=$loc->getIdByHashIOMapped($self->getParent->Self,$newrec,
+                                       DEBUG=>\$d,
+                                       ForceLikeSearch=>1);
+   }
+
    if ($#locid!=-1){
       return(\@locid);
    }
