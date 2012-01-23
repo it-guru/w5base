@@ -142,14 +142,16 @@ sub findW5LocID
    }
    #printf STDERR ("fifi newrec=%s\n",Dumper($newrec));
    my $d;
-   my @locid=$loc->getIdByHashIOMapped("tsinet::location",$newrec,DEBUG=>\$d);
+   my @locid=$loc->getIdByHashIOMapped($self->Self,$newrec,
+                                       DEBUG=>\$d,
+                                       ForceLikeSearch=>1);
    #printf STDERR ("debug=%s\n",$d);
    $d="";
    if ($newrec->{zipcode} ne "" && $#locid==-1){ # try without zipcode
-   #   printf STDERR ("try without zipcode\n");
       delete($newrec->{zipcode});
-      @locid=$loc->getIdByHashIOMapped("tsinet::location",$newrec,DEBUG=>\$d);
-   #   printf STDERR ("debug=%s\n",$d);
+      @locid=$loc->getIdByHashIOMapped($self->Self,$newrec,
+                                       DEBUG=>\$d,
+                                       ForceLikeSearch=>1);
    }
   
    if ($#locid!=-1){

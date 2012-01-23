@@ -278,6 +278,7 @@ sub getRecordImageUrl
 }
 
 
+
 sub Validate
 {
    my $self=shift;
@@ -462,10 +463,24 @@ sub Welcome
    return($self->MapTester());
 }
 
+sub getValidWebFunctions
+{
+   my $self=shift;
+   return("MapTester",
+          $self->SUPER::getValidWebFunctions());
+}
+
+
 sub MapTester   
 {
    my $self=shift;
    my $debug;
+   my $mapsize=6;
+   if (Query->Param("search_mapsize")){
+      $mapsize=Query->Param("search_mapsize");
+      $mapsize=3 if ($mapsize<3);
+      $mapsize=10 if ($mapsize>10);
+   }
 
    print $self->HttpHeader();
    print $self->HtmlHeader(
@@ -524,7 +539,7 @@ sub MapTester
              "</tr>\n";
          my @outval;
          my %qrec;
-         for(my $fno=1;$fno<=5;$fno++){
+         for(my $fno=1;$fno<=$mapsize;$fno++){
             my $fieldname=Query->Param("field".$fno);;
             if ($fieldname ne ""){
                my $inval="val$fno";
@@ -548,7 +563,7 @@ sub MapTester
             $debug.="DEBUG End Log\n";
          }
 
-         for(my $fno=1;$fno<=5;$fno++){
+         for(my $fno=1;$fno<=$mapsize;$fno++){
             my @in;
             foreach my $fname (@l){
                push(@in,$fname,$fname);

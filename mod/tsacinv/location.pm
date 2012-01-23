@@ -104,59 +104,72 @@ sub new
                                  'zipcode','location']),
 
 
+      new kernel::Field::Text(
+                name          =>'w5locid',
+                label         =>'W5Base Location ID',
+                group         =>'w5baselocation',
+                searchable    =>0,
+                depend        =>[qw(location address1 country zipcode)],
+                onRawValue    =>\&findW5LocID),
 
-#      new kernel::Field::GoogleMap(  name          =>'googlemap',
-#                                     group         =>'map',
-#                                     htmlwidth     =>'500px',
-#                                     label         =>'GoogleMap',
-#                                     depend        =>['country','address1',
-#                                                      'fullname',
-#                                                      'gpslongitude',
-##                                                      'gpslatitude',
-#                                                      'zipcode','location'],
-#                                     marker=>sub{
-#                                        my $self=shift;
-#                                        my $current=shift;
-#                                        my $m="";
-#                                        $m=$current->{fullname};
-#                                        $m="<b>$m</b>" if ($m ne "");
-#                                        $m.="<br>" if ($m ne "");
-#                                        if ($current->{address1} ne ""){
-#                                           $m.="<br>".$current->{address1};
-#                                        }
-#                                        my $o=$current->{country};
-#                                        if ($current->{zipcode} ne ""){
-#                                           $o.="-" if ($o ne "");
-#                                           $o.=$current->{zipcode};
-#                                        }
-#                                        if ($current->{location} ne ""){
-#                                           $o.=" " if ($o ne "");
-#                                           $o.=$current->{location};
-#                                        }
-#                                        if ($o ne ""){
-#                                           $m.="<br>$o";
-#                                        }
-#                                        return($m);
-#                                     },
-#                                     address=>\&AddressBuild),
-
-#      new kernel::Field::GoogleAddrChk(name        =>'googlechk',
-#                                     group         =>'map',
-#                                     htmldetail    =>0,
-#                                     htmlwidth     =>'200px',
-#                                     label         =>'Google Address Check',
-#                                     depend        =>['country','address1',
-#                                                      'label',
-#                                                      'gpslongitude',
-#                                                      'gpslatitude',
-#                                                      'zipcode','location'],
-#                                     address=>\&AddressBuild),
+      new kernel::Field::TextDrop(
+                name          =>'w5location',
+                group         =>'w5baselocation',
+                label         =>'W5Base Location',
+                vjointo       =>'base::location',
+                vjoindisp     =>'name',
+                vjoinon       =>['w5locid'=>'id'],
+                searchable    =>0),
 
    );
-   $self->setDefaultView(qw(linenumber code locationid fullname zipcode location address1));
+   $self->setDefaultView(qw(linenumber code locationid fullname 
+                             zipcode location address1));
    $self->{MainSearchFieldLines}=4;
    return($self);
 }
+
+sub findW5LocID
+{
+   my $self=shift;
+   my $current=shift;
+
+   my $loc=getModuleObject($self->getParent->Config,"base::location");
+   my $address1=$self->getParent->getField("address1")->RawValue($current);
+   my $location=$self->getParent->getField("location")->RawValue($current);
+   my $zipcode=$self->getParent->getField("zipcode")->RawValue($current);
+   my $country=$self->getParent->getField("country")->RawValue($current);
+   my $newrec;
+   $newrec->{country}=$country;
+   $newrec->{location}=$location;
+   $newrec->{address1}=$address1;
+   $newrec->{zipcode}=$zipcode;
+   $newrec->{cistatusid}="4";
+
+   $loc->Normalize($newrec);
+
+   foreach my $k (keys(%$newrec)){
+      delete($newrec->{$k}) if (!defined($newrec->{$k}));
+   }
+   #printf STDERR ("fifi newrec=%s\n",Dumper($newrec));
+   my $d;
+   my @locid=$loc->getIdByHashIOMapped($self->Self,$newrec,
+                                       DEBUG=>\$d,
+                                       ForceLikeSearch=>1);
+   #printf STDERR ("debug=%s\n",$d);
+   $d="";
+   if ($newrec->{zipcode} ne "" && $#locid==-1){ # try without zipcode
+      delete($newrec->{zipcode});
+      @locid=$loc->getIdByHashIOMapped($self->Self,$newrec,
+                                       DEBUG=>\$d,
+                                       ForceLikeSearch=>1);
+   }
+
+   if ($#locid!=-1){
+      return(\@locid);
+   }
+   return(undef);
+}
+
 
 sub getSqlFrom
 {
