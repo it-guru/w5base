@@ -159,9 +159,7 @@ sub findW5LocID
    if ($#locid!=-1){
       return(\@locid);
    }
-   else{
-      return($d);
-   }
+   #return($d);
    return(undef);
 }
 
