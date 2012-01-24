@@ -262,6 +262,15 @@ sub Init
                       "OSY::projectroom",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itts.kern.servicesupport",
+                      "itil::servicesupport",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itts.kern.servicesupport.new",
+                      "itil::servicesupport",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itts.proc",
                       "tmpl/welcome",
                       prio=>20000);

@@ -56,6 +56,8 @@
 'itts.kern.servicesupport.new'=>{de=>'Neueingabe',en=>'New'},
 'itts.kern.costcenter'=>{de=>'Kostenstelle/CO',en=>'CostCenter/CO'},
 'itts.kern.costcenter.new'=>{de=>'Neueingabe',en=>'New'},
+'itts.kern.servicesupport'=>{de=>'Service&Support',en=>'Service&Support'},
+'itts.kern.servicesupport.new'=>{de=>'Neueingabe',en=>'New'},
 'itts.kern.bp'=>{de=>'Geschäftsprozess',en=>'Business process'},
 'itts.kern.bp.new'=>{de=>'Neueingabe',en=>'New'},
 'itts.kern.projectroom'=>{de=>'Projektraum',en=>'Projectroom'},
