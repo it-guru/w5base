@@ -100,6 +100,11 @@ sub FormatedDetail
    if ($mode ne "HtmlDetail"){
       $mapsize=200;
    }
+   if ($mode eq "edit"){
+      return("<div id=\"OSMapLayer$id\" ".
+             "style=\"width: 100%; height: ${mapsize}px\">".
+             "edit not supported ...</div>");
+   }
 
 
 
