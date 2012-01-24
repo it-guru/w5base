@@ -770,8 +770,8 @@ sub Normalize
    $rec->{location}=~s/^St\.{0,1}\s/Sankt /;  # Sankt Abkürzung
    $rec->{label}=~s/\.//;
    $rec->{address1}=~s/\.//;
-   $rec->{address1}=~s/\(.*\)//;  # keine Klammerzusätze
-   $rec->{location}=~s/\(.*\)//;  # keine Klammerzusätze
+   $rec->{address1}=~s/\s*\(.*\)//;  # keine Klammerzusätze
+   $rec->{location}=~s/\s*\(.*\)//;  # keine Klammerzusätze
    if (($rec->{location}=~m/^Naumburg.*/i) ){
       $rec->{location}="Naumburg (Saale)";
    }
