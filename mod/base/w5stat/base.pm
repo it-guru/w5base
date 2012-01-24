@@ -508,7 +508,8 @@ sub processData
       my $wf=getModuleObject($self->getParent->Config,"base::workflow");
      
       msg(INFO,"starting collect of base::workflow set1.1");
-      $wf->SetFilter({eventend=>">=$month/$year AND <$month/$year+1M"});
+      $wf->SetFilter({eventend=>">=$month/$year AND <$month/$year+1M",
+                      isdeleted=>\'0'});
       # not posible because sequential search
       #            {eventstart=>">=$month/$year AND <$month/$year+1M"}]);
       #            {eventstart=>"<$month/$year",eventend=>">$month/$year+1M"}]);
@@ -531,7 +532,8 @@ sub processData
      
       msg(INFO,"starting collect of base::workflow set1.2");
       $wf->ResetFilter();
-      $wf->SetFilter({eventend=>"[EMPTY]"});
+      $wf->SetFilter({eventend=>"[EMPTY]",
+                      isdeleted=>\'0'});
       $wf->SetCurrentView(@wfstat);
       $wf->SetCurrentOrder("NONE");
       my $c=0;
@@ -551,7 +553,8 @@ sub processData
      
       msg(INFO,"starting collect of base::workflow set2");
       $wf->ResetFilter();
-      $wf->SetFilter([{stateid=>"<20",fwdtarget=>'![EMPTY]'}]);
+      $wf->SetFilter([{stateid=>"<20",fwdtarget=>'![EMPTY]',
+                       isdeleted=>\'0'}]);
       $wf->SetCurrentView(@wfstat);
       $wf->SetCurrentOrder("NONE");
       my $c=0;

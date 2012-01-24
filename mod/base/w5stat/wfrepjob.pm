@@ -76,7 +76,8 @@ sub processData
       my $wfw=$wf->Clone();
       msg(INFO,"starting collect of base::workflow set0 ".
                "- all modified $dstrange");
-      $wf->SetFilter({mdate=>">monthbase-1M-2d AND <now"});
+      $wf->SetFilter({mdate=>">monthbase-1M-2d AND <now",
+                      isdeleted=>\'0'});
    #   $wf->SetFilter({id=>"12312433930002"});
    #   $wf->Limit(15500);
       $wf->SetCurrentView(qw(ALL));
