@@ -812,6 +812,8 @@ sub Validate
    ########################################################################
    my $chksslurl=effVal($oldrec,$newrec,"sslurl");
    if ($chksslurl ne ""){
+      $chksslurl=~s/^\[//; # für nicht automatisch
+      $chksslurl=~s/\]$//; # gescannte URLs 
       if (!($chksslurl=~m/^(ldaps|https|http):\/\/(\S)+$/) &&
           !($chksslurl=~m/^(\S+):(\d)+$/)){
          $self->LastMsg(ERROR,"url did not looks like a ssl url");

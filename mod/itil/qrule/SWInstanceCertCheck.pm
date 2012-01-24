@@ -122,7 +122,8 @@ sub qcheckRecord
 
    return(0,undef) if ($rec->{'cistatusid'}!=4 && 
                        $rec->{'cistatusid'}!=3);
-   if ($rec->{'sslurl'} ne ""){
+   if ($rec->{'sslurl'} ne "" &&  # Eckige Klammern verhindern den autoscan
+       !($rec->{'sslurl'}=~m/^\[.+\]$/)){
       my $sslurl=$rec->{'sslurl'};
       my $sslstate=$rec->{'sslstate'};
       my $sslend=$rec->{'sslend'};
