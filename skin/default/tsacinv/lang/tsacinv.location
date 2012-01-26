@@ -9,3 +9,6 @@
 'Location Type'=>{de=>'Standorttyp'},
 'Country'=>{de=>'Land'},
 'ZIP'=>{de=>'PLZ'},
+'W5Base Location: Location'=>{de=>'W5Base Location: Ort'},
+'W5Base Location: street'=>{de=>'W5Base Location: Strasse'},
+'W5Base Location: zipcode'=>{de=>'W5Base Location: PLZ'},

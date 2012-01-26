@@ -103,7 +103,6 @@ sub new
                                  'gpslatitude',
                                  'zipcode','location']),
 
-
       new kernel::Field::Text(
                 name          =>'w5locid',
                 label         =>'W5Base Location ID',
@@ -113,11 +112,38 @@ sub new
                 onRawValue    =>\&findW5LocID),
 
       new kernel::Field::TextDrop(
-                name          =>'w5location',
+                name          =>'w5loc_name',
                 group         =>'w5baselocation',
-                label         =>'W5Base Location',
+                label         =>'W5Base Location: Fullname',
                 vjointo       =>'base::location',
                 vjoindisp     =>'name',
+                vjoinon       =>['w5locid'=>'id'],
+                searchable    =>0),
+
+      new kernel::Field::TextDrop(
+                name          =>'w5locaddress1',
+                group         =>'w5baselocation',
+                label         =>'W5Base Location: street',
+                vjointo       =>'base::location',
+                vjoindisp     =>'address1',
+                vjoinon       =>['w5locid'=>'id'],
+                searchable    =>0),
+
+      new kernel::Field::TextDrop(
+                name          =>'w5loclocation',
+                group         =>'w5baselocation',
+                label         =>'W5Base Location: Location',
+                vjointo       =>'base::location',
+                vjoindisp     =>'location',
+                vjoinon       =>['w5locid'=>'id'],
+                searchable    =>0),
+
+      new kernel::Field::TextDrop(
+                name          =>'w5loczipcode',
+                group         =>'w5baselocation',
+                label         =>'W5Base Location: zipcode',
+                vjointo       =>'base::location',
+                vjoindisp     =>'zipcode',
                 vjoinon       =>['w5locid'=>'id'],
                 searchable    =>0),
 
