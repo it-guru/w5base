@@ -403,7 +403,7 @@ sub new
                 vjoinon       =>['osreleaseid'=>'id'],
                 vjoindisp     =>'name'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'osreleaseid',
                 label         =>'OSReleaseID',
                 dataobjattr   =>'system.osrelease'),
