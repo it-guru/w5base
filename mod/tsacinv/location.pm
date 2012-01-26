@@ -145,6 +145,9 @@ sub findW5LocID
    $newrec->{zipcode}=$zipcode;
    $newrec->{cistatusid}="4";
 
+   return(undef) if ($newrec->{address1}=~m/^\s*$/);
+   return(undef) if ($newrec->{location}=~m/^\s*$/);
+
    $loc->Normalize($newrec);
 
    foreach my $k (keys(%$newrec)){
