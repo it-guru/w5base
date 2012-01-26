@@ -1234,7 +1234,8 @@ sub SecureSetFilter
    my $self=shift;
    my @flt=@_;
 
-   if (!$self->isDirectFilter(@flt) && 
+   if (
+      #!$self->isDirectFilter(@flt) && 
        !$self->IsMemberOf([qw(admin w5base.itil.appl.read w5base.itil.read)],
                           "RMember")){
       my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");

@@ -1365,7 +1365,12 @@ sub Detail
             }
             else{
                if ($self->can("HtmlPublicDetail")){
-                  print($self->HtmlPublicDetail($rec,1));
+                  print($self->T("Short information summary ".
+                                 "for config-item from inaccessable mandator").
+                        ":<br><hr><center>".
+                        "<div style='width:600px;text-align:left'>".
+                        $self->HtmlPublicDetail($rec,1).
+                        "</div></center>");
                }
                else{
                   print "<center>ERROR: Record exists, ".

@@ -117,6 +117,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'zipcode',
+                htmleditwidth =>'50px',
                 label         =>'ZIP Code',
                 dataobjattr   =>'location.zipcode'),
 
