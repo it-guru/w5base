@@ -284,7 +284,7 @@ sub Initialize
 sub initSqlWhere
 {
    my $self=shift;
-   my $where="amcostcenter.bdelete=0 and amcostcenter.lcostid<>''";
+   my $where="amcostcenter.bdelete=0";
    return($where);
 }
 

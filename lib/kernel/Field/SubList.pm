@@ -222,6 +222,7 @@ sub getSubListData
          return("undefined");
       }
       my $srcval=$srcfield->RawValue($current);
+      return(undef) if (!defined($srcval));
       my $loadfield=$self->{vjoinon}->[1];
       $self->vjoinobjInit();
       $self->vjoinobj->ResetFilter();
