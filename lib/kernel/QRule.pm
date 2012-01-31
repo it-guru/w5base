@@ -127,6 +127,9 @@ sub IfaceCompare
        $param{mode} eq "string"){           # like nativ string compares
       if (exists($comprec->{$compfieldname})){
          if (defined($comprec->{$compfieldname})){
+            $origrec->{$origfieldname}=trim($origrec->{$origfieldname});
+            my $t1=$origrec->{$origfieldname};
+            my $t2=$comprec->{$compfieldname};
             if (!defined($origrec->{$origfieldname}) ||
                 $comprec->{$compfieldname} ne $origrec->{$origfieldname}){
                $takeremote++;
@@ -137,10 +140,12 @@ sub IfaceCompare
    elsif ($param{mode} eq "text"){          # for multiline text fields
       if (exists($comprec->{$compfieldname})){
          if (defined($comprec->{$compfieldname})){
+            $origrec->{$origfieldname}=trim($origrec->{$origfieldname});
             my $t1=$origrec->{$origfieldname};
             my $t2=$comprec->{$compfieldname};
             $t1=~s/\r\n/\n/gs;
             $t2=~s/\r\n/\n/gs;
+            $t2=~s/\s*$//gs;
             if (!defined($origrec->{$origfieldname}) || $t1 ne $t2){
                $takeremote++;
             }

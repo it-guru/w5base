@@ -146,7 +146,7 @@ sub qcheckRecord
                              $parrec,"version",
                              $forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'native');
+                             mode=>'text');
          if ($dataobj->Self eq "AL_TCom::appl"){  # only for AL DTAG
             $self->IfaceCompare($dataobj,
                                 $rec,"acinmassingmentgroup",
@@ -251,7 +251,7 @@ sub qcheckRecord
             }
          }
          else{
-            $forcedupd->{cistatusid}=4;
+            $forcedupd->{cistatusid}=4 if ($rec->{cistatusid}!=4);
             my $databossid;
             my $acgroup=getModuleObject($self->getParent->Config,
                                         "tsacinv::group");
