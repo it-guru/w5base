@@ -23,6 +23,7 @@ use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
 use kernel::Field::OSMap;
+use kernel::Field::WebLink;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -124,6 +125,7 @@ sub new
                 name          =>'w5locaddress1',
                 group         =>'w5baselocation',
                 label         =>'W5Base Location: street',
+                htmldetail    =>0,
                 vjointo       =>'base::location',
                 vjoindisp     =>'address1',
                 vjoinon       =>['w5locid'=>'id'],
@@ -133,6 +135,7 @@ sub new
                 name          =>'w5loclocation',
                 group         =>'w5baselocation',
                 label         =>'W5Base Location: Location',
+                htmldetail    =>0,
                 vjointo       =>'base::location',
                 vjoindisp     =>'location',
                 vjoinon       =>['w5locid'=>'id'],
@@ -142,10 +145,40 @@ sub new
                 name          =>'w5loczipcode',
                 group         =>'w5baselocation',
                 label         =>'W5Base Location: zipcode',
+                htmldetail    =>0,
                 vjointo       =>'base::location',
                 vjoindisp     =>'zipcode',
                 vjoinon       =>['w5locid'=>'id'],
                 searchable    =>0),
+
+      new kernel::Field::WebLink(
+                name          =>'w5lociomaptester',
+                group         =>'w5baselocation',
+                label         =>'W5Base IO Map-Test',
+                depend        =>[qw(location address1 country zipcode)],
+                uivisible     =>sub{
+                   my $self=shift;
+                   return(1) if ($self->getParent->IsMemberOf("admin"));
+                   return(0);
+                },
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $q=kernel::cgi::Hash2QueryString({
+                       'search_dataobj'=>'base::location',
+                       'search_mapsize'=>4,
+                       'ForceLike'=>1,
+                       'search_queryfrom'=>$self->getParent->Self,
+                       'field1'=>"country",
+                       'val1'=>$current->{country},
+                       'field2'=>"zipcode",
+                       'val2'=>$current->{zipcode},
+                       'field3'=>"location",
+                       'val3'=>$current->{location},
+                       'field4'=>"address1",
+                       'val4'=>$current->{address1}});
+                   return("../../base/iomap/MapTester?$q");
+                }),
 
    );
    $self->setDefaultView(qw(linenumber code locationid fullname 

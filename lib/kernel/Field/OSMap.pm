@@ -106,6 +106,12 @@ sub FormatedDetail
              "edit not supported ...</div>");
    }
 
+   $q="$current->{country} $current->{zipcode} ".
+       "$current->{location} ; $current->{address1}";
+   my $queryobj=new kernel::cgi({q=>latin1($q)->utf8()});
+   $q=$queryobj->QueryString();
+   my $gmaplink="<a href='http://maps.google.de?$q' target=_blank>";
+   my $binglink="<a href='http://www.bing.com/maps/?$q' target=_blank>";
 
 
    $marker=~s/\n/<br>/g;
@@ -113,8 +119,8 @@ sub FormatedDetail
       $d.=<<EOF;
 <script language=JavaScript xsrc="../../../public/base/load/firebug-lite.js"></script>
 
-<script src="http://www.openlayers.org/api/OpenLayers.js" type="text/javascript"></script>
-<script src="http://www.openstreetmap.org/openlayers/OpenStreetMap.js" type="text/javascript">
+<script xsrc="http://www.openlayers.org/api/OpenLayers.js" type="text/javascript"></script>
+<script xsrc="http://www.openstreetmap.org/openlayers/OpenStreetMap.js" type="text/javascript">
 </script>
 <script language="JavaScript">
 
@@ -341,8 +347,34 @@ function addPositionMarker(wgspos,markerText){
 }
 
 addEvent(window, "load", OSMapInit$id);
+
+(function() {
+
+   var osl=document.createElement('script'); 
+   osl.type='text/javascript'; 
+   osl.async=true;
+   osl.src='http://www.openlayers.org/api/OpenLayers.js';
+   (document.getElementsByTagName('head')[0] || 
+    document.getElementsByTagName('body')[0]).appendChild(osl);
+
+   var osm=document.createElement('script'); 
+   osm.type='text/javascript'; 
+   osm.async=true;
+   osm.src='http://www.openstreetmap.org/openlayers/OpenStreetMap.js';
+   (document.getElementsByTagName('head')[0] || 
+    document.getElementsByTagName('body')[0]).appendChild(osm);
+
+
+    })();
+
+
 </script>
-<div id="OSMapLayer$id" style="width: 100%; height: ${mapsize}px"></div>
+<div id="OSMapLayer$id" style="width: 100%; height: ${mapsize}px;border-style:solid;border-color:gray;border-width:1px;margin-bottom:0px;border-bottom-style:none"></div>
+<div id="OSMapSig$id" style="width: 100%; height: auto;border-style:solid;border-color:gray;border-width:1px;margin-bottom:2px;">&nbsp;
+<b>forward address search:</b>
+-&gt; ${gmaplink}GoogleMaps</a> &nbsp;&nbsp;
+-&gt; ${binglink}Microsoft Bing</a> &nbsp;&nbsp;
+</div>
 EOF
    }
    else{

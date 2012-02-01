@@ -56,7 +56,7 @@ sub new
 
       new kernel::Field::Mandator(),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'mandatorid',
                 dataobjattr   =>'appl.mandator'),
 

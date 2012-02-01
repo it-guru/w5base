@@ -200,6 +200,7 @@ EOF
    }
    my %template=();
    my %grouplabel;
+   my @indexdataaddon;
    if ($#detaillist!=-1){
       for(my $c=0;$c<=$#detaillist;$c++){
          my $template=$detaillist[$c];
@@ -363,11 +364,20 @@ EOF
             my $name=$fieldlist[$c]->Name();
             next if (!($uivisibleof[$c]));
             next if (!($fieldlist[$c]->htmldetail("HtmlDetail",current=>$rec)));
+
             my @fieldgrouplist=($fieldlist[$c]->{group});
             if (ref($fieldlist[$c]->{group}) eq "ARRAY"){
                @fieldgrouplist=@{$fieldlist[$c]->{group}};
             }
             if (grep(/^$group$/,@fieldgrouplist)){
+               if ($fieldlist[$c]->Type() eq "WebLink"){ # WebLink special
+                  push(@indexdataaddon,{                 # handling
+                     href=>$fieldlist[$c]->RawValue($rec),
+                     target=>'_blank',
+                     label=>$fieldlist[$c]->Label()});
+printf STDERR ("fifi =%s\n",$fieldlist[$c]->RawValue($rec));
+                  next;
+               }
                my $valign=$fieldlist[$c]->valign();
                $valign=" valign=$valign";
                $valign=" valign=top" if ($fieldlist[$c]->can("EditProcessor"));
@@ -447,18 +457,20 @@ EOF
 </td>
 EOF
                }
-               $col++;
-               if ($halfwidth){
-                  if ($col>=2){
-                     $col=0;
-                  } 
+               if ($fieldlist[$c]->Type() ne "WebLink"){
+                  $col++;
+                  if ($halfwidth){
+                     if ($col>=2){
+                        $col=0;
+                     } 
+                  }
+                  else{
+                     if ($col>=1){
+                        $col=0;
+                     } 
+                  }
+                  $subblock.="</tr>" if ($col==0);
                }
-               else{
-                  if ($col>=1){
-                     $col=0;
-                  } 
-               }
-               $subblock.="</tr>" if ($col==0);
             }
          }
          my $grouplabel="fieldgroup.".$group;
@@ -521,6 +533,9 @@ EOF
                                                             current=>$rec,
                                                             mode=>'HtmlDetail');
    my @indexdata=$app->getRecordHtmlIndex($rec,$id,$viewgroups,\@blocks,\%grouplabel);
+   if ($#indexdataaddon!=-1){
+      push(@indexdata,@indexdataaddon);
+   }
    if ($#indexdata!=-1){
       my @set;
       my $setno=0;
@@ -533,7 +548,8 @@ EOF
                $link.=" target='$indexdata[$c]->{target}'";
             }
             $link.=">";
-            $set[$setno].="<li>$link$indexdata[$c]->{label}</a></li>";
+            $link=~s/\%/\\%/g;
+            $set[$setno].="&bull;&nbsp;$link$indexdata[$c]->{label}</a><br>";
          }
       }
       $template{"header"}.=<<EOF;
@@ -544,7 +560,7 @@ EOF
 <td width=40% valign=top>
 <table style="table-layout:fixed;width:100%" 
        cellspacing=0 cellpadding=0 border=0><tr><td>
-<ul>$set[0]</ul>
+$set[0]
 </td></tr></table>
 </td>
 <td width=40% valign=top>

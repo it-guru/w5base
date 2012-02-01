@@ -547,20 +547,31 @@ sub MapTester
             }
          }
          my %mrec;
-         if (keys(%qrec)){
-            $debug.="DEBUG Start Log\n";
-            %mrec=%qrec;
-            my $projectmode=0;
-            if (Query->Param("ProjectMode")){
-               $projectmode=1;
-               $debug.="process start in PROJECT mode\n";
+         if (Query->Param("do")){
+            if (keys(%qrec)){
+               $debug.="DEBUG Start Log\n";
+               %mrec=%qrec;
+               my $projectmode=0;
+               if (Query->Param("ProjectMode")){
+                  $projectmode=1;
+                  $debug.="process start in PROJECT mode\n";
+               }
+               else{
+                  $debug.="process start in normal mode\n";
+               }
+               my $forcelike=0;
+               if (Query->Param("ForceLike")){
+                  $forcelike=1;
+                  $debug.="process start in LIKE mode\n";
+               }
+               $o->getIOMap($q{queryfrom},1,$projectmode);  # bypass cache
+               #$o->NormalizeByIOMap($q{queryfrom},\%mrec,DEBUG=>\$debug,
+               #                                  ForceLikeSearch=>$forcelike);
+               my @locid=$o->getIdByHashIOMapped($q{queryfrom},\%mrec,
+                                          DEBUG=>\$debug,
+                                          ForceLikeSearch=>$forcelike);
+               $debug.="\n\nDEBUG End Log\n";
             }
-            else{
-               $debug.="process start in normal mode\n";
-            }
-            $o->getIOMap($q{queryfrom},1,$projectmode);  # bypass cache
-            $o->NormalizeByIOMap($q{queryfrom},\%mrec,DEBUG=>\$debug);
-            $debug.="DEBUG End Log\n";
          }
 
          for(my $fno=1;$fno<=$mapsize;$fno++){
@@ -585,7 +596,7 @@ sub MapTester
                 "style='width:100%' value=\"$mval\"></td>";
             $d.="</tr>\n";
          }
-         $d.="<tr>\n<td colspan=3><input type=submit ".
+         $d.="<tr>\n<td colspan=3><input type=submit name=do ".
              "value='process --&gt;' style=\"width:100%\"></td></tr>\n";
          $d.="</table>\n";
       }
@@ -597,6 +608,12 @@ sub MapTester
    }
    $p.=">";
 
+   my $l="<input type=checkbox name=ForceLike";
+   if (Query->Param("ForceLike")){
+      $l.=" checked";
+   }
+   $l.=">";
+
    
    print("<table height=100% width=100% border=0>");
    print("\n<tr height=1%><td valign=top nowrap align=center>".
@@ -604,7 +621,7 @@ sub MapTester
                 "onclick=\"openwin('MapTester','_blank',".
                 "'height=480,width=640,toolbar=no,status=no,".
                 "resizeable=yes,scrollbars=no')\">".
-                "<b>Map Tester</b></div> (project mode $p)").
+                "<b>Map Tester</b></div> (project mode $p &bull; LikeMode $l)").
          "</td></tr>\n");
    printf("<tr height=1%><td valign=top>%s</td></tr>",$d);
 

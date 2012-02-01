@@ -17,3 +17,4 @@
 'is private'=>{de=>'Vertraulich behandeln'},
 'insuficient rights to write privacy data'=>{de=>'ungenügende Rechte, um vertrauliche Daten zu schreiben'},
 'invalid file upload "%s" (size=%d by %s)'=>{de=>'Ungültiger Datei upload "%s" (größe=%d von %s)'},
+"can't store file - please contact admin"=>{de=>"Datei speichern technisch nicht möglich - bitte kontaktieren Sie den Admin"},
