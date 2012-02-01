@@ -243,7 +243,8 @@ sub getSqlFrom
 sub initSqlWhere
 {
    my $self=shift;
-   my $where="amlocation.lcountryid=amcountry.lcountryid(+) ";
+   my $where="amlocation.lcountryid=amcountry.lcountryid(+) and ".
+             "amlocation.bdelete=0";
    return($where);
 }
 
