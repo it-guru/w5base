@@ -525,7 +525,6 @@ sub Validate
       $binnamekey.=unpack("B16",pack("H4",$okt));
    }
    if ($oldrec->{binnamekey} ne $binnamekey){
-      printf STDERR ("store:$binnamekey\n");
       $newrec->{'binnamekey'}=$binnamekey;
    }
    if ($oldrec->{name} ne lc($name)){
