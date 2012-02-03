@@ -86,15 +86,15 @@ sub Result
       my @grpids=keys(%grp);
       @grpids=(qw(-1)) if ($#grpids==-1);
 
-      my %q1;
+      my %q1=%q;
       $q1{cistatusid}='<=4';
       $q1{businessteamid}=\@grpids;
 
-      my %q2;
+      my %q2=%q;
       $q2{cistatusid}='<=4';
       $q2{responseteamid}=\@grpids;
 
-      my %q3;
+      my %q3=%q;
       $q3{cistatusid}='<=4';
       $q3{delmgrteamid}=\@grpids;
 
@@ -118,7 +118,6 @@ sub Result
       $q3{businessteamid}=\@grpids;
       $q4{responseteamid}=\@grpids;
       $q5{delmgr2id}=\$userid;
-      $q6{ldelmgr2id}=\$userid;
       push(@q,\%q1,\%q2,\%q3,\%q4,\%q5,\%q6);
    }
    if ($dc ne "DEPONLY" && $dc ne "TEAM"){
@@ -131,7 +130,6 @@ sub Result
       $q2{tsmid}=\$userid;
       $q3{databossid}=\$userid;
       $q4{delmgrid}=\$userid;
-      $q5{ldelmgrid}=\$userid;
       push(@q,\%q1,\%q2,\%q3,\%q4,\%q5);
    }
 
