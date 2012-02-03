@@ -145,7 +145,7 @@ sub Result
    if ($#l>-1){
       @appl=map({$_->{id}} @l);
    }
-   my %q1=%q;
+   my %q1=%orgq;
    $q1{affectedapplicationid}=\@appl;
    $q1{stateid}='>6';
    $q1{eventend}=Query->Param("Search_TimeRange");
