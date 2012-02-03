@@ -82,6 +82,12 @@ sub new
                 group         =>'relatedto',
                 dataobjattr   =>'ipaddress.system'),
                                                   
+      new kernel::Field::Link(
+                name          =>'binnamekey',
+                label         =>'Binary IP-Adress',
+                group         =>'relatedto',
+                dataobjattr   =>'ipaddress.binnamekey'),
+                                                  
       new kernel::Field::TextDrop(
                 name          =>'itclustsvc',
                 htmlwidth     =>'150px',
@@ -459,7 +465,9 @@ sub Validate
    }
 
    my $name=trim(effVal($oldrec,$newrec,"name"));
+   my $binnamekey="";
    $name=~s/\s//g;
+   my $ip6str="";
    if ($cistatusid<=5){
       $name=~s/\[\d*\]$//;
    }
@@ -469,9 +477,11 @@ sub Validate
    }
    else{
       $name=~s/\s//g;
-      $name=~s/^[0]+([1-9])/$1/g;
-      $name=~s/\.[0]+([1-9])/.$1/g;
-      my $chkname=$name;
+      if ($name=~m/\./){
+         $name=~s/^[0]+([1-9])/$1/g;
+         $name=~s/\.[0]+([1-9])/.$1/g;
+      }
+      my $chkname=lc($name);
       if ($cistatusid>5){
          $chkname=~s/\[\d+\]$//;
       }
@@ -486,13 +496,41 @@ sub Validate
                    sprintf($self->T("invalid IPV4 address '\%s'"),$name));
             return(0);
          }
+         $ip6str="0000:0000:0000:0000:0000:ffff:".
+                 unpack("H2",pack('C',$o1)).
+                 unpack("H2",pack('C',$o2)).":".
+                 unpack("H2",pack('C',$o3)).
+                 unpack("H2",pack('C',$o4));
+      }
+      elsif (my ($o1,$o2,$o3,$o4,$o5,$o6,$o7,$o8)=$chkname
+                =~m/^([0-9a-f]{4}):([0-9a-f]{4}):([0-9a-f]{4}):([0-9a-f]{4}):([0-9a-f]{4}):([0-9a-f]{4}):([0-9a-f]{4}):([0-9a-f]{4})$/){
+       #  if (($o1<0 || $o1 >255 || 
+       #       $o2<0 || $o2 >255 ||
+       #       $o3<0 || $o3 >255 ||
+       #       $o4<0 || $o4 >255)||
+       #      ($o1==0 && $o2==0 && $o3==0 && $o4==0) ||
+       #      ($o1==255 && $o2==255 && $o3==255 && $o4==255)){
+       #     $self->LastMsg(ERROR,
+       #            sprintf($self->T("invalid IPV4 address '\%s'"),$name));
+       #     return(0);
+       #  }
+          $ip6str=$chkname;
       }
       else{
          $self->LastMsg(ERROR,"unknown ip-address format");
          return(0);
       }
+   } 
+   foreach my $okt (split(/:/,$ip6str)){
+      $binnamekey.=unpack("B16",pack("H4",$okt));
    }
-   $newrec->{'name'}=$name;
+   if ($oldrec->{binnamekey} ne $binnamekey){
+      printf STDERR ("store:$binnamekey\n");
+      $newrec->{'binnamekey'}=$binnamekey;
+   }
+   if ($oldrec->{name} ne lc($name)){
+      $newrec->{'name'}=lc($name);
+   }
 
    #######################################################################
    # unique IP-Handling

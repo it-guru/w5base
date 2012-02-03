@@ -250,7 +250,7 @@ create table network (
 );
 create table ipaddress (
   id         bigint(20) NOT NULL,
-  name       varchar(40) NOT NULL,  
+  name       varchar(45) NOT NULL, binnamekey char(128),
   cistatus   int(2)      NOT NULL,
     dnsname        varchar(40) default NULL,
     addresstyp     int(10)     default NULL,
@@ -270,7 +270,7 @@ create table ipaddress (
   srcid      varchar(20) default NULL,
   srcload    datetime    default NULL,
   PRIMARY KEY  (id),
-  key name(network,name),key dnsname(dnsname),
+  key name(network,name),key dnsname(dnsname),key(binnamekey),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table liccontract (
