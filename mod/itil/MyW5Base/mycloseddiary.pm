@@ -73,6 +73,11 @@ sub Result
 {
    my $self=shift;
    my %q=$self->{DataObj}->getSearchHash();
+   my %orgq=%q;
+   if (exists($q{affectedapplication})){
+      $q{name}=$q{affectedapplication};
+      delete($q{affectedapplication});
+   }
 
    my $userid=$self->getParent->getCurrentUserId();
    $userid=-1 if (!defined($userid) || $userid==0);
@@ -125,14 +130,12 @@ sub Result
       my %q2=%q;
       my %q3=%q;
       my %q4=%q;
-      my %q5=%q;
       $q1{semid}=\$userid;
       $q2{tsmid}=\$userid;
       $q3{databossid}=\$userid;
       $q4{delmgrid}=\$userid;
-      push(@q,\%q1,\%q2,\%q3,\%q4,\%q5);
+      push(@q,\%q1,\%q2,\%q3,\%q4);
    }
-   printf STDERR ("fifi dc=$dc q=%s\n",Dumper(\@q));
 
 
    $self->{appl}->ResetFilter();
