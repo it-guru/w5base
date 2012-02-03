@@ -115,9 +115,7 @@ sub Result
                                             "down");
       my @grpids=keys(%grp);
       @grpids=(qw(-1)) if ($#grpids==-1);
-      my %q3;
       $q3{businessteamid}=\@grpids;
-      my %q4;
       $q4{responseteamid}=\@grpids;
       $q5{delmgr2id}=\$userid;
       $q6{ldelmgr2id}=\$userid;
