@@ -132,6 +132,7 @@ sub Result
       $q4{delmgrid}=\$userid;
       push(@q,\%q1,\%q2,\%q3,\%q4,\%q5);
    }
+   printf STDERR ("fifi dc=$dc q=%s\n",Dumper(\@q));
 
 
    $self->{appl}->ResetFilter();
