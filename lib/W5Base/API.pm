@@ -327,7 +327,7 @@ use Getopt::Long;
 use FindBin qw($RealScript);
 use Config;
 
-$VERSION = "0.6";
+$VERSION = "0.7";
 @ISA = qw(Exporter);
 @EXPORT = qw(&msg &ERROR &WARN &DEBUG &INFO $RealScript
              &XGetOptions
@@ -645,6 +645,7 @@ sub getModuleObject
    my $SOAP=$config->{SOAP};
    my $SOAPresult=eval("\$SOAP->validateObjectname({dataobject=>\$objectname,
                                                 lang=>\$config->{lang}})");
+   return(undef) if (!defined($SOAPresult));
    my $result=$SOAPresult->result;
    return(undef) if (!defined($result) || $result->{exitcode}!=0);
    return(new W5Base::ModuleObject(CONFIG=>$config,SOAP=>$SOAP,
