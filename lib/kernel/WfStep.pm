@@ -357,10 +357,13 @@ sub nativProcess
          $oprec->{postponeduntil}=undef;    # wf aktuell an mich zugewiesen
       }                                     # u. Rückstellung wird entfernt.
       my $effort=$h->{effort};
+      my $intiatornotify=$h->{intiatornotify};
+      $intiatornotify=1 if ($intiatornotify ne "" &&
+                            $intiatornotify ne "0");
       if ($self->getParent->getParent->Action->StoreRecord(
           $WfRec->{id},"wfaddnote",
-          {translation=>'base::workflow::request'},$note,$effort)){
-         my $intiatornotify=$h->{intiatornotify};
+          {translation=>'base::workflow::request',
+           intiatornotify=>$intiatornotify},$note,$effort)){
          if ($intiatornotify ne "" && defined($WfRec->{initiatorid}) &&
              $WfRec->{initiatorid} ne ""){
             my $user=getModuleObject($self->Config,"base::user");
