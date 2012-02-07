@@ -390,7 +390,7 @@ sub Import
 
 
       my $mand=getModuleObject($self->Config,"base::mandator");
-      $mand->SetFilter({name=>"extern"});
+      $mand->SetFilter({cistatusid=>\'4',name=>"extern"});
       my ($mandrec,$msg)=$mand->getOnlyFirst(qw(grpid));
       if (!defined($mandrec)){
          $self->LastMsg(ERROR,"Can't find mandator extern");
@@ -399,7 +399,12 @@ sub Import
       my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"write","direct");
       my $mandatorid=$mandrec->{grpid};
       if ($#mandators!=-1){
-         $mandatorid=$mandators[0];
+         $mand->ResetFilter();
+         $mand->SetFilter({cistatusid=>\'4',grpid=>\@mandators});
+         my ($mandrec,$msg)=$mand->getOnlyFirst(qw(grpid));
+         if (defined($mandrec)){
+            $mandatorid=$mandrec->{grpid};
+         }
       }
       my $newrec={name=>$clustrec->{name},
                   clusterid=>$clustrec->{clusterid},
