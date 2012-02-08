@@ -798,7 +798,7 @@ sub Validate
       }
    }
    ########################################################################
-   if (!defined($oldrec) &&
+   if (defined($oldrec) &&
        effChanged($oldrec,$newrec,"runonclusts")){
       $newrec->{lnksoftwaresystemid}=undef;
       $newrec->{itclustsid}=undef;
