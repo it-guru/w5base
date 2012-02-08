@@ -798,11 +798,19 @@ sub Validate
       }
    }
    ########################################################################
-   if (effChanged($oldrec,$newrec,"runonclusts")){
+   if (!defined($oldrec) &&
+       effChanged($oldrec,$newrec,"runonclusts")){
       $newrec->{lnksoftwaresystemid}=undef;
-      $newrec->{systemid}=undef;
       $newrec->{itclustsid}=undef;
+      $newrec->{systemid}=undef;
    }
+   if (defined($newrec->{itclustsid}) &&
+       defined($newrec->{systemid})){
+      $newrec->{lnksoftwaresystemid}=undef;
+      $newrec->{itclustsid}=undef;
+      $newrec->{systemid}=undef;
+   }
+  
    ########################################################################
    if (exists($newrec->{swport})){
       if (effVal($oldrec,$newrec,"swport")=~m/^\s*$/){
