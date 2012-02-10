@@ -262,6 +262,7 @@ sub FormatedDetail
          $d=$self->getParent->ExpandTimeExpression($d,"SOAP",
                                                       $usertimezone,
                                                       "GMT");
+         return(undef) if ($d eq ""); # prevent display in XML SOAP Response
       }
       if ($mode eq "JSON"){
          my $usertimezone=$self->getParent->UserTimezone();
