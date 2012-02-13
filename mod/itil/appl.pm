@@ -652,7 +652,7 @@ sub new
                                  'HP OpenView',
                                  'OpenNMS',
                                  'Nagios',
-                                 'Relfex',  # for HP-NonStop Unix
+                                 'Reflex',  # for HP-NonStop Unix
                                  'Tivoli 5',
                                  'Tivoli 6',
                                  'TV-CC',
@@ -669,7 +669,7 @@ sub new
                                  'BigBrother',
                                  'OpenNMS',
                                  'Nagios',
-                                 'Relfex',  # for HP-NonStop Unix
+                                 'Reflex',  # for HP-NonStop Unix
                                  'Tivoli 5',
                                  'Tivoli 6',
                                  'TV-CC',
