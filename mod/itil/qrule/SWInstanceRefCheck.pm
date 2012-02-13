@@ -3,8 +3,12 @@
 
 =head3 PURPOSE
 
-Checks the related application (and in the further the system too)
-to the current instance is "active".
+Checks if the related application, logical system and software installation
+to the current instance is "active" and valid.
+
+An aktiv software instance need to have a link to a valid logical system 
+or cluster service. Also there is need to have a valid link to a software
+installation.
 
 =head3 IMPORTS
 
@@ -68,11 +72,13 @@ sub qcheckRecord
          push(@msg,"invalid application reference");
       }
       else{
-         if ($arec->{cistatusid}>5 || $arec->{cistatusid}<2){
+         if ($arec->{cistatusid}>5 || $arec->{cistatusid}<3){
             push(@msg,"referenced application application is not active");
          }
       }
       if (defined($arec)){ # further checks are only needed, if appl found
+         my $swinstvalid=1;
+         $swinstvalid=0 if ($rec->{lnksoftwaresystemid} eq ""); 
          if ($rec->{runonclusts}){   # now do cluster checks
             if ($rec->{itclusts} eq ""){
                push(@msg,"no cluster service specified");
@@ -83,22 +89,28 @@ sub qcheckRecord
                my $clustsid=$rec->{itclustsid};
                my $applid=$arec->{id};
                $c->SetFilter({itclustsvcid=>\$clustsid,applid=>\$applid});
-               my ($chkrec,$msg)=$c->getOnlyFirst(qw(id));
+               my ($svcrec,$msg)=$c->getOnlyFirst(qw(id));
 
-               if (!defined($chkrec)){
+               if (!defined($svcrec)){
                   push(@msg,"application does not match application ".
                             "in cluster service");
                }
             }
          }
          else{                       # now do system checks
-            if ($rec->{system} eq ""){
+            my $systemid=$rec->{systemid};
+            my $sys=getModuleObject($self->getParent->Config,"itil::system");
+            $sys->SetFilter({id=>\$systemid});
+            my ($sysrec,$msg)=$sys->getOnlyFirst(qw(id cistatusid));
+            if (!defined($sysrec)){
                push(@msg,"no system specified");
             }
             else{
+               if ($sysrec->{cistatusid}>5 || $sysrec->{cistatusid}<3){
+                  push(@msg,"referenced logical system is not active");
+               }
                my $c=getModuleObject($self->getParent->Config,
                                      "itil::lnkapplsystem");
-               my $systemid=$rec->{systemid};
                my $applid=$arec->{id};
                $c->SetFilter({systemid=>\$systemid,applid=>\$applid});
                my ($chkrec,$msg)=$c->getOnlyFirst(qw(id));
@@ -109,7 +121,30 @@ sub qcheckRecord
                }
             }
          }
+         if ($swinstvalid){ # detail check of software-Installation
+            my $swi=getModuleObject($self->getParent->Config,
+                                    "itil::lnksoftware");
+            $swi->SetFilter({id=>\$rec->{lnksoftwaresystemid}});
+            my ($swirec,$msg)=$swi->getOnlyFirst(qw(id systemid itclustsvcid));
+            if (!defined($swirec)){
+               $swinstvalid=0
+            }
+            else{
+               # detail check of found software installation
+               # printf STDERR ("swirec=%s\n",Dumper($swirec));
+               if (defined($swirec->{systemid}) &&
+                   $swirec->{systemid} ne $rec->{systemid}){
+                  push(@msg,
+                       "software installation no longer belongs to the system");
+               }
+            }
+         }
+         if (!$swinstvalid){
+            push(@msg,
+                 "invalid or not existing software installation specified");
+         }
       }
+      
 
 
 

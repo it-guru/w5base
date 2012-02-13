@@ -7,6 +7,9 @@ package itil::qrule::SystemInstalledSoftware;
 Every System in in CI-Status "installed/active" or "available", may
 only use software products in software installations with an CI-Status
 of 3,4 or 5. In other cases, there will be a dataissue produced.
+For some instance types (OracleDB, Tomcat, Apache, Mysql) there will be
+a check done, if needed Software for these instances is installed
+on the logical system.
 
 
 =head3 IMPORTS
@@ -60,8 +63,20 @@ sub qcheckRecord
    my @msg;
 
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
+
+   my %swneeded=();
+   my %swifound=();
+   if (ref($rec->{swinstances}) eq "ARRAY"){
+      foreach my $swi (@{$rec->{swinstances}}){
+         if ($swi->{softwareinstname} eq ""){ # this is a instance with no
+            $swneeded{$swi->{swnature}}++;    # assinged software installation
+         }
+      }
+   }
+
    if (ref($rec->{software}) eq "ARRAY"){
       foreach my $swrec (@{$rec->{software}}){
+         $swifound{$swrec->{software}}++;
          if ($swrec->{softwarecistatusid}!=4 &&
              $swrec->{softwarecistatusid}!=5 &&
              $swrec->{softwarecistatusid}!=3){
@@ -72,6 +87,20 @@ sub qcheckRecord
       }
       
    }
+   my %chkmap=("Oracle DB Server"=>'^oracle.*database.*$',
+               "Apache"=>'^.*apache.*(web|http).*$',
+               "Tomcat"=>'^.*tomcat.*$',
+               "MySQL"=>'^.*mysql.*server.*$');
+   foreach my $chk (sort(keys(%chkmap))){
+      if (exists($swneeded{$chk})){
+         my $chkexp=$chkmap{$chk};
+         if (!(grep(/$chkexp/i,keys(%swifound)))){
+            push(@msg,"missing installation of software for: ".$chk);
+         }
+      }
+   }
+   #printf STDERR ("fifi needed=%s found=%s\n",
+   #               Dumper(\%swneeded),Dumper(\%swifound));
    if ($#msg!=-1){
       return(3,{qmsg=>\@msg,dataissue=>\@msg});
    }
