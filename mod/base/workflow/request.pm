@@ -1033,6 +1033,7 @@ sub nativProcess
 
    if ($op ne "" && !grep(/^$op$/,@{$actions})){
       $self->LastMsg(ERROR,"invalid disalloed action requested");
+      msg(ERROR,"invalid requested operation was '$op'");
       return(0);
    }
 
@@ -1223,10 +1224,12 @@ sub Process
              $WfRec->{id},"wfaccept",
              {translation=>'base::workflow::request'},"",undef)){
             sleep(1);
+            my $intiatornotify=Query->Param("intiatornotify");
+            $intiatornotify=1 if ($intiatornotify ne "");
             if ($self->getParent->getParent->Action->StoreRecord(
                 $WfRec->{id},"wfaddnote",
-                {translation=>'base::workflow::request'},$note,$effort)){
-               my $intiatornotify=Query->Param("intiatornotify");
+                {translation=>'base::workflow::request',
+                 intiatornotify=>$intiatornotify},$note,$effort)){
                if ($intiatornotify ne "" && defined($WfRec->{initiatorid}) &&
                    $WfRec->{initiatorid} ne ""){
                   my $user=getModuleObject($self->Config,"base::user");
@@ -1377,7 +1380,7 @@ sub Process
          $note=trim($note);
          my $h=$self->getWriteRequestHash("web");
          $h->{note}=$note if ($note ne "");
-         return($self->nativProcess("SaveStep.".$op,$h,$WfRec,$actions));
+         return($self->nativProcess($op,$h,$WfRec,$actions));
       }
       elsif ($op eq "wfapprovalreq"){
          my $note=Query->Param("note");
