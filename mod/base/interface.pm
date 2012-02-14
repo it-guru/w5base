@@ -800,7 +800,7 @@ sub getHashList
                   $objns="W5Kernel" if ($ns eq "");
                   fldloop: foreach my $fobj (@fobjs){
                      my $k=$fobj->Name();
-                     my $v=$fobj->UiVisible("XML",current=>$chkrec);
+                     my $v=$fobj->UiVisible("SOAP",current=>$chkrec);
                      next if (!$v && ($fobj->Type() ne "Interface"));
                      my $grp=$fobj->{group};
                      $grp=[$grp] if (!ref($grp));
@@ -824,9 +824,11 @@ sub getHashList
                         }
                      }
                      else{
-                        $v=latin1($v)->utf8();
+                        $v=latin1($v)->utf8() if (defined($v));
                      }
-                     $cprec{$k}=SOAP::Data->type($wsdl)->value($v);
+                     if (defined($v)){
+                        $cprec{$k}=SOAP::Data->type($wsdl)->value($v);
+                     }
                   }
                   $resl[$c]=SOAP::Data->name('record')
                                       ->type('curns:Record')

@@ -214,6 +214,8 @@ sub new
                 label         =>'Forward to',
                 dst           =>['base::grp' =>'fullname',
                                  'base::user'=>'fullname'],
+                vjoineditbase =>[{cistatusid=>"<5"},
+                                 {cistatusid=>"<5"}],
                 dsttypfield   =>'fwdtarget',
                 dstidfield    =>'fwdtargetid'),
 
