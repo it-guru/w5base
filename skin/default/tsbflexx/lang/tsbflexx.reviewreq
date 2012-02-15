@@ -1,0 +1,5 @@
+'tsbflexx::reviewreq'=>{de=>'B:Flexx Review Anforderung',
+                        en=>'B:Flexx Review Request'},
+'bflexxmessage'=>{de=>'Review-Nachricht von B:Flexx',
+                  en=>'Review-Message from B:Flexx'},
+

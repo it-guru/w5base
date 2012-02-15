@@ -43,6 +43,10 @@ sub Init
                       "tsbflexx::ifworkflow",
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("itu.bflexx.reviewreq",
+                      "tsbflexx::reviewreq",
+                      defaultacl=>['admin']);
+   
    return($self);
 }
 
