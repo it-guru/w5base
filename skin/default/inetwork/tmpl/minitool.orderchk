@@ -1,0 +1,54 @@
+<table width=100% height=100% border=0><tr><td align=center valign=top>
+<!------------------------------------------------------>
+<div class=dialog style="width:98%">
+<table width=100% cellpadding=4 cellspacing=4>
+<tr><td colspan=2><b>I-Network Order check</b></td></tr>
+<tr>
+<td colspan=2>With this tool, you can validate a I-Network
+ordernumber direct by querying the I-Network tool.
+If you start the query, you have to login with a valid
+NT-Domain Account (if you are not using IE or you are not already logged in 
+in a NT-Domain)
+</td></tr>
+<tr><td width=1% nowrap align=center colspan=2>I-Network Order-Number (f.e. 1234567):
+<input type=text class=finput id=inorder value="1340040" style='width:80px'> <input id=doit type=button value=" query "></td>
+</tr>
+</table>
+</div>
+<div style="text-align:left;width:400px;overflow:auto">
+%LASTMSG(RAW)%
+</div>
+<!------------------------------------------------------>
+</td>
+<tr><td colspan=2 valign=bottom>
+<iframe id=indisp width=100% height=350 src="../../base/load/empty.gif"></iframe>
+</td></tr>
+<tr><td colspan=2 valign=bottom>
+<iframe id=inrel width=100% height=90 src="../../base/load/empty.gif"></iframe>
+</td></tr>
+</table>
+
+<script language=JavaScript>
+
+$(document).ready(function(){
+   $('#doit').click(function(){
+       var ino;
+       ino=$('#inorder').val();
+       if (!ino.match(/^\d{5,7}$/)){
+          alert("This looks not like a I-Network order number!");
+          return;
+       }
+       var indisp="https://inetwork.telekom.de/cgi-bin/tdex.dll?"+
+                  "action=BefragungEdit&Newest=1&AID="+ino;
+       $('#indisp').attr('src',indisp);
+
+       var inrel="https://inetwork.telekom.de/cgi-bin/tdex.dll?"+
+                 "action=Kreuzanalyse2&Simple=1&freitext="+ino;
+    
+       $('#inrel').attr('src',inrel);
+   });
+});
+
+
+</script>
+
