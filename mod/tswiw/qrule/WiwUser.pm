@@ -12,6 +12,9 @@ This quality rule syncs to WhoIsWho user contacts.
 Synced fields ...
 office_phone office_street office_zipcode office_location office_mobile 
 office_costcenter office_accarea office_facsimile givenname surname
+On contacts of typ function and service, there will be givenname
+and surname excluded.
+
 
 
 =cut
@@ -110,11 +113,18 @@ sub qcheckRecord
       my $wfrequest={};
       my @qmsg;
       my @dataissue;
-      foreach my $fld (qw(office_phone office_street office_zipcode 
-                          office_location office_mobile office_costcenter
-                          office_accarea
-                          office_facsimile
-                          givenname surname)){
+
+      my @fieldlist=qw(office_phone office_street office_zipcode 
+                       office_location office_mobile office_costcenter
+                       office_accarea
+                       office_facsimile);
+      if ($rec->{usertyp} ne "function" &&
+          $rec->{usertyp} ne "serivce"){
+         push(@fieldlist,"givenname","surname");
+      }
+
+
+      foreach my $fld (@fieldlist){
           my $wiwdata={$fld=>$wiwrec->{$fld}};
           if (ref($wiwdata->{$fld}) eq "ARRAY"){
              $wiwdata->{$fld}=$wiwdata->{$fld}->[0];
