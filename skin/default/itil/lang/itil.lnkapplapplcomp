@@ -1,5 +1,8 @@
 'itil::lnkapplapplcomp'=>{de=>'Schnittstellen Komponente',en=>'Interface Component'},
+'fieldgroup.interfacecompemailcontact'=>{de=>'Schnittstellenkomponente E-Mail Kontakt',en=>'Interface Component E-Mail contact'},
 'Component'=>{de=>'Komponente'},
 'Redundance 1'=>{de=>'Redundanz 1'},
 'Redundance 2'=>{de=>'Redundanz 2'},
 'Component type'=>{de=>'Art der Komponente'},
+'E-Mail Contact TO'=>{de=>'E-Mail Kontakt An:'},
+'E-Mail Contact CC'=>{de=>'E-Mail Kontakt CC:'},

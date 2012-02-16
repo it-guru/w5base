@@ -115,6 +115,63 @@ sub new
                 label         =>'Object3 ID',
                 dataobjattr   =>'lnkapplapplcomp.obj3id'),
 
+
+
+      new kernel::Field::Text(
+                name          =>'contactidto',
+                label         =>'Contact TO',
+                group         =>'interfacecompemailcontact',
+                depend        =>['objtype','obj1id','obj2id','obj3id'],
+                searchable    =>0,
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my @l;
+                   if ($current->{objtype} eq "base::user"){
+                      push(@l,$current->{obj1id}) if ($current->{obj1id} ne "");
+                   }
+                   return(\@l);
+                }),
+
+      new kernel::Field::Text(
+                name          =>'contactidcc',
+                label         =>'Contact CC',
+                group         =>'interfacecompemailcontact',
+                searchable    =>0,
+                depend        =>['objtype','obj1id','obj2id','obj3id'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my @l;
+                   if ($current->{objtype} eq "base::user"){
+                      push(@l,$current->{obj2id}) if ($current->{obj2id} ne "");
+                      push(@l,$current->{obj3id}) if ($current->{obj3id} ne "");
+                   }
+                   return(\@l);
+                }),
+
+      new kernel::Field::Email(
+                name          =>'emailto',
+                label         =>'E-Mail Contact TO',
+                group         =>'interfacecompemailcontact',
+                searchable    =>0,
+                vjointo       =>'base::user',
+                vjoinon       =>['contactidto'=>'userid'],
+                vjoindisp     =>'email'
+                ),
+
+      new kernel::Field::Email(
+                name          =>'emailcc',
+                label         =>'E-Mail Contact CC',
+                group         =>'interfacecompemailcontact',
+                searchable    =>0,
+                vjointo       =>'base::user',
+                vjoinon       =>['contactidcc'=>'userid'],
+                vjoindisp     =>'email'
+                ),
+
+
+
       new kernel::Field::Text(
                 name          =>'comments',
                 label         =>'Comments',
