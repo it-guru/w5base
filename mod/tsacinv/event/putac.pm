@@ -460,8 +460,8 @@ sub ApplicationModified
                   }
                }
                my %posix=();
-               foreach my $userent (qw(tsm tsm2 sem databoss 
-                                       ldelmgr delmgr delmgr2)){
+               foreach my $userent (qw(tsm tsm2 opm opm2 sem databoss 
+                                       delmgr delmgr2)){
                   if ($rec->{$userent} ne ""){
                      $user->SetFilter({fullname=>\$rec->{$userent}});
                      $user->SetCurrentView("posix");
@@ -532,7 +532,7 @@ sub ApplicationModified
                                    DataSupervisor=>$posix{databoss},
                                    Service_Manager=>$posix{sem},
                                    Deputy_Technical_Contact=>$posix{tsm2},
-                                   Lead_Del_manager=>$posix{ldelmgr},
+                                   Lead_Del_manager=>$posix{opm},
                                    Del_manager=>$posix{delmgr},
                                    Deputy_Del_manager=>$posix{delmgr2},
                                    bDelete=>'0',
