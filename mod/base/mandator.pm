@@ -64,6 +64,12 @@ sub new
                 label         =>'Groupname',
                 vjointo       =>'base::grp',
                 vjoinon       =>['grpid'=>'grpid'],
+                readonly      =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+                   return(0) if (!defined($rec));
+                   return(1);
+                },
                 vjoindisp     =>'fullname'),
 
       new kernel::Field::Link(
