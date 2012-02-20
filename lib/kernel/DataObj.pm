@@ -1152,6 +1152,11 @@ sub getIdByHashIOMapped
          }
       }
    }
+   if (!defined($flt{cistatusid})){
+      if ($self->getField("cistatusid")){
+         $flt{cistatusid}="<=5";
+      }
+   }
 
    $self->ResetFilter();
    $self->SetFilter(\%flt);
