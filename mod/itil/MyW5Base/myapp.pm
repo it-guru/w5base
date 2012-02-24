@@ -82,7 +82,7 @@ sub Result
       my %q4=%q;
       $q4{responseteamid}=\@grpids;
 
-      my %q6=%q;
+      my %q5=%q;
       $q5{delmgr2id}=\$userid;
       my %q7=%q;
       $q7{opm2id}=\$userid;
