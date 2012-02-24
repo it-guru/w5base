@@ -82,21 +82,24 @@ sub Result
       my %q4=%q;
       $q4{responseteamid}=\@grpids;
 
-      my %q5=%q;
       my %q6=%q;
       $q5{delmgr2id}=\$userid;
-      push(@q,\%q1,\%q2,\%q3,\%q4,\%q5,\%q6);
+      my %q7=%q;
+      $q7{opm2id}=\$userid;
+      push(@q,\%q1,\%q2,\%q3,\%q4,\%q6,\%q7);
    }
    if ($dc ne "DEPONLY" && $dc ne "TEAM"){
       my %q1=%q;
       my %q2=%q;
       my %q3=%q;
       my %q4=%q;
+      my %q5=%q;
       $q1{semid}=\$userid;
       $q2{tsmid}=\$userid;
       $q3{databossid}=\$userid;
       $q4{delmgrid}=\$userid;
-      push(@q,\%q1,\%q2,\%q3,\%q4);
+      $q2{opmid}=\$userid;
+      push(@q,\%q1,\%q2,\%q3,\%q4,\%q5);
    }
    if ($dc eq "TEAM"){
       my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
