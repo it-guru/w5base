@@ -98,7 +98,7 @@ sub Result
       $q2{tsmid}=\$userid;
       $q3{databossid}=\$userid;
       $q4{delmgrid}=\$userid;
-      $q2{opmid}=\$userid;
+      $q5{opmid}=\$userid;
       push(@q,\%q1,\%q2,\%q3,\%q4,\%q5);
    }
    if ($dc eq "TEAM"){
