@@ -86,7 +86,7 @@ sub Result
       $q5{delmgr2id}=\$userid;
       my %q7=%q;
       $q7{opm2id}=\$userid;
-      push(@q,\%q1,\%q2,\%q3,\%q4,\%q6,\%q7);
+      push(@q,\%q1,\%q2,\%q3,\%q4,\%q5,\%q7);
    }
    if ($dc ne "DEPONLY" && $dc ne "TEAM"){
       my %q1=%q;
