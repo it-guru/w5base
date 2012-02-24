@@ -6,7 +6,10 @@
                        en=>'Relation'},
 'Fraction'=>{de=>'Anteil der Anwendung am Vertrag'},
 'Application'=>{de=>'Anwendung'},
+'Application Customer'=>{de=>'Anwendungs Kunde'},
+'Application CI-State'=>{de=>'Anwendungs CI-Status'},
 'Customer Contract'=>{de=>'Kundenvertrag'},
+'Customer Contract Customer'=>{de=>'Kundenvertrags Kunde'},
 'Customer ContractId'=>{de=>'Kundenvertrags ID'},
 'Customer Contract CI-State'=>{de=>'Kundenvertrag CI-Status'},
 

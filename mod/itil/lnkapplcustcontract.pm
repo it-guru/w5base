@@ -36,6 +36,13 @@ sub new
                 label         =>'LinkID',
                 dataobjattr   =>'lnkapplcustcontract.id'),
 
+      new kernel::Field::Link(
+                name          =>'fullname',
+                label         =>'relation fullname',
+                dataobjattr   =>'concat(appl.name," - ",'.
+                                'custcontract.name," (ID:",'.
+                                'lnkapplcustcontract.id,")")'),
+
       new kernel::Field::TextDrop(
                 name          =>'appl',
                 htmlwidth     =>'300px',
@@ -43,6 +50,17 @@ sub new
                 vjointo       =>'itil::appl',
                 vjoinon       =>['applid'=>'id'],
                 vjoindisp     =>'name'),
+
+      new kernel::Field::Select(
+                name          =>'applcistatus',
+                htmleditwidth =>'40%',
+                readonly      =>1,
+                group         =>'relation',
+                label         =>'Application CI-State',
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['applcistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
 
       new kernel::Field::TextDrop(
                 name          =>'custcontract',
@@ -55,9 +73,9 @@ sub new
       new kernel::Field::Select(
                 name          =>'custcontractcistatus',
                 htmleditwidth =>'40%',
+                readonly      =>1,
                 group         =>'relation',
                 label         =>'Customer Contract CI-State',
-                vjoineditbase =>{id=>">0"},
                 vjointo       =>'base::cistatus',
                 vjoinon       =>['custcontractcistatusid'=>'id'],
                 vjoindisp     =>'name'),
@@ -133,6 +151,25 @@ sub new
                 dataobjattr   =>'custcontract.cistatus'),
 
       new kernel::Field::Link(
+                name          =>'applcistatusid',
+                label         =>'ApplCiStatusID',
+                dataobjattr   =>'appl.cistatus'),
+
+      new kernel::Field::Text(
+                name          =>'applcustomer',
+                label         =>'Application Customer',
+                readonly      =>1,
+                group         =>'relation',
+                dataobjattr   =>'applcustgrp.fullname'),
+
+      new kernel::Field::Text(
+                name          =>'contractcustomer',
+                label         =>'Customer Contract Customer',
+                readonly      =>1,
+                group         =>'relation',
+                dataobjattr   =>'contractcustgrp.fullname'),
+
+      new kernel::Field::Link(
                 name          =>'custcontractname',
                 label         =>'CustContractName',
                 dataobjattr   =>'custcontract.fullname'),
@@ -153,6 +190,21 @@ sub new
    return($self);
 }
 
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_custcontractcistatus"))){
+     Query->Param("search_custcontractcistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+   if (!defined(Query->Param("search_applcistatus"))){
+     Query->Param("search_applcistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
+
+
 
 sub getSqlFrom
 {
@@ -160,7 +212,11 @@ sub getSqlFrom
    my $from="lnkapplcustcontract left outer join appl ".
             "on lnkapplcustcontract.appl=appl.id ".
             "left outer join custcontract ".
-            "on lnkapplcustcontract.custcontract=custcontract.id";
+            "on lnkapplcustcontract.custcontract=custcontract.id ".
+            "left outer join grp as contractcustgrp on ".
+            "custcontract.customer=contractcustgrp.grpid ".
+            "left outer join grp as applcustgrp on ".
+            "appl.customer=applcustgrp.grpid ";
    return($from);
 }
 
