@@ -78,6 +78,7 @@ sub Result
       $q{name}=$q{affectedapplication};
       delete($q{affectedapplication});
    }
+   delete($q{name});
 
    my $userid=$self->getParent->getCurrentUserId();
    $userid=-1 if (!defined($userid) || $userid==0);
