@@ -119,7 +119,7 @@ sub qcheckRecord
                        office_accarea
                        office_facsimile);
       if ($rec->{usertyp} ne "function" &&
-          $rec->{usertyp} ne "serivce"){
+          $rec->{usertyp} ne "service"){
          push(@fieldlist,"givenname","surname");
       }
 
