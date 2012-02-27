@@ -24,6 +24,7 @@
 'fieldgroup.w5basedata'=>{de=>'W5Base/Darwin Daten',
                           en=>'W5Base/Darwin Data'},
 'Priority of system'=>{de=>'Priorität des Systems'},
+'installation date'=>{de=>'Installationsdatum'},
 'Services Columns'=>{de=>'Leistungsarten in Spalten'},
 'W5Base Application'=>{de=>'W5Base Anwendung'},
 'W5Base Businessteam'=>{de=>'W5Base Betriebsteam'},

@@ -260,6 +260,11 @@ sub new
                 label         =>'Priority of system',
                 dataobjattr   =>'amportfolio.priority'),
 
+      new kernel::Field::Date(
+                name          =>'installdate',
+                label         =>'installation date',
+                dataobjattr   =>'amportfolio.dtinvent'),
+
       new kernel::Field::Import($self,
                 vjointo       =>'tsacinv::asset',
                 vjoinon       =>['lassetid'=>'lassetid'],
