@@ -156,7 +156,8 @@ sub doNotify
       push(@cc,$applrec->{tsm2id});
       push(@cc,$applrec->{opm2id});
       if ($applrec->{mandatorid} ne ""){
-         my @l=$appl->getMembersOf($applrec->{mandatorid},"RCFManager","up");
+         my @l=$appl->getMembersOf($applrec->{mandatorid},
+                                   ["RCFManager","RCFManager2"],"up");
          push(@cc,@l);
       }
       {

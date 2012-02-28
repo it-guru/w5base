@@ -932,3 +932,24 @@ alter table swinstance add installusername varchar(40) default NULL;
 alter table swinstance add configdirpath varchar(80) default NULL;
 alter table swinstance add issslinstance varchar(10) default 'UNKNOWN';
 alter table swinstance add admcomments longtext default NULL;
+create table ipnet (
+  id         bigint(20) NOT NULL,
+  name       varchar(45) NOT NULL, binnamekey char(128),
+  cistatus   int(2)      NOT NULL,
+    netmask        varchar(40) default NULL,
+    network        bigint(20)  default NULL,
+    description    longtext     default NULL,
+    additional     longtext     default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) NOT NULL default '0',
+  modifyuser bigint(20) NOT NULL default '0',
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  srcsys     varchar(100) default 'w5base',
+  srcid      varchar(20) default NULL,
+  srcload    datetime    default NULL,
+  PRIMARY KEY  (id),
+  unique(name),key(binnamekey),key(network),
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

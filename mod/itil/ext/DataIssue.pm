@@ -108,7 +108,8 @@ sub DataIssueCompleteWriteRequest
                  $newrec->{fwdtargetid} eq ""){
                # now search a Config-Manager
                my @confmgr=$self->getParent->getMembersOf(
-                              $confrec->{mandatorid},"RCFManager");
+                              $confrec->{mandatorid},
+                              ["RCFManager","RCFManager2"]);
                my $cfmgr1=shift(@confmgr);
                my $cfmgr2=shift(@confmgr);
                if ($cfmgr1 ne ""){

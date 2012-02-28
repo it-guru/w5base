@@ -370,7 +370,7 @@ sub SecureSetFilter
    if (!$self->IsMemberOf("admin")){
       my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
       my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
-                                  [orgRoles(),qw(RCFManager)],"both");
+                              [orgRoles(),qw(RCFManager RCFManager2)],"both");
       my @grpids=keys(%grps);
       my $userid=$self->getCurrentUserId();
       push(@flt,[
@@ -511,7 +511,8 @@ sub isWriteValid
       push(@chkgroups,$rec->{mandatorid}) if ($rec->{mandatorid} ne "");
       push(@chkgroups,$rec->{responseteamid}) if ($rec->{responseteamid} ne "");
       if ($#chkgroups!=-1){
-         if ($self->IsMemberOf(\@chkgroups,["RControlling","RCFManager",
+         if ($self->IsMemberOf(\@chkgroups,["RControlling",
+                                            "RCFManager","RCFManager2",
                                             "RDataAdmin"],"down")){
             return(@databossedit);
          }

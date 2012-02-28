@@ -98,9 +98,13 @@ sub new
                                  'RControlling',
                                  'RTimeManager',
                                  'RINManager',                 # ITIL role
+                                 'RINManager2',                # ITIL role
                                  'RCHManager',                 # ITIL role
+                                 'RCHManager2',                # ITIL role
                                  'RCFManager',                 # ITIL role
+                                 'RCFManager2',                # ITIL role
                                  'RPRManager',                 # ITIL role
+                                 'RPRManager2',                # ITIL role
                                  'RITSoDManager',              # IT role
                                  'RITDemandMgr',               # IT role
                                  'RINOperator',                # ITIL role

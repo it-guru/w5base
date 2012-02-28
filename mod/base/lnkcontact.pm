@@ -143,7 +143,25 @@ sub new
                 name          =>'expiration',
                 label         =>'Expiration-Date',
                 dataobjattr   =>'lnkcontact.expiration'),
-                                                 
+
+      new kernel::Field::Select(
+                name          =>'alertstate',
+                value         =>['','yellow','orange',
+                                 'red'],
+                uivisible     =>sub{
+                    my $self=shift;
+                    my $mode=shift;
+                    my $app=$self->getParent;
+                    my %param=@_;
+                    return(1) if (!defined($param{current}));
+                    return(1) if (
+                       $param{current}->{alertstate} ne "");
+                    return(0);
+                },
+                readonly      =>1,
+                label         =>'Alert-State',
+                dataobjattr   =>'lnkcontact.alertstate'),
+
       new kernel::Field::Text(
                 name          =>'comments',
                 sqlorder      =>'NONE',

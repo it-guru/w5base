@@ -610,7 +610,8 @@ sub SecureSetFilter
       my $userid=$self->getCurrentUserId();
       my %grp=$self->getGroupsOf($ENV{REMOTE_USER},
                                 [qw(RMember RBoss RBoss2 RQManager
-                                    RCFManager RCFOperator)],"both");
+                                    RCFManager RCFManager2 
+                                    RCFOperator)],"both");
       my @grpids=keys(%grp);
       @grpids=(qw(NONE)) if ($#grpids==-1);
 
@@ -687,7 +688,7 @@ sub isWriteValid
    else{
       if ($rec->{customerid} ne ""){
          my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
-                                     [qw(RCFManager 
+                                     [qw(RCFManager RCFManager2
                                          RCFOperator)],"both");
          my @grpids=keys(%grps);
          if (in_array(\@grpids,$rec->{customerid})){

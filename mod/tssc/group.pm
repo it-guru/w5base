@@ -59,6 +59,21 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'dsccentralassignmentm1.name'),
 
+
+#      new kernel::Field::TextDrop(
+#                name          =>'supervisor',
+#                label         =>'Supervisor',
+#                searchable    =>0,
+#                vjointo       =>'tsacinv::user',
+#                vjoinon       =>['supervid'=>'lempldeptid'],
+#                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Text(
+                name          =>'supervisor', # leider keine richtige reference
+                label         =>'Supervisor',
+                dataobjattr   =>'dsccentralassignmentm1.assgrp_response'),
+
+
       new kernel::Field::Email(
                 name          =>'groupmailbox',
                 label         =>'group mailbox',

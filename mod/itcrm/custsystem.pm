@@ -155,7 +155,8 @@ sub SecureSetFilter
       my $userid=$self->getCurrentUserId();
       my %grp=$self->getGroupsOf($ENV{REMOTE_USER},
                                 [qw(RMember RBoss RBoss2 RQManager
-                                    RCFManager RCFOperator)],"both");
+                                    RCFManager RCFManager2
+                                    RCFOperator)],"both");
       my @grpids=keys(%grp);
       @grpids=(qw(NONE)) if ($#grpids==-1);
 

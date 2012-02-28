@@ -39,8 +39,12 @@ sub Init
 
    $self->RegisterEvent("amchecktool","amchecktool");
    $self->RegisterEvent("amVerifyGroupParents","amVerifyGroupParents");
+   $self->RegisterEvent("ChkAppToW5Base","ChkAppToW5Base");
    return(1);
 }
+
+
+
 
 
 sub amchecktool

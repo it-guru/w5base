@@ -246,7 +246,8 @@ sub new
                 vjointo       =>'itil::swinstance',
                 vjoinbase     =>[{cistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>['fullname','swnature']),
+                vjoindisp     =>['fullname','swnature'],
+                vjoininhash   =>['fullname','swnature','softwareinstname']),
 
       new kernel::Field::Text(
                 name          =>'shortdesc',
@@ -1115,7 +1116,8 @@ sub SecureSetFilter
                           "RMember")){
       my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
       my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
-               [orgRoles(),qw(RCFManager RCFManager RAuditor RMonitor)],"both");
+               [orgRoles(),qw(RCFManager RCFManager2 RAuditor RMonitor)],
+               "both");
       my @grpids=keys(%grps);
       my $userid=$self->getCurrentUserId();
       push(@flt,[
@@ -1326,11 +1328,13 @@ sub isWriteValid
          }
       }
       if ($rec->{mandatorid}!=0 &&
-         $self->IsMemberOf($rec->{mandatorid},"RCFManager","down")){
+         $self->IsMemberOf($rec->{mandatorid},["RCFManager","RCFManager2"],
+                           "down")){
          return(@databossedit);
       }
       if ($rec->{adminteamid}!=0 &&
-         $self->IsMemberOf($rec->{adminteamid},"RCFManager","down")){
+         $self->IsMemberOf($rec->{adminteamid},["RCFManager","RCFManager2"],
+                           "down")){
          return(@databossedit);
       }
    }

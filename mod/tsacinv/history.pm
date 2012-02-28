@@ -148,9 +148,17 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>"amhistory.mempreviouscmt"),
 
-      new kernel::Field::Text(
+      new kernel::Field::TextDrop(
                 name          =>'creator',
                 label         =>'Creator',
+                vjointo       =>'tsacinv::user',
+                vjoinon       =>['creatorid'=>'lempldeptid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Text(
+                name          =>'creatorid',
+                htmldetail    =>0,
+                label         =>'CreatorID',
                 dataobjattr   =>'amhistory.lauthorid'),
 
       new kernel::Field::Date(

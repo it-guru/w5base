@@ -1242,7 +1242,8 @@ sub SecureSetFilter
                           "RMember")){
       my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
       my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
-                          [orgRoles(),qw(RCFManager RAuditor RMonitor)],"both");
+                          [orgRoles(),qw(RCFManager RCFManager2 
+                                         RAuditor RMonitor)],"both");
       my @grpids=keys(%grps);
 
       my $userid=$self->getCurrentUserId();
@@ -1438,15 +1439,18 @@ sub isWriteValid
          }
       }
       if ($rec->{mandatorid}!=0 && 
-         $self->IsMemberOf($rec->{mandatorid},"RCFManager","down")){
+         $self->IsMemberOf($rec->{mandatorid},["RCFManager","RCFManager2"],
+                           "down")){
          return($self->expandByDataACL($rec->{mandatorid},@databossedit));
       }
       if ($rec->{businessteamid}!=0 && 
-         $self->IsMemberOf($rec->{businessteamid},"RCFManager","down")){
+         $self->IsMemberOf($rec->{businessteamid},["RCFManager","RCFManager2"],
+                           "down")){
          return($self->expandByDataACL($rec->{mandatorid},@databossedit));
       }
       if ($rec->{responseteamid}!=0 && 
-         $self->IsMemberOf($rec->{responseteamid},"RCFManager","down")){
+         $self->IsMemberOf($rec->{responseteamid},["RCFManager","RCFManager2"],
+                           "down")){
          return($self->expandByDataACL($rec->{mandatorid},@databossedit));
       }
    }

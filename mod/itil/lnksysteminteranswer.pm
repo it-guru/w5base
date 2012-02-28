@@ -88,7 +88,7 @@ sub SecureSetFilter
    if (!$self->IsMemberOf([qw(admin w5base.itil.system.read w5base.itil.read)],
                           "RMember")){
       my %g=$self->getGroupsOf($ENV{REMOTE_USER},
-                               [qw(RCFManager RAuditor RQManager)],
+                               [qw(RCFManager RCFManager2 RAuditor RQManager)],
                                'down');
       my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
       my @secflt=({mandatorid=>\@mandators});

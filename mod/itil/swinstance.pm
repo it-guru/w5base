@@ -674,7 +674,7 @@ sub SecureSetFilter
                           "RMember")){
       my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
       my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
-            [orgRoles(),qw(RCFManager RCFManager RAuditor RMonitor)],"both");
+            [orgRoles(),qw(RCFManager RCFManager2 RAuditor RMonitor)],"both");
       my @grpids=keys(%grps);
       my $userid=$self->getCurrentUserId();
       push(@flt,[
@@ -935,11 +935,13 @@ sub isWriteValid
          }
       }
       if ($rec->{mandatorid}!=0 && 
-         $self->IsMemberOf($rec->{mandatorid},"RCFManager","down")){
+         $self->IsMemberOf($rec->{mandatorid},["RCFManager","RCFManager2"],
+                           "down")){
          return(@databossedit);
       }
       if ($rec->{swteam}!=0 && 
-         $self->IsMemberOf($rec->{swteam},"RCFManager","down")){
+         $self->IsMemberOf($rec->{swteam},["RCFManager","RCFManager2"],
+                           "down")){
          return(@databossedit);
       }
    }
@@ -950,7 +952,8 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header default adm sec env misc cluster 
-             systems softwareinst contacts swinstanceparam ssl attachments source));
+             systems softwareinst contacts swinstanceparam ssl 
+             attachments source));
 }
 
 

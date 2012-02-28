@@ -269,7 +269,7 @@ sub GetW5BaseUserID
             return($self->GetW5BaseUserID($uid));
          }
       }
-      return($self->Import({importname=>$importname}));
+      return($self->Import({importname=>$importname,quiet=>1}));
    }
    return(undef);
 }
@@ -310,11 +310,16 @@ sub Import
    $self->SetFilter($flt);
    my @l=$self->getHashList(qw(uid surname givenname email));
    if ($#l==-1){
-      $self->LastMsg(ERROR,"contact '$q' not found in WhoIsWho while Import");
+      if (!$param->{quiet}){
+         $self->LastMsg(ERROR,"contact '$q' not found in ".
+                              "WhoIsWho while Import");
+      }
       return(undef);
    }
    if ($#l>0){
-      $self->LastMsg(ERROR,"contact not unique in WhoIsWho");
+      if (!$param->{quiet}){
+         $self->LastMsg(ERROR,"contact not unique in WhoIsWho");
+      }
       return(undef);
    }
    my $wiwrec=$l[0];

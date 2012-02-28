@@ -20,7 +20,8 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfClass;
-@ISA=qw(kernel::WfClass);
+use itil::workflow::base;
+@ISA=qw(kernel::WfClass itil::workflow::base);
 
 sub new
 {
