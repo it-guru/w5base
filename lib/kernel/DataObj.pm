@@ -3046,6 +3046,7 @@ sub Data2SQLwhere
    my $filter=shift;
    my %sqlparam=@_;
 
+
    $sqlparam{addmode}="and"     if (!defined($sqlparam{addmode}));
    $sqlparam{conjunction}="or"  if (!defined($sqlparam{conjunction}));
    $sqlparam{datatype}="STRING" if (!defined($sqlparam{datatype}));
@@ -3200,16 +3201,21 @@ sub FilterPart2SQLexp
              !($val=~m/\*/ || $val=~m/\?/)){
             $compop="=";
          }
+         my $compopcount=0;
          while($val=~m/^[<>]/){
+            if ($compopcount>0){
+               $self->LastMsg(ERROR,"illegal usage of comparison operator");
+               return(undef);
+            }
             if ($val=~m/^<=/){
                $val=~s/^<=//;
                $compop="<=";
             }
-            if ($val=~m/^</){
+            elsif ($val=~m/^</){
                $val=~s/^<//;
                $compop="<";
             }
-            if ($val=~m/^>=/){
+            elsif ($val=~m/^>=/){
                $val=~s/^>=//;
                $compop=">=";
             }
@@ -3217,6 +3223,7 @@ sub FilterPart2SQLexp
                $val=~s/^>//;
                $compop=">";
             }
+            $compopcount++;
          }
          if ($sqlparam{datatype} eq "FULLTEXT"){
             $sqlfieldname="match($sqlfieldname)";

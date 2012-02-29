@@ -1,4 +1,5 @@
 'Output format selection'=>{de=>'Ausgabeformat auswahl'},
+'illegal usage of comparison operator'=>{de=>'ungültige Verwendung eines Vergleichsoperators'},
 'MSG001'=>{de=>'Ansichten-Bearbeitung-Datenobjekt:',en=>'View-Edit-Dataobject:'},
 'MSG002'=>{de=>'View-Auswahl:',en=>'View-List:'},
 'MSG003'=>{de=><<EOF,
