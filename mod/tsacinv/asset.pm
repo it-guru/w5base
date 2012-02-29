@@ -73,7 +73,8 @@ sub new
                 name          =>'install',
                 label         =>'Install Date',
                 timezone      =>'CET',
-                dataobjattr   =>'amasset.dinstall'),
+                #dataobjattr   =>'amasset.dinstall'), # this seems to be dcreate
+                dataobjattr   =>'assetportfolio.dtinvent'),
 
       new kernel::Field::TextDrop(
                 name          =>'assignmentgroup',

@@ -263,7 +263,8 @@ sub new
       new kernel::Field::Date(
                 name          =>'installdate',
                 label         =>'installation date',
-                dataobjattr   =>'amportfolio.dtinvent'),
+                dataobjattr   =>'decode(amportfolio.dtinvent,NULL,'.
+                              'assetportfolio.dtinvent,amportfolio.dtinvent)'),
 
       new kernel::Field::Import($self,
                 vjointo       =>'tsacinv::asset',
@@ -445,7 +446,7 @@ sub new
       new kernel::Field::Date(
                 name          =>'instdate',
                 group         =>'source',
-                label         =>'Installation date',
+                label         =>'system installation date',
                 dataobjattr   =>'amportfolio.dtinvent'),
 
       new kernel::Field::Date(
@@ -662,7 +663,8 @@ sub getSqlFrom
    my $from=
       "amcomputer,amportfolio,ammodel,".
       "(select amcostcenter.* from amcostcenter ".
-      " where amcostcenter.bdelete=0) amcostcenter";
+      " where amcostcenter.bdelete=0) amcostcenter, ".
+      "amportfolio assetportfolio";
 
    return($from);
 }
@@ -672,6 +674,8 @@ sub initSqlWhere
    my $self=shift;
    my $where=
       "amportfolio.bdelete=0 ".
+      "and assetportfolio.bdelete!=1 ".
+      "and amportfolio.lparentid=assetportfolio.lportfolioitemid(+) ".
       "and amportfolio.lportfolioitemid=amcomputer.litemid ".
       "and amportfolio.lmodelid=ammodel.lmodelid ".
       "and amportfolio.lcostid=amcostcenter.lcostid(+) ".
