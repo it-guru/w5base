@@ -327,7 +327,7 @@ sub Unformat
    my $r={};
    if (defined($formated)){
       if ($self->{multiple}){
-         $r->{$self->{name}}=[split(/\s+/,$formated->[0])];
+         $r->{$self->{name}}=[split(/[,;]{0,1}\s+/,$formated->[0])];
       }
       else{
          $r->{$self->{name}}=[$formated->[0]];
