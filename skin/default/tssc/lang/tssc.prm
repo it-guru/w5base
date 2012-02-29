@@ -16,6 +16,7 @@
 'Workaround'=>{de=>'Übergangslösung'},
 'Solution'=>{de=>'Lösung'},
 'Assignment'=>{de=>'Zugewiesen an'},
+'Assigned worker'=>{de=>'Zugewiesener Bearbeiter'},
 'Homeassignment'=>{de=>'Erstellergruppe'},
 'Create time'=>{de=>'Erstellungszeitpunkt'},
 'Closeing time'=>{de=>'Abschlusszeitpunkt'},

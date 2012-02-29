@@ -269,6 +269,13 @@ sub new
                 label         =>'Assignment',
                 dataobjattr   =>'rootcausem1.assignment'),
 
+      new kernel::Field::Text(
+                name          =>'assignedtouser',
+                uppersearch   =>1,
+                group         =>'contact',
+                label         =>'Assigned worker',
+                dataobjattr   =>'rootcausem1.assigned_to'),
+
    );
    $self->{use_distinct}=0;
    $self->setDefaultView(qw(linenumber cdate problemnumber status name));
