@@ -1,6 +1,7 @@
 'base::itemizedlist'=>{de=>'konfigurierbare Auswahlliste',
                        en=>'configurable itemized list'},
 'full name'=>{de=>'vollständiger Anzeigename'},
+'invalid internal name'=>{de=>'ungültiger interner Name'},
 'fieldgroup.icontrol'=>{de=>'Interpretation',en=>'Interpretation'},
 'internal name'=>{de=>'interner Name'},
 'label data'=>{de=>'Anzeigenamen Daten'},
