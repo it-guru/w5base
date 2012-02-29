@@ -76,7 +76,7 @@ sub getQueryTemplate
 <td class=fname width=20%>MilesPlus Enviroment:</td>
 <td class=finput width=30% nowrap>
 <select name=base>
-<option value='https://milesplus.t-systems.com/prod'>Prod Enviroment</option>
+<option value='https://websso.t-systems.com/milesplus/prod'>Prod Enviroment (WebSSO)</option>
 <option value='https://milesplus-ref.t-systems.com/mpt5'>Test Enviroment</option>
 </select>
 </td>
@@ -618,7 +618,8 @@ sub doLogin
    my $self=shift;
    my $user=shift;
    my $pass=shift;
-   my $url=$self->{base}."plsql/plogin.login";
+   #my $url=$self->{base}."plsql/plogin.login";
+   my $url=$self->{base}."plsql/prost.create_main";
 
    my $response=$self->{ua}->request(GET($url));
    if ($response->code ne "200"){
@@ -635,11 +636,12 @@ sub doLogin
    msg(DEBUG,"get login page OK");
    #print $response->content;
 
-   $self->{'CurrentForm'}->{i_passwd}="$pass";
-   $self->{'CurrentForm'}->{i_user}="$user";
+   $self->{'CurrentForm'}->{password}="$pass";
+   $self->{'CurrentForm'}->{username}="$user";
    delete($self->{'CurrentForm'}->{''});
 
-   my $url=$self->{base}."plsql/plogin.login";
+   my $url="https://websso.t-systems.com/pkmslogin.form";
+
    my $request=POST($url,Content_Type=>'application/x-www-form-urlencoded',
                          Content=>[%{$self->{CurrentForm}}]);
    my $response=$self->{ua}->request($request);
