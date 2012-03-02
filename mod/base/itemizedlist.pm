@@ -63,6 +63,7 @@ sub new
                    return(defined($param{current}) ? 1 : 0);
                 },
                 readonly      =>1,
+                uploadable    =>0,
                 group         =>'icontrol',
                 depend        =>['labeldata'],
                 onPreProcessFilter=>sub {
@@ -118,6 +119,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'en_fullname',
                 searchable    =>0,
+                uploadable    =>0,
                 group         =>'icontrol',
                 depend        =>['labeldata'], 
                 label         =>'en fullname',
@@ -130,6 +132,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'de_fullname',
                 searchable    =>0,
+                uploadable    =>0,
                 group         =>'icontrol',
                 label         =>'de fullname',
                 depend        =>['labeldata'], 
