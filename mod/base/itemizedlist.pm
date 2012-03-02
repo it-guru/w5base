@@ -88,7 +88,9 @@ sub new
       new kernel::Field::Text(
                 name          =>'fullname',
                 searchable    =>0,
-                htmldetail    =>1,
+                uploadable    =>0,
+                readonly      =>1,
+                htmldetail    =>0,
                 group         =>'icontrol',
                 label         =>'item entry fullname',
                 dataobjattr   =>"concat(itemizedlist.selectlabel,".
