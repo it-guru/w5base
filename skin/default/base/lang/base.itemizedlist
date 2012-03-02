@@ -9,4 +9,4 @@
 'de fullname'=>{de=>'deutscher Anzeigename'},
 'Select label'=>{de=>'SelectBox Bezeichnung'},
 'order prio'=>{de=>'sortier Position'},
-'item entry fullname'=>{de=>'qualifizierte Eintragsname'},
+'item entry fullname'=>{de=>'vollqualifizierter Eintragsname'},
