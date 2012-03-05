@@ -644,38 +644,51 @@ sub new
                 dataobjattr   =>'appl.opmode'),
 
       new kernel::Field::Select(
+                name          =>'applbasemoniname',
+                group         =>'monisla',
+                label         =>'Application base monitoring',
+                allowempty    =>1,
+                weblinkto     =>"none",
+                vjointo       =>'base::itemizedlist',
+                vjoinbase     =>{
+                   selectlabel=>\'itil::appl::applbasemoni',
+                },
+                vjoineditbase =>{
+                   selectlabel=>\'itil::appl::applbasemoni',
+                   cistatusid=>\'4'
+                },
+                vjoinon       =>['applbasemoni'=>'name'],
+                vjoindisp     =>'displaylabel',
+                htmleditwidth =>'200px'),
+
+      new kernel::Field::Link(
                 name          =>'applbasemoni',
                 group         =>'monisla',
                 label         =>'Application base monitoring',
-                value         =>['',
-                                 'BigBrother',
-                                 'HP OpenView',
-                                 'OpenNMS',
-                                 'Nagios',
-                                 'Reflex',  # for HP-NonStop Unix
-                                 'Tivoli 5',
-                                 'Tivoli 6',
-                                 'TV-CC',
-                                 'SAP-Reporter',
-                                 'no monitoring'],
-                htmleditwidth =>'200px',
                 dataobjattr   =>'appl.applbasemoni'),
 
       new kernel::Field::Select(
+                name          =>'slacontroltoolname',
+                group         =>'monisla',
+                label         =>'SLA control tool type',
+                allowempty    =>1,
+                weblinkto     =>"none",
+                vjointo       =>'base::itemizedlist',
+                vjoinbase     =>{
+                   selectlabel=>\'itil::appl::slacontroltool',
+                },
+                vjoineditbase =>{
+                   selectlabel=>\'itil::appl::slacontroltool',
+                   cistatusid=>\'4'
+                },
+                vjoinon       =>['slacontroltool'=>'name'],
+                vjoindisp     =>'displaylabel',
+                htmleditwidth =>'200px'),
+
+      new kernel::Field::Link(
                 name          =>'slacontroltool',
                 group         =>'monisla',
                 label         =>'SLA control tool type',
-                value         =>['',
-                                 'BigBrother',
-                                 'OpenNMS',
-                                 'Nagios',
-                                 'Reflex',  # for HP-NonStop Unix
-                                 'Tivoli 5',
-                                 'Tivoli 6',
-                                 'TV-CC',
-                                 'SAP-Reporter',
-                                 'no SLA control'],
-                htmleditwidth =>'200px',
                 dataobjattr   =>'appl.slacontroltool'),
 
       new kernel::Field::Number(
