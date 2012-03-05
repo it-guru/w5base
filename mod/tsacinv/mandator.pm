@@ -33,7 +33,30 @@ sub new
       new kernel::Field::Text(     name       =>'acaltbc',
                                    label      =>'AC Alternate Business Center',
                                    group      =>'acrelation',
+                                   searchable =>0,
                                    container  =>'additional'),
+
+      new kernel::Field::Boolean(  name       =>'doexport',
+                                   label      =>'AC Config-Item Export active',
+                                   default    =>'1',
+                                   searchable =>0,
+                                   group      =>'acrelation',
+                                   container  =>'additional'),
+
+      new kernel::Field::TextDrop( name       =>'defaultassignment',
+                                   label      =>'AC Default Config Assignment',
+                                   group      =>'acrelation',
+                                   vjointo    =>'tsacinv::group',
+                                   vjoinon    =>['defaultassignmentid'=>
+                                                 'lgroupid'],
+                                   vjoindisp     =>'name'),
+
+      new kernel::Field::Link(     name       =>'defaultassignmentid',
+                                   label      =>'AC Default Assignment ID',
+                                   searchable =>0,
+                                   group      =>'acrelation',
+                                   container  =>'additional'),
+
    );
    $self->setDefaultView(qw(id name acaltbc));
    return($self);

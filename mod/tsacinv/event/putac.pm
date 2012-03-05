@@ -250,7 +250,8 @@ sub ApplicationModified
    my $acgrp=getModuleObject($self->Config,"tsacinv::group");
    my $app=getModuleObject($self->Config,"AL_TCom::appl");
    my $user=getModuleObject($self->Config,"base::user");
-   my $mand=getModuleObject($self->Config,"base::mandator");
+   my $mand=getModuleObject($self->Config,"tsacinv::mandator");
+   my $mandconfig;
    my $acuser=getModuleObject($self->Config,"tsacinv::user");
    my %filter=(cistatusid=>['3','4']);
    $self->{DebugMode}=0;
@@ -262,6 +263,23 @@ sub ApplicationModified
       }
       $filter{id}=\@appid;
    }
+   {  # mandator init
+      $mand->SetFilter({cistatusid=>[3,4]});
+      $mand->SetCurrentView(qw(id grpid defaultassignmentid 
+                               defaultassignment doexport));
+      $mandconfig=$mand->getHashIndexed(qw(grpid doexport));
+      if (ref($mandconfig) ne "HASH"){
+         return({exitcode=>1,msg=>msg(ERROR,"can not read mandator config")});
+      }
+      my @mandid=map({$_->{grpid}} @{$mandconfig->{doexport}->{1}});
+      if ($#mandid==-1){
+         return({exitcode=>1,msg=>msg(ERROR,"no export mandator")});
+      }
+      $filter{mandatorid}=\@mandid;
+   }
+
+
+
    my %w52ac=(0 =>'OTHER',
               5 =>'CUSTOMER RESPONSIBILITY',
               10=>'APPLICATION LICENSE',
@@ -300,6 +318,7 @@ sub ApplicationModified
 
    my $exclmand;
    {
+      $mand->ResetFilter();
       $mand->SetFilter("name"=>'Extern');
       my ($mandrec,$msg)=$mand->getOnlyFirst(qw(grpid));
       if (defined($mandrec)){
@@ -474,6 +493,15 @@ sub ApplicationModified
                }
                my $chkassignment=$rec->{businessteam};
                my $assignment=$self->getAcGroupByW5BaseGroup($chkassignment);
+               if (!defined($assignment)){
+                  if (exists($mandconfig->{grpid}->{$rec->{mandatorid}})){
+                     my $mrec=$mandconfig->{grpid}->{$rec->{mandatorid}};
+                     if (defined($mrec->{defaultassignment})){
+                        $assignment=$mrec->{defaultassignment};
+                        $grpnotfound{$chkassignment}=1;
+                     }
+                  }
+               }
                if (!defined($assignment)){
                   $grpnotfound{$chkassignment}=1;
                   $assignment="CSS.AO.DTAG" 
