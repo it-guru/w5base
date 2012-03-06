@@ -65,7 +65,6 @@ sub new
       new kernel::Field::Text(    
                 name          =>'statusid',
                 sqlorder      =>'NONE',
-                htmldetail    =>0,
                 label         =>'Status',
                 dataobjattr   =>'TBL_BFLEXX_WFREVIEW.status'),
 
@@ -74,6 +73,18 @@ sub new
                 sqlorder      =>'NONE',
                 label         =>'Reason',
                 dataobjattr   =>'TBL_BFLEXX_WFREVIEW.reason'),
+
+      new kernel::Field::Text(    
+                name          =>'userid',
+                sqlorder      =>'NONE',
+                label         =>'UserID',
+                dataobjattr   =>'TBL_BFLEXX_WFREVIEW.userid'),
+
+      new kernel::Field::Email(    
+                name          =>'email',
+                sqlorder      =>'NONE',
+                label         =>'E-Mail',
+                dataobjattr   =>'TBL_BFLEXX_WFREVIEW.mail'),
    );
    $self->setDefaultView(qw(linenumber id w5baseid name statusid activity reason));
    return($self);

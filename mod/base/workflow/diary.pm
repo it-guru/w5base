@@ -136,14 +136,20 @@ sub getPosibleActions
    my $WfRec=shift;
    my $app=$self->getParent;
    my $userid=$self->getParent->getCurrentUserId();
+   my $iscurrent=$self->isCurrentForward($WfRec);
+
    my @l=();
-   if ($WfRec->{state}==17){
+   if (!$self->getParent->isDataInputFromUserFrontend()){
+      if ($WfRec->{stateid}>=16){
+         push(@l,"wfforcerevise");
+      }
+   }
+   if ($WfRec->{state}==17 || $WfRec->{state}==18){
       if ($WfRec->{openuser}==$userid){
          push(@l,"addsup");
          push(@l,"wffinish");
       }
-      if ($WfRec->{fwdtarget} eq 'base::user' && 
-          $userid==$WfRec->{fwdtargetid}){ 
+      if ($iscurrent || $self->getParent->IsMemberOf("admin")){
          push(@l,"wffinish");
       }
    }
@@ -183,7 +189,8 @@ sub getPosibleActions
             push(@l,"addnote");
          }
       }
-      if ($WfRec->{owner}==$userid || $WfRec->{openuser}==$userid){
+      if ($iscurrent || $self->getParent->IsMemberOf("admin") || 
+          $WfRec->{openuser}==$userid){
          push(@l,"addnote");
          if ($WfRec->{fwdtarget} ne ""){
             push(@l,"remsup");
@@ -409,7 +416,7 @@ sub nativProcess
       }
       return(0);
    }
-   return(0);
+   return($self->SUPER::nativProcess($action,$h,$WfRec,$actions));
 }
 
 sub Process
@@ -849,16 +856,15 @@ sub getWorkHeight
    return(80);
 }
 
-
-sub Process
+sub nativProcess
 {
    my $self=shift;
    my $action=shift;
+   my $h=shift;
    my $WfRec=shift;
    my $actions=shift;
 
-   if (!defined($action) && Query->Param("reactivate")){
-      return(undef) if (!$self->ValidActionCheck(1,$actions,"reactivate"));
+   if ($action eq "reactivate"){
       if ($self->StoreRecord($WfRec,{
                                 step=>'base::workflow::diary::main',
                                 fwdtarget=>undef,
@@ -869,10 +875,30 @@ sub Process
          if ($self->getParent->getParent->Action->StoreRecord(
              $WfRec->{id},"reactivate", 
              {translation=>'base::workflow::diary'},undef)){
-            Query->Delete("WorkflowStep");
             return(1);
          }
          return(0);
+      }
+      return(0);
+   }
+
+
+   return($self->SUPER::nativProcess($action,$h,$WfRec,$actions));
+}
+
+
+sub Process
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   if (!defined($action) && Query->Param("reactivate")){
+      return(undef) if (!$self->ValidActionCheck(1,$actions,"reactivate"));
+      if ($self->nativProcess("reactivate",{},$WfRec,$actions)){
+         Query->Delete("WorkflowStep");
+         return(1);
       }
       return(0);
    }

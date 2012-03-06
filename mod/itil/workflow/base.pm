@@ -227,5 +227,83 @@ sub DataIssueCompleteWriteRequest
 }
 
 
+# global action handler for this workflow type
+sub nativProcess    
+{
+   my $self=shift;
+   my $action=shift;
+   my $h=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+
+   if ($action eq "wfforcerevise"){
+      my $ownerid=$WfRec->{owner};
+      my @applid=@{$WfRec->{affectedapplicationid}};
+      my $appl=getModuleObject($self->Config,"itil::appl");
+      $appl->SetFilter({id=>\@applid});
+      my @ccids=qw(delmgrid delmgr2id tsmid tsm2id);
+      my @l=$appl->getHashList(@ccids);
+      my %ccid;
+      foreach my $rec (@l){
+         foreach my $n (@ccids){
+            if ($rec->{$n} ne "" && $rec->{$n}  ne $ownerid){
+               $ccid{$rec->{$n}}++;
+            }
+         }
+      }
+      my @ccids=sort(keys(%ccid));
+      if ($h->{note}=~m/^\s*$/){
+         $self->LastMsg(ERROR,"invalid revise note specified for $WfRec->{id}");
+         return(0);
+      }
+      
+      my $wf=$self->getParent->Clone();
+      $wf->ResetFilter();
+      my $newinvoicedate=$WfRec->{invoicedate};
+      for(my $c=0;1;$c++){
+         my $d=CalcDateDuration($newinvoicedate,NowStamp("en"));
+         if ($d->{totaldays}<0){
+            last;
+         }
+         $newinvoicedate=$wf->ExpandTimeExpression("$newinvoicedate+1M");
+         if ($c>6){
+            $self->LastMsg(ERROR,
+                  "alte camellen werden nicht aufgewärmt $WfRec->{id}");
+            return(1);
+         }
+      }
+      if ($wf->Action->StoreRecord($WfRec->{id},'ccomplaint',{},$h->{note})){
+         my %wfch=(
+                   fwdtargetid=>$ownerid,
+                   fwdtarget=>'base::user',
+                   invoicedate=>$newinvoicedate,
+                   stateid=>18,
+                  );
+            if ($WfRec->{class}=~m/::workflow::diary$/){
+               $wfch{step}="base::workflow::diary::main";
+            }
+            if ($wf->ValidatedUpdateRecord($WfRec,\%wfch,
+                                           {id=>\$WfRec->{id}})){
+               push(@ccids,11634953080001);
+               $wf->Action->NotifyForward($WfRec->{id},
+                                          'base::user',
+                                          $ownerid,
+                                          "Reviewer",
+                                          "Bitte Nachbearbeiten",
+                                          addcctarget=>\@ccids);
+               return(1);
+           }
+      }
+      #printf STDERR ("fifi l=%s\n",Dumper(\@l));
+      #printf STDERR ("fifi general action wfforcerevise\n");
+      #printf STDERR ("fifi owner=$ownerid\n");
+      #printf STDERR ("fifi applid=%s\n",Dumper(\@applid));
+      return(1);
+   }
+   return(0);
+}
+
+
 
 1;

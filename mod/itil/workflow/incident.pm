@@ -64,6 +64,22 @@ sub getDynamicFields
    ));
 }
 
+sub getPosibleActions
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my @l=$self->SUPER::getPosibleActions($WfRec);
+
+   if (!$self->getParent->isDataInputFromUserFrontend()){
+      if ($WfRec->{stateid}>=16){
+         push(@l,"wfforcerevise");
+      }
+   }
+   return(@l);
+}
+
+
+
 
 
 sub IsModuleSelectable

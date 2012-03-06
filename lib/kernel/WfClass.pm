@@ -184,7 +184,7 @@ sub getStepObject
 #
 # SOAP Interface connector
 #
-sub nativProcess
+sub nativProcessInitiate
 {
    my $self=shift;
    my $action=shift;
@@ -200,7 +200,8 @@ sub nativProcess
    if ($stepobj->can("nativProcess")){
       my $d=Dumper($h);
       $d=~s/^.*?=\s*//;
-      msg(INFO,"*nativProcess on $self\n action='$action'\n dataload=%s",$d);
+      msg(INFO,"*nativProcess on $self\n action='$action'\nstep='$step'\n ".
+               "dataload=%s",$d);
       my @actions=$self->getPosibleActions($WfRec);
       return($stepobj->nativProcess($action,$h,$WfRec,\@actions));
    }

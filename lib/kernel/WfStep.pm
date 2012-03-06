@@ -383,6 +383,11 @@ sub nativProcess
       }
       return(0);
    }
+   else{
+      if ($self->getParent->can("nativProcess")){
+         return($self->getParent->nativProcess($op,$h,$WfRec,$actions));
+      }
+   }
 
 
    return(0);

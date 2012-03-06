@@ -470,10 +470,12 @@ sub getPosibleActions
    if ($isadmin){
       push(@l,"wfforward"); # workflow weiterleiten   (neuen Bearbeiter setzen)
    }
-   if (($stateid==4 || $stateid==3) && 
+   if (($stateid==4 || $stateid==3 || $stateid==18) && 
        ($lastworker==$userid || $isadmin) && ($userid!=$creator)){
       push(@l,"wffineproc");# Bearbeiten und zurück an Anf.  (durch Bearbeiter)
-      push(@l,"wfapprovalreq"); # Genehmigung anfordern      (durch Bearbeiter)
+      if ($stateid!=18){
+         push(@l,"wfapprovalreq"); # Genehmigung anfordern   (durch Bearbeiter)
+      }
    }
 
    #push(@l,"wfapprove");    # workflow genehmigen            (durch Aprover)
@@ -538,17 +540,16 @@ sub getPosibleActions
       }
    }
    if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
-      printf STDERR ("WFSTATE:\n".
-                     "========\n");
-      printf STDERR (" - isininitiatorgroup   : %d\n",$isininitiatorgroup);
-      printf STDERR (" - stateid              : %d\n",$stateid);
-      printf STDERR (" - iscurrent            : %d\n",$iscurrent);
-      printf STDERR (" - isadmin              : %d\n",$isadmin);
-      printf STDERR (" - iscurrentapprover    : %d\n",$iscurrentapprover);
-      printf STDERR (" - userid               : %s\n",$userid);
-      printf STDERR (" - creator              : %s\n",$creator);
-      printf STDERR (" - lastworker           : %s\n",$lastworker);
-      printf STDERR (" - actions              : %s\n",join(", ",@l));
+      msg(INFO,sprintf("WFSTATE:\n"."========\n").
+      sprintf(" - isininitiatorgroup   : %d\n",$isininitiatorgroup).
+      sprintf(" - stateid              : %d\n",$stateid).
+      sprintf(" - iscurrent            : %d\n",$iscurrent).
+      sprintf(" - isadmin              : %d\n",$isadmin).
+      sprintf(" - iscurrentapprover    : %d\n",$iscurrentapprover).
+      sprintf(" - userid               : %s\n",$userid).
+      sprintf(" - creator              : %s\n",$creator).
+      sprintf(" - lastworker           : %s\n",$lastworker).
+      sprintf(" - actions              : %s\n",join(", ",@l)));
       #printf STDERR (" - WfRec :\n%s\n",Dumper($WfRec));
    }
 
@@ -1105,10 +1106,16 @@ sub nativProcess
           $WfRec->{id},"wfaddnote",
           {translation=>'base::workflow::request'},$h->{note},$h->{effort})){
          my $openuserid=$WfRec->{openuser};
+         my $setend=NowStamp("en");
+         if ($WfRec->{stateid}==18){
+            if ($WfRec->{eventend} ne ""){
+               $setend=$WfRec->{eventend};
+            }
+         }
          $self->StoreRecord($WfRec,{stateid=>16,
                                     fwdtargetid=>$openuserid,
                                     fwdtarget=>'base::user',
-                                    eventend=>NowStamp("en"),
+                                    eventend=>$setend,
                                     fwddebtarget=>undef,
                                     fwddebtargetid=>undef});
          $self->getParent->getParent->CleanupWorkspace($WfRec->{id});

@@ -129,7 +129,7 @@ sub mkp800
       $wf->SetCurrentView(qw(id affectedcontractid 
                              wffields.tcomcodrelevant
                              class stateid eventend ));
-      $wf->SetFilter(eventend=>"\">=$starttime\" AND \"<=$endtime\"",
+      $wf->SetFilter(invoicedate=>"\">=$starttime\" AND \"<=$endtime\"",
                      class=>[grep(/^AL_TCom::.*$/,keys(%{$wf->{SubDataObj}}))]);
       my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
       if (defined($rec)){

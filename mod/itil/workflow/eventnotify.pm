@@ -79,7 +79,6 @@ sub Validate
    }
    my $eventstatrespo=effVal($oldrec,$newrec,"eventstatrespo");
    if ($eventstatrespo ne "" && $eventstatrespo ne "EVre.analyse"){
-printf STDERR ("fifi newrec=%s\n",Dumper($newrec));
       if ($eventstatrespo eq "EVre.itprov"){
          if (effVal($oldrec,$newrec,"eventspecrespocustomerid") ne ""){
             $self->LastMsg(ERROR,
@@ -87,7 +86,6 @@ printf STDERR ("fifi newrec=%s\n",Dumper($newrec));
                            "it is not allowed to set a specific customer");
             return(0);
          }
-printf STDERR ("fifi eventspecrespoitprovid=%s\n",effVal($oldrec,$newrec,"eventspecrespoitprovid"));
          if (effVal($oldrec,$newrec,"eventspecrespoitprovid") eq ""){
             $self->LastMsg(ERROR,
                            "if IT-Provider is responsible, ".

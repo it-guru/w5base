@@ -145,6 +145,8 @@ sub getStepByShortname
 
    return("itil::workflow::change::".$shortname);
 }  
+
+
    
 
 
@@ -282,6 +284,11 @@ sub getPosibleActions
             push(@l,"wfaddnote");
             last;
          }
+      }
+   }
+   if (!$self->getParent->isDataInputFromUserFrontend()){
+      if ($WfRec->{stateid}>=16){
+         push(@l,"wfforcerevise");
       }
    }
    return(@l);

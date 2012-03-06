@@ -45,6 +45,7 @@
 'wfautofinish'=>{de=>'automatisch beendet',en=>'auto finished'},
 'forwardto'=>{de=>'Weitergeleitet'},
 'note'=>{de=>'Notiz'},
+'ccomplaint'=>{de=>'kaufmännische Reklamation',en=>'commercial complaint'},
 'reactivate'=>{de=>'Reaktivierung'},
 'fixlink'=>{de=>'keine syncronisation notwendig',en=>'no sync needed'},
 'w5base2extern'=>{de=>'W5Base Datentransfer zum externen System',en=>'W5Base data transfer to the external system'},

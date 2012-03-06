@@ -104,7 +104,7 @@ sub new
                 htmleditwidth =>'50%',
                 transprefix   =>'wfstate.',
                 value         =>[qw(0 1 2 3 4 5 6 7 8 9 10 16 
-                                    17 21 22 23 24 25 26)],
+                                    17 18 21 22 23 24 25 26)],
                 readonly      =>1,
                 dataobjattr   =>'wfhead.wfstate'),
 
@@ -2683,7 +2683,7 @@ sub nativProcess
       return(undef);
    }
    msg(INFO,"request on class=$class step=$step");
-   return($classobj->nativProcess($action,$h,$step,$WfRec));
+   return($classobj->nativProcessInitiate($action,$h,$step,$WfRec));
 }
 
 sub getRecordHtmlIndex
