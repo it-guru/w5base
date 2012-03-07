@@ -118,6 +118,11 @@ sub new
                 dataobjattr   =>'amempldept.webpassword'),
 
       new kernel::Field::Text(
+                name          =>'idno',
+                label         =>'IDNo',
+                dataobjattr   =>'amempldept.idno'),
+
+      new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
@@ -130,7 +135,7 @@ sub new
                 dataobjattr   =>'amempldept.externalid'),
                                                    
    );
-   $self->setDefaultView(qw(lempldeptid fullname name ldapid srcsys srcid));
+   $self->setDefaultView(qw(lempldeptid fullname name ldapid idno srcsys srcid));
    return($self);
 }
 
