@@ -463,6 +463,8 @@ sub getPostibleParentObjs
 }
 
 
+
+
 sub Validate
 {
    my $self=shift;
@@ -547,8 +549,12 @@ sub Validate
       $self->LastMsg(ERROR,"invalid userid specified");
       return(0);
    }
-
-   if (!$self->IsMemberOf("admin")){ 
+   my $parentname;
+   if (my $p=$self->getParent()){
+      $parentname=$p->Self();
+   }
+   if ($parentname ne "faq::forum" &&  # not fine - but it works
+       $self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){ 
       # sec check
       if ($curuserid ne $userid){
          if (effVal($oldrec,$newrec,"parent") eq "base::staticinfoabo"){

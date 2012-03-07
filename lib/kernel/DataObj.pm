@@ -43,7 +43,13 @@ sub Clone
    my $self=shift;
    my $name=$self->Self;
    my $config=$self->Config;
-   return(getModuleObject($config,$name));
+   my $o=getModuleObject($config,$name);
+   if (defined($o)){
+      if (my $p=$self->getParent()){
+         $o->setParent($p);
+      }
+   }
+   return($o);
 }
 
 sub getFilterSet
