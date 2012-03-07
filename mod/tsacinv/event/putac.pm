@@ -479,14 +479,36 @@ sub ApplicationModified
                   }
                }
                my %posix=();
+               my %idno=();
                foreach my $userent (qw(tsm tsm2 opm opm2 sem databoss 
                                        delmgr delmgr2)){
                   if ($rec->{$userent} ne ""){
                      $user->SetFilter({fullname=>\$rec->{$userent}});
-                     $user->SetCurrentView("posix");
+                     $user->SetCurrentView("posix","email");
                      my ($rec,$msg)=$user->getFirst();
                      if (defined($rec)){
                         $posix{$userent}=lc($rec->{posix});
+                        if ($posix{$userent} ne ""){
+                           $acuser->ResetFilter();
+                           $acuser->SetFilter([
+                              {
+                                 loginname=>\$posix{$userent}
+                              },
+                              {
+                                 ldapid=>\$posix{$userent}
+                              },
+                              {
+                                 idno=>\$posix{$userent}
+                              },
+                              {
+                                 email=>\$rec->{email}
+                              }
+                           ]);
+                           my @l=$acuser->getHashList(qw(lempldeptid idno));
+                           if ($#l>-1 && $#l<3){
+                              $idno{$userent}=$l[0]->{idno};
+                           }
+                        }
                      }
                   }
                   $posix{$userent}="[NULL]" if (!defined($posix{$userent}));
@@ -556,13 +578,13 @@ sub ApplicationModified
                                    Version=>$rec->{currentvers},
                                    SoxRelevant=>$issoxappl,
                                    Criticality=>$criticality,
-                                   Technical_Contact=>$posix{tsm},
-                                   DataSupervisor=>$posix{databoss},
-                                   Service_Manager=>$posix{sem},
+                                   Technical_Contact=>$idno{tsm},
+                                   DataSupervisor=>$idno{databoss},
+                                   Service_Manager=>$idno{sem},
                                    Deputy_Technical_Contact=>$posix{tsm2},
-                                   Lead_Del_manager=>$posix{opm},
-                                   Del_manager=>$posix{delmgr},
-                                   Deputy_Del_manager=>$posix{delmgr2},
+                                   Lead_Del_manager=>$idno{opm},
+                                   Del_manager=>$idno{delmgr},
+                                   Deputy_Del_manager=>$idno{delmgr2},
                                    bDelete=>'0',
                                    Name=>$rec->{name}
                                 }
