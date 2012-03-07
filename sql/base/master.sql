@@ -411,3 +411,5 @@ create table iomap (
   PRIMARY KEY (id),key(dataobject),key(createdate),key(cistatus,createdate)
 );
 alter table iomap add fullname varchar(65), add key(fullname);
+alter table isocountry add zipcodeexp varchar(128) default NULL;
+alter table location modify zipcode varchar(16) NOT NULL;

@@ -57,6 +57,11 @@ sub new
                 label         =>'Countryname',
                 dataobjattr   =>'isocountry.name'),
 
+      new kernel::Field::Text(
+                name          =>'zipcodeexp',
+                label         =>'ZIP Code Expression',
+                dataobjattr   =>'isocountry.zipcodeexp'),
+
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',

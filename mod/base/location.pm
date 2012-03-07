@@ -117,7 +117,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'zipcode',
-                htmleditwidth =>'50px',
+                htmleditwidth =>'80px',
                 label         =>'ZIP Code',
                 dataobjattr   =>'location.zipcode'),
 
@@ -508,10 +508,22 @@ sub Validate
    my $label=trim(effVal($oldrec,$newrec,"label"));
    my $address1=trim(effVal($oldrec,$newrec,"address1"));
    my $zipcode=trim(effVal($oldrec,$newrec,"zipcode"));
-   if ($zipcode ne "" && !($zipcode=~m/^\d{4,6}$/)){
-      $self->LastMsg(ERROR,"invalid zipcode '\%s'",$zipcode);
-      return(0);
+   
+   my $loc=getModuleObject($self->Config,"base::isocountry");
+   $loc->SetFilter({token=>\$country});
+   my ($rec,$msg)=$loc->getOnlyFirst(qw(zipcodeexp));
+   if (defined($rec)){
+      my $zipcodeexp=$rec->{zipcodeexp};
+      if (!($zipcodeexp=~m/^\s*$/)){
+         my $chk;
+         eval("\$chk=\$zipcode=~m$zipcodeexp;");
+         if ($@ ne "" || !($chk)){
+            $self->LastMsg(ERROR,"invalid zipcode '\%s'",$zipcode);
+            return(undef);
+         }
+      }
    }
+
    if ($location eq "" || $location eq "0" || $address1 eq "0"){
       $self->LastMsg(ERROR,"invalid location");
       msg(ERROR,"invalid location request with ".
