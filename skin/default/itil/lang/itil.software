@@ -7,6 +7,7 @@
 'you are only authorized to add in \'order\' or \'reserved\' state'=>{de=>'Sie sind nur berechtig, im Status \'angefordert\' oder \'reserviert\' Datensätze zu erzeugen'},
 'invalid producer specified'=>{de=>'ungültiger Hersteller'},
 'Producer'=>{de=>'Hersteller'},
+'Fullname'=>{de=>'Hersteller - Softwareprodukt',en=>'Producer - Softwareproduct'},
 'Release Expression'=>{de=>'Versionsausdruck'},
 'system relations'=>{de=>'Systemzuorndungen'},
 'active system relations'=>{de=>'aktive Systemzuorndungen'},

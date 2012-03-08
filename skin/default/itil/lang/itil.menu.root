@@ -86,6 +86,8 @@
 'Tools.analytics.itilfault'=>{de=>'ITIL Ausfallsanalyse',en=>'ITIL fault analytics'},
 'itil.proc'=>{de=>'Prozesssteuerung',en=>'Processcontrol'},
 'itil.proc.ChangeManagement'=>{de=>'Change Management',en=>'Change Management'},
+'itil.proc.softmgmt'=>{de=>'Software Management',en=>'Software Management'},
+'itil.proc.softmgmt.analyse'=>{de=>'Analyse',en=>'Analyse'},
 'invoice.lnkapplinvoicestor'=>{de=>'bereitgest. Storage',en=>'provided Storage'},
 'invoice.lnkapplinvoicestor.cum'=>{de=>'kumuliert',en=>'cumulated'},
 'invoice.lnkapplinvoicestor.new'=>{de=>'Neueingabe',en=>'New'},
