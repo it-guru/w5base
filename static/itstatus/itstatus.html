@@ -26,7 +26,7 @@
           </span>
       </td>
       <td align=center class="toplabel">
-        SDM DTAG current top management information<br>(Prio 1/2 events of prio 1 config items)
+        SDM DTAG current top management information<br>(P1 events of prio 1 config items)
       </td>
       <td width=10% valign=center align=center>
           <span style="cursor:pointer" onclick="reloadStatus();">
@@ -179,7 +179,7 @@
 // ------------------------------------------------------------------------
 
 function storeEvent(currento,rec){
-   if (rec.eventstatclass<3){  // only prio 1 and prio 2 events
+   if (rec.eventstatclass<2){  // only prio 1  events
       if (rec.affecteditemprio==1){
          if (rec.eventstatclass==1){
             if (currento.state<30) currento.state=30;
