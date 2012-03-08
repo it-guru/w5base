@@ -356,6 +356,50 @@ sub new
                 selectfix     =>1,
                 dataobjattr   =>'lnksoftwaresystem.lnkitclustsvc'),
 
+     new kernel::Field::Text(
+                name          =>'softwareset',
+                readonly      =>1,
+                htmldetail    =>0,
+                selectsearch  =>sub{
+                   my $self=shift;
+                   my $ss=getModuleObject($self->getParent->Config,
+                                          "itil::softwareset");
+                   $ss->SecureSetFilter({cistatusid=>4});
+                   my @l=$ss->getVal("name");
+                   unshift(@l,"");
+                   return(@l);
+                },
+                searchable    =>1,
+                group         =>'softsetvalidation',
+                htmlwidth     =>'200px',
+                htmlnowrap    =>1,
+                label         =>'validate against Software Set',
+                onPreProcessFilter=>sub{
+                   my $self=shift;
+                   return(0);
+                },
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $FilterSet=$self->getParent->Context->{FilterSet};
+                   return($FilterSet->{softwareset});
+                }),
+
+     new kernel::Field::Text(
+                name          =>'softwareinstrelstate',
+                readonly      =>1,
+                searchable    =>0,
+                group         =>'softsetvalidation',
+                label         =>'Software release state',
+                onRawValue    =>\&calcSoftwareState),
+
+     new kernel::Field::Textarea(
+                name          =>'softwareinstrelmsg',
+                readonly      =>1,
+                searchable    =>0,
+                group         =>'softsetvalidation',
+                label         =>'Software release message',
+                onRawValue    =>\&calcSoftwareState),
+
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
@@ -494,6 +538,21 @@ sub calcLicMetrics   # licrelevantopmode licrelevantosrelease
    }
    return(\@res);
 }
+
+
+sub SetFilter
+{
+   my $self=shift;
+
+   if (ref($_[0]) eq "HASH" && exists($_[0]->{softwareset})){
+      $self->Context->{FilterSet}={
+                                     softwareset=>$_[0]->{softwareset}
+                                  };
+   }
+   return($self->SUPER::SetFilter(@_));
+
+}
+
 
 
 
@@ -663,6 +722,201 @@ sub VersionKeyGenerator
    $newrec->{releasekey}=join("",@relkey);
 }
 
+
+
+sub calcSoftwareState
+{
+   my $self=shift;
+   my $current=shift;
+
+   my $FilterSet=$self->getParent->Context->{FilterSet};
+   if ($FilterSet->{softwareset} eq ""){
+      return("NO SOFTSET SELECTED");
+   }
+   if ($FilterSet->{Set}->{name} ne $FilterSet->{softwareset} &&
+       $FilterSet->{softwareset} ne ""){
+      $FilterSet->{Set}={name=>$FilterSet->{softwareset}};
+      my $ss=getModuleObject($self->getParent->Config,
+                             "itil::softwareset");
+      $ss->SecureSetFilter({cistatusid=>4,name=>\$FilterSet->{softwareset}});
+      my ($rec)=$ss->getOnlyFirst("name","software");
+      $FilterSet->{Set}->{data}=$rec;
+      Dumper($FilterSet->{Set}->{data});
+   }
+   my @applid;
+   my $cachekey;
+   if ($self->getParent->SelfAsParentObject() eq "itil::appl"){
+      @applid=($current->{id});
+      $cachekey=join(",",sort(@applid));
+   }
+   else{
+      $cachekey=$current->{id};
+   }
+
+   if ($FilterSet->{Analyse}->{id} ne $cachekey){
+      $FilterSet->{Analyse}={id=>$cachekey};
+      # load interessting softwareids from softwareset
+      my %swid;
+      foreach my $swrec (@{$FilterSet->{Set}->{data}->{software}}){
+         $swid{$swrec->{softwareid}}++;
+      }
+      $FilterSet->{Analyse}->{softwareid}=[keys(%swid)];
+      if ($#applid!=-1){ # load systems
+         my $lnk=getModuleObject($self->getParent->Config,
+                                "itil::lnkapplsystem");
+         $lnk->SetFilter({applid=>\@applid,
+                          systemcistatusid=>[3,4]}); 
+         $FilterSet->{Analyse}->{systems}=[$lnk->getVal("systemid")];
+      }
+      my $lnk=getModuleObject($self->getParent->Config,
+                             "itil::lnksoftwaresystem");
+      if ($#applid!=-1){# load system installed software
+         $lnk->SetFilter({systemid=>$FilterSet->{Analyse}->{systems}});
+      }
+      else{
+         $lnk->SetFilter({id=>\$current->{id}});
+      }
+      $lnk->SetCurrentView(qw(systemid system software 
+                              releasekey version softwareid));
+      $FilterSet->{Analyse}->{ssoftware}=
+             $lnk->getHashIndexed(qw(id systemid softwareid));
+
+
+      if ($#applid!=-1){# load related software instances
+         my $sw=getModuleObject($self->getParent->Config,
+                                "itil::swinstance");
+         $sw->SetFilter({cistatusid=>[3,4],
+                         applid=>\$current->{id}});
+         $FilterSet->{Analyse}->{swi}=[
+              $sw->getHashList(qw(id lnksoftwaresystemid fullname))];
+      }
+
+      # check softwareset against installations
+      $FilterSet->{Analyse}->{relevantSoftwareInst}=0;
+      $FilterSet->{Analyse}->{todo}=[];
+      $FilterSet->{Analyse}->{totalstate}="OK";
+      $FilterSet->{Analyse}->{totalmsg}=[];
+      my $ssoftware=$FilterSet->{Analyse}->{ssoftware}->{softwareid};
+      foreach my $swrec (@{$FilterSet->{Set}->{data}->{software}}){
+         foreach my $swi (values(%{$FilterSet->{Analyse}->{ssoftware}->{id}})){
+            if ($swrec->{softwareid} eq  $swi->{softwareid}){
+               $FilterSet->{Analyse}->{relevantSoftwareInst}++;
+               if ($swi->{version}=~m/^\s*$/){
+                  push(@{$FilterSet->{Analyse}->{todo}},
+                        "- no version specified in software installaton ".
+                        "of $swrec->{softwareid} on system $swi->{systemid}");
+               }
+               if (length($swrec->{releasekey})!=
+                   length($swi->{releasekey}) ||
+                   ($swi->{releasekey}=~m/^0*$/) ||
+                   ($swrec->{releasekey}=~m/^0*$/)){
+                  push(@{$FilterSet->{Analyse}->{todo}},
+                        "- releasekey missmatch in  ".
+                        "$swi->{software} on $swi->{system} ");
+                  $FilterSet->{Analyse}->{totalstate}="FAIL";
+               }
+               else{
+                  if ($swrec->{comparator} eq "2"){
+                     if ($swrec->{releasekey} ne $swi->{releasekey} ||
+                         $swrec->{version} ne $swi->{version}){
+                        push(@{$FilterSet->{Analyse}->{todo}},
+                              "- only version $swi->{version} ".
+                              " of $swi->{software} is allowed on  ".
+                              " system $swi->{system} ");
+                        $FilterSet->{Analyse}->{totalstate}="FAIL";
+                        push(@{$FilterSet->{Analyse}->{totalmsg}},
+                             "$swi->{software} needs $swrec->{version}");
+                     }
+                  }
+                  elsif ($swrec->{comparator} eq "1"){
+                     if ($swrec->{releasekey} eq $swi->{releasekey} ||
+                         $swrec->{version} eq $swi->{version}){
+                        push(@{$FilterSet->{Analyse}->{todo}},
+                              "- remove disallowed version $swi->{software} ".
+                              " $swi->{version} from  system $swi->{system} ");
+                        $FilterSet->{Analyse}->{totalstate}="FAIL";
+                        push(@{$FilterSet->{Analyse}->{totalmsg}},
+                             "$swi->{software} disallowed $swrec->{version}");
+                     }
+                  }
+                  elsif ($swrec->{comparator} eq "0"){
+                     if ($swrec->{releasekey} gt $swi->{releasekey}){
+                        push(@{$FilterSet->{Analyse}->{todo}},
+                              "- update $swi->{software} on ".
+                              "system $swi->{system} ".
+                              "from $swi->{version} to  $swrec->{version}");
+                        $FilterSet->{Analyse}->{totalstate}="FAIL";
+                        push(@{$FilterSet->{Analyse}->{totalmsg}},
+                             "$swi->{software} needs >=$swrec->{version}");
+                     }
+                  }
+               }
+            }
+            #printf STDERR ("check $swrec->{softwareid} $swrec->{releasekey} against $swi->{softwareid} $swi->{releasekey}\n");
+         }
+      }
+
+ 
+      
+   }
+ #  printf STDERR ("id=$current->{id} d=%s\n",Dumper($FilterSet->{Set}->{data}));
+ #  printf STDERR ("sw=%s\n",Dumper($FilterSet->{Analyse}->{ssoftware}));
+
+   my @d;
+   if ($#applid!=-1){
+      { # system count
+         my $m=sprintf("analysed system count: %d",
+                         $#{$FilterSet->{Analyse}->{systems}}+1);
+         if ($#{$FilterSet->{Analyse}->{systems}}==-1){
+            push(@d,"<font color=red>"."WARN: ".$m."</font>");
+         }
+         else{
+            push(@d,"INFO: ".$m);
+         }
+      }
+      # softwareinstallation count
+      if ($#{$FilterSet->{Analyse}->{systems}}!=-1){
+         my $m=sprintf("analysed software installations count: %d",
+                        keys(%{$FilterSet->{Analyse}->{ssoftware}->{id}})+0);
+         if (keys(%{$FilterSet->{Analyse}->{ssoftware}->{id}})==0){
+            push(@d,"<font color=red>"."WARN: ".$m."</font>");
+         }
+         else{
+            push(@d,"INFO: ".$m);
+         }
+         { # check software instances
+            my $m=sprintf("analysed software instance count: %d",
+                            $#{$FilterSet->{Analyse}->{swi}}+1);
+            if ($#{$FilterSet->{Analyse}->{swi}}!=-1){
+               push(@d,"INFO: ".$m);
+            }
+            else{
+               push(@d,"<font color=red>"."WARN: ".$m."</font>");
+            }
+         }
+         my $m=sprintf("found <b>%d</b> relevant software installations for check",
+                       $FilterSet->{Analyse}->{relevantSoftwareInst});
+         push(@d,"INFO: ".$m);
+      }
+   }
+   if ($self->Name eq "softwareanalysestate"){
+      return("<div style='width:300px'>".join("<br>",@d)."</div>");
+   }
+   if ($self->Name eq "softwareanalysetodo"){
+      return("<div style='width:500px'>".
+             join("<br>",@{$FilterSet->{Analyse}->{todo}})."</div>");
+   }
+   if ($self->Name eq "softwareinstrelstate"){
+      return($FilterSet->{Analyse}->{totalstate});
+   }
+   if ($self->Name eq "softwareinstrelmsg"){
+      return(join("\n",@{$FilterSet->{Analyse}->{totalmsg}}));
+   }
+
+   return(join("<br>",@d));
+}
+
+
 sub isViewValid
 {
    my $self=shift;
@@ -719,7 +973,9 @@ sub isParentWriteable  # Eltern Object Schreibzugriff prüfen
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default lic useableby misc link releaseinfos source));
+   return(qw(header default lic useableby misc link 
+             releaseinfos softsetvalidation
+             source));
 }
 
 

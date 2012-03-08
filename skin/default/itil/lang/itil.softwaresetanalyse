@@ -1,1 +1,3 @@
-'itil::softwaresetanalyse'=>{de=>'Software Set Analyse',en=>'Software Set analyse'},
+'itil::softwaresetanalyse'=>{de=>'Anwendungs Software Set Analyse',en=>'Application Software Set analyse'},
+'fieldgroup.softsetvalidation'=>{de=>'SoftwareSet Prüfung',en=>'softwareset validation'},
+'validate against Software Set'=>{de=>'Prüfung gegen SoftwareSet'},
