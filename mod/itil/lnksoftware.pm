@@ -130,22 +130,25 @@ sub new
       new kernel::Field::Text(
                 name          =>'releasekey',
                 readonly      =>1,
+                htmldetail    =>0,
                 group         =>'releaseinfos',
-                label         =>'Releasekey (Beta)',
+                label         =>'Releasekey',
                 dataobjattr   =>'lnksoftwaresystem.releasekey'),
                                                    
       new kernel::Field::Text(
                 name          =>'majorminorkey',
                 readonly      =>1,
+                htmldetail    =>0,
                 group         =>'releaseinfos',
-                label         =>'majorminorkey (Beta)',
+                label         =>'majorminorkey',
                 dataobjattr   =>'lnksoftwaresystem.majorminorkey'),
                                                    
       new kernel::Field::Text(
                 name          =>'patchkey',
                 readonly      =>1,
+                htmldetail    =>0,
                 group         =>'releaseinfos',
-                label         =>'patchkey (Beta)',
+                label         =>'patchkey',
                 dataobjattr   =>'lnksoftwaresystem.patchkey'),
                                                    
       new kernel::Field::Text(
@@ -388,6 +391,7 @@ sub new
                 name          =>'softwareinstrelstate',
                 readonly      =>1,
                 searchable    =>0,
+                htmldetail    =>0,
                 group         =>'softsetvalidation',
                 label         =>'Software release state',
                 onRawValue    =>\&calcSoftwareState),
@@ -396,6 +400,7 @@ sub new
                 name          =>'softwareinstrelmsg',
                 readonly      =>1,
                 searchable    =>0,
+                htmldetail    =>0,
                 group         =>'softsetvalidation',
                 label         =>'Software release message',
                 onRawValue    =>\&calcSoftwareState),

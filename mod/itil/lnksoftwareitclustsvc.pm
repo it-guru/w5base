@@ -86,6 +86,8 @@ sub new
                 dataobjattr   =>'lnksoftwareitclustsvc.software')
                                                    
    );
+   $self->getField("systemid")->{uivisible}=0;
+   $self->getField("system")->{uivisible}=0;
    $self->getField("itclustsvc")->{searchable}=1;
    $self->getField("cicistatusid")->{dataobjattr}='itclust.cistatus';
    $self->getField("mandatorid")->{dataobjattr}='itclust.mandator';
@@ -122,6 +124,8 @@ sub getSqlFrom
             "on lnksoftwaresystem.lnkitclustsvc=lnkitclustsvc.id ".
             "left outer join itclust ".
             "on lnkitclustsvc.itclust=itclust.id ".
+            "left outer join system ".   # dummy relation, to corrct sql
+            "on '-99'=system.id ".       # handling of fullname
             "left outer join liccontract ".
             "on lnksoftwaresystem.liccontract=liccontract.id";
    return($from);

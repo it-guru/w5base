@@ -170,6 +170,8 @@ sub new
                 dataobjattr   =>'lnksoftwaresystem.software')
                                                    
    );
+   $self->getField("itclustsvc")->{uivisible}=0;
+   $self->getField("itclustsvcid")->{uivisible}=0;
    $self->getField("system")->{searchable}=1;
    $self->getField("cicistatusid")->{dataobjattr}='system.cistatus';
    $self->getField("mandatorid")->{dataobjattr}='system.mandator';

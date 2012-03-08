@@ -28,3 +28,5 @@
 'license relevant system class'=>{de=>'Lizenzrelevante Systemklasse'},
 'license relevant operation mode'=>{de=>'Lizenzrelevante vorrangige Betriebsart'},
 'validate against Software Set'=>{de=>'Prüfung gegen SoftwareSet'},
+'Software release state'=>{de=>'Softwareversionsstatus'},
+'Software release message'=>{de=>'Softwareversions-Meldung'},
