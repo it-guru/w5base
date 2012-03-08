@@ -1,0 +1,4 @@
+'comp.0'=>{de=>'>= größer oder gleich',en=>'greater or equal'},
+'comp.1'=>{de=>'!= nicht zugelassen',en=>'not allowed'},
+'comp.2'=>{de=>'= exakt gleich zugelassen',en=>'exakt equal allowed'},
+'Comparator'=>{de=>'Vergleichsoperator'},

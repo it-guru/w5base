@@ -414,6 +414,15 @@ sub Init
                       "itil::chmmgmt",
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("itil.proc.softmgmt",
+                      "itil::softwareset",
+                      func=>'MainWithNew',
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itil.proc.softmgmt.analyse",
+                      "itil::softwaresetanalyse",
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("invoice.lnkapplinvoicestor",
                       "itil::lnkapplinvoicestor",
                       defaultacl=>['admin']);

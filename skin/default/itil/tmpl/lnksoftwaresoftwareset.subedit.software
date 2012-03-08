@@ -1,0 +1,15 @@
+<div class=editframe>
+   <table class=editframe>
+      <tr>
+         <td class=fname width=10%>%software(label)%:</td>
+         <td class=finput colspan=3 width=40%>%software(sublistedit)%</td>
+      </tr>
+      <tr>
+         <td class=fname width=5%>%version(label)%:</td>
+         <td class=finput width=100>%version(sublistedit)%</td>
+         <td class=fname width=5%>%comparator(label)%:</td>
+         <td class=finput width=120>%comparator(sublistedit)%</td>
+      </tr>
+   </table>
+</div>
+%StdButtonBar(subadd,subdelete,subsave,subcancel)%

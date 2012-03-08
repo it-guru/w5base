@@ -41,6 +41,13 @@ sub new
                 dataobjattr   =>'software.id'),
                                                   
       new kernel::Field::Text(
+                name          =>'fullname',
+                htmldetail    =>0,
+                label         =>'Fullname',
+                dataobjattr   =>"concat(producer.name,
+                                 if(producer.name<>'','-',''),software.name)"),
+
+      new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
                 dataobjattr   =>'software.name'),
@@ -393,6 +400,19 @@ sub new
    $self->setWorktable("software");
    return($self);
 }
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $from="$worktable ".
+            "left outer join producer on software.producer=producer.id";
+
+   return($from);
+}
+
+
 
 sub PhoneUsage
 {

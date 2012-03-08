@@ -966,8 +966,19 @@ sub FormatedSearch
    $d.="<tr><td>". # for min width, add an empty image with 50px width
        "<img width=50 border=0 height=1 ".
        "src=\"../../../public/base/load/empty.gif\">";
-   $d.="<input type=text  name=\"search_$name\" ".
-       "class=finput style=\"min-width:50px\" value=\"$curval\">";
+   if (exists($self->{selectsearch})){
+      my $options=$self->{selectsearch};
+      $options=[&$options($self)] if (ref($options) eq "CODE");
+      $d.="<select name=\"search_$name\" style=\"min-width:50px;width:100%\">";
+      foreach my $opt (@$options){
+         $d.="<option>".$opt."</option>";
+      }
+      $d.="</select>";
+   }
+   else{
+      $d.="<input type=text  name=\"search_$name\" ".
+          "class=finput style=\"min-width:50px\" value=\"$curval\">";
+   }
    $d.="</td>";
    my $FieldHelpUrl=$self->getFieldHelpUrl();
    if (defined($FieldHelpUrl)){

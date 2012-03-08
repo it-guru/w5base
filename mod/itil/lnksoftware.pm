@@ -602,17 +602,7 @@ sub Validate
       }
    }
    if ($version ne "" && exists($newrec->{version})){  #release details gen
-      my @v=split(/\./,$version);
-      my @relkey=();
-      for(my $relpos=0;$relpos<5;$relpos++){
-         if ($v[$relpos]=~m/^\d+$/){
-            $relkey[$relpos]=sprintf("%04d",$v[$relpos]);
-         }
-         else{
-            $relkey[$relpos]="9999";
-         }
-      }
-      $newrec->{releasekey}=join("",@relkey);
+      VersionKeyGenerator($oldrec,$newrec);
       if (my ($rel,$patch)=$version=~m/^(.*\d)(p\d.*)$/){
          $newrec->{patchkey}=$patch;
          $newrec->{majorminorkey}=$rel;
@@ -654,6 +644,24 @@ sub Validate
    return(1);
 }
 
+sub VersionKeyGenerator
+{
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $version=effVal($oldrec,$newrec,"version");
+
+   my @v=split(/\./,$version);
+   my @relkey=();
+   for(my $relpos=0;$relpos<5;$relpos++){
+      if ($v[$relpos]=~m/^\d+$/){
+         $relkey[$relpos]=sprintf("%04d",$v[$relpos]);
+      }
+      else{
+         $relkey[$relpos]="0000";
+      }
+   }
+   $newrec->{releasekey}=join("",@relkey);
+}
 
 sub isViewValid
 {

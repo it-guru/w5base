@@ -156,13 +156,15 @@ sub ProcessLine
                $dest="ById/".$id;
             }
             else{
-               $dest=$app->Self();
-               $dest=~s/::/\//g;
-               my $lq=new kernel::cgi({});
-               $lq->Param($idfieldname=>$id);
-               $lq->Param(AllowClose=>1);
-               my $urlparam=$lq->QueryString();
-               $dest="../../$dest/$ResultLineClickHandler?$urlparam";
+               if ($app->can($ResultLineClickHandler)){
+                  $dest=$app->Self();
+                  $dest=~s/::/\//g;
+                  my $lq=new kernel::cgi({});
+                  $lq->Param($idfieldname=>$id);
+                  $lq->Param(AllowClose=>1);
+                  my $urlparam=$lq->QueryString();
+                  $dest="../../$dest/$ResultLineClickHandler?$urlparam";
+               }
             }
             my $detailx=$app->DetailX();
             my $detaily=$app->DetailY();
@@ -180,7 +182,9 @@ sub ProcessLine
                    "resizable=yes,scrollbars=auto\")";
             }
             else{
-               $lineonclick="custopenwin(\"$dest\",\"$winsize\",$detailx)";
+               if ($dest ne ""){
+                  $lineonclick="custopenwin(\"$dest\",\"$winsize\",$detailx)";
+               }
             }
          }
       }
