@@ -271,6 +271,27 @@ sub SecureValidate
 }
 
 
+sub ValidateCONumber
+{
+   my $self=shift;
+   my $fieldname=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+
+   my $conummer=uc(effVal($oldrec,$newrec,$fieldname));
+   if ($conummer=~m/^\s*$/ || 
+       (!($conummer=~m/^[0-9]+$/) &&
+        !($conummer=~m/^[A-Z]-[0-9]{6,12}-[A-Z,0-9]{3,6}$/) )){
+      $self->LastMsg(ERROR,"invalid number format '\%s' specified",$conummer);
+      return(0);
+   }
+   $conummer=~s/^0+//g;
+   $newrec->{$fieldname}=$conummer;
+   return(1);
+}
+
+
 
 
 sub Validate
@@ -292,15 +313,7 @@ sub Validate
          return(undef);
       }
    }
-   my $conummer=uc(effVal($oldrec,$newrec,"name"));
-   if ($conummer=~m/^\s*$/ || 
-       (!($conummer=~m/^[0-9]+$/) &&
-        !($conummer=~m/^[A-Z]-[0-9]+-[A-Z,0-9]+$/) )){
-      $self->LastMsg(ERROR,"invalid number format '\%s' specified",$conummer);
-      return(0);
-   }
-   $conummer=~s/^0+//g;
-   $newrec->{name}=$conummer;
+   return(0) if (!$self->ValidateCONumber("name",$oldrec,$newrec));
 
    if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
       my $userid=$self->getCurrentUserId();

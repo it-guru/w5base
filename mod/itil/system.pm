@@ -24,6 +24,7 @@ use kernel::DataObj::DB;
 use kernel::App::Web::InterviewLink;
 use kernel::Field;
 use kernel::CIStatusTools;
+use finance::costcenter;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB 
         kernel::App::Web::InterviewLink
         kernel::CIStatusTools);
@@ -1166,6 +1167,11 @@ sub Validate
       if (effVal($oldrec,$newrec,"isclusternode")!=1){
          $newrec->{itclustid}=undef;
       }
+   }
+
+   if (exists($newrec->{conumber})){
+      return(0) if (!$self->finance::costcenter::ValidateCONumber("conumber",
+                    $oldrec,$newrec));
    }
 
    ########################################################################

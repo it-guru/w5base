@@ -25,6 +25,7 @@ use kernel::DataObj::DB;
 use kernel::Field;
 use kernel::CIStatusTools;
 use kernel::MandatorDataACL;
+use finance::costcenter;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB 
         kernel::App::Web::InterviewLink kernel::CIStatusTools
         kernel::MandatorDataACL);
@@ -1325,18 +1326,8 @@ sub Validate
       }
    }
    if (exists($newrec->{conumber})){
-      my $conumber=trim(effVal($oldrec,$newrec,"conumber"));
-      if ($conumber ne ""){
-         $conumber=~s/^0+//g;
-         if (!($conumber=~m/^\d{5,13}$/)){
-            my $fo=$self->getField("conumber");
-            my $msg=sprintf($self->T("value of '%s' is not correct ".
-                                     "numeric"),$fo->Label());
-            $self->LastMsg(ERROR,$msg);
-            return(0);
-         }
-         $newrec->{conumber}=$conumber;
-      }
+      return(0) if (!$self->finance::costcenter::ValidateCONumber("conumber",
+                    $oldrec,$newrec));
    }
    foreach my $v (qw(avgusercount namedusercount)){
       $newrec->{$v}=undef if (exists($newrec->{$v}) && $newrec->{$v} eq "");

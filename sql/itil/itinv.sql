@@ -4,7 +4,7 @@ create table appl (
   name       varchar(40) NOT NULL,
   cistatus   int(2)      NOT NULL,
     applid         varchar(20) default NULL,
-    conumber       varchar(20) default NULL,
+    conumber       varchar(40) default NULL,
     applgroup      varchar(20) default NULL,
     databoss       bigint(20)  default NULL,
     tsm            bigint(20)  default NULL,
@@ -65,7 +65,7 @@ create table system (
     admteam        bigint(20)  default NULL,
     systemid       varchar(20)  default NULL,
     inventoryno    varchar(20)  default NULL,
-    conumber       varchar(20) default NULL,
+    conumber       varchar(40) default NULL,
     mandator       bigint(20)  default NULL,
     is_prod        bool default '0',
     is_test        bool default '0',
@@ -670,7 +670,7 @@ alter table swinstance add databoss2 bigint(20)  default NULL;
 alter table system     add hostid    varchar(20) default NULL;
 alter table system     add vhostsystem bigint(20) default NULL;
 alter table appl       add opmode     varchar(20) default NULL;
-alter table asset      add conumber   varchar(20) default NULL;
+alter table asset      add conumber   varchar(40) default NULL;
 alter table system     add key(conumber);
 alter table asset      add key(conumber);
 alter table liccontract  add unitcount int(2) default 1;

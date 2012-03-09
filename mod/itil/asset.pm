@@ -23,6 +23,7 @@ use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
 use kernel::CIStatusTools;
+use finance::costcenter;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::CIStatusTools);
 
 sub new
@@ -650,6 +651,12 @@ sub Validate
        $newrec->{systemhandle} ne $systemhandle){
       $newrec->{systemhandle}=$systemhandle;
    }
+
+   if (exists($newrec->{conumber})){
+      return(0) if (!$self->finance::costcenter::ValidateCONumber("conumber",
+                    $oldrec,$newrec));
+   }
+
 
    ########################################################################
    # standard security handling

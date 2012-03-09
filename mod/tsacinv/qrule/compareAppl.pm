@@ -87,6 +87,11 @@ sub qcheckRecord
          $errorlevel=3 if ($errorlevel<3);
       }
       else{
+         if (!($parrec->{conumber}=~m/^\d+$/) &&          # classic co
+             !($parrec->{conumber}=~m/^[A-Z]-\d+-\d+$/)){ # PSP
+            # filter to remove invalid co-numbers without error message
+            delete($parrec->{conumber});
+         }
          $self->IfaceCompare($dataobj,
                              $rec,"conumber",
                              $parrec,"conumber",
