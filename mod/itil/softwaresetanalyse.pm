@@ -94,19 +94,21 @@ sub SetFilter
    my $self=shift;
 
    if (ref($_[0]) ne "HASH" || !exists($_[0]->{softwareset})){ 
-      $self->LastMsg(ERROR,"invalid or undefined analyse softwareset in filter");
+      $self->LastMsg(ERROR,
+                     "invalid or undefined analyse softwareset in filter");
       return(0);
    }
-   else{
+   if (ref($_[0]) eq "HASH" && exists($_[0]->{softwareset})){
+      my $setname=$_[0]->{softwareset};
+      $setname=~s/^"(.*)"/$1/;
       $self->Context->{FilterSet}={
-                                     softwareset=>$_[0]->{softwareset}
+                                     softwareset=>$setname
                                   };
    }
-
-
    return($self->SUPER::SetFilter(@_));
 
 }
+
 
 
 sub isViewValid
