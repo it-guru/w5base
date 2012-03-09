@@ -115,6 +115,14 @@ sub FormatedResult
    my $FormatAs=shift;
    my $d=$self->RawValue($current);
    $d=$self->FormatedDetailDereferncer($current,$FormatAs,$d);
+   if ($self->readonly($current) && 
+       ref($self->{onRawValue}) eq "CODE" &&
+       !($FormatAs=~m/^Html.*$/)){
+      $d=~s/\n//g;
+      $d=~s/<br>/\r\n/g;
+      $d=~s/<[a-zA-Z]+[^>]*>//g;
+      $d=~s/<\/[a-zA-Z]+[^>]*>//g;
+   }
  #  if ($FormatAs eq "HtmlV01"){
  #     if (!$self->{AllowHtmlInput}){
  #        $d=~s/</&lt;/g;

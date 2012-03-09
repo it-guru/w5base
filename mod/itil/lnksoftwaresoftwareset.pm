@@ -75,7 +75,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'comparator',
-                htmlwidth     =>'50px',
+                htmlwidth     =>'150px',
                 label         =>'Comparator',
                 transprefix   =>'comp.',
                 value         =>['0', '1', '2'],
