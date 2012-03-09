@@ -173,21 +173,22 @@ sub new
                 group         =>'source',
                 label         =>'RealEditor',
                 dataobjattr   =>'softwareset.realeditor'),
-   
-   #   new kernel::Field::Link(
-   #             name          =>'sectarget',
-   #             noselect      =>'1',
-   #             dataobjattr   =>'lnkcontact.target'),
-#
-#      new kernel::Field::Link(
-#                name          =>'sectargetid',
-#                noselect      =>'1',
-#                dataobjattr   =>'lnkcontact.targetid'),
-#
-#      new kernel::Field::Link(
-#                name          =>'secroles',
-#                noselect      =>'1',
-#                dataobjattr   =>'lnkcontact.croles'),
+
+      new kernel::Field::Link(
+                name          =>'sectarget',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.target'),
+
+      new kernel::Field::Link(
+                name          =>'sectargetid',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.targetid'),
+
+      new kernel::Field::Link(
+                name          =>'secroles',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.croles'),
+
 
    #   new kernel::Field::IssueState(),
    #   new kernel::Field::QualityText(),
@@ -213,16 +214,16 @@ sub getDetailBlockPriority
 }
 
 
-#sub getSqlFrom
-#{
-#   my $self=shift;
-#   my ($worktable,$workdb)=$self->getWorktable();
-#   my $from="$worktable left outer join lnkcontact ".
-#            "on lnkcontact.parentobj in ('itil::softwareset') ".
-#            "and $worktable.id=lnkcontact.refid";
-#
-#   return($from);
-#}
+sub getSqlFrom
+{
+   my $self=shift;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $from="$worktable left outer join lnkcontact ".
+            "on lnkcontact.parentobj in ('itil::softwareset') ".
+            "and $worktable.id=lnkcontact.refid";
+
+   return($from);
+}
 
 
 sub initSearchQuery
@@ -236,41 +237,70 @@ sub initSearchQuery
 
 
 
-#sub SecureSetFilter
-#{
-#   my $self=shift;
-#   my @flt=@_;
-#   
-#   if (!$self->IsMemberOf("admin")){
-#      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
-#      my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
-#          [orgRoles(),qw(RCFManager RCFManager2
-#                         RAuditor RMonitor)],"both");
-#      my @grpids=keys(%grps);
-#      my $userid=$self->getCurrentUserId();
-#      push(@flt,[
-#                 {mandatorid=>\@mandators},
-#                 {databossid=>$userid},
-#                 {sectargetid=>\$userid,sectarget=>\'base::user',
-#                  secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
-#                            "*roles=?read?=roles*"},
-#                 {sectargetid=>\@grpids,sectarget=>\'base::grp',
-#                  secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
-#                            "*roles=?read?=roles*"},
-#                ]);
-#   }
-#   return($self->SetFilter(@flt));
-#}
-
-
 sub Validate
 {
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
 
+   ########################################################################
+   # standard security handling
+   #
+   if ($self->isDataInputFromUserFrontend()){
+      my $userid=$self->getCurrentUserId();
+      if (!defined($oldrec)){
+         if (!defined($newrec->{databossid}) ||
+             $newrec->{databossid}==0){
+            $newrec->{databossid}=$userid;
+         }
+      }
+      if (!$self->IsMemberOf("admin")){
+         if (defined($newrec->{databossid}) &&
+             $newrec->{databossid}!=$userid &&
+             $newrec->{databossid}!=$oldrec->{databossid}){
+            $self->LastMsg(ERROR,"you are not authorized to set other persons ".
+                                 "as databoss");
+            return(0);
+         }
+      }
+   }
+   ########################################################################
+
+   return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"fullname"));
+
+
    return(1);
 }
+
+
+
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if (!$self->IsMemberOf("admin")){
+      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
+      my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+          [orgRoles(),qw(RCFManager RCFManager2
+                         RAuditor RMonitor)],"both");
+      my @grpids=keys(%grps);
+      my $userid=$self->getCurrentUserId();
+      push(@flt,[
+                 {mandatorid=>\@mandators},
+                 {databossid=>$userid},
+                 {sectargetid=>\$userid,sectarget=>\'base::user',
+                  secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
+                            "*roles=?read?=roles*"},
+                 {sectargetid=>\@grpids,sectarget=>\'base::grp',
+                  secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
+                            "*roles=?read?=roles*"},
+                ]);
+   }
+   return($self->SetFilter(@flt));
+}
+
+
 
 
 sub FinishWrite
@@ -309,6 +339,54 @@ sub isWriteValid
    return("ALL")  if ($self->IsMemberOf("admin"));
    return(undef);
 }
+
+sub isWriteValid
+{
+   my $self=shift;
+   my $rec=shift;
+   my $userid=$self->getCurrentUserId();
+
+   my @databossedit=qw(default software contacts misc);
+   if (!defined($rec)){
+      return(@databossedit);
+   }
+   else{
+      if ($rec->{databossid}==$userid){
+         return(@databossedit);
+      }
+      if ($self->IsMemberOf("admin")){
+         return(@databossedit);
+      }
+      if (defined($rec->{contacts}) && ref($rec->{contacts}) eq "ARRAY"){
+         my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+                                     ["RMember"],"both");
+         my @grpids=keys(%grps);
+         foreach my $contact (@{$rec->{contacts}}){
+            if ($contact->{target} eq "base::user" &&
+                $contact->{targetid} ne $userid){
+               next;
+            }
+            if ($contact->{target} eq "base::grp"){
+               my $grpid=$contact->{targetid};
+               next if (!grep(/^$grpid$/,@grpids));
+            }
+            my @roles=($contact->{roles});
+            @roles=@{$contact->{roles}} if (ref($contact->{roles}) eq "ARRAY");
+            return(@databossedit) if (grep(/^write$/,@roles));
+         }
+      }
+      my @chkgroups;
+      push(@chkgroups,$rec->{mandatorid}) if ($rec->{mandatorid} ne "");
+      if ($#chkgroups!=-1){
+         if ($self->IsMemberOf(\@chkgroups,["RDataAdmin"],"down")){
+            return(@databossedit);
+         }
+      }
+   }
+   return(undef);
+}
+
+
 
 sub SelfAsParentObject    # this method is needed because existing derevations
 {

@@ -971,7 +971,19 @@ sub FormatedSearch
       $options=[&$options($self)] if (ref($options) eq "CODE");
       $d.="<select name=\"search_$name\" style=\"min-width:50px;width:100%\">";
       foreach my $opt (@$options){
-         $d.="<option>".$opt."</option>";
+         my $valopt=$opt;
+         my $dispopt=$opt;
+         if (ref($opt) eq "ARRAY"){
+            $valopt=$opt->[0];
+            $dispopt=$opt->[1];
+         }
+         $dispopt=~s/>/&gt;/g;
+         $dispopt=~s/</&lt;/g;
+         if ($valopt=~m/\s/){
+            $valopt="\"$valopt\"";
+         }
+         $valopt=~s/"/&quot;/g;
+         $d.="<option value=\"$valopt\">".$dispopt."</option>";
       }
       $d.="</select>";
    }

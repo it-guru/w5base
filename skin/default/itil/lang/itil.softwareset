@@ -1,3 +1,4 @@
 'itil::softwareset'=>{de=>'Software-Set',en=>'Software-Set'},
 'fieldgroup.software'=>{de=>'Software Vorgaben',en=>'Software preset'},
 'fieldgroup.osrelease'=>{de=>'Betriebssystem Vorgaben',en=>'Operation system preset'},
+'Databoss'=>{de=>'Datenverantwortlicher'},

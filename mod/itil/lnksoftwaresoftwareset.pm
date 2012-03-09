@@ -75,7 +75,8 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'comparator',
-                htmlwidth     =>'150px',
+                htmlwidth     =>'220px',
+                htmleditwidth =>'220px',
                 label         =>'Comparator',
                 transprefix   =>'comp.',
                 value         =>['0', '1', '2'],
@@ -192,29 +193,18 @@ sub Validate
    itil::lnksoftware::VersionKeyGenerator($oldrec,$newrec);
 
 
-#   my $name=uc(trim(effVal($oldrec,$newrec,"name")));
-#   if (($name=~m/\s/) || ($name=~m/^\s*$/)){
-#      $self->LastMsg(ERROR,"invalid license key specified");
-#      return(undef);
-#   }
-#   else{
-#      $newrec->{name}=$name;
-#   }
-#   
-#   if ((!defined($oldrec) && !defined($newrec->{liccontractid})) ||
-##       (defined($newrec->{liccontractid}) && $newrec->{liccontractid}==0)){
-#      $self->LastMsg(ERROR,"invalid license contract specified");
-#      return(undef);
-##   }
-#   my $parentobj=effVal($oldrec,$newrec,"parentobj");
-#
-#   if ($self->isDataInputFromUserFrontend()){
-#      if (!$self->isWriteOnApplValid($applid,"accountnumbers") ||
-#          $parentobj ne "itil::appl"){
-#         $self->LastMsg(ERROR,"no access");
-#         return(undef);
-#      }
-#   }
+   my $version=effVal($oldrec,$newrec,"version");
+   if ($version=~m/^\s*$/){
+      $self->LastMsg(ERROR,"no version specified");
+      return(undef);
+   }
+   my $softwaresetid=effVal($oldrec,$newrec,"softwaresetid");
+   if ($self->isDataInputFromUserFrontend()){
+      if (!$self->isWriteOnSoftwaresetValid($softwaresetid,"software")){
+         $self->LastMsg(ERROR,"no access");
+         return(undef);
+      }
+   }
    return(1);
 }
 
@@ -238,13 +228,11 @@ sub isWriteValid
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-
+   my $softwaresetid=effVal($oldrec,$newrec,"softwaresetid");
 
    return("default") if (!defined($oldrec) && !defined($newrec));
    return("default") if ($self->IsMemberOf("admin"));
-   return("default") if (!$self->isDataInputFromUserFrontend() &&
-                         !defined($oldrec));
-
+   return("default") if ($self->isWriteOnSoftwaresetValid($softwaresetid,"software"));
    return(undef);
 }
 

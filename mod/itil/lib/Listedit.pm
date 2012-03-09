@@ -147,6 +147,23 @@ sub isWriteOnSwinstanceValid
 }
 
 
+sub isWriteOnSoftwaresetValid
+{
+   my $self=shift;
+   my $softwaresetid=shift;
+   my $group=shift;
+
+   my $softwareset=$self->getPersistentModuleObject("itil::softwareset");
+   $softwareset->SetFilter({id=>\$softwaresetid});
+   my ($arec,$msg)=$softwareset->getOnlyFirst(qw(ALL));
+   my @g=$softwareset->isWriteValid($arec);
+   if (grep(/^ALL$/,@g) || grep(/^$group$/,@g)){
+      return(1);
+   }
+   return(0);
+}
+
+
 sub isWriteOnBProcessValid
 {
    my $self=shift;

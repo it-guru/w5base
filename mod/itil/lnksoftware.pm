@@ -550,8 +550,10 @@ sub SetFilter
    my $self=shift;
 
    if (ref($_[0]) eq "HASH" && exists($_[0]->{softwareset})){
+      my $setname=$_[0]->{softwareset};
+      $setname=~s/^"(.*)"/$1/;
       $self->Context->{FilterSet}={
-                                     softwareset=>$_[0]->{softwareset}
+                                     softwareset=>$setname
                                   };
    }
    return($self->SUPER::SetFilter(@_));
@@ -745,6 +747,9 @@ sub calcSoftwareState
                              "itil::softwareset");
       $ss->SecureSetFilter({cistatusid=>4,name=>\$FilterSet->{softwareset}});
       my ($rec)=$ss->getOnlyFirst("name","software");
+      if (!defined($rec)){
+         return("INVALID SOFTSET SELECTED");
+      }
       $FilterSet->{Set}->{data}=$rec;
       Dumper($FilterSet->{Set}->{data});
    }
@@ -819,6 +824,8 @@ sub calcSoftwareState
                         "- releasekey missmatch in  ".
                         "$swi->{software} on $swi->{system} ");
                   $FilterSet->{Analyse}->{totalstate}="FAIL";
+                  push(@{$FilterSet->{Analyse}->{totalmsg}},
+                       "releasekey error");
                }
                else{
                   if ($swrec->{comparator} eq "2"){

@@ -2,3 +2,4 @@
 'comp.1'=>{de=>'!= nicht zugelassen',en=>'not allowed'},
 'comp.2'=>{de=>'= exakt gleich zugelassen',en=>'exakt equal allowed'},
 'Comparator'=>{de=>'Vergleichsoperator'},
+'no version specified'=>{de=>'keine Version angeben'},
