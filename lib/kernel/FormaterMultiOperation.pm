@@ -280,6 +280,7 @@ sub Init
       $self->Context->{DO}=1;
    }
    $self->Context->{VALID}=$self->Validate();
+   return("");
 }
 
 

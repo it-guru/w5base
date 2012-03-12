@@ -129,6 +129,7 @@ sub WriteToStdout
    local *TMP;
 
    #binmode(STDOUT);   # test 24.07.2008 by hv
+   $self->Format->prepareParent($app,\%param);
    open(TMP, "+>", undef);
    my $fh=\*TMP;
    my ($rec,$msg);
@@ -243,6 +244,7 @@ sub WriteToScalar    # ToDo: viewgroups implementation
    my $app=$self->getParent();
    local *TMP;
 
+   $self->Format->prepareParent($app,\%param);
    open(TMP, "+>", undef);
    my $fh=\*TMP;
 

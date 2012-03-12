@@ -19,10 +19,10 @@ package kernel::Output::OneLine;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use Data::Dumper;
 use base::load;
-use kernel::Output::HtmlSubList;
-@ISA    = qw(kernel::Formater);
+use kernel::FormaterMultiOperation;
+@ISA    = qw(kernel::FormaterMultiOperation);
+
 
 
 sub new
@@ -39,11 +39,11 @@ sub IsModuleSelectable
  
    return(1) if ($param{mode} eq "Init"); 
    my $app=$self->getParent()->getParent;
-   my @l=$app->getCurrentView();
-   if ($#l==0){
-      return(1);
-   }
-   return(0);
+#   my @l=$app->getCurrentView();
+#   if ($#l==0){
+#      return(1);
+#   }
+   return(1);
 }
 sub getRecordImageUrl
 {
@@ -99,15 +99,83 @@ sub quoteData
    return($d); 
 }
 
+sub MultiOperationTableHeader
+{
+   my $self=shift;
+
+   my $d=undef;
+
+   return($d);
+}
+
+sub ProcessLine
+{
+   my $self=shift;
+
+   return($self->kernel::Formater::ProcessLine(@_));
+}
+
+
+
 sub ProcessHead
 {
    my ($self,$fh,$rec,$msg)=@_;
+   my $app=$self->getParent->getParent();
+ 
+
+   my @l=$app->getCurrentView();
+   my @useField=Query->Param("useField");
+   my $d=$self->SUPER::ProcessHead($fh,$rec,$msg);
+
+   if ($#l!=0){
+      $d.="<table class=freeform width=95% border=0>";
+      $d.="<tr>";
+      $d.="<td nowrap>";
+      $d.="&nbsp;&nbsp;&nbsp;".
+          "&nbsp;&nbsp;&nbsp;".
+          "<select name=useField multiple size=5 style='width:95%'>";
+      foreach my $fldname (@l){
+         my $fldlabel=$app->getField($fldname)->Label($rec);
+         if ($fldlabel ne ""){
+            $d.="<option value=\"$fldname\"";
+            $d.=" selected" if (in_array(\@useField,$fldname));
+            $d.=">";
+            $d.=$fldlabel;
+            $d.="</option>";
+         }
+      }
+      $d.="</select>";
+      $d.="</td>";
+      $d.="<td width=1% valign=bottom>";
+      $d.="<input type=submit value=\"".
+          $self->getParent->getParent->T("show",'kernel::Output::OneLine').
+          "\">";
+      $d.="</td>";
+      $d.="</tr>";
+      $d.="</table><br><br><hr>";
+   }
+   return($d);
+}
+
+sub ProcessBottom
+{
+   my ($self,$fh,$rec,$msg)=@_;
+   my $app=$self->getParent->getParent();
+   my $view=$app->getCurrentViewName();
+   my @view=$app->getCurrentView();
    my $d;
 
    my %l=();
+   my @view=$app->getCurrentView();
+   my @useField=Query->Param("useField");
+   if ($#view==0){
+      @useField=@view;
+   }
    for(my $recno=0;$recno<=$#{$self->{recordlist}};$recno++){
       for(my $fieldno=0;$fieldno<=$#{$self->{recordlist}->[$recno]};$fieldno++){
-         $l{$self->{recordlist}->[$recno]->[$fieldno]}++;
+         if (in_array(\@useField,$view[$fieldno])){
+            $l{$self->{recordlist}->[$recno]->[$fieldno]}++;
+         }
       }
    }
    my @l=grep(!/^\s*$/,sort(keys(%l)));
@@ -127,7 +195,8 @@ sub ProcessHead
    elsif (!grep(/\t/,@l)){
       $d.=join("\t",@l);
    }
-   $d.="\r\n";
+   $d.="\r\n<br><br>";
+   $d.=$app->HtmlBottom(form=>1,body=>1);
    return($d);
 }
 

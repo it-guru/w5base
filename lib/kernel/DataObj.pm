@@ -1487,6 +1487,12 @@ sub ValidatedUpdateRecord
    return($bk);
 }
 
+sub HtmlStatSetList
+{
+   my $self=shift;
+   return(undef);
+}
+
 sub ValidatedUpdateRecordTransactionless
 {
    my $self=shift;

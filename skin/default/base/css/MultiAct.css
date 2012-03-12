@@ -1,12 +1,12 @@
-tr.line{
+.data tr.line{
 }
-tr.lineok{
+.data tr.lineok{
    background:#dfedd5;
 }
-tr.linefail{
+.data tr.linefail{
    background:#edd5db;
 }
-th{
+.data th{
    padding:0px;
    margin:0px;
    padding-left:2px;
@@ -28,7 +28,7 @@ input.button{
    width:99%;
 }
 
-td{
+.data td{
    padding:0px;
    margin:0px;
    padding-left:2px;

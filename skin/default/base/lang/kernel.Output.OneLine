@@ -1,0 +1,3 @@
+'Output to one line'=>{de=>'Ausgabe als eine Zeile'},
+'show'=>{de=>'Anzeigen'},
+'Writes in one ASCII line.'=>{de=>'Alle Feldwerte werden eindeutig in einer Zeile ausgegeben'},
