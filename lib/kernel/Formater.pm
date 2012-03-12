@@ -49,6 +49,12 @@ sub modeName
    return($mode);
 }
 
+sub prepareParent    # inital parent to set f.e. the view
+{
+   my ($self)=@_;
+   return(undef);
+}
+
 sub Init
 {
    my ($self,$fh)=@_;

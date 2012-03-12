@@ -118,15 +118,30 @@ EOF
    $d.="$lastmsg<br>";
    $d.=$self->Context->{MultiActor};
 
-   foreach my $v (Query->Param()){
-      next if ($v=~m/^search_.*$/);
-      next if ($v=~m/^FormatAs$/);
-      next if ($v=~m/^CurrentView$/);
-      Query->Delete($v);
-   }
-   $d.=$app->HtmlPersistentVariables(qw(ALL));
+   my $idfield=$app->IdField();
 
-   $d.="<table class=data width=100%>";
+
+   foreach my $v (Query->Param()){            # This block is
+      next if ($v=~m/^search_.*$/i);          # neassasary, to work in
+      next if ($v=~m/^CurrentId$/);           # "WorkflowSubLink" Mode
+      next if ($v=~m/^fulltext$/);            # correct!
+      next if ($v=~m/^class$/);               #
+      next if ($v=~m/^FormatAs$/);            #
+      next if ($v=~m/^id$/);                  # this needs to be dynamic! TODO!
+      next if ($v=~m/^CurrentView$/);         #
+      next if ($v=~m/^MyW5BaseSUBMOD$/);      #
+      Query->Delete($v);                      #
+   }                                          #
+   $d.=$app->HtmlPersistentVariables(qw(ALL));#
+   $d.=$self->MultiOperationTableHeader();
+
+}
+
+sub MultiOperationTableHeader
+{
+   my $self=shift;
+
+   my $d="<table class=data width=100%>";
    $d.="<tr><th width=1%>".
        "<input type=button OnClick=MarkAll() value=\"X\" ".
        "style=\"width:100%;height:100%\"></th>";
@@ -136,6 +151,8 @@ EOF
       $d.="<th>$label</th>";
    }
    $d.="</tr>";
+
+   return($d);
 }
 
 sub MultiOperationHeader
@@ -211,7 +228,7 @@ sub ProcessLine
    }
    my $rowspan=1;
    $rowspan=2 if ($fail>0);
-   $d.="<tr class=$class>".
+   $d.="\n<tr class=$class>".
        "<td align=center valign=top rowspan=$rowspan>$marker</td>";
    for(my $cc;$cc<=$#view;$cc++){
       my $fo=$view[$cc];

@@ -184,9 +184,11 @@ sub WorkflowLinkResult
             }
          }
       }
-      $h->ResetFilter();
-      $h->SecureSetFilter({id=>\@idl});
-      return($h->Result(ExternalFilter=>1));
+      if ($#idl!=-1){
+         $h->ResetFilter();
+         $h->SecureSetFilter({id=>\@idl});
+         return($h->Result(ExternalFilter=>1));
+      }
    }
    if ($h->validateSearchQuery()){
       my %q=$h->getSearchHash();
