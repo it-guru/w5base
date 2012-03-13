@@ -66,19 +66,24 @@ sub qcheckRecord
 
    my $exitcode=0;
    my $desc={qmsg=>[],solvtip=>[]};
-   my @msg;
+   my @msg=();
 
-   if ($rec->{stateid}>=17){  # check only closed records
+   if ($rec->{stateid}<=21){  # check all
       if ($rec->{affectedcontractid} ne ""){
          my $contractid=$rec->{affectedcontractid};
          if (ref($contractid) ne "ARRAY"){ 
             $contractid=[$contractid];
          }
          if ($#{$contractid}!=-1){
-            my $isp800needed=0;
+            my $isp800needed=1;
             my $contr=$self->getPersistentModuleObject("AL_TCom::custcontract");
-            $contr->SetFilter({id=>$contractid,cistatusid=>[3,4]});
-            foreach my $cr ($contr->getHashList(qw(p800opmode customer))){
+            $contr->SetFilter({id=>$contractid});
+            my $oldcontracts=0;
+            foreach my $cr ($contr->getHashList(qw(p800opmode cistatusid 
+                                                   customer))){
+               if ($cr->{cistatusid}!=4){
+                  $oldcontracts++;
+               }
                if ((($cr->{customer}=~m/^DTAG$/) ||
                     ($cr->{customer}=~m/^DTAG\..*$/)) &&
                    $cr->{p800opmode} ne ""){
@@ -86,8 +91,13 @@ sub qcheckRecord
                   last;
                }
             }
+            if ($oldcontracts){
+               push(@msg,'found inactive or old customer contracts');
+               $exitcode=3;
+            }
             if ($isp800needed){
-               if ($rec->{tcomcodrelevant} eq "yes"){
+               if (1 || $rec->{class} eq "AL_TCom::workflow::businesreq" ||
+                   $rec->{tcomcodrelevant} eq "yes"){
                   if ($rec->{tcomcodcause} eq "" || 
                       $rec->{tcomcodcause} eq "undef"){
                      push(@msg,'insufficient cause description');
