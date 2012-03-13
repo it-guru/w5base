@@ -10,7 +10,7 @@ CREATE TABLE grp (
   srcsys varchar(40) default NULL,
   srcid varchar(20) default NULL,
   srcload datetime default NULL,
-  comments blob,
+  comments blob,additional longtext    default NULL,
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   modifydate datetime NOT NULL default '0000-00-00 00:00:00',
   createuser bigint(20) NOT NULL default '0',
