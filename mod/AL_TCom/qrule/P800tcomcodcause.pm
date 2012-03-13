@@ -96,7 +96,7 @@ sub qcheckRecord
                $exitcode=3;
             }
             if ($isp800needed){
-               if (1 || $rec->{class} eq "AL_TCom::workflow::businesreq" ||
+               if ($rec->{class} eq "AL_TCom::workflow::businesreq" ||
                    $rec->{tcomcodrelevant} eq "yes"){
                   if ($rec->{tcomcodcause} eq "" || 
                       $rec->{tcomcodcause} eq "undef"){
@@ -104,7 +104,7 @@ sub qcheckRecord
                      $exitcode=3;
                   }
                   my $cmt=$rec->{tcomcodcomments};
-                  { # min 15 Zeichen mit 0-9 und a-z Zeichen
+                  if ($rec->{tcomworktime}>0){ # min 15 Zeichen mit 0-9 und a-z Zeichen
                      my $cmt1=$cmt;
                      $cmt1=~s/\s//g;
                      if (!($cmt1=~m/[a-z,0-9]{15,}/i)){
@@ -119,22 +119,28 @@ sub qcheckRecord
                         }
                      }
                   }
-                  { # max. 1024 Zeichen
+                  if ($rec->{tcomworktime}>0){ # max. 1024 Zeichen
                     if (length($cmt)>1024){
                         push(@msg,"description of work to long ".
                                   "(bFlexx can handle max. 1024 char)");
                         $exitcode=3;
                     }
                   }
-                  my $f='\d\d\.\d\d.\d\d\d\d von \d\d:\d\d bis \d\d:\d\d(\n|$)';
+                  my $f='(\d{1,2}\.\d{1,2}.\d\d\d\d\s+von\s+\d{1,2}:\d\d(\s*h){0,1}\s+bis\s+\d{1,2}:\d\d(\s*h){0,1}|\d{1,2}\.\d{1,2}.\d\d\d\d\s+\d{1,2}:\d\d(\s*h){0,1}\s+-\s+\d{1,2}:\d\d(\s*h){0,1})(\n|$)';
                   if ($rec->{tcomcodcause} eq "appl.add.baseext"){
-                     if (!($cmt=~m/$f/)){
+                     if (($rec->{tcomworktime}>0) &&
+                         !($cmt=~m/$f/)){
                         push(@msg,"invalid delivery timerange");
                         $exitcode=3;
                      }
                      $cmt=~s/$f\s*//s;
-                     if (!($rec->{tcomexternalid}=~m/(^|\s)IN:\d{5,8}(\s|$)/)){
+                     my $externalid=$rec->{tcomexternalid};
+                     if ($rec->{class} eq "AL_TCom::workflow::businesreq"){
+                        $externalid=$rec->{customerrefno};
+                     }
+                     if (!($externalid=~m/(^|\s)IN:[0-9,-]{5,8}(\s|$)/)){
                         push(@msg,"invalid I-Network reference - ExternalID");
+                        push(@msg,"ExternalID:'".$rec->{tcomexternalid}."'");
                         $exitcode=3;
                      }
                      my $sum=0;
