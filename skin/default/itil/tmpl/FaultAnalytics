@@ -147,7 +147,7 @@ function doPrint()
 
     <div class=BlockHead onclick=BlockSwitch("DETAIL")>
          <span id=DETAILflag>&rarr;</span> 
-         detailierte Komponenten Kontakte
+         detaillierte Komponenten Kontakte
     </div>
     <div id=DETAIL class=DataBlock style="display:none;visibility:hidden">
          %DETAIL%

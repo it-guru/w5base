@@ -1,4 +1,4 @@
 'itil::qrule::ApplDesc'=>{de=>'Prüfung der Anwendungsbeschreibung',
                           en=>'check of Application description'},
 'there is no description defined'=>{de=>'es ist keine Anwendungsbeschreibung hinterlegt'},
-'description is not detailed enough'=>{de=>'Beschreibung nicht detailiert genug (min. 15 Worte)'},
+'description is not detailed enough'=>{de=>'Beschreibung nicht detailliert genug (min. 15 Worte)'},

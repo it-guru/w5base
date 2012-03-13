@@ -13,5 +13,5 @@
 'estimated estimated for realisation'=>{de=>'geschätzter Arbeitsaufwand zur Realisierung'},
 'senseless effort specification'=>{de=>'sinnloser Arbeitsaufwand eingetragen'},
 'senseless finish date specified'=>{de=>'sinnloses Fertigstellungsdatum eingetragen'},
-'detailed description of quotation'=>{de=>'detailierte Beschreibung der Angebotsanfrage'},
+'detailed description of quotation'=>{de=>'detaillierte Beschreibung der Angebotsanfrage'},
 'wfreject'=>{de=>'Abgelehnt',en=>'Rejected'},

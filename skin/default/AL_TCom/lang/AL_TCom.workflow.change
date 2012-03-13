@@ -15,7 +15,7 @@
 'true customer prio'=>{de=>'resultierende Kundenpriorität'},
 'noncustomer'=>{de=>'Basisleistung',en=>'standard service'},
 
-'undef'=>           {de=>'nicht detailierte Leistung',
+'undef'=>           {de=>'nicht detaillierte Leistung',
                      en=>'undefined Service'},
 'std'=>             {de=>'Basisleistung',
                      en=>'Standard'},
