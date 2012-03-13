@@ -141,7 +141,13 @@ sub finishWriteRequestHash
       }
    }
    if (ref($newrec->{$self->Name}) eq "HASH"){
-      $newrec->{$self->Name}=Hash2Datafield(%{$newrec->{$self->Name}}); 
+      my %wr=%{$newrec->{$self->Name}};
+      foreach my $k (keys(%wr)){
+         if (exists($wr{$k}) && !defined($wr{$k})){
+            delete($wr{$k});
+         }
+      }
+      $newrec->{$self->Name}=Hash2Datafield(%wr);
    }
    if ($changed){
       $newrec->{$self->Name}="" if (!defined($newrec->{$self->Name}));
