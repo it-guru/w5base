@@ -54,3 +54,7 @@ create table costteamfixup (
   KEY name (name),KEY grpid (grpid),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 );
+set FOREIGN_KEY_CHECKS=0;
+alter table costcenter add FOREIGN KEY fk_costcenter_databoss (databoss)
+          REFERENCES contact (userid) ON DELETE RESTRICT;
+set FOREIGN_KEY_CHECKS=1;

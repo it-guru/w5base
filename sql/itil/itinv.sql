@@ -953,3 +953,31 @@ create table ipnet (
   unique(name),key(binnamekey),key(network),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+set FOREIGN_KEY_CHECKS=0;
+alter table appl add FOREIGN KEY fk_appl_databoss (databoss)
+          REFERENCES contact (userid) ON DELETE RESTRICT;
+set FOREIGN_KEY_CHECKS=1;
+set FOREIGN_KEY_CHECKS=0;
+alter table asset add FOREIGN KEY fk_asset_databoss (databoss)
+          REFERENCES contact (userid) ON DELETE RESTRICT;
+set FOREIGN_KEY_CHECKS=1;
+set FOREIGN_KEY_CHECKS=0;
+alter table itclust add FOREIGN KEY fk_itclust_databoss (databoss)
+          REFERENCES contact (userid) ON DELETE RESTRICT;
+set FOREIGN_KEY_CHECKS=1;
+set FOREIGN_KEY_CHECKS=0;
+alter table system add FOREIGN KEY fk_system_databoss (databoss)
+          REFERENCES contact (userid) ON DELETE RESTRICT;
+set FOREIGN_KEY_CHECKS=1;
+set FOREIGN_KEY_CHECKS=0;
+alter table liccontract add FOREIGN KEY fk_liccontract_databoss (databoss)
+          REFERENCES contact (userid) ON DELETE RESTRICT;
+set FOREIGN_KEY_CHECKS=1;
+set FOREIGN_KEY_CHECKS=0;
+alter table servicesupport add FOREIGN KEY fk_servicesupport_databoss (databoss)
+          REFERENCES contact (userid) ON DELETE RESTRICT;
+set FOREIGN_KEY_CHECKS=1;
+set FOREIGN_KEY_CHECKS=0;
+alter table swinstance add FOREIGN KEY fk_swinstance_databoss (databoss)
+          REFERENCES contact (userid) ON DELETE RESTRICT;
+set FOREIGN_KEY_CHECKS=1;

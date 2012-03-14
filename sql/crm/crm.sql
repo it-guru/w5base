@@ -47,3 +47,7 @@ update businessprocess set eventlang='de';
 alter table businessprocess add processowner bigint(20)  default NULL;
 alter table businessprocess add processowner2 bigint(20)  default NULL;
 alter table businessprocess add customerprio int(2) default '2';
+set FOREIGN_KEY_CHECKS=0;
+alter table businessprocess add FOREIGN KEY fk_businessprocess_databoss (databoss)
+          REFERENCES contact (userid) ON DELETE RESTRICT;
+set FOREIGN_KEY_CHECKS=1;

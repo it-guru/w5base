@@ -64,3 +64,7 @@ alter table projectroom add is_commercial  int(1) default '0';
 alter table projectroom add conumber       varchar(20) default NULL;
 alter table projectroom add is_allowlnkact int(1) default '0';
 alter table projectroom add is_isrestirctiv int(1) default '0';
+set FOREIGN_KEY_CHECKS=0;
+alter table projectroom add FOREIGN KEY fk_projectroom_databoss (databoss)
+          REFERENCES contact (userid) ON DELETE RESTRICT;
+set FOREIGN_KEY_CHECKS=1;

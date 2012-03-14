@@ -236,3 +236,7 @@ create table workprocessitem (
   UNIQUE KEY `srcsys` (srcsys,srcid)
 );
 alter table workprocessitem add is_milestone int(1) default '0';
+set FOREIGN_KEY_CHECKS=0;
+alter table workprocess add FOREIGN KEY fk_workprocess_databoss (databoss)
+          REFERENCES contact (userid) ON DELETE RESTRICT;
+set FOREIGN_KEY_CHECKS=1;

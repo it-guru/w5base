@@ -56,3 +56,7 @@ create table custcontractmod (
   UNIQUE KEY `srcsys` (srcsys,srcid),
   FOREIGN KEY fk_custcontract (contractid) REFERENCES custcontract (id) ON DELETE CASCADE
 );
+set FOREIGN_KEY_CHECKS=0;
+alter table custcontract add FOREIGN KEY fk_custcontract_databoss (databoss)
+          REFERENCES contact (userid) ON DELETE RESTRICT;
+set FOREIGN_KEY_CHECKS=1;

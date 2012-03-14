@@ -413,3 +413,7 @@ create table iomap (
 alter table iomap add fullname varchar(65), add key(fullname);
 alter table isocountry add zipcodeexp varchar(128) default NULL;
 alter table location modify zipcode varchar(16) NOT NULL;
+set FOREIGN_KEY_CHECKS=0;
+alter table location add FOREIGN KEY fk_location_databoss (databoss)
+          REFERENCES contact (userid) ON DELETE RESTRICT;
+set FOREIGN_KEY_CHECKS=1;
