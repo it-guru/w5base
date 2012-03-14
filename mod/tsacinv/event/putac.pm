@@ -584,7 +584,7 @@ sub ApplicationModified
                                    Deputy_Technical_Contact=>$posix{tsm2},
                                    Lead_Del_manager=>$idno{opm},
                                    Del_manager=>$idno{delmgr},
-                                   Deputy_Del_manager=>$idno{delmgr2},
+                                   Deputy_Del_manager=>$idno{opm2},
                                    bDelete=>'0',
                                    Name=>$rec->{name}
                                 }
