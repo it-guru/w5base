@@ -343,6 +343,16 @@ sub Validate
          return(undef);
       }
    }
+   my $name=effVal($oldrec,$newrec,"name");
+   if ($name eq "" ||
+       haveSpecialChar($name)){
+      $self->LastMsg(ERROR,"invalid service name");
+      return(0);
+   }
+
+   
+
+
 
    return(1);
 }

@@ -16,3 +16,4 @@
 'application does not match all related software instances'=>{de=>'Anwendung passt nicht zu allen zugeordneten Software-Instanzen'},
 'invalid application specified'=>{de=>'ungültige Anwendung angegeben'},
 'no write access to specified cluster'=>{de=>'kein Schreibzugriff auf den angegeben Cluster'},
+'invalid service name'=>{de=>'ungültiger Servicename'},
