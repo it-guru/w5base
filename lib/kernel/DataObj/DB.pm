@@ -759,7 +759,7 @@ sub preProcessDBmsg
       return(sprintf($self->T("Duplicate entry '%s'"),$fld));
    }
    
-   if (my ($fld,$key)=$msg=~m/^Cannot delete or update a parent row: a foreign key constraint fails \(`w5base\/[^`]+`, CONSTRAINT `[^`]+` FOREIGN KEY \(`databoss`\) REFERENCES `contact` \(`userid`\)\)\s*$/){
+   if (my ($fld,$key)=$msg=~m/^Cannot delete or update a parent row: a foreign key constraint fails \(`[^`]+`, CONSTRAINT `[^`]+` FOREIGN KEY \(`[^`]+`\) REFERENCES `[^`]+` \(`[^`]+`\)\)\s*$/){
       return(sprintf($self->T('Delete not possible '.
             'due to existing relations(s)'),$fld));
    }
