@@ -132,7 +132,7 @@ sub qcheckRecord
             else{
                # detail check of found software installation
                # printf STDERR ("swirec=%s\n",Dumper($swirec));
-               if (defined($swirec->{systemid}) &&
+               if (defined($rec->{systemid}) &&
                    $swirec->{systemid} ne $rec->{systemid}){
                   push(@msg,
                        "software installation no longer belongs to the system");
