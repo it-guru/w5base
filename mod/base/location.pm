@@ -709,7 +709,7 @@ sub Normalize
    if ($rec->{address1}=~m/Hauptwach.*$/ && $rec->{location} eq "Bamberg"){
       $rec->{label}="T-Punkt";
    }
-   if ($rec->{address1}=~m/Salamander.*$/ && 
+   if ($rec->{address1}=~m/Salamander.*31.*$/ && 
        $rec->{location} eq "G\xF6ppingen"){
       $rec->{label}="T-Systems SCZ S\xFCdwest";
    }
