@@ -25,7 +25,7 @@
 'Urgency'=>{de=>'Dringlichkeit'},
 'closetype.'=>{de=>'Undefiniert',  en=>'Undefined'},
 'closetype.1'=>{de=>'Bekannter Fehler',  en=>'Known Error'},
-'closetype.2'=>{de=>'Problem gelöst',    en=>'Solfed Problem'},
+'closetype.2'=>{de=>'Problem gelöst',    en=>'Solved Problem'},
 'closetype.3'=>{de=>'keine Lösung',      en=>'Wrong Cause'},
 'Triggered by'=>{de=>'Initiert durch'},
 'Sub Category 1'=>{de=>'Unterkategorie 1'},
