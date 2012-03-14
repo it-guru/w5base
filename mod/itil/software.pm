@@ -43,6 +43,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'fullname',
                 htmldetail    =>0,
+                searchable    =>0,
                 label         =>'Fullname',
                 dataobjattr   =>"concat(producer.name,
                                  if(producer.name<>'','-',''),software.name)"),
