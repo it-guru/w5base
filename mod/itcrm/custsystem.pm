@@ -69,6 +69,7 @@ sub new
                 label         =>'CI-StatusID',  # show undefined state
                 dataobjattr   =>'system.cistatus'),
 
+
       new kernel::Field::Select(
                 name          =>'osrelease',
                 label         =>'OS-Release',
@@ -76,6 +77,15 @@ sub new
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['osreleaseid'=>'id'],
                 vjoindisp     =>'name'),
+
+      new kernel::Field::Import( $self,
+                vjointo       =>'itil::system',
+                vjoinon       =>['id'=>'id'],
+                group         =>'default',
+                dontrename    =>1,
+                fields        =>[qw(cpucount memory locationid location)]),
+
+
 
       new kernel::Field::Link(
                 name          =>'osreleaseid',

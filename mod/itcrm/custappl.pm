@@ -110,7 +110,8 @@ sub new
                 vjointo       =>'itil::appl',
                 group         =>'default',
                 dontrename    =>1,
-                fields        =>[qw(opmode)]),
+                fields        =>[qw(opmode customerprio description
+                                    maintwindow)]),
 
       new kernel::Field::Interface(
                 name          =>'cistatusid',   # function is needed to 
@@ -161,6 +162,16 @@ sub new
                 vjointo       =>'base::user',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['semid'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::TextDrop(
+                name          =>'sem2',
+                group         =>'tscontact',
+                label         =>'Deputy Customer Business Manager',
+                translation   =>'itil::appl',
+                vjointo       =>'base::user',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['sem2id'=>'userid'],
                 vjoindisp     =>'fullname'),
 
       new kernel::Field::Interface(
