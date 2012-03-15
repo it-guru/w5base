@@ -535,8 +535,11 @@ sub getPosibleActions
        !in_array(\@l,"wfaccept")  &&
        !in_array(\@l,"wfforward") && defined($WfRec->{id})){
       my $mgr=$self->isWorkflowManager($WfRec); # Workflow Manager can
-      if ($mgr){                                # always takeover an active
+      if (!$iscurrent && $mgr){                 # always takeover an active
          push(@l,"nop","wfhardtake");           # workflow !!
+      }
+      if ($iscurrent && $mgr){                  # 
+         push(@l,"wfforward");                  # manager can forward
       }
    }
    if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
@@ -1487,7 +1490,6 @@ sub PostProcess
    my $aobj=$self->getParent->getParent->Action();
    my $workflowname=$self->getParent->getWorkflowMailName();
 
-printf STDERR ("fifi PostProcess for action=$action\n");
    if ($action eq "SaveStep.wfapprovalreq"){
       $aobj->NotifyForward($WfRec->{id},
                            $param{fwdtarget},

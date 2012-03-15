@@ -168,6 +168,7 @@ sub  recalcResponsiblegrp
 sub validateExtDesc
 {
    my $self=shift;
+   my $WfRec=shift;
    my $h=shift;
 
    foreach my $k (keys(%$h)){
@@ -194,17 +195,23 @@ sub validateExtDesc
       }
    }
    if (exists($h->{extdescdesend})){
-      my $d=CalcDateDuration(NowStamp("en"),$h->{extdescdesstart});
-      if ($d->{totalminutes}<60){
-         $self->LastMsg(ERROR,"invalid precarriage time in desired end");
-         return(0);
+      my $d=CalcDateDuration($WfRec->{extdescdesend},$h->{extdescdesend});
+      if ($d->{totalminutes} != 0){
+         my $d=CalcDateDuration(NowStamp("en"),$h->{extdescdesend});
+         if ($d->{totalminutes}<60){
+            $self->LastMsg(ERROR,"invalid precarriage time in desired end");
+            return(0);
+         }
       }
    }
    if (exists($h->{extdescdesstart})){
-      my $d=CalcDateDuration(NowStamp("en"),$h->{extdescdesstart});
-      if ($d->{totalminutes}<60){
-         $self->LastMsg(ERROR,"invalid precarriage time in desired start");
-         return(0);
+      my $d=CalcDateDuration($WfRec->{extdescdesstart},$h->{extdescdesstart});
+      if ($d->{totalminutes} != 0){
+         my $d=CalcDateDuration(NowStamp("en"),$h->{extdescdesstart});
+         if ($d->{totalminutes}<60){
+            $self->LastMsg(ERROR,"invalid precarriage time in desired start");
+            return(0);
+         }
       }
    }
    if (exists($h->{extdescdesstart}) &&
@@ -214,6 +221,7 @@ sub validateExtDesc
          $self->LastMsg(ERROR,"start and end window not large enough");
          return(0);
       }
+      $h->{reqdesdate}="";
    }
 
 
@@ -228,11 +236,11 @@ sub handleFollowupExtended  # hock to handel additional parameters in followup
    my $h=shift;
    my $param=shift;
 
-   return(0) if (!$self->validateExtDesc($h));
+   return(0) if (!$self->validateExtDesc($WfRec,$h));
    my %wr;
    my %w;
    foreach my $k (%$h){
-      if ($k=~m/^extdesc/){
+      if ($k=~m/^extdesc/ || $k eq "reqdesdate"){
          $wr{$k}=$h->{$k};
          $w{$k}=$h->{$k};
       }
@@ -610,7 +618,7 @@ sub nativProcess
       if ($h->{affectedapplicationid} ne ""){
          $flt={id=>\$h->{affectedapplicationid}}; 
       }
-      if (!$self->getParent->validateExtDesc($h)){
+      if (!$self->getParent->validateExtDesc($WfRec,$h)){
          return(0);
       }
       if (defined($flt)){

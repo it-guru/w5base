@@ -858,7 +858,6 @@ sub Validate
       }
    }
 
-
    return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"fullname"));
    return(1);
 }

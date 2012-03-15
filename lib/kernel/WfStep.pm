@@ -178,7 +178,7 @@ sub PostProcess
                               $param{note},%newparam);
       }
       else{
-         printf STDERR ("fifi no SaveStep.wffollowup message - user is sender\n");
+         #printf STDERR ("fifi no SaveStep.wffollowup message - user is sender\n");
       }
    }
    if ($action eq "SaveStep.wfdefer"){
