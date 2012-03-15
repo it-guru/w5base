@@ -144,6 +144,16 @@ sub getPosibleRoles
                                                      $self->Self),
             );
    }
+   if ($parentobj=~m/^.+::softwareset$/ ||
+       (defined($self->getParent) &&
+        defined($self->getParent->getParent) &&
+       $self->getParent->getParent->Self()=~m/^.+::softwareset$/)){
+      return("read"            =>$self->getParent->T("read",
+                                                     $self->Self),
+             "write"           =>$self->getParent->T("write",
+                                                     $self->Self),
+            );
+   }
    if ($parentobj=~m/^.+::asset$/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
