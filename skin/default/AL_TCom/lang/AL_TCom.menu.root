@@ -74,4 +74,6 @@
 'AL_TCom.proc'=>{de=>'Prozesssteuerung',en=>'Processcontrol'},
 'AL_TCom.proc.ChangeManagement'=>{de=>'Change Management',
                                   en=>'Change Management'},
+'AL_TCom.proc.softmgmt'=>{de=>'Software Management',en=>'Software Management'},
+'AL_TCom.proc.softmgmt.analyse'=>{de=>'Analyse',en=>'Analyse'},
 'Reporting.amore'=>{de=>'@more',en=>'@more'},

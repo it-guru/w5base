@@ -389,6 +389,15 @@ sub Init
                       "TS::chmmgmt",
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("AL_TCom.proc.softmgmt",
+                      "itil::softwareset",
+                      func=>'MainWithNew',
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("AL_TCom.proc.softmgmt.analyse",
+                      "itil::softwaresetanalyse",
+                      defaultacl=>['admin']);
+
    $self->RegisterObj('AL_TCom::workflow::eventnotify$',
                       "base::workflow",
                       func=>'New',
