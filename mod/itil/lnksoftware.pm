@@ -405,6 +405,36 @@ sub new
                 label         =>'Software release message',
                 onRawValue    =>\&calcSoftwareState),
 
+     new kernel::Field::Select(
+                name          =>'denyupd',
+                group         =>'upd',
+                label         =>'installation update posible',
+                value         =>[0,10,20,30,99],
+                transprefix   =>'DENUPD.',
+                dataobjattr   =>'lnksoftwaresystem.denyupd'),
+
+     new kernel::Field::Textarea(
+                name          =>'denyupdcomments',
+                group         =>'upd',
+                label         =>'comments to Update/Upgrade posibilities',
+                dataobjattr   =>'lnksoftwaresystem.denyupdcomments'),
+
+     new kernel::Field::Date(
+                name          =>'denyupdvalidto',
+                group         =>'upd',
+                htmldetail    =>sub{
+                                   my $self=shift;
+                                   my $mode=shift;
+                                   my %param=@_;
+                                   if (defined($param{current})){
+                                      my $d=$param{current}->{$self->{name}};
+                                      return(1) if ($d ne "");
+                                   }
+                                   return(0);
+                                },
+                label         =>'Update/Upgrade reject valid to',
+                dataobjattr   =>'lnksoftwaresystem.denyupdvalidto'),
+
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
@@ -667,6 +697,7 @@ sub Validate
          }
       }
    }
+
    if ($version ne "" && exists($newrec->{version})){  #release details gen
       VersionKeyGenerator($oldrec,$newrec);
       if (my ($rel,$patch)=$version=~m/^(.*\d)(p\d.*)$/){
@@ -706,6 +737,20 @@ sub Validate
    if (exists($newrec->{quantity}) && ! defined($newrec->{quantity})){
       delete($newrec->{quantity});
    }
+
+   if (exists($newrec->{denyupd})){
+      if ($newrec->{denyupd}>0){
+         if (exists($newrec->{denyupdvalidto})){
+            # prüfen ob länger als 365 Tage in der Zukunft!
+         }
+         if (effVal($oldrec,$newrec,"denyupdvalidto") eq ""){
+            $newrec->{denyupdvalidto}=$self->ExpandTimeExpression("now+365d");
+         }
+      }
+      else{
+         $newrec->{denyupdvalidto}=undef;
+      }
+   } 
 
    return(1);
 }
@@ -786,7 +831,7 @@ sub calcSoftwareState
       else{
          $lnk->SetFilter({id=>\$current->{id}});
       }
-      $lnk->SetCurrentView(qw(systemid system software 
+      $lnk->SetCurrentView(qw(systemid system software denyupd denyupdvalidto
                               releasekey version softwareid));
       $FilterSet->{Analyse}->{ssoftware}=
              $lnk->getHashIndexed(qw(id systemid softwareid));
@@ -816,6 +861,17 @@ sub calcSoftwareState
                         "- no version specified in software installaton ".
                         "of $swrec->{softwareid} on system $swi->{systemid}");
                }
+               my $failpost="";
+               if ($swi->{denyupd}>0){
+                  $failpost=" but OK";
+                  if ($swi->{denyupdvalidto} ne ""){
+                      my $d=CalcDateDuration(
+                                        NowStamp("en"),$swi->{denyupdvalidto});
+                      if ($d->{totalminutes}<0){
+                         $failpost=" and not OK";
+                      }
+                  }
+               }
                if (length($swrec->{releasekey})!=
                    length($swi->{releasekey}) ||
                    ($swi->{releasekey}=~m/^0*$/) ||
@@ -831,11 +887,15 @@ sub calcSoftwareState
                   if ($swrec->{comparator} eq "2"){
                      if ($swrec->{releasekey} ne $swi->{releasekey} ||
                          $swrec->{version} ne $swi->{version}){
-                        push(@{$FilterSet->{Analyse}->{todo}},
-                              "- only version $swi->{version} ".
-                              " of $swi->{software} is allowed on  ".
-                              " system $swi->{system} ");
-                        $FilterSet->{Analyse}->{totalstate}="FAIL";
+                        if ($failpost ne " but OK"){
+                           push(@{$FilterSet->{Analyse}->{todo}},
+                                 "- only version $swi->{version} ".
+                                 " of $swi->{software} is allowed on  ".
+                                 " system $swi->{system} ");
+                        }
+                        if ($FilterSet->{Analyse}->{totalstate} ne "FAIL"){
+                           $FilterSet->{Analyse}->{totalstate}="FAIL".$failpost;
+                        }
                         push(@{$FilterSet->{Analyse}->{totalmsg}},
                              "$swi->{software} needs $swrec->{version}");
                      }
@@ -843,21 +903,29 @@ sub calcSoftwareState
                   elsif ($swrec->{comparator} eq "1"){
                      if ($swrec->{releasekey} eq $swi->{releasekey} ||
                          $swrec->{version} eq $swi->{version}){
-                        push(@{$FilterSet->{Analyse}->{todo}},
-                              "- remove disallowed version $swi->{software} ".
-                              " $swi->{version} from  system $swi->{system} ");
-                        $FilterSet->{Analyse}->{totalstate}="FAIL";
+                        if ($failpost ne " but OK"){
+                           push(@{$FilterSet->{Analyse}->{todo}},
+                               "- remove disallowed version $swi->{software} ".
+                               " $swi->{version} from  system $swi->{system} ");
+                        }
+                        if ($FilterSet->{Analyse}->{totalstate} ne "FAIL"){
+                           $FilterSet->{Analyse}->{totalstate}="FAIL".$failpost;
+                        }
                         push(@{$FilterSet->{Analyse}->{totalmsg}},
                              "$swi->{software} disallowed $swrec->{version}");
                      }
                   }
                   elsif ($swrec->{comparator} eq "0"){
                      if ($swrec->{releasekey} gt $swi->{releasekey}){
-                        push(@{$FilterSet->{Analyse}->{todo}},
-                              "- update $swi->{software} on ".
-                              "system $swi->{system} ".
-                              "from $swi->{version} to  $swrec->{version}");
-                        $FilterSet->{Analyse}->{totalstate}="FAIL";
+                        if ($failpost ne " but OK"){
+                           push(@{$FilterSet->{Analyse}->{todo}},
+                                 "- update $swi->{software} on ".
+                                 "system $swi->{system} ".
+                                 "from $swi->{version} to  $swrec->{version}");
+                        }
+                        if ($FilterSet->{Analyse}->{totalstate} ne "FAIL"){
+                           $FilterSet->{Analyse}->{totalstate}="FAIL".$failpost;
+                        }
                         push(@{$FilterSet->{Analyse}->{totalmsg}},
                              "$swi->{software} needs >=$swrec->{version}");
                      }
@@ -948,7 +1016,7 @@ sub isWriteValid
                                                        $rec->{itclustsvcid}));
    $rw=1 if ((!$rw) && ($self->IsMemberOf("admin")));
    if ($rw){
-      return("default","lic","misc");
+      return("default","lic","misc","upd");
    }
    return(undef);
 }
@@ -987,7 +1055,7 @@ sub getDetailBlockPriority
    my $self=shift;
    return(qw(header default lic useableby misc link 
              releaseinfos softsetvalidation
-             source));
+             upd source));
 }
 
 

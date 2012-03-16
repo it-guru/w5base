@@ -981,3 +981,11 @@ set FOREIGN_KEY_CHECKS=0;
 alter table swinstance add FOREIGN KEY fk_swinstance_databoss (databoss)
           REFERENCES contact (userid) ON DELETE RESTRICT;
 set FOREIGN_KEY_CHECKS=1;
+alter table lnksoftwaresystem add denyupd int(1) default '0';
+alter table lnksoftwaresystem add denyupdvalidto datetime default NULL;
+alter table lnksoftwaresystem add denyupdcomments longtext default NULL;
+alter table system add autodisc_mode varchar(20) default NULL,
+add autodisc_rawdata longtext default NULL, add autodisc_mdate datetime default NULL,
+add autodisc_srcload datetime default NULL, add autodisc_srcsys varchar(100) default NULL,
+add autodisc_srcid varchar(20) default NULL, add autodisc_modifyuser bigint(20) default NULL,
+add autodisc_editor varchar(100) default NULL, add autodisc_realeditor varchar(100) default NULL;

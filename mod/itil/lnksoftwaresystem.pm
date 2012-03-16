@@ -230,7 +230,8 @@ sub Validate
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default lic useableby misc link releaseinfos source));
+   return(qw(header default lic useableby misc link releaseinfos 
+             upd source));
 }
 
 
