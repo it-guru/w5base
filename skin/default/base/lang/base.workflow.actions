@@ -3,7 +3,7 @@
 'wfreject'=>{de=>'Anforderung ablehnen und zurück an Anforderer senden',en=>'reject request and send back to requestor'},
 'wfaddnote'=>{de=>'Bearbeitungshinweis oder Notiz hinzufügen',en=>'add note'},
 'wfaddsnote'=>{de=>'Bearbeitungshinweis oder Notiz hinzufügen',en=>'add note'},
-'wfacceptp'=>{de=>'Anforderung annehmen, sofort bearbeiten und zurück an Anforderer',en=>'accept request process if needed'},
+'wfacceptp'=>{de=>'Anforderung annehmen, abschließend bearbeiten und zurück an Anforderer',en=>'accept request, edit and finaly back to the requestor'},
 'wfacceptn'=>{de=>'Anforderung annehmen und Notiz hinzufügen',en=>'accept request and add note'},
 'wffine'=>{de=>'Anforderung/Anfrage/Aufgabe/Workflow abschließen',en=>'finish/task/quotation/workflow the request'},
 'wffineproc'=>{de=>'Anforderung bearbeiten und danach zurück zum Anforderer senden',en=>'process request and send back to requestor'},
