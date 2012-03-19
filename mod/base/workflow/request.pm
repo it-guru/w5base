@@ -467,7 +467,15 @@ sub getPosibleActions
          push(@l,"wfforward"); # workflow beliebig weiterleiten 
       }
       else{
-         push(@l,"wfactivate"); # falls zurückgerufen wurde
+         my $foundothers=0;
+         foreach my $action (@{$WfRec->{shortactionlog}}){
+            if ($action->{creator}!=$creator){
+               $foundothers=1;
+            }
+         }
+         if (!$foundothers){
+            push(@l,"wfforward"); # workflow beliebig weiterleiten 
+         }
       }
    }
    if ($isadmin){
