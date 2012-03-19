@@ -466,6 +466,9 @@ sub getPosibleActions
       if ($userid!=$creator){
          push(@l,"wfforward"); # workflow beliebig weiterleiten 
       }
+      else{
+         push(@l,"wfactivate"); # falls zurückgerufen wurde
+      }
    }
    if ($isadmin){
       push(@l,"wfforward"); # workflow weiterleiten   (neuen Bearbeiter setzen)
