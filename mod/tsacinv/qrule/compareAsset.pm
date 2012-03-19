@@ -67,6 +67,7 @@ sub qcheckRecord
    my $self=shift;
    my $dataobj=shift;
    my $rec=shift;
+   my $autocorrect=shift;
 
    my $wfrequest={};
    my $forcedupd={};
@@ -98,61 +99,86 @@ sub qcheckRecord
           }
          # $acroom="C1.300" if ($acroom eq "1.300"); 
 #printf STDERR ("acroom=$acroom asset=%s\n",Dumper($parrec));
-          $self->IfaceCompare($dataobj,
-                              $rec,"room",
-                              {room=>$acroom},"room",
-                              $forcedupd,$wfrequest,
-                              \@qmsg,\@dataissue,\$errorlevel,
-                              mode=>'string');
+          $self->IfComp($dataobj,
+                        $rec,"room",
+                        {room=>$acroom},"room",
+                        $autocorrect,$forcedupd,$wfrequest,
+                        \@qmsg,\@dataissue,\$errorlevel,
+                        mode=>'string');
 
-          $self->IfaceCompare($dataobj,
-                              $rec,"serialno",
-                              $parrec,"serialno",
-                              $forcedupd,$wfrequest,
-                              \@qmsg,\@dataissue,\$errorlevel,
-                              mode=>'string');
+          $self->IfComp($dataobj,
+                        $rec,"serialno",
+                        $parrec,"serialno",
+                        $autocorrect,$forcedupd,$wfrequest,
+                        \@qmsg,\@dataissue,\$errorlevel,mode=>'string');
 
-         $self->IfaceCompare($dataobj,
-                             $rec,"memory",
-                             $parrec,"memory",
-                             $forcedupd,$wfrequest,
-                             \@qmsg,\@dataissue,\$errorlevel,
-                             tolerance=>5,mode=>'integer');
+         $self->IfComp($dataobj,
+                       $rec,"memory",
+                       $parrec,"memory",
+                       $autocorrect,$forcedupd,$wfrequest,
+                       \@qmsg,\@dataissue,\$errorlevel,
+                       tolerance=>5,mode=>'integer');
 
-         $self->IfaceCompare($dataobj,
-                             $rec,"cpucount",
-                             $parrec,"cpucount",
-                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
-                             mode=>'integer');
+         $self->IfComp($dataobj,
+                       $rec,"cpucount",
+                       $parrec,"cpucount",
+                       $autocorrect,$forcedupd,$wfrequest,
+                       \@qmsg,\@dataissue,\$errorlevel,
+                       mode=>'integer');
 
-         $self->IfaceCompare($dataobj,
-                             $rec,"corecount",
-                             $parrec,"corecount",
-                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
-                             mode=>'integer');
+         $self->IfComp($dataobj,
+                       $rec,"corecount",
+                       $parrec,"corecount",
+                       $autocorrect,$forcedupd,$wfrequest,
+                       \@qmsg,\@dataissue,\$errorlevel,
+                       mode=>'integer');
 
-         my $w5aclocation=$self->getW5ACLocationname($parrec->{locationid},
-                          "QualityCheck of $rec->{name}");
-         msg(INFO,"rec location=$rec->{location}");
-         msg(INFO,"ac  location=$w5aclocation");
+         my $w5aclocation;
+
+#=$self->getW5ACLocationname($parrec->{locationid},
+#                          "QualityCheck of $rec->{name}");
+#         msg(INFO,"rec location=$rec->{location}");
+#         msg(INFO,"ac  location=$w5aclocation");
+         if ($parrec->{locationid} ne ""){
+            my $acloc=getModuleObject($self->getParent->Config(),
+                                      "tsacinv::location");
+            if (defined($acloc)){
+               $acloc->SetFilter({locationid=>\$parrec->{locationid}});
+               my ($aclocrec,$msg)=$acloc->getOnlyFirst(qw(w5loc_name));
+               if (defined($aclocrec)){
+                  my $r=$aclocrec->{w5loc_name};
+                  $r=[$r] if (ref($r) ne "ARRAY");
+                  $r=[sort(@$r)];
+                  if (defined($r->[0]) && $r->[0] ne ""){
+                     $w5aclocation=$r->[0];
+                  }
+               }
+            }
+            else{
+               msg(ERROR,"fail to create tsacinv::location object");
+            }
+         }
+
+
          if (defined($w5aclocation)){ # only if a valid W5Base Location found
-            $self->IfaceCompare($dataobj,
-                                $rec,"location",
-                                {location=>$w5aclocation},"location",
-                                $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
-                                mode=>'string');
+            $self->IfComp($dataobj,
+                          $rec,"location",
+                          {location=>$w5aclocation},"location",
+                          $autocorrect,$forcedupd,$wfrequest,
+                          \@qmsg,\@dataissue,\$errorlevel,
+                          mode=>'string');
          }
 
          if (defined($parrec->{conumber}) &&
              !($parrec->{conumber}=~m/^\d+$/)){
             $parrec->{conumber}=undef;
          }
-         $self->IfaceCompare($dataobj,
-                             $rec,"conumber",
-                             $parrec,"conumber",
-                             $forcedupd,$wfrequest,
-                             \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'string');
+         $self->IfComp($dataobj,
+                       $rec,"conumber",
+                       $parrec,"conumber",
+                       $autocorrect,$forcedupd,$wfrequest,
+                       \@qmsg,\@dataissue,\$errorlevel,
+                       mode=>'string');
 
          return(undef,undef) if (!$par->Ping());
       }

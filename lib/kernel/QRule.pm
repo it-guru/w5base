@@ -245,6 +245,151 @@ sub IfaceCompare
    }
 }
 
+sub IfComp  # new version of IfaceCompare  - only this should be used from now!
+{
+   my $self=shift;
+   my $obj=shift;
+   my $origrec=shift;
+   my $origfieldname=shift;
+   my $comprec=shift;
+   my $compfieldname=shift;
+   my $autocorrect=shift;
+   my $forcedupd=shift;
+   my $wfrequest=shift;
+   my $qmsg=shift;
+   my $dataissue=shift;
+   my $errorlevel=shift;
+   my %param=@_;
+
+   $param{mode}="native" if (!defined($param{mode}));
+   $param{AllowEmpty}=1 if (!defined($param{AllowEmpty}));
+
+   return if (!defined($obj->getField($origfieldname)));
+   my $takeremote=0;
+   my $ask=1;
+   if ($param{mode} eq "native" ||
+       $param{mode} eq "string"){           # like nativ string compares
+      if (exists($comprec->{$compfieldname})){
+         if (defined($comprec->{$compfieldname})){
+            $origrec->{$origfieldname}=trim($origrec->{$origfieldname});
+            my $t1=$origrec->{$origfieldname};
+            my $t2=$comprec->{$compfieldname};
+            if (!defined($origrec->{$origfieldname}) ||
+                $comprec->{$compfieldname} ne $origrec->{$origfieldname}){
+               $takeremote++;
+            }
+         }
+      }
+   }
+   elsif ($param{mode} eq "text"){          # for multiline text fields
+      if (exists($comprec->{$compfieldname})){
+         if (defined($comprec->{$compfieldname})){
+            $origrec->{$origfieldname}=trim($origrec->{$origfieldname});
+            my $t1=$origrec->{$origfieldname};
+            my $t2=$comprec->{$compfieldname};
+            $t1=~s/\r\n/\n/gs;
+            $t2=~s/\r\n/\n/gs;
+            $t2=~s/\s*$//gs;
+            if (!defined($origrec->{$origfieldname}) || $t1 ne $t2){
+               $takeremote++;
+            }
+         }
+      }
+   }
+   elsif ($param{mode} eq "leftouterlinkcreate" ||
+          $param{mode} eq "leftouterlink"){  # like servicesupprt links
+      if (exists($comprec->{$compfieldname}) &&
+          defined($comprec->{$compfieldname}) &&
+          (!defined($origrec->{$origfieldname}) ||
+           $comprec->{$compfieldname} ne $origrec->{$origfieldname})){
+         my $lnkfield=$obj->getField($origfieldname);
+         my $lnkobj=$lnkfield->{vjointo};
+         my $chkobj=getModuleObject($self->getParent->Config,$lnkobj);
+         if (defined($chkobj)){
+            $chkobj->SetFilter($lnkfield->{vjoindisp}=>
+                               "\"".$comprec->{$compfieldname}."\"");
+            my ($chkrec,$msg)=$chkobj->getOnlyFirst($lnkfield->{vjoinon}->[1]);
+            if (!defined($chkrec)){
+               if ($param{mode} eq "leftouterlinkcreate"){
+                  my $newrec={};
+                  if (ref($param{onCreate}) eq "HASH"){
+                     foreach my $k (keys(%{$param{onCreate}})){
+                        $newrec->{$k}=$param{onCreate}->{$k};
+                     }
+                  }
+                  #printf STDERR ("MSG: auto create element in '%s'\n%s\n",
+                  #               $chkobj->Self(),Dumper($newrec));
+                  $chkobj->ValidatedInsertRecord($newrec);
+                  $takeremote++;
+               }
+               else{
+                  msg(ERROR,"invalid value '$comprec->{$compfieldname}' ".
+                            "while qrule compare '$origfieldname' and ".
+                            "'$compfieldname'");
+               }
+            }
+            else{
+               $takeremote++;
+            }
+         }
+      }
+   }
+   elsif ($param{mode} eq "integer"){  # like amounth of memory
+      if (exists($comprec->{$compfieldname}) &&
+          defined($comprec->{$compfieldname}) &&
+          $comprec->{$compfieldname}!=0 &&
+          (!defined($origrec->{$origfieldname}) ||
+           $origrec->{$origfieldname} ==0 ||
+           $comprec->{$compfieldname} != $origrec->{$origfieldname})){
+         if (defined($param{tolerance})){
+            if ( ($comprec->{$compfieldname}*((100+$param{tolerance})/100.0)<
+                  $origrec->{$origfieldname}) ||
+                 ($comprec->{$compfieldname}*((100-$param{tolerance})/100.0)>
+                  $origrec->{$origfieldname})){
+               $takeremote++;
+            }
+         }
+         else{
+            $takeremote++;
+         }
+      }
+   }
+   elsif ($param{mode} eq "boolean"){  # like true/false 1|0
+      if (exists($comprec->{$compfieldname}) &&
+          defined($comprec->{$compfieldname}) &&
+          (!defined($origrec->{$origfieldname}) ||
+           $comprec->{$compfieldname} != $origrec->{$origfieldname})){
+         
+         $takeremote++;
+      }
+   }
+   if ($takeremote){
+      my $compval;
+      if (exists($comprec->{$compfieldname})){
+         $compval=$comprec->{$compfieldname};
+         if ($param{mode} eq "boolean"){ 
+            if ($compval){ # some data cleanup in boolean mode 
+               $compval=1;
+            }
+            else{
+               $compval=0;
+            }
+         }
+      }
+      if ($autocorrect ||
+          (exists($origrec->{allowifupdate}) && $origrec->{allowifupdate}) ||
+          !defined($origrec->{$origfieldname}) ||
+          $origrec->{$origfieldname}=~m/^\s*$/){
+         if (!(!$param{AllowEmpty} && $comprec->{$compfieldname} eq "")){
+            $forcedupd->{$origfieldname}=$compval;
+         }
+      }
+      else{
+         $wfrequest->{$origfieldname}=$compval;
+      }
+   }
+}
+
 sub HandleWfRequest
 {
    my $self=shift;

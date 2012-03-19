@@ -207,7 +207,8 @@ sub nativQualityCheck
             $qruledone{$qrulename}++;
             my $oldcontext=$W5V2::OperationContext;
             $W5V2::OperationContext="QualityCheck";
-            my ($qresult,$control)=$qrule->qcheckRecord($parent,$rec);
+            my $acorrect=0;  # vorgesehen für auto correct mode
+            my ($qresult,$control)=$qrule->qcheckRecord($parent,$rec,$acorrect);
             $W5V2::OperationContext=$oldcontext;
             if (defined($control) && defined($control->{dataissue})){
                my $dataissuemsg=$control->{dataissue};
@@ -265,9 +266,9 @@ sub nativQualityCheck
       my $affectedobject=$dataobj->SelfAsParentObject();
       my $idfield=$dataobj->IdField();
       my $affectedobjectid=$idfield->RawValue($rec);
-      msg(INFO,"QualityRule Level1");
+      #msg(INFO,"QualityRule Level1");
       if (keys(%alldataissuemsg)){
-         msg(INFO,"QualityRule Level2");
+         #msg(INFO,"QualityRule Level2");
          my $directlnkmode="DataIssueMsg";
          my $detaildescription;
          foreach my $qrule (keys(%alldataissuemsg)){
@@ -283,7 +284,7 @@ sub nativQualityCheck
                }
             }
          }
-         msg(INFO,"QualityRule Level3");
+         #msg(INFO,"QualityRule Level3");
          my $oldforce=$ENV{HTTP_FORCE_LANGUAGE};
          $ENV{HTTP_FORCE_LANGUAGE}="en";
          my $objectname=$dataobj->getRecordHeader($rec);
@@ -299,14 +300,14 @@ sub nativQualityCheck
          $wf->SetFilter({stateid=>"<20",class=>\"base::workflow::DataIssue",
                          directlnktype=>\$affectedobject,
                          directlnkid=>\$affectedobjectid});
-         msg(INFO,"QualityRule Level4");
+         #msg(INFO,"QualityRule Level4");
          my ($WfRec,$msg)=$wf->getOnlyFirst(qw(ALL));
          my $oldcontext=$W5V2::OperationContext;
          $W5V2::OperationContext="QualityCheck";
-         msg(INFO,"QualityRule Level5");
+         #msg(INFO,"QualityRule Level5");
          if (!defined($WfRec)){
-            msg(INFO,"QualtiyCheck: ".
-                     "an old record does not exists - so i create a new one");
+            #msg(INFO,"QualtiyCheck: ".
+            #         "an old record does not exists - so i create a new one");
             my $newrec={name=>$name,
                         detaildescription=>$detaildescription,
                         class=>"base::workflow::DataIssue",

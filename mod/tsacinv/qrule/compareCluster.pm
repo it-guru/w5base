@@ -56,6 +56,7 @@ sub qcheckRecord
    my $self=shift;
    my $dataobj=shift;
    my $rec=shift;
+   my $autocorrect=shift;
 
    my $wfrequest={};
    my $forcedupd={};
