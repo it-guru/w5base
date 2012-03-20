@@ -857,6 +857,9 @@ sub isWriteValid
 
    my @databossedit=qw(phonenumbers management grprelations 
                        contacts comments gps);
+   if ($rec->{cistatusid}<=2){
+      push(@databossedit,"default");
+   }
 
    if (defined($rec) && $rec->{databossid}==$userid){
       return(@databossedit);
