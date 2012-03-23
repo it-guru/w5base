@@ -165,6 +165,19 @@ sub new
                 label         =>'Attachments',
                 group         =>'attachments'),
 
+      new kernel::Field::Container(
+                name          =>'additional',
+                group         =>'additional',
+                label         =>'additional',
+                selectfix     =>1,
+                uivisible     =>1,
+                htmldetail    =>sub {
+                   my $self=shift;
+                   return(1) if ($self->getParent->IsMemberOf("admin"));
+                   return(0);
+                },
+                dataobjattr   =>'grp.additional'),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
@@ -528,101 +541,101 @@ sub isDeleteValid
 
 sub isViewValid
 {
-   my $self=shift;
-   my $rec=shift;
-   
-   return(qw(header default source)) if (!defined($rec) || 
-                                  (defined($rec->{grpid}) && $rec->{grpid}<=0));
-   return("ALL");
+my $self=shift;
+my $rec=shift;
+
+return(qw(header default source)) if (!defined($rec) || 
+                               (defined($rec->{grpid}) && $rec->{grpid}<=0));
+return("ALL");
 }
 
 sub isWriteValid
 {
-   my $self=shift;
-   my $rec=shift;
+my $self=shift;
+my $rec=shift;
 
-   my $userid=$self->getCurrentUserId();
-   return(qw(default)) if (!defined($rec));
-   return("default") if ($rec->{cistatusid}<3 && ($rec->{creator}==$userid ||
-                         $self->IsMemberOf($self->{CI_Handling}->{activator})));
+my $userid=$self->getCurrentUserId();
+return(qw(default)) if (!defined($rec));
+return("default") if ($rec->{cistatusid}<3 && ($rec->{creator}==$userid ||
+                      $self->IsMemberOf($self->{CI_Handling}->{activator})));
 
-   return(qw(default)) if (!defined($rec) && $self->IsMemberOf("admin"));
-   return(undef) if ($rec->{grpid}<=0);
-   return(qw(default users phonenumbers 
-             misc grptype attachments)) if ($self->IsMemberOf("admin"));
-   if (defined($rec)){
-      my $grpid=$rec->{grpid};
-      if ($self->IsMemberOf([$grpid],"RAdmin","down")){
-         return(qw(users phonenumbers misc attachments));
-      }
-      if ($self->IsMemberOf([$grpid],["RBoss","RBoss2"],"direct")){
-         return(qw(phonenumbers misc grptype attachments));
-      }
+return(qw(default)) if (!defined($rec) && $self->IsMemberOf("admin"));
+return(undef) if ($rec->{grpid}<=0);
+return(qw(default users phonenumbers 
+          misc grptype attachments)) if ($self->IsMemberOf("admin"));
+if (defined($rec)){
+   my $grpid=$rec->{grpid};
+   if ($self->IsMemberOf([$grpid],"RAdmin","down")){
+      return(qw(users phonenumbers misc attachments));
    }
-   return(undef);
+   if ($self->IsMemberOf([$grpid],["RBoss","RBoss2"],"direct")){
+      return(qw(phonenumbers misc grptype attachments));
+   }
+}
+return(undef);
 }
 
 sub FinishWrite
 {
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
+my $self=shift;
+my $oldrec=shift;
+my $newrec=shift;
 
-  # $self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}});
-   $self->NotifyOnCIStatusChange($oldrec,$newrec);
-   my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
-   $self->InvalidateGroupCache();
-   return($bak);
+# $self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}});
+$self->NotifyOnCIStatusChange($oldrec,$newrec);
+my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
+$self->InvalidateGroupCache();
+return($bak);
 }
 
 sub FinishDelete
 {
-   my $self=shift;
-   my $oldrec=shift;
-   my $bak=$self->SUPER::FinishDelete($oldrec);
+my $self=shift;
+my $oldrec=shift;
+my $bak=$self->SUPER::FinishDelete($oldrec);
 
-   $self->InvalidateGroupCache();
-   if (!$self->HandleCIStatus($oldrec,undef,%{$self->{CI_Handling}})){
-      return(0);
-   }
-   return($self->SUPER::FinishDelete($oldrec));
+$self->InvalidateGroupCache();
+if (!$self->HandleCIStatus($oldrec,undef,%{$self->{CI_Handling}})){
+   return(0);
+}
+return($self->SUPER::FinishDelete($oldrec));
 }
 
 sub ValidateDelete
 {
-   my $self=shift;
-   my $rec=shift;
+my $self=shift;
+my $rec=shift;
 
-   if (ref($rec->{users}) eq "ARRAY" &&
-       $#{$rec->{users}}!=-1){
-      $self->LastMsg(WARN,"group has members!");
+if (ref($rec->{users}) eq "ARRAY" &&
+    $#{$rec->{users}}!=-1){
+   $self->LastMsg(WARN,"group has members!");
+}
+my $grpid=$rec->{grpid};
+if ($grpid ne ""){
+   my $chk=getModuleObject($self->Config,"base::menuacl");
+   $chk->SetFilter({acltarget=>\'base::grp',
+                    acltargetid=>\$grpid});
+   my ($chkrec,$msg)=$chk->getOnlyFirst(qw(refid));
+   if (defined($chkrec)){
+      $self->LastMsg(WARN,"group has references in menu acl!");
    }
-   my $grpid=$rec->{grpid};
-   if ($grpid ne ""){
-      my $chk=getModuleObject($self->Config,"base::menuacl");
-      $chk->SetFilter({acltarget=>\'base::grp',
-                       acltargetid=>\$grpid});
-      my ($chkrec,$msg)=$chk->getOnlyFirst(qw(refid));
-      if (defined($chkrec)){
-         $self->LastMsg(WARN,"group has references in menu acl!");
-      }
-      my $chk=getModuleObject($self->Config,"base::lnkcontact");
-      $chk->SetFilter({target=>\'base::grp',
-                       targetid=>\$grpid});
-      my ($chkrec,$msg)=$chk->getOnlyFirst(qw(refid));
-      if (defined($chkrec)){
-         $self->LastMsg(WARN,"group has references in contact links!");
-      }
+   my $chk=getModuleObject($self->Config,"base::lnkcontact");
+   $chk->SetFilter({target=>\'base::grp',
+                    targetid=>\$grpid});
+   my ($chkrec,$msg)=$chk->getOnlyFirst(qw(refid));
+   if (defined($chkrec)){
+      $self->LastMsg(WARN,"group has references in contact links!");
    }
+}
 
-   return(1);
+return(1);
 }
 
 
 sub getDetailBlockPriority                # posibility to change the block order
 {
-   my $self=shift;
-   return(qw(header default users subunits phonenumbers grptype 
+my $self=shift;
+return(qw(header default users subunits phonenumbers grptype additional
              misc attachments));
 }
 
