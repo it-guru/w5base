@@ -99,6 +99,7 @@ sub FormatedDetail
 
    if ($mode ne "HtmlDetail"){
       $mapsize=200;
+      $mapsize=1;
    }
    if ($mode eq "edit"){
       return("<div id=\"OSMapLayer$id\" ".
@@ -112,6 +113,7 @@ sub FormatedDetail
    $q=$queryobj->QueryString();
    my $gmaplink="<a href='http://maps.google.de?$q' target=_blank>";
    my $binglink="<a href='http://www.bing.com/maps/?$q' target=_blank>";
+   my $forwardmsg=$self->getParent->T("forward address search",$self->Self);
 
 
    $marker=~s/\n/<br>/g;
@@ -346,7 +348,7 @@ function addPositionMarker(wgspos,markerText){
    OSMMap$id.setCenter(sphpos,16);
 }
 
-addEvent(window, "load", OSMapInit$id);
+//addEvent(window, "load", OSMapInit$id);
 
 (function() {
 
@@ -369,9 +371,11 @@ addEvent(window, "load", OSMapInit$id);
 
 
 </script>
+<!--
 <div id="OSMapLayer$id" style="width: 100%; height: ${mapsize}px;border-style:solid;border-color:gray;border-width:1px;margin-bottom:0px;border-bottom-style:none"></div>
 <div id="OSMapSig$id" style="width: 100%; height: auto;border-style:solid;border-color:gray;border-width:1px;margin-bottom:2px;">&nbsp;
-<b>forward address search:</b>
+-->
+<b>$forwardmsg:</b>
 -&gt; ${gmaplink}GoogleMaps</a> &nbsp;&nbsp;
 -&gt; ${binglink}Microsoft Bing</a> &nbsp;&nbsp;
 </div>
