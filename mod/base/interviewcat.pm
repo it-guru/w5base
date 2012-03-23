@@ -128,7 +128,7 @@ sub new
                 dataobjattr   =>'interviewcat.parentid'),
    );
    $self->{history}=[qw(insert modify delete)];
-   $self->{locktables}="interviewcat write, history write";
+   $self->{locktables}="interviewcat write, history write, iomap write";
    $self->setDefaultView(qw(fullname interviewcatid editor comments));
    $self->setWorktable("interviewcat");
    return($self);

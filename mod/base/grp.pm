@@ -282,7 +282,7 @@ sub new
    $self->setWorktable("grp");
    $self->setDefaultView(qw(fullname cistatus editor description grpid));
    $self->{locktables}="grp write,contact write,lnkgrpuser write,wfhead write, ".
-                       "wfkey write, wfaction write";
+                       "wfkey write, wfaction write, iomap write";
    return($self);
 }
 

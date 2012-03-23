@@ -211,7 +211,7 @@ sub new
    $self->setWorktable("filemgmt");
    $self->setDefaultView(qw(fullname contentsize parentobj entrytyp editor));
    $self->{PathSeperator}="/";
-   $self->{locktables}="filemgmt write,fileacl write,contact write";
+   $self->{locktables}="filemgmt write,fileacl write,contact write, iomap write";
    return($self);
 }
 

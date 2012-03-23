@@ -125,7 +125,7 @@ sub new
                 label         =>'ParentID',
                 dataobjattr   =>'faqcat.parentid'),
    );
-   $self->{locktables}="faqcat write, faqcatacl write";
+   $self->{locktables}="faqcat write, faqcatacl write,  iomap write";
    $self->setDefaultView(qw(fullname faqcatid editor comments));
    $self->setWorktable("faqcat");
    return($self);
