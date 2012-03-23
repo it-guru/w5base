@@ -75,6 +75,30 @@ sub Validate
          $origrec->{fullname}=$newrec->{name};
       }
    }
+   my $fn=effVal($oldrec,$newrec,"fullname");
+   if (length($fn)>250){
+      $self->LastMsg(ERROR,"resulting fullname to long '$fn'");
+      return(0);
+   }
+   if (effChanged($oldrec,$newrec,"parentid")){
+      # tree validierung
+      msg(INFO,"new parentid needs tree validierung");
+      my $parentid=effVal($oldrec,$newrec,"parentid");
+      my $idname=$self->IdField->Name;
+      my %ring=(effVal($oldrec,$newrec,$idname)=>1);
+      while($parentid ne ""){
+         if (exists($ring{$parentid})){
+            $self->LastMsg(ERROR,"result entry will create a loop pointer");
+            return(0);
+         }
+         else{
+            $ring{$parentid}++;
+         }
+         $parentid=$self->getVal("parentid",{$idname=>$parentid});
+         msg(INFO,"check $parentid");
+      }
+      printf STDERR ("fifi chk=%s\n",Dumper(\%ring));
+   }
    return(1);
 }
 
