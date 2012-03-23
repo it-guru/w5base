@@ -120,9 +120,11 @@ sub FormatedDetail
    if ($mode=~m/^Html.*$/){
       $d.=<<EOF;
 <script language=JavaScript xsrc="../../../public/base/load/firebug-lite.js"></script>
-
+<!--
 <script xsrc="http://www.openlayers.org/api/OpenLayers.js" type="text/javascript"></script>
 <script xsrc="http://www.openstreetmap.org/openlayers/OpenStreetMap.js" type="text/javascript">
+-->
+
 </script>
 <script language="JavaScript">
 
