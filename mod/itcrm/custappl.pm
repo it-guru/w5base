@@ -110,7 +110,7 @@ sub new
                 vjointo       =>'itil::appl',
                 group         =>'default',
                 dontrename    =>1,
-                fields        =>[qw(opmode customerprio description
+                fields        =>[qw(opmode customerprio criticality description
                                     maintwindow)]),
 
       new kernel::Field::Interface(
