@@ -36,7 +36,8 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("NotifyByScriptToSVNHost","NotifyByScriptToSVNHost",timeout=>300);
+   $self->RegisterEvent("NotifyByScriptToSVNHost",
+                        "NotifyByScriptToSVNHost",timeout=>300);
    return(1);
 }
 
@@ -96,6 +97,9 @@ sub NotifyByScriptToSVNHost
          printf CMD ("END: groups\n");
       }
       close(CMD);
+   }
+   else{
+      return({exitcode=>1,msg=>'fail to run '.$NotifyByScript});
    }
 
    return({exitcode=>0,msg=>'ok'});
