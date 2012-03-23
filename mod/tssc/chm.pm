@@ -460,7 +460,7 @@ sub initSearchQuery
    my $nowlabel=$self->T("now","kernel::App");
 
    if (!defined(Query->Param("search_plannedend"))){
-     Query->Param("search_plannedend"=>">$nowlabel AND <$nowlabel+2M");
+     Query->Param("search_plannedend"=>">$nowlabel-2d AND <$nowlabel+1M");
    }
 }
 
@@ -513,9 +513,20 @@ sub SecureSetFilter
                         $chmfilter);
          return(undef);
       }
+      my $userid=$self->getCurrentUserId();
+      my $user=getModuleObject($self->Config,"base::user");
+      $user->SetFilter({userid=>\$userid});
+      my ($urec,$msg)=$user->getOnlyFirst(qw(posix));
+      if (defined($urec) && $urec->{posix} ne ""){
+         my $usr=uc($urec->{posix});
+         push(@chmfilter,{requestedby=>\$usr});
+         push(@chmfilter,{implementor=>\$usr});
+         push(@chmfilter,{coordinator=>\$usr});
+         push(@chmfilter,{editor=>\$usr});
+      }
       # ensure, that undefined mandators results to empty result
       @chmfilter=("rawlocation"=>\'InvalidMandator') if ($#chmfilter==-1);
-      msg(INFO,"chm mandator filter=%s\n",Dumper(\@chmfilter));
+      #msg(INFO,"chm mandator filter=%s\n",Dumper(\@chmfilter));
       $self->SetNamedFilter("MandatorFilter",\@chmfilter);
    }
    return($self->SUPER::SecureSetFilter(@flt));
