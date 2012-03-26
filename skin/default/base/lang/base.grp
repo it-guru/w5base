@@ -29,3 +29,4 @@
 'organisational Team'=>{de=>'organisatorisches Team'},
 'organisational Subunit'=>{de=>'organisatorische Untereinheit'},
 'Rights overview'              =>{ de=>'Referenz-Übersicht'},
+'organisational members'       =>{ de=>'organisatorische Mitglieder'},

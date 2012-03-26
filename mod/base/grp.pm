@@ -94,6 +94,18 @@ sub new
                 vjoininhash   =>['userid','email','user',
                                  'posix','usertyp','roles']),
 
+      new kernel::Field::Text(
+                name          =>'orgusers',
+                subeditmsk    =>'subedit.group',
+                label         =>'organisational members',
+                group         =>'users',
+                htmldetail    =>0,
+                vjointo       =>'base::lnkgrpuser',
+                vjoinbase     =>{lineroles=>[orgRoles()]},
+                weblinkto     =>'NONE',
+                vjoinon       =>['grpid'=>'grpid'],
+                vjoindisp     =>['user']),
+
       new kernel::Field::TextDrop(
                 name          =>'parent',
                 AllowEmpty    =>1,
