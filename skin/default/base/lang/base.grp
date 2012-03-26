@@ -30,3 +30,4 @@
 'organisational Subunit'=>{de=>'organisatorische Untereinheit'},
 'Rights overview'              =>{ de=>'Referenz-Übersicht'},
 'organisational members'       =>{ de=>'organisatorische Mitglieder'},
+'boss'                         =>{ de=>'Leiter'},

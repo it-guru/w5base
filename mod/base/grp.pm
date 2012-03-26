@@ -96,12 +96,24 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'orgusers',
-                subeditmsk    =>'subedit.group',
                 label         =>'organisational members',
+                readonly      =>1,
                 group         =>'users',
                 htmldetail    =>0,
                 vjointo       =>'base::lnkgrpuser',
                 vjoinbase     =>{lineroles=>[orgRoles()]},
+                weblinkto     =>'NONE',
+                vjoinon       =>['grpid'=>'grpid'],
+                vjoindisp     =>['user']),
+
+      new kernel::Field::Text(
+                name          =>'bossusers',
+                readonly      =>1,
+                label         =>'boss',
+                group         =>'users',
+                htmldetail    =>0,
+                vjointo       =>'base::lnkgrpuser',
+                vjoinbase     =>{lineroles=>['RBoss']},
                 weblinkto     =>'NONE',
                 vjoinon       =>['grpid'=>'grpid'],
                 vjoindisp     =>['user']),
