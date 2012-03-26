@@ -115,6 +115,7 @@ sub qcheckRecord
 #         $altname=~s/^DTAG\.TSI\.Prod\.GBOP\.PSS.*$/PSS/i;
 
          my %trtab=(
+            'SDM.TC' =>'^DTAG\.TSI\.S\.DTAG\.(.*)$',
             'CS.TC'  =>'^DTAG\.TSI\.Prod\.CS\.Telco\.(.*)$',
             'PSS'    =>'^DTAG\.TSI\.Prod\.GBOP\.PSS\.(.*)$',
             'INT.CSS'=>'^DTAG\.TSI\.INT\.SK\.CSS\.CSS_Applicat\.(.*)$'
