@@ -51,22 +51,22 @@ sub getPostibleValues
 
    if (defined($self->{value}) && ref($self->{value}) eq "ARRAY"){
       my @l=();
-   #   map({
-   #          my $kval=$_;
-   #          my $dispname=$kval;
-   #          if (defined($self->{transprefix})){
-   #             my $tdispname=$self->{transprefix}.$kval;
-   #             my $tr=$self->{translation};
-   #             $tr=$self->getParent->Self() if (!defined($tr));
-   #             my $newdisp=$self->getParent->T($tdispname,$tr);
-   #             if ($tdispname ne $newdisp){
-   #                $dispname=$newdisp;
-   #             }
-   #          }
-   #          push(@l,$kval,$dispname);
-   #       } @{$self->{value}});
-      map({push(@l,$_,$_);} @{$self->{value}});
-      if ($self->{allowempty}==1){
+      map({
+             my $kval=$_;
+             my $dispname=$kval;
+             if (defined($self->{transprefix})){
+                my $tdispname=$self->{transprefix}.$kval;
+                my $tr=$self->{translation};
+                $tr=$self->getParent->Self() if (!defined($tr));
+                my $newdisp=$self->getParent->T($tdispname,$tr);
+                if ($tdispname ne $newdisp){
+                   $dispname=$newdisp;
+                }
+             }
+             push(@l,$kval,$dispname);
+          } @{$self->{value}});
+#      map({push(@l,$_,$_);} @{$self->{value}}); # altes Verfahren - macht
+      if ($self->{allowempty}==1){               # Probleme beim XLS Upload!
          unshift(@l,"","");
       }
       return(@l);
@@ -162,8 +162,7 @@ sub FormatedDetail
          my $qval=quotemeta($val);
          $s.=" selected" if (($qkey ne "" && grep(/^$qkey$/,@{$d})) || 
                              ($qval ne "" && grep(/^$qval$/,@{$d})));
-         $s.=">".$self->getParent->T($self->{transprefix}.$val,
-                                     $self->{translation})."</option>";
+         $s.=">".$val."</option>";
       }
 
       $s.="</select>";
