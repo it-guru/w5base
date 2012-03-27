@@ -586,7 +586,8 @@ sub ApplicationModified
                                    Del_manager=>$idno{delmgr},
                                    Deputy_Del_manager=>$idno{opm2},
                                    bDelete=>'0',
-                                   Name=>$rec->{name}
+                                   Name=>$rec->{name},
+                                   Appl_Group=>$rec->{applgroup}
                                 }
                             };
                #
