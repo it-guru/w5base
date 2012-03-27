@@ -44,3 +44,4 @@
 'bind on parent viewgroup'=>{de=>'Anzeigen nur bei bestimmter Viewgroup'},
 'answer contact from parent'=>{de=>'Beantwortungskontakt aus Elternobjekt'},
 'additional quest data'=>{de=>'zusätzlich Frage-Daten'},
+'invalid question specified'=>{de=>'ungültiger Frage-Text'},

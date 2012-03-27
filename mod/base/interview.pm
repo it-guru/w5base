@@ -473,7 +473,12 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
-   my $name=trim(effVal($oldrec,$newrec,"name"));
+   my $name=trim(effVal($oldrec,$newrec,"name_de"));
+   if (length($name)<10 || ($name=~m/^\s*$/i)){
+      $self->LastMsg(ERROR,"invalid question specified"); 
+      return(undef);
+   }
+   my $name=trim(effVal($oldrec,$newrec,"name_en"));
    if (length($name)<10 || ($name=~m/^\s*$/i)){
       $self->LastMsg(ERROR,"invalid question specified"); 
       return(undef);
