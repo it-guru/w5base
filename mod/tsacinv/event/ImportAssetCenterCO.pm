@@ -56,7 +56,8 @@ sub ImportAssetManagerCO
    $self->{wf}=getModuleObject($self->Config,"base::workflow");
    $self->{user}=getModuleObject($self->Config,"base::user");
    $self->{mandator}=getModuleObject($self->Config,"base::mandator");
-   my $flt=[{bc=>['AL T-COM','Notes & Collab. Ser.','AL TMO']},
+   my $flt=[{bc=>['AL T-COM','Notes & Collab. Ser.','AL TMO',
+                  'Global CU Telco']},
             {orgunit=>['DTAG']}];
    $self->{statefile}="/var/log/w5base/SystemID.noappl.log";
    #$flt->{name}=\'9100007746';
