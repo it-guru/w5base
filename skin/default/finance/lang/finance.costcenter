@@ -6,7 +6,7 @@
 'Accounting Area'=>{de=>'Buchungskreis'},
 'Contacts'=>{de=>'Kontakte'},
 'CO-Shortdescription'=>{de=>'CO-/PSP-/Kostenstellenbez.'},
-"invalid number format '\%s' specified"=>{de=>"ungültige Nummernformat '\%s' eingegeben"},
+"invalid number format '\%s' specified"=>{de=>"ungültige CO-Nummernformat '\%s' eingegeben"},
 'Deputy Service Delivery Manager'=>{de=>'Service Delivery Manager Vertreter'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'costcenter is direct useable by workflows'=>{de=>'Konstenstelle darf direkt von Workflows verwendet werden'},

@@ -1169,7 +1169,7 @@ sub Validate
       }
    }
 
-   if (exists($newrec->{conumber})){
+   if (exists($newrec->{conumber}) && $newrec->{conumber} ne ""){
       return(0) if (!$self->finance::costcenter::ValidateCONumber("conumber",
                     $oldrec,$newrec));
    }
