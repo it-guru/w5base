@@ -106,6 +106,21 @@ sub new
                 label         =>'Business Center',
                 dataobjattr   =>'amcostcenter.alternatebusinesscenter'),
 
+      new kernel::Field::Text(
+                name          =>'saphier',
+                label         =>'SAP costcenter hierarchy',
+                group         =>'saphier',
+                ignorecase    =>1,
+                dataobjattr   =>"amcostcenter.hier0id||'.'||".
+                                "amcostcenter.hier1id||'.'||".
+                                "amcostcenter.hier2id||'.'||".
+                                "amcostcenter.hier3id||'.'||".
+                                "amcostcenter.hier4id||'.'||".
+                                "amcostcenter.hier5id||'.'||".
+                                "amcostcenter.hier7id||'.'||".
+                                "amcostcenter.hier8id||'.'||".
+                                "amcostcenter.hier9id"),
+
       new kernel::Field::TextDrop(
                 name          =>'assignmentgroup',
                 label         =>'Assignment Group',
