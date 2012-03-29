@@ -1376,7 +1376,7 @@ sub isWriteValid
        ($rec->{creator}==$userid && $rec->{cistatusid}<3)){
       return("name","userparam","office","officeacc","private","nativcontact",
              "usersubst","control","officeacc","personrelated","introdution",
-             "officeacc","interview");
+             "officeacc","interview","comments");
    }
    # check if the user has a direct boss
    my $g=$self->getField("groups")->RawValue($rec);
