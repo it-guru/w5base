@@ -638,6 +638,7 @@ sub doLogin
 
    $self->{'CurrentForm'}->{password}="$pass";
    $self->{'CurrentForm'}->{username}="$user";
+   $self->{'CurrentForm'}->{'login-form-type'}="pwd";
    delete($self->{'CurrentForm'}->{''});
 
    my $url="https://websso.t-systems.com/pkmslogin.form";
@@ -651,6 +652,7 @@ sub doLogin
                      $response->code));
       return(0);
    }
+   #print "<xmp>".$response->content()."</xmp>";
    msg(DEBUG,"auth login cookie OK");
    return(1);
 }
