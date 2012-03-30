@@ -912,7 +912,7 @@ alter table swinstance add techrelstring longtext default NULL;
 create table lnkswinstanceparam (
   id           bigint(20) NOT NULL,
   swinstance   bigint(20) NOT NULL,
-  name         varchar(100) NOT NULL,
+  name         varchar(100) NOT NULL,namegrp varchar(20),
   val          varchar(254) NOT NULL,
   mdate        datetime NOT NULL default '0000-00-00 00:00:00',
   islatest     int(1) default NULL,

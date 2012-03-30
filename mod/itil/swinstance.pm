@@ -509,7 +509,7 @@ sub new
                 vjoinbase     =>{'islatest'=>'1'},
                 vjointo       =>'itil::lnkswinstanceparam',
                 vjoinon       =>['id'=>'swinstanceid'],
-                vjoindisp     =>['name','val']),
+                vjoindisp     =>['namegrp','name','val']),
 
 
       new kernel::Field::Text(
