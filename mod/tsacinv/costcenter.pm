@@ -49,6 +49,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'untrimmedname',
                 htmldetail    =>0,
+                searchable    =>0,
                 label         =>'untrimmed CostCenter-No.',
                 dataobjattr   =>'amcostcenter.title'),
 
