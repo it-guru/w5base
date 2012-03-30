@@ -83,7 +83,8 @@ sub new
       new kernel::Field::Text(
                 name          =>'version',
                 label         =>'Version',
-                dataobjattr   =>'amsoftinstall.versionlevel'),
+                #dataobjattr   =>'amsoftinstall.versionlevel'),
+                dataobjattr   =>'ammodel.versionlevel'),
 
       new kernel::Field::Text(
                 name          =>'instpath',
@@ -105,6 +106,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'llicense',
+                htmldetail    =>0,
                 label         =>'LicenseID',
                 dataobjattr   =>'amsoftinstall.llicenseid'),
 
@@ -125,13 +127,24 @@ sub new
                 vjoinon       =>['lparentid'=>'lportfolioitemid'],
                 vjoindisp     =>'applicationnames'),
 
+      new kernel::Field::Text(
+                name          =>'applicationids',
+                htmlwidth     =>'100px',
+                weblinkto     =>'NONE',
+                group         =>'useableby',
+                htmldetail    =>0,
+                label         =>'useable by applicationids',
+                vjointo       =>'tsacinv::lnkapplsystem',
+                vjoinon       =>['lparentid'=>'lchildid'],
+                vjoindisp     =>'applid'),
+
       new kernel::Field::Date(
                 name          =>'mdate',
                 group         =>'source',
                 label         =>'Modification-Date',
                 dataobjattr   =>'amsoftinstall.dtlastmodif'),
    );
-   $self->setDefaultView(qw(id name system license quantity));
+   $self->setDefaultView(qw(id name version system license quantity));
    return($self);
 }
 
@@ -165,6 +178,7 @@ sub initSqlWhere
    my $where=
       "amportfolio.lportfolioitemid=amsoftinstall.litemid ".
       "and amportfolio.lmodelid=ammodel.lmodelid ".
+      "and ammodel.certification='CSS' ".
       "and ammodel.lnatureid=amnature.lnatureid(+) ".
       "and amnature.name='SW-INSTALLATION' ".
       "and amportfolio.bdelete=0 ";

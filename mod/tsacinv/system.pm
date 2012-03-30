@@ -416,7 +416,7 @@ sub new
                 group         =>'software',
                 vjointo       =>'tsacinv::lnksystemsoftware',
                 vjoinon       =>['lportfolioitemid'=>'lparentid'],
-                vjoindisp     =>[qw(id name quantity)]),
+                vjoindisp     =>[qw(id name version quantity)]),
 
       new kernel::Field::Dynamic(
                 name          =>'dynservices',

@@ -75,12 +75,6 @@ sub new
 
 
 
-#      new kernel::Field::Import($self,
-#                vjointo       =>'tsacinv::location',
-#                vjoinon       =>['locationid'=>'locationid'],
-#                group         =>"location",
-#                fields        =>[qw(fullname location)]),
-#
       new kernel::Field::Link(
                 name          =>'lcostcenterid',
                 label         =>'CostCenterID',
@@ -104,207 +98,42 @@ sub new
                 vjoinon       =>['lassignmentid'=>'lgroupid'],
                 vjoindisp     =>'name'),
 
-#      new kernel::Field::TextDrop(
-#                name          =>'iassignmentgroup',
-#                label         =>'Incident Assignment Group',
-#                vjointo       =>'tsacinv::group',
-#                vjoinon       =>['lincidentagid'=>'lgroupid'],
-#                vjoindisp     =>'name'),
-
       new kernel::Field::Link(
                 name          =>'lassignmentid',
                 label         =>'AC-AssignmentID',
                 dataobjattr   =>'amportfolio.lassignmentid'),
 
-#      new kernel::Field::Link(
-#                name          =>'lincidentagid',
-#                label         =>'AC-Incident-AssignmentID',
-#                dataobjattr   =>'amportfolio.lincidentagid'),
-#
-#      new kernel::Field::Text(
-#                name          =>'controlcenter',
-#                weblinkto     =>'tsacinv::group',
-#                weblinkon     =>['controlcenter'=>'name'],
-#                label         =>'ControlCenter',
-#                dataobjattr   =>'amportfolio.controlcenter'),
-
-#      new kernel::Field::Text(
-#                name          =>'status',
-#                group         =>'form',
-#                label         =>'Status',
-#                dataobjattr   =>'amportfolioitem.status'),
-
-#      new kernel::Field::Text(
-#                name          =>'usage',
-#                group         =>'form',
-#                label         =>'Usage',
-#                dataobjattr   =>'amportfolio.usage'),
-#
-#      new kernel::Field::Text(
-#                name          =>'type',
-#                label         =>'Type',
-#                group         =>'form',
-#                dataobjattr   =>'amcomputer.computertype'),
-#
-#      new kernel::Field::Float(
-#                name          =>'systemcpucount',
-#                label         =>'System CPU count',
-#                unit          =>'CPU',
-#                precision     =>0,
-#                dataobjattr   =>'amcomputer.lcpunumber'),
-#
-#      new kernel::Field::Float(
-#                name          =>'systemcpuspeed',
-#                label         =>'System CPU speed',
-#                unit          =>'MHz',
-#                precision     =>0,
-#                dataobjattr   =>'amcomputer.lcpuspeedmhz'),
-#
-#      new kernel::Field::Float(
-#                name          =>'systemmemory',
-#                label         =>'System Memory',
-#                unit          =>'MB',
-#                precision     =>0,
-#                dataobjattr   =>'amcomputer.lmemorysizemb'),
-#
-#      new kernel::Field::Text(
-#                name          =>'systemos',
-#                label         =>'System OS',
-#                dataobjattr   =>'amcomputer.operatingsystem'),
-#
-#      new kernel::Field::Float(
-#                name          =>'partofasset',
-#                label         =>'System Part of Asset',
-#                unit          =>'%',
-#                depend        =>['lassetid'],
-#                prepRawValue  =>\&SystemPartOfCorrection,
-#                dataobjattr   =>'amcomputer.psystempartofasset'),
-#
-#      new kernel::Field::Text(
-#                name          =>'costallocactive',
-#                label         =>'Cost allocation active',
-#                dataobjattr   =>'amcomputer.bcostallocactive'),
-#
-#      new kernel::Field::Text(
-#                name          =>'systemola',
-#                label         =>'System OLA',
-#                dataobjattr   =>'amcomputer.olaclasssystem'),
-#
-#      new kernel::Field::Text(
-#                name          =>'priority',
-#                label         =>'Priority of system',
-#                dataobjattr   =>'amportfolio.priority'),
-#
-#      new kernel::Field::Import($self,
-#                vjointo       =>'tsacinv::asset',
-#                vjoinon       =>['lassetid'=>'lassetid'],
-#                weblinkto     =>'tsacinv::asset',
-#                weblinkon     =>['lassetid'=>'lassetid'],
-#                prefix        =>"asset",
-#                group         =>"assetdata",
-#                fields        =>[qw(assetid serialno inventoryno modelname 
-#                                    powerinput cpucount cpuspeed corecount
-#                                    systemsonasset maitcond)]),
-#
-#      new kernel::Field::Import($self,
-#                vjointo       =>'tsacinv::asset',
-#                vjoinon       =>['lassetid'=>'lassetid'],
-#                prefix        =>"asset",
-#                group         =>"assetfinanz",
-#                fields        =>[qw( mdepr mmaint)]),
-#
-#      new kernel::Field::Link(
-#                name          =>'partofassetdec',
-#                label         =>'System Part of Asset',
-#                dataobjattr   =>'amcomputer.psystempartofasset'),
-#
-#      new kernel::Field::Link(
-#                name          =>'lcomputerid',
-#                label         =>'AC-ComputerID',
-#                dataobjattr   =>'amcomputer.lcomputerid'),
-#
       new kernel::Field::Text(
                 name          =>'lassetid',
                 label         =>'AC-AssetID',
+                htmldetail    =>0,
                 dataobjattr   =>'amportfolio.lparentid'),
 
       new kernel::Field::Text(
                 name          =>'lportfolioitemid',
                 label         =>'PortfolioID',
+                htmldetail    =>0,
                 dataobjattr   =>'amportfolio.lportfolioitemid'),
 
       new kernel::Field::Text(
                 name          =>'lastid',
                 label         =>'lastid',
+                htmldetail    =>0,
                 dataobjattr   =>'amportfolio.lastid'),
-#
-#      new kernel::Field::Link(
-#                name          =>'locationid',
-#                label         =>'AC-LocationID',
-#                vjointo       =>'tsacinv::asset',
-#                vjoinon       =>['lassetid'=>'lassetid'],
-#                vjoindisp     =>'locationid'),
-#
+
       new kernel::Field::Link(
                 name          =>'altbc',
+                htmldetail    =>0,
                 label         =>'Alternate BC',
                 dataobjattr   =>'amcostcenter.alternatebusinesscenter'),
 
-#      new kernel::Field::SubList(
-#                name          =>'services',
-#                label         =>'Services',
-#                group         =>'services',
-#                vjointo       =>'tsacinv::service',
-#                vjoinon       =>['systemid'=>'systemid'],
-#                vjoindisp     =>[qw(name type ammount unit)],
-#                vjoininhash   =>['name','type','ammount']),
-#
-#      new kernel::Field::SubList(
-#                name          =>'ipaddresses',
-#                label         =>'IP-Adresses',
-#                group         =>'ipaddresses',
-#                vjointo       =>'tsacinv::ipaddress',
-#                vjoinon       =>['systemid'=>'systemid'],
-#                vjoindisp     =>[qw(ipaddress description)]),
-#
-#      new kernel::Field::SubList(
-#                name          =>'applications',
-#                label         =>'Applications',
-#                group         =>'applications',
-#                vjointo       =>'tsacinv::lnkapplsystem',
-#                vjoinon       =>['lportfolioitemid'=>'lchildid'],
-#                vjoindisp     =>[qw(parent)]),
-#
-#      new kernel::Field::Dynamic(
-#                name          =>'dynservices',
-#                depend        =>[qw(systemid)],
-#                group         =>'services',
-#                label         =>'Services Columns',
-#                fields        =>\&AddServices),
-#
-#      new kernel::Field::Text(
-#                name          =>'w5base_appl',
-#                group         =>'w5basedata',
-#                searchable    =>0,
-#                label         =>'W5Base Anwendung',
-#                onRawValue    =>\&AddW5BaseData,
-#                depend        =>'systemid'),
-#
-#      new kernel::Field::Text(
-#                name          =>'w5base_sem',
-#                searchable    =>0,
-#                group         =>'w5basedata',
-#                label         =>'W5Base SeM',
-#                onRawValue    =>\&AddW5BaseData,
-#                depend        =>'systemid'),
-#
-#      new kernel::Field::Text(
-#                name          =>'w5base_tsm',
-#                searchable    =>0,
-#                group         =>'w5basedata',
-#                label         =>'W5Base TSM',
-#                onRawValue    =>\&AddW5BaseData,
-#                depend        =>'systemid'),
+      new kernel::Field::SubList(
+                name          =>'software',
+                label         =>'Software installations',
+                group         =>'software',
+                vjointo       =>'tsacinv::lnksystemsoftware',
+                vjoinon       =>['lastid'=>'llicense'],
+                vjoindisp     =>[qw(system name version quantity)]),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
@@ -315,7 +144,6 @@ sub new
                 dataobjattr   =>'amcomment.memcomment'),
 
 
-#
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
@@ -453,144 +281,8 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default form location));
+   return( qw(header default software misc source));
 }  
-
-
-sub getValidWebFunctions
-{
-   my ($self)=@_;
-   return($self->SUPER::getValidWebFunctions(),qw(ImportSystem));
-}  
-
-sub ImportSystem
-{
-   my $self=shift;
-
-   my $importname=Query->Param("importname");
-   if (Query->Param("DOIT")){
-      if ($self->Import({importname=>$importname})){
-         Query->Delete("importname");
-         $self->LastMsg(OK,"system has been successfuly imported");
-      }
-      Query->Delete("DOIT");
-   }
-
-
-   print $self->HttpHeader("text/html");
-   print $self->HtmlHeader(style=>['default.css','work.css',
-                                   'kernel.App.Web.css'],
-                           static=>{importname=>$importname},
-                           body=>1,form=>1,
-                           title=>"AssetManager System Import");
-   print $self->getParsedTemplate("tmpl/minitool.system.import",{});
-   print $self->HtmlBottom(body=>1,form=>1);
-}
-
-
-   
-
-sub Import
-{
-   my $self=shift;
-   my $param=shift;
-
-   my $flt;
-   if ($param->{importname} ne ""){
-      $flt={systemid=>[$param->{importname}]};
-   }
-   else{
-      return(undef);
-   }
-   $self->ResetFilter();
-   $self->SetFilter($flt);
-   my @l=$self->getHashList(qw(systemid systemname lassignmentid assetid));
-   if ($#l==-1){
-      $self->LastMsg(ERROR,"SystemID not found in AssetManager");
-      return(undef);
-   }
-   if ($#l>0){
-      $self->LastMsg(ERROR,"SystemID not unique in AssetManager");
-      return(undef);
-   }
-
-   my $sysrec=$l[0];
-   my $sys=getModuleObject($self->Config,"itil::system");
-   $sys->SetFilter($flt);
-   my ($w5sysrec,$msg)=$sys->getOnlyFirst(qw(ALL));
-   my $identifyby;
-   if (defined($w5sysrec)){
-      if ($w5sysrec->{cistatusid}==4){
-         $self->LastMsg(ERROR,"SystemID already exists in W5Base");
-         return(undef);
-      }
-      $identifyby=$sys->ValidatedUpdateRecord($w5sysrec,{cistatusid=>4},
-                                              {id=>\$w5sysrec->{id}});
-   }
-   else{
-      # check 1: Assigmenen Group registered
-      if ($sysrec->{lassignmentid} eq ""){
-         $self->LastMsg(ERROR,"SystemID has no Assignment Group");
-         return(undef);
-      }
-      printf STDERR Dumper($sysrec);
-      # check 2: Assingment Group active
-      my $acgroup=getModuleObject($self->Config,"tsacinv::group");
-      $acgroup->SetFilter({lgroupid=>\$sysrec->{lassignmentid}});
-      my ($acgrouprec,$msg)=$acgroup->getOnlyFirst(qw(supervisorldapid));
-      if (!defined($acgrouprec)){
-         $self->LastMsg(ERROR,"Can't find Assignment Group of system");
-         return(undef);
-      }
-      # check 3: Supervisor registered
-      if ($acgrouprec->{supervisorldapid} eq "" &&
-          $acgrouprec->{supervisoremail} eq ""){
-         $self->LastMsg(ERROR,"incomplet Supervisor at Assignment Group");
-         return(undef);
-      }
-      my $importname=$acgrouprec->{supervisorldapid};
-      $importname=$acgrouprec->{supervisoremail} if ($importname eq "");
-      # check 4: load Supervisor ID in W5Base
-      my $tswiw=getModuleObject($self->Config,"tswiw::user");
-      my $databossid=$tswiw->GetW5BaseUserID($importname);
-      if (!defined($databossid)){
-         $self->LastMsg(ERROR,"Can't import Supervisor as Databoss");
-         return(undef);
-      }
-      # check 5: find id of mandator "extern"
-      my $mand=getModuleObject($self->Config,"base::mandator");
-      $mand->SetFilter({name=>"extern"});
-      my ($mandrec,$msg)=$mand->getOnlyFirst(qw(grpid));
-      if (!defined($mandrec)){
-         $self->LastMsg(ERROR,"Can't find mandator extern");
-         return(undef);
-      }
-      my $mandatorid=$mandrec->{grpid};
-      # final: do the insert operation
-      my $newrec={name=>$sysrec->{systemname},
-                  systemid=>$sysrec->{systemid},
-                  admid=>$databossid,
-                  allowifupdate=>1,
-                  mandatorid=>$mandatorid,
-                  cistatusid=>4};
-      $identifyby=$sys->ValidatedInsertRecord($newrec);
-   }
-   if (defined($identifyby) && $identifyby!=0){
-      $sys->ResetFilter();
-      $sys->SetFilter({'id'=>\$identifyby});
-      my ($rec,$msg)=$sys->getOnlyFirst(qw(ALL));
-      if (defined($rec)){
-         my $qc=getModuleObject($self->Config,"base::qrule");
-         $qc->setParent($sys);
-         $qc->nativQualityCheck($sys->getQualityCheckCompat($rec),$rec);
-      }
-   }
-   return($identifyby);
-}
-
-
-
 
 
 1;
