@@ -670,7 +670,20 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/itil/load/lnkapplsystem.jpg?".$cgi->query_string());
 }
-         
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_systemcistatus"))){
+     Query->Param("search_systemcistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+   if (!defined(Query->Param("search_applcistatus"))){
+     Query->Param("search_applcistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
 
 sub getSqlFrom
 {
