@@ -28,7 +28,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{MainSearchFieldLines}=5 if (!defined($param{MainSearchFieldLines}));
+   $param{MainSearchFieldLines}=6 if (!defined($param{MainSearchFieldLines}));
    my $self=bless($type->SUPER::new(%param),$type);
    
 
@@ -121,7 +121,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'namegrp',
                 htmlwidth     =>'120px',
-                label         =>'parameter group',
+                label         =>'group',
                 dataobjattr   =>'lnkswinstanceparam.namegrp'),
                                                    
       new kernel::Field::Text(
@@ -169,7 +169,7 @@ sub new
                 dataobjattr   =>'lnkswinstanceparam.srcload')
                                                    
    );
-   $self->setDefaultView(qw(swinstance name val swinstance mdate));
+   $self->setDefaultView(qw(swinstance namegrp name val swinstance mdate));
 
    $self->setWorktable("lnkswinstanceparam");
    return($self);
