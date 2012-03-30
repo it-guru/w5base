@@ -119,6 +119,12 @@ sub new
                 dataobjattr   =>'lnkswinstanceparam.name'),
                                                    
       new kernel::Field::Text(
+                name          =>'namegrp',
+                htmlwidth     =>'120px',
+                label         =>'parameter group',
+                dataobjattr   =>'lnkswinstanceparam.namegrp'),
+                                                   
+      new kernel::Field::Text(
                 name          =>'val',
                 label         =>'parameter value',
                 dataobjattr   =>'lnkswinstanceparam.val'),

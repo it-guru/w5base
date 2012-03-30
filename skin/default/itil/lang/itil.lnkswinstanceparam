@@ -3,6 +3,7 @@
 'fieldgroup.link'=>{de=>'Software-Instanz Verknüpfung',
                     en=>'Relation'},
 'parameter name'=>{de=>'Parameter Name'},
+'group'=>{de=>'Gruppe'},
 'parameter value'=>{de=>'Parameter Inhalt'},
 'is latest'=>{de=>'aktuellster Stand'},
 'Instance type'=>{de=>'Instanz Typ'},
