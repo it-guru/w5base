@@ -46,6 +46,12 @@ sub new
                 label         =>'CostCenter-No.',
                 dataobjattr   =>'amcostcenter.trimmedtitle'),
 
+      new kernel::Field::Text(
+                name          =>'untrimmedname',
+                htmldetail    =>0,
+                label         =>'untrimmed CostCenter-No.',
+                dataobjattr   =>'amcostcenter.title'),
+
       new kernel::Field::Boolean(
                 name          =>'islocked',
                 label         =>'is locked',
@@ -175,6 +181,7 @@ sub new
                 label         =>'SAP hierarchy 0',
                 group         =>'saphier',
                 ignorecase    =>1,
+                htmldetail    =>0,
                 dataobjattr   =>'amcostcenter.hier0id'),
 
       new kernel::Field::Text(
@@ -182,6 +189,7 @@ sub new
                 label         =>'SAP hierarchy 1',
                 group         =>'saphier',
                 ignorecase    =>1,
+                htmldetail    =>0,
                 dataobjattr   =>'amcostcenter.hier1id'),
 
       new kernel::Field::Text(
@@ -189,6 +197,7 @@ sub new
                 label         =>'SAP hierarchy 2',
                 group         =>'saphier',
                 ignorecase    =>1,
+                htmldetail    =>0,
                 dataobjattr   =>'amcostcenter.hier2id'),
 
       new kernel::Field::Text(
@@ -196,6 +205,7 @@ sub new
                 label         =>'SAP hierarchy 3',
                 group         =>'saphier',
                 ignorecase    =>1,
+                htmldetail    =>0,
                 dataobjattr   =>'amcostcenter.hier3id'),
 
       new kernel::Field::Text(
@@ -203,6 +213,7 @@ sub new
                 label         =>'SAP hierarchy 4',
                 group         =>'saphier',
                 ignorecase    =>1,
+                htmldetail    =>0,
                 dataobjattr   =>'amcostcenter.hier4id'),
 
       new kernel::Field::Text(
@@ -210,6 +221,7 @@ sub new
                 label         =>'SAP hierarchy 5',
                 group         =>'saphier',
                 ignorecase    =>1,
+                htmldetail    =>0,
                 dataobjattr   =>'amcostcenter.hier5id'),
 
       new kernel::Field::Text(
@@ -217,6 +229,7 @@ sub new
                 label         =>'SAP hierarchy 6',
                 group         =>'saphier',
                 ignorecase    =>1,
+                htmldetail    =>0,
                 dataobjattr   =>'amcostcenter.hier6id'),
 
       new kernel::Field::Text(
@@ -224,6 +237,7 @@ sub new
                 label         =>'SAP hierarchy 7',
                 group         =>'saphier',
                 ignorecase    =>1,
+                htmldetail    =>0,
                 dataobjattr   =>'amcostcenter.hier7id'),
 
       new kernel::Field::Text(
@@ -231,6 +245,7 @@ sub new
                 label         =>'SAP hierarchy 8',
                 group         =>'saphier',
                 ignorecase    =>1,
+                htmldetail    =>0,
                 dataobjattr   =>'amcostcenter.hier8id'),
 
       new kernel::Field::Text(
@@ -238,6 +253,7 @@ sub new
                 label         =>'SAP hierarchy 9',
                 group         =>'saphier',
                 ignorecase    =>1,
+                htmldetail    =>0,
                 dataobjattr   =>'amcostcenter.hier9id'),
 
       new kernel::Field::Text(
@@ -280,7 +296,7 @@ sub initSearchQuery
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default contact nor applications systems source));
+   return(qw(header default contact nor applications systems saphier source));
 }
 
 

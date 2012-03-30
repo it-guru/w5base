@@ -50,7 +50,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'name',
-                label         =>'Model',
+                label         =>'Licensetyp',
                 uppersearch   =>1,
                 size          =>'16',
                 dataobjattr   =>'ammodel.name'),
@@ -129,7 +129,7 @@ sub new
 
       new kernel::Field::SubList(
                 name          =>'software',
-                label         =>'Software installations',
+                label         =>'Software installations on',
                 group         =>'software',
                 vjointo       =>'tsacinv::lnksystemsoftware',
                 vjoinon       =>['lastid'=>'llicense'],
@@ -160,7 +160,7 @@ sub new
    );
    $self->{use_distinct}=0;
 
-   $self->setDefaultView(qw(licenseid model assignmentgroup));
+   $self->setDefaultView(qw(licenseid name assignmentgroup));
    return($self);
 }
 
