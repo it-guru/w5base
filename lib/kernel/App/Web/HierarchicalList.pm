@@ -97,7 +97,6 @@ sub Validate
          $parentid=$self->getVal("parentid",{$idname=>$parentid});
          msg(INFO,"check $parentid");
       }
-      printf STDERR ("fifi chk=%s\n",Dumper(\%ring));
    }
    return(1);
 }
