@@ -428,9 +428,10 @@ sub WSDLstoreRecord
    $$XMLtypes.="<xsd:complexType name=\"storeRecInp\">";
    $$XMLtypes.="<xsd:sequence>";
    $$XMLtypes.="<xsd:element name=\"lang\" ".
-              "type=\"xsd:string\" nillable=\"true\" />";
+               "type=\"xsd:string\" nillable=\"true\" />";
    $$XMLtypes.="<xsd:element name=\"IdentifiedBy\" ".
-              "type=\"xsd:integer\" nillable=\"true\" />";
+               "minOccurs=\"0\" maxOccurs=\"1\" ".
+               "type=\"xsd:integer\" nillable=\"true\" />";
    $$XMLtypes.="<xsd:element name=\"data\" ".
               "type=\"${ns}:$recordname\" />";
    $$XMLtypes.="</xsd:sequence>";
