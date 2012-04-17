@@ -118,8 +118,9 @@ sub qcheckRecord
                             "Contact '%s'\nseems to be a telekom ".
                             "contact, which have\nleave the organisation.".
                             "\nPlease check the existence. If he not\n".
-                            "leave the organisation, clear the posix entry.",
-                            $urec->{fullname}."\n-");
+                            "leave the organisation, clear the posix entry.".
+                            "\n-",
+                            $urec->{fullname});
                      }
                   }
                }
