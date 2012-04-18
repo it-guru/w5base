@@ -135,13 +135,16 @@ sub ProcessHead
           "&nbsp;&nbsp;&nbsp;".
           "<select name=useField multiple size=5 style='width:95%'>";
       foreach my $fldname (@l){
-         my $fldlabel=$app->getField($fldname)->Label($rec);
-         if ($fldlabel ne ""){
-            $d.="<option value=\"$fldname\"";
-            $d.=" selected" if (in_array(\@useField,$fldname));
-            $d.=">";
-            $d.=$fldlabel;
-            $d.="</option>";
+         my $fld=$app->getField($fldname);
+         if (defined($fld)){
+            my $fldlabel=$fld->Label($rec);
+            if ($fldlabel ne ""){
+               $d.="<option value=\"$fldname\"";
+               $d.=" selected" if (in_array(\@useField,$fldname));
+               $d.=">";
+               $d.=$fldlabel;
+               $d.="</option>";
+            }
          }
       }
       $d.="</select>";
