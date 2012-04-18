@@ -748,6 +748,7 @@ sub RawValue
       if (keys(%flt)>0){
          if ($joinval){ 
             if (!exists($c->{$joinkey})){
+               $self->vjoinobj->ResetFilter();
                if (defined($self->{vjoinbase})){
                   my $base=$self->{vjoinbase};
                   if (ref($base) eq "CODE"){

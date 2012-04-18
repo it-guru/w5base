@@ -409,7 +409,7 @@ sub Unformat
       else{
          $r->{$self->Name()}=$formated;
       }
-      if ($self->{allowempty}==1){
+      if ($self->{allowempty}==1 && !defined($self->{vjointo})){
          $r->{$self->Name()}=undef if ($r->{$self->Name()} eq "");
       }
    }
