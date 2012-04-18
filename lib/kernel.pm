@@ -130,11 +130,16 @@ sub extractLangEntry       # extracts a specific lang entry from a multiline
       $ltxt{""}=$ltxt{$lang};
    }
    my $d;
-   if ($multiline>0){
-      $d=join("\n",@{$ltxt{""}});
+   if (ref($ltxt{""}) eq "ARRAY"){
+      if ($multiline>0){
+         $d=join("\n",@{$ltxt{""}});
+      }
+      else{
+         $d=join(" ",@{$ltxt{""}});
+      }
    }
    else{
-      $d=join(" ",@{$ltxt{""}});
+      $d="";
    }
   
    return(trim($d));
