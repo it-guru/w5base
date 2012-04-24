@@ -351,7 +351,6 @@ sub getSqlSelect
       #
       # Limit Handling
       #
-#printf STDERR ("fifi limitnum=$limitnum in cmd=$cmd\n");
       if ($limitnum>0 && !$self->{_UseSoftLimit}){
 
          if (defined($self->{DB}->{db}) &&
@@ -773,7 +772,9 @@ sub tieRec
 {
    my $self=shift;
    my $rec=shift;
-   
+
+   $self->preProcessReadedRecord($rec);
+
    my %rec;
    my $view=[$self->getFieldObjsByView([$self->getCurrentView()],
                                        current=>$rec)];

@@ -301,6 +301,10 @@ sub ProcessHead
       next if ($view[$cellno]->Type() eq "Container");
       my $xlscellno=$self->{xlscollindex}->{$view[$cellno]->Name()};
       my $label=$view[$cellno]->Label();
+      my $fieldHeader="";
+      $view[$cellno]->extendFieldHeader($self->{WindowMode},$rec,\$fieldHeader,
+                                        $self->Self);
+      $label.=$fieldHeader;
       my $format="header";
       { # color handling
          my $xlscolor=$view[$cellno]->xlscolor;

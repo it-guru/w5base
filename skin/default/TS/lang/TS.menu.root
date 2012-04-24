@@ -3,6 +3,8 @@
 'itts.custcontract.new'=>{de=>'Neueingabe',en=>'New'},
 'itts.custcontract.lnkappl'=>{de=>'Verkn. Anwendung',en=>'Link Application'},
 'itts.custcontract.lnkappl.new'=>{de=>'Neueingabe',en=>'New'},
+'itts.custcontract.adv'=>{de=>'ADV',en=>'ADV'},
+'itts.custcontract.nor'=>{de=>'NOR-Nachweis',en=>'NOR-Verification'},
 'itts.appl'=>{de=>'Anwendung',en=>'Application'},
 'itts.appl.new'=>{de=>'Neueingabe',en=>'New'},
 'itts.appl.lnkcustcontract'=>{de=>'Verkn. Kundenvertrag',en=>'Link Cust. Contract'},

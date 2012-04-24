@@ -48,6 +48,14 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("itts.custcontract.adv",
+                      "TS::appladv",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itts.custcontract.nor",
+                      "TS::applnor",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itts.custcontract.lnkappl",
                       "itil::lnkapplcustcontract",
                       defaultacl=>['admin']);

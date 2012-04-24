@@ -366,6 +366,13 @@ sub getNext
    return(undef);
 }
 
+sub preProcessReadedRecord
+{
+   my $rec=shift;
+
+   return(undef);
+}
+
 sub allowHtmlFullList
 {
    my $self=shift;

@@ -280,6 +280,9 @@ sub extendFieldHeader
    my $mode=shift;
    my $current=shift;
    my $curFieldHeadRef=shift;
+   if (exists($self->{extLabelPostfix}) && $mode ne "Detail"){
+      $$curFieldHeadRef=$self->{extLabelPostfix};
+   }
 #   $$curFieldHeadRef.="x";
 }
 
@@ -678,7 +681,8 @@ sub RawValue
    my $current=shift;
    my $d;
 
-   if (exists($current->{$self->Name()})){
+   if (exists($current->{$self->Name()}) &&
+       !(!defined($current->{$self->Name()}) && $self->{noUndefRawCaching})){
       $d=$current->{$self->Name()};
    }
    elsif (defined($self->{onRawValue}) && ref($self->{onRawValue}) eq "CODE"){
@@ -816,23 +820,7 @@ sub RawValue
       }
    }
    elsif (defined($self->{container})){
-      my $container=$self->getParent->getField($self->{container});
-      if (!defined($container)){ # if the container comes from the parrent
-                                 # DataObj (if i be a SubDataObj)
-         my $parentofparent=$self->getParent->getParent();
-         $container=$parentofparent->getField($self->{container});
-      }
-      my $containerdata=$container->RawValue($current);
-      if (wantarray()){
-         return(@{$containerdata->{$self->Name}});
-      }
-      if (ref($containerdata->{$self->Name}) eq "ARRAY" &&
-          $#{$containerdata->{$self->Name}}<=0){
-         $d=$containerdata->{$self->Name}->[0];
-      }
-      else{
-         $d=$containerdata->{$self->Name};
-      }
+      $d=$self->resolvContainerEntryFromCurrent($current);
    }
    elsif (defined($self->{alias})){
       my $fo=$self->getParent->getField($self->{alias});
@@ -848,6 +836,35 @@ sub RawValue
    }
    $d=$self->{default} if (exists($self->{default}) && (!defined($d) ||
                            $d eq ""));
+   return($d);
+}
+
+sub resolvContainerEntryFromCurrent
+{
+   my $self=shift;
+   my $current=shift;
+   my $d;
+
+   my $container=$self->getParent->getField($self->{container});
+   if (!defined($container)){ # if the container comes from the parrent
+                              # DataObj (if i be a SubDataObj)
+      my $parentofparent=$self->getParent->getParent();
+      $container=$parentofparent->getField($self->{container});
+   }
+   my $containerdata=$container->RawValue($current);
+   if (wantarray()){
+      if (ref($containerdata->{$self->Name}) eq "ARRAY"){
+         return(@{$containerdata->{$self->Name}});
+      }
+      return($containerdata->{$self->Name});
+   }
+   if (ref($containerdata->{$self->Name}) eq "ARRAY" &&
+       $#{$containerdata->{$self->Name}}<=0){
+      $d=$containerdata->{$self->Name}->[0];
+   }
+   else{
+      $d=$containerdata->{$self->Name};
+   }
    return($d);
 }
 
@@ -980,7 +997,7 @@ sub FormatedSearch
          }
          $dispopt=~s/>/&gt;/g;
          $dispopt=~s/</&lt;/g;
-         if ($valopt=~m/\s/){
+         if ($valopt=~m/\s/ && !($valopt=~m/^"/)){
             $valopt="\"$valopt\"";
          }
          $valopt=~s/"/&quot;/g;

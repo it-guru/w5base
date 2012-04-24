@@ -702,7 +702,6 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
-
    foreach my $v (qw(autoname runtimeusername intallusername configdirpath)){ 
       
       if (exists($newrec->{$v})){

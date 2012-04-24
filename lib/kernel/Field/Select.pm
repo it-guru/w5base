@@ -210,6 +210,7 @@ sub preProcessFilter
             $trval=$self->{transprefix}.$trval;
          }
          my $tropt=$self->getParent->T($trval,$fobj->{translation});
+         my $tropt=$val;
          $tr{$tropt}=$key;
       }
       my @newsearch=();
@@ -261,6 +262,7 @@ sub preProcessFilter
                if ($neg){
                   if (grep(/^$chk$/i,keys(%tr))){ # check if neg is translated
                      push(@newsearch,grep(!/^$chk$/i,keys(%tr)));
+                     $changed++;
                   }
                   elsif (grep(/^$chk$/i,keys(%raw))){ # check if neg is on raw
                      push(@newsearch,grep(!/^$chk$/i,keys(%raw)));

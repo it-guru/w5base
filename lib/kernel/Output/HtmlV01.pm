@@ -232,7 +232,8 @@ sub ProcessLine
                $self->{fieldHeaders}->{$fieldname}="";
             }
             $field->extendFieldHeader($self->{WindowMode},$rec,
-                                      \$self->{fieldHeaders}->{$fieldname});
+                                      \$self->{fieldHeaders}->{$fieldname},
+                                      $self->Self);
             $field->extendPageHeader($self->{WindowMode},$rec,
                                      \$self->{fieldsPageHeader});
          }

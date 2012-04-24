@@ -43,7 +43,11 @@ sub FormatedDetail
    my $mode=shift;
    my $name=$self->Name();
    my $d=$self->RawValue($current);
-   $d=join("\n--\n",@{$d}) if (ref($d) eq "ARRAY");
+   my $j="\n--\n";
+   if (exists($self->{vjoinconcat})){
+      $j=$self->{vjoinconcat};
+   }
+   $d=join($j,@{$d}) if (ref($d) eq "ARRAY");
    my $readonly=$self->readonly($current);
    if ($mode eq "HtmlDetail" || 
        (($mode eq "edit" || $mode eq "workflow") && $readonly)){
@@ -159,7 +163,12 @@ sub FormatedResult
    my $current=shift;
    my $FormatAs=shift;
    my $d=$self->RawValue($current);
-   $d=join("\n--\n",@{$d}) if (ref($d) eq "ARRAY");
+   my $j="\n--\n";
+   if (exists($self->{vjoinconcat})){
+      $j=$self->{vjoinconcat};
+   }
+   $d=join($j,@{$d}) if (ref($d) eq "ARRAY");
+   
    if ($FormatAs eq "HtmlV01"){
       if (!$self->{AllowHtmlInput}){
          $d=~s/</&lt;/g;

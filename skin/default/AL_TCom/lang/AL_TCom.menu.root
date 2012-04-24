@@ -3,6 +3,8 @@
 'AL_TCom.custcontract.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.custcontract.lnkappl'=>{de=>'Verkn. Anwendung',en=>'Link Application'},
 'AL_TCom.custcontract.lnkappl.new'=>{de=>'Neueingabe',en=>'New'},
+'AL_TCom.custcontract.adv'=>{de=>'ADV',en=>'ADV'},
+'AL_TCom.custcontract.nor'=>{de=>'NOR-Nachweis',en=>'NOR-Verification'},
 'AL_TCom.appl'=>{de=>'Anwendung',en=>'Application'},
 'AL_TCom.appl.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.appl.lnkcustcontract'=>{de=>'Verkn. Kundenvertrag',en=>'Link Cust. Contract'},
