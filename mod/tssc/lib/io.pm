@@ -839,8 +839,9 @@ sub extractAffectedApplication
          msg(DEBUG,"after systemcheck system=%s",join(",",keys(%system)));
          msg(DEBUG,"after systemcheck systemid=%s",join(",",keys(%systemid)));
          if ($novalidappl){
-            @applid=sort(keys(%applid));
-            @applna=sort(keys(%applna));
+            @primapplid=@applid=sort(keys(%applid));
+            @primapplna=@applna=sort(keys(%applna));
+
             $appl->SetFilter({id=>\@applid}); # reread the application table
             @l=$appl->getHashList(qw(id name custcontracts customer 
                                      businessteam responseteam conumber
