@@ -314,7 +314,7 @@ sub CryptoOut
          # 
          #  Process write operaion
          # 
-         printf STDERR ("%s\n",Dumper(scalar(Query->MultiVars())));
+         #printf STDERR ("%s\n",Dumper(scalar(Query->MultiVars())));
 
          if ($cryptdata ne "" && $id ne ""){
             if ($saveok){
@@ -475,7 +475,7 @@ function do_save()
    document.forms[0].cryptdata.value=enc;
    document.forms[0].submit();
 }
-window.setTimeout("do_unecryptkeys(parent.parent.document.forms[0].password.value);", 500);
+window.setTimeout("do_unecryptkeys(parent.parent.document.forms[0].rsaphrase.value);", 500);
 parent.parent.document.forms[0].activity.value=getClockTime();
 
 </script>
@@ -578,7 +578,7 @@ function CheckPasswordState()
 {
    var work=document.getElementById("TabSelectorModeSelect");
    var info=document.getElementById("RunInfo");
-   if (parent.document.forms[0].password.value.length<5 ||
+   if (parent.document.forms[0].rsaphrase.value.length<5 ||
        parent.returnpressed==false){
       work.style.visibility="hidden";
       info.style.visibility="visible";
@@ -596,7 +596,7 @@ function CheckActivityState()
    var a=parent.document.getElementById("activity");
    var curact=a.value;
    if (curact==oldact){
-      parent.document.forms[0].password.value="";
+      parent.document.forms[0].rsaphrase.value="";
       parent.returnpressed=false;
       if (window.frames['CryptoOut']){
          window.frames['CryptoOut'].document.location.href="CryptoOut";
@@ -962,7 +962,7 @@ textarea.keyinput{
 <script language="JavaScript">
 function check_do_store()
 {
-  if (parent.document.forms[0].password.value!='' &&
+  if (parent.document.forms[0].rsaphrase.value!='' &&
       document.forms[0].plain_n.value!=''){
      document.forms[0].do_store.disabled=false;
   }
@@ -983,7 +983,7 @@ document.getElementsByTagName('body')[0].style.cursor='wait';
 function ProcessKeyUnencrypt()
 {
    if (document.forms[0].verify.value!=""){
-      unecryptkeys(parent.document.forms[0].password.value);
+      unecryptkeys(parent.document.forms[0].rsaphrase.value);
    }
    document.getElementsByTagName('body')[0].style.cursor='default';
    document.getElementById('genrsa').disabled=false;
@@ -1021,7 +1021,7 @@ function do_save()
   f.action="KeyStore";
   f.target="KeyStore";
 
-  var key=parent.document.forms[0].password.value;
+  var key=parent.document.forms[0].rsaphrase.value;
 
   var l=new Array('p','q','d','dmp1','dmq1','coeff','verify');
   for(c=0;c<l.length;c++){
@@ -1076,13 +1076,12 @@ function keyhandler(ev)
 
 function testForEnter() 
 {    
-   if (event){
-	if (event.keyCode == 13) 
-	{        
-		event.cancelBubble = true;
-		event.returnValue = false;
-                window.returnpressed=true;
-        }
+   if (typeof(event)!="undefined"){
+      if (event.keyCode == 13){        
+         event.cancelBubble = true;
+         event.returnValue = false;
+         window.returnpressed=true;
+      }
    }
 } 
 
@@ -1102,10 +1101,14 @@ function RestartWorkspace()
    window.frames['CryptoWorkspace'].document.location.href="Workspace";
    window.frames['CryptoOut'].document.location.href="CryptoOut";
 }
+window.onload=function(){
+   window.document.forms[0].rsaphrase.focus();
+
+}
 </script>
 <table width=100% height=100% border=0>
 <tr height=1%><td width=10% nowrap>$PersonalPassword</td><td>
-<input name=password onkeydown="testForEnter();" onkeypress="inputkeyhandler();" type=password>
+<input name=rsaphrase autocomplete="off" autofill="off" onkeydown="testForEnter();" onkeypress="inputkeyhandler();" type=password>
 <input id=activity disabled name=activity type=hidden value="">
 </td><td align=right>
 <input type=button name=restart value=" $RestartApplication " onClick="RestartWorkspace()"></td></tr>
