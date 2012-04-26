@@ -1,0 +1,20 @@
+{
+   "name": "W5Base/Darwin",
+   "description": "ultimate Business Application",
+   "version": "1.0",
+   "icons": {
+      "128": "128.png"
+   },
+   "app": {
+      "urls": [
+         "https://darwin.telekom.de/darwin/auth/base/menu/msel/MyW5Base"
+      ],
+      "launch": {
+         "web_url": "https://darwin.telekom.de/darwin/auth/base/menu/msel/MyW5Base"
+      }
+   },
+   "permissions": [
+      "unlimitedStorage",
+      "notifications"
+   ]
+}
