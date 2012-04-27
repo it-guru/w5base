@@ -1,0 +1,32 @@
+{
+  "name" : "universal WebDial",
+  "version" : "0.1.0",
+  "description" : "universal extension to use softphone (webdialer)",
+  "background_page" : "background.html",
+  "options_page": "options.html",
+  "page_action" :
+  {
+    "default_icon" : "dhrclickcall-19.png",
+    "default_title" : "Phone numbers were linked on this page"
+  },
+  "content_scripts" : [
+    {
+      "matches" : [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js" : ["jquery-1.4.4.min.js", 
+              "jquery.ba-replacetext.min.js", 
+              "contentscript.js"],
+      "run_at" : "document_idle",
+      "all_frames" : true
+    }
+  ],
+  "icons" : {
+    "128" : "dhrclickcall-128.png"
+  },
+  "permissions" : [
+    "contextMenus",
+    "tabs"
+   ]
+}
