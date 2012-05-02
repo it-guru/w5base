@@ -120,7 +120,7 @@ sub aclToSVNRule
       }
       if ($k eq "grprd"){
          foreach my $grpid (keys(%{$acl->{$k}})){
-            $d.="\@GRP$grpid = rd\n";
+            $d.="\@GRP$grpid = r\n";
          }
       }
       if ($k eq "usrwr"){
@@ -133,7 +133,7 @@ sub aclToSVNRule
       if ($k eq "usrrd"){
          foreach my $usrid (keys(%{$acl->{$k}})){
             foreach my $acc ($self->getAccountsByUserid($usrid)){
-               $d.=$acc." = rd\n";
+               $d.=$acc." = r\n";
             }
          }
       }
