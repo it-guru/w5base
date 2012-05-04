@@ -375,7 +375,7 @@ sub getSqlSelect
       if (defined($self->{DB}->{db}) &&
           lc($self->{DB}->{db}->{Driver}->{Name}) eq "mysql"){
          my $cmd=join(" union ",@cmd);
-         $cmd.=" limit $limitnum" if ($limitnum>0);
+         $cmd.=" limit $limitnum" if ($limitnum>0 && !$self->{_UseSoftLimit});
          return($cmd);
       }
    }
