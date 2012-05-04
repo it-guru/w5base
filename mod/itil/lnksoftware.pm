@@ -69,6 +69,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'version',
                 htmlwidth     =>'50px',
+                group         =>'instdetail',
                 label         =>'Version',
                 dataobjattr   =>'lnksoftwaresystem.version'),
                                                    
@@ -110,13 +111,13 @@ sub new
 
       new kernel::Field::Date(
                 name          =>'instdate',
-                group         =>'misc',
+                group         =>'instdetail',
                 label         =>'Installation date',
                 dataobjattr   =>'lnksoftwaresystem.instdate'),
                                                    
       new kernel::Field::Text(
                 name          =>'instpath',
-                group         =>'misc',
+                group         =>'instdetail',
                 label         =>'Installation path',
                 dataobjattr   =>'lnksoftwaresystem.instpath'),
                                                    
@@ -1016,7 +1017,19 @@ sub isWriteValid
                                                        $rec->{itclustsvcid}));
    $rw=1 if ((!$rw) && ($self->IsMemberOf("admin")));
    if ($rw){
-      return("default","lic","misc","upd");
+      return("default","lic","misc","instdetail","upd");
+   }
+   else{
+      # check if there is an software instance based on this installation
+      my $swi=getModuleObject($self->Config,"itil::swinstance");
+      $swi->SetFilter({lnksoftwaresystemid=>[$rec->{id}],
+                       cistatusid=>"<=5"});
+      foreach my $swirec ($swi->getHashList(qw(ALL))){
+         my @l=$swi->isWriteValid($swirec);
+         if (in_array(\@l,["ALL","default"])){
+            return(qw(instdetail));
+         }
+      }
    }
    return(undef);
 }
@@ -1053,7 +1066,7 @@ sub isParentWriteable  # Eltern Object Schreibzugriff prüfen
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default lic useableby misc link 
+   return(qw(header default instdetail lic useableby misc link 
              releaseinfos softsetvalidation
              upd source));
 }

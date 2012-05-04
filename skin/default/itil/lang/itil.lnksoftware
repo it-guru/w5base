@@ -2,6 +2,7 @@
                       en=>'Softwareinstallation'},
 'fieldgroup.default'=>{de=>'Softwareinstallation',en=>'Softwareinstallation'},
 'fieldgroup.link'=>{de=>'CI-Relationen',en=>'CI-Relations'},
+'fieldgroup.instdetail'=>{de=>'Installationsdetails',en=>'installation details'},
 'fieldgroup.lic'=>{de=>'Lizenzierung der Installation',en=>'licensing of installation'},
 'fieldgroup.useableby'=>{de=>'nutzbar durch',en=>'usable by'},
 'fieldgroup.upd'=>{de=>'Update/Upgrade Möglichkeiten',en=>'Update/Upgrade posibilities'},
