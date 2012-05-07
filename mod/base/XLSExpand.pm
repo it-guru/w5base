@@ -397,6 +397,10 @@ sub ProcessFile
             $outkey{$v}=$h->{out}->{$v}->{label};
          }
       }
+      my $oldstyle=1;
+      if ($Spreadsheet::ParseExcel::VERSION eq "0.57"){
+         $oldstyle=0;
+      }
 
       if (defined($maxrow) && keys(%globalrec)>0){
          my $c=0;
@@ -408,10 +412,21 @@ sub ProcessFile
             $oBook->AddCell($iSheet,$maxrow+2+$c,0,$outkey{$k}.":",0);
             $oBook->AddCell($iSheet,$maxrow+2+$c,1,
                             join("; ",sort(keys(%{$globalrec{$k}}))),0);
-            $sSheet->AddCell(0,$c-1,$outkey{$k},0);
+
+            if ($oldstyle){
+               $oBook->AddCell($sSheet,0,$c-1,$outkey{$k},0);
+            }
+            else{
+               $sSheet->AddCell(0,$c-1,$outkey{$k},0);
+            }
             my $sRow=1;
             foreach my $v (sort(keys(%{$globalrec{$k}}))){
-               $sSheet->AddCell($sRow++,$c-1,$v,0);
+               if ($oldstyle){
+                  $oBook->AddCell($sSheet,$sRow++,$c-1,$v,0);
+               }
+               else{
+                  $sSheet->AddCell($sRow++,$c-1,$v,0);
+               }
             }
             $c++;
          }
