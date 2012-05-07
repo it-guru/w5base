@@ -368,9 +368,9 @@ sub ProcessFile
         if ($haveindata){
            $maxrow=$row;
            #printf STDERR ("==>ourrec=%s\n---\n",Dumper(\%outrec));
-           printf STDERR ("==>in=%s\n---\n",Dumper(\%inrec));
+           #printf STDERR ("==>in=%s\n---\n",Dumper(\%inrec));
            my $res=$self->ProcessLine($row,\%inrec,\%out);
-           printf STDERR ("==>out=%s\n---\n",Dumper(\%out));
+           #printf STDERR ("==>out=%s\n---\n",Dumper(\%out));
            foreach my $kout (keys(%out)){
               if (defined($out{$kout})){
                  my @d=($out{$kout});
