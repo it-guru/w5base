@@ -128,7 +128,8 @@ sub ProcessLine
                         cistatusid=>'4'});
       }
       else{
-         $o->SetFilter({conumber=>\$in->{'finance::costcenter::name'},cistatusid=>'4'});
+         $o->SetFilter({conumber=>\$in->{'finance::costcenter::name'},
+                        cistatusid=>'4'});
       }
       foreach my $orec ($o->getHashList(qw(id))){
          $in->{'itil::appl::id'}->{$orec->{id}}++;
@@ -147,9 +148,16 @@ sub ProcessLine
       foreach my $applrec ($appl->getHashList(qw(id conumber systems))){
          $in->{'itil::appl::id'}->{$applrec->{id}}++;
          if ($applrec->{conumber} ne ""){
-            if (!exists($in->{'finance::costcenter::name'}) ||
-                ref($in->{'finance::costcenter::name'}) eq "HASH"){
-               $in->{'finance::costcenter::name'}->{$applrec->{conumber}}++;
+            if (!exists($in->{'finance::costcenter::id'})){
+               my $o=$self->getParent->getPersistentModuleObject(
+                     'finance::costcenter');
+               $o->SetFilter({name=>\$applrec->{conumber},
+                              cistatusid=>\'4'});
+               my ($corec,$msg)=$o->getOnlyFirst(qw(id));
+               if (defined($corec)){
+                  $in->{'finance::costcenter::id'}->{$corec->{id}}++;
+               }
+               return(0); # input data has been enritched
             }
          }
          if (grep(/^itil::system::.*$/,keys(%{$out}))){
@@ -164,7 +172,8 @@ sub ProcessLine
    }
    if (defined($in->{'itil::system::systemid'})) {
       my $sys=$self->getParent->getPersistentModuleObject('itil::system');
-      $sys->SetFilter({systemid=>\$in->{'itil::system::systemid'},cistatusid=>'4'});
+      $sys->SetFilter({systemid=>\$in->{'itil::system::systemid'},
+                       cistatusid=>'4'});
       foreach my $sysrec ($sys->getHashList(qw(id))){
          $in->{'itil::system::id'}->{$sysrec->{id}}++;
       }

@@ -71,22 +71,42 @@ sub ProcessLine
  
    # output
    foreach my $appsekvar (qw(name delmgr fullname)){
-      if (defined($in->{'finance::costcenter::id'}) && 
-          exists($out->{'finance::costcenter::'.$appsekvar})){
-         my $o=$self->getParent->getPersistentModuleObject('finance::costcenter');
-         my $id=[keys(%{$in->{'finance::costcenter::id'}})];
-         $o->SetFilter({id=>$id});
-         foreach my $rec ($o->getHashList($appsekvar)){
-            if (defined($rec->{$appsekvar})){
-               if (ref($rec->{$appsekvar}) ne "ARRAY"){
-                  $rec->{$appsekvar}=[$rec->{$appsekvar}]; 
-               }
-               foreach my $v (@{$rec->{$appsekvar}}){
-                   if ($v ne ""){
-                      $out->{'finance::costcenter::'.$appsekvar}->{$v}++;
-                   }
-               }
-            } 
+      if (exists($out->{'finance::costcenter::'.$appsekvar})){
+         if (!defined($in->{'finance::costcenter::id'}) &&
+             defined($out->{'finance::costcenter::name'})){
+            my $o=$self->getParent->getPersistentModuleObject(
+                  'finance::costcenter');
+            if (ref($out->{'finance::costcenter::name'}) eq "HASH"){
+               $o->SetFilter({
+                    name=>[keys(%{$out->{'finance::costcenter::name'}})],
+                    cistatusid=>'4'});
+            }
+            else{
+               $o->SetFilter({
+                    name=>\$out->{'finance::costcenter::name'},
+                    cistatusid=>'4'});
+            }
+            foreach my $orec ($o->getHashList(qw(id))){
+               $in->{'finance::costcenter::id'}->{$orec->{id}}++;
+            }
+         }
+         if (defined($in->{'finance::costcenter::id'})){
+            my $o=$self->getParent->getPersistentModuleObject(
+                                                       'finance::costcenter');
+            my $id=[keys(%{$in->{'finance::costcenter::id'}})];
+            $o->SetFilter({id=>$id});
+            foreach my $rec ($o->getHashList($appsekvar)){
+               if (defined($rec->{$appsekvar})){
+                  if (ref($rec->{$appsekvar}) ne "ARRAY"){
+                     $rec->{$appsekvar}=[$rec->{$appsekvar}]; 
+                  }
+                  foreach my $v (@{$rec->{$appsekvar}}){
+                      if ($v ne ""){
+                         $out->{'finance::costcenter::'.$appsekvar}->{$v}++;
+                      }
+                  }
+               } 
+            }
          }
       }
    }

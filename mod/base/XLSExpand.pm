@@ -250,7 +250,7 @@ sub Result
       print $self->HtmlBottom(body=>1);
    }
    my %q=Query->MultiVars();
-   print STDERR (Dumper(\%q));
+   #print STDERR (Dumper(\%q));
 
 }
 
@@ -367,10 +367,10 @@ sub ProcessFile
         }
         if ($haveindata){
            $maxrow=$row;
-           printf STDERR ("==>ourrec=%s\n---\n",Dumper(\%outrec));
-           printf STDERR ("==>in=%s\n---\n",Dumper(\%inrec));
+           #printf STDERR ("==>ourrec=%s\n---\n",Dumper(\%outrec));
+           #printf STDERR ("==>in=%s\n---\n",Dumper(\%inrec));
            my $res=$self->ProcessLine($row,\%inrec,\%out);
-           printf STDERR ("==>out=%s\n---\n",Dumper(\%out));
+           #printf STDERR ("==>out=%s\n---\n",Dumper(\%out));
            foreach my $kout (keys(%out)){
               if (defined($out{$kout})){
                  my @d=($out{$kout});
@@ -408,10 +408,10 @@ sub ProcessFile
             $oBook->AddCell($iSheet,$maxrow+2+$c,0,$outkey{$k}.":",0);
             $oBook->AddCell($iSheet,$maxrow+2+$c,1,
                             join("; ",sort(keys(%{$globalrec{$k}}))),0);
-            $oBook->AddCell($sSheet,0,$c-1,$outkey{$k},0);
+            $sSheet->AddCell(0,$c-1,$outkey{$k},0);
             my $sRow=1;
             foreach my $v (sort(keys(%{$globalrec{$k}}))){
-               $oBook->AddCell($sSheet,$sRow++,$c-1,$v,0);
+               $sSheet->AddCell($sRow++,$c-1,$v,0);
             }
             $c++;
          }
@@ -461,12 +461,12 @@ sub ProcessLine
    while($#proclist!=-1 && $loopcount<10){
       @failproc=();
       foreach my $obj (@proclist){
-         msg(INFO,"ProcessLine for $obj");
+         #msg(INFO,"ProcessLine for $obj");
          my $isprocessed=$obj->ProcessLine($line,$in,$out,$loopcount);
          if (!$isprocessed){
             push(@failproc,$obj);
          }
-         msg(INFO,"ProcessLine for $obj returned $isprocessed");
+         #msg(INFO,"ProcessLine for $obj returned $isprocessed");
       }
       if ($loopcount>1){
          @proclist=@failproc;
