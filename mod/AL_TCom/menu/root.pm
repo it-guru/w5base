@@ -83,11 +83,11 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
-   $self->RegisterObj("AL_TCom.custcontract.adv",
+   $self->RegisterObj("AL_TCom.appl.adv",
                       "TS::appladv",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("AL_TCom.custcontract.nor",
+   $self->RegisterObj("AL_TCom.appl.nor",
                       "TS::applnor",
                       defaultacl=>['valid_user']);
 

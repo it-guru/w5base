@@ -402,6 +402,27 @@ sub new
                 htmleditwidth =>'100px',
                 dataobjattr   =>'appl.criticality'),
 
+      new kernel::Field::Text(
+                name          =>'itnormodel',
+                group         =>'customer',
+                label         =>'NOR Model to use',
+                searchable    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $app=$self->getParent();
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                vjoinon       =>['itnormodelid'=>'id'],
+                vjointo       =>'itil::itnormodel',
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'itnormodelid',
+                group         =>'customer',
+                label         =>'NOR ModelID',
+                dataobjattr   =>'appladv.itnormodel'),
+
       new kernel::Field::Select(
                 name          =>'avgusercount',
                 group         =>'customer',
@@ -1239,7 +1260,8 @@ sub getSqlFrom
    my $selfasparent=$self->SelfAsParentObject();
    my $from="$worktable left outer join lnkcontact ".
             "on lnkcontact.parentobj='$selfasparent' ".
-            "and $worktable.id=lnkcontact.refid";
+            "and $worktable.id=lnkcontact.refid ".
+            "left outer join appladv on (appl.id=appladv.appl and appladv.isactive=1)";
 
    return($from);
 }

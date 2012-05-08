@@ -1302,7 +1302,7 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
 
    my @databossedit=qw(default software admin logsys contacts misc opmode 
-                       physys ipaddresses phonenumbers sec cluster
+                       physys ipaddresses phonenumbers sec cluster autodisc
                        attachments control systemclass interview);
    if (!defined($rec)){
       return("default","physys","admin","misc","cluster",
@@ -1359,6 +1359,7 @@ sub getDetailBlockPriority
              swinstances ipaddresses
              contacts misc attachments control source));
 }
+
 
 
 #############################################################################

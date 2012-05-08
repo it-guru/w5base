@@ -1838,6 +1838,17 @@ sub postUpload
    return(1);
 }
 
+sub prepUploadFilterRecord
+{
+   my $self=shift;
+   my $newrec=shift;
+
+   foreach my $k (keys(%$newrec)){
+      delete($newrec->{$k}) if ($newrec->{$k} eq "-");
+
+   }
+}
+
 sub prepUploadRecord                       # pre processing interface
 {
    my $self=shift;
@@ -1883,7 +1894,11 @@ sub translateUploadFieldnames              # translation interface
    for(my $c=0;$c<=$#flistorg;$c++){
       if (!defined($flistnew[$c])){
          foreach my $fo (@fl){
-            if ($fo->Label eq $flistorg[$c]){
+            my $label=$fo->Label;
+            my $fieldHeader="";
+            $fo->extendFieldHeader("Upload",{},\$fieldHeader,$self->Self);
+            $label.=$fieldHeader;
+            if ($label eq $flistorg[$c]){
                $flistnew[$c]=$fo->Name;
             }
          }
@@ -2065,7 +2080,7 @@ sub Upload
                                    $ptyp=$p if (!defined($ptyp));
                                    $ptyp=~s/\//::/g;
                                    if ($ptyp eq $self->Self()){
-
+                                      $self->prepUploadFilterRecord($prec);
 
                                       my $fldchk=1;
                                       foreach my $fieldname (keys(%$prec)){

@@ -443,6 +443,10 @@ sub getFullFieldTreeSelect
                         sort(keys(%{$app->{SubDataObj}}),
                         sort(keys(%{$app->{InactivSubDataObj}}))));
    foreach my $grp ($app->sortDetailBlocks([keys(%sgrp)])){
+      my $grpentry=$app->getGroup($grp);
+      if (defined($grpentry)){
+         unshift(@{$translation{$grp}},@{$grpentry->{translation}});
+      }
       my $trgrp;
       my @checkedobjs;
       foreach my $fobj (@{$sgrp{$grp}}){

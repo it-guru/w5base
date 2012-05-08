@@ -48,11 +48,11 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("itil.custcontract.adv",
+   $self->RegisterObj("itil.appl.adv",
                       "itil::appladv",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("itil.custcontract.nor",
+   $self->RegisterObj("itil.appl.nor",
                       "itil::applnor",
                       defaultacl=>['valid_user']);
 
@@ -73,10 +73,6 @@ sub Init
                       "itil::appl",
                       func=>'New',
                       defaultacl=>['admin']);
-
-   $self->RegisterObj("itil.appl.nor",
-                      "itil::applnor",
-                      defaultacl=>['valid_user']);
 
    $self->RegisterObj("itil.appl.lnkapplappl",
                       "itil::lnkapplappl",
@@ -401,6 +397,15 @@ sub Init
    
    $self->RegisterObj("itil.kern.storagetype.new",
                       "itil::storagetype",
+                      func=>'New',
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itil.kern.itnormodel",
+                      "itil::itnormodel",
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("itil.kern.itnormodel.new",
+                      "itil::itnormodel",
                       func=>'New',
                       defaultacl=>['admin']);
 

@@ -375,7 +375,6 @@ EOF
                      href=>$fieldlist[$c]->RawValue($rec),
                      target=>'_blank',
                      label=>$fieldlist[$c]->Label()});
-printf STDERR ("fifi =%s\n",$fieldlist[$c]->RawValue($rec));
                   next;
                }
                my $valign=$fieldlist[$c]->valign();
@@ -532,15 +531,24 @@ EOF
    my @blocks=$self->getParent->getParent->sortDetailBlocks([keys(%template)],
                                                             current=>$rec,
                                                             mode=>'HtmlDetail');
-   my @indexdata=$app->getRecordHtmlIndex($rec,$id,$viewgroups,\@blocks,\%grouplabel);
+   my @indexdata=$app->getRecordHtmlIndex($rec,$id,$viewgroups,
+                                          \@blocks,\%grouplabel);
    if ($#indexdataaddon!=-1){
       push(@indexdata,@indexdataaddon);
    }
    if ($#indexdata!=-1){
       my @set;
       my $setno=0;
+      my $indexcols=2; 
       for(my $c=0;$c<=$#indexdata;$c++){
-         $setno++ if ($setno==0 && $c>($#indexdata/2));
+         if (length($indexdata[$c]->{label})>40){
+            $indexcols=1;last;
+         }
+      }
+      for(my $c=0;$c<=$#indexdata;$c++){
+         if ($indexcols==2){
+            $setno++ if ($setno==0 && $c>($#indexdata/2));
+         }
          if (defined($indexdata[$c])){
             my $link="<a class=HtmlDetailIndex ".
                      "href=\"$indexdata[$c]->{href}\"";
@@ -552,24 +560,21 @@ EOF
             $set[$setno].="&bull;&nbsp;$link$indexdata[$c]->{label}</a><br>";
          }
       }
+      my $indexcoldata=""; # long group names special handling
+      for(my $icolnum=0;$icolnum<$indexcols;$icolnum++){
+         $indexcoldata.='<td width=40% valign=top>'.
+                        '<table style="table-layout:fixed;width:100%" '.
+                        'cellspacing=0 cellpadding=0 border=0><tr><td>'.
+                        $set[$icolnum].
+                        '</td></tr></table>'.
+                        '</td>';
+      }
+
       $template{"header"}.=<<EOF;
 <center><div class=HtmlDetailIndex style="text-align:center;width:95%">
 <hr>
 <table style="xtable-layout:fixed;width:98%" border=0 cellspacing=0 cellpadding=0>
-<tr>
-<td width=40% valign=top>
-<table style="table-layout:fixed;width:100%" 
-       cellspacing=0 cellpadding=0 border=0><tr><td>
-$set[0]
-</td></tr></table>
-</td>
-<td width=40% valign=top>
-<table style="table-layout:fixed;width:100%" 
-       cellspacing=0 cellpadding=0 border=0><tr><td>
-<ul>$set[1]</ul>
-</td></tr></table>
-</td>
-</tr>
+<tr>$indexcoldata</tr>
 </table>
 
 <hr>

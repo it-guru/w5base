@@ -28,11 +28,11 @@ sub new
    my %param=@_;
    $param{MainSearchFieldLines}=4;
    $param{Worktable}='appladv';
-   $param{doclabel}='ADV-';
+   $param{doclabel}='-ADV';
    my $self=bless($type->SUPER::new(%param),$type);
 
-   my $ic=$self->getField("iscurrent");
-   $ic->{label}="current ADV";
+   my $ic=$self->getField("isactive");
+   $ic->{label}="active ADV";
    $ic->{translation}='itil::appladv';
 
    my @allmodules=$self->getAllPosibleApplModules();
@@ -44,9 +44,22 @@ sub new
 
 
    $self->AddFields(
+      new kernel::Field::Link(
+                name          =>'databossid',
+                dataobjattr   =>"appl.sem"),
+                insertafter=>'mandator'
+        
+   );
+   $self->AddFields(
+      new kernel::Field::Databoss(
+                uploadable    =>0),
+                insertafter=>'mandator'
+        
+   );
+   $self->AddFields(
       new kernel::Field::Select(
                 name          =>'modules',
-                label         =>'relevant modules',
+                label         =>'Modules',
                 group         =>'advdef',
                 multisize     =>'5',
                 #value         =>$self->{allModules},
@@ -57,14 +70,43 @@ sub new
                 searchable    =>0,
                 onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
                 container     =>"additional"),
+
       new kernel::Field::Select(
                 name          =>'normodelbycustomer',
                 label         =>'customer NOR Model definiton wish',
                 group         =>'nordef',
-                value         =>['S'.'D1','D2','D3','D4','D5','D6'],
+                allowempty    =>1,
+                vjointo       =>'itil::itnormodel',
+                vjoinon       =>['normodelbycustomerid'=>'id'],
+                vjoindisp     =>'name',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                searchable    =>0),
+
+      new kernel::Field::Link(
+                name          =>'normodelbycustomerid',
+                label         =>'customer NOR Model definiton wish ID',
+                group         =>'nordef',
                 searchable    =>0,
                 onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
                 container     =>"additional"),
+
+      new kernel::Field::Select(
+                name          =>'itnormodel',
+                label         =>'NOR Model to use',
+                group         =>'nordef',
+                searchable    =>0,
+                vjoinon       =>['itnormodelid'=>'id'],
+                vjointo       =>'itil::itnormodel',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'itnormodelid',
+                label         =>'NOR Model to use ID',
+                group         =>'nordef',
+                searchable    =>0,
+                dataobjattr   =>"appladv.itnormodel"),
+
       new kernel::Field::Boolean(
                 name          =>'processingpersdata',
                 label         =>'processing of person related data',
@@ -74,7 +116,7 @@ sub new
                 onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
                 container     =>"additional"),
       new kernel::Field::Boolean(
-                name          =>'processingscddata',
+                name          =>'scddata',
                 label         =>'processing of Sensitive Customer Data (SCD)',
                 group         =>'nordef',
                 useNullEmpty  =>1,
@@ -95,6 +137,18 @@ sub new
                    onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
                    container     =>"additional"),
       );
+      if ($module=~m/^MHardware/){
+         $self->AddFields(
+            new kernel::Field::Text(
+                      name          =>$module."LocationCountryRest", 
+                      label         =>"HW Location Country restriction",
+                      group         =>$module,
+                      extLabelPostfix=>": ".$module,
+                      searchable    =>0,
+                      onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
+                      container     =>"additional"),
+         );
+      }
    }
 
 
@@ -108,11 +162,11 @@ sub getAllPosibleApplModules
 
    my @moduletags=qw(
      MAppl                      
+     MSystemOS MHardwareOS
+     MSystemMF MHardwareMF
      MWebSrv 
      MDB 
      MBackupRestore 
-     MSystemOS MHardwareOS
-     MSystemMF MHardwareMF
      MAdmVirtHost
      MAdmVPN
      MAdmNAS
@@ -135,7 +189,7 @@ sub autoFillAutogenField
    my $current=shift;
 
    if ($fld->{name} eq "normodelbycustomer"){
-      return("D6");
+      return("S");
    }
    if ($fld->{name} eq "processingpersdata"){
       return("1");
@@ -148,6 +202,36 @@ sub autoFillAutogenField
    }
    return($self->SUPER::autoFillAutogenField($fld,$current));
 }
+
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $origrec=shift;
+
+   my $c=getModuleObject($self->Config,"base::isocountry");
+   foreach my $k (keys(%$newrec)){
+      if (defined($newrec->{$k}) &&
+          ($k=~m/^.*CountryRest$/)){
+         $newrec->{$k}=uc($newrec->{$k}); 
+         my @l=split(/[,;\s]\s*/,$newrec->{$k});
+         foreach my $lid (@l){
+            $c->ResetFilter();
+            $c->SetFilter({token=>\$lid});
+            if ($c->CountRecords<1){
+               $self->LastMsg(ERROR,"invalid country code");
+               return(0);
+            }
+         }
+         $newrec->{$k}=join(", ",sort(@l));
+      }
+   }
+
+   return($self->SUPER::Validate($oldrec,$newrec,$origrec));
+}
+
 
 
 

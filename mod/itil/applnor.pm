@@ -28,12 +28,26 @@ sub new
    my %param=@_;
    $param{MainSearchFieldLines}=4;
    $param{Worktable}='applnor';
-   $param{doclabel}='NOR-';
+   $param{doclabel}='-NOR';
+   $param{displayall}='1';
    my $self=bless($type->SUPER::new(%param),$type);
 
-   my $ic=$self->getField("iscurrent");
-   $ic->{label}="only current NOR verification";
+   my $ic=$self->getField("isactive");
+   $ic->{label}="active NOR certificate";
    $ic->{translation}='itil::applnor';
+
+#   $self->AddFields(                  # todo - databoss definieren!
+#      new kernel::Field::Link(
+#                name          =>'databossid',
+#                dataobjattr   =>"appl.sem"),
+#                insertafter=>'mandator'
+#
+#   );
+#   $self->AddFields(
+#      new kernel::Field::Databoss(),
+#                insertafter=>'mandator'
+#
+#   );
 
 
    $self->AddFields(
@@ -52,16 +66,25 @@ sub new
                 weblinkto     =>'NONE',
                 vjointo       =>'itil::appladv',
                 vjoinon       =>['advid'=>'id'],
-                vjoindisp     =>'normodelbycustomer'),
+                vjoindisp     =>'itnormodel'),
 
-      new kernel::Field::Text(
+      new kernel::Field::TextDrop(
                 name          =>'modules',
-                label         =>'relevant Modules',
+                label         =>'Modules',
                 readonly      =>'1',
                 weblinkto     =>'NONE',
                 vjointo       =>'itil::appladv',
                 vjoinon       =>['advid'=>'id'],
                 vjoindisp     =>'modules'),
+
+      new kernel::Field::Boolean(
+                name          =>'scddata',
+                label         =>'SCD Datahandling',
+                readonly      =>'1',
+                weblinkto     =>'NONE',
+                vjointo       =>'itil::appladv',
+                vjoinon       =>['advid'=>'id'],
+                vjoindisp     =>'scddata'),
 
       new kernel::Field::Text(
                 name          =>'advid',
@@ -69,18 +92,18 @@ sub new
                 label         =>'linked ADV ID',
                 readonly      =>1,
                 searchable    =>0,
-                onRawValue    =>sub{   # if the record 'iscurrent' then
-                   my $self=shift;     # use the 'iscurrent' ADV - else
+                onRawValue    =>sub{   # if the record 'isactive' then
+                   my $self=shift;     # use the 'isactive' ADV - else
                    my $current=shift;  # use the storedadvid
                    my $app=$self->getParent();
-                   if (!defined($current->{rawiscurrent}) ||
+                   if (!defined($current->{isactive}) ||
                        !defined($current->{dstate}) ||
                        $current->{dstate}==10 ||
-                       $current->{rawiscurrent}==1){
+                       $current->{isactive}==1){
                       if ($current->{srcparentid} ne ""){
                          my $o=getModuleObject($app->Config,"itil::appladv");
                          $o->SetFilter({srcparentid=>\$current->{srcparentid},
-                                        rawiscurrent=>'1 [EMPTY]'});
+                                        isactive=>'1 [EMPTY]'});
                          my ($rec,$msg)=$o->getOnlyFirst(qw(id
                                                             fullname));
                          # you need to select two fields, because selectfix
@@ -138,10 +161,25 @@ sub new
                    searchable    =>0,
                    onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
                    container     =>"additional"),
+
+         new kernel::Field::Boolean(
+                   name          =>$module."isSCDconform", 
+                   label         =>"SCD conform",
+                   group         =>$module,
+                   readonly      =>1,
+                   markempty     =>1,
+                   extLabelPostfix=>": ".$module,
+                   searchable    =>0,
+                   onRawValue    =>sub{
+                       my $self=shift;
+                       return(undef);
+                   }),
+
          new kernel::Field::Text(
                    name          =>$module."DeliveryItemID", 
                    label         =>"Delivery ConfigItem IDs",
                    group         =>$module,
+                   htmldetail    =>$self->{displayall},
                    extLabelPostfix=>": ".$module,
                    searchable    =>0,
                    onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
@@ -150,6 +188,7 @@ sub new
                    name          =>$module."DeliveryGroup", 
                    label         =>"Delivery Groups",
                    group         =>$module,
+                   htmldetail    =>$self->{displayall},
                    extLabelPostfix=>": ".$module,
                    searchable    =>0,
                    onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
@@ -158,6 +197,7 @@ sub new
                    name          =>$module."DeliveryGroupID", 
                    label         =>"Delivery GroupIDs",
                    group         =>$module,
+                   htmldetail    =>$self->{displayall},
                    extLabelPostfix=>": ".$module,
                    searchable    =>0,
                    onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
@@ -166,12 +206,75 @@ sub new
                    name          =>$module."DeliveryContactID", 
                    label         =>"Delivery Contacts",
                    group         =>$module,
+                   htmldetail    =>$self->{displayall},
                    extLabelPostfix=>": ".$module,
                    searchable    =>0,
                    onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
                    container     =>"additional"),
+         new kernel::Field::Text(
+                   name          =>$module."ADVCountryRest", 
+                   label         =>"ADV Country restrictions",
+                   group         =>$module,
+                   htmldetail    =>$self->{displayall},
+                   extLabelPostfix=>": ".$module,
+                   readonly      =>1,
+                   weblinkto     =>'NONE',
+                   vjointo       =>'itil::appladv',
+                   vjoinon       =>['advid'=>'id'],
+                   vjoindisp     =>$module."CountryRest"),
+
+         new kernel::Field::Boolean(
+                   name          =>$module."isCompliant", 
+                   label         =>"valid against ADV country restrictions",
+                   group         =>$module,
+                   extLabelPostfix=>": ".$module,
+                   markempty     =>1,
+                   depend        =>[$module."ADVCountryRest"],
+                   searchable    =>0,
+                   readonly      =>1,
+                   onRawValue    =>sub{
+                       my $self=shift;
+                       my $current=shift;
+                       my $cur=$current->{$self->{group}."DeliveryCountries"};
+                       my $sol=$current->{$self->{group}."ADVCountryRest"};
+                       return(1) if ($sol eq "");
+                       $cur=[split(/[;,]\s*/,uc($cur))] if (!ref($cur));
+                       $sol=[split(/[;,]\s*/,uc($sol))] if (!ref($sol));
+                       foreach my $chk (@$cur){
+                          if (!in_array($chk,@$sol)){
+                             return(0);
+                          }
+                       }
+                       return(1);
+                   }),
+
       );
    }
+
+   $self->AddFields(
+      new kernel::Field::Boolean(
+                name          =>"SUMMARYisSCDconform", 
+                label         =>"total SCD conform",
+                group         =>"summary",
+                readonly      =>1,
+                searchable    =>0,
+                onRawValue    =>sub{
+                    my $self=shift;
+                    return(undef);
+                }),
+
+      new kernel::Field::Boolean(
+                name          =>"SUMMARYisCompliant", 
+                label         =>"total valid against ADV",
+                group         =>"summary",
+                searchable    =>0,
+                readonly      =>1,
+                onRawValue    =>sub{
+                    my $self=shift;
+                    return(0);
+                })
+   );
+
 
    return($self);
 }
@@ -198,7 +301,7 @@ sub isViewValid
 
    my @modules=split(/,\s/,$rec->{modules});
    @modules=@{$modules[0]} if (ref($modules[0]) eq "ARRAY");
-   push(@l,"nordef","advdef",@modules);
+   push(@l,"nordef","advdef","summary",@modules);
    return(@l);
 }
 
@@ -251,6 +354,35 @@ sub autoFillAutogenField
              [keys(%systemid)], $current->{srcparentid}]);
       }
    }
+   elsif (
+          $fld->{name} eq "MWebSrvDeliveryGroup" || 
+          $fld->{name} eq "MWebSrvDeliveryItemID" ||
+          $fld->{name} eq "MWebSrvDeliveryGroupID" ||
+          $fld->{name} eq "MDBDeliveryGroup" || 
+          $fld->{name} eq "MDBDeliveryItemID" ||
+          $fld->{name} eq "MDBDeliveryGroupID"
+         ){
+      my $swnature="NIX";
+      if ($fld->{group} eq "MWebSrv"){
+         $swnature='apache iis';
+      }
+      if ($fld->{group} eq "MDB"){
+         $swnature='mysql mssql "Oracle DB Server"';
+      }
+      my $o=getModuleObject($self->Config,"itil::swinstance");
+      $o->SetFilter({applid=>\$current->{srcparentid},
+                     swnature=>$swnature,
+                     cistatusid=>"<=5"});
+      foreach my $rec ($o->getHashList(qw(id swteam swteamid))){
+         $self->autoFillAddResultCache(
+            [$fld->{group}."DeliveryGroupID",
+             $rec->{swteamid},$current->{srcparentid}],
+            [$fld->{group}."DeliveryGroup",
+             $rec->{swteam}, $current->{srcparentid}],
+            [$fld->{group}."DeliveryItemID",
+             $rec->{id}, $current->{srcparentid}]);
+      }
+   }
    elsif ($fld->{name} eq "MSystemOSDeliveryGroupID" ||
           $fld->{name} eq "MSystemOSDeliveryGroup"){
       my $gfld=$self->getField("MApplDeliveryGroup",$current);
@@ -296,16 +428,16 @@ sub autoFillAutogenField
       if (defined($refid)){
          $refid=[$refid] if (!ref($refid));
          my $o=getModuleObject($self->Config,"base::grp");
-         $o->SetFilter({grpid=>$refid});
-         my ($rec,$msg)=$o->getOnlyFirst("users");
+         $o->SetFilter({grpid=>$refid,
+                        cistatusid=>"<=5"});
          my @uidlist=();
-         if (defined($rec)){
+         foreach my $rec ($o->getHashList("users")){
             foreach my $urec (@{$rec->{users}}){
                if ($urec->{usertyp} eq "user" ||
                    $urec->{usertyp} eq "extern"){
                   push(@uidlist,$urec->{userid});
                }
-            };
+            }
          }
          $self->autoFillAddResultCache([$fld->{name},
                                         \@uidlist,
@@ -322,20 +454,7 @@ sub autoFillAutogenField
             my $CacheKey="DeliveryContactAddr-".$uid;
             my $r=$self->autoFillGetResultCache($CacheKey);
             if (!defined($r)){
-               if ($uid=~m/^\d{10,20}$/){
-                  my $o=getModuleObject($self->Config,"base::user");
-                  ($rec,$msg)=$o->getOnlyFirst({userid=>\$uid},
-                                                qw(office_zipcode
-                                                   office_location
-                                                   office_street));
-               }
-               elsif ($uid=~m/^\S{5,8}$/){
-                  my $o=getModuleObject($self->Config,"base::user");
-                  ($rec,$msg)=$o->getOnlyFirst({posix=>\$uid},
-                                                qw(office_zipcode
-                                                   office_location
-                                                   office_street));
-               }
+               my $rec=$self->resolvUserID($uid);
                if (defined($rec)){
                   $adr=$rec->{office_zipcode};
                   if ($rec->{office_location} ne ""){
@@ -347,7 +466,7 @@ sub autoFillAutogenField
                      $adr.=$rec->{office_street};
                   }
                }
-               $adr="unknown/invalid address" if ($adr eq "");
+               $adr="unknown/invalid address at '$uid'" if ($adr eq "");
                $self->autoFillAddResultCache([$CacheKey,$adr]);
                $r=$self->autoFillGetResultCache($CacheKey);
             }
@@ -359,32 +478,30 @@ sub autoFillAutogenField
              [keys(%uadr)], $current->{srcparentid}]);
       }
    }
-   elsif ($fld->{name}=~m/^.*DeliveryOrgs$/){
-      my $gfld=$self->getField("MApplDeliveryGroup",$current);
-      my $ref=$gfld->RawValue($current);
-      my $org="Other/Unknown";
-      my @org=();
-      foreach my $r (@$ref){
-         if ($r=~m/^DTAG\.TSI($|\..*)/){
-            push(@org,"T-Systems GmbH");
-         }
-         elsif ($ref=~m/^DTAG\.TDG($|\..*)/){
-            push(@org,"T-Deutschland");
-         }
-         else{
-            push(@org,"Other/Unknown");
-         }
-      }
-      $self->autoFillAddResultCache(
-         [$fld->{name},
-          \@org, $current->{srcparentid}]);
-   }
-   elsif ($fld->{name}=~m/^.*DeliveryCountries$/){
-      $self->autoFillAddResultCache(
-         [$fld->{name},
-          "?",$current->{srcparentid}]);
-   }
    return($self->SUPER::autoFillAutogenField($fld,$current));
+}
+
+sub resolvUserID
+{
+   my $self=shift;
+   my $uid=shift;
+
+   my ($rec,$msg);
+   if ($uid=~m/^\d{10,20}$/){
+      my $o=getModuleObject($self->Config,"base::user");
+      ($rec,$msg)=$o->getOnlyFirst({userid=>\$uid},
+                                    qw(office_zipcode
+                                       office_location
+                                       office_street));
+   }
+   elsif ($uid=~m/^\S{3,8}$/){
+      my $o=getModuleObject($self->Config,"base::user");
+      ($rec,$msg)=$o->getOnlyFirst({posix=>\$uid},
+                                    qw(office_zipcode
+                                       office_location
+                                       office_street));
+   }
+   return($rec);
 }
 
 
@@ -392,7 +509,7 @@ sub autoFillAutogenField
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default ),@{$self->{allModules}},qw(source));
+   return(qw(header default ),@{$self->{allModules}},qw(summary source));
 }
 
 

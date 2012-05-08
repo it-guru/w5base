@@ -60,7 +60,10 @@ sub new
       new kernel::Field::Text(
                 name          =>'name',
                 readonly      =>1,
+                uploadable    =>1,
                 label         =>'Applicationname',
+                weblinkto     =>'itil::appl',
+                weblinkon     =>['srcparentid'=>'id'],
                 dataobjattr   =>'appl.name'),
 
       new kernel::Field::Select(
@@ -79,21 +82,21 @@ sub new
                 dataobjattr   =>"$worktable.dstate"),
                                                   
       new kernel::Field::Boolean(
-                name          =>'iscurrent',
+                name          =>'isactive',
                 selectfix     =>1,
                 htmldetail    =>0,
                 readonly      =>1,
-                selectsearch  =>[['"1" [LEER]',$self->T('yes - show only current')],
+                selectsearch  =>[['"1" [LEER]',$self->T('yes - show only active')],
                                  ['',$self->T('no - show all')]],
-                label         =>'is current',
-                dataobjattr   =>"$worktable.iscurrent"),
+                label         =>'is active',
+                dataobjattr   =>"$worktable.isactive"),
                                                   
       new kernel::Field::Interface(
-                name          =>'rawiscurrent',
+                name          =>'rawisactive',
                 selectfix     =>1,
                 readonly      =>1,
-                label         =>'raw is current',
-                dataobjattr   =>"$worktable.iscurrent"),
+                label         =>'raw is active',
+                dataobjattr   =>"$worktable.isactive"),
                                                   
       new kernel::Field::Select(
                 name          =>'cistatus',
@@ -204,16 +207,16 @@ sub new
                 htmldetail    =>0,
                 label         =>'Documentname',
                 dataobjattr   =>
-                   "if ($worktable.dstate is null or $worktable.dstate<=10,".
-                   "concat('$doclabel',appl.name,'-',substr(now(),1,7)),".
-                   "concat('$doclabel',appl.name,'-',".
-                           "substr($worktable.docdate,1,7)))"),
+               "if ($worktable.dstate is null or $worktable.dstate<=10,".
+               "concat(appl.name,'$doclabel','-',substr(now(),1,7),'-(AUTO)'),".
+               "concat(appl.name,'$doclabel','-',".
+                       "substr($worktable.docdate,1,7)))"),
 
    );
-   my $fo=$self->getField("iscurrent");
+   my $fo=$self->getField("isactive");
    delete($fo->{default});
    $self->{use_distinct}=1;
-   $self->setDefaultView(qw(fullname cistatus mandator dstate editor mdate));
+   $self->setDefaultView(qw(fullname cistatus mandator dstate isactive editor mdate));
    return($self);
 }
 
@@ -257,10 +260,10 @@ sub autoFillAddResultCache
       $C->{$name}={} if (!exists($C->{$name}));
      
       if (ref($val) eq "ARRAY"){
-         map({$C->{$name}->{$_}++} @$val);
+         map({$C->{$name}->{$_}++} grep(!/^\s*$/,@$val));
       }
       else{
-         $C->{$name}->{$val}++;
+         $C->{$name}->{$val}++ if ($val ne "");
       }
    }
 }
@@ -306,7 +309,7 @@ sub preProcessReadedRecord
    if (!defined($rec->{id}) && $rec->{srcparentid} ne ""){
       my $o=$self->Clone();
       my ($id)=$o->ValidatedInsertRecord({parentid=>$rec->{srcparentid},
-                                          iscurrent=>1});
+                                          isactive=>1});
       $rec->{id}=$id;
    }
    return(undef);
@@ -349,6 +352,10 @@ sub initSearchQuery
      Query->Param("search_cistatus"=>
                   "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
    }
+   if (!defined(Query->Param("search_mandator"))){
+     Query->Param("search_mandator"=>
+                  "!Extern");
+   }
 }
 
 
@@ -379,7 +386,7 @@ sub Validate
 
    if (defined($oldrec)){
       $newrec->{dstate}=20;
-      $newrec->{iscurrent}=1;
+      $newrec->{isactive}=1;
       if ($oldrec->{dstate} eq "10"){  # ensure that ALL default values will
          my ($worktable,$workdb)=$self->getWorktable(); # be written!
          my @fieldlist=$self->getFieldObjsByView([qw(ALL)],
@@ -444,7 +451,7 @@ sub FinishWrite
       if ($oldrec->{dstate} eq "10" && $newrec->{dstate} eq "20"){
          my $o=$self->Clone();
          $o->UpdateRecord({dstate=>30,
-                           iscurrent=>0},{parentid=>$oldrec->{parentid},
+                           isactive=>0},{parentid=>$oldrec->{parentid},
                                           dstateid=>"!30",
                                           id=>"!$oldrec->{id}"});
          $o->ValidatedInsertRecord({parentid=>$oldrec->{parentid}});
@@ -452,16 +459,28 @@ sub FinishWrite
    }
    if ($newrec->{dstate} eq "20"){
       my $o=$self->Clone();
-      $o->UpdateRecord({iscurrent=>0},{parentid=>$oldrec->{parentid},
+      $o->UpdateRecord({isactive=>0},{parentid=>$oldrec->{parentid},
                                        id=>"!$oldrec->{id}"});
    }
    if ($newrec->{dstate} eq "30"){
       my $o=$self->Clone();
-      $o->UpdateRecord({iscurrent=>1},{parentid=>$oldrec->{parentid},
+      $o->UpdateRecord({isactive=>1},{parentid=>$oldrec->{parentid},
                                        dstateid=>\'10'});
    }
    return($bak);
 }
+
+
+sub prepUploadFilterRecord
+{
+   my $self=shift;
+   my $newrec=shift;
+
+   delete($newrec->{name});
+   $self->SUPER::prepUploadFilterRecord($newrec);
+}
+
+
 
 
 

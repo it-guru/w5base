@@ -991,9 +991,9 @@ add autodisc_srcid varchar(20) default NULL, add autodisc_modifyuser bigint(20) 
 add autodisc_editor varchar(100) default NULL, add autodisc_realeditor varchar(100) default NULL;
 create table appladv (
   id           bigint(20) NOT NULL,
-  appl         bigint(20) NOT NULL,
+  appl         bigint(20) NOT NULL,itnormodel bigint(20) default '0',
   dstate       int(1) default '10',
-  iscurrent    int(1) default NULL,
+  isactive     int(1) default NULL,
   docdate      char(7) default NULL,
   comments     longtext default NULL,
   additional   longtext default NULL,
@@ -1013,7 +1013,7 @@ create table applnor (
   id           bigint(20) NOT NULL,
   appl         bigint(20) NOT NULL,
   dstate       int(1) default '10',
-  iscurrent    int(1) default NULL,
+  isactive     int(1) default NULL,
   docdate      char(7) default NULL,
   comments     longtext default NULL,
   additional   longtext default NULL,
@@ -1029,3 +1029,21 @@ create table applnor (
               REFERENCES appl (id) ON DELETE CASCADE,
   UNIQUE KEY `srcsys` (srcsys,srcid)
 )  ENGINE=InnoDB DEFAULT CHARSET=latin1;
+create table itnormodel (
+  id           bigint(20) NOT NULL,
+  name         char(5) NOT NULL,cistatus int(2)  NOT NULL,
+  fullname     varchar(40) not NULL,
+  comments     longtext default NULL,
+  modifydate   datetime NOT NULL default '0000-00-00 00:00:00',
+  modifyuser   bigint(20) default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) NOT NULL default '0',
+  editor       varchar(100) NOT NULL default '',
+  realeditor   varchar(100) NOT NULL default '',
+  srcsys       varchar(100) default 'w5base',
+  srcid        varchar(20) default NULL,
+  srcload      datetime    default NULL,
+  PRIMARY KEY  (id),key(name),
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+)  ENGINE=InnoDB DEFAULT CHARSET=latin1;
+insert into itnormodel (id,name,cistatus,fullname) values(0,'S',4,'S - Standard');

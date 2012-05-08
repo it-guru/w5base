@@ -34,9 +34,10 @@ sub new
       if (in_array([qw(MSystemOS MHardwareOS)],$module)){
          $self->AddFields(
             new kernel::Field::Text(
-               name          =>$module."AMassignments",
-               label         =>"AssetManager Assignments",
+               name          =>$module."SCassignments",
+               label         =>"AssetManager iAssignments",
                group         =>$module,
+               htmldetail    =>$self->{displayall},
                extLabelPostfix=>": ".$module,
                searchable    =>0,
                onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
@@ -45,6 +46,7 @@ sub new
                name          =>$module."AMPortfolioIDs",
                label         =>"AssetManager PortfolioIDs",
                group         =>$module,
+               htmldetail    =>$self->{displayall},
                extLabelPostfix=>": ".$module,
                searchable    =>0,
                onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
@@ -71,14 +73,14 @@ sub autoFillAutogenField
    if ($fld->{name} eq "MSystemOSDeliveryContactID" ||
        $fld->{name} eq "MHardwareOSDeliveryContactID"){
       my %pid=();
-      my $gfld=$self->getField($fld->{group}."AMassignments",$current);
+      my $gfld=$self->getField($fld->{group}."SCassignments",$current);
       my $refid=$gfld->RawValue($current);
       if (defined($refid) && $#{$refid}>=0){
-         my $o=getModuleObject($self->Config,"tsacinv::group");
+         my $o=getModuleObject($self->Config,"tssc::group");
          $o->SetFilter({name=>$refid});
          foreach my $r ($o->getHashList(qw(users))){
             foreach my $urec (@{$r->{users}}){
-               $pid{$urec->{user}}++ if ($urec->{user} ne "");
+               $pid{uc($urec->{luser})}++ if ($urec->{luser} ne "");
             }
          };
          $self->autoFillAddResultCache([$fld->{name},
@@ -86,30 +88,30 @@ sub autoFillAutogenField
                                         $current->{srcparentid}]);
       }
    }
-   elsif ($fld->{name} eq "MSystemOSAMassignments"){
+   elsif ($fld->{name} eq "MSystemOSSCassignments"){
       my %pid=();
       my $gfld=$self->getField("MSystemOSAMPortfolioIDs",$current);
       my $refid=$gfld->RawValue($current);
       if (defined($refid) && $#{$refid}>=0){
          my $o=getModuleObject($self->Config,"tsacinv::system");
          $o->SetFilter({systemid=>$refid});
-         foreach my $r ($o->getHashList(qw(assignmentgroup))){
-            $pid{$r->{assignmentgroup}}++ if ($r->{assignmentgroup} ne "");
+         foreach my $r ($o->getHashList(qw(iassignmentgroup))){
+            $pid{$r->{iassignmentgroup}}++ if ($r->{iassignmentgroup} ne "");
          };
          $self->autoFillAddResultCache([$fld->{name},
                                         [keys(%pid)],
                                         $current->{srcparentid}]);
       }
    }
-   elsif ($fld->{name} eq "MHardwareOSAMassignments"){
+   elsif ($fld->{name} eq "MHardwareOSSCassignments"){
       my %pid=();
       my $gfld=$self->getField("MHardwareOSAMPortfolioIDs",$current);
       my $refid=$gfld->RawValue($current);
       if (defined($refid) && $#{$refid}>=0){
          my $o=getModuleObject($self->Config,"tsacinv::asset");
          $o->SetFilter({assetid=>$refid});
-         foreach my $r ($o->getHashList(qw(assignmentgroup))){
-            $pid{$r->{assignmentgroup}}++ if ($r->{assignmentgroup} ne "");
+         foreach my $r ($o->getHashList(qw(iassignmentgroup))){
+            $pid{$r->{iassignmentgroup}}++ if ($r->{iassignmentgroup} ne "");
          };
          $self->autoFillAddResultCache([$fld->{name},
                                         [keys(%pid)],
@@ -142,7 +144,94 @@ sub autoFillAutogenField
                                         $current->{srcparentid}]);
       }
    }
+   elsif (my ($grp)=$fld->{name}=~m/^(.*)DeliveryOrgs$/){ # temp hack
+      my $gfld=$self->getField($grp."DeliveryGroup",$current);
+      my $ref=$gfld->RawValue($current);
+      my @org=();
+      foreach my $r (@$ref){
+         if ($r=~m/.*\.SK$/){
+            push(@org,"T-Systems Slovakia s.r.o");
+         }
+         elsif ($r=~m/.*\.HU$/){
+            push(@org,"IT Services Hungary");
+         }
+         elsif ($r=~m/^DTAG\.TSI($|\..*)/){
+            push(@org,"T-Systems International GmbH");
+         }
+         elsif ($ref=~m/^DTAG\.TDG($|\..*)/){
+            push(@org,"T-Deutschland");
+         }
+         else{
+            push(@org,"Other/Unknown");
+         }
+      }
+      $self->autoFillAddResultCache(
+         [$fld->{name},
+          \@org, $current->{srcparentid}]);
+   }
+   elsif (my ($grp)=$fld->{name}=~m/^(.*)DeliveryCountries$/){ # temp hack
+      my @country=();
+      my $gfld=$self->getField($grp."DeliveryGroup",$current);
+      my $ref=$gfld->RawValue($current);
+      foreach my $r (@$ref){
+         if (($r=~m/.*\.SK$/)){
+            push(@country,"SK");
+         }
+         elsif (($r=~m/.*\.HU$/)){
+            push(@country,"HU");
+         }
+         elsif (($r=~m/.*\.CZ$/)){
+            push(@country,"CZ");
+         }
+         else{
+            push(@country,"DE");
+         }
+      }
+      my $gfld=$self->getField($grp."SCassignments",$current);
+      if (defined($gfld)){
+         my $ref=$gfld->RawValue($current);
+         foreach my $r (@$ref){
+            if (($r=~m/^\S+\.\S+\.SK\..*/)){
+               push(@country,"SK");
+            }
+            elsif (($r=~m/^\S+\.\S+\.HU\..*/)){
+               push(@country,"HU");
+            }
+            elsif (($r=~m/^\S+\.\S+\.CZ\..*/)){
+               push(@country,"CZ");
+            }
+            else{
+               push(@country,"DE");
+            }
+         }
+      }
+      $self->autoFillAddResultCache(
+         [$fld->{name},
+          \@country,$current->{srcparentid}]);
+   }
    return($self->SUPER::autoFillAutogenField($fld,$current));
+}
+
+
+sub resolvUserID
+{
+   my $self=shift;
+   my $uid=shift;
+
+   my $rec=$self->SUPER::resolvUserID($uid);
+   if (!defined($rec) && (!$uid=~m/(\s|^\s*$)/)){
+      my $wiw=getModuleObject($self->Config,"tswiw::user");
+      $wiw->SetFilter({uid=>\$uid});
+      my ($wiwrec,$msg)=$wiw->getOnlyFirst(qw(office_zipcode office_location 
+                                              office_street));
+      if (defined($wiwrec)){
+         return($wiwrec);
+      }
+      else{
+         return({office_location=>'invalid who is who user entry '.$uid});
+      }
+   }
+   return($rec);
 }
 
 
