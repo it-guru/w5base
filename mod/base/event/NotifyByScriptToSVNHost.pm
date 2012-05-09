@@ -50,56 +50,60 @@ sub NotifyByScriptToSVNHost
 
    return({exitcode=>1,msg=>'no mod specified'}) if ($mod eq "");
 
+
    my $NotifyByScript=$self->Config->Param("NotifyByScript");
    $NotifyByScript=$NotifyByScript->{$mod} if (ref($NotifyByScript) eq "HASH");
    return({exitcode=>0,msg=>'no script specified'}) if ($NotifyByScript eq "");
 
-   if (open(CMD,"|$NotifyByScript")){
-      my $pr=getModuleObject($self->Config,"base::projectroom");
-     
-      $pr->SetFilter({id=>\$param{id}});
-      my %grplist;
-      foreach my $prrec ($pr->getHashList(qw(id name contacts))){
-         my %acl;
-         foreach my $c (@{$prrec->{contacts}}){
-            if ($c->{target} eq "base::user"){
-               if (in_array($c->{roles},"SVNread")){
-                  $acl{usrrd}->{$c->{targetid}}++;
+   my $pr=getModuleObject($self->Config,"base::projectroom");
+   $pr->SetFilter({id=>\$param{id}});
+   my @prlist=$pr->getHashList(qw(id name contacts));
+
+   if ($#prlist!=-1){
+      if (open(CMD,"|$NotifyByScript")){
+         my %grplist;
+         foreach my $prrec (@prlist){
+            my %acl;
+            foreach my $c (@{$prrec->{contacts}}){
+               if ($c->{target} eq "base::user"){
+                  if (in_array($c->{roles},"SVNread")){
+                     $acl{usrrd}->{$c->{targetid}}++;
+                  }
+                  if (in_array($c->{roles},"SVNwrite")){
+                     $acl{usrwr}->{$c->{targetid}}++;
+                  }
                }
-               if (in_array($c->{roles},"SVNwrite")){
-                  $acl{usrwr}->{$c->{targetid}}++;
+               if ($c->{target} eq "base::grp"){
+                  if (in_array($c->{roles},"SVNread")){
+                     $acl{grprd}->{$c->{targetid}}++;
+                     $grplist{$c->{targetid}}=[];
+                  }
+                  if (in_array($c->{roles},"SVNwrite")){
+                     $acl{grpwr}->{$c->{targetid}}++;
+                     $grplist{$c->{targetid}}=[];
+                  }
                }
             }
-            if ($c->{target} eq "base::grp"){
-               if (in_array($c->{roles},"SVNread")){
-                  $acl{grprd}->{$c->{targetid}}++;
-                  $grplist{$c->{targetid}}=[];
-               }
-               if (in_array($c->{roles},"SVNwrite")){
-                  $acl{grpwr}->{$c->{targetid}}++;
-                  $grplist{$c->{targetid}}=[];
-               }
-            }
+            printf CMD ("BEGIN: projectroom $prrec->{id} $prrec->{name}\n");
+            printf CMD ("[%s:/]\n",$prrec->{id});
+            printf CMD ("%s\n",$self->aclToSVNRule(\%acl));
+            printf CMD ("[%s:/]\n",$prrec->{name});
+            printf CMD ("%s\n",$self->aclToSVNRule(\%acl));
+            printf CMD ("END: projectroom\n");
          }
-         printf CMD ("BEGIN: projectroom $prrec->{id} $prrec->{name}\n");
-         printf CMD ("[%s:/]\n",$prrec->{id});
-         printf CMD ("%s\n",$self->aclToSVNRule(\%acl));
-         printf CMD ("[%s:/]\n",$prrec->{name});
-         printf CMD ("%s\n",$self->aclToSVNRule(\%acl));
-         printf CMD ("END: projectroom\n");
-      }
-      if (keys(%grplist)){ 
          printf CMD ("\nBEGIN: groups\n");
-         foreach my $grpid (keys(%grplist)){
-            printf CMD ("GRP$grpid = %s\n",
-                        join(", ",$self->getGroupMemberAccounts($grpid)));
+         if (keys(%grplist)){ 
+            foreach my $grpid (keys(%grplist)){
+               printf CMD ("GRP$grpid = %s\n",
+                           join(", ",$self->getGroupMemberAccounts($grpid)));
+            }
          }
-         printf CMD ("END: groups\n");
+         printf CMD ("END: groups\n\n");
+         close(CMD);
       }
-      close(CMD);
-   }
-   else{
-      return({exitcode=>1,msg=>'fail to run '.$NotifyByScript});
+      else{
+         return({exitcode=>1,msg=>'fail to run '.$NotifyByScript});
+      }
    }
 
    return({exitcode=>0,msg=>'ok'});
