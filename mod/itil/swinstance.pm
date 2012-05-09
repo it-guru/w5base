@@ -378,6 +378,13 @@ sub new
                 label         =>'Customer cost allocation',
                 group         =>'misc',
                 dataobjattr   =>'swinstance.custcostalloc'),
+      
+      new kernel::Field::Boolean(
+                name          =>'autogendiary',
+                label         =>'automatic generation of diaries',
+                group         =>'control',
+                dataobjattr   =>'swinstance.autogendiary'),
+
 
       new kernel::Field::Boolean(
                 name          =>'runonclusts',
@@ -878,7 +885,7 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   my @all=qw(header default adm sec ssl misc env history
+   my @all=qw(header default adm sec ssl misc env history control
               softwareinst contacts attachments source swinstanceparam);
    if (defined($rec) && $rec->{'runonclusts'}){
       push(@all,"cluster");
@@ -901,7 +908,7 @@ sub isWriteValid
 
    my @databossedit=qw(default adm systems contacts ssl env misc 
                        softwareinst
-                       attachments cluster sec);
+                       attachments cluster control sec);
    if (!defined($rec)){
       return(@databossedit);
    }
@@ -951,7 +958,7 @@ sub getDetailBlockPriority
    my $self=shift;
    return(qw(header default adm sec env misc cluster 
              systems softwareinst contacts swinstanceparam ssl 
-             attachments source));
+             control attachments source));
 }
 
 

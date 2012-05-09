@@ -50,7 +50,7 @@ sub mkP800swi
    my ($year,$month,$day, $hour,$min,$sec) = Today_and_Now("GMT");
    my $start=sprintf("%02d/%04d",$month,$year);
    $sw->ResetFilter();
-   $sw->SetFilter({custcostalloc=>1,cistatusid=>4});
+   $sw->SetFilter({autogendiary=>1,cistatusid=>4});
    #$sw->SetFilter({fullname=>'adslnidb.Oracle.primary.1521.u8nc0'}); for debugging
 
    $sw->SetCurrentView("fullname","appl","applid","id","servicesupportid",
@@ -60,6 +60,7 @@ sub mkP800swi
    if (defined($rec)){
       do{
          my $ssrec;
+         printf("TEST1 %s\n", Dumper($rec));
          if ($rec->{servicesupportid} ne ""){
             $ss->ResetFilter();
             $ss->SetFilter({id=>\$rec->{servicesupportid},cistatusid=>'<=4'});
