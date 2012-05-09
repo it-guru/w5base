@@ -31,6 +31,20 @@ sub new
 
 
    foreach my $module (@{$self->{allModules}}){
+      if (in_array([qw(MSystemOS MSystemMF)],$module)){
+         $self->AddFields(
+            new kernel::Field::Text(
+               name          =>$module."AMSecurityFlag",
+               label         =>"AssetManager SecurityFlag",
+               group         =>$module,
+               htmldetail    =>$self->{displayall},
+               extLabelPostfix=>": ".$module,
+               searchable    =>0,
+               onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
+               container     =>"additional"),
+         );
+
+      }
       if (in_array([qw(MSystemOS MHardwareOS)],$module)){
          $self->AddFields(
             new kernel::Field::Text(
@@ -88,18 +102,24 @@ sub autoFillAutogenField
                                         $current->{srcparentid}]);
       }
    }
-   elsif ($fld->{name} eq "MSystemOSSCassignments"){
+   elsif (($fld->{name}=~m/^MSystem.*SCassignments$/) ||
+          ($fld->{name}=~m/^MSystem.*AMSecurityFlag$/)){
       my %pid=();
+      my %secmod=();
       my $gfld=$self->getField("MSystemOSAMPortfolioIDs",$current);
       my $refid=$gfld->RawValue($current);
       if (defined($refid) && $#{$refid}>=0){
          my $o=getModuleObject($self->Config,"tsacinv::system");
          $o->SetFilter({systemid=>$refid});
-         foreach my $r ($o->getHashList(qw(iassignmentgroup))){
+         foreach my $r ($o->getHashList(qw(iassignmentgroup securitymodel))){
             $pid{$r->{iassignmentgroup}}++ if ($r->{iassignmentgroup} ne "");
+            $secmod{$r->{securitymodel}}++ if ($r->{securitymodel} ne "");
          };
-         $self->autoFillAddResultCache([$fld->{name},
+         $self->autoFillAddResultCache([$fld->{group}."SCassignments",
                                         [keys(%pid)],
+                                        $current->{srcparentid}],
+                                       [$fld->{group}."AMSecurityFlag",
+                                        [keys(%secmod)],
                                         $current->{srcparentid}]);
       }
    }
@@ -121,7 +141,7 @@ sub autoFillAutogenField
    elsif ($fld->{name} eq "MSystemOSAMPortfolioIDs"){
       my $gfld=$self->getField("MApplDeliveryGroup",$current);
       my $refid=$gfld->RawValue($current);
-      my $r=$self->autoFillGetResultCache("systemsystemid",
+      my $r=$self->autoFillGetResultCache($fld->{group}."systemsystemid",
                                           $current->{srcparentid});
       $self->autoFillAddResultCache([$fld->{name},
                                      $r,

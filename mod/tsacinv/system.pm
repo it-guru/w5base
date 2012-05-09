@@ -193,6 +193,23 @@ sub new
                 group         =>'form',
                 dataobjattr   =>"decode(amportfolio.soxrelevant,'YES',1,0)"),
 
+      new kernel::Field::Text(
+                name          =>'securitymodel',
+                label         =>'security model',
+                searchable    =>sub{
+                   my $self=shift; 
+                   my $current=shift; 
+                   return(1) if ($self->getParent->IsMemberOf("admin"));
+                   return(0);
+                },
+                group         =>'form',
+                dataobjattr   =>"decode(amcomputer.addsysname,".
+                                "'+VS+','VS',".
+                                "'+VS++','VS',".
+                                "'+GS+','GS',".
+                                "'+GS++','GS'".
+                                ",'NONE')"),
+
       new kernel::Field::Float(
                 name          =>'systemcpucount',
                 label         =>'System CPU count',
