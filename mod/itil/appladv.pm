@@ -51,6 +51,13 @@ sub new
         
    );
    $self->AddFields(
+      new kernel::Field::Link(
+                name          =>'sem2id',
+                dataobjattr   =>"appl.sem2"),
+                insertafter=>'databossid'
+        
+   );
+   $self->AddFields(
       new kernel::Field::Databoss(
                 uploadable    =>0),
                 insertafter=>'mandator'
@@ -258,7 +265,14 @@ sub isWriteValid
       my @modules=($rec->{modules});
       @modules=@{$modules[0]} if (ref($modules[0]) eq "ARRAY");
       push(@l,"nordef","advdef",@modules);
-      return(@l);
+
+      my $userid=$self->getCurrentUserId();
+      return(@l) if ($rec->{databossid} eq $userid ||
+                     $rec->{sem2id} eq $userid ||
+                     $self->IsMemberOf("admin"));
+      if ($rec->{responseteamid} ne ""){
+         return(@l) if ($self->IsMemberOf($rec->{responseteamid}));
+      }
    }
    return();
 }

@@ -64,7 +64,7 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'custcontract',
-                htmlwidth     =>'300px',
+                htmlwidth     =>'130px',
                 label         =>'Customer Contract',
                 vjointo       =>'itil::custcontract',
                 vjoinon       =>['custcontractid'=>'id'],
@@ -73,6 +73,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'custcontractcistatus',
                 htmleditwidth =>'40%',
+                htmlwidth     =>'160px',
                 readonly      =>1,
                 group         =>'relation',
                 label         =>'Customer Contract CI-State',

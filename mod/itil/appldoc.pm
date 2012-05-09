@@ -415,7 +415,8 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
    if ($rec->{dstate}<30){
-      return(qw(default));
+      my $userid=$self->getCurrentUserId();
+      return(qw(default)) if ($self->IsMemberOf("admin"));
    }
    return();
 }

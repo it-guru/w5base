@@ -4,6 +4,7 @@
 'fieldgroup.summary'=>{de=>'Zusammenfassung',en=>'Summary'},
 'Application CI-State'=>{de=>'Anwendungs CI-Status'},
 'Modules'=>{de=>'Module'},
+'customer contract'=>{de=>'Kundenvertrag'},
 'Application name'=>{de=>'Anwendungsname'},
 'no - show all'=>{de=>'nein - alle anzeigen'},
 'Contract Number'=>{de=>'Vertragsnummer'},

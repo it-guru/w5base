@@ -474,7 +474,7 @@ sub new
                 subeditmsk    =>'subedit.appl',
                 vjointo       =>'itil::lnkapplcustcontract',
                 vjoinon       =>['id'=>'applid'],
-                vjoindisp     =>['custcontract','fraction'],
+                vjoindisp     =>['custcontract','custcontractcistatus','fraction'],
                 vjoinbase     =>[{custcontractcistatusid=>'<=5'}],
                 vjoininhash   =>['custcontractid','custcontractcistatusid',
                                  'modules',

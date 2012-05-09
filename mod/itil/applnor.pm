@@ -36,19 +36,31 @@ sub new
    $ic->{label}="active NOR certificate";
    $ic->{translation}='itil::applnor';
 
-#   $self->AddFields(                  # todo - databoss definieren!
-#      new kernel::Field::Link(
-#                name          =>'databossid',
-#                dataobjattr   =>"appl.sem"),
-#                insertafter=>'mandator'
-#
-#   );
-#   $self->AddFields(
-#      new kernel::Field::Databoss(),
-#                insertafter=>'mandator'
-#
-#   );
+   $self->AddFields( 
+      new kernel::Field::Link(
+                name          =>'databossid',
+                label         =>'Delivery Manager',
+                vjointo       =>'finance::costcenter',
+                vjoinon       =>['conumber'=>'name'],
+                vjoindisp     =>'delmgrid'),
+   );
 
+   $self->AddFields(
+      new kernel::Field::Databoss(),
+                insertafter=>'mandator'
+
+   );
+
+
+   $self->AddFields(
+      new kernel::Field::Text(
+                name          =>'custcontract',
+                label         =>'customer contract',
+                searchable    =>0,
+                onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
+                container     =>'additional'),
+                insertafter=>'name'
+   );
 
    $self->AddFields(
       new kernel::Field::TextDrop(
@@ -314,7 +326,13 @@ sub isWriteValid
       my @modules=split(/,\s/,$rec->{modules});
       @modules=@{$modules[0]} if (ref($modules[0]) eq "ARRAY");
       push(@l,"nordef","advdef",@modules);
-      return(@l);
+      my $userid=$self->getCurrentUserId();
+      return(@l) if ($rec->{databossid} eq $userid ||
+                     $rec->{delmgr2id} eq $userid ||
+                     $self->IsMemberOf("admin"));
+      if ($rec->{delmgrteamid} ne ""){
+         return(@l) if ($self->IsMemberOf($rec->{delmgrteamid}));
+      }
    }
    return();
 }
@@ -327,11 +345,12 @@ sub autoFillAutogenField
 
    if ($fld->{name} eq "MApplDeliveryGroup" || 
        $fld->{name} eq "MApplDeliveryItemID" ||
-       $fld->{name} eq "MApplDeliveryGroupID"){
+       $fld->{name} eq "MApplDeliveryGroupID" ||
+       $fld->{name} eq "custcontract"){
       my $o=getModuleObject($self->Config,"itil::appl");
       $o->SetFilter({id=>\$current->{srcparentid}});
       my ($rec,$msg)=$o->getOnlyFirst(qw(id businessteam businessteamid 
-                                         systems));
+                                         systems custcontracts));
       if (defined($rec)){
          $self->autoFillAddResultCache(
             ["MApplDeliveryGroupID",
@@ -347,7 +366,16 @@ sub autoFillAutogenField
             $ssystemid{$s->{systemsystemid}}++ if ($s->{systemsystemid} ne "");
             $systemid{$s->{systemid}}++ if ($s->{systemid} ne "");
          };
+         my %con=();
+         foreach my $contr (@{$rec->{custcontracts}}){
+            if ($contr->{custcontractcistatusid}<=4 &&
+                $contr->{custcontractcistatusid}>=2){
+               $con{$contr->{custcontract}}++;
+            }
+         }
          $self->autoFillAddResultCache(
+            ["custcontract",
+             [keys(%con)], $current->{srcparentid}],
             ["systemsystemid",
              [keys(%ssystemid)], $current->{srcparentid}],
             ["MSystemOSDeliveryItemID",
