@@ -776,7 +776,7 @@ sub getHashList
    }
    my $idfield=$o->IdField();
    my $idname=$idfield->Name();
-   msg(INFO,"SOAPgetHashList in search objectname=$objectname");
+   #msg(INFO,"SOAPgetHashList in search objectname=$objectname");
    my @sellist=@$view;
    if (!($#sellist==0 && lc($sellist[0]) eq "all")){
       push(@sellist,$idname);
