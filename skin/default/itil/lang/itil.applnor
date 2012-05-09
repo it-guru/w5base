@@ -23,3 +23,4 @@
 'valid against ADV country restrictions'=>{de=>'übereinstimmend mit der ADV Ländereinschränkungen'},
 'total SCD conform'=>{de=>'insgesammt SCD konform'},
 'total valid against ADV country restrictions'=>{de=>'insgesammt übereinstimmend mit der ADV Ländereinschränkungen'},
+'ADV Country restrictions'=>{de=>'ADV Ländereinschränkungen'},

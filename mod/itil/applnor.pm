@@ -360,11 +360,32 @@ sub autoFillAutogenField
             ["MApplDeliveryItemID",
              $rec->{id}, $current->{srcparentid}]);
 
-         my %ssystemid=();
-         my %systemid=();
+         my %osssystemid=();
+         my %ossystemid=();
+         my %mfssystemid=();
+         my %mfsystemid=();
+         my $sys=getModuleObject($self->Config,"itil::system");
          foreach my $s (@{$rec->{systems}}){
-            $ssystemid{$s->{systemsystemid}}++ if ($s->{systemsystemid} ne "");
-            $systemid{$s->{systemid}}++ if ($s->{systemid} ne "");
+            my $sysid=$s->{systemid};
+            if ($sysid ne ""){
+               $sys->ResetFilter();
+               $sys->SetFilter({id=>\$sysid});
+               my $class=$sys->getVal(qw(osclass));
+               if ($s->{systemsystemid} ne ""){
+                  if ($class eq "MAINFRAME"){
+                     $mfssystemid{$s->{systemsystemid}}++;
+                  }
+                  else{
+                     $osssystemid{$s->{systemsystemid}}++;
+                  }
+               }
+               if ($class eq "MAINFRAME"){
+                  $mfsystemid{$sysid}++;
+               }
+               else{
+                  $ossystemid{$sysid}++;
+               }
+            }
          };
          my %con=();
          foreach my $contr (@{$rec->{custcontracts}}){
@@ -376,10 +397,14 @@ sub autoFillAutogenField
          $self->autoFillAddResultCache(
             ["custcontract",
              [keys(%con)], $current->{srcparentid}],
-            ["systemsystemid",
-             [keys(%ssystemid)], $current->{srcparentid}],
+            ["MSystemOSsystemsystemid",
+             [keys(%osssystemid)], $current->{srcparentid}],
+            ["MSystemMFsystemsystemid",
+             [keys(%mfssystemid)], $current->{srcparentid}],
+            ["MSystemMFDeliveryItemID",
+             [keys(%mfsystemid)], $current->{srcparentid}],
             ["MSystemOSDeliveryItemID",
-             [keys(%systemid)], $current->{srcparentid}]);
+             [keys(%ossystemid)], $current->{srcparentid}]);
       }
    }
    elsif (
@@ -412,42 +437,51 @@ sub autoFillAutogenField
       }
    }
    elsif ($fld->{name} eq "MSystemOSDeliveryGroupID" ||
-          $fld->{name} eq "MSystemOSDeliveryGroup"){
+          $fld->{name} eq "MSystemOSDeliveryGroup" ||
+          $fld->{name} eq "MSystemMFDeliveryGroupID" ||
+          $fld->{name} eq "MSystemMFDeliveryGroup"){
       my $gfld=$self->getField("MApplDeliveryGroup",$current);
       my $refid=$gfld->RawValue($current);
-      my $r=$self->autoFillGetResultCache("systemsystemid",
+      my $r=$self->autoFillGetResultCache($fld->{group}."systemsystemid",
                                           $current->{srcparentid});
       my $o=getModuleObject($self->Config,"itil::system");
       $o->SetFilter({systemid=>$r});
       foreach my $srec ($o->getHashList(qw(adminteam adminteamid))){
          if ($srec->{adminteam} ne ""){
             $self->autoFillAddResultCache(
-               ["MSystemOSDeliveryGroupID",
+               [$fld->{group}."DeliveryGroupID",
                 $srec->{adminteamid},$current->{srcparentid}],
-               ["MSystemOSDeliveryGroup",
+               [$fld->{group}."DeliveryGroup",
                 $srec->{adminteam},$current->{srcparentid}]);
          }
       }
    }
    elsif ($fld->{name} eq "MHardwareOSDeliveryItemID" ||
           $fld->{name} eq "MHardwareOSDeliveryGroup" ||
-          $fld->{name} eq "MHardwareOSDeliveryGroupID"){
+          $fld->{name} eq "MHardwareOSDeliveryGroupID" ||
+          $fld->{name} eq "MHardwareMFDeliveryItemID" ||
+          $fld->{name} eq "MHardwareMFDeliveryGroup" ||
+          $fld->{name} eq "MHardwareMFDeliveryGroupID"){
       my $gfld=$self->getField("MApplDeliveryGroup",$current);
       my $refid=$gfld->RawValue($current);
-      my $r=$self->autoFillGetResultCache("systemsystemid",
+      my $loadfrom=$fld->{group};
+      $loadfrom=~s/^MHardware/MSystem/;
+      my $r=$self->autoFillGetResultCache($loadfrom."systemsystemid",
                                           $current->{srcparentid});
-      my $o=getModuleObject($self->Config,"itil::asset");
-      $o->SetFilter({systemids=>$r});
-      foreach my $srec ($o->getHashList(qw(location id
-                                           guardianteam guardianteamid))){
-         $self->autoFillAddResultCache(
-            ["MHardwareOSDeliveryItemID", 
-             $srec->{id}, $current->{srcparentid}],
-            ["MHardwareOSDeliveryGroup", 
-             $srec->{guardianteam}, $current->{srcparentid}],
-            ["MHardwareOSDeliveryGroupID",
-             $srec->{guardianteamid},
-             $current->{srcparentid}]);
+      if (defined($r)){
+         my $o=getModuleObject($self->Config,"itil::asset");
+         $o->SetFilter({systemids=>$r});
+         foreach my $srec ($o->getHashList(qw(location id
+                                              guardianteam guardianteamid))){
+            $self->autoFillAddResultCache(
+               [$fld->{group}."DeliveryItemID", 
+                $srec->{id}, $current->{srcparentid}],
+               [$fld->{group}."DeliveryGroup", 
+                $srec->{guardianteam}, $current->{srcparentid}],
+               [$fld->{group}."DeliveryGroupID",
+                $srec->{guardianteamid},
+                $current->{srcparentid}]);
+         }
       }
    }
    elsif ($fld->{name}=~m/^.*DeliveryContactID$/){
