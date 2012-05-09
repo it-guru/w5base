@@ -118,6 +118,11 @@ sub Init
                       "base::lnkuserinteranswer",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("sysadm.user.blacklist",
+                      "base::userblacklist",
+                      func=>'MainWithNew',
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("sysadm.useraccount",
                       "base::useraccount",
                       defaultacl=>['admin']);

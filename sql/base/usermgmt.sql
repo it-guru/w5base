@@ -309,3 +309,24 @@ alter table contact add dateofsecretpro_edt varchar(128) default NULL;
 alter table contact add killtimeout int(22) default '1000';
 alter table contact add is_vsnfdsafe int(1) default '0';
 alter table contact add w5mailsig longtext  default NULL;
+create table userblacklist (
+  id         bigint(20)   NOT NULL,
+  email            varchar(128) default NULL,
+  posix_identifier varchar(8) default NULL,
+  account          varchar(128) default NULL,
+  lockorgtransfer       int(1) default '0',
+  lockcontactcreate     int(1) default '0',
+  lockcreateci          int(1) default '0',
+  lockcreateforumentry  int(1) default '0',
+  lockcreatefaqentry    int(1) default '0',
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifyuser bigint(20) NOT NULL default '0',
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) NOT NULL default '0',
+  PRIMARY KEY  (id),
+  UNIQUE email (email),
+  UNIQUE posix_identifier (posix_identifier),
+  UNIQUE account (account)
+);

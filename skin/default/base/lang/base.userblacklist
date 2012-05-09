@@ -1,0 +1,4 @@
+'base::userblacklist'=>{de=>'Kontakt-Blacklist',en=>'Contact-Blacklist'},
+'fieldgroup.flags'=>{de=>'Parameter',en=>'Parameter'},
+'lock automatic organisational transfer'=>{de=>'Sperre automatischer organisatorischer Versetzungen'},
+'lock create of contact'=>{de=>'Erzeugen dieses Kontaktes verhindern'},

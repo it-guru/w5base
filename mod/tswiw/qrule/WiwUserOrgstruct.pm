@@ -161,10 +161,15 @@ sub qcheckRecord
             my ($wiwrec,$msg)=$wiworg->getOnlyFirst(qw(touid name parentid 
                                                        parent shortname));
             if (defined($wiwrec)){
-               my $bk=$self->addGrpLinkToUser($grp,$wiworg,$grpuser,
-                                              $wiwrec,$urec,
-                                              [$level1role,'RMember']);
-               return($errorlevel,undef) if (defined($bk));
+               my $bl=getModuleObject($dataobj->Config,"base::userblacklist");
+               if (!$bl->checkLock('lockorgtransfer',[
+                                   {posix=>$urec->{posix}},
+                                   {email=>\$urec->{email}}])){
+                  my $bk=$self->addGrpLinkToUser($grp,$wiworg,$grpuser,
+                                                 $wiwrec,$urec,
+                                                 [$level1role,'RMember']);
+                  return($errorlevel,undef) if (defined($bk));
+               }
             }
             else{
                if (defined($msg)){

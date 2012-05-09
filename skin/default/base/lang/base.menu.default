@@ -51,6 +51,7 @@
 'sysadm.user.new'=>{de=>'Neueingabe',en=>'New'},
 'sysadm.user.lnkcontact'=>{de=>'Kontaktverknüpfungen',en=>'Contactlinks'},
 'sysadm.user.lnkuserinteranswer'=>{de=>'Interview',en=>'Interview'},
+'sysadm.user.blacklist'=>{de=>'Blacklist',en=>'Blacklist'},
 'sysadm.itemizedlist'=>{de=>'Auswahlliste',en=>'Itemized list'},
 'sysadm.menu'=>{de=>'Menü-Verwaltung',en=>'Menu-Administration'},
 'sysadm.menu.new'=>{de=>'Neueingabe',en=>'New'},
