@@ -144,18 +144,6 @@ sub new
                    onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
                    container     =>"additional"),
       );
-      if ($module=~m/^MHardware/){
-         $self->AddFields(
-            new kernel::Field::Text(
-                      name          =>$module."LocationCountryRest", 
-                      label         =>"HW Location Country restriction",
-                      group         =>$module,
-                      extLabelPostfix=>": ".$module,
-                      searchable    =>0,
-                      onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
-                      container     =>"additional"),
-         );
-      }
    }
 
 
