@@ -80,15 +80,6 @@ sub new
                 vjoinon       =>['advid'=>'id'],
                 vjoindisp     =>'itnormodel'),
 
-      new kernel::Field::TextDrop(
-                name          =>'modules',
-                label         =>'Modules',
-                readonly      =>'1',
-                weblinkto     =>'NONE',
-                vjointo       =>'itil::appladv',
-                vjoinon       =>['advid'=>'id'],
-                vjoindisp     =>'modules'),
-
       new kernel::Field::Boolean(
                 name          =>'scddata',
                 label         =>'SCD Datahandling',
@@ -97,6 +88,15 @@ sub new
                 vjointo       =>'itil::appladv',
                 vjoinon       =>['advid'=>'id'],
                 vjoindisp     =>'scddata'),
+
+      new kernel::Field::TextDrop(
+                name          =>'modules',
+                label         =>'Modules',
+                readonly      =>'1',
+                weblinkto     =>'NONE',
+                vjointo       =>'itil::appladv',
+                vjoinon       =>['advid'=>'id'],
+                vjoindisp     =>'modules'),
 
       new kernel::Field::Text(
                 name          =>'advid',
@@ -252,8 +252,13 @@ sub new
                        return(1) if ($sol eq "");
                        $cur=[split(/[;,]\s*/,uc($cur))] if (!ref($cur));
                        $sol=[split(/[;,]\s*/,uc($sol))] if (!ref($sol));
+                       my $c=getModuleObject($self->getParent->Config,
+                                             "base::isocountry");
+                       my @l=$c->getCountryEntryByToken(1,@$sol); # resolv
+                       return(0) if ($#l==-1);                    # EU o.e.
+                       $sol=[map({$_->{token}} @l)];
                        foreach my $chk (@$cur){
-                          if (!in_array($chk,@$sol)){
+                          if (!in_array($sol,$chk)){
                              return(0);
                           }
                        }
@@ -264,26 +269,114 @@ sub new
    }
 
    $self->AddFields(
-      new kernel::Field::Boolean(
-                name          =>"SUMMARYisSCDconform", 
-                label         =>"total SCD conform",
+      new kernel::Field::Text(
+                name          =>"SUMMARYdeliveryCountry", 
+                label         =>"delivery and production country",
                 group         =>"summary",
                 readonly      =>1,
                 searchable    =>0,
                 onRawValue    =>sub{
                     my $self=shift;
-                    return(undef);
+                    my $current=shift;
+                    my @m=split(/[;,\s]\s*/,$current->{modules});
+                    my $res=1;
+                    my %country;
+                    foreach my $m (@m){
+                       my $fo=$self->getParent->getField($m.
+                                                         "DeliveryCountries");
+                       if (defined($fo)){
+                          my $l=$fo->RawValue($current);
+                          $l=[split(/[;,\s]\s*/,$l)] if (ref($l) ne "ARRAY");
+                          foreach my $ll (@$l){
+                             $country{$ll}++;
+                          }
+                       }
+                    }
+                    return([keys(%country)]);
+                }),
+
+      new kernel::Field::Text(
+                name          =>"SUMMARYdeliveryRegion", 
+                label         =>"delivery and production region",
+                group         =>"summary",
+                readonly      =>1,
+                searchable    =>0,
+                onRawValue    =>sub{
+                    my $self=shift;
+                    my $current=shift;
+                    my $fo=$self->getParent->getField("SUMMARYdeliveryCountry");
+                    my $l=$fo->RawValue($current);
+                    if ($#{$l}==-1){
+                       return("?");
+                    }
+                    if ($#{$l}==0){
+                       return($l->[0]);
+                    }
+                    my $c=getModuleObject($self->getParent->Config,
+                                          "base::isocountry");
+                    my @eu=$c->getCountryEntryByToken(1,"EU");
+
+                    @eu=map({$_->{token}} @eu);
+                    my $allfound=1;
+                    foreach my $chk (@$l){
+                       if (!in_array(\@eu,$chk)){
+                          $allfound=0;last;
+                       }
+                    }
+                    return("EU") if ($allfound);
+
+                    my @europe=$c->getCountryEntryByToken(1,"EUROPE");
+                    @europe=map({$_->{token}} @europe);
+                    my $allfound=1;
+                    foreach my $chk (@$l){
+                       if (!in_array(\@europe,$chk)){
+                          $allfound=0;last;
+                       }
+                    }
+                    return("EUROPE") if ($allfound);
+
+                    return("II");
+                }),
+
+      new kernel::Field::Boolean(
+                name          =>"SUMMARYisSCDconform", 
+                label         =>"total conform against ADV SCD restrictions",
+                group         =>"summary",
+                readonly      =>1,
+                markempty     =>1,
+                searchable    =>0,
+                onRawValue    =>sub{
+                    my $self=shift;
+                    my $current=shift;
+                    my $fo=$self->getParent->getField("scddata");
+                    my $scddata=$fo->RawValue($current);
+                    if ($scddata eq "1"){
+                       return(undef);
+                    }
+                    return(1);
                 }),
 
       new kernel::Field::Boolean(
                 name          =>"SUMMARYisCompliant", 
-                label         =>"total valid against ADV",
+                label         =>"total valid against ADV country restrictions",
                 group         =>"summary",
                 searchable    =>0,
                 readonly      =>1,
                 onRawValue    =>sub{
                     my $self=shift;
-                    return(0);
+                    my $current=shift;
+                    my @m=split(/[;,\s]\s*/,$current->{modules});
+                    my $res=1;
+                    foreach my $m (@m){
+                       my $fo=$self->getParent->getField($m."isCompliant");
+                       if (!defined($fo)){
+                          $res=0;last;
+                       }
+                       if (!($fo->RawValue($current))){
+                          $res=0;last;
+                       }
+                    }
+                    return($res);
                 })
    );
 

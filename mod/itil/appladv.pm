@@ -225,9 +225,7 @@ sub Validate
          $newrec->{$k}=uc($newrec->{$k}); 
          my @l=split(/[,;\s]\s*/,$newrec->{$k});
          foreach my $lid (@l){
-            $c->ResetFilter();
-            $c->SetFilter({token=>\$lid});
-            if ($c->CountRecords<1){
+            if (!($c->getCountryEntryByToken(1,$lid))){
                $self->LastMsg(ERROR,"invalid country code");
                return(0);
             }

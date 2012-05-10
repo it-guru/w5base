@@ -3,3 +3,5 @@
 'Location label'=>{de=>'Adresse name'},
 'full country name'=>{de=>'Land'},
 'Countryname'=>{de=>'Ländername (englisch)'},
+'member of european union'=>{de=>'Mitglied der Europäischen Union - EU'},
+'land of europe'=>{de=>'Land des Kontinetes Europa'},

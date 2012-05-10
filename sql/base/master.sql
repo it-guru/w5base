@@ -417,3 +417,5 @@ set FOREIGN_KEY_CHECKS=0;
 alter table location add FOREIGN KEY fk_location_databoss (databoss)
           REFERENCES contact (userid) ON DELETE RESTRICT;
 set FOREIGN_KEY_CHECKS=1;
+alter table isocountry add is_eu int(1) default '0';
+alter table isocountry add is_europe int(1) default '0';

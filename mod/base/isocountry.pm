@@ -24,6 +24,10 @@ use kernel::DataObj::DB;
 use kernel::Field;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
+# 
+#  based on ISO 3166 country codes  + SSG-FI extensions (II,EU und EUROPE)
+# 
+
 sub new
 {
    my $type=shift;
@@ -61,6 +65,16 @@ sub new
                 name          =>'zipcodeexp',
                 label         =>'ZIP Code Expression',
                 dataobjattr   =>'isocountry.zipcodeexp'),
+
+      new kernel::Field::Boolean(
+                name          =>'is_eu',
+                label         =>'member of european union',
+                dataobjattr   =>'isocountry.is_eu'),
+
+      new kernel::Field::Boolean(
+                name          =>'is_europe',
+                label         =>'land of europe',
+                dataobjattr   =>'isocountry.is_europe'),
 
       new kernel::Field::CDate(
                 name          =>'cdate',
@@ -104,6 +118,46 @@ sub new
    $self->setDefaultView(qw(linenumber token fullname cistatus cdate mdate));
    $self->setWorktable("isocountry");
    return($self);
+}
+
+sub getCountryEntryByToken
+{
+   my $self=shift;
+   my $allowGlobs=shift;  # EU, II, EUROPE
+   my @token=@_;
+   my @l;
+
+   if ($allowGlobs){
+      foreach my $ot (@token){
+         foreach my $t (split(/[,;\s]\s*/,$ot)){
+            $self->ResetFilter();
+            if (uc($t) eq "EU"){        # EU
+               $self->SetFilter({is_eu=>1});
+            }
+            elsif (uc($t) eq "II"){     # International
+            }
+            elsif (uc($t) eq "EUROPE"){ # Europa
+               $self->SetFilter({is_europe=>1});
+            }
+            else{
+               $self->SetFilter({token=>\$t});
+            }
+            my @subl=$self->getHashList(qw(token fullname is_eu is_europe));
+            if ($#subl==-1){
+               return();
+            }
+            push(@l,@subl);
+         }
+      }
+   }
+   else{
+      $self->ResetFilter();
+      $self->SetFilter({token=>\@token});
+      @l=$self->getHashList(qw(token fullname is_eu is_europe));
+   }
+
+   return() if ($#l==-1);
+   return(@l);
 }
 
 sub Validate
