@@ -41,4 +41,4 @@
 'SYSCLASS.20'=>{de=>'STANDARDIZED',en=>'STANDARDIZED'},
 'SYSCLASS.25'=>{de=>'STANDARDIZED SLICE',en=>'STANDARDIZED SLICE'},
 'SYSCLASS.30'=>{de=>'APPCOM',en=>'APPCOM'},
-'security model'=>{de=>'Sicherheitsmodel'},
+'security flag'=>{de=>'Sicherheits-Flag'},

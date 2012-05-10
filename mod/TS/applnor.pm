@@ -29,6 +29,78 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
 
+   $self->AddFields(
+      new kernel::Field::Text(
+         name          =>"SUMMARYAMSecurityFlag",
+         label         =>"summary AssetManager Security Flag",
+         group         =>"summary",
+         searchable    =>0,
+         readonly      =>1,
+         onRawValue    =>sub{
+            my $self=shift;
+            my $current=shift;
+
+
+            my $fo=$self->getParent->getField("modules");
+            my $modules=$fo->RawValue($current);
+            my @m=split(/[;,\s]\s*/,$modules);
+            my %sec;
+            foreach my $mod (grep(/^MSystem/,@m)){
+               my $fo1=$self->getParent->getField($mod."AMSecurityFlag");
+               my $f1=$fo1->RawValue($current);
+               $f1=split(/[;,\s]\s*/,$f1) if (ref($f1) ne "ARRAY");
+               foreach my $s (@$f1){
+                  $sec{$s}++;
+               }
+            }
+            return([sort(keys(%sec))]);
+         },
+         container     =>"additional"),
+      new kernel::Field::Text(
+         name          =>"SUMMARYdeterminedNOR",
+         label         =>"dynamic determined NOR model",
+         group         =>"summary",
+         searchable    =>0,
+         readonly      =>1,
+         onRawValue    =>sub{
+            my $self=shift;
+            my $current=shift;
+
+            my $fo=$self->getParent->getField("SUMMARYisCountryCompliant");
+            my $ok=$fo->RawValue($current);
+            return("S") if (!$ok);
+
+            my $fo=$self->getParent->getField("SUMMARYdeliveryRegion");
+            my $region=$fo->RawValue($current);
+            if ($region eq "DE"){
+               my $fo1=$self->getParent->getField("SUMMARYAMSecurityFlag");
+               my $f1=$fo1->RawValue($current);
+               if (grep(/GS/,@$f1)){ # wenn System GS dann u.U. D6 Betrieb
+                  return("D6 (GS=?)");
+               }
+               return("D4 (VS-NfD=?)");
+            }
+            elsif ($region eq "EU"){
+               return("D3");
+            }
+            elsif ($region eq "EUROPE"){
+               return("D2");
+            }
+            else{
+               return("S");
+            }
+         },
+         container     =>"additional"),
+      new kernel::Field::Text(
+         name          =>"SUMMARYappliedNOR",
+         label         =>"applied NOR model",
+         group         =>"summary",
+         searchable    =>0,
+         onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
+         container     =>"additional"),
+   );
+
+
 
    foreach my $module (@{$self->{allModules}}){
       if (in_array([qw(MSystemOS MSystemMF)],$module)){
@@ -189,6 +261,14 @@ sub autoFillAutogenField
          [$fld->{name},
           \@org, $current->{srcparentid}]);
    }
+   elsif ($fld->{name} eq "SUMMARYappliedNOR"){
+      my $gfld=$self->getField("SUMMARYdeterminedNOR",$current);
+      my $ref=$gfld->RawValue($current);
+      $ref=~s/\s.*$//;
+      $self->autoFillAddResultCache(
+         [$fld->{name},
+          $ref, $current->{srcparentid}]);
+   }
    elsif (my ($grp)=$fld->{name}=~m/^(.*)DeliveryCountries$/){ # temp hack
       my @country=();
       my $gfld=$self->getField($grp."DeliveryGroup",$current);
@@ -233,6 +313,23 @@ sub autoFillAutogenField
 }
 
 
+sub validateSCDconform
+{
+   my $self=shift;
+   my $current=shift;
+
+   my $fo1=$self->getField("SUMMARYAMSecurityFlag");
+   my $f1=$fo1->RawValue($current);
+   if (grep(/^NONE$/,@$f1)){ # wenn SCD aktiv darf NONE nie drin stehen
+      return(0);
+   }
+
+
+   return($self->SUPER::validateSCDconform($current));
+}
+
+
+
 sub resolvUserID
 {
    my $self=shift;
@@ -252,6 +349,18 @@ sub resolvUserID
       }
    }
    return($rec);
+}
+
+
+sub isWriteValid
+{
+   my $self=shift;
+   my $rec=shift;
+   my @l=$self->SUPER::isWriteValid($rec);
+   if ($#l!=-1){
+      push(@l,"summary");
+   }
+   return(@l);
 }
 
 

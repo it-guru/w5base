@@ -351,13 +351,13 @@ sub new
                     my $fo=$self->getParent->getField("scddata");
                     my $scddata=$fo->RawValue($current);
                     if ($scddata eq "1"){
-                       return(undef);
+                       return($self->getParent->validateSCDconform($current));
                     }
                     return(1);
                 }),
 
       new kernel::Field::Boolean(
-                name          =>"SUMMARYisCompliant", 
+                name          =>"SUMMARYisCountryCompliant", 
                 label         =>"total valid against ADV country restrictions",
                 group         =>"summary",
                 searchable    =>0,
@@ -382,6 +382,14 @@ sub new
 
 
    return($self);
+}
+
+sub validateSCDconform
+{
+   my $self=shift;
+   my $current=shift;
+
+   return(undef);
 }
 
 

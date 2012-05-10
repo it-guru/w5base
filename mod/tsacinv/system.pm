@@ -195,7 +195,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'securitymodel',
-                label         =>'security model',
+                label         =>'security flag',
                 searchable    =>sub{
                    my $self=shift; 
                    my $current=shift; 

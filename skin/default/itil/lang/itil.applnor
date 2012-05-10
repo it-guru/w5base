@@ -7,6 +7,7 @@
 'customer contract'=>{de=>'Kundenvertrag'},
 'Application name'=>{de=>'Anwendungsname'},
 'no - show all'=>{de=>'nein - alle anzeigen'},
+'only current NOR verification'=>{de=>'nur aktuelle NOR-Nachweise'},
 'Contract Number'=>{de=>'Vertragsnummer'},
 'active NOR certificate'=>{de=>'aktiver NOR-Nachweis'},
 'dstate.'=>{de=>'unberührt',en=>'untouched'},
