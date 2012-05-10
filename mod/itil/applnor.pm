@@ -29,7 +29,11 @@ sub new
    $param{MainSearchFieldLines}=4;
    $param{Worktable}='applnor';
    $param{doclabel}='-NOR';
-   $param{displayall}='1';
+   $param{displayall}=sub{
+      my $self=shift;
+      my $current=shift;
+      return(1);
+   };
    my $self=bless($type->SUPER::new(%param),$type);
 
    my $ic=$self->getField("isactive");
@@ -236,7 +240,7 @@ sub new
                    vjoindisp     =>$module."CountryRest"),
 
          new kernel::Field::Boolean(
-                   name          =>$module."isCompliant", 
+                   name          =>$module."isCountryCompliant", 
                    label         =>"valid against ADV country restrictions",
                    group         =>$module,
                    extLabelPostfix=>": ".$module,
@@ -368,7 +372,8 @@ sub new
                     my @m=split(/[;,\s]\s*/,$current->{modules});
                     my $res=1;
                     foreach my $m (@m){
-                       my $fo=$self->getParent->getField($m."isCompliant");
+                       my $fo=$self->getParent->getField($m.
+                                                         "isCountryCompliant");
                        if (!defined($fo)){
                           $res=0;last;
                        }
@@ -607,11 +612,65 @@ sub autoFillAutogenField
                                         $current->{srcparentid}]);
       }
    }
+   elsif ($fld->{name}=~m/^.*DeliveryCountries$/){
+      my (%ucount);
+      if ($fld->{group} eq "MHardwareOS" ||
+          $fld->{group} eq "MHardwareMF"){
+         my $fo=$self->getField($fld->{group}."DeliveryItemID",$current);
+         my $i=$fo->RawValue($current);
+         if (defined($i)){
+            my $o=getModuleObject($self->Config,"itil::asset");
+            $o->SetFilter({id=>$i});
+            my @l=$o->getHashList(qw(locationid));
+            if ($#l!=-1){
+               my $o=getModuleObject($self->Config,"base::location");
+               $o->SetFilter({id=>[map({$_->{locationid}} @l)]});
+               foreach my $rec ($o->getHashList(qw(country))){
+                  $ucount{uc($rec->{country})}++;
+               } 
+            }
+         }
+      }
+      $self->autoFillAddResultCache(
+         [$fld->{name},
+          [keys(%ucount)], $current->{srcparentid}]);
+   }
    elsif ($fld->{name}=~m/^.*DeliveryAddresses$/){
+      my (%uadr);
+      if ($fld->{group} eq "MHardwareOS" ||
+          $fld->{group} eq "MHardwareMF"){
+         my $fo=$self->getField($fld->{group}."DeliveryItemID",$current);
+         my $i=$fo->RawValue($current);
+         if (defined($i)){
+            my $o=getModuleObject($self->Config,"itil::asset");
+            $o->SetFilter({id=>$i});
+            my @l=$o->getHashList(qw(locationid));
+            if ($#l!=-1){
+               my $o=getModuleObject($self->Config,"base::location");
+               $o->SetFilter({id=>[map({$_->{locationid}} @l)]});
+               foreach my $rec ($o->getHashList(qw(zipcode address1 location))){
+                  if (defined($rec)){
+                     my $adr=$rec->{zipcode};
+                     if ($rec->{location} ne ""){
+                        $adr.=" " if ($adr ne "");
+                        $adr.=$rec->{location};
+                     }
+                     if ($rec->{address1} ne ""){
+                        $adr.="; " if ($adr ne "");
+                        $adr.=$rec->{address1};
+                     }
+                     if ($adr ne ""){
+                        $uadr{$adr}++;
+                     }
+                  }
+               } 
+            }
+         }
+      }
       my $gfld=$self->getField($fld->{group}."DeliveryContactID",$current);
       my $refid=$gfld->RawValue($current);
       if (defined($refid)){
-         my (%uadr,$rec,$msg);
+         my ($rec,$msg);
          foreach my $uid (@{$refid}){
             my $adr;
             my $CacheKey="DeliveryContactAddr-".$uid;
@@ -636,10 +695,10 @@ sub autoFillAutogenField
 
             $uadr{$r->[0]}++;
          }
-         $self->autoFillAddResultCache(
-            [$fld->{name},
-             [keys(%uadr)], $current->{srcparentid}]);
       }
+      $self->autoFillAddResultCache(
+         [$fld->{name},
+          [keys(%uadr)], $current->{srcparentid}]);
    }
    return($self->SUPER::autoFillAutogenField($fld,$current));
 }
