@@ -14,7 +14,7 @@
 'itil.appl.lnkaccountingno'=>{de=>'Verkn. Account Nr.',en=>'Link Account No.'},
 'itil.appl.lnkapplcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
 'itil.appl.lnkapplinteranswer'=>{de=>'Interview',en=>'Interview'},
-'itil.appl.adv'=>{de=>'ADV',en=>'ADV'},
+'itil.appl.adv'=>{de=>'NOR-Vorgaben',en=>'NOR-target'},
 'itil.appl.nor'=>{de=>'NOR-Nachweis',en=>'NOR-Verification'},
 'itil.itclust'=>{de=>'Cluster',en=>'Cluster'},
 'itil.itclust.new'=>{de=>'Neueingabe',en=>'New'},
