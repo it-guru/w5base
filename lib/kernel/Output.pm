@@ -165,8 +165,10 @@ sub WriteToStdout
             if ($#viewgroups!=-1 && defined($viewgroups[0]) && 
                 $viewgroups[0] ne "0"){
                $app->Context->{Linenumber}++;
-               my @recordview=$app->getFieldObjsByView([$app->getCurrentView()],
-                                                       current=>$rec);
+               my @recordview=$app->getFieldObjsByView(
+                                   [$app->getCurrentView()],
+                                    current=>$rec,
+                                    output=>$self->Format->Self());
                my $fieldbase={};
                map({$fieldbase->{$_->Name()}=$_} @recordview);
                foreach my $fo (@recordview){
@@ -285,8 +287,10 @@ sub WriteToScalar    # ToDo: viewgroups implementation
             if ($#viewgroups!=-1 && defined($viewgroups[0]) && 
                 $viewgroups[0] ne "0"){
                $self->getParent->Context->{Linenumber}++;
-               my @recordview=$app->getFieldObjsByView([$app->getCurrentView()],
-                                                       current=>$rec);
+               my @recordview=$app->getFieldObjsByView(
+                              [$app->getCurrentView()],
+                               current=>$rec,
+                               output=>$self->Format->Self());
                my $fieldbase={};
                map({$fieldbase->{$_->Name()}=$_} @recordview);
                foreach my $fo (@recordview){

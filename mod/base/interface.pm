@@ -794,7 +794,9 @@ sub getHashList
                my @viewl=$o->isViewValid($chkrec);
                if ($#viewl!=-1 && !($#viewl==0 && !defined($viewl[0]))){
                   $resl[$c]=$l[$c];
-                  my @fobjs=$o->getFieldObjsByView($view,current=>$resl[$c]);
+                  my @fobjs=$o->getFieldObjsByView($view,
+                                              current=>$resl[$c],
+                                              output=>'kernel::Output::SOAP');
                   my %cprec;
                   my $objns=$ns;
                   $objns="W5Kernel" if ($ns eq "");
