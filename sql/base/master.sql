@@ -419,3 +419,8 @@ alter table location add FOREIGN KEY fk_location_databoss (databoss)
 set FOREIGN_KEY_CHECKS=1;
 alter table isocountry add is_eu int(1) default '0';
 alter table isocountry add is_europe int(1) default '0';
+alter table isocountry add is_asia int(1) default '0';
+alter table isocountry add is_australia int(1) default '0';
+alter table isocountry add is_namerica int(1) default '0';
+alter table isocountry add is_samerica int(1) default '0';
+alter table isocountry add is_africa int(1) default '0';

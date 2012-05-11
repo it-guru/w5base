@@ -76,6 +76,31 @@ sub new
                 label         =>'land of europe',
                 dataobjattr   =>'isocountry.is_europe'),
 
+      new kernel::Field::Boolean(
+                name          =>'is_asia',
+                label         =>'land of asia',
+                dataobjattr   =>'isocountry.is_asia'),
+
+      new kernel::Field::Boolean(
+                name          =>'is_australia',
+                label         =>'land of australia',
+                dataobjattr   =>'isocountry.is_australia'),
+
+      new kernel::Field::Boolean(
+                name          =>'is_namerica',
+                label         =>'land of north america',
+                dataobjattr   =>'isocountry.is_namerica'),
+
+      new kernel::Field::Boolean(
+                name          =>'is_samerica',
+                label         =>'land of south america',
+                dataobjattr   =>'isocountry.is_samerica'),
+
+      new kernel::Field::Boolean(
+                name          =>'is_africa',
+                label         =>'land of africa',
+                dataobjattr   =>'isocountry.is_africa'),
+
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
