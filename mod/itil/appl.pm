@@ -421,7 +421,8 @@ sub new
                 name          =>'itnormodelid',
                 group         =>'customer',
                 label         =>'NOR ModelID',
-                dataobjattr   =>'appladv.itnormodel'),
+                dataobjattr   =>'if (appladv.itnormodel is null,'.
+                                '0,appladv.itnormodel)'),
 
       new kernel::Field::Select(
                 name          =>'avgusercount',
@@ -1028,6 +1029,30 @@ sub initSearchQuery
      Query->Param("search_cistatus"=>
                   "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
    }
+}
+
+sub getFieldObjsByView
+{
+   my $self=shift;
+   my $view=shift;
+   my %param=@_;
+
+   my @l=$self->SUPER::getFieldObjsByView($view,%param);
+
+   # 
+   # hack to prevent display of "itnormodel" in outputs other then
+   # Standard-Detail
+   # 
+   if (defined($param{current}) && exists($param{current}->{itnormodel})){
+      if ($param{output} ne "kernel::Output::HtmlDetail"){
+         if (!$self->IsMemberOf("admin")){
+            @l=grep({$_->{name} ne "itnormodel"} @l);
+         }
+      }
+   }
+
+
+   return(@l);
 }
 
 

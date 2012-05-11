@@ -143,6 +143,18 @@ sub new
                 fields        =>[qw(delmgrid delmgr2id
                                     delmgrteamid)]),
 
+      new kernel::Field::Group(
+                name          =>'responseteam',
+                translation   =>'itil::appl',
+                label         =>'CBM Team',
+                vjoinon       =>'responseteamid'),
+
+      new kernel::Field::Link(
+                name          =>'responseteamid',
+                dataobjattr   =>'appl.responseteam'),
+
+
+
       new kernel::Field::Container(
                 name          =>'additional',
                 label         =>'Additionalinformations',
@@ -311,6 +323,7 @@ sub preProcessReadedRecord
       my ($id)=$o->ValidatedInsertRecord({parentid=>$rec->{srcparentid},
                                           isactive=>1});
       $rec->{id}=$id;
+      $rec->{isactive}="1";
    }
    return(undef);
 }
@@ -323,21 +336,26 @@ sub SecureSetFilter
    my @flt=@_;
 
    if (!$self->IsMemberOf("admin")){
-      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
       my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
-                              [orgRoles(),qw(RCFManager RCFManager2)],"both");
+                              [qw(RCFManager RCFManager2)],"both");
       my @grpids=keys(%grps);
+      my %dgrps=$self->getGroupsOf($ENV{REMOTE_USER},
+                              [orgRoles()],"direct");
+      my @dgrpids=keys(%dgrps);
       my $userid=$self->getCurrentUserId();
       push(@flt,[
-                 {mandatorid=>\@mandators},
+                 {responseteamid=>[@grpids,@dgrpids]},
+                 {delmgrteamid=>[@grpids,@dgrpids]},
+       #          {sectargetid=>\$userid,sectarget=>\'base::user',
+       #           secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
+       #                     "*roles=?read?=roles*"},
+       #          {sectargetid=>\@grpids,sectarget=>\'base::grp',
+       #           secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
+       #                     "*roles=?read?=roles*"},
                  {semid=>$userid},
-                 {sectargetid=>\$userid,sectarget=>\'base::user',
-                  secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
-                            "*roles=?read?=roles*"},
-                 {sectargetid=>\@grpids,sectarget=>\'base::grp',
-                  secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
-                            "*roles=?read?=roles*"},
-                 {sem2id=>$userid}
+                 {sem2id=>$userid},
+                 {delmgrid=>$userid},
+                 {delmgr2id=>$userid}
                 ]);
    }
    return($self->SetFilter(@flt));

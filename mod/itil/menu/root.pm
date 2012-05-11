@@ -400,15 +400,6 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
-   $self->RegisterObj("itil.kern.itnormodel",
-                      "itil::itnormodel",
-                      defaultacl=>['admin']);
-   
-   $self->RegisterObj("itil.kern.itnormodel.new",
-                      "itil::itnormodel",
-                      func=>'New',
-                      defaultacl=>['admin']);
-
    $self->RegisterObj("itil.kern.storageclass",
                       "itil::storageclass",
                       defaultacl=>['admin']);
