@@ -1033,7 +1033,7 @@ create table itnormodel (
   id           bigint(20) NOT NULL,
   name         char(5) NOT NULL,cistatus int(2)  NOT NULL,
   fullname     varchar(40) not NULL,
-  comments     longtext default NULL,
+  comments     longtext default NULL,mdesc longtext default NULL,
   modifydate   datetime NOT NULL default '0000-00-00 00:00:00',
   modifyuser   bigint(20) default NULL,
   createdate datetime NOT NULL default '0000-00-00 00:00:00',

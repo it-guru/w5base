@@ -423,6 +423,11 @@ sub Init
                       func=>'MainWithNew',
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("itil.kern.itnormodel",
+                      "itil::itnormodel",
+                      func=>'MainWithNew',
+                      defaultacl=>['admin']);
+   
    $self->RegisterObj("itil.proc",
                       "tmpl/welcome",
                       prio=>20000);

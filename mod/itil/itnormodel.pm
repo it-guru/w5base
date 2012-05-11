@@ -61,6 +61,11 @@ sub new
                 dataobjattr   =>'itnormodel.cistatus'),
 
       new kernel::Field::Textarea(
+                name          =>'mdesc',
+                label         =>'model description',
+                dataobjattr   =>'itnormodel.mdesc'),
+
+      new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',
                 dataobjattr   =>'itnormodel.comments'),
