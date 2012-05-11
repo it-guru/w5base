@@ -48,7 +48,7 @@ sub new
             foreach my $mod (grep(/^MSystem/,@m)){
                my $fo1=$self->getParent->getField($mod."AMSecurityFlag");
                my $f1=$fo1->RawValue($current);
-               $f1=split(/[;,\s]\s*/,$f1) if (ref($f1) ne "ARRAY");
+               $f1=[split(/[;,\s]\s*/,$f1)] if (ref($f1) ne "ARRAY");
                foreach my $s (@$f1){
                   $sec{$s}++;
                }
