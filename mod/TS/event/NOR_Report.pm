@@ -108,7 +108,7 @@ sub NOR_Report
          $W5V2::Cache={};
       }
       return(1);
-   }
+   };
 
    my @control=({DataObj=>'TS::appladv',
                  filter=>\%flt,
