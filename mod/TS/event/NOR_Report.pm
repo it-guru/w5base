@@ -121,7 +121,7 @@ sub NOR_Report
                  filter=>\%flt,
                  recPreProcess=>$cacheReseter,
                  view=>[qw(fullname id name custcontract isactive 
-                           dstate databoss normodel
+                           dstate databoss normodel modules
                            SUMMARYdeliveryCountry
                            SUMMARYisCountryCompliant
                            SUMMARYisSCDconform
