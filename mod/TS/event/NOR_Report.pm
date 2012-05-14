@@ -100,14 +100,26 @@ sub NOR_Report
 
    $flt{'isactive'}='1 [EMPTY]'; 
 
+   my $cacheReseter=sub{
+      $W5V2::CacheCount++;
+      if ($W5V2::CacheCount>50){
+         $W5Base::CacheCount=0;
+         $W5V2::Context={};
+         $W5V2::Cache={};
+      }
+      return(1);
+   }
+
    my @control=({DataObj=>'TS::appladv',
                  filter=>\%flt,
+                 recPreProcess=>$cacheReseter,
                  view=>[qw(fullname id name isactive dstate databoss 
                            modules normodelbycustomer itnormodel 
                            processingpersdata scddata)]},
 
                 {DataObj=>'TS::applnor',
                  filter=>\%flt,
+                 recPreProcess=>$cacheReseter,
                  view=>[qw(fullname id name custcontract isactive 
                            dstate databoss normodel
                            SUMMARYdeliveryCountry
