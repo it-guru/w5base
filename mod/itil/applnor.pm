@@ -32,7 +32,8 @@ sub new
    $param{displayall}=sub{
       my $self=shift;
       my $current=shift;
-      return(1);
+      return(1) if ($self->getParent->IsMemberOf("admin"));
+      return(0);
    };
    my $self=bless($type->SUPER::new(%param),$type);
 
@@ -234,10 +235,32 @@ sub new
                    htmldetail    =>$self->{displayall},
                    extLabelPostfix=>": ".$module,
                    readonly      =>1,
-                   weblinkto     =>'NONE',
-                   vjointo       =>'itil::appladv',
-                   vjoinon       =>['advid'=>'id'],
-                   vjoindisp     =>$module."CountryRest"),
+                   onRawValue    =>sub{
+                      my $self=shift;
+                      my $current=shift;
+                      my $advid=$current->{advid};
+                      my $adv=getModuleObject($self->getParent->Config,
+                                              "itil::appladv");
+                      $adv->SetFilter({id=>\$advid});
+                      my ($rec,$msg)=$adv->getOnlyFirst($module."CountryRest",
+                                                      "itnormodelid");
+                      if (defined($rec)){
+                         if ($rec->{$module."CountryRest"} ne ""){
+                            return($rec->{$module."CountryRest"});
+                         }
+                         if ($rec->{itnormodelid} ne ""){
+                            my $nor=getModuleObject($self->getParent->Config,
+                                              "itil::itnormodel");
+                            $nor->SetFilter({id=>\$rec->{itnormodelid}});
+                            my ($norrec,$msg)=$nor->getOnlyFirst("defcountry");
+                            if (defined($norrec) && 
+                                $norrec->{defcountry} ne ""){
+                               return($norrec->{defcountry});
+                            }
+                         }
+                      }
+                      return("II");
+                   }),
 
          new kernel::Field::Boolean(
                    name          =>$module."isCountryCompliant", 

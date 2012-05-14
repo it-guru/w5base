@@ -60,6 +60,11 @@ sub new
                 label         =>'CI-StateID',
                 dataobjattr   =>'itnormodel.cistatus'),
 
+      new kernel::Field::Text(
+                name          =>'defcountry',
+                label         =>'default country restriction',
+                dataobjattr   =>'itnormodel.defcountry'),
+
       new kernel::Field::Textarea(
                 name          =>'mdesc',
                 label         =>'model description',

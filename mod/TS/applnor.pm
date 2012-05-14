@@ -240,6 +240,7 @@ sub autoFillAutogenField
       my $gfld=$self->getField($grp."DeliveryGroup",$current);
       my $ref=$gfld->RawValue($current);
       my @org=();
+printf STDERR ("fifi check=%s\n",$fld->{name});
       foreach my $r (@$ref){
          if ($r=~m/.*\.SK$/){
             push(@org,"T-Systems Slovakia s.r.o");

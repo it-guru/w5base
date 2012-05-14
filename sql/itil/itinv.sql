@@ -1049,3 +1049,4 @@ create table itnormodel (
 insert into itnormodel (id,name,cistatus,fullname) values(0,'S',4,'S - Standard');
 alter table swinstance add autogendiary int(1) default '0';
 update swinstance set autogendiary = custcostalloc;
+alter table itnormodel add defcountry varchar(80) default null;

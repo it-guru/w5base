@@ -1,3 +1,3 @@
 'itil::itnormodel'=>{de=>'NOR Betriebsmodel',en=>'NOR Solutionmodel'},
 'model description'=>{de=>'Betriebsmodelbeschreibung'},
-
+'default country restriction'=>{de=>'Standard Ländereinschränkung'},
