@@ -86,7 +86,11 @@ sub NOR_Report
       $names="ALL" if ($names eq "");
       $names=substr($names,0,40)."___" if (length($names)>40);
       $names=~s/[^a-z0-9]/_/gi;
-      $param{'filename'}="/tmp/W5BaseDarwin-NOR-Report_${names}.xls";
+      my ($year, $month)=$self->Today_and_Now("GMT");
+      my $t=sprintf("%04d_%02d",$year, $month);
+      $param{'filename'}=[
+          "webfs:/Reports/NOR/W5BaseDarwin-NOR-Report_${names}.$t.xls",
+          "webfs:/Reports/NOR/W5BaseDarwin-NOR-Report_${names}.cur.xls"];
    }
    msg(INFO,"start Report to $param{'filename'}");
  
