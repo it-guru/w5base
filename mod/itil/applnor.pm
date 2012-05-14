@@ -392,7 +392,10 @@ sub new
                 onRawValue    =>sub{
                     my $self=shift;
                     my $current=shift;
-                    my @m=split(/[;,\s]\s*/,$current->{modules});
+                    my $mfld=$self->getParent->getField("modules");
+                    my $m=$mfld->RawValue($current);
+                    $m=join(",",@$m) if (ref($m) eq "ARRAY"); 
+                    my @m=split(/[;,\s]\s*/,$m);
                     my $res=1;
                     foreach my $m (@m){
                        my $fo=$self->getParent->getField($m.

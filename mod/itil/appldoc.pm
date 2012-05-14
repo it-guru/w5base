@@ -130,8 +130,9 @@ sub new
                 group         =>'sem',
                 dataobjattr   =>'appl.sem2'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Text(
                 name          =>'conumber',
+                htmldetail    =>0,
                 label         =>'CO-Number',
                 dataobjattr   =>'appl.conumber'),
 
@@ -140,7 +141,7 @@ sub new
                 vjoinon       =>['conumber'=>'name'],
                 dontrename    =>1,
                 group         =>'delmgmt',
-                fields        =>[qw(delmgrid delmgr2id
+                fields        =>[qw(delmgrid delmgr delmgr2id
                                     delmgrteamid)]),
 
       new kernel::Field::Group(
@@ -153,6 +154,18 @@ sub new
                 name          =>'responseteamid',
                 dataobjattr   =>'appl.responseteam'),
 
+      new kernel::Field::TextDrop(
+                name          =>'customer',
+                label         =>'Customer',
+                translation   =>'itil::appl',
+                htmldetail    =>0,
+                vjointo       =>'base::grp',
+                vjoinon       =>['customerid'=>'grpid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'customerid',
+                dataobjattr   =>'appl.customer'),
 
 
       new kernel::Field::Container(
@@ -324,6 +337,10 @@ sub preProcessReadedRecord
                                           isactive=>1});
       $rec->{id}=$id;
       $rec->{isactive}="1";
+   }
+   if ($rec->{dstate}<=10){
+      $rec->{owner}=undef;
+      $rec->{mdate}=undef;
    }
    return(undef);
 }
