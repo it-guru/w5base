@@ -38,7 +38,8 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("NOR_Report","NOR_Report");
+   $self->RegisterEvent("NOR_Report","NOR_Report",
+                        timeout=>14400);
    return(1);
 }
 
@@ -93,6 +94,183 @@ sub NOR_Report
           "webfs:/Reports/NOR/W5BaseDarwin-NOR-Report_${names}.cur.xls"];
    }
    msg(INFO,"start Report to $param{'filename'}");
+
+
+
+   my $o=getModuleObject($self->Config,"TS::applnor");
+
+   $o->AddFields(
+      new kernel::Field::Text(
+                name          =>'sdmcluster',
+                label         =>'SDM Cluster',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return("SDM C&U extern");
+                }),
+      new kernel::Field::Text(
+                name          =>'customertopname',
+                label         =>'Kundenname',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return("DTAG");
+                }),
+      new kernel::Field::Text(
+                name          =>'customersgpno',
+                label         =>'SGP-Nr',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return("3000900");
+                }),
+      new kernel::Field::Text(
+                name          =>'customergpnr',
+                label         =>'GP-Nr',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return("?");
+                }),
+      new kernel::Field::Text(
+                name          =>'delmgrposix',
+                label         =>'WIW Kennung',
+                vjointo       =>'base::user',
+                vjoinon       =>['delmgrid'=>'userid'],
+                vjoindisp     =>'posix',
+                ),
+      new kernel::Field::Text(
+                name          =>'delmgremail',
+                label         =>'eMail',
+                vjointo       =>'base::user',
+                vjoinon       =>['delmgrid'=>'userid'],
+                vjoindisp     =>'email',
+                ),
+      new kernel::Field::Link(
+                name          =>'clustersecid',
+                label         =>'Cluster Security ID',
+                onRawValue    =>sub{
+                   return("11634962040001");
+                }),
+      new kernel::Field::Text(
+                name          =>'clustersec',
+                label         =>'Cluster Security',
+                vjointo       =>'base::user',
+                vjoinon       =>['clustersecid'=>'userid'],
+                vjoindisp     =>'fullname',
+                ),
+      new kernel::Field::Text(
+                name          =>'clustersecposix',
+                label         =>'WiW Kennung',
+                vjointo       =>'base::user',
+                vjoinon       =>['clustersecid'=>'userid'],
+                vjoindisp     =>'posix',
+                ),
+      new kernel::Field::Text(
+                name          =>'clustersecemail',
+                label         =>'eMail',
+                vjointo       =>'base::user',
+                vjoinon       =>['clustersecid'=>'userid'],
+                vjoindisp     =>'email',
+                ),
+      new kernel::Field::Text(
+                name          =>'norcheck',
+                label         =>'Status der NOR Prüfung',
+                depend        =>['dstateid'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return("offen") if ($current->{dstateid}<=10);
+                   return("erfolgt");
+                }),
+      new kernel::Field::Text(
+                name          =>'norstatus',
+                label         =>'NOR Status',
+                depend        =>['dstateid'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return("?");
+                }),
+      new kernel::Field::Text(
+                name          =>'nearshorenogo',
+                label         =>'NOGO Grund Vertraglich Rechtlich',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return("?");
+                }),
+      new kernel::Field::Text(
+                name          =>'nearshorego',
+                label         =>'Nearshore Verlagerung derzeit möglich',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return("?");
+                }),
+      new kernel::Field::Text(
+                name          =>'blnorstatus',
+                label         =>'NOR Status',
+                depend        =>['dstateid'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return("?");
+                }),
+      new kernel::Field::Text(
+                name          =>'blnearshorenogo',
+                label         =>'NOGO Grund Vertraglich Rechtlich',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return("?");
+                }),
+      new kernel::Field::Text(
+                name          =>'blnearshorego',
+                label         =>'Offshore Verlagerung derzeit möglich',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return("?");
+                }),
+      new kernel::Field::Text(
+                name          =>'restrictions',
+                label         =>'Ggf. Einschränkung',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return("?");
+                }),
+      new kernel::Field::Text(
+                name          =>'isdelta',
+                label         =>'Abweichung Betriebsmodel Vorgabe/Realität',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return("?");
+                }),
+      new kernel::Field::Text(
+                name          =>'applname',
+                label         =>'Anwendungsname',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return($current->{name});
+                }),
+   );
+
+   $o->getField("customer")->{label}="GP Name";
+   $o->getField("custcontract")->{label}="Vertragsnummer";
+   $o->getField("conumber")->{label}="CO-Auftrag bzw. ZGSL-Nr./VKL-Nr.";
+   $o->getField("name")->{label}="Bemerkung zu\n".
+                                 "CO-Auftrag ILV / VKL Nr\n".
+                                 "Leistungsgegenstand";
+   $o->getField("mdate")->{label}="NOR-Nachweis erstellt/update am";
+   $o->getField("normodel")->{label}="Betriebsmodell nach Kunde (CBM-Angabe)";
+   $o->getField("SUMMARYappliedNOR")->{label}="Betriebsmodell nach Realsituation (SDM-Angabe)";
+   
+
+
  
 
    my $out=new kernel::XLSReport($self,$param{'filename'});
@@ -100,33 +278,40 @@ sub NOR_Report
 
    $flt{'isactive'}='1 [EMPTY]'; 
 
-   my $cacheReseter=sub{
-      $W5V2::CacheCount++;
-      if ($W5V2::CacheCount>50){
-         $W5Base::CacheCount=0;
-         $W5V2::Context={};
-         $W5V2::Cache={};
-      }
-      return(1);
-   };
-
-   my @control=({DataObj=>'TS::appladv',
+   my @control=(
+                {DataObj=>$o,
                  filter=>\%flt,
-                 recPreProcess=>$cacheReseter,
-                 view=>[qw(fullname id name isactive dstate databoss 
-                           modules normodelbycustomer itnormodel 
-                           processingpersdata scddata)]},
-
-                {DataObj=>'TS::applnor',
-                 filter=>\%flt,
-                 recPreProcess=>$cacheReseter,
-                 view=>[qw(fullname id name custcontract isactive 
-                           dstate databoss normodel modules
-                           SUMMARYdeliveryCountry
-                           SUMMARYisCountryCompliant
-                           SUMMARYisSCDconform
-                           SUMMARYappliedNOR mdate owner)]},
-                );
+         #        recPreProcess=>$cacheReseter,
+                 view=>[qw(sdmcluster 
+                           customertopname
+                           customersgpno
+                           customergpnr
+                           customer
+                           delmgr
+                           delmgrposix delmgremail
+                           clustersec clustersecposix clustersecemail
+                           custcontract
+                           conumber name
+                           norcheck
+                           mdate
+                           norstatus
+                           nearshorenogo
+                           nearshorego
+                           blnorstatus
+                           blnearshorenogo
+                           blnearshorego
+                           restrictions
+                           normodel
+                           SUMMARYappliedNOR
+                           isdelta applname
+                           )],
+#                 view=>[qw(fullname id name custcontract isactive 
+#                           dstate databoss normodel modules
+#                           SUMMARYdeliveryCountry
+#                           SUMMARYisCountryCompliant
+#                           SUMMARYisSCDconform
+#                           SUMMARYappliedNOR mdate owner)]},
+                });
 
    $out->Process(@control);
 
