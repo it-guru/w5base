@@ -230,13 +230,13 @@ sub new
    return($self);
 }
 
-sub initSearchQuery
-{
-   my $self=shift;
-   if (!defined(Query->Param("search_name"))){
-     Query->Param("search_name"=>"Q4DE8NCO34*");
-   }
-}
+#sub initSearchQuery
+#{
+#   my $self=shift;
+#   if (!defined(Query->Param("search_name"))){
+#     Query->Param("search_name"=>"Q4DE8NCO34*");
+#   }
+#}
 
 
 
