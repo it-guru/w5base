@@ -552,7 +552,7 @@ sub autoFillAutogenField
          $swnature='apache iis';
       }
       if ($fld->{group} eq "MDB"){
-         $swnature='mysql mssql "Oracle DB Server"';
+         $swnature='mysql mssql PostgeSQL DB2 "Oracle DB Server"';
       }
       my $o=getModuleObject($self->Config,"itil::swinstance");
       $o->SetFilter({applid=>\$current->{srcparentid},
