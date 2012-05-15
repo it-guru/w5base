@@ -92,6 +92,14 @@ sub new
                 onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
                 container     =>"additional"),
 
+      new kernel::Field::Dynamic(
+                name          =>'modulematrix',
+                label         =>'Module Matrix',
+                depend        =>['modules'],
+                group         =>'advdef',
+                searchable    =>0,
+                fields        =>\&addModuleMatrix),
+
       new kernel::Field::Select(
                 name          =>'normodelbycustomer',
                 label         =>'customer NOR Model definiton wish',
@@ -174,6 +182,44 @@ sub new
 
 
    return($self);
+}
+
+sub addModuleMatrix
+{
+   my $self=shift;
+   my %param=@_;
+   my @dyn=();
+   my $p=$self->getParent();
+   my $current=$param{current};
+   return() if (!defined($current) || $current->{srcparentid} eq "");
+
+   my $mfld=$p->getField("modules");
+   my $curmod=$mfld->RawValue($current);
+   
+   my @modlist=$p->getAllPosibleApplModules();
+   while (my $mod=shift(@modlist)){
+      my $modname=shift(@modlist);
+      my $st=0;
+      if (in_array($mod,$curmod)){
+         $st=1;
+      }
+      push(@dyn,$p->InitFields(
+           new kernel::Field::Boolean(
+              name       =>"MOD".$mod,
+              label      =>$mod,
+              align      =>'center',
+              group      =>$self->{group},
+              htmldetail =>0,
+              readonly   =>1,
+              onRawValue =>sub {
+                               return("$st");
+                            },
+              ),
+          ));
+   }
+   
+
+   return(@dyn);
 }
 
 

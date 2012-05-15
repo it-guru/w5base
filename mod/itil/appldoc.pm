@@ -86,8 +86,10 @@ sub new
                 selectfix     =>1,
                 htmldetail    =>0,
                 readonly      =>1,
-                selectsearch  =>[['"1" [LEER]',$self->T('yes - show only active')],
-                                 ['',$self->T('no - show all')]],
+                selectsearch  =>[['"1" [LEER]',
+                                     $self->T('yes - show only active')],
+                                 ['',
+                                     $self->T('no - show all')]],
                 label         =>'is active',
                 dataobjattr   =>"$worktable.isactive"),
                                                   
