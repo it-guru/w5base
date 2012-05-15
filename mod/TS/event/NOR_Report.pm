@@ -39,7 +39,7 @@ sub Init
 
 
    $self->RegisterEvent("NOR_Report","NOR_Report",
-                        timeout=>14400);
+                        timeout=>3600);
    return(1);
 }
 
@@ -130,7 +130,7 @@ sub NOR_Report
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
-                   return("?");
+                   return("");
                 }),
       new kernel::Field::Text(
                 name          =>'delmgrposix',
@@ -186,11 +186,15 @@ sub NOR_Report
       new kernel::Field::Text(
                 name          =>'norstatus',
                 label         =>'NOR Status',
-                depend        =>['dstateid'],
+                depend        =>['normodel'],
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
-                   return("?");
+                   my $fld=$self->getParent->getField("normodel");
+                   my $d=$fld->RawValue($current);
+                   return("go") if ($d eq "S");
+                   return("go") if ($d eq "D3");
+                   return("no go");
                 }),
       new kernel::Field::Text(
                 name          =>'nearshorenogo',
@@ -198,7 +202,7 @@ sub NOR_Report
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
-                   return("?");
+                   return("");
                 }),
       new kernel::Field::Text(
                 name          =>'nearshorego',
@@ -206,7 +210,7 @@ sub NOR_Report
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
-                   return("?");
+                   return("");
                 }),
       new kernel::Field::Text(
                 name          =>'blnorstatus',
@@ -215,7 +219,10 @@ sub NOR_Report
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
-                   return("?");
+                   my $fld=$self->getParent->getField("normodel");
+                   my $d=$fld->RawValue($current);
+                   return("go") if ($d eq "S");
+                   return("no go");
                 }),
       new kernel::Field::Text(
                 name          =>'blnearshorenogo',
@@ -223,7 +230,7 @@ sub NOR_Report
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
-                   return("?");
+                   return("");
                 }),
       new kernel::Field::Text(
                 name          =>'blnearshorego',
@@ -231,7 +238,7 @@ sub NOR_Report
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
-                   return("?");
+                   return("");
                 }),
       new kernel::Field::Text(
                 name          =>'restrictions',
@@ -239,7 +246,7 @@ sub NOR_Report
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
-                   return("?");
+                   return("");
                 }),
       new kernel::Field::Text(
                 name          =>'isdelta',
@@ -247,7 +254,14 @@ sub NOR_Report
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
-                   return("?");
+                   my $fld=$self->getParent->getField("normodel");
+                   my $d1=$fld->RawValue($current);
+                   my $fld=$self->getParent->getField("SUMMARYappliedNOR");
+                   my $d2=$fld->RawValue($current);
+                   if ($d1 eq $d2){
+                      return("nein");
+                   }
+                   return("ja");
                 }),
       new kernel::Field::Text(
                 name          =>'applname',
@@ -267,12 +281,9 @@ sub NOR_Report
                                  "Leistungsgegenstand";
    $o->getField("mdate")->{label}="NOR-Nachweis erstellt/update am";
    $o->getField("normodel")->{label}="Betriebsmodell nach Kunde (CBM-Angabe)";
-   $o->getField("SUMMARYappliedNOR")->{label}="Betriebsmodell nach Realsituation (SDM-Angabe)";
+   $o->getField("SUMMARYappliedNOR")->{label}=
+                      "Betriebsmodell nach Realsituation (SDM-Angabe)";
    
-
-
- 
-
    my $out=new kernel::XLSReport($self,$param{'filename'});
    $out->initWorkbook();
 
@@ -281,7 +292,7 @@ sub NOR_Report
    my @control=(
                 {DataObj=>$o,
                  filter=>\%flt,
-         #        recPreProcess=>$cacheReseter,
+                 recPreProcess=>\&recPreProcess,
                  view=>[qw(sdmcluster 
                            customertopname
                            customersgpno
@@ -305,25 +316,42 @@ sub NOR_Report
                            SUMMARYappliedNOR
                            isdelta applname
                            )],
-#                 view=>[qw(fullname id name custcontract isactive 
-#                           dstate databoss normodel modules
-#                           SUMMARYdeliveryCountry
-#                           SUMMARYisCountryCompliant
-#                           SUMMARYisSCDconform
-#                           SUMMARYappliedNOR mdate owner)]},
                 });
 
    $out->Process(@control);
 
-
-#   $self->{workbook}=$self->XLSopenWorkbook();
-#   if (!($self->{workbook}=$self->XLSopenWorkbook())){
-#      return({exitcode=>1,msg=>'fail to create tempoary workbook'});
-#   }
-
-
    return({exitcode=>0,msg=>'OK'});
 }
+
+
+sub recPreProcess
+{
+   my ($self,$DataObj,$rec,$recordview,$reproccount)=@_;
+
+   if (!defined($self->{buffer})){
+      if (ref($rec->{custcontract}) eq "ARRAY"){
+         $self->{buffer}=[@{$rec->{custcontract}}];
+      }
+      else{
+         $self->{buffer}=[split(/[;,]\s*/,$rec->{custcontract})];
+      }
+   }
+   if (defined($self->{buffer})){
+      #####################################################################
+      # reprocess buffer
+      my $r=shift(@{$self->{buffer}});
+      $rec->{custcontract}=$r;
+      if ($#{$self->{buffer}}==-1){
+         delete($self->{buffer});
+      }
+      else{
+         return(2);
+      }
+   }
+   return(1);
+}
+
+
 
 
 
