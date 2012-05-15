@@ -338,7 +338,7 @@ sub preProcessReadedRecord
       $rec->{id}=$id;
       $rec->{isactive}="1";
    }
-   if ($rec->{dstate}<=10){
+   if ($rec->{dstateid}<=10){
       $rec->{owner}=undef;
       $rec->{mdate}=undef;
    }
