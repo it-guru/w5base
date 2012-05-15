@@ -2,6 +2,7 @@
 'State'=>{de=>'Status'},
 'Databoss'=>{de=>'ADV Verantwortlicher',en=>'ADV accountable'},
 'NOR Model to use'=>{de=>'zu verwendendes NOR Lösungsmodel'},
+'Customer Contract'=>{de=>'Kundenvertrag'},
 'Customer Contract CI-State'=>{de=>'Kundenvertrags CI-Status'},
 'Application names'=>{de=>'Anwendungsnamen'},
 'Contract Number'=>{de=>'Vertragsnummer'},
@@ -32,3 +33,4 @@
 'fieldgroup.MAdmSAN'=>{de=>'Administration SAN (MAdmSAN)',en=>'Administration of SAN (MAdmSAN)'},
 'fieldgroup.MAdmNAS'=>{de=>'Administration NAS (MAdmNAS)',en=>'Administration of NAS (MAdmNAS)'},
 'fieldgroup.MAdmFW'=>{de=>'Firewall-Administration (MAdmFW)',en=>'Firewall-Administration (MAdmFW)'},
+'processing of inventory or traffic data (TKG)'=>{de=>'Verarbeitung von Bestands- oder Verkehrsdaten gemäß Telekomunikationsgesetz (de)'},

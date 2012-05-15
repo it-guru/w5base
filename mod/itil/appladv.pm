@@ -63,6 +63,20 @@ sub new
                 insertafter=>'mandator'
         
    );
+
+   $self->AddFields(
+      new kernel::Field::Text(
+                name          =>'custcontract',
+                label         =>'Customer Contract',
+                weblinkto     =>'NONE',
+                vjointo       =>'itil::lnkapplcustcontract',
+                vjoinon       =>['srcparentid'=>'applid'],
+                vjoindisp     =>'custcontract',
+                vjoinbase     =>[{custcontractcistatusid=>'<=4'}]),
+                insertafter=>'name'
+   );
+
+
    $self->AddFields(
       new kernel::Field::Select(
                 name          =>'modules',
@@ -122,6 +136,17 @@ sub new
                 useNullEmpty  =>1,
                 onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
                 container     =>"additional"),
+
+      new kernel::Field::Boolean(
+                name          =>'processingtkgdata',
+                label         =>'processing of inventory or traffic data (TKG)',
+                group         =>'nordef',
+                searchable    =>0,
+                useNullEmpty  =>1,
+                onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
+                container     =>"additional"),
+
+
       new kernel::Field::Boolean(
                 name          =>'scddata',
                 label         =>'processing of Sensitive Customer Data (SCD)',
@@ -190,6 +215,9 @@ sub autoFillAutogenField
    }
    if ($fld->{name} eq "processingpersdata"){
       return("1");
+   }
+   if ($fld->{name} eq "processingtkgdata"){
+      return("0");
    }
    if ($fld->{name} eq "processingscddata"){
       return("0");
