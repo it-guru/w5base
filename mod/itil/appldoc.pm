@@ -72,6 +72,7 @@ sub new
                 value         =>[10,20,30],         # 20   = edit record
                 default       =>'10',               # 30   = archived record
                 readonly      =>1,
+                translation   =>'itil::appldoc',
                 transprefix   =>'dstate.',
                 dataobjattr   =>"$worktable.dstate"),
                                                   
@@ -86,10 +87,13 @@ sub new
                 selectfix     =>1,
                 htmldetail    =>0,
                 readonly      =>1,
-                selectsearch  =>[['"1" [LEER]',
-                                     $self->T('yes - show only active')],
-                                 ['',
-                                     $self->T('no - show all')]],
+                selectsearch  =>sub{
+                   my $self=shift;
+                   return(['"1" [LEER]',
+                           $self->getParent->T('yes - show only active')],
+                          ['', 
+                           $self->getParent->T('no - show all')]);
+                },
                 label         =>'is active',
                 dataobjattr   =>"$worktable.isactive"),
                                                   
@@ -142,7 +146,7 @@ sub new
                 vjointo       =>'itil::costcenter',
                 vjoinon       =>['conumber'=>'name'],
                 dontrename    =>1,
-                group         =>'delmgmt',
+                htmldetail    =>0,
                 fields        =>[qw(delmgrid delmgr delmgr2id
                                     delmgrteamid)]),
 
@@ -239,6 +243,14 @@ sub new
                "concat(appl.name,'$doclabel','-',".
                        "substr($worktable.docdate,1,7)))"),
 
+      new kernel::Field::QualityText(),
+      new kernel::Field::IssueState(),
+      new kernel::Field::QualityState(),
+      new kernel::Field::QualityOk(),
+      new kernel::Field::QualityLastDate(
+                dataobjattr   =>"$worktable.lastqcheck"),
+      new kernel::Field::QualityResponseArea()
+
    );
    my $fo=$self->getField("isactive");
    delete($fo->{default});
@@ -246,6 +258,20 @@ sub new
    $self->setDefaultView(qw(fullname cistatus mandator dstate isactive editor mdate));
    return($self);
 }
+
+
+sub SetFilterForQualityCheck    # prepaire dataobject for automatic
+{                               # quality check (nightly)
+   my $self=shift;
+   my @view=@_;                 # predefinition for request view
+
+   $self->ResetFilter();
+   $self->SetFilter({active=>"1 [EMPTY]"});
+   $self->SetCurrentView(@view);
+   return(1);
+}
+
+
 
 
 sub handleRawValueAutogenField
@@ -421,6 +447,10 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
+   return(1) if (defined($newrec) &&
+                 exists($newrec->{lastqcheck}) && 
+                 keys(%{$newrec})==1);
+ 
    if (defined($oldrec)){
       $newrec->{dstate}=20;
       $newrec->{isactive}=1;
@@ -465,7 +495,7 @@ sub isViewValid
    if ($rec->{dstate}>10){
       return(qw(header default source));
    }
-   return("header","default");
+   return("header","default","qc");
 }
 
 sub isDeleteValid

@@ -6,6 +6,8 @@
 'Customer Contract CI-State'=>{de=>'Kundenvertrags CI-Status'},
 'Application names'=>{de=>'Anwendungsnamen'},
 'Contract Number'=>{de=>'Vertragsnummer'},
+'yes - show only active'=>{de=>'ja - nur aktive ADV anzeigen'},
+'no - show all'=>{de=>'nein - alle anzeigen'},
 'active ADV'=>{de=>'aktive ADV'},
 'dstate.'=>{de=>'unberührt',en=>'untouched'},
 'dstate.10'=>{de=>'autogen',en=>'autogen'},
@@ -23,3 +25,4 @@
 'processing of inventory or traffic data (TKG)'=>{de=>'Verarbeitung von Bestands- oder Verkehrsdaten gemäß Telekomunikationsgesetz (de)'},
 'Application specific Modules'=>{de=>'Anwendungsspezifische Module'},
 'effectiv aktive modules'=>{de=>'Effektiv aktive Module'},
+'contract wide modules'=>{de=>'Vertragsweit gültige Module'},

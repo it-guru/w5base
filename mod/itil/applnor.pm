@@ -463,7 +463,7 @@ sub isViewValid
    my @l=$self->SUPER::isViewValid($rec);
 
    my @modules=$self->currentModules($rec);
-   push(@l,"nordef","advdef","misc","summary",@modules);
+   push(@l,"nordef","advdef","misc","summary",@modules,"qc");
    return(@l);
 }
 
@@ -785,8 +785,18 @@ sub currentModules
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default ),@{$self->{allModules}},qw(summary misc source));
+   return(qw(header default),@{$self->{allModules}},qw(summary misc source qc));
 }
+
+
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/itil/load/applnor.jpg?".$cgi->query_string());
+}
+
+
 
 
 

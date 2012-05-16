@@ -94,6 +94,17 @@ sub new
                 onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
                 container     =>"additional"),
 
+      new kernel::Field::Text(
+                name          =>'contractmodules',
+                label         =>'contract wide modules',
+                group         =>'default',
+                depend        =>'custcontract',
+                htmldetail    =>0,
+                readonly      =>1,
+                searchable    =>0,
+                onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
+                container     =>"additional"),
+
       new kernel::Field::Select(
                 name          =>'modules',
                 label         =>'effectiv aktive modules',
@@ -103,7 +114,7 @@ sub new
                    $self=shift;
                    return($self->getParent->getAllPosibleApplModules());
                 },
-                depend        =>'custcontract',
+                depend        =>['contractmodules','applmodules'],
                 readonly      =>1,
                 searchable    =>0,
                 onRawValue    =>sub{
@@ -114,28 +125,12 @@ sub new
                    my $afld=$p->getField("applmodules");
                    my $l1=$afld->RawValue($current);
                    $l1=[split(/[;,]\s*/,$l1)] if (ref($l1) ne "ARRAY");
-                   my @modules=();
-
-                   my $f=$self->getParent->getField("custcontract");
-                   my $d=$f->RawValue($current);
-
-                   my @contractid=();
-                   foreach my $crec (@{$d}){
-                      push(@contractid,$crec->{custcontractid});
-                   }
-            
-                   my $o=getModuleObject($self->getParent->Config,
-                                         "finance::custcontract");
-                   $o->SetFilter({id=>\@contractid});
-                   foreach my $crec ($o->getHashList("modules")){
-                      foreach my $rawrec (@{$crec->{modules}}){
-                         push(@modules,$rawrec->{rawname});
-                      }
-                   }
-                   push(@modules,@$l1);
+                   my $afld=$p->getField("contractmodules");
+                   my $l2=$afld->RawValue($current);
+                   $l2=[split(/[;,]\s*/,$l2)] if (ref($l2) ne "ARRAY");
+                   my @modules=(@$l1,@$l2);
                    return(\@modules);
-                },
-                container     =>"additional"),
+                }),
 
       new kernel::Field::Dynamic(
                 name          =>'modulematrix',
@@ -307,6 +302,26 @@ sub autoFillAutogenField
    if ($fld->{name} eq "applmodules"){
       return(["MAppl"]);
    }
+   if ($fld->{name} eq "contractmodules"){
+      my @modules;
+      my $f=$self->getField("custcontract");
+      my $d=$f->RawValue($current);
+
+      my @contractid=();
+      foreach my $crec (@{$d}){
+         push(@contractid,$crec->{custcontractid});
+      }
+      
+      my $o=getModuleObject($self->Config,
+                            "finance::custcontract");
+      $o->SetFilter({id=>\@contractid});
+      foreach my $crec ($o->getHashList("modules")){
+         foreach my $rawrec (@{$crec->{modules}}){
+            push(@modules,$rawrec->{rawname});
+         }
+      }
+      return(\@modules);
+   }
    return($self->SUPER::autoFillAutogenField($fld,$current));
 }
 
@@ -381,8 +396,17 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default advdef nordef),@{$self->{allModules}},qw(source));
+   return(qw(header default advdef nordef),@{$self->{allModules}},qw(source qc));
 }
+
+
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/itil/load/appladv.jpg?".$cgi->query_string());
+}
+
 
 
 
