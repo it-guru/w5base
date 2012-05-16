@@ -300,7 +300,7 @@ sub autoFillAutogenField
       return("0");
    }
    if ($fld->{name} eq "applmodules"){
-      return(["MAppl"]);
+      return(["MAppl","MSystemOS","MHardwareOS"]);
    }
    if ($fld->{name} eq "contractmodules"){
       my @modules;
@@ -406,6 +406,13 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/itil/load/appladv.jpg?".$cgi->query_string());
 }
+
+sub SelfAsParentObject    # this method is needed because existing derevations
+{
+   return("itil::appladv");
+}
+
+
 
 
 

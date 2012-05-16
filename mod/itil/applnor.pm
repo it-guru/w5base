@@ -72,6 +72,7 @@ sub new
                 name          =>'adv',
                 label         =>'relevant ADV',
                 readonly      =>'1',
+                searchable    =>0,
                 vjointo       =>'itil::appladv',
                 vjoinon       =>['advid'=>'id'],
                 vjoindisp     =>'fullname'),
@@ -80,6 +81,7 @@ sub new
                 name          =>'normodel',
                 label         =>'relevant NOR-Solutionmodel',
                 readonly      =>'1',
+                searchable    =>0,
                 weblinkto     =>'NONE',
                 vjointo       =>'itil::appladv',
                 vjoinon       =>['advid'=>'id'],
@@ -89,6 +91,7 @@ sub new
                 name          =>'scddata',
                 label         =>'SCD Datahandling',
                 readonly      =>'1',
+                searchable    =>0,
                 weblinkto     =>'NONE',
                 vjointo       =>'itil::appladv',
                 vjoinon       =>['advid'=>'id'],
@@ -99,6 +102,7 @@ sub new
                 name          =>'modules',
                 label         =>'Modules',
                 readonly      =>'1',
+                searchable    =>0,
                 vjoinconcat   =>",\n",
                 depend        =>'advid',
                 getPostibleValues=>sub{
@@ -252,6 +256,7 @@ sub new
                    htmldetail    =>$self->{displayall},
                    extLabelPostfix=>": ".$module,
                    readonly      =>1,
+                   searchable    =>0,
                    onRawValue    =>sub{
                       my $self=shift;
                       my $current=shift;
@@ -795,6 +800,12 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/itil/load/applnor.jpg?".$cgi->query_string());
 }
+
+sub SelfAsParentObject    # this method is needed because existing derevations
+{
+   return("itil::applnor");
+}
+
 
 
 
