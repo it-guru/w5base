@@ -65,23 +65,25 @@ sub new
    );
 
    $self->AddFields(
-      new kernel::Field::Text(
+      new kernel::Field::SubList(
                 name          =>'custcontract',
                 label         =>'Customer Contract',
                 weblinkto     =>'NONE',
                 vjointo       =>'itil::lnkapplcustcontract',
                 vjoinon       =>['srcparentid'=>'applid'],
-                vjoindisp     =>'custcontract',
-                vjoinbase     =>[{custcontractcistatusid=>'<=4'}]),
+                vjoindisp     =>['custcontract','custcontractcistatus'],
+                vjoinbase     =>[{custcontractcistatusid=>'<=4'}],
+                vjoininhash   =>['custcontract','custcontractid']),
                 insertafter=>'name'
    );
 
 
    $self->AddFields(
       new kernel::Field::Select(
-                name          =>'modules',
-                label         =>'Modules',
+                name          =>'applmodules',
+                label         =>'Application specific Modules',
                 group         =>'advdef',
+                vjoinconcat   =>",\n",
                 multisize     =>'5',
                 #value         =>$self->{allModules},
                 getPostibleValues=>sub{
@@ -90,6 +92,49 @@ sub new
                 },
                 searchable    =>0,
                 onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
+                container     =>"additional"),
+
+      new kernel::Field::Select(
+                name          =>'modules',
+                label         =>'effectiv aktive modules',
+                group         =>'default',
+                vjoinconcat   =>",\n",
+                getPostibleValues=>sub{
+                   $self=shift;
+                   return($self->getParent->getAllPosibleApplModules());
+                },
+                depend        =>'custcontract',
+                readonly      =>1,
+                searchable    =>0,
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+
+                   my $p=$self->getParent();
+                   my $afld=$p->getField("applmodules");
+                   my $l1=$afld->RawValue($current);
+                   $l1=[split(/[;,]\s*/,$l1)] if (ref($l1) ne "ARRAY");
+                   my @modules=();
+
+                   my $f=$self->getParent->getField("custcontract");
+                   my $d=$f->RawValue($current);
+
+                   my @contractid=();
+                   foreach my $crec (@{$d}){
+                      push(@contractid,$crec->{custcontractid});
+                   }
+            
+                   my $o=getModuleObject($self->getParent->Config,
+                                         "finance::custcontract");
+                   $o->SetFilter({id=>\@contractid});
+                   foreach my $crec ($o->getHashList("modules")){
+                      foreach my $rawrec (@{$crec->{modules}}){
+                         push(@modules,$rawrec->{rawname});
+                      }
+                   }
+                   push(@modules,@$l1);
+                   return(\@modules);
+                },
                 container     =>"additional"),
 
       new kernel::Field::Dynamic(
@@ -167,6 +212,7 @@ sub new
 
 
    foreach my $module (@{$self->{allModules}}){
+      $self->AddGroup($module,translation=>'itil::ext::custcontractmod');
       $self->AddFields(
          new kernel::Field::Text(
                    name          =>$module."CountryRest",  # ISO 3166 kürzel
@@ -228,24 +274,14 @@ sub getAllPosibleApplModules
 {
    my $self=shift;
 
-   my @moduletags=qw(
-     MAppl                      
-     MSystemOS MHardwareOS
-     MSystemMF MHardwareMF
-     MWebSrv 
-     MDB 
-     MBackupRestore 
-     MAdmVirtHost
-     MAdmVPN
-     MAdmNAS
-     MAdmSAN
-     MAdmFW
-   );
-   my @l;
-   foreach my $m (@moduletags){
-      push(@l,$m,$self->T("fieldgroup.$m"));
+   my $o=getModuleObject($self->Config,"finance::custcontractmod");
+
+   my @l=$o->getPosibleModuleValues();
+   my @d;
+   foreach my $l (@l){
+      push(@d,$l->{rawname},$l->{name});
    }
-   return(@l);
+   return(@d);
 }
 
 
@@ -268,8 +304,8 @@ sub autoFillAutogenField
    if ($fld->{name} eq "processingscddata"){
       return("0");
    }
-   if ($fld->{name} eq "modules"){
-      return(["MAppl","MSystemOS","MHardwareOS"]);
+   if ($fld->{name} eq "applmodules"){
+      return(["MAppl"]);
    }
    return($self->SUPER::autoFillAutogenField($fld,$current));
 }
@@ -313,6 +349,7 @@ sub isViewValid
    if ($rec->{dstate}>=10){
       my @modules=($rec->{modules});
       @modules=@{$modules[0]} if (ref($modules[0]) eq "ARRAY");
+      
       push(@l,"nordef","advdef",@modules);
    }
    return(@l);

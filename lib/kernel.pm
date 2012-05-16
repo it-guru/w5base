@@ -645,7 +645,7 @@ sub getModuleObject
          #print("Content-type:text/plain\n\n");
          msg(ERROR,"can't create object '%s'",$package); 
          if ($msg ne ""){ 
-            print STDERR ("--\n$msg");
+            print STDERR ("---\n$msg---\n");
          }
          return(undef);
       }

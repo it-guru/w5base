@@ -1,0 +1,42 @@
+'fieldgroup.MAppl'         =>{de=>'Betrieb: Anwendungsbetrieb (MAppl)',
+                              en=>'Business: Applicationbusiness (MAppl)'},
+
+'fieldgroup.MDB'           =>{de=>'Betrieb: Datenbankbetrieb und Administration (MDB)',
+                              en=>'Business: Databasebusiness (MDB)'},
+
+'fieldgroup.MMiddleWare'   =>{de=>'Betrieb: MiddleWare Administration (MMiddleWare)',
+                              en=>'Business: MiddleWare administration (MMiddleWare)'},
+
+'fieldgroup.MSystemOS'     =>{de=>'Server: Administration Betriebssystem OpenSystems (MSystemOS)',
+                              en=>'Server: Administration of operation OpenSystems (MSystemOS)'},
+
+'fieldgroup.MHardwareOS'   =>{de=>'Server: Betreuung der Server Hardware OpenSystems (MHardwareOS)',
+                              en=>'Server: responsibile for server hardware OpenSystems (MHardwareOS)'},
+
+'fieldgroup.MAdmVirtHost'  =>{de=>'Server: Administration virtueller Hosts (MAdmVirtHost)',
+                              en=>'Server: Administration of virtual hosts (MAdmVirtHost)'},
+
+'fieldgroup.MBackupRestore'=>{de=>'Backup, Restrore und Archive (MBackupRest)',
+                              en=>'Backup, Restore and archivs (MBackupRest)'},
+
+'fieldgroup.MSystemMF'     =>{de=>'Mainframe: Administration Betriebssystem (MSystemMF)',
+                              en=>'Mainframe: Administration of operation system (MSystemMF)'},
+
+'fieldgroup.MHardwareMF'   =>{de=>'Mainframe: Betreuung der Server-Hardware (MHardwareMF)',
+                              en=>'Mainframe: responsibile for server hardware (MHardwareMF)'},
+
+'fieldgroup.MStorNAS'      =>{de=>'Storage: NAS Betreuung (MStorNAS)',
+                              en=>'Storage: NAS Service (MStorNAS)'},
+
+'fieldgroup.MStorSAN'      =>{de=>'Storage: SAN Betreuung (MStorSAN)',
+                              en=>'Storage: SAN Service (MStorSAN)'},
+
+'fieldgroup.MSupport'      =>{de=>'Support: Servicedesk, Helpline, Hotline (MSupport)',
+                              en=>'Support: Servicedesk, Helpline, Hotline (MSupport)'},
+
+'fieldgroup.MNetwork'      =>{de=>'Network: Netzwerkanbindung, FW, DMZ, ISDN, SSL (MNetwork)',
+                              en=>'Network: Networkconnect, FW, DMZ, ISDN, SSL (MNetwork)'},
+
+'fieldgroup.MSub'          =>{de=>'Subunternehmer Leistungen (MSub)',
+                              en=>'Subcompany Services (MSub)'},
+

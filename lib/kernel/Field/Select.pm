@@ -27,7 +27,9 @@ use Text::ParseWords;
 sub new
 {
    my $type=shift;
-   my $self=bless($type->SUPER::new(@_),$type);
+   my %param=@_;
+   $param{vjoinconcat}=", " if (!exists($param{vjoinconcat}));
+   my $self=bless($type->SUPER::new(%param),$type);
    $self->{_permitted}->{jsonchanged}=1;      # On Changed Handling
    $self->{_permitted}->{jsoninit}=1;      # On Init Handling
    $self->{allownative}=undef if (!exists($self->{allownative}));
@@ -377,15 +379,42 @@ sub FormatedResult
       }
    }
    $d=[$d] if (ref($d) ne "ARRAY");
-  
+ 
+   my $res;
    if (defined($self->{getPostibleValues}) &&
        ref($self->{getPostibleValues}) eq "CODE"){
-      my %opt=&{$self->{getPostibleValues}}($self,$current,undef);
-      return(join(", ",map({ defined($opt{$_}) ? $opt{$_} : '?'; } @{$d})));
+      my @opt=&{$self->{getPostibleValues}}($self,$current,undef);
+      my @res;
+      my %p;
+      map({$p{$_}++} @{$d});
+      
+      while(my $k=shift(@opt)){
+         my $v=shift(@opt);
+         if (exists($p{$k})){
+            push(@res,$v);
+            delete($p{$k});
+         }
+      }
+      foreach my $k (keys(%p)){
+         push(@res,"?-$k");
+      }
+
+
+
+      $res=join($self->vjoinconcat,@res);
    }
-   return(join(", ",map({
-        $self->getParent->T($self->{transprefix}.$_,$self->{translation})
-                        } @{$d})));
+   else{
+       $res=join($self->vjoinconcat,map({
+           $self->getParent->T($self->{transprefix}.$_,$self->{translation})
+                           } @{$d}));
+   }
+   if ($FormatAs=~m/^Html/){
+      $res=~s/</&lt;/g;
+      $res=~s/>/&gt;/g;
+      $res=~s/\n/<br>\n/g;
+   }
+
+   return($res);
 }
 
 

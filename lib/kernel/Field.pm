@@ -139,9 +139,9 @@ sub new
    if (!defined($self->{uivisible}) && !$self->{selectable}){
       $self->{uivisible}=0;
    }
+   $self->{vjoinconcat}="; " if (!exists($self->{vjoinconcat}));
+   $self->{_permitted}->{vjoinconcat}=1;# Verkettung der Ergebnisse
    if (defined($self->{vjointo})){
-      $self->{vjoinconcat}="; " if (!exists($self->{vjoinconcat}));
-      $self->{_permitted}->{vjoinconcat}=1;# Verkettung der Ergebnisse
       if (!defined($self->{weblinkto})){
          $self->{weblinkto}=$self->{vjointo};
       }
@@ -313,6 +313,19 @@ sub Uploadable
    return(0) if ($self->{name} eq "srcsys");
    return(0) if ($self->{name} eq "srcload");
    return(1);
+}
+
+
+sub getField
+{
+   my $self=shift;
+   return($self->getParent->getField(@_));
+}
+
+sub Config
+{
+   my $self=shift;
+   return($self->getParent->Config(@_));
 }
 
 sub DefaultValue

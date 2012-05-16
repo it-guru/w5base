@@ -58,17 +58,17 @@ sub new
       new kernel::Field::Select(
                 name          =>'name',
                 label         =>'Modulename',
-                weblinkto     =>"none",
-                vjointo       =>'base::itemizedlist',
-                vjoinbase     =>{
-                   selectlabel=>\'finance::custcontractmod::name',
+                getPostibleValues=>sub{
+                   $self=shift;
+                   my @l=$self->getParent->getPosibleModuleValues();
+                   my @d;
+                   foreach my $l (@l){
+                      push(@d,$l->{rawname},$l->{name});
+                   }
+                   return(@d);
                 },
-                vjoineditbase =>{
-                   selectlabel=>\'finance::custcontractmod::name',
-                   cistatusid=>\'4'
-                },
-                vjoinon       =>['rawname'=>'name'],
-                vjoindisp     =>'displaylabel'),
+                dataobjattr   =>'custcontractmod.name'),
+
 
 
       new kernel::Field::Textarea(
@@ -135,9 +135,35 @@ sub new
                 dataobjattr   =>'custcontractmod.realeditor')
    );
    $self->setDefaultView(qw(linenumber name cistatus mandator mdate fullname));
+   $self->LoadSubObjs("ext/custcontractmod","custcontractmod");
    $self->setWorktable("custcontractmod");
    return($self);
 }
+
+
+sub getPosibleModuleValues
+{
+   my $self=shift;
+   my $current=shift;
+   my $newrec=shift;
+   my $app=$self;
+   my @opt;
+   my $parentobj;
+   if (defined($current)){
+      $parentobj=$current->{parentobj};
+   }
+   else{
+      $parentobj=$newrec->{parentobj};
+   }
+   my @l=();
+
+
+   foreach my $obj (values(%{$app->{custcontractmod}})){
+      $obj->collectModules($self,\@l,$current,$newrec);
+   }
+   return(@l);
+}
+
 
 
 sub getDetailBlockPriority

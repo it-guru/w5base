@@ -94,14 +94,31 @@ sub new
                 vjoinon       =>['advid'=>'id'],
                 vjoindisp     =>'scddata'),
 
-      new kernel::Field::TextDrop(
+
+      new kernel::Field::Select(
                 name          =>'modules',
                 label         =>'Modules',
                 readonly      =>'1',
-                weblinkto     =>'NONE',
-                vjointo       =>'itil::appladv',
-                vjoinon       =>['advid'=>'id'],
-                vjoindisp     =>'modules'),
+                vjoinconcat   =>",\n",
+                depend        =>'advid',
+                getPostibleValues=>sub{
+                   $self=shift;
+                   my $o=getModuleObject($self->Config,"itil::appladv");
+                   return($o->getAllPosibleApplModules());
+                },
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $f=$self->getField("advid");
+                   my $advid=$f->RawValue($current);
+                   my $o=getModuleObject($self->Config,"itil::appladv");
+                   $o->SetFilter({id=>\$advid});
+                   my ($rec,$msg)=$o->getOnlyFirst(qw(modules));
+                   if (defined($rec)){
+                      return($rec->{modules});
+                   }
+                   return([]);
+                }),
 
       new kernel::Field::Text(
                 name          =>'advid',
@@ -151,7 +168,7 @@ sub new
    }
 
    foreach my $module (@{$self->{allModules}}){
-      $self->AddGroup($module,translation=>'itil::appladv');
+      $self->AddGroup($module,translation=>'itil::ext::custcontractmod');
       $self->AddFields(
          new kernel::Field::Text(
                    name          =>$module."DeliveryCountries", 
@@ -305,7 +322,7 @@ sub new
                 onRawValue    =>sub{
                     my $self=shift;
                     my $current=shift;
-                    my @m=split(/[;,\s]\s*/,$current->{modules});
+                    my @m=$self->getParent->currentModules($current);
                     my $res=1;
                     my %country;
                     foreach my $m (@m){
@@ -392,10 +409,7 @@ sub new
                 onRawValue    =>sub{
                     my $self=shift;
                     my $current=shift;
-                    my $mfld=$self->getParent->getField("modules");
-                    my $m=$mfld->RawValue($current);
-                    $m=join(",",@$m) if (ref($m) eq "ARRAY"); 
-                    my @m=split(/[;,\s]\s*/,$m);
+                    my @m=$self->getParent->currentModules($current);
                     my $res=1;
                     foreach my $m (@m){
                        my $fo=$self->getParent->getField($m.
@@ -408,7 +422,12 @@ sub new
                        }
                     }
                     return($res);
-                })
+                }),
+      new kernel::Field::Textarea(
+                name          =>'comments',
+                group         =>'misc',
+                label         =>'Comments',
+                dataobjattr   =>'applnor.comments'),
    );
 
 
@@ -443,9 +462,8 @@ sub isViewValid
    my $rec=shift;
    my @l=$self->SUPER::isViewValid($rec);
 
-   my @modules=split(/,\s/,$rec->{modules});
-   @modules=@{$modules[0]} if (ref($modules[0]) eq "ARRAY");
-   push(@l,"nordef","advdef","summary",@modules);
+   my @modules=$self->currentModules($rec);
+   push(@l,"nordef","advdef","misc","summary",@modules);
    return(@l);
 }
 
@@ -455,9 +473,8 @@ sub isWriteValid
    my $rec=shift;
    if ($rec->{dstate}<30){
       my @l;
-      my @modules=split(/,\s/,$rec->{modules});
-      @modules=@{$modules[0]} if (ref($modules[0]) eq "ARRAY");
-      push(@l,"nordef","advdef",@modules);
+      my @modules=$self->currentModules($rec);
+      push(@l,"nordef","advdef","misc",@modules);
       my $userid=$self->getCurrentUserId();
       return(@l) if ($rec->{databossid} eq $userid ||
                      $rec->{delmgr2id} eq $userid ||
@@ -540,25 +557,27 @@ sub autoFillAutogenField
       }
    }
    elsif (
-          $fld->{name} eq "MWebSrvDeliveryGroup" || 
-          $fld->{name} eq "MWebSrvDeliveryItemID" ||
-          $fld->{name} eq "MWebSrvDeliveryGroupID" ||
+          $fld->{name} eq "MMiddleWareDeliveryGroup" || 
+          $fld->{name} eq "MMiddleWareDeliveryItemID" ||
+          $fld->{name} eq "MMiddleWareDeliveryGroupID" ||
           $fld->{name} eq "MDBDeliveryGroup" || 
           $fld->{name} eq "MDBDeliveryItemID" ||
           $fld->{name} eq "MDBDeliveryGroupID"
          ){
-      my $swnature="NIX";
-      if ($fld->{group} eq "MWebSrv"){
-         $swnature='apache iis';
-      }
-      if ($fld->{group} eq "MDB"){
-         $swnature='mysql mssql PostgeSQL DB2 "Oracle DB Server"';
-      }
       my $o=getModuleObject($self->Config,"itil::swinstance");
       $o->SetFilter({applid=>\$current->{srcparentid},
-                     swnature=>$swnature,
                      cistatusid=>"<=5"});
-      foreach my $rec ($o->getHashList(qw(id swteam swteamid))){
+      foreach my $rec ($o->getHashList(qw(id swteam swteamid swnature))){
+         if ($fld->{group} eq "MDB"){
+            next if (!in_array($rec->{swnature},
+                               ["mysql","mssql","postgesql","db2",
+                                "oracle db server"]));
+         }
+         if ($fld->{group} eq "MMiddleWare"){
+            next if (in_array($rec->{swnature},
+                              ["mysql","mssql","postgesql","db2",
+                               "oracle db server"]));
+         }
          $self->autoFillAddResultCache(
             [$fld->{group}."DeliveryGroupID",
              $rec->{swteamid},$current->{srcparentid}],
@@ -752,12 +771,21 @@ sub resolvUserID
    return($rec);
 }
 
+sub currentModules
+{
+   my $self=shift;
+   my $current=shift;
+
+   my $m=$self->getField("modules")->RawValue($current);
+   return(@$m);
+}
+
 
 
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default ),@{$self->{allModules}},qw(summary source));
+   return(qw(header default ),@{$self->{allModules}},qw(summary misc source));
 }
 
 
