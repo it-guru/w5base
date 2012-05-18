@@ -68,7 +68,9 @@ sub qcheckRecord
          return($exitcode,$desc);
       }
    }
-   return($exitcode,$desc) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
+   return($exitcode,$desc) if (($rec->{cistatusid}!=4 && 
+                                $rec->{cistatusid}!=3) ||
+                               $rec->{opmode} eq "license");
 
    if ($rec->{scapprgroup}=~m/^\s*$/){
       $exitcode=3 if ($exitcode<3);

@@ -59,7 +59,9 @@ sub qcheckRecord
 
    my $exitcode=0;
    my $desc={qmsg=>[],solvtip=>[]};
-   return($exitcode,$desc) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
+   return($exitcode,$desc) if (($rec->{cistatusid}!=4 && 
+                               $rec->{cistatusid}!=3) ||
+                               $rec->{opmode} eq "license");
 
    if ($rec->{acinmassingmentgroup}=~m/^\s*$/){
       $exitcode=3 if ($exitcode<3);
