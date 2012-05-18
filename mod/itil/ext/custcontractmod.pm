@@ -42,6 +42,7 @@ sub collectModules
      MAppl                      
      MMiddleWare 
      MDB 
+     MBackupRestore 
      MSystemOS MHardwareOS
      MAdmVirtHost
      MSystemMF MHardwareMF

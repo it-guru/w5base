@@ -76,6 +76,20 @@ sub new
                 vjoininhash   =>['custcontract','custcontractid']),
                 insertafter=>'name'
    );
+   $self->AddFields(
+      new kernel::Field::Text(
+                name          =>'custcontractnames',
+                label         =>'Customer Contract numbers',
+                weblinkto     =>'NONE',
+                htmldetail    =>0,
+                readonly      =>1,
+                uploadable    =>1,
+                vjointo       =>'itil::lnkapplcustcontract',
+                vjoinon       =>['srcparentid'=>'applid'],
+                vjoindisp     =>['custcontract'],
+                vjoinbase     =>[{custcontractcistatusid=>'<=4 AND >=2'}]),
+                insertafter=>'custcontract'
+   );
 
 
    $self->AddFields(
@@ -137,6 +151,8 @@ sub new
                 label         =>'Module Matrix',
                 depend        =>['modules'],
                 group         =>'advdef',
+                readonly      =>1,
+                uploadable    =>0,
                 searchable    =>0,
                 fields        =>\&addModuleMatrix),
 

@@ -138,6 +138,8 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'conumber',
+                uploadable    =>0,
+                readonly      =>1,
                 htmldetail    =>0,
                 label         =>'CO-Number',
                 dataobjattr   =>'appl.conumber'),
@@ -146,12 +148,16 @@ sub new
                 vjointo       =>'itil::costcenter',
                 vjoinon       =>['conumber'=>'name'],
                 dontrename    =>1,
+                readonly      =>1,
+                uploadable    =>0,
                 htmldetail    =>0,
                 fields        =>[qw(delmgrid delmgr delmgr2id
                                     delmgrteamid)]),
 
       new kernel::Field::Group(
                 name          =>'responseteam',
+                readonly      =>1,
+                uploadable    =>0,
                 translation   =>'itil::appl',
                 label         =>'CBM Team',
                 vjoinon       =>'responseteamid'),
@@ -163,6 +169,8 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'customer',
                 label         =>'Customer',
+                readonly      =>1,
+                uploadable    =>0,
                 translation   =>'itil::appl',
                 htmldetail    =>0,
                 vjointo       =>'base::grp',
@@ -563,7 +571,22 @@ sub prepUploadFilterRecord
    my $self=shift;
    my $newrec=shift;
 
+   if ((!defined($newrec->{id}) || $newrec->{id} eq "")
+       && $newrec->{name} ne ""){
+      my $o=$self->Clone();
+      $o->SetFilter({name=>\$newrec->{name},
+                     isactive=>'1 [EMPTY]'});
+      my ($crec,$msg)=$o->getOnlyFirst(qw(id));
+      if (defined($crec)){
+         $newrec->{id}=$crec->{id};
+      }
+      else{
+         $self->LastMsg(ERROR,"invalid application");
+      }
+   }
+
    delete($newrec->{name});
+   delete($newrec->{custcontractnames});
    $self->SUPER::prepUploadFilterRecord($newrec);
 }
 
