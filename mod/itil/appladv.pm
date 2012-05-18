@@ -97,7 +97,7 @@ sub new
                 name          =>'applmodules',
                 label         =>'Application specific Modules',
                 group         =>'advdef',
-                vjoinconcat   =>",\n",
+                vjoinconcat   =>";\n",
                 multisize     =>'5',
                 #value         =>$self->{allModules},
                 getPostibleValues=>sub{

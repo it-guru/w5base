@@ -459,7 +459,22 @@ sub prepUploadRecord   # prepair one record on upload
       my @options=$self->getPostibleValues($oldrec,$newrec,"edit");
       my @o=@options;
       if ($self->{multisize}>0){  # multivalue selects
-         $reqval=[split(/[,;]\s+/,$reqval)] if (ref($reqval) ne "ARRAY");
+         if (ref($reqval) ne "ARRAY"){
+            my $joinconcat=$self->vjoinconcat;
+            my $sep;
+            if ($joinconcat=~m/,/){
+               $sep='[,]\s+';
+               $reqval=~s/[,\s\n]*$//s;
+            }
+            elsif ($joinconcat=~m/;/){
+               $sep='[;]\s+';
+               $reqval=~s/[;\s\n]*$//s;
+            }
+            else{
+               $sep='[,;]\s+';
+            }
+            $reqval=[grep(!/^\s*$/,split(/$sep/,$reqval))];
+         }
          $newkey=[];
          if ($#{$reqval}!=-1){
             foreach my $strval (@$reqval){
