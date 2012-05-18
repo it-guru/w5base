@@ -22,6 +22,7 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use HTML::TagFilter;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 
@@ -339,8 +340,51 @@ sub Validate
       }
    }
    if (exists($newrec->{data})){
-      $newrec->{data}=~s/<script/<div style="visible:hidden" script/gi;
-      $newrec->{data}=~s/<\script>/<\/div>/gi;
+      my $tf=new HTML::TagFilter(strip_comments => 1,
+                                 verbose=>1,
+                                 log_rejects => 1);  
+      $tf->clear_rules();
+      $tf->allow_tags({br=>{},
+                       strong=>{},
+                       sup=>{}, sub=>{},
+                       ol=>{}, ul=>{}, li=>{},
+                       h1=>{style=>[any=>[]]}, 
+                       h2=>{style=>[any=>[]]}, 
+                       h3=>{style=>[any=>[]]}, 
+                       h4=>{style=>[any=>[]]}, 
+                       h5=>{style=>[any=>[]]},
+                       xmp=>{},
+                       pre=>{},
+                       img=>{src=>['any'=>[]],border=>['any'=>[]]},
+                       a=>{href=>['any'=>[]],
+                           title=>['any'=>[]],
+                           target=>['any'=>[]]},
+                       font=>{'any'=>[]},
+                       hr=>{'/'=>['/']},
+                       br=>{'/'=>['/']},
+                       span=>{style=>[any=>[]]},
+                       p=>{align=> ['left','right','center'],
+                           class=>[any=>[]],
+                           style=>[any=>[]]},
+                      });
+      $newrec->{data}=$tf->filter($newrec->{data});
+      my %e;
+      foreach my $le ($tf->report()){
+         if ($le->{reason} eq "tag"){
+            $e{sprintf("faq article tag '%s' error",
+                      $le->{tag})}++;
+         }
+         if ($le->{reason} eq "attribute"){
+            $e{sprintf("faq article tag '%s' attr '%s' val='%s'",
+                      $le->{tag},$le->{attribute},$le->{value})}++;
+         }
+      }
+      if (keys(%e) && !grep(/FORCE_SAVE_ARTICLE/,$newrec->{data})){
+         $self->LastMsg(ERROR,"no FORCE_SAVE_ARTICLE and invalid html tags\n".
+                              join("\n",keys(%e)));
+         return(0);
+      }
+      $newrec->{data}=~s/FORCE_SAVE_ARTICLE//g;
    }
    if (exists($newrec->{data})){
       $newrec->{data}=~s/(^|[^>])FAQ(\d{10,20})([^<]|$)/<i>FAQ$2<\/i>/gi;
