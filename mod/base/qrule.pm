@@ -352,7 +352,9 @@ sub nativQualityCheck
          delete($ENV{HTTP_FORCE_LANGUAGE}) if ($ENV{HTTP_FORCE_LANGUAGE} eq "");
          $wf->ResetFilter();
          $wf->SetFilter({stateid=>"<20",class=>\"base::workflow::DataIssue",
-                         directlnktype=>\$affectedobject,
+                        # directlnktype=>\$affectedobject,
+                         directlnktype=>[$affectedobject,
+                                         $dataobj->SelfAsParent()],
                          directlnkid=>\$affectedobjectid});
          #msg(INFO,"QualityRule Level4");
          my ($WfRec,$msg)=$wf->getOnlyFirst(qw(ALL));
