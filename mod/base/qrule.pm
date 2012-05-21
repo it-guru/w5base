@@ -219,7 +219,6 @@ sub nativQualityCheck
    my $parentTransformationCount=0;
 
    if ($parent->Self() ne "base::workflow"){
-#   if (0){
       foreach my $lnkrec ($lnkr->getHashList(qw(mdate qruleid dataobj))){
          my $do=getModuleObject($self->Config,$lnkrec->{dataobj});
          if (my $qrule=$self->isQruleApplicable($do,$objlist,$lnkrec,$rec)){
@@ -321,9 +320,9 @@ sub nativQualityCheck
       my $affectedobject=$dataobj->Self(); # new version of affected calc
       my $idfield=$dataobj->IdField();
       my $affectedobjectid=$idfield->RawValue($rec);
-      #msg(INFO,"QualityRule Level1");
+      msg(INFO,"QualityRule Level1");
       if (keys(%alldataissuemsg)){
-         #msg(INFO,"QualityRule Level2");
+         msg(INFO,"QualityRule Level2");
          my $directlnkmode="DataIssueMsg";
          my $detaildescription;
          foreach my $qrule (keys(%alldataissuemsg)){
@@ -339,7 +338,7 @@ sub nativQualityCheck
                }
             }
          }
-         #msg(INFO,"QualityRule Level3");
+         msg(INFO,"QualityRule Level3");
          my $oldforce=$ENV{HTTP_FORCE_LANGUAGE};
          $ENV{HTTP_FORCE_LANGUAGE}="en";
          my $objectname=$dataobj->getRecordHeader($rec);
@@ -407,7 +406,8 @@ sub nativQualityCheck
       $wf->ResetFilter();
       $wf->SetFilter({stateid=>"<20",class=>\"base::workflow::DataIssue",
                       srcload=>"<\"$checkStart GMT\"",
-                      directlnktype=>\$affectedobject,
+                      directlnktype=>[$affectedobject,
+                                      $dataobj->SelfAsParentObject()],
                       directlnkid=>\$affectedobjectid});
       $wf->SetCurrentView(qw(ALL));
       $wf->ForeachFilteredRecord(sub{
