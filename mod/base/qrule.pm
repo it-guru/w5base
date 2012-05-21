@@ -240,7 +240,7 @@ sub nativQualityCheck
                   $parent=$do;
                }
                else{
-                  msg(ERROR,"qrule.pm can not detect idfield in ",$do->Self());
+                  msg(ERROR,"qrule.pm can not detect idfield in ".$do->Self());
                }
             }
             else{
