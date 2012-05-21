@@ -45,6 +45,8 @@ sub getDetailBlockPriority                # posibility to change the block order
 sub IdField
 {
    my $self=shift;
+   my $p=$self->getParent;
+   return() if (!defined($p));
    return($self->getParent->IdField());
 }
 
