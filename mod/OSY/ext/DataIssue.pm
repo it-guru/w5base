@@ -39,12 +39,7 @@ sub getControlRecord
              dataobj   =>'OSY::system',
              target    =>'name',
              targetid  =>'id'
-           },
-           {
-             dataobj   =>'OSY::asset',
-             target    =>'name',
-             targetid  =>'id'
-           },
+           }
          ];
    return($d);
 }
