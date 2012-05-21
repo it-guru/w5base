@@ -218,33 +218,35 @@ sub nativQualityCheck
 
    my $parentTransformationCount=0;
 
-   foreach my $lnkrec ($lnkr->getHashList(qw(mdate qruleid dataobj))){
-      my $do=getModuleObject($self->Config,$lnkrec->{dataobj});
-      if (my $qrule=$self->isQruleApplicable($do,$objlist,$lnkrec,$rec)){
-         if ($parent->Self() ne $do->Self()){
-            if ($parentTransformationCount==0){
-               # rec muß neu gelesen werden!
-               $do->ResetFilter();
-               my $idobj=$do->IdField();
-               if (defined($idobj)){
-                  my $idname=$do->IdField()->Name();
-                  $do->SetFilter({$idname=>\$rec->{$idname}});
-                  ($rec)=$do->getOnlyFirst(qw(ALL)); 
-                  if (!defined($rec)){
-                     msg(ERROR,"parent transformation error while reread rec");
-                     return;
+   if (!($parent->Self=~m/::workflow::/)){
+      foreach my $lnkrec ($lnkr->getHashList(qw(mdate qruleid dataobj))){
+         my $do=getModuleObject($self->Config,$lnkrec->{dataobj});
+         if (my $qrule=$self->isQruleApplicable($do,$objlist,$lnkrec,$rec)){
+            if ($parent->Self() ne $do->Self()){
+               if ($parentTransformationCount==0){
+                  # rec muß neu gelesen werden!
+                  $do->ResetFilter();
+                  my $idobj=$do->IdField();
+                  if (defined($idobj)){
+                     my $idname=$do->IdField()->Name();
+                     $do->SetFilter({$idname=>\$rec->{$idname}});
+                     ($rec)=$do->getOnlyFirst(qw(ALL)); 
+                     if (!defined($rec)){
+                        msg(ERROR,"parent transformation error while reread rec");
+                        return;
+                     }
+                     $objlist=$do->getQualityCheckCompat($rec); # recreate compat list
+                     msg(INFO,"qrule parent transformation from %s to %s done",
+                              $parent->Self(),$do->Self());
+                     $parent=$do;
                   }
-                  $objlist=$do->getQualityCheckCompat($rec); # recreate compat list
-                  msg(INFO,"qrule parent transformation from %s to %s done",
-                           $parent->Self(),$do->Self());
-                  $parent=$do;
+                  else{
+                     msg(ERROR,"qrule.pm can not detect idfield in ".$do->Self());
+                  }
                }
                else{
-                  msg(ERROR,"qrule.pm can not detect idfield in ".$do->Self());
+                  msg(ERROR,"mulitple parent transformation detected");
                }
-            }
-            else{
-               msg(ERROR,"mulitple parent transformation detected");
             }
          }
       }
