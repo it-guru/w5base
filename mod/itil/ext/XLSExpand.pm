@@ -179,7 +179,6 @@ sub ProcessLine
       }
    } 
    if (defined($in->{'itil::asset::name'})){
-      printf STDERR ("process in by assetid\n");
       my $ass=$self->getParent->getPersistentModuleObject('itil::asset');
       my @flt=();
       if (defined($in->{'itil::asset::name'})){
@@ -222,7 +221,6 @@ sub ProcessLine
    }
    if (defined($in->{'itil::system::name'}) || 
        defined($in->{'itil::system::id'})){
-      printf STDERR ("process in by systemname\n");
       my $sys=$self->getParent->getPersistentModuleObject('itil::system');
       my @flt=();
       if (defined($in->{'itil::system::name'})){
