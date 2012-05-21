@@ -36,16 +36,6 @@ sub getControlRecord
    my $self=shift;
    my $d=[ 
            {
-             dataobj   =>'OSY::appl',
-             target    =>'name',
-             targetid  =>'id'
-           },
-           {
-             dataobj   =>'OSY::custcontract',
-             target    =>'name',
-             targetid  =>'id'
-           },
-           {
              dataobj   =>'OSY::system',
              target    =>'name',
              targetid  =>'id'

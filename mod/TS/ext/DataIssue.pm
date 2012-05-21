@@ -41,11 +41,6 @@ sub getControlRecord
              targetid  =>'id'
            },
            {
-             dataobj   =>'TS::custcontract',
-             target    =>'name',
-             targetid  =>'id'
-           },
-           {
              dataobj   =>'TS::system',
              target    =>'name',
              targetid  =>'id'
