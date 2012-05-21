@@ -112,6 +112,13 @@ sub ProcessLine
 {
    my $self=shift;
 
+   my @useField=Query->Param("useField");
+   if ($#useField==-1){
+      if ($#{$self->{recordlist}}>2){
+         return(undef);
+      }
+   }
+
    return($self->kernel::Formater::ProcessLine(@_));
 }
 

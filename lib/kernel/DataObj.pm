@@ -2468,6 +2468,7 @@ sub getSubList
    return("...")       if ($mode=~m/^Multi.*/);   # on FormaterMultiOperation s
    $mode="HtmlSubList" if ($mode=~m/^.{0,1}Html.*$/);
    $mode="SubXMLV01"   if ($mode=~m/XML/);
+   $mode="CsvV01"      if ($mode=~m/^OneLine$/);
    $param{parentcurrent}=$current;
    if ($mode eq "RAW" || $mode eq "JSON"){
       my @view=$self->GetCurrentView();
