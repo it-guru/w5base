@@ -218,7 +218,8 @@ sub nativQualityCheck
 
    my $parentTransformationCount=0;
 
-   if (!($parent->Self=~m/::workflow::/)){
+   if ($parent->Self() ne "base::workflow"){
+#   if (0){
       foreach my $lnkrec ($lnkr->getHashList(qw(mdate qruleid dataobj))){
          my $do=getModuleObject($self->Config,$lnkrec->{dataobj});
          if (my $qrule=$self->isQruleApplicable($do,$objlist,$lnkrec,$rec)){
@@ -354,7 +355,7 @@ sub nativQualityCheck
          $wf->SetFilter({stateid=>"<20",class=>\"base::workflow::DataIssue",
                         # directlnktype=>\$affectedobject,
                          directlnktype=>[$affectedobject,
-                                         $dataobj->SelfAsParent()],
+                                         $dataobj->SelfAsParentObject()],
                          directlnkid=>\$affectedobjectid});
          #msg(INFO,"QualityRule Level4");
          my ($WfRec,$msg)=$wf->getOnlyFirst(qw(ALL));
