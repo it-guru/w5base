@@ -132,6 +132,7 @@ sub new
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
                 label         =>'Contacts',
+                vjointo       =>'base::lnkprojectroomcontact',
                 class         =>'mandator',
                 vjoinbase     =>[{'parentobj'=>\'base::projectroom'}],
                 vjoininhash   =>['targetid','target','roles'],
@@ -347,6 +348,17 @@ sub Validate
    my $newrec=shift;
 
    my $name=trim(effVal($oldrec,$newrec,"name"));
+
+   $name=~s/\s+/_/g;
+   if (length($name)<3 || haveSpecialChar($name) ||
+       ($name=~m/^\d+$/) || # only numbers as application name is not ok!
+       ($name=~m/\@/)){     # @ is in some cases invalid
+      $self->LastMsg(ERROR,
+           sprintf($self->T("invalid project name '%s' specified"),$name));
+      return(0);
+   }
+
+
    if (exists($newrec->{name}) && $newrec->{name} ne $name){
       $newrec->{name}=$name;
    }

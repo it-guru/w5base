@@ -101,6 +101,15 @@ sub Init
                        $wfrec->{affectedapplication} ne ""){
                       $personaltag="APPL:".$wfrec->{affectedapplication};
                    }
+                   if (exists($wfrec->{affectedproject})){
+                      my $p=$wfrec->{affectedproject};
+                      if (ref($p) eq "ARRAY"){
+                         $p=join(",",@{$p});
+                      }
+                      if ($p ne ""){
+                         $personaltag.='@'.$p;
+                      }
+                   }
 
 
                    return($personaltag);
