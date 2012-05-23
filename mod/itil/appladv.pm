@@ -219,6 +219,12 @@ sub new
                 searchable    =>0,
                 onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
                 container     =>"additional"),
+
+      new kernel::Field::Textarea(
+                name          =>'comments',
+                group         =>'misc',
+                label         =>'Comments',
+                dataobjattr   =>'appladv.comments'),
    );
 
 
@@ -381,7 +387,7 @@ sub isViewValid
       my @modules=($rec->{modules});
       @modules=@{$modules[0]} if (ref($modules[0]) eq "ARRAY");
       
-      push(@l,"nordef","advdef",@modules);
+      push(@l,"nordef","advdef","misc",@modules);
    }
    return(@l);
 }
@@ -394,12 +400,20 @@ sub isWriteValid
       my @l;
       my @modules=($rec->{modules});
       @modules=@{$modules[0]} if (ref($modules[0]) eq "ARRAY");
-      push(@l,"nordef","advdef",@modules);
+      push(@l,"nordef","advdef","misc",@modules);
 
       my $userid=$self->getCurrentUserId();
+      return(@l) if ($self->IsMemberOf("admin"));
+
+      # check on ankered applnor for current appladv
+      my $nor=getModuleObject($self->Config,"itil::applnor");
+      $nor->SetFilter({srcparentid=>\$rec->{srcparentid}});
+      foreach my $chkrec ($nor->getHashList(qw(id dstate advid))){
+         return() if ($chkrec->{advid} eq $rec->{id} &&
+                      $chkrec->{dstate}>10);
+      }
       return(@l) if ($rec->{databossid} eq $userid ||
-                     $rec->{sem2id} eq $userid ||
-                     $self->IsMemberOf("admin"));
+                     $rec->{sem2id} eq $userid);
       if ($rec->{responseteamid} ne ""){
          return(@l) if ($self->IsMemberOf($rec->{responseteamid}));
       }
@@ -412,7 +426,8 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default advdef nordef),@{$self->{allModules}},qw(source qc));
+   return(qw(header default advdef nordef),@{$self->{allModules}},
+          qw(misc source qc));
 }
 
 

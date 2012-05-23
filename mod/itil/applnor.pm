@@ -136,8 +136,7 @@ sub new
                    my $app=$self->getParent();
                    if (!defined($current->{isactive}) ||
                        !defined($current->{dstate}) ||
-                       $current->{dstate}==10 ||
-                       $current->{isactive}==1){
+                       $current->{dstate}==10){
                       if ($current->{srcparentid} ne ""){
                          my $o=getModuleObject($app->Config,"itil::appladv");
                          $o->SetFilter({srcparentid=>\$current->{srcparentid},
@@ -455,10 +454,13 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
-   if (effVal($oldrec,$newrec,"dstate")==20){
-      $newrec->{storedadvid}=effVal($oldrec,$newrec,"advid");
+   my $bk=$self->SUPER::Validate($oldrec,$newrec,$origrec);
+   if ($bk){
+      if (effVal($oldrec,$newrec,"dstate")==20){
+         $newrec->{storedadvid}=effVal($oldrec,$newrec,"advid");
+      }
    }
-   return($self->SUPER::Validate($oldrec,$newrec,$origrec));
+   return($bk);
 }
 
 sub isViewValid

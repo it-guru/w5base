@@ -79,6 +79,12 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'contactsm1.first_name'),
 
+      new kernel::Field::Boolean(
+                name          =>'islogonuser',
+                label         =>'is real logon user',
+                upperserarch  =>1,
+                dataobjattr   =>"decode(contactsm1.groupprgn,'YES',1,0)"),
+
       new kernel::Field::Text(
                 name          =>'email',
                 label         =>'E-Mail',
@@ -176,7 +182,7 @@ sub new
                 name          =>'userid',
                 label         =>'User-ID',
                 upperserarch  =>1,
-                dataobjattr   =>'operatorm1.name'),
+                dataobjattr   =>"operatorm1.name"),
 
       new kernel::Field::Text(
                 name          =>'srcid',
@@ -286,6 +292,16 @@ sub getDetailBlockPriority
    my $grp=shift;
    my %param=@_;
    return("header","default","office","groups","source");
+}
+
+
+sub initSearchQuery
+{
+   my $self=shift;
+
+   if (!defined(Query->Param("search_islogonuser"))){
+     Query->Param("search_islogonuser"=>$self->T("yes"));
+   }
 }
 
 

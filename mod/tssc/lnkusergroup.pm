@@ -50,6 +50,7 @@ sub new
                                    htmlwidth  =>'200px',
                                    searchable =>0,
                                    vjointo    =>'tssc::user',
+                                   vjoinbase  =>{'islogonuser'=>'1'},
                                    vjoinon    =>['luser'=>'userid'],
                                    vjoindisp  =>'fullname'),
 
@@ -59,6 +60,7 @@ sub new
                                    searchable =>0,
                                    htmldetail =>0,
                                    vjointo    =>'tssc::user',
+                                   vjoinbase  =>{'islogonuser'=>'1'},
                                    vjoinon    =>['luser'=>'userid'],
                                    vjoindisp  =>'email'),
 

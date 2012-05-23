@@ -6,3 +6,4 @@
 'Name'   =>{ de=>'Nachname'},
 'FAX-Number'=>{ de=>'FAX'},
 'Phonenumber'=>{ de=>'Telefonnummer'},
+'is real logon user'=>{de=>'Echter Logon-User'},
