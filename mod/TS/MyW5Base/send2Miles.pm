@@ -242,7 +242,7 @@ sub signMonth
    #printf("as_string=%s\n",$request->as_string());
    my $response=$self->{ua}->request($request);
    my $res=$response->content;
-   if (($res=~m/Unterschrift Mitarbeiter/) &&
+   if (($res=~m/Datum Mitarbeiter/) &&
        !($res=~m/error/i)){
       $self->printFlushed("... sign of month report seems to be OK");
    }
