@@ -26,10 +26,10 @@ use Text::ParseWords;
 sub new
 {
    my $type=shift;
+   $self->{vjoinconcat}=", " if (!defined($self->{vjoinconcat}));
    my $self=bless($type->SUPER::new(@_),$type);
    $self->{multiple}=1       if (!defined($self->{multiple}));
    $self->{conjunction}="or" if (!defined($self->{conjunction}));
-   $self->{vjoinconcat}=", " if (!defined($self->{vjoinconcat}));
    $self->{WSDLfieldType}="ArrayOfStringItems" if (!defined($self->{WSDLfieldType}));
    return($self);
 }
