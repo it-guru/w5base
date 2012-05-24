@@ -26,8 +26,9 @@ use Text::ParseWords;
 sub new
 {
    my $type=shift;
-   my $self=bless($type->SUPER::new(@_),$type);
-   $self->{vjoinconcat}=", " if (!defined($self->{vjoinconcat}));
+   my %param=@_;
+   $param{vjoinconcat}=", " if (!defined($param{vjoinconcat}));
+   my $self=bless($type->SUPER::new(%param),$type);
    $self->{multiple}=1       if (!defined($self->{multiple}));
    $self->{conjunction}="or" if (!defined($self->{conjunction}));
    $self->{WSDLfieldType}="ArrayOfStringItems" if (!defined($self->{WSDLfieldType}));
