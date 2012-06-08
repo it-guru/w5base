@@ -165,10 +165,13 @@ sub Sendmail
          # TO Handling
          $rec->{emailto}=[$rec->{emailto}] if (ref($rec->{emailto}) ne "ARRAY");
          my @emailto=@{$rec->{emailto}};
-         if ($#mailallow!=-1 || $opmode eq "test"){
+         if ($#mailallow!=-1 || 
+             $opmode eq "test" ||
+             $opmode eq "dev"){
             @emailto=map({my $m=$_;
                           my $qm=quotemeta($m);
                           if (!grep(/^$qm$/i,@mailallow)){
+                             $m=~s/\@.*$//;
                              $m=~s/\@.*$/\@null.com/;
                           }
                           $m;
@@ -182,6 +185,7 @@ sub Sendmail
             @emailcc=map({my $m=$_;
                           my $qm=quotemeta($m);
                           if (!grep(/^$qm$/i,@mailallow)){
+                             $m=~s/\@.*$//;
                              $m=~s/\@.*$/\@null.com/;
                           }
                           $m;
@@ -197,6 +201,7 @@ sub Sendmail
             @emailbcc=map({my $m=$_;
                           my $qm=quotemeta($m);
                           if (!grep(/^$qm$/i,@mailallow)){
+                             $m=~s/\@.*$//;
                              $m=~s/\@.*$/\@null.com/;
                           }
                           $m;
