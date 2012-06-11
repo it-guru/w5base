@@ -44,10 +44,7 @@ chrome.extension.sendRequest({ action: 'options' }, function (response) {
         var tURL=response.options.tURL;
         $(".uniWebDial").click(function() {
           var num=$(this).text();
-          num=num.replace(/[ \t\(\)]/g,"");
-          num=num.replace(/^\+49/,"0");
-          var callURL=tURL;
-          callURL=callURL.replace(/%phonenumber%/g,num);
+          var callURL=mergeURL(tURL,num);
           var win=window.open(callURL,'_blank',
                    'height=480,width=640,toolbar=no,status=no,'+
                    'location=no,resizable=yes,scrollbars=no,'+
@@ -59,3 +56,5 @@ chrome.extension.sendRequest({ action: 'options' }, function (response) {
         chrome.extension.sendRequest({action:'showPageAction' },function(){});
     }
 });
+
+

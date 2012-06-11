@@ -21,18 +21,22 @@ function getDirectDial() {
    return function (info, tab) {
       var tURL=localStorage['tURL'] || defaults['tURL'];
       var url = 'http://127.0.0.1:7069/Dial/' + info.selectionText;
-      url=tURL;
+      var num=info.selectionText;
+      var callURL=tURL;
+      var callURL=mergeURL(tURL,num);
+     
       // Create a new window to the info page.
-      chrome.windows.create({ url: url, width: 520, height: 660 });
+      chrome.windows.create({ url: callURL, width: 520, height: 660 });
    };
 };
+
 
 
 /**
 * Create a context menu which will only show up for images.
 */
 chrome.contextMenus.create({
-    "title": "Dial %s",
+    "title": "directDial %s",
     "type": "normal",
     "contexts": ["selection"],
     "onclick": getDirectDial()

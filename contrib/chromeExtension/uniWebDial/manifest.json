@@ -17,6 +17,7 @@
       ],
       "js" : ["jquery-1.4.4.min.js", 
               "jquery.ba-replacetext.min.js", 
+               "util.js",
               "contentscript.js"],
       "run_at" : "document_idle",
       "all_frames" : true
