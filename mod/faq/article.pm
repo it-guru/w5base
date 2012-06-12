@@ -60,6 +60,13 @@ sub new
                 vjoinon       =>['faqcat'=>'faqcatid'],
                 vjoindisp     =>'fullname'),
 
+      new kernel::Field::Select(
+                name          =>'lang',
+                label         =>'Language',
+                htmleditwidth =>'50%',
+                value         =>['multilang',LangTable()],
+                dataobjattr   =>'faq.lang'),
+
       new kernel::Field::Htmlarea(
                 name          =>'data',
                 searchable    =>0,
@@ -826,7 +833,16 @@ sub getDefaultHtmlDetailPage
 }
 
 
-
+sub initSearchQuery
+{
+   my $self=shift;
+   my $lang=$self->Lang();
+   
+   if (!defined(Query->Param('search_lang'))){
+     Query->Param('search_lang'=>
+                  $self->T('multilang','faq::article').' '.$lang);
+   }
+}
 
 
 

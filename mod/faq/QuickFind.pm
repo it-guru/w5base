@@ -299,7 +299,8 @@ EOF
       my @kwords=split(/\s*\|\s*/,$searchtext);
       foreach my $kwords (@kwords){
          $faq->ResetFilter();
-         $faq->SecureSetFilter({kwords=>$kwords});
+         $faq->SecureSetFilter({kwords=>$kwords,
+                                lang=>[$self->Lang(),"multilang"]});
          my @l=$faq->getHashList(qw(mdate name faqid));
          my $loop=0;
          foreach my $rec (@l){

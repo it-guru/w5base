@@ -22,3 +22,4 @@ update faq set createuser=owner where createuser is null;
 alter table faq add furtherkeys varchar(128) default NULL;
 alter table faq add viewlast  datetime default NULL, add key(viewlast);
 alter table faq add viewfreq  int(20)  default NULL;
+alter table faq add lang  varchar(10)  default 'multilang';

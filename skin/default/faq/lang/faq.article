@@ -25,3 +25,5 @@
 'View frequeny'=>{de=>'Vollbild Aufrufe Häufung'},
 'View last'=>{de=>'letzter Vollbild Aufruf'},
 'raw data'=>{de=>'Rohdaten'},
+'multilang'=>{de=>'mehrsprachig',en=>'multilingual'},
+'Language'=>{de=>'Sprache'},
