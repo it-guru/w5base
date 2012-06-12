@@ -20,7 +20,8 @@
 
 chrome.extension.sendRequest({ action: 'options' }, function (response) {
 
-    var contentExp='([\+][0-9]{1,2}[0-9, ]{5,20})';
+    var contentExp='([\+][0-9]{1,2}[0-9, ]{5,20}|'+
+        '[\+]{1}[0-9]{1,2}[ ]{0,1}[\(]{1}[0-9, ]{2,5}[\)]{1}[0-9, ]{5,20})';
     var contentExp = RegExp(contentExp, 'gm');
 
     var intlReplacement="<span class='uniWebDial'>$&</span>";
