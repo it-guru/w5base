@@ -56,6 +56,16 @@ sub getControlRecord
              targetid  =>'id'
            },
            {
+             dataobj   =>'itil::applnor',
+             target    =>'fullname',
+             targetid  =>'id'
+           },
+           {
+             dataobj   =>'itil::appladv',
+             target    =>'fullname',
+             targetid  =>'id'
+           },
+           {
              dataobj   =>'itil::swinstance',
              target    =>'fullname',
              targetid  =>'id'
@@ -84,6 +94,8 @@ sub DataIssueCompleteWriteRequest
        ($affectedobject=~m/::custcontract$/) ||
        ($affectedobject=~m/::swinstance$/) ||
        ($affectedobject=~m/::itclust$/) ||
+       ($affectedobject=~m/::applnor$/) ||
+       ($affectedobject=~m/::appladv$/) ||
        ($affectedobject=~m/::asset$/) ||
        ($affectedobject=~m/::system$/)){
       if (defined($newrec->{affectedobject}) &&

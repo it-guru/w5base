@@ -316,8 +316,8 @@ sub nativQualityCheck
    if ($parent->Self() ne "base::workflow"){ # only DataIssues for nonworkflows!
       my $wf=getModuleObject($parent->Config,"base::workflow");
       my $dataobj=$parent;
-      #my $affectedobject=$dataobj->SelfAsParentObject();
-      my $affectedobject=$dataobj->Self(); # new version of affected calc
+      my $affectedobject=$dataobj->SelfAsParentObject();
+      my $affectedobjectinstance=$dataobj->Self(); # new version of affected calc
       my $idfield=$dataobj->IdField();
       my $affectedobjectid=$idfield->RawValue($rec);
       msg(INFO,"QualityRule Level1");
@@ -369,6 +369,7 @@ sub nativQualityCheck
                         class=>"base::workflow::DataIssue",
                         step=>"base::workflow::DataIssue::dataload",
                         affectedobject=>$affectedobject,
+                        affectedobjectinstance=>$affectedobjectinstance,
                         affectedobjectid=>$affectedobjectid,
                         altaffectedobjectname=>$objectname,
                         directlnkmode=>$directlnkmode,
