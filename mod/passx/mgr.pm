@@ -209,7 +209,8 @@ sub isViewValid
 sub getValidWebFunctions
 {
    my $self=shift;
-   return("UserFrontend","Workspace","CryptoOut","KeyStore","helptmpl",
+   return("UserFrontend",
+          "Workspace","CryptoOut","KeyStore","helptmpl",
           "Connector",
           $self->SUPER::getValidWebFunctions());
 }
@@ -549,14 +550,21 @@ EOF
    $page=$self->connector() if ($p eq "connector");
    $page=$self->help()      if ($p eq "help");
 
-   my @WfFunctions=();
-   my %param=(functions   =>\@WfFunctions,
-              pages       =>$pages,
-              activpage  =>$p,
-              tabwidth    =>"18%",
-              page        =>$page,
-             );
-   print TabSelectorTool("ModeSelect",%param);
+
+   my $directopenid=Query->Param("directopenid");
+   if ($directopenid eq ""){
+      my @WfFunctions=();
+      my %param=(functions   =>\@WfFunctions,
+                 pages       =>$pages,
+                 activpage  =>$p,
+                 tabwidth    =>"18%",
+                 page        =>$page,
+                );
+      print TabSelectorTool("ModeSelect",%param);
+   }
+   else{
+      print("<div id=TabSelectorModeSelect>".$self->directOpen()."</div>");
+   }
    print(<<EOF);
 <style>
 #TabSelectorModeSelect{
@@ -586,6 +594,14 @@ function CheckPasswordState()
    else{
       work.style.visibility="visible";
       info.style.visibility="hidden";
+      if ("$directopenid"!=""){
+         var newurl="CryptoOut?id=$directopenid";
+         var oldurl=window.frames['CryptoOut'].document.location.href;
+         var oldsub=oldurl.substring(oldurl.length-newurl.length);
+         if (oldsub!=newurl){
+            window.frames['CryptoOut'].document.location.href=newurl;
+         }
+      }
    }
    window.setTimeout("CheckPasswordState();", 1000);
 }
@@ -715,6 +731,7 @@ sub keydist
 EOF
 }
 
+
 sub pstore
 {
    my $self=shift;
@@ -795,6 +812,24 @@ function setCurPath(p)
 }
 
 </script>
+EOF
+}
+
+
+sub directOpen
+{
+   my $self=shift;
+   my $PasswordFolders=$self->T("Password folders");
+   my $flt=Query->Param("filter");
+   my $curpath=Query->Param("curpath");
+   my $search=$self->T("search");
+
+   my $d=<<EOF;
+</td>
+<td align=center>
+<div class=storewin>
+<iframe name=CryptoOut src="CryptoOut" style="width:99%;height:280px"></iframe>
+</div>
 EOF
 }
 
@@ -1047,6 +1082,7 @@ sub UserFrontend
 {
    my $self=shift;
    my $userid=$self->getCurrentUserId();
+   my $directopenid=Query->Param("id");
    my $pk=$self->getPersistentModuleObject("passx::key");
    $pk->SetFilter({userid=>\$userid});
 
@@ -1056,6 +1092,10 @@ sub UserFrontend
                            title=>$self->T($self->Self()));
    my $PersonalPassword=$self->T("personal password");
    my $RestartApplication=$self->T("restart PassX");
+   my $directopenparam="";
+   if ($directopenid ne ""){
+      $directopenparam="?directopenid=$directopenid";
+   }
    print <<EOF;
 <style>
 html,body{
@@ -1098,7 +1138,7 @@ function inputkeyhandler()        //IE Variante
 
 function RestartWorkspace()
 {
-   window.frames['CryptoWorkspace'].document.location.href="Workspace";
+   window.frames['CryptoWorkspace'].document.location.href="Workspace$directopenparam";
    window.frames['CryptoOut'].document.location.href="CryptoOut";
 }
 window.onload=function(){
@@ -1114,7 +1154,7 @@ window.onload=function(){
 <input type=button name=restart value=" $RestartApplication " onClick="RestartWorkspace()"></td></tr>
 <tr>
 <td colspan=3>
-<iframe name=CryptoWorkspace style="width:100%;height:100%;padding:0;margin:0;border-width:0" frameborder=0 src="Workspace"></iframe>
+<iframe name=CryptoWorkspace style="width:100%;height:100%;padding:0;margin:0;border-width:0" frameborder=0 src="Workspace$directopenparam"></iframe>
 </td>
 </tr>
 </table>
@@ -1124,6 +1164,8 @@ EOF
    print $self->HtmlBottom(body=>1,form=>1);
 
 }
+
+
 
 
 1;

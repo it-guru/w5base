@@ -207,6 +207,11 @@ sub new
                 webtitle      =>'access Password Store',
                 label         =>'Link'),
 
+      new kernel::Field::Text( 
+                name          =>'passxdirect',
+                onRawValue    =>\&PassXopenurl,
+                label         =>'PassX direct url'),
+
       new kernel::Field::Link(
                 name          =>'aclmode',
                 selectable    =>0,
@@ -223,7 +228,7 @@ sub new
                 dataobjattr   =>'passxacl.acltargetid'),
 
    );
-   $self->setDefaultView(qw(entrytype name account listweblink comments mdate));
+   $self->setDefaultView(qw(entrytype name account listweblink passxdirecturl comments mdate));
    return($self);
 }
 
@@ -245,12 +250,20 @@ sub mkContextMenu
    my $rec=shift;
 
 
-   my $onclick="openwin('../entry/Detail?".
+   my $onclickdetail="openwin('../entry/Detail?".
                "AllowClose=1&search_id=$rec->{id}',".
                "'_blank',".
                "'height=480,width=640,toolbar=no,status=no,".
                "resizable=yes,scrollbars=no')";
-   my @ml=($self->T("Detail")=>$onclick);
+   my @ml=($self->T("Detail")=>$onclickdetail);
+
+   if ($rec->{passxdirect} ne ""){
+      my $onclickpass="openwin('$rec->{passxdirect}',".
+                  "'_blank',".
+                  "'height=480,width=640,toolbar=no,status=no,".
+                  "resizable=yes,scrollbars=no')";
+      push(@ml,"PassX"=>$onclickpass);
+   }
 
 
    return(\@ml);
@@ -456,6 +469,9 @@ sub generateMenuTree
                     if ($rec->{entrytype}==6){
                        $mrec{hreftarget}.="_blank";
                     }
+
+
+
                     if ($rec->{comments} ne ""){
                        if ($mode eq "connector"){ 
                           $mrec{label}.="</a>";
@@ -714,6 +730,21 @@ sub DirectLink
    }
    
    return("JavaScript:o($current->{id})");
+}
+
+sub PassXopenurl
+{
+   my $self=shift;
+   my $current=shift;
+   my $mgr=$self->getParent->getPersistentModuleObject("passx::mgr");
+   my $userid=$self->getParent->getCurrentUserId();
+   $mgr->SetFilter({userid=>\$userid,entryid=>\$current->{id}});
+   my ($erec,$msg)=$mgr->getOnlyFirst(qw(id));
+   if (!defined($erec)){
+      return(undef);
+   }
+   
+   return("../mgr/UserFrontend?id=$current->{id}");
 }
 
 sub Initialize
