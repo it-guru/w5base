@@ -60,6 +60,7 @@ sub NotifyByScriptToSVNHost
    my @prlist=$pr->getHashList(qw(id name contacts));
 
    if ($#prlist!=-1){
+      $SIG{TERM}='DEFAULT'; #maybee this should be default for any event handler
       if (open(CMD,"|$NotifyByScript")){
          my %grplist;
          foreach my $prrec (@prlist){
