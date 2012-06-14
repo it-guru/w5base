@@ -55,13 +55,24 @@ sub NotifyByScriptToSVNHost
    $NotifyByScript=$NotifyByScript->{$mod} if (ref($NotifyByScript) eq "HASH");
    return({exitcode=>0,msg=>'no script specified'}) if ($NotifyByScript eq "");
 
+   $|=1;
+
+   $SIG{INT}='DEFAULT';
+   $SIG{HUP}='DEFAULT';
+   $SIG{CHLD}='DEFAULT';
+   $SIG{ALRM}='DEFAULT';
+   $SIG{USR1}='DEFAULT';
+   $SIG{TERM}='DEFAULT';
+   $SIG{PIPE}='DEFAULT';
+   $SIG{WARN}='DEFAULT';
+   $SIG{QUIT}='DEFAULT';
+
    my $pr=getModuleObject($self->Config,"base::projectroom");
    $pr->SetFilter({id=>\$param{id}});
    my @prlist=$pr->getHashList(qw(id name contacts));
 
    if ($#prlist!=-1){
-      $SIG{TERM}='DEFAULT'; #maybee this should be default for any event handler
-      if (open(CMD,"|$NotifyByScript")){
+      if (my $pid=open(CMD,"|$NotifyByScript")){
          my %grplist;
          foreach my $prrec (@prlist){
             my %acl;
@@ -95,11 +106,15 @@ sub NotifyByScriptToSVNHost
          printf CMD ("\nBEGIN: groups\n");
          if (keys(%grplist)){ 
             foreach my $grpid (keys(%grplist)){
+               next if ($grpid==-2);
+               next if ($grpid==-1);
                printf CMD ("GRP$grpid = %s\n",
                            join(", ",$self->getGroupMemberAccounts($grpid)));
             }
          }
          printf CMD ("END: groups\n\n");
+         sleep(1);
+         kill(15,$pid);
          close(CMD);
       }
       else{
@@ -120,12 +135,28 @@ sub aclToSVNRule
    foreach my $k (keys(%$acl)){
       if ($k eq "grpwr"){
          foreach my $grpid (keys(%{$acl->{$k}})){
-            $d.="\@GRP$grpid = wr\n";
+            if ($grpid==-1){
+               $d.="* = wr\n";
+            }
+            elsif ($grpid==-2){
+               $d.="anonymous = wr\n";
+            }
+            else{
+               $d.="\@GRP$grpid = wr\n";
+            }
          }
       }
       if ($k eq "grprd"){
          foreach my $grpid (keys(%{$acl->{$k}})){
-            $d.="\@GRP$grpid = r\n";
+            if ($grpid==-1){
+               $d.="* = r\n";
+            }
+            elsif ($grpid==-2){
+               $d.="anonymous = r\n";
+            }
+            else{
+               $d.="\@GRP$grpid = r\n";
+            }
          }
       }
       if ($k eq "usrwr"){
