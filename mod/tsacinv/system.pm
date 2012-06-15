@@ -706,6 +706,7 @@ sub initSqlWhere
    my $self=shift;
    my $where=
       "amportfolio.bdelete=0 ".
+      "and amcomputer.bgroup=0 ".
       "and assetportfolio.bdelete!=1 ".
       "and amportfolio.lparentid=assetportfolio.lportfolioitemid(+) ".
       "and amportfolio.lportfolioitemid=amcomputer.litemid ".
