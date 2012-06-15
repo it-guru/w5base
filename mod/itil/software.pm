@@ -42,6 +42,8 @@ sub new
                                                   
       new kernel::Field::Text(
                 name          =>'fullname',
+                readonly      =>1,
+                uploadable    =>0,
                 htmldetail    =>0,
                 searchable    =>0,
                 label         =>'Fullname',
