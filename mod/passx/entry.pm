@@ -209,6 +209,8 @@ sub new
 
       new kernel::Field::Text( 
                 name          =>'passxdirect',
+                htmldetail    =>0,
+                readonly      =>1,
                 onRawValue    =>\&PassXopenurl,
                 label         =>'PassX direct url'),
 
