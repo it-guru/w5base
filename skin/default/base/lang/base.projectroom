@@ -1,5 +1,7 @@
 'base::projectroom'=>{de=>'Projekt/Projektraum',en=>'Project/Projectroom'},
-'Projectroom name'=>{de=>'Projektraum Name'},
+'Projectroom short-name'=>{de=>'Projektraum Kurzname'},
+'Project fullname'=>{de=>'Projekt Bezeichnung'},
+'Project description'=>{de=>'Detailbeschreibung des Projektes'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'Contacts'=>{de=>'Kontakte'},
 'WELCOME'=>{de=>'

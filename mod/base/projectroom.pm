@@ -50,8 +50,13 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'name',
-                label         =>'Projectroom name',
+                label         =>'Projectroom short-name',
                 dataobjattr   =>'projectroom.name'),
+
+      new kernel::Field::Text(
+                name          =>'projectname',
+                label         =>'Project fullname',
+                dataobjattr   =>'projectroom.fullname'),
 
       new kernel::Field::Select(
                 name          =>'cistatus',
@@ -179,6 +184,11 @@ sub new
                 vjoindisp     =>['parentobj','refid',
                                  'parentobjname','comments']),
 
+      new kernel::Field::Textarea(
+                name          =>'description',
+                label         =>'Project description',
+                dataobjattr   =>'projectroom.description'),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
@@ -261,10 +271,22 @@ sub new
                          };
    $self->{workflowlink}->{workflowstart}=\&calcWorkflowStart;
    $self->{history}=[qw(modify delete)];
-   $self->setDefaultView(qw(linenumber name cistatus mandator mdate));
+   $self->setDefaultView(qw(linenumber name projectname 
+                            cistatus mandator mdate));
    $self->setWorktable("projectroom");
    return($self);
 }
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_cistatus"))){
+     Query->Param("search_cistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
+
 
 
 
