@@ -29,7 +29,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{MainSearchFieldLines}=3;
+   $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->AddFields(
@@ -68,6 +68,18 @@ sub new
                 weblinkto     =>'none',
                 vjoindisp     =>'systemid',
                 label         =>'SystemID'),
+
+      new kernel::Field::Text(
+                name          =>'tenant',
+                label         =>'Tenant',
+                group         =>'source',
+                dataobjattr   =>'amtenant.code'),
+
+      new kernel::Field::Interface(
+                name          =>'tenantid',
+                label         =>'Tenant ID',
+                group         =>'source',
+                dataobjattr   =>'amtenant.ltenantid'),
 
       new kernel::Field::Date(
                 name          =>'install',
@@ -414,7 +426,7 @@ sub getSqlFrom
    my $self=shift;
    my $from="amasset,amnature, amportfolio assetportfolio,ammodel, amlocation,".
             "(select amcostcenter.* from amcostcenter ".
-            " where amcostcenter.bdelete=0) amcostcenter";
+            " where amcostcenter.bdelete=0) amcostcenter, amtenant";
 
    return($from);
 }
@@ -425,6 +437,9 @@ sub initSearchQuery
    my $self=shift;
    if (!defined(Query->Param("search_status"))){
      Query->Param("search_status"=>"\"!wasted\"");
+   }
+   if (!defined(Query->Param("search_tenant"))){
+     Query->Param("search_tenant"=>"CS");
    }
 }
 
@@ -439,6 +454,7 @@ sub initSqlWhere
       "assetportfolio.assettag=amasset.assettag ".
       "and assetportfolio.lmodelid=ammodel.lmodelid ".
       "and assetportfolio.llocaid=amlocation.llocaid(+) ".
+      "and assetportfolio.ltenantid=amtenant.ltenantid ".
       "and ammodel.lnatureid=amnature.lnatureid(+) ".
       "and amasset.lsendercostcenterid=amcostcenter.lcostid(+) ".
       "and assetportfolio.bdelete=0 ".$naturerest;

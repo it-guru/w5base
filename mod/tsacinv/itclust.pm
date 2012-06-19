@@ -65,6 +65,28 @@ sub new
                 align         =>'left',
                 dataobjattr   =>'amportfolio.assettag'),
 
+      new kernel::Field::Text(
+                name          =>'status',
+                label         =>'Status',
+                dataobjattr   =>'amcomputer.status'),
+
+      new kernel::Field::Text(
+                name          =>'usage',
+                label         =>'Usage',
+                dataobjattr   =>'amportfolio.usage'),
+
+      new kernel::Field::Text(
+                name          =>'tenant',
+                label         =>'Tenant',
+                group         =>'source',
+                dataobjattr   =>'amtenant.code'),
+
+      new kernel::Field::Interface(
+                name          =>'tenantid',
+                label         =>'Tenant ID',
+                group         =>'source',
+                dataobjattr   =>'amtenant.ltenantid'),
+
       new kernel::Field::TextDrop(
                 name          =>'assignmentgroup',
                 label         =>'Assignment Group',
@@ -85,6 +107,7 @@ sub new
                 name          =>'assignmentgroupsupervisoremail',
                 label         =>'Assignment Group Supervisor E-Mail',
                 htmldetail    =>0,
+                searchable    =>0,
                 vjointo       =>'tsacinv::group',
                 vjoinon       =>['lassignmentid'=>'lgroupid'],
                 vjoindisp     =>'supervisoremail'),
@@ -105,16 +128,6 @@ sub new
                 name          =>'lincidentagid',
                 label         =>'AC-Incident-AssignmentID',
                 dataobjattr   =>'amportfolio.lincidentagid'),
-
-      new kernel::Field::Text(
-                name          =>'status',
-                label         =>'Status',
-                dataobjattr   =>'amcomputer.status'),
-
-      new kernel::Field::Text(
-                name          =>'usage',
-                label         =>'Usage',
-                dataobjattr   =>'amportfolio.usage'),
 
 #      new kernel::Field::Text(
 #                name          =>'type',
@@ -230,15 +243,6 @@ sub new
    return($self);
 }
 
-#sub initSearchQuery
-#{
-#   my $self=shift;
-#   if (!defined(Query->Param("search_name"))){
-#     Query->Param("search_name"=>"Q4DE8NCO34*");
-#   }
-#}
-
-
 
 sub Initialize
 {
@@ -249,6 +253,17 @@ sub Initialize
    return(1) if (defined($self->{DB}));
    return(0);
 }
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_tenant"))){
+     Query->Param("search_tenant"=>"CS");
+   }
+
+}
+
+
 
 sub getRecordImageUrl
 {
@@ -266,7 +281,7 @@ sub getSqlFrom
       "(select amportfolio.* from amportfolio ".
       " where amportfolio.bdelete=0) amportfolio,ammodel,".
       "(select amcostcenter.* from amcostcenter ".
-      " where amcostcenter.bdelete=0) amcostcenter";
+      " where amcostcenter.bdelete=0) amcostcenter, amtenant";
 
    return($from);
 }
@@ -279,6 +294,7 @@ sub initSqlWhere
       "and amportfolio.lmodelid=ammodel.lmodelid ".
       "and amportfolio.lcostid=amcostcenter.lcostid(+) ".
       "and ammodel.name='CLUSTER' ".
+      "and amportfolio.ltenantid=amtenant.ltenantid ".
       "and amcomputer.clustertype='Cluster' ".
       "and amcomputer.status<>'out of operation'";
    return($where);

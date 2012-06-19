@@ -12,6 +12,8 @@
 'System CPU count'=>{de=>'CPU Anzahl'},
 'invoice relevant cpu count'=>{de=>'abrechnungsrelevante CPU Anzahl'},
 'System CPU speed'=>{de=>'CPU Taktfrequenz'},
+'Tenant'=>{de=>'Instanz-Mieter'},
+'Tenant ID'=>{de=>'Instanz-Mieter ID'},
 'System CPU type'=>{de=>'CPU Typ'},
 'System Memory'=>{de=>'Arbeitsspeicher'},
 'System OS'=>{de=>'Betriebssystem'},

@@ -29,7 +29,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{MainSearchFieldLines}=3;
+   $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->AddFields(
@@ -67,6 +67,18 @@ sub new
                 name          =>'status',
                 label         =>'Status',
                 dataobjattr   =>'amtsicustappl.status'),
+                                    
+      new kernel::Field::Text(
+                name          =>'tenant',
+                label         =>'Tenant',
+                group         =>'source',
+                dataobjattr   =>'amtenant.code'),
+                                    
+      new kernel::Field::Interface(
+                name          =>'tenantid',
+                label         =>'Tenant ID',
+                group         =>'source',
+                dataobjattr   =>'amtenant.ltenantid'),
                                     
       new kernel::Field::Text(
                 name          =>'usage',
@@ -349,6 +361,15 @@ sub Initialize
    return(0);
 }
 
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_tenant"))){
+     Query->Param("search_tenant"=>"CS");
+   }
+}
+
+
 sub getRecordImageUrl
 {
    my $self=shift;
@@ -364,7 +385,8 @@ sub getSqlFrom
       "amtsicustappl, ".
       "(select amcostcenter.* from amcostcenter ".
       " where amcostcenter.bdelete=0) amcostcenter,amemplgroup assigrp,".
-      "amcomment amtsimaint,amcomment businessdesc";
+      "amcomment amtsimaint,amcomment businessdesc,".
+      "amtenant";
 
    return($from);
 }
@@ -373,8 +395,9 @@ sub initSqlWhere
 {
    my $self=shift;
    my $where=
-      "amtsicustappl.bdelete=0 and ".
-      "amtsicustappl.lmaintwindowid=amtsimaint.lcommentid(+) ".
+      "amtsicustappl.bdelete=0 ".
+      "and amtsicustappl.lmaintwindowid=amtsimaint.lcommentid(+) ".
+      "and amtsicustappl.ltenantid=amtenant.ltenantid ".
       "and amtsicustappl.lcostcenterid=amcostcenter.lcostid(+) ".
       "and amtsicustappl.lcustbusinessdescid=businessdesc.lcommentid(+) ".
       "and amtsicustappl.lassignmentid=assigrp.lgroupid(+) ";

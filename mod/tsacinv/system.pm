@@ -67,6 +67,18 @@ sub new
                 dataobjattr   =>'amcomputer.status'),
 
       new kernel::Field::Text(
+                name          =>'tenant',
+                label         =>'Tenant',
+                group         =>'source',
+                dataobjattr   =>'amtenant.code'),
+
+      new kernel::Field::Interface(
+                name          =>'tenantid',
+                label         =>'Tenant ID',
+                group         =>'source',
+                dataobjattr   =>'amtenant.ltenantid'),
+
+      new kernel::Field::Text(
                 name          =>'conumber',
                 label         =>'CO-Number',
                 size          =>'15',
@@ -641,6 +653,10 @@ sub initSearchQuery
    if (!defined(Query->Param("search_status"))){
      Query->Param("search_status"=>"\"!out of operation\"");
    }
+   if (!defined(Query->Param("search_tenant"))){
+     Query->Param("search_tenant"=>"CS");
+   }
+
 }
 
 
@@ -696,7 +712,7 @@ sub getSqlFrom
       "amcomputer,amportfolio,ammodel,".
       "(select amcostcenter.* from amcostcenter ".
       " where amcostcenter.bdelete=0) amcostcenter, ".
-      "amportfolio assetportfolio";
+      "amportfolio assetportfolio, amtenant";
 
    return($from);
 }
@@ -711,6 +727,7 @@ sub initSqlWhere
       "and amportfolio.lparentid=assetportfolio.lportfolioitemid(+) ".
       "and amportfolio.lportfolioitemid=amcomputer.litemid ".
       "and amportfolio.lmodelid=ammodel.lmodelid ".
+      "and amportfolio.ltenantid=amtenant.ltenantid ".
       "and amportfolio.lcostid=amcostcenter.lcostid(+) ".
       "and ammodel.name='LOGICAL SYSTEM' ";
    return($where);

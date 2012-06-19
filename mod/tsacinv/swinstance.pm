@@ -131,6 +131,18 @@ sub new
                 dataobjattr   =>'amtsiswinstance.status'),
 
       new kernel::Field::Text(
+                name          =>'tenant',
+                label         =>'Tenant',
+                group         =>'source',
+                dataobjattr   =>'amtenant.code'),
+
+      new kernel::Field::Interface(
+                name          =>'tenantid',
+                label         =>'Tenant ID',
+                group         =>'source',
+                dataobjattr   =>'amtenant.ltenantid'),
+
+      new kernel::Field::Text(
                 name          =>'monname',
                 label         =>'Monitoring name',
                 dataobjattr   =>'amtsiswinstance.monitoringname'),
@@ -176,6 +188,9 @@ sub initSearchQuery
    if (!defined(Query->Param("search_status"))){
      Query->Param("search_status"=>"!\"out of operation\"");
    }
+   if (!defined(Query->Param("search_tenant"))){
+     Query->Param("search_tenant"=>"CS");
+   }
 }
 
 
@@ -206,7 +221,7 @@ sub getSqlFrom
       "(select amportfolio.* from amportfolio ".
       " where amportfolio.bdelete=0) amportfolio,ammodel,".
       "(select amcostcenter.* from amcostcenter ".
-      " where amcostcenter.bdelete=0) amcostcenter";
+      " where amcostcenter.bdelete=0) amcostcenter, amtenant";
 
    return($from);
 }
@@ -217,6 +232,7 @@ sub initSqlWhere
    my $where=
       "amportfolio.lportfolioitemid=amtsiswinstance.lportfolioid ".
       "and amportfolio.lmodelid=ammodel.lmodelid ".
+      "and amportfolio.ltenantid=amtenant.ltenantid ".
       "and amportfolio.lcostid=amcostcenter.lcostid(+) ";
    return($where);
 }

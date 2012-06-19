@@ -6,6 +6,8 @@
 'CFM Assignment Group'=>{de=>'CFM Assignment Group'},
 'INM Assignment Group'=>{de=>'INM Assignment Group'},
 'CO-Number'=>{de=>'CO-Nummer/Kostenstelle'},
+'Tenant'=>{de=>'Instanz-Mieter'},
+'Tenant ID'=>{de=>'Instanz-Mieter ID'},
 'Usage'=>{de=>'Betriebsart'},
 'Applicationname'=>{de=>'Anwendungsname'},
 'Deputy Technical Contact'=>{de=>'Technischer Ansprechpartner Vertr.'},

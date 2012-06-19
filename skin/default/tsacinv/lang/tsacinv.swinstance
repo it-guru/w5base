@@ -1,3 +1,6 @@
 'tsacinv::swinstance'=>{de=>'Software-Instanz',en=>'Software-Instance'},
 'Instance fullname'=>{de=>'vollst. Instanz-Name'},
 'Instance name'=>{de=>'Instanzname'},
+'Tenant'=>{de=>'Instanz-Mieter'},
+'Tenant ID'=>{de=>'Instanz-Mieter ID'},
+
