@@ -388,6 +388,8 @@ sub nativQualityCheck
             my $newrec={name=>$name,
                         mdate=>$WfRec->{mdate},
                         owner=>$WfRec->{owner},
+                        affectedobjectinstance=>$affectedobjectinstance,
+                        srcsys=>$affectedobject,
                         editor=>$WfRec->{editor},
                         realeditor=>$WfRec->{realeditor},
                         srcload=>NowStamp("en"),
