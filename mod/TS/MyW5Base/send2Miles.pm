@@ -242,7 +242,7 @@ sub signMonth
    #printf("as_string=%s\n",$request->as_string());
    my $response=$self->{ua}->request($request);
    my $res=$response->content;
-   if (($res=~m/Datum Mitarbeiter/) &&
+   if (($res=~m/Zeitbuchungen/) &&
        !($res=~m/error/i)){
       $self->printFlushed("... sign of month report seems to be OK");
    }
@@ -455,12 +455,12 @@ sub getWorkspace
    my $c=0;
 
    pos($d) = 0;
-   while ($d=~m#\G.*?\<td class="tdi">&nbsp;\</td\>.*?own_def_edit.*?\<td\>(.+?)\</td>.*?showusertasks\?i_ts_id_arr=([\d-]+)&i_rt_id_arr=([\d-]+)&i_la_id_arr=(.+?)&i_action=DELETE.*?\</TR\>#gcs){
-     #  printf("Set:%d\n",$c++);
-     #  print "Found name $1 .\n";
-     #  print "Found i_ts_id_arr $2 .\n";
-     #  print "Found i_rt_id_arr $3 .\n";
-     #  print "Found i_la_id_arr $4 .\n";
+   while ($d=~m#\G.*?\<td class="btn_col">.*?\<td\>.+?\</td>.*?\<td\>(.+?)\</td>.*?showusertasks\?i_ts_id_arr=([\d-]+)&.*?i_rt_id_arr=([\d-]+)&.*?i_la_id_arr=(.+?)&.*?i_action=DELETE.*?\</tr\>#gcs){
+      # printf STDERR ("Set:%d\n",$c++);
+      # print  STDERR "Found name $1 .\n";
+      # print  STDERR "Found i_ts_id_arr $2 .\n";
+      # print  STDERR "Found i_rt_id_arr $3 .\n";
+      # print  STDERR "Found i_la_id_arr $4 .\n";
       my %rec=(label=>$1,
                i_ts_id_arr=>$2,
                i_rt_id_arr=>$3,
