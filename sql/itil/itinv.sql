@@ -1052,3 +1052,7 @@ update swinstance set autogendiary = custcostalloc;
 alter table itnormodel add defcountry varchar(80) default null;
 alter table applnor add lastqcheck datetime default NULL,add key(lastqcheck);
 alter table appladv add lastqcheck datetime default NULL,add key(lastqcheck);
+alter table software add productclass varchar(20) default 'MAIN';
+alter table software add parent bigint(20) default null, add key(parent);
+alter table software add FOREIGN KEY fk_software (parent)
+          REFERENCES software (id) ON DELETE CASCADE;

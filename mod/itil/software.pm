@@ -80,6 +80,18 @@ sub new
                 name          =>'producerid',
                 dataobjattr   =>'software.producer'),
 
+      new kernel::Field::SubList(
+                name          =>'options',
+                label         =>'Options',
+                group         =>'options',
+                allowcleanup  =>1,
+                subeditmsk    =>'subedit.options',
+                vjoinbase     =>[{cistatusid=>"<=5"}],
+                vjointo       =>'itil::software',
+                vjoinon       =>['id'=>'parentid'],
+                vjoinbase     =>[{pclass=>\'OPTION'}],
+                vjoindisp     =>['name','cistatus']),
+
       new kernel::Field::Contact(
                 name          =>'compcontact',
                 AllowEmpty    =>1,
@@ -341,6 +353,34 @@ sub new
                 label         =>'Source-Load',
                 dataobjattr   =>'software.srcload'),
 
+      new kernel::Field::Interface(
+                name          =>'pclass',
+                selectfix     =>1,
+                label         =>'Product Class',
+                dataobjattr   =>'software.productclass'),
+                                                   
+      new kernel::Field::Interface(
+                name          =>'parentid',
+                label         =>'parent product id',
+                dataobjattr   =>'software.parent'),
+                                                   
+      new kernel::Field::TextDrop(
+                name          =>'parentproduct',
+                group         =>'source',
+                label         =>'parent product',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(0) if (!defined($current));
+                   return(1) if ($current->{pclass} eq "OPTION");
+                   return(0);
+                },
+                vjointo       =>'itil::software',
+                vjoinon       =>['parentid'=>'id'],
+                vjoindisp     =>'fullname'),
+                                                   
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
@@ -489,6 +529,20 @@ sub Validate
    if (exists($newrec->{name})){
       $newrec->{name}=~s/\s+/_/g;
    }
+   if (!defined($oldrec) &&
+        $newrec->{pclass} eq "OPTION" &&
+        $newrec->{parentid} ne ""){
+      my $s=getModuleObject($self->Config,"itil::software");
+      $s->SetFilter({id=>\$newrec->{parentid}});
+      my ($prec,$msg)=$s->getOnlyFirst(qw(cistatusid producerid));
+      if (!defined($prec)){
+         $self->LastMsg(ERROR,"invalid parent software product specified");
+         return(undef);
+      }
+      if (!defined($newrec->{producerid})){
+         $newrec->{producerid}=$prec->{producerid};
+      }
+   }
    if (!(trim(effVal($oldrec,$newrec,"producerid"))=~m/^\d+$/)){
       $self->LastMsg(ERROR,"invalid producer specified");
       return(0);
@@ -535,7 +589,7 @@ sub initSearchQuery
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default doccontrol phonenumbers source));
+   return(qw(header default options doccontrol phonenumbers source));
 }
 
 
@@ -558,10 +612,14 @@ sub isWriteValid
    my $rec=shift;
 
    my $userid=$self->getCurrentUserId();
-   return("default","doccontrol","phonenumbers") if (!defined($rec) ||
+   my @l;
+   push(@l,"default","doccontrol","phonenumbers") if (!defined($rec) ||
                          ($rec->{cistatusid}<3 && $rec->{creator}==$userid) ||
                          $self->IsMemberOf($self->{CI_Handling}->{activator}));
-   return(undef);
+   if (defined($rec) && $rec->{pclass} eq "MAIN"){
+      push(@l,"options");
+   }
+   return(@l);
 }
 
 
@@ -570,6 +628,9 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
+   if ($rec->{pclass} ne "MAIN"){
+      return("header","default","source");
+   }
    return("ALL");
 }
 

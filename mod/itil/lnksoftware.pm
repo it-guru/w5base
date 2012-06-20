@@ -731,8 +731,11 @@ sub Validate
    }
    else{
       if (!$self->isParentWriteable($systemid,$itclustsvcid)){
-         $self->LastMsg(ERROR,"system is not writeable for you");
-         return(undef);
+         if (!defined($oldrec) ||
+             !($self->isInstanceRelationWriteable($oldrec->{id}))){
+            $self->LastMsg(ERROR,"system is not writeable for you");
+            return(undef);
+         }
       }
    }
    if (exists($newrec->{quantity}) && ! defined($newrec->{quantity})){
@@ -1021,17 +1024,28 @@ sub isWriteValid
    }
    else{
       # check if there is an software instance based on this installation
-      my $swi=getModuleObject($self->Config,"itil::swinstance");
-      $swi->SetFilter({lnksoftwaresystemid=>[$rec->{id}],
-                       cistatusid=>"<=5"});
-      foreach my $swirec ($swi->getHashList(qw(ALL))){
-         my @l=$swi->isWriteValid($swirec);
-         if (in_array(\@l,["ALL","default"])){
-            return(qw(instdetail));
-         }
+      if ($self->isInstanceRelationWriteable($rec->{id})){
+         return(qw(instdetail));
       }
    }
    return(undef);
+}
+
+sub isInstanceRelationWriteable
+{
+   my $self=shift;
+   my $id=shift;
+
+   my $swi=getModuleObject($self->Config,"itil::swinstance");
+   $swi->SetFilter({lnksoftwaresystemid=>\$id,
+                    cistatusid=>"<=5"});
+   foreach my $swirec ($swi->getHashList(qw(ALL))){
+      my @l=$swi->isWriteValid($swirec);
+      if (in_array(\@l,["ALL","default"])){
+         return(1);
+      }
+   }
+   return(0);
 }
 
 sub isParentWriteable  # Eltern Object Schreibzugriff prüfen
