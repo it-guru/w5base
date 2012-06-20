@@ -22,5 +22,5 @@
 'deputy competent contact'=>{de=>'alternativer Ansprechpartner'},
 'fieldgroup.phonenumbers'=>{de=>'Rufnummernverzeichnis',en=>'Phonenumbers'},
 'phoneHot'=>{de=>'Hotline',en=>'Hotline'},
-'Prodcut Class'=>{de=>'Produkt Klasse'},
+'Product Class'=>{de=>'Produkt Klasse'},
 'parent product'=>{de=>'Elternprodukt'},

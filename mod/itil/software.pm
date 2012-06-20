@@ -86,10 +86,9 @@ sub new
                 group         =>'options',
                 allowcleanup  =>1,
                 subeditmsk    =>'subedit.options',
-                vjoinbase     =>[{cistatusid=>"<=5"}],
                 vjointo       =>'itil::software',
                 vjoinon       =>['id'=>'parentid'],
-                vjoinbase     =>[{pclass=>\'OPTION'}],
+                vjoinbase     =>[{pclass=>\'OPTION',cistatusid=>"<=5"}],
                 vjoindisp     =>['name','cistatus']),
 
       new kernel::Field::Contact(
@@ -353,8 +352,9 @@ sub new
                 label         =>'Source-Load',
                 dataobjattr   =>'software.srcload'),
 
-      new kernel::Field::Interface(
+      new kernel::Field::Text(
                 name          =>'pclass',
+                htmldetail    =>0,
                 selectfix     =>1,
                 label         =>'Product Class',
                 dataobjattr   =>'software.productclass'),

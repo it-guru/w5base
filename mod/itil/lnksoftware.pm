@@ -52,10 +52,11 @@ sub new
                    "concat(software.name,".
                    "if (lnksoftwaresystem.version<>'',".
                    "concat('-',lnksoftwaresystem.version),''),".
+                   "if (lnksoftwaresystem.parent is null,".
                    "if (lnksoftwaresystem.system is not null,".
                    "concat(' (system installed\@',system.name,')'),".
  
-                   "' (cluster service installed)'))"),
+                   "' (cluster service installed)'),' (Option)'))"),
                                                  
       new kernel::Field::TextDrop(
                 name          =>'software',
@@ -263,17 +264,20 @@ sub new
                 name          =>'softwareproducer',
                 label         =>'Software Producer',
                 htmldetail    =>0,
+                readonly      =>1,
+                group         =>'softwaredetails',
                 vjointo       =>'itil::producer',
                 vjoinon       =>['softwareproducerid'=>'id'],
                 vjoindisp     =>'name'),
 
       new kernel::Field::Link(
                 name          =>'softwareproducerid',
+                group         =>'softwaredetails',
                 dataobjattr   =>'software.producer'),
 
       new kernel::Field::Select(
                 name          =>'softwarecistatus',
-                group         =>'link',
+                group         =>'softwaredetails',
                 searchable    =>0,
                 readonly      =>1,
                 htmldetail    =>0,
@@ -285,7 +289,16 @@ sub new
       new kernel::Field::Link(
                 name          =>'softwarecistatusid',
                 label         =>'SoftwareCiStatusID',
+                group         =>'softwaredetails',
                 dataobjattr   =>'software.cistatus'),
+
+      new kernel::Field::Text(
+                name          =>'softwareinstpclass',
+                label         =>'Software installation class',
+                htmldetail    =>0,
+                readonly      =>1,
+                group         =>'softwaredetails',
+                dataobjattr   =>'software.productclass'),
 
       new kernel::Field::Select(
                 name          =>'rightsmgmt',
@@ -337,6 +350,16 @@ sub new
                 selectfix     =>1,
                 label         =>'LiccontractCiStatusID',
                 dataobjattr   =>'liccontract.cistatus'),
+
+      new kernel::Field::SubList(
+                name          =>'options',
+                label         =>'Options',
+                group         =>'options',
+                allowcleanup  =>1,
+                subeditmsk    =>'subedit.options',
+                vjointo       =>'itil::lnksoftwareoption',
+                vjoinon       =>['id'=>'parentid'],
+                vjoindisp     =>['fullname']),
                                                    
       new kernel::Field::Link(
                 name          =>'softwareid',
@@ -622,6 +645,9 @@ sub initSearchQuery
      Query->Param("search_cicistatus"=>
                   "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
    }
+   if (!defined(Query->Param("search_softwareinstpclass"))){
+     Query->Param("search_softwareinstpclass"=>"MAIN");
+   }
 }
 
 
@@ -723,18 +749,20 @@ sub Validate
       }
       
    }
-   my $itclustsvcid=effVal($oldrec,$newrec,"itclustsvcid");
-   my $systemid=effVal($oldrec,$newrec,"systemid");
-   if ($systemid==0 && $itclustsvcid==0){
-      $self->LastMsg(ERROR,"invalid system specified");
-      return(undef);
-   }
-   else{
-      if (!$self->isParentWriteable($systemid,$itclustsvcid)){
-         if (!defined($oldrec) ||
-             !($self->isInstanceRelationWriteable($oldrec->{id}))){
-            $self->LastMsg(ERROR,"system is not writeable for you");
-            return(undef);
+   if ($self->Self ne "itil::lnksoftwareoption"){
+      my $itclustsvcid=effVal($oldrec,$newrec,"itclustsvcid");
+      my $systemid=effVal($oldrec,$newrec,"systemid");
+      if ($systemid==0 && $itclustsvcid==0){
+         $self->LastMsg(ERROR,"invalid system specified");
+         return(undef);
+      }
+      else{
+         if (!$self->isParentWriteable($systemid,$itclustsvcid)){
+            if (!defined($oldrec) ||
+                !($self->isInstanceRelationWriteable($oldrec->{id}))){
+               $self->LastMsg(ERROR,"system is not writeable for you");
+               return(undef);
+            }
          }
       }
    }
@@ -1020,12 +1048,12 @@ sub isWriteValid
                                                        $rec->{itclustsvcid}));
    $rw=1 if ((!$rw) && ($self->IsMemberOf("admin")));
    if ($rw){
-      return("default","lic","misc","instdetail","upd");
+      return("default","lic","misc","instdetail","upd","options");
    }
    else{
       # check if there is an software instance based on this installation
       if ($self->isInstanceRelationWriteable($rec->{id})){
-         return(qw(instdetail));
+         return(qw(instdetail options));
       }
    }
    return(undef);
@@ -1080,7 +1108,7 @@ sub isParentWriteable  # Eltern Object Schreibzugriff prüfen
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default instdetail lic useableby misc link 
+   return(qw(header default instdetail lic options useableby misc link 
              releaseinfos softsetvalidation
              upd source));
 }

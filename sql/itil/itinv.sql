@@ -400,7 +400,7 @@ create table lnksoftwaresystem (
   srcload      datetime    default NULL,
   PRIMARY KEY  (id),
   KEY software (software),KEY liccontract (liccontract),
-  KEY system (system),
+  KEY system (system), FOREIGN KEY (software) REFERENCES software (id) ON DELETE RESTRICT,
   UNIQUE KEY `srcsys` (srcsys,srcid)
 );
 create table lnkinstance (
@@ -1056,3 +1056,6 @@ alter table software add productclass varchar(20) default 'MAIN';
 alter table software add parent bigint(20) default null, add key(parent);
 alter table software add FOREIGN KEY fk_software (parent)
           REFERENCES software (id) ON DELETE CASCADE;
+alter table lnksoftwaresystem add parent bigint(20) default null,add key(parent);
+alter table lnksoftwaresystem add FOREIGN KEY fk_lnksoftwaresystem (parent)
+          REFERENCES lnksoftwaresystem (id) ON DELETE CASCADE;
