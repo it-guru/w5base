@@ -639,7 +639,7 @@ sub isViewValid
    my $rec=shift;
    return("header","default") if (!defined($rec));
    if ($rec->{pclass} ne "MAIN"){
-      return("header","default","source","doccontrol");
+      return("header","default","source","doccontrol","history");
    }
    return("ALL");
 }
