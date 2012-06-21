@@ -44,7 +44,9 @@ sub new
    $self->getField("itclustsvcid")->{searchable}=0;
    $self->getField("itclustsvcid")->{uivisible}=0;
 
+   $self->getField("fullname")->{label}="Option label";
    $self->getField("system")->{searchable}=0;
+   $self->getField("software")->{vjoinbase}=[{pclass=>\'OPTION'}];
    $self->getField("system")->{uivisible}=0;
    $self->getField("systemid")->{searchable}=0;
    $self->getField("systemid")->{uivisible}=0;
@@ -80,7 +82,11 @@ sub Validate
          $self->LastMsg(ERROR,"parent installation is not a MAIN installation");
          return(undef);
       }
+      $newrec->{systemid}=$prec->{systemid};
+      $newrec->{itclustsvcid}=$prec->{itclustsvcid};
    }
+
+printf STDERR ("fifi newrec=%s\n",Dumper($newrec));
 
 
 
@@ -123,6 +129,22 @@ sub getSqlFrom
             "on lnksoftwaresystem.parent=plnksoftware.id";
 
    return($from);
+}
+
+sub SecureValidate   # needed to allow updates in SubList Edit mode
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $wrgroups=shift;
+
+   if (defined($oldrec)){ 
+      delete($newrec->{software});
+      delete($newrec->{softwareid});
+      delete($newrec->{parentid});
+   }
+
+   return($self->SUPER::SecureValidate($oldrec,$newrec,$wrgroups));
 }
 
 

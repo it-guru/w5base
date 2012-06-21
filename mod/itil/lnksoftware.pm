@@ -743,6 +743,10 @@ sub Validate
          $newrec->{patchkey}=$patch;
          $newrec->{majorminorkey}=$rel;
       }
+      elsif (my ($rel)=$version=~m/^(\d+[\.\d+]{0,1})$/){
+         $newrec->{patchkey}="";
+         $newrec->{majorminorkey}=$rel;
+      }
       else{
          $newrec->{patchkey}="?";
          $newrec->{majorminorkey}="?";
@@ -1048,12 +1052,27 @@ sub isWriteValid
                                                        $rec->{itclustsvcid}));
    $rw=1 if ((!$rw) && ($self->IsMemberOf("admin")));
    if ($rw){
-      return("default","lic","misc","instdetail","upd","options");
+      if (!defined($rec) ||    # on create of a record, "default" is always
+          $rec->{softwareinstpclass} eq "MAIN"){  # need to write!
+            return("default","lic","misc","instdetail","upd","options");
+      }
+      else{
+         return("lic","misc","instdetail","upd","options");
+      }
    }
    else{
       # check if there is an software instance based on this installation
-      if ($self->isInstanceRelationWriteable($rec->{id})){
-         return(qw(instdetail options));
+      if ($rec->{softwareinstpclass} eq "MAIN"){
+         if ($self->isInstanceRelationWriteable($rec->{id})){
+            return(qw(instdetail options));
+         }
+      }
+      if ($rec->{softwareinstpclass} eq "OPTION" &&
+          exists( $rec->{parentid}) &&  # this is only in lnksoftwareoption
+          $rec->{parentid} ne ""){      # derivation posible !
+         if ($self->isInstanceRelationWriteable($rec->{parentid})){
+            return(qw(instdetail options misc options upd lic));
+         }
       }
    }
    return(undef);

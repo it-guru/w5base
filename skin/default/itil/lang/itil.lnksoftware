@@ -48,3 +48,4 @@
 'comments to Update/Upgrade posibilities'=>{de=>'Bemerkungen zu den Update/Upgrade Möglichkeiten'},
 'system is not writeable for you'=>{de=>'Das zugeordnete System ist nicht schreibbar für Sie'},
 'Software installation class'=>{de=>'Softwareinstallationsklasse'},
+'Option label'=>{de=>'Optionsbezeichnung'},

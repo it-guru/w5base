@@ -622,6 +622,16 @@ sub isWriteValid
    return(@l);
 }
 
+sub isDeleteValid
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my @l=$self->isWriteValid($rec);
+   return(1) if (in_array(\@l,"default"));
+   return(0);
+}
+
 
 sub isViewValid
 {
