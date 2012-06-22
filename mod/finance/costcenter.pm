@@ -282,6 +282,7 @@ sub ValidateCONumber
    my $conummer=uc(effVal($oldrec,$newrec,$fieldname));
    if ($conummer=~m/^\s*$/ || 
        (!($conummer=~m/^[0-9]+$/) &&
+        !($conummer=~m/^[A-Z,0-9][0-9]{8}[A-Z,0-9]$/) &&
         !($conummer=~m/^[A-Z]-[0-9]{6,12}-[A-Z,0-9]{3,6}$/) )){
       $self->LastMsg(ERROR,"invalid number format '\%s' specified",$conummer);
       return(0);
