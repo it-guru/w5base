@@ -288,7 +288,9 @@ sub ValidateCONumber
       return(0);
    }
    $conummer=~s/^0+//g;
-   $newrec->{$fieldname}=$conummer;
+   if (defined($newrec)){
+      $newrec->{$fieldname}=$conummer;
+   }
    return(1);
 }
 
