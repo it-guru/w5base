@@ -80,6 +80,8 @@
 'EVloccomp.access'=>{de=>'Zuganssysteme',en=>'access'},
 'EVloccomp.other'=>{de=>'Sonstiges',en=>'other'},
 'sendcustinfo'=>{de=>'Kundeninfo versandt'},
+'earlywarn'=>{de=>'Vorwarnung'},
+'early warning'=>{de=>'Vorwarnung'},
 'wfmodeventtime'=>{de=>'Ereigniszeitraum angepasst',en=>'event timespan modified'},
 'initiate Managment call'=>{de=>'Management Konferenz (BETA)',
                             en=>'initiate Managment call (BETA)'},
@@ -98,8 +100,6 @@
 'static mail subject'=>{de=>'statischer Benachrichtigungs-Betreff'},
 'static additional notify distribution list'=>{de=>'statische (zusätzliche) Verteilerliste'},
 'Affected Item Prio'=>{de=>'Prio des betroffenen Elementes'},
-
-
 'SALUTATION02.open'=>{
  'de'=>"Sehr geehrte Damen und Herren,\n\n".
        "im Folgenden erhalten Sie den aktuellen Stand zum Ereignis\n".

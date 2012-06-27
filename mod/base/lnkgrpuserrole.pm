@@ -99,6 +99,7 @@ sub new
                                  'RTimeManager',
                                  'RINManager',                 # ITIL role
                                  'RINManager2',                # ITIL role
+                                 'RINOperator',                # ITIL role
                                  'RCHManager',                 # ITIL role
                                  'RCHManager2',                # ITIL role
                                  'RCFManager',                 # ITIL role

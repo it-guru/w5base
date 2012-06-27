@@ -759,6 +759,9 @@ sub activateMailSend
 
    my %d=(step=>'base::workflow::mailsend::waitforspool',
           emailsignatur=>'EventNotification');
+   if ($action eq "earlywarn"){
+      delete($d{emailsignatur});
+   }
    $self->linkMail($WfRec->{id},$id);
    if (my $r=$wf->Store($id,%d)){
       return(1);
@@ -834,7 +837,8 @@ sub isViewValid
       }
    }
 
-   my %inmmgr=$self->getGroupsOf($userid,'RINManager','both');
+   my %inmmgr=$self->getGroupsOf($userid,[qw(RINManager RINManager2 
+                                             RINOperator)],'both');
 
    # if (is in mandator)
    my $mandators=$rec->{mandatorid};
@@ -1026,13 +1030,29 @@ sub getPosibleRelations
 }
 
 
+sub IsEarlyWarningAllowed
+{
+   my $self=shift;
+   my $WfRec=shift;
+
+   my %groups=$self->getGroupsOf($ENV{REMOTE_USER},
+                                       [qw(RINManager RINManager2
+                                           RINOperator)],'direct');
+   return(1) if (keys(%groups));
+   return(1) if ($self->getParent->IsMemberOf("admin"));
+   return(0);
+}
+
+
 sub IsIncidentManager
 {
    my $self=shift;
    my $WfRec=shift;
+   return(0) if (!defined($WfRec));
    my $mandator=$WfRec->{mandatorid};
    $mandator=[$mandator] if (!ref($mandator) eq "ARRAY");
-   return(1) if ($self->getParent->IsMemberOf($mandator,"RINManager","down"));
+   return(1) if ($self->getParent->IsMemberOf($mandator,
+                 [qw(RINManager RINManager2 RINOperator)],"down"));
    return(1) if ($self->getParent->IsMemberOf("admin"));
    if (defined($WfRec->{affectedapplicationid}) &&
        ref($WfRec->{affectedapplicationid}) eq "ARRAY" &&
@@ -1043,14 +1063,11 @@ sub IsIncidentManager
       foreach my $ag ($appl->getHashList(qw(businessteamid))){
          if ($ag->{businessteamid}!=0 &&
              $self->getParent->IsMemberOf($ag->{businessteamid},
-                                          "RINManager","down")){
+                          [qw(RINManager RINManager2 RINOperator)],"down")){
             return(1);
          }
       }
    }
-
-
-
 
    return(0);
 }
@@ -1222,11 +1239,11 @@ sub addComplexAbos
 sub getNotifyDestinations
 {
    my $self=shift;
-   my $mode=shift;    # "custinfo" | "mgmtinfo"
+   my $mode=shift;    # "custinfo" | "mgmtinfo" | "earlywarning"
    my $WfRec=shift;
    my $emailto=shift;
 
-   if ($mode eq "custinfo"){
+   if ($mode eq "custinfo" || $mode eq "earlywarning"){
       my $ia=getModuleObject($self->Config,"base::infoabo");
       if ($WfRec->{eventmode} eq "EVk.appl"){ 
          my $applid=$WfRec->{affectedapplicationid};
@@ -1358,6 +1375,10 @@ sub getNotificationSubject
 
    my $afcust=$WfRec->{affectedcustomer}->[0]; # only first customer 
    my $subject="P".$WfRec->{eventstatclass};
+   if ($action eq "earlywarning"){
+      $subject=$self->T("early warning");
+      $state="";
+   }
    my $prio="";
    if ($WfRec->{affecteditemprio} ne ""){
       if ($WfRec->{affecteditemprio}==1){   # Aussage von Hr. Weidner
@@ -2320,6 +2341,15 @@ sub generateWorkspace
 
    my @steplist=Query->Param("WorkflowStep");
    pop(@steplist);
+   my $earlywarning="";
+   if ($self->getParent->IsEarlyWarningAllowed($WfRec)){
+      $earlywarning="&nbsp;&nbsp;".
+                    $self->T("send early warning").
+                    "<input type=checkbox name=Formated_earlywarning>";
+   }
+
+
+
    my $StoredWorkspace=$self->SUPER::generateStoredWorkspace($WfRec,@steplist);
    my $t=<<EOF;
 Mit dem nächsten Schritt wird die Ereignisinformation "erzeugt". In 
@@ -2341,7 +2371,7 @@ $StoredWorkspace
 </tr>
 <tr>
 <td class=fname valign=top width=20%>%eventendexpected(label)%:</td>
-<td class=finput>%eventendexpected(detail)%</td>
+<td class=finput>%eventendexpected(detail)%$earlywarning</td>
 </tr>
 <tr>
 <td class=fname valign=top width=20%>%eventdesciption(label)%:</td>
@@ -2589,13 +2619,19 @@ sub nativProcess
          return(0);
       }
       my @inm=$self->getParent->getMembersOf($h->{mandatorid},
-                                             ['RINManager'],'up');
+                            [qw(RINManager RINManager2 RINOperator)],'up');
       if ($#inm==-1){
          $self->getParent->LastMsg(ERROR,"no incident managers found for ".
                                          "selected config-item");
          return(0);
       }
       $h->{step}=$self->getNextStep() if ($h->{step} eq "");
+      if ($h->{earlywarning} && !$self->getParent->IsEarlyWarningAllowed()){
+         $self->getParent->LastMsg(ERROR,"early warning not allowed from you");
+         return(0);
+      }
+      my $earlywarning=$h->{earlywarning};
+      delete($h->{earlywarning});
       my $newid;
       if (!($newid=$self->StoreRecord($WfRec,$h))){
          return(0);
@@ -2606,12 +2642,54 @@ sub nativProcess
             # notify incident manager in selected mandator area
             $self->getParent->getParent->Action->NotifyForward(
                $newid,undef,undef,undef,
-               $self->getParent->T("A new event information has been registered by a non incident manager. Please ensure that all neassasary actions be done, to handle this workflow correctly!"),
+               $self->getParent->T("A new event information has ".
+                  "been registered by a non incident manager. Please ".
+                  "ensure that all neassasary actions be done, to handle ".
+                  "this workflow correctly!"),
                addtarget=>\@inm,sendercc=>1,mode=>'INFO:');
 
          }
       }
-
+      if ($earlywarning){
+         $self->getParent->getParent->ResetFilter();
+         $self->getParent->getParent->SetFilter({id=>\$newid});
+         my ($WfRec,$msg)=$self->getParent->getParent->getOnlyFirst(qw(ALL));
+         if (defined($WfRec)){
+            my %emailto;
+            $self->getParent->getNotifyDestinations("earlywarning",
+                                                   $WfRec,\%emailto);
+            my $wf=getModuleObject($self->getParent->getParent->Config,
+                                   "base::workflow");
+            my %additional=(headcolor=>"orange",
+                            eventtype=>'Event',    
+                            headid=>$newid,
+                            salutation=>"Dies ist eine Vorwarung",
+                            creationtime=>"now");
+            my $subject=$self->getParent->getNotificationSubject($WfRec,
+                        "earlywarning",0,"subjectlabel","failclass");
+            my $newmailrec={
+                   class    =>'base::workflow::mailsend',
+                   step     =>'base::workflow::mailsend::dataload',
+                   name     =>$subject,
+                   emailto        =>[keys(%emailto)],
+                   emailtext      =>$self->T("This message is an early ".
+                       "warning about a upcoming event information.")."\n\n".
+                                    $WfRec->{eventdesciption},
+                   allowsms       =>1,
+                   additional     =>\%additional
+                  };
+            if (my $id=$wf->Store(undef,$newmailrec)){
+               if ($self->getParent->activateMailSend($WfRec,$wf,$id,
+                                                  $newmailrec,"earlywarn")){
+                  if ($wf->Action->StoreRecord(
+                      $WfRec->{id},"earlywarn",
+                      {translation=>'itil::workflow::eventnotify'},
+                      "",undef)){
+                  }
+               }
+            }
+         }
+      }
       return(1);
    }
    return(0);
@@ -2631,6 +2709,9 @@ sub Process
          $h->{eventend}=undef;
          if (Query->Param("Formated_eventmode") ne ""){
             $h->{eventmode}=Query->Param("Formated_eventmode");
+         }
+         if (Query->Param("Formated_earlywarning") ne ""){
+            $h->{earlywarning}=1;
          }
          if (Query->Param("Formated_eventendofevent") ne ""){
             $h->{eventend}=Query->Param("Formated_eventendofevent");

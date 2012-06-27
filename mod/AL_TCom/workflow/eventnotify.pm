@@ -423,7 +423,7 @@ sub loadDataFromSC
 sub getNotifyDestinations
 {
    my $self=shift;
-   my $mode=shift;    # "custinfo" | "mgmtinfo"
+   my $mode=shift;    # "custinfo" | "mgmtinfo" | "earlywarning"
    my $WfRec=shift;
    my $emailto=shift;
 
