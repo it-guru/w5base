@@ -232,7 +232,7 @@ sub getMandatorsOf
    my %groups=$self->getGroupsOf($AccountOrUserID,
                                  [qw(REmployee 
                                      RBoss RBoss2 
-                                     RMember RCFManager)],
+                                     RMember RCFManager RCFManager2)],
                                  'both');
    my @grps=keys(%groups);
    my %m=();
