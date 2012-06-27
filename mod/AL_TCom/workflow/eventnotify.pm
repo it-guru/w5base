@@ -491,6 +491,9 @@ sub activateMailSend
 
    my %d=(step=>'base::workflow::mailsend::waitforspool',
           emailsignatur=>'EventNotification: GCU Telco');
+   if ($action eq "earlywarn"){
+      delete($d{emailsignatur});
+   }
    $self->linkMail($WfRec->{id},$id);
    if (my $r=$wf->Store($id,%d)){
       return(1);
