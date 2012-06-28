@@ -111,11 +111,17 @@ sub MultiOperationTableHeader
 sub ProcessLine
 {
    my $self=shift;
+   my ($fh,$viewgroups,$rec,$msg)=@_;
+   my $app=$self->getParent->getParent();
+   my @view=$app->getCurrentView();
+   
 
-   my @useField=Query->Param("useField");
-   if ($#useField==-1){
-      if ($#{$self->{recordlist}}>2){
-         return(undef);
+   if ($#view!=0){
+      my @useField=Query->Param("useField");
+      if ($#useField==-1){
+         if ($#{$self->{recordlist}}>2){
+            return(undef);
+         }
       }
    }
 

@@ -66,8 +66,8 @@ sub IsModuleSelectable
             @words=parse_line('[,;]{0,1}\s+',0,
                               $param{currentFrontendFilter}->{$col1name});
          }
-         msg(INFO,"XlsV03: col1name='%s'",$col1name);
-         msg(INFO,"XlsV03: flt=%s",Dumper(\@words));
+         #msg(INFO,"XlsV03: col1name='%s'",$col1name);
+         #msg(INFO,"XlsV03: flt=%s",Dumper(\@words));
          return(1);
       }
    }
