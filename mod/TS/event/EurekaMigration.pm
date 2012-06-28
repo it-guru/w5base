@@ -70,15 +70,25 @@ sub ProcessLineData
    my $o="costcenter";
    $self->{$o}->ResetFilter();
    $self->{$o}->SetFilter({name=>\$data->[0]});
-   my $n=0;
+   my $total=0;
+   my %to=();
+   my %cc=(11634953080001=>1,11634955570001=>1,
+           11634955470001=>1,11999553900001=>1);
+   my $msg="";
+   my $EventJobBaseUrl=$self->Config->Param("EventJobBaseUrl");
    foreach my $rec ($self->{$o}->getHashList(qw(ALL))){
       if ($self->{$o}->ValidatedUpdateRecord($rec,
                         {name=>$data->[1]},{id=>\$rec->{id}})){
          msg(INFO,"... set $data->[0] -> $data->[1] in ".$self->{$o}->Self);
-         $n++;
+         $total++;
+         $to{$rec->{databossid}}++ if ($rec->{databossid} ne "");
+         my $l=$self->{$o}->T($self->{$o}->Self,$self->{$o}->Self);
+         $msg.="\n".$l." : $data->[0]\n".
+               "$EventJobBaseUrl/finance/costcenter/ById/".$rec->{id}."\n";
+               
       }
    }
-   $data->[$logcol]="$n replaces in ".$self->{$o}->Self;
+   $data->[$logcol]="$total replaces in ".$self->{$o}->Self;
 
    foreach my $o (qw(system asset appl custcontract)){ 
       $self->{$o}->ResetFilter();
@@ -90,9 +100,43 @@ sub ProcessLineData
             msg(INFO,"... set $data->[0] -> $data->[1] in ".$self->{$o}->Self.
                      " on id ".$rec->{id});
             $n++;
+            $total++;
+            $cc{$rec->{databossid}}++ if ($rec->{databossid} ne "");
+            my $l=$self->{$o}->T($self->{$o}->Self,$self->{$o}->Self);
+            my $t=$self->{$o}->Self;
+            $t=~s/::/\//g;
+            $msg.="\n".$l." : $rec->{name}\n".
+                  "$EventJobBaseUrl/$t/ById/".$rec->{id}."\n";
          }
       }
       $data->[$logcol++]="$n replaces in ".$self->{$o}->Self;
+   }
+   if ($total>0){
+      #printf STDERR ("fifi to=%s\n",Dumper(\%to));
+      #printf STDERR ("fifi cc=%s\n",Dumper(\%cc));
+      my $wfa=getModuleObject($self->Config,"base::workflowaction");
+      if (keys(%to)==0){
+         %to=%cc;
+         %cc=();
+      }
+      $wfa->Notify("INFO",
+                   "CO/Kostenstellen/PSP Migration - ".
+                   "Eureka/TelekomIT - ".$data->[0]."->".$data->[1],
+                   "Sehr geehrte Damen und Herren,\n\n".
+                   "Aufgrund einer notwendigen Umstellung von CO-Nummern ".
+                   "und Kostenstellen aufgrund des Eureka Projektes ".
+                   "(Telekom IT), wurden in W5Base/Darwin ".
+                   "Korrekturen an Config-Items durchgeführt, die durch ".
+                   "Sie datenverantwortet werden.\n\n".
+                   "Im konkreten Fall wurde der Kostenknoten '<b>".
+                   $data->[0]."</b>' auf '<b>".$data->[1]."</b>' umgestellt. ".
+                   "Die Korrektur hat Auswirkungen auf die folgenden ".
+                   "Config-Items:\n".$msg.
+                   "\n\nBitte prüfen Sie im Bedarfsfall, ob diese ".
+                   "Umstellungen auch aus Ihrer Sicht korrekt sind.",
+                   emailto=>[keys(%to)],
+                   emailcc=>[keys(%cc)]);
+      exit(0);
    }
    
 }
