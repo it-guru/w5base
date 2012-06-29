@@ -107,7 +107,7 @@ sub ProcessLineData
             my $t=$self->{$o}->Self;
             $t=~s/::/\//g;
             $msg.="\n".$l." : $rec->{name}\n".
-                  "$EventJobBaseUrl/$t/ById/".$rec->{id}."\n";
+                  "$EventJobBaseUrl/auth/$t/ById/".$rec->{id}."\n";
          }
       }
       $data->[$logcol++]="$n replaces in ".$self->{$o}->Self;
