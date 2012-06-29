@@ -92,7 +92,8 @@ sub ProcessLineData
 
    foreach my $o (qw(system asset appl custcontract)){ 
       $self->{$o}->ResetFilter();
-      $self->{$o}->SetFilter({conumber=>\$data->[0]});
+      $self->{$o}->SetFilter({conumber=>\$data->[0],
+                              cistatusid=>"<=5"});
       my $n=0;
       foreach my $rec ($self->{$o}->getHashList(qw(ALL))){
          if ($self->{$o}->ValidatedUpdateRecord($rec,
