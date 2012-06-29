@@ -116,27 +116,25 @@ sub ProcessLineData
       #printf STDERR ("fifi to=%s\n",Dumper(\%to));
       #printf STDERR ("fifi cc=%s\n",Dumper(\%cc));
       my $wfa=getModuleObject($self->Config,"base::workflowaction");
-      if (keys(%to)==0){
-         %to=%cc;
-         %cc=();
+      if (keys(%to)!=0){
+         $wfa->Notify("INFO",
+                      "CO/Kostenstellen/PSP Migration - ".
+                      "Eureka/TelekomIT - ".$data->[0]."->".$data->[1],
+                      "Sehr geehrte Damen und Herren,\n\n".
+                      "Aufgrund einer notwendigen Umstellung von CO-Nummern ".
+                      "und Kostenstellen aufgrund des Eureka Projektes ".
+                      "(Telekom IT), wurden in W5Base/Darwin ".
+                      "Korrekturen an Config-Items durchgeführt, die durch ".
+                      "Sie datenverantwortet werden.\n\n".
+                      "Im konkreten Fall wurde der Kostenknoten '<b>".
+                      $data->[0]."</b>' auf '<b>".$data->[1]."</b>' umgestellt. ".
+                      "Die Korrektur hat Auswirkungen auf die folgenden ".
+                      "Config-Items:\n".$msg.
+                      "\n\nBitte prüfen Sie im Bedarfsfall, ob diese ".
+                      "Umstellungen auch aus Ihrer Sicht korrekt sind.",
+                      emailto=>[keys(%to)],
+                      emailcc=>[keys(%cc)]);
       }
-      $wfa->Notify("INFO",
-                   "CO/Kostenstellen/PSP Migration - ".
-                   "Eureka/TelekomIT - ".$data->[0]."->".$data->[1],
-                   "Sehr geehrte Damen und Herren,\n\n".
-                   "Aufgrund einer notwendigen Umstellung von CO-Nummern ".
-                   "und Kostenstellen aufgrund des Eureka Projektes ".
-                   "(Telekom IT), wurden in W5Base/Darwin ".
-                   "Korrekturen an Config-Items durchgeführt, die durch ".
-                   "Sie datenverantwortet werden.\n\n".
-                   "Im konkreten Fall wurde der Kostenknoten '<b>".
-                   $data->[0]."</b>' auf '<b>".$data->[1]."</b>' umgestellt. ".
-                   "Die Korrektur hat Auswirkungen auf die folgenden ".
-                   "Config-Items:\n".$msg.
-                   "\n\nBitte prüfen Sie im Bedarfsfall, ob diese ".
-                   "Umstellungen auch aus Ihrer Sicht korrekt sind.",
-                   emailto=>[keys(%to)],
-                   emailcc=>[keys(%cc)]);
    }
    
 }
