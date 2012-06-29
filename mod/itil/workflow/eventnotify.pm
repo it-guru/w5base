@@ -1386,6 +1386,10 @@ sub getNotificationSubject
       }
    }
    my $subject2=" / ? / $state Incident / ".$afcust." / $prio ? /";
+   if ($WfRec->{eventmode} eq "EVk.free"){ 
+      $subject2=" / Incident / ".$WfRec->{eventstaticmailsubject}.
+                " /";
+   }
    if ($WfRec->{eventmode} eq "EVk.appl"){ 
       my $ag="";
       foreach my $appl (@{$WfRec->{affectedapplication}}){
