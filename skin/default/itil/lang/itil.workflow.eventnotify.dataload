@@ -3,4 +3,4 @@
 'no incident managers found for selected config-item'=>{de=>'Es existieren keine Incident-Manager für das gewählte Config-Item'},
 'send early warning'=>{de=>'Vorwarnung versenden'},
 'early warning'=>{de=>'Vorwarnung auf Ereignisinformation'},
-'This message is an early warning about a upcoming event information.'=>{de=>'Dies ist eine vorab Benachrichtigung auf ein Ereingismeldung.'},
+'This message is an early warning about a upcoming event information.'=>{de=>'Dies ist eine vorab Benachrichtigung auf eine Ereingismeldung.'},
