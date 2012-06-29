@@ -84,7 +84,7 @@ sub ProcessLineData
          $to{$rec->{databossid}}++ if ($rec->{databossid} ne "");
          my $l=$self->{$o}->T($self->{$o}->Self,$self->{$o}->Self);
          $msg.="\n".$l." : $data->[0]\n".
-               "$EventJobBaseUrl/finance/costcenter/ById/".$rec->{id}."\n";
+               "$EventJobBaseUrl/auth/finance/costcenter/ById/".$rec->{id}."\n";
                
       }
    }
