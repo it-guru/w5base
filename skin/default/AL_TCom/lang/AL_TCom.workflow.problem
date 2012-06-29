@@ -1,3 +1,3 @@
-'AL_TCom::workflow::problem'=>{de=>'GCU Telco: ITIL Problem individualisiert',
-                               en=>'GCU Telco: ITIL Problem spezicalized'},
+'AL_TCom::workflow::problem'=>{de=>'Telekom IT: ITIL Problem individualisiert',
+                               en=>'Telekom IT: ITIL Problem spezicalized'},
 

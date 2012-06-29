@@ -117,6 +117,7 @@ sub qcheckRecord
          my %trtab=(
             'SDM.TC' =>'^DTAG\.TSI\.S\.DTAG\.(.*)$',
             'CS.TC'  =>'^DTAG\.TSI\.Prod\.CS\.Telco\.(.*)$',
+            'TIT'    =>'^DTAG\.TSI\.TIT\.(.*)$',
             'PSS'    =>'^DTAG\.TSI\.Prod\.GBOP\.PSS\.(.*)$',
             'INT.CSS'=>'^DTAG\.TSI\.INT\.SK\.CSS\.CSS_Applicat\.(.*)$'
          );

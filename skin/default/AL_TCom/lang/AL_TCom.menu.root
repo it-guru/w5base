@@ -1,4 +1,4 @@
-'AL_TCom'=>{de=>'IT-Inventar GCU Telco',en=>'IT-Inventory GCU Telco'},
+'AL_TCom'=>{de=>'IT-Inventar Telekom IT',en=>'IT-Inventory Telekom IT'},
 'AL_TCom.custcontract'=>{de=>'Kundenvertrag',en=>'CustomerContract'},
 'AL_TCom.custcontract.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.custcontract.lnkappl'=>{de=>'Verkn. Anwendung',en=>'Link Application'},

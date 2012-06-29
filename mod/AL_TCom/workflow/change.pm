@@ -203,7 +203,7 @@ sub activateMailSend
    my $action=shift;
 
    my %d=(step=>'base::workflow::mailsend::waitforspool',
-          emailsignatur=>'ChangeNotification: GCU Telco');
+          emailsignatur=>'ChangeNotification: Telekom IT');
    $self->linkMail($WfRec->{id},$id);
    if (my $r=$wf->Store($id,%d)){
       return(1);

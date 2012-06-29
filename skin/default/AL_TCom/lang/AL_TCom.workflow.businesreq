@@ -1,5 +1,5 @@
-'AL_TCom::workflow::businesreq'=>{de=>'GCU Telco: Anfrage/Auftrag an den Anwendungsbetrieb oder an die Anwendungsbetreuung',en=>'GCU Telco: Question or request to applications businessteam'},
-'AL_TCom::workflow::businesreq::tip'=>{de=>'Dieser Workflow nimmt speziell Aufträge des Kunden an die <b>GCU Telco</b> Anwendungsbetreuung entgegen. Der Workflow wird automatisch an den Auftragseingang der jeweiligen Anwendung weitergeleitet.<br>Sollte bei der ausgewählten Anwendung kein Kundenauftragseingang registriert sein, so wird die Weiterleitung des Workflows nicht gestattet.',en=>'Question or request to the application developers'},
+'AL_TCom::workflow::businesreq'=>{de=>'Telekom IT: Anfrage/Auftrag an den Anwendungsbetrieb oder an die Anwendungsbetreuung',en=>'Telekom IT: Question or request to applications businessteam'},
+'AL_TCom::workflow::businesreq::tip'=>{de=>'Dieser Workflow nimmt speziell Aufträge des Kunden an die <b>Telekom IT</b> Anwendungsbetreuung entgegen. Der Workflow wird automatisch an den Auftragseingang der jeweiligen Anwendung weitergeleitet.<br>Sollte bei der ausgewählten Anwendung kein Kundenauftragseingang registriert sein, so wird die Weiterleitung des Workflows nicht gestattet.',en=>'Question or request to the application developers'},
 'Worktime'=>{de=>'Arbeitszeit'},
 'no P800 effort derivable'=>{de=>'keine P800 Arbeitaufwände eingegeben bzw. ableitbar'},
 'P800 effort more than 20h needs detail comments'=>{de=>'P800 Arbeitszeit von mehr als 20 Stunden braucht eine detaillierte Beschreibung'},

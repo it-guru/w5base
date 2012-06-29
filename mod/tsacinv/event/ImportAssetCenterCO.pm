@@ -18,7 +18,6 @@ package tsacinv::event::ImportAssetCenterCO;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::Event;
 @ISA=qw(kernel::Event);
@@ -57,7 +56,7 @@ sub ImportAssetManagerCO
    $self->{user}=getModuleObject($self->Config,"base::user");
    $self->{mandator}=getModuleObject($self->Config,"base::mandator");
    my $flt=[{bc=>['AL T-COM','Notes & Collab. Ser.','AL TMO',
-                  'Global CU Telco']},
+                  'Global CU Telco','Telekom IT']},
             {orgunit=>['DTAG']}];
    $self->{statefile}="/var/log/w5base/SystemID.noappl.log";
    #$flt->{name}=\'9100007746';
@@ -68,7 +67,7 @@ sub ImportAssetManagerCO
    my $cocount=0;
    foreach my $rec (@l){
      msg(INFO,"co=$rec->{name}");
-     next if (!($rec->{name}=~m/^\d{5,20}$/));
+     next if (!$w5co->ValidateCONumber("name",$rec));
      $w5co->ResetFilter();
      $w5co->SetFilter({name=>\$rec->{name}});
      my ($w5rec,$msg)=$w5co->getOnlyFirst(qw(ALL));

@@ -1,4 +1,4 @@
-'AL_TCom::workflow::P800'=>{de=>'GCU Telco P800 Report',en=>'GCU Telco P800 Report'},
+'AL_TCom::workflow::P800'=>{de=>'Telekom IT P800 Report',en=>'Telekom IT P800 Report'},
 'fieldgroup.p800_app'=>{de=>'Modul: Anwendung',en=>'Module: Application'},
 'fieldgroup.p800_sys'=>{de=>'Modul: log. System',en=>'Module: log. System'},
 'total worktime of changes'=>{de=>'Arbeitsaufwand für Changes'},

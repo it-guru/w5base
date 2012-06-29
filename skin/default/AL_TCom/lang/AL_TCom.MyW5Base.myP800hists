@@ -1,2 +1,2 @@
-'AL_TCom::MyW5Base::myP800hists'=>{de=>'GCU Telco: P800 History-Sonderleistung 20.-19.',
-                              en=>'GCU Telco: P800 History-Specialservices 20.-19.'},
+'AL_TCom::MyW5Base::myP800hists'=>{de=>'Telekom IT: P800 History-Sonderleistung 20.-19.',
+                              en=>'Telekom IT: P800 History-Specialservices 20.-19.'},

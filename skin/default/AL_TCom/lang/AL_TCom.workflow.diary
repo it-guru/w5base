@@ -1,9 +1,9 @@
-'AL_TCom::workflow::diary'=>{de=>'GCU Telco: Betriebstagebuch',
-                             en=>'GCU Telco: Diary'},
+'AL_TCom::workflow::diary'=>{de=>'Telekom IT: Betriebstagebuch',
+                             en=>'Telekom IT: Diary'},
 'AL_TCom::workflow::diary::tip'=>{
               de=>'Das Betriebstagebuch dient zur Dokumentation von '.
                   'Projektarbeiten oder allgemeinen Veränderungen '.
-                  'in bestimmten Anwendungen. Für die GCU Telco müssen '.
+                  'in bestimmten Anwendungen. Für die Telekom IT müssen '.
                   'im speziellen die P800 relevanten Aufwände '.
                   'dokumentiert werden.',
                   },

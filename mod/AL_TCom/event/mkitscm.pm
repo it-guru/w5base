@@ -46,7 +46,7 @@ sub mkitscm
    my %param=@_;
    my $tmpfile="/tmp/appl-handbook.$$.pdf";
    my $filename="handbook.pdf";
-   my $area="DTAG.TSI.Prod.CS.Telco";
+   my $area="DTAG.TSI.TIT";
    my $obj=getModuleObject($self->Config,"itil::appl");
    $obj->ResetFilter();
    $obj->SetFilter(businessteam=>"$area $area.*",

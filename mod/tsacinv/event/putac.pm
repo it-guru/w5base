@@ -79,6 +79,7 @@ sub getAcGroupByW5BaseGroup
 
    $grpname=~s/^.*\.CS\.AO\.DTAG/CSS.AO.DTAG/i;
    $grpname=~s/^.*\.Prod\.CS\.Telco/CSS.AO.DTAG/i;
+   $grpname=~s/^.*\.TIT/CSS.AO.DTAG/i;
    $grpname=~s/^DTAG\.TSI\.Prod\.CS\.SDMSS\.PSS\.IMS\.IM2$/CSS.SDM.PSS.CIAM/i;
    $grpname=~s/^DTAG\.TSI\.Prod\.CS\.SDMSS\.PSS\.IMS\.IM3$/CSS.SDM.PSS.CIAM/i;
    $grpname=~s/^DTAG\.TSI\.Prod\.CS\.SDMSS\.PSS/CSS.SDM.PSS/i;

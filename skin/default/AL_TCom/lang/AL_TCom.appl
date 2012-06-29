@@ -1,5 +1,5 @@
-'AL_TCom::appl'=>{de=>'GCU Telco Anwendung',
-                  en=>'GCU Telco Application'},
+'AL_TCom::appl'=>{de=>'Telekom IT Anwendung',
+                  en=>'Telekom IT Application'},
 'allow to send for (Herbeiruf)'=>{de=>'Herbeiruf gestattet'},
 'Application number'=>{de=>'Anwendungsnummer'},
 'fieldgroup.inm'=>{de=>'Incident-Management',en=>'Incident-Management'},

@@ -1,5 +1,5 @@
-'AL_TCom::workflow::change'=>{de=>'GCU Telco: ITIL Change individualisiert',
-                              en=>'GCU Telco: ITIL Change spezicalized'},
+'AL_TCom::workflow::change'=>{de=>'Telekom IT: ITIL Change individualisiert',
+                              en=>'Telekom IT: ITIL Change spezicalized'},
 'fieldgroup.tcomcod'=>{de=>'Fakturadaten',en=>'invoice data'},
 'manual checked'=>{de=>'manuell überprüft'},
 'Customer Contract'=>{de=>'Kundenvertrag'},

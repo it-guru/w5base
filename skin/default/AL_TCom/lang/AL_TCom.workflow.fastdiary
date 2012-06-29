@@ -1,9 +1,9 @@
-'AL_TCom::workflow::fastdiary'=>{de=>'GCU Telco: Betriebstagebuch Kleinarbeiten',
-                                 en=>'GCU Telco: Diary short jobs'},
+'AL_TCom::workflow::fastdiary'=>{de=>'Telekom IT: Betriebstagebuch Kleinarbeiten',
+                                 en=>'Telekom IT: Diary short jobs'},
 'AL_TCom::workflow::fastdiary::tip'=>{
               de=>'Das Betriebstagebuch dient zur Dokumentation von '.
                   'Projektarbeiten oder allgemeinen Veränderungen '.
-                  'in bestimmten Anwendungen. Für die GCU Telco müssen '.
+                  'in bestimmten Anwendungen. Für die Telekom IT müssen '.
                   'im speziellen die P800 relevanten Aufwände '.
                   'dokumentiert werden. Dieses spezielle Betriebstagebuch '.
                   'ist zur schellen und effektiven Dokumentation von '.

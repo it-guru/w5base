@@ -1,5 +1,5 @@
-'AL_TCom::workflow::incident'=>{de=>'GCU Telco: ITIL Incident individualisiert',
-                                en=>'GCU Telco: ITIL Incident spezicalized'},
+'AL_TCom::workflow::incident'=>{de=>'Telekom IT: ITIL Incident individualisiert',
+                                en=>'Telekom IT: ITIL Incident spezicalized'},
 'fieldgroup.tcomcod'=>{de=>'Fakturadaten',en=>'invoice data'},
 'Workflow invoice'=>{de=>'Workflow fakturieren'},
 'RootCause Analyses'=>{de=>'Problemanalyse'},

@@ -1,5 +1,5 @@
-'AL_TCom::workflow::eventnotify'=>{de=>'GCU Telco: IT-Ereignismeldung',en=>'GCU Telco: IT-Eventnotification'},
-'no GCU Telco, Extern or DSS mandator included'=>{de=>'kein GCU Telco, Extern or DSS Mandant eingeschlossen'},
+'AL_TCom::workflow::eventnotify'=>{de=>'Telekom IT: IT-Ereignismeldung',en=>'Telekom IT: IT-Eventnotification'},
+'no Telekom IT, Extern or DSS mandator included'=>{de=>'kein Telekom IT, Extern or DSS Mandant eingeschlossen'},
 'EVt.iswtsi'=>{de=>'Individual-SW TSI',en=>'Individual-SW TSI'},
 'EVt.iswext'=>{de=>'Individual-SW extern',en=>'Individual-SW extern'},
 'EVt.wrkerr'=>{de=>'Arbeitsfehler',en=>'Work mistake'},

@@ -490,7 +490,7 @@ sub activateMailSend
    my $action=shift;
 
    my %d=(step=>'base::workflow::mailsend::waitforspool',
-          emailsignatur=>'EventNotification: GCU Telco');
+          emailsignatur=>'EventNotification: Telekom IT');
    if ($action eq "earlywarn"){
       delete($d{emailsignatur});
    }

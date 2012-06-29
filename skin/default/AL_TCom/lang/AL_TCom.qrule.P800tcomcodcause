@@ -1,5 +1,5 @@
-'AL_TCom::qrule::P800tcomcodcause'=>{de=>'GCU Telco P800 Prüfung',
-                                     en=>'GCU Telco P800 verification'},
+'AL_TCom::qrule::P800tcomcodcause'=>{de=>'Telekom IT P800 Prüfung',
+                                     en=>'Telekom IT P800 verification'},
 'insufficient cause description'=>{de=>'Tätigkeitsklassifizierung nicht zulässig'},
 'description of work to short'=>{de=>'detaillierte Tätigkeitsbeschreibung zu kurz'},
 'description of work not detailed enougth'=>{de=>'Tätigkeitsbeschreibung nicht detailliert genug'},
