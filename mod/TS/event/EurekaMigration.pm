@@ -170,7 +170,8 @@ sub ProcessExcelImport
    $self->{asset}=getModuleObject($self->Config,"itil::asset");
 
    my $oExcel;
-   eval('use Spreadsheet::ParseExcel::SaveParser;'.
+   eval('use Spreadsheet::ParseExcel;'.
+        'use Spreadsheet::ParseExcel::SaveParser;'.
         '$oExcel=new Spreadsheet::ParseExcel::SaveParser;');
    if ($@ ne "" || !defined($oExcel)){
       msg(ERROR,"%s",$@);
