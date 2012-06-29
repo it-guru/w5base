@@ -136,7 +136,6 @@ sub ProcessLineData
                    "Umstellungen auch aus Ihrer Sicht korrekt sind.",
                    emailto=>[keys(%to)],
                    emailcc=>[keys(%cc)]);
-      exit(0);
    }
    
 }
