@@ -173,12 +173,15 @@ sub qcheckRecord
              !($parrec->{conumber}=~m/^\d+$/)){
             $parrec->{conumber}=undef;
          }
-         $self->IfComp($dataobj,
-                       $rec,"conumber",
-                       $parrec,"conumber",
-                       $autocorrect,$forcedupd,$wfrequest,
-                       \@qmsg,\@dataissue,\$errorlevel,
-                       mode=>'string');
+#
+# deactivated due Eurak Migration
+#
+#         $self->IfComp($dataobj,
+#                       $rec,"conumber",
+#                       $parrec,"conumber",
+#                       $autocorrect,$forcedupd,$wfrequest,
+#                       \@qmsg,\@dataissue,\$errorlevel,
+#                       mode=>'string');
 
          return(undef,undef) if (!$par->Ping());
       }

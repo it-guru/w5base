@@ -93,11 +93,15 @@ sub qcheckRecord
             # filter to remove invalid co-numbers without error message
             delete($parrec->{conumber});
          }
-         $self->IfaceCompare($dataobj,
-                             $rec,"conumber",
-                             $parrec,"conumber",
-                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
-                             mode=>'native');
+#
+# deactivated due Eurak Migration
+#
+
+#         $self->IfaceCompare($dataobj,
+#                             $rec,"conumber",
+#                             $parrec,"conumber",
+#                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
+#                             mode=>'native');
          if ($parrec->{sememail} ne ""){
             my $semid=$tswiw->GetW5BaseUserID($parrec->{sememail});
             if (defined($semid)){
