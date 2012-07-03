@@ -58,12 +58,12 @@ sub qcheckRecord
    my $rec=shift;
 
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
-   if (!($rec->{conumber}=~m/^\d{5,15}$/)){
+   my $coobj=getModuleObject($self->getParent->Config,"itil::costcenter");
+   if (!($coobj->ValidateCONumber("conumber",$rec,undef))){
       return(3,{qmsg=>['no valid conumber'],
                 dataissue=>['no valid conumber']});
    }
    else{
-      my $coobj=getModuleObject($self->getParent->Config,"itil::costcenter");
       $coobj->SetFilter({cistatusid=>4,name=>\$rec->{conumber}});
       my ($rec,$msg)=$coobj->getOnlyFirst(qw(id));
       if (!defined($rec)){
