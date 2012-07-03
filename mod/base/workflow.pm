@@ -43,12 +43,14 @@ sub new
       new kernel::Field::Linenumber(
                 name          =>'linenumber',
                 htmlwidth     =>'10px',
+                nowrap        =>1,
                 label         =>'No.'),
 
       new kernel::Field::Id(
                 name          =>'id',
                 label         =>'WorkflowID',
                 htmldetail    =>0,
+                nowrap        =>1,
                 searchable    =>1,
                 sqlorder      =>'desc',
                 size          =>'10',
@@ -758,6 +760,26 @@ sub ById
    $self->HtmlGoto("../Process",post=>{$idname=>$val});
    return();
 }
+
+sub HtmlStatSetList
+{
+   my $self=shift;
+   my $mode=shift;
+
+   my $s={ default=>'nix',
+           set=>{
+                 byfwdtarget=>{
+                    label=>'Hans',
+                    header=>'This is the hans chart',
+                    bottom=>'This is the hans bottom',
+                    view=>['nature','fwdtarget','cistatus'],
+                    aggregation=>'count'}
+                }
+         };
+   return($s);
+}
+
+
 
 sub isMarkDeleteValid
 {
