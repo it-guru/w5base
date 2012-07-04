@@ -652,10 +652,14 @@ sub Validate
        $newrec->{systemhandle} ne $systemhandle){
       $newrec->{systemhandle}=$systemhandle;
    }
-
    if (exists($newrec->{conumber}) && $newrec->{conumber} ne ""){
-      return(0) if (!$self->finance::costcenter::ValidateCONumber("conumber",
-                    $oldrec,$newrec));
+      if (!$self->finance::costcenter::ValidateCONumber("conumber",
+          $oldrec,$newrec)){
+         $self->LastMsg(ERROR,
+             $self->T("invalid number format '\%s' specified",
+                      "finance::costcenter"),$newrec->{conumber});
+         return(0);
+      }
    }
 
 

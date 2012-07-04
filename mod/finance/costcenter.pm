@@ -284,7 +284,6 @@ sub ValidateCONumber
        (!($conummer=~m/^[0-9]+$/) &&
         !($conummer=~m/^[A-Z,0-9][0-9]{8}[A-Z,0-9]$/) &&
         !($conummer=~m/^[A-Z]-[0-9]{6,12}-[A-Z,0-9]{3,6}$/) )){
-      $self->LastMsg(ERROR,"invalid number format '\%s' specified",$conummer);
       return(0);
    }
    $conummer=~s/^0+//g;
@@ -316,7 +315,14 @@ sub Validate
          return(undef);
       }
    }
-   return(0) if (!$self->ValidateCONumber("name",$oldrec,$newrec));
+   if (!$self->finance::costcenter::ValidateCONumber("name",
+       $oldrec,$newrec)){
+      $self->LastMsg(ERROR,
+          $self->T("invalid number format '\%s' specified",
+                   "finance::costcenter"),$newrec->{name});
+      return(0);
+   }
+
 
    if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
       my $userid=$self->getCurrentUserId();
@@ -382,6 +388,13 @@ sub isWriteValid
    }
    return();
 }
+
+sub SelfAsParentObject    # this method is needed because existing derevations
+{
+   return("finance::costcenter");
+}
+
+
 
 
 1;

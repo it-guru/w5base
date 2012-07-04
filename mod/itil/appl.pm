@@ -1374,8 +1374,13 @@ sub Validate
       }
    }
    if (exists($newrec->{conumber}) && $newrec->{conumber} ne ""){
-      return(0) if (!$self->finance::costcenter::ValidateCONumber("conumber",
-                    $oldrec,$newrec));
+      if (!$self->finance::costcenter::ValidateCONumber("conumber",
+          $oldrec,$newrec)){
+         $self->LastMsg(ERROR,
+             $self->T("invalid number format '\%s' specified",
+                      "finance::costcenter"),$newrec->{conumber});
+         return(0);
+      }
    }
    foreach my $v (qw(avgusercount namedusercount)){
       $newrec->{$v}=undef if (exists($newrec->{$v}) && $newrec->{$v} eq "");
