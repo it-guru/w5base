@@ -116,6 +116,7 @@ sub ProcessHead
    $d.="<table border=1>\n<tr>";
    if ($#view!=-1){
       foreach my $field (@view){
+         my $nowrap="";
          my $displayname=$field->Name();
          if (defined($field)){
             $displayname=$field->Label();
@@ -123,11 +124,14 @@ sub ProcessHead
          if (defined($field->{unit})){
             $displayname.="<br>($field->{unit})";
          }
+         if ($field->{htmlnowrap} eq "all" || $field->{htmlnowrap} eq "head"){
+            $nowrap=" nowrap";
+         }
          my $style="";
          if (defined($field->{htmlwidth})){
             $style="width:$field->{htmlwidth};";
          }
-         $d.="<th class=headfield valign=top style=\"$style\">".
+         $d.="<th class=headfield valign=top style=\"$style\"$nowrap>".
              $displayname."</th>";
       }
    }
