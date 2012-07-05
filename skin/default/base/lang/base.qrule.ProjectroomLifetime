@@ -1,0 +1,3 @@
+'base::qrule::ProjectroomLifetime'=>{de=>'Überprüfung der Projektraum Lebenszeit',en=>'check of projectroom lifetime'},
+'projectroom is avalilable or active before start date'=>{de=>'Projectraum ist verfügbar oder aktiv vor dem eigentlich Startzeitpunkt'},
+'projectroom is avalilable or active after end date'=>{de=>'Projectraum ist verfügbar oder aktiv nach dem gesetzten Ende Zeitpunkt'},
