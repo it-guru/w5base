@@ -171,9 +171,11 @@ sub qcheckRecord
             my ($chkrec,$msg)=$dataobj->getOnlyFirst(qw(id name));
             if (defined($chkrec)){
                $nameok=0;
-               push(@qmsg,'systemname from AssetManager is already in use '.
-                          'by an other system - '.
-                          'contact OSS make the systemname unique!');
+               my $m='systemname from AssetManager is already in use '.
+                     'by an other system - '.
+                     'contact OSS make the systemname unique!';
+               push(@qmsg,$m);
+               push(@dataissue,$m);
                $errorlevel=3 if ($errorlevel<3);
             }
          }
@@ -356,8 +358,6 @@ sub qcheckRecord
          $errorlevel=3 if ($errorlevel<3);
       }
    }
-
-
 
    if (keys(%$forcedupd)){
       #printf STDERR ("fifi request a forceupd=%s\n",Dumper($forcedupd));

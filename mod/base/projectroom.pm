@@ -105,6 +105,16 @@ sub new
                 group         =>'commercial',
                 dataobjattr   =>'projectroom.projectboss2'),
 
+      new kernel::Field::Date(
+                name          =>'durationstart',
+                label         =>'Projectroom start',
+                dataobjattr   =>'projectroom.durationstart'),
+
+      new kernel::Field::Date(
+                name          =>'durationend',
+                label         =>'Projectroom end',
+                dataobjattr   =>'projectroom.durationend'),
+
       new kernel::Field::Text(
                 name          =>'conumber',
                 htmlwidth     =>'100px',
@@ -384,6 +394,43 @@ sub Validate
    if (exists($newrec->{name}) && $newrec->{name} ne $name){
       $newrec->{name}=$name;
    }
+
+   my $vname="durationstart";
+   if (effChanged($oldrec,$newrec,$vname)){
+      my $d=effVal($oldrec,$newrec,$vname);
+      my $off=CalcDateDuration(NowStamp("en"),$d);
+      if ($off->{totaldays}<-180){
+         $self->LastMsg(ERROR,"projectroom start too far in the past");
+         return(0)
+      }
+      if ($off->{totaldays}>14){
+         $self->LastMsg(ERROR,"projectroom start too far in the future");
+         return(0)
+      }
+   }
+
+   my $vname="durationend";
+   my $cistatusid=effVal($oldrec,$newrec,"cistatusid");
+   if ($cistatusid>2 && $cistatusid<6){
+      if (effVal($oldrec,$newrec,$vname) eq ""){
+         $self->LastMsg(ERROR,"no projectroom end specified");
+         return(0)
+      }
+   }
+   if (effChanged($oldrec,$newrec,$vname)){
+      my $d=effVal($oldrec,$newrec,$vname);
+      my $off=CalcDateDuration(NowStamp("en"),$d);
+      if ($off->{totaldays}<-14){ # max. 14 days in the past
+         $self->LastMsg(ERROR,"projectroom end too far in the past");
+         return(0)
+      }
+      if ($off->{totaldays}>730){  # max. 2 years in the future
+         $self->LastMsg(ERROR,"projectroom end too far in the future");
+         return(0)
+      }
+   }
+
+
    ########################################################################
    # standard security handling
    #
