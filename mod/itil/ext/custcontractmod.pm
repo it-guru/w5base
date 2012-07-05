@@ -39,17 +39,18 @@ sub collectModules
    my $current=shift;
 
    my @tags=qw(
-     MAppl                      
-     MMiddleWare 
-     MDB 
-     MBackupRestore 
-     MSystemOS MHardwareOS
-     MAdmVirtHost
-     MSystemMF MHardwareMF
-     MStorNAS MStorSAN
-     MSupport
-     MNetwork
-     MSub
+      MHardwareOS
+      MSystemOS
+      MDB
+      MMiddleWare
+      MAppl
+      MStorage
+      MBackupRest
+      MNetwork
+      MSub
+      MSupport
+      MDev
+      MDesktop
    );
    my @l;
 
