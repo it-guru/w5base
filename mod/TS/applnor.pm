@@ -174,6 +174,90 @@ sub autoFillAutogenField
                                         $current->{srcparentid}]);
       }
    }
+   elsif (($fld->{name}=~m/^MStorageDeliveryAddresses$/)||
+          ($fld->{name}=~m/^MStorageDeliveryOrgs$/) ||
+          ($fld->{name}=~m/^MStorageDeliveryCountries$/)){
+      my %uadr=('96050 Bamberg; Gutenbergstr. 13'=>1,
+                '73035 Göppingen; Salamanderstr. 25-31'=>1,
+                '24145 Kiel; Bunsenstr. 29'=>1,
+                '47807 Krefeld; Europark Fichtenhain'=>1,
+                '89070 Ulm; Olgastr. 67'=>1,
+                '39104 Magdeburg; Listemannstr. 6'=>1,
+                '80995 München; Dachauer Str. 651'=>1,
+                '40549 Düsseldorf; Heerdter Lohweg 35'=>1,
+                '65760 Eschborn; Mergenthaler Allee 38-42'=>1,
+                '70372 Stuttgart; Nauheimer Str. 98"'=>1);
+      my %ucnt=('DE'=>1);
+      if ($current->{normodel} eq "S" ||
+          $current->{normodel} eq "D3"){
+         %uadr=('04001 Kosice; Postova 18'=>1);
+         %ucnt=('HU'=>1);
+      }
+      $self->autoFillAddResultCache(
+         ['MStorageDeliveryOrgs',
+          ['T-Systems International GmbH'], $current->{srcparentid}],
+         ['MStorageDeliveryAddresses',
+          [keys(%uadr)], $current->{srcparentid}],
+         ['MStorageDeliveryCountries',
+          [keys(%ucnt)], $current->{srcparentid}]);
+   }
+   elsif (($fld->{name}=~m/^MNetworkDeliveryAddresses$/)||
+          ($fld->{name}=~m/^MNetworkDeliveryOrgs$/) ||
+          ($fld->{name}=~m/^MNetworkDeliveryCountries$/)){
+      my %uadr=('96050 Bamberg; Gutenbergstr. 13'=>1,
+                '24145 Kiel; Bunsenstr. 29'=>1,
+                '20146 Hamburg; Binderstr. 26-32'=>1,
+                '48155 Münster; Wolbecker Str. 268'=>1,
+                '53122 Bonn '=>1,
+                '40549 Düsseldorf; Heerdter Lohweg 35'=>1,
+                '55237 Flonheim'=>1,
+                '70771 Leinfelden; Fasanenweg 5 '=>1,
+                '80995 München; Dachauer Str. 651'=>1,
+                '90441 Nürnberg; Hansastr. 45'=>1);
+      my %ucnt=('DE'=>1);
+      if ($current->{normodel} eq "S" ||
+          $current->{normodel} eq "D3"){
+         %uadr=('04001 Kosice; Postova 18'=>1);
+         %ucnt=('HU'=>1);
+      }
+      $self->autoFillAddResultCache(
+         ['MNetworkDeliveryOrgs',
+          ['T-Systems International GmbH'], $current->{srcparentid}],
+         ['MNetworkDeliveryAddresses',
+          [keys(%uadr)], $current->{srcparentid}],
+         ['MNetworkDeliveryCountries',
+          [keys(%ucnt)], $current->{srcparentid}]);
+   }
+   elsif (($fld->{name}=~m/^MBackupRestDeliveryAddresses$/)||
+          ($fld->{name}=~m/^MBackupRestDeliveryOrgs$/) ||
+          ($fld->{name}=~m/^MBackupRestDeliveryCountries$/)){
+      my %uadr=('96050 Bamberg; Gutenbergstr. 13'=>1,
+                '33605 Bielefeld; Detmolder Str. 380'=>1,
+                '24145 Kiel; Bunsenstr. 29'=>1,
+                '47807 Krefeld; Europark Fichtenhain'=>1,
+                '48155 Münster; Wolbecker Str. 268'=>1,
+                '64293 Darmstadt; Pallaswiesenstr. 178'=>1,
+                '20146 Hamburg; Binderstr. 26-32'=>1,
+                '39104 Magdeburg; Listemannstr. 6'=>1,
+                '14197 Berlin; Johannisberger Str. 74'=>1,
+                '40549 Düsseldorf; Heerdter Lohweg 35'=>1,
+                '65760 Eschborn; Mergenthaler Allee 38-42'=>1,
+                '80995 München; Dachauer Str. 651'=>1,
+                '70372 Stuttgart; Nauheimer Str. 98'=>1);
+      my %ucnt=('DE'=>1);
+      if ($current->{normodel} eq "S" ||
+          $current->{normodel} eq "D3"){
+         %uadr=('04001 Kosice; Postova 18'=>1);
+         %ucnt=('HU'=>1);
+      }
+      $self->autoFillAddResultCache(
+         ['MBackupRestDeliveryOrgs',
+          ['T-Systems International GmbH'], $current->{srcparentid}],
+         ['MBackupRestDeliveryAddresses',
+          [keys(%uadr)], $current->{srcparentid}],
+         ['MBackupRestDeliveryCountries',
+          [keys(%ucnt)], $current->{srcparentid}]);
+   }
    elsif (($fld->{name}=~m/^MSystem.*SCassignments$/) ||
           ($fld->{name}=~m/^MSystem.*AMSecurityFlag$/)){
       my %pid=();

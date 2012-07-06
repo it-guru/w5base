@@ -478,7 +478,7 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   if ($rec->{dstate}<30){
+   if (defined($rec) && $rec->{dstate}<30){
       my @l;
       my @modules=$self->currentModules($rec);
       push(@l,"nordef","advdef","misc",@modules);
@@ -528,19 +528,9 @@ sub autoFillAutogenField
                $sys->SetFilter({id=>\$sysid});
                my $class=$sys->getVal(qw(osclass));
                if ($s->{systemsystemid} ne ""){
-                  if ($class eq "MAINFRAME"){
-                     $mfssystemid{$s->{systemsystemid}}++;
-                  }
-                  else{
-                     $osssystemid{$s->{systemsystemid}}++;
-                  }
+                  $osssystemid{$s->{systemsystemid}}++;
                }
-               if ($class eq "MAINFRAME"){
-                  $mfsystemid{$sysid}++;
-               }
-               else{
-                  $ossystemid{$sysid}++;
-               }
+               $ossystemid{$sysid}++;
             }
          };
          my %con=();
@@ -555,10 +545,6 @@ sub autoFillAutogenField
              [keys(%con)], $current->{srcparentid}],
             ["MSystemOSsystemsystemid",
              [keys(%osssystemid)], $current->{srcparentid}],
-            ["MSystemMFsystemsystemid",
-             [keys(%mfssystemid)], $current->{srcparentid}],
-            ["MSystemMFDeliveryItemID",
-             [keys(%mfsystemid)], $current->{srcparentid}],
             ["MSystemOSDeliveryItemID",
              [keys(%ossystemid)], $current->{srcparentid}]);
       }
@@ -595,9 +581,7 @@ sub autoFillAutogenField
       }
    }
    elsif ($fld->{name} eq "MSystemOSDeliveryGroupID" ||
-          $fld->{name} eq "MSystemOSDeliveryGroup" ||
-          $fld->{name} eq "MSystemMFDeliveryGroupID" ||
-          $fld->{name} eq "MSystemMFDeliveryGroup"){
+          $fld->{name} eq "MSystemOSDeliveryGroup"){
       my $gfld=$self->getField("MApplDeliveryGroup",$current);
       my $refid=$gfld->RawValue($current);
       my $r=$self->autoFillGetResultCache($fld->{group}."systemsystemid",
@@ -616,10 +600,7 @@ sub autoFillAutogenField
    }
    elsif ($fld->{name} eq "MHardwareOSDeliveryItemID" ||
           $fld->{name} eq "MHardwareOSDeliveryGroup" ||
-          $fld->{name} eq "MHardwareOSDeliveryGroupID" ||
-          $fld->{name} eq "MHardwareMFDeliveryItemID" ||
-          $fld->{name} eq "MHardwareMFDeliveryGroup" ||
-          $fld->{name} eq "MHardwareMFDeliveryGroupID"){
+          $fld->{name} eq "MHardwareOSDeliveryGroupID"){
       my $gfld=$self->getField("MApplDeliveryGroup",$current);
       my $refid=$gfld->RawValue($current);
       my $loadfrom=$fld->{group};
@@ -666,8 +647,7 @@ sub autoFillAutogenField
    }
    elsif ($fld->{name}=~m/^.*DeliveryCountries$/){
       my (%ucount);
-      if ($fld->{group} eq "MHardwareOS" ||
-          $fld->{group} eq "MHardwareMF"){
+      if ($fld->{group} eq "MHardwareOS"){
          my $fo=$self->getField($fld->{group}."DeliveryItemID",$current);
          my $i=$fo->RawValue($current);
          if (defined($i)){
@@ -689,8 +669,7 @@ sub autoFillAutogenField
    }
    elsif ($fld->{name}=~m/^.*DeliveryAddresses$/){
       my (%uadr);
-      if ($fld->{group} eq "MHardwareOS" ||
-          $fld->{group} eq "MHardwareMF"){
+      if ($fld->{group} eq "MHardwareOS" ){
          my $fo=$self->getField($fld->{group}."DeliveryItemID",$current);
          my $i=$fo->RawValue($current);
          if (defined($i)){
@@ -750,7 +729,7 @@ sub autoFillAutogenField
       }
       $self->autoFillAddResultCache(
          [$fld->{name},
-          [keys(%uadr)], $current->{srcparentid}]);
+          [sort(keys(%uadr))], $current->{srcparentid}]);
    }
    return($self->SUPER::autoFillAutogenField($fld,$current));
 }
