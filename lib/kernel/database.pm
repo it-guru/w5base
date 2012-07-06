@@ -268,7 +268,13 @@ sub DriverName
 sub Ping
 {
    my $self=shift;
-   return($self->{db}->ping());
+   my $bk=$self->{db}->ping();
+ #  if ($bk){  # check if session realy ok
+ #     if (lc($self->DriverName()) eq "oracle"){
+ #        return(0);
+ #     }
+ #  }
+   return($bk);
 }
 
 

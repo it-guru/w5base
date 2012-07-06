@@ -780,6 +780,11 @@ sub RawValue
                }
                $self->vjoinobj->SetFilter(\%flt);
                $c->{$joinkey}=[$self->vjoinobj->getHashList(@view)];
+               if ($#{$c->{$joinkey}}==-1){
+                  if (!$self->vjoinobj->Ping()){
+                    return("[ERROR: information temporarily unavailable]");
+                  }
+               }
                Dumper($c->{$joinkey}); # ensure that all subs are resolved
             }
             my %u=();
@@ -792,7 +797,12 @@ sub RawValue
                       die("fail to find $disp in $self");
                    }
                    my $bk=$dispobj->RawValue(\%current);
-                   $bk=join(", ",@$bk) if (ref($bk) eq "ARRAY");
+                   if (!$self->vjoinobj->Ping()){
+                    $bk="[ERROR: information temporarily unavailable]";
+                   }
+                   else{
+                      $bk=join(", ",@$bk) if (ref($bk) eq "ARRAY");
+                   }
                    $u{$bk}=1;
                 } @{$c->{$joinkey}});
             if (keys(%u)>0){
