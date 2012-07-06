@@ -147,14 +147,20 @@ sub ViewProcessor
          $obj->SetFilter({$idfield->Name()=>\$refid});
          $obj->SetCurrentOrder("NONE");
          my ($rec,$msg)=$obj->getOnlyFirst(qw(ALL));
-         my $fo=$obj->getField($self->Name(),$rec);
-         if (defined($fo) && defined($rec)){
-            my $d=$fo->RawValue($rec);
-            $d=[$d] if (ref($d) ne "ARRAY");
-            $response->{document}->{value}=$d;
+         if ($obj->Ping()){
+            my $fo=$obj->getField($self->Name(),$rec);
+            if (defined($fo) && defined($rec)){
+               my $d=$fo->RawValue($rec);
+               $d=[$d] if (ref($d) ne "ARRAY");
+               $response->{document}->{value}=$d;
+            }
+            else{
+               $response->{document}->{value}="";
+            }
          }
          else{
-            $response->{document}->{value}="";
+            $response->{document}->{value}=
+               "[ERROR: layer 1 information temporarily unavailable]";
          }
       }
       print $self->getParent->HttpHeader("text/xml");
