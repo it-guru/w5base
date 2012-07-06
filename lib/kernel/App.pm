@@ -322,7 +322,10 @@ sub LoadGroups
    my $direction=shift;
    my @grpids=@_;
    my $GroupCache=$self->Cache->{Group}->{Cache};
-
+   if (!defined($GroupCache)){
+      $self->ValidateGroupCache();
+      $GroupCache=$self->Cache->{Group}->{Cache};
+   }
    my @up;
    my @down;
 
@@ -331,8 +334,9 @@ sub LoadGroups
       if (!defined($allgrp->{$grp}) || 
           ($allgrp->{$grp}->{direction} eq "up" || # if a group has been loaded
            $direction eq "both")){ # in up mode and a additional "both" mode
+         my $fullname=$GroupCache->{grpid}->{$grp}->{fullname};
          $allgrp->{$grp}={         # is requested - a force load is needed!
-               fullname=>$GroupCache->{grpid}->{$grp}->{fullname},
+               fullname=>$fullname,
                grpid=>$grp,
                direction=>$direction
          };
