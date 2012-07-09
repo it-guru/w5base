@@ -190,7 +190,13 @@ sub ProcessBottom
    for(my $recno=0;$recno<=$#{$self->{recordlist}};$recno++){
       for(my $fieldno=0;$fieldno<=$#{$self->{recordlist}->[$recno]};$fieldno++){
          if (in_array(\@useField,$view[$fieldno])){
-            $l{$self->{recordlist}->[$recno]->[$fieldno]}++;
+            my $dval=$self->{recordlist}->[$recno]->[$fieldno];
+            if (ref($dval) eq "ARRAY"){
+               map({$l{$_}++} @$dval);
+            }
+            else{
+               $l{$dval}++;
+            }
          }
       }
    }

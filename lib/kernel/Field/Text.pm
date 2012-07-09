@@ -62,6 +62,9 @@ sub FormatedDetail
    if ($FormatAs eq "HtmlDetail"){
       $d=[map({$self->addWebLinkToFacility(quoteHtml($_),$current)} @{$d})];
    }
+   if ($FormatAs eq "OneLine"){
+      return($d);
+   }
    if ($FormatAs eq "SOAP"){
       $d=[map({quoteSOAP($_)} @{$d})];
    }
