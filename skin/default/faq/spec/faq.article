@@ -1,3 +1,15 @@
+'published'=>{de=>'
+Erst wenn ein FAQ Artikel veröffentlicht
+wurde, ist es möglich das andere
+Personen diesen Artikel "sehen" können.
+(Natürlich unter Berücksichtigung der
+vergebenen Berechtigungen).
+',en=>'
+If you set this to yes, it is
+posible to other users to see
+this article. (offcurse the rights
+are considered)
+'},
 'viewcount'=>{de=>'
 Zeit die Anzahl an, wie oft die 
 Vollbild darstellung aufgerufen wurde.

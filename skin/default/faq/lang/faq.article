@@ -27,3 +27,4 @@
 'raw data'=>{de=>'Rohdaten'},
 'multilang'=>{de=>'mehrsprachig',en=>'multilingual'},
 'Language'=>{de=>'Sprache'},
+'Published'=>{de=>'Veröffentlicht'},

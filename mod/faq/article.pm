@@ -67,6 +67,11 @@ sub new
                 value         =>['multilang',LangTable()],
                 dataobjattr   =>'faq.lang'),
 
+      new kernel::Field::Boolean(
+                name          =>'published',
+                label         =>'Published',
+                dataobjattr   =>'faq.published'),
+
       new kernel::Field::Htmlarea(
                 name          =>'data',
                 searchable    =>0,
@@ -287,17 +292,22 @@ sub SecureSetFilter
       return($self->SUPER::SecureSetFilter([{owner=>\$userid},
                                             {raclmode=>['read'],
                                              racltarget=>\'base::user',
-                                             racltargetid=>[$userid]},
+                                             racltargetid=>[$userid], 
+                                             published => ['1']},
                                             {raclmode=>['read'],
                                              racltarget=>\'base::grp',
-                                             racltargetid=>[keys(%groups),-2]},
+                                             racltargetid=>[keys(%groups),-2], 
+                                             published => ['1']},
                                             {waclmode=>['write'],
                                              wacltarget=>\'base::user',
-                                             wacltargetid=>[$userid]},
+                                             wacltargetid=>[$userid], 
+                                             published => ['1']},
                                             {waclmode=>['write'],
                                              wacltarget=>\'base::grp',
-                                             wacltargetid=>[keys(%groups),-2]},
-                                            {racltargetid=>[undef]},
+                                             wacltargetid=>[keys(%groups),-2], 
+                                             published => ['1']},
+                                            {racltargetid=>[undef], 
+                                             published => ['1']},
                                             ],@_));
    }
    return($self->SUPER::SecureSetFilter(@_));
@@ -483,21 +493,24 @@ sub FinishWrite
    $url=~s#/public/#/auth/#g;
    my $lang=$self->Lang();
 
-   my %p=(eventname=>'faqchanged',
-          spooltag=>'faqchanged-'.$id,
-          redefine=>'1',
-          retryinterval=>600,
-          firstcalldelay=>900,
-          eventparam=>$id.";".$url.";".$lang,
-          userid=>11634953080001);
-   my $res;
-   if ($self->isDataInputFromUserFrontend() && !defined($newrec->{viewcount})){
-      if (defined($res=$self->W5ServerCall("rpcCallSpooledEvent",%p)) &&
-          $res->{exitcode}==0){
-         msg(INFO,"FaqModifed Event sent OK");
-      }
-      else{
-         msg(ERROR,"FaqModifed Event sent failed");
+   if (effVal($oldrec,$newrec,"published") eq "1"){
+      my %p=(eventname=>'faqchanged',
+             spooltag=>'faqchanged-'.$id,
+             redefine=>'1',
+             retryinterval=>600,
+             firstcalldelay=>900,
+             eventparam=>$id.";".$url.";".$lang,
+             userid=>11634953080001);
+      my $res;
+      if ($self->isDataInputFromUserFrontend() && 
+          !defined($newrec->{viewcount})){
+         if (defined($res=$self->W5ServerCall("rpcCallSpooledEvent",%p)) &&
+            $res->{exitcode}==0){
+            msg(INFO,"FaqModifed Event sent OK");
+         }
+         else{
+            msg(ERROR,"FaqModifed Event sent failed");
+         }
       }
    }
 
