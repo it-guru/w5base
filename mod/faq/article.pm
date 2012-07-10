@@ -70,6 +70,7 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'published',
                 label         =>'Published',
+                searchable    =>0,
                 dataobjattr   =>'faq.published'),
 
       new kernel::Field::Htmlarea(
