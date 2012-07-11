@@ -545,7 +545,7 @@ sub Sendmail
             my $user=getModuleObject($self->Config,"base::user");
             $user->SetFilter({email=>\@emailto});
             my @smsrec=$user->getHashList(qw(fullname sms 
-                                             office_mobile home_mobile));
+                                             office_mobile private_mobile));
             $smstext=$rec->{smstext} if ($rec->{smstext} ne "");
             my @numlist;
             foreach my $smsrec (@smsrec){
