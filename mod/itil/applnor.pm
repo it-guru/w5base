@@ -296,7 +296,10 @@ sub new
                        my $self=shift;
                        my $current=shift;
                        my $cur=$current->{$self->{group}."DeliveryCountries"};
-                       my $sol=$current->{$self->{group}."ADVCountryRest"};
+                       my $solfld=$self->getParent->getField(
+                               $self->{group}."ADVCountryRest");
+                       return(undef) if (!defined($solfld));
+                       my $sol=$solfld->RawValue($current);
                        return(1) if ($sol eq "");
                        $cur=[split(/[;,]\s*/,uc($cur))] if (!ref($cur));
                        $sol=[split(/[;,]\s*/,uc($sol))] if (!ref($sol));
