@@ -554,7 +554,7 @@ sub Sendmail
                   $number=$smsrec->{office_mobile};
                }
                if ($smsrec->{sms} eq "homealways"){
-                  $number=$smsrec->{home_mobile};
+                  $number=$smsrec->{private_mobile};
                }
                if (defined($number)){
                   $number=~s/[\s-\/\(\)]//g;
