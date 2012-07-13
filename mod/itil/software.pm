@@ -72,6 +72,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'producer',
                 label         =>'Producer',
+                vjoineditbase =>{'cistatusid'=>"<5"},
                 vjointo       =>'itil::producer',
                 vjoinon       =>['producerid'=>'id'],
                 vjoindisp     =>'name'),

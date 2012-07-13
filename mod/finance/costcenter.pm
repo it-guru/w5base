@@ -394,6 +394,17 @@ sub SelfAsParentObject    # this method is needed because existing derevations
    return("finance::costcenter");
 }
 
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_cistatus"))){
+     Query->Param("search_cistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
+
+
 
 
 
