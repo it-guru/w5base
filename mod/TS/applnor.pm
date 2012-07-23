@@ -43,9 +43,11 @@ sub new
 
             my $fo=$self->getParent->getField("modules");
             my $modules=$fo->RawValue($current);
-            my @m=split(/[;,\s]\s*/,$modules);
+            if (ref($modules) ne "ARRAY"){
+               $modules=[split(/[;,\s]\s*/,$modules)];
+            }
             my %sec;
-            foreach my $mod (grep(/^MSystem/,@m)){
+            foreach my $mod (grep(/^MSystem/,@$modules)){
                my $fo1=$self->getParent->getField($mod."AMSecurityFlag");
                my $f1=$fo1->RawValue($current);
                $f1=[split(/[;,\s]\s*/,$f1)] if (ref($f1) ne "ARRAY");
