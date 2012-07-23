@@ -66,9 +66,14 @@ sub new
             my $self=shift;
             my $current=shift;
 
-            my $fo=$self->getParent->getField("SUMMARYisCountryCompliant");
-            my $ok=$fo->RawValue($current);
-            return("S") if (!$ok);
+            # auf Wunsch ...
+            # https://darwin.telekom.de/darwin/auth/base/workflowaction/ById/13420092170009
+            # ... wieder entfernt
+            #
+            #my $fo=$self->getParent->getField("SUMMARYisCountryCompliant");
+            #my $ok=$fo->RawValue($current);
+            #return("S") if (!$ok);
+            #
 
             my $fo=$self->getParent->getField("SUMMARYdeliveryRegion");
             my $region=$fo->RawValue($current);
