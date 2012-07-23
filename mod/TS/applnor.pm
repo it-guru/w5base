@@ -49,10 +49,12 @@ sub new
             my %sec;
             foreach my $mod (grep(/^MSystem/,@$modules)){
                my $fo1=$self->getParent->getField($mod."AMSecurityFlag");
-               my $f1=$fo1->RawValue($current);
-               $f1=[split(/[;,\s]\s*/,$f1)] if (ref($f1) ne "ARRAY");
-               foreach my $s (@$f1){
-                  $sec{$s}++;
+               if (defined($fo1)){
+                  my $f1=$fo1->RawValue($current);
+                  $f1=[split(/[;,\s]\s*/,$f1)] if (ref($f1) ne "ARRAY");
+                  foreach my $s (@$f1){
+                     $sec{$s}++;
+                  }
                }
             }
             return([sort(keys(%sec))]);
