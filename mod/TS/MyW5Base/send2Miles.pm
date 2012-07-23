@@ -230,7 +230,7 @@ sub signMonth
       printf STDERR ("ERROR: parsing createweek=$url\n");
       return(0);
    }
-   $self->{CurrentForm}->{'form_aktion'}='INSERT';
+   $self->{CurrentForm}->{'form_aktion'}='Sichern';
    delete($self->{CurrentForm}->{''});
    msg(DEBUG,"month Report loaded $month OK");
    my $sendurl=$self->{base}."plsql/timesheet_gc.createtimesheet";
