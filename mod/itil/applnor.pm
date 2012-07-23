@@ -565,12 +565,12 @@ sub autoFillAutogenField
                      cistatusid=>"<=5"});
       foreach my $rec ($o->getHashList(qw(id swteam swteamid swnature))){
          if ($fld->{group} eq "MDB"){
-            next if (!in_array($rec->{swnature},
+            next if (!in_array(lc($rec->{swnature}),
                                ["mysql","mssql","postgesql","db2",
                                 "oracle db server"]));
          }
          if ($fld->{group} eq "MMiddleWare"){
-            next if (in_array($rec->{swnature},
+            next if (in_array(lc($rec->{swnature}),
                               ["mysql","mssql","postgesql","db2",
                                "oracle db server"]));
          }
