@@ -388,7 +388,7 @@ sub FormatedResult
       my %p;
       map({$p{$_}++} @{$d});
       
-      while(my $k=shift(@opt)){
+      while(defined(my $k=shift(@opt))){
          my $v=shift(@opt);
          if (exists($p{$k})){
             push(@res,$v);
