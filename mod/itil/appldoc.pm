@@ -136,6 +136,26 @@ sub new
                 group         =>'sem',
                 dataobjattr   =>'appl.sem2'),
 
+      new kernel::Field::Link(
+                name          =>'tsmid',
+                group         =>'tsm',
+                dataobjattr   =>'appl.tsm'),
+
+      new kernel::Field::Link(
+                name          =>'tsm2id',
+                group         =>'tsm',
+                dataobjattr   =>'appl.tsm2'),
+
+      new kernel::Field::Link(
+                name          =>'opmid',
+                group         =>'opm',
+                dataobjattr   =>'appl.opm'),
+
+      new kernel::Field::Link(
+                name          =>'opm2id',
+                group         =>'opm',
+                dataobjattr   =>'appl.opm2'),
+
       new kernel::Field::Text(
                 name          =>'conumber',
                 uploadable    =>0,
@@ -424,6 +444,10 @@ sub SecureSetFilter
        #          {sectargetid=>\@grpids,sectarget=>\'base::grp',
        #           secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
        #                     "*roles=?read?=roles*"},
+                 {tsmid=>$userid},
+                 {tsm2id=>$userid},
+                 {opmid=>$userid},
+                 {opm2id=>$userid},
                  {semid=>$userid},
                  {sem2id=>$userid},
                  {delmgrid=>$userid},
