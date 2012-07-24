@@ -27,6 +27,9 @@ sub new
 {
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
+
+   $self->{'showcomm'} = 0 if !defined($self->{'showcomm'});
+
    return($self);
 }
 
@@ -96,7 +99,7 @@ sub ListFiles
                $self->getParent->Lang())." GMT by $rec->{editor}";
 
          $clone{description}="$t";
-
+         
          $clone{href}="ViewProcessor/load/$self->{name}/".
                       "$refid/$clone{fid}/$clone{name}";
          if ($mode eq "FileListMode.DELENT"){
@@ -108,10 +111,11 @@ sub ListFiles
    $d="";
    if ($#filelist!=-1){
 
-      my %p=('tree'     => \@filelist,
+      my %p=('tree'     =>\@filelist,
              'rootimg'  =>'minifileroot.gif',
              'rootpath' =>'./',
-             'hrefclass'=>'filelink');
+             'hrefclass'=>'filelink',
+             'showcomm' =>$self->{'showcomm'});
       $d=kernel::MenuTree::BuildHtmlTree(%p);
    }
    return($d);

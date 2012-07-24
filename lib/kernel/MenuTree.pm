@@ -31,6 +31,7 @@ sub BuildHtmlTree
    # $control->{tree}     =Datenstruktur des Trees
    # $control->{rootpath} =rootpath/prefix vor den img tags
    # $control->{rootimg}  =name of the top image
+   # $control->{showcomm} =if equals to 1, comments will be displayed
    #
    # tree->{prio}         = sortierreihenfolge
    # tree->{href}         = href link für den link
@@ -59,11 +60,14 @@ sub _TreeLine
    my $href;
    my $text;
    my $desc;
+   my $comm = undef;
    my $d;
+
    if (defined($ment)){
       $href=$ment->{href};
       $text=$ment->{label};
       $desc=$ment->{description};
+      $comm=$ment->{comments} if $control->{'showcomm'} == 1;
    }
    my $rootpath=$control->{rootpath};
    if ($id==0){
@@ -109,6 +113,7 @@ sub _TreeLine
       }
       $d.=$text  if (defined($text));
       $d.="</a>" if (defined($href));
+      $d.= ' ('.CGI::escapeHTML(limitlen($comm,30,1)).')' if ($comm ne '');
       $d.="</td></tr></table>";
       $d.="</div>\n";
       if (defined($ment->{contextMenu}) && 
