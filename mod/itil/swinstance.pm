@@ -282,6 +282,16 @@ sub new
 
 
       new kernel::Field::Text(
+                name          =>'optionlist',
+                htmldetail    =>0,
+                readonly      =>1,
+                label         =>'installed Optionlist',
+                group         =>'softwareinst',
+                vjointo       =>'itil::lnksoftwareoption',
+                vjoinon       =>['lnksoftwaresystemid'=>'parentid'],
+                vjoindisp     =>['software']),
+
+      new kernel::Field::Text(
                 name          =>'softwareinstproducer',
                 htmldetail    =>0,
                 readonly      =>1,
@@ -884,6 +894,7 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
+
    return("header","default") if (!defined($rec));
    my @all=qw(header default adm sec ssl misc env history control
               softwareinst contacts attachments source swinstanceparam);

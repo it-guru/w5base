@@ -52,3 +52,4 @@
 'Version of installed software'=>{de=>'Version der Software-Installation'},
 'W5BaseID of software installation'=>{de=>'W5BaseID der Software-Installation'},
 'automatic generation of diaries'=>{de=>'Automatische Pauschal-Betriebstagebuchgenerierung'},
+'installed Optionlist'=>{de=>'installierte Optionsliste'},

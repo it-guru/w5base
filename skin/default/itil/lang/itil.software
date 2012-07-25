@@ -24,3 +24,4 @@
 'phoneHot'=>{de=>'Hotline',en=>'Hotline'},
 'Product Class'=>{de=>'Produkt Klasse'},
 'parent product'=>{de=>'Elternprodukt'},
+'Options'=>{de=>'Optionen'},

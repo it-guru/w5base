@@ -63,6 +63,7 @@ sub new
                 htmlwidth     =>'200px',
                 label         =>'Software',
                 vjoineditbase =>{cistatusid=>[3,4]},
+                vjoinbase     =>{pclass=>\'MAIN'},
                 vjointo       =>'itil::software',
                 vjoinon       =>['softwareid'=>'id'],
                 vjoindisp     =>'name'),
@@ -353,13 +354,23 @@ sub new
 
       new kernel::Field::SubList(
                 name          =>'options',
-                label         =>'Options',
+                label         =>'installed Options',
                 group         =>'options',
                 allowcleanup  =>1,
                 subeditmsk    =>'subedit.options',
                 vjointo       =>'itil::lnksoftwareoption',
                 vjoinon       =>['id'=>'parentid'],
                 vjoindisp     =>['fullname']),
+                                                   
+      new kernel::Field::Text(
+                name          =>'insoptionlist',
+                label         =>'Optionlist',
+                group         =>'options',
+                htmldetail    =>0,
+                searchable    =>0,
+                vjointo       =>'itil::lnksoftwareoption',
+                vjoinon       =>['id'=>'parentid'],
+                vjoindisp     =>['software']),
                                                    
       new kernel::Field::Link(
                 name          =>'softwareid',
@@ -701,6 +712,16 @@ sub Validate
    if ($softwareid==0){
       $self->LastMsg(ERROR,"invalid software specified");
       return(undef);
+   }
+   if (defined($oldrec)){
+      if (effChanged($oldrec,$newrec,"softwareid")){
+         if (ref($oldrec->{options}) eq "ARRAY" &&
+             $#{$oldrec->{options}}!=-1){
+            $self->LastMsg(ERROR,"change of software product not allowed ".
+                                 "if there are options");
+            return(undef);
+         }
+      }
    }
    if (!defined($oldrec) && $newrec->{instdate} eq ""){
       $newrec->{instdate}=NowStamp("en");

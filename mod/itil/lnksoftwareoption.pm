@@ -52,6 +52,7 @@ sub new
    $self->getField("systemid")->{uivisible}=0;
    $self->getField("softwareinstpclass")->{uivisible}=0;
    $self->getField("options")->{uivisible}=0;
+   $self->getField("insoptionlist")->{uivisible}=0;
    $self->setDefaultView(qw(software version quantity system cdate));
    return($self);
 }
@@ -73,7 +74,7 @@ sub Validate
    if (!defined($oldrec)){
       my $s=getModuleObject($self->Config,"itil::lnksoftware");
       $s->SetFilter({id=>\$parentid});
-      my ($prec,$msg)=$s->getOnlyFirst(qw(softwareinstpclass));
+      my ($prec,$msg)=$s->getOnlyFirst(qw(softwareinstpclass softwareid));
       if (!defined($prec)){
          $self->LastMsg(ERROR,"invalid parent installation specifed");
          return(undef);
@@ -84,14 +85,23 @@ sub Validate
       }
       $newrec->{systemid}=$prec->{systemid};
       $newrec->{itclustsvcid}=$prec->{itclustsvcid};
+      my $softwareid=effVal($oldrec,$newrec,"softwareid");
+      if ($softwareid eq ""){
+         $self->LastMsg(ERROR,"invalid softwareid");
+         return(undef);
+      }
+      my $sp=getModuleObject($self->Config,"itil::software");
+      $sp->SetFilter({id=>\$softwareid});
+      my ($sprec,$msg)=$sp->getOnlyFirst(qw(parentid));
+      if (!defined($sprec)){
+         $self->LastMsg(ERROR,"can not find software product record");
+         return(undef);
+      }
+      if ($sprec->{parentid} ne $prec->{softwareid}){
+         $self->LastMsg(ERROR,"option not allowed for selected product");
+         return(undef);
+      }
    }
-
-printf STDERR ("fifi newrec=%s\n",Dumper($newrec));
-
-
-
-
-
 
    my $bk=$self->SUPER::Validate($oldrec,$newrec,$origrec);
    return($bk) if (!$bk);

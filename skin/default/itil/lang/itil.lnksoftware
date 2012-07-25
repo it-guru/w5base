@@ -49,3 +49,6 @@
 'system is not writeable for you'=>{de=>'Das zugeordnete System ist nicht schreibbar für Sie'},
 'Software installation class'=>{de=>'Softwareinstallationsklasse'},
 'Option label'=>{de=>'Optionsbezeichnung'},
+'installed Options'=>{de=>'installierte Optionen'},
+'Optionlist'=>{de=>'Optionsliste'},
+'change of software product not allowed if there are options'=>{de=>'Ändern der Software ist nicht erlaubt wenn Optionen vorhanden sind'},

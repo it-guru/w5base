@@ -81,17 +81,6 @@ sub new
                 name          =>'producerid',
                 dataobjattr   =>'software.producer'),
 
-      new kernel::Field::SubList(
-                name          =>'options',
-                label         =>'Options',
-                group         =>'options',
-                allowcleanup  =>1,
-                subeditmsk    =>'subedit.options',
-                vjointo       =>'itil::software',
-                vjoinon       =>['id'=>'parentid'],
-                vjoinbase     =>[{pclass=>\'OPTION',cistatusid=>"<=5"}],
-                vjoindisp     =>['name','cistatus']),
-
       new kernel::Field::Contact(
                 name          =>'compcontact',
                 AllowEmpty    =>1,
@@ -318,6 +307,17 @@ sub new
                 name          =>'comments',
                 label         =>'Comments',
                 dataobjattr   =>'software.comments'),
+
+      new kernel::Field::SubList(
+                name          =>'options',
+                label         =>'Options',
+                group         =>'options',
+                allowcleanup  =>1,
+                subeditmsk    =>'subedit.options',
+                vjointo       =>'itil::software',
+                vjoinon       =>['id'=>'parentid'],
+                vjoinbase     =>[{pclass=>\'OPTION',cistatusid=>"<=5"}],
+                vjoindisp     =>['name','cistatus']),
 
       new kernel::Field::Container(
                 name          =>'additional',
