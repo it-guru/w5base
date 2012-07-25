@@ -791,8 +791,8 @@ sub Validate
       else{
          if (!$self->isParentWriteable($systemid,$itclustsvcid)){
             if (!defined($oldrec) &&
-                $self->checkAlternateInstCreateRight($newrec)){
-               msg(INFO,"create of installation OK");
+                $self->checkAlternateInstCreateRights($newrec)){
+               msg(INFO,"alternate create of installation OK");
             }
             else{
                if (!defined($oldrec) ||
@@ -1158,7 +1158,7 @@ sub isParentWriteable  # Eltern Object Schreibzugriff prüfen
    return(0);
 }
 
-sub checkAlternateInstCreateRight
+sub checkAlternateInstCreateRights
 {
    my $self=shift;     # installation create for central instance support
    my $newrec=shift;   # teams
@@ -1167,9 +1167,56 @@ sub checkAlternateInstCreateRight
 
    return(0) if ($softwareid eq "");
 
+   my $sw=getModuleObject($self->Config,"itil::software");
+   $sw->SetFilter({id=>\$softwareid});
+   my ($swrec,$msg)=$sw->getOnlyFirst(qw(depcompcontactid compcontactid));
+   return(0) if (!defined($swrec));
+   my $userid=$self->getCurrentUserId();
+   return(0) if ($swrec->{depcompcontactid} ne $userid &&
+                 $swrec->{compcontactid} ne $userid);  # first release of
+                                                       # trust checking - this
+                                                       # is not the final 
+                                                       # process!
+
+   $newrec->{alternateCreateRight}="1";  # store information about alternate
+                                         # process for FinishWrite
 
    return(1);
 }
+
+sub FinishWrite
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   if (!defined($oldrec)){
+      if ($newrec->{alternateCreateRight} && $newrec->{id} ne ""){
+         # send a mail to system/cluster databoss with cc on current user
+         my $swi=$self->Clone();
+         $swi->SetFilter({id=>\$newrec->{id}});
+         my ($swirec,$msg)=$swi->getOnlyFirst(qw(databossid fullname));
+         if (defined($swirec) && $swirec->{databossid} ne ""){
+            my $userid=$self->getCurrentUserId();
+            my $u=getModuleObject($self->Config,"base::user");
+            $u->SetFilter({userid=>\$swirec->{databossid},
+                           cistatusid=>"<6"});
+            my ($urec,$msg)=$u->getOnlyFirst(qw(lastlang));
+            my $lang=$urec->{lastlang};
+            my $wfa=getModuleObject($self->Config,"base::workflowaction");
+            $wfa->Notify("INFO","create of software installation",
+                         "Hello,\n\ni have create the software installation ".
+                         "<b>".$swirec->{fullname}."</b>".
+                         " for you.\n\nThis is original ".
+                         "your job, but through other dependencies, i had ".
+                         "need to do this for you.",
+                         emailto=>$swirec->{databossid},
+                         emailcc=>[11634953080001,$userid]);
+         }
+      }
+   }
+   return($self->SUPER::FinishWrite($oldrec,$newrec));
+}
+
 
 
 sub getDetailBlockPriority
