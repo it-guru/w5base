@@ -1120,7 +1120,7 @@ sub getPosibleActions
       }
    }
    push(@l,"sendcustinfo","imgmtinfo") if ($self->IsIncidentManager($WfRec));
-   msg(INFO,"valid operations=%s",join(",",@l));
+   #msg(INFO,"valid operations=%s",join(",",@l));
 
    return(@l);
 }
