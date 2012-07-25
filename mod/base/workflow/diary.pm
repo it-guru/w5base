@@ -201,7 +201,7 @@ sub getPosibleActions
          push(@l,"wfclose");
       }
    }
-   msg(INFO,"valid operations=%s",join(",",@l));
+   #msg(INFO,"valid operations=%s",join(",",@l));
 
    return(@l);
 }
