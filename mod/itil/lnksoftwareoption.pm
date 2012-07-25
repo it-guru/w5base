@@ -46,7 +46,8 @@ sub new
 
    $self->getField("fullname")->{label}="Option label";
    $self->getField("system")->{searchable}=0;
-   $self->getField("software")->{vjoinbase}=[{pclass=>\'OPTION'}];
+   $self->getField("software")->{vjoineditbase}=[{pclass=>\'OPTION',
+                                                  cistatusid=>[3,4]}];
    $self->getField("system")->{uivisible}=0;
    $self->getField("systemid")->{searchable}=0;
    $self->getField("systemid")->{uivisible}=0;

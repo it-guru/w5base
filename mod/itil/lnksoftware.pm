@@ -62,8 +62,7 @@ sub new
                 name          =>'software',
                 htmlwidth     =>'200px',
                 label         =>'Software',
-                vjoineditbase =>{cistatusid=>[3,4]},
-                vjoinbase     =>{pclass=>\'MAIN'},
+                vjoineditbase =>{pclass=>\'MAIN',cistatusid=>[3,4]},
                 vjointo       =>'itil::software',
                 vjoinon       =>['softwareid'=>'id'],
                 vjoindisp     =>'name'),
@@ -159,6 +158,14 @@ sub new
                 label         =>'Installationtyp',
                 readonly      =>1,
                 selectfix     =>1,
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(0) if (!defined($current));
+                   return(1);
+                },
                 dataobjattr   =>
                    "if (lnksoftwaresystem.system is not null,".
                    "'System',".
@@ -783,10 +790,16 @@ sub Validate
       }
       else{
          if (!$self->isParentWriteable($systemid,$itclustsvcid)){
-            if (!defined($oldrec) ||
-                !($self->isInstanceRelationWriteable($oldrec->{id}))){
-               $self->LastMsg(ERROR,"system is not writeable for you");
-               return(undef);
+            if (!defined($oldrec) &&
+                $self->checkAlternateInstCreateRight($newrec)){
+               msg(INFO,"create of installation OK");
+            }
+            else{
+               if (!defined($oldrec) ||
+                   !($self->isInstanceRelationWriteable($oldrec->{id}))){
+                  $self->LastMsg(ERROR,"system is not writeable for you");
+                  return(undef);
+               }
             }
          }
       }
@@ -1058,7 +1071,7 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default","header") if (!defined($rec));
+   return("default","header","instdetail") if (!defined($rec));
    return("ALL");
 }
 
@@ -1085,7 +1098,7 @@ sub isWriteValid
       # check if there is an software instance based on this installation
       if ($rec->{softwareinstpclass} eq "MAIN"){
          if ($self->isInstanceRelationWriteable($rec->{id})){
-            return(qw(instdetail options));
+            return(qw(instdetail options lic));
          }
       }
       if ($rec->{softwareinstpclass} eq "OPTION" &&
@@ -1144,6 +1157,20 @@ sub isParentWriteable  # Eltern Object Schreibzugriff prüfen
    }
    return(0);
 }
+
+sub checkAlternateInstCreateRight
+{
+   my $self=shift;     # installation create for central instance support
+   my $newrec=shift;   # teams
+
+   my $softwareid=$newrec->{softwareid};
+
+   return(0) if ($softwareid eq "");
+
+
+   return(1);
+}
+
 
 sub getDetailBlockPriority
 {
