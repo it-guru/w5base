@@ -80,7 +80,9 @@ while(my $l=<STDIN>){
 $text=encode('gsm0338',$text);
 
 my $ok=0;
+my $lasterrtxt;
 foreach my $connect (split(/\s+/,$conn)){
+   next if ($lasterrtxt=~/^Address not in list/);
    msg(DEBUG(),"try '%s'",$connect);
    my ($host,$port)=$connect=~m/^(\S+):(\S+)$/;
    if ($host ne "" && $port ne ""){
@@ -122,9 +124,11 @@ foreach my $connect (split(/\s+/,$conn)){
                   last;
                }
                else{
-                  msg(WARN(),"SMS message '%s' while sending ".
+                  $errtxt=~s/\n.*//s if (!$W5V2::Debug);
+                  msg(ERROR(),"SMS message '%s' while sending ".
                              "throw '%s' to '%s' failed",
                              $errtxt,$connect,$number);
+                  $lasterrtxt=$errtxt;
                }
             }
             else{
