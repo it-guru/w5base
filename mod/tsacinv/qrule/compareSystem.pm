@@ -217,15 +217,12 @@ sub qcheckRecord
              !($parrec->{conumber}=~m/^\d+$/)){
             $parrec->{conumber}=undef;
          }
-#
-# deactivated due Eurak Migration
-#
-#         $self->IfaceCompare($dataobj,
-#                             $rec,"conumber",
-#                             $parrec,"conumber",
-#                             $forcedupd,$wfrequest,
-#                             \@qmsg,\@dataissue,\$errorlevel,
-#                             mode=>'string');
+         $self->IfaceCompare($dataobj,
+                             $rec,"conumber",
+                             $parrec,"conumber",
+                             $forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'string');
          $self->IfaceCompare($dataobj,
                              $rec,"osrelease",
                              $parrec,"systemos",

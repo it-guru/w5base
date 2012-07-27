@@ -46,9 +46,6 @@ sub ImportAssetManagerCO
 {
    my $self=shift;
 
-   printf STDERR ("ERROR: event hard deactivated due Eureka migration\n");
-   return({exitcode=>1});
-
    my $co=getModuleObject($self->Config,"tsacinv::costcenter");
    my $w5co=getModuleObject($self->Config,"itil::costcenter");
 
