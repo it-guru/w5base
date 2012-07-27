@@ -65,13 +65,15 @@ sub qcheckRecord
                    dataissue=>['no interfaces defined']});
       }
       foreach my $ifrec (@{$rec->{interfaces}}){
+         if ($ifrec->{'comments'}=~m/(^|\s)DataLoopInOutTechSpec(\s|$)/) {
+            next;
+         }
          if ($ifrec->{toapplid} eq $rec->{id}){
             my @msg=("loop interfaces to the current ".
                      "application are not allowed");
             return(3,{qmsg=>\@msg,dataissue=>\@msg});
          }
       }
-      
    }
    else{
       if (ref($rec->{interfaces}) eq "ARRAY" && $#{$rec->{interfaces}}!=-1){

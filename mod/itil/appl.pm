@@ -493,7 +493,7 @@ sub new
                 vjoinon       =>['id'=>'fromapplid'],
                 vjoindisp     =>['toappl','contype','conproto','conmode'],
                 vjoininhash   =>['toappl','contype','conproto','conmode',
-                                 'toapplid']),
+                                 'toapplid', 'comments']),
 
       new kernel::Field::SubList(
                 name          =>'systems',
