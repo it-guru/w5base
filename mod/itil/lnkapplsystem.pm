@@ -96,7 +96,7 @@ sub new
                 readonly      =>1,
                 group         =>'assetinfo',
                 label         =>'Asset-Name',
-                dataobjattr   =>'asset.name'),
+                dataobjattr   =>"if (system.systemtype='vmware',vasset.name,asset.name)"),
 
       new kernel::Field::TextDrop(
                 name          =>'assetlocation',
@@ -442,7 +442,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'assetid',
                 label         =>'AssetID W5BaseID',
-                dataobjattr   =>'system.asset'),
+                dataobjattr   =>"if (system.systemtype='vmware',vsystem.asset,system.asset)"),
 
       new kernel::Field::Link(
                 name          =>'customerid',
@@ -543,7 +543,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'assetid',
                 label         =>'AssetId',
-                dataobjattr   =>'system.asset'),
+                dataobjattr   =>"if (system.systemtype='vmware',vsystem.asset,system.asset)"),
                                                    
       new kernel::Field::Text(
                 name          =>'applid',
@@ -804,7 +804,11 @@ sub getSqlFrom
             "left outer join system ".
             "on qlnkapplsystem.system=system.id ".
             "left outer join asset ".
-            "on system.asset=asset.id";
+            "on system.asset=asset.id ".
+            "left outer join system as vsystem ".
+            "on system.vhostsystem=vsystem.id ".
+            "left outer join asset as vasset ".
+            "on vsystem.asset=vasset.id";
    return($from);
 }
 

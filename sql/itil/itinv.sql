@@ -424,7 +424,7 @@ create table lnkinstance (
 );
 alter table appl add is_soxcontroll   bool default '0';
 alter table appl add is_applwithnosys bool default '0';
-alter table system add systemtype varchar(20) not null,add key(systemtype);
+alter table system add systemtype varchar(20) default 'STANDARD',add key(systemtype);
 alter table asset add room varchar(20) default '';
 alter table ipaddress add unique ipchk(name,uniqueflag,network);
 alter table ipaddress add comments     longtext    default NULL;
@@ -1059,3 +1059,43 @@ alter table software add FOREIGN KEY fk_software (parent)
 alter table lnksoftwaresystem add parent bigint(20) default null,add key(parent);
 alter table lnksoftwaresystem add FOREIGN KEY fk_lnksoftwaresystem (parent)
           REFERENCES lnksoftwaresystem (id) ON DELETE CASCADE;
+create table swinstancerule (
+  id         bigint(20) NOT NULL,
+  swinstance bigint(20) NOT NULL,
+  ruletype   char(10)   NOT NULL,
+  appl       bigint(20) default NULL,
+  system     bigint(20) default NULL,
+  cistatus   int(2)      NOT NULL,
+  complexity   int(2)   default '5',isprivate int(2) default '0',
+  rulelabel    varchar(40) default '',
+  varname      longtext default NULL,
+  vargroup     longtext default NULL,
+  varval       longtext default NULL,
+  srcport      longtext default NULL,
+  dsthost      longtext default NULL,
+  dstport      longtext default NULL,
+  conumber     varchar(40) default NULL,
+  comments     longtext default NULL,
+  additional   longtext default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) NOT NULL default '0',
+  modifyuser bigint(20) NOT NULL default '0',
+  editor       varchar(100) NOT NULL default '',
+  realeditor   varchar(100) NOT NULL default '',
+  srcsys       varchar(100) default 'w5base',
+  srcid        varchar(20) default NULL,
+  srcload      datetime    default NULL,
+  PRIMARY KEY  (id),
+  FOREIGN KEY fk_swinstance (swinstance)
+              REFERENCES swinstance (id) ON DELETE CASCADE,
+  FOREIGN KEY fk_appl (appl)
+              REFERENCES appl (id) ON DELETE CASCADE,
+  FOREIGN KEY fk_system (system)
+              REFERENCES system (id) ON DELETE CASCADE,
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+)  ENGINE=InnoDB DEFAULT CHARSET=latin1;
+set FOREIGN_KEY_CHECKS=0;
+alter table system add FOREIGN KEY fk_vhostsystem (vhostsystem)
+          REFERENCES system (id) ON DELETE RESTRICT;
+set FOREIGN_KEY_CHECKS=1;

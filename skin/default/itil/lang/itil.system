@@ -6,6 +6,8 @@
 'fieldgroup.location'=>{de=>'Standort',en=>'Location'},
 'fieldgroup.systemclass'=>{de=>'Systemklassifizierung',en=>'Systemclass'},
 'fieldgroup.applications'=>{de=>'Anwendungen',en=>'Applications'},
+'fieldgroup.vhost'=>{de=>'Host-System des virtuellen Systems',en=>'Host-System of virtual system'},
+'Host system (parent of virtual system)'=>{de=>'Host-System (VM-Elternsystem)'},
 'fieldgroup.software'=>{de=>'Softwareinstallationen',en=>'Software installations'},
 'fieldgroup.swinstances'=>{de=>'Software Instanzen',en=>'Software Instances'},
 'fieldgroup.ipaddresses'=>{de=>'IP-Adressen',en=>'IP-Addresses'},

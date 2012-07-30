@@ -277,6 +277,21 @@ sub new
                 vjoindisp     =>'email'),
 
       new kernel::Field::TextDrop(
+                name          =>'vhostsystem',
+                group         =>'vhost',
+                label         =>'Host system (parent of virtual system)',
+                AllowEmpty    =>1,
+                vjointo       =>'itil::system',
+                vjoineditbase =>{'cistatusid'=>"<=5",
+                                 'systemtype'=>'standard'},
+                vjoinon       =>['vhostsystemid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'vhostsystemid',
+                dataobjattr   =>'system.vhostsystem'),
+
+      new kernel::Field::TextDrop(
                 name          =>'asset',
                 group         =>'physys',
                 label         =>'Asset-Name',
@@ -439,7 +454,7 @@ sub new
                                  'HDomain',              # sun hardware Domain
                                  'lpar',                 # z/os
                                  ],
-                dataobjattr   =>'system.systemtype'),,
+                dataobjattr   =>'system.systemtype'),
 
       new kernel::Field::Number(
                 name          =>'cpucount',
@@ -556,7 +571,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'assetid',
-                dataobjattr   =>'system.asset'),
+                dataobjattr   =>"if (system.systemtype='vmware',vsystem.asset,system.asset)"),
 
       new kernel::Field::Link(
                 name          =>'locationid',
@@ -597,14 +612,14 @@ sub new
                 readonly      =>1,
                 group         =>'physys',
                 label         =>'phys. CPU-Count',
-                dataobjattr   =>'asset.cpucount'),
+                dataobjattr   =>"if (system.systemtype='vmware',vasset.cpucount,asset.cpucount)"),
 
       new kernel::Field::Number(
                 name          =>'hwcorecount',
                 readonly      =>1,
                 group         =>'physys',
                 label         =>'phys. Core-Count',
-                dataobjattr   =>'asset.corecount'),
+                dataobjattr   =>"if (system.systemtype='vmware',vasset.corecount,asset.corecount)"),
 
       new kernel::Field::Number(
                 name          =>'hwmemory',
@@ -612,14 +627,14 @@ sub new
                 group         =>'physys',
                 label         =>'phys. Memory',
                 unit          =>'MB',
-                dataobjattr   =>'asset.memory'),
+                dataobjattr   =>"if (system.systemtype='vmware',vasset.memory,asset.memory)"),
 
       new kernel::Field::Text(
                 name          =>'systemhandle',
                 readonly      =>1,
                 group         =>'physys',
                 label         =>'Producer System-Handle',
-                dataobjattr   =>'asset.systemhandle'),
+                dataobjattr   =>"if (system.systemtype='vmware',vasset.systemhandle,asset.systemhandle)"),
 
       new kernel::Field::Text(
                 name          =>'assetservicesupport',
@@ -1231,7 +1246,9 @@ sub getSqlFrom
    $from.=" left outer join lnkcontact ".
           "on lnkcontact.parentobj='itil::system' ".
           "and $worktable.id=lnkcontact.refid ".
-          " left outer join asset on system.asset=asset.id";
+          " left outer join asset on system.asset=asset.id".
+          " left outer join system as vsystem on system.vhostsystem=vsystem.id".
+          " left outer join asset as vasset on vsystem.asset=vasset.id";
 
    return($from);
 }
@@ -1291,6 +1308,9 @@ sub isViewValid
               physys ipaddresses phonenumbers sec applications
               location source customer history
               attachments control systemclass interview);
+   if (defined($rec) && $rec->{'systemtype'} eq "vmware"){
+      push(@all,"vhost");
+   }
    if (defined($rec) && $rec->{'isclusternode'}){
       push(@all,"cluster");
    }
@@ -1309,6 +1329,10 @@ sub isWriteValid
    my @databossedit=qw(default software admin logsys contacts misc opmode 
                        physys ipaddresses phonenumbers sec cluster autodisc
                        attachments control systemclass interview);
+   if (defined($rec) && $rec->{systemtype} eq "vmware"){
+      @databossedit=grep(!/^physys$/, @databossedit);
+      push(@databossedit,"vhost");
+   }
    if (!defined($rec)){
       return("default","physys","admin","misc","cluster",
              "opmode","control","systemclass","sec");
@@ -1359,7 +1383,7 @@ sub getDetailBlockPriority
    my $self=shift;
    return(
           qw(header default admin phonenumbers logsys location 
-             physys systemclass cluster
+             vhost physys systemclass cluster
              opmode sec applications customer software 
              swinstances ipaddresses
              contacts misc attachments control source));
