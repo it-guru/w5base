@@ -257,7 +257,7 @@ sub autoFillAutogenField
       if ($current->{normodel} eq "S" ||
           $current->{normodel} eq "D3"){
          %uadr=('04001 Kosice; Postova 18'=>1);
-         %ucnt=('HU'=>1);
+         %ucnt=('SK'=>1);
       }
       $self->autoFillAddResultCache(
          ['MBackupRestDeliveryOrgs',
