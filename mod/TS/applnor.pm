@@ -334,10 +334,10 @@ sub autoFillAutogenField
       my $ref=$gfld->RawValue($current);
       my @org=();
       foreach my $r (@$ref){
-         if ($r=~m/.*\.SK$/){
+         if (($r=~m/.*\.SK$/) || ($r=~m/^[^\.]+\.[^\.]+\.SK\.*/)){
             push(@org,"T-Systems Slovakia s.r.o");
          }
-         elsif ($r=~m/.*\.HU$/){
+         elsif (($r=~m/.*\.HU$/) || ($r=~m/^[^\.]+\.[^\.]+\.HU\.*/)){
             push(@org,"IT Services Hungary");
          }
          elsif ($r=~m/^DTAG\.TSI($|\..*)/){
@@ -367,14 +367,17 @@ sub autoFillAutogenField
       my $gfld=$self->getField($grp."DeliveryGroup",$current);
       my $ref=$gfld->RawValue($current);
       foreach my $r (@$ref){
-         if (($r=~m/.*\.SK$/)){
+         if (($r=~m/.*\.SK$/) || ($r=~m/^[^\.]+\.[^\.]+\.SK\.*/)){
             push(@country,"SK");
          }
-         elsif (($r=~m/.*\.HU$/)){
+         elsif (($r=~m/.*\.HU$/) || ($r=~m/^[^\.]+\.[^\.]+\.HU\.*/)){
             push(@country,"HU");
          }
-         elsif (($r=~m/.*\.CZ$/)){
+         elsif (($r=~m/.*\.CZ$/) || ($r=~m/^[^\.]+\.[^\.]+\.CZ\.*/)){
             push(@country,"CZ");
+         }
+         elsif (($r=~m/^[^\.]+\.[^\.]+\.INT\.*/)){
+            push(@country,"II");
          }
          else{
             push(@country,"DE");
