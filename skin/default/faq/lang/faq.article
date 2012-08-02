@@ -24,6 +24,7 @@
 'View count'=>{de=>'Anzahl Vollbild Aufrufe'},
 'View frequeny'=>{de=>'Vollbild Aufrufe Häufung'},
 'View last'=>{de=>'letzter Vollbild Aufruf'},
+'View last by author'=>{de=>'letzte Sichtung durch Author'},
 'raw data'=>{de=>'Rohdaten'},
 'multilang'=>{de=>'mehrsprachig',en=>'multilingual'},
 'Language'=>{de=>'Sprache'},

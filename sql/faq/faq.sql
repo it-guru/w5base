@@ -25,3 +25,5 @@ alter table faq add viewfreq  int(20)  default NULL;
 alter table faq add lang  varchar(10)  default 'multilang';
 alter table faq add published boolean  default '0';
 update faq set published=1;
+alter table faq add viewlastbywriter  datetime default NULL, add key(viewlastbywriter);
+alter table faq add viewlastbywriternotify  datetime default NULL;

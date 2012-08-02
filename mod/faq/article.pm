@@ -149,6 +149,21 @@ sub new
                 group         =>'sig',
                 dataobjattr   =>'faq.viewlast'),
 
+      new kernel::Field::Date(
+                name          =>'viewlastbywriter',
+                label         =>'View last by author',
+                frontreadonly =>1,
+                group         =>'sig',
+                dataobjattr   =>'faq.viewlastbywriter'),
+
+      new kernel::Field::Date(
+                name          =>'viewlastbywriternotify',
+                label         =>'View last by author - notify',
+                uivisible     =>0,
+                frontreadonly =>1,
+                group         =>'sig',
+                dataobjattr   =>'faq.viewlastbywriternotify'),
+
       new kernel::Field::Number(
                 name          =>'viewfreq',
                 readonly      =>1,
@@ -302,12 +317,10 @@ sub SecureSetFilter
                                              published => ['1']},
                                             {waclmode=>['write'],
                                              wacltarget=>\'base::user',
-                                             wacltargetid=>[$userid], 
-                                             published => ['1']},
+                                             wacltargetid=>[$userid]},
                                             {waclmode=>['write'],
                                              wacltarget=>\'base::grp',
-                                             wacltargetid=>[keys(%groups),-2], 
-                                             published => ['1']},
+                                             wacltargetid=>[keys(%groups),-2]},
                                             {racltargetid=>[undef], 
                                              published => ['1']},
                                             ],@_));
@@ -521,6 +534,31 @@ sub FinishWrite
          }
       }
    }
+   
+   if (!defined($oldrec)) {
+      my $faqid = $newrec->{'faqid'};
+      my $userid = $newrec->{'owner'};
+      my $faqacl = getModuleObject($self->Config, 'faq::acl');
+      $faqacl->SetFilter({
+         'refid'        => $faqid,
+         'aclparentobj' => \'faq::article',
+         'acltargetid'  => $userid,
+         'acltarget'    => \'base::user',
+         'aclmode'      => \'write'
+      });
+      my ($faqaclrec, $msg) = $faqacl->getOnlyFirst(qw(aclid));
+      if (!defined($faqaclrec)) {
+         my $acl = {
+            'aclparentobj' => 'faq::article',
+            'aclmode'      => 'write',
+            'acltargetid'  => $userid,
+            'acltarget'    => 'base::user',
+            'refid'        => $faqid,
+            'comments'     => 'write permission by creation of faq article'
+         };
+         $faqacl->ValidatedInsertRecord($acl);
+      }
+   }
 
    return($self->SUPER::FinishWrite($oldrec,$newrec));
 }
@@ -572,6 +610,7 @@ sub getHtmlDetailPageContent
    my $idval=$rec->{$idname};
 
    return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "FView");
+   $self->HandleLastView("HtmlDetail",$rec) if ($p eq "StandardDetail");
 
    if ($p eq "FView"){
       Query->Param("$idname"=>$idval);
@@ -618,35 +657,11 @@ sub FullView
          print($self->noAccess());
          return(undef);
       }
-      #######################################################################
-      # häufigkeits Berechnung - erster Versuch
-      #
-      my $now=NowStamp("en");
-      my $viewfreq=defined($rec->{viewfreq}) ? $rec->{viewfreq}: 100;
-      if ($rec->{viewlast} ne ""){
-         my $t=CalcDateDuration($rec->{viewlast},$now,"GMT");
-         if ($t->{totalseconds}>15120000){  # halbes Jahr
-            $viewfreq=$viewfreq*0.2;
-         }
-         elsif ($t->{totalseconds}>604800){  # woche
-            $viewfreq=$viewfreq*0.3;
-         }
-         elsif ($t->{totalseconds}>86400){  # tag
-            $viewfreq=$viewfreq*0.8;
-         }
-         elsif ($t->{totalseconds}>3600){
-            $viewfreq=$viewfreq*1.3;
-         }
-         else{
-            $viewfreq=$viewfreq*1.05;
-         }
-         $viewfreq=int($viewfreq);
-      }
-      #######################################################################
-      $self->UpdateRecord({viewlast=>$now,
-                           viewfreq=>$viewfreq,
-                           viewcount=>$rec->{viewcount}+1},
-                           {faqid=>\$rec->{faqid}});
+      $self->HandleLastView("FullView",$rec);
+   }
+   else{
+      print($self->noAccess());
+      return(undef);
    }
    my $further;
    my @fl;
@@ -842,6 +857,52 @@ sub ById
    $self->HtmlGoto("../Detail",post=>{$idname=>$val,
                                       ModeSelectCurrentMode=>'FView'});
    return();
+}
+
+
+
+sub HandleLastView
+{
+   my $self=shift;
+   my $mode=shift;
+   my $rec=shift;
+
+   #######################################################################
+   # häufigkeits Berechnung - erster Versuch
+   #
+   my $now=NowStamp("en");
+   my $viewfreq=defined($rec->{viewfreq}) ? $rec->{viewfreq}: 100;
+   if ($rec->{viewlast} ne ""){
+      my $t=CalcDateDuration($rec->{viewlast},$now,"GMT");
+      if ($t->{totalseconds}>15120000){  # halbes Jahr
+         $viewfreq=$viewfreq*0.2;
+      }
+      elsif ($t->{totalseconds}>604800){  # woche
+         $viewfreq=$viewfreq*0.3;
+      }
+      elsif ($t->{totalseconds}>86400){  # tag
+         $viewfreq=$viewfreq*0.8;
+      }
+      elsif ($t->{totalseconds}>3600){
+         $viewfreq=$viewfreq*1.3;
+      }
+      else{
+         $viewfreq=$viewfreq*1.05;
+      }
+      $viewfreq=int($viewfreq);
+   }
+   #######################################################################
+   my %upd=(viewlast=>$now,
+            viewfreq=>$viewfreq,
+            viewcount=>$rec->{viewcount}+1);
+
+   my @acl=$self->isWriteValid($rec);       # method to document, if a user
+   if (in_array(\@acl,["default","ALL"])){  # with write rights has been 
+      $upd{viewlastbywriter}=$now;          # viewed the article. This will
+      $upd{viewlastbywriternotify}=undef;   # be later used for quality
+   }                                        # check on faq articles
+
+   $self->UpdateRecord(\%upd,{faqid=>\$rec->{faqid}});
 }
 
 sub getDefaultHtmlDetailPage
