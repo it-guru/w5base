@@ -3259,10 +3259,10 @@ sub FilterPart2SQLexp
             if (($val eq '' || $val=~m/^\d+$/) && $compop eq " like "){
                $compop="=";
             }
-            if ($sqlparam{uppersearch}){
+            if ($sqlparam{uppersearch} && defined($val)){
                $val=uc($val);
             }
-            if ($sqlparam{lowersearch}){
+            if ($sqlparam{lowersearch} && defined($val)){
                $val=lc($val);
             }
             $val=dbQuote($val,%sqlparam);
