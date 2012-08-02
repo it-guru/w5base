@@ -80,7 +80,10 @@ Bei Serverkomandos (z.B. W5Event, W5Server, W5Replicate ...) wird die Konfigurat
   Passwort, mit dem sich auf das Datenbackend verbunden werden soll.
 
 * MASTERADMIN
-  REMOTE_USER Name des Admins, falls die User-Verwaltung noch nicht initialisiert ist.
+  REMOTE_USER Name des Admins, falls die User-Verwaltung noch nicht 
+  initialisiert ist. Dieser User-Account ist IMMER Admin - egal ob
+  er in der eigentlichen Gruppe "admin" als Member eingetragen ist
+  oder nicht.
 
 * MIMETYPES
   Pfad zur Mimetypes Tabelle
