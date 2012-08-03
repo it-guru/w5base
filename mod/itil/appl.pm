@@ -125,6 +125,8 @@ sub new
 
       new kernel::Field::Contact(
                 name          =>'sem',
+                vjoineditbase =>{'cistatusid'=>[3,4,5],
+                                 'usertyp'=>[qw(extern user)]},
                 group         =>'finance',
                 label         =>'Customer Business Manager',
                 vjoinon       =>'semid'),
@@ -197,12 +199,16 @@ sub new
 
       new kernel::Field::Contact(
                 name          =>'tsm',
+                vjoineditbase =>{'cistatusid'=>[3,4,5],
+                                 'usertyp'=>[qw(extern user)]},
                 group         =>'technical',
                 label         =>'Technical Solution Manager',
                 vjoinon       =>'tsmid'),
 
       new kernel::Field::Contact(
                 name          =>'opm',
+                vjoineditbase =>{'cistatusid'=>[3,4,5],
+                                 'usertyp'=>[qw(extern user)]},
                 group         =>'opmgmt',
                 label         =>'Operation Manager',
                 vjoinon       =>'opmid'),
@@ -339,6 +345,8 @@ sub new
       new kernel::Field::Contact(
                 name          =>'sem2',
                 AllowEmpty    =>1,
+                vjoineditbase =>{'cistatusid'=>[3,4,5],
+                                 'usertyp'=>[qw(extern user)]},
                 group         =>'finance',
                 label         =>'Deputy Customer Business Manager',
                 vjoinon       =>'sem2id'),
@@ -351,12 +359,16 @@ sub new
       new kernel::Field::Contact(
                 name          =>'tsm2',
                 AllowEmpty    =>1,
+                vjoineditbase =>{'cistatusid'=>[3,4,5],
+                                 'usertyp'=>[qw(extern user)]},
                 group         =>'technical',
                 label         =>'Deputy Technical Solution Manager',
                 vjoinon       =>'tsm2id'),
 
       new kernel::Field::Contact(
                 name          =>'opm2',
+                vjoineditbase =>{'cistatusid'=>[3,4,5],
+                                 'usertyp'=>[qw(extern user)]},
                 AllowEmpty    =>1,
                 group         =>'opmgmt',
                 label         =>'Deputy Operation Manager',
