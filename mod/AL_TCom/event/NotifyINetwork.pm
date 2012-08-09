@@ -75,14 +75,12 @@ sub NotifyINetwork
    $SCType=$SCType->[0] if (ref($SCType) eq "ARRAY");
 
    my $ChmApproved=$WfRec->{additional}->{ChangemanagementApproved};
-   $ChmApproved=$ChmApproved->[0] if (ref($SCType) eq "ARRAY");
+   $ChmApproved=$ChmApproved->[0] if (ref($ChmApproved) eq "ARRAY");
 
    if (lc($SCType) ne "standard" && $ChmApproved ne "1"){
       return({exitcode=>0,
               msg=>'no trigger needed - approve from chm missing'});
    }
-
-
 
 
 
