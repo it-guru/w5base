@@ -192,30 +192,34 @@ sub new
                 searchable    =>0,
                 dataobjattr   =>"appladv.itnormodel"),
 
-      new kernel::Field::Boolean(
+      new kernel::Field::Select(
                 name          =>'processingpersdata',
                 label         =>'processing of person related data',
                 group         =>'nordef',
+                value         =>[undef,0,1],
+                transprefix   =>"Q.",
                 searchable    =>0,
-                useNullEmpty  =>1,
                 onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
                 container     =>"additional"),
 
-      new kernel::Field::Boolean(
+      new kernel::Field::Select(
                 name          =>'processingtkgdata',
                 label         =>'processing of inventory or traffic data (TKG)',
                 group         =>'nordef',
+                value         =>[undef,0,1],
+                transprefix   =>"Q.",
                 searchable    =>0,
-                useNullEmpty  =>1,
                 onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
                 container     =>"additional"),
 
 
-      new kernel::Field::Boolean(
+      new kernel::Field::Select(
                 name          =>'scddata',
-                label         =>'processing of Sensitive Customer Data (SCD)',
+                label         =>'processing of Sensitive Customer '.
+                                'Data (SCD/VS-NfD)',
                 group         =>'nordef',
-                useNullEmpty  =>1,
+                value         =>[undef,0,1],
+                transprefix   =>"Q.",
                 searchable    =>0,
                 onRawValue    =>\&itil::appldoc::handleRawValueAutogenField,
                 container     =>"additional"),
@@ -311,15 +315,6 @@ sub autoFillAutogenField
 
    if ($fld->{name} eq "normodelbycustomer"){
       return("S");
-   }
-   if ($fld->{name} eq "processingpersdata"){
-      return("1");
-   }
-   if ($fld->{name} eq "processingtkgdata"){
-      return("0");
-   }
-   if ($fld->{name} eq "processingscddata"){
-      return("0");
    }
    if ($fld->{name} eq "applmodules"){
       return(["MAppl","MSystemOS","MHardwareOS"]);
