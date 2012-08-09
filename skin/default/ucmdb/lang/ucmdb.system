@@ -1,0 +1,4 @@
+'ucmdb::system'=>{de=>'HP-uCMDB System',en=>'HP-uCMDB System'},
+'Applications'=>{de=>'Anwendungen'},
+'fieldgroup.applications'=>{en=>'Applications',de=>'Anwendungen'},
+

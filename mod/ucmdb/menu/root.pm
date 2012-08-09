@@ -47,6 +47,14 @@ sub Init
                       "ucmdb::uclass",
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("itu.ucmdb.appl",
+                      "ucmdb::appl",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itu.ucmdb.system",
+                      "ucmdb::system",
+                      defaultacl=>['valid_user']);
+   
    
    return(1);
 }
