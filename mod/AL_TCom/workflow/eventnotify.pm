@@ -283,6 +283,28 @@ sub calcKPIs
 }
 
 
+sub getNotificationSubject 
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $action=shift;
+   my $sendcustinfocount=shift;
+   my $subjectlabel=shift;
+   my $failclass=shift;
+
+   my $s=$self->SUPER::getNotificationSubject($WfRec,$action,$sendcustinfocount,
+                                              $subjectlabel,$failclass);
+
+   if ($WfRec->{affecteditemprio} eq "1" &&
+       $WfRec->{eventstatclass} eq "1"){
+      $s="MI".$s;
+   }
+   $s="LIM-Info: ".$s;
+
+   return($s);
+}
+
+
 sub calcSCrelations
 {
    my $self=shift;
