@@ -46,6 +46,8 @@ sub new
       new kernel::Field::Text(    
                 name          =>'w5baseid',
                 label         =>'W5BaseID',
+                weblinkto     =>'base::workflow',
+                weblinkon     =>['w5baseid'=>'id'],
                 dataobjattr   =>'TBL_BFLEXX_WFREVIEW.w5baseid'),
 
       new kernel::Field::Text(    
