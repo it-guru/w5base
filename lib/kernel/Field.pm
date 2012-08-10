@@ -168,12 +168,7 @@ sub addWebLinkToFacility
    if (defined($weblinkto) && defined($weblinkon) && lc($weblinkto) ne "none"){
       my $target=$weblinkto;
       $target=~s/::/\//g;
-      if ($weblinkto eq "base::workflow"){
-         $target="../../$target/Process";
-      }
-      else{
-         $target="../../$target/Detail";
-      }
+      $target="../../$target/Detail";
       my $targetid=$weblinkon->[1];
       my $targetval;
       if (!defined($targetid)){
