@@ -267,7 +267,7 @@ sub nativProcess
             last;
          }
          $newinvoicedate=$wf->ExpandTimeExpression("$newinvoicedate+1M");
-         if ($c>6){
+         if ($c>3){
             $self->LastMsg(ERROR,
                   "alte camellen werden nicht aufgewärmt $WfRec->{id}");
             return(1);
@@ -285,6 +285,9 @@ sub nativProcess
             }
             if ($wf->ValidatedUpdateRecord($WfRec,\%wfch,
                                            {id=>\$WfRec->{id}})){
+               foreach my $uid (@ccids){
+                  $wf->AddToWorkspace($WfRec->{id},"base::user",$uid);
+               }
                push(@ccids,11634953080001);
                $wf->Action->NotifyForward($WfRec->{id},
                                           'base::user',
