@@ -694,11 +694,24 @@ sub _FancyLinks
    return($res);
 }
 
+sub _FancyMailLinks
+{
+   my $link=shift;
+   my $prefix=shift;
+   my $name=shift;
+   my $res="<a href=\"$link\" target=_blank>$link</a>".$prefix;
+   if ($name ne ""){
+      $res="<a href=\"$link\" title=\"$link\" target=_blank>$name</a>".$prefix;
+   }
+   return($res);
+}
+
 sub FancyLinks
 {
    my $data=shift;
    $data=~s#(http|https|telnet|news)(://\S+?)(\?\S+){0,1}(["']{0,1}\s)#_FancyLinks("$1$2$3",$4)#ge;
    $data=~s#(http|https|telnet|news)(://\S+?)(\?\S+){0,1}$#_FancyLinks("$1$2$3",$4)#ge;
+   $data=~s#(mailto)(:\S+?)\@(\S+)#_FancyMailLinks("$1$2$3")#ge;
 
    return($data);
 }
