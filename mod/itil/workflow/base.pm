@@ -290,7 +290,12 @@ sub nativProcess
                                           'base::user',
                                           $ownerid,
                                           "Reviewer",
-                                          "Bitte Nachbearbeiten",
+                "Es wurde eine kaufmännische Reklamation an diesem ".
+                "Workflow durchgeführt. Bitte prüfen Sie im speziellen ".
+                "den Block Fakturadaten und führen Sie eine ".
+                "entsprechende Nachbearbeitung durch. Gründe für die ".
+                "Reklamation finden Sie im Verlauf-Protokoll des ".
+                "Workflows.",
                                           addcctarget=>\@ccids);
                return(1);
            }
