@@ -481,7 +481,10 @@ sub getPosibleActions
    if ($isadmin){
       push(@l,"wfforward"); # workflow weiterleiten   (neuen Bearbeiter setzen)
    }
-   if ($stateid==18 &&
+printf STDERR ("fifi if ($stateid==18 &&  # reflektion
+       ($lastworker==$userid || $isadmin || $iscurrent || 
+        $isworkspace) && ($userid!=$creator)){\n");
+   if ($stateid==18 &&  # reflektion
        ($lastworker==$userid || $isadmin || $iscurrent || 
         $isworkspace) && ($userid!=$creator)){
       push(@l,"wffineproc");# Bearbeiten und zurück an Anf.  (durch Bearbeiter)
