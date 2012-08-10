@@ -186,6 +186,8 @@ sub isUserTrusted          # allow extended edit on Workflow
          return(0) if (!defined($arec));
          my $userid=$self->getParent->getCurrentUserId();
 
+printf STDERR ("fifi user=$userid arec=%s\n",Dumper($arec));
+
          if (($arec->{tsmid} ne "" && $arec->{tsmid}==$userid) ||
              ($arec->{opmid} ne "" && $arec->{opmid}==$userid) ||
              ($arec->{opm2id} ne "" && $arec->{opm2id}==$userid) ||
