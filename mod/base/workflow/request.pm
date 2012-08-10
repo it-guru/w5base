@@ -913,7 +913,7 @@ sub generateWorkspacePages
       $$divset.="<div id=OPwfnoreprocess style=\"$class;margin:15px\"><br>".
                 $self->getParent->T("The request to reprocess a ".
                 "workflow is only 14 days and at most 5 times allowed. ".
-                "For this workflow, no reprocessing is posible.").
+                "For this workflow, no reprocessing is posible.",$tr).
                 "</div>";
    }
    if (grep(/^wfreprocess$/,@$actions)){
