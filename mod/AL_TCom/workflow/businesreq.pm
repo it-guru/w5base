@@ -151,7 +151,7 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
    my @grps=$self->SUPER::isWriteValid($rec);
-   if (grep(/^init$/,@grps)){
+   if (grep(/^init$/,@grps) || $rec->{stateid}==18){
       if ($self->isUserTrusted($rec)){
          push(@grps,"tcomcod","relations");
       }
@@ -186,14 +186,13 @@ sub isUserTrusted          # allow extended edit on Workflow
          return(0) if (!defined($arec));
          my $userid=$self->getParent->getCurrentUserId();
 
-printf STDERR ("fifi user=$userid arec=%s\n",Dumper($arec));
-
          if (($arec->{tsmid} ne "" && $arec->{tsmid}==$userid) ||
              ($arec->{opmid} ne "" && $arec->{opmid}==$userid) ||
              ($arec->{opm2id} ne "" && $arec->{opm2id}==$userid) ||
              ($arec->{tsm2id} ne "" && $arec->{tsm2id}==$userid) ||
              ($arec->{semid} ne "" && $arec->{semid}==$userid) ||
              ($arec->{sem2id} ne "" && $arec->{sem2id}==$userid) ){
+            printf STDERR ("fifi OK $ENV{REMOTE_USER} is trusted\n");
             return(1);
          }
          my @g=();
