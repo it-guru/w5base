@@ -181,11 +181,14 @@ sub isUserTrusted          # allow extended edit on Workflow
          $app->SetFilter({id=>$affectedapplicationid});
          my ($arec,$msg)=$app->getOnlyFirst(qw(responseteamid 
                                                businessteamid 
+                                               opmid opm2id
                                                tsmid semid tsm2id sem2id));
          return(0) if (!defined($arec));
          my $userid=$self->getParent->getCurrentUserId();
 
          if (($arec->{tsmid} ne "" && $arec->{tsmid}==$userid) ||
+             ($arec->{opmid} ne "" && $arec->{opmid}==$userid) ||
+             ($arec->{opm2id} ne "" && $arec->{opm2id}==$userid) ||
              ($arec->{tsm2id} ne "" && $arec->{tsm2id}==$userid) ||
              ($arec->{semid} ne "" && $arec->{semid}==$userid) ||
              ($arec->{sem2id} ne "" && $arec->{sem2id}==$userid) ){
