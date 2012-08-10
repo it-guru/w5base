@@ -87,6 +87,36 @@ sub new
                 sqlorder      =>'NONE',
                 label         =>'E-Mail',
                 dataobjattr   =>'TBL_BFLEXX_WFREVIEW.mail'),
+
+      new kernel::Field::Text(    
+                name          =>'relatedtsm',
+                label         =>'related TSM',
+                group         =>'analyse',
+                depend        =>['w5baseid'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+
+                   my $wf=getModuleObject($self->getParent->Config,
+                                          "base::workflow");
+
+                   $wf->SetFilter({id=>\$current->{w5baseid}});
+                   my ($WfRec,$m)=$wf->getOnlyFirst(qw(affectedapplicationid));
+                   if (defined($WfRec)){
+                      if ($WfRec->{affectedapplicationid} ne ""){
+                         my $applid=$WfRec->{affectedapplicationid};
+                         $applid=[$applid] if (ref($applid) ne "ARRAY");
+                         my $a=getModuleObject($self->getParent->Config,
+                                               "itil::appl");
+                         $a->SetFilter({id=>$applid});
+                         $a->SetCurrentView(qw(tsm));
+                         my $al=$a->getHashIndexed(qw(tsm));
+                         return([sort(keys(%{$al->{tsm}}))]);
+                      }
+                   }
+                   return([]);
+                }),
+
    );
    $self->setDefaultView(qw(linenumber id w5baseid name statusid activity reason));
    return($self);

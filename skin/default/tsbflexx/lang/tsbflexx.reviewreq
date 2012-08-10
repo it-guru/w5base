@@ -2,4 +2,4 @@
                         en=>'B:Flexx Review Request'},
 'bflexxmessage'=>{de=>'Review-Nachricht von B:Flexx',
                   en=>'Review-Message from B:Flexx'},
-
+'fieldgroup.analyse'=>{de=>'Analysen',en=>'analysis'},
