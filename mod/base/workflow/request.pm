@@ -481,9 +481,6 @@ sub getPosibleActions
    if ($isadmin){
       push(@l,"wfforward"); # workflow weiterleiten   (neuen Bearbeiter setzen)
    }
-printf STDERR ("fifi if ($stateid==18 &&  # reflektion
-       ($lastworker==$userid || $isadmin || $iscurrent || 
-        $isworkspace) && ($userid!=$creator)){\n");
    if ($stateid==18 &&  # reflektion
        ($lastworker==$userid || $isadmin || $iscurrent || 
         $isworkspace) && ($userid!=$creator)){
@@ -530,6 +527,11 @@ printf STDERR ("fifi if ($stateid==18 &&  # reflektion
                if ($reprook){
                   push(@l,"wffollowup"); # Nachtrag 
                   push(@l,"wfreprocess");# Zuweisen zur Nachbesserung 
+               }
+               else{
+                  if ($stateid<20){
+                     push(@l,"wfnoreprocess");# keine Nachbesserung 
+                  }
                }
             }                            # notwendig (durch Anforderer)
             else{                        # aber nur max 5mal und nicht laenger
@@ -902,6 +904,16 @@ sub generateWorkspacePages
       my $note=Query->Param("note");
       $$divset.="<div id=OPwffineproc class=\"$class\">".
                 $self->getDefaultNoteDiv($WfRec,$actions).
+                "</div>";
+   }
+   if (grep(/^wfnoreprocess$/,@$actions)){
+      $$selopt.="<option value=\"wfnoreprocess\">".
+                $self->getParent->T("wfnoreprocess",$tr).
+                "</option>\n";
+      $$divset.="<div id=OPwfnoreprocess style=\"$class;margin:15px\"><br>".
+                $self->getParent->T("The request to reprocess a ".
+                "workflow is only 14 days and at most 5 times allowed. ".
+                "For this workflow, no reprocessing is posible.").
                 "</div>";
    }
    if (grep(/^wfreprocess$/,@$actions)){
