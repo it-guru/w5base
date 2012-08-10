@@ -287,7 +287,7 @@ min number of cores               : 1
     deb-src http://ftp.de.debian.org/debian/ lenny main contrib non-free
     deb http://oss.oracle.com/debian unstable main non-free
    
-   ... then run "sudo aptidude update" to load the current depot index
+   ... then run "sudo aptitude update" to load the current depot index
    files from all depots.
    After this, you have to download the Oracle Instance Client from ...
 
