@@ -192,7 +192,6 @@ sub isUserTrusted          # allow extended edit on Workflow
              ($arec->{tsm2id} ne "" && $arec->{tsm2id}==$userid) ||
              ($arec->{semid} ne "" && $arec->{semid}==$userid) ||
              ($arec->{sem2id} ne "" && $arec->{sem2id}==$userid) ){
-            printf STDERR ("fifi OK $ENV{REMOTE_USER} is trusted\n");
             return(1);
          }
          my @g=();
