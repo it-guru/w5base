@@ -131,7 +131,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'cistatus',
                 htmleditwidth =>'40%',
-                group         =>['name','default'],
+                group         =>['name','default','admcomments'],
                 readonly      =>
                    sub{
                       my $self=shift;
@@ -812,6 +812,12 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'contact.comments'),
 
+      new kernel::Field::Textarea(
+                name          =>'admcomments',
+                group         =>'admcomments', 
+                label         =>'Admin Comments',
+                dataobjattr   =>'contact.admcomments'),
+
       new kernel::Field::Interview(),
       new kernel::Field::QualityText(),
       new kernel::Field::IssueState(),
@@ -1228,6 +1234,9 @@ sub isViewValid
              qw(default name office officeacc private userparam groups 
                 userid userro control usersubst header qc interview));
    }
+   if ($self->IsMemberOf(["admin"])){
+      push(@gl,"admcomments");
+   }
    my $secstate=$self->getCurrentSecState();
 
    if ($rec->{userid}!=$userid && 
@@ -1366,7 +1375,7 @@ sub isWriteValid
    return(undef) if (!defined($rec));
    if ($self->IsMemberOf("admin")){
       return(qw(default name office private userparam 
-                groups usersubst control
+                groups usersubst control admcomments
                 comments header picture nativcontact userro 
                 personrelated introdution
                 interview officeacc userid));
@@ -1540,7 +1549,8 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return(qw(header name picture default comments nativcontact office 
+   return(qw(header name picture default admcomments 
+             comments nativcontact office 
              officeacc private personrelated introdution
              userparam control groups usersubst userid userro ));
 }
