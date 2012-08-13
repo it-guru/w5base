@@ -330,3 +330,4 @@ create table userblacklist (
   UNIQUE posix_identifier (posix_identifier),
   UNIQUE account (account)
 );
+alter table contact add admcomments longtext default NULL;
