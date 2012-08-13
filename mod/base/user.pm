@@ -815,6 +815,7 @@ sub new
       new kernel::Field::Textarea(
                 name          =>'admcomments',
                 group         =>'admcomments', 
+                history       =>0,
                 label         =>'Admin Comments',
                 dataobjattr   =>'contact.admcomments'),
 
