@@ -476,8 +476,8 @@ sub Store
    $vval=UTF8toLatin1($vval);
 
    my $i=getModuleObject($self->Config,"base::interview");
-   printf STDERR ("\n\nAjaxStore: qid=$qid parentid=$parentid ".
-                  "parentobj=$parentobj vname=$vname\nval=$vval\n\n");
+#   printf STDERR ("\n\nAjaxStore: qid=$qid parentid=$parentid ".
+#                  "parentobj=$parentobj vname=$vname\nval=$vval\n\n");
 
    my ($write,$irec,$oldrec)=$self->getAnswerWriteState($i,$qid,
                                                         $parentid,$parentobj);
