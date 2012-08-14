@@ -70,16 +70,17 @@ sub NotifyINetwork
               msg=>'no trigger needed'});
    }
 
-
-   my $SCType=$WfRec->{additional}->{ServiceCenterType};
-   $SCType=$SCType->[0] if (ref($SCType) eq "ARRAY");
-
-   my $ChmApproved=$WfRec->{additional}->{ChangemanagementApproved};
-   $ChmApproved=$ChmApproved->[0] if (ref($ChmApproved) eq "ARRAY");
-
-   if (lc($SCType) ne "standard" && $ChmApproved ne "1"){
-      return({exitcode=>0,
-              msg=>'no trigger needed - approve from chm missing'});
+   if ($WfRec->{class}=~m/.*::change$/){
+      my $SCType=$WfRec->{additional}->{ServiceCenterType};
+      $SCType=$SCType->[0] if (ref($SCType) eq "ARRAY");
+     
+      my $ChmApproved=$WfRec->{additional}->{ChangemanagementApproved};
+      $ChmApproved=$ChmApproved->[0] if (ref($ChmApproved) eq "ARRAY");
+     
+      if (lc($SCType) ne "standard" && $ChmApproved ne "1"){
+         return({exitcode=>0,
+                 msg=>'no trigger needed - approve from chm missing'});
+      }
    }
 
 
