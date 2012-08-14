@@ -296,7 +296,6 @@ sub getNotificationSubject
                                               $subjectlabel,$failclass);
 
    if ($WfRec->{affecteditemprio} eq "1" &&
-                affecteditemprio
        $WfRec->{eventstatclass} eq "1"){
       $s="MI:".$s;
    }
