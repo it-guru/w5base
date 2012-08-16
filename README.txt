@@ -522,7 +522,7 @@ modify the user permissions to:
                       Update_priv='N',         File_priv='Y',
                       Delete_priv='N',         Grant_priv='Y',
                       Create_priv='N',
-                      Drop_priv='N',           References_priv='N',
+                      Drop_priv='Y',           References_priv='N',
                       Reload_priv='N',         Index_priv='Y',
                       Alter_priv='N',          Show_db_priv='Y',
                       Super_priv='N',          Create_tmp_table_priv='N',
