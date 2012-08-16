@@ -538,7 +538,7 @@ create table swinstance (
   UNIQUE KEY fullname (fullname),key(system),key(databoss),
   UNIQUE KEY name (fullname),KEY(mandator),key(name),key(servicesupport),
   UNIQUE KEY `srcsys` (srcsys,srcid),key(swteam),key(adm),key(adm2)
-);
+)  ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table asset add systemhandle varchar(30)   default NULL;
 alter table asset add prodmaintlevel bigint(20)  default NULL;
 alter table appl  add slacontroltool varchar(20) default NULL;
