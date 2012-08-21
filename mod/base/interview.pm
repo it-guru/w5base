@@ -119,10 +119,13 @@ sub new
       new kernel::Field::Contact(
                 name          =>'contact2',
                 label         =>'Deputy Contact',
+                depend        =>['contactid'],
                 readonly      =>sub{
                    my $self=shift;
                    my $rec=shift;
                    my $userid=$self->getParent->getCurrentUserId();
+                   return(0) if ($userid==$rec->{"contact2id"} &&
+                                 $userid==$rec->{"contactid"});
                    return(1) if ($userid==$rec->{$self->{name}."id"});
                    return(0);
                 },
