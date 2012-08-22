@@ -38,7 +38,7 @@ Config-Item "%s" zu aktivieren.
  %s
 
 Bitte prüfen Sie das Config-Item und setzen Sie den
-CI-Status bei erflogreicher Prüfung auf "installiert/aktiv".
+CI-Status bei erfolgreicher Prüfung auf "installiert/aktiv".
 
 Die vollständige Liste der Config-Items vom Typ "%s" können Sie über folgenden Link ...
 
@@ -54,7 +54,7 @@ Der o.g. Anforderer wird dann automatisch per E-Mail
 
  %s
 
-The complet list of config items of type "%s" can
+The complete list of config items of type "%s" can
 be viewed by 
 
   %s
