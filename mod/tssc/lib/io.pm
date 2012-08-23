@@ -438,9 +438,14 @@ sub mkChangeStoreRec
    # ... für diesen Code Teil immer Markus Zeiss fragen
    #
    $wfrec{additional}->{Type4INetwork}=$rec->{type};
-   if ($rec->{name}=~m/[^a-z]regel-ipl/i){
-      $wfrec{additional}->{Type4INetwork}="standard";
-   }
+
+#   nicht mehr notwendig laut ...
+#   https://darwin.telekom.de/darwin/auth/base/workflow/ById/13451155090001
+#   if ($rec->{name}=~m/[^a-z]regel-ipl/i){
+#      $wfrec{additional}->{Type4INetwork}="standard";
+#   }
+
+
 #   if (time()>1197242364){  # ca Mo. der 10.12.2007 aktiv
 #      if ($rec->{type}=~m/^standard$/i){
 #         $wfrec{additional}->{Type4INetwork}="trivial";
