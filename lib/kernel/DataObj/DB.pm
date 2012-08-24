@@ -877,6 +877,17 @@ sub getOnlyFirst
    return(@res);
 }
 
+sub finish
+{
+   my $self=shift;
+
+   if (defined($self->{sth})){
+      $self->{sth}->finish();
+   }
+   return();
+}
+
+
 sub getNext
 {
    my $self=shift;

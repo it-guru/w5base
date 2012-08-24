@@ -112,6 +112,7 @@ sub processWorkflowReviews
          ($rec,$msg)=$req->getNext();
       } until(!defined($rec) || $#okid>5);
    }
+   $req->finish();
    if ($#okid!=-1){
       push(@errmsg,"OK:".join(", ",@okid));
    }
