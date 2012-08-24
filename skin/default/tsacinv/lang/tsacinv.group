@@ -5,3 +5,4 @@
 'Phone'=>{de=>'Telefonnummer'},
 'Supervisor LDAPID'=>{de=>'Leiter LDAPID'},
 'Supervisor E-Mail'=>{de=>'Leiter E-Mail'},
+'marked as delete'=>{de=>'gelöscht markiert'},

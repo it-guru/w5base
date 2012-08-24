@@ -38,6 +38,7 @@ sub new
       new kernel::Field::Id(
                 name          =>'lempldeptid',
                 label         =>'UserID',
+                searchable    =>0,
                 dataobjattr   =>'amempldept.lempldeptid'),
 
       new kernel::Field::Text(
@@ -54,6 +55,12 @@ sub new
                 htmlwidth     =>'250',
                 ignorecase    =>1,
                 dataobjattr   =>'amempldept.fullname'),
+
+      new kernel::Field::Boolean(
+                name          =>'deleted',
+                htmldetail    =>0,
+                label         =>'marked as delete',
+                dataobjattr   =>'amempldept.bdelete'),
 
       new kernel::Field::Text(
                 name          =>'loginname',
@@ -210,6 +217,15 @@ sub isWriteValid
    my $rec=shift;
    return(undef);
 }
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_deleted"))){
+     Query->Param("search_deleted"=>$self->T("no"));
+   }
+}
+
 
 
 1;

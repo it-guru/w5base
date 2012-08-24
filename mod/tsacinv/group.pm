@@ -40,6 +40,7 @@ sub new
                 name          =>'code',
                 label         =>'Code',
                 ignorecase    =>1,
+                searchable    =>0,
                 dataobjattr   =>'amemplgroup.barcode'),
 
       new kernel::Field::Id(
@@ -53,6 +54,12 @@ sub new
                 size          =>'20',
                 ignorecase    =>1,
                 dataobjattr   =>'amemplgroup.name'),
+
+      new kernel::Field::Boolean(
+                name          =>'deleted',
+                htmldetail    =>0,
+                label         =>'marked as delete',
+                dataobjattr   =>'amemplgroup.bdelete'),
 
       new kernel::Field::Text(
                 name          =>'phone',
@@ -139,6 +146,16 @@ sub Initialize
    return(1) if (defined($self->{DB}));
    return(0);
 }
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_deleted"))){
+     Query->Param("search_deleted"=>$self->T("no"));
+   }
+}
+
+
 
 sub getRecordImageUrl
 {
