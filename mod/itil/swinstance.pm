@@ -861,15 +861,17 @@ sub Validate
       }
    }
    else{ # validate service app
-      if ((my $clustsid=effVal($oldrec,$newrec,"itclustsid")) ne ""){ 
-         my $c=getModuleObject($self->Config,"itil::lnkitclustsvcappl");
-         my $applid=effVal($oldrec,$newrec,"applid");
-         $c->SetFilter({itclustsvcid=>\$clustsid,applid=>\$applid});
-         my ($rec,$msg)=$c->getOnlyFirst(qw(applid));
-         if (!defined($rec)){
-            $self->LastMsg(ERROR,"cluster service application and instance ".
-                                 "application does not match");
-            return(undef);
+      if (exists($newrec->{itclustsid})){
+         if ((my $clustsid=effVal($oldrec,$newrec,"itclustsid")) ne ""){ 
+            my $c=getModuleObject($self->Config,"itil::lnkitclustsvcappl");
+            my $applid=effVal($oldrec,$newrec,"applid");
+            $c->SetFilter({itclustsvcid=>\$clustsid,applid=>\$applid});
+            my ($rec,$msg)=$c->getOnlyFirst(qw(applid));
+            if (!defined($rec)){
+               $self->LastMsg(ERROR,"cluster service application and instance ".
+                                    "application does not match");
+               return(undef);
+            }
          }
       }
    }
