@@ -112,7 +112,7 @@ sub processWorkflowReviews
          ($rec,$msg)=$req->getNext();
       } until(!defined($rec) || $#okid>5);
    }
-   $req->finish();
+   $req=$req->Clone();
    if ($#okid!=-1){
       push(@errmsg,"OK:".join(", ",@okid));
    }
@@ -120,8 +120,8 @@ sub processWorkflowReviews
       $wfact->Notify("ERROR","$toappl interface problems",
                      "Meldungen:\n\n".join("\n\n",@errmsg),
                      adminbcc=>1,
-                     emailto=>\@to,
-                     emailcc=>\@cc);
+                     xemailto=>\@to,
+                     xemailcc=>\@cc);
    }
    $req->ResetFilter();
    $req->ValidatedUpdateRecord({},{statusid=>1},{id=>\@okid});
