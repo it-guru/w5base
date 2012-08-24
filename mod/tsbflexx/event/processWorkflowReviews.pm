@@ -61,7 +61,7 @@ sub processWorkflowReviews
                             conproto=>\'ODBC'});
    my @ifid=$lnkapplappl->getVal("id");
    if ($#ifid==-1){
-      msg(ERROR,"no inteface definition found in itil::lnkapplappl\n".
+      msg(ERROR,"no interface definition found in itil::lnkapplappl\n".
                 "for connect from $fromappl to $toappl with ODBC online");
       msg(ERROR,"this interface is disabled");
       return({exitcode=>1,msg=>'missing interface definition'}); 
@@ -91,7 +91,7 @@ sub processWorkflowReviews
    $req->SetFilter({statusid=>\'0'});
    my @okid=();
 
-   $req->SetCurrentView(qw(id reason activity w5baseid));
+   $req->SetCurrentView(qw(id reason activity email w5baseid));
    my ($rec,$msg)=$req->getFirst(unbuffered=>1);
    if (defined($rec)){
       do{
@@ -103,13 +103,14 @@ sub processWorkflowReviews
                my $res=$self->ProcessWorkflow($wf,$wfact,\@errmsg,$WfRec,$rec);
                if (defined($res) && $res==1){
                   push(@okid,$rec->{id});
+ 
                   #push(@errmsg,"res=$res");
                   # add result to oplog, set state to 1 in review file
                }
             }
          }
          ($rec,$msg)=$req->getNext();
-      } until(!defined($rec));
+      } until(!defined($rec) || $#okid>5);
    }
    if ($#okid!=-1){
       push(@errmsg,"OK:".join(", ",@okid));
@@ -118,8 +119,8 @@ sub processWorkflowReviews
       $wfact->Notify("ERROR","$toappl interface problems",
                      "Meldungen:\n\n".join("\n\n",@errmsg),
                      adminbcc=>1,
-                     xemailto=>\@to,
-                     xemailcc=>\@cc);
+                     emailto=>\@to,
+                     emailcc=>\@cc);
    }
    $req->ResetFilter();
    $req->ValidatedUpdateRecord({},{statusid=>1},{id=>\@okid});
@@ -156,8 +157,11 @@ sub ProcessWorkflow
       push(@$errmsg,"do not know, how to handle revise on $rec->{w5baseid}");
       return(0);
    }
+   my $msg=$rec->{reason}."\n\n";
+   $msg.="revise request from : B:Flexx\n";
+   $msg.="further questions to: mailto:$rec->{email}" if ($rec->{email} ne "");
    my $bk=$wf->nativProcess("wfforcerevise",{
-                            note=>$rec->{reason} 
+                            note=>$msg 
                            },$rec->{w5baseid});
    if ($bk ne "1"){
       push(@$errmsg,"Unexpected result while processing W5Base workflow ".
