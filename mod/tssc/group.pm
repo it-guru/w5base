@@ -84,6 +84,7 @@ sub new
                 name          =>'users',
                 label         =>'Users',
                 group         =>'users',
+                forwardSearch =>1,
                 searchable    =>0,
                 vjointo       =>'tssc::lnkusergroup',
                 vjoinon       =>['groupid'=>'lgroup'],
