@@ -550,6 +550,9 @@ sub NotifyForward
    my %adr=(emailfrom=>$from,
             emailto  =>\@to);
 
+   if ($param{emailfrom} ne ""){
+      $adr{emailfrom}=$param{emailfrom};
+   }
    if ($param{sendercc} && $from ne 'no_reply@w5base.net'){
       $adr{emailcc}=[$from];
    }
@@ -654,10 +657,10 @@ sub Notify
                if (defined($urec)){
                   $param{$target}->[$c]=$urec->{email};
                }
-               else{
-                  $param{$target}->[$c]='"invalid ref($param{$target}->[$c])" '.
-                                        '<null\@network>';
-               }
+             #  else{
+             #     $param{$target}->[$c]='"invalid ref($param{$target}->[$c])" '.
+             #                           '<null\@network>';
+             #  }
             }
             elsif ($param{$target}->[$c]=~m/^[a-z0-9]{2,8}$/){ # target posixid
                $user->ResetFilter();

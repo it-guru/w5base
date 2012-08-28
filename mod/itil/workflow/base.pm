@@ -289,6 +289,10 @@ sub nativProcess
                   $wf->AddToWorkspace($WfRec->{id},"base::user",$uid);
                }
                push(@ccids,11634953080001);
+               my %mailopt=(addcctarget=>\@ccids);
+               if ($h->{emailfrom} ne ""){
+                  $mailopt{emailfrom}=$h->{emailfrom};
+               }
                $wf->Action->NotifyForward($WfRec->{id},
                                           'base::user',
                                           $ownerid,
@@ -299,7 +303,7 @@ sub nativProcess
                 "entsprechende Nachbearbeitung durch. Gründe für die ".
                 "Reklamation finden Sie im Verlauf-Protokoll des ".
                 "Workflows.",
-                                          addcctarget=>\@ccids);
+                                          %mailopt);
                return(1);
            }
       }

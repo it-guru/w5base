@@ -162,7 +162,8 @@ sub ProcessWorkflow
    $msg.="revise request from : B:Flexx\n";
    $msg.="further questions to: mailto:$rec->{email}" if ($rec->{email} ne "");
    my $bk=$wf->nativProcess("wfforcerevise",{
-                            note=>$msg 
+                            note=>$msg,
+                            emailfrom=>$rec->{email}
                            },$rec->{w5baseid});
    if ($bk ne "1"){
       push(@$errmsg,"Unexpected result while processing W5Base workflow ".
