@@ -259,7 +259,7 @@ sub orgRoles
 sub XmlQuote
 {
    my $org=shift;
-   $org=unHtml($org);
+   $org=rmNonLatin1(unHtml($org));
    $org=~s/&/&amp;/g;
    $org=~s/</&lt;/g;
    $org=~s/>/&gt;/g;
@@ -391,8 +391,10 @@ sub Hash2Datafield
 sub rmNonLatin1
 {
    my $txt=shift;
+   $txt=~s/([\x00-\x08])//g; 
+   $txt=~s/([\x10])/\n/g; 
    $txt=~s/([^\x00-\xff])/sprintf('&#%d;', ord($1))/ge; 
-   $txt=~s/[^\ta-z0-9,:;\!"#\\\?\+\-\/<>\._\&\[\]\(\)\n\{\}= ÖÄÜöäüß\|\@\^\*'\$\§\%]//i;
+   $txt=~s/[^\ta-z0-9,:;\!"#\\\?\+\-\/<>\._\&\[\]\(\)\n\{\}= ÖÄÜöäüß\|\@\^\*'\$\§\%]//ig;
    return($txt);
 }
 

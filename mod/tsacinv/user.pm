@@ -65,7 +65,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'loginname',
                 label         =>'User-Login',
-                ignorecase    =>1,
+                lowersearch   =>1,
                 dataobjattr   =>'amempldept.userlogin'),
 
       new kernel::Field::Text(
@@ -101,7 +101,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'email',
                 label         =>'E-Mail',
-                ignorecase    =>1,
+                lowersearch   =>1,
                 dataobjattr   =>'amempldept.email'),
 
       new kernel::Field::Text(
