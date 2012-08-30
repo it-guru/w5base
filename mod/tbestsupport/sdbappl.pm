@@ -55,6 +55,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'contractnumber',
+                noselect      =>'1',
                 dataobjattr   =>'vertragsnummer'),
 
 #      new kernel::Field::Textarea(        # distinct Problem!
