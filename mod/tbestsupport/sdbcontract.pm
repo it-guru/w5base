@@ -88,6 +88,15 @@ sub Initialize
    return(0);
 }
 
+sub initSqlWhere
+{
+   my $self=shift;
+   my $where=
+      "vertragsnummer is not null";
+   return($where);
+}
+
+
 
 sub getDetailBlockPriority
 {
