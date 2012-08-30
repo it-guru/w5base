@@ -811,6 +811,21 @@ sub isViewValid
    my $rec=shift;   # if $rec is undefined, general access to app is checked
    my %param=@_;  
 
+   if (exists($self->{useMenuFullnameAsACL})){
+      my $func="Main";
+      #$func="New" if (!defined($rec));
+      my $acl=$self->getMenuAcl($ENV{REMOTE_USER},
+                        $self->{useMenuFullnameAsACL},
+                        func=>$func);
+      if (defined($acl)){
+         if (!defined($rec) && grep(/^(read|write)$/,@$acl)){
+            return("header","default");
+         }
+         return("ALL") if (grep(/^(read|write)$/,@$acl));
+      }
+      return();
+   }
+
    return("header","default") if (!defined($rec));
    return("ALL");
 }
@@ -820,6 +835,17 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;  # if $rec is not defined, insert is validated
 
+   if (exists($self->{useMenuFullnameAsACL})){
+      my $func="Main";
+      $func="New" if (!defined($rec));
+      my $acl=$self->getMenuAcl($ENV{REMOTE_USER},
+                        $self->{useMenuFullnameAsACL},
+                        func=>$func);
+      if (defined($acl)){
+         return("ALL") if (grep(/^write$/,@$acl));
+      }
+      return();
+   }
    return();  # ALL means all groups - else return list of fieldgroups
 }
 

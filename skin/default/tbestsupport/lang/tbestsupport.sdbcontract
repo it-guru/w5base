@@ -1,0 +1,5 @@
+'tbestsupport::sdbcontract'=>{de=>'Telekom BestSupport - SDB - Vertrag',
+                          en=>'Telekom BestSupport - SDB - Contract'},
+'contractnumber'=>{de=>'Vertragsnummer'},
+'contractstate'=>{de=>'Vertragsstatus'},
+'fieldgroup.applications'=>{de=>'Anwendungen',en=>'Applications'},
