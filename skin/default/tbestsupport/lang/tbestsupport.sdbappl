@@ -13,3 +13,4 @@
 'CMI'=>{de=>'Change-Manager integrative',en=>'Change-Manager integrativ'},
 'CMO'=>{de=>'Change-Manager operativ',en=>'Change-Manager operativ'},
 'fieldgroup.contracts'=>{de=>'Verträge',en=>'Contracts'},
+'Contracts'=>{de=>'Verträge'},
