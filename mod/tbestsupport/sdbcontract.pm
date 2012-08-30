@@ -72,7 +72,7 @@ sub new
    );
    $self->{use_distinct}=0;
    $self->{useMenuFullnameAsACL}=$self->Self;
-   $self->setDefaultView(qw(contructnumber contructstate));
+   $self->setDefaultView(qw(contractnumber contractstate));
    $self->setWorktable("SDB_DARWIN");
    return($self);
 }
