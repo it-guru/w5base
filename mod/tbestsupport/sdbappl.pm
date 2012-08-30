@@ -88,7 +88,7 @@ sub new
    );
    #$self->{use_distinct}=0;
    $self->{useMenuFullnameAsACL}=$self->Self;
-   $self->setDefaultView(qw(shortname prio state));
+   $self->setDefaultView(qw(name prio state));
    $self->setWorktable("SDB_DARWIN");
    return($self);
 }
