@@ -120,10 +120,10 @@ sub processWorkflowReviews
             }
          }
          ($rec,$msg)=$req->getNext();
-      } until(!defined($rec) || $#okid>5);
+      } until(!defined($rec) || $#okid>25);
    }
    if ($#okid!=-1){
-      push(@errmsg,"OK:".join(", ",@okid));
+     # push(@errmsg,"OK:".join(", ",@okid));
    }
    if ($#errmsg!=-1){
       $wfact->Notify("ERROR","$toappl interface problems",
