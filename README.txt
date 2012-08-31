@@ -42,7 +42,8 @@ min number of cores               : 1
        libole-storage-lite-perl libnetaddr-ip-perl libarchive-zip-perl \
        libgd-gd2-perl libapache-dbi-perl libsoap-lite-perl \
        libnet-ldap-perl libnet-ssleay-perl libio-socket-ssl-perl \
-       libapache2-mod-perl2 libapache2-mod-perl2-dev libapache2-mod-perl2-doc 
+       libapache2-mod-perl2 libapache2-mod-perl2-dev libapache2-mod-perl2-doc \
+       libunicode-map8-perl
 
 
  Step3: setup webserver/basic auth for webserv and database enviroment 
@@ -423,6 +424,13 @@ min number of cores               : 1
    </Perl>
 
    # don't forget to restart apache to activated the config changes!
+
+
+   Installing Spreadsheet::ParseExcel
+   ----------------------------------
+   as root:
+   perl -MCPAN -e 'install "Spreadsheet::ParseExcel";'
+
 
 
  Step8: configure W5MailGate
