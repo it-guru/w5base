@@ -309,7 +309,8 @@ min number of cores               : 1
 
    In newer oracle-instantclient-basic versions, sometimes sqlplus is missing. 
    If this happens, you have to install oracle-instantclient-sqlplus
-   as an additional package from the oracle site.
+   and oracle-instantclient-devel as an additional packages from the 
+   oracle site.
    
    Now ensure, that your enviroment is refreshed with ...
 
