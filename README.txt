@@ -306,6 +306,10 @@ min number of cores               : 1
    like a "normale" debian package.
 
     sudo dpkg -i ./oracle-instantclient-basic_10.2.0.4-2_i386.deb
+
+   In newer oracle-instantclient-basic versions, sometimes sqlplus is missing. 
+   If this happens, you have to install oracle-instantclient-sqlplus
+   as an additional package from the oracle site.
    
    Now ensure, that your enviroment is refreshed with ...
 
