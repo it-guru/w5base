@@ -85,10 +85,20 @@ sub processWorkflowReviews
    }
 
    # ok start operation
+   my @wfid=@_;
+   my %flt=(statusid=>\'0');
+
+   if ($#wfid!=-1){
+      if (grep(/^debug$/i,@wfid)){
+         @wfid=grep(!/^debug$/i,@wfid);
+         $self->{DebugMode}=1;
+         msg(ERROR,"processing DebugMode - loading '%s'",join(",",@wfid));
+      }
+      $flt{w5baseid}=\@wfid;
+   }
 
 
-
-   $req->SetFilter({statusid=>\'0'});
+   $req->SetFilter(\%flt);
    my @okid=();
 
    $req->SetCurrentView(qw(id reason activity email w5baseid));
@@ -112,7 +122,6 @@ sub processWorkflowReviews
          ($rec,$msg)=$req->getNext();
       } until(!defined($rec) || $#okid>5);
    }
-   $req=$req->Clone();
    if ($#okid!=-1){
       push(@errmsg,"OK:".join(", ",@okid));
    }
@@ -123,8 +132,11 @@ sub processWorkflowReviews
                      xemailto=>\@to,
                      xemailcc=>\@cc);
    }
-   $req->ResetFilter();
-   $req->ValidatedUpdateRecord({},{statusid=>1},{id=>\@okid});
+   if (!$self->{DebugMode}){
+      $req=$req->Clone();
+      $req->ResetFilter();
+      $req->ValidatedUpdateRecord({},{statusid=>1},{id=>\@okid});
+   }
    
 
    return({exitcode=>0}); 
