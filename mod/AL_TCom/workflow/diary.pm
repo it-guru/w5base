@@ -189,12 +189,12 @@ sub getPosibleActions
          else{
             my $d=CalcDateDuration($WfRec->{eventend},NowStamp("en"));
             if ($d->{totalminutes}>5000){ # modify only allowed for 3 days
-               return();
+               return(@l);
             }
          }
       }
    }
-   if ($WfRec->{state}==17){
+   if ($WfRec->{state}==17 || $WfRec->{state}==18){
       my @acl=$self->getFinishUseridList($WfRec);
       if (grep(/^$userid$/,@acl)){
          push(@l,"addsup");
