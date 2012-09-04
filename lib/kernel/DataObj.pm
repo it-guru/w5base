@@ -1035,8 +1035,6 @@ sub StoreUpdateDelta
                $new=~s/\r\n/\n/gs;
                $old=~s/\r\n/\n/gs;
                if (trim($new) ne trim($old)){
-                      use String::Diff;
-                      my $diff=String::Diff::diff($old,$new);
                   $delta{$field}={'old'=>$old,'new'=>$new};
                }
             }
