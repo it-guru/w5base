@@ -87,6 +87,15 @@ sub new
                 vjoinon       =>['advid'=>'id'],
                 vjoindisp     =>'itnormodel'),
 
+      new kernel::Field::Link(
+                name          =>'advdstateid',
+                label         =>'state of relevant ADV',
+                readonly      =>'1',
+                searchable    =>0,
+                vjointo       =>'itil::appladv',
+                vjoinon       =>['advid'=>'id'],
+                vjoindisp     =>'dstateid'),
+
       new kernel::Field::Boolean(
                 name          =>'scddata',
                 label         =>'SCD Datahandling',
@@ -486,6 +495,11 @@ sub isWriteValid
       my @modules=$self->currentModules($rec);
       push(@l,"nordef","advdef","misc",@modules);
       my $userid=$self->getCurrentUserId();
+
+      return() if ($rec->{advid} eq "");
+      return() if ($rec->{advdstateid}<20);
+
+
       return(@l) if ($rec->{databossid} eq $userid ||
                      $rec->{delmgr2id} eq $userid ||
                      $self->IsMemberOf("admin"));
