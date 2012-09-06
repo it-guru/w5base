@@ -87,9 +87,9 @@ sub new
                 vjoinon       =>['advid'=>'id'],
                 vjoindisp     =>'itnormodel'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'advdstateid',
-                label         =>'state of relevant ADV',
+                label         =>'dstateid of relevant ADV',
                 readonly      =>'1',
                 searchable    =>0,
                 vjointo       =>'itil::appladv',
