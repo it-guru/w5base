@@ -108,41 +108,40 @@ sub qcheckRecord
    
 
 
+   my $prefix;
+   my $n1;
+   my %trtab=(
+      'SDM.TC' =>'DTAG.TSI.S.DTAG',
+      'CS.TC'  =>'DTAG.TSI.Prod.CS.Telco',
+      'TI'     =>'DTAG.TSI.TI',
+      'PSS'    =>'DTAG.TSI.Prod.GBOP.PSS',
+      'INT.CSS'=>'DTAG.TSI.INT.SK.CSS.CSS_Applicat'
+   );
+
+
    {  # altname creation
       if (defined($tOuSD)){  # ok - the unit is a org unit
         # $altname=~s/^DTAG\.TSI\.S.*$/S/i;
         # $altname=~s/^DTAG\.TSI\.Prod\.CS\.Telco.*$/CS.TC/i;
 #         $altname=~s/^DTAG\.TSI\.Prod\.GBOP\.PSS.*$/PSS/i;
 
-         my %trtab=(
-            'SDM.TC' =>'^DTAG\.TSI\.S\.DTAG\.(.*)$',
-            'CS.TC'  =>'^DTAG\.TSI\.Prod\.CS\.Telco\.(.*)$',
-            'TIT'    =>'^DTAG\.TSI\.TIT\.(.*)$',
-            'PSS'    =>'^DTAG\.TSI\.Prod\.GBOP\.PSS\.(.*)$',
-            'INT.CSS'=>'^DTAG\.TSI\.INT\.SK\.CSS\.CSS_Applicat\.(.*)$'
-         );
 
-         my $prefix;
          my $shortname;
 
          foreach my $k (keys(%trtab)){
-            if (my ($sn)=$rec->{fullname}=~m/$trtab{$k}/i){
+            my $qtr=quotemeta($trtab{$k});
+            if (my ($sn)=$rec->{fullname}=~m/^$qtr(\.(.*)){0,1}$/i){
                $prefix=$k;
                $shortname=$sn;
                last;
             }
          }
          if (defined($prefix)){
-            my $n1=uc($prefix.".".$country.".".$tOuSD.$subteamgroup);
+            $n1=uc($prefix.".".$country.".".$tOuSD.$subteamgroup);
             $n1=~s/\s/_/g;
-            my $n2=uc($prefix.".".$country.".".$shortname);
-            $n2=~s/\s/_/g;
 
             if (length($n1)>30){
                $n1=undef;
-            }
-            if (length($n2)>30){
-               $n2=undef;
             }
 
             if ($n1 ne $alternateGroupnameHR){
@@ -151,23 +150,74 @@ sub qcheckRecord
                }
                $forcedupd->{additional}->{alternateGroupnameHR}=$n1;
             }
-            if ($n2 ne $alternateGroupname){
-               if (!exists($forcedupd->{additional})){
-                  $forcedupd->{additional}=\%a;
-               }
-               $forcedupd->{additional}->{alternateGroupname}=$n2;
-            }
          }
          else{
             if (!exists($forcedupd->{additional})){
                $forcedupd->{additional}=\%a;
             }
             delete($forcedupd->{additional}->{alternateGroupnameHR});
-            delete($forcedupd->{additional}->{alternateGroupname});
+         }
+
+
+
+
+      }
+   }
+   my $spocgrp;
+   if (defined($prefix) && $trtab{$prefix} ne ""){ # SPOC suchen
+      my $grp=getModuleObject($self->getParent->Config,"base::grp");
+      my $name=$trtab{$prefix}.".AGroupAdmin";
+      $grp->SetFilter({fullname=>\$name});
+      ($spocgrp)=$grp->getOnlyFirst(qw(fullname grpid));
+   }
+   my $oldWf;
+   if ($rec->{grpid} ne ""){ # bestehenden Task suchen
+      my $wf=getModuleObject($self->getParent->Config,"base::workflow");
+      $wf->SetFilter({directlnktype=>\'base::grp',
+                       directlnkid=>\$rec->{grpid},
+                       directlnkmode=>\'AGroupAdmin',
+                       class=>\'base::workflow::task',
+                       stateid=>'<20'});
+      ($oldWf)=$wf->getOnlyFirst(qw(fullname grpid));
+   }
+   printf STDERR ("fifi spocgrp=$spocgrp\n");
+   printf STDERR ("fifi oldWf=$oldWf\n");
+
+   if ((!defined($spocgrp) || $n1 eq "") && defined($oldWf) ){
+      # mark existing task as 25-obsolete
+   }
+
+   if (defined($spocgrp) && $n1 ne ""){
+      my $acgrpo=getModuleObject($self->getParent->Config,"tsacinv::group");
+      $acgrpo->SetFilter({srcid=>\"W5B:$rec->{grpid}"});
+      my ($acgrp)=$acgrpo->getOnlyFirst(qw(code name));
+
+      if ($acgrpo->Ping()){
+         if (defined($acgrp)){
+            if ($acgrp->{name} ne $n1){
+               # Bitte gruppe umbenennen lassen
+            }
+            else{
+            }
+         }
+         else{
+            # Bitte gruppe neu anlegen lassen
+            # mit folgenden Mitgliedern
          }
       }
    }
+
+   if (1){
+      if (!defined($oldWf)){
+         # neuen Task mit Text anlegen
+      }
+      else{
+         # bestehenden Task ändern
+      }
+   }
+
    if (keys(%$forcedupd)){
+      delete($forcedupd->{additional}->{alternateGroupname});
       delete($forcedupd->{additional}->{alternateGroupnameAM});
       delete($forcedupd->{additional}->{alternateGroupnameSC});
       if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,
