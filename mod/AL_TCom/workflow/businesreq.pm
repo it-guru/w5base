@@ -151,7 +151,7 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
    my @grps=$self->SUPER::isWriteValid($rec);
-   if (grep(/^init$/,@grps) || $rec->{stateid}==18){
+   if ($rec->{stateid}<16 ||  $rec->{stateid}==18){
       if ($self->isUserTrusted($rec)){
          push(@grps,"tcomcod","relations");
       }
@@ -169,6 +169,7 @@ sub isUserTrusted          # allow extended edit on Workflow
    $mandatorid=[$mandatorid] if (ref($mandatorid) ne "ARRAY");
    @$mandatorid=grep(!/^\s*$/,@$mandatorid);
    if ($#{$mandatorid}!=-1){
+printf STDERR ("fifi 01\n");
       if ($self->getParent->IsMemberOf($mandatorid,"RMember")){
          return(1);
       }
@@ -195,10 +196,13 @@ sub isUserTrusted          # allow extended edit on Workflow
             return(1);
          }
          my @g=();
+printf STDERR ("fifi 02\n");
          push(@g,$arec->{responseteamid}) if ($arec->{responseteamid} ne "");
          push(@g,$arec->{businessteamid}) if ($arec->{businessteamid} ne "");
          if ($#g!=-1){
+printf STDERR ("fifi 03\n");
             if ($self->getParent->IsMemberOf(\@g,"RMember")){
+printf STDERR ("fifi 04\n");
                return(1);
             }
          }
