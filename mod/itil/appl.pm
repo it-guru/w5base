@@ -578,6 +578,24 @@ sub new
                 depend        =>['id'],
                 onRawValue    =>\&calculateRelPhysCpuCount),
 
+# Change: ITIL Anfrage/Anforderung an die Anwendungsentwicklung ID:13466586280001, 07.09.2012
+      new kernel::Field::Select(
+               name          =>'opmode',
+                #group         =>'misc',
+                label         =>'primary operation mode',
+                transprefix   =>'opmode.',
+                value         =>['',
+                                 'prod',
+                                 'pilot',
+                                 'test',
+                                 'devel',
+                                 'education',
+                                'approvtest',
+                                'reference',
+                                'license',
+                                 'cbreakdown'],  # see also opmode at system
+                htmleditwidth =>'200px',
+               dataobjattr   =>'appl.opmode'),
       new kernel::Field::Text(
                 name          =>'applgroup',
                 label         =>'Application Group',
@@ -660,24 +678,6 @@ sub new
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['servicesupportid'=>'id'],
                 vjoindisp     =>'name'),
-
-      new kernel::Field::Select(
-                name          =>'opmode',
-                group         =>'misc',
-                label         =>'primary operation mode',
-                transprefix   =>'opmode.',
-                value         =>['',
-                                 'prod',
-                                 'pilot',
-                                 'test',
-                                 'devel',
-                                 'education',
-                                 'approvtest',
-                                 'reference',
-                                 'license',
-                                 'cbreakdown'],  # see also opmode at system
-                htmleditwidth =>'200px',
-                dataobjattr   =>'appl.opmode'),
 
       new kernel::Field::Select(
                 name          =>'applbasemoniname',
