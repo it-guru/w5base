@@ -190,7 +190,8 @@ sub getPosibleActions
          }
       }
       if ($iscurrent || $self->getParent->IsMemberOf("admin") || 
-          $WfRec->{openuser}==$userid){
+          (($WfRec->{openuser}==$userid) ||
+           ($WfRec->{openuser}=="" && $WfRec->{owner}==$userid))){
          push(@l,"addnote");
          if ($WfRec->{fwdtarget} ne ""){
             push(@l,"remsup");
