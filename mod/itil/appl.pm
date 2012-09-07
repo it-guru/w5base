@@ -328,15 +328,12 @@ sub new
                                     delmgrteam
                                     delmgrteamid)]),
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Group(
                 name          =>'customer',
                 group         =>'customer',
                 SoftValidate  =>1,
                 label         =>'Customer',
-                vjointo       =>'base::grp',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['customerid'=>'grpid'],
-                vjoindisp     =>'fullname'),
+                vjoinon       =>'customerid'),
 
       new kernel::Field::Link( 
                 name          =>'customerid',
