@@ -3,3 +3,5 @@
 'contractnumber'=>{de=>'Vertragsnummer'},
 'contractstate'=>{de=>'Vertragsstatus'},
 'fieldgroup.applications'=>{de=>'Anwendungen',en=>'Applications'},
+'contract number'=>{de=>'Vertragsnummer'},
+'contract title'=>{de=>'Vertragstitel'},

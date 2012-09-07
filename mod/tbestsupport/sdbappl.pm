@@ -28,14 +28,14 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{MainSearchFieldLines}=4;
+   $param{MainSearchFieldLines}=3 if (!exists($param{MainSearchFieldLines}));
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
       new kernel::Field::Id(
                 name          =>'id',
                 sqlorder      =>'desc',
-                label         =>'ID',
+                label         =>'SDB SupportObjekt ID',
                 dataobjattr   =>"id"),
 
       new kernel::Field::Text(
@@ -58,10 +58,19 @@ sub new
                 noselect      =>'1',
                 dataobjattr   =>'vertragsnummer'),
 
-#      new kernel::Field::Textarea(        # distinct Problem!
-#                name          =>'description',
-#                label         =>'description',
-#                dataobjattr   =>'kurzbeschreibung'),
+      new kernel::Field::Textarea(        # distinct Problem!
+                name          =>'description',
+                label         =>'description',
+                dataobjattr   =>'kurzbeschreibung'),
+
+      new kernel::Field::SubList(
+                name          =>'posibletsapplications',
+                label         =>'posible T-Systems applications',
+                group         =>'posibletsapplications',
+                vjointo       =>'itil::lnkapplcustcontract',
+                weblinkto     =>'none',
+                vjoinon       =>['custcontractnumbers'=>'custcontract'],
+                vjoindisp     =>['appl','applcistatus']),
 
       new kernel::Field::Email(
                 name          =>'sm',
@@ -84,13 +93,25 @@ sub new
                 group         =>'contracts',
                 vjointo       =>'tbestsupport::sdbcontract',
                 vjoinon       =>['id'=>'sdbapplid'],
-                vjoindisp     =>['contractnumber','contractstate'])
+                vjoindisp     =>['contractnumber','contractstate','fullname']),
+
+      new kernel::Field::Text(
+                name          =>'custcontractnumbers',
+                label         =>'Contract numbers',
+                group         =>'contracts',
+                htmldetail    =>0,
+                searchable    =>0,
+                vjointo       =>'tbestsupport::sdbcontract',
+                vjoinon       =>['id'=>'sdbapplid'],
+                vjoindisp     =>'contractnumber'),
+
+
 
    );
-   #$self->{use_distinct}=0;
+   $self->{use_distinct}=0;
    $self->{useMenuFullnameAsACL}=$self->Self;
    $self->setDefaultView(qw(name prio state));
-   $self->setWorktable("SDB_DARWIN");
+   $self->setWorktable("SDB_DARWIN_SupportObjekt");
    return($self);
 }
 

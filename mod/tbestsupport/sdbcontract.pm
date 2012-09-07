@@ -37,24 +37,28 @@ sub new
                 sqlorder      =>'desc',
                 label         =>'ID',
                 htmldetail    =>0,
-                dataobjattr   =>"ltrim(cast(id AS varchar(10))+'\@'+vertragsnummer) "),
+                dataobjattr   =>"ltrim(cast(sdb_supportobjekt_id AS varchar(10))+'\@'+vertragsnummer)"),
 
       new kernel::Field::Link(
                 name          =>'sdbapplid',
                 sqlorder      =>'desc',
                 label         =>'applid',
-                dataobjattr   =>"id"),
-
-      new kernel::Field::Text(
-                name          =>'fullname',
-                label         =>'Fullname',
-                uivisible     =>0,
-                dataobjattr   =>'vertragsnummer'),
+                dataobjattr   =>"sdb_supportobjekt_id"),
 
       new kernel::Field::Text(
                 name          =>'contractnumber',
-                label         =>'contractnumber',
-                dataobjattr   =>'vertragsnummer'),
+                label         =>'contract number',
+                dataobjattr   =>'Vertragsnummer'),
+
+      new kernel::Field::Text(
+                name          =>'fullname',
+                label         =>'contract title',
+                dataobjattr   =>'Vertragstitel'),
+
+      new kernel::Field::Text(
+                name          =>'sdbapplid',
+                label         =>'SDB-Support-Objekt-ID',
+                dataobjattr   =>'sdb_supportobjekt_id'),
 
       new kernel::Field::Text(
                 name          =>'contractstate',
@@ -66,14 +70,14 @@ sub new
                 label         =>'Applications',
                 group         =>'applications',
                 vjointo       =>'tbestsupport::sdbappl',
-                vjoinon       =>['contractnumber'=>'contractnumber'],
+                vjoinon       =>['sdbapplid'=>'id'],
                 vjoindisp     =>['name'])
 
    );
    $self->{use_distinct}=0;
    $self->{useMenuFullnameAsACL}=$self->Self;
    $self->setDefaultView(qw(contractnumber contractstate));
-   $self->setWorktable("SDB_DARWIN");
+   $self->setWorktable("SDB_DARWIN_wibcockpit");
    return($self);
 }
 
