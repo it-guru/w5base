@@ -91,7 +91,21 @@ sub new
                                     delmgr delmgrid
                                     businessteam businessteamid
                                     customer customerid 
-                                    customerprio criticality)])
+                                    customerprio criticality)]),
+
+      new kernel::Field::TimeSpans(
+                name          =>'mainusetimes',
+                htmlwidth     =>'150px',
+                depend        =>['isoncallservice'],
+                group         =>'mainusetimes',
+                label         =>'main use times',
+                container     =>'additional'),
+
+      new kernel::Field::Container(
+                name          =>'additional',
+                label         =>'Additionalinformations',
+                htmldetail    =>0,
+                dataobjattr   =>'appl.additionalchm')
    );
    $self->AddGroup("appldata",translation=>'itil::chmmgmt');
    $self->{history}=[qw(insert modify delete)];
@@ -150,20 +164,20 @@ sub isWriteValid
 
    return(undef) if (!defined($rec));
    if (!defined($rec->{chmgrteamid})){
-      return("default");
+      return("default","mainusetimes");
    }
    else{
       if ($self->IsMemberOf($rec->{mandatorid},
                             ["RCHManager","RCHManager2",
                              "RCFManager","RCFManager2"],"up")){
-         return("default");
+         return("default","mainusetimes");
       }
       if ($self->IsMemberOf($rec->{chmgrteamid},
                             ["RMember"],"up")){
-         return("default");
+         return("default","mainusetimes");
       }
       if ($self->IsMemberOf("admin")){
-         return(qw(default));
+         return(qw(default mainusetimes));
       }
    }
    return(undef);
