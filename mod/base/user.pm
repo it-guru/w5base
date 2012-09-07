@@ -48,7 +48,7 @@ sub new
                 name          =>'linenumber',
                 label         =>'No.'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Contact(
                 name          =>'fullname',
                 htmlwidth     =>'280',
                 group         =>'name',
@@ -80,6 +80,7 @@ sub new
                       }
                       return($d);
                    },
+                vjoinon       =>'userid',
                 label         =>'Fullname',
                 dataobjattr   =>'contact.fullname'),
 
@@ -875,7 +876,8 @@ sub getLastLogon
       my $ul=$self->getParent->getPersistentModuleObject("ul",
                                                          "base::userlogon");
       $ul->SetFilter({account=>\@accounts,
-                      logonbrowser=>'!SOAP::*'}); # exclude SOAP logons
+                      logonbrowser=>'!SOAP::* !curl/* !Jakarta*'}
+                     ); # exclude SOAP (and other automation) logons
       $ul->Limit(1);
       my ($ulrec,$msg)=$ul->getOnlyFirst(qw(logondate lang));
       if (defined($ulrec)){
