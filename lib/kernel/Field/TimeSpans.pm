@@ -42,11 +42,23 @@ sub Validate
    return({}) if (!exists($newrec->{$name}));
 
    my $newval=$newrec->{$name};
-   $newval=[$newval] if (!ref($newval) eq "ARRAY");
+   if (!ref($newval) && ($newval=~m/^0\(.*1\(.*2\(.*3\(.*4\(.*5\(.*6\(.*\)$/)){
+      my @deparse=();
+      while(my ($t,$v)=$newval=~m/^\+{0,1}(\d)\(([^\)]*?)\)/){
+         if ($t>=0 && $t<=6){
+            $deparse[$t]=$v;
+         }
+         $newval=~s/^\+{0,1}\d\([^\)]*?\)//;
+      }
+      $newval=\@deparse;
+
+   }
+   $newval=[$newval] if (ref($newval) ne "ARRAY");
    my $newstring="";
    for(my $day=0;$day<=$#{$newval};$day++){
       $newval->[$day]=~s/[\(\)\s\+]//g;
       my @times;
+      my @chk;
       foreach my $t (split(/[,;]/,$newval->[$day])){
          if ($t ne ""){
             my ($h1,$m1,$h2,$m2)=$t=~m/^(\d+):(\d+)-(\d+):(\d+)$/;
@@ -56,6 +68,22 @@ sub Validate
                $self->getParent->LastMsg(ERROR,$msg);
                return(undef);
             }
+            if (($h1*60+$m1>=$h2*60+$m2) ||
+                ($h1<0) || ($h1>23) || ($m1<0) || ($m1>59) ||
+                ($h2<0) || ($h2>23) || ($m2<0) || ($m2>59)){
+               my $msg=sprintf($app->T("range missmismatch '%s'"),$t);
+               $self->getParent->LastMsg(ERROR,$msg);
+               return(undef);
+            }
+            foreach my $c (@chk){
+               if (($c->[0]<$h1*60+$m1 && $c->[1]>$h1*60+$m1) ||
+                   ($c->[0]<$h2*60+$m2 && $c->[1]>$h2*60+$m2)){
+                  my $msg=sprintf($app->T("overlap range '%s'"),$t);
+                  $self->getParent->LastMsg(ERROR,$msg);
+                  return(undef);
+               }
+            }
+            push(@chk,[$h1*60+$m1,$h2*60+$m2]);
             push(@times,sprintf("%02d:%02d-%02d:%02d",$h1,$m1,$h2,$m2));
          }
       }

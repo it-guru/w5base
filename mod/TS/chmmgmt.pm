@@ -29,15 +29,15 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
 
-   $self->AddFields(
-      new kernel::Field::Boolean(
-                name          =>'cabrelevant',
-                group         =>'default',
-                label         =>'Change advisory board (CAB) relevant',
-                sqlorder      =>'desc',
-                dataobjattr   =>'appl.cabrelevant'),
-      insertafter=>'chmgrteam'
-   );
+#   $self->AddFields(
+#      new kernel::Field::Boolean(
+#                name          =>'cabrelevant',
+#                group         =>'default',
+#                label         =>'Change advisory board (CAB) relevant',
+#                sqlorder      =>'desc',
+#                dataobjattr   =>'appl.cabrelevant'),
+#      insertafter=>'chmgrteam'
+#   );
  
    return($self);
 }

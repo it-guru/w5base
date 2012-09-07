@@ -1099,3 +1099,5 @@ set FOREIGN_KEY_CHECKS=0;
 alter table system add FOREIGN KEY fk_vhostsystem (vhostsystem)
           REFERENCES system (id) ON DELETE RESTRICT;
 set FOREIGN_KEY_CHECKS=1;
+alter table appl add additionalchm longtext default NULL;
+alter table appl add additionalinm longtext default NULL;
