@@ -180,8 +180,8 @@ sub qcheckRecord
                        stateid=>'<20'});
       ($oldWf)=$wf->getOnlyFirst(qw(fullname grpid));
    }
-   printf STDERR ("fifi spocgrp=$spocgrp\n");
-   printf STDERR ("fifi oldWf=$oldWf\n");
+   #printf STDERR ("fifi spocgrp=$spocgrp\n");
+   #printf STDERR ("fifi oldWf=$oldWf\n");
 
    if ((!defined($spocgrp) || $n1 eq "") && defined($oldWf) ){
       # mark existing task as 25-obsolete
