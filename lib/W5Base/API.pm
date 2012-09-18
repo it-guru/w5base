@@ -452,7 +452,7 @@ sub XGetOptions
    }
    if (defined($param->{'verbose+'}) &&
        ref($param->{'verbose+'}) eq "SCALAR" &&
-       ${$param->{'verbose+'}}>0){
+       ${$param->{'verbose+'}}>1){
       $Main::VERBOSE=1;
       msg(INFO,"using parameters:");
       foreach my $p (sort(keys(%$param))){
