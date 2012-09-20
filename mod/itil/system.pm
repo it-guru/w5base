@@ -571,7 +571,8 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'assetid',
-                dataobjattr   =>"if (system.systemtype='vmware',vsystem.asset,system.asset)"),
+                #dataobjattr   =>"if (system.systemtype='vmware',vsystem.asset,system.asset)"), # funktioniert bei updates nicht!
+                dataobjattr   =>"system.asset"),
 
       new kernel::Field::Link(
                 name          =>'locationid',
