@@ -327,7 +327,7 @@ use Getopt::Long;
 use FindBin qw($RealScript);
 use Config;
 
-$VERSION = "0.7";
+$VERSION = "0.8";
 @ISA = qw(Exporter);
 @EXPORT = qw(&msg &ERROR &WARN &DEBUG &INFO $RealScript
              &XGetOptions
@@ -459,7 +459,12 @@ sub XGetOptions
          my $pname=$p;
          $pname=~s/=.*$//;
          $pname=~s/\+.*$//;
-         msg(INFO,sprintf("%8s = '%s'",$pname,${$param->{$p}}));
+         next if (($pname=~m/(pass|password)$/) &&
+                   ${$param->{'verbose+'}}<4);
+         my $ot=$param->{$p};
+         $ot=$$ot if (ref($ot) eq "SCALAR");
+         $ot=join(", ",@{$ot}) if (ref($ot) eq "ARRAY");
+         msg(INFO,sprintf("%8s = '%s'",$pname,$ot));
       }
       msg(INFO,"-----------------");
    }
