@@ -44,3 +44,4 @@
 'SYSCLASS.25'=>{de=>'STANDARDIZED SLICE',en=>'STANDARDIZED SLICE'},
 'SYSCLASS.30'=>{de=>'APPCOM',en=>'APPCOM'},
 'security flag'=>{de=>'Sicherheits-Flag'},
+'merged description of application usage'=>{de=>'Zusammengeführte Anwendungsverwendung'},

@@ -418,7 +418,8 @@ sub new
                 group         =>'applications',
                 vjointo       =>'tsacinv::lnkapplsystem',
                 vjoinon       =>['lportfolioitemid'=>'lchildid'],
-                vjoindisp     =>[qw(parent applid)]),
+                vjoindisp     =>[qw(parent applid)],
+                vjoininhash   =>['parent','applid','usage','comments']),
 
       new kernel::Field::Text(
                 name          =>'applicationnames',
@@ -492,6 +493,28 @@ sub new
                 group         =>'source',
                 label         =>'system installation date',
                 dataobjattr   =>'amportfolio.dtinvent'),
+
+      new kernel::Field::Textarea(
+                name          =>'merged_use_description',
+                label         =>'merged description of application usage',
+                depend        =>['applications'],
+                searchable    =>'0',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $app=$self->getParent();
+                   my $fo=$app->getField("applications",$current);
+                   my $d=$fo->RawValue($current);
+                   $d=[$d] if (ref($d) ne "ARRAY");
+                   my $out="";
+                   foreach my $rec (sort({$a->{parent}<=>$b->{parent}} @$d)){
+                      my $l="'$rec->{parent}' as $rec->{usage} system";
+                      $l.="\n$rec->{comments}" if ($rec->{comments} ne "");
+                      $out.="\n---\n"  if ($out ne "" && $l ne "");
+                      $out.=$l;
+                   }
+                   return($out);
+                }),
 
       new kernel::Field::Date(
                 name          =>'cdate',
