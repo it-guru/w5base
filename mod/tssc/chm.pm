@@ -85,12 +85,14 @@ sub new
                 name          =>'location',
                 label         =>'Location',
                 ignorecase    =>1,
-                dataobjattr   =>'cm3rm1.location_code'),
+                dataobjattr   =>'cm3rm1.change_shortname'), # scheint nicht 
+       #         dataobjattr   =>'cm3rm1.location_code'), # scheint nicht 
 
       new kernel::Field::Link(
                 name          =>'rawlocation',
                 label         =>'raw Location',
-                dataobjattr   =>'cm3rm1.location_code'),
+                dataobjattr   =>'cm3rm1.change_shortname'), # scheint nicht 
+       #         dataobjattr   =>'cm3rm1.location_code'),
 
       new kernel::Field::Text(
                 name          =>'softwareid',
