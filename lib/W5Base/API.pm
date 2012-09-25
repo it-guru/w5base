@@ -515,8 +515,13 @@ sub XLoadStoreFile
             if (exists($param->{$var})){
                if (!(${$param->{store}}) || $var eq "webuser=s" ||
                    $var eq "webpass=s"){
-                  if (!defined(${$param->{$var}})){
-                     ${$param->{$var}}=unpack("u*",$val);
+                  if (ref($param->{$var}) eq "SCALAR"){
+                     if (!defined(${$param->{$var}})){
+                        ${$param->{$var}}=unpack("u*",$val);
+                     }
+                  }
+                  if (ref($param->{$var}) eq "ARRAY"){
+                     push(@{$param->{$var}},unpack("u*",$val));
                   }
                }
             }
@@ -537,10 +542,17 @@ sub XSaveStoreFile
          next if ($p=~m/^verbose.*/);
          next if ($p=~m/^help$/);
          next if ($p=~m/^store$/);
-         if (defined(${$param->{$p}})){
+         if (ref($param->{$p}) eq "SCALAR"){
             my $pstring=pack("u*",${$param->{$p}});
             $pstring=~s/\n//g;
             printf F ("%s\t%s\n",$p,$pstring);
+         }
+         if (ref($param->{$p}) eq "ARRAY"){
+            foreach my $val (@{$param->{$p}}){
+               my $pstring=pack("u*",$val);
+               $pstring=~s/\n//g;
+               printf F ("%s\t%s\n",$p,$pstring);
+            }
          }
       }
       close(F);
