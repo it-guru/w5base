@@ -92,6 +92,7 @@
 'first information'=>{de=>'Erstinformation'},
 'follow info'=>{de=>'Folgemeldung'},
 'finish info'=>{de=>'Abschlussmeldung'},
+'technical finish info'=>{de=>'technische Abschlussmeldung'},
 'consequenceof'=>{de=>'der Workflow "%s" hat den aktuellen Workflow ausgelöst',en=>'the workflow "%s" is a consequence of the current workflow'},
 'REV.consequenceof'=>{de=>'der aktuelle Workflow hat den Workflow "%s" ausgelöst',en=>'the current workflow has triggered the workflow "%s"'},
 'info'=>{de=>'im Workflow "%s" finden sie weiterführende Informationen',en=>'you can find further informations in the "%s"'},

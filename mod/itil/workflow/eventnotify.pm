@@ -1376,8 +1376,11 @@ sub getNotifyCountLabel
    my $sendcustinfocount=shift;
 
    my $state="Ereignis";
-   if ($WfRec->{stateid} == 17){
+   if ($WfRec->{stateid} == 17 && $WfRec->{qceventendofevent} ne "" ){
      $state=$self->getParent->T("finish info",
+                                "itil::workflow::eventnotify");
+   }elsif ($WfRec->{stateid} == 17){
+     $state=$self->getParent->T("technical finish info",
                                 "itil::workflow::eventnotify");
    }elsif ($sendcustinfocount > 0){
      $state=$sendcustinfocount.". ".
