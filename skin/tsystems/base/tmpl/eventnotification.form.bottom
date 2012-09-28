@@ -1,17 +1,17 @@
-<table id=tabelle width="754" border="0" cellspacing="0" cellpadding="0">
-  <tr>
-    <td class=col1 nowrap align=left>
-  %emailbottom%
-    </td>
-  </tr>
+<table width=640 cellspacing=2 cellpadding=2 border=0>
+  <tr><td bgcolor=silver valign=top>&nbsp;</td></tr>
+  <tr><td valign=top><p style="font-size:10px">
+       Rot hinterlegte Kopfzeile=&gt;Ereignisklasse 1 oder 2; 
+       Grau hinterlegte Kopfzeile=&gt;Ereignisklasse 3,4 oder 5; 
+       Gelb hinterlegte Kopfzeile=&gt;Ereignis abgeschlosse (Gutmeldung);
+       Grün hinterlegte Kopfzeile=&gt;Qualitätsgesicherte Betriebsfreigabe;
+       Blau hinterlegte Kopfzeile=&gt;Ergebnis der Ursachenanalyse</td></tr>
+  <tr><td valign=top><p style="font-size:10px">
+       Red topline =&gt;event priority 1 or 2; 
+       grey topline =&gt;event priority 3, 4 or 5; 
+       yellow topline =&gt;event closed; 
+       green topline =&gt;quality checked recommissioning; 
+       blue topline=&gt;result of root cause analysis</td></tr>
 </table>
-<hr align=left width=754>
-<table id=tabelle2 width="754" border="0" cellspacing="0" cellpadding="0">
-  <tr>
-    <td class=col1 align=left><p style="font-size:10px">
-Rot hinterlegte Kopfzeile=>Ereignisklasse 1 oder 2; Gelb hinterlegte Kopfzeile=>Ereignisklasse 3,4 oder 5; Grün hinterlegte Kopfzeile=>Ereignis abgeschlosse (Gutmeldung); Blau hinterlegte Kopfzeile=>Ergebnis der Ursachenanalyse
-    </td>
-  </tr>
+</td></tr>
 </table>
-<hr align=left width=754>
-</form>

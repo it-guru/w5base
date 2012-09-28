@@ -22,6 +22,7 @@
 'Eventnotification'=>{de=>'Ereignismeldung'},
 'Impact for customer'=>{de=>'Auswirkungen für den Kunden'},
 'Event reason'=>{de=>'Ursachencluster'},
+'quality checked recommissioning'=>{de=>'qualitätsgesicherte Betriebsfreigabe'},
 'Event responsibility'=>{de=>'Verantwortung'},
 'specifice responsible at customer'=>{de=>'konkret verantwortlicher Bereich beim Kunden'},
 'specifice responsible at IT-Provider'=>{de=>'konkret verantwortlicher Bereich beim IT-Provider'},
@@ -29,7 +30,7 @@
 'Start'=>{de=>'Start'},
 'End'=>{de=>'Ende'},
 'Event Start'=>{de=>'Ereignisbeginn'},
-'Event End'=>{de=>'Ereignisende'},
+'Event End (technical)'=>{de=>'Ereignisende (technisch)'},
 'Event nature'=>{de=>'Ereignisart'},
 'EVn.info'=>{de=>'Allgemeine Information/Infomeldung',en=>'Info/Informational Message'},
 'EVn.performance'=>{de=>'Performance-Einbuße',en=>'Performance'},
@@ -182,4 +183,4 @@
 'missing specific responsible'=>{de=>'fehlender konkreter verantwortlicher Bereich'},
 'if customer is responsible, it is not allowed to set a specific IT-Provider'=>{de=>'Wenn der Kunde verantwortlich ist, dann darf kein konkreter IT-Provider angegeben sein'},
 'if customer is responsible, you need to set a specific customer'=>{de=>'Wenn der Kunde verantwortlich ist, muß dieser konkret angegeben werden'},
-
+"qc eventend can't be sooner as eventend"=>{de=>"Betriebsfreigabe kann nicht vor technisches Ereignisende sein"},

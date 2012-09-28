@@ -65,6 +65,18 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
+   my $qceventend=effVal($oldrec,$newrec,"qceventendofevent");
+   my $eventend=effVal($oldrec,$newrec,"eventendofevent");
+   my $eventstart=effVal($oldrec,$newrec,"eventstartofevent");
+   if ($qceventend ne "" && $eventend ne ""){
+      my $duration=CalcDateDuration($eventend,$qceventend);
+      if ($duration->{totalseconds}<0){
+         $self->LastMsg(ERROR,"qc eventend can't be sooner as eventend");
+         return(0);
+      }
+   }
+
+
    if (defined($oldrec) && $oldrec->{eventstatnature} ne "" &&
        exists($newrec->{eventstatnature}) &&
        $newrec->{eventstatnature} eq ""){
@@ -146,6 +158,15 @@ sub getDynamicFields
                 name          =>'eventendexpected',
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'eventnotifyshort',
+                htmldetail     =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   my $v=$self->RawValue($current);
+                   return(1) if ($v ne "");
+                   return(0);
+                },
                 label         =>'expected event end',
                 container     =>'headref'),
 
@@ -153,8 +174,15 @@ sub getDynamicFields
                 name          =>'eventendofevent',
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'eventnotifyshort',
-                label         =>'Event End',
+                label         =>'Event End (technical)',
                 alias         =>'eventend'),
+
+      new kernel::Field::Date(
+                name          =>'qceventendofevent',
+                translation   =>'itil::workflow::eventnotify',
+                group         =>'eventnotifyshort',
+                label         =>'quality checked recommissioning',
+                container     =>'headref'),
 
       new kernel::Field::KeyText( 
                 name          =>'affectedapplication',
@@ -1565,6 +1593,7 @@ sub generateMailSet
    }
    my @smsfields=qw(wffields.eventmode wffields.eventstatclass);
    my @baseset=qw(wffields.eventstartofevent wffields.eventendofevent
+                  wffields.qceventendofevent
                   wffields.eventstatclass);
    push(@baseset,qw(wffields.affectedregion));
    if ($WfRec->{eventmode} eq "EVk.appl"){
@@ -1630,7 +1659,7 @@ sub generateMailSet
                   elsif ($field=~m/(eventstartofevent)/){
                      $$smstext.=$self->T("Start").": ".$v."\n";
                   }
-                  elsif ($field=~m/(eventendofevent)/){
+                  elsif ($field=~m/^eventendofevent$/){
                      $$smstext.=$self->T("End").":  ".$v."\n";
                   }
                   elsif ($field=~m/(eventimpact)/){
@@ -3392,12 +3421,14 @@ sub Process
       my $utz=$self->getParent->getParent->UserTimezone();
       my $creationtime=$self->getParent->getParent->ExpandTimeExpression('now',
                                                                "de",$utz,$utz);
-      if ($eventstat==17){
+      if ($eventstat==17 && $WfRec->{qceventendofevent} ne ""){
          $failcolor="limegreen";
+      } elsif ($eventstat==17){
+         $failcolor="yellow";
       }elsif ($failclass==1 || $failclass==2){
          $failcolor="red";
       }elsif ($failclass==3 || $failclass==4 || $failclass==5){
-         $failcolor="yellow";
+         $failcolor="silver";
       }
       my $id=$WfRec->{id};
       my $app=$self->getParent->getParent();
@@ -3537,6 +3568,10 @@ EOF
 <td class=fname valign=top width=20%>%eventendofevent(label)%:</td>
 <td class=finput>%eventend(detail)%</td>
 </tr>
+<tr>
+<td class=fname valign=top width=20%>%qceventendofevent(label)%:</td>
+<td class=finput>%qceventendofevent(detail)%</td>
+</tr>
 <tr><td colspan=2>
 <div class=Question>
 $t
@@ -3664,6 +3699,9 @@ sub Process
       return(undef) if (!$self->ValidActionCheck(1,$actions,"wfclose"));
       my $h=$self->getWriteRequestHash("web",{class=>$self->getParent->Self});
       $h->{stateid}=21;
+      if ($WfRec->{qceventendofevent} eq ""){
+         $h->{qceventendofevent}=$WfRec->{eventendofevent};
+      }
       my $newstep=$self->getParent->getStepByShortname("wfclose",$WfRec);
       $h->{step}=$newstep;
       if ($self->getParent->StoreRecord($WfRec,$newstep,$h)){
