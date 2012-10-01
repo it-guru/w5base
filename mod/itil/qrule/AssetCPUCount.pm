@@ -9,6 +9,8 @@ defined on a phyiscal system in CI-Status "installed/active" or "available",
 this will produce an error.
 If the Core-Count is lower then the CPU-Count, this will also produce an
 error.
+A core count of more then 4096 and a cpucount of more then 1024 will be
+handled as not realistic.
 
 =head3 IMPORTS
 
@@ -60,13 +62,25 @@ sub qcheckRecord
    my $rec=shift;
 
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
+   my @msg;
    if ($rec->{cpucount}<=0){
       my $msg='no cpu count defined';
-      return(3,{qmsg=>[$msg],dataissue=>[$msg]});
+      push(@msg,$msg);
+   }
+   if ($rec->{cpucount}>1024){
+      my $msg='cpu count is not realistic';
+      push(@msg,$msg);
+   }
+   if ($rec->{corecount}>1024){
+      my $msg='core count is not realistic';
+      push(@msg,$msg);
    }
    if ($rec->{corecount}<$rec->{cpucount}){
       my $msg='core count is less then cpu count';
-      return(3,{qmsg=>[$msg],dataissue=>[$msg]});
+      push(@msg,$msg);
+   }
+   if ($#msg>=0){
+      return(3,{qmsg=>\@msg,dataissue=>\@msg});
    }
    return(0,undef);
 

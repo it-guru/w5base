@@ -2,3 +2,5 @@
                                 en=>'check CPU count of a phyisical system'},
 'no cpu count defined'=>{de=>'keine CPU Anzahl definiert'},
 'core count is less then cpu count'=>{de=>'Core-Anzahl ist geringer als die CPU-Anzahl'},
+'cpu count is not realistic'=>{de=>'CPU Anzahl ist nicht realistisch'},
+'core count is not realistic'=>{de=>'Core Anzahl ist nicht realistisch'},
