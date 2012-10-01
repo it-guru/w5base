@@ -692,7 +692,7 @@ sub getBackendName     # returns the name/function to place in select
       }
       return($self->{dataobjattr});
    }
-   if ($mode eq "order"){
+   elsif ($mode eq "order"){
       my $ordername=shift;
     
       if (defined($self->{dataobjattr}) && 
@@ -715,6 +715,9 @@ sub getBackendName     # returns the name/function to place in select
          return(undef) if (lc($self->{sqlorder}) eq "none");
          return($orderstring);
       }
+   }
+   else{
+      return($self->{dataobjattr});
    }
    return(undef);
 }

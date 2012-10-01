@@ -436,6 +436,7 @@ sub getSqlCount
 sub QuoteHashData
 {
    my $self=shift;
+   my $mode=shift;
    my $workdb=shift;
    my %param=@_;
    my $newdata=$param{current};
@@ -452,8 +453,9 @@ sub QuoteHashData
    #      exit(1);
    #      return(undef);
       }
-      if (defined($fobj->{dataobjattr})){
-         my $rawname=$fobj->{dataobjattr};
+      my $dataobjattr=$fobj->getBackendName($mode,$workdb);
+      if (defined($dataobjattr)){
+         my $rawname=$dataobjattr;
          $rawname=~s/^.*\.//;               # this is a test to make update
          if (!defined($newdata->{$field})){ # and insert statements shorter
             $raw{$rawname}="NULL";
@@ -497,7 +499,8 @@ sub UpdateRecord
       $self->LastMsg(ERROR,"can't updateRecord in $self - no workdb");
       return(undef);
    }
-   my %raw=$self->QuoteHashData($workdb,oldrec=>undef,current=>$newdata);
+   my %raw=$self->QuoteHashData("update",$workdb,
+                                oldrec=>undef,current=>$newdata);
    my $cmd;
    my $logcmd;
    {
@@ -662,7 +665,8 @@ sub InsertRecord
    else{
       $id=$newdata->{$idfield};
    }
-   my %raw=$self->QuoteHashData($workdb,oldrec=>undef,current=>$newdata);
+   my %raw=$self->QuoteHashData("insert",$workdb,oldrec=>undef,
+                                current=>$newdata);
    my $cmd;
    if ($self->{UseSqlReplace}==1){
 

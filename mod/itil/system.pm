@@ -569,10 +569,11 @@ sub new
                 parentobj     =>'itil::system',
                 group         =>'attachments'),
 
-      new kernel::Field::Link(
+      new itil::system::Asset::Link(
                 name          =>'assetid',
-                #dataobjattr   =>"if (system.systemtype='vmware',vsystem.asset,system.asset)"), # funktioniert bei updates nicht!
-                dataobjattr   =>"system.asset"),
+                dataobjattr   =>"if (system.systemtype='vmware',".
+                                "vsystem.asset,system.asset)", 
+                wrdataobjattr =>"system.asset"),
 
       new kernel::Field::Link(
                 name          =>'locationid',
@@ -1393,6 +1394,35 @@ sub getDetailBlockPriority
 
 
 #############################################################################
+
+package itil::system::Asset::Link;
+
+use strict;
+use vars qw(@ISA);
+@ISA    = qw(kernel::Field::Link);
+
+
+sub new
+{
+   my $type=shift;
+   my $self={@_};
+   $self=bless($type->SUPER::new(%$self),$type);
+   return($self);
+}
+
+sub getBackendName     # returns the name/function to place in select
+{
+   my $self=shift;
+   my $mode=shift;
+   my $db=shift;
+
+   return($self->{wrdataobjattr}) if ($mode eq "update" || $mode eq "insert");
+
+   return($self->SUPER::getBackendName($mode,$db));
+}
+
+
+
 
 
 
