@@ -524,37 +524,69 @@ sub preProcessFilter
          }
          $fobj->vjoinobj->SetNamedFilter("BASE",@{$base});
       }
-      my %flt=($searchfield=>$hflt->{$field});
 
       my @keylist=();
-      if ($fobj->vjoinobj->SetFilter(\%flt)){
-         if (defined($hflt->{$fobj->{vjoinon}->[0]}) &&
-             !defined($self->{dataobjattr})){
-            $fobj->vjoinobj->SetNamedFilter("vjoinadd".$field,
-                     {$fobj->{vjoinon}->[1]=>$hflt->{$fobj->{vjoinon}->[0]}});
+      if (exists($fobj->{vjoinreverse})){
+         my %flt=($searchfield=>$hflt->{$field});
+         my $localFld=$fobj->{vjoinreverse}->[0];
+         my $remoteFld=$fobj->{vjoinreverse}->[1];
+         $fobj->vjoinobj->ResetFilter();
+         if ($fobj->vjoinobj->SetFilter(\%flt)){
+            $fobj->vjoinobj->SetCurrentView($remoteFld);
+            delete($hflt->{$field});
+            my $d=$fobj->vjoinobj->getHashIndexed($remoteFld);
+            @keylist=keys(%{$d->{$remoteFld}});
+            if (($flt{$searchfield}=~m/\[LEER\]/) || 
+                ($flt{$searchfield}=~m/\[EMPTY\]/)){
+               push(@keylist,undef,"");
+            }
+            if ($#keylist==-1){
+               @keylist=(-99);
+            }
          }
-         $fobj->vjoinobj->SetCurrentView($fobj->{vjoinon}->[1]);
-         delete($hflt->{$field});
-         my $d=$fobj->vjoinobj->getHashIndexed($fobj->{vjoinon}->[1]);
-         @keylist=keys(%{$d->{$fobj->{vjoinon}->[1]}});
-         if (($flt{$searchfield}=~m/\[LEER\]/) || 
-             ($flt{$searchfield}=~m/\[EMPTY\]/)){
-            push(@keylist,undef,"");
-         }
-         if ($#keylist==-1){
+         else{
+            delete($hflt->{$field});
             @keylist=(-99);
+            $changed=1;
+         }
+         $hflt->{$localFld}=\@keylist;
+         if ($localFld ne $self->Name()){
+            $changed=1;
          }
       }
       else{
-         delete($hflt->{$field});
-         @keylist=(-99);
-         $changed=1;
+         my %flt=($searchfield=>$hflt->{$field});
+         my $localFld=$fobj->{vjoinon}->[0];
+         my $remoteFld=$fobj->{vjoinon}->[1];
+         if ($fobj->vjoinobj->SetFilter(\%flt)){
+            if (defined($hflt->{$localFld}) &&
+                !defined($self->{dataobjattr})){
+               $fobj->vjoinobj->SetNamedFilter("vjoinadd".$field,
+                      {$fobj->{vjoinon}->[1]=>$hflt->{$localFld}});
+            }
+            $fobj->vjoinobj->SetCurrentView($remoteFld);
+            delete($hflt->{$field});
+            my $d=$fobj->vjoinobj->getHashIndexed($remoteFld);
+            @keylist=keys(%{$d->{$remoteFld}});
+            if (($flt{$searchfield}=~m/\[LEER\]/) || 
+                ($flt{$searchfield}=~m/\[EMPTY\]/)){
+               push(@keylist,undef,"");
+            }
+            if ($#keylist==-1){
+               @keylist=(-99);
+            }
+         }
+         else{
+            delete($hflt->{$field});
+            @keylist=(-99);
+            $changed=1;
+         }
+         $hflt->{$localFld}=\@keylist;
+         if ($localFld ne $self->Name()){
+            $changed=1;
+         }
       }
 
-      $hflt->{$fobj->{vjoinon}->[0]}=\@keylist;
-      if ($fobj->{vjoinon}->[0] ne $self->Name()){
-         $changed=1;
-      }
    }
    return($changed,$err);
 }
@@ -592,7 +624,7 @@ sub prepUploadRecord   # prepair one record on upload
 }
 
 
-sub getSelectField     # returns the name/function to place in select
+sub getBackendName     # returns the name/function to place in select
 {
    my $self=shift;
    my $mode=shift;

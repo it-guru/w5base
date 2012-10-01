@@ -33,7 +33,7 @@ sub new
    return($self);
 }
 
-#sub getSelectField     # returns the name/function to place in select
+#sub getBackendName     # returns the name/function to place in select
 #{
 #   my $self=shift;
 #   my $mode=shift;
@@ -41,7 +41,7 @@ sub new
 #   if ($mode eq "select"){
 #      return("__raw_container_.".$self->{dataobjattr});
 #   }
-#   return($self->SUPER::getSelectField($mode,$db));
+#   return($self->SUPER::getBackendName($mode,$db));
 #}
 
 

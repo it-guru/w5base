@@ -1,6 +1,6 @@
-package kernel::DataObj::LDAP;
+package kernel::DataObj::SOAPuCMDB;
 #  W5Base Framework
-#  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2012  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,14 +16,14 @@ package kernel::DataObj::LDAP;
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+use lib('/opt/uCMDB/perl-api');
 use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::DataObj;
-use kernel::ldapdriver;
 use Time::HiRes qw(gettimeofday tv_interval);
 use Text::ParseWords;
-use Data::Dumper;
+use WebService::uCMDB;
 use UNIVERSAL;
 @ISA    = qw(kernel::DataObj UNIVERSAL);
 
@@ -35,21 +35,64 @@ sub new
    return($self);
 }
 
-sub AddDirectory
+sub AddSoapPartner
 {
    my $self=shift;
-   my $db=shift;
-   my $obj=shift;
+   my $partnername=shift;
+   my $ucmdbobject=shift;
+   my $debug=0;
 
-   my ($dbh,$msg)=$obj->Connect();
-   if (!$dbh){
-      if ($msg ne ""){
+   return($self->{SOAP}) if (defined($self->{SOAP}));
+
+   my %p=();
+
+   $p{WEBSERVICEUSER}=$self->Config->Param('WEBSERVICEUSER');
+   $p{WEBSERVICEPASS}=$self->Config->Param('WEBSERVICEPASS');
+   $p{WEBSERVICEPROXY}=$self->Config->Param('WEBSERVICEPROXY');
+
+
+   foreach my $v (qw(WEBSERVICEUSER WEBSERVICEPASS WEBSERVICEPROXY)){
+      if (ref($p{$v}) ne "HASH" || !defined($p{$v}->{$partnername}) ||
+          $p{$v}->{$partnername} eq ""){
+         my $msg="missing essential config parameter $v for $partnername";
          return("InitERROR",$msg);
       }
-      return("InitERROR",msg(ERROR,"can't connect to database '%s'",$db));
+      $p{$v}=$p{$v}->{$partnername};
    }
-   $self->{$db}=$obj;
-   return($dbh);
+   my $px=$p{WEBSERVICEPROXY};
+
+   my ($proto,$host,$port,$path,$loginuser,$loginpass);
+   if (my ($p1,$p2,$p3,$p4)=$px=~m#^([a-z]+)://([^:]+):(\d+)(/.*)$#){
+      $proto=$p1;
+      $host=$p2;
+      $port=$p3;
+      $path=$p4;
+   }
+   $loginuser=$p{WEBSERVICEUSER};
+   $loginpass=$p{WEBSERVICEPASS};
+
+   if (0){
+      msg(ERROR,"SOAPuCMDB - Adapter");
+      msg(ERROR,"SOAPuCMDB : user='$loginuser'");
+      msg(ERROR,"SOAPuCMDB : pass='$loginpass'");
+      msg(ERROR,"SOAPuCMDB : proto = $proto");
+      msg(ERROR,"SOAPuCMDB : host  = $host ");
+      msg(ERROR,"SOAPuCMDB : port  = $port ");
+      msg(ERROR,"SOAPuCMDB : path  = $path ");
+   }
+   $self->{SOAP}=new WebService::uCMDB::Adapter(
+
+      debug=>$debug, user=>$loginuser, password=>$loginpass,
+      application=>"W5Base($ENV{REMOTE_USER})",
+
+      host=>$host, port=>$port, proto=>$proto
+   );
+   if (!defined($self->{SOAP})){
+      my $msg="can not create SOAP endpoint";
+      return("InitERROR",$msg);
+   }
+   $self->{uCMDBobject}=$ucmdbobject;
+   return($self->{SOAP});
 }  
 
 sub getSqlFields
@@ -115,127 +158,40 @@ sub getSqlFields
 
 
 
-sub getSqlFrom
-{
-   my $self=shift;
-   my ($worktable,$workdb)=$self->getBase();
-   return($worktable);
-}
 
-sub getSqlOrder
-{
-   my $self=shift;
-   my ($worktable,$workdb)=$self->getBase();
-   my @order;
-   my @view=$self->getCurrentView();
 
-   foreach my $fieldname (@view){
-      my $field=$self->getField($fieldname);
-      if (defined($field->{dataobjattr})){
-         push(@order,$field->{dataobjattr});
-      }
-   }
-   return(join(",",@order));
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-
-   return("");
-}
-
-sub getFinalLdapFilter
+sub getFinalSOAPFilter
 {
    my $self=shift;
    my @filter=@_;
-#   my $where=$self->initSqlWhere();
-   my $where="";
 
-   sub dbQuote
-   {
-      return("NULL") if (!defined($_[0]));
-      return("'".$_[0]."'");
-   }
+   my %where;
 
-   sub AddOrList
+   sub addToWhere
    {
+      my $self=shift;
+      my $name=shift;
+      my $data=shift;
       my $where=shift;
-      my $fieldobject=shift;
-      my $sqlfield=shift;
-      my $param=shift;
-      my @list=@_;
+      my %param=@_;
 
-      sub MakeLikeList
-      {
-         my $sqlfield=shift;
-         my $fo=shift;
-         my $sub="";
-         foreach my $subval (@_){
-            my @vallist=$fo->prepareToSearch($subval);
-            foreach my $val (@vallist){
-               $sub.="($sqlfield=$val)";
-            }
-            if ($#vallist>0){
-              $sub="(|$sub)";
-            }
-         }
-         return($sub);
-      }
-      if ($#list==-1){
-         $$where="($$where) and " if ($$where ne "");
-         $$where.="(1=0)";
-         return($where);
-      }
-      if ($param->{wildcards}){
-         my $sub="";
-         my @orlist=();
-         my @norlist=();
-         foreach my $val (@list){
-            if ($val=~m/^!/){
-               $val=~s/^!//;
-               push(@norlist,$val);
-            }
-            else{
-               push(@orlist,$val);
-            }
-         }
-         my $orlist=MakeLikeList($sqlfield,$fieldobject,@orlist);
-         my $norlist=MakeLikeList($sqlfield,$fieldobject,@norlist);
-         #msg(INFO,"orlist =$orlist");
-         #msg(INFO,"norlist=$norlist");
-         if ($orlist ne "" || $norlist ne ""){ 
-            my $notempty=0;
-            $notempty=1 if ($$where ne "");
-            $$where="(& ".$$where if ($notempty);
-            $$where.=$orlist  if ($orlist ne "");
-            $$where.="  )" if ($notempty);
-         }
-      }
-      elsif($param->{onlyextprocessing}){
-         my $orlist=MakeLikeList($sqlfield,$fieldobject,join(" ",@list));
-         $$where.=" and " if ($$where ne "");
-         if ($orlist ne ""){
-            $$where.=$orlist;
-         }
-         else{
-            $$where.="2=3";
-         }
+      if (ref($data) eq "ARRAY"){
+
       }
       else{
-         
-         my $fname=$fieldobject->Name();
-         foreach my $q (@list){
-            $q=$q;
-            $$where.="($sqlfield=$q)";
-         }
+         $data=~s/\*/%/g;
       }
-      #msg(INFO,"AddOrList=$$where");
+      if ($data=~m/^".*"$/){
+         $data=~s/^"//;
+         $data=~s/"$//;
+      }
+
+      $where->{$name}=$data;
    }
 
    foreach my $filter (@filter){
-      #msg(INFO,"getSqlWhere: interpret $filter in object $self");
-      #msg(INFO,"getSqlWhere: interpret %s",Dumper($filter));
+      #printf STDERR ("getFinalSOAPFilter: interpret $filter in object $self\n");
+      #printf STDERR ("getFinalSOAPFilter: interpret %s\n",Dumper($filter));
       my @subflt=$filter;
       @subflt=@$filter if (ref($filter) eq "ARRAY");
       foreach my $filter (@subflt){
@@ -253,18 +209,13 @@ sub getFinalLdapFilter
                #msg(INFO,"getFinalLdapFilter: process field '$field' ".
                #         "dataobjattr=$dataobjattr");
                if (ref($filter->{$field}) eq "ARRAY"){
-                  AddOrList(\$subwhere,$fo,$dataobjattr,{wildcards=>0},
-                            @{$filter->{$field}});
-                  # fix processing - no wildcards
+                  $self->addToWhere($dataobjattr,$filter->{$field},\%where);
                }
                elsif (ref($filter->{$field}) eq "SCALAR"){
-                  AddOrList(\$subwhere,$fo,$dataobjattr,{wildcards=>0},
-                            ${$filter->{$field}});
+                  $self->addToWhere($dataobjattr,$filter->{$field},\%where);
                }
                elsif ($fo->Type()=~m/^.{0,1}Date$/){
-                  AddOrList(\$subwhere,$fo,$dataobjattr,{wildcards=>0,
-                                                 onlyextprocessing=>1},
-                            $filter->{$field});
+                  $self->addToWhere($dataobjattr,$filter->{$field},\%where);
                }
                elsif (ref($filter->{$field}) eq "HASH"){
                   # spezial processing - not implemented at this time
@@ -272,29 +223,27 @@ sub getFinalLdapFilter
                             "for '$field'");
                }
                elsif (!defined($filter->{$field})){
-                  AddOrList(\$subwhere,$fo,$dataobjattr,{wildcards=>0},undef);
+                  $self->addToWhere($dataobjattr,$filter->{$field},\%where);
                }
                else{
-                  # scalar processing - lists an wildcards
-                  my @words=parse_line(',{0,1}\s+',0,$filter->{$field});
-                  AddOrList(\$subwhere,$fo,$dataobjattr,{wildcards=>1},@words);
+                  $self->addToWhere($dataobjattr,$filter->{$field},\%where);
+                 # # scalar processing - lists an wildcards
+                 # my @words=parse_line(',{0,1}\s+',0,$filter->{$field});
+                 # AddOrList(\$subwhere,$fo,$dataobjattr,{wildcards=>1},@words);
                }
             }
          }
-         # printf STDERR ("SUBDUMP:$subwhere\n");
-         $where="(|".$where.$subwhere.")" if ($subwhere ne "");
-     
       }
    } 
-   #printf STDERR ("DUMP:$where\n");
-   return($where);
+   printf STDERR ("fifi SUBDUMP where: %s\n",Dumper(\%where));
+   return(\%where);
 }
 
-sub getLdapFilter
+sub getSOAPFilter
 {
    my $self=shift;
 
-   my $where=$self->getFinalLdapFilter($self->getFilterSet());
+   my $where=$self->getFinalSOAPFilter($self->getFilterSet());
    return($where);
 }
 
@@ -349,8 +298,9 @@ sub tieRec
    foreach my $fname (@{$view}){
       my $fobj=$self->getField($fname);
       next if (!defined($fobj));
-      if (exists($fobj->{dataobjattr}) && exists($rec->{$fobj->{dataobjattr}})){
-         $trrec->{$fname}=$rec->{$fobj->{dataobjattr}};
+      if (exists($fobj->{dataobjattr}) && 
+          exists($rec->{attr}->{$fobj->{dataobjattr}})){
+         $trrec->{$fname}=$rec->{attr}->{$fobj->{dataobjattr}};
       }
       if (defined($fobj->{depend})){
          if (ref($fobj->{depend}) ne "ARRAY"){
@@ -359,7 +309,7 @@ sub tieRec
          foreach my $field (@{$fobj->{depend}}){
             my $dfobj=$self->getField($field);
             if (defined($dfobj->{dataobjattr})){
-               $trrec->{$field}=$rec->{$dfobj->{dataobjattr}};
+               $trrec->{$field}=$rec->{attr}->{$dfobj->{dataobjattr}};
             }
          }
       }
@@ -368,7 +318,7 @@ sub tieRec
 
 
 
-   tie(%rec,'kernel::DataObj::LDAP::rec',$self,$trrec,$view);
+   tie(%rec,'kernel::DataObj::SOAPuCMDB::rec',$self,$trrec,$view);
    return(\%rec);
    return(undef);
    
@@ -378,12 +328,17 @@ sub Rows
 {
     my $self=shift;
 
-    if (defined($self->{LDAP})){
-       return($self->{LDAP}->rows());
-    }
     return(undef);
 }
 
+
+sub finish
+{
+   my $self=shift;
+
+   $self->{currentSet}=undef;
+   return(1);
+}
 
 sub getOnlyFirst
 {
@@ -396,7 +351,7 @@ sub getOnlyFirst
    $self->SetCurrentView(@view);
    $self->Limit(1,1);
    my @res=$self->getFirst();
-   $self->{LDAP}->finish();
+   $self->finish();
    return(@res);
 }
 
@@ -406,8 +361,8 @@ sub getFirst
    my @fieldlist=$self->getFieldList();
    my @attr=();
 
-   if (!defined($self->{LDAP})){
-      return(undef,msg(ERROR,"no LDAP connection"));
+   if (!defined($self->{SOAP})){
+      return(undef,msg(ERROR,"no SOAP connection"));
    }
 #   my @sqlcmd=($self->getLdapFilter());
    my $baselimit=$self->Limit();
@@ -456,49 +411,63 @@ sub getFirst
       }
    }
 
+   my $soapfilter=$self->getSOAPFilter();
 
-   my $ldapfilter=$self->getLdapFilter();
-   my $base=$self->getBase;
-   my ($sth,$mesg)=$self->{LDAP}->execute(filter=>latin1($ldapfilter)->utf8,
-                                          base=>$base,
-                                          attrs=>\@attr);
+   printf STDERR ("call getFilteredCIs at object '%s'\n",$self->{uCMDBobject});
+   printf STDERR ("     attr: %s\n",join(",",@attr));
+   printf STDERR ("     flt: %s\n",Dumper($soapfilter));
+
+   my $uCMDBobject=$self->{uCMDBobject};
+   if (!exists($soapfilter->{__LinkedToID}) &&
+       ref($uCMDBobject) eq "ARRAY"){
+      $uCMDBobject=$uCMDBobject->[0];
+
+   }
+
+
+   my $sth=$self->{SOAP}->getFilteredCIs($uCMDBobject,\@attr,$soapfilter);
    my $t=tv_interval($t0,[gettimeofday()]);
    my $p=$self->Self();
    my $msg=sprintf("time=%0.4fsec;mod=$p",$t);
    $msg.=";user=$ENV{REMOTE_USER}" if ($ENV{REMOTE_USER} ne "");
-   msg(INFO,"LDAP Time of=%s attrs=%s base=\"%s\" ($msg)",
-            $ldapfilter,join(",",@attr),$base);
-   if ($sth){
+   msg(INFO,"uCMDB SOAP call Time attrs=%s ($msg)",
+            join(",",@attr));
+   if ($sth->success() && ($self->{currentSet}=$sth->result())){
+      $self->{currentRecord}=undef;
       if ($self->{_LimitStart}>0){
          for(my $c=0;$c<$self->{_LimitStart}-1;$c++){
-            my ($temprec,$error)=$self->{LDAP}->fetchrow();
+            my $temprec=$self->{currentSet}->();
             last if (!defined($temprec));
          }
       }
-      my ($temprec,$error)=$self->{LDAP}->fetchrow();
+      my $temprec=$self->{currentSet}->();
       if ($temprec){
          $temprec=$self->tieRec($temprec);
       }
       return($temprec);
+
    }
-   else{
-      return($sth,$mesg);
-   }
+   return(undef,"ERROR - not found");
+
 }
 
 sub getNext
 {
    my $self=shift;
 
-   if (defined($self->Context->{CurrentLimit})){
-      $self->Context->{CurrentLimit}--;
-      if ($self->Context->{CurrentLimit}<=0){
-         while(my $temprec=$self->{LDAP}->fetchrow()){
-         }
-         return(undef,"Limit reached");
-      }
-   }
-   my $temprec=$self->{LDAP}->fetchrow();
+   #
+   # dafür werd ich vermutlich ein anderen Paging-Verfahren benötigen,
+   # da die Satzanzahl nicht ermittelt werden kann.
+
+#   if (defined($self->Context->{CurrentLimit})){
+#      $self->Context->{CurrentLimit}--;
+#      if ($self->Context->{CurrentLimit}<=0){
+#         while(my $temprec=$self->{currentSet}->()){
+#         }
+#         return(undef,"Limit reached");
+#      }
+#   }
+   my $temprec=$self->{currentSet}->();
    if ($temprec){
       $temprec=$self->tieRec($temprec);
    }
@@ -514,25 +483,11 @@ sub ResolvFieldValue
    return($current->{$name});
 }
 
-sub setBase
-{
-   my $self=shift;
-   $self->{Base}=$_[0];
-   delete($self->{WorkDIR});
-   $self->{WorkDIR}=$_[1] if (defined($self->{WorkDIR}));
-   return($self->{Base},$self->{WorkDIR});
-}
-
-sub getBase
-{
-   my $self=shift;
-   return($self->{Base});
-}
 
 
 
 
-package kernel::DataObj::LDAP::rec;
+package kernel::DataObj::SOAPuCMDB::rec;
 use strict;
 use kernel::Universal;
 use vars qw(@ISA);

@@ -56,7 +56,7 @@ sub Validate
    return({});
 }
 
-sub getSelectField
+sub getBackendName
 {
    my $self=shift;
    my $mode=shift;
@@ -75,7 +75,7 @@ sub getSelectField
 #         };
 #      }
 #   }
-   return($self->SUPER::getSelectField($mode,$db));
+   return($self->SUPER::getBackendName($mode,$db));
 }
 
 

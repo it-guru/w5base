@@ -185,7 +185,7 @@ sub FormatedResult
    return($d);
 }
 
-sub getSelectField
+sub getBackendName
 {
    my $self=shift;
    my $mode=shift;

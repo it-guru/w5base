@@ -121,7 +121,7 @@ sub getSqlFields
       my $field=$self->getField($fieldname);
       next if (!defined($field));
       next if (!$field->selectable());
-      my $selectfield=$field->getSelectField("select",$self->{DB});
+      my $selectfield=$field->getBackendName("select",$self->{DB});
       if ($field->Type() eq "Container"){
          $fieldname="___raw_container___$fieldname";
       }
@@ -142,7 +142,7 @@ sub getSqlFields
             die("vjoinon not corret in field $field->{name}");
          }
          if (!grep(/^$joinon$/,@view)){
-            my $selectfield=$joinonfield->getSelectField("select",$self->{DB});
+            my $selectfield=$joinonfield->getBackendName("select",$self->{DB});
             if (defined($selectfield)){
                $selectfield.=" ".$joinon;
                if (!grep(/^$selectfield$/,@flist)){
@@ -188,7 +188,7 @@ sub getSqlOrder
    if (!($#o==0 && uc($o[0]) eq "NONE")){
       if ($#o==-1 || ($#o==0 && $o[0] eq "")){
          foreach my $field (@view){
-            my $orderstring=$field->getSelectField("order",$self->{DB});
+            my $orderstring=$field->getBackendName("order",$self->{DB});
             next if (!defined($orderstring));
             push(@order,$orderstring);
          }
@@ -200,7 +200,7 @@ sub getSqlOrder
             $fieldname=~s/^[+-]//;
             my $field=$self->getField($fieldname);
             next if (!defined($field));
-            my $orderstring=$field->getSelectField("order",$self->{DB},$ofield);
+            my $orderstring=$field->getBackendName("order",$self->{DB},$ofield);
             next if (!defined($orderstring));
             push(@order,$orderstring);
          }
@@ -268,7 +268,7 @@ sub processFilterHash
             $sqlparam{ignorecase}=1;
          }
          $sqlparam{sqldbh}=$self->{DB};
-         my $sqlfieldname=$fo->getSelectField("where.$wheremode",$self->{DB});
+         my $sqlfieldname=$fo->getBackendName("where.$wheremode",$self->{DB});
          if ($wheremode eq "update" || $wheremode eq "delete"){
             $sqlfieldname=~s/^.*\.//; # test to make update/delete shorter
          }
