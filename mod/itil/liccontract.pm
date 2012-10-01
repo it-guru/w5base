@@ -154,6 +154,7 @@ sub new
                 value         =>[
                                  'logicalSystem',
                                  'logicalCPU',
+                                 'physicalCPU',
                                  'concurrentUser',
                                  'namedUser',
                                  'project',
