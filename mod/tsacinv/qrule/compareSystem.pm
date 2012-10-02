@@ -27,6 +27,9 @@ is set to "yes", some aditional Imports are posible:
 
 - "AC Assignmentgroup" is imported to comments field in W5Base
 
+If the system type is vmware, the AssetID from AssetManager will NOT
+be imported.
+
 =cut
 #######################################################################
 
@@ -130,24 +133,28 @@ sub qcheckRecord
          }
          #################################################################### 
          # assetid compare 
-         if ($parrec->{assetassetid} ne ""){
-            $self->IfaceCompare($dataobj,
-                                $rec,"asset",
-                                $parrec,"assetassetid",
-                                $forcedupd,$wfrequest,
-                                \@qmsg,\@dataissue,\$errorlevel,
-                                mode=>'leftouterlinkcreate',
-                                onCreate=>{
-                                  comments=>
+         if ($rec->{systemtype} ne "vmware"){
+            if ($parrec->{assetassetid} ne ""){
+               $self->IfaceCompare($dataobj,
+                                   $rec,"asset",
+                                   $parrec,"assetassetid",
+                                   $forcedupd,$wfrequest,
+                                   \@qmsg,\@dataissue,\$errorlevel,
+                                   mode=>'leftouterlinkcreate',
+                                   onCreate=>{
+                                     comments=>
                                          "automaticly create by QualityCheck",
-                                  cistatusid=>4,
-                                  allowifupdate=>1,
-                                  mandatorid=>$rec->{mandatorid},
-                                  name=>$parrec->{assetassetid},
-                                  databossid=>$rec->{databossid}}
-                                );
+                                     cistatusid=>4,
+                                     allowifupdate=>1,
+                                     mandatorid=>$rec->{mandatorid},
+                                     name=>$parrec->{assetassetid},
+                                     databossid=>$rec->{databossid}}
+                                   );
+            }
          }
-
+         else{  # special VM Host-system handling - vhostsystem needs to sync
+          
+         }
          #################################################################### 
 
          if (defined($parrec->{systemname})){
