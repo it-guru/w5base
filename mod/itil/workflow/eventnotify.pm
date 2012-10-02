@@ -3397,16 +3397,21 @@ sub Process
             $ht=$sendcustinfocount.". ".$self->T($subjectlabel,
                                              'itil::workflow::eventnotify');
          }
-         if ($WfRec->{eventendofevent} ne ""){ 
-            $subjectlabel="finish info";
-            $ht=$self->T($subjectlabel,'itil::workflow::eventnotify');
+
+         if ($WfRec->{stateid} == 17 && $WfRec->{qceventendofevent} ne "" ){
+                  $subjectlabel="finish info";
+                  $ht=$self->T($subjectlabel,'itil::workflow::eventnotify');
+         }elsif ($WfRec->{stateid} == 17){
+                  $subjectlabel="technical finish info";
+                  $ht=$self->T($subjectlabel,'itil::workflow::eventnotify');
          }
+ 
          delete($ENV{HTTP_FORCE_LANGUAGE});
          $headtext{"headtextPAGE".$cl}=$ht;
       }
-#   elsif ($variname eq "HEADCOLOR"){
-#      my $val=$self->findtemplvar("referenz_failend");
-#      my $failclass=$self->findtemplvar("referenz_failclass"); 
+ #   elsif ($variname eq "HEADCOLOR"){
+ #      my $val=$self->findtemplvar("referenz_failend");
+ #      my $failclass=$self->findtemplvar("referenz_failclass"); 
 #      if ($val ne ""){
 #         return("green");
 #      }
@@ -3426,12 +3431,12 @@ sub Process
                                                                "de",$utz,$utz);
       if ($eventstat==17 && $WfRec->{qceventendofevent} ne ""){
          $failcolor="limegreen";
+      }elsif ($failclass==3 || $failclass==4 || $failclass==5){
+         $failcolor="silver";
       } elsif ($eventstat==17){
          $failcolor="yellow";
       }elsif ($failclass==1 || $failclass==2){
          $failcolor="red";
-      }elsif ($failclass==3 || $failclass==4 || $failclass==5){
-         $failcolor="silver";
       }
       my $id=$WfRec->{id};
       my $app=$self->getParent->getParent();
