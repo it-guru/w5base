@@ -239,6 +239,14 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.asset.core",
+                      "itil::assetphyscore",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.asset.cpu",
+                      "itil::assetphyscpu",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.asset.lnkassetcontact",
                       "itil::lnkassetcontact",
                       defaultacl=>['valid_user']);
