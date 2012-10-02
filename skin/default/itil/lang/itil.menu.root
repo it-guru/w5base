@@ -44,6 +44,8 @@
 'itil.system.signedfilesystem'=>{de=>'signierte Datei',en=>'signed file'},
 'itil.asset'=>{de=>'Hardware',en=>'Hardware'},
 'itil.asset.new'=>{de=>'Neueingabe',en=>'New'},
+'itil.asset.core'=>{de=>'phys. Core',en=>'phys. Core'},
+'itil.asset.cpu'=>{de=>'phys. CPU',en=>'phys. CPU'},
 'itil.asset.lnkassetcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
 'itil.liccontract'=>{de=>'Lizenzvertrag',en=>'License Contract'},
 'itil.liccontract.new'=>{de=>'Neueingabe',en=>'New'},
