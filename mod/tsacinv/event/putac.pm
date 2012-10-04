@@ -582,7 +582,7 @@ sub ApplicationModified
                                    Technical_Contact=>$idno{tsm},
                                    DataSupervisor=>$idno{databoss},
                                    Service_Manager=>$idno{sem},
-                                   Deputy_Technical_Contact=>$posix{tsm2},
+                                   Deputy_Technical_Contact=>$idno{tsm2},
                                    Lead_Del_manager=>$idno{opm},
                                    Del_manager=>$idno{delmgr},
                                    Deputy_Del_manager=>$idno{opm2},
