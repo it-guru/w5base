@@ -113,6 +113,15 @@ sub Init
                       "itil::lnkapplinteranswer",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itil.appl.bs",
+                      "itil::businessservice",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itil.appl.bs.new",
+                      "itil::businessservice",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itil.itclust",
                       "itil::itclust",
                       defaultacl=>['valid_user']);
@@ -234,6 +243,14 @@ sub Init
    $self->RegisterObj("itil.asset.new",
                       "itil::asset",
                       func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itil.asset.core",
+                      "itil::assetphyscore",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itil.asset.cpu",
+                      "itil::assetphyscpu",
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("itil.asset.lnkassetcontact",

@@ -143,6 +143,15 @@ sub Init
                       "itil::lnkapplinteranswer",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.appl.bs",
+                      "itil::businessservice",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.appl.bs.new",
+                      "itil::businessservice",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.itclust",
                       "AL_TCom::itclust",
                       defaultacl=>['valid_user']);

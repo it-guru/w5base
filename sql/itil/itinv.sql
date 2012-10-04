@@ -1101,3 +1101,43 @@ alter table system add FOREIGN KEY fk_vhostsystem (vhostsystem)
 set FOREIGN_KEY_CHECKS=1;
 alter table appl add additionalchm longtext default NULL;
 alter table appl add additionalinm longtext default NULL;
+create table assetphyscore (
+  id         bigint(20) NOT NULL,
+  coreid     int(4) NOT NULL,
+  asset      bigint(20) NOT NULL,
+  cpu        bigint(20) default NULL,
+  PRIMARY KEY  (id),
+  FOREIGN KEY fk_asset (asset)
+              REFERENCES asset (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+create table assetphyscpu (
+  id         bigint(20) NOT NULL,
+  cpuid      int(4) NOT NULL,
+  asset      bigint(20) NOT NULL,
+  PRIMARY KEY  (id),
+  FOREIGN KEY fk_asset (asset)
+              REFERENCES asset (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+create table businessservice (
+  id          bigint(20)  NOT NULL,
+  name        varchar(128) default NULL,
+  appl        bigint(20) NOT NULL,
+  cistatus    int(2)      NOT NULL, funcmgr bigint(20) default NULL,
+  description longtext     default NULL,
+  comments    longtext     default NULL,
+  additional  longtext     default NULL,
+  createdate  datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate  datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser  bigint(20) NOT NULL default '0',
+  modifyuser  bigint(20) NOT NULL default '0',
+  editor      varchar(100) NOT NULL default '',
+  realeditor  varchar(100) NOT NULL default '',
+  srcsys      varchar(100) default 'w5base',
+  srcid       varchar(20) default NULL,
+  srcload     datetime    default NULL,
+  PRIMARY KEY  (id),
+  UNIQUE KEY name (appl,name),KEY(name),
+  UNIQUE KEY `srcsys` (srcsys,srcid),
+  FOREIGN KEY fk_appl (appl)
+              REFERENCES appl (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
