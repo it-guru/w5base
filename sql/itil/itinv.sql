@@ -1141,3 +1141,4 @@ create table businessservice (
   FOREIGN KEY fk_appl (appl)
               REFERENCES appl (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+alter table appl add applmgr bigint(20) default NULL, add applowner bigint(20) default NULL;
