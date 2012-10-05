@@ -235,6 +235,7 @@ sub new
                 forwardSearch =>1,
                 vjointo       =>'itil::lnksoftwaresystem',
                 vjoinon       =>['id'=>'systemid'],
+                vjoinbase     =>{softwarecistatusid=>"<=5"},
                 vjoindisp     =>['software','version','quantity','comments'],
                 vjoininhash   =>['softwarecistatusid','liccontractcistatusid',
                                  'liccontractid',
