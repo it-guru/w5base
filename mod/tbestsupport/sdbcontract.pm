@@ -37,7 +37,7 @@ sub new
                 sqlorder      =>'desc',
                 label         =>'ID',
                 htmldetail    =>0,
-                dataobjattr   =>"ltrim(cast(sdb_supportobjekt_id AS varchar(10))+'\@'+vertragsnummer)"),
+                dataobjattr   =>"ID"),
 
       new kernel::Field::Link(
                 name          =>'sdbapplid',
