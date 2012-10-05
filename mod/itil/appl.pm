@@ -411,6 +411,34 @@ sub new
                 htmleditwidth =>'100px',
                 dataobjattr   =>'appl.criticality'),
 
+      new kernel::Field::Contact(
+                name          =>'applowner',
+                vjoineditbase =>{'cistatusid'=>[3,4,5],
+                                 'usertyp'=>[qw(extern user)]},
+                AllowEmpty    =>1,
+                group         =>'customer',
+                label         =>'Application Owner',
+                vjoinon       =>'applownerid'),
+
+      new kernel::Field::Link(
+                name          =>'applownerid',
+                group         =>'customer',
+                dataobjattr   =>'appl.applowner'),
+
+      new kernel::Field::Contact(
+                name          =>'applmgr',
+                vjoineditbase =>{'cistatusid'=>[3,4,5],
+                                 'usertyp'=>[qw(extern user)]},
+                AllowEmpty    =>1,
+                group         =>'customer',
+                label         =>'Application Manager',
+                vjoinon       =>'applmgrid'),
+
+      new kernel::Field::Link(
+                name          =>'applmgrid',
+                group         =>'customer',
+                dataobjattr   =>'appl.applmgr'),
+
       new kernel::Field::Text(
                 name          =>'itnormodel',
                 group         =>'customer',

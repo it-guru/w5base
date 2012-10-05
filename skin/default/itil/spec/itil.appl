@@ -51,3 +51,22 @@ muss etwa wie folgt aussehen:
 server:/pfada/pfadeb
 http://server/pfada/pfadeb
 https://server:port/pfade'},
+'applowner'=>{de=>'
+Der Application-Owner ist der
+Repräsentant des Hauptnutzungsbereiches
+einer Anwendung. Er hat die 
+Budgetverantwortung und verantwortet
+alle fachlichen Anforderungen und
+Nutzungsszenarien einer Anwendung.
+',en=>'
+'},
+'applmgr'=>{de=>'
+Der Application-Manager ist u.a.
+verantwortlich für die operative
+realisation von fachlichen
+Anforderungen, die Informationssicherheit,
+und die operative Budgetplanung. Er
+verantwortet weiterhin die Steuerung
+und das Monitoring der Leistungserbringung.
+',en=>'
+'},

@@ -30,7 +30,7 @@
 'fieldgroup.opmode'=>{de=>'Betriebsparameter',en=>'Operationalparameters'},
 'fieldgroup.technical'=>{de=>'Technische Verantwortung',en=>'technical'},
 'fieldgroup.delmgmt'=>{de=>'Delivery',en=>'delivery'},
-'fieldgroup.customer'=>{de=>'Kunde',en=>'Customer'},
+'fieldgroup.customer'=>{de=>'Kunde/Auftraggeber',en=>'Customer'},
 'fieldgroup.phonenumbers'=>{de=>'Rufnummernverzeichnis',en=>'Phonenumbers'},
 'fieldgroup.accountnumbers'=>{de=>'Account Nummern',en=>'Account numbers'},
 'fieldgroup.workflowbasedata'=>{de=>'Workflow Basis-Daten',en=>'Workflow Base-Data'},
