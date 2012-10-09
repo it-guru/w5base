@@ -4,7 +4,7 @@
 'Application'=>{de=>'Anwendung'},
 'provided by application'=>{de=>'zur Verfügung gestellt durch Anwendung'},
 'Application CI-State'=>{de=>'Anwendungs CI-Status'},
-'functional manager'=>{de=>'funktionell Verantwortlicher'},
+'functional manager'=>{de=>'funktionell/fachlich Verantwortlicher'},
 'no write access to specified application'=>{de=>'kein Schreibzugriff auf die angegebene Anwendung'},
 'invalid service name specified'=>{de=>'ungültiger Business-Service Name'},
 'WELCOME'=>{de=>'

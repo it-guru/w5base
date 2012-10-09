@@ -81,15 +81,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'application',
-                htmldetail    =>sub{
-                   my $self=shift;
-                   my $mode=shift;
-                   my %param=@_;
-                   my $current=$param{current};
-
-                   return(1) if (defined($current));
-                   return(0);
-                },
+                htmldetail    =>0,
                 readonly      =>sub{
                    my $self=shift;
                    my $current=shift;
@@ -128,6 +120,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'applcistatus',
+                htmldetail    =>0,
                 group         =>'applinfo',
                 label         =>'Application CI-State',
                 vjointo       =>'base::cistatus',
