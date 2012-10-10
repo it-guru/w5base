@@ -78,7 +78,7 @@ sub FormatedDetail
             $r.="<td class=containerfname $descwidth valign=top>$k</td>"; 
             my $dk=$d->{$k};
             $dk=[$dk] if (ref($dk) ne "ARRAY");
-            my $dd=join(", ",@{$dk});
+            my $dd=quoteHtml(join(", ",@{$dk}));
             $dd="&nbsp;" if ($dd=~m/^\s*$/);
             #$dd=~s/\n/<br>\n/g;
             if ($dd=~m/\n/ || $dd=~m/\S{40}/){

@@ -216,7 +216,7 @@ sub mkProblemStoreRec
                                                 "en","CET");
    $wfrec{openuser}=undef;
    $wfrec{openusername}=undef;
-   if ($rec->{creator} ne ""){
+   if ($rec->{creator}=~m/^[a-z0-9_-]{1,8}$/i){
       $wfrec{openusername}="wiw/".lc($rec->{creator});
       $self->{user}->SetFilter({posix=>\$rec->{creator}});
       my $userid=$self->{user}->getVal("userid");
@@ -945,6 +945,7 @@ sub mkIncidentStoreRec
       ServiceCenterInitialAssignment=>$rec->{iassignment},
       ServiceCenterResolvedAssignment=>$rec->{rassignment},
       ServiceCenterSysModTime=>$rec->{sysmodtime},
+      ServiceCenterReportedBy=>$rec->{reportedby},
       ServiceCenterInvolvedAssignment=>$rec->{involvedassignment},
       ServiceCenterSoftwareID=>$rec->{softwareid},
       ServiceCenterDowntimeStart=>$rec->{downtimestart},
@@ -974,7 +975,7 @@ sub mkIncidentStoreRec
 
    $wfrec{openuser}=undef;
    $wfrec{openusername}=undef;
-   if ($rec->{reportedby} ne ""){
+   if ($rec->{reportedby}=~m/^[a-z0-9_-]{1,8}$/i){
       $wfrec{openusername}="wiw/".lc($rec->{reportedby});
       $self->{user}->SetFilter({posix=>\$rec->{reportedby}});
       my $userid=$self->{user}->getVal("userid");
