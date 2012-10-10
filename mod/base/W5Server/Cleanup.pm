@@ -39,9 +39,21 @@ sub process
       if ((defined($nextrun) && $nextrun<=time()) || $self->{doForceCleanup}){
          $self->{doForceCleanup}=0;
          if (!$ro){
+            my $joblog=getModuleObject($self->getParent->Config,"base::joblog");
+            my %jobrec=(name=>"Cleanup.pm",event=>"Cleanup.pm W5Server Start",
+                        pid=>$$);
+            my $jobid=$joblog->ValidatedInsertRecord(\%jobrec);
+
             $self->doCleanup();
             $self->CleanupWorkflows();
             $self->CleanupHistory();
+            if ($jobid ne ""){
+               $joblog->ValidatedUpdateRecord({id=>$jobid},
+                                             {exitcode=>"0",
+                                              exitmsg=>"done",
+                                              exitstate=>"OK"},
+                                             {id=>\$jobid});
+            }
          }
        #  $self->CleanupInlineAttachments(); tests are needed !!!
          sleep(1);
