@@ -3615,6 +3615,10 @@ sub Process
             return(0);
          }
       }
+      if ($h->{eventend} eq "" &&
+          $h->{qceventendofevent} ne ""){
+         $h->{eventend}=$h->{qceventendofevent};
+      }
       if ($h->{eventend} ne ""){
          my $dur=CalcDateDuration($h->{eventstart},
                                   $h->{eventend});
