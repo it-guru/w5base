@@ -1,5 +1,6 @@
 'itil::businessservice'=>{de=>'Business-Service',en=>'Business-Service'},
 'fieldgroup.applinfo'=>{de=>'Applikationsdaten',en=>'Application informations'},
+'fieldgroup.desc'=>{de=>'Beschreibung',en=>'Description'},
 'Business-Service Fullname'=>{de=>'vollqualifizierter Business-Service'},
 'Application'=>{de=>'Anwendung'},
 'provided by application'=>{de=>'zur Verfügung gestellt durch Anwendung'},
@@ -7,6 +8,7 @@
 'functional manager'=>{de=>'funktionell/fachlich Verantwortlicher'},
 'no write access to specified application'=>{de=>'kein Schreibzugriff auf die angegebene Anwendung'},
 'invalid service name specified'=>{de=>'ungültiger Business-Service Name'},
+'Business Service Description'=>{de=>'Beschreibung des Business-Service'},
 'WELCOME'=>{de=>'
 Ein Business-Service ist ein Dienst (oder auch fachliches
 Thema, den eine Anwendung bereitstellt. Mehrere 

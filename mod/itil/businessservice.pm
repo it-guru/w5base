@@ -147,6 +147,7 @@ sub new
                                                   
       new kernel::Field::Mandator( 
                 readonly      =>1,
+                htmldetail    =>0,
                 group         =>'applinfo'),
 
       new kernel::Field::Interface(
@@ -154,6 +155,12 @@ sub new
                 group         =>'applinfo',
                 readonly      =>1,
                 dataobjattr   =>'appl.mandator'),
+
+      new kernel::Field::Textarea(
+                name          =>'description',
+                group         =>'desc',
+                label         =>'Business Service Description',
+                dataobjattr   =>"$worktable.description"),
 
       new kernel::Field::Link(
                 name          =>'databossid',
@@ -166,6 +173,44 @@ sub new
       new kernel::Field::Link(
                 name          =>'responseteamid',
                 dataobjattr   =>'appl.responseteam'),
+
+      new kernel::Field::CDate(
+                name          =>'cdate',
+                group         =>'source',
+                sqlorder      =>'desc',
+                label         =>'Creation-Date',
+                dataobjattr   =>"$worktable.createdate"),
+
+      new kernel::Field::MDate(
+                name          =>'mdate',
+                group         =>'source',
+                sqlorder      =>'desc',
+                label         =>'Modification-Date',
+                dataobjattr   =>"$worktable.modifydate"),
+
+      new kernel::Field::Creator(
+                name          =>'creator',
+                group         =>'source',
+                label         =>'Creator',
+                dataobjattr   =>"$worktable.createuser"),
+
+      new kernel::Field::Owner(
+                name          =>'owner',
+                group         =>'source',
+                label         =>'Owner',
+                dataobjattr   =>"$worktable.modifyuser"),
+
+      new kernel::Field::Editor(
+                name          =>'editor',
+                group         =>'source',
+                label         =>'Editor',
+                dataobjattr   =>"$worktable.editor"),
+
+      new kernel::Field::RealEditor(
+                name          =>'realeditor',
+                group         =>'source',
+                label         =>'RealEditor',
+                dataobjattr   =>"$worktable.realeditor"),
 
       new kernel::Field::Link(
                 name          =>'sectarget',
@@ -187,6 +232,15 @@ sub new
    return($self);
 }
 
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   return(
+          qw(header default applinfo desc source));
+}
+
+
+
 
 
 
@@ -197,7 +251,10 @@ sub preProcessReadedRecord
 
    if (!defined($rec->{id}) && $rec->{parentid} ne ""){
       my $o=$self->Clone();
+      my $oldcontext=$W5V2::OperationContext;
+      $W5V2::OperationContext="QualityCheck";
       my ($id)=$o->ValidatedInsertRecord({applid=>$rec->{parentid}});
+      $W5V2::OperationContext=$oldcontext;
       $rec->{id}=$id;
    }
    return(undef);
