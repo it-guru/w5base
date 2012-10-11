@@ -407,11 +407,16 @@ sub nativQualityCheck
       # cleanup deprecated DataIssues for current object
       #
       $wf->ResetFilter();
-      $wf->SetFilter({stateid=>"<20",class=>\"base::workflow::DataIssue",
+      my $cleanupfilter={stateid=>"<20",class=>\"base::workflow::DataIssue",
                       srcload=>"<\"$checkStart GMT\"",
                       directlnktype=>[$affectedobject,
                                       $dataobj->SelfAsParentObject()],
-                      directlnkid=>\$affectedobjectid});
+                      directlnkid=>\$affectedobjectid};
+      if (!keys(%alldataissuemsg)){       # ensure that all open workflows
+         delete($cleanupfilter->{srcload})# are closed, if currently no open
+      }                                   # messages
+
+      $wf->SetFilter($cleanupfilter);
       $wf->SetCurrentView(qw(ALL));
       $wf->ForeachFilteredRecord(sub{
                          $wf->Store($_,{stateid=>'21',
