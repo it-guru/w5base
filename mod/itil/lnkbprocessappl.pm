@@ -194,7 +194,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'applcistatusid',
-                label         =>'SystemCiStatusID',
+                label         =>'ApplCiStatusID',
                 dataobjattr   =>'appl.cistatus'),
                                                    
       new kernel::Field::Link(
