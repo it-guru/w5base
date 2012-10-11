@@ -6,6 +6,7 @@
 'you are only authorized to add in \'order\' or \'reserved\' state'=>{de=>'Sie sind nur berechtig, im Status \'angefordert\' oder \'reserviert\' Datensätze zu erzeugen'},
 'Customer'=>{de=>'Kunde'},
 'Duration Start'=>{de=>'Laufzeitbegin'},
+'Contruct Coordinator'=>{de=>'Vertragskoordinator'},
 'Duration End'=>{de=>'Laufzeitende'},
 'Contract Number'=>{de=>'Vertragsnummer'},
 'Contract Name'=>{de=>'Vertragbezeichnung'},

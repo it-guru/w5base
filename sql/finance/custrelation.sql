@@ -60,3 +60,4 @@ set FOREIGN_KEY_CHECKS=0;
 alter table custcontract add FOREIGN KEY fk_custcontract_databoss (databoss)
           REFERENCES contact (userid) ON DELETE RESTRICT;
 set FOREIGN_KEY_CHECKS=1;
+alter table custcontract add contractcoord bigint(20) default NULL;

@@ -95,16 +95,26 @@ sub new
                 name          =>'customerid',
                 dataobjattr   =>'custcontract.customer'),
 
-      new kernel::Field::TextDrop(
-                name          =>'databoss',
-                label         =>'Databoss',
-                vjointo       =>'base::user',
-                vjoinon       =>['databossid'=>'userid'],
-                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Databoss(),
 
       new kernel::Field::Link(
                 name          =>'databossid',
                 dataobjattr   =>'custcontract.databoss'),
+
+
+      new kernel::Field::Contact(
+                name          =>'contructcoord',
+                vjoineditbase =>{'cistatusid'=>[3,4,5],
+                                 'usertyp'=>[qw(extern user)]},
+                label         =>'Contruct Coordinator',
+                vjoinon       =>'contructcoordid'),
+
+      new kernel::Field::Link(
+                name          =>'contructcoordid',
+                dataobjattr   =>'custcontract.contractcoord'),
+
+
 
       new kernel::Field::Date(
                 name          =>'durationstart',
@@ -425,6 +435,16 @@ sub Validate
          }
       }
    }
+   if (exists($newrec->{conumber}) && $newrec->{conumber} ne ""){
+      if (!$self->finance::costcenter::ValidateCONumber("conumber",
+          $oldrec,$newrec)){
+         $self->LastMsg(ERROR,
+             $self->T("invalid number format '\%s' specified",
+                      "finance::costcenter"),$newrec->{conumber});
+         return(0);
+      }
+   }
+
    my $durationstart=trim(effVal($oldrec,$newrec,"durationstart"));
    if ((!defined($oldrec) || exists($newrec->{durationstart})) &&
        $durationstart eq ""){
