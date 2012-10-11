@@ -520,7 +520,8 @@ sub XLoadStoreFile
                         ${$param->{$var}}=unpack("u*",$val);
                      }
                   }
-                  if (ref($param->{$var}) eq "ARRAY"){
+                  if (ref($param->{$var}) eq "ARRAY" &&
+                      $#{$param->{$var}}==-1){
                      push(@{$param->{$var}},unpack("u*",$val));
                   }
                }
