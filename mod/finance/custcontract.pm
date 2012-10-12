@@ -309,6 +309,7 @@ sub new
                 noselect      =>'1',
                 dataobjattr   =>'lnkcontact.croles'),
 
+      new kernel::Field::IssueState(),
       new kernel::Field::QualityText(),
       new kernel::Field::QualityState(),
       new kernel::Field::QualityOk(),
