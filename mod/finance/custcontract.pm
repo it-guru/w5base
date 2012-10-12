@@ -44,12 +44,6 @@ sub new
                 label         =>'W5BaseID',
                 dataobjattr   =>'custcontract.id'),
                                                   
-      new kernel::Field::Mandator(),
-
-      new kernel::Field::Link(
-                name          =>'mandatorid',
-                dataobjattr   =>'custcontract.mandator'),
-
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Contract Number',
@@ -59,6 +53,12 @@ sub new
                 name          =>'fullname',
                 label         =>'Contract Name',
                 dataobjattr   =>'custcontract.fullname'),
+
+      new kernel::Field::Mandator(),
+
+      new kernel::Field::Link(
+                name          =>'mandatorid',
+                dataobjattr   =>'custcontract.mandator'),
 
       new kernel::Field::Text(
                 name          =>'conumber',
