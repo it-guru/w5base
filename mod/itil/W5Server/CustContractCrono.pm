@@ -83,6 +83,7 @@ sub doCrono
    my $out=getModuleObject($self->Config,"itil::custcontractcrono");
    my $in=getModuleObject($self->Config,"itil::custcontract");
    my $sys=getModuleObject($self->Config,"itil::lnkapplsystem");
+   my $swi=getModuleObject($self->Config,"itil::swinstance");
    $in->SetFilter({cistatusid=>\'4'});
 
    $in->SetCurrentView(qw(name fullname id applications));
@@ -110,17 +111,36 @@ sub doCrono
             }
             $add{activeLogicalSystemCount}=$syscount;
             $add{activeLogicalCPUCount}=$logicalcpucount;
-            $out->ValidatedInsertOrUpdateRecord({
-                  custcontractid=>$rec->{id},
-                  name=>$rec->{name},
-                  fullname=>$rec->{fullname},
-                  applications=>join(", ",sort(keys(%appl))),
-                  month=>$m,
-                  additional=>\%add
-                  },{
-                  custcontractid=>\$rec->{id},
-                  month=>\$m
-            });
+
+            $swi->ResetFilter();
+            $swi->SetFilter({applid=>[keys(%applid)],
+                             cistatusid=>\'4'});
+            my $swinstancecount=0;
+            my $dbcount=0;
+            foreach my $irec ($swi->getHashList(qw(id swnature))){
+               $swinstancecount++;
+               if ($irec->{nature}=~
+                   m/(mysql|mssql|oracle db|informix|postgres)/i){
+                  $dbcount++;
+               }
+            }
+            $add{totalActiveInstances}=$swinstancecount;
+            $add{activeDatabaseInstances}=$dbcount;
+
+            my $reportkeyfilter={custcontractid=>\$rec->{id},month=>\$m};
+            if (keys(%applid)<=0){
+               $out->BulkDeleteRecord($reportkeyfilter); 
+            }
+            else{
+               $out->ValidatedInsertOrUpdateRecord({
+                     custcontractid=>$rec->{id},
+                     name=>$rec->{name},
+                     fullname=>$rec->{fullname},
+                     applications=>join(", ",sort(keys(%appl))),
+                     month=>$m,
+                     additional=>\%add
+                     },$reportkeyfilter);
+            }
          }
          ($rec,$msg)=$in->getNext();
       } until(!defined($rec));
