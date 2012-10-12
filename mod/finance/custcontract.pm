@@ -142,15 +142,11 @@ sub new
                 value         =>[qw(0 1 2 3 6 12 18 24 36)],
                 dataobjattr   =>'custcontract.cancelperiod'),
 
-
-      new kernel::Field::TextDrop(
+      new kernel::Field::Group(
                 name          =>'responseteam',
                 group         =>'sem',
-                htmlwidth     =>'300px',
                 label         =>'CBM Team',
-                vjointo       =>'base::grp',
-                vjoinon       =>['responseteamid'=>'grpid'],
-                vjoindisp     =>'fullname'),
+                vjoinon       =>'responseteamid'),
 
       new kernel::Field::Link(
                 name          =>'responseteamid',
