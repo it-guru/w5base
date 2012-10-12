@@ -115,15 +115,19 @@ sub getSqlFields
    }
    foreach my $fullfieldname (@view){
       my ($container,$fieldname)=(undef,$fullfieldname);
+      my $field;
       if ($fullfieldname=~m/^\S+\.\S+$/){
          ($container,$fieldname)=split(/\./,$fullfieldname);
+         $field=$self->getField($container);
       }
-      my $field=$self->getField($fieldname);
+      else{
+         $field=$self->getField($fieldname);
+      }
       next if (!defined($field));
       next if (!$field->selectable());
       my $selectfield=$field->getBackendName("select",$self->{DB});
       if ($field->Type() eq "Container"){
-         $fieldname="___raw_container___$fieldname";
+         $fieldname=$field->Name();
       }
       if (defined($selectfield)){
          push(@flist,"$selectfield $fieldname");
