@@ -397,6 +397,7 @@ sub Validate
                              align=>['any'=>[]],
                              width=>['any'=>[]],
                              alt=>['any'=>[]],
+                             '/'=>['/'],
                              height=>['any'=>[]],
                              class=>['any'=>[]]},
                        a=>{href=>['any'=>[]],
