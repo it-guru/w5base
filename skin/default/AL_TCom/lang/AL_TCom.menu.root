@@ -2,7 +2,7 @@
 'AL_TCom.custcontract'=>{de=>'Kundenvertrag',en=>'CustomerContract'},
 'AL_TCom.custcontract.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.custcontract.lnkappl'=>{de=>'Verkn. Anwendung',en=>'Link Application'},
-'AL_TCom.custcontract.lnkappl.new'=>{de=>'Neueingabe',en=>'New'},
+'AL_TCom.custcontract.crono'=>{de=>'Vertrags-Chronologie',en=>'Contruct-Chronology'},
 'AL_TCom.appl'=>{de=>'Anwendung',en=>'Application'},
 'AL_TCom.appl.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.appl.lnkcustcontract'=>{de=>'Verkn. Kundenvertrag',en=>'Link Cust. Contract'},

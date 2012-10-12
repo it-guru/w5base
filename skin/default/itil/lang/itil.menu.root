@@ -1,6 +1,7 @@
 'itil'=>{de=>'IT-Inventar',en=>'IT-Invetory'},
 'itil.custcontract'=>{de=>'Kundenvertrag',en=>'CustomerContract'},
 'itil.custcontract.new'=>{de=>'Neueingabe',en=>'New'},
+'itil.custcontract.crono'=>{de=>'Vertrags-Chronologie',en=>'Contruct-Chronology'},
 'itil.custcontract.lnkappl'=>{de=>'Verkn. Anwendung',en=>'Link Application'},
 'itil.custcontract.lnkappl.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.appl'=>{de=>'Anwendung',en=>'Application'},

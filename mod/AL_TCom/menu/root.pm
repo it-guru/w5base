@@ -74,6 +74,10 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.custcontract.crono",
+                      "itil::custcontractcrono",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.custcontract.lnkappl",
                       "itil::lnkapplcustcontract",
                       defaultacl=>['admin']);

@@ -1,0 +1,5 @@
+'itil::custcontractcrono'=>{de=>'Kundenvertrags-Chronologie',en=>'Cusomtercontract-Chronology'},
+'Contructnumber'=>{de=>'Vertragsnummer'},
+'Contract Name'=>{de=>'Vertragsbezeichnung'},
+'active Applications'=>{de=>'aktive Anwendungen'},
+'Month'=>{de=>'Monat'},
