@@ -173,12 +173,9 @@ sub fields
    my $name=$self->Name();
    my @fl;
    if (defined($param{current})){
-      if (defined($param{current}->{$name})){
-         if (ref($param{current}->{$name}) ne "HASH"){
-            my %h=Datafield2Hash($param{current}->{$name});
-            $param{current}->{$name}=\%h;
-         }
-         foreach my $k (keys(%{$param{current}->{$name}})){
+      my $d=$self->RawValue($param{current});
+      if ($d && ref($d) eq "HASH"){
+         foreach my $k (keys(%{$d})){
             push(@fl, new kernel::Field::Text(
                               name       =>$k,
                               label      =>$k,
