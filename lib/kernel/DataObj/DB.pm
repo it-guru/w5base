@@ -127,7 +127,7 @@ sub getSqlFields
       next if (!$field->selectable());
       my $selectfield=$field->getBackendName("select",$self->{DB});
       if ($field->Type() eq "Container"){
-         $fieldname=$field->Name();
+         $fieldname="___raw_container___".$field->Name();
       }
       if (defined($selectfield)){
          push(@flist,"$selectfield $fieldname");
