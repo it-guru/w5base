@@ -97,7 +97,7 @@ sub preProcessFilter
             $cmd.=" use index(".join(",",@useindex).")";
          }
          my $subcmd="$cmd where $where";
-         msg(INFO,"key searchcmd or=%s",$subcmd);
+         #msg(INFO,"key searchcmd or=%s",$subcmd);
          foreach my $rec ($db->getHashList($subcmd)){
             $res{$rec->{id}}++;
          }
