@@ -160,7 +160,7 @@ sub new
 
       new kernel::Field::FileList(
                 name          =>'attachments',
-                parentobj     =>'finance::itclust',
+                parentobj     =>'itil::itclust',
                 label         =>'Attachments',
                 group         =>'attachments'),
 
