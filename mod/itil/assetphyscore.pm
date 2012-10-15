@@ -70,15 +70,54 @@ sub new
       new kernel::Field::Text(
                 name          =>'asset',
                 readonly      =>1,
-                uploadable    =>1,
+                uploadable    =>0,
                 label         =>'Asset',
-                weblinkto     =>'itil::appl',
+                weblinkto     =>'itil::asset',
                 weblinkon     =>['parentid'=>'id'],
                 dataobjattr   =>'asset.name'),
+
+      new kernel::Field::Select(
+                name          =>'assetcistatus',
+                readonly      =>1,
+                uploadable    =>0,
+                htmleditwidth =>'40%',
+                label         =>'Asset CI-State',
+                vjoineditbase =>{id=>">0"},
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['assetcistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'assetcistatusid',
+                readonly      =>1,
+                uploadable    =>0,
+                label         =>'Asset CI-StateID',
+                dataobjattr   =>'asset.cistatus'),
+
+
    );
    $self->setDefaultView(qw(asset coreid id));
    return($self);
 }
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_assetcistatus"))){
+     Query->Param("search_assetcistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
+sub initSqlWhere
+{
+   my $self=shift;
+   my $mode=shift;
+   my $where="(asset.corecount is not null AND asset.corecount>0)";
+   return($where);
+}
+
+
 
 
 

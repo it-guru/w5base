@@ -1,1 +1,2 @@
 'itil::assetphyscore'=>{de=>'phys. Core - Rechenkern',en=>'physical Core'},
+'Asset CI-State'=>{de=>'Asset CI-Status'},
