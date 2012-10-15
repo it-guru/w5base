@@ -284,7 +284,7 @@ sub new
                 AllowEmpty    =>1,
                 vjointo       =>'itil::system',
                 vjoineditbase =>{'cistatusid'=>"<=5",
-                                 'systemtype'=>'standard'},
+                                 'systemtype'=>['standard','',undef]},
                 vjoinon       =>['vhostsystemid'=>'id'],
                 vjoindisp     =>'name'),
 

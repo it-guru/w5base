@@ -10,3 +10,4 @@
 'different values stored in AssetManager'=>{de=>'in AssetManager sind andere Inhalte gespeichert'},
 'systemname with whitespace in AssetManager - contact oss to fix this!'=>{de=>'Systemname mit Leerzeichen in AssetManager - kontaktieren Sie OSS um dies zu korrigieren!'},
 'systemname from AssetManager is already in use by an other system - contact OSS make the systemname unique!'=>{de=>'Systemname aus AssetManager ist bereits von einem anderen System in Verwendung - kontaktieren Sie OSS damit ein eindeutiger Systemname vergeben wird!'},
+'can not find needed vm host system in IT-Inventar'=>{de=>'notwendiges VM-Host-System in IT-Inventar nicht auffindbar'},

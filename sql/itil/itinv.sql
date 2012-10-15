@@ -424,7 +424,7 @@ create table lnkinstance (
 );
 alter table appl add is_soxcontroll   bool default '0';
 alter table appl add is_applwithnosys bool default '0';
-alter table system add systemtype varchar(20) default 'STANDARD',add key(systemtype);
+alter table system add systemtype varchar(20) default 'standard',add key(systemtype);
 alter table asset add room varchar(20) default '';
 alter table ipaddress add unique ipchk(name,uniqueflag,network);
 alter table ipaddress add comments     longtext    default NULL;

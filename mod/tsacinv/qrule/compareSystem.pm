@@ -133,6 +133,7 @@ sub qcheckRecord
          }
          #################################################################### 
          # assetid compare 
+printf STDERR ("fifi assetcheck \n");
          if ($rec->{systemtype} ne "vmware"){
             if ($parrec->{assetassetid} ne ""){
                $self->IfaceCompare($dataobj,
@@ -153,7 +154,50 @@ sub qcheckRecord
             }
          }
          else{  # special VM Host-system handling - vhostsystem needs to sync
-          
+            my $assetid=$parrec->{assetassetid};
+            if ($assetid ne ""){
+               my $sys=$dataobj->ModuleObject("tsacinv::system");
+               $sys->SetFilter({assetassetid=>\$assetid,
+                                'status'=>\'in operation',
+                                usage=>'"*KONSOLSYSTEM VMWARE"'});
+               my @l=$sys->getHashList(qw(systemname systemid));
+               if ($#l!=0){
+                  push(@qmsg,'can not find a related '.
+                             'VMWARE KONSOLSYSTEM in AssetManager');
+                  $errorlevel=3 if ($errorlevel<3);
+               }
+               else{
+                  my $hostsystemsystemid=$l[0]->{systemid};
+                  my $o=getModuleObject($self->getParent->Config(),
+                                        "itil::system");
+                  $o->SetFilter({systemid=>\$hostsystemsystemid});
+                  my @h=$o->getHashList(qw(name));
+                  if ($#h<0){
+                     push(@qmsg,'can not find needed '.
+                                'vm host system in IT-Inventar: '.
+                                $l[0]->{systemname}." ".
+                                'SystemID: '.$l[0]->{systemid});
+                     $errorlevel=3 if ($errorlevel<3);
+                  }
+                  if ($#h==0){
+                     $parrec->{vhostsystem}=$h[0]->{name};
+                  }
+                  
+
+
+
+
+                  print Dumper(\@h);
+               }
+               print STDERR Dumper(\@l);      
+ 
+            }
+            $self->IfaceCompare($dataobj,
+                                $rec,"vhostsystem",
+                                $parrec,"vhostsystem",
+                                $forcedupd,$wfrequest,
+                                \@qmsg,\@dataissue,\$errorlevel,
+                                mode=>'string');
          }
          #################################################################### 
 
@@ -350,9 +394,11 @@ sub qcheckRecord
          }
       }
       else{
-         push(@qmsg,'no assetid specified');
-         push(@dataissue,'no assetid specified');
-         $errorlevel=3 if ($errorlevel<3);
+         if ($#qmsg==-1 && keys(%$forcedupd)==0){ # this makes only sense, if
+            push(@qmsg,'no assetid specified');  # this rule have no other 
+            push(@dataissue,'no assetid specified'); # error messages and there
+            $errorlevel=3 if ($errorlevel<3);    # are no updates in the pipe
+         }
       }
    }
    else{
