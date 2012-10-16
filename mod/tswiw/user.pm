@@ -169,6 +169,12 @@ sub new
                                    label      =>'tOuID',
                                    dataobjattr=>'tOuID'),
 
+      new kernel::Field::Boolean(  name       =>'isVSNFD',
+                                   group      =>'status',
+                                   label      =>'is VS-NfD instructed',
+                                   dataobjattr=>'tVsNfd'),
+
+
    );
    $self->setDefaultView(qw(id uid surname givenname email));
    return($self);
