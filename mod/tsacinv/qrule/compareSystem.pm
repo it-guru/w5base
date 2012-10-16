@@ -133,7 +133,6 @@ sub qcheckRecord
          }
          #################################################################### 
          # assetid compare 
-printf STDERR ("fifi assetcheck \n");
          if ($rec->{systemtype} ne "vmware"){
             if ($parrec->{assetassetid} ne ""){
                $self->IfaceCompare($dataobj,
@@ -182,15 +181,7 @@ printf STDERR ("fifi assetcheck \n");
                   if ($#h==0){
                      $parrec->{vhostsystem}=$h[0]->{name};
                   }
-                  
-
-
-
-
-                  print Dumper(\@h);
                }
-               print STDERR Dumper(\@l);      
- 
             }
             $self->IfaceCompare($dataobj,
                                 $rec,"vhostsystem",
