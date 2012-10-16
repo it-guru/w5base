@@ -321,7 +321,7 @@ sub getWfEventNotifyTargets     # calculates the target email addresses
                                 [keys(%allcustgrp)]);
    }
    $ia->LoadTargets($emailto,'*::businessprocess',\'eventnotify',$bpid);
-   $ia->LoadTargets($emailto,'base::staticinfoabo',\'eventnotify',
+   $ia->LoadTargets($emailto,'base::staticinfoabo',\'STEVeventinfobyfunction',
                              '100000002',\@byfunc,default=>1);
 
    return([sort(keys(%$emailto))]);

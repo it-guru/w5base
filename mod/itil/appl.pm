@@ -1269,7 +1269,7 @@ sub getWfEventNotifyTargets     # calculates the target email addresses
       }
    }
   # print STDERR "byorg=".Dumper(\@byorg);
-   $ia->LoadTargets($emailto,'base::staticinfoabo',\'eventnotify',
+   $ia->LoadTargets($emailto,'base::staticinfoabo',\'STEVeventinfobyorg',
                              '100000001',\@byorg,default=>1);
 
 
