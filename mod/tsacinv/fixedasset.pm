@@ -133,7 +133,7 @@ sub getSqlFrom
 sub initSqlWhere
 {
    my $self=shift;
-   my $where="amfixedasset.bdelete='0'";
+   my $where="amfixedasset.bdelete='0' and amfixedasset.legalunit is not null";
    return($where);
 }
 
