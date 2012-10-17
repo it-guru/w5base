@@ -1,4 +1,6 @@
 'itil::businessprocess'=>{de=>'Geschäftsprozess',en=>'Business process'},
 'fieldgroup.applications'=>{de=>'Anwendungen',en=>'Applications'},
+'fieldgroup.businessservices'=>{de=>'Businessservices',en=>'Businessservices'},
 'fieldgroup.systems'=>{de=>'Systems',en=>'Systems'},
 'eventnotify'=>{de=>'Ereignismeldung',en=>'Eventnotification'},
+'Applications'=>{de=>'Anwendungen'},

@@ -32,27 +32,26 @@ sub new
 
    $self->AddFields(
       new kernel::Field::SubList(    
+                name          =>'businessservices',
+                label         =>'Businessservices',
+                group         =>'businessservices',
+                subeditmsk    =>'subedit.businessservice',
+                vjointo       =>'itil::lnkbprocessbservice',
+                vjoinon       =>['id'=>'bprocessid'],
+                vjoindisp     =>['businessservice'],
+                vjoinbase     =>[{applcistatusid=>'<=5'}],
+                vjoininhash   =>['businessservice','applid',
+                                 'applcistatusid','appl']),
+      new kernel::Field::SubList(
                 name          =>'applications',
                 label         =>'Applications',
-                allowcleanup  =>1,
+                htmldetail    =>0,
                 group         =>'applications',
-                subeditmsk    =>'subedit.appl',
-                vjointo       =>'itil::lnkbprocessappl',
+                vjointo       =>'itil::lnkbprocessbservice',
                 vjoinon       =>['id'=>'bprocessid'],
                 vjoindisp     =>['appl'],
-                vjoinbase     =>[{systemcistatusid=>'<=4'}],
+                vjoinbase     =>[{applcistatusid=>'<=5'}],
                 vjoininhash   =>['applid','applcistatusid','appl']),
-      new kernel::Field::SubList(
-                name          =>'systems',
-                label         =>'Systems',
-                allowcleanup  =>1,
-                group         =>'systems',
-                subeditmsk    =>'subedit.system',
-                vjointo       =>'itil::lnkbprocesssystem',
-                vjoinon       =>['id'=>'bprocessid'],
-                vjoindisp     =>['system'],
-                vjoinbase     =>[{systemcistatusid=>'<=4'}],
-                vjoininhash   =>['systemid','systemcistatusid','system']),
    );
    return($self);
 }
@@ -69,15 +68,15 @@ sub isWriteValid
 {
    my $self=shift;
    my @res=$self->SUPER::isWriteValid(@_);
-   push(@res,"applications","systems") if (grep(/^procdesc$/,@res) ||
-                                           grep(/^ALL$/,@res));
+   push(@res,"businessservices") if (grep(/^procdesc$/,@res) ||
+                                 grep(/^ALL$/,@res));
    return(@res);
 }
 
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default procdesc applications systems acl misc source));
+   return(qw(header default procdesc applications businessservices acl misc source));
 }
 
 
