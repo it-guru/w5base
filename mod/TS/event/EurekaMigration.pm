@@ -23,6 +23,10 @@ use kernel::Event;
 use finance::costcenter;
 @ISA=qw(kernel::Event);
 
+our %src;
+our %dst;
+
+
 sub new
 {
    my $type=shift;
@@ -73,7 +77,8 @@ sub ProcessLineData
    my $total=0;
    my %to=();
    my %cc=(11634953080001=>1,11634955570001=>1,
-           11634955470001=>1,11999553900001=>1);
+           11634955470001=>1,11999553900001=>1,
+           12941417060008=>1);
    my $msg="";
    my $EventJobBaseUrl=$self->Config->Param("EventJobBaseUrl");
    foreach my $rec ($self->{$o}->getHashList(qw(ALL))){
@@ -127,11 +132,14 @@ sub ProcessLineData
                       "Korrekturen an Config-Items durchgeführt, die durch ".
                       "Sie datenverantwortet werden.\n\n".
                       "Im konkreten Fall wurde der Kostenknoten '<b>".
-                      $data->[0]."</b>' auf '<b>".$data->[1]."</b>' umgestellt. ".
+                      $data->[0]."</b>' auf '<b>".$data->[1].
+                      "</b>' umgestellt. ".
                       "Die Korrektur hat Auswirkungen auf die folgenden ".
                       "Config-Items:\n".$msg.
                       "\n\nBitte prüfen Sie im Bedarfsfall, ob diese ".
-                      "Umstellungen auch aus Ihrer Sicht korrekt sind.",
+                      "Umstellungen auch aus Ihrer Sicht korrekt sind. Bei ".
+                      "Rückfragen zu dieser Migration wenden Sie sich bitte ".
+                      "an den zuständigen Projektleiter Hr. Schulz, Rainer",
                       emailto=>[keys(%to)],
                       emailcc=>[keys(%cc)]);
       }
@@ -213,7 +221,15 @@ sub ProcessExcelExpandLevel1
       $data[$col]=$oWkS->{'Cells'}[$row][$col]->Value();
    }
    @orgdata=@data;
-   $self->ProcessLineData($oExcel,$oBook,$oWkS,$iSheet,$row,\@data);
+   $src{$data[0]}++ if ($data[0] ne "");
+   $dst{$data[1]}++ if ($data[1] ne "");
+   if ($src{$data[0]}>1){
+      printf STDERR ("Doppelte SRC CO: $data[0] in line $row\n");
+      $data[2].="DoppeltSRC";
+   }
+   if ($data[0] ne ""){
+      $self->ProcessLineData($oExcel,$oBook,$oWkS,$iSheet,$row,\@data);
+   }
    for(my $col=0;$col<=$#data;$col++){
       if ($data[$col] ne $orgdata[$col]){
          $oBook->AddCell($iSheet,$row,$col,$data[$col],0);
