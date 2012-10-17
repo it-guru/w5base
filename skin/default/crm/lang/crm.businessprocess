@@ -3,7 +3,7 @@
 'fieldgroup.procdesc'=>{de=>'Prozessbeschreibung',en=>'Process description'},
 'Customer'=>{de=>'Kunde'},
 'Shortname'=>{de=>'Kurzbezeichnung'},
-'Selector'=>{de=>'Auswahlbeizeichnung'},
+'Selector'=>{de=>'vollqualifizierte Prozessbezeichnung'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'Process Owner'=>{de=>'Prozesseigentümer'},
 'Deputy Process Owner'=>{de=>'Prozesseigentümer Vertreter'},

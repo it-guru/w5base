@@ -1,8 +1,8 @@
 <div class=editframe>
    <table class=editframe>
       <tr>
-         <td class=fname width=10%>%appl(label)%:</td>
-         <td class=finput colspan=3>%appl(sublistedit)%</td>
+         <td class=fname width=10%>%businessservice(label)%:</td>
+         <td class=finput colspan=3>%businessservice(sublistedit)%</td>
       </tr>
    </table>
 </div>

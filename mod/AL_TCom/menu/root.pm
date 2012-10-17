@@ -148,7 +148,7 @@ sub Init
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("AL_TCom.appl.bs",
-                      "itil::businessservice",
+                      "AL_TCom::businessservice",
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("AL_TCom.appl.bs.new",
@@ -384,16 +384,12 @@ sub Init
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("AL_TCom.kern.bp",
-                      "itil::businessprocess",
+                      "AL_TCom::businessprocess",
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("AL_TCom.kern.bp.new",
-                      "itil::businessprocess",
+                      "AL_TCom::businessprocess",
                       func=>'New',
-                      defaultacl=>['admin']);
-
-   $self->RegisterObj("AL_TCom.kern.bp.lnksys",
-                      "itil::lnkbprocesssystem",
                       defaultacl=>['admin']);
 
    $self->RegisterObj("AL_TCom.kern.bp.lnkappl",

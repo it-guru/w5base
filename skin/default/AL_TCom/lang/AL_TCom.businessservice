@@ -1,0 +1,5 @@
+'AL_TCom::businessservice'=>{de=>'Telekom IT IT-Service',
+                          en=>'Telekom IT IT-Service'},
+'Business-Service Fullname'=>{de=>'vollqualifizierter IT-Service',
+                              en=>'IT-Service Fullname'},
+

@@ -1,4 +1,4 @@
-package itil::lnkbprocesssystem;
+package itil::lnkbprocessbservice;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -26,7 +26,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{MainSearchFieldLines}=5;
+   $param{MainSearchFieldLines}=3;
    my $self=bless($type->SUPER::new(%param),$type);
 
    
@@ -40,141 +40,119 @@ sub new
                 name          =>'id',
                 label         =>'LinkID',
                 searchable    =>0,
-                dataobjattr   =>'lnkbprocesssystem.id'),
+                dataobjattr   =>'lnkbprocessbusinessservice.id'),
                                                  
       new kernel::Field::TextDrop(
                 name          =>'bprocess',
                 htmlwidth     =>'250px',
-                label         =>'Application',
+                label         =>'Business process',
                 vjointo       =>'itil::bprocess',
                 vjoinon       =>['bprocessid'=>'id'],
                 vjoindisp     =>'name',
                 dataobjattr   =>'businessprocess.name'),
                                                    
       new kernel::Field::TextDrop(
-                name          =>'system',
+                name          =>'businessservice',
                 htmlwidth     =>'100px',
-                label         =>'System',
-                vjointo       =>'itil::system',
-                vjoinon       =>['systemid'=>'id'],
-                vjoindisp     =>'name',
-                dataobjattr   =>'system.name'),
+                label         =>'Businessservice',
+                vjointo       =>'itil::businessservice',
+                vjoinon       =>['businessserviceid'=>'id'],
+                vjoindisp     =>'fullname'),
                                                    
       new kernel::Field::Select(
-                name          =>'systemcistatus',
-                group         =>'systeminfo',
-                label         =>'System CI-State',
+                name          =>'applcistatus',
+                group         =>'applinfo',
+                label         =>'Application CI-State',
                 vjointo       =>'base::cistatus',
-                vjoinon       =>['systemcistatusid'=>'id'],
+                vjoinon       =>['applcistatusid'=>'id'],
                 vjoindisp     =>'name'),
 
       new kernel::Field::Text(
-                name          =>'systemsystemid',
-                label         =>'SystemID',
-                group         =>'systeminfo',
-                dataobjattr   =>'system.systemid'),
+                name          =>'applapplid',
+                label         =>'ApplicationID',
+                group         =>'applinfo',
+                dataobjattr   =>'appl.applid'),
 
       new kernel::Field::Text(
-                name          =>'shortdesc',
-                label         =>'Short Description',
-                translation   =>'itil::system',
-                group         =>'systeminfo',
-                dataobjattr   =>'system.shortdesc'),
+                name          =>'appl',
+                label         =>'Application',
+                htmldetail    =>0,
+                group         =>'applinfo',
+                dataobjattr   =>'appl.name'),
 
-      new kernel::Field::Select(
-                name          =>'osrelease',
-                group         =>'systeminfo',
-                translation   =>'itil::system',
-                htmleditwidth =>'40%',
-                readonly      =>1,
-                label         =>'OS-Release',
-                vjointo       =>'itil::osrelease',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['osreleaseid'=>'id'],
-                vjoindisp     =>'name'),
+      new kernel::Field::Boolean(
+                name          =>'autobpnotify',
+                group         =>'eventnotification',
+                label         =>
+                'automatic notification of businessprocess impact',
+                dataobjattr   =>'lnkbprocessbusinessservice.autobpnotify'),
 
-      new kernel::Field::Link(
-                name          =>'osreleaseid',
-                label         =>'OSReleaseID',
-                dataobjattr   =>'system.osrelease'),
-
-      new kernel::Field::Select(
-                name          =>'isprod',
-                group         =>'systeminfo',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
-                label         =>'Productionsystem',
-                value         =>[0,1],
-                dataobjattr   =>'system.is_prod'),
-
-      new kernel::Field::Select(
-                name          =>'istest',
-                group         =>'systeminfo',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
-                label         =>'Testsystem',
-                value         =>[0,1],
-                dataobjattr   =>'system.is_test'),
+      new kernel::Field::Textarea(
+                name          =>'applfailinfo',
+                group         =>'eventnotification',
+                label         =>
+                'impact to businessproces on application impairment',
+                dataobjattr   =>'lnkbprocessbusinessservice.appfailinfo'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
                 searchable    =>0,
                 label         =>'Comments',
-                dataobjattr   =>'lnkbprocesssystem.comments'),
+                dataobjattr   =>'lnkbprocessbusinessservice.comments'),
 
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
                 label         =>'Creator',
-                dataobjattr   =>'lnkbprocesssystem.createuser'),
+                dataobjattr   =>'lnkbprocessbusinessservice.createuser'),
                                    
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'source',
                 label         =>'Owner',
-                dataobjattr   =>'lnkbprocesssystem.modifyuser'),
+                dataobjattr   =>'lnkbprocessbusinessservice.modifyuser'),
                                    
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'lnkbprocesssystem.srcsys'),
+                dataobjattr   =>'lnkbprocessbusinessservice.srcsys'),
                                                    
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
                 label         =>'Source-Id',
-                dataobjattr   =>'lnkbprocesssystem.srcid'),
+                dataobjattr   =>'lnkbprocessbusinessservice.srcid'),
                                                    
       new kernel::Field::Date(
                 name          =>'srcload',
                 group         =>'source',
                 label         =>'Last-Load',
-                dataobjattr   =>'lnkbprocesssystem.srcload'),
+                dataobjattr   =>'lnkbprocessbusinessservice.srcload'),
                                                    
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
                 label         =>'Creation-Date',
-                dataobjattr   =>'lnkbprocesssystem.createdate'),
+                dataobjattr   =>'lnkbprocessbusinessservice.createdate'),
                                                 
       new kernel::Field::MDate(
                 name          =>'mdate',
                 group         =>'source',
                 label         =>'Modification-Date',
-                dataobjattr   =>'lnkbprocesssystem.modifydate'),
+                dataobjattr   =>'lnkbprocessbusinessservice.modifydate'),
                                                    
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'source',
                 label         =>'Editor',
-                dataobjattr   =>'lnkbprocesssystem.editor'),
+                dataobjattr   =>'lnkbprocessbusinessservice.editor'),
                                                   
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 group         =>'source',
                 label         =>'RealEditor',
-                dataobjattr   =>'lnkbprocesssystem.realeditor'),
+                dataobjattr   =>'lnkbprocessbusinessservice.realeditor'),
 
       new kernel::Field::Mandator(
                 group         =>'bprocessinfo',
@@ -204,7 +182,7 @@ sub new
                 name          =>'customer',
                 label         =>'Customer',
                 group         =>'bprocessinfo',
-                translation   =>'itil::bprocess',
+                translation   =>'crm::businessprocess',
                 vjointo       =>'base::grp',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['customerid'=>'grpid'],
@@ -216,89 +194,49 @@ sub new
                 dataobjattr   =>'businessprocess.cistatus'),
 
       new kernel::Field::Link(
-                name          =>'assetid',
-                label         =>'AssetID',
-                dataobjattr   =>'system.asset'),
-
-      new kernel::Field::Link(
                 name          =>'customerid',
                 label         =>'CustomerID',
                 dataobjattr   =>'businessprocess.customer'),
 
-      new kernel::Field::Select(
-                name          =>'isdevel',
-                group         =>'systeminfo',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
-                label         =>'Developmentsystem',
-                value         =>[0,1],
-                dataobjattr   =>'system.is_devel'),
-
-      new kernel::Field::Select(
-                name          =>'iseducation',
-                group         =>'systeminfo',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
-                label         =>'Educationsystem',
-                value         =>[0,1],
-                dataobjattr   =>'system.is_education'),
-
-      new kernel::Field::Select(
-                name          =>'isapprovtest',
-                group         =>'systeminfo',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
-                label         =>'Approval Testsystem',
-                value         =>[0,1],
-                dataobjattr   =>'system.is_approvtest'),
-
-      new kernel::Field::Select(
-                name          =>'isreference',
-                group         =>'systeminfo',
-                transprefix   =>'boolean.',
-                htmleditwidth =>'30%',
-                label         =>'Referencesystem',
-                value         =>[0,1],
-                dataobjattr   =>'system.is_reference'),
-
-                                                   
       new kernel::Field::Link(
-                name          =>'systemcistatusid',
-                label         =>'SystemCiStatusID',
-                dataobjattr   =>'system.cistatus'),
-                                                   
-      new kernel::Field::Link(
-                name          =>'assetid',
-                label         =>'AssetId',
-                dataobjattr   =>'system.asset'),
+                name          =>'applcistatusid',
+                label         =>'ApplCiStatusID',
+                dataobjattr   =>'appl.cistatus'),
                                                    
       new kernel::Field::Link(
                 name          =>'bprocessid',
-                label         =>'ApplID',
-                dataobjattr   =>'lnkbprocesssystem.bprocess'),
+                label         =>'BusinessprocessID',
+                dataobjattr   =>'lnkbprocessbusinessservice.bprocess'),
                                                    
       new kernel::Field::Link(
-                name          =>'systemid',
+                name          =>'businessserviceid',
                 label         =>'SystemId',
-                dataobjattr   =>'lnkbprocesssystem.system'),
+                dataobjattr   =>'lnkbprocessbusinessservice.businessservice'),
+
+      new kernel::Field::Link(
+                name          =>'applid',
+                label         =>'ApplID',
+                dataobjattr   =>'appl.id'),
 
       new kernel::Field::Link(
                 name          =>'mandatorid',
                 label         =>'MandatorID',
                 dataobjattr   =>'businessprocess.mandator'),
    );
-   $self->setDefaultView(qw(bprocess system systemsystemid fraction cdate));
-   $self->setWorktable("lnkbprocesssystem");
+   $self->setDefaultView(qw(bprocess appl applapplid fraction cdate));
+   $self->setWorktable("lnkbprocessbusinessservice");
    return($self);
 }
 
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="lnkbprocesssystem left outer join businessprocess ".
-            "on lnkbprocesssystem.bprocess=businessprocess.id ".
-            "left outer join system ".
-            "on lnkbprocesssystem.system=system.id";
+   my $from="lnkbprocessbusinessservice left outer join businessprocess ".
+            "on lnkbprocessbusinessservice.bprocess=businessprocess.id ".
+            "left outer join businessservice ".
+            "on lnkbprocessbusinessservice.businessservice=businessservice.id ".
+            "left outer join appl ".
+            "on businessservice.appl=appl.id";
    return($from);
 }
 
@@ -337,15 +275,15 @@ sub Validate
       $self->LastMsg(ERROR,"invalid business process specified");
       return(undef);
    }
-   if ((!defined($oldrec) && !defined($newrec->{systemid})) ||
-       (defined($newrec->{systemid}) && $newrec->{systemid}==0)){
-      $self->LastMsg(ERROR,"invalid system specified");
+   if ((!defined($oldrec) && !defined($newrec->{businessserviceid})) ||
+       (defined($newrec->{businessserviceid}) && $newrec->{businessserviceid}==0)){
+      $self->LastMsg(ERROR,"invalid application specified");
       return(undef);
    }
    my $bprocessid=effVal($oldrec,$newrec,"bprocessid");
 
    if ($self->isDataInputFromUserFrontend()){
-      if (!$self->isWriteOnBProcessValid($bprocessid,"systems")){
+      if (!$self->isWriteOnBProcessValid($bprocessid,"businessservices")){
          $self->LastMsg(ERROR,"no access");
          return(undef);
       }
@@ -361,10 +299,12 @@ sub isViewValid
    return("ALL");
 }
 
+
 sub SecureValidate
 {
    return(kernel::DataObj::SecureValidate(@_));
 }
+
 
 
 sub isWriteValid
@@ -373,21 +313,22 @@ sub isWriteValid
    my $oldrec=shift;
    my $newrec=shift;
    my $bprocessid=effVal($oldrec,$newrec,"bprocessid");
+   my @rw=qw(default eventnotification);
 
-   return("default") if (!defined($oldrec) && !defined($newrec));
-   return("default") if ($self->IsMemberOf("admin"));
-   return("default") if ($self->isWriteOnBProcessValid($bprocessid,"systems"));
-   return("default") if (!$self->isDataInputFromUserFrontend() &&
+   return(@rw) if (!defined($oldrec) && !defined($newrec));
+   return(@rw) if ($self->IsMemberOf("admin"));
+   return(@rw) if ($self->isWriteOnBProcessValid($bprocessid,
+                                                       "businessservices"));
+   return(@rw) if (!$self->isDataInputFromUserFrontend() &&
                          !defined($oldrec));
 
-   return(undef);
+   return();
 }
 
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default misc bprocessinfo systeminfo ));
+   return(qw(header default eventnotification misc bprocessinfo applinfo ));
 }
 
 

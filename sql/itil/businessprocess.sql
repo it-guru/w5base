@@ -43,3 +43,9 @@ create table lnkbprocesssystem (
 );
 alter table lnkbprocessappl add appfailinfo longtext default NULL;
 alter table lnkbprocessappl add autobpnotify int(1) default '0';
+drop table lnkbprocesssystem;
+rename table lnkbprocessappl to lnkbprocessbusinessservice;
+alter table lnkbprocessbusinessservice add businessservice bigint(20) NOT NULL;
+set FOREIGN_KEY_CHECKS=0;
+alter table lnkbprocessbusinessservice add FOREIGN KEY fk_bs (businessservice) REFERENCES businessservice (id) ON DELETE CASCADE;
+set FOREIGN_KEY_CHECKS=1;

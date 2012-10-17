@@ -400,10 +400,6 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
-   $self->RegisterObj("itil.kern.bp.lnksys",
-                      "itil::lnkbprocesssystem",
-                      defaultacl=>['admin']);
-
    $self->RegisterObj("itil.kern.bp.lnkappl",
                       "itil::lnkbprocessappl",
                       defaultacl=>['admin']);
