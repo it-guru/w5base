@@ -3,7 +3,7 @@
   <tr><td valign=top><p style="font-size:10px">
        Rot hinterlegte Kopfzeile=&gt;Ereignisklasse 1 oder 2; 
        Grau hinterlegte Kopfzeile=&gt;Ereignisklasse 3,4 oder 5; 
-       Gelb hinterlegte Kopfzeile=&gt;Ereignis abgeschlosse (Gutmeldung);
+       Gelb hinterlegte Kopfzeile=&gt;Ereignis abgeschlossen (Gutmeldung);
        Grün hinterlegte Kopfzeile=&gt;Qualitätsgesicherte Betriebsfreigabe;
        Blau hinterlegte Kopfzeile=&gt;Ergebnis der Ursachenanalyse</td></tr>
   <tr><td valign=top><p style="font-size:10px">
