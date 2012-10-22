@@ -161,8 +161,10 @@ sub qcheckRecord
                                 usage=>'"*KONSOLSYSTEM VMWARE"'});
                my @l=$sys->getHashList(qw(systemname systemid));
                if ($#l!=0){
-                  push(@qmsg,'can not find a related '.
-                             'VMWARE KONSOLSYSTEM in AssetManager');
+                  my $m='can not find a related VMWARE KONSOLSYSTEM '.
+                          'in AssetManager';
+                  push(@dataissue,$m);
+                  push(@qmsg,$m);
                   $errorlevel=3 if ($errorlevel<3);
                }
                else{
