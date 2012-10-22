@@ -149,6 +149,10 @@ sub FormatedDetail
          $d=$targetval;
       }
    }
+   if ($mode eq "SOAP"){
+      $d=~s/&/&amp;/g;;
+   }
+
    return($d);
 }
 
