@@ -156,10 +156,22 @@ sub qcheckRecord
             my $assetid=$parrec->{assetassetid};
             if ($assetid ne ""){
                my $sys=$dataobj->ModuleObject("tsacinv::system");
-               $sys->SetFilter({assetassetid=>\$assetid,
-                                'status'=>\'in operation',
-                                usage=>'"*KONSOLSYSTEM VMWARE"'});
+               $sys->SetFilter({
+                  assetassetid=>\$assetid,
+                  status=>\'in operation',
+                  usage=>['OSY-I: KONSOLSYSTEM HYPERVISOR',
+                          'OSY-I: KONSOLSYSTEM VMWARE']
+               });
                my @l=$sys->getHashList(qw(systemname systemid));
+               if ($#l==-1){
+                  $sys->ResetFilter();
+                  $sys->SetFilter({
+                     assetassetid=>\$assetid,
+                     status=>\'in operation',
+                     usage=>['OSY-I: KONSOLSYSTEM(BLADE&APPCOM)']
+                  });
+                  @l=$sys->getHashList(qw(systemname systemid));
+               }
                if ($#l!=0){
                   my $m='can not find a related VMWARE KONSOLSYSTEM '.
                           'in AssetManager';
