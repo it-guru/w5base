@@ -133,7 +133,7 @@ sub qcheckRecord
          }
          #################################################################### 
          # assetid compare 
-         if ($rec->{systemtype} ne "vmware"){
+         if (!in_array($dataobj->{needVMHost},$rec->{systemtype})){
             if ($parrec->{assetassetid} ne ""){
                $self->IfaceCompare($dataobj,
                                    $rec,"asset",

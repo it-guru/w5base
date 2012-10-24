@@ -36,6 +36,14 @@ sub new
    $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
 
+   $self->{needVMHost}=['vmware','vPartition'];
+   $self->{needVMHost}=[]; # removed temp. since data quality problems
+   my $vmifexp="if (".join(' or ',
+                map({"system.systemtype='$_'"} @{$self->{needVMHost}}));
+   if ($#{$self->{needVMHost}}==-1){
+      $vmifexp="if (0";
+   }
+
 
    $self->AddFields(
       new kernel::Field::Linenumber(
@@ -572,8 +580,7 @@ sub new
 
       new itil::system::Asset::Link(
                 name          =>'assetid',
-                dataobjattr   =>"if (system.systemtype='vmware',".
-                                "vsystem.asset,system.asset)", 
+                dataobjattr   =>"$vmifexp,vsystem.asset,system.asset)", 
                 wrdataobjattr =>"system.asset"),
 
       new kernel::Field::Link(
@@ -615,14 +622,14 @@ sub new
                 readonly      =>1,
                 group         =>'physys',
                 label         =>'phys. CPU-Count',
-                dataobjattr   =>"if (system.systemtype='vmware',vasset.cpucount,asset.cpucount)"),
+                dataobjattr   =>"$vmifexp,vasset.cpucount,asset.cpucount)"),
 
       new kernel::Field::Number(
                 name          =>'hwcorecount',
                 readonly      =>1,
                 group         =>'physys',
                 label         =>'phys. Core-Count',
-                dataobjattr   =>"if (system.systemtype='vmware',vasset.corecount,asset.corecount)"),
+                dataobjattr   =>"$vmifexp,vasset.corecount,asset.corecount)"),
 
       new kernel::Field::Number(
                 name          =>'hwmemory',
@@ -630,14 +637,14 @@ sub new
                 group         =>'physys',
                 label         =>'phys. Memory',
                 unit          =>'MB',
-                dataobjattr   =>"if (system.systemtype='vmware',vasset.memory,asset.memory)"),
+                dataobjattr   =>"$vmifexp,vasset.memory,asset.memory)"),
 
       new kernel::Field::Text(
                 name          =>'systemhandle',
                 readonly      =>1,
                 group         =>'physys',
                 label         =>'Producer System-Handle',
-                dataobjattr   =>"if (system.systemtype='vmware',vasset.systemhandle,asset.systemhandle)"),
+                dataobjattr   =>"$vmifexp,vasset.systemhandle,asset.systemhandle)"),
 
       new kernel::Field::Text(
                 name          =>'assetservicesupport',
@@ -1311,7 +1318,7 @@ sub isViewValid
               physys ipaddresses phonenumbers sec applications
               location source customer history
               attachments control systemclass interview);
-   if (defined($rec) && $rec->{'systemtype'} eq "vmware"){
+   if (defined($rec) && in_array($self->{needVMHost},$rec->{'systemtype'})){
       push(@all,"vhost");
    }
    if (defined($rec) && $rec->{'isclusternode'}){
@@ -1332,7 +1339,7 @@ sub isWriteValid
    my @databossedit=qw(default software admin logsys contacts misc opmode 
                        physys ipaddresses phonenumbers sec cluster autodisc
                        attachments control systemclass interview);
-   if (defined($rec) && $rec->{systemtype} eq "vmware"){
+   if (defined($rec) && in_array($self->{needVMHost},$rec->{'systemtype'})){
       @databossedit=grep(!/^physys$/, @databossedit);
       push(@databossedit,"vhost");
    }
