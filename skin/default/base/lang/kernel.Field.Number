@@ -1,2 +1,3 @@
 "invalid number format '\%s' in field '\%s'"=>{de=>"ungültiges Zahlenformat '\%s' im Feld  '\%s'"},
+"value '%s' not in allowed range '%s-%s' for '%s'"=>{de=>"Wert '%s' nicht im erlaubten Wertebereich '%s-%s' für das Feld '%s'"},
 

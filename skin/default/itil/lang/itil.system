@@ -67,4 +67,5 @@
 'Customer Contract'=>{de=>'Kundenvertrag'},
 'mangaged by rules of SOX'=>{de=>'Betreuung nach SOX (USA) Regeln'},
 'SOX state'=>{de=>'SOX (USA) status'},
-
+"invalid systemid '%s' specified"=>{de=>"ungültige SystemID '%s'"},
+"invalid system name '%s' specified"=>{de=>"ungültiger Systemname '%s'"},

@@ -468,6 +468,7 @@ sub new
       new kernel::Field::Number(
                 name          =>'cpucount',
                 group         =>'logsys',
+                editrange     =>[1,4096],
                 label         =>'CPU-Count',
                 dataobjattr   =>'system.cpucount'),
 
@@ -487,6 +488,7 @@ sub new
                 group         =>'logsys',
                 label         =>'Memory',
                 unit          =>'MB',
+                editrange     =>[1,2147483647],
                 dataobjattr   =>'system.memory'),
 
       new kernel::Field::Text(
@@ -1181,10 +1183,19 @@ sub Validate
                                  $newrec->{name} ne lc($name));
    my $systemid=trim(effVal($oldrec,$newrec,"systemid"));
    if (exists($newrec->{systemid}) && $newrec->{systemid} ne $systemid){
-      $newrec->{systemid}=$systemid;
+      $newrec->{systemid}=$systemid; # keine Ahnung, was das Darstellen soll HV
    }
    $newrec->{systemid}=undef if (exists($newrec->{systemid}) &&
                                  $newrec->{systemid} eq "");
+   if (defined($newrec->{systemid})){
+      if (!($newrec->{systemid}=~m/^[A-Z0-9]+$/)){
+         $self->LastMsg(ERROR,"invalid systemid '%s' specified",
+                        $newrec->{systemid});
+         return(0);
+      }
+   }
+
+
    if (defined($newrec->{asset}) && $newrec->{asset} eq ""){
       $newrec->{asset}=undef;
    }
@@ -1232,7 +1243,7 @@ sub Validate
          foreach my $iprec (@{$oldrec->{ipaddresses}}){
             if ($iprec->{cistatusid}!=6){
                $self->LastMsg(ERROR,
-                          "there are still linked active ipaddresses on this system");
+                    "there are still linked active ipaddresses on this system");
                return(undef);
             }
          }

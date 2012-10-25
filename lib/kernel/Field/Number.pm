@@ -27,6 +27,7 @@ sub new
 {
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
+   $self->{_permitted}->{editrange}=1;
    $self->{_permitted}->{precision}=1;
    $self->{_permitted}->{decimaldot}=1;
    $self->{decimaldot}="," if (!defined($self->{decimaldot}));
@@ -129,6 +130,33 @@ sub Unformat
    }
    return({});
 }
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   return({}) if (!exists($newrec->{$self->Name()}));
+   if (defined($newrec->{$self->Name()})){
+      if (ref($self->{editrange}) eq "ARRAY"){
+         my $d=$newrec->{$self->Name()};
+         if (!($d>=$self->{editrange}->[0] && $d<=$self->{editrange}->[1])){
+            $self->getParent->LastMsg(ERROR,
+                sprintf(
+                   $self->getParent->T(
+                     "value '%s' not in allowed editrange '%s-%s' for '%s'",
+                      $self->Self),$d,
+                     $self->{editrange}->[0],$self->{editrange}->[1],
+                     $self->Label()));
+            return(undef);
+         }
+      }
+   }
+   return($self->SUPER::Validate($oldrec,$newrec));
+}
+
+
 
 
 sub getXLSformatname
