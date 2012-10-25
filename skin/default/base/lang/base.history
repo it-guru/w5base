@@ -1,5 +1,6 @@
 'base::history'=>{de=>'Verlauf',en=>'History'},
 'fieldgroup.default'=>{de=>'Veränderungsdaten',en=>'Modificationdata'},
+'internal Fieldname'=>{de=>'interner Feldname'},
 'Fieldname'=>{de=>'Feldname'},
 'Dataobject'=>{de=>'Datenobjekt'},
 'Operation'=>{de=>'Operation'},

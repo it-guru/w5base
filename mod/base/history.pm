@@ -39,11 +39,35 @@ sub new
                                   
       new kernel::Field::Text(
                 name          =>'name',
-                label         =>'Fieldname',
+                label         =>'internal Fieldname',
+                selectfix     =>1,
                 dataobjattr   =>'history.name'),
 
       new kernel::Field::Text(
+                name          =>'fullname',
+                label         =>'Fieldname',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   if ($current->{dataobject} ne ""){
+                      my $o=getModuleObject($self->getParent->Config,
+                                            $current->{dataobject});
+                      if (defined($o)){
+                         my $f=$o->getField($current->{name},$current);
+                         if (defined($f)){
+                            return($f->Label());
+                         }
+                      }
+                   }
+                   return("[".$current->{name}."]");
+
+
+
+                }),
+
+      new kernel::Field::Text(
                 name          =>'dataobject',
+                selectfix     =>1,
                 label         =>'Dataobject',
                 dataobjattr   =>'history.dataobject'),
 
@@ -169,7 +193,7 @@ sub new
 
    );
    $self->{dontSendRemoteEvent}=1;
-   $self->setDefaultView(qw(cdate editor name newstate));
+   $self->setDefaultView(qw(cdate editor fullname newstate));
    $self->setWorktable("history");
    return($self);
 }
