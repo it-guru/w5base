@@ -371,7 +371,7 @@ sub _LoadUserInUserCache
    my $UserCache=$self->Cache->{User}->{Cache};
    if ($o){
          $o->SetCurrentView(qw(surname userid givenname posix groups tz lang
-                               cistatusid secstate 
+                               cistatusid secstate ipacl
                                dialermode dialerurl dialeripref
                                email usersubst usertyp fullname));
          if ($AccountOrUserID=~m/^\d+$/){
@@ -382,6 +382,9 @@ sub _LoadUserInUserCache
          }
          my ($rec,$msg)=$o->getFirst();
          if (defined($rec)){
+            if ($rec->{ipacl} ne ""){
+               $rec->{ipacl}=[split(/[;,]\s*/,$rec->{ipacl})];
+            }
             $UserCache->{$AccountOrUserID}->{rec}=$rec;
             if (defined($res)){   # only in Web-Context the state is stored
                $UserCache->{$AccountOrUserID}->{state}=$res->{state};

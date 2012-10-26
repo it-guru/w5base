@@ -511,6 +511,27 @@ sub ValidateCaches
             return(0);
          }
       }
+      if ($#{$UserCache->{$ENV{REMOTE_USER}}->{rec}->{ipacl}}!=-1){
+         if (!in_array($UserCache->{$ENV{REMOTE_USER}}->{rec}->{ipacl},
+              $ENV{REMOTE_ADDR})){
+            if (Query->Param("MOD") eq "base::interface"){
+               printf("Status: 403 Forbidden - ".
+                      "your ip $ENV{REMOTE_ADDR} is not allowed in ipacl ".
+                      "for $ENV{REMOTE_USER}\n");
+               printf("Content-type: text/xml\n\n".
+                      "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+               return(0);
+            }
+            else{
+               print("Content-type:text/plain;charset=ISO-8895-1\n\n");
+               printf(msg(ERROR,$self->T("access for user '\%s' to W5Base ".
+                                "Framework rejected")),$ENV{REMOTE_USER});
+               printf(
+                  msg(INFO,$self->T("your client ip is rejected by ipacl")));
+               return(0);
+            }
+         }
+      }
    }
 
    return(1);

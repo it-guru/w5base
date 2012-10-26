@@ -38,3 +38,4 @@
 'gtc text has not been accepted unmodified'=>{de=>'AGBs wurden nicht unverändert akzeptiert'},
 "You are sure, you will accept the completly GTC's and have understood all consequences?"=>{de=>'Sie sind sicher, dass Sie mit den AGBs einverstanden sind und alle Konsequenzen verstanden haben?'},
 "Without accepted GTC's, no access could be granted!"=>{de=>"Ohne die Bestätigung der AGBs kann kein Zugriff gewährt werden!"},
+"your client ip is rejected by ipacl"=>{de=>"Ihre Client-IP-Adresse wurde von der IP Zugriffsbeschränkung abgelehnt"},

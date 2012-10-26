@@ -207,6 +207,13 @@ sub new
                 group         =>'userro',
                 dataobjattr   =>'contact.secstate'),
 
+      new kernel::Field::Text(
+                name          =>'ipacl',
+                uploadable    =>1,
+                label         =>'IP access control',
+                group         =>'userro',
+                dataobjattr   =>'contact.ipacl'),
+
       new kernel::Field::Number(
                 name          =>'killtimeout',
                 label         =>'limit query duration',
@@ -1026,6 +1033,38 @@ sub Validate
    if (effVal($oldrec,$newrec,"fullname")=~m/^\s*$/){
       $self->LastMsg(ERROR,"invalid fullname");
       return(0);
+   }
+   if (exists($newrec->{ipacl})){
+      my @l=split(/[;,]\s*/,$newrec->{ipacl});
+      my @ok;
+      foreach my $ip (@l){
+         next if ($ip eq "");
+         if (my ($o1,$o2,$o3,$o4)=$ip=~m/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/){
+            if (($o1<0 || $o1 >255 ||
+                 $o2<0 || $o2 >255 ||
+                 $o3<0 || $o3 >255 ||
+                 $o4<0 || $o4 >255)||
+                ($o1==0 && $o2==0 && $o3==0 && $o4==0) ||
+                ($o1==255 && $o2==255 && $o3==255 && $o4==255)){
+               $self->LastMsg(ERROR,
+                      sprintf($self->T("invalid IPV4 address '\%s'"),$ip));
+               return(0);
+            }
+            push(@ok,$ip);
+         }
+         elsif (my ($o1,$o2,$o3,$o4,$o5,$o6,$o7,$o8)=$ip
+                   =~m/^([0-9a-f]{4}):([0-9a-f]{4}):([0-9a-f]{4}):([0-9a-f]{4}):([0-9a-f]{4}):([0-9a-f]{4}):([0-9a-f]{4}):([0-9a-f]{4})$/){
+             push(@ok,$ip);
+         }
+         else{
+            $self->LastMsg(ERROR,"unknown ip-address format '$ip'");
+            return(0);
+         }
+      }
+      $newrec->{ipacl}=join(", ",sort(@ok));
+      if ($newrec->{ipacl} eq ""){
+         $newrec->{ipacl}=undef;
+      }
    }
    #######################################################################
    # SSH 1 Key Handling
