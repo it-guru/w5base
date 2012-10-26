@@ -768,7 +768,7 @@ sub FullView
    my $fldobj=$self->getField("mdate",$rec);
    my $d=$fldobj->FormatedResult($rec,"HtmlV01");
    print(" at ".$d) if ($d ne "");
-   print("<br>powered by W5Base technology");
+   print("<br>powered by W5Base technology<br><br>");
 
    print("</div>");
    if (defined($rec->{attachments}) && ref($rec->{attachments}) eq "ARRAY" &&
