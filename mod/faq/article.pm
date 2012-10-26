@@ -763,12 +763,12 @@ sub FullView
       print(" created by ".$d) if ($d ne "");
    }
 
-   print(" modified by ".$downer) if ($downer ne "" && $downer ne "NONE");
+   print("<br>modified by ".$downer) if ($downer ne "" && $downer ne "NONE");
 
    my $fldobj=$self->getField("mdate",$rec);
    my $d=$fldobj->FormatedResult($rec,"HtmlV01");
    print(" at ".$d) if ($d ne "");
-   print(" powered by W5Base technology");
+   print("<br>powered by W5Base technology");
 
    print("</div>");
    if (defined($rec->{attachments}) && ref($rec->{attachments}) eq "ARRAY" &&
