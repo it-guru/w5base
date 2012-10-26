@@ -123,4 +123,4 @@
 'limit query duration'=>{de=>'Begrenzung der Abfragedauer'},
 'Rights overview' =>{ de=>'Referenz-Übersicht'},
 'managed by group' =>{ de=>'Kontakt verwaltet durch Gruppe'},
-'IP acces control' =>{ de=>'IP Zugriffsbeschränkung'},
+'IP access control' =>{ de=>'IP Zugriffsbeschränkung'},
