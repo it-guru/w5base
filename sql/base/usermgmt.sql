@@ -331,3 +331,4 @@ create table userblacklist (
   UNIQUE account (account)
 );
 alter table contact add admcomments longtext default NULL;
+alter table contact add ipacl longtext default NULL;
