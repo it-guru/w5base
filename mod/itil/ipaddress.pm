@@ -281,6 +281,7 @@ sub new
                 name          =>'type',
                 htmleditwidth =>'190px',
                 label         =>'Typ',
+                default       =>1,
                 transprefix   =>'iptyp.',
                 value         =>[qw(0 1 2 3 4 5 8 9 6 7)],
                 dataobjattr   =>'ipaddress.addresstyp'),
