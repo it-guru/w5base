@@ -580,7 +580,7 @@ sub new
                 parentobj     =>'itil::system',
                 group         =>'attachments'),
 
-      new itil::system::Asset::Link(
+      new itil::system::Asset::Interface(
                 name          =>'assetid',
                 dataobjattr   =>"$vmifexp,vsystem.asset,system.asset)", 
                 wrdataobjattr =>"system.asset"),
@@ -1414,11 +1414,11 @@ sub getDetailBlockPriority
 
 #############################################################################
 
-package itil::system::Asset::Link;
+package itil::system::Asset::Interface;
 
 use strict;
 use vars qw(@ISA);
-@ISA    = qw(kernel::Field::Link);
+@ISA    = qw(kernel::Field::Interface);
 
 
 sub new
