@@ -98,7 +98,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'lassignmentid',
                 label         =>'AC-AssignmentID',
-	dataobjattr   =>'assetportfolio.lassignmentid'),
+                dataobjattr   =>'assetportfolio.lassignmentid'),
 
       new kernel::Field::Text(
                 name          =>'conumber',
@@ -289,8 +289,13 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'lassetid',
-                label         =>'LAssetId',
+                label         =>'LAssetPortfolioId',
                 dataobjattr   =>'assetportfolio.lportfolioitemid'),
+
+      new kernel::Field::Link(
+                name          =>'lassetassetid',
+                label         =>'LAssetId',
+                dataobjattr   =>'amasset.lastid'),
 
       new kernel::Field::Link(
                 name          =>'lmodelid',
@@ -303,7 +308,7 @@ sub new
                 group         =>'components',
                 forwardSearch =>1,
                 vjointo       =>'tsacinv::fixedasset',
-                vjoinon       =>['assetid'=>'assetid'],
+                vjoinon       =>['lassetassetid'=>'lassetid'],
                 vjoindisp     =>['description','deprstart','deprend','deprbase']),
 
       new kernel::Field::Text(

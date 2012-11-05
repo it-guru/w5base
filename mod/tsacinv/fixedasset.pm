@@ -101,6 +101,11 @@ sub new
                 vjoinconcat   =>', ',
                 fields        =>['systemid','systemname','conumber']),
 
+      new kernel::Field::Link(
+                name          =>'lassetid',
+                noselect      =>'1',
+                dataobjattr   =>'amrelfixedasset.lastid'),
+
    );
    $self->setDefaultView(qw(name assetid deprstart deprend deprbase inventoryno));
    return($self);
@@ -126,14 +131,16 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="amfixedasset";
+   my $from="amfixedasset,amrelfixedasset";
    return($from);
 }
 
 sub initSqlWhere
 {
    my $self=shift;
-   my $where="amfixedasset.bdelete='0' and amfixedasset.legalunit is not null";
+   my $where="amfixedasset.lfixedastid=amrelfixedasset.lfixedastid and ".
+             "amfixedasset.bdelete='0'";
+   #my $where="amfixedasset.bdelete='0' and amfixedasset.legalunit is not null";
    return($where);
 }
 
