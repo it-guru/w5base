@@ -934,6 +934,15 @@ sub new
                 vjoinbase     =>[{'parentobj'=>\'itil::appl'}],
                 subeditmsk    =>'subedit'),
 
+      new kernel::Field::Text(
+                name          =>'customerapplicationname',
+                htmldetail    =>0,
+                readonly      =>1,
+                group         =>'customer',
+                label         =>'nameing of application by customer',
+                dataobjattr   =>"if (itcrmappl.name is null or ".
+                                "itcrmappl.name='',appl.name,itcrmappl.name)"),
+
       new kernel::Field::SubList(
                 name          =>'oncallphones',
                 searchable    =>0,
@@ -1324,7 +1333,9 @@ sub getSqlFrom
    my $from="$worktable left outer join lnkcontact ".
             "on lnkcontact.parentobj='$selfasparent' ".
             "and $worktable.id=lnkcontact.refid ".
-            "left outer join appladv on (appl.id=appladv.appl and appladv.isactive=1)";
+            "left outer join appladv on (appl.id=appladv.appl and ".
+            "appladv.isactive=1) ".
+            "left outer join itcrmappl on appl.id=itcrmappl.id";
 
    return($from);
 }

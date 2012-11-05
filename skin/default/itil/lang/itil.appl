@@ -137,3 +137,4 @@
 'last Cluster-Service switch date (temp)'=>{de=>'letzter Cluster-Service-Switch test Zeitpunkt (temp bis 06/2011)'},
 'last Cluster-Service switch test (WorkflowEnd)'=>{de=>'letzter Cluster-Service-Switch test (WorkflowEnd)'},
 'comments to switch-over behaviour'=>{de=>'Bemerkungen zur Umschalt/Schwenk Strategie'},
+'nameing of application by customer'=>{de=>'Bezeichnung der Anwendung beim Kunden/Auftraggeber'},
