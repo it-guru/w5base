@@ -815,7 +815,8 @@ sub Validate
    }
    ########################################################################
    if (defined($oldrec) &&
-       effChanged($oldrec,$newrec,"runonclusts")){
+       effChanged($oldrec,$newrec,"runonclusts") &&
+       !($oldrec->{runonclusts} eq "" && $newrec->{runonclusts} eq "0") ){
       $newrec->{lnksoftwaresystemid}=undef;
       $newrec->{itclustsid}=undef;
       $newrec->{systemid}=undef;
