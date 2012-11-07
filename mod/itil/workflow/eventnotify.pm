@@ -1248,6 +1248,10 @@ sub addComplexAbos
                  affectedorgareaid=>[keys(%allorgarea)],
                  });
    }
+   elsif ($WfRec->{eventmode} eq "EVk.net"){
+      push(@flt,{mode=>\'eventinfo',cistatusid=>[3,4],
+                 nativeventstatclass=>[$WfRec->{eventstatclass}]});
+   }
    elsif ($WfRec->{eventmode} eq "EVk.bprocess"){
       my $bpid=$WfRec->{affectedbusinessprocessid};
       $bpid=[$bpid] if (ref($bpid) ne "ARRAY");
