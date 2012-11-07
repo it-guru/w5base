@@ -1248,6 +1248,25 @@ sub addComplexAbos
                  affectedorgareaid=>[keys(%allorgarea)],
                  });
    }
+   elsif ($WfRec->{eventmode} eq "EVk.bprocess"){
+      my $bpid=$WfRec->{affectedbusinessprocessid};
+      $bpid=[$bpid] if (ref($bpid) ne "ARRAY");
+      my $bp=getModuleObject($self->Config,"itil::businessprocess");
+      $bp->SetFilter({id=>$bpid});
+      foreach my $rec ($bp->getHashList(qw(customerid))){
+         if ($rec->{customerid} ne ""){
+            $self->LoadGroups(\%allcustomer,"up",$rec->{customerid});
+         }
+      }
+      if (keys(%allcustomer)){
+         push(@flt,{mode=>\'eventinfo',cistatusid=>[3,4],
+                    nativeventstatclass=>[$WfRec->{eventstatclass},undef],
+                    affecteditemprio=>[$WfRec->{affecteditemprio},undef],
+                    affectedcustomerid=>[keys(%allcustomer)],
+                    affectedorgareaid=>[undef],
+                    });
+      }
+   }
    else{
       push(@flt,{mode=>\'eventinfo',cistatusid=>[3,4],
                  nativeventstatclass=>[$WfRec->{eventstatclass},undef],
@@ -1293,6 +1312,7 @@ sub getNotifyDestinations
          my $net=getModuleObject($self->Config,"itil::network");
          $net->SetFilter({id=>$netid});
          $ia->LoadTargets($emailto,'*::network',\'eventnotify',$netid);
+         $self->addComplexAbos($emailto,$WfRec);
       }
       elsif ($WfRec->{eventmode} eq "EVk.bprocess"){ 
          my $bprocid=$WfRec->{affectedbusinessprocessid};
@@ -1306,6 +1326,7 @@ sub getNotifyDestinations
                $emailto->{$email}++;
             }
          }
+         $self->addComplexAbos($emailto,$WfRec);
       }
       elsif ($WfRec->{eventmode} eq "EVk.infraloc"){ 
          my $locid=$WfRec->{affectedlocationid};
@@ -1326,6 +1347,7 @@ sub getNotifyDestinations
             $ia->LoadTargets($emailto,'base::grp',\'eventnotify',
                                       [keys(%allcustgrp)]);
          }
+         $self->addComplexAbos($emailto,$WfRec);
       }
       elsif ($WfRec->{eventmode} eq "EVk.free"){ 
       }
@@ -3182,12 +3204,12 @@ sub Process
          return(undef);
       }
 
-printf STDERR ("fifi emailto=%s\n",Dumper(\$emailto));
-printf STDERR ("fifi emailtext=%s\n",Dumper(\$emailtext));
-printf STDERR ("fifi rawterminstart=%s\n",Dumper(\$rawterminstart));
-printf STDERR ("fifi rawterminend=%s\n",Dumper(\$rawterminend));
-printf STDERR ("fifi tstart=%s\n",Dumper(\$tstart));
-printf STDERR ("fifi tend=%s\n",Dumper(\$tend));
+#printf STDERR ("fifi emailto=%s\n",Dumper(\$emailto));
+#printf STDERR ("fifi emailtext=%s\n",Dumper(\$emailtext));
+#printf STDERR ("fifi rawterminstart=%s\n",Dumper(\$rawterminstart));
+#printf STDERR ("fifi rawterminend=%s\n",Dumper(\$rawterminend));
+#printf STDERR ("fifi tstart=%s\n",Dumper(\$tstart));
+#printf STDERR ("fifi tend=%s\n",Dumper(\$tend));
 
       my $wf=getModuleObject($self->Config,"base::workflow");
       my %notiy;
